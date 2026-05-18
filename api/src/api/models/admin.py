@@ -1,0 +1,356 @@
+"""Admin / observability tables.
+
+These tables back the `/admin/system` superadmin dashboard. They're append-only
+event logs plus two configuration tables (RSS feeds, manual cost entries).
+
+Tables in this module:
+  - `usage_events`        — every paid API call (OpenAI, Gemini, Anthropic,
+                            Apify, YouTube) with token counts + cost in USD.
+                            Source for the "API costs" tab.
+  - `system_metrics`      — psutil snapshot rows captured by Celery beat
+                            every minute. Source for the CPU/mem/disk
+                            charts on the "Infra" tab.
+  - `ingest_runs`         — start/finish records for every Celery ingest
+                            task (per platform + the BERTopic re-cluster).
+                            Source for the "Pipeline health" tab.
+  - `rss_feeds`           — configurable list of mainstream news RSS URLs.
+                            Was a hardcoded dict in `services/rss.py`.
+  - `manual_costs`        — human-entered cost rows for non-API spend
+                            (VPS at IDCloudHost, domain renewal, etc).
+  - `page_views`          — every request to a Next.js page route, signed-in
+                            or anonymous. Source for the "Analytics" tab.
+
+All tables are write-heavy but read in aggregate, so we index on the time
+column + the natural filter (provider, platform, path). Retention isn't
+configured — at prototype scale a few months fits comfortably in Postgres.
+"""
+
+from datetime import datetime
+from uuid import UUID, uuid4
+
+from sqlalchemy import (
+    Boolean,
+    DateTime,
+    Float,
+    Index,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    text,
+)
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import Mapped, mapped_column
+
+from api.models.base import Base, TimestampMixin
+
+
+class UsageEvent(Base):
+    """One paid API call. Append-only — never updated after insert."""
+
+    __tablename__ = "usage_events"
+
+    id: Mapped[UUID] = mapped_column(
+        primary_key=True, default=uuid4, server_default=text("gen_random_uuid()")
+    )
+    occurred_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("now()"),
+        index=True,
+    )
+    provider: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    """One of: openai, gemini, anthropic, apify, youtube."""
+
+    model: Mapped[str | None] = mapped_column(String(128))
+    """Model name where applicable (`gpt-4o-mini`, `claude-sonnet-4-5`, …).
+    For Apify this is the actor id; for YouTube it's the endpoint."""
+
+    operation: Mapped[str] = mapped_column(String(64), nullable=False)
+    """High-level operation tag: `embedding`, `classify_relevance`,
+    `synth_brief`, `scrape`, `search`. Lets us group costs by feature."""
+
+    tokens_in: Mapped[int | None] = mapped_column(Integer)
+    tokens_out: Mapped[int | None] = mapped_column(Integer)
+    units: Mapped[int | None] = mapped_column(Integer)
+    """For non-token APIs (YouTube Data API uses 'quota units', Apify uses
+    'items processed'). One of (tokens_in/out, units) is set, not both."""
+
+    cost_usd: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+
+    meta: Mapped[dict | None] = mapped_column(JSONB)
+    """Free-form: actor run_id for Apify, request id for OpenAI, etc."""
+
+    __table_args__ = (
+        Index("ix_usage_events_provider_time", "provider", "occurred_at"),
+    )
+
+
+class SystemMetric(Base):
+    """One psutil snapshot — captured every minute by a Celery beat task."""
+
+    __tablename__ = "system_metrics"
+
+    id: Mapped[UUID] = mapped_column(
+        primary_key=True, default=uuid4, server_default=text("gen_random_uuid()")
+    )
+    captured_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("now()"),
+        index=True,
+    )
+    cpu_pct: Mapped[float] = mapped_column(Float, nullable=False)
+    """0-100. `psutil.cpu_percent(interval=1.0)` — wall-clock average over 1s."""
+
+    mem_used_mb: Mapped[float] = mapped_column(Float, nullable=False)
+    mem_total_mb: Mapped[float] = mapped_column(Float, nullable=False)
+
+    disk_used_gb: Mapped[float] = mapped_column(Float, nullable=False)
+    disk_total_gb: Mapped[float] = mapped_column(Float, nullable=False)
+
+    load_1m: Mapped[float | None] = mapped_column(Float)
+    """1-minute load average (UNIX). None on platforms without `getloadavg`."""
+
+
+class IngestRun(Base):
+    """Lifecycle record for one ingest task. Updated once at start, once at
+    finish. Used to populate the 'Pipeline health' tab and to flag stuck runs.
+    """
+
+    __tablename__ = "ingest_runs"
+
+    id: Mapped[UUID] = mapped_column(
+        primary_key=True, default=uuid4, server_default=text("gen_random_uuid()")
+    )
+    task_name: Mapped[str] = mapped_column(String(128), nullable=False)
+    platform: Mapped[str | None] = mapped_column(String(20), index=True)
+    """NULL for cross-platform tasks like `recluster_all`."""
+
+    status: Mapped[str] = mapped_column(String(20), nullable=False)
+    """One of: running, success, failed."""
+
+    started_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, index=True
+    )
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    items_scraped: Mapped[int | None] = mapped_column(Integer)
+    items_stored: Mapped[int | None] = mapped_column(Integer)
+    cost_usd: Mapped[float | None] = mapped_column(Float)
+
+    error: Mapped[str | None] = mapped_column(Text)
+
+
+class RssFeed(Base, TimestampMixin):
+    """One configurable RSS source for the `mainstream` ingest platform."""
+
+    __tablename__ = "rss_feeds"
+
+    id: Mapped[UUID] = mapped_column(
+        primary_key=True, default=uuid4, server_default=text("gen_random_uuid()")
+    )
+    name: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+    """Outlet name used as the post `author` (Kompas, Detik, …)."""
+
+    url: Mapped[str] = mapped_column(Text, nullable=False)
+    enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+
+    scope: Mapped[str] = mapped_column(
+        String(16), nullable=False, server_default=text("'national'"), index=True
+    )
+    """One of `national` or `regional`. Posts inherit this via `region`."""
+
+    region: Mapped[str | None] = mapped_column(String(32), index=True)
+    """Region code matching `UserProfile.location` (jabodetabek, jawa_barat,
+    …). Required when `scope = 'regional'`, NULL otherwise."""
+
+    fetch_body: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, server_default=text("true")
+    )
+    """When TRUE, the scraper follows each RSS item's `link` to extract the
+    full article body via trafilatura. **On by default** — most outlet RSS
+    ledes are too thin for the relevance classifier; flip OFF only when an
+    outlet's RSS body is already substantive enough or you need to cut
+    ingest time. Extra latency: ~5s per article fetch + 1s politeness per
+    same-host request."""
+
+    __table_args__ = (UniqueConstraint("name", name="uq_rss_feed_name"),)
+
+
+class ManualCost(Base, TimestampMixin):
+    """Human-entered cost line. Used for VPS + domain spend that we pay
+    flat-rate outside of any metered API."""
+
+    __tablename__ = "manual_costs"
+
+    id: Mapped[UUID] = mapped_column(
+        primary_key=True, default=uuid4, server_default=text("gen_random_uuid()")
+    )
+    kind: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    """One of: infra (monthly), domain (yearly), other."""
+
+    vendor: Mapped[str] = mapped_column(String(64), nullable=False)
+    """e.g. 'IDCloudHost', 'Niagahoster'."""
+
+    period_start: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    period_end: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    """Inclusive billing window."""
+
+    amount_idr: Mapped[float] = mapped_column(Float, nullable=False)
+    note: Mapped[str | None] = mapped_column(Text)
+
+
+class AppSetting(Base, TimestampMixin):
+    """Single-row-per-key config table for runtime-editable settings.
+
+    Currently used for the USD→IDR display rate (key=`usd_to_idr`). Kept as
+    text so future settings can land here without per-key migrations: parse
+    on read in `lib/settings.ts`.
+    """
+
+    __tablename__ = "app_settings"
+
+    key: Mapped[str] = mapped_column(String(64), primary_key=True)
+    value: Mapped[str] = mapped_column(Text, nullable=False)
+
+
+class Donation(Base, TimestampMixin):
+    """Human-entered donation receipt.
+
+    Counterpart of `ManualCost` on the income side. Surfaced on the public
+    `/transparency` page so the team can be open about money coming in.
+    Donor identity is shown only when `is_anonymous = False`.
+    """
+
+    __tablename__ = "donations"
+
+    id: Mapped[UUID] = mapped_column(
+        primary_key=True, default=uuid4, server_default=text("gen_random_uuid()")
+    )
+    received_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, index=True
+    )
+    amount_idr: Mapped[float] = mapped_column(Float, nullable=False)
+    donor: Mapped[str | None] = mapped_column(String(120))
+    """Donor's display name. NULL when anonymous or unknown."""
+
+    is_anonymous: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, server_default=text("false")
+    )
+    """When TRUE, the public page shows 'Anonymous' regardless of `donor`."""
+
+    channel: Mapped[str | None] = mapped_column(String(32))
+    """How the donation came in: bank_transfer / qris / cash / other."""
+
+    note: Mapped[str | None] = mapped_column(Text)
+
+
+class IngestQuery(Base, TimestampMixin):
+    """One scrape keyword for one platform.
+
+    The Celery rotating-ingest task pulls the least-recently-used row per
+    platform on each tick. This lets the team mix religious vocabulary
+    (e.g. `dakwah`, `khutbah`) with societal-concern queries (e.g. `pinjol`,
+    `mental health`) — letting the Gemini relevance classifier downstream
+    decide which surfaced posts are da'wah-worthy, instead of pre-filtering
+    in a religious bubble.
+    """
+
+    __tablename__ = "ingest_queries"
+
+    id: Mapped[UUID] = mapped_column(
+        primary_key=True, default=uuid4, server_default=text("gen_random_uuid()")
+    )
+    platform: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
+    """Platform this query runs against: x / instagram / tiktok / youtube."""
+
+    query: Mapped[str] = mapped_column(String(160), nullable=False)
+    """Raw query string. Hashtag prefixes (#) are added/stripped per platform
+    by the scraper wrappers — store the canonical word."""
+
+    category: Mapped[str | None] = mapped_column(String(32))
+    """Optional grouping label: religious / family / youth / muamalah /
+    social_justice / education / health / cultural / current_events. Purely
+    organizational — no behavior depends on it."""
+
+    enabled: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, server_default=text("true")
+    )
+
+    last_run_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        comment="Updated by the rotating task each time this query runs. "
+        "NULL = never used; picked first on next rotation.",
+    )
+
+    __table_args__ = (
+        UniqueConstraint("platform", "query", name="uq_ingest_query_platform"),
+        Index("ix_ingest_queries_platform_enabled", "platform", "enabled"),
+    )
+
+
+class ContactMessage(Base, TimestampMixin):
+    """Inbound message from the public /contact form.
+
+    Persisted so admins can see history even if the forwarded email gets
+    lost in spam. Surfaced at `/admin/system/inbox`.
+    """
+
+    __tablename__ = "contact_messages"
+
+    id: Mapped[UUID] = mapped_column(
+        primary_key=True, default=uuid4, server_default=text("gen_random_uuid()")
+    )
+    received_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("now()"),
+        index=True,
+    )
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    email: Mapped[str] = mapped_column(String(255), nullable=False)
+    """Reply-to address typed by the sender. We do not verify it; admin
+    replies via their own mail client + this field as the destination."""
+
+    subject: Mapped[str | None] = mapped_column(String(200))
+    message: Mapped[str] = mapped_column(Text, nullable=False)
+
+    status: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        server_default=text("'new'"),
+        index=True,
+    )
+    """One of: new, read, archived. Soft-state for the admin inbox."""
+
+
+class PageView(Base):
+    """One page render. Signed-in user OR anonymous session-cookie scoped."""
+
+    __tablename__ = "page_views"
+
+    id: Mapped[UUID] = mapped_column(
+        primary_key=True, default=uuid4, server_default=text("gen_random_uuid()")
+    )
+    occurred_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("now()"),
+        index=True,
+    )
+    path: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    """Stripped of locale prefix and query string — `/insights/x` not `/en/insights/x?q=…`."""
+
+    locale: Mapped[str | None] = mapped_column(String(8))
+    user_id: Mapped[UUID | None] = mapped_column()
+    """No FK on purpose: a deleted user shouldn't cascade-delete their history
+    (and we frequently scrub PII without dropping analytics)."""
+
+    session_id: Mapped[str | None] = mapped_column(String(64))
+    """Random ID set in an httpOnly cookie. Same value across a visitor's
+    session, never tied back to identity. Lets us count distinct visitors
+    without storing IPs."""
+
+    referer: Mapped[str | None] = mapped_column(Text)
+    user_agent: Mapped[str | None] = mapped_column(Text)

@@ -1,0 +1,104 @@
+[project]
+name = "api"
+version = "0.1.0"
+description = "DakwahLens backend — ingestion, ML pipeline, RAG, and brief generation"
+readme = "../README.md"
+authors = [
+    { name = "Taufik Adi Nugraha", email = "taufik.adinugraha@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    # Web
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "pydantic>=2.9.0",
+    "pydantic-settings>=2.6.0",
+
+    # DB
+    "sqlalchemy[asyncio]>=2.0.36",
+    "asyncpg>=0.30.0",
+    "psycopg2-binary>=2.9.10",  # sync driver for Alembic migrations
+    "alembic>=1.14.0",
+
+    # Auth
+    "pyjwt[crypto]>=2.10.0",
+    "email-validator>=2.2.0",
+
+    # Scrapers
+    "apify-client>=1.8.0",
+    "feedparser>=6.0.11",
+
+    # ML — IndoBERT sentiment (loaded once at module level)
+    "transformers>=4.45.0",
+    "torch>=2.4.0",
+
+    # Topic clustering — sentence-transformers gives us multilingual embeddings
+    # (good for ID+EN mixed posts) and BERTopic does UMAP+HDBSCAN+c-TF-IDF.
+    "sentence-transformers>=3.3.0",
+    "bertopic>=0.16.4",
+
+    # Queue
+    "celery[redis]>=5.4.0",
+    "redis>=5.2.0",
+
+    # Vector DB
+    "qdrant-client>=1.12.0",
+
+    # LLM / embeddings
+    "openai>=1.55.0",
+    "anthropic>=0.40.0",
+    "google-genai>=0.3.0",
+
+    # ML (added in week 3 but pinned now to lock versions)
+    # "transformers>=4.46.0",
+    # "torch>=2.5.0",
+
+    # Scraping / parsing
+    "httpx>=0.27.0",
+    "feedparser>=6.0.11",
+    "beautifulsoup4>=4.12.0",
+    "lxml>=5.3.0",
+    # Full-article body extraction for RSS items where the lede isn't enough
+    # to classify. Per-feed opt-in via `rss_feeds.fetch_body`.
+    "trafilatura>=1.12.0",
+
+    # Utils
+    "structlog>=24.4.0",
+    "python-multipart>=0.0.19",
+    "tenacity>=9.0.0",
+    "psutil>=6.1.0",
+    # Language detection for routing IndoBERT sentiment only at Indonesian
+    # text. Tiny pure-Python lib, ~3MB with all language profiles.
+    "langdetect>=1.0.9",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.8.0",
+    "mypy>=1.13.0",
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.24.0",
+    "httpx>=0.27.0",
+]
+
+[project.scripts]
+api = "api.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

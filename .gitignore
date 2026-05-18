@@ -1,0 +1,45 @@
+# Env
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Node
+node_modules/
+.next/
+out/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# OS / editor / Claude Code
+.DS_Store
+.vscode/
+.idea/
+*.swp
+.claude/settings.local.json
+
+# Local data
+data/
+*.sqlite
+*.db
+storage/
+
+# Logs
+*.log
+logs/
+
+# Build artifacts
+coverage/
+.turbo/

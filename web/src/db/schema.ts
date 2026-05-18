@@ -1,0 +1,542 @@
+/**
+ * Drizzle schema — mirrors the SQLAlchemy models in `api/src/api/models/`.
+ *
+ * Alembic is the source of truth for migrations. This file just reflects
+ * the existing tables for Auth.js + custom queries on the Next.js side.
+ * If you change a column here, also change it in the corresponding
+ * SQLAlchemy model + run `uv run alembic revision --autogenerate`.
+ */
+
+import {
+  pgTable,
+  text,
+  timestamp,
+  integer,
+  uuid,
+  primaryKey,
+  uniqueIndex,
+  index,
+  boolean,
+  jsonb,
+  doublePrecision,
+} from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+
+export const users = pgTable(
+  "users",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: text("name"),
+    email: text("email").notNull().unique(),
+    emailVerified: timestamp("email_verified", { withTimezone: true }),
+    image: text("image"),
+    passwordHash: text("password_hash"),
+    status: text("status").notNull().default("pending"),
+    role: text("role").notNull().default("user"),
+    profile: jsonb("profile").$type<UserProfile>(),
+    onboardedAt: timestamp("onboarded_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => [uniqueIndex("ix_users_email_unique").on(table.email)],
+);
+
+/**
+ * Shape of `users.profile` collected by the /onboarding wizard. Every
+ * preset-choice field has a paired `*_other` string for free-text overrides.
+ * All fields nullable so partial saves are valid.
+ */
+export type UserProfile = {
+  /** Preferred panggilan (Indonesian honorific). One of: ust, ustadzah,
+   *  hj, kh, prof, dr, drs, buya, habib, bapak, ibu, none, or "other". */
+  honorific?: string;
+  /** Free-text honorific when `honorific === "other"`. Also keeps abbreviation. */
+  honorific_other?: string;
+  age_range?: string;
+  age_range_other?: string;
+  location?: string;
+  location_other?: string;
+  profession?: string;
+  profession_other?: string;
+  audience?: string[];
+  audience_other?: string;
+  focus?: string[];
+  output_lang?: string;
+};
+
+export const accounts = pgTable(
+  "accounts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: text("type").notNull(),
+    provider: text("provider").notNull(),
+    providerAccountId: text("provider_account_id").notNull(),
+    refresh_token: text("refresh_token"),
+    access_token: text("access_token"),
+    expires_at: integer("expires_at"),
+    token_type: text("token_type"),
+    scope: text("scope"),
+    id_token: text("id_token"),
+    session_state: text("session_state"),
+  },
+  (table) => [
+    index("ix_accounts_user_id").on(table.userId),
+    uniqueIndex("uq_account_provider").on(
+      table.provider,
+      table.providerAccountId,
+    ),
+  ],
+);
+
+export const verificationTokens = pgTable(
+  "verification_tokens",
+  {
+    identifier: text("identifier").notNull(),
+    token: text("token").notNull(),
+    expires: timestamp("expires", { withTimezone: true }).notNull(),
+  },
+  (table) => [
+    primaryKey({
+      columns: [table.identifier, table.token],
+      name: "pk_verification_token",
+    }),
+  ],
+);
+
+export const organizations = pgTable(
+  "organizations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    slug: text("slug").notNull().unique(),
+    name: text("name").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => [uniqueIndex("ix_organizations_slug_unique").on(table.slug)],
+);
+
+export const orgMembers = pgTable(
+  "org_members",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    role: text("role").notNull().default("member"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => [
+    index("ix_org_members_user_id").on(table.userId),
+    index("ix_org_members_org_id").on(table.orgId),
+    uniqueIndex("uq_org_member").on(table.userId, table.orgId),
+  ],
+);
+
+export const briefs = pgTable(
+  "briefs",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    orgId: uuid("org_id").references(() => organizations.id, {
+      onDelete: "set null",
+    }),
+    topicTitle: text("topic_title").notNull(),
+    segment: text("segment").notNull(),
+    tone: text("tone").notNull(),
+    locale: text("locale").notNull().default("en"),
+    isPlaceholder: boolean("is_placeholder").notNull().default(true),
+    content: jsonb("content").notNull().$type<BriefContent>(),
+    status: text("status").notNull().default("draft"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => [
+    index("ix_briefs_user_id").on(table.userId),
+    index("ix_briefs_org_id").on(table.orgId),
+  ],
+);
+
+export type BriefDaleel = {
+  surah: number;
+  ayah: number;
+  arabic: string;
+  translation: string;
+  /** Citation string, e.g. "QS. An-Nahl: 125" or "Qur'an, An-Nahl 16:125". */
+  source: string;
+  /** Where this daleel came from — Qdrant semantic search or keyword fallback. */
+  retrieval_source?: "qdrant" | "keyword";
+  /** Cosine similarity score from Qdrant (0–1). Undefined for keyword fallback. */
+  retrieval_score?: number;
+};
+
+export type BriefContent = {
+  situation_summary: string;
+  issue_analysis: string;
+  audience_segmentation: {
+    primary: string;
+    perception: string;
+    angle: string;
+  };
+  daleel: BriefDaleel[];
+  recommendations: string[];
+  content_templates: {
+    khutbah_outline: string;
+    social_caption: string;
+  };
+};
+
+/**
+ * Mirror of the SQLAlchemy `SocialPost` model. The Python side owns the
+ * canonical schema (Alembic migrations); this Drizzle table just lets the
+ * Next.js server side read what the ingestion pipeline writes.
+ */
+export const socialPosts = pgTable(
+  "social_posts",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    platform: text("platform").notNull(),
+    externalId: text("external_id").notNull(),
+    author: text("author"),
+    url: text("url"),
+    text: text("text").notNull(),
+    language: text("language"),
+    postedAt: timestamp("posted_at", { withTimezone: true }),
+    rawPayload: jsonb("raw_payload"),
+
+    // Sentiment (IndoBERT)
+    sentimentLabel: text("sentiment_label"),
+    sentimentScore: doublePrecision("sentiment_score"),
+
+    // Relevance (Gemini Flash-Lite, 9-category)
+    dawahRelevance: doublePrecision("dawah_relevance"),
+    categories: jsonb("categories").$type<Record<string, number>>(),
+
+    // Cluster assignment from the latest BERTopic run (FK to `topics.id`).
+    topicId: uuid("topic_id"),
+
+    // Region code for mainstream regional outlets — NULL for national /
+    // non-mainstream platforms. Mirrors `UserProfile.location`.
+    region: text("region"),
+
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => [
+    index("ix_social_posts_platform").on(table.platform),
+    index("ix_social_posts_relevance").on(table.dawahRelevance),
+    index("ix_social_posts_topic_id").on(table.topicId),
+    index("ix_social_posts_platform_region").on(table.platform, table.region),
+    uniqueIndex("uq_social_post_platform_external").on(
+      table.platform,
+      table.externalId,
+    ),
+  ],
+);
+
+/**
+ * BERTopic-discovered clusters per platform. Refreshed in batch by
+ * `cluster_topics.py`. Each topic has a `label` (joined keywords) and a
+ * `keywords[]` array used for richer rendering on the insights page.
+ */
+export const topics = pgTable(
+  "topics",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    platform: text("platform").notNull(),
+    clusterId: integer("cluster_id").notNull(),
+    label: text("label").notNull(),
+    keywords: text("keywords").array().notNull(),
+    postCount: integer("post_count").notNull().default(0),
+    firstSeen: timestamp("first_seen", { withTimezone: true }),
+    lastSeen: timestamp("last_seen", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => [
+    index("ix_topics_platform").on(table.platform),
+    index("ix_topics_platform_postcount").on(table.platform, table.postCount),
+  ],
+);
+
+/**
+ * Admin / observability mirrors. Source of truth is
+ * `api/src/api/models/admin.py` — keep columns aligned.
+ */
+export const usageEvents = pgTable(
+  "usage_events",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    occurredAt: timestamp("occurred_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    provider: text("provider").notNull(),
+    model: text("model"),
+    operation: text("operation").notNull(),
+    tokensIn: integer("tokens_in"),
+    tokensOut: integer("tokens_out"),
+    units: integer("units"),
+    costUsd: doublePrecision("cost_usd").notNull().default(0),
+    meta: jsonb("meta"),
+  },
+  (table) => [
+    index("ix_usage_events_occurred_at").on(table.occurredAt),
+    index("ix_usage_events_provider").on(table.provider),
+    index("ix_usage_events_provider_time").on(table.provider, table.occurredAt),
+  ],
+);
+
+export const systemMetrics = pgTable(
+  "system_metrics",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    capturedAt: timestamp("captured_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    cpuPct: doublePrecision("cpu_pct").notNull(),
+    memUsedMb: doublePrecision("mem_used_mb").notNull(),
+    memTotalMb: doublePrecision("mem_total_mb").notNull(),
+    diskUsedGb: doublePrecision("disk_used_gb").notNull(),
+    diskTotalGb: doublePrecision("disk_total_gb").notNull(),
+    load1m: doublePrecision("load_1m"),
+  },
+  (table) => [index("ix_system_metrics_captured_at").on(table.capturedAt)],
+);
+
+export const ingestRuns = pgTable(
+  "ingest_runs",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    taskName: text("task_name").notNull(),
+    platform: text("platform"),
+    status: text("status").notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+    finishedAt: timestamp("finished_at", { withTimezone: true }),
+    itemsScraped: integer("items_scraped"),
+    itemsStored: integer("items_stored"),
+    costUsd: doublePrecision("cost_usd"),
+    error: text("error"),
+  },
+  (table) => [
+    index("ix_ingest_runs_platform").on(table.platform),
+    index("ix_ingest_runs_started_at").on(table.startedAt),
+  ],
+);
+
+export const rssFeeds = pgTable(
+  "rss_feeds",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    name: text("name").notNull().unique(),
+    url: text("url").notNull(),
+    enabled: boolean("enabled").notNull().default(true),
+    /** "national" or "regional". Defaults to "national" for back-compat. */
+    scope: text("scope").notNull().default("national"),
+    /** One of the 8 onboarding region codes when scope = regional. NULL otherwise. */
+    region: text("region"),
+    /** When true, follow each item's `link` and extract the article body
+     *  via trafilatura. On by default — adds ~5s + 1s/host politeness per
+     *  article, but RSS ledes alone are usually too thin for the classifier. */
+    fetchBody: boolean("fetch_body").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => [
+    index("ix_rss_feeds_scope").on(table.scope),
+    index("ix_rss_feeds_region").on(table.region),
+  ],
+);
+
+export const manualCosts = pgTable(
+  "manual_costs",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    kind: text("kind").notNull(),
+    vendor: text("vendor").notNull(),
+    periodStart: timestamp("period_start", { withTimezone: true }).notNull(),
+    periodEnd: timestamp("period_end", { withTimezone: true }).notNull(),
+    amountIdr: doublePrecision("amount_idr").notNull(),
+    note: text("note"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => [index("ix_manual_costs_kind").on(table.kind)],
+);
+
+/**
+ * Single-row-per-key runtime settings. First citizen: `usd_to_idr` —
+ * editable from the superadmin overview page so the team can update FX
+ * without a redeploy.
+ */
+export const appSettings = pgTable("app_settings", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .default(sql`now()`),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .default(sql`now()`),
+});
+
+/**
+ * Income side of the ledger. Counterpart to `manualCosts`. Shown publicly
+ * on `/transparency` (anonymized when `isAnonymous` is true).
+ */
+export const donations = pgTable(
+  "donations",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    receivedAt: timestamp("received_at", { withTimezone: true }).notNull(),
+    amountIdr: doublePrecision("amount_idr").notNull(),
+    donor: text("donor"),
+    isAnonymous: boolean("is_anonymous").notNull().default(false),
+    channel: text("channel"),
+    note: text("note"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => [index("ix_donations_received_at").on(table.receivedAt)],
+);
+
+/**
+ * Inbound contact form submissions. Surfaced at /admin/system/inbox.
+ */
+/**
+ * Per-platform scrape keywords. The Celery rotating-ingest task pulls the
+ * least-recently-used enabled row per platform on each tick. Editable from
+ * /admin/system/queries so the team can mix religious + societal terms
+ * without redeploys.
+ */
+export const ingestQueries = pgTable(
+  "ingest_queries",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    platform: text("platform").notNull(),
+    query: text("query").notNull(),
+    category: text("category"),
+    enabled: boolean("enabled").notNull().default(true),
+    lastRunAt: timestamp("last_run_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => [
+    index("ix_ingest_queries_platform").on(table.platform),
+    index("ix_ingest_queries_platform_enabled").on(
+      table.platform,
+      table.enabled,
+    ),
+    uniqueIndex("uq_ingest_query_platform").on(table.platform, table.query),
+  ],
+);
+
+export const contactMessages = pgTable(
+  "contact_messages",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    receivedAt: timestamp("received_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    name: text("name").notNull(),
+    email: text("email").notNull(),
+    subject: text("subject"),
+    message: text("message").notNull(),
+    /** new / read / archived */
+    status: text("status").notNull().default("new"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => [
+    index("ix_contact_messages_received_at").on(table.receivedAt),
+    index("ix_contact_messages_status").on(table.status),
+  ],
+);
+
+export const pageViews = pgTable(
+  "page_views",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    occurredAt: timestamp("occurred_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    path: text("path").notNull(),
+    locale: text("locale"),
+    userId: uuid("user_id"),
+    sessionId: text("session_id"),
+    referer: text("referer"),
+    userAgent: text("user_agent"),
+  },
+  (table) => [
+    index("ix_page_views_occurred_at").on(table.occurredAt),
+    index("ix_page_views_path").on(table.path),
+  ],
+);
+
+export type User = typeof users.$inferSelect;
+export type Account = typeof accounts.$inferSelect;
+export type Organization = typeof organizations.$inferSelect;
+export type Brief = typeof briefs.$inferSelect;
+export type SocialPost = typeof socialPosts.$inferSelect;
+export type Topic = typeof topics.$inferSelect;
+export type UsageEvent = typeof usageEvents.$inferSelect;
+export type SystemMetric = typeof systemMetrics.$inferSelect;
+export type IngestRun = typeof ingestRuns.$inferSelect;
+export type RssFeed = typeof rssFeeds.$inferSelect;
+export type ManualCost = typeof manualCosts.$inferSelect;
+export type PageView = typeof pageViews.$inferSelect;
+export type AppSetting = typeof appSettings.$inferSelect;
+export type Donation = typeof donations.$inferSelect;
+export type ContactMessage = typeof contactMessages.$inferSelect;
+export type IngestQuery = typeof ingestQueries.$inferSelect;
