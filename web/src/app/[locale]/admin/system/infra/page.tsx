@@ -45,7 +45,7 @@ export default async function InfraPage() {
       <HelpCallout>
         <p>
           A Celery beat task (<code>snapshot_system</code>) runs{" "}
-          <code>psutil.cpu_percent / virtual_memory / disk_usage("/")</code>{" "}
+          <code>psutil.cpu_percent / virtual_memory / disk_usage(&quot;/&quot;)</code>{" "}
           every 60 seconds and writes the result to <code>system_metrics</code>.
           If you see <em>no data</em>, start the Celery worker with the{" "}
           <code>-B</code> flag:
@@ -56,7 +56,7 @@ export default async function InfraPage() {
         <p className="mt-2">
           For production VPS monitoring, this snapshot reflects the box
           Celery is running on — point it at your IDCloudHost VPS and the
-          metrics here are what you'd see in <code>htop</code>.
+          metrics here are what you&apos;d see in <code>htop</code>.
         </p>
       </HelpCallout>
 

@@ -83,7 +83,7 @@ export function AddFeedForm({
           Fetch full article body for each item
           <span className="ml-2 text-slate-500">
             (on by default — adds ~5s/item + 1s/host politeness; uncheck if
-            the outlet's RSS lede is already enough)
+            the outlet&apos;s RSS lede is already enough)
           </span>
         </span>
       </label>
