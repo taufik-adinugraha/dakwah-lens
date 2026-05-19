@@ -75,9 +75,11 @@ jobs:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
-          # 20 min ceiling — first build can take 8 min (Python ML wheels),
-          # subsequent builds 1-2 min with layer cache. 20 leaves headroom.
-          command_timeout: 20m
+          # 45 min ceiling. The COLD first build pulls ~3 GB of CPU-only
+          # PyTorch + transformers + bertopic wheels and that alone can
+          # eat 20 min on a small VM. Warm rebuilds finish in 1-2 min
+          # because layer cache hits. 45 leaves slack for the worst case.
+          command_timeout: 45m
           script: |
             set -euo pipefail
             bash /srv/dakwah-lens/repo/deploy/deploy.sh
