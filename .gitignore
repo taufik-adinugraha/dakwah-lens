@@ -32,6 +32,10 @@ venv/
 
 # Local data
 data/
+# …except for the seeded mock-data module used by web components.
+# The bare `data/` rule above otherwise eats web/src/data/ on this checkout.
+!web/src/data/
+!web/src/data/**
 *.sqlite
 *.db
 storage/

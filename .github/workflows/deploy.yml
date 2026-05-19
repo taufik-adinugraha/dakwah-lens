@@ -36,13 +36,19 @@ jobs:
         working-directory: web
         run: npm ci --prefer-offline --no-audit
 
-      - name: Web — typecheck
-        working-directory: web
-        run: npx tsc --noEmit
-
       - name: Web — lint
         working-directory: web
         run: npx eslint .
+
+      # `next build` is the canonical typecheck for App Router projects —
+      # `PageProps`/`LayoutProps` globals are only emitted into
+      # `.next/types/` during build, so a bare `tsc --noEmit` reports them
+      # as undefined. Building also catches runtime config issues (CSS
+      # extraction, route grouping, server/client boundary slips) that
+      # tsc alone would miss.
+      - name: Web — build (typecheck + bundle)
+        working-directory: web
+        run: npm run build
 
       - uses: astral-sh/setup-uv@v3
         with:
