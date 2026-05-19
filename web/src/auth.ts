@@ -126,29 +126,31 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
-  callbacks: {
-    async signIn({ user, account }) {
-      // For Google sign-in, auto-bootstrap roles by env. SUPERADMIN_EMAIL
-      // wins over ADMIN_EMAIL if the same address is in both.
-      if (account?.provider === "google" && user.email) {
-        const email = user.email.toLowerCase();
-        const superEmail = process.env.SUPERADMIN_EMAIL?.toLowerCase();
-        const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase();
-        const targetRole =
-          superEmail && email === superEmail
-            ? "superadmin"
-            : adminEmail && email === adminEmail
-              ? "admin"
-              : null;
-        if (targetRole) {
-          await db
-            .update(schema.users)
-            .set({ status: "approved", role: targetRole })
-            .where(eq(schema.users.email, user.email));
-        }
-      }
-      return true;
+  events: {
+    // Fires AFTER the adapter has inserted a new user row — so the
+    // UPDATE below actually matches a row (the previous attempt did
+    // the bootstrap in `signIn`, which runs *before* the adapter
+    // creates the row, and silently updated zero rows on first
+    // sign-up).
+    async createUser({ user }) {
+      if (!user.email) return;
+      const email = user.email.toLowerCase();
+      const superEmail = process.env.SUPERADMIN_EMAIL?.toLowerCase();
+      const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase();
+      const targetRole =
+        superEmail && email === superEmail
+          ? "superadmin"
+          : adminEmail && email === adminEmail
+            ? "admin"
+            : null;
+      if (!targetRole) return;
+      await db
+        .update(schema.users)
+        .set({ status: "approved", role: targetRole })
+        .where(eq(schema.users.email, email));
     },
+  },
+  callbacks: {
     async jwt({ token, user }) {
       // First sign-in: seed the JWT from the User row so the DB-refresh
       // step below has sensible defaults if it somehow can't find the row.
