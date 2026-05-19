@@ -91,6 +91,20 @@ api = "api.cli:main"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+# ─── uv: CPU-only PyTorch ────────────────────────────────────────────
+# Default `torch` wheels on PyPI bundle CUDA libs (~750 MB per wheel),
+# which we'll NEVER use on the CPU-only IDCloudHost VM. The CPU index
+# at download.pytorch.org publishes ~200 MB wheels with the same Python
+# API. Saves ~3 GB across image + cache, and shaves several minutes
+# off the build (smaller download + faster layer export).
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
 [tool.ruff]
 line-length = 100
 target-version = "py312"
