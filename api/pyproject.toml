@@ -2,7 +2,10 @@
 name = "api"
 version = "0.1.0"
 description = "DakwahLens backend — ingestion, ML pipeline, RAG, and brief generation"
-readme = "../README.md"
+# No `readme` field — the root README lives at ../README.md from this
+# file's location, which doesn't resolve inside the Docker build where
+# only `api/` is copied. We don't publish to PyPI either, so the field
+# is metadata-only and safe to omit.
 authors = [
     { name = "Taufik Adi Nugraha", email = "taufik.adinugraha@gmail.com" }
 ]
