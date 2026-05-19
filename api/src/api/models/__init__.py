@@ -19,7 +19,7 @@ from api.models.auth import (
 )
 from api.models.base import Base, TimestampMixin
 from api.models.briefs import Brief
-from api.models.orgs import OrgMember, OrgRole, Organization
+from api.models.orgs import Organization, OrgMember, OrgRole
 from api.models.social import Platform, SentimentLabel, SocialPost
 from api.models.topics import Topic
 

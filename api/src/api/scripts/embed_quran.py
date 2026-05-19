@@ -200,7 +200,7 @@ def main() -> None:
     print(f"Qdrant collection `{COLLECTION}` is ready.")
     print(f"  URL          : {settings.qdrant_url}")
     print(f"  Vector dim   : {VECTOR_DIM}")
-    print(f"  Distance     : cosine")
+    print("  Distance     : cosine")
     print(f"  Sample point : id={ids[0]}, surah={payloads[0]['surah']}, ayah={payloads[0]['ayah']}")
 
 

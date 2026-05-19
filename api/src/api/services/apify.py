@@ -33,6 +33,7 @@ depends on the specific actor's pricing curve at the time of the run.
 
 from __future__ import annotations
 
+import os as _os
 from dataclasses import dataclass
 from typing import Any
 
@@ -50,7 +51,6 @@ log = structlog.get_logger()
 #   APIFY_ACTOR_X=apify/twitter-scraper-lite
 # to swap without code changes. Some actors are paid-plan-gated by their
 # authors; pick a free-plan-compatible one for prototype use.
-import os as _os
 
 DEFAULT_ACTORS: dict[str, str] = {
     "x": _os.environ.get("APIFY_ACTOR_X", "apidojo/tweet-scraper"),

@@ -1,6 +1,6 @@
 """Multi-tenant organization models."""
 
-from enum import Enum
+from enum import StrEnum
 from uuid import UUID, uuid4
 
 from sqlalchemy import ForeignKey, String, UniqueConstraint, text
@@ -10,7 +10,7 @@ from api.models.auth import User
 from api.models.base import Base, TimestampMixin
 
 
-class OrgRole(str, Enum):
+class OrgRole(StrEnum):
     owner = "owner"
     admin = "admin"
     member = "member"

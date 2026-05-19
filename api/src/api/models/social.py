@@ -13,7 +13,7 @@ Per PRD §05 / §08 the post flows through this lifecycle:
 """
 
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import UUID, uuid4
 
@@ -33,7 +33,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from api.models.base import Base, TimestampMixin
 
 
-class Platform(str, Enum):
+class Platform(StrEnum):
     """Recognised content sources. Stored as plain text; this enum is for code."""
 
     x = "x"
@@ -44,7 +44,7 @@ class Platform(str, Enum):
     mainstream = "mainstream"
 
 
-class SentimentLabel(str, Enum):
+class SentimentLabel(StrEnum):
     positive = "positive"
     neutral = "neutral"
     negative = "negative"

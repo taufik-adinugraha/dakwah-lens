@@ -6,10 +6,9 @@ both Drizzle (on the Next.js side, for OAuth account creation) and SQLAlchemy
 """
 
 from datetime import datetime
-from enum import Enum
-from uuid import UUID, uuid4
-
+from enum import StrEnum
 from typing import Any
+from uuid import UUID, uuid4
 
 from sqlalchemy import (
     DateTime,
@@ -19,7 +18,6 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
-    func,
     text,
 )
 from sqlalchemy.dialects.postgresql import JSONB
@@ -28,7 +26,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from api.models.base import Base, TimestampMixin
 
 
-class UserStatus(str, Enum):
+class UserStatus(StrEnum):
     """Account approval status — every new signup starts as `pending`."""
 
     pending = "pending"
@@ -37,7 +35,7 @@ class UserStatus(str, Enum):
     blocked = "blocked"
 
 
-class UserRole(str, Enum):
+class UserRole(StrEnum):
     user = "user"
     admin = "admin"
     superadmin = "superadmin"
@@ -59,8 +57,12 @@ class User(Base, TimestampMixin):
     password_hash: Mapped[str | None] = mapped_column(Text)
 
     # Approval workflow — see §12 in the PRD.
-    status: Mapped[str] = mapped_column(String(20), default=UserStatus.pending.value, nullable=False)
-    role: Mapped[str] = mapped_column(String(20), default=UserRole.user.value, nullable=False)
+    status: Mapped[str] = mapped_column(
+        String(20), default=UserStatus.pending.value, nullable=False
+    )
+    role: Mapped[str] = mapped_column(
+        String(20), default=UserRole.user.value, nullable=False
+    )
 
     # ── Onboarding profile ─────────────────────────────────────────
     # Collected by the post-signup wizard at /onboarding. JSONB so we can

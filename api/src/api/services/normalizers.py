@@ -16,8 +16,9 @@ that needs touching.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from typing import Any, Callable
+from collections.abc import Callable
+from datetime import UTC, datetime
+from typing import Any
 
 NormalizerFn = Callable[[dict[str, Any]], dict[str, Any] | None]
 
@@ -27,11 +28,11 @@ def _to_datetime(value: Any) -> datetime | None:
     if value is None:
         return None
     if isinstance(value, datetime):
-        return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
+        return value if value.tzinfo else value.replace(tzinfo=UTC)
     if isinstance(value, int | float):
         # Unix epoch seconds.
         try:
-            return datetime.fromtimestamp(value, tz=timezone.utc)
+            return datetime.fromtimestamp(value, tz=UTC)
         except (OverflowError, OSError, ValueError):
             return None
     if isinstance(value, str):
@@ -317,10 +318,10 @@ def normalize_mainstream(item: dict[str, Any]) -> dict[str, Any] | None:
     if parsed is not None:
         try:
             import calendar
-            from datetime import datetime, timezone
+            from datetime import datetime
 
             posted_at = datetime.fromtimestamp(
-                calendar.timegm(parsed), tz=timezone.utc
+                calendar.timegm(parsed), tz=UTC
             )
         except (TypeError, ValueError, OverflowError):
             posted_at = None
