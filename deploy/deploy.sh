@@ -58,7 +58,13 @@ say "▶ docker build (this may take 3–8 min on first run)"
 # `--pull` ensures base images (node:22-alpine, python:3.12-slim) are
 # refreshed weekly enough — security patches matter. Builds use cached
 # layers so incremental builds are 30–60s.
-$COMPOSE build --pull web api
+#
+# Build ALL services — worker and beat reuse api/Dockerfile but
+# compose tags each service's image separately. If we built only web+api
+# the worker image would stale-out and silently run old code after
+# `up -d` reused the existing image. (We learned this the hard way:
+# scraper fixes landed in api but worker kept the asyncio loop bug.)
+$COMPOSE build --pull web api worker beat
 
 # 3. Bring up data services so step 4 has something to migrate against ──
 say "▶ starting postgres/qdrant/redis (idempotent if already up)"
