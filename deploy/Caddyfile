@@ -1,0 +1,20 @@
+{
+    email admin@batiinvestasi.ai
+}
+
+dakwah-lens.id, www.dakwah-lens.id {
+    encode gzip zstd
+
+    # Single upstream — Next.js owns every public route, including
+    # /api/auth/* (NextAuth) and /api/admin/attachments/* (uploads).
+    # FastAPI is reachable only inside the dakwah docker network at
+    # http://api:8000 (the web service calls it directly).
+    reverse_proxy localhost:3000
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        -Server
+    }
+}

@@ -88,7 +88,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           .where(eq(schema.users.email, email.toLowerCase()))
           .limit(1);
 
-        if (!user || !user.passwordHash) return null;
+        // Differentiate "no account" vs "wrong password" so the UI can
+        // nudge the user to sign up instead of guessing passwords. The
+        // security tradeoff (account enumeration) is mitigated by the
+        // rate limit on signinAction (5 per IP per 5 min).
+        if (!user) {
+          throw new CredentialsSignin("email_not_registered");
+        }
+        // Existing user but no passwordHash → they signed up via Google
+        // and never set a password. Send them to the Google button.
+        if (!user.passwordHash) {
+          throw new CredentialsSignin("oauth_only_account");
+        }
 
         const ok = await compare(password, user.passwordHash);
         if (!ok) return null;

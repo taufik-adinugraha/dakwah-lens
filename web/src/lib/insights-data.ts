@@ -284,3 +284,151 @@ export async function getPlatformInsights(
     })),
   };
 }
+
+/* ──────────────────────────────────────────────────────────────────
+ * Cross-platform overview used by the public `/insights` landing.
+ *
+ * Same shape ideas as the per-platform queries but aggregated over
+ * every platform with no scope filter. Returns `null` when the
+ * pipeline hasn't ingested anything yet so the page can render an
+ * empty state without inventing numbers.
+ * ────────────────────────────────────────────────────────────────── */
+export type OverviewInsights = {
+  totalPosts: number;
+  classifiedPosts: number;
+  sentimentMix: { positive: number; neutral: number; negative: number };
+  /** Sum of per-post category scores across all platforms. */
+  categoryTotals: Record<string, number>;
+  /** Post count per dominant da'wah category. Sorted desc. */
+  dominantCategories: Array<{ category: string; posts: number }>;
+  /** Top BERTopic-discovered topics across platforms. */
+  trendingTopics: Array<{
+    id: string;
+    label: string;
+    platform: string;
+    keywords: string[];
+    postCount: number;
+  }>;
+};
+
+export async function getOverviewInsights(): Promise<OverviewInsights | null> {
+  const [{ totalPosts = 0 } = { totalPosts: 0 }] = (await db
+    .select({ totalPosts: count() })
+    .from(schema.socialPosts)) as Array<{ totalPosts: number }>;
+
+  if (totalPosts === 0) return null;
+
+  const [{ classifiedPosts = 0 } = { classifiedPosts: 0 }] = (await db
+    .select({ classifiedPosts: count() })
+    .from(schema.socialPosts)
+    .where(isNotNull(schema.socialPosts.sentimentLabel))) as Array<{
+    classifiedPosts: number;
+  }>;
+
+  // Sentiment mix — same shape as per-platform, just no WHERE clause.
+  const sentimentRows = (await db
+    .select({
+      label: schema.socialPosts.sentimentLabel,
+      n: count(),
+    })
+    .from(schema.socialPosts)
+    .groupBy(schema.socialPosts.sentimentLabel)) as Array<{
+    label: string | null;
+    n: number;
+  }>;
+  const sentimentMix = { positive: 0, neutral: 0, negative: 0 };
+  for (const row of sentimentRows) {
+    if (row.label === "positive") sentimentMix.positive = row.n;
+    else if (row.label === "negative") sentimentMix.negative = row.n;
+    else if (row.label === "neutral") sentimentMix.neutral = row.n;
+  }
+
+  const CATEGORIES = [
+    "aqidah",
+    "akhlaq",
+    "muamalah",
+    "social_justice",
+    "family",
+    "youth",
+    "education",
+    "economic_ethics",
+    "health",
+  ] as const;
+  type CatKey = (typeof CATEGORIES)[number];
+
+  // Sum of per-post per-category scores — gives "collective attention"
+  // weight per da'wah category across the whole corpus.
+  const categorySums = (await db
+    .select({
+      ...Object.fromEntries(
+        CATEGORIES.map((cat) => [
+          cat,
+          sql<number>`COALESCE(SUM((categories ->> ${cat})::numeric), 0)`,
+        ]),
+      ),
+    })
+    .from(schema.socialPosts)
+    .where(isNotNull(schema.socialPosts.categories))) as Array<
+    Record<CatKey, number>
+  >;
+  const categoryTotals: Record<string, number> = {};
+  for (const cat of CATEGORIES) {
+    categoryTotals[cat] = Number(categorySums[0]?.[cat] ?? 0);
+  }
+
+  // Dominant-category bucketing — for each post, find the category with
+  // the highest score in its `categories` JSONB; count posts per dominant.
+  // Encapsulated in raw SQL because Postgres has no "argmax over jsonb keys"
+  // shortcut.
+  const dominantRows = (await db.execute(sql`
+    SELECT dominant AS category, count(*)::int AS posts
+    FROM (
+      SELECT (
+        SELECT key
+        FROM jsonb_each_text(categories)
+        WHERE key = ANY (ARRAY[${sql.raw(
+          CATEGORIES.map((c) => `'${c}'`).join(","),
+        )}])
+        ORDER BY value::numeric DESC
+        LIMIT 1
+      ) AS dominant
+      FROM social_posts
+      WHERE categories IS NOT NULL
+    ) sub
+    WHERE dominant IS NOT NULL
+    GROUP BY dominant
+    ORDER BY posts DESC
+  `)) as unknown as { rows: Array<{ category: string; posts: number }> };
+  const dominantCategories = (dominantRows.rows ?? []).map((r) => ({
+    category: r.category,
+    posts: r.posts,
+  }));
+
+  // Top trending topics across all platforms — highest postCount first.
+  const trendingTopics = await db
+    .select({
+      id: schema.topics.id,
+      label: schema.topics.label,
+      platform: schema.topics.platform,
+      keywords: schema.topics.keywords,
+      postCount: schema.topics.postCount,
+    })
+    .from(schema.topics)
+    .orderBy(desc(schema.topics.postCount))
+    .limit(5);
+
+  return {
+    totalPosts,
+    classifiedPosts,
+    sentimentMix,
+    categoryTotals,
+    dominantCategories,
+    trendingTopics: trendingTopics.map((t) => ({
+      id: t.id,
+      label: t.label,
+      platform: t.platform,
+      keywords: t.keywords ?? [],
+      postCount: t.postCount,
+    })),
+  };
+}

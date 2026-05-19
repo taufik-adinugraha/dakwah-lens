@@ -460,13 +460,20 @@ export async function signinAction(
     // Unreachable on success — signIn throws the redirect.
   } catch (error) {
     if (error instanceof AuthError) {
-      // The `authorize` callback throws `CredentialsSignin("email_unverified")`
-      // when the password matches but emailVerified is NULL. Auth.js exposes
-      // that on `.code`.
+      // The authorize callback in auth.ts throws CredentialsSignin
+      // with a distinct `.code` for each failure mode so the UI can
+      // surface a useful message instead of one generic "invalid".
       const code = (error as AuthError & { code?: string }).code;
       if (code === "email_unverified") {
         return { ok: false, error: "error_email_unverified" };
       }
+      if (code === "email_not_registered") {
+        return { ok: false, error: "error_email_not_registered" };
+      }
+      if (code === "oauth_only_account") {
+        return { ok: false, error: "error_oauth_only_account" };
+      }
+      // Wrong password (authorize returned null) falls through to here.
       return { ok: false, error: "error_invalid_credentials" };
     }
     // NEXT_REDIRECT and similar framework errors must propagate.

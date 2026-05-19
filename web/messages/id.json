@@ -1098,6 +1098,8 @@
     "footer_signup_link": "Masuk",
     "back_home": "Kembali ke beranda",
     "error_invalid_credentials": "Email atau password salah.",
+    "error_email_not_registered": "Email ini belum terdaftar. Silakan buat akun dulu.",
+    "error_oauth_only_account": "Akun ini terdaftar via Google. Silakan masuk dengan tombol Google di atas.",
     "error_email_taken": "Email ini sudah terdaftar. Coba masuk.",
     "error_rate_limited": "Terlalu banyak percobaan. Mohon tunggu beberapa menit sebelum mencoba lagi.",
     "error_invalid_email": "Silakan masukkan email yang valid.",

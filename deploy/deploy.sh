@@ -40,6 +40,19 @@ git fetch --quiet origin main
 git reset --hard origin/main
 say "   at $(git rev-parse --short HEAD): $(git log -1 --pretty=%s)"
 
+# 1.5 Sync Caddy config ────────────────────────────────────────
+# Caddyfile lives in deploy/ inside the repo so a fresh-VM provision
+# automatically gets the right routing. We use `install` (not cp) and
+# whitelist this exact invocation in /etc/sudoers.d/deploy so the
+# deploy user can write to /etc/caddy/ without full sudo.
+if ! cmp -s "$REPO_DIR/deploy/Caddyfile" /etc/caddy/Caddyfile 2>/dev/null; then
+  say "▶ caddy: applying updated Caddyfile + reload"
+  sudo install -m 644 -o root -g root "$REPO_DIR/deploy/Caddyfile" /etc/caddy/Caddyfile
+  sudo systemctl reload caddy
+else
+  say "   caddy config unchanged"
+fi
+
 # 2. Build images ─────────────────────────────────────────────
 say "▶ docker build (this may take 3–8 min on first run)"
 # `--pull` ensures base images (node:22-alpine, python:3.12-slim) are

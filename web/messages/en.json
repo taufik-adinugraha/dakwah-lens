@@ -1107,6 +1107,8 @@
     "footer_signup_link": "Sign in",
     "back_home": "Back to home",
     "error_invalid_credentials": "Wrong email or password.",
+    "error_email_not_registered": "This email isn't registered yet. Sign up first.",
+    "error_oauth_only_account": "This account was created with Google. Use the Google button above to sign in.",
     "error_email_taken": "That email is already registered. Try signing in.",
     "error_rate_limited": "Too many attempts. Please wait a few minutes before trying again.",
     "error_invalid_email": "Please enter a valid email address.",

@@ -131,6 +131,12 @@ services:
       TZ: Asia/Jakarta
     volumes:
       - /srv/dakwah-lens/data/attachments:/data/attachments
+      # Static kitab corpus, read-only. The embed_*.py scripts read from
+      # /app/data/*.json (resolved via Path(__file__).parents[3] / "data"
+      # inside the api source tree). Not load-bearing at runtime — once
+      # embeddings land in Qdrant we don't read these files again — but
+      # we keep the mount so re-embed jobs work without a redeploy.
+      - /srv/dakwah-lens/data/kitab:/app/data:ro
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:
@@ -198,11 +204,13 @@ services:
         "--schedule=/data/celerybeat-schedule.db",
       ]
     volumes:
-      - beat_data:/data
+      # Bind mount instead of a named volume. Named-volume init owns the
+      # mount root as root:root, which collides with the in-container
+      # `app` user (uid 1001) trying to write the schedule database.
+      # The host dir is pre-created with `sudo chown 1001:1001
+      # /srv/dakwah-lens/data/beat` so the container user can write.
+      - /srv/dakwah-lens/data/beat:/data
     depends_on:
       redis:
         condition: service_healthy
     networks: [dakwah]
-
-volumes:
-  beat_data:
