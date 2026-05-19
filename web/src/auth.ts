@@ -138,17 +138,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return true;
     },
-    async jwt({ token, user, trigger }) {
-      // First sign-in: copy status/role from the User into the JWT.
+    async jwt({ token, user }) {
+      // First sign-in: seed the JWT from the User row so the DB-refresh
+      // step below has sensible defaults if it somehow can't find the row.
       if (user) {
         token.sub = user.id ?? token.sub;
         token.status = (user.status as string) ?? "pending";
         token.role = (user.role as string) ?? "user";
-        token.onboarded = false; // refreshed below
+        token.onboarded = false;
       }
-      // Re-fetch from DB on session update or every refresh so approval
-      // status changes propagate without forcing the user to sign out.
-      if (trigger === "update" || (!token.status && token.sub)) {
+      // Always re-fetch status/role/onboarded from the DB. JWTs are signed
+      // and cached for the cookie lifetime, so without this an admin
+      // approval, role change, or block wouldn't reach the user until they
+      // sign out and back in. One query per JWT callback is acceptable at
+      // our scale; if it becomes hot, add a Redis-backed cache here.
+      if (token.sub) {
         const [fresh] = await db
           .select({
             status: schema.users.status,
@@ -163,17 +167,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           token.role = fresh.role;
           token.onboarded = !!fresh.onboardedAt;
         }
-      }
-      // Always refresh `onboarded` from DB if we haven't yet — JWT is cached
-      // for the cookie lifetime so we want this to flip the moment the user
-      // finishes the wizard.
-      if (token.sub && token.onboarded !== true) {
-        const [fresh] = await db
-          .select({ onboardedAt: schema.users.onboardedAt })
-          .from(schema.users)
-          .where(eq(schema.users.id, token.sub))
-          .limit(1);
-        if (fresh) token.onboarded = !!fresh.onboardedAt;
       }
       return token;
     },

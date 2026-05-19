@@ -14,6 +14,7 @@ import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
 import type { BriefContent, BriefDaleel } from "@/db/schema";
 import { briefToMarkdown, type MarkdownHeadings } from "@/lib/brief-markdown";
+import { PrintButton } from "@/components/PrintButton";
 import { PublicBriefDownload } from "./PublicBriefDownload";
 
 const RECENCY_DAYS = 7;
@@ -78,7 +79,13 @@ export default async function PublicBriefDetailPage({
     audiencePerception: tBriefs("section_audience_perception"),
     audienceAngle: t("md_audience_angle"),
     daleel: tBriefs("section_daleel"),
+    linkedAyah: t("md_linked_ayah"),
+    alsoFoundIn: t("md_also_found_in"),
     recommendations: t("md_recommendations"),
+    objections: t("md_objections"),
+    objectionLabel: t("md_objection_label"),
+    responseLabel: t("md_response_label"),
+    illustrations: t("md_illustrations"),
     khutbah: t("md_khutbah"),
     social: t("md_social"),
     disclaimer: t("disclaimer_md"),
@@ -100,10 +107,10 @@ export default async function PublicBriefDetailPage({
   );
 
   return (
-    <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
+    <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16 print:py-0">
       <Link
         href="/briefs/public"
-        className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900"
+        className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 print:hidden"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
         {t("back_to_list")}
@@ -183,27 +190,72 @@ export default async function PublicBriefDetailPage({
           icon={<BookOpenCheck className="h-5 w-5 text-emerald-700" />}
         >
           <ol className="space-y-5">
-            {content.daleel.map((d: BriefDaleel, i: number) => (
-              <li
-                key={i}
-                className="rounded-2xl border border-emerald-100 bg-emerald-50/40 p-5"
-              >
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
-                  {d.source}
-                </p>
-                <p
-                  lang="ar"
-                  dir="rtl"
-                  className="mt-2 font-amiri text-xl leading-[1.9] text-slate-900"
+            {content.daleel.map((d: BriefDaleel, i: number) => {
+              const muttafaq =
+                d.also_found_in?.length &&
+                [d.source, ...d.also_found_in.map((a) => a.source)]
+                  .map((s) => s.toLowerCase())
+                  .some((s) => s.includes("bukhari")) &&
+                [d.source, ...d.also_found_in.map((a) => a.source)]
+                  .map((s) => s.toLowerCase())
+                  .some((s) => s.includes("muslim"));
+              return (
+                <li
+                  key={i}
+                  className="rounded-2xl border border-emerald-100 bg-emerald-50/40 p-5"
                 >
-                  <Quote className="mr-1 inline h-3 w-3 text-emerald-500" />
-                  {d.arabic}
-                </p>
-                <p className="mt-3 text-pretty text-sm leading-relaxed text-slate-700">
-                  &ldquo;{d.translation}&rdquo;
-                </p>
-              </li>
-            ))}
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+                      {d.source}
+                    </p>
+                    {muttafaq && (
+                      <span className="inline-flex items-center rounded-full bg-emerald-700 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-white">
+                        {tBriefs("daleel_muttafaq_alayh")}
+                      </span>
+                    )}
+                  </div>
+                  <p
+                    lang="ar"
+                    dir="rtl"
+                    className="mt-2 font-amiri text-xl leading-[1.9] text-slate-900"
+                  >
+                    <Quote className="mr-1 inline h-3 w-3 text-emerald-500" />
+                    {d.arabic}
+                  </p>
+                  <p className="mt-3 text-pretty text-sm leading-relaxed text-slate-700">
+                    &ldquo;{d.translation}&rdquo;
+                  </p>
+
+                  {d.also_found_in?.length ? (
+                    <p className="mt-2 text-[11px] leading-relaxed text-emerald-800/80">
+                      <span className="font-semibold">
+                        {tBriefs("daleel_also_found_in_label")}:
+                      </span>{" "}
+                      {d.also_found_in.map((a) => a.source).join(" · ")}
+                    </p>
+                  ) : null}
+
+                  {d.linked_ayah ? (
+                    <div className="mt-3 rounded-xl border border-emerald-200/70 bg-white/70 p-3">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+                        {tBriefs("daleel_linked_ayah_label")} ·{" "}
+                        {d.linked_ayah.source}
+                      </p>
+                      <p
+                        lang="ar"
+                        dir="rtl"
+                        className="mt-1.5 font-amiri text-base leading-[1.9] text-slate-900"
+                      >
+                        {d.linked_ayah.arabic}
+                      </p>
+                      <p className="mt-1.5 text-pretty text-xs leading-relaxed text-slate-600">
+                        &ldquo;{d.linked_ayah.translation}&rdquo;
+                      </p>
+                    </div>
+                  ) : null}
+                </li>
+              );
+            })}
           </ol>
         </Section>
       )}
@@ -223,6 +275,47 @@ export default async function PublicBriefDetailPage({
         </Section>
       )}
 
+      {content.anticipated_objections?.length ? (
+        <Section title={t("md_objections")}>
+          <div className="space-y-3">
+            {content.anticipated_objections.map((o, i) => (
+              <div
+                key={i}
+                className="rounded-2xl border border-slate-200 bg-white p-4"
+              >
+                <p className="text-sm font-medium text-slate-900">
+                  <span className="mr-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                    {t("md_objection_label")}
+                  </span>
+                  {o.objection}
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-slate-700">
+                  <span className="mr-2 text-[10px] font-semibold uppercase tracking-wider text-brand-700">
+                    {t("md_response_label")}
+                  </span>
+                  {o.response}
+                </p>
+              </div>
+            ))}
+          </div>
+        </Section>
+      ) : null}
+
+      {content.story_illustrations?.length ? (
+        <Section title={t("md_illustrations")}>
+          <ol className="space-y-2">
+            {content.story_illustrations.map((s, i) => (
+              <li key={i} className="flex gap-3">
+                <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-100 text-[10px] font-bold text-amber-800">
+                  {i + 1}
+                </span>
+                <span className="text-pretty">{s}</span>
+              </li>
+            ))}
+          </ol>
+        </Section>
+      ) : null}
+
       {content.content_templates && (
         <>
           <Section title={t("md_khutbah")}>
@@ -238,11 +331,14 @@ export default async function PublicBriefDetailPage({
         </>
       )}
 
-      <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-6">
-        <PublicBriefDownload
-          markdown={markdown}
-          topicTitle={brief.topicTitle}
-        />
+      <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-6 print:hidden">
+        <div className="flex flex-wrap items-center gap-2">
+          <PublicBriefDownload
+            markdown={markdown}
+            topicTitle={brief.topicTitle}
+          />
+          <PrintButton namespace="PublicBriefs" />
+        </div>
         <Link
           href="/briefs/public"
           className="text-xs font-medium text-slate-500 hover:text-slate-900"

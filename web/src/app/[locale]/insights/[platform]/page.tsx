@@ -661,10 +661,10 @@ function LiveStream({ live, t }: { live: PlatformInsights; t: T }) {
               Live ingestion
             </span>
             <h2 className="mt-3 text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-              What's surfacing right now
+              What&apos;s surfacing right now
             </h2>
             <p className="mt-1.5 text-pretty text-sm text-slate-600">
-              Top posts by da'wah relevance from the {live.totalPosts.toLocaleString()}{" "}
+              Top posts by da&apos;wah relevance from the {live.totalPosts.toLocaleString()}{" "}
               already-ingested · classified by IndoBERT + Gemini.
             </p>
           </div>
@@ -806,10 +806,12 @@ function TopStories({ config, t }: { config: DrilldownConfig; t: T }) {
           ))}
         </div>
 
-        <p className="mx-auto mt-8 flex max-w-2xl items-center justify-center gap-1.5 text-center text-xs text-slate-500">
-          <Info className="h-3.5 w-3.5" />
-          {t("data_note")}
-        </p>
+        {process.env.NODE_ENV !== "production" && (
+          <p className="mx-auto mt-8 flex max-w-2xl items-center justify-center gap-1.5 text-center text-xs text-slate-500">
+            <Info className="h-3.5 w-3.5" />
+            {t("data_note")}
+          </p>
+        )}
       </div>
     </section>
   );

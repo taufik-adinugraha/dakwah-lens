@@ -16,12 +16,16 @@ import {
  * actually ran." Source of truth is `workers/celery_app.py`.
  */
 const BEAT_SCHEDULE = [
-  { name: "ingest-mainstream", task: "run_ingest", platform: "mainstream", cron: "every 2 hours", query: "(all)" },
-  { name: "ingest-youtube", task: "run_ingest", platform: "youtube", cron: "06:10 & 18:10 daily", query: "dakwah" },
-  { name: "ingest-x", task: "run_ingest", platform: "x", cron: "07:20 daily", query: "#dakwah" },
-  { name: "ingest-tiktok", task: "run_ingest", platform: "tiktok", cron: "07:30 daily", query: "dakwah" },
-  { name: "ingest-instagram", task: "run_ingest", platform: "instagram", cron: "07:40 daily", query: "dakwah" },
-  { name: "recluster-topics", task: "recluster_all", platform: "all", cron: "08:00 daily", query: "—" },
+  { name: "ingest-mainstream", task: "run_ingest", platform: "mainstream", cron: "every 2 hours", query: "(all RSS)" },
+  { name: "ingest-youtube", task: "rotating_ingest", platform: "youtube", cron: "00:00 WIB daily", query: "(all enabled)" },
+  { name: "ingest-x-mon", task: "rotating_ingest", platform: "x", cron: "Mon 00:10 WIB", query: "(all enabled)" },
+  { name: "ingest-x-wed", task: "rotating_ingest", platform: "x", cron: "Wed 00:10 WIB", query: "(all enabled)" },
+  { name: "ingest-x-fri", task: "rotating_ingest", platform: "x", cron: "Fri 00:10 WIB", query: "(all enabled)" },
+  { name: "ingest-tiktok", task: "rotating_ingest", platform: "tiktok", cron: "00:20 WIB daily", query: "(all enabled, free actor)" },
+  { name: "ingest-tiktok-paid", task: "rotating_ingest", platform: "tiktok", cron: "1st + 3rd Mon 00:25 WIB", query: "(all enabled, paid actor)" },
+  { name: "ingest-instagram", task: "rotating_ingest", platform: "instagram", cron: "Mon 00:30 WIB", query: "(all enabled)" },
+  { name: "trending-ingest", task: "trending_ingest", platform: "x + tiktok", cron: "12:00 WIB daily", query: "(trending overlay)" },
+  { name: "recluster-topics", task: "recluster_all", platform: "all", cron: "08:00 WIB daily", query: "—" },
   { name: "snapshot-system", task: "snapshot_system", platform: "host", cron: "every 60s", query: "—" },
 ] as const;
 
@@ -85,7 +89,7 @@ export default async function PipelinePage() {
           <li>
             <strong>Scheduler</strong> — Celery beat, defined in{" "}
             <code>api/src/api/workers/celery_app.py</code>. Edit that
-            file's <code>beat_schedule</code> dict to change cadence.
+            file&apos;s <code>beat_schedule</code> dict to change cadence.
           </li>
           <li>
             <strong>Tracker</strong> — every task wraps itself in{" "}

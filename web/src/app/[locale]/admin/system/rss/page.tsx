@@ -1,10 +1,12 @@
 import { Trash2 } from "lucide-react";
 import { asc } from "drizzle-orm";
 
+import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
 import { deleteRssFeed, toggleFetchBody, toggleRssFeed } from "../actions";
 import { Card, EmptyState, HelpCallout, PageHeader } from "../_ui";
+import { ConfirmForm } from "../_ConfirmForm";
 import { AddFeedForm } from "./AddFeedForm";
 
 /**
@@ -28,6 +30,10 @@ type ScopeFilter = (typeof SCOPE_FILTERS)[number];
 export default async function RssPage({
   searchParams,
 }: PageProps<"/[locale]/admin/system/rss">) {
+  // Admin view is read-only — hide the Add form and per-row toggles/delete.
+  const session = await auth();
+  const isSuperadmin = session?.user?.role === "superadmin";
+
   const feeds = await db
     .select()
     .from(schema.rssFeeds)
@@ -62,7 +68,7 @@ export default async function RssPage({
           The RSS scraper (<code>services/rss.py</code>) reads enabled rows
           from <code>rss_feeds</code> at the start of every run. Disable a
           feed here to stop ingesting it without losing the URL. Delete
-          only when you're sure — re-adding requires re-typing the URL.
+          only when you&apos;re sure — re-adding requires re-typing the URL.
         </p>
         <p>
           <strong>Scope</strong>: pick <code>national</code> for outlets
@@ -79,9 +85,11 @@ export default async function RssPage({
         </p>
       </HelpCallout>
 
-      <Card title="Add a new feed">
-        <AddFeedForm regionLabels={REGION_LABELS} />
-      </Card>
+      {isSuperadmin && (
+        <Card title="Add a new feed">
+          <AddFeedForm regionLabels={REGION_LABELS} />
+        </Card>
+      )}
 
       <Card title={`Configured feeds (${feeds.length})`}>
         <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -128,7 +136,11 @@ export default async function RssPage({
             {visibleFeeds.map((f) => (
               <li
                 key={f.id}
-                className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 py-2"
+                className={
+                  isSuperadmin
+                    ? "grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 py-2"
+                    : "py-2"
+                }
               >
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-1.5">
@@ -136,6 +148,12 @@ export default async function RssPage({
                       {f.name}
                     </p>
                     <ScopePill scope={f.scope} region={f.region} />
+                    {!isSuperadmin && (
+                      <ReadOnlyStatusPill
+                        enabled={f.enabled}
+                        fetchBody={f.fetchBody}
+                      />
+                    )}
                   </div>
                   <a
                     href={f.url}
@@ -146,44 +164,51 @@ export default async function RssPage({
                     {f.url}
                   </a>
                 </div>
-                <form action={toggleFetchBody}>
-                  <input type="hidden" name="id" value={f.id} />
-                  <input
-                    type="hidden"
-                    name="fetch_body"
-                    value={String(f.fetchBody)}
-                  />
-                  <button
-                    type="submit"
-                    title={
-                      f.fetchBody
-                        ? "Full article body fetched per item"
-                        : "Only RSS title + summary used"
-                    }
-                    className={`inline-flex h-7 items-center rounded-full px-3 text-[11px] font-semibold transition ${
-                      f.fetchBody
-                        ? "border border-violet-200 bg-violet-50 text-violet-700 hover:bg-violet-100"
-                        : "border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100"
-                    }`}
-                  >
-                    {f.fetchBody ? "Full body" : "Title only"}
-                  </button>
-                </form>
-                <ToggleSwitch
-                  id={f.id}
-                  enabled={f.enabled}
-                  name={f.name}
-                />
-                <form action={deleteRssFeed}>
-                  <input type="hidden" name="id" value={f.id} />
-                  <button
-                    type="submit"
-                    className="inline-flex h-7 w-7 items-center justify-center rounded-full text-slate-400 hover:bg-rose-50 hover:text-rose-700"
-                    aria-label={`Delete ${f.name}`}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </form>
+                {isSuperadmin && (
+                  <>
+                    <form action={toggleFetchBody}>
+                      <input type="hidden" name="id" value={f.id} />
+                      <input
+                        type="hidden"
+                        name="fetch_body"
+                        value={String(f.fetchBody)}
+                      />
+                      <button
+                        type="submit"
+                        title={
+                          f.fetchBody
+                            ? "Full article body fetched per item"
+                            : "Only RSS title + summary used"
+                        }
+                        className={`inline-flex h-7 items-center rounded-full px-3 text-[11px] font-semibold transition ${
+                          f.fetchBody
+                            ? "border border-violet-200 bg-violet-50 text-violet-700 hover:bg-violet-100"
+                            : "border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100"
+                        }`}
+                      >
+                        {f.fetchBody ? "Full body" : "Title only"}
+                      </button>
+                    </form>
+                    <ToggleSwitch
+                      id={f.id}
+                      enabled={f.enabled}
+                      name={f.name}
+                    />
+                    <ConfirmForm
+                      action={deleteRssFeed}
+                      confirmMessage={`Delete the "${f.name}" feed? This removes the row from rss_feeds — re-adding requires re-typing the URL.`}
+                    >
+                      <input type="hidden" name="id" value={f.id} />
+                      <button
+                        type="submit"
+                        className="inline-flex h-7 w-7 items-center justify-center rounded-full text-slate-400 hover:bg-rose-50 hover:text-rose-700"
+                        aria-label={`Delete ${f.name}`}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </ConfirmForm>
+                  </>
+                )}
               </li>
             ))}
           </ul>
@@ -220,6 +245,39 @@ function FilterPill({
         {count}
       </span>
     </Link>
+  );
+}
+
+/** Read-only badge stack shown to admins in place of the interactive
+ *  controls — keeps the same information density without offering write. */
+function ReadOnlyStatusPill({
+  enabled,
+  fetchBody,
+}: {
+  enabled: boolean;
+  fetchBody: boolean;
+}) {
+  return (
+    <>
+      <span
+        className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ring-1 ${
+          enabled
+            ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
+            : "bg-slate-100 text-slate-500 ring-slate-200"
+        }`}
+      >
+        {enabled ? "Enabled" : "Disabled"}
+      </span>
+      <span
+        className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ring-1 ${
+          fetchBody
+            ? "bg-violet-50 text-violet-700 ring-violet-100"
+            : "bg-slate-50 text-slate-500 ring-slate-200"
+        }`}
+      >
+        {fetchBody ? "Full body" : "Title only"}
+      </span>
+    </>
   );
 }
 

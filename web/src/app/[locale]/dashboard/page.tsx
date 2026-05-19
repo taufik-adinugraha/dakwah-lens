@@ -18,6 +18,16 @@ import {
 import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
+import {
+  getBriefsThisWeek,
+  getDailyInsights,
+  getPulseSnapshot,
+  getTopIssues,
+  getTrendingCount24h,
+  type DailyInsights as DailyInsightsData,
+  type PulseSnapshot,
+  type TopIssue,
+} from "@/lib/dashboard-metrics";
 import { formatPanggilan } from "@/lib/panggilan";
 
 export async function generateMetadata({
@@ -60,25 +70,40 @@ export default async function DashboardPage({
     return <PendingDashboard name={greetingName} t={t} />;
   }
 
-  const recentBriefs = await db
-    .select({
-      id: schema.briefs.id,
-      topicTitle: schema.briefs.topicTitle,
-      segment: schema.briefs.segment,
-      tone: schema.briefs.tone,
-      isPlaceholder: schema.briefs.isPlaceholder,
-      createdAt: schema.briefs.createdAt,
-    })
-    .from(schema.briefs)
-    .where(eq(schema.briefs.userId, session.user.id))
-    .orderBy(desc(schema.briefs.createdAt))
-    .limit(5);
+  // Fetch everything in parallel — these are all independent queries.
+  const [recentBriefs, pulse, trendingCount, briefsThisWeek, topIssues, insights] =
+    await Promise.all([
+      db
+        .select({
+          id: schema.briefs.id,
+          topicTitle: schema.briefs.topicTitle,
+          segment: schema.briefs.segment,
+          tone: schema.briefs.tone,
+          isPlaceholder: schema.briefs.isPlaceholder,
+          createdAt: schema.briefs.createdAt,
+        })
+        .from(schema.briefs)
+        .where(eq(schema.briefs.userId, session.user.id))
+        .orderBy(desc(schema.briefs.createdAt))
+        .limit(5),
+      getPulseSnapshot(),
+      getTrendingCount24h(),
+      getBriefsThisWeek(session.user.id),
+      getTopIssues(3),
+      getDailyInsights(),
+    ]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
-      <GreetingPulse name={greetingName} t={t} />
-      <TopIssues t={t} />
-      <DailyInsights t={t} />
+      <GreetingPulse
+        name={greetingName}
+        pulse={pulse}
+        trendingCount={trendingCount}
+        briefsThisWeek={briefsThisWeek}
+        t={t}
+      />
+      <TopIssues issues={topIssues} t={t} />
+      <DailyInsights insights={insights} t={t} />
       <RecentBriefs briefs={recentBriefs} t={t} tBriefs={tBriefs} locale={locale} />
       <QuickLinks t={t} />
     </div>
@@ -88,7 +113,24 @@ export default async function DashboardPage({
 type T = Awaited<ReturnType<typeof getTranslations<"Dashboard">>>;
 type TBriefs = Awaited<ReturnType<typeof getTranslations<"Briefs">>>;
 
-function GreetingPulse({ name, t }: { name: string; t: T }) {
+function GreetingPulse({
+  name,
+  pulse,
+  trendingCount,
+  briefsThisWeek,
+  t,
+}: {
+  name: string;
+  pulse: PulseSnapshot;
+  trendingCount: number;
+  briefsThisWeek: number;
+  t: T;
+}) {
+  // Pulse rendering — three states: real score, insufficient data, no movement.
+  const hasScore = pulse.score !== null;
+  const deltaSign =
+    pulse.delta === null ? "flat" : pulse.delta > 0 ? "up" : pulse.delta < 0 ? "down" : "flat";
+
   return (
     <section className="grid gap-4 sm:grid-cols-[1.4fr_1fr] sm:gap-5">
       <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
@@ -106,16 +148,39 @@ function GreetingPulse({ name, t }: { name: string; t: T }) {
             </p>
             <p className="mt-0.5 flex items-baseline gap-2">
               <span className="text-5xl font-bold tabular-nums text-slate-900">
-                7.3
+                {hasScore ? pulse.score!.toFixed(1) : "—"}
               </span>
               <span className="text-sm text-slate-400">/ 10</span>
             </p>
-            <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
-              <TrendingUp className="h-3 w-3" />
-              {t("pulse_delta")}
-            </p>
+            {hasScore && pulse.delta !== null ? (
+              <p
+                className={`mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                  deltaSign === "up"
+                    ? "bg-emerald-50 text-emerald-700"
+                    : deltaSign === "down"
+                      ? "bg-amber-50 text-amber-700"
+                      : "bg-slate-100 text-slate-600"
+                }`}
+              >
+                <TrendingUp
+                  className={`h-3 w-3 ${deltaSign === "down" ? "rotate-180" : deltaSign === "flat" ? "rotate-90" : ""}`}
+                />
+                {t(
+                  deltaSign === "up"
+                    ? "pulse_delta_up"
+                    : deltaSign === "down"
+                      ? "pulse_delta_down"
+                      : "pulse_delta_flat",
+                  deltaSign === "flat" ? {} : { delta: Math.abs(pulse.delta).toFixed(1) },
+                )}
+              </p>
+            ) : (
+              <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
+                {t("pulse_no_score")}
+              </p>
+            )}
           </div>
-          <PulseSparkline />
+          <PulseSparkline points={pulse.sparkline} />
         </div>
 
         <p className="mt-4 text-pretty text-xs leading-relaxed text-slate-500">
@@ -128,30 +193,31 @@ function GreetingPulse({ name, t }: { name: string; t: T }) {
           tone="brand"
           icon={Flame}
           label={t("stat_trending_label")}
-          value="12"
+          value={trendingCount.toString()}
           hint={t("stat_trending_hint")}
         />
         <MiniStat
           tone="amber"
           icon={ScrollText}
-          label={t("stat_briefs_ready_label")}
-          value="3"
-          hint={t("stat_briefs_ready_hint")}
+          label={t("stat_briefs_this_week_label")}
+          value={briefsThisWeek.toString()}
+          hint={t("stat_briefs_this_week_hint")}
         />
       </div>
     </section>
   );
 }
 
-function PulseSparkline() {
-  const points = [55, 58, 60, 62, 65, 70, 73];
+function PulseSparkline({ points }: { points: number[] }) {
+  // No data → flat baseline rather than blanking. Keeps the visual rhythm.
+  const safe = points.length > 0 ? points : [0, 0, 0, 0, 0, 0, 0];
   const w = 120;
   const h = 56;
-  const max = Math.max(...points);
-  const min = Math.min(...points);
+  const max = Math.max(...safe);
+  const min = Math.min(...safe);
   const range = Math.max(1, max - min);
-  const step = w / (points.length - 1);
-  const path = points
+  const step = w / Math.max(1, safe.length - 1);
+  const path = safe
     .map((p, i) => `${i === 0 ? "M" : "L"}${i * step},${h - ((p - min) / range) * h}`)
     .join(" ");
   const area = `${path} L${w},${h} L0,${h} Z`;
@@ -215,90 +281,99 @@ function MiniStat({
   );
 }
 
-function TopIssues({ t }: { t: T }) {
-  const issues = [
-    {
-      key: 1,
-      title: t("topic_1_title"),
-      tag: t("topic_1_tag"),
-      volume: t("topic_1_volume"),
-      reach: t("topic_1_reach"),
-      sentiment: [38, 30, 32] as [number, number, number],
-      tone: "from-brand-500 to-cyan-500",
-    },
-    {
-      key: 2,
-      title: t("topic_2_title"),
-      tag: t("topic_2_tag"),
-      volume: t("topic_2_volume"),
-      reach: t("topic_2_reach"),
-      sentiment: [62, 25, 13] as [number, number, number],
-      tone: "from-emerald-500 to-emerald-600",
-    },
-    {
-      key: 3,
-      title: t("topic_3_title"),
-      tag: t("topic_3_tag"),
-      volume: t("topic_3_volume"),
-      reach: t("topic_3_reach"),
-      sentiment: [55, 32, 13] as [number, number, number],
-      tone: "from-violet-500 to-rose-500",
-    },
+function TopIssues({ issues, t }: { issues: TopIssue[]; t: T }) {
+  // Cycle through a fixed tone palette so cards stay visually consistent
+  // whether the query returns 1, 2, or 3 results.
+  const tones = [
+    "from-brand-500 to-cyan-500",
+    "from-emerald-500 to-emerald-600",
+    "from-violet-500 to-rose-500",
   ];
 
   return (
     <section className="mt-10">
       <SectionHeader title={t("section_top_issues")} subtitle={t("section_top_issues_subtitle")} />
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {issues.map((i) => (
-          <article
-            key={i.key}
-            className="group relative flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-          >
-            <div
-              className={`mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${i.tone} text-white shadow-sm`}
+      {issues.length === 0 ? (
+        <div className="mt-5 flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-10 text-center shadow-sm">
+          <Flame className="h-5 w-5 text-slate-400" />
+          <p className="text-sm font-medium text-slate-700">
+            {t("top_issues_empty_title")}
+          </p>
+          <p className="max-w-md text-[11px] leading-relaxed text-slate-500">
+            {t("top_issues_empty_body")}
+          </p>
+        </div>
+      ) : (
+        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {issues.map((i, idx) => (
+            <article
+              key={i.id}
+              className="group relative flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
             >
-              <Flame className="h-5 w-5" />
-            </div>
-
-            <h3 className="text-balance text-base font-semibold text-slate-900 sm:text-lg">
-              {i.title}
-            </h3>
-            <p className="mt-1 text-[11px] font-medium text-slate-500">{i.tag}</p>
-
-            <div className="mt-4 grid grid-cols-2 gap-3 text-[11px]">
-              <Stat label={t("card_volume_label")} value={i.volume} />
-              <Stat label={t("card_reach_label")} value={i.reach} />
-            </div>
-
-            <div className="mt-4">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                {t("card_sentiment_label")}
-              </p>
-              <div className="mt-1 flex h-2 overflow-hidden rounded-full">
-                <span className="bg-emerald-500" style={{ width: `${i.sentiment[0]}%` }} />
-                <span className="bg-slate-300" style={{ width: `${i.sentiment[1]}%` }} />
-                <span className="bg-amber-500" style={{ width: `${i.sentiment[2]}%` }} />
+              <div
+                className={`mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${tones[idx % tones.length]} text-white shadow-sm`}
+              >
+                <Flame className="h-5 w-5" />
               </div>
-            </div>
 
-            <Link
-              href={{
-                pathname: "/briefs/new",
-                query: { topic: i.title },
-              }}
-              className="mt-5 inline-flex h-9 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800"
-            >
-              <Sparkles className="h-3.5 w-3.5" />
-              {t("card_generate_button")}
-              <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
-            </Link>
-          </article>
-        ))}
-      </div>
+              <h3 className="text-balance text-base font-semibold text-slate-900 sm:text-lg">
+                {i.title}
+              </h3>
+              <p className="mt-1 text-[11px] font-medium uppercase tracking-wider text-slate-500">
+                {i.platform}
+                {i.keywords.length > 0 && (
+                  <span className="text-slate-300"> · </span>
+                )}
+                {i.keywords.slice(0, 2).join(" · ")}
+              </p>
+
+              <div className="mt-4 grid grid-cols-2 gap-3 text-[11px]">
+                <Stat
+                  label={t("card_volume_label")}
+                  value={formatCompactNumber(i.volume)}
+                />
+                <Stat
+                  label={t("card_reach_label")}
+                  value={i.reach > 0 ? formatCompactNumber(i.reach) : "—"}
+                />
+              </div>
+
+              <div className="mt-4">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                  {t("card_sentiment_label")}
+                </p>
+                <div className="mt-1 flex h-2 overflow-hidden rounded-full">
+                  <span className="bg-emerald-500" style={{ width: `${i.sentiment[0]}%` }} />
+                  <span className="bg-slate-300" style={{ width: `${i.sentiment[1]}%` }} />
+                  <span className="bg-amber-500" style={{ width: `${i.sentiment[2]}%` }} />
+                </div>
+              </div>
+
+              <Link
+                href={{
+                  pathname: "/briefs/new",
+                  query: { topic: i.title },
+                }}
+                className="mt-5 inline-flex h-9 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800"
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                {t("card_generate_button")}
+                <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
+              </Link>
+            </article>
+          ))}
+        </div>
+      )}
     </section>
   );
+}
+
+/** Compact thousands formatting — 12,400 → "12.4K", 2,100,000 → "2.1M". */
+function formatCompactNumber(n: number): string {
+  if (n < 1000) return n.toString();
+  if (n < 1_000_000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}K`;
+  return `${(n / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`;
 }
 
 function Stat({ label, value }: { label: string; value: string }) {
@@ -314,37 +389,75 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function DailyInsights({ t }: { t: T }) {
-  const cards = [
-    {
+function DailyInsights({
+  insights,
+  t,
+}: {
+  insights: DailyInsightsData;
+  t: T;
+}) {
+  type Card = {
+    key: string;
+    tone: "rose" | "brand" | "amber" | "emerald";
+    icon: typeof TrendingUp;
+    title: string;
+    body: string;
+  };
+  const cards: Card[] = [];
+
+  if (insights.sentiment) {
+    const { thisWeekPos, deltaPp } = insights.sentiment;
+    cards.push({
       key: "sentiment",
       tone: "rose",
       icon: TrendingUp,
       title: t("insight_sentiment_title"),
-      body: t("insight_sentiment_body"),
-    },
-    {
+      body: t("insight_sentiment_body_tpl", {
+        positive: thisWeekPos,
+        deltaSign: deltaPp > 0 ? "+" : deltaPp < 0 ? "−" : "",
+        deltaAbs: Math.abs(deltaPp),
+      }),
+    });
+  }
+
+  if (insights.emerging) {
+    cards.push({
       key: "emerging",
       tone: "brand",
       icon: Compass,
       title: t("insight_emerging_title"),
-      body: t("insight_emerging_body"),
-    },
-    {
-      key: "segment",
+      body: t("insight_emerging_body_tpl", {
+        label: insights.emerging.label,
+        volume: insights.emerging.volume,
+      }),
+    });
+  }
+
+  if (insights.topPlatform) {
+    cards.push({
+      key: "platform",
       tone: "amber",
       icon: Users,
-      title: t("insight_segment_title"),
-      body: t("insight_segment_body"),
-    },
-    {
+      title: t("insight_platform_title"),
+      body: t("insight_platform_body_tpl", {
+        platform: insights.topPlatform.platform,
+        share: insights.topPlatform.share,
+      }),
+    });
+  }
+
+  if (insights.daleelOpportunity) {
+    cards.push({
       key: "daleel",
       tone: "emerald",
       icon: BookOpenCheck,
       title: t("insight_daleel_title"),
-      body: t("insight_daleel_body"),
-    },
-  ] as const;
+      body: t("insight_daleel_body_tpl", {
+        category: insights.daleelOpportunity.category,
+        count: insights.daleelOpportunity.nPosts,
+      }),
+    });
+  }
 
   const toneClasses = {
     rose: "bg-rose-50 text-rose-700 ring-rose-100",
@@ -352,6 +465,10 @@ function DailyInsights({ t }: { t: T }) {
     amber: "bg-amber-50 text-amber-700 ring-amber-100",
     emerald: "bg-emerald-50 text-emerald-700 ring-emerald-100",
   } as const;
+
+  // Hide the section entirely when no insight has enough data — better than
+  // 4 blank or mocked cards.
+  if (cards.length === 0) return null;
 
   return (
     <section className="mt-12">
@@ -438,7 +555,7 @@ function RecentBriefs({
                   <p className="truncate text-sm font-medium text-slate-900">
                     {b.topicTitle}
                   </p>
-                  {b.isPlaceholder && (
+                  {b.isPlaceholder && process.env.NODE_ENV !== "production" && (
                     <span className="inline-flex items-center rounded-full bg-amber-50 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber-700">
                       placeholder
                     </span>

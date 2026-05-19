@@ -103,6 +103,7 @@ export function ResetPasswordForm({
             type="password"
             required
             minLength={10}
+            maxLength={256}
             autoComplete="new-password"
             placeholder={t("reset_field_password_placeholder")}
             className="mt-1.5 block h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"

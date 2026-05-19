@@ -12,7 +12,6 @@ import {
   Compass,
   Globe2,
   Heart,
-  Mail,
   Newspaper,
   QrCode,
   Quote,
@@ -48,13 +47,18 @@ async function getCoverage(): Promise<Coverage> {
       .select({ n: count() })
       .from(schema.rssFeeds)
       .where(eq(schema.rssFeeds.enabled, true)),
+    // "Posts analyzed" = ones that actually completed the classification
+    // pipeline (Gemini relevance set). Heuristic-skipped + failed-classification
+    // rows stay in the table but don't count toward the figure shown on the
+    // homepage — the card promises "Sentiment + relevance classified". We
+    // count mainstream RSS too; it's the majority of the corpus.
     db
       .select({ n: count() })
       .from(schema.socialPosts)
       .where(
         and(
-          sql`platform IN ('x','instagram','tiktok','youtube')`,
           sql`created_at >= now() - interval '30 days'`,
+          sql`dawah_relevance IS NOT NULL`,
         ),
       ),
   ]);
@@ -587,7 +591,7 @@ function Donate({ t }: { t: DonateT }) {
             {t("methods_title")}
           </h3>
 
-          <div className="mt-5 grid gap-4 sm:grid-cols-3">
+          <div className="mt-5 grid gap-4 sm:grid-cols-2">
             <DonateMethod
               icon={Building2}
               label={t("bank_label")}
@@ -599,12 +603,6 @@ function Donate({ t }: { t: DonateT }) {
               label={t("qris_label")}
               status={t("qris_status")}
               comingSoon
-            />
-            <DonateMethod
-              icon={Mail}
-              label={t("contact_label")}
-              status={t("contact_body")}
-              email={t("contact_email")}
             />
           </div>
 

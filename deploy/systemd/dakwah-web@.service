@@ -1,0 +1,26 @@
+[Unit]
+# Templated unit. Activate with:
+#   systemctl enable --now dakwah-web@prod.service
+#   systemctl enable --now dakwah-web@dev.service
+#
+# `%i` expands to the instance name (prod | dev). Each instance has its
+# own checkout at /srv/dakwah-lens-%i and its own .env file with a
+# distinct PORT.
+Description=Dakwah-Lens web (Next.js) — %i
+After=network.target docker.service
+
+[Service]
+Type=simple
+User=deploy
+Group=deploy
+WorkingDirectory=/srv/dakwah-lens-%i/web
+EnvironmentFile=/srv/dakwah-lens-%i/.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/env npm run start
+Restart=on-failure
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -31,28 +31,48 @@ async def pick_next_query(platform: str) -> tuple[UUID, str] | None:
     NULL `last_run_at` sorts first (NULLS FIRST) so freshly-added queries
     get an immediate first run before falling into the rotation.
     """
+    res = await pick_next_queries(platform, n=1)
+    return res[0] if res else None
+
+
+async def pick_next_queries(platform: str, n: int = 1) -> list[tuple[UUID, str]]:
+    """Return up to N least-recently-used enabled queries for `platform`.
+
+    Used by the cadence-tuned beat schedule: e.g. YT/X daily with n=7
+    gives a 7-day rotation cycle across the ~49-keyword pool, TT daily
+    with n=4 gives ~12-day, IG daily with n=2 gives ~25-day. n=1 keeps
+    the original single-keyword-per-tick behavior.
+    """
+    if n <= 0:
+        return []
     async with SessionLocal() as session:
         res = await session.execute(
             select(IngestQuery.id, IngestQuery.query)
             .where(IngestQuery.platform == platform)
             .where(IngestQuery.enabled.is_(True))
             .order_by(asc(IngestQuery.last_run_at).nulls_first())
-            .limit(1)
+            .limit(n)
         )
-        row = res.first()
-        if row is None:
-            return None
-        return row[0], row[1]
+        return [(row[0], row[1]) for row in res.all()]
 
 
 async def mark_used(query_id: UUID) -> None:
     """Stamp `last_run_at = now()` so this query falls to the back of the
     rotation queue. Called after a scrape completes regardless of result
     count — failed/empty runs still consume their turn."""
+    await mark_used_many([query_id])
+
+
+async def mark_used_many(query_ids: list[UUID]) -> None:
+    """Batch variant of `mark_used` — single UPDATE for N ids. Used when
+    the beat task picks multiple keywords per tick so we don't issue N
+    separate UPDATEs."""
+    if not query_ids:
+        return
     async with SessionLocal() as session:
         await session.execute(
             update(IngestQuery)
-            .where(IngestQuery.id == query_id)
+            .where(IngestQuery.id.in_(query_ids))
             .values(last_run_at=datetime.utcnow())
         )
         await session.commit()

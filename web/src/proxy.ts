@@ -7,7 +7,16 @@ import { routing } from "@/i18n/routing";
 
 const intl = createIntlMiddleware(routing);
 
-const PROTECTED_PREFIXES = ["/dashboard", "/briefs", "/segments", "/admin"];
+const PROTECTED_PREFIXES = [
+  "/dashboard",
+  "/briefs",
+  "/admin",
+  // Onboarding is sign-in-required even though it's also in ONBOARDING_EXEMPT
+  // below — those serve different concerns. Here it gates anonymous traffic;
+  // the exempt list prevents already-signed-in-but-not-onboarded users from
+  // being redirected to themselves.
+  "/onboarding",
+];
 
 // Routes that match a PROTECTED_PREFIX but should NOT require auth — public
 // surfaces nested under an otherwise-private root. Order matters: the public

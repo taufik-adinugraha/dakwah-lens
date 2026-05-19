@@ -1,6 +1,7 @@
 import { Trash2 } from "lucide-react";
-import { asc, sql } from "drizzle-orm";
+import { and, asc, eq, sql, type SQL } from "drizzle-orm";
 
+import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
 import {
@@ -13,9 +14,10 @@ import {
   EmptyState,
   HelpCallout,
   PageHeader,
-  StatTile,
   formatRelative,
 } from "../_ui";
+import { ConfirmForm } from "../_ConfirmForm";
+import { QuerySearchForm } from "./QuerySearchForm";
 
 const PLATFORMS = ["x", "instagram", "tiktok", "youtube"] as const;
 const CATEGORIES = [
@@ -30,30 +32,71 @@ const CATEGORIES = [
   "current_events",
 ] as const;
 type PlatformFilter = (typeof PLATFORMS)[number] | "all";
+type CategoryFilter = (typeof CATEGORIES)[number] | "all";
+
+/** Build /admin/system/queries URL while preserving the cross-filters
+ *  (toggling one filter shouldn't drop the others). */
+function buildHref(
+  platform: PlatformFilter,
+  category: CategoryFilter,
+  search: string,
+): string {
+  const params = new URLSearchParams();
+  if (platform !== "all") params.set("platform", platform);
+  if (category !== "all") params.set("category", category);
+  if (search) params.set("q", search);
+  const qs = params.toString();
+  return `/admin/system/queries${qs ? `?${qs}` : ""}`;
+}
 
 export default async function QueriesPage({
   searchParams,
 }: PageProps<"/[locale]/admin/system/queries">) {
-  const sp = await searchParams;
-  const rawFilter = typeof sp.platform === "string" ? sp.platform : undefined;
-  const platformFilter: PlatformFilter =
-    rawFilter && (PLATFORMS as readonly string[]).includes(rawFilter)
-      ? (rawFilter as PlatformFilter)
-      : "all";
+  // Admin view is read-only — hide Add form, row delete, and toggle.
+  const session = await auth();
+  const isSuperadmin = session?.user?.role === "superadmin";
 
-  // Per-platform tallies for the filter pills.
-  const counts = await db.execute(sql`
+  const sp = await searchParams;
+  const rawPlatform =
+    typeof sp.platform === "string" ? sp.platform : undefined;
+  const platformFilter: PlatformFilter =
+    rawPlatform && (PLATFORMS as readonly string[]).includes(rawPlatform)
+      ? (rawPlatform as PlatformFilter)
+      : "all";
+  const rawCategory =
+    typeof sp.category === "string" ? sp.category : undefined;
+  const categoryFilter: CategoryFilter =
+    rawCategory && (CATEGORIES as readonly string[]).includes(rawCategory)
+      ? (rawCategory as CategoryFilter)
+      : "all";
+  const search =
+    typeof sp.q === "string" ? sp.q.trim().slice(0, 100) : "";
+  // Postgres ILIKE escapes — keep the user's % and _ as literals so
+  // searching for "_" doesn't match every row.
+  const escapedSearch = search.replace(/\\/g, "\\\\").replace(/%/g, "\\%").replace(/_/g, "\\_");
+
+  // Per-filter tallies — each pill's count tells the user "if I click
+  // this pill, how many rows will I see?". So each filter's counts
+  // apply the OTHER filter + the search:
+  //   - Platform pill counts apply (search + active category)
+  //   - Category pill counts apply (search + active platform)
+  // The pill-row "All" sums tell the user how many rows there'd be if
+  // they clicked All (relaxing that filter while keeping the other).
+  const platformCounts = await db.execute(sql`
     SELECT
       platform,
       COUNT(*)::int AS total,
       COUNT(*) FILTER (WHERE enabled)::int AS enabled
     FROM ingest_queries
+    WHERE TRUE
+      ${search ? sql`AND query ILIKE ${"%" + escapedSearch + "%"}` : sql``}
+      ${categoryFilter !== "all" ? sql`AND category = ${categoryFilter}` : sql``}
     GROUP BY platform
-    ORDER BY platform
   `);
   const perPlatform = new Map<string, { total: number; enabled: number }>();
-  for (const row of Array.isArray(counts)
-    ? (counts as unknown as Array<{
+  for (const p of PLATFORMS) perPlatform.set(p, { total: 0, enabled: 0 });
+  for (const row of Array.isArray(platformCounts)
+    ? (platformCounts as unknown as Array<{
         platform: string;
         total: number;
         enabled: number;
@@ -61,29 +104,64 @@ export default async function QueriesPage({
     : []) {
     perPlatform.set(row.platform, { total: row.total, enabled: row.enabled });
   }
-  const overall = {
-    total: Array.from(perPlatform.values()).reduce(
-      (s, p) => s + p.total,
-      0,
-    ),
-    enabled: Array.from(perPlatform.values()).reduce(
-      (s, p) => s + p.enabled,
-      0,
-    ),
-  };
 
-  // Filtered list.
-  const queries =
-    platformFilter === "all"
-      ? await db
-          .select()
-          .from(schema.ingestQueries)
-          .orderBy(asc(schema.ingestQueries.platform), asc(schema.ingestQueries.query))
-      : await db
-          .select()
-          .from(schema.ingestQueries)
-          .where(sql`platform = ${platformFilter}`)
-          .orderBy(asc(schema.ingestQueries.query));
+  const categoryCounts = await db.execute(sql`
+    SELECT
+      COALESCE(category, '__null__') AS category,
+      COUNT(*)::int AS total
+    FROM ingest_queries
+    WHERE TRUE
+      ${search ? sql`AND query ILIKE ${"%" + escapedSearch + "%"}` : sql``}
+      ${platformFilter !== "all" ? sql`AND platform = ${platformFilter}` : sql``}
+    GROUP BY category
+  `);
+  const perCategory = new Map<string, number>();
+  for (const c of CATEGORIES) perCategory.set(c, 0);
+  for (const row of Array.isArray(categoryCounts)
+    ? (categoryCounts as unknown as Array<{ category: string; total: number }>)
+    : []) {
+    if (row.category === "__null__") continue;
+    perCategory.set(row.category, row.total);
+  }
+
+  // The two "All" sums must come from their OWN axis (not the other's),
+  // since each axis is filtered by the other already:
+  //   - Platform "All" = sum of platform counts = matches given
+  //     (search + active category)
+  //   - Category "All" = sum of category counts = matches given
+  //     (search + active platform)
+  const platformAllCount = Array.from(perPlatform.values()).reduce(
+    (s, p) => s + p.total,
+    0,
+  );
+  const categoryAllCount = Array.from(perCategory.values()).reduce(
+    (s, n) => s + n,
+    0,
+  );
+
+  // Filtered list — combine platform + category + search. Sort by
+  // category first (per request), then platform + query alphabetically
+  // within each category. NULL categories fall to the end via
+  // PostgreSQL's default ASC NULLS LAST.
+  const conditions: SQL[] = [];
+  if (platformFilter !== "all") {
+    conditions.push(eq(schema.ingestQueries.platform, platformFilter));
+  }
+  if (categoryFilter !== "all") {
+    conditions.push(eq(schema.ingestQueries.category, categoryFilter));
+  }
+  if (search) {
+    conditions.push(sql`query ILIKE ${"%" + escapedSearch + "%"}`);
+  }
+  const queries = await db
+    .select()
+    .from(schema.ingestQueries)
+    .where(conditions.length ? and(...conditions) : undefined)
+    .orderBy(
+      asc(schema.ingestQueries.category),
+      asc(schema.ingestQueries.platform),
+      asc(schema.ingestQueries.query),
+    );
 
   return (
     <>
@@ -94,14 +172,20 @@ export default async function QueriesPage({
 
       <HelpCallout>
         <p>
-          The rotating-ingest Celery task picks the <strong>least-recently-used
-          enabled</strong> query per platform on each beat tick. So if you have
-          30 queries enabled for X, each one runs roughly once a month at the
-          current daily cadence.
+          The rotating-ingest Celery task scrapes <strong>every enabled
+          query</strong> for the platforms it runs. Cadence per platform:
+          YouTube + TikTok every day (00:00 / 00:20 WIB, both free actors), X
+          three times a week (Mon/Wed/Fri 00:10), Instagram once a week (Mon
+          00:30). TikTok also gets a biweekly Monday re-sweep (1st + 3rd
+          Mondays of each month, 00:25) with the paid{" "}
+          <code>clockworks/tiktok-scraper</code> actor for richer metadata —
+          overwrites that day&apos;s free-actor payload. At the current pool
+          size that is roughly{" "}
+          <strong>~58 keywords × 18.5 runs/week ≈ 1,073 scrapes/week.</strong>
         </p>
         <p>
           The downstream Gemini relevance classifier filters every scraped
-          post into the 9 PRD da'wah categories before anything reaches the
+          post into the 9 PRD da&apos;wah categories before anything reaches the
           dashboard. Broad societal queries (<code>pinjol</code>,{" "}
           <code>burnout</code>) surface real ummah concerns, then the
           classifier picks the religiously-relevant subset.
@@ -113,21 +197,7 @@ export default async function QueriesPage({
         </p>
       </HelpCallout>
 
-      <div className="grid gap-3 sm:grid-cols-4">
-        {PLATFORMS.map((p) => {
-          const c = perPlatform.get(p) ?? { total: 0, enabled: 0 };
-          return (
-            <StatTile
-              key={p}
-              label={p.toUpperCase()}
-              value={String(c.enabled)}
-              hint={`${c.total} total · ${c.enabled} enabled`}
-              accent={c.enabled === 0 ? "rose" : "emerald"}
-            />
-          );
-        })}
-      </div>
-
+      {isSuperadmin && (
       <Card title="Add a new query">
         <form action={addIngestQuery} className="space-y-4">
           <div className="grid gap-3 sm:grid-cols-[2fr_1fr]">
@@ -194,36 +264,81 @@ export default async function QueriesPage({
           </div>
         </form>
       </Card>
+      )}
 
-      <Card title={`Queries (${overall.enabled}/${overall.total} enabled)`}>
-        <div className="mb-4 flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-            Show
-          </span>
-          <FilterPill
-            href="/admin/system/queries"
-            active={platformFilter === "all"}
-            label="All"
-            count={overall.total}
-          />
-          {PLATFORMS.map((p) => (
-            <FilterPill
-              key={p}
-              href={`/admin/system/queries?platform=${p}`}
-              active={platformFilter === p}
-              label={p}
-              count={perPlatform.get(p)?.total ?? 0}
+      <Card
+        title={`Queries (${queries.filter((q) => q.enabled).length}/${queries.length} enabled)`}
+      >
+        {/* Platform + category filter pills, co-located with the search
+            field below so the user sees all three filter axes together
+            without scrolling. All three compose: each pill's href
+            preserves the others, the search form preserves the active
+            pills via hidden inputs. */}
+        <div className="mb-2">
+          <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+            Platform
+          </p>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <PlatformFilterPill
+              label="All"
+              count={platformAllCount}
+              href={buildHref("all", categoryFilter, search)}
+              active={platformFilter === "all"}
             />
-          ))}
+            {PLATFORMS.map((p) => {
+              const c = perPlatform.get(p) ?? { total: 0, enabled: 0 };
+              return (
+                <PlatformFilterPill
+                  key={p}
+                  label={p}
+                  count={c.total}
+                  href={buildHref(p, categoryFilter, search)}
+                  active={platformFilter === p}
+                />
+              );
+            })}
+          </div>
         </div>
+        <div className="mb-3">
+          <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+            Category
+          </p>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <PlatformFilterPill
+              label="All"
+              count={categoryAllCount}
+              href={buildHref(platformFilter, "all", search)}
+              active={categoryFilter === "all"}
+            />
+            {CATEGORIES.map((c) => (
+              <PlatformFilterPill
+                key={c}
+                label={c.replace(/_/g, " ")}
+                count={perCategory.get(c) ?? 0}
+                href={buildHref(platformFilter, c, search)}
+                active={categoryFilter === c}
+              />
+            ))}
+          </div>
+        </div>
+        <QuerySearchForm
+          initialSearch={search}
+          platformFilter={platformFilter}
+          categoryFilter={categoryFilter}
+          matchCount={queries.length}
+        />
 
         {queries.length === 0 ? (
           <EmptyState
-            title="No queries"
-            hint="Add one above, or run uv run python -m api.scripts.seed_ingest_queries to seed defaults."
+            title={search ? "No matches" : "No queries"}
+            hint={
+              search
+                ? `No queries matching "${search}"${platformFilter !== "all" ? ` on ${platformFilter}` : ""}. Try a shorter term or clear the filter.`
+                : "Add one above, or run uv run python -m api.scripts.seed_ingest_queries to seed defaults."
+            }
           />
         ) : (
-          <table className="w-full text-sm">
+          <table className="w-full text-sm max-md:block max-md:overflow-x-auto">
             <thead>
               <tr className="border-b border-slate-100 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                 <th className="py-2">Platform</th>
@@ -231,7 +346,7 @@ export default async function QueriesPage({
                 <th className="py-2">Category</th>
                 <th className="py-2">Last run</th>
                 <th className="py-2 text-right">State</th>
-                <th className="py-2" />
+                {isSuperadmin && <th className="py-2" />}
               </tr>
             </thead>
             <tbody>
@@ -256,24 +371,41 @@ export default async function QueriesPage({
                     {q.lastRunAt ? formatRelative(q.lastRunAt) : "never"}
                   </td>
                   <td className="py-2 text-right">
-                    <ToggleSwitch
-                      id={q.id}
-                      enabled={q.enabled}
-                      label={q.query}
-                    />
-                  </td>
-                  <td className="py-2 text-right">
-                    <form action={deleteIngestQuery}>
-                      <input type="hidden" name="id" value={q.id} />
-                      <button
-                        type="submit"
-                        className="inline-flex h-7 w-7 items-center justify-center rounded-full text-slate-400 hover:bg-rose-50 hover:text-rose-700"
-                        aria-label={`Delete ${q.query}`}
+                    {isSuperadmin ? (
+                      <ToggleSwitch
+                        id={q.id}
+                        enabled={q.enabled}
+                        label={q.query}
+                      />
+                    ) : (
+                      <span
+                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ring-1 ${
+                          q.enabled
+                            ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
+                            : "bg-slate-100 text-slate-500 ring-slate-200"
+                        }`}
                       >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </form>
+                        {q.enabled ? "Enabled" : "Disabled"}
+                      </span>
+                    )}
                   </td>
+                  {isSuperadmin && (
+                    <td className="py-2 text-right">
+                      <ConfirmForm
+                        action={deleteIngestQuery}
+                        confirmMessage={`Delete the "${q.query}" query on ${q.platform}? This drops the rotation state — consider disabling instead if you might want it back.`}
+                      >
+                        <input type="hidden" name="id" value={q.id} />
+                        <button
+                          type="submit"
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-full text-slate-400 hover:bg-rose-50 hover:text-rose-700"
+                          aria-label={`Delete ${q.query}`}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </ConfirmForm>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -289,7 +421,7 @@ export default async function QueriesPage({
         >
           pipeline health
         </Link>{" "}
-        to see how each query's recent runs performed.
+        to see how each query&apos;s recent runs performed.
       </p>
     </>
   );
@@ -319,29 +451,33 @@ function FormField({
   );
 }
 
-function FilterPill({
-  href,
-  active,
+function PlatformFilterPill({
   label,
   count,
+  href,
+  active,
 }: {
-  href: string;
-  active: boolean;
   label: string;
   count: number;
+  href: string;
+  active: boolean;
 }) {
   return (
     <Link
       href={href}
-      className={`inline-flex h-7 items-center gap-1.5 rounded-full border px-3 text-[11px] font-semibold transition ${
+      scroll={false}
+      aria-current={active ? "true" : undefined}
+      className={`inline-flex h-7 items-center gap-1.5 rounded-full border px-3 text-[11px] font-semibold uppercase tracking-wider transition ${
         active
           ? "border-slate-900 bg-slate-900 text-white"
-          : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+          : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
       }`}
     >
-      <span className="capitalize">{label}</span>
+      <span>{label}</span>
       <span
-        className={`tabular-nums ${active ? "text-white/80" : "text-slate-400"}`}
+        className={`tabular-nums ${
+          active ? "text-white/70" : "text-slate-400"
+        }`}
       >
         {count}
       </span>

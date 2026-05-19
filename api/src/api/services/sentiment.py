@@ -10,14 +10,39 @@ baseline is materially worse on our domain. See PRD §08 Stage 2.
 
 Latency: ~50-200ms per inference on CPU. Memory: ~600MB peak. Fine to keep
 hot-loaded in the same FastAPI process for prototype scale (~50K posts/mo).
+
+CPU budget
+----------
+PyTorch grabs every CPU core by default for matmul, which starves the rest
+of the worker (Celery, Postgres queries, the API server) on the shared
+4-vCPU VM. We cap thread counts before transformers/torch import so a
+single sentiment batch can't monopolise the box. The cap applies to BERTopic
+and any other torch-backed code that loads after this module too.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Literal
+import os
 
-import structlog
+# Must be set BEFORE the first `import torch` anywhere in the process.
+# `setdefault` lets a systemd EnvironmentFile or explicit shell override
+# win — useful for benchmarking different limits without code changes.
+# Currently 1 — IndoBERT runs single-threaded so the rest of the worker
+# (Celery, Postgres queries, the API server) keeps the other vCPUs.
+_CPU_LIMIT = "1"
+for _var in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS"):
+    os.environ.setdefault(_var, _CPU_LIMIT)
+# Silences a noisy HF warning and avoids over-subscribing the tokenizer's
+# own thread pool on top of the matmul threads.
+os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+
+# Imports below intentionally come AFTER the env-var setup — ruff E402 is
+# suppressed because rearranging would defeat the cap (torch reads OMP/MKL
+# vars exactly once, at first import).
+from dataclasses import dataclass  # noqa: E402
+from typing import Literal  # noqa: E402
+
+import structlog  # noqa: E402
 
 log = structlog.get_logger()
 
@@ -46,9 +71,27 @@ _pipeline = None
 def _get_pipeline():
     global _pipeline
     if _pipeline is None:
+        # Belt-and-suspenders: even if some other module imported torch
+        # before our env-var setting could take effect, these runtime
+        # setters still cap the thread pools. No-op if already set.
+        import torch
         from transformers import pipeline
 
-        log.info("sentiment.loading_model", model=_MODEL_NAME)
+        try:
+            torch.set_num_threads(int(_CPU_LIMIT))
+            torch.set_num_interop_threads(int(_CPU_LIMIT))
+        except RuntimeError:
+            # set_num_interop_threads can only be called once per process;
+            # the second call raises rather than silently overriding. Safe
+            # to swallow — set_num_threads above already covered the
+            # primary matmul pool.
+            pass
+
+        log.info(
+            "sentiment.loading_model",
+            model=_MODEL_NAME,
+            cpu_limit=_CPU_LIMIT,
+        )
         _pipeline = pipeline(
             "text-classification",
             model=_MODEL_NAME,

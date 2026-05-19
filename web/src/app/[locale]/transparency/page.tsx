@@ -10,8 +10,10 @@ import {
   Sparkles,
 } from "lucide-react";
 
+import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
+import { marketingSectionLink } from "@/lib/marketing-href";
 import { getUsdToIdrRow } from "@/lib/settings";
 
 export async function generateMetadata({
@@ -30,8 +32,15 @@ export default async function TransparencyPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const t = await getTranslations("Transparency");
+  const [t, session] = await Promise.all([
+    getTranslations("Transparency"),
+    auth(),
+  ]);
   const idLocale = locale === "id" ? "id-ID" : "en-US";
+  const donateHref = marketingSectionLink(
+    session?.user?.status === "approved",
+    locale,
+  )("#donate");
 
   const [
     fxRow,
@@ -184,7 +193,7 @@ export default async function TransparencyPage({
 
       <DonationsList donations={recentDonations} t={t} idLocale={idLocale} />
 
-      <ClosingCTA t={t} />
+      <ClosingCTA t={t} donateHref={donateHref} />
     </>
   );
 }
@@ -456,7 +465,7 @@ function DonationsList({
   );
 }
 
-function ClosingCTA({ t }: { t: T }) {
+function ClosingCTA({ t, donateHref }: { t: T; donateHref: string }) {
   return (
     <section className="py-12 sm:py-16">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
@@ -475,12 +484,12 @@ function ClosingCTA({ t }: { t: T }) {
             {t("closing_body")}
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/#donate"
+            <a
+              href={donateHref}
               className="inline-flex h-12 items-center gap-2 rounded-full bg-white px-6 text-sm font-semibold text-emerald-800 shadow-lg transition hover:bg-emerald-50"
             >
               {t("closing_cta_donate")}
-            </Link>
+            </a>
             <Link
               href="/about"
               className="inline-flex h-12 items-center gap-2 rounded-full border border-white/30 bg-white/5 px-6 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/10"

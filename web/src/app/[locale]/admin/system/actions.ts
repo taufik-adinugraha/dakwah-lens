@@ -4,8 +4,34 @@ import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 
 import { db, schema } from "@/db";
-import { setUsdToIdr } from "@/lib/settings";
-import { requireSuperadmin } from "@/lib/superadmin";
+import { logAdminAction } from "@/lib/admin-log";
+import {
+  deleteAttachment,
+  writeAttachment,
+  type AttachmentKind,
+} from "@/lib/attachments";
+import { KNOWN_PROVIDERS } from "@/lib/cost-providers";
+import { getUsdToIdr, setUsdToIdr } from "@/lib/settings";
+import { requireSuperadmin, requireSystemAccess } from "@/lib/superadmin";
+
+/** Pull an uploaded file from FormData, persist it to disk, return
+ *  the metadata to store on the DB row. Returns null when no file
+ *  was attached. Throws on validation failure (size / type / IO)
+ *  with the same error-code shape the caller can surface. */
+async function consumeAttachment(
+  formData: FormData,
+  kind: AttachmentKind,
+): Promise<{
+  path: string;
+  filename: string;
+  sizeBytes: number;
+  mimeType: string;
+} | null> {
+  const raw = formData.get("attachment");
+  if (!(raw instanceof File) || raw.size === 0) return null;
+  const meta = await writeAttachment(kind, raw);
+  return meta;
+}
 
 /* ────────────────────────────────────────────────────────────
  * RSS feed CRUD
@@ -79,9 +105,12 @@ function isUnsafeFeedUrl(input: string): boolean {
 }
 
 export async function addRssFeed(formData: FormData) {
-  await requireSuperadmin();
-  const name = String(formData.get("name") ?? "").trim();
-  const url = String(formData.get("url") ?? "").trim();
+  const session = await requireSuperadmin();
+  // Cap at the column widths defined in the SQLAlchemy model — admin
+  // gate keeps the attack surface small, but bounded inputs prevent a
+  // typo (or a paste of the wrong thing) from filling the column.
+  const name = String(formData.get("name") ?? "").trim().slice(0, 64);
+  const url = String(formData.get("url") ?? "").trim().slice(0, 500);
   const rawScope = String(formData.get("scope") ?? "national");
   const rawRegion = String(formData.get("region") ?? "");
   if (!name || !url) return;
@@ -97,43 +126,93 @@ export async function addRssFeed(formData: FormData) {
       : null;
   if (scope === "regional" && !region) return;
   const fetchBody = formData.get("fetch_body") === "on";
-  await db
+  const [inserted] = await db
     .insert(schema.rssFeeds)
     .values({ name, url, enabled: true, scope, region, fetchBody })
-    .onConflictDoNothing();
+    .onConflictDoNothing()
+    .returning({ id: schema.rssFeeds.id });
+  if (inserted) {
+    await logAdminAction({
+      actorId: session.user.id,
+      action: "rss.add",
+      targetType: "rss_feed",
+      targetId: inserted.id,
+      payload: { name, url, scope, region, fetch_body: fetchBody },
+    });
+  }
   revalidatePath("/admin/system/rss");
 }
 
 /** Flip the per-feed `fetch_body` toggle. */
 export async function toggleFetchBody(formData: FormData) {
-  await requireSuperadmin();
+  const session = await requireSuperadmin();
   const id = String(formData.get("id") ?? "");
   const next = formData.get("fetch_body") !== "true";
   if (!id) return;
+  const [row] = await db
+    .select({ name: schema.rssFeeds.name })
+    .from(schema.rssFeeds)
+    .where(eq(schema.rssFeeds.id, id))
+    .limit(1);
+  if (!row) return;
   await db
     .update(schema.rssFeeds)
     .set({ fetchBody: next, updatedAt: new Date() })
     .where(eq(schema.rssFeeds.id, id));
+  await logAdminAction({
+    actorId: session.user.id,
+    action: "rss.toggle_fetch_body",
+    targetType: "rss_feed",
+    targetId: id,
+    payload: { name: row.name, fetch_body: next },
+  });
   revalidatePath("/admin/system/rss");
 }
 
 export async function toggleRssFeed(formData: FormData) {
-  await requireSuperadmin();
+  const session = await requireSuperadmin();
   const id = String(formData.get("id") ?? "");
   const enabled = formData.get("enabled") === "true";
   if (!id) return;
+  const [row] = await db
+    .select({ name: schema.rssFeeds.name })
+    .from(schema.rssFeeds)
+    .where(eq(schema.rssFeeds.id, id))
+    .limit(1);
+  if (!row) return;
+  const newEnabled = !enabled;
   await db
     .update(schema.rssFeeds)
-    .set({ enabled: !enabled, updatedAt: new Date() })
+    .set({ enabled: newEnabled, updatedAt: new Date() })
     .where(eq(schema.rssFeeds.id, id));
+  await logAdminAction({
+    actorId: session.user.id,
+    action: "rss.toggle_enabled",
+    targetType: "rss_feed",
+    targetId: id,
+    payload: { name: row.name, enabled: newEnabled },
+  });
   revalidatePath("/admin/system/rss");
 }
 
 export async function deleteRssFeed(formData: FormData) {
-  await requireSuperadmin();
+  const session = await requireSuperadmin();
   const id = String(formData.get("id") ?? "");
   if (!id) return;
+  const [row] = await db
+    .select({ name: schema.rssFeeds.name, url: schema.rssFeeds.url })
+    .from(schema.rssFeeds)
+    .where(eq(schema.rssFeeds.id, id))
+    .limit(1);
+  if (!row) return;
   await db.delete(schema.rssFeeds).where(eq(schema.rssFeeds.id, id));
+  await logAdminAction({
+    actorId: session.user.id,
+    action: "rss.delete",
+    targetType: "rss_feed",
+    targetId: id,
+    payload: { name: row.name, url: row.url },
+  });
   revalidatePath("/admin/system/rss");
 }
 
@@ -142,30 +221,101 @@ export async function deleteRssFeed(formData: FormData) {
  * ──────────────────────────────────────────────────────────── */
 
 export async function addManualCost(formData: FormData) {
-  await requireSuperadmin();
-  const kind = String(formData.get("kind") ?? "").trim();
-  const vendor = String(formData.get("vendor") ?? "").trim();
+  const session = await requireSuperadmin();
+  const kind = String(formData.get("kind") ?? "").trim().slice(0, 32);
+  const vendor = String(formData.get("vendor") ?? "").trim().slice(0, 64);
   const amount = Number(formData.get("amount_idr") ?? 0);
   const start = String(formData.get("period_start") ?? "");
   const end = String(formData.get("period_end") ?? "");
-  const note = (formData.get("note") ?? "").toString().trim() || null;
+  const rawNote = (formData.get("note") ?? "").toString().trim();
+  const note = rawNote ? rawNote.slice(0, 2000) : null;
   if (!kind || !vendor || !amount || !start || !end) return;
-  await db.insert(schema.manualCosts).values({
-    kind,
-    vendor,
-    amountIdr: amount,
-    periodStart: new Date(start),
-    periodEnd: new Date(end),
-    note,
-  });
+
+  // Validate covers_provider against the KNOWN_PROVIDERS allow-list.
+  // Empty string / "none" → null (pure infra cost, no usage offset).
+  const rawCoversProvider = (
+    formData.get("covers_provider") ?? ""
+  ).toString();
+  const coversProvider = (KNOWN_PROVIDERS as readonly string[]).includes(
+    rawCoversProvider,
+  )
+    ? rawCoversProvider
+    : null;
+
+  // Optional invoice attachment. Persist to disk first so the DB row
+  // doesn't reference a missing file if the upload fails mid-way.
+  const attachment = await consumeAttachment(formData, "manual-cost");
+
+  const [inserted] = await db
+    .insert(schema.manualCosts)
+    .values({
+      kind,
+      vendor,
+      amountIdr: amount,
+      periodStart: new Date(start),
+      periodEnd: new Date(end),
+      note,
+      coversProvider,
+      attachmentPath: attachment?.path,
+      attachmentFilename: attachment?.filename,
+      attachmentSizeBytes: attachment?.sizeBytes,
+      attachmentMimeType: attachment?.mimeType,
+    })
+    .returning({ id: schema.manualCosts.id });
+  if (inserted) {
+    await logAdminAction({
+      actorId: session.user.id,
+      action: "cost.add",
+      targetType: "manual_cost",
+      targetId: inserted.id,
+      payload: {
+        kind,
+        vendor,
+        amount_idr: amount,
+        covers_provider: coversProvider,
+        has_attachment: Boolean(attachment),
+      },
+    });
+  }
   revalidatePath("/admin/system/costs");
+  revalidatePath("/admin/system");
 }
 
 export async function deleteManualCost(formData: FormData) {
-  await requireSuperadmin();
+  const session = await requireSuperadmin();
   const id = String(formData.get("id") ?? "");
   if (!id) return;
+  // Read the row first so we know which file (if any) to unlink and
+  // can include identifying fields in the audit payload — once the
+  // row is gone there's no way to recover them.
+  const [row] = await db
+    .select({
+      attachmentPath: schema.manualCosts.attachmentPath,
+      kind: schema.manualCosts.kind,
+      vendor: schema.manualCosts.vendor,
+      amountIdr: schema.manualCosts.amountIdr,
+      coversProvider: schema.manualCosts.coversProvider,
+    })
+    .from(schema.manualCosts)
+    .where(eq(schema.manualCosts.id, id))
+    .limit(1);
+  if (!row) return;
   await db.delete(schema.manualCosts).where(eq(schema.manualCosts.id, id));
+  if (row.attachmentPath) {
+    await deleteAttachment(row.attachmentPath);
+  }
+  await logAdminAction({
+    actorId: session.user.id,
+    action: "cost.delete",
+    targetType: "manual_cost",
+    targetId: id,
+    payload: {
+      kind: row.kind,
+      vendor: row.vendor,
+      amount_idr: row.amountIdr,
+      covers_provider: row.coversProvider,
+    },
+  });
   revalidatePath("/admin/system/costs");
 }
 
@@ -174,7 +324,8 @@ export async function deleteManualCost(formData: FormData) {
  * ──────────────────────────────────────────────────────────── */
 
 export async function addDonation(formData: FormData) {
-  await requireSuperadmin();
+  // Donations are admin-accessible (read-only system area exception #1).
+  const session = await requireSystemAccess();
   const amount = Number(formData.get("amount_idr") ?? 0);
   const receivedAt = String(formData.get("received_at") ?? "");
   if (!amount || amount <= 0 || !receivedAt) return;
@@ -184,31 +335,86 @@ export async function addDonation(formData: FormData) {
   // not even in `donor`. The public page filters on `is_anonymous`, but
   // a dropped column is safer than a depended-on check.
   const rawDonor = (formData.get("donor") ?? "").toString().trim();
-  const donor = isAnonymous ? null : rawDonor || null;
+  const donor = isAnonymous ? null : rawDonor ? rawDonor.slice(0, 120) : null;
 
   const rawChannel = (formData.get("channel") ?? "").toString().trim();
   const channel = rawChannel ? rawChannel.slice(0, 32) : null;
 
-  const note = (formData.get("note") ?? "").toString().trim() || null;
+  const rawNote = (formData.get("note") ?? "").toString().trim();
+  const note = rawNote ? rawNote.slice(0, 2000) : null;
 
-  await db.insert(schema.donations).values({
-    receivedAt: new Date(receivedAt),
-    amountIdr: amount,
-    donor,
-    isAnonymous,
-    channel,
-    note,
-  });
+  // Optional transfer-proof / receipt file. Admin-only access via
+  // /api/admin/attachments/donation/[id] — never exposed publicly
+  // (the /transparency page reads from `donations` but never the
+  // attachment fields).
+  const attachment = await consumeAttachment(formData, "donation");
+
+  const [inserted] = await db
+    .insert(schema.donations)
+    .values({
+      receivedAt: new Date(receivedAt),
+      amountIdr: amount,
+      donor,
+      isAnonymous,
+      channel,
+      note,
+      attachmentPath: attachment?.path,
+      attachmentFilename: attachment?.filename,
+      attachmentSizeBytes: attachment?.sizeBytes,
+      attachmentMimeType: attachment?.mimeType,
+    })
+    .returning({ id: schema.donations.id });
+  if (inserted) {
+    await logAdminAction({
+      actorId: session.user.id,
+      action: "donation.add",
+      targetType: "donation",
+      targetId: inserted.id,
+      payload: {
+        amount_idr: amount,
+        donor: isAnonymous ? "(anonymous)" : donor,
+        channel,
+        has_attachment: Boolean(attachment),
+      },
+    });
+  }
   revalidatePath("/admin/system/donations");
   revalidatePath("/admin/system/costs");
   revalidatePath("/transparency");
 }
 
 export async function deleteDonation(formData: FormData) {
-  await requireSuperadmin();
+  // Donations are admin-accessible (read-only system area exception #1).
+  const session = await requireSystemAccess();
   const id = String(formData.get("id") ?? "");
   if (!id) return;
+  const [row] = await db
+    .select({
+      attachmentPath: schema.donations.attachmentPath,
+      amountIdr: schema.donations.amountIdr,
+      donor: schema.donations.donor,
+      isAnonymous: schema.donations.isAnonymous,
+      channel: schema.donations.channel,
+    })
+    .from(schema.donations)
+    .where(eq(schema.donations.id, id))
+    .limit(1);
+  if (!row) return;
   await db.delete(schema.donations).where(eq(schema.donations.id, id));
+  if (row.attachmentPath) {
+    await deleteAttachment(row.attachmentPath);
+  }
+  await logAdminAction({
+    actorId: session.user.id,
+    action: "donation.delete",
+    targetType: "donation",
+    targetId: id,
+    payload: {
+      amount_idr: row.amountIdr,
+      donor: row.isAnonymous ? "(anonymous)" : row.donor,
+      channel: row.channel,
+    },
+  });
   revalidatePath("/admin/system/donations");
   revalidatePath("/admin/system/costs");
   revalidatePath("/transparency");
@@ -219,14 +425,28 @@ export async function deleteDonation(formData: FormData) {
  * ──────────────────────────────────────────────────────────── */
 
 export async function setContactStatus(formData: FormData) {
-  await requireSuperadmin();
+  // Inbox triage is admin-accessible (read-only system area exception #2).
+  const session = await requireSystemAccess();
   const id = String(formData.get("id") ?? "");
   const status = String(formData.get("status") ?? "");
   if (!id || !["new", "read", "archived"].includes(status)) return;
+  const [row] = await db
+    .select({ email: schema.contactMessages.email })
+    .from(schema.contactMessages)
+    .where(eq(schema.contactMessages.id, id))
+    .limit(1);
+  if (!row) return;
   await db
     .update(schema.contactMessages)
     .set({ status, updatedAt: new Date() })
     .where(eq(schema.contactMessages.id, id));
+  await logAdminAction({
+    actorId: session.user.id,
+    action: "contact.status_change",
+    targetType: "contact_message",
+    targetId: id,
+    payload: { email: row.email, new_status: status },
+  });
   revalidatePath("/admin/system/inbox");
   revalidatePath("/admin/system");
 }
@@ -249,7 +469,7 @@ const QUERY_CATEGORIES = [
 ] as const;
 
 export async function addIngestQuery(formData: FormData) {
-  await requireSuperadmin();
+  const session = await requireSuperadmin();
   const query = String(formData.get("query") ?? "").trim().slice(0, 160);
   const category = String(formData.get("category") ?? "").trim() || null;
   // Multi-select platforms via repeated form fields.
@@ -267,8 +487,9 @@ export async function addIngestQuery(formData: FormData) {
     return;
   }
   // One row per (platform, query). Conflict = silently skip.
+  const insertedPlatforms: string[] = [];
   for (const platform of platforms) {
-    await db
+    const [inserted] = await db
       .insert(schema.ingestQueries)
       .values({
         platform,
@@ -276,40 +497,112 @@ export async function addIngestQuery(formData: FormData) {
         category,
         enabled: true,
       })
-      .onConflictDoNothing();
+      .onConflictDoNothing()
+      .returning({ id: schema.ingestQueries.id });
+    if (inserted) insertedPlatforms.push(platform);
+  }
+  if (insertedPlatforms.length > 0) {
+    await logAdminAction({
+      actorId: session.user.id,
+      action: "ingest_query.add",
+      targetType: "ingest_query",
+      // Multi-row insert — use the query string itself as the target
+      // identifier for the audit row (platforms are in the payload).
+      targetId: query,
+      payload: { query, category, platforms: insertedPlatforms },
+    });
   }
   revalidatePath("/admin/system/queries");
 }
 
 export async function toggleIngestQuery(formData: FormData) {
-  await requireSuperadmin();
+  const session = await requireSuperadmin();
   const id = String(formData.get("id") ?? "");
   const enabled = formData.get("enabled") === "true";
   if (!id) return;
+  const [row] = await db
+    .select({
+      platform: schema.ingestQueries.platform,
+      query: schema.ingestQueries.query,
+    })
+    .from(schema.ingestQueries)
+    .where(eq(schema.ingestQueries.id, id))
+    .limit(1);
+  if (!row) return;
+  const newEnabled = !enabled;
   await db
     .update(schema.ingestQueries)
-    .set({ enabled: !enabled, updatedAt: new Date() })
+    .set({ enabled: newEnabled, updatedAt: new Date() })
     .where(eq(schema.ingestQueries.id, id));
+  await logAdminAction({
+    actorId: session.user.id,
+    action: "ingest_query.toggle",
+    targetType: "ingest_query",
+    targetId: id,
+    payload: {
+      platform: row.platform,
+      query: row.query,
+      enabled: newEnabled,
+    },
+  });
   revalidatePath("/admin/system/queries");
 }
 
 export async function deleteIngestQuery(formData: FormData) {
-  await requireSuperadmin();
+  const session = await requireSuperadmin();
   const id = String(formData.get("id") ?? "");
   if (!id) return;
+  const [row] = await db
+    .select({
+      platform: schema.ingestQueries.platform,
+      query: schema.ingestQueries.query,
+      category: schema.ingestQueries.category,
+    })
+    .from(schema.ingestQueries)
+    .where(eq(schema.ingestQueries.id, id))
+    .limit(1);
+  if (!row) return;
   await db
     .delete(schema.ingestQueries)
     .where(eq(schema.ingestQueries.id, id));
+  await logAdminAction({
+    actorId: session.user.id,
+    action: "ingest_query.delete",
+    targetType: "ingest_query",
+    targetId: id,
+    payload: {
+      platform: row.platform,
+      query: row.query,
+      category: row.category,
+    },
+  });
   revalidatePath("/admin/system/queries");
 }
 
 export async function deleteContactMessage(formData: FormData) {
-  await requireSuperadmin();
+  // Inbox triage is admin-accessible (read-only system area exception #2).
+  const session = await requireSystemAccess();
   const id = String(formData.get("id") ?? "");
   if (!id) return;
+  const [row] = await db
+    .select({
+      email: schema.contactMessages.email,
+      subject: schema.contactMessages.subject,
+    })
+    .from(schema.contactMessages)
+    .where(eq(schema.contactMessages.id, id))
+    .limit(1);
+  if (!row) return;
   await db
     .delete(schema.contactMessages)
     .where(eq(schema.contactMessages.id, id));
+  await logAdminAction({
+    actorId: session.user.id,
+    action: "contact.delete",
+    targetType: "contact_message",
+    targetId: id,
+    payload: { email: row.email, subject: row.subject },
+  });
   revalidatePath("/admin/system/inbox");
   revalidatePath("/admin/system");
 }
@@ -319,13 +612,21 @@ export async function deleteContactMessage(formData: FormData) {
  * ──────────────────────────────────────────────────────────── */
 
 export async function updateFxRate(formData: FormData) {
-  await requireSuperadmin();
+  const session = await requireSuperadmin();
   const raw = formData.get("usd_to_idr");
   const rate = Number(typeof raw === "string" ? raw.trim() : raw);
   if (!Number.isFinite(rate) || rate <= 0) return;
   // Sanity ceiling — anything above 100k IDR/USD is a typo, not an FX move.
   if (rate > 100_000) return;
+  const previous = await getUsdToIdr();
   await setUsdToIdr(rate);
+  await logAdminAction({
+    actorId: session.user.id,
+    action: "fx_rate.update",
+    targetType: "setting",
+    targetId: "usd_to_idr",
+    payload: { from: previous, to: rate },
+  });
   revalidatePath("/admin/system");
   revalidatePath("/admin/system/costs");
   revalidatePath("/admin/system/api-costs");

@@ -11,6 +11,7 @@ import {
   StatTile,
   formatRelative,
 } from "../_ui";
+import { ConfirmForm } from "../_ConfirmForm";
 
 type StatusFilter = "new" | "read" | "archived" | "all";
 const STATUS_FILTERS: readonly StatusFilter[] = [
@@ -84,7 +85,7 @@ export default async function InboxPage({
         <p>
           Reply by emailing the sender directly from your own mail client —
           the From / Reply-To address is shown next to each message.
-          Mark-as-read and Archive are purely visual; we don't auto-delete.
+          Mark-as-read and Archive are purely visual; we don&apos;t auto-delete.
         </p>
       </HelpCallout>
 
@@ -248,7 +249,11 @@ function MessageCard({
         {isArchived && (
           <StatusButton id={message.id} next="new" label="Unarchive" icon={Mail} tone="emerald" />
         )}
-        <form action={deleteContactMessage} className="ml-auto">
+        <ConfirmForm
+          action={deleteContactMessage}
+          confirmMessage={`Delete the message from ${message.email}? This removes it permanently — archive instead if you might revisit it.`}
+          className="ml-auto"
+        >
           <input type="hidden" name="id" value={message.id} />
           <button
             type="submit"
@@ -258,7 +263,7 @@ function MessageCard({
             <Trash2 className="h-3 w-3" />
             Delete
           </button>
-        </form>
+        </ConfirmForm>
       </div>
     </li>
   );

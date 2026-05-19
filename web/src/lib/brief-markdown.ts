@@ -20,7 +20,13 @@ export type MarkdownHeadings = {
   audiencePerception: string;
   audienceAngle: string;
   daleel: string;
+  linkedAyah: string;
+  alsoFoundIn: string;
   recommendations: string;
+  objections: string;
+  objectionLabel: string;
+  responseLabel: string;
+  illustrations: string;
   khutbah: string;
   social: string;
   disclaimer: string;
@@ -79,6 +85,19 @@ export function briefToMarkdown(
       lines.push("");
       lines.push(d.translation);
       lines.push("");
+      if (d.also_found_in?.length) {
+        const cites = d.also_found_in.map((a) => a.source).join(" · ");
+        lines.push(`*${headings.alsoFoundIn}: ${cites}*`);
+        lines.push("");
+      }
+      if (d.linked_ayah) {
+        lines.push(`**${headings.linkedAyah} — ${d.linked_ayah.source}**`);
+        lines.push("");
+        lines.push("> " + d.linked_ayah.arabic);
+        lines.push("");
+        lines.push(`> ${d.linked_ayah.translation}`);
+        lines.push("");
+      }
     });
   }
 
@@ -86,6 +105,25 @@ export function briefToMarkdown(
     lines.push(`## ${headings.recommendations}`);
     c.recommendations.forEach((r, i) => {
       lines.push(`${i + 1}. ${r}`);
+    });
+    lines.push("");
+  }
+
+  if (c.anticipated_objections?.length) {
+    lines.push(`## ${headings.objections}`);
+    c.anticipated_objections.forEach((o, i) => {
+      lines.push(`### ${i + 1}. ${headings.objectionLabel}`);
+      lines.push(`> ${o.objection}`);
+      lines.push("");
+      lines.push(`**${headings.responseLabel}:** ${o.response}`);
+      lines.push("");
+    });
+  }
+
+  if (c.story_illustrations?.length) {
+    lines.push(`## ${headings.illustrations}`);
+    c.story_illustrations.forEach((s, i) => {
+      lines.push(`${i + 1}. ${s}`);
     });
     lines.push("");
   }

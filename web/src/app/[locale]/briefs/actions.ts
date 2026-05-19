@@ -6,10 +6,43 @@ import { z } from "zod";
 
 import { auth } from "@/auth";
 import { db, schema } from "@/db";
-import { retrieveDaleelSemantic } from "@/lib/quran-retrieval";
+import {
+  retrieveDaleel,
+  RetrievalUnavailableError,
+  WeakRelevanceError,
+} from "@/lib/kitab-retrieval";
 import { generateBriefContent } from "@/lib/brief-generator";
 import { LlmUnavailableError } from "@/lib/llm";
 import type { BriefDaleel, UserProfile } from "@/db/schema";
+
+/**
+ * Best-effort failure log. The brief-error tile on /admin/system/analytics
+ * reads this to compute a 7-day error rate; we never want logging to
+ * derail an already-failing action, so swallow any insert error.
+ */
+async function logBriefError(input: {
+  userId: string | null;
+  topicTitle?: string;
+  segment?: string;
+  tone?: string;
+  locale?: string;
+  errorCode: string;
+  errorMessage?: string;
+}): Promise<void> {
+  try {
+    await db.insert(schema.briefErrors).values({
+      userId: input.userId,
+      topicTitle: input.topicTitle?.slice(0, 200),
+      segment: input.segment?.slice(0, 32),
+      tone: input.tone?.slice(0, 32),
+      locale: input.locale?.slice(0, 8),
+      errorCode: input.errorCode.slice(0, 64),
+      errorMessage: input.errorMessage?.slice(0, 2000),
+    });
+  } catch (err) {
+    console.warn("[brief] failed to log brief error:", err);
+  }
+}
 
 const SEGMENTS = [
   "urban_gen_z",
@@ -62,20 +95,86 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
   }
   const { topic_title, segment, tone, locale, extra_context } = parsed.data;
 
-  // 1) Retrieve daleel via Qdrant semantic search.
-  // Enrich the query with the target segment so the retrieved verses lean
-  // toward what that audience would benefit from.
+  // 1) Retrieve daleel via Qdrant semantic search across the full kitab
+  // corpus. Enrich the query with the target segment so retrieved daleel
+  // leans toward what that audience would benefit from.
+  //
+  // `corpus: "all"` queries quran + hadith + tafsir_ibn_kathir in parallel,
+  // merges by similarity score, returns top-K. Per-corpus failures (e.g.
+  // before embed_hadith.py / embed_tafsir.py have run) are skipped; the
+  // merge proceeds with whatever IS embedded.
+  //
+  // If NO corpus produces hits (Qdrant down, no collection embedded,
+  // OpenAI embed failed), kitab-retrieval throws RetrievalUnavailableError
+  // and we refuse to generate the brief — per PRD §12, a brief must never
+  // ship without verified daleel.
   const enrichedQuery = `${topic_title} for ${SEGMENT_LABELS[segment].en} audience`;
-  const matched = await retrieveDaleelSemantic(enrichedQuery, 3);
-  const daleel: BriefDaleel[] = matched.map((d) => ({
-    surah: d.surah,
-    ayah: d.ayah,
-    arabic: d.arabic,
-    translation: locale === "id" ? d.translation_id : d.translation_en,
-    source: locale === "id" ? d.source_id : d.source_en,
-    retrieval_source: d.source,
-    retrieval_score: d.score,
-  }));
+  let daleel: BriefDaleel[];
+  try {
+    const matched = await retrieveDaleel(enrichedQuery, {
+      corpus: "all",
+      topK: 2,
+      locale,
+    });
+    daleel = matched.map((d) => ({
+      surah: d.surah ?? 0,
+      ayah: d.ayah ?? 0,
+      arabic: d.arabic,
+      translation: d.translation,
+      source: d.citation,
+      retrieval_source: d.retrievalSource,
+      retrieval_score: d.score,
+      linked_ayah: d.linkedAyah
+        ? {
+            arabic: d.linkedAyah.arabic,
+            translation: d.linkedAyah.translation,
+            source: d.linkedAyah.citation,
+          }
+        : undefined,
+      also_found_in: d.alsoFoundIn?.map((a) => ({
+        corpus: a.corpus,
+        source: a.citation,
+      })),
+    }));
+  } catch (err) {
+    const errCtx = {
+      userId: session.user.id,
+      topicTitle: topic_title,
+      segment,
+      tone,
+      locale,
+    };
+    if (err instanceof WeakRelevanceError) {
+      console.warn(
+        "[brief] weak relevance for topic:",
+        topic_title,
+        "top score:",
+        err.topScore,
+      );
+      await logBriefError({
+        ...errCtx,
+        errorCode: "error_weak_relevance",
+        errorMessage: `top_score=${err.topScore}`,
+      });
+      return { ok: false, error: "error_weak_relevance" };
+    }
+    if (err instanceof RetrievalUnavailableError) {
+      console.error("[brief] retrieval unavailable:", err.reason);
+      await logBriefError({
+        ...errCtx,
+        errorCode: "error_retrieval_unavailable",
+        errorMessage: err.reason,
+      });
+      return { ok: false, error: "error_retrieval_unavailable" };
+    }
+    console.error("[brief] retrieval error:", err);
+    await logBriefError({
+      ...errCtx,
+      errorCode: "error_generation_failed",
+      errorMessage: err instanceof Error ? err.message : String(err),
+    });
+    return { ok: false, error: "error_generation_failed" };
+  }
 
   // Load the requester's onboarding profile so the LLM can tailor the
   // angle to their region / role / audience. Profile may be null (skipped
@@ -105,11 +204,28 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
     content = generated.content;
     provider = generated.provider;
   } catch (err) {
+    const errCtx = {
+      userId: session.user.id,
+      topicTitle: topic_title,
+      segment,
+      tone,
+      locale,
+    };
     if (err instanceof LlmUnavailableError) {
       console.error("[brief] all LLM providers failed:", err.message);
+      await logBriefError({
+        ...errCtx,
+        errorCode: "error_llm_unavailable",
+        errorMessage: err.message,
+      });
       return { ok: false, error: "error_llm_unavailable" };
     }
     console.error("[brief] generation error:", err);
+    await logBriefError({
+      ...errCtx,
+      errorCode: "error_generation_failed",
+      errorMessage: err instanceof Error ? err.message : String(err),
+    });
     return { ok: false, error: "error_generation_failed" };
   }
 

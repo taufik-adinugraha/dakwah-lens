@@ -109,12 +109,12 @@ export default async function ApiCostsPage() {
           one-shot SQL update.
         </p>
         <p>
-          <strong>Providers tracked:</strong> OpenAI (Qur'an embeddings),
+          <strong>Providers tracked:</strong> OpenAI (Qur&apos;an embeddings),
           Gemini (relevance classifier + brief synthesis), Anthropic (brief
           synthesis fallback), Apify (X / Instagram / TikTok), YouTube Data
           API (quota units), RSS (free — volume tracking only), and{" "}
           Resend (transactional email — verification + password reset).
-          Resend's free tier covers 3,000 emails/month, so cost rows show
+          Resend&apos;s free tier covers 3,000 emails/month, so cost rows show
           $0 even as the unit counter ticks up.
         </p>
       </HelpCallout>
@@ -157,7 +157,7 @@ export default async function ApiCostsPage() {
 
       <Card title="By provider (30d)">
         {Array.isArray(perProvider) && perProvider.length > 0 ? (
-          <table className="w-full text-sm">
+          <table className="w-full text-sm max-md:block max-md:overflow-x-auto">
             <thead>
               <tr className="border-b border-slate-100 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                 <th className="py-2">Provider</th>
@@ -201,7 +201,7 @@ export default async function ApiCostsPage() {
 
       <Card title="Top operations (30d)">
         {Array.isArray(perOperation) && perOperation.length > 0 ? (
-          <table className="w-full text-sm">
+          <table className="w-full text-sm max-md:block max-md:overflow-x-auto">
             <thead>
               <tr className="border-b border-slate-100 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                 <th className="py-2">Provider · model · op</th>

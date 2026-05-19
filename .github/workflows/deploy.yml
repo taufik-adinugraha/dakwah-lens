@@ -1,0 +1,77 @@
+name: Deploy
+
+# Trigger rules:
+#   push to main         → prod (dakwah-lens.id)
+#   manual via UI        → also prod, lets you retry without a code change
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Serialise deploys. New deploys queue behind running ones — mid-deploy
+# cancellation would leave the VM with a half-built artifact (a partially
+# built Docker image, a half-applied migration). `cancel-in-progress:false`
+# is the explicit, slow-but-safe choice.
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+jobs:
+  # ─── Pre-flight ──────────────────────────────────────────────
+  # Catch the easy errors on the GitHub runner BEFORE we touch the VM.
+  # A type error or lint failure here costs ~1 min; the same failure
+  # on the VM costs 5+ min of Docker build before it surfaces.
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Web — install
+        working-directory: web
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Web — typecheck
+        working-directory: web
+        run: npx tsc --noEmit
+
+      - name: Web — lint
+        working-directory: web
+        run: npx eslint .
+
+      - uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: API — install
+        working-directory: api
+        run: uv sync --frozen
+
+      - name: API — lint
+        working-directory: api
+        run: uv run ruff check src/
+
+  # ─── Deploy ──────────────────────────────────────────────────
+  # SSHes to the VM and runs deploy.sh. All Docker work happens there;
+  # this step is just the trigger.
+  deploy:
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH + deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          # 20 min ceiling — first build can take 8 min (Python ML wheels),
+          # subsequent builds 1-2 min with layer cache. 20 leaves headroom.
+          command_timeout: 20m
+          script: |
+            set -euo pipefail
+            bash /srv/dakwah-lens/repo/deploy/deploy.sh

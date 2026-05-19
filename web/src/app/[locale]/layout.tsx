@@ -5,9 +5,11 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import { routing } from "@/i18n/routing";
-import { Header } from "@/components/Header";
+import { ActiveNotice } from "@/components/ActiveNotice";
 import { Footer } from "@/components/Footer";
+import { Header } from "@/components/Header";
 import { PageTracker } from "@/components/PageTracker";
+import { PendingApprovalBanner } from "@/components/PendingApprovalBanner";
 import "../globals.css";
 
 const geistSans = Geist({
@@ -61,7 +63,9 @@ export default async function RootLayout({
     >
       <body className="relative min-h-full bg-white text-slate-900">
         <NextIntlClientProvider>
+          <PendingApprovalBanner />
           <Header />
+          <ActiveNotice locale={locale} />
           <main className="flex flex-col">{children}</main>
           <Footer />
           <PageTracker locale={locale} />

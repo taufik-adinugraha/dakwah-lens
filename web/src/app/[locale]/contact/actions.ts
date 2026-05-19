@@ -4,7 +4,7 @@ import { and, eq, gt, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { db, schema } from "@/db";
-import { appUrl, sendEmail } from "@/lib/email";
+import { appUrl, renderEmail, sendEmail } from "@/lib/email";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 /**
@@ -134,19 +134,16 @@ export async function sendContactMessage(
         `— —\n` +
         `Reply by emailing ${email} directly.\n` +
         `Manage in the admin inbox: ${inboxLink}`,
-      html: `
-        <div style="font-family:system-ui,-apple-system,sans-serif;max-width:580px;margin:0 auto;color:#0f172a;">
-          <p style="color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:.05em;margin:0 0 8px;">New contact form message</p>
-          <p style="margin:0 0 16px;"><strong>${escapeHtml(name)}</strong> &lt;${escapeHtml(email)}&gt;</p>
-          <p style="margin:0 0 4px;color:#64748b;font-size:12px;">Subject</p>
-          <p style="margin:0 0 16px;font-weight:600;">${escapeHtml(safeSubject)}</p>
-          <p style="margin:0 0 4px;color:#64748b;font-size:12px;">Message</p>
-          <pre style="margin:0;padding:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;white-space:pre-wrap;font-family:inherit;font-size:14px;line-height:1.55;">${escapeHtml(message)}</pre>
-          <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;">
-          <p style="font-size:12px;color:#64748b;margin:0 0 8px;">Reply by emailing <a href="mailto:${escapeHtml(email)}" style="color:#1d4ed8;">${escapeHtml(email)}</a> directly.</p>
-          <p style="font-size:12px;color:#64748b;margin:0;">Manage in the admin inbox: <a href="${inboxLink}" style="color:#1d4ed8;">${inboxLink}</a></p>
-        </div>
-      `,
+      html: renderEmail({
+        heading: `New message: ${escapeHtml(safeSubject)}`,
+        paragraphs: [
+          `<strong>From:</strong> ${escapeHtml(name)} &lt;<a href="mailto:${escapeHtml(email)}" style="color:#047857;">${escapeHtml(email)}</a>&gt;`,
+          `<div style="margin-top:8px;padding:14px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;white-space:pre-wrap;font-size:14px;line-height:1.6;color:#0f172a;">${escapeHtml(message)}</div>`,
+        ],
+        cta: { label: "Open in admin inbox", url: inboxLink },
+        footnote: `Reply by emailing <a href="mailto:${escapeHtml(email)}" style="color:#047857;">${escapeHtml(email)}</a> directly.`,
+        footerTagline: "Forwarded from the public /contact form",
+      }),
     });
   }
 

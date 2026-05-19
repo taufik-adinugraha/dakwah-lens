@@ -137,8 +137,17 @@ export const DEFAULT_USD_TO_IDR = 16_300;
  *  number reflects the superadmin-edited setting. Returns the IDR string,
  *  rounded to whole rupiah. */
 export function formatIdr(usd: number, rate: number = DEFAULT_USD_TO_IDR): string {
-  const idr = Math.round(usd * rate);
-  return `Rp ${idr.toLocaleString("id-ID")}`;
+  return formatRupiah(usd * rate);
+}
+
+/** Display helper when the source value is already in IDR (manual costs,
+ *  donations, etc.) — no conversion, just round to whole rupiah and apply
+ *  the Indonesian thousand-separator. Always use this instead of inlining
+ *  `Rp ${x.toLocaleString("id-ID")}` so we never accidentally render
+ *  fractional rupiah from floating-point arithmetic (allocated monthly
+ *  costs in particular: 1/30, 1/12 etc. produce ugly decimals). */
+export function formatRupiah(idr: number): string {
+  return `Rp ${Math.round(idr).toLocaleString("id-ID")}`;
 }
 
 export function formatUsd(usd: number): string {

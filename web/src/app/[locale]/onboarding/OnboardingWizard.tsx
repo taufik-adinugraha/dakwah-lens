@@ -2,12 +2,17 @@
 
 import { useTransition, useState } from "react";
 import { ArrowRight, ChevronLeft } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Spinner } from "@/components/Spinner";
 import clsx from "clsx";
 
 import { saveProfileAction, skipOnboardingAction } from "./actions";
 
+// Loose translator signature — keeps the existing call sites
+// (`t(key)`, `t(key, { vars })`) working without per-call key narrowing.
+// next-intl's `useTranslations` returns a stricter type, but we route it
+// through this alias so the rest of the file doesn't need to change.
 type T = (key: string, vars?: Record<string, string | number>) => string;
 
 type ChoiceOption = {
@@ -174,7 +179,12 @@ type Answers = {
   output_lang?: string;
 };
 
-export function OnboardingWizard({ t, tInsights }: { t: T; tInsights: T }) {
+export function OnboardingWizard() {
+  // next-intl's strict generic types don't compose well with our generic
+  // key strings (titleKey/hintKey are looked up at runtime). Cast through
+  // the loose T alias so the call sites stay readable.
+  const t = useTranslations("Onboarding") as unknown as T;
+  const tInsights = useTranslations("Insights") as unknown as T;
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
   const [pending, startTransition] = useTransition();
@@ -295,9 +305,11 @@ export function OnboardingWizard({ t, tInsights }: { t: T; tInsights: T }) {
         <h1 className="text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
           {t(current.titleKey)}
         </h1>
-        <p className="mt-2 text-pretty text-sm leading-relaxed text-slate-600">
-          {t(current.hintKey)}
-        </p>
+        {t(current.hintKey) && (
+          <p className="mt-2 text-pretty text-sm leading-relaxed text-slate-600">
+            {t(current.hintKey)}
+          </p>
+        )}
 
         <div
           className={clsx(

@@ -54,8 +54,12 @@ def _str_or_none(value: Any, max_len: int = 255) -> str | None:
 def normalize_x(item: dict[str, Any]) -> dict[str, Any] | None:
     """Map an Apify tweet object → SocialPost row dict.
 
-    Tested against `kaitoeasyapi/twitter-x-data-tweet-scraper-pay-per-result-cheapest`.
-    Author is nested under `author` (dict) or `user` (dict). Tweet ID is `id`.
+    Field-by-field tolerant — works across `apidojo/tweet-scraper`
+    (current default), `kaitoeasyapi/twitter-x-data-tweet-scraper-...`
+    (previous default), and most other community X actors. Author may
+    live under `author` (dict) or `user` (dict), id under `id` / `id_str` /
+    `tweetId`. Each fallback chain matches the union of actor schemas
+    we've seen.
     """
     text = item.get("text") or item.get("full_text") or item.get("content")
     if not isinstance(text, str) or not text.strip():
@@ -111,8 +115,10 @@ def normalize_x(item: dict[str, Any]) -> dict[str, Any] | None:
 def normalize_tiktok(item: dict[str, Any]) -> dict[str, Any] | None:
     """Map an Apify TikTok video object → SocialPost row dict.
 
-    Tested against `clockworks/free-tiktok-scraper`. Caption is in `text`,
-    author info nested under `authorMeta` (dict). Video ID is `id`.
+    Tested against `clockworks/free-tiktok-scraper` (current default)
+    and `clockworks/tiktok-scraper` (paid sibling, available via env
+    override). Same author = same output shape — caption in `text`,
+    author info nested under `authorMeta`, video id in `id`.
     """
     text = item.get("text") or item.get("description") or item.get("caption")
     if not isinstance(text, str) or not text.strip():

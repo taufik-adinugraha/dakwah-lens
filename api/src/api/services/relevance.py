@@ -41,9 +41,12 @@ MAX_BATCH = 50
 MIN_TEXT_CHARS = 30
 # Pure-celebrity-gossip vocabulary that almost never produces da'wah-worthy
 # content. Tuned for Indonesian entertainment-news patterns; English equivalents
-# are uncommon in our corpus so we keep the regex tight.
+# are uncommon in our corpus so we keep the regex tight. Note: `viral` is
+# deliberately NOT in this list — it's an active ingest keyword and the
+# Gemini classifier (not the heuristic) decides whether a viral item is
+# da'wah-relevant.
 _GOSSIP_RE = re.compile(
-    r"\b(viral|selebgram|mendadak|skandal|terciduk|kepergok|gosip)\b",
+    r"\b(selebgram|mendadak|skandal|terciduk|kepergok|gosip)\b",
     re.IGNORECASE,
 )
 

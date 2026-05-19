@@ -11,7 +11,9 @@ import {
   Users,
 } from "lucide-react";
 
+import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
+import { marketingSectionLink } from "@/lib/marketing-href";
 
 export async function generateMetadata({
   params,
@@ -26,7 +28,11 @@ export default async function AboutPage({
 }: PageProps<"/[locale]/about">) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations("About");
+  const [t, session] = await Promise.all([getTranslations("About"), auth()]);
+  const donateHref = marketingSectionLink(
+    session?.user?.status === "approved",
+    locale,
+  )("#donate");
 
   return (
     <>
@@ -35,7 +41,7 @@ export default async function AboutPage({
       <Supervisor t={t} />
       <Legacy t={t} />
       <Daleel t={t} />
-      <CTA t={t} />
+      <CTA t={t} donateHref={donateHref} />
     </>
   );
 }
@@ -252,7 +258,7 @@ function Daleel({ t }: { t: T }) {
   );
 }
 
-function CTA({ t }: { t: T }) {
+function CTA({ t, donateHref }: { t: T; donateHref: string }) {
   return (
     <section className="py-16 sm:py-24">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
@@ -271,12 +277,12 @@ function CTA({ t }: { t: T }) {
             {t("cta_body")}
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/#donate"
+            <a
+              href={donateHref}
               className="inline-flex h-12 items-center gap-2 rounded-full bg-white px-6 text-sm font-semibold text-emerald-800 shadow-lg transition hover:bg-emerald-50"
             >
               {t("cta_donate")}
-            </Link>
+            </a>
             <Link
               href="/"
               className="inline-flex h-12 items-center gap-2 rounded-full border border-white/30 bg-white/5 px-6 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/10"

@@ -52,6 +52,12 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Standalone output bundles the Next runtime + only the node_modules it
+  // actually uses into `.next/standalone/`. Production Docker images copy
+  // just that directory, which keeps the final image ~150 MB instead of
+  // ~700 MB if we'd shipped the full node_modules. Server runs via
+  // `node server.js` — no `npm run start` needed.
+  output: "standalone",
   async headers() {
     return [
       {

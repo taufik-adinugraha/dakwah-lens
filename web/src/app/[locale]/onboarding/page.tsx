@@ -4,6 +4,12 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { OnboardingWizard } from "./OnboardingWizard";
 
+// Auth-dependent — must not be prerendered, or anonymous traffic gets a
+// cached copy of the wizard and the in-page session check below is dead
+// code. Proxy middleware also gates this route, but `force-dynamic` is
+// the local belt-and-suspenders.
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/onboarding">) {
@@ -23,13 +29,8 @@ export default async function OnboardingPage({
     redirect("/login?callbackUrl=/onboarding");
   }
 
-  const t = await getTranslations({ locale, namespace: "Onboarding" });
-  const tInsights = await getTranslations({ locale, namespace: "Insights" });
-
-  return (
-    <OnboardingWizard
-      t={(k, v) => t(k as Parameters<typeof t>[0], v)}
-      tInsights={(k) => tInsights(k as Parameters<typeof tInsights>[0])}
-    />
-  );
+  // Translator functions can't cross the server→client boundary — RSC
+  // requires serializable props. The wizard pulls its own translations
+  // via `useTranslations()` inside the client component instead.
+  return <OnboardingWizard />;
 }

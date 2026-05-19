@@ -55,16 +55,25 @@ SCRAPERS = {
 }
 
 
-def _scrape(platform: str, query: str, limit: int) -> ScrapeResult:
+def _scrape(
+    platform: str, query: str, limit: int, *, actor_id: str | None = None
+) -> ScrapeResult:
     fn = SCRAPERS.get(platform)
     if fn is None:
         raise ValueError(f"Unsupported platform: {platform}")
+    # Only a subset of scrapers accept an actor_id override (the Apify
+    # ones — RSS / YT use no Apify actor). Pass through where supported,
+    # silently ignore where not.
+    if actor_id is not None and platform == "tiktok":
+        return fn(query, max_items=limit, actor_id=actor_id)
     return fn(query, max_items=limit)
 
 
-async def _run(platform: str, query: str, limit: int) -> int:
+async def _run(
+    platform: str, query: str, limit: int, *, actor_id: str | None = None
+) -> int:
     # 1. Scrape
-    result = _scrape(platform, query, limit)
+    result = _scrape(platform, query, limit, actor_id=actor_id)
     cost = result.cost_usd or 0
     dur = result.duration_s or 0
     print(f"✓ Apify pulled {len(result.items)} items (cost ${cost:.4f}, {dur:.1f}s)")

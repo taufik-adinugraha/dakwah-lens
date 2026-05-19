@@ -1,12 +1,17 @@
 /**
- * Superadmin gate for `/admin/system/*` routes.
+ * Access gates for `/admin/system/*` routes.
  *
- * Stricter than the existing `/admin/users` check — only role=`superadmin`
- * gets in. Regular `admin` can still manage user signups but cannot see
- * infra metrics, API costs, or cost configuration.
+ *  - `requireSystemAccess()` — admin OR superadmin. The read-side gate.
+ *    Used by the system layout and any server action that's safe for
+ *    regular admins (inbox triage, donation ledger entry).
  *
- * Usage at the top of every superadmin-only page:
- *   const session = await requireSuperadmin();
+ *  - `requireSuperadmin()` — strict superadmin-only. Used by write
+ *    actions that should stay locked down: FX rate, manual costs,
+ *    RSS feeds, ingest queries, terms-followup blasts.
+ *
+ * The role distinction is enforced server-side on every write action,
+ * not just hidden in the UI — an admin can't escalate by hand-crafting
+ * a POST to a restricted endpoint.
  */
 
 import { redirect } from "next/navigation";
@@ -19,6 +24,21 @@ export async function requireSuperadmin() {
     redirect("/login?callbackUrl=/admin/system");
   }
   if (session.user.role !== "superadmin") {
+    redirect("/dashboard?error=forbidden");
+  }
+  return session;
+}
+
+/** Read-side gate for /admin/system/*. Admins land here too but get
+ *  a read-only view of most pages — inbox + donations are the two
+ *  exceptions where they have full write access. */
+export async function requireSystemAccess() {
+  const session = await auth();
+  if (!session?.user?.id) {
+    redirect("/login?callbackUrl=/admin/system");
+  }
+  const role = session.user.role;
+  if (role !== "admin" && role !== "superadmin") {
     redirect("/dashboard?error=forbidden");
   }
   return session;

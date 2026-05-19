@@ -71,10 +71,30 @@ export function LoginForm({
   }
 
   if (checkEmailFor) {
-    return <CheckEmailState email={checkEmailFor} t={t} />;
+    return (
+      <CheckEmailState
+        email={checkEmailFor}
+        t={t}
+        onBack={() => {
+          setCheckEmailFor(null);
+          setMode("signin");
+          setError(null);
+        }}
+      />
+    );
   }
   if (resetSentTo) {
-    return <ResetSentState email={resetSentTo} t={t} />;
+    return (
+      <ResetSentState
+        email={resetSentTo}
+        t={t}
+        onBack={() => {
+          setResetSentTo(null);
+          setMode("signin");
+          setError(null);
+        }}
+      />
+    );
   }
 
   return (
@@ -143,6 +163,7 @@ export function LoginForm({
             placeholder={t("field_name_placeholder")}
             autoComplete="name"
             required
+            maxLength={120}
           />
         )}
         <Field
@@ -152,6 +173,7 @@ export function LoginForm({
           placeholder={t("field_email_placeholder")}
           autoComplete="email"
           required
+          maxLength={254}
         />
         {mode !== "forgot" && (
           <Field
@@ -164,6 +186,7 @@ export function LoginForm({
             }
             required
             minLength={mode === "signup" ? 10 : 1}
+            maxLength={256}
           />
         )}
 
@@ -209,6 +232,31 @@ export function LoginForm({
             <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
           )}
         </button>
+
+        {mode === "signup" && (
+          <p className="text-pretty text-center text-xs leading-relaxed text-slate-500">
+            {t.rich("signup_terms_notice", {
+              terms: (chunks) => (
+                <Link
+                  href="/terms"
+                  target="_blank"
+                  className="font-medium text-slate-700 underline-offset-2 hover:underline"
+                >
+                  {chunks}
+                </Link>
+              ),
+              privacy: (chunks) => (
+                <Link
+                  href="/privacy"
+                  target="_blank"
+                  className="font-medium text-slate-700 underline-offset-2 hover:underline"
+                >
+                  {chunks}
+                </Link>
+              ),
+            })}
+          </p>
+        )}
       </form>
 
       {mode === "forgot" ? (
@@ -300,6 +348,7 @@ function Field({
   autoComplete,
   required,
   minLength,
+  maxLength,
 }: {
   label: string;
   name: string;
@@ -308,6 +357,7 @@ function Field({
   autoComplete?: string;
   required?: boolean;
   minLength?: number;
+  maxLength?: number;
 }) {
   return (
     <label className="block text-left">
@@ -319,6 +369,7 @@ function Field({
         autoComplete={autoComplete}
         required={required}
         minLength={minLength}
+        maxLength={maxLength}
         className="mt-1.5 block h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
       />
     </label>
@@ -333,11 +384,14 @@ function Field({
 function CheckEmailState({
   email,
   t,
+  onBack,
 }: {
   email: string;
   t: ReturnType<typeof useTranslations<"Auth">>;
+  onBack: () => void;
 }) {
   const [resent, setResent] = useState(false);
+  const [resendError, setResendError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   function onResend() {
@@ -345,8 +399,12 @@ function CheckEmailState({
     const fd = new FormData();
     fd.set("email", email);
     startTransition(async () => {
-      await resendVerificationAction(fd);
-      setResent(true);
+      const r = await resendVerificationAction(fd);
+      if (r.ok) {
+        setResent(true);
+      } else {
+        setResendError(r.error);
+      }
     });
   }
 
@@ -378,13 +436,17 @@ function CheckEmailState({
               ? t("verify_resent")
               : t("verify_resend_cta")}
         </button>
-        <Link
-          href="/login"
+        <button
+          type="button"
+          onClick={onBack}
           className="inline-flex h-10 items-center justify-center rounded-full bg-slate-900 px-4 text-xs font-semibold text-white hover:bg-slate-800"
         >
           {t("verify_back_to_login")}
-        </Link>
+        </button>
       </div>
+      {resendError && (
+        <p className="text-xs text-rose-600">{t(resendError as Parameters<typeof t>[0])}</p>
+      )}
     </div>
   );
 }
@@ -396,9 +458,11 @@ function CheckEmailState({
 function ResetSentState({
   email,
   t,
+  onBack,
 }: {
   email: string;
   t: ReturnType<typeof useTranslations<"Auth">>;
+  onBack: () => void;
 }) {
   return (
     <div className="space-y-5 text-center">
@@ -414,12 +478,13 @@ function ResetSentState({
       <p className="text-pretty text-xs leading-relaxed text-slate-500">
         {t("forgot_sent_hint")}
       </p>
-      <Link
-        href="/login"
+      <button
+        type="button"
+        onClick={onBack}
         className="inline-flex h-10 items-center justify-center rounded-full bg-slate-900 px-4 text-xs font-semibold text-white hover:bg-slate-800"
       >
         {t("verify_back_to_login")}
-      </Link>
+      </button>
     </div>
   );
 }

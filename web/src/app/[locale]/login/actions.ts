@@ -8,7 +8,52 @@ import { z } from "zod";
 import { signIn } from "@/auth";
 import { db, schema } from "@/db";
 import { consumeAuthToken, issueAuthToken } from "@/lib/auth-tokens";
-import { appUrl, sendEmail } from "@/lib/email";
+import { appUrl, renderEmail, sendEmail } from "@/lib/email";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+
+/* ───────────────────────────────────────────────────────────────
+ * Rate-limit budgets per auth endpoint.
+ *
+ * IP-based budgets stop scripted attacks from one source. Email-based
+ * budgets stop credential-stuffing across many IPs targeting one
+ * account (and prevent password-reset / verification email spam).
+ *
+ * Trade-off: email-based limiting on signin lets a hostile actor
+ * temporarily lock a known account by spraying wrong passwords —
+ * accepted at our scale because it's bounded (1 hour window), the
+ * owner can still use forgot-password (rate-limited separately), and
+ * the alternative is letting distributed brute-force run uncontested.
+ *
+ * All counters are in-process. Lost on restart, not shared across
+ * Node instances. See lib/rate-limit.ts for the upgrade path (Redis).
+ * ─────────────────────────────────────────────────────────────── */
+
+const SIGNIN_IP_MAX = 5;
+const SIGNIN_IP_WINDOW_MS = 5 * 60_000; // 5 min
+const SIGNIN_EMAIL_MAX = 10;
+const SIGNIN_EMAIL_WINDOW_MS = 60 * 60_000; // 1 hour
+
+const SIGNUP_IP_MAX = 10;
+const SIGNUP_IP_WINDOW_MS = 15 * 60_000;
+
+const FORGOT_IP_MAX = 3;
+const FORGOT_IP_WINDOW_MS = 15 * 60_000;
+const FORGOT_EMAIL_MAX = 3;
+const FORGOT_EMAIL_WINDOW_MS = 60 * 60_000;
+
+const RESET_IP_MAX = 10;
+const RESET_IP_WINDOW_MS = 15 * 60_000;
+
+const VERIFY_IP_MAX = 10;
+const VERIFY_IP_WINDOW_MS = 15 * 60_000;
+
+// Verification-email resend. Tight caps because each call burns one
+// transactional email from the Resend quota — easy to drain the free
+// tier with a stuck retry loop or a malicious actor harvesting tokens.
+const RESEND_IP_MAX = 5;
+const RESEND_IP_WINDOW_MS = 15 * 60_000;
+const RESEND_EMAIL_MAX = 3;
+const RESEND_EMAIL_WINDOW_MS = 60 * 60_000;
 
 function safeCallbackUrl(raw: string | undefined | null): string {
   const candidate = (raw ?? "/dashboard").toString();
@@ -17,15 +62,29 @@ function safeCallbackUrl(raw: string | undefined | null): string {
     : "/dashboard";
 }
 
+/**
+ * Caps applied to every public-facing auth input. These exist so a
+ * malicious POST (curl, scripted bot — HTML maxLength is decorative,
+ * not enforcing) can't fill the Postgres `text` column with megabytes
+ * of payload or DOS the bcrypt comparator with a giant input.
+ *
+ *   - email max 254 — RFC 5321 hard limit on real-world email length
+ *   - name max 120 — matches the contact form convention
+ *   - password max 256 — well above any human password; bcrypt itself
+ *     only reads ~72 bytes but the zod gate keeps the request body
+ *     bounded before it reaches the comparator
+ *   - token max 256 — our reset tokens are short hex strings, this is
+ *     a safety net not a tight constraint
+ */
 const SignupSchema = z.object({
-  name: z.string().trim().min(1, "error_name_required"),
-  email: z.string().trim().toLowerCase().email("error_invalid_email"),
-  password: z.string().min(10, "error_password_short"),
+  name: z.string().trim().min(1, "error_name_required").max(120),
+  email: z.string().trim().toLowerCase().email("error_invalid_email").max(254),
+  password: z.string().min(10, "error_password_short").max(256),
 });
 
 const SigninSchema = z.object({
-  email: z.string().trim().toLowerCase().email("error_invalid_email"),
-  password: z.string().min(1, "error_invalid_credentials"),
+  email: z.string().trim().toLowerCase().email("error_invalid_email").max(254),
+  password: z.string().min(1, "error_invalid_credentials").max(256),
 });
 
 export type SignupResult =
@@ -45,6 +104,19 @@ export async function signupAction(formData: FormData): Promise<SignupResult> {
     return { ok: false, error: parsed.error.issues[0].message };
   }
   const { name, email, password } = parsed.data;
+
+  // Rate-limit by IP to stop scripted signup spam. No email-side
+  // limit here — email is captured first time and we want legitimate
+  // typos / re-attempts to go through.
+  const ip = await getClientIp();
+  if (ip) {
+    const rl = checkRateLimit(
+      `signup:ip:${ip}`,
+      SIGNUP_IP_MAX,
+      SIGNUP_IP_WINDOW_MS,
+    );
+    if (!rl.ok) return { ok: false, error: "error_rate_limited" };
+  }
 
   const [existing] = await db
     .select({ id: schema.users.id })
@@ -106,19 +178,16 @@ async function sendVerificationEmail(email: string): Promise<void> {
       `Klik tautan ini untuk memverifikasi email Anda dan menyelesaikan pendaftaran Dakwah-Lens:\n\n${link}\n\n` +
       `Tautan ini berlaku 24 jam. Kalau Anda tidak merasa mendaftar, abaikan email ini.\n\n` +
       `— Dakwah-Lens · Sukses & Berkah Group`,
-    html: `
-      <div style="font-family:system-ui,-apple-system,sans-serif;max-width:520px;margin:0 auto;color:#0f172a;">
-        <p>Assalamu'alaykum,</p>
-        <p>Terima kasih sudah mendaftar di <strong>Dakwah-Lens</strong>. Klik tombol di bawah untuk memverifikasi email Anda dan menyelesaikan pendaftaran:</p>
-        <p style="margin:24px 0;">
-          <a href="${link}" style="display:inline-block;background:#0f172a;color:#fff;padding:12px 20px;border-radius:9999px;text-decoration:none;font-weight:600;">Verifikasi email</a>
-        </p>
-        <p style="font-size:12px;color:#64748b;">Atau salin tautan ini: <br><span style="word-break:break-all;">${link}</span></p>
-        <p style="font-size:12px;color:#64748b;">Tautan ini berlaku 24 jam. Kalau Anda tidak merasa mendaftar, abaikan email ini.</p>
-        <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;">
-        <p style="font-size:12px;color:#94a3b8;">Dakwah-Lens · Sukses & Berkah Group</p>
-      </div>
-    `,
+    html: renderEmail({
+      greeting: "Assalamu'alaykum,",
+      heading: "Verifikasi email Anda",
+      paragraphs: [
+        "Terima kasih sudah mendaftar di <strong>Dakwah-Lens</strong>. Klik tombol di bawah untuk memverifikasi email Anda dan menyelesaikan pendaftaran.",
+      ],
+      cta: { label: "Verifikasi email", url: link },
+      footnote:
+        "Tautan ini berlaku 24 jam. Kalau Anda tidak merasa mendaftar, abaikan saja email ini.",
+    }),
   });
 }
 
@@ -138,6 +207,26 @@ export async function resendVerificationAction(
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return { ok: false, error: "error_invalid_email" };
   }
+
+  // Rate-limit BEFORE the DB lookup so a flood can't even probe whether
+  // an email exists. IP cap is the broad shield; per-email cap blocks
+  // the case where one address is repeatedly hit from rotating IPs.
+  const ip = await getClientIp();
+  if (ip) {
+    const rl = checkRateLimit(
+      `resend:ip:${ip}`,
+      RESEND_IP_MAX,
+      RESEND_IP_WINDOW_MS,
+    );
+    if (!rl.ok) return { ok: false, error: "error_rate_limited" };
+  }
+  const rlEmail = checkRateLimit(
+    `resend:email:${email}`,
+    RESEND_EMAIL_MAX,
+    RESEND_EMAIL_WINDOW_MS,
+  );
+  if (!rlEmail.ok) return { ok: false, error: "error_rate_limited" };
+
   const [user] = await db
     .select({ id: schema.users.id, verified: schema.users.emailVerified })
     .from(schema.users)
@@ -162,6 +251,19 @@ export async function verifyEmailAction(
   email: string,
   token: string,
 ): Promise<VerifyResult> {
+  // Rate-limit by IP so an attacker can't brute-force the verify
+  // token. Tokens are random + short-lived already, this is defense
+  // in depth.
+  const ip = await getClientIp();
+  if (ip) {
+    const rl = checkRateLimit(
+      `verify:ip:${ip}`,
+      VERIFY_IP_MAX,
+      VERIFY_IP_WINDOW_MS,
+    );
+    if (!rl.ok) return { ok: false, error: "error_rate_limited" };
+  }
+
   const consumed = await consumeAuthToken("verify", email, token);
   if (!consumed) return { ok: false, error: "error_verify_invalid" };
   await db
@@ -176,13 +278,13 @@ export async function verifyEmailAction(
  * ─────────────────────────────────────────────────────────────── */
 
 const ForgotSchema = z.object({
-  email: z.string().trim().toLowerCase().email("error_invalid_email"),
+  email: z.string().trim().toLowerCase().email("error_invalid_email").max(254),
 });
 
 const ResetSchema = z.object({
-  email: z.string().trim().toLowerCase().email("error_invalid_email"),
-  token: z.string().min(1, "error_token_missing"),
-  password: z.string().min(10, "error_password_short"),
+  email: z.string().trim().toLowerCase().email("error_invalid_email").max(254),
+  token: z.string().min(1, "error_token_missing").max(256),
+  password: z.string().min(10, "error_password_short").max(256),
 });
 
 export type ForgotResult =
@@ -201,6 +303,25 @@ export async function forgotPasswordAction(
     return { ok: false, error: parsed.error.issues[0].message };
   }
   const { email } = parsed.data;
+
+  // Rate-limit by IP and email. Stops being used as a free email-spam
+  // relay (Resend bill + recipient inbox abuse) and prevents
+  // enumeration attempts.
+  const ip = await getClientIp();
+  if (ip) {
+    const rl = checkRateLimit(
+      `forgot:ip:${ip}`,
+      FORGOT_IP_MAX,
+      FORGOT_IP_WINDOW_MS,
+    );
+    if (!rl.ok) return { ok: false, error: "error_rate_limited" };
+  }
+  const rlEmail = checkRateLimit(
+    `forgot:email:${email}`,
+    FORGOT_EMAIL_MAX,
+    FORGOT_EMAIL_WINDOW_MS,
+  );
+  if (!rlEmail.ok) return { ok: false, error: "error_rate_limited" };
 
   const [user] = await db
     .select({ id: schema.users.id })
@@ -223,19 +344,16 @@ export async function forgotPasswordAction(
         `Kami menerima permintaan untuk mereset password akun Dakwah-Lens Anda. Klik tautan ini untuk membuat password baru:\n\n${link}\n\n` +
         `Tautan ini berlaku 1 jam. Kalau bukan Anda yang meminta, abaikan email ini — password lama tetap aman.\n\n` +
         `— Dakwah-Lens · Sukses & Berkah Group`,
-      html: `
-        <div style="font-family:system-ui,-apple-system,sans-serif;max-width:520px;margin:0 auto;color:#0f172a;">
-          <p>Assalamu'alaykum,</p>
-          <p>Kami menerima permintaan untuk mereset password akun <strong>Dakwah-Lens</strong> Anda. Klik tombol di bawah untuk membuat password baru:</p>
-          <p style="margin:24px 0;">
-            <a href="${link}" style="display:inline-block;background:#0f172a;color:#fff;padding:12px 20px;border-radius:9999px;text-decoration:none;font-weight:600;">Reset password</a>
-          </p>
-          <p style="font-size:12px;color:#64748b;">Atau salin tautan ini: <br><span style="word-break:break-all;">${link}</span></p>
-          <p style="font-size:12px;color:#64748b;">Tautan ini berlaku <strong>1 jam</strong>. Kalau bukan Anda yang meminta, abaikan email ini — password lama tetap aman.</p>
-          <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;">
-          <p style="font-size:12px;color:#94a3b8;">Dakwah-Lens · Sukses & Berkah Group</p>
-        </div>
-      `,
+      html: renderEmail({
+        greeting: "Assalamu'alaykum,",
+        heading: "Reset password Anda",
+        paragraphs: [
+          "Kami menerima permintaan untuk mereset password akun <strong>Dakwah-Lens</strong> Anda. Klik tombol di bawah untuk membuat password baru.",
+        ],
+        cta: { label: "Reset password", url: link },
+        footnote:
+          "Tautan ini berlaku <strong>1 jam</strong>. Kalau bukan Anda yang meminta, abaikan email ini — password lama tetap aman.",
+      }),
     });
   }
 
@@ -259,6 +377,19 @@ export async function resetPasswordAction(
     return { ok: false, error: parsed.error.issues[0].message };
   }
   const { email, token, password } = parsed.data;
+
+  // Rate-limit by IP. Tokens are random + single-use + short-lived but
+  // we add an outer envelope to stop a flood of token guesses.
+  const ip = await getClientIp();
+  if (ip) {
+    const rl = checkRateLimit(
+      `reset:ip:${ip}`,
+      RESET_IP_MAX,
+      RESET_IP_WINDOW_MS,
+    );
+    if (!rl.ok) return { ok: false, error: "error_rate_limited" };
+  }
+
   const consumed = await consumeAuthToken("reset", email, token);
   if (!consumed) return { ok: false, error: "error_reset_invalid" };
 
@@ -293,6 +424,26 @@ export async function signinAction(
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0].message };
   }
+
+  // Rate-limit BEFORE invoking signIn so we don't burn a bcrypt
+  // comparator cycle on already-blocked attempts. Pattern matches the
+  // contact form: increment-on-call. A normal human won't make 5
+  // attempts in 5 minutes; legitimate fat-fingered logins still fit.
+  const ip = await getClientIp();
+  if (ip) {
+    const rl = checkRateLimit(
+      `signin:ip:${ip}`,
+      SIGNIN_IP_MAX,
+      SIGNIN_IP_WINDOW_MS,
+    );
+    if (!rl.ok) return { ok: false, error: "error_rate_limited" };
+  }
+  const rlEmail = checkRateLimit(
+    `signin:email:${parsed.data.email}`,
+    SIGNIN_EMAIL_MAX,
+    SIGNIN_EMAIL_WINDOW_MS,
+  );
+  if (!rlEmail.ok) return { ok: false, error: "error_rate_limited" };
 
   // Only accept relative callback URLs to avoid open redirects.
   // Default landing for a successful sign-in is the Dashboard.

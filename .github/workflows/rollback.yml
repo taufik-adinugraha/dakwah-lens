@@ -1,0 +1,62 @@
+name: Rollback
+
+# Manual-only. Reverts the running stack to a previous git SHA.
+# DOES NOT downgrade the database schema — Alembic downgrades are
+# destructive and need a human in the loop. If the rollback target
+# is older than a migration that's already applied, leave the schema
+# alone and roll back the app code only; the new schema is usually
+# backwards-compatible with the prior code.
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: Git SHA to roll back to (full or 7+ char short)
+        required: true
+        type: string
+      confirm:
+        description: Type ROLLBACK to confirm
+        required: true
+        type: string
+
+# Same group prefix as deploy.yml so a deploy and a rollback to the same
+# env queue rather than race.
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate confirmation
+        if: ${{ inputs.confirm != 'ROLLBACK' }}
+        run: |
+          echo "✗ Confirmation must be the literal string ROLLBACK"
+          exit 1
+
+      - name: SSH + rollback
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          command_timeout: 15m
+          envs: TARGET_SHA
+          script: |
+            set -euo pipefail
+            cd /srv/dakwah-lens/repo
+            TARGET="${{ inputs.sha }}"
+            echo "[rollback] target SHA: $TARGET"
+            git fetch --quiet origin
+            # `git rev-parse --verify` resolves short SHAs and errors on
+            # unknown ones — catches typos before we touch anything.
+            FULL=$(git rev-parse --verify "$TARGET^{commit}")
+            echo "[rollback] resolved to: $FULL"
+            git reset --hard "$FULL"
+            # Same compose path as deploy.sh.
+            COMPOSE="docker compose --env-file .env -f docker-compose.prod.yml"
+            $COMPOSE build --pull web api
+            $COMPOSE up -d --remove-orphans web api worker beat
+            docker image prune -f >/dev/null
+            sleep 5
+            echo "[rollback] ✓ now serving SHA $(git rev-parse --short HEAD)"

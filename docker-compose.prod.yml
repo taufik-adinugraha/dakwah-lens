@@ -1,0 +1,208 @@
+# ─────────────────────────────────────────────────────────────────
+# Production Compose stack for dakwah-lens.id on the IDCloudHost VM.
+#
+# Differs from dev `docker-compose.yml`:
+#  - Adds `web`, `api`, `worker`, `beat` services (the apps themselves)
+#  - Data services (postgres/qdrant/redis) bind ONLY to the internal
+#    Docker network — no public/host ports exposed. UFW would block
+#    them anyway; this is defense in depth.
+#  - Bind mounts to /srv/dakwah-lens/data/* on the host so backups are
+#    just a plain rsync, not a `docker volume export` dance.
+#  - All app services bind their host port to 127.0.0.1 only. Caddy on
+#    the host reverse-proxies them to the public Internet. The world
+#    never reaches our app sockets directly.
+#
+# Bring up with:
+#   docker compose --env-file .env -f docker-compose.prod.yml up -d
+# (the deploy.sh script wraps this so you don't have to remember.)
+# ─────────────────────────────────────────────────────────────────
+
+name: dakwah-lens
+
+networks:
+  dakwah:
+    driver: bridge
+
+services:
+  # ─── Data layer ───────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      # WIB so timestamps in psql shell match server logs.
+      TZ: Asia/Jakarta
+    volumes:
+      - /srv/dakwah-lens/data/postgres:/var/lib/postgresql/data
+      - ./deploy/postgres-init.sql:/docker-entrypoint-initdb.d/01-create-databases.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [dakwah]
+
+  qdrant:
+    image: qdrant/qdrant:v1.12.4
+    restart: unless-stopped
+    volumes:
+      - /srv/dakwah-lens/data/qdrant:/qdrant/storage
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c ':> /dev/tcp/127.0.0.1/6333' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [dakwah]
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - /srv/dakwah-lens/data/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [dakwah]
+
+  # ─── App layer ────────────────────────────────────────────────
+  web:
+    build:
+      context: .
+      dockerfile: web/Dockerfile
+    restart: unless-stopped
+    # Runtime env. Anything secret comes from `.env` on the host;
+    # anything routing-related is hard-coded here because the
+    # service names + ports never change across deploys.
+    environment:
+      NODE_ENV: production
+      NEXTAUTH_URL: ${NEXTAUTH_URL}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      AUTH_TRUST_HOST: "true"
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      SUPERADMIN_EMAIL: ${SUPERADMIN_EMAIL}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      EMAIL_FROM: ${EMAIL_FROM}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      QDRANT_URL: http://qdrant:6333
+      QDRANT_API_KEY: ${QDRANT_API_KEY:-}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      API_BASE_URL: http://api:8000
+      UPLOAD_DIR: /data/attachments
+    volumes:
+      # Shared with `api` so admins can upload an invoice via the web UI
+      # and the api can read it back for downloads.
+      - /srv/dakwah-lens/data/attachments:/data/attachments
+    ports:
+      # Caddy lives on the host and reverse-proxies localhost:3000.
+      # Binding to 127.0.0.1 means the port is unreachable from outside
+      # the VM even if UFW is later misconfigured.
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [dakwah]
+
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      QDRANT_URL: http://qdrant:6333
+      QDRANT_API_KEY: ${QDRANT_API_KEY:-}
+      REDIS_URL: redis://redis:6379/0
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      APIFY_TOKEN: ${APIFY_TOKEN}
+      YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-large}
+      CLASSIFIER_MODEL: ${CLASSIFIER_MODEL:-gemini-2.0-flash}
+      BRIEF_MODEL: ${BRIEF_MODEL:-claude-sonnet-4-6}
+      TZ: Asia/Jakarta
+    volumes:
+      - /srv/dakwah-lens/data/attachments:/data/attachments
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+    networks: [dakwah]
+
+  # Celery worker — async tasks: ingest, classification, brief generation.
+  worker:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      QDRANT_URL: http://qdrant:6333
+      QDRANT_API_KEY: ${QDRANT_API_KEY:-}
+      REDIS_URL: redis://redis:6379/0
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      APIFY_TOKEN: ${APIFY_TOKEN}
+      YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-large}
+      CLASSIFIER_MODEL: ${CLASSIFIER_MODEL:-gemini-2.0-flash}
+      TZ: Asia/Jakarta
+    command:
+      [
+        "celery",
+        "-A",
+        "api.workers.celery_app",
+        "worker",
+        "--loglevel=info",
+        "--concurrency=2",
+      ]
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks: [dakwah]
+
+  # Celery beat — scheduler. Single replica is critical: two beats
+  # produce duplicate jobs. Restart policy is `unless-stopped` and the
+  # schedule file lives in a named volume so a crash + restart resumes
+  # exactly where it left off.
+  beat:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      REDIS_URL: redis://redis:6379/0
+      TZ: Asia/Jakarta
+    command:
+      [
+        "celery",
+        "-A",
+        "api.workers.celery_app",
+        "beat",
+        "--loglevel=info",
+        "--schedule=/data/celerybeat-schedule.db",
+      ]
+    volumes:
+      - beat_data:/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks: [dakwah]
+
+volumes:
+  beat_data:

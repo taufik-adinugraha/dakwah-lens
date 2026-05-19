@@ -149,10 +149,12 @@ export default async function InsightsPage({
       <PlatformsBreakdown t={t} />
 
       <section className="pb-20 sm:pb-28">
-        <p className="mx-auto mb-12 flex max-w-3xl items-center justify-center gap-1.5 px-4 text-center text-xs text-slate-500 sm:px-6">
-          <Info className="h-3.5 w-3.5" />
-          {t("data_note")}
-        </p>
+        {process.env.NODE_ENV !== "production" && (
+          <p className="mx-auto mb-12 flex max-w-3xl items-center justify-center gap-1.5 px-4 text-center text-xs text-slate-500 sm:px-6">
+            <Info className="h-3.5 w-3.5" />
+            {t("data_note")}
+          </p>
+        )}
 
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
           <div className="relative isolate overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 via-emerald-700 to-brand-700 px-6 py-12 text-center text-white shadow-2xl sm:px-12">

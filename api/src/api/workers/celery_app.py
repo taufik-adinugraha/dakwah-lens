@@ -45,31 +45,93 @@ celery_app.conf.update(
             "schedule": crontab(minute=0, hour="*/2"),
             "kwargs": {"platform": "mainstream", "query": "", "limit": 40},
         },
-        # Social-media platforms rotate through the `ingest_queries` table
-        # (admin-editable at /admin/system/queries) — one query per tick,
-        # least-recently-used. Hardcoded keywords are gone; the team edits
-        # the mix to balance religious + societal coverage.
-        # 2×/day cadence (morning + evening) with limit=50 per run lands at
-        # ~$8/mo Apify spend on the Starter plan — under the $10 budget.
+        # Social-media platforms scrape the FULL `ingest_queries` pool
+        # (admin-editable at /admin/system/queries). Cadence varies by
+        # platform, balancing freshness against Apify cost / free-actor
+        # rate limits:
+        #   YT (every day)             — free (YouTube Data API)
+        #   TT (every day)             — free actor (clockworks/free-...)
+        #   TT (every 2 weeks, paid)   — clockworks/tiktok-scraper $4/1K,
+        #                                richer metadata, 1st + 3rd Mon
+        #   X  (Mon, Wed, Fri)         — apidojo $0.40/1K
+        #   IG (Mon only)              — apify hashtag $2.30/1K, priciest
+        #
+        # n_keywords=999 is intentionally larger than the realistic pool
+        # size — the rotating_ingest task picks "up to N" enabled
+        # queries, so any N >> pool means "all enabled".
+        #
+        # All runs land at 00:xx WIB (Indonesian sleep window) on a
+        # 10-min stagger to avoid Apify per-actor concurrency bursts.
+        # Starting at midnight gives a generous buffer before the 08:00
+        # WIB BERTopic recluster picks up the fresh material.
+        #
+        # On TT-paid weeks, the paid run lands at 00:25 — between the
+        # daily TT free run (00:20) and IG (00:30). The DB upserts on
+        # (platform, external_id), so the paid run's richer payload
+        # OVERWRITES the free run's lighter data for the same videos.
+        # On other days/weeks, only the free actor runs.
+        #
+        # Cost at the current ~58-keyword pool × ~20 posts/keyword =
+        # ~1.16K results per run:
+        #   YT 7×/wk × 1.16K → free
+        #   TT 7×/wk × 1.16K (free actor) → $0
+        #   TT 2×/mo × 1.16K (paid actor) → ~$9.3/mo @ $4/1K
+        #   X  3×/wk × 1.16K → ~$6.0/mo @ $0.40/1K
+        #   IG 1×/wk × 1.16K → ~$11.5/mo @ $2.30/1K
+        # Subtotal sweep: ~$26.8/mo. Add daily trending overlay
+        # (~$1.4/mo with free TT) → ~$28/mo total Apify usage —
+        # comfortably inside Starter credits. Track real costs at
+        # /admin/system/api-costs.
         "ingest-youtube": {
             "task": "api.workers.ingest.rotating_ingest",
-            "schedule": crontab(minute=10, hour="6,18"),
-            "kwargs": {"platform": "youtube", "limit": 50},
+            "schedule": crontab(minute=0, hour=0),  # daily
+            "kwargs": {"platform": "youtube", "limit": 20, "n_keywords": 999},
         },
-        "ingest-x": {
+        "ingest-x-mon": {
             "task": "api.workers.ingest.rotating_ingest",
-            "schedule": crontab(minute=20, hour="7,19"),
-            "kwargs": {"platform": "x", "limit": 50},
+            "schedule": crontab(minute=10, hour=0, day_of_week=1),
+            "kwargs": {"platform": "x", "limit": 20, "n_keywords": 999},
+        },
+        "ingest-x-wed": {
+            "task": "api.workers.ingest.rotating_ingest",
+            "schedule": crontab(minute=10, hour=0, day_of_week=3),
+            "kwargs": {"platform": "x", "limit": 20, "n_keywords": 999},
+        },
+        "ingest-x-fri": {
+            "task": "api.workers.ingest.rotating_ingest",
+            "schedule": crontab(minute=10, hour=0, day_of_week=5),
+            "kwargs": {"platform": "x", "limit": 20, "n_keywords": 999},
         },
         "ingest-tiktok": {
             "task": "api.workers.ingest.rotating_ingest",
-            "schedule": crontab(minute=30, hour="7,19"),
-            "kwargs": {"platform": "tiktok", "limit": 50},
+            "schedule": crontab(minute=20, hour=0),  # daily — free actor
+            "kwargs": {"platform": "tiktok", "limit": 20, "n_keywords": 999},
+        },
+        "ingest-tiktok-paid": {
+            "task": "api.workers.ingest.rotating_ingest",
+            # Biweekly: 1st + 3rd Mondays of the month. Celery crontab
+            # `day_of_month="1-7,15-21"` constrains the date range, then
+            # `day_of_week=1` picks the Monday inside each range — that's
+            # exactly two Mondays per month, 14 days apart in-month
+            # (cross-month gap can be 14-21 days depending on weekday
+            # alignment).
+            "schedule": crontab(
+                minute=25,
+                hour=0,
+                day_of_week=1,
+                day_of_month="1-7,15-21",
+            ),
+            "kwargs": {
+                "platform": "tiktok",
+                "limit": 20,
+                "n_keywords": 999,
+                "actor_id": "clockworks/tiktok-scraper",
+            },
         },
         "ingest-instagram": {
             "task": "api.workers.ingest.rotating_ingest",
-            "schedule": crontab(minute=40, hour="7,19"),
-            "kwargs": {"platform": "instagram", "limit": 50},
+            "schedule": crontab(minute=30, hour=0, day_of_week=1),
+            "kwargs": {"platform": "instagram", "limit": 20, "n_keywords": 999},
         },
         # Re-cluster topics every night after the daily ingest finishes. The
         # task itself handles the "not enough posts" case gracefully so it's
@@ -77,6 +139,15 @@ celery_app.conf.update(
         "recluster-topics": {
             "task": "api.workers.ingest.recluster_all",
             "schedule": crontab(minute=0, hour=8),
+        },
+        # Trending overlay: fetch Google Trends + YouTube popular + Google
+        # News for Indonesia, filter via Gemini Flash-Lite, then dispatch
+        # ad-hoc scrapes on the surviving keywords. Runs at 12:00 WIB so
+        # the news cycle has settled in for the day. ~$15.8/mo extra
+        # Apify (X $1.4 + TT $14.4 with the paid clockworks actor).
+        "trending-ingest": {
+            "task": "api.workers.ingest.trending_ingest",
+            "schedule": crontab(minute=0, hour=12),
         },
         # Host metrics every minute → drives the superadmin infra chart.
         "snapshot-system": {

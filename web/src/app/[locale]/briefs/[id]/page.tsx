@@ -6,6 +6,8 @@ import {
   ArrowLeft,
   BookOpenCheck,
   ChevronRight,
+  Lightbulb,
+  MessageCircleQuestion,
   Quote,
   Sparkles,
   Users,
@@ -16,6 +18,7 @@ import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
 import type { BriefContent, BriefDaleel } from "@/db/schema";
 import { PlaceholderBanner, PlaceholderChip } from "@/components/PlaceholderBadge";
+import { PrintButton } from "@/components/PrintButton";
 
 export async function generateMetadata({
   params,
@@ -57,8 +60,8 @@ export default async function BriefDetailPage({
   const toneLabel = tSeg(`tone_${brief.tone}` as Parameters<typeof tSeg>[0]);
 
   return (
-    <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
-      <div className="flex items-center justify-between">
+    <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16 print:py-0">
+      <div className="flex items-center justify-between print:hidden">
         <Link
           href="/briefs/new"
           className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900"
@@ -66,7 +69,10 @@ export default async function BriefDetailPage({
           <ArrowLeft className="h-3.5 w-3.5" />
           {t("regenerate")}
         </Link>
-        {brief.isPlaceholder && <PlaceholderChip label={t("placeholder_label")} />}
+        <div className="flex items-center gap-2">
+          {brief.isPlaceholder && <PlaceholderChip label={t("placeholder_label")} />}
+          <PrintButton namespace="Briefs" />
+        </div>
       </div>
 
       <h1 className="mt-6 text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
@@ -149,6 +155,50 @@ export default async function BriefDetailPage({
         </ol>
       </Section>
 
+      {content.anticipated_objections?.length ? (
+        <Section
+          icon={MessageCircleQuestion}
+          title={t("section_objections")}
+        >
+          <div className="space-y-4">
+            {content.anticipated_objections.map((o, i) => (
+              <div
+                key={i}
+                className="rounded-xl border border-slate-200 bg-slate-50/60 p-4"
+              >
+                <p className="text-sm font-medium text-slate-900">
+                  <span className="mr-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                    {t("objection_label")}
+                  </span>
+                  {o.objection}
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-slate-700">
+                  <span className="mr-2 text-[10px] font-semibold uppercase tracking-wider text-brand-700">
+                    {t("response_label")}
+                  </span>
+                  {o.response}
+                </p>
+              </div>
+            ))}
+          </div>
+        </Section>
+      ) : null}
+
+      {content.story_illustrations?.length ? (
+        <Section icon={Lightbulb} title={t("section_illustrations")}>
+          <ol className="space-y-2 text-sm leading-relaxed text-slate-700">
+            {content.story_illustrations.map((s, i) => (
+              <li key={i} className="flex gap-3">
+                <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-50 text-[11px] font-semibold text-amber-700">
+                  {i + 1}
+                </span>
+                <span className="text-pretty">{s}</span>
+              </li>
+            ))}
+          </ol>
+        </Section>
+      ) : null}
+
       <Section icon={Quote} title={t("section_templates")}>
         <div className="space-y-4">
           <TemplateBlock
@@ -212,6 +262,17 @@ function DaleelCard({
 }) {
   const isSemantic = d.retrieval_source === "qdrant";
   const isFallback = d.retrieval_source === "keyword";
+  // "Muttafaq alayh" — agreed upon by Bukhari AND Muslim — is the
+  // strongest hadith authentication tier. Flag it explicitly so the
+  // da'i sees the credibility signal at a glance.
+  const isMuttafaq = (() => {
+    if (!d.also_found_in?.length) return false;
+    const corpora = new Set([d.source, ...d.also_found_in.map((a) => a.source)]
+      .map((s) => s.toLowerCase()));
+    const hitsBukhari = Array.from(corpora).some((s) => s.includes("bukhari"));
+    const hitsMuslim = Array.from(corpora).some((s) => s.includes("muslim"));
+    return hitsBukhari && hitsMuslim;
+  })();
   return (
     <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-5 ring-1 ring-emerald-50">
       <p
@@ -243,7 +304,41 @@ function DaleelCard({
             {t("daleel_source_keyword")}
           </span>
         )}
+        {isMuttafaq && (
+          <span className="inline-flex items-center rounded-full bg-emerald-700 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
+            {t("daleel_muttafaq_alayh")}
+          </span>
+        )}
       </div>
+
+      {d.also_found_in?.length ? (
+        <p className="mt-2 text-[11px] leading-relaxed text-emerald-800/80">
+          <span className="font-semibold">
+            {t("daleel_also_found_in_label")}:
+          </span>{" "}
+          {d.also_found_in.map((a) => a.source).join(" · ")}
+        </p>
+      ) : null}
+
+      {d.linked_ayah ? (
+        <div className="mt-3 rounded-xl border border-emerald-200/70 bg-white/70 p-3">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+            {t("daleel_linked_ayah_label")} · {d.linked_ayah.source}
+          </p>
+          <p
+            dir="rtl"
+            lang="ar"
+            className="mt-1.5 font-arabic text-lg leading-[1.9] text-slate-900"
+          >
+            {d.linked_ayah.arabic}
+          </p>
+          <p className="mt-1.5 text-pretty text-xs leading-relaxed text-slate-600">
+            <span aria-hidden>“</span>
+            {d.linked_ayah.translation}
+            <span aria-hidden>”</span>
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }

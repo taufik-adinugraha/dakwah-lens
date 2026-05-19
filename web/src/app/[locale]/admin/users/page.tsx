@@ -14,7 +14,9 @@ import {
   promoteToSuperadminAction,
   reinstateUserAction,
   rejectUserAction,
+  removeUserAction,
 } from "@/app/[locale]/admin/actions";
+import { ConfirmFormButton } from "./ConfirmFormButton";
 
 export async function generateMetadata({
   params,
@@ -265,6 +267,9 @@ function UserRowCard({
   isSelf: boolean;
   callerRole: string;
 }) {
+  // Localized confirm text with the target email substituted in, so
+  // the admin sees exactly whose row is about to be deleted.
+  const removeConfirm = t("confirm_remove", { email: user.email });
   const initials = (user.name ?? user.email)
     .split(/[\s@.]/)
     .filter(Boolean)
@@ -311,6 +316,7 @@ function UserRowCard({
         t={t}
         disabled={isSelf}
         callerRole={callerRole}
+        removeConfirm={removeConfirm}
       />
     </li>
   );
@@ -323,6 +329,7 @@ function ActionButtons({
   t,
   disabled,
   callerRole,
+  removeConfirm,
 }: {
   userId: string;
   userRole: string;
@@ -330,6 +337,7 @@ function ActionButtons({
   t: Awaited<ReturnType<typeof getTranslations<"Admin">>>;
   disabled: boolean;
   callerRole: string;
+  removeConfirm: string;
 }) {
   if (disabled) {
     return <span className="text-[10px] uppercase tracking-wider text-slate-400">—</span>;
@@ -370,18 +378,34 @@ function ActionButtons({
           label={t("block_button")}
           tone="rose"
         />
+        <ConfirmFormButton
+          action={removeUserAction}
+          userId={userId}
+          label={t("remove_button")}
+          confirmMessage={removeConfirm}
+          tone="rose"
+        />
       </div>
     );
   }
 
   return (
-    <AdminFormButton
-      action={reinstateUserAction}
-      userId={userId}
-      label={t("reinstate_button")}
-      tone="emerald"
-      icon={CheckCircle2}
-    />
+    <div className="flex flex-wrap items-center justify-end gap-1.5">
+      <AdminFormButton
+        action={reinstateUserAction}
+        userId={userId}
+        label={t("reinstate_button")}
+        tone="emerald"
+        icon={CheckCircle2}
+      />
+      <ConfirmFormButton
+        action={removeUserAction}
+        userId={userId}
+        label={t("remove_button")}
+        confirmMessage={removeConfirm}
+        tone="rose"
+      />
+    </div>
   );
 }
 

@@ -1,3 +1,4 @@
+import { Link } from "@/i18n/navigation";
 import { Card, HelpCallout, PageHeader } from "../_ui";
 
 /**
@@ -13,9 +14,10 @@ export default async function ScrapersPage() {
     apifyToken: !!process.env.APIFY_TOKEN,
     youtubeKey: !!process.env.YOUTUBE_API_KEY,
     actors: {
-      x:
-        process.env.APIFY_ACTOR_X ??
-        "kaitoeasyapi/twitter-x-data-tweet-scraper-pay-per-result-cheapest",
+      // Keep these fallbacks in sync with DEFAULT_ACTORS in
+      // api/src/api/services/apify.py — they're what gets used when
+      // the matching APIFY_ACTOR_* env var isn't set.
+      x: process.env.APIFY_ACTOR_X ?? "apidojo/tweet-scraper",
       instagram:
         process.env.APIFY_ACTOR_INSTAGRAM ?? "apify/instagram-hashtag-scraper",
       tiktok:
@@ -44,7 +46,7 @@ export default async function ScrapersPage() {
       </HelpCallout>
 
       <Card title="Required keys">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm max-md:block max-md:overflow-x-auto">
           <thead>
             <tr className="border-b border-slate-100 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-500">
               <th className="py-2">Env var</th>
@@ -56,7 +58,7 @@ export default async function ScrapersPage() {
             <KeyRow
               name="APIFY_TOKEN"
               configured={status.apifyToken}
-              src="console.apify.com → Settings → Integrations → Personal API tokens. Free tier: $5/mo credit."
+              src="console.apify.com → Settings → Integrations → Personal API tokens. We run on Starter ($29/mo, $29 platform credit included — overages bill on top). Free tier ($5 credit) is enough only for a one-off dev run."
             />
             <KeyRow
               name="YOUTUBE_API_KEY"
@@ -78,15 +80,16 @@ export default async function ScrapersPage() {
             notes={
               <>
                 <p>
-                  The default <code>kaitoeasyapi</code> actor works on the
-                  Apify free plan. The "official" <code>apidojo</code>{" "}
-                  actor returns 5-item samples on free.
+                  The default <code>apidojo/tweet-scraper</code> actor is the
+                  industry standard for X — full thread context, reliable
+                  on weekend bursts. Swap via <code>APIFY_ACTOR_X</code> if you
+                  want to test alternatives.
                 </p>
                 <p>
                   Run manually:{" "}
                   <code>
                     uv run python -m api.scripts.ingest --platform x --query
-                    "#dakwah" --limit 20
+                    &quot;#dakwah&quot; --limit 20
                   </code>
                 </p>
               </>
@@ -111,12 +114,29 @@ export default async function ScrapersPage() {
             via="Apify"
             actor={status.actors.tiktok}
             env="APIFY_ACTOR_TIKTOK"
-            cost="free actor, $5 Apify-platform credit covers ~10K results"
+            cost="free actor daily · paid actor biweekly adds ~$9/mo"
             notes={
-              <p>
-                Default actor is <code>clockworks/free-tiktok-scraper</code>{" "}
-                — free actor, no per-result charge, just compute time.
-              </p>
+              <>
+                <p>
+                  Dual-actor setup. The daily 00:20 WIB sweep uses{" "}
+                  <code>clockworks/free-tiktok-scraper</code> (no per-result
+                  charge — Apify platform may still bill compute time
+                  against your plan credit). Every 1st &amp; 3rd Monday at
+                  00:25 WIB a second sweep fires with{" "}
+                  <code>clockworks/tiktok-scraper</code> (paid, ~$4/1K
+                  results) for richer metadata — the DB upsert on{" "}
+                  <code>(platform, external_id)</code> overwrites that day&apos;s
+                  free-actor payload with the richer one for the same
+                  videos.
+                </p>
+                <p>
+                  Set <code>APIFY_ACTOR_TIKTOK=clockworks/tiktok-scraper</code>{" "}
+                  in <code>.env</code> if you want the paid actor for ALL
+                  runs — but drop the daily TT entry in{" "}
+                  <code>celery_app.py</code> to weekly first, daily paid TT
+                  at the current pool size would cost ~$140/mo.
+                </p>
+              </>
             }
           />
           <Platform
@@ -160,12 +180,12 @@ export default async function ScrapersPage() {
             notes={
               <p>
                 List of outlets is editable at{" "}
-                <a
+                <Link
                   href="/admin/system/rss"
                   className="font-semibold text-brand-700 hover:underline"
                 >
                   /admin/system/rss
-                </a>
+                </Link>
                 . Six Indonesian outlets are seeded by default.
               </p>
             }

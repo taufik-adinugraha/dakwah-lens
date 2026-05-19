@@ -10,7 +10,9 @@ import {
   HelpCallout,
   PageHeader,
   StatTile,
+  formatRupiah,
 } from "../_ui";
+import { ConfirmForm } from "../_ConfirmForm";
 
 export default async function DonationsPage() {
   const [
@@ -71,7 +73,7 @@ export default async function DonationsPage() {
           tile on the Overview.
         </p>
         <p>
-          <strong>Donor privacy:</strong> when you tick "Mark as anonymous",
+          <strong>Donor privacy:</strong> when you tick &quot;Mark as anonymous&quot;,
           the donor name is dropped before the row is inserted — not just
           hidden on the public page. There is no way to surface a donor
           name that was never persisted.
@@ -81,26 +83,26 @@ export default async function DonationsPage() {
       <div className="grid gap-3 sm:grid-cols-4">
         <StatTile
           label="All-time donations"
-          value={`Rp ${total.toLocaleString("id-ID")}`}
+          value={formatRupiah(total)}
           hint={`${donations.length} entries`}
           accent="emerald"
         />
         <StatTile
           label="Last 30 days"
-          value={`Rp ${Math.round(amount30).toLocaleString("id-ID")}`}
+          value={formatRupiah(amount30)}
           hint={`${count30} entries`}
           accent="brand"
         />
         <StatTile
           label="Last 90 days"
-          value={`Rp ${Math.round(amount90).toLocaleString("id-ID")}`}
+          value={formatRupiah(amount90)}
           hint={`${count90} entries`}
         />
         <StatTile
           label="Avg per entry"
           value={
             donations.length > 0
-              ? `Rp ${Math.round(total / donations.length).toLocaleString("id-ID")}`
+              ? formatRupiah(total / donations.length)
               : "—"
           }
           hint="all-time mean"
@@ -108,7 +110,11 @@ export default async function DonationsPage() {
       </div>
 
       <Card title="Record a donation">
-        <form action={addDonation} className="space-y-4">
+        <form
+          action={addDonation}
+          className="space-y-4"
+          encType="multipart/form-data"
+        >
           <div className="grid gap-3 sm:grid-cols-[1fr_1fr_1fr]">
             <FormField label="Received on">
               <input
@@ -171,6 +177,17 @@ export default async function DonationsPage() {
               className="h-9 w-full rounded-lg border border-slate-200 px-3 text-sm placeholder:text-slate-400"
             />
           </FormField>
+          <FormField
+            label="Receipt file"
+            hint="Optional · transfer proof or receipt · PDF / JPG / PNG / WebP · max 5 MB · admin-only download (never exposed on /transparency)"
+          >
+            <input
+              name="attachment"
+              type="file"
+              accept="application/pdf,image/jpeg,image/png,image/webp"
+              className="block w-full text-sm text-slate-700 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-slate-700 hover:file:bg-slate-200"
+            />
+          </FormField>
           <div className="flex justify-end pt-1">
             <button
               type="submit"
@@ -184,7 +201,7 @@ export default async function DonationsPage() {
 
       <Card
         title={`Donation log (${donations.length})`}
-        hint={`total Rp ${total.toLocaleString("id-ID")}`}
+        hint={`total ${formatRupiah(total)}`}
       >
         {donations.length === 0 ? (
           <EmptyState
@@ -192,7 +209,7 @@ export default async function DonationsPage() {
             hint="Record the first one above. It'll appear here and on /transparency."
           />
         ) : (
-          <table className="w-full text-sm">
+          <table className="w-full text-sm max-md:block max-md:overflow-x-auto">
             <thead>
               <tr className="border-b border-slate-100 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                 <th className="py-2">Received</th>
@@ -200,6 +217,7 @@ export default async function DonationsPage() {
                 <th className="py-2">Channel</th>
                 <th className="py-2 text-right">Amount</th>
                 <th className="py-2">Note</th>
+                <th className="py-2">Receipt</th>
                 <th className="py-2" />
               </tr>
             </thead>
@@ -225,13 +243,28 @@ export default async function DonationsPage() {
                     {(d.channel ?? "—").replace(/_/g, " ")}
                   </td>
                   <td className="py-2 text-right tabular-nums">
-                    Rp {d.amountIdr.toLocaleString("id-ID")}
+                    {formatRupiah(d.amountIdr)}
                   </td>
                   <td className="py-2 text-xs text-slate-500">
                     {d.note ?? "—"}
                   </td>
+                  <td className="py-2 text-xs">
+                    {d.attachmentPath ? (
+                      <a
+                        href={`/api/admin/attachments/donation/${d.id}`}
+                        className="font-medium text-brand-700 underline-offset-2 hover:underline"
+                      >
+                        {d.attachmentFilename ?? "download"}
+                      </a>
+                    ) : (
+                      <span className="text-slate-400">—</span>
+                    )}
+                  </td>
                   <td className="py-2 text-right">
-                    <form action={deleteDonation}>
+                    <ConfirmForm
+                      action={deleteDonation}
+                      confirmMessage={`Delete this ${formatRupiah(d.amountIdr)} donation${d.isAnonymous ? "" : d.donor ? ` from ${d.donor}` : ""}? Also unlinks any attached receipt and updates the public /transparency page.`}
+                    >
                       <input type="hidden" name="id" value={d.id} />
                       <button
                         type="submit"
@@ -240,7 +273,7 @@ export default async function DonationsPage() {
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
-                    </form>
+                    </ConfirmForm>
                   </td>
                 </tr>
               ))}
@@ -268,7 +301,7 @@ export default async function DonationsPage() {
                     {m.n} entr{m.n === 1 ? "y" : "ies"}
                   </span>
                   <span className="text-slate-900">
-                    Rp {Math.round(m.idr).toLocaleString("id-ID")}
+                    {formatRupiah(m.idr)}
                   </span>
                 </span>
               </li>

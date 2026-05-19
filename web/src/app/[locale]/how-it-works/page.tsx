@@ -39,6 +39,7 @@ export default async function HowItWorksPage({
       <StackGrid t={t} />
       <SystemDiagram t={t} />
       <IngestionPipeline t={t} />
+      <DiscoveryStrategy t={t} />
       <BriefPipeline t={t} />
       <ModelsTable t={t} />
       <KitabCorpus t={t} />
@@ -100,16 +101,89 @@ function TLDR({ t }: { t: T }) {
   return (
     <section className="py-8 sm:py-12">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-6 sm:p-8">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+        <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-6 shadow-sm sm:p-8">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">
             {t("tldr_label")}
           </p>
-          <p className="mt-2 text-pretty text-[15px] leading-relaxed text-slate-700">
-            {t("tldr_body")}
+
+          {/* Two facet cards: architecture + AI stack. Equal weight,
+           * stacked on mobile, side-by-side on tablet+. */}
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <TldrFacet
+              icon={Layers}
+              label={t("tldr_arch_label")}
+              body={t("tldr_arch_body")}
+              tone="brand"
+            />
+            <TldrFacet
+              icon={Sparkles}
+              label={t("tldr_ai_label")}
+              body={t("tldr_ai_body")}
+              tone="violet"
+            />
+          </div>
+
+          {/* The credibility-anchor callout — visually distinct from the
+           * facets above so the reader's eye locks on the daleel-retrieval
+           * guarantee. Matches the emerald/ShieldCheck idiom used on the
+           * /kitab and onboarding "we don't hallucinate" surfaces. */}
+          <div className="mt-4 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50/70 p-4">
+            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+                {t("tldr_trust_label")}
+              </p>
+              <p className="mt-1 text-pretty text-sm leading-relaxed text-emerald-900">
+                {t("tldr_trust_body")}
+              </p>
+            </div>
+          </div>
+
+          <p className="mt-4 text-center text-[11px] text-slate-500">
+            {t("tldr_license")}
           </p>
         </div>
       </div>
     </section>
+  );
+}
+
+function TldrFacet({
+  icon: Icon,
+  label,
+  body,
+  tone,
+}: {
+  icon: typeof Layers;
+  label: string;
+  body: string;
+  tone: "brand" | "violet";
+}) {
+  const tones: Record<typeof tone, { border: string; bg: string; text: string }> = {
+    brand: {
+      border: "border-brand-200",
+      bg: "bg-brand-50/60",
+      text: "text-brand-700",
+    },
+    violet: {
+      border: "border-violet-200",
+      bg: "bg-violet-50/60",
+      text: "text-violet-700",
+    },
+  };
+  const s = tones[tone];
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white p-4">
+      <div
+        className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${s.border} ${s.bg} ${s.text}`}
+      >
+        <Icon className="h-3 w-3" />
+        {label}
+      </div>
+      <p className="mt-2 text-pretty text-sm leading-relaxed text-slate-700">
+        {body}
+      </p>
+    </div>
   );
 }
 
@@ -224,13 +298,20 @@ function StackCard({
           {title}
         </h3>
       </div>
+      {/* Grid (not flex) so wrapped names — e.g. "Anthropic Claude Sonnet
+       * 4.5" — keep the role column starting at the top of the row instead
+       * of jumping to the first-line baseline. Column widths are explicit
+       * so role text in every row starts at the same x-offset. */}
       <ul className="mt-4 space-y-2 text-sm">
         {items.map((it) => (
-          <li key={it.name} className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
-            <span className="font-mono text-xs font-semibold text-slate-900 sm:w-44">
+          <li
+            key={it.name}
+            className="grid gap-x-3 gap-y-0.5 sm:grid-cols-[12rem_1fr]"
+          >
+            <span className="font-mono text-xs font-semibold leading-snug text-slate-900">
               {it.name}
             </span>
-            <span className="text-slate-600">{it.role}</span>
+            <span className="leading-snug text-slate-600">{it.role}</span>
           </li>
         ))}
       </ul>
@@ -434,6 +515,56 @@ function IngestionPipeline({ t }: { t: T }) {
   );
 }
 
+/* Discovery strategy: how keywords are picked. Sits between the
+ * IngestionPipeline (which assumes you have a query) and BriefPipeline.
+ * Two-card layout because there are exactly two complementary layers —
+ * curated rotation and the daily trending overlay. */
+function DiscoveryStrategy({ t }: { t: T }) {
+  return (
+    <section className="py-12 sm:py-16">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <SectionHeader
+          title={t("discovery_title")}
+          subtitle={t("discovery_subtitle")}
+        />
+        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="flex items-center gap-2">
+              <GitBranch className="h-5 w-5 text-brand-600" />
+              <h3 className="text-base font-bold text-slate-900">
+                {t("discovery_curated_title")}
+              </h3>
+            </div>
+            <p className="mt-1 font-mono text-[10px] text-brand-700">
+              {t("discovery_curated_module")}
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-slate-700">
+              {t("discovery_curated_body")}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-amber-500" />
+              <h3 className="text-base font-bold text-slate-900">
+                {t("discovery_trending_title")}
+              </h3>
+            </div>
+            <p className="mt-1 font-mono text-[10px] text-brand-700">
+              {t("discovery_trending_module")}
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-slate-700">
+              {t("discovery_trending_body")}
+            </p>
+          </div>
+        </div>
+        <p className="mx-auto mt-6 max-w-3xl text-pretty text-center text-xs text-slate-500">
+          {t("discovery_why_note")}
+        </p>
+      </div>
+    </section>
+  );
+}
+
 function BriefPipeline({ t }: { t: T }) {
   const stages = [
     {
@@ -443,12 +574,12 @@ function BriefPipeline({ t }: { t: T }) {
     },
     {
       title: t("brief_stage_2_title"),
-      module: "lib/quran-retrieval.ts",
+      module: "lib/kitab-retrieval.ts",
       body: t("brief_stage_2_body"),
     },
     {
       title: t("brief_stage_3_title"),
-      module: "Qdrant `quran` collection",
+      module: "Qdrant: all kitab collections",
       body: t("brief_stage_3_body"),
     },
     {
@@ -616,6 +747,10 @@ function KitabCorpus({ t }: { t: T }) {
             title="Riyad as-Salihin"
             detail={t("kitab_riyad")}
           />
+          <KitabItem
+            title="Tafsir Ibn Kathir"
+            detail={t("kitab_tafsir")}
+          />
         </ul>
         <p className="mx-auto mt-6 max-w-2xl text-pretty text-center text-xs leading-relaxed text-slate-600">
           {t("kitab_note")}
@@ -688,6 +823,7 @@ function Tradeoffs({ t }: { t: T }) {
     { q: t("tradeoff_3_q"), a: t("tradeoff_3_a") },
     { q: t("tradeoff_4_q"), a: t("tradeoff_4_a") },
     { q: t("tradeoff_5_q"), a: t("tradeoff_5_a") },
+    { q: t("tradeoff_6_q"), a: t("tradeoff_6_a") },
   ];
   return (
     <section className="border-t border-slate-100 bg-slate-50/50 py-12 sm:py-16">

@@ -24,7 +24,15 @@ export function PageTracker({ locale }: { locale: string }) {
     // aggregation. `/en/insights/x` → `/insights/x`.
     const normalized =
       pathname.replace(/^\/(en|id)(?=\/|$)/, "") || "/";
-    void trackPageView({ path: normalized, locale });
+    // Fire-and-forget — page views are nice-to-have, never block UX.
+    // The .catch swallows transient fetch failures (HMR mid-flight,
+    // server restart, navigation race) so they don't surface as
+    // unhandledRejection in the browser console.
+    trackPageView({ path: normalized, locale }).catch((err) => {
+      if (process.env.NODE_ENV !== "production") {
+        console.debug("[page-tracker] silent failure:", err);
+      }
+    });
   }, [pathname, locale]);
 
   return null;

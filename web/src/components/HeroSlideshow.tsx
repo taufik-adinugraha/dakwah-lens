@@ -10,13 +10,17 @@ import {
   ChevronRight,
   Filter,
   LayoutDashboard,
+  Library,
   ScrollText,
+  Sparkles,
   TrendingUp,
   Users,
+  Lightbulb,
+  BookMarked,
 } from "lucide-react";
 import clsx from "clsx";
 
-const SLIDES = ["dashboard", "trends", "brief", "segments"] as const;
+const SLIDES = ["dashboard", "trends", "brief", "kitab"] as const;
 type SlideKey = (typeof SLIDES)[number];
 
 const AUTO_ADVANCE_MS = 6500;
@@ -25,7 +29,7 @@ const SLIDE_ICONS: Record<SlideKey, typeof LayoutDashboard> = {
   dashboard: LayoutDashboard,
   trends: TrendingUp,
   brief: ScrollText,
-  segments: Users,
+  kitab: Library,
 };
 
 type T = ReturnType<typeof useTranslations<"Preview">>;
@@ -48,7 +52,7 @@ export function HeroSlideshow() {
     dashboard: t("dashboard_url"),
     trends: t("trends_url"),
     brief: t("brief_url"),
-    segments: t("segments_url"),
+    kitab: t("kitab_url"),
   };
 
   return (
@@ -112,7 +116,7 @@ export function HeroSlideshow() {
         <div className="overflow-hidden rounded-xl border border-slate-200/70 bg-gradient-to-br from-slate-50 to-white">
           <BrowserChrome url={urls[active]} live={t("live")} />
 
-          <div className="relative min-h-[360px] sm:min-h-[420px]">
+          <div className="relative min-h-[400px] sm:min-h-[460px]">
             {SLIDES.map((key, i) => (
               <div
                 key={key}
@@ -127,7 +131,7 @@ export function HeroSlideshow() {
                 {key === "dashboard" && <DashboardSlide t={t} />}
                 {key === "trends" && <TrendsSlide t={t} />}
                 {key === "brief" && <BriefSlide t={t} />}
-                {key === "segments" && <SegmentsSlide t={t} />}
+                {key === "kitab" && <KitabSlide t={t} />}
               </div>
             ))}
           </div>
@@ -174,12 +178,14 @@ function BrowserChrome({ url, live }: { url: string; live: string }) {
 
 /* ────────────────────────────────────────────────────────────
  * Slide 1 — Dashboard
+ * Top stat row + Daily Insights strip + Top Issues grid.
  * ──────────────────────────────────────────────────────────── */
 
 function DashboardSlide({ t }: { t: T }) {
+  const insightIcons = [TrendingUp, Sparkles, Users, BookOpenCheck];
   return (
     <div className="space-y-3">
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-2 sm:grid-cols-3">
         <StatCard
           tone="brand"
           label={t("dashboard_pulse_label")}
@@ -200,38 +206,52 @@ function DashboardSlide({ t }: { t: T }) {
         />
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white p-3">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-          {t("dashboard_sentiment_label")}
+      <div>
+        <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+          {t("dashboard_insights_label")}
         </p>
-        <div className="mt-2 flex h-2 overflow-hidden rounded-full">
-          <span className="bg-emerald-500" style={{ width: "48%" }} />
-          <span className="bg-slate-300" style={{ width: "30%" }} />
-          <span className="bg-amber-500" style={{ width: "22%" }} />
-        </div>
-        <div className="mt-2 grid grid-cols-3 gap-1 text-[10px] text-slate-500">
-          <span><span className="font-semibold text-emerald-600">48%</span> {t("dashboard_sentiment_pos")}</span>
-          <span><span className="font-semibold text-slate-600">30%</span> {t("dashboard_sentiment_neu")}</span>
-          <span><span className="font-semibold text-amber-600">22%</span> {t("dashboard_sentiment_neg")}</span>
+        <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+          {[1, 2, 3, 4].map((n, i) => {
+            const Icon = insightIcons[i];
+            return (
+              <div
+                key={n}
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 py-1.5"
+              >
+                <Icon className="h-3 w-3 shrink-0 text-brand-600" />
+                <span className="truncate text-[10px] font-medium text-slate-700">
+                  {t(`dashboard_insight_${n}` as Parameters<typeof t>[0])}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      <div className="space-y-1.5">
-        <IssueRow
-          title={t("dashboard_issue_1_title")}
-          tag={t("dashboard_issue_1_tag")}
-          sentiment={62}
-        />
-        <IssueRow
-          title={t("dashboard_issue_2_title")}
-          tag={t("dashboard_issue_2_tag")}
-          sentiment={48}
-        />
-        <IssueRow
-          title={t("dashboard_issue_3_title")}
-          tag={t("dashboard_issue_3_tag")}
-          sentiment={75}
-        />
+      <div>
+        <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+          {t("dashboard_issues_label")}
+        </p>
+        <div className="space-y-1.5">
+          <IssueRow
+            title={t("dashboard_issue_1_title")}
+            tag={t("dashboard_issue_1_tag")}
+            volume="12.4K"
+            sentiment={62}
+          />
+          <IssueRow
+            title={t("dashboard_issue_2_title")}
+            tag={t("dashboard_issue_2_tag")}
+            volume="8.1K"
+            sentiment={48}
+          />
+          <IssueRow
+            title={t("dashboard_issue_3_title")}
+            tag={t("dashboard_issue_3_tag")}
+            volume="6.7K"
+            sentiment={75}
+          />
+        </div>
       </div>
     </div>
   );
@@ -269,10 +289,12 @@ function StatCard({
 function IssueRow({
   title,
   tag,
+  volume,
   sentiment,
 }: {
   title: string;
   tag: string;
+  volume: string;
   sentiment: number;
 }) {
   return (
@@ -283,13 +305,16 @@ function IssueRow({
         </p>
         <p className="text-[10px] text-slate-500">{tag}</p>
       </div>
-      <div className="hidden h-1.5 w-20 overflow-hidden rounded-full bg-slate-100 sm:block">
+      <span className="hidden text-[11px] font-medium tabular-nums text-slate-500 sm:inline">
+        {volume}
+      </span>
+      <div className="hidden h-1.5 w-16 overflow-hidden rounded-full bg-slate-100 sm:block">
         <div
           className="h-full rounded-full bg-gradient-to-r from-brand-500 to-emerald-500"
           style={{ width: `${sentiment}%` }}
         />
       </div>
-      <span className="hidden text-[11px] font-medium text-slate-500 sm:inline">
+      <span className="hidden w-8 text-right text-[11px] font-medium text-slate-500 sm:inline">
         {sentiment}%
       </span>
     </div>
@@ -298,6 +323,8 @@ function IssueRow({
 
 /* ────────────────────────────────────────────────────────────
  * Slide 2 — Trends Explorer
+ * Two-column: trending table on the left, sentiment + category
+ * volume panel on the right (mirrors /insights split).
  * ──────────────────────────────────────────────────────────── */
 
 function TrendsSlide({ t }: { t: T }) {
@@ -309,6 +336,13 @@ function TrendsSlide({ t }: { t: T }) {
     { title: t("trends_row_5_title"), tag: t("trends_row_5_tag"), volume: "4.2K", relevance: 76, trend: [30, 32, 30, 28, 35, 40, 45] },
   ];
 
+  const categories = [
+    { label: t("trends_category_1"), pct: 84 },
+    { label: t("trends_category_2"), pct: 71 },
+    { label: t("trends_category_3"), pct: 58 },
+    { label: t("trends_category_4"), pct: 42 },
+  ];
+
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-1.5">
@@ -317,31 +351,88 @@ function TrendsSlide({ t }: { t: T }) {
         <FilterChip icon={Filter} label={t("trends_filter_sentiment")} />
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
-        <div className="grid grid-cols-[1fr_auto_auto_auto] gap-3 border-b border-slate-200 bg-slate-50 px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-          <span>{t("trends_col_topic")}</span>
-          <span className="hidden sm:inline">{t("trends_col_volume")}</span>
-          <span>{t("trends_col_relevance")}</span>
-          <span>{t("trends_col_trend")}</span>
-        </div>
-        {rows.map((r) => (
-          <div
-            key={r.title}
-            className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 border-b border-slate-100 px-3 py-2 last:border-0"
-          >
-            <div className="min-w-0">
-              <p className="truncate text-xs font-medium text-slate-800">{r.title}</p>
-              <p className="text-[10px] text-slate-500">{r.tag}</p>
-            </div>
-            <span className="hidden text-xs tabular-nums text-slate-600 sm:inline">
-              {r.volume}
-            </span>
-            <span className="inline-flex items-center rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-semibold text-brand-700">
-              {r.relevance}
-            </span>
-            <Sparkline points={r.trend} />
+      <div className="grid gap-3 sm:grid-cols-[1.6fr_1fr]">
+        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+          <div className="grid grid-cols-[1fr_auto_auto_auto] gap-3 border-b border-slate-200 bg-slate-50 px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+            <span>{t("trends_col_topic")}</span>
+            <span className="hidden sm:inline">{t("trends_col_volume")}</span>
+            <span>{t("trends_col_relevance")}</span>
+            <span>{t("trends_col_trend")}</span>
           </div>
-        ))}
+          {rows.map((r) => (
+            <div
+              key={r.title}
+              className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 border-b border-slate-100 px-3 py-2 last:border-0"
+            >
+              <div className="min-w-0">
+                <p className="truncate text-xs font-medium text-slate-800">
+                  {r.title}
+                </p>
+                <p className="text-[10px] text-slate-500">{r.tag}</p>
+              </div>
+              <span className="hidden text-xs tabular-nums text-slate-600 sm:inline">
+                {r.volume}
+              </span>
+              <span className="inline-flex items-center rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-semibold text-brand-700">
+                {r.relevance}
+              </span>
+              <Sparkline points={r.trend} />
+            </div>
+          ))}
+        </div>
+
+        <div className="space-y-3">
+          <div className="rounded-lg border border-slate-200 bg-white p-3">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+              {t("trends_sentiment_label")}
+            </p>
+            <div className="mt-2 flex h-2 overflow-hidden rounded-full">
+              <span className="bg-emerald-500" style={{ width: "48%" }} />
+              <span className="bg-slate-300" style={{ width: "30%" }} />
+              <span className="bg-amber-500" style={{ width: "22%" }} />
+            </div>
+            <div className="mt-2 grid grid-cols-3 gap-1 text-[10px] text-slate-500">
+              <span>
+                <span className="font-semibold text-emerald-600">48%</span>{" "}
+                {t("dashboard_sentiment_pos")}
+              </span>
+              <span>
+                <span className="font-semibold text-slate-600">30%</span>{" "}
+                {t("dashboard_sentiment_neu")}
+              </span>
+              <span>
+                <span className="font-semibold text-amber-600">22%</span>{" "}
+                {t("dashboard_sentiment_neg")}
+              </span>
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-slate-200 bg-white p-3">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+              {t("trends_categories_label")}
+            </p>
+            <div className="mt-2 space-y-1.5">
+              {categories.map((c) => (
+                <div key={c.label}>
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="font-medium text-slate-700">
+                      {c.label}
+                    </span>
+                    <span className="tabular-nums text-slate-500">
+                      {c.pct}%
+                    </span>
+                  </div>
+                  <div className="mt-0.5 h-1 overflow-hidden rounded-full bg-slate-100">
+                    <div
+                      className="h-full rounded-full bg-brand-500"
+                      style={{ width: `${c.pct}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -381,6 +472,8 @@ function Sparkline({ points }: { points: number[] }) {
 
 /* ────────────────────────────────────────────────────────────
  * Slide 3 — Brief Detail
+ * Summary + audience-segmentation chips + daleel card +
+ * recommendations list (mirrors the real brief layout).
  * ──────────────────────────────────────────────────────────── */
 
 function BriefSlide({ t }: { t: T }) {
@@ -399,13 +492,36 @@ function BriefSlide({ t }: { t: T }) {
         <p className="mt-1 text-[11px] text-slate-500">{t("brief_meta")}</p>
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white p-3">
+      <div className="rounded-lg border border-slate-200 bg-white p-2.5">
         <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
           {t("brief_section_summary")}
         </p>
-        <p className="mt-1.5 text-pretty text-xs leading-relaxed text-slate-700">
+        <p className="mt-1 text-pretty text-[11px] leading-relaxed text-slate-700">
           {t("brief_summary")}
         </p>
+      </div>
+
+      <div>
+        <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+          {t("brief_section_audience")}
+        </p>
+        <div className="grid grid-cols-3 gap-1.5">
+          <AudienceCell
+            label={t("brief_audience_primary_label")}
+            value={t("brief_audience_primary_value")}
+            tone="brand"
+          />
+          <AudienceCell
+            label={t("brief_audience_perception_label")}
+            value={t("brief_audience_perception_value")}
+            tone="amber"
+          />
+          <AudienceCell
+            label={t("brief_audience_angle_label")}
+            value={t("brief_audience_angle_value")}
+            tone="emerald"
+          />
+        </div>
       </div>
 
       <div className="rounded-lg border border-emerald-100 bg-emerald-50/60 p-3">
@@ -418,16 +534,40 @@ function BriefSlide({ t }: { t: T }) {
         <p
           dir="rtl"
           lang="ar"
-          className="mt-2 font-arabic text-lg leading-[2] text-slate-900 sm:text-xl"
+          className="mt-2 font-arabic text-base leading-[2] text-slate-900 sm:text-lg"
         >
           {t("brief_daleel_arabic")}
         </p>
-        <p className="mt-1.5 text-pretty text-xs leading-relaxed text-slate-700">
+        <p className="mt-1 text-pretty text-[11px] leading-relaxed text-slate-700">
           {t("brief_daleel_translation")}
         </p>
         <p className="mt-1 text-[10px] font-medium text-emerald-700">
           — {t("brief_daleel_source")}
         </p>
+        <div className="mt-2 flex items-center gap-1.5 border-t border-emerald-100/80 pt-2 text-[10px] text-emerald-700">
+          <BookMarked className="h-3 w-3" />
+          <span className="font-medium">{t("brief_daleel_2_label")}</span>
+          <span className="text-emerald-600">{t("brief_daleel_2_source")}</span>
+        </div>
+      </div>
+
+      <div>
+        <p className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+          <Lightbulb className="h-3 w-3 text-amber-500" />
+          {t("brief_section_recommendations")}
+        </p>
+        <ol className="space-y-1 text-[11px] text-slate-700">
+          {[1, 2, 3].map((n) => (
+            <li key={n} className="flex items-start gap-2">
+              <span className="mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[9px] font-semibold text-white">
+                {n}
+              </span>
+              <span className="leading-snug">
+                {t(`brief_rec_${n}` as Parameters<typeof t>[0])}
+              </span>
+            </li>
+          ))}
+        </ol>
       </div>
 
       <p className="text-center text-[10px] text-slate-400">{t("ai_label")}</p>
@@ -435,72 +575,132 @@ function BriefSlide({ t }: { t: T }) {
   );
 }
 
+function AudienceCell({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone: "brand" | "amber" | "emerald";
+}) {
+  const tones: Record<typeof tone, string> = {
+    brand: "border-brand-200 bg-brand-50/60 text-brand-800",
+    amber: "border-amber-200 bg-amber-50/60 text-amber-800",
+    emerald: "border-emerald-200 bg-emerald-50/60 text-emerald-800",
+  };
+  return (
+    <div className={`rounded-lg border ${tones[tone]} px-2 py-1.5`}>
+      <p className="text-[9px] font-semibold uppercase tracking-wider opacity-80">
+        {label}
+      </p>
+      <p className="mt-0.5 text-[11px] font-medium leading-tight">{value}</p>
+    </div>
+  );
+}
+
 /* ────────────────────────────────────────────────────────────
- * Slide 4 — Audience Segments
+ * Slide 4 — Kitab Library
+ * The credibility hook: every daleel retrieved, never generated.
+ * Mirrors the public /kitab page's source cards.
  * ──────────────────────────────────────────────────────────── */
 
-function SegmentsSlide({ t }: { t: T }) {
-  const segments = [
-    { name: t("segment_1_name"), concerns: t("segment_1_concerns"), size: t("segment_1_size"), tone: "brand" as const },
-    { name: t("segment_2_name"), concerns: t("segment_2_concerns"), size: t("segment_2_size"), tone: "emerald" as const },
-    { name: t("segment_3_name"), concerns: t("segment_3_concerns"), size: t("segment_3_size"), tone: "amber" as const },
-    { name: t("segment_4_name"), concerns: t("segment_4_concerns"), size: t("segment_4_size"), tone: "rose" as const },
+function KitabSlide({ t }: { t: T }) {
+  const sources = [
+    {
+      name: t("kitab_1_name"),
+      meta: t("kitab_1_meta"),
+      languages: t("kitab_1_languages"),
+      tone: "brand" as const,
+    },
+    {
+      name: t("kitab_2_name"),
+      meta: t("kitab_2_meta"),
+      languages: t("kitab_2_languages"),
+      tone: "emerald" as const,
+    },
+    {
+      name: t("kitab_3_name"),
+      meta: t("kitab_3_meta"),
+      languages: t("kitab_3_languages"),
+      tone: "amber" as const,
+    },
+    {
+      name: t("kitab_4_name"),
+      meta: t("kitab_4_meta"),
+      languages: t("kitab_4_languages"),
+      tone: "rose" as const,
+    },
+    {
+      name: t("kitab_5_name"),
+      meta: t("kitab_5_meta"),
+      languages: t("kitab_5_languages"),
+      tone: "violet" as const,
+    },
+    {
+      name: t("kitab_6_name"),
+      meta: t("kitab_6_meta"),
+      languages: t("kitab_6_languages"),
+      tone: "cyan" as const,
+    },
   ];
 
-  const tones: Record<"brand" | "emerald" | "amber" | "rose", string> = {
-    brand: "from-brand-100 to-brand-50 text-brand-700",
-    emerald: "from-emerald-100 to-emerald-50 text-emerald-700",
-    amber: "from-amber-100 to-amber-50 text-amber-700",
-    rose: "from-rose-100 to-rose-50 text-rose-700",
+  const tones: Record<
+    "brand" | "emerald" | "amber" | "rose" | "violet" | "cyan",
+    string
+  > = {
+    brand: "border-brand-200 bg-brand-50/50 text-brand-700",
+    emerald: "border-emerald-200 bg-emerald-50/50 text-emerald-700",
+    amber: "border-amber-200 bg-amber-50/50 text-amber-700",
+    rose: "border-rose-200 bg-rose-50/50 text-rose-700",
+    violet: "border-violet-200 bg-violet-50/50 text-violet-700",
+    cyan: "border-cyan-200 bg-cyan-50/50 text-cyan-700",
   };
 
   return (
-    <div className="space-y-3">
-      <p className="text-[11px] text-slate-500">{t("segments_subtitle")}</p>
-      <div className="grid gap-2.5 sm:grid-cols-2">
-        {segments.map((s) => (
+    <div className="flex h-full flex-col gap-3">
+      <div className="flex items-center justify-between gap-2">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+            {t("kitab_eyebrow")}
+          </p>
+          <p className="mt-0.5 text-xs text-slate-600 sm:text-sm">
+            {t("kitab_subtitle")}
+          </p>
+        </div>
+        <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
+          <BookOpenCheck className="h-3 w-3" />
+          {t("kitab_verified_badge")}
+        </span>
+      </div>
+
+      <div className="grid flex-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        {sources.map((s) => (
           <div
             key={s.name}
-            className="rounded-lg border border-slate-200 bg-white p-3"
+            className="flex flex-col gap-1 rounded-lg border border-slate-200 bg-white p-3"
           >
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-slate-900">
-                  {s.name}
-                </p>
-                <p className="mt-0.5 text-[11px] text-slate-500">{s.concerns}</p>
-              </div>
+            <div className="flex items-center justify-between gap-2">
+              <p className="truncate text-sm font-semibold text-slate-900">
+                {s.name}
+              </p>
               <span
-                className={`shrink-0 rounded-full bg-gradient-to-br px-2 py-0.5 text-[10px] font-semibold ${tones[s.tone]}`}
+                className={`shrink-0 rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider ${tones[s.tone]}`}
               >
-                {s.size}
+                {s.languages}
               </span>
             </div>
-            <div className="mt-2 h-1 overflow-hidden rounded-full bg-slate-100">
-              <div
-                className={clsx(
-                  "h-full rounded-full",
-                  s.tone === "brand" && "bg-brand-500",
-                  s.tone === "emerald" && "bg-emerald-500",
-                  s.tone === "amber" && "bg-amber-500",
-                  s.tone === "rose" && "bg-rose-500",
-                )}
-                style={{
-                  width: `${
-                    s.tone === "brand"
-                      ? 40
-                      : s.tone === "emerald"
-                        ? 85
-                        : s.tone === "amber"
-                          ? 65
-                          : 55
-                  }%`,
-                }}
-              />
-            </div>
+            <p className="text-[11px] leading-snug text-slate-600">
+              {s.meta}
+            </p>
           </div>
         ))}
       </div>
+
+      <p className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-center text-[11px] leading-relaxed text-slate-600">
+        <BookOpenCheck className="mr-1 inline h-3 w-3 align-text-bottom text-emerald-600" />
+        {t("kitab_promise")}
+      </p>
     </div>
   );
 }

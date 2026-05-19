@@ -82,3 +82,35 @@ body {
   mask-image: radial-gradient(ellipse 75% 55% at 50% 0%, #000 50%, transparent 100%);
   -webkit-mask-image: radial-gradient(ellipse 75% 55% at 50% 0%, #000 50%, transparent 100%);
 }
+
+@media print {
+  /* Hide app chrome — site header, footer, and any element opting out
+     via Tailwind's print:hidden variant. The brief content itself is
+     the only thing that should hit the PDF. */
+  header,
+  footer {
+    display: none !important;
+  }
+  @page {
+    margin: 14mm;
+  }
+  html,
+  body {
+    background: #ffffff !important;
+  }
+  /* Keep emerald daleel cards, muttafaq badge, and other tonal accents
+     instead of letting browsers strip them to plain text. */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  /* Avoid splitting a daleel block, audience panel, or template across
+     pages — readers should see a quoted ayah and its translation
+     together. */
+  article > section,
+  .rounded-2xl,
+  .rounded-xl {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

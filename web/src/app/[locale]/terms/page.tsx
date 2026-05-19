@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
+import { TERMS_UPDATED_AT } from "@/lib/terms-version";
 
 export async function generateMetadata({
   params,
@@ -29,10 +30,14 @@ export default async function TermsPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("Terms");
+  const lastUpdated = new Intl.DateTimeFormat(
+    locale === "id" ? "id-ID" : "en-GB",
+    { year: "numeric", month: "long", day: "numeric" },
+  ).format(TERMS_UPDATED_AT);
 
   return (
     <>
-      <Hero t={t} />
+      <Hero t={t} lastUpdated={lastUpdated} />
       <Preamble t={t} />
       <SectionList t={t} />
       <Closing t={t} />
@@ -42,7 +47,7 @@ export default async function TermsPage({
 
 type T = Awaited<ReturnType<typeof getTranslations<"Terms">>>;
 
-function Hero({ t }: { t: T }) {
+function Hero({ t, lastUpdated }: { t: T; lastUpdated: string }) {
   return (
     <section className="relative isolate overflow-hidden pt-12 pb-8 sm:pt-16 sm:pb-10">
       <div
@@ -65,7 +70,7 @@ function Hero({ t }: { t: T }) {
           {t("hero_subtitle")}
         </p>
         <p className="mt-4 text-[11px] uppercase tracking-wider text-slate-400">
-          {t("hero_last_updated")}
+          {t("hero_last_updated", { date: lastUpdated })}
         </p>
       </div>
     </section>
@@ -200,9 +205,9 @@ function SectionList({ t }: { t: T }) {
       body: (
         <p>
           {t.rich("s8_body", {
-            about: (chunks) => (
+            contact: (chunks) => (
               <Link
-                href="/about"
+                href="/contact"
                 className="font-semibold text-brand-700 underline-offset-2 hover:underline"
               >
                 {chunks}

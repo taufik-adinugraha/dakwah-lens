@@ -9,12 +9,26 @@ with its own input shape and pricing. We wrap the common pattern:
 …into a single `scrape(...)` call that returns a `ScrapeResult` with the
 items + the actual cost the run incurred.
 
-For Phase 1 we ship X (Twitter) only via `apidojo/tweet-scraper` — the
-cheapest reasonably-reliable Twitter actor at ~$0.25 per 1K tweets. Adding
-other platforms is just a new factory function (`scrape_instagram`, etc.)
-that wraps `scrape()` with the appropriate actor and input shape.
+Default actors are tuned for paid-plan Apify (we run on Starter $29/mo):
+  - X: `apidojo/tweet-scraper` (~$0.40/1K results) — industry default,
+    full thread context, reliable on weekend bursts
+  - TikTok (default): `clockworks/free-tiktok-scraper` ($0/result) —
+    rate-limited and occasionally flaky, but since it's free we run
+    it every day and tolerate occasional misses. Separately, a
+    biweekly `ingest-tiktok-paid` beat task runs the 1st + 3rd
+    Mondays of each month with explicit `actor_id=
+    "clockworks/tiktok-scraper"` (paid, ~$4/1K) to refresh the same
+    videos with richer metadata twice a month — the DB upsert
+    overwrites the lighter daily payload with the richer biweekly
+    one for the same (platform, external_id) pair.
+  - Instagram: `apify/instagram-hashtag-scraper` (~$2.30/1K results) —
+    official Apify, sufficient for our hashtag-driven discovery
+Override any of them via env vars (e.g. `APIFY_ACTOR_X=...`).
 
 Run cost is captured for budget tracking (PRD §13 caps spend at IDR 1M/mo).
+The /admin/system/api-costs page reads the actual per-run USD reported by
+Apify, so the figures above are planning estimates only — real cost
+depends on the specific actor's pricing curve at the time of the run.
 """
 
 from __future__ import annotations
@@ -39,7 +53,7 @@ log = structlog.get_logger()
 import os as _os
 
 DEFAULT_ACTORS: dict[str, str] = {
-    "x": _os.environ.get("APIFY_ACTOR_X", "kaitoeasyapi/twitter-x-data-tweet-scraper-pay-per-result-cheapest"),
+    "x": _os.environ.get("APIFY_ACTOR_X", "apidojo/tweet-scraper"),
     "instagram": _os.environ.get(
         "APIFY_ACTOR_INSTAGRAM", "apify/instagram-hashtag-scraper"
     ),
@@ -178,15 +192,23 @@ def scrape_x(query: str, *, max_items: int = 50) -> ScrapeResult:
     )
 
 
-def scrape_tiktok(query: str, *, max_items: int = 50) -> ScrapeResult:
+def scrape_tiktok(
+    query: str, *, max_items: int = 50, actor_id: str | None = None
+) -> ScrapeResult:
     """Scrape TikTok videos for a hashtag or search keyword.
 
     Strip the leading `#` from a hashtag (the actor adds it back). Pass a
     plain string for keyword search.
+
+    `actor_id` overrides the default `clockworks/free-tiktok-scraper`.
+    Used by the weekly `ingest-tiktok-paid` beat task to upgrade Monday's
+    scrape to `clockworks/tiktok-scraper` (paid, richer metadata) while
+    daily runs stay on the free actor.
     """
     hashtag = query.lstrip("#")
     return scrape(
         platform="tiktok",
+        actor_id=actor_id,
         run_input={
             "hashtags": [hashtag],
             "resultsPerPage": max_items,

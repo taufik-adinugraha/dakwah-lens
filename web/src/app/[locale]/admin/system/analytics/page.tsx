@@ -25,9 +25,6 @@ const EXCLUDE_PATHS = sql`
 
 export default async function AnalyticsPage() {
   const [
-    [{ pv24 = 0 } = { pv24: 0 }],
-    [{ pv7d = 0 } = { pv7d: 0 }],
-    [{ pv30d = 0 } = { pv30d: 0 }],
     [{ sessions7d = 0 } = { sessions7d: 0 }],
     [{ signedIn7d = 0 } = { signedIn7d: 0 }],
     [{ anon7d = 0 } = { anon7d: 0 }],
@@ -39,34 +36,20 @@ export default async function AnalyticsPage() {
       { briefsTotal = 0, briefsReal = 0 } = { briefsTotal: 0, briefsReal: 0 },
     ],
     [
-      { briefs24 = 0, briefs7d = 0, briefs30d = 0 } = {
-        briefs24: 0,
-        briefs7d: 0,
-        briefs30d: 0,
-      },
+      {
+        creatorsAll = 0,
+        avgPerCreatorAll = 0,
+      } = { creatorsAll: 0, avgPerCreatorAll: 0 },
     ],
     [
       {
-        creatorsAll = 0,
-        creators7d = 0,
-        avgPerCreatorAll = 0,
-      } = { creatorsAll: 0, creators7d: 0, avgPerCreatorAll: 0 },
+        brief_success_7d: briefSuccess7d = 0,
+        brief_errors_7d: briefErrors7d = 0,
+      } = { brief_success_7d: 0, brief_errors_7d: 0 },
     ],
     briefsPerDay,
     topCreators,
   ] = await Promise.all([
-    db
-      .select({ pv24: sql<number>`COUNT(*)::int` })
-      .from(schema.pageViews)
-      .where(sql`occurred_at >= now() - interval '24 hours' AND ${EXCLUDE_PATHS}`),
-    db
-      .select({ pv7d: sql<number>`COUNT(*)::int` })
-      .from(schema.pageViews)
-      .where(sql`occurred_at >= now() - interval '7 days' AND ${EXCLUDE_PATHS}`),
-    db
-      .select({ pv30d: sql<number>`COUNT(*)::int` })
-      .from(schema.pageViews)
-      .where(sql`occurred_at >= now() - interval '30 days' AND ${EXCLUDE_PATHS}`),
     db
       .select({ sessions7d: sql<number>`COUNT(DISTINCT session_id)::int` })
       .from(schema.pageViews)
@@ -132,15 +115,7 @@ export default async function AnalyticsPage() {
       .from(schema.briefs),
     db
       .select({
-        briefs24: sql<number>`COUNT(*) FILTER (WHERE created_at >= now() - interval '24 hours' AND is_placeholder = false)::int`,
-        briefs7d: sql<number>`COUNT(*) FILTER (WHERE created_at >= now() - interval '7 days' AND is_placeholder = false)::int`,
-        briefs30d: sql<number>`COUNT(*) FILTER (WHERE created_at >= now() - interval '30 days' AND is_placeholder = false)::int`,
-      })
-      .from(schema.briefs),
-    db
-      .select({
         creatorsAll: sql<number>`COUNT(DISTINCT user_id) FILTER (WHERE is_placeholder = false)::int`,
-        creators7d: sql<number>`COUNT(DISTINCT user_id) FILTER (WHERE is_placeholder = false AND created_at >= now() - interval '7 days')::int`,
         avgPerCreatorAll: sql<number>`COALESCE(
           (COUNT(*) FILTER (WHERE is_placeholder = false))::float
           / NULLIF(COUNT(DISTINCT user_id) FILTER (WHERE is_placeholder = false), 0),
@@ -148,6 +123,24 @@ export default async function AnalyticsPage() {
         )`,
       })
       .from(schema.briefs),
+    // 7-day brief-generation error rate. Successes come from `briefs`
+    // (real ones only, exclude placeholders); failures come from
+    // `brief_errors` which is populated by `generateBriefAction` on
+    // every error path. Error rate = errors / (errors + successes).
+    db.execute(sql`
+      SELECT
+        (
+          SELECT COUNT(*)::int FROM briefs
+          WHERE is_placeholder = false
+            AND created_at >= now() - interval '7 days'
+        ) AS brief_success_7d,
+        (
+          SELECT COUNT(*)::int FROM brief_errors
+          WHERE created_at >= now() - interval '7 days'
+        ) AS brief_errors_7d
+    `) as unknown as Promise<
+      Array<{ brief_success_7d: number; brief_errors_7d: number }>
+    >,
     db.execute(sql`
       SELECT
         DATE_TRUNC('day', created_at)::date AS day,
@@ -197,21 +190,18 @@ export default async function AnalyticsPage() {
         </p>
         <p>
           No third-party SDK runs in the browser — everything stays in
-          your own Postgres. That's deliberate per UU PDP §27/2022
+          your own Postgres. That&apos;s deliberate per UU PDP §27/2022
           (Indonesia data residency).
         </p>
         <p>
           <strong>Filter:</strong> page-view stats below exclude{" "}
           <code>/admin/*</code> and <code>/api/*</code> so superadmin
-          navigation here doesn't inflate the user-traffic numbers. The
+          navigation here doesn&apos;t inflate the user-traffic numbers. The
           raw rows are still in the <code>page_views</code> table.
         </p>
       </HelpCallout>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatTile label="Page views · 24h" value={pv24.toLocaleString()} />
-        <StatTile label="Page views · 7d" value={pv7d.toLocaleString()} accent="brand" />
-        <StatTile label="Page views · 30d" value={pv30d.toLocaleString()} />
         <StatTile label="Sessions · 7d" value={sessions7d.toLocaleString()} accent="emerald" />
         <StatTile label="Signed-in · 7d" value={signedIn7d.toLocaleString()} accent="emerald" />
         <StatTile label="Anonymous · 7d" value={anon7d.toLocaleString()} />
@@ -262,7 +252,7 @@ export default async function AnalyticsPage() {
 
       <Card title="Top pages (7 days)" hint={`${topPaths.length} routes · /admin excluded`}>
         {Array.isArray(topPaths) && topPaths.length > 0 ? (
-          <table className="w-full text-sm">
+          <table className="w-full text-sm max-md:block max-md:overflow-x-auto">
             <thead>
               <tr className="border-b border-slate-100 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                 <th className="py-2">Path</th>
@@ -303,17 +293,6 @@ export default async function AnalyticsPage() {
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <StatTile
-            label="Briefs · 24h"
-            value={briefs24.toLocaleString()}
-            accent="emerald"
-          />
-          <StatTile
-            label="Briefs · 7d"
-            value={briefs7d.toLocaleString()}
-            accent="brand"
-          />
-          <StatTile label="Briefs · 30d" value={briefs30d.toLocaleString()} />
-          <StatTile
             label="Briefs · all-time"
             value={briefsReal.toLocaleString()}
             hint={
@@ -321,11 +300,6 @@ export default async function AnalyticsPage() {
                 ? `+${briefsTotal - briefsReal} placeholder`
                 : undefined
             }
-          />
-          <StatTile
-            label="Active creators · 7d"
-            value={creators7d.toLocaleString()}
-            accent="emerald"
           />
           <StatTile
             label="Total creators · all-time"
@@ -340,6 +314,28 @@ export default async function AnalyticsPage() {
             }
             hint="all-time, real only"
             accent="brand"
+          />
+          <StatTile
+            label="Brief gen error rate · 7d"
+            value={
+              briefSuccess7d + briefErrors7d > 0
+                ? `${((briefErrors7d / (briefSuccess7d + briefErrors7d)) * 100).toFixed(1)}%`
+                : "—"
+            }
+            hint={
+              briefSuccess7d + briefErrors7d > 0
+                ? `${briefErrors7d} fail / ${briefSuccess7d + briefErrors7d} attempts`
+                : "no attempts in last 7d"
+            }
+            accent={
+              briefSuccess7d + briefErrors7d === 0
+                ? undefined
+                : briefErrors7d / (briefSuccess7d + briefErrors7d) >= 0.2
+                  ? "rose"
+                  : briefErrors7d / (briefSuccess7d + briefErrors7d) >= 0.05
+                    ? "amber"
+                    : "emerald"
+            }
           />
         </div>
 

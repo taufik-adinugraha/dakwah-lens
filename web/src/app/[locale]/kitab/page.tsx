@@ -109,9 +109,6 @@ function Methodology({ t }: { t: T }) {
           <h2 className="text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
             {t("methodology_title")}
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-pretty text-base leading-relaxed text-slate-600">
-            {t("methodology_subtitle")}
-          </p>
         </div>
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -172,6 +169,22 @@ function Library({ t }: { t: T }) {
       status: "planned" as const,
       tone: "from-amber-50 to-amber-100/40",
       iconTone: "bg-amber-600",
+    },
+    {
+      title: t("kitab_tafsir_title"),
+      meta: t("kitab_tafsir_meta"),
+      translations: t("kitab_tafsir_translations"),
+      status: "planned" as const,
+      tone: "from-violet-50 to-violet-100/40",
+      iconTone: "bg-violet-600",
+    },
+    {
+      title: t("kitab_bulugh_title"),
+      meta: t("kitab_bulugh_meta"),
+      translations: t("kitab_bulugh_translations"),
+      status: "planned" as const,
+      tone: "from-cyan-50 to-cyan-100/40",
+      iconTone: "bg-cyan-600",
     },
   ];
 
@@ -252,14 +265,13 @@ function Suggest({ t }: { t: T }) {
             {t("suggest_body")}
           </p>
 
-          <a
-            href={`mailto:${t("suggest_email")}`}
+          <Link
+            href="/contact"
             className="mt-6 inline-flex h-11 items-center gap-2 rounded-full bg-slate-900 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
           >
             {t("suggest_button")}
             <ArrowRight className="h-4 w-4" />
-          </a>
-          <p className="mt-3 text-xs text-slate-500">{t("suggest_email")}</p>
+          </Link>
         </div>
       </div>
     </section>

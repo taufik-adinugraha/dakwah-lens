@@ -1,6 +1,7 @@
 services:
   postgres:
     image: postgres:16-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-dakwah}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dakwah_dev}
@@ -9,6 +10,9 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      # Init script is consulted only on a FRESH data volume — creates the
+      # dev + prod databases so a single Postgres instance serves both envs.
+      - ./deploy/postgres-init.sql:/docker-entrypoint-initdb.d/01-create-databases.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dakwah}"]
       interval: 10s
@@ -17,6 +21,7 @@ services:
 
   qdrant:
     image: qdrant/qdrant:v1.12.4
+    restart: unless-stopped
     ports:
       - "6333:6333"
       - "6334:6334"
@@ -30,6 +35,7 @@ services:
 
   redis:
     image: redis:7-alpine
+    restart: unless-stopped
     ports:
       - "6380:6379"
     volumes:
@@ -40,14 +46,23 @@ services:
       timeout: 5s
       retries: 5
 
-  # IndoBERT sentiment service — added in week 3
+  # IndoBERT sentiment service — added in week 3 when we extract sentiment
+  # classification out of the Celery worker process. For now IndoBERT runs
+  # in-process inside the Celery worker (see api/src/api/services/sentiment.py),
+  # and its CPU + memory budget is governed there.
   # indobert:
   #   build: ./services/indobert
   #   ports:
   #     - "8001:8000"
+  #   environment:
+  #     OMP_NUM_THREADS: "1"
+  #     MKL_NUM_THREADS: "1"
+  #     OPENBLAS_NUM_THREADS: "1"
+  #     TOKENIZERS_PARALLELISM: "false"
   #   deploy:
   #     resources:
   #       limits:
+  #         cpus: "1.0"
   #         memory: 2G
 
 volumes:

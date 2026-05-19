@@ -156,7 +156,7 @@ function BriefRow({
           <p className="truncate text-sm font-semibold text-slate-900 sm:text-base">
             {brief.topicTitle}
           </p>
-          {brief.isPlaceholder && (
+          {brief.isPlaceholder && process.env.NODE_ENV !== "production" && (
             <span className="inline-flex items-center rounded-full bg-amber-50 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber-700">
               placeholder
             </span>

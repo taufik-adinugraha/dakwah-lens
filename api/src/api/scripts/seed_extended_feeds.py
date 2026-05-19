@@ -78,15 +78,6 @@ EXTRA_NATIONAL: list[FeedSpec] = [
         "fetch_body": True,
     },
     {
-        # Substitutes for Jakarta Post (no public RSS as of 2026) — serves
-        # the same English-language Indonesia readership.
-        "name": "Antara English",
-        "url": "https://en.antaranews.com/rss/news.xml",
-        "scope": "national",
-        "region": None,
-        "fetch_body": True,
-    },
-    {
         "name": "Detik Hot",
         "url": "https://hot.detik.com/rss",
         "scope": "national",

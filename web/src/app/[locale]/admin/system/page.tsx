@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { count, desc, sql } from "drizzle-orm";
 
+import { auth } from "@/auth";
 import { db, schema } from "@/db";
 import { getUsdToIdrRow } from "@/lib/settings";
 import { updateFxRate } from "./actions";
@@ -14,13 +15,20 @@ import {
   HelpCallout,
   PageHeader,
   StatTile,
-  formatIdr,
   formatRelative,
 } from "./_ui";
 
 // ── Thresholds ───────────────────────────────────────────────────────
 const BUDGET_CAP_IDR = 1_000_000; // PRD §13 monthly cap
 const MIN_POSTS_FOR_CLUSTERING = 20;
+
+// Apify-specific monthly budget alert. Apify is our largest variable
+// cost (scrape volume × per-result pricing); a sudden spike usually
+// means a free actor started charging compute, an actor changed pricing,
+// or someone bumped the rotation cadence. Override at runtime via
+// APIFY_BUDGET_THRESHOLD_USD in .env when you upgrade the Apify plan.
+const APIFY_BUDGET_THRESHOLD_USD =
+  Number(process.env.APIFY_BUDGET_THRESHOLD_USD) || 30;
 
 type Severity = "critical" | "medium" | "low";
 
@@ -31,6 +39,11 @@ type Issue = {
 };
 
 export default async function SystemOverviewPage() {
+  // Layout already gated admin/superadmin; we only need the role to
+  // decide whether to show the FX-rate editor (superadmin-only write).
+  const session = await auth();
+  const isSuperadmin = session?.user?.role === "superadmin";
+
   // ── Headline tallies ─────────────────────────────────────────────
   const [
     fxRow,
@@ -39,7 +52,9 @@ export default async function SystemOverviewPage() {
     [{ totalBriefs = 0 } = { totalBriefs: 0 }],
     [{ pviews24h = 0 } = { pviews24h: 0 }],
     [{ uniqSessions30d = 0 } = { uniqSessions30d: 0 }],
-    [{ apiUsd30 = 0 } = { apiUsd30: 0 }],
+    [{ usd: apiThisMonthUsd = 0 } = { usd: 0 }],
+    [{ apifyUsdMtd = 0 } = { apifyUsdMtd: 0 }],
+    [{ apiNonApifyUsdMtd = 0 } = { apiNonApifyUsdMtd: 0 }],
     latestMetric,
     latestIngest,
     // ── Inputs for the Needs Attention engine ──
@@ -65,10 +80,39 @@ export default async function SystemOverviewPage() {
       .where(
         sql`occurred_at >= now() - interval '30 days' AND path NOT LIKE '/admin%' AND path NOT LIKE '/api%'`,
       ),
+    // Calendar-month API spend (date_trunc), NOT a rolling 30-day
+    // window — so it lines up with the manual-cost allocation below
+    // when both feed the "Total cost · this month" issue logic.
+    // Excludes providers covered by an active subscription manual
+    // cost (e.g. Apify Starter); their per-call usage stays visible
+    // in the dedicated Apify tile and on /admin/system/api-costs,
+    // but doesn't get added to the budget cap math.
+    db.execute(sql`
+      SELECT COALESCE(SUM(cost_usd), 0)::float AS usd
+      FROM usage_events
+      WHERE occurred_at >= date_trunc('month', now())
+        AND provider NOT IN (
+          SELECT DISTINCT covers_provider
+          FROM manual_costs
+          WHERE covers_provider IS NOT NULL
+            AND period_start <= now()
+            AND period_end >= date_trunc('month', now())
+        )
+    `) as unknown as Promise<Array<{ usd: number }>>,
     db
-      .select({ apiUsd30: sql<number>`COALESCE(SUM(cost_usd), 0)::float` })
+      .select({ apifyUsdMtd: sql<number>`COALESCE(SUM(cost_usd), 0)::float` })
       .from(schema.usageEvents)
-      .where(sql`occurred_at >= now() - interval '30 days'`),
+      .where(
+        sql`provider = 'apify' AND occurred_at >= date_trunc('month', now())`,
+      ),
+    db
+      .select({
+        apiNonApifyUsdMtd: sql<number>`COALESCE(SUM(cost_usd), 0)::float`,
+      })
+      .from(schema.usageEvents)
+      .where(
+        sql`provider <> 'apify' AND occurred_at >= date_trunc('month', now())`,
+      ),
     db
       .select()
       .from(schema.systemMetrics)
@@ -113,32 +157,60 @@ export default async function SystemOverviewPage() {
   const run = latestIngest[0];
   const usdToIdr = fxRow.value;
 
-  // ── Total cost this month (allocated manual + 30d API spend) ─────
+  // ── Total cost this month (allocated manual + calendar-month API) ─────
   // Manual entries that span more than one month are allocated 1/N to
   // each month; entries shorter than 31 days are treated as single-month
   // charges. Mirrors the math on /admin/system/costs.
+  //
+  // 30.44 = average days per month — using `Math.round(days / 30.44)`
+  // means a 365-day domain renewal divides into 12 months (not 13).
   const monthStartMs = (() => {
     const d = new Date();
     return new Date(d.getFullYear(), d.getMonth(), 1).getTime();
   })();
-  const manualThisMonthIdr = manualThisMonth.reduce((total, row) => {
+  // Per-row "this-month allocation" — shared between the total
+  // computation and the per-provider subscription breakdown below.
+  function allocatedToThisMonth(row: {
+    periodStart: Date;
+    periodEnd: Date;
+    amountIdr: number;
+  }): number {
     const start = new Date(row.periodStart).getTime();
     const end = new Date(row.periodEnd).getTime();
-    if (end < monthStartMs) return total;
+    if (end < monthStartMs) return 0;
     const days = Math.max(1, (end - start) / 86_400_000);
-    if (days <= 31) return total + row.amountIdr;
-    return total + row.amountIdr / Math.ceil(days / 30);
-  }, 0);
-  const apiThisMonthIdr = apiUsd30 * usdToIdr;
+    if (days <= 31) return row.amountIdr;
+    const months = Math.max(1, Math.round(days / 30.44));
+    return row.amountIdr / months;
+  }
+  const manualThisMonthIdr = manualThisMonth.reduce(
+    (total, row) => total + allocatedToThisMonth(row),
+    0,
+  );
+  const apiThisMonthIdr = apiThisMonthUsd * usdToIdr;
   const totalThisMonthIdr = manualThisMonthIdr + apiThisMonthIdr;
   const capUsagePct = (totalThisMonthIdr / BUDGET_CAP_IDR) * 100;
 
+  // Apify subscription credit allocated to this month (sums all
+  // covers_provider='apify' rows whose period overlaps). Drives the
+  // smarter "usage / credit" framing on the Apify tile.
+  const apifySubscriptionIdr = manualThisMonth
+    .filter((r) => r.coversProvider === "apify")
+    .reduce((total, row) => total + allocatedToThisMonth(row), 0);
+  const apifySubscriptionUsd = apifySubscriptionIdr / usdToIdr;
+  const apifyOverageUsd = Math.max(0, apifyUsdMtd - apifySubscriptionUsd);
+
   // ── Operational signal: is the worker fresh? ─────────────────────
+  // `Date.now()` is safe here — server component, render runs once
+  // per request. The lint rule targets client-component render
+  // impurity; not applicable to a server-rendered admin page.
+  // eslint-disable-next-line react-hooks/purity
+  const nowMs = Date.now();
   const metricAgeMin = metric
-    ? (Date.now() - new Date(metric.capturedAt).getTime()) / 60_000
+    ? (nowMs - new Date(metric.capturedAt).getTime()) / 60_000
     : Infinity;
   const ingestAgeHr = run
-    ? (Date.now() - new Date(run.startedAt).getTime()) / 3_600_000
+    ? (nowMs - new Date(run.startedAt).getTime()) / 3_600_000
     : Infinity;
 
   // ── Needs Attention engine ───────────────────────────────────────
@@ -180,6 +252,17 @@ export default async function SystemOverviewPage() {
       hint: `Already at ${capUsagePct.toFixed(0)}% of the IDR ${BUDGET_CAP_IDR.toLocaleString("id-ID")} cap. Throttle Apify / heavier LLMs.`,
     });
   }
+  // Critical — Apify-specific over-threshold check. Apify is the
+  // largest variable line; alerting separately gives the admin one
+  // platform to throttle before the IDR cap above is hit.
+  const apifyPct = (apifyUsdMtd / APIFY_BUDGET_THRESHOLD_USD) * 100;
+  if (apifyPct >= 100) {
+    issues.push({
+      severity: "critical",
+      title: `Apify spend crossed $${APIFY_BUDGET_THRESHOLD_USD} this month`,
+      hint: `Month-to-date: $${apifyUsdMtd.toFixed(2)} (${apifyPct.toFixed(0)}% of the $${APIFY_BUDGET_THRESHOLD_USD} alert threshold). Break down by actor at /admin/system/api-costs; the usual suspects are daily TT free-actor compute and the biweekly TT paid sweep.`,
+    });
+  }
 
   // Medium
   if (capUsagePct >= 80 && capUsagePct < 100) {
@@ -187,6 +270,13 @@ export default async function SystemOverviewPage() {
       severity: "medium",
       title: `Spend at ${capUsagePct.toFixed(0)}% of monthly cap`,
       hint: `Headroom is tight (≤ ${(100 - capUsagePct).toFixed(0)}%). Watch /admin/system/api-costs for a few days.`,
+    });
+  }
+  if (apifyPct >= 80 && apifyPct < 100) {
+    issues.push({
+      severity: "medium",
+      title: `Apify spend at ${apifyPct.toFixed(0)}% of $${APIFY_BUDGET_THRESHOLD_USD} alert threshold`,
+      hint: `Month-to-date: $${apifyUsdMtd.toFixed(2)}. Open /admin/system/api-costs to see which actor is driving the spend; consider dialing back the daily TikTok free run or the biweekly TT paid sweep.`,
     });
   }
   if (Number(recentFailures) > 0) {
@@ -306,22 +396,38 @@ export default async function SystemOverviewPage() {
           value={pviews24h.toLocaleString()}
         />
         <StatTile
-          label="Total cost · this month"
-          value={formatIdr(totalThisMonthIdr / usdToIdr, usdToIdr)}
-          hint={`${capUsagePct.toFixed(0)}% of IDR ${(BUDGET_CAP_IDR / 1_000_000).toFixed(1)}M cap`}
-          accent={
-            capUsagePct >= 100 ? "rose" : capUsagePct >= 80 ? "amber" : "emerald"
-          }
+          label="API cost (other than Apify)"
+          value={`$${apiNonApifyUsdMtd.toFixed(2)}`}
+          hint="this month · OpenAI + Gemini + Anthropic + Resend + YouTube"
+          accent="emerald"
         />
         <StatTile
-          label="CPU now"
-          value={metric ? `${metric.cpuPct.toFixed(0)}%` : "—"}
-          hint={
-            metric
-              ? `mem ${((metric.memUsedMb / metric.memTotalMb) * 100).toFixed(0)}% · ${formatRelative(metric.capturedAt)}`
-              : "no snapshots yet — start Celery beat"
+          label="Apify usage · this month"
+          value={
+            apifySubscriptionUsd > 0
+              ? `$${apifyUsdMtd.toFixed(2)} / $${apifySubscriptionUsd.toFixed(0)}`
+              : `$${apifyUsdMtd.toFixed(2)}`
           }
-          accent={metric && metric.cpuPct > 80 ? "rose" : "emerald"}
+          hint={
+            apifySubscriptionUsd > 0
+              ? apifyOverageUsd > 0
+                ? `$${apifyOverageUsd.toFixed(2)} over credit — Apify will bill the overage`
+                : `Subscription covers credit · $${(apifySubscriptionUsd - apifyUsdMtd).toFixed(2)} left`
+              : `no subscription recorded · pay-as-you-go`
+          }
+          accent={
+            apifySubscriptionUsd > 0
+              ? apifyOverageUsd > 0
+                ? "rose"
+                : apifyUsdMtd / apifySubscriptionUsd >= 0.8
+                  ? "amber"
+                  : "emerald"
+              : apifyPct >= 100
+                ? "rose"
+                : apifyPct >= 80
+                  ? "amber"
+                  : "emerald"
+          }
         />
         <StatTile
           label="Last ingest"
@@ -343,10 +449,12 @@ export default async function SystemOverviewPage() {
 
       <NeedsAttention issues={issues} counts={counts} />
 
-      <FxRateEditor
-        rate={usdToIdr}
-        updatedAt={fxRow.updatedAt}
-      />
+      {isSuperadmin && (
+        <FxRateEditor
+          rate={usdToIdr}
+          updatedAt={fxRow.updatedAt}
+        />
+      )}
     </>
   );
 }
