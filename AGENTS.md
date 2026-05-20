@@ -16,7 +16,7 @@ Read the PRD (`Dakwah-Lens_PRD_v0.4.pdf`) for full product context. Owner: Sukse
 | Embedding model | `text-embedding-3-small` (OpenAI) |
 | Sentiment | IndoBERT, self-hosted (week 3+) |
 | Classifier / topic / relevance | Gemini Flash (default) |
-| Brief synthesis | Claude Sonnet 4.6 (fallback: OpenAI) |
+| Brief synthesis | Gemini 2.5 Pro (fallback: Claude Sonnet 4.6) |
 | Vector store | Qdrant Cloud free tier (prototype), self-host later |
 | Hosting | IDCloudHost VPS (Indonesia residency per UU PDP §27/2022) |
 | Auth | NextAuth.js (email + Google OAuth) |

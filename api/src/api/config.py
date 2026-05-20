@@ -44,7 +44,11 @@ class Settings(BaseSettings):
 
     embedding_model: str = "text-embedding-3-small"
     classifier_model: str = "gemini-2.0-flash"
-    brief_model: str = "claude-sonnet-4-6"
+    # Brief synthesis: Gemini 2.5 Pro primary (cheaper than Claude
+    # Sonnet at $1.25/$10.00 vs $3/$15 per 1M tokens), Claude Sonnet
+    # 4.6 as fallback when Gemini errors or returns malformed output.
+    brief_model: str = "gemini-2.5-pro"
+    brief_fallback_model: str = "claude-sonnet-4-6"
 
     # ─── Scrapers ────────────────────────────────────────
     apify_token: str | None = None

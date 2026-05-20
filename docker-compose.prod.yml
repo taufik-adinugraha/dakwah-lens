@@ -134,7 +134,8 @@ services:
       YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-large}
       CLASSIFIER_MODEL: ${CLASSIFIER_MODEL:-gemini-2.0-flash}
-      BRIEF_MODEL: ${BRIEF_MODEL:-claude-sonnet-4-6}
+      BRIEF_MODEL: ${BRIEF_MODEL:-gemini-2.5-pro}
+      BRIEF_FALLBACK_MODEL: ${BRIEF_FALLBACK_MODEL:-claude-sonnet-4-6}
       TZ: Asia/Jakarta
     volumes:
       - /srv/dakwah-lens/data/attachments:/data/attachments
