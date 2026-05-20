@@ -151,14 +151,15 @@ def trending_ingest() -> dict[str, object]:
     its own time budget (the parent finishes in <1 min regardless of how
     many scrapes fan out).
 
-    Platforms scraped: X (apidojo at ~$0.40/1K) and TikTok
-    (clockworks/free-tiktok-scraper at $0). Skipping IG (most expensive
-    + 30-day lookback duplicates the weekly curated sweep anyway) and
-    YouTube (its own popular-chart fetch is already one of the trending
-    signal sources). Budget impact at current limits: ~$1.4/mo extra
-    Apify (X only — TT is free).
+    Platforms scraped: X (apidojo at $0.0004/item). Skipping IG (most
+    expensive + 30-day lookback duplicates the weekly curated sweep
+    anyway) and YouTube (its own popular-chart fetch is already one of
+    the trending signal sources). TikTok was here too but dropped
+    2026-05-20 — TT is fully disabled until we make a product decision,
+    and the "free" actor isn't free ($0.004/item). Budget impact:
+    ~$0.1/mo Apify, ~3-5 trending keywords/day × $0.0004 × 20 items.
     """
-    PLATFORMS = ("x", "tiktok")
+    PLATFORMS = ("x",)
     LIMIT = 20
 
     keywords = trending_topics.get_trending_keywords()
