@@ -50,16 +50,10 @@ celery_app.conf.update(
         # platform, balancing freshness against Apify cost / free-actor
         # rate limits:
         #   YT (every day)             — free (YouTube Data API)
-        #   TT (Tue only)              — clockworks/free-tiktok-scraper.
-        #                                "Free" is the product NAME, not the
-        #                                cost: Apify still charges compute
-        #                                (~$0.08/run × 49 keys = ~$3.92/run).
-        #                                Cut from daily to weekly to keep
-        #                                inside the IDR 1M ($60/mo) cap.
-        #   TT (every 2 weeks, paid)   — clockworks/tiktok-scraper $4/1K,
-        #                                richer metadata, 1st + 3rd Mon
-        #   X  (Mon, Wed, Fri)         — apidojo $0.40/1K
-        #   IG (Mon only)              — apify hashtag $2.30/1K, priciest
+        #   TT (disabled)              — pending product decision; see
+        #                                the disabled block below
+        #   X  (Mon, Wed, Fri)         — apidojo $0.0004/item
+        #   IG (Mon only)              — apify hashtag $0.0023/item
         #
         # n_keywords=999 is intentionally larger than the realistic pool
         # size — the rotating_ingest task picks "up to N" enabled
@@ -70,20 +64,13 @@ celery_app.conf.update(
         # Starting at midnight gives a generous buffer before the 08:00
         # WIB BERTopic recluster picks up the fresh material.
         #
-        # The TT-paid biweekly run lands on Monday — separate from the
-        # weekly free run on Tuesday — so the two never collide on the
-        # same day. DB upserts on (platform, external_id) anyway, so a
-        # collision would be safe (richer payload wins).
-        #
         # Cost at the current ~49-keyword pool × ~20 posts/keyword =
         # ~980 results per run:
         #   YT 7×/wk × 980 → free
-        #   TT 1×/wk (free actor) → ~$17/mo  (49 × $0.08 × ~4.3 wk/mo)
-        #   TT 2×/mo (paid actor) → ~$8/mo @ $4/1K
-        #   X  3×/wk × 980 → ~$5/mo @ $0.40/1K
-        #   IG 1×/wk × 980 → ~$10/mo @ $2.30/1K
-        # Subtotal sweep: ~$40/mo. Add daily trending overlay (~$1.4/mo)
-        # → ~$41/mo total Apify usage. Inside the IDR 1M ($60) cap.
+        #   X  3×/wk × 980 → ~$5/mo @ $0.0004/item
+        #   IG 1×/wk × 980 → ~$10/mo @ $0.0023/item
+        # Subtotal sweep: ~$15/mo. Add daily trending overlay (~$1.4/mo)
+        # → ~$17/mo total Apify usage. Inside the IDR 1M ($60) cap.
         # Track real costs at /admin/system/api-costs.
         "ingest-youtube": {
             "task": "api.workers.ingest.rotating_ingest",
@@ -105,33 +92,15 @@ celery_app.conf.update(
             "schedule": crontab(minute=10, hour=0, day_of_week=5),
             "kwargs": {"platform": "x", "limit": 20, "n_keywords": 999},
         },
-        # TikTok ingest temporarily disabled (2026-05-20) pending a
-        # product decision on whether the platform is worth the spend.
-        # Free actor (`clockworks/free-tiktok-scraper`): $0.004/item
-        # = ~$3.92/run; paid actor (`clockworks/tiktok-scraper`):
-        # $45/mo flat. Daily cadence makes paid cheaper than free; any
-        # cadence ≤ weekly makes free cheaper. Restore the entries
-        # below (and pick the actor that matches cadence) once decided.
+        # TikTok ingest disabled (2026-05-20) pending product decision.
+        # Free actor (`clockworks/free-tiktok-scraper`) costs $0.004/item
+        # = ~$3.92/run × 49 keys → ~$17/mo weekly or ~$118/mo daily.
+        # Restore the entry below once the product decision is made.
         #
         # "ingest-tiktok": {
         #     "task": "api.workers.ingest.rotating_ingest",
         #     "schedule": crontab(minute=20, hour=0, day_of_week=2),
         #     "kwargs": {"platform": "tiktok", "limit": 20, "n_keywords": 999},
-        # },
-        # "ingest-tiktok-paid": {
-        #     "task": "api.workers.ingest.rotating_ingest",
-        #     "schedule": crontab(
-        #         minute=25,
-        #         hour=0,
-        #         day_of_week=1,
-        #         day_of_month="1-7,15-21",
-        #     ),
-        #     "kwargs": {
-        #         "platform": "tiktok",
-        #         "limit": 20,
-        #         "n_keywords": 999,
-        #         "actor_id": "clockworks/tiktok-scraper",
-        #     },
         # },
         "ingest-instagram": {
             "task": "api.workers.ingest.rotating_ingest",

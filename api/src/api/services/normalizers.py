@@ -139,9 +139,8 @@ def normalize_x(item: dict[str, Any]) -> dict[str, Any] | None:
 def normalize_tiktok(item: dict[str, Any]) -> dict[str, Any] | None:
     """Map an Apify TikTok video object → SocialPost row dict.
 
-    Tested against `clockworks/free-tiktok-scraper` (current default)
-    and `clockworks/tiktok-scraper` (paid sibling, available via env
-    override). Same author = same output shape — caption in `text`,
+    Tested against `clockworks/free-tiktok-scraper`. Output shape is
+    stable across clockworks's TikTok actor family — caption in `text`,
     author info nested under `authorMeta`, video id in `id`.
     """
     text = item.get("text") or item.get("description") or item.get("caption")

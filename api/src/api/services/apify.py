@@ -10,20 +10,16 @@ with its own input shape and pricing. We wrap the common pattern:
 items + the actual cost the run incurred.
 
 Default actors are tuned for paid-plan Apify (we run on Starter $29/mo):
-  - X: `apidojo/tweet-scraper` (~$0.40/1K results) — industry default,
+  - X: `apidojo/tweet-scraper` ($0.0004/item) — industry default,
     full thread context, reliable on weekend bursts
-  - TikTok (default): `clockworks/free-tiktok-scraper` ($0/result) —
-    rate-limited and occasionally flaky, but since it's free we run
-    it every day and tolerate occasional misses. Separately, a
-    biweekly `ingest-tiktok-paid` beat task runs the 1st + 3rd
-    Mondays of each month with explicit `actor_id=
-    "clockworks/tiktok-scraper"` (paid, ~$4/1K) to refresh the same
-    videos with richer metadata twice a month — the DB upsert
-    overwrites the lighter daily payload with the richer biweekly
-    one for the same (platform, external_id) pair.
-  - Instagram: `apify/instagram-hashtag-scraper` (~$2.30/1K results) —
+  - TikTok: `clockworks/free-tiktok-scraper` ($0.004/item) — name
+    is misleading ("free" trial, not free-cost). TT ingest is
+    currently disabled in beat pending product decision; this
+    default stays here so manual `--platform tiktok` invocations
+    still work for ad-hoc verification.
+  - Instagram: `apify/instagram-hashtag-scraper` ($0.0023/item) —
     official Apify, sufficient for our hashtag-driven discovery
-Override any of them via env vars (e.g. `APIFY_ACTOR_X=...`).
+Override any of them via the `actor_id` parameter on `scrape(...)`.
 
 Run cost is captured for budget tracking (PRD §13 caps spend at IDR 1M/mo).
 The /admin/system/api-costs page reads the actual per-run USD reported by
@@ -201,9 +197,8 @@ def scrape_tiktok(
     plain string for keyword search.
 
     `actor_id` overrides the default `clockworks/free-tiktok-scraper`.
-    Used by the weekly `ingest-tiktok-paid` beat task to upgrade Monday's
-    scrape to `clockworks/tiktok-scraper` (paid, richer metadata) while
-    daily runs stay on the free actor.
+    Kept available as a general escape hatch for swapping in a different
+    TikTok actor without redeploying.
     """
     hashtag = query.lstrip("#")
     return scrape(
