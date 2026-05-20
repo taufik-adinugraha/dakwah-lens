@@ -89,64 +89,105 @@ async def _run(
         return 0
     print(f"  Normalized {len(rows)}/{len(result.items)} usable rows")
 
-    # 3. Detect language per row, then dispatch classifiers accordingly.
+    # 3. Detect language per row (cheap, no API call — always re-run).
     texts = [r["text"] for r in rows]
     languages = [detect_lang(t) for t in texts]
     for row, lang in zip(rows, languages, strict=False):
-        # Detection result wins over whatever the per-platform normalizer
-        # might have set (e.g. mainstream RSS hardcoded "id" before this
-        # change). Stored so the analytics surface can filter by language.
         row["language"] = lang
 
-    # Dispatch sentiment by platform AND language:
+    # 3a. Look up rows we've already classified — RSS feeds carry items
+    # for ~24h and beat fires every 2h, so a naive re-classify burns
+    # ~80% of Gemini calls on items already in the DB. Skip the LLM for
+    # any row whose `categories` is already populated; we'll still upsert
+    # so text/body improvements land, but with the cached scores intact.
+    external_ids = [r["external_id"] for r in rows]
+    async with SessionLocal() as session:
+        existing_res = await session.execute(
+            select(
+                SocialPost.external_id,
+                SocialPost.sentiment_label,
+                SocialPost.sentiment_score,
+                SocialPost.dawah_relevance,
+                SocialPost.categories,
+            ).where(
+                SocialPost.platform == platform,
+                SocialPost.external_id.in_(external_ids),
+                SocialPost.categories.is_not(None),
+            )
+        )
+        cached: dict[str, tuple[str | None, float | None, float | None, dict]] = {
+            eid: (label, score, rel, cats)
+            for (eid, label, score, rel, cats) in existing_res.all()
+        }
+    fresh_indices = [
+        i for i, r in enumerate(rows) if r["external_id"] not in cached
+    ]
+    fresh_texts = [texts[i] for i in fresh_indices]
+    fresh_languages = [languages[i] for i in fresh_indices]
+    print(
+        f"  Classifier skip: {len(cached)}/{len(rows)} already classified, "
+        f"running on {len(fresh_indices)} new items …"
+    )
+
+    # Dispatch sentiment by platform AND language, on FRESH items only:
     #   - mainstream            → Gemini news-valence (event-valence
     #                             prompt, IndoBERT misfires on news).
     #   - else, ID language     → IndoBERT (free, on-device, well-tuned
     #                             for Indonesian tweets/captions).
-    #   - else, non-ID language → Gemini Flash-Lite fallback (was NULL
-    #                             before — non-ID posts on X/YT/TT/IG
-    #                             went unclassified, hurting coverage
-    #                             on Indonesian Muslims who tweet in EN
-    #                             and on internationally-sourced YT vids).
+    #   - else, non-ID language → Gemini Flash-Lite fallback.
     sentiment_by_index: dict[int, object] = {}
-    if platform == "mainstream":
-        print(f"  Running Gemini news-sentiment on {len(texts)} posts …")
-        news_sentiments = classify_news_sentiment(texts)
-        sentiment_by_index = dict(enumerate(news_sentiments))
+    if fresh_texts:
+        if platform == "mainstream":
+            print(f"  Running Gemini news-sentiment on {len(fresh_texts)} posts …")
+            fresh_sentiments = classify_news_sentiment(fresh_texts)
+            for idx, s in zip(fresh_indices, fresh_sentiments, strict=False):
+                sentiment_by_index[idx] = s
+        else:
+            id_local = [
+                i for i, lang in enumerate(fresh_languages) if lang == "id"
+            ]
+            non_id_local = [
+                i for i, lang in enumerate(fresh_languages) if lang != "id"
+            ]
+            id_texts = [fresh_texts[i] for i in id_local]
+            non_id_texts = [fresh_texts[i] for i in non_id_local]
+            print(
+                f"  IndoBERT on {len(id_texts)} ID posts, "
+                f"Gemini fallback on {len(non_id_texts)} non-ID posts …"
+            )
+            id_sentiments = classify_sentiment(id_texts) if id_texts else []
+            non_id_sentiments = (
+                classify_news_sentiment(non_id_texts) if non_id_texts else []
+            )
+            for li, s in zip(id_local, id_sentiments, strict=False):
+                sentiment_by_index[fresh_indices[li]] = s
+            for li, s in zip(non_id_local, non_id_sentiments, strict=False):
+                sentiment_by_index[fresh_indices[li]] = s
+
+        # Gemini relevance handles ID + EN natively.
+        print("  Running Gemini relevance …")
+        fresh_relevances = classify_relevance(fresh_texts)
     else:
-        id_indices = [i for i, lang in enumerate(languages) if lang == "id"]
-        non_id_indices = [
-            i for i, lang in enumerate(languages) if lang != "id"
-        ]
-        id_texts = [texts[i] for i in id_indices]
-        non_id_texts = [texts[i] for i in non_id_indices]
-        print(
-            f"  IndoBERT on {len(id_texts)} ID posts, "
-            f"Gemini fallback on {len(non_id_texts)} non-ID posts …"
-        )
-        id_sentiments = classify_sentiment(id_texts) if id_texts else []
-        # Reuse news-sentiment for the fallback path. The prompt is
-        # news-tuned but Gemini handles general short text reasonably,
-        # and even a slight neutral bias beats NULL. If quality is bad
-        # at scale, swap to a tweet-specific prompt later.
-        non_id_sentiments = (
-            classify_news_sentiment(non_id_texts) if non_id_texts else []
-        )
-        for idx, s in zip(id_indices, id_sentiments, strict=False):
-            sentiment_by_index[idx] = s
-        for idx, s in zip(non_id_indices, non_id_sentiments, strict=False):
-            sentiment_by_index[idx] = s
+        fresh_relevances = []
 
-    # Gemini relevance handles ID + EN natively, so it runs on everything.
-    print("  Running Gemini relevance …")
-    relevances = classify_relevance(texts)
+    relevance_by_index = {
+        idx: r for idx, r in zip(fresh_indices, fresh_relevances, strict=False)
+    }
 
-    for i, (row, r) in enumerate(zip(rows, relevances, strict=False)):
-        s = sentiment_by_index.get(i)
-        row["sentiment_label"] = getattr(s, "label", None)
-        row["sentiment_score"] = getattr(s, "score", None)
-        row["dawah_relevance"] = r.dawah_relevance
-        row["categories"] = r.categories
+    for i, row in enumerate(rows):
+        if row["external_id"] in cached:
+            label, score, rel, cats = cached[row["external_id"]]
+            row["sentiment_label"] = label
+            row["sentiment_score"] = score
+            row["dawah_relevance"] = rel
+            row["categories"] = cats
+        else:
+            s = sentiment_by_index.get(i)
+            r = relevance_by_index.get(i)
+            row["sentiment_label"] = getattr(s, "label", None)
+            row["sentiment_score"] = getattr(s, "score", None)
+            row["dawah_relevance"] = getattr(r, "dawah_relevance", None)
+            row["categories"] = getattr(r, "categories", None)
 
     # 4. Upsert
     async with SessionLocal() as session:
