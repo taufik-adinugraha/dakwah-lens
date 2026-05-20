@@ -160,6 +160,11 @@ services:
       context: .
       dockerfile: api/Dockerfile
     restart: unless-stopped
+    # 5min grace lets Celery finish in-flight tasks before SIGKILL on
+    # `compose up -d`. Pairs with `task_acks_late=True` in celery_app.py
+    # so any task that doesn't finish in time gets re-queued instead
+    # of dropped.
+    stop_grace_period: 300s
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       QDRANT_URL: http://qdrant:6333
@@ -210,6 +215,10 @@ services:
       context: .
       dockerfile: api/Dockerfile
     restart: unless-stopped
+    # Beat is intentionally stopped at the start of deploy.sh (so no
+    # new tasks fire mid-deploy). 30s is plenty for a clean shutdown
+    # of a process that's just a scheduler — no in-flight work.
+    stop_grace_period: 30s
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       REDIS_URL: redis://redis:6379/0

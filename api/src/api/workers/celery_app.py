@@ -35,6 +35,17 @@ celery_app.conf.update(
     enable_utc=True,
     task_track_started=True,
     task_time_limit=600,
+    # Crash-safe task delivery. With `acks_late=True` Redis only removes
+    # the message from the queue once the task SUCCEEDS — so a worker
+    # crash mid-task returns the message for retry instead of dropping
+    # it. Combined with `prefetch=1` (workers hold ONE task at a time
+    # instead of the default 4 in-memory buffer), a SIGKILL during a
+    # deploy loses at most one in-flight task per worker process. We
+    # learned this the hard way on 2026-05-20: a mid-deploy worker
+    # restart dropped 8 trending-overlay X scrapes because Celery had
+    # already pulled them out of Redis into worker memory.
+    task_acks_late=True,
+    worker_prefetch_multiplier=1,
     # Beat schedule. Keep query strings broad enough to surface a meaningful
     # cross-section of da'wah-relevant content. Mainstream/YouTube have no
     # Apify cost, so they run more often.

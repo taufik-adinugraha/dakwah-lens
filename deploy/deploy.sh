@@ -53,6 +53,21 @@ else
   say "   caddy config unchanged"
 fi
 
+# 1.7 Stop beat EARLY ──────────────────────────────────────────
+# Halt the scheduler before we touch images, so no new tasks fire
+# mid-deploy. We learned the hard way (2026-05-20) that a deploy that
+# restarts the worker while beat is fanning out trending overlay
+# tasks loses 8+ in-flight scrapes. Stopping beat first means the
+# worker only has whatever's currently in Redis to drain, no
+# moving target. Beat resumes in step 5 with its persistent schedule
+# DB so missed fires catch up on the next tick.
+if docker inspect dakwah-lens-beat-1 >/dev/null 2>&1; then
+  say "▶ stopping beat (no new task dispatches during deploy)"
+  $COMPOSE stop beat
+else
+  say "   beat not running yet — first deploy, skipping stop"
+fi
+
 # 2. Build images ─────────────────────────────────────────────
 say "▶ docker build (this may take 3–8 min on first run)"
 # Build WITHOUT --pull. Refreshing base images (node:22-alpine,
@@ -99,11 +114,35 @@ done
 say "▶ alembic upgrade head"
 $COMPOSE run --rm api alembic upgrade head
 
+# 4.5 Wait for worker queue to drain ─────────────────────────
+# Beat has been stopped since step 1.7 so no new tasks are being
+# dispatched. Now give whatever was already in Redis a chance to
+# finish before we restart the worker. With `task_acks_late=True`
+# + `worker_prefetch_multiplier=1` (set in celery_app.py) any task
+# we DO interrupt gets re-queued, so this drain wait is "best effort
+# to avoid re-runs" rather than "load-bearing for correctness". Cap
+# at 5min so a stuck task doesn't block the deploy forever.
+say "▶ draining worker queue (max 5min)"
+for i in {1..30}; do
+  depth=$(docker exec dakwah-lens-redis-1 redis-cli LLEN celery 2>/dev/null || echo "0")
+  if [[ "$depth" == "0" ]]; then
+    say "   queue empty after ${i}0s"
+    break
+  fi
+  say "   queue depth: $depth — waiting…"
+  sleep 10
+  if [[ $i -eq 30 ]]; then
+    say "   ⚠ queue still has $depth tasks after 5min — proceeding anyway (acks_late will re-queue interrupted ones)"
+  fi
+done
+
 # 5. Roll the app services ────────────────────────────────────
 say "▶ rolling web/api/worker/beat"
 # `--remove-orphans` cleans up containers from services that were
 # renamed or removed in the compose file — keeps the running set
-# matching declared set without us having to remember.
+# matching declared set without us having to remember. Beat is
+# restored here after being stopped in step 1.7; its persistent
+# schedule DB makes the catch-up logic fire any missed cron ticks.
 $COMPOSE up -d --remove-orphans web api worker beat
 
 # 6. Prune ─────────────────────────────────────────────────────
