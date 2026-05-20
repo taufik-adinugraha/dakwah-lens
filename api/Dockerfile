@@ -37,12 +37,20 @@ COPY api/pyproject.toml api/uv.lock ./
 # `--frozen` enforces the lockfile (matches `npm ci` semantics).
 # Project itself isn't installed yet — `--no-install-project` skips that
 # step so we can copy source separately and cache the dep layer.
-RUN uv sync --frozen --no-install-project --no-dev
+#
+# BuildKit cache mount persists uv's wheel cache across rebuilds (lives
+# on the Docker daemon, survives layer invalidation). When pyproject
+# changes, this RUN re-executes but uv finds existing wheels in cache
+# — only NEW wheels download. Saves ~2-3 min on most deploys; on first
+# build (cold daemon) it's the same as before.
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-install-project --no-dev
 
 # Now copy the source and re-run sync to install the project itself.
 # Project install is fast (no wheel download — it's just a metadata bind).
 COPY api/ ./
-RUN uv sync --frozen --no-dev
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev
 
 # ─── Runtime image ──────────────────────────────────────────────
 FROM python:3.12-slim AS runner
