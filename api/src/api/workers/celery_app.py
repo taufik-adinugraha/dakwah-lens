@@ -85,48 +85,48 @@ celery_app.conf.update(
         # Subtotal sweep: ~$32/mo. Add trending overlay (X only, ~$0.1)
         # → ~$32/mo total Apify usage. Inside the IDR 1M ($60) cap.
         # Track real costs at /admin/system/api-costs.
-        "ingest-youtube-channels": {
-            "task": "api.workers.ingest.youtube_channels_ingest",
-            "schedule": crontab(minute=0, hour=0),  # daily, midnight WIB
-            # Pull up to 50 most-recent uploads per whitelisted channel
-            # (50 = YT Data API per-call max for playlistItems.list,
-            # which costs 1 quota unit regardless of maxResults). With
-            # ~80 channels in the whitelist this burns ~80 units/day —
-            # under 1% of the 10K free tier. The classifier dedup pass
-            # in `_run` step 3a means we only pay Gemini for actually-new
-            # uploads, which is usually a tiny fraction.
-            "kwargs": {"limit": 50},
-        },
-        "ingest-x-mon": {
-            "task": "api.workers.ingest.rotating_ingest",
-            "schedule": crontab(minute=10, hour=0, day_of_week=1),
-            "kwargs": {"platform": "x", "limit": 20, "n_keywords": 999},
-        },
-        "ingest-x-wed": {
-            "task": "api.workers.ingest.rotating_ingest",
-            "schedule": crontab(minute=10, hour=0, day_of_week=3),
-            "kwargs": {"platform": "x", "limit": 20, "n_keywords": 999},
-        },
-        "ingest-x-fri": {
-            "task": "api.workers.ingest.rotating_ingest",
-            "schedule": crontab(minute=10, hour=0, day_of_week=5),
-            "kwargs": {"platform": "x", "limit": 20, "n_keywords": 999},
-        },
-        # TikTok weekly (Tuesday 00:20 WIB). Free actor
-        # (`clockworks/free-tiktok-scraper`) charges $0.004/item — the
-        # name is misleading, "free" is the trial tier. At 49 keywords
-        # × 20 items = 980 items/run × 4.33 wk/mo ≈ $17/mo. Tuesday
-        # avoids Mon collision with X + IG.
-        "ingest-tiktok": {
-            "task": "api.workers.ingest.rotating_ingest",
-            "schedule": crontab(minute=20, hour=0, day_of_week=2),
-            "kwargs": {"platform": "tiktok", "limit": 20, "n_keywords": 999},
-        },
-        "ingest-instagram": {
-            "task": "api.workers.ingest.rotating_ingest",
-            "schedule": crontab(minute=30, hour=0, day_of_week=1),
-            "kwargs": {"platform": "instagram", "limit": 20, "n_keywords": 999},
-        },
+        # ── PAUSED 2026-05-20 ───────────────────────────────────────
+        # Only `mainstream` RSS is verified end-to-end against the new
+        # dedup-before-classify + lang-filter + Top-sort + relevance
+        # JSON-fix code path. X / TT / IG / YT remain unvalidated and
+        # we don't want to leave them firing unattended while the user
+        # is off-server. Re-enable one at a time after running a single
+        # manual trigger and confirming items_stored + distribution +
+        # `ingest.lang_filter` log entries look sane.
+        #
+        # YT specifically also needs a one-time
+        # `uv run python -m api.scripts.seed_youtube_channels`
+        # before the daily ingest will find any channels to scrape.
+        # "ingest-youtube-channels": {
+        #     "task": "api.workers.ingest.youtube_channels_ingest",
+        #     "schedule": crontab(minute=0, hour=0),
+        #     "kwargs": {"limit": 50},
+        # },
+        # "ingest-x-mon": {
+        #     "task": "api.workers.ingest.rotating_ingest",
+        #     "schedule": crontab(minute=10, hour=0, day_of_week=1),
+        #     "kwargs": {"platform": "x", "limit": 20, "n_keywords": 999},
+        # },
+        # "ingest-x-wed": {
+        #     "task": "api.workers.ingest.rotating_ingest",
+        #     "schedule": crontab(minute=10, hour=0, day_of_week=3),
+        #     "kwargs": {"platform": "x", "limit": 20, "n_keywords": 999},
+        # },
+        # "ingest-x-fri": {
+        #     "task": "api.workers.ingest.rotating_ingest",
+        #     "schedule": crontab(minute=10, hour=0, day_of_week=5),
+        #     "kwargs": {"platform": "x", "limit": 20, "n_keywords": 999},
+        # },
+        # "ingest-tiktok": {
+        #     "task": "api.workers.ingest.rotating_ingest",
+        #     "schedule": crontab(minute=20, hour=0, day_of_week=2),
+        #     "kwargs": {"platform": "tiktok", "limit": 20, "n_keywords": 999},
+        # },
+        # "ingest-instagram": {
+        #     "task": "api.workers.ingest.rotating_ingest",
+        #     "schedule": crontab(minute=30, hour=0, day_of_week=1),
+        #     "kwargs": {"platform": "instagram", "limit": 20, "n_keywords": 999},
+        # },
         # Re-cluster topics nightly. 04:00 WIB — 1–2h after the daily
         # X/YT/TT/IG fanouts finish (~02:00) so we have fresh data, but
         # well before the workday so the public /insights page shows
@@ -153,15 +153,12 @@ celery_app.conf.update(
             "task": "api.workers.ingest.send_weekly_digest",
             "schedule": crontab(minute=0, hour=18, day_of_week=0),
         },
-        # Trending overlay: fetch Google Trends + YouTube popular + Google
-        # News for Indonesia, filter via Gemini Flash-Lite, then dispatch
-        # ad-hoc scrapes on the surviving keywords. Runs at 12:00 WIB so
-        # the news cycle has settled in for the day. ~$15.8/mo extra
-        # Apify (X $1.4 + TT $14.4 with the paid clockworks actor).
-        "trending-ingest": {
-            "task": "api.workers.ingest.trending_ingest",
-            "schedule": crontab(minute=0, hour=12),
-        },
+        # Trending overlay paused 2026-05-20 — fans out X scrapes
+        # which are themselves paused pending verification.
+        # "trending-ingest": {
+        #     "task": "api.workers.ingest.trending_ingest",
+        #     "schedule": crontab(minute=0, hour=12),
+        # },
         # Daily 06:00 WIB reconcile of Apify's authoritative monthly
         # spend against our per-run usage_events. Closes the gap between
         # `run.usageTotalUsd` (best-effort, lags) and Apify's billing
