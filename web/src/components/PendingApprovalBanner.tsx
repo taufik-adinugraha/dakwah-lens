@@ -1,28 +1,61 @@
-import { getTranslations } from "next-intl/server";
+"use client";
 
-import { auth } from "@/auth";
+import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
+
 import { PendingApprovalBannerClient } from "./PendingApprovalBannerClient";
 
 /**
  * Top-of-page banner for users whose registration is still under review.
  *
- * Server-side: reads the session, returns null unless the signed-in user
- * has `status === "pending"`. No DB hit beyond the auth lookup the layout
- * already performs.
+ * Client-side fetch of `/api/auth/session` (NextAuth's built-in session
+ * endpoint, served from this app, no extra config). We used to read the
+ * session server-side via `await auth()`, but the layout that hosts this
+ * banner gets cached as a static fragment in Next.js 16 — so an admin
+ * who flipped a user's status from `pending` → `approved` in the DB
+ * would still see the banner because the rendered HTML was frozen. The
+ * client-side fetch always hits the live JWT, so promotions reflect
+ * within seconds (or instantly on a refresh).
  *
- * Client-side: the inner `PendingApprovalBannerClient` owns the close
- * button and the localStorage dismiss flag (scoped to the user id so a
- * different signin doesn't inherit the previous user's dismissal).
+ * Same approach also dodges the "server error on signout" we were
+ * seeing: when the layout server-renders right after a signout, it
+ * could observe a half-cleared session and crash. Reading from the
+ * client moves that concern out of the render path.
  *
- * Why not the existing ActiveNotice pattern: ActiveNotice is admin-driven
- * broadcasts that live in `app_notices`. This banner is per-user state —
- * different concern, simpler implementation.
+ * Loading state renders nothing (no flash of "you're pending" while
+ * we're still fetching). The fetch is one round-trip per page load —
+ * acceptable cost for correctness.
  */
-export async function PendingApprovalBanner() {
-  const session = await auth();
-  if (!session?.user?.id || session.user.status !== "pending") return null;
+export function PendingApprovalBanner() {
+  type Session = {
+    user?: { id?: string; status?: string };
+  } | null;
 
-  const t = await getTranslations("Auth");
+  const [session, setSession] = useState<Session>(null);
+  const [loaded, setLoaded] = useState(false);
+  const t = useTranslations("Auth");
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/auth/session", { credentials: "same-origin" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: Session) => {
+        if (!cancelled) {
+          setSession(data);
+          setLoaded(true);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setLoaded(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (!loaded) return null;
+  if (!session?.user?.id) return null;
+  if (session.user.status !== "pending") return null;
 
   return (
     <PendingApprovalBannerClient
