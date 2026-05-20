@@ -566,10 +566,16 @@ export const pageViews = pgTable(
     sessionId: text("session_id"),
     referer: text("referer"),
     userAgent: text("user_agent"),
+    // IP-derived Indonesian region bucket (jabodetabek / jawa_barat /
+    // jawa_tengah_diy / jawa_timur / sumatera / kalimantan / sulawesi /
+    // indonesia_timur). NULL when geoip lookup fails or the visitor is
+    // outside Indonesia. The IP itself is never stored — PDP §15.
+    region: text("region"),
   },
   (table) => [
     index("ix_page_views_occurred_at").on(table.occurredAt),
     index("ix_page_views_path").on(table.path),
+    index("ix_page_views_region").on(table.region),
   ],
 );
 

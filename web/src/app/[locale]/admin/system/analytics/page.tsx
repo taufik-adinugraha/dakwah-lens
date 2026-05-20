@@ -23,6 +23,30 @@ const EXCLUDE_PATHS = sql`
   AND path NOT LIKE '/api%'
 `;
 
+const REGION_LABELS: Record<string, string> = {
+  jabodetabek: "Jabodetabek",
+  jawa_barat: "Jawa Barat",
+  jawa_tengah_diy: "Jawa Tengah & DIY",
+  jawa_timur: "Jawa Timur",
+  sumatera: "Sumatera",
+  kalimantan: "Kalimantan",
+  sulawesi: "Sulawesi",
+  indonesia_timur: "Indonesia Timur",
+  unknown: "Unknown / outside ID",
+};
+
+const REGION_COLORS: Record<string, string> = {
+  jabodetabek: "bg-brand-500",
+  jawa_barat: "bg-emerald-500",
+  jawa_tengah_diy: "bg-cyan-500",
+  jawa_timur: "bg-amber-500",
+  sumatera: "bg-rose-500",
+  kalimantan: "bg-violet-500",
+  sulawesi: "bg-fuchsia-500",
+  indonesia_timur: "bg-slate-500",
+  unknown: "bg-slate-300",
+};
+
 export default async function AnalyticsPage() {
   const [
     [{ sessions7d = 0 } = { sessions7d: 0 }],
@@ -50,6 +74,7 @@ export default async function AnalyticsPage() {
     briefsPerDay,
     topCreators,
     localeSplit,
+    regionSplit,
   ] = await Promise.all([
     db
       .select({ sessions7d: sql<number>`COUNT(DISTINCT session_id)::int` })
@@ -183,9 +208,24 @@ export default async function AnalyticsPage() {
       GROUP BY COALESCE(locale, 'unknown')
       ORDER BY sessions DESC
     `) as unknown as Promise<Array<{ locale: string; sessions: number }>>,
+    // Region split — distinct sessions per IP-derived Indonesian region.
+    // NULL bucket means non-Indonesia visitor, dev/local IP, or pre-
+    // geolocation rows (anything inserted before the page_views.region
+    // column was added).
+    db.execute(sql`
+      SELECT COALESCE(region, 'unknown') AS region,
+             COUNT(DISTINCT session_id)::int AS sessions
+      FROM page_views
+      WHERE occurred_at >= now() - interval '7 days'
+        AND path NOT LIKE '/admin%'
+        AND path NOT LIKE '/api%'
+      GROUP BY COALESCE(region, 'unknown')
+      ORDER BY sessions DESC
+    `) as unknown as Promise<Array<{ region: string; sessions: number }>>,
   ]);
 
   const localeTotal = localeSplit.reduce((s, r) => s + r.sessions, 0);
+  const regionTotal = regionSplit.reduce((s, r) => s + r.sessions, 0);
 
   return (
     <>
@@ -231,6 +271,58 @@ export default async function AnalyticsPage() {
           hint="signed-in / total"
         />
       </div>
+
+      {/* Region split — distinct sessions per IP-derived Indonesian
+          region. Pure infrastructure metric (no IPs stored). */}
+      {regionTotal > 0 && (
+        <Card
+          title="Region · 7d"
+          hint={`${regionTotal.toLocaleString()} distinct sessions`}
+        >
+          <p className="text-[11px] text-slate-500">
+            Indonesian region inferred from IP at request time. The IP
+            itself is never stored — only the region bucket (PDP §15).
+          </p>
+          <div className="mt-3 flex h-3 overflow-hidden rounded-full">
+            {regionSplit.map((row) => {
+              const pct = (row.sessions / regionTotal) * 100;
+              const color = REGION_COLORS[row.region] ?? "bg-slate-300";
+              return (
+                <span
+                  key={row.region}
+                  className={color}
+                  style={{ width: `${pct}%` }}
+                  title={`${row.region} · ${pct.toFixed(1)}%`}
+                />
+              );
+            })}
+          </div>
+          <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {regionSplit.map((row) => {
+              const pct = (row.sessions / regionTotal) * 100;
+              const label = REGION_LABELS[row.region] ?? row.region;
+              const dotColor = REGION_COLORS[row.region] ?? "bg-slate-400";
+              return (
+                <li
+                  key={row.region}
+                  className="flex items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2 text-xs"
+                >
+                  <span className="inline-flex items-center gap-2 font-medium text-slate-700">
+                    <span
+                      className={`inline-block h-2.5 w-2.5 rounded-full ${dotColor}`}
+                    />
+                    {label}
+                  </span>
+                  <span className="tabular-nums text-slate-600">
+                    {row.sessions.toLocaleString()}{" "}
+                    <span className="text-slate-400">· {pct.toFixed(1)}%</span>
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </Card>
+      )}
 
       {/* Locale split — distinct sessions per language preference. */}
       {localeTotal > 0 && (

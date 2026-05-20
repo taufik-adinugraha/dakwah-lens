@@ -17,6 +17,7 @@ import { cookies, headers } from "next/headers";
 
 import { auth } from "@/auth";
 import { db, schema } from "@/db";
+import { resolveRegion } from "@/lib/geolocation";
 
 const SESSION_COOKIE = "dlens_session";
 // 1 year — long enough that repeat visitors get attributed to one session
@@ -44,6 +45,11 @@ export async function trackPageView(input: {
     const session = await auth();
     const hdrs = await headers();
 
+    // Resolve IP → Indonesian region bucket via geoip-lite. The IP
+    // itself is NEVER passed beyond this scope — only the region code
+    // is persisted (PDP §15: personal-data minimisation).
+    const region = resolveRegion(hdrs);
+
     await db.insert(schema.pageViews).values({
       path: input.path,
       locale: input.locale ?? null,
@@ -51,6 +57,7 @@ export async function trackPageView(input: {
       sessionId,
       referer: hdrs.get("referer") ?? null,
       userAgent: hdrs.get("user-agent")?.slice(0, 500) ?? null,
+      region,
     });
   } catch (err) {
     console.warn("[analytics] page view track failed:", err);
