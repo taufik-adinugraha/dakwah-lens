@@ -98,13 +98,16 @@ async def _run(
         # change). Stored so the analytics surface can filter by language.
         row["language"] = lang
 
-    # Dispatch sentiment by platform:
-    #   - mainstream  → Gemini news-valence (IndoBERT was trained on
-    #                   tweets/reviews and reads speaker-emotion, not
-    #                   event-valence — produces ~95% neutral on news).
-    #   - else        → IndoBERT, ID-only (for EN/other the model
-    #                   produces confident noise, so we leave sentiment
-    #                   NULL on non-ID posts).
+    # Dispatch sentiment by platform AND language:
+    #   - mainstream            → Gemini news-valence (event-valence
+    #                             prompt, IndoBERT misfires on news).
+    #   - else, ID language     → IndoBERT (free, on-device, well-tuned
+    #                             for Indonesian tweets/captions).
+    #   - else, non-ID language → Gemini Flash-Lite fallback (was NULL
+    #                             before — non-ID posts on X/YT/TT/IG
+    #                             went unclassified, hurting coverage
+    #                             on Indonesian Muslims who tweet in EN
+    #                             and on internationally-sourced YT vids).
     sentiment_by_index: dict[int, object] = {}
     if platform == "mainstream":
         print(f"  Running Gemini news-sentiment on {len(texts)} posts …")
@@ -112,16 +115,27 @@ async def _run(
         sentiment_by_index = dict(enumerate(news_sentiments))
     else:
         id_indices = [i for i, lang in enumerate(languages) if lang == "id"]
+        non_id_indices = [
+            i for i, lang in enumerate(languages) if lang != "id"
+        ]
         id_texts = [texts[i] for i in id_indices]
-        n_id, n_other = len(id_texts), len(texts) - len(id_texts)
+        non_id_texts = [texts[i] for i in non_id_indices]
         print(
-            f"  Running IndoBERT sentiment on {n_id}/{len(texts)} ID posts "
-            f"({n_other} non-ID skipped) …"
+            f"  IndoBERT on {len(id_texts)} ID posts, "
+            f"Gemini fallback on {len(non_id_texts)} non-ID posts …"
         )
         id_sentiments = classify_sentiment(id_texts) if id_texts else []
-        sentiment_by_index = dict(
-            zip(id_indices, id_sentiments, strict=False)
+        # Reuse news-sentiment for the fallback path. The prompt is
+        # news-tuned but Gemini handles general short text reasonably,
+        # and even a slight neutral bias beats NULL. If quality is bad
+        # at scale, swap to a tweet-specific prompt later.
+        non_id_sentiments = (
+            classify_news_sentiment(non_id_texts) if non_id_texts else []
         )
+        for idx, s in zip(id_indices, id_sentiments, strict=False):
+            sentiment_by_index[idx] = s
+        for idx, s in zip(non_id_indices, non_id_sentiments, strict=False):
+            sentiment_by_index[idx] = s
 
     # Gemini relevance handles ID + EN natively, so it runs on everything.
     print("  Running Gemini relevance …")

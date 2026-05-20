@@ -187,8 +187,13 @@ def trending_ingest() -> dict[str, object]:
 
 
 @celery_app.task(name="api.workers.ingest.recluster_all")
-def recluster_all(min_cluster: int = 5) -> dict[str, int]:
-    """Re-fit BERTopic on every platform that has enough posts. Idempotent."""
+def recluster_all() -> dict[str, int]:
+    """Re-run Gemini topic discovery on every platform that has enough posts.
+
+    Idempotent — each run truncates the platform's topics and writes
+    fresh ones from the most recent corpus. Replaced BERTopic with the
+    Gemini-based discoverer on 2026-05-20.
+    """
 
     async def _runner() -> dict[str, int]:
         out: dict[str, int] = {}
@@ -197,7 +202,7 @@ def recluster_all(min_cluster: int = 5) -> dict[str, int]:
                 task_name="recluster_all", platform=platform
             )
             try:
-                n = await cluster_topics._run(platform, min_cluster)
+                n = await cluster_topics._run(platform)
                 out[platform] = n
                 await ingest_runs.finish_run(
                     run_id, status="success", items_stored=n

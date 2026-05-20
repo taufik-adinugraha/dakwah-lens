@@ -19,7 +19,7 @@ Both functions are async — call from async code or wrap with `asyncio.run`.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from uuid import UUID
 
 import structlog
@@ -32,11 +32,15 @@ log = structlog.get_logger()
 
 async def start_run(task_name: str, *, platform: str | None = None) -> UUID:
     async with SessionLocal() as session:
+        # `datetime.now(UTC)` not `utcnow()` — utcnow returns a naive
+        # datetime that PG (with session TZ=Asia/Jakarta) re-interprets
+        # as local time, double-converting and storing the value 7
+        # hours off. Pass a tz-aware datetime instead.
         run = IngestRun(
             task_name=task_name,
             platform=platform,
             status="running",
-            started_at=datetime.utcnow(),
+            started_at=datetime.now(UTC),
         )
         session.add(run)
         await session.commit()
@@ -60,7 +64,7 @@ async def finish_run(
             .where(IngestRun.id == run_id)
             .values(
                 status=status,
-                finished_at=datetime.utcnow(),
+                finished_at=datetime.now(UTC),
                 items_scraped=items_scraped,
                 items_stored=items_stored,
                 cost_usd=cost_usd,

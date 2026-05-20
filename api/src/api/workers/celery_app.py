@@ -120,12 +120,15 @@ celery_app.conf.update(
             "schedule": crontab(minute=30, hour=0, day_of_week=1),
             "kwargs": {"platform": "instagram", "limit": 20, "n_keywords": 999},
         },
-        # Re-cluster topics every night after the daily ingest finishes. The
-        # task itself handles the "not enough posts" case gracefully so it's
-        # safe to fire even when scrapers returned nothing.
+        # Re-cluster topics nightly. 04:00 WIB — 1–2h after the daily
+        # X/YT/TT/IG fanouts finish (~02:00) so we have fresh data, but
+        # well before the workday so the public /insights page shows
+        # current themes. Was 08:00 WIB but that wasted 4 fresh-data
+        # hours of public visibility. The task handles "not enough
+        # posts" gracefully, so safe to fire even on quiet platforms.
         "recluster-topics": {
             "task": "api.workers.ingest.recluster_all",
-            "schedule": crontab(minute=0, hour=8),
+            "schedule": crontab(minute=0, hour=4),
         },
         # Trending overlay: fetch Google Trends + YouTube popular + Google
         # News for Indonesia, filter via Gemini Flash-Lite, then dispatch
