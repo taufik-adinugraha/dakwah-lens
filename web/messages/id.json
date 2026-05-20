@@ -185,6 +185,16 @@
     "kitab_6_languages": "AR · EN",
     "kitab_promise": "AI tidak pernah mengarang rujukan Islami — hanya mengambil dari pustaka ini, dan selalu mencantumkan sumber asli."
   },
+  "Saved": {
+    "page_title": "Item tersimpan",
+    "title": "Item yang Anda simpan",
+    "subtitle": "Kutipan, brief, dan postingan yang Anda simpan untuk nanti. Privat hanya untuk Anda.",
+    "kind_all": "Semua",
+    "kind_kitab": "Kitab",
+    "kind_brief": "Brief",
+    "kind_post": "Postingan",
+    "empty": "Belum ada yang disimpan. Bookmark sesuatu dari /kitab, /briefs, atau /insights untuk memulai perpustakaan pribadi Anda."
+  },
   "Kitab": {
     "page_title": "Pustaka Kitab",
     "badge": "Pustaka Terverifikasi",

@@ -764,3 +764,39 @@ export const insightsSummaries = pgTable(
     index("ix_insights_summaries_generated_at").on(table.generatedAt),
   ],
 );
+
+/**
+ * User-saved items — kitab citations, briefs, social posts.
+ *
+ * `kind` discriminator + opaque `ref_id` + JSONB `payload` keeps
+ * one table flexible across save targets. UNIQUE on
+ * (userId, kind, refId) makes a re-save idempotent.
+ */
+export const bookmarks = pgTable(
+  "bookmarks",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    kind: text("kind").notNull(),
+    refId: text("ref_id").notNull(),
+    payload: jsonb("payload").$type<Record<string, unknown>>().notNull(),
+    note: text("note"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => [
+    uniqueIndex("uq_bookmark_user_kind_ref").on(
+      table.userId,
+      table.kind,
+      table.refId,
+    ),
+    index("ix_bookmarks_user_kind_time").on(
+      table.userId,
+      table.kind,
+      table.createdAt,
+    ),
+  ],
+);

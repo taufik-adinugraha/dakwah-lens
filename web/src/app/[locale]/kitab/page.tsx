@@ -3,7 +3,10 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { BookOpen, Search, ShieldCheck, Sparkles } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
+import { auth } from "@/auth";
+import { BookmarkButton } from "@/components/BookmarkButton";
 import { CitationShare } from "@/components/CitationShare";
+import { getSavedFlags } from "@/app/[locale]/saved/actions";
 import {
   getKitabCounts,
   searchKitabBrowse,
@@ -118,6 +121,16 @@ export default async function KitabPage({
       })
     : [];
 
+  // Check session + saved state for any visible hits in one round-trip.
+  const session = await auth();
+  const signedIn = !!session?.user?.id;
+  const savedFlags = signedIn
+    ? await getSavedFlags(
+        "kitab",
+        hits.map((h) => citationRefId(h.corpus, h.citation)),
+      )
+    : {};
+
   return (
     <>
       <Hero t={t} />
@@ -128,7 +141,7 @@ export default async function KitabPage({
         counts={counts}
       />
       {query ? (
-        <Results t={t} hits={hits} query={query} />
+        <Results t={t} hits={hits} query={query} savedFlags={savedFlags} signedIn={signedIn} />
       ) : (
         <KitabGrid t={t} counts={counts} />
       )}
@@ -249,14 +262,26 @@ function SearchForm({
   );
 }
 
+// Stable reference id for a kitab hit: scopes to corpus + citation.
+// Same citation could (in theory) appear in multiple corpora — Bukhari
+// + Muslim share many hadith — so we want each save attributable to
+// its source corpus.
+function citationRefId(corpus: string, citation: string): string {
+  return `${corpus}:${citation}`;
+}
+
 function Results({
   t,
   hits,
   query,
+  savedFlags,
+  signedIn,
 }: {
   t: T;
   hits: KitabHit[];
   query: string;
+  savedFlags: Record<string, boolean>;
+  signedIn: boolean;
 }) {
   return (
     <section className="pb-16 sm:pb-20">
@@ -303,11 +328,25 @@ function Results({
                     {h.translation}
                   </p>
                 )}
-                <CitationShare
-                  arabic={h.arabic}
-                  translation={h.translation}
-                  citation={h.citation}
-                />
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <BookmarkButton
+                    kind="kitab"
+                    refId={citationRefId(h.corpus, h.citation)}
+                    payload={{
+                      corpus: h.corpus,
+                      citation: h.citation,
+                      arabic: h.arabic,
+                      translation: h.translation,
+                    }}
+                    initialSaved={!!savedFlags[citationRefId(h.corpus, h.citation)]}
+                    signedIn={signedIn}
+                  />
+                  <CitationShare
+                    arabic={h.arabic}
+                    translation={h.translation}
+                    citation={h.citation}
+                  />
+                </div>
               </li>
             ))}
           </ul>

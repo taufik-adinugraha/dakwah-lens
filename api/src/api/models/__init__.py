@@ -1,5 +1,6 @@
 from api.models.admin import (
     AppSetting,
+    Bookmark,
     ContactMessage,
     Donation,
     IngestQuery,
@@ -28,6 +29,7 @@ __all__ = [
     "Account",
     "AppSetting",
     "Base",
+    "Bookmark",
     "Brief",
     "ContactMessage",
     "Donation",

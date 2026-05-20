@@ -32,6 +32,7 @@ from sqlalchemy import (
     Boolean,
     DateTime,
     Float,
+    ForeignKey,
     Index,
     Integer,
     String,
@@ -599,3 +600,47 @@ class InsightsSummary(Base):
     tokens_in: Mapped[int | None] = mapped_column(Integer)
     tokens_out: Mapped[int | None] = mapped_column(Integer)
     cost_usd: Mapped[float | None] = mapped_column(Float)
+
+
+class Bookmark(Base):
+    """User-saved item (kitab citation, brief, or social post).
+
+    Schema flexibility: `kind` discriminator + opaque `ref_id` +
+    JSONB `payload` lets one table back multiple save targets without
+    proliferating tables. Unique on (user_id, kind, ref_id) so the
+    same item never gets saved twice.
+    """
+
+    __tablename__ = "bookmarks"
+
+    id: Mapped[UUID] = mapped_column(
+        primary_key=True, default=uuid4, server_default=text("gen_random_uuid()")
+    )
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    kind: Mapped[str] = mapped_column(String(32), nullable=False)
+    """One of: 'kitab', 'brief', 'post'."""
+
+    ref_id: Mapped[str] = mapped_column(String(512), nullable=False)
+    """Opaque identifier per kind. See migration docstring."""
+
+    payload: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    """Snapshot of the saved item so it renders even if the source
+    row is later deleted. For a kitab citation: arabic, translation,
+    citation, corpus. For a brief: title, segment, locale. For a
+    post: text snippet, author, platform, url."""
+
+    note: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("now()"),
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id", "kind", "ref_id", name="uq_bookmark_user_kind_ref"
+        ),
+        Index("ix_bookmarks_user_kind_time", "user_id", "kind", "created_at"),
+    )

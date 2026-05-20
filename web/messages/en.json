@@ -189,6 +189,16 @@
     "kitab_6_languages": "AR · EN",
     "kitab_promise": "The AI never invents an Islamic reference — it can only retrieve from this library, and always cites back to source."
   },
+  "Saved": {
+    "page_title": "Saved items",
+    "title": "Your saved items",
+    "subtitle": "Citations, briefs, and posts you've kept for later. Private to you.",
+    "kind_all": "All",
+    "kind_kitab": "Kitab",
+    "kind_brief": "Briefs",
+    "kind_post": "Posts",
+    "empty": "Nothing saved yet. Bookmark something from /kitab, /briefs, or /insights to start a personal library."
+  },
   "Kitab": {
     "page_title": "Kitab Library",
     "badge": "Verified library",
