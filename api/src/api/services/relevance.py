@@ -32,10 +32,15 @@ from api.config import settings
 log = structlog.get_logger()
 
 MODEL = "gemini-2.5-flash-lite"
-# Max texts per Gemini call. Larger batches amortize the system-prompt
-# overhead but risk a JSON schema validation timeout on huge inputs. 50
-# is the sweet spot at our typical per-platform run size.
-MAX_BATCH = 50
+# Max texts per Gemini call. We previously used 50 (~$1/mo cheaper than
+# singletons), but a 50-item structured-output response runs ~2.5K output
+# tokens and we saw the model produce a 6932-line / 123KB malformed JSON
+# on a live run — likely a truncation or thinking-token-leak edge case
+# that scales with output length. Dropping to 10 keeps ~95% of the
+# batching cost win, slashes the per-call output to ~500 tokens (well
+# below any plausible limit), and caps blast radius if one batch still
+# fails. See defensive try/except in `_classify_chunk` for the catch.
+MAX_BATCH = 10
 # Texts shorter than this are almost always headline fragments or thumbnail
 # captions with too little signal for the classifier to score reliably.
 MIN_TEXT_CHARS = 30
@@ -212,7 +217,29 @@ def _classify_chunk(texts: list[str]) -> list[RelevanceResult]:
         ),
     )
     raw = resp.text or "[]"
-    parsed: list[dict[str, float]] = json.loads(raw)
+    try:
+        parsed: list[dict[str, float]] = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        # Gemini's structured-output mode is best-effort. We've observed
+        # the model emit a 6932-line / 123KB malformed JSON for a 50-item
+        # batch — likely a truncation or thinking-token-leak edge case.
+        # MAX_BATCH=10 should eliminate this, but the try/except is a
+        # safety net so a single bad call can't kill the whole ingest.
+        # Items still land in social_posts with zero relevance; they'll
+        # surface once a subsequent classify pass succeeds.
+        usage_md_local = getattr(resp, "usage_metadata", None)
+        log.warning(
+            "relevance.json_decode_failed",
+            error=str(exc),
+            raw_chars=len(raw),
+            raw_head=raw[:500],
+            raw_tail=raw[-500:],
+            batch_size=len(texts),
+            output_tokens=getattr(
+                usage_md_local, "candidates_token_count", None
+            ),
+        )
+        parsed = []
 
     from api.services.usage import record_usage
 
