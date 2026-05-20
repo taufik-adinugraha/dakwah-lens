@@ -155,6 +155,15 @@ celery_app.conf.update(
             "task": "api.workers.ingest.trending_ingest",
             "schedule": crontab(minute=0, hour=12),
         },
+        # Daily 06:00 WIB reconcile of Apify's authoritative monthly
+        # spend against our per-run usage_events. Closes the gap between
+        # `run.usageTotalUsd` (best-effort, lags) and Apify's billing
+        # dashboard (truth). After the morning ingests have settled but
+        # before the workday so the cost dashboard reads correctly.
+        "reconcile-apify-costs": {
+            "task": "api.workers.ingest.reconcile_apify_costs",
+            "schedule": crontab(minute=0, hour=6),
+        },
         # Host metrics every minute → drives the superadmin infra chart.
         "snapshot-system": {
             "task": "api.workers.ingest.snapshot_system",

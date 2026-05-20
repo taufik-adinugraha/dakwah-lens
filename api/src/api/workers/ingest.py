@@ -18,7 +18,7 @@ import structlog
 
 from api.scripts import cluster_topics
 from api.scripts import ingest as ingest_script
-from api.services import ingest_queries, ingest_runs, metrics, trending_topics
+from api.services import billing, ingest_queries, ingest_runs, metrics, trending_topics
 from api.workers.celery_app import celery_app
 
 log = structlog.get_logger()
@@ -209,6 +209,21 @@ def recluster_all(min_cluster: int = 5) -> dict[str, int]:
         return out
 
     return asyncio.run(_runner())
+
+
+@celery_app.task(name="api.workers.ingest.reconcile_apify_costs")
+def reconcile_apify_costs() -> dict[str, object]:
+    """Pull Apify's authoritative monthly bill and write a delta row.
+
+    Closes the gap between per-run `usageTotalUsd` (which lags + skips
+    failed runs + rounds small runs to $0) and the real dashboard total.
+    Idempotent — re-runs the same day are no-ops.
+    """
+    try:
+        return asyncio.run(billing.reconcile_apify_monthly())
+    except Exception:
+        log.exception("billing.reconcile_failed")
+        return {"error": "reconcile_failed"}
 
 
 @celery_app.task(name="api.workers.ingest.snapshot_system")
