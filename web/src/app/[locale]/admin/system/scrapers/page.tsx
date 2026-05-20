@@ -114,27 +114,30 @@ export default async function ScrapersPage() {
             via="Apify"
             actor={status.actors.tiktok}
             env="APIFY_ACTOR_TIKTOK"
-            cost="free actor daily · paid actor biweekly adds ~$9/mo"
+            cost="~$17/mo · Tuesday weekly · 49 keys × 20 items × $0.004"
             notes={
               <>
                 <p>
-                  Dual-actor setup. The daily 00:20 WIB sweep uses{" "}
-                  <code>clockworks/free-tiktok-scraper</code> (no per-result
-                  charge — Apify platform may still bill compute time
-                  against your plan credit). Every 1st &amp; 3rd Monday at
-                  00:25 WIB a second sweep fires with{" "}
-                  <code>clockworks/tiktok-scraper</code> (paid, ~$4/1K
-                  results) for richer metadata — the DB upsert on{" "}
-                  <code>(platform, external_id)</code> overwrites that day&apos;s
-                  free-actor payload with the richer one for the same
-                  videos.
+                  Weekly sweep only — fires Tuesday 00:20 WIB via{" "}
+                  <code>clockworks/free-tiktok-scraper</code>. The actor name
+                  is misleading: &quot;free&quot; means free trial, not free
+                  cost. Apify still charges $0.004/result, so a daily sweep
+                  at our 49-keyword pool would cost ~$118/mo and blow the
+                  IDR 1M ($60) budget cap.
                 </p>
                 <p>
-                  Set <code>APIFY_ACTOR_TIKTOK=clockworks/tiktok-scraper</code>{" "}
-                  in <code>.env</code> if you want the paid actor for ALL
-                  runs — but drop the daily TT entry in{" "}
-                  <code>celery_app.py</code> to weekly first, daily paid TT
-                  at the current pool size would cost ~$140/mo.
+                  Crossover math: free actor breaks even with the $45/mo
+                  paid subscription (<code>clockworks/tiktok-scraper</code>)
+                  at ~12 runs/month. Below that, free is cheaper; above
+                  daily cadence, paid wins. At Tue-only (4.3 runs/mo), free
+                  is the right choice.
+                </p>
+                <p>
+                  If you ever want to switch actors, set{" "}
+                  <code>APIFY_ACTOR_TIKTOK=clockworks/tiktok-scraper</code>{" "}
+                  in <code>.env</code>. The paid-actor beat entry was
+                  removed on 2026-05-20 — restore it from git history if
+                  you re-subscribe.
                 </p>
               </>
             }

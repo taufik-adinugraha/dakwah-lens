@@ -49,6 +49,7 @@ export default async function AnalyticsPage() {
     ],
     briefsPerDay,
     topCreators,
+    localeSplit,
   ] = await Promise.all([
     db
       .select({ sessions7d: sql<number>`COUNT(DISTINCT session_id)::int` })
@@ -169,7 +170,22 @@ export default async function AnalyticsPage() {
     `) as unknown as Promise<
       Array<{ user_id: string; label: string; briefs: number }>
     >,
+    // Locale split — which language do real visitors prefer? Counts
+    // DISTINCT sessions per locale across the last 7 days, excluding
+    // /admin and /api so superadmin navigation doesn't dominate.
+    db.execute(sql`
+      SELECT COALESCE(locale, 'unknown') AS locale,
+             COUNT(DISTINCT session_id)::int AS sessions
+      FROM page_views
+      WHERE occurred_at >= now() - interval '7 days'
+        AND path NOT LIKE '/admin%'
+        AND path NOT LIKE '/api%'
+      GROUP BY COALESCE(locale, 'unknown')
+      ORDER BY sessions DESC
+    `) as unknown as Promise<Array<{ locale: string; sessions: number }>>,
   ]);
+
+  const localeTotal = localeSplit.reduce((s, r) => s + r.sessions, 0);
 
   return (
     <>
@@ -215,6 +231,68 @@ export default async function AnalyticsPage() {
           hint="signed-in / total"
         />
       </div>
+
+      {/* Locale split — distinct sessions per language preference. */}
+      {localeTotal > 0 && (
+        <Card
+          title="Language preference · 7d"
+          hint={`${localeTotal.toLocaleString()} distinct sessions`}
+        >
+          <div className="mt-1 flex h-3 overflow-hidden rounded-full">
+            {localeSplit.map((row) => {
+              const pct = (row.sessions / localeTotal) * 100;
+              const color =
+                row.locale === "id"
+                  ? "bg-emerald-500"
+                  : row.locale === "en"
+                    ? "bg-brand-500"
+                    : "bg-slate-300";
+              return (
+                <span
+                  key={row.locale}
+                  className={color}
+                  style={{ width: `${pct}%` }}
+                  title={`${row.locale} · ${pct.toFixed(1)}%`}
+                />
+              );
+            })}
+          </div>
+          <ul className="mt-3 grid gap-2 sm:grid-cols-3">
+            {localeSplit.map((row) => {
+              const pct = (row.sessions / localeTotal) * 100;
+              const label =
+                row.locale === "id"
+                  ? "Bahasa Indonesia"
+                  : row.locale === "en"
+                    ? "English"
+                    : "Unknown / pre-locale";
+              const dotColor =
+                row.locale === "id"
+                  ? "bg-emerald-500"
+                  : row.locale === "en"
+                    ? "bg-brand-500"
+                    : "bg-slate-400";
+              return (
+                <li
+                  key={row.locale}
+                  className="flex items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2 text-xs"
+                >
+                  <span className="inline-flex items-center gap-2 font-medium text-slate-700">
+                    <span
+                      className={`inline-block h-2.5 w-2.5 rounded-full ${dotColor}`}
+                    />
+                    {label}
+                  </span>
+                  <span className="tabular-nums text-slate-600">
+                    {row.sessions.toLocaleString()}{" "}
+                    <span className="text-slate-400">· {pct.toFixed(1)}%</span>
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </Card>
+      )}
 
       <div className="mt-6 grid gap-4 lg:grid-cols-[2fr_1fr]">
         <Card title="Daily traffic (last 14 days)">
