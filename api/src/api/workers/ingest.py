@@ -18,7 +18,14 @@ import structlog
 
 from api.scripts import cluster_topics
 from api.scripts import ingest as ingest_script
-from api.services import billing, ingest_queries, ingest_runs, metrics, trending_topics
+from api.services import (
+    billing,
+    ingest_queries,
+    ingest_runs,
+    insights_summary,
+    metrics,
+    trending_topics,
+)
 from api.workers.celery_app import celery_app
 
 log = structlog.get_logger()
@@ -215,6 +222,22 @@ def recluster_all() -> dict[str, int]:
         return out
 
     return asyncio.run(_runner())
+
+
+@celery_app.task(name="api.workers.ingest.generate_insights_summary")
+def generate_insights_summary() -> dict[str, object]:
+    """Generate the daily executive briefing for /insights.
+
+    Runs at 04:30 WIB — right after the 04:00 Gemini topic-discovery
+    pass so the LLM sees the freshest theme labels. One Gemini 2.5
+    Pro call, ~$0.05–0.10 per run.
+    """
+    try:
+        result = asyncio.run(insights_summary.generate_summary())
+        return result or {"skipped": True}
+    except Exception:
+        log.exception("insights_summary.failed")
+        return {"error": "generate_failed"}
 
 
 @celery_app.task(name="api.workers.ingest.reconcile_apify_costs")

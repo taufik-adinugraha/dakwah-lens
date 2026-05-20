@@ -130,6 +130,14 @@ celery_app.conf.update(
             "task": "api.workers.ingest.recluster_all",
             "schedule": crontab(minute=0, hour=4),
         },
+        # 30 min after recluster, generate the AI-narrated executive
+        # briefing that appears as the hero card on /insights. Reads
+        # the freshly-clustered topic labels so the narrative is in
+        # sync with what the dashboard surfaces below it.
+        "generate-insights-summary": {
+            "task": "api.workers.ingest.generate_insights_summary",
+            "schedule": crontab(minute=30, hour=4),
+        },
         # Trending overlay: fetch Google Trends + YouTube popular + Google
         # News for Indonesia, filter via Gemini Flash-Lite, then dispatch
         # ad-hoc scrapes on the surviving keywords. Runs at 12:00 WIB so

@@ -735,3 +735,32 @@ export const adminLogs = pgTable(
     index("ix_admin_logs_action_time").on(table.action, table.createdAt),
   ],
 );
+
+/**
+ * Daily AI-narrated executive briefing for /insights. One row per
+ * generation. Celery beat `generate_insights_summary` task writes
+ * this at 04:30 WIB after the topic-discovery pass. The /insights
+ * page reads the most-recent row to render the hero card.
+ */
+export const insightsSummaries = pgTable(
+  "insights_summaries",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    generatedAt: timestamp("generated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    periodStart: timestamp("period_start", { withTimezone: true }).notNull(),
+    periodEnd: timestamp("period_end", { withTimezone: true }).notNull(),
+    summaryMd: text("summary_md").notNull(),
+    headlineStats: jsonb("headline_stats")
+      .$type<Record<string, unknown>>()
+      .notNull(),
+    model: text("model").notNull(),
+    tokensIn: integer("tokens_in"),
+    tokensOut: integer("tokens_out"),
+    costUsd: doublePrecision("cost_usd"),
+  },
+  (table) => [
+    index("ix_insights_summaries_generated_at").on(table.generatedAt),
+  ],
+);

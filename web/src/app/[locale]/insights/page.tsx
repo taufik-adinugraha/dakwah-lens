@@ -12,7 +12,11 @@ import {
 import clsx from "clsx";
 
 import { Link } from "@/i18n/navigation";
-import { getOverviewInsights } from "@/lib/insights-data";
+import {
+  getLatestInsightsSummary,
+  getOverviewInsights,
+  type LatestInsightsSummary,
+} from "@/lib/insights-data";
 
 export async function generateMetadata({
   params,
@@ -32,7 +36,10 @@ export default async function InsightsPage({
   // Live aggregation over `social_posts`. Returns null when the pipeline
   // hasn't ingested anything yet — page renders an honest empty state
   // instead of inventing numbers.
-  const overview = await getOverviewInsights();
+  const [overview, summary] = await Promise.all([
+    getOverviewInsights(),
+    getLatestInsightsSummary(),
+  ]);
 
   // Trending topics: Gemini-discovered themes, top 5 by post count.
   // Empty until the nightly re-cluster has run (04:00 WIB).
@@ -98,9 +105,11 @@ export default async function InsightsPage({
         </div>
       </section>
 
+      {summary && <ExecutiveBriefing summary={summary} t={t} locale={locale} />}
+
       <section className="pb-16 sm:pb-20">
         <div className="mx-auto grid max-w-6xl gap-5 px-4 sm:px-6 lg:grid-cols-3">
-          {/* Trending — BERTopic-discovered themes, top 5 by post count.
+          {/* Trending — Gemini-discovered themes, top 5 by post count.
               Empty until the nightly re-cluster has populated `topics`. */}
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-2">
             <div className="flex items-center justify-between">
@@ -266,6 +275,191 @@ export default async function InsightsPage({
 }
 
 type T = Awaited<ReturnType<typeof getTranslations<"Insights">>>;
+
+/* ────────────────────────────────────────────────────────────────
+ * Executive briefing hero — daily AI-narrated summary + pill row.
+ *
+ * Data lives in `insights_summaries`, written by a Celery beat task
+ * at 04:30 WIB after topic discovery. UI is intentionally large +
+ * narrative-first; the existing widgets below act as supporting
+ * detail for anyone who wants to drill in.
+ * ──────────────────────────────────────────────────────────────── */
+function ExecutiveBriefing({
+  summary,
+  t,
+  locale,
+}: {
+  summary: LatestInsightsSummary;
+  t: T;
+  locale: string;
+}) {
+  const stats = summary.headlineStats ?? {};
+  const sentiment = stats.sentiment ?? {};
+  const topCategory = stats.top_categories?.[0];
+  const topTopic = stats.top_topics?.[0];
+  const totals = stats.totals ?? {};
+
+  // Format the generation time as an absolute date — Next.js's
+  // react-hooks purity rule rejects `Date.now()` in server components.
+  // Absolute timestamp is also more accessible / less ambiguous than
+  // "X hours ago" for users in different timezones.
+  const generatedLabel = new Date(summary.generatedAt).toLocaleString(locale, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  return (
+    <section className="pb-12 pt-2 sm:pb-16">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-emerald-50/30 to-brand-50/30 p-6 shadow-sm sm:p-8">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -top-16 -right-12 h-44 w-44 rounded-full bg-emerald-200 opacity-30 blur-3xl"
+          />
+
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+              <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+              {t("exec_briefing_label")}
+            </span>
+            <p className="text-[11px] text-slate-500">
+              {t("exec_briefing_generated", { when: generatedLabel })}
+            </p>
+          </div>
+
+          <p className="mt-5 whitespace-pre-line text-pretty text-base leading-relaxed text-slate-800 sm:text-lg">
+            {summary.summaryMd}
+          </p>
+
+          {/* Numeric pill row */}
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Sentiment pill */}
+            {sentiment.current_pct_negative !== undefined && (
+              <HeadlinePill
+                label={t("exec_pill_concerned")}
+                value={`${Math.round(sentiment.current_pct_negative)}%`}
+                delta={
+                  sentiment.delta_pp_negative !== undefined
+                    ? `${sentiment.delta_pp_negative >= 0 ? "+" : ""}${sentiment.delta_pp_negative.toFixed(1)}pp`
+                    : null
+                }
+                deltaIsBad={(sentiment.delta_pp_negative ?? 0) > 0}
+                accent={
+                  (sentiment.current_pct_negative ?? 0) > 30
+                    ? "amber"
+                    : "slate"
+                }
+              />
+            )}
+
+            {/* Top category pill */}
+            {topCategory && (
+              <HeadlinePill
+                label={t("exec_pill_top_category")}
+                value={localizeCategory(t, topCategory.category)}
+                hint={`${Math.round(topCategory.share_pct)}% share`}
+                delta={
+                  topCategory.delta_pp
+                    ? `${topCategory.delta_pp >= 0 ? "+" : ""}${topCategory.delta_pp.toFixed(1)}pp`
+                    : null
+                }
+                deltaIsBad={false}
+                accent="brand"
+              />
+            )}
+
+            {/* Top topic pill */}
+            {topTopic && (
+              <HeadlinePill
+                label={t("exec_pill_top_topic")}
+                value={topTopic.label}
+                hint={`${topTopic.post_count.toLocaleString(locale)} posts · ${topTopic.platform}`}
+                delta={null}
+                deltaIsBad={false}
+                accent="emerald"
+              />
+            )}
+
+            {/* Volume pill */}
+            {totals.posts_7d !== undefined && (
+              <HeadlinePill
+                label={t("exec_pill_volume")}
+                value={(totals.posts_7d ?? 0).toLocaleString(locale)}
+                hint={t("exec_pill_volume_hint")}
+                delta={
+                  totals.delta_pct != null
+                    ? `${totals.delta_pct >= 0 ? "+" : ""}${totals.delta_pct.toFixed(0)}%`
+                    : null
+                }
+                deltaIsBad={false}
+                accent="slate"
+              />
+            )}
+          </div>
+
+          <p className="mt-5 text-[10px] text-slate-400">
+            {t("exec_briefing_model_credit", { model: summary.model })}
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HeadlinePill({
+  label,
+  value,
+  hint,
+  delta,
+  deltaIsBad,
+  accent,
+}: {
+  label: string;
+  value: string;
+  hint?: string;
+  delta: string | null;
+  deltaIsBad: boolean;
+  accent: "brand" | "emerald" | "amber" | "slate";
+}) {
+  const accentBg = {
+    brand: "bg-brand-50/70 ring-brand-100",
+    emerald: "bg-emerald-50/70 ring-emerald-100",
+    amber: "bg-amber-50/70 ring-amber-100",
+    slate: "bg-white ring-slate-200",
+  }[accent];
+
+  return (
+    <div
+      className={`rounded-xl p-3 ring-1 ${accentBg}`}
+    >
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+        {label}
+      </p>
+      <div className="mt-1 flex items-baseline gap-2">
+        <p className="truncate text-base font-bold text-slate-900 sm:text-lg">
+          {value}
+        </p>
+        {delta && (
+          <span
+            className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold tabular-nums ${
+              deltaIsBad
+                ? "bg-amber-100 text-amber-800"
+                : "bg-emerald-100 text-emerald-800"
+            }`}
+          >
+            {delta}
+          </span>
+        )}
+      </div>
+      {hint && (
+        <p className="mt-0.5 truncate text-[11px] text-slate-500">{hint}</p>
+      )}
+    </div>
+  );
+}
 
 // Visual config per platform. Wired from real DB data (post counts,
 // top topic, top category) — no hardcoded percentages anymore.

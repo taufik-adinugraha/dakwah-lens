@@ -318,6 +318,63 @@ export type OverviewInsights = {
   }>;
 };
 
+export type LatestInsightsSummary = {
+  generatedAt: Date;
+  periodStart: Date;
+  periodEnd: Date;
+  summaryMd: string;
+  headlineStats: {
+    totals?: {
+      posts_7d?: number;
+      posts_prev_7d?: number;
+      delta_pct?: number | null;
+    };
+    sentiment?: {
+      current_pct_negative?: number;
+      current_pct_neutral?: number;
+      current_pct_positive?: number;
+      baseline_pct_negative?: number;
+      delta_pp_negative?: number;
+    };
+    top_categories?: Array<{
+      category: string;
+      posts: number;
+      share_pct: number;
+      delta_pp: number;
+    }>;
+    top_topics?: Array<{
+      label: string;
+      platform: string;
+      keywords: string[];
+      post_count: number;
+    }>;
+    platforms?: Array<{ platform: string; posts: number }>;
+  };
+  model: string;
+};
+
+/** Most-recent AI-narrated executive briefing — null if the table is
+ *  empty (briefing job hasn't fired yet). */
+export async function getLatestInsightsSummary(): Promise<LatestInsightsSummary | null> {
+  const [row] = await db
+    .select({
+      generatedAt: schema.insightsSummaries.generatedAt,
+      periodStart: schema.insightsSummaries.periodStart,
+      periodEnd: schema.insightsSummaries.periodEnd,
+      summaryMd: schema.insightsSummaries.summaryMd,
+      headlineStats: schema.insightsSummaries.headlineStats,
+      model: schema.insightsSummaries.model,
+    })
+    .from(schema.insightsSummaries)
+    .orderBy(desc(schema.insightsSummaries.generatedAt))
+    .limit(1);
+  if (!row) return null;
+  return {
+    ...row,
+    headlineStats: row.headlineStats as LatestInsightsSummary["headlineStats"],
+  };
+}
+
 export async function getOverviewInsights(): Promise<OverviewInsights | null> {
   const [{ totalPosts = 0 } = { totalPosts: 0 }] = (await db
     .select({ totalPosts: count() })
