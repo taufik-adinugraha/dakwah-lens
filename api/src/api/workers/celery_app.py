@@ -50,7 +50,12 @@ celery_app.conf.update(
         # platform, balancing freshness against Apify cost / free-actor
         # rate limits:
         #   YT (every day)             — free (YouTube Data API)
-        #   TT (every day)             — free actor (clockworks/free-...)
+        #   TT (Tue only)              — clockworks/free-tiktok-scraper.
+        #                                "Free" is the product NAME, not the
+        #                                cost: Apify still charges compute
+        #                                (~$0.08/run × 49 keys = ~$3.92/run).
+        #                                Cut from daily to weekly to keep
+        #                                inside the IDR 1M ($60/mo) cap.
         #   TT (every 2 weeks, paid)   — clockworks/tiktok-scraper $4/1K,
         #                                richer metadata, 1st + 3rd Mon
         #   X  (Mon, Wed, Fri)         — apidojo $0.40/1K
@@ -65,23 +70,21 @@ celery_app.conf.update(
         # Starting at midnight gives a generous buffer before the 08:00
         # WIB BERTopic recluster picks up the fresh material.
         #
-        # On TT-paid weeks, the paid run lands at 00:25 — between the
-        # daily TT free run (00:20) and IG (00:30). The DB upserts on
-        # (platform, external_id), so the paid run's richer payload
-        # OVERWRITES the free run's lighter data for the same videos.
-        # On other days/weeks, only the free actor runs.
+        # The TT-paid biweekly run lands on Monday — separate from the
+        # weekly free run on Tuesday — so the two never collide on the
+        # same day. DB upserts on (platform, external_id) anyway, so a
+        # collision would be safe (richer payload wins).
         #
-        # Cost at the current ~58-keyword pool × ~20 posts/keyword =
-        # ~1.16K results per run:
-        #   YT 7×/wk × 1.16K → free
-        #   TT 7×/wk × 1.16K (free actor) → $0
-        #   TT 2×/mo × 1.16K (paid actor) → ~$9.3/mo @ $4/1K
-        #   X  3×/wk × 1.16K → ~$6.0/mo @ $0.40/1K
-        #   IG 1×/wk × 1.16K → ~$11.5/mo @ $2.30/1K
-        # Subtotal sweep: ~$26.8/mo. Add daily trending overlay
-        # (~$1.4/mo with free TT) → ~$28/mo total Apify usage —
-        # comfortably inside Starter credits. Track real costs at
-        # /admin/system/api-costs.
+        # Cost at the current ~49-keyword pool × ~20 posts/keyword =
+        # ~980 results per run:
+        #   YT 7×/wk × 980 → free
+        #   TT 1×/wk (free actor) → ~$17/mo  (49 × $0.08 × ~4.3 wk/mo)
+        #   TT 2×/mo (paid actor) → ~$8/mo @ $4/1K
+        #   X  3×/wk × 980 → ~$5/mo @ $0.40/1K
+        #   IG 1×/wk × 980 → ~$10/mo @ $2.30/1K
+        # Subtotal sweep: ~$40/mo. Add daily trending overlay (~$1.4/mo)
+        # → ~$41/mo total Apify usage. Inside the IDR 1M ($60) cap.
+        # Track real costs at /admin/system/api-costs.
         "ingest-youtube": {
             "task": "api.workers.ingest.rotating_ingest",
             "schedule": crontab(minute=0, hour=0),  # daily
@@ -104,7 +107,10 @@ celery_app.conf.update(
         },
         "ingest-tiktok": {
             "task": "api.workers.ingest.rotating_ingest",
-            "schedule": crontab(minute=20, hour=0),  # daily — free actor
+            # Tuesday only — was daily, but the "free" actor isn't free
+            # (~$3.92/run × 7 days = ~$118/mo, blowing the IDR 1M cap).
+            # Tue picked to avoid colliding with Mon (X + IG + TT-paid).
+            "schedule": crontab(minute=20, hour=0, day_of_week=2),
             "kwargs": {"platform": "tiktok", "limit": 20, "n_keywords": 999},
         },
         "ingest-tiktok-paid": {
