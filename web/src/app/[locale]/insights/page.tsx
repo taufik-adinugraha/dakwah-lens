@@ -107,6 +107,34 @@ export default async function InsightsPage({
 
       {summary && <ExecutiveBriefing summary={summary} t={t} locale={locale} />}
 
+      {/* Audience-segment chips. Each links to /insights/segment/X
+          for a filtered view (e.g. "just family + youth chatter"). */}
+      <section className="pb-2 pt-2">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+            {t("segments_chip_label")}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {(
+              [
+                { focus: "spiritual", label: t("segment_spiritual_title"), tone: "bg-emerald-50 text-emerald-800 ring-emerald-100" },
+                { focus: "family", label: t("segment_family_title"), tone: "bg-rose-50 text-rose-800 ring-rose-100" },
+                { focus: "youth", label: t("segment_youth_title"), tone: "bg-cyan-50 text-cyan-800 ring-cyan-100" },
+                { focus: "justice", label: t("segment_justice_title"), tone: "bg-amber-50 text-amber-800 ring-amber-100" },
+              ] as const
+            ).map((s) => (
+              <Link
+                key={s.focus}
+                href={`/insights/segment/${s.focus}`}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ring-1 transition hover:-translate-y-0.5 hover:shadow-sm ${s.tone}`}
+              >
+                {s.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="pb-16 sm:pb-20">
         <div className="mx-auto grid max-w-6xl gap-5 px-4 sm:px-6 lg:grid-cols-3">
           {/* Trending — Gemini-discovered themes, top 5 by post count.

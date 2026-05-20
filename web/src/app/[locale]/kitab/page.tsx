@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { BookOpen, Search, ShieldCheck, Sparkles } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
+import { CitationShare } from "@/components/CitationShare";
 import {
   getKitabCounts,
   searchKitabBrowse,
@@ -302,6 +303,11 @@ function Results({
                     {h.translation}
                   </p>
                 )}
+                <CitationShare
+                  arabic={h.arabic}
+                  translation={h.translation}
+                  citation={h.citation}
+                />
               </li>
             ))}
           </ul>
