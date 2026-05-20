@@ -16,11 +16,34 @@ that needs touching.
 
 from __future__ import annotations
 
+import html
+import re
 from collections.abc import Callable
 from datetime import UTC, datetime
 from typing import Any
 
+from bs4 import BeautifulSoup
+
 NormalizerFn = Callable[[dict[str, Any]], dict[str, Any] | None]
+
+_WHITESPACE_RE = re.compile(r"[ \t ]+")
+_NEWLINES_RE = re.compile(r"\n{3,}")
+
+
+def _strip_html(text: str) -> str:
+    """Strip HTML tags + decode entities from an RSS summary.
+
+    Republika and a few other Indonesian outlets ship summaries that lead
+    with `<img …>` and pepper the body with `&nbsp;`/`&ndash;`. Feeding
+    that raw to IndoBERT eats the 512-token budget on markup and biases
+    the classifier toward neutral. Pure text in, no HTML, no entities.
+    """
+    if "<" in text or "&" in text:
+        text = BeautifulSoup(text, "html.parser").get_text(separator=" ")
+        text = html.unescape(text)
+    text = _WHITESPACE_RE.sub(" ", text)
+    text = _NEWLINES_RE.sub("\n\n", text)
+    return text.strip()
 
 
 def _to_datetime(value: Any) -> datetime | None:
@@ -298,15 +321,22 @@ def normalize_mainstream(item: dict[str, Any]) -> dict[str, Any] | None:
     if not (isinstance(title, str) and title.strip()):
         return None
 
-    text = title.strip()
+    # Strip any HTML tags + decode entities. Republika and a few others
+    # inject `<img>` and `&nbsp;` into the summary, which biases IndoBERT
+    # toward neutral. Trafilatura output (`_full_text`) is already plain
+    # text — `_strip_html` is a cheap no-op on those.
+    title_clean = _strip_html(title)
+    if not title_clean:
+        return None
+
+    text = title_clean
     body_source = (
         full_text if isinstance(full_text, str) and full_text.strip() else summary
     )
     if isinstance(body_source, str) and body_source.strip():
-        # Some feeds put raw HTML in summary; trafilatura output is already
-        # clean text. Either way, we don't strip further — classifiers
-        # tolerate light HTML noise.
-        text = f"{title.strip()}\n\n{body_source.strip()}"
+        body_clean = _strip_html(body_source)
+        if body_clean:
+            text = f"{title_clean}\n\n{body_clean}"
 
     external_id = item.get("id") or item.get("link")
     if not external_id:
