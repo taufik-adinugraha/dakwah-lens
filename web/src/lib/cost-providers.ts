@@ -22,14 +22,17 @@ export function isKnownProvider(value: string): value is KnownProvider {
 }
 
 /** Pretty label for UI use. Falls back to the raw value (e.g. "rss")
- *  if it isn't in the known list. */
+ *  if it isn't in the known list. Labels include the typical
+ *  subscription tier where the admin is most likely to select this
+ *  provider for a manual-cost entry — so the dropdown is unambiguous
+ *  about what monthly fee they're recording. */
 const PROVIDER_LABELS: Record<KnownProvider, string> = {
-  apify: "Apify",
-  openai: "OpenAI",
-  anthropic: "Anthropic (Claude)",
-  gemini: "Gemini",
-  youtube: "YouTube Data API",
-  resend: "Resend",
+  apify: "Apify Starter ($29/mo)",
+  openai: "OpenAI (pay-as-you-go)",
+  anthropic: "Anthropic / Claude (pay-as-you-go)",
+  gemini: "Gemini (pay-as-you-go)",
+  youtube: "YouTube Data API (free tier)",
+  resend: "Resend (free tier / $20 Pro)",
 };
 
 export function providerLabel(value: string | null | undefined): string {
