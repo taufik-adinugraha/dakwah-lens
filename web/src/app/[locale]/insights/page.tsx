@@ -12,6 +12,7 @@ import {
 import clsx from "clsx";
 
 import { Link } from "@/i18n/navigation";
+import { getOverviewInsights } from "@/lib/insights-data";
 
 export async function generateMetadata({
   params,
@@ -28,24 +29,49 @@ export default async function InsightsPage({
   setRequestLocale(locale);
 
   const t = await getTranslations("Insights");
+  // Live aggregation over `social_posts`. Returns null when the pipeline
+  // hasn't ingested anything yet — page renders an honest empty state
+  // instead of inventing numbers.
+  const overview = await getOverviewInsights();
 
-  const trendingRows = [
-    { title: t("trending_row_1"), tag: t("trending_row_1_tag"), volume: "12.4K", relevance: 92, spark: [40, 50, 60, 55, 70, 78, 82] },
-    { title: t("trending_row_2"), tag: t("trending_row_2_tag"), volume: "8.1K", relevance: 81, spark: [20, 30, 28, 40, 55, 60, 68] },
-    { title: t("trending_row_3"), tag: t("trending_row_3_tag"), volume: "6.7K", relevance: 88, spark: [55, 50, 60, 65, 60, 62, 70] },
-    { title: t("trending_row_4"), tag: t("trending_row_4_tag"), volume: "5.3K", relevance: 64, spark: [25, 30, 35, 40, 38, 42, 48] },
-    { title: t("trending_row_5"), tag: t("trending_row_5_tag"), volume: "4.2K", relevance: 76, spark: [30, 32, 30, 28, 35, 40, 45] },
-  ];
+  // Trending topics: BERTopic-discovered themes, top 5 by post count.
+  // Empty until the nightly re-cluster has run (08:00 WIB).
+  const trendingRows = overview?.trendingTopics ?? [];
 
-  const categories = [
-    { label: t("category_akhlaq"), volume: 4280, tone: "bg-brand-500" },
-    { label: t("category_muamalah"), volume: 3120, tone: "bg-emerald-500" },
-    { label: t("category_tarbiyah"), volume: 2750, tone: "bg-cyan-500" },
-    { label: t("category_sosial"), volume: 1980, tone: "bg-amber-500" },
-    { label: t("category_aqidah"), volume: 1430, tone: "bg-rose-500" },
-    { label: t("category_ibadah"), volume: 980, tone: "bg-violet-500" },
+  // Top dominant da'wah categories, color-cycled for visual variety.
+  const CATEGORY_TONES = [
+    "bg-brand-500",
+    "bg-emerald-500",
+    "bg-cyan-500",
+    "bg-amber-500",
+    "bg-rose-500",
+    "bg-violet-500",
   ];
-  const catMax = Math.max(...categories.map((c) => c.volume));
+  const categories = (overview?.dominantCategories ?? [])
+    .slice(0, 6)
+    .map((c, i) => ({
+      label: localizeCategory(t, c.category),
+      volume: c.posts,
+      tone: CATEGORY_TONES[i % CATEGORY_TONES.length],
+    }));
+  const catMax = categories.length
+    ? Math.max(...categories.map((c) => c.volume))
+    : 1;
+
+  // Sentiment percentages — guarded against divide-by-zero pre-ingest.
+  const mix = overview?.sentimentMix ?? {
+    positive: 0,
+    neutral: 0,
+    negative: 0,
+  };
+  const sentimentTotal = mix.positive + mix.neutral + mix.negative;
+  const sentimentPct = {
+    positive: sentimentTotal ? (mix.positive / sentimentTotal) * 100 : 0,
+    neutral: sentimentTotal ? (mix.neutral / sentimentTotal) * 100 : 0,
+    negative: sentimentTotal ? (mix.negative / sentimentTotal) * 100 : 0,
+  };
+
+  const totalPosts = overview?.totalPosts ?? 0;
 
   return (
     <>
@@ -74,7 +100,8 @@ export default async function InsightsPage({
 
       <section className="pb-16 sm:pb-20">
         <div className="mx-auto grid max-w-6xl gap-5 px-4 sm:px-6 lg:grid-cols-3">
-          {/* Trending */}
+          {/* Trending — BERTopic-discovered themes, top 5 by post count.
+              Empty until the nightly re-cluster has populated `topics`. */}
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-2">
             <div className="flex items-center justify-between">
               <h2 className="text-balance text-base font-semibold text-slate-900 sm:text-lg">
@@ -82,65 +109,111 @@ export default async function InsightsPage({
               </h2>
               <TrendingUp className="h-4 w-4 text-brand-600" />
             </div>
-            <div className="mt-4 overflow-hidden rounded-lg border border-slate-200">
-              {trendingRows.map((r, i) => (
-                <div
-                  key={r.title}
-                  className={`grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 px-3 py-2.5 ${i > 0 ? "border-t border-slate-100" : ""}`}
-                >
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-slate-800">
-                      {r.title}
-                    </p>
-                    <p className="text-[11px] text-slate-500">{r.tag}</p>
+            {trendingRows.length === 0 ? (
+              <div className="mt-4 rounded-lg border border-dashed border-slate-200 bg-slate-50/60 p-6 text-center text-xs text-slate-500">
+                {t("how_coverage_posts_empty")}
+              </div>
+            ) : (
+              <div className="mt-4 overflow-hidden rounded-lg border border-slate-200">
+                {trendingRows.map((r, i) => (
+                  <div
+                    key={r.id}
+                    className={`grid grid-cols-[1fr_auto] items-center gap-3 px-3 py-2.5 ${i > 0 ? "border-t border-slate-100" : ""}`}
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-slate-800">
+                        {r.label}
+                      </p>
+                      <p className="truncate text-[11px] text-slate-500">
+                        {r.keywords.slice(0, 4).join(" · ") || r.platform}
+                      </p>
+                    </div>
+                    <span className="text-xs tabular-nums text-slate-600">
+                      {r.postCount.toLocaleString()}
+                    </span>
                   </div>
-                  <span className="hidden text-xs tabular-nums text-slate-600 sm:inline">
-                    {r.volume}
-                  </span>
-                  <span className="inline-flex items-center rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-semibold text-brand-700">
-                    {r.relevance}
-                  </span>
-                  <Sparkline points={r.spark} />
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Sentiment */}
+          {/* Sentiment + categories */}
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <h2 className="text-balance text-base font-semibold text-slate-900 sm:text-lg">
               {t("section_sentiment")}
             </h2>
-            <div className="mt-4 flex h-3 overflow-hidden rounded-full">
-              <span className="bg-emerald-500" style={{ width: "48%" }} />
-              <span className="bg-slate-300" style={{ width: "30%" }} />
-              <span className="bg-amber-500" style={{ width: "22%" }} />
-            </div>
-            <div className="mt-4 space-y-2 text-xs">
-              <SentimentRow color="bg-emerald-500" pct="48%" label="Positive" />
-              <SentimentRow color="bg-slate-300" pct="30%" label="Neutral" />
-              <SentimentRow color="bg-amber-500" pct="22%" label="Concerned" />
-            </div>
+            {sentimentTotal === 0 ? (
+              <div className="mt-4 rounded-lg border border-dashed border-slate-200 bg-slate-50/60 p-4 text-center text-xs text-slate-500">
+                {t("how_coverage_posts_empty")}
+              </div>
+            ) : (
+              <>
+                <div className="mt-4 flex h-3 overflow-hidden rounded-full">
+                  <span
+                    className="bg-emerald-500"
+                    style={{ width: `${sentimentPct.positive}%` }}
+                  />
+                  <span
+                    className="bg-slate-300"
+                    style={{ width: `${sentimentPct.neutral}%` }}
+                  />
+                  <span
+                    className="bg-amber-500"
+                    style={{ width: `${sentimentPct.negative}%` }}
+                  />
+                </div>
+                <div className="mt-4 space-y-2 text-xs">
+                  <SentimentRow
+                    color="bg-emerald-500"
+                    pct={`${Math.round(sentimentPct.positive)}%`}
+                    label={t("live_sentiment_positive")}
+                  />
+                  <SentimentRow
+                    color="bg-slate-300"
+                    pct={`${Math.round(sentimentPct.neutral)}%`}
+                    label={t("live_sentiment_neutral")}
+                  />
+                  <SentimentRow
+                    color="bg-amber-500"
+                    pct={`${Math.round(sentimentPct.negative)}%`}
+                    label={t("live_sentiment_concerned")}
+                  />
+                </div>
+              </>
+            )}
 
             <h3 className="mt-6 text-balance text-base font-semibold text-slate-900 sm:text-lg">
               {t("section_categories")}
             </h3>
-            <div className="mt-3 space-y-2">
-              {categories.map((c) => (
-                <div key={c.label} className="text-xs">
-                  <div className="mb-1 flex items-center justify-between text-[11px] text-slate-600">
-                    <span>{c.label}</span>
-                    <span className="tabular-nums">{c.volume}</span>
+            {categories.length === 0 ? (
+              <div className="mt-3 rounded-lg border border-dashed border-slate-200 bg-slate-50/60 p-4 text-center text-xs text-slate-500">
+                {t("how_coverage_posts_empty")}
+              </div>
+            ) : (
+              <div className="mt-3 space-y-2">
+                {categories.map((c) => (
+                  <div key={c.label} className="text-xs">
+                    <div className="mb-1 flex items-center justify-between text-[11px] text-slate-600">
+                      <span>{c.label}</span>
+                      <span className="tabular-nums">
+                        {c.volume.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
+                      <div
+                        className={`h-full rounded-full ${c.tone}`}
+                        style={{ width: `${(c.volume / catMax) * 100}%` }}
+                      />
+                    </div>
                   </div>
-                  <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
-                    <div
-                      className={`h-full rounded-full ${c.tone}`}
-                      style={{ width: `${(c.volume / catMax) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
+            {totalPosts > 0 && (
+              <p className="mt-4 text-[10px] text-slate-400">
+                {totalPosts.toLocaleString()} posts ingested
+              </p>
+            )}
           </div>
         </div>
 
@@ -435,25 +508,6 @@ function SentimentRow({
   );
 }
 
-function Sparkline({ points }: { points: number[] }) {
-  const w = 56;
-  const h = 18;
-  const max = Math.max(...points);
-  const min = Math.min(...points);
-  const range = Math.max(1, max - min);
-  const step = w / (points.length - 1);
-  const path = points
-    .map((p, i) => `${i === 0 ? "M" : "L"}${i * step},${h - ((p - min) / range) * h}`)
-    .join(" ");
-  return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="text-emerald-500">
-      <path
-        d={path}
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={1.5}
-        strokeLinecap="round"
-      />
-    </svg>
-  );
+function localizeCategory(t: T, category: string): string {
+  return t(`dawah_category_${category}` as Parameters<typeof t>[0]);
 }
