@@ -13,6 +13,7 @@ import {
   type KitabCorpus,
   type KitabHit,
 } from "@/lib/kitab-retrieval";
+import { KitabPill } from "./KitabPill";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -81,10 +82,19 @@ export async function generateMetadata({
   return { title: t("page_title") };
 }
 
-function parseCorpusSelection(raw: string | undefined): KitabCorpus[] {
+function parseCorpusSelection(
+  raw: string | string[] | undefined,
+): KitabCorpus[] {
   if (!raw) return ALL_CORPORA;
-  const requested = raw
-    .split(",")
+  // Multi-checkbox forms submit as `?kitab=a&kitab=b&kitab=c`, which
+  // Next.js surfaces as `string[]`. Single-value or comma-delimited
+  // links still work for shareable URLs. Previously we only handled
+  // `typeof string`, which meant any multi-select fell through to
+  // ALL_CORPORA — making the filter look broken on the public page.
+  const tokens = Array.isArray(raw)
+    ? raw.flatMap((s) => s.split(","))
+    : raw.split(",");
+  const requested = tokens
     .map((s) => s.trim())
     .filter((s) => (ALL_CORPORA as string[]).includes(s)) as KitabCorpus[];
   return requested.length === 0 ? ALL_CORPORA : requested;
@@ -105,9 +115,9 @@ export default async function KitabPage({
 
   const query =
     typeof search.q === "string" ? search.q.trim().slice(0, 200) : "";
-  const corporaSelection = parseCorpusSelection(
-    typeof search.kitab === "string" ? search.kitab : undefined,
-  );
+  // `search.kitab` can be a string OR string[] (multi-checkbox forms
+  // produce arrays). `parseCorpusSelection` handles both shapes.
+  const corporaSelection = parseCorpusSelection(search.kitab);
 
   // Always show kitab counts so visitors see what's actually embedded.
   const counts = await getKitabCounts();
@@ -228,28 +238,13 @@ function SearchForm({
                 selected.has(c);
               const count = counts[c] ?? 0;
               return (
-                <label
+                <KitabPill
                   key={c}
-                  className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 transition ${
-                    isOn
-                      ? "border-emerald-300 bg-emerald-50 text-emerald-800"
-                      : "border-slate-200 bg-white text-slate-500"
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    name="kitab"
-                    value={c}
-                    defaultChecked={isOn}
-                    className="hidden"
-                  />
-                  <span className="font-medium">{t(KITAB_META[c].labelKey as Parameters<typeof t>[0])}</span>
-                  {count > 0 && (
-                    <span className="text-[10px] tabular-nums text-slate-500">
-                      {count.toLocaleString()}
-                    </span>
-                  )}
-                </label>
+                  corpusKey={c}
+                  label={t(KITAB_META[c].labelKey as Parameters<typeof t>[0])}
+                  count={count}
+                  initialChecked={isOn}
+                />
               );
             })}
             <span className="ml-auto text-[11px] text-slate-400">

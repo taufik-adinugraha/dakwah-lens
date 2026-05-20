@@ -41,7 +41,7 @@ from api.services.normalizers import NORMALIZERS
 from api.services.relevance import classify_batch as classify_relevance
 from api.services.rss import scrape_mainstream
 from api.services.sentiment import classify_batch as classify_sentiment
-from api.services.youtube import scrape_youtube
+from api.services.youtube import scrape_youtube, scrape_youtube_uploads
 
 log = structlog.get_logger()
 
@@ -71,10 +71,24 @@ def _scrape(
 
 
 async def _run(
-    platform: str, query: str, limit: int, *, actor_id: str | None = None
+    platform: str,
+    query: str,
+    limit: int,
+    *,
+    actor_id: str | None = None,
+    channel_id: str | None = None,
 ) -> int:
-    # 1. Scrape
-    result = _scrape(platform, query, limit, actor_id=actor_id)
+    # 1. Scrape — two YouTube paths: channel-based (whitelisted uploads
+    # via playlistItems.list, 1 quota unit) and keyword search.list
+    # (100 units). `channel_id` opts into the cheap, curated path; when
+    # NULL we fall back to the legacy `_scrape()` dispatcher which
+    # routes by `platform`.
+    if channel_id and platform == "youtube":
+        result = scrape_youtube_uploads(
+            channel_id, max_items=limit, channel_name=query or None
+        )
+    else:
+        result = _scrape(platform, query, limit, actor_id=actor_id)
     cost = result.cost_usd or 0
     dur = result.duration_s or 0
     print(f"✓ Apify pulled {len(result.items)} items (cost ${cost:.4f}, {dur:.1f}s)")

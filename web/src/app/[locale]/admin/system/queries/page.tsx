@@ -19,7 +19,11 @@ import {
 import { ConfirmForm } from "../_ConfirmForm";
 import { QuerySearchForm } from "./QuerySearchForm";
 
-const PLATFORMS = ["x", "instagram", "tiktok", "youtube"] as const;
+// YouTube migrated to a curated channel whitelist on 2026-05-20 — see
+// /admin/system/youtube-channels. The legacy `youtube` rows are still
+// in `ingest_queries` (no beat fires them) so disabling shows them as
+// "not currently used" rather than deleting history.
+const PLATFORMS = ["x", "instagram", "tiktok"] as const;
 const CATEGORIES = [
   "religious",
   "family",
@@ -143,7 +147,12 @@ export default async function QueriesPage({
   // category first (per request), then platform + query alphabetically
   // within each category. NULL categories fall to the end via
   // PostgreSQL's default ASC NULLS LAST.
-  const conditions: SQL[] = [];
+  //
+  // Note: legacy `youtube` rows are hidden here — YT switched to a
+  // curated channel whitelist on 2026-05-20, so keyword queries for
+  // that platform no longer drive any beat task. Rows stay in DB for
+  // history but don't show up in the admin grid.
+  const conditions: SQL[] = [sql`platform != 'youtube'`];
   if (platformFilter !== "all") {
     conditions.push(eq(schema.ingestQueries.platform, platformFilter));
   }
@@ -242,7 +251,7 @@ export default async function QueriesPage({
                     type="checkbox"
                     name="platforms"
                     value={p}
-                    defaultChecked={p !== "youtube"}
+                    defaultChecked
                     className="h-3.5 w-3.5 rounded border-slate-300"
                   />
                   <span className="capitalize">{p}</span>
@@ -250,8 +259,9 @@ export default async function QueriesPage({
               ))}
             </div>
             <p className="mt-1 text-[10px] text-slate-500">
-              YouTube is unchecked by default — its content tends to be
-              channel-driven, so it benefits from a narrower keyword set.
+              YouTube migrated to the curated channel whitelist on
+              2026-05-20 and isn&apos;t scraped via keywords anymore — see{" "}
+              <code>/admin/system/youtube-channels</code>.
             </p>
           </fieldset>
           <div className="flex justify-end">

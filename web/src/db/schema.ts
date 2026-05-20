@@ -411,6 +411,38 @@ export const rssFeeds = pgTable(
   ],
 );
 
+/**
+ * Whitelisted YouTube channels — replaces keyword search.list for YT
+ * (100× cheaper on quota via playlistItems.list on the channel's
+ * uploads playlist). One row per curated channel. `category` is one
+ * of the 8 buckets: religious, family, youth, muamalah, social_justice,
+ * health, education, cultural.
+ */
+export const youtubeChannels = pgTable(
+  "youtube_channels",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    channelId: text("channel_id").notNull().unique(),
+    name: text("name").notNull(),
+    handle: text("handle"),
+    category: text("category").notNull(),
+    enabled: boolean("enabled").notNull().default(true),
+    lastRunAt: timestamp("last_run_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => [
+    index("ix_youtube_channels_category_enabled").on(
+      table.category,
+      table.enabled,
+    ),
+  ],
+);
+
 export const manualCosts = pgTable(
   "manual_costs",
   {
@@ -692,6 +724,7 @@ export type UsageEvent = typeof usageEvents.$inferSelect;
 export type SystemMetric = typeof systemMetrics.$inferSelect;
 export type IngestRun = typeof ingestRuns.$inferSelect;
 export type RssFeed = typeof rssFeeds.$inferSelect;
+export type YoutubeChannel = typeof youtubeChannels.$inferSelect;
 export type ManualCost = typeof manualCosts.$inferSelect;
 export type PageView = typeof pageViews.$inferSelect;
 export type AppSetting = typeof appSettings.$inferSelect;

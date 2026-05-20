@@ -85,10 +85,17 @@ celery_app.conf.update(
         # Subtotal sweep: ~$32/mo. Add trending overlay (X only, ~$0.1)
         # → ~$32/mo total Apify usage. Inside the IDR 1M ($60) cap.
         # Track real costs at /admin/system/api-costs.
-        "ingest-youtube": {
-            "task": "api.workers.ingest.rotating_ingest",
-            "schedule": crontab(minute=0, hour=0),  # daily
-            "kwargs": {"platform": "youtube", "limit": 20, "n_keywords": 999},
+        "ingest-youtube-channels": {
+            "task": "api.workers.ingest.youtube_channels_ingest",
+            "schedule": crontab(minute=0, hour=0),  # daily, midnight WIB
+            # Pull up to 50 most-recent uploads per whitelisted channel
+            # (50 = YT Data API per-call max for playlistItems.list,
+            # which costs 1 quota unit regardless of maxResults). With
+            # ~80 channels in the whitelist this burns ~80 units/day —
+            # under 1% of the 10K free tier. The classifier dedup pass
+            # in `_run` step 3a means we only pay Gemini for actually-new
+            # uploads, which is usually a tiny fraction.
+            "kwargs": {"limit": 50},
         },
         "ingest-x-mon": {
             "task": "api.workers.ingest.rotating_ingest",

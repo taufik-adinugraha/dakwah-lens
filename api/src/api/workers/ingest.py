@@ -13,6 +13,7 @@ items scraped, duration, error).
 from __future__ import annotations
 
 import asyncio
+from datetime import UTC, datetime
 
 import structlog
 
@@ -39,12 +40,17 @@ def run_ingest(
     query: str,
     limit: int = 20,
     actor_id: str | None = None,
+    channel_id: str | None = None,
 ) -> int:
     """Scrape + classify + upsert one platform. Returns post count.
 
     `actor_id` overrides the Apify default for the given platform — used
     by the weekly TT paid task to scrape with the richer-metadata actor
     on Mondays while daily runs use the free actor.
+
+    `channel_id` (YouTube only) routes this task through the curated
+    playlistItems.list path instead of keyword search.list — 100×
+    cheaper on YT quota. `query` becomes a display name in that path.
 
     Errors auto-retry with exponential backoff. Most failures we've seen are
     transient (Apify rate-limit, RSS outlet 5xx, Gemini quota) and resolve
@@ -58,7 +64,13 @@ def run_ingest(
             task_name="run_ingest", platform=platform
         )
         try:
-            n = await ingest_script._run(platform, query, limit, actor_id=actor_id)
+            n = await ingest_script._run(
+                platform,
+                query,
+                limit,
+                actor_id=actor_id,
+                channel_id=channel_id,
+            )
             await ingest_runs.finish_run(
                 run_id, status="success", items_stored=n, items_scraped=n
             )
@@ -72,7 +84,12 @@ def run_ingest(
     try:
         return asyncio.run(_runner())
     except Exception as exc:
-        log.exception("ingest.task_failed", platform=platform, query=query)
+        log.exception(
+            "ingest.task_failed",
+            platform=platform,
+            query=query,
+            channel_id=channel_id,
+        )
         raise self.retry(exc=exc, countdown=300 * (2**self.request.retries)) from exc
 
 
@@ -141,6 +158,75 @@ def rotating_ingest(
         "actor_id": actor_id,
         "dispatched": len(picked),
         "keywords": [q for _, q in picked],
+    }
+
+
+@celery_app.task(
+    name="api.workers.ingest.youtube_channels_ingest",
+    bind=True,
+    max_retries=2,
+)
+def youtube_channels_ingest(self, limit: int = 50) -> dict[str, object]:
+    """Iterate enabled `youtube_channels` and fan out one `run_ingest`
+    child per channel via the playlistItems.list (uploads) path.
+
+    At 1 quota unit per channel and ~80 channels, the whole sweep costs
+    ~80 units/day — under 1% of the YT API free tier. We mark
+    `last_run_at` after dispatch (parent), not after each child finishes
+    — same rationale as the keyword rotator: a failing child shouldn't
+    starve the rest of the curated whitelist.
+    """
+    from sqlalchemy import select, update
+
+    from api.db import SessionLocal
+    from api.models.admin import YoutubeChannel
+
+    async def _pick_and_mark() -> list[tuple[str, str]]:
+        async with SessionLocal() as session:
+            res = await session.execute(
+                select(
+                    YoutubeChannel.id,
+                    YoutubeChannel.channel_id,
+                    YoutubeChannel.name,
+                ).where(YoutubeChannel.enabled.is_(True))
+            )
+            rows = list(res.all())
+            if not rows:
+                return []
+            await session.execute(
+                update(YoutubeChannel)
+                .where(YoutubeChannel.id.in_([r[0] for r in rows]))
+                .values(last_run_at=datetime.now(UTC))
+            )
+            await session.commit()
+            return [(r[1], r[2]) for r in rows]
+
+    try:
+        picked = asyncio.run(_pick_and_mark())
+    except Exception as exc:
+        log.exception("youtube_channels_ingest.pick_failed")
+        raise self.retry(exc=exc, countdown=300 * (2**self.request.retries)) from exc
+
+    if not picked:
+        log.warning("youtube_channels_ingest.no_channels")
+        return {"dispatched": 0, "channels": []}
+
+    for channel_id, channel_name in picked:
+        run_ingest.delay(
+            platform="youtube",
+            query=channel_name,
+            limit=limit,
+            channel_id=channel_id,
+        )
+
+    log.info(
+        "youtube_channels_ingest.dispatched",
+        n=len(picked),
+        channels=[c[1] for c in picked],
+    )
+    return {
+        "dispatched": len(picked),
+        "channels": [c[1] for c in picked],
     }
 
 

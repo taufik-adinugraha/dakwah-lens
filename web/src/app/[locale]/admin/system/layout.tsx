@@ -28,6 +28,7 @@ import {
   ShieldCheck,
   Wallet,
   Workflow,
+  Video,
 } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
@@ -47,6 +48,7 @@ const NAV = [
   { href: "/admin/system/api-costs", label: "API costs", icon: DollarSign },
   { href: "/admin/system/pipeline", label: "Pipeline health", icon: Workflow },
   { href: "/admin/system/rss", label: "RSS feeds", icon: Newspaper },
+  { href: "/admin/system/youtube-channels", label: "YT channels", icon: Video },
   { href: "/admin/system/queries", label: "Ingest queries", icon: Hash },
   { href: "/admin/system/scrapers", label: "Scrapers setup", icon: Settings },
   { href: "/admin/system/donations", label: "Donations", icon: HandHeart },

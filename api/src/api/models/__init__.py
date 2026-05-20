@@ -11,6 +11,7 @@ from api.models.admin import (
     RssFeed,
     SystemMetric,
     UsageEvent,
+    YoutubeChannel,
 )
 from api.models.auth import (
     Account,
@@ -53,4 +54,5 @@ __all__ = [
     "UserRole",
     "UserStatus",
     "VerificationToken",
+    "YoutubeChannel",
 ]

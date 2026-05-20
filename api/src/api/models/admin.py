@@ -179,6 +179,49 @@ class RssFeed(Base, TimestampMixin):
     __table_args__ = (UniqueConstraint("name", name="uq_rss_feed_name"),)
 
 
+class YoutubeChannel(Base, TimestampMixin):
+    """One whitelisted YouTube channel — replaces the rotating-keyword
+    strategy for the `youtube` platform.
+
+    We hit `playlistItems.list` on each channel's auto-generated uploads
+    playlist (`UU` + channel_id suffix), which is 1 quota unit per call
+    vs. 100 for `search.list`. The curator picks the bucket via
+    `category` (religious / family / youth / muamalah / social_justice /
+    health / education / cultural — note: `current_events` was dropped
+    after curation because Najwa / Narasi / Watchdoc cover that beat
+    from `social_justice`).
+    """
+
+    __tablename__ = "youtube_channels"
+
+    id: Mapped[UUID] = mapped_column(
+        primary_key=True, default=uuid4, server_default=text("gen_random_uuid()")
+    )
+    channel_id: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+    """YT-issued ID, e.g. `UCu7AHrqzz1ggvNCH8mqg9PA`. We derive the
+    uploads playlist by replacing the leading `UC` with `UU`."""
+
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    """Display name. Used as `author` on the resulting social_posts rows
+    and shown in the admin UI."""
+
+    handle: Mapped[str | None] = mapped_column(String(128))
+    """Optional @handle for human readability in the admin UI. Not used
+    for scraping (handle → channel_id resolution happens once at seed time)."""
+
+    category: Mapped[str] = mapped_column(String(32), nullable=False)
+    """One of: religious, family, youth, muamalah, social_justice, health,
+    education, cultural."""
+
+    enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+
+    last_run_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        comment="Updated each time this channel is scraped. NULL = never; "
+        "picked first on rotation.",
+    )
+
+
 class ManualCost(Base, TimestampMixin):
     """Human-entered cost line. Used for VPS + domain spend that we pay
     flat-rate outside of any metered API."""

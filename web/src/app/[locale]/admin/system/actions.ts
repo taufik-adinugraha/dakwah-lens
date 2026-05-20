@@ -217,6 +217,140 @@ export async function deleteRssFeed(formData: FormData) {
 }
 
 /* ────────────────────────────────────────────────────────────
+ * YouTube channel whitelist CRUD
+ *
+ * Replaces keyword search.list for YT (100× cheaper on quota via
+ * playlistItems.list). One row per curated channel; `category` is one
+ * of the 8 buckets curated on 2026-05-20.
+ * ──────────────────────────────────────────────────────────── */
+
+const YT_CATEGORIES = [
+  "religious",
+  "family",
+  "youth",
+  "muamalah",
+  "social_justice",
+  "health",
+  "education",
+  "cultural",
+] as const;
+
+/** YT channel IDs are always 24 chars starting with `UC`. We use this
+ *  to derive the uploads playlist (`UU…`) without paying for an extra
+ *  channels.list call. Anything else is either a typo or a legacy
+ *  account we can't auto-scrape — reject at write time. */
+function isValidYtChannelId(value: string): boolean {
+  return /^UC[A-Za-z0-9_-]{22}$/.test(value);
+}
+
+export async function addYoutubeChannel(formData: FormData) {
+  const session = await requireSuperadmin();
+  const channelId = String(formData.get("channel_id") ?? "").trim();
+  const name = String(formData.get("name") ?? "").trim().slice(0, 255);
+  const handle = String(formData.get("handle") ?? "").trim().slice(0, 128) || null;
+  const rawCategory = String(formData.get("category") ?? "");
+  if (!channelId || !name) return;
+  if (!isValidYtChannelId(channelId)) return;
+  const category = (YT_CATEGORIES as readonly string[]).includes(rawCategory)
+    ? rawCategory
+    : null;
+  if (!category) return;
+  const [inserted] = await db
+    .insert(schema.youtubeChannels)
+    .values({ channelId, name, handle, category, enabled: true })
+    .onConflictDoNothing()
+    .returning({ id: schema.youtubeChannels.id });
+  if (inserted) {
+    await logAdminAction({
+      actorId: session.user.id,
+      action: "youtube_channel.add",
+      targetType: "youtube_channel",
+      targetId: inserted.id,
+      payload: { channel_id: channelId, name, category },
+    });
+  }
+  revalidatePath("/admin/system/youtube-channels");
+}
+
+export async function toggleYoutubeChannel(formData: FormData) {
+  const session = await requireSuperadmin();
+  const id = String(formData.get("id") ?? "");
+  const enabled = formData.get("enabled") === "true";
+  if (!id) return;
+  const [row] = await db
+    .select({ name: schema.youtubeChannels.name })
+    .from(schema.youtubeChannels)
+    .where(eq(schema.youtubeChannels.id, id))
+    .limit(1);
+  if (!row) return;
+  const newEnabled = !enabled;
+  await db
+    .update(schema.youtubeChannels)
+    .set({ enabled: newEnabled, updatedAt: new Date() })
+    .where(eq(schema.youtubeChannels.id, id));
+  await logAdminAction({
+    actorId: session.user.id,
+    action: "youtube_channel.toggle",
+    targetType: "youtube_channel",
+    targetId: id,
+    payload: { name: row.name, enabled: newEnabled },
+  });
+  revalidatePath("/admin/system/youtube-channels");
+}
+
+export async function updateYoutubeChannelCategory(formData: FormData) {
+  const session = await requireSuperadmin();
+  const id = String(formData.get("id") ?? "");
+  const rawCategory = String(formData.get("category") ?? "");
+  if (!id) return;
+  if (!(YT_CATEGORIES as readonly string[]).includes(rawCategory)) return;
+  const [row] = await db
+    .select({ name: schema.youtubeChannels.name })
+    .from(schema.youtubeChannels)
+    .where(eq(schema.youtubeChannels.id, id))
+    .limit(1);
+  if (!row) return;
+  await db
+    .update(schema.youtubeChannels)
+    .set({ category: rawCategory, updatedAt: new Date() })
+    .where(eq(schema.youtubeChannels.id, id));
+  await logAdminAction({
+    actorId: session.user.id,
+    action: "youtube_channel.recategorize",
+    targetType: "youtube_channel",
+    targetId: id,
+    payload: { name: row.name, category: rawCategory },
+  });
+  revalidatePath("/admin/system/youtube-channels");
+}
+
+export async function deleteYoutubeChannel(formData: FormData) {
+  const session = await requireSuperadmin();
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+  const [row] = await db
+    .select({
+      name: schema.youtubeChannels.name,
+      channelId: schema.youtubeChannels.channelId,
+    })
+    .from(schema.youtubeChannels)
+    .where(eq(schema.youtubeChannels.id, id))
+    .limit(1);
+  if (!row) return;
+  await db
+    .delete(schema.youtubeChannels)
+    .where(eq(schema.youtubeChannels.id, id));
+  await logAdminAction({
+    actorId: session.user.id,
+    action: "youtube_channel.delete",
+    targetType: "youtube_channel",
+    targetId: id,
+    payload: { name: row.name, channel_id: row.channelId },
+  });
+  revalidatePath("/admin/system/youtube-channels");
+}
+
+/* ────────────────────────────────────────────────────────────
  * Manual cost CRUD (VPS, domain, etc.)
  * ──────────────────────────────────────────────────────────── */
 
