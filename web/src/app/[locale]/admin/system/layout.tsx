@@ -1,4 +1,17 @@
 import { setRequestLocale } from "next-intl/server";
+
+// Force dynamic rendering for every page under /admin/system/*.
+//
+// Without this, Next.js 16's static-generation step tries to
+// pre-render these pages at build time and times out (60s × 3
+// retries) on DB queries that have no DB available during build.
+// All admin pages need live auth + live DB anyway, so static
+// generation is the wrong default.
+//
+// Safe here: the admin/system layout does NOT export
+// `generateStaticParams` (unlike the locale layout one level up),
+// so there's no conflict with that opt-in.
+export const dynamic = "force-dynamic";
 import {
   Activity,
   BarChart3,
