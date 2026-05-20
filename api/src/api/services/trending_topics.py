@@ -150,18 +150,45 @@ For each candidate text, do TWO things:
      '#TREASURE_NEW_WAV_D14 LET\\'S GO'  →  'treasure new wav'  (will be filtered out anyway)
      'Gibran Majukan Wisata Daerah'  →  'gibran wisata'
 
-2. Judge whether the topic is DA'WAH-RELEVANT — i.e. would a da'i preparing
-   a khutbah or social-media post find this useful?
-     KEEP if it's about: society, news, family/parenting, muamalah/economic
-       ethics, social justice, education, health, current events, religion,
-       youth/mental-health concerns, parenting, policy debate.
-     SKIP if it's pure entertainment: K-pop / BL / anime fandom, sports
-       (football, badminton, e-sports), celebrity gossip, gaming product
-       launches, tech-product hype, music charts, awards-show hashtags.
+2. Judge whether the topic is socially relevant for a da'i preparing a
+   khutbah, kajian, or social-media post. The lens is intentionally
+   BROAD — a da'i needs to understand what Indonesian society is talking
+   about, feeling, and struggling with. Religious topics matter, but so
+   do family, ethics, justice, economy, education, youth, and current
+   events that shape how people live.
+
+     KEEP when the topic touches society at large — even if the entry
+     point looks like sports/celebrity/entertainment:
+       - Society/policy/news: protests, layoffs, new regulations, public
+         safety, government decisions, infrastructure
+       - Family / youth / education: parenting trends, student issues,
+         marriage discourse, mental health, pesantren, school policy
+       - Economy / ethics: PHK, corruption cases, halal industry,
+         gig-economy debates, price hikes, business scandals
+       - Sports/celebrity ONLY when it crosses into society: a stadium
+         tragedy, a public figure's hijrah, athlete on national pride,
+         celebrity parenting controversy, fan-violence incident
+       - Religion: explicitly Islamic / interfaith / spiritual content
+
+     SKIP only when the topic is purely entertainment with no broader
+     social angle:
+       - K-pop / BL / anime fandom chatter, music chart positions,
+         concert hype
+       - Sports results / scores / transfers with no policy, safety,
+         or societal angle
+       - Celebrity gossip strictly about romance/breakups/feuds without
+         broader ethical or family-discourse angle
+       - Gaming / e-sports tournaments, product launches, tech-hype
+       - Awards-show hashtags, fandom stan wars
+
+When in doubt, KEEP — the per-post relevance classifier downstream
+will down-rank truly irrelevant content. The cost of a wrong-skip is
+missing a real social signal; the cost of a wrong-keep is one cheap
+extra scrape.
 
 Return ONLY valid JSON: a list of {keyword, keep, reason} objects in input
-order. `reason` should be 3-8 words explaining the judgment ("policy",
-"K-pop fandom", "sports", "social-issue news", etc.).
+order. `reason` should be 3-8 words explaining the judgment ("layoff
+debate", "K-pop fandom", "stadium tragedy", "athlete transfer", etc.).
 """
 
 
