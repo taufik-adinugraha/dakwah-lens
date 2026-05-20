@@ -1,41 +1,136 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import {
-  ArrowRight,
-  BookOpen,
-  CheckCircle2,
-  Clock,
-  Fingerprint,
-  Layers,
-  Mail,
-  ShieldCheck,
-  Sparkles,
-} from "lucide-react";
+import { BookOpen, Search, ShieldCheck, Sparkles } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
+import {
+  getKitabCounts,
+  searchKitabBrowse,
+  type KitabCorpus,
+  type KitabHit,
+} from "@/lib/kitab-retrieval";
+
+type SearchParams = Record<string, string | string[] | undefined>;
+
+const ALL_CORPORA: KitabCorpus[] = [
+  "quran",
+  "bukhari",
+  "muslim",
+  "riyad",
+  "bulugh",
+  "tafsir",
+];
+
+const RESULTS_LIMIT = 20;
+
+// Display metadata for each kitab. The label key joins the existing
+// Kitab namespace strings (kitab_quran_title etc.).
+const KITAB_META: Record<
+  KitabCorpus,
+  { labelKey: string; metaKey: string; tone: string; iconTone: string }
+> = {
+  quran: {
+    labelKey: "kitab_quran_title",
+    metaKey: "kitab_quran_meta",
+    tone: "from-emerald-50 to-emerald-100/40",
+    iconTone: "bg-emerald-600",
+  },
+  bukhari: {
+    labelKey: "kitab_bukhari_title",
+    metaKey: "kitab_bukhari_meta",
+    tone: "from-brand-50 to-brand-100/40",
+    iconTone: "bg-brand-600",
+  },
+  muslim: {
+    labelKey: "kitab_muslim_title",
+    metaKey: "kitab_muslim_meta",
+    tone: "from-cyan-50 to-cyan-100/40",
+    iconTone: "bg-cyan-600",
+  },
+  riyad: {
+    labelKey: "kitab_riyad_title",
+    metaKey: "kitab_riyad_meta",
+    tone: "from-amber-50 to-amber-100/40",
+    iconTone: "bg-amber-600",
+  },
+  bulugh: {
+    labelKey: "kitab_bulugh_title",
+    metaKey: "kitab_bulugh_meta",
+    tone: "from-cyan-50 to-cyan-100/40",
+    iconTone: "bg-cyan-600",
+  },
+  tafsir: {
+    labelKey: "kitab_tafsir_title",
+    metaKey: "kitab_tafsir_meta",
+    tone: "from-violet-50 to-violet-100/40",
+    iconTone: "bg-violet-600",
+  },
+};
 
 export async function generateMetadata({
   params,
-}: PageProps<"/[locale]/kitab">): Promise<Metadata> {
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Kitab" });
   return { title: t("page_title") };
 }
 
+function parseCorpusSelection(raw: string | undefined): KitabCorpus[] {
+  if (!raw) return ALL_CORPORA;
+  const requested = raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => (ALL_CORPORA as string[]).includes(s)) as KitabCorpus[];
+  return requested.length === 0 ? ALL_CORPORA : requested;
+}
+
 export default async function KitabPage({
   params,
-}: PageProps<"/[locale]/kitab">) {
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<SearchParams>;
+}) {
   const { locale } = await params;
+  const search = await searchParams;
   setRequestLocale(locale);
 
-  const t = await getTranslations("Kitab");
+  const t = await getTranslations({ locale, namespace: "Kitab" });
+
+  const query =
+    typeof search.q === "string" ? search.q.trim().slice(0, 200) : "";
+  const corporaSelection = parseCorpusSelection(
+    typeof search.kitab === "string" ? search.kitab : undefined,
+  );
+
+  // Always show kitab counts so visitors see what's actually embedded.
+  const counts = await getKitabCounts();
+
+  // Run search only if the user submitted a query. Empty query = browse-only.
+  const hits: KitabHit[] = query
+    ? await searchKitabBrowse(query, {
+        corpora: corporaSelection,
+        limit: RESULTS_LIMIT,
+        locale: locale === "id" ? "id" : "en",
+      })
+    : [];
 
   return (
     <>
       <Hero t={t} />
-      <Methodology t={t} />
-      <Library t={t} />
-      <Suggest t={t} />
+      <SearchForm
+        t={t}
+        query={query}
+        corporaSelection={corporaSelection}
+        counts={counts}
+      />
+      {query ? (
+        <Results t={t} hits={hits} query={query} />
+      ) : (
+        <KitabGrid t={t} counts={counts} />
+      )}
     </>
   );
 }
@@ -44,7 +139,7 @@ type T = Awaited<ReturnType<typeof getTranslations<"Kitab">>>;
 
 function Hero({ t }: { t: T }) {
   return (
-    <section className="relative isolate overflow-hidden pt-14 pb-12 sm:pt-20 sm:pb-16">
+    <section className="relative isolate overflow-hidden pt-14 pb-10 sm:pt-20 sm:pb-12">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
@@ -52,227 +147,236 @@ function Hero({ t }: { t: T }) {
         <div className="absolute inset-0 grid-bg opacity-60" />
         <div className="absolute -top-20 left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-emerald-200 opacity-50 blur-3xl" />
       </div>
-
       <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
         <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50/80 px-3 py-1 text-xs font-medium text-emerald-700 shadow-sm backdrop-blur">
           <ShieldCheck className="h-3.5 w-3.5" />
           {t("badge")}
         </span>
-        <h1 className="mt-6 text-balance text-4xl font-bold leading-[1.1] tracking-tight text-slate-900 sm:text-5xl">
+        <h1 className="mt-6 text-balance text-3xl font-bold leading-[1.1] tracking-tight text-slate-900 sm:text-5xl">
           {t("title")}
         </h1>
-        <p className="mx-auto mt-5 max-w-2xl text-pretty text-base leading-relaxed text-slate-600 sm:text-lg">
+        <p className="mx-auto mt-4 max-w-2xl text-pretty text-base leading-relaxed text-slate-600 sm:text-lg">
           {t("body")}
         </p>
-
-        <div className="mx-auto mt-8 inline-flex max-w-2xl items-start gap-2.5 rounded-2xl border border-emerald-100 bg-emerald-50/60 px-4 py-3 text-left text-sm leading-relaxed text-emerald-900">
-          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-          <span className="text-pretty">{t("trust_note")}</span>
-        </div>
       </div>
     </section>
   );
 }
 
-function Methodology({ t }: { t: T }) {
-  const steps = [
-    {
-      icon: Layers,
-      title: t("method_1_title"),
-      body: t("method_1_body"),
-      tone: "from-brand-500 to-cyan-500",
-    },
-    {
-      icon: Sparkles,
-      title: t("method_2_title"),
-      body: t("method_2_body"),
-      tone: "from-cyan-500 to-emerald-500",
-    },
-    {
-      icon: Fingerprint,
-      title: t("method_3_title"),
-      body: t("method_3_body"),
-      tone: "from-emerald-500 to-emerald-600",
-    },
-    {
-      icon: BookOpen,
-      title: t("method_4_title"),
-      body: t("method_4_body"),
-      tone: "from-emerald-600 to-teal-600",
-    },
-  ];
+/* Server-rendered form: submits as GET, so the result page is shareable
+ * and back-button friendly. Multi-select kitab via checkbox group. */
+function SearchForm({
+  t,
+  query,
+  corporaSelection,
+  counts,
+}: {
+  t: T;
+  query: string;
+  corporaSelection: KitabCorpus[];
+  counts: Record<KitabCorpus, number>;
+}) {
+  const selected = new Set<KitabCorpus>(corporaSelection);
+  const allSelected = selected.size === ALL_CORPORA.length;
 
   return (
-    <section className="py-16 sm:py-20">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-            {t("methodology_title")}
-          </h2>
-        </div>
-
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {steps.map(({ icon: Icon, title, body, tone }) => (
-            <div
-              key={title}
-              className="relative rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+    <section className="pb-8">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
+        <form
+          method="get"
+          className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5"
+        >
+          <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 focus-within:border-emerald-400 focus-within:bg-white">
+            <Search className="h-4 w-4 shrink-0 text-slate-400" />
+            <input
+              type="text"
+              name="q"
+              defaultValue={query}
+              placeholder={t("search_placeholder")}
+              className="flex-1 bg-transparent text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none"
+              maxLength={200}
+            />
+            <button
+              type="submit"
+              className="rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-800"
             >
-              <div
-                className={`mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${tone} text-white shadow-sm`}
-              >
-                <Icon className="h-5 w-5" />
-              </div>
-              <h3 className="text-balance text-base font-semibold text-slate-900">
-                {title}
-              </h3>
-              <p className="mt-2 text-pretty text-sm leading-relaxed text-slate-600">
-                {body}
-              </p>
-            </div>
-          ))}
-        </div>
+              {t("search_button")}
+            </button>
+          </label>
+
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+            <span className="font-semibold text-slate-500">
+              {t("search_kitab_label")}
+            </span>
+            {ALL_CORPORA.map((c) => {
+              const isOn =
+                allSelected /* "all" defaults to all-on for unsubmitted forms */ ||
+                selected.has(c);
+              const count = counts[c] ?? 0;
+              return (
+                <label
+                  key={c}
+                  className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 transition ${
+                    isOn
+                      ? "border-emerald-300 bg-emerald-50 text-emerald-800"
+                      : "border-slate-200 bg-white text-slate-500"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    name="kitab"
+                    value={c}
+                    defaultChecked={isOn}
+                    className="hidden"
+                  />
+                  <span className="font-medium">{t(KITAB_META[c].labelKey as Parameters<typeof t>[0])}</span>
+                  {count > 0 && (
+                    <span className="text-[10px] tabular-nums text-slate-500">
+                      {count.toLocaleString()}
+                    </span>
+                  )}
+                </label>
+              );
+            })}
+            <span className="ml-auto text-[11px] text-slate-400">
+              {t("search_hint")}
+            </span>
+          </div>
+        </form>
       </div>
     </section>
   );
 }
 
-function Library({ t }: { t: T }) {
-  const kitabs = [
-    {
-      title: t("kitab_quran_title"),
-      meta: t("kitab_quran_meta"),
-      translations: t("kitab_quran_translations"),
-      status: "planned" as const,
-      tone: "from-emerald-50 to-emerald-100/40",
-      iconTone: "bg-emerald-600",
-    },
-    {
-      title: t("kitab_bukhari_title"),
-      meta: t("kitab_bukhari_meta"),
-      translations: t("kitab_bukhari_translations"),
-      status: "planned" as const,
-      tone: "from-brand-50 to-brand-100/40",
-      iconTone: "bg-brand-600",
-    },
-    {
-      title: t("kitab_muslim_title"),
-      meta: t("kitab_muslim_meta"),
-      translations: t("kitab_muslim_translations"),
-      status: "planned" as const,
-      tone: "from-cyan-50 to-cyan-100/40",
-      iconTone: "bg-cyan-600",
-    },
-    {
-      title: t("kitab_riyad_title"),
-      meta: t("kitab_riyad_meta"),
-      translations: t("kitab_riyad_translations"),
-      status: "planned" as const,
-      tone: "from-amber-50 to-amber-100/40",
-      iconTone: "bg-amber-600",
-    },
-    {
-      title: t("kitab_tafsir_title"),
-      meta: t("kitab_tafsir_meta"),
-      translations: t("kitab_tafsir_translations"),
-      status: "planned" as const,
-      tone: "from-violet-50 to-violet-100/40",
-      iconTone: "bg-violet-600",
-    },
-    {
-      title: t("kitab_bulugh_title"),
-      meta: t("kitab_bulugh_meta"),
-      translations: t("kitab_bulugh_translations"),
-      status: "planned" as const,
-      tone: "from-cyan-50 to-cyan-100/40",
-      iconTone: "bg-cyan-600",
-    },
-  ];
-
-  const statusLabel: Record<"planned" | "in_progress" | "ready", string> = {
-    planned: t("status_planned"),
-    in_progress: t("status_in_progress"),
-    ready: t("status_ready"),
-  };
-
+function Results({
+  t,
+  hits,
+  query,
+}: {
+  t: T;
+  hits: KitabHit[];
+  query: string;
+}) {
   return (
-    <section className="bg-gradient-to-b from-white to-slate-50 py-16 sm:py-20">
+    <section className="pb-16 sm:pb-20">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
+        <p className="mb-4 text-sm text-slate-600">
+          {t("results_count", { count: hits.length, query })}
+        </p>
+
+        {hits.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-10 text-center text-sm text-slate-500">
+            {t("results_empty")}
+          </div>
+        ) : (
+          <ul className="space-y-3">
+            {hits.map((h, i) => (
+              <li
+                key={i}
+                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2 text-[11px]">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2 py-0.5 font-semibold uppercase tracking-wider text-slate-700">
+                    {t(KITAB_META[h.corpus].labelKey as Parameters<typeof t>[0])}
+                  </span>
+                  <div className="flex items-center gap-3 text-slate-500">
+                    <span className="font-mono">{h.citation}</span>
+                    {h.score !== undefined && (
+                      <span className="tabular-nums text-slate-400">
+                        {(h.score * 100).toFixed(0)}%
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {h.arabic && (
+                  <p
+                    className="mt-3 text-right font-amiri text-xl leading-relaxed text-slate-900"
+                    dir="rtl"
+                  >
+                    {h.arabic}
+                  </p>
+                )}
+                {h.translation && (
+                  <p className="mt-2 text-sm leading-relaxed text-slate-700">
+                    {h.translation}
+                  </p>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function KitabGrid({
+  t,
+  counts,
+}: {
+  t: T;
+  counts: Record<KitabCorpus, number>;
+}) {
+  return (
+    <section className="bg-gradient-to-b from-white to-slate-50 py-12 sm:py-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+          <h2 className="text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
             {t("library_title")}
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-pretty text-base leading-relaxed text-slate-600">
+          <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
             {t("library_subtitle")}
           </p>
         </div>
 
-        <div className="mt-12 grid gap-4 sm:grid-cols-2">
-          {kitabs.map((k) => (
-            <article
-              key={k.title}
-              className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md sm:p-6"
-            >
-              <div className="flex items-start gap-4">
-                <div
-                  className={`relative inline-flex h-14 w-12 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br ${k.tone} shadow-inner ring-1 ring-white/40`}
-                >
-                  <BookOpen className={`h-5 w-5 text-white`} />
-                  <span
-                    className={`absolute inset-0 -z-10 rounded-lg ${k.iconTone} opacity-95`}
-                  />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-balance text-base font-semibold text-slate-900 sm:text-lg">
-                      {k.title}
-                    </h3>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-700 ring-1 ring-amber-100">
-                      <Clock className="h-3 w-3" />
-                      {statusLabel[k.status]}
-                    </span>
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {ALL_CORPORA.map((c) => {
+            const m = KITAB_META[c];
+            const count = counts[c] ?? 0;
+            const isEmbedded = count > 0;
+            return (
+              <article
+                key={c}
+                className={`relative overflow-hidden rounded-2xl border bg-gradient-to-br ${m.tone} ${
+                  isEmbedded ? "border-slate-200" : "border-slate-200/50 opacity-70"
+                } p-5 shadow-sm`}
+              >
+                <div className="flex items-start gap-4">
+                  <div
+                    className={`relative inline-flex h-14 w-12 shrink-0 items-center justify-center rounded-lg shadow-inner ring-1 ring-white/40`}
+                  >
+                    <BookOpen className="relative z-10 h-5 w-5 text-white" />
+                    <span
+                      className={`absolute inset-0 -z-0 rounded-lg ${m.iconTone} opacity-95`}
+                    />
                   </div>
-                  <p className="mt-1 text-xs text-slate-500">{k.meta}</p>
-                  <p className="mt-3 text-pretty text-sm leading-relaxed text-slate-600">
-                    {k.translations}
-                  </p>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-balance text-base font-semibold text-slate-900 sm:text-lg">
+                      {t(m.labelKey as Parameters<typeof t>[0])}
+                    </h3>
+                    <p className="mt-1 text-xs text-slate-500">
+                      {t(m.metaKey as Parameters<typeof t>[0])}
+                    </p>
+                    <p className="mt-2 inline-flex items-center gap-1 rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-700 ring-1 ring-slate-200">
+                      <Sparkles className="h-3 w-3" />
+                      {isEmbedded
+                        ? t("kitab_count_embedded", { count })
+                        : t("kitab_count_not_yet")}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </div>
-      </div>
-    </section>
-  );
-}
 
-function Suggest({ t }: { t: T }) {
-  return (
-    <section className="py-20 sm:py-24">
-      <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <div className="relative isolate overflow-hidden rounded-3xl border border-slate-200 bg-white px-6 py-12 text-center shadow-sm sm:px-12">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 -z-10"
-          >
-            <div className="absolute -top-12 left-1/2 h-56 w-56 -translate-x-1/2 rounded-full bg-emerald-100 opacity-50 blur-3xl" />
-          </div>
-
-          <Mail className="mx-auto h-6 w-6 text-emerald-600" />
-          <h2 className="mt-4 text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-            {t("suggest_title")}
-          </h2>
-          <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
-            {t("suggest_body")}
-          </p>
-
-          <Link
-            href="/contact"
-            className="mt-6 inline-flex h-11 items-center gap-2 rounded-full bg-slate-900 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
-          >
-            {t("suggest_button")}
-            <ArrowRight className="h-4 w-4" />
+        <p className="mx-auto mt-8 max-w-2xl text-center text-xs leading-relaxed text-slate-500">
+          {t("library_search_hint")}{" "}
+          <Link href="/kitab?q=" className="font-semibold text-emerald-700 underline">
+            {t("library_search_cta")}
           </Link>
-        </div>
+        </p>
       </div>
     </section>
   );

@@ -267,6 +267,86 @@ export async function retrieveDaleel(
   return await attachLinkedAyahToTafsir(deduped, opts.locale);
 }
 
+/**
+ * How many points each corpus collection holds. Used by the public
+ * /kitab page to show the corpus size next to each kitab card. Reads
+ * Qdrant collection info (fast, no embed) and returns 0 for any
+ * corpus whose collection doesn't exist yet.
+ */
+export async function getKitabCounts(): Promise<Record<KitabCorpus, number>> {
+  const qdrant = getQdrant();
+  const corpora = Object.keys(COLLECTION_NAMES) as KitabCorpus[];
+  const counts: Partial<Record<KitabCorpus, number>> = {};
+  await Promise.all(
+    corpora.map(async (c) => {
+      try {
+        const info = await qdrant.getCollection(COLLECTION_NAMES[c]);
+        counts[c] = info.points_count ?? 0;
+      } catch {
+        counts[c] = 0;
+      }
+    }),
+  );
+  return counts as Record<KitabCorpus, number>;
+}
+
+
+/**
+ * Public-facing browse search — distinct from `retrieveDaleel` because
+ * we want different semantics here:
+ *  - No MIN_RELEVANCE filter (let the user see weak matches too;
+ *    they can judge for themselves)
+ *  - No dedup (each kitab's hit is its own row, useful for citation
+ *    research)
+ *  - No throws on empty — return [] so the UI shows "no results"
+ *  - Return at most `limit` rows ACROSS all queried corpora (vs.
+ *    `retrieveDaleel`'s per-corpus topK)
+ *
+ * Used by the public `/kitab` page so any visitor can semantic-search
+ * the corpus without needing a login or a brief.
+ */
+export async function searchKitabBrowse(
+  query: string,
+  opts: { corpora: KitabCorpus[]; limit: number; locale: "id" | "en" },
+): Promise<KitabHit[]> {
+  if (!query.trim() || opts.corpora.length === 0) return [];
+
+  const openai = getOpenai();
+  if (!openai) return [];
+
+  let vector: number[] | null = null;
+  try {
+    const emb = await openai.embeddings.create({
+      model: EMBEDDING_MODEL,
+      input: query,
+    });
+    vector = emb.data[0]?.embedding ?? null;
+    void recordUsage({
+      provider: "openai",
+      operation: "embedding",
+      model: EMBEDDING_MODEL,
+      tokensIn: emb.usage?.total_tokens ?? null,
+    });
+  } catch (err) {
+    console.error("[kitab-search] embed failed:", err);
+    return [];
+  }
+  if (!vector) return [];
+
+  // Query each corpus for up to `limit` hits so we have enough merged
+  // candidates to fairly compete across corpora. Worst case: 6 × 20 =
+  // 120 candidates, sorted and sliced to `limit`.
+  const perCorpusHits = await Promise.all(
+    opts.corpora.map((c) => queryCorpus(c, vector!, opts.limit, opts.locale)),
+  );
+
+  return perCorpusHits
+    .flat()
+    .sort((a, b) => (b.score ?? -Infinity) - (a.score ?? -Infinity))
+    .slice(0, opts.limit);
+}
+
+
 async function queryCorpus(
   corpus: KitabCorpus,
   vector: number[],

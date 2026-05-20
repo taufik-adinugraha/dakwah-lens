@@ -226,7 +226,17 @@
     "suggest_title": "Ada kitab lain yang ingin Anda lihat?",
     "suggest_body": "Kami terbuka untuk masukan dari para ulama dan da'i. Kalau ada kitab yang bisa membantu pekerjaan Anda, langsung saja hubungi kami.",
     "suggest_email": "kitab@dakwah-lens.id",
-    "suggest_button": "Hubungi Kami"
+    "suggest_button": "Hubungi Kami",
+    "search_placeholder": "Cari di kitab — misal \"riba\", \"sabar menghadapi ujian\", \"mendidik anak\"…",
+    "search_button": "Cari",
+    "search_kitab_label": "Di:",
+    "search_hint": "Tip: gunakan bahasa alami. Pencarian semantik, bukan kata-kunci.",
+    "results_count": "{count} hasil untuk \"{query}\"",
+    "results_empty": "Tidak ada passage yang cocok. Coba kata yang lebih luas atau pilihan kitab berbeda.",
+    "kitab_count_embedded": "{count} entri sudah di-embed",
+    "kitab_count_not_yet": "Belum di-embed",
+    "library_search_hint": "Jalankan pencarian semantik di atas —",
+    "library_search_cta": "buka pencarian"
   },
   "Donate": {
     "badge": "Dukung perjalanan kami",

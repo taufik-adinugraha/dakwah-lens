@@ -230,7 +230,17 @@
     "suggest_title": "Want to see another kitab?",
     "suggest_body": "We welcome suggestions from scholars and da'i. If there's a kitab that would help your work, just reach out.",
     "suggest_email": "kitab@dakwah-lens.id",
-    "suggest_button": "Contact Us"
+    "suggest_button": "Contact Us",
+    "search_placeholder": "Search the kitab — e.g. \"riba\", \"patience in hardship\", \"raising children\"…",
+    "search_button": "Search",
+    "search_kitab_label": "In:",
+    "search_hint": "Tip: phrase your search in natural language. Semantic search, not keyword.",
+    "results_count": "{count} result(s) for \"{query}\"",
+    "results_empty": "No matching passages. Try broader wording or different kitab selection.",
+    "kitab_count_embedded": "{count} entries embedded",
+    "kitab_count_not_yet": "Not yet embedded",
+    "library_search_hint": "Run a semantic search above —",
+    "library_search_cta": "open search"
   },
   "Donate": {
     "badge": "Support our journey",
