@@ -109,7 +109,47 @@ async def _run(
     for row, lang in zip(rows, languages, strict=False):
         row["language"] = lang
 
-    # 3a. Look up rows we've already classified — RSS feeds carry items
+    # 3a. Drop non-Indonesian items on social platforms. X's
+    # `tweetLanguage: "id"` is a soft hint that lets Hausa / Urdu /
+    # Bengali tweets through (they share Arabic-derived vocabulary with
+    # Indonesian and Twitter's classifier conflates them). YouTube already
+    # filters at scrape time; do the same defense for X / TT / IG / FB.
+    # `mainstream` is exempt — Antara English wires are wanted.
+    SOCIAL_WITH_LANG_FILTER = {"x", "tiktok", "instagram", "facebook"}
+    if platform in SOCIAL_WITH_LANG_FILTER:
+        kept_rows: list[dict] = []
+        kept_texts: list[str] = []
+        kept_languages: list[str] = []
+        dropped_langs: dict[str, int] = {}
+        for row, text, lang in zip(rows, texts, languages, strict=False):
+            if lang == "id":
+                kept_rows.append(row)
+                kept_texts.append(text)
+                kept_languages.append(lang)
+            else:
+                dropped_langs[lang] = dropped_langs.get(lang, 0) + 1
+        if dropped_langs:
+            total_dropped = sum(dropped_langs.values())
+            log.info(
+                "ingest.lang_filter",
+                platform=platform,
+                query=query,
+                dropped=total_dropped,
+                kept=len(kept_rows),
+                dropped_by_lang=dropped_langs,
+            )
+            print(
+                f"  Language filter: dropped {total_dropped} non-ID items "
+                f"({dropped_langs}), kept {len(kept_rows)}"
+            )
+        rows = kept_rows
+        texts = kept_texts
+        languages = kept_languages
+        if not rows:
+            print("⚠ All items were non-Indonesian — skipping")
+            return 0
+
+    # 3b. Look up rows we've already classified — RSS feeds carry items
     # for ~24h and beat fires every 2h, so a naive re-classify burns
     # ~80% of Gemini calls on items already in the DB. Skip the LLM for
     # any row whose `categories` is already populated; we'll still upsert
