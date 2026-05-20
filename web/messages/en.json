@@ -523,6 +523,7 @@
     "section_platforms_subtitle": "What each platform is talking about — at a glance.",
     "section_source_mix": "Where the volume comes from",
     "platform_top_topic": "Top topic",
+    "platform_top_topic_pending": "Topic discovery runs nightly at 04:00 WIB",
     "platform_news_name": "Mainstream Media",
     "platform_news_volume": "8.2K articles",
     "platform_news_trend": "+12%",

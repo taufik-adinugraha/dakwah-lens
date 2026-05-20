@@ -219,7 +219,10 @@ export default async function InsightsPage({
 
       </section>
 
-      <PlatformsBreakdown t={t} />
+      <PlatformsBreakdown
+        t={t}
+        breakdown={overview?.platformBreakdown ?? []}
+      />
 
       <section className="pb-20 sm:pb-28">
         {process.env.NODE_ENV !== "production" && (
@@ -264,57 +267,118 @@ export default async function InsightsPage({
 
 type T = Awaited<ReturnType<typeof getTranslations<"Insights">>>;
 
-function PlatformsBreakdown({ t }: { t: T }) {
-  const platforms = [
-    {
-      key: "news",
-      Icon: Newspaper,
-      iconBg: "bg-slate-900",
-      barColor: "bg-slate-500",
-      volumePct: 1.5,
-      href: "/insights/mainstream",
-    },
-    {
-      key: "youtube",
-      Icon: YouTubeIcon,
-      iconBg: "bg-red-600",
-      barColor: "bg-red-500",
-      volumePct: 4.6,
-      href: "/insights/youtube",
-    },
-    {
-      key: "tiktok",
-      Icon: TikTokIcon,
-      iconBg: "bg-black",
-      barColor: "bg-fuchsia-500",
-      volumePct: 35.1,
-      href: "/insights/tiktok",
-    },
-    {
-      key: "x",
-      Icon: XIcon,
-      iconBg: "bg-black",
-      barColor: "bg-zinc-700",
-      volumePct: 26.6,
-      href: "/insights/x",
-    },
-    {
-      key: "instagram",
-      Icon: InstagramIcon,
-      iconBg: "bg-gradient-to-br from-fuchsia-500 via-rose-500 to-amber-400",
-      barColor: "bg-rose-500",
-      volumePct: 17.8,
-      href: "/insights/instagram",
-    },
-    {
-      key: "facebook",
-      Icon: FacebookIcon,
-      iconBg: "bg-[#1877F2]",
-      barColor: "bg-blue-600",
-      volumePct: 14.3,
-      href: "/insights/facebook",
-    },
-  ] as const;
+// Visual config per platform. Wired from real DB data (post counts,
+// top topic, top category) — no hardcoded percentages anymore.
+const PLATFORM_VISUALS: Record<
+  string,
+  {
+    key: string;
+    Icon: React.ComponentType<{ className?: string }>;
+    iconBg: string;
+    barColor: string;
+    href: string;
+  }
+> = {
+  mainstream: {
+    key: "news",
+    Icon: Newspaper,
+    iconBg: "bg-slate-900",
+    barColor: "bg-slate-500",
+    href: "/insights/mainstream",
+  },
+  youtube: {
+    key: "youtube",
+    Icon: YouTubeIcon,
+    iconBg: "bg-red-600",
+    barColor: "bg-red-500",
+    href: "/insights/youtube",
+  },
+  tiktok: {
+    key: "tiktok",
+    Icon: TikTokIcon,
+    iconBg: "bg-black",
+    barColor: "bg-fuchsia-500",
+    href: "/insights/tiktok",
+  },
+  x: {
+    key: "x",
+    Icon: XIcon,
+    iconBg: "bg-black",
+    barColor: "bg-zinc-700",
+    href: "/insights/x",
+  },
+  instagram: {
+    key: "instagram",
+    Icon: InstagramIcon,
+    iconBg: "bg-gradient-to-br from-fuchsia-500 via-rose-500 to-amber-400",
+    barColor: "bg-rose-500",
+    href: "/insights/instagram",
+  },
+  facebook: {
+    key: "facebook",
+    Icon: FacebookIcon,
+    iconBg: "bg-[#1877F2]",
+    barColor: "bg-blue-600",
+    href: "/insights/facebook",
+  },
+};
+
+const PLATFORM_ORDER = ["mainstream", "youtube", "tiktok", "x", "instagram", "facebook"];
+
+function PlatformsBreakdown({
+  t,
+  breakdown,
+}: {
+  t: T;
+  breakdown: Array<{
+    platform: string;
+    posts: number;
+    topTopic: { label: string; keywords: string[] } | null;
+    topCategory: string | null;
+  }>;
+}) {
+  // Map DB rows by platform name + compute share %.
+  const byPlatform = new Map(breakdown.map((b) => [b.platform, b]));
+  const totalPosts = breakdown.reduce((s, b) => s + b.posts, 0) || 1;
+
+  // Render in fixed order so the layout is stable across days. Platforms
+  // with zero posts still render (greyed) so visitors see the full surface
+  // even before all sources are active.
+  const rows = PLATFORM_ORDER.map((platform) => {
+    const visual = PLATFORM_VISUALS[platform];
+    const data = byPlatform.get(platform);
+    const posts = data?.posts ?? 0;
+    const sharePct = (posts / totalPosts) * 100;
+    return {
+      platform,
+      visual,
+      posts,
+      sharePct,
+      topTopic: data?.topTopic ?? null,
+      topCategory: data?.topCategory ?? null,
+    };
+  });
+
+  if (totalPosts <= 1 && breakdown.length === 0) {
+    // No data at all — show a single empty state instead of greyed cards.
+    return (
+      <section className="pb-16 sm:pb-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+              {t("section_platforms")}
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
+              {t("section_platforms_subtitle")}
+            </p>
+          </div>
+          <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-10 text-center text-sm text-slate-500">
+            {t("how_coverage_posts_empty")}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="pb-16 sm:pb-20">
@@ -334,23 +398,30 @@ function PlatformsBreakdown({ t }: { t: T }) {
             {t("section_source_mix")}
           </p>
           <div className="mt-3 flex h-3 overflow-hidden rounded-full">
-            {platforms.map((p) => (
-              <span
-                key={p.key}
-                className={p.barColor}
-                style={{ width: `${p.volumePct}%` }}
-                title={`${p.key} · ${p.volumePct}%`}
-              />
-            ))}
+            {rows.map((r) =>
+              r.sharePct > 0 ? (
+                <span
+                  key={r.platform}
+                  className={r.visual.barColor}
+                  style={{ width: `${r.sharePct}%` }}
+                  title={`${r.visual.key} · ${r.sharePct.toFixed(1)}%`}
+                />
+              ) : null,
+            )}
           </div>
           <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-[11px]">
-            {platforms.map((p) => (
-              <span key={p.key} className="inline-flex items-center gap-1.5 text-slate-600">
-                <span className={`inline-block h-2 w-2 rounded-full ${p.barColor}`} />
+            {rows.map((r) => (
+              <span
+                key={r.platform}
+                className={`inline-flex items-center gap-1.5 ${r.posts === 0 ? "text-slate-400" : "text-slate-600"}`}
+              >
+                <span className={`inline-block h-2 w-2 rounded-full ${r.visual.barColor}`} />
                 <span className="font-medium text-slate-700">
-                  {t(`platform_${p.key}_name` as Parameters<typeof t>[0])}
+                  {t(`platform_${r.visual.key}_name` as Parameters<typeof t>[0])}
                 </span>
-                <span className="text-slate-400">{p.volumePct}%</span>
+                <span className="tabular-nums">
+                  {r.posts === 0 ? "—" : `${r.sharePct.toFixed(1)}%`}
+                </span>
               </span>
             ))}
           </div>
@@ -358,7 +429,13 @@ function PlatformsBreakdown({ t }: { t: T }) {
 
         {/* Platform cards */}
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {platforms.map(({ key, Icon, iconBg, href }) => {
+          {rows.map((r) => {
+            const { visual, posts, topTopic, topCategory } = r;
+            const { Icon, iconBg, href } = visual;
+            const hasData = posts > 0;
+            const categoryLabel = topCategory
+              ? t(`dawah_category_${topCategory}` as Parameters<typeof t>[0])
+              : null;
             const inner = (
               <>
                 <div className="flex items-start gap-3">
@@ -369,33 +446,43 @@ function PlatformsBreakdown({ t }: { t: T }) {
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold text-slate-900">
-                      {t(`platform_${key}_name` as Parameters<typeof t>[0])}
+                      {t(`platform_${visual.key}_name` as Parameters<typeof t>[0])}
                     </p>
                     <div className="mt-0.5 flex items-center gap-2 text-[11px] text-slate-500">
-                      <span>{t(`platform_${key}_volume` as Parameters<typeof t>[0])}</span>
-                      <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-50 px-1.5 py-0.5 font-medium text-emerald-700">
-                        {t(`platform_${key}_trend` as Parameters<typeof t>[0])}
+                      <span className="tabular-nums">
+                        {hasData
+                          ? `${posts.toLocaleString()} posts`
+                          : t("how_coverage_posts_empty")}
                       </span>
+                      {hasData && (
+                        <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-50 px-1.5 py-0.5 font-medium text-emerald-700">
+                          {r.sharePct.toFixed(1)}%
+                        </span>
+                      )}
                     </div>
                   </div>
-                  {href && (
+                  {hasData && (
                     <ChevronRight className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-slate-700" />
                   )}
                 </div>
 
-                <div className="mt-4 rounded-lg border border-slate-100 bg-slate-50/60 p-3">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                    {t("platform_top_topic")}
-                  </p>
-                  <p className="mt-1 text-sm font-medium text-slate-800">
-                    {t(`platform_${key}_topic` as Parameters<typeof t>[0])}
-                  </p>
-                  <p className="mt-0.5 text-[11px] text-slate-500">
-                    {t(`platform_${key}_tag` as Parameters<typeof t>[0])}
-                  </p>
-                </div>
+                {hasData && (
+                  <div className="mt-4 rounded-lg border border-slate-100 bg-slate-50/60 p-3">
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                      {t("platform_top_topic")}
+                    </p>
+                    <p className="mt-1 text-sm font-medium text-slate-800">
+                      {topTopic?.label ?? t("platform_top_topic_pending")}
+                    </p>
+                    {(topTopic?.keywords.length || categoryLabel) && (
+                      <p className="mt-0.5 text-[11px] text-slate-500">
+                        {topTopic?.keywords.slice(0, 3).join(" · ") || categoryLabel}
+                      </p>
+                    )}
+                  </div>
+                )}
 
-                {href && (
+                {hasData && (
                   <p className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-brand-700 group-hover:text-brand-900">
                     {t("platform_view_breakdown")}
                     <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
@@ -406,15 +493,16 @@ function PlatformsBreakdown({ t }: { t: T }) {
 
             const cardClass = clsx(
               "group block rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition",
-              href && "hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md",
+              hasData && "hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md",
+              !hasData && "opacity-60",
             );
 
-            return href ? (
-              <Link key={key} href={href} className={cardClass}>
+            return hasData ? (
+              <Link key={visual.key} href={href} className={cardClass}>
                 {inner}
               </Link>
             ) : (
-              <article key={key} className={cardClass}>
+              <article key={visual.key} className={cardClass}>
                 {inner}
               </article>
             );
