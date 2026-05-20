@@ -36,6 +36,7 @@ from api.services.apify import (
     scrape_x,
 )
 from api.services.language import detect_lang
+from api.services.news_sentiment import classify_batch as classify_news_sentiment
 from api.services.normalizers import NORMALIZERS
 from api.services.relevance import classify_batch as classify_relevance
 from api.services.rss import scrape_mainstream
@@ -97,19 +98,30 @@ async def _run(
         # change). Stored so the analytics surface can filter by language.
         row["language"] = lang
 
-    # IndoBERT only on Indonesian text — for English / other, the model
-    # produces confident-looking noise, so we keep sentiment NULL.
-    id_indices = [i for i, lang in enumerate(languages) if lang == "id"]
-    id_texts = [texts[i] for i in id_indices]
-    n_id, n_other = len(id_texts), len(texts) - len(id_texts)
-    print(
-        f"  Running IndoBERT sentiment on {n_id}/{len(texts)} ID posts "
-        f"({n_other} non-ID skipped) …"
-    )
-    id_sentiments = classify_sentiment(id_texts) if id_texts else []
-    sentiment_by_index: dict[int, object] = dict(
-        zip(id_indices, id_sentiments, strict=False)
-    )
+    # Dispatch sentiment by platform:
+    #   - mainstream  → Gemini news-valence (IndoBERT was trained on
+    #                   tweets/reviews and reads speaker-emotion, not
+    #                   event-valence — produces ~95% neutral on news).
+    #   - else        → IndoBERT, ID-only (for EN/other the model
+    #                   produces confident noise, so we leave sentiment
+    #                   NULL on non-ID posts).
+    sentiment_by_index: dict[int, object] = {}
+    if platform == "mainstream":
+        print(f"  Running Gemini news-sentiment on {len(texts)} posts …")
+        news_sentiments = classify_news_sentiment(texts)
+        sentiment_by_index = dict(enumerate(news_sentiments))
+    else:
+        id_indices = [i for i, lang in enumerate(languages) if lang == "id"]
+        id_texts = [texts[i] for i in id_indices]
+        n_id, n_other = len(id_texts), len(texts) - len(id_texts)
+        print(
+            f"  Running IndoBERT sentiment on {n_id}/{len(texts)} ID posts "
+            f"({n_other} non-ID skipped) …"
+        )
+        id_sentiments = classify_sentiment(id_texts) if id_texts else []
+        sentiment_by_index = dict(
+            zip(id_indices, id_sentiments, strict=False)
+        )
 
     # Gemini relevance handles ID + EN natively, so it runs on everything.
     print("  Running Gemini relevance …")

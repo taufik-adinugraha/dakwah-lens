@@ -1,24 +1,24 @@
-"""One-off backfill: re-clean HTML from mainstream-RSS posts + re-classify.
+"""One-off backfill: clean mainstream-RSS posts + relabel sentiment with Gemini.
 
-Existing mainstream rows were normalized before `_strip_html` landed, so a
-chunk of them have HTML tags + entities (e.g. Republika's `<img>` lede,
-`&nbsp;`, `&ndash;`) embedded in `posts.text`. That noise biased IndoBERT
-toward neutral. This script:
+This script does two things on every `platform='mainstream'` row:
 
-    1. Pulls every `platform='mainstream'` row.
-    2. Rebuilds `text` from `raw_payload` via the updated normalizer
-       (which now strips HTML).
-    3. UPDATEs `text` for any row that changed.
-    4. Re-runs IndoBERT on the cleaned text for `language='id'` rows
-       whose text changed, and UPDATEs sentiment fields too.
-    5. Leaves relevance/categories alone — Gemini cost money, and HTML
-       noise affects relevance much less than sentiment (Gemini handles
-       light markup gracefully).
+    1. Re-runs the normalizer (`normalize_mainstream`) so the stored
+       `text` is HTML-stripped + entity-decoded. Idempotent — already-
+       clean rows aren't touched.
 
-Idempotent — running it twice is a no-op since the second pass's
-`_strip_html` output equals the stored text.
+    2. Re-runs sentiment via the NEW Gemini news-valence classifier
+       (`services/news_sentiment`). The previous IndoBERT-based labels
+       were ~95% neutral on news (wrong tool: IndoBERT was trained on
+       tweets/reviews) and need a full rollback, not just on rows
+       whose text changed. Cost is negligible (~$0.0001/item).
+
+Relevance + categories are left as-is — Gemini already handled those,
+and HTML noise doesn't materially affect category scoring.
 
     uv run python -m api.scripts.reclean_mainstream [--dry-run]
+
+Idempotent: re-running picks up the same Gemini scores (modulo temperature
+0.1 jitter) and writes the same rows. Safe to run after deploys.
 """
 
 from __future__ import annotations
@@ -32,8 +32,8 @@ from sqlalchemy import select, update
 
 from api.db import SessionLocal
 from api.models.social import SocialPost
+from api.services.news_sentiment import classify_batch as classify_news_sentiment
 from api.services.normalizers import normalize_mainstream
-from api.services.sentiment import classify_batch as classify_sentiment
 
 log = structlog.get_logger()
 
@@ -46,71 +46,83 @@ async def _run(dry_run: bool) -> int:
         posts = res.scalars().all()
 
     print(f"Loaded {len(posts)} mainstream posts.")
-
-    changed: list[tuple[SocialPost, str]] = []
-    for p in posts:
-        if not isinstance(p.raw_payload, dict):
-            continue
-        rebuilt = normalize_mainstream(p.raw_payload)
-        if rebuilt is None:
-            continue
-        new_text = rebuilt["text"]
-        if new_text != p.text:
-            changed.append((p, new_text))
-
-    print(f"  {len(changed)} rows have HTML noise to strip.")
-
-    if dry_run:
-        for p, new_text in changed[:5]:
-            print("─" * 60)
-            print(f"id={p.id}  outlet={p.author}")
-            print(f"  BEFORE: {(p.text or '')[:200]!r}")
-            print(f"  AFTER : {new_text[:200]!r}")
-        print(f"\n[dry-run] would update {len(changed)} rows; no DB write.")
-        return len(changed)
-
-    if not changed:
-        print("Nothing to do.")
+    if not posts:
         return 0
 
-    # Re-classify ID posts whose text changed. Non-ID rows still get their
-    # text updated below but skip the model — sentiment for non-ID is NULL.
-    id_changed_idx = [
-        i for i, (p, _) in enumerate(changed) if (p.language or "").startswith("id")
-    ]
-    id_texts = [changed[i][1] for i in id_changed_idx]
-    print(f"  Running IndoBERT on {len(id_texts)} ID posts …")
-    new_sentiments = classify_sentiment(id_texts) if id_texts else []
-    sentiment_by_changed_idx: dict[int, object] = dict(
-        zip(id_changed_idx, new_sentiments, strict=False)
-    )
+    # Step 1: figure out the right text for each row (HTML-stripped).
+    text_by_id: dict[str, str] = {}
+    n_text_changed = 0
+    for p in posts:
+        if not isinstance(p.raw_payload, dict):
+            text_by_id[str(p.id)] = p.text or ""
+            continue
+        rebuilt = normalize_mainstream(p.raw_payload)
+        new_text = rebuilt["text"] if rebuilt else (p.text or "")
+        text_by_id[str(p.id)] = new_text
+        if new_text != (p.text or ""):
+            n_text_changed += 1
 
+    print(f"  {n_text_changed} rows need HTML-stripped text.")
+
+    if dry_run:
+        print("\n[dry-run] sentiment label distribution will be relabeled "
+              "by Gemini for ALL rows; printing 3 text diffs and exiting.\n")
+        shown = 0
+        for p in posts:
+            new = text_by_id[str(p.id)]
+            if new != (p.text or "") and shown < 3:
+                print("─" * 60)
+                print(f"id={p.id}  outlet={p.author}  current_label={p.sentiment_label}")
+                print(f"  BEFORE: {(p.text or '')[:200]!r}")
+                print(f"  AFTER : {new[:200]!r}")
+                shown += 1
+        print(f"\n[dry-run] would re-classify {len(posts)} rows + "
+              f"update text on {n_text_changed}; no DB write.")
+        return n_text_changed
+
+    # Step 2: call Gemini once for every row's (cleaned) text.
+    print(f"  Running Gemini news-sentiment on {len(posts)} posts …")
+    texts = [text_by_id[str(p.id)] for p in posts]
+    new_sentiments = classify_news_sentiment(texts)
+
+    # Step 3: write everything back. We always update text (idempotent
+    # if unchanged) + sentiment fields. Relevance is left alone.
     n_written = 0
+    n_label_changed = 0
     async with SessionLocal() as session:
-        for idx, (post, new_text) in enumerate(changed):
-            values: dict[str, object] = {"text": new_text}
-            s = sentiment_by_changed_idx.get(idx)
-            if s is not None:
-                values["sentiment_label"] = s.label  # type: ignore[attr-defined]
-                values["sentiment_score"] = s.score  # type: ignore[attr-defined]
+        for p, s in zip(posts, new_sentiments, strict=False):
+            new_text = text_by_id[str(p.id)]
+            values: dict[str, object] = {
+                "text": new_text,
+                "sentiment_label": s.label,
+                "sentiment_score": s.score,
+            }
+            if s.label != p.sentiment_label:
+                n_label_changed += 1
             await session.execute(
-                update(SocialPost).where(SocialPost.id == post.id).values(**values)
+                update(SocialPost).where(SocialPost.id == p.id).values(**values)
             )
             n_written += 1
         await session.commit()
 
-    print(f"\n✓ Updated {n_written} rows ({len(id_texts)} re-classified).")
+    print(
+        f"\n✓ Updated {n_written} rows  "
+        f"({n_text_changed} text changes, {n_label_changed} sentiment flips)."
+    )
     return n_written
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Strip HTML from existing mainstream posts + re-run IndoBERT."
+        description=(
+            "Backfill mainstream posts: HTML-strip text + relabel sentiment "
+            "via Gemini news-valence. Replaces IndoBERT labels."
+        )
     )
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Show what would change without writing anything.",
+        help="Show what would change without writing or calling Gemini.",
     )
     args = parser.parse_args()
 
