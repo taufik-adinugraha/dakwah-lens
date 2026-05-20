@@ -174,13 +174,20 @@ def scrape_x(query: str, *, max_items: int = 50) -> ScrapeResult:
 
     `query` accepts hashtags (`#islam`), keywords, or X's full search syntax
     (`from:@detikcom #pemilu`, etc).
+
+    Sort is "Top" (Twitter's algorithmic engagement ranking) rather than
+    "Latest". For a da'wah-audience-intelligence product, engagement is the
+    relevant signal — what's resonating, not just what was posted most
+    recently. Trade-off: we may miss low-engagement fresh posts that haven't
+    accrued likes/retweets yet. Acceptable at our weekly-ish per-keyword
+    cadence; bumps to dual-mode if needed later.
     """
     return scrape(
         platform="x",
         run_input={
             "searchTerms": [query],
             "maxItems": max_items,
-            "sort": "Latest",
+            "sort": "Top",
             "tweetLanguage": "id",
             "onlyVerifiedUsers": False,
         },

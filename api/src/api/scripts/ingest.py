@@ -124,9 +124,25 @@ async def _run(
     ]
     fresh_texts = [texts[i] for i in fresh_indices]
     fresh_languages = [languages[i] for i in fresh_indices]
+    overlap_pct = (
+        round(100.0 * len(cached) / len(rows), 1) if rows else 0.0
+    )
+    # Structured log for offline analysis: if overlap_pct stays high
+    # (>50%) on a given (platform, query) we're either burning Apify
+    # spend on dupes or our max_items cap is too conservative. Aggregate
+    # via `grep ingest.dedup_stats` on worker logs.
+    log.info(
+        "ingest.dedup_stats",
+        platform=platform,
+        query=query,
+        scraped=len(rows),
+        cached=len(cached),
+        new=len(fresh_indices),
+        overlap_pct=overlap_pct,
+    )
     print(
-        f"  Classifier skip: {len(cached)}/{len(rows)} already classified, "
-        f"running on {len(fresh_indices)} new items …"
+        f"  Classifier skip: {len(cached)}/{len(rows)} already classified "
+        f"({overlap_pct}% overlap), running on {len(fresh_indices)} new items …"
     )
 
     # Dispatch sentiment by platform AND language, on FRESH items only:
