@@ -108,10 +108,14 @@ export default async function AuditLogPage({
   }
   const interval = rangeToInterval(range);
   if (interval) {
+    // sql.raw — Postgres rejects parameter binding inside an interval
+    // literal ("interval $1" → syntax error). `interval` is sourced
+    // from our own RANGE_OPTIONS allow-list, never from user input,
+    // so inlining is safe.
     conditions.push(
       gte(
         schema.adminLogs.createdAt,
-        sql`now() - interval ${interval}`,
+        sql`now() - interval ${sql.raw(`'${interval}'`)}`,
       ),
     );
   }

@@ -56,10 +56,14 @@ export function InfraChart({
     return { minV, maxV, w, h, pad, stepX, polyline, gridY };
   }, [points]);
 
+  // Stroke colour only — no fill class. Earlier version had
+  // `stroke-X-500 fill-X-500` which made the polyline render as a
+  // closed polygon and produced bizarre filled-triangle artifacts
+  // when the line crossed itself.
   const strokeClass = {
-    brand: "stroke-brand-500 fill-brand-500",
-    emerald: "stroke-emerald-500 fill-emerald-500",
-    amber: "stroke-amber-500 fill-amber-500",
+    brand: "stroke-brand-500",
+    emerald: "stroke-emerald-500",
+    amber: "stroke-amber-500",
   }[accent];
 
   const handlePointerMove = (e: React.PointerEvent<SVGSVGElement>) => {
@@ -145,12 +149,15 @@ export function InfraChart({
               );
             })}
 
-            {/* Line */}
+            {/* Line — fill explicitly none (and no fill-class) so
+                 the polyline doesn't auto-close into a polygon. */}
             <polyline
               points={polyline}
               fill="none"
               strokeWidth={1.5}
               className={strokeClass}
+              strokeLinejoin="round"
+              strokeLinecap="round"
             />
 
             {/* Hover marker */}

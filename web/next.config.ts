@@ -58,6 +58,14 @@ const nextConfig: NextConfig = {
   // ~700 MB if we'd shipped the full node_modules. Server runs via
   // `node server.js` — no `npm run start` needed.
   output: "standalone",
+  // geoip-lite ships its lookup data in .dat files that the Next.js
+  // file tracer doesn't pick up automatically (it only follows JS
+  // imports). Without this we get ENOENT at runtime when
+  // `resolveRegion()` tries to read the country DB. Force-include
+  // every .dat under the package.
+  outputFileTracingIncludes: {
+    "*": ["./node_modules/geoip-lite/data/*.dat"],
+  },
   async headers() {
     return [
       {
