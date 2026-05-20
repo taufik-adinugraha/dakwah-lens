@@ -105,35 +105,34 @@ celery_app.conf.update(
             "schedule": crontab(minute=10, hour=0, day_of_week=5),
             "kwargs": {"platform": "x", "limit": 20, "n_keywords": 999},
         },
-        "ingest-tiktok": {
-            "task": "api.workers.ingest.rotating_ingest",
-            # Tuesday only — was daily, but the "free" actor isn't free
-            # (~$3.92/run × 7 days = ~$118/mo, blowing the IDR 1M cap).
-            # Tue picked to avoid colliding with Mon (X + IG + TT-paid).
-            "schedule": crontab(minute=20, hour=0, day_of_week=2),
-            "kwargs": {"platform": "tiktok", "limit": 20, "n_keywords": 999},
-        },
-        "ingest-tiktok-paid": {
-            "task": "api.workers.ingest.rotating_ingest",
-            # Biweekly: 1st + 3rd Mondays of the month. Celery crontab
-            # `day_of_month="1-7,15-21"` constrains the date range, then
-            # `day_of_week=1` picks the Monday inside each range — that's
-            # exactly two Mondays per month, 14 days apart in-month
-            # (cross-month gap can be 14-21 days depending on weekday
-            # alignment).
-            "schedule": crontab(
-                minute=25,
-                hour=0,
-                day_of_week=1,
-                day_of_month="1-7,15-21",
-            ),
-            "kwargs": {
-                "platform": "tiktok",
-                "limit": 20,
-                "n_keywords": 999,
-                "actor_id": "clockworks/tiktok-scraper",
-            },
-        },
+        # TikTok ingest temporarily disabled (2026-05-20) pending a
+        # product decision on whether the platform is worth the spend.
+        # Free actor (`clockworks/free-tiktok-scraper`): $0.004/item
+        # = ~$3.92/run; paid actor (`clockworks/tiktok-scraper`):
+        # $45/mo flat. Daily cadence makes paid cheaper than free; any
+        # cadence ≤ weekly makes free cheaper. Restore the entries
+        # below (and pick the actor that matches cadence) once decided.
+        #
+        # "ingest-tiktok": {
+        #     "task": "api.workers.ingest.rotating_ingest",
+        #     "schedule": crontab(minute=20, hour=0, day_of_week=2),
+        #     "kwargs": {"platform": "tiktok", "limit": 20, "n_keywords": 999},
+        # },
+        # "ingest-tiktok-paid": {
+        #     "task": "api.workers.ingest.rotating_ingest",
+        #     "schedule": crontab(
+        #         minute=25,
+        #         hour=0,
+        #         day_of_week=1,
+        #         day_of_month="1-7,15-21",
+        #     ),
+        #     "kwargs": {
+        #         "platform": "tiktok",
+        #         "limit": 20,
+        #         "n_keywords": 999,
+        #         "actor_id": "clockworks/tiktok-scraper",
+        #     },
+        # },
         "ingest-instagram": {
             "task": "api.workers.ingest.rotating_ingest",
             "schedule": crontab(minute=30, hour=0, day_of_week=1),
