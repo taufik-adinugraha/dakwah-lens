@@ -21,11 +21,11 @@ const BEAT_SCHEDULE = [
   { name: "ingest-x-mon", task: "rotating_ingest", platform: "x", cron: "Mon 00:10 WIB", query: "(all enabled)" },
   { name: "ingest-x-wed", task: "rotating_ingest", platform: "x", cron: "Wed 00:10 WIB", query: "(all enabled)" },
   { name: "ingest-x-fri", task: "rotating_ingest", platform: "x", cron: "Fri 00:10 WIB", query: "(all enabled)" },
-  { name: "ingest-tiktok", task: "rotating_ingest", platform: "tiktok", cron: "00:20 WIB daily", query: "(all enabled, free actor)" },
-  { name: "ingest-tiktok-paid", task: "rotating_ingest", platform: "tiktok", cron: "1st + 3rd Mon 00:25 WIB", query: "(all enabled, paid actor)" },
+  { name: "ingest-tiktok", task: "rotating_ingest", platform: "tiktok", cron: "Tue 00:20 WIB", query: "(all enabled, free actor)" },
   { name: "ingest-instagram", task: "rotating_ingest", platform: "instagram", cron: "Mon 00:30 WIB", query: "(all enabled)" },
-  { name: "trending-ingest", task: "trending_ingest", platform: "x + tiktok", cron: "12:00 WIB daily", query: "(trending overlay)" },
-  { name: "recluster-topics", task: "recluster_all", platform: "all", cron: "08:00 WIB daily", query: "—" },
+  { name: "trending-ingest", task: "trending_ingest", platform: "x", cron: "12:00 WIB daily", query: "(trending overlay)" },
+  { name: "reconcile-apify-costs", task: "reconcile_apify_costs", platform: "—", cron: "06:00 WIB daily", query: "(Apify billing reconcile)" },
+  { name: "recluster-topics", task: "recluster_all", platform: "all", cron: "04:00 WIB daily", query: "(Gemini topic discovery)" },
   { name: "snapshot-system", task: "snapshot_system", platform: "host", cron: "every 60s", query: "—" },
 ] as const;
 

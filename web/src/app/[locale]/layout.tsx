@@ -33,6 +33,13 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+// Force dynamic rendering on every request — the layout reads auth state
+// (PendingApprovalBanner) which must reflect the live JWT, not a cached
+// snapshot. Without this, a user who got their `status` flipped from
+// `pending` → `approved` in the DB would keep seeing the pending banner
+// because Next.js was serving a cached fragment.
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params,
 }: LayoutProps<"/[locale]">): Promise<Metadata> {

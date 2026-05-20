@@ -30,20 +30,52 @@ _WHITESPACE_RE = re.compile(r"[ \t ]+")
 _NEWLINES_RE = re.compile(r"\n{3,}")
 
 
-def _strip_html(text: str) -> str:
-    """Strip HTML tags + decode entities from an RSS summary.
+# Outlet-specific CTA boilerplate that gets appended to RSS bodies and
+# pollutes the text we feed downstream classifiers + the public UI.
+_CTA_PATTERNS: tuple[re.Pattern[str], ...] = (
+    re.compile(r"Berikan apresiasi[^.]*?https?://\S+", re.IGNORECASE),
+    re.compile(r"apresiasi kamu di sini[^.]*?https?://\S+", re.IGNORECASE),
+    re.compile(
+        r"\b(BACA(?: JUGA)?|ARTIKEL TERKAIT|TONTON JUGA|SIMAK JUGA|LIHAT JUGA)\s*:[^\n]{0,200}",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"(?:Original Video|Originl Video|Source|Sumber)\s*:\s*https?://\S+",
+        re.IGNORECASE,
+    ),
+)
 
-    Republika and a few other Indonesian outlets ship summaries that lead
-    with `<img …>` and pepper the body with `&nbsp;`/`&ndash;`. Feeding
-    that raw to IndoBERT eats the 512-token budget on markup and biases
-    the classifier toward neutral. Pure text in, no HTML, no entities.
+
+def _clean_text(text: str, *, strip_outlet_cta: bool = False) -> str:
+    """Decode HTML entities, strip HTML tags, normalize whitespace.
+
+    Called by every per-platform normalizer so the rules are consistent:
+    `&quot;` → `"`, `&#39;` → `'`, `&amp;` → `&`, etc. Outlet CTA
+    boilerplate (`apresiasi kamu di sini: …`, `BACA JUGA: …`) is stripped
+    only for RSS bodies — irrelevant on X/TT/IG which are user posts.
+
+    `html.unescape()` runs BEFORE BeautifulSoup because BS4's get_text()
+    is unreliable on entities outside HTML structure; running unescape
+    first guarantees the decode happens regardless.
     """
-    if "<" in text or "&" in text:
+    if not text:
+        return ""
+    text = html.unescape(text)
+    if "<" in text:
         text = BeautifulSoup(text, "html.parser").get_text(separator=" ")
+        # Tags may have hidden more entities (e.g. attribute values).
         text = html.unescape(text)
+    if strip_outlet_cta:
+        for pat in _CTA_PATTERNS:
+            text = pat.sub("", text)
     text = _WHITESPACE_RE.sub(" ", text)
     text = _NEWLINES_RE.sub("\n\n", text)
     return text.strip()
+
+
+# Backwards-compat alias — old code (reclean script) calls _strip_html.
+def _strip_html(text: str) -> str:
+    return _clean_text(text, strip_outlet_cta=True)
 
 
 def _to_datetime(value: Any) -> datetime | None:
@@ -88,6 +120,7 @@ def normalize_x(item: dict[str, Any]) -> dict[str, Any] | None:
     text = item.get("text") or item.get("full_text") or item.get("content")
     if not isinstance(text, str) or not text.strip():
         return None
+    text = _clean_text(text)
 
     external_id = (
         item.get("id_str") or item.get("id") or item.get("tweetId")
@@ -147,6 +180,7 @@ def normalize_tiktok(item: dict[str, Any]) -> dict[str, Any] | None:
     if not isinstance(text, str) or not text.strip():
         # Some TikTok posts have empty captions but still useful titles; skip.
         return None
+    text = _clean_text(text)
 
     external_id = item.get("id") or item.get("videoId") or item.get("aweme_id")
     if not external_id:
@@ -189,6 +223,7 @@ def normalize_instagram(item: dict[str, Any]) -> dict[str, Any] | None:
     text = item.get("caption") or item.get("text")
     if not isinstance(text, str) or not text.strip():
         return None
+    text = _clean_text(text)
 
     external_id = (
         item.get("id") or item.get("shortCode") or item.get("shortcode")
@@ -236,6 +271,7 @@ def normalize_facebook(item: dict[str, Any]) -> dict[str, Any] | None:
     text = item.get("text") or item.get("postText") or item.get("message")
     if not isinstance(text, str) or not text.strip():
         return None
+    text = _clean_text(text)
 
     external_id = (
         item.get("postId") or item.get("id") or item.get("topLevelUrl")
@@ -285,8 +321,8 @@ def normalize_youtube(item: dict[str, Any]) -> dict[str, Any] | None:
     if not video_id:
         return None
 
-    title = snippet.get("title") or ""
-    description = snippet.get("description") or ""
+    title = _clean_text(snippet.get("title") or "")
+    description = _clean_text(snippet.get("description") or "")
     if not title and not description:
         return None
     text = f"{title}\n\n{description}".strip()

@@ -301,13 +301,20 @@ export type OverviewInsights = {
   categoryTotals: Record<string, number>;
   /** Post count per dominant da'wah category. Sorted desc. */
   dominantCategories: Array<{ category: string; posts: number }>;
-  /** Top BERTopic-discovered topics across platforms. */
+  /** Top Gemini-discovered topics across platforms. */
   trendingTopics: Array<{
     id: string;
     label: string;
     platform: string;
     keywords: string[];
     postCount: number;
+  }>;
+  /** Per-platform breakdown for the /insights source-mix + cards. */
+  platformBreakdown: Array<{
+    platform: string;
+    posts: number;
+    topTopic: { label: string; keywords: string[] } | null;
+    topCategory: string | null;
   }>;
 };
 
@@ -417,6 +424,70 @@ export async function getOverviewInsights(): Promise<OverviewInsights | null> {
     .orderBy(desc(schema.topics.postCount))
     .limit(5);
 
+  // Per-platform breakdown: post count + top topic per platform.
+  // Drives the source-mix bar + per-platform cards on /insights.
+  const platformCountRows = (await db
+    .select({
+      platform: schema.socialPosts.platform,
+      posts: count(),
+    })
+    .from(schema.socialPosts)
+    .groupBy(schema.socialPosts.platform)) as Array<{
+    platform: string;
+    posts: number;
+  }>;
+
+  // Top topic per platform (single SQL with DISTINCT ON for simplicity).
+  const topTopicRows = (await db.execute(sql`
+    SELECT DISTINCT ON (platform) platform, label, keywords
+    FROM topics
+    ORDER BY platform, post_count DESC
+  `)) as unknown as {
+    rows: Array<{ platform: string; label: string; keywords: string[] | null }>;
+  };
+  const topTopicByPlatform = new Map(
+    (topTopicRows.rows ?? []).map((r) => [
+      r.platform,
+      { label: r.label, keywords: r.keywords ?? [] },
+    ]),
+  );
+
+  // Top dominant category per platform.
+  const topCategoryRows = (await db.execute(sql`
+    SELECT platform, dominant AS category, count(*)::int AS posts
+    FROM (
+      SELECT
+        platform,
+        (
+          SELECT key FROM jsonb_each_text(categories)
+          WHERE key = ANY (ARRAY[${sql.raw(
+            CATEGORIES.map((c) => `'${c}'`).join(","),
+          )}])
+          ORDER BY value::numeric DESC LIMIT 1
+        ) AS dominant
+      FROM social_posts
+      WHERE categories IS NOT NULL
+    ) sub
+    WHERE dominant IS NOT NULL
+    GROUP BY platform, dominant
+    ORDER BY platform, posts DESC
+  `)) as unknown as {
+    rows: Array<{ platform: string; category: string; posts: number }>;
+  };
+  const topCategoryByPlatform = new Map<string, string>();
+  for (const r of topCategoryRows.rows ?? []) {
+    if (!topCategoryByPlatform.has(r.platform)) {
+      topCategoryByPlatform.set(r.platform, r.category);
+    }
+  }
+
+  const platformBreakdown = platformCountRows.map((r) => ({
+    platform: r.platform,
+    posts: r.posts,
+    topTopic: topTopicByPlatform.get(r.platform) ?? null,
+    topCategory: topCategoryByPlatform.get(r.platform) ?? null,
+  }));
+
   return {
     totalPosts,
     classifiedPosts,
@@ -430,5 +501,6 @@ export async function getOverviewInsights(): Promise<OverviewInsights | null> {
       keywords: t.keywords ?? [],
       postCount: t.postCount,
     })),
+    platformBreakdown,
   };
 }

@@ -42,6 +42,7 @@ export default async function HowItWorksPage({
       <DiscoveryStrategy t={t} />
       <BriefPipeline t={t} />
       <ModelsTable t={t} />
+      <MonthlyCost t={t} />
       <KitabCorpus t={t} />
       <Observability t={t} />
       <Tradeoffs t={t} />
@@ -716,6 +717,160 @@ function ModelsTable({ t }: { t: T }) {
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Estimated monthly API spend across all providers. Hard-coded snapshot
+ * — the real numbers live in `/admin/system/api-costs` (superadmin). The
+ * point of this section is to be transparent about cost discipline.
+ *
+ * Numbers reflect the schedule as of 2026-05-20:
+ *   X Mon/Wed/Fri · TT Tue only · IG Mon · YT daily · mainstream every 2h
+ *   trending overlay daily (X only) · topic discovery daily 04:00 WIB
+ */
+function MonthlyCost({ t }: { t: T }) {
+  const rows = [
+    {
+      provider: "Apify · X (apidojo)",
+      use: t("cost_x_use"),
+      monthly: 5.1,
+      note: "$0.0004/item · 12.7K/mo",
+    },
+    {
+      provider: "Apify · Instagram",
+      use: t("cost_ig_use"),
+      monthly: 9.76,
+      note: "$0.0023/item · 4.2K/mo",
+    },
+    {
+      provider: "Apify · TikTok (free actor)",
+      use: t("cost_tt_use"),
+      monthly: 16.97,
+      note: "$0.004/item · 4.2K/mo",
+    },
+    {
+      provider: "Apify · Trending overlay (X)",
+      use: t("cost_trending_use"),
+      monthly: 1.92,
+      note: "$0.0004/item · 4.8K/mo",
+    },
+    {
+      provider: "YouTube Data API",
+      use: t("cost_yt_use"),
+      monthly: 0,
+      note: t("cost_free_quota"),
+    },
+    {
+      provider: "RSS (feedparser + trafilatura)",
+      use: t("cost_rss_use"),
+      monthly: 0,
+      note: t("cost_free"),
+    },
+    {
+      provider: "Gemini Flash-Lite",
+      use: t("cost_gemini_use"),
+      monthly: 6.2,
+      note: "$0.10/$0.40 per 1M tokens",
+    },
+    {
+      provider: "OpenAI embeddings (one-shot)",
+      use: t("cost_openai_use"),
+      monthly: 0,
+      note: t("cost_openai_note"),
+    },
+    {
+      provider: "Anthropic Claude (fallback)",
+      use: t("cost_claude_use"),
+      monthly: 0,
+      note: t("cost_on_demand"),
+    },
+    {
+      provider: "Gemini 2.5 Pro (briefs, on-demand)",
+      use: t("cost_gemini_pro_use"),
+      monthly: 0,
+      note: t("cost_on_demand"),
+    },
+  ];
+
+  const total = rows.reduce((s, r) => s + r.monthly, 0);
+  const totalIDR = total * 16300;
+  const cap = 60;
+  const capIDR = cap * 16300;
+  const usedPct = Math.min(100, (total / cap) * 100);
+
+  return (
+    <section className="border-y border-slate-100 bg-gradient-to-b from-amber-50/30 to-white py-12 sm:py-16">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+        <SectionHeader
+          title={t("cost_title")}
+          subtitle={t("cost_subtitle")}
+        />
+
+        <div className="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <table className="w-full min-w-[640px] text-sm">
+            <thead>
+              <tr className="border-b border-slate-100 bg-slate-50 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                <th className="px-4 py-3">{t("cost_th_provider")}</th>
+                <th className="px-4 py-3">{t("cost_th_use")}</th>
+                <th className="px-4 py-3 text-right">{t("cost_th_monthly")}</th>
+                <th className="px-4 py-3">{t("cost_th_note")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.provider} className="border-b border-slate-50 last:border-0">
+                  <td className="px-4 py-3 align-top">
+                    <p className="font-semibold text-slate-900">{r.provider}</p>
+                  </td>
+                  <td className="px-4 py-3 align-top text-slate-700">{r.use}</td>
+                  <td className="px-4 py-3 align-top text-right tabular-nums text-slate-900">
+                    {r.monthly === 0
+                      ? "—"
+                      : `$${r.monthly.toFixed(2)}`}
+                  </td>
+                  <td className="px-4 py-3 align-top text-xs text-slate-500">
+                    {r.note}
+                  </td>
+                </tr>
+              ))}
+              <tr className="border-t-2 border-slate-200 bg-slate-50/60 font-semibold">
+                <td className="px-4 py-3 text-slate-900" colSpan={2}>
+                  {t("cost_total_row")}
+                </td>
+                <td className="px-4 py-3 text-right tabular-nums text-slate-900">
+                  ~${total.toFixed(2)}
+                </td>
+                <td className="px-4 py-3 text-xs text-slate-600">
+                  ≈ Rp {Math.round(totalIDR / 1000).toLocaleString("id-ID")}K/bulan
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Budget cap bar */}
+        <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50/60 p-4 sm:p-5">
+          <div className="flex flex-wrap items-baseline justify-between gap-2 text-sm">
+            <p className="font-semibold text-slate-900">
+              {t("cost_budget_title")}
+            </p>
+            <p className="font-mono text-xs text-slate-700">
+              ${total.toFixed(2)} / ${cap} · Rp {Math.round(capIDR / 1000).toLocaleString("id-ID")}K
+            </p>
+          </div>
+          <div className="mt-3 h-2 overflow-hidden rounded-full bg-amber-100">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-amber-500"
+              style={{ width: `${usedPct}%` }}
+            />
+          </div>
+          <p className="mt-2 text-xs text-slate-600">
+            {t("cost_budget_caveat")}
+          </p>
         </div>
       </div>
     </section>

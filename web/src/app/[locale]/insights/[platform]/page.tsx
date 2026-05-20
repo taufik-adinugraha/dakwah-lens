@@ -113,7 +113,7 @@ export default async function PlatformDrilldownPage({
       )}
       {live && live.totalPosts > 0 && <LiveStream live={live} t={t} />}
       {useRealClusters ? (
-        <RealCategoryClusters live={live!} locale={locale} />
+        <RealCategoryClusters live={live!} locale={locale} platform={platform} />
       ) : (
         <ClusterCards config={config} t={t} />
       )}
@@ -219,9 +219,11 @@ const DAWAH_CATEGORIES = [
 async function RealCategoryClusters({
   live,
   locale,
+  platform,
 }: {
   live: PlatformInsights;
   locale: string;
+  platform: string;
 }) {
   // Use the shared Insights namespace for da'wah category labels so they're
   // consistent across platforms and properly localized.
@@ -263,9 +265,10 @@ async function RealCategoryClusters({
                 )
               : c.category;
             return (
-              <article
+              <Link
                 key={c.category}
-                className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+                href={`/insights/${platform}/posts?category=${c.category}`}
+                className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -295,7 +298,10 @@ async function RealCategoryClusters({
                     style={{ width: `${sharePct}%` }}
                   />
                 </div>
-              </article>
+                <p className="mt-3 text-[11px] font-medium text-brand-700 opacity-0 transition group-hover:opacity-100">
+                  {tInsights("category_view_posts")} →
+                </p>
+              </Link>
             );
           })}
         </div>

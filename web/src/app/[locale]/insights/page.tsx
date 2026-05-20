@@ -34,8 +34,8 @@ export default async function InsightsPage({
   // instead of inventing numbers.
   const overview = await getOverviewInsights();
 
-  // Trending topics: BERTopic-discovered themes, top 5 by post count.
-  // Empty until the nightly re-cluster has run (08:00 WIB).
+  // Trending topics: Gemini-discovered themes, top 5 by post count.
+  // Empty until the nightly re-cluster has run (04:00 WIB).
   const trendingRows = overview?.trendingTopics ?? [];
 
   // Top dominant da'wah categories, color-cycled for visual variety.
