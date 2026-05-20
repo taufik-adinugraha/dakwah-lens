@@ -9,11 +9,14 @@ effort approximation. Reasons we drift below truth:
      cost goes unrecorded on our side but is still billed by Apify.
   3. Apify rounds to fractions of a cent per usage unit; small runs
      return $0 to us while still incrementing the dashboard.
+  4. Some actors (notably `apidojo/tweet-scraper`) report ~$0 compute
+     at run-completion and bill the per-event fee LATER — our DB sees
+     none of that until reconcile.
 
 This module pulls the authoritative monthly total straight from Apify's
-billing endpoint and writes a single `usage_events` delta row, so the
-`/admin/system/api-costs` dashboard stays in lockstep with reality
-within ~24h.
+billing endpoint (`/v2/users/me/limits` → `data.current.monthlyUsageUsd`)
+and writes a single `usage_events` delta row so the cost dashboard stays
+within ~24h of reality.
 """
 
 from __future__ import annotations
@@ -27,79 +30,95 @@ from sqlalchemy import func, select
 from api.config import settings
 from api.db import SessionLocal
 from api.models.admin import UsageEvent
-from api.services.usage import record_usage
 
 log = structlog.get_logger()
 
 
 async def reconcile_apify_monthly() -> dict[str, object]:
-    """Fetch this month's authoritative Apify usage, write a delta row.
+    """Fetch this billing-cycle's authoritative Apify usage, write a delta row.
 
     Idempotent across days: the delta is `apify_total - SUM(our_rows)`
     INCLUDING any prior reconcile rows, so cumulative sum stays equal
     to Apify's truth.
+
+    Note: Apify's billing cycle is the user's account anniversary, not
+    the calendar month. We use whatever start date Apify reports so the
+    DB aggregate window matches the apify_total window.
     """
     if not settings.apify_token:
         log.info("billing.reconcile_skipped", reason="no_apify_token")
         return {"skipped": "no_apify_token"}
 
-    today = date.today()
-    month_start = datetime(today.year, today.month, 1, tzinfo=UTC)
-
     async with httpx.AsyncClient(timeout=20.0) as client:
         resp = await client.get(
-            "https://api.apify.com/v2/users/me/usage/monthly",
+            "https://api.apify.com/v2/users/me/limits",
             headers={"Authorization": f"Bearer {settings.apify_token}"},
-            params={"date": today.isoformat()},
         )
         resp.raise_for_status()
         payload = resp.json()
 
-    # Apify wraps responses in `{"data": ...}`. The monthly endpoint
-    # historically returned the total under either `usageTotalUsd` or
-    # `monthlyServiceUsageTotalUsd` depending on plan — tolerate both.
     data = payload.get("data") or {}
-    apify_total = float(
-        data.get("usageTotalUsd")
-        or data.get("monthlyServiceUsageTotalUsd")
-        or 0.0
-    )
+    current = data.get("current") or {}
+    apify_total = float(current.get("monthlyUsageUsd") or 0.0)
+
+    # Apify's cycle starts on the user's account anniversary day. Use
+    # the cycle start it reports so our DB aggregate matches the same
+    # window — calendar-month would over- or under-count near the
+    # boundary.
+    cycle = data.get("monthlyUsageCycle") or {}
+    cycle_start_str = cycle.get("startAt")
+    if cycle_start_str:
+        cycle_start = datetime.fromisoformat(cycle_start_str.replace("Z", "+00:00"))
+    else:
+        today = date.today()
+        cycle_start = datetime(today.year, today.month, 1, tzinfo=UTC)
 
     async with SessionLocal() as session:
         result = await session.execute(
             select(func.coalesce(func.sum(UsageEvent.cost_usd), 0.0))
             .where(UsageEvent.provider == "apify")
-            .where(UsageEvent.occurred_at >= month_start)
+            .where(UsageEvent.occurred_at >= cycle_start)
         )
         db_total = float(result.scalar() or 0.0)
 
-    delta = round(apify_total - db_total, 4)
+        delta = round(apify_total - db_total, 4)
 
-    if abs(delta) < 0.001:
-        log.info(
-            "billing.reconcile_no_op",
-            apify_total=apify_total,
-            db_total=db_total,
+        if abs(delta) < 0.001:
+            log.info(
+                "billing.reconcile_no_op",
+                apify_total=apify_total,
+                db_total=db_total,
+                cycle_start=cycle_start.isoformat(),
+            )
+            return {
+                "apify_total": apify_total,
+                "db_total": db_total,
+                "delta": delta,
+                "cycle_start": cycle_start.isoformat(),
+                "wrote_row": False,
+            }
+
+        # Insert delta row directly. We tried using `usage.record_usage`
+        # here originally but it's a sync function that does
+        # `ensure_future` from inside an async caller — the coroutine
+        # was scheduled but never awaited, so the row never landed.
+        event = UsageEvent(
+            provider="apify",
+            operation="billing_reconcile",
+            model=None,
+            tokens_in=None,
+            tokens_out=None,
+            units=None,
+            cost_usd=delta,
+            meta={
+                "cycle_start": cycle_start.isoformat(),
+                "apify_total_usd": apify_total,
+                "db_total_before_delta_usd": db_total,
+                "reconciled_at": datetime.now(UTC).isoformat(),
+            },
         )
-        return {
-            "apify_total": apify_total,
-            "db_total": db_total,
-            "delta": delta,
-            "wrote_row": False,
-        }
-
-    record_usage(
-        provider="apify",
-        operation="billing_reconcile",
-        model=None,
-        cost_usd=delta,
-        meta={
-            "month": today.strftime("%Y-%m"),
-            "apify_total_usd": apify_total,
-            "db_total_before_delta_usd": db_total,
-            "reconciled_at": datetime.now(UTC).isoformat(),
-        },
-    )
+        session.add(event)
+        await session.commit()
 
     log.info(
         "billing.reconcile_done",
@@ -112,5 +131,6 @@ async def reconcile_apify_monthly() -> dict[str, object]:
         "apify_total": apify_total,
         "db_total": db_total,
         "delta": delta,
+        "cycle_start": cycle_start.isoformat(),
         "wrote_row": True,
     }
