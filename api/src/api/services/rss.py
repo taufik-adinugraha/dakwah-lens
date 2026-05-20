@@ -9,8 +9,12 @@ have to know the source was RSS rather than Apify.
 Pass empty string ("") to take the latest N items across all feeds.
 
 Feed list is configurable via the `rss_feeds` table (managed by the
-superadmin at `/admin/system/rss`). On a fresh database we seed
-`DEFAULT_FEEDS` so the ingest pipeline works out of the box.
+superadmin at `/admin/system/rss`). The table must be seeded before
+the ingest pipeline runs — `scripts/seed_rss_feeds.py` populates
+`DEFAULT_FEEDS` as a starting point, `seed_extended_feeds.py` adds the
+regional + extended national outlets. If the table is empty at runtime
+the loader raises rather than silently falling back to the constant —
+silent fallback once hid a real bug for two days.
 """
 
 from __future__ import annotations
@@ -57,24 +61,47 @@ async def _load_feeds_async() -> dict[str, FeedMeta]:
         )
         rows = res.all()
         if not rows:
-            return {
-                name: (url, None, False) for name, url in DEFAULT_FEEDS.items()
-            }
+            # No enabled rows is a configuration error — the admin must
+            # seed the `rss_feeds` table (see scripts/seed_rss_feeds.py).
+            # Fail loudly rather than silently scrape an unrelated set.
+            raise RuntimeError(
+                "rss_feeds table has no enabled rows — seed it via "
+                "`uv run python -m api.scripts.seed_rss_feeds` "
+                "(and the extended-feeds script for regional outlets) "
+                "before running ingest."
+            )
         return {
             row.name: (row.url, row.region, bool(row.fetch_body)) for row in rows
         }
 
 
 def _load_feeds() -> dict[str, FeedMeta]:
-    """Sync wrapper. RSS scraper runs in Celery sync tasks + the ingest CLI."""
+    """Sync wrapper. RSS scraper runs in Celery sync tasks AND inside the
+    ingest CLI's async `_run` — i.e. sometimes called from a sync context,
+    sometimes from inside a running event loop.
+
+    `asyncio.run()` raises `RuntimeError("asyncio.run() cannot be called from
+    a running event loop")` when invoked from inside an active loop. We used
+    to swallow that and silently fall back to a hardcoded default list,
+    which masked real configuration bugs (the regional Tribun outlets
+    never got scraped for days). The fallback is gone — we now detect the
+    running-loop case and run the DB query in a separate thread with its
+    own loop. Any failure of the DB query propagates.
+    """
     try:
-        return asyncio.run(_load_feeds_async())
+        asyncio.get_running_loop()
     except RuntimeError:
-        # Already inside an event loop — fall back to defaults rather than
-        # depending on `nest_asyncio`. In practice this only happens during
-        # tests or unusual REPL setups.
-        log.warning("rss.load_feeds.no_loop_fallback")
-        return {name: (url, None, False) for name, url in DEFAULT_FEEDS.items()}
+        # No loop in this thread — direct asyncio.run is correct.
+        return asyncio.run(_load_feeds_async())
+
+    # We're inside a running event loop. Spawn a one-shot worker thread
+    # that builds its own loop, runs the query, and returns the result.
+    # ThreadPoolExecutor is the standard idiom for "I have an async call
+    # but need it from sync code in an already-async context".
+    import concurrent.futures
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+        return executor.submit(lambda: asyncio.run(_load_feeds_async())).result()
 
 
 # CNN Indonesia (and a few others) reject bare requests as bots — send a
