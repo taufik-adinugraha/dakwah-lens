@@ -351,11 +351,16 @@ export type LatestInsightsSummary = {
     platforms?: Array<{ platform: string; posts: number }>;
   };
   model: string;
+  segment: string | null;
+  daleelRefs: schema.DaleelRef[] | null;
 };
 
-/** Most-recent AI-narrated executive briefing — null if the table is
- *  empty (briefing job hasn't fired yet). */
-export async function getLatestInsightsSummary(): Promise<LatestInsightsSummary | null> {
+/** Most-recent AI-narrated executive briefing for a given segment.
+ *  `segment` = null returns the all-platform briefing. Returns null
+ *  when no row exists yet (briefing job hasn't fired). */
+export async function getLatestInsightsSummary(
+  segment: string | null = null,
+): Promise<LatestInsightsSummary | null> {
   const [row] = await db
     .select({
       generatedAt: schema.insightsSummaries.generatedAt,
@@ -364,14 +369,22 @@ export async function getLatestInsightsSummary(): Promise<LatestInsightsSummary 
       summaryMd: schema.insightsSummaries.summaryMd,
       headlineStats: schema.insightsSummaries.headlineStats,
       model: schema.insightsSummaries.model,
+      segment: schema.insightsSummaries.segment,
+      daleelRefs: schema.insightsSummaries.daleelRefs,
     })
     .from(schema.insightsSummaries)
+    .where(
+      segment === null
+        ? sql`segment IS NULL`
+        : eq(schema.insightsSummaries.segment, segment),
+    )
     .orderBy(desc(schema.insightsSummaries.generatedAt))
     .limit(1);
   if (!row) return null;
   return {
     ...row,
     headlineStats: row.headlineStats as LatestInsightsSummary["headlineStats"],
+    daleelRefs: (row.daleelRefs as schema.DaleelRef[] | null) ?? null,
   };
 }
 

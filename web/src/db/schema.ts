@@ -794,11 +794,33 @@ export const insightsSummaries = pgTable(
     tokensIn: integer("tokens_in"),
     tokensOut: integer("tokens_out"),
     costUsd: doublePrecision("cost_usd"),
+    /** NULL = all-platform briefing. Otherwise one of `spiritual` /
+     *  `family` / `youth` / `justice` per the 2026-05-20 expansion. */
+    segment: text("segment"),
+    /** Kitab passages the LLM was permitted to cite for this
+     *  briefing. The render layer surfaces these as clickable chips
+     *  beneath the narrative. Shape:
+     *    [{ corpus, citation, score, arabic, translation_id,
+     *       translation_en, ref_id }] */
+    daleelRefs: jsonb("daleel_refs").$type<DaleelRef[] | null>(),
   },
   (table) => [
     index("ix_insights_summaries_generated_at").on(table.generatedAt),
+    index("ix_insights_summaries_segment").on(table.segment, table.generatedAt),
   ],
 );
+
+/** Shape of one item in `insightsSummaries.daleelRefs`. Mirrors what the
+ *  Python service writes — kept in sync by convention. */
+export type DaleelRef = {
+  corpus: string;
+  citation: string;
+  score: number | null;
+  arabic: string;
+  translation_id: string;
+  translation_en: string;
+  ref_id: string;
+};
 
 /**
  * User-saved items — kitab citations, briefs, social posts.

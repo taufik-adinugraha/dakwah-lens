@@ -644,6 +644,22 @@ class InsightsSummary(Base):
     tokens_out: Mapped[int | None] = mapped_column(Integer)
     cost_usd: Mapped[float | None] = mapped_column(Float)
 
+    segment: Mapped[str | None] = mapped_column(String(32))
+    """NULL for the all-platform briefing. One of `spiritual`, `family`,
+    `youth`, `justice` for per-segment briefings. The 4 segments map to
+    subsets of the 9 dakwah categories — see
+    web/src/app/[locale]/insights/segment/[focus]/page.tsx for the
+    canonical category mapping."""
+
+    daleel_refs: Mapped[list[dict] | None] = mapped_column(JSONB)
+    """List of kitab citations the narrative was ALLOWED to reference.
+    PRD §12: every Islamic reference in a briefing must be retrieved
+    from Qdrant, never freely generated. The service constrains the
+    LLM at prompt-time to cite only these, and the UI renders each as
+    a chip linking back to the kitab passage. Schema per item:
+        { corpus, citation, score, arabic, translation, ref_id }
+    """
+
 
 class Bookmark(Base):
     """User-saved item (kitab citation, brief, or social post).

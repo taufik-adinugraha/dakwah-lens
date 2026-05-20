@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { and, desc, sql } from "drizzle-orm";
-import { ArrowLeft, Layers } from "lucide-react";
+import { ArrowLeft, BookOpen, Layers } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
+import { getLatestInsightsSummary } from "@/lib/insights-data";
 
 /**
  * Audience-segmented dashboard. The /insights main page is mixed —
@@ -39,10 +40,16 @@ const FOCUS_DEFINITIONS: Record<
     tone: { accent: string; ring: string };
   }
 > = {
+  // Four segments cover all 9 dakwah classifier categories after the
+  // 2026-05-20 remap. `health` folds into `family` (mom/child/mental
+  // health are the dominant Indonesian family-vlog topics anyway) and
+  // `muamalah` folds into `justice` (Indonesian audiences increasingly
+  // hear Islamic-finance issues — pinjol, riba, paylater — as
+  // economic-justice issues).
   family: {
     labelKey: "segment_family_title",
     descriptionKey: "segment_family_desc",
-    categories: ["family"],
+    categories: ["family", "health"],
     tone: { accent: "bg-rose-500", ring: "ring-rose-100" },
   },
   youth: {
@@ -54,7 +61,7 @@ const FOCUS_DEFINITIONS: Record<
   justice: {
     labelKey: "segment_justice_title",
     descriptionKey: "segment_justice_desc",
-    categories: ["social_justice", "economic_ethics"],
+    categories: ["social_justice", "economic_ethics", "muamalah"],
     tone: { accent: "bg-amber-500", ring: "ring-amber-100" },
   },
   spiritual: {
@@ -103,7 +110,12 @@ export default async function SegmentPage({
     ORDER BY value::numeric DESC LIMIT 1
   )`;
 
-  const [topPosts, sentimentRows, [totals]] = await Promise.all([
+  // Per-segment AI-narrated briefing — written by the Celery
+  // `generate_insights_summary` task. May be null if today's run
+  // hasn't fired or no posts exist for this segment yet.
+  const segmentBriefingPromise = getLatestInsightsSummary(focus);
+
+  const [topPosts, sentimentRows, [totals], segmentBriefing] = await Promise.all([
     db
       .select({
         id: schema.socialPosts.id,
@@ -144,6 +156,7 @@ export default async function SegmentPage({
           def.categories.map((c) => `'${c}'`).join(","),
         )}])
     `) as unknown as Promise<Array<{ total: number }>>,
+    segmentBriefingPromise,
   ]);
 
   const total = (totals?.total as number) ?? 0;
@@ -189,6 +202,52 @@ export default async function SegmentPage({
           </div>
         </div>
       </section>
+
+      {/* Per-segment AI briefing — narrative + nasihah + retrieved daleel */}
+      {segmentBriefing && (
+        <section className="pb-8">
+          <div className="mx-auto max-w-5xl px-4 sm:px-6">
+            <div className="rounded-3xl border border-slate-200 bg-gradient-to-br from-white to-emerald-50/30 p-6 shadow-sm sm:p-7">
+              <p className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+                <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                {t("exec_briefing_label")}
+              </p>
+              <p className="whitespace-pre-line text-pretty text-sm leading-relaxed text-slate-800 sm:text-base">
+                {segmentBriefing.summaryMd}
+              </p>
+              {segmentBriefing.daleelRefs &&
+                segmentBriefing.daleelRefs.length > 0 && (
+                  <div className="mt-4 rounded-2xl border border-emerald-100 bg-white/60 p-3">
+                    <p className="mb-2 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+                      <BookOpen className="h-3 w-3" />
+                      {t("exec_daleel_label")}
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {segmentBriefing.daleelRefs.map((ref) => (
+                        <Link
+                          key={ref.ref_id}
+                          href={{
+                            pathname: "/kitab",
+                            query: { q: ref.citation, kitab: ref.corpus },
+                          }}
+                          title={ref.translation_id || ref.translation_en || ""}
+                          className="group inline-flex max-w-full items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] text-emerald-900 transition hover:border-emerald-300 hover:bg-emerald-100"
+                        >
+                          <span className="text-[9px] font-semibold uppercase tracking-wider text-emerald-700">
+                            {ref.corpus.replace(/_/g, " ")}
+                          </span>
+                          <span className="truncate font-medium">
+                            {ref.citation}
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Sentiment mix for this segment */}
       {sentimentTotal > 0 && (
