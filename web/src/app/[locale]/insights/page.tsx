@@ -12,6 +12,10 @@ import {
 import clsx from "clsx";
 
 import { Link } from "@/i18n/navigation";
+import { auth } from "@/auth";
+import { eq } from "drizzle-orm";
+import { db, schema } from "@/db";
+import { DigestOptInPrompt } from "@/components/DigestOptInPrompt";
 import {
   getLatestInsightsSummary,
   getOverviewInsights,
@@ -36,10 +40,24 @@ export default async function InsightsPage({
   // Live aggregation over `social_posts`. Returns null when the pipeline
   // hasn't ingested anything yet — page renders an honest empty state
   // instead of inventing numbers.
-  const [overview, summary] = await Promise.all([
+  const [overview, summary, session] = await Promise.all([
     getOverviewInsights(),
     getLatestInsightsSummary(),
+    auth(),
   ]);
+
+  // Show the weekly-digest opt-in prompt only for signed-in users
+  // who haven't already opted in. Anonymous visitors get nothing
+  // (they need a verified email first).
+  let showDigestPrompt = false;
+  if (session?.user?.id) {
+    const [row] = await db
+      .select({ optedIn: schema.users.emailDigestOptIn })
+      .from(schema.users)
+      .where(eq(schema.users.id, session.user.id))
+      .limit(1);
+    showDigestPrompt = !row?.optedIn;
+  }
 
   // Trending topics: Gemini-discovered themes, top 5 by post count.
   // Empty until the nightly re-cluster has run (04:00 WIB).
@@ -106,6 +124,17 @@ export default async function InsightsPage({
       </section>
 
       {summary && <ExecutiveBriefing summary={summary} t={t} locale={locale} />}
+
+      {showDigestPrompt && (
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <DigestOptInPrompt
+            title={t("digest_prompt_title")}
+            body={t("digest_prompt_body")}
+            yesLabel={t("digest_prompt_yes")}
+            noLabel={t("digest_prompt_no")}
+          />
+        </div>
+      )}
 
       {/* Audience-segment chips. Each links to /insights/segment/X
           for a filtered view (e.g. "just family + youth chatter"). */}

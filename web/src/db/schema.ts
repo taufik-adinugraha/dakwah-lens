@@ -35,6 +35,8 @@ export const users = pgTable(
     role: text("role").notNull().default("user"),
     profile: jsonb("profile").$type<UserProfile>(),
     onboardedAt: timestamp("onboarded_at", { withTimezone: true }),
+    emailDigestOptIn: boolean("email_digest_opt_in").notNull().default(false),
+    digestUnsubscribeToken: text("digest_unsubscribe_token"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .default(sql`now()`),

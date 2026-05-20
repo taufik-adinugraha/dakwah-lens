@@ -20,6 +20,7 @@ from api.scripts import cluster_topics
 from api.scripts import ingest as ingest_script
 from api.services import (
     billing,
+    email_digest,
     ingest_queries,
     ingest_runs,
     insights_summary,
@@ -222,6 +223,22 @@ def recluster_all() -> dict[str, int]:
         return out
 
     return asyncio.run(_runner())
+
+
+@celery_app.task(name="api.workers.ingest.send_weekly_digest")
+def send_weekly_digest() -> dict[str, object]:
+    """Send the weekly insights digest to every opted-in user.
+
+    Runs Sunday 18:00 WIB via Celery beat. Uses the most-recent row
+    of `insights_summaries` as the body. Free up to 3K emails/month
+    via Resend.
+    """
+    try:
+        result = asyncio.run(email_digest.send_weekly_digests())
+        return result or {"skipped": True}
+    except Exception:
+        log.exception("email_digest.failed")
+        return {"error": "send_failed"}
 
 
 @celery_app.task(name="api.workers.ingest.generate_insights_summary")

@@ -11,6 +11,7 @@ from typing import Any
 from uuid import UUID, uuid4
 
 from sqlalchemy import (
+    Boolean,
     DateTime,
     ForeignKey,
     Integer,
@@ -74,6 +75,17 @@ class User(Base, TimestampMixin):
         DateTime(timezone=True),
         comment="Set when the user finishes the /onboarding wizard.",
     )
+
+    # ── Weekly email digest opt-in ─────────────────────────────────
+    # Default False — PDP §22 requires explicit consent for marketing
+    # / informational emails. Toggled on via a UI prompt or onboarding.
+    email_digest_opt_in: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False
+    )
+    # Per-user opaque token used by the unsubscribe link in each
+    # digest email — lets users opt out without logging in. Generated
+    # on first opt-in.
+    digest_unsubscribe_token: Mapped[str | None] = mapped_column(String(64))
 
     accounts: Mapped[list["Account"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"

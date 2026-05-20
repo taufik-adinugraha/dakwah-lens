@@ -138,6 +138,14 @@ celery_app.conf.update(
             "task": "api.workers.ingest.generate_insights_summary",
             "schedule": crontab(minute=30, hour=4),
         },
+        # Weekly email digest — Sunday 18:00 WIB. Late-evening before
+        # Monday morning so Indonesian audiences see it in their
+        # Sunday-evening inbox routine. Free up to 3K emails/month on
+        # Resend's free tier.
+        "send-weekly-digest": {
+            "task": "api.workers.ingest.send_weekly_digest",
+            "schedule": crontab(minute=0, hour=18, day_of_week=0),
+        },
         # Trending overlay: fetch Google Trends + YouTube popular + Google
         # News for Indonesia, filter via Gemini Flash-Lite, then dispatch
         # ad-hoc scrapes on the surviving keywords. Runs at 12:00 WIB so
