@@ -7,6 +7,7 @@ import { ArrowLeft, BookOpen, Layers } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
 import { getLatestInsightsSummary } from "@/lib/insights-data";
+import { InsightsHeadlinePills } from "@/components/InsightsHeadlinePills";
 
 /**
  * Audience-segmented dashboard. The /insights main page is mixed —
@@ -244,6 +245,17 @@ export default async function SegmentPage({
                     </div>
                   </div>
                 )}
+              {/* Segment-filtered headline pills — same shape as the
+                  all-platform hero, but the underlying stats are scoped
+                  to this segment's category set. */}
+              <InsightsHeadlinePills
+                stats={segmentBriefing.headlineStats}
+                locale={locale}
+                t={(key) => t(key as Parameters<typeof t>[0])}
+                localizeCategory={(cat) =>
+                  t(`dawah_category_${cat}` as Parameters<typeof t>[0])
+                }
+              />
             </div>
           </div>
         </section>

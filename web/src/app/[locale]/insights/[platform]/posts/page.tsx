@@ -86,10 +86,27 @@ export default async function PostsBrowsePage({
     ? (sentimentParam as Sentiment)
     : "all";
 
+  // Topic filter — discovered cluster from the topics table. Validate
+  // shape only (UUID-ish); the join below tolerates a no-match value
+  // by returning zero rows.
+  const topicParam = typeof search.topic === "string" ? search.topic : "";
+  const topicId = /^[0-9a-f-]{36}$/i.test(topicParam) ? topicParam : "";
+
+  // Outlet/author filter — string match against social_posts.author.
+  // Cap length so a pathological querystring can't blow up the query.
+  const authorParam = typeof search.author === "string" ? search.author : "";
+  const author = authorParam.slice(0, 64);
+
   // Build WHERE clauses.
   const filters = [eq(schema.socialPosts.platform, dbPlatformName)];
   if (sentiment !== "all") {
     filters.push(eq(schema.socialPosts.sentimentLabel, sentiment));
+  }
+  if (topicId) {
+    filters.push(eq(schema.socialPosts.topicId, topicId));
+  }
+  if (author) {
+    filters.push(eq(schema.socialPosts.author, author));
   }
 
   // For category filter: dominant category match. JSONB → key with the

@@ -119,10 +119,10 @@ export default async function PlatformDrilldownPage({
       )}
       {!useRealClusters && <TopicsByCluster config={config} />}
       {live && live.discoveredTopics.length > 0 && (
-        <DiscoveredTopics live={live} locale={locale} />
+        <DiscoveredTopics live={live} locale={locale} platform={platform} />
       )}
-      <TopOutlets config={config} t={t} live={live} />
-      <TopStories config={config} t={t} />
+      <TopOutlets config={config} t={t} live={live} platform={platform} />
+      <TopStories config={config} t={t} live={live} platform={platform} />
       <CTA t={t} />
     </>
   );
@@ -311,17 +311,21 @@ async function RealCategoryClusters({
 }
 
 /**
- * Topics discovered by BERTopic. Distinct from the 9 PRD `categories` —
- * categories are a fixed taxonomy from the relevance classifier; topics are
- * emergent clusters with keyword-derived labels that surface what the
- * conversation is actually *about* this week.
+ * Topics discovered by the Gemini topic-discovery pass (replaced BERTopic
+ * 2026-05-20 — BERTopic underperformed on short Indonesian social text).
+ * Distinct from the 9 PRD `categories`: categories are a fixed taxonomy
+ * from the relevance classifier; topics are emergent clusters with
+ * Gemini-authored Bahasa labels that surface what the conversation is
+ * actually *about* this week. Each card links to the posts in the cluster.
  */
 async function DiscoveredTopics({
   live,
   locale,
+  platform,
 }: {
   live: PlatformInsights;
   locale: string;
+  platform: string;
 }) {
   const tInsights = await getTranslations({ locale, namespace: "Insights" });
   const totalPosts = live.discoveredTopics.reduce(
@@ -361,9 +365,10 @@ async function DiscoveredTopics({
               1,
             );
             return (
-              <article
+              <Link
                 key={topic.id}
-                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+                href={`/insights/${platform}/posts?topic=${topic.id}`}
+                className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
               >
                 <div className="flex items-start justify-between gap-3">
                   <p className="text-base font-semibold leading-snug text-slate-900">
@@ -403,7 +408,10 @@ async function DiscoveredTopics({
                     ))}
                   </div>
                 )}
-              </article>
+                <p className="mt-3 text-[11px] font-medium text-brand-700 opacity-0 transition group-hover:opacity-100">
+                  {tInsights("category_view_posts")} →
+                </p>
+              </Link>
             );
           })}
         </div>
@@ -583,12 +591,17 @@ function TopOutlets({
   config,
   t,
   live,
+  platform,
 }: {
   config: DrilldownConfig;
   t: T;
   live: PlatformInsights | null;
+  platform: string;
 }) {
   // Prefer live data when we have a meaningful number of distinct outlets.
+  // When live data is present, each row is a clickable link to the filtered
+  // post list — config-based fallback rows stay non-interactive since they
+  // are demo placeholders.
   const useLive = !!live && live.topOutlets.length >= 2;
   const outlets = useLive ? live!.topOutlets : config.topOutlets;
   const max = Math.max(...outlets.map((o) => o.articles), 1);
@@ -612,14 +625,11 @@ function TopOutlets({
         </div>
 
         <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="space-y-3">
+          <div className="space-y-1">
             {outlets.map((o) => {
               const pct = (o.articles / max) * 100;
-              return (
-                <div
-                  key={o.name}
-                  className="grid grid-cols-[140px_1fr_auto] items-center gap-3 sm:grid-cols-[200px_1fr_auto]"
-                >
+              const rowInner = (
+                <>
                   <span className="truncate text-sm font-medium text-slate-800">
                     {o.name}
                   </span>
@@ -632,6 +642,21 @@ function TopOutlets({
                   <span className="text-xs tabular-nums text-slate-500">
                     {o.articles.toLocaleString()}
                   </span>
+                </>
+              );
+              const gridClasses =
+                "grid grid-cols-[140px_1fr_auto] items-center gap-3 rounded-lg px-2 py-2 sm:grid-cols-[200px_1fr_auto]";
+              return useLive ? (
+                <Link
+                  key={o.name}
+                  href={`/insights/${platform}/posts?author=${encodeURIComponent(o.name)}`}
+                  className={`${gridClasses} transition hover:bg-slate-50`}
+                >
+                  {rowInner}
+                </Link>
+              ) : (
+                <div key={o.name} className={gridClasses}>
+                  {rowInner}
                 </div>
               );
             })}
@@ -774,8 +799,25 @@ function LiveStream({ live, t }: { live: PlatformInsights; t: T }) {
   );
 }
 
-function TopStories({ config, t }: { config: DrilldownConfig; t: T }) {
-  const stories = Array.from({ length: config.storyCount }, (_, i) => i + 1);
+function TopStories({
+  config,
+  t,
+  live,
+  platform,
+}: {
+  config: DrilldownConfig;
+  t: T;
+  live: PlatformInsights | null;
+  platform: string;
+}) {
+  // Use REAL top posts (sorted by da'wah relevance) when we have any.
+  // Falls back to the i18n-keyed demo strings only as a placeholder
+  // while ingestion is empty — the demo was the source of the
+  // "Government urges work-life balance after burnout study" English
+  // mock that confused users about whether the section was real.
+  const useLive = !!live && live.topStories.length > 0;
+  const stories = useLive ? live!.topStories.slice(0, config.storyCount) : [];
+
   return (
     <section className="bg-slate-50/60 py-12 sm:py-16">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
@@ -786,37 +828,84 @@ function TopStories({ config, t }: { config: DrilldownConfig; t: T }) {
           <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
             {t("section_stories_subtitle")}
           </p>
+          {useLive && (
+            <p className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
+              <Radio className="h-3 w-3" />
+              Real-time · top posts by da&apos;wah relevance
+            </p>
+          )}
         </div>
 
-        <div className="mt-8 space-y-2.5">
-          {stories.map((i) => (
-            <article
-              key={i}
-              className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300"
-            >
-              <Newspaper className="h-5 w-5 shrink-0 text-slate-400" />
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-slate-800">
-                  {t(`story_${i}_title`)}
-                </p>
-                <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-slate-500">
-                  <span className="font-medium text-slate-700">
-                    {t(`story_${i}_outlet`)}
-                  </span>
-                  <span>·</span>
-                  <span>{t(`story_${i}_tag`)}</span>
-                </p>
-              </div>
-              <ArrowUpRight className="h-4 w-4 shrink-0 text-slate-300" />
-            </article>
-          ))}
-        </div>
-
-        {process.env.NODE_ENV !== "production" && (
-          <p className="mx-auto mt-8 flex max-w-2xl items-center justify-center gap-1.5 text-center text-xs text-slate-500">
-            <Info className="h-3.5 w-3.5" />
+        {useLive ? (
+          <div className="mt-8 space-y-2.5">
+            {stories.map((post) => {
+              // First non-empty line of the post body — what most outlets
+              // put their headline as. Trim and cap so a long article body
+              // doesn't visually overflow.
+              const title =
+                (post.text ?? "").split("\n").find((s) => s.trim()) ?? "";
+              const dominantCat = post.categories
+                ? Object.entries(post.categories)
+                    .sort(([, a], [, b]) => (b as number) - (a as number))[0]?.[0]
+                : null;
+              const inner = (
+                <>
+                  <Newspaper className="h-5 w-5 shrink-0 text-slate-400" />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-slate-800">
+                      {title.slice(0, 130) || "(no headline)"}
+                    </p>
+                    <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-slate-500">
+                      {post.author && (
+                        <>
+                          <span className="font-medium text-slate-700">
+                            {post.author}
+                          </span>
+                          {dominantCat && <span>·</span>}
+                        </>
+                      )}
+                      {dominantCat && (
+                        <span className="capitalize">
+                          {dominantCat.replace(/_/g, " ")}
+                        </span>
+                      )}
+                      {typeof post.dawahRelevance === "number" && (
+                        <>
+                          <span>·</span>
+                          <span className="tabular-nums">
+                            relevance {(post.dawahRelevance * 100).toFixed(0)}%
+                          </span>
+                        </>
+                      )}
+                    </p>
+                  </div>
+                  <ArrowUpRight className="h-4 w-4 shrink-0 text-slate-300" />
+                </>
+              );
+              return post.url ? (
+                <a
+                  key={post.id}
+                  href={post.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300 hover:shadow-md"
+                >
+                  {inner}
+                </a>
+              ) : (
+                <div
+                  key={post.id}
+                  className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+                >
+                  {inner}
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="mt-8 rounded-2xl border border-dashed border-slate-200 bg-white/60 p-8 text-center text-sm text-slate-500">
             {t("data_note")}
-          </p>
+          </div>
         )}
       </div>
     </section>

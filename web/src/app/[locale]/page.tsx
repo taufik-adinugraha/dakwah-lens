@@ -107,10 +107,15 @@ export default async function LandingPage({
     viewerProfile = row?.profile ?? null;
   }
 
+  // Compute `approved` from session.user.status — NOT hardcoded false.
+  // Without this, an approved user who lands on /?view=marketing (via
+  // "Features"/"How it works"/"Donate" header links that intentionally
+  // skip the dashboard redirect) was being shown the pending-review CTA
+  // even though they're already approved.
   const viewer: Viewer = session?.user
     ? {
         signedIn: true,
-        approved: false,
+        approved: session.user.status === "approved",
         name:
           formatPanggilan(viewerProfile, session.user.name) ||
           session.user.email?.split("@")[0] ||

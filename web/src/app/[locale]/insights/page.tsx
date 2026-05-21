@@ -17,6 +17,7 @@ import { auth } from "@/auth";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { DigestOptInPrompt } from "@/components/DigestOptInPrompt";
+import { InsightsHeadlinePills } from "@/components/InsightsHeadlinePills";
 import {
   getLatestInsightsSummary,
   getOverviewInsights,
@@ -352,10 +353,6 @@ function ExecutiveBriefing({
   locale: string;
 }) {
   const stats = summary.headlineStats ?? {};
-  const sentiment = stats.sentiment ?? {};
-  const topCategory = stats.top_categories?.[0];
-  const topTopic = stats.top_topics?.[0];
-  const totals = stats.totals ?? {};
 
   // Format the generation time as an absolute date — Next.js's
   // react-hooks purity rule rejects `Date.now()` in server components.
@@ -400,71 +397,12 @@ function ExecutiveBriefing({
             <DaleelChips refs={summary.daleelRefs} t={t} />
           )}
 
-          {/* Numeric pill row */}
-          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {/* Sentiment pill */}
-            {sentiment.current_pct_negative !== undefined && (
-              <HeadlinePill
-                label={t("exec_pill_concerned")}
-                value={`${Math.round(sentiment.current_pct_negative)}%`}
-                delta={
-                  sentiment.delta_pp_negative !== undefined
-                    ? `${sentiment.delta_pp_negative >= 0 ? "+" : ""}${sentiment.delta_pp_negative.toFixed(1)}pp`
-                    : null
-                }
-                deltaIsBad={(sentiment.delta_pp_negative ?? 0) > 0}
-                accent={
-                  (sentiment.current_pct_negative ?? 0) > 30
-                    ? "amber"
-                    : "slate"
-                }
-              />
-            )}
-
-            {/* Top category pill */}
-            {topCategory && (
-              <HeadlinePill
-                label={t("exec_pill_top_category")}
-                value={localizeCategory(t, topCategory.category)}
-                hint={`${Math.round(topCategory.share_pct)}% share`}
-                delta={
-                  topCategory.delta_pp
-                    ? `${topCategory.delta_pp >= 0 ? "+" : ""}${topCategory.delta_pp.toFixed(1)}pp`
-                    : null
-                }
-                deltaIsBad={false}
-                accent="brand"
-              />
-            )}
-
-            {/* Top topic pill */}
-            {topTopic && (
-              <HeadlinePill
-                label={t("exec_pill_top_topic")}
-                value={topTopic.label}
-                hint={`${topTopic.post_count.toLocaleString(locale)} posts · ${topTopic.platform}`}
-                delta={null}
-                deltaIsBad={false}
-                accent="emerald"
-              />
-            )}
-
-            {/* Volume pill */}
-            {totals.posts_7d !== undefined && (
-              <HeadlinePill
-                label={t("exec_pill_volume")}
-                value={(totals.posts_7d ?? 0).toLocaleString(locale)}
-                hint={t("exec_pill_volume_hint")}
-                delta={
-                  totals.delta_pct != null
-                    ? `${totals.delta_pct >= 0 ? "+" : ""}${totals.delta_pct.toFixed(0)}%`
-                    : null
-                }
-                deltaIsBad={false}
-                accent="slate"
-              />
-            )}
-          </div>
+          <InsightsHeadlinePills
+            stats={stats}
+            locale={locale}
+            t={(key) => t(key as Parameters<typeof t>[0])}
+            localizeCategory={(cat) => localizeCategory(t, cat)}
+          />
 
           <p className="mt-5 text-[10px] text-slate-400">
             {t("exec_briefing_model_credit", { model: summary.model })}
@@ -520,57 +458,8 @@ function DaleelChips({
   );
 }
 
-function HeadlinePill({
-  label,
-  value,
-  hint,
-  delta,
-  deltaIsBad,
-  accent,
-}: {
-  label: string;
-  value: string;
-  hint?: string;
-  delta: string | null;
-  deltaIsBad: boolean;
-  accent: "brand" | "emerald" | "amber" | "slate";
-}) {
-  const accentBg = {
-    brand: "bg-brand-50/70 ring-brand-100",
-    emerald: "bg-emerald-50/70 ring-emerald-100",
-    amber: "bg-amber-50/70 ring-amber-100",
-    slate: "bg-white ring-slate-200",
-  }[accent];
-
-  return (
-    <div
-      className={`rounded-xl p-3 ring-1 ${accentBg}`}
-    >
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-        {label}
-      </p>
-      <div className="mt-1 flex items-baseline gap-2">
-        <p className="truncate text-base font-bold text-slate-900 sm:text-lg">
-          {value}
-        </p>
-        {delta && (
-          <span
-            className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold tabular-nums ${
-              deltaIsBad
-                ? "bg-amber-100 text-amber-800"
-                : "bg-emerald-100 text-emerald-800"
-            }`}
-          >
-            {delta}
-          </span>
-        )}
-      </div>
-      {hint && (
-        <p className="mt-0.5 truncate text-[11px] text-slate-500">{hint}</p>
-      )}
-    </div>
-  );
-}
+// HeadlinePill moved to @/components/InsightsHeadlinePills for reuse on
+// /insights/segment/[focus]. ExecutiveBriefing now imports InsightsHeadlinePills.
 
 // Visual config per platform. Wired from real DB data (post counts,
 // top topic, top category) — no hardcoded percentages anymore.
