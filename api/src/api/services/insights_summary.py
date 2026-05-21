@@ -159,7 +159,7 @@ async def _compute_stats(
     # post with a tiny non-zero score in a segment key was counted in
     # the segment. That made all four segment summaries converge to the
     # same numbers (2026-05-21 bugfix).
-    post_filter = f"""
+    post_filter = """
       WITH filtered AS (
         SELECT sp.*, (
           SELECT key FROM jsonb_each_text(categories)
