@@ -451,23 +451,23 @@ async def generate_summary(
             config=types.GenerateContentConfig(
                 system_instruction=SYSTEM_PROMPT,
                 temperature=0.3,
-                # 2048 visible-output budget gives ~1500 headroom after
-                # the 512 thinking budget — comfortable margin for the
-                # 300-500 token target briefing length.
-                max_output_tokens=2048,
+                # 8192 output budget — well below Gemini 2.5 Pro's
+                # 65k ceiling, but enough that 4096 of thinking +
+                # ~500 of visible briefing has comfortable headroom.
+                # Earlier 1200 was undersized once thinking was on.
+                max_output_tokens=8192,
                 safety_settings=relaxed_safety,
-                # "Low" thinking — 512 tokens is enough for the model
-                # to pick the 2-3 most resonant daleel from the
-                # retrieved list and spot subtle patterns in the
-                # stats, without ballooning into the multi-thousand
-                # internal monologue that the default (-1, dynamic)
-                # produced. Observed 2026-05-21 that dynamic thinking
-                # consumed the entire 1200 max_output budget for 4/5
-                # segments, leaving zero visible text. 512 is the
-                # sweet spot for a structured 3-paragraph briefing
-                # over pre-aggregated data — enough reasoning, but
-                # not so much that we starve the output.
-                thinking_config=types.ThinkingConfig(thinking_budget=512),
+                # "Medium-high" thinking — 4096 tokens lets the model
+                # reason properly about which 2-3 daleel from the
+                # retrieved list fit best, spot subtle patterns in
+                # the stats, and structure the 3-paragraph briefing
+                # with better narrative coherence. We tested with
+                # 512 ("low") and 0 ("disabled") — both produced
+                # adequate but flatter output. Cost difference is
+                # negligible at our 5-briefings/day cadence
+                # (~$1-3/mo vs ~$0.75 disabled). Quality matters more
+                # for the public-facing hero card.
+                thinking_config=types.ThinkingConfig(thinking_budget=4096),
             ),
         )
         summary_md = (resp.text or "").strip()
