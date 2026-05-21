@@ -32,7 +32,12 @@ from api.services.sentiment import SentimentResult
 log = structlog.get_logger()
 
 MODEL = "gemini-2.5-flash-lite"
-MAX_BATCH = 50
+# Was 50; lowered to 25 on 2026-05-21 after observing 503 "model overloaded"
+# spikes that drop oversized requests first. Smaller chunks mean a single
+# 503 doesn't soft-zero 50 items, and the prompt fits comfortably within
+# the model's processing window even when Gemini is under load. Doubles
+# the call count but each item is still ~$0.0001 — well inside cap.
+MAX_BATCH = 25
 
 _LABELS = ("positive", "neutral", "negative")
 

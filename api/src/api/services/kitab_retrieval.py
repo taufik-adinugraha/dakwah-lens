@@ -53,6 +53,20 @@ MIN_SCORE: dict[str, float] = {
     "tafsir_ibn_kathir": 0.28,
 }
 
+# Verse / hadith IDs that we never want to surface UNGROUNDED in a
+# briefing. These passages have legitimate scholarly readings but are
+# easy to misframe in a 280-character chip — and the briefing UI shows
+# them stripped of tafsir context (PRD §12: promote rahma + hikmah).
+# When a brief explicitly needs to address a controversial verse in
+# context, that's a dedicated UX surface, not the daily auto-briefing.
+#
+# Observed 2026-05-21: family-segment retrieval pulled QS. An-Nisaa 4:34
+# (waḍribūhunna) against a "family resilience" query — semantic match
+# without tafsir framing.
+DALEEL_DENYLIST: frozenset[str] = frozenset({
+    "quran::4:34",
+})
+
 
 _openai_client: OpenAI | None = None
 _qdrant_client: QdrantClient | None = None
@@ -189,7 +203,15 @@ def retrieve_daleel(
             if hit.score is None or hit.score < threshold:
                 below_threshold += 1
                 continue
-            all_hits.append(_normalize_hit(corpus, hit))
+            normalized = _normalize_hit(corpus, hit)
+            if normalized["ref_id"] in DALEEL_DENYLIST:
+                log.info(
+                    "kitab_retrieval.denylisted",
+                    ref_id=normalized["ref_id"],
+                    score=normalized["score"],
+                )
+                continue
+            all_hits.append(normalized)
 
     all_hits.sort(key=lambda h: h["score"] or -1e9, reverse=True)
     log.info(

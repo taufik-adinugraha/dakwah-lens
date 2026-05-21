@@ -350,13 +350,15 @@ export type LatestInsightsSummary = {
       current_pct_neutral?: number;
       current_pct_positive?: number;
       baseline_pct_negative?: number;
-      delta_pp_negative?: number;
+      /** null when there's no prior-week baseline yet (first ingest weeks). */
+      delta_pp_negative?: number | null;
     };
     top_categories?: Array<{
       category: string;
       posts: number;
       share_pct: number;
-      delta_pp: number;
+      /** null when there's no prior-week baseline. */
+      delta_pp: number | null;
     }>;
     top_topics?: Array<{
       label: string;

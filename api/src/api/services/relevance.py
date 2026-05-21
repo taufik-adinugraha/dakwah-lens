@@ -264,9 +264,18 @@ def classify_batch(texts: list[str]) -> list[RelevanceResult]:
     if keep_texts:
         scored: list[RelevanceResult] = []
         for start in range(0, len(keep_texts), MAX_BATCH):
-            scored.extend(
-                _classify_chunk(keep_texts[start : start + MAX_BATCH])
-            )
+            chunk = keep_texts[start : start + MAX_BATCH]
+            try:
+                scored.extend(_classify_chunk(chunk))
+            except Exception:
+                # Mirror news_sentiment's soft-fallback (2026-05-21): a
+                # Gemini 503 / quota / transient outage shouldn't fail
+                # the whole ingest. Default the chunk to zero-relevance
+                # so the rest of the pipeline (upsert, sentiment) still
+                # commits its work. Items can be re-scored by a later
+                # backfill pass once Gemini stabilizes.
+                log.exception("relevance.chunk_failed", batch_size=len(chunk))
+                scored.extend(_zero_result() for _ in chunk)
         for idx, r in zip(keep_indices, scored, strict=False):
             results[idx] = r
 
@@ -410,11 +419,14 @@ def classify_opportunity_batch(texts: list[str]) -> list[float]:
     if keep_texts:
         scored: list[float] = []
         for start in range(0, len(keep_texts), MAX_BATCH):
-            scored.extend(
-                _classify_opportunity_chunk(
-                    keep_texts[start : start + MAX_BATCH]
-                )
-            )
+            chunk = keep_texts[start : start + MAX_BATCH]
+            try:
+                scored.extend(_classify_opportunity_chunk(chunk))
+            except Exception:
+                # Soft-fallback to 0.0 on Gemini outage (2026-05-21) —
+                # same rationale as relevance.classify_batch above.
+                log.exception("opportunity.chunk_failed", batch_size=len(chunk))
+                scored.extend(0.0 for _ in chunk)
         for idx, score in zip(keep_indices, scored, strict=False):
             results[idx] = score
 

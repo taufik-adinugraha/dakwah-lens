@@ -69,7 +69,7 @@ The briefing has THREE consecutive paragraphs separated by blank lines:
 PARAGRAPH 1 — Penjelasan (3-4 sentences in Bahasa Indonesia):
   - Dominant theme this week — which category leads, what % share, what's driving it
   - Sentiment temperature with the specific numbers
-  - What's RISING vs LAST WEEK — name the specific topic or category with the change
+  - What's RISING vs LAST WEEK — name the specific topic or category with the change. IF `delta_pp` / `delta_pp_negative` is null in the input, you have NO baseline week yet — OMIT the rising-vs-last-week sentence entirely. Do NOT fabricate a comparison, do NOT write "naik signifikan" without a real number.
   Tone: precise, observational, practical. Use the numbers VERBATIM (e.g. "38%" not "sekitar sepertiga").
 
   CRITICAL — SCOPE OF PERCENTAGES: read SEGMENT_SCOPE in the input. When SEGMENT_SCOPE is "all" the percentages are share of all weekly conversation. When SEGMENT_SCOPE is a specific segment (spiritual/family/youth/justice), the percentages in `top_categories` are share *WITHIN THAT SEGMENT'S CATEGORIES ONLY* — e.g. "family 89%" means 89% of family-segment posts are family-dominant (vs health-dominant), NOT 89% of all conversation. Phrase accordingly: use language like "di antara konten segmen keluarga, kategori family mendominasi dengan 89%" or "dalam diskursus segmen ini, X memimpin dengan 89%". Do NOT write "percakapan publik didominasi oleh family 89%" when scope is a segment — that overclaims.
@@ -104,7 +104,7 @@ The briefing has THREE consecutive paragraphs separated by blank lines:
 PARAGRAPH 1 — Context (3-4 sentences in clear, neutral English):
   - Dominant theme this week — which category leads, what % share, what's driving it
   - Sentiment temperature with the specific numbers
-  - What's RISING vs LAST WEEK — name the specific topic or category with the change
+  - What's RISING vs LAST WEEK — name the specific topic or category with the change. IF `delta_pp` / `delta_pp_negative` is null in the input, you have NO baseline week yet — OMIT the rising-vs-last-week sentence entirely. Do NOT fabricate a comparison.
   Tone: precise, observational, practical. Use the numbers VERBATIM (e.g. "38%" not "about a third").
 
   CRITICAL — SCOPE OF PERCENTAGES: read SEGMENT_SCOPE in the input. When SEGMENT_SCOPE is "all" the percentages are share of all weekly conversation. When SEGMENT_SCOPE is a specific segment (spiritual/family/youth/justice), the percentages in `top_categories` are share *WITHIN THAT SEGMENT'S CATEGORIES ONLY* — e.g. "family 89%" means 89% of family-segment posts are family-dominant (vs health-dominant), NOT 89% of all conversation. Phrase accordingly: use language like "within family-segment content, the family category leads at 89%" or "in this segment's discourse, X leads with 89%". Do NOT write "public conversation is dominated by family 89%" when scope is a segment — that overclaims.
@@ -287,31 +287,45 @@ async def _compute_stats(
             {"prev": prev_period_start, "start": period_start},
         )
     ).all()
-    cat_total_prev = sum(int(r.posts) for r in prev_cat_rows) or 1
+    cat_total_prev_real = sum(int(r.posts) for r in prev_cat_rows)
+    # Defensive `or 1` for the division below; the real value is used as
+    # the no-baseline guard when populating delta_pp downstream.
+    cat_total_prev = cat_total_prev_real or 1
     prev_share = {
         r.category: round(100 * int(r.posts) / cat_total_prev, 1)
         for r in prev_cat_rows
     }
 
-    # 4. Topics — latest, ranked by post count. (Not segment-filtered
-    # because the `topics` table doesn't yet carry a category column;
-    # if topic discovery later splits per-segment, swap in a join.)
+    # 4. Topics — ranked by SEGMENT post count via a join on social_posts.
+    # The `topics` table itself doesn't carry a category column, so we
+    # bucket posts into topics + segment by joining the global-argmax
+    # `filtered` CTE. Without this each segment's briefing was fed the
+    # same global top-8 topics (2026-05-21) and narratives became
+    # interchangeable across segments.
     #
     # For each topic also fetch 2-3 sample headlines (first non-empty
     # line of each post's text), top-scored by da'wah relevance, so
     # the LLM prompt has SUBSTANCE, not just category aggregates. Without
     # this, observed 2026-05-21 that briefings read as "isu pemuda
     # penting" instead of naming the specific stories driving the topic.
+    # Headlines are also segment-filtered for the same reason.
     topic_rows = (
         await session.execute(
             text(
-                """
-                SELECT id, label, platform, keywords, post_count
-                FROM topics
-                ORDER BY post_count DESC
+                f"""
+                {post_filter}
+                SELECT t.id, t.label, t.platform, t.keywords,
+                       count(f.id)::int AS seg_post_count
+                FROM topics t
+                JOIN filtered f ON f.topic_id = t.id
+                WHERE f.dominant_cat = ANY ({cats_sql_array})
+                  AND f.posted_at >= :start
+                GROUP BY t.id, t.label, t.platform, t.keywords
+                ORDER BY seg_post_count DESC
                 LIMIT 8
                 """
-            )
+            ),
+            {"start": period_start},
         )
     ).all()
     top_topics: list[dict[str, Any]] = []
@@ -319,10 +333,12 @@ async def _compute_stats(
         headline_rows = (
             await session.execute(
                 text(
-                    """
+                    f"""
+                    {post_filter}
                     SELECT text, author
-                    FROM social_posts
+                    FROM filtered
                     WHERE topic_id = :tid AND text IS NOT NULL
+                      AND dominant_cat = ANY ({cats_sql_array})
                     ORDER BY dawah_relevance DESC NULLS LAST
                     LIMIT 3
                     """
@@ -347,7 +363,7 @@ async def _compute_stats(
             "label": r.label,
             "platform": r.platform,
             "keywords": list(r.keywords or [])[:5],
-            "post_count": int(r.post_count or 0),
+            "post_count": int(r.seg_post_count or 0),
             "sample_headlines": sample_headlines,
         })
 
@@ -389,13 +405,26 @@ async def _compute_stats(
             "current_pct_neutral": pct_neutral_7d,
             "current_pct_positive": pct_positive_7d,
             "baseline_pct_negative": pct_negative_prev,
-            "delta_pp_negative": round(pct_negative_7d - pct_negative_prev, 1),
+            # Only emit a delta when we have a real baseline week. When
+            # baseline_total = 0 (first full week of ingest, or empty
+            # segment), the delta would equal the current value and
+            # surface as a misleading "+27.5pp" pill (2026-05-21).
+            "delta_pp_negative": (
+                round(pct_negative_7d - pct_negative_prev, 1)
+                if baseline_total > 0
+                else None
+            ),
         },
         "top_categories": [
             {
                 **c,
-                "delta_pp": round(
-                    c["share_pct"] - prev_share.get(c["category"], 0), 1
+                # Same baseline-empty guard: if there was no prior-week
+                # data we can't compute a real delta, so emit None and
+                # let the UI show "—" rather than a spurious "+58.2pp".
+                "delta_pp": (
+                    round(c["share_pct"] - prev_share.get(c["category"], 0), 1)
+                    if cat_total_prev_real > 0
+                    else None
                 ),
             }
             for c in top_categories_7d

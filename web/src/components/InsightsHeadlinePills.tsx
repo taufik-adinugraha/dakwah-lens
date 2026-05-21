@@ -48,7 +48,7 @@ export function InsightsHeadlinePills({
           label={t("exec_pill_concerned")}
           value={`${Math.round(sentiment.current_pct_negative)}%`}
           delta={
-            sentiment.delta_pp_negative !== undefined
+            sentiment.delta_pp_negative != null
               ? `${sentiment.delta_pp_negative >= 0 ? "+" : ""}${sentiment.delta_pp_negative.toFixed(1)}pp`
               : null
           }
@@ -69,7 +69,7 @@ export function InsightsHeadlinePills({
           value={localizeCategory(topCategory.category)}
           hint={`${Math.round(topCategory.share_pct)}% share`}
           delta={
-            topCategory.delta_pp
+            topCategory.delta_pp != null
               ? `${topCategory.delta_pp >= 0 ? "+" : ""}${topCategory.delta_pp.toFixed(1)}pp`
               : null
           }
