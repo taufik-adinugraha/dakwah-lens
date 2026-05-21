@@ -200,3 +200,113 @@ def retrieve_daleel(
         top_score=all_hits[0]["score"] if all_hits else None,
     )
     return all_hits[:limit]
+
+
+def rerank_daleel(
+    theme: str,
+    candidates: list[dict[str, Any]],
+    *,
+    top_n: int = 3,
+) -> list[dict[str, Any]]:
+    """Re-rank embedding-retrieved daleel candidates by THEMATIC fit
+    using Gemini Flash-Lite.
+
+    Cosine similarity matches passages whose embedding tokens overlap
+    the query — for "isu youth" it surfaces verses that contain `muda`
+    or `pemuda` regardless of context (e.g. Quran verses about
+    youthful paradise servants instead of real-world youth issues).
+    This re-rank asks a cheap LLM to score the *thematic relevance*
+    of each candidate to the theme described in the briefing.
+
+    Cost: ~$0.0001 per re-rank call on `gemini-2.5-flash-lite`. Big
+    quality lift on daleel selection for a tiny cost.
+
+    Returns the top `top_n` candidates by re-rank score, preserving
+    the original schema. Falls back to the input order on any error
+    (defense in depth — never break the pipeline on a re-rank failure).
+    """
+    if not candidates or len(candidates) <= top_n:
+        return candidates[:top_n]
+
+    # Lazy import to keep this module light when re-rank isn't called.
+    from google import genai
+    from google.genai import types as genai_types
+
+    if not settings.gemini_api_key:
+        return candidates[:top_n]
+
+    client = genai.Client(api_key=settings.gemini_api_key)
+
+    numbered = "\n".join(
+        f"[{i}] {c['corpus'].upper()} {c['citation']}\n"
+        f"    Arab: {c['arabic'][:200]}\n"
+        f"    ID:   {c['translation_id'][:300] or c['translation_en'][:300]}"
+        for i, c in enumerate(candidates)
+    )
+    prompt = f"""Theme da'i akan diangkat pekan ini:
+{theme}
+
+Berikut adalah {len(candidates)} kandidat daleel dari Qur'an dan hadith yang ditemukan oleh pencarian embedding. Beberapa cocok dengan tema, beberapa hanya cocok pada kata kunci permukaan saja (tidak relevan secara tematik).
+
+Pilih INDEX dari {top_n} daleel yang PALING relevan secara TEMATIK untuk tema di atas. Pertimbangkan:
+- Apakah ayat/hadith ini benar-benar BERBICARA tentang tema, atau hanya berbagi kata kunci?
+- Apakah seorang da'i akan mengutipnya untuk topik ini, atau itu akan terasa dipaksakan?
+
+Kandidat:
+{numbered}
+
+Kembalikan JSON: {{"indices": [i1, i2, i3]}} dengan {top_n} index daleel terbaik, diurutkan dari yang paling relevan."""
+
+    try:
+        resp = client.models.generate_content(
+            model="gemini-2.5-flash-lite",
+            contents=prompt,
+            config=genai_types.GenerateContentConfig(
+                response_mime_type="application/json",
+                temperature=0.1,
+                max_output_tokens=200,
+                thinking_config=genai_types.ThinkingConfig(thinking_budget=256),
+            ),
+        )
+        raw = resp.text or "{}"
+        import json as _json
+
+        data = _json.loads(raw)
+        indices = data.get("indices", [])
+        if not isinstance(indices, list):
+            raise ValueError("indices not a list")
+        picked: list[dict[str, Any]] = []
+        seen: set[int] = set()
+        for idx in indices:
+            if isinstance(idx, int) and 0 <= idx < len(candidates) and idx not in seen:
+                picked.append(candidates[idx])
+                seen.add(idx)
+                if len(picked) >= top_n:
+                    break
+
+        usage_md = getattr(resp, "usage_metadata", None)
+        record_usage(
+            provider="gemini",
+            operation="daleel_rerank",
+            model="gemini-2.5-flash-lite",
+            tokens_in=getattr(usage_md, "prompt_token_count", None),
+            tokens_out=getattr(usage_md, "candidates_token_count", None),
+        )
+        log.info(
+            "kitab_retrieval.reranked",
+            theme=theme[:80],
+            candidates_in=len(candidates),
+            picked=len(picked),
+        )
+        # If the LLM picked fewer than top_n (or returned garbage), fall back
+        # to topping up from the original (similarity-sorted) list.
+        if len(picked) < top_n:
+            for c in candidates:
+                if c not in picked:
+                    picked.append(c)
+                    if len(picked) >= top_n:
+                        break
+        return picked
+    except Exception as exc:
+        log.warning("kitab_retrieval.rerank_failed", error=str(exc))
+        return candidates[:top_n]

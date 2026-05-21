@@ -33,7 +33,7 @@ from sqlalchemy import text
 from api.config import settings
 from api.db import SessionLocal
 from api.models.admin import InsightsSummary
-from api.services.kitab_retrieval import retrieve_daleel
+from api.services.kitab_retrieval import rerank_daleel, retrieve_daleel
 
 log = structlog.get_logger()
 
@@ -70,7 +70,9 @@ PARAGRAPH 1 — Penjelasan (3-4 sentences in Bahasa Indonesia):
   - Dominant theme this week — which category leads, what % share, what's driving it
   - Sentiment temperature with the specific numbers
   - What's RISING vs LAST WEEK — name the specific topic or category with the change
-  Tone: precise, observational, practical. Use the numbers VERBATIM (e.g. "38%" not "sekitar sepertiga"). Do not invent topics.
+  Tone: precise, observational, practical. Use the numbers VERBATIM (e.g. "38%" not "sekitar sepertiga").
+
+  CRITICAL: when describing what's happening, USE THE SPECIFIC SAMPLE HEADLINES I provide for each top topic. Do NOT abstract them into generic category statements ("isu pemuda penting"). Instead, name the actual stories driving the trend ("rentetan kasus pencabulan oleh kiai di Ponorogo, guru honorer, dan pria di kamar mandi masjid"). The headlines I give you ARE the substance — use them. Do NOT invent stories not in the headlines.
 
 PARAGRAPH 2 — Nasihah (2-3 sentences in Bahasa Indonesia):
   Practical Islamic counsel tied to what trended. Address the BROAD da'wah audience — da'i giving khutbah, ustadzah leading kajian ibu-ibu, content creators on YouTube/IG/TikTok, parents teaching at home, community organizers, researchers tracking Muslim discourse. Do NOT default to "khutbah Jumat" as the only surface. Mention the angle that resonates across these surfaces. Concrete, not generic.
@@ -247,11 +249,17 @@ async def _compute_stats(
     # 4. Topics — latest, ranked by post count. (Not segment-filtered
     # because the `topics` table doesn't yet carry a category column;
     # if topic discovery later splits per-segment, swap in a join.)
+    #
+    # For each topic also fetch 2-3 sample headlines (first non-empty
+    # line of each post's text), top-scored by da'wah relevance, so
+    # the LLM prompt has SUBSTANCE, not just category aggregates. Without
+    # this, observed 2026-05-21 that briefings read as "isu pemuda
+    # penting" instead of naming the specific stories driving the topic.
     topic_rows = (
         await session.execute(
             text(
                 """
-                SELECT label, platform, keywords, post_count
+                SELECT id, label, platform, keywords, post_count
                 FROM topics
                 ORDER BY post_count DESC
                 LIMIT 8
@@ -259,15 +267,42 @@ async def _compute_stats(
             )
         )
     ).all()
-    top_topics = [
-        {
+    top_topics: list[dict[str, Any]] = []
+    for r in topic_rows:
+        headline_rows = (
+            await session.execute(
+                text(
+                    """
+                    SELECT text, author
+                    FROM social_posts
+                    WHERE topic_id = :tid AND text IS NOT NULL
+                    ORDER BY dawah_relevance DESC NULLS LAST
+                    LIMIT 3
+                    """
+                ),
+                {"tid": r.id},
+            )
+        ).all()
+        # First non-empty line of each post = the headline most of the
+        # time (RSS body lead with the title; social posts are short).
+        sample_headlines = []
+        for h in headline_rows:
+            first = next(
+                (line for line in (h.text or "").splitlines() if line.strip()),
+                "",
+            )
+            if first:
+                sample_headlines.append({
+                    "title": first[:140],
+                    "author": h.author,
+                })
+        top_topics.append({
             "label": r.label,
             "platform": r.platform,
             "keywords": list(r.keywords or [])[:5],
             "post_count": int(r.post_count or 0),
-        }
-        for r in topic_rows
-    ]
+            "sample_headlines": sample_headlines,
+        })
 
     # 5. Per-platform breakdown — within segment.
     plat_rows = (
@@ -366,15 +401,47 @@ def _build_user_prompt(
         else "(tidak ada daleel yang ditemukan untuk tema ini)"
     )
 
+    # Pretty-print top topics with their sample headlines so the model
+    # can write about specific stories, not just category percentages.
+    top_topics_block_lines: list[str] = []
+    for t in stats.get("top_topics", [])[:5]:
+        top_topics_block_lines.append(
+            f"- {t['label']} ({t['post_count']} posts · platform={t['platform']})"
+        )
+        for h in t.get("sample_headlines", [])[:3]:
+            author = h.get("author") or "?"
+            top_topics_block_lines.append(
+                f"    · [{author}] {h['title']}"
+            )
+    top_topics_block = (
+        "\n".join(top_topics_block_lines)
+        if top_topics_block_lines
+        else "(tidak ada topik dengan sample headline)"
+    )
+
+    # Strip sample_headlines out of the JSON dump to avoid duplicating
+    # them — they're already laid out in TOP TOPICS WITH SAMPLE HEADLINES.
+    stats_for_json = {
+        **stats,
+        "top_topics": [
+            {k: v for k, v in t.items() if k != "sample_headlines"}
+            for t in stats.get("top_topics", [])
+        ],
+    }
+
     return f"""HEADLINE NUMBERS (use these and ONLY these for paragraph 1):
 
-{json.dumps(stats, indent=2, ensure_ascii=False)}
+{json.dumps(stats_for_json, indent=2, ensure_ascii=False)}
+
+TOP TOPICS WITH SAMPLE HEADLINES (paragraph 1 MUST name the specific stories from these headlines, not just abstract category counts):
+
+{top_topics_block}
 
 DALEEL YOU MAY CITE in paragraph 3 (cite 2-3 of these; you may NOT cite anything not in this list):
 
 {daleel_block}
 
-Write the briefing now: Paragraph 1 (Penjelasan), blank line, Paragraph 2 (Nasihah), blank line, Paragraph 3 (Daleel as a short list)."""
+Write the briefing now: Paragraph 1 (Penjelasan, grounded in the specific headlines above), blank line, Paragraph 2 (Nasihah), blank line, Paragraph 3 (Daleel as a short list)."""
 
 
 _client: genai.Client | None = None
@@ -411,14 +478,25 @@ async def generate_summary(
             )
             return None
 
-        # Daleel retrieval — synchronous (qdrant_client is sync), short.
+        # Daleel retrieval — two-pass: (1) embedding similarity over
+        # the whole corpus to surface a wide candidate set (limit=15,
+        # per_corpus=4), then (2) Gemini Flash-Lite re-ranks them by
+        # THEMATIC fit, returning the top 3 actually-relevant matches.
+        # Without the re-rank, embedding matches like Quran verses
+        # about youthful paradise servants slip through for any query
+        # mentioning "muda" / "pemuda" — surface keyword overlap, not
+        # semantic relevance.
         retrieval_query = _build_retrieval_query(stats, segment)
-        daleel = retrieve_daleel(retrieval_query, limit=6, per_corpus=2)
+        candidates = retrieve_daleel(
+            retrieval_query, limit=15, per_corpus=4
+        )
+        daleel = rerank_daleel(retrieval_query, candidates, top_n=3)
         log.info(
             "insights_summary.retrieved_daleel",
             segment=segment,
             query=retrieval_query,
-            n=len(daleel),
+            candidates=len(candidates),
+            final=len(daleel),
         )
 
         client = _get_client()

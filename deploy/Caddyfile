@@ -1,5 +1,16 @@
 {
-    email admin@batiinvestasi.ai
+    email taufik.adinugraha@gmail.com
+
+    # Disable HTTP/3 (QUIC over UDP 443). UDP path between user
+    # networks and our VM was being dropped silently — symptom was
+    # "this page couldn't load" with the browser falling back to
+    # HTTP/2 after ~2s on every navigation. HTTP/3 perf benefit is
+    # marginal (~50-100ms on cold connections); reliability matters
+    # more. Investigated 2026-05-21 — Caddy received zero requests
+    # when user clicked while alt-svc/h3 was advertised.
+    servers {
+        protocols h1 h2
+    }
 }
 
 dakwah-lens.id, www.dakwah-lens.id {

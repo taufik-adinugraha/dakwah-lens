@@ -75,25 +75,35 @@ export default async function LandingPage({
 }: PageProps<"/[locale]">) {
   const { locale } = await params;
   const { view } = await searchParams;
-  setRequestLocale(locale);
 
-  const [tLanding, tDaleel, tDonate, session, coverage] = await Promise.all([
-    getTranslations("Landing"),
-    getTranslations("Daleel"),
-    getTranslations("Donate"),
-    auth(),
-    getCoverage(),
-  ]);
-
+  // CHECK AUTH + REDIRECT FIRST, before any streaming work begins.
+  //
   // Signed-in approved users belong on the dashboard, not the marketing
   // landing — UNLESS they explicitly asked for the marketing view (e.g.
   // they clicked "Features" / "How it works" / "Donate" in the header,
-  // which append `?view=marketing` precisely for this purpose). The hash
-  // fragment that drives anchor scrolling is invisible to the server, so
-  // we use a query sentinel instead.
+  // which append `?view=marketing` precisely for this purpose).
+  //
+  // This must run BEFORE setRequestLocale / getTranslations / getCoverage.
+  // Once those start, Next.js 16 commits to streaming the response body
+  // and `redirect()` falls back to embedding a `<meta http-equiv=refresh>`
+  // tag instead of sending an HTTP 307. Browsers render the half-page
+  // and then meta-refresh after 1s — visible as a flash of "page can't
+  // load" before the dashboard appears (reported by user 2026-05-21).
+  const session = await auth();
   if (session?.user?.status === "approved" && view !== "marketing") {
     redirect("/dashboard");
   }
+
+  // From here on, the user is either anonymous OR pending OR explicitly
+  // chose marketing-view. Safe to start the heavier rendering work.
+  setRequestLocale(locale);
+
+  const [tLanding, tDaleel, tDonate, coverage] = await Promise.all([
+    getTranslations("Landing"),
+    getTranslations("Daleel"),
+    getTranslations("Donate"),
+    getCoverage(),
+  ]);
 
   // Look up the profile so we can address signed-in viewers by their
   // preferred panggilan instead of their bare first name.
