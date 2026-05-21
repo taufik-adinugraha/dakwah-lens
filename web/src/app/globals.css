@@ -113,4 +113,48 @@ body {
     break-inside: avoid;
     page-break-inside: avoid;
   }
+
+  /* Insights brief detail page (/insights/brief/[id]) — print-specific
+     adjustments for the long-form 5-section briefing. */
+  .brief-print {
+    font-size: 11pt;
+    line-height: 1.5;
+    color: #0f172a;
+  }
+  .brief-print h2 {
+    font-size: 14pt;
+    margin-top: 18pt;
+    margin-bottom: 6pt;
+    border-bottom: 1px solid #d1d5db;
+    padding-bottom: 4pt;
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+  .brief-print h2:first-of-type {
+    margin-top: 0;
+  }
+  .brief-print h3 {
+    font-size: 11pt;
+    margin-top: 12pt;
+    margin-bottom: 4pt;
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+  .brief-print p {
+    margin-top: 6pt;
+    orphans: 3;
+    widows: 3;
+  }
+  .brief-print blockquote {
+    border-left: 2pt solid #047857;
+    padding-left: 10pt;
+    margin: 8pt 0;
+    font-style: normal;
+  }
+  /* Force a page break before Section 5 (Daleel & Sumber) so the
+     citation block reads cleanly from page top — heuristic, doesn't
+     always trigger but harmless when it doesn't. */
+  .brief-print h2:last-of-type {
+    page-break-before: auto;
+  }
 }

@@ -407,6 +407,68 @@ export async function getLatestInsightsSummary(
   };
 }
 
+/** Slug → briefing resolver for /briefs/[id] public pages.
+ *
+ *  Slug format: `{YYYY-MM-DD}-{segment-or-all}` (e.g. `2026-05-21-all`,
+ *  `2026-05-21-family`). Date is interpreted in WIB (Asia/Jakarta) so a
+ *  briefing fired at 04:30 WIB lands on today's date even though UTC is
+ *  still yesterday. Returns the LATEST briefing matching that
+ *  date+segment — when multiple briefings exist for the same combo
+ *  (e.g. a test re-run), only the freshest is reachable by slug.
+ *
+ *  Public: no auth check — insights_summaries contains only aggregated
+ *  conversation data + LLM narrative, no PII.
+ */
+export async function getBriefingBySlug(
+  slug: string,
+): Promise<LatestInsightsSummary | null> {
+  // Strict regex match — slug is YYYY-MM-DD followed by -segment.
+  const m = slug.match(/^(\d{4}-\d{2}-\d{2})-(all|family|youth|justice|spiritual)$/);
+  if (!m) return null;
+  const [, date, segmentLabel] = m;
+  const segment = segmentLabel === "all" ? null : segmentLabel;
+
+  const [row] = await db
+    .select({
+      generatedAt: schema.insightsSummaries.generatedAt,
+      periodStart: schema.insightsSummaries.periodStart,
+      periodEnd: schema.insightsSummaries.periodEnd,
+      summaryMd: schema.insightsSummaries.summaryMd,
+      summaryMdEn: schema.insightsSummaries.summaryMdEn,
+      headlineStats: schema.insightsSummaries.headlineStats,
+      model: schema.insightsSummaries.model,
+      segment: schema.insightsSummaries.segment,
+      daleelRefs: schema.insightsSummaries.daleelRefs,
+    })
+    .from(schema.insightsSummaries)
+    .where(
+      sql`(generated_at AT TIME ZONE 'Asia/Jakarta')::date = ${date}::date AND ${
+        segment === null
+          ? sql`segment IS NULL`
+          : sql`segment = ${segment}`
+      }`,
+    )
+    .orderBy(desc(schema.insightsSummaries.generatedAt))
+    .limit(1);
+  if (!row) return null;
+  return {
+    ...row,
+    headlineStats: row.headlineStats as LatestInsightsSummary["headlineStats"],
+    daleelRefs: (row.daleelRefs as schema.DaleelRef[] | null) ?? null,
+  };
+}
+
+/** Canonical slug for a briefing — used for share links + RSS later. */
+export function briefingSlug(generatedAt: Date, segment: string | null): string {
+  // Convert UTC → WIB by adding 7h, then take date portion. Done manually
+  // so we don't pull a tz library on the server hot path.
+  const wib = new Date(generatedAt.getTime() + 7 * 3600 * 1000);
+  const y = wib.getUTCFullYear();
+  const m = String(wib.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(wib.getUTCDate()).padStart(2, "0");
+  return `${y}-${m}-${d}-${segment ?? "all"}`;
+}
+
 export async function getOverviewInsights(): Promise<OverviewInsights | null> {
   // All the live widgets on /insights below the executive-briefing hero
   // (sentiment composition, dominant-category bars, category totals,

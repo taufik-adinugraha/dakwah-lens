@@ -20,6 +20,7 @@ import { I18nText } from "@/components/I18nText";
 import { DigestOptInPrompt } from "@/components/DigestOptInPrompt";
 import { InsightsHeadlinePills } from "@/components/InsightsHeadlinePills";
 import {
+  briefingSlug,
   getLatestInsightsSummary,
   getOverviewInsights,
   type LatestInsightsSummary,
@@ -347,10 +348,6 @@ function ExecutiveBriefing({
 }) {
   const stats = summary.headlineStats ?? {};
 
-  // Format the generation time as an absolute date — Next.js's
-  // react-hooks purity rule rejects `Date.now()` in server components.
-  // Absolute timestamp is also more accessible / less ambiguous than
-  // "X hours ago" for users in different timezones.
   const generatedLabel = new Date(summary.generatedAt).toLocaleString(locale, {
     weekday: "short",
     month: "short",
@@ -358,6 +355,24 @@ function ExecutiveBriefing({
     hour: "2-digit",
     minute: "2-digit",
   });
+
+  const fullBody =
+    locale === "en" && summary.summaryMdEn
+      ? summary.summaryMdEn
+      : summary.summaryMd;
+
+  // Preview: just the first H2 section (Ringkasan Eksekutif / Executive
+  // Summary) — the full long-form brief lives on /insights/brief/[id].
+  // Trimming here keeps the /insights hub scannable; users who want the
+  // full read click through via the CTA below.
+  const preview = extractFirstSection(fullBody);
+
+  // Approximate reading time for the full briefing — surfaces the depth
+  // available behind the CTA without forcing the user into it.
+  const wordCount = fullBody.trim().split(/\s+/).length;
+  const readingMinutes = Math.max(1, Math.round(wordCount / 200));
+
+  const slug = briefingSlug(new Date(summary.generatedAt), summary.segment);
 
   return (
     <section className="pb-12 pt-2 sm:pb-16">
@@ -378,22 +393,23 @@ function ExecutiveBriefing({
             </p>
           </div>
 
-          {/* Pretty-printed briefing: paragraph 1 gets percentage + quoted-
-              string highlights; paragraph 2 becomes a Nasihah pull-quote;
-              paragraph 3 (inline daleel lines) is dropped and replaced by
-              styled cards via DaleelChips mode="cards". Locale fallback:
-              English narrative may be NULL on rows generated before the
-              2026-05-21 dual-language migration. */}
           <BriefingNarrative
-            text={
-              locale === "en" && summary.summaryMdEn
-                ? summary.summaryMdEn
-                : summary.summaryMd
-            }
+            text={preview}
             daleelRefs={summary.daleelRefs}
-            nasihahLabel={t("exec_briefing_nasihah_label")}
             citedDaleelLabel={t("exec_daleel_label")}
           />
+
+          {/* CTA into the full long-form briefing — public, shareable URL. */}
+          <Link
+            href={`/insights/brief/${slug}`}
+            className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-emerald-700 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-800"
+          >
+            {t("brief_read_full_cta")}
+            <ArrowRight className="h-3.5 w-3.5" />
+            <span className="text-[10px] font-normal text-emerald-100">
+              · {t("brief_reading_time", { minutes: readingMinutes })}
+            </span>
+          </Link>
 
           <InsightsHeadlinePills
             stats={stats}
@@ -405,9 +421,6 @@ function ExecutiveBriefing({
           <p className="mt-5 text-[10px] text-slate-400">
             {t("exec_briefing_model_credit", { model: summary.model })}
           </p>
-          {/* Sharia compliance disclaimer (PRD §12). The narrative above
-              is AI-assisted — religious responsibility for anything a
-              da'i delivers publicly remains with them, in front of Allah. */}
           <p className="mt-1.5 text-[10px] italic text-slate-400">
             {t("exec_briefing_ai_disclaimer")}
           </p>
@@ -415,6 +428,30 @@ function ExecutiveBriefing({
       </div>
     </section>
   );
+}
+
+/**
+ * Pull the first H2 section out of a long-form markdown briefing.
+ *
+ * Returns everything from the first `## ` heading up to (but not
+ * including) the second `## ` heading. The H2 line itself is included
+ * so the preview renders with its own heading — matches what readers
+ * see when they click through to the full page.
+ *
+ * Falls back to returning the whole body if no second H2 exists (old
+ * 3-paragraph rows from before the 2026-05-21 long-form migration).
+ */
+function extractFirstSection(body: string): string {
+  const headings: number[] = [];
+  body.split("\n").forEach((line, idx) => {
+    if (/^##\s+/.test(line)) headings.push(idx);
+  });
+  if (headings.length < 2) return body;
+
+  const lines = body.split("\n");
+  const start = headings[0];
+  const end = headings[1];
+  return lines.slice(start, end).join("\n").trim();
 }
 
 // HeadlinePill moved to @/components/InsightsHeadlinePills for reuse on
