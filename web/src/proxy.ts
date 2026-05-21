@@ -75,6 +75,29 @@ export default auth((req) => {
     return NextResponse.redirect(target);
   }
 
+  // Approved user landing on the marketing home page → bounce to
+  // /dashboard with a real HTTP 307. The same check exists inside
+  // page.tsx as a fallback, but doing it here in middleware happens
+  // BEFORE the layout starts rendering. When the redirect is called
+  // from the page after the layout has started streaming (which it
+  // always does, since the layout has its own server components like
+  // Header that await auth()), Next.js 16 falls back to embedding
+  // <meta http-equiv="refresh"> in the body — visible to the user as
+  // a brief "page can't load" flash before navigating to /dashboard.
+  // Middleware redirect is always a clean 307, no rendering, no flash.
+  //
+  // The `?view=marketing` opt-out (used by header "Features" /
+  // "How it works" / "Donate" links) still bypasses this — approved
+  // users CAN view marketing intentionally, just not as the default.
+  if (
+    session?.user?.status === "approved" &&
+    (stripped === "/" || stripped === "") &&
+    req.nextUrl.searchParams.get("view") !== "marketing"
+  ) {
+    const target = new URL("/dashboard", req.nextUrl);
+    return NextResponse.redirect(target);
+  }
+
   return intl(req as NextRequest);
 });
 
