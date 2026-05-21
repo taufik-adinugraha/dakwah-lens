@@ -27,7 +27,31 @@
  * region bucket leaves this module.
  */
 
-import geoip from "geoip-lite";
+/**
+ * Defensive load. We had a bundler-pathing bug on 2026-05-21 where
+ * `geoip-lite`'s data files weren't reachable in the standalone
+ * runtime, and the eager `require` at module-import time crashed
+ * every server-action / page-render that touched analytics.
+ *
+ * Now: lazy require inside a try/catch so a future packaging
+ * regression downgrades to "no region data" instead of breaking the
+ * entire page. Combined with `serverExternalPackages: ["geoip-lite"]`
+ * in next.config.ts, this should be belt-and-suspenders.
+ */
+type GeoipLookup = {
+  lookup: (ip: string) => { country?: string; region?: string } | null;
+};
+
+let geoip: GeoipLookup | null = null;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  geoip = require("geoip-lite") as GeoipLookup;
+} catch (err) {
+  console.warn(
+    "[geolocation] geoip-lite failed to load — region resolution disabled:",
+    err instanceof Error ? err.message : err,
+  );
+}
 
 export type RegionBucket =
   | "jabodetabek"
@@ -133,12 +157,13 @@ function stripIpv6Prefix(ip: string): string {
  *    haven't added yet — log + return null rather than misclassify)
  */
 export function resolveRegion(headers: Headers): RegionBucket | null {
+  if (!geoip) return null;
   const ip = clientIpFromHeaders(headers);
   if (!ip || isPrivateIp(ip)) return null;
   try {
     const hit = geoip.lookup(ip);
     if (!hit || hit.country !== "ID") return null;
-    return PROVINCE_TO_REGION[hit.region] ?? null;
+    return PROVINCE_TO_REGION[hit.region ?? ""] ?? null;
   } catch {
     return null;
   }
