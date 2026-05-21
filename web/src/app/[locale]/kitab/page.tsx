@@ -31,46 +31,72 @@ const RESULTS_LIMIT = 20;
 
 // Display metadata for each kitab. The label key joins the existing
 // Kitab namespace strings (kitab_quran_title etc.).
+//
+// `languages` reflects what's actually embedded in Qdrant per the embed
+// scripts (api/src/api/scripts/embed_*.py). Quran has all three from the
+// AGENTS.md corpus pick (AR + Kemenag ID + Sahih International EN); the
+// hadith corpora ship AR + EN only because Indonesian translations aren't
+// in the source data; Tafsir Ibn Kathir is AR + EN (Mubarakpuri abridged).
 const KITAB_META: Record<
   KitabCorpus,
-  { labelKey: string; metaKey: string; tone: string; iconTone: string }
+  {
+    labelKey: string;
+    metaKey: string;
+    tone: string;
+    iconTone: string;
+    languages: ("AR" | "ID" | "EN")[];
+  }
 > = {
   quran: {
     labelKey: "kitab_quran_title",
     metaKey: "kitab_quran_meta",
     tone: "from-emerald-50 to-emerald-100/40",
     iconTone: "bg-emerald-600",
+    languages: ["AR", "ID", "EN"],
   },
   bukhari: {
     labelKey: "kitab_bukhari_title",
     metaKey: "kitab_bukhari_meta",
     tone: "from-brand-50 to-brand-100/40",
     iconTone: "bg-brand-600",
+    languages: ["AR", "EN"],
   },
   muslim: {
     labelKey: "kitab_muslim_title",
     metaKey: "kitab_muslim_meta",
     tone: "from-cyan-50 to-cyan-100/40",
     iconTone: "bg-cyan-600",
+    languages: ["AR", "EN"],
   },
   riyad: {
     labelKey: "kitab_riyad_title",
     metaKey: "kitab_riyad_meta",
     tone: "from-amber-50 to-amber-100/40",
     iconTone: "bg-amber-600",
+    languages: ["AR", "EN"],
   },
   bulugh: {
     labelKey: "kitab_bulugh_title",
     metaKey: "kitab_bulugh_meta",
     tone: "from-cyan-50 to-cyan-100/40",
     iconTone: "bg-cyan-600",
+    languages: ["AR", "EN"],
   },
   tafsir: {
     labelKey: "kitab_tafsir_title",
     metaKey: "kitab_tafsir_meta",
     tone: "from-violet-50 to-violet-100/40",
     iconTone: "bg-violet-600",
+    languages: ["AR", "EN"],
   },
+};
+
+// Tailwind classes per language code — emerald/amber/violet for AR/ID/EN
+// so the same chip reads consistently across corpora.
+const LANGUAGE_PILL_TONE: Record<"AR" | "ID" | "EN", string> = {
+  AR: "bg-emerald-50 text-emerald-800 ring-emerald-200",
+  ID: "bg-rose-50 text-rose-800 ring-rose-200",
+  EN: "bg-sky-50 text-sky-800 ring-sky-200",
 };
 
 export async function generateMetadata({
@@ -388,6 +414,19 @@ function KitabGrid({
                     <p className="mt-1 text-xs text-slate-500">
                       {t(m.metaKey as Parameters<typeof t>[0])}
                     </p>
+                    {/* Language pills — which translations are actually
+                        embedded for this corpus. Quran has all three;
+                        hadith corpora are AR + EN only. */}
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {m.languages.map((lang) => (
+                        <span
+                          key={lang}
+                          className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ring-1 ${LANGUAGE_PILL_TONE[lang]}`}
+                        >
+                          {lang}
+                        </span>
+                      ))}
+                    </div>
                     <p className="mt-2 inline-flex items-center gap-1 rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-700 ring-1 ring-slate-200">
                       <Sparkles className="h-3 w-3" />
                       {isEmbedded

@@ -183,6 +183,22 @@ export type TopIssue = {
   reach: number;
   /** [positive %, neutral %, concerned %] — already 0–100, sums to ≤100. */
   sentiment: [number, number, number];
+  /** Raw sentiment counts for the detail modal — Σ may differ from volume
+   *  when some posts have no sentiment label. */
+  sentimentCounts: { positive: number; neutral: number; negative: number };
+  /** Top-N posts in this topic, highest opportunity first. The dashboard
+   *  card itself doesn't show these — they populate the detail modal. */
+  samplePosts: Array<{
+    id: string;
+    text: string;
+    author: string | null;
+    url: string | null;
+    sentimentLabel: string | null;
+    opportunity: number | null;
+    postedAt: Date | null;
+  }>;
+  /** Top outlets/accounts covering this topic with their post counts. */
+  topOutlets: Array<{ name: string; count: number }>;
 };
 
 type TopIssueRow = {
@@ -195,6 +211,23 @@ type TopIssueRow = {
   n_pos: number;
   n_neu: number;
   n_neg: number;
+};
+
+type TopIssuePostRow = {
+  topic_id: string;
+  id: string;
+  text: string;
+  author: string | null;
+  url: string | null;
+  sentiment_label: string | null;
+  opportunity: number | null;
+  posted_at: Date | null;
+};
+
+type TopIssueOutletRow = {
+  topic_id: string;
+  name: string;
+  count: number;
 };
 
 export async function getTopIssues(limit = 3): Promise<TopIssue[]> {
@@ -219,6 +252,73 @@ export async function getTopIssues(limit = 3): Promise<TopIssue[]> {
     LIMIT ${limit}
   `)) as unknown as TopIssueRow[];
 
+  if (rows.length === 0) return [];
+
+  const topicIds = rows.map((r) => r.id);
+
+  // Sample posts per topic — pick top-5 by opportunity score so the modal
+  // surfaces the strongest da'wah signal in the cluster, not just whatever
+  // happened to be ingested most recently. ROW_NUMBER() inside a CTE so
+  // we can take N per topic in one query.
+  const postRows = (await db.execute(sql`
+    SELECT topic_id, id, text, author, url, sentiment_label, opportunity, posted_at
+    FROM (
+      SELECT
+        sp.topic_id::text AS topic_id,
+        sp.id::text AS id,
+        sp.text AS text,
+        sp.author AS author,
+        sp.url AS url,
+        sp.sentiment_label AS sentiment_label,
+        sp.dawah_opportunity AS opportunity,
+        sp.posted_at AS posted_at,
+        ROW_NUMBER() OVER (
+          PARTITION BY sp.topic_id
+          ORDER BY COALESCE(sp.dawah_opportunity, sp.dawah_relevance, 0) DESC,
+                   sp.posted_at DESC
+        ) AS rn
+      FROM social_posts sp
+      WHERE sp.topic_id::text = ANY (${topicIds})
+        AND sp.created_at >= now() - interval '7 days'
+    ) ranked
+    WHERE rn <= 5
+    ORDER BY topic_id, rn
+  `)) as unknown as TopIssuePostRow[];
+
+  // Top 3 outlets per topic by post count.
+  const outletRows = (await db.execute(sql`
+    SELECT topic_id, author AS name, count
+    FROM (
+      SELECT
+        sp.topic_id::text AS topic_id,
+        sp.author AS author,
+        count(*)::int AS count,
+        ROW_NUMBER() OVER (
+          PARTITION BY sp.topic_id ORDER BY count(*) DESC
+        ) AS rn
+      FROM social_posts sp
+      WHERE sp.topic_id::text = ANY (${topicIds})
+        AND sp.author IS NOT NULL
+        AND sp.created_at >= now() - interval '7 days'
+      GROUP BY sp.topic_id, sp.author
+    ) ranked
+    WHERE rn <= 3
+    ORDER BY topic_id, rn
+  `)) as unknown as TopIssueOutletRow[];
+
+  const postsByTopic = new Map<string, TopIssuePostRow[]>();
+  for (const p of postRows) {
+    const list = postsByTopic.get(p.topic_id) ?? [];
+    list.push(p);
+    postsByTopic.set(p.topic_id, list);
+  }
+  const outletsByTopic = new Map<string, TopIssueOutletRow[]>();
+  for (const o of outletRows) {
+    const list = outletsByTopic.get(o.topic_id) ?? [];
+    list.push(o);
+    outletsByTopic.set(o.topic_id, list);
+  }
+
   return rows.map((r) => {
     const labelled = r.n_pos + r.n_neu + r.n_neg;
     let sentiment: [number, number, number] = [0, 0, 0];
@@ -229,8 +329,8 @@ export async function getTopIssues(limit = 3): Promise<TopIssue[]> {
         Math.round((r.n_neg / labelled) * 100),
       ];
     } else {
-      // No sentiment labels (e.g. all-English content with IndoBERT gated):
-      // show a neutral bar rather than a misleading 0/0/0.
+      // No sentiment labels — show a neutral bar rather than a
+      // misleading 0/0/0.
       sentiment = [0, 100, 0];
     }
     return {
@@ -241,6 +341,24 @@ export async function getTopIssues(limit = 3): Promise<TopIssue[]> {
       volume: Number(r.volume),
       reach: Number(r.reach),
       sentiment,
+      sentimentCounts: {
+        positive: Number(r.n_pos),
+        neutral: Number(r.n_neu),
+        negative: Number(r.n_neg),
+      },
+      samplePosts: (postsByTopic.get(r.id) ?? []).map((p) => ({
+        id: p.id,
+        text: p.text,
+        author: p.author,
+        url: p.url,
+        sentimentLabel: p.sentiment_label,
+        opportunity: p.opportunity != null ? Number(p.opportunity) : null,
+        postedAt: p.posted_at,
+      })),
+      topOutlets: (outletsByTopic.get(r.id) ?? []).map((o) => ({
+        name: o.name,
+        count: Number(o.count),
+      })),
     };
   });
 }

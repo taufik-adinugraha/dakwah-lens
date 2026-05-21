@@ -706,8 +706,9 @@ function LiveStream({
               What&apos;s surfacing right now
             </h2>
             <p className="mt-1.5 text-pretty text-sm text-slate-600">
-              Top posts by da&apos;wah relevance from the {live.totalPosts.toLocaleString()}{" "}
-              already-ingested · classified by IndoBERT + Gemini.
+              {tInsights("live_section_subtitle", {
+                count: live.totalPosts.toLocaleString(),
+              })}
             </p>
           </div>
 

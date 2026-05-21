@@ -18,6 +18,7 @@ import {
 import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
+import { TopIssueCards } from "@/components/TopIssueCards";
 import {
   getBriefsThisWeek,
   getDailyInsights,
@@ -189,19 +190,24 @@ function GreetingPulse({
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-1 sm:gap-4">
+        {/* Trending count → /insights (the page that lists every topic). */}
         <MiniStat
           tone="brand"
           icon={Flame}
           label={t("stat_trending_label")}
           value={trendingCount.toString()}
           hint={t("stat_trending_hint")}
+          href="/insights"
         />
+        {/* Briefs this week → if 0, point at the brief creator; if >0, the
+            user's brief list. Both routes exist. */}
         <MiniStat
           tone="amber"
           icon={ScrollText}
           label={t("stat_briefs_this_week_label")}
           value={briefsThisWeek.toString()}
           hint={t("stat_briefs_this_week_hint")}
+          href={briefsThisWeek > 0 ? "/briefs" : "/briefs/new"}
         />
       </div>
     </section>
@@ -251,22 +257,29 @@ function MiniStat({
   label,
   value,
   hint,
+  href,
 }: {
   tone: "brand" | "amber" | "emerald";
   icon: typeof Flame;
   label: string;
   value: string;
   hint: string;
+  /** When provided, the tile becomes a clickable Link routing into the
+   *  detail surface (e.g. /insights for the trending count tile). */
+  href?: string;
 }) {
   const tones = {
     brand: "from-brand-50 to-brand-100/40 text-brand-700",
     amber: "from-amber-50 to-amber-100/40 text-amber-700",
     emerald: "from-emerald-50 to-emerald-100/40 text-emerald-700",
   } as const;
-  return (
-    <div
-      className={`rounded-2xl border border-slate-200 bg-gradient-to-br ${tones[tone]} p-4 shadow-sm sm:p-5`}
-    >
+  const baseClass = `block rounded-2xl border border-slate-200 bg-gradient-to-br ${tones[tone]} p-4 shadow-sm sm:p-5`;
+  const interactiveClass = href
+    ? " transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+    : "";
+
+  const inner = (
+    <>
       <div className="flex items-center justify-between">
         <p className="text-[11px] font-medium uppercase tracking-wider opacity-80">
           {label}
@@ -277,19 +290,20 @@ function MiniStat({
         {value}
       </p>
       <p className="text-[11px] text-slate-500">{hint}</p>
-    </div>
+    </>
   );
+
+  if (href) {
+    return (
+      <Link href={href} className={`${baseClass}${interactiveClass}`}>
+        {inner}
+      </Link>
+    );
+  }
+  return <div className={baseClass}>{inner}</div>;
 }
 
 function TopIssues({ issues, t }: { issues: TopIssue[]; t: T }) {
-  // Cycle through a fixed tone palette so cards stay visually consistent
-  // whether the query returns 1, 2, or 3 results.
-  const tones = [
-    "from-brand-500 to-cyan-500",
-    "from-emerald-500 to-emerald-600",
-    "from-violet-500 to-rose-500",
-  ];
-
   return (
     <section className="mt-10">
       <SectionHeader title={t("section_top_issues")} subtitle={t("section_top_issues_subtitle")} />
@@ -305,87 +319,15 @@ function TopIssues({ issues, t }: { issues: TopIssue[]; t: T }) {
           </p>
         </div>
       ) : (
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {issues.map((i, idx) => (
-            <article
-              key={i.id}
-              className="group relative flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-            >
-              <div
-                className={`mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${tones[idx % tones.length]} text-white shadow-sm`}
-              >
-                <Flame className="h-5 w-5" />
-              </div>
-
-              <h3 className="text-balance text-base font-semibold text-slate-900 sm:text-lg">
-                {i.title}
-              </h3>
-              <p className="mt-1 text-[11px] font-medium uppercase tracking-wider text-slate-500">
-                {i.platform}
-                {i.keywords.length > 0 && (
-                  <span className="text-slate-300"> · </span>
-                )}
-                {i.keywords.slice(0, 2).join(" · ")}
-              </p>
-
-              <div className="mt-4 grid grid-cols-2 gap-3 text-[11px]">
-                <Stat
-                  label={t("card_volume_label")}
-                  value={formatCompactNumber(i.volume)}
-                />
-                <Stat
-                  label={t("card_reach_label")}
-                  value={i.reach > 0 ? formatCompactNumber(i.reach) : "—"}
-                />
-              </div>
-
-              <div className="mt-4">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                  {t("card_sentiment_label")}
-                </p>
-                <div className="mt-1 flex h-2 overflow-hidden rounded-full">
-                  <span className="bg-emerald-500" style={{ width: `${i.sentiment[0]}%` }} />
-                  <span className="bg-slate-300" style={{ width: `${i.sentiment[1]}%` }} />
-                  <span className="bg-amber-500" style={{ width: `${i.sentiment[2]}%` }} />
-                </div>
-              </div>
-
-              <Link
-                href={{
-                  pathname: "/briefs/new",
-                  query: { topic: i.title },
-                }}
-                className="mt-5 inline-flex h-9 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800"
-              >
-                <Sparkles className="h-3.5 w-3.5" />
-                {t("card_generate_button")}
-                <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
-              </Link>
-            </article>
-          ))}
-        </div>
+        <TopIssueCards
+          issues={issues}
+          generateBriefLabel={t("card_generate_button")}
+          volumeLabel={t("card_volume_label")}
+          reachLabel={t("card_reach_label")}
+          sentimentLabel={t("card_sentiment_label")}
+        />
       )}
     </section>
-  );
-}
-
-/** Compact thousands formatting — 12,400 → "12.4K", 2,100,000 → "2.1M". */
-function formatCompactNumber(n: number): string {
-  if (n < 1000) return n.toString();
-  if (n < 1_000_000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}K`;
-  return `${(n / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`;
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-lg border border-slate-200/70 bg-slate-50/60 px-2.5 py-1.5">
-      <p className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
-        {label}
-      </p>
-      <p className="mt-0.5 text-sm font-semibold tabular-nums text-slate-900">
-        {value}
-      </p>
-    </div>
   );
 }
 
@@ -402,6 +344,8 @@ function DailyInsights({
     icon: typeof TrendingUp;
     title: string;
     body: string;
+    /** When set, the card becomes a Link to this destination. */
+    href?: string;
   };
   const cards: Card[] = [];
 
@@ -417,6 +361,8 @@ function DailyInsights({
         deltaSign: deltaPp > 0 ? "+" : deltaPp < 0 ? "−" : "",
         deltaAbs: Math.abs(deltaPp),
       }),
+      // Drill into the full sentiment view on /insights.
+      href: "/insights",
     });
   }
 
@@ -430,6 +376,8 @@ function DailyInsights({
         label: insights.emerging.label,
         volume: insights.emerging.volume,
       }),
+      // Open the trending topics list — the emerging topic is in there.
+      href: "/insights",
     });
   }
 
@@ -443,10 +391,26 @@ function DailyInsights({
         platform: insights.topPlatform.platform,
         share: insights.topPlatform.share,
       }),
+      // Direct link to that platform's drilldown.
+      href: `/insights/${insights.topPlatform.platform}`,
     });
   }
 
   if (insights.daleelOpportunity) {
+    // Map the dominant category to the segment page that covers it.
+    const SEGMENT_BY_CATEGORY: Record<string, string> = {
+      aqidah: "spiritual",
+      akhlaq: "spiritual",
+      family: "family",
+      health: "family",
+      youth: "youth",
+      education: "youth",
+      social_justice: "justice",
+      economic_ethics: "justice",
+      muamalah: "justice",
+    };
+    const segment =
+      SEGMENT_BY_CATEGORY[insights.daleelOpportunity.category] ?? null;
     cards.push({
       key: "daleel",
       tone: "emerald",
@@ -456,6 +420,7 @@ function DailyInsights({
         category: insights.daleelOpportunity.category,
         count: insights.daleelOpportunity.nPosts,
       }),
+      href: segment ? `/insights/segment/${segment}` : "/insights",
     });
   }
 
@@ -475,24 +440,41 @@ function DailyInsights({
       <SectionHeader title={t("section_insights")} subtitle={t("section_insights_subtitle")} />
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {cards.map(({ key, tone, icon: Icon, title, body }) => (
-          <div
-            key={key}
-            className="flex flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5"
-          >
-            <span
-              className={`inline-flex h-8 w-8 items-center justify-center rounded-lg ring-1 ${toneClasses[tone]}`}
-            >
-              <Icon className="h-4 w-4" />
-            </span>
-            <p className="mt-3 text-balance text-sm font-semibold text-slate-900">
-              {title}
-            </p>
-            <p className="mt-1.5 text-pretty text-xs leading-relaxed text-slate-600">
-              {body}
-            </p>
-          </div>
-        ))}
+        {cards.map(({ key, tone, icon: Icon, title, body, href }) => {
+          const inner = (
+            <>
+              <span
+                className={`inline-flex h-8 w-8 items-center justify-center rounded-lg ring-1 ${toneClasses[tone]}`}
+              >
+                <Icon className="h-4 w-4" />
+              </span>
+              <p className="mt-3 text-balance text-sm font-semibold text-slate-900">
+                {title}
+              </p>
+              <p className="mt-1.5 text-pretty text-xs leading-relaxed text-slate-600">
+                {body}
+              </p>
+            </>
+          );
+          const baseClass =
+            "flex flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5";
+          if (href) {
+            return (
+              <Link
+                key={key}
+                href={href}
+                className={`${baseClass} transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md`}
+              >
+                {inner}
+              </Link>
+            );
+          }
+          return (
+            <div key={key} className={baseClass}>
+              {inner}
+            </div>
+          );
+        })}
       </div>
     </section>
   );

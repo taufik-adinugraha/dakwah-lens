@@ -15,7 +15,7 @@ import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/db";
-import { DaleelChips } from "@/components/DaleelChips";
+import { BriefingNarrative } from "@/components/BriefingNarrative";
 import { DigestOptInPrompt } from "@/components/DigestOptInPrompt";
 import { InsightsHeadlinePills } from "@/components/InsightsHeadlinePills";
 import {
@@ -23,6 +23,8 @@ import {
   getOverviewInsights,
   type LatestInsightsSummary,
 } from "@/lib/insights-data";
+import { getTopIssues } from "@/lib/dashboard-metrics";
+import { TrendingTopicsList } from "@/components/TrendingTopicsList";
 
 export async function generateMetadata({
   params,
@@ -42,10 +44,16 @@ export default async function InsightsPage({
   // Live aggregation over `social_posts`. Returns null when the pipeline
   // hasn't ingested anything yet — page renders an honest empty state
   // instead of inventing numbers.
-  const [overview, summary, session] = await Promise.all([
+  //
+  // Trending topics are fetched via getTopIssues so each row carries
+  // sample posts + top outlets + sentiment counts. The /insights
+  // trending list reuses the dashboard's TopicDetailModal on click,
+  // so both surfaces need the same enriched shape.
+  const [overview, summary, session, topIssues] = await Promise.all([
     getOverviewInsights(),
     getLatestInsightsSummary(),
     auth(),
+    getTopIssues(5),
   ]);
 
   // Show the weekly-digest opt-in prompt only for signed-in users
@@ -63,7 +71,7 @@ export default async function InsightsPage({
 
   // Trending topics: Gemini-discovered themes, top 5 by post count.
   // Empty until the nightly re-cluster has run (04:00 WIB).
-  const trendingRows = overview?.trendingTopics ?? [];
+  const trendingRows = topIssues;
 
   // Top dominant da'wah categories, color-cycled for visual variety.
   const CATEGORY_TONES = [
@@ -181,48 +189,12 @@ export default async function InsightsPage({
               <div className="mt-4 rounded-lg border border-dashed border-slate-200 bg-slate-50/60 p-6 text-center text-xs text-slate-500">
                 {t("how_coverage_posts_empty")}
               </div>
-            ) : (() => {
-              // Anchor the bar widths to the max post_count so the visual
-              // accent reflects relative volume. Was a number-only list;
-              // adding a width-proportional bar makes the dominant theme
-              // pop without forcing the user to read 5 numbers.
-              const maxCount = Math.max(
-                ...trendingRows.map((r) => r.postCount),
-                1,
-              );
-              return (
-                <div className="mt-4 overflow-hidden rounded-lg border border-slate-200">
-                  {trendingRows.map((r, i) => {
-                    const pct = (r.postCount / maxCount) * 100;
-                    return (
-                      <div
-                        key={r.id}
-                        className={`relative grid grid-cols-[1fr_auto] items-center gap-3 px-3 py-2.5 ${i > 0 ? "border-t border-slate-100" : ""}`}
-                      >
-                        {/* Background bar — sits behind the row contents,
-                            width proportional to post_count vs max. */}
-                        <span
-                          aria-hidden
-                          className="pointer-events-none absolute inset-y-0 left-0 bg-brand-50"
-                          style={{ width: `${pct}%` }}
-                        />
-                        <div className="relative min-w-0">
-                          <p className="truncate text-sm font-medium text-slate-800">
-                            {r.label}
-                          </p>
-                          <p className="truncate text-[11px] text-slate-500">
-                            {r.keywords.slice(0, 4).join(" · ") || r.platform}
-                          </p>
-                        </div>
-                        <span className="relative text-xs font-semibold tabular-nums text-slate-700">
-                          {r.postCount.toLocaleString()}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })()}
+            ) : (
+              <TrendingTopicsList
+                topics={trendingRows}
+                countLabel={t("trending_count_suffix")}
+              />
+            )}
           </div>
 
           {/* Sentiment + categories */}
@@ -405,22 +377,22 @@ function ExecutiveBriefing({
             </p>
           </div>
 
-          <p className="mt-5 whitespace-pre-line text-pretty text-base leading-relaxed text-slate-800 sm:text-lg">
-            {/* Locale-aware narrative. English column may be NULL on rows
-                generated before the 2026-05-21 dual-language migration —
-                fall back to the Indonesian primary then. */}
-            {locale === "en" && summary.summaryMdEn
-              ? summary.summaryMdEn
-              : summary.summaryMd}
-          </p>
-
-          {/* Retrieved daleel chips. The narrative may reference these
-              inline (per PRD §12, citations must come from the kitab
-              corpus — the LLM was forbidden from inventing them).
-              Click a chip → modal with Arabic + translations. */}
-          {summary.daleelRefs && summary.daleelRefs.length > 0 && (
-            <DaleelChips refs={summary.daleelRefs} />
-          )}
+          {/* Pretty-printed briefing: paragraph 1 gets percentage + quoted-
+              string highlights; paragraph 2 becomes a Nasihah pull-quote;
+              paragraph 3 (inline daleel lines) is dropped and replaced by
+              styled cards via DaleelChips mode="cards". Locale fallback:
+              English narrative may be NULL on rows generated before the
+              2026-05-21 dual-language migration. */}
+          <BriefingNarrative
+            text={
+              locale === "en" && summary.summaryMdEn
+                ? summary.summaryMdEn
+                : summary.summaryMd
+            }
+            daleelRefs={summary.daleelRefs}
+            nasihahLabel={t("exec_briefing_nasihah_label")}
+            citedDaleelLabel={t("exec_daleel_label")}
+          />
 
           <InsightsHeadlinePills
             stats={stats}

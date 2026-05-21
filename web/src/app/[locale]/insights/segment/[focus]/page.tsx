@@ -7,9 +7,9 @@ import { ArrowLeft, Layers } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
 import { getLatestInsightsSummary } from "@/lib/insights-data";
-import { DaleelChips } from "@/components/DaleelChips";
+import { BriefingNarrative } from "@/components/BriefingNarrative";
 import { InsightsHeadlinePills } from "@/components/InsightsHeadlinePills";
-import { ShowMoreList } from "@/components/ShowMoreList";
+import { FilterableTopPosts } from "@/components/FilterableTopPosts";
 
 /**
  * Audience-segmented dashboard. The /insights main page is mixed —
@@ -223,15 +223,16 @@ export default async function SegmentPage({
                 <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
                 {t("exec_briefing_label")}
               </p>
-              <p className="whitespace-pre-line text-pretty text-sm leading-relaxed text-slate-800 sm:text-base">
-                {locale === "en" && segmentBriefing.summaryMdEn
-                  ? segmentBriefing.summaryMdEn
-                  : segmentBriefing.summaryMd}
-              </p>
-              {segmentBriefing.daleelRefs &&
-                segmentBriefing.daleelRefs.length > 0 && (
-                  <DaleelChips refs={segmentBriefing.daleelRefs} />
-                )}
+              <BriefingNarrative
+                text={
+                  locale === "en" && segmentBriefing.summaryMdEn
+                    ? segmentBriefing.summaryMdEn
+                    : segmentBriefing.summaryMd
+                }
+                daleelRefs={segmentBriefing.daleelRefs}
+                nasihahLabel={t("exec_briefing_nasihah_label")}
+                citedDaleelLabel={t("exec_daleel_label")}
+              />
               {/* Segment-filtered headline pills — same shape as the
                   all-platform hero, but the underlying stats are scoped
                   to this segment's category set. */}
@@ -284,76 +285,23 @@ export default async function SegmentPage({
         </section>
       )}
 
-      {/* Top posts in this segment */}
+      {/* Top posts in this segment — with sentiment filter chips */}
       <section className="pb-16">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <h2 className="mb-4 text-base font-semibold text-slate-900 sm:text-lg">
-            {t("segment_top_posts_title")}
-          </h2>
-          {topPosts.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-8 text-center text-sm text-slate-500">
-              {t("how_coverage_posts_empty")}
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <ShowMoreList pageSize={8} moreLabel={t("show_more")}>
-                {topPosts.map((p) => (
-                  <article
-                    key={p.id}
-                    className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md sm:p-5"
-                  >
-                    <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
-                      <span className="font-semibold uppercase tracking-wider text-slate-700">
-                        {p.platform}
-                      </span>
-                      {p.author && <span>@{p.author}</span>}
-                      {p.sentimentLabel && (
-                        <span
-                          className={`inline-flex items-center rounded-full px-2 py-0.5 font-semibold ring-1 ${
-                            p.sentimentLabel === "positive"
-                              ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
-                              : p.sentimentLabel === "negative"
-                                ? "bg-amber-50 text-amber-800 ring-amber-100"
-                                : "bg-slate-50 text-slate-600 ring-slate-100"
-                          }`}
-                        >
-                          {p.sentimentLabel}
-                        </span>
-                      )}
-                      {(p.dawahOpportunity ?? p.dawahRelevance) !== null &&
-                        (p.dawahOpportunity ?? p.dawahRelevance) !== undefined && (
-                          <span className="tabular-nums">
-                            {(
-                              (p.dawahOpportunity ?? p.dawahRelevance ?? 0) * 100
-                            ).toFixed(0)}
-                            % relevance
-                          </span>
-                        )}
-                      {p.postedAt && (
-                        <span className="text-slate-400">
-                          {new Date(p.postedAt).toLocaleDateString(locale)}
-                        </span>
-                      )}
-                    </div>
-                    <p className="mt-2 text-pretty text-sm leading-relaxed text-slate-800">
-                      {(p.text ?? "").slice(0, 360)}
-                      {(p.text ?? "").length > 360 ? "…" : ""}
-                    </p>
-                    {p.url && (
-                      <a
-                        href={p.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="mt-2 inline-block text-[11px] font-medium text-brand-700 hover:underline"
-                      >
-                        {t("posts_open_source")} ↗
-                      </a>
-                    )}
-                  </article>
-                ))}
-              </ShowMoreList>
-            </div>
-          )}
+          <FilterableTopPosts
+            posts={topPosts}
+            locale={locale}
+            title={t("segment_top_posts_title")}
+            openSourceLabel={t("posts_open_source")}
+            emptyMessage={t("how_coverage_posts_empty")}
+            showMoreLabel={t("show_more")}
+            filterLabels={{
+              all: t("filter_all"),
+              positive: t("filter_positive"),
+              neutral: t("filter_neutral"),
+              negative: t("filter_negative"),
+            }}
+          />
         </div>
       </section>
     </>

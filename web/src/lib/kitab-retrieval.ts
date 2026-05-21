@@ -20,6 +20,7 @@
  *    Islamic reference must come from the corpus, never invented).
  */
 
+import { GoogleGenAI } from "@google/genai";
 import { QdrantClient } from "@qdrant/js-client-rest";
 import OpenAI from "openai";
 
@@ -291,6 +292,101 @@ export async function getKitabCounts(): Promise<Record<KitabCorpus, number>> {
 }
 
 
+/* ─────────────────────────────────────────────────────────────
+ * Query expansion — bridge ID/EN/AR asymmetry across the corpora
+ *
+ * The Qdrant vectors were embedded asymmetrically across corpora:
+ *   - Quran: EN + ID concatenated (multilingual matches well)
+ *   - Hadith + Tafsir: EN only
+ *
+ * A query in pure Indonesian ("judi") therefore underperforms against
+ * hadith/tafsir vs the English equivalent ("gambling"). Expanding the
+ * query before embedding — adding its translation + 1-2 thematic
+ * synonyms — flattens this asymmetry without re-embedding the corpus.
+ *
+ * Detection is implicit: we ask Flash-Lite to produce a "bilingual,
+ * synonym-enriched" version of whatever the user typed; the model
+ * figures out source language and supplies the missing translation.
+ *
+ * Cost: ~$0.0001 per search call on gemini-2.5-flash-lite. Latency adds
+ * ~200-400ms but kitab search is already a "submit a form, wait for
+ * results" interaction — that envelope is comfortable.
+ *
+ * Falls back to the original query string on any Gemini failure so
+ * search never breaks because of the expansion step.
+ * ───────────────────────────────────────────────────────────── */
+
+let _genai: GoogleGenAI | null = null;
+function getGenai(): GoogleGenAI | null {
+  if (!process.env.GEMINI_API_KEY) return null;
+  if (_genai === null) {
+    _genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  }
+  return _genai;
+}
+
+async function expandQuery(query: string): Promise<string> {
+  const trimmed = query.trim();
+  if (!trimmed) return trimmed;
+  // Long queries are usually already context-rich and don't need
+  // expansion; skip to save the LLM call.
+  if (trimmed.length > 80) return trimmed;
+
+  const genai = getGenai();
+  if (!genai) return trimmed;
+
+  const prompt = `User search query for an Islamic kitab library: "${trimmed}"
+
+Output the same query enriched for semantic search across an Arabic-Indonesian-English corpus. Detect the input language and add:
+- The equivalent term(s) in the OTHER language (id ↔ en)
+- 1-2 close thematic synonyms in either language
+- If the input is a transliteration of Arabic (e.g. "sabr"), include the Indonesian + English equivalents
+
+Output ONLY the expanded query as a single space-separated string. No JSON, no labels, no quotes, no explanation.
+
+Examples:
+- "judi" → judi gambling betting maysir
+- "gambling" → gambling judi maysir
+- "sabar" → sabar patience perseverance
+- "patience" → patience sabar tabah
+- "anak yatim" → anak yatim orphan yatama
+- "pinjol" → pinjol online lending riba interest
+
+Expanded query:`;
+
+  try {
+    const resp = await genai.models.generateContent({
+      model: "gemini-2.5-flash-lite",
+      contents: prompt,
+      config: {
+        temperature: 0.2,
+        maxOutputTokens: 60,
+        // No reasoning needed — this is template-fill.
+        thinkingConfig: { thinkingBudget: 0 },
+      },
+    });
+    const expanded = (resp.text ?? "").trim().replace(/^["']|["']$/g, "");
+    void recordUsage({
+      provider: "gemini",
+      operation: "kitab_query_expand",
+      model: "gemini-2.5-flash-lite",
+      tokensIn: resp.usageMetadata?.promptTokenCount ?? null,
+      tokensOut: resp.usageMetadata?.candidatesTokenCount ?? null,
+    });
+    // Sanity check — if expansion returned empty or weirdly long
+    // (~runaway generation), fall back to the original.
+    if (!expanded || expanded.length > 300) return trimmed;
+    return expanded;
+  } catch (err) {
+    console.warn(
+      "[kitab-search] query expansion failed, using original:",
+      err instanceof Error ? err.message : err,
+    );
+    return trimmed;
+  }
+}
+
+
 /**
  * Public-facing browse search — distinct from `retrieveDaleel` because
  * we want different semantics here:
@@ -314,11 +410,16 @@ export async function searchKitabBrowse(
   const openai = getOpenai();
   if (!openai) return [];
 
+  // Expand the query so an "judi" search hits English hadith/tafsir
+  // vectors as well as Indonesian ones (and vice versa). See expandQuery
+  // for the asymmetry rationale.
+  const enrichedQuery = await expandQuery(query);
+
   let vector: number[] | null = null;
   try {
     const emb = await openai.embeddings.create({
       model: EMBEDDING_MODEL,
-      input: query,
+      input: enrichedQuery,
     });
     vector = emb.data[0]?.embedding ?? null;
     void recordUsage({

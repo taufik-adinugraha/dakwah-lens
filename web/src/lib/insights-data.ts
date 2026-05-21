@@ -474,6 +474,10 @@ export async function getOverviewInsights(): Promise<OverviewInsights | null> {
   // the highest score in its `categories` JSONB; count posts per dominant.
   // Encapsulated in raw SQL because Postgres has no "argmax over jsonb keys"
   // shortcut.
+  // drizzle's db.execute with postgres-js returns the array directly,
+  // not a `{ rows: [...] }` wrapper. Was previously typed wrong → access
+  // to `.rows` always returned undefined → "Activity by category" panel
+  // rendered the empty state even when 506 posts were classified.
   const dominantRows = (await db.execute(sql`
     SELECT dominant AS category, count(*)::int AS posts
     FROM (
@@ -492,11 +496,16 @@ export async function getOverviewInsights(): Promise<OverviewInsights | null> {
     WHERE dominant IS NOT NULL
     GROUP BY dominant
     ORDER BY posts DESC
-  `)) as unknown as { rows: Array<{ category: string; posts: number }> };
-  const dominantCategories = (dominantRows.rows ?? []).map((r) => ({
-    category: r.category,
-    posts: r.posts,
-  }));
+  `)) as unknown as Array<{ category: string; posts: number }>;
+  const dominantCategories: Array<{ category: string; posts: number }> = [];
+  for (const row of Array.isArray(dominantRows) ? dominantRows : []) {
+    if (row && typeof row.category === "string") {
+      dominantCategories.push({
+        category: row.category,
+        posts: Number(row.posts ?? 0),
+      });
+    }
+  }
 
   // Top trending topics across all platforms — highest postCount first.
   const trendingTopics = await db
