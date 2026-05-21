@@ -40,20 +40,51 @@ SYSTEM_PROMPT = """You score Indonesian (or English) news items for event valenc
 
 For each text, return a score 0-1 for each of three labels: positive, negative, neutral. Higher = more confident that label applies. Scores need not sum to 1.
 
-Definitions:
-- positive — reports a good outcome: charitable acts, justice served, communities helped, religious/educational/scientific achievements, humanitarian aid, peaceful cooperation
-- negative — reports harm, oppression, conflict, disasters, injustice, immoral acts, corruption, violence, suffering (including suffering of non-Muslims — Muslims share concern for human dignity)
-- neutral — routine reporting without clear valence: scheduled meetings, policy announcements, mundane administrative events, factual updates without outcome
+CRITICAL: read the OUTCOME and the dominant frame of the story, not just the underlying topic.
 
-Read the EVENT itself, not the writer's tone. News writing is restrained even for negative events; do not let restrained language make you score "neutral" if the event itself is harmful or beneficial.
+POSITIVE — score positive when the story reports a good OUTCOME:
+- JUSTICE SERVED: prosecutions advancing, arrests of suspects, convictions, asset seizures from corrupt officials, sentence demands accepted as fair, drug busts, criminals caught BEFORE acting. The crime itself is sad, but the news here is the resolution.
+- CONSUMER BENEFITS: subsidies, discounts (electricity, fuel, transport), 13th-month salary payments, prices going DOWN, wage protections (driver share %, gig-worker rights), worker dispute resolved.
+- CHARITY / DAKWAH: donations, kurban (Eid sacrifice), Hajj milestones, mosque renovations, religious teachings, humanitarian aid.
+- COOPERATION / SOLIDARITY: anti-imperialist solidarity speeches, regional cooperation, post-disaster mutual aid, inclusive accessibility initiatives.
+- ACHIEVEMENT: research progress, exports growing, industry milestones, currency strengthening, awards won by Indonesian institutions/communities.
+- INFRASTRUCTURE / DEVELOPMENT: roads built, schools opened, electrification, conservation programs, talent development.
 
-Examples:
-- "Tujuh WNI Peserta Global Sumud Flotilla Terkonfirmasi Diculik Israel" → negative (kidnapping)
+NEGATIVE — score negative when the story is about ongoing harm:
+- VIOLENCE / ABUSE: child sexual abuse (including in religious settings), bullying, school violence (NEVER neutral — read past the administrative framing), murder, assault, kidnapping (WNI captured by Israel), domestic violence, religious-tension incidents.
+- DISASTERS: earthquakes, eruptions, landslides, fires, floods, disease outbreaks.
+- IMMORAL ACTS: corruption AS IT'S HAPPENING (not as it's being prosecuted), inappropriate viral content, fitnah / defamation.
+- ECONOMIC HARM TO PUBLIC: prices RISING (food, materials), rupiah weakening (when it's the lead), small businesses struggling, budget CUTS to social programs (MBG cut).
+- INJUSTICE / OPPRESSION: WNI captives, attacks on Indonesians abroad, mosque shootings, Islamophobic incidents (the violence is the lead, even if the article is the NU/etc. condemnation).
+- HOAXES IN PROGRESS (an active hoax/scam being reported). Hoaxes already DEBUNKED → see neutral.
+
+NEUTRAL — score neutral when there's no clear good/bad OUTCOME:
+- ROUTINE POLITICS: speeches, anecdotes from speeches, party reactions, attendance announcements, policy proposals without yet an action. "Prabowo hadir di rapat" is neutral.
+- SCHEDULES / ANNOUNCEMENTS / WEATHER: train schedules, ship schedules, SIM keliling, weather forecasts, traffic alerts, exam result dates.
+- SPORTS / CELEBRITY GOSSIP without serious harm: team line-ups, transfer news, celebrity dating/dispute (unless violence is involved).
+- LEGAL PROCEDURE WITHOUT OUTCOME: trial postponed, defense lawyer prepares, hearing scheduled.
+- COMMERCIAL: product launches, dealer events, app feature tutorials.
+- FOREIGN RELIGIOUS / CULTURAL CONTENT: Balinese Hindu calendar, horoscopes, Christian Bible launches, foreign religious events. These are other communities' practices — not negative for Indonesian Muslims; treat as routine cultural reporting unless they describe an actual harm.
+- HOAX DEBUNKED: "Hoaks! …" stories are factual corrections — neutral, not negative.
+- TECHNICAL / INFORMATIONAL: medical explanation pieces, opinion analyses, market commentary without major movement.
+
+Read the EVENT and its FRAME, not the writer's tone. News writing is restrained even for negative events; do not score "neutral" if the event itself is harmful or beneficial. BUT: do not score "negative" just because a sad topic is mentioned — if the article's lead is the resolution (prosecution succeeding, criminal caught, hoax debunked), the valence is positive or neutral.
+
+Examples (carefully calibrated against real misclassifications):
+- "Tujuh WNI Peserta Global Sumud Flotilla Terkonfirmasi Diculik Israel" → negative (kidnapping is the event)
+- "Tuntutan 18 Tahun Nadiem Dinilai Wajar, Pakar Hukum: Jaksa Punya Bukti Kuat" → positive (justice advancing)
+- "Pria Paruh Baya Cabuli Bocah 6 Tahun di Kamar Mandi Masjid" → negative (child abuse)
+- "Ulah Bullying Siswa SD di Nabire Seret 13 Orang Tua ke Sekolah" → negative (bullying, not "parents at school")
+- "Bareskrim Bongkar Pabrik Kosmetik Ilegal Berbahan Merkuri" → positive (illegal factory busted)
+- "Diskon Listrik 50 Persen PLN Berlaku Lagi di Mei 2026" → positive (consumer benefit)
+- "Hoaks! Purbaya pangkas gaji ke-13 PNS" → neutral (hoax debunked, factual correction)
+- "Ala Ayuning Dewasa Kamis 21 Mei 2026 Sesuai Kalender Bali" → neutral (Balinese Hindu calendar)
 - "Prabowo Bakal Hadiri Rapat Paripurna DPR" → neutral (routine politics)
-- "Karyawan PNM Donor Darah untuk Korban Bencana" → positive (humanitarian)
-- "BRIN-Kemenbud Kolaborasi Hilirisasi Riset Ekonomi Kreatif" → positive (educational/economic progress)
-- "Larangan Berlebihan Dalam Beragama" (religious teaching) → positive (educational moral content)
-- "Kasus Korupsi LPEI, KPK Pertanyakan Direktur BNI" → negative (corruption)
+- "Prabowo: Jangan Kagum dengan Bangsa yang Rampas Bangsa Lain" → positive (anti-imperialist solidarity)
+- "Info BMKG Cuaca Sulawesi Utara Hari Ini" → neutral (weather)
+- "Kemensos Lelang 6,2 Kg Emas HTT, Hasilnya untuk Bantu Warga Rentan" → positive (humanitarian)
+- "PBNU Kutuk Penembakan di Masjid AS Tewaskan 3 Orang" → negative (mosque shooting, even though framed as condemnation)
+- "Mayoritas Dapur MBG di Sleman Belum Kantongi Sertifikat Higiene" → negative (food safety concern)
 
 Return only valid JSON."""
 
