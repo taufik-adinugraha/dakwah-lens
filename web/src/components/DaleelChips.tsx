@@ -37,18 +37,18 @@ export function DaleelChips({ refs }: { refs: DaleelRef[] }) {
           {t("exec_daleel_label")}
         </p>
         <div className="flex flex-wrap gap-1.5">
-          {refs.map((ref) => (
+          {refs.map((d) => (
             <button
-              key={ref.ref_id}
+              key={d.ref_id}
               type="button"
-              onClick={() => setActiveId(ref.ref_id)}
-              title={ref.translation_id || ref.translation_en || ""}
+              onClick={() => setActiveId(d.ref_id)}
+              title={d.translation_id || d.translation_en || ""}
               className="group inline-flex max-w-full items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] text-emerald-900 transition hover:border-emerald-300 hover:bg-emerald-100"
             >
               <span className="text-[9px] font-semibold uppercase tracking-wider text-emerald-700">
-                {ref.corpus.replace(/_/g, " ")}
+                {d.corpus.replace(/_/g, " ")}
               </span>
-              <span className="truncate font-medium">{ref.citation}</span>
+              <span className="truncate font-medium">{d.citation}</span>
             </button>
           ))}
         </div>
@@ -56,7 +56,7 @@ export function DaleelChips({ refs }: { refs: DaleelRef[] }) {
 
       {active && (
         <DaleelModal
-          ref={active}
+          daleel={active}
           onClose={() => setActiveId(null)}
         />
       )}
@@ -65,10 +65,10 @@ export function DaleelChips({ refs }: { refs: DaleelRef[] }) {
 }
 
 function DaleelModal({
-  ref,
+  daleel,
   onClose,
 }: {
-  ref: DaleelRef;
+  daleel: DaleelRef;
   onClose: () => void;
 }) {
   const t = useTranslations("Insights");
@@ -100,13 +100,13 @@ function DaleelModal({
         <div className="sticky top-0 flex items-start justify-between gap-3 border-b border-slate-100 bg-white/95 px-6 py-4 backdrop-blur">
           <div className="min-w-0 flex-1">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
-              {ref.corpus.replace(/_/g, " ")}
+              {daleel.corpus.replace(/_/g, " ")}
             </p>
             <h3
               id="daleel-modal-title"
               className="mt-1 text-balance text-lg font-bold text-slate-900 sm:text-xl"
             >
-              {ref.citation}
+              {daleel.citation}
             </h3>
           </div>
           <button
@@ -120,7 +120,7 @@ function DaleelModal({
         </div>
 
         <div className="space-y-5 px-6 py-5">
-          {ref.arabic && (
+          {daleel.arabic && (
             <section>
               <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                 {t("exec_daleel_arabic_label")}
@@ -130,29 +130,29 @@ function DaleelModal({
                 dir="rtl"
                 lang="ar"
               >
-                {ref.arabic}
+                {daleel.arabic}
               </p>
             </section>
           )}
 
-          {ref.translation_id && (
+          {daleel.translation_id && (
             <section>
               <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                 {t("exec_daleel_translation_id_label")}
               </p>
               <p className="whitespace-pre-line text-pretty text-base leading-relaxed text-slate-800">
-                {ref.translation_id}
+                {daleel.translation_id}
               </p>
             </section>
           )}
 
-          {ref.translation_en && (
+          {daleel.translation_en && (
             <section>
               <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                 {t("exec_daleel_translation_en_label")}
               </p>
               <p className="whitespace-pre-line text-pretty text-base leading-relaxed text-slate-800">
-                {ref.translation_en}
+                {daleel.translation_en}
               </p>
             </section>
           )}
