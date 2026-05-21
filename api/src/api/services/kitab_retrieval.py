@@ -149,12 +149,16 @@ def retrieve_daleel(
     all_hits: list[dict[str, Any]] = []
     for corpus, collection in COLLECTION_NAMES.items():
         try:
-            results = qdrant.search(
+            # qdrant-client 1.18 removed `.search()` — the new API is
+            # `query_points()` which returns a QueryResponse with `.points`.
+            # Works against both legacy (1.12) and newer Qdrant servers.
+            qr = qdrant.query_points(
                 collection_name=collection,
-                query_vector=vector,
+                query=vector,
                 limit=per_corpus,
                 with_payload=True,
             )
+            results = qr.points
         except Exception as exc:
             # Empty / missing collections are normal during rollout.
             log.debug(

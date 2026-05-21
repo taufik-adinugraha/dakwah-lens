@@ -75,13 +75,15 @@ PARAGRAPH 1 — Penjelasan (3-4 sentences in Bahasa Indonesia):
 PARAGRAPH 2 — Nasihah (2-3 sentences in Bahasa Indonesia):
   Practical Islamic counsel tied to what trended. What angle would resonate for a da'i's khutbah/kajian this week. Concrete, not generic.
 
-PARAGRAPH 3 — Daleel (LIST format — each on its own line):
-  Cite 2-3 of the kitab passages I provide. Each line:
+PARAGRAPH 3 — Daleel (ONLY if I provided non-empty daleel below):
+  If I have provided daleel passages, cite 2-3 of them. Each line:
     - QS [surah_name] [ayah]: [brief Bahasa Indonesia gloss]
     - HR. Bukhari/Muslim/etc. [number]: [brief Bahasa Indonesia gloss]
-  CRITICAL: You may ONLY cite passages from the daleel list I supplied below. You may NOT invent verses, hadith numbers, or attributions. If you cannot find a fitting daleel in the provided list, write "Belum ada daleel yang spesifik dalam korpus untuk tema ini" and stop the paragraph.
+  CRITICAL: You may ONLY cite passages from the daleel list I supplied. You may NOT invent verses, hadith numbers, or attributions.
 
-Output format: plain text. No headings, no markdown formatting. Three paragraphs separated by blank lines.
+  If the daleel list is empty (the user input says "tidak ada daleel"), OMIT paragraph 3 entirely. Output only paragraphs 1 and 2. Do NOT write filler text about missing daleel — just stop after paragraph 2.
+
+Output format: plain text. No headings, no markdown formatting. Two or three paragraphs separated by blank lines, depending on whether daleel was provided.
 """
 
 
