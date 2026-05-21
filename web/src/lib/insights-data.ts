@@ -408,6 +408,17 @@ export async function getLatestInsightsSummary(
 }
 
 export async function getOverviewInsights(): Promise<OverviewInsights | null> {
+  // All the live widgets on /insights below the executive-briefing hero
+  // (sentiment composition, dominant-category bars, category totals,
+  // per-platform mix) are scoped to the SAME 7-day window the briefing
+  // narrates over. Before 2026-05-21 these were lifetime aggregates,
+  // which made the briefing pill say "22.4% concerned" while the bar
+  // beneath it read "22.8% concerned" — same population, different
+  // windows, no labels. Aligning everything to 7d removes that confusion.
+  // `totalPosts` stays lifetime as a "scale-of-corpus" badge — it's
+  // clearly labeled below the category panel and represents total ingest.
+  const sevenDaysAgo = sql`now() - interval '7 days'`;
+
   const [{ totalPosts = 0 } = { totalPosts: 0 }] = (await db
     .select({ totalPosts: count() })
     .from(schema.socialPosts)) as Array<{ totalPosts: number }>;
@@ -421,13 +432,14 @@ export async function getOverviewInsights(): Promise<OverviewInsights | null> {
     classifiedPosts: number;
   }>;
 
-  // Sentiment mix — same shape as per-platform, just no WHERE clause.
+  // Sentiment mix — 7-day window only (was lifetime).
   const sentimentRows = (await db
     .select({
       label: schema.socialPosts.sentimentLabel,
       n: count(),
     })
     .from(schema.socialPosts)
+    .where(sql`${schema.socialPosts.postedAt} >= ${sevenDaysAgo}`)
     .groupBy(schema.socialPosts.sentimentLabel)) as Array<{
     label: string | null;
     n: number;
@@ -453,7 +465,7 @@ export async function getOverviewInsights(): Promise<OverviewInsights | null> {
   type CatKey = (typeof CATEGORIES)[number];
 
   // Sum of per-post per-category scores — gives "collective attention"
-  // weight per da'wah category across the whole corpus.
+  // weight per da'wah category across the 7-day window (was lifetime).
   const categorySums = (await db
     .select({
       ...Object.fromEntries(
@@ -464,9 +476,9 @@ export async function getOverviewInsights(): Promise<OverviewInsights | null> {
       ),
     })
     .from(schema.socialPosts)
-    .where(isNotNull(schema.socialPosts.categories))) as Array<
-    Record<CatKey, number>
-  >;
+    .where(
+      sql`${schema.socialPosts.categories} IS NOT NULL AND ${schema.socialPosts.postedAt} >= ${sevenDaysAgo}`,
+    )) as Array<Record<CatKey, number>>;
   const categoryTotals: Record<string, number> = {};
   for (const cat of CATEGORIES) {
     categoryTotals[cat] = Number(categorySums[0]?.[cat] ?? 0);
@@ -489,11 +501,13 @@ export async function getOverviewInsights(): Promise<OverviewInsights | null> {
         WHERE key = ANY (ARRAY[${sql.raw(
           CATEGORIES.map((c) => `'${c}'`).join(","),
         )}])
+          AND value::numeric > 0
         ORDER BY value::numeric DESC
         LIMIT 1
       ) AS dominant
       FROM social_posts
       WHERE categories IS NOT NULL
+        AND posted_at >= now() - interval '7 days'
     ) sub
     WHERE dominant IS NOT NULL
     GROUP BY dominant
@@ -524,12 +538,16 @@ export async function getOverviewInsights(): Promise<OverviewInsights | null> {
 
   // Per-platform breakdown: post count + top topic per platform.
   // Drives the source-mix bar + per-platform cards on /insights.
+  // 7-day window only — was lifetime, which made greyed cards for
+  // paused platforms persist their old all-time counts even after
+  // a multi-week absence.
   const platformCountRows = (await db
     .select({
       platform: schema.socialPosts.platform,
       posts: count(),
     })
     .from(schema.socialPosts)
+    .where(sql`${schema.socialPosts.postedAt} >= ${sevenDaysAgo}`)
     .groupBy(schema.socialPosts.platform)) as Array<{
     platform: string;
     posts: number;
@@ -550,7 +568,7 @@ export async function getOverviewInsights(): Promise<OverviewInsights | null> {
     ]),
   );
 
-  // Top dominant category per platform.
+  // Top dominant category per platform — 7-day window.
   const topCategoryRows = (await db.execute(sql`
     SELECT platform, dominant AS category, count(*)::int AS posts
     FROM (
@@ -561,10 +579,12 @@ export async function getOverviewInsights(): Promise<OverviewInsights | null> {
           WHERE key = ANY (ARRAY[${sql.raw(
             CATEGORIES.map((c) => `'${c}'`).join(","),
           )}])
+            AND value::numeric > 0
           ORDER BY value::numeric DESC LIMIT 1
         ) AS dominant
       FROM social_posts
       WHERE categories IS NOT NULL
+        AND posted_at >= now() - interval '7 days'
     ) sub
     WHERE dominant IS NOT NULL
     GROUP BY platform, dominant

@@ -138,6 +138,7 @@ export default async function SegmentPage({
       .where(
         and(
           sql`${schema.socialPosts.categories} IS NOT NULL`,
+          sql`${schema.socialPosts.postedAt} >= now() - interval '7 days'`,
           sql`${dominantCategorySql} = ANY (ARRAY[${sql.raw(
             def.categories.map((c) => `'${c}'`).join(","),
           )}])`,
@@ -152,10 +153,13 @@ export default async function SegmentPage({
       )
       // Fetch a deeper pool; UI uses <ShowMoreList /> to reveal in batches.
       .limit(50),
+    // Segment sentiment mix — scoped to the 7-day window so the bar
+    // here matches the briefing pill above (2026-05-21 fix).
     db.execute(sql`
       SELECT sentiment_label, count(*)::int AS n
       FROM social_posts
       WHERE categories IS NOT NULL
+        AND posted_at >= now() - interval '7 days'
         AND ${dominantCategorySql} = ANY (ARRAY[${sql.raw(
           def.categories.map((c) => `'${c}'`).join(","),
         )}])
@@ -166,6 +170,7 @@ export default async function SegmentPage({
       SELECT count(*)::int AS total
       FROM social_posts
       WHERE categories IS NOT NULL
+        AND posted_at >= now() - interval '7 days'
         AND ${dominantCategorySql} = ANY (ARRAY[${sql.raw(
           def.categories.map((c) => `'${c}'`).join(","),
         )}])
