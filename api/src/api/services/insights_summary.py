@@ -451,18 +451,23 @@ async def generate_summary(
             config=types.GenerateContentConfig(
                 system_instruction=SYSTEM_PROMPT,
                 temperature=0.3,
-                max_output_tokens=1200,
+                # 2048 visible-output budget gives ~1500 headroom after
+                # the 512 thinking budget — comfortable margin for the
+                # 300-500 token target briefing length.
+                max_output_tokens=2048,
                 safety_settings=relaxed_safety,
-                # Disable Gemini 2.5 Pro internal "thinking" tokens.
-                # These count toward max_output_tokens — observed
-                # 2026-05-21 that thinking consumed the entire 1200
-                # budget for 4/5 briefings, leaving zero visible
-                # output (finish_reason=MAX_TOKENS, empty text). A
-                # structured 3-paragraph briefing doesn't benefit
-                # from extended reasoning; the format is fixed and
-                # the data is already pre-computed. Setting budget=0
-                # disables thinking and routes all tokens to output.
-                thinking_config=types.ThinkingConfig(thinking_budget=0),
+                # "Low" thinking — 512 tokens is enough for the model
+                # to pick the 2-3 most resonant daleel from the
+                # retrieved list and spot subtle patterns in the
+                # stats, without ballooning into the multi-thousand
+                # internal monologue that the default (-1, dynamic)
+                # produced. Observed 2026-05-21 that dynamic thinking
+                # consumed the entire 1200 max_output budget for 4/5
+                # segments, leaving zero visible text. 512 is the
+                # sweet spot for a structured 3-paragraph briefing
+                # over pre-aggregated data — enough reasoning, but
+                # not so much that we starve the output.
+                thinking_config=types.ThinkingConfig(thinking_budget=512),
             ),
         )
         summary_md = (resp.text or "").strip()
