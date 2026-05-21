@@ -1,72 +1,50 @@
-import { Quote, Sparkles } from "lucide-react";
+import ReactMarkdown, { type Components } from "react-markdown";
 
 import type { DaleelRef } from "@/db/schema";
 import { DaleelChips } from "./DaleelChips";
 
 /**
- * Pretty-prints the AI-narrated weekly briefing.
+ * Renders the AI-narrated weekly briefing.
  *
- * The LLM produces 3 paragraphs (separated by blank lines):
- *   1. Penjelasan — numbers + named stories driving the week
- *   2. Nasihah — practical Islamic counsel
- *   3. Daleel — citation lines (one per line, starting with "QS." or "HR.")
+ * The LLM emits a 5-section markdown document (~1500-1800 words):
+ *   1. Ringkasan Eksekutif / Executive Summary
+ *   2. Numerik & Tren Pekan Ini / Numbers & Trends This Week
+ *   3. Tema Utama & Pola Yang Muncul / Main Themes & Emerging Patterns
+ *   4. Strategi per Surface Dakwah / Da'wah Surface Strategies
+ *      — has ### sub-headings per surface (khutbah / kajian / kreator / pengajaran)
+ *   5. Daleel & Sumber / Daleel & Sources
+ *      — citations with > blockquote translation + 1-2 sentence context
  *
- * Rendering tricks:
- *   - Paragraph 1: percentages get bold + color tint; quoted strings
- *     get italicised so the LLM-named stories pop.
- *   - Paragraph 2: left-border accent + small "Nasihah" label so it reads
- *     like counsel, not data.
- *   - Paragraph 3: text lines are dropped — the same citations render as
- *     proper cards via <DaleelChips mode="cards"/>, which is also where
- *     the click-to-expand modal lives.
+ * Replaced the 3-paragraph short-form renderer on 2026-05-21 after the
+ * scenario-1 calibration test showed long-form names ~4× more specific
+ * stories, identifies cross-topic patterns, and gives each da'wah surface
+ * a distinct angle.
  *
- * If the LLM doesn't follow the 3-paragraph spec (older rows, or it
- * decides to skip), we fall back to rendering the raw text — never
- * worse than before.
+ * Daleel chips render BELOW the markdown body as a supplemental
+ * Arabic+modal interaction — the long-form's Section 5 already covers the
+ * conceptual context per daleel, but the chips give users a way to read
+ * the original Arabic + locale-switched translations.
  */
 export function BriefingNarrative({
   text,
   daleelRefs,
-  nasihahLabel,
   citedDaleelLabel,
 }: {
   text: string;
   daleelRefs: DaleelRef[] | null;
-  /** "Nasihah" badge text — locale-aware via translations from parent. */
-  nasihahLabel: string;
-  /** "Cited daleel · click to read in full" header. */
+  /** Header label for the collapsible daleel chips section below the
+   *  narrative. Locale-aware via translations from parent. */
   citedDaleelLabel: string;
+  /** @deprecated — was the inline "Nasihah" badge label for the old short
+   *  format. Kept in the prop signature so existing callers don't break;
+   *  long-form output uses native H2 headings now. */
+  nasihahLabel?: string;
 }) {
-  const paragraphs = text.trim().split(/\n\s*\n/).filter(Boolean);
-  // Last paragraph that consists ONLY of daleel-shaped lines (QS./HR.)
-  // is the daleel paragraph. Anything else is narrative.
-  const isDaleelLine = (line: string) =>
-    /^\s*(QS\.|HR\.)\s/i.test(line);
-  const isDaleelParagraph = (p: string) =>
-    p
-      .split("\n")
-      .filter((l) => l.trim().length > 0)
-      .every(isDaleelLine);
-
-  const narrativeParagraphs = paragraphs.filter((p) => !isDaleelParagraph(p));
-  // Paragraph 1 — context; Paragraph 2 — nasihah.
-  const [context, nasihah, ...rest] = narrativeParagraphs;
-
   return (
-    <div className="mt-5 space-y-4 text-pretty text-base leading-relaxed text-slate-800 sm:text-lg">
-      {context && <ContextParagraph text={context} />}
-
-      {nasihah && (
-        <NasihahParagraph text={nasihah} label={nasihahLabel} />
-      )}
-
-      {/* Any extra paragraphs the LLM might emit (rare) — render plain
-          so we don't truncate content. */}
-      {rest.map((p, i) => (
-        <p key={`extra-${i}`} className="whitespace-pre-line">
-          {p}
-        </p>
-      ))}
+    <div className="mt-5">
+      <article className="text-pretty text-slate-800">
+        <ReactMarkdown components={MARKDOWN_COMPONENTS}>{text}</ReactMarkdown>
+      </article>
 
       {daleelRefs && daleelRefs.length > 0 && (
         <DaleelChips
@@ -79,85 +57,55 @@ export function BriefingNarrative({
   );
 }
 
-/* ───────── Paragraph 1 — Penjelasan ───────── */
-
-function ContextParagraph({ text }: { text: string }) {
-  return (
-    <p className="whitespace-pre-line">{highlightContext(text)}</p>
-  );
-}
-
 /**
- * Highlight numbers + quoted phrases at render time.
- *
- * Why regex post-processing instead of asking the LLM to emit
- * markdown: PRD §12 keeps the LLM output to plain text (no
- * markdown/HTML the model could exploit). The patterns we want to
- * highlight (percentages, quoted strings) are mechanical and safe to
- * extract here. Tones are sentiment-aware where the percentage is
- * obviously attached to "positif"/"negatif"/"netral" — otherwise
- * a default slate.
+ * Tailwind-class overrides per markdown element. Tuned for the briefing
+ * card aesthetic — section headings use emerald accents to match the
+ * existing /insights briefing card chrome; blockquotes get a left rule
+ * to read as inline citation context.
  */
-function highlightContext(text: string): React.ReactNode[] {
-  // Tokenise on: percentage numbers, quoted strings (curly or straight).
-  // Keep the matched groups so we can wrap them.
-  const tokens = text.split(
-    /(\d+(?:[.,]\d+)?\s*%|"[^"]+"|"[^"]+"|'[^']+')/g,
-  );
-  return tokens.map((tok, i) => {
-    if (!tok) return tok;
-    // Percentages — tone by adjacent sentiment word in surrounding context.
-    if (/^\d+(?:[.,]\d+)?\s*%$/.test(tok)) {
-      const lookback = text.slice(Math.max(0, text.indexOf(tok) - 40), text.indexOf(tok)).toLowerCase();
-      let toneClass = "text-slate-900";
-      if (/\bpositif|positive\b/.test(lookback)) {
-        toneClass = "text-emerald-700";
-      } else if (/\bnegatif|negative|concerned|negative\b/.test(lookback)) {
-        toneClass = "text-amber-700";
-      } else if (/\bnetral|neutral\b/.test(lookback)) {
-        toneClass = "text-slate-700";
-      }
-      return (
-        <strong key={i} className={`font-semibold tabular-nums ${toneClass}`}>
-          {tok}
-        </strong>
-      );
-    }
-    // Quoted strings — give them italic + subtle weight so LLM-named
-    // stories stand apart from the prose.
-    if (/^["'"][^"'"]+["'"]$/.test(tok)) {
-      return (
-        <em key={i} className="font-medium not-italic text-slate-900">
-          {tok}
-        </em>
-      );
-    }
-    return tok;
-  });
-}
-
-/* ───────── Paragraph 2 — Nasihah ───────── */
-
-function NasihahParagraph({
-  text,
-  label,
-}: {
-  text: string;
-  label: string;
-}) {
-  return (
-    <div className="relative rounded-r-xl border-l-2 border-emerald-300 bg-emerald-50/40 py-3 pl-4 pr-3">
-      <div className="mb-1.5 inline-flex items-center gap-1.5 rounded-full bg-emerald-100/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-800">
-        <Sparkles className="h-2.5 w-2.5" />
-        {label}
-      </div>
-      <p className="whitespace-pre-line text-pretty leading-relaxed text-slate-800">
-        {text}
-      </p>
-    </div>
-  );
-}
-
-// Re-export Quote so consumers (if any) can use it; currently used only
-// internally if we want to render a quote glyph somewhere.
-export { Quote };
+const MARKDOWN_COMPONENTS: Components = {
+  h2: ({ children }) => (
+    <h2 className="mt-7 mb-2 border-b border-emerald-100 pb-1.5 text-balance text-lg font-bold tracking-tight text-slate-900 first:mt-0 sm:text-xl">
+      {children}
+    </h2>
+  ),
+  h3: ({ children }) => (
+    <h3 className="mt-5 mb-1 text-balance text-sm font-semibold uppercase tracking-wider text-emerald-700 sm:text-[15px]">
+      {children}
+    </h3>
+  ),
+  p: ({ children }) => (
+    <p className="mt-2 text-pretty leading-relaxed text-slate-700">
+      {children}
+    </p>
+  ),
+  ul: ({ children }) => (
+    <ul className="mt-2 list-disc space-y-1 pl-5 text-slate-700">{children}</ul>
+  ),
+  ol: ({ children }) => (
+    <ol className="mt-2 list-decimal space-y-1 pl-5 text-slate-700">
+      {children}
+    </ol>
+  ),
+  li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+  blockquote: ({ children }) => (
+    <blockquote className="my-2 border-l-2 border-emerald-300 bg-emerald-50/40 py-2 pl-4 pr-3 text-slate-700">
+      {children}
+    </blockquote>
+  ),
+  strong: ({ children }) => (
+    <strong className="font-semibold text-slate-900">{children}</strong>
+  ),
+  em: ({ children }) => <em className="italic text-slate-700">{children}</em>,
+  a: ({ href, children }) => (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-emerald-700 underline decoration-emerald-300 underline-offset-2 hover:text-emerald-900"
+    >
+      {children}
+    </a>
+  ),
+  hr: () => <hr className="my-5 border-slate-200" />,
+};

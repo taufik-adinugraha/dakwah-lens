@@ -14,8 +14,8 @@ import clsx from "clsx";
 
 import { Link } from "@/i18n/navigation";
 import { I18nText } from "@/components/I18nText";
-import { ShowMoreList } from "@/components/ShowMoreList";
 import { TopicsByCluster } from "@/components/TopicsByCluster";
+import { PlatformStoriesFilter } from "./PlatformStoriesFilter";
 import {
   CLUSTER_TONES,
   DRILLDOWN_CONFIGS,
@@ -741,79 +741,18 @@ function LiveStream({
           </div>
         </div>
 
-        <div className="mt-8 grid gap-3">
-        <ShowMoreList pageSize={8} moreLabel={tInsights("show_more")}>
-          {live.topStories.map((s) => {
-            const dominant = (() => {
-              if (!s.categories) return null;
-              const [k, v] =
-                Object.entries(s.categories).sort((a, b) => b[1] - a[1])[0] ?? [
-                  null,
-                  0,
-                ];
-              return k && v >= 0.5 ? { key: k, score: v } : null;
-            })();
-            const sentTone =
-              s.sentimentLabel === "positive"
-                ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
-                : s.sentimentLabel === "negative"
-                  ? "bg-amber-50 text-amber-700 ring-amber-100"
-                  : "bg-slate-50 text-slate-700 ring-slate-200";
-            return (
-              <article
-                key={s.id}
-                className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300"
-              >
-                <div className="flex flex-wrap items-center gap-2 text-[11px]">
-                  {s.author && (
-                    <span className="font-semibold text-slate-700">
-                      @{s.author}
-                    </span>
-                  )}
-                  {s.sentimentLabel && (
-                    <span
-                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ring-1 ${sentTone}`}
-                    >
-                      {s.sentimentLabel}
-                      {typeof s.sentimentScore === "number"
-                        ? ` · ${(s.sentimentScore * 100).toFixed(0)}%`
-                        : ""}
-                    </span>
-                  )}
-                  {dominant && (
-                    <span className="inline-flex items-center rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-brand-700 ring-1 ring-brand-100">
-                      {dominant.key} · {(dominant.score * 100).toFixed(0)}%
-                    </span>
-                  )}
-                  {(() => {
-                    const score = s.dawahOpportunity ?? s.dawahRelevance;
-                    if (typeof score !== "number") return null;
-                    return (
-                      <span className="ml-auto text-[10px] tabular-nums text-slate-500">
-                        relevance {(score * 100).toFixed(0)}%
-                      </span>
-                    );
-                  })()}
-                </div>
-                <p className="mt-2 text-pretty text-sm leading-relaxed text-slate-800">
-                  {s.text.length > 280 ? s.text.slice(0, 280) + "…" : s.text}
-                </p>
-                {s.url && (
-                  <a
-                    href={s.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 hover:text-slate-900"
-                  >
-                    Open original
-                    <ArrowUpRight className="h-3 w-3" />
-                  </a>
-                )}
-              </article>
-            );
-          })}
-        </ShowMoreList>
-        </div>
+        <PlatformStoriesFilter
+          stories={live.topStories}
+          filterLabels={{
+            all: tInsights("filter_all"),
+            positive: tInsights("live_sentiment_positive"),
+            neutral: tInsights("live_sentiment_neutral"),
+            negative: tInsights("live_sentiment_concerned"),
+          }}
+          showMoreLabel={tInsights("show_more")}
+          openOriginalLabel={tInsights("posts_open_source")}
+          emptyMessage={tInsights("how_coverage_posts_empty")}
+        />
       </div>
     </section>
   );

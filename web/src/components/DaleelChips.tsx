@@ -41,6 +41,7 @@ export function DaleelChips({
   headerLabel?: string;
 }) {
   const t = useTranslations("Insights");
+  const locale = useLocale();
   const [activeId, setActiveId] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
 
@@ -79,6 +80,7 @@ export function DaleelChips({
                   <DaleelCard
                     key={d.ref_id}
                     daleel={d}
+                    locale={locale}
                     onClick={() => setActiveId(d.ref_id)}
                   />
                 ))}
@@ -119,12 +121,22 @@ export function DaleelChips({
 
 function DaleelCard({
   daleel,
+  locale,
   onClick,
 }: {
   daleel: DaleelRef;
+  /** Active UI locale — switches Quran preview between ID (Kemenag) and
+   *  EN (Sahih International). Hadith corpora have only EN data, so the
+   *  fallback still kicks in for those. Before 2026-05-21 this always
+   *  showed translation_id first, leaving the EN-locale briefing with
+   *  Indonesian Quran previews on every card. */
+  locale: string;
   onClick: () => void;
 }) {
-  const translation = daleel.translation_id || daleel.translation_en || "";
+  const translation =
+    locale === "en"
+      ? daleel.translation_en || daleel.translation_id || ""
+      : daleel.translation_id || daleel.translation_en || "";
   return (
     <button
       type="button"
