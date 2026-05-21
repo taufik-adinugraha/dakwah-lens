@@ -451,22 +451,22 @@ async def generate_summary(
             config=types.GenerateContentConfig(
                 system_instruction=SYSTEM_PROMPT,
                 temperature=0.3,
-                # 8192 output budget — well below Gemini 2.5 Pro's
-                # 65k ceiling, but enough that 4096 of thinking +
-                # ~500 of visible briefing has comfortable headroom.
-                # Earlier 1200 was undersized once thinking was on.
-                max_output_tokens=8192,
+                # `max_output_tokens` deliberately UNSET. Earlier
+                # 1200/2048/8192 guesses were all working blind —
+                # we don't actually know how many tokens the model
+                # needs for this briefing shape. By leaving it off,
+                # Gemini uses its model-side default ceiling (65k
+                # for 2.5 Pro) and we capture the real consumption
+                # in tokens_out from `usage_metadata`. Once we have
+                # a few real runs we can size a sensible cap with
+                # data instead of guesses.
                 safety_settings=relaxed_safety,
-                # "Medium-high" thinking — 4096 tokens lets the model
-                # reason properly about which 2-3 daleel from the
-                # retrieved list fit best, spot subtle patterns in
-                # the stats, and structure the 3-paragraph briefing
-                # with better narrative coherence. We tested with
-                # 512 ("low") and 0 ("disabled") — both produced
-                # adequate but flatter output. Cost difference is
-                # negligible at our 5-briefings/day cadence
-                # (~$1-3/mo vs ~$0.75 disabled). Quality matters more
-                # for the public-facing hero card.
+                # Generous thinking budget — 4096 tokens lets the
+                # model reason properly about which 2-3 daleel from
+                # the retrieved list fit best, spot subtle patterns
+                # in the stats, and structure the 3-paragraph briefing
+                # with better narrative coherence. Cost impact is
+                # negligible at 5 briefings/day.
                 thinking_config=types.ThinkingConfig(thinking_budget=4096),
             ),
         )
