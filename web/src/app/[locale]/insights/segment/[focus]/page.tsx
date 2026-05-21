@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { and, desc, sql } from "drizzle-orm";
-import { ArrowLeft, BookOpen, Layers } from "lucide-react";
+import { ArrowLeft, Layers } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
 import { getLatestInsightsSummary } from "@/lib/insights-data";
+import { DaleelChips } from "@/components/DaleelChips";
 import { InsightsHeadlinePills } from "@/components/InsightsHeadlinePills";
 
 /**
@@ -126,6 +127,7 @@ export default async function SegmentPage({
         url: schema.socialPosts.url,
         sentimentLabel: schema.socialPosts.sentimentLabel,
         dawahRelevance: schema.socialPosts.dawahRelevance,
+        dawahOpportunity: schema.socialPosts.dawahOpportunity,
         postedAt: schema.socialPosts.postedAt,
       })
       .from(schema.socialPosts)
@@ -137,7 +139,13 @@ export default async function SegmentPage({
           )}])`,
         ),
       )
-      .orderBy(desc(schema.socialPosts.dawahRelevance))
+      // Sort by da'wah opportunity (2026-05-21 focused-prompt signal),
+      // falling back to dawahRelevance for pre-migration rows.
+      .orderBy(
+        desc(
+          sql`COALESCE(${schema.socialPosts.dawahOpportunity}, ${schema.socialPosts.dawahRelevance})`,
+        ),
+      )
       .limit(15),
     db.execute(sql`
       SELECT sentiment_label, count(*)::int AS n
@@ -214,36 +222,13 @@ export default async function SegmentPage({
                 {t("exec_briefing_label")}
               </p>
               <p className="whitespace-pre-line text-pretty text-sm leading-relaxed text-slate-800 sm:text-base">
-                {segmentBriefing.summaryMd}
+                {locale === "en" && segmentBriefing.summaryMdEn
+                  ? segmentBriefing.summaryMdEn
+                  : segmentBriefing.summaryMd}
               </p>
               {segmentBriefing.daleelRefs &&
                 segmentBriefing.daleelRefs.length > 0 && (
-                  <div className="mt-4 rounded-2xl border border-emerald-100 bg-white/60 p-3">
-                    <p className="mb-2 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
-                      <BookOpen className="h-3 w-3" />
-                      {t("exec_daleel_label")}
-                    </p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {segmentBriefing.daleelRefs.map((ref) => (
-                        <Link
-                          key={ref.ref_id}
-                          href={{
-                            pathname: "/kitab",
-                            query: { q: ref.citation, kitab: ref.corpus },
-                          }}
-                          title={ref.translation_id || ref.translation_en || ""}
-                          className="group inline-flex max-w-full items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] text-emerald-900 transition hover:border-emerald-300 hover:bg-emerald-100"
-                        >
-                          <span className="text-[9px] font-semibold uppercase tracking-wider text-emerald-700">
-                            {ref.corpus.replace(/_/g, " ")}
-                          </span>
-                          <span className="truncate font-medium">
-                            {ref.citation}
-                          </span>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
+                  <DaleelChips refs={segmentBriefing.daleelRefs} />
                 )}
               {/* Segment-filtered headline pills — same shape as the
                   all-platform hero, but the underlying stats are scoped
@@ -328,11 +313,15 @@ export default async function SegmentPage({
                         {p.sentimentLabel}
                       </span>
                     )}
-                    {p.dawahRelevance !== null && p.dawahRelevance !== undefined && (
-                      <span className="tabular-nums">
-                        {(p.dawahRelevance * 100).toFixed(0)}% relevance
-                      </span>
-                    )}
+                    {(p.dawahOpportunity ?? p.dawahRelevance) !== null &&
+                      (p.dawahOpportunity ?? p.dawahRelevance) !== undefined && (
+                        <span className="tabular-nums">
+                          {(
+                            (p.dawahOpportunity ?? p.dawahRelevance ?? 0) * 100
+                          ).toFixed(0)}
+                          % relevance
+                        </span>
+                      )}
                     {p.postedAt && (
                       <span className="text-slate-400">
                         {new Date(p.postedAt).toLocaleDateString(locale)}

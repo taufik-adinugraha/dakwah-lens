@@ -92,7 +92,17 @@ class SocialPost(Base, TimestampMixin):
 
     # ── relevance (Gemini Flash, Stage 4) ──────────────────────────
     dawah_relevance: Mapped[float | None] = mapped_column(Float)
-    """Aggregate da'wah-worthiness, 0-1. Indexed for `WHERE relevance >= …` queries."""
+    """Topical relevance, 0-1. Aggregated as mean-of-top-2 category
+    scores so single-keyword matches don't dominate (was max() until
+    2026-05-21). Used by segment filtering + topic discovery."""
+
+    dawah_opportunity: Mapped[float | None] = mapped_column(Float)
+    """'Would a da'i credibly use this?' score, 0-1 continuous.
+    Independent second-pass classifier with prompt-side calibration
+    anchors at 0.2/0.4/0.6/0.8 — addresses the bucketing pathology
+    where the topical relevance score collapsed to {0.0, 0.5, 1.0}.
+    UI sorts 'Top posts' by this; falls back to dawah_relevance when
+    NULL (rows from before the 2026-05-21 migration)."""
 
     categories: Mapped[dict[str, float] | None] = mapped_column(JSONB)
     """Per-category scores: `{ "akhlaq": 0.78, "muamalah": 0.12, … }`."""
@@ -111,6 +121,7 @@ class SocialPost(Base, TimestampMixin):
             "platform", "external_id", name="uq_social_post_platform_external"
         ),
         Index("ix_social_posts_relevance", "dawah_relevance"),
+        Index("ix_social_posts_opportunity", "dawah_opportunity"),
         Index("ix_social_posts_platform_posted", "platform", "posted_at"),
         Index("ix_social_posts_platform_region", "platform", "region"),
     )

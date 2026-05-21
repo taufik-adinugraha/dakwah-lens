@@ -628,6 +628,11 @@ class InsightsSummary(Base):
     summary_md: Mapped[str] = mapped_column(Text, nullable=False)
     """Markdown narrative produced by the LLM. Bahasa Indonesia primary."""
 
+    summary_md_en: Mapped[str | None] = mapped_column(Text, nullable=True)
+    """Parallel English narrative. Generated alongside `summary_md` in
+    the same run. Nullable so rows from before the 2026-05-21 migration
+    survive — the UI falls back to `summary_md` when this is NULL."""
+
     headline_stats: Mapped[dict] = mapped_column(JSONB, nullable=False)
     """Pre-computed numbers for the front-end pill row, so /insights
     doesn't recompute on every page load. Shape:

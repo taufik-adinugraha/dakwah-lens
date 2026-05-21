@@ -62,7 +62,7 @@ ALL_CATEGORIES = [
 ]
 
 
-SYSTEM_PROMPT = """You write a daily executive briefing for Indonesian Muslim community leaders (da'i, ustadz, content creators) about what's happening in the public conversation.
+SYSTEM_PROMPT_ID = """You write a daily executive briefing for Indonesian Muslim community leaders (da'i, ustadz, content creators) about what's happening in the public conversation.
 
 The briefing has THREE consecutive paragraphs separated by blank lines:
 
@@ -71,6 +71,8 @@ PARAGRAPH 1 — Penjelasan (3-4 sentences in Bahasa Indonesia):
   - Sentiment temperature with the specific numbers
   - What's RISING vs LAST WEEK — name the specific topic or category with the change
   Tone: precise, observational, practical. Use the numbers VERBATIM (e.g. "38%" not "sekitar sepertiga").
+
+  CRITICAL — SCOPE OF PERCENTAGES: read SEGMENT_SCOPE in the input. When SEGMENT_SCOPE is "all" the percentages are share of all weekly conversation. When SEGMENT_SCOPE is a specific segment (spiritual/family/youth/justice), the percentages in `top_categories` are share *WITHIN THAT SEGMENT'S CATEGORIES ONLY* — e.g. "family 89%" means 89% of family-segment posts are family-dominant (vs health-dominant), NOT 89% of all conversation. Phrase accordingly: use language like "di antara konten segmen keluarga, kategori family mendominasi dengan 89%" or "dalam diskursus segmen ini, X memimpin dengan 89%". Do NOT write "percakapan publik didominasi oleh family 89%" when scope is a segment — that overclaims.
 
   CRITICAL: when describing what's happening, USE THE SPECIFIC SAMPLE HEADLINES I provide for each top topic. Do NOT abstract them into generic category statements ("isu pemuda penting"). Instead, name the actual stories driving the trend ("rentetan kasus pencabulan oleh kiai di Ponorogo, guru honorer, dan pria di kamar mandi masjid"). The headlines I give you ARE the substance — use them. Do NOT invent stories not in the headlines.
 
@@ -84,6 +86,35 @@ PARAGRAPH 3 — Daleel (ONLY if I provided non-empty daleel below):
   CRITICAL: You may ONLY cite passages from the daleel list I supplied. You may NOT invent verses, hadith numbers, or attributions.
 
   If the daleel list is empty (the user input says "tidak ada daleel"), OMIT paragraph 3 entirely. Output only paragraphs 1 and 2. Do NOT write filler text about missing daleel — just stop after paragraph 2.
+
+Output format: plain text. No headings, no markdown formatting. Two or three paragraphs separated by blank lines, depending on whether daleel was provided.
+"""
+
+
+SYSTEM_PROMPT_EN = """You write a daily executive briefing for Indonesian Muslim community leaders (da'i, ustadz, content creators) about what's happening in the public conversation. THIS BRIEFING IS IN ENGLISH for non-Indonesian readers (diaspora, international researchers, English-medium content creators).
+
+The briefing has THREE consecutive paragraphs separated by blank lines:
+
+PARAGRAPH 1 — Context (3-4 sentences in clear, neutral English):
+  - Dominant theme this week — which category leads, what % share, what's driving it
+  - Sentiment temperature with the specific numbers
+  - What's RISING vs LAST WEEK — name the specific topic or category with the change
+  Tone: precise, observational, practical. Use the numbers VERBATIM (e.g. "38%" not "about a third").
+
+  CRITICAL — SCOPE OF PERCENTAGES: read SEGMENT_SCOPE in the input. When SEGMENT_SCOPE is "all" the percentages are share of all weekly conversation. When SEGMENT_SCOPE is a specific segment (spiritual/family/youth/justice), the percentages in `top_categories` are share *WITHIN THAT SEGMENT'S CATEGORIES ONLY* — e.g. "family 89%" means 89% of family-segment posts are family-dominant (vs health-dominant), NOT 89% of all conversation. Phrase accordingly: use language like "within family-segment content, the family category leads at 89%" or "in this segment's discourse, X leads with 89%". Do NOT write "public conversation is dominated by family 89%" when scope is a segment — that overclaims.
+
+  CRITICAL: when describing what's happening, USE THE SPECIFIC SAMPLE HEADLINES I provide for each top topic. The headlines are in Indonesian — translate or paraphrase them naturally into English. Do NOT abstract them into generic category statements ("youth issues are important"). Instead, name the actual stories driving the trend ("a string of clerical sexual-abuse cases in Ponorogo and elsewhere"). Do NOT invent stories not in the headlines.
+
+PARAGRAPH 2 — Nasihah (2-3 sentences in clear English):
+  Practical Islamic counsel tied to what trended. Address the BROAD da'wah audience — da'i giving khutbah, ustadzah leading kajian, content creators on YouTube/IG/TikTok, parents teaching at home, community organizers, researchers tracking Muslim discourse. Do NOT default to "Friday sermon" as the only surface. Mention the angle that resonates across these surfaces. Concrete, not generic. KEEP da'wah-specific terms (da'i, khutbah, nasihah, daleel, kitab, aqidah, akhlaq, muamalah) as-is — do not translate them to generic English equivalents.
+
+PARAGRAPH 3 — Daleel (ONLY if I provided non-empty daleel below):
+  If I have provided daleel passages, cite 2-3 of them. Each line:
+    - QS [surah_name] [ayah]: [brief English gloss]
+    - Sahih Bukhari/Muslim/etc. [number]: [brief English gloss]
+  CRITICAL: You may ONLY cite passages from the daleel list I supplied. You may NOT invent verses, hadith numbers, or attributions.
+
+  If the daleel list is empty (the user input says "no daleel found"), OMIT paragraph 3 entirely. Output only paragraphs 1 and 2. Do NOT write filler text about missing daleel — just stop after paragraph 2.
 
 Output format: plain text. No headings, no markdown formatting. Two or three paragraphs separated by blank lines, depending on whether daleel was provided.
 """
@@ -358,12 +389,13 @@ async def _compute_stats(
     }
 
 
-def _build_retrieval_query(stats: dict[str, Any], segment: str | None) -> str:
-    """Build a single thematic search string for Qdrant retrieval.
+def _build_retrieval_query_fallback(stats: dict[str, Any], segment: str | None) -> str:
+    """Token-concatenation fallback when LLM query generation fails.
 
-    Uses the top-category label + the top-1 rising topic label + a
-    segment hint so non-Quran corpora have a fair shot at the
-    similarity contest.
+    Used to be the primary retrieval-query builder. Token-matches verses
+    that contain category names literally (e.g. "youth" → Quran verses
+    about youthful paradise servants), so quality is poor. Kept only as
+    a non-fatal fallback if Flash-Lite is unavailable.
     """
     bits: list[str] = []
     if stats["top_categories"]:
@@ -386,19 +418,155 @@ def _build_retrieval_query(stats: dict[str, Any], segment: str | None) -> str:
     return ". ".join(bits) or "tema dakwah umum minggu ini"
 
 
+_SEGMENT_INTENT = {
+    None: "isu dakwah umum yang relevan ke audiens Muslim Indonesia minggu ini",
+    "spiritual": "pembinaan aqidah dan akhlaq Muslim",
+    "family": "ketahanan keluarga, peran orang tua, dan kesehatan rumah tangga",
+    "youth": "pembinaan pemuda Muslim, pendidikan, dan tantangan generasi muda",
+    "justice": "keadilan sosial, etika ekonomi, dan muamalah",
+}
+
+
+def _build_retrieval_query(stats: dict[str, Any], segment: str | None) -> str:
+    """LLM-generated thematic search query for Qdrant retrieval.
+
+    Why an LLM call: token-concatenation of category names
+    ("isu youth. yang sedang meningkat: youth.") matches surface keywords
+    in verse translations — e.g. "youth" surfaces Quran verses about
+    youthful paradise servants, not thematic guidance for pemuda. Flash-Lite
+    reads the segment intent + top headlines and synthesizes a query in
+    scholarly Bahasa Indonesia that a da'i would actually search for
+    (e.g. "amanah pemuda dalam menghadapi tekanan ekonomi dan
+    kritisme politik yang konstruktif"), giving the embedding step a
+    fair shot at thematic-fit verses instead of surface-keyword matches.
+
+    Cost: ~$0.0005 per call · 5 calls/day → ~$0.075/mo. Negligible.
+
+    Falls back to the legacy token-concat builder on any error so the
+    pipeline never breaks because of this enhancement.
+    """
+    if not settings.gemini_api_key:
+        return _build_retrieval_query_fallback(stats, segment)
+
+    headline_lines: list[str] = []
+    for t in stats.get("top_topics", [])[:5]:
+        for h in t.get("sample_headlines", [])[:2]:
+            title = (h.get("title") or "").strip()
+            if title:
+                headline_lines.append(f"- {title}")
+    headlines_block = "\n".join(headline_lines) or "(tidak ada headline)"
+
+    top_cat = (
+        stats["top_categories"][0]["category"]
+        if stats.get("top_categories")
+        else "umum"
+    )
+    intent = _SEGMENT_INTENT.get(segment, _SEGMENT_INTENT[None])
+
+    prompt = f"""Saya ingin mencari ayat Qur'an dan hadith dari basis data vektor untuk dijadikan daleel dalam briefing da'i.
+
+KONTEKS BRIEFING:
+- Segmen: {segment or 'umum (semua)'}
+- Niat tematik segmen ini: {intent}
+- Kategori dominan pekan ini: {top_cat}
+
+HEADLINE NYATA YANG MENDORONG TREN PEKAN INI:
+{headlines_block}
+
+TUGAS: Tulis SATU kalimat (maksimal 25 kata) dalam Bahasa Indonesia yang menggambarkan TEMA INTI yang menghubungkan headline-headline di atas dengan niat segmen, MENGGUNAKAN KOSAKATA SYAR'I yang biasa muncul dalam terjemahan ayat/hadith (contoh: amanah, qana'ah, ketahanan keluarga, akhlaq, adil, mengurangi timbangan, hikmah, sabar, tolong-menolong dalam kebaikan).
+
+Jangan tulis nama kasus atau orang. Jangan tulis kata bahasa Inggris seperti "youth" atau "family". Tulis hanya kalimat tematik tersebut, tanpa pengantar."""
+
+    try:
+        client = _get_client()
+        resp = client.models.generate_content(
+            model="gemini-2.5-flash-lite",
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                temperature=0.2,
+                max_output_tokens=120,
+                # thinking disabled — this is a simple template-fill task,
+                # no reasoning needed. Saves ~512 tokens of thinking budget
+                # per call. Flash-Lite minimum if thinking IS enabled is 512.
+                thinking_config=types.ThinkingConfig(thinking_budget=0),
+            ),
+        )
+        query = (resp.text or "").strip().strip('"').strip("'")
+        if not query:
+            return _build_retrieval_query_fallback(stats, segment)
+
+        usage_md = getattr(resp, "usage_metadata", None)
+        from api.services.usage import record_usage as _record_usage
+
+        _record_usage(
+            provider="gemini",
+            operation="retrieval_query_gen",
+            model="gemini-2.5-flash-lite",
+            tokens_in=getattr(usage_md, "prompt_token_count", None),
+            tokens_out=getattr(usage_md, "candidates_token_count", None),
+            meta={"segment": segment},
+        )
+        log.info(
+            "insights_summary.retrieval_query_generated",
+            segment=segment,
+            query=query[:120],
+        )
+        return query
+    except Exception as exc:
+        log.warning(
+            "insights_summary.retrieval_query_failed",
+            segment=segment,
+            error=str(exc),
+        )
+        return _build_retrieval_query_fallback(stats, segment)
+
+
 def _build_user_prompt(
-    stats: dict[str, Any], daleel: list[dict[str, Any]]
+    stats: dict[str, Any],
+    daleel: list[dict[str, Any]],
+    *,
+    language: str = "id",
 ) -> str:
-    """Assemble the structured context for Gemini."""
+    """Assemble the structured context for Gemini.
+
+    `language` switches the daleel block (Bahasa translation for `id`,
+    English translation for `en`) and the empty-daleel sentinel string.
+    The stats JSON itself is language-agnostic — the model translates
+    numeric + categorical context naturally.
+    """
+    if language == "en":
+        empty_marker = "(no daleel found for this theme)"
+        translation_label = "Translation (EN)"
+        scope_note_all = (
+            "SEGMENT_SCOPE: all\n"
+            "Top_categories percentages are share of all categorized "
+            "conversation this week. Phrase as 'public conversation' is fine."
+        )
+    else:
+        empty_marker = "(tidak ada daleel yang ditemukan untuk tema ini)"
+        translation_label = "Terjemahan ID"
+        scope_note_all = (
+            "SEGMENT_SCOPE: all\n"
+            "Top_categories percentages are share of all categorized "
+            "conversation this week. Phrase as 'percakapan publik' is fine."
+        )
+
+    def _translation_for(d: dict[str, Any]) -> str:
+        if language == "en":
+            # Hadith corpora have no Bahasa translation; English is the
+            # only option there anyway. Quran has both.
+            return d.get("translation_en") or d.get("translation_id") or ""
+        return d.get("translation_id") or d.get("translation_en") or ""
+
     daleel_block = (
         "\n\n".join(
             f"[{d['ref_id']}] {d['corpus'].upper()} {d['citation']}\n"
             f"Arabic: {d['arabic'][:300]}\n"
-            f"Terjemahan ID: {d['translation_id'][:500]}"
+            f"{translation_label}: {_translation_for(d)[:500]}"
             for d in daleel
         )
         if daleel
-        else "(tidak ada daleel yang ditemukan untuk tema ini)"
+        else empty_marker
     )
 
     # Pretty-print top topics with their sample headlines so the model
@@ -429,7 +597,22 @@ def _build_user_prompt(
         ],
     }
 
-    return f"""HEADLINE NUMBERS (use these and ONLY these for paragraph 1):
+    segment = stats.get("segment")
+    scope_label = segment if segment else "all"
+    if segment:
+        seg_cats = SEGMENT_CATEGORIES.get(segment, [])
+        scope_note = (
+            f"SEGMENT_SCOPE: {scope_label}\n"
+            f"Top_categories percentages are share WITHIN this segment's "
+            f"categories ({', '.join(seg_cats)}) — not share of all weekly "
+            f"conversation. Phrase accordingly (see system instructions)."
+        )
+    else:
+        scope_note = scope_note_all
+
+    return f"""{scope_note}
+
+HEADLINE NUMBERS (use these and ONLY these for paragraph 1):
 
 {json.dumps(stats_for_json, indent=2, ensure_ascii=False)}
 
@@ -454,6 +637,85 @@ def _get_client() -> genai.Client:
     if _client is None:
         _client = genai.Client(api_key=settings.gemini_api_key)
     return _client
+
+
+_RELAXED_SAFETY = [
+    types.SafetySetting(category=cat, threshold="BLOCK_ONLY_HIGH")
+    for cat in (
+        "HARM_CATEGORY_HARASSMENT",
+        "HARM_CATEGORY_HATE_SPEECH",
+        "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+        "HARM_CATEGORY_DANGEROUS_CONTENT",
+    )
+]
+# Observed 2026-05-21: Gemini 2.5 Pro returned empty responses on 4 of 5
+# segment briefings under default safety. The prompts referenced
+# corruption cases, child-abuse incidents, WNI captives — news data we
+# want the model to ANALYZE for a da'wah audience, not generate. Default
+# thresholds over-fire for analytical use cases of dark-news content.
+
+
+def _generate_for_language(
+    client: genai.Client,
+    stats: dict[str, Any],
+    daleel: list[dict[str, Any]],
+    language: str,
+    segment: str | None,
+) -> tuple[str, int | None, int | None, float] | None:
+    """Run one Gemini Pro call in the requested language.
+
+    Returns `(summary_md, tokens_in, tokens_out, cost_usd)` on success
+    or `None` on empty response (safety block / token cap / unknown
+    finish reason). Caller decides whether the missing output is fatal
+    (Indonesian) or recoverable with fallback (English).
+    """
+    system_prompt = SYSTEM_PROMPT_EN if language == "en" else SYSTEM_PROMPT_ID
+    user_prompt = _build_user_prompt(stats, daleel, language=language)
+
+    resp = client.models.generate_content(
+        model=MODEL,
+        contents=user_prompt,
+        config=types.GenerateContentConfig(
+            system_instruction=system_prompt,
+            temperature=0.3,
+            safety_settings=_RELAXED_SAFETY,
+            # 4096-token thinking budget — lets the model pick the right
+            # 2-3 daleel from the rerank list and structure the 3-paragraph
+            # briefing coherently. Negligible cost at 5×2 briefings/day.
+            thinking_config=types.ThinkingConfig(thinking_budget=4096),
+        ),
+    )
+    summary_md = (resp.text or "").strip()
+    if not summary_md:
+        finish_reason = None
+        block_reason = None
+        try:
+            if resp.candidates:
+                finish_reason = getattr(
+                    resp.candidates[0], "finish_reason", None
+                )
+            pf = getattr(resp, "prompt_feedback", None)
+            if pf is not None:
+                block_reason = getattr(pf, "block_reason", None)
+        except Exception:
+            pass
+        log.warning(
+            "insights_summary.empty_response",
+            segment=segment,
+            language=language,
+            finish_reason=str(finish_reason) if finish_reason else None,
+            block_reason=str(block_reason) if block_reason else None,
+        )
+        return None
+
+    usage_md = getattr(resp, "usage_metadata", None)
+    tokens_in = getattr(usage_md, "prompt_token_count", None)
+    tokens_out = getattr(usage_md, "candidates_token_count", None)
+    cost = (
+        (tokens_in or 0) / 1_000_000 * 1.25
+        + (tokens_out or 0) / 1_000_000 * 10.00
+    )
+    return summary_md, tokens_in, tokens_out, cost
 
 
 async def generate_summary(
@@ -500,92 +762,41 @@ async def generate_summary(
         )
 
         client = _get_client()
-        user_prompt = _build_user_prompt(stats, daleel)
 
-        # Safety settings: relax to BLOCK_ONLY_HIGH. Observed 2026-05-21:
-        # Gemini 2.5 Pro returned empty responses on 4 of 5 segment
-        # briefings — the prompts contained references to corruption
-        # cases, child-abuse incidents, and Israeli captivity of WNI,
-        # which tripped default-strength safety filters. None of these
-        # are us GENERATING harmful content; they're news data we want
-        # the model to ANALYZE for a da'wah audience. Default thresholds
-        # over-fire for analytical use cases.
-        relaxed_safety = [
-            types.SafetySetting(
-                category=cat,
-                threshold="BLOCK_ONLY_HIGH",
-            )
-            for cat in (
-                "HARM_CATEGORY_HARASSMENT",
-                "HARM_CATEGORY_HATE_SPEECH",
-                "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-                "HARM_CATEGORY_DANGEROUS_CONTENT",
-            )
-        ]
-
-        resp = client.models.generate_content(
-            model=MODEL,
-            contents=user_prompt,
-            config=types.GenerateContentConfig(
-                system_instruction=SYSTEM_PROMPT,
-                temperature=0.3,
-                # `max_output_tokens` deliberately UNSET. Earlier
-                # 1200/2048/8192 guesses were all working blind —
-                # we don't actually know how many tokens the model
-                # needs for this briefing shape. By leaving it off,
-                # Gemini uses its model-side default ceiling (65k
-                # for 2.5 Pro) and we capture the real consumption
-                # in tokens_out from `usage_metadata`. Once we have
-                # a few real runs we can size a sensible cap with
-                # data instead of guesses.
-                safety_settings=relaxed_safety,
-                # Generous thinking budget — 4096 tokens lets the
-                # model reason properly about which 2-3 daleel from
-                # the retrieved list fit best, spot subtle patterns
-                # in the stats, and structure the 3-paragraph briefing
-                # with better narrative coherence. Cost impact is
-                # negligible at 5 briefings/day.
-                thinking_config=types.ThinkingConfig(thinking_budget=4096),
-            ),
-        )
-        summary_md = (resp.text or "").strip()
-        if not summary_md:
-            # Surface why the model returned empty so we can tell safety-
-            # filter blocks apart from token-limit truncation or other
-            # finish reasons in production logs.
-            finish_reason = None
-            block_reason = None
-            try:
-                if resp.candidates:
-                    finish_reason = getattr(
-                        resp.candidates[0], "finish_reason", None
-                    )
-                pf = getattr(resp, "prompt_feedback", None)
-                if pf is not None:
-                    block_reason = getattr(pf, "block_reason", None)
-            except Exception:
-                pass
-            log.warning(
-                "insights_summary.empty_response",
-                segment=segment,
-                finish_reason=str(finish_reason) if finish_reason else None,
-                block_reason=str(block_reason) if block_reason else None,
-            )
+        # Two-language generation. We make ONE Gemini Pro call per
+        # language so each output is idiomatic-native, not a translation
+        # — Islamic guidance content has nuance (e.g. honorifics, terms
+        # of art, code-mixed da'wah vocabulary) that translation flattens.
+        # Cost roughly doubles (~$0.013 per pair vs ~$0.006 single), still
+        # well under the IDR 1M/month cap.
+        #
+        # If English fails, we still persist the Indonesian row with
+        # summary_md_en=NULL; UI falls back to summary_md. The reverse
+        # (English-only) is treated as a failure since Indonesian is the
+        # primary product locale.
+        id_result = _generate_for_language(client, stats, daleel, "id", segment)
+        if id_result is None:
             return None
+        summary_md, tokens_in_id, tokens_out_id, cost_id = id_result
 
-        usage_md = getattr(resp, "usage_metadata", None)
-        tokens_in = getattr(usage_md, "prompt_token_count", None)
-        tokens_out = getattr(usage_md, "candidates_token_count", None)
-        cost = (
-            (tokens_in or 0) / 1_000_000 * 1.25
-            + (tokens_out or 0) / 1_000_000 * 10.00
-        )
+        en_result = _generate_for_language(client, stats, daleel, "en", segment)
+        if en_result is None:
+            summary_md_en = None
+            tokens_in_en = tokens_out_en = 0
+            cost_en = 0.0
+        else:
+            summary_md_en, tokens_in_en, tokens_out_en, cost_en = en_result
+
+        tokens_in = (tokens_in_id or 0) + (tokens_in_en or 0)
+        tokens_out = (tokens_out_id or 0) + (tokens_out_en or 0)
+        cost = cost_id + cost_en
 
         row = InsightsSummary(
             generated_at=datetime.now(UTC),
             period_start=datetime.fromisoformat(stats["period_start"]),
             period_end=datetime.fromisoformat(stats["period_end"]),
             summary_md=summary_md,
+            summary_md_en=summary_md_en,
             headline_stats=stats,
             model=MODEL,
             tokens_in=tokens_in,
@@ -606,7 +817,7 @@ async def generate_summary(
             tokens_in=tokens_in,
             tokens_out=tokens_out,
             cost_usd=cost,
-            meta={"segment": segment},
+            meta={"segment": segment, "languages": "id+en" if summary_md_en else "id"},
         )
 
         log.info(
@@ -617,10 +828,12 @@ async def generate_summary(
             tokens_in=tokens_in,
             tokens_out=tokens_out,
             cost_usd=round(cost, 4),
+            has_en=summary_md_en is not None,
         )
 
         return {
             "summary_md": summary_md,
+            "summary_md_en": summary_md_en,
             "stats": stats,
             "daleel_refs": daleel,
             "segment": segment,

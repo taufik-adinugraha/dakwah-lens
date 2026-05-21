@@ -43,15 +43,16 @@ For each text, return a score 0-1 for each of three labels: positive, negative, 
 CRITICAL: read the OUTCOME and the dominant frame of the story, not just the underlying topic.
 
 POSITIVE — score positive when the story reports a good OUTCOME:
-- JUSTICE SERVED: prosecutions advancing, arrests of suspects, convictions, asset seizures from corrupt officials, sentence demands accepted as fair, drug busts, criminals caught BEFORE acting. The crime itself is sad, but the news here is the resolution.
+- JUSTICE SERVED: prosecutions advancing, arrests of suspects, convictions, asset seizures from corrupt officials, sentence demands accepted as fair, drug busts, criminals caught BEFORE acting. The crime itself is sad, but the news here is the resolution. ARREST/CONVICTION VERBS that ALWAYS mark justice-served: "diringkus", "ditangkap", "ditembak" (when applied to perpetrators), "divonis", "dibekuk", "diciduk", "dijerat", "didakwa" (when the actor is the criminal, not victim), "kabur tertangkap". When a headline names a crime AND uses one of these verbs, the lead is the resolution → POSITIVE.
 - CONSUMER BENEFITS: subsidies, discounts (electricity, fuel, transport), 13th-month salary payments, prices going DOWN, wage protections (driver share %, gig-worker rights), worker dispute resolved.
 - CHARITY / DAKWAH: donations, kurban (Eid sacrifice), Hajj milestones, mosque renovations, religious teachings, humanitarian aid.
 - COOPERATION / SOLIDARITY: anti-imperialist solidarity speeches, regional cooperation, post-disaster mutual aid, inclusive accessibility initiatives.
-- ACHIEVEMENT: research progress, exports growing, industry milestones, currency strengthening, awards won by Indonesian institutions/communities.
+- ACHIEVEMENT: research progress, exports growing, industry milestones, currency strengthening, awards won by Indonesian institutions/communities. Personal achievements that inspire — earning a doctorate (especially cumlaude), success stories of small entrepreneurs ("Kisah Sukses X"), regenerasi positif in sports/work, individual lulus / juara / berhasil framings.
 - INFRASTRUCTURE / DEVELOPMENT: roads built, schools opened, electrification, conservation programs, talent development.
 
 NEGATIVE — score negative when the story is about ongoing harm:
 - VIOLENCE / ABUSE: child sexual abuse (including in religious settings), bullying, school violence (NEVER neutral — read past the administrative framing), murder, assault, kidnapping (WNI captured by Israel), domestic violence, religious-tension incidents.
+- DEATHS: a person found dead ("ditemukan meninggal", "tewas", "wafat" — when the subject is unknown, an ordinary citizen, or a victim of crime/accident). Exception: peaceful death of an elderly public figure where the article is a tribute, not a harm report → neutral.
 - DISASTERS: earthquakes, eruptions, landslides, fires, floods, disease outbreaks.
 - IMMORAL ACTS: corruption AS IT'S HAPPENING (not as it's being prosecuted), inappropriate viral content, fitnah / defamation.
 - ECONOMIC HARM TO PUBLIC: prices RISING (food, materials), rupiah weakening (when it's the lead), small businesses struggling, budget CUTS to social programs (MBG cut).
@@ -59,7 +60,9 @@ NEGATIVE — score negative when the story is about ongoing harm:
 - HOAXES IN PROGRESS (an active hoax/scam being reported). Hoaxes already DEBUNKED → see neutral.
 
 NEUTRAL — score neutral when there's no clear good/bad OUTCOME:
-- ROUTINE POLITICS: speeches, anecdotes from speeches, party reactions, attendance announcements, policy proposals without yet an action. "Prabowo hadir di rapat" is neutral.
+- ROUTINE POLITICS: speeches, anecdotes from speeches, party reactions, attendance announcements, policy proposals without yet an action, mutual diplomatic praise between coalition figures ("X menghormati Y", "X mengapresiasi Y", "X tegaskan Y memperkuat..."). "Prabowo hadir di rapat" is neutral. Inter-party courtesy / spin is neutral, NOT positive — there's no concrete outcome for the public.
+- AMBIGUOUS FOREIGN VISITS / DIPLOMATIC ARRIVALS without a stated harm or benefit ("3 Kapal Perang X Tiba-Tiba Bersandar di Jakarta, Ada Urusan Apa?") — neutral until the outcome is reported.
+- CELEBRITY DENIALS / DISPUTES without confirmed harm ("Erin Bantah Punya Perilaku Kasar"): the allegation is unconfirmed, the denial isn't an outcome — neutral.
 - SCHEDULES / ANNOUNCEMENTS / WEATHER: train schedules, ship schedules, SIM keliling, weather forecasts, traffic alerts, exam result dates.
 - SPORTS / CELEBRITY GOSSIP without serious harm: team line-ups, transfer news, celebrity dating/dispute (unless violence is involved).
 - LEGAL PROCEDURE WITHOUT OUTCOME: trial postponed, defense lawyer prepares, hearing scheduled.
@@ -85,6 +88,15 @@ Examples (carefully calibrated against real misclassifications):
 - "Kemensos Lelang 6,2 Kg Emas HTT, Hasilnya untuk Bantu Warga Rentan" → positive (humanitarian)
 - "PBNU Kutuk Penembakan di Masjid AS Tewaskan 3 Orang" → negative (mosque shooting, even though framed as condemnation)
 - "Mayoritas Dapur MBG di Sleman Belum Kantongi Sertifikat Higiene" → negative (food safety concern)
+- "Komplotan Pencuri Aset Tower Seluler di Banyumas Diringkus" → positive ("diringkus" = arrest verb; criminals caught)
+- "Jambret HP Bocah Perekam Bus Telolet Ditangkap, 2 Pelaku Ditembak" → positive (snatchers arrested + perpetrators shot)
+- "ASN Aceh Raih Doktor Lewat Publikasi Jurnal Q1, Lulus Cumlaude" → positive (personal achievement)
+- "Kisah Sukses Otiv jadi Inspirasi Para Agen BRILink" → positive (inspiring success story)
+- "Pria Ditemukan Meninggal di Sentani, Saksi Sebut Korban Sempat Mengeluh Demam" → negative (death of an ordinary citizen)
+- "Gerindra: Ucapan Terima Kasih ke PDIP Bukti Prabowo Hormati Oposisi" → neutral (inter-party courtesy, no concrete outcome)
+- "Qodari Tegaskan Presiden Prabowo Perkuat Pengawasan Ekspor demi Jalankan Pasal 33 UUD 1945" → neutral (political spin, no action yet)
+- "3 Kapal Perang Pakistan Tiba-Tiba Bersandar di Jakarta, Ada Urusan Apa?" → neutral (ambiguous foreign arrival without outcome)
+- "Erin Bantah Punya Perilaku Kasar ke ART" → neutral (celebrity denial, allegation unconfirmed)
 
 Return only valid JSON."""
 

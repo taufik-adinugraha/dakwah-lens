@@ -770,11 +770,15 @@ function LiveStream({ live, t }: { live: PlatformInsights; t: T }) {
                       {dominant.key} · {(dominant.score * 100).toFixed(0)}%
                     </span>
                   )}
-                  {typeof s.dawahRelevance === "number" && (
-                    <span className="ml-auto text-[10px] tabular-nums text-slate-500">
-                      relevance {(s.dawahRelevance * 100).toFixed(0)}%
-                    </span>
-                  )}
+                  {(() => {
+                    const score = s.dawahOpportunity ?? s.dawahRelevance;
+                    if (typeof score !== "number") return null;
+                    return (
+                      <span className="ml-auto text-[10px] tabular-nums text-slate-500">
+                        relevance {(score * 100).toFixed(0)}%
+                      </span>
+                    );
+                  })()}
                 </div>
                 <p className="mt-2 text-pretty text-sm leading-relaxed text-slate-800">
                   {s.text.length > 280 ? s.text.slice(0, 280) + "…" : s.text}
@@ -869,14 +873,18 @@ function TopStories({
                           {dominantCat.replace(/_/g, " ")}
                         </span>
                       )}
-                      {typeof post.dawahRelevance === "number" && (
-                        <>
-                          <span>·</span>
-                          <span className="tabular-nums">
-                            relevance {(post.dawahRelevance * 100).toFixed(0)}%
-                          </span>
-                        </>
-                      )}
+                      {(() => {
+                        const score = post.dawahOpportunity ?? post.dawahRelevance;
+                        if (typeof score !== "number") return null;
+                        return (
+                          <>
+                            <span>·</span>
+                            <span className="tabular-nums">
+                              relevance {(score * 100).toFixed(0)}%
+                            </span>
+                          </>
+                        );
+                      })()}
                     </p>
                   </div>
                   <ArrowUpRight className="h-4 w-4 shrink-0 text-slate-300" />

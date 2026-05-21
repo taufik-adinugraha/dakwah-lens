@@ -40,6 +40,20 @@ git fetch --quiet origin main
 git reset --hard origin/main
 say "   at $(git rev-parse --short HEAD): $(git log -1 --pretty=%s)"
 
+# 1.3 Ensure shared volume dirs exist + writable by the container user
+# The web/api/worker containers all run as UID 1001 (web=nextjs:nogroup,
+# api/worker=app:app). The bind-mounted host dir must match — otherwise
+# uploads fail with EACCES at mkdir time. Idempotent: only chowns when
+# the ownership doesn't match, so reruns are no-ops on a healthy host.
+ATTACH_DIR=/srv/dakwah-lens/data/attachments
+if [[ ! -d "$ATTACH_DIR" ]]; then
+  say "▶ creating $ATTACH_DIR"
+  sudo install -d -o 1001 -g 1001 -m 755 "$ATTACH_DIR"
+elif [[ "$(stat -c %u "$ATTACH_DIR")" != "1001" ]]; then
+  say "▶ chowning $ATTACH_DIR to 1001:1001"
+  sudo chown -R 1001:1001 "$ATTACH_DIR"
+fi
+
 # 1.5 Sync Caddy config ────────────────────────────────────────
 # Caddyfile lives in deploy/ inside the repo so a fresh-VM provision
 # automatically gets the right routing. We use `install` (not cp) and

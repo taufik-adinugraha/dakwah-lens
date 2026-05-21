@@ -38,7 +38,10 @@ from api.services.apify import (
 from api.services.language import detect_lang
 from api.services.news_sentiment import classify_batch as classify_news_sentiment
 from api.services.normalizers import NORMALIZERS
-from api.services.relevance import classify_batch as classify_relevance
+from api.services.relevance import (
+    classify_batch as classify_relevance,
+    classify_opportunity_batch as classify_opportunity,
+)
 from api.services.rss import scrape_mainstream
 from api.services.sentiment import classify_batch as classify_sentiment
 from api.services.youtube import scrape_youtube, scrape_youtube_uploads
@@ -162,6 +165,7 @@ async def _run(
                 SocialPost.sentiment_label,
                 SocialPost.sentiment_score,
                 SocialPost.dawah_relevance,
+                SocialPost.dawah_opportunity,
                 SocialPost.categories,
             ).where(
                 SocialPost.platform == platform,
@@ -169,9 +173,12 @@ async def _run(
                 SocialPost.categories.is_not(None),
             )
         )
-        cached: dict[str, tuple[str | None, float | None, float | None, dict]] = {
-            eid: (label, score, rel, cats)
-            for (eid, label, score, rel, cats) in existing_res.all()
+        cached: dict[
+            str,
+            tuple[str | None, float | None, float | None, float | None, dict],
+        ] = {
+            eid: (label, score, rel, opp, cats)
+            for (eid, label, score, rel, opp, cats) in existing_res.all()
         }
     fresh_indices = [
         i for i, r in enumerate(rows) if r["external_id"] not in cached
@@ -234,22 +241,34 @@ async def _run(
             for li, s in zip(non_id_local, non_id_sentiments, strict=False):
                 sentiment_by_index[fresh_indices[li]] = s
 
-        # Gemini relevance handles ID + EN natively.
-        print("  Running Gemini relevance …")
+        # Gemini relevance handles ID + EN natively. Two passes:
+        # (1) 9-category topical relevance (mean-of-top-2 aggregate)
+        # (2) focused da'wah-opportunity score — what UI sorts on
+        # Run them sequentially rather than parallel — Gemini Flash-Lite
+        # is rate-limited per minute, and the second pass benefits from
+        # being independent of the categorical pass anyway.
+        print("  Running Gemini relevance + opportunity …")
         fresh_relevances = classify_relevance(fresh_texts)
+        fresh_opportunities = classify_opportunity(fresh_texts)
     else:
         fresh_relevances = []
+        fresh_opportunities = []
 
     relevance_by_index = {
         idx: r for idx, r in zip(fresh_indices, fresh_relevances, strict=False)
     }
+    opportunity_by_index = {
+        idx: o
+        for idx, o in zip(fresh_indices, fresh_opportunities, strict=False)
+    }
 
     for i, row in enumerate(rows):
         if row["external_id"] in cached:
-            label, score, rel, cats = cached[row["external_id"]]
+            label, score, rel, opp, cats = cached[row["external_id"]]
             row["sentiment_label"] = label
             row["sentiment_score"] = score
             row["dawah_relevance"] = rel
+            row["dawah_opportunity"] = opp
             row["categories"] = cats
         else:
             s = sentiment_by_index.get(i)
@@ -257,6 +276,7 @@ async def _run(
             row["sentiment_label"] = getattr(s, "label", None)
             row["sentiment_score"] = getattr(s, "score", None)
             row["dawah_relevance"] = getattr(r, "dawah_relevance", None)
+            row["dawah_opportunity"] = opportunity_by_index.get(i)
             row["categories"] = getattr(r, "categories", None)
 
     # 4. Upsert
@@ -272,6 +292,7 @@ async def _run(
                     "sentiment_label": insert(SocialPost).excluded.sentiment_label,
                     "sentiment_score": insert(SocialPost).excluded.sentiment_score,
                     "dawah_relevance": insert(SocialPost).excluded.dawah_relevance,
+                    "dawah_opportunity": insert(SocialPost).excluded.dawah_opportunity,
                     "categories": insert(SocialPost).excluded.categories,
                     "region": insert(SocialPost).excluded.region,
                     "raw_payload": insert(SocialPost).excluded.raw_payload,

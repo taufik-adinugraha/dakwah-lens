@@ -29,7 +29,10 @@ from sqlalchemy.dialects.postgresql import insert
 from api.db import SessionLocal
 from api.models.social import SocialPost
 from api.services.apify import scrape_x
-from api.services.relevance import classify_batch as classify_relevance
+from api.services.relevance import (
+    classify_batch as classify_relevance,
+    classify_opportunity_batch as classify_opportunity,
+)
 from api.services.sentiment import classify_batch as classify_sentiment
 
 log = structlog.get_logger()
@@ -138,17 +141,21 @@ async def _run(query: str, limit: int) -> int:
         return 0
     print(f"  Normalized {len(rows)} usable rows")
 
-    # 3. Classify (sentiment + relevance, both batched)
+    # 3. Classify (sentiment + relevance + opportunity)
     texts = [r["text"] for r in rows]
     print("  Running IndoBERT sentiment …")
     sentiments = classify_sentiment(texts)
-    print("  Running Gemini relevance …")
+    print("  Running Gemini relevance + opportunity …")
     relevances = classify_relevance(texts)
+    opportunities = classify_opportunity(texts)
 
-    for row, s, r in zip(rows, sentiments, relevances, strict=False):
+    for row, s, r, o in zip(
+        rows, sentiments, relevances, opportunities, strict=False
+    ):
         row["sentiment_label"] = s.label
         row["sentiment_score"] = s.score
         row["dawah_relevance"] = r.dawah_relevance
+        row["dawah_opportunity"] = o
         row["categories"] = r.categories
 
     # 4. Upsert into Postgres
@@ -163,6 +170,7 @@ async def _run(query: str, limit: int) -> int:
                     "sentiment_label": insert(SocialPost).excluded.sentiment_label,
                     "sentiment_score": insert(SocialPost).excluded.sentiment_score,
                     "dawah_relevance": insert(SocialPost).excluded.dawah_relevance,
+                    "dawah_opportunity": insert(SocialPost).excluded.dawah_opportunity,
                     "categories": insert(SocialPost).excluded.categories,
                     "raw_payload": insert(SocialPost).excluded.raw_payload,
                 },

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { BookOpen, Search, ShieldCheck, Sparkles } from "lucide-react";
+import { BookOpen, ShieldCheck, Sparkles } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
@@ -14,6 +14,7 @@ import {
   type KitabHit,
 } from "@/lib/kitab-retrieval";
 import { KitabPill } from "./KitabPill";
+import { KitabSearchInput } from "@/components/KitabSearchInput";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -210,23 +211,12 @@ function SearchForm({
           method="get"
           className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5"
         >
-          <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 focus-within:border-emerald-400 focus-within:bg-white">
-            <Search className="h-4 w-4 shrink-0 text-slate-400" />
-            <input
-              type="text"
-              name="q"
-              defaultValue={query}
-              placeholder={t("search_placeholder")}
-              className="flex-1 bg-transparent text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none"
-              maxLength={200}
-            />
-            <button
-              type="submit"
-              className="rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-800"
-            >
-              {t("search_button")}
-            </button>
-          </label>
+          <KitabSearchInput
+            defaultValue={query}
+            placeholder={t("search_placeholder")}
+            submitLabel={t("search_button")}
+            clearLabel={t("search_clear")}
+          />
 
           <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
             <span className="font-semibold text-slate-500">

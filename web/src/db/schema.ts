@@ -260,8 +260,13 @@ export const socialPosts = pgTable(
     sentimentLabel: text("sentiment_label"),
     sentimentScore: doublePrecision("sentiment_score"),
 
-    // Relevance (Gemini Flash-Lite, 9-category)
+    // Relevance (Gemini Flash-Lite, 9-category) — mean-of-top-2 since
+    // 2026-05-21 (was max(); see relevance.py for rationale).
     dawahRelevance: doublePrecision("dawah_relevance"),
+    // 'Would a da'i actually use this?' second-pass score, 0-1
+    // continuous. UI sorts top-posts by this; falls back to
+    // dawahRelevance when NULL on pre-migration rows.
+    dawahOpportunity: doublePrecision("dawah_opportunity"),
     categories: jsonb("categories").$type<Record<string, number>>(),
 
     // Cluster assignment from the latest BERTopic run (FK to `topics.id`).
@@ -787,6 +792,9 @@ export const insightsSummaries = pgTable(
     periodStart: timestamp("period_start", { withTimezone: true }).notNull(),
     periodEnd: timestamp("period_end", { withTimezone: true }).notNull(),
     summaryMd: text("summary_md").notNull(),
+    /** Parallel English narrative. NULL on rows generated before the
+     *  2026-05-21 migration — UI falls back to `summaryMd` then. */
+    summaryMdEn: text("summary_md_en"),
     headlineStats: jsonb("headline_stats")
       .$type<Record<string, unknown>>()
       .notNull(),

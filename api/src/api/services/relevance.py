@@ -100,22 +100,106 @@ def _get_client() -> genai.Client:
     return _client
 
 
-SYSTEM_PROMPT = """You score how relevant a piece of Indonesian or English text is to each of nine da'wah categories.
+SYSTEM_PROMPT = """You score how much da'wah SUBSTANCE a piece of Indonesian or English text carries for each of nine da'wah categories.
 
-For each text, return a score 0-1 per category. 0 = not relevant at all; 0.5 = somewhat relevant; 1 = highly relevant (the post is directly about that category).
+For each text, return a continuous score 0-1 per category. USE THE FULL RANGE — most posts deserve scores like 0.15, 0.32, 0.55, 0.78. Do NOT round to {0.0, 0.5, 1.0} — that loses the signal a da'i needs to triage.
+
+Anchor points to calibrate:
+  0.0  — completely irrelevant; nothing a da'i could use for this category
+  0.2  — surface-keyword mention only (e.g. "anak" appears once in a sports event recap)
+  0.4  — the category is genuinely the topic but the post offers no moral / spiritual / da'wah dimension
+  0.6  — the post raises a question a da'i could address (an issue, a tension, a behaviour worth commenting on)
+  0.8  — clear da'wah substance: a story, statistic, or behavioural pattern a da'i could BUILD a khutbah or kajian segment around
+  1.0  — the post is itself da'wah content, OR a textbook case study for the category (kurban story, child-abuse case from religious setting, riba scandal, etc.)
+
+CRITICAL DISTINCTION — TOPIC vs DA'WAH SUBSTANCE:
+A stock-market dip mentions banking → that's TOPIC overlap with muamalah, not da'wah substance. Score it 0.2-0.3. A story about a riba scandal where a community lost money → 0.8.
+A school event with kids → TOPIC overlap with youth/education. Score 0.2-0.3. A story about youth gang violence or pesantren reform → 0.7+.
+A celebrity birth announcement → TOPIC overlap with family. Score 0.2. A story about a divorce settlement involving guardianship of children → 0.7.
+
+The question to ask each time: "Could a da'i credibly cite this in a khutbah, kajian, or da'wah content piece this week without forcing the connection?"
 
 Categories:
-- aqidah        — Islamic creed, tauhid, beliefs about Allah/prophets/afterlife
-- akhlaq        — Islamic ethics, character, adab, moral conduct
-- muamalah      — finance, business, halal/haram, riba, zakat, contracts
-- social_justice— justice, inequality, oppression, public ethics
-- family        — marriage, parenting, kinship, husband/wife/children
-- youth         — issues facing young people: identity, education, career, mental health
-- education     — knowledge-seeking, schools, pesantren, learning
-- economic_ethics — work ethics, employment, halal income, business honesty
-- health        — physical/mental health from an Islamic lens
+- aqidah          — creed, tauhid, beliefs about Allah/prophets/afterlife, shirik, modern challenges to belief
+- akhlaq          — ethics, character, adab, moral conduct, real moral failures or examples
+- muamalah        — finance ethics, halal/haram dealings, riba, zakat, contracts, real-world business morality
+- social_justice  — oppression, injustice, public-good policy, Muslim-community welfare, anti-imperialism
+- family          — marriage, parenting practice, kinship, real family-life issues a da'i would address
+- youth           — youth-specific tensions: identity, peer pressure, mental health, career anxiety, moral pressure
+- education       — knowledge-seeking, pesantren, schools, Islamic learning, reform in education
+- economic_ethics — work ethics, halal income, honesty in business, gig-worker rights, exploitative practices
+- health          — physical/mental health from an Islamic lens, real concerns parents/community grapple with
+
+Calibrated examples (read carefully — these mirror real misclassifications):
+- "Suku Bunga Naik, BI Pastikan Likuiditas Bank Tetap Longgar" → muamalah ~0.25 (banking topic only; no halal/riba angle; pure policy news)
+- "Komplotan Pencuri Aset Tower Seluler Diringkus" → social_justice ~0.35 (justice served is positive but routine crime news, low da'wah pull)
+- "Diversifikasi Bisnis ke Energi Terbarukan Topang MBAP" → economic_ethics ~0.15 (stock story, no ethics angle)
+- "Pria Cabuli Bocah di Kamar Mandi Masjid" → akhlaq 0.95, family 0.7, social_justice 0.5 (textbook da'wah case)
+- "Petani Sawit Kaltim Terjepit Ekonomi Global" → muamalah 0.55, economic_ethics 0.6, social_justice 0.7 (clear injustice + da'wah hook)
+- "Bupati Membuka O2SN dan FLS3N SMP" → youth 0.2, education 0.2 (event opening, no substance)
+- "Guru di Cirebon Dapat Pelatihan Dampingi Anak Berkebutuhan Khusus" → education 0.75, akhlaq 0.6 (inclusive practice da'wah hook)
+- "Rifky Alhabsyi Ceritakan Persalinan Istri" → family 0.25 (celebrity birth, no parenting depth)
+- "GPCI Dorong Pembebasan WNI Ditangkap Israel" → social_justice 0.85 (oppression of Muslims, strong da'wah hook)
+- "BIJB Kertajati Jadi MRO Hercules" → social_justice 0.2 (military maintenance facility, no umma angle)
+- "Remaja di Pasar Rebo Dibacok Geng Motor" → youth 0.75, akhlaq 0.65 (gang violence, real da'wah opportunity)
+- "Prabowo Kurban 25 Limousin di Sulsel" → akhlaq 0.7, muamalah 0.4 (kurban practice, da'wah-relevant by topic)
+- "Susu Formula Masuk MBG? IDAI Soroti ASI Eksklusif" → family 0.7, health 0.7 (parenting + nutrition advocacy)
+- "Hoaks! Purbaya Pangkas Gaji ke-13 PNS" → akhlaq 0.3 (hoax-debunk, mild ethics angle on misinformation)
+- "Industri Herbal Nasional Bidik Pasar Global" → muamalah 0.2, health 0.25 (business news, weak hook)
 
 Return only valid JSON, one object per input."""
+
+
+OPPORTUNITY_SYSTEM_PROMPT = """You score Indonesian or English news posts for DA'WAH OPPORTUNITY — the chance a da'i could credibly use this in a khutbah, kajian, or da'wah content piece this week.
+
+Return ONE continuous score 0-1 per post. USE THE FULL RANGE — most posts deserve scores like 0.15, 0.32, 0.55, 0.78. Do NOT round to {0.0, 0.5, 1.0}.
+
+Anchor points:
+  0.0  — completely unusable for da'wah (sports scores, train schedules, celebrity gossip with no moral hook)
+  0.2  — topically Islamic-adjacent but no da'wah substance (a bank-policy story, a school event opening)
+  0.4  — there's a TOPIC a da'i might mention but they'd have to force the connection
+  0.6  — the post raises a genuine moral / spiritual question a da'i could address
+  0.8  — clear da'wah opportunity: real story with moral dimension, behavioural pattern worth commenting on, injustice worth raising
+  1.0  — textbook da'wah material: kurban story, riba scandal, abuse-in-religious-setting case, oppression of Muslims, redemptive justice
+
+Key heuristics:
+- Routine politics ("Prabowo hadir di rapat", coalition praise) → 0.1-0.2 (no da'wah substance)
+- Stock market / corporate news → 0.1-0.2 unless there's an ethics dimension
+- "Justice served" stories (criminals caught, traffickers convicted) → 0.4-0.55 (mild da'wah hook on adab, fairness)
+- Child abuse, especially in religious settings → 0.85-0.95 (urgent da'wah opportunity)
+- WNI captured by Israel, mosque attacks abroad → 0.85+ (oppression of umma)
+- School events, sports lineups → 0.1-0.2 (topic only, no substance)
+- Inclusive education / disability-support programs → 0.6-0.75 (akhlaq + rahma da'wah)
+- Riba / pinjol predation stories → 0.7-0.85
+- Kurban, Hajj, Eid stories → 0.65-0.85 (direct da'wah relevance)
+- Foreign religious calendar (Balinese Hindu, Christian festivals) → 0.05-0.15 (not Muslim-community concern)
+- Hoax-debunk stories → 0.25-0.35 (mild adab-of-truthfulness angle)
+- Family policy debates (ASI vs formula, MBG nutrition) → 0.55-0.7 (parenting da'wah)
+- Generic celebrity life events (birth, denial, gossip) → 0.1-0.25
+- Petani / nelayan / driver economic struggles → 0.55-0.75 (justice + ekonomi adil)
+
+The key question: would a da'i NATURALLY reach for this in their content this week, or would they have to force it?
+
+Calibrated examples:
+- "Suku Bunga Naik, BI Pastikan Likuiditas Bank Tetap Longgar" → 0.15 (banking policy, no da'wah hook)
+- "Pria Cabuli Bocah 6 Tahun di Kamar Mandi Masjid" → 0.95 (urgent — abuse in religious setting)
+- "Petani Sawit Kaltim Terjepit Ekonomi Global" → 0.65 (struggle + injustice da'wah)
+- "Bupati Buka O2SN dan FLS3N SMP" → 0.15 (event opening only)
+- "Guru di Cirebon Dapat Pelatihan Dampingi Anak Berkebutuhan Khusus" → 0.75 (rahma + education da'wah)
+- "Rifky Alhabsyi Ceritakan Persalinan Istri" → 0.15 (celebrity life, no depth)
+- "GPCI Dorong Pembebasan WNI Ditangkap Israel" → 0.85 (oppression of Muslims)
+- "BIJB Kertajati Jadi MRO Hercules" → 0.1 (military facility, no umma angle)
+- "Remaja di Pasar Rebo Dibacok Geng Motor" → 0.7 (youth violence, real concern)
+- "Prabowo Kurban 25 Limousin di Sulsel" → 0.75 (kurban practice, da'wah-relevant)
+- "Komplotan Pencuri Aset Tower Diringkus" → 0.4 (routine crime + justice)
+- "Susu Formula Masuk MBG? IDAI Soroti ASI Eksklusif" → 0.7 (parenting policy)
+- "IHSG Ambrol Dikaitkan BUMN Ekspor" → 0.15 (market news)
+- "Hoaks! Purbaya Pangkas Gaji ke-13 PNS" → 0.3 (mild adab angle on misinformation)
+- "Diskon Listrik 50 Persen PLN Berlaku Lagi" → 0.15 (consumer news)
+- "PBNU Kutuk Penembakan di Masjid AS" → 0.85 (mosque attack abroad)
+- "Mayoritas Dapur MBG di Sleman Belum Kantongi Sertifikat Higiene" → 0.55 (amanah in public service)
+
+Return only valid JSON: an array of objects, each `{"opportunity": <number>}`, in input order."""
 
 
 def _zero_result() -> RelevanceResult:
@@ -123,6 +207,28 @@ def _zero_result() -> RelevanceResult:
         categories={k: 0.0 for k in CATEGORY_KEYS},
         dawah_relevance=0.0,
     )
+
+
+def _aggregate_relevance(categories: dict[str, float]) -> float:
+    """Mean of the top-2 category scores.
+
+    Was `max()` until 2026-05-21 — that let any single-keyword surface
+    match dominate (e.g. "bank" → muamalah=1.0 → overall=1.0 even when
+    the rest were 0). Mean-of-top-2 forces a post to score on at least
+    two categories before it can rank high, which empirically tracks
+    "does this have real da'wah substance" better than a single peak.
+
+    Falls back to the single top score when only one category has
+    non-zero signal (the second-best is 0 anyway, so it averages to
+    half — but that's correct: a post that only hits one category
+    weakly should rank lower than one that hits two solidly).
+    """
+    if not categories:
+        return 0.0
+    sorted_scores = sorted(categories.values(), reverse=True)
+    top1 = sorted_scores[0]
+    top2 = sorted_scores[1] if len(sorted_scores) > 1 else 0.0
+    return (top1 + top2) / 2.0
 
 
 def _should_skip(text: str) -> bool:
@@ -256,8 +362,12 @@ def _classify_chunk(texts: list[str]) -> list[RelevanceResult]:
     results: list[RelevanceResult] = []
     for cats in parsed:
         clean = {k: float(cats.get(k, 0.0)) for k in CATEGORY_KEYS}
-        rel = max(clean.values()) if clean else 0.0
-        results.append(RelevanceResult(categories=clean, dawah_relevance=rel))
+        results.append(
+            RelevanceResult(
+                categories=clean,
+                dawah_relevance=_aggregate_relevance(clean),
+            )
+        )
 
     if len(results) != len(texts):
         log.warning(
@@ -267,3 +377,125 @@ def _classify_chunk(texts: list[str]) -> list[RelevanceResult]:
         )
 
     return results
+
+
+# ─── Opportunity classifier (second pass) ──────────────────────────────────
+
+
+def classify_opportunity_batch(texts: list[str]) -> list[float]:
+    """Score each text for 'would a da'i credibly use this for da'wah'.
+
+    Continuous 0-1 score per input. Independent from the 9-category
+    relevance pass — uses a focused prompt with anchor calibration at
+    0.2 / 0.4 / 0.6 / 0.8 to break the bucketing pathology observed
+    when the category-level scoring was repurposed as a ranking signal.
+
+    Falls back to 0.0 for skipped items (too short / pure gossip).
+
+    Cost: ~$0.0001 per item. ~426 mainstream-RSS posts/week → ~$0.05/mo.
+    """
+    if not texts:
+        return []
+
+    results: list[float | None] = [None] * len(texts)
+    keep_indices: list[int] = []
+    keep_texts: list[str] = []
+    for i, t in enumerate(texts):
+        if _should_skip(t):
+            results[i] = 0.0
+        else:
+            keep_indices.append(i)
+            keep_texts.append(t)
+
+    if keep_texts:
+        scored: list[float] = []
+        for start in range(0, len(keep_texts), MAX_BATCH):
+            scored.extend(
+                _classify_opportunity_chunk(
+                    keep_texts[start : start + MAX_BATCH]
+                )
+            )
+        for idx, score in zip(keep_indices, scored, strict=False):
+            results[idx] = score
+
+    for i, r in enumerate(results):
+        if r is None:
+            log.warning("opportunity.missing_result", index=i)
+            results[i] = 0.0
+
+    return [r for r in results if r is not None]
+
+
+def _classify_opportunity_chunk(texts: list[str]) -> list[float]:
+    """One Gemini call for up to MAX_BATCH texts. See classify_opportunity_batch."""
+    client = _get_client()
+
+    numbered = "\n\n".join(
+        f"[{i + 1}] {t[:1000]}" for i, t in enumerate(texts)
+    )
+    user_prompt = (
+        f"Score each of the following {len(texts)} text(s) for da'wah "
+        f"opportunity. Return an array of {len(texts)} score objects, "
+        f"in input order.\n\n{numbered}"
+    )
+
+    response_schema = {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "properties": {"opportunity": {"type": "number"}},
+            "required": ["opportunity"],
+        },
+    }
+
+    resp = client.models.generate_content(
+        model=MODEL,
+        contents=user_prompt,
+        config=types.GenerateContentConfig(
+            system_instruction=OPPORTUNITY_SYSTEM_PROMPT,
+            response_mime_type="application/json",
+            response_schema=response_schema,
+            temperature=0.2,
+        ),
+    )
+    raw = resp.text or "[]"
+    try:
+        parsed: list[dict[str, float]] = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        log.warning(
+            "opportunity.json_decode_failed",
+            error=str(exc),
+            raw_chars=len(raw),
+            raw_head=raw[:500],
+            batch_size=len(texts),
+        )
+        parsed = []
+
+    from api.services.usage import record_usage
+
+    usage_md = getattr(resp, "usage_metadata", None)
+    record_usage(
+        provider="gemini",
+        operation="classify_opportunity",
+        model=MODEL,
+        tokens_in=getattr(usage_md, "prompt_token_count", None),
+        tokens_out=getattr(usage_md, "candidates_token_count", None),
+        meta={"batch_size": len(texts)},
+    )
+
+    scores = [
+        max(0.0, min(1.0, float(item.get("opportunity", 0.0))))
+        for item in parsed
+    ]
+
+    if len(scores) != len(texts):
+        log.warning(
+            "opportunity.size_mismatch",
+            expected=len(texts),
+            got=len(scores),
+        )
+        # Pad with zeros so caller can zip safely.
+        while len(scores) < len(texts):
+            scores.append(0.0)
+
+    return scores

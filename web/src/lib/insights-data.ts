@@ -23,6 +23,7 @@ export type PlatformInsights = {
     sentimentLabel: string | null;
     sentimentScore: number | null;
     dawahRelevance: number | null;
+    dawahOpportunity: number | null;
     categories: Record<string, number> | null;
     postedAt: Date | null;
   }>;
@@ -132,6 +133,10 @@ export async function getPlatformInsights(
     .orderBy(desc(count()))
     .limit(8)) as Array<{ name: string | null; articles: number }>;
 
+  // Top posts: sort by da'wah opportunity (the 2026-05-21 focused-prompt
+  // signal), falling back to dawahRelevance when opportunity is NULL
+  // on rows ingested before the migration. COALESCE keeps the ranking
+  // continuous across the cutover.
   const topStories = await db
     .select({
       id: schema.socialPosts.id,
@@ -141,12 +146,17 @@ export async function getPlatformInsights(
       sentimentLabel: schema.socialPosts.sentimentLabel,
       sentimentScore: schema.socialPosts.sentimentScore,
       dawahRelevance: schema.socialPosts.dawahRelevance,
+      dawahOpportunity: schema.socialPosts.dawahOpportunity,
       categories: schema.socialPosts.categories,
       postedAt: schema.socialPosts.postedAt,
     })
     .from(schema.socialPosts)
     .where(platformWhere)
-    .orderBy(desc(schema.socialPosts.dawahRelevance))
+    .orderBy(
+      desc(
+        sql`COALESCE(${schema.socialPosts.dawahOpportunity}, ${schema.socialPosts.dawahRelevance})`,
+      ),
+    )
     .limit(8);
 
   // Sentiment mix — count per label.
@@ -271,6 +281,7 @@ export async function getPlatformInsights(
       ...s,
       sentimentScore: s.sentimentScore as number | null,
       dawahRelevance: s.dawahRelevance as number | null,
+      dawahOpportunity: s.dawahOpportunity as number | null,
       categories: s.categories as Record<string, number> | null,
     })),
     sentimentMix,
@@ -323,6 +334,9 @@ export type LatestInsightsSummary = {
   periodStart: Date;
   periodEnd: Date;
   summaryMd: string;
+  /** Parallel English narrative — null on rows generated before the
+   *  2026-05-21 migration. Consumers should fall back to summaryMd. */
+  summaryMdEn: string | null;
   headlineStats: {
     totals?: {
       posts_7d?: number;
@@ -367,6 +381,7 @@ export async function getLatestInsightsSummary(
       periodStart: schema.insightsSummaries.periodStart,
       periodEnd: schema.insightsSummaries.periodEnd,
       summaryMd: schema.insightsSummaries.summaryMd,
+      summaryMdEn: schema.insightsSummaries.summaryMdEn,
       headlineStats: schema.insightsSummaries.headlineStats,
       model: schema.insightsSummaries.model,
       segment: schema.insightsSummaries.segment,

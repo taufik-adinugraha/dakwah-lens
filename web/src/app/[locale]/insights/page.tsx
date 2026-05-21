@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import {
   ArrowRight,
-  BookOpen,
   ChevronRight,
   Eye,
   Info,
@@ -16,6 +15,7 @@ import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/db";
+import { DaleelChips } from "@/components/DaleelChips";
 import { DigestOptInPrompt } from "@/components/DigestOptInPrompt";
 import { InsightsHeadlinePills } from "@/components/InsightsHeadlinePills";
 import {
@@ -386,15 +386,20 @@ function ExecutiveBriefing({
           </div>
 
           <p className="mt-5 whitespace-pre-line text-pretty text-base leading-relaxed text-slate-800 sm:text-lg">
-            {summary.summaryMd}
+            {/* Locale-aware narrative. English column may be NULL on rows
+                generated before the 2026-05-21 dual-language migration —
+                fall back to the Indonesian primary then. */}
+            {locale === "en" && summary.summaryMdEn
+              ? summary.summaryMdEn
+              : summary.summaryMd}
           </p>
 
           {/* Retrieved daleel chips. The narrative may reference these
               inline (per PRD §12, citations must come from the kitab
               corpus — the LLM was forbidden from inventing them).
-              Each chip links back to the kitab passage. */}
+              Click a chip → modal with Arabic + translations. */}
           {summary.daleelRefs && summary.daleelRefs.length > 0 && (
-            <DaleelChips refs={summary.daleelRefs} t={t} />
+            <DaleelChips refs={summary.daleelRefs} />
           )}
 
           <InsightsHeadlinePills
@@ -410,51 +415,6 @@ function ExecutiveBriefing({
         </div>
       </div>
     </section>
-  );
-}
-
-/**
- * Renders the daleel passages the LLM was permitted to cite for this
- * briefing, as a horizontal chip strip beneath the narrative. Each
- * chip shows corpus + citation; clicking deep-links into /kitab with
- * the citation as the search query so the user can read it in full.
- *
- * Rendered as a chip strip rather than a vertical list so it stays
- * visually subordinate to the narrative — the AI's text is the
- * primary read; the daleel is provenance the user can verify.
- */
-function DaleelChips({
-  refs,
-  t,
-}: {
-  refs: NonNullable<LatestInsightsSummary["daleelRefs"]>;
-  t: T;
-}) {
-  return (
-    <div className="mt-5 rounded-2xl border border-emerald-100 bg-white/60 p-3 sm:p-4">
-      <p className="mb-2 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
-        <BookOpen className="h-3 w-3" />
-        {t("exec_daleel_label")}
-      </p>
-      <div className="flex flex-wrap gap-1.5">
-        {refs.map((ref) => (
-          <Link
-            key={ref.ref_id}
-            href={{
-              pathname: "/kitab",
-              query: { q: ref.citation, kitab: ref.corpus },
-            }}
-            className="group inline-flex max-w-full items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] text-emerald-900 transition hover:border-emerald-300 hover:bg-emerald-100"
-            title={ref.translation_id || ref.translation_en || ""}
-          >
-            <span className="font-semibold uppercase tracking-wider text-emerald-700 text-[9px]">
-              {ref.corpus.replace(/_/g, " ")}
-            </span>
-            <span className="truncate font-medium">{ref.citation}</span>
-          </Link>
-        ))}
-      </div>
-    </div>
   );
 }
 
