@@ -35,6 +35,24 @@ COLLECTION_NAMES: dict[str, str] = {
     "tafsir_ibn_kathir": "tafsir_ibn_kathir",
 }
 
+# Per-corpus minimum cosine similarity for a hit to count as a usable
+# daleel. Calibrated against a 11-query test set on 2026-05-21
+# (strong / medium / weak / noise tiers). Scores observed:
+#   - Quran tops STRONG queries: 0.36-0.60; NOISE never above 0.27.
+#   - Hadith tops STRONG queries: 0.27-0.46; NOISE never above 0.19.
+# Quran embeds higher than hadith for the same query because the
+# translations are cleaner Bahasa text. Setting separate thresholds
+# rather than a single global one — a global cut high enough to
+# block Quran noise would block most legitimate hadith hits.
+MIN_SCORE: dict[str, float] = {
+    "quran": 0.35,
+    "bukhari": 0.28,
+    "muslim": 0.28,
+    "riyad_as_salihin": 0.28,
+    "bulugh_al_maram": 0.28,
+    "tafsir_ibn_kathir": 0.28,
+}
+
 
 _openai_client: OpenAI | None = None
 _qdrant_client: QdrantClient | None = None
@@ -60,44 +78,42 @@ def _get_qdrant() -> QdrantClient:
     return _qdrant_client
 
 
-def _build_ref_id(corpus: str, payload: dict[str, Any]) -> str:
-    """Stable identifier the UI can use to link back to a kitab passage."""
-    citation = (
-        payload.get("citation")
-        or payload.get("ref")
-        or f"{payload.get('surah', '?')}:{payload.get('ayah', '?')}"
-    )
-    return f"{corpus}::{citation}"
-
-
 def _normalize_hit(corpus: str, hit: Any) -> dict[str, Any]:
     """Reshape a Qdrant hit into the schema we persist in
-    `insights_summaries.daleel_refs` (and feed to the LLM).
+    `insights_summaries.daleel_refs` and feed to the LLM.
 
-    Different corpora use slightly different payload keys — Quran has
-    surah + ayah + translation_id / translation_en; hadith has citation
-    + matn_translation_id / matn_translation_en. Normalize here so the
-    LLM and UI see one shape.
+    Payload schema differs by corpus (inspected directly in Qdrant on
+    2026-05-21 — see `embed_quran.py` / `embed_hadith.py`):
+
+      Quran:  {surah, ayah, surah_name_translit, surah_name_en, arabic,
+               id, en, citation_id, citation_en}
+      Hadith: {collection, hadithnumber, book, ar, en, citation_en,
+               grades}      # hadith corpora have NO Bahasa translation
+
+    `citation` uses the human-readable Indonesian form when available
+    ("QS. Al-Baqarah: 286"), falling back to English. `ref_id` is the
+    stable identifier the UI uses to deep-link back into /kitab.
     """
     payload = dict(hit.payload or {})
-    citation = (
-        payload.get("citation")
-        or payload.get("ref")
-        or f"QS {payload.get('surah_name', payload.get('surah'))} {payload.get('ayah','')}"
-    )
-    arabic = payload.get("arabic") or payload.get("matn_arabic") or ""
-    translation_id = (
-        payload.get("translation_id")
-        or payload.get("matn_translation_id")
-        or payload.get("text_id")
-        or ""
-    )
-    translation_en = (
-        payload.get("translation_en")
-        or payload.get("matn_translation_en")
-        or payload.get("text_en")
-        or ""
-    )
+
+    if corpus == "quran":
+        citation = payload.get("citation_id") or payload.get("citation_en") or ""
+        arabic = payload.get("arabic") or ""
+        translation_id = payload.get("id") or ""
+        translation_en = payload.get("en") or ""
+        ref_id = (
+            f"quran::{payload.get('surah','')}:{payload.get('ayah','')}"
+        )
+    else:
+        # All four hadith corpora share the same payload shape.
+        citation = payload.get("citation_en") or ""
+        arabic = payload.get("ar") or ""
+        # Hadith corpora aren't translated to Bahasa yet — leave id
+        # blank so the UI knows to render the English text instead.
+        translation_id = ""
+        translation_en = payload.get("en") or ""
+        ref_id = f"{corpus}::{payload.get('hadithnumber','')}"
+
     return {
         "corpus": corpus,
         "citation": str(citation),
@@ -105,7 +121,7 @@ def _normalize_hit(corpus: str, hit: Any) -> dict[str, Any]:
         "arabic": arabic,
         "translation_id": translation_id,
         "translation_en": translation_en,
-        "ref_id": _build_ref_id(corpus, payload),
+        "ref_id": ref_id,
     }
 
 
@@ -147,6 +163,7 @@ def retrieve_daleel(
 
     qdrant = _get_qdrant()
     all_hits: list[dict[str, Any]] = []
+    below_threshold = 0
     for corpus, collection in COLLECTION_NAMES.items():
         try:
             # qdrant-client 1.18 removed `.search()` — the new API is
@@ -167,8 +184,19 @@ def retrieve_daleel(
                 error=str(exc),
             )
             continue
+        threshold = MIN_SCORE.get(corpus, 0.30)
         for hit in results:
+            if hit.score is None or hit.score < threshold:
+                below_threshold += 1
+                continue
             all_hits.append(_normalize_hit(corpus, hit))
 
     all_hits.sort(key=lambda h: h["score"] or -1e9, reverse=True)
+    log.info(
+        "kitab_retrieval.scored",
+        query=query[:80],
+        kept=len(all_hits),
+        below_threshold=below_threshold,
+        top_score=all_hits[0]["score"] if all_hits else None,
+    )
     return all_hits[:limit]
