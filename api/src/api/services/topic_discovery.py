@@ -177,6 +177,17 @@ def discover_topics(
                 response_mime_type="application/json",
                 response_schema=response_schema,
                 temperature=0.2,
+                # 16K output budget so the model can emit full post_indices
+                # arrays for 5-8 themes over the full 7-day pool. The
+                # default ~8K was being silently exhausted on a 274-post
+                # input, producing a truncated JSON that failed to parse
+                # and persisted ZERO topics (2026-05-21).
+                max_output_tokens=16384,
+                # Disable thinking — this is a "bucket inputs into named
+                # groups" task with hard rules in the system prompt, not a
+                # reasoning problem. Thinking tokens were eating into the
+                # output budget AND adding ~200s of latency per call.
+                thinking_config=types.ThinkingConfig(thinking_budget=0),
             ),
         )
     except Exception:
