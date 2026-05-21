@@ -157,7 +157,9 @@ export async function getPlatformInsights(
         sql`COALESCE(${schema.socialPosts.dawahOpportunity}, ${schema.socialPosts.dawahRelevance})`,
       ),
     )
-    .limit(8);
+    // Fetch a deeper pool; UI uses <ShowMoreList /> to reveal 8 at
+    // a time. 50 is enough for ~6 "show more" clicks before exhaust.
+    .limit(50);
 
   // Sentiment mix — count per label.
   const sentimentRows = (await db

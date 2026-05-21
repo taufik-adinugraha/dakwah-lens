@@ -9,6 +9,7 @@ import { db, schema } from "@/db";
 import { getLatestInsightsSummary } from "@/lib/insights-data";
 import { DaleelChips } from "@/components/DaleelChips";
 import { InsightsHeadlinePills } from "@/components/InsightsHeadlinePills";
+import { ShowMoreList } from "@/components/ShowMoreList";
 
 /**
  * Audience-segmented dashboard. The /insights main page is mixed —
@@ -146,7 +147,8 @@ export default async function SegmentPage({
           sql`COALESCE(${schema.socialPosts.dawahOpportunity}, ${schema.socialPosts.dawahRelevance})`,
         ),
       )
-      .limit(15),
+      // Fetch a deeper pool; UI uses <ShowMoreList /> to reveal in batches.
+      .limit(50),
     db.execute(sql`
       SELECT sentiment_label, count(*)::int AS n
       FROM social_posts
@@ -289,62 +291,64 @@ export default async function SegmentPage({
               {t("how_coverage_posts_empty")}
             </div>
           ) : (
-            <ul className="space-y-3">
-              {topPosts.map((p) => (
-                <li
-                  key={p.id}
-                  className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md sm:p-5"
-                >
-                  <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
-                    <span className="font-semibold uppercase tracking-wider text-slate-700">
-                      {p.platform}
-                    </span>
-                    {p.author && <span>@{p.author}</span>}
-                    {p.sentimentLabel && (
-                      <span
-                        className={`inline-flex items-center rounded-full px-2 py-0.5 font-semibold ring-1 ${
-                          p.sentimentLabel === "positive"
-                            ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
-                            : p.sentimentLabel === "negative"
-                              ? "bg-amber-50 text-amber-800 ring-amber-100"
-                              : "bg-slate-50 text-slate-600 ring-slate-100"
-                        }`}
-                      >
-                        {p.sentimentLabel}
+            <div className="space-y-3">
+              <ShowMoreList pageSize={8} moreLabel={t("show_more")}>
+                {topPosts.map((p) => (
+                  <article
+                    key={p.id}
+                    className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md sm:p-5"
+                  >
+                    <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
+                      <span className="font-semibold uppercase tracking-wider text-slate-700">
+                        {p.platform}
                       </span>
-                    )}
-                    {(p.dawahOpportunity ?? p.dawahRelevance) !== null &&
-                      (p.dawahOpportunity ?? p.dawahRelevance) !== undefined && (
-                        <span className="tabular-nums">
-                          {(
-                            (p.dawahOpportunity ?? p.dawahRelevance ?? 0) * 100
-                          ).toFixed(0)}
-                          % relevance
+                      {p.author && <span>@{p.author}</span>}
+                      {p.sentimentLabel && (
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 font-semibold ring-1 ${
+                            p.sentimentLabel === "positive"
+                              ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
+                              : p.sentimentLabel === "negative"
+                                ? "bg-amber-50 text-amber-800 ring-amber-100"
+                                : "bg-slate-50 text-slate-600 ring-slate-100"
+                          }`}
+                        >
+                          {p.sentimentLabel}
                         </span>
                       )}
-                    {p.postedAt && (
-                      <span className="text-slate-400">
-                        {new Date(p.postedAt).toLocaleDateString(locale)}
-                      </span>
+                      {(p.dawahOpportunity ?? p.dawahRelevance) !== null &&
+                        (p.dawahOpportunity ?? p.dawahRelevance) !== undefined && (
+                          <span className="tabular-nums">
+                            {(
+                              (p.dawahOpportunity ?? p.dawahRelevance ?? 0) * 100
+                            ).toFixed(0)}
+                            % relevance
+                          </span>
+                        )}
+                      {p.postedAt && (
+                        <span className="text-slate-400">
+                          {new Date(p.postedAt).toLocaleDateString(locale)}
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-2 text-pretty text-sm leading-relaxed text-slate-800">
+                      {(p.text ?? "").slice(0, 360)}
+                      {(p.text ?? "").length > 360 ? "…" : ""}
+                    </p>
+                    {p.url && (
+                      <a
+                        href={p.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-2 inline-block text-[11px] font-medium text-brand-700 hover:underline"
+                      >
+                        {t("posts_open_source")} ↗
+                      </a>
                     )}
-                  </div>
-                  <p className="mt-2 text-pretty text-sm leading-relaxed text-slate-800">
-                    {(p.text ?? "").slice(0, 360)}
-                    {(p.text ?? "").length > 360 ? "…" : ""}
-                  </p>
-                  {p.url && (
-                    <a
-                      href={p.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mt-2 inline-block text-[11px] font-medium text-brand-700 hover:underline"
-                    >
-                      {t("posts_open_source")} ↗
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
+                  </article>
+                ))}
+              </ShowMoreList>
+            </div>
           )}
         </div>
       </section>

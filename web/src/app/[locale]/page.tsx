@@ -137,6 +137,7 @@ export default async function LandingPage({
     <>
       <Hero t={tLanding} viewer={viewer} />
       <Features t={tLanding} />
+      <WhyNotJustLlm t={tLanding} />
       <HowItWorks t={tLanding} coverage={coverage} />
       <Daleel t={tDaleel} />
       <Donate t={tDonate} />
@@ -326,6 +327,87 @@ function Features({ t }: { t: LandingT }) {
             </div>
           ))}
         </div>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Positioning section answering the natural objection: "ChatGPT / Claude /
+ * DeepSeek can already do this — why a dedicated tool?" Side-by-side card
+ * pair: a generic LLM column vs the Dakwah-Lens column. Anchored on four
+ * things general LLMs structurally can't deliver: retrieved-not-generated
+ * daleel (PRD §12), live Indonesian discourse signal, sharia-compliance
+ * guardrails, and pre-computed da'wah-opportunity context.
+ */
+function WhyNotJustLlm({ t }: { t: LandingT }) {
+  const rows = [
+    { llm: t("why_llm_row1_llm"), us: t("why_llm_row1_us") },
+    { llm: t("why_llm_row2_llm"), us: t("why_llm_row2_us") },
+    { llm: t("why_llm_row3_llm"), us: t("why_llm_row3_us") },
+    { llm: t("why_llm_row4_llm"), us: t("why_llm_row4_us") },
+  ];
+
+  return (
+    <section id="why-not-llm" className="border-t border-slate-100 bg-gradient-to-b from-white to-slate-50/40 py-20 sm:py-28">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+        <div className="mx-auto max-w-2xl text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-sm">
+            {t("why_llm_eyebrow")}
+          </span>
+          <h2 className="mt-4 text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+            {t("why_llm_title")}
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-pretty text-base leading-relaxed text-slate-600">
+            {t("why_llm_subtitle")}
+          </p>
+        </div>
+
+        <div className="mt-14 grid gap-5 lg:grid-cols-2">
+          {/* Generic LLM column */}
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+              {t("why_llm_col_llm_eyebrow")}
+            </p>
+            <h3 className="mt-2 text-balance text-lg font-semibold text-slate-900">
+              {t("why_llm_col_llm_title")}
+            </h3>
+            <ul className="mt-5 space-y-3 text-sm leading-relaxed text-slate-700">
+              {rows.map((r, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <span aria-hidden className="mt-1 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-slate-300" />
+                  <span>{r.llm}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Dakwah-Lens column */}
+          <div className="relative overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-br from-white via-emerald-50/40 to-brand-50/30 p-6 shadow-sm ring-1 ring-emerald-100 sm:p-7">
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-emerald-200 opacity-25 blur-2xl"
+            />
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+              {t("why_llm_col_us_eyebrow")}
+            </p>
+            <h3 className="mt-2 text-balance text-lg font-semibold text-slate-900">
+              {t("why_llm_col_us_title")}
+            </h3>
+            <ul className="mt-5 space-y-3 text-sm leading-relaxed text-slate-800">
+              {rows.map((r, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                  <span>{r.us}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <p className="mx-auto mt-10 max-w-2xl text-pretty text-center text-sm text-slate-500">
+          {t("why_llm_footnote")}
+        </p>
       </div>
     </section>
   );

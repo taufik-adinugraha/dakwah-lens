@@ -13,6 +13,7 @@ import {
 import clsx from "clsx";
 
 import { Link } from "@/i18n/navigation";
+import { ShowMoreList } from "@/components/ShowMoreList";
 import { TopicsByCluster } from "@/components/TopicsByCluster";
 import {
   CLUSTER_TONES,
@@ -111,7 +112,9 @@ export default async function PlatformDrilldownPage({
           tInsights={tInsights}
         />
       )}
-      {live && live.totalPosts > 0 && <LiveStream live={live} t={t} />}
+      {live && live.totalPosts > 0 && (
+        <LiveStream live={live} t={t} tInsights={tInsights} />
+      )}
       {useRealClusters ? (
         <RealCategoryClusters live={live!} locale={locale} platform={platform} />
       ) : (
@@ -673,7 +676,15 @@ function TopOutlets({
  * category — the user can verify the ingestion pipeline is actually surfacing
  * the right kind of content.
  */
-function LiveStream({ live, t }: { live: PlatformInsights; t: T }) {
+function LiveStream({
+  live,
+  t,
+  tInsights,
+}: {
+  live: PlatformInsights;
+  t: T;
+  tInsights: Awaited<ReturnType<typeof getTranslations>>;
+}) {
   const totalSentiment = Math.max(
     1,
     live.sentimentMix.positive + live.sentimentMix.neutral + live.sentimentMix.negative,
@@ -728,6 +739,7 @@ function LiveStream({ live, t }: { live: PlatformInsights; t: T }) {
         </div>
 
         <div className="mt-8 grid gap-3">
+        <ShowMoreList pageSize={8} moreLabel={tInsights("show_more")}>
           {live.topStories.map((s) => {
             const dominant = (() => {
               if (!s.categories) return null;
@@ -797,6 +809,7 @@ function LiveStream({ live, t }: { live: PlatformInsights; t: T }) {
               </article>
             );
           })}
+        </ShowMoreList>
         </div>
       </div>
     </section>
