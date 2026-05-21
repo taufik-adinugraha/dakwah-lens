@@ -287,7 +287,16 @@ Kembalikan JSON: {{"indices": [i1, i2, i3]}} dengan {top_n} index daleel terbaik
                 response_mime_type="application/json",
                 temperature=0.1,
                 max_output_tokens=200,
-                thinking_config=genai_types.ThinkingConfig(thinking_budget=256),
+                # thinking_budget=0 disables deliberation — this is a
+                # "pick 3 indices from a small list" task, not a reasoning
+                # problem, so deliberation adds latency + cost with no
+                # quality gain. Was 256 but Gemini API now rejects values
+                # in 1-511 with 400 INVALID_ARGUMENT, which silently broke
+                # the rerank step on every briefing run (2026-05-21):
+                # we fell back to raw cosine-sorted candidates which
+                # always rank Quran higher than hadith, so every
+                # briefing's daleel was Quran-only.
+                thinking_config=genai_types.ThinkingConfig(thinking_budget=0),
             ),
         )
         raw = resp.text or "{}"

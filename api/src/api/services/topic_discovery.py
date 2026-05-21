@@ -34,10 +34,13 @@ log = structlog.get_logger()
 
 MODEL = "gemini-2.5-flash-lite"
 
-# How many recent posts to sample per platform. Smaller = cheaper but
-# misses long-tail themes; larger = costs more tokens. 100 balances
-# theme coverage (~5-8 surfaces well) and token budget (~$0.003/run).
-SAMPLE_SIZE = 100
+# Hard cap on how many posts we ever send to Gemini in one call.
+# Was 100 — silently truncated the 500 posts the caller pre-fetched and
+# left ~80% of the corpus without a topic_id (2026-05-21). Raised to
+# 2000 to match the caller's 7-day window cap. At ~200 chars each + a
+# tight system prompt this fits in Flash-Lite's input window with
+# headroom; cost stays ~$0.02/run.
+SAMPLE_SIZE = 2000
 
 # Truncate each post's text to control input tokens. Tweets / captions
 # usually fit in 200 chars; mainstream articles get cut to the lede

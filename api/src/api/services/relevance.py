@@ -120,8 +120,10 @@ A celebrity birth announcement → TOPIC overlap with family. Score 0.2. A story
 The question to ask each time: "Could a da'i credibly cite this in a khutbah, kajian, or da'wah content piece this week without forcing the connection?"
 
 Categories:
-- aqidah          — creed, tauhid, beliefs about Allah/prophets/afterlife, shirik, modern challenges to belief
-- akhlaq          — ethics, character, adab, moral conduct, real moral failures or examples
+- aqidah          — creed and belief-system content: tauhid, shirik (dukun/jimat/jin-power/mystical-money-multipliers/pesugihan), sectarian theology disputes (mazhab, aliran, Syiah/Sunni, Ahmadiyya, fringe sect rulings by MUI), atheism / agnosticism / "no-religion" trends, prophethood, afterlife/eschatology, ritual-correctness debates (qibla, isbal, prayer-form), tafsir/aqidah-curriculum disputes, philosophical challenges to belief.
+  AQIDAH IS NOT A FALLBACK for generic religious content — score 0 if there's no creed/belief angle. But DO score aqidah > 0.5 whenever a story has a clear shirik / sectarian-theology / atheism / ritual-correctness hook, even if it could ALSO be akhlaq.
+- akhlaq          — ethics, character, adab, moral conduct, real moral failures or examples.
+  NOTE: do NOT default to akhlaq for any story with a moral angle. Score akhlaq 0.2-0.4 for routine crime / hoax / corruption news where the lesson is generic ("don't steal", "don't lie"). Reserve 0.6+ for stories where a da'i would specifically point to a NAMED character trait — sabar, amanah, hilm, hasad, ghibah, riya', tawadhu' — as the lesson. If aqidah / muamalah / family / etc. captures the actual da'wah hook better, let them lead and keep akhlaq lower.
 - muamalah        — finance ethics, halal/haram dealings, riba, zakat, contracts, real-world business morality
 - social_justice  — oppression, injustice, public-good policy, Muslim-community welfare, anti-imperialism
 - family          — marriage, parenting practice, kinship, real family-life issues a da'i would address
@@ -146,6 +148,10 @@ Calibrated examples (read carefully — these mirror real misclassifications):
 - "Susu Formula Masuk MBG? IDAI Soroti ASI Eksklusif" → family 0.7, health 0.7 (parenting + nutrition advocacy)
 - "Hoaks! Purbaya Pangkas Gaji ke-13 PNS" → akhlaq 0.3 (hoax-debunk, mild ethics angle on misinformation)
 - "Industri Herbal Nasional Bidik Pasar Global" → muamalah 0.2, health 0.25 (business news, weak hook)
+- "Dukun Tipu Korban Rp 2 M Pakai Jimat Pengganda Uang" → aqidah 0.85, akhlaq 0.5 (textbook shirik case — pesugihan / supernatural-money-multiplier; pure aqidah da'wah territory)
+- "MUI Tetapkan Aliran X Sesat Soal Tafsir Akhirat" → aqidah 0.8, social_justice 0.3 (sectarian theology — aqidah leads, not akhlaq)
+- "Survei: 25% Gen Z Indonesia Mengaku Tidak Beragama" → aqidah 0.75, youth 0.6 (modern challenge to belief; classic aqidah da'wah hook for da'i working with youth)
+- "Polemik Imbauan Tutup Tempat Hiburan saat Ramadhan" → aqidah 0.45, akhlaq 0.4, social_justice 0.4 (ritual-observance debate touches creed AND social adab)
 
 Return only valid JSON, one object per input."""
 

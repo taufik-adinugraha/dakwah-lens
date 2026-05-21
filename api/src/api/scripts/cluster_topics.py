@@ -24,6 +24,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import sys
+from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import UUID
 
@@ -44,11 +45,18 @@ log = structlog.get_logger()
 # handful of unrelated posts.
 MIN_POSTS_FOR_DISCOVERY = 20
 
-# How many of the most-recent posts to feed the discovery service. Wider
-# windows blur day-over-day theme shifts; narrower windows miss long-tail
-# topics that span a few days. 500 = ~3 days of mainstream RSS or ~half
-# a week of X scrapes at current cadence.
-RECENT_POST_LIMIT = 500
+# Topic discovery window — last 7 days. Matches the executive briefing's
+# 7-day window so the topics surfaced in trending are the SAME ones the
+# briefing narrates over. Earlier this was a "most recent N" slice
+# (RECENT_POST_LIMIT=500) which got narrowed again to 100 inside the
+# discovery service, leaving 484 of 584 mainstream posts without a
+# topic_id (2026-05-21).
+#
+# A safety cap so a runaway scrape (e.g. accidentally re-enabling a paused
+# platform) can't blow our Gemini token budget on a single recluster run.
+# Today 7d is ~500-600 mainstream posts; 2000 leaves comfortable headroom.
+RECENT_POST_LIMIT = 2000
+TOPIC_DISCOVERY_WINDOW_DAYS = 7
 
 # Floor for `dawah_opportunity` when deciding which posts feed topic
 # discovery. Without this filter the sample is dominated by routine
@@ -71,9 +79,13 @@ async def _fetch_recent_posts(platform: str) -> list[dict[str, Any]]:
     discovery sample focused.
     """
     async with SessionLocal() as session:
+        window_start = datetime.now(UTC) - timedelta(
+            days=TOPIC_DISCOVERY_WINDOW_DAYS
+        )
         res = await session.execute(
             select(SocialPost.id, SocialPost.text, SocialPost.posted_at)
             .where(SocialPost.platform == platform)
+            .where(SocialPost.posted_at >= window_start)
             .where(
                 sql_or(
                     SocialPost.dawah_opportunity.is_(None),

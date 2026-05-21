@@ -797,7 +797,11 @@ async def generate_summary(
         candidates = retrieve_daleel(
             retrieval_query, limit=15, per_corpus=4
         )
-        daleel = rerank_daleel(retrieval_query, candidates, top_n=3)
+        # top_n=5 (was 3) gives the brief LLM a richer set to pick from.
+        # The system prompt still asks for 2-3 citations, but a wider
+        # pool lets a strong hadith / tafsir surface alongside the
+        # default-leaning Quran hits (2026-05-21).
+        daleel = rerank_daleel(retrieval_query, candidates, top_n=5)
         log.info(
             "insights_summary.retrieved_daleel",
             segment=segment,

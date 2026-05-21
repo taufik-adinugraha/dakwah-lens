@@ -125,6 +125,19 @@ export type KitabHit = {
   surah?: number;
   ayah?: number;
   hadithNumber?: number;
+  /** Tafsir-only: which chunk of the per-ayah commentary this hit is. */
+  chunkIndex?: number;
+  /** Tafsir-only: how many chunks the per-ayah commentary was split into. */
+  totalChunks?: number;
+  /** Tafsir-only: the FULL English commentary for the ayah (every chunk
+   *  concatenated as it appeared in the source). Used by the UI to render
+   *  a "show full commentary" expansion so a chunk hit doesn't read as
+   *  cut-off mid-sentence. */
+  fullCommentaryEn?: string;
+  /** Tafsir-only: the FULL Arabic commentary for the ayah. Same purpose
+   *  as fullCommentaryEn — gives the reader the whole exegesis when they
+   *  expand the result. */
+  fullCommentaryAr?: string;
   /** For tafsir hits only: the Qur'an ayah this passage is commenting on,
    *  fetched from the quran collection by exact key. Lets the brief
    *  generator quote both the source verse and the commentary together,
@@ -523,14 +536,25 @@ function normalizeHit(
     };
   }
 
-  // tafsir
+  // tafsir. The matched `chunk_text_en` is what we surface as the primary
+  // translation — that's the segment Qdrant scored high — but we ALSO
+  // carry the full per-ayah commentary so the UI can offer "read full".
+  // Without that, a chunk reads as cut-off mid-sentence (observed
+  // 2026-05-21). The arabic field stays as the FULL ayah AR commentary
+  // because we don't chunk Arabic alongside English at embed time —
+  // there's no AR chunk to single out.
+  const fullCommentaryEn = String(p.ayah_text_en ?? "");
   return {
     corpus,
     arabic: String(p.ayah_text_ar ?? p.arabic ?? ""),
-    translation: String(p.chunk_text_en ?? p.ayah_text_en ?? ""),
+    translation: String(p.chunk_text_en ?? fullCommentaryEn ?? ""),
     citation: String(p.citation_en ?? ""),
     surah: typeof p.surah === "number" ? p.surah : undefined,
     ayah: typeof p.ayah === "number" ? p.ayah : undefined,
+    chunkIndex: typeof p.chunk_index === "number" ? p.chunk_index : undefined,
+    totalChunks: typeof p.total_chunks === "number" ? p.total_chunks : undefined,
+    fullCommentaryEn: fullCommentaryEn || undefined,
+    fullCommentaryAr: String(p.ayah_text_ar ?? "") || undefined,
     score,
     retrievalSource: "qdrant",
   };

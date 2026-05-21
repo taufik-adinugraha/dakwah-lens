@@ -13,6 +13,7 @@ import {
   type KitabCorpus,
   type KitabHit,
 } from "@/lib/kitab-retrieval";
+import { TafsirResult } from "./TafsirResult";
 import { KitabPill } from "./KitabPill";
 import { KitabSearchInput } from "@/components/KitabSearchInput";
 
@@ -26,6 +27,16 @@ const ALL_CORPORA: KitabCorpus[] = [
   "bulugh",
   "tafsir",
 ];
+
+// Default selection when the user hasn't picked anything yet. Tafsir is
+// excluded so first-time visitors get verse + hadith hits surfaced first
+// — tafsir matches embed against long commentary text and tend to push
+// the canonical Quran/hadith hits down the list. Users who want tafsir
+// can tick the chip explicitly. Briefing-time retrieval (Python
+// kitab_retrieval) is unaffected and still iterates every corpus.
+const DEFAULT_CORPORA: KitabCorpus[] = ALL_CORPORA.filter(
+  (c) => c !== "tafsir",
+);
 
 const RESULTS_LIMIT = 20;
 
@@ -112,7 +123,7 @@ export async function generateMetadata({
 function parseCorpusSelection(
   raw: string | string[] | undefined,
 ): KitabCorpus[] {
-  if (!raw) return ALL_CORPORA;
+  if (!raw) return DEFAULT_CORPORA;
   // Multi-checkbox forms submit as `?kitab=a&kitab=b&kitab=c`, which
   // Next.js surfaces as `string[]`. Single-value or comma-delimited
   // links still work for shareable URLs. Previously we only handled
@@ -124,7 +135,7 @@ function parseCorpusSelection(
   const requested = tokens
     .map((s) => s.trim())
     .filter((s) => (ALL_CORPORA as string[]).includes(s)) as KitabCorpus[];
-  return requested.length === 0 ? ALL_CORPORA : requested;
+  return requested.length === 0 ? DEFAULT_CORPORA : requested;
 }
 
 export default async function KitabPage({
@@ -326,7 +337,7 @@ function Results({
                   </div>
                 </div>
 
-                {h.arabic && (
+                {h.arabic && h.corpus !== "tafsir" && (
                   <p
                     className="mt-3 text-right font-amiri text-xl leading-relaxed text-slate-900"
                     dir="rtl"
@@ -334,10 +345,20 @@ function Results({
                     {h.arabic}
                   </p>
                 )}
-                {h.translation && (
-                  <p className="mt-2 text-sm leading-relaxed text-slate-700">
-                    {h.translation}
-                  </p>
+                {h.corpus === "tafsir" ? (
+                  <TafsirResult
+                    chunk={h.translation}
+                    fullCommentaryEn={h.fullCommentaryEn}
+                    fullCommentaryAr={h.fullCommentaryAr}
+                    chunkIndex={h.chunkIndex}
+                    totalChunks={h.totalChunks}
+                  />
+                ) : (
+                  h.translation && (
+                    <p className="mt-2 text-sm leading-relaxed text-slate-700">
+                      {h.translation}
+                    </p>
+                  )
                 )}
                 <div className="mt-3 flex flex-wrap items-center gap-2">
                   <BookmarkButton
