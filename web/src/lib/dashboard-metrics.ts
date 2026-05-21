@@ -278,7 +278,7 @@ export async function getTopIssues(limit = 3): Promise<TopIssue[]> {
                    sp.posted_at DESC
         ) AS rn
       FROM social_posts sp
-      WHERE sp.topic_id::text = ANY (${topicIds})
+      WHERE sp.topic_id::text = ANY (${sql.raw(`ARRAY[${topicIds.map((id) => `'${id.replace(/'/g, "''")}'`).join(",")}]::text[]`)})
         AND sp.created_at >= now() - interval '7 days'
     ) ranked
     WHERE rn <= 5
@@ -297,7 +297,7 @@ export async function getTopIssues(limit = 3): Promise<TopIssue[]> {
           PARTITION BY sp.topic_id ORDER BY count(*) DESC
         ) AS rn
       FROM social_posts sp
-      WHERE sp.topic_id::text = ANY (${topicIds})
+      WHERE sp.topic_id::text = ANY (${sql.raw(`ARRAY[${topicIds.map((id) => `'${id.replace(/'/g, "''")}'`).join(",")}]::text[]`)})
         AND sp.author IS NOT NULL
         AND sp.created_at >= now() - interval '7 days'
       GROUP BY sp.topic_id, sp.author
