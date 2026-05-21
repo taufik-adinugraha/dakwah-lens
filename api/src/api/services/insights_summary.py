@@ -424,6 +424,27 @@ async def generate_summary(
         client = _get_client()
         user_prompt = _build_user_prompt(stats, daleel)
 
+        # Safety settings: relax to BLOCK_ONLY_HIGH. Observed 2026-05-21:
+        # Gemini 2.5 Pro returned empty responses on 4 of 5 segment
+        # briefings — the prompts contained references to corruption
+        # cases, child-abuse incidents, and Israeli captivity of WNI,
+        # which tripped default-strength safety filters. None of these
+        # are us GENERATING harmful content; they're news data we want
+        # the model to ANALYZE for a da'wah audience. Default thresholds
+        # over-fire for analytical use cases.
+        relaxed_safety = [
+            types.SafetySetting(
+                category=cat,
+                threshold="BLOCK_ONLY_HIGH",
+            )
+            for cat in (
+                "HARM_CATEGORY_HARASSMENT",
+                "HARM_CATEGORY_HATE_SPEECH",
+                "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                "HARM_CATEGORY_DANGEROUS_CONTENT",
+            )
+        ]
+
         resp = client.models.generate_content(
             model=MODEL,
             contents=user_prompt,
@@ -431,11 +452,32 @@ async def generate_summary(
                 system_instruction=SYSTEM_PROMPT,
                 temperature=0.3,
                 max_output_tokens=1200,
+                safety_settings=relaxed_safety,
             ),
         )
         summary_md = (resp.text or "").strip()
         if not summary_md:
-            log.warning("insights_summary.empty_response", segment=segment)
+            # Surface why the model returned empty so we can tell safety-
+            # filter blocks apart from token-limit truncation or other
+            # finish reasons in production logs.
+            finish_reason = None
+            block_reason = None
+            try:
+                if resp.candidates:
+                    finish_reason = getattr(
+                        resp.candidates[0], "finish_reason", None
+                    )
+                pf = getattr(resp, "prompt_feedback", None)
+                if pf is not None:
+                    block_reason = getattr(pf, "block_reason", None)
+            except Exception:
+                pass
+            log.warning(
+                "insights_summary.empty_response",
+                segment=segment,
+                finish_reason=str(finish_reason) if finish_reason else None,
+                block_reason=str(block_reason) if block_reason else None,
+            )
             return None
 
         usage_md = getattr(resp, "usage_metadata", None)
