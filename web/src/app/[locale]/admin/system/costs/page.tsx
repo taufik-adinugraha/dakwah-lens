@@ -257,7 +257,10 @@ export default async function CostsPage() {
                 className="h-9 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm"
               >
                 <option value="infra">Infra (monthly VPS)</option>
+                <option value="infra_topup">Infra (Top Up)</option>
                 <option value="domain">Domain (yearly)</option>
+                <option value="api_topup">API (Top Up)</option>
+                <option value="api_usage">API Usage</option>
                 <option value="other">Other</option>
               </select>
             </FormField>
@@ -370,30 +373,30 @@ export default async function CostsPage() {
           <table className="w-full text-sm max-md:block max-md:overflow-x-auto">
             <thead>
               <tr className="border-b border-slate-100 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                <th className="py-2">Kind</th>
-                <th className="py-2">Vendor</th>
-                <th className="py-2">Period</th>
-                <th className="py-2 text-right">Amount</th>
-                <th className="py-2">Note</th>
-                <th className="py-2">Invoice</th>
-                {isSuperadmin && <th className="py-2" />}
+                <th className="px-3 py-2 first:pl-0">Kind</th>
+                <th className="px-3 py-2">Vendor</th>
+                <th className="px-3 py-2">Period</th>
+                <th className="px-3 py-2 text-right">Amount</th>
+                <th className="px-3 py-2">Note</th>
+                <th className="px-3 py-2">Invoice</th>
+                {isSuperadmin && <th className="px-3 py-2 last:pr-0" />}
               </tr>
             </thead>
             <tbody>
               {manual.map((m) => (
                 <tr key={m.id} className="border-b border-slate-50 last:border-0">
-                  <td className="py-2 text-xs font-semibold capitalize">
-                    {m.kind}
+                  <td className="px-3 py-2 text-xs font-semibold first:pl-0">
+                    {kindLabel(m.kind)}
                   </td>
-                  <td className="py-2 text-xs text-slate-700">{m.vendor}</td>
-                  <td className="py-2 text-xs text-slate-500">
+                  <td className="px-3 py-2 text-xs text-slate-700">{m.vendor}</td>
+                  <td className="px-3 py-2 text-xs text-slate-500 whitespace-nowrap">
                     {new Date(m.periodStart).toLocaleDateString()} →{" "}
                     {new Date(m.periodEnd).toLocaleDateString()}
                   </td>
-                  <td className="py-2 text-right tabular-nums">
+                  <td className="px-3 py-2 text-right tabular-nums whitespace-nowrap">
                     {formatRupiah(m.amountIdr)}
                   </td>
-                  <td className="py-2 text-xs text-slate-500">
+                  <td className="px-3 py-2 text-xs text-slate-500">
                     {m.note ?? "—"}
                     {m.coversProvider && (
                       <span className="ml-2 inline-flex items-center rounded-full bg-emerald-50 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-emerald-700 ring-1 ring-emerald-100">
@@ -401,7 +404,7 @@ export default async function CostsPage() {
                       </span>
                     )}
                   </td>
-                  <td className="py-2 text-xs">
+                  <td className="px-3 py-2 text-xs">
                     {m.attachmentPath ? (
                       <a
                         href={`/api/admin/attachments/manual-cost/${m.id}`}
@@ -414,7 +417,7 @@ export default async function CostsPage() {
                     )}
                   </td>
                   {isSuperadmin && (
-                    <td className="py-2 text-right">
+                    <td className="px-3 py-2 text-right last:pr-0">
                       <ConfirmForm
                         action={deleteManualCost}
                         confirmMessage={`Delete the ${m.vendor} entry (${formatRupiah(m.amountIdr)})? This also unlinks any attached invoice.`}
@@ -579,6 +582,26 @@ function ProviderRollup({
         </tr>
       </tbody>
     </table>
+  );
+}
+
+// Human-readable label for the manual_costs.kind text column. Mirrors
+// the order of the dropdown so the log table reads consistent with how
+// rows get added. Unknown kinds fall back to a capitalize-first render
+// so older data (or future kinds added before this map updates) still
+// looks reasonable.
+const KIND_LABELS: Record<string, string> = {
+  infra: "Infra (monthly)",
+  infra_topup: "Infra (Top Up)",
+  domain: "Domain (yearly)",
+  api_topup: "API (Top Up)",
+  api_usage: "API Usage",
+  other: "Other",
+};
+
+function kindLabel(kind: string): string {
+  return (
+    KIND_LABELS[kind] ?? kind.charAt(0).toUpperCase() + kind.slice(1).replace(/_/g, " ")
   );
 }
 
