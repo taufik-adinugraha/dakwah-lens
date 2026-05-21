@@ -73,7 +73,7 @@ PARAGRAPH 1 — Penjelasan (3-4 sentences in Bahasa Indonesia):
   Tone: precise, observational, practical. Use the numbers VERBATIM (e.g. "38%" not "sekitar sepertiga"). Do not invent topics.
 
 PARAGRAPH 2 — Nasihah (2-3 sentences in Bahasa Indonesia):
-  Practical Islamic counsel tied to what trended. What angle would resonate for a da'i's khutbah/kajian this week. Concrete, not generic.
+  Practical Islamic counsel tied to what trended. Address the BROAD da'wah audience — da'i giving khutbah, ustadzah leading kajian ibu-ibu, content creators on YouTube/IG/TikTok, parents teaching at home, community organizers, researchers tracking Muslim discourse. Do NOT default to "khutbah Jumat" as the only surface. Mention the angle that resonates across these surfaces. Concrete, not generic.
 
 PARAGRAPH 3 — Daleel (ONLY if I provided non-empty daleel below):
   If I have provided daleel passages, cite 2-3 of them. Each line:
