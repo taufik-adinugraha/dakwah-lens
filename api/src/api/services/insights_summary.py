@@ -453,6 +453,16 @@ async def generate_summary(
                 temperature=0.3,
                 max_output_tokens=1200,
                 safety_settings=relaxed_safety,
+                # Disable Gemini 2.5 Pro internal "thinking" tokens.
+                # These count toward max_output_tokens — observed
+                # 2026-05-21 that thinking consumed the entire 1200
+                # budget for 4/5 briefings, leaving zero visible
+                # output (finish_reason=MAX_TOKENS, empty text). A
+                # structured 3-paragraph briefing doesn't benefit
+                # from extended reasoning; the format is fixed and
+                # the data is already pre-computed. Setting budget=0
+                # disables thinking and routes all tokens to output.
+                thinking_config=types.ThinkingConfig(thinking_budget=0),
             ),
         )
         summary_md = (resp.text or "").strip()
