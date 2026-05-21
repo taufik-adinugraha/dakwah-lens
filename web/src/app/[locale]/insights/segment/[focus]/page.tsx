@@ -104,12 +104,15 @@ export default async function SegmentPage({
   const t = await getTranslations({ locale, namespace: "Insights" });
 
   // Posts whose DOMINANT category is in this focus's category set.
-  // Filter via the same JSONB argmax pattern we use in insights-data.
+  // Take the GLOBAL top-1 category (no inner segment filter — see
+  // 2026-05-21 bugfix), then check membership outside. Earlier the
+  // inner subquery filtered keys to the segment's set, which made
+  // any post with a tiny non-zero score in a segment key match the
+  // segment — so the four segments converged to nearly identical
+  // sentiment mixes.
   const dominantCategorySql = sql`(
     SELECT key FROM jsonb_each_text(${schema.socialPosts.categories})
-    WHERE key = ANY (ARRAY[${sql.raw(
-      def.categories.map((c) => `'${c}'`).join(","),
-    )}])
+    WHERE value::numeric > 0
     ORDER BY value::numeric DESC LIMIT 1
   )`;
 

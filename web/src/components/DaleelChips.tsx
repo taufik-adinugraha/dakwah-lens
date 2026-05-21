@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { BookOpen, X } from "lucide-react";
+import { BookOpen, ChevronDown, X } from "lucide-react";
 
 import type { DaleelRef } from "@/db/schema";
 
@@ -42,6 +42,7 @@ export function DaleelChips({
 }) {
   const t = useTranslations("Insights");
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState(false);
 
   if (refs.length === 0) return null;
 
@@ -51,36 +52,55 @@ export function DaleelChips({
   return (
     <>
       <div className="mt-5 rounded-2xl border border-emerald-100 bg-white/60 p-3 sm:p-4">
-        <p className="mb-2 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
-          <BookOpen className="h-3 w-3" />
-          {label}
-        </p>
-        {mode === "cards" ? (
-          <div className="space-y-2">
-            {refs.map((d) => (
-              <DaleelCard
-                key={d.ref_id}
-                daleel={d}
-                onClick={() => setActiveId(d.ref_id)}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-wrap gap-1.5">
-            {refs.map((d) => (
-              <button
-                key={d.ref_id}
-                type="button"
-                onClick={() => setActiveId(d.ref_id)}
-                title={d.translation_id || d.translation_en || ""}
-                className="group inline-flex max-w-full items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] text-emerald-900 transition hover:border-emerald-300 hover:bg-emerald-100"
-              >
-                <span className="text-[9px] font-semibold uppercase tracking-wider text-emerald-700">
-                  {d.corpus.replace(/_/g, " ")}
-                </span>
-                <span className="truncate font-medium">{d.citation}</span>
-              </button>
-            ))}
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+          className="group flex w-full items-center justify-between gap-2 text-left"
+        >
+          <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+            <BookOpen className="h-3 w-3" />
+            {label}
+            <span className="ml-1 rounded-full bg-emerald-100/80 px-1.5 py-0.5 text-[9px] font-semibold text-emerald-800">
+              {refs.length}
+            </span>
+          </span>
+          <ChevronDown
+            className={`h-4 w-4 text-emerald-700 transition-transform ${
+              expanded ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+        {expanded && (
+          <div className="mt-3">
+            {mode === "cards" ? (
+              <div className="space-y-2">
+                {refs.map((d) => (
+                  <DaleelCard
+                    key={d.ref_id}
+                    daleel={d}
+                    onClick={() => setActiveId(d.ref_id)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-1.5">
+                {refs.map((d) => (
+                  <button
+                    key={d.ref_id}
+                    type="button"
+                    onClick={() => setActiveId(d.ref_id)}
+                    title={d.translation_id || d.translation_en || ""}
+                    className="group inline-flex max-w-full items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] text-emerald-900 transition hover:border-emerald-300 hover:bg-emerald-100"
+                  >
+                    <span className="text-[9px] font-semibold uppercase tracking-wider text-emerald-700">
+                      {d.corpus.replace(/_/g, " ")}
+                    </span>
+                    <span className="truncate font-medium">{d.citation}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>

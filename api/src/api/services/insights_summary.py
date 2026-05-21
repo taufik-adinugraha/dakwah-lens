@@ -151,15 +151,19 @@ async def _compute_stats(
     # Postgres array literal for the IN/ANY filter.
     cats_sql_array = "ARRAY[" + ",".join(f"'{c}'" for c in cats_filter) + "]"
 
-    # Helper: a CTE that pre-filters posts to ones whose dominant
-    # category is in `cats_filter`. For the all-platform case
-    # (`cats_filter == ALL_CATEGORIES`), the filter is a no-op against
-    # any categorized row.
+    # Helper: a CTE that tags each post with its GLOBAL top-1 category
+    # (argmax over the categories JSONB), then downstream queries filter
+    # rows where `dominant_cat = ANY (cats_filter)`. Earlier we put the
+    # `key = ANY (cats_filter)` filter inside the inner SELECT — that
+    # returned the highest-scoring key *among the segment's set*, so any
+    # post with a tiny non-zero score in a segment key was counted in
+    # the segment. That made all four segment summaries converge to the
+    # same numbers (2026-05-21 bugfix).
     post_filter = f"""
       WITH filtered AS (
         SELECT sp.*, (
           SELECT key FROM jsonb_each_text(categories)
-          WHERE key = ANY ({cats_sql_array})
+          WHERE value::numeric > 0
           ORDER BY value::numeric DESC LIMIT 1
         ) AS dominant_cat
         FROM social_posts sp
@@ -174,8 +178,8 @@ async def _compute_stats(
                 f"""
                 {post_filter}
                 SELECT
-                  count(*) FILTER (WHERE posted_at >= :start AND dominant_cat IS NOT NULL) AS posts_7d,
-                  count(*) FILTER (WHERE posted_at >= :prev AND posted_at < :start AND dominant_cat IS NOT NULL) AS posts_prev_7d
+                  count(*) FILTER (WHERE posted_at >= :start AND dominant_cat = ANY ({cats_sql_array})) AS posts_7d,
+                  count(*) FILTER (WHERE posted_at >= :prev AND posted_at < :start AND dominant_cat = ANY ({cats_sql_array})) AS posts_prev_7d
                 FROM filtered
                 """
             ),
@@ -197,7 +201,7 @@ async def _compute_stats(
                   count(*) FILTER (WHERE sentiment_label = 'positive') AS pos,
                   count(*) FILTER (WHERE sentiment_label IS NOT NULL) AS total
                 FROM filtered
-                WHERE posted_at >= :start AND dominant_cat IS NOT NULL
+                WHERE posted_at >= :start AND dominant_cat = ANY ({cats_sql_array})
                 """
             ),
             {"start": period_start},
@@ -229,7 +233,7 @@ async def _compute_stats(
                   count(*) FILTER (WHERE sentiment_label = 'negative') AS neg,
                   count(*) FILTER (WHERE sentiment_label IS NOT NULL) AS total
                 FROM filtered
-                WHERE posted_at >= :prev AND posted_at < :start AND dominant_cat IS NOT NULL
+                WHERE posted_at >= :prev AND posted_at < :start AND dominant_cat = ANY ({cats_sql_array})
                 """
             ),
             {"prev": prev_period_start, "start": period_start},
@@ -250,7 +254,7 @@ async def _compute_stats(
                 {post_filter}
                 SELECT dominant_cat AS category, count(*)::int AS posts
                 FROM filtered
-                WHERE posted_at >= :start AND dominant_cat IS NOT NULL
+                WHERE posted_at >= :start AND dominant_cat = ANY ({cats_sql_array})
                 GROUP BY dominant_cat
                 ORDER BY posts DESC
                 LIMIT 5
@@ -276,7 +280,7 @@ async def _compute_stats(
                 {post_filter}
                 SELECT dominant_cat AS category, count(*)::int AS posts
                 FROM filtered
-                WHERE posted_at >= :prev AND posted_at < :start AND dominant_cat IS NOT NULL
+                WHERE posted_at >= :prev AND posted_at < :start AND dominant_cat = ANY ({cats_sql_array})
                 GROUP BY dominant_cat
                 """
             ),
@@ -355,7 +359,7 @@ async def _compute_stats(
                 {post_filter}
                 SELECT platform, count(*)::int AS posts
                 FROM filtered
-                WHERE posted_at >= :start AND dominant_cat IS NOT NULL
+                WHERE posted_at >= :start AND dominant_cat = ANY ({cats_sql_array})
                 GROUP BY platform
                 ORDER BY posts DESC
                 """

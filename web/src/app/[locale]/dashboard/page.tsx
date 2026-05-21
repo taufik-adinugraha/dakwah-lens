@@ -18,6 +18,7 @@ import {
 import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
+import { I18nText } from "@/components/I18nText";
 import { TopIssueCards } from "@/components/TopIssueCards";
 import {
   getBriefsThisWeek,
@@ -144,9 +145,10 @@ function GreetingPulse({
 
         <div className="mt-5 flex items-end gap-4">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-              {t("pulse_label")}
-            </p>
+            <I18nText
+              text={t("pulse_label")}
+              className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500"
+            />
             <p className="mt-0.5 flex items-baseline gap-2">
               <span className="text-5xl font-bold tabular-nums text-slate-900">
                 {hasScore ? pulse.score!.toFixed(1) : "—"}
@@ -184,9 +186,10 @@ function GreetingPulse({
           <PulseSparkline points={pulse.sparkline} />
         </div>
 
-        <p className="mt-4 text-pretty text-xs leading-relaxed text-slate-500">
-          {t("pulse_explainer")}
-        </p>
+        <I18nText
+          text={t("pulse_explainer")}
+          className="mt-4 block text-pretty text-xs leading-relaxed text-slate-500"
+        />
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-1 sm:gap-4">
@@ -314,9 +317,10 @@ function TopIssues({ issues, t }: { issues: TopIssue[]; t: T }) {
           <p className="text-sm font-medium text-slate-700">
             {t("top_issues_empty_title")}
           </p>
-          <p className="max-w-md text-[11px] leading-relaxed text-slate-500">
-            {t("top_issues_empty_body")}
-          </p>
+          <I18nText
+            text={t("top_issues_empty_body")}
+            className="block max-w-md text-[11px] leading-relaxed text-slate-500"
+          />
         </div>
       ) : (
         <TopIssueCards
@@ -601,11 +605,11 @@ function SectionHeader({
   return (
     <div>
       <h2 className="text-balance text-lg font-semibold text-slate-900 sm:text-xl">
-        {title}
+        <I18nText text={title} />
       </h2>
       {subtitle && (
         <p className="mt-1 text-pretty text-xs leading-relaxed text-slate-500 sm:text-sm">
-          {subtitle}
+          <I18nText text={subtitle} />
         </p>
       )}
     </div>

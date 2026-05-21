@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
+import { I18nText } from "./I18nText";
 import { SentimentBar } from "./SentimentBar";
 import { TopicDetailModal, type TopicDetail } from "./TopicDetailModal";
 
@@ -79,9 +80,10 @@ export function TopIssueCards({
             </div>
 
             <div className="mt-4">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                {sentimentLabel}
-              </p>
+              <I18nText
+                text={sentimentLabel}
+                className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500"
+              />
               <div className="mt-1.5">
                 <SentimentBar
                   sentiment={i.sentiment}

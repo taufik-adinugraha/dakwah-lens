@@ -27,6 +27,7 @@ import { db, schema } from "@/db";
 import { Link } from "@/i18n/navigation";
 import { HeroBackground } from "@/components/HeroBackground";
 import { HeroSlideshow } from "@/components/HeroSlideshow";
+import { I18nText } from "@/components/I18nText";
 import { formatPanggilan } from "@/lib/panggilan";
 import type { UserProfile } from "@/db/schema";
 
@@ -230,7 +231,7 @@ function AnonymousCtas({ t }: { t: LandingT }) {
         className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-emerald-200 bg-emerald-50/80 px-6 text-sm font-semibold text-emerald-700 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-100 sm:w-auto"
       >
         <Globe2 className="h-4 w-4" />
-        {t("cta_tertiary")}
+        <I18nText text={t("cta_tertiary")} />
       </Link>
     </div>
   );
@@ -321,7 +322,7 @@ function Features({ t }: { t: LandingT }) {
               </div>
               <h3 className="text-balance text-lg font-semibold text-slate-900">{title}</h3>
               <p className="mt-2 text-pretty text-sm leading-relaxed text-slate-600">
-                {body}
+                <I18nText text={body} />
               </p>
               <span className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-gradient-to-br from-brand-100/0 to-emerald-100/40 opacity-0 transition group-hover:opacity-100" />
             </div>
@@ -358,17 +359,19 @@ function WhyNotJustLlm({ t }: { t: LandingT }) {
           <h2 className="mt-4 text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
             {t("why_llm_title")}
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-pretty text-base leading-relaxed text-slate-600">
-            {t("why_llm_subtitle")}
-          </p>
+          <I18nText
+            text={t("why_llm_subtitle")}
+            className="mx-auto mt-4 block max-w-xl text-pretty text-base leading-relaxed text-slate-600"
+          />
         </div>
 
         <div className="mt-14 grid gap-5 lg:grid-cols-2">
           {/* Generic LLM column */}
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-              {t("why_llm_col_llm_eyebrow")}
-            </p>
+            <I18nText
+              text={t("why_llm_col_llm_eyebrow")}
+              className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500"
+            />
             <h3 className="mt-2 text-balance text-lg font-semibold text-slate-900">
               {t("why_llm_col_llm_title")}
             </h3>

@@ -3,6 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { marketingSectionLink } from "@/lib/marketing-href";
+import { I18nText } from "./I18nText";
 import { Logo } from "./Logo";
 
 export async function Footer() {
@@ -25,9 +26,10 @@ export async function Footer() {
           <Logo tone="light" showWordmark={false} />
           <div>
             <p className="text-sm font-semibold">Dakwah-Lens</p>
-            <p className="mt-0.5 max-w-xs text-pretty text-[11px] leading-relaxed text-slate-400">
-              {t("tagline")}
-            </p>
+            <I18nText
+              text={t("tagline")}
+              className="mt-0.5 block max-w-xs text-pretty text-[11px] leading-relaxed text-slate-400"
+            />
           </div>
         </div>
 

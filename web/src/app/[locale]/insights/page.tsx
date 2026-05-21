@@ -16,6 +16,7 @@ import { auth } from "@/auth";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { BriefingNarrative } from "@/components/BriefingNarrative";
+import { I18nText } from "@/components/I18nText";
 import { DigestOptInPrompt } from "@/components/DigestOptInPrompt";
 import { InsightsHeadlinePills } from "@/components/InsightsHeadlinePills";
 import {
@@ -187,7 +188,7 @@ export default async function InsightsPage({
             </div>
             {trendingRows.length === 0 ? (
               <div className="mt-4 rounded-lg border border-dashed border-slate-200 bg-slate-50/60 p-6 text-center text-xs text-slate-500">
-                {t("how_coverage_posts_empty")}
+                <I18nText text={t("how_coverage_posts_empty")} />
               </div>
             ) : (
               <TrendingTopicsList
@@ -200,11 +201,11 @@ export default async function InsightsPage({
           {/* Sentiment + categories */}
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <h2 className="text-balance text-base font-semibold text-slate-900 sm:text-lg">
-              {t("section_sentiment")}
+              <I18nText text={t("section_sentiment")} />
             </h2>
             {sentimentTotal === 0 ? (
               <div className="mt-4 rounded-lg border border-dashed border-slate-200 bg-slate-50/60 p-4 text-center text-xs text-slate-500">
-                {t("how_coverage_posts_empty")}
+                <I18nText text={t("how_coverage_posts_empty")} />
               </div>
             ) : (
               <>
@@ -247,7 +248,7 @@ export default async function InsightsPage({
             </h3>
             {categories.length === 0 ? (
               <div className="mt-3 rounded-lg border border-dashed border-slate-200 bg-slate-50/60 p-4 text-center text-xs text-slate-500">
-                {t("how_coverage_posts_empty")}
+                <I18nText text={t("how_coverage_posts_empty")} />
               </div>
             ) : (
               <div className="mt-3 space-y-2">
@@ -525,7 +526,7 @@ function PlatformsBreakdown({
             </p>
           </div>
           <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-10 text-center text-sm text-slate-500">
-            {t("how_coverage_posts_empty")}
+            <I18nText text={t("how_coverage_posts_empty")} />
           </div>
         </div>
       </section>
@@ -602,9 +603,11 @@ function PlatformsBreakdown({
                     </p>
                     <div className="mt-0.5 flex items-center gap-2 text-[11px] text-slate-500">
                       <span className="tabular-nums">
-                        {hasData
-                          ? `${posts.toLocaleString()} posts`
-                          : t("how_coverage_posts_empty")}
+                        {hasData ? (
+                          `${posts.toLocaleString()} posts`
+                        ) : (
+                          <I18nText text={t("how_coverage_posts_empty")} />
+                        )}
                       </span>
                       {hasData && (
                         <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-50 px-1.5 py-0.5 font-medium text-emerald-700">

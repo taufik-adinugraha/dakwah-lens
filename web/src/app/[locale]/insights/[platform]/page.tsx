@@ -13,6 +13,7 @@ import {
 import clsx from "clsx";
 
 import { Link } from "@/i18n/navigation";
+import { I18nText } from "@/components/I18nText";
 import { ShowMoreList } from "@/components/ShowMoreList";
 import { TopicsByCluster } from "@/components/TopicsByCluster";
 import {
@@ -705,11 +706,12 @@ function LiveStream({
             <h2 className="mt-3 text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
               What&apos;s surfacing right now
             </h2>
-            <p className="mt-1.5 text-pretty text-sm text-slate-600">
-              {tInsights("live_section_subtitle", {
+            <I18nText
+              text={tInsights("live_section_subtitle", {
                 count: live.totalPosts.toLocaleString(),
               })}
-            </p>
+              className="mt-1.5 block text-pretty text-sm text-slate-600"
+            />
           </div>
 
           {/* Sentiment mix mini-chart */}
