@@ -56,6 +56,7 @@ async def run(
     limit: int | None,
     dry_run: bool,
     skip_sentiment: bool,
+    redo_done: bool,
 ) -> None:
     async with SessionLocal() as session:
         stmt = select(
@@ -64,6 +65,11 @@ async def run(
             SocialPost.external_id,
             SocialPost.text,
         ).where(SocialPost.categories.is_not(None))
+        if not redo_done:
+            # Resume mode: skip rows that already have the new opportunity
+            # score (i.e. previous backfill run got to them). Lets us
+            # re-run after a transient Gemini 502 without redoing work.
+            stmt = stmt.where(SocialPost.dawah_opportunity.is_(None))
         if days is not None:
             cutoff = datetime.now(UTC) - timedelta(days=days)
             stmt = stmt.where(SocialPost.posted_at >= cutoff)
@@ -76,31 +82,53 @@ async def run(
     print(
         f"Backfilling {len(rows)} posts "
         f"(sentiment on {sentiment_eligible} mainstream rows, "
-        f"skip_sentiment={skip_sentiment}, dry_run={dry_run}) …"
+        f"skip_sentiment={skip_sentiment}, redo_done={redo_done}, "
+        f"dry_run={dry_run}) …"
     )
     if dry_run:
         return
 
     done = 0
+    failed_chunks = 0
     for start in range(0, len(rows), CHUNK):
         chunk = rows[start : start + CHUNK]
         texts = [r.text or "" for r in chunk]
 
         # Re-classify relevance + opportunity for every row in the chunk.
-        relevances = classify_relevance(texts)
-        opportunities = classify_opportunity(texts)
+        # Wrap in try/except so a transient Gemini outage on one chunk
+        # (we hit a 502 mid-run on 2026-05-21) doesn't kill the whole
+        # backfill. The skip-resume logic above lets a re-run pick up
+        # exactly the chunks that failed.
+        try:
+            relevances = classify_relevance(texts)
+            opportunities = classify_opportunity(texts)
+        except Exception as exc:
+            failed_chunks += 1
+            print(
+                f"  ⚠ chunk {start}-{start + len(chunk)} failed: "
+                f"{type(exc).__name__}: {exc}"
+            )
+            continue
 
         # Sentiment is mainstream-only — IndoBERT (other platforms) wasn't
         # retuned this round, only the Gemini news prompt was. Build a
         # parallel-aligned list with None gaps for non-mainstream rows.
+        # Same defensive try/except as relevance — sentiment outage shouldn't
+        # block relevance/opportunity from landing.
         sentiments: list[object | None] = [None] * len(chunk)
         if not skip_sentiment:
             mainstream_idx = [i for i, r in enumerate(chunk) if r.platform == "mainstream"]
             mainstream_texts = [texts[i] for i in mainstream_idx]
             if mainstream_texts:
-                scored = classify_news_sentiment(mainstream_texts)
-                for li, s in zip(mainstream_idx, scored, strict=False):
-                    sentiments[li] = s
+                try:
+                    scored = classify_news_sentiment(mainstream_texts)
+                    for li, s in zip(mainstream_idx, scored, strict=False):
+                        sentiments[li] = s
+                except Exception as exc:
+                    print(
+                        f"  ⚠ sentiment chunk {start}-{start + len(chunk)} failed: "
+                        f"{type(exc).__name__}: {exc} — preserving existing labels"
+                    )
 
         async with SessionLocal() as session:
             for i, row in enumerate(chunk):
@@ -123,6 +151,11 @@ async def run(
         done += len(chunk)
         print(f"  {done}/{len(rows)} done")
 
+    if failed_chunks > 0:
+        print(
+            f"⚠ {failed_chunks} chunk(s) failed (transient Gemini errors). "
+            f"Re-run to pick up where it stopped — already-done rows are skipped."
+        )
     print("✓ backfill complete")
 
 
@@ -135,6 +168,11 @@ def main() -> None:
         action="store_true",
         help="re-classify relevance + opportunity only; leave sentiment_label intact",
     )
+    parser.add_argument(
+        "--redo-done",
+        action="store_true",
+        help="also re-process rows that already have dawah_opportunity set (default: skip them)",
+    )
     parser.add_argument("--dry-run", action="store_true", help="count rows only")
     args = parser.parse_args()
     asyncio.run(
@@ -143,6 +181,7 @@ def main() -> None:
             limit=args.limit,
             dry_run=args.dry_run,
             skip_sentiment=args.skip_sentiment,
+            redo_done=args.redo_done,
         )
     )
 
