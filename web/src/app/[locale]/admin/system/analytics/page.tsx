@@ -554,8 +554,14 @@ function DailyBars({
   rows: Array<{ day: string; hits: number; uniques: number }>;
 }) {
   const max = Math.max(...rows.map((r) => r.hits), 1);
+  // Layout: outer container has h-40 (10rem) AND items-stretch so each
+  // column receives the full row height. Each column reserves a fixed
+  // strip at the bottom for the date label; the remaining flex-1 div is
+  // the bars area, with percentage-height children stacked from the
+  // bottom. Was previously `items-end` + column without h-full → column
+  // shrank to label-content height → percentage bars collapsed to 0.
   return (
-    <div className="flex h-40 items-end gap-1.5">
+    <div className="flex h-40 items-stretch gap-1.5">
       {rows.map((r) => {
         const pct = (r.hits / max) * 100;
         const upct = (r.uniques / max) * 100;
@@ -566,10 +572,10 @@ function DailyBars({
         return (
           <div
             key={r.day}
-            className="group flex flex-1 flex-col items-center gap-1"
+            className="group flex flex-1 flex-col items-center"
             title={`${day} · ${r.hits} views · ${r.uniques} unique`}
           >
-            <div className="flex h-full w-full flex-col-reverse">
+            <div className="flex w-full flex-1 flex-col-reverse">
               <div
                 className="w-full rounded-sm bg-brand-200"
                 style={{ height: `${pct}%` }}
@@ -579,7 +585,7 @@ function DailyBars({
                 style={{ height: `${upct}%` }}
               />
             </div>
-            <p className="text-[9px] text-slate-500">{day}</p>
+            <p className="mt-1 text-[9px] text-slate-500">{day}</p>
           </div>
         );
       })}
@@ -593,8 +599,10 @@ function BriefBars({
   rows: Array<{ day: string; briefs: number; creators: number }>;
 }) {
   const max = Math.max(...rows.map((r) => r.briefs), 1);
+  // Same layout shape as DailyBars — see comment there for why
+  // items-stretch + flex-1 bars area is required for percentage heights.
   return (
-    <div className="flex h-40 items-end gap-1.5">
+    <div className="flex h-40 items-stretch gap-1.5">
       {rows.map((r) => {
         const pct = (r.briefs / max) * 100;
         const cpct = (r.creators / max) * 100;
@@ -605,10 +613,10 @@ function BriefBars({
         return (
           <div
             key={r.day}
-            className="group flex flex-1 flex-col items-center gap-1"
+            className="group flex flex-1 flex-col items-center"
             title={`${day} · ${r.briefs} briefs · ${r.creators} unique creators`}
           >
-            <div className="flex h-full w-full flex-col-reverse">
+            <div className="flex w-full flex-1 flex-col-reverse">
               <div
                 className="w-full rounded-sm bg-emerald-200"
                 style={{ height: `${pct}%` }}
@@ -618,7 +626,7 @@ function BriefBars({
                 style={{ height: `${cpct}%` }}
               />
             </div>
-            <p className="text-[9px] text-slate-500">{day}</p>
+            <p className="mt-1 text-[9px] text-slate-500">{day}</p>
           </div>
         );
       })}

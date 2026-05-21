@@ -29,6 +29,7 @@ from uuid import UUID
 
 import structlog
 from sqlalchemy import delete, select, update
+from sqlalchemy import or_ as sql_or
 
 from api.db import SessionLocal
 from api.models.social import SocialPost
@@ -49,12 +50,36 @@ MIN_POSTS_FOR_DISCOVERY = 20
 # a week of X scrapes at current cadence.
 RECENT_POST_LIMIT = 500
 
+# Floor for `dawah_opportunity` when deciding which posts feed topic
+# discovery. Without this filter the sample is dominated by routine
+# politics, stock market, sports, BPJS, weather — none of which produces
+# da'wah-relevant themes. 0.4 keeps anything a da'i could plausibly use
+# (per the calibration anchors in relevance.py) while dropping the noise
+# floor. Posts missing the column (pre-migration) are included so we
+# don't accidentally exclude content that just hasn't been re-classified.
+MIN_OPPORTUNITY_FOR_DISCOVERY = 0.4
+
 
 async def _fetch_recent_posts(platform: str) -> list[dict[str, Any]]:
+    """Pull recent posts above the da'wah-opportunity floor.
+
+    Mainstream RSS publishes ~50% routine news the model can't form a
+    da'wah theme out of (stock prices, sports scores, traffic alerts).
+    Feeding that noise into Gemini produces newsroom-shaped clusters
+    ("Kebijakan Ekonomi & Bisnis") instead of da'wah-shaped ones
+    ("Persiapan Haji & Kurban"). Filtering at the SQL level keeps the
+    discovery sample focused.
+    """
     async with SessionLocal() as session:
         res = await session.execute(
             select(SocialPost.id, SocialPost.text, SocialPost.posted_at)
             .where(SocialPost.platform == platform)
+            .where(
+                sql_or(
+                    SocialPost.dawah_opportunity.is_(None),
+                    SocialPost.dawah_opportunity >= MIN_OPPORTUNITY_FOR_DISCOVERY,
+                )
+            )
             .order_by(SocialPost.posted_at.desc().nulls_last())
             .limit(RECENT_POST_LIMIT)
         )

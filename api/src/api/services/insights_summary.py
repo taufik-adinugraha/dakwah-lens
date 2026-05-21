@@ -79,6 +79,12 @@ PARAGRAPH 1 — Penjelasan (3-4 sentences in Bahasa Indonesia):
 PARAGRAPH 2 — Nasihah (2-3 sentences in Bahasa Indonesia):
   Practical Islamic counsel tied to what trended. Address the BROAD da'wah audience — da'i giving khutbah, ustadzah leading kajian ibu-ibu, content creators on YouTube/IG/TikTok, parents teaching at home, community organizers, researchers tracking Muslim discourse. Do NOT default to "khutbah Jumat" as the only surface. Mention the angle that resonates across these surfaces. Concrete, not generic.
 
+  TONE GUARDRAILS (PRD §12 — non-negotiable):
+  - Promote rahma (mercy) + hikmah (wisdom). Never confrontational, divisive, or sectarian framing.
+  - Do NOT contradict established ijma' on fundamental aqidah. If a trending topic is sensitive (mazhab differences, modern fiqh debate), counsel HOW to discuss it adabfully rather than picking sides.
+  - Do NOT issue rulings (haram/halal verdicts, fatwa-shaped statements). You're providing a starting point for a da'i to think with, not a fatwa for an audience to act on.
+  - Default to charity in framing. When pointing at a moral failing (corruption, abuse, etc.) focus on the systemic angle and the path forward, not on shaming individuals or groups.
+
 PARAGRAPH 3 — Daleel (ONLY if I provided non-empty daleel below):
   If I have provided daleel passages, cite 2-3 of them. Each line:
     - QS [surah_name] [ayah]: [brief Bahasa Indonesia gloss]
@@ -107,6 +113,12 @@ PARAGRAPH 1 — Context (3-4 sentences in clear, neutral English):
 
 PARAGRAPH 2 — Nasihah (2-3 sentences in clear English):
   Practical Islamic counsel tied to what trended. Address the BROAD da'wah audience — da'i giving khutbah, ustadzah leading kajian, content creators on YouTube/IG/TikTok, parents teaching at home, community organizers, researchers tracking Muslim discourse. Do NOT default to "Friday sermon" as the only surface. Mention the angle that resonates across these surfaces. Concrete, not generic. KEEP da'wah-specific terms (da'i, khutbah, nasihah, daleel, kitab, aqidah, akhlaq, muamalah) as-is — do not translate them to generic English equivalents.
+
+  TONE GUARDRAILS (PRD §12 — non-negotiable):
+  - Promote rahma (mercy) + hikmah (wisdom). Never confrontational, divisive, or sectarian framing.
+  - Do NOT contradict established ijma' on fundamental aqidah. When a trending topic is sensitive (mazhab differences, modern fiqh debate), counsel HOW to discuss it adabfully rather than picking sides.
+  - Do NOT issue rulings (haram/halal verdicts, fatwa-shaped statements). You're providing a starting point for a da'i to think with, not a fatwa for an audience to act on.
+  - Default to charity in framing. When pointing at a moral failing (corruption, abuse, etc.) focus on the systemic angle and the path forward, not on shaming individuals or groups.
 
 PARAGRAPH 3 — Daleel (ONLY if I provided non-empty daleel below):
   If I have provided daleel passages, cite 2-3 of them. Each line:

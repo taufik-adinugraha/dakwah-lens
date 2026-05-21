@@ -190,6 +190,73 @@ def _build_inputs(verses: list[dict[str, object]]) -> tuple[
     return texts, payloads, ids
 
 
+def _embed_with_retry(
+    openai: OpenAI, batch_texts: list[str], max_retries: int = 6
+) -> list[list[float]]:
+    """Call OpenAI embeddings with explicit backoff on 429s.
+
+    Why we need this beyond the SDK's built-in retry: a 1M-token-per-minute
+    TPM ceiling means a 100-chunk batch at ~1000 tokens each consumes a
+    tenth of the bucket per call. Six calls/minute fills it. The SDK
+    catches 429 once and retries on the same second; we need to sleep
+    long enough that the TPM window resets. Use the `Retry-After` hint
+    when present, otherwise exponential backoff capped at 60s.
+    """
+    delay = 5.0
+    for attempt in range(max_retries):
+        try:
+            resp = openai.embeddings.create(
+                model=EMBEDDING_MODEL, input=batch_texts
+            )
+            return [d.embedding for d in resp.data]
+        except Exception as exc:
+            is_rate_limit = "429" in str(exc) or "rate_limit" in str(exc).lower()
+            is_server_error = any(
+                s in str(exc) for s in ("500", "502", "503", "504")
+            )
+            if not (is_rate_limit or is_server_error):
+                raise
+            if attempt == max_retries - 1:
+                raise
+            wait_s = min(60.0, delay)
+            log.warning(
+                "embed.retry",
+                attempt=attempt + 1,
+                max_retries=max_retries,
+                wait_s=round(wait_s, 1),
+                reason="rate_limit" if is_rate_limit else "server_error",
+            )
+            time.sleep(wait_s)
+            delay *= 2
+    # Should be unreachable — raise above on last attempt.
+    raise RuntimeError("_embed_with_retry exhausted without returning")
+
+
+def _existing_point_ids(qdrant: QdrantClient, ids: list[int]) -> set[int]:
+    """Probe Qdrant for ids already in the collection so a re-run can
+    skip them. Uses retrieve() with `with_payload=False, with_vectors=False`
+    — cheap metadata-only lookup. Returns the subset of `ids` already
+    present (or an empty set if the collection doesn't exist yet)."""
+    if not qdrant.collection_exists(COLLECTION):
+        return set()
+    found: set[int] = set()
+    PROBE_BATCH = 1000
+    for i in range(0, len(ids), PROBE_BATCH):
+        chunk = ids[i : i + PROBE_BATCH]
+        try:
+            hits = qdrant.retrieve(
+                collection_name=COLLECTION,
+                ids=chunk,
+                with_payload=False,
+                with_vectors=False,
+            )
+            found.update(int(h.id) for h in hits if h.id is not None)
+        except Exception as exc:
+            log.warning("embed.probe_failed", error=str(exc))
+            break
+    return found
+
+
 def _ensure_collection(qdrant: QdrantClient) -> None:
     """Create or recreate the collection so its vector size matches the
     current embedding model. Avoids the silent-dim-mismatch failure mode."""
@@ -263,37 +330,73 @@ def main() -> None:
     )
     _ensure_collection(qdrant)
 
-    all_vectors: list[list[float]] = []
+    # Skip-already-embedded resume: if Qdrant already has a point for a
+    # given (surah, ayah, chunk_index) id, drop it from this run. Saves
+    # rework when picking up after a rate-limit / connection failure.
+    # Idempotent re-runs cost nothing extra.
+    existing_ids = _existing_point_ids(qdrant, ids)
+    if existing_ids:
+        before = len(texts)
+        kept = [
+            (t, p, i)
+            for t, p, i in zip(texts, payloads, ids, strict=True)
+            if i not in existing_ids
+        ]
+        texts = [k[0] for k in kept]
+        payloads = [k[1] for k in kept]
+        ids = [k[2] for k in kept]
+        log.info(
+            "embed.resume",
+            already_in_qdrant=len(existing_ids),
+            still_to_embed=len(texts),
+            dropped_from_run=before - len(texts),
+        )
+
+    if not texts:
+        print()
+        print(f"✓ Nothing to do — all {len(existing_ids):,} chunks already in Qdrant.")
+        print(f"Qdrant collection `{COLLECTION}` is ready.")
+        return
+
+    # Embed AND upsert per batch so a mid-run crash (rate-limit, network
+    # blip, OOM) doesn't lose hours of work. Was previously two-phase
+    # (embed-all → upsert-all); a 429 at chunk 2300/12000 left zero points
+    # in Qdrant despite ~$0.25 already spent.
     total_tokens = 0
+    upserted = 0
     start = time.time()
     for i in range(0, len(texts), EMBED_BATCH):
-        batch = texts[i : i + EMBED_BATCH]
-        resp = openai.embeddings.create(model=EMBEDDING_MODEL, input=batch)
-        all_vectors.extend(d.embedding for d in resp.data)
-        total_tokens += resp.usage.total_tokens
+        batch_texts = texts[i : i + EMBED_BATCH]
+        batch_ids = ids[i : i + EMBED_BATCH]
+        batch_payloads = payloads[i : i + EMBED_BATCH]
+
+        vectors = _embed_with_retry(openai, batch_texts)
+        # Update tokens estimate post-hoc — we lose .usage on retry paths
+        # but the order-of-magnitude is what matters for the cost summary.
+        total_tokens += sum(len(t) for t in batch_texts) // 4
+
+        points = [
+            PointStruct(id=pid, vector=vec, payload=pl)
+            for pid, vec, pl in zip(batch_ids, vectors, batch_payloads, strict=True)
+        ]
+        qdrant.upsert(collection_name=COLLECTION, points=points)
+        upserted += len(points)
+
         elapsed = time.time() - start
         log.info(
             "embed.batch",
-            done=i + len(batch),
+            done=i + len(batch_texts),
             total=len(texts),
-            tokens=total_tokens,
+            upserted=upserted,
+            tokens_est=total_tokens,
             elapsed_s=round(elapsed, 1),
         )
-
-    points = [
-        PointStruct(id=pid, vector=vec, payload=pl)
-        for pid, vec, pl in zip(ids, all_vectors, payloads, strict=True)
-    ]
-    for i in range(0, len(points), UPSERT_BATCH):
-        chunk = points[i : i + UPSERT_BATCH]
-        qdrant.upsert(collection_name=COLLECTION, points=chunk)
-        log.info("embed.upsert", done=i + len(chunk), total=len(points))
 
     elapsed = time.time() - start
     actual_cost = total_tokens / 1_000_000 * PRICE_PER_1M
     print()
-    print(f"✓ Embedded {len(points):,} chunks across {len(verses):,} ayat")
-    print(f"  tokens used : {total_tokens:>10,}")
+    print(f"✓ Embedded {upserted:,} chunks across {len(verses):,} ayat")
+    print(f"  tokens (est): {total_tokens:>10,}")
     print(f"  elapsed     : {elapsed:>10.1f} s")
     print(f"  cost (USD)  : {actual_cost:>10.4f}")
     print()

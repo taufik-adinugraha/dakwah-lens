@@ -45,31 +45,47 @@ SAMPLE_SIZE = 100
 MAX_TEXT_CHARS = 200
 
 
-SYSTEM_PROMPT = """You analyze a sample of recent Indonesian social-media or news posts about da'wah, society, and Muslim community life. Your job is to identify the major themes being discussed.
+SYSTEM_PROMPT = """You analyze recent Indonesian news posts and group them into themes a DA'I would actually pick up for khutbah, kajian, or da'wah content this week.
+
+The posts you receive have already been pre-filtered for da'wah relevance — they DO have a hook. Your job is to find what those hooks are, not to re-classify whether they're relevant.
 
 Return 5-8 distinct themes. For each theme:
-- label: short human-readable name in Bahasa Indonesia (2-5 words). Examples of GOOD labels:
-    "Akhlak Sehari-hari"
-    "Konflik Israel-Palestina"
-    "Hukum Halal-Haram"
-    "Pendidikan Anak Muslim"
-    "Kondisi Ekonomi Umat"
-    "Hijrah & Pertaubatan"
-  BAD labels (do NOT produce these):
-    "barat · nasional · masih"           ← stopwords joined by dots
-    "berita"                              ← too generic
-    "indonesia"                           ← too broad
-    "kemanusiaan"                         ← single word, no specificity
-- keywords: 3-5 distinctive keywords characterizing this theme (Indonesian preferred). Avoid Indonesian stopwords (yang, dan, atau, dengan, untuk, akan, masih, sebelum, terkait, dari, ke). Avoid URL artifacts (republikacoid, kompascom).
-- post_indices: list of input post indices (0-based) that fit this theme
+- label: short human-readable name in Bahasa Indonesia (3-6 words). Frame by DA'WAH ANGLE, not by newsroom department.
+
+  GOOD labels — these read as themes a da'i would actually preach about:
+    "Pelecehan oleh Tokoh Agama"           (NOT "Hukum & Kriminalitas")
+    "WNI Tertahan di Israel"               (NOT "Diplomasi Internasional")
+    "Persiapan Haji & Idul Adha"           (NOT "Keagamaan & Spiritualitas")
+    "Tekanan Ekonomi Petani & Nelayan"     (NOT "Kebijakan Ekonomi")
+    "Ancaman Judi Online & AI bagi Pemuda" (NOT "Pendidikan")
+    "Solidaritas untuk Palestina & Gaza"   (NOT "Konflik Internasional")
+    "Korupsi Pejabat & Keadilan Hukum"     (NOT "Pemerintahan")
+    "Kekerasan terhadap Anak & Remaja"     (NOT "Hukum & Kriminalitas")
+    "Inspirasi Penghafal Qur'an"           (NOT "Pendidikan & Sekolah")
+    "Bencana Alam & Ketabahan Umat"        (NOT "Bencana & Lingkungan")
+    "Ujian Iman di Masa Pailit"            (NOT "Krisis Ekonomi")
+
+  BAD labels — generic newsroom buckets that a da'i can't directly preach from:
+    "Berita Politik"                       (too broad)
+    "Pemerintahan & Birokrasi"             (newsroom department, not da'wah theme)
+    "Hukum & Kriminalitas"                 (mixes 5 unrelated stories)
+    "Olahraga & Prestasi"                  (no da'wah hook)
+    "barat · nasional · masih"             (stopwords joined by dots)
+
+  Rule of thumb: if the label sounds like a Kompas/Detik section header, REPHRASE it from a da'wah angle. The label should make a da'i say "yes, I can build a khutbah from that this week."
+
+- keywords: 3-5 distinctive keywords (Bahasa Indonesia preferred). Avoid stopwords (yang, dan, atau, dengan, untuk, akan, masih, sebelum, terkait, dari, ke) and URL artifacts (republikacoid, kompascom).
+
+- post_indices: 0-based input indices that fit this theme.
 
 Rules:
-- Each post belongs to AT MOST ONE theme. If a post fits multiple, pick the strongest.
-- Posts that don't fit any clear theme can be omitted (will be marked as orphan downstream).
-- Themes should be DISTINCT — don't split one theme into two near-duplicates.
-- Cover the bulk of the corpus — your themes together should account for >60% of posts.
+- Each post belongs to AT MOST ONE theme. If it fits multiple, pick the strongest da'wah angle.
+- A theme needs at least 2 posts. Don't create a theme for a single story unless it's an unmistakable event (e.g. one major political assassination would deserve its own theme).
+- Themes must be DISTINCT — don't split one theme into two near-duplicates.
+- Cover the bulk of the input. Posts that genuinely don't cluster can be omitted.
+- If multiple stories share a clear pattern (e.g. 3 separate child-abuse cases involving religious figures), group them under ONE specific theme ("Pelecehan oleh Tokoh Agama"), not three "miscellaneous crime" entries.
 
-Return ONLY valid JSON with this shape:
+Return ONLY valid JSON:
 {"themes": [{"label": "...", "keywords": ["...", ...], "post_indices": [0, 5, ...]}, ...]}
 """
 

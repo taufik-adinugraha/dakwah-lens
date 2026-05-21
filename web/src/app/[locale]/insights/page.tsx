@@ -181,28 +181,48 @@ export default async function InsightsPage({
               <div className="mt-4 rounded-lg border border-dashed border-slate-200 bg-slate-50/60 p-6 text-center text-xs text-slate-500">
                 {t("how_coverage_posts_empty")}
               </div>
-            ) : (
-              <div className="mt-4 overflow-hidden rounded-lg border border-slate-200">
-                {trendingRows.map((r, i) => (
-                  <div
-                    key={r.id}
-                    className={`grid grid-cols-[1fr_auto] items-center gap-3 px-3 py-2.5 ${i > 0 ? "border-t border-slate-100" : ""}`}
-                  >
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-slate-800">
-                        {r.label}
-                      </p>
-                      <p className="truncate text-[11px] text-slate-500">
-                        {r.keywords.slice(0, 4).join(" · ") || r.platform}
-                      </p>
-                    </div>
-                    <span className="text-xs tabular-nums text-slate-600">
-                      {r.postCount.toLocaleString()}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
+            ) : (() => {
+              // Anchor the bar widths to the max post_count so the visual
+              // accent reflects relative volume. Was a number-only list;
+              // adding a width-proportional bar makes the dominant theme
+              // pop without forcing the user to read 5 numbers.
+              const maxCount = Math.max(
+                ...trendingRows.map((r) => r.postCount),
+                1,
+              );
+              return (
+                <div className="mt-4 overflow-hidden rounded-lg border border-slate-200">
+                  {trendingRows.map((r, i) => {
+                    const pct = (r.postCount / maxCount) * 100;
+                    return (
+                      <div
+                        key={r.id}
+                        className={`relative grid grid-cols-[1fr_auto] items-center gap-3 px-3 py-2.5 ${i > 0 ? "border-t border-slate-100" : ""}`}
+                      >
+                        {/* Background bar — sits behind the row contents,
+                            width proportional to post_count vs max. */}
+                        <span
+                          aria-hidden
+                          className="pointer-events-none absolute inset-y-0 left-0 bg-brand-50"
+                          style={{ width: `${pct}%` }}
+                        />
+                        <div className="relative min-w-0">
+                          <p className="truncate text-sm font-medium text-slate-800">
+                            {r.label}
+                          </p>
+                          <p className="truncate text-[11px] text-slate-500">
+                            {r.keywords.slice(0, 4).join(" · ") || r.platform}
+                          </p>
+                        </div>
+                        <span className="relative text-xs font-semibold tabular-nums text-slate-700">
+                          {r.postCount.toLocaleString()}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Sentiment + categories */}
@@ -411,6 +431,12 @@ function ExecutiveBriefing({
 
           <p className="mt-5 text-[10px] text-slate-400">
             {t("exec_briefing_model_credit", { model: summary.model })}
+          </p>
+          {/* Sharia compliance disclaimer (PRD §12). The narrative above
+              is AI-assisted — religious responsibility for anything a
+              da'i delivers publicly remains with them, in front of Allah. */}
+          <p className="mt-1.5 text-[10px] italic text-slate-400">
+            {t("exec_briefing_ai_disclaimer")}
           </p>
         </div>
       </div>

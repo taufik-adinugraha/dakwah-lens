@@ -243,6 +243,10 @@ export default async function SegmentPage({
                   t(`dawah_category_${cat}` as Parameters<typeof t>[0])
                 }
               />
+              {/* Sharia compliance disclaimer (PRD §12). */}
+              <p className="mt-4 text-[10px] italic text-slate-400">
+                {t("exec_briefing_ai_disclaimer")}
+              </p>
             </div>
           </div>
         </section>

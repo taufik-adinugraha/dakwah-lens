@@ -1,3 +1,5 @@
+import os from "node:os";
+
 import { desc, sql } from "drizzle-orm";
 
 import { Link } from "@/i18n/navigation";
@@ -130,9 +132,17 @@ export default async function InfraPage({
             <StatTile
               label="CPU (now)"
               value={`${m.cpuPct.toFixed(0)}%`}
-              hint={
-                m.load1m != null ? `load avg ${m.load1m.toFixed(2)}` : undefined
-              }
+              hint={(() => {
+                // CPU cores from /proc inside the web container. Container
+                // inherits the host's logical CPU count when no cpu-limit
+                // is set on the service, so this matches the cores the
+                // worker's psutil measured against — good context for
+                // interpreting the load_1m number.
+                const cores = os.cpus().length;
+                const load =
+                  m.load1m != null ? `load avg ${m.load1m.toFixed(2)}` : "";
+                return load ? `${load} · ${cores} cores` : `${cores} cores`;
+              })()}
               accent={m.cpuPct > 80 ? "rose" : m.cpuPct > 50 ? "amber" : "emerald"}
             />
             <StatTile

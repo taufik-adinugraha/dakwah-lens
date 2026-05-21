@@ -45,18 +45,20 @@ CRITICAL: read the OUTCOME and the dominant frame of the story, not just the und
 POSITIVE — score positive when the story reports a good OUTCOME:
 - JUSTICE SERVED: prosecutions advancing, arrests of suspects, convictions, asset seizures from corrupt officials, sentence demands accepted as fair, drug busts, criminals caught BEFORE acting. The crime itself is sad, but the news here is the resolution. ARREST/CONVICTION VERBS that ALWAYS mark justice-served: "diringkus", "ditangkap", "ditembak" (when applied to perpetrators), "divonis", "dibekuk", "diciduk", "dijerat", "didakwa" (when the actor is the criminal, not victim), "kabur tertangkap". When a headline names a crime AND uses one of these verbs, the lead is the resolution → POSITIVE.
 - CONSUMER BENEFITS: subsidies, discounts (electricity, fuel, transport), 13th-month salary payments, prices going DOWN, wage protections (driver share %, gig-worker rights), worker dispute resolved.
-- CHARITY / DAKWAH: donations, kurban (Eid sacrifice), Hajj milestones, mosque renovations, religious teachings, humanitarian aid.
+- CHARITY / DAKWAH / RELIGIOUS PRACTICE: donations, kurban (Eid sacrifice), Hajj milestones ("jamaah RI tiba di Tanah Suci", "X persen jamaah berangkat", "calon haji"), mosque renovations, religious teachings, humanitarian aid, tahfidz/hafidz achievement. Any story about a religious figure or congregation engaging in worship-adjacent practice is positive — even if the framing sounds offhand ("Ustaz Solmed Gak Pasang Batasan Untuk Kurban" is still a positive kurban story).
 - COOPERATION / SOLIDARITY: anti-imperialist solidarity speeches, regional cooperation, post-disaster mutual aid, inclusive accessibility initiatives.
-- ACHIEVEMENT: research progress, exports growing, industry milestones, currency strengthening, awards won by Indonesian institutions/communities. Personal achievements that inspire — earning a doctorate (especially cumlaude), success stories of small entrepreneurs ("Kisah Sukses X"), regenerasi positif in sports/work, individual lulus / juara / berhasil framings.
+- ACHIEVEMENT: research progress, exports growing, industry milestones, **currency strengthening ("rupiah menguat", "IHSG rebound", "BI-rate keputusan")**, awards won by Indonesian institutions/communities ("raih penghargaan", "raih predikat", "sertifikasi nasional"). Personal achievements that inspire — earning a doctorate (especially cumlaude), success stories of small entrepreneurs ("Kisah Sukses X"), regenerasi positif in sports/work, individual lulus / juara / berhasil framings.
+- ANTI-CORRUPTION ACTION: state body actively seizing or recovering corrupt assets ("Kejati sita lagi Rp X miliar korupsi", "KPK terbitkan sprindik", "Kembangkan kasus bupati"), drug seizures and busts ("Polda Gagalkan peredaran ganja", "BNN Tangkap anggota TNI jaringan narkoba"), preventive policing ("Tim Pemburu Begal", "Patroli Karhutla"). When the article's lead names a state action against crime/corruption, score positive — the existence of a crime is data; the institutional response is the news.
 - INFRASTRUCTURE / DEVELOPMENT: roads built, schools opened, electrification, conservation programs, talent development.
 
 NEGATIVE — score negative when the story is about ongoing harm:
 - VIOLENCE / ABUSE: child sexual abuse (including in religious settings), bullying, school violence (NEVER neutral — read past the administrative framing), murder, assault, kidnapping (WNI captured by Israel), domestic violence, religious-tension incidents.
-- DEATHS: a person found dead ("ditemukan meninggal", "tewas", "wafat" — when the subject is unknown, an ordinary citizen, or a victim of crime/accident). Exception: peaceful death of an elderly public figure where the article is a tribute, not a harm report → neutral.
+- DEATHS / MURDER DISCOVERY: a person found dead ("ditemukan meninggal", "tewas", "wafat", "MAYAT", "korban pembunuhan", "lehernya digorok", "dibunuh sadis" — when the subject is an ordinary citizen, a victim of crime, illness, or accident). The phrase "Polisi Sebut [the crime]" does NOT make this positive — police describing a murder is still a murder report. Justice-served language requires an ARREST verb (diringkus / ditangkap / divonis / dibekuk) applied to the perpetrator, not just police narration of the crime. Exception: peaceful death of an elderly public figure framed as a tribute → neutral.
+- HUMANITARIAN AFTERMATH: "korban bencana", "warga terdampak", "rumah hilang", "ibu dan anak hilang tertimbun longsor" — disaster victims are negative even when the article describes recovery efforts.
 - DISASTERS: earthquakes, eruptions, landslides, fires, floods, disease outbreaks.
 - IMMORAL ACTS: corruption AS IT'S HAPPENING (not as it's being prosecuted), inappropriate viral content, fitnah / defamation.
 - ECONOMIC HARM TO PUBLIC: prices RISING (food, materials), rupiah weakening (when it's the lead), small businesses struggling, budget CUTS to social programs (MBG cut).
-- INJUSTICE / OPPRESSION: WNI captives, attacks on Indonesians abroad, mosque shootings, Islamophobic incidents (the violence is the lead, even if the article is the NU/etc. condemnation).
+- INJUSTICE / OPPRESSION: WNI captives, attacks on Indonesians abroad, mosque shootings, Islamophobic incidents (the violence is the lead, even if the article is the NU/etc. condemnation). Government-response framings ("Kemenlu pantau WNI ditahan Israel", "Istana koordinasi selamatkan WNI", "Keluarga ungkap kontak terakhir korban penculikan") are STILL negative — the underlying topic is oppression-of-Muslims, the government statement is a response to harm, not a positive resolution. A government response only becomes positive when the captives are actually released or a perpetrator is arrested.
 - HOAXES IN PROGRESS (an active hoax/scam being reported). Hoaxes already DEBUNKED → see neutral.
 
 NEUTRAL — score neutral when there's no clear good/bad OUTCOME:
@@ -75,7 +77,10 @@ Read the EVENT and its FRAME, not the writer's tone. News writing is restrained 
 
 Examples (carefully calibrated against real misclassifications):
 - "Tujuh WNI Peserta Global Sumud Flotilla Terkonfirmasi Diculik Israel" → negative (kidnapping is the event)
-- "Tuntutan 18 Tahun Nadiem Dinilai Wajar, Pakar Hukum: Jaksa Punya Bukti Kuat" → positive (justice advancing)
+- "Tuntutan 18 Tahun Nadiem Dinilai Wajar, Pakar Hukum: Jaksa Punya Bukti Kuat" → positive (sentence demand on corruption case accepted as fair = justice advancing)
+- "Kemenlu: WNI yang Ditangkap Israel Bertambah Jadi 9 Orang" → negative (oppression count rising, not a positive resolution)
+- "Istana dan Kemlu Terus Koordinasi Selamatkan WNI yang Ditahan Tentara Israel" → negative (government response to oppression — captives still held)
+- "Keluarga Ungkap Kontak Terakhir Thoudy Badai Sebelum Diculik Israel" → negative (kidnapping context)
 - "Pria Paruh Baya Cabuli Bocah 6 Tahun di Kamar Mandi Masjid" → negative (child abuse)
 - "Ulah Bullying Siswa SD di Nabire Seret 13 Orang Tua ke Sekolah" → negative (bullying, not "parents at school")
 - "Bareskrim Bongkar Pabrik Kosmetik Ilegal Berbahan Merkuri" → positive (illegal factory busted)
@@ -97,6 +102,21 @@ Examples (carefully calibrated against real misclassifications):
 - "Qodari Tegaskan Presiden Prabowo Perkuat Pengawasan Ekspor demi Jalankan Pasal 33 UUD 1945" → neutral (political spin, no action yet)
 - "3 Kapal Perang Pakistan Tiba-Tiba Bersandar di Jakarta, Ada Urusan Apa?" → neutral (ambiguous foreign arrival without outcome)
 - "Erin Bantah Punya Perilaku Kasar ke ART" → neutral (celebrity denial, allegation unconfirmed)
+- "MAYAT di Banjar Cabe Darmasaba Ternyata Korban Pembunuhan Berencana, Polisi Sebut Lehernya Digorok" → negative (murder discovery — "Polisi Sebut" is narration of the crime, not arrest)
+- "Kuasa Hukum Aca Siapkan Saksi Meringankan dalam Sidang Kasus Pembunuhan" → neutral (legal procedure, no outcome)
+- "Pria Ditemukan Meninggal di Sentani, Saksi Sebut Korban Sempat Mengeluh Demam" → negative (death of ordinary citizen, even if natural cause)
+- "Kejati Kaltim sita lagi Rp57,45 miliar korupsi lahan transmigrasi" → positive (asset seizure from corrupt)
+- "BNN Tangkap Anggota TNI terkait Jaringan Narkoba Aceh-Bogor" → positive (justice served + internal corruption surfaced)
+- "Polda Metro Jaya Gagalkan Peredaran 2 Kg Ganja di Jaktim" → positive (drug bust)
+- "Tim Pemburu Begal PMJ Gandeng Poskamling-Pegiat Medsos Buru Pelaku" → positive (preventive policing)
+- "Kembangkan Kasus Bupati Ponorogo, KPK Terbitkan 2 Sprindik Baru" → positive (corruption case advancing)
+- "Rupiah Menguat Usai Pidato Presiden dan Keputusan Suku Bunga BI" → positive (currency strengthening)
+- "Pemkab Sidoarjo Raih Penghargaan Kearsipan Terbaik Nasional" → positive (institutional achievement)
+- "Gus Irfan: 93 Persen Jamaah RI Sudah Tiba di Tanah Suci" → positive (Hajj milestone)
+- "Ustaz Solmed Gak Pasang Batasan Anggaran Untuk Kurban" → positive (kurban story even with offhand framing)
+- "Sapi Jumbo 'Mayor' Milik Warga Bandung Barat Dipesan Jadi Hewan Kurban Presiden" → positive (kurban story)
+- "Pemkab Agam upayakan tambahan lahan relokasi warga korban bencana" → negative (humanitarian aftermath — bencana korban are still negative)
+- "Longsor di Batangtoru Tapanuli Selatan, Ibu dan Anak Hilang Tertimbun" → negative (disaster victims missing)
 
 Return only valid JSON."""
 
