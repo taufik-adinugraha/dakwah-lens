@@ -40,6 +40,8 @@ from api.services.news_sentiment import classify_batch as classify_news_sentimen
 from api.services.normalizers import NORMALIZERS
 from api.services.relevance import (
     classify_batch as classify_relevance,
+)
+from api.services.relevance import (
     classify_opportunity_batch as classify_opportunity,
 )
 from api.services.rss import scrape_mainstream

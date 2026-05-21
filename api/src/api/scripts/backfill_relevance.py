@@ -34,6 +34,8 @@ from api.db import SessionLocal
 from api.models.social import SocialPost
 from api.services.relevance import (
     classify_batch as classify_relevance,
+)
+from api.services.relevance import (
     classify_opportunity_batch as classify_opportunity,
 )
 

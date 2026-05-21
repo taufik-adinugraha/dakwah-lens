@@ -31,6 +31,8 @@ from api.models.social import SocialPost
 from api.services.apify import scrape_x
 from api.services.relevance import (
     classify_batch as classify_relevance,
+)
+from api.services.relevance import (
     classify_opportunity_batch as classify_opportunity,
 )
 from api.services.sentiment import classify_batch as classify_sentiment
