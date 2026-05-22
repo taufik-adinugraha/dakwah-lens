@@ -26,7 +26,14 @@ from typing import Any
 
 import structlog
 from google import genai
+from google.genai import errors as genai_errors
 from google.genai import types
+from tenacity import (
+    Retrying,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from api.config import settings
 
@@ -168,28 +175,46 @@ def discover_topics(
     }
 
     client = _get_client()
+    # Tenacity wrapper around generate_content. The genai client has its
+    # own short-window retry but it gives up too fast on intermittent 503s
+    # ("This model is currently experiencing high demand"). Observed on
+    # 2026-05-22 04:00 WIB: a single 503 → recluster_all returned with
+    # `{'mainstream': 0}`, no topics created for the day, briefings at
+    # 04:30 used stale yesterday-topic data. Adding our own backoff
+    # gives the model 3 chances over ~2.5 min before we give up; if all
+    # fail we still fall through to the soft-empty return so the task
+    # doesn't crash and the existing topics rows stay intact.
     try:
-        resp = client.models.generate_content(
-            model=MODEL,
-            contents=user_prompt,
-            config=types.GenerateContentConfig(
-                system_instruction=SYSTEM_PROMPT,
-                response_mime_type="application/json",
-                response_schema=response_schema,
-                temperature=0.2,
-                # 16K output budget so the model can emit full post_indices
-                # arrays for 5-8 themes over the full 7-day pool. The
-                # default ~8K was being silently exhausted on a 274-post
-                # input, producing a truncated JSON that failed to parse
-                # and persisted ZERO topics (2026-05-21).
-                max_output_tokens=16384,
-                # Disable thinking — this is a "bucket inputs into named
-                # groups" task with hard rules in the system prompt, not a
-                # reasoning problem. Thinking tokens were eating into the
-                # output budget AND adding ~200s of latency per call.
-                thinking_config=types.ThinkingConfig(thinking_budget=0),
-            ),
-        )
+        for attempt in Retrying(
+            stop=stop_after_attempt(3),
+            wait=wait_exponential(multiplier=10, min=10, max=120),
+            retry=retry_if_exception_type(genai_errors.ServerError),
+            reraise=True,
+        ):
+            with attempt:
+                resp = client.models.generate_content(
+                    model=MODEL,
+                    contents=user_prompt,
+                    config=types.GenerateContentConfig(
+                        system_instruction=SYSTEM_PROMPT,
+                        response_mime_type="application/json",
+                        response_schema=response_schema,
+                        temperature=0.2,
+                        # 16K output budget so the model can emit full
+                        # post_indices arrays for 5-8 themes over the full
+                        # 7-day pool. The default ~8K was being silently
+                        # exhausted on a 274-post input, producing a
+                        # truncated JSON that failed to parse and persisted
+                        # ZERO topics (2026-05-21).
+                        max_output_tokens=16384,
+                        # Disable thinking — this is a "bucket inputs into
+                        # named groups" task with hard rules in the system
+                        # prompt, not a reasoning problem. Thinking tokens
+                        # were eating into the output budget AND adding
+                        # ~200s of latency per call.
+                        thinking_config=types.ThinkingConfig(thinking_budget=0),
+                    ),
+                )
     except Exception:
         log.exception("topic_discovery.gemini_failed", platform=platform)
         return []
