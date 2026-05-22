@@ -21,9 +21,11 @@ MAX_BATCH per Gemini call to amortize system-prompt tokens.
 from __future__ import annotations
 
 import json
+import time
 
 import structlog
 from google import genai
+from google.genai import errors as genai_errors
 from google.genai import types
 
 from api.config import settings
@@ -38,6 +40,14 @@ MODEL = "gemini-2.5-flash-lite"
 # the model's processing window even when Gemini is under load. Doubles
 # the call count but each item is still ~$0.0001 — well inside cap.
 MAX_BATCH = 25
+
+# Retry config for transient Gemini 5xx (mostly 503 "model overloaded" during
+# Indonesia daytime traffic peaks). Three attempts with exponential backoff
+# is enough to absorb the typical ~10-30s overload windows; longer outages
+# fall through to a NULL sentiment_label which `retry_failed_sentiment`
+# picks up on its 2-hourly cron.
+MAX_RETRIES = 3
+RETRY_BASE_SLEEP_S = 4.0
 
 _LABELS = ("positive", "neutral", "negative")
 
@@ -141,19 +151,21 @@ def _get_client() -> genai.Client:
     return _client
 
 
-def _neutral_result() -> SentimentResult:
-    return SentimentResult(
-        label="neutral",
-        score=1.0,
-        raw={"positive": 0.0, "neutral": 1.0, "negative": 0.0},
-    )
-
-
-def classify(text: str) -> SentimentResult:
+def classify(text: str) -> SentimentResult | None:
     return classify_batch([text])[0]
 
 
-def classify_batch(texts: list[str]) -> list[SentimentResult]:
+def classify_batch(texts: list[str]) -> list[SentimentResult | None]:
+    """Classify a batch of news items.
+
+    Returns a same-length list aligned with `texts`. An entry is `None`
+    when the Gemini call for that chunk exhausted MAX_RETRIES (e.g. a
+    sustained 503 outage). Callers should write `sentiment_label=NULL`
+    for None entries so the `retry_failed_sentiment` worker task picks
+    them up later. Previously these used to be force-labeled neutral
+    with score 1.0, which was indistinguishable from a real confident
+    neutral and silently degraded the dashboard's sentiment mix.
+    """
     if not texts:
         return []
 
@@ -163,23 +175,21 @@ def classify_batch(texts: list[str]) -> list[SentimentResult]:
         try:
             scored = _classify_chunk(chunk)
         except Exception:
-            # A Gemini outage shouldn't poison an ingest run — fall back
-            # to neutral so the rest of the pipeline (relevance, upsert)
-            # still commits its work.
-            log.exception("news_sentiment.chunk_failed", batch_size=len(chunk))
-            scored = [_neutral_result() for _ in chunk]
+            # All retries exhausted. Leave `None` in the slots so the
+            # caller can write NULL labels — `retry_failed_sentiment`
+            # cron retries them every 2h.
+            log.exception(
+                "news_sentiment.chunk_failed_after_retries",
+                batch_size=len(chunk),
+            )
+            continue
         for i, r in enumerate(scored):
             results[start + i] = r
 
-    for i, r in enumerate(results):
-        if r is None:
-            log.warning("news_sentiment.missing_result", index=i)
-            results[i] = _neutral_result()
-
-    return [r for r in results if r is not None]
+    return results
 
 
-def _classify_chunk(texts: list[str]) -> list[SentimentResult]:
+def _classify_chunk(texts: list[str]) -> list[SentimentResult | None]:
     client = _get_client()
 
     numbered = "\n\n".join(
@@ -200,16 +210,51 @@ def _classify_chunk(texts: list[str]) -> list[SentimentResult]:
         },
     }
 
-    resp = client.models.generate_content(
-        model=MODEL,
-        contents=user_prompt,
-        config=types.GenerateContentConfig(
-            system_instruction=SYSTEM_PROMPT,
-            response_mime_type="application/json",
-            response_schema=response_schema,
-            temperature=0.1,
-        ),
-    )
+    # Retry loop — Gemini Flash-Lite returns 503 "model overloaded" in
+    # bursts during Indonesia daytime peaks. 3 attempts × exponential
+    # backoff (4s, 8s, 16s) absorbs most of those windows. On final
+    # failure we let the exception bubble; `classify_batch` catches and
+    # leaves NULL labels for the cron retry job to pick up.
+    last_exc: Exception | None = None
+    resp = None
+    for attempt in range(MAX_RETRIES):
+        try:
+            resp = client.models.generate_content(
+                model=MODEL,
+                contents=user_prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=SYSTEM_PROMPT,
+                    response_mime_type="application/json",
+                    response_schema=response_schema,
+                    temperature=0.1,
+                ),
+            )
+            break
+        except genai_errors.ServerError as exc:
+            last_exc = exc
+            if attempt == MAX_RETRIES - 1:
+                log.warning(
+                    "news_sentiment.gemini_5xx_giveup",
+                    attempt=attempt + 1,
+                    batch_size=len(texts),
+                    error=str(exc)[:200],
+                )
+                raise
+            wait_s = RETRY_BASE_SLEEP_S * (2**attempt)
+            log.info(
+                "news_sentiment.gemini_5xx_retry",
+                attempt=attempt + 1,
+                wait_s=wait_s,
+                batch_size=len(texts),
+            )
+            time.sleep(wait_s)
+    if resp is None:
+        # Defensive: shouldn't reach here because the final attempt
+        # either breaks or raises, but keeps the type-checker happy.
+        raise RuntimeError(
+            "news_sentiment: retry loop exited without response"
+        ) from last_exc
+
     raw = resp.text or "[]"
     parsed: list[dict[str, float]] = json.loads(raw)
 
@@ -262,8 +307,10 @@ def _classify_chunk(texts: list[str]) -> list[SentimentResult]:
             expected=len(texts),
             got=len(results),
         )
-        # Pad with neutral so caller can zip safely.
-        while len(results) < len(texts):
-            results.append(_neutral_result())
+        # Pad with None so callers see the same "unclassified" signal as
+        # for a full-batch retry exhaustion. Better to surface the holes
+        # than fabricate confident-neutral labels that hide the model
+        # misbehaving.
+        results.extend([None] * (len(texts) - len(results)))
 
     return results

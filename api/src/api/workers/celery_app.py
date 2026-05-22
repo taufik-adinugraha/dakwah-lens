@@ -50,11 +50,20 @@ celery_app.conf.update(
     # cross-section of da'wah-relevant content. Mainstream/YouTube have no
     # Apify cost, so they run more often.
     beat_schedule={
-        # Mainstream RSS — free, every 2 hours.
+        # Mainstream RSS — free, every 2 hours (00:00, 02:00, … WIB).
         "ingest-mainstream": {
             "task": "api.workers.ingest.run_ingest",
             "schedule": crontab(minute=0, hour="*/2"),
             "kwargs": {"platform": "mainstream", "query": "", "limit": 40},
+        },
+        # Retry mainstream rows whose sentiment label is NULL (Gemini 5xx
+        # exhausted the in-line retry budget). Runs at 01:00, 03:00, … —
+        # one hour OFFSET from the RSS ingest so a Gemini overload that
+        # took down the previous tick has time to recover. Almost always
+        # a no-op (0-25 rows); cost is < $0.003 per run when it does work.
+        "retry-failed-sentiment": {
+            "task": "api.workers.ingest.retry_failed_sentiment",
+            "schedule": crontab(minute=0, hour="1-23/2"),
         },
         # Social-media platforms scrape the FULL `ingest_queries` pool
         # (admin-editable at /admin/system/queries). Cadence varies by

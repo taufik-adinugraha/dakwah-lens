@@ -87,17 +87,23 @@ async def _run(dry_run: bool) -> int:
 
     # Step 3: write everything back. We always update text (idempotent
     # if unchanged) + sentiment fields. Relevance is left alone.
+    # A `None` element in new_sentiments means the chunk hit a sustained
+    # Gemini 5xx and retries were exhausted — we write NULL labels so
+    # `retry_failed_sentiment` can pick them up on its 2-hourly cron.
     n_written = 0
     n_label_changed = 0
+    n_null = 0
     async with SessionLocal() as session:
         for p, s in zip(posts, new_sentiments, strict=False):
             new_text = text_by_id[str(p.id)]
-            values: dict[str, object] = {
+            values: dict[str, object | None] = {
                 "text": new_text,
-                "sentiment_label": s.label,
-                "sentiment_score": s.score,
+                "sentiment_label": s.label if s is not None else None,
+                "sentiment_score": s.score if s is not None else None,
             }
-            if s.label != p.sentiment_label:
+            if s is None:
+                n_null += 1
+            elif s.label != p.sentiment_label:
                 n_label_changed += 1
             await session.execute(
                 update(SocialPost).where(SocialPost.id == p.id).values(**values)
@@ -107,7 +113,8 @@ async def _run(dry_run: bool) -> int:
 
     print(
         f"\n✓ Updated {n_written} rows  "
-        f"({n_text_changed} text changes, {n_label_changed} sentiment flips)."
+        f"({n_text_changed} text changes, {n_label_changed} sentiment flips, "
+        f"{n_null} unclassified — retry cron will reprocess)."
     )
     return n_written
 

@@ -13,7 +13,7 @@ items scraped, duration, error).
 from __future__ import annotations
 
 import asyncio
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 import structlog
 
@@ -345,6 +345,96 @@ def generate_insights_summary() -> dict[str, object]:
     except Exception:
         log.exception("insights_summary.failed")
         return {"error": "generate_failed"}
+
+
+@celery_app.task(name="api.workers.ingest.retry_failed_sentiment")
+def retry_failed_sentiment() -> dict[str, int]:
+    """Re-classify mainstream posts whose sentiment label is NULL.
+
+    These rows result from sustained Gemini 5xx outages that exhausted
+    the in-line retry budget inside `news_sentiment._classify_chunk`.
+    Rather than burning $0.09 on a full reclean we just pick up the
+    stragglers — usually 0-25 rows after each ingest tick.
+
+    Scoped to the last 14 days so a backlog from an old outage doesn't
+    grow unbounded. Caps at 200 rows per run so a worst-case batch
+    can't blow our Gemini-per-minute quota.
+
+    Schedule: every 2h offset 1h from the RSS ingest (so 01:00, 03:00
+    … WIB). The offset means an RSS-induced 503 has a full hour to
+    recover before we try the failed rows again.
+    """
+    from sqlalchemy import and_, select, update
+
+    from api.db import SessionLocal
+    from api.models.social import SocialPost
+    from api.services.news_sentiment import (
+        classify_batch as classify_news_sentiment,
+    )
+
+    cutoff = datetime.now(UTC) - timedelta(days=14)
+
+    async def _runner() -> dict[str, int]:
+        async with SessionLocal() as session:
+            rows = (
+                await session.execute(
+                    select(SocialPost.id, SocialPost.text)
+                    .where(
+                        and_(
+                            SocialPost.platform == "mainstream",
+                            SocialPost.sentiment_label.is_(None),
+                            SocialPost.text.is_not(None),
+                            SocialPost.posted_at >= cutoff,
+                        )
+                    )
+                    .order_by(SocialPost.posted_at.desc().nulls_last())
+                    .limit(200)
+                )
+            ).all()
+
+            if not rows:
+                log.info("retry_failed_sentiment.nothing_to_do")
+                return {"checked": 0, "relabeled": 0, "still_failed": 0}
+
+            ids = [r.id for r in rows]
+            texts = [r.text or "" for r in rows]
+            scored = classify_news_sentiment(texts)
+
+            relabeled = 0
+            still_failed = 0
+            for post_id, s in zip(ids, scored, strict=False):
+                if s is None:
+                    still_failed += 1
+                    # Leave label NULL — next cron tick retries.
+                    continue
+                await session.execute(
+                    update(SocialPost)
+                    .where(SocialPost.id == post_id)
+                    .values(
+                        sentiment_label=s.label,
+                        sentiment_score=s.score,
+                    )
+                )
+                relabeled += 1
+            await session.commit()
+
+            log.info(
+                "retry_failed_sentiment.done",
+                checked=len(rows),
+                relabeled=relabeled,
+                still_failed=still_failed,
+            )
+            return {
+                "checked": len(rows),
+                "relabeled": relabeled,
+                "still_failed": still_failed,
+            }
+
+    try:
+        return asyncio.run(_runner())
+    except Exception:
+        log.exception("retry_failed_sentiment.failed")
+        return {"checked": 0, "relabeled": 0, "still_failed": 0}
 
 
 @celery_app.task(name="api.workers.ingest.reconcile_apify_costs")
