@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import {
   BookOpen,
   Check,
@@ -12,6 +12,7 @@ import {
   Home,
   Mic,
   Printer,
+  Quote,
   Smartphone,
   Users,
   X,
@@ -98,6 +99,41 @@ const KIND_ICON_TONE: Record<CardKind, string> = {
   content: "bg-sky-100 text-sky-700",
   genz: "bg-violet-100 text-violet-700",
   action: "bg-teal-100 text-teal-700",
+};
+
+/** Modal header bar tint per card kind — the colored strip across the
+ *  top of the focus modal echoes the card's accent so the user keeps
+ *  visual continuity between clicking and reading. */
+const KIND_HEADER_BG: Record<CardKind, string> = {
+  khutbah: "bg-gradient-to-r from-emerald-50 via-white to-emerald-50",
+  kajian: "bg-gradient-to-r from-rose-50 via-white to-rose-50",
+  home: "bg-gradient-to-r from-amber-50 via-white to-amber-50",
+  content: "bg-gradient-to-r from-sky-50 via-white to-sky-50",
+  genz: "bg-gradient-to-r from-violet-50 via-white to-violet-50",
+  action: "bg-gradient-to-r from-teal-50 via-white to-teal-50",
+};
+
+/** Accent border-bottom for the header, drives the section h3 underline
+ *  inside the modal body as well. */
+const KIND_ACCENT_BORDER: Record<CardKind, string> = {
+  khutbah: "border-emerald-200",
+  kajian: "border-rose-200",
+  home: "border-amber-200",
+  content: "border-sky-200",
+  genz: "border-violet-200",
+  action: "border-teal-200",
+};
+
+/** Blockquote palette per card kind — matches the section accent so a
+ *  hadith inside the khutbah modal reads emerald, inside a Gen Z guide
+ *  reads violet, etc. */
+const KIND_QUOTE: Record<CardKind, { bg: string; border: string; icon: string }> = {
+  khutbah: { bg: "bg-emerald-50/70", border: "border-emerald-400", icon: "text-emerald-500" },
+  kajian: { bg: "bg-rose-50/70", border: "border-rose-400", icon: "text-rose-500" },
+  home: { bg: "bg-amber-50/70", border: "border-amber-400", icon: "text-amber-500" },
+  content: { bg: "bg-sky-50/70", border: "border-sky-400", icon: "text-sky-500" },
+  genz: { bg: "bg-violet-50/70", border: "border-violet-400", icon: "text-violet-500" },
+  action: { bg: "bg-teal-50/70", border: "border-teal-400", icon: "text-teal-500" },
 };
 
 /**
@@ -461,16 +497,34 @@ function DeliverableModal({
       <div
         className="deliverable-printable relative flex h-[92dvh] w-full max-w-3xl flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:h-[88dvh] sm:rounded-2xl"
       >
-        {/* Top bar: title + close */}
-        <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-5 py-3 sm:px-6">
-          <h2 className="truncate text-base font-bold text-slate-900 sm:text-lg">
-            {card.heading}
-          </h2>
+        {/* Top bar: title + close — tinted with the card's accent tone so
+            the modal reads as a continuation of the card the user just
+            clicked, not a generic dialog. */}
+        <div
+          className={`flex items-center justify-between gap-3 border-b-2 px-5 py-3.5 sm:px-6 ${
+            card.kind ? KIND_HEADER_BG[card.kind] : "bg-white"
+          } ${card.kind ? KIND_ACCENT_BORDER[card.kind] : "border-slate-200"}`}
+        >
+          <div className="flex min-w-0 items-center gap-2.5">
+            {card.kind && (
+              <span
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${KIND_ICON_TONE[card.kind]}`}
+              >
+                {(() => {
+                  const Icon = KIND_ICON[card.kind];
+                  return <Icon className="h-4 w-4" />;
+                })()}
+              </span>
+            )}
+            <h2 className="truncate text-base font-bold text-slate-900 sm:text-lg">
+              {card.heading}
+            </h2>
+          </div>
           <button
             type="button"
             onClick={onClose}
             aria-label={labels.close}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-slate-500 transition hover:bg-white hover:text-slate-900"
           >
             <X className="h-5 w-5" />
           </button>
@@ -479,7 +533,9 @@ function DeliverableModal({
         {/* Scrollable body */}
         <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-8 sm:py-7">
           <article className="text-pretty text-slate-800">
-            <ReactMarkdown components={MODAL_MARKDOWN_COMPONENTS}>
+            <ReactMarkdown
+              components={makeModalMarkdownComponents(card.kind)}
+            >
               {card.body}
             </ReactMarkdown>
           </article>
@@ -534,48 +590,117 @@ function DeliverableModal({
 }
 
 /**
- * Modal-specific markdown styling. Larger type than the brief body since
- * the modal is a focus surface — fewer competing elements, so we can
- * afford a comfortable reading size.
+ * Same Arabic-transliteration heuristic used by `BriefingNarrative` —
+ * detects du'a / dhikr paragraphs by density of long-vowel + diacritic
+ * marks (ā ī ū ḥ ṣ ẓ etc.) and the standard opening tokens (Allāhumma,
+ * Rabbanā…). Pure paragraphs are styled as "sacred-text cards" instead
+ * of plain prose so the khateeb / pembaca can read the du'a comfortably
+ * off a phone screen.
  */
-const MODAL_MARKDOWN_COMPONENTS: Components = {
-  h1: ({ children }) => (
-    <h1 className="mt-6 mb-2 text-balance text-xl font-bold text-slate-900 first:mt-0 sm:text-2xl">
-      {children}
-    </h1>
-  ),
-  h2: ({ children }) => (
-    <h2 className="mt-6 mb-2 text-balance text-lg font-bold text-slate-900 first:mt-0 sm:text-xl">
-      {children}
-    </h2>
-  ),
-  h3: ({ children }) => (
-    <h3 className="mt-5 mb-1 text-balance text-base font-semibold uppercase tracking-wider text-emerald-700">
-      {children}
-    </h3>
-  ),
-  p: ({ children }) => (
-    <p className="mt-3 text-pretty leading-[1.75] text-slate-800">{children}</p>
-  ),
-  ul: ({ children }) => (
-    <ul className="mt-3 list-disc space-y-1.5 pl-5 text-slate-800">
-      {children}
-    </ul>
-  ),
-  ol: ({ children }) => (
-    <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-slate-800">
-      {children}
-    </ol>
-  ),
-  li: ({ children }) => <li className="leading-[1.75]">{children}</li>,
-  blockquote: ({ children }) => (
-    <blockquote className="my-3 border-l-2 border-emerald-300 bg-emerald-50/40 py-2 pl-4 pr-3 text-slate-700">
-      {children}
-    </blockquote>
-  ),
-  strong: ({ children }) => (
-    <strong className="font-semibold text-slate-900">{children}</strong>
-  ),
-  em: ({ children }) => <em className="italic text-slate-700">{children}</em>,
-  hr: () => <hr className="my-6 border-slate-200" />,
-};
+function modalLooksLikeArabic(text: string): boolean {
+  if (text.length < 40) return false;
+  const strong = /(allahumma|al[\s-]?ḥamdu|inna [aA]llaha|rabbana|subḥāna|wa[\s-]?ṣalli|allāhumma)/i;
+  if (strong.test(text)) return true;
+  const marks = text.match(/[āīūṣḍḥṭẓʿʾ]/g);
+  if (!marks) return false;
+  return marks.length / text.length >= 0.02;
+}
+
+function modalChildrenToString(children: React.ReactNode): string {
+  if (typeof children === "string") return children;
+  if (typeof children === "number") return String(children);
+  if (Array.isArray(children)) return children.map(modalChildrenToString).join("");
+  if (
+    children &&
+    typeof children === "object" &&
+    "props" in (children as object)
+  ) {
+    return modalChildrenToString(
+      (children as { props: { children?: React.ReactNode } }).props.children,
+    );
+  }
+  return "";
+}
+
+/**
+ * Modal-specific markdown styling. Larger type than the brief body since
+ * the modal is a focus surface. Takes the card's `kind` so blockquotes
+ * and section headings inherit the card's accent color — a hadith inside
+ * the Khutbah modal reads emerald, inside Gen Z reads violet, etc.
+ */
+function makeModalMarkdownComponents(kind: CardKind | null): Components {
+  const quote = kind ? KIND_QUOTE[kind] : KIND_QUOTE.khutbah;
+  const accent = kind
+    ? KIND_ICON_TONE[kind].replace("bg-", "text-").replace("-100", "-700").split(" ")[0]
+    : "text-slate-700";
+
+  return {
+    h1: ({ children }) => (
+      <h1
+        className={`mt-6 mb-3 text-balance text-xl font-bold text-slate-900 first:mt-0 sm:text-2xl`}
+      >
+        {children}
+      </h1>
+    ),
+    h2: ({ children }) => (
+      <h2
+        className={`mt-7 mb-2 text-balance border-b pb-1.5 text-lg font-bold text-slate-900 first:mt-0 sm:text-xl ${kind ? KIND_ACCENT_BORDER[kind] : "border-slate-200"}`}
+      >
+        {children}
+      </h2>
+    ),
+    h3: ({ children }) => (
+      <h3
+        className={`mt-5 mb-1 text-balance text-[13px] font-semibold uppercase tracking-wider ${accent}`}
+      >
+        {children}
+      </h3>
+    ),
+    p: ({ children }) => {
+      const text = modalChildrenToString(children);
+      if (modalLooksLikeArabic(text)) {
+        return (
+          <p
+            className="my-5 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/90 via-white to-teal-50/70 px-6 py-5 text-center font-amiri text-base leading-[2] text-emerald-950 shadow-sm sm:px-8 sm:text-[17px]"
+          >
+            {children}
+          </p>
+        );
+      }
+      return (
+        <p className="mt-3 text-pretty leading-[1.75] text-slate-800">
+          {children}
+        </p>
+      );
+    },
+    ul: ({ children }) => (
+      <ul className="mt-3 list-disc space-y-1.5 pl-5 text-slate-800">
+        {children}
+      </ul>
+    ),
+    ol: ({ children }) => (
+      <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-slate-800">
+        {children}
+      </ol>
+    ),
+    li: ({ children }) => <li className="leading-[1.75]">{children}</li>,
+    blockquote: ({ children }) => (
+      <blockquote
+        className={`relative my-4 rounded-xl border-l-4 ${quote.border} ${quote.bg} px-5 py-3 pl-12 text-slate-700 shadow-sm`}
+      >
+        <Quote
+          className={`absolute left-3 top-3 h-5 w-5 opacity-50 ${quote.icon}`}
+          aria-hidden
+        />
+        {children}
+      </blockquote>
+    ),
+    strong: ({ children }) => (
+      <strong className="font-semibold text-slate-900">{children}</strong>
+    ),
+    em: ({ children }) => <em className="italic text-slate-700">{children}</em>,
+    hr: () => (
+      <hr className="my-6 border-0 border-t border-dashed border-slate-300" />
+    ),
+  };
+}

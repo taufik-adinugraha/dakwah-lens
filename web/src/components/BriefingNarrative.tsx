@@ -1,4 +1,12 @@
 import ReactMarkdown, { type Components } from "react-markdown";
+import {
+  BarChart3,
+  BookOpen,
+  Compass,
+  Flame,
+  Quote,
+  Sparkles,
+} from "lucide-react";
 
 import type { DaleelRef } from "@/db/schema";
 import { BriefDeliverableCards } from "./BriefDeliverableCards";
@@ -94,12 +102,12 @@ export function BriefingNarrative({
       <article className="text-pretty text-slate-800">
         {split ? (
           <>
-            <ReactMarkdown components={MARKDOWN_COMPONENTS}>
+            <ReactMarkdown components={makeMarkdownComponents()}>
               {split.before}
             </ReactMarkdown>
             {split.section4 && (
               <>
-                <ReactMarkdown components={MARKDOWN_COMPONENTS}>
+                <ReactMarkdown components={makeMarkdownComponents()}>
                   {split.section4HeadingLine}
                 </ReactMarkdown>
                 <BriefDeliverableCards
@@ -110,12 +118,14 @@ export function BriefingNarrative({
                 />
               </>
             )}
-            <ReactMarkdown components={MARKDOWN_COMPONENTS}>
+            <ReactMarkdown components={makeMarkdownComponents()}>
               {split.after}
             </ReactMarkdown>
           </>
         ) : (
-          <ReactMarkdown components={MARKDOWN_COMPONENTS}>{text}</ReactMarkdown>
+          <ReactMarkdown components={makeMarkdownComponents()}>
+            {text}
+          </ReactMarkdown>
         )}
       </article>
 
@@ -188,54 +198,208 @@ function splitSection4(
 }
 
 /**
- * Tailwind-class overrides per markdown element. Tuned for the briefing
- * card aesthetic — section headings use emerald accents to match the
- * existing /insights briefing card chrome; blockquotes get a left rule
- * to read as inline citation context.
+ * Per-section visual themes — each ## h2 in the briefing gets a unique
+ * accent color + lucide icon, so the long-form doc scans as a sequence
+ * of color-coded chapters rather than one continuous grey block.
+ * Match is case-insensitive substring against the heading text — accepts
+ * both Indonesian and English wording.
  */
-const MARKDOWN_COMPONENTS: Components = {
-  h2: ({ children }) => (
-    <h2 className="mt-7 mb-2 border-b border-emerald-100 pb-1.5 text-balance text-lg font-bold tracking-tight text-slate-900 first:mt-0 sm:text-xl">
-      {children}
-    </h2>
-  ),
-  h3: ({ children }) => (
-    <h3 className="mt-5 mb-1 text-balance text-sm font-semibold uppercase tracking-wider text-emerald-700 sm:text-[15px]">
-      {children}
-    </h3>
-  ),
-  p: ({ children }) => (
-    <p className="mt-2 text-pretty leading-relaxed text-slate-700">
-      {children}
-    </p>
-  ),
-  ul: ({ children }) => (
-    <ul className="mt-2 list-disc space-y-1 pl-5 text-slate-700">{children}</ul>
-  ),
-  ol: ({ children }) => (
-    <ol className="mt-2 list-decimal space-y-1 pl-5 text-slate-700">
-      {children}
-    </ol>
-  ),
-  li: ({ children }) => <li className="leading-relaxed">{children}</li>,
-  blockquote: ({ children }) => (
-    <blockquote className="my-2 border-l-2 border-emerald-300 bg-emerald-50/40 py-2 pl-4 pr-3 text-slate-700">
-      {children}
-    </blockquote>
-  ),
-  strong: ({ children }) => (
-    <strong className="font-semibold text-slate-900">{children}</strong>
-  ),
-  em: ({ children }) => <em className="italic text-slate-700">{children}</em>,
-  a: ({ href, children }) => (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-emerald-700 underline decoration-emerald-300 underline-offset-2 hover:text-emerald-900"
-    >
-      {children}
-    </a>
-  ),
-  hr: () => <hr className="my-5 border-slate-200" />,
+const SECTION_THEMES: Array<{
+  match: RegExp;
+  icon: typeof Sparkles;
+  /** Tailwind classes for the icon container chip. */
+  iconClass: string;
+  /** Tailwind border-bottom class for the heading rule. */
+  ruleClass: string;
+  /** Tailwind background tint for blockquotes inside this section. */
+  quoteBg: string;
+  /** Tailwind border-left color for blockquotes inside this section. */
+  quoteBorder: string;
+}> = [
+  {
+    match: /ringkasan eksekutif|executive summary/i,
+    icon: Sparkles,
+    iconClass: "bg-emerald-100 text-emerald-700",
+    ruleClass: "border-emerald-300",
+    quoteBg: "bg-emerald-50/60",
+    quoteBorder: "border-emerald-300",
+  },
+  {
+    match: /numerik|numbers & trends|trends?/i,
+    icon: BarChart3,
+    iconClass: "bg-blue-100 text-blue-700",
+    ruleClass: "border-blue-300",
+    quoteBg: "bg-blue-50/60",
+    quoteBorder: "border-blue-300",
+  },
+  {
+    match: /tema utama|main themes/i,
+    icon: Flame,
+    iconClass: "bg-amber-100 text-amber-700",
+    ruleClass: "border-amber-300",
+    quoteBg: "bg-amber-50/60",
+    quoteBorder: "border-amber-300",
+  },
+  {
+    match: /strategi & aksi|strategies & actions/i,
+    icon: Compass,
+    iconClass: "bg-rose-100 text-rose-700",
+    ruleClass: "border-rose-300",
+    quoteBg: "bg-rose-50/60",
+    quoteBorder: "border-rose-300",
+  },
+  {
+    match: /daleel & sumber|daleel & sources/i,
+    icon: BookOpen,
+    iconClass: "bg-teal-100 text-teal-700",
+    ruleClass: "border-teal-300",
+    quoteBg: "bg-teal-50/60",
+    quoteBorder: "border-teal-300",
+  },
+];
+
+const DEFAULT_THEME = {
+  icon: Sparkles,
+  iconClass: "bg-slate-100 text-slate-700",
+  ruleClass: "border-slate-300",
+  quoteBg: "bg-slate-50/60",
+  quoteBorder: "border-slate-300",
 };
+
+function themeForHeading(text: string) {
+  for (const t of SECTION_THEMES) {
+    if (t.match.test(text)) return t;
+  }
+  return DEFAULT_THEME;
+}
+
+/**
+ * Heuristic — does this paragraph look like a transliterated Arabic
+ * du'a / dhikr block? We trigger on the density of long-vowel/diacritic
+ * marks (ā ī ū ḥ ṣ ẓ ʿ etc.) and specific opening tokens. False positives
+ * are cheap (paragraph just gets a serif treatment); false negatives mean
+ * the du'a renders as normal prose.
+ */
+function looksLikeArabicTransliteration(text: string): boolean {
+  if (text.length < 40) return false;
+  // Strong tokens that almost guarantee a du'a block.
+  const strongTokens = /(allahumma|al[\s-]?ḥamdu|inna [aA]llaha|rabbana|subḥāna|wa[\s-]?ṣalli|allāhumma)/i;
+  if (strongTokens.test(text)) return true;
+  // Density check on long-vowel/diacritic marks. A normal Indonesian
+  // paragraph has near-zero of these; a transliteration paragraph
+  // typically has > 4% of its characters as one of them.
+  const marks = text.match(/[āīūṣḍḥṭẓʿʾ]/g);
+  if (!marks) return false;
+  return marks.length / text.length >= 0.02;
+}
+
+function childrenToString(children: React.ReactNode): string {
+  if (typeof children === "string") return children;
+  if (typeof children === "number") return String(children);
+  if (Array.isArray(children)) return children.map(childrenToString).join("");
+  if (
+    children &&
+    typeof children === "object" &&
+    "props" in (children as object)
+  ) {
+    return childrenToString(
+      (children as { props: { children?: React.ReactNode } }).props.children,
+    );
+  }
+  return "";
+}
+
+/**
+ * Tailwind-class overrides per markdown element. The MARKDOWN_COMPONENTS
+ * factory takes a "current section theme" ref so blockquotes can pick up
+ * the active section's color. h2 mutates the theme as the doc unfolds.
+ */
+function makeMarkdownComponents(): Components {
+  // Mutable theme tracked across the markdown render. ReactMarkdown
+  // renders elements in document order so this is safe — h2 sets the
+  // theme, subsequent elements read it. Resets at the next h2.
+  const themeRef = { current: DEFAULT_THEME as ReturnType<typeof themeForHeading> };
+
+  return {
+    h2: ({ children }) => {
+      const text = childrenToString(children);
+      const theme = themeForHeading(text);
+      themeRef.current = theme;
+      const Icon = theme.icon;
+      return (
+        <h2
+          className={`mt-8 mb-3 flex items-center gap-2.5 border-b-2 pb-2 text-balance text-lg font-bold tracking-tight text-slate-900 first:mt-0 sm:text-xl ${theme.ruleClass}`}
+        >
+          <span
+            className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${theme.iconClass}`}
+          >
+            <Icon className="h-4 w-4" />
+          </span>
+          <span className="flex-1">{children}</span>
+        </h2>
+      );
+    },
+    h3: ({ children }) => (
+      <h3 className="mt-5 mb-1 text-balance text-sm font-semibold uppercase tracking-wider text-slate-700 sm:text-[15px]">
+        {children}
+      </h3>
+    ),
+    p: ({ children }) => {
+      const text = childrenToString(children);
+      if (looksLikeArabicTransliteration(text)) {
+        return (
+          <p className="my-4 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/80 to-teal-50/60 px-5 py-4 text-center font-amiri text-[15px] leading-[2] text-emerald-950 shadow-sm sm:px-7 sm:text-base">
+            {children}
+          </p>
+        );
+      }
+      return (
+        <p className="mt-2 text-pretty leading-relaxed text-slate-700">
+          {children}
+        </p>
+      );
+    },
+    ul: ({ children }) => (
+      <ul className="mt-2 list-disc space-y-1 pl-5 text-slate-700">
+        {children}
+      </ul>
+    ),
+    ol: ({ children }) => (
+      <ol className="mt-2 list-decimal space-y-1 pl-5 text-slate-700">
+        {children}
+      </ol>
+    ),
+    li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+    blockquote: ({ children }) => {
+      const t = themeRef.current;
+      return (
+        <blockquote
+          className={`relative my-3 rounded-xl border-l-4 ${t.quoteBorder} ${t.quoteBg} px-5 py-3 pl-12 text-slate-700`}
+        >
+          <Quote
+            className={`absolute left-3 top-3 h-5 w-5 ${t.iconClass.replace(/bg-\S+\s*/, "").replace("-100", "-500")} opacity-50`}
+            aria-hidden
+          />
+          {children}
+        </blockquote>
+      );
+    },
+    strong: ({ children }) => (
+      <strong className="font-semibold text-slate-900">{children}</strong>
+    ),
+    em: ({ children }) => <em className="italic text-slate-700">{children}</em>,
+    a: ({ href, children }) => (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-emerald-700 underline decoration-emerald-300 underline-offset-2 hover:text-emerald-900"
+      >
+        {children}
+      </a>
+    ),
+    hr: () => (
+      <hr className="my-6 border-0 border-t border-dashed border-slate-300" />
+    ),
+  };
+}

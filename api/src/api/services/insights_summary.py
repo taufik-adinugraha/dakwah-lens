@@ -106,26 +106,35 @@ CRITICAL — SCOPE OF PERCENTAGES: baca SEGMENT_SCOPE di input. Jika "all", pers
 - Hindari kata kerja perintah ("wajib", "harus", "pentingnya"). Gunakan observasional ("menyoroti", "memetakan", "menunjukkan", "tercermin dari")
 - HANYA gunakan headlines dari pool yang saya berikan. JANGAN mengarang cerita.
 
-## Strategi & Aksi Dakwah (3000-4500 kata)
+## Strategi & Aksi Dakwah (5400-7430 kata)
 Ini adalah CONTENT KIT — bukan saran strategis. Setiap sub-section harus berupa DRAFT SIAP-PAKAI yang bisa dibaca / dipakai langsung oleh dai, ustadzah, kreator, atau pengurus komunitas tanpa harus menulis ulang dari nol. WAJIB 6 sub-section dengan ### H3:
 
-### Khutbah Jumat (1000-1500 kata)
-Tulis KHUTBAH JUMAT LENGKAP siap-baca dari pembuka sampai penutup, terdiri dari Khutbah Pertama dan Khutbah Kedua. Bahasa Indonesia formal-mengalir, bisa dipahami jamaah umum, jangan terlalu akademis.
+### Khutbah Jumat (2300-3200 kata)
+Tulis KHUTBAH JUMAT LENGKAP siap-baca dari pembuka sampai penutup, terdiri dari Khutbah Pertama dan Khutbah Kedua. Bahasa Indonesia formal-mengalir, bisa dipahami jamaah umum, jangan terlalu akademis. Panjang khutbah harus sebanding dengan khutbah Jumat Indonesia standar (15-22 menit ucapan = ~2300-3200 kata) — JANGAN terlalu pendek.
 
-KHUTBAH PERTAMA (700-1000 kata):
-- Mukadimah singkat (hamdalah → sholawat → syahadat → wasiat takwa, ~70 kata, template Indonesia standar).
-- Ayat Quran pembuka yang relevan dengan tema pekan — sebut nama surah + nomor ayat + TERJEMAHAN Bahasa Indonesia saja, JANGAN kutip teks Arab.
-- Pengantar tema (3-4 paragraf): hubungkan ayat dengan 1-2 peristiwa NYATA pekan ini dari pool sample_headlines, sebut outletnya ("Detik melaporkan…", "menurut Republika…").
-- Inti khutbah (4-6 paragraf prosa mengalir, jangan pakai sub-judul): satu argumen jernih, didukung 1-2 hadis tambahan (terjemahan Bahasa Indonesia + sumber, bukan teks Arab).
-- Bersisi praktis: 2-3 tindakan konkret yang bisa dilakukan jamaah pekan ini.
+KHUTBAH PERTAMA (1800-2500 kata):
+- Mukadimah singkat (hamdalah → sholawat → syahadat → wasiat takwa, ~70 kata, transliterasi Arab standar khutbah Indonesia).
+- Ayat Quran pembuka yang relevan dengan tema pekan — sebut nama surah + nomor ayat + TERJEMAHAN Bahasa Indonesia. Kutip transliterasi Arab singkat untuk ayat ini saja BOLEH sebagai pembuka (mengikuti praktik khutbah Indonesia).
+- Pengantar tema (4-6 paragraf): hubungkan ayat dengan 2-3 peristiwa NYATA pekan ini dari pool sample_headlines, sebut outletnya ("Detik melaporkan…", "menurut Republika…", "seperti diberitakan Kompas…").
+- Inti khutbah (6-9 paragraf prosa mengalir, jangan pakai sub-judul): satu argumen yang BERKEMBANG sepanjang khutbah, didukung 2-3 hadis tambahan (terjemahan Bahasa Indonesia + sumber). Setiap paragraf harus mengembangkan argumen, BUKAN paraphrase paragraf sebelumnya.
+- Bersisi praktis: 3-4 tindakan konkret untuk jamaah pekan ini.
+- Tutup khutbah pertama dengan formula standar transliterasi Arab: "Baarakallahu lii wa lakum fil qur'aanil 'azhiim…" dst (~80 kata).
 
-KHUTBAH KEDUA (300-500 kata):
-- Mukadimah singkat.
-- Penegasan inti khutbah pertama dalam 1-2 paragraf.
-- Doa penutup yang menyentuh (~150 kata): untuk umat, untuk korban kezaliman (Palestina/kekerasan/dll), untuk pemimpin, untuk diri jamaah dan keluarga.
-- Penutup standar (template Indonesia: "Inna Allaha wa malaikatahu yusholluuna 'alan-nabiy…" + sholawat + "ibadallah, innallaha ya'muru bil 'adl wal ihsan…" + doa terakhir, ~80 kata).
+KHUTBAH KEDUA (500-700 kata):
+- Mukadimah singkat (hamdalah + sholawat + syahadat, transliterasi Arab ~50 kata).
+- Penegasan inti khutbah pertama (2-3 paragraf reflektif).
+- DOA PENUTUP DALAM TRANSLITERASI BAHASA ARAB (300-450 kata). Ini bagian utama khutbah kedua. JANGAN tulis dalam Bahasa Indonesia — gunakan rangkaian doa standar khutbah Jumat Indonesia, struktur:
+  * "Allahumma ighfir lil mu'minīna wal mu'mināt, wal muslimīna wal muslimāt, al-aḥyā'i minhum wal amwāt, innaka samī'un qarībun mujību da'awāt." (untuk seluruh umat)
+  * "Allahumma anshurnā 'alā 'aduwwika wa 'aduwwinā, wa 'aduwwil islām." (untuk pertolongan)
+  * "Allahumma anshur ikhwānanā al-muslimīna al-mustadh'afīna fī kulli makān, wa khushūshan ikhwānanā fī arḍi falisṭīn…" (untuk Palestina + korban kezaliman pekan ini — bisa sebut spesifik konteks 9 WNI Israel atau korban lain)
+  * "Allahumma aṣliḥ wulāta umūrinā, wa wuffiqhum li khayri 'ibādika wa bilādik." (untuk pemimpin)
+  * "Allahumma irḥamnā wa wālidaynā, wa rabbiyahum kamā rabbayānā ṣighārā." (untuk diri & keluarga)
+  * Boleh tambahkan 1-2 doa tematik yang relevan dengan isu pekan ini (mis: untuk korban kekerasan anak, untuk pelajar yang dibully, untuk petani yang ekonominya tertekan).
+  * "Rabbanā ātinā fid-dunyā ḥasanah wa fil ākhirati ḥasanah, wa qinā 'adzāban-nār." (penutup doa)
+  Gunakan transliterasi Arab dengan vokal panjang (ā, ī, ū) supaya khateeb mudah membacanya.
+- Penutup standar transliterasi Arab (~120 kata): "Inna Allāha wa malā'ikatahū yuṣallūna 'alan-nabiy…" + sholawat lengkap ("Allāhumma ṣalli 'alā sayyidinā Muḥammad wa 'alā āli sayyidinā Muḥammad…") + "'Ibādallāh, innallāha ya'muru bil 'adli wal-iḥsān wa ītā'i dzil qurbā…" + tahmid akhir "Wadzkurullāhal 'aẓīm yadzkurkum, wasykuruhu 'alā ni'amih yazidkum, wa lasykrullāhi akbar."
 
-### Kajian Ibu-ibu & Majelis Taklim (600-900 kata)
+### Kajian Ibu-ibu & Majelis Taklim (800-1100 kata)
 Tulis OUTLINE KAJIAN 45-MENIT siap-pakai, format hands-on bukan ceramah teoritis:
 - Pembuka (~80 kata): basmalah, salam, ice-breaker / pertanyaan ringan terkait pengalaman ibu-ibu pekan ini (misal: "Siapa yang harga sembako-nya naik minggu ini?").
 - Inti — 3 talking points (masing-masing 150-200 kata) dengan struktur per-poin:
@@ -136,7 +145,7 @@ Tulis OUTLINE KAJIAN 45-MENIT siap-pakai, format hands-on bukan ceramah teoritis
 - Sesi Q&A (~100 kata): tulis 3 pertanyaan yang KEMUNGKINAN AKAN diajukan ibu-ibu + jawaban singkat-jujur (jangan idealistis berlebihan).
 - Penutup (~50 kata): doa singkat untuk keluarga, ringkasan satu kalimat yang bisa diingat.
 
-### Pengajaran di Rumah (300-500 kata)
+### Pengajaran di Rumah (500-700 kata)
 Tulis 3-4 CONVERSATION SCRIPT untuk orang tua dengan anak, masing-masing format:
 - Setting: kapan (sarapan / di mobil / sebelum tidur) + usia anak (SD / SMP / SMA)
 - Pertanyaan pembuka orang tua (1-2 kalimat — pertanyaan, bukan ceramah).
@@ -151,20 +160,58 @@ Tulis SCRIPT VIDEO siap-pakai 60-90 detik untuk TikTok / IG Reels / YouTube Shor
 - CTA (5-10 detik / ~15 kata): ajakan konkret yang bisa langsung dilakukan penonton.
 Hindari frasa khas khutbah ("hadirin yang dirahmati Allah", "marilah kita renungkan").
 
-### Pendekatan Gen Z (400-600 kata)
-Tulis OUTLINE OPEN-MIC KAJIAN GEN Z siap-pakai (1.5 jam, format diskusi terbuka, BUKAN ceramah). Gen Z menolak nasihat top-down — semua materi di sini harus dirancang sebagai DISKUSI yang difasilitasi, bukan disampaikan.
-- Setting & format (~50 kata): venue (kafe / co-working / ruang komunitas), max 20-25 peserta, lingkaran (bukan teater), moderator (bukan penceramah) menyiapkan air & snack.
-- Framing question pembuka (~30 kata): satu pertanyaan provokatif yang menghubungkan isu pekan ini dengan pertanyaan eksistensial Gen Z (identitas, mental-health, masa depan, ketidakadilan).
-- 4-5 pertanyaan lanjutan (masing-masing 50-80 kata): tulis pertanyaan + 2-3 kalimat anticipated pushback (cynism, "agama ngapain ikut campur") + respons-tidak-defensif yang menghormati keraguan tapi tetap berakar pada Quran/sunnah.
-- Penutup (~50 kata): bukan kesimpulan moral — refleksi terbuka + tawaran kelanjutan (Discord channel, peer group, mentor 1-on-1).
+### Pendekatan Gen Z (800-1100 kata)
+Tulis OUTLINE OPEN-MIC KAJIAN / DISKUSI GEN Z siap-pakai (1.5 jam, format diskusi terbuka, BUKAN ceramah). Gen Z menolak nasihat top-down — semua materi di sini harus dirancang sebagai DISKUSI yang difasilitasi, bukan disampaikan. Struktur:
 
-### Aksi Sosial & Khidmah Umat (400-600 kata)
-Tulis ACTION PLAN siap-eksekusi untuk komunitas / masjid / yayasan / organisasi dakwah. Pilih SATU aksi spesifik yang dipicu oleh berita pekan ini, format:
-- Trigger (~50 kata): peristiwa/isu spesifik pekan ini yang menjadi alasan aksi, sebut outlet.
-- Aksi konkret (~70 kata): satu kalimat yang menggambarkan aksi (contoh: "Satgas Perlindungan Santri lintas-ponpes", "Dapur Jamaah berbasis masjid untuk keluarga rentan").
-- Langkah peluncuran (3 langkah, masing-masing 80-120 kata): step 1 (minggu pertama), step 2 (minggu 2-4), step 3 (bulan 2+). Tiap langkah harus konkret: siapa yang melakukan apa, dengan apa, ke mana.
-- Kebutuhan sumber daya (~80 kata): SDM (volunteer count + skills), dana (estimasi Rp), kerja sama (institusi/komunitas yang perlu digandeng).
-- Metrik sukses (~50 kata): satu metrik kuantitatif yang bisa dilaporkan 3 bulan ke depan.
+- **Setting & format** (~60 kata): venue (kafe / co-working / ruang komunitas), maks 20-25 peserta, formasi lingkaran (bukan teater), moderator (BUKAN penceramah) menyiapkan air & snack ringan.
+
+- **Framing question pembuka** (~50 kata): satu pertanyaan provokatif yang menghubungkan isu pekan ini dengan pertanyaan eksistensial Gen Z (identitas, mental-health, masa depan, ketidakadilan, kesepian, makna kerja).
+
+- **Pop-culture bridge** (~180 kata): satu pintu masuk lewat budaya pop yang sedang relevan dengan Gen Z. Pilih SATU jalur (sebut judul/figur/lirik SPESIFIK yang sedang trending, jangan generik):
+  * Lirik K-pop / J-pop dengan layer eksistensial — mis. BTS "Magic Shop" tentang trauma & penyembuhan → tazkiyatun nafs; NewJeans "Bubble Gum" tentang nostalgia identitas → fitrah; Lisa solo tentang kesendirian fame → ujian ketenaran
+  * Plot atau character arc anime / manga — mis. Frieren tentang waktu & kefanaan → ziara'tul qubur; Vinland Saga tentang taubat seorang viking → konsep hijrah; Solo Leveling tentang ujian level → sabar dalam musibah
+  * Lagu Indonesian indie tentang krisis identitas/spiritual — Hindia "Apatis", Pamungkas "Masing-Masing", Tulus "Hati-Hati di Jalan", .Feast "Camkan", Bernadya, Hanggini — kutip bait spesifik sebagai pemicu
+  * Tren TikTok / sound viral pekan ini dengan lapisan filosofis — mis. tren "main character energy" → ujub; tren "delulu" → ghuruur; tren "sigma male" → ananiyyah (egoism)
+  * Hijrah-figure kreator / atlet / influencer yang OTENTIK (bukan yang sudah jadi clichéd brand) sebagai case study
+  * Esports / gaming community ethics — toxic chat di Mobile Legends/Valorant → akhlaq ruang digital; rasa "FOMO ranked push" → qana'ah
+
+  KAIDAH KETAT: (1) HORMATI bahwa karya pop ini sah dinikmati Gen Z — JANGAN posisikan "harus dilawan" atau haram; (2) JANGAN memaksakan analogi Islami yang dipaksa — biarkan koneksinya organik, mungkin hanya 1-2 lapisan dalam; (3) gunakan sebagai PEMICU diskusi yang Gen Z sendiri kembangkan, BUKAN khutbah berbungkus pop-culture; (4) sebut JUDUL/LIRIK/FIGUR yang spesifik dan relevan dengan isu pekan ini, BUKAN referensi pop random.
+
+- **4-5 pertanyaan lanjutan** (masing-masing 60-100 kata): tulis pertanyaan + 2-3 kalimat anticipated pushback (sinisme, "agama ngapain ikut campur", "ini cuma hiburan kok dikaitkan agama") + respons-tidak-defensif yang menghormati keraguan tapi tetap berakar pada Quran/sunnah.
+
+- **Penutup** (~60 kata): BUKAN kesimpulan moral — refleksi terbuka + tawaran kelanjutan (Discord channel, peer group, mentor 1-on-1, group WA untuk Q&A lanjutan).
+
+### Aksi Sosial & Khidmah Umat (600-900 kata)
+Tulis ACTION PLAN siap-eksekusi untuk komunitas / masjid / yayasan / organisasi dakwah. Pilih SATU aksi spesifik yang dipicu oleh berita pekan ini. BUKAN ceramah, BUKAN konten — harus kegiatan nyata yang bisa diluncurkan dalam 1-2 minggu.
+
+WAJIB OUT-OF-THE-BOX. Hindari ide klise yang sudah jenuh:
+- ❌ Warung jujur / kantin kejujuran
+- ❌ Bakti sosial generik / pembagian sembako konvensional
+- ❌ Pengajian rutin tambahan
+- ❌ Buka puasa atau santunan anak yatim sebagai aksi mandiri
+- ❌ Sumbangan masjid / pembangunan fisik
+
+Sebaliknya, pikirkan aksi yang HANYA MASUK AKAL DI ERA 2026 — memanfaatkan teknologi, jaringan profesional ummat, atau bentuk komunitas yang baru muncul. Kategori inspirasi (pilih SATU yang paling cocok dengan isu pekan ini, JANGAN pakai semua):
+- Program digital-detox terstruktur (mis: lockdown anti-judi-online 30 hari dengan peer accountability + family-link app + check-in mingguan)
+- Layanan mental-health berbasis masjid (kerja sama psikolog Muslim, hotline anonim Gen Z lewat Telegram/WA)
+- Jaringan profesional Muslim untuk mentoring online santri / pesantren (coding, AI, finansial, jurnalisme — Muslim diaspora ikut)
+- Sistem akreditasi independen pesantren (audit perlindungan anak + transparansi keuangan, model lembaga sertifikasi sekuler)
+- Halal-fintech literacy bootcamp untuk ibu / UMKM (workshop praktis pakai app nyata — bukan ceramah riba)
+- Whistleblower support fund untuk saksi kasus korupsi (perlindungan hukum + dana sementara)
+- Forum restorative justice antar-tetangga (mediasi sebelum bawa ke polisi, mediator terlatih)
+- Sertifikasi masjid inklusif disabilitas (audit aksesibilitas terukur, daftar masjid bersertifikat publik)
+- Solidaritas struktural jangka panjang untuk korban kezaliman luar negeri (support fund 12-bulan untuk keluarga WNI di tahanan asing)
+- Anti-bullying peer-mediation di SD/SMP berbasis nilai Islami (kerja sama lintas-pesantren + sekolah negeri)
+- Maternal mental-health circle untuk ibu baru (postpartum support group, bukan tausiyah)
+- AI-assisted khutbah accessibility — auto-translate khutbah ke bahasa daerah / bahasa isyarat
+- Climate-resilient masjid (solar panel + water harvesting + kebun produktif, dijadikan pilot percontohan)
+
+Format wajib (ringkas, padat, BUKAN prosa berbunga-bunga):
+- **Trigger** (~80 kata): peristiwa/isu spesifik pekan ini yang memotivasi aksi. Sebut outlet + tanggal jika ada.
+- **Aksi konkret** (~100 kata): label aksi (1 kalimat **bold**), lalu 2-3 kalimat yang menjelaskan KENAPA pendekatan ini PAS UNTUK 2026 — apa yang membedakan dari pendekatan lama yang sudah dicoba.
+- **Langkah peluncuran** (3 langkah × 100-150 kata): Minggu 1 (kickoff — siapa kumpul di mana, agenda, deliverable konkret), Minggu 2-4 (scale-out — siapa yang dijangkau, channel yang dipakai), Bulan 2+ (sustain + ukur — feedback loop).
+- **Kebutuhan sumber daya** (~100 kata): SDM dengan SKILL SPESIFIK (bukan "tim relawan" — tapi mis. "1 psikolog klinis bersertifikat, 2 IT engineer fullstack, 1 jurnalis investigasi"), dana (estimasi Rp dengan breakdown 3-4 komponen), partnership (institusi konkret yang perlu digandeng — sebut namanya: Komnas Perempuan / BNN / IKAPI / Yayasan Cahaya / atau yang relevan dengan isu pekan ini).
+- **Metrik sukses** (~80 kata): satu metrik kuantitatif yang bisa dilaporkan 3 bulan ke depan + satu metrik kualitatif (mis: "5 testimonial peserta yang dipublikasikan", "case study di portal yayasan").
 
 ## Dalil & Sumber (250-350 kata)
 - Kutip 4-5 dalil dari pool yang saya berikan, masing-masing dengan KONTEKS ringkas
@@ -225,26 +272,35 @@ CRITICAL — SCOPE OF PERCENTAGES: read SEGMENT_SCOPE in the input. When "all", 
 - Prefer observation verbs ("highlights", "maps", "tracks", "surfaces") over command verbs ("must", "should", "the importance of")
 - Only use headlines from the pool I provide. Do NOT invent stories.
 
-## Da'wah Strategies & Actions (3000-4500 words)
+## Da'wah Strategies & Actions (5400-7430 words)
 This is a CONTENT KIT — not strategic advice. Each sub-section must be a READY-TO-USE DRAFT that a da'i, ustadzah, creator, or community organizer can use directly without rewriting from scratch. REQUIRED: 6 sub-sections with ### H3:
 
-### Friday Khutbah (1000-1500 words)
-Write a COMPLETE ready-to-deliver Friday khutbah from opening to closing, consisting of Khutbah Pertama (First Khutbah) and Khutbah Kedua (Second Khutbah). Use clear formal English that translates the Indonesian khutbah flow — name structural elements in Indonesian where they have no English equivalent (mukadimah, sholawat, syahadat).
+### Friday Khutbah (2300-3200 words)
+Write a COMPLETE ready-to-deliver Friday khutbah from opening to closing, consisting of Khutbah Pertama (First Khutbah) and Khutbah Kedua (Second Khutbah). Length must match a standard Indonesian Friday khutbah (15-22 minutes spoken = ~2300-3200 words) — do NOT cut short.
 
-KHUTBAH PERTAMA (700-1000 words):
-- Brief mukadimah (hamdalah → sholawat → syahadat → wasiat takwa, ~70 words, standard template).
-- Opening Quranic verse tied to this week's theme — name the surah + verse number + English TRANSLATION only, do NOT quote Arabic.
-- Theme introduction (3-4 paragraphs): link the verse to 1-2 REAL events from this week's sample_headlines pool, naming the outlet ("Detik reports…", "according to Republika…").
-- Khutbah body (4-6 flowing paragraphs, no sub-headings): one clear argument supported by 1-2 additional hadith (English translation + source, not Arabic).
-- Practical close: 2-3 concrete actions the congregation can take this week.
+KHUTBAH PERTAMA (1800-2500 words):
+- Brief mukadimah (hamdalah → sholawat → syahadat → wasiat takwa, ~70 words, standard Indonesian-khutbah Arabic transliteration).
+- Opening Quranic verse tied to this week's theme — name the surah + verse number + English TRANSLATION. A short Arabic transliteration of just this opening verse is OK (matches Indonesian khutbah practice).
+- Theme introduction (4-6 paragraphs): link the verse to 2-3 REAL events from this week's sample_headlines pool, naming the outlet ("Detik reports…", "according to Republika…", "as Kompas reports…").
+- Khutbah body (6-9 flowing paragraphs, no sub-headings): one argument that DEVELOPS across the khutbah, supported by 2-3 additional hadith (English translation + source). Each paragraph must advance the argument, NOT paraphrase the previous one.
+- Practical close: 3-4 concrete actions the congregation can take this week.
+- Close khutbah pertama with the standard Arabic transliteration formula: "Baarakallahu lii wa lakum fil qur'aanil 'azhiim…" etc (~80 words).
 
-KHUTBAH KEDUA (300-500 words):
-- Brief mukadimah.
-- Restate the first khutbah's core in 1-2 paragraphs.
-- Heartfelt closing prayer (~150 words): for the ummah, for victims of oppression (Palestine/violence/etc), for leaders, for the congregation and their families.
-- Standard close (Indonesian template: "Inna Allaha wa malaikatahu yusholluuna 'alan-nabiy…" + sholawat + "ibadallah, innallaha ya'muru bil 'adl wal ihsan…" + final du'a, ~80 words).
+KHUTBAH KEDUA (500-700 words):
+- Brief mukadimah (hamdalah + sholawat + syahadat, Arabic transliteration ~50 words).
+- Restate the first khutbah's core (2-3 reflective paragraphs).
+- CLOSING DU'A IN ARABIC TRANSLITERATION (300-450 words). This is the main body of khutbah kedua. Do NOT write it in English — use the standard Indonesian Friday khutbah du'a sequence:
+  * "Allahumma ighfir lil mu'minīna wal mu'mināt, wal muslimīna wal muslimāt, al-aḥyā'i minhum wal amwāt, innaka samī'un qarībun mujību da'awāt." (for the whole ummah)
+  * "Allahumma anshurnā 'alā 'aduwwika wa 'aduwwinā, wa 'aduwwil islām." (for divine help)
+  * "Allahumma anshur ikhwānanā al-muslimīna al-mustadh'afīna fī kulli makān, wa khushūshan ikhwānanā fī arḍi falisṭīn…" (for Palestine + this week's oppression victims — can name specific contexts like the 9 WNI in Israel or other current victims)
+  * "Allahumma aṣliḥ wulāta umūrinā, wa wuffiqhum li khayri 'ibādika wa bilādik." (for leaders)
+  * "Allahumma irḥamnā wa wālidaynā, wa rabbiyahum kamā rabbayānā ṣighārā." (for self & family)
+  * Add 1-2 thematic du'a relevant to this week's issues (e.g. for child-abuse victims, for bullied students, for farmers under economic pressure).
+  * "Rabbanā ātinā fid-dunyā ḥasanah wa fil ākhirati ḥasanah, wa qinā 'adzāban-nār." (closing of the du'a)
+  Use Arabic transliteration with long-vowel marks (ā, ī, ū) so the khateeb can read it easily.
+- Standard closing in Arabic transliteration (~120 words): "Inna Allāha wa malā'ikatahū yuṣallūna 'alan-nabiy…" + full sholawat ("Allāhumma ṣalli 'alā sayyidinā Muḥammad wa 'alā āli sayyidinā Muḥammad…") + "'Ibādallāh, innallāha ya'muru bil 'adli wal-iḥsān wa ītā'i dzil qurbā…" + final tahmid "Wadzkurullāhal 'aẓīm yadzkurkum, wasykuruhu 'alā ni'amih yazidkum, wa lasykrullāhi akbar."
 
-### Women's Kajian & Majelis Taklim (600-900 words)
+### Women's Kajian & Majelis Taklim (800-1100 words)
 Write a 45-MINUTE KAJIAN OUTLINE ready for delivery — hands-on, NOT theoretical lecture:
 - Opening (~80 words): basmalah, salam, an ice-breaker question tied to ibu-ibu's lived experience this week (e.g. "Whose grocery bill went up this week?").
 - Core — 3 talking points (150-200 words each) with per-point structure:
@@ -255,7 +311,7 @@ Write a 45-MINUTE KAJIAN OUTLINE ready for delivery — hands-on, NOT theoretica
 - Q&A section (~100 words): write 3 questions the audience IS LIKELY to ask + honest brief answers (don't be overly idealistic).
 - Closing (~50 words): a short prayer for the family, a one-sentence takeaway.
 
-### Teaching at Home (300-500 words)
+### Teaching at Home (500-700 words)
 Write 3-4 CONVERSATION SCRIPTS for parents with their children, each in the format:
 - Setting: when (breakfast / in the car / before bed) + child's age (elementary / middle school / high school)
 - Parent's opening question (1-2 sentences — a question, NOT a lecture).
@@ -270,20 +326,58 @@ Write a READY-TO-USE video script for a 60-90 second TikTok / IG Reels / YouTube
 - CTA (5-10 seconds / ~15 words): concrete viewer action they can do immediately.
 Avoid khutbah idioms ("hadirin yang dirahmati Allah", "marilah kita renungkan").
 
-### Reaching Gen Z (400-600 words)
-Write a ready-to-use GEN Z OPEN-MIC KAJIAN OUTLINE (1.5 hours, open discussion format, NOT lecture). Gen Z rejects top-down advice — every element here should be designed to be FACILITATED, not delivered.
-- Setting & format (~50 words): venue (cafe / co-working / community space), max 20-25 attendees, circle (not theater), moderator (not preacher), water & snacks ready.
-- Opening framing question (~30 words): one provocative question that links this week's issues to a Gen Z existential question (identity, mental health, future, injustice).
-- 4-5 follow-up questions (50-80 words each): write the question + 2-3 sentences of anticipated pushback (cynicism, "what does religion have to do with this") + a non-defensive response that honors the doubt while staying rooted in Quran/sunnah.
-- Close (~50 words): NOT a moral conclusion — open reflection + continuation offer (Discord channel, peer group, 1-on-1 mentor).
+### Reaching Gen Z (800-1100 words)
+Write a ready-to-use GEN Z OPEN-MIC KAJIAN / DISCUSSION OUTLINE (1.5 hours, open discussion format, NOT lecture). Gen Z rejects top-down advice — every element here should be designed to be FACILITATED, not delivered. Structure:
 
-### Social Action & Service to the Ummah (400-600 words)
-Write a ready-to-execute ACTION PLAN for a community / mosque / yayasan / da'wah organization. Pick ONE specific action triggered by this week's news, format:
-- Trigger (~50 words): the specific event/issue this week that motivates the action, name the outlet.
-- Concrete action (~70 words): one sentence describing the action (e.g. "Cross-pesantren Santri Safeguarding Task Force", "Mosque-based Jamaah Kitchen for vulnerable families").
-- Launch steps (3 steps, 80-120 words each): week 1, weeks 2-4, month 2+. Each step must be concrete: who does what, with what, where.
-- Resource needs (~80 words): people (volunteer count + skills), funds (rough IDR estimate), partnerships (institutions/communities to engage).
-- Success metric (~50 words): one quantitative metric to report in 3 months.
+- **Setting & format** (~60 words): venue (cafe / co-working / community space), max 20-25 attendees, circle formation (not theater), moderator (NOT a preacher), water & light snacks ready.
+
+- **Opening framing question** (~50 words): one provocative question that links this week's issues to a Gen Z existential question (identity, mental health, future, injustice, loneliness, meaning of work).
+
+- **Pop-culture bridge** (~180 words): ONE entry point via the pop culture currently resonating with Gen Z. Pick ONE lane (name SPECIFIC trending titles/figures/lyrics — do NOT be generic):
+  * K-pop / J-pop lyrics with existential layers — e.g. BTS "Magic Shop" on trauma & healing → tazkiyatun nafs; NewJeans "Bubble Gum" on identity nostalgia → fitrah; Lisa solo on isolation in fame → trial of celebrity
+  * Anime / manga plot or character arc — e.g. Frieren on time & mortality → ziarah qubur; Vinland Saga on a viking's tawbah → concept of hijrah; Solo Leveling's level grind → patience in trials
+  * Indonesian indie songs on identity / spiritual crisis — Hindia "Apatis", Pamungkas "Masing-Masing", Tulus "Hati-Hati di Jalan", .Feast "Camkan", Bernadya, Hanggini — quote a specific verse as the prompt
+  * This week's TikTok trend / viral sound with philosophical layers — e.g. "main character energy" → ujub; "delulu" → ghuruur; "sigma male" → ananiyyah (egoism)
+  * AUTHENTIC hijrah figures from creators / athletes / influencers (NOT clichéd-brand ones) as case studies
+  * Esports / gaming community ethics — toxic chat in Mobile Legends/Valorant → akhlaq in digital spaces; "FOMO ranked push" → qana'ah
+
+  STRICT RULES: (1) RESPECT that this pop culture is legitimately enjoyed by Gen Z — do NOT position it as something to "fight" or label haram; (2) do NOT force Islamic analogies — let the connection be organic, maybe just 1-2 layers deep; (3) use as a TRIGGER for Gen Z's own discussion, NOT a khutbah wrapped in pop-culture costume; (4) name SPECIFIC titles/lyrics/figures that genuinely connect to this week's issues, NOT random pop references.
+
+- **4-5 follow-up questions** (60-100 words each): write the question + 2-3 sentences of anticipated pushback (cynicism, "what does religion have to do with this", "this is just entertainment — why link it to religion") + a non-defensive response that honors the doubt while staying rooted in Quran/sunnah.
+
+- **Close** (~60 words): NOT a moral conclusion — open reflection + continuation offer (Discord channel, peer group, 1-on-1 mentor, WA group for Q&A).
+
+### Social Action & Service to the Ummah (600-900 words)
+Write a ready-to-execute ACTION PLAN for a community / mosque / yayasan / da'wah organization. Pick ONE specific action triggered by this week's news. NOT a sermon, NOT content — must be a real activity launchable in 1-2 weeks.
+
+MUST BE OUT-OF-THE-BOX. Avoid stale, overdone ideas:
+- ❌ Warung jujur / honesty stalls
+- ❌ Generic baksos / conventional rice-packet distribution
+- ❌ Adding more routine pengajian
+- ❌ Iftar drives or orphan donations as a standalone action
+- ❌ Mosque-building fundraisers
+
+Instead, propose actions that ONLY MAKE SENSE IN 2026 — leveraging technology, professional networks within the ummah, or community forms that have only recently emerged. Inspiration categories (pick ONE that best fits this week's issues, do NOT use all):
+- Structured digital-detox programs (e.g. 30-day anti-online-gambling lockdown with peer accountability + family-link app + weekly check-ins)
+- Mosque-based mental-health services (partner Muslim psychologists, anonymous Gen Z hotline via Telegram/WA)
+- Muslim professional networks mentoring santri / pesantren online (coding, AI, finance, journalism — including diaspora professionals)
+- Independent pesantren accreditation system (child-safeguarding + financial transparency audits, modeled on secular certification bodies)
+- Halal-fintech literacy bootcamps for housewives / SMEs (hands-on app workshops — NOT another riba sermon)
+- Whistleblower support fund for corruption witnesses (legal protection + interim stipend)
+- Restorative justice circles between neighbors (mediation before police involvement, trained mediators)
+- Disability-inclusive mosque certification (measurable accessibility audit, public list of certified mosques)
+- Long-term structural solidarity for victims abroad (12-month support fund for families of WNI detained overseas)
+- Anti-bullying peer-mediation in SD/SMP grounded in Islamic ethics (cross-pesantren + state-school partnership)
+- Maternal mental-health circles for new mothers (postpartum support group, NOT a tausiyah)
+- AI-assisted khutbah accessibility (auto-translate khutbah to regional languages / sign language)
+- Climate-resilient mosque pilot (solar + water harvesting + productive gardens as a showcase project)
+
+Required format (concise, dense, NOT flowery prose):
+- **Trigger** (~80 words): the specific event/issue this week that motivates the action. Name the outlet + date if possible.
+- **Concrete action** (~100 words): action label (one **bold** sentence), then 2-3 sentences explaining WHY this approach FITS 2026 — what makes it different from older approaches that have been tried.
+- **Launch steps** (3 steps × 100-150 words): Week 1 (kickoff — who meets where, agenda, concrete deliverable), Weeks 2-4 (scale-out — who is reached, what channels), Month 2+ (sustain + measure — feedback loop).
+- **Resource needs** (~100 words): SPECIFIC people skills (NOT "a team of volunteers" — but e.g. "1 certified clinical psychologist, 2 fullstack IT engineers, 1 investigative journalist"), funds (rough IDR estimate with 3-4 component breakdown), partnerships (specific institutions to engage — name them: Komnas Perempuan / BNN / IKAPI / Yayasan Cahaya / or whatever is relevant to this week's issue).
+- **Success metric** (~80 words): one quantitative metric reportable in 3 months + one qualitative metric (e.g. "5 published participant testimonials", "case study on the yayasan's portal").
 
 ## Daleel & Sources (250-350 words)
 - Cite 4-5 daleel from the pool I provide, each with brief CONTEXT
@@ -851,9 +945,9 @@ def _build_user_prompt(
         scope_note = scope_note_all
 
     write_now = (
-        "Tulis briefing sekarang dalam format markdown 5 bagian (Ringkasan Eksekutif / Numerik & Tren Pekan Ini / Tema Utama & Pola Yang Muncul / Strategi & Aksi Dakwah / Daleel & Sumber), ~4500-6500 kata total — Strategi & Aksi Dakwah adalah CONTENT KIT yang isinya draft siap-pakai (khutbah lengkap, outline kajian, script video, dll), bukan ringkasan strategi."
+        "Tulis briefing sekarang dalam format markdown 5 bagian (Ringkasan Eksekutif / Numerik & Tren Pekan Ini / Tema Utama & Pola Yang Muncul / Strategi & Aksi Dakwah / Daleel & Sumber), ~6800-9300 kata total — Strategi & Aksi Dakwah adalah CONTENT KIT yang isinya draft siap-pakai (khutbah lengkap, outline kajian, script video, dll), bukan ringkasan strategi."
         if language == "id"
-        else "Write the briefing now in markdown, 5-section format (Executive Summary / Numbers & Trends This Week / Main Themes & Emerging Patterns / Da'wah Strategies & Actions / Daleel & Sources), ~4500-6500 words total — Da'wah Strategies & Actions is a CONTENT KIT containing ready-to-use drafts (full khutbah, kajian outline, video script, etc), NOT a strategic summary."
+        else "Write the briefing now in markdown, 5-section format (Executive Summary / Numbers & Trends This Week / Main Themes & Emerging Patterns / Da'wah Strategies & Actions / Daleel & Sources), ~6800-9300 words total — Da'wah Strategies & Actions is a CONTENT KIT containing ready-to-use drafts (full khutbah, kajian outline, video script, etc), NOT a strategic summary."
     )
 
     return f"""{scope_note}
@@ -926,19 +1020,20 @@ def _generate_for_language(
             temperature=0.5,
             safety_settings=_RELAXED_SAFETY,
             # 32768-token output cap supports the long-form 5-section
-            # briefing where Section 4 is a full content kit (khutbah +
-            # kajian outline + script + Gen Z discussion + action plan
-            # ≈ 3000-4500 words for that section alone, ~6000-8000
-            # tokens). Bumped from 8192 when Section 4 expanded
-            # (2026-05-22). Cost rises ~2× per call but cadence dropped
-            # from daily → every 3 days (see celery_app.py), netting
-            # roughly the same monthly spend (~$11/mo).
+            # briefing where Section 4 is a full content kit (full
+            # khutbah 2300-3200 kata + kajian outline + script + Gen Z
+            # discussion + action plan ≈ 4300-6200 words for that
+            # section alone, ~10000-13000 tokens visible). Top-level
+            # brief ≈ 5800-8200 words → ~12000-16000 tokens. Bumped
+            # from 8192 when Section 4 expanded (2026-05-22).
             max_output_tokens=32768,
-            # 8192-token thinking budget — model needs more planning
-            # space for the longer Section 4. Pro charges thinking at
-            # the output rate, so this adds ~$0.08/call; offset by the
-            # cadence drop.
-            thinking_config=types.ThinkingConfig(thinking_budget=8192),
+            # 12288-token thinking budget — Section 4 has a multi-part
+            # structure (6 sub-sections, full khutbah with mukadimah →
+            # inti → doa Arab → tahmid) that the model needs space to
+            # plan coherently. Pro charges thinking at the output rate,
+            # so this adds ~$0.12/call; offset by the every-3-days
+            # cadence drop and still inside the IDR cap.
+            thinking_config=types.ThinkingConfig(thinking_budget=12288),
         ),
     )
     summary_md = (resp.text or "").strip()
