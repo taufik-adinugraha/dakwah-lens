@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { and, desc, sql } from "drizzle-orm";
-import { ArrowLeft, Layers } from "lucide-react";
+import { ArrowLeft, ArrowRight, Layers } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
-import { getLatestInsightsSummary } from "@/lib/insights-data";
+import { briefingSlug, getLatestInsightsSummary } from "@/lib/insights-data";
 import { BriefingNarrative } from "@/components/BriefingNarrative";
 import { InsightsHeadlinePills } from "@/components/InsightsHeadlinePills";
 import { FilterableTopPosts } from "@/components/FilterableTopPosts";
@@ -226,43 +226,70 @@ export default async function SegmentPage({
       </section>
 
       {/* Per-segment AI briefing — narrative + nasihah + retrieved daleel */}
-      {segmentBriefing && (
-        <section className="pb-8">
-          <div className="mx-auto max-w-5xl px-4 sm:px-6">
-            <div className="rounded-3xl border border-slate-200 bg-gradient-to-br from-white to-emerald-50/30 p-6 shadow-sm sm:p-7">
-              <p className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
-                <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-                {t("exec_briefing_label")}
-              </p>
-              <BriefingNarrative
-                text={
-                  locale === "en" && segmentBriefing.summaryMdEn
-                    ? segmentBriefing.summaryMdEn
-                    : segmentBriefing.summaryMd
-                }
-                daleelRefs={segmentBriefing.daleelRefs}
-                nasihahLabel={t("exec_briefing_nasihah_label")}
-                citedDaleelLabel={t("exec_daleel_label")}
-              />
-              {/* Segment-filtered headline pills — same shape as the
-                  all-platform hero, but the underlying stats are scoped
-                  to this segment's category set. */}
-              <InsightsHeadlinePills
-                stats={segmentBriefing.headlineStats}
-                locale={locale}
-                t={(key) => t(key as Parameters<typeof t>[0])}
-                localizeCategory={(cat) =>
-                  t(`dawah_category_${cat}` as Parameters<typeof t>[0])
-                }
-              />
-              {/* Sharia compliance disclaimer (PRD §12). */}
-              <p className="mt-4 text-[10px] italic text-slate-400">
-                {t("exec_briefing_ai_disclaimer")}
-              </p>
+      {segmentBriefing && (() => {
+        const briefingBody =
+          locale === "en" && segmentBriefing.summaryMdEn
+            ? segmentBriefing.summaryMdEn
+            : segmentBriefing.summaryMd;
+        // Reading-time estimate from full body, matching the
+        // /insights all-platform hero. ~200 wpm Indonesian average.
+        const wordCount = briefingBody.trim().split(/\s+/).length;
+        const readingMinutes = Math.max(1, Math.round(wordCount / 200));
+        const slug = briefingSlug(
+          new Date(segmentBriefing.generatedAt),
+          segmentBriefing.segment,
+        );
+        return (
+          <section className="pb-8">
+            <div className="mx-auto max-w-5xl px-4 sm:px-6">
+              <div className="rounded-3xl border border-slate-200 bg-gradient-to-br from-white to-emerald-50/30 p-6 shadow-sm sm:p-7">
+                <p className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+                  <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                  {t("exec_briefing_label")}
+                </p>
+                <BriefingNarrative
+                  text={briefingBody}
+                  daleelRefs={segmentBriefing.daleelRefs}
+                  nasihahLabel={t("exec_briefing_nasihah_label")}
+                  citedDaleelLabel={t("exec_daleel_label")}
+                />
+
+                {/* CTA to the dedicated /insights/brief/{slug} page — has
+                    TOC sidebar + share + download toolbars. Matches the
+                    pattern on the all-platform /insights hero so every
+                    briefing surface offers the same path to the full
+                    standalone view. */}
+                <Link
+                  href={`/insights/brief/${slug}`}
+                  className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-emerald-700 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-800"
+                >
+                  {t("brief_read_full_cta")}
+                  <ArrowRight className="h-3.5 w-3.5" />
+                  <span className="text-[10px] font-normal text-emerald-100">
+                    · {t("brief_reading_time", { minutes: readingMinutes })}
+                  </span>
+                </Link>
+
+                {/* Segment-filtered headline pills — same shape as the
+                    all-platform hero, but the underlying stats are scoped
+                    to this segment's category set. */}
+                <InsightsHeadlinePills
+                  stats={segmentBriefing.headlineStats}
+                  locale={locale}
+                  t={(key) => t(key as Parameters<typeof t>[0])}
+                  localizeCategory={(cat) =>
+                    t(`dawah_category_${cat}` as Parameters<typeof t>[0])
+                  }
+                />
+                {/* Sharia compliance disclaimer (PRD §12). */}
+                <p className="mt-4 text-[10px] italic text-slate-400">
+                  {t("exec_briefing_ai_disclaimer")}
+                </p>
+              </div>
             </div>
-          </div>
-        </section>
-      )}
+          </section>
+        );
+      })()}
 
       {/* Sentiment mix for this segment */}
       {sentimentTotal > 0 && (

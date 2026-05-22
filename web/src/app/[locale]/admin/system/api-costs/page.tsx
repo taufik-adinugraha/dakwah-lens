@@ -11,6 +11,7 @@ import {
   formatIdr,
   formatRelative,
   formatUsd,
+  formatUsdCompact,
 } from "../_ui";
 
 const BUDGET_CAP_IDR = 1_000_000;
@@ -122,23 +123,23 @@ export default async function ApiCostsPage() {
       <div className="grid gap-3 sm:grid-cols-3">
         <StatTile
           label="24h"
-          value={formatUsd(total24)}
+          value={formatUsdCompact(total24)}
           hint={formatIdr(total24, usdToIdr)}
         />
         <StatTile
           label="7d"
-          value={formatUsd(total7)}
+          value={formatUsdCompact(total7)}
           hint={formatIdr(total7, usdToIdr)}
           accent="brand"
         />
         <StatTile
           label="30d"
-          value={formatUsd(total30)}
+          value={formatUsdCompact(total30)}
           hint={formatIdr(total30, usdToIdr)}
         />
         <StatTile
           label="Projected · monthly"
-          value={formatUsd(monthlyProjection)}
+          value={formatUsdCompact(monthlyProjection)}
           hint={`${formatIdr(monthlyProjection, usdToIdr)} · from last 7d`}
           accent={monthlyProjection > capUsd * 0.8 ? "amber" : "emerald"}
         />

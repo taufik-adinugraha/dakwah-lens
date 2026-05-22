@@ -154,6 +154,15 @@ export function formatUsd(usd: number): string {
   return `$${usd.toFixed(4)}`;
 }
 
+/** 2-decimal variant for big-number StatTile values where the precision
+ *  of formatUsd's 4 decimals is just visual noise on aggregate totals
+ *  (e.g. "$5.30" reads cleanly; "$5.3017" doesn't). Use formatUsd in
+ *  tables / hints where per-call costs ($0.0001, $0.0004) need the
+ *  extra precision. */
+export function formatUsdCompact(usd: number): string {
+  return `$${usd.toFixed(2)}`;
+}
+
 export function formatRelative(d: Date | string | null): string {
   if (!d) return "—";
   const date = typeof d === "string" ? new Date(d) : d;

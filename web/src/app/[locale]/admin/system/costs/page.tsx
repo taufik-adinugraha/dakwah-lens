@@ -14,6 +14,7 @@ import {
   formatIdr,
   formatRupiah,
   formatUsd,
+  formatUsdCompact,
 } from "../_ui";
 import { ConfirmForm } from "../_ConfirmForm";
 import { KNOWN_PROVIDERS, providerLabel } from "@/lib/cost-providers";
@@ -203,7 +204,7 @@ export default async function CostsPage() {
         />
         <StatTile
           label="API spend · 30d"
-          value={formatUsd(apiUsd30)}
+          value={formatUsdCompact(apiUsd30)}
           hint={formatIdr(apiUsd30, usdToIdr)}
         />
         <StatTile

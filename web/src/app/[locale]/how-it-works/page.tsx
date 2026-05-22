@@ -40,6 +40,7 @@ export default async function HowItWorksPage({
       <SystemDiagram t={t} />
       <IngestionPipeline t={t} />
       <DiscoveryStrategy t={t} />
+      <InsightsBriefingPipeline t={t} />
       <BriefPipeline t={t} />
       <ModelsTable t={t} />
       <MonthlyCost t={t} />
@@ -632,6 +633,81 @@ function BriefPipeline({ t }: { t: T }) {
   );
 }
 
+/**
+ * Daily insights briefings pipeline.
+ *
+ * Different from BriefPipeline (which describes the on-demand user-created
+ * brief flow). Insights briefings are written by the system on a fixed
+ * schedule, public, and structured as long-form analyst reports — see
+ * insights_summary.py for the Celery task and /insights/brief/[id] for
+ * the public viewer.
+ */
+function InsightsBriefingPipeline({ t }: { t: T }) {
+  const stages = [
+    {
+      title: t("insights_brief_stage_1_title"),
+      module: "workers/ingest.py::generate_insights_summary",
+      body: t("insights_brief_stage_1_body"),
+    },
+    {
+      title: t("insights_brief_stage_2_title"),
+      module: "services/insights_summary.py::_compute_stats",
+      body: t("insights_brief_stage_2_body"),
+    },
+    {
+      title: t("insights_brief_stage_3_title"),
+      module: "services/kitab_retrieval.py + rerank_daleel",
+      body: t("insights_brief_stage_3_body"),
+    },
+    {
+      title: t("insights_brief_stage_4_title"),
+      module: "Gemini 2.5 Pro × 2 languages",
+      body: t("insights_brief_stage_4_body"),
+    },
+    {
+      title: t("insights_brief_stage_5_title"),
+      module: "insights_summaries table → /insights/brief/[id]",
+      body: t("insights_brief_stage_5_body"),
+    },
+  ];
+
+  return (
+    <section className="border-y border-slate-100 bg-brand-50/30 py-12 sm:py-16">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <SectionHeader
+          title={t("insights_brief_title")}
+          subtitle={t("insights_brief_subtitle")}
+        />
+        <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {stages.map((s, i) => (
+            <li
+              key={i}
+              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+            >
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-brand-700 text-[11px] font-bold text-white">
+                {i + 1}
+              </span>
+              <p className="mt-3 text-sm font-bold text-slate-900">
+                {s.title}
+              </p>
+              <p className="mt-1 font-mono text-[10px] text-brand-700">
+                {s.module}
+              </p>
+              <p className="mt-3 text-xs leading-relaxed text-slate-600">
+                {s.body}
+              </p>
+            </li>
+          ))}
+        </ol>
+        <div className="mx-auto mt-6 max-w-3xl rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 text-center text-xs text-emerald-900">
+          <strong>{t("insights_brief_callout_strong")}</strong>{" "}
+          {t("insights_brief_callout_body")}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function ModelsTable({ t }: { t: T }) {
   const rows = [
     {
@@ -728,35 +804,36 @@ function ModelsTable({ t }: { t: T }) {
  * — the real numbers live in `/admin/system/api-costs` (superadmin). The
  * point of this section is to be transparent about cost discipline.
  *
- * Numbers reflect the schedule as of 2026-05-20:
- *   X Mon/Wed/Fri · TT Tue only · IG Mon · YT daily · mainstream every 2h
- *   trending overlay daily (X only) · topic discovery daily 04:00 WIB
+ * Numbers reflect the schedule as of 2026-05-22:
+ *   X / TT / IG / Trending — PAUSED (verification phase, see project note)
+ *   YT — daily, free quota
+ *   mainstream RSS — every 2h, free
+ *   topic discovery — daily 04:00 WIB
+ *   briefings — daily 04:30 WIB (5 segments × 2 languages = 10 Pro calls)
+ *
+ * Validated against `usage_events` 7-day rollup on 2026-05-22 — earlier
+ * estimates undercounted Pro briefings ($0 → ~$9/mo) and overcounted
+ * paused Apify scrapers (~$34/mo → $0).
  */
 function MonthlyCost({ t }: { t: T }) {
   const rows = [
     {
-      provider: "Apify · X (apidojo)",
-      use: t("cost_x_use"),
-      monthly: 5.1,
-      note: "$0.0004/item · 12.7K/mo",
+      provider: "Gemini 2.5 Pro (briefings, scheduled)",
+      use: t("cost_gemini_pro_use"),
+      monthly: 9.0,
+      note: "5 segmen × 2 bahasa daily · ~$0.06/segmen-bahasa",
     },
     {
-      provider: "Apify · Instagram",
-      use: t("cost_ig_use"),
-      monthly: 9.76,
-      note: "$0.0023/item · 4.2K/mo",
+      provider: "Gemini Flash-Lite",
+      use: t("cost_gemini_use"),
+      monthly: 2.6,
+      note: "$0.10/$0.40 per 1M tokens · klasifikasi + topik + rerank",
     },
     {
-      provider: "Apify · TikTok (free actor)",
-      use: t("cost_tt_use"),
-      monthly: 16.97,
-      note: "$0.004/item · 4.2K/mo",
-    },
-    {
-      provider: "Apify · Trending overlay (X)",
-      use: t("cost_trending_use"),
-      monthly: 1.92,
-      note: "$0.0004/item · 4.8K/mo",
+      provider: "OpenAI embeddings",
+      use: t("cost_openai_use"),
+      monthly: 0.1,
+      note: "Embedding query daleel + one-shot corpus",
     },
     {
       provider: "YouTube Data API",
@@ -771,34 +848,54 @@ function MonthlyCost({ t }: { t: T }) {
       note: t("cost_free"),
     },
     {
-      provider: "Gemini Flash-Lite",
-      use: t("cost_gemini_use"),
-      monthly: 6.2,
-      note: "$0.10/$0.40 per 1M tokens",
-    },
-    {
-      provider: "OpenAI embeddings (one-shot)",
-      use: t("cost_openai_use"),
-      monthly: 0,
-      note: t("cost_openai_note"),
-    },
-    {
       provider: "Anthropic Claude (fallback)",
       use: t("cost_claude_use"),
       monthly: 0,
       note: t("cost_on_demand"),
     },
+    // ── Server / infrastructure (non-API) ──
     {
-      provider: "Gemini 2.5 Pro (briefs, on-demand)",
-      use: t("cost_gemini_pro_use"),
+      provider: "VPS · IDCloudHost (Jakarta)",
+      use: t("cost_vps_use"),
+      monthly: 30,
+      note: "≈ Rp 500K/bulan · server + DB + Redis + Qdrant",
+    },
+    // ── PAUSED platforms — Apify scrapers (X / TT / IG / Trending) ──
+    // Real cost = $0 while paused. Listed for transparency about what's
+    // scheduled to come back online; rebudget at re-enable.
+    {
+      provider: "Apify · X (apidojo)",
+      use: t("cost_x_use"),
       monthly: 0,
-      note: t("cost_on_demand"),
+      note: t("cost_paused"),
+    },
+    {
+      provider: "Apify · Instagram",
+      use: t("cost_ig_use"),
+      monthly: 0,
+      note: t("cost_paused"),
+    },
+    {
+      provider: "Apify · TikTok (free actor)",
+      use: t("cost_tt_use"),
+      monthly: 0,
+      note: t("cost_paused"),
+    },
+    {
+      provider: "Apify · Trending overlay (X)",
+      use: t("cost_trending_use"),
+      monthly: 0,
+      note: t("cost_paused"),
     },
   ];
 
   const total = rows.reduce((s, r) => s + r.monthly, 0);
   const totalIDR = total * 16300;
-  const cap = 60;
+  // Total operating budget cap = ~IDR 2M / month (~$123). Covers
+  // EVERYTHING — server + API + Apify scrapers when re-enabled. Earlier
+  // value of $60 only covered the API portion; updated 2026-05-22 after
+  // we added the VPS line item for full operating cost.
+  const cap = 123;
   const capIDR = cap * 16300;
   const usedPct = Math.min(100, (total / cap) * 100);
 
