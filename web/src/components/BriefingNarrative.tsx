@@ -6,12 +6,13 @@ import { DaleelChips } from "./DaleelChips";
 /**
  * Renders the AI-narrated weekly briefing.
  *
- * The LLM emits a 5-section markdown document (~1500-1800 words):
+ * The LLM emits a 5-section markdown document (~1700-2000 words):
  *   1. Ringkasan Eksekutif / Executive Summary
  *   2. Numerik & Tren Pekan Ini / Numbers & Trends This Week
  *   3. Tema Utama & Pola Yang Muncul / Main Themes & Emerging Patterns
- *   4. Strategi per Surface Dakwah / Da'wah Surface Strategies
- *      — has ### sub-headings per surface (khutbah / kajian / kreator / pengajaran)
+ *   4. Strategi & Aksi Dakwah / Da'wah Strategies & Actions
+ *      — has ### sub-headings per channel + audience + action:
+ *        khutbah / kajian / pengajaran / kreator / Gen Z / aksi sosial
  *   5. Daleel & Sumber / Daleel & Sources
  *      — citations with > blockquote translation + 1-2 sentence context
  *

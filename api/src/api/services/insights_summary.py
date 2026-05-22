@@ -106,8 +106,8 @@ CRITICAL — SCOPE OF PERCENTAGES: baca SEGMENT_SCOPE di input. Jika "all", pers
 - Hindari kata kerja perintah ("wajib", "harus", "pentingnya"). Gunakan observasional ("menyoroti", "memetakan", "menunjukkan", "tercermin dari")
 - HANYA gunakan headlines dari pool yang saya berikan. JANGAN mengarang cerita.
 
-## Strategi per Surface Dakwah (350-450 kata)
-WAJIB 4 sub-section dengan ### H3:
+## Strategi & Aksi Dakwah (500-650 kata)
+WAJIB 6 sub-section dengan ### H3, SETIAP sub-section harus dapat angle BERBEDA — bukan satu nasihat yang di-paraphrase enam kali:
 
 ### Khutbah Jumat
 [2-3 kalimat: sudut spesifik. Sebut tema sentral dan satu angle khutbah konkret.]
@@ -115,13 +115,17 @@ WAJIB 4 sub-section dengan ### H3:
 ### Kajian Ibu-ibu & Majelis Taklim
 [2-3 kalimat: angle praktis-pastoral. Masalah hari-ke-hari, BUKAN ceramah teoritis.]
 
-### Kreator Konten Digital
-[2-3 kalimat: format/hook spesifik untuk YouTube/TikTok/IG/Reels.]
-
 ### Pengajaran di Rumah
 [2-3 kalimat: pendekatan untuk orang tua dengan anak. Percakapan keluarga, BUKAN khutbah mini di ruang makan.]
 
-SETIAP surface harus dapat angle BERBEDA — bukan satu nasihat yang di-paraphrase 4x.
+### Kreator Konten Digital
+[2-3 kalimat: format/hook spesifik untuk YouTube/TikTok/IG/Reels.]
+
+### Pendekatan Gen Z
+[2-3 kalimat: pendekatan SPESIFIK untuk Gen Z — audiens TERBESAR sekaligus TERSULIT untuk dijangkau, BUKAN sekadar memindahkan khutbah ke TikTok. Gen Z menolak nasihat top-down dan otoritarian. Pertimbangkan masuk lewat: pertanyaan identitas / mental-health / kecemasan masa depan, komunitas hobi (gaming, fandom, olahraga), peer-to-peer storytelling oleh sesama Gen Z yang sedang/sudah berhijrah, format hybrid online-offline (open-mic kajian sebagai diskusi terbuka — bukan ceramah), advokasi sosial sebagai pintu masuk dakwah (Palestina, mental-health awareness, isu sosial pekan ini).]
+
+### Aksi Sosial & Khidmah Umat
+[2-3 kalimat: aksi konkret yang bisa diinisiasi komunitas / masjid / yayasan / organisasi dakwah — BUKAN ceramah, BUKAN konten, harus berupa kegiatan nyata. Contoh angle: penggalangan dana / bantuan korban, pembentukan satgas perlindungan (anak / korban kekerasan / jamaah di luar negeri), kelompok pemberdayaan (ekonomi UMKM, mentoring pemuda, pendampingan korban), advokasi & kerja sama antar-komunitas. Sebut isu spesifik dari pekan ini sebagai pemicu aksi.]
 
 ## Dalil & Sumber (250-350 kata)
 - Kutip 4-5 dalil dari pool yang saya berikan, masing-masing dengan KONTEKS ringkas
@@ -182,8 +186,8 @@ CRITICAL — SCOPE OF PERCENTAGES: read SEGMENT_SCOPE in the input. When "all", 
 - Prefer observation verbs ("highlights", "maps", "tracks", "surfaces") over command verbs ("must", "should", "the importance of")
 - Only use headlines from the pool I provide. Do NOT invent stories.
 
-## Da'wah Surface Strategies (350-450 words)
-REQUIRED: 4 sub-sections with ### H3:
+## Da'wah Strategies & Actions (500-650 words)
+REQUIRED: 6 sub-sections with ### H3, EACH with a DIFFERENT angle — not one piece of advice paraphrased six ways:
 
 ### Friday Khutbah
 [2-3 sentences: specific angle, not generic. Name the central theme + one concrete khutbah angle.]
@@ -191,13 +195,17 @@ REQUIRED: 4 sub-sections with ### H3:
 ### Women's Kajian & Majelis Taklim
 [2-3 sentences: practical-pastoral angle. Day-to-day problems, NOT theoretical lecture.]
 
-### Digital Content Creators
-[2-3 sentences: specific format/hook for YouTube/TikTok/IG/Reels.]
-
 ### Teaching at Home
 [2-3 sentences: approach for parents with children. Family conversation, NOT a mini-khutbah at the dinner table.]
 
-EACH surface gets a DIFFERENT angle — not one piece of advice paraphrased 4 ways.
+### Digital Content Creators
+[2-3 sentences: specific format/hook for YouTube/TikTok/IG/Reels.]
+
+### Reaching Gen Z
+[2-3 sentences: SPECIFIC approach for Gen Z — the LARGEST and MOST DIFFICULT audience to reach, NOT just porting khutbah to TikTok. Gen Z rejects top-down authoritarian advice. Consider entry points: identity / mental-health / future-anxiety questions, hobby communities (gaming, fandom, sports), peer-to-peer storytelling by fellow Gen Z mid- or post-hijrah, hybrid online-offline formats (open-mic kajian as open discussion — not lecture), social advocacy as gateway to da'wah (Palestine solidarity, mental-health awareness, this week's social issues).]
+
+### Social Action & Service to the Ummah
+[2-3 sentences: concrete action a community / mosque / foundation / da'wah organization can initiate — NOT a sermon, NOT content, must be a real activity. Examples: disaster fundraising / victim assistance, child-safeguarding task forces (or for abuse victims, or for jamaah held abroad), empowerment cohorts (SME economics, youth mentoring, victim accompaniment), advocacy and inter-community collaborations. Tie to this week's specific issues as the trigger.]
 
 ## Daleel & Sources (250-350 words)
 - Cite 4-5 daleel from the pool I provide, each with brief CONTEXT
@@ -765,9 +773,9 @@ def _build_user_prompt(
         scope_note = scope_note_all
 
     write_now = (
-        "Tulis briefing sekarang dalam format markdown 5 bagian (Ringkasan Eksekutif / Numerik & Tren Pekan Ini / Tema Utama & Pola Yang Muncul / Strategi per Surface Dakwah / Daleel & Sumber), ~1500-1800 kata."
+        "Tulis briefing sekarang dalam format markdown 5 bagian (Ringkasan Eksekutif / Numerik & Tren Pekan Ini / Tema Utama & Pola Yang Muncul / Strategi & Aksi Dakwah / Daleel & Sumber), ~1700-2000 kata."
         if language == "id"
-        else "Write the briefing now in markdown, 5-section format (Executive Summary / Numbers & Trends This Week / Main Themes & Emerging Patterns / Da'wah Surface Strategies / Daleel & Sources), ~1500-1800 words."
+        else "Write the briefing now in markdown, 5-section format (Executive Summary / Numbers & Trends This Week / Main Themes & Emerging Patterns / Da'wah Strategies & Actions / Daleel & Sources), ~1700-2000 words."
     )
 
     return f"""{scope_note}
