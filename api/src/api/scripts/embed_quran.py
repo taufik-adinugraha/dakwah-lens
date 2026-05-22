@@ -44,6 +44,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, PointStruct, VectorParams
 
 from api.config import settings
+from api.services.usage import record_usage
 
 log = structlog.get_logger()
 
@@ -167,7 +168,18 @@ def main() -> None:
         batch = texts[i : i + EMBED_BATCH]
         resp = openai.embeddings.create(model=EMBEDDING_MODEL, input=batch)
         all_vectors.extend(d.embedding for d in resp.data)
-        total_tokens += resp.usage.total_tokens
+        batch_tokens = resp.usage.total_tokens
+        total_tokens += batch_tokens
+        # Log per batch so Ctrl-C mid-corpus still leaves an honest audit
+        # trail in usage_events. Single corpus-build runs in dev/prod hit
+        # this; price is computed inside record_usage from PRICES table.
+        record_usage(
+            provider="openai",
+            operation="corpus_embed_quran",
+            model=EMBEDDING_MODEL,
+            tokens_in=batch_tokens,
+            meta={"batch_size": len(batch)},
+        )
         elapsed = time.time() - start
         log.info(
             "embed.batch",

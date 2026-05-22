@@ -67,6 +67,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, PointStruct, VectorParams
 
 from api.config import settings
+from api.services.usage import record_usage
 
 log = structlog.get_logger()
 
@@ -199,7 +200,17 @@ def _embed_book(
         batch = texts[i : i + EMBED_BATCH]
         resp = openai.embeddings.create(model=EMBEDDING_MODEL, input=batch)
         all_vectors.extend(d.embedding for d in resp.data)
-        tokens_used += resp.usage.total_tokens
+        batch_tokens = resp.usage.total_tokens
+        tokens_used += batch_tokens
+        # Per-batch logging so partial corpus runs still leave audit
+        # rows in usage_events (vs the previous untracked ~$2 gap).
+        record_usage(
+            provider="openai",
+            operation="corpus_embed_hadith",
+            model=EMBEDDING_MODEL,
+            tokens_in=batch_tokens,
+            meta={"book": book.qdrant_collection, "batch_size": len(batch)},
+        )
         log.info(
             "embed.batch",
             book=book.qdrant_collection,

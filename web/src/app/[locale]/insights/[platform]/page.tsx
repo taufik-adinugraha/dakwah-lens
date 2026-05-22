@@ -701,10 +701,10 @@ function LiveStream({
           <div>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
               <Radio className="h-3 w-3" />
-              Live ingestion
+              {tInsights("live_sentiment_concerned_badge")}
             </span>
             <h2 className="mt-3 text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-              What&apos;s surfacing right now
+              {tInsights("live_section_title")}
             </h2>
             <I18nText
               text={tInsights("live_section_subtitle", {
@@ -712,12 +712,18 @@ function LiveStream({
               })}
               className="mt-1.5 block text-pretty text-sm text-slate-600"
             />
+            <I18nText
+              text={tInsights("live_section_top50_note", {
+                count: live.totalPosts.toLocaleString(),
+              })}
+              className="mt-1 block text-pretty text-xs italic text-slate-500"
+            />
           </div>
 
           {/* Sentiment mix mini-chart */}
           <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-              Sentiment mix
+              {tInsights("live_sentiment_mix")}
             </p>
             <div className="mt-2 flex h-2 overflow-hidden rounded-full">
               <span className="bg-emerald-500" style={{ width: `${posPct}%` }} />
@@ -727,15 +733,15 @@ function LiveStream({
             <div className="mt-2 flex justify-between text-[11px] tabular-nums text-slate-600">
               <span>
                 <span className="font-semibold text-emerald-700">{posPct}%</span>{" "}
-                positive
+                {tInsights("live_sentiment_positive")}
               </span>
               <span>
                 <span className="font-semibold text-slate-700">{neuPct}%</span>{" "}
-                neutral
+                {tInsights("live_sentiment_neutral")}
               </span>
               <span>
                 <span className="font-semibold text-amber-700">{negPct}%</span>{" "}
-                concerned
+                {tInsights("live_sentiment_concerned")}
               </span>
             </div>
           </div>

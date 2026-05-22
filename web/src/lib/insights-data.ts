@@ -458,6 +458,34 @@ export async function getBriefingBySlug(
   };
 }
 
+/**
+ * Pull the first H2 section out of a long-form markdown briefing.
+ *
+ * Returns everything from the first `## ` heading up to (but not
+ * including) the second `## ` heading. The H2 line itself is included
+ * so the preview renders with its own heading — matches what readers
+ * see when they click through to the full page.
+ *
+ * Falls back to returning the whole body if no second H2 exists (old
+ * 3-paragraph rows from before the 2026-05-21 long-form migration).
+ *
+ * Used by the /insights all-platform hero AND each /insights/segment/
+ * [focus] page to render only the executive summary + a CTA to the
+ * standalone /insights/brief/[id] view.
+ */
+export function extractFirstBriefingSection(body: string): string {
+  const headings: number[] = [];
+  body.split("\n").forEach((line, idx) => {
+    if (/^##\s+/.test(line)) headings.push(idx);
+  });
+  if (headings.length < 2) return body;
+
+  const lines = body.split("\n");
+  const start = headings[0];
+  const end = headings[1];
+  return lines.slice(start, end).join("\n").trim();
+}
+
 /** Canonical slug for a briefing — used for share links + RSS later. */
 export function briefingSlug(generatedAt: Date, segment: string | null): string {
   // Convert UTC → WIB by adding 7h, then take date portion. Done manually

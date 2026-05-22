@@ -65,11 +65,34 @@ jobs:
   # ─── Deploy ──────────────────────────────────────────────────
   # SSHes to the VM and runs deploy.sh. All Docker work happens there;
   # this step is just the trigger.
+  #
+  # User-facing notice: at deploy start we POST to /api/internal/deploy-event
+  # with state="deploying" so the centered overlay locks the app in every
+  # open browser tab. At deploy end (success or failure) we POST state="idle"
+  # or "failed" to clear/replace the overlay. Both webhook calls are HMAC-
+  # signed against DEPLOY_WEBHOOK_SECRET. The final `always()` step makes
+  # sure we never leave the overlay stuck if SSH fails midway.
   deploy:
     needs: verify
     runs-on: ubuntu-latest
     steps:
+      - name: Notify users — deploy starting
+        run: |
+          set -e
+          BODY=$(jq -nc \
+            --arg state "deploying" \
+            --arg sha "${GITHUB_SHA}" \
+            --arg msg "$(git log -1 --pretty=%s "$GITHUB_SHA" 2>/dev/null || echo '')" \
+            --arg url "https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" \
+            '{state:$state, commit_sha:$sha, commit_message:$msg, workflow_run_url:$url}')
+          SIG="sha256=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "${{ secrets.DEPLOY_WEBHOOK_SECRET }}" | awk '{print $2}')"
+          curl -sS -X POST "${{ secrets.DEPLOY_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -H "X-Deploy-Signature: $SIG" \
+            -d "$BODY" || echo "WARN: deploy-event start ping failed; continuing"
+
       - name: SSH + deploy
+        id: ssh_deploy
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.DEPLOY_HOST }}
@@ -83,3 +106,27 @@ jobs:
           script: |
             set -euo pipefail
             bash /srv/dakwah-lens/repo/deploy/deploy.sh
+
+      - name: Notify users — deploy finished
+        # `always()` so the overlay clears even if SSH failed — leaving
+        # users staring at a non-dismissible overlay forever is worse than
+        # silently swallowing the failure here. State reports success or
+        # failure based on the SSH step's conclusion.
+        if: always()
+        run: |
+          set -e
+          STATE="idle"
+          if [ "${{ steps.ssh_deploy.outcome }}" != "success" ]; then
+            STATE="failed"
+          fi
+          BODY=$(jq -nc \
+            --arg state "$STATE" \
+            --arg sha "${GITHUB_SHA}" \
+            --arg msg "$(git log -1 --pretty=%s "$GITHUB_SHA" 2>/dev/null || echo '')" \
+            --arg url "https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" \
+            '{state:$state, commit_sha:$sha, commit_message:$msg, workflow_run_url:$url}')
+          SIG="sha256=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "${{ secrets.DEPLOY_WEBHOOK_SECRET }}" | awk '{print $2}')"
+          curl -sS -X POST "${{ secrets.DEPLOY_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -H "X-Deploy-Signature: $SIG" \
+            -d "$BODY" || echo "WARN: deploy-event finish ping failed"

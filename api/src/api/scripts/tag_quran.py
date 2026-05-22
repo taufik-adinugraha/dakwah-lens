@@ -45,6 +45,7 @@ from google.genai import types
 from pydantic import BaseModel
 
 from api.config import settings
+from api.services.usage import gemini_output_tokens, record_usage
 
 log = structlog.get_logger()
 
@@ -174,6 +175,18 @@ def main() -> None:
                 else:
                     raw = json.loads(response.text)
                     result = [VerseTag.model_validate(item) for item in raw]
+                # Log to usage_events so the api-costs dashboard sees this
+                # one-shot corpus spend (historically these batches went
+                # untracked and produced the ~$2 gap vs. the AI Studio bill).
+                usage_md = getattr(response, "usage_metadata", None)
+                record_usage(
+                    provider="gemini",
+                    operation="corpus_tag_quran",
+                    model=MODEL,
+                    tokens_in=getattr(usage_md, "prompt_token_count", None),
+                    tokens_out=gemini_output_tokens(usage_md),
+                    meta={"batch_size": len(batch)},
+                )
                 break
             except Exception as e:
                 wait = 2**attempt

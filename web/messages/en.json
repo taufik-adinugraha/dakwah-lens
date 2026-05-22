@@ -4,6 +4,13 @@
     "tagline": "See what your ummah needs — before they ask.",
     "description": "AI-powered media intelligence platform for Indonesian da'i. Free forever."
   },
+  "Deploy": {
+    "deploying_title": "App update in progress",
+    "deploying_body": "A new version is being deployed. Hold on — the app will be available again in a few minutes. Please don't submit forms or make changes right now.",
+    "failed_title": "Update failed",
+    "failed_body": "The latest deploy didn't complete. The team has been notified. You can try refreshing this page in a few minutes.",
+    "auto_refresh_note": "This notice will disappear automatically when the deploy finishes · ~5s delay."
+  },
   "Nav": {
     "home": "Home",
     "features": "Features",
@@ -540,6 +547,7 @@
     "live_badge": "Live · {count} posts ingested",
     "live_section_title": "What's surfacing right now",
     "live_section_subtitle": "Top posts by da'wah relevance from the {count} already-ingested · classified by Gemini.",
+    "live_section_top50_note": "Note: only the 50 most relevant posts are shown in detail below. The Sentiment mix chart on the side counts all {count} posts, so the chart percentages and the filter-chip counts will differ.",
     "show_more": "Show more",
     "live_sentiment_mix": "Sentiment mix",
     "live_sentiment_positive": "positive",

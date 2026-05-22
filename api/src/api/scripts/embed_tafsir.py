@@ -61,6 +61,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, PointStruct, VectorParams
 
 from api.config import settings
+from api.services.usage import record_usage
 
 log = structlog.get_logger()
 
@@ -192,8 +193,11 @@ def _build_inputs(verses: list[dict[str, object]]) -> tuple[
 
 def _embed_with_retry(
     openai: OpenAI, batch_texts: list[str], max_retries: int = 6
-) -> list[list[float]]:
+) -> tuple[list[list[float]], int]:
     """Call OpenAI embeddings with explicit backoff on 429s.
+
+    Returns `(vectors, total_tokens)` so the caller can record honest
+    usage instead of the char/4 estimate.
 
     Why we need this beyond the SDK's built-in retry: a 1M-token-per-minute
     TPM ceiling means a 100-chunk batch at ~1000 tokens each consumes a
@@ -208,7 +212,7 @@ def _embed_with_retry(
             resp = openai.embeddings.create(
                 model=EMBEDDING_MODEL, input=batch_texts
             )
-            return [d.embedding for d in resp.data]
+            return [d.embedding for d in resp.data], resp.usage.total_tokens
         except Exception as exc:
             is_rate_limit = "429" in str(exc) or "rate_limit" in str(exc).lower()
             is_server_error = any(
@@ -370,10 +374,16 @@ def main() -> None:
         batch_ids = ids[i : i + EMBED_BATCH]
         batch_payloads = payloads[i : i + EMBED_BATCH]
 
-        vectors = _embed_with_retry(openai, batch_texts)
-        # Update tokens estimate post-hoc — we lose .usage on retry paths
-        # but the order-of-magnitude is what matters for the cost summary.
-        total_tokens += sum(len(t) for t in batch_texts) // 4
+        vectors, batch_tokens = _embed_with_retry(openai, batch_texts)
+        total_tokens += batch_tokens
+        # Log per batch so a mid-run crash still leaves an audit row.
+        record_usage(
+            provider="openai",
+            operation="corpus_embed_tafsir",
+            model=EMBEDDING_MODEL,
+            tokens_in=batch_tokens,
+            meta={"batch_size": len(batch_texts)},
+        )
 
         points = [
             PointStruct(id=pid, vector=vec, payload=pl)
@@ -388,7 +398,7 @@ def main() -> None:
             done=i + len(batch_texts),
             total=len(texts),
             upserted=upserted,
-            tokens_est=total_tokens,
+            tokens=total_tokens,
             elapsed_s=round(elapsed, 1),
         )
 
@@ -396,7 +406,7 @@ def main() -> None:
     actual_cost = total_tokens / 1_000_000 * PRICE_PER_1M
     print()
     print(f"✓ Embedded {upserted:,} chunks across {len(verses):,} ayat")
-    print(f"  tokens (est): {total_tokens:>10,}")
+    print(f"  tokens used : {total_tokens:>10,}")
     print(f"  elapsed     : {elapsed:>10.1f} s")
     print(f"  cost (USD)  : {actual_cost:>10.4f}")
     print()

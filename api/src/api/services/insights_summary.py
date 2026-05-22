@@ -34,6 +34,7 @@ from api.config import settings
 from api.db import SessionLocal
 from api.models.admin import InsightsSummary
 from api.services.kitab_retrieval import rerank_daleel, retrieve_daleel
+from api.services.usage import gemini_output_tokens
 
 log = structlog.get_logger()
 
@@ -651,7 +652,7 @@ Jangan tulis nama kasus atau orang. Jangan tulis kata bahasa Inggris seperti "yo
             operation="retrieval_query_gen",
             model="gemini-2.5-flash-lite",
             tokens_in=getattr(usage_md, "prompt_token_count", None),
-            tokens_out=getattr(usage_md, "candidates_token_count", None),
+            tokens_out=gemini_output_tokens(usage_md),
             meta={"segment": segment},
         )
         log.info(
@@ -874,7 +875,8 @@ def _generate_for_language(
 
     usage_md = getattr(resp, "usage_metadata", None)
     tokens_in = getattr(usage_md, "prompt_token_count", None)
-    tokens_out = getattr(usage_md, "candidates_token_count", None)
+    # Pro thinking tokens are billed at output rate, so fold them in.
+    tokens_out = gemini_output_tokens(usage_md)
     cost = (
         (tokens_in or 0) / 1_000_000 * 1.25
         + (tokens_out or 0) / 1_000_000 * 10.00

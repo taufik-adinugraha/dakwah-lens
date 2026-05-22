@@ -865,3 +865,7 @@ export const bookmarks = pgTable(
     ),
   ],
 );
+
+// Deploy status persists as a single JSON-encoded value under the
+// `deploy_status` key in `app_settings` — no new table needed.
+// See /api/internal/deploy-event (write) and /api/deploy-status (read).

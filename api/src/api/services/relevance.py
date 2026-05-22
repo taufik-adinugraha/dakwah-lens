@@ -368,7 +368,7 @@ def _classify_chunk(texts: list[str]) -> list[RelevanceResult]:
         )
         parsed = []
 
-    from api.services.usage import record_usage
+    from api.services.usage import gemini_output_tokens, record_usage
 
     usage_md = getattr(resp, "usage_metadata", None)
     record_usage(
@@ -376,7 +376,7 @@ def _classify_chunk(texts: list[str]) -> list[RelevanceResult]:
         operation="classify_relevance",
         model=MODEL,
         tokens_in=getattr(usage_md, "prompt_token_count", None),
-        tokens_out=getattr(usage_md, "candidates_token_count", None),
+        tokens_out=gemini_output_tokens(usage_md),
         meta={"batch_size": len(texts)},
     )
 
@@ -495,7 +495,7 @@ def _classify_opportunity_chunk(texts: list[str]) -> list[float]:
         )
         parsed = []
 
-    from api.services.usage import record_usage
+    from api.services.usage import gemini_output_tokens, record_usage
 
     usage_md = getattr(resp, "usage_metadata", None)
     record_usage(
@@ -503,7 +503,7 @@ def _classify_opportunity_chunk(texts: list[str]) -> list[float]:
         operation="classify_opportunity",
         model=MODEL,
         tokens_in=getattr(usage_md, "prompt_token_count", None),
-        tokens_out=getattr(usage_md, "candidates_token_count", None),
+        tokens_out=gemini_output_tokens(usage_md),
         meta={"batch_size": len(texts)},
     )
 

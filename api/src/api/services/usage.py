@@ -68,6 +68,23 @@ PRICES: dict[str, dict[str, float]] = {
 }
 
 
+def gemini_output_tokens(usage_md: Any) -> int | None:
+    """Sum `candidates_token_count` + `thoughts_token_count` from a Gemini
+    `usage_metadata` object.
+
+    Google bills thinking tokens at the same rate as output tokens but
+    exposes them on a SEPARATE field. Reading only `candidates_token_count`
+    under-counts cost by up to (thinking_budget × output_rate) per call —
+    on Pro briefings (budget 4096 @ $10/M) that's ~$0.04 per call missed.
+    """
+    if usage_md is None:
+        return None
+    candidates = getattr(usage_md, "candidates_token_count", None) or 0
+    thoughts = getattr(usage_md, "thoughts_token_count", None) or 0
+    total = candidates + thoughts
+    return total if total > 0 else None
+
+
 def estimate_cost(
     *,
     provider: str,

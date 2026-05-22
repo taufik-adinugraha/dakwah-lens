@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, count, desc, eq, sql } from "drizzle-orm";
 import { ArrowLeft, Filter } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
@@ -97,22 +97,21 @@ export default async function PostsBrowsePage({
   const authorParam = typeof search.author === "string" ? search.author : "";
   const author = authorParam.slice(0, 64);
 
-  // Build WHERE clauses.
-  const filters = [eq(schema.socialPosts.platform, dbPlatformName)];
-  if (sentiment !== "all") {
-    filters.push(eq(schema.socialPosts.sentimentLabel, sentiment));
-  }
+  // Build WHERE clauses. Non-sentiment filters are reused for the
+  // per-sentiment counts query below — keeping the sentiment chip
+  // counts in sync with whatever other filter is active.
+  const baseFilters = [eq(schema.socialPosts.platform, dbPlatformName)];
   if (topicId) {
-    filters.push(eq(schema.socialPosts.topicId, topicId));
+    baseFilters.push(eq(schema.socialPosts.topicId, topicId));
   }
   if (author) {
-    filters.push(eq(schema.socialPosts.author, author));
+    baseFilters.push(eq(schema.socialPosts.author, author));
   }
 
   // For category filter: dominant category match. JSONB → key with the
   // highest value among the 9 da'wah keys must equal the requested one.
   if (category) {
-    filters.push(
+    baseFilters.push(
       sql`(
         SELECT key FROM jsonb_each_text(${schema.socialPosts.categories})
         WHERE key = ANY (ARRAY[${sql.raw(
@@ -123,6 +122,11 @@ export default async function PostsBrowsePage({
       ) = ${category}`,
     );
   }
+
+  const queryFilters =
+    sentiment !== "all"
+      ? [...baseFilters, eq(schema.socialPosts.sentimentLabel, sentiment)]
+      : baseFilters;
 
   const posts = await db
     .select({
@@ -136,9 +140,36 @@ export default async function PostsBrowsePage({
       postedAt: schema.socialPosts.postedAt,
     })
     .from(schema.socialPosts)
-    .where(and(...filters))
+    .where(and(...queryFilters))
     .orderBy(desc(schema.socialPosts.postedAt))
     .limit(50);
+
+  // Per-sentiment totals, ignoring the current sentiment chip so each
+  // chip shows "how many would I see if I switched to this".
+  const sentimentCountRows = (await db
+    .select({
+      label: schema.socialPosts.sentimentLabel,
+      n: count(),
+    })
+    .from(schema.socialPosts)
+    .where(and(...baseFilters))
+    .groupBy(schema.socialPosts.sentimentLabel)) as Array<{
+    label: string | null;
+    n: number;
+  }>;
+
+  const sentimentCounts: Record<Sentiment, number> = {
+    all: 0,
+    positive: 0,
+    neutral: 0,
+    negative: 0,
+  };
+  for (const row of sentimentCountRows) {
+    sentimentCounts.all += row.n;
+    if (row.label === "positive") sentimentCounts.positive = row.n;
+    else if (row.label === "neutral") sentimentCounts.neutral = row.n;
+    else if (row.label === "negative") sentimentCounts.negative = row.n;
+  }
 
   const categoryLabel = category
     ? t(`dawah_category_${category}` as Parameters<typeof t>[0])
@@ -187,23 +218,44 @@ export default async function PostsBrowsePage({
           </span>
           {SENTIMENTS.map((s) => {
             const active = s === sentiment;
-            const colorClass = {
-              all: "bg-slate-100 text-slate-700 ring-slate-200",
-              positive: "bg-emerald-50 text-emerald-700 ring-emerald-200",
-              neutral: "bg-slate-50 text-slate-700 ring-slate-200",
-              negative: "bg-amber-50 text-amber-800 ring-amber-200",
+            // Tone palette matches the /insights/[platform] hero filter
+            // (PlatformStoriesFilter) so the two surfaces don't drift.
+            const tone: "slate" | "emerald" | "amber" = {
+              all: "slate" as const,
+              positive: "emerald" as const,
+              neutral: "slate" as const,
+              negative: "amber" as const,
             }[s];
+            const toneActive = {
+              slate: "bg-slate-900 text-white ring-slate-900",
+              emerald: "bg-emerald-600 text-white ring-emerald-600",
+              amber: "bg-amber-600 text-white ring-amber-600",
+            }[tone];
+            const toneInactive = {
+              slate: "bg-white text-slate-700 ring-slate-200 hover:bg-slate-50",
+              emerald:
+                "bg-white text-emerald-700 ring-emerald-200 hover:bg-emerald-50",
+              amber: "bg-white text-amber-700 ring-amber-200 hover:bg-amber-50",
+            }[tone];
+            const n = sentimentCounts[s];
             return (
               <Link
                 key={s}
                 href={buildChipHref(s)}
-                className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 transition ${
-                  active
-                    ? `${colorClass} font-semibold shadow-sm`
-                    : "bg-white text-slate-500 ring-slate-200 hover:bg-slate-50"
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ring-1 transition ${
+                  active ? toneActive : toneInactive
                 }`}
               >
-                {t(`posts_sentiment_${s}` as Parameters<typeof t>[0])}
+                <span>
+                  {t(`posts_sentiment_${s}` as Parameters<typeof t>[0])}
+                </span>
+                <span
+                  className={`tabular-nums text-[10px] ${
+                    active ? "text-white/80" : "text-slate-500"
+                  }`}
+                >
+                  {n}
+                </span>
               </Link>
             );
           })}

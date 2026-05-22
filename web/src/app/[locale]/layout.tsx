@@ -6,10 +6,12 @@ import { notFound } from "next/navigation";
 
 import { routing } from "@/i18n/routing";
 import { ActiveNotice } from "@/components/ActiveNotice";
+import { DeployOverlay } from "@/components/DeployOverlay";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { PageTracker } from "@/components/PageTracker";
 import { PendingApprovalBanner } from "@/components/PendingApprovalBanner";
+import { readDeployStatus } from "@/lib/deploy-status";
 import "../globals.css";
 
 const geistSans = Geist({
@@ -64,6 +66,12 @@ export default async function RootLayout({
 
   setRequestLocale(locale);
 
+  // SSR-fetch the deploy status so the overlay paints immediately on
+  // first paint during an in-progress deploy — no flash of usable UI
+  // before the client picks it up. Failure here is non-fatal (renders
+  // as idle).
+  const deployStatus = await readDeployStatus().catch(() => null);
+
   return (
     <html
       lang={locale}
@@ -77,6 +85,7 @@ export default async function RootLayout({
           <main className="flex flex-col">{children}</main>
           <Footer />
           <PageTracker locale={locale} />
+          {deployStatus && <DeployOverlay initialStatus={deployStatus} />}
         </NextIntlClientProvider>
       </body>
     </html>

@@ -6,7 +6,11 @@ import { ArrowLeft, ArrowRight, Layers } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
-import { briefingSlug, getLatestInsightsSummary } from "@/lib/insights-data";
+import {
+  briefingSlug,
+  extractFirstBriefingSection,
+  getLatestInsightsSummary,
+} from "@/lib/insights-data";
 import { BriefingNarrative } from "@/components/BriefingNarrative";
 import { InsightsHeadlinePills } from "@/components/InsightsHeadlinePills";
 import { FilterableTopPosts } from "@/components/FilterableTopPosts";
@@ -225,14 +229,18 @@ export default async function SegmentPage({
         </div>
       </section>
 
-      {/* Per-segment AI briefing — narrative + nasihah + retrieved daleel */}
+      {/* Per-segment AI briefing — preview only (Section 1 + daleel
+          chips + CTA). The full long-form briefing lives on
+          /insights/brief/[slug]; this card mirrors the /insights
+          all-platform hero so both surfaces use the same
+          scannable-preview-plus-CTA shape. */}
       {segmentBriefing && (() => {
         const briefingBody =
           locale === "en" && segmentBriefing.summaryMdEn
             ? segmentBriefing.summaryMdEn
             : segmentBriefing.summaryMd;
-        // Reading-time estimate from full body, matching the
-        // /insights all-platform hero. ~200 wpm Indonesian average.
+        const preview = extractFirstBriefingSection(briefingBody);
+        // Reading-time estimate from the FULL body (what the CTA leads to).
         const wordCount = briefingBody.trim().split(/\s+/).length;
         const readingMinutes = Math.max(1, Math.round(wordCount / 200));
         const slug = briefingSlug(
@@ -248,17 +256,14 @@ export default async function SegmentPage({
                   {t("exec_briefing_label")}
                 </p>
                 <BriefingNarrative
-                  text={briefingBody}
+                  text={preview}
                   daleelRefs={segmentBriefing.daleelRefs}
-                  nasihahLabel={t("exec_briefing_nasihah_label")}
                   citedDaleelLabel={t("exec_daleel_label")}
                 />
 
-                {/* CTA to the dedicated /insights/brief/{slug} page — has
-                    TOC sidebar + share + download toolbars. Matches the
-                    pattern on the all-platform /insights hero so every
-                    briefing surface offers the same path to the full
-                    standalone view. */}
+                {/* CTA into the full long-form briefing on the dedicated
+                    /insights/brief/{slug} page — has TOC sidebar + share +
+                    download toolbars. */}
                 <Link
                   href={`/insights/brief/${slug}`}
                   className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-emerald-700 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-800"

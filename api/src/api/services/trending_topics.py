@@ -235,7 +235,7 @@ def filter_with_gemini(candidates: list[Candidate]) -> list[str]:
         parsed = json.loads(resp.text or "[]")
 
         # Log usage so the superadmin api-costs page sees this spend.
-        from api.services.usage import record_usage
+        from api.services.usage import gemini_output_tokens, record_usage
 
         usage_md = getattr(resp, "usage_metadata", None)
         record_usage(
@@ -243,7 +243,7 @@ def filter_with_gemini(candidates: list[Candidate]) -> list[str]:
             operation="trending_filter",
             model=FILTER_MODEL,
             tokens_in=getattr(usage_md, "prompt_token_count", None),
-            tokens_out=getattr(usage_md, "candidates_token_count", None),
+            tokens_out=gemini_output_tokens(usage_md),
             meta={"candidates": len(candidates)},
         )
 

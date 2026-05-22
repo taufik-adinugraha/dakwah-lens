@@ -210,7 +210,7 @@ def _classify_chunk(texts: list[str]) -> list[SentimentResult]:
     raw = resp.text or "[]"
     parsed: list[dict[str, float]] = json.loads(raw)
 
-    from api.services.usage import record_usage
+    from api.services.usage import gemini_output_tokens, record_usage
 
     usage_md = getattr(resp, "usage_metadata", None)
     record_usage(
@@ -218,7 +218,7 @@ def _classify_chunk(texts: list[str]) -> list[SentimentResult]:
         operation="classify_news_sentiment",
         model=MODEL,
         tokens_in=getattr(usage_md, "prompt_token_count", None),
-        tokens_out=getattr(usage_md, "candidates_token_count", None),
+        tokens_out=gemini_output_tokens(usage_md),
         meta={"batch_size": len(texts)},
     )
 

@@ -4,6 +4,13 @@
     "tagline": "Pahami apa yang sedang dibutuhkan umat — sebelum mereka bertanya.",
     "description": "Platform media intelligence berbasis AI untuk para da'i di Indonesia. Gratis selamanya."
   },
+  "Deploy": {
+    "deploying_title": "Aplikasi sedang diperbarui",
+    "deploying_body": "Versi baru sedang di-deploy. Sebentar ya — aplikasi akan otomatis tersedia kembali dalam beberapa menit. Mohon tidak mengirim formulir atau melakukan perubahan saat ini.",
+    "failed_title": "Pembaruan gagal",
+    "failed_body": "Deploy terbaru tidak selesai. Tim sedang menanganinya. Anda bisa coba refresh halaman ini setelah beberapa menit.",
+    "auto_refresh_note": "Pemberitahuan ini akan hilang otomatis saat deploy selesai · ~5 detik delay."
+  },
   "Nav": {
     "home": "Beranda",
     "features": "Fitur",
@@ -536,6 +543,7 @@
     "live_badge": "Live · {count} postingan ter-ingest",
     "live_section_title": "Yang sedang menonjol saat ini",
     "live_section_subtitle": "Postingan teratas berdasarkan relevansi da'wah dari {count} yang sudah ter-ingest · diklasifikasi oleh Gemini.",
+    "live_section_top50_note": "Catatan: hanya 50 postingan paling relevan yang ditampilkan secara detail di bawah. Chart Komposisi Sentimen di samping menghitung semua {count} postingan, jadi angka di chart dan jumlah pada chip filter wajar berbeda.",
     "show_more": "Tampilkan lebih banyak",
     "live_sentiment_mix": "Komposisi sentimen",
     "live_sentiment_positive": "positif",

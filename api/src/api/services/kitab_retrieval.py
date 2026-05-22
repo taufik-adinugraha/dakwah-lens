@@ -21,7 +21,7 @@ from openai import OpenAI
 from qdrant_client import QdrantClient
 
 from api.config import settings
-from api.services.usage import record_usage
+from api.services.usage import gemini_output_tokens, record_usage
 
 log = structlog.get_logger()
 
@@ -321,7 +321,7 @@ Kembalikan JSON: {{"indices": [i1, i2, i3]}} dengan {top_n} index daleel terbaik
             operation="daleel_rerank",
             model="gemini-2.5-flash-lite",
             tokens_in=getattr(usage_md, "prompt_token_count", None),
-            tokens_out=getattr(usage_md, "candidates_token_count", None),
+            tokens_out=gemini_output_tokens(usage_md),
         )
         log.info(
             "kitab_retrieval.reranked",

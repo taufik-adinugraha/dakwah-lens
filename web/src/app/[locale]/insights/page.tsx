@@ -21,6 +21,7 @@ import { DigestOptInPrompt } from "@/components/DigestOptInPrompt";
 import { InsightsHeadlinePills } from "@/components/InsightsHeadlinePills";
 import {
   briefingSlug,
+  extractFirstBriefingSection,
   getLatestInsightsSummary,
   getOverviewInsights,
   type LatestInsightsSummary,
@@ -365,7 +366,7 @@ function ExecutiveBriefing({
   // Summary) — the full long-form brief lives on /insights/brief/[id].
   // Trimming here keeps the /insights hub scannable; users who want the
   // full read click through via the CTA below.
-  const preview = extractFirstSection(fullBody);
+  const preview = extractFirstBriefingSection(fullBody);
 
   // Approximate reading time for the full briefing — surfaces the depth
   // available behind the CTA without forcing the user into it.
@@ -430,29 +431,9 @@ function ExecutiveBriefing({
   );
 }
 
-/**
- * Pull the first H2 section out of a long-form markdown briefing.
- *
- * Returns everything from the first `## ` heading up to (but not
- * including) the second `## ` heading. The H2 line itself is included
- * so the preview renders with its own heading — matches what readers
- * see when they click through to the full page.
- *
- * Falls back to returning the whole body if no second H2 exists (old
- * 3-paragraph rows from before the 2026-05-21 long-form migration).
- */
-function extractFirstSection(body: string): string {
-  const headings: number[] = [];
-  body.split("\n").forEach((line, idx) => {
-    if (/^##\s+/.test(line)) headings.push(idx);
-  });
-  if (headings.length < 2) return body;
-
-  const lines = body.split("\n");
-  const start = headings[0];
-  const end = headings[1];
-  return lines.slice(start, end).join("\n").trim();
-}
+// extractFirstBriefingSection lives in @/lib/insights-data — shared
+// with the segment-focus page so both surfaces use the same preview
+// extraction logic.
 
 // HeadlinePill moved to @/components/InsightsHeadlinePills for reuse on
 // /insights/segment/[focus]. ExecutiveBriefing now imports InsightsHeadlinePills.

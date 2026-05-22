@@ -263,7 +263,7 @@ def discover_topics(
     themes_raw = parsed.get("themes") or []
 
     # Record cost so the api-costs dashboard sees this spend.
-    from api.services.usage import record_usage
+    from api.services.usage import gemini_output_tokens, record_usage
 
     usage_md = getattr(resp, "usage_metadata", None) if resp else None
     record_usage(
@@ -271,7 +271,7 @@ def discover_topics(
         operation="topic_discovery",
         model=MODEL,
         tokens_in=getattr(usage_md, "prompt_token_count", None),
-        tokens_out=getattr(usage_md, "candidates_token_count", None),
+        tokens_out=gemini_output_tokens(usage_md),
         meta={"platform": platform, "sample_size": len(sample)},
     )
 
