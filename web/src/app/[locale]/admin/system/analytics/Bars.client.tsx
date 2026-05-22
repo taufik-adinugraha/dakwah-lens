@@ -165,6 +165,41 @@ function ChartTooltip({
  * the tooltip arrow points at the right place regardless of segment
  * order or size.
  */
+/**
+ * Pure helper — kept OUTSIDE the React component so the `cumulative +=`
+ * prefix-sum doesn't trip the react-hooks/immutability lint rule (which
+ * forbids reassigning a closed-over variable inside a `.map()` callback
+ * at the component top level).
+ */
+function positionSegments(
+  segments: Array<{ key: string; label: string; color: string; value: number }>,
+  total: number,
+): Array<{
+  key: string;
+  label: string;
+  color: string;
+  value: number;
+  pct: number;
+  center: number;
+}> {
+  const out: Array<{
+    key: string;
+    label: string;
+    color: string;
+    value: number;
+    pct: number;
+    center: number;
+  }> = [];
+  let cumulative = 0;
+  for (const s of segments) {
+    const pct = total > 0 ? (s.value / total) * 100 : 0;
+    const center = cumulative + pct / 2;
+    cumulative += pct;
+    out.push({ ...s, pct, center });
+  }
+  return out;
+}
+
 export function StackedBar({
   segments,
   total,
@@ -179,13 +214,7 @@ export function StackedBar({
   // Precompute the horizontal-center position of each segment so the
   // tooltip arrow lines up with where the cursor is, not where the
   // segment's box-origin happens to land.
-  let cumulative = 0;
-  const positioned = segments.map((s) => {
-    const pct = total > 0 ? (s.value / total) * 100 : 0;
-    const center = cumulative + pct / 2;
-    cumulative += pct;
-    return { ...s, pct, center };
-  });
+  const positioned = positionSegments(segments, total);
 
   return (
     <div className="relative">
