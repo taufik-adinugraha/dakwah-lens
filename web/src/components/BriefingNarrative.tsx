@@ -1,7 +1,16 @@
 import ReactMarkdown, { type Components } from "react-markdown";
 
 import type { DaleelRef } from "@/db/schema";
+import { BriefDeliverableCards } from "./BriefDeliverableCards";
 import { DaleelChips } from "./DaleelChips";
+
+/** Section 4 heading variants per language. Used to split the markdown
+ *  body around the deliverable section so it renders as cards-and-modal
+ *  instead of inline. Match is case-insensitive and tolerant of trailing
+ *  punctuation but requires the exact phrase since the LLM is steered
+ *  toward these exact section names by the prompt. */
+const SECTION_4_HEADINGS_ID = ["strategi & aksi dakwah", "strategi dan aksi dakwah"];
+const SECTION_4_HEADINGS_EN = ["da'wah strategies & actions", "dawah strategies & actions"];
 
 /**
  * Renders the AI-narrated weekly briefing.
@@ -30,21 +39,84 @@ export function BriefingNarrative({
   text,
   daleelRefs,
   citedDaleelLabel,
+  briefBasePath,
+  deliverableLabels,
+  initialDeliverable,
+  locale,
 }: {
   text: string;
   daleelRefs: DaleelRef[] | null;
   /** Header label for the collapsible daleel chips section below the
    *  narrative. Locale-aware via translations from parent. */
   citedDaleelLabel: string;
+  /** Path of the brief detail route. When provided, Section 4 of the
+   *  markdown is rendered as a card grid (BriefDeliverableCards) instead
+   *  of inline scroll, with each ### h3 opening a focus modal. Omit on
+   *  preview surfaces (e.g. /insights hero) — there we want the plain
+   *  inline render. */
+  briefBasePath?: string;
+  /** Localized strings for the card grid + modal toolbar. Required when
+   *  `briefBasePath` is set. */
+  deliverableLabels?: {
+    open: string;
+    copy: string;
+    copied: string;
+    download: string;
+    print: string;
+    close: string;
+  };
+  /** Deep-link slug: opens the matching modal on mount. */
+  initialDeliverable?:
+    | "khutbah"
+    | "kajian"
+    | "home"
+    | "content"
+    | "genz"
+    | "action"
+    | null;
+  /** Brief language; controls which Section 4 heading we look for. */
+  locale?: string;
   /** @deprecated — was the inline "Nasihah" badge label for the old short
    *  format. Kept in the prop signature so existing callers don't break;
    *  long-form output uses native H2 headings now. */
   nasihahLabel?: string;
 }) {
+  // Try to split out Section 4 only when caller provides cards UI hooks.
+  // Otherwise render the whole markdown inline (existing behavior for
+  // preview surfaces and back-compat).
+  const split =
+    briefBasePath && deliverableLabels
+      ? splitSection4(text, locale === "en")
+      : null;
+
   return (
     <div className="mt-5">
       <article className="text-pretty text-slate-800">
-        <ReactMarkdown components={MARKDOWN_COMPONENTS}>{text}</ReactMarkdown>
+        {split ? (
+          <>
+            <ReactMarkdown components={MARKDOWN_COMPONENTS}>
+              {split.before}
+            </ReactMarkdown>
+            {split.section4 && (
+              <>
+                <ReactMarkdown components={MARKDOWN_COMPONENTS}>
+                  {split.section4HeadingLine}
+                </ReactMarkdown>
+                <BriefDeliverableCards
+                  section4Markdown={split.section4Body}
+                  labels={deliverableLabels!}
+                  briefBasePath={briefBasePath!}
+                  initialDeliverable={initialDeliverable ?? null}
+                />
+              </>
+            )}
+            <ReactMarkdown components={MARKDOWN_COMPONENTS}>
+              {split.after}
+            </ReactMarkdown>
+          </>
+        ) : (
+          <ReactMarkdown components={MARKDOWN_COMPONENTS}>{text}</ReactMarkdown>
+        )}
       </article>
 
       {daleelRefs && daleelRefs.length > 0 && (
@@ -56,6 +128,63 @@ export function BriefingNarrative({
       )}
     </div>
   );
+}
+
+/**
+ * Find Section 4 ("Strategi & Aksi Dakwah" / "Da'wah Strategies & Actions")
+ * in the markdown and split into:
+ *   - before: everything up to and including Section 3 + 5? actually up to but
+ *     NOT including the Section 4 heading line.
+ *   - section4HeadingLine: just the `## …` line (we still want it rendered
+ *     as a normal h2 so the BriefTOC anchor remains intact).
+ *   - section4Body: everything under Section 4 until the next `## ` heading.
+ *   - after: everything from the next `## ` onward (Section 5).
+ * Returns null if Section 4 isn't found — caller falls back to inline render.
+ */
+function splitSection4(
+  text: string,
+  isEnglish: boolean,
+): {
+  before: string;
+  section4HeadingLine: string;
+  section4Body: string;
+  after: string;
+  section4: boolean;
+} | null {
+  const lines = text.split("\n");
+  const targets = isEnglish ? SECTION_4_HEADINGS_EN : SECTION_4_HEADINGS_ID;
+
+  let s4Start = -1;
+  for (let i = 0; i < lines.length; i++) {
+    if (!lines[i].startsWith("## ")) continue;
+    const headingText = lines[i]
+      .replace(/^##\s+/, "")
+      .replace(/\s*\(.*\)\s*$/, "") // strip optional "(NNN kata)" trailer
+      .trim()
+      .toLowerCase();
+    if (targets.some((t) => headingText.startsWith(t))) {
+      s4Start = i;
+      break;
+    }
+  }
+  if (s4Start === -1) return null;
+
+  // Find next ## after s4Start.
+  let s4End = lines.length;
+  for (let i = s4Start + 1; i < lines.length; i++) {
+    if (lines[i].startsWith("## ")) {
+      s4End = i;
+      break;
+    }
+  }
+
+  return {
+    before: lines.slice(0, s4Start).join("\n"),
+    section4HeadingLine: lines[s4Start],
+    section4Body: lines.slice(s4Start + 1, s4End).join("\n"),
+    after: lines.slice(s4End).join("\n"),
+    section4: true,
+  };
 }
 
 /**

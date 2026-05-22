@@ -150,9 +150,18 @@ celery_app.conf.update(
         # briefing that appears as the hero card on /insights. Reads
         # the freshly-clustered topic labels so the narrative is in
         # sync with what the dashboard surfaces below it.
+        #
+        # Every 3 days (days 1/4/7/.../28/31 each month) rather than
+        # daily. Each briefing is now a long-form content kit (full
+        # khutbah text, kajian outline, video script, etc — 4000-6000
+        # words) instead of a short strategic briefing, so generating
+        # daily would be both expensive (~$33/mo at every-day cadence)
+        # AND mostly redundant — the 7-day analysis window means a
+        # daily run overwrites the same news cycle with marginal new
+        # content. Every 3 days lands ~10 briefings/month at ~$11/mo.
         "generate-insights-summary": {
             "task": "api.workers.ingest.generate_insights_summary",
-            "schedule": crontab(minute=30, hour=4),
+            "schedule": crontab(minute=30, hour=4, day_of_month="*/3"),
         },
         # Weekly email digest — Sunday 18:00 WIB. Late-evening before
         # Monday morning so Indonesian audiences see it in their

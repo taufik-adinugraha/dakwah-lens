@@ -171,4 +171,49 @@ body {
   .brief-print h2:last-of-type {
     page-break-before: auto;
   }
+
+  /* Per-deliverable modal print mode. The deliverable modal portals to
+     `document.body` as `.deliverable-print-root`; clicking its in-toolbar
+     "Print" sets `printing-deliverable` on <body> right before
+     `window.print()`. CSS below hides every direct child of body EXCEPT
+     the portal root, then flattens the modal card's flex layout so the
+     content prints as a normal flowing document. Body class is removed
+     in `onafterprint`. */
+  body.printing-deliverable > *:not(.deliverable-print-root) {
+    display: none !important;
+  }
+  body.printing-deliverable .deliverable-print-root {
+    position: static !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+  }
+  body.printing-deliverable .deliverable-print-root > button {
+    display: none !important;
+  }
+  body.printing-deliverable .deliverable-printable {
+    position: static !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+  body.printing-deliverable .deliverable-printable > div {
+    overflow: visible !important;
+    flex: initial !important;
+    display: block !important;
+  }
+  body.printing-deliverable .deliverable-printable button {
+    display: none !important;
+  }
+  /* The top bar's close button is hidden via the rule above; show
+     just the heading so the printed page has a title. */
+  body.printing-deliverable .deliverable-printable h2 {
+    border: none !important;
+    padding: 0 !important;
+    margin-bottom: 12pt !important;
+    font-size: 18pt !important;
+  }
 }
