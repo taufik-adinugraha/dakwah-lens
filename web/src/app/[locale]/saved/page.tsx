@@ -200,7 +200,9 @@ function KitabSaveCard({
         </span>
         <span className="font-mono">{payload.citation}</span>
         <span className="text-slate-400">
-          {new Date(createdAt).toLocaleDateString(locale)}
+          {new Date(createdAt).toLocaleDateString(locale, {
+            timeZone: "Asia/Jakarta",
+          })}
         </span>
       </div>
       {payload.arabic && (
@@ -245,7 +247,9 @@ function BriefSaveCard({
           <BookmarkCheck className="h-3 w-3" /> brief
         </span>
         <span className="text-slate-400">
-          {new Date(createdAt).toLocaleDateString(locale)}
+          {new Date(createdAt).toLocaleDateString(locale, {
+            timeZone: "Asia/Jakarta",
+          })}
         </span>
       </div>
       <p className="mt-2 text-sm font-semibold text-slate-900">
@@ -285,7 +289,9 @@ function PostSaveCard({
           <span className="font-medium">@{payload.author}</span>
         )}
         <span className="text-slate-400">
-          {new Date(createdAt).toLocaleDateString(locale)}
+          {new Date(createdAt).toLocaleDateString(locale, {
+            timeZone: "Asia/Jakarta",
+          })}
         </span>
       </div>
       {payload.text && (

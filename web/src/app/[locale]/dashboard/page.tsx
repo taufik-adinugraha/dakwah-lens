@@ -178,8 +178,12 @@ function GreetingPulse({
                 )}
               </p>
             ) : (
+              // Two distinct "no chip" states share styling but not copy:
+              //   - !hasScore        → score itself isn't ready (thin this-week)
+              //   - hasScore + !delta → score is real, last-week is thin so the
+              //                         delta can't be computed
               <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
-                {t("pulse_no_score")}
+                {t(hasScore ? "pulse_no_comparison" : "pulse_no_score")}
               </p>
             )}
           </div>
@@ -193,14 +197,15 @@ function GreetingPulse({
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-1 sm:gap-4">
-        {/* Trending count → /insights (the page that lists every topic). */}
+        {/* Trending count → /insights#trending (jumps to the Trending
+            topics section, not the page top). */}
         <MiniStat
           tone="brand"
           icon={Flame}
           label={t("stat_trending_label")}
           value={trendingCount.toString()}
           hint={t("stat_trending_hint")}
-          href="/insights"
+          href="/insights#trending"
         />
         {/* Briefs this week → if 0, point at the brief creator; if >0, the
             user's brief list. Both routes exist. */}
@@ -553,7 +558,12 @@ function RecentBriefs({
                   <span className="tabular-nums">
                     {new Date(b.createdAt).toLocaleDateString(
                       locale === "id" ? "id-ID" : "en-US",
-                      { year: "numeric", month: "short", day: "numeric" },
+                      {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                        timeZone: "Asia/Jakarta",
+                      },
                     )}
                   </span>
                 </p>

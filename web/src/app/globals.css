@@ -144,12 +144,26 @@ body {
     margin-top: 6pt;
     orphans: 3;
     widows: 3;
+    /* Keep a paragraph from being sliced mid-line by the page break.
+       The browser breaks BETWEEN paragraphs instead of through them.
+       Combined with orphans/widows above, short paragraphs land
+       whole; long ones break only at their line boundaries. */
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
   .brief-print blockquote {
     border-left: 2pt solid #047857;
     padding-left: 10pt;
     margin: 8pt 0;
     font-style: normal;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  /* List items + figures should also stay together — same reason. */
+  .brief-print li,
+  .brief-print figure {
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
   /* Force a page break before Section 5 (Daleel & Sumber) so the
      citation block reads cleanly from page top — heuristic, doesn't

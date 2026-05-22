@@ -24,6 +24,7 @@ export function BriefDownloadMenu({
     markdown: string;
     text: string;
     print: string;
+    print_hint: string;
   };
 }) {
   const [open, setOpen] = useState(false);
@@ -48,7 +49,7 @@ export function BriefDownloadMenu({
           />
           <div
             role="menu"
-            className="absolute left-0 z-20 mt-2 w-60 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl"
+            className="absolute left-0 z-20 mt-2 w-72 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl"
           >
             <button
               type="button"
@@ -56,10 +57,17 @@ export function BriefDownloadMenu({
                 setOpen(false);
                 window.print();
               }}
-              className="flex w-full items-center gap-2.5 px-3.5 py-2 text-left text-xs text-slate-700 transition hover:bg-slate-50"
+              className="flex w-full items-start gap-2.5 px-3.5 py-2.5 text-left transition hover:bg-slate-50"
             >
-              <Printer className="h-4 w-4 text-slate-500" />
-              <span>{labels.print}</span>
+              <Printer className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
+              <span className="flex-1">
+                <span className="block text-xs font-medium text-slate-700">
+                  {labels.print}
+                </span>
+                <span className="mt-0.5 block text-[10px] leading-snug text-slate-500">
+                  {labels.print_hint}
+                </span>
+              </span>
             </button>
             <div className="my-1 border-t border-slate-100" />
             <DownloadLink

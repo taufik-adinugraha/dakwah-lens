@@ -1,22 +1,14 @@
 """LLM-driven topic discovery via Gemini Flash-Lite.
 
-Replaces the previous BERTopic implementation. BERTopic underperformed on
-short Indonesian social text — stopword leakage (`masih`, `sebelum`),
-URL/outlet artifacts in keywords (`republikacoid`), and auto-labels like
-"barat · nasional · masih" that nobody can interpret.
-
-Gemini fits this job better:
-  - Native handling of Indonesian + English
-  - Handles short tweets/captions (BERTopic's sentence-transformer
-    embeddings collapse on <140 chars)
-  - Produces human-readable labels in Bahasa Indonesia
-  - Picks meaningful themes, not c-TF-IDF noise
+Gemini handles this job well for our corpus:
+  - Native Indonesian + English support
+  - Short tweets/captions (<140 chars) are fine
+  - Produces human-readable Bahasa Indonesia labels
+  - Picks meaningful themes, not surface-form keyword noise
 
 One Gemini call per platform per day → ~$0.36/mo total.
 
-Output preserves the existing `Topic` table schema (label / keywords /
-post_count), so the `/insights/[platform]` page reads from the same
-table — drop-in replacement.
+Writes to the `topics` table; `/insights/[platform]` reads from there.
 """
 
 from __future__ import annotations

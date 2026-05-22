@@ -11,6 +11,25 @@ import { and, count, countDistinct, desc, eq, isNotNull, sql } from "drizzle-orm
 
 import { db, schema } from "@/db";
 
+/**
+ * The 9 PRD da'wah categories the Gemini classifier assigns to every post.
+ * Source of truth: `api/src/api/services/relevance.py`. Mirror here because
+ * the web side aggregates per-category scores from the `categories` JSONB
+ * column. Stat tiles + segment definitions key off `.length` so a category
+ * add/remove only needs an edit in one place.
+ */
+export const DAWAH_CATEGORIES = [
+  "aqidah",
+  "akhlaq",
+  "muamalah",
+  "social_justice",
+  "family",
+  "youth",
+  "education",
+  "economic_ethics",
+  "health",
+] as const;
+
 export type PlatformInsights = {
   totalPosts: number;
   uniqueAuthors: number;
@@ -41,8 +60,9 @@ export type PlatformInsights = {
    */
   dominantCategories: Array<{ category: string; posts: number }>;
   /**
-   * Topics discovered by the BERTopic batch job. Empty until
-   * `api/src/api/scripts/cluster_topics.py` has run for this platform.
+   * Topics discovered by the Gemini topic-discovery batch job. Empty
+   * until `api/src/api/scripts/cluster_topics.py` has run for this
+   * platform (runs nightly at 04:00 WIB).
    */
   discoveredTopics: Array<{
     id: string;
@@ -184,22 +204,10 @@ export async function getPlatformInsights(
   // Aggregate category scores across all posts for this platform. We sum the
   // per-post per-category scores; the resulting magnitudes show "how much
   // collective attention" each da'wah category is getting.
-  const CATEGORIES = [
-    "aqidah",
-    "akhlaq",
-    "muamalah",
-    "social_justice",
-    "family",
-    "youth",
-    "education",
-    "economic_ethics",
-    "health",
-  ] as const;
-
   const categorySums = (await db
     .select({
       ...Object.fromEntries(
-        CATEGORIES.map((cat) => [
+        DAWAH_CATEGORIES.map((cat) => [
           cat,
           sql<number>`COALESCE(SUM((categories ->> ${cat})::numeric), 0)`,
         ]),
@@ -208,11 +216,11 @@ export async function getPlatformInsights(
     .from(schema.socialPosts)
     .where(
       and(platformWhere, isNotNull(schema.socialPosts.categories)),
-    )) as Array<Record<(typeof CATEGORIES)[number], number>>;
+    )) as Array<Record<(typeof DAWAH_CATEGORIES)[number], number>>;
 
   const row = categorySums[0] ?? ({} as Record<string, number>);
   const categoryTotals: Record<string, number> = {};
-  for (const cat of CATEGORIES) {
+  for (const cat of DAWAH_CATEGORIES) {
     categoryTotals[cat] = Number(row[cat] ?? 0);
   }
 
@@ -260,7 +268,7 @@ export async function getPlatformInsights(
     }
   }
 
-  // Discovered topics for this platform (latest BERTopic batch).
+  // Discovered topics for this platform (latest topic-discovery batch).
   const topicRows = await db
     .select({
       id: schema.topics.id,
@@ -541,25 +549,14 @@ export async function getOverviewInsights(): Promise<OverviewInsights | null> {
     else if (row.label === "neutral") sentimentMix.neutral = row.n;
   }
 
-  const CATEGORIES = [
-    "aqidah",
-    "akhlaq",
-    "muamalah",
-    "social_justice",
-    "family",
-    "youth",
-    "education",
-    "economic_ethics",
-    "health",
-  ] as const;
-  type CatKey = (typeof CATEGORIES)[number];
+  type CatKey = (typeof DAWAH_CATEGORIES)[number];
 
   // Sum of per-post per-category scores — gives "collective attention"
   // weight per da'wah category across the 7-day window (was lifetime).
   const categorySums = (await db
     .select({
       ...Object.fromEntries(
-        CATEGORIES.map((cat) => [
+        DAWAH_CATEGORIES.map((cat) => [
           cat,
           sql<number>`COALESCE(SUM((categories ->> ${cat})::numeric), 0)`,
         ]),
@@ -570,7 +567,7 @@ export async function getOverviewInsights(): Promise<OverviewInsights | null> {
       sql`${schema.socialPosts.categories} IS NOT NULL AND ${schema.socialPosts.postedAt} >= ${sevenDaysAgo}`,
     )) as Array<Record<CatKey, number>>;
   const categoryTotals: Record<string, number> = {};
-  for (const cat of CATEGORIES) {
+  for (const cat of DAWAH_CATEGORIES) {
     categoryTotals[cat] = Number(categorySums[0]?.[cat] ?? 0);
   }
 
@@ -589,7 +586,7 @@ export async function getOverviewInsights(): Promise<OverviewInsights | null> {
         SELECT key
         FROM jsonb_each_text(categories)
         WHERE key = ANY (ARRAY[${sql.raw(
-          CATEGORIES.map((c) => `'${c}'`).join(","),
+          DAWAH_CATEGORIES.map((c) => `'${c}'`).join(","),
         )}])
           AND value::numeric > 0.1
         ORDER BY value::numeric DESC
@@ -667,7 +664,7 @@ export async function getOverviewInsights(): Promise<OverviewInsights | null> {
         (
           SELECT key FROM jsonb_each_text(categories)
           WHERE key = ANY (ARRAY[${sql.raw(
-            CATEGORIES.map((c) => `'${c}'`).join(","),
+            DAWAH_CATEGORIES.map((c) => `'${c}'`).join(","),
           )}])
             AND value::numeric > 0.1
           ORDER BY value::numeric DESC LIMIT 1

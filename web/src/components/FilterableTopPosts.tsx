@@ -143,7 +143,9 @@ export function FilterableTopPosts({
                     )}
                   {p.postedAt && (
                     <span className="text-slate-400">
-                      {new Date(p.postedAt).toLocaleDateString(locale)}
+                      {new Date(p.postedAt).toLocaleDateString(locale, {
+                        timeZone: "Asia/Jakarta",
+                      })}
                     </span>
                   )}
                 </div>

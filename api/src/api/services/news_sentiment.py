@@ -78,6 +78,9 @@ NEUTRAL — score neutral when there's no clear good/bad OUTCOME:
 - HOAX DEBUNKED: "Hoaks! …" stories are factual corrections — neutral, not negative.
 - TECHNICAL / INFORMATIONAL: medical explanation pieces, opinion analyses, market commentary without major movement.
 
+WHEN UNCERTAIN — DEFAULT TO NEUTRAL, NOT POSITIVE:
+If a story doesn't clearly fit positive OR negative criteria (routine politics, ambiguous diplomacy, unfamiliar non-religious topic, opinion piece, etc.), return `neutral` with a confident score (≥ 0.7), NOT a low-confidence positive. Never emit all three scores at or near 0 — that produces an arbitrary label. ALWAYS commit at least 0.5 to whichever label best fits; if none clearly does, that label is neutral.
+
 Read the EVENT and its FRAME, not the writer's tone. News writing is restrained even for negative events; do not score "neutral" if the event itself is harmful or beneficial. BUT: do not score "negative" just because a sad topic is mentioned — if the article's lead is the resolution (prosecution succeeding, criminal caught, hoax debunked), the valence is positive or neutral.
 
 Examples (carefully calibrated against real misclassifications):
@@ -225,7 +228,26 @@ def _classify_chunk(texts: list[str]) -> list[SentimentResult]:
     results: list[SentimentResult] = []
     for scores in parsed:
         clean = {label: float(scores.get(label, 0.0)) for label in _LABELS}
-        top_label, top_score = max(clean.items(), key=lambda kv: kv[1])
+        # Argmax with a NEUTRAL-preferring tie-break. Python's `max()` on a
+        # dict returns the first-seen key on ties, and dict-insertion order
+        # here is (positive, neutral, negative). Before this fix, items the
+        # model returned as {pos: 0, neu: 0, neg: 0} silently became
+        # "positive · 0.00" rows — ~80 of 252 mainstream positives in the
+        # last 7 days. Sort key: (-score, neutral-bias) so highest score
+        # wins, and `neutral` wins any tie with the other two.
+        ranked = sorted(
+            clean.items(),
+            key=lambda kv: (-kv[1], 0 if kv[0] == "neutral" else 1),
+        )
+        top_label, top_score = ranked[0]
+        # Low-confidence punt: if the model didn't commit (top < 0.5), the
+        # valence is genuinely unclear → treat as confident neutral. Floor
+        # the score at 0.7 so the rows don't drag down the median confidence
+        # of the neutral bucket.
+        if top_score < 0.5:
+            top_label = "neutral"
+            top_score = max(0.7, clean.get("neutral", 0.0))
+            clean = {"positive": 0.0, "neutral": top_score, "negative": 0.0}
         results.append(
             SentimentResult(
                 label=top_label,  # type: ignore[arg-type]

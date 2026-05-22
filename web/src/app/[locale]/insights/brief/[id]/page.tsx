@@ -50,6 +50,7 @@ export async function generateMetadata({
     month: "long",
     day: "numeric",
     year: "numeric",
+    timeZone: "Asia/Jakarta",
   });
   const title = t("brief_page_title", { scope: scopeLabel, date: dateStr });
   // Use the first 200 chars of the body as a description for OG/social
@@ -102,6 +103,7 @@ export default async function BriefDetailPage({
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: "Asia/Jakarta",
   });
 
   const scopeLabel = brief.segment
@@ -174,6 +176,7 @@ export default async function BriefDetailPage({
                 markdown: t("brief_download_markdown"),
                 text: t("brief_download_text"),
                 print: t("brief_download_print"),
+                print_hint: t("brief_download_print_hint"),
               }}
             />
           </div>

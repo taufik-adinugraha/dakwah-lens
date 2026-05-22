@@ -11,8 +11,8 @@ Tables in this module:
                             every minute. Source for the CPU/mem/disk
                             charts on the "Infra" tab.
   - `ingest_runs`         — start/finish records for every Celery ingest
-                            task (per platform + the BERTopic re-cluster).
-                            Source for the "Pipeline health" tab.
+                            task (per platform + the nightly topic-discovery
+                            re-cluster). Source for the "Pipeline health" tab.
   - `rss_feeds`           — configurable list of mainstream news RSS URLs.
                             Was a hardcoded dict in `services/rss.py`.
   - `manual_costs`        — human-entered cost rows for non-API spend

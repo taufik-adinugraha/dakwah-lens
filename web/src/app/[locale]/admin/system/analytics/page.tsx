@@ -8,6 +8,7 @@ import {
   PageHeader,
   StatTile,
 } from "../_ui";
+import { BriefBars, DailyBars, StackedBar } from "./Bars.client";
 
 /**
  * Shared exclusion filter for analytics queries. We strip:
@@ -283,19 +284,16 @@ export default async function AnalyticsPage() {
             Indonesian region inferred from IP at request time. The IP
             itself is never stored — only the region bucket (PDP §15).
           </p>
-          <div className="mt-3 flex h-3 overflow-hidden rounded-full">
-            {regionSplit.map((row) => {
-              const pct = (row.sessions / regionTotal) * 100;
-              const color = REGION_COLORS[row.region] ?? "bg-slate-300";
-              return (
-                <span
-                  key={row.region}
-                  className={color}
-                  style={{ width: `${pct}%` }}
-                  title={`${row.region} · ${pct.toFixed(1)}%`}
-                />
-              );
-            })}
+          <div className="mt-3">
+            <StackedBar
+              total={regionTotal}
+              segments={regionSplit.map((row) => ({
+                key: row.region,
+                label: REGION_LABELS[row.region] ?? row.region,
+                color: REGION_COLORS[row.region] ?? "bg-slate-300",
+                value: row.sessions,
+              }))}
+            />
           </div>
           <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {regionSplit.map((row) => {
@@ -330,24 +328,26 @@ export default async function AnalyticsPage() {
           title="Language preference · 7d"
           hint={`${localeTotal.toLocaleString()} distinct sessions`}
         >
-          <div className="mt-1 flex h-3 overflow-hidden rounded-full">
-            {localeSplit.map((row) => {
-              const pct = (row.sessions / localeTotal) * 100;
-              const color =
-                row.locale === "id"
-                  ? "bg-emerald-500"
-                  : row.locale === "en"
-                    ? "bg-brand-500"
-                    : "bg-slate-300";
-              return (
-                <span
-                  key={row.locale}
-                  className={color}
-                  style={{ width: `${pct}%` }}
-                  title={`${row.locale} · ${pct.toFixed(1)}%`}
-                />
-              );
-            })}
+          <div className="mt-1">
+            <StackedBar
+              total={localeTotal}
+              segments={localeSplit.map((row) => ({
+                key: row.locale,
+                label:
+                  row.locale === "id"
+                    ? "Bahasa Indonesia"
+                    : row.locale === "en"
+                      ? "English"
+                      : "Unknown / pre-locale",
+                color:
+                  row.locale === "id"
+                    ? "bg-emerald-500"
+                    : row.locale === "en"
+                      ? "bg-brand-500"
+                      : "bg-slate-300",
+                value: row.sessions,
+              }))}
+            />
           </div>
           <ul className="mt-3 grid gap-2 sm:grid-cols-3">
             {localeSplit.map((row) => {
@@ -548,88 +548,6 @@ export default async function AnalyticsPage() {
   );
 }
 
-function DailyBars({
-  rows,
-}: {
-  rows: Array<{ day: string; hits: number; uniques: number }>;
-}) {
-  const max = Math.max(...rows.map((r) => r.hits), 1);
-  // Layout: outer container has h-40 (10rem) AND items-stretch so each
-  // column receives the full row height. Each column reserves a fixed
-  // strip at the bottom for the date label; the remaining flex-1 div is
-  // the bars area, with percentage-height children stacked from the
-  // bottom. Was previously `items-end` + column without h-full → column
-  // shrank to label-content height → percentage bars collapsed to 0.
-  return (
-    <div className="flex h-40 items-stretch gap-1.5">
-      {rows.map((r) => {
-        const pct = (r.hits / max) * 100;
-        const upct = (r.uniques / max) * 100;
-        const day = new Date(r.day).toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-        });
-        return (
-          <div
-            key={r.day}
-            className="group flex flex-1 flex-col items-center"
-            title={`${day} · ${r.hits} views · ${r.uniques} unique`}
-          >
-            <div className="flex w-full flex-1 flex-col-reverse">
-              <div
-                className="w-full rounded-sm bg-brand-200"
-                style={{ height: `${pct}%` }}
-              />
-              <div
-                className="-mb-px w-full rounded-sm bg-brand-600 opacity-90"
-                style={{ height: `${upct}%` }}
-              />
-            </div>
-            <p className="mt-1 text-[9px] text-slate-500">{day}</p>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function BriefBars({
-  rows,
-}: {
-  rows: Array<{ day: string; briefs: number; creators: number }>;
-}) {
-  const max = Math.max(...rows.map((r) => r.briefs), 1);
-  // Same layout shape as DailyBars — see comment there for why
-  // items-stretch + flex-1 bars area is required for percentage heights.
-  return (
-    <div className="flex h-40 items-stretch gap-1.5">
-      {rows.map((r) => {
-        const pct = (r.briefs / max) * 100;
-        const cpct = (r.creators / max) * 100;
-        const day = new Date(r.day).toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-        });
-        return (
-          <div
-            key={r.day}
-            className="group flex flex-1 flex-col items-center"
-            title={`${day} · ${r.briefs} briefs · ${r.creators} unique creators`}
-          >
-            <div className="flex w-full flex-1 flex-col-reverse">
-              <div
-                className="w-full rounded-sm bg-emerald-200"
-                style={{ height: `${pct}%` }}
-              />
-              <div
-                className="-mb-px w-full rounded-sm bg-emerald-600 opacity-90"
-                style={{ height: `${cpct}%` }}
-              />
-            </div>
-            <p className="mt-1 text-[9px] text-slate-500">{day}</p>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
+// DailyBars + BriefBars moved to ./Bars.client.tsx — they're client
+// components now because of the hover-tooltip state. Server side just
+// hands them the data fetched above.

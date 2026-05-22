@@ -16,6 +16,21 @@ import {
 
 const BUDGET_CAP_IDR = 1_000_000;
 
+/**
+ * Provider display names. DB stores lowercase keys (matches code call
+ * sites + PRICES table); humans want the canonical brand casing.
+ * Anything not in this map falls through to `capitalize` (CSS), which
+ * is fine for `gemini`, `anthropic`, `apify`, `resend`.
+ */
+const PROVIDER_DISPLAY: Record<string, string> = {
+  openai: "OpenAI",
+  rss: "RSS",
+};
+
+function formatProvider(provider: string): string {
+  return PROVIDER_DISPLAY[provider] ?? provider;
+}
+
 export default async function ApiCostsPage() {
   const usdToIdr = await getUsdToIdr();
   const capUsd = BUDGET_CAP_IDR / usdToIdr;
@@ -173,7 +188,7 @@ export default async function ApiCostsPage() {
               {perProvider.map((p) => (
                 <tr key={p.provider} className="border-b border-slate-50 last:border-0">
                   <td className="py-2 font-semibold capitalize text-slate-900">
-                    {p.provider}
+                    {formatProvider(p.provider)}
                   </td>
                   <td className="py-2 text-right tabular-nums">{p.calls}</td>
                   <td className="py-2 text-right tabular-nums text-slate-600">
@@ -215,7 +230,7 @@ export default async function ApiCostsPage() {
                 <tr key={i} className="border-b border-slate-50 last:border-0">
                   <td className="py-2 text-slate-800">
                     <span className="font-semibold capitalize">
-                      {r.provider}
+                      {formatProvider(r.provider)}
                     </span>{" "}
                     · <span className="font-mono text-xs">{r.model ?? "—"}</span> ·{" "}
                     <span className="text-xs text-slate-500">{r.operation}</span>
@@ -243,7 +258,7 @@ export default async function ApiCostsPage() {
                   {formatRelative(r.occurredAt)}
                 </span>
                 <span className="w-16 capitalize text-slate-700">
-                  {r.provider}
+                  {formatProvider(r.provider)}
                 </span>
                 <span className="flex-1 truncate text-slate-600">
                   {r.model ?? r.operation}

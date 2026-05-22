@@ -242,8 +242,6 @@ function StackGrid({ t }: { t: T }) {
         { name: "Gemini 2.5 Pro / Flash-Lite", role: t("stack_ai_gemini") },
         { name: "Anthropic Claude Sonnet 4.5", role: t("stack_ai_anthropic") },
         { name: "IndoBERT", role: t("stack_ai_indobert") },
-        { name: "BERTopic", role: t("stack_ai_bertopic") },
-        { name: "sentence-transformers", role: t("stack_ai_st") },
         { name: "trafilatura", role: t("stack_ai_trafilatura") },
       ],
     },
@@ -744,13 +742,6 @@ function ModelsTable({ t }: { t: T }) {
       role: t("models_embedding_role"),
       why: t("models_embedding_why"),
       where: t("models_embedding_where"),
-    },
-    {
-      name: "BERTopic + MiniLM",
-      id: "paraphrase-multilingual-MiniLM-L12-v2",
-      role: t("models_bertopic_role"),
-      why: t("models_bertopic_why"),
-      where: t("models_bertopic_where"),
     },
   ];
 

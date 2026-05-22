@@ -8,8 +8,11 @@ later debugging / re-classification without re-scraping.
 
 Per PRD §05 / §08 the post flows through this lifecycle:
   raw_payload      → just-scraped, no classification yet
-  + sentiment_*    → after IndoBERT pass (Stage 2)
-  + categories     → after Gemini Flash relevance classifier (Stage 4)
+  + sentiment_*    → after sentiment pass: Gemini Flash-Lite for mainstream
+                     news, IndoBERT for social-media (X / IG / TikTok / YT)
+  + categories     → after Gemini Flash-Lite da'wah classifier
+  + topic_id       → after Gemini Flash-Lite topic discovery clusters posts
+                     into themes; runs nightly at 04:00 WIB.
 """
 
 from datetime import datetime
@@ -85,12 +88,15 @@ class SocialPost(Base, TimestampMixin):
     raw_payload: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     """Original API/scraper response. Useful for re-classification later."""
 
-    # ── sentiment (IndoBERT, Stage 2) ──────────────────────────────
+    # ── sentiment (Stage 2) ─────────────────────────────────────────
+    # Source depends on platform: Gemini Flash-Lite for mainstream news
+    # (IndoBERT mis-fires ~95% neutral on news), IndoBERT for ID-language
+    # social-media posts, Gemini Flash-Lite fallback for non-ID social.
     sentiment_label: Mapped[str | None] = mapped_column(String(20))
     sentiment_score: Mapped[float | None] = mapped_column(Float)
     """Confidence of the predicted label, 0-1."""
 
-    # ── relevance (Gemini Flash, Stage 4) ──────────────────────────
+    # ── relevance (Gemini Flash-Lite, Stage 4) ─────────────────────
     dawah_relevance: Mapped[float | None] = mapped_column(Float)
     """Topical relevance, 0-1. Aggregated as mean-of-top-2 category
     scores so single-keyword matches don't dominate (was max() until
@@ -107,13 +113,13 @@ class SocialPost(Base, TimestampMixin):
     categories: Mapped[dict[str, float] | None] = mapped_column(JSONB)
     """Per-category scores: `{ "akhlaq": 0.78, "muamalah": 0.12, … }`."""
 
-    # ── topic cluster (BERTopic, Stage 5) ──────────────────────────
+    # ── topic cluster (Gemini Flash-Lite topic discovery, Stage 5) ──
     topic_id: Mapped[UUID | None] = mapped_column(
         ForeignKey("topics.id", ondelete="SET NULL"), index=True
     )
-    """FK to the BERTopic cluster this post was assigned to in the latest run.
-    Nullable: an outlier post (BERTopic cluster -1) or a post scraped after the
-    last clustering run has no topic yet."""
+    """FK to the discovered-topic cluster this post was assigned to in the
+    latest run. Nullable: a post not picked up by any theme, or one scraped
+    after the last topic-discovery run, has no topic yet."""
 
     __table_args__ = (
         # Dedup key — re-scraping the same post upserts rather than duplicates.

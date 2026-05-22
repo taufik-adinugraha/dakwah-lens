@@ -128,7 +128,12 @@ export default async function PublicBriefDetailPage({
         <span className="ml-1 text-xs text-slate-500">
           {new Date(brief.createdAt).toLocaleDateString(
             locale === "id" ? "id-ID" : "en-US",
-            { year: "numeric", month: "short", day: "numeric" },
+            {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              timeZone: "Asia/Jakarta",
+            },
           )}
         </span>
       </div>

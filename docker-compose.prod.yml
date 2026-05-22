@@ -107,6 +107,10 @@ services:
       # /api/internal/deploy-event returns 500 and the "App update in
       # progress" overlay never activates for users during rollouts.
       DEPLOY_WEBHOOK_SECRET: ${DEPLOY_WEBHOOK_SECRET}
+      # Server-rendered `Date.toLocaleString()` reads from $TZ. Without
+      # this, SSR formats every briefing/post timestamp in UTC and users
+      # see times 7 hours behind WIB. Matches postgres/api/worker/beat.
+      TZ: Asia/Jakarta
     volumes:
       # Shared with `api` so admins can upload an invoice via the web UI
       # and the api can read it back for downloads.

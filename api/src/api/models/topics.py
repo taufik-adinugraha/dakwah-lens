@@ -1,13 +1,17 @@
 """Discovered-topic model.
 
-A `Topic` is one cluster produced by BERTopic over the latest batch of social
-posts for a given platform. We persist the cluster's auto-generated keyword
-label and the per-platform post count so the `/insights/[platform]` page can
-render a "Discovered topics" section without re-clustering on every request.
+A `Topic` is one theme cluster produced by `services.topic_discovery`
+(Gemini Flash-Lite) over the latest batch of social posts for a given
+platform. We persist the label, the keyword list, and the per-platform post
+count so the `/insights/[platform]` page can render a "Discovered topics"
+section without re-clustering on every request.
 
-Topics are recomputed in batch (Celery beat or manual CLI) — between runs
-they're effectively immutable. The `topic_id` FK on `SocialPost` lets us
-join posts back to their topic for drilldowns.
+Topics are recomputed in batch (Celery beat at 04:00 WIB, or manual CLI) —
+between runs they're effectively immutable. The `topic_id` FK on
+`SocialPost` lets us join posts back to their topic for drilldowns.
+
+The `cluster_id` column is a vestigial integer kept for back-compat with
+old rows; new rows get a synthetic value.
 """
 
 from datetime import datetime
@@ -38,17 +42,16 @@ class Topic(Base, TimestampMixin):
     """The platform this topic was discovered on. Topics are scoped per-platform
     because clustering across platforms mixes vocabulary in unhelpful ways."""
 
-    # BERTopic's integer cluster ID for the run that produced this row. -1 is
-    # the "outlier" cluster which we drop before persisting, so all stored
-    # topics have a real cluster_id >= 0. Useful for re-joining to the
-    # in-memory model if we re-load it.
+    # Vestigial cluster id. New rows receive a synthetic integer to keep
+    # the NOT NULL constraint; nothing in the read path uses it anymore.
     cluster_id: Mapped[int] = mapped_column(Integer, nullable=False)
 
     label: Mapped[str] = mapped_column(Text, nullable=False)
-    """Human-readable label — for now the top 3 keywords joined by ' · '."""
+    """Human-readable Indonesian theme label authored by Gemini Flash-Lite
+    during topic discovery (e.g. 'Korupsi Pejabat dan Keadilan Hukum')."""
 
     keywords: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False)
-    """All top keywords from c-TF-IDF, ordered by relevance."""
+    """Keyword list from the topic-discovery pass, ordered by relevance."""
 
     post_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 

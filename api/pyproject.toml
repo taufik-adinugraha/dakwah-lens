@@ -35,11 +35,6 @@ dependencies = [
     "transformers>=4.45.0",
     "torch>=2.4.0",
 
-    # Topic clustering — sentence-transformers gives us multilingual embeddings
-    # (good for ID+EN mixed posts) and BERTopic does UMAP+HDBSCAN+c-TF-IDF.
-    "sentence-transformers>=3.3.0",
-    "bertopic>=0.16.4",
-
     # Queue
     "celery[redis]>=5.4.0",
     "redis>=5.2.0",

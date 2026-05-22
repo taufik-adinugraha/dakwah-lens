@@ -135,13 +135,18 @@ export async function getPulseSnapshot(): Promise<PulseSnapshot> {
  * ───────────────────────────────────────────────────────────── */
 
 export async function getTrendingCount24h(): Promise<number> {
+  // Distinct topic clusters with at least one post PUBLISHED in the last
+  // 24h. Was previously keyed on `created_at` (ingest time) which made
+  // the count drift with our scraping schedule instead of with actual
+  // news activity. `posted_at` reflects when the outlet published the
+  // item — the user-meaningful "trending right now" signal.
   const [row] = await db
     .select({ n: sql<number>`count(DISTINCT topic_id)::int` })
     .from(schema.socialPosts)
     .where(
       and(
         gte(
-          schema.socialPosts.createdAt,
+          schema.socialPosts.postedAt,
           sql`now() - interval '24 hours'`,
         ),
         isNotNull(schema.socialPosts.topicId),

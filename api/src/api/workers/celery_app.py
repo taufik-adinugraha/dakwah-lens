@@ -73,8 +73,8 @@ celery_app.conf.update(
         #
         # All runs land at 00:xx WIB (Indonesian sleep window) on a
         # 10-min stagger to avoid Apify per-actor concurrency bursts.
-        # Starting at midnight gives a generous buffer before the 08:00
-        # WIB BERTopic recluster picks up the fresh material.
+        # Starting at midnight gives a generous buffer before the 04:00
+        # WIB topic-discovery recluster picks up the fresh material.
         #
         # Cost at the current ~49-keyword pool × ~20 posts/keyword =
         # ~980 results per run:

@@ -1,10 +1,6 @@
 """Topic discovery over `social_posts` — refreshes the `topics` table.
 
-Previously this ran BERTopic locally. We replaced it on 2026-05-20 with a
-Gemini Flash-Lite call (see `services/topic_discovery`) after BERTopic
-underperformed on short Indonesian social text — stopword leakage,
-URL/outlet artifacts in keywords, and uninterpretable auto-labels like
-"barat · nasional · masih".
+Driven by a Gemini Flash-Lite call (see `services/topic_discovery`).
 
 Pipeline (per platform):
   1. Pull recent posts for the platform (text + id + posted_at).

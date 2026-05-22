@@ -13,6 +13,7 @@ import {
 import clsx from "clsx";
 
 import { Link } from "@/i18n/navigation";
+import { auth } from "@/auth";
 import { I18nText } from "@/components/I18nText";
 import { TopicsByCluster } from "@/components/TopicsByCluster";
 import { PlatformStoriesFilter } from "./PlatformStoriesFilter";
@@ -25,6 +26,7 @@ import {
 } from "@/data/drilldowns";
 import { routing } from "@/i18n/routing";
 import {
+  DAWAH_CATEGORIES,
   getPlatformInsights,
   type InsightsFilters,
   type PlatformInsights,
@@ -95,7 +97,12 @@ export default async function PlatformDrilldownPage({
 
   // Fetch real ingested data; null if nothing has been scraped for this
   // platform yet, in which case all sections fall back to mock content.
-  const live = await getPlatformInsights(platform, filters);
+  // `session` gates the "Apply for Full Access" CTA at the page bottom —
+  // signed-in users have already converted, so they don't need that pitch.
+  const [live, session] = await Promise.all([
+    getPlatformInsights(platform, filters),
+    auth(),
+  ]);
 
   // Use real da'wah-category clusters when we have a meaningful number of
   // classified posts; below that threshold the mock editorial clusters are
@@ -127,7 +134,7 @@ export default async function PlatformDrilldownPage({
       )}
       <TopOutlets config={config} t={t} live={live} platform={platform} />
       <TopStories config={config} t={t} live={live} platform={platform} />
-      <CTA t={t} />
+      {!session?.user && <CTA t={t} />}
     </>
   );
 }
@@ -208,17 +215,7 @@ const CATEGORY_TONES: Record<string, keyof typeof CLUSTER_TONES> = {
   health: "emerald",
 };
 
-const DAWAH_CATEGORIES = [
-  "aqidah",
-  "akhlaq",
-  "muamalah",
-  "social_justice",
-  "family",
-  "youth",
-  "education",
-  "economic_ethics",
-  "health",
-] as const;
+// DAWAH_CATEGORIES is imported from @/lib/insights-data (single source).
 
 async function RealCategoryClusters({
   live,
@@ -315,8 +312,7 @@ async function RealCategoryClusters({
 }
 
 /**
- * Topics discovered by the Gemini topic-discovery pass (replaced BERTopic
- * 2026-05-20 — BERTopic underperformed on short Indonesian social text).
+ * Topics discovered by the Gemini topic-discovery pass.
  * Distinct from the 9 PRD `categories`: categories are a fixed taxonomy
  * from the relevance classifier; topics are emergent clusters with
  * Gemini-authored Bahasa labels that surface what the conversation is
@@ -480,7 +476,10 @@ function Hero({
               {t("title")}
             </h1>
             <p className="mt-3 text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
-              {t("subtitle")}
+              {t("subtitle", {
+                count: totalArticles.toLocaleString(),
+                outlets: String(totalOutlets),
+              })}
             </p>
           </div>
 
@@ -495,7 +494,10 @@ function Hero({
             />
             <Stat label={t("stat_outlets")} value={String(totalOutlets)} />
             <Stat label={t("stat_clusters")} value={String(config.clusters.length)} />
-            <Stat label={t("stat_categories")} value="6" />
+            <Stat
+              label={t("stat_categories")}
+              value={String(DAWAH_CATEGORIES.length)}
+            />
           </div>
         </div>
       </div>

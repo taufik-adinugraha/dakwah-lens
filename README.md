@@ -10,30 +10,33 @@ See `Dakwah-Lens_PRD_v0.4.pdf` for the full product spec.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  web/   Next.js 15 (App Router) + Tailwind + next-intl      │
+│  web/   Next.js 16 (App Router) + Tailwind v4 + next-intl   │
 │         Pages: dashboard, trends, briefs, kitab library     │
 └──────────────────────────┬──────────────────────────────────┘
-                           │ REST + SSE
+                           │ REST
 ┌──────────────────────────┴──────────────────────────────────┐
 │  api/   FastAPI + Celery workers                            │
-│   ├─ ingestion (RSS + Apify actors)                         │
-│   ├─ ml          (IndoBERT sentiment, Gemini Flash classify)│
-│   ├─ rag         (Qdrant retrieval)                         │
-│   └─ briefs      (Claude Sonnet 4.6 brief generation)       │
-└──────────┬──────────────┬───────────────┬──────────────┬───┘
-           │              │               │              │
-        Postgres       Qdrant          Redis         Object
-        (data)         (vectors)       (queue)       store
+│   ├─ ingestion   (RSS + YouTube + Apify actors)             │
+│   ├─ ml          (IndoBERT for social-media sentiment;      │
+│   │              Gemini Flash-Lite for news sentiment +     │
+│   │              da'wah classifier + topic discovery)       │
+│   ├─ rag         (OpenAI embeddings → Qdrant retrieval)     │
+│   └─ briefs      (Gemini 2.5 Pro primary,                   │
+│                   Claude Sonnet 4.6 fallback)               │
+└──────────┬──────────────┬───────────────┬───────────────────┘
+           │              │               │
+        Postgres       Qdrant          Redis
+        (data)         (vectors)       (queue)
 ```
 
-## Locked decisions (2026-05-17)
+## Locked decisions (current as of 2026-05-22)
 
 - Languages: Indonesian (primary) + English via next-intl
-- Embedding model: OpenAI `text-embedding-3-small`
+- Embedding model: OpenAI `text-embedding-3-large`
 - VPS: IDCloudHost (Indonesia residency per UU PDP §27/2022)
 - Kitab corpus v0: Qur'an (AR + ID Kemenag + EN Sahih International), Sahih al-Bukhari, Sahih Muslim, Riyad as-Salihin
 - Multi-tenant: `organizations` + `org_members` (owner/admin/member), app-level scoping
-- Tiered LLM: Gemini Flash by default → Claude Sonnet 4.6 only for brief synthesis
+- Tiered LLM: Gemini Flash-Lite for classify/topic/rerank → Gemini 2.5 Pro for brief synthesis → Claude Sonnet 4.6 only as a Pro fallback
 
 ## Local development
 
@@ -46,22 +49,23 @@ docker compose up -d       # postgres + qdrant + redis
 cd web && npm install && npm run dev          # http://localhost:3000
 
 # Backend (in another shell)
-cd api && uv sync && uv run uvicorn app.main:app --reload   # http://localhost:8000
+cd api && uv sync && uv run api               # http://localhost:8000
 ```
 
 ## Project structure
 
 ```
 dakwah-lens/
-├── docker-compose.yml          # postgres, qdrant, redis (+ indobert-svc later)
+├── docker-compose.yml          # local postgres, qdrant, redis
+├── docker-compose.prod.yml     # full prod stack incl. web/api/worker/beat
 ├── web/                        # Next.js frontend
 │   ├── src/app/[locale]/       # localized routes (/id, /en)
 │   └── messages/               # ID + EN translation strings
-└── api/                        # FastAPI backend
-    ├── app/
-    │   ├── routers/            # HTTP endpoints
-    │   ├── models/             # SQLAlchemy + Pydantic
-    │   ├── services/           # business logic
-    │   └── workers/            # Celery tasks
-    └── scripts/                # one-off CLI (kitab ingestion, etc.)
+└── api/                        # FastAPI backend (uv-managed Python 3.12)
+    └── src/api/
+        ├── routers/            # HTTP endpoints
+        ├── models/             # SQLAlchemy + Pydantic
+        ├── services/           # business logic (LLM clients, retrieval)
+        ├── workers/            # Celery tasks + beat schedule
+        └── scripts/            # one-off CLI (kitab embed, backfill, etc.)
 ```

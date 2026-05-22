@@ -340,7 +340,7 @@ export default async function SystemOverviewPage() {
   if (totalPosts < MIN_POSTS_FOR_CLUSTERING) {
     issues.push({
       severity: "low",
-      title: `Only ${totalPosts} social posts — BERTopic needs ≥ ${MIN_POSTS_FOR_CLUSTERING}`,
+      title: `Only ${totalPosts} social posts — topic discovery needs ≥ ${MIN_POSTS_FOR_CLUSTERING}`,
       hint:
         "Topic clusters won't be produced until the corpus grows. Run more ingests or wait for the beat schedule.",
     });

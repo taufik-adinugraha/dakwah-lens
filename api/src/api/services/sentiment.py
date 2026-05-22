@@ -16,8 +16,8 @@ CPU budget
 PyTorch grabs every CPU core by default for matmul, which starves the rest
 of the worker (Celery, Postgres queries, the API server) on the shared
 4-vCPU VM. We cap thread counts before transformers/torch import so a
-single sentiment batch can't monopolise the box. The cap applies to BERTopic
-and any other torch-backed code that loads after this module too.
+single sentiment batch can't monopolise the box. The cap applies to any
+other torch-backed code that loads after this module too.
 """
 
 from __future__ import annotations

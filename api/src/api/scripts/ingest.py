@@ -5,7 +5,10 @@ a `--query` (hashtag or keyword), and `--limit`. The pipeline:
 
     1. scrape via Apify (`services/apify.scrape_<platform>`)
     2. normalize per platform (`services/normalizers.NORMALIZERS[platform]`)
-    3. classify sentiment (IndoBERT, batched)
+    3. classify sentiment — three-way split:
+         · mainstream         → Gemini Flash-Lite (news-valence prompt)
+         · social + ID lang   → IndoBERT (on-device)
+         · social + non-ID    → Gemini Flash-Lite fallback
     4. classify relevance (Gemini Flash-Lite, 9 da'wah categories, batched)
     5. upsert into `social_posts` on `(platform, external_id)`
     6. print top-5 by relevance for a quick sanity check

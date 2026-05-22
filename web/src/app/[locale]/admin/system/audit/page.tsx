@@ -94,8 +94,12 @@ export default async function AuditLogPage({
       ? (sp.range as RangeValue)
       : "7d";
 
+  // Actor filter — UUID of a user who has appeared in admin_logs.
+  // Validation: any non-empty string is passed through; if it doesn't
+  // match an actor in the dropdown, the resulting filter just returns
+  // zero rows (safe — no SQL injection because we bind it via Drizzle).
   const actorFilter =
-    typeof sp.actor === "string" ? sp.actor.trim().slice(0, 200) : "";
+    typeof sp.actor === "string" ? sp.actor.trim().slice(0, 64) : "";
 
   const page = Math.max(
     1,
@@ -119,23 +123,35 @@ export default async function AuditLogPage({
       ),
     );
   }
-  // Actor filter is a substring match against the user's email or
-  // name. We resolve it by ID via a sub-select to keep the main
-  // query indexed on (actor_user_id, created_at).
+  // Actor filter is now an exact user-ID match (dropdown-sourced).
+  // The index on (actor_user_id, created_at) makes this trivial.
   if (actorFilter) {
-    conditions.push(
-      sql`actor_user_id IN (
-        SELECT id FROM users
-        WHERE email ILIKE ${"%" + actorFilter + "%"}
-           OR COALESCE(name, '') ILIKE ${"%" + actorFilter + "%"}
-      )`,
-    );
+    conditions.push(eq(schema.adminLogs.actorUserId, actorFilter));
   }
 
   const whereClause = conditions.length ? and(...conditions) : undefined;
   const offset = (page - 1) * PAGE_SIZE;
 
-  const [logsRaw, [{ totalCount = 0 } = { totalCount: 0 }]] =
+  // Actor dropdown — distinct users who have ever shown up in admin_logs.
+  // We pull from the log table (not `users.role IN ('admin','superadmin')`)
+  // so ex-admins whose actions are still in the history remain filterable
+  // even after a role change or deletion. Joined back to `users` for the
+  // current display name/email; rows where the user is gone are dropped
+  // since we can't show a useful label.
+  const actorOptionsPromise = db
+    .selectDistinct({
+      id: schema.users.id,
+      email: schema.users.email,
+      name: schema.users.name,
+    })
+    .from(schema.adminLogs)
+    .innerJoin(
+      schema.users,
+      eq(schema.users.id, schema.adminLogs.actorUserId),
+    )
+    .orderBy(schema.users.email);
+
+  const [logsRaw, [{ totalCount = 0 } = { totalCount: 0 }], actorOptions] =
     await Promise.all([
       db
         .select({
@@ -164,6 +180,7 @@ export default async function AuditLogPage({
         .select({ totalCount: sql<number>`COUNT(*)::int` })
         .from(schema.adminLogs)
         .where(whereClause),
+      actorOptionsPromise,
     ]);
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
@@ -220,14 +237,19 @@ export default async function AuditLogPage({
               ))}
             </select>
           </FormField>
-          <FormField label="Actor (email or name)">
-            <input
+          <FormField label="Actor">
+            <select
               name="actor"
               defaultValue={actorFilter}
-              maxLength={200}
-              placeholder="ahmed@example.com"
-              className="h-9 w-64 rounded-lg border border-slate-200 px-3 text-sm placeholder:text-slate-400"
-            />
+              className="h-9 w-64 rounded-lg border border-slate-200 bg-white px-3 text-sm"
+            >
+              <option value="">All actors</option>
+              {actorOptions.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.name ? `${u.name} · ${u.email}` : u.email}
+                </option>
+              ))}
+            </select>
           </FormField>
           <button
             type="submit"

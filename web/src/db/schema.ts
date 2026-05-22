@@ -269,7 +269,7 @@ export const socialPosts = pgTable(
     dawahOpportunity: doublePrecision("dawah_opportunity"),
     categories: jsonb("categories").$type<Record<string, number>>(),
 
-    // Cluster assignment from the latest BERTopic run (FK to `topics.id`).
+    // Cluster assignment from the latest topic-discovery run (FK to `topics.id`).
     topicId: uuid("topic_id"),
 
     // Region code for mainstream regional outlets — NULL for national /
@@ -296,9 +296,10 @@ export const socialPosts = pgTable(
 );
 
 /**
- * BERTopic-discovered clusters per platform. Refreshed in batch by
- * `cluster_topics.py`. Each topic has a `label` (joined keywords) and a
- * `keywords[]` array used for richer rendering on the insights page.
+ * Topic-discovery clusters per platform (Gemini Flash-Lite themes).
+ * Refreshed in batch by `cluster_topics.py`. Each topic has a `label`
+ * (human-readable Bahasa Indonesia theme) and a `keywords[]` array
+ * used for richer rendering on the insights page.
  */
 export const topics = pgTable(
   "topics",

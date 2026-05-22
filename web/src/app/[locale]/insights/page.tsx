@@ -180,8 +180,14 @@ export default async function InsightsPage({
       <section className="pb-16 sm:pb-20">
         <div className="mx-auto grid max-w-6xl gap-5 px-4 sm:px-6 lg:grid-cols-3">
           {/* Trending — Gemini-discovered themes, top 5 by post count.
-              Empty until the nightly re-cluster has populated `topics`. */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-2">
+              Empty until the nightly re-cluster has populated `topics`.
+              `id="trending"` is the anchor target for the dashboard's
+              "Trending issues" MiniStat card. Scroll-margin-top keeps
+              the heading clear of the sticky top nav after the jump. */}
+          <div
+            id="trending"
+            className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-2"
+          >
             <div className="flex items-center justify-between">
               <h2 className="text-balance text-base font-semibold text-slate-900 sm:text-lg">
                 {t("section_trending")}
@@ -295,34 +301,38 @@ export default async function InsightsPage({
           </p>
         )}
 
-        <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <div className="relative isolate overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 via-emerald-700 to-brand-700 px-6 py-12 text-center text-white shadow-2xl sm:px-12">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 -z-10"
-            >
-              <div className="absolute -top-24 left-1/3 h-72 w-72 rounded-full bg-amber-300 opacity-25 blur-3xl" />
-              <div className="absolute -bottom-24 right-0 h-72 w-72 rounded-full bg-emerald-300 opacity-30 blur-3xl" />
+        {/* "Apply for Full Access" CTA — anonymous visitors only. Signed-in
+            users have already converted, so this banner just adds noise. */}
+        {!session?.user && (
+          <div className="mx-auto max-w-5xl px-4 sm:px-6">
+            <div className="relative isolate overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 via-emerald-700 to-brand-700 px-6 py-12 text-center text-white shadow-2xl sm:px-12">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 -z-10"
+              >
+                <div className="absolute -top-24 left-1/3 h-72 w-72 rounded-full bg-amber-300 opacity-25 blur-3xl" />
+                <div className="absolute -bottom-24 right-0 h-72 w-72 rounded-full bg-emerald-300 opacity-30 blur-3xl" />
+              </div>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur">
+                <Sparkles className="h-3.5 w-3.5" />
+                Free forever
+              </span>
+              <h2 className="mt-6 text-balance text-2xl font-bold tracking-tight sm:text-3xl">
+                {t("cta_title")}
+              </h2>
+              <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-white/85 sm:text-base">
+                {t("cta_body")}
+              </p>
+              <Link
+                href="/login"
+                className="mt-7 inline-flex h-12 items-center gap-2 rounded-full bg-white px-6 text-sm font-semibold text-emerald-800 shadow-lg transition hover:bg-emerald-50"
+              >
+                {t("cta_button")}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
             </div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur">
-              <Sparkles className="h-3.5 w-3.5" />
-              Free forever
-            </span>
-            <h2 className="mt-6 text-balance text-2xl font-bold tracking-tight sm:text-3xl">
-              {t("cta_title")}
-            </h2>
-            <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-white/85 sm:text-base">
-              {t("cta_body")}
-            </p>
-            <Link
-              href="/login"
-              className="mt-7 inline-flex h-12 items-center gap-2 rounded-full bg-white px-6 text-sm font-semibold text-emerald-800 shadow-lg transition hover:bg-emerald-50"
-            >
-              {t("cta_button")}
-              <ArrowRight className="h-4 w-4" />
-            </Link>
           </div>
-        </div>
+        )}
       </section>
     </>
   );
@@ -355,6 +365,7 @@ function ExecutiveBriefing({
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: "Asia/Jakarta",
   });
 
   const fullBody =

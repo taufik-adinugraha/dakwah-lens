@@ -172,7 +172,12 @@ function BriefRow({
           <span className="tabular-nums">
             {new Date(brief.createdAt).toLocaleDateString(
               locale === "id" ? "id-ID" : "en-US",
-              { year: "numeric", month: "short", day: "numeric" },
+              {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                timeZone: "Asia/Jakarta",
+              },
             )}
           </span>
         </p>

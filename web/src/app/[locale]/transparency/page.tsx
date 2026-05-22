@@ -315,6 +315,7 @@ function FxDisclaimer({
                   year: "numeric",
                   month: "short",
                   day: "numeric",
+                  timeZone: "Asia/Jakarta",
                 })
               : t("fx_factory_default"),
           })}
@@ -367,6 +368,7 @@ function MonthlyTable({
                       {new Date(r.month).toLocaleDateString(idLocale, {
                         year: "numeric",
                         month: "long",
+                        timeZone: "Asia/Jakarta",
                       })}
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums text-emerald-700">
@@ -442,6 +444,7 @@ function DonationsList({
                       year: "numeric",
                       month: "short",
                       day: "numeric",
+                      timeZone: "Asia/Jakarta",
                     })}
                     {d.channel ? (
                       <>

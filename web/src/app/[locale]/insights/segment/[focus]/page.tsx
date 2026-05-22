@@ -14,6 +14,7 @@ import {
 import { BriefingNarrative } from "@/components/BriefingNarrative";
 import { InsightsHeadlinePills } from "@/components/InsightsHeadlinePills";
 import { FilterableTopPosts } from "@/components/FilterableTopPosts";
+import { I18nText } from "@/components/I18nText";
 
 /**
  * Audience-segmented dashboard. The /insights main page is mixed —
@@ -331,6 +332,17 @@ export default async function SegmentPage({
       {/* Top posts in this segment — with sentiment filter chips */}
       <section className="pb-16">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
+          {/* Same top-50-cap caveat as /insights/[platform] — only render
+              when total > 50 so smaller segments don't see a confusing
+              note that doesn't apply. */}
+          {total > 50 && (
+            <I18nText
+              text={t("live_section_top50_note", {
+                count: total.toLocaleString(),
+              })}
+              className="mb-3 block text-pretty text-xs italic text-slate-500"
+            />
+          )}
           <FilterableTopPosts
             posts={topPosts}
             locale={locale}

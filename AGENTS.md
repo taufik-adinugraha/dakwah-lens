@@ -6,18 +6,19 @@ Read the PRD (`Dakwah-Lens_PRD_v0.4.pdf`) for full product context. Owner: Sukse
 
 - `web/` — Next.js 16 frontend. See `web/AGENTS.md` for Next.js-specific rules.
 - `api/` — FastAPI + Celery backend. See `api/` files; uv-managed Python 3.12 in `src/api/`.
-- `docker-compose.yml` — local Postgres, Qdrant, Redis (and later IndoBERT service).
+- `docker-compose.yml` — local Postgres, Qdrant, Redis. IndoBERT runs in-process inside the `worker` container, not a separate service.
 
-## Locked decisions (2026-05-17)
+## Locked decisions (current as of 2026-05-22)
 
 | Decision | Value |
 |---|---|
 | Languages | Indonesian (primary) + English via next-intl |
-| Embedding model | `text-embedding-3-small` (OpenAI) |
-| Sentiment | IndoBERT, self-hosted (week 3+) |
-| Classifier / topic / relevance | Gemini Flash (default) |
+| Embedding model | `text-embedding-3-large` (OpenAI) |
+| Sentiment — mainstream news | Gemini Flash-Lite (`services/news_sentiment.py`) — IndoBERT misfires ~95% neutral on news |
+| Sentiment — social (X / IG / TikTok / YouTube) | IndoBERT, self-hosted in worker container; Gemini Flash-Lite fallback for non-ID text |
+| Da'wah classifier / opportunity / topic discovery / rerank | Gemini 2.5 Flash-Lite |
 | Brief synthesis | Gemini 2.5 Pro (fallback: Claude Sonnet 4.6) |
-| Vector store | Qdrant Cloud free tier (prototype), self-host later |
+| Vector store | Self-hosted Qdrant in docker compose |
 | Hosting | IDCloudHost VPS (Indonesia residency per UU PDP §27/2022) |
 | Auth | NextAuth.js (email + Google OAuth) |
 | Multi-tenancy | `organizations` + `org_members` (owner/admin/member), app-level scoping |
@@ -33,8 +34,8 @@ Read the PRD (`Dakwah-Lens_PRD_v0.4.pdf`) for full product context. Owner: Sukse
 
 ## Cost discipline (per PRD §13)
 
-- Budget cap: IDR 1M/month at prototype stage.
-- Tiered LLM routing — Gemini Flash by default; Claude/OpenAI ONLY for brief synthesis or explicit "deep analysis".
+- Budget cap: IDR ~1.5-2M/month (~IDR 1M LLM + ~IDR 500K VPS).
+- Tiered LLM routing — Gemini Flash-Lite by default for classify/topic/rerank; Gemini 2.5 Pro reserved for brief synthesis; Claude Sonnet 4.6 only as a Pro fallback.
 - Aggressive caching: never re-embed an unchanged kitab chunk; cache topic classifications.
 - Batch classification calls whenever the API supports it.
 - Flag any suggestion that would breach the cap before implementing.

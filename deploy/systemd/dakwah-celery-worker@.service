@@ -11,10 +11,10 @@ User=deploy
 Group=deploy
 WorkingDirectory=/srv/dakwah-lens-%i/api
 EnvironmentFile=/srv/dakwah-lens-%i/.env
-# Cap PyTorch / MKL / OpenBLAS thread pools so IndoBERT + BERTopic don't
-# starve the rest of the worker (Postgres, Celery, the API server) on the
-# shared 4-vCPU VM. Setting these here means they're in place BEFORE
-# Python imports torch — the most reliable point.
+# Cap PyTorch / MKL / OpenBLAS thread pools so IndoBERT doesn't starve
+# the rest of the worker (Postgres, Celery, the API server) on the shared
+# 4-vCPU VM. Setting these here means they're in place BEFORE Python
+# imports torch — the most reliable point.
 # Currently 1 — IndoBERT runs single-threaded; bump only after measuring
 # that ingest latency is actually the bottleneck.
 Environment="OMP_NUM_THREADS=1"
