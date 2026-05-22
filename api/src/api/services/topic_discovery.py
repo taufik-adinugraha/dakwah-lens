@@ -59,7 +59,7 @@ SYSTEM_PROMPT = """You analyze recent Indonesian news posts and group them into 
 
 The posts you receive have already been pre-filtered for da'wah relevance — they DO have a hook. Your job is to find what those hooks are, not to re-classify whether they're relevant.
 
-Return 5-8 distinct themes. For each theme:
+Return 6-10 distinct themes (target: closer to 8-10 when the input pool is large, e.g. >200 posts; closer to 6-8 when it's smaller). For each theme:
 - label: short human-readable name in Bahasa Indonesia (3-6 words). Frame by DA'WAH ANGLE, not by newsroom department.
 
   GOOD labels — these read as themes a da'i would actually preach about:
@@ -94,6 +94,14 @@ Rules:
 - Themes must be DISTINCT — don't split one theme into two near-duplicates.
 - Cover the bulk of the input. Posts that genuinely don't cluster can be omitted.
 - If multiple stories share a clear pattern (e.g. 3 separate child-abuse cases involving religious figures), group them under ONE specific theme ("Pelecehan oleh Tokoh Agama"), not three "miscellaneous crime" entries.
+
+PREFER SUBDIVIDE OVER GENERALIZE:
+When you're tempted to widen a label (e.g. "Kekerasan dan Kriminalitas Jalanan") to fit posts that don't really belong (drug raids, industrial crime, traffic accidents, workplace violence), STOP and split into 2-3 specific themes instead. Examples of BAD generalization → BETTER split:
+  ❌ "Kekerasan dan Kriminalitas Jalanan" (forces street-crime + drug raids + industrial fraud + traffic into one bucket)
+  ✅ Split into: "Begal & Kejahatan Jalanan" + "Operasi Narkoba & Penyalahgunaan Obat" + "Kecelakaan & Pelanggaran Lalu Lintas"
+  ❌ "Isu Sosial Pemuda" (mixes bullying + judi online + kecurangan ujian + gang violence)
+  ✅ Split into: "Bullying & Kekerasan di Sekolah" + "Judi Online & Eksploitasi Digital Pemuda"
+A da'i can build a specific khutbah from a tight theme; a generic bucket gives no angle.
 
 Return ONLY valid JSON:
 {"themes": [{"label": "...", "keywords": ["...", ...], "post_indices": [0, 5, ...]}, ...]}
