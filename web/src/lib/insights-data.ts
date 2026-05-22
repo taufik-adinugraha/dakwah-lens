@@ -563,7 +563,7 @@ export async function getOverviewInsights(): Promise<OverviewInsights | null> {
         WHERE key = ANY (ARRAY[${sql.raw(
           CATEGORIES.map((c) => `'${c}'`).join(","),
         )}])
-          AND value::numeric > 0
+          AND value::numeric > 0.1
         ORDER BY value::numeric DESC
         LIMIT 1
       ) AS dominant
@@ -641,7 +641,7 @@ export async function getOverviewInsights(): Promise<OverviewInsights | null> {
           WHERE key = ANY (ARRAY[${sql.raw(
             CATEGORIES.map((c) => `'${c}'`).join(","),
           )}])
-            AND value::numeric > 0
+            AND value::numeric > 0.1
           ORDER BY value::numeric DESC LIMIT 1
         ) AS dominant
       FROM social_posts

@@ -118,6 +118,7 @@ export default async function PostsBrowsePage({
         WHERE key = ANY (ARRAY[${sql.raw(
           DAWAH_CATEGORIES.map((c) => `'${c}'`).join(","),
         )}])
+          AND value::numeric > 0.1
         ORDER BY value::numeric DESC LIMIT 1
       ) = ${category}`,
     );

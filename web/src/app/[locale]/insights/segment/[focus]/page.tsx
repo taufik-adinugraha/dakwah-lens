@@ -110,9 +110,12 @@ export default async function SegmentPage({
   // any post with a tiny non-zero score in a segment key match the
   // segment — so the four segments converged to nearly identical
   // sentiment mixes.
+  // Floor > 0.1 (was > 0) so classifier-punted posts (all 9 categories
+  // flat at 0.1) drop out of segment queries. See insights_summary.py
+  // post_filter for the full rationale (2026-05-22 contamination fix).
   const dominantCategorySql = sql`(
     SELECT key FROM jsonb_each_text(${schema.socialPosts.categories})
-    WHERE value::numeric > 0
+    WHERE value::numeric > 0.1
     ORDER BY value::numeric DESC LIMIT 1
   )`;
 

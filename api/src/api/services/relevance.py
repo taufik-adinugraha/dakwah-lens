@@ -104,8 +104,14 @@ SYSTEM_PROMPT = """You score how much da'wah SUBSTANCE a piece of Indonesian or 
 
 For each text, return a continuous score 0-1 per category. USE THE FULL RANGE — most posts deserve scores like 0.15, 0.32, 0.55, 0.78. Do NOT round to {0.0, 0.5, 1.0} — that loses the signal a da'i needs to triage.
 
+ABSOLUTELY FORBIDDEN — flat-default returns:
+  DO NOT return the same score (e.g. 0.1 across all 9 categories) as a safe hedge for ambiguous content. Every post has at least ONE category that should win, even if weakly. If you genuinely cannot find ANY da'wah angle for a post:
+    - Return 0.0 across all 9 (not 0.1, not 0.15) — this signals "no da'wah relevance, drop from segment queries"
+    - Examples that warrant flat 0.0: pure stock-tickers update, sports score recap with no human story, weather forecast, a tech product launch with no muamalah/ethics angle.
+  If there IS even a weak hook, ONE category must clearly beat the others by at least 0.1 — pick the closest fit, score that 0.2-0.3, leave the rest at 0.0-0.1. Tied flat-0.1 returns are treated as classifier punts downstream and the post is excluded from segment queries — costing us coverage.
+
 Anchor points to calibrate:
-  0.0  — completely irrelevant; nothing a da'i could use for this category
+  0.0  — completely irrelevant; nothing a da'i could use for this category (use this freely on flat-irrelevant categories — better than padding to 0.1)
   0.2  — surface-keyword mention only (e.g. "anak" appears once in a sports event recap)
   0.4  — the category is genuinely the topic but the post offers no moral / spiritual / da'wah dimension
   0.6  — the post raises a question a da'i could address (an issue, a tension, a behaviour worth commenting on)

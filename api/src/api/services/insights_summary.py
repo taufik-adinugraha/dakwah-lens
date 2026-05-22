@@ -122,17 +122,17 @@ WAJIB 4 sub-section dengan ### H3:
 
 SETIAP surface harus dapat angle BERBEDA — bukan satu nasihat yang di-paraphrase 4x.
 
-## Daleel & Sumber (250-350 kata)
-- Kutip 4-5 daleel dari pool yang saya berikan, masing-masing dengan KONTEKS ringkas
-- Format heading per daleel: `**{{citation_only}}**` — citation sudah berisi nama korpus dan nomor (mis. "QS. Hud: 85" atau "Riyad as-Salihin 1420"). JANGAN mengulang nama korpus dengan format `**RIYAD_AS_SALIHIN Riyad as-Salihin 1420**`. JANGAN sertakan ref_id `[quran::11:85]`.
-- Format penuh per daleel:
+## Dalil & Sumber (250-350 kata)
+- Kutip 4-5 dalil dari pool yang saya berikan, masing-masing dengan KONTEKS ringkas
+- Format heading per dalil: `**{{citation_only}}**` — citation sudah berisi nama korpus dan nomor (mis. "QS. Hud: 85" atau "Riyad as-Salihin 1420"). JANGAN mengulang nama korpus dengan format `**RIYAD_AS_SALIHIN Riyad as-Salihin 1420**`. JANGAN sertakan ref_id `[quran::11:85]`.
+- Format penuh per dalil:
 
   **{{citation}}**
   > {{Terjemahan atau parafrase}}
 
-  {{1-2 kalimat konteks: mengapa daleel ini relevan dengan tema pekan ini}}
+  {{1-2 kalimat konteks: mengapa dalil ini relevan dengan tema pekan ini}}
 
-- CRITICAL: HANYA gunakan daleel dari pool yang saya sediakan. JANGAN mengutip ayat atau hadits dari memori Anda.
+- CRITICAL: HANYA gunakan dalil dari pool yang saya sediakan. JANGAN mengutip ayat atau hadits dari memori Anda.
 - TERJEMAHAN HADITS: pertahankan struktur dan nuansa asli. Contoh: Bulugh al-Maram 1023 berbunyi "tunaikan amanah kepada yang mempercayaimu, dan JANGAN khianati orang yang mengkhianatimu" — ini hadits anti-retaliation (walau dia mengkhianatimu, kau tidak balik mengkhianati). Jangan datarkan ke generik "jangan saling mengkhianati".
 - Urutkan dari yang PALING RELEVAN dengan tema pekan ini
 
@@ -144,7 +144,7 @@ TONE GUARDRAILS (PRD §12):
 - Tidak mengeluarkan rulings (haram/halal, fatwa-shape). Anda starting point untuk da'i berpikir, bukan fatwa.
 - Default ke charity in framing. Saat menyoroti kegagalan moral, fokus pada angle SISTEMIK + jalan keluar.
 - Pertahankan jarak observasional. Anda analis, bukan da'i di mimbar.
-- Istilah dakwah (da'i, khutbah, daleel, kitab, muamalah, akhlaq, amanah, mustad'afin) ditulis as-is, BUKAN diterjemahkan.
+- Istilah dakwah (da'i, khutbah, dalil, kitab, muamalah, akhlaq, amanah, mustad'afin) ditulis as-is, BUKAN diterjemahkan.
 - Transliterasi Arab (*rahma*, *hikmah*, *mustad'afin*, *amanah*) bungkus dengan italic.
 """
 
@@ -252,11 +252,21 @@ async def _compute_stats(
     # post with a tiny non-zero score in a segment key was counted in
     # the segment. That made all four segment summaries converge to the
     # same numbers (2026-05-21 bugfix).
+    # Floor raised to > 0.1 on 2026-05-22 — about 28% of mainstream
+    # posts came back from the classifier with ALL nine categories
+    # tied at exactly 0.1 (the LLM punted with a flat default instead
+    # of actually scoring). With the old > 0 threshold the argmax
+    # picked whichever key came first in Postgres's jsonb iteration
+    # order — effectively random — and a Bea Cukai corruption post
+    # ended up tagged `youth`, contaminating the youth-segment
+    # briefing. Floor > 0.1 means a post needs at least one category
+    # the classifier actually picked above the flat default; punted
+    # rows fall out of segment queries entirely.
     post_filter = """
       WITH filtered AS (
         SELECT sp.*, (
           SELECT key FROM jsonb_each_text(categories)
-          WHERE value::numeric > 0
+          WHERE value::numeric > 0.1
           ORDER BY value::numeric DESC LIMIT 1
         ) AS dominant_cat
         FROM social_posts sp

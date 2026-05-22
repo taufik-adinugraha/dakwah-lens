@@ -1,31 +1,26 @@
-import { Fragment, type ReactNode } from "react";
+import { type ReactNode } from "react";
 
 /**
- * Render translation strings with inline `*italic*` markdown for emphasis
- * on English technical terms within Indonesian copy.
+ * Render translation strings that contain inline `*…*` markers from
+ * Indonesian translations (used to flag English technical terms like
+ * dashboard, brief, kitab, insights). Strips the asterisks so they
+ * don't show literally in the UI.
  *
- * Why this exists
- * ---------------
- * Indonesian web copy commonly mixes English technical terms (dashboard,
- * brief, kitab, insight). Convention is to italicise the English term to
- * mark it as a borrowed word. next-intl's plain `t("key")` returns a
- * raw string, so the asterisks would show literally.
+ * Italic rendering is currently DISABLED — the matched text renders
+ * plain. The marker convention is kept in `messages/id.json` because
+ * (a) we may want italic back later for a specific surface, (b) the
+ * markers double as a semantic hint that the word is a borrowed
+ * English term, and (c) removing them all from id.json would be a
+ * destructive search-and-replace. So we keep the parser, drop the
+ * styling.
  *
- * Convention
- * ----------
- * In `messages/id.json` write:
+ * Convention in `messages/id.json`:
  *     "stat_briefs_this_week_label": "*Brief* minggu ini"
+ * Rendered output:
+ *     <span>Brief minggu ini</span>
  *
- * Components render with:
- *     <I18nText text={t("stat_briefs_this_week_label")} />
- *
- * Renders as:
- *     <span>
- *       <em className="italic">Brief</em> minggu ini
- *     </span>
- *
- * Escape an asterisk you actually want shown with `\*`. The parser
- * matches non-greedy `*…*` runs that don't span newlines.
+ * Escape an asterisk you want shown with `\*`. The parser matches
+ * non-greedy `*…*` runs that don't span newlines.
  */
 export function I18nText({
   text,
@@ -34,24 +29,20 @@ export function I18nText({
   text: string;
   className?: string;
 }) {
-  return <span className={className}>{renderInlineItalic(text)}</span>;
+  return <span className={className}>{stripMarkers(text)}</span>;
 }
 
-function renderInlineItalic(input: string): ReactNode[] {
+function stripMarkers(input: string): ReactNode[] {
   // Split on `*…*` runs that don't cross newlines. The capturing group
-  // keeps the delimiters in the split, so positional logic stays simple:
-  // even indices = plain text, odd = italic content (without asterisks).
+  // keeps the matched content in the split (without asterisks), so
+  // positional logic stays simple: even indices = surrounding plain
+  // text, odd indices = previously-marked content (now also plain).
   const tokens = input.split(/\*([^*\n]+)\*/g);
   return tokens.map((tok, i) => {
     if (i % 2 === 1) {
-      return (
-        <em key={i} className="not-italic">
-          {/* `not-italic` keeps it from inheriting parent italic styles —
-              we apply italic directly so emphasis is precise even
-              when nested. */}
-          <span className="italic">{tok}</span>
-        </em>
-      );
+      // Was italic; now plain — render as a span so React still has a
+      // keyed boundary if we ever want to flip italic back on.
+      return <span key={i}>{tok}</span>;
     }
     // Escape sequence: `\*` → `*` literal.
     return tok.replace(/\\\*/g, "*");

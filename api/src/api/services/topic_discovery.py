@@ -22,18 +22,13 @@ table — drop-in replacement.
 from __future__ import annotations
 
 import json
+import time
 from typing import Any
 
 import structlog
 from google import genai
 from google.genai import errors as genai_errors
 from google.genai import types
-from tenacity import (
-    Retrying,
-    retry_if_exception_type,
-    stop_after_attempt,
-    wait_exponential,
-)
 
 from api.config import settings
 
@@ -183,57 +178,86 @@ def discover_topics(
     }
 
     client = _get_client()
-    # Tenacity wrapper around generate_content. The genai client has its
-    # own short-window retry but it gives up too fast on intermittent 503s
-    # ("This model is currently experiencing high demand"). Observed on
-    # 2026-05-22 04:00 WIB: a single 503 → recluster_all returned with
-    # `{'mainstream': 0}`, no topics created for the day, briefings at
-    # 04:30 used stale yesterday-topic data. Adding our own backoff
-    # gives the model 3 chances over ~2.5 min before we give up; if all
-    # fail we still fall through to the soft-empty return so the task
-    # doesn't crash and the existing topics rows stay intact.
-    try:
-        for attempt in Retrying(
-            stop=stop_after_attempt(3),
-            wait=wait_exponential(multiplier=10, min=10, max=120),
-            retry=retry_if_exception_type(genai_errors.ServerError),
-            reraise=True,
-        ):
-            with attempt:
-                resp = client.models.generate_content(
-                    model=MODEL,
-                    contents=user_prompt,
-                    config=types.GenerateContentConfig(
-                        system_instruction=SYSTEM_PROMPT,
-                        response_mime_type="application/json",
-                        response_schema=response_schema,
-                        temperature=0.2,
-                        # 16K output budget so the model can emit full
-                        # post_indices arrays for 5-8 themes over the full
-                        # 7-day pool. The default ~8K was being silently
-                        # exhausted on a 274-post input, producing a
-                        # truncated JSON that failed to parse and persisted
-                        # ZERO topics (2026-05-21).
-                        max_output_tokens=16384,
-                        # Disable thinking — this is a "bucket inputs into
-                        # named groups" task with hard rules in the system
-                        # prompt, not a reasoning problem. Thinking tokens
-                        # were eating into the output budget AND adding
-                        # ~200s of latency per call.
-                        thinking_config=types.ThinkingConfig(thinking_budget=0),
-                    ),
-                )
-    except Exception:
-        log.exception("topic_discovery.gemini_failed", platform=platform)
-        return []
+    # Wrap the full generate+parse cycle in tenacity. Two failure modes
+    # we want to retry on:
+    #   1. ServerError (transient 503 "model overloaded") — 2026-05-22
+    #      04:00 WIB hit this; recluster persisted 0 topics for the day.
+    #   2. Truncated/malformed JSON — Gemini sometimes returns HTTP 200
+    #      with the response body cut off mid-array (observed 2026-05-22
+    #      08:54 WIB: 45s call returned just the first theme's opening
+    #      brace before truncation). Treating this as transient gives us
+    #      a clean second attempt instead of giving up on the day.
+    # 3 attempts with exponential backoff (10s, 20s, 40s ... capped 120s).
+    # Final fallback: empty themes → recluster returns 0 → existing topic
+    # rows stay intact (defensive design preserved).
+    resp = None
+    parsed = None
+    for attempt_idx in range(3):
+        try:
+            resp = client.models.generate_content(
+                model=MODEL,
+                contents=user_prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=SYSTEM_PROMPT,
+                    response_mime_type="application/json",
+                    response_schema=response_schema,
+                    temperature=0.2,
+                    # Output budget bumped 16K → 32K on 2026-05-22 after
+                    # observing a Flash-Lite call truncate mid-array
+                    # despite the 16K cap. With 354 posts in 6-10 themes
+                    # each carrying its full post_indices list, real
+                    # output can hit 5-8K tokens; the bigger cap gives
+                    # headroom against model-side overshoots.
+                    max_output_tokens=32768,
+                    # Thinking budget raised 0 → 4096. Setting it to 0
+                    # was meant to disable thinking but Flash-Lite still
+                    # spent ~45s deliberating internally and exhausted
+                    # the implicit thinking allocation, leaving the
+                    # output truncated. A modest explicit budget lets
+                    # the model reason about cluster boundaries without
+                    # racing past the output cap.
+                    thinking_config=types.ThinkingConfig(thinking_budget=4096),
+                ),
+            )
+            raw = resp.text or "{}"
+            parsed = json.loads(raw)
+            break  # success
+        except genai_errors.ServerError as exc:
+            log.warning(
+                "topic_discovery.server_error_retry",
+                platform=platform,
+                attempt=attempt_idx + 1,
+                error=str(exc)[:200],
+            )
+        except json.JSONDecodeError:
+            # Log enough to diagnose: finish_reason tells us if it was
+            # MAX_TOKENS / SAFETY / STOP; tokens_out tells us how much
+            # the model actually emitted before truncating.
+            finish_reason = None
+            tokens_out = None
+            try:
+                if resp and resp.candidates:
+                    finish_reason = getattr(resp.candidates[0], "finish_reason", None)
+                usage_md = getattr(resp, "usage_metadata", None) if resp else None
+                if usage_md:
+                    tokens_out = getattr(usage_md, "candidates_token_count", None)
+            except Exception:
+                pass
+            log.warning(
+                "topic_discovery.bad_json_retry",
+                platform=platform,
+                attempt=attempt_idx + 1,
+                finish_reason=str(finish_reason) if finish_reason else None,
+                tokens_out=tokens_out,
+                raw_len=len(resp.text or "") if resp else 0,
+                raw_tail=(resp.text or "")[-200:] if resp else "",
+            )
+        # Exponential backoff before next attempt.
+        if attempt_idx < 2:
+            time.sleep(10 * (2 ** attempt_idx))
 
-    raw = resp.text or "{}"
-    try:
-        parsed = json.loads(raw)
-    except json.JSONDecodeError:
-        log.warning(
-            "topic_discovery.bad_json", platform=platform, raw=raw[:200]
-        )
+    if parsed is None:
+        log.error("topic_discovery.gave_up", platform=platform)
         return []
 
     themes_raw = parsed.get("themes") or []
@@ -241,7 +265,7 @@ def discover_topics(
     # Record cost so the api-costs dashboard sees this spend.
     from api.services.usage import record_usage
 
-    usage_md = getattr(resp, "usage_metadata", None)
+    usage_md = getattr(resp, "usage_metadata", None) if resp else None
     record_usage(
         provider="gemini",
         operation="topic_discovery",

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import {
   ArrowUpRight,
@@ -114,12 +115,17 @@ function Supervisor({ t }: { t: T }) {
         </div>
 
         <article className="mt-8 grid gap-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:grid-cols-[auto_1fr] sm:items-start sm:gap-6 sm:p-8">
-          <span
-            aria-hidden
-            className="inline-flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-emerald-500 text-2xl font-bold text-white shadow-md"
-          >
-            N
-          </span>
+          <Image
+            src="/team/nasruddin.png"
+            alt="Prof. Dr.-Ing. Ir. Nasruddin, M.Eng."
+            width={64}
+            height={64}
+            className="h-16 w-16 shrink-0 rounded-2xl object-cover shadow-md ring-1 ring-slate-200"
+            priority
+          />
+          {/* Was a gradient avatar with the letter "N" — swapped to the
+              actual portrait on 2026-05-22. File lives in
+              `web/public/team/nasruddin.png`. */}
           <div>
             <a
               href="https://eng.ui.ac.id/personnel/nasruddin/"
