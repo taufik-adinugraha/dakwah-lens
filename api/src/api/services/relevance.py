@@ -20,11 +20,13 @@ from __future__ import annotations
 
 import json
 import re
+import time
 from dataclasses import dataclass
 from typing import Literal
 
 import structlog
 from google import genai
+from google.genai import errors as genai_errors
 from google.genai import types
 
 from api.config import settings
@@ -41,6 +43,15 @@ MODEL = "gemini-2.5-flash-lite"
 # below any plausible limit), and caps blast radius if one batch still
 # fails. See defensive try/except in `_classify_chunk` for the catch.
 MAX_BATCH = 10
+
+# Retry config — Gemini Flash-Lite returns 503 "model overloaded" in
+# bursts during Indonesia daytime peaks. Three attempts × exponential
+# backoff (4s, 8s, 16s) absorbs typical 10-30s overload windows. After
+# all retries fail, the chunk falls through to the existing zero-result
+# fallback so the rest of the ingest still commits. Mirrors the same
+# pattern in `news_sentiment._classify_chunk`.
+MAX_RETRIES = 3
+RETRY_BASE_SLEEP_S = 4.0
 # Texts shorter than this are almost always headline fragments or thumbnail
 # captions with too little signal for the classifier to score reliably.
 MIN_TEXT_CHARS = 30
@@ -333,16 +344,43 @@ def _classify_chunk(texts: list[str]) -> list[RelevanceResult]:
         },
     }
 
-    resp = client.models.generate_content(
-        model=MODEL,
-        contents=user_prompt,
-        config=types.GenerateContentConfig(
-            system_instruction=SYSTEM_PROMPT,
-            response_mime_type="application/json",
-            response_schema=response_schema,
-            temperature=0.2,
-        ),
-    )
+    # Retry loop on transient 5xx. After MAX_RETRIES the exception
+    # bubbles to `classify_batch`'s chunk-level try/except, which falls
+    # back to zero-result for the chunk — same outcome as before, just
+    # less often.
+    resp = None
+    for attempt in range(MAX_RETRIES):
+        try:
+            resp = client.models.generate_content(
+                model=MODEL,
+                contents=user_prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=SYSTEM_PROMPT,
+                    response_mime_type="application/json",
+                    response_schema=response_schema,
+                    temperature=0.2,
+                ),
+            )
+            break
+        except genai_errors.ServerError as exc:
+            if attempt == MAX_RETRIES - 1:
+                log.warning(
+                    "relevance.gemini_5xx_giveup",
+                    attempt=attempt + 1,
+                    batch_size=len(texts),
+                    error=str(exc)[:200],
+                )
+                raise
+            wait_s = RETRY_BASE_SLEEP_S * (2**attempt)
+            log.info(
+                "relevance.gemini_5xx_retry",
+                attempt=attempt + 1,
+                wait_s=wait_s,
+                batch_size=len(texts),
+            )
+            time.sleep(wait_s)
+    assert resp is not None  # noqa: S101 — loop above guarantees this or raises
+
     raw = resp.text or "[]"
     try:
         parsed: list[dict[str, float]] = json.loads(raw)
@@ -472,16 +510,40 @@ def _classify_opportunity_chunk(texts: list[str]) -> list[float]:
         },
     }
 
-    resp = client.models.generate_content(
-        model=MODEL,
-        contents=user_prompt,
-        config=types.GenerateContentConfig(
-            system_instruction=OPPORTUNITY_SYSTEM_PROMPT,
-            response_mime_type="application/json",
-            response_schema=response_schema,
-            temperature=0.2,
-        ),
-    )
+    # Same retry pattern as the categories classifier above.
+    resp = None
+    for attempt in range(MAX_RETRIES):
+        try:
+            resp = client.models.generate_content(
+                model=MODEL,
+                contents=user_prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=OPPORTUNITY_SYSTEM_PROMPT,
+                    response_mime_type="application/json",
+                    response_schema=response_schema,
+                    temperature=0.2,
+                ),
+            )
+            break
+        except genai_errors.ServerError as exc:
+            if attempt == MAX_RETRIES - 1:
+                log.warning(
+                    "opportunity.gemini_5xx_giveup",
+                    attempt=attempt + 1,
+                    batch_size=len(texts),
+                    error=str(exc)[:200],
+                )
+                raise
+            wait_s = RETRY_BASE_SLEEP_S * (2**attempt)
+            log.info(
+                "opportunity.gemini_5xx_retry",
+                attempt=attempt + 1,
+                wait_s=wait_s,
+                batch_size=len(texts),
+            )
+            time.sleep(wait_s)
+    assert resp is not None  # noqa: S101 — loop above guarantees this or raises
+
     raw = resp.text or "[]"
     try:
         parsed: list[dict[str, float]] = json.loads(raw)
