@@ -3,6 +3,11 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ArrowRight, BarChart3, Eye, Sparkles } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
+
+// Always render on demand — this page queries `insights_summaries` for
+// each of 5 segments via getAllLatestBriefings(). Static pre-rendering
+// at `next build` time has no DB available and would fail.
+export const dynamic = "force-dynamic";
 import { auth } from "@/auth";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/db";

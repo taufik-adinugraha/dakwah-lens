@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+
+// Always render on demand — getOverviewInsights + getTopIssues query
+// `social_posts` aggregates that aren't available at build time.
+export const dynamic = "force-dynamic";
 import {
   ArrowRight,
   BarChart3,

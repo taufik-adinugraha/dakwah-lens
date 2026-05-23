@@ -15,6 +15,12 @@
  * requests will surface the error to the user as a 500.
  */
 export async function register() {
+  // Skip during the production BUILD phase — `next build` evaluates
+  // `register()` while doing static-page generation, and a Chromium
+  // launch attempt during build either hangs the worker or pulls
+  // puppeteer's binary resolver into a state that breaks unrelated
+  // pages (deploy 26319575913 failed this way on 2026-05-23).
+  if (process.env.NEXT_PHASE === "phase-production-build") return;
   // Only run on Node runtime — Edge has no filesystem, no Puppeteer.
   if (process.env.NEXT_RUNTIME !== "nodejs") return;
 

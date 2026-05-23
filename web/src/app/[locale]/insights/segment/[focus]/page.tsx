@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+
+// Always render on demand — segment focus pages query `insights_summaries`
+// and `social_posts` aggregates that aren't available at build time.
+export const dynamic = "force-dynamic";
 import { and, desc, sql } from "drizzle-orm";
 import { ArrowLeft, ArrowRight, Layers } from "lucide-react";
 
