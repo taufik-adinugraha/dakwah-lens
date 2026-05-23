@@ -274,6 +274,18 @@ CONTOH JEBAKAN NYATA (jangan tiru):
 
 RULE: kalau headline mengandung kata `dari` + nama institusi/orang/kelompok, BERHENTI dan baca ulang. Kalau pembaca bisa salah membaca arah preposisi (pelindung vs sasaran), GANTI dengan konstruksi `di` (lokasi), `untuk` (penerima manfaat), atau `bersama` (kolaborator).
 
+ATURAN ANTI-MISLEADING IBADAH (KRITIS): headline TIDAK BOLEH menampilkan rukun ibadah atau sunnah (kurban / sholat / puasa / zakat / haji / sedekah / membaca Quran) sebagai sesuatu yang dipertentangkan dengan amal lain. Konstruksi `X, bukan Y` ("X not Y") sangat berbahaya jika Y adalah ibadah riil — pembaca yang sekilas baca akan menafsirkan "tinggalkan Y dan lakukan X" yang bisa berarti merendahkan ibadah pokoknya.
+
+CONTOH JEBAKAN NYATA (jangan tiru):
+- ❌ "Kurbankan Satu Kebiasaan, Bukan Kambing" — secara harfiah berarti "potong kebiasaan, JANGAN kambing" — terdengar seperti melarang kurban hewan (padahal sunnah muakkadah). Maksud sebenarnya additive (kambing PLUS kebiasaan) tapi konstruksinya oposisi.
+- ✓ "Kurbankan Juga Satu Kebiasaan" — `juga` = "also/and also", jelas additive
+- ✓ "Tambah Kurban Kebiasaan Tahun Ini" — `tambah` = "add", langsung additive
+- ✓ "Kambing untuk Allah, Kebiasaan untuk Diri" — parallel structure, dua-duanya dikurbankan
+- ❌ "Sedekah Senyum, Bukan Uang" — merendahkan sedekah harta. Pakai "Tambah Sedekah lewat Senyum".
+- ❌ "Doa di Hati, Bukan di Bibir" — bisa dibaca melarang lafadz doa. Pakai "Hati Hadir Saat Bibir Berdoa".
+
+RULE: setiap headline yang menyebut ibadah/sunnah, baca dengan asumsi pembaca tergesa-gesa dan kemungkinan TIDAK akan baca paragraf di bawah. Kalau headline saja sudah bisa dibaca sebagai "tinggalkan ibadah X demi Y", REWRITE. Pakai konstruksi additive (`juga`, `dan`, `tambah`, `plus`, `serta`), JANGAN oposisi (`bukan`, `tanpa`, `daripada`, `tidak`).
+
 ATURAN DALEEL: citation HARUS persis cocok dengan salah satu entri di daleel pool yang saya berikan. Pilih daleel yang PALING terkait dengan isi paragraf flyer-nya — bukan asal pilih. Headline + daleel + paragraf harus membentuk satu pesan yang utuh dan saling memperkuat. Boleh dua flyer pakai daleel berbeda dari pool yang sama; usahakan 4 flyer pakai 4 daleel berbeda kalau pool memungkinkan.
 
 LARANGAN MUTLAK pada keempat paragraf:
@@ -509,6 +521,18 @@ REAL TRAP CASES (do NOT mimic):
 - ❌ "Tegakkan Adil dari Pejabat" — makes officials the sole cause. Use "Tegakkan Adil Mulai dari Diri" / "Audit Fairness at Every Desk".
 
 RULE: when the headline contains `dari` / `from` + an institution / person / group, STOP and re-read. If the preposition direction can be misread (protector vs target), swap to a `di` (in / at), `untuk` (for), or `bersama` (with) construction.
+
+ANTI-MISLEADING-IBADAH RULE (CRITICAL): headlines must NEVER stage a religious obligation or sunnah (sacrifice / prayer / fasting / zakat / hajj / sadaqah / Qur'an reading) AGAINST another act of goodness. The `X, not Y` construction is especially dangerous when Y is a real ibadah — a rushed reader will parse it as "skip Y, do X" which can sound like belittling the core ritual.
+
+REAL TRAP CASES (do NOT mimic):
+- ❌ "Kurbankan Satu Kebiasaan, Bukan Kambing" / "Sacrifice One Habit, Not a Goat" — literally says "don't sacrifice the goat" — sounds like discouraging the sunnah kurban (the goat sacrifice). The intent was additive (goat AND habit) but the construction is oppositional.
+- ✓ "Kurbankan Juga Satu Kebiasaan" / "Sacrifice One Habit Too" — `juga` / `too` makes it additive.
+- ✓ "Add a Habit to Your Kurban This Year" — `add` makes it clearly cumulative.
+- ✓ "Kambing untuk Allah, Kebiasaan untuk Diri" — parallel structure, both are sacrificed.
+- ❌ "Sedekah Senyum, Bukan Uang" / "Smile Sadaqah, Not Money" — belittles material sadaqah. Use "Add a Smile to Your Sadaqah".
+- ❌ "Pray in Your Heart, Not on Your Lips" — can read as forbidding verbal du'a. Use "Heart Present While Lips Pray".
+
+RULE: any headline that names an ibadah / sunnah must be read assuming the audience is rushed and will likely NOT read the paragraph underneath. If the headline ALONE can be read as "skip ibadah X for Y", REWRITE. Use additive constructions (`also`, `and`, `add`, `plus`, `too`) — NEVER oppositional ones (`not`, `without`, `instead of`).
 
 DALEEL RULES: the citation MUST match one of the entries in the daleel pool I provided. Pick the daleel that most DIRECTLY supports the paragraph — not a random pick. Headline + daleel + paragraph must read as one tight message that reinforces itself. Two flyers can pull from the same pool; aim for 4 different daleel across the 4 flyers when the pool allows.
 
