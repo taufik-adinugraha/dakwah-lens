@@ -1,5 +1,31 @@
 import type { FlyerLayoutComponent } from "./types";
 
+function Tally({ color, marks = 6 }: { color: string; marks?: number }) {
+  return (
+    <svg
+      viewBox={`0 0 ${marks * 90} 60`}
+      width="320"
+      height="24"
+      aria-hidden
+      style={{ color }}
+    >
+      {Array.from({ length: marks }).map((_, i) => (
+        <line
+          key={i}
+          x1={20 + i * 90}
+          y1={30}
+          x2={70 + i * 90}
+          y2={30}
+          stroke="currentColor"
+          strokeWidth="6"
+          strokeLinecap="round"
+          opacity="0.55"
+        />
+      ))}
+    </svg>
+  );
+}
+
 /**
  * PosterQuestion — campus bulletin-board poster.
  *
@@ -46,31 +72,6 @@ export const PosterQuestion: FlyerLayoutComponent = ({
             ? "66px"
             : "56px";
   const lineHeight = len < 45 ? "1.06" : len < 85 ? "1.08" : "1.12";
-
-  // Shared decorative tally-marks used by 3 of 4 variants.
-  const Tally = ({ color, marks = 6 }: { color: string; marks?: number }) => (
-    <svg
-      viewBox={`0 0 ${marks * 90} 60`}
-      width="320"
-      height="24"
-      aria-hidden
-      style={{ color }}
-    >
-      {Array.from({ length: marks }).map((_, i) => (
-        <line
-          key={i}
-          x1={20 + i * 90}
-          y1={30}
-          x2={70 + i * 90}
-          y2={30}
-          stroke="currentColor"
-          strokeWidth="6"
-          strokeLinecap="round"
-          opacity="0.55"
-        />
-      ))}
-    </svg>
-  );
 
   const bgStops = palette.bgGradient;
 
