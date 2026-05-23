@@ -33,7 +33,11 @@ from sqlalchemy import text
 from api.config import settings
 from api.db import SessionLocal
 from api.models.admin import InsightsSummary
-from api.services.kitab_retrieval import rerank_daleel, retrieve_daleel
+from api.services.kitab_retrieval import (
+    rerank_daleel,
+    retrieve_daleel,
+    translate_daleel_to_id,
+)
 from api.services.usage import gemini_output_tokens
 
 log = structlog.get_logger()
@@ -106,8 +110,14 @@ CRITICAL — SCOPE OF PERCENTAGES: baca SEGMENT_SCOPE di input. Jika "all", pers
 - Hindari kata kerja perintah ("wajib", "harus", "pentingnya"). Gunakan observasional ("menyoroti", "memetakan", "menunjukkan", "tercermin dari")
 - HANYA gunakan headlines dari pool yang saya berikan. JANGAN mengarang cerita.
 
-## Strategi & Aksi Dakwah (5400-7430 kata)
-Ini adalah CONTENT KIT — bukan saran strategis. Setiap sub-section harus berupa DRAFT SIAP-PAKAI yang bisa dibaca / dipakai langsung oleh dai, ustadzah, kreator, atau pengurus komunitas tanpa harus menulis ulang dari nol. WAJIB 6 sub-section dengan ### H3:
+## Strategi & Aksi Dakwah (5700-7800 kata)
+Ini adalah CONTENT KIT — bukan saran strategis. Setiap sub-section harus berupa DRAFT SIAP-PAKAI yang bisa dibaca / dipakai langsung oleh dai, ustadzah, kreator, atau pengurus komunitas tanpa harus menulis ulang dari nol. WAJIB 6 sub-section dengan ### H3.
+
+RUJUKAN DALEEL DI SECTION 4 — pool yang saya sediakan berisi 10 daleel hasil rerank tematik. Setiap sub-section di bawah WAJIB merujuk 2-3 daleel dari pool ini secara INLINE (bukan ditumpuk semua di Section 5):
+- Pilih daleel yang paling SUPPORT argumen sub-section tersebut — bukan asal comot, bukan random pertama
+- Format inline: `**{{citation}}**` (mis. `**QS. Hud: 85**` atau `**Riyad as-Salihin 1420**`) langsung diikuti 1 kalimat parafrase singkat Bahasa Indonesia
+- Sub-section berbeda BOLEH mengutip daleel yang sama jika memang paling pas, tapi USAHAKAN variasi supaya 8-10 daleel pool terdistribusi (khutbah ~3-4 daleel, kajian ~2-3, pengajaran ~1-2, kreator ~1, gen-z ~2, aksi ~1-2)
+- JANGAN mengarang ayat atau hadits di luar pool. Citation yang muncul di Section 4 HARUS persis cocok dengan citation di pool
 
 ### Khutbah Jumat (2300-3200 kata)
 Tulis KHUTBAH JUMAT LENGKAP siap-baca dari pembuka sampai penutup, terdiri dari Khutbah Pertama dan Khutbah Kedua. Bahasa Indonesia formal-mengalir, bisa dipahami jamaah umum, jangan terlalu akademis. Panjang khutbah harus sebanding dengan khutbah Jumat Indonesia standar (15-22 menit ucapan = ~2300-3200 kata) — JANGAN terlalu pendek.
@@ -116,7 +126,7 @@ KHUTBAH PERTAMA (1800-2500 kata):
 - Mukadimah singkat (hamdalah → sholawat → syahadat → wasiat takwa, ~70 kata, transliterasi Arab standar khutbah Indonesia).
 - Ayat Quran pembuka yang relevan dengan tema pekan — sebut nama surah + nomor ayat + TERJEMAHAN Bahasa Indonesia. Kutip transliterasi Arab singkat untuk ayat ini saja BOLEH sebagai pembuka (mengikuti praktik khutbah Indonesia).
 - Pengantar tema (4-6 paragraf): hubungkan ayat dengan 2-3 peristiwa NYATA pekan ini dari pool sample_headlines, sebut outletnya ("Detik melaporkan…", "menurut Republika…", "seperti diberitakan Kompas…").
-- Inti khutbah (6-9 paragraf prosa mengalir, jangan pakai sub-judul): satu argumen yang BERKEMBANG sepanjang khutbah, didukung 2-3 hadis tambahan (terjemahan Bahasa Indonesia + sumber). Setiap paragraf harus mengembangkan argumen, BUKAN paraphrase paragraf sebelumnya.
+- Inti khutbah (6-9 paragraf prosa mengalir, jangan pakai sub-judul): satu argumen yang BERKEMBANG sepanjang khutbah, didukung 2-3 daleel tambahan DARI POOL (gunakan citation persis dari pool, tulis bold inline `**citation**` lalu terjemahan Bahasa Indonesia). Setiap paragraf harus mengembangkan argumen, BUKAN paraphrase paragraf sebelumnya.
 - Bersisi praktis: 3-4 tindakan konkret untuk jamaah pekan ini.
 - Tutup khutbah pertama dengan formula standar transliterasi Arab: "Baarakallahu lii wa lakum fil qur'aanil 'azhiim…" dst (~80 kata).
 
@@ -140,7 +150,7 @@ Tulis OUTLINE KAJIAN 45-MENIT siap-pakai, format hands-on bukan ceramah teoritis
 - Inti — 3 talking points (masing-masing 150-200 kata) dengan struktur per-poin:
   * Pernyataan inti (1 kalimat)
   * Contoh konkret dari berita pekan ini (sebut outlet)
-  * Rujukan daleel singkat (terjemahan, sebut sumber)
+  * Rujukan daleel singkat dari pool — tulis `**citation**` lalu 1 kalimat terjemahan
   * Aplikasi praktis untuk dapur / keluarga (2-3 tindakan)
 - Sesi Q&A (~100 kata): tulis 3 pertanyaan yang KEMUNGKINAN AKAN diajukan ibu-ibu + jawaban singkat-jujur (jangan idealistis berlebihan).
 - Penutup (~50 kata): doa singkat untuk keluarga, ringkasan satu kalimat yang bisa diingat.
@@ -156,7 +166,7 @@ Topik dipilih dari peristiwa nyata pekan ini.
 ### Kreator Konten Digital (100-130 kata)
 Tulis SCRIPT VIDEO siap-pakai 60-90 detik untuk TikTok / IG Reels / YouTube Shorts — kreator bisa baca langsung di depan kamera tanpa diedit. Bahasa Indonesia percakapan, BUKAN gaya khutbah. Struktur wajib:
 - HOOK (5 detik / ~10 kata): kalimat pertama yang menghentikan scroll. Boleh pertanyaan, boleh kontras, boleh fakta yang mengejutkan dari berita pekan ini.
-- BODY (40-60 detik / 80-100 kata): satu argumen jernih + satu rujukan daleel singkat (sebut nama surah/hadis dalam Bahasa Indonesia — JANGAN kutip teks Arab di video).
+- BODY (40-60 detik / 80-100 kata): satu argumen jernih + satu rujukan daleel singkat DARI POOL (sebut citation persis seperti di pool dalam Bahasa Indonesia — JANGAN kutip teks Arab di video, JANGAN mengarang citation).
 - CTA (5-10 detik / ~15 kata): ajakan konkret yang bisa langsung dilakukan penonton.
 Hindari frasa khas khutbah ("hadirin yang dirahmati Allah", "marilah kita renungkan").
 
@@ -182,39 +192,44 @@ Tulis OUTLINE OPEN-MIC KAJIAN / DISKUSI GEN Z siap-pakai (1.5 jam, format diskus
 - **Penutup** (~60 kata): BUKAN kesimpulan moral — refleksi terbuka + tawaran kelanjutan (Discord channel, peer group, mentor 1-on-1, group WA untuk Q&A lanjutan).
 
 ### Aksi Sosial & Khidmah Umat (600-900 kata)
-Tulis ACTION PLAN siap-eksekusi untuk komunitas / masjid / yayasan / organisasi dakwah. Pilih SATU aksi spesifik yang dipicu oleh berita pekan ini. BUKAN ceramah, BUKAN konten — harus kegiatan nyata yang bisa diluncurkan dalam 1-2 minggu.
+Tulis SET aksi kecil-berdampak yang bisa dijalankan oleh komunitas LOKAL — RT, RW, masjid lingkungan, keluarga, pengurus pengajian, karang taruna. BUKAN ceramah, BUKAN konten — kegiatan nyata yang bisa diluncurkan dalam 1-2 minggu dengan EFFORT KECIL (1-5 orang penggerak, tanpa sertifikasi profesional) dan BUDGET KECIL (total di bawah Rp 2.000.000).
 
-WAJIB OUT-OF-THE-BOX. Hindari ide klise yang sudah jenuh:
+Skala dampak: tetangga + lingkungan langsung. BUKAN program nasional, BUKAN platform tech ambisius, BUKAN partnership dengan kementerian / lembaga besar.
+
+Hindari ide klise atau yang terlalu berat:
 - ❌ Warung jujur / kantin kejujuran
-- ❌ Bakti sosial generik / pembagian sembako konvensional
+- ❌ Bakti sosial generik / pembagian sembako tanpa angle baru
 - ❌ Pengajian rutin tambahan
-- ❌ Buka puasa atau santunan anak yatim sebagai aksi mandiri
-- ❌ Sumbangan masjid / pembangunan fisik
+- ❌ Sumbangan / pembangunan fisik masjid
+- ❌ Bootcamp / sertifikasi formal / hotline nasional
+- ❌ Partnership dengan Komnas / BNN / kementerian (terlalu berat untuk lingkup RT)
 
-Sebaliknya, pikirkan aksi yang HANYA MASUK AKAL DI ERA 2026 — memanfaatkan teknologi, jaringan profesional ummat, atau bentuk komunitas yang baru muncul. Kategori inspirasi (pilih SATU yang paling cocok dengan isu pekan ini, JANGAN pakai semua):
-- Program digital-detox terstruktur (mis: lockdown anti-judi-online 30 hari dengan peer accountability + family-link app + check-in mingguan)
-- Layanan mental-health berbasis masjid (kerja sama psikolog Muslim, hotline anonim Gen Z lewat Telegram/WA)
-- Jaringan profesional Muslim untuk mentoring online santri / pesantren (coding, AI, finansial, jurnalisme — Muslim diaspora ikut)
-- Sistem akreditasi independen pesantren (audit perlindungan anak + transparansi keuangan, model lembaga sertifikasi sekuler)
-- Halal-fintech literacy bootcamp untuk ibu / UMKM (workshop praktis pakai app nyata — bukan ceramah riba)
-- Whistleblower support fund untuk saksi kasus korupsi (perlindungan hukum + dana sementara)
-- Forum restorative justice antar-tetangga (mediasi sebelum bawa ke polisi, mediator terlatih)
-- Sertifikasi masjid inklusif disabilitas (audit aksesibilitas terukur, daftar masjid bersertifikat publik)
-- Solidaritas struktural jangka panjang untuk korban kezaliman luar negeri (support fund 12-bulan untuk keluarga WNI di tahanan asing)
-- Anti-bullying peer-mediation di SD/SMP berbasis nilai Islami (kerja sama lintas-pesantren + sekolah negeri)
-- Maternal mental-health circle untuk ibu baru (postpartum support group, bukan tausiyah)
-- AI-assisted khutbah accessibility — auto-translate khutbah ke bahasa daerah / bahasa isyarat
-- Climate-resilient masjid (solar panel + water harvesting + kebun produktif, dijadikan pilot percontohan)
+Sebaliknya, fokus ke aksi sederhana yang DAMPAKNYA TERASA OLEH TETANGGA dalam 2-4 minggu. Format wajib: PROPOSE 4 AKSI SEGMENTASI USIA, satu trigger pekan ini diturunkan ke 4 segmen audiens berbeda. Tiap segmen jadi pelaku (bukan objek bantuan).
 
-Format wajib (ringkas, padat, BUKAN prosa berbunga-bunga):
-- **Trigger** (~80 kata): peristiwa/isu spesifik pekan ini yang memotivasi aksi. Sebut outlet + tanggal jika ada.
-- **Aksi konkret** (~100 kata): label aksi (1 kalimat **bold**), lalu 2-3 kalimat yang menjelaskan KENAPA pendekatan ini PAS UNTUK 2026 — apa yang membedakan dari pendekatan lama yang sudah dicoba.
-- **Langkah peluncuran** (3 langkah × 100-150 kata): Minggu 1 (kickoff — siapa kumpul di mana, agenda, deliverable konkret), Minggu 2-4 (scale-out — siapa yang dijangkau, channel yang dipakai), Bulan 2+ (sustain + ukur — feedback loop).
-- **Kebutuhan sumber daya** (~100 kata): SDM dengan SKILL SPESIFIK (bukan "tim relawan" — tapi mis. "1 psikolog klinis bersertifikat, 2 IT engineer fullstack, 1 jurnalis investigasi"), dana (estimasi Rp dengan breakdown 3-4 komponen), partnership (institusi konkret yang perlu digandeng — sebut namanya: Komnas Perempuan / BNN / IKAPI / Yayasan Cahaya / atau yang relevan dengan isu pekan ini).
-- **Metrik sukses** (~80 kata): satu metrik kuantitatif yang bisa dilaporkan 3 bulan ke depan + satu metrik kualitatif (mis: "5 testimonial peserta yang dipublikasikan", "case study di portal yayasan").
+**Trigger** (~80 kata): peristiwa/isu spesifik pekan ini yang memotivasi aksi. Sebut outlet + tanggal jika ada. Jelaskan kenapa isu ini bisa direspons di level lingkungan (bukan level kebijakan nasional).
 
-## Dalil & Sumber (250-350 kata)
-- Kutip 4-5 dalil dari pool yang saya berikan, masing-masing dengan KONTEKS ringkas
+Untuk SETIAP segmen di bawah, tulis:
+- Label aksi (1 kalimat **bold**, sangat spesifik — bukan judul abstrak)
+- Cara kerja (2-3 kalimat: siapa penggerak, di mana, kapan, output langsung yang terlihat)
+- Budget (di bawah Rp 500.000 per aksi, breakdown 2-3 komponen)
+- Dampak terukur (1 metrik kecil-tapi-nyata: jumlah tetangga ikut, jumlah keluarga terjangkau, kg sampah, jumlah pertemuan, dll.)
+
+#### 🧒 Anak-anak (5-12 tahun) (~140 kata)
+Aksi yang diorganisir oleh orang tua + guru ngaji + remaja masjid, melibatkan 5-15 anak. Pendek (30-60 menit), berulang (mingguan), output yang bisa dipamerkan ke orang tua. Contoh arahan: patroli sampah Jum'at-pagi di sekitar masjid + papan timbangan mingguan; surat-tangan untuk lansia di kompleks; menanam 1 pohon per anak di pekarangan tetangga; mini-piket cek air wudhu masjid bergiliran. Pilih SATU yang relevan dengan trigger pekan ini, jangan pakai semua contoh.
+
+#### 🧑 Remaja (13-19 tahun) (~160 kata)
+Aksi yang diinisiasi remaja masjid / karang taruna sendiri, didampingi 1 orang dewasa. Manfaatkan energi + skill digital mereka untuk dampak hyper-local. Contoh arahan: video pendek (IG/TikTok) memperkenalkan pedagang kecil di pasar tetangga setiap pekan; kelas TPA online singkat — remaja jadi tutor baca Qur'an untuk anak SD via video-call grup RT; bersih-bersih saluran air kompleks + dokumentasi singkat; "PR-bareng" — remaja SMA jadi mentor PR untuk adik SD/SMP di mushola sore. Hindari proyek tech yang butuh server / domain / aplikasi baru — cukup pakai WA, IG, Google Form yang sudah mereka pakai sehari-hari.
+
+#### 👨 Dewasa (20-55 tahun) (~160 kata)
+Aksi yang diorganisir setelah jam kerja / akhir pekan, melibatkan keluarga atau tetangga 1 RT. Bobot lebih ke pengorganisiran + tindak lanjut praktis, bukan event sekali jadi. Contoh arahan: "adopsi tetangga" — 3-5 keluarga rotasi menjaga 1 keluarga prasejahtera di RT (kunjungan + kebutuhan nyata, bukan sembako bulanan); rotasi masak untuk lansia yang tinggal sendiri di kompleks; kelompok perbaikan rumah — tukang RT bergiliran perbaiki atap/listrik rumah lansia/janda; ronda parenting — 4-5 ayah kumpul 1 jam tiap 2 minggu bahas isu spesifik (mis. gadget anak, judi online di sekolah). Targetkan dampak yang bisa diceritakan kembali ke 1-2 keluarga konkret, bukan statistik agregat.
+
+#### 👵 Lansia (55+) (~140 kata)
+Aksi yang menghormati kapasitas + kebijaksanaan lansia — mereka jadi PELAKU/sumber, BUKAN objek bantuan. Fokus: transmisi pengalaman + akhlaq ke generasi muda. Contoh arahan: "cerita maghrib" — lansia kumpul anak-anak RT sehabis sholat untuk ceritakan kisah nabi atau kisah lokal 15 menit, 1x seminggu; transfer resep keluarga — lansia ajarkan 1 resep tradisional ke remaja/dewasa muda setiap pekan; lansia jadi mediator konflik kecil RT/RW (peran kebijaksanaan, bukan birokrasi); "ngobrol pagi" — lansia tinggal sendiri saling berkunjung bergiliran ke rumah satu sama lain.
+
+**Sinergi & koordinasi** (~80 kata): bagaimana 4 aksi ini bisa dijalankan paralel sebagai 1 kampanye RT/masjid/komunitas. Sebut: siapa koordinator (1 nama peran — mis. takmir muda / sekretaris RT / pengurus pengajian ibu), channel komunikasi (WA grup yang sudah ada, jangan bikin baru), dan 1 momen kebersamaan di akhir 4 minggu (mis. sholat berjamaah + sesi laporan singkat 20 menit di teras masjid) untuk merayakan + refleksi.
+
+## Dalil & Sumber (500-700 kata)
+- Kutip 8-10 dalil dari pool yang saya berikan, masing-masing dengan KONTEKS ringkas — ini adalah bibliography lengkap, jadi tampilkan semua atau hampir semua daleel pool (boleh lewatkan 1-2 jika benar-benar tidak relevan dengan tema pekan ini setelah dibaca ulang)
 - Format heading per dalil: `**{{citation_only}}**` — citation sudah berisi nama korpus dan nomor (mis. "QS. Hud: 85" atau "Riyad as-Salihin 1420"). JANGAN mengulang nama korpus dengan format `**RIYAD_AS_SALIHIN Riyad as-Salihin 1420**`. JANGAN sertakan ref_id `[quran::11:85]`.
 - Format penuh per dalil:
 
@@ -272,8 +287,14 @@ CRITICAL — SCOPE OF PERCENTAGES: read SEGMENT_SCOPE in the input. When "all", 
 - Prefer observation verbs ("highlights", "maps", "tracks", "surfaces") over command verbs ("must", "should", "the importance of")
 - Only use headlines from the pool I provide. Do NOT invent stories.
 
-## Da'wah Strategies & Actions (5400-7430 words)
-This is a CONTENT KIT — not strategic advice. Each sub-section must be a READY-TO-USE DRAFT that a da'i, ustadzah, creator, or community organizer can use directly without rewriting from scratch. REQUIRED: 6 sub-sections with ### H3:
+## Da'wah Strategies & Actions (5700-7800 words)
+This is a CONTENT KIT — not strategic advice. Each sub-section must be a READY-TO-USE DRAFT that a da'i, ustadzah, creator, or community organizer can use directly without rewriting from scratch. REQUIRED: 6 sub-sections with ### H3.
+
+DALEEL REFERENCING IN SECTION 4 — the pool I provide contains 10 thematically-reranked daleel. Each sub-section below MUST weave 2-3 daleel from this pool INLINE (not all stacked in Section 5):
+- Pick daleel that genuinely SUPPORT each sub-section's argument — not random first picks
+- Inline format: `**{{citation}}**` (e.g. `**QS. Hud: 85**` or `**Riyad as-Salihin 1420**`) immediately followed by 1 sentence English paraphrase
+- Different sub-sections MAY cite the same daleel if it really fits best, but TRY to distribute so the 8-10 daleel pool gets spread across sub-sections (khutbah ~3-4 daleel, kajian ~2-3, home ~1-2, content ~1, gen-z ~2, action ~1-2)
+- DO NOT invent verses or hadith outside the pool. Any citation appearing in Section 4 MUST exactly match a citation in the pool.
 
 ### Friday Khutbah (2300-3200 words)
 Write a COMPLETE ready-to-deliver Friday khutbah from opening to closing, consisting of Khutbah Pertama (First Khutbah) and Khutbah Kedua (Second Khutbah). Length must match a standard Indonesian Friday khutbah (15-22 minutes spoken = ~2300-3200 words) — do NOT cut short.
@@ -282,7 +303,7 @@ KHUTBAH PERTAMA (1800-2500 words):
 - Brief mukadimah (hamdalah → sholawat → syahadat → wasiat takwa, ~70 words, standard Indonesian-khutbah Arabic transliteration).
 - Opening Quranic verse tied to this week's theme — name the surah + verse number + English TRANSLATION. A short Arabic transliteration of just this opening verse is OK (matches Indonesian khutbah practice).
 - Theme introduction (4-6 paragraphs): link the verse to 2-3 REAL events from this week's sample_headlines pool, naming the outlet ("Detik reports…", "according to Republika…", "as Kompas reports…").
-- Khutbah body (6-9 flowing paragraphs, no sub-headings): one argument that DEVELOPS across the khutbah, supported by 2-3 additional hadith (English translation + source). Each paragraph must advance the argument, NOT paraphrase the previous one.
+- Khutbah body (6-9 flowing paragraphs, no sub-headings): one argument that DEVELOPS across the khutbah, supported by 2-3 additional daleel FROM THE POOL (use the exact citation, write bold inline `**citation**` then English translation). Each paragraph must advance the argument, NOT paraphrase the previous one.
 - Practical close: 3-4 concrete actions the congregation can take this week.
 - Close khutbah pertama with the standard Arabic transliteration formula: "Baarakallahu lii wa lakum fil qur'aanil 'azhiim…" etc (~80 words).
 
@@ -306,7 +327,7 @@ Write a 45-MINUTE KAJIAN OUTLINE ready for delivery — hands-on, NOT theoretica
 - Core — 3 talking points (150-200 words each) with per-point structure:
   * Core statement (one sentence)
   * Concrete example from this week's news (name the outlet)
-  * Brief daleel reference (translation, name the source)
+  * Brief daleel reference from the pool — write `**citation**` then 1 sentence translation
   * Practical application for the kitchen / family (2-3 actions)
 - Q&A section (~100 words): write 3 questions the audience IS LIKELY to ask + honest brief answers (don't be overly idealistic).
 - Closing (~50 words): a short prayer for the family, a one-sentence takeaway.
@@ -322,7 +343,7 @@ Pick topics from this week's actual events.
 ### Digital Content Creators (100-130 words)
 Write a READY-TO-USE video script for a 60-90 second TikTok / IG Reels / YouTube Shorts format — creator can read it straight into camera without editing. Conversational Indonesian, NOT khutbah style. Required structure:
 - HOOK (5 seconds / ~10 words): the first line that stops scroll. Question, contrast, or surprising fact from this week's news.
-- BODY (40-60 seconds / 80-100 words): one clear argument + one brief daleel reference (name the surah/hadith in Indonesian — DO NOT quote Arabic in-video).
+- BODY (40-60 seconds / 80-100 words): one clear argument + one brief daleel reference FROM THE POOL (name the citation exactly as in the pool — DO NOT quote Arabic in-video, DO NOT invent citations).
 - CTA (5-10 seconds / ~15 words): concrete viewer action they can do immediately.
 Avoid khutbah idioms ("hadirin yang dirahmati Allah", "marilah kita renungkan").
 
@@ -348,39 +369,44 @@ Write a ready-to-use GEN Z OPEN-MIC KAJIAN / DISCUSSION OUTLINE (1.5 hours, open
 - **Close** (~60 words): NOT a moral conclusion — open reflection + continuation offer (Discord channel, peer group, 1-on-1 mentor, WA group for Q&A).
 
 ### Social Action & Service to the Ummah (600-900 words)
-Write a ready-to-execute ACTION PLAN for a community / mosque / yayasan / da'wah organization. Pick ONE specific action triggered by this week's news. NOT a sermon, NOT content — must be a real activity launchable in 1-2 weeks.
+Write a SET of small-but-impactful actions doable by a LOCAL community — RT, RW, neighborhood mosque, families, pengajian circle, karang taruna. NOT a sermon, NOT content — real activities launchable in 1-2 weeks with SMALL EFFORT (1-5 organizers, no professional certification required) and SMALL BUDGET (total under IDR 2,000,000).
 
-MUST BE OUT-OF-THE-BOX. Avoid stale, overdone ideas:
+Impact scope: neighbors + immediate surroundings. NOT national programs, NOT ambitious tech platforms, NOT ministry/large-institution partnerships.
+
+Avoid stale or oversized ideas:
 - ❌ Warung jujur / honesty stalls
 - ❌ Generic baksos / conventional rice-packet distribution
 - ❌ Adding more routine pengajian
-- ❌ Iftar drives or orphan donations as a standalone action
 - ❌ Mosque-building fundraisers
+- ❌ Bootcamps / formal certification / national hotlines
+- ❌ Partnerships with Komnas / BNN / ministries (too heavy for RT-level scope)
 
-Instead, propose actions that ONLY MAKE SENSE IN 2026 — leveraging technology, professional networks within the ummah, or community forms that have only recently emerged. Inspiration categories (pick ONE that best fits this week's issues, do NOT use all):
-- Structured digital-detox programs (e.g. 30-day anti-online-gambling lockdown with peer accountability + family-link app + weekly check-ins)
-- Mosque-based mental-health services (partner Muslim psychologists, anonymous Gen Z hotline via Telegram/WA)
-- Muslim professional networks mentoring santri / pesantren online (coding, AI, finance, journalism — including diaspora professionals)
-- Independent pesantren accreditation system (child-safeguarding + financial transparency audits, modeled on secular certification bodies)
-- Halal-fintech literacy bootcamps for housewives / SMEs (hands-on app workshops — NOT another riba sermon)
-- Whistleblower support fund for corruption witnesses (legal protection + interim stipend)
-- Restorative justice circles between neighbors (mediation before police involvement, trained mediators)
-- Disability-inclusive mosque certification (measurable accessibility audit, public list of certified mosques)
-- Long-term structural solidarity for victims abroad (12-month support fund for families of WNI detained overseas)
-- Anti-bullying peer-mediation in SD/SMP grounded in Islamic ethics (cross-pesantren + state-school partnership)
-- Maternal mental-health circles for new mothers (postpartum support group, NOT a tausiyah)
-- AI-assisted khutbah accessibility (auto-translate khutbah to regional languages / sign language)
-- Climate-resilient mosque pilot (solar + water harvesting + productive gardens as a showcase project)
+Instead, focus on simple actions whose IMPACT IS FELT BY NEIGHBORS within 2-4 weeks. Required format: PROPOSE 4 AGE-SEGMENTED ACTIONS — one trigger this week, four activations per audience segment. Each segment is an actor (not an aid recipient).
 
-Required format (concise, dense, NOT flowery prose):
-- **Trigger** (~80 words): the specific event/issue this week that motivates the action. Name the outlet + date if possible.
-- **Concrete action** (~100 words): action label (one **bold** sentence), then 2-3 sentences explaining WHY this approach FITS 2026 — what makes it different from older approaches that have been tried.
-- **Launch steps** (3 steps × 100-150 words): Week 1 (kickoff — who meets where, agenda, concrete deliverable), Weeks 2-4 (scale-out — who is reached, what channels), Month 2+ (sustain + measure — feedback loop).
-- **Resource needs** (~100 words): SPECIFIC people skills (NOT "a team of volunteers" — but e.g. "1 certified clinical psychologist, 2 fullstack IT engineers, 1 investigative journalist"), funds (rough IDR estimate with 3-4 component breakdown), partnerships (specific institutions to engage — name them: Komnas Perempuan / BNN / IKAPI / Yayasan Cahaya / or whatever is relevant to this week's issue).
-- **Success metric** (~80 words): one quantitative metric reportable in 3 months + one qualitative metric (e.g. "5 published participant testimonials", "case study on the yayasan's portal").
+**Trigger** (~80 words): the specific event/issue this week that motivates the action. Name the outlet + date if possible. Explain why this can be addressed at the neighborhood level (not national policy).
 
-## Daleel & Sources (250-350 words)
-- Cite 4-5 daleel from the pool I provide, each with brief CONTEXT
+For EACH segment below, write:
+- Action label (one **bold** sentence, very specific — not an abstract title)
+- How it works (2-3 sentences: who organizes, where, when, immediate visible output)
+- Budget (under IDR 500,000 per action, breakdown 2-3 components)
+- Measurable impact (one small-but-real metric: neighbors involved, families reached, kg waste, meetings held, etc.)
+
+#### 🧒 Children (5-12 years) (~140 words)
+Action organized by parents + Qur'an teacher + masjid teens, involving 5-15 kids. Short (30-60 min), repeating (weekly), output that can be shown to parents. Example directions: Friday-morning trash patrol around the mosque + weekly weigh-in board; handwritten letters to elderly in the complex; one tree per child planted in a neighbor's yard; mini rotation for checking masjid wudu water. Pick ONE that fits this week's trigger, do NOT use all examples.
+
+#### 🧑 Teens (13-19 years) (~160 words)
+Action initiated by masjid youth / karang taruna themselves, with 1 adult mentor. Leverage their energy + digital skills for hyper-local impact. Example directions: short videos (IG/TikTok) introducing small vendors at the neighborhood market each week; brief online TPA — teens become Qur'an reading tutors for SD kids via RT WA group video-call; sweep complex drainage + brief story documentation; "homework-together" — SMA teens mentor SD/SMP juniors at the mushola in the afternoon. Avoid tech projects requiring new servers / domains / apps — use the WA, IG, Google Form they already use daily.
+
+#### 👨 Adults (20-55 years) (~160 words)
+Action organized after work / weekends, involving family or 1 RT of neighbors. Weight more toward organizing + practical follow-up, not one-off events. Example directions: "adopt-a-neighbor" — 3-5 families rotate caring for 1 lower-income family in the RT (visits + real needs, not monthly rice packets); cooking rotation for elderly living alone in the complex; home-repair circle — RT handymen rotate fixing roofs/electric for elderly/widows; parenting ronda — 4-5 fathers gather 1 hour every 2 weeks on a specific issue (e.g. kid gadget use, online gambling at school). Target impact that can be retold about 1-2 concrete families, not aggregate statistics.
+
+#### 👵 Elderly (55+) (~140 words)
+Action that honors elderly capacity + wisdom — they are ACTORS/sources, NOT aid recipients. Focus: transmission of experience + akhlaq to younger generations. Example directions: "maghrib stories" — elderly gather neighborhood kids after prayer to tell prophet stories or local stories for 15 min, 1x weekly; family-recipe transfer — elderly teach one traditional recipe to teens/young adults each week; elderly serve as mediators for small RT/RW conflicts (wisdom role, not bureaucracy); "morning chats" — solo-living elderly rotate visiting each other's homes.
+
+**Synergy & coordination** (~80 words): how 4 actions run in parallel as 1 RT/mosque/community campaign. Name: one coordinator (a single role — e.g. young takmir / RT secretary / pengajian ibu lead), communication channel (existing WA group, don't make new), and 1 closing moment after 4 weeks (e.g. congregational prayer + 20-minute brief reporting session on the mosque terrace) for celebration + reflection.
+
+## Daleel & Sources (500-700 words)
+- Cite 8-10 daleel from the pool I provide, each with brief CONTEXT — this is the comprehensive bibliography, so display all or nearly all of the pool (you MAY skip 1-2 if they really don't fit this week's themes on re-read)
 - Per-daleel heading format: `**{{citation_only}}**` — the citation already contains the corpus name and number (e.g. "QS. Hud: 85" or "Riyad as-Salihin 1420"). DO NOT repeat the corpus name as `**RIYAD_AS_SALIHIN Riyad as-Salihin 1420**`. DO NOT include the ref_id prefix `[quran::11:85]`.
 - Full format per daleel:
 
@@ -945,9 +971,9 @@ def _build_user_prompt(
         scope_note = scope_note_all
 
     write_now = (
-        "Tulis briefing sekarang dalam format markdown 5 bagian (Ringkasan Eksekutif / Numerik & Tren Pekan Ini / Tema Utama & Pola Yang Muncul / Strategi & Aksi Dakwah / Daleel & Sumber), ~6800-9300 kata total — Strategi & Aksi Dakwah adalah CONTENT KIT yang isinya draft siap-pakai (khutbah lengkap, outline kajian, script video, dll), bukan ringkasan strategi."
+        "Tulis briefing sekarang dalam format markdown 5 bagian (Ringkasan Eksekutif / Numerik & Tren Pekan Ini / Tema Utama & Pola Yang Muncul / Strategi & Aksi Dakwah / Daleel & Sumber), ~7300-9800 kata total — Strategi & Aksi Dakwah adalah CONTENT KIT yang isinya draft siap-pakai (khutbah lengkap, outline kajian, script video, dll) dengan daleel pool yang ditenun inline ke setiap sub-section, bukan ringkasan strategi."
         if language == "id"
-        else "Write the briefing now in markdown, 5-section format (Executive Summary / Numbers & Trends This Week / Main Themes & Emerging Patterns / Da'wah Strategies & Actions / Daleel & Sources), ~6800-9300 words total — Da'wah Strategies & Actions is a CONTENT KIT containing ready-to-use drafts (full khutbah, kajian outline, video script, etc), NOT a strategic summary."
+        else "Write the briefing now in markdown, 5-section format (Executive Summary / Numbers & Trends This Week / Main Themes & Emerging Patterns / Da'wah Strategies & Actions / Daleel & Sources), ~7300-9800 words total — Da'wah Strategies & Actions is a CONTENT KIT containing ready-to-use drafts (full khutbah, kajian outline, video script, etc) with daleel from the pool woven inline into each sub-section, NOT a strategic summary."
     )
 
     return f"""{scope_note}
@@ -1031,7 +1057,7 @@ def _generate_for_language(
             # structure (6 sub-sections, full khutbah with mukadimah →
             # inti → doa Arab → tahmid) that the model needs space to
             # plan coherently. Pro charges thinking at the output rate,
-            # so this adds ~$0.12/call; offset by the every-3-days
+            # so this adds ~$0.12/call; offset by the weekly (Sunday)
             # cadence drop and still inside the IDR cap.
             thinking_config=types.ThinkingConfig(thinking_budget=12288),
         ),
@@ -1104,11 +1130,19 @@ async def generate_summary(
         candidates = retrieve_daleel(
             retrieval_query, limit=15, per_corpus=4
         )
-        # top_n=5 (was 3) gives the brief LLM a richer set to pick from.
-        # The system prompt still asks for 2-3 citations, but a wider
-        # pool lets a strong hadith / tafsir surface alongside the
-        # default-leaning Quran hits (2026-05-21).
-        daleel = rerank_daleel(retrieval_query, candidates, top_n=5)
+        # top_n=10 (was 5, 2026-05-23) — the brief now weaves daleel
+        # citations into BOTH Section 4 sub-sections (khutbah, kajian,
+        # Gen Z, etc.) AND Section 5 (bibliography). A pool of 10 gives
+        # the LLM room to pick the most thematically-fit verse per
+        # sub-section without repeating the same 2-3 daleel everywhere.
+        # The two flyers also pick different daleel (rank 0 vs rank 1)
+        # so they don't visually duplicate.
+        daleel = rerank_daleel(retrieval_query, candidates, top_n=10)
+        # Fill `translation_id` for hadith entries (Qdrant only has EN
+        # for the hadith corpora). Without this the DaleelChips below
+        # the ID-locale brief render English. Idempotent on Quran-only
+        # lists. ~$0.0001 per brief.
+        daleel = translate_daleel_to_id(daleel)
         log.info(
             "insights_summary.retrieved_daleel",
             segment=segment,
@@ -1119,29 +1153,24 @@ async def generate_summary(
 
         client = _get_client()
 
-        # Two-language generation. We make ONE Gemini Pro call per
-        # language so each output is idiomatic-native, not a translation
-        # — Islamic guidance content has nuance (e.g. honorifics, terms
-        # of art, code-mixed da'wah vocabulary) that translation flattens.
-        # Cost roughly doubles (~$0.013 per pair vs ~$0.006 single), still
-        # well under the IDR 1M/month cap.
+        # Indonesian-only generation. The English brief was disabled
+        # 2026-05-23 — at current usage all users prefer Indonesian and
+        # the second Pro call effectively doubled per-brief cost for a
+        # locale nobody was reading. UI falls back to `summary_md` when
+        # `summary_md_en` is NULL, with a banner on the EN-locale view
+        # explaining the situation + the "contact us for English" path.
         #
-        # If English fails, we still persist the Indonesian row with
-        # summary_md_en=NULL; UI falls back to summary_md. The reverse
-        # (English-only) is treated as a failure since Indonesian is the
-        # primary product locale.
+        # Re-enable by restoring the `_generate_for_language("en", ...)`
+        # call below — the persistence path already handles a non-NULL
+        # `summary_md_en`.
         id_result = _generate_for_language(client, stats, daleel, "id", segment)
         if id_result is None:
             return None
         summary_md, tokens_in_id, tokens_out_id, cost_id = id_result
 
-        en_result = _generate_for_language(client, stats, daleel, "en", segment)
-        if en_result is None:
-            summary_md_en = None
-            tokens_in_en = tokens_out_en = 0
-            cost_en = 0.0
-        else:
-            summary_md_en, tokens_in_en, tokens_out_en, cost_en = en_result
+        summary_md_en = None
+        tokens_in_en = tokens_out_en = 0
+        cost_en = 0.0
 
         tokens_in = (tokens_in_id or 0) + (tokens_in_en or 0)
         tokens_out = (tokens_out_id or 0) + (tokens_out_en or 0)

@@ -328,16 +328,17 @@ def send_weekly_digest() -> dict[str, object]:
 
 @celery_app.task(name="api.workers.ingest.generate_insights_summary")
 def generate_insights_summary() -> dict[str, object]:
-    """Generate all 5 daily executive briefings for /insights.
+    """Generate all 5 weekly executive briefings for /insights.
 
     1 all-platform briefing + 4 per-segment (spiritual / family /
     youth / justice). Each briefing now grounds its `daleel` paragraph
     in passages retrieved from Qdrant — the LLM is constrained to cite
     only those (PRD §12).
 
-    Runs at 04:30 WIB — right after the 04:00 Gemini topic-discovery
-    pass so the LLM sees the freshest theme labels. Five Gemini 2.5
-    Pro calls + five OpenAI embedding calls, ~$0.10-0.30 per run total.
+    Runs Sunday 05:00 WIB — one hour after the 04:00 Gemini topic-
+    discovery pass so the LLM sees the freshest theme labels. Five
+    Gemini 2.5 Pro calls + five OpenAI embedding calls, ~$0.10-0.30
+    per run total.
     """
     try:
         result = asyncio.run(insights_summary.generate_all_summaries())

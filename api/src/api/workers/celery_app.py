@@ -146,23 +146,28 @@ celery_app.conf.update(
             "task": "api.workers.ingest.recluster_all",
             "schedule": crontab(minute=0, hour=4),
         },
-        # 30 min after recluster, generate the AI-narrated executive
-        # briefing that appears as the hero card on /insights. Reads
-        # the freshly-clustered topic labels so the narrative is in
-        # sync with what the dashboard surfaces below it.
+        # Insights briefing generation — PAUSED 2026-05-23 for cost.
         #
-        # Every 3 days (days 1/4/7/.../28/31 each month) rather than
-        # daily. Each briefing is now a long-form content kit (full
-        # khutbah text, kajian outline, video script, etc — 4000-6000
-        # words) instead of a short strategic briefing, so generating
-        # daily would be both expensive (~$33/mo at every-day cadence)
-        # AND mostly redundant — the 7-day analysis window means a
-        # daily run overwrites the same news cycle with marginal new
-        # content. Every 3 days lands ~10 briefings/month at ~$11/mo.
-        "generate-insights-summary": {
-            "task": "api.workers.ingest.generate_insights_summary",
-            "schedule": crontab(minute=30, hour=4, day_of_month="*/3"),
-        },
+        # Gemini 2.5 Pro at the current 7300-9800-word target costs
+        # ~$0.30-0.50 per briefing × 5 segments × 4 Sundays/month ≈
+        # $6-10/mo. Modest in absolute terms but the user is tightening
+        # the budget during the development phase, so we disabled the
+        # auto schedule and switched to manual generation via Claude.
+        #
+        # The pipeline still works end-to-end (stats compute, daleel
+        # retrieval, prompt assembly) — only the LLM step is now manual.
+        # Trigger from a host shell:
+        #
+        #   uv run python -m api.scripts.manual_briefing dump all > /tmp/p.md
+        #   # paste /tmp/p.md into Claude → save reply as /tmp/r.md
+        #   uv run python -m api.scripts.manual_briefing save all /tmp/r.md
+        #
+        # Re-enable by uncommenting this block + restoring the schedule
+        # constants in services/insights_summary.py if changed.
+        # "generate-insights-summary": {
+        #     "task": "api.workers.ingest.generate_insights_summary",
+        #     "schedule": crontab(minute=0, hour=5, day_of_week=0),
+        # },
         # Weekly email digest — Sunday 18:00 WIB. Late-evening before
         # Monday morning so Indonesian audiences see it in their
         # Sunday-evening inbox routine. Free up to 3K emails/month on
