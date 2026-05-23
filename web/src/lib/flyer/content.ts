@@ -297,27 +297,42 @@ export function extractGenZTagline(markdown: string): string {
  *  for them: khutbah voice → action voice → kreator voice → reflection. */
 export type FlyerMessageSlot = 0 | 1 | 2 | 3;
 
+/** Parsed contents of one `### Pesan Flyer N` block. Briefings written
+ *  after the 2026-05-23 prompt refresh carry explicit `**Headline:**`
+ *  and `**Daleel:**` markers so the flyer renderer can use a
+ *  message-matched title + citation instead of guessing from the
+ *  deliverable sections. `body` is what's left after those markers
+ *  are stripped — the 75-word standalone message itself. */
+export type FlyerMessageBlock = {
+  headline?: string;
+  daleelCitation?: string;
+  body: string;
+};
+
 /** Pull one of the 4 standalone messages from the `## Pesan Flyer`
  *  / `## Flyer Messages` section that the briefing prompt asks for
- *  (added 2026-05-23). Returns "" if the section is missing — that's
- *  the signal for the caller to fall back to the per-variant
+ *  (added 2026-05-23). Returns `null` if the section is missing —
+ *  that's the signal for the caller to fall back to the per-variant
  *  extractors (Benang Merah + format-filtered deliverable text).
  *
- *  Section structure:
+ *  Section structure (2026-05-23+):
  *    ## Pesan Flyer
  *    ### Pesan Flyer 1 — Suara Khutbah
+ *    **Headline:** "Mulai Adil dari Meja Sendiri"
+ *    **Daleel:** QS. Ar-Rahmaan: 9
+ *
  *    <paragraph>
  *    ### Pesan Flyer 2 — Suara Aksi Sosial
- *    <paragraph>
- *    ### Pesan Flyer 3 — Suara Kreator Konten
- *    <paragraph>
- *    ### Pesan Flyer 4 — Suara Refleksi Gen Z
- *    <paragraph>
+ *    ...
+ *
+ *  Older briefings (pre-marker) just have `<paragraph>` directly under
+ *  the H3 — both headline and citation will be undefined and the
+ *  caller falls back to the legacy extractors.
  */
-export function extractDedicatedFlyerMessage(
+export function extractDedicatedFlyerBlock(
   markdown: string,
   slot: FlyerMessageSlot,
-): string {
+): FlyerMessageBlock | null {
   const lines = markdown.split("\n");
 
   // Find the section heading. Match both ID + EN labels — the writer
@@ -330,7 +345,7 @@ export function extractDedicatedFlyerMessage(
       break;
     }
   }
-  if (secStart === -1) return "";
+  if (secStart === -1) return null;
 
   // Section runs until the next H2 (or EOF — Pesan Flyer is the last
   // section the prompt asks for).
@@ -363,11 +378,79 @@ export function extractDedicatedFlyerMessage(
   }
   flushBlock(secEnd);
 
-  const body = blocks[slot];
-  if (!body) return "";
-  // Strip markdown but keep sentence structure. Use the existing
-  // trim helper so we get the same format-reference filtering.
-  return trimToSentences(stripMd(body), 4, 360);
+  const rawBlock = blocks[slot];
+  if (!rawBlock) return null;
+
+  // Parse out the two optional marker lines. They sit at the TOP of
+  // the block, each on its own line, before the prose paragraph.
+  //   **Headline:** "Mulai Adil dari Meja Sendiri"
+  //   **Daleel:** QS. Ar-Rahmaan: 9
+  const headlineMatch = rawBlock.match(
+    /^\s*\*\*\s*(?:headline|judul|tema)\s*[:：]\s*\*\*\s*(.+?)\s*$/im,
+  );
+  const daleelMatch = rawBlock.match(
+    /^\s*\*\*\s*(?:daleel|dalil|citation)\s*[:：]\s*\*\*\s*(.+?)\s*$/im,
+  );
+
+  // Strip the marker lines from the block before sentence-trimming so
+  // the rendered flyer body doesn't include "Headline: ..." text.
+  let bodyMd = rawBlock;
+  if (headlineMatch) bodyMd = bodyMd.replace(headlineMatch[0], "");
+  if (daleelMatch) bodyMd = bodyMd.replace(daleelMatch[0], "");
+  const body = trimToSentences(stripMd(bodyMd), 4, 360);
+
+  const headline = headlineMatch?.[1]
+    ? tidyHeadline(
+        headlineMatch[1].replace(/^["“”'']\s*/, "").replace(/\s*["”'']$/, ""),
+        8,
+      )
+    : undefined;
+  const daleelCitation = daleelMatch?.[1]?.trim();
+
+  return { headline, daleelCitation, body };
+}
+
+/** Convenience wrapper for callers that only need the message body —
+ *  the previous (pre-2026-05-23) shape of this helper. */
+export function extractDedicatedFlyerMessage(
+  markdown: string,
+  slot: FlyerMessageSlot,
+): string {
+  return extractDedicatedFlyerBlock(markdown, slot)?.body ?? "";
+}
+
+/** Find the daleel in the retrieved pool whose `citation` (case- and
+ *  whitespace-insensitive) matches the given string. Used so the
+ *  per-flyer `**Daleel:**` marker in the briefing can pin which pool
+ *  entry shows up on the flyer card — instead of picking by position
+ *  rank. Returns null if no match. */
+export function findDaleelByCitation(
+  refs: DaleelRef[] | null,
+  citation: string | undefined,
+): DaleelRef | null {
+  if (!refs || !citation) return null;
+  const norm = (s: string) =>
+    s
+      .toLowerCase()
+      .replace(/\s+/g, " ")
+      .replace(/[.,;:]+/g, "")
+      .trim();
+  const wanted = norm(citation);
+  for (const r of refs) {
+    if (norm(r.citation) === wanted) return r;
+  }
+  // Loose match: prefix (the LLM may write "QS. Al-Ma'aarij 32" while
+  // the pool has "QS. Al-Ma'aarij: 32" — normalizing punctuation
+  // catches most of these, but allow startsWith for safety).
+  for (const r of refs) {
+    if (
+      norm(r.citation).startsWith(wanted) ||
+      wanted.startsWith(norm(r.citation))
+    ) {
+      return r;
+    }
+  }
+  return null;
 }
 
 // ──────────────────────────────────────────────────────────────────

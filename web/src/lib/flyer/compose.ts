@@ -4,6 +4,7 @@ import {
   extractAksiMessage,
   extractBenangMerah,
   extractCampaignTagline,
+  extractDedicatedFlyerBlock,
   extractDedicatedFlyerMessage,
   extractDeliverableHeadline,
   extractDeliverableMessage,
@@ -13,6 +14,7 @@ import {
   extractKhutbahTagline,
   extractKreatorHook,
   extractKreatorMessage,
+  findDaleelByCitation,
   formatFlyerDate,
   pickFlyerDaleel,
   type FlyerMessageSlot,
@@ -350,15 +352,36 @@ function messageForGenZB(body: string): string {
   });
 }
 
+/** Map a flyer slot to its Pesan Flyer index (0..3). */
+function pesanFlyerSlotFor(slot: FlyerSlot): FlyerMessageSlot | null {
+  if (slot.kind === "general" && slot.variant === "a") return 0;
+  if (slot.kind === "general" && slot.variant === "b") return 1;
+  if (slot.kind === "genz" && slot.variant === "a") return 2;
+  if (slot.kind === "genz" && slot.variant === "b") return 3;
+  return null;
+}
+
 function buildContent(ctx: FlyerContext): FlyerContent {
   const lang = ctx.locale;
   const brand = "dakwah-lens.id";
   const dateLabel = formatFlyerDate(ctx.generatedAt, lang);
   const rank = daleelRankForSlot(ctx.slot);
-  const daleel = pickFlyerDaleel(ctx.daleelRefs, lang, rank);
+
+  // Try the dedicated `## Pesan Flyer` block first — when present (post
+  // 2026-05-23 briefings), it carries an explicit headline + daleel
+  // citation tailored to the message. Falls back to the legacy
+  // tagline extractors when those markers are missing.
+  const pesanSlot = pesanFlyerSlotFor(ctx.slot);
+  const dedicatedBlock =
+    pesanSlot !== null ? extractDedicatedFlyerBlock(ctx.body, pesanSlot) : null;
+  const dedicatedDaleel = findDaleelByCitation(
+    ctx.daleelRefs,
+    dedicatedBlock?.daleelCitation,
+  );
+  const daleel = dedicatedDaleel ?? pickFlyerDaleel(ctx.daleelRefs, lang, rank);
 
   if (ctx.slot.kind === "general") {
-    const headline =
+    const fallbackHeadline =
       ctx.slot.variant === "a"
         ? extractKhutbahTagline(ctx.body)
         : extractCampaignTagline(ctx.body);
@@ -370,8 +393,8 @@ function buildContent(ctx: FlyerContext): FlyerContent {
       brand,
       dateLabel,
       headline:
-        headline ||
-        extractKhutbahTagline(ctx.body) ||
+        dedicatedBlock?.headline ||
+        fallbackHeadline ||
         "Pesan Pekan Ini",
       message: message || "",
       daleel,
@@ -379,7 +402,7 @@ function buildContent(ctx: FlyerContext): FlyerContent {
   }
 
   if (ctx.slot.kind === "genz") {
-    const headline =
+    const fallbackHeadline =
       ctx.slot.variant === "a"
         ? extractKreatorHook(ctx.body)
         : extractGenZTagline(ctx.body);
@@ -391,7 +414,9 @@ function buildContent(ctx: FlyerContext): FlyerContent {
       brand,
       dateLabel,
       headline:
-        headline || extractGenZTagline(ctx.body) || "Renungan Pekan Ini",
+        dedicatedBlock?.headline ||
+        fallbackHeadline ||
+        "Renungan Pekan Ini",
       message: message || "",
       daleel,
     };

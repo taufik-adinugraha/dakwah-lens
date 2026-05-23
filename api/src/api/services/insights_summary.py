@@ -252,6 +252,20 @@ Di akhir Bagian 5, tutup dengan satu paragraf italic:
 
 Bagian ini WAJIB ada SETELAH Bagian 5. Output-nya 4 paragraf flyer pendek (masing-masing 3-4 kalimat, ~70-90 kata) yang BERDIRI SENDIRI — flyer dibaca terpisah dari khutbah / kajian / kreator script / diskusi Gen Z, jadi konten di sini TIDAK BOLEH menyebut atau merujuk ke salah satu format itu.
 
+STRUKTUR WAJIB setiap pesan flyer — dua baris marker DULU, baru paragraf:
+
+```
+### Pesan Flyer N — Suara {kategori}
+**Headline:** "{4-6 kata yang impactful, powerful, langsung menyampaikan inti}"
+**Daleel:** {citation persis dari daleel pool — mis. "QS. Ar-Rahmaan: 9"}
+
+{paragraf 70-90 kata}
+```
+
+ATURAN HEADLINE: 4-6 kata, kalimat aktif, langsung menyentuh inti pesan. Hindari nama deliverable, hindari clickbait, hindari pertanyaan retoris. Contoh GOOD: "Mulai Adil dari Meja Sendiri", "Hadirlah Sebelum Layar Lebih Dulu", "Bela yang Lemah dari RT", "Pulang Dulu, Cari Makna Kemudian". Contoh BAD: "Khutbah Pertama", "Pesan Pekan Ini", "Renungan Mingguan", "Apa yang Terjadi Pekan Ini?".
+
+ATURAN DALEEL: citation HARUS persis cocok dengan salah satu entri di daleel pool yang saya berikan. Pilih daleel yang PALING terkait dengan isi paragraf flyer-nya — bukan asal pilih. Headline + daleel + paragraf harus membentuk satu pesan yang utuh dan saling memperkuat. Boleh dua flyer pakai daleel berbeda dari pool yang sama; usahakan 4 flyer pakai 4 daleel berbeda kalau pool memungkinkan.
+
 LARANGAN MUTLAK pada keempat paragraf:
 - JANGAN tulis "mari kita tutup khutbah ini" / "khutbah pertama" / "khutbah ini"
 - JANGAN tulis "diskusi malam ini" / "diskusi ini" / "kajian ini" / "sesi ini"
@@ -463,6 +477,20 @@ End Section 5 with one italic paragraph:
 ## Flyer Messages (~400 words, rendered to 4 1080×1080 flyers shared to IG/WA)
 
 REQUIRED section AFTER Section 5. Output is 4 short flyer paragraphs (3-4 sentences each, ~70-90 words) that STAND ALONE — the flyer is read separately from any khutbah / kajian / kreator script / Gen Z discussion, so the content here MUST NOT reference any of those formats.
+
+REQUIRED STRUCTURE per flyer message — two marker lines FIRST, then the paragraph:
+
+```
+### Flyer Message N — {category} voice
+**Headline:** "{4-6 impactful, powerful words that go straight to the point}"
+**Daleel:** {citation exactly as written in the daleel pool — e.g. "QS. Ar-Rahmaan: 9"}
+
+{70-90 word paragraph}
+```
+
+HEADLINE RULES: 4-6 words, active voice, lands the message immediately. No deliverable names, no clickbait, no rhetorical questions. GOOD: "Start Fair at Your Own Table", "Be Present Before the Screen", "Defend the Weak Next Door", "Come Home Before Chasing Meaning". BAD: "First Khutbah", "Weekly Message", "This Week's Reflection", "What Happened This Week?".
+
+DALEEL RULES: the citation MUST match one of the entries in the daleel pool I provided. Pick the daleel that most DIRECTLY supports the paragraph — not a random pick. Headline + daleel + paragraph must read as one tight message that reinforces itself. Two flyers can pull from the same pool; aim for 4 different daleel across the 4 flyers when the pool allows.
 
 ABSOLUTE bans across all four paragraphs:
 - Do NOT write "let's close this khutbah" / "first khutbah" / "this khutbah"
