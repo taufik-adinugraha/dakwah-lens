@@ -1,4 +1,4 @@
-import { Trash2 } from "lucide-react";
+import { ShieldAlert, ShieldCheck, Trash2 } from "lucide-react";
 import { asc } from "drizzle-orm";
 
 import { auth } from "@/auth";
@@ -12,6 +12,8 @@ import { Card, EmptyState, HelpCallout, PageHeader } from "../_ui";
 import { ConfirmForm } from "../_ConfirmForm";
 import { AddChannelForm } from "./AddChannelForm";
 import { CategorySelect } from "./CategorySelect";
+import { VerifyAllBar } from "./VerifyAllBar";
+import { VerifyButton } from "./VerifyButton";
 
 const CATEGORIES = [
   "religious",
@@ -121,6 +123,8 @@ export default async function YoutubeChannelsPage({
       )}
 
       <Card title={`Whitelisted channels (${channels.length})`}>
+        <VerifyAllBar totalChannels={channels.length} />
+
         <div className="mb-4 flex flex-wrap items-center gap-1.5">
           <span className="mr-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
             Show
@@ -158,8 +162,8 @@ export default async function YoutubeChannelsPage({
                 key={c.id}
                 className={
                   isSuperadmin
-                    ? "grid grid-cols-[2fr_1.5fr_auto_auto_auto] items-center gap-3 py-2"
-                    : "grid grid-cols-[2fr_1.5fr_auto] items-center gap-3 py-2"
+                    ? "grid grid-cols-[2fr_1.5fr_auto_auto_auto_auto] items-center gap-3 py-2"
+                    : "grid grid-cols-[2fr_1.5fr_auto_auto] items-center gap-3 py-2"
                 }
               >
                 <div className="min-w-0">
@@ -175,16 +179,37 @@ export default async function YoutubeChannelsPage({
                     {!isSuperadmin && (
                       <ReadOnlyStatusPill enabled={c.enabled} />
                     )}
+                    {/* Pipeline-eligibility cue — visible to both admin
+                        and superadmin. Verified rows are the only ones
+                        ingest will actually scrape. */}
+                    <VerifyStatusBadge verified={c.verified} />
                   </div>
                   <p className="font-mono text-[11px] text-slate-500">
                     {c.channelId}
                     {c.handle && <span className="ml-1.5">· @{c.handle}</span>}
+                    {c.verifiedAt && (
+                      <span className="ml-1.5 text-emerald-600">
+                        · verified{" "}
+                        {new Date(c.verifiedAt).toLocaleDateString(undefined, {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
+                    )}
                   </p>
                 </div>
                 <CategoryControl
                   id={c.id}
                   category={c.category as Category}
                   isSuperadmin={isSuperadmin}
+                />
+                {/* Verify button — visible to both admin and superadmin.
+                    Per-row re-check; flips `verified` based on YT API
+                    outcome (see verifyYoutubeChannel server action). */}
+                <VerifyButton
+                  id={c.id}
+                  initialVerified={c.verified}
+                  curatedName={c.name}
                 />
                 {isSuperadmin && (
                   <>
@@ -287,6 +312,27 @@ function ReadOnlyStatusPill({ enabled }: { enabled: boolean }) {
       }`}
     >
       {enabled ? "Enabled" : "Disabled"}
+    </span>
+  );
+}
+
+/** Pipeline-eligibility pill shown on every row. Rendered server-side
+ *  (just reads the row's `verified`) — the VerifyButton component
+ *  re-renders ITS OWN local mirror to reflect post-click state
+ *  immediately. Both will converge after the next page render. */
+function VerifyStatusBadge({ verified }: { verified: boolean }) {
+  if (verified) {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700 ring-1 ring-emerald-200">
+        <ShieldCheck className="h-2.5 w-2.5" />
+        verified
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-700 ring-1 ring-amber-200">
+      <ShieldAlert className="h-2.5 w-2.5" />
+      unverified
     </span>
   );
 }

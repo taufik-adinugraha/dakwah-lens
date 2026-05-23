@@ -283,20 +283,30 @@ function themeForHeading(text: string) {
 }
 
 /**
- * Heuristic — does this paragraph look like a transliterated Arabic
- * du'a / dhikr block? We trigger on the density of long-vowel/diacritic
- * marks (ā ī ū ḥ ṣ ẓ ʿ etc.) and specific opening tokens. False positives
- * are cheap (paragraph just gets a serif treatment); false negatives mean
- * the du'a renders as normal prose.
+ * Heuristic — does this paragraph look like Arabic du'a / dhikr text?
+ *
+ * Triggers on EITHER:
+ *   - Native Arabic script (U+0600-U+06FF range, ≥10 chars) — what
+ *     khutbah blocks contain since the 2026-05-23 prompt switch from
+ *     Latin transliteration to actual Arabic with harakat.
+ *   - Latin transliteration (legacy briefs pre-2026-05-23 still have
+ *     "Allāhumma ighfir lil mu'minīna..." prose).
+ *
+ * False positives are cheap (paragraph just gets the serif/Amiri
+ * treatment). False negatives mean the du'a renders as normal prose.
  */
 function looksLikeArabicTransliteration(text: string): boolean {
+  // Native Arabic-script detection — anything in the Arabic Unicode
+  // blocks beyond a token threshold. Counts the full Arabic + Arabic
+  // Supplement + Arabic Extended-A ranges so harakat marks register.
+  const arabicChars = text.match(/[؀-ۿݐ-ݿࢠ-ࣿ]/g);
+  if (arabicChars && arabicChars.length >= 10) return true;
+
   if (text.length < 40) return false;
-  // Strong tokens that almost guarantee a du'a block.
+  // Strong tokens that almost guarantee a Latin-transliterated du'a.
   const strongTokens = /(allahumma|al[\s-]?ḥamdu|inna [aA]llaha|rabbana|subḥāna|wa[\s-]?ṣalli|allāhumma)/i;
   if (strongTokens.test(text)) return true;
-  // Density check on long-vowel/diacritic marks. A normal Indonesian
-  // paragraph has near-zero of these; a transliteration paragraph
-  // typically has > 4% of its characters as one of them.
+  // Density check on long-vowel/diacritic marks for the legacy path.
   const marks = text.match(/[āīūṣḍḥṭẓʿʾ]/g);
   if (!marks) return false;
   return marks.length / text.length >= 0.02;
@@ -356,8 +366,20 @@ function makeMarkdownComponents(): Components {
     p: ({ children }) => {
       const text = childrenToString(children);
       if (looksLikeArabicTransliteration(text)) {
+        // Native Arabic gets RTL + bigger Amiri so the harakat are
+        // legible; Latin transliteration uses the same card but LTR
+        // and smaller. Detection via the same Arabic Unicode test
+        // we used in `looksLikeArabicTransliteration`.
+        const hasNativeArabic = /[؀-ۿݐ-ݿࢠ-ࣿ]/.test(text);
         return (
-          <p className="my-4 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/80 to-teal-50/60 px-5 py-4 text-center font-amiri text-[15px] leading-[2] text-emerald-950 shadow-sm sm:px-7 sm:text-base">
+          <p
+            dir={hasNativeArabic ? "rtl" : "ltr"}
+            className={`my-4 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/80 to-teal-50/60 px-5 py-4 text-center font-amiri leading-[2] text-emerald-950 shadow-sm sm:px-7 ${
+              hasNativeArabic
+                ? "text-[20px] sm:text-[22px]"
+                : "text-[15px] sm:text-base"
+            }`}
+          >
             {children}
           </p>
         );

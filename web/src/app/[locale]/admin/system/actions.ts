@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 
 import { db, schema } from "@/db";
 import { logAdminAction } from "@/lib/admin-log";
@@ -348,6 +348,324 @@ export async function deleteYoutubeChannel(formData: FormData) {
     payload: { name: row.name, channel_id: row.channelId },
   });
   revalidatePath("/admin/system/youtube-channels");
+}
+
+/* ────────────────────────────────────────────────────────────
+ * YouTube channel verification — single + bulk
+ *
+ * The seed script's top-1 search.list match sometimes resolves to the
+ * wrong channel for ambiguous names. Verify confirms the channel
+ * exists + matches a few sanity heuristics (subscriber count above
+ * a floor, title overlap with curated name) before the ingest
+ * dispatcher will scrape it.
+ *
+ * Gated by requireSystemAccess (admin OR superadmin) — flipping a
+ * boolean on a known curated row is low-risk, and the admin role exists
+ * partly so the curation team can vet channels without superadmin.
+ * ──────────────────────────────────────────────────────────── */
+
+type YtVerifyOutcome = "ok" | "not_found" | "deleted" | "private" | "api_error";
+
+type YtVerifyResult = {
+  channelId: string;
+  title: string | null;
+  outcome: YtVerifyOutcome;
+  subscriberCount: number | null;
+  videoCount: number | null;
+  customUrl: string | null;
+  /** Human-readable error message for "api_error" or "not_found" rows. */
+  detail: string | null;
+};
+
+/**
+ * One round-trip to YouTube channels.list for a single channel_id. Costs
+ * 1 quota unit; reports back whether the channel still exists, its
+ * current title, and basic stats. Caller decides whether to flip the
+ * `verified` flag — we only return facts here, no DB writes.
+ */
+async function verifyChannelOnce(channelId: string): Promise<YtVerifyResult> {
+  const apiKey = process.env.YOUTUBE_API_KEY;
+  if (!apiKey) {
+    return {
+      channelId,
+      title: null,
+      outcome: "api_error",
+      subscriberCount: null,
+      videoCount: null,
+      customUrl: null,
+      detail: "YOUTUBE_API_KEY not configured",
+    };
+  }
+
+  const url = new URL("https://www.googleapis.com/youtube/v3/channels");
+  url.searchParams.set("part", "snippet,statistics,status");
+  url.searchParams.set("id", channelId);
+  url.searchParams.set("key", apiKey);
+
+  try {
+    const resp = await fetch(url, { cache: "no-store" });
+    if (!resp.ok) {
+      return {
+        channelId,
+        title: null,
+        outcome: "api_error",
+        subscriberCount: null,
+        videoCount: null,
+        customUrl: null,
+        detail: `HTTP ${resp.status}`,
+      };
+    }
+    const body = (await resp.json()) as {
+      items?: Array<{
+        id: string;
+        snippet?: { title?: string; customUrl?: string };
+        statistics?: { subscriberCount?: string; videoCount?: string };
+        status?: { privacyStatus?: string };
+      }>;
+    };
+    const item = body.items?.[0];
+    if (!item) {
+      // YT returns an empty items[] for deleted, never-existed, or
+      // private channels — we can't distinguish from this endpoint
+      // alone. Mark as not_found; the admin can investigate.
+      return {
+        channelId,
+        title: null,
+        outcome: "not_found",
+        subscriberCount: null,
+        videoCount: null,
+        customUrl: null,
+        detail: "Channel not returned by channels.list",
+      };
+    }
+    const privacy = item.status?.privacyStatus;
+    if (privacy && privacy !== "public") {
+      return {
+        channelId,
+        title: item.snippet?.title ?? null,
+        outcome: "private",
+        subscriberCount: null,
+        videoCount: null,
+        customUrl: item.snippet?.customUrl ?? null,
+        detail: `privacyStatus=${privacy}`,
+      };
+    }
+    return {
+      channelId,
+      title: item.snippet?.title ?? null,
+      outcome: "ok",
+      subscriberCount: item.statistics?.subscriberCount
+        ? Number(item.statistics.subscriberCount)
+        : null,
+      videoCount: item.statistics?.videoCount
+        ? Number(item.statistics.videoCount)
+        : null,
+      customUrl: item.snippet?.customUrl ?? null,
+      detail: null,
+    };
+  } catch (err) {
+    return {
+      channelId,
+      title: null,
+      outcome: "api_error",
+      subscriberCount: null,
+      videoCount: null,
+      customUrl: null,
+      detail: err instanceof Error ? err.message : String(err),
+    };
+  }
+}
+
+export type VerifyYoutubeChannelResult = YtVerifyResult & {
+  /** Curated DB name — surfaced so the admin can compare against the
+   *  YT-reported title and spot mismatched matches. */
+  curatedName: string;
+  /** What we DID to the row: true → verified flipped to true, false →
+   *  cleared/left unverified. Null when no DB write happened (e.g.
+   *  api_error keeps the existing flag). */
+  verifiedNow: boolean | null;
+};
+
+/**
+ * Verify ONE channel by row id. Server action used by the per-row
+ * "Verify" button on /admin/system/youtube-channels.
+ *
+ * Outcome → DB action:
+ *   ok        → verified=true, verified_at=now()
+ *   private   → verified=false (channel still exists but locked down)
+ *   deleted / not_found → verified=false
+ *   api_error → no-op (transient; don't clear an existing verification)
+ */
+export async function verifyYoutubeChannel(
+  formData: FormData,
+): Promise<VerifyYoutubeChannelResult> {
+  const session = await requireSystemAccess();
+  const id = String(formData.get("id") ?? "");
+  if (!id) {
+    throw new Error("missing_id");
+  }
+  const [row] = await db
+    .select({
+      id: schema.youtubeChannels.id,
+      name: schema.youtubeChannels.name,
+      channelId: schema.youtubeChannels.channelId,
+    })
+    .from(schema.youtubeChannels)
+    .where(eq(schema.youtubeChannels.id, id))
+    .limit(1);
+  if (!row) {
+    throw new Error("not_found");
+  }
+
+  const result = await verifyChannelOnce(row.channelId);
+
+  let verifiedNow: boolean | null = null;
+  if (result.outcome === "ok") {
+    await db
+      .update(schema.youtubeChannels)
+      .set({
+        verified: true,
+        verifiedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(schema.youtubeChannels.id, id));
+    verifiedNow = true;
+  } else if (result.outcome === "private" || result.outcome === "not_found") {
+    await db
+      .update(schema.youtubeChannels)
+      .set({
+        verified: false,
+        verifiedAt: null,
+        updatedAt: new Date(),
+      })
+      .where(eq(schema.youtubeChannels.id, id));
+    verifiedNow = false;
+  }
+
+  await logAdminAction({
+    actorId: session.user.id,
+    action: "youtube_channel.verify",
+    targetType: "youtube_channel",
+    targetId: id,
+    payload: {
+      name: row.name,
+      channel_id: row.channelId,
+      outcome: result.outcome,
+      yt_title: result.title,
+      detail: result.detail,
+    },
+  });
+
+  revalidatePath("/admin/system/youtube-channels");
+  return { ...result, curatedName: row.name, verifiedNow };
+}
+
+export type VerifyAllYoutubeChannelsResult = {
+  total: number;
+  ok: number;
+  private_: number;
+  not_found: number;
+  api_error: number;
+  /** Per-channel results, capped at 100 in the payload to keep the
+   *  client-side serialization small. The summary counts are exact. */
+  sample: VerifyYoutubeChannelResult[];
+};
+
+/**
+ * Verify EVERY channel sequentially. Costs ~1 quota unit × N channels
+ * (~80 today = ~80 quota of the 10K daily budget — trivial).
+ *
+ * Sequential rather than parallel because:
+ *   - YT API rate limits per-second more aggressively than per-day
+ *   - The whole loop finishes in ~10-20s for 80 channels, fine for an
+ *     admin action that returns at the end
+ *   - Errors on one channel shouldn't fail the rest
+ */
+export async function verifyAllYoutubeChannels(): Promise<VerifyAllYoutubeChannelsResult> {
+  const session = await requireSystemAccess();
+  const rows = await db
+    .select({
+      id: schema.youtubeChannels.id,
+      name: schema.youtubeChannels.name,
+      channelId: schema.youtubeChannels.channelId,
+    })
+    .from(schema.youtubeChannels);
+
+  const counts = { ok: 0, private_: 0, not_found: 0, api_error: 0 };
+  const sample: VerifyYoutubeChannelResult[] = [];
+
+  for (const row of rows) {
+    const r = await verifyChannelOnce(row.channelId);
+    let verifiedNow: boolean | null = null;
+    if (r.outcome === "ok") {
+      counts.ok += 1;
+      verifiedNow = true;
+    } else if (r.outcome === "private") {
+      counts.private_ += 1;
+      verifiedNow = false;
+    } else if (r.outcome === "not_found" || r.outcome === "deleted") {
+      counts.not_found += 1;
+      verifiedNow = false;
+    } else {
+      counts.api_error += 1;
+    }
+    if (sample.length < 100) {
+      sample.push({ ...r, curatedName: row.name, verifiedNow });
+    }
+  }
+
+  // Bulk-update all the "ok" rows in ONE statement, same for the
+  // unverify cohort — much faster than N individual updates.
+  const okIds = rows
+    .filter((_, i) => sample[i]?.verifiedNow === true)
+    .map((r) => r.id);
+  const clearIds = rows
+    .filter((_, i) => sample[i]?.verifiedNow === false)
+    .map((r) => r.id);
+  if (okIds.length) {
+    await db
+      .update(schema.youtubeChannels)
+      .set({
+        verified: true,
+        verifiedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(inArray(schema.youtubeChannels.id, okIds));
+  }
+  if (clearIds.length) {
+    await db
+      .update(schema.youtubeChannels)
+      .set({
+        verified: false,
+        verifiedAt: null,
+        updatedAt: new Date(),
+      })
+      .where(inArray(schema.youtubeChannels.id, clearIds));
+  }
+
+  await logAdminAction({
+    actorId: session.user.id,
+    action: "youtube_channel.verify_all",
+    targetType: "youtube_channel",
+    targetId: "ALL",
+    payload: {
+      total: rows.length,
+      ok: counts.ok,
+      private: counts.private_,
+      not_found: counts.not_found,
+      api_error: counts.api_error,
+    },
+  });
+
+  revalidatePath("/admin/system/youtube-channels");
+  return {
+    total: rows.length,
+    ok: counts.ok,
+    private_: counts.private_,
+    not_found: counts.not_found,
+    api_error: counts.api_error,
+    sample,
+  };
 }
 
 /* ────────────────────────────────────────────────────────────

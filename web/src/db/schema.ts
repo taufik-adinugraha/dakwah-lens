@@ -12,6 +12,7 @@ import {
   text,
   timestamp,
   integer,
+  bigint,
   uuid,
   primaryKey,
   uniqueIndex,
@@ -279,6 +280,16 @@ export const socialPosts = pgTable(
     dawahOpportunity: doublePrecision("dawah_opportunity"),
     categories: jsonb("categories").$type<Record<string, number>>(),
 
+    // Per-video engagement metrics (YouTube videos.list stats; planned
+    // to extend to X/IG/TT as their scrapers come back online). NULL for
+    // mainstream RSS where no per-article counts exist.
+    engagementViews: bigint("engagement_views", { mode: "number" }),
+    engagementLikes: bigint("engagement_likes", { mode: "number" }),
+    engagementComments: bigint("engagement_comments", { mode: "number" }),
+    // Composite score: log10(views+1) + 0.5*log10(comments+1) + 0.3*log10(likes+1).
+    // Indexed DESC for "top by engagement" reads.
+    engagementScore: doublePrecision("engagement_score"),
+
     // Cluster assignment from the latest topic-discovery run (FK to `topics.id`).
     topicId: uuid("topic_id"),
 
@@ -443,6 +454,11 @@ export const youtubeChannels = pgTable(
     handle: text("handle"),
     category: text("category").notNull(),
     enabled: boolean("enabled").notNull().default(true),
+    // Verified channels are the only ones the ingest dispatcher will
+    // scrape. Admin flips this via /admin/system/youtube-channels after
+    // a one-shot YT API check (channels.list?part=snippet,statistics).
+    verified: boolean("verified").notNull().default(false),
+    verifiedAt: timestamp("verified_at", { withTimezone: true }),
     lastRunAt: timestamp("last_run_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()

@@ -639,14 +639,17 @@ function DeliverableModal({
 }
 
 /**
- * Same Arabic-transliteration heuristic used by `BriefingNarrative` —
- * detects du'a / dhikr paragraphs by density of long-vowel + diacritic
- * marks (ā ī ū ḥ ṣ ẓ etc.) and the standard opening tokens (Allāhumma,
- * Rabbanā…). Pure paragraphs are styled as "sacred-text cards" instead
- * of plain prose so the khateeb / pembaca can read the du'a comfortably
- * off a phone screen.
+ * Same Arabic detection used by `BriefingNarrative` — fires on EITHER
+ * native Arabic script (U+0600 block, ≥10 chars — the format khutbah
+ * du'a use since the 2026-05-23 prompt change) OR Latin transliteration
+ * (legacy briefs from earlier). Paragraphs that match get the sacred-
+ * text card styling so the khateeb / pembaca can read the du'a
+ * comfortably off a phone screen.
  */
 function modalLooksLikeArabic(text: string): boolean {
+  const arabicChars = text.match(/[؀-ۿݐ-ݿࢠ-ࣿ]/g);
+  if (arabicChars && arabicChars.length >= 10) return true;
+
   if (text.length < 40) return false;
   const strong = /(allahumma|al[\s-]?ḥamdu|inna [aA]llaha|rabbana|subḥāna|wa[\s-]?ṣalli|allāhumma)/i;
   if (strong.test(text)) return true;
@@ -722,9 +725,15 @@ function makeModalMarkdownComponents(kind: CardKind | null): Components {
     p: ({ children }) => {
       const text = modalChildrenToString(children);
       if (modalLooksLikeArabic(text)) {
+        const hasNativeArabic = /[؀-ۿݐ-ݿࢠ-ࣿ]/.test(text);
         return (
           <p
-            className="my-5 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/90 via-white to-teal-50/70 px-6 py-5 text-center font-amiri text-base leading-[2] text-emerald-950 shadow-sm sm:px-8 sm:text-[17px]"
+            dir={hasNativeArabic ? "rtl" : "ltr"}
+            className={`my-5 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/90 via-white to-teal-50/70 px-6 py-5 text-center font-amiri leading-[2] text-emerald-950 shadow-sm sm:px-8 ${
+              hasNativeArabic
+                ? "text-[22px] sm:text-[24px]"
+                : "text-base sm:text-[17px]"
+            }`}
           >
             {children}
           </p>
