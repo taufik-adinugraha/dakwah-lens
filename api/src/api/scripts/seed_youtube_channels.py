@@ -78,10 +78,10 @@ SEED_CHANNELS: list[tuple[str, str]] = [
     ("Bayt Al-Hikmah Bayt Al-Quran", "muamalah"),
     ("Muamalah Daily", "muamalah"),
     ("KEUSY OJK Syariah", "muamalah"),
-    # ── Social Justice / Accountability (12) ───────────────────────────
+    # ── Social Justice / Accountability (11) ───────────────────────────
+    # Narasi Newsroom dropped 2026-05-23 — duplicate of Narasi.
     ("Najwa Shihab Mata Najwa", "social_justice"),
     ("Narasi", "social_justice"),
-    ("Narasi Newsroom", "social_justice"),
     ("Watchdoc Documentary", "social_justice"),
     ("Asumsi", "social_justice"),
     ("Bossman Mardigu TS Media", "social_justice"),
@@ -103,8 +103,8 @@ SEED_CHANNELS: list[tuple[str, str]] = [
     ("Yulia Baltschun", "health"),
     ("Emasuperr", "health"),
     ("dr Frieda", "health"),
-    # ── Education / Edukasi (11) ───────────────────────────────────────
-    ("Ruangguru", "education"),
+    # ── Education / Edukasi (10) ───────────────────────────────────────
+    # Ruangguru dropped 2026-05-23 — commercial edu-tech, not da'wah-shaped content.
     ("Malaka Project", "education"),
     ("Kok Bisa", "education"),
     ("Guru Gembul", "education"),
@@ -115,13 +115,13 @@ SEED_CHANNELS: list[tuple[str, str]] = [
     ("Kontekstual", "education"),
     ("Cania Citta Irlanie", "education"),
     ("Makin Pandai", "education"),
-    # ── Cultural / Budaya & Travel (7) ─────────────────────────────────
+    # ── Cultural / Budaya & Travel (6) ─────────────────────────────────
+    # Farida Nurhan dropped 2026-05-23 — food/travel content, edge of da'wah scope.
     ("IndonesiaKaya Galeri Indonesia Kaya", "cultural"),
     ("KEMENBUD", "cultural"),
     ("Kanal Budaya Indonesia", "cultural"),
     ("Rumah Budaya Indonesia", "cultural"),
     ("Warisan Budaya Indonesia", "cultural"),
-    ("Farida Nurhan", "cultural"),
     ("Ki Seno Nugroho Wayang", "cultural"),
 ]
 
