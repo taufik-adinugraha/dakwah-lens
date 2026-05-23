@@ -27,11 +27,19 @@ export async function Header() {
   // full nav + native hash scroll consistently — matches the same
   // pattern the desktop hash links use to avoid Next.js App Router's
   // cross-page hash-scroll quirk.
+  // Insights is the primary product surface (5 weekly briefings) — call
+  // it out with the "insights" tone so MobileNav renders it as an
+  // emerald-tinted CTA, and the desktop nav matches with a pill-style
+  // link below.
   const mobileItems = [
     { href: `/${locale}`, label: t("home") },
+    {
+      href: `/${locale}/insights`,
+      label: t("insights"),
+      tone: "insights" as const,
+    },
     { href: sectionLink("#features"), label: t("features") },
     { href: sectionLink("#how-it-works"), label: t("how_it_works") },
-    { href: `/${locale}/insights`, label: t("insights") },
     { href: `/${locale}/kitab`, label: t("kitab") },
     { href: `/${locale}/briefs/public`, label: t("briefs_library") },
     {
@@ -85,7 +93,11 @@ export async function Header() {
             >
               {t("how_it_works")}
             </a>
-            <Link href="/insights" className="hover:text-slate-900 transition">
+            <Link
+              href="/insights"
+              className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 font-semibold text-emerald-700 ring-1 ring-emerald-200/70 transition hover:bg-emerald-100 hover:text-emerald-800"
+            >
+              <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
               {t("insights")}
             </Link>
             <Link href="/kitab" className="hover:text-slate-900 transition">

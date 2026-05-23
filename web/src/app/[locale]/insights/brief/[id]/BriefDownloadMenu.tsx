@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Download, FileText, Printer } from "lucide-react";
+import { useLocale } from "next-intl";
+import { Download, FileText, ImageDown, Printer } from "lucide-react";
 
 /**
  * Download menu — sits beside the share menu on the brief detail page.
@@ -25,9 +26,12 @@ export function BriefDownloadMenu({
     text: string;
     print: string;
     print_hint: string;
+    flyer: string;
   };
 }) {
   const [open, setOpen] = useState(false);
+  const locale = useLocale();
+  const flyerLang = locale === "en" ? "en" : "id";
 
   return (
     <div className="relative">
@@ -80,6 +84,13 @@ export function BriefDownloadMenu({
               href={`/api/insights-brief/${briefId}/text`}
               icon={<FileText className="h-4 w-4" />}
               label={labels.text}
+              onClose={() => setOpen(false)}
+            />
+            <div className="my-1 border-t border-slate-100" />
+            <DownloadLink
+              href={`/api/insights-brief/${briefId}/flyer?lang=${flyerLang}`}
+              icon={<ImageDown className="h-4 w-4" />}
+              label={labels.flyer}
               onClose={() => setOpen(false)}
             />
           </div>

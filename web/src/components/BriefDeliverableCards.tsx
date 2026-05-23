@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import {
   BookOpen,
@@ -10,6 +11,7 @@ import {
   Download,
   HandHeart,
   Home,
+  ImageDown,
   Mic,
   Printer,
   Quote,
@@ -59,6 +61,8 @@ type Labels = {
   download: string;
   /** Modal toolbar: "Cetak" / "Print". */
   print: string;
+  /** Modal toolbar: "Unduh Flyer" / "Download Flyer". */
+  flyer: string;
   /** Modal close (aria). */
   close: string;
 };
@@ -251,6 +255,7 @@ export function BriefDeliverableCards({
   section4Markdown,
   labels,
   briefBasePath,
+  briefId,
   initialDeliverable,
 }: {
   section4Markdown: string;
@@ -258,6 +263,9 @@ export function BriefDeliverableCards({
   /** Path of the brief detail route — e.g. `/insights/brief/2026-05-22-all`.
    *  Closing the modal navigates here; opening pushes `${path}/${kind}`. */
   briefBasePath: string;
+  /** Brief slug (`{YYYY-MM-DD}-{segment-or-all}`) — used to construct
+   *  the per-deliverable flyer download URL. */
+  briefId: string;
   initialDeliverable?: CardKind | null;
 }) {
   const router = useRouter();
@@ -328,6 +336,7 @@ export function BriefDeliverableCards({
         <DeliverableModal
           card={orderedCards[openIndex]}
           labels={labels}
+          briefId={briefId}
           onClose={onCloseModal}
         />
       )}
@@ -390,13 +399,16 @@ function DeliverableCardTile({
 function DeliverableModal({
   card,
   labels,
+  briefId,
   onClose,
 }: {
   card: DeliverableCard;
   labels: Labels;
+  briefId: string;
   onClose: () => void;
 }) {
   const [copyOk, setCopyOk] = useState(false);
+  const locale = useLocale();
 
   useEffect(() => {
     const prevOverflow = document.body.style.overflow;
@@ -458,6 +470,33 @@ function DeliverableModal({
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  }
+
+  async function handleFlyer() {
+    // Only fire when the deliverable has a known kind — the flyer
+    // template needs a palette + slug, and an unknown card can't pick
+    // one. Server-side route validates again, but fail-fast here so
+    // the user doesn't get a 404 page.
+    if (!card.kind) return;
+    const url = `/api/insights-brief/${encodeURIComponent(briefId)}/flyer/${card.kind}?lang=${locale === "en" ? "en" : "id"}`;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`status ${res.status}`);
+      const blob = await res.blob();
+      const obj = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = obj;
+      a.download = `${briefId}-${card.kind}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(obj);
+    } catch (err) {
+      // Soft-fail — don't crash the modal if the server route hiccups.
+      // Browser will surface its own download error to the user via
+      // the fetch promise rejection trace.
+      console.error("flyer download failed", err);
+    }
   }
 
   function handlePrint() {
@@ -568,6 +607,16 @@ function DeliverableModal({
             <Download className="h-3.5 w-3.5" />
             {labels.download}
           </button>
+          {card.kind && (
+            <button
+              type="button"
+              onClick={handleFlyer}
+              className="inline-flex h-9 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+            >
+              <ImageDown className="h-3.5 w-3.5" />
+              {labels.flyer}
+            </button>
+          )}
           <button
             type="button"
             onClick={handlePrint}
@@ -655,6 +704,20 @@ function makeModalMarkdownComponents(kind: CardKind | null): Components {
       >
         {children}
       </h3>
+    ),
+    h4: ({ children }) => (
+      <h4
+        className={`mt-6 mb-2 flex items-baseline gap-2 text-balance text-[15px] font-bold text-slate-900 sm:text-base`}
+      >
+        <span
+          className={`inline-block h-1.5 w-1.5 rounded-full ${
+            kind
+              ? KIND_ICON_TONE[kind].split(" ")[0].replace("-100", "-500")
+              : "bg-slate-400"
+          }`}
+        />
+        {children}
+      </h4>
     ),
     p: ({ children }) => {
       const text = modalChildrenToString(children);

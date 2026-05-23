@@ -66,14 +66,17 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "*": ["./node_modules/geoip-lite/data/*.dat"],
   },
-  // Belt-and-suspenders: keep geoip-lite as a true Node require at
-  // runtime instead of webpack-bundling it. The package resolves its
-  // data path via `__dirname`, and the standalone bundler was
-  // rewriting that to a placeholder `/ROOT/...` path that didn't
-  // exist on the running container — every page render was logging
-  // ENOENT on `geoip-country.dat`. Listing it here keeps the runtime
-  // lookup against the actual node_modules path.
-  serverExternalPackages: ["geoip-lite"],
+  // Belt-and-suspenders: keep geoip-lite + puppeteer as true Node
+  // requires at runtime instead of webpack-bundling them.
+  //   * geoip-lite resolves its data path via `__dirname`; the
+  //     standalone bundler was rewriting that to a placeholder
+  //     `/ROOT/...` path that didn't exist on the running container.
+  //   * puppeteer dynamically resolves its Chromium executable path
+  //     (we override via PUPPETEER_EXECUTABLE_PATH but its internal
+  //     resolver still walks node_modules at launch).
+  // Listing them here keeps the runtime lookup against the actual
+  // node_modules path inside the standalone output.
+  serverExternalPackages: ["geoip-lite", "puppeteer", "puppeteer-core"],
   async headers() {
     return [
       {

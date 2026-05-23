@@ -419,7 +419,7 @@ export async function getLatestInsightsSummary(
  *
  *  Slug format: `{YYYY-MM-DD}-{segment-or-all}` (e.g. `2026-05-21-all`,
  *  `2026-05-21-family`). Date is interpreted in WIB (Asia/Jakarta) so a
- *  briefing fired at 04:30 WIB lands on today's date even though UTC is
+ *  briefing fired at 05:00 WIB lands on today's date even though UTC is
  *  still yesterday. Returns the LATEST briefing matching that
  *  date+segment — when multiple briefings exist for the same combo
  *  (e.g. a test re-run), only the freshest is reachable by slug.
@@ -503,6 +503,150 @@ export function briefingSlug(generatedAt: Date, segment: string | null): string 
   const m = String(wib.getUTCMonth() + 1).padStart(2, "0");
   const d = String(wib.getUTCDate()).padStart(2, "0");
   return `${y}-${m}-${d}-${segment ?? "all"}`;
+}
+
+/** All 5 segment keys in canonical reading order. `null` represents the
+ *  cross-segment "all" briefing. Kept here (not in a shared constants file)
+ *  because briefing navigation is the only place this exact order matters. */
+export const BRIEFING_SEGMENTS: (string | null)[] = [
+  null,
+  "spiritual",
+  "family",
+  "youth",
+  "justice",
+];
+
+/**
+ * Fetch the latest briefing per segment in one batch. Returns a 5-entry
+ * map keyed by segment ("all" for the cross-segment briefing) — missing
+ * keys mean that segment's generation failed for the most recent cycle.
+ *
+ * Used by /insights to render all 5 briefings side-by-side as the
+ * primary nav hub (briefings-first redesign, 2026-05-23).
+ */
+export async function getAllLatestBriefings(): Promise<
+  Map<string, LatestInsightsSummary>
+> {
+  const rows = await Promise.all(
+    BRIEFING_SEGMENTS.map((seg) => getLatestInsightsSummary(seg)),
+  );
+  const out = new Map<string, LatestInsightsSummary>();
+  BRIEFING_SEGMENTS.forEach((seg, i) => {
+    const row = rows[i];
+    if (row) out.set(seg ?? "all", row);
+  });
+  return out;
+}
+
+export type BriefingNavLink = {
+  slug: string;
+  segment: string | null;
+  generatedAt: Date;
+};
+
+export type BriefingNavigation = {
+  /** One entry per segment in this edition (same WIB date as the brief the
+   *  reader is on). Map keyed by `segment ?? "all"`. Missing entries mean
+   *  that segment's briefing failed/wasn't generated for this cycle. */
+  peers: Map<string, BriefingNavLink>;
+  /** Previous edition of the SAME segment (strictly older). */
+  previous: BriefingNavLink | null;
+  /** Next edition of the SAME segment (strictly newer) — non-null only
+   *  when the reader is browsing an older brief. */
+  next: BriefingNavLink | null;
+};
+
+/**
+ * Data feeder for the in-page brief pagination widget.
+ *
+ * Strategy: peer briefings are scoped to the SAME WIB date as the current
+ * brief — that's the cleanest definition of "this edition" given the
+ * weekly Sunday cron may drift by minutes. For prev/next we strictly compare
+ * `generated_at` of the SAME segment.
+ */
+export async function getBriefingNavigation(
+  currentSegment: string | null,
+  currentGeneratedAt: Date,
+): Promise<BriefingNavigation> {
+  // Peers in the same edition — one row per segment, freshest wins if
+  // somehow two briefings landed on the same WIB date for the same segment.
+  const peerRows = (await db.execute(sql`
+    SELECT DISTINCT ON (segment)
+      generated_at AS "generatedAt",
+      segment
+    FROM insights_summaries
+    WHERE (generated_at AT TIME ZONE 'Asia/Jakarta')::date
+        = (${currentGeneratedAt.toISOString()}::timestamptz AT TIME ZONE 'Asia/Jakarta')::date
+    ORDER BY segment NULLS FIRST, generated_at DESC
+  `)) as unknown as Array<{ generatedAt: Date; segment: string | null }>;
+
+  const peers = new Map<string, BriefingNavLink>();
+  for (const row of peerRows) {
+    const generatedAt =
+      row.generatedAt instanceof Date
+        ? row.generatedAt
+        : new Date(row.generatedAt);
+    const key = row.segment ?? "all";
+    peers.set(key, {
+      segment: row.segment,
+      generatedAt,
+      slug: briefingSlug(generatedAt, row.segment),
+    });
+  }
+
+  // Previous edition of the same segment.
+  const [prevRow] = await db
+    .select({
+      generatedAt: schema.insightsSummaries.generatedAt,
+      segment: schema.insightsSummaries.segment,
+    })
+    .from(schema.insightsSummaries)
+    .where(
+      sql`generated_at < ${currentGeneratedAt.toISOString()}::timestamptz AND ${
+        currentSegment === null
+          ? sql`segment IS NULL`
+          : sql`segment = ${currentSegment}`
+      }`,
+    )
+    .orderBy(desc(schema.insightsSummaries.generatedAt))
+    .limit(1);
+
+  // Next edition of the same segment (only exists if reading an older brief).
+  const nextRow = (
+    await db
+      .select({
+        generatedAt: schema.insightsSummaries.generatedAt,
+        segment: schema.insightsSummaries.segment,
+      })
+      .from(schema.insightsSummaries)
+      .where(
+        sql`generated_at > ${currentGeneratedAt.toISOString()}::timestamptz AND ${
+          currentSegment === null
+            ? sql`segment IS NULL`
+            : sql`segment = ${currentSegment}`
+        }`,
+      )
+      .orderBy(schema.insightsSummaries.generatedAt)
+      .limit(1)
+  )[0];
+
+  return {
+    peers,
+    previous: prevRow
+      ? {
+          segment: prevRow.segment,
+          generatedAt: prevRow.generatedAt,
+          slug: briefingSlug(prevRow.generatedAt, prevRow.segment),
+        }
+      : null,
+    next: nextRow
+      ? {
+          segment: nextRow.segment,
+          generatedAt: nextRow.generatedAt,
+          slug: briefingSlug(nextRow.generatedAt, nextRow.segment),
+        }
+      : null,
+  };
 }
 
 export async function getOverviewInsights(): Promise<OverviewInsights | null> {

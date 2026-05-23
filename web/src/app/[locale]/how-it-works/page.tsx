@@ -632,19 +632,25 @@ function BriefPipeline({ t }: { t: T }) {
 }
 
 /**
- * Daily insights briefings pipeline.
+ * Weekly insights briefings pipeline.
  *
  * Different from BriefPipeline (which describes the on-demand user-created
- * brief flow). Insights briefings are written by the system on a fixed
- * schedule, public, and structured as long-form analyst reports — see
- * insights_summary.py for the Celery task and /insights/brief/[id] for
- * the public viewer.
+ * brief flow). Insights briefings are public, long-form analyst reports
+ * that combine 5 markdown sections + 6 ready-to-use deliverables in
+ * Section 4 + 2 share-ready flyers per briefing. See
+ * insights_summary.py for the pipeline, scripts/manual_briefing.py for
+ * the current manual operator flow, and /insights/brief/[id] for the
+ * public viewer.
+ *
+ * The cron is wired for Sunday 05:00 WIB but currently PAUSED
+ * (2026-05-23) — operator runs manually via Claude-in-the-loop to keep
+ * Gemini Pro spend at zero during the dev phase.
  */
 function InsightsBriefingPipeline({ t }: { t: T }) {
   const stages = [
     {
       title: t("insights_brief_stage_1_title"),
-      module: "workers/ingest.py::generate_insights_summary",
+      module: "workers/celery_app.py + scripts/manual_briefing.py",
       body: t("insights_brief_stage_1_body"),
     },
     {
@@ -654,17 +660,17 @@ function InsightsBriefingPipeline({ t }: { t: T }) {
     },
     {
       title: t("insights_brief_stage_3_title"),
-      module: "services/kitab_retrieval.py + rerank_daleel",
+      module: "services/kitab_retrieval.py + rerank_daleel (top_n=10)",
       body: t("insights_brief_stage_3_body"),
     },
     {
       title: t("insights_brief_stage_4_title"),
-      module: "Gemini 2.5 Pro × 2 languages",
+      module: "Gemini 2.5 Pro (paused) → Claude manual",
       body: t("insights_brief_stage_4_body"),
     },
     {
       title: t("insights_brief_stage_5_title"),
-      module: "insights_summaries table → /insights/brief/[id]",
+      module: "insights_summaries → /insights/brief/[id] + Puppeteer flyers",
       body: t("insights_brief_stage_5_body"),
     },
   ];
@@ -697,12 +703,204 @@ function InsightsBriefingPipeline({ t }: { t: T }) {
             </li>
           ))}
         </ol>
+
+        <BriefingAnatomy t={t} />
+
         <div className="mx-auto mt-6 max-w-3xl rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 text-center text-xs text-emerald-900">
           <strong>{t("insights_brief_callout_strong")}</strong>{" "}
           {t("insights_brief_callout_body")}
         </div>
       </div>
     </section>
+  );
+}
+
+/**
+ * "What's inside one briefing" — visual breakdown of the 5 markdown
+ * sections (with Section 4 expanded into its 6 ready-to-use deliverables)
+ * plus the 2 share-ready flyers Puppeteer renders alongside.
+ *
+ * Placed under the 5-stage pipeline so readers see HOW the system runs
+ * AND then what they actually receive — closes the loop between the
+ * tech explanation and the user-visible output.
+ */
+function BriefingAnatomy({ t }: { t: T }) {
+  const sections = [
+    {
+      n: "1",
+      title: t("anatomy_s1_title"),
+      body: t("anatomy_s1_body"),
+      words: "100-130",
+    },
+    {
+      n: "2",
+      title: t("anatomy_s2_title"),
+      body: t("anatomy_s2_body"),
+      words: "250-350",
+    },
+    {
+      n: "3",
+      title: t("anatomy_s3_title"),
+      body: t("anatomy_s3_body"),
+      words: "350-450",
+    },
+    {
+      n: "5",
+      title: t("anatomy_s5_title"),
+      body: t("anatomy_s5_body"),
+      words: "500-700",
+    },
+  ];
+
+  const deliverables = [
+    {
+      key: "khutbah",
+      title: t("anatomy_kit_khutbah_title"),
+      body: t("anatomy_kit_khutbah_body"),
+      words: "2,300-3,200",
+    },
+    {
+      key: "kajian",
+      title: t("anatomy_kit_kajian_title"),
+      body: t("anatomy_kit_kajian_body"),
+      words: "800-1,100",
+    },
+    {
+      key: "home",
+      title: t("anatomy_kit_home_title"),
+      body: t("anatomy_kit_home_body"),
+      words: "500-700",
+    },
+    {
+      key: "content",
+      title: t("anatomy_kit_content_title"),
+      body: t("anatomy_kit_content_body"),
+      words: "100-130",
+    },
+    {
+      key: "genz",
+      title: t("anatomy_kit_genz_title"),
+      body: t("anatomy_kit_genz_body"),
+      words: "800-1,100",
+    },
+    {
+      key: "action",
+      title: t("anatomy_kit_action_title"),
+      body: t("anatomy_kit_action_body"),
+      words: "600-900",
+    },
+  ];
+
+  return (
+    <div className="mt-12 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+      <h3 className="text-balance text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
+        {t("anatomy_title")}
+      </h3>
+      <p className="mt-1.5 max-w-2xl text-pretty text-sm leading-relaxed text-slate-600">
+        {t("anatomy_subtitle")}
+      </p>
+
+      {/* Top row: 5-section structure (Section 4 expanded below) */}
+      <div className="mt-6">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+          {t("anatomy_sections_label")}
+        </p>
+        <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {sections.map((s) => (
+            <li
+              key={s.n}
+              className="rounded-xl border border-slate-200 bg-slate-50/60 p-3"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white">
+                  {s.n}
+                </span>
+                <span className="text-[10px] font-mono text-slate-400 tabular-nums">
+                  ~{s.words} kata
+                </span>
+              </div>
+              <p className="mt-2 text-[13px] font-bold text-slate-900">
+                {s.title}
+              </p>
+              <p className="mt-1 text-[11px] leading-relaxed text-slate-600">
+                {s.body}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Section 4 deep-dive: 6 ready-to-use deliverables */}
+      <div className="mt-7 rounded-xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50/50 to-white p-4">
+        <div className="flex items-baseline justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+              {t("anatomy_section4_eyebrow")}
+            </p>
+            <p className="mt-1 text-balance text-sm font-bold text-slate-900 sm:text-base">
+              {t("anatomy_section4_title")}
+            </p>
+          </div>
+          <span className="text-[10px] font-mono text-emerald-700 tabular-nums">
+            5,400-7,800 kata
+          </span>
+        </div>
+        <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {deliverables.map((d) => (
+            <li
+              key={d.key}
+              className="rounded-xl border border-slate-200 bg-white p-3"
+            >
+              <div className="flex items-baseline justify-between gap-2">
+                <p className="text-[13px] font-bold text-slate-900">
+                  {d.title}
+                </p>
+                <span className="text-[10px] font-mono text-slate-400 tabular-nums">
+                  ~{d.words}
+                </span>
+              </div>
+              <p className="mt-1 text-[11px] leading-relaxed text-slate-600">
+                {d.body}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Flyer companions row */}
+      <div className="mt-7 rounded-xl border-2 border-fuchsia-200 bg-gradient-to-br from-fuchsia-50/40 to-white p-4">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-fuchsia-700">
+          {t("anatomy_flyer_eyebrow")}
+        </p>
+        <p className="mt-1 text-balance text-sm font-bold text-slate-900 sm:text-base">
+          {t("anatomy_flyer_title")}
+        </p>
+        <p className="mt-1 max-w-2xl text-[12px] leading-relaxed text-slate-600">
+          {t("anatomy_flyer_body")}
+        </p>
+        <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+          <li className="rounded-xl border border-slate-200 bg-white p-3">
+            <p className="text-[13px] font-bold text-slate-900">
+              {t("anatomy_flyer_general_title")}
+            </p>
+            <p className="mt-1 text-[11px] leading-relaxed text-slate-600">
+              {t("anatomy_flyer_general_body")}
+            </p>
+          </li>
+          <li className="rounded-xl border border-slate-200 bg-white p-3">
+            <p className="text-[13px] font-bold text-slate-900">
+              {t("anatomy_flyer_genz_title")}
+            </p>
+            <p className="mt-1 text-[11px] leading-relaxed text-slate-600">
+              {t("anatomy_flyer_genz_body")}
+            </p>
+          </li>
+        </ul>
+        <p className="mt-3 text-[11px] text-slate-500">
+          {t("anatomy_flyer_footnote")}
+        </p>
+      </div>
+    </div>
   );
 }
 
@@ -800,7 +998,7 @@ function ModelsTable({ t }: { t: T }) {
  *   YT — daily, free quota
  *   mainstream RSS — every 2h, free
  *   topic discovery — daily 04:00 WIB
- *   briefings — daily 04:30 WIB (5 segments × 2 languages = 10 Pro calls)
+ *   briefings — weekly Sunday 05:00 WIB cron (currently PAUSED — manual via scripts/manual_briefing.py)
  *
  * Validated against `usage_events` 7-day rollup on 2026-05-22 — earlier
  * estimates undercounted Pro briefings ($0 → ~$9/mo) and overcounted
@@ -809,10 +1007,12 @@ function ModelsTable({ t }: { t: T }) {
 function MonthlyCost({ t }: { t: T }) {
   const rows = [
     {
-      provider: "Gemini 2.5 Pro (briefings, scheduled)",
+      provider: "Gemini 2.5 Pro (briefings, scheduled — currently paused)",
       use: t("cost_gemini_pro_use"),
-      monthly: 9.0,
-      note: "5 segmen × 2 bahasa daily · ~$0.06/segmen-bahasa",
+      // Paused per 2026-05-23 to keep dev-phase spend at zero. Projected
+      // $5/mo if cron flips back on: 5 briefings × 4 Sundays × ~$0.26.
+      monthly: 0,
+      note: "Paused; would be ~$5/mo if re-enabled (5 segmen × 1 bahasa × Ahad × ~$0.26)",
     },
     {
       provider: "Gemini Flash-Lite",

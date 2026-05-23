@@ -10,6 +10,7 @@ import {
 
 import type { DaleelRef } from "@/db/schema";
 import { BriefDeliverableCards } from "./BriefDeliverableCards";
+import { BriefFlyerSection } from "./BriefFlyerSection";
 import { DaleelChips } from "./DaleelChips";
 
 /** Section 4 heading variants per language. Used to split the markdown
@@ -48,6 +49,7 @@ export function BriefingNarrative({
   daleelRefs,
   citedDaleelLabel,
   briefBasePath,
+  briefId,
   deliverableLabels,
   initialDeliverable,
   locale,
@@ -63,6 +65,10 @@ export function BriefingNarrative({
    *  preview surfaces (e.g. /insights hero) — there we want the plain
    *  inline render. */
   briefBasePath?: string;
+  /** Brief slug (e.g. `2026-05-22-all`) — used to construct the
+   *  per-deliverable flyer download URL. Required when `briefBasePath`
+   *  is set. */
+  briefId?: string;
   /** Localized strings for the card grid + modal toolbar. Required when
    *  `briefBasePath` is set. */
   deliverableLabels?: {
@@ -71,6 +77,7 @@ export function BriefingNarrative({
     copied: string;
     download: string;
     print: string;
+    flyer: string;
     close: string;
   };
   /** Deep-link slug: opens the matching modal on mount. */
@@ -114,8 +121,10 @@ export function BriefingNarrative({
                   section4Markdown={split.section4Body}
                   labels={deliverableLabels!}
                   briefBasePath={briefBasePath!}
+                  briefId={briefId!}
                   initialDeliverable={initialDeliverable ?? null}
                 />
+                {briefId && <BriefFlyerSection briefId={briefId} />}
               </>
             )}
             <ReactMarkdown components={makeMarkdownComponents()}>

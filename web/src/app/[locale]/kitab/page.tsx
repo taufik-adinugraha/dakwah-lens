@@ -4,6 +4,7 @@ import { BookOpen, ShieldCheck, Sparkles } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
+import { BackToInsightsLink } from "@/components/BackToInsightsLink";
 import { BookmarkButton } from "@/components/BookmarkButton";
 import { CitationShare } from "@/components/CitationShare";
 import { getSavedFlags } from "@/app/[locale]/saved/actions";
@@ -181,6 +182,9 @@ export default async function KitabPage({
 
   return (
     <>
+      <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
+        <BackToInsightsLink />
+      </div>
       <Hero t={t} />
       <SearchForm
         t={t}

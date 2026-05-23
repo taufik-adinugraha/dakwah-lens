@@ -12,6 +12,7 @@ import {
   WeakRelevanceError,
 } from "@/lib/kitab-retrieval";
 import { generateBriefContent } from "@/lib/brief-generator";
+import { computeCost, estimateBriefCost } from "@/lib/brief-cost";
 import { LlmUnavailableError } from "@/lib/llm";
 import type { BriefDaleel, UserProfile } from "@/db/schema";
 
@@ -191,6 +192,9 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
   //    Anthropic Claude → Gemini → throw.
   let content;
   let provider: "anthropic" | "gemini";
+  let model: string;
+  let tokensIn: number | null = null;
+  let tokensOut: number | null = null;
   try {
     const generated = await generateBriefContent({
       topic: topic_title,
@@ -203,6 +207,9 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
     });
     content = generated.content;
     provider = generated.provider;
+    model = generated.model;
+    tokensIn = generated.tokensIn;
+    tokensOut = generated.tokensOut;
   } catch (err) {
     const errCtx = {
       userId: session.user.id,
@@ -229,6 +236,19 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
     return { ok: false, error: "error_generation_failed" };
   }
 
+  // Compute actual cost from the tokens the provider reported. NULL
+  // when the SDK didn't surface usage (rare); we persist NULL rather
+  // than guess so analytics doesn't pretend it knows.
+  const costUsd =
+    tokensIn != null && tokensOut != null
+      ? computeCost({
+          tokensIn,
+          tokensOut,
+          provider,
+          model,
+        }).totalUsd
+      : null;
+
   const [row] = await db
     .insert(schema.briefs)
     .values({
@@ -240,11 +260,91 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
       isPlaceholder: false,
       content,
       status: "draft",
+      tokensIn,
+      tokensOut,
+      costUsd: costUsd != null ? costUsd.toFixed(6) : null,
+      provider,
+      model,
     })
     .returning({ id: schema.briefs.id });
 
-  console.info(`[brief] generated via ${provider} (id=${row.id})`);
+  console.info(
+    `[brief] generated via ${provider} (id=${row.id}, tokens=${tokensIn}/${tokensOut}, cost=$${costUsd?.toFixed(4) ?? "?"})`,
+  );
   redirect(`/briefs/${row.id}`);
+}
+
+/* ──────────────────────────────────────────────────────────────
+ * Cost preview — runs BEFORE generation so the form can show
+ * "this will cost ~$X" in a confirmation step.
+ * ──────────────────────────────────────────────────────────── */
+
+const EstimateSchema = z.object({
+  topic_title: z.string().trim().min(4, "topic_too_short").max(200),
+  locale: z.enum(LOCALES),
+  extra_context: z
+    .string()
+    .trim()
+    .max(2000, "extra_context_too_long")
+    .optional()
+    .transform((v) => (v && v.length > 0 ? v : undefined)),
+});
+
+export type EstimateResult =
+  | {
+      ok: true;
+      tokensIn: number;
+      tokensOut: number;
+      totalUsd: number;
+      totalIdr: number;
+      provider: string;
+      model: string;
+    }
+  | { ok: false; error: string };
+
+/**
+ * Cheap heuristic cost preview. Calibrated against historic briefs so
+ * the estimate is within ±20% of actual — accurate enough to surface a
+ * budget warning, not precise enough to bill against.
+ *
+ * Auth-gated (signed-in approved users only) so it can't be abused
+ * to enumerate cost characteristics of the prompt assembly.
+ */
+export async function estimateBriefCostAction(
+  formData: FormData,
+): Promise<EstimateResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { ok: false, error: "auth_required" };
+  }
+  if (session.user.status !== "approved") {
+    return { ok: false, error: "account_not_approved" };
+  }
+
+  const parsed = EstimateSchema.safeParse({
+    topic_title: formData.get("topic_title"),
+    locale: formData.get("locale"),
+    extra_context: formData.get("extra_context"),
+  });
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0].message };
+  }
+
+  const cost = estimateBriefCost({
+    topicTitle: parsed.data.topic_title,
+    extraContext: parsed.data.extra_context,
+    locale: parsed.data.locale,
+  });
+
+  return {
+    ok: true,
+    tokensIn: cost.tokensIn,
+    tokensOut: cost.tokensOut,
+    totalUsd: cost.totalUsd,
+    totalIdr: cost.totalIdr,
+    provider: cost.provider,
+    model: cost.model,
+  };
 }
 
 const SEGMENT_LABELS: Record<string, { id: string; en: string }> = {

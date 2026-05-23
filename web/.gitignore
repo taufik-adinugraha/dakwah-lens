@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Admin-uploaded flyer assets (DB-tracked; files live on volume in prod)
+public/flyer-assets/uploads/*
+!public/flyer-assets/uploads/.gitkeep

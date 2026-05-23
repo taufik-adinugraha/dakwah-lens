@@ -22,8 +22,10 @@ export type MobileNavItem = {
    *  natively after navigation — same pattern as Header desktop. */
   href: string;
   label: string;
-  /** "donate" highlights this item in emerald to match desktop. */
-  tone?: "donate";
+  /** Visual emphasis. "donate" = emerald text. "insights" = filled
+   *  emerald pill (the primary product surface, called out so first-time
+   *  visitors don't miss the 5 weekly briefings). */
+  tone?: "donate" | "insights";
 };
 
 export function MobileNav({
@@ -100,20 +102,35 @@ export function MobileNav({
                 </button>
               </div>
               <nav className="flex flex-col gap-1 px-3 pb-6">
-                {items.map((item) => (
-                  <a
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    className={`rounded-lg px-3 py-3 text-base font-medium transition ${
-                      item.tone === "donate"
-                        ? "text-emerald-700 hover:bg-emerald-50"
-                        : "text-slate-700 hover:bg-slate-100"
-                    }`}
-                  >
-                    {item.label}
-                  </a>
-                ))}
+                {items.map((item) => {
+                  if (item.tone === "insights") {
+                    return (
+                      <a
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setOpen(false)}
+                        className="mb-1 inline-flex items-center gap-2 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 px-3 py-3 text-base font-bold text-white shadow-sm transition hover:from-emerald-600 hover:to-emerald-700"
+                      >
+                        <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-white" />
+                        {item.label}
+                      </a>
+                    );
+                  }
+                  return (
+                    <a
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setOpen(false)}
+                      className={`rounded-lg px-3 py-3 text-base font-medium transition ${
+                        item.tone === "donate"
+                          ? "text-emerald-700 hover:bg-emerald-50"
+                          : "text-slate-700 hover:bg-slate-100"
+                      }`}
+                    >
+                      {item.label}
+                    </a>
+                  );
+                })}
               </nav>
             </div>
           </div>,

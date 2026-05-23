@@ -115,6 +115,12 @@ services:
       # Shared with `api` so admins can upload an invoice via the web UI
       # and the api can read it back for downloads.
       - /srv/dakwah-lens/data/attachments:/data/attachments
+      # Admin-uploaded flyer assets (photos, ornaments, patterns) land
+      # here so they survive container rebuilds. Committed seed assets
+      # live in the IMAGE (under public/flyer-assets/{ornaments,patterns,
+      # photos}/) — only the `uploads/` subdir is host-mounted because
+      # only that subdir gets written to at runtime.
+      - /srv/dakwah-lens/data/flyer-assets-uploads:/app/public/flyer-assets/uploads
     ports:
       # Caddy lives on the host and reverse-proxies localhost:3000.
       # Binding to 127.0.0.1 means the port is unreachable from outside

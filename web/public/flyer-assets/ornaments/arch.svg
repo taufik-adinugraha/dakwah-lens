@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280" width="200" height="280">
+  <!-- Pointed Islamic arch (mihrab silhouette) -->
+  <path d="M 20 280 L 20 140 Q 20 20 100 20 Q 180 20 180 140 L 180 280 Z" fill="none" stroke="currentColor" stroke-width="3" />
+  <path d="M 40 280 L 40 145 Q 40 40 100 40 Q 160 40 160 145 L 160 280 Z" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.55" />
+</svg>

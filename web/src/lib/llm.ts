@@ -39,6 +39,10 @@ export type LlmResult<T> = {
   provider: LlmProvider;
   /** Model name reported by the provider. */
   model: string;
+  /** Token counts reported by the provider — null when the SDK didn't
+   *  surface them (rare; usually a quirk of streaming responses). */
+  tokensIn: number | null;
+  tokensOut: number | null;
 };
 
 /**
@@ -81,8 +85,14 @@ export async function generateJson<T = unknown>(
   // 1. Gemini Pro — cost-optimized primary (~35% cheaper than Sonnet).
   if (process.env.GEMINI_API_KEY) {
     try {
-      const data = await callGemini<T>(req);
-      return { data, provider: "gemini", model: GEMINI_MODEL };
+      const { data, tokensIn, tokensOut } = await callGemini<T>(req);
+      return {
+        data,
+        provider: "gemini",
+        model: GEMINI_MODEL,
+        tokensIn,
+        tokensOut,
+      };
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       console.warn(`[llm] Gemini failed: ${msg}`);
@@ -94,8 +104,14 @@ export async function generateJson<T = unknown>(
   //    quality bracket. Activates when Gemini is missing or errors out.
   if (process.env.ANTHROPIC_API_KEY) {
     try {
-      const data = await callAnthropic<T>(req);
-      return { data, provider: "anthropic", model: ANTHROPIC_MODEL };
+      const { data, tokensIn, tokensOut } = await callAnthropic<T>(req);
+      return {
+        data,
+        provider: "anthropic",
+        model: ANTHROPIC_MODEL,
+        tokensIn,
+        tokensOut,
+      };
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       console.warn(`[llm] Anthropic failed: ${msg}`);
@@ -126,7 +142,9 @@ function getAnthropic(): Anthropic {
   return _anthropic;
 }
 
-async function callAnthropic<T>(req: LlmRequest): Promise<T> {
+async function callAnthropic<T>(
+  req: LlmRequest,
+): Promise<{ data: T; tokensIn: number | null; tokensOut: number | null }> {
   const client = getAnthropic();
   const response = await client.messages.create({
     model: ANTHROPIC_MODEL,
@@ -145,18 +163,21 @@ async function callAnthropic<T>(req: LlmRequest): Promise<T> {
     messages: [{ role: "user", content: req.userPrompt }],
   });
 
+  const tokensIn = response.usage?.input_tokens ?? null;
+  const tokensOut = response.usage?.output_tokens ?? null;
+
   void recordUsage({
     provider: "anthropic",
     operation: "synth_brief",
     model: ANTHROPIC_MODEL,
-    tokensIn: response.usage?.input_tokens ?? null,
-    tokensOut: response.usage?.output_tokens ?? null,
+    tokensIn,
+    tokensOut,
   });
 
   // First tool_use block IS the structured output.
   for (const block of response.content) {
     if (block.type === "tool_use" && block.name === "emit_brief") {
-      return block.input as T;
+      return { data: block.input as T, tokensIn, tokensOut };
     }
   }
   throw new Error("Anthropic response did not contain a tool_use block.");
@@ -178,7 +199,9 @@ function getGemini(): GoogleGenAI {
   return _gemini;
 }
 
-async function callGemini<T>(req: LlmRequest): Promise<T> {
+async function callGemini<T>(
+  req: LlmRequest,
+): Promise<{ data: T; tokensIn: number | null; tokensOut: number | null }> {
   const client = getGemini();
   const response = await client.models.generateContent({
     model: GEMINI_MODEL,
@@ -195,16 +218,19 @@ async function callGemini<T>(req: LlmRequest): Promise<T> {
   const text = response.text;
   if (!text) throw new Error("Gemini returned empty response.");
 
+  const tokensIn = response.usageMetadata?.promptTokenCount ?? null;
+  const tokensOut = response.usageMetadata?.candidatesTokenCount ?? null;
+
   void recordUsage({
     provider: "gemini",
     operation: "synth_brief",
     model: GEMINI_MODEL,
-    tokensIn: response.usageMetadata?.promptTokenCount ?? null,
-    tokensOut: response.usageMetadata?.candidatesTokenCount ?? null,
+    tokensIn,
+    tokensOut,
   });
 
   try {
-    return JSON.parse(text) as T;
+    return { data: JSON.parse(text) as T, tokensIn, tokensOut };
   } catch (err) {
     throw new Error(
       `Gemini returned invalid JSON: ${err instanceof Error ? err.message : String(err)}`,

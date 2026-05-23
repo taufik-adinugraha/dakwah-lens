@@ -317,6 +317,8 @@ export type GeneratedBrief = {
   content: BriefContent;
   provider: LlmProvider;
   model: string;
+  tokensIn: number | null;
+  tokensOut: number | null;
 };
 
 export async function generateBriefContent(
@@ -375,7 +377,7 @@ export async function generateBriefContent(
     .filter(Boolean)
     .join("\n");
 
-  const { data, provider, model } = await generateJson<BriefResponse>({
+  const { data, provider, model, tokensIn, tokensOut } = await generateJson<BriefResponse>({
     systemPrompt: SYSTEM_PROMPT,
     userPrompt,
     responseSchema: RESPONSE_JSON_SCHEMA,
@@ -406,7 +408,7 @@ export async function generateBriefContent(
     daleel, // append the retrieved daleel — LLM never authors these
   };
 
-  return { content, provider, model };
+  return { content, provider, model, tokensIn, tokensOut };
 }
 
 /* ─────────────────────────────────────────────────────────────

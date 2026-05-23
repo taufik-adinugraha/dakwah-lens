@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import {
+  AlertCircle,
   ArrowRight,
   ArrowUpRight,
   BookOpen,
@@ -9,15 +10,21 @@ import {
   Building2,
   CheckCircle2,
   Clock,
+  Coins,
   Compass,
+  Eye,
   Globe2,
   Heart,
+  ListChecks,
+  Mail,
   Newspaper,
   QrCode,
   Quote,
   Radar,
   Radio,
+  ShieldCheck,
   Sparkles,
+  UserCircle2,
   Workflow,
 } from "lucide-react";
 import { and, count, eq, sql } from "drizzle-orm";
@@ -142,6 +149,7 @@ export default async function LandingPage({
       <HowItWorks t={tLanding} coverage={coverage} />
       <Daleel t={tDaleel} />
       <Donate t={tDonate} />
+      {!viewer.approved && <SignupJourney t={tLanding} />}
       <FinalCTA t={tLanding} viewer={viewer} />
     </>
   );
@@ -210,29 +218,75 @@ function Hero({ t, viewer }: { t: LandingT; viewer: Viewer }) {
 }
 
 function AnonymousCtas({ t }: { t: LandingT }) {
+  // Primary CTA: a substantial card pointing first-time visitors at
+  // Public Insights — the lowest-friction surface (no signup, real data,
+  // immediately useful). The user-feedback finding that drove this
+  // redesign: in the previous three-button row, new visitors didn't
+  // know which to click first. Promoting Insights to the visual hero
+  // gives a clear "start here" path; the signup + how-it-works actions
+  // sit below as smaller pills for users who already know they want
+  // them.
   return (
-    <div className="mt-8 flex flex-col flex-wrap items-center justify-center gap-3 sm:flex-row">
-      <Link
-        href={{ pathname: "/login", query: { mode: "signup" } }}
-        className="group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-slate-900 px-6 text-sm font-semibold text-white shadow-lg shadow-slate-900/15 transition hover:bg-slate-800 sm:w-auto"
-      >
-        {t("cta_primary")}
-        <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-      </Link>
-      <Link
-        href="#how-it-works"
-        className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-6 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 sm:w-auto"
-      >
-        <Workflow className="h-4 w-4" />
-        {t("cta_secondary")}
-      </Link>
+    <div className="mt-10 flex flex-col items-center">
+      {/* Primary: Insights card */}
       <Link
         href="/insights"
-        className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-emerald-200 bg-emerald-50/80 px-6 text-sm font-semibold text-emerald-700 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-100 sm:w-auto"
+        className="group relative w-full max-w-xl overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 px-7 py-7 text-left shadow-xl shadow-emerald-500/25 transition hover:shadow-2xl hover:shadow-emerald-500/35 hover:scale-[1.01] sm:px-9 sm:py-8"
       >
-        <Globe2 className="h-4 w-4" />
-        <I18nText text={t("cta_tertiary")} />
+        {/* Subtle radial glow in top-right corner */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-white/15 blur-3xl"
+        />
+        <div className="relative flex items-center justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-100">
+              <Sparkles className="h-3 w-3" />
+              {t("hero_start_here_label")}
+            </span>
+            <h2 className="mt-2 text-balance text-2xl font-bold leading-tight text-white sm:text-3xl">
+              {t("hero_insights_card_title")}
+            </h2>
+            <p className="mt-2 text-pretty text-sm leading-relaxed text-emerald-50/95 sm:text-base">
+              {t("hero_insights_card_body")}
+            </p>
+          </div>
+          <span className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/15 text-white transition group-hover:translate-x-1 group-hover:bg-white/25 sm:flex">
+            <ArrowRight className="h-5 w-5" />
+          </span>
+        </div>
       </Link>
+
+      {/* No-login reassurance under the primary card — directly addresses
+           user research showing first-time visitors assumed they needed to
+           sign up before reading anything. */}
+      <p className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-medium text-emerald-700">
+        <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
+        {t("hero_no_login_required")}
+      </p>
+
+      {/* Bridge text: login is for personalization + team review. */}
+      <p className="mt-6 max-w-md text-center text-xs leading-relaxed text-slate-500">
+        {t("hero_login_purpose")}
+      </p>
+
+      {/* Secondary actions */}
+      <div className="mt-3 flex flex-col items-stretch justify-center gap-2 sm:flex-row sm:items-center sm:gap-3">
+        <Link
+          href={{ pathname: "/login", query: { mode: "signup" } }}
+          className="group inline-flex h-10 items-center justify-center gap-2 rounded-full bg-slate-900 px-5 text-sm font-semibold text-white shadow-md shadow-slate-900/15 transition hover:bg-slate-800"
+        >
+          {t("cta_primary")}
+          <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+        </Link>
+        <Link
+          href="#how-it-works"
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+        >
+          <Workflow className="h-3.5 w-3.5" />
+          {t("cta_secondary")}
+        </Link>
+      </div>
     </div>
   );
 }
@@ -276,6 +330,10 @@ function SignedInCtas({ t, approved }: { t: LandingT; approved: boolean }) {
 }
 
 function Features({ t }: { t: LandingT }) {
+  // Four cards arranged as a left-to-right pipeline: signal → meaning →
+  // output → foundation. The "Briefing Mingguan" card is the focal one
+  // because it's the actual deliverable — the other three describe how
+  // it's built.
   const items = [
     {
       icon: Radar,
@@ -288,6 +346,13 @@ function Features({ t }: { t: LandingT }) {
       title: t("feature_analyze_title"),
       body: t("feature_analyze_body"),
       tone: "from-cyan-500 to-emerald-500",
+    },
+    {
+      icon: Newspaper,
+      title: t("feature_briefing_title"),
+      body: t("feature_briefing_body"),
+      tone: "from-emerald-500 to-teal-500",
+      featured: true,
     },
     {
       icon: BookOpenCheck,
@@ -309,12 +374,21 @@ function Features({ t }: { t: LandingT }) {
           </p>
         </div>
 
-        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map(({ icon: Icon, title, body, tone }) => (
+        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {items.map(({ icon: Icon, title, body, tone, featured }) => (
             <div
               key={title}
-              className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+              className={`group relative overflow-hidden rounded-2xl border bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
+                featured
+                  ? "border-emerald-300 ring-2 ring-emerald-100"
+                  : "border-slate-200"
+              }`}
             >
+              {featured && (
+                <span className="absolute right-4 top-4 inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+                  {t("feature_briefing_badge")}
+                </span>
+              )}
               <div
                 className={`mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${tone} text-white shadow-sm`}
               >
@@ -328,8 +402,130 @@ function Features({ t }: { t: LandingT }) {
             </div>
           ))}
         </div>
+
+        <BriefingShowcase t={t} />
       </div>
     </section>
+  );
+}
+
+/**
+ * Featured callout below the four feature cards — goes deeper on the
+ * weekly briefing as the actual deliverable. Lists what's inside one
+ * briefing, the schedule cadence, and links to the briefings hub.
+ *
+ * Keeps the homepage's "what you'll get" story concrete and removes the
+ * need for new visitors to click through to /insights to understand
+ * what we actually publish.
+ */
+function BriefingShowcase({ t }: { t: LandingT }) {
+  const ingredients = [
+    {
+      icon: BookOpen,
+      title: t("briefing_showcase_item_khutbah_title"),
+      body: t("briefing_showcase_item_khutbah_body"),
+    },
+    {
+      icon: Compass,
+      title: t("briefing_showcase_item_kajian_title"),
+      body: t("briefing_showcase_item_kajian_body"),
+    },
+    {
+      icon: Heart,
+      title: t("briefing_showcase_item_home_title"),
+      body: t("briefing_showcase_item_home_body"),
+    },
+    {
+      icon: Sparkles,
+      title: t("briefing_showcase_item_content_title"),
+      body: t("briefing_showcase_item_content_body"),
+    },
+    {
+      icon: ArrowUpRight,
+      title: t("briefing_showcase_item_genz_title"),
+      body: t("briefing_showcase_item_genz_body"),
+    },
+    {
+      icon: Building2,
+      title: t("briefing_showcase_item_action_title"),
+      body: t("briefing_showcase_item_action_body"),
+    },
+  ];
+
+  return (
+    <div className="mt-16 overflow-hidden rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50/70 via-white to-cyan-50/40 shadow-sm">
+      <div className="grid gap-0 lg:grid-cols-[1fr_1.4fr]">
+        {/* Left: pitch */}
+        <div className="border-b border-emerald-100 px-7 py-8 sm:px-9 lg:border-b-0 lg:border-r">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+            <Sparkles className="h-3 w-3" />
+            {t("briefing_showcase_eyebrow")}
+          </span>
+          <h3 className="mt-4 text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+            {t("briefing_showcase_title")}
+          </h3>
+          <p className="mt-3 text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
+            {t("briefing_showcase_body")}
+          </p>
+
+          <ul className="mt-5 space-y-2.5 text-sm text-slate-700">
+            <li className="flex items-start gap-2">
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+              <span>{t("briefing_showcase_bullet_cadence")}</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+              <span>{t("briefing_showcase_bullet_segments")}</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+              <span>{t("briefing_showcase_bullet_daleel")}</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+              <span>{t("briefing_showcase_bullet_free")}</span>
+            </li>
+          </ul>
+
+          <Link
+            href="/insights"
+            className="mt-7 inline-flex h-11 items-center gap-2 rounded-full bg-emerald-700 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800"
+          >
+            {t("briefing_showcase_cta")}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+
+        {/* Right: 6-item content-kit grid — shows what's inside ONE briefing */}
+        <div className="bg-white px-7 py-8 sm:px-9">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+            {t("briefing_showcase_kit_label")}
+          </p>
+          <h4 className="mt-1 text-balance text-base font-bold text-slate-900 sm:text-lg">
+            {t("briefing_showcase_kit_title")}
+          </h4>
+
+          <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+            {ingredients.map(({ icon: Icon, title, body }) => (
+              <li
+                key={title}
+                className="flex items-start gap-2.5 rounded-xl border border-slate-100 bg-slate-50/50 px-3 py-3"
+              >
+                <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+                  <Icon className="h-3.5 w-3.5" />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-[13px] font-bold text-slate-900">{title}</p>
+                  <p className="mt-0.5 text-[12px] leading-relaxed text-slate-600">
+                    {body}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -832,6 +1028,214 @@ function FinalCTA({ t, viewer }: { t: LandingT; viewer: Viewer }) {
             className="mt-8 inline-flex h-12 items-center gap-2 rounded-full bg-white px-6 text-sm font-semibold text-emerald-800 shadow-lg transition hover:bg-emerald-50"
           >
             {buttonLabel}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * "What do you get from signing in?" section — placed near the bottom
+ * of the landing page so first-time visitors who scrolled this far get
+ * a clear answer to "should I sign up?".
+ *
+ * Communicates three things:
+ *   1. The concrete benefits of a personalized account (vs. the public
+ *      briefings everyone gets at /insights).
+ *   2. The registration process (profiling → team review → approval).
+ *   3. The current pause on new approvals — with a direct nudge to
+ *      /insights as the right starting point right now.
+ *
+ * Hidden for already-approved users (the section is sales/onboarding
+ * copy, not relevant once they're in).
+ */
+function SignupJourney({ t }: { t: LandingT }) {
+  const benefits = [
+    {
+      icon: UserCircle2,
+      title: t("signup_benefit_personalized_title"),
+      body: t("signup_benefit_personalized_body"),
+    },
+    {
+      icon: BookOpenCheck,
+      title: t("signup_benefit_saved_title"),
+      body: t("signup_benefit_saved_body"),
+    },
+    {
+      icon: ShieldCheck,
+      title: t("signup_benefit_reviewed_title"),
+      body: t("signup_benefit_reviewed_body"),
+    },
+  ];
+
+  const steps = [
+    {
+      icon: UserCircle2,
+      title: t("signup_step_1_title"),
+      body: t("signup_step_1_body"),
+    },
+    {
+      icon: ListChecks,
+      title: t("signup_step_2_title"),
+      body: t("signup_step_2_body"),
+    },
+    {
+      icon: ShieldCheck,
+      title: t("signup_step_3_title"),
+      body: t("signup_step_3_body"),
+    },
+    {
+      icon: Sparkles,
+      title: t("signup_step_4_title"),
+      body: t("signup_step_4_body"),
+    },
+  ];
+
+  return (
+    <section
+      id="signup-journey"
+      className="border-t border-slate-100 bg-gradient-to-b from-white to-slate-50/60 py-20 sm:py-28"
+    >
+      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+        {/* Pause notice — placed FIRST so visitors aren't surprised
+             after reading through the benefits + process. */}
+        <div className="mb-12 rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-5 shadow-sm sm:p-6">
+          <div className="flex items-start gap-3">
+            <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+              <AlertCircle className="h-5 w-5" />
+            </span>
+            <div className="flex-1">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-700">
+                {t("signup_pause_eyebrow")}
+              </p>
+              <h3 className="mt-1 text-balance text-base font-bold text-amber-950 sm:text-lg">
+                {t("signup_pause_title")}
+              </h3>
+              <p className="mt-1 text-pretty text-sm leading-relaxed text-amber-900">
+                {t("signup_pause_body")}
+              </p>
+              <Link
+                href="/insights"
+                className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-amber-700 px-4 py-2 text-xs font-semibold text-white transition hover:bg-amber-800"
+              >
+                <Eye className="h-3.5 w-3.5" />
+                {t("signup_pause_cta")}
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Header */}
+        <div className="mx-auto max-w-2xl text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700">
+            <UserCircle2 className="h-3.5 w-3.5" />
+            {t("signup_section_eyebrow")}
+          </span>
+          <h2 className="mt-4 text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+            {t("signup_section_title")}
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
+            {t("signup_section_subtitle")}
+          </p>
+        </div>
+
+        {/* Benefits — 3 cards */}
+        <div className="mt-10 grid gap-4 sm:grid-cols-3">
+          {benefits.map(({ icon: Icon, title, body }) => (
+            <article
+              key={title}
+              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+            >
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                <Icon className="h-5 w-5" />
+              </span>
+              <h3 className="mt-3 text-base font-bold text-slate-900">
+                {title}
+              </h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-slate-600">
+                {body}
+              </p>
+            </article>
+          ))}
+        </div>
+
+        {/* Registration process — 4 steps in a single panel */}
+        <div className="mt-12">
+          <h3 className="text-center text-balance text-xl font-bold text-slate-900 sm:text-2xl">
+            {t("signup_process_title")}
+          </h3>
+          <p className="mx-auto mt-2 max-w-2xl text-center text-pretty text-sm leading-relaxed text-slate-600">
+            {t("signup_process_subtitle")}
+          </p>
+
+          <ol className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {steps.map(({ icon: Icon, title, body }, i) => (
+              <li
+                key={title}
+                className="relative rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+              >
+                <span className="absolute -top-3 left-5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-[11px] font-bold text-white">
+                  {i + 1}
+                </span>
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
+                  <Icon className="h-4 w-4" />
+                </span>
+                <p className="mt-3 text-sm font-bold text-slate-900">{title}</p>
+                <p className="mt-1.5 text-[13px] leading-relaxed text-slate-600">
+                  {body}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        {/* Cost transparency callout — placed AFTER the benefits + process
+             so the reader sees the "what you'd get" first, then the honest
+             trade-off about future cost. Sky/blue palette (informational,
+             not urgent) — distinct from the amber pause notice at the top. */}
+        <div className="mt-12 rounded-2xl border border-sky-200 bg-gradient-to-br from-sky-50/80 to-white p-5 shadow-sm sm:p-6">
+          <div className="flex items-start gap-3">
+            <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sky-100 text-sky-700">
+              <Coins className="h-5 w-5" />
+            </span>
+            <div className="flex-1">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-sky-700">
+                {t("signup_cost_eyebrow")}
+              </p>
+              <h3 className="mt-1 text-balance text-base font-bold text-sky-950 sm:text-lg">
+                {t("signup_cost_title")}
+              </h3>
+              <p className="mt-2 text-pretty text-sm leading-relaxed text-sky-900">
+                {t("signup_cost_body")}
+              </p>
+              <p className="mt-2 text-pretty text-sm leading-relaxed text-sky-900">
+                {t("signup_cost_apology")}
+              </p>
+              <Link
+                href="/contact"
+                className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-sky-300 bg-white px-4 py-2 text-xs font-semibold text-sky-800 transition hover:border-sky-500 hover:bg-sky-50"
+              >
+                <Mail className="h-3.5 w-3.5" />
+                {t("signup_cost_contact_cta")}
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Closing pointer back to Insights — reinforces the pause note */}
+        <div className="mt-12 text-center">
+          <p className="text-sm text-slate-600">
+            {t("signup_closing_pointer")}
+          </p>
+          <Link
+            href="/insights"
+            className="mt-3 inline-flex h-11 items-center gap-2 rounded-full bg-emerald-700 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800"
+          >
+            <Eye className="h-4 w-4" />
+            {t("signup_closing_cta")}
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>

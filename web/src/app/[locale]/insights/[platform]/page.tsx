@@ -14,6 +14,7 @@ import clsx from "clsx";
 
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
+import { BackToInsightsLink } from "@/components/BackToInsightsLink";
 import { I18nText } from "@/components/I18nText";
 import { TopicsByCluster } from "@/components/TopicsByCluster";
 import { PlatformStoriesFilter } from "./PlatformStoriesFilter";
@@ -111,6 +112,9 @@ export default async function PlatformDrilldownPage({
 
   return (
     <>
+      <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
+        <BackToInsightsLink />
+      </div>
       <Hero config={config} t={t} live={live} />
       {platform === "mainstream" && (
         <ScopePicker

@@ -19,6 +19,7 @@ import {
   boolean,
   jsonb,
   doublePrecision,
+  numeric,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
@@ -170,6 +171,15 @@ export const briefs = pgTable(
     isPlaceholder: boolean("is_placeholder").notNull().default(true),
     content: jsonb("content").notNull().$type<BriefContent>(),
     status: text("status").notNull().default("draft"),
+    /** Generation cost metrics. NULL for legacy rows (pre-2026-05-23) and
+     *  for any error path that fails before the LLM responds. */
+    tokensIn: integer("tokens_in"),
+    tokensOut: integer("tokens_out"),
+    /** Drizzle returns numeric as string to avoid IEEE-754 precision loss
+     *  — callers should `Number()`-cast for display arithmetic. */
+    costUsd: numeric("cost_usd", { precision: 10, scale: 6 }),
+    provider: text("provider"),
+    model: text("model"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .default(sql`now()`),
@@ -778,10 +788,11 @@ export const adminLogs = pgTable(
 );
 
 /**
- * Daily AI-narrated executive briefing for /insights. One row per
+ * Weekly AI-narrated executive briefing for /insights. One row per
  * generation. Celery beat `generate_insights_summary` task writes
- * this at 04:30 WIB after the topic-discovery pass. The /insights
- * page reads the most-recent row to render the hero card.
+ * this every Sunday at 05:00 WIB (one hour after the topic-discovery
+ * pass). The /insights page reads the most-recent row to render the
+ * hero card.
  */
 export const insightsSummaries = pgTable(
   "insights_summaries",
@@ -870,3 +881,37 @@ export const bookmarks = pgTable(
 // Deploy status persists as a single JSON-encoded value under the
 // `deploy_status` key in `app_settings` — no new table needed.
 // See /api/internal/deploy-event (write) and /api/deploy-status (read).
+
+/**
+ * DB-backed registry for the modular flyer system.
+ *
+ * Was a hand-edited TS file (web/src/lib/flyer/images/registry.ts);
+ * promoted to a DB table 2026-05-23 so admins can upload new photos /
+ * SVGs via /admin/system/flyer-assets without a code redeploy.
+ *
+ * Files referenced by `src` live under web/public/flyer-assets/. The
+ * seed migration writes the 13 originally-committed assets; new rows
+ * come from admin uploads landing in public/flyer-assets/uploads/*.
+ */
+export const flyerAssets = pgTable(
+  "flyer_assets",
+  {
+    /** Stable identifier — used as the compose() seed. Lowercase
+     *  kebab-case by convention. */
+    id: text("id").primaryKey(),
+    /** "photo" | "ornament" | "pattern" — enforced by a CHECK. */
+    kind: text("kind").notNull(),
+    /** Path relative to the web root, e.g. "/flyer-assets/photos/x.jpg". */
+    src: text("src").notNull(),
+    /** "1:1" | "wide" | "tall" — enforced by a CHECK. */
+    aspect: text("aspect").notNull(),
+    /** Free-form mood tags used by compose() to filter candidates. */
+    tags: text("tags").array().notNull().default(sql`'{}'::text[]`),
+    /** NULL for seeded entries, admin user id for runtime uploads. */
+    uploadedById: uuid("uploaded_by_id"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => [index("ix_flyer_assets_kind").on(table.kind)],
+);

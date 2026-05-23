@@ -4,10 +4,14 @@ import { ArrowLeft, Clock, Sparkles } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import { BriefingNarrative } from "@/components/BriefingNarrative";
-import { getBriefingBySlug } from "@/lib/insights-data";
+import {
+  getBriefingBySlug,
+  getBriefingNavigation,
+} from "@/lib/insights-data";
 import { BriefShareMenu } from "./BriefShareMenu";
 import { BriefDownloadMenu } from "./BriefDownloadMenu";
 import { BriefTOC } from "./BriefTOC";
+import { BriefPagination } from "./BriefPagination";
 
 /**
  * Server-component render of a single briefing.
@@ -43,8 +47,21 @@ export async function BriefDetailContent({
   const brief = await getBriefingBySlug(id);
   if (!brief) notFound();
 
+  const navigation = await getBriefingNavigation(
+    brief.segment,
+    brief.generatedAt,
+  );
+
+  // EN generation paused 2026-05-23 for cost reasons (all current users
+  // prefer Indonesian). Briefs after that date have `summaryMdEn = NULL`
+  // — we fall back to the Indonesian body and show a soft banner above
+  // the article explaining the situation + the "contact us" path for
+  // users who actually need English.
+  const wantsEnglish = locale === "en";
+  const hasEnglish = !!brief.summaryMdEn;
+  const showLangFallbackNote = wantsEnglish && !hasEnglish;
   const body =
-    locale === "en" && brief.summaryMdEn ? brief.summaryMdEn : brief.summaryMd;
+    wantsEnglish && hasEnglish ? brief.summaryMdEn! : brief.summaryMd;
 
   const wordCount = body.trim().split(/\s+/).length;
   // ~200 wpm (Indonesian average); cap to whole minutes, min 1.
@@ -133,6 +150,7 @@ export async function BriefDetailContent({
                 text: t("brief_download_text"),
                 print: t("brief_download_print"),
                 print_hint: t("brief_download_print_hint"),
+                flyer: t("brief_flyer_download"),
               }}
             />
           </div>
@@ -145,11 +163,25 @@ export async function BriefDetailContent({
           </aside>
 
           <article className="brief-print min-w-0">
+            {showLangFallbackNote && (
+              <div
+                role="note"
+                className="mb-5 rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-white px-5 py-4 text-sm leading-relaxed text-amber-900 shadow-sm print:hidden"
+              >
+                <p className="font-semibold">
+                  {t("brief_lang_fallback_title")}
+                </p>
+                <p className="mt-1 text-amber-800">
+                  {t("brief_lang_fallback_body")}
+                </p>
+              </div>
+            )}
             <BriefingNarrative
               text={body}
               daleelRefs={brief.daleelRefs}
               citedDaleelLabel={t("exec_daleel_label")}
               briefBasePath={briefBasePath}
+              briefId={id}
               locale={locale}
               initialDeliverable={initialDeliverable}
               deliverableLabels={{
@@ -158,8 +190,15 @@ export async function BriefDetailContent({
                 copied: t("brief_deliverable_copied"),
                 download: t("brief_deliverable_download"),
                 print: t("brief_deliverable_print"),
+                flyer: t("brief_deliverable_flyer"),
                 close: t("brief_deliverable_close"),
               }}
+            />
+
+            <BriefPagination
+              locale={locale}
+              navigation={navigation}
+              currentSegment={brief.segment}
             />
           </article>
         </div>

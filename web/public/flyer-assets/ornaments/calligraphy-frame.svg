@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" width="600" height="200">
+  <!-- Decorative rectangular frame with corner flourishes -->
+  <rect x="50" y="30" width="500" height="140" fill="none" stroke="currentColor" stroke-width="2" />
+  <rect x="60" y="40" width="480" height="120" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5" />
+  <!-- Top-left corner -->
+  <path d="M 50 80 Q 30 80 30 50 Q 30 30 50 30" fill="none" stroke="currentColor" stroke-width="2.5" />
+  <circle cx="40" cy="40" r="3" fill="currentColor" />
+  <!-- Top-right -->
+  <path d="M 550 80 Q 570 80 570 50 Q 570 30 550 30" fill="none" stroke="currentColor" stroke-width="2.5" />
+  <circle cx="560" cy="40" r="3" fill="currentColor" />
+  <!-- Bottom-left -->
+  <path d="M 50 120 Q 30 120 30 150 Q 30 170 50 170" fill="none" stroke="currentColor" stroke-width="2.5" />
+  <circle cx="40" cy="160" r="3" fill="currentColor" />
+  <!-- Bottom-right -->
+  <path d="M 550 120 Q 570 120 570 150 Q 570 170 550 170" fill="none" stroke="currentColor" stroke-width="2.5" />
+  <circle cx="560" cy="160" r="3" fill="currentColor" />
+  <!-- Center top/bottom diamond accents -->
+  <polygon points="300,18 308,30 300,42 292,30" fill="currentColor" />
+  <polygon points="300,158 308,170 300,182 292,170" fill="currentColor" />
+</svg>

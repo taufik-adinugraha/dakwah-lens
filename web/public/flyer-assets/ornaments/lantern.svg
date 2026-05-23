@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280" width="200" height="280">
+  <!-- Stylized hanging lantern -->
+  <line x1="100" y1="0" x2="100" y2="40" stroke="currentColor" stroke-width="2" />
+  <circle cx="100" cy="50" r="6" fill="currentColor" />
+  <path d="M 60 80 L 140 80 L 155 110 L 155 200 L 140 230 L 60 230 L 45 200 L 45 110 Z" fill="none" stroke="currentColor" stroke-width="3" />
+  <path d="M 75 110 L 125 110 M 75 130 L 125 130 M 75 150 L 125 150 M 75 170 L 125 170 M 75 190 L 125 190" stroke="currentColor" stroke-width="1.5" opacity="0.6" />
+  <ellipse cx="100" cy="245" rx="35" ry="8" fill="currentColor" />
+  <line x1="100" y1="253" x2="100" y2="275" stroke="currentColor" stroke-width="2" />
+  <circle cx="100" cy="278" r="3" fill="currentColor" />
+</svg>
