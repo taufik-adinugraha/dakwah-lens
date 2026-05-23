@@ -91,7 +91,16 @@ const STAGE_CUE_RE = /\(visual:|\(scene:|\(transisi|\(b-roll|\(teks (?:di|akhir|
 function trimToSentences(raw: string, targetSentences = 3, maxChars = 320): string {
   const clean = stripMd(raw);
   if (isArabicHeavy(clean)) return "";
-  const sentences = clean.match(/[^.!?]+[.!?]+/g) ?? [clean];
+  // Indonesian uses `.` as thousand separator AND `,` as decimal sep
+  // ("Rp 1.000", "Rp 50.000", "12,5%"). The naive `[.!?]+` sentence
+  // regex was splitting "Rp 1.000" into "Rp 1." + "000" and the flyer
+  // ended up showing "menabung Rp 1." — meaningless. Protect numeric
+  // periods with a private-use placeholder, split, then restore.
+  const SEP = "\uE000";
+  const protectedText = clean.replace(/(\d)\.(?=\d)/g, `$1${SEP}`);
+  const sentences = (protectedText.match(/[^.!?]+[.!?]+/g) ?? [protectedText]).map(
+    (s) => s.replace(new RegExp(SEP, "g"), "."),
+  );
   let out = "";
   let acceptedCount = 0;
   for (let i = 0; i < sentences.length && acceptedCount < targetSentences + 2; i++) {
@@ -155,12 +164,19 @@ export function extractKhutbahTagline(markdown: string): string {
     if (tidied) return tidied;
   }
 
-  // Fallback: first bold phrase that isn't a kitab citation.
+  // Fallback: first bold phrase that isn't a kitab citation or a
+  // structural khutbah section label. Without the structural-label
+  // filter, the regex was picking up `**KHUTBAH PERTAMA**` (the
+  // opening section marker in Claude-written briefings) as the
+  // flyer title — meaningless on a standalone flyer.
   const allBold = [...body.matchAll(/\*\*([^*\n]{8,70})\*\*/g)];
   const citationRe = /^(QS\.|Sahih |Riyad |Bulugh |HR\.|HQ\.|Surat\s|Hadits)/i;
+  const structuralRe = /^(?:khutbah\s+(?:pertama|kedua|jumat|pembuka|penutup)|mukadimah|pembuka(?:an)?|penutup|inti(?:\s+khutbah)?|isi(?:\s+khutbah)?|doa(?:\s+penutup)?|do['ʼ']?a|hook|body|cta|teks(?:\s+layar)?|talking\s+point\s*\d*|setting|format|trigger|pertanyaan\s+lanjutan\s*\d*|framing\s+question|pop-?culture\s+bridge|sinergi(?:\s+&?\s*koordinasi)?|label\s+aksi|cara\s+kerja|budget|dampak\s+terukur|first\s+sermon|second\s+sermon|opening|closing)$/i;
   for (const b of allBold) {
     const phrase = b[1].trim();
-    if (!citationRe.test(phrase)) return tidyHeadline(phrase, 6);
+    if (citationRe.test(phrase)) continue;
+    if (structuralRe.test(phrase)) continue;
+    return tidyHeadline(phrase, 6);
   }
   return "";
 }
