@@ -289,14 +289,11 @@ function AnonymousCtas({ t }: { t: LandingT }) {
       </p>
 
       {/* Secondary actions */}
+      {/* Sign-up CTA hidden 2026-05-23 — beta quota is limited; we review
+          each request manually before approving access, so the front-door
+          flow is "read public insights, contact us if you need access"
+          rather than an open self-serve sign-up button. */}
       <div className="mt-3 flex flex-col items-stretch justify-center gap-2 sm:flex-row sm:items-center sm:gap-3">
-        <Link
-          href={{ pathname: "/login", query: { mode: "signup" } }}
-          className="group inline-flex h-10 items-center justify-center gap-2 rounded-full bg-slate-900 px-5 text-sm font-semibold text-white shadow-md shadow-slate-900/15 transition hover:bg-slate-800"
-        >
-          {t("cta_primary")}
-          <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
-        </Link>
         <Link
           href="#how-it-works"
           className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
@@ -690,6 +687,27 @@ function HowItWorks({
           <h2 className="text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
             {t("how_title")}
           </h2>
+        </div>
+
+        {/* Pipeline status banner — honest disclosure that only the RSS
+            leg is live right now. Social pipelines (X/IG/TikTok/YT) are
+            implemented but paused while we verify quality + cost; the
+            three-steps narrative above shouldn't oversell. */}
+        <div className="mx-auto mt-6 max-w-2xl">
+          <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50/70 px-4 py-3 text-left text-sm leading-relaxed text-amber-900 shadow-sm">
+            <span
+              aria-hidden
+              className="mt-0.5 inline-flex h-2 w-2 shrink-0 rounded-full bg-amber-500 ring-4 ring-amber-200/60"
+            />
+            <div>
+              <p className="font-semibold text-amber-900">
+                {t("how_pipeline_status_title")}
+              </p>
+              <p className="mt-0.5 text-amber-800">
+                {t("how_pipeline_status_body")}
+              </p>
+            </div>
+          </div>
         </div>
 
         <ol className="mt-14 grid gap-6 sm:grid-cols-3">

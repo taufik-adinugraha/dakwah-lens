@@ -92,10 +92,15 @@ export function BriefTOC({
 
 function parseH2Headings(body: string): Array<{ id: string; text: string }> {
   const out: Array<{ id: string; text: string }> = [];
+  // `## Pesan Flyer` / `## Flyer Messages` is renderer input (stripped
+  // from the rendered body by BriefingNarrative). Skip it in the TOC
+  // too — otherwise the link scrolls to a heading that doesn't exist.
+  const HIDDEN = /^(?:pesan\s+flyer|flyer\s+messages)\b/i;
   for (const line of body.split("\n")) {
     const m = line.match(/^##\s+(.+?)\s*$/);
     if (m) {
       const text = m[1].trim();
+      if (HIDDEN.test(text)) continue;
       out.push({ id: slugify(text), text });
     }
   }

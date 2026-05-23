@@ -21,6 +21,24 @@ import { DaleelChips } from "./DaleelChips";
 const SECTION_4_HEADINGS_ID = ["strategi & aksi dakwah", "strategi dan aksi dakwah"];
 const SECTION_4_HEADINGS_EN = ["da'wah strategies & actions", "dawah strategies & actions"];
 
+/** The `## Pesan Flyer` / `## Flyer Messages` section is INPUT for the
+ *  PNG flyer renderer (see `extractDedicatedFlyerMessage` in
+ *  `flyer/content.ts`) — it should not also be rendered as plain
+ *  markdown text in the briefing body, otherwise the same 4 messages
+ *  show twice (once as PNGs via `BriefFlyerSection`, once as text
+ *  below). Strip it before any rendering. Case-insensitive H2 match;
+ *  the section runs to EOF (the prompt puts it last). */
+function stripFlyerMessagesSection(md: string): string {
+  const lines = md.split("\n");
+  const heading = /^##\s+(?:pesan\s+flyer|flyer\s+messages)\b/i;
+  for (let i = 0; i < lines.length; i++) {
+    if (heading.test(lines[i])) {
+      return lines.slice(0, i).join("\n").replace(/\s+$/, "") + "\n";
+    }
+  }
+  return md;
+}
+
 /**
  * Renders the AI-narrated weekly briefing.
  *
@@ -96,12 +114,15 @@ export function BriefingNarrative({
    *  long-form output uses native H2 headings now. */
   nasihahLabel?: string;
 }) {
+  // `## Pesan Flyer` is renderer input, not display content — see helper.
+  const bodyForDisplay = stripFlyerMessagesSection(text);
+
   // Try to split out Section 4 only when caller provides cards UI hooks.
   // Otherwise render the whole markdown inline (existing behavior for
   // preview surfaces and back-compat).
   const split =
     briefBasePath && deliverableLabels
-      ? splitSection4(text, locale === "en")
+      ? splitSection4(bodyForDisplay, locale === "en")
       : null;
 
   return (
@@ -132,7 +153,7 @@ export function BriefingNarrative({
           </>
         ) : (
           <ReactMarkdown components={makeMarkdownComponents()}>
-            {text}
+            {bodyForDisplay}
           </ReactMarkdown>
         )}
       </article>

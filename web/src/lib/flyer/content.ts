@@ -76,8 +76,9 @@ function tidyHeadline(raw: string, maxWords = 6): string {
 /** Drop sentences that only make sense in their original deliverable
  *  context (a Friday khutbah, a Sunday discussion, a Kreator script).
  *  The flyer is read standalone — references to "this khutbah", "this
- *  discussion", "thanks guys", etc. read as nonsense in that context. */
-const FORMAT_REFERENCE_RE = /\b(?:mari kita tutup|kita tutup|khutbah ini|kajian ini|diskusi (?:ini|malam ini)|thanks guys|guys,|sidang jum'?at|ma['ʼ]?asyiral|jamaah|jama['ʼ]?ah|hadirin|rahimakumullah|mukmin sekalian|bapak[- ]?ibu|ibu[- ]?ibu yang|kakak[- ]?kakak yang|adik[- ]?adik yang|sekian|wallahu a['ʼ]?lam|video ini|reel ini|caption ini|outline ini|materi ini|sesi ini|pertemuan ini|pekan depan kita|sesi (?:tadi|hari ini)|saat khutbah|saat kajian)\b/i;
+ *  discussion", "thanks guys", "the X topics above", etc. read as
+ *  nonsense in that context. */
+const FORMAT_REFERENCE_RE = /\b(?:mari kita tutup|kita tutup|khutbah ini|kajian ini|diskusi (?:ini|malam ini)|thanks guys|guys,|sidang jum'?at|ma['ʼ]?asyiral|jamaah|jama['ʼ]?ah|hadirin|rahimakumullah|mukmin sekalian|bapak[- ]?ibu|ibu[- ]?ibu yang|kakak[- ]?kakak yang|adik[- ]?adik yang|sekian|wallahu a['ʼ]?lam|video ini|reel ini|caption ini|outline ini|materi ini|sesi ini|pertemuan ini|pekan depan kita|sesi (?:tadi|hari ini)|saat khutbah|saat kajian|topik(?:-topik)? di atas|topik(?:-topik)? tersebut|(?:dua|tiga|empat|lima|enam|tujuh|delapan|sembilan|sepuluh) topik|kategori di atas|ringkasan di atas|bagian di atas|tabel di atas|section\s+(?:above|di atas)|paragraf di atas|the (?:eight|seven|six|five|four|three|two|nine|ten) topics|topics? above|sections? above|the table above|as (?:noted|shown) above)\b/i;
 
 /** Drop visual-direction / stage cues that creep in from the Kreator
  *  script when its prose is lifted into the flyer message. */
