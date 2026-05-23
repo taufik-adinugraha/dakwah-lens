@@ -21,6 +21,14 @@ export async function Header() {
     locale,
   );
 
+  // Briefs library is gated to admin only while the feature is
+  // experimental (per the briefs admin-gate in commit 39ef38a). The
+  // Header was still rendering the "Pustaka Kajian" link to anonymous
+  // visitors, which leaked an admin-only destination into the public
+  // nav. Hide unless the viewer is admin / superadmin.
+  const isAdmin =
+    user?.role === "admin" || user?.role === "superadmin";
+
   // Mobile-menu items mirror the desktop nav. Plain `<a>` everywhere
   // (sectionLink already returns locale-prefixed absolute URLs; we
   // build the same shape for the routed pages) so the browser does
@@ -41,7 +49,9 @@ export async function Header() {
     { href: sectionLink("#features"), label: t("features") },
     { href: sectionLink("#how-it-works"), label: t("how_it_works") },
     { href: `/${locale}/kitab`, label: t("kitab") },
-    { href: `/${locale}/briefs/public`, label: t("briefs_library") },
+    ...(isAdmin
+      ? [{ href: `/${locale}/briefs/public`, label: t("briefs_library") }]
+      : []),
     {
       href: sectionLink("#donate"),
       label: t("donate"),
@@ -103,12 +113,14 @@ export async function Header() {
             <Link href="/kitab" className="hover:text-slate-900 transition">
               {t("kitab")}
             </Link>
-            <Link
-              href="/briefs/public"
-              className="hover:text-slate-900 transition"
-            >
-              {t("briefs_library")}
-            </Link>
+            {isAdmin && (
+              <Link
+                href="/briefs/public"
+                className="hover:text-slate-900 transition"
+              >
+                {t("briefs_library")}
+              </Link>
+            )}
             <a
               href={sectionLink("#donate")}
               className="text-emerald-700 hover:text-emerald-900 transition"
