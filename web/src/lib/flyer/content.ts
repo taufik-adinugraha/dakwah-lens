@@ -701,6 +701,35 @@ export function pickFlyerDaleel(
 }
 
 // ──────────────────────────────────────────────────────────────────
+// Mahasiswa Poster — the 1080×1080 PNG for the university bulletin
+// board. The H3 "### Mahasiswa: Poster, Artikel & Diskusi" sub-section
+// of Section 4 carries a `**Poster Question:**` marker line that holds
+// the one-sentence provocative question. This helper pulls it.
+// ──────────────────────────────────────────────────────────────────
+
+/** Extract the bulletin-board poster question from the Mahasiswa
+ *  sub-section. Returns "" if the section or marker is missing — the
+ *  caller (poster renderer) treats that as "skip the poster". */
+export function extractPosterQuestion(markdown: string): string {
+  const body = sliceSubSection(
+    markdown,
+    /^###\s+.*(?:mahasiswa|university\s+student|gen[\s-]?z|pendekatan\s+gen|reaching gen)/i,
+  ).join("\n");
+  if (!body) return "";
+  const m = body.match(
+    /^\s*\*\*\s*(?:poster\s+question|pertanyaan\s+poster|pertanyaan\s+pemicu)\s*[:：]\s*\*\*\s*["“]?(.+?)["”]?\s*$/im,
+  );
+  if (m && m[1]) {
+    return m[1]
+      .trim()
+      .replace(/^["“]\s*|\s*["”]$/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+  return "";
+}
+
+// ──────────────────────────────────────────────────────────────────
 // Per-deliverable extractors (used by /flyer/{deliverable})
 // ──────────────────────────────────────────────────────────────────
 
@@ -709,7 +738,13 @@ const DELIVERABLE_MATCHERS: Record<DeliverableSlug, RegExp> = {
   kajian: /^###\s+.*kajian|^###\s+.*majelis/i,
   home: /^###\s+.*rumah|^###\s+.*teaching at\s+home/i,
   content: /^###\s+.*konten|^###\s+.*kreator|^###\s+.*digital content/i,
-  genz: /^###\s+.*gen[\s-]?z|^###\s+.*pendekatan\s+gen|^###\s+.*reaching gen/i,
+  // `genz` is the internal slug — kept stable so existing URLs / DB
+  // routes don't break — but the heading matcher also catches the new
+  // "Mahasiswa: Poster, Artikel & Diskusi" format that replaced the
+  // Pendekatan Gen Z deliverable on 2026-05-23. The card title in the
+  // UI is whatever the briefing's H3 says; this matcher just decides
+  // which deliverable slot it belongs to.
+  genz: /^###\s+.*mahasiswa|^###\s+.*gen[\s-]?z|^###\s+.*pendekatan\s+gen|^###\s+.*reaching gen|^###\s+.*university\s+student/i,
   action: /^###\s+.*aksi|^###\s+.*khidmah|^###\s+.*social action|^###\s+.*service to/i,
 };
 

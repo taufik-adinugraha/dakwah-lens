@@ -193,6 +193,16 @@ export async function BriefDetailContent({
                 flyer: t("brief_deliverable_flyer"),
                 close: t("brief_deliverable_close"),
               }}
+              posterLabels={{
+                eyebrow: t("brief_poster_section_eyebrow"),
+                title: t("brief_poster_section_title"),
+                body: t("brief_poster_section_body"),
+                openLarge: t("brief_poster_open_large"),
+                download: t("brief_poster_download"),
+                print: t("brief_poster_print"),
+                loading: t("brief_poster_loading"),
+                close: t("brief_poster_close"),
+              }}
             />
 
             <BriefPagination

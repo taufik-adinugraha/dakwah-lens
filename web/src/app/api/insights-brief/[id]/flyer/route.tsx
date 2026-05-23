@@ -17,12 +17,13 @@ import { renderFlyerPng } from "@/lib/flyer/render-flyer";
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
-type Variant = "general-a" | "general-b" | "genz-a" | "genz-b";
+type Variant = "general-a" | "general-b" | "genz-a" | "genz-b" | "poster";
 const VARIANTS: ReadonlySet<Variant> = new Set([
   "general-a",
   "general-b",
   "genz-a",
   "genz-b",
+  "poster",
 ]);
 
 function parseVariant(input: string | null): Variant {
@@ -49,17 +50,23 @@ export async function GET(
   const body =
     lang === "en" && brief.summaryMdEn ? brief.summaryMdEn : brief.summaryMd;
 
-  const slot = variant.startsWith("general")
-    ? {
-        kind: "general" as const,
-        variant: variant.endsWith("a") ? ("a" as const) : ("b" as const),
-        segment: brief.segment,
-      }
-    : {
-        kind: "genz" as const,
-        variant: variant.endsWith("a") ? ("a" as const) : ("b" as const),
-        segment: brief.segment,
-      };
+  const slot =
+    variant === "poster"
+      ? {
+          kind: "poster" as const,
+          segment: brief.segment,
+        }
+      : variant.startsWith("general")
+        ? {
+            kind: "general" as const,
+            variant: variant.endsWith("a") ? ("a" as const) : ("b" as const),
+            segment: brief.segment,
+          }
+        : {
+            kind: "genz" as const,
+            variant: variant.endsWith("a") ? ("a" as const) : ("b" as const),
+            segment: brief.segment,
+          };
 
   const png = await renderFlyerPng({
     generatedAt: brief.generatedAt,

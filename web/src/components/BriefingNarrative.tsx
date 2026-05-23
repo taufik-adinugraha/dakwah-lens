@@ -12,6 +12,7 @@ import type { DaleelRef } from "@/db/schema";
 import { BriefDeliverableCards } from "./BriefDeliverableCards";
 import { BriefFlyerSection } from "./BriefFlyerSection";
 import { DaleelChips } from "./DaleelChips";
+import { MahasiswaPosterCard } from "./MahasiswaPosterCard";
 
 /** Section 4 heading variants per language. Used to split the markdown
  *  body around the deliverable section so it renders as cards-and-modal
@@ -71,6 +72,7 @@ export function BriefingNarrative({
   deliverableLabels,
   initialDeliverable,
   locale,
+  posterLabels,
 }: {
   text: string;
   daleelRefs: DaleelRef[] | null;
@@ -109,10 +111,23 @@ export function BriefingNarrative({
     | null;
   /** Brief language; controls which Section 4 heading we look for. */
   locale?: string;
+  /** Localized strings for the Mahasiswa bulletin-board poster card.
+   *  Rendered between Section 4 cards and the share-flyer grid. */
+  posterLabels?: {
+    eyebrow: string;
+    title: string;
+    body: string;
+    openLarge: string;
+    download: string;
+    print: string;
+    loading: string;
+    close: string;
+  };
   /** @deprecated — was the inline "Nasihah" badge label for the old short
    *  format. Kept in the prop signature so existing callers don't break;
    *  long-form output uses native H2 headings now. */
   nasihahLabel?: string;
+  // posterLabels is documented above; the trailing rest-of-shape closes here.
 }) {
   // `## Pesan Flyer` is renderer input, not display content — see helper.
   const bodyForDisplay = stripFlyerMessagesSection(text);
@@ -144,6 +159,13 @@ export function BriefingNarrative({
                   briefBasePath={briefBasePath!}
                   initialDeliverable={initialDeliverable ?? null}
                 />
+                {briefId && posterLabels && (
+                  <MahasiswaPosterCard
+                    briefId={briefId}
+                    locale={locale ?? "id"}
+                    labels={posterLabels}
+                  />
+                )}
                 {briefId && <BriefFlyerSection briefId={briefId} />}
               </>
             )}

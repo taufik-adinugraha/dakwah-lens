@@ -14,6 +14,7 @@ import {
   extractKhutbahTagline,
   extractKreatorHook,
   extractKreatorMessage,
+  extractPosterQuestion,
   findDaleelByCitation,
   formatFlyerDate,
   pickFlyerDaleel,
@@ -64,6 +65,7 @@ export type GenZVariant = "a" | "b";
 export type FlyerSlot =
   | { kind: "general"; variant: GeneralVariant; segment: string | null }
   | { kind: "genz"; variant: GenZVariant; segment: string | null }
+  | { kind: "poster"; segment: string | null }
   | {
       kind: "deliverable";
       deliverable: DeliverableSlug;
@@ -235,12 +237,53 @@ const GENZ_B_PALETTES: PalettePreset[] = [
   },
 ];
 
+/** Mahasiswa poster palette — academic-feeling navy/indigo so it reads
+ *  as "campus material" rather than IG share. Rotates 4 sub-tones per
+ *  edition. */
+const POSTER_PALETTES: PalettePreset[] = [
+  {
+    name: "campus-navy",
+    bgGradient: ["#e0e7ff", "#c7d2fe", "#312e81"],
+    accent: "#312e81",
+    accentDeep: "#1e1b4b",
+    accentSoft: "#a5b4fc",
+    chipText: "#e0e7ff",
+  },
+  {
+    name: "campus-forest",
+    bgGradient: ["#ecfdf5", "#a7f3d0", "#064e3b"],
+    accent: "#065f46",
+    accentDeep: "#022c22",
+    accentSoft: "#6ee7b7",
+    chipText: "#ecfdf5",
+  },
+  {
+    name: "campus-rust",
+    bgGradient: ["#fff7ed", "#fed7aa", "#7c2d12"],
+    accent: "#9a3412",
+    accentDeep: "#431407",
+    accentSoft: "#fdba74",
+    chipText: "#fff7ed",
+  },
+  {
+    name: "campus-slate",
+    bgGradient: ["#f1f5f9", "#cbd5e1", "#0f172a"],
+    accent: "#1e293b",
+    accentDeep: "#020617",
+    accentSoft: "#94a3b8",
+    chipText: "#f8fafc",
+  },
+];
+
 function palettesFor(slot: FlyerSlot): PalettePreset[] {
   if (slot.kind === "general") {
     return slot.variant === "a" ? GENERAL_A_PALETTES : GENERAL_B_PALETTES;
   }
   if (slot.kind === "genz") {
     return slot.variant === "a" ? GENZ_A_PALETTES : GENZ_B_PALETTES;
+  }
+  if (slot.kind === "poster") {
+    return POSTER_PALETTES;
   }
   // Per-deliverable: keep the original tone (matches the on-screen card).
   return [];
@@ -267,6 +310,9 @@ function layoutForSlot(slot: FlyerSlot): LayoutId {
   }
   if (slot.kind === "genz") {
     return slot.variant === "a" ? "hero-headline" : "quote-card";
+  }
+  if (slot.kind === "poster") {
+    return "poster-question";
   }
   return "hero-ayat";
 }
@@ -422,6 +468,23 @@ function buildContent(ctx: FlyerContext): FlyerContent {
     };
   }
 
+  if (ctx.slot.kind === "poster") {
+    // The Mahasiswa bulletin-board poster: question-only. No message
+    // body, no daleel (those sit in the article + Q&A on the briefing
+    // page itself). Question is pulled from the `**Poster Question:**`
+    // marker line inside the Mahasiswa H3 sub-section.
+    const question = extractPosterQuestion(ctx.body);
+    return {
+      brand,
+      dateLabel,
+      headline:
+        question ||
+        "Pertanyaan Mahasiswa untuk Pekan Ini",
+      message: "",
+      daleel: null,
+    };
+  }
+
   // deliverable
   return {
     brand,
@@ -476,7 +539,9 @@ export async function composeFlyer(ctx: FlyerContext): Promise<{
   const slotKey =
     ctx.slot.kind === "general" || ctx.slot.kind === "genz"
       ? ctx.slot.variant
-      : ctx.slot.deliverable;
+      : ctx.slot.kind === "deliverable"
+        ? ctx.slot.deliverable
+        : "poster";
 
   const seed = seedFrom([
     ctx.generatedAt.toISOString().slice(0, 10),

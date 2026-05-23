@@ -173,26 +173,25 @@ Tulis SCRIPT VIDEO siap-pakai 60-90 detik untuk TikTok / IG Reels / YouTube Shor
 - CTA (5-10 detik / ~15 kata): ajakan konkret yang bisa langsung dilakukan penonton.
 Hindari frasa khas khutbah ("hadirin yang dirahmati Allah", "marilah kita renungkan").
 
-### Pendekatan Gen Z (800-1100 kata)
-Tulis OUTLINE OPEN-MIC KAJIAN / DISKUSI GEN Z siap-pakai (1.5 jam, format diskusi terbuka, BUKAN ceramah). Gen Z menolak nasihat top-down — semua materi di sini harus dirancang sebagai DISKUSI yang difasilitasi, bukan disampaikan. Struktur:
+### Mahasiswa: Poster, Artikel & Diskusi (900-1200 kata)
+Tulis PAKET KAMPUS siap-tempel di papan pengumuman jurusan / mushala kampus / fakultas. Audience: mahasiswa S1/S2 yang cerdas, sinis terhadap ceramah, suka diskusi + logika, kurang antusias kalau daleel dibawa sebagai argumen utama. Tujuan paket: bangkitkan rasa ingin tahu lewat satu pertanyaan provokatif, lalu beri pintu masuk pemikiran yang utuh untuk dibahas sendiri / diskusi peer.
 
-- **Setting & format** (~60 kata): venue (kafe / co-working / ruang komunitas), maks 20-25 peserta, formasi lingkaran (bukan teater), moderator (BUKAN penceramah) menyiapkan air & snack ringan.
+Output WAJIB 3 elemen — POSTER QUESTION, ARTIKEL, dan Q&A — dirancang berpasangan: poster menarik perhatian dari jauh, artikel dibaca lebih dekat ketika tertarik.
 
-- **Framing question pembuka** (~50 kata): satu pertanyaan provokatif yang menghubungkan isu pekan ini dengan pertanyaan eksistensial Gen Z (identitas, mental-health, masa depan, ketidakadilan, kesepian, makna kerja).
+- **Poster Question** (1 kalimat, 10-18 kata): satu pertanyaan provokatif yang langsung menghubungkan isu pekan ini ke pertanyaan eksistensial / etis yang dialami mahasiswa hari ini. JANGAN gunakan bahasa khotbah ("renungkan", "marilah", "wahai") — pakai bahasa percakapan akademik yang langsung menohok. Contoh GOOD: "Kalau adil itu sudah jelas wajib, kenapa pasar tetap curang?" / "Kalau Tuhan adil, kenapa orang baik juga menderita?" / "Bisakah kita lurus di kantor yang miring?". Format output: `**Poster Question:** "kalimat pertanyaan disini"` pada satu baris.
 
-- **Pop-culture bridge** (~180 kata): satu pintu masuk lewat budaya pop yang sedang relevan dengan Gen Z. Pilih SATU jalur (sebut judul/figur/lirik SPESIFIK yang sedang trending, jangan generik):
-  * Lirik K-pop / J-pop dengan layer eksistensial — mis. BTS "Magic Shop" tentang trauma & penyembuhan → tazkiyatun nafs; NewJeans "Bubble Gum" tentang nostalgia identitas → fitrah; Lisa solo tentang kesendirian fame → ujian ketenaran
-  * Plot atau character arc anime / manga — mis. Frieren tentang waktu & kefanaan → ziara'tul qubur; Vinland Saga tentang taubat seorang viking → konsep hijrah; Solo Leveling tentang ujian level → sabar dalam musibah
-  * Lagu Indonesian indie tentang krisis identitas/spiritual — Hindia "Apatis", Pamungkas "Masing-Masing", Tulus "Hati-Hati di Jalan", .Feast "Camkan", Bernadya, Hanggini — kutip bait spesifik sebagai pemicu
-  * Tren TikTok / sound viral pekan ini dengan lapisan filosofis — mis. tren "main character energy" → ujub; tren "delulu" → ghuruur; tren "sigma male" → ananiyyah (egoism)
-  * Hijrah-figure kreator / atlet / influencer yang OTENTIK (bukan yang sudah jadi clichéd brand) sebagai case study
-  * Esports / gaming community ethics — toxic chat di Mobile Legends/Valorant → akhlaq ruang digital; rasa "FOMO ranked push" → qana'ah
+- **Artikel** (650-850 kata, mengalir, judul SUB-section sendiri): tulis seperti artikel opini akademik singkat untuk mahasiswa. Struktur:
+  * **Pembuka** (~150 kata): mulai dari pengalaman empiris / berita pekan ini yang relevan. JANGAN buka dengan ayat / hadits. Buat pembaca mengangguk pada masalah dulu.
+  * **Argumen logis** (~350 kata): bangun rangkaian penalaran step-by-step. Mengapa fenomena ini terjadi? Apa yang ditawarkan kerangka berpikir Islam (bukan "perintah Islam"). Sebut prinsip-prinsip seperti *mizan*, *amanah*, *adl*, *qist*, *istikhlaf*, *tazkiyatun nafs* sebagai LENS analitis — bukan sebagai keputusan otoritatif. Daleel boleh disebut sebagai supporting evidence di akhir argumen, BUKAN sebagai premis.
+  * **Solusi praktis** (~200 kata): apa yang bisa dilakukan mahasiswa hari ini — di kos, di kelas, di lab, di kantin, di magang, di organisasi. Hindari saran abstrak ("perbaiki niat"); berikan langkah konkret yang bisa dicoba pekan ini.
+  * **Penutup** (~80 kata): refleksi terbuka. Tidak memaksa kesimpulan. Mengundang dialog.
+  TONE: cerdas, sopan, sedikit ironis OK. JANGAN menggurui. JANGAN gunakan kata "wahai mahasiswa", "kalian harus", "renungkanlah". Pakai "kita", "mungkin", "perhatikan". Daleel boleh dikutip dalam Bahasa Indonesia dengan citation pendek (mis. "QS. Hud: 85 mengingatkan kita..."), tapi MAKSIMAL 2 daleel di seluruh artikel — kalau kebanyakan, jadi terasa khotbah.
 
-  KAIDAH KETAT: (1) HORMATI bahwa karya pop ini sah dinikmati Gen Z — JANGAN posisikan "harus dilawan" atau haram; (2) JANGAN memaksakan analogi Islami yang dipaksa — biarkan koneksinya organik, mungkin hanya 1-2 lapisan dalam; (3) gunakan sebagai PEMICU diskusi yang Gen Z sendiri kembangkan, BUKAN khutbah berbungkus pop-culture; (4) sebut JUDUL/LIRIK/FIGUR yang spesifik dan relevan dengan isu pekan ini, BUKAN referensi pop random.
+- **Q&A Realistis** (5 pertanyaan, masing-masing 80-120 kata): tulis 5 PUSHBACK yang mahasiswa kritis BENERAN akan ajukan saat membaca artikel ini — bukan straw-man yang gampang dijawab. Setiap entry:
+  * **Q:** pertanyaan keras tapi jujur (mis. "Bukannya ini masalah sistem, bukan personal?", "Kenapa Islam yang harus ngurusin ekonomi modern?", "Apa bedanya nasihat ini dengan moralisme generik?", "Bukankah mengaitkan agama dengan politik justru bahaya?", "Saya nggak shalat juga, masih bisa pegang prinsip ini?")
+  * **A:** respons tidak defensif (~70 kata) — akui sebagian validity pushback-nya, lalu tawarkan sudut pandang yang lebih utuh tanpa retreat ke "pokoknya begini katanya kitab". Bahasa percakapan akademik.
 
-- **4-5 pertanyaan lanjutan** (masing-masing 60-100 kata): tulis pertanyaan + 2-3 kalimat anticipated pushback (sinisme, "agama ngapain ikut campur", "ini cuma hiburan kok dikaitkan agama") + respons-tidak-defensif yang menghormati keraguan tapi tetap berakar pada Quran/sunnah.
-
-- **Penutup** (~60 kata): BUKAN kesimpulan moral — refleksi terbuka + tawaran kelanjutan (Discord channel, peer group, mentor 1-on-1, group WA untuk Q&A lanjutan).
+FORMAT output H4 untuk sub-section: gunakan `#### Poster Question`, `#### Artikel`, `#### Q&A Realistis`. Di dalam Q&A, gunakan bold inline `**Q:** ...` dan `**A:** ...`.
 
 ### Aksi Sosial & Khidmah Umat (600-900 kata)
 Tulis SET aksi kecil-berdampak yang bisa dijalankan oleh komunitas LOKAL — RT, RW, masjid lingkungan, keluarga, pengurus pengajian, karang taruna. BUKAN ceramah, BUKAN konten — kegiatan nyata yang bisa diluncurkan dalam 1-2 minggu dengan EFFORT KECIL (1-5 orang penggerak, tanpa sertifikasi profesional) dan BUDGET KECIL (total di bawah Rp 2.000.000).
@@ -262,7 +261,18 @@ STRUKTUR WAJIB setiap pesan flyer — dua baris marker DULU, baru paragraf:
 {{paragraf 70-90 kata}}
 ```
 
-ATURAN HEADLINE: 4-6 kata, kalimat aktif, langsung menyentuh inti pesan. Hindari nama deliverable, hindari clickbait, hindari pertanyaan retoris. Contoh GOOD: "Mulai Adil dari Meja Sendiri", "Hadirlah Sebelum Layar Lebih Dulu", "Bela yang Lemah dari RT", "Pulang Dulu, Cari Makna Kemudian". Contoh BAD: "Khutbah Pertama", "Pesan Pekan Ini", "Renungan Mingguan", "Apa yang Terjadi Pekan Ini?".
+ATURAN HEADLINE: 4-6 kata, kalimat aktif, langsung menyentuh inti pesan. Hindari nama deliverable, hindari clickbait, hindari pertanyaan retoris. Contoh GOOD: "Mulai Adil dari Meja Sendiri", "Hadir untuk Tetangga yang Lemah", "Mulai Bela yang Lemah di RT", "Pulang Dulu, Cari Makna Kemudian". Contoh BAD: "Khutbah Pertama", "Pesan Pekan Ini", "Renungan Mingguan", "Apa yang Terjadi Pekan Ini?".
+
+ATURAN ANTI-AMBIGUITAS (KRITIS): baca ulang setiap headline dengan asumsi pembaca tergesa-gesa dan hanya akan menginterpretasi sekali. Hindari konstruksi preposisi yang BISA dibaca dua arti — terutama `X dari Y`, `X oleh Y`, `X kepada Y` yang melibatkan subjek yang seharusnya kita lindungi.
+
+CONTOH JEBAKAN NYATA (jangan tiru):
+- ❌ "Bela yang Lemah dari Tetangga" — ambiguity trap. Bisa dibaca "lindungi yang lemah, mulai DARI lingkungan kita" (maksud) ATAU "lindungi yang lemah DARI [serangan] tetangga" (yang muncul lebih dulu di otak pembaca — seolah tetangga adalah ancaman). Tetangga dalam dakwah selalu diposisikan sebagai pihak yang dirawat, BUKAN pelaku ancaman.
+- ✓ "Mulai Bela yang Lemah di RT" — preposisi `di` mengikat lokasi, tidak menuduh
+- ✓ "Hadir untuk Tetangga yang Lemah" — `untuk` jelas membantu, tidak menyerang
+- ❌ "Lindungi Anak dari Sekolah" — bisa dibaca anak harus dilindungi DARI sekolah. Pakai "Lindungi Anak di Sekolah" atau "Jaga Anak Saat di Sekolah".
+- ❌ "Tegakkan Adil dari Pejabat" — preposisi `dari` membuat pejabat seolah penyebab ketidakadilan tunggal. Pakai "Tegakkan Adil Mulai dari Diri" atau "Audit Adil di Setiap Meja".
+
+RULE: kalau headline mengandung kata `dari` + nama institusi/orang/kelompok, BERHENTI dan baca ulang. Kalau pembaca bisa salah membaca arah preposisi (pelindung vs sasaran), GANTI dengan konstruksi `di` (lokasi), `untuk` (penerima manfaat), atau `bersama` (kolaborator).
 
 ATURAN DALEEL: citation HARUS persis cocok dengan salah satu entri di daleel pool yang saya berikan. Pilih daleel yang PALING terkait dengan isi paragraf flyer-nya — bukan asal pilih. Headline + daleel + paragraf harus membentuk satu pesan yang utuh dan saling memperkuat. Boleh dua flyer pakai daleel berbeda dari pool yang sama; usahakan 4 flyer pakai 4 daleel berbeda kalau pool memungkinkan.
 
@@ -399,26 +409,25 @@ Write a READY-TO-USE video script for a 60-90 second TikTok / IG Reels / YouTube
 - CTA (5-10 seconds / ~15 words): concrete viewer action they can do immediately.
 Avoid khutbah idioms ("hadirin yang dirahmati Allah", "marilah kita renungkan").
 
-### Reaching Gen Z (800-1100 words)
-Write a ready-to-use GEN Z OPEN-MIC KAJIAN / DISCUSSION OUTLINE (1.5 hours, open discussion format, NOT lecture). Gen Z rejects top-down advice — every element here should be designed to be FACILITATED, not delivered. Structure:
+### Mahasiswa: Poster, Article & Discussion (900-1200 words)
+Write a CAMPUS BULLETIN-BOARD PACK ready to print + post on a faculty noticeboard / campus mushola / departmental wall. Audience: intelligent university students (S1/S2) who are cynical of sermons, love discussion + logic, and don't respond well when daleel is used as the primary argument. Goal: ignite curiosity via one provocative question, then offer a complete framework for them to think through (alone or in peer discussion).
 
-- **Setting & format** (~60 words): venue (cafe / co-working / community space), max 20-25 attendees, circle formation (not theater), moderator (NOT a preacher), water & light snacks ready.
+REQUIRED output: three elements — POSTER QUESTION, ARTICLE, Q&A — designed as a pair: the poster grabs attention from across the room; the article gets read up close once they're curious.
 
-- **Opening framing question** (~50 words): one provocative question that links this week's issues to a Gen Z existential question (identity, mental health, future, injustice, loneliness, meaning of work).
+- **Poster Question** (one sentence, 10-18 words): a provocative question linking this week's issue to an existential / ethical question that today's students actually face. NO sermon language ("ponder", "let us", "O reader") — use direct, conversational academic phrasing that lands. GOOD examples: "If fairness is obviously obligatory, why is the market still crooked?" / "If God is just, why do good people suffer too?" / "Can you stay straight inside a crooked office?". Output format: `**Poster Question:** "your question here"` on a single line.
 
-- **Pop-culture bridge** (~180 words): ONE entry point via the pop culture currently resonating with Gen Z. Pick ONE lane (name SPECIFIC trending titles/figures/lyrics — do NOT be generic):
-  * K-pop / J-pop lyrics with existential layers — e.g. BTS "Magic Shop" on trauma & healing → tazkiyatun nafs; NewJeans "Bubble Gum" on identity nostalgia → fitrah; Lisa solo on isolation in fame → trial of celebrity
-  * Anime / manga plot or character arc — e.g. Frieren on time & mortality → ziarah qubur; Vinland Saga on a viking's tawbah → concept of hijrah; Solo Leveling's level grind → patience in trials
-  * Indonesian indie songs on identity / spiritual crisis — Hindia "Apatis", Pamungkas "Masing-Masing", Tulus "Hati-Hati di Jalan", .Feast "Camkan", Bernadya, Hanggini — quote a specific verse as the prompt
-  * This week's TikTok trend / viral sound with philosophical layers — e.g. "main character energy" → ujub; "delulu" → ghuruur; "sigma male" → ananiyyah (egoism)
-  * AUTHENTIC hijrah figures from creators / athletes / influencers (NOT clichéd-brand ones) as case studies
-  * Esports / gaming community ethics — toxic chat in Mobile Legends/Valorant → akhlaq in digital spaces; "FOMO ranked push" → qana'ah
+- **Article** (650-850 words, flowing prose, with its own H4 sub-heading): write it like a short academic opinion piece for university readers. Structure:
+  * **Opening** (~150 words): start from empirical experience / this week's news that's relevant. Do NOT open with an ayat / hadith. Make the reader nod at the problem first.
+  * **Logical argument** (~350 words): build step-by-step reasoning. Why does this phenomenon happen? What does an Islamic framework offer (not "Islamic command"). Use principles like *mizan*, *amanah*, *adl*, *qist*, *istikhlaf*, *tazkiyatun nafs* as analytical LENSES — not authoritative verdicts. Daleel may appear as supporting evidence at the END of an argument, NEVER as the premise.
+  * **Practical answer** (~200 words): what a student can actually do today — in their dorm, classroom, lab, cafeteria, internship, organization. Avoid abstractions ("fix your intent"); name concrete steps they can try this week.
+  * **Close** (~80 words): open reflection. No forced conclusion. Invite dialogue.
+  TONE: smart, polite, mild irony is OK. Do NOT lecture. Avoid "O students", "you must", "ponder this". Use "we", "perhaps", "consider". Daleel may be quoted in English with a short citation (e.g. "QS. Hud: 85 reminds us..."), but MAX 2 daleel across the whole article — more turns it into a sermon.
 
-  STRICT RULES: (1) RESPECT that this pop culture is legitimately enjoyed by Gen Z — do NOT position it as something to "fight" or label haram; (2) do NOT force Islamic analogies — let the connection be organic, maybe just 1-2 layers deep; (3) use as a TRIGGER for Gen Z's own discussion, NOT a khutbah wrapped in pop-culture costume; (4) name SPECIFIC titles/lyrics/figures that genuinely connect to this week's issues, NOT random pop references.
+- **Realistic Q&A** (5 questions, 80-120 words each): write 5 PUSHBACK questions a critical student would actually raise after reading this article — not strawmen that are easy to swat. For each entry:
+  * **Q:** a hard but honest question (e.g. "Isn't this a systems problem, not a personal one?", "Why does Islam need to step into modern economics?", "How is this different from generic moralism?", "Doesn't tying religion to politics get dangerous?", "I don't even pray — does this framework still apply to me?")
+  * **A:** non-defensive response (~70 words) — concede part of the pushback's validity, then offer a more complete angle without retreating to "the book says so". Conversational academic tone.
 
-- **4-5 follow-up questions** (60-100 words each): write the question + 2-3 sentences of anticipated pushback (cynicism, "what does religion have to do with this", "this is just entertainment — why link it to religion") + a non-defensive response that honors the doubt while staying rooted in Quran/sunnah.
-
-- **Close** (~60 words): NOT a moral conclusion — open reflection + continuation offer (Discord channel, peer group, 1-on-1 mentor, WA group for Q&A).
+H4 sub-section format: use `#### Poster Question`, `#### Article`, `#### Realistic Q&A`. Inside the Q&A, use inline bold `**Q:** ...` and `**A:** ...`.
 
 ### Social Action & Service to the Ummah (600-900 words)
 Write a SET of small-but-impactful actions doable by a LOCAL community — RT, RW, neighborhood mosque, families, pengajian circle, karang taruna. NOT a sermon, NOT content — real activities launchable in 1-2 weeks with SMALL EFFORT (1-5 organizers, no professional certification required) and SMALL BUDGET (total under IDR 2,000,000).
@@ -489,6 +498,17 @@ REQUIRED STRUCTURE per flyer message — two marker lines FIRST, then the paragr
 ```
 
 HEADLINE RULES: 4-6 words, active voice, lands the message immediately. No deliverable names, no clickbait, no rhetorical questions. GOOD: "Start Fair at Your Own Table", "Be Present Before the Screen", "Defend the Weak Next Door", "Come Home Before Chasing Meaning". BAD: "First Khutbah", "Weekly Message", "This Week's Reflection", "What Happened This Week?".
+
+ANTI-AMBIGUITY RULE (CRITICAL): re-read every headline assuming a rushed reader who interprets ONCE. Avoid prepositional constructions that can be read two ways — especially `X from Y`, `X by Y`, `X against Y` when Y is a group we're meant to be protecting. In Indonesian dakwah, neighbors / family / classmates are sources of care, NEVER positioned as threats.
+
+REAL TRAP CASES (do NOT mimic):
+- ❌ "Bela yang Lemah dari Tetangga" / "Defend the Weak from Neighbors" — reads first as "protect the weak FROM the neighbors" (neighbors as threat) before the intended "starting from your neighborhood" lands.
+- ✓ "Mulai Bela yang Lemah di RT" / "Start Defending the Weak in Your Block" — preposition `di` / `in` binds location, doesn't accuse.
+- ✓ "Hadir untuk Tetangga yang Lemah" / "Show Up for Vulnerable Neighbors" — `untuk` / `for` clearly marks them as recipients of care.
+- ❌ "Lindungi Anak dari Sekolah" / "Protect Kids from School" — school becomes the antagonist. Use "Lindungi Anak di Sekolah" / "Keep Kids Safe at School".
+- ❌ "Tegakkan Adil dari Pejabat" — makes officials the sole cause. Use "Tegakkan Adil Mulai dari Diri" / "Audit Fairness at Every Desk".
+
+RULE: when the headline contains `dari` / `from` + an institution / person / group, STOP and re-read. If the preposition direction can be misread (protector vs target), swap to a `di` (in / at), `untuk` (for), or `bersama` (with) construction.
 
 DALEEL RULES: the citation MUST match one of the entries in the daleel pool I provided. Pick the daleel that most DIRECTLY supports the paragraph — not a random pick. Headline + daleel + paragraph must read as one tight message that reinforces itself. Two flyers can pull from the same pool; aim for 4 different daleel across the 4 flyers when the pool allows.
 
