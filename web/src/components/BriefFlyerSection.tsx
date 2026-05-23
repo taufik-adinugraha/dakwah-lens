@@ -7,21 +7,36 @@ import { Download, Image as ImageIcon, Maximize2, Sparkles } from "lucide-react"
 /* eslint-disable @next/next/no-img-element */
 
 /**
- * "Flyer Dakwah" section — 4 shareable 1080×1080 PNGs per briefing.
+ * "Flyer Dakwah" section — 6 shareable 1080×1080 PNGs per briefing.
  *
  * Each flyer is a different angle on the same week:
- *   - Variant A (umum)  → Khutbah tagline + actionable steps
- *   - Variant B (umum)  → Aksi Sosial campaign + small-action framing
- *   - Variant A (modern) → Kreator HOOK slogan + body
- *   - Variant B (modern) → Gen Z framing punchline + reflection
+ *   - Variant A (umum)    → Khutbah tagline + actionable steps
+ *   - Variant B (umum)    → Aksi Sosial campaign + small-action framing
+ *   - Variant A (modern)  → Kreator HOOK slogan + body
+ *   - Variant B (modern)  → Gen Z framing punchline + reflection
+ *   - Variant A (sunnah)  → Ajakan ibadah sunnah pekan ini + short du'a
+ *   - Variant B (sunnah)  → Doa pekan ini (Arabic hero + ID translation)
  *
- * Each uses a different daleel from the retrieval pool so the four
+ * Each uses a different daleel from the retrieval pool so the six
  * don't repeat. No segment / "for Gen Z" labels — the design itself
  * carries the tone.
  */
-type Variant = "general-a" | "general-b" | "genz-a" | "genz-b";
+type Variant =
+  | "general-a"
+  | "general-b"
+  | "genz-a"
+  | "genz-b"
+  | "sunnah-a"
+  | "sunnah-b";
 
-const VARIANTS: Variant[] = ["general-a", "general-b", "genz-a", "genz-b"];
+const VARIANTS: Variant[] = [
+  "general-a",
+  "general-b",
+  "genz-a",
+  "genz-b",
+  "sunnah-a",
+  "sunnah-b",
+];
 
 export function BriefFlyerSection({ briefId }: { briefId: string }) {
   const locale = useLocale();
@@ -81,11 +96,19 @@ export function BriefFlyerSection({ briefId }: { briefId: string }) {
 
 function cardKey(
   v: Variant,
-): "general_a" | "general_b" | "modern_a" | "modern_b" {
+):
+  | "general_a"
+  | "general_b"
+  | "modern_a"
+  | "modern_b"
+  | "sunnah_a"
+  | "sunnah_b" {
   if (v === "general-a") return "general_a";
   if (v === "general-b") return "general_b";
   if (v === "genz-a") return "modern_a";
-  return "modern_b";
+  if (v === "genz-b") return "modern_b";
+  if (v === "sunnah-a") return "sunnah_a";
+  return "sunnah_b";
 }
 
 function FlyerCard({
@@ -112,18 +135,33 @@ function FlyerCard({
   const [loaded, setLoaded] = useState(false);
 
   const isModern = variant.startsWith("genz");
-  const palette = isModern
-    ? {
-        ring: "ring-fuchsia-200/70",
-        accentBtn: "bg-fuchsia-600 hover:bg-fuchsia-700",
-        previewBg:
-          "bg-gradient-to-br from-fuchsia-50 via-violet-50 to-amber-50",
-      }
-    : {
-        ring: "ring-emerald-200/70",
-        accentBtn: "bg-emerald-600 hover:bg-emerald-700",
-        previewBg: "bg-gradient-to-br from-emerald-50 to-white",
-      };
+  const isSunnah = variant.startsWith("sunnah");
+  const palette = isSunnah
+    ? variant === "sunnah-a"
+      ? {
+          ring: "ring-amber-200/70",
+          accentBtn: "bg-amber-600 hover:bg-amber-700",
+          previewBg:
+            "bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50",
+        }
+      : {
+          ring: "ring-emerald-300/70",
+          accentBtn: "bg-emerald-700 hover:bg-emerald-800",
+          previewBg:
+            "bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50",
+        }
+    : isModern
+      ? {
+          ring: "ring-fuchsia-200/70",
+          accentBtn: "bg-fuchsia-600 hover:bg-fuchsia-700",
+          previewBg:
+            "bg-gradient-to-br from-fuchsia-50 via-violet-50 to-amber-50",
+        }
+      : {
+          ring: "ring-emerald-200/70",
+          accentBtn: "bg-emerald-600 hover:bg-emerald-700",
+          previewBg: "bg-gradient-to-br from-emerald-50 to-white",
+        };
 
   return (
     <article

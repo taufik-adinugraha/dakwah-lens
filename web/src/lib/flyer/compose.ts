@@ -62,9 +62,12 @@ import type {
 export type GeneralVariant = "a" | "b";
 export type GenZVariant = "a" | "b";
 
+export type SunnahVariant = "a" | "b";
+
 export type FlyerSlot =
   | { kind: "general"; variant: GeneralVariant; segment: string | null }
   | { kind: "genz"; variant: GenZVariant; segment: string | null }
+  | { kind: "sunnah"; variant: SunnahVariant; segment: string | null }
   | { kind: "poster"; segment: string | null }
   | {
       kind: "deliverable";
@@ -237,6 +240,80 @@ const GENZ_B_PALETTES: PalettePreset[] = [
   },
 ];
 
+/** Sunnah invitation (slot 5a) — warm amber / gold that feels like
+ *  invitation and barakah. */
+const SUNNAH_A_PALETTES: PalettePreset[] = [
+  {
+    name: "amber-gold",
+    bgGradient: ["#fffbeb", "#fde68a", "#92400e"],
+    accent: "#b45309",
+    accentDeep: "#78350f",
+    accentSoft: "#fcd34d",
+    chipText: "#fffbeb",
+  },
+  {
+    name: "rose-warm",
+    bgGradient: ["#fff7ed", "#fed7aa", "#9a3412"],
+    accent: "#c2410c",
+    accentDeep: "#7c2d12",
+    accentSoft: "#fdba74",
+    chipText: "#fff7ed",
+  },
+  {
+    name: "honey-cream",
+    bgGradient: ["#fefce8", "#fef08a", "#854d0e"],
+    accent: "#a16207",
+    accentDeep: "#713f12",
+    accentSoft: "#fde68a",
+    chipText: "#fefce8",
+  },
+  {
+    name: "soft-clay",
+    bgGradient: ["#fef2f2", "#fecaca", "#991b1b"],
+    accent: "#b91c1c",
+    accentDeep: "#7f1d1d",
+    accentSoft: "#fca5a5",
+    chipText: "#fef2f2",
+  },
+];
+
+/** Du'a hero (slot 5b) — deep emerald / teal so the Arabic feels
+ *  sacred and contemplative. */
+const SUNNAH_B_PALETTES: PalettePreset[] = [
+  {
+    name: "deep-emerald",
+    bgGradient: ["#f0fdf4", "#bbf7d0", "#064e3b"],
+    accent: "#047857",
+    accentDeep: "#022c22",
+    accentSoft: "#6ee7b7",
+    chipText: "#f0fdf4",
+  },
+  {
+    name: "midnight-teal",
+    bgGradient: ["#f0fdfa", "#99f6e4", "#134e4a"],
+    accent: "#0f766e",
+    accentDeep: "#042f2e",
+    accentSoft: "#5eead4",
+    chipText: "#f0fdfa",
+  },
+  {
+    name: "blue-night",
+    bgGradient: ["#eff6ff", "#bfdbfe", "#1e3a8a"],
+    accent: "#1d4ed8",
+    accentDeep: "#172554",
+    accentSoft: "#93c5fd",
+    chipText: "#eff6ff",
+  },
+  {
+    name: "deep-violet",
+    bgGradient: ["#faf5ff", "#e9d5ff", "#581c87"],
+    accent: "#7e22ce",
+    accentDeep: "#3b0764",
+    accentSoft: "#d8b4fe",
+    chipText: "#faf5ff",
+  },
+];
+
 /** Mahasiswa poster palette — academic-feeling navy/indigo so it reads
  *  as "campus material" rather than IG share. Rotates 4 sub-tones per
  *  edition. */
@@ -282,6 +359,9 @@ function palettesFor(slot: FlyerSlot): PalettePreset[] {
   if (slot.kind === "genz") {
     return slot.variant === "a" ? GENZ_A_PALETTES : GENZ_B_PALETTES;
   }
+  if (slot.kind === "sunnah") {
+    return slot.variant === "a" ? SUNNAH_A_PALETTES : SUNNAH_B_PALETTES;
+  }
   if (slot.kind === "poster") {
     return POSTER_PALETTES;
   }
@@ -311,6 +391,12 @@ function layoutForSlot(slot: FlyerSlot): LayoutId {
   if (slot.kind === "genz") {
     return slot.variant === "a" ? "hero-headline" : "quote-card";
   }
+  if (slot.kind === "sunnah") {
+    // Sunnah invitation reads best in split-image (action call + photo
+    // of sunnah practice). Du'a hero uses HeroAyat which gives the
+    // Arabic translation card center-stage.
+    return slot.variant === "a" ? "split-image" : "hero-ayat";
+  }
   if (slot.kind === "poster") {
     return "poster-question";
   }
@@ -322,7 +408,17 @@ function daleelRankForSlot(slot: FlyerSlot): number {
   if (slot.kind === "general" && slot.variant === "b") return 1;
   if (slot.kind === "genz" && slot.variant === "a") return 2;
   if (slot.kind === "genz" && slot.variant === "b") return 3;
+  if (slot.kind === "sunnah" && slot.variant === "a") return 4;
+  if (slot.kind === "sunnah" && slot.variant === "b") return 5;
   return 0;
+}
+
+/** Map a flyer slot to its Pesan Flyer index (0..5). */
+function pesanFlyerSlotIndex(slot: FlyerSlot): FlyerMessageSlot | null {
+  if (slot.kind === "general") return slot.variant === "a" ? 0 : 1;
+  if (slot.kind === "genz") return slot.variant === "a" ? 2 : 3;
+  if (slot.kind === "sunnah") return slot.variant === "a" ? 4 : 5;
+  return null;
 }
 
 /** Pick an image for the chosen slot. ALWAYS prefers a photo across
@@ -398,15 +494,6 @@ function messageForGenZB(body: string): string {
   });
 }
 
-/** Map a flyer slot to its Pesan Flyer index (0..3). */
-function pesanFlyerSlotFor(slot: FlyerSlot): FlyerMessageSlot | null {
-  if (slot.kind === "general" && slot.variant === "a") return 0;
-  if (slot.kind === "general" && slot.variant === "b") return 1;
-  if (slot.kind === "genz" && slot.variant === "a") return 2;
-  if (slot.kind === "genz" && slot.variant === "b") return 3;
-  return null;
-}
-
 function buildContent(ctx: FlyerContext): FlyerContent {
   const lang = ctx.locale;
   const brand = "dakwah-lens.id";
@@ -417,7 +504,7 @@ function buildContent(ctx: FlyerContext): FlyerContent {
   // 2026-05-23 briefings), it carries an explicit headline + daleel
   // citation tailored to the message. Falls back to the legacy
   // tagline extractors when those markers are missing.
-  const pesanSlot = pesanFlyerSlotFor(ctx.slot);
+  const pesanSlot = pesanFlyerSlotIndex(ctx.slot);
   const dedicatedBlock =
     pesanSlot !== null ? extractDedicatedFlyerBlock(ctx.body, pesanSlot) : null;
   const dedicatedDaleel = findDaleelByCitation(
@@ -464,6 +551,24 @@ function buildContent(ctx: FlyerContext): FlyerContent {
         fallbackHeadline ||
         "Renungan Pekan Ini",
       message: message || "",
+      daleel,
+    };
+  }
+
+  if (ctx.slot.kind === "sunnah") {
+    // Sunnah invitation (a) + Du'a hero (b). Both use the dedicated
+    // Pesan Flyer 5 / 6 blocks; fall back to benang merah if the
+    // briefing was generated before the 2026-05-23 6-flyer schema.
+    const fallbackMessage = extractBenangMerah(ctx.body);
+    return {
+      brand,
+      dateLabel,
+      headline:
+        dedicatedBlock?.headline ||
+        (ctx.slot.variant === "a"
+          ? "Ajakan Sunnah Pekan Ini"
+          : "Doa Pekan Ini"),
+      message: dedicatedBlock?.body || fallbackMessage || "",
       daleel,
     };
   }
@@ -537,7 +642,9 @@ export async function composeFlyer(ctx: FlyerContext): Promise<{
 }> {
   const layoutId = layoutForSlot(ctx.slot);
   const slotKey =
-    ctx.slot.kind === "general" || ctx.slot.kind === "genz"
+    ctx.slot.kind === "general" ||
+    ctx.slot.kind === "genz" ||
+    ctx.slot.kind === "sunnah"
       ? ctx.slot.variant
       : ctx.slot.kind === "deliverable"
         ? ctx.slot.deliverable

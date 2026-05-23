@@ -293,9 +293,10 @@ export function extractGenZTagline(markdown: string): string {
 // Dedicated flyer-message section (briefings post-2026-05-23)
 // ──────────────────────────────────────────────────────────────────
 
-/** Index into the 4 flyer-message slots, in the order the prompt asks
- *  for them: khutbah voice → action voice → kreator voice → reflection. */
-export type FlyerMessageSlot = 0 | 1 | 2 | 3;
+/** Index into the 6 flyer-message slots, in the order the prompt asks
+ *  for them: khutbah → action → kreator → Gen Z reflection → sunnah
+ *  invitation → this week's du'a. */
+export type FlyerMessageSlot = 0 | 1 | 2 | 3 | 4 | 5;
 
 /** Parsed contents of one `### Pesan Flyer N` block. Briefings written
  *  after the 2026-05-23 prompt refresh carry explicit `**Headline:**`

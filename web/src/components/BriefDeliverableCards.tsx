@@ -115,6 +115,19 @@ const KIND_HEADER_BG: Record<CardKind, string> = {
   action: "bg-gradient-to-r from-teal-50 via-white to-teal-50",
 };
 
+/** Modal scrollable-body backdrop per card kind — a soft tinted
+ *  gradient that frames the white "paper" article surface so the
+ *  content feels presented, not dumped as plain markdown. */
+const KIND_BODY_BG: Record<CardKind, string> = {
+  khutbah:
+    "bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/50",
+  kajian: "bg-gradient-to-br from-rose-50/70 via-white to-pink-50/50",
+  home: "bg-gradient-to-br from-amber-50/70 via-white to-yellow-50/50",
+  content: "bg-gradient-to-br from-sky-50/70 via-white to-blue-50/50",
+  genz: "bg-gradient-to-br from-violet-50/70 via-white to-fuchsia-50/50",
+  action: "bg-gradient-to-br from-teal-50/70 via-white to-cyan-50/50",
+};
+
 /** Accent border-bottom for the header, drives the section h3 underline
  *  inside the modal body as well. */
 const KIND_ACCENT_BORDER: Record<CardKind, string> = {
@@ -532,9 +545,19 @@ function DeliverableModal({
           </button>
         </div>
 
-        {/* Scrollable body */}
-        <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-8 sm:py-7">
-          <article className="text-pretty text-slate-800">
+        {/* Scrollable body — tinted gradient backdrop per card kind, with
+            a centered "paper" article surface so the content feels like
+            a curated brief, not raw markdown. */}
+        <div
+          className={`flex-1 overflow-y-auto px-3 py-6 sm:px-6 sm:py-8 ${
+            card.kind ? KIND_BODY_BG[card.kind] : "bg-slate-50/40"
+          }`}
+        >
+          <article
+            className={`mx-auto max-w-2xl rounded-2xl border bg-white px-5 py-6 text-pretty text-slate-800 shadow-sm sm:px-8 sm:py-9 ${
+              card.kind ? KIND_ACCENT_BORDER[card.kind] : "border-slate-200"
+            }`}
+          >
             <ReactMarkdown
               components={makeModalMarkdownComponents(card.kind)}
             >
@@ -638,44 +661,59 @@ function modalChildrenToString(children: React.ReactNode): string {
  */
 function makeModalMarkdownComponents(kind: CardKind | null): Components {
   const quote = kind ? KIND_QUOTE[kind] : KIND_QUOTE.khutbah;
-  const accent = kind
+  const accentText = kind
     ? KIND_ICON_TONE[kind].replace("bg-", "text-").replace("-100", "-700").split(" ")[0]
     : "text-slate-700";
+  const accentDot = kind
+    ? KIND_ICON_TONE[kind].split(" ")[0].replace("-100", "-500")
+    : "bg-slate-400";
+
+  // First non-Arabic paragraph gets the "lead" treatment — slightly
+  // bigger + a muted decorative bar so the reader's eye lands on the
+  // article opening with weight.
+  let isFirstPara = true;
 
   return {
     h1: ({ children }) => (
       <h1
-        className={`mt-6 mb-3 text-balance text-xl font-bold text-slate-900 first:mt-0 sm:text-2xl`}
+        className={`mt-7 mb-4 text-balance text-2xl font-extrabold tracking-tight text-slate-900 first:mt-0 sm:text-3xl`}
       >
         {children}
       </h1>
     ),
     h2: ({ children }) => (
       <h2
-        className={`mt-7 mb-2 text-balance border-b pb-1.5 text-lg font-bold text-slate-900 first:mt-0 sm:text-xl ${kind ? KIND_ACCENT_BORDER[kind] : "border-slate-200"}`}
+        className={`group mt-8 mb-3 flex items-center gap-3 text-balance text-xl font-extrabold tracking-tight text-slate-900 first:mt-0 sm:text-2xl`}
       >
-        {children}
+        <span
+          aria-hidden
+          className={`inline-block h-7 w-1.5 rounded-full ${accentDot}`}
+        />
+        <span>{children}</span>
       </h2>
     ),
     h3: ({ children }) => (
       <h3
-        className={`mt-5 mb-1 text-balance text-[13px] font-semibold uppercase tracking-wider ${accent}`}
+        className={`mt-6 mb-2 inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.15em] ${accentText} ${
+          kind ? KIND_ICON_TONE[kind] : "bg-slate-100"
+        }`}
       >
+        <span
+          aria-hidden
+          className={`inline-block h-1.5 w-1.5 rounded-full ${accentDot}`}
+        />
         {children}
       </h3>
     ),
     h4: ({ children }) => (
       <h4
-        className={`mt-6 mb-2 flex items-baseline gap-2 text-balance text-[15px] font-bold text-slate-900 sm:text-base`}
+        className={`mt-6 mb-2 flex items-baseline gap-2.5 text-balance text-base font-bold tracking-tight text-slate-900 sm:text-[17px]`}
       >
         <span
-          className={`inline-block h-1.5 w-1.5 rounded-full ${
-            kind
-              ? KIND_ICON_TONE[kind].split(" ")[0].replace("-100", "-500")
-              : "bg-slate-400"
-          }`}
+          aria-hidden
+          className={`inline-block h-2 w-2 shrink-0 rounded-full ${accentDot}`}
         />
-        {children}
+        <span>{children}</span>
       </h4>
     ),
     p: ({ children }) => {
@@ -685,9 +723,9 @@ function makeModalMarkdownComponents(kind: CardKind | null): Components {
         return (
           <p
             dir={hasNativeArabic ? "rtl" : "ltr"}
-            className={`my-5 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/90 via-white to-teal-50/70 px-6 py-5 text-center font-amiri leading-[2] text-emerald-950 shadow-sm sm:px-8 ${
+            className={`my-5 rounded-2xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50/95 via-white to-teal-50/80 px-6 py-5 text-center font-amiri leading-[2] text-emerald-950 shadow-md sm:px-8 ${
               hasNativeArabic
-                ? "text-[22px] sm:text-[24px]"
+                ? "text-[22px] sm:text-[26px]"
                 : "text-base sm:text-[17px]"
             }`}
           >
@@ -695,32 +733,49 @@ function makeModalMarkdownComponents(kind: CardKind | null): Components {
           </p>
         );
       }
+      const lead = isFirstPara;
+      isFirstPara = false;
+      if (lead) {
+        return (
+          <p
+            className={`relative mt-1 mb-4 pl-4 text-pretty text-[15px] leading-[1.85] text-slate-700 sm:text-base`}
+          >
+            <span
+              aria-hidden
+              className={`absolute left-0 top-1.5 bottom-1.5 w-1 rounded-full ${accentDot} opacity-60`}
+            />
+            {children}
+          </p>
+        );
+      }
       return (
-        <p className="mt-3 text-pretty leading-[1.75] text-slate-800">
+        <p className="mt-3 text-pretty leading-[1.78] text-slate-800">
           {children}
         </p>
       );
     },
     ul: ({ children }) => (
-      <ul className="mt-3 list-disc space-y-1.5 pl-5 text-slate-800">
+      <ul
+        className={`mt-3 ml-1 list-disc space-y-2 pl-5 text-slate-800 marker:${accentDot.replace("bg-", "text-")}`}
+      >
         {children}
       </ul>
     ),
     ol: ({ children }) => (
-      <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-slate-800">
+      <ol className="mt-3 ml-1 list-decimal space-y-2 pl-5 text-slate-800 marker:font-extrabold marker:text-slate-500">
         {children}
       </ol>
     ),
-    li: ({ children }) => <li className="leading-[1.75]">{children}</li>,
+    li: ({ children }) => <li className="leading-[1.75] pl-1">{children}</li>,
     blockquote: ({ children }) => (
       <blockquote
-        className={`relative my-4 rounded-xl border-l-4 ${quote.border} ${quote.bg} px-5 py-3 pl-12 text-slate-700 shadow-sm`}
+        className={`relative my-5 rounded-2xl border-l-[5px] ${quote.border} ${quote.bg} px-6 py-4 pl-14 text-slate-700 shadow-sm`}
       >
         <Quote
-          className={`absolute left-3 top-3 h-5 w-5 opacity-50 ${quote.icon}`}
+          className={`absolute left-3.5 top-3.5 h-6 w-6 opacity-55 ${quote.icon}`}
           aria-hidden
         />
-        {children}
+        <div className="text-[15px] leading-[1.7]">{children}</div>
       </blockquote>
     ),
     strong: ({ children }) => (
@@ -728,7 +783,11 @@ function makeModalMarkdownComponents(kind: CardKind | null): Components {
     ),
     em: ({ children }) => <em className="italic text-slate-700">{children}</em>,
     hr: () => (
-      <hr className="my-6 border-0 border-t border-dashed border-slate-300" />
+      <div className="my-7 flex items-center gap-3">
+        <span className="h-px flex-1 bg-gradient-to-r from-transparent to-slate-300" />
+        <span className={`inline-block h-1.5 w-1.5 rounded-full ${accentDot}`} />
+        <span className="h-px flex-1 bg-gradient-to-l from-transparent to-slate-300" />
+      </div>
     ),
   };
 }

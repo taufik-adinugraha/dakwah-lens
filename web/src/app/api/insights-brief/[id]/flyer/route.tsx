@@ -17,12 +17,21 @@ import { renderFlyerPng } from "@/lib/flyer/render-flyer";
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
-type Variant = "general-a" | "general-b" | "genz-a" | "genz-b" | "poster";
+type Variant =
+  | "general-a"
+  | "general-b"
+  | "genz-a"
+  | "genz-b"
+  | "sunnah-a"
+  | "sunnah-b"
+  | "poster";
 const VARIANTS: ReadonlySet<Variant> = new Set([
   "general-a",
   "general-b",
   "genz-a",
   "genz-b",
+  "sunnah-a",
+  "sunnah-b",
   "poster",
 ]);
 
@@ -62,11 +71,21 @@ export async function GET(
             variant: variant.endsWith("a") ? ("a" as const) : ("b" as const),
             segment: brief.segment,
           }
-        : {
-            kind: "genz" as const,
-            variant: variant.endsWith("a") ? ("a" as const) : ("b" as const),
-            segment: brief.segment,
-          };
+        : variant.startsWith("sunnah")
+          ? {
+              kind: "sunnah" as const,
+              variant: variant.endsWith("a")
+                ? ("a" as const)
+                : ("b" as const),
+              segment: brief.segment,
+            }
+          : {
+              kind: "genz" as const,
+              variant: variant.endsWith("a")
+                ? ("a" as const)
+                : ("b" as const),
+              segment: brief.segment,
+            };
 
   const png = await renderFlyerPng({
     generatedAt: brief.generatedAt,

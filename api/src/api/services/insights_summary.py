@@ -274,6 +274,15 @@ CONTOH JEBAKAN NYATA (jangan tiru):
 
 RULE: kalau headline mengandung kata `dari` + nama institusi/orang/kelompok, BERHENTI dan baca ulang. Kalau pembaca bisa salah membaca arah preposisi (pelindung vs sasaran), GANTI dengan konstruksi `di` (lokasi), `untuk` (penerima manfaat), atau `bersama` (kolaborator).
 
+ATURAN SPESIFITAS (KRITIS): setiap kali Anda menyebutkan masalah / isu / berita pekan ini di bagian manapun (Section 2, 3, 4 sub-sections, atau Pesan Flyer), masalah itu HARUS spesifik dan dapat dilacak ke headline pekan ini. JANGAN gunakan framing emosional yang kosong seperti "kabar yang menyayat hati", "berita yang membuat hati prihatin", "ada beberapa kabar tentang...", "beberapa peristiwa pekan ini" tanpa menyebut SECARA NYATA: lokasi (kota/kabupaten), pelaku/korban (jumlah, peran), inti peristiwa (apa yang terjadi), dan kapan jika relevan.
+
+CONTOH JEBAKAN (jangan tiru):
+- ❌ "Pekan ini ada beberapa kabar yang menyayat hati tentang anak-anak yang dititipkan di tempat pengajian." — pembaca tidak tahu kabar apa, di mana, berapa korban, apa yang terjadi
+- ❌ "Banyak berita yang membuat hati prihatin pekan ini" — kosong; mana? berapa? siapa?
+- ✓ "Tiga berita pekan ini menempatkan anak-anak di posisi paling rapuh. Dari Kediri, kasus pencabulan oleh seorang guru ngaji bertambah hingga total 12 korban anak. Di Tanahlaut, seorang kakek mencegat cucunya sepulang pengajian. Di Sukolilo, seorang ayah tiri melukai dua anaknya di rumah." — pembaca tahu persis apa, di mana, berapa.
+
+RULE: setiap framing emosional tentang masalah pekan ini harus diikuti SEGERA (di kalimat yang sama atau kalimat berikutnya) oleh fakta spesifik yang DI-COCOK-KAN dengan sample_headlines yang Anda terima. Setelah masalah disebut spesifik, paragraf yang sama harus juga memuat SOLUSI / LANGKAH konkret — jangan tutup paragraf hanya dengan masalah, selalu pasangkan masalah + solusi.
+
 ATURAN ANTI-MISLEADING IBADAH (KRITIS): headline TIDAK BOLEH menampilkan rukun ibadah atau sunnah (kurban / sholat / puasa / zakat / haji / sedekah / membaca Quran) sebagai sesuatu yang dipertentangkan dengan amal lain. Konstruksi `X, bukan Y` ("X not Y") sangat berbahaya jika Y adalah ibadah riil — pembaca yang sekilas baca akan menafsirkan "tinggalkan Y dan lakukan X" yang bisa berarti merendahkan ibadah pokoknya.
 
 CONTOH JEBAKAN NYATA (jangan tiru):
@@ -310,7 +319,19 @@ Sudut: pesan hook untuk feed IG/TikTok. Tone: percakapan, bahasa anak muda Indon
 ### Pesan Flyer 4 — Suara Refleksi Gen Z (~75 kata)
 Sudut: refleksi yang langsung memberi panduan + langkah, BUKAN sekadar pertanyaan menggantung. Tone: jujur, hangat, tanpa nada moralistik. Audiens: Gen Z. JANGAN buka dengan "Guys," / "Thanks guys" / "Diskusi malam ini" — ini posting standalone. Tutup dengan kalimat ringkas yang ngarahin ke satu tindakan / sikap, bisa di-screenshot dan dibagi.
 
-ATURAN UMUM untuk SEMUA 4 pesan flyer:
+### Pesan Flyer 5 — Ajakan Sunnah Pekan Ini (~75 kata)
+Sudut: ajakan sunnah yang TIMELY untuk pekan ini — pertimbangkan kalender Hijriyah saat ini (mis. menjelang Dzulhijjah = puasa Arafah/Tarwiyah/9 hari awal; bulan Syawal = puasa 6 hari; Muharram = puasa Asyura; Rajab/Sya'ban = persiapan Ramadhan; pekan biasa = puasa Senin-Kamis, sedekah Subuh, sholat Dhuha, qiyamul lail, dzikir pagi-petang). Tone: hangat, mengajak, BUKAN menyalahkan yang belum ikut. Audiens: umum Muslim Indonesia. Struktur paragraf: (1) sebutkan sunnah-nya + waktunya yang spesifik, (2) hubungkan ringkas dengan keadaan publik pekan ini (mis. "saat kabar pekan ini terasa berat, sunnah ini menjadi cahaya"), (3) ajakan konkret + 1-2 baris du'a pendek (Arab + terjemahan ID) yang relevan dengan sunnah-nya (boleh kutip dari adhkar pagi-petang / Hisnul Muslim / Quran / hadits otentik). JANGAN gunakan kata "wajib" untuk sunnah — pakai "dianjurkan", "diteladankan Nabi", "sangat disukai". Tutup dengan kalimat yang ringan dan penuh harapan.
+
+### Pesan Flyer 6 — Du'a Pekan Ini (~75 kata)
+Sudut: SATU du'a otentik yang relevan dengan tema pekan ini — pembaca bisa langsung membaca dan menjadikannya wirid pribadi. Audiens: umum Muslim Indonesia, dewasa dan remaja. Struktur:
+1. **Pengantar singkat** (1 kalimat, ~15 kata): hubungkan keadaan pekan ini dengan kebutuhan akan du'a tertentu — mis. "Pekan ini banyak ujian amanah; mari sandarkan langkah pada satu doa yang Nabi ajarkan."
+2. **Du'a** (Arab berharakat lengkap, 1 baris untuk doa pendek atau 2-3 baris untuk doa panjang) — DARI sumber otentik: adhkar pagi-petang (Hisnul Muslim), du'a-du'a Nabi dalam Quran (mis. doa Nabi Yunus, Nabi Ibrahim, Nabi Sulaiman), atau doa-doa pendek dari Riyad as-Salihin / Bukhari / Muslim. Setelah Arab, beri terjemahan Bahasa Indonesia 1 baris.
+3. **Citation 1 baris**: sumber persis (mis. "HR. Bukhari & Muslim", "QS. Al-Anbiya: 87", "Hisnul Muslim — Dzikir Pagi").
+4. **Ajakan mikro** (1 kalimat): "Recite setiap pagi pekan ini" atau "Bawa dalam sholat Tahajjud tiga hari berturut-turut" — sesuatu yang konkret dan ringan.
+
+CRITICAL: du'a harus OTENTIK dengan sumber jelas. JANGAN mengarang du'a. Kalau citation muncul di daleel pool yang saya berikan, gunakan citation yang persis cocok di marker `**Daleel:**`. Kalau bukan dari pool (mis. adhkar Hisnul Muslim), tetap tulis citation lengkap di paragraf — marker `**Daleel:**` boleh kosongkan ATAU pakai citation pool yang paling tematik. Du'a dalam Arab WAJIB berharakat lengkap (fathah, kasrah, dhammah, sukūn, syaddah, mad).
+
+ATURAN UMUM untuk SEMUA 6 pesan flyer:
 - SOLUTIF, bukan provokatif. Setiap pesan harus berisi (a) konteks ringkas masalah, (b) prinsip Islami yang relevan, (c) langkah konkret individu, (d) langkah konkret komunitas/lingkungan. JANGAN tutup hanya dengan pertanyaan retoris tanpa arahan — pembaca harus tahu APA yang bisa dia kerjakan hari ini.
 - HEADLINE harus JELAS, tidak ambigu, langsung menyampaikan inti pesan. Hindari clickbait ("KENAPA DUNIA KAYAK SEKARANG?"), pilih frasa yang langsung memberi inti ("Mulai Adil dari Dapur Sendiri"). Pembaca yang scroll cepat harus tahu pesan flyer DALAM 2 DETIK.
 - Bahasa LEMBUT. JANGAN gunakan kata-kata keras / menghakimi seperti: "pengkhianatan", "pengkhianat", "merusak", "menjajah", "rezim", "tikus", "bejat", "biadab", "kebobrokan". Pakai kata yang lebih lembut + observasional: "amanah yang belum tertunaikan", "harapan yang kita rindukan", "ruang yang perlu kita rawat", "kepercayaan publik yang sedang diuji". Khususnya saat membicarakan pemerintah, instansi, atau organisasi — fokus pada SOLUSI + DOA, bukan kecaman.
@@ -522,6 +543,15 @@ REAL TRAP CASES (do NOT mimic):
 
 RULE: when the headline contains `dari` / `from` + an institution / person / group, STOP and re-read. If the preposition direction can be misread (protector vs target), swap to a `di` (in / at), `untuk` (for), or `bersama` (with) construction.
 
+SPECIFICITY RULE (CRITICAL): every time you reference a problem / issue / news item from this week — in any section (2, 3, 4 sub-sections, or Flyer Messages) — the reference MUST be specific and traceable to the actual sample_headlines I supplied. Do NOT use empty emotional framings like "heart-wrenching news", "stories that grieve us", "several reports this week", "some incidents this week" without naming concretely: location (city/regency), who (count, role), what happened (the actual event), and when if relevant.
+
+TRAP CASES (do NOT mimic):
+- ❌ "This week brought several heart-wrenching reports about children at religious schools." — the reader doesn't know what reports, where, how many victims, what happened
+- ❌ "Many distressing news items this week" — empty; which? how many? who?
+- ✓ "Three news items this week placed children in the most fragile position. From Kediri, the case of a Quran teacher's molestation grew to 12 child victims. In Tanahlaut, a grandfather intercepted his grandchild returning from religious study. In Sukolilo, a stepfather harmed his two children at home." — the reader knows exactly what, where, how many.
+
+RULE: every emotional framing about this week's problems must be IMMEDIATELY followed (same sentence or the next) by specific facts MATCHED to the sample_headlines provided. Once the problem is named specifically, the same paragraph must also carry a SOLUTION / concrete next step — never close a paragraph with only the problem; always pair problem + solution.
+
 ANTI-MISLEADING-IBADAH RULE (CRITICAL): headlines must NEVER stage a religious obligation or sunnah (sacrifice / prayer / fasting / zakat / hajj / sadaqah / Qur'an reading) AGAINST another act of goodness. The `X, not Y` construction is especially dangerous when Y is a real ibadah — a rushed reader will parse it as "skip Y, do X" which can sound like belittling the core ritual.
 
 REAL TRAP CASES (do NOT mimic):
@@ -558,7 +588,19 @@ Angle: hook for IG/TikTok feeds. Tone: conversational, Indonesian youth language
 ### Flyer Message 4 — Gen Z reflection voice (~75 words)
 Angle: a reflection that gives direction + a concrete step — NOT just a dangling rhetorical question. Tone: honest, warm, no moralistic edge. Audience: Gen Z. Do NOT open with "Guys," / "Thanks guys" / "Tonight's discussion" — this is a standalone post. End with one short line that points to a specific action or stance, screenshot-able and shareable.
 
-GENERAL RULES for ALL 4 flyer messages:
+### Flyer Message 5 — Sunnah Practice Invitation (~75 words)
+Angle: timely sunnah invitation matched to the current Hijri month (e.g., approaching Dzulhijjah → Arafah / Tarwiyah / first-9-days fasting; Syawal → six-day fast; Muharram → Ashura fast; Rajab / Sha'ban → Ramadhan prep; regular weeks → Monday-Thursday fast, dawn sadaqah, Dhuha prayer, qiyamul lail, morning-evening adhkar). Tone: warm, inviting, NOT shaming those who haven't joined. Audience: general Indonesian Muslim. Paragraph structure: (1) name the sunnah + its specific timing, (2) connect briefly to this week's public mood (e.g., "as the week's news feels heavy, this sunnah becomes light"), (3) concrete invitation + 1-2 lines of a SHORT du'a (Arabic with harakat + ID translation) relevant to the sunnah, sourced from authentic adhkar / Hisnul Muslim / Qur'an / hadith. Do NOT use the word "wajib" / "must" for a sunnah — use "encouraged", "modeled by the Prophet ﷺ", "highly loved". Close lightly and hopefully.
+
+### Flyer Message 6 — This Week's Du'a (~75 words)
+Angle: ONE authentic du'a relevant to this week's theme — readers can immediately recite it and make it a personal wird. Audience: general Indonesian Muslim, adults and youth. Structure:
+1. **Short intro** (1 sentence, ~15 words): connect this week's situation to the need for this particular du'a — e.g., "This week trust is being tested at many tables; anchor each step in one du'a the Prophet ﷺ taught."
+2. **Du'a** (Arabic with full harakat — 1 line for a short du'a, 2-3 lines for a longer one) — from an authentic source: morning-evening adhkar (Hisnul Muslim), Qur'anic prophets' du'a (e.g., Yunus, Ibrahim, Sulaiman), or short du'a from Riyad as-Salihin / Bukhari / Muslim. After the Arabic, give one line of ID translation.
+3. **One-line citation**: exact source (e.g., "HR. Bukhari & Muslim", "QS. Al-Anbiya: 87", "Hisnul Muslim — Morning Adhkar").
+4. **Micro-invitation** (1 sentence): "Recite each morning this week" or "Carry it into Tahajjud for three consecutive nights" — something concrete and light.
+
+CRITICAL: the du'a MUST be authentic with a clear source. Do NOT invent du'a. If the citation appears in the daleel pool I provided, use that exact citation in the `**Daleel:**` marker. Otherwise (e.g., from Hisnul Muslim), still write the full citation in the paragraph — the `**Daleel:**` marker may be left empty OR use the most thematic pool entry. Arabic du'a MUST carry full harakat (fathah, kasrah, dhammah, sukūn, syaddah, mad).
+
+GENERAL RULES for ALL 6 flyer messages:
 - SOLUTIVE, not provocative. Every message must include (a) brief problem context, (b) the relevant Islamic principle, (c) one concrete individual step, (d) one concrete community/neighborhood step. Do NOT close with a rhetorical question alone — the reader must walk away knowing WHAT to do today.
 - HEADLINE must be CLEAR, not ambiguous, leading straight to the message. Avoid clickbait ("WHY IS THE WORLD LIKE THIS?"); pick a phrase that signals the gist ("Start Fairness at Your Own Table"). A scroll-skim reader must understand the flyer's point WITHIN 2 SECONDS.
 - SOFT language. Do NOT use harsh / judgmental words like "betrayal", "rot", "rotten", "thugs", "predator state", "regime", "filthy", "rats". Use softer + observational framings: "amanah yet to be fulfilled", "trust being tested", "spaces we need to repair", "iman to rebuild together". Especially when speaking about government, agencies, or organisations — focus on SOLUTION + PRAYER, not condemnation.
