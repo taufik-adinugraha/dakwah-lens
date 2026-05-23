@@ -375,11 +375,12 @@ function palettesFor(slot: FlyerSlot): PalettePreset[] {
 // Layout sub-variants — visual variety within the same slot.
 // ──────────────────────────────────────────────────────────────────
 
-/** Optional sub-variant index (0-2) so each layout can vary its
- *  decorations without us adding 12 distinct layout files. The layout
- *  component reads this off the palette ctx and switches accent
- *  positions / shapes. */
-export type LayoutVariant = 0 | 1 | 2;
+/** Optional sub-variant index so each layout can vary its decorations
+ *  without us adding many distinct layout files. The layout component
+ *  reads this off the palette ctx and switches accent positions /
+ *  shapes / structural compositions. Range is 0..3; layouts that only
+ *  define 3 variants can switch on `variant % 3` internally. */
+export type LayoutVariant = 0 | 1 | 2 | 3;
 
 // ──────────────────────────────────────────────────────────────────
 
@@ -685,8 +686,13 @@ export async function composeFlyer(ctx: FlyerContext): Promise<{
   const content = buildContent(ctx);
   const palette = buildPalette(ctx.slot, seed);
   // Distinct seeds for layout variant so decorations rotate
-  // independently of palette + photo (more visual variety).
-  const layoutVariant = ((seed >>> 8) % 3) as LayoutVariant;
+  // independently of palette + photo (more visual variety). The
+  // PosterQuestion layout defines 4 truly distinct top-level
+  // compositions (side photo / top photo banner / pure typography /
+  // photo backdrop) — give it the wider rotation. All other layouts
+  // still cap at 3 variants and can mod themselves.
+  const variantMod = ctx.slot.kind === "poster" ? 4 : 3;
+  const layoutVariant = ((seed >>> 8) % variantMod) as LayoutVariant;
 
   return {
     layoutId,

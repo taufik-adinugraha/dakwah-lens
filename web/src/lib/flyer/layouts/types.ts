@@ -62,9 +62,12 @@ export type ResolvedAssets = {
 
 export type FlyerRenderProps = FlyerComposition & {
   assets: ResolvedAssets;
-  /** 0-2 — drives decoration variation within a single layout so
-   *  successive editions don't look identical. */
-  layoutVariant: 0 | 1 | 2;
+  /** 0-3 — drives decoration variation within a single layout so
+   *  successive editions don't look identical. Most layouts only
+   *  consume 0..2; PosterQuestion uses all 4. compose.ts caps the
+   *  rotation modulo the layout's own count via the `variantMod`
+   *  branch. */
+  layoutVariant: 0 | 1 | 2 | 3;
 };
 
 /** Every layout component conforms to this shape. */
