@@ -120,10 +120,16 @@ export type FlyerSlot =
       segment: string | null;
     };
 
+/** Briefing-level context passed into composeFlyer. `daleelRefs` is the
+ *  thematic pool (used by general / genz flyers); `adhkarRefs` is the
+ *  separate du'a / dzikir pool (used by sunnah / dua flyers).
+ *  `adhkarRefs` is optional / null for older briefings written before
+ *  the 2026-05-23 adhkar split. */
 export type FlyerContext = {
   generatedAt: Date;
   body: string;
   daleelRefs: DaleelRef[] | null;
+  adhkarRefs?: DaleelRef[] | null;
   slot: FlyerSlot;
   locale: FlyerLocale;
 };
@@ -605,25 +611,32 @@ async function buildContent(ctx: FlyerContext): Promise<FlyerContent> {
     // Sunnah invitation (variant a) + Du'a hero (variant b).
     //
     // The Pesan Flyer 5 / 6 paragraphs carry the relevant du'a +
-    // citation INLINE — that's the whole point of these flyers. Using
-    // the briefing's themed daleel pool here showed unrelated daleel
-    // (because the pool is scoped to the week's news topic, not to
-    // the sunnah being recommended).
+    // citation INLINE — that's the whole point of these flyers.
     //
-    // Strategy:
-    //   - Parse the inline Arabic + ID translation + citation out of
-    //     the block as a synthetic DaleelRef.
-    //   - For variant b (Du'a hero, hero-ayat layout) this becomes
-    //     the daleel card the layout displays as the centerpiece.
-    //   - For variant a (Sunnah call, split-image layout) we DON'T
-    //     show a separate daleel card — the inline du'a stays inside
-    //     the message paragraph where it belongs.
-    //   - Either way, the briefing's pool daleel is ignored for
-    //     these slots so an unrelated daleel never lands on screen.
+    // Strategy (in priority order):
+    //   1. The briefing's `adhkarRefs` pool — du'a retrieved from the
+    //      kitab corpus via the du'a-biased query path. The LLM cites
+    //      from this pool when it writes Pesan Flyer 5+6, so the
+    //      `**Daleel:**` marker on the block should match one of
+    //      these entries. This is the verified path.
+    //   2. parseInlineDua — fallback when the briefing was written
+    //      before the 2026-05-23 adhkar split (adhkarRefs is null) or
+    //      the marker citation didn't match a pool entry. Extracts
+    //      the Arabic + translation + citation from the paragraph
+    //      itself.
+    //   3. null — for variant a (Sunnah call) we explicitly skip the
+    //      daleel card so the inline short du'a in the message
+    //      paragraph stays the only du'a reference.
+    //   - The briefing's THEMATIC `daleelRefs` is never used for
+    //     these slots — those are argumentative, not recitable.
+    const adhkarPoolDaleel = findDaleelByCitation(
+      ctx.adhkarRefs ?? null,
+      dedicatedBlock?.daleelCitation,
+    );
     const inlineDua = dedicatedBlock ? parseInlineDua(dedicatedBlock) : null;
     const fallbackMessage = extractBenangMerah(ctx.body);
     const rawMessage =
-      (dedicatedBlock && ctx.slot.variant === "b" && inlineDua
+      (dedicatedBlock && ctx.slot.variant === "b"
         ? stripInlineDua(dedicatedBlock)
         : dedicatedBlock?.body) ||
       fallbackMessage ||
@@ -637,7 +650,10 @@ async function buildContent(ctx: FlyerContext): Promise<FlyerContent> {
           ? "Ajakan Sunnah Pekan Ini"
           : "Doa Pekan Ini"),
       message: rawMessage,
-      daleel: ctx.slot.variant === "b" ? inlineDua : null,
+      daleel:
+        ctx.slot.variant === "b"
+          ? adhkarPoolDaleel ?? inlineDua
+          : null,
     };
   }
 

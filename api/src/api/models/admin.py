@@ -677,6 +677,17 @@ class InsightsSummary(Base):
         { corpus, citation, score, arabic, translation, ref_id }
     """
 
+    adhkar_refs: Mapped[list[dict] | None] = mapped_column(JSONB)
+    """Separate du'a / dzikir pool retrieved via the du'a-biased query
+    path (`retrieve_dua` in services/kitab_retrieval.py). Feeds Pesan
+    Flyer 5 (Sunnah invitation) + Flyer 6 (Du'a hero) so those
+    surfaces show RECITABLE du'a sourced from the existing kitab
+    corpus instead of relying on LLM parametric memory. Same item
+    schema as `daleel_refs`. NULL on older briefings written before
+    the 2026-05-23 adhkar split — the flyer renderer falls back to
+    its inline-parse path in that case.
+    """
+
 
 class Bookmark(Base):
     """User-saved item (kitab citation, brief, or social post).

@@ -60,7 +60,9 @@ from api.services.insights_summary import (
 )
 from api.services.kitab_retrieval import (
     rerank_daleel,
+    rerank_dua,
     retrieve_daleel,
+    retrieve_dua,
     translate_daleel_to_id,
 )
 
@@ -103,12 +105,19 @@ def _cache_path(segment_key: str) -> Path:
 
 async def _prepare_context(
     segment: str | None,
-) -> tuple[dict[str, Any], list[dict[str, Any]], str, str]:
+) -> tuple[
+    dict[str, Any],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    str,
+    str,
+]:
     """Run the data-prep half of the pipeline (everything BEFORE the LLM).
 
-    Returns: (stats, daleel, system_prompt, user_prompt). Indonesian-only
-    because EN generation is paused; switch SYSTEM_PROMPT_EN/ "en" here
-    if you ever need to dump an English prompt.
+    Returns: (stats, daleel, adhkar, system_prompt, user_prompt).
+    Indonesian-only because EN generation is paused; switch
+    SYSTEM_PROMPT_EN/ "en" here if you ever need to dump an English
+    prompt.
     """
     async with SessionLocal() as session:
         stats = await _compute_stats(session, segment)
@@ -123,15 +132,29 @@ async def _prepare_context(
         daleel = rerank_daleel(retrieval_query, candidates, top_n=10)
         daleel = translate_daleel_to_id(daleel)
 
+        # Du'a / dzikir retrieval — same theme, different query shape,
+        # different pool. Feeds Pesan Flyer 5 (Sunnah call) + Flyer 6
+        # (Du'a hero) so those flyers cite a recitable du'a sourced
+        # from the existing kitab corpus instead of relying on the
+        # LLM's parametric memory.
+        dua_candidates = retrieve_dua(
+            retrieval_query, limit=15, per_corpus=4
+        )
+        adhkar = rerank_dua(retrieval_query, dua_candidates, top_n=6)
+        adhkar = translate_daleel_to_id(adhkar)
+
         log.info(
             "manual_briefing.context_ready",
             segment=segment,
             daleel_count=len(daleel),
+            adhkar_count=len(adhkar),
             posts_7d=stats["totals"]["posts_7d"],
         )
 
-    user_prompt = _build_user_prompt(stats, daleel, language="id")
-    return stats, daleel, SYSTEM_PROMPT_ID, user_prompt
+    user_prompt = _build_user_prompt(
+        stats, daleel, adhkar=adhkar, language="id"
+    )
+    return stats, daleel, adhkar, SYSTEM_PROMPT_ID, user_prompt
 
 
 # ──────────────────────────────────────────────────────────────────
@@ -142,10 +165,13 @@ async def _prepare_context(
 async def cmd_dump(segment: str, output_path: str | None) -> None:
     seg = _segment_arg(segment)
     seg_key = _segment_key(seg)
-    stats, daleel, system_prompt, user_prompt = await _prepare_context(seg)
+    stats, daleel, adhkar, system_prompt, user_prompt = await _prepare_context(
+        seg
+    )
 
-    # Cache the (stats, daleel) for the matching `save` step. JSON keeps
-    # this tool inspectable + portable across script invocations.
+    # Cache the (stats, daleel, adhkar) for the matching `save` step.
+    # JSON keeps this tool inspectable + portable across script
+    # invocations.
     cache_path = _cache_path(seg_key)
     cache_path.write_text(
         json.dumps(
@@ -154,6 +180,7 @@ async def cmd_dump(segment: str, output_path: str | None) -> None:
                 "segment_key": seg_key,
                 "stats": stats,
                 "daleel": daleel,
+                "adhkar": adhkar,
                 "dumped_at_utc": datetime.now(UTC).isoformat(),
             },
             indent=2,
@@ -169,7 +196,7 @@ async def cmd_dump(segment: str, output_path: str | None) -> None:
     composed = (
         f"<!-- DAKWAH-LENS MANUAL BRIEFING PROMPT -->\n"
         f"<!-- segment: {seg_key}  dumped: {datetime.now(UTC).isoformat()} -->\n"
-        f"<!-- daleel pool: {len(daleel)} entries -->\n"
+        f"<!-- daleel pool: {len(daleel)} entries · adhkar pool: {len(adhkar)} entries -->\n"
         f"<!-- After Claude responds, save the reply as a .md file and run: -->\n"
         f"<!--   uv run python -m api.scripts.manual_briefing save {seg_key} <reply.md> -->\n\n"
         "================================================================\n"
@@ -244,6 +271,7 @@ async def cmd_save(segment: str, markdown_path: str) -> None:
     cached = json.loads(cache_path.read_text(encoding="utf-8"))
     stats: dict[str, Any] = cached["stats"]
     daleel: list[dict[str, Any]] = cached["daleel"]
+    adhkar: list[dict[str, Any]] = cached.get("adhkar", [])
 
     # Belt-and-braces: don't let a stale cache get attached to a fresh
     # briefing the user dumped weeks ago.
@@ -272,6 +300,7 @@ async def cmd_save(segment: str, markdown_path: str) -> None:
             cost_usd=0.0,
             segment=seg,
             daleel_refs=daleel,
+            adhkar_refs=adhkar,
         )
         session.add(row)
         await session.commit()
@@ -279,7 +308,7 @@ async def cmd_save(segment: str, markdown_path: str) -> None:
         sys.stderr.write(
             f"✓ Briefing saved for segment '{seg_key}'.\n"
             f"  model={MODEL_TAG} (manual)\n"
-            f"  daleel_refs={len(daleel)}\n"
+            f"  daleel_refs={len(daleel)} · adhkar_refs={len(adhkar)}\n"
             f"  body={len(summary_md):,} chars\n"
             f"  cost=$0.00\n",
         )

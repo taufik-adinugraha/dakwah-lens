@@ -297,6 +297,8 @@ RULE: setiap headline yang menyebut ibadah/sunnah, baca dengan asumsi pembaca te
 
 ATURAN DALEEL: citation HARUS persis cocok dengan salah satu entri di daleel pool yang saya berikan. Pilih daleel yang PALING terkait dengan isi paragraf flyer-nya — bukan asal pilih. Headline + daleel + paragraf harus membentuk satu pesan yang utuh dan saling memperkuat. Boleh dua flyer pakai daleel berbeda dari pool yang sama; usahakan 4 flyer pakai 4 daleel berbeda kalau pool memungkinkan.
 
+ATURAN DALEEL untuk Pesan Flyer 5 & 6 (SUNNAH + DOA): citation pada Pesan Flyer 5 (Ajakan Sunnah) dan Pesan Flyer 6 (Doa Pekan Ini) HARUS dipilih dari blok **ADHKAR POOL** yang TERPISAH dari DALEEL POOL (lihat user prompt di bawah). ADHKAR POOL berisi du'a / dzikir yang dapat dibaca langsung — entri yang cocok untuk dijadikan wirid. JANGAN ambil daleel untuk Flyer 5+6 dari DALEEL POOL (yang sifatnya argumentatif-tematik, bukan recitable). Kalau ADHKAR POOL kosong atau tidak ada entri yang cocok untuk satu paragraf, kosongkan baris `**Daleel:**` untuk paragraf itu (jangan diisi dengan citation yang tidak ada di pool).
+
 LARANGAN MUTLAK pada keempat paragraf:
 - JANGAN tulis "mari kita tutup khutbah ini" / "khutbah pertama" / "khutbah ini"
 - JANGAN tulis "diskusi malam ini" / "diskusi ini" / "kajian ini" / "sesi ini"
@@ -565,6 +567,8 @@ REAL TRAP CASES (do NOT mimic):
 RULE: any headline that names an ibadah / sunnah must be read assuming the audience is rushed and will likely NOT read the paragraph underneath. If the headline ALONE can be read as "skip ibadah X for Y", REWRITE. Use additive constructions (`also`, `and`, `add`, `plus`, `too`) — NEVER oppositional ones (`not`, `without`, `instead of`).
 
 DALEEL RULES: the citation MUST match one of the entries in the daleel pool I provided. Pick the daleel that most DIRECTLY supports the paragraph — not a random pick. Headline + daleel + paragraph must read as one tight message that reinforces itself. Two flyers can pull from the same pool; aim for 4 different daleel across the 4 flyers when the pool allows.
+
+DALEEL RULES for Flyer Messages 5 & 6 (SUNNAH + DU'A): citations on Flyer Message 5 (Sunnah Invitation) and Flyer Message 6 (This Week's Du'a) MUST come from the **ADHKAR POOL** — a separate pool in the user prompt below, holding recitable du'a / dzikir entries. Do NOT use DALEEL POOL entries for Flyer 5+6 (those are argumentative-thematic, not recitable). If the ADHKAR POOL is empty or none of its entries fit a given paragraph, leave the `**Daleel:**` marker line blank for that paragraph (never fabricate a citation).
 
 ABSOLUTE bans across all four paragraphs:
 - Do NOT write "let's close this khutbah" / "first khutbah" / "this khutbah"
@@ -1064,6 +1068,7 @@ def _build_user_prompt(
     stats: dict[str, Any],
     daleel: list[dict[str, Any]],
     *,
+    adhkar: list[dict[str, Any]] | None = None,
     language: str = "id",
 ) -> str:
     """Assemble the structured context for Gemini.
@@ -1072,6 +1077,12 @@ def _build_user_prompt(
     English translation for `en`) and the empty-daleel sentinel string.
     The stats JSON itself is language-agnostic — the model translates
     numeric + categorical context naturally.
+
+    `adhkar` is the separate du'a / dzikir pool retrieved via
+    `retrieve_dua`. When supplied, it surfaces in its own ADHKAR POOL
+    block so the LLM cites recitable du'a for Pesan Flyer 5 + 6
+    (Sunnah invitation + Du'a hero) instead of inventing them from
+    parametric memory. None / empty list → block hidden entirely.
     """
     if language == "en":
         empty_marker = "(no daleel found for this theme)"
@@ -1160,6 +1171,29 @@ def _build_user_prompt(
         else "Write the briefing now in markdown, 5-section format (Executive Summary / Numbers & Trends This Week / Main Themes & Emerging Patterns / Da'wah Strategies & Actions / Daleel & Sources), ~7300-9800 words total — Da'wah Strategies & Actions is a CONTENT KIT containing ready-to-use drafts (full khutbah, kajian outline, video script, etc) with daleel from the pool woven inline into each sub-section, NOT a strategic summary."
     )
 
+    # ADHKAR POOL — du'a / dzikir retrieved separately so Pesan Flyer
+    # 5 (Sunnah invitation) and Flyer 6 (Du'a hero) cite a recitable
+    # du'a sourced from the kitab corpus. We render it whether or not
+    # the LLM uses every entry; the prompt instructs Pesan Flyer 5 + 6
+    # to pin their `**Daleel:**` markers to citations from THIS pool.
+    if adhkar:
+        adhkar_block = "\n\n".join(
+            f"Citation: {a['citation']}\n"
+            f"Arabic: {a['arabic'][:300]}\n"
+            f"{translation_label}: {_translation_for(a)[:500]}"
+            for a in adhkar
+        )
+        adhkar_section = (
+            "\n\nADHKAR POOL (for Pesan Flyer 5 — Ajakan Sunnah dan "
+            "Flyer 6 — Doa Pekan Ini; the `**Daleel:**` marker on those "
+            "two flyer paragraphs MUST cite from THIS pool — these are "
+            "recitable du'a sourced from authentic kitab, distinct from "
+            "the thematic DALEEL POOL above):\n\n"
+            f"{adhkar_block}"
+        )
+    else:
+        adhkar_section = ""
+
     return f"""{scope_note}
 
 HEADLINE NUMBERS (use ONLY these for Sections 1 & 2):
@@ -1172,7 +1206,7 @@ TOP TOPICS WITH SAMPLE HEADLINES (Section 3 MUST name specific stories from thes
 
 DALEEL POOL (use for Section 5, cite 4-5 from here; the `Citation` field is what goes in your heading):
 
-{daleel_block}
+{daleel_block}{adhkar_section}
 
 {write_now}"""
 
@@ -1211,6 +1245,7 @@ def _generate_for_language(
     daleel: list[dict[str, Any]],
     language: str,
     segment: str | None,
+    adhkar: list[dict[str, Any]] | None = None,
 ) -> tuple[str, int | None, int | None, float] | None:
     """Run one Gemini Pro call in the requested language.
 
@@ -1220,7 +1255,9 @@ def _generate_for_language(
     (Indonesian) or recoverable with fallback (English).
     """
     system_prompt = SYSTEM_PROMPT_EN if language == "en" else SYSTEM_PROMPT_ID
-    user_prompt = _build_user_prompt(stats, daleel, language=language)
+    user_prompt = _build_user_prompt(
+        stats, daleel, adhkar=adhkar, language=language
+    )
 
     resp = client.models.generate_content(
         model=MODEL,
@@ -1327,12 +1364,27 @@ async def generate_summary(
         # the ID-locale brief render English. Idempotent on Quran-only
         # lists. ~$0.0001 per brief.
         daleel = translate_daleel_to_id(daleel)
+
+        # Adhkar pool — du'a-biased retrieval over the same kitab
+        # corpus, fed to Pesan Flyer 5 (Sunnah call) + Flyer 6 (Du'a
+        # hero) so those slots cite a recitable du'a sourced from the
+        # database instead of relying on the LLM's parametric memory.
+        # Separate pool because the thematic daleel above surfaces
+        # general guidance, not always recitable du'a.
+        from api.services.kitab_retrieval import retrieve_dua, rerank_dua
+
+        dua_candidates = retrieve_dua(
+            retrieval_query, limit=15, per_corpus=4
+        )
+        adhkar = rerank_dua(retrieval_query, dua_candidates, top_n=6)
+        adhkar = translate_daleel_to_id(adhkar)
         log.info(
             "insights_summary.retrieved_daleel",
             segment=segment,
             query=retrieval_query,
             candidates=len(candidates),
             final=len(daleel),
+            adhkar=len(adhkar),
         )
 
         client = _get_client()
@@ -1347,7 +1399,9 @@ async def generate_summary(
         # Re-enable by restoring the `_generate_for_language("en", ...)`
         # call below — the persistence path already handles a non-NULL
         # `summary_md_en`.
-        id_result = _generate_for_language(client, stats, daleel, "id", segment)
+        id_result = _generate_for_language(
+            client, stats, daleel, "id", segment, adhkar=adhkar
+        )
         if id_result is None:
             return None
         summary_md, tokens_in_id, tokens_out_id, cost_id = id_result
@@ -1373,6 +1427,7 @@ async def generate_summary(
             cost_usd=cost,
             segment=segment,
             daleel_refs=daleel,
+            adhkar_refs=adhkar,
         )
         session.add(row)
         await session.commit()

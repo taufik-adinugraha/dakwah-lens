@@ -839,6 +839,12 @@ export const insightsSummaries = pgTable(
      *    [{ corpus, citation, score, arabic, translation_id,
      *       translation_en, ref_id }] */
     daleelRefs: jsonb("daleel_refs").$type<DaleelRef[] | null>(),
+    /** Separate du'a / dzikir pool for Pesan Flyer 5 (Sunnah
+     *  invitation) + Flyer 6 (Du'a hero). Retrieved via the
+     *  du'a-biased query path (Python `retrieve_dua()`); contains
+     *  recitable du'a sourced from the existing kitab corpus. NULL
+     *  on briefings written before the 2026-05-23 adhkar split. */
+    adhkarRefs: jsonb("adhkar_refs").$type<DaleelRef[] | null>(),
   },
   (table) => [
     index("ix_insights_summaries_generated_at").on(table.generatedAt),

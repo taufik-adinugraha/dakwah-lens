@@ -224,6 +224,229 @@ def retrieve_daleel(
     return all_hits[:limit]
 
 
+def retrieve_dua(
+    theme: str,
+    *,
+    hijri_context: str | None = None,
+    limit: int = 8,
+    per_corpus: int = 4,
+) -> list[dict[str, Any]]:
+    """Retrieve DU'A / dzikir entries from the existing kitab corpus
+    biased toward du'a content.
+
+    Existing collections already cover this — Bukhari has Kitab
+    ad-Da'awat (book 75, hadith 6304-6411); Muslim has Kitab adh-Dhikr
+    wa ad-Du'a wa at-Tawbah wa al-Istighfar (book 48); Riyad as-Salihin
+    has chapters 245-373 of dzikir + du'a; and Qur'an carries every
+    prophetic du'a (Yunus, Ibrahim, Musa, Zakaria, Sulaiman, Ayyub…).
+    We don't need a separate adhkar index — we need a separate QUERY
+    shape so embedding similarity surfaces du'a passages instead of
+    general thematic verses.
+
+    The query is enriched with du'a-flavored Indonesian phrasing so
+    the embedded vector lands near du'a content in vector space:
+        "doa dan munajat tentang {theme}: memohon kepada Allah,
+         dzikir pagi-petang, perlindungan, ketetapan hati"
+    Hijri context (e.g., "menjelang Idul Adha", "bulan Sya'ban")
+    biases retrieval toward seasonal du'a (Arafah, Asyura, Sha'ban).
+
+    Returns the same DaleelRef shape as `retrieve_daleel`. The pool
+    is meant to be passed to the LLM as an ADHKAR_POOL alongside the
+    regular thematic DALEEL_POOL, and the Pesan Flyer 5 + 6 paragraphs
+    are instructed to cite from this pool.
+    """
+    if not theme.strip():
+        return []
+
+    parts = [
+        f"doa dan munajat tentang {theme}",
+        "memohon kepada Allah, dzikir pagi dan petang",
+        "perlindungan, hidayah, ketetapan hati, ampunan, tazkiyatun nafs",
+    ]
+    if hijri_context and hijri_context.strip():
+        parts.insert(1, f"konteks Hijriyah: {hijri_context.strip()}")
+    enriched = " — ".join(parts)
+
+    # Pull from each corpus, then merge. Bukhari + Muslim + Riyad
+    # naturally hold most of the du'a content; Quran lands the
+    # prophetic du'a. Skip tafsir_ibn_kathir — it's exegesis, not
+    # du'a text per se, and using it as a "du'a source" would surface
+    # commentary rather than a recitable du'a.
+    openai = _get_openai()
+    try:
+        emb = openai.embeddings.create(
+            model=settings.embedding_model, input=enriched
+        )
+        vector = emb.data[0].embedding
+        record_usage(
+            provider="openai",
+            operation="embedding",
+            model=settings.embedding_model,
+            tokens_in=getattr(emb.usage, "total_tokens", None),
+            meta={"purpose": "adhkar_retrieval"},
+        )
+    except Exception as exc:
+        log.warning("adhkar_retrieval.embed_failed", error=str(exc))
+        return []
+
+    DUA_CORPORA = {
+        "quran": "quran",
+        "bukhari": "bukhari",
+        "muslim": "muslim",
+        "riyad_as_salihin": "riyad_as_salihin",
+        # Bulugh al-Maram is fiqh-focused; less rich in standalone du'a.
+        # Skip to keep the pool tight.
+    }
+
+    qdrant = _get_qdrant()
+    all_hits: list[dict[str, Any]] = []
+    for corpus, collection in DUA_CORPORA.items():
+        try:
+            qr = qdrant.query_points(
+                collection_name=collection,
+                query=vector,
+                limit=per_corpus,
+                with_payload=True,
+            )
+            results = qr.points
+        except Exception as exc:
+            log.debug(
+                "adhkar_retrieval.corpus_failed",
+                corpus=corpus,
+                error=str(exc),
+            )
+            continue
+        # Use the same MIN_SCORE bar — embedded queries match du'a
+        # content reasonably well, so the existing thresholds work.
+        threshold = MIN_SCORE.get(corpus, 0.30)
+        for hit in results:
+            if hit.score is None or hit.score < threshold:
+                continue
+            normalized = _normalize_hit(corpus, hit)
+            if normalized["ref_id"] in DALEEL_DENYLIST:
+                continue
+            all_hits.append(normalized)
+
+    all_hits.sort(key=lambda h: h["score"] or -1e9, reverse=True)
+    log.info(
+        "adhkar_retrieval.scored",
+        theme=theme[:80],
+        kept=len(all_hits),
+        top_score=all_hits[0]["score"] if all_hits else None,
+    )
+    return all_hits[:limit]
+
+
+def rerank_dua(
+    theme: str,
+    candidates: list[dict[str, Any]],
+    *,
+    top_n: int = 5,
+) -> list[dict[str, Any]]:
+    """Re-rank du'a candidates by whether they ARE a recitable du'a
+    (vs. a verse / hadith ABOUT du'a), and by thematic fit.
+
+    Mirrors `rerank_daleel` but with a du'a-shaped rubric — embedding
+    similarity sometimes surfaces verses commenting on du'a (e.g.
+    "Allah is near, He answers du'a") instead of an actual recitable
+    du'a passage. The re-rank asks Gemini Flash-Lite to score each
+    candidate against two criteria:
+      (a) Is it a recitable du'a / dzikir (i.e. an Arabic supplication
+          the reader can say verbatim)?
+      (b) Does it thematically connect to the briefing's theme?
+    """
+    if not candidates or len(candidates) <= top_n:
+        return candidates[:top_n]
+
+    from google import genai
+    from google.genai import types as genai_types
+
+    if not settings.gemini_api_key:
+        return candidates[:top_n]
+
+    client = genai.Client(api_key=settings.gemini_api_key)
+
+    numbered = "\n".join(
+        f"[{i}] {c['corpus'].upper()} {c['citation']}\n"
+        f"    Arab: {c['arabic'][:200]}\n"
+        f"    ID:   {c['translation_id'][:300] or c['translation_en'][:300]}"
+        for i, c in enumerate(candidates)
+    )
+    prompt = f"""Tema dakwah pekan ini:
+{theme}
+
+Berikut adalah {len(candidates)} kandidat dari Qur'an / hadith yang ditemukan untuk slot DOA + DZIKIR (bukan slot daleel argumentatif). Tugas Anda: pilih {top_n} kandidat terbaik berdasarkan DUA KRITERIA:
+
+1. RECITABLE — apakah ini doa atau dzikir yang BISA langsung dibaca / diwirid oleh pembaca? (mis. "Allāhumma innī as'aluka al-hudā..." YES; "Allah akan menjawab doa hamba-Nya..." NO — itu komentar tentang doa, bukan doa itu sendiri)
+2. THEMATIC — apakah maknanya nyambung dengan tema pekan ini?
+
+Yang harus dihindari:
+- Ayat / hadith yang sekadar BICARA TENTANG doa (bukan doa itu sendiri)
+- Doa yang sangat panjang (>2 kalimat Arab) — sulit dipakai untuk flyer
+- Doa yang konteksnya sangat spesifik tidak match dengan tema (mis. doa naik kendaraan untuk tema "amanah pejabat")
+
+Kandidat:
+{numbered}
+
+Kembalikan JSON: {{"indices": [i1, i2, ...]}} dengan {top_n} index terbaik, diurutkan dari yang paling cocok untuk slot doa + tema."""
+
+    try:
+        resp = client.models.generate_content(
+            model="gemini-2.5-flash-lite",
+            contents=prompt,
+            config=genai_types.GenerateContentConfig(
+                response_mime_type="application/json",
+                temperature=0.1,
+                max_output_tokens=200,
+                thinking_config=genai_types.ThinkingConfig(thinking_budget=0),
+            ),
+        )
+        raw = resp.text or "{}"
+        import json as _json
+
+        data = _json.loads(raw)
+        indices = data.get("indices", [])
+        if not isinstance(indices, list):
+            raise ValueError("indices not a list")
+        picked: list[dict[str, Any]] = []
+        seen: set[int] = set()
+        for idx in indices:
+            if (
+                isinstance(idx, int)
+                and 0 <= idx < len(candidates)
+                and idx not in seen
+            ):
+                picked.append(candidates[idx])
+                seen.add(idx)
+                if len(picked) >= top_n:
+                    break
+
+        usage_md = getattr(resp, "usage_metadata", None)
+        record_usage(
+            provider="gemini",
+            operation="adhkar_rerank",
+            model="gemini-2.5-flash-lite",
+            tokens_in=getattr(usage_md, "prompt_token_count", None),
+            tokens_out=gemini_output_tokens(usage_md),
+        )
+        log.info(
+            "adhkar_retrieval.reranked",
+            theme=theme[:80],
+            candidates_in=len(candidates),
+            picked=len(picked),
+        )
+        if len(picked) < top_n:
+            for c in candidates:
+                if c not in picked:
+                    picked.append(c)
+                    if len(picked) >= top_n:
+                        break
+        return picked
+    except Exception as exc:
+        log.warning("adhkar_retrieval.rerank_failed", error=str(exc))
+        return candidates[:top_n]
+
+
 def rerank_daleel(
     theme: str,
     candidates: list[dict[str, Any]],

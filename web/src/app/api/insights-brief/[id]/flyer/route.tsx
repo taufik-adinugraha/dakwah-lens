@@ -91,6 +91,7 @@ export async function GET(
     generatedAt: brief.generatedAt,
     body,
     daleelRefs: brief.daleelRefs,
+    adhkarRefs: brief.adhkarRefs,
     slot,
     locale: lang,
   });

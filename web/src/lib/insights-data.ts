@@ -379,6 +379,10 @@ export type LatestInsightsSummary = {
   model: string;
   segment: string | null;
   daleelRefs: schema.DaleelRef[] | null;
+  /** Separate du'a / dzikir pool for Pesan Flyer 5 + 6. NULL on
+   *  briefings written before the 2026-05-23 adhkar split. Same item
+   *  schema as `daleelRefs`. */
+  adhkarRefs: schema.DaleelRef[] | null;
 };
 
 /** Most-recent AI-narrated executive briefing for a given segment.
@@ -398,6 +402,7 @@ export async function getLatestInsightsSummary(
       model: schema.insightsSummaries.model,
       segment: schema.insightsSummaries.segment,
       daleelRefs: schema.insightsSummaries.daleelRefs,
+      adhkarRefs: schema.insightsSummaries.adhkarRefs,
     })
     .from(schema.insightsSummaries)
     .where(
@@ -412,6 +417,7 @@ export async function getLatestInsightsSummary(
     ...row,
     headlineStats: row.headlineStats as LatestInsightsSummary["headlineStats"],
     daleelRefs: (row.daleelRefs as schema.DaleelRef[] | null) ?? null,
+    adhkarRefs: (row.adhkarRefs as schema.DaleelRef[] | null) ?? null,
   };
 }
 
@@ -447,6 +453,7 @@ export async function getBriefingBySlug(
       model: schema.insightsSummaries.model,
       segment: schema.insightsSummaries.segment,
       daleelRefs: schema.insightsSummaries.daleelRefs,
+      adhkarRefs: schema.insightsSummaries.adhkarRefs,
     })
     .from(schema.insightsSummaries)
     .where(
@@ -463,6 +470,7 @@ export async function getBriefingBySlug(
     ...row,
     headlineStats: row.headlineStats as LatestInsightsSummary["headlineStats"],
     daleelRefs: (row.daleelRefs as schema.DaleelRef[] | null) ?? null,
+    adhkarRefs: (row.adhkarRefs as schema.DaleelRef[] | null) ?? null,
   };
 }
 
