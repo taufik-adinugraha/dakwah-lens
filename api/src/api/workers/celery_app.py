@@ -54,7 +54,15 @@ celery_app.conf.update(
         "ingest-mainstream": {
             "task": "api.workers.ingest.run_ingest",
             "schedule": crontab(minute=0, hour="*/2"),
-            "kwargs": {"platform": "mainstream", "query": "", "limit": 40},
+            # limit=100 (was 40) — 27 enabled feeds × ~3-4 items per
+            # outlet per run via the round-robin interleave in
+            # services/rss.py::scrape_mainstream. Older 40-cap had every
+            # run hitting the ceiling with no spare headroom (items
+            # scraped == items stored == 40 verbatim), capping real
+            # daily volume around 480 even on busy news days. New cap
+            # lifts the ceiling to ~1,200/day while staying well inside
+            # the Flash-Lite classification budget.
+            "kwargs": {"platform": "mainstream", "query": "", "limit": 100},
         },
         # Retry mainstream rows whose sentiment label is NULL (Gemini 5xx
         # exhausted the in-line retry budget). Runs at 01:00, 03:00, … —
