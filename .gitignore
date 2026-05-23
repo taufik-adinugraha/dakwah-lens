@@ -47,3 +47,6 @@ logs/
 # Build artifacts
 coverage/
 .turbo/
+
+# Local-only experiment artifacts (kept outside git history)
+experiments/

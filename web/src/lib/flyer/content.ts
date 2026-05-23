@@ -73,27 +73,40 @@ function tidyHeadline(raw: string, maxWords = 6): string {
   return h;
 }
 
+/** Drop sentences that only make sense in their original deliverable
+ *  context (a Friday khutbah, a Sunday discussion, a Kreator script).
+ *  The flyer is read standalone — references to "this khutbah", "this
+ *  discussion", "thanks guys", etc. read as nonsense in that context. */
+const FORMAT_REFERENCE_RE = /\b(?:mari kita tutup|kita tutup|khutbah ini|kajian ini|diskusi (?:ini|malam ini)|thanks guys|guys,|sidang jum'?at|ma['ʼ]?asyiral|jamaah|jama['ʼ]?ah|hadirin|rahimakumullah|mukmin sekalian|bapak[- ]?ibu|ibu[- ]?ibu yang|kakak[- ]?kakak yang|adik[- ]?adik yang|sekian|wallahu a['ʼ]?lam|video ini|reel ini|caption ini|outline ini|materi ini|sesi ini|pertemuan ini|pekan depan kita|sesi (?:tadi|hari ini)|saat khutbah|saat kajian)\b/i;
+
+/** Drop visual-direction / stage cues that creep in from the Kreator
+ *  script when its prose is lifted into the flyer message. */
+const STAGE_CUE_RE = /\(visual:|\(scene:|\(transisi|\(b-roll|\(teks (?:di|akhir|layar)/i;
+
 /** Trim a body block to ~3-4 short sentences, capped at maxChars.
- *  Skips Arabic-heavy passages (more than half of letters are Arabic)
- *  so we never put a closing du'a in the flyer message slot. */
+ *  Drops Arabic-heavy passages, drops sentences with deliverable
+ *  format references, drops stage cues. Result is suitable for a
+ *  standalone flyer message. */
 function trimToSentences(raw: string, targetSentences = 3, maxChars = 320): string {
   const clean = stripMd(raw);
   if (isArabicHeavy(clean)) return "";
-  // Sentence split on .?! followed by whitespace + capital. Keeps the
-  // punctuation.
   const sentences = clean.match(/[^.!?]+[.!?]+/g) ?? [clean];
   let out = "";
-  for (let i = 0; i < sentences.length && i < targetSentences + 2; i++) {
-    if (isArabicHeavy(sentences[i])) continue;
-    const next = (out + " " + sentences[i]).trim();
+  let acceptedCount = 0;
+  for (let i = 0; i < sentences.length && acceptedCount < targetSentences + 2; i++) {
+    const s = sentences[i];
+    if (isArabicHeavy(s)) continue;
+    if (FORMAT_REFERENCE_RE.test(s)) continue;
+    if (STAGE_CUE_RE.test(s)) continue;
+    const next = (out + " " + s).trim();
     if (next.length > maxChars && out.length > 0) break;
     out = next;
-    if (i + 1 >= targetSentences && out.length > maxChars * 0.7) break;
+    acceptedCount += 1;
+    if (acceptedCount >= targetSentences && out.length > maxChars * 0.7) break;
   }
   if (out.length > maxChars) {
     out = out.slice(0, maxChars - 1).trimEnd() + "…";
   }
-  // Strip stray opening / closing quote pairs that survive the join.
   return out.replace(/^["“]\s*|\s*["”]$/g, "").trim();
 }
 
@@ -257,6 +270,134 @@ export function extractGenZTagline(markdown: string): string {
     return tidyHeadline(first.slice(0, 60), 7);
   }
   return "";
+}
+
+// ──────────────────────────────────────────────────────────────────
+// Dedicated flyer-message section (briefings post-2026-05-23)
+// ──────────────────────────────────────────────────────────────────
+
+/** Index into the 4 flyer-message slots, in the order the prompt asks
+ *  for them: khutbah voice → action voice → kreator voice → reflection. */
+export type FlyerMessageSlot = 0 | 1 | 2 | 3;
+
+/** Pull one of the 4 standalone messages from the `## Pesan Flyer`
+ *  / `## Flyer Messages` section that the briefing prompt asks for
+ *  (added 2026-05-23). Returns "" if the section is missing — that's
+ *  the signal for the caller to fall back to the per-variant
+ *  extractors (Benang Merah + format-filtered deliverable text).
+ *
+ *  Section structure:
+ *    ## Pesan Flyer
+ *    ### Pesan Flyer 1 — Suara Khutbah
+ *    <paragraph>
+ *    ### Pesan Flyer 2 — Suara Aksi Sosial
+ *    <paragraph>
+ *    ### Pesan Flyer 3 — Suara Kreator Konten
+ *    <paragraph>
+ *    ### Pesan Flyer 4 — Suara Refleksi Gen Z
+ *    <paragraph>
+ */
+export function extractDedicatedFlyerMessage(
+  markdown: string,
+  slot: FlyerMessageSlot,
+): string {
+  const lines = markdown.split("\n");
+
+  // Find the section heading. Match both ID + EN labels — the writer
+  // may use either depending on the briefing's locale.
+  const sectionHeading = /^##\s+(?:pesan\s+flyer|flyer\s+messages)\b/i;
+  let secStart = -1;
+  for (let i = 0; i < lines.length; i++) {
+    if (sectionHeading.test(lines[i])) {
+      secStart = i + 1;
+      break;
+    }
+  }
+  if (secStart === -1) return "";
+
+  // Section runs until the next H2 (or EOF — Pesan Flyer is the last
+  // section the prompt asks for).
+  let secEnd = lines.length;
+  for (let i = secStart; i < lines.length; i++) {
+    if (lines[i].startsWith("## ")) {
+      secEnd = i;
+      break;
+    }
+  }
+
+  // Collect each `### Pesan Flyer N` / `### Flyer Message N` block.
+  // Captures the body up to the next H3 or section end.
+  const subHeading = /^###\s+(?:pesan\s+flyer|flyer\s+message)\s*(\d)/i;
+  const blocks: string[] = [];
+  let currentStart = -1;
+  let currentIdx = -1;
+  const flushBlock = (endLine: number) => {
+    if (currentStart >= 0 && currentIdx >= 0) {
+      blocks[currentIdx] = lines.slice(currentStart, endLine).join("\n").trim();
+    }
+  };
+  for (let i = secStart; i < secEnd; i++) {
+    const m = lines[i].match(subHeading);
+    if (m) {
+      flushBlock(i);
+      currentIdx = parseInt(m[1], 10) - 1;
+      currentStart = i + 1;
+    }
+  }
+  flushBlock(secEnd);
+
+  const body = blocks[slot];
+  if (!body) return "";
+  // Strip markdown but keep sentence structure. Use the existing
+  // trim helper so we get the same format-reference filtering.
+  return trimToSentences(stripMd(body), 4, 360);
+}
+
+// ──────────────────────────────────────────────────────────────────
+// Wholistic-message extractor
+// ──────────────────────────────────────────────────────────────────
+
+/** Pull the "Benang merah" closing paragraph from Section 3 (Tema
+ *  Utama & Pola Yang Muncul). This is the most wholistic message in
+ *  the briefing — a 2-3 sentence summary of the week's underlying
+ *  thread that doesn't reference any specific deliverable format.
+ *  Ideal default for the flyer body. */
+export function extractBenangMerah(markdown: string): string {
+  const lines = markdown.split("\n");
+  let s2Start = -1;
+  let h2Count = 0;
+  // Locate Section 3 — the third H2 heading.
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].startsWith("## ")) {
+      h2Count += 1;
+      if (h2Count === 3) {
+        s2Start = i + 1;
+        break;
+      }
+    }
+  }
+  if (s2Start === -1) return "";
+  let s2End = lines.length;
+  for (let i = s2Start; i < lines.length; i++) {
+    if (lines[i].startsWith("## ")) {
+      s2End = i;
+      break;
+    }
+  }
+  const body = lines.slice(s2Start, s2End).join("\n");
+  // Look for the bolded `**Benang merah:**` (Indonesian) or
+  // `**Common thread:**` (English) marker.
+  const m = body.match(
+    /\*\*\s*(?:benang\s+merah|common\s+thread)\s*[:：]?\s*\*\*\s*([\s\S]+?)(?=\n\s*\*\*|\n##|$)/i,
+  );
+  if (m && m[1]) return trimToSentences(stripMd(m[1]), 3, 320);
+  // Fallback: take the LAST substantive paragraph of Section 3 (it
+  // usually carries the synthesis even without an explicit marker).
+  const paragraphs = body
+    .split(/\n\s*\n/)
+    .map((p) => stripMd(p))
+    .filter((p) => p.length > 100 && !isArabicHeavy(p));
+  return trimToSentences(paragraphs[paragraphs.length - 1] ?? "", 3, 320);
 }
 
 // ──────────────────────────────────────────────────────────────────

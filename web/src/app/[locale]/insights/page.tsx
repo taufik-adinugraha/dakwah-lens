@@ -129,10 +129,11 @@ export default async function InsightsPage({
         </div>
       </section>
 
-      {/* Footer CTA for anonymous visitors — clarified to set the right
-           expectation: most features are open without login, so signup
-           is for personalization + team-review, not for basic access. */}
-      {!session?.user && (
+      {/* Footer "Apply for Full Access" CTA hidden (2026-05-23) —
+          signups paused while the brief feature is admin-only and
+          experimental. Anonymous visitors can still browse insights
+          without needing the upsell. */}
+      {false && !session?.user && (
         <section className="pb-20 sm:pb-28">
           <div className="mx-auto max-w-5xl px-4 sm:px-6">
             <div className="relative isolate overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 via-emerald-700 to-brand-700 px-6 py-12 text-center text-white shadow-2xl sm:px-12">

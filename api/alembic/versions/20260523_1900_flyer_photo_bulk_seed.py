@@ -1,14 +1,14 @@
-"""Bulk seed flyer_assets photo pool — 204 CC0 photos from Unsplash.
+"""Bulk seed flyer_assets photo pool — 196 CC0 photos from Unsplash.
 
-Source themes:
-  - mosque (25)        - mosque-detail (24)
-  - islamic-calligraphy (22) - prayer-objects (17)
-  - indonesia-nature (25) - nature-extra (25)
-  - sky-light (25)     - writing-hands (24)
-  - children-learning (17)
+Source themes (post hand-review):
+  - mosque (25)              - mosque-detail (24)
+  - islamic-calligraphy (22) - prayer-objects (16)
+  - indonesia-nature (25)    - nature-extra (25)
+  - sky-light (25)           - writing-hands (23)
+  - children-learning (11)
 
 Sourced via /tmp/fetch-flyer-photos.py + /tmp/source-new-themes.py and
-hand-reviewed for dakwah appropriateness (58 + 24 inappropriate
+hand-reviewed for dakwah appropriateness (58 + 24 + 8 inappropriate
 candidates flagged + removed across multiple curation passes).
 
 Revision ID: n6r8t0v2x4z6
@@ -28,7 +28,7 @@ branch_labels = None
 depends_on = None
 
 
-# (id, src, aspect, tags) tuples — 204 photos.
+# (id, src, aspect, tags) tuples — 196 photos.
 SEED_PHOTOS: list[tuple[str, str, str, list[str]]] = [
     ('photo-mosque-D5xvlpBt', '/flyer-assets/photos/uploads/mosque-01-D5xvlpBt.jpg', '1:1', ['masjid', 'ibadah', 'ruang', 'arsitektur']),
     ('photo-mosque-8VSMuAKb', '/flyer-assets/photos/uploads/mosque-02-8VSMuAKb.jpg', '1:1', ['masjid', 'ibadah', 'ruang', 'arsitektur']),
@@ -57,8 +57,6 @@ SEED_PHOTOS: list[tuple[str, str, str, list[str]]] = [
     ('photo-mosque-icDgNwst', '/flyer-assets/photos/uploads/mosque-25-icDgNwst.jpg', '1:1', ['masjid', 'ibadah', 'ruang', 'arsitektur']),
     ('photo-children-learning-ocEpT2tK', '/flyer-assets/photos/uploads/children-learning-01-ocEpT2tK.jpg', '1:1', ['anak', 'pendidikan', 'ngaji', 'santri']),
     ('photo-children-learning-xplEn10Z', '/flyer-assets/photos/uploads/children-learning-05-xplEn10Z.jpg', '1:1', ['anak', 'pendidikan', 'ngaji', 'santri']),
-    ('photo-children-learning-IxfPGP3b', '/flyer-assets/photos/uploads/children-learning-07-IxfPGP3b.jpg', '1:1', ['anak', 'pendidikan', 'ngaji', 'santri']),
-    ('photo-children-learning-dPee-Mbg', '/flyer-assets/photos/uploads/children-learning-08-dPee-Mbg.jpg', '1:1', ['anak', 'pendidikan', 'ngaji', 'santri']),
     ('photo-children-learning-CSC6RWSi', '/flyer-assets/photos/uploads/children-learning-09-CSC6RWSi.jpg', '1:1', ['anak', 'pendidikan', 'ngaji', 'santri']),
     ('photo-children-learning-07p6_tBL', '/flyer-assets/photos/uploads/children-learning-10-07p6_tBL.jpg', '1:1', ['anak', 'pendidikan', 'ngaji', 'santri']),
     ('photo-children-learning-_KPuV9qS', '/flyer-assets/photos/uploads/children-learning-12-_KPuV9qS.jpg', '1:1', ['anak', 'pendidikan', 'ngaji', 'santri']),
@@ -83,8 +81,6 @@ SEED_PHOTOS: list[tuple[str, str, str, list[str]]] = [
     ('photo-writing-hands-v1t81b8R', '/flyer-assets/photos/uploads/writing-hands-24-v1t81b8R.jpg', '1:1', ['menulis', 'jurnal', 'tangan', 'refleksi']),
     ('photo-writing-hands-QGkdIcuI', '/flyer-assets/photos/uploads/writing-hands-25-QGkdIcuI.jpg', '1:1', ['menulis', 'jurnal', 'tangan', 'refleksi']),
     ('photo-children-learning-yw9z-otD', '/flyer-assets/photos/uploads/children-learning-16-yw9z-otD.jpg', '1:1', ['anak', 'pendidikan', 'ngaji', 'santri']),
-    ('photo-children-learning-JKq3NPV_', '/flyer-assets/photos/uploads/children-learning-17-JKq3NPV_.jpg', '1:1', ['anak', 'pendidikan', 'ngaji', 'santri']),
-    ('photo-children-learning-fvxG34jv', '/flyer-assets/photos/uploads/children-learning-19-fvxG34jv.jpg', '1:1', ['anak', 'pendidikan', 'ngaji', 'santri']),
     ('photo-indonesia-nature-6NiUh7ZP', '/flyer-assets/photos/uploads/indonesia-nature-02-6NiUh7ZP.jpg', '1:1', ['alam', 'sawah', 'indonesia', 'lingkungan']),
     ('photo-indonesia-nature-fSdjQO8r', '/flyer-assets/photos/uploads/indonesia-nature-03-fSdjQO8r.jpg', '1:1', ['alam', 'sawah', 'indonesia', 'lingkungan']),
     ('photo-indonesia-nature-kXoEdaZ3', '/flyer-assets/photos/uploads/indonesia-nature-04-kXoEdaZ3.jpg', '1:1', ['alam', 'sawah', 'indonesia', 'lingkungan']),
@@ -111,15 +107,12 @@ SEED_PHOTOS: list[tuple[str, str, str, list[str]]] = [
     ('photo-indonesia-nature-4Fzp6z40', '/flyer-assets/photos/uploads/indonesia-nature-25-4Fzp6z40.jpg', '1:1', ['alam', 'sawah', 'indonesia', 'lingkungan']),
     ('photo-children-learning-qPrmz-LI', '/flyer-assets/photos/uploads/children-learning-16-qPrmz-LI.jpg', '1:1', ['anak', 'pendidikan', 'ngaji', 'santri']),
     ('photo-children-learning-87d_Yq1O', '/flyer-assets/photos/uploads/children-learning-18-87d_Yq1O.jpg', '1:1', ['anak', 'pendidikan', 'ngaji', 'santri']),
-    ('photo-children-learning-lN7bRp6f', '/flyer-assets/photos/uploads/children-learning-19-lN7bRp6f.jpg', '1:1', ['anak', 'pendidikan', 'ngaji', 'santri']),
     ('photo-children-learning-o9IBX2FX', '/flyer-assets/photos/uploads/children-learning-20-o9IBX2FX.jpg', '1:1', ['anak', 'pendidikan', 'ngaji', 'santri']),
     ('photo-children-learning-B56ziIfY', '/flyer-assets/photos/uploads/children-learning-23-B56ziIfY.jpg', '1:1', ['anak', 'pendidikan', 'ngaji', 'santri']),
     ('photo-children-learning-zT08bgl0', '/flyer-assets/photos/uploads/children-learning-25-zT08bgl0.jpg', '1:1', ['anak', 'pendidikan', 'ngaji', 'santri']),
     ('photo-writing-hands-OrOY3eY9', '/flyer-assets/photos/uploads/writing-hands-20-OrOY3eY9.jpg', '1:1', ['menulis', 'jurnal', 'tangan', 'refleksi']),
     ('photo-writing-hands-9TucEPaZ', '/flyer-assets/photos/uploads/writing-hands-23-9TucEPaZ.jpg', '1:1', ['menulis', 'jurnal', 'tangan', 'refleksi']),
-    ('photo-writing-hands-XjzFoGO7', '/flyer-assets/photos/uploads/writing-hands-24-XjzFoGO7.jpg', '1:1', ['menulis', 'jurnal', 'tangan', 'refleksi']),
     ('photo-writing-hands-FDAIlESG', '/flyer-assets/photos/uploads/writing-hands-25-FDAIlESG.jpg', '1:1', ['menulis', 'jurnal', 'tangan', 'refleksi']),
-    ('photo-children-learning-3CYJkMKK', '/flyer-assets/photos/uploads/children-learning-final-25-3CYJkMKK.jpg', '1:1', ['anak', 'pendidikan', 'ngaji', 'santri']),
     ('photo-writing-hands-bdvycycd', '/flyer-assets/photos/uploads/writing-hands-final-25-bdvycycd.jpg', '1:1', ['menulis', 'jurnal', 'tangan', 'refleksi']),
     ('photo-islamic-calligraphy-4udaet5n', '/flyer-assets/photos/uploads/islamic-calligraphy-01-4udaet5n.jpg', '1:1', ['kaligrafi', 'seni', 'arab', 'tulisan']),
     ('photo-islamic-calligraphy-fk_RMyFK', '/flyer-assets/photos/uploads/islamic-calligraphy-03-fk_RMyFK.jpg', '1:1', ['kaligrafi', 'seni', 'arab', 'tulisan']),
@@ -143,7 +136,6 @@ SEED_PHOTOS: list[tuple[str, str, str, list[str]]] = [
     ('photo-islamic-calligraphy-XJI2zF_B', '/flyer-assets/photos/uploads/islamic-calligraphy-22-XJI2zF_B.jpg', '1:1', ['kaligrafi', 'seni', 'arab', 'tulisan']),
     ('photo-islamic-calligraphy-LOFvEAtK', '/flyer-assets/photos/uploads/islamic-calligraphy-23-LOFvEAtK.jpg', '1:1', ['kaligrafi', 'seni', 'arab', 'tulisan']),
     ('photo-islamic-calligraphy-QvTIxJwC', '/flyer-assets/photos/uploads/islamic-calligraphy-25-QvTIxJwC.jpg', '1:1', ['kaligrafi', 'seni', 'arab', 'tulisan']),
-    ('photo-prayer-objects-LS8FaYad', '/flyer-assets/photos/uploads/prayer-objects-02-LS8FaYad.jpg', '1:1', ['ibadah', 'objek', 'shalat', 'ramadan']),
     ('photo-prayer-objects-D734dP1y', '/flyer-assets/photos/uploads/prayer-objects-03-D734dP1y.jpg', '1:1', ['ibadah', 'objek', 'shalat', 'ramadan']),
     ('photo-prayer-objects-alsfz8lJ', '/flyer-assets/photos/uploads/prayer-objects-04-alsfz8lJ.jpg', '1:1', ['ibadah', 'objek', 'shalat', 'ramadan']),
     ('photo-prayer-objects-GVbgm6Mz', '/flyer-assets/photos/uploads/prayer-objects-05-GVbgm6Mz.jpg', '1:1', ['ibadah', 'objek', 'shalat', 'ramadan']),

@@ -72,25 +72,38 @@ export default async function DashboardPage({
     return <PendingDashboard name={greetingName} t={t} />;
   }
 
+  // Brief generation is admin-only while the feature is experimental
+  // (2026-05-23). Non-admin approved users see the dashboard WITHOUT
+  // the brief-related sections — their own brief list is empty anyway
+  // since they can't create one.
+  const canCreateBriefs =
+    session.user.role === "admin" || session.user.role === "superadmin";
+
   // Fetch everything in parallel — these are all independent queries.
+  // Briefs queries are skipped entirely for non-admin so we don't burn
+  // round-trips fetching a list they won't see.
   const [recentBriefs, pulse, trendingCount, briefsThisWeek, topIssues, insights] =
     await Promise.all([
-      db
-        .select({
-          id: schema.briefs.id,
-          topicTitle: schema.briefs.topicTitle,
-          segment: schema.briefs.segment,
-          tone: schema.briefs.tone,
-          isPlaceholder: schema.briefs.isPlaceholder,
-          createdAt: schema.briefs.createdAt,
-        })
-        .from(schema.briefs)
-        .where(eq(schema.briefs.userId, session.user.id))
-        .orderBy(desc(schema.briefs.createdAt))
-        .limit(5),
+      canCreateBriefs
+        ? db
+            .select({
+              id: schema.briefs.id,
+              topicTitle: schema.briefs.topicTitle,
+              segment: schema.briefs.segment,
+              tone: schema.briefs.tone,
+              isPlaceholder: schema.briefs.isPlaceholder,
+              createdAt: schema.briefs.createdAt,
+            })
+            .from(schema.briefs)
+            .where(eq(schema.briefs.userId, session.user.id))
+            .orderBy(desc(schema.briefs.createdAt))
+            .limit(5)
+        : Promise.resolve([]),
       getPulseSnapshot(),
       getTrendingCount24h(),
-      getBriefsThisWeek(session.user.id),
+      canCreateBriefs
+        ? getBriefsThisWeek(session.user.id)
+        : Promise.resolve(0),
       getTopIssues(3),
       getDailyInsights(),
     ]);
@@ -103,11 +116,23 @@ export default async function DashboardPage({
         trendingCount={trendingCount}
         briefsThisWeek={briefsThisWeek}
         t={t}
+        canCreateBriefs={canCreateBriefs}
       />
-      <TopIssues issues={topIssues} t={t} />
+      <TopIssues
+        issues={topIssues}
+        t={t}
+        canCreateBriefs={canCreateBriefs}
+      />
       <DailyInsights insights={insights} t={t} />
-      <RecentBriefs briefs={recentBriefs} t={t} tBriefs={tBriefs} locale={locale} />
-      <QuickLinks t={t} />
+      {canCreateBriefs && (
+        <RecentBriefs
+          briefs={recentBriefs}
+          t={t}
+          tBriefs={tBriefs}
+          locale={locale}
+        />
+      )}
+      <QuickLinks t={t} canCreateBriefs={canCreateBriefs} />
     </div>
   );
 }
@@ -121,12 +146,14 @@ function GreetingPulse({
   trendingCount,
   briefsThisWeek,
   t,
+  canCreateBriefs,
 }: {
   name: string;
   pulse: PulseSnapshot;
   trendingCount: number;
   briefsThisWeek: number;
   t: T;
+  canCreateBriefs: boolean;
 }) {
   // Pulse rendering — three states: real score, insufficient data, no movement.
   const hasScore = pulse.score !== null;
@@ -207,16 +234,20 @@ function GreetingPulse({
           hint={t("stat_trending_hint")}
           href="/insights#trending"
         />
-        {/* Briefs this week → if 0, point at the brief creator; if >0, the
-            user's brief list. Both routes exist. */}
-        <MiniStat
-          tone="amber"
-          icon={ScrollText}
-          label={t("stat_briefs_this_week_label")}
-          value={briefsThisWeek.toString()}
-          hint={t("stat_briefs_this_week_hint")}
-          href={briefsThisWeek > 0 ? "/briefs" : "/briefs/new"}
-        />
+        {/* Briefs this week → admin/superadmin only while the feature
+            is experimental. Hidden entirely for regular approved users
+            so they're not tempted to click into a page that would
+            redirect them away. */}
+        {canCreateBriefs && (
+          <MiniStat
+            tone="amber"
+            icon={ScrollText}
+            label={t("stat_briefs_this_week_label")}
+            value={briefsThisWeek.toString()}
+            hint={t("stat_briefs_this_week_hint")}
+            href={briefsThisWeek > 0 ? "/briefs" : "/briefs/new"}
+          />
+        )}
       </div>
     </section>
   );
@@ -311,7 +342,15 @@ function MiniStat({
   return <div className={baseClass}>{inner}</div>;
 }
 
-function TopIssues({ issues, t }: { issues: TopIssue[]; t: T }) {
+function TopIssues({
+  issues,
+  t,
+  canCreateBriefs,
+}: {
+  issues: TopIssue[];
+  t: T;
+  canCreateBriefs: boolean;
+}) {
   return (
     <section className="mt-10">
       <SectionHeader title={t("section_top_issues")} subtitle={t("section_top_issues_subtitle")} />
@@ -334,6 +373,7 @@ function TopIssues({ issues, t }: { issues: TopIssue[]; t: T }) {
           volumeLabel={t("card_volume_label")}
           reachLabel={t("card_reach_label")}
           sentimentLabel={t("card_sentiment_label")}
+          canCreateBriefs={canCreateBriefs}
         />
       )}
     </section>
@@ -577,11 +617,20 @@ function RecentBriefs({
   );
 }
 
-function QuickLinks({ t }: { t: T }) {
+function QuickLinks({
+  t,
+  canCreateBriefs,
+}: {
+  t: T;
+  canCreateBriefs: boolean;
+}) {
   const links = [
     { href: "/insights", label: t("quick_trends"), icon: Globe2 },
     { href: "/kitab", label: t("quick_kitab"), icon: BookOpenCheck },
-    { href: "/briefs", label: t("quick_briefs"), icon: ScrollText },
+    // /briefs hidden for non-admin while the feature is experimental.
+    ...(canCreateBriefs
+      ? [{ href: "/briefs", label: t("quick_briefs"), icon: ScrollText }]
+      : []),
   ] as const;
 
   return (

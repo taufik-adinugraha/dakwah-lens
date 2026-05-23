@@ -39,11 +39,15 @@ export function TopicDetailModal({
   onClose,
   generateBriefLabel = "Generate brief",
   closeLabel = "Close",
+  canCreateBriefs = false,
 }: {
   topic: TopicDetail;
   onClose: () => void;
   generateBriefLabel?: string;
   closeLabel?: string;
+  /** Hide the "Generate brief" CTA inside the modal when the viewer
+   *  isn't allowed to create briefs (admin-only while experimental). */
+  canCreateBriefs?: boolean;
 }) {
   // Close on Esc + lock body scroll while open.
   useEffect(() => {
@@ -239,22 +243,25 @@ export function TopicDetailModal({
           )}
         </div>
 
-        {/* Sticky footer with the CTA */}
+        {/* Sticky footer — CTA only shown when the viewer can actually
+            create a brief (admin-only while experimental). */}
         <div className="sticky bottom-0 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 bg-white/95 px-6 py-3 backdrop-blur">
           <p className="text-[11px] text-slate-500">
             Showing top {topic.samplePosts.length} of {topic.volume} posts in last 7 days
           </p>
-          <Link
-            href={{
-              pathname: "/briefs/new",
-              query: { topic: topic.title },
-            }}
-            className="group inline-flex items-center gap-1.5 rounded-full bg-slate-900 px-4 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800"
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-            {generateBriefLabel}
-            <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
-          </Link>
+          {canCreateBriefs && (
+            <Link
+              href={{
+                pathname: "/briefs/new",
+                query: { topic: topic.title },
+              }}
+              className="group inline-flex items-center gap-1.5 rounded-full bg-slate-900 px-4 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              {generateBriefLabel}
+              <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
+            </Link>
+          )}
         </div>
       </div>
     </div>

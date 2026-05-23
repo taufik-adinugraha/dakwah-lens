@@ -130,16 +130,19 @@ export default async function LandingPage({
   // "Features"/"How it works"/"Donate" header links that intentionally
   // skip the dashboard redirect) was being shown the pending-review CTA
   // even though they're already approved.
+  const role = session?.user?.role;
+  const canCreateBriefs = role === "admin" || role === "superadmin";
   const viewer: Viewer = session?.user
     ? {
         signedIn: true,
         approved: session.user.status === "approved",
+        canCreateBriefs,
         name:
           formatPanggilan(viewerProfile, session.user.name) ||
           session.user.email?.split("@")[0] ||
           "",
       }
-    : { signedIn: false, approved: false, name: "" };
+    : { signedIn: false, approved: false, canCreateBriefs: false, name: "" };
 
   return (
     <>
@@ -150,7 +153,10 @@ export default async function LandingPage({
       <Daleel t={tDaleel} />
       <Donate t={tDonate} />
       {!viewer.approved && <SignupJourney t={tLanding} />}
-      <FinalCTA t={tLanding} viewer={viewer} />
+      {/* "Ready for more targeted da'wah?" CTA hidden (2026-05-23) —
+          we paused account signups + the apply-for-full-access pitch
+          while the brief feature is admin-only and experimental. */}
+      {false && <FinalCTA t={tLanding} viewer={viewer} />}
     </>
   );
 }
@@ -158,6 +164,9 @@ export default async function LandingPage({
 type Viewer = {
   signedIn: boolean;
   approved: boolean;
+  /** Brief generation is admin-only while the feature is experimental
+   *  (2026-05-23). `canCreateBriefs` reflects role, NOT just approval. */
+  canCreateBriefs: boolean;
   name: string;
 };
 
@@ -200,18 +209,27 @@ function Hero({ t, viewer }: { t: LandingT; viewer: Viewer }) {
           </p>
 
           {viewer.signedIn ? (
-            <SignedInCtas t={t} approved={viewer.approved} />
+            <SignedInCtas
+              t={t}
+              approved={viewer.approved}
+              canCreateBriefs={viewer.canCreateBriefs}
+            />
           ) : (
             <AnonymousCtas t={t} />
           )}
         </div>
 
-        <div
-          className="mx-auto mt-16 max-w-5xl animate-fade-up"
-          style={{ animationDelay: "0.2s" }}
-        >
-          <HeroSlideshow />
-        </div>
+        {/* Hero slideshow temporarily hidden (2026-05-23) — the slides
+            referenced features we've since reorganized. Resurrect once
+            the new content kit is ready to showcase visually. */}
+        {false && (
+          <div
+            className="mx-auto mt-16 max-w-5xl animate-fade-up"
+            style={{ animationDelay: "0.2s" }}
+          >
+            <HeroSlideshow />
+          </div>
+        )}
       </div>
     </section>
   );
@@ -291,17 +309,38 @@ function AnonymousCtas({ t }: { t: LandingT }) {
   );
 }
 
-function SignedInCtas({ t, approved }: { t: LandingT; approved: boolean }) {
+function SignedInCtas({
+  t,
+  approved,
+  canCreateBriefs,
+}: {
+  t: LandingT;
+  approved: boolean;
+  canCreateBriefs: boolean;
+}) {
   return (
     <>
       <div className="mt-8 flex flex-col flex-wrap items-center justify-center gap-3 sm:flex-row">
-        {approved ? (
+        {canCreateBriefs ? (
+          // Admin / superadmin → still gets the "create brief" CTA. The
+          // feature is experimental but available to the team.
           <Link
             href="/briefs/new"
             className="group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-slate-900 px-6 text-sm font-semibold text-white shadow-lg shadow-slate-900/15 transition hover:bg-slate-800 sm:w-auto"
           >
             <Sparkles className="h-4 w-4" />
             {t("signed_in_cta_primary")}
+            <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+          </Link>
+        ) : approved ? (
+          // Approved user (but not admin) → brief generation is paused
+          // for them while the feature is experimental. Steer to insights.
+          <Link
+            href="/insights"
+            className="group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-slate-900 px-6 text-sm font-semibold text-white shadow-lg shadow-slate-900/15 transition hover:bg-slate-800 sm:w-auto"
+          >
+            <Sparkles className="h-4 w-4" />
+            {t("signed_in_cta_tertiary")}
             <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
           </Link>
         ) : (
@@ -964,11 +1003,13 @@ function DonateMethod({
 }
 
 function FinalCTA({ t, viewer }: { t: LandingT; viewer: Viewer }) {
-  // Approved signed-in user → invite them to generate a brief.
-  // Pending user → encourage them to explore public insights while waiting.
+  // Admin → invite them to generate a brief (still experimental).
+  // Approved non-admin → invite them to explore insights (brief
+  // generation is paused for regular users).
+  // Pending user → encourage them to explore public insights.
   // Anonymous → original "Apply for Full Access" pitch.
   const variant =
-    viewer.signedIn && viewer.approved
+    viewer.signedIn && viewer.canCreateBriefs
       ? "create_brief"
       : viewer.signedIn
         ? "pending_explore"

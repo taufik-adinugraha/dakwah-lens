@@ -100,15 +100,21 @@ export function UserMenu({ email, name, status, role }: Props) {
 
           <div className="p-1.5">
             {approved && (
+              <Link
+                href="/dashboard"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-900"
+              >
+                <LayoutDashboard className="h-4 w-4 text-brand-600" />
+                Dashboard
+              </Link>
+            )}
+            {/* Brief creation is admin-only while the feature is
+                experimental — non-admin approved users can still
+                reach /dashboard and /insights but won't see entry
+                points to brief generation here. */}
+            {isAdmin && (
               <>
-                <Link
-                  href="/dashboard"
-                  onClick={() => setOpen(false)}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-900"
-                >
-                  <LayoutDashboard className="h-4 w-4 text-brand-600" />
-                  Dashboard
-                </Link>
                 <Link
                   href="/briefs/new"
                   onClick={() => setOpen(false)}

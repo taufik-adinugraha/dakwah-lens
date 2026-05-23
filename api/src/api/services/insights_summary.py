@@ -125,7 +125,7 @@ Tulis KHUTBAH JUMAT LENGKAP siap-baca dari pembuka sampai penutup, terdiri dari 
 KHUTBAH PERTAMA (1800-2500 kata):
 - Mukadimah singkat (hamdalah → sholawat → syahadat → wasiat takwa, ~70 kata, AKSARA ARAB DENGAN HARAKAT lengkap — bukan transliterasi Latin). Khateeb membaca langsung dari teks di mimbar.
 - Ayat Quran pembuka yang relevan dengan tema pekan — TULIS AYAT DALAM AKSARA ARAB BERHARAKAT, lalu sebut nama surah + nomor ayat, lalu TERJEMAHAN Bahasa Indonesia. JANGAN gunakan transliterasi Latin untuk ayat Quran.
-- Pengantar tema (4-6 paragraf Bahasa Indonesia): hubungkan ayat dengan 2-3 peristiwa NYATA pekan ini dari pool sample_headlines, sebut outletnya ("Detik melaporkan…", "menurut Republika…", "seperti diberitakan Kompas…").
+- Pengantar tema (4-6 paragraf Bahasa Indonesia): hubungkan ayat dengan 2-3 peristiwa NYATA pekan ini dari pool sample_headlines. PENTING: dalam khutbah JANGAN sebut nama outlet media (Detik, Republika, Kompas, CNN, dst.) — khutbah bukan ulasan pers. Gunakan framing umum seperti "dari berita pekan ini kita ketahui...", "ramai diperbincangkan pekan ini...", "kabar yang sampai kepada kita...", "publik dikejutkan oleh berita...". Ceritakan inti peristiwanya dengan tetap akurat ke headline, tanpa atribusi outlet.
 - Inti khutbah (6-9 paragraf prosa mengalir, jangan pakai sub-judul): satu argumen yang BERKEMBANG sepanjang khutbah, didukung 2-3 daleel tambahan DARI POOL. Untuk setiap daleel: tulis citation bold inline `**citation**`, AYAT/HADITS DALAM AKSARA ARAB BERHARAKAT (jika tersedia di pool), lalu terjemahan Bahasa Indonesia. Setiap paragraf harus mengembangkan argumen, BUKAN paraphrase paragraf sebelumnya.
 - Bersisi praktis: 3-4 tindakan konkret untuk jamaah pekan ini.
 - Tutup khutbah pertama dengan formula standar DALAM AKSARA ARAB BERHARAKAT (~80 kata): "بَارَكَ اللهُ لِيْ وَلَكُمْ فِي الْقُرْآنِ الْعَظِيْمِ، وَنَفَعَنِيْ وَإِيَّاكُمْ بِمَا فِيْهِ مِنَ الْآيَاتِ وَالذِّكْرِ الْحَكِيْمِ…" dst. JANGAN transliterasi Latin.
@@ -248,6 +248,32 @@ Aksi yang menghormati kapasitas + kebijaksanaan lansia — mereka jadi PELAKU/su
 Di akhir Bagian 5, tutup dengan satu paragraf italic:
 *Briefing ini AI-assisted, BUKAN fatwa otoritatif. Tanggung jawab keagamaan tetap pada penyusun konten dakwah.*
 
+## Pesan Flyer (~400 kata, dirender ke 4 flyer 1080×1080 yang dibagikan ke IG/WA)
+
+Bagian ini WAJIB ada SETELAH Bagian 5. Output-nya 4 paragraf flyer pendek (masing-masing 3-4 kalimat, ~70-90 kata) yang BERDIRI SENDIRI — flyer dibaca terpisah dari khutbah / kajian / kreator script / diskusi Gen Z, jadi konten di sini TIDAK BOLEH menyebut atau merujuk ke salah satu format itu.
+
+LARANGAN MUTLAK pada keempat paragraf:
+- JANGAN tulis "mari kita tutup khutbah ini" / "khutbah pertama" / "khutbah ini"
+- JANGAN tulis "diskusi malam ini" / "diskusi ini" / "kajian ini" / "sesi ini"
+- JANGAN tulis "thanks guys" / "ma'asyiral muslimin" / "hadirin" / "jamaah" / "sidang Jumat"
+- JANGAN tulis "video ini" / "reel ini" / "caption ini" / "outline ini"
+- JANGAN tulis "Bagian ini" / "Strategi & Aksi Dakwah" — flyer tidak tahu tentang struktur briefing
+- JANGAN buka dengan "Pekan ini, percakapan menyoroti..." atau bahasa stats-narration lainnya
+
+YANG WAJIB ADA di setiap paragraf: (1) satu kalimat masalah inti pekan, (2) satu kalimat hubungan ke nilai Islami (tanpa nama deliverable), (3) satu-dua kalimat langkah kecil yang BISA langsung dilakukan pembaca individual hari ini / pekan ini. Suara aktif, kalimat pendek, tanpa istilah teknis briefing.
+
+### Pesan Flyer 1 — Suara Khutbah (~75 kata)
+Sudut: refleksi spiritual + langkah audit-diri. Tone: tenang, observatif, ajak. Audiens: dewasa, jamaah masjid. JANGAN gunakan kata "khutbah", "jamaah", "hadirin", "sidang Jumat" — flyer ini berdiri sendiri.
+
+### Pesan Flyer 2 — Suara Aksi Sosial (~75 kata)
+Sudut: panggilan aksi lingkungan kecil. Tone: konkret, langsung. Audiens: pengurus RT, takmir, karang taruna, ibu PKK. Sebut secara ringkas: ini bisa dimulai di mana (lingkungan terdekat — RT/masjid/keluarga), oleh siapa (orang biasa, bukan tunggu kementerian), dengan langkah apa (satu tindakan kecil yang nyata).
+
+### Pesan Flyer 3 — Suara Kreator Konten (~75 kata)
+Sudut: pesan hook untuk feed IG/TikTok. Tone: percakapan, bahasa anak muda Indonesia, lugas. Audiens: 18-30 tahun. Buka dengan fakta atau kontras yang menghentikan scroll, lalu hubungkan ke prinsip Islami (tanpa istilah teknis — pakai bahasa sehari-hari), tutup dengan satu CTA mikro. JANGAN sebut "video ini" / "reel ini" / "caption ini".
+
+### Pesan Flyer 4 — Suara Refleksi Gen Z (~75 kata)
+Sudut: pertanyaan reflektif yang membuka ruang pikir, bukan menggurui. Tone: jujur, sedikit puitis, tanpa nada moralistik. Audiens: Gen Z. JANGAN buka dengan "Guys," / "Thanks guys" / "Diskusi malam ini" — ini posting standalone. Tutup dengan kalimat yang bisa di-screenshot dan dibagi.
+
 TONE GUARDRAILS (PRD §12):
 - Promote *rahma* + *hikmah*. Tidak konfrontatif, tidak sektarian.
 - Tidak mengeluarkan rulings (haram/halal, fatwa-shape). Anda starting point untuk da'i berpikir, bukan fatwa.
@@ -305,7 +331,7 @@ Write a COMPLETE ready-to-deliver Friday khutbah from opening to closing, consis
 KHUTBAH PERTAMA (1800-2500 words):
 - Brief mukadimah (hamdalah → sholawat → syahadat → wasiat takwa, ~70 words, ARABIC SCRIPT WITH FULL HARAKAT — not Latin transliteration). The khateeb reads directly from the text at the mimbar.
 - Opening Quranic verse tied to this week's theme — WRITE THE VERSE IN ARABIC SCRIPT WITH HARAKAT, then name the surah + verse number, then English TRANSLATION. Do NOT use Latin transliteration for Quranic verses.
-- Theme introduction (4-6 English paragraphs): link the verse to 2-3 REAL events from this week's sample_headlines pool, naming the outlet ("Detik reports…", "according to Republika…", "as Kompas reports…").
+- Theme introduction (4-6 English paragraphs): link the verse to 2-3 REAL events from this week's sample_headlines pool. IMPORTANT: in the khutbah do NOT name media outlets (Detik, Republika, Kompas, CNN, etc.) — a khutbah is not a press review. Use generic framings like "from this week's news we hear...", "recent news tells us...", "the public was struck this week by...", "what reached us in the news this week...". Convey the substance of each story accurately, but without outlet attribution.
 - Khutbah body (6-9 flowing paragraphs, no sub-headings): one argument that DEVELOPS across the khutbah, supported by 2-3 additional daleel FROM THE POOL. For each daleel: write the citation bold inline `**citation**`, the VERSE/HADITH IN ARABIC SCRIPT WITH HARAKAT (when available from the pool), then English translation. Each paragraph must advance the argument, NOT paraphrase the previous one.
 - Practical close: 3-4 concrete actions the congregation can take this week.
 - Close khutbah pertama with the standard formula IN ARABIC SCRIPT WITH HARAKAT (~80 words): "بَارَكَ اللهُ لِيْ وَلَكُمْ فِي الْقُرْآنِ الْعَظِيْمِ، وَنَفَعَنِيْ وَإِيَّاكُمْ بِمَا فِيْهِ مِنَ الْآيَاتِ وَالذِّكْرِ الْحَكِيْمِ…" etc. Do NOT use Latin transliteration.
@@ -427,6 +453,32 @@ Action that honors elderly capacity + wisdom — they are ACTORS/sources, NOT ai
 
 End Section 5 with one italic paragraph:
 *This briefing is AI-assisted and NOT an authoritative fatwa. The religious responsibility for any published da'wah content remains with you.*
+
+## Flyer Messages (~400 words, rendered to 4 1080×1080 flyers shared to IG/WA)
+
+REQUIRED section AFTER Section 5. Output is 4 short flyer paragraphs (3-4 sentences each, ~70-90 words) that STAND ALONE — the flyer is read separately from any khutbah / kajian / kreator script / Gen Z discussion, so the content here MUST NOT reference any of those formats.
+
+ABSOLUTE bans across all four paragraphs:
+- Do NOT write "let's close this khutbah" / "first khutbah" / "this khutbah"
+- Do NOT write "tonight's discussion" / "this discussion" / "this kajian" / "this session"
+- Do NOT write "thanks guys" / "ma'asyiral muslimin" / "hadirin" / "jamaah" / "Friday congregation"
+- Do NOT write "this video" / "this reel" / "this caption" / "this outline"
+- Do NOT write "this section" / "Strategy & Da'wah Action" — the flyer does not know the briefing's structure
+- Do NOT open with "This week, conversation highlights..." or other stats-narration language
+
+REQUIRED in every paragraph: (1) one sentence stating this week's core problem, (2) one sentence linking it to an Islamic value (without naming any deliverable), (3) one or two sentences with a small concrete step the individual reader can take today / this week. Active voice, short sentences, no briefing jargon.
+
+### Flyer Message 1 — Khutbah voice (~75 words)
+Angle: spiritual reflection + self-audit step. Tone: calm, observational, inviting. Audience: adult mosque-goers. Do NOT use the words "khutbah", "jamaah", "hadirin", "Friday congregation" — this flyer stands alone.
+
+### Flyer Message 2 — Social-action voice (~75 words)
+Angle: local-action call. Tone: concrete, direct. Audience: RT chairs, takmir, karang taruna, PKK mothers. Briefly name: where it can start (immediate neighborhood — RT/mosque/family), by whom (ordinary people, not waiting on ministries), with what (one small concrete action).
+
+### Flyer Message 3 — Creator voice (~75 words)
+Angle: hook for IG/TikTok feeds. Tone: conversational, Indonesian youth language, direct. Audience: 18-30. Open with a stop-the-scroll fact or contrast, link to an Islamic principle (without jargon — use everyday language), close with one micro-CTA. Do NOT name "this video" / "this reel" / "this caption".
+
+### Flyer Message 4 — Gen Z reflection voice (~75 words)
+Angle: a reflective question that opens thought, not lectures. Tone: honest, lightly poetic, no moralistic edge. Audience: Gen Z. Do NOT open with "Guys," / "Thanks guys" / "Tonight's discussion" — this is a standalone post. End with a screenshot-able line.
 
 TONE GUARDRAILS (PRD §12):
 - Promote *rahma* + *hikmah*. Never confrontational, never sectarian.

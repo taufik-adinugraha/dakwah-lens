@@ -20,11 +20,15 @@ import { snapHtmlToPng } from "./render/snap";
  * this single pipeline.
  */
 export async function renderFlyerPng(ctx: FlyerContext): Promise<Buffer> {
-  const { layoutId, composition } = await composeFlyer(ctx);
+  const { layoutId, composition, layoutVariant } = await composeFlyer(ctx);
   const assets = await resolveAssets(composition.image);
 
   const Layout = LAYOUTS[layoutId];
-  const tree = createElement(Layout, { ...composition, assets });
+  const tree = createElement(Layout, {
+    ...composition,
+    assets,
+    layoutVariant,
+  });
 
   const html = await buildHtmlDocument(tree);
   return await snapHtmlToPng(html);

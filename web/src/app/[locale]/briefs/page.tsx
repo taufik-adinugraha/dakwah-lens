@@ -46,6 +46,15 @@ export default async function MyBriefsPage({
 
   return (
     <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
+      {/* Brief generation is admin-only while the feature is still
+          experimental. The proxy already gates non-admin access; this
+          notice reminds the admins viewing the page that the surface
+          isn't yet production-ready. */}
+      <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-amber-700">
+        <Sparkles className="h-3 w-3" />
+        Experimental · Admin only
+      </div>
+
       <div className="flex items-start justify-between gap-3">
         <div>
           <span className="inline-flex items-center gap-1.5 rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700">

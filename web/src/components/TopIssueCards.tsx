@@ -34,12 +34,17 @@ export function TopIssueCards({
   volumeLabel,
   reachLabel,
   sentimentLabel,
+  canCreateBriefs = false,
 }: {
   issues: TopicDetail[];
   generateBriefLabel: string;
   volumeLabel: string;
   reachLabel: string;
   sentimentLabel: string;
+  /** Brief generation is admin-only while the feature is experimental
+   *  (2026-05-23). When false the per-card "Generate brief" CTA is
+   *  hidden — the card itself still opens the detail modal. */
+  canCreateBriefs?: boolean;
 }) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const active = activeId ? issues.find((i) => i.id === activeId) ?? null : null;
@@ -93,17 +98,20 @@ export function TopIssueCards({
               </div>
             </div>
 
-            {/* CTA — stopPropagation so the click doesn't also bubble up to
-                open the detail modal. */}
-            <Link
-              href={{ pathname: "/briefs/new", query: { topic: i.title } }}
-              onClick={(e) => e.stopPropagation()}
-              className="mt-5 inline-flex h-9 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800"
-            >
-              <Sparkles className="h-3.5 w-3.5" />
-              {generateBriefLabel}
-              <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
-            </Link>
+            {/* CTA — admin-only while brief generation is experimental.
+                Non-admin viewers still get the clickable card → detail
+                modal flow. */}
+            {canCreateBriefs && (
+              <Link
+                href={{ pathname: "/briefs/new", query: { topic: i.title } }}
+                onClick={(e) => e.stopPropagation()}
+                className="mt-5 inline-flex h-9 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800"
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                {generateBriefLabel}
+                <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
+              </Link>
+            )}
           </button>
         ))}
       </div>
@@ -113,6 +121,7 @@ export function TopIssueCards({
           topic={active}
           onClose={() => setActiveId(null)}
           generateBriefLabel={generateBriefLabel}
+          canCreateBriefs={canCreateBriefs}
         />
       )}
     </>

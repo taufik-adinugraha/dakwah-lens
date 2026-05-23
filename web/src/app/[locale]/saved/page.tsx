@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, ne } from "drizzle-orm";
 import { BookmarkCheck, ExternalLink } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
@@ -40,8 +40,18 @@ export default async function SavedPage({
   const t = await getTranslations({ locale, namespace: "Saved" });
   const tInsights = await getTranslations({ locale, namespace: "Insights" });
 
+  // Brief generation is admin-only while the feature is experimental
+  // (2026-05-23). Non-admin users can't reach the brief detail pages,
+  // so we hide the brief filter chip + brief items from the list.
+  const canAccessBriefs =
+    session.user.role === "admin" || session.user.role === "superadmin";
+
+  const allowedKinds = canAccessBriefs
+    ? ["kitab", "brief", "post"]
+    : ["kitab", "post"];
+
   const kindFilter =
-    typeof sp.kind === "string" && ["kitab", "brief", "post"].includes(sp.kind)
+    typeof sp.kind === "string" && allowedKinds.includes(sp.kind)
       ? sp.kind
       : null;
 
@@ -54,7 +64,12 @@ export default async function SavedPage({
             eq(schema.bookmarks.userId, session.user.id),
             eq(schema.bookmarks.kind, kindFilter),
           )
-        : eq(schema.bookmarks.userId, session.user.id),
+        : and(
+            eq(schema.bookmarks.userId, session.user.id),
+            // Drop brief bookmarks from the list view for non-admin
+            // users — the links would 302 to /insights anyway.
+            ...(canAccessBriefs ? [] : [ne(schema.bookmarks.kind, "brief")]),
+          ),
     )
     .orderBy(desc(schema.bookmarks.createdAt))
     .limit(200);
@@ -76,7 +91,11 @@ export default async function SavedPage({
           <KindChip
             href="/saved"
             label={t("kind_all")}
-            count={counts.kitab + counts.brief + counts.post}
+            count={
+              counts.kitab +
+              (canAccessBriefs ? counts.brief : 0) +
+              counts.post
+            }
             active={!kindFilter}
           />
           <KindChip
@@ -85,12 +104,14 @@ export default async function SavedPage({
             count={counts.kitab}
             active={kindFilter === "kitab"}
           />
-          <KindChip
-            href="/saved?kind=brief"
-            label={t("kind_brief")}
-            count={counts.brief}
-            active={kindFilter === "brief"}
-          />
+          {canAccessBriefs && (
+            <KindChip
+              href="/saved?kind=brief"
+              label={t("kind_brief")}
+              count={counts.brief}
+              active={kindFilter === "brief"}
+            />
+          )}
           <KindChip
             href="/saved?kind=post"
             label={t("kind_post")}

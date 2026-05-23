@@ -23,6 +23,12 @@ const PROTECTED_PREFIXES = [
 // exemption is checked first so it short-circuits the prefix check.
 const PUBLIC_OVERRIDES = ["/briefs/public"];
 
+// Routes that require an admin (or superadmin) role even when the user is
+// signed in + approved. Personalized brief generation is gated behind this
+// while the feature is still experimental — only admins should be able to
+// create / list / view briefs. /briefs/public is exempt via PUBLIC_OVERRIDES.
+const ADMIN_ONLY_PREFIXES = ["/briefs"];
+
 // Routes that require auth but must NOT trigger the onboarding redirect —
 // the wizard itself, login, and logout. Adding /admin would defeat the
 // whole gate, so it's deliberately not here.
@@ -32,18 +38,26 @@ function stripLocale(pathname: string): string {
   return pathname.replace(/^\/(en|id)(?=\/|$)/, "") || "/";
 }
 
+function isPublicOverride(stripped: string): boolean {
+  return PUBLIC_OVERRIDES.some(
+    (p) => stripped === p || stripped.startsWith(`${p}/`),
+  );
+}
+
 function isProtected(pathname: string): boolean {
   const stripped = stripLocale(pathname);
   // Public override wins — e.g. /briefs is protected, but /briefs/public
   // is explicitly carved out.
-  if (
-    PUBLIC_OVERRIDES.some(
-      (p) => stripped === p || stripped.startsWith(`${p}/`),
-    )
-  ) {
-    return false;
-  }
+  if (isPublicOverride(stripped)) return false;
   return PROTECTED_PREFIXES.some(
+    (p) => stripped === p || stripped.startsWith(`${p}/`),
+  );
+}
+
+function isAdminOnly(pathname: string): boolean {
+  const stripped = stripLocale(pathname);
+  if (isPublicOverride(stripped)) return false;
+  return ADMIN_ONLY_PREFIXES.some(
     (p) => stripped === p || stripped.startsWith(`${p}/`),
   );
 }
@@ -56,6 +70,19 @@ export default auth((req) => {
     const loginUrl = new URL("/login", req.nextUrl);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
+  }
+
+  // Admin-only gate. /briefs/* is currently admin/superadmin only —
+  // brief generation is still experimental, regular users shouldn't be
+  // able to reach the create / list / detail views. Bounce them to
+  // /insights with a notice they can see.
+  if (isAdminOnly(pathname)) {
+    const role = req.auth?.user?.role;
+    if (role !== "admin" && role !== "superadmin") {
+      const target = new URL("/insights", req.nextUrl);
+      target.searchParams.set("notice", "briefs-admin-only");
+      return NextResponse.redirect(target);
+    }
   }
 
   // Signed-in regular user who hasn't completed the wizard → send them there

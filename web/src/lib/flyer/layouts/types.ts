@@ -62,6 +62,9 @@ export type ResolvedAssets = {
 
 export type FlyerRenderProps = FlyerComposition & {
   assets: ResolvedAssets;
+  /** 0-2 — drives decoration variation within a single layout so
+   *  successive editions don't look identical. */
+  layoutVariant: 0 | 1 | 2;
 };
 
 /** Every layout component conforms to this shape. */

@@ -138,7 +138,8 @@ export default async function PlatformDrilldownPage({
       )}
       <TopOutlets config={config} t={t} live={live} platform={platform} />
       <TopStories config={config} t={t} live={live} platform={platform} />
-      {!session?.user && <CTA t={t} />}
+      {/* Apply-for-Full-Access CTA hidden (2026-05-23). */}
+      {false && !session?.user && <CTA t={t} />}
     </>
   );
 }

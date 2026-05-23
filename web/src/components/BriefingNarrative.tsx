@@ -121,7 +121,6 @@ export function BriefingNarrative({
                   section4Markdown={split.section4Body}
                   labels={deliverableLabels!}
                   briefBasePath={briefBasePath!}
-                  briefId={briefId!}
                   initialDeliverable={initialDeliverable ?? null}
                 />
                 {briefId && <BriefFlyerSection briefId={briefId} />}
