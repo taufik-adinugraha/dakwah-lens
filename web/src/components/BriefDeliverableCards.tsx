@@ -13,6 +13,7 @@ import {
   Mic,
   Printer,
   Quote,
+  Share2,
   Smartphone,
   Users,
   X,
@@ -336,6 +337,11 @@ export function BriefDeliverableCards({
             card={card}
             openLabel={labels.open}
             onOpen={() => onOpenCard(i)}
+            shareUrl={
+              card.kind
+                ? `/d/${briefBasePath.replace(/^\/?(?:[a-z]{2}\/)?insights\/brief\//, "")}/${card.kind}`
+                : null
+            }
           />
         ))}
       </div>
@@ -354,10 +360,12 @@ function DeliverableCardTile({
   card,
   openLabel,
   onOpen,
+  shareUrl,
 }: {
   card: DeliverableCard;
   openLabel: string;
   onOpen: () => void;
+  shareUrl: string | null;
 }) {
   const Icon = card.kind ? KIND_ICON[card.kind] : BookOpen;
   const tone = card.kind
@@ -367,11 +375,20 @@ function DeliverableCardTile({
     ? KIND_ICON_TONE[card.kind]
     : "bg-slate-100 text-slate-700";
 
+  // Card body is the open trigger (div + role=button) so we can nest a
+  // real <button> for Share without violating button-in-button rules.
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onOpen}
-      className={`group relative flex flex-col gap-3 rounded-2xl bg-gradient-to-br p-4 text-left ring-1 shadow-sm transition hover:shadow-md hover:ring-emerald-300 sm:p-5 ${tone}`}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onOpen();
+        }
+      }}
+      className={`group relative flex cursor-pointer flex-col gap-3 rounded-2xl bg-gradient-to-br p-4 text-left ring-1 shadow-sm transition hover:shadow-md hover:ring-emerald-300 sm:p-5 ${tone}`}
     >
       <div className="flex items-start gap-3">
         <span
@@ -386,10 +403,63 @@ function DeliverableCardTile({
       <p className="text-pretty text-[13px] leading-relaxed text-slate-600">
         {previewOf(card.body, 160)}
       </p>
-      <span className="mt-auto inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 transition group-hover:gap-1.5">
-        {openLabel}
-        <span aria-hidden>→</span>
-      </span>
+      <div className="mt-auto flex items-center justify-between gap-2">
+        <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 transition group-hover:gap-1.5">
+          {openLabel}
+          <span aria-hidden>→</span>
+        </span>
+        {shareUrl && (
+          <CardShareButton url={shareUrl} title={card.heading} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function CardShareButton({ url, title }: { url: string; title: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      aria-label="Bagikan"
+      onClick={async (e) => {
+        // Don't bubble — the surrounding card div opens the modal on click.
+        e.stopPropagation();
+        const fullUrl =
+          typeof window !== "undefined"
+            ? new URL(url, window.location.origin).toString()
+            : url;
+        if (navigator.share) {
+          try {
+            await navigator.share({ title, url: fullUrl });
+            return;
+          } catch {
+            /* user cancel — fall through to clipboard */
+          }
+        }
+        if (navigator.clipboard?.writeText) {
+          try {
+            await navigator.clipboard.writeText(fullUrl);
+          } catch {
+            /* permission denied */
+          }
+        }
+        setCopied(true);
+        window.setTimeout(() => setCopied(false), 1800);
+      }}
+      className="inline-flex h-7 items-center gap-1 rounded-full border border-slate-200 bg-white/90 px-2.5 text-[11px] font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-white"
+    >
+      {copied ? (
+        <>
+          <Check className="h-3 w-3 text-emerald-600" />
+          Tertaut!
+        </>
+      ) : (
+        <>
+          <Share2 className="h-3 w-3" />
+          Bagikan
+        </>
+      )}
     </button>
   );
 }

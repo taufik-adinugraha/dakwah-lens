@@ -421,6 +421,80 @@ export async function getLatestInsightsSummary(
   };
 }
 
+/** Section-4 deliverable slugs that map H3 sub-headings to URL keys.
+ *  The matcher pattern is the same one used by
+ *  BriefDeliverableCards.classifyHeading — kept here so both server
+ *  pages (/d/{brief}/{deliverable}) and the modal card grid agree. */
+export const DELIVERABLE_HEADING_PATTERNS: Record<
+  string,
+  { matcher: (heading: string) => boolean; title: string }
+> = {
+  khutbah: {
+    matcher: (h) => /khutbah|friday/i.test(h),
+    title: "Khutbah Jumat",
+  },
+  kajian: {
+    matcher: (h) => /kajian|majelis/i.test(h),
+    title: "Kajian",
+  },
+  home: {
+    matcher: (h) => /rumah|home|teaching at/i.test(h),
+    title: "Pengajaran di Rumah",
+  },
+  content: {
+    matcher: (h) =>
+      /konten|kreator|content creator|digital content/i.test(h),
+    title: "Kreator Konten",
+  },
+  genz: {
+    matcher: (h) =>
+      /mahasiswa|university\s+student|gen[\s-]?z|pendekatan\s+gen|reaching gen/i.test(
+        h,
+      ),
+    title: "Mahasiswa",
+  },
+  action: {
+    matcher: (h) =>
+      /aksi|khidmah|ummah|social action|service to/i.test(h),
+    title: "Aksi Sosial",
+  },
+};
+
+/** Extract one Section-4 deliverable sub-section from a briefing's
+ *  markdown body. Returns the H3 heading text + the prose / Q&A under
+ *  it (everything between that H3 and the next H3 / H2). Returns null
+ *  when the briefing doesn't have that deliverable. */
+export function extractDeliverableSection(
+  markdown: string,
+  slug: keyof typeof DELIVERABLE_HEADING_PATTERNS,
+): { heading: string; body: string } | null {
+  const matcher = DELIVERABLE_HEADING_PATTERNS[slug]?.matcher;
+  if (!matcher) return null;
+  const lines = markdown.split("\n");
+  let start = -1;
+  let headingLine = "";
+  for (let i = 0; i < lines.length; i++) {
+    const m = lines[i].match(/^###\s+(.+?)\s*$/);
+    if (m && matcher(m[1])) {
+      start = i + 1;
+      headingLine = m[1].trim();
+      break;
+    }
+  }
+  if (start === -1) return null;
+  let end = lines.length;
+  for (let i = start; i < lines.length; i++) {
+    if (lines[i].startsWith("### ") || lines[i].startsWith("## ")) {
+      end = i;
+      break;
+    }
+  }
+  return {
+    heading: headingLine,
+    body: lines.slice(start, end).join("\n").trim(),
+  };
+}
+
 /** Slug → briefing resolver for /briefs/[id] public pages.
  *
  *  Slug format: `{YYYY-MM-DD}-{segment-or-all}` (e.g. `2026-05-21-all`,

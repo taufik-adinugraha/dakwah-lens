@@ -1371,7 +1371,7 @@ async def generate_summary(
         # database instead of relying on the LLM's parametric memory.
         # Separate pool because the thematic daleel above surfaces
         # general guidance, not always recitable du'a.
-        from api.services.kitab_retrieval import retrieve_dua, rerank_dua
+        from api.services.kitab_retrieval import rerank_dua, retrieve_dua
 
         dua_candidates = retrieve_dua(
             retrieval_query, limit=15, per_corpus=4
