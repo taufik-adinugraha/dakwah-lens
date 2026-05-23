@@ -1,5 +1,54 @@
 import type { FlyerLayoutComponent } from "./types";
 
+/** QR + URL badge — a white card with the article-page QR code on top
+ *  and the visible URL underneath, so a phoneless reader can still
+ *  type the URL by hand. White background guarantees the QR remains
+ *  scannable on any palette / photo backdrop. */
+function ArticleBadge({
+  qrDataUrl,
+  url,
+  size = 196,
+  align = "left",
+}: {
+  qrDataUrl?: string;
+  url?: string;
+  size?: number;
+  align?: "left" | "right" | "center";
+}) {
+  if (!qrDataUrl || !url) return null;
+  const justify =
+    align === "right"
+      ? "items-end"
+      : align === "center"
+        ? "items-center"
+        : "items-start";
+  return (
+    <div className={`flex flex-col gap-3 ${justify}`}>
+      <div
+        className="rounded-2xl bg-white p-3 shadow-2xl"
+        style={{ boxShadow: "0 14px 38px rgba(15,23,42,0.25)" }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={qrDataUrl}
+          alt="QR ke artikel"
+          width={size}
+          height={size}
+          style={{ width: `${size}px`, height: `${size}px` }}
+        />
+      </div>
+      <div className="flex flex-col gap-0.5">
+        <div className="text-[14px] font-bold uppercase tracking-[0.18em] opacity-70">
+          Scan / Kunjungi
+        </div>
+        <div className="text-[20px] font-extrabold tracking-tight">
+          {url}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Tally({ color, marks = 6 }: { color: string; marks?: number }) {
   return (
     <svg
@@ -55,7 +104,8 @@ export const PosterQuestion: FlyerLayoutComponent = ({
   assets,
   layoutVariant,
 }) => {
-  const { headline, dateLabel, brand } = content;
+  const { headline, dateLabel, brand, articleUrl, articleQrDataUrl } =
+    content;
   const len = headline.length;
 
   // Font sizing tuned against the actual text column width (~650px
@@ -132,8 +182,8 @@ export const PosterQuestion: FlyerLayoutComponent = ({
         />
 
         {/* Text area in the lower 60% */}
-        <div className="relative z-10 flex h-full flex-col justify-between px-[80px] pt-[460px] pb-[80px]">
-          <div className="flex flex-1 flex-col justify-center">
+        <div className="relative z-10 flex h-full flex-col justify-between px-[80px] pt-[450px] pb-[60px]">
+          <div className="flex flex-1 flex-col justify-center pr-[260px]">
             <div
               className="font-black tracking-tight"
               style={{
@@ -152,9 +202,20 @@ export const PosterQuestion: FlyerLayoutComponent = ({
               </span>
               {headline}
             </div>
-            <div className="mt-[34px]">
+            <div className="mt-[28px]">
               <Tally color={palette.accent} />
             </div>
+          </div>
+          <div
+            className="absolute right-[80px] bottom-[60px]"
+            style={{ color: palette.accentDeep }}
+          >
+            <ArticleBadge
+              qrDataUrl={articleQrDataUrl}
+              url={articleUrl}
+              size={180}
+              align="right"
+            />
           </div>
         </div>
       </div>
@@ -245,7 +306,17 @@ export const PosterQuestion: FlyerLayoutComponent = ({
             </div>
             <Tally color={palette.accent} marks={5} />
           </div>
-          <div aria-hidden className="h-[10px]" />
+          <div
+            className="flex justify-center"
+            style={{ color: palette.accentDeep }}
+          >
+            <ArticleBadge
+              qrDataUrl={articleQrDataUrl}
+              url={articleUrl}
+              size={160}
+              align="center"
+            />
+          </div>
         </div>
       </div>
     );
@@ -288,7 +359,7 @@ export const PosterQuestion: FlyerLayoutComponent = ({
               {dateLabel}
             </div>
           </div>
-          <div className="flex flex-1 flex-col justify-center py-10">
+          <div className="flex flex-1 flex-col justify-center pr-[260px] py-6">
             <div
               aria-hidden
               className="mb-[14px] text-[120px] font-black leading-none drop-shadow-lg"
@@ -307,16 +378,28 @@ export const PosterQuestion: FlyerLayoutComponent = ({
                 lineHeight,
                 color: "#ffffff",
                 letterSpacing: "-0.022em",
-                maxWidth: "880px",
+                maxWidth: "740px",
               }}
             >
               {headline}
             </div>
-            <div className="mt-[34px]">
+            <div className="mt-[28px]">
               <Tally color="#ffffff" />
             </div>
           </div>
-          <div aria-hidden className="h-[10px]" />
+          {/* QR + URL — placed on a white card so it scans cleanly
+              against the dark photo backdrop. */}
+          <div
+            className="absolute right-[80px] bottom-[80px]"
+            style={{ color: "#ffffff" }}
+          >
+            <ArticleBadge
+              qrDataUrl={articleQrDataUrl}
+              url={articleUrl}
+              size={180}
+              align="right"
+            />
+          </div>
         </div>
       </div>
     );
@@ -378,7 +461,7 @@ export const PosterQuestion: FlyerLayoutComponent = ({
           </div>
         </div>
 
-        <div className="flex max-w-[650px] flex-1 flex-col justify-center">
+        <div className="flex max-w-[620px] flex-1 flex-col justify-center">
           <div
             className="font-black tracking-tight"
             style={{
@@ -397,9 +480,21 @@ export const PosterQuestion: FlyerLayoutComponent = ({
             </span>
             {headline}
           </div>
-          <div className="mt-[34px]">
+          <div className="mt-[28px]">
             <Tally color={palette.accent} />
           </div>
+        </div>
+
+        {/* QR + URL — bottom-left, under the text column. Side photo
+            already occupies the right side of the canvas so we keep
+            the QR with the typography for a coherent reading flow. */}
+        <div style={{ color: palette.accentDeep }}>
+          <ArticleBadge
+            qrDataUrl={articleQrDataUrl}
+            url={articleUrl}
+            size={170}
+            align="left"
+          />
         </div>
       </div>
     </div>

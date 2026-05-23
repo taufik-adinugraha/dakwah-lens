@@ -785,6 +785,94 @@ export function pickFlyerDaleel(
 // the one-sentence provocative question. This helper pulls it.
 // ──────────────────────────────────────────────────────────────────
 
+/** Slice the entire Mahasiswa sub-section out of Section 4. Returns
+ *  the raw lines (without the H3 heading itself) so callers can
+ *  parse further. */
+function sliceMahasiswaSection(markdown: string): string {
+  const lines = markdown.split("\n");
+  const heading =
+    /^###\s+.*(?:mahasiswa|university\s+student|gen[\s-]?z|pendekatan\s+gen|reaching gen)/i;
+  let start = -1;
+  for (let i = 0; i < lines.length; i++) {
+    if (heading.test(lines[i])) {
+      start = i + 1;
+      break;
+    }
+  }
+  if (start === -1) return "";
+  let end = lines.length;
+  for (let i = start; i < lines.length; i++) {
+    if (lines[i].startsWith("### ") || lines[i].startsWith("## ")) {
+      end = i;
+      break;
+    }
+  }
+  return lines.slice(start, end).join("\n").trim();
+}
+
+/** Parsed Q&A pair from the Mahasiswa section. */
+export type MahasiswaQAPair = { question: string; answer: string };
+
+/** Parsed Mahasiswa deliverable — used by both the bulletin-board
+ *  poster (just the question) and the dedicated article page at
+ *  `/m/{slug}` (article body + Q&A). The article body is the prose
+ *  under `#### Artikel`; the Q&A is parsed as `**Q:** … **A:** …`
+ *  pairs under `#### Q&A Realistis`. */
+export type MahasiswaContent = {
+  question: string;
+  article: string;
+  qa: MahasiswaQAPair[];
+};
+
+export function extractMahasiswaContent(markdown: string): MahasiswaContent {
+  const body = sliceMahasiswaSection(markdown);
+  if (!body) return { question: "", article: "", qa: [] };
+
+  // Poster Question marker — same regex as extractPosterQuestion below.
+  const qMatch = body.match(
+    /^\s*\*\*\s*(?:poster\s+question|pertanyaan\s+poster|pertanyaan\s+pemicu)\s*[:：]\s*\*\*\s*["“]?(.+?)["”]?\s*$/im,
+  );
+  const question = qMatch?.[1]?.trim().replace(/^["“]\s*|\s*["”]$/g, "") ?? "";
+
+  // Article section — everything between `#### Artikel` and the next
+  // `#### ` heading (which is `#### Q&A Realistis` / `Q & A`).
+  const articleStart = body.search(
+    /^####\s+(?:artikel|article)\b/im,
+  );
+  const qaStart = body.search(/^####\s+(?:q\s*&\s*a|q\s+&\s+a|q&a)/im);
+  let article = "";
+  if (articleStart >= 0) {
+    const aEnd = qaStart > articleStart ? qaStart : body.length;
+    article = body
+      .slice(articleStart, aEnd)
+      .replace(/^####\s+[^\n]+\n?/, "")
+      .trim();
+  }
+
+  // Q&A block — pull each **Q:** / **A:** pair.
+  let qaBody = "";
+  if (qaStart >= 0) {
+    qaBody = body.slice(qaStart).replace(/^####\s+[^\n]+\n?/, "").trim();
+  }
+  const qa: MahasiswaQAPair[] = [];
+  if (qaBody) {
+    // Pair regex tolerates the LLM occasionally writing `**Q:**\n…` or
+    // wrapping the answer in a new paragraph. We just grab the chunks
+    // between successive Q markers.
+    const qSplits = qaBody
+      .split(/^\s*\*\*\s*Q\s*[:：]\s*\*\*\s*/im)
+      .slice(1);
+    for (const chunk of qSplits) {
+      const [q, ...rest] = chunk.split(/^\s*\*\*\s*A\s*[:：]\s*\*\*\s*/im);
+      if (rest.length === 0) continue;
+      const answer = rest.join("").trim();
+      qa.push({ question: q.trim(), answer });
+    }
+  }
+
+  return { question, article, qa };
+}
+
 /** Extract the bulletin-board poster question from the Mahasiswa
  *  sub-section. Returns "" if the section or marker is missing — the
  *  caller (poster renderer) treats that as "skip the poster". */

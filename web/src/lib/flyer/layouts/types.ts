@@ -22,6 +22,14 @@ export type FlyerContent = {
   message: string;
   /** The cited daleel — may be null if retrieval returned nothing. */
   daleel: DaleelRef | null;
+  /** Mahasiswa poster only — the short URL to the article page (e.g.
+   *  "dakwah-lens.id/m/2026-05-23-justice"). Rendered as visible text
+   *  next to the QR so a phoneless reader can still type it in. */
+  articleUrl?: string;
+  /** Mahasiswa poster only — pre-rendered QR code as a data URL. The
+   *  Puppeteer pipeline can't fetch external assets, so the compose
+   *  step pre-renders QR → data URL → layout embeds via <img>. */
+  articleQrDataUrl?: string;
 };
 
 export type FlyerPalette = {

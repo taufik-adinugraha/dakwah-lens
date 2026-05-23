@@ -1,4 +1,47 @@
+import QRCode from "qrcode";
+
 import type { DaleelRef } from "@/db/schema";
+import { briefingSlug } from "@/lib/insights-data";
+
+/** Hostname used inside the poster's article link + QR. Production
+ *  domain by default; can be overridden by `PUBLIC_SITE_URL` for
+ *  staging / preview builds. The bare host (no scheme) is what we
+ *  show as visible text on the poster — easier to read + type. */
+const ARTICLE_HOST = (() => {
+  const env = process.env.PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL;
+  if (env) return env.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  return "dakwah-lens.id";
+})();
+
+/** Build the canonical short URL for the Mahasiswa article page that
+ *  the poster's QR + visible text both point at. */
+function buildArticleUrl(generatedAt: Date, segment: string | null): {
+  href: string;
+  display: string;
+} {
+  const slug = briefingSlug(generatedAt, segment);
+  return {
+    href: `https://${ARTICLE_HOST}/m/${slug}`,
+    display: `${ARTICLE_HOST}/m/${slug}`,
+  };
+}
+
+/** Render a QR code to a base64 data URL for inline embedding in the
+ *  poster HTML. `M` error correction tier survives partial occlusion
+ *  (e.g., a wrinkle on a printed bulletin board) and keeps the QR
+ *  visually compact. White background + dark accent is the typical
+ *  high-contrast pairing. */
+async function buildArticleQrDataUrl(
+  href: string,
+  darkColor: string,
+): Promise<string> {
+  return QRCode.toDataURL(href, {
+    errorCorrectionLevel: "M",
+    margin: 1,
+    width: 480,
+    color: { dark: darkColor, light: "#ffffff" },
+  });
+}
 
 import {
   extractAksiMessage,
@@ -497,7 +540,7 @@ function messageForGenZB(body: string): string {
   });
 }
 
-function buildContent(ctx: FlyerContext): FlyerContent {
+async function buildContent(ctx: FlyerContext): Promise<FlyerContent> {
   const lang = ctx.locale;
   const brand = "dakwah-lens.id";
   const dateLabel = formatFlyerDate(ctx.generatedAt, lang);
@@ -599,11 +642,18 @@ function buildContent(ctx: FlyerContext): FlyerContent {
   }
 
   if (ctx.slot.kind === "poster") {
-    // The Mahasiswa bulletin-board poster: question-only. No message
-    // body, no daleel (those sit in the article + Q&A on the briefing
-    // page itself). Question is pulled from the `**Poster Question:**`
-    // marker line inside the Mahasiswa H3 sub-section.
+    // The Mahasiswa bulletin-board poster: question + URL + QR to the
+    // article page. The poster intentionally CANNOT carry the full
+    // article (too long for bulletin-board print real estate), so the
+    // question hooks attention and the URL/QR pair carries readers to
+    // the dedicated article page at `/m/{slug}` where the full prose +
+    // Q&A live in a colorful magazine layout.
     const question = extractPosterQuestion(ctx.body);
+    const { href, display } = buildArticleUrl(
+      ctx.generatedAt,
+      ctx.slot.segment,
+    );
+    const qrDataUrl = await buildArticleQrDataUrl(href, "#0f172a");
     return {
       brand,
       dateLabel,
@@ -612,6 +662,8 @@ function buildContent(ctx: FlyerContext): FlyerContent {
         "Pertanyaan Mahasiswa untuk Pekan Ini",
       message: "",
       daleel: null,
+      articleUrl: display,
+      articleQrDataUrl: qrDataUrl,
     };
   }
 
@@ -683,7 +735,7 @@ export async function composeFlyer(ctx: FlyerContext): Promise<{
   ]);
 
   const image = await pickImage(seed);
-  const content = buildContent(ctx);
+  const content = await buildContent(ctx);
   const palette = buildPalette(ctx.slot, seed);
   // Distinct seeds for layout variant so decorations rotate
   // independently of palette + photo (more visual variety). The
