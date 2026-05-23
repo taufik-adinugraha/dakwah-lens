@@ -420,6 +420,83 @@ export function extractDedicatedFlyerMessage(
   return extractDedicatedFlyerBlock(markdown, slot)?.body ?? "";
 }
 
+/** Parse the inline du'a out of a Pesan Flyer 5 / 6 block. The Sunnah
+ *  invitation and Du'a-hero flyers both carry the Arabic + ID
+ *  translation + citation INSIDE the message paragraph (the prompt
+ *  steers the LLM to write them there). Lifting them into a synthetic
+ *  DaleelRef lets the flyer compose step pass them to the layout as
+ *  daleel content — so the flyer's daleel card matches the message,
+ *  instead of falling back to a random pool entry scoped to the
+ *  week's news theme. */
+export function parseInlineDua(block: FlyerMessageBlock): DaleelRef | null {
+  const md = block.body;
+
+  // Longest Arabic run in the block — captures the du'a sentence(s)
+  // even if commas / spaces break it into shorter chunks.
+  const arabicRuns = md.match(/[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-ﻰ\sؐ-ًؚ-ٟ]+/g);
+  if (!arabicRuns) return null;
+  const arabic = arabicRuns
+    .map((r) => r.trim())
+    .filter((r) => /[؀-ۿ]/.test(r))
+    .reduce((longest, r) => (r.length > longest.length ? r : longest), "");
+  if (arabic.length < 10) return null;
+
+  // ID translation — italic-quoted sentence near the Arabic. The
+  // prompt format is roughly: Arabic line → blank → *"translation"*
+  // (citation). Match the first 20-220 char quoted phrase.
+  const transMatch = md.match(
+    /\*\s*["“]([^"”*\n]{20,260})["”]\s*\*/,
+  );
+  const translation = transMatch?.[1]?.trim() ?? "";
+
+  // Citation — prefer the explicit `**Daleel:**` marker on the block,
+  // fall back to a `(HR. ...)` / `(QS. ...)` / `(Hisnul Muslim ...)`
+  // parenthesized phrase in the body.
+  let citation = block.daleelCitation?.trim() ?? "";
+  if (!citation) {
+    const m = md.match(
+      /\((?:HR\.|QS\.|Hisnul Muslim|Sahih|Bukhari|Muslim|Tirmidzi|Abu Dawud|Bulugh|Riyad)[^)]{2,80}\)/i,
+    );
+    citation = m ? m[0].replace(/[()]/g, "").trim() : "";
+  }
+  if (!translation || !citation) return null;
+
+  return {
+    corpus: "inline",
+    citation,
+    score: null,
+    arabic,
+    translation_id: translation,
+    translation_en: translation,
+    ref_id: "synthetic:flyer-dua",
+  };
+}
+
+/** Strip the parsed-out Arabic du'a + its translation + citation from
+ *  the message body so the flyer doesn't duplicate the same content
+ *  twice (once as the daleel hero card, once as the message paragraph).
+ *  Returns the original body unchanged if any step doesn't match — the
+ *  caller can decide to fall back to the full paragraph. */
+export function stripInlineDua(block: FlyerMessageBlock): string {
+  let body = block.body;
+  // Drop Arabic-heavy lines / runs entirely.
+  body = body.replace(
+    /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-ﻰ\sؐ-ًؚ-ٟ]{12,}/g,
+    " ",
+  );
+  // Drop the italic-quoted translation immediately following.
+  body = body.replace(/\*\s*["“][^"”*\n]{20,260}["”]\s*\*/g, " ");
+  // Drop the inline citation parenthetical (now redundant — we surface
+  // it as the daleel card citation).
+  body = body.replace(
+    /\((?:HR\.|QS\.|Hisnul Muslim|Sahih|Bukhari|Muslim|Tirmidzi|Abu Dawud|Bulugh|Riyad)[^)]{2,80}\)/gi,
+    "",
+  );
+  // Collapse the whitespace we left behind.
+  body = body.replace(/\s+/g, " ").trim();
+  return body;
+}
+
 /** Find the daleel in the retrieved pool whose `citation` (case- and
  *  whitespace-insensitive) matches the given string. Used so the
  *  per-flyer `**Daleel:**` marker in the briefing can pin which pool

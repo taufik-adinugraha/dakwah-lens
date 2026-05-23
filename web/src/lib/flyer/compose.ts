@@ -16,6 +16,8 @@ import {
   extractKreatorMessage,
   extractPosterQuestion,
   findDaleelByCitation,
+  parseInlineDua,
+  stripInlineDua,
   formatFlyerDate,
   pickFlyerDaleel,
   type FlyerMessageSlot,
@@ -556,10 +558,32 @@ function buildContent(ctx: FlyerContext): FlyerContent {
   }
 
   if (ctx.slot.kind === "sunnah") {
-    // Sunnah invitation (a) + Du'a hero (b). Both use the dedicated
-    // Pesan Flyer 5 / 6 blocks; fall back to benang merah if the
-    // briefing was generated before the 2026-05-23 6-flyer schema.
+    // Sunnah invitation (variant a) + Du'a hero (variant b).
+    //
+    // The Pesan Flyer 5 / 6 paragraphs carry the relevant du'a +
+    // citation INLINE — that's the whole point of these flyers. Using
+    // the briefing's themed daleel pool here showed unrelated daleel
+    // (because the pool is scoped to the week's news topic, not to
+    // the sunnah being recommended).
+    //
+    // Strategy:
+    //   - Parse the inline Arabic + ID translation + citation out of
+    //     the block as a synthetic DaleelRef.
+    //   - For variant b (Du'a hero, hero-ayat layout) this becomes
+    //     the daleel card the layout displays as the centerpiece.
+    //   - For variant a (Sunnah call, split-image layout) we DON'T
+    //     show a separate daleel card — the inline du'a stays inside
+    //     the message paragraph where it belongs.
+    //   - Either way, the briefing's pool daleel is ignored for
+    //     these slots so an unrelated daleel never lands on screen.
+    const inlineDua = dedicatedBlock ? parseInlineDua(dedicatedBlock) : null;
     const fallbackMessage = extractBenangMerah(ctx.body);
+    const rawMessage =
+      (dedicatedBlock && ctx.slot.variant === "b" && inlineDua
+        ? stripInlineDua(dedicatedBlock)
+        : dedicatedBlock?.body) ||
+      fallbackMessage ||
+      "";
     return {
       brand,
       dateLabel,
@@ -568,8 +592,8 @@ function buildContent(ctx: FlyerContext): FlyerContent {
         (ctx.slot.variant === "a"
           ? "Ajakan Sunnah Pekan Ini"
           : "Doa Pekan Ini"),
-      message: dedicatedBlock?.body || fallbackMessage || "",
-      daleel,
+      message: rawMessage,
+      daleel: ctx.slot.variant === "b" ? inlineDua : null,
     };
   }
 
