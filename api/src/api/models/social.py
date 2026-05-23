@@ -21,6 +21,7 @@ from typing import Any
 from uuid import UUID, uuid4
 
 from sqlalchemy import (
+    BigInteger,
     DateTime,
     Float,
     ForeignKey,
@@ -112,6 +113,20 @@ class SocialPost(Base, TimestampMixin):
 
     categories: Mapped[dict[str, float] | None] = mapped_column(JSONB)
     """Per-category scores: `{ "akhlaq": 0.78, "muamalah": 0.12, … }`."""
+
+    # ── engagement (YouTube videos.list stats — 2026-05-23) ─────────
+    # Per-video interaction counts. Populated for platforms with public
+    # engagement metrics (YT today, X / IG / TikTok when those scrapers
+    # come back online). NULL for mainstream RSS where no per-article
+    # counts exist.
+    engagement_views: Mapped[int | None] = mapped_column(BigInteger)
+    engagement_likes: Mapped[int | None] = mapped_column(BigInteger)
+    engagement_comments: Mapped[int | None] = mapped_column(BigInteger)
+    engagement_score: Mapped[float | None] = mapped_column(Float)
+    """Composite score: log10(views+1) + 0.5*log10(comments+1) +
+    0.3*log10(likes+1). Views dominate the magnitude; comments weight
+    higher than likes because they signal stronger audience reaction.
+    Used by top-posts sorting + topic-discovery weighting."""
 
     # ── topic cluster (Gemini Flash-Lite topic discovery, Stage 5) ──
     topic_id: Mapped[UUID | None] = mapped_column(

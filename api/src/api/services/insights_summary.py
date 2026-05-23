@@ -123,26 +123,29 @@ RUJUKAN DALEEL DI SECTION 4 — pool yang saya sediakan berisi 10 daleel hasil r
 Tulis KHUTBAH JUMAT LENGKAP siap-baca dari pembuka sampai penutup, terdiri dari Khutbah Pertama dan Khutbah Kedua. Bahasa Indonesia formal-mengalir, bisa dipahami jamaah umum, jangan terlalu akademis. Panjang khutbah harus sebanding dengan khutbah Jumat Indonesia standar (15-22 menit ucapan = ~2300-3200 kata) — JANGAN terlalu pendek.
 
 KHUTBAH PERTAMA (1800-2500 kata):
-- Mukadimah singkat (hamdalah → sholawat → syahadat → wasiat takwa, ~70 kata, transliterasi Arab standar khutbah Indonesia).
-- Ayat Quran pembuka yang relevan dengan tema pekan — sebut nama surah + nomor ayat + TERJEMAHAN Bahasa Indonesia. Kutip transliterasi Arab singkat untuk ayat ini saja BOLEH sebagai pembuka (mengikuti praktik khutbah Indonesia).
-- Pengantar tema (4-6 paragraf): hubungkan ayat dengan 2-3 peristiwa NYATA pekan ini dari pool sample_headlines, sebut outletnya ("Detik melaporkan…", "menurut Republika…", "seperti diberitakan Kompas…").
-- Inti khutbah (6-9 paragraf prosa mengalir, jangan pakai sub-judul): satu argumen yang BERKEMBANG sepanjang khutbah, didukung 2-3 daleel tambahan DARI POOL (gunakan citation persis dari pool, tulis bold inline `**citation**` lalu terjemahan Bahasa Indonesia). Setiap paragraf harus mengembangkan argumen, BUKAN paraphrase paragraf sebelumnya.
+- Mukadimah singkat (hamdalah → sholawat → syahadat → wasiat takwa, ~70 kata, AKSARA ARAB DENGAN HARAKAT lengkap — bukan transliterasi Latin). Khateeb membaca langsung dari teks di mimbar.
+- Ayat Quran pembuka yang relevan dengan tema pekan — TULIS AYAT DALAM AKSARA ARAB BERHARAKAT, lalu sebut nama surah + nomor ayat, lalu TERJEMAHAN Bahasa Indonesia. JANGAN gunakan transliterasi Latin untuk ayat Quran.
+- Pengantar tema (4-6 paragraf Bahasa Indonesia): hubungkan ayat dengan 2-3 peristiwa NYATA pekan ini dari pool sample_headlines, sebut outletnya ("Detik melaporkan…", "menurut Republika…", "seperti diberitakan Kompas…").
+- Inti khutbah (6-9 paragraf prosa mengalir, jangan pakai sub-judul): satu argumen yang BERKEMBANG sepanjang khutbah, didukung 2-3 daleel tambahan DARI POOL. Untuk setiap daleel: tulis citation bold inline `**citation**`, AYAT/HADITS DALAM AKSARA ARAB BERHARAKAT (jika tersedia di pool), lalu terjemahan Bahasa Indonesia. Setiap paragraf harus mengembangkan argumen, BUKAN paraphrase paragraf sebelumnya.
 - Bersisi praktis: 3-4 tindakan konkret untuk jamaah pekan ini.
-- Tutup khutbah pertama dengan formula standar transliterasi Arab: "Baarakallahu lii wa lakum fil qur'aanil 'azhiim…" dst (~80 kata).
+- Tutup khutbah pertama dengan formula standar DALAM AKSARA ARAB BERHARAKAT (~80 kata): "بَارَكَ اللهُ لِيْ وَلَكُمْ فِي الْقُرْآنِ الْعَظِيْمِ، وَنَفَعَنِيْ وَإِيَّاكُمْ بِمَا فِيْهِ مِنَ الْآيَاتِ وَالذِّكْرِ الْحَكِيْمِ…" dst. JANGAN transliterasi Latin.
 
 KHUTBAH KEDUA (500-700 kata):
-- Mukadimah singkat (hamdalah + sholawat + syahadat, transliterasi Arab ~50 kata).
-- Penegasan inti khutbah pertama (2-3 paragraf reflektif).
-- DOA PENUTUP DALAM TRANSLITERASI BAHASA ARAB (300-450 kata). Ini bagian utama khutbah kedua. JANGAN tulis dalam Bahasa Indonesia — gunakan rangkaian doa standar khutbah Jumat Indonesia, struktur:
-  * "Allahumma ighfir lil mu'minīna wal mu'mināt, wal muslimīna wal muslimāt, al-aḥyā'i minhum wal amwāt, innaka samī'un qarībun mujību da'awāt." (untuk seluruh umat)
-  * "Allahumma anshurnā 'alā 'aduwwika wa 'aduwwinā, wa 'aduwwil islām." (untuk pertolongan)
-  * "Allahumma anshur ikhwānanā al-muslimīna al-mustadh'afīna fī kulli makān, wa khushūshan ikhwānanā fī arḍi falisṭīn…" (untuk Palestina + korban kezaliman pekan ini — bisa sebut spesifik konteks 9 WNI Israel atau korban lain)
-  * "Allahumma aṣliḥ wulāta umūrinā, wa wuffiqhum li khayri 'ibādika wa bilādik." (untuk pemimpin)
-  * "Allahumma irḥamnā wa wālidaynā, wa rabbiyahum kamā rabbayānā ṣighārā." (untuk diri & keluarga)
-  * Boleh tambahkan 1-2 doa tematik yang relevan dengan isu pekan ini (mis: untuk korban kekerasan anak, untuk pelajar yang dibully, untuk petani yang ekonominya tertekan).
-  * "Rabbanā ātinā fid-dunyā ḥasanah wa fil ākhirati ḥasanah, wa qinā 'adzāban-nār." (penutup doa)
-  Gunakan transliterasi Arab dengan vokal panjang (ā, ī, ū) supaya khateeb mudah membacanya.
-- Penutup standar transliterasi Arab (~120 kata): "Inna Allāha wa malā'ikatahū yuṣallūna 'alan-nabiy…" + sholawat lengkap ("Allāhumma ṣalli 'alā sayyidinā Muḥammad wa 'alā āli sayyidinā Muḥammad…") + "'Ibādallāh, innallāha ya'muru bil 'adli wal-iḥsān wa ītā'i dzil qurbā…" + tahmid akhir "Wadzkurullāhal 'aẓīm yadzkurkum, wasykuruhu 'alā ni'amih yazidkum, wa lasykrullāhi akbar."
+- Mukadimah singkat (hamdalah + sholawat + syahadat, AKSARA ARAB DENGAN HARAKAT lengkap, ~50 kata).
+- Penegasan inti khutbah pertama (2-3 paragraf reflektif dalam Bahasa Indonesia).
+- DOA PENUTUP DALAM AKSARA ARAB DENGAN HARAKAT LENGKAP (300-450 kata Arab). Ini bagian utama khutbah kedua. JANGAN tulis transliterasi Latin, JANGAN tulis Bahasa Indonesia — TULIS DALAM HURUF ARAB ASLI dengan tanda syakal/harakat (fathah, kasrah, dhammah, sukūn, syaddah, dst.) supaya khateeb bisa membaca langsung di mimbar. Gunakan rangkaian doa standar khutbah Jumat Indonesia, struktur:
+  * Doa untuk seluruh umat (mukminin, mukminat, muslimin, muslimat, yang hidup dan yang wafat):
+    اَللّٰهُمَّ اغْفِرْ لِلْمُؤْمِنِيْنَ وَالْمُؤْمِنَاتِ، وَالْمُسْلِمِيْنَ وَالْمُسْلِمَاتِ، الْأَحْيَاءِ مِنْهُمْ وَالْأَمْوَاتِ، إِنَّكَ سَمِيْعٌ قَرِيْبٌ مُجِيْبُ الدَّعَوَاتِ.
+  * Doa pertolongan: اَللّٰهُمَّ انْصُرْنَا عَلٰى عَدُوِّكَ وَعَدُوِّنَا، وَعَدُوِّ الْإِسْلَامِ.
+  * Doa untuk Palestina + korban kezaliman pekan ini (mustadh'afin, sebut konteks spesifik bila relevan — misalnya WNI di tahanan asing, korban di tempat bencana, dst.): اَللّٰهُمَّ انْصُرْ إِخْوَانَنَا الْمُسْلِمِيْنَ الْمُسْتَضْعَفِيْنَ فِيْ كُلِّ مَكَانٍ، وَخُصُوْصًا إِخْوَانَنَا فِيْ أَرْضِ فِلَسْطِيْنَ…
+  * Doa untuk pemimpin: اَللّٰهُمَّ أَصْلِحْ وُلَاةَ أُمُوْرِنَا، وَوَفِّقْهُمْ لِخَيْرِ عِبَادِكَ وَبِلَادِكَ.
+  * Doa untuk diri & keluarga: اَللّٰهُمَّ ارْحَمْنَا وَوَالِدَيْنَا، وَرَبِّهِمْ كَمَا رَبَّيَانَا صِغَارًا.
+  * Boleh tambahkan 1-2 doa tematik DALAM HURUF ARAB yang relevan dengan isu pekan ini (mis: doa untuk korban kekerasan anak, untuk pelajar yang dibully, untuk petani/nelayan yang tertekan). Tulis dalam aksara Arab berharakat, JANGAN transliterasi.
+  * Penutup doa: رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ.
+
+  CRITICAL: setiap baris doa di atas adalah CONTOH. Anda boleh menambah/menyesuaikan dengan konteks pekan ini, tapi SETIAP TAMBAHAN HARUS DALAM AKSARA ARAB BERHARAKAT — bukan transliterasi Latin.
+
+- Penutup standar (~120 kata Arab): aksara Arab berharakat penuh untuk sequence "إِنَّ اللهَ وَمَلَائِكَتَهُ يُصَلُّوْنَ عَلَى النَّبِيّ…" → sholawat lengkap "اَللّٰهُمَّ صَلِّ عَلٰى سَيِّدِنَا مُحَمَّدٍ وَعَلٰى آلِ سَيِّدِنَا مُحَمَّدٍ…" → "عِبَادَ اللهِ، إِنَّ اللهَ يَأْمُرُ بِالْعَدْلِ وَالْإِحْسَانِ وَإِيْتَاءِ ذِي الْقُرْبٰى…" → tahmid akhir "وَاذْكُرُوا اللهَ الْعَظِيْمَ يَذْكُرْكُمْ، وَاشْكُرُوْهُ عَلٰى نِعَمِهِ يَزِدْكُمْ، وَلَذِكْرُ اللهِ أَكْبَرُ." Semua dalam aksara Arab, harakat lengkap.
 
 ### Kajian Ibu-ibu & Majelis Taklim (800-1100 kata)
 Tulis OUTLINE KAJIAN 45-MENIT siap-pakai, format hands-on bukan ceramah teoritis:
@@ -300,26 +303,29 @@ DALEEL REFERENCING IN SECTION 4 — the pool I provide contains 10 thematically-
 Write a COMPLETE ready-to-deliver Friday khutbah from opening to closing, consisting of Khutbah Pertama (First Khutbah) and Khutbah Kedua (Second Khutbah). Length must match a standard Indonesian Friday khutbah (15-22 minutes spoken = ~2300-3200 words) — do NOT cut short.
 
 KHUTBAH PERTAMA (1800-2500 words):
-- Brief mukadimah (hamdalah → sholawat → syahadat → wasiat takwa, ~70 words, standard Indonesian-khutbah Arabic transliteration).
-- Opening Quranic verse tied to this week's theme — name the surah + verse number + English TRANSLATION. A short Arabic transliteration of just this opening verse is OK (matches Indonesian khutbah practice).
-- Theme introduction (4-6 paragraphs): link the verse to 2-3 REAL events from this week's sample_headlines pool, naming the outlet ("Detik reports…", "according to Republika…", "as Kompas reports…").
-- Khutbah body (6-9 flowing paragraphs, no sub-headings): one argument that DEVELOPS across the khutbah, supported by 2-3 additional daleel FROM THE POOL (use the exact citation, write bold inline `**citation**` then English translation). Each paragraph must advance the argument, NOT paraphrase the previous one.
+- Brief mukadimah (hamdalah → sholawat → syahadat → wasiat takwa, ~70 words, ARABIC SCRIPT WITH FULL HARAKAT — not Latin transliteration). The khateeb reads directly from the text at the mimbar.
+- Opening Quranic verse tied to this week's theme — WRITE THE VERSE IN ARABIC SCRIPT WITH HARAKAT, then name the surah + verse number, then English TRANSLATION. Do NOT use Latin transliteration for Quranic verses.
+- Theme introduction (4-6 English paragraphs): link the verse to 2-3 REAL events from this week's sample_headlines pool, naming the outlet ("Detik reports…", "according to Republika…", "as Kompas reports…").
+- Khutbah body (6-9 flowing paragraphs, no sub-headings): one argument that DEVELOPS across the khutbah, supported by 2-3 additional daleel FROM THE POOL. For each daleel: write the citation bold inline `**citation**`, the VERSE/HADITH IN ARABIC SCRIPT WITH HARAKAT (when available from the pool), then English translation. Each paragraph must advance the argument, NOT paraphrase the previous one.
 - Practical close: 3-4 concrete actions the congregation can take this week.
-- Close khutbah pertama with the standard Arabic transliteration formula: "Baarakallahu lii wa lakum fil qur'aanil 'azhiim…" etc (~80 words).
+- Close khutbah pertama with the standard formula IN ARABIC SCRIPT WITH HARAKAT (~80 words): "بَارَكَ اللهُ لِيْ وَلَكُمْ فِي الْقُرْآنِ الْعَظِيْمِ، وَنَفَعَنِيْ وَإِيَّاكُمْ بِمَا فِيْهِ مِنَ الْآيَاتِ وَالذِّكْرِ الْحَكِيْمِ…" etc. Do NOT use Latin transliteration.
 
 KHUTBAH KEDUA (500-700 words):
-- Brief mukadimah (hamdalah + sholawat + syahadat, Arabic transliteration ~50 words).
-- Restate the first khutbah's core (2-3 reflective paragraphs).
-- CLOSING DU'A IN ARABIC TRANSLITERATION (300-450 words). This is the main body of khutbah kedua. Do NOT write it in English — use the standard Indonesian Friday khutbah du'a sequence:
-  * "Allahumma ighfir lil mu'minīna wal mu'mināt, wal muslimīna wal muslimāt, al-aḥyā'i minhum wal amwāt, innaka samī'un qarībun mujību da'awāt." (for the whole ummah)
-  * "Allahumma anshurnā 'alā 'aduwwika wa 'aduwwinā, wa 'aduwwil islām." (for divine help)
-  * "Allahumma anshur ikhwānanā al-muslimīna al-mustadh'afīna fī kulli makān, wa khushūshan ikhwānanā fī arḍi falisṭīn…" (for Palestine + this week's oppression victims — can name specific contexts like the 9 WNI in Israel or other current victims)
-  * "Allahumma aṣliḥ wulāta umūrinā, wa wuffiqhum li khayri 'ibādika wa bilādik." (for leaders)
-  * "Allahumma irḥamnā wa wālidaynā, wa rabbiyahum kamā rabbayānā ṣighārā." (for self & family)
-  * Add 1-2 thematic du'a relevant to this week's issues (e.g. for child-abuse victims, for bullied students, for farmers under economic pressure).
-  * "Rabbanā ātinā fid-dunyā ḥasanah wa fil ākhirati ḥasanah, wa qinā 'adzāban-nār." (closing of the du'a)
-  Use Arabic transliteration with long-vowel marks (ā, ī, ū) so the khateeb can read it easily.
-- Standard closing in Arabic transliteration (~120 words): "Inna Allāha wa malā'ikatahū yuṣallūna 'alan-nabiy…" + full sholawat ("Allāhumma ṣalli 'alā sayyidinā Muḥammad wa 'alā āli sayyidinā Muḥammad…") + "'Ibādallāh, innallāha ya'muru bil 'adli wal-iḥsān wa ītā'i dzil qurbā…" + final tahmid "Wadzkurullāhal 'aẓīm yadzkurkum, wasykuruhu 'alā ni'amih yazidkum, wa lasykrullāhi akbar."
+- Brief mukadimah (hamdalah + sholawat + syahadat, ARABIC SCRIPT WITH FULL HARAKAT, ~50 words).
+- Restate the first khutbah's core (2-3 reflective English paragraphs).
+- CLOSING DU'A IN ARABIC SCRIPT WITH FULL HARAKAT (300-450 Arabic words). This is the main body of khutbah kedua. Do NOT write Latin transliteration, do NOT write English — WRITE IN ORIGINAL ARABIC LETTERS with syakal/harakat marks (fathah, kasrah, dhammah, sukūn, syaddah, etc.) so the khateeb can read straight from the mimbar. Use the standard Indonesian Friday khutbah du'a sequence:
+  * For the whole ummah (believers, men and women, living and deceased):
+    اَللّٰهُمَّ اغْفِرْ لِلْمُؤْمِنِيْنَ وَالْمُؤْمِنَاتِ، وَالْمُسْلِمِيْنَ وَالْمُسْلِمَاتِ، الْأَحْيَاءِ مِنْهُمْ وَالْأَمْوَاتِ، إِنَّكَ سَمِيْعٌ قَرِيْبٌ مُجِيْبُ الدَّعَوَاتِ.
+  * For divine help: اَللّٰهُمَّ انْصُرْنَا عَلٰى عَدُوِّكَ وَعَدُوِّنَا، وَعَدُوِّ الْإِسْلَامِ.
+  * For Palestine + this week's oppression victims (mustadh'afin, name specific contexts when relevant — WNI detained abroad, disaster victims, etc.): اَللّٰهُمَّ انْصُرْ إِخْوَانَنَا الْمُسْلِمِيْنَ الْمُسْتَضْعَفِيْنَ فِيْ كُلِّ مَكَانٍ، وَخُصُوْصًا إِخْوَانَنَا فِيْ أَرْضِ فِلَسْطِيْنَ…
+  * For leaders: اَللّٰهُمَّ أَصْلِحْ وُلَاةَ أُمُوْرِنَا، وَوَفِّقْهُمْ لِخَيْرِ عِبَادِكَ وَبِلَادِكَ.
+  * For self & family: اَللّٰهُمَّ ارْحَمْنَا وَوَالِدَيْنَا، وَرَبِّهِمْ كَمَا رَبَّيَانَا صِغَارًا.
+  * Add 1-2 thematic du'a IN ARABIC SCRIPT relevant to this week's issues (e.g. for child-abuse victims, for bullied students, for farmers under economic pressure). Write in Arabic letters with harakat, NOT Latin transliteration.
+  * Closing of du'a: رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ.
+
+  CRITICAL: every du'a line above is an EXAMPLE. You may add/adapt to this week's context, but EVERY ADDITION MUST BE IN ARABIC SCRIPT WITH HARAKAT — never Latin transliteration.
+
+- Standard closing (~120 Arabic words) in ARABIC SCRIPT WITH FULL HARAKAT: the sequence "إِنَّ اللهَ وَمَلَائِكَتَهُ يُصَلُّوْنَ عَلَى النَّبِيّ…" → full sholawat "اَللّٰهُمَّ صَلِّ عَلٰى سَيِّدِنَا مُحَمَّدٍ وَعَلٰى آلِ سَيِّدِنَا مُحَمَّدٍ…" → "عِبَادَ اللهِ، إِنَّ اللهَ يَأْمُرُ بِالْعَدْلِ وَالْإِحْسَانِ وَإِيْتَاءِ ذِي الْقُرْبٰى…" → final tahmid "وَاذْكُرُوا اللهَ الْعَظِيْمَ يَذْكُرْكُمْ، وَاشْكُرُوْهُ عَلٰى نِعَمِهِ يَزِدْكُمْ، وَلَذِكْرُ اللهِ أَكْبَرُ." All in Arabic letters with harakat.
 
 ### Women's Kajian & Majelis Taklim (800-1100 words)
 Write a 45-MINUTE KAJIAN OUTLINE ready for delivery — hands-on, NOT theoretical lecture:

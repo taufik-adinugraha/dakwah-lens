@@ -212,14 +212,18 @@ async def _run(
     )
 
     # Dispatch sentiment by platform AND language, on FRESH items only:
-    #   - mainstream            → Gemini news-valence (event-valence
-    #                             prompt, IndoBERT misfires on news).
+    #   - mainstream + youtube  → Gemini news-valence. Mainstream because
+    #                             IndoBERT misfires ~95% neutral on news;
+    #                             YT because video descriptions run 500-
+    #                             5000 chars and IndoBERT's 128-token cap
+    #                             throws away the body (added 2026-05-23
+    #                             alongside the YT pipeline optimization).
     #   - else, ID language     → IndoBERT (free, on-device, well-tuned
     #                             for Indonesian tweets/captions).
     #   - else, non-ID language → Gemini Flash-Lite fallback.
     sentiment_by_index: dict[int, object] = {}
     if fresh_texts:
-        if platform == "mainstream":
+        if platform in {"mainstream", "youtube"}:
             print(f"  Running Gemini news-sentiment on {len(fresh_texts)} posts …")
             fresh_sentiments = classify_news_sentiment(fresh_texts)
             for idx, s in zip(fresh_indices, fresh_sentiments, strict=False):
@@ -284,6 +288,15 @@ async def _run(
             row["dawah_opportunity"] = opportunity_by_index.get(i)
             row["categories"] = getattr(r, "categories", None)
 
+        # Normalize engagement keys — non-YT platforms don't populate
+        # these in their normalizers, but `insert.values(rows)` needs a
+        # union-of-keys-aware shape. Default to None when the normalizer
+        # didn't set them so all rows share the same columns.
+        row.setdefault("engagement_views", None)
+        row.setdefault("engagement_likes", None)
+        row.setdefault("engagement_comments", None)
+        row.setdefault("engagement_score", None)
+
     # 4. Upsert
     async with SessionLocal() as session:
         stmt = (
@@ -301,6 +314,15 @@ async def _run(
                     "categories": insert(SocialPost).excluded.categories,
                     "region": insert(SocialPost).excluded.region,
                     "raw_payload": insert(SocialPost).excluded.raw_payload,
+                    # Engagement REFRESHED on every upsert (view counts
+                    # grow over time, comments accumulate) so the
+                    # engagement_score reflects current popularity not
+                    # first-seen popularity. Cheap — already fetched in
+                    # the scraper alongside playlistItems.list.
+                    "engagement_views": insert(SocialPost).excluded.engagement_views,
+                    "engagement_likes": insert(SocialPost).excluded.engagement_likes,
+                    "engagement_comments": insert(SocialPost).excluded.engagement_comments,
+                    "engagement_score": insert(SocialPost).excluded.engagement_score,
                 },
             )
         )

@@ -29,12 +29,14 @@ log = structlog.get_logger()
 MODEL = "gemini-2.5-flash-lite"
 
 # Hard cap on how many posts we ever send to Gemini in one call.
-# Was 100 — silently truncated the 500 posts the caller pre-fetched and
-# left ~80% of the corpus without a topic_id (2026-05-21). Raised to
-# 2000 to match the caller's 7-day window cap. At ~200 chars each + a
-# tight system prompt this fits in Flash-Lite's input window with
-# headroom; cost stays ~$0.02/run.
-SAMPLE_SIZE = 2000
+# Sized to match the caller's stratified sample ceiling (PER_DAY_CAP ×
+# TOPIC_DISCOVERY_WINDOW_DAYS = 800 × 7 = 5600 in
+# cluster_topics.py). At ~200 chars each + system prompt this lands
+# around 280K input tokens — well inside Flash-Lite's 1M context, ~$0.03
+# per recluster call. Earlier values: 100 (truncated 80% of input,
+# 2026-05-21) → 2000 (clipped to 1.6 days at busy news pace,
+# 2026-05-22) → 5600 stratified (2026-05-23).
+SAMPLE_SIZE = 5600
 
 # Truncate each post's text to control input tokens. Tweets / captions
 # usually fit in 200 chars; mainstream articles get cut to the lede

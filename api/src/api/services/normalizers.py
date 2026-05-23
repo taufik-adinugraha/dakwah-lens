@@ -327,6 +327,19 @@ def normalize_youtube(item: dict[str, Any]) -> dict[str, Any] | None:
         return None
     text = f"{title}\n\n{description}".strip()
 
+    # Engagement stats — populated by services.youtube when present.
+    # Older raw_payloads (pre-2026-05-23) lack the `statistics` block;
+    # those rows just keep engagement_* NULL.
+    stats = snippet.get("statistics") if isinstance(snippet, dict) else None
+    engagement: dict[str, Any] = {}
+    if isinstance(stats, dict):
+        engagement = {
+            "engagement_views": stats.get("views"),
+            "engagement_likes": stats.get("likes"),
+            "engagement_comments": stats.get("comments"),
+            "engagement_score": stats.get("score"),
+        }
+
     return {
         "platform": "youtube",
         "external_id": str(video_id),
@@ -336,6 +349,7 @@ def normalize_youtube(item: dict[str, Any]) -> dict[str, Any] | None:
         "language": _str_or_none(snippet.get("defaultAudioLanguage"), max_len=8),
         "posted_at": _to_datetime(snippet.get("publishedAt")),
         "raw_payload": item,
+        **engagement,
     }
 
 

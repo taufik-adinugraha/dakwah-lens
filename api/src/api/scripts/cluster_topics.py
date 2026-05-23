@@ -25,7 +25,7 @@ from typing import Any
 from uuid import UUID
 
 import structlog
-from sqlalchemy import delete, select, update
+from sqlalchemy import delete, func, select, update
 from sqlalchemy import or_ as sql_or
 
 from api.db import SessionLocal
@@ -41,18 +41,29 @@ log = structlog.get_logger()
 # handful of unrelated posts.
 MIN_POSTS_FOR_DISCOVERY = 20
 
-# Topic discovery window — last 7 days. Matches the executive briefing's
-# 7-day window so the topics surfaced in trending are the SAME ones the
-# briefing narrates over. Earlier this was a "most recent N" slice
-# (RECENT_POST_LIMIT=500) which got narrowed again to 100 inside the
-# discovery service, leaving 484 of 584 mainstream posts without a
-# topic_id (2026-05-21).
+# Topic discovery is a STRATIFIED sample: up to PER_DAY_CAP posts from
+# each of the last TOPIC_DISCOVERY_WINDOW_DAYS days. Total upper bound is
+# PER_DAY_CAP × DAYS, but most days will yield fewer.
 #
-# A safety cap so a runaway scrape (e.g. accidentally re-enabling a paused
-# platform) can't blow our Gemini token budget on a single recluster run.
-# Today 7d is ~500-600 mainstream posts; 2000 leaves comfortable headroom.
-RECENT_POST_LIMIT = 2000
+# Why stratified instead of "newest N":
+#   The old "newest 2000" cut clipped to ~1.6 days at busy-news pace
+#   (1200 mainstream posts/day with the new RSS cap=100). Themes that
+#   emerged Sunday/Monday would be invisible by Friday's recluster.
+#   Per-day buckets guarantee every day contributes some signal —
+#   the LLM sees a representative cross-section of the week.
+#
+# Within each day we still take the newest, so partial days at the
+# window edges naturally yield fewer rows. Days with no posts at all
+# (or only sub-floor `dawah_opportunity`) contribute zero — no
+# bookkeeping for empty days.
 TOPIC_DISCOVERY_WINDOW_DAYS = 7
+PER_DAY_CAP = 800
+SAMPLE_HARD_CEILING = PER_DAY_CAP * TOPIC_DISCOVERY_WINDOW_DAYS  # 5600
+
+# Day buckets are computed in Asia/Jakarta so a post at 23:00 WIB lands
+# in the same day as one at 06:00 WIB — what readers would call "the
+# same day's news". Otherwise UTC-midnight would split Indonesian days.
+DAY_TZ = "Asia/Jakarta"
 
 # Floor for `dawah_opportunity` when deciding which posts feed topic
 # discovery. Without this filter the sample is dominated by routine
@@ -65,21 +76,40 @@ MIN_OPPORTUNITY_FOR_DISCOVERY = 0.4
 
 
 async def _fetch_recent_posts(platform: str) -> list[dict[str, Any]]:
-    """Pull recent posts above the da'wah-opportunity floor.
+    """Pull stratified recent posts above the da'wah-opportunity floor.
 
     Mainstream RSS publishes ~50% routine news the model can't form a
     da'wah theme out of (stock prices, sports scores, traffic alerts).
-    Feeding that noise into Gemini produces newsroom-shaped clusters
-    ("Kebijakan Ekonomi & Bisnis") instead of da'wah-shaped ones
-    ("Persiapan Haji & Kurban"). Filtering at the SQL level keeps the
-    discovery sample focused.
+    The opportunity floor filter at the SQL level keeps the discovery
+    sample focused.
+
+    Stratification: PER_DAY_CAP posts per WIB day, newest-first within
+    each day. Returns up to SAMPLE_HARD_CEILING rows ordered overall
+    newest-first.
     """
     async with SessionLocal() as session:
         window_start = datetime.now(UTC) - timedelta(
             days=TOPIC_DISCOVERY_WINDOW_DAYS
         )
-        res = await session.execute(
-            select(SocialPost.id, SocialPost.text, SocialPost.posted_at)
+        # Window function ranks each post within its WIB-calendar day.
+        # We then keep only ranks <= PER_DAY_CAP. Doing the partition +
+        # rank in one CTE keeps Postgres planner happy on the
+        # (platform, posted_at) composite index.
+        day_bucket = func.date_trunc(
+            "day", func.timezone(DAY_TZ, SocialPost.posted_at)
+        )
+        ranked = (
+            select(
+                SocialPost.id,
+                SocialPost.text,
+                SocialPost.posted_at,
+                func.row_number()
+                .over(
+                    partition_by=day_bucket,
+                    order_by=SocialPost.posted_at.desc(),
+                )
+                .label("rn"),
+            )
             .where(SocialPost.platform == platform)
             .where(SocialPost.posted_at >= window_start)
             .where(
@@ -88,14 +118,27 @@ async def _fetch_recent_posts(platform: str) -> list[dict[str, Any]]:
                     SocialPost.dawah_opportunity >= MIN_OPPORTUNITY_FOR_DISCOVERY,
                 )
             )
-            .order_by(SocialPost.posted_at.desc().nulls_last())
-            .limit(RECENT_POST_LIMIT)
+            .subquery()
         )
-        return [
+
+        res = await session.execute(
+            select(ranked.c.id, ranked.c.text, ranked.c.posted_at)
+            .where(ranked.c.rn <= PER_DAY_CAP)
+            .order_by(ranked.c.posted_at.desc())
+        )
+        rows = [
             {"id": row.id, "text": row.text, "posted_at": row.posted_at}
             for row in res.all()
             if row.text
         ]
+
+        # Belt-and-suspenders against a runaway scrape: enforce the
+        # absolute ceiling even though the partition cap should already
+        # bound it. Cheap O(n) slice.
+        if len(rows) > SAMPLE_HARD_CEILING:
+            rows = rows[:SAMPLE_HARD_CEILING]
+
+        return rows
 
 
 async def _persist(

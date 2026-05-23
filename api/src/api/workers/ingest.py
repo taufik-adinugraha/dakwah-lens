@@ -167,8 +167,17 @@ def rotating_ingest(
     max_retries=2,
 )
 def youtube_channels_ingest(self, limit: int = 50) -> dict[str, object]:
-    """Iterate enabled `youtube_channels` and fan out one `run_ingest`
-    child per channel via the playlistItems.list (uploads) path.
+    """Iterate enabled + VERIFIED `youtube_channels` and fan out one
+    `run_ingest` child per channel via the playlistItems.list (uploads)
+    path.
+
+    Verified filter (2026-05-23): channels enter the pipeline only after
+    an admin confirms the channel via the /admin/system/youtube-channels
+    "Verify" button (which round-trips through channels.list). The seed
+    script's top-1 search.list match was wrong for ambiguous names —
+    e.g. "dr Sung" → "Justin Sung" instead of an Indonesian Dr Sung.
+    Without the verify gate, those wrong channels would have polluted
+    the ingest.
 
     At 1 quota unit per channel and ~80 channels, the whole sweep costs
     ~80 units/day — under 1% of the YT API free tier. We mark
@@ -188,7 +197,9 @@ def youtube_channels_ingest(self, limit: int = 50) -> dict[str, object]:
                     YoutubeChannel.id,
                     YoutubeChannel.channel_id,
                     YoutubeChannel.name,
-                ).where(YoutubeChannel.enabled.is_(True))
+                )
+                .where(YoutubeChannel.enabled.is_(True))
+                .where(YoutubeChannel.verified.is_(True))
             )
             rows = list(res.all())
             if not rows:

@@ -215,6 +215,18 @@ class YoutubeChannel(Base, TimestampMixin):
 
     enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
+    # Verified channels are the only ones the ingest dispatcher will
+    # scrape — guards against the seed script's wrong-channel matches
+    # (e.g. "dr Sung" → "Justin Sung"). Admin flips this true via the
+    # /admin/system/youtube-channels page after a one-shot YT API
+    # round-trip confirms the channel matches expectations.
+    verified: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default=text("false")
+    )
+    verified_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True)
+    )
+
     last_run_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
         comment="Updated each time this channel is scraped. NULL = never; "
