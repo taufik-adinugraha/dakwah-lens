@@ -255,11 +255,11 @@ Bagian ini WAJIB ada SETELAH Bagian 5. Output-nya 4 paragraf flyer pendek (masin
 STRUKTUR WAJIB setiap pesan flyer — dua baris marker DULU, baru paragraf:
 
 ```
-### Pesan Flyer N — Suara {kategori}
-**Headline:** "{4-6 kata yang impactful, powerful, langsung menyampaikan inti}"
-**Daleel:** {citation persis dari daleel pool — mis. "QS. Ar-Rahmaan: 9"}
+### Pesan Flyer N — Suara {{kategori}}
+**Headline:** "{{4-6 kata yang impactful, powerful, langsung menyampaikan inti}}"
+**Daleel:** {{citation persis dari daleel pool — mis. "QS. Ar-Rahmaan: 9"}}
 
-{paragraf 70-90 kata}
+{{paragraf 70-90 kata}}
 ```
 
 ATURAN HEADLINE: 4-6 kata, kalimat aktif, langsung menyentuh inti pesan. Hindari nama deliverable, hindari clickbait, hindari pertanyaan retoris. Contoh GOOD: "Mulai Adil dari Meja Sendiri", "Hadirlah Sebelum Layar Lebih Dulu", "Bela yang Lemah dari RT", "Pulang Dulu, Cari Makna Kemudian". Contoh BAD: "Khutbah Pertama", "Pesan Pekan Ini", "Renungan Mingguan", "Apa yang Terjadi Pekan Ini?".
@@ -481,11 +481,11 @@ REQUIRED section AFTER Section 5. Output is 4 short flyer paragraphs (3-4 senten
 REQUIRED STRUCTURE per flyer message — two marker lines FIRST, then the paragraph:
 
 ```
-### Flyer Message N — {category} voice
-**Headline:** "{4-6 impactful, powerful words that go straight to the point}"
-**Daleel:** {citation exactly as written in the daleel pool — e.g. "QS. Ar-Rahmaan: 9"}
+### Flyer Message N — {{category}} voice
+**Headline:** "{{4-6 impactful, powerful words that go straight to the point}}"
+**Daleel:** {{citation exactly as written in the daleel pool — e.g. "QS. Ar-Rahmaan: 9"}}
 
-{70-90 word paragraph}
+{{70-90 word paragraph}}
 ```
 
 HEADLINE RULES: 4-6 words, active voice, lands the message immediately. No deliverable names, no clickbait, no rhetorical questions. GOOD: "Start Fair at Your Own Table", "Be Present Before the Screen", "Defend the Weak Next Door", "Come Home Before Chasing Meaning". BAD: "First Khutbah", "Weekly Message", "This Week's Reflection", "What Happened This Week?".
