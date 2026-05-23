@@ -36,10 +36,24 @@ export const PosterQuestion: FlyerLayoutComponent = ({
     background: `linear-gradient(140deg, ${bgStops[0]} 0%, ${bgStops[1]} 100%)`,
   };
 
-  // Aggressive scaling — the question is the only thing on the card.
+  // Font sizing tuned against the actual text column width (~650px
+  // with side photo). Each tier's chars-per-line × line-count must
+  // fit in ~820px of vertical room. Tested against 50-130 char
+  // headlines; the "all" briefing at 109 chars used to clip at the
+  // bottom — these numbers are calibrated to keep that case inside.
   const len = headline.length;
   const fontSize =
-    len < 50 ? "132px" : len < 75 ? "106px" : len < 100 ? "88px" : "76px";
+    len < 45
+      ? "118px"
+      : len < 65
+        ? "94px"
+        : len < 85
+          ? "78px"
+          : len < 110
+            ? "66px"
+            : "56px";
+  const lineHeight =
+    len < 45 ? "1.06" : len < 85 ? "1.08" : "1.12";
 
   // Photo accent shape rotates so a weekly viewer sees variety. All
   // three placements are SIDE accents, not full-width bands, so the
@@ -140,31 +154,30 @@ export const PosterQuestion: FlyerLayoutComponent = ({
           </div>
         </div>
 
-        {/* Question hero — vertically centered in remaining space */}
+        {/* Question hero — vertically centered in remaining space.
+            No oversized decorative quote here; a small inline quote
+            mark sits next to the first word. The big ornamental quote
+            we used before was eating 200px of vertical room and
+            clipping long questions at the bottom. */}
         <div
-          className={`flex flex-col justify-center ${textColWidth} flex-1 py-10`}
+          className={`flex flex-col justify-center ${textColWidth} flex-1`}
         >
-          {/* Big opening quote mark, transparent so it reads as
-              ornament. Sized large for visual weight. */}
           <div
-            aria-hidden
-            className="mb-[20px] text-[200px] font-black leading-none"
-            style={{
-              color: palette.accent,
-              opacity: 0.22,
-              letterSpacing: "-0.05em",
-            }}
-          >
-            “
-          </div>
-          <div
-            className="font-black leading-[1.06] tracking-tight"
+            className="font-black tracking-tight"
             style={{
               fontSize,
+              lineHeight,
               color: "#0f172a",
-              letterSpacing: "-0.025em",
+              letterSpacing: "-0.022em",
             }}
           >
+            <span
+              aria-hidden
+              className="mr-[6px]"
+              style={{ color: palette.accent, opacity: 0.7 }}
+            >
+              “
+            </span>
             {headline}
           </div>
 
@@ -172,18 +185,18 @@ export const PosterQuestion: FlyerLayoutComponent = ({
               opacity so it doesn't fight the headline. */}
           <svg
             viewBox="0 0 600 60"
-            width="380"
-            height="28"
+            width="320"
+            height="24"
             aria-hidden
-            className="mt-[40px]"
+            className="mt-[34px]"
             style={{ color: palette.accent }}
           >
-            {Array.from({ length: 7 }).map((_, i) => (
+            {Array.from({ length: 6 }).map((_, i) => (
               <line
                 key={i}
-                x1={20 + i * 80}
+                x1={20 + i * 90}
                 y1={30}
-                x2={70 + i * 80}
+                x2={70 + i * 90}
                 y2={30}
                 stroke="currentColor"
                 strokeWidth="6"
@@ -193,11 +206,6 @@ export const PosterQuestion: FlyerLayoutComponent = ({
             ))}
           </svg>
         </div>
-
-        {/* Bottom bar — empty placeholder to keep flex spacing. The
-            brand already sat at the top, so the bottom is intentionally
-            quiet to avoid pulling attention from the question. */}
-        <div aria-hidden className="h-[10px]" />
       </div>
     </div>
   );
