@@ -1,11 +1,11 @@
 import type { FlyerLayoutComponent } from "./types";
 
 /**
- * HeroAyat — ayat-centered classical layout.
+ * HeroAyat — image-backed classical layout (general-a slot).
  *
- * Big Arabic at the visual center, translation + citation below,
- * pull-quote callout near the bottom. Best with calm photo as
- * backdrop OR an ornament accent.
+ * Photo backdrop with brand-tinted overlay, big 4-5 word headline,
+ * 3-4 sentence message paragraph, compact daleel block. No segment
+ * label — the flyer carries the message, not the metadata.
  */
 export const HeroAyat: FlyerLayoutComponent = ({
   content,
@@ -14,7 +14,7 @@ export const HeroAyat: FlyerLayoutComponent = ({
   locale,
   assets,
 }) => {
-  const { daleel, headline, eyebrow, dateLabel, brand } = content;
+  const { daleel, headline, message, dateLabel, brand } = content;
   const isEnglish = locale === "en";
   const translation = daleel
     ? isEnglish
@@ -26,8 +26,13 @@ export const HeroAyat: FlyerLayoutComponent = ({
   const bgStyle = {
     background: `linear-gradient(135deg, ${bgStops[0]} 0%, ${bgStops[1]} ${bgStops[2] ? "55%" : "100%"}${bgStops[2] ? `, ${bgStops[2]} 100%` : ""})`,
   };
-
   const usePhotoBg = image.kind === "photo";
+
+  // Headline sizing: cap word count is done upstream — here we size by
+  // character length so super-short ("Tegakkan Timbangan") feels heroic
+  // and slightly-longer still fits comfortably.
+  const headlineSize =
+    headline.length < 18 ? "108px" : headline.length < 28 ? "92px" : "76px";
 
   return (
     <div
@@ -45,126 +50,126 @@ export const HeroAyat: FlyerLayoutComponent = ({
           <div
             className="absolute inset-0"
             style={{
-              background: `linear-gradient(180deg, ${palette.accentDeep}d0 0%, ${palette.accent}c0 60%, ${bgStops[bgStops[2] ? 2 : 1]}f0 100%)`,
+              background: `linear-gradient(180deg, ${palette.accentDeep}cc 0%, ${palette.accentDeep}99 35%, ${palette.accent}b3 70%, ${palette.accentDeep}e6 100%)`,
             }}
           />
         </>
       )}
 
-      {/* Top star border */}
-      <div
-        className="absolute left-0 right-0 top-0 h-[60px]"
-        style={{ color: palette.accent }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={assets.starsRow} alt="" className="block h-full w-full" />
-      </div>
-
-      {/* Ornament accent behind content when not photo-backed */}
       {!usePhotoBg && image.kind === "ornament" && (
         <div
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.10]"
           style={{ color: palette.accent }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={assets.primary}
-            alt=""
-            className={
-              image.aspect === "tall"
-                ? "h-[700px] w-auto"
-                : image.aspect === "wide"
-                  ? "h-auto w-[900px]"
-                  : "h-[600px] w-[600px]"
-            }
-          />
+          <img src={assets.primary} alt="" className="h-[680px] w-auto" />
         </div>
       )}
 
-      {/* Main content column */}
-      <div className="relative z-10 flex flex-1 flex-col items-center justify-between px-[80px] pt-[100px] pb-[60px]">
-        <div className="flex flex-col items-center gap-3">
+      {/* Top star border */}
+      <div
+        className="absolute left-0 right-0 top-0 h-[44px]"
+        style={{ color: palette.accent }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={assets.starsRow} alt="" className="block h-full w-full" />
+      </div>
+
+      <div className="relative z-10 flex h-full flex-col justify-between px-[80px] pt-[90px] pb-[60px]">
+        {/* Header */}
+        <div className="flex items-center justify-between">
           <div
-            className="rounded-full px-6 py-2.5 text-[22px] font-bold uppercase tracking-widest"
+            className="rounded-full px-5 py-2 text-[18px] font-extrabold tracking-widest"
             style={{
-              backgroundColor: palette.accent,
-              color: palette.chipText,
-              boxShadow: `0 4px 14px ${palette.accent}55`,
+              backgroundColor: usePhotoBg ? "rgba(255,255,255,0.92)" : palette.accent,
+              color: usePhotoBg ? palette.accentDeep : palette.chipText,
+              boxShadow: `0 4px 14px ${palette.accent}33`,
             }}
           >
-            {eyebrow}
+            {brand}
           </div>
           <div
-            className="text-[20px] font-medium"
-            style={{
-              color: usePhotoBg ? "#ffffffd0" : palette.accent,
-              opacity: usePhotoBg ? 1 : 0.75,
-            }}
+            className="text-[20px] font-bold tracking-wide"
+            style={{ color: usePhotoBg ? "#ffffffd0" : palette.accentDeep }}
           >
             {dateLabel}
           </div>
         </div>
 
-        {daleel && daleel.arabic ? (
-          <div className="flex max-w-[920px] flex-col items-center gap-[20px]">
+        {/* Hero block: headline + message */}
+        <div className="flex flex-col gap-[28px]">
+          <div
+            className="font-black leading-[1.04] tracking-tight"
+            style={{
+              fontSize: headlineSize,
+              color: usePhotoBg ? "#ffffff" : palette.accentDeep,
+              letterSpacing: "-0.02em",
+              textShadow: usePhotoBg ? "0 2px 10px rgba(0,0,0,0.25)" : "none",
+            }}
+          >
+            {headline}
+          </div>
+          {message && (
             <div
-              dir="rtl"
-              className="font-amiri text-center font-bold leading-[1.75]"
+              className="max-w-[920px] text-[28px] font-medium leading-[1.45]"
               style={{
-                fontSize: daleel.arabic.length > 80 ? "48px" : "58px",
-                color: usePhotoBg ? "#ffffff" : palette.accentDeep,
+                color: usePhotoBg ? "#ffffffec" : "#1f2937",
               }}
             >
-              {daleel.arabic.length > 140
-                ? daleel.arabic.slice(0, 140) + "…"
-                : daleel.arabic}
+              {message}
             </div>
-            {translation && (
+          )}
+        </div>
+
+        {/* Daleel block — compact, on a translucent card so it reads
+            against any backdrop. */}
+        {daleel && (daleel.arabic || translation) && (
+          <div
+            className="flex max-w-[940px] flex-col gap-[14px] rounded-3xl border px-7 py-6"
+            style={{
+              backgroundColor: usePhotoBg
+                ? "rgba(255,255,255,0.94)"
+                : "rgba(255,255,255,0.85)",
+              borderColor: palette.accent + "55",
+              boxShadow: `0 8px 24px ${palette.accent}22`,
+            }}
+          >
+            {daleel.arabic && (
               <div
-                className="max-w-[820px] text-center text-[26px] italic leading-[1.5]"
-                style={{ color: usePhotoBg ? "#ffffffe8" : "#1f2937" }}
+                dir="rtl"
+                className="font-amiri font-bold leading-[1.55]"
+                style={{
+                  fontSize: daleel.arabic.length > 70 ? "30px" : "36px",
+                  color: palette.accentDeep,
+                }}
               >
+                {daleel.arabic.length > 90
+                  ? daleel.arabic.slice(0, 90) + "…"
+                  : daleel.arabic}
+              </div>
+            )}
+            {translation && (
+              <div className="text-[20px] italic leading-[1.4] text-slate-700">
                 &ldquo;
-                {translation.length > 220
-                  ? translation.slice(0, 220) + "…"
+                {translation.length > 150
+                  ? translation.slice(0, 150) + "…"
                   : translation}
                 &rdquo;
               </div>
             )}
             <div
-              className="text-[24px] font-bold"
-              style={{ color: usePhotoBg ? "#ffffff" : palette.accentDeep }}
+              className="text-[16px] font-extrabold tracking-wider"
+              style={{ color: palette.accent }}
             >
               — {daleel.citation}
             </div>
           </div>
-        ) : (
-          <div />
         )}
-
-        <div className="flex w-full flex-col items-center gap-[28px]">
-          <div
-            className="max-w-[900px] rounded-3xl border-2 px-9 py-7 text-center text-[28px] font-semibold leading-[1.45] text-slate-900 shadow-lg"
-            style={{
-              backgroundColor: "rgba(255,255,255,0.92)",
-              borderColor: palette.accent,
-              boxShadow: `0 4px 14px ${palette.accent}33`,
-            }}
-          >
-            {headline}
-          </div>
-          <div
-            className="text-[24px] font-bold tracking-wider"
-            style={{ color: usePhotoBg ? "#ffffff" : palette.accentDeep }}
-          >
-            {brand}
-          </div>
-        </div>
       </div>
 
       {/* Bottom star border */}
       <div
-        className="absolute bottom-0 left-0 right-0 h-[60px]"
+        className="absolute bottom-0 left-0 right-0 h-[44px]"
         style={{ color: palette.accent }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}

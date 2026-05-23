@@ -1,8 +1,16 @@
 import type { DaleelRef } from "@/db/schema";
 
 import {
-  extractGenZHook,
-  extractHeadline,
+  extractAksiMessage,
+  extractCampaignTagline,
+  extractDeliverableHeadline,
+  extractDeliverableMessage,
+  extractGenZMessage,
+  extractGenZTagline,
+  extractKhutbahMessage,
+  extractKhutbahTagline,
+  extractKreatorHook,
+  extractKreatorMessage,
   formatFlyerDate,
   pickFlyerDaleel,
 } from "./content";
@@ -16,7 +24,7 @@ import {
   getAssetsByKind,
   type FlyerImageAsset,
 } from "./images/registry";
-import { LAYOUT_IDS, type LayoutId } from "./layouts";
+import type { LayoutId } from "./layouts";
 import type {
   FlyerComposition,
   FlyerContent,
@@ -25,21 +33,34 @@ import type {
 } from "./layouts/types";
 
 /**
- * Pick a layout + image + palette for a given briefing slot.
+ * Pick a layout + image + palette for a given briefing flyer slot.
  *
- * "Rotating" mode: seed = generated_at + segment + kind. Same edition +
- * slot always produces the same flyer (so share-URLs are stable), but
- * different editions of the same slot get different looks over time.
+ * The brief surfaces FOUR shareable flyers, two general + two Gen-Z
+ * themed. Each variant pulls from a different slice of the briefing so
+ * the four don't visually duplicate:
  *
- * The rotation across editions matters more than the rotation within
- * an edition — readers see one flyer per slot per week, so variety
- * across weeks is what keeps the feed feeling fresh.
+ *   general-a → Khutbah tagline + actionable steps  (HeroAyat layout)
+ *   general-b → Aksi Sosial campaign tagline        (SplitImage layout)
+ *   genz-a    → Kreator HOOK slogan                 (HeroHeadline)
+ *   genz-b    → Gen Z framing punchline             (QuoteCard)
+ *
+ * Daleel is cycled by rank (0,1,2,3) so each flyer cites a different
+ * entry from the retrieval pool. The legacy "deliverable" slot is kept
+ * so the per-Section-4 download flow (BriefDeliverableCards) keeps
+ * working unchanged.
  */
 
+export type GeneralVariant = "a" | "b";
+export type GenZVariant = "a" | "b";
+
 export type FlyerSlot =
-  | { kind: "general"; segment: string | null }
-  | { kind: "genz"; segment: string | null }
-  | { kind: "deliverable"; deliverable: DeliverableSlug; segment: string | null };
+  | { kind: "general"; variant: GeneralVariant; segment: string | null }
+  | { kind: "genz"; variant: GenZVariant; segment: string | null }
+  | {
+      kind: "deliverable";
+      deliverable: DeliverableSlug;
+      segment: string | null;
+    };
 
 export type FlyerContext = {
   generatedAt: Date;
@@ -59,7 +80,69 @@ function segmentToSlug(s: string | null): SegmentSlug {
   return "all";
 }
 
-/** djb2 hash → 32-bit unsigned int. Used as a deterministic seed. */
+/** Each slot gets a fixed layout so the four-card grid in the UI
+ *  always shows visual variety (not all four are HeroAyat by chance). */
+function layoutForSlot(slot: FlyerSlot): LayoutId {
+  if (slot.kind === "general") {
+    return slot.variant === "a" ? "hero-ayat" : "split-image";
+  }
+  if (slot.kind === "genz") {
+    return slot.variant === "a" ? "hero-headline" : "quote-card";
+  }
+  // Per-deliverable: classical layout, image-backed.
+  return "hero-ayat";
+}
+
+/** Pick the rank used to choose which daleel from the pool. Different
+ *  ranks across the four flyers spread citations evenly. */
+function daleelRankForSlot(slot: FlyerSlot): number {
+  if (slot.kind === "general" && slot.variant === "a") return 0;
+  if (slot.kind === "general" && slot.variant === "b") return 1;
+  if (slot.kind === "genz" && slot.variant === "a") return 2;
+  if (slot.kind === "genz" && slot.variant === "b") return 3;
+  return 0; // deliverable
+}
+
+/** Pick an image for the chosen layout. Each layout has a preferred
+ *  image kind (photo for image-prominent layouts, ornament for accent
+ *  layouts) — we always pick something so the flyer never renders
+ *  text-only. djb2 hash over generated_at + slot = deterministic. */
+async function pickImage(
+  layout: LayoutId,
+  slotSeed: number,
+): Promise<FlyerImageAsset> {
+  const [photos, ornaments, patterns] = await Promise.all([
+    getAssetsByKind("photo"),
+    getAssetsByKind("ornament"),
+    getAssetsByKind("pattern"),
+  ]);
+
+  const pick = (pool: FlyerImageAsset[]) =>
+    pool[slotSeed % Math.max(1, pool.length)];
+
+  // Image-prominent layouts → prefer photo (real emotion).
+  if (layout === "split-image" || layout === "hero-ayat") {
+    if (photos.length) return pick(photos);
+    if (ornaments.length) return pick(ornaments);
+    if (patterns.length) return pick(patterns);
+  }
+  // Bold/accent layouts → ornament adds nuance without competing with
+  // the headline.
+  if (layout === "hero-headline") {
+    if (ornaments.length) return pick(ornaments);
+    if (photos.length) return pick(photos);
+    if (patterns.length) return pick(patterns);
+  }
+  // Quote card → soft pattern backdrop.
+  if (patterns.length) return pick(patterns);
+  if (ornaments.length) return pick(ornaments);
+  if (photos.length) return pick(photos);
+
+  // No assets at all — surface the failure rather than crash the render
+  // pipeline downstream.
+  throw new Error("flyer registry has no assets; upload at least one image");
+}
+
 function seedFrom(parts: (string | number)[]): number {
   let h = 5381;
   const s = parts.join("|");
@@ -69,103 +152,78 @@ function seedFrom(parts: (string | number)[]): number {
   return h;
 }
 
-function pickIndex(seed: number, length: number): number {
-  return seed % Math.max(1, length);
-}
-
-/** Pick which layout fits this slot+seed. The Gen-Z slot is biased
- *  toward headline-driven layouts; the general slot toward ayat-led. */
-function pickLayout(slot: FlyerSlot, seed: number): LayoutId {
-  if (slot.kind === "genz") {
-    // Bold layouts only — never ayat-led for Gen Z.
-    const opts: LayoutId[] = ["hero-headline", "split-image"];
-    return opts[pickIndex(seed, opts.length)];
-  }
-  // General + per-deliverable: rotate through all 4 layouts.
-  return LAYOUT_IDS[pickIndex(seed, LAYOUT_IDS.length)];
-}
-
-/** Pick an image based on the chosen layout's needs. Reads candidate
- *  pool from the DB-backed registry (cached 60s). If the pool for the
- *  preferred kind is empty (e.g. admin deleted everything), this still
- *  throws — caller should guarantee at least one asset per kind exists
- *  or short-circuit before composing. */
-async function pickImage(
-  layout: LayoutId,
-  seed: number,
-): Promise<FlyerImageAsset> {
-  if (layout === "split-image") {
-    const photos = await getAssetsByKind("photo");
-    if (photos.length) return photos[pickIndex(seed, photos.length)];
-    // Photo pool empty → fall through to ornament so render doesn't crash.
-    const ornaments = await getAssetsByKind("ornament");
-    return ornaments[pickIndex(seed, ornaments.length)];
-  }
-  if (layout === "quote-card") {
-    const patterns = await getAssetsByKind("pattern");
-    if (patterns.length) return patterns[pickIndex(seed, patterns.length)];
-    const ornaments = await getAssetsByKind("ornament");
-    return ornaments[pickIndex(seed, ornaments.length)];
-  }
-  if (layout === "hero-headline") {
-    const ornaments = await getAssetsByKind("ornament");
-    return ornaments[pickIndex(seed, ornaments.length)];
-  }
-  // hero-ayat: rotate photos + ornaments — photo gives a contemplative
-  // backdrop, ornament gives a classic engraved-page feel.
-  const [photos, ornaments] = await Promise.all([
-    getAssetsByKind("photo"),
-    getAssetsByKind("ornament"),
-  ]);
-  const pool = [...photos, ...ornaments];
-  return pool[pickIndex(seed, pool.length)];
-}
-
 function buildContent(ctx: FlyerContext): FlyerContent {
   const lang = ctx.locale;
   const brand = "dakwah-lens.id";
   const dateLabel = formatFlyerDate(ctx.generatedAt, lang);
+  const rank = daleelRankForSlot(ctx.slot);
+  const daleel = pickFlyerDaleel(ctx.daleelRefs, lang, rank);
+
+  if (ctx.slot.kind === "general") {
+    const headline =
+      ctx.slot.variant === "a"
+        ? extractKhutbahTagline(ctx.body)
+        : extractCampaignTagline(ctx.body);
+    const message =
+      ctx.slot.variant === "a"
+        ? extractKhutbahMessage(ctx.body)
+        : extractAksiMessage(ctx.body);
+    return {
+      brand,
+      dateLabel,
+      headline: headline || extractKhutbahTagline(ctx.body) || "Pesan Pekan Ini",
+      message: message || "",
+      daleel,
+    };
+  }
 
   if (ctx.slot.kind === "genz") {
+    const headline =
+      ctx.slot.variant === "a"
+        ? extractKreatorHook(ctx.body)
+        : extractGenZTagline(ctx.body);
+    const message =
+      ctx.slot.variant === "a"
+        ? extractKreatorMessage(ctx.body)
+        : extractGenZMessage(ctx.body);
     return {
       brand,
       dateLabel,
-      eyebrow: lang === "en" ? "Made for Gen Z" : "Buat Kamu, Gen Z",
-      headline: extractGenZHook(ctx.body),
-      daleel: pickFlyerDaleel(ctx.daleelRefs, lang, 1),
-      cta: lang === "en" ? "Want to talk about this?" : "Mau ngobrol soal ini?",
+      headline:
+        headline || extractGenZTagline(ctx.body) || "Renungan Pekan Ini",
+      message: message || "",
+      daleel,
     };
   }
 
-  if (ctx.slot.kind === "deliverable") {
-    const palette = DELIVERABLE_PALETTE[ctx.slot.deliverable];
-    return {
-      brand,
-      dateLabel,
-      eyebrow: palette.label[lang],
-      headline: extractHeadline(ctx.body),
-      daleel: pickFlyerDaleel(ctx.daleelRefs, lang, 0),
-    };
-  }
-
-  // general
-  const segPalette = SEGMENT_PALETTE[segmentToSlug(ctx.slot.segment)];
+  // deliverable
   return {
     brand,
     dateLabel,
-    eyebrow: segPalette.label[lang],
-    headline: extractHeadline(ctx.body),
-    daleel: pickFlyerDaleel(ctx.daleelRefs, lang, 0),
+    headline: extractDeliverableHeadline(ctx.body, ctx.slot.deliverable) || "",
+    message: extractDeliverableMessage(ctx.body, ctx.slot.deliverable) || "",
+    daleel,
   };
 }
 
 function buildPalette(slot: FlyerSlot): FlyerPalette {
+  // Gen-Z slots get the saturated violet/amber-coded palette regardless
+  // of segment — playing with the THEME, never labeled "for Gen Z".
   if (slot.kind === "genz") {
+    if (slot.variant === "a") {
+      return {
+        bgGradient: ["#ede9fe", "#fae8ff", "#fef3c7"],
+        accent: "#a21caf",
+        accentDeep: "#6b21a8",
+        accentSoft: "#fae8ff",
+        chipText: "#ffffff",
+      };
+    }
     return {
-      bgGradient: ["#ede9fe", "#fae8ff", "#fef3c7"],
-      accent: "#a21caf",
-      accentDeep: "#6b21a8",
-      accentSoft: "#fae8ff",
+      bgGradient: ["#fef3c7", "#fbcfe8", "#ddd6fe"],
+      accent: "#db2777",
+      accentDeep: "#9d174d",
+      accentSoft: "#fce7f3",
       chipText: "#ffffff",
     };
   }
@@ -179,13 +237,26 @@ function buildPalette(slot: FlyerSlot): FlyerPalette {
       chipText: p.chipText,
     };
   }
-  const p = SEGMENT_PALETTE[segmentToSlug(slot.segment)];
+  // General: lean on the brand emerald regardless of segment so the
+  // flyer doesn't surface segment names visually.
+  if (slot.variant === "a") {
+    const p = SEGMENT_PALETTE.all;
+    return {
+      bgGradient: [p.bgGradient[0], p.bgGradient[1]],
+      accent: p.accent,
+      accentDeep: p.accent,
+      accentSoft: p.accentSoft,
+      chipText: p.chipText,
+    };
+  }
+  // general-b → slate / warm cream so the two general flyers don't
+  // look identical when shown side-by-side.
   return {
-    bgGradient: [p.bgGradient[0], p.bgGradient[1]],
-    accent: p.accent,
-    accentDeep: p.accent,
-    accentSoft: p.accentSoft,
-    chipText: p.chipText,
+    bgGradient: ["#f8fafc", "#e2e8f0"],
+    accent: "#0f172a",
+    accentDeep: "#0f172a",
+    accentSoft: "#cbd5e1",
+    chipText: "#ffffff",
   };
 }
 
@@ -193,21 +264,24 @@ export async function composeFlyer(ctx: FlyerContext): Promise<{
   layoutId: LayoutId;
   composition: FlyerComposition;
 }> {
-  // Seed: WIB date + segment + kind. Same edition + slot → same flyer;
-  // next edition → new dice roll.
+  const layoutId = layoutForSlot(ctx.slot);
+
+  // Deterministic image seed per edition+slot.
   const seed = seedFrom([
     ctx.generatedAt.toISOString().slice(0, 10),
     ctx.slot.segment ?? "all",
     ctx.slot.kind,
-    ctx.slot.kind === "deliverable" ? ctx.slot.deliverable : "",
+    ctx.slot.kind === "general" || ctx.slot.kind === "genz"
+      ? ctx.slot.variant
+      : ctx.slot.deliverable,
   ]);
 
-  const layoutId = pickLayout(ctx.slot, seed);
-  // Use a slightly-shifted seed for image so layout + image picks vary
-  // independently — otherwise they always advance together.
-  const image = await pickImage(layoutId, seed ^ 0x9e3779b9);
+  const image = await pickImage(layoutId, seed);
   const content = buildContent(ctx);
   const palette = buildPalette(ctx.slot);
+
+  // suppress unused symbol if segmentToSlug isn't otherwise referenced
+  void segmentToSlug;
 
   return {
     layoutId,

@@ -2,7 +2,9 @@ import { getBriefingBySlug } from "@/lib/insights-data";
 import { renderFlyerPng } from "@/lib/flyer/render-flyer";
 
 /**
- * Gen-Z flyer — headline-driven layout, violet/pink palette.
+ * Legacy alias for the unified flyer route — returns the `genz-a`
+ * variant. Kept so external links to /flyer-genz (download URLs in old
+ * messages, etc.) still resolve.
  *
  *   GET /api/insights-brief/{slug}/flyer-genz
  */
@@ -29,7 +31,7 @@ export async function GET(
     generatedAt: brief.generatedAt,
     body,
     daleelRefs: brief.daleelRefs,
-    slot: { kind: "genz", segment: brief.segment },
+    slot: { kind: "genz", variant: "a", segment: brief.segment },
     locale: lang,
   });
 

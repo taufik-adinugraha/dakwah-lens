@@ -1,12 +1,12 @@
 import type { FlyerLayoutComponent } from "./types";
 
 /**
- * HeroHeadline — headline-driven, Gen-Z-coded.
+ * HeroHeadline — bold headline-driven layout (genz-a slot).
  *
- * The hook line is the focal element (Inter Black 64-78px). The ayat
- * is demoted to a tilted supporting card. Saturated 3-stop gradient
- * background, two soft corner blobs, scroll-hint dashes under the
- * headline. CTA + brand at the bottom.
+ * The 4-5 word headline IS the visual focus (Inter Black, 90-110px).
+ * Saturated 3-stop gradient backdrop, 3-4 sentence message below the
+ * headline, daleel demoted to a tilted supporting card. No "made for
+ * Gen Z" label — the design itself plays the role.
  */
 export const HeroHeadline: FlyerLayoutComponent = ({
   content,
@@ -15,7 +15,7 @@ export const HeroHeadline: FlyerLayoutComponent = ({
   locale,
   assets,
 }) => {
-  const { daleel, headline, eyebrow, dateLabel, brand, cta } = content;
+  const { daleel, headline, message, dateLabel, brand } = content;
   const isEnglish = locale === "en";
   const translation = daleel
     ? isEnglish
@@ -28,9 +28,8 @@ export const HeroHeadline: FlyerLayoutComponent = ({
     background: `linear-gradient(135deg, ${bgStops[0]} 0%, ${bgStops[1]} ${bgStops[2] ? "55%" : "100%"}${bgStops[2] ? `, ${bgStops[2]} 100%` : ""})`,
   };
 
-  const truncatedHook =
-    headline.length > 110 ? headline.slice(0, 109).trimEnd() + "…" : headline;
-  const headlineSize = truncatedHook.length > 75 ? "64px" : "78px";
+  const headlineSize =
+    headline.length < 18 ? "118px" : headline.length < 28 ? "98px" : "78px";
 
   return (
     <div
@@ -39,18 +38,19 @@ export const HeroHeadline: FlyerLayoutComponent = ({
     >
       {/* Two corner gradient blobs */}
       <div
-        className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full opacity-[0.22]"
+        className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full opacity-[0.30]"
         style={{ background: palette.accent }}
       />
       <div
-        className="absolute -bottom-24 -right-24 h-[520px] w-[520px] rounded-full opacity-[0.28]"
+        className="absolute -bottom-28 -right-28 h-[520px] w-[520px] rounded-full opacity-[0.32]"
         style={{ background: "#f59e0b" }}
       />
 
-      {/* Optional decorative ornament in corner — lantern, star8 */}
+      {/* Ornament corner accent — gives emotional nuance without
+          competing with the headline. */}
       {image.kind === "ornament" && (
         <div
-          className="absolute top-[80px] right-[80px] opacity-[0.22]"
+          className="absolute -right-[40px] top-[160px] opacity-[0.30]"
           style={{ color: palette.accent }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -59,54 +59,72 @@ export const HeroHeadline: FlyerLayoutComponent = ({
             alt=""
             className={
               image.aspect === "tall"
-                ? "h-[280px] w-auto"
+                ? "h-[420px] w-auto"
                 : image.aspect === "wide"
-                  ? "h-auto w-[400px]"
-                  : "h-[260px] w-[260px]"
+                  ? "h-auto w-[480px]"
+                  : "h-[400px] w-[400px]"
             }
           />
         </div>
       )}
+      {/* If we got a photo instead of ornament, anchor it as a small
+          circular accent in the corner so the layout still always has
+          an image. */}
+      {image.kind === "photo" && (
+        <div
+          className="absolute right-[60px] top-[60px] h-[180px] w-[180px] overflow-hidden rounded-full shadow-2xl ring-4"
+          style={{
+            // Avoid optional-chaining (Satori still mid-flight in toolchain)
+            borderColor: palette.accent,
+            // ring shadow approx via boxShadow
+            boxShadow: `0 0 0 6px ${palette.accent}33, 0 12px 28px ${palette.accent}66`,
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={assets.primary}
+            alt=""
+            className="h-full w-full object-cover"
+          />
+        </div>
+      )}
 
-      {/* Main content column */}
-      <div className="relative z-10 flex flex-1 flex-col justify-between px-[80px] py-[70px]">
-        {/* Top: eyebrow chip + date */}
-        <div className="flex flex-col items-start gap-[14px]">
+      <div className="relative z-10 flex h-full flex-col justify-between px-[80px] py-[70px]">
+        {/* Top: brand chip + date */}
+        <div className="flex items-center justify-between">
           <div
-            className="inline-flex items-center rounded-full px-6 py-2.5 text-[22px] font-extrabold uppercase tracking-widest"
+            className="inline-flex items-center rounded-full px-5 py-2 text-[18px] font-extrabold tracking-widest"
             style={{
               backgroundColor: palette.accent,
               color: palette.chipText,
-              boxShadow: `0 4px 14px ${palette.accent}66`,
+              boxShadow: `0 4px 14px ${palette.accent}55`,
             }}
           >
-            ★ {eyebrow}
+            ★ {brand}
           </div>
           <div
-            className="text-[20px] font-semibold opacity-75"
+            className="text-[18px] font-bold opacity-80"
             style={{ color: palette.accentDeep }}
           >
             {dateLabel}
           </div>
         </div>
 
-        {/* Middle: HERO hook */}
-        <div className="flex max-w-[920px] flex-col gap-[28px]">
+        {/* HERO block: headline + scroll-hint dashes + message */}
+        <div className="flex max-w-[940px] flex-col gap-[26px]">
           <div
-            className="font-black leading-[1.08] text-slate-900"
+            className="font-black leading-[1.04] text-slate-900"
             style={{
               fontSize: headlineSize,
-              letterSpacing: "-0.02em",
+              letterSpacing: "-0.025em",
             }}
           >
-            {truncatedHook}
+            {headline}
           </div>
-
-          {/* Scroll-hint dashes */}
           <svg
             viewBox="0 0 1080 60"
             width="700"
-            height="40"
+            height="32"
             aria-hidden
             style={{ color: palette.accent }}
           >
@@ -118,79 +136,63 @@ export const HeroHeadline: FlyerLayoutComponent = ({
                 x2={120 + i * 90}
                 y2={30}
                 stroke="currentColor"
-                strokeWidth="4"
+                strokeWidth="5"
                 strokeLinecap="round"
-                opacity="0.5"
+                opacity="0.55"
               />
             ))}
           </svg>
-        </div>
-
-        {/* Bottom: tilted daleel card + CTA */}
-        <div className="flex flex-col gap-[26px]">
-          {daleel && (daleel.arabic || translation) && (
+          {message && (
             <div
-              className="flex max-w-[820px] flex-col gap-3 rounded-3xl border-2 bg-white px-7 py-6 shadow-xl"
-              style={{
-                borderColor: "#d8b4fe",
-                boxShadow: `0 8px 24px ${palette.accent}33`,
-                transform: "rotate(-1.2deg)",
-              }}
+              className="max-w-[860px] text-[26px] font-semibold leading-[1.45]"
+              style={{ color: "#1f1f1f" }}
             >
-              {daleel.arabic && (
-                <div
-                  dir="rtl"
-                  className="font-amiri font-bold leading-[1.5]"
-                  style={{
-                    fontSize: "38px",
-                    color: palette.accentDeep,
-                  }}
-                >
-                  {daleel.arabic.length > 100
-                    ? daleel.arabic.slice(0, 100) + "…"
-                    : daleel.arabic}
-                </div>
-              )}
-              {translation && (
-                <div
-                  className="text-[22px] italic leading-[1.4]"
-                  style={{ color: "#0f172a" }}
-                >
-                  &ldquo;
-                  {translation.length > 180
-                    ? translation.slice(0, 180) + "…"
-                    : translation}
-                  &rdquo;
-                </div>
-              )}
-              <div
-                className="text-[18px] font-extrabold tracking-wider"
-                style={{ color: palette.accent }}
-              >
-                — {daleel.citation}
-              </div>
+              {message}
             </div>
           )}
+        </div>
 
-          {/* CTA + brand */}
-          <div className="flex items-center justify-between gap-6">
-            {cta && (
+        {/* Daleel tilted card */}
+        {daleel && (daleel.arabic || translation) && (
+          <div
+            className="flex max-w-[820px] flex-col gap-3 rounded-3xl border-2 bg-white px-7 py-6 shadow-xl"
+            style={{
+              borderColor: palette.accentSoft,
+              boxShadow: `0 12px 28px ${palette.accent}40`,
+              transform: "rotate(-1.5deg)",
+            }}
+          >
+            {daleel.arabic && (
               <div
-                className="flex items-center gap-2 text-[26px] font-bold"
-                style={{ color: palette.accentDeep }}
+                dir="rtl"
+                className="font-amiri font-bold leading-[1.5]"
+                style={{
+                  fontSize: daleel.arabic.length > 70 ? "30px" : "36px",
+                  color: palette.accentDeep,
+                }}
               >
-                {cta}
-                <span className="text-[28px]">→</span>
+                {daleel.arabic.length > 90
+                  ? daleel.arabic.slice(0, 90) + "…"
+                  : daleel.arabic}
+              </div>
+            )}
+            {translation && (
+              <div className="text-[20px] italic leading-[1.4] text-slate-800">
+                &ldquo;
+                {translation.length > 150
+                  ? translation.slice(0, 150) + "…"
+                  : translation}
+                &rdquo;
               </div>
             )}
             <div
-              className="text-[22px] font-extrabold tracking-wider"
-              style={{ color: palette.accentDeep }}
+              className="text-[16px] font-extrabold tracking-wider"
+              style={{ color: palette.accent }}
             >
-              {brand}
+              — {daleel.citation}
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

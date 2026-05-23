@@ -2,18 +2,22 @@ import type { DaleelRef } from "@/db/schema";
 import type { DeliverableSlug } from "./design";
 
 /**
- * Content extraction from the briefing markdown for use on flyers.
+ * Content extraction from the briefing markdown for the 4 shareable
+ * flyers (2 general + 2 Gen-Z themed).
  *
- * The brief is a 6800-9400 word markdown document; the flyer needs to
- * compress it down to ONE headline + ONE daleel + a per-deliverable
- * pull-quote. These helpers do the shrinking deterministically (no LLM
- * call at flyer-generation time — keeps the flyer endpoint fast and
- * idempotent given the same brief).
+ * Each flyer carries 3 text elements:
+ *   1) HEADLINE — 4-5 impactful words (a tagline, not a sentence).
+ *   2) MESSAGE  — 3-4 sentence concise actionable paragraph (problem →
+ *      what we can do → small first step). NOT stats narration.
+ *   3) DALEEL   — one entry from the retrieved pool (cycled by rank).
+ *
+ * These helpers extract those elements deterministically from the
+ * existing briefing markdown, no extra LLM call required. Each variant
+ * pulls from a different slice of the briefing so the 4 flyers do not
+ * visually duplicate.
  */
 
-/** Strip markdown markers + collapse whitespace. Doesn't try to be a
- *  full markdown→text converter — enough to render plain text on the
- *  flyer. */
+/** Strip markdown markers + collapse whitespace. */
 function stripMd(s: string): string {
   return s
     .replace(/^#{1,6}\s+/gm, "")
@@ -26,67 +30,18 @@ function stripMd(s: string): string {
     .trim();
 }
 
-/** Lift the first compelling sentence out of Section 1 (Ringkasan
- *  Eksekutif / Executive Summary). Used as the main brief flyer's
- *  headline. Falls back to the first 200 chars of the body if Section 1
- *  isn't found. */
-export function extractHeadline(markdown: string, maxChars = 220): string {
-  const lines = markdown.split("\n");
-  // Find first H2 and its body up to the next H2.
-  let s1Start = -1;
-  let s1End = lines.length;
-  for (let i = 0; i < lines.length; i++) {
-    if (lines[i].startsWith("## ")) {
-      if (s1Start === -1) {
-        s1Start = i + 1;
-      } else {
-        s1End = i;
-        break;
-      }
-    }
-  }
-  const body = lines.slice(s1Start >= 0 ? s1Start : 0, s1End).join(" ");
-  const clean = stripMd(body);
-  // Pull the first 1-2 sentences.
-  const sentenceMatch = clean.match(/^(.{40,}?[.!?])\s/);
-  const out = sentenceMatch ? sentenceMatch[1] : clean.slice(0, maxChars);
-  return out.length > maxChars ? out.slice(0, maxChars - 1).trimEnd() + "…" : out;
-}
-
-/** Extract the body of a specific Section 4 sub-section (h3) from the
- *  markdown — used for the per-deliverable flyer's pull-quote. */
-export function extractDeliverableBody(
-  markdown: string,
-  slug: DeliverableSlug,
-): string | null {
-  // Match h3 headings against known deliverable kinds.
-  const patterns: Record<DeliverableSlug, RegExp[]> = {
-    khutbah: [/^###\s+.*khutbah/i, /^###\s+.*friday/i],
-    kajian: [/^###\s+.*kajian/i, /^###\s+.*majelis/i],
-    home: [/^###\s+.*rumah/i, /^###\s+.*home/i, /^###\s+.*teaching at/i],
-    content: [
-      /^###\s+.*konten/i,
-      /^###\s+.*content/i,
-      /^###\s+.*kreator/i,
-    ],
-    genz: [/^###\s+.*gen[\s-]?z/i, /^###\s+.*reaching gen/i],
-    action: [
-      /^###\s+.*aksi/i,
-      /^###\s+.*khidmah/i,
-      /^###\s+.*social action/i,
-      /^###\s+.*service to/i,
-    ],
-  };
-  const matchers = patterns[slug];
+/** Find the lines of a named H3 sub-section. Returns the raw lines
+ *  between the matching `### ...` and the next H3 / H2. */
+function sliceSubSection(markdown: string, matcher: RegExp): string[] {
   const lines = markdown.split("\n");
   let start = -1;
   for (let i = 0; i < lines.length; i++) {
-    if (matchers.some((re) => re.test(lines[i]))) {
+    if (matcher.test(lines[i])) {
       start = i + 1;
       break;
     }
   }
-  if (start === -1) return null;
+  if (start === -1) return [];
   let end = lines.length;
   for (let i = start; i < lines.length; i++) {
     if (lines[i].startsWith("### ") || lines[i].startsWith("## ")) {
@@ -94,63 +49,396 @@ export function extractDeliverableBody(
       break;
     }
   }
-  return lines.slice(start, end).join("\n").trim();
+  return lines.slice(start, end);
 }
 
-/** Pull a deliverable-specific message — the most compelling 1-2
- *  sentence excerpt from the deliverable body. Skips formulaic openings
- *  (mukadimah, basmalah, salam) which dominate the first 100 words of a
- *  khutbah but aren't the message worth posting on Instagram. */
-export function extractDeliverableQuote(
-  body: string,
-  maxChars = 280,
-): string {
-  // Drop lines that look like formal openings/closings.
-  const skipPatterns = [
-    /assalamu['ʼ]?alaikum/i,
-    /alhamdulillah/i,
-    /allahumma/i,
-    /asyhadu/i,
-    /bismillah/i,
-    /baarakallahu/i,
-    /shallallahu/i,
-    /^\s*\*[^*]+\*\s*$/, // pure italic line (often Arabic opening)
-  ];
+/** Tidy a headline candidate: trim quotes, em-dashes, trailing
+ *  punctuation. Cap at maxWords words so we keep the "punchy tagline"
+ *  feel (the user spec is 4-5 words). */
+function tidyHeadline(raw: string, maxWords = 6): string {
+  let h = raw.trim();
+  // Drop surrounding quotes / asterisks / quotes-with-spaces.
+  h = h.replace(/^["“”'']\s*/, "").replace(/\s*["“”'']$/, "");
+  // Drop trailing period / colon / em-dash content.
+  h = h.replace(/\s*[—–-]\s*.*$/, "");
+  // Drop trailing punctuation.
+  h = h.replace(/[.,:;!?]+$/, "");
+  // Collapse whitespace.
+  h = h.replace(/\s+/g, " ").trim();
+  // Cap word count.
+  const words = h.split(" ");
+  if (words.length > maxWords) {
+    h = words.slice(0, maxWords).join(" ");
+  }
+  return h;
+}
+
+/** Trim a body block to ~3-4 short sentences, capped at maxChars.
+ *  Skips Arabic-heavy passages (more than half of letters are Arabic)
+ *  so we never put a closing du'a in the flyer message slot. */
+function trimToSentences(raw: string, targetSentences = 3, maxChars = 320): string {
+  const clean = stripMd(raw);
+  if (isArabicHeavy(clean)) return "";
+  // Sentence split on .?! followed by whitespace + capital. Keeps the
+  // punctuation.
+  const sentences = clean.match(/[^.!?]+[.!?]+/g) ?? [clean];
+  let out = "";
+  for (let i = 0; i < sentences.length && i < targetSentences + 2; i++) {
+    if (isArabicHeavy(sentences[i])) continue;
+    const next = (out + " " + sentences[i]).trim();
+    if (next.length > maxChars && out.length > 0) break;
+    out = next;
+    if (i + 1 >= targetSentences && out.length > maxChars * 0.7) break;
+  }
+  if (out.length > maxChars) {
+    out = out.slice(0, maxChars - 1).trimEnd() + "…";
+  }
+  // Strip stray opening / closing quote pairs that survive the join.
+  return out.replace(/^["“]\s*|\s*["”]$/g, "").trim();
+}
+
+/** True if more than 40% of the letter chars are in the Arabic Unicode
+ *  block. Used to skip Quranic ayat / closing du'a passages so the
+ *  flyer message never lands on Arabic the reader can't act on. */
+function isArabicHeavy(s: string): boolean {
+  const arabic = (s.match(/[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/g) ?? []).length;
+  const letters = (s.match(/[\p{L}]/gu) ?? []).length;
+  if (letters < 30) return false;
+  return arabic / letters > 0.4;
+}
+
+// ──────────────────────────────────────────────────────────────────
+// Headline extractors (4-5 word taglines)
+// ──────────────────────────────────────────────────────────────────
+
+/** Pull the Khutbah Jumat tagline. Handles three real styles:
+ *    `**Tema: "Sembelih Nafsumu Sebelum Kurbanmu — Menegakkan Adil…"**` (Claude, quoted + em-dash)
+ *    `**Tema: Generasi Pemegang Amanah — Anak Muda di Persimpangan**` (Claude, unquoted + em-dash)
+ *    `**Tema: Amanah yang Tercabik: Dari Istana hingga Ruang Keluarga**` (Gemini, colon-split)
+ *  Returns 4-6 word phrase. Falls back to the first non-citation bold. */
+export function extractKhutbahTagline(markdown: string): string {
+  const body = sliceSubSection(markdown, /^###\s+.*khutbah/i).join("\n");
+  if (!body) return "";
+
+  // Pull the full **Tema: ...** line, then trim it down. Captures
+  // until the line's closing `**` — allows italic markers (`*Amanah*`)
+  // inside the captured tagline.
+  const themaLine = body.match(/\*\*\s*tema\s*[:：]\s*([^\n]+?)\s*\*\*\s*$/im);
+  if (themaLine && themaLine[1]) {
+    let phrase = themaLine[1].trim();
+    // Drop inline italic markers (`*amanah*` → `amanah`).
+    phrase = phrase.replace(/\*([^*\n]+?)\*/g, "$1");
+    // Strip surrounding quotes if present.
+    phrase = phrase.replace(/^["“”'']\s*/, "").replace(/\s*["“”'']$/, "");
+    // Split on em-dash or colon-after-cap (Gemini-style "X: Y subtitle")
+    // — take the part before. Em-dash beats colon when both exist.
+    if (/[—–]/.test(phrase)) {
+      phrase = phrase.split(/\s*[—–]\s*/)[0];
+    } else if (/:\s+[A-Z]/.test(phrase)) {
+      phrase = phrase.split(/:\s+(?=[A-Z])/)[0];
+    }
+    const tidied = tidyHeadline(phrase, 6);
+    if (tidied) return tidied;
+  }
+
+  // Fallback: first bold phrase that isn't a kitab citation.
+  const allBold = [...body.matchAll(/\*\*([^*\n]{8,70})\*\*/g)];
+  const citationRe = /^(QS\.|Sahih |Riyad |Bulugh |HR\.|HQ\.|Surat\s|Hadits)/i;
+  for (const b of allBold) {
+    const phrase = b[1].trim();
+    if (!citationRe.test(phrase)) return tidyHeadline(phrase, 6);
+  }
+  return "";
+}
+
+/** Pull the Aksi Sosial campaign tagline. Handles three styles:
+ *    `**"Bulan Tegakkan Timbangan"**` (Claude — campaign month)
+ *    `**Label aksi: "Sahabat Pulang Pengajian"**` (Claude — first action label)
+ *    `**ACTION PLAN: INSIATIF "MIHRAB AMAN"**` (Gemini — initiative name)
+ *  Prefers the quoted name when present (cleaner phrase). */
+export function extractCampaignTagline(markdown: string): string {
+  const body = sliceSubSection(markdown, /^###\s+.*aksi|^###\s+.*khidmah/i).join("\n");
+  if (!body) return "";
+
+  // Claude "Bulan X" — month-campaign name.
+  const bulanMatch = body.match(/\*\*\s*["“]?\s*(Bulan\s+[A-Z][^"”*\n]{3,40})\s*["”]?\s*\*\*/);
+  if (bulanMatch && bulanMatch[1]) return tidyHeadline(bulanMatch[1], 5);
+
+  // Gemini "ACTION PLAN: INSIATIF/INISIATIF "X"" — prefer the quoted
+  // initiative name (the chunk inside the smart quotes).
+  const actionQuoted = body.match(/action\s+plan[^"\n]*["“]([A-Z][^"”\n]{4,50})["”]/i);
+  if (actionQuoted && actionQuoted[1]) return tidyHeadline(actionQuoted[1], 5);
+
+  // Claude "Label aksi: "X"" — first action's bolded label.
+  const labelMatch = body.match(/label\s+aksi\s*[:：]\s*\*?\*?["“]?\s*([^"”*\n]{6,60})/i);
+  if (labelMatch && labelMatch[1]) return tidyHeadline(labelMatch[1], 5);
+
+  // Gemini fallback: ACTION PLAN: TEXT (no quote).
+  const actionPlan = body.match(/\*\*action\s+plan\s*[:：]?\s*([^"”*\n]{6,60})/i);
+  return actionPlan ? tidyHeadline(actionPlan[1], 5) : "";
+}
+
+/** Pull the on-screen text from the Kreator HOOK — usually a punchy
+ *  ALL-CAPS slogan. Handles three styles:
+ *    `teks layar: "PEKAN INI YANG DICURI BUKAN UANG"` (Claude — quoted slogan)
+ *    `**Teks:** DOSA TERBESAR MINGGU INI...` (Gemini — bold marker, unquoted)
+ *    Falls back to the first spoken **Kreator:** sentence. */
+export function extractKreatorHook(markdown: string): string {
+  const body = sliceSubSection(markdown, /^###\s+.*kreator|^###\s+.*content/i).join("\n");
+  if (!body) return "";
+
+  // 1) Quoted ALL-CAPS phrase anywhere in the section. Allow %, =, ×, :
+  //    so slogans like "PINJOL × 1 KLIK = 365% RIBA PER TAHUN" match.
+  const allQuoted = [...body.matchAll(/["“]([A-Z][A-Z0-9 %×=:\-?!,.]{5,90})["”]/g)];
+  for (const m of allQuoted) {
+    const phrase = m[1].trim();
+    if (/^[A-Z]+$/.test(phrase) || phrase.split(" ").length < 2) continue;
+    if (phrase.length >= 6) return tidyHeadline(phrase, 10);
+  }
+
+  // 2) `**(Teks: SLOGAN)**` or `**Teks: SLOGAN**` — Gemini's patterns
+  //    (slogan inside the bold marker itself). Skip hashtag-only strings
+  //    (those are end-card tag lines, not the hero slogan).
+  for (const re of [
+    /\*\*\(\s*teks[^:]*:\s*([^)*\n]+?)\)\s*\*\*/i,
+    /\*\*\s*teks(?:\s+layar)?\s*[:：]\s*([A-Z][^*\n]{5,90})\s*\*\*/i,
+  ]) {
+    const m = body.match(re);
+    if (m && m[1] && !/^#/.test(m[1].trim())) {
+      return tidyHeadline(m[1], 10);
+    }
+  }
+
+  // 3) `**Teks:** SLOGAN` — bold marker, then slogan on next line / same line.
+  const teksBold = body.match(/\*\*\s*teks(?:\s+layar)?\s*[:：]\s*\*\*\s*([A-Z][A-Z0-9 %×=:\-?!,.…]{5,90})/);
+  if (teksBold && teksBold[1]) return tidyHeadline(teksBold[1], 10);
+
+  // 4) Plain "Teks: SLOGAN" without bold markers.
+  const teksPlain = body.match(/teks(?:\s+layar)?\s*[:：]\s*([A-Z][A-Z0-9 %×=:\-?!,.…]{8,90})/);
+  if (teksPlain && teksPlain[1]) return tidyHeadline(teksPlain[1], 10);
+
+  // 5) First **Kreator:** dialog → first sentence if punchy enough.
+  const krMatch = body.match(/\*\*\s*kreator\s*[:：]\s*\*\*\s*["“]?([^\n*"”]{20,200})/i);
+  if (krMatch && krMatch[1]) {
+    const firstSent = krMatch[1].match(/^([^.!?]+[.!?])/);
+    return tidyHeadline(firstSent ? firstSent[1] : krMatch[1], 8);
+  }
+  return "";
+}
+
+/** Pull a punchy phrase out of the Gen Z section. Prefers the outline
+ *  title (the bolded **"X"** at the top of the sub-section), falls
+ *  back to a short clause from the framing question. */
+export function extractGenZTagline(markdown: string): string {
+  const body = sliceSubSection(markdown, /^###\s+.*pendekatan\s+gen|^###\s+.*gen[\s-]?z|^###\s+.*reaching gen/i).join("\n");
+  if (!body) return "";
+
+  // 1) Look for a bolded outline title in quotes. Real examples:
+  //    `**OUTLINE DISKUSI TERBUKA (1.5 JAM): "TRUST BREACH — DARI ..."**`
+  //    `**OUTLINE DISKUSI TERBUKA: "MARRIED CONTENT vs MARRIED REALITY ..."**`
+  //    Take the part before the em-dash (cleaner phrase). Length cap
+  //    is generous so long titles with embedded apostrophes still
+  //    match end-to-end.
+  const titleMatch = body.match(/outline[^"\n]*["“]([A-Z][^"”\n]{6,200})["”]/i);
+  if (titleMatch && titleMatch[1]) {
+    const beforeDash = titleMatch[1].split(/\s*[—–]\s*/)[0];
+    const beforeColon = beforeDash.split(/\s*[:]\s*/)[0];
+    return tidyHeadline(beforeColon, 7);
+  }
+
+  // 2) Framing question — find a punchy subordinate clause inside.
+  const fqBlock = body.match(/\*\*framing\s+question[^*]*\*\*\s*\n+([\s\S]+?)(?=\n\s*\*\*|\n##|\n###)/i);
+  if (fqBlock && fqBlock[1]) {
+    const first = stripMd(fqBlock[1])
+      .replace(/^["“]?\s*(?:guys|hey|so|nah)\s*[,:]?\s*/i, "")
+      .split(/\?[\s"”]/)[0];
+    const punch = first.match(/(?:gimana|bagaimana|kenapa|apakah|sampai\s+di\s+mana)\s+[^.,;]{8,40}/i);
+    if (punch) return tidyHeadline(punch[0], 7);
+    return tidyHeadline(first.slice(0, 60), 7);
+  }
+  return "";
+}
+
+// ──────────────────────────────────────────────────────────────────
+// Message extractors (3-4 sentence actionable paragraphs)
+// ──────────────────────────────────────────────────────────────────
+
+/** Pull the action-steps block from the khutbah ("ada empat langkah",
+ *  "Empat langkah praktis", "berikut langkah", "mari kita mulai", etc.)
+ *  Returns 3-4 sentence summary of the concrete steps. */
+export function extractKhutbahMessage(markdown: string): string {
+  const body = sliceSubSection(markdown, /^###\s+.*khutbah/i).join("\n");
+  if (!body) return "";
+
+  // Locate any phrasing of "(four|three|two|several) concrete/practical
+  // (steps|things|actions)". Handles both Claude wording ("empat langkah
+  // konkret") and Gemini wording ("beberapa langkah praktis", "tiga hal
+  // praktis", "ada beberapa langkah").
+  const pivot = body.match(
+    /(?:(?:ada\s+|melakukan\s+|melakukan\s+\w+\s+)?(?:empat|tiga|dua|lima|beberapa)\s+(?:langkah|hal|aksi|tindakan)(?:\s+(?:konkret|praktis))?|berikut\s+langkah|mari\s+kita\s+mulai|langkah[- ]langkah\s+(?:konkret|praktis))[\s\S]{0,1500}/i,
+  );
+  if (pivot && pivot[0]) {
+    // Drop the leading "Empat langkah konkret..." sentence + colon.
+    const after = pivot[0]
+      .replace(/^[^.:]*[:.]\s*/, "")
+      .replace(/\*\*pertama,?\*\*\s*/i, "")
+      .trim();
+    const tried = trimToSentences(after, 3, 320);
+    if (tried.length > 60) return tried;
+  }
+
+  // Fallback: walk Indonesian paragraphs from the back, skip closing
+  // formulas + Arabic, take the LAST substantive paragraph that reads
+  // as a call to action (contains "mari", "marilah", "mulai", "audit").
+  const beforeClose = body.split(/baraakallah|barakallahu|أَقُوْلُ/i)[0];
+  const paragraphs = beforeClose
+    .split(/\n\s*\n/)
+    .map((p) => stripMd(p))
+    .filter((p) => p.length > 80 && !isArabicHeavy(p));
+  const callToAction = [...paragraphs]
+    .reverse()
+    .find((p) => /(mari|marilah|audit|mulai|jangan biarkan|jangan tunggu)/i.test(p));
+  if (callToAction) return trimToSentences(callToAction, 3, 320);
+  return trimToSentences(paragraphs[paragraphs.length - 1] ?? "", 3, 320);
+}
+
+/** Pull a 3-4 sentence call-to-action message from the Aksi Sosial
+ *  framing. The "Trigger" paragraph often contains both stats AND the
+ *  action framing, separated by a pivot phrase like "Tiga peristiwa,
+ *  satu pola" or "Empat aksi berikut" — we slice out the stats prefix
+ *  so the message reads as a call to action, not a news recap. */
+export function extractAksiMessage(markdown: string): string {
+  const body = sliceSubSection(markdown, /^###\s+.*aksi|^###\s+.*khidmah/i).join("\n");
+  if (!body) return "";
   const paragraphs = body
     .split(/\n\s*\n/)
     .map((p) => stripMd(p))
-    .filter((p) => p.length > 60)
-    .filter((p) => !skipPatterns.some((re) => re.test(p)));
+    .filter((p) => p.length > 80 && !isArabicHeavy(p));
 
-  if (!paragraphs.length) return stripMd(body).slice(0, maxChars);
+  // Pivot phrases that mark the transition from stats → action framing.
+  const pivotRe =
+    /(?:tiga|empat|lima|dua|beberapa)\s+(?:peristiwa|lapis\s+cerita|cerita|isu)[\s,.:—–-]+/i;
+  const actionMarker =
+    /(lingkungan\s+kita\s+harus|kita\s+bisa\s+memulai|empat\s+aksi\s+berikut|setiap\s+RT|setiap\s+masjid|isu\s+yang\s+harus\s+direspons|bukan\s+isu\s+yang\s+menunggu)/i;
 
-  // Prefer a paragraph that mentions a real-world event hook (an outlet
-  // name, a specific noun) — gives the flyer more weight than a generic
-  // moral statement.
-  const outletHook = /(Detik|Liputan6|Kompas|Republika|CNN|Tempo|Antara|Tribun|Sindonews|Banjarmasin|RRI|Okezone|Wartakota)/i;
-  const withHook = paragraphs.find((p) => outletHook.test(p));
-  const candidate = withHook ?? paragraphs[0];
+  // Find the paragraph that contains the action-framing marker (may
+  // include stats prefix).
+  const target =
+    paragraphs.find((p) => actionMarker.test(p)) ??
+    paragraphs.filter((p) => !/^trigger\s*[:：]/i.test(p))[1] ??
+    paragraphs[1] ??
+    paragraphs[0] ??
+    "";
+  if (!target) return "";
 
-  // Pull 1-2 sentences from the candidate.
-  const sentenceMatch = candidate.match(/^(.{60,}?[.!?])\s/);
-  const out = sentenceMatch ? sentenceMatch[1] : candidate.slice(0, maxChars);
-  return out.length > maxChars
-    ? out.slice(0, maxChars - 1).trimEnd() + "…"
-    : out;
+  // Strip the stats prefix: drop everything up to (and including) the
+  // pivot phrase if present, so the message starts at "satu pola..."
+  // or "Setiap RT...".
+  let cleaned = target.replace(/^trigger\s*[:：]\s*/i, "");
+  const pivotIdx = cleaned.search(pivotRe);
+  if (pivotIdx > 0) {
+    // Keep from the pivot onward (it usually starts the action framing).
+    cleaned = cleaned.slice(pivotIdx);
+  }
+  return trimToSentences(cleaned, 3, 320);
 }
 
-/** Pick the daleel to feature on the flyer. The rerank pass in
- *  insights_summary already orders by thematic relevance, so the first
- *  usable entry is usually the best. Prefer entries with both arabic +
- *  a non-empty translation in the user's locale (Quran has both ID + EN
- *  in our corpus; hadith may lack translation_id until the just-in-time
- *  translation pass runs).
- *
- *  `rank` selects which usable entry to return: 0 = first usable (the
- *  default), 1 = second usable, etc. Used by the Gen-Z flyer to pick a
- *  different daleel from the general flyer so the two share-cards don't
- *  visually duplicate. Falls back gracefully — if `rank` is past the
- *  end, returns the last usable entry (or null if none). */
+/** Pull a 3-4 sentence message from the Kreator section. Handles two
+ *  dialog styles:
+ *    `**Kreator:** Dialog text...` (Claude — explicit speaker marker)
+ *    `"Dialog text..."` (Gemini — bare quoted dialog after **HOOK:**)
+ *  Always strips visual stage directions ((Visual: ...), Scene markers). */
+export function extractKreatorMessage(markdown: string): string {
+  const body = sliceSubSection(markdown, /^###\s+.*kreator|^###\s+.*content/i).join("\n");
+  if (!body) return "";
+
+  // Style 1: explicit `**Kreator:**` speaker marker.
+  const krMatches = [...body.matchAll(/\*\*\s*kreator\s*[:：]\s*\*\*\s*([^*]+?)(?=\n\s*\*Visual|\n\s*\*\*|\n###|\n##|$)/gi)];
+  if (krMatches.length > 0) {
+    const joined = krMatches
+      .slice(0, 2)
+      .map((m) => stripMd(m[1]).replace(/^["“]\s*|\s*["”]$/g, "").trim())
+      .join(" ");
+    const text = trimToSentences(joined, 3, 320);
+    if (text.length > 60) return text;
+  }
+
+  // Style 2: bare quoted dialog after HOOK marker (Gemini). Walk lines,
+  // skip stage-direction lines (start with `**(` or `**Visual` or `**Scene`),
+  // collect quoted-content lines.
+  const lines = body.split("\n");
+  const dialogChunks = [];
+  for (const line of lines) {
+    const t = line.trim();
+    if (!t) continue;
+    // Skip stage directions / section headers.
+    if (/^\*\*\s*\(/.test(t) || /^\*\*\s*(visual|scene|hook|body|cta|teks)/i.test(t)) continue;
+    if (/^\*\*[^*]+\*\*\s*$/.test(t)) continue; // bare bold header
+    // Grab the quoted content if any.
+    const q = t.match(/^["“]([^"”\n]{20,300})["”]/);
+    if (q) dialogChunks.push(q[1]);
+  }
+  if (dialogChunks.length > 0) {
+    const joined = dialogChunks.slice(0, 3).join(" ");
+    const text = trimToSentences(joined, 3, 320);
+    if (text.length > 60) return text;
+  }
+
+  // Style 3: fallback to first plain Indonesian paragraph.
+  const paragraphs = body
+    .split(/\n\s*\n/)
+    .map((p) => stripMd(p))
+    .filter(
+      (p) =>
+        p.length > 80 &&
+        !isArabicHeavy(p) &&
+        !/^visual|^teks|^hook|^body|^cta|^scene|^transisi/i.test(p),
+    );
+  return trimToSentences(paragraphs[0] ?? "", 3, 320);
+}
+
+/** Pull a reflective message from the Gen Z section — prefers the
+ *  "Penutup" closing, then pop-culture-bridge reflective close, then
+ *  the framing-question reflection. Handles Gemini's looser markers
+ *  ("**Penutup (10 menit):**", "**Pop-culture Bridge (20 menit):**"). */
+export function extractGenZMessage(markdown: string): string {
+  const body = sliceSubSection(markdown, /^###\s+.*pendekatan\s+gen|^###\s+.*gen[\s-]?z|^###\s+.*reaching gen/i).join("\n");
+  if (!body) return "";
+
+  // 1) Penutup block — handle both `**Penutup**` and `**Penutup (X menit):**`.
+  const penutup = body.match(/\*\*\s*penutup[^*]*\*\*\s*\n+([\s\S]+?)(?=\n\s*\*\*|\n##|\n###|$)/i);
+  if (penutup && penutup[1]) {
+    const text = trimToSentences(stripMd(penutup[1]), 3, 320);
+    if (text.length > 60) return text;
+  }
+
+  // 2) Pop-culture bridge — take the LAST paragraph (the reflective
+  //    take-away rather than the setup).
+  const popBridge = body.match(/\*\*\s*pop[\s-]?culture\s+bridge[^*]*\*\*[\s\S]{40,2000}/i);
+  if (popBridge && popBridge[0]) {
+    const paras = popBridge[0]
+      .split(/\n\s*\n/)
+      .map((p) => stripMd(p))
+      .filter((p) => p.length > 100 && !isArabicHeavy(p));
+    const text = trimToSentences(paras[paras.length - 1] ?? paras[0] ?? "", 3, 320);
+    if (text.length > 60) return text;
+  }
+
+  // 3) Fallback: last substantive paragraph in the whole section.
+  const paragraphs = body
+    .split(/\n\s*\n/)
+    .map((p) => stripMd(p))
+    .filter((p) => p.length > 100 && !isArabicHeavy(p));
+  return trimToSentences(paragraphs[paragraphs.length - 1] ?? paragraphs[0] ?? "", 3, 320);
+}
+
+// ──────────────────────────────────────────────────────────────────
+// Daleel + date helpers (unchanged from earlier version)
+// ──────────────────────────────────────────────────────────────────
+
+/** Pick a daleel from the pool for a given variant rank (0-3 → cycles
+ *  through the 4 most-relevant entries so the 4 flyers do not share
+ *  the same daleel). */
 export function pickFlyerDaleel(
   refs: DaleelRef[] | null,
   locale: "id" | "en",
@@ -164,7 +452,6 @@ export function pickFlyerDaleel(
   if (usable.length) {
     return usable[Math.min(rank, usable.length - 1)];
   }
-  // Fall back to anything with arabic; same rank semantics.
   const withArabic = refs.filter((r) => r.arabic);
   if (withArabic.length) {
     return withArabic[Math.min(rank, withArabic.length - 1)];
@@ -172,31 +459,65 @@ export function pickFlyerDaleel(
   return refs[Math.min(rank, refs.length - 1)];
 }
 
-/** Extract a punchy hook line from the Gen Z sub-section for the Gen-Z
- *  flyer's hero headline. The Gen Z section in the long-form brief leads
- *  with a Hook + pop-culture-bridge paragraph; we lift the first
- *  substantive sentence as the flyer headline. Falls back to the section
- *  intro if no dedicated Hook sub-heading is found. */
-export function extractGenZHook(markdown: string, maxChars = 110): string {
-  const genzBody = extractDeliverableBody(markdown, "genz");
-  if (!genzBody) {
-    // No Gen Z section — fall back to the brief's main headline.
-    return extractHeadline(markdown, maxChars);
-  }
+// ──────────────────────────────────────────────────────────────────
+// Per-deliverable extractors (used by /flyer/{deliverable})
+// ──────────────────────────────────────────────────────────────────
 
-  // Try to find a `**Hook**` / `**Pop-culture bridge**` sub-section first.
-  const hookMatch = genzBody.match(
-    /\*\*(?:hook|pop[\s-]?culture(?:\s+bridge)?|jembatan(?:\s+pop[\s-]?culture)?)\*\*\s*[:\-—–]?\s*([\s\S]+?)(?=\n\s*[-*]\s*\*\*|\n\s*\*\*[A-Z]|\n##|\n###|$)/i,
+const DELIVERABLE_MATCHERS: Record<DeliverableSlug, RegExp> = {
+  khutbah: /^###\s+.*khutbah/i,
+  kajian: /^###\s+.*kajian|^###\s+.*majelis/i,
+  home: /^###\s+.*rumah|^###\s+.*teaching at\s+home/i,
+  content: /^###\s+.*konten|^###\s+.*kreator|^###\s+.*digital content/i,
+  genz: /^###\s+.*gen[\s-]?z|^###\s+.*pendekatan\s+gen|^###\s+.*reaching gen/i,
+  action: /^###\s+.*aksi|^###\s+.*khidmah|^###\s+.*social action|^###\s+.*service to/i,
+};
+
+/** Headline for a per-deliverable flyer — reuses the variant-specific
+ *  tagline extractors when appropriate, falls back to a generic label. */
+export function extractDeliverableHeadline(
+  markdown: string,
+  slug: DeliverableSlug,
+): string {
+  if (slug === "khutbah") return extractKhutbahTagline(markdown);
+  if (slug === "content") return extractKreatorHook(markdown);
+  if (slug === "genz") return extractGenZTagline(markdown);
+  if (slug === "action") return extractCampaignTagline(markdown);
+  // Kajian / Home: pull the bolded outline title from the sub-section.
+  const body = sliceSubSection(markdown, DELIVERABLE_MATCHERS[slug]).join("\n");
+  const titleMatch = body.match(
+    /\*\*\s*(?:outline\s+kajian|script\s+\d|pengajaran)[^"*]*["“]([^"”*\n]{6,80})/i,
   );
-  const candidateBlock = hookMatch ? hookMatch[1] : genzBody;
-  const clean = stripMd(candidateBlock);
+  if (titleMatch && titleMatch[1]) return tidyHeadline(titleMatch[1], 7);
+  // Fallback: first bold-quoted phrase.
+  const anyQuoted = body.match(/\*\*["“]([^"”*\n]{6,80})["”]\*\*/);
+  return anyQuoted ? tidyHeadline(anyQuoted[1], 7) : "";
+}
 
-  // First sentence (40-130 chars window — keeps it punchy).
-  const sentenceMatch = clean.match(/^(.{40,140}?[.!?])\s/);
-  const out = sentenceMatch ? sentenceMatch[1] : clean.slice(0, maxChars);
-  return out.length > maxChars
-    ? out.slice(0, maxChars - 1).trimEnd() + "…"
-    : out;
+/** Message for a per-deliverable flyer — first substantive paragraph
+ *  in the sub-section, skipping formal openings (salam, basmalah, etc.). */
+export function extractDeliverableMessage(
+  markdown: string,
+  slug: DeliverableSlug,
+): string {
+  if (slug === "khutbah") return extractKhutbahMessage(markdown);
+  if (slug === "content") return extractKreatorMessage(markdown);
+  if (slug === "genz") return extractGenZMessage(markdown);
+  if (slug === "action") return extractAksiMessage(markdown);
+  const body = sliceSubSection(markdown, DELIVERABLE_MATCHERS[slug]).join("\n");
+  const skipPatterns = [
+    /assalamu['ʼ]?alaikum/i,
+    /alhamdulillah/i,
+    /allahumma/i,
+    /asyhadu/i,
+    /bismillah/i,
+    /baarakallahu/i,
+    /shallallahu/i,
+  ];
+  const paragraphs = body
+    .split(/\n\s*\n/)
+    .map((p) => stripMd(p))
+    .filter((p) => p.length > 80 && !skipPatterns.some((re) => re.test(p)));
+  return trimToSentences(paragraphs[0] ?? "", 3, 320);
 }
 
 /** Indonesian / English short date for the flyer footer. */

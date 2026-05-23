@@ -14,15 +14,14 @@ export type FlyerContent = {
   brand: string;
   /** Short formatted date for the footer ("23 Mei 2026"). */
   dateLabel: string;
-  /** Eyebrow chip text — segment label, "Buat Kamu Gen Z", etc. */
-  eyebrow: string;
-  /** The visual focal text — extracted from Section 1 (general) or
-   *  the Gen Z hook (genz slot). */
+  /** The visual focal text — a 4-5 word impactful tagline extracted
+   *  from the briefing (Khutbah tema / Aksi campaign / Kreator hook). */
   headline: string;
+  /** A 3-4 sentence concise actionable message (problem → what we can
+   *  do → small first step). Not stats narration. */
+  message: string;
   /** The cited daleel — may be null if retrieval returned nothing. */
   daleel: DaleelRef | null;
-  /** Optional CTA line at the bottom — used by Gen-Z slot only. */
-  cta?: string;
 };
 
 export type FlyerPalette = {

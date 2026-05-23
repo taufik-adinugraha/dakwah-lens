@@ -7,28 +7,31 @@ import { Download, Image as ImageIcon, Maximize2, Sparkles } from "lucide-react"
 /* eslint-disable @next/next/no-img-element */
 
 /**
- * Two-card "Flyer Dakwah" section that sits between Section 4 (Strategi
- * & Aksi Dakwah) and Section 5 (Daleel & Sumber) on every brief page.
+ * "Flyer Dakwah" section — 4 shareable 1080×1080 PNGs per briefing.
  *
- * The two cards surface the existing flyer endpoints:
- *   - Flyer Umum   → /api/insights-brief/{id}/flyer       (segment palette,
- *                                                          classical layout)
- *   - Flyer Gen Z  → /api/insights-brief/{id}/flyer-genz  (bold layout,
- *                                                          headline-led)
+ * Each flyer is a different angle on the same week:
+ *   - Variant A (umum)  → Khutbah tagline + actionable steps
+ *   - Variant B (umum)  → Aksi Sosial campaign + small-action framing
+ *   - Variant A (modern) → Kreator HOOK slogan + body
+ *   - Variant B (modern) → Gen Z framing punchline + reflection
  *
- * Each card shows a real preview of the PNG (browser caches via the
- * route's Cache-Control header), Download + Open-large buttons, and a
- * short pitch for who the flyer is for.
+ * Each uses a different daleel from the retrieval pool so the four
+ * don't repeat. No segment / "for Gen Z" labels — the design itself
+ * carries the tone.
  */
+type Variant = "general-a" | "general-b" | "genz-a" | "genz-b";
+
+const VARIANTS: Variant[] = ["general-a", "general-b", "genz-a", "genz-b"];
+
 export function BriefFlyerSection({ briefId }: { briefId: string }) {
   const locale = useLocale();
   const t = useTranslations("Insights");
   const lang = locale === "en" ? "en" : "id";
 
-  const generalUrl = `/api/insights-brief/${briefId}/flyer?lang=${lang}`;
-  const genzUrl = `/api/insights-brief/${briefId}/flyer-genz?lang=${lang}`;
+  const [zoomed, setZoomed] = useState<Variant | null>(null);
 
-  const [zoomed, setZoomed] = useState<null | "general" | "genz">(null);
+  const flyerUrl = (v: Variant) =>
+    `/api/insights-brief/${briefId}/flyer?variant=${v}&lang=${lang}`;
 
   return (
     <section className="mt-10 mb-6">
@@ -48,40 +51,26 @@ export function BriefFlyerSection({ briefId }: { briefId: string }) {
       </div>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
-        <FlyerCard
-          variant="general"
-          previewUrl={generalUrl}
-          downloadName={`dakwah-lens_${briefId}_flyer.png`}
-          title={t("brief_flyer_general_title")}
-          body={t("brief_flyer_general_body")}
-          audienceLabel={t("brief_flyer_general_audience")}
-          openLabel={t("brief_flyer_open_large")}
-          downloadLabel={t("brief_flyer_download_short")}
-          loadingLabel={t("brief_flyer_loading")}
-          onZoom={() => setZoomed("general")}
-        />
-        <FlyerCard
-          variant="genz"
-          previewUrl={genzUrl}
-          downloadName={`dakwah-lens_${briefId}_flyer-genz.png`}
-          title={t("brief_flyer_genz_title")}
-          body={t("brief_flyer_genz_body")}
-          audienceLabel={t("brief_flyer_genz_audience")}
-          openLabel={t("brief_flyer_open_large")}
-          downloadLabel={t("brief_flyer_download_short")}
-          loadingLabel={t("brief_flyer_loading")}
-          onZoom={() => setZoomed("genz")}
-        />
+        {VARIANTS.map((v) => (
+          <FlyerCard
+            key={v}
+            variant={v}
+            previewUrl={flyerUrl(v)}
+            downloadName={`dakwah-lens_${briefId}_flyer-${v}.png`}
+            title={t(`brief_flyer_${cardKey(v)}_title`)}
+            body={t(`brief_flyer_${cardKey(v)}_body`)}
+            openLabel={t("brief_flyer_open_large")}
+            downloadLabel={t("brief_flyer_download_short")}
+            loadingLabel={t("brief_flyer_loading")}
+            onZoom={() => setZoomed(v)}
+          />
+        ))}
       </div>
 
       {zoomed && (
         <ZoomOverlay
-          src={zoomed === "general" ? generalUrl : genzUrl}
-          alt={
-            zoomed === "general"
-              ? t("brief_flyer_general_title")
-              : t("brief_flyer_genz_title")
-          }
+          src={flyerUrl(zoomed)}
+          alt={t(`brief_flyer_${cardKey(zoomed)}_title`)}
           closeLabel={t("brief_flyer_close")}
           onClose={() => setZoomed(null)}
         />
@@ -90,24 +79,31 @@ export function BriefFlyerSection({ briefId }: { briefId: string }) {
   );
 }
 
+function cardKey(
+  v: Variant,
+): "general_a" | "general_b" | "modern_a" | "modern_b" {
+  if (v === "general-a") return "general_a";
+  if (v === "general-b") return "general_b";
+  if (v === "genz-a") return "modern_a";
+  return "modern_b";
+}
+
 function FlyerCard({
   variant,
   previewUrl,
   downloadName,
   title,
   body,
-  audienceLabel,
   openLabel,
   downloadLabel,
   loadingLabel,
   onZoom,
 }: {
-  variant: "general" | "genz";
+  variant: Variant;
   previewUrl: string;
   downloadName: string;
   title: string;
   body: string;
-  audienceLabel: string;
   openLabel: string;
   downloadLabel: string;
   loadingLabel: string;
@@ -115,22 +111,19 @@ function FlyerCard({
 }) {
   const [loaded, setLoaded] = useState(false);
 
-  const palette =
-    variant === "general"
-      ? {
-          ring: "ring-emerald-200/70",
-          chipBg: "bg-emerald-100",
-          chipText: "text-emerald-700",
-          accentBtn: "bg-emerald-600 hover:bg-emerald-700",
-          previewBg: "bg-gradient-to-br from-emerald-50 to-white",
-        }
-      : {
-          ring: "ring-fuchsia-200/70",
-          chipBg: "bg-fuchsia-100",
-          chipText: "text-fuchsia-700",
-          accentBtn: "bg-fuchsia-600 hover:bg-fuchsia-700",
-          previewBg: "bg-gradient-to-br from-fuchsia-50 via-violet-50 to-amber-50",
-        };
+  const isModern = variant.startsWith("genz");
+  const palette = isModern
+    ? {
+        ring: "ring-fuchsia-200/70",
+        accentBtn: "bg-fuchsia-600 hover:bg-fuchsia-700",
+        previewBg:
+          "bg-gradient-to-br from-fuchsia-50 via-violet-50 to-amber-50",
+      }
+    : {
+        ring: "ring-emerald-200/70",
+        accentBtn: "bg-emerald-600 hover:bg-emerald-700",
+        previewBg: "bg-gradient-to-br from-emerald-50 to-white",
+      };
 
   return (
     <article
@@ -167,12 +160,7 @@ function FlyerCard({
 
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div>
-          <span
-            className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${palette.chipBg} ${palette.chipText}`}
-          >
-            {audienceLabel}
-          </span>
-          <h3 className="mt-2 text-base font-bold text-slate-900">{title}</h3>
+          <h3 className="text-base font-bold text-slate-900">{title}</h3>
           <p className="mt-1 text-sm leading-relaxed text-slate-600">{body}</p>
         </div>
 
