@@ -56,6 +56,13 @@ export async function renderPosterPdf(ctx: FlyerContext): Promise<Buffer> {
     layoutVariant: 0,
   });
 
-  const html = await buildHtmlDocument(tree);
+  // A4 portrait canvas — the wrapper used to hardcode 1080×1080
+  // which produced a poster div filling only ~62% of the A4 page
+  // (the famous white-band bug). Passing the mm dimensions makes
+  // the wrapper match the PosterQuestionA4 layout's intent.
+  const html = await buildHtmlDocument(tree, {
+    width: "210mm",
+    height: "297mm",
+  });
   return await snapHtmlToPdf(html);
 }
