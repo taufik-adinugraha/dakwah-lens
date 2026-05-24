@@ -26,8 +26,13 @@ export async function GET(
 
   const url = new URL(request.url);
   const lang = url.searchParams.get("lang") === "en" ? "en" : "id";
-  const origin = new URL(request.url).origin;
-  const pageUrl = `${origin}/${lang}/m/${id}?print=1`;
+  // In-container Puppeteer fetch. Public-origin URL was producing
+  // https://0.0.0.0:3000 in prod (Caddy forwards with that Host)
+  // which Puppeteer SSL-errored on. Plain http://localhost:3000
+  // works in dev and the Docker container.
+  const internalBase =
+    process.env.INTERNAL_BASE_URL ?? "http://localhost:3000";
+  const pageUrl = `${internalBase}/${lang}/m/${id}?print=1`;
 
   const browser = await getBrowser();
   const page = await browser.newPage();

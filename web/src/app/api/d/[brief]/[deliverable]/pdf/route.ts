@@ -45,12 +45,17 @@ export async function GET(
   const url = new URL(request.url);
   const lang = url.searchParams.get("lang") === "en" ? "en" : "id";
 
-  // Same-host origin so Chromium fetches the page from the local
-  // Next.js server instead of hitting prod over the public network.
-  // `request.url` already carries the right origin in prod (Caddy
-  // forwards it); fall back to localhost for `cd web && npm run dev`.
-  const origin = new URL(request.url).origin;
-  const pageUrl = `${origin}/${lang}/d/${brief}/${deliverable}?print=1`;
+  // Puppeteer fetches the page in-container — same Next.js process,
+  // never the public domain. Hardcoding http://localhost:3000 (the
+  // port Next.js binds in both dev and the Docker container) avoids
+  // a reverse-proxy quirk where Caddy in prod forwards with
+  // Host: 0.0.0.0:3000, making `new URL(request.url).origin` resolve
+  // to `https://0.0.0.0:3000` — Puppeteer then SSL-errored on port
+  // 3000 (which is plain HTTP). `INTERNAL_BASE_URL` lets a future
+  // deployment override this if Next.js ever moves off 3000.
+  const internalBase =
+    process.env.INTERNAL_BASE_URL ?? "http://localhost:3000";
+  const pageUrl = `${internalBase}/${lang}/d/${brief}/${deliverable}?print=1`;
 
   const browser = await getBrowser();
   const page = await browser.newPage();

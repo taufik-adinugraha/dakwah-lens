@@ -41,11 +41,7 @@ export async function Header() {
   // link below.
   const mobileItems = [
     { href: `/${locale}`, label: t("home") },
-    {
-      href: `/${locale}/insights`,
-      label: t("insights"),
-      tone: "insights" as const,
-    },
+    { href: `/${locale}/insights`, label: t("insights") },
     { href: `/${locale}/discussions`, label: t("discussions") },
     { href: `/${locale}/kitab`, label: t("kitab") },
     ...(isAdmin
@@ -90,11 +86,7 @@ export async function Header() {
           </Link>
 
           <nav className="hidden items-center gap-7 text-sm font-medium text-slate-600 md:flex">
-            <Link
-              href="/insights"
-              className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 font-semibold text-emerald-700 ring-1 ring-emerald-200/70 transition hover:bg-emerald-100 hover:text-emerald-800"
-            >
-              <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+            <Link href="/insights" className="hover:text-slate-900 transition">
               {t("insights")}
             </Link>
             <Link
