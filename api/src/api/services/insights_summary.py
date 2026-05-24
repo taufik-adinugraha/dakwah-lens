@@ -167,16 +167,21 @@ KHUTBAH KEDUA (750-1050 kata):
 
 - Penutup standar (~120 kata Arab): aksara Arab berharakat penuh untuk sequence "إِنَّ اللهَ وَمَلَائِكَتَهُ يُصَلُّوْنَ عَلَى النَّبِيّ…" → sholawat lengkap "اَللّٰهُمَّ صَلِّ عَلٰى سَيِّدِنَا مُحَمَّدٍ وَعَلٰى آلِ سَيِّدِنَا مُحَمَّدٍ…" → "عِبَادَ اللهِ، إِنَّ اللهَ يَأْمُرُ بِالْعَدْلِ وَالْإِحْسَانِ وَإِيْتَاءِ ذِي الْقُرْبٰى…" → tahmid akhir "وَاذْكُرُوا اللهَ الْعَظِيْمَ يَذْكُرْكُمْ، وَاشْكُرُوْهُ عَلٰى نِعَمِهِ يَزِدْكُمْ، وَلَذِكْرُ اللهِ أَكْبَرُ." Semua dalam aksara Arab, harakat lengkap.
 
-### Kajian Ibu-ibu & Majelis Taklim (800-1100 kata)
-Tulis OUTLINE KAJIAN 45-MENIT siap-pakai, format hands-on bukan ceramah teoritis:
-- Pembuka (~80 kata): basmalah, salam, ice-breaker / pertanyaan ringan terkait pengalaman ibu-ibu pekan ini (misal: "Siapa yang harga sembako-nya naik minggu ini?").
-- Inti — 3 talking points (masing-masing 150-200 kata) dengan struktur per-poin:
-  * Pernyataan inti (1 kalimat)
-  * Contoh konkret dari berita pekan ini (sebut outlet)
-  * Rujukan dalil singkat dari pool — tulis `**citation**` lalu 1 kalimat terjemahan
-  * Aplikasi praktis untuk dapur / keluarga (2-3 tindakan)
-- Sesi Q&A (~100 kata): tulis 3 pertanyaan yang KEMUNGKINAN AKAN diajukan ibu-ibu + jawaban singkat-jujur (jangan idealistis berlebihan).
-- Penutup (~50 kata): doa singkat untuk keluarga, ringkasan satu kalimat yang bisa diingat.
+### Kajian Ibu-ibu & Majelis Taklim (1400-1800 kata)
+Tulis OUTLINE KAJIAN 60-MENIT siap-pakai, format hands-on bukan ceramah teoritis. Lebih panjang dari sub-section lain karena ibu-ibu sering minta detail praktis ("kalau di rumah saya gimana, Ustadzah?") dan butuh ruang untuk cerita konkret + Q&A yang jujur.
+
+- Pembuka (~120 kata): basmalah, salam, ice-breaker / pertanyaan ringan terkait pengalaman ibu-ibu pekan ini ("Siapa yang harga sembako-nya naik minggu ini?", "Ada yang anaknya minta beli skincare karena lihat artis di TikTok?"). Boleh selipkan satu humor ringan yang relatable buat ibu-ibu — TIDAK menyindir, TIDAK merendahkan, hanya pengamatan jujur tentang kehidupan rumah. Contoh nada: "Wahai ibu-ibu, kalau di grup WhatsApp lebih ramai dari pasar Senen, ini pertanda kita semua butuh tarbiyah kembali — termasuk saya."
+- Inti — 4 talking points (masing-masing 250-320 kata) dengan struktur per-poin:
+  * Pernyataan inti (1 kalimat) yang langsung menyentuh keseharian.
+  * Konteks dari berita pekan ini — JANGAN sebut nama media tertentu (Detik, CNN, Tribun, Tempo, Antara, Republika, Liputan6, Kompas, Okezone, Sindo, dll.). Gunakan frasa generik: "dari media, kita dapatkan kabar bahwa...", "pekan ini ramai dibicarakan...", "berita yang sampai ke kita...". Ini menjaga kajian tetap fokus pada pesan, bukan promosi outlet.
+  * Rujukan dalil singkat dari pool — tulis `**citation**` lalu 1-2 kalimat terjemahan + 1 kalimat tafsir kontekstual yang relevan dengan dapur/keluarga.
+  * Cerita pendek konkret dari pengalaman jamaah / sirah / fiqh perempuan — bukan paragraf abstrak.
+  * Aplikasi praktis untuk dapur / keluarga (3-4 tindakan spesifik, bukan slogan).
+  * Selipkan satu humor ringan di salah satu poin — observasional, hangat, MIRROR ibu-ibu sendiri, JANGAN candaan tentang suami/anak yang merendahkan. Contoh yang OK: "Kadang kita lebih cepat baca pesan WA dari sebelah daripada baca surat An-Nisa — padahal An-Nisa itu untuk kita."
+- Sesi Q&A (~200 kata): tulis 4 pertanyaan yang KEMUNGKINAN AKAN diajukan ibu-ibu + jawaban singkat-jujur (jangan idealistis berlebihan). Sertakan satu pertanyaan yang "bikin gelak" sebelum jawabannya tetap serius — meniru dinamika majelis taklim nyata. Contoh: "Ustadzah, kalau suami tahu saya ikut kajian tapi tetap belanja online tiap malam, bagaimana?" — jawaban tetap memuat hikmah.
+- Penutup (~120 kata): doa singkat untuk keluarga, ringkasan satu kalimat yang bisa diingat di dapur besok pagi, dan ajakan praktis (mis. "pekan ini, satu menit lebih lama menatap anak sebelum kasih HP").
+
+TONE KAJIAN: hangat seperti tante yang dipercaya, BUKAN ustadzah yang berjarak. Tertawa bersama, bukan ditertawakan. Humor harus AMAN — tidak menyentuh suami, anak, atau pekerjaan rumah tangga secara merendahkan, tidak menyentuh kelas sosial, tidak menyentuh fisik. Yang aman: kebiasaan kita sendiri (WhatsApp, scrolling, lupa nama tetangga, dll.).
 
 ### Pengajaran di Rumah (500-700 kata)
 Tulis 3-4 CONVERSATION SCRIPT untuk orang tua dengan anak, masing-masing format:

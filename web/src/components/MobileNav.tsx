@@ -22,10 +22,6 @@ export type MobileNavItem = {
    *  natively after navigation — same pattern as Header desktop. */
   href: string;
   label: string;
-  /** Visual emphasis. "donate" = emerald text. "insights" = filled
-   *  emerald pill (the primary product surface, called out so first-time
-   *  visitors don't miss the 5 weekly briefings). */
-  tone?: "donate";
 };
 
 export function MobileNav({
@@ -107,11 +103,7 @@ export function MobileNav({
                     key={item.href}
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className={`rounded-lg px-3 py-3 text-base font-medium transition ${
-                      item.tone === "donate"
-                        ? "text-emerald-700 hover:bg-emerald-50"
-                        : "text-slate-700 hover:bg-slate-100"
-                    }`}
+                    className="rounded-lg px-3 py-3 text-base font-medium text-slate-700 transition hover:bg-slate-100"
                   >
                     {item.label}
                   </a>

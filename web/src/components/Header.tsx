@@ -47,11 +47,7 @@ export async function Header() {
     ...(isAdmin
       ? [{ href: `/${locale}/briefs/public`, label: t("briefs_library") }]
       : []),
-    {
-      href: sectionLink("#donate"),
-      label: t("donate"),
-      tone: "donate" as const,
-    },
+    { href: sectionLink("#donate"), label: t("donate") },
   ];
 
   return (
@@ -108,7 +104,7 @@ export async function Header() {
             )}
             <a
               href={sectionLink("#donate")}
-              className="text-emerald-700 hover:text-emerald-900 transition"
+              className="hover:text-slate-900 transition"
             >
               {t("donate")}
             </a>
