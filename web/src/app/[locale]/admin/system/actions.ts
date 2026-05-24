@@ -955,6 +955,56 @@ export async function setCommentStatus(formData: FormData) {
   revalidatePath("/admin/rooms");
 }
 
+/**
+ * Hard-delete a comment from the public discussion. Used to clean
+ * up obvious spam / gibberish that we don't need to keep around for
+ * audit. Goes through the same admin+ gate as setCommentStatus —
+ * reactive moderation is shared between admin and superadmin.
+ *
+ * Cascades naturally: any replies hanging off this comment have
+ * `parent_id` set NULL via the FK ON DELETE SET NULL (so orphan
+ * replies surface back at the top level, never silently lost).
+ */
+export async function deleteComment(formData: FormData) {
+  const session = await requireSystemAccess();
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+  const [row] = await db
+    .select({
+      briefingSlug: schema.mahasiswaComments.briefingSlug,
+      displayName: schema.mahasiswaComments.displayName,
+      body: schema.mahasiswaComments.body,
+      status: schema.mahasiswaComments.status,
+    })
+    .from(schema.mahasiswaComments)
+    .where(eq(schema.mahasiswaComments.id, id))
+    .limit(1);
+  if (!row) return;
+  await db
+    .delete(schema.mahasiswaComments)
+    .where(eq(schema.mahasiswaComments.id, id));
+  await logAdminAction({
+    actorId: session.user.id,
+    action: "comment.delete",
+    targetType: "mahasiswa_comment",
+    targetId: id,
+    payload: {
+      slug: row.briefingSlug,
+      display_name: row.displayName,
+      // Truncated snippet of the deleted body for the audit log so
+      // the action is still inspectable later without keeping the
+      // full row.
+      body_snippet: row.body.slice(0, 200),
+      prior_status: row.status,
+    },
+  });
+  revalidatePath("/admin/system/discussion");
+  revalidatePath("/admin/system");
+  revalidatePath(`/m/${row.briefingSlug}`);
+  revalidatePath("/insights");
+  revalidatePath("/admin/rooms");
+}
+
 /* ────────────────────────────────────────────────────────────
  * Ingest-query CRUD (keyword rotation, /admin/system/queries)
  * ──────────────────────────────────────────────────────────── */

@@ -1,7 +1,15 @@
-import { AlertTriangle, ShieldAlert, ShieldCheck, Hash } from "lucide-react";
+import {
+  AlertTriangle,
+  ExternalLink,
+  Hash,
+  ShieldAlert,
+  ShieldCheck,
+  Trash2,
+} from "lucide-react";
 import { and, desc, eq, sql } from "drizzle-orm";
 
 import { db, schema } from "@/db";
+import { Link } from "@/i18n/navigation";
 import {
   Card,
   EmptyState,
@@ -10,7 +18,7 @@ import {
   StatTile,
   formatRelative,
 } from "../_ui";
-import { setCommentStatus } from "../actions";
+import { deleteComment, setCommentStatus } from "../actions";
 import { ConfirmForm } from "../_ConfirmForm";
 
 /**
@@ -226,10 +234,15 @@ export default async function DiscussionModerationPage({
                 key={s.slug}
                 className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 px-3 py-2"
               >
-                <code className="truncate text-[12px] text-slate-700">
-                  <Hash className="-mt-0.5 mr-1 inline h-3 w-3 text-slate-400" />
-                  {s.slug}
-                </code>
+                <Link
+                  href={`/m/${s.slug}`}
+                  target="_blank"
+                  className="inline-flex min-w-0 items-center gap-1 truncate font-mono text-[12px] text-slate-700 transition hover:text-slate-900 hover:underline"
+                >
+                  <Hash className="h-3 w-3 shrink-0 text-slate-400" />
+                  <span className="truncate">{s.slug}</span>
+                  <ExternalLink className="h-3 w-3 shrink-0 text-slate-400" />
+                </Link>
                 <span className="shrink-0 text-[11.5px] tabular-nums">
                   <span className="font-semibold text-rose-700">
                     {s.blocked} blocked
@@ -289,10 +302,15 @@ export default async function DiscussionModerationPage({
             {items.map((c) => (
               <li key={c.id} className="py-3.5">
                 <header className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                  <span className="font-mono text-[11px] text-slate-500">
-                    <Hash className="-mt-0.5 mr-0.5 inline h-3 w-3 text-slate-400" />
+                  <Link
+                    href={`/m/${c.briefingSlug}`}
+                    target="_blank"
+                    className="inline-flex items-center gap-1 font-mono text-[11px] text-slate-500 transition hover:text-slate-900 hover:underline"
+                  >
+                    <Hash className="h-3 w-3 text-slate-400" />
                     {c.briefingSlug}
-                  </span>
+                    <ExternalLink className="h-3 w-3 text-slate-400" />
+                  </Link>
                   <span className="text-slate-300">·</span>
                   <span className="text-[12.5px] font-semibold text-slate-900">
                     {c.displayName}
@@ -363,6 +381,23 @@ export default async function DiscussionModerationPage({
                         </button>
                       </ConfirmForm>
                     )}
+                    {/* Hard-delete — for obvious spam / gibberish we
+                        don't need to keep around. Goes through a
+                        second confirm because it's irreversible. */}
+                    <ConfirmForm
+                      action={deleteComment}
+                      confirmMessage="Permanently delete this comment? This cannot be undone."
+                      className="inline"
+                    >
+                      <input type="hidden" name="id" value={c.id} />
+                      <button
+                        type="submit"
+                        className="inline-flex h-7 items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 text-[11px] font-semibold text-slate-600 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                        Delete
+                      </button>
+                    </ConfirmForm>
                   </span>
                 </div>
               </li>

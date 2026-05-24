@@ -104,7 +104,7 @@ export default async function SystemAdminLayout({
           ) : (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
               <ShieldCheck className="h-3.5 w-3.5" />
-              Admin · read-only
+              Admin
             </span>
           )}
           <h1 className="mt-2 text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
@@ -113,7 +113,7 @@ export default async function SystemAdminLayout({
           <p className="mt-1 max-w-2xl text-pretty text-sm text-slate-600">
             {isSuperadmin
               ? "Observability + configuration for the Dakwah-Lens stack. Every section here writes to or reads from the same database that powers the user-facing app."
-              : "Read-only access to observability + configuration. You can act on Inbox messages and record Donations — other sections show data but hide controls."}
+              : "Observability + reactive moderation. You can act on Inbox messages, Contact replies, Discussion comments, and record Donations — configuration sections (RSS, ingest queries, costs, FX) are superadmin-only and show as read-only."}
           </p>
         </div>
         <Link

@@ -72,11 +72,16 @@ export function DailyBars({
 }
 
 /**
- * Hourly traffic bars (last 24 hours). One bar per hour bucket; bucket
- * timestamp is already converted to Asia/Jakarta on the server so the
- * label reads in WIB regardless of viewer's timezone. Empty buckets
- * (no traffic that hour) still render as a 0-height column so the
- * x-axis stays evenly spaced.
+ * Hourly traffic line chart (last 24 hours). Two SVG polylines with
+ * a circle at each data point — one for views (brand-300), one for
+ * uniques (brand-700). Replaced the prior vertical-bar version
+ * (2026-05-24) because a line chart reads as a continuous trend
+ * across the 24h window, where bars made every empty bucket visually
+ * heavy. Hover hit area is a full-height invisible column per data
+ * point so the tooltip stays easy to trigger.
+ *
+ * `hour` arrives as "YYYY-MM-DD HH:00" in WIB; we render the HH:00
+ * label every 4 buckets so the x-axis stays scannable.
  */
 export function HourlyBars({
   rows,
@@ -84,74 +89,190 @@ export function HourlyBars({
   rows: Array<{ hour: string; hits: number; uniques: number }>;
 }) {
   const [active, setActive] = useState<number | null>(null);
-  const max = Math.max(...rows.map((r) => r.hits), 1);
+  const max = Math.max(...rows.map((r) => Math.max(r.hits, r.uniques)), 1);
+
+  // SVG viewBox: 100 units wide × 100 units tall. The actual visual
+  // size comes from the parent's `h-40` (~160px) plus 100% width;
+  // SVG `preserveAspectRatio="none"` lets the chart stretch to fill.
+  const n = rows.length;
+  const xAt = (i: number) =>
+    n <= 1 ? 50 : (i / (n - 1)) * 100;
+  const yAt = (v: number) => 100 - (v / max) * 100;
+
+  // Build the polyline `points` strings once per metric — avoids
+  // joining 24 strings inside the JSX.
+  const hitsPoints = rows
+    .map((r, i) => `${xAt(i).toFixed(2)},${yAt(r.hits).toFixed(2)}`)
+    .join(" ");
+  const uniquesPoints = rows
+    .map((r, i) => `${xAt(i).toFixed(2)},${yAt(r.uniques).toFixed(2)}`)
+    .join(" ");
+
+  // x-axis labels — every 4 buckets + the last one.
+  const labelIdx = rows.flatMap((_r, i) =>
+    i % 4 === 0 || i === n - 1 ? [i] : [],
+  );
 
   return (
-    <div className="flex h-40 items-stretch gap-[3px]">
-      {rows.map((r, i) => {
-        const pct = (r.hits / max) * 100;
-        const upct = (r.uniques / max) * 100;
-        // `hour` is "YYYY-MM-DD HH:00" in WIB — show the hour part as the
-        // axis label, plus the day-roll marker every 6 hours so the
-        // 24-bar strip stays scannable.
-        const d = new Date(r.hour.replace(" ", "T") + "+07:00");
-        const hh = d.toLocaleString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-          timeZone: "Asia/Jakarta",
-        });
-        const dayLabel = d.toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-          timeZone: "Asia/Jakarta",
-        });
-        const showHourLabel = i % 4 === 0 || i === rows.length - 1;
-        const isActive = active === i;
-        return (
-          <div
-            key={r.hour}
-            className="relative flex flex-1 flex-col items-center"
-            onMouseEnter={() => setActive(i)}
-            onMouseLeave={() => setActive((cur) => (cur === i ? null : cur))}
-          >
-            <div className="flex w-full flex-1 flex-col-reverse">
-              <div
-                className={`w-full rounded-sm transition-colors ${isActive ? "bg-brand-300" : "bg-brand-200"}`}
-                style={{ height: `${pct}%` }}
+    <div className="relative">
+      <svg
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+        className="h-40 w-full"
+        aria-label="Hourly traffic — last 24 hours"
+      >
+        {/* Faint horizontal gridlines at 25 / 50 / 75 %. */}
+        {[25, 50, 75].map((y) => (
+          <line
+            key={y}
+            x1={0}
+            x2={100}
+            y1={y}
+            y2={y}
+            stroke="currentColor"
+            strokeWidth={0.15}
+            className="text-slate-200"
+            vectorEffect="non-scaling-stroke"
+          />
+        ))}
+
+        {/* Views line (brand-300) */}
+        <polyline
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.4}
+          className="text-brand-300"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
+          points={hitsPoints}
+        />
+        {/* Uniques line (brand-700) */}
+        <polyline
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.4}
+          className="text-brand-700"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
+          points={uniquesPoints}
+        />
+
+        {/* Points + invisible hover columns. */}
+        {rows.map((r, i) => {
+          const x = xAt(i);
+          const isActive = active === i;
+          const ptRadius = isActive ? 1.6 : 1.0;
+          return (
+            <g key={r.hour}>
+              <circle
+                cx={x}
+                cy={yAt(r.hits)}
+                r={ptRadius}
+                className="text-brand-300"
+                fill="currentColor"
+                stroke="white"
+                strokeWidth={0.4}
+                vectorEffect="non-scaling-stroke"
               />
-              <div
-                className={`-mb-px w-full rounded-sm opacity-90 transition-colors ${isActive ? "bg-brand-700" : "bg-brand-600"}`}
-                style={{ height: `${upct}%` }}
+              <circle
+                cx={x}
+                cy={yAt(r.uniques)}
+                r={ptRadius}
+                className="text-brand-700"
+                fill="currentColor"
+                stroke="white"
+                strokeWidth={0.4}
+                vectorEffect="non-scaling-stroke"
               />
-            </div>
-            <p className="mt-1 text-[9px] text-slate-500">
-              {showHourLabel ? hh : ""}
+              {/* Invisible hover column — covers a slice wider than
+                  the gap between points so the cursor doesn't have
+                  to land on the dot itself. */}
+              <rect
+                x={x - 50 / Math.max(n - 1, 1)}
+                y={0}
+                width={100 / Math.max(n - 1, 1)}
+                height={100}
+                fill="transparent"
+                onMouseEnter={() => setActive(i)}
+                onMouseLeave={() =>
+                  setActive((cur) => (cur === i ? null : cur))
+                }
+              />
+            </g>
+          );
+        })}
+      </svg>
+
+      {/* x-axis labels — laid out as an absolutely-positioned strip
+          so percentages match the SVG x-coordinates exactly. */}
+      <div className="relative mt-1 h-3">
+        {labelIdx.map((i) => {
+          const d = new Date(rows[i].hour.replace(" ", "T") + "+07:00");
+          const hh = d.toLocaleString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+            timeZone: "Asia/Jakarta",
+          });
+          return (
+            <p
+              key={rows[i].hour}
+              className="absolute -translate-x-1/2 text-[9px] text-slate-500"
+              style={{ left: `${xAt(i)}%` }}
+            >
+              {hh}
             </p>
-            {isActive && (
-              <ChartTooltip>
-                <p className="font-semibold text-white">
-                  {dayLabel} · {hh} WIB
-                </p>
-                <p>
-                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-brand-300" />{" "}
-                  Views:{" "}
-                  <span className="tabular-nums">
-                    {r.hits.toLocaleString()}
-                  </span>
-                </p>
-                <p>
-                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-brand-700" />{" "}
-                  Unique:{" "}
-                  <span className="tabular-nums">
-                    {r.uniques.toLocaleString()}
-                  </span>
-                </p>
-              </ChartTooltip>
-            )}
+          );
+        })}
+      </div>
+
+      {/* Tooltip — rendered outside the SVG so it can use the rich
+          ChartTooltip popover (which positions itself relative to a
+          % offset). */}
+      {active !== null && (
+        <div
+          className="pointer-events-none absolute -top-2 left-0 right-0 h-full"
+          aria-hidden
+        >
+          <div
+            className="absolute -top-2 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-lg bg-slate-900 px-3 py-2 text-[11px] leading-snug text-slate-200 shadow-lg ring-1 ring-slate-800"
+            style={{ left: `${xAt(active)}%` }}
+          >
+            <div className="space-y-0.5">
+              <p className="font-semibold text-white">
+                {new Date(
+                  rows[active].hour.replace(" ", "T") + "+07:00",
+                ).toLocaleString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                  timeZone: "Asia/Jakarta",
+                })}{" "}
+                WIB
+              </p>
+              <p>
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-brand-300" />{" "}
+                Views:{" "}
+                <span className="tabular-nums">
+                  {rows[active].hits.toLocaleString()}
+                </span>
+              </p>
+              <p>
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-brand-700" />{" "}
+                Unique:{" "}
+                <span className="tabular-nums">
+                  {rows[active].uniques.toLocaleString()}
+                </span>
+              </p>
+            </div>
+            <span className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-slate-900" />
           </div>
-        );
-      })}
+        </div>
+      )}
     </div>
   );
 }

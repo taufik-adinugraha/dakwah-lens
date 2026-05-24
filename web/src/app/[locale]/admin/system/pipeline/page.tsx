@@ -30,7 +30,8 @@ const BEAT_SCHEDULE = [
 ] as const;
 
 export default async function PipelinePage() {
-  const [recent, perPlatform, latestPerPlatform] = await Promise.all([
+  const [recent, perPlatform, latestPerPlatform, postsClassified7d] =
+    await Promise.all([
     db
       .select()
       .from(schema.ingestRuns)
@@ -72,7 +73,20 @@ export default async function PipelinePage() {
         error: string | null;
       }>
     >,
+    // Unique posts that completed Gemini classification in the last
+    // 7 days. Matches the homepage's "postingan dianalisis" metric
+    // (same `social_posts` table, same `dawah_relevance IS NOT NULL`
+    // filter, just a tighter 7d window for pipeline-health context).
+    // Apples-to-apples with the homepage so operators can mentally
+    // scale: this number × ~4 ≈ the 30d homepage figure.
+    db.execute(sql`
+      SELECT COUNT(*)::int AS n
+      FROM social_posts
+      WHERE created_at >= now() - interval '7 days'
+        AND dawah_relevance IS NOT NULL
+    `) as unknown as Promise<Array<{ n: number }>>,
   ]);
+  const classifiedCount = postsClassified7d[0]?.n ?? 0;
 
   return (
     <>
@@ -134,12 +148,18 @@ export default async function PipelinePage() {
           accent="rose"
         />
         <StatTile
-          label="Posts ingested · 7d"
-          value={String(
-            Array.isArray(perPlatform)
-              ? perPlatform.reduce((s, p) => s + p.posts, 0)
-              : 0,
-          )}
+          label="Posts classified · 7d"
+          value={classifiedCount.toLocaleString()}
+          hint={
+            // Mirrors the homepage's "postingan dianalisis" card so
+            // operators see the same metric (unique social_posts with
+            // dawah_relevance set) on a 7d window, vs the homepage's
+            // 30d. Replaces the prior SUM(items_stored) tile, which
+            // counted raw per-run ingest events and double-counted
+            // refreshes — making the number look much larger than
+            // what actually reached the queryable corpus.
+            "Unique posts that finished Gemini classification (matches the homepage's 30d card, scoped to 7d here)."
+          }
           accent="brand"
         />
       </div>
