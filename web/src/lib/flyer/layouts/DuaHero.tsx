@@ -68,36 +68,57 @@ export const DuaHero: FlyerLayoutComponent = ({
   const arabicLine =
     arLen < 130 ? "1.7" : arLen < 300 ? "1.75" : arLen < 650 ? "1.6" : "1.5";
 
-  // Translation card sits at the bottom of the 1080-tall canvas. The
-  // Arabic block above consumes vertical space proportional to its
-  // length × font-size, so the translation must scale DOWN as Arabic
-  // grows, and the text itself must truncate when even the smallest
-  // size won't fit. Numbers below are calibrated to keep the card
-  // inside the canvas across short-Quran (50 chars) → long-hadith
-  // (500+ chars) content.
+  // Translation card sits absolutely at the bottom of the canvas
+  // (~300px max-height after the layout refactor). The translation
+  // font shrinks with combined Arabic+translation weight, and a
+  // generous per-tier char cap matches how many chars actually fit
+  // in the card at that size. Previous tiers (capping at 240 chars
+  // on the smallest tier) were calibrated for the older flex layout
+  // when the card could be pushed off-canvas — that's not a concern
+  // anymore so we can keep more translation text on screen.
   const transRaw = translation;
   // Combined "weight": Arabic contributes ~3x its length, translation
-  // its own length. Captures the "even small Arabic with massive
-  // translation needs aggressive truncation" case too.
+  // its own. Captures the "even small Arabic with massive translation
+  // needs aggressive font shrink" case too.
   const weight = arLen * 3 + transRaw.length;
   let transSize = 22;
-  let transMax = 360;
+  let transMax = 520;
   if (weight > 700) {
     transSize = 20;
-    transMax = 320;
+    transMax = 560;
   }
   if (weight > 1100) {
     transSize = 17;
-    transMax = 280;
+    transMax = 640;
   }
   if (weight > 1700) {
     transSize = 15;
-    transMax = 240;
+    transMax = 760;
   }
-  const truncatedTranslation =
-    transRaw.length > transMax
-      ? transRaw.slice(0, transMax).trimEnd().replace(/[,;:.]$/, "") + "…"
-      : transRaw;
+  // Truncate at the last sentence/word boundary BEFORE the cap so
+  // the cut never lands mid-word ("tiada s…"). Order of preference:
+  // 1) last sentence end (. ! ?) in the back half of the budget
+  // 2) last comma / semicolon / colon
+  // 3) last whitespace
+  // 4) hard cut as the final fallback
+  const truncatedTranslation = (() => {
+    if (transRaw.length <= transMax) return transRaw;
+    const head = transRaw.slice(0, transMax);
+    const sentenceCut = head.search(/[.!?](?=[^.!?]*$)/);
+    const halfway = Math.floor(transMax * 0.5);
+    if (sentenceCut >= halfway) {
+      return head.slice(0, sentenceCut + 1) + " …";
+    }
+    const commaCut = head.lastIndexOf(",");
+    if (commaCut >= halfway) {
+      return head.slice(0, commaCut) + " …";
+    }
+    const wordCut = head.lastIndexOf(" ");
+    if (wordCut > 0) {
+      return head.slice(0, wordCut).replace(/[,;:.]$/, "") + " …";
+    }
+    return head + "…";
+  })();
 
   return (
     <div

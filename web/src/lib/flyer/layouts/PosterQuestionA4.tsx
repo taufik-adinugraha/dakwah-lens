@@ -120,30 +120,36 @@ export const PosterQuestionA4: FlyerLayoutComponent = ({
           >
             Diskusi Mahasiswa
           </span>
-          {/* Negative letter-spacing on this headline used to break the
-              PDF text layer — Chromium's page.pdf() emits each glyph
-              at an absolute position when letter-spacing != 0, and the
-              extractor then can't tell space chars apart from regular
-              gaps. Copy-paste / screen readers saw words jammed
-              together ("pahalanyapalingbesar"). Default tracking is
-              safe at this font size; visual balance is preserved by
-              text-wrap: balance alone. The quote glyphs are inlined
-              with a leading/trailing space so they don't need
-              margin-spaced wrapper spans (which had the same effect). */}
+          {/* PDF text-layer hardening: keep the headline as a single
+              continuous string so PDF readers can copy/select it
+              with intact word boundaries. Chromium's page.pdf()
+              slips into per-glyph positioning (no literal space
+              chars in the text stream) when ANY of these are
+              present:
+                - non-zero letter-spacing
+                - text-wrap: balance (words individually positioned
+                  to balance line widths)
+                - text-shadow (draws the text twice — once as the
+                  shadow offset, once as the main layer, so every
+                  PDF reader sees the headline doubled)
+                - sibling <span>s on the same line (each slice
+                  becomes its own positioned fragment)
+              All of those are gone here. The quote glyphs are
+              inlined directly in the string so the headline emits
+              as a single text run per line. font-kerning: none
+              disables pair-kerning adjustments. */}
           <h1
-            className="mt-7 text-balance font-black"
+            className="mt-7 font-black text-pretty"
             style={{
               fontSize: `${headlineSize}px`,
               lineHeight: 1.05,
               color: "#ffffff",
-              textWrap: "balance",
               maxWidth: "180mm",
-              textShadow: "0 2px 24px rgba(0,0,0,0.25)",
+              fontKerning: "none",
+              letterSpacing: "normal",
             }}
           >
-            <span style={{ opacity: 0.5 }}>&ldquo;</span>
-            {headline}
-            <span style={{ opacity: 0.5 }}>&rdquo;</span>
+            {`“${headline}”`}
           </h1>
           <p
             className="mt-7 max-w-[140mm] text-pretty text-[14px] leading-[1.55]"
