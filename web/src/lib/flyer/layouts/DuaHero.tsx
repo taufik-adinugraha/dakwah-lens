@@ -45,6 +45,11 @@ export const DuaHero: FlyerLayoutComponent = ({
   // (e.g. QS. Al-Anbiya: 87 "Lā ilāha illā anta…") gets very large
   // typography; long du'a (Hisnul Muslim morning adhkar paragraphs)
   // step down so the whole text still fits inside the canvas.
+  // Tiers were tightened 2026-05-24 after Riyad as-Salihin 776 (a
+  // ~640-char evening-adhkar paragraph) blew through the canvas and
+  // pushed the translation card past the bottom edge — the bottom
+  // bounds at 32/28 px keep even the longest Hisnul Muslim entries
+  // inside the Arabic slot.
   const arLen = arabic.length;
   const arabicSize =
     arLen < 70
@@ -55,8 +60,13 @@ export const DuaHero: FlyerLayoutComponent = ({
           ? "62px"
           : arLen < 300
             ? "48px"
-            : "38px";
-  const arabicLine = arLen < 130 ? "1.7" : arLen < 300 ? "1.75" : "1.6";
+            : arLen < 450
+              ? "38px"
+              : arLen < 650
+                ? "32px"
+                : "28px";
+  const arabicLine =
+    arLen < 130 ? "1.7" : arLen < 300 ? "1.75" : arLen < 650 ? "1.6" : "1.5";
 
   // Translation card sits at the bottom of the 1080-tall canvas. The
   // Arabic block above consumes vertical space proportional to its
@@ -161,27 +171,45 @@ export const DuaHero: FlyerLayoutComponent = ({
         </>
       )}
 
-      <div className="relative z-10 flex h-full flex-col px-[70px] pt-[70px] pb-[70px]">
-        {/* Top bar — small brand + date so the Arabic gets all the focus. */}
-        <div className="flex items-center justify-between">
-          <div
-            className="text-[22px] font-extrabold tracking-tight"
-            style={{ color: palette.accentDeep }}
-          >
-            {brand}
-          </div>
-          <div
-            className="text-[18px] font-bold opacity-80"
-            style={{ color: palette.accentDeep }}
-          >
-            {dateLabel}
-          </div>
+      {/* Top bar — small brand + date so the Arabic gets all the focus. */}
+      <div
+        className="absolute left-0 right-0 z-10 flex items-center justify-between px-[70px]"
+        style={{ top: "70px" }}
+      >
+        <div
+          className="text-[22px] font-extrabold tracking-tight"
+          style={{ color: palette.accentDeep }}
+        >
+          {brand}
         </div>
+        <div
+          className="text-[18px] font-bold opacity-80"
+          style={{ color: palette.accentDeep }}
+        >
+          {dateLabel}
+        </div>
+      </div>
 
+      {/* Arabic block: fills the vertical space BETWEEN the top bar
+          (~120px) and the translation card (~410px from bottom). Hard
+          maxHeight + overflow:hidden means even a worst-case du'a
+          can't push the card off the canvas — the Arabic clips
+          gracefully via the fade mask below instead. The top offset
+          covers brand + decorative glyph; the bottom offset reserves
+          card height + outer padding. */}
+      <div
+        className="absolute left-0 right-0 z-10 flex flex-col items-center"
+        style={{
+          top: "140px",
+          bottom: "410px",
+          paddingLeft: "70px",
+          paddingRight: "70px",
+        }}
+      >
         {/* Decorative opening quote glyph */}
         <div
           aria-hidden
-          className="mx-auto mt-[34px] text-[160px] font-black leading-none"
+          className="text-[140px] font-black leading-none"
           style={{
             color: palette.accent,
             opacity: 0.22,
@@ -191,36 +219,54 @@ export const DuaHero: FlyerLayoutComponent = ({
           ﴾
         </div>
 
-        {/* Arabic du'a — RTL, Amiri, the visual focal point. */}
+        {/* Arabic du'a — RTL, Amiri. Hard-clipped inside the slot so
+            the bottom card stays at its reserved position. */}
         {arabic ? (
           <div
             dir="rtl"
             lang="ar"
-            className="mx-auto mt-[8px] max-w-[920px] text-center font-amiri text-emerald-950"
+            className="mt-[8px] max-w-[920px] text-center font-amiri"
             style={{
               fontSize: arabicSize,
               lineHeight: arabicLine,
               color: "#0f172a",
+              flex: "1 1 0%",
+              minHeight: 0,
+              overflow: "hidden",
+              // Soft fade at the bottom so a clipped long du'a reads
+              // as "more below" rather than abruptly cut. No-op when
+              // the text fits comfortably.
+              maskImage:
+                "linear-gradient(to bottom, black 88%, transparent 100%)",
+              WebkitMaskImage:
+                "linear-gradient(to bottom, black 88%, transparent 100%)",
             }}
           >
             {arabic}
           </div>
         ) : (
           <div
-            className="mx-auto mt-[8px] max-w-[820px] text-center text-[44px] font-black tracking-tight text-slate-900"
+            className="mt-[8px] max-w-[820px] text-center text-[44px] font-black tracking-tight text-slate-900"
             style={{ letterSpacing: "-0.022em" }}
           >
             Doa Pekan Ini
           </div>
         )}
+      </div>
 
-        {/* Tally separator between Arabic and translation card */}
+      {/* Tally separator + Translation + citation card. Anchored to
+          the canvas bottom so the Arabic block above can never push
+          this off-canvas, regardless of du'a length. */}
+      <div
+        className="absolute left-0 right-0 z-10 flex flex-col items-center px-[70px]"
+        style={{ bottom: "70px" }}
+      >
         <svg
           viewBox="0 0 600 60"
           width="280"
           height="22"
           aria-hidden
-          className="mx-auto mt-[28px]"
+          className="mb-[18px]"
           style={{ color: palette.accent }}
         >
           {Array.from({ length: 6 }).map((_, i) => (
@@ -238,21 +284,17 @@ export const DuaHero: FlyerLayoutComponent = ({
           ))}
         </svg>
 
-        {/* Translation + citation card. Bounded in height + given a
-            dynamic font-size so long-hadith translations don't spill
-            past the bottom edge of the 1080-tall canvas. */}
         {(translation || citation) && (
           <div
-            className="mx-auto mt-auto flex max-w-[940px] flex-col gap-3 rounded-3xl px-7 py-6"
+            className="flex max-w-[940px] flex-col gap-3 rounded-3xl px-7 py-6"
             style={{
               backgroundColor: "rgba(255,255,255,0.94)",
               boxShadow: `0 14px 36px ${palette.accentDeep}40`,
               border: `1px solid ${palette.accentSoft}`,
-              // Hard ceiling — anything beyond this height gets cut by
-              // overflow:hidden on the parent canvas. With the
-              // truncation above we should always land inside this,
-              // but the cap is defense-in-depth.
-              maxHeight: "330px",
+              // Hard ceiling matches the bottom-410px reservation
+              // above. Translation truncation guarantees we land
+              // inside this; the cap is defense-in-depth.
+              maxHeight: "300px",
               overflow: "hidden",
             }}
           >

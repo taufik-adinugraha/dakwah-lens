@@ -46,8 +46,7 @@ export async function Header() {
       label: t("insights"),
       tone: "insights" as const,
     },
-    { href: sectionLink("#features"), label: t("features") },
-    { href: sectionLink("#how-it-works"), label: t("how_it_works") },
+    { href: `/${locale}/discussions`, label: t("discussions") },
     { href: `/${locale}/kitab`, label: t("kitab") },
     ...(isAdmin
       ? [{ href: `/${locale}/briefs/public`, label: t("briefs_library") }]
@@ -91,24 +90,18 @@ export async function Header() {
           </Link>
 
           <nav className="hidden items-center gap-7 text-sm font-medium text-slate-600 md:flex">
-            <a
-              href={sectionLink("#features")}
-              className="hover:text-slate-900 transition"
-            >
-              {t("features")}
-            </a>
-            <a
-              href={sectionLink("#how-it-works")}
-              className="hover:text-slate-900 transition"
-            >
-              {t("how_it_works")}
-            </a>
             <Link
               href="/insights"
               className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 font-semibold text-emerald-700 ring-1 ring-emerald-200/70 transition hover:bg-emerald-100 hover:text-emerald-800"
             >
               <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
               {t("insights")}
+            </Link>
+            <Link
+              href="/discussions"
+              className="hover:text-slate-900 transition"
+            >
+              {t("discussions")}
             </Link>
             <Link href="/kitab" className="hover:text-slate-900 transition">
               {t("kitab")}

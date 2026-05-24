@@ -120,21 +120,30 @@ export const PosterQuestionA4: FlyerLayoutComponent = ({
           >
             Diskusi Mahasiswa
           </span>
+          {/* Negative letter-spacing on this headline used to break the
+              PDF text layer — Chromium's page.pdf() emits each glyph
+              at an absolute position when letter-spacing != 0, and the
+              extractor then can't tell space chars apart from regular
+              gaps. Copy-paste / screen readers saw words jammed
+              together ("pahalanyapalingbesar"). Default tracking is
+              safe at this font size; visual balance is preserved by
+              text-wrap: balance alone. The quote glyphs are inlined
+              with a leading/trailing space so they don't need
+              margin-spaced wrapper spans (which had the same effect). */}
           <h1
-            className="mt-7 text-balance font-black tracking-tight"
+            className="mt-7 text-balance font-black"
             style={{
               fontSize: `${headlineSize}px`,
               lineHeight: 1.05,
-              letterSpacing: "-0.02em",
               color: "#ffffff",
               textWrap: "balance",
               maxWidth: "180mm",
               textShadow: "0 2px 24px rgba(0,0,0,0.25)",
             }}
           >
-            <span className="mr-1 opacity-50">&ldquo;</span>
+            <span style={{ opacity: 0.5 }}>&ldquo;</span>
             {headline}
-            <span className="ml-1 opacity-50">&rdquo;</span>
+            <span style={{ opacity: 0.5 }}>&rdquo;</span>
           </h1>
           <p
             className="mt-7 max-w-[140mm] text-pretty text-[14px] leading-[1.55]"

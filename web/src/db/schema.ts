@@ -970,6 +970,18 @@ export const mahasiswaComments = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .default(sql`now()`),
+    /** Last poster-initiated edit. NULL = never edited. The PATCH
+     *  endpoint verifies ownership via visitor_token_hash cookie. */
+    editedAt: timestamp("edited_at", { withTimezone: true }),
+    /** Edit counter — capped server-side to keep the audit footprint
+     *  small. Public UI just shows "edited" if > 0. */
+    editCount: integer("edit_count").notNull().default(0),
+    /** Reply target. NULL = top-level. Single-level threading: the
+     *  POST endpoint rejects submissions whose parent itself has a
+     *  non-NULL parent_id. ON DELETE SET NULL so admin-deletion of a
+     *  parent surfaces the orphans back at the top level instead of
+     *  cascade-wiping people's writing. */
+    parentId: uuid("parent_id"),
   },
   (table) => [
     index("ix_mahasiswa_comments_slug_status_time").on(
@@ -978,6 +990,11 @@ export const mahasiswaComments = pgTable(
       table.createdAt,
     ),
     index("ix_mahasiswa_comments_ip_time").on(table.ipHash, table.createdAt),
+    index("ix_mahasiswa_comments_parent_status_time").on(
+      table.parentId,
+      table.status,
+      table.createdAt,
+    ),
   ],
 );
 

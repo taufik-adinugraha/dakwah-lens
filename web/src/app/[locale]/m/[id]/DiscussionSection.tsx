@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, isNull, sql } from "drizzle-orm";
 import { Lock, MessagesSquare } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
@@ -40,6 +40,14 @@ export async function DiscussionSection({
 }) {
   const t = await getTranslations("Discussion");
 
+  // `replyCount` matches the /comments GET shape: number of approved
+  // replies hanging off each top-level row. Replies themselves load
+  // lazily via /comments/{id}/replies when the user expands a thread.
+  const replyCountSql = sql<number>`(
+    SELECT COUNT(*)::int FROM ${schema.mahasiswaComments} AS r
+    WHERE r.parent_id = ${schema.mahasiswaComments.id}
+      AND r.status = 'approved'
+  )`;
   const [rows, [roomRow]] = await Promise.all([
     db
       .select({
@@ -48,12 +56,15 @@ export async function DiscussionSection({
         body: schema.mahasiswaComments.body,
         createdAt: schema.mahasiswaComments.createdAt,
         pinned: schema.mahasiswaComments.pinned,
+        editedAt: schema.mahasiswaComments.editedAt,
+        replyCount: replyCountSql,
       })
       .from(schema.mahasiswaComments)
       .where(
         and(
           eq(schema.mahasiswaComments.briefingSlug, briefingSlug),
           eq(schema.mahasiswaComments.status, "approved"),
+          isNull(schema.mahasiswaComments.parentId),
         ),
       )
       .orderBy(
@@ -76,6 +87,8 @@ export async function DiscussionSection({
     body: r.body,
     createdAt: r.createdAt.toISOString(),
     pinned: r.pinned,
+    editedAt: r.editedAt ? r.editedAt.toISOString() : null,
+    replyCount: r.replyCount,
   }));
 
   return (
@@ -153,6 +166,28 @@ export async function DiscussionSection({
               notifyPrivacy: t("notify_privacy"),
               emailPlaceholder: t("email_placeholder"),
               successNotify: t("success_notify"),
+              edit: t("edit"),
+              editSave: t("edit_save"),
+              editSaving: t("edit_saving"),
+              editCancel: t("edit_cancel"),
+              editLabel: t("edit_label"),
+              editWindowHint: t("edit_window_hint", { minutes: 15 }),
+              editSuccess: t("edit_success"),
+              editSuccessPending: t("edit_success_pending"),
+              editErrorWindow: t("edit_error_window"),
+              editErrorLimit: t("edit_error_limit"),
+              editErrorForbidden: t("edit_error_forbidden"),
+              reply: t("reply"),
+              replyBodyPlaceholder: t("reply_body_placeholder"),
+              replySend: t("reply_send"),
+              replySending: t("reply_sending"),
+              replyCancel: t("reply_cancel"),
+              replyCountOne: t("reply_count_one"),
+              replyCountMany: t("reply_count_many"),
+              repliesShow: t("replies_show"),
+              repliesHide: t("replies_hide"),
+              repliesLoading: t("replies_loading"),
+              repliesEmpty: t("replies_empty"),
             }}
             initialItems={initialItems}
             initialHasMore={hasMore}

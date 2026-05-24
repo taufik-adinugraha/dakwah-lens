@@ -63,7 +63,6 @@ from api.services.kitab_retrieval import (
     rerank_dua,
     retrieve_daleel,
     retrieve_dua,
-    translate_daleel_to_id,
 )
 
 log = structlog.get_logger(__name__)
@@ -136,7 +135,14 @@ async def _prepare_context(
         # choice without forcing weak fits.
         candidates = retrieve_daleel(retrieval_query, limit=28, per_corpus=6)
         daleel = rerank_daleel(retrieval_query, candidates, top_n=18)
-        daleel = translate_daleel_to_id(daleel)
+        # Cached per-hadith ID translation. Replaces the old
+        # batch-of-many Gemini call (kept failing silently at
+        # 2000-token output for full pools); this version asks one
+        # hadith at a time and caches in `hadith_translations_id`,
+        # so first run pays the LLM cost and re-runs are SELECTs.
+        from api.services.hadith_translation import enrich_daleel_translations
+
+        daleel = await enrich_daleel_translations(session, daleel)
 
         # Du'a / dzikir retrieval — same theme, different query shape,
         # different pool. Feeds Pesan Flyer 5 (Sunnah call) + Flyer 6
@@ -147,7 +153,7 @@ async def _prepare_context(
             retrieval_query, limit=15, per_corpus=4
         )
         adhkar = rerank_dua(retrieval_query, dua_candidates, top_n=6)
-        adhkar = translate_daleel_to_id(adhkar)
+        adhkar = await enrich_daleel_translations(session, adhkar)
 
         log.info(
             "manual_briefing.context_ready",

@@ -417,6 +417,26 @@ class MahasiswaComment(Base):
         DateTime(timezone=True), nullable=False, server_default=text("now()")
     )
 
+    edited_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    """Last time the poster edited this comment. NULL = never edited.
+    Editing is allowed for the poster (verified via visitor_token_hash
+    cookie) within a short window after `created_at`."""
+
+    edit_count: Mapped[int] = mapped_column(
+        Integer, nullable=False, server_default=text("0")
+    )
+    """How many times this comment has been edited. Capped server-side
+    to keep the audit footprint small."""
+
+    parent_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("mahasiswa_comments.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    """Reply target — NULL = top-level. Single-level threading; the
+    API enforces that `parent` itself has `parent_id IS NULL`."""
+
     __table_args__ = (
         Index(
             "ix_mahasiswa_comments_slug_status_time",
@@ -425,6 +445,12 @@ class MahasiswaComment(Base):
             "created_at",
         ),
         Index("ix_mahasiswa_comments_ip_time", "ip_hash", "created_at"),
+        Index(
+            "ix_mahasiswa_comments_parent_status_time",
+            "parent_id",
+            "status",
+            "created_at",
+        ),
     )
 
 
@@ -854,4 +880,30 @@ class Bookmark(Base):
             "user_id", "kind", "ref_id", name="uq_bookmark_user_kind_ref"
         ),
         Index("ix_bookmarks_user_kind_time", "user_id", "kind", "created_at"),
+    )
+
+
+class HadithTranslationId(Base):
+    """One-shot Gemini Flash-Lite translation of a hadith's English
+    text into Indonesian. The seeded kitab corpus has no Bahasa
+    translations for the hadith corpora (Bukhari, Muslim, Riyad
+    as-Salihin), which made every hadith-cited flyer render in English.
+
+    Keyed by (corpus, hadithnumber). `text_en` is stored so we can
+    invalidate the cached ID translation if the upstream source ever
+    changes. Idempotent: the calling service does "check, translate
+    if missing, return".
+    """
+
+    __tablename__ = "hadith_translations_id"
+
+    corpus: Mapped[str] = mapped_column(String(64), primary_key=True)
+    hadithnumber: Mapped[str] = mapped_column(String(32), primary_key=True)
+    text_en: Mapped[str] = mapped_column(Text, nullable=False)
+    text_id: Mapped[str] = mapped_column(Text, nullable=False)
+    model: Mapped[str] = mapped_column(String(64), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("now()"),
     )

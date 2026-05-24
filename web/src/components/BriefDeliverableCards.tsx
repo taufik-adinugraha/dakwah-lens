@@ -166,6 +166,18 @@ const KIND_QUOTE: Record<CardKind, { bg: string; border: string; icon: string }>
 function classifyHeading(heading: string): CardKind | null {
   const lower = heading.toLowerCase();
   if (lower.includes("khutbah") || lower.includes("friday")) return "khutbah";
+  // Mahasiswa / Gen Z must be checked BEFORE kajian — the LLM sometimes
+  // generates "### Kajian Mahasiswa: ..." which would otherwise match the
+  // kajian (ibu-ibu/majelis) slot first and dedupe-drop the genz card.
+  if (
+    lower.includes("mahasiswa") ||
+    lower.includes("kampus") ||
+    lower.includes("campus") ||
+    lower.includes("gen z") ||
+    lower.includes("gen-z") ||
+    lower.includes("reaching gen")
+  )
+    return "genz";
   if (lower.includes("kajian") || lower.includes("majelis")) return "kajian";
   if (
     lower.includes("rumah") ||
@@ -180,15 +192,6 @@ function classifyHeading(heading: string): CardKind | null {
     lower.includes("kreator")
   )
     return "content";
-  if (
-    lower.includes("mahasiswa") ||
-    lower.includes("kampus") ||
-    lower.includes("campus") ||
-    lower.includes("gen z") ||
-    lower.includes("gen-z") ||
-    lower.includes("reaching gen")
-  )
-    return "genz";
   if (
     lower.includes("aksi") ||
     lower.includes("khidmah") ||

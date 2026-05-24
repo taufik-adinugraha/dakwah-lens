@@ -1,7 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Bell, Pin, Send } from "lucide-react";
+import {
+  Bell,
+  ChevronDown,
+  ChevronUp,
+  CornerDownRight,
+  MessageSquare,
+  Pencil,
+  Pin,
+  Send,
+} from "lucide-react";
 
 import { localeAwareFormatDateTime } from "@/lib/date-id";
 
@@ -12,6 +21,11 @@ type CommentItem = {
   /** ISO 8601 string — Dates don't cross the server/client boundary. */
   createdAt: string;
   pinned?: boolean;
+  /** ISO 8601 of last poster edit, or null/undefined if never edited. */
+  editedAt?: string | null;
+  /** Server-provided count of approved replies. Only meaningful on
+   *  top-level rows (reply rows themselves can't be replied to). */
+  replyCount?: number;
 };
 
 type Labels = {
@@ -38,7 +52,39 @@ type Labels = {
   notifyPrivacy: string;
   emailPlaceholder: string;
   successNotify: string;
+  edit: string;
+  editSave: string;
+  editSaving: string;
+  editCancel: string;
+  editLabel: string;
+  editWindowHint: string;
+  editSuccess: string;
+  editSuccessPending: string;
+  editErrorWindow: string;
+  editErrorLimit: string;
+  editErrorForbidden: string;
+  reply: string;
+  replyBodyPlaceholder: string;
+  replySend: string;
+  replySending: string;
+  replyCancel: string;
+  replyCountOne: string;
+  /** Plural form with `{count}` placeholder. */
+  replyCountMany: string;
+  repliesShow: string;
+  repliesHide: string;
+  repliesLoading: string;
+  repliesEmpty: string;
 };
+
+/** Must match EDIT_WINDOW_MINUTES in the PATCH route. UI uses this to
+ *  decide whether to show the pencil — server is still the source of
+ *  truth and rejects late edits with 410. */
+const EDIT_WINDOW_MS = 15 * 60_000;
+/** localStorage key holding `{ [commentId]: createdAtEpochMs }` so we
+ *  can show the pencil only on rows this visitor authored. Pruned on
+ *  each write to keep growth bounded. */
+const OWNED_KEY = "dl_owned";
 
 type Palette = {
   accent: string;
@@ -114,6 +160,68 @@ export function CommentForm({
     { tone: "success" | "warn" | "error"; message: string } | null
   >(null);
 
+  // Map of commentId → ownership marker. Hydrated from localStorage on
+  // mount so a returning visitor keeps the pencil on rows they wrote.
+  // Server still gates edits via the httpOnly cookie — this is purely
+  // UI: showing the pencil to someone who doesn't actually own the row
+  // just gets them a 403 if they try.
+  const [ownedIds, setOwnedIds] = useState<Set<string>>(() => new Set());
+
+  // Inline edit state. Only one row is editable at a time — opening
+  // edit on a different row replaces this.
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editBody, setEditBody] = useState("");
+  const [editSubmitting, setEditSubmitting] = useState(false);
+  // `now` ticks so the edit-window check re-evaluates without us
+  // calling Date.now() during render (React's purity rule).
+  const [now, setNow] = useState<number>(() => Date.now());
+
+  // Reply form state — at most one inline reply form is open at a time.
+  // Reply name re-uses the top-level name (hydrated from localStorage)
+  // by default so the visitor doesn't re-type their identity.
+  const [replyingToId, setReplyingToId] = useState<string | null>(null);
+  const [replyBody, setReplyBody] = useState("");
+  const [replySubmitting, setReplySubmitting] = useState(false);
+
+  // Per-parent reply state — cached after first expand so a re-expand
+  // doesn't re-fetch unnecessarily. `expanded` decides visibility;
+  // `loading` shows a skeleton when first fetched.
+  const [repliesByParent, setRepliesByParent] = useState<
+    Record<string, CommentItem[]>
+  >({});
+  const [repliesExpanded, setRepliesExpanded] = useState<
+    Record<string, boolean>
+  >({});
+  const [repliesLoading, setRepliesLoading] = useState<Record<string, boolean>>(
+    {},
+  );
+
+  useEffect(() => {
+    hydrateOwnership({ setOwnedIds });
+  }, []);
+
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(t);
+  }, []);
+
+  const rememberOwnership = useCallback((commentId: string) => {
+    setOwnedIds((prev) => {
+      if (prev.has(commentId)) return prev;
+      const next = new Set(prev);
+      next.add(commentId);
+      return next;
+    });
+    try {
+      const raw = window.localStorage.getItem(OWNED_KEY) ?? "{}";
+      const map = JSON.parse(raw) as Record<string, number>;
+      map[commentId] = Date.now();
+      window.localStorage.setItem(OWNED_KEY, JSON.stringify(map));
+    } catch {
+      /* storage unavailable — keep going */
+    }
+  }, []);
+
   const loadMore = useCallback(async () => {
     setLoadingMore(true);
     try {
@@ -175,6 +283,7 @@ export function CommentForm({
           status?: string;
           error?: string;
           subscribed?: boolean;
+          id?: string | null;
         };
         if (r.status === 429) {
           setNotice({ tone: "warn", message: labels.errorRate });
@@ -234,14 +343,21 @@ export function CommentForm({
             ? `${labels.successPublished} ${labels.successNotify}`
             : labels.successPublished;
           setNotice({ tone: "success", message });
+          // Server returned the real id for an approved row — use it
+          // so the in-place edit pencil works immediately without a
+          // page reload. Fall back to a local id when missing (older
+          // server, or some edge case).
+          const newId = data.id ?? `local-${Date.now()}`;
+          if (data.id) rememberOwnership(data.id);
           // Optimistically prepend to the list so the writer sees
           // their own comment immediately — saves one full reload.
           setItems((prev) => [
             {
-              id: `local-${Date.now()}`,
+              id: newId,
               displayName: trimmedName,
               body: trimmedBody,
               createdAt: new Date().toISOString(),
+              editedAt: null,
             },
             ...prev,
           ]);
@@ -253,7 +369,281 @@ export function CommentForm({
         setSubmitting(false);
       }
     },
-    [submitting, name, body, briefingSlug, labels, submitToken, hp, email, notifyMe],
+    [
+      submitting,
+      name,
+      body,
+      briefingSlug,
+      labels,
+      submitToken,
+      hp,
+      email,
+      notifyMe,
+      rememberOwnership,
+    ],
+  );
+
+  const openEdit = useCallback((c: CommentItem) => {
+    setEditingId(c.id);
+    setEditBody(c.body);
+    setNotice(null);
+  }, []);
+
+  const cancelEdit = useCallback(() => {
+    setEditingId(null);
+    setEditBody("");
+  }, []);
+
+  const saveEdit = useCallback(
+    async (commentId: string) => {
+      if (editSubmitting) return;
+      const trimmed = editBody.trim();
+      if (trimmed.length < 2) {
+        setNotice({ tone: "error", message: labels.errorInvalid });
+        return;
+      }
+      setEditSubmitting(true);
+      setNotice(null);
+      try {
+        const r = await fetch(
+          `/api/m/${encodeURIComponent(briefingSlug)}/comments/${encodeURIComponent(
+            commentId,
+          )}`,
+          {
+            method: "PATCH",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ body: trimmed }),
+          },
+        );
+        const data = (await r.json().catch(() => ({}))) as {
+          ok?: boolean;
+          status?: string;
+          error?: string;
+          editedAt?: string;
+          noop?: boolean;
+        };
+        if (r.status === 410 || data.error === "window_closed") {
+          setNotice({ tone: "warn", message: labels.editErrorWindow });
+          // Pencil is now wrong-state; drop ownership so it disappears.
+          setOwnedIds((prev) => {
+            const next = new Set(prev);
+            next.delete(commentId);
+            return next;
+          });
+          cancelEdit();
+          return;
+        }
+        if (r.status === 403 || data.error === "forbidden") {
+          setNotice({ tone: "error", message: labels.editErrorForbidden });
+          return;
+        }
+        if (data.error === "edit_limit") {
+          setNotice({ tone: "warn", message: labels.editErrorLimit });
+          return;
+        }
+        if (r.status === 429) {
+          setNotice({ tone: "warn", message: labels.errorRate });
+          return;
+        }
+        if (!r.ok || !data.ok) {
+          setNotice({
+            tone: "error",
+            message:
+              data.error === "invalid" ? labels.errorInvalid : labels.errorGeneric,
+          });
+          return;
+        }
+        if (data.status === "pending") {
+          // Re-moderation demoted the row — strip it from the visible
+          // list (it's now `status='blocked'` server-side) and tell the
+          // user what happened.
+          setItems((prev) => prev.filter((c) => c.id !== commentId));
+          setOwnedIds((prev) => {
+            const next = new Set(prev);
+            next.delete(commentId);
+            return next;
+          });
+          setNotice({ tone: "warn", message: labels.editSuccessPending });
+        } else {
+          setItems((prev) =>
+            prev.map((c) =>
+              c.id === commentId
+                ? {
+                    ...c,
+                    body: trimmed,
+                    editedAt: data.editedAt ?? new Date().toISOString(),
+                  }
+                : c,
+            ),
+          );
+          setNotice({ tone: "success", message: labels.editSuccess });
+        }
+        cancelEdit();
+      } catch {
+        setNotice({ tone: "error", message: labels.errorGeneric });
+      } finally {
+        setEditSubmitting(false);
+      }
+    },
+    [editSubmitting, editBody, briefingSlug, labels, cancelEdit],
+  );
+
+  const openReply = useCallback((parentId: string) => {
+    setReplyingToId(parentId);
+    setReplyBody("");
+    setNotice(null);
+    setEditingId(null);
+  }, []);
+
+  const cancelReply = useCallback(() => {
+    setReplyingToId(null);
+    setReplyBody("");
+  }, []);
+
+  const fetchReplies = useCallback(
+    async (parentId: string) => {
+      setRepliesLoading((m) => ({ ...m, [parentId]: true }));
+      try {
+        const r = await fetch(
+          `/api/m/${encodeURIComponent(briefingSlug)}/comments/${encodeURIComponent(
+            parentId,
+          )}/replies`,
+          { cache: "no-store" },
+        );
+        if (!r.ok) return;
+        const data = (await r.json()) as { items: CommentItem[] };
+        setRepliesByParent((m) => ({ ...m, [parentId]: data.items }));
+      } finally {
+        setRepliesLoading((m) => ({ ...m, [parentId]: false }));
+      }
+    },
+    [briefingSlug],
+  );
+
+  const toggleReplies = useCallback(
+    async (parentId: string, replyCount: number) => {
+      const wasExpanded = repliesExpanded[parentId] === true;
+      setRepliesExpanded((m) => ({ ...m, [parentId]: !wasExpanded }));
+      // First expand → fetch. After that the cache is reused; only
+      // a fresh-submit path mutates `repliesByParent` to keep it in
+      // sync with reality without a re-fetch.
+      if (!wasExpanded && !repliesByParent[parentId] && replyCount > 0) {
+        await fetchReplies(parentId);
+      }
+    },
+    [repliesExpanded, repliesByParent, fetchReplies],
+  );
+
+  const submitReply = useCallback(
+    async (parentId: string) => {
+      if (replySubmitting) return;
+      const trimmedName = name.trim();
+      const trimmedBody = replyBody.trim();
+      if (trimmedName.length < 2 || trimmedBody.length < 2) {
+        setNotice({ tone: "error", message: labels.errorInvalid });
+        return;
+      }
+      setReplySubmitting(true);
+      setNotice(null);
+      try {
+        const r = await fetch(
+          `/api/m/${encodeURIComponent(briefingSlug)}/comments`,
+          {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+              display_name: trimmedName,
+              body: trimmedBody,
+              token: submitToken,
+              parent_id: parentId,
+              dl_url_check: hp,
+            }),
+          },
+        );
+        const data = (await r.json().catch(() => ({}))) as {
+          ok?: boolean;
+          status?: string;
+          error?: string;
+          id?: string | null;
+        };
+        if (r.status === 429) {
+          setNotice({ tone: "warn", message: labels.errorRate });
+          return;
+        }
+        if (r.status === 410 || data.error === "stale") {
+          setNotice({ tone: "warn", message: labels.errorStale });
+          return;
+        }
+        if (r.status === 403 || data.error === "forbidden") {
+          setNotice({ tone: "error", message: labels.errorForbidden });
+          return;
+        }
+        if (r.status === 423 || data.error === "muted") {
+          setNotice({ tone: "warn", message: labels.errorMuted });
+          return;
+        }
+        if (!r.ok || !data.ok) {
+          setNotice({
+            tone: "error",
+            message:
+              data.error === "invalid"
+                ? labels.errorInvalid
+                : labels.errorGeneric,
+          });
+          return;
+        }
+        if (data.status === "pending") {
+          setNotice({ tone: "warn", message: labels.successPending });
+          cancelReply();
+          return;
+        }
+        // Approved — optimistically append to the cached thread and
+        // bump the parent's reply count so the badge updates.
+        const newId = data.id ?? `local-${Date.now()}`;
+        if (data.id) rememberOwnership(data.id);
+        const newReply: CommentItem = {
+          id: newId,
+          displayName: trimmedName,
+          body: trimmedBody,
+          createdAt: new Date().toISOString(),
+          editedAt: null,
+        };
+        setRepliesByParent((m) => ({
+          ...m,
+          [parentId]: [...(m[parentId] ?? []), newReply],
+        }));
+        setRepliesExpanded((m) => ({ ...m, [parentId]: true }));
+        setItems((prev) =>
+          prev.map((c) =>
+            c.id === parentId
+              ? { ...c, replyCount: (c.replyCount ?? 0) + 1 }
+              : c,
+          ),
+        );
+        try {
+          window.localStorage.setItem("dl_dn", trimmedName);
+        } catch {
+          /* storage unavailable — keep going */
+        }
+        setNotice({ tone: "success", message: labels.successPublished });
+        cancelReply();
+      } catch {
+        setNotice({ tone: "error", message: labels.errorGeneric });
+      } finally {
+        setReplySubmitting(false);
+      }
+    },
+    [
+      replySubmitting,
+      name,
+      replyBody,
+      briefingSlug,
+      submitToken,
+      hp,
+      labels,
+      cancelReply,
+      rememberOwnership,
+    ],
   );
 
   return (
@@ -411,6 +801,29 @@ export function CommentForm({
         )}
         {items.map((c) => {
           const isAdminReply = /^dakwah[\s.\-_·]*lens/i.test(c.displayName);
+          const createdMs = new Date(c.createdAt).getTime();
+          const withinWindow =
+            Number.isFinite(createdMs) && now - createdMs < EDIT_WINDOW_MS;
+          // Edits are only meaningful for real DB ids — skip the
+          // `local-…` placeholder used in the offline-block path. Also
+          // hide the pencil on admin-reply rows just in case the
+          // ownership map ever gets a stray id from that path.
+          const canEdit =
+            ownedIds.has(c.id) &&
+            !c.id.startsWith("local-") &&
+            withinWindow &&
+            !isAdminReply;
+          const isEditingThis = editingId === c.id;
+          const replyCount = c.replyCount ?? 0;
+          const repliesAreExpanded = repliesExpanded[c.id] === true;
+          const isReplyingHere = replyingToId === c.id;
+          const threadReplies = repliesByParent[c.id] ?? [];
+          const repliesIsLoading = repliesLoading[c.id] === true;
+          const canReply = !muted && !isReplyingHere;
+          const replyCountLabel =
+            replyCount === 1
+              ? labels.replyCountOne
+              : labels.replyCountMany.replace("{count}", String(replyCount));
           return (
             <li
               key={c.id}
@@ -447,20 +860,258 @@ export function CommentForm({
                       {labels.pinned}
                     </span>
                   )}
+                  {c.editedAt && (
+                    <span className="text-[10px] font-medium text-slate-400">
+                      · {labels.editLabel}
+                    </span>
+                  )}
                 </div>
-                <span className="text-[11px] text-slate-400">
-                  {localeAwareFormatDateTime(new Date(c.createdAt), locale, {
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    timeZone: "Asia/Jakarta",
-                  })}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] text-slate-400">
+                    {localeAwareFormatDateTime(new Date(c.createdAt), locale, {
+                      month: "short",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      timeZone: "Asia/Jakarta",
+                    })}
+                  </span>
+                  {canEdit && !isEditingThis && (
+                    <button
+                      type="button"
+                      onClick={() => openEdit(c)}
+                      className="inline-flex h-6 items-center gap-1 rounded-full border border-slate-200 bg-white px-2 text-[10px] font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-900"
+                    >
+                      <Pencil className="h-2.5 w-2.5" />
+                      {labels.edit}
+                    </button>
+                  )}
+                </div>
               </div>
-              <p className="mt-1.5 whitespace-pre-wrap text-pretty text-[14px] leading-relaxed text-slate-700">
-                {c.body}
-              </p>
+              {isEditingThis ? (
+                <div className="mt-2 space-y-2">
+                  <textarea
+                    value={editBody}
+                    onChange={(e) => setEditBody(e.target.value)}
+                    maxLength={BODY_MAX}
+                    rows={4}
+                    className="block w-full resize-y rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm leading-relaxed text-slate-900 shadow-sm transition focus:outline-none focus:ring-2"
+                    style={{ ["--tw-ring-color" as string]: palette.accent }}
+                    autoFocus
+                  />
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-[10px] text-slate-400">
+                      {labels.editWindowHint} · {editBody.length}/{BODY_MAX}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={cancelEdit}
+                        disabled={editSubmitting}
+                        className="inline-flex h-8 items-center rounded-full border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {labels.editCancel}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => saveEdit(c.id)}
+                        disabled={editSubmitting}
+                        className="inline-flex h-8 items-center rounded-full px-4 text-xs font-bold text-white shadow-sm transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+                        style={{ background: palette.accentDeep }}
+                      >
+                        {editSubmitting ? labels.editSaving : labels.editSave}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <p className="mt-1.5 whitespace-pre-wrap text-pretty text-[14px] leading-relaxed text-slate-700">
+                  {c.body}
+                </p>
+              )}
+
+              {/* Reply controls — Balas button + reply-count toggle. */}
+              {(canReply || replyCount > 0) && !isEditingThis && (
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  {canReply && (
+                    <button
+                      type="button"
+                      onClick={() => openReply(c.id)}
+                      className="inline-flex h-7 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 text-[11px] font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-900"
+                    >
+                      <MessageSquare className="h-3 w-3" />
+                      {labels.reply}
+                    </button>
+                  )}
+                  {replyCount > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => toggleReplies(c.id, replyCount)}
+                      className="inline-flex h-7 items-center gap-1.5 rounded-full px-2.5 text-[11px] font-semibold transition"
+                      style={{
+                        background: palette.accent + "12",
+                        color: palette.accentDeep,
+                      }}
+                    >
+                      {repliesAreExpanded ? (
+                        <ChevronUp className="h-3 w-3" />
+                      ) : (
+                        <ChevronDown className="h-3 w-3" />
+                      )}
+                      {replyCountLabel}
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Inline reply form — name re-uses the top-level state
+                  so the visitor doesn't re-type their identity. */}
+              {isReplyingHere && (
+                <div
+                  className="mt-3 rounded-xl border-l-4 border bg-slate-50/70 p-3"
+                  style={{
+                    borderLeftColor: palette.accent,
+                    borderColor: palette.soft + "55",
+                  }}
+                >
+                  <div className="mb-2 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">
+                    <CornerDownRight className="h-3 w-3" />
+                    <span>{labels.reply}</span>
+                    <span className="text-slate-400">·</span>
+                    <span
+                      className="font-bold normal-case"
+                      style={{ color: palette.accentDeep }}
+                    >
+                      {c.displayName}
+                    </span>
+                  </div>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    maxLength={NAME_MAX}
+                    placeholder={labels.namePlaceholder}
+                    autoComplete="nickname"
+                    className="mb-2 block w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-[13px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2"
+                    style={{ ["--tw-ring-color" as string]: palette.accent }}
+                    required
+                    minLength={2}
+                  />
+                  <textarea
+                    value={replyBody}
+                    onChange={(e) => setReplyBody(e.target.value)}
+                    maxLength={BODY_MAX}
+                    rows={3}
+                    placeholder={labels.replyBodyPlaceholder}
+                    className="block w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-2 text-[13px] leading-relaxed text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2"
+                    style={{ ["--tw-ring-color" as string]: palette.accent }}
+                    autoFocus
+                  />
+                  <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-[10px] text-slate-400">
+                      {replyBody.length}/{BODY_MAX}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={cancelReply}
+                        disabled={replySubmitting}
+                        className="inline-flex h-8 items-center rounded-full border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {labels.replyCancel}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => submitReply(c.id)}
+                        disabled={replySubmitting}
+                        className="inline-flex h-8 items-center gap-1.5 rounded-full px-4 text-xs font-bold text-white shadow-sm transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+                        style={{ background: palette.accentDeep }}
+                      >
+                        <Send className="h-3 w-3" />
+                        {replySubmitting
+                          ? labels.replySending
+                          : labels.replySend}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Replies — visually offset (indent + accent left rail
+                  + tinted background) so the hierarchy reads clearly
+                  even without a heavy outer container. */}
+              {repliesAreExpanded && (
+                <div
+                  className="mt-3 space-y-2 border-l-2 pl-4 sm:pl-5"
+                  style={{ borderColor: palette.accent + "55" }}
+                >
+                  {repliesIsLoading && threadReplies.length === 0 && (
+                    <p className="text-[12px] italic text-slate-400">
+                      {labels.repliesLoading}
+                    </p>
+                  )}
+                  {!repliesIsLoading &&
+                    threadReplies.length === 0 &&
+                    replyCount > 0 && (
+                      <p className="text-[12px] italic text-slate-400">
+                        {labels.repliesEmpty}
+                      </p>
+                    )}
+                  {threadReplies.map((r) => {
+                    const replyIsAdmin = /^dakwah[\s.\-_·]*lens/i.test(
+                      r.displayName,
+                    );
+                    return (
+                      <div
+                        key={r.id}
+                        className="rounded-xl border border-l-4 px-4 py-3"
+                        style={{
+                          borderColor: palette.soft + "60",
+                          borderLeftColor: replyIsAdmin
+                            ? palette.accentDeep
+                            : palette.accent + "aa",
+                          background: replyIsAdmin
+                            ? palette.quoteBg
+                            : palette.accent + "08",
+                        }}
+                      >
+                        <div className="flex flex-wrap items-baseline justify-between gap-2">
+                          <span
+                            className="text-[13px] font-bold"
+                            style={{ color: palette.accentDeep }}
+                          >
+                            {r.displayName}
+                          </span>
+                          <span className="text-[10px] text-slate-400">
+                            {localeAwareFormatDateTime(
+                              new Date(r.createdAt),
+                              locale,
+                              {
+                                month: "short",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                timeZone: "Asia/Jakarta",
+                              },
+                            )}
+                            {r.editedAt && (
+                              <>
+                                {" · "}
+                                <span className="text-slate-400">
+                                  {labels.editLabel}
+                                </span>
+                              </>
+                            )}
+                          </span>
+                        </div>
+                        <p className="mt-1 whitespace-pre-wrap text-pretty text-[13px] leading-relaxed text-slate-700">
+                          {r.body}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </li>
           );
         })}
@@ -501,4 +1152,37 @@ function applyHydratedState({
   if (saved.name) setName(saved.name);
   if (saved.email) setEmail(saved.email);
   if (saved.notify) setNotifyMe(true);
+}
+
+/**
+ * Hydrate the owned-comments map from localStorage and push it into
+ * React state. Extracted from the post-mount effect for the same
+ * cascade-render-lint reason — the read + prune + setState pattern is
+ * a deliberate one-shot hydration.
+ */
+function hydrateOwnership({
+  setOwnedIds,
+}: {
+  setOwnedIds: (s: Set<string>) => void;
+}): void {
+  try {
+    const raw = window.localStorage.getItem(OWNED_KEY);
+    if (!raw) return;
+    const map = JSON.parse(raw) as Record<string, number>;
+    const next = new Set<string>();
+    const pruneCutoff = Date.now() - 7 * 24 * 60 * 60_000;
+    let changed = false;
+    for (const [cid, ts] of Object.entries(map)) {
+      if (!Number.isFinite(ts) || ts < pruneCutoff) {
+        delete map[cid];
+        changed = true;
+        continue;
+      }
+      next.add(cid);
+    }
+    if (changed) window.localStorage.setItem(OWNED_KEY, JSON.stringify(map));
+    setOwnedIds(next);
+  } catch {
+    /* storage unavailable — silent no-op */
+  }
 }

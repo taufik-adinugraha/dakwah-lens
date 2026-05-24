@@ -143,9 +143,14 @@ def _parse_flyer_blocks(
         body_end = h3_iter[i + 1].start() if i + 1 < len(h3_iter) else len(section)
         body = section[body_start:body_end].strip()
         title = h3.group(1).strip()
-        # Pull the `**Daleel:**` marker. Empty / missing → empty string.
+        # Pull the `**Dalil:**` (current) or `**Daleel:**` (legacy)
+        # marker. Empty / missing → empty string. Both forms coexist
+        # while the 2026-05-24 ID-prompt change rolls out and the
+        # backfill rewrites old rows.
         daleel_match = re.search(
-            r"\*\*Daleel:\*\*\s*([^\n]+)", body, flags=re.IGNORECASE
+            r"\*\*(?:Dalil|Daleel):\*\*\s*([^\n]+)",
+            body,
+            flags=re.IGNORECASE,
         )
         citation = ""
         if daleel_match:
@@ -435,9 +440,10 @@ def check_flyer_daleel_alignment(
             )
             continue
 
-        # Trim paragraph: drop the **Headline:**, **Daleel:** markers.
+        # Trim paragraph: drop the **Headline:**, **Dalil:** /
+        # **Daleel:** markers (both forms accepted during the rollout).
         para_body = re.sub(
-            r"\*\*(Headline|Daleel)\:\*\*[^\n]*\n?",
+            r"\*\*(Headline|Dalil|Daleel)\:\*\*[^\n]*\n?",
             "",
             b["body"],
             flags=re.IGNORECASE,
@@ -573,15 +579,14 @@ def apply_daleel_autofixes(
         current = w["current_citation"]
         replacement = w["suggested_citation"]
 
-        # Find the **Daleel:** line that appears INSIDE this specific
-        # flyer's body. We do this by anchoring to the flyer's H3
-        # heading line + searching only within the block range.
+        # Find the **Dalil:** / **Daleel:** line that appears INSIDE
+        # this specific flyer's body. Both forms accepted during the
+        # 2026-05-24 rollout. The capturing group preserves the actual
+        # marker style in the rewrite (so the rewrite keeps the
+        # original "Dalil" or "Daleel" wording).
         block_body = blocks[idx]["body"]
-        # The current_citation may have been normalized — try a few
-        # exact-shape variants. Most permissive: case-insensitive,
-        # whitespace-collapsed.
         daleel_re = re.compile(
-            r"(\*\*Daleel:\*\*\s*)" + re.escape(current),
+            r"(\*\*(?:Dalil|Daleel):\*\*\s*)" + re.escape(current),
             flags=re.IGNORECASE,
         )
         new_block_body, n = daleel_re.subn(

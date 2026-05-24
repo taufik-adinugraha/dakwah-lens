@@ -36,7 +36,6 @@ from api.models.admin import InsightsSummary
 from api.services.kitab_retrieval import (
     rerank_daleel,
     retrieve_daleel,
-    translate_daleel_to_id,
 )
 from api.services.usage import gemini_output_tokens
 
@@ -99,7 +98,7 @@ Untuk SETIAP paragraf flyer, SETIAP saran aksi, SETIAP rekomendasi tindakan di o
         - ❌ "Adopsi tetangga yang sedang hamil" — tidak masuk akal sebagai saran umum, terdengar aneh, ambigu, bisa salah-tafsir. Yang dimaksud kemungkinan: "kunjungi/tengok tetangga yang sedang hamil", "bantu kebutuhan tetangga yang hamil dengan masakan / antar ke posyandu". Tulis versi yang TIDAK AMBIGU.
         - ❌ "Bergabung dengan korban kekerasan" — ambigu, terdengar seolah ikut menjadi korban. Yang dimaksud: "kunjungi keluarga korban", "tawarkan bantuan finansial / hukum kepada korban".
         - ❌ "Hapus media sosial demi anak" — terlalu ekstrim sebagai saran umum. Yang dimaksud kemungkinan: "batasi waktu media sosial Anda saat bersama anak", "ganti satu jam scroll dengan satu jam main bersama anak".
-     b. DALEEL-PARAGRAF FIT (khusus flyer + sub-section): apakah daleel yang ditag SECARA MANDIRI berbicara tentang tema paragraf? Tanyakan: "Kalau saya lepaskan daleel ini dari paragraf, apakah ia tetap relevan dengan topik paragraf?" Kalau hanya berbagi 1-2 kata permukaan (mis. paragraf tentang pinjol + daleel tentang "pemuda" umum) → MISMATCH, ganti atau kosongkan.
+     b. DALIL-PARAGRAF FIT (khusus flyer + sub-section): apakah dalil yang ditag SECARA MANDIRI berbicara tentang tema paragraf? Tanyakan: "Kalau saya lepaskan dalil ini dari paragraf, apakah ia tetap relevan dengan topik paragraf?" Kalau hanya berbagi 1-2 kata permukaan (mis. paragraf tentang pinjol + dalil tentang "pemuda" umum) → MISMATCH, ganti atau kosongkan.
      c. KONTEKS LENGKAP: apakah ada konteks yang HILANG yang membuat saran terdengar mengambang / setengah jadi? Tambahkan satu kalimat klarifikasi.
      d. NADA: apakah saran terasa menghakimi, paternalistik, atau mengindoktrinasi? Reframe jadi observasional + invitasi, bukan perintah.
   3. KALAU JAWABAN ada yang "tidak/ya-tapi-terdengar-aneh" — KEMBALI ke step 1 dan REWRITE.
@@ -134,20 +133,20 @@ CRITICAL — SCOPE OF PERCENTAGES: baca SEGMENT_SCOPE di input. Jika "all", pers
 ## Strategi & Aksi Dakwah (6850-9400 kata)
 Ini adalah CONTENT KIT — bukan saran strategis. Setiap sub-section harus berupa DRAFT SIAP-PAKAI yang bisa dibaca / dipakai langsung oleh dai, ustadzah, kreator, atau pengurus komunitas tanpa harus menulis ulang dari nol. WAJIB 6 sub-section dengan ### H3.
 
-RUJUKAN DALEEL DI SECTION 4 — pool yang saya sediakan berisi 10 daleel hasil rerank tematik. Setiap sub-section di bawah WAJIB merujuk 2-3 daleel dari pool ini secara INLINE (bukan ditumpuk semua di Section 5):
-- Pilih daleel yang paling SUPPORT argumen sub-section tersebut — bukan asal comot, bukan random pertama
+RUJUKAN DALIL DI SECTION 4 — pool yang saya sediakan berisi 10 dalil hasil rerank tematik. Setiap sub-section di bawah WAJIB merujuk 2-3 dalil dari pool ini secara INLINE (bukan ditumpuk semua di Section 5):
+- Pilih dalil yang paling SUPPORT argumen sub-section tersebut — bukan asal comot, bukan random pertama
 - Format inline: `**{{citation}}**` (mis. `**QS. Hud: 85**` atau `**Riyad as-Salihin 1420**`) langsung diikuti 1 kalimat parafrase singkat Bahasa Indonesia
-- Sub-section berbeda BOLEH mengutip daleel yang sama jika memang paling pas, tapi USAHAKAN variasi supaya 8-10 daleel pool terdistribusi (khutbah ~3-4 daleel, kajian ~2-3, pengajaran ~1-2, kreator ~1, gen-z ~2, aksi ~1-2)
+- Sub-section berbeda BOLEH mengutip dalil yang sama jika memang paling pas, tapi USAHAKAN variasi supaya 8-10 dalil pool terdistribusi (khutbah ~3-4 dalil, kajian ~2-3, pengajaran ~1-2, kreator ~1, gen-z ~2, aksi ~1-2)
 - JANGAN mengarang ayat atau hadits di luar pool. Citation yang muncul di Section 4 HARUS persis cocok dengan citation di pool
 
 ### Khutbah Jumat (3450-4800 kata)
-Tulis KHUTBAH JUMAT LENGKAP siap-baca dari pembuka sampai penutup, terdiri dari Khutbah Pertama dan Khutbah Kedua. Bahasa Indonesia formal-mengalir, bisa dipahami jamaah umum, jangan terlalu akademis. Panjang khutbah harus sebanding dengan khutbah Jumat Indonesia standar yang lengkap dan bernapas panjang (22-30 menit ucapan = ~3450-4800 kata) — JANGAN terlalu pendek, beri ruang argumen berkembang dengan 3-4 daleel, 2-3 cerita konkret pekan ini, dan refleksi yang dalam.
+Tulis KHUTBAH JUMAT LENGKAP siap-baca dari pembuka sampai penutup, terdiri dari Khutbah Pertama dan Khutbah Kedua. Bahasa Indonesia formal-mengalir, bisa dipahami jamaah umum, jangan terlalu akademis. Panjang khutbah harus sebanding dengan khutbah Jumat Indonesia standar yang lengkap dan bernapas panjang (22-30 menit ucapan = ~3450-4800 kata) — JANGAN terlalu pendek, beri ruang argumen berkembang dengan 3-4 dalil, 2-3 cerita konkret pekan ini, dan refleksi yang dalam.
 
 KHUTBAH PERTAMA (2700-3750 kata):
 - Mukadimah singkat (hamdalah → sholawat → syahadat → wasiat takwa, ~70 kata, AKSARA ARAB DENGAN HARAKAT lengkap — bukan transliterasi Latin). Khateeb membaca langsung dari teks di mimbar.
 - Ayat Quran pembuka yang relevan dengan tema pekan — TULIS AYAT DALAM AKSARA ARAB BERHARAKAT, lalu sebut nama surah + nomor ayat, lalu TERJEMAHAN Bahasa Indonesia. JANGAN gunakan transliterasi Latin untuk ayat Quran.
 - Pengantar tema (6-9 paragraf Bahasa Indonesia): hubungkan ayat dengan 3-4 peristiwa NYATA pekan ini dari pool sample_headlines. PENTING: dalam khutbah JANGAN sebut nama outlet media (Detik, Republika, Kompas, CNN, dst.) — khutbah bukan ulasan pers. Gunakan framing umum seperti "dari berita pekan ini kita ketahui...", "ramai diperbincangkan pekan ini...", "kabar yang sampai kepada kita...", "publik dikejutkan oleh berita...". Ceritakan inti peristiwanya dengan tetap akurat ke headline, tanpa atribusi outlet.
-- Inti khutbah (9-13 paragraf prosa mengalir, jangan pakai sub-judul): satu argumen yang BERKEMBANG sepanjang khutbah, didukung 3-4 daleel tambahan DARI POOL. Untuk setiap daleel: tulis citation bold inline `**citation**`, AYAT/HADITS DALAM AKSARA ARAB BERHARAKAT (jika tersedia di pool), lalu terjemahan Bahasa Indonesia. Setiap paragraf harus mengembangkan argumen, BUKAN paraphrase paragraf sebelumnya. Beri ruang untuk: (a) penjelasan teologis ayat/hadits, (b) contoh dari sirah Nabi atau kisah sahabat yang relevan, (c) refleksi langsung ke konteks pekan ini, (d) implikasi untuk jamaah di Indonesia 2026.
+- Inti khutbah (9-13 paragraf prosa mengalir, jangan pakai sub-judul): satu argumen yang BERKEMBANG sepanjang khutbah, didukung 3-4 dalil tambahan DARI POOL. Untuk setiap dalil: tulis citation bold inline `**citation**`, AYAT/HADITS DALAM AKSARA ARAB BERHARAKAT (jika tersedia di pool), lalu terjemahan Bahasa Indonesia. Setiap paragraf harus mengembangkan argumen, BUKAN paraphrase paragraf sebelumnya. Beri ruang untuk: (a) penjelasan teologis ayat/hadits, (b) contoh dari sirah Nabi atau kisah sahabat yang relevan, (c) refleksi langsung ke konteks pekan ini, (d) implikasi untuk jamaah di Indonesia 2026.
 - Bersisi praktis: 4-6 tindakan konkret untuk jamaah pekan ini, dengan deskripsi singkat per-tindakan (bukan hanya bullet pendek).
 - Tutup khutbah pertama dengan formula standar DALAM AKSARA ARAB BERHARAKAT (~80 kata): "بَارَكَ اللهُ لِيْ وَلَكُمْ فِي الْقُرْآنِ الْعَظِيْمِ، وَنَفَعَنِيْ وَإِيَّاكُمْ بِمَا فِيْهِ مِنَ الْآيَاتِ وَالذِّكْرِ الْحَكِيْمِ…" dst. JANGAN transliterasi Latin.
 
@@ -174,7 +173,7 @@ Tulis OUTLINE KAJIAN 45-MENIT siap-pakai, format hands-on bukan ceramah teoritis
 - Inti — 3 talking points (masing-masing 150-200 kata) dengan struktur per-poin:
   * Pernyataan inti (1 kalimat)
   * Contoh konkret dari berita pekan ini (sebut outlet)
-  * Rujukan daleel singkat dari pool — tulis `**citation**` lalu 1 kalimat terjemahan
+  * Rujukan dalil singkat dari pool — tulis `**citation**` lalu 1 kalimat terjemahan
   * Aplikasi praktis untuk dapur / keluarga (2-3 tindakan)
 - Sesi Q&A (~100 kata): tulis 3 pertanyaan yang KEMUNGKINAN AKAN diajukan ibu-ibu + jawaban singkat-jujur (jangan idealistis berlebihan).
 - Penutup (~50 kata): doa singkat untuk keluarga, ringkasan satu kalimat yang bisa diingat.
@@ -190,12 +189,12 @@ Topik dipilih dari peristiwa nyata pekan ini.
 ### Kreator Konten Digital (100-130 kata)
 Tulis SCRIPT VIDEO siap-pakai 60-90 detik untuk TikTok / IG Reels / YouTube Shorts — kreator bisa baca langsung di depan kamera tanpa diedit. Bahasa Indonesia percakapan, BUKAN gaya khutbah. Struktur wajib:
 - HOOK (5 detik / ~10 kata): kalimat pertama yang menghentikan scroll. Boleh pertanyaan, boleh kontras, boleh fakta yang mengejutkan dari berita pekan ini.
-- BODY (40-60 detik / 80-100 kata): satu argumen jernih + satu rujukan daleel singkat DARI POOL (sebut citation persis seperti di pool dalam Bahasa Indonesia — JANGAN kutip teks Arab di video, JANGAN mengarang citation).
+- BODY (40-60 detik / 80-100 kata): satu argumen jernih + satu rujukan dalil singkat DARI POOL (sebut citation persis seperti di pool dalam Bahasa Indonesia — JANGAN kutip teks Arab di video, JANGAN mengarang citation).
 - CTA (5-10 detik / ~15 kata): ajakan konkret yang bisa langsung dilakukan penonton.
 Hindari frasa khas khutbah ("hadirin yang dirahmati Allah", "marilah kita renungkan").
 
 ### Mahasiswa: Poster, Artikel & Diskusi (900-1200 kata)
-Tulis PAKET KAMPUS siap-tempel di papan pengumuman jurusan / mushala kampus / fakultas. Audience: mahasiswa S1/S2 yang cerdas, sinis terhadap ceramah, suka diskusi + logika, kurang antusias kalau daleel dibawa sebagai argumen utama. Tujuan paket: bangkitkan rasa ingin tahu lewat satu pertanyaan provokatif, lalu beri pintu masuk pemikiran yang utuh untuk dibahas sendiri / diskusi peer.
+Tulis PAKET KAMPUS siap-tempel di papan pengumuman jurusan / mushala kampus / fakultas. Audience: mahasiswa S1/S2 yang cerdas, sinis terhadap ceramah, suka diskusi + logika, kurang antusias kalau dalil dibawa sebagai argumen utama. Tujuan paket: bangkitkan rasa ingin tahu lewat satu pertanyaan provokatif, lalu beri pintu masuk pemikiran yang utuh untuk dibahas sendiri / diskusi peer.
 
 Output WAJIB 3 elemen — POSTER QUESTION, ARTIKEL, dan Q&A — dirancang berpasangan: poster menarik perhatian dari jauh, artikel dibaca lebih dekat ketika tertarik.
 
@@ -203,10 +202,10 @@ Output WAJIB 3 elemen — POSTER QUESTION, ARTIKEL, dan Q&A — dirancang berpas
 
 - **Artikel** (650-850 kata, mengalir, judul SUB-section sendiri): tulis seperti artikel opini akademik singkat untuk mahasiswa. Struktur:
   * **Pembuka** (~150 kata): mulai dari pengalaman empiris / berita pekan ini yang relevan. JANGAN buka dengan ayat / hadits. Buat pembaca mengangguk pada masalah dulu.
-  * **Argumen logis** (~350 kata): bangun rangkaian penalaran step-by-step. Mengapa fenomena ini terjadi? Apa yang ditawarkan kerangka berpikir Islam (bukan "perintah Islam"). Sebut prinsip-prinsip seperti *mizan*, *amanah*, *adl*, *qist*, *istikhlaf*, *tazkiyatun nafs* sebagai LENS analitis — bukan sebagai keputusan otoritatif. Daleel boleh disebut sebagai supporting evidence di akhir argumen, BUKAN sebagai premis.
+  * **Argumen logis** (~350 kata): bangun rangkaian penalaran step-by-step. Mengapa fenomena ini terjadi? Apa yang ditawarkan kerangka berpikir Islam (bukan "perintah Islam"). Sebut prinsip-prinsip seperti *mizan*, *amanah*, *adl*, *qist*, *istikhlaf*, *tazkiyatun nafs* sebagai LENS analitis — bukan sebagai keputusan otoritatif. Dalil boleh disebut sebagai supporting evidence di akhir argumen, BUKAN sebagai premis.
   * **Solusi praktis** (~200 kata): apa yang bisa dilakukan mahasiswa hari ini — di kos, di kelas, di lab, di kantin, di magang, di organisasi. Hindari saran abstrak ("perbaiki niat"); berikan langkah konkret yang bisa dicoba pekan ini.
   * **Penutup** (~80 kata): refleksi terbuka. Tidak memaksa kesimpulan. Mengundang dialog.
-  TONE: cerdas, sopan, sedikit ironis OK. JANGAN menggurui. JANGAN gunakan kata "wahai mahasiswa", "kalian harus", "renungkanlah". Pakai "kita", "mungkin", "perhatikan". Daleel boleh dikutip dalam Bahasa Indonesia dengan citation pendek (mis. "QS. Hud: 85 mengingatkan kita..."), tapi MAKSIMAL 2 daleel di seluruh artikel — kalau kebanyakan, jadi terasa khotbah.
+  TONE: cerdas, sopan, sedikit ironis OK. JANGAN menggurui. JANGAN gunakan kata "wahai mahasiswa", "kalian harus", "renungkanlah". Pakai "kita", "mungkin", "perhatikan". Dalil boleh dikutip dalam Bahasa Indonesia dengan citation pendek (mis. "QS. Hud: 85 mengingatkan kita..."), tapi MAKSIMAL 2 dalil di seluruh artikel — kalau kebanyakan, jadi terasa khotbah.
 
 - **Q&A Realistis** (5 pertanyaan, masing-masing 80-120 kata): tulis 5 PUSHBACK yang mahasiswa kritis BENERAN akan ajukan saat membaca artikel ini — bukan straw-man yang gampang dijawab. Setiap entry:
   * **Q:** pertanyaan keras tapi jujur (mis. "Bukannya ini masalah sistem, bukan personal?", "Kenapa Islam yang harus ngurusin ekonomi modern?", "Apa bedanya nasihat ini dengan moralisme generik?", "Bukankah mengaitkan agama dengan politik justru bahaya?", "Saya nggak shalat juga, masih bisa pegang prinsip ini?")
@@ -252,7 +251,7 @@ Aksi yang menghormati kapasitas + kebijaksanaan lansia — mereka jadi PELAKU/su
 **Sinergi & koordinasi** (~80 kata): bagaimana 4 aksi ini bisa dijalankan paralel sebagai 1 kampanye RT/masjid/komunitas. Sebut: siapa koordinator (1 nama peran — mis. takmir muda / sekretaris RT / pengurus pengajian ibu), channel komunikasi (WA grup yang sudah ada, jangan bikin baru), dan 1 momen kebersamaan di akhir 4 minggu (mis. sholat berjamaah + sesi laporan singkat 20 menit di teras masjid) untuk merayakan + refleksi.
 
 ## Dalil & Sumber (500-700 kata)
-- Kutip 8-10 dalil dari pool yang saya berikan, masing-masing dengan KONTEKS ringkas — ini adalah bibliography lengkap, jadi tampilkan semua atau hampir semua daleel pool (boleh lewatkan 1-2 jika benar-benar tidak relevan dengan tema pekan ini setelah dibaca ulang)
+- Kutip 8-10 dalil dari pool yang saya berikan, masing-masing dengan KONTEKS ringkas — ini adalah bibliography lengkap, jadi tampilkan semua atau hampir semua dalil pool (boleh lewatkan 1-2 jika benar-benar tidak relevan dengan tema pekan ini setelah dibaca ulang)
 - Format heading per dalil: `**{{citation_only}}**` — citation sudah berisi nama korpus dan nomor (mis. "QS. Hud: 85" atau "Riyad as-Salihin 1420"). JANGAN mengulang nama korpus dengan format `**RIYAD_AS_SALIHIN Riyad as-Salihin 1420**`. JANGAN sertakan ref_id `[quran::11:85]`.
 - Format penuh per dalil:
 
@@ -277,7 +276,7 @@ STRUKTUR WAJIB setiap pesan flyer — dua baris marker DULU, baru paragraf:
 ```
 ### Pesan Flyer N — Suara {{kategori}}
 **Headline:** "{{4-6 kata yang impactful, powerful, langsung menyampaikan inti}}"
-**Daleel:** {{citation persis dari daleel pool — mis. "QS. Ar-Rahmaan: 9"}}
+**Dalil:** {{citation persis dari dalil pool — mis. "QS. Ar-Rahmaan: 9"}}
 
 {{paragraf 70-90 kata}}
 ```
@@ -316,21 +315,21 @@ CONTOH JEBAKAN NYATA (jangan tiru):
 
 RULE: setiap headline yang menyebut ibadah/sunnah, baca dengan asumsi pembaca tergesa-gesa dan kemungkinan TIDAK akan baca paragraf di bawah. Kalau headline saja sudah bisa dibaca sebagai "tinggalkan ibadah X demi Y", REWRITE. Pakai konstruksi additive (`juga`, `dan`, `tambah`, `plus`, `serta`), JANGAN oposisi (`bukan`, `tanpa`, `daripada`, `tidak`).
 
-ATURAN DALEEL — paragraf, headline, dan daleel WAJIB membentuk satu thread tematik yang konsisten:
+ATURAN DALIL — paragraf, headline, dan dalil WAJIB membentuk satu thread tematik yang konsisten:
 
-1. Citation HARUS persis cocok dengan salah satu entri di daleel pool yang saya berikan. JANGAN mengarang citation.
+1. Citation HARUS persis cocok dengan salah satu entri di dalil pool yang saya berikan. JANGAN mengarang citation.
 
-2. Daleel-nya WAJIB berbicara langsung tentang topik paragraf-nya. Cek ulang sebelum men-tag: kalau paragraf-nya tentang pinjol, daleel-nya HARUS tentang riba/kezhaliman dalam hutang — BUKAN ayat umum tentang "pemuda" atau "harta" yang kebetulan ada di pool. Kalau paragraf-nya tentang judol, daleel-nya HARUS tentang maysir/qimar — BUKAN ayat tentang "permainan" / "lahw" yang tidak spesifik. Kalau paragraf-nya tentang kekerasan terhadap anak, daleel-nya HARUS tentang hak anak atau ihsan kepada lemah — BUKAN ayat umum tentang keluarga.
+2. Dalil-nya WAJIB berbicara langsung tentang topik paragraf-nya. Cek ulang sebelum men-tag: kalau paragraf-nya tentang pinjol, dalil-nya HARUS tentang riba/kezhaliman dalam hutang — BUKAN ayat umum tentang "pemuda" atau "harta" yang kebetulan ada di pool. Kalau paragraf-nya tentang judol, dalil-nya HARUS tentang maysir/qimar — BUKAN ayat tentang "permainan" / "lahw" yang tidak spesifik. Kalau paragraf-nya tentang kekerasan terhadap anak, dalil-nya HARUS tentang hak anak atau ihsan kepada lemah — BUKAN ayat umum tentang keluarga.
 
-3. Pertanyaan double-check sebelum tag daleel: "Kalau pembaca melihat citation ini DI BAWAH paragraf ini, apakah hubungannya jelas tanpa penjelasan tambahan?" Kalau jawabannya "harus dipaksakan", PILIH daleel lain dari pool, ATAU kosongkan baris `**Daleel:**` untuk paragraf itu.
+3. Pertanyaan double-check sebelum tag dalil: "Kalau pembaca melihat citation ini DI BAWAH paragraf ini, apakah hubungannya jelas tanpa penjelasan tambahan?" Kalau jawabannya "harus dipaksakan", PILIH dalil lain dari pool, ATAU kosongkan baris `**Dalil:**` untuk paragraf itu.
 
-4. Kalau TIDAK ADA satu pun entri di pool yang BENAR-BENAR cocok dengan paragraf, KOSONGKAN baris `**Daleel:**` (jangan dipaksakan dengan daleel yang hanya berbagi satu kata kunci). Flyer tetap valid tanpa tag daleel.
+4. Kalau TIDAK ADA satu pun entri di pool yang BENAR-BENAR cocok dengan paragraf, KOSONGKAN baris `**Dalil:**` (jangan dipaksakan dengan dalil yang hanya berbagi satu kata kunci). Flyer tetap valid tanpa tag dalil.
 
-5. Variasi: usahakan 4-6 flyer pakai daleel yang berbeda kalau pool memungkinkan — tapi PRIORITAS adalah ketepatan tematik, BUKAN distribusi. Lebih baik 2 flyer share daleel yang tepat daripada 4 flyer dengan 4 daleel yang dipaksakan.
+5. Variasi: usahakan 4-6 flyer pakai dalil yang berbeda kalau pool memungkinkan — tapi PRIORITAS adalah ketepatan tematik, BUKAN distribusi. Lebih baik 2 flyer share dalil yang tepat daripada 4 flyer dengan 4 dalil yang dipaksakan.
 
-ATURAN DALEEL untuk Pesan Flyer 5 & 6 (SUNNAH + DOA): citation pada Pesan Flyer 5 (Ajakan Sunnah) dan Pesan Flyer 6 (Doa Pekan Ini) HARUS dipilih dari blok **ADHKAR POOL** yang TERPISAH dari DALEEL POOL (lihat user prompt di bawah). ADHKAR POOL berisi du'a / dzikir yang dapat dibaca langsung — entri yang cocok untuk dijadikan wirid. JANGAN ambil daleel untuk Flyer 5+6 dari DALEEL POOL (yang sifatnya argumentatif-tematik, bukan recitable). Kalau ADHKAR POOL kosong atau tidak ada entri yang cocok untuk satu paragraf, kosongkan baris `**Daleel:**` untuk paragraf itu (jangan diisi dengan citation yang tidak ada di pool).
+ATURAN DALIL untuk Pesan Flyer 5 & 6 (SUNNAH + DOA): citation pada Pesan Flyer 5 (Ajakan Sunnah) dan Pesan Flyer 6 (Doa Pekan Ini) HARUS dipilih dari blok **ADHKAR POOL** yang TERPISAH dari DALIL POOL (lihat user prompt di bawah). ADHKAR POOL berisi du'a / dzikir yang dapat dibaca langsung — entri yang cocok untuk dijadikan wirid. JANGAN ambil dalil untuk Flyer 5+6 dari DALIL POOL (yang sifatnya argumentatif-tematik, bukan recitable). Kalau ADHKAR POOL kosong atau tidak ada entri yang cocok untuk satu paragraf, kosongkan baris `**Dalil:**` untuk paragraf itu (jangan diisi dengan citation yang tidak ada di pool).
 
-ATURAN PANJANG DU'A untuk Pesan Flyer 6: pilih entri ADHKAR POOL yang BENAR-BENAR sebuah du'a/dzikir pendek yang bisa langsung diwirid (rule of thumb: teks Arab < 200 karakter, terjemahan < 280 karakter). JANGAN pilih hadits panjang dengan rantai perawi ("ḥaddatsanā fulān… 'an fulān…") atau narasi cerita panjang sebagai "du'a" — itu hadits historis, bukan du'a recitable. Kalau satu-satunya pilihan di pool adalah riwayat panjang, lebih baik kosongkan `**Daleel:**` Flyer 6 daripada memaksa entri yang tidak cocok untuk format flyer 1080×1080.
+ATURAN PANJANG DU'A untuk Pesan Flyer 6: pilih entri ADHKAR POOL yang BENAR-BENAR sebuah du'a/dzikir pendek yang bisa langsung diwirid (rule of thumb: teks Arab < 200 karakter, terjemahan < 280 karakter). JANGAN pilih hadits panjang dengan rantai perawi ("ḥaddatsanā fulān… 'an fulān…") atau narasi cerita panjang sebagai "du'a" — itu hadits historis, bukan du'a recitable. Kalau satu-satunya pilihan di pool adalah riwayat panjang, lebih baik kosongkan `**Dalil:**` Flyer 6 daripada memaksa entri yang tidak cocok untuk format flyer 1080×1080.
 
 LARANGAN MUTLAK pada keempat paragraf:
 - JANGAN tulis "mari kita tutup khutbah ini" / "khutbah pertama" / "khutbah ini"
@@ -364,7 +363,7 @@ Sudut: SATU du'a otentik yang relevan dengan tema pekan ini — pembaca bisa lan
 3. **Citation 1 baris**: sumber persis (mis. "HR. Bukhari & Muslim", "QS. Al-Anbiya: 87", "Hisnul Muslim — Dzikir Pagi").
 4. **Ajakan mikro** (1 kalimat): "Recite setiap pagi pekan ini" atau "Bawa dalam sholat Tahajjud tiga hari berturut-turut" — sesuatu yang konkret dan ringan.
 
-CRITICAL: du'a harus OTENTIK dengan sumber jelas. JANGAN mengarang du'a. Kalau citation muncul di daleel pool yang saya berikan, gunakan citation yang persis cocok di marker `**Daleel:**`. Kalau bukan dari pool (mis. adhkar Hisnul Muslim), tetap tulis citation lengkap di paragraf — marker `**Daleel:**` boleh kosongkan ATAU pakai citation pool yang paling tematik. Du'a dalam Arab WAJIB berharakat lengkap (fathah, kasrah, dhammah, sukūn, syaddah, mad).
+CRITICAL: du'a harus OTENTIK dengan sumber jelas. JANGAN mengarang du'a. Kalau citation muncul di dalil pool yang saya berikan, gunakan citation yang persis cocok di marker `**Dalil:**`. Kalau bukan dari pool (mis. adhkar Hisnul Muslim), tetap tulis citation lengkap di paragraf — marker `**Dalil:**` boleh kosongkan ATAU pakai citation pool yang paling tematik. Du'a dalam Arab WAJIB berharakat lengkap (fathah, kasrah, dhammah, sukūn, syaddah, mad).
 
 ATURAN UMUM untuk SEMUA 6 pesan flyer:
 - SOLUTIF, bukan provokatif. Setiap pesan harus berisi (a) konteks ringkas masalah, (b) prinsip Islami yang relevan, (c) langkah konkret individu, (d) langkah konkret komunitas/lingkungan. JANGAN tutup hanya dengan pertanyaan retoris tanpa arahan — pembaca harus tahu APA yang bisa dia kerjakan hari ini.
@@ -1447,9 +1446,11 @@ async def generate_summary(
         daleel = rerank_daleel(retrieval_query, candidates, top_n=18)
         # Fill `translation_id` for hadith entries (Qdrant only has EN
         # for the hadith corpora). Without this the DaleelChips below
-        # the ID-locale brief render English. Idempotent on Quran-only
-        # lists. ~$0.0001 per brief.
-        daleel = translate_daleel_to_id(daleel)
+        # the ID-locale brief render English. Per-hadith translation is
+        # cached in `hadith_translations_id` so re-runs are free SELECTs.
+        from api.services.hadith_translation import enrich_daleel_translations
+
+        daleel = await enrich_daleel_translations(session, daleel)
 
         # Adhkar pool — du'a-biased retrieval over the same kitab
         # corpus, fed to Pesan Flyer 5 (Sunnah call) + Flyer 6 (Du'a
@@ -1463,7 +1464,7 @@ async def generate_summary(
             retrieval_query, limit=15, per_corpus=4
         )
         adhkar = rerank_dua(retrieval_query, dua_candidates, top_n=6)
-        adhkar = translate_daleel_to_id(adhkar)
+        adhkar = await enrich_daleel_translations(session, adhkar)
         log.info(
             "insights_summary.retrieved_daleel",
             segment=segment,

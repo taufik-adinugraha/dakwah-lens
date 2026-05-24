@@ -1,7 +1,7 @@
 import "server-only";
 import { createHash, randomBytes } from "crypto";
 
-import { and, desc, eq, gte, or, sql } from "drizzle-orm";
+import { and, desc, eq, gte, isNull, or, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { db, schema } from "@/db";
@@ -73,8 +73,18 @@ export async function GET(
   const page = Math.max(1, parseInt(url.searchParams.get("page") || "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
-  // Pinned rows first (admin-promoted), then newest-first. Page 1
-  // always shows pins; subsequent pages only contain non-pinned.
+  // Top-level rows only (parent_id IS NULL); replies are fetched
+  // lazily via the /replies sub-endpoint when the user expands a
+  // thread. Pinned rows first, then newest-first.
+  //
+  // `replyCount` is computed via a correlated count subquery so the
+  // listing returns everything the client needs in a single round-
+  // trip — keeps the room scrollable without an N+1 fetch storm.
+  const replyCountSql = sql<number>`(
+    SELECT COUNT(*)::int FROM ${schema.mahasiswaComments} AS r
+    WHERE r.parent_id = ${schema.mahasiswaComments.id}
+      AND r.status = 'approved'
+  )`;
   const rows = await db
     .select({
       id: schema.mahasiswaComments.id,
@@ -82,12 +92,15 @@ export async function GET(
       body: schema.mahasiswaComments.body,
       createdAt: schema.mahasiswaComments.createdAt,
       pinned: schema.mahasiswaComments.pinned,
+      editedAt: schema.mahasiswaComments.editedAt,
+      replyCount: replyCountSql,
     })
     .from(schema.mahasiswaComments)
     .where(
       and(
         eq(schema.mahasiswaComments.briefingSlug, id),
         eq(schema.mahasiswaComments.status, "approved"),
+        isNull(schema.mahasiswaComments.parentId),
       ),
     )
     .orderBy(
@@ -208,6 +221,13 @@ export async function POST(
   // `homepage` etc) so password managers and LinkedIn-style
   // autofills don't populate it for real users.
   const honeypot = typeof obj.dl_url_check === "string" ? obj.dl_url_check : "";
+  // Optional reply target. NULL/missing = top-level comment.
+  // Validated below: parent must exist in the same room, be
+  // status='approved', and itself be a top-level comment (single-
+  // level threading — no reply-to-reply chains).
+  const rawParentId =
+    typeof obj.parent_id === "string" ? obj.parent_id.trim() : "";
+  const parentId = rawParentId || null;
 
   // Email opt-in fields (both optional). Only honored when:
   //   - `notify_me` is truthy
@@ -346,6 +366,33 @@ export async function POST(
     }
   }
 
+  // 10b. Reply target validation. Parent must exist, live in the
+  //      SAME room, be `status='approved'`, and itself be a
+  //      top-level comment. Anything else → 400 'invalid' so we
+  //      don't silently accept a malformed reply.
+  let resolvedParentId: string | null = null;
+  if (parentId) {
+    const [parentRow] = await db
+      .select({
+        id: schema.mahasiswaComments.id,
+        briefingSlug: schema.mahasiswaComments.briefingSlug,
+        status: schema.mahasiswaComments.status,
+        parentId: schema.mahasiswaComments.parentId,
+      })
+      .from(schema.mahasiswaComments)
+      .where(eq(schema.mahasiswaComments.id, parentId))
+      .limit(1);
+    if (
+      !parentRow ||
+      parentRow.briefingSlug !== id ||
+      parentRow.status !== "approved" ||
+      parentRow.parentId !== null
+    ) {
+      return NextResponse.json({ ok: false, error: "invalid" }, { status: 400 });
+    }
+    resolvedParentId = parentRow.id;
+  }
+
   // 11. Moderate. Display name also goes through the same blocklist
   //     so a clean body + spammy name still gets flagged.
   const nameVerdict = await moderateComment(displayName, { useLlm: false });
@@ -380,6 +427,7 @@ export async function POST(
       visitorTokenHash,
       status,
       blockReason,
+      parentId: resolvedParentId,
     })
     .returning({ id: schema.mahasiswaComments.id });
 
@@ -433,9 +481,16 @@ export async function POST(
   // Soft-block: from the writer's POV, we silently accept and tell
   // them it's pending review. This is intentional — telling them
   // "you tripped the gambling filter" teaches the bypass.
+  //
+  // `id` is included on approved inserts so the client can stash it
+  // as "I own this row" and offer in-place edit while the visitor
+  // cookie is still good. Blocked inserts return no id (the row is
+  // invisible to the poster).
   const res = NextResponse.json({
     ok: true,
     status: status === "approved" ? "approved" : "pending",
+    id: status === "approved" ? insertedComment?.id ?? null : null,
+    parentId: resolvedParentId,
     subscribed: subscriberEmail !== null && status === "approved",
   });
   if (mintedThisRequest) {
