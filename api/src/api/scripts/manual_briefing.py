@@ -128,8 +128,14 @@ async def _prepare_context(
             )
 
         retrieval_query = _build_retrieval_query(stats, segment)
-        candidates = retrieve_daleel(retrieval_query, limit=15, per_corpus=4)
-        daleel = rerank_daleel(retrieval_query, candidates, top_n=10)
+        # Same widened-pool params as the auto pipeline
+        # (generate_summary in insights_summary.py). limit=28
+        # candidates + top_n=18 reranked gives the brief LLM a
+        # genuinely thematic pool to pick from — 6 sub-sections + 6
+        # Pesan Flyer slots = 12 needs, so a pool of 18 leaves real
+        # choice without forcing weak fits.
+        candidates = retrieve_daleel(retrieval_query, limit=28, per_corpus=6)
+        daleel = rerank_daleel(retrieval_query, candidates, top_n=18)
         daleel = translate_daleel_to_id(daleel)
 
         # Du'a / dzikir retrieval — same theme, different query shape,
@@ -286,12 +292,50 @@ async def cmd_save(segment: str, markdown_path: str) -> None:
         if input().strip().lower() != "y":
             raise SystemExit("Aborted.")
 
+    # Run validation FIRST so we can autofix any high-confidence
+    # daleel mismatches inline before persisting. The autofix
+    # rewrites the markdown's **Daleel:** markers for paragraphs
+    # whose tagged citation doesn't address the topic (verdict =
+    # MISMATCH from Flash-Lite), swapping in the suggester's
+    # better pool entry. Weak verdicts stay as warnings — they're
+    # subjective and shouldn't be auto-applied.
+    from api.services.validate_briefing import (
+        apply_daleel_autofixes,
+        format_autofixes_for_stderr,
+        format_warnings_for_stderr,
+        validate_briefing,
+    )
+
+    final_md = summary_md
+    autofix_warnings: list[dict] = []
+    applied_swaps: list[dict[str, str]] = []
+    try:
+        warnings = validate_briefing(
+            summary_md, daleel_pool=daleel, adhkar_pool=adhkar
+        )
+        final_md, applied_swaps = apply_daleel_autofixes(
+            summary_md, warnings, include_weak=False
+        )
+        if applied_swaps:
+            # Re-validate against the rewritten markdown so the final
+            # warning report reflects the post-fix state (not the
+            # pre-fix one). Otherwise the operator would see "fix X"
+            # warnings that have already been applied.
+            autofix_warnings = validate_briefing(
+                final_md, daleel_pool=daleel, adhkar_pool=adhkar
+            )
+        else:
+            autofix_warnings = warnings
+    except Exception as exc:
+        sys.stderr.write(f"⚠ Validation/autofix pass failed (non-fatal): {exc}\n")
+        autofix_warnings = []
+
     async with SessionLocal() as session:
         row = InsightsSummary(
             generated_at=datetime.now(UTC),
             period_start=datetime.fromisoformat(stats["period_start"]),
             period_end=datetime.fromisoformat(stats["period_end"]),
-            summary_md=summary_md,
+            summary_md=final_md,
             summary_md_en=None,
             headline_stats=stats,
             model=MODEL_TAG,
@@ -309,35 +353,120 @@ async def cmd_save(segment: str, markdown_path: str) -> None:
             f"✓ Briefing saved for segment '{seg_key}'.\n"
             f"  model={MODEL_TAG} (manual)\n"
             f"  daleel_refs={len(daleel)} · adhkar_refs={len(adhkar)}\n"
-            f"  body={len(summary_md):,} chars\n"
-            f"  cost=$0.00\n",
+            f"  body={len(final_md):,} chars"
+            + (
+                f" (autofix rewrote {len(applied_swaps)} daleel "
+                f"citation{'s' if len(applied_swaps) != 1 else ''})"
+                if applied_swaps
+                else ""
+            )
+            + "\n  cost=$0.00\n",
         )
 
-    # Post-save validation — surface mismatched daleel + forbidden
-    # phrases (e.g., "Kemenag style") so the operator can re-prompt or
-    # hand-edit before publishing. Best-effort: validation errors are
-    # logged but never block the save.
-    try:
-        from api.services.validate_briefing import (
-            format_warnings_for_stderr,
-            validate_briefing,
-        )
-
-        warnings = validate_briefing(
-            summary_md, daleel_pool=daleel, adhkar_pool=adhkar
-        )
-        report = format_warnings_for_stderr(warnings)
-        if report:
-            sys.stderr.write("\n" + report + "\n")
-        else:
-            sys.stderr.write("✓ Validation: no issues found.\n")
-    except Exception as exc:
-        sys.stderr.write(f"⚠ Validation pass failed (non-fatal): {exc}\n")
+    # Report autofixes + any remaining warnings.
+    autofix_report = format_autofixes_for_stderr(applied_swaps)
+    if autofix_report:
+        sys.stderr.write(autofix_report + "\n")
+    warning_report = format_warnings_for_stderr(autofix_warnings)
+    if warning_report:
+        sys.stderr.write("\n" + warning_report + "\n")
+    elif not applied_swaps:
+        sys.stderr.write("✓ Validation: no issues found.\n")
+    else:
+        sys.stderr.write("✓ Validation: clean after autofix.\n")
 
 
 # ──────────────────────────────────────────────────────────────────
 # Subcommand: list
 # ──────────────────────────────────────────────────────────────────
+
+
+async def cmd_autofix(segment: str) -> None:
+    """Retroactive autofix on the latest briefing for a segment.
+
+    Loads the most-recent `insights_summaries` row, runs the
+    validator, applies high-confidence daleel autofixes inline, and
+    UPDATEs the row. Useful for cleaning up briefings that were
+    saved BEFORE the autofix pipeline shipped (or whenever you want
+    a fresh validation pass against the current rubric).
+    """
+    from sqlalchemy import desc, select, update
+
+    from api.services.validate_briefing import (
+        apply_daleel_autofixes,
+        format_autofixes_for_stderr,
+        format_warnings_for_stderr,
+        validate_briefing,
+    )
+
+    seg = _segment_arg(segment)
+    seg_key = _segment_key(seg)
+
+    async with SessionLocal() as session:
+        result = await session.execute(
+            select(InsightsSummary)
+            .where(
+                InsightsSummary.segment.is_(None)
+                if seg is None
+                else InsightsSummary.segment == seg
+            )
+            .order_by(desc(InsightsSummary.generated_at))
+            .limit(1)
+        )
+        row = result.scalar_one_or_none()
+        if row is None:
+            raise SystemExit(f"No briefing found for segment '{seg_key}'.")
+
+        original_md = row.summary_md
+        daleel = row.daleel_refs or []
+        adhkar = row.adhkar_refs or []
+
+        sys.stderr.write(
+            f"Loaded latest briefing for '{seg_key}'\n"
+            f"  generated_at={row.generated_at.isoformat()}\n"
+            f"  body={len(original_md):,} chars\n"
+            f"  daleel_refs={len(daleel)} · adhkar_refs={len(adhkar)}\n\n"
+        )
+
+        warnings = validate_briefing(
+            original_md, daleel_pool=daleel, adhkar_pool=adhkar
+        )
+        new_md, applied = apply_daleel_autofixes(
+            original_md, warnings, include_weak=False
+        )
+        if not applied:
+            sys.stderr.write(
+                "No autofixable mismatches found. Validator output:\n\n"
+                + (format_warnings_for_stderr(warnings) or "✓ Clean.\n")
+            )
+            return
+
+        # Re-validate the rewritten markdown.
+        post_warnings = validate_briefing(
+            new_md, daleel_pool=daleel, adhkar_pool=adhkar
+        )
+
+        # Persist the rewrite.
+        await session.execute(
+            update(InsightsSummary)
+            .where(InsightsSummary.id == row.id)
+            .values(summary_md=new_md)
+        )
+        await session.commit()
+
+        sys.stderr.write(
+            f"✓ Updated briefing for '{seg_key}' "
+            f"({len(applied)} citation"
+            f"{'s' if len(applied) != 1 else ''} rewritten)\n"
+        )
+        sys.stderr.write(format_autofixes_for_stderr(applied) + "\n")
+        if post_warnings:
+            sys.stderr.write(
+                "Remaining warnings after autofix:\n\n"
+                + format_warnings_for_stderr(post_warnings)
+            )
+        else:
+            sys.stderr.write("✓ Validation: clean after autofix.\n")
 
 
 async def cmd_list() -> None:
@@ -429,6 +558,19 @@ def main() -> None:
 
     sub.add_parser("list", help="Show the most-recent briefing per segment.")
 
+    p_autofix = sub.add_parser(
+        "autofix",
+        help=(
+            "Re-validate the latest briefing for SEGMENT and rewrite any "
+            "high-confidence daleel mismatches inline. Persists the updated "
+            "markdown back to the same row."
+        ),
+    )
+    p_autofix.add_argument(
+        "segment",
+        help=f"Segment name. One of: {', '.join(sorted(VALID_SEGMENTS))}",
+    )
+
     args = parser.parse_args()
 
     if args.cmd == "dump":
@@ -439,6 +581,9 @@ def main() -> None:
         asyncio.run(cmd_save(args.segment, args.markdown_file))
     elif args.cmd == "list":
         asyncio.run(cmd_list())
+    elif args.cmd == "autofix":
+        _validate_segment(args.segment)
+        asyncio.run(cmd_autofix(args.segment))
 
 
 if __name__ == "__main__":

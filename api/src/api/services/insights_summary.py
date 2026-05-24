@@ -1492,17 +1492,36 @@ async def generate_summary(
             return None
         summary_md, tokens_in_id, tokens_out_id, cost_id = id_result
 
-        # Post-generation validation — flag forbidden phrases (e.g.
-        # "Kemenag style") + flyer paragraphs whose tagged daleel
-        # doesn't actually fit the paragraph theme. Logged as
-        # structured warnings the operator can review via the admin
-        # console; never blocks the save.
+        # Post-generation validation + autofix — flag forbidden
+        # phrases (e.g. "Kemenag style") and flyer-daleel mismatches.
+        # For high-confidence MISMATCH verdicts with a suggested
+        # replacement, rewrite the `**Daleel:**` marker inline before
+        # persisting. Weak verdicts stay as warnings. Best-effort:
+        # any failure inside this block is logged and never blocks
+        # the save.
         try:
-            from api.services.validate_briefing import validate_briefing
+            from api.services.validate_briefing import (
+                apply_daleel_autofixes,
+                validate_briefing,
+            )
 
             briefing_warnings = validate_briefing(
                 summary_md, daleel_pool=daleel, adhkar_pool=adhkar
             )
+            summary_md, applied_swaps = apply_daleel_autofixes(
+                summary_md, briefing_warnings, include_weak=False
+            )
+            if applied_swaps:
+                # Re-validate the rewritten markdown so the persisted
+                # warnings reflect post-fix state. Cheap (Flash-Lite).
+                briefing_warnings = validate_briefing(
+                    summary_md, daleel_pool=daleel, adhkar_pool=adhkar
+                )
+                log.info(
+                    "insights_summary.autofix_applied",
+                    segment=segment,
+                    swaps=applied_swaps,
+                )
             if briefing_warnings:
                 log.warning(
                     "insights_summary.validation_warnings",

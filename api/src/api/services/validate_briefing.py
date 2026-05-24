@@ -29,8 +29,13 @@ from api.services.usage import gemini_output_tokens, record_usage
 log = structlog.get_logger(__name__)
 
 
-class BriefingWarning(TypedDict):
-    """One issue surfaced by `validate_briefing`."""
+class BriefingWarning(TypedDict, total=False):
+    """One issue surfaced by `validate_briefing`.
+
+    Structured fields (`flyer_index` / `current_citation` /
+    `suggested_citation`) are populated for daleel-fit warnings so
+    callers can autofix without re-parsing the message string.
+    """
 
     kind: Literal[
         "forbidden_phrase",
@@ -42,6 +47,15 @@ class BriefingWarning(TypedDict):
     severity: Literal["low", "medium", "high"]
     where: str  # human-readable locator, e.g. "Pesan Flyer 2"
     message: str
+
+    # ── Optional structured payload ──────────────────────────────
+    # Present on daleel_mismatch / daleel_weak only.
+    flyer_index: int  # 0-based — Pesan Flyer N → idx N-1
+    current_citation: str
+    # Present when the re-retrieval suggester returned a better pool
+    # entry. Absent if no pool entry fits — operator should leave the
+    # marker empty.
+    suggested_citation: str
 
 
 # ──────────────────────────────────────────────────────────────────
@@ -442,43 +456,165 @@ def check_flyer_daleel_alignment(
         if verdict in ("weak", "mismatch"):
             # Focused re-retrieval — ask Flash-Lite to pick the best
             # pool entry for THIS paragraph specifically. Surfaced
-            # to the operator as a concrete replacement suggestion.
+            # to the operator as a concrete replacement suggestion
+            # AND as structured fields (current_citation /
+            # suggested_citation / flyer_index) so apply_daleel_autofixes()
+            # can rewrite the markdown without re-parsing the message.
             replacement = _suggest_replacement_daleel(para_body, pool)
+            has_real_replacement = bool(replacement) and replacement != citation
             suggestion = (
                 f" Suggested replacement from pool: '{replacement}'."
-                if replacement and replacement != citation
+                if has_real_replacement
                 else " Leave the **Daleel:** marker empty if no pool entry fits."
             )
-            if verdict == "weak":
-                warnings.append(
-                    {
-                        "kind": "daleel_weak",
-                        "severity": "medium",
-                        "where": flyer_label,
-                        "message": (
-                            f"daleel '{citation}' weakly fits."
-                            + suggestion
-                        ),
-                    }
+            warning: BriefingWarning = {
+                "kind": "daleel_weak" if verdict == "weak" else "daleel_mismatch",
+                "severity": "medium" if verdict == "weak" else "high",
+                "where": flyer_label,
+                "message": (
+                    f"daleel '{citation}' weakly fits."
+                    if verdict == "weak"
+                    else (
+                        f"daleel '{citation}' does NOT match "
+                        "paragraph theme."
+                    )
                 )
-            else:
-                warnings.append(
-                    {
-                        "kind": "daleel_mismatch",
-                        "severity": "high",
-                        "where": flyer_label,
-                        "message": (
-                            f"daleel '{citation}' does NOT match "
-                            "paragraph theme." + suggestion
-                        ),
-                    }
-                )
+                + suggestion,
+                "flyer_index": idx,
+                "current_citation": citation,
+            }
+            if has_real_replacement and replacement:
+                warning["suggested_citation"] = replacement
+            warnings.append(warning)
     return warnings
 
 
 # ──────────────────────────────────────────────────────────────────
 # Aggregator — single entry point
 # ──────────────────────────────────────────────────────────────────
+
+
+# ──────────────────────────────────────────────────────────────────
+# Autofix — apply structured warnings back to the markdown
+# ──────────────────────────────────────────────────────────────────
+
+
+def apply_daleel_autofixes(
+    markdown: str,
+    warnings: list[BriefingWarning],
+    *,
+    include_weak: bool = False,
+) -> tuple[str, list[dict[str, str]]]:
+    """Rewrite `**Daleel:**` markers on flyer paragraphs whose
+    validator warning carries a `suggested_citation`.
+
+    Mode:
+      - default (`include_weak=False`): only autofixes
+        `daleel_mismatch` (high severity). The mismatch verdict from
+        Flash-Lite is a confident "this doesn't address the topic";
+        swapping in the pool's best alternative is almost always
+        net-positive.
+      - `include_weak=True`: also rewrites `daleel_weak` cases. Weak
+        verdicts are subjective ("terkait jauh tapi terasa
+        dipaksakan"), so this is off by default — callers can opt
+        in for aggressive cleanup.
+
+    Returns the rewritten markdown + a list of applied swaps
+    (`[{"where": "Pesan Flyer 2", "from": "X", "to": "Y"}]`) for
+    audit logging. Empty list means nothing changed.
+
+    Defensive: only rewrites a marker line that contains the exact
+    `current_citation` string. If the markdown drifted (operator
+    hand-edited between validate and autofix), the swap is skipped
+    and absent from the returned list.
+    """
+    target_kinds: set[str] = (
+        {"daleel_mismatch", "daleel_weak"} if include_weak else {"daleel_mismatch"}
+    )
+
+    # Group warnings by flyer_index so we only re-parse blocks once.
+    by_idx: dict[int, BriefingWarning] = {}
+    for w in warnings:
+        if w.get("kind") not in target_kinds:
+            continue
+        if "suggested_citation" not in w or "current_citation" not in w:
+            continue
+        if "flyer_index" not in w:
+            continue
+        # If multiple warnings target the same flyer (shouldn't happen,
+        # but be defensive), prefer mismatch over weak.
+        existing = by_idx.get(w["flyer_index"])
+        if existing and existing.get("kind") == "daleel_mismatch":
+            continue
+        by_idx[w["flyer_index"]] = w
+
+    if not by_idx:
+        return markdown, []
+
+    # Locate flyer blocks via the same parser the alignment check uses.
+    blocks = _parse_flyer_blocks(markdown)
+    if not blocks:
+        return markdown, []
+
+    md = markdown
+    applied: list[dict[str, str]] = []
+    for idx, w in by_idx.items():
+        if idx < 0 or idx >= len(blocks):
+            continue
+        current = w["current_citation"]
+        replacement = w["suggested_citation"]
+
+        # Find the **Daleel:** line that appears INSIDE this specific
+        # flyer's body. We do this by anchoring to the flyer's H3
+        # heading line + searching only within the block range.
+        block_body = blocks[idx]["body"]
+        # The current_citation may have been normalized — try a few
+        # exact-shape variants. Most permissive: case-insensitive,
+        # whitespace-collapsed.
+        daleel_re = re.compile(
+            r"(\*\*Daleel:\*\*\s*)" + re.escape(current),
+            flags=re.IGNORECASE,
+        )
+        new_block_body, n = daleel_re.subn(
+            # Default-arg binding so this lambda captures the current
+            # loop value rather than late-binding by name (B023).
+            lambda m, _r=replacement: m.group(1) + _r,
+            block_body,
+            count=1,
+        )
+        if n == 0:
+            # Citation drift since validate ran — skip.
+            continue
+
+        # Splice the new block body back into the full markdown. We
+        # locate by the block's `### Pesan Flyer N — ...` heading
+        # + the original body string (unambiguous within the doc).
+        if block_body not in md:
+            continue  # paranoid guard against unicode-normalize drift
+        md = md.replace(block_body, new_block_body, 1)
+        applied.append(
+            {
+                "where": w.get("where", f"Pesan Flyer {idx + 1}"),
+                "from": current,
+                "to": replacement,
+            }
+        )
+
+    return md, applied
+
+
+def format_autofixes_for_stderr(applied: list[dict[str, str]]) -> str:
+    """Pretty-print applied autofixes for the manual_briefing.py save
+    flow. Returns "" when nothing was applied."""
+    if not applied:
+        return ""
+    lines = [
+        f"\n✎ {len(applied)} daleel autofix(es) applied — citations rewritten:\n",
+    ]
+    for a in applied:
+        lines.append(f"  · [{a['where']}] '{a['from']}' → '{a['to']}'")
+    lines.append("")
+    return "\n".join(lines)
 
 
 def validate_briefing(
