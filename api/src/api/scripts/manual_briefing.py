@@ -292,43 +292,28 @@ async def cmd_save(segment: str, markdown_path: str) -> None:
         if input().strip().lower() != "y":
             raise SystemExit("Aborted.")
 
-    # Run validation FIRST so we can autofix any high-confidence
-    # daleel mismatches inline before persisting. The autofix
-    # rewrites the markdown's **Daleel:** markers for paragraphs
-    # whose tagged citation doesn't address the topic (verdict =
-    # MISMATCH from Flash-Lite), swapping in the suggester's
-    # better pool entry. Weak verdicts stay as warnings — they're
-    # subjective and shouldn't be auto-applied.
+    # Lightweight validation only — regex/heuristic checks (forbidden
+    # phrases). No API-LLM calls out: paragraph↔daleel fit + advice
+    # sanity + replacement suggestion are content-judgment tasks the
+    # operator's Claude session does in-chat, not via a Gemini call
+    # from this script. Per the project rule "no API LLM for manual
+    # content judgment".
     from api.services.validate_briefing import (
-        apply_daleel_autofixes,
-        format_autofixes_for_stderr,
         format_warnings_for_stderr,
         validate_briefing,
     )
 
     final_md = summary_md
-    autofix_warnings: list[dict] = []
-    applied_swaps: list[dict[str, str]] = []
+    heuristic_warnings: list[dict] = []
     try:
-        warnings = validate_briefing(
-            summary_md, daleel_pool=daleel, adhkar_pool=adhkar
+        heuristic_warnings = validate_briefing(
+            summary_md,
+            daleel_pool=daleel,
+            adhkar_pool=adhkar,
+            llm_judgments=False,
         )
-        final_md, applied_swaps = apply_daleel_autofixes(
-            summary_md, warnings, include_weak=False
-        )
-        if applied_swaps:
-            # Re-validate against the rewritten markdown so the final
-            # warning report reflects the post-fix state (not the
-            # pre-fix one). Otherwise the operator would see "fix X"
-            # warnings that have already been applied.
-            autofix_warnings = validate_briefing(
-                final_md, daleel_pool=daleel, adhkar_pool=adhkar
-            )
-        else:
-            autofix_warnings = warnings
     except Exception as exc:
-        sys.stderr.write(f"⚠ Validation/autofix pass failed (non-fatal): {exc}\n")
-        autofix_warnings = []
+        sys.stderr.write(f"⚠ Validation pass failed (non-fatal): {exc}\n")
 
     async with SessionLocal() as session:
         row = InsightsSummary(
@@ -353,27 +338,22 @@ async def cmd_save(segment: str, markdown_path: str) -> None:
             f"✓ Briefing saved for segment '{seg_key}'.\n"
             f"  model={MODEL_TAG} (manual)\n"
             f"  daleel_refs={len(daleel)} · adhkar_refs={len(adhkar)}\n"
-            f"  body={len(final_md):,} chars"
-            + (
-                f" (autofix rewrote {len(applied_swaps)} daleel "
-                f"citation{'s' if len(applied_swaps) != 1 else ''})"
-                if applied_swaps
-                else ""
-            )
-            + "\n  cost=$0.00\n",
+            f"  body={len(final_md):,} chars\n"
+            f"  cost=$0.00\n",
         )
 
-    # Report autofixes + any remaining warnings.
-    autofix_report = format_autofixes_for_stderr(applied_swaps)
-    if autofix_report:
-        sys.stderr.write(autofix_report + "\n")
-    warning_report = format_warnings_for_stderr(autofix_warnings)
+    # Report heuristic warnings. Paragraph↔daleel fit + advice sanity
+    # are NOT checked here on purpose — the operator runs that
+    # judgment in-chat via Claude.
+    warning_report = format_warnings_for_stderr(heuristic_warnings)
     if warning_report:
         sys.stderr.write("\n" + warning_report + "\n")
-    elif not applied_swaps:
-        sys.stderr.write("✓ Validation: no issues found.\n")
     else:
-        sys.stderr.write("✓ Validation: clean after autofix.\n")
+        sys.stderr.write(
+            "✓ Heuristic validation: no forbidden phrases.\n"
+            "  (Paragraph↔daleel fit + advice sanity are reviewed "
+            "in-chat by the operator, not by this script.)\n",
+        )
 
 
 # ──────────────────────────────────────────────────────────────────
@@ -381,23 +361,77 @@ async def cmd_save(segment: str, markdown_path: str) -> None:
 # ──────────────────────────────────────────────────────────────────
 
 
-async def cmd_autofix(segment: str) -> None:
-    """Retroactive autofix on the latest briefing for a segment.
+async def cmd_apply_swaps(segment: str, swaps_file: str | None) -> None:
+    """Apply a list of daleel-citation swaps to the latest briefing.
 
-    Loads the most-recent `insights_summaries` row, runs the
-    validator, applies high-confidence daleel autofixes inline, and
-    UPDATEs the row. Useful for cleaning up briefings that were
-    saved BEFORE the autofix pipeline shipped (or whenever you want
-    a fresh validation pass against the current rubric).
+    The swap list is operator-authored — typically copy-pasted from
+    Claude-in-chat after the operator reviews the briefing's
+    paragraph↔daleel fit. This command does the string substitution
+    and DB UPDATE; it never calls an API LLM. Per the project rule
+    "no API-LLM for manual content judgment", the suggester step is
+    done in-chat, not from this script.
+
+    Swap JSON shape (read from `swaps_file` or stdin):
+      [
+        {"flyer_index": 1, "from": "Riyad as-Salihin 951",
+         "to": "QS. Al-Hajj: 30"},
+        ...
+      ]
+    `flyer_index` is 0-based — Pesan Flyer N → index N-1.
     """
     from sqlalchemy import desc, select, update
 
     from api.services.validate_briefing import (
+        BriefingWarning,
         apply_daleel_autofixes,
         format_autofixes_for_stderr,
-        format_warnings_for_stderr,
-        validate_briefing,
     )
+
+    # Read swaps JSON.
+    if swaps_file and swaps_file != "-":
+        raw = Path(swaps_file).read_text(encoding="utf-8")
+    else:
+        raw = sys.stdin.read()
+    try:
+        swaps = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise SystemExit(f"Invalid swap JSON: {exc}") from exc
+    if not isinstance(swaps, list) or not swaps:
+        raise SystemExit(
+            "Swap JSON must be a non-empty array of "
+            '{"flyer_index": N, "from": "<citation>", "to": "<citation>"}'
+        )
+
+    # Convert to the BriefingWarning shape `apply_daleel_autofixes`
+    # consumes — same string-substitution code path the auto pipeline
+    # uses. We tag each swap as a daleel_mismatch so the default
+    # include_weak=False still applies them.
+    synthetic_warnings: list[BriefingWarning] = []
+    for s in swaps:
+        if not isinstance(s, dict):
+            raise SystemExit(f"Each swap must be an object, got: {s!r}")
+        idx = s.get("flyer_index")
+        current = s.get("from")
+        replacement = s.get("to")
+        if (
+            not isinstance(idx, int)
+            or not isinstance(current, str)
+            or not isinstance(replacement, str)
+        ):
+            raise SystemExit(
+                f"Each swap needs {{flyer_index: int, from: str, to: str}}: {s!r}"
+            )
+        synthetic_warnings.append(
+            {
+                "kind": "daleel_mismatch",
+                "severity": "high",
+                "where": f"Pesan Flyer {idx + 1}",
+                "message": "operator-applied swap",
+                "flyer_index": idx,
+                "current_citation": current,
+                "suggested_citation": replacement,
+            }
+        )
 
     seg = _segment_arg(segment)
     seg_key = _segment_key(seg)
@@ -418,35 +452,28 @@ async def cmd_autofix(segment: str) -> None:
             raise SystemExit(f"No briefing found for segment '{seg_key}'.")
 
         original_md = row.summary_md
-        daleel = row.daleel_refs or []
-        adhkar = row.adhkar_refs or []
-
         sys.stderr.write(
             f"Loaded latest briefing for '{seg_key}'\n"
             f"  generated_at={row.generated_at.isoformat()}\n"
             f"  body={len(original_md):,} chars\n"
-            f"  daleel_refs={len(daleel)} · adhkar_refs={len(adhkar)}\n\n"
+            f"  swaps requested: {len(swaps)}\n\n"
         )
 
-        warnings = validate_briefing(
-            original_md, daleel_pool=daleel, adhkar_pool=adhkar
-        )
         new_md, applied = apply_daleel_autofixes(
-            original_md, warnings, include_weak=False
+            original_md, synthetic_warnings, include_weak=False
         )
+        skipped = [s for s in swaps if not any(
+            a["from"] == s["from"] and a["to"] == s["to"] for a in applied
+        )]
+
         if not applied:
             sys.stderr.write(
-                "No autofixable mismatches found. Validator output:\n\n"
-                + (format_warnings_for_stderr(warnings) or "✓ Clean.\n")
+                "⚠ No swaps applied — none of the `from` citations "
+                "matched the markdown. Possible drift: re-check the slug "
+                "and flyer_index, or the briefing may have been edited.\n"
             )
             return
 
-        # Re-validate the rewritten markdown.
-        post_warnings = validate_briefing(
-            new_md, daleel_pool=daleel, adhkar_pool=adhkar
-        )
-
-        # Persist the rewrite.
         await session.execute(
             update(InsightsSummary)
             .where(InsightsSummary.id == row.id)
@@ -460,13 +487,16 @@ async def cmd_autofix(segment: str) -> None:
             f"{'s' if len(applied) != 1 else ''} rewritten)\n"
         )
         sys.stderr.write(format_autofixes_for_stderr(applied) + "\n")
-        if post_warnings:
+        if skipped:
             sys.stderr.write(
-                "Remaining warnings after autofix:\n\n"
-                + format_warnings_for_stderr(post_warnings)
+                f"⚠ {len(skipped)} swap(s) skipped (citation drift — not "
+                "found in markdown):\n",
             )
-        else:
-            sys.stderr.write("✓ Validation: clean after autofix.\n")
+            for s in skipped:
+                sys.stderr.write(
+                    f"  · Flyer {s['flyer_index'] + 1}: "
+                    f"'{s['from']}' → '{s['to']}'\n"
+                )
 
 
 async def cmd_list() -> None:
@@ -558,17 +588,26 @@ def main() -> None:
 
     sub.add_parser("list", help="Show the most-recent briefing per segment.")
 
-    p_autofix = sub.add_parser(
-        "autofix",
+    p_apply = sub.add_parser(
+        "apply-swaps",
         help=(
-            "Re-validate the latest briefing for SEGMENT and rewrite any "
-            "high-confidence daleel mismatches inline. Persists the updated "
-            "markdown back to the same row."
+            "Apply operator-authored daleel-citation swaps to the latest "
+            "briefing for SEGMENT. The swap list is JSON (file or stdin) of "
+            "the form "
+            "[{\"flyer_index\": N, \"from\": \"X\", \"to\": \"Y\"}, ...]. "
+            "No API-LLM is called — the operator's Claude session does the "
+            "paragraph↔daleel judgment in-chat, then pipes the swaps here."
         ),
     )
-    p_autofix.add_argument(
+    p_apply.add_argument(
         "segment",
         help=f"Segment name. One of: {', '.join(sorted(VALID_SEGMENTS))}",
+    )
+    p_apply.add_argument(
+        "--swaps-file",
+        "-f",
+        help="Path to JSON file with the swap list. Default: read stdin.",
+        default=None,
     )
 
     args = parser.parse_args()
@@ -581,9 +620,9 @@ def main() -> None:
         asyncio.run(cmd_save(args.segment, args.markdown_file))
     elif args.cmd == "list":
         asyncio.run(cmd_list())
-    elif args.cmd == "autofix":
+    elif args.cmd == "apply-swaps":
         _validate_segment(args.segment)
-        asyncio.run(cmd_autofix(args.segment))
+        asyncio.run(cmd_apply_swaps(args.segment, args.swaps_file))
 
 
 if __name__ == "__main__":

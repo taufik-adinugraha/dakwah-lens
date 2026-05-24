@@ -1,14 +1,23 @@
 """Post-generation sanity checks for an LLM-written briefing.
 
-Two passes:
+Two passes — context-aware:
 
   1. Forbidden-phrase scan — fast regex over the markdown body. Catches
      translator / publisher mentions ("Kemenag", "Sahih International",
      etc.) and other "metadata leaked into prose" tells. No LLM cost.
+     Runs in BOTH manual + auto paths.
 
-  2. Per-flyer paragraph ↔ daleel alignment — Flash-Lite scores whether
-     the daleel tagged on each Pesan Flyer paragraph actually addresses
-     the paragraph's theme. ~$0.0001 per call × 6 flyers = negligible.
+  2. Per-flyer paragraph ↔ daleel alignment — Gemini Flash-Lite scores
+     whether the daleel tagged on each Pesan Flyer paragraph actually
+     addresses the paragraph's theme + suggests a replacement from
+     the pool when it doesn't. ~$0.0001 per call × 6 flyers = negligible.
+     ONLY runs in the AUTO pipeline. The manual path (which uses
+     Claude-in-chat as the writer) does the same judgment in chat —
+     no API-LLM call out from the script — per the project rule
+     "no API LLM for manual content judgment".
+
+Caller selects the depth via `validate_briefing(..., llm_judgments=True/False)`.
+Manual flow passes False; auto pipeline passes True.
 
 Returns a list of structured warnings the caller can log or print.
 Never raises into the caller's flow — generation must not break when
@@ -622,23 +631,41 @@ def validate_briefing(
     *,
     daleel_pool: list[dict[str, Any]],
     adhkar_pool: list[dict[str, Any]] | None = None,
+    llm_judgments: bool = False,
 ) -> list[BriefingWarning]:
     """Run all validators. Never raises — failures inside individual
     passes are logged and the pass returns no warnings for that
-    branch."""
+    branch.
+
+    `llm_judgments` gates the API-LLM-based passes:
+      - False (default, manual flow): only regex/heuristic checks
+        (forbidden phrases). Paragraph↔daleel fit and absurd-advice
+        detection get done by the operator's Claude session out of
+        band — no API-LLM call out from this script.
+      - True (auto pipeline): also runs the Gemini Flash-Lite passes
+        for daleel alignment + advice sanity. Fine in the auto path
+        since it's already an API-LLM context.
+    """
     warnings: list[BriefingWarning] = []
     try:
         warnings.extend(scan_forbidden_phrases(markdown))
     except Exception as exc:
         log.warning("validate_briefing.forbidden_scan_failed", error=str(exc))
-    try:
-        warnings.extend(
-            check_flyer_daleel_alignment(
-                markdown, daleel_pool, adhkar_pool=adhkar_pool
+    if llm_judgments:
+        # Paragraph↔daleel fit + absurd-advice scoring + replacement
+        # suggester all call Gemini Flash-Lite. Skipped on the manual
+        # path so the script doesn't make API-LLM calls out — the
+        # operator's Claude session does that judgment in-chat.
+        try:
+            warnings.extend(
+                check_flyer_daleel_alignment(
+                    markdown, daleel_pool, adhkar_pool=adhkar_pool
+                )
             )
-        )
-    except Exception as exc:
-        log.warning("validate_briefing.alignment_check_failed", error=str(exc))
+        except Exception as exc:
+            log.warning(
+                "validate_briefing.alignment_check_failed", error=str(exc)
+            )
     return warnings
 
 

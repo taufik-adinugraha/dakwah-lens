@@ -1496,9 +1496,16 @@ async def generate_summary(
         # phrases (e.g. "Kemenag style") and flyer-daleel mismatches.
         # For high-confidence MISMATCH verdicts with a suggested
         # replacement, rewrite the `**Daleel:**` marker inline before
-        # persisting. Weak verdicts stay as warnings. Best-effort:
-        # any failure inside this block is logged and never blocks
-        # the save.
+        # persisting. Weak verdicts stay as warnings.
+        #
+        # `llm_judgments=True` because this is the SCHEDULED auto
+        # pipeline — already an API-LLM context (Gemini Pro just
+        # generated the briefing), so it's fine for the validator to
+        # also call Flash-Lite for paragraph↔daleel scoring + advice
+        # sanity + replacement suggestions. The manual pipeline
+        # (`manual_briefing.py save`) passes False so the script
+        # never calls an API LLM on operator-driven runs — the
+        # operator's Claude session does that judgment in-chat.
         try:
             from api.services.validate_briefing import (
                 apply_daleel_autofixes,
@@ -1506,7 +1513,10 @@ async def generate_summary(
             )
 
             briefing_warnings = validate_briefing(
-                summary_md, daleel_pool=daleel, adhkar_pool=adhkar
+                summary_md,
+                daleel_pool=daleel,
+                adhkar_pool=adhkar,
+                llm_judgments=True,
             )
             summary_md, applied_swaps = apply_daleel_autofixes(
                 summary_md, briefing_warnings, include_weak=False
@@ -1515,7 +1525,10 @@ async def generate_summary(
                 # Re-validate the rewritten markdown so the persisted
                 # warnings reflect post-fix state. Cheap (Flash-Lite).
                 briefing_warnings = validate_briefing(
-                    summary_md, daleel_pool=daleel, adhkar_pool=adhkar
+                    summary_md,
+                    daleel_pool=daleel,
+                    adhkar_pool=adhkar,
+                    llm_judgments=True,
                 )
                 log.info(
                     "insights_summary.autofix_applied",
