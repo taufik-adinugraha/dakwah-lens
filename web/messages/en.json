@@ -9,7 +9,8 @@
     "deploying_body": "A new version is being deployed. Hold on — the app will be available again in a few minutes. Please don't submit forms or make changes right now.",
     "failed_title": "Update failed",
     "failed_body": "The latest deploy didn't complete. The team has been notified. You can try refreshing this page in a few minutes.",
-    "auto_refresh_note": "This notice will disappear automatically when the deploy finishes · ~5s delay."
+    "auto_refresh_note": "This notice will disappear automatically when the deploy finishes · ~5s delay.",
+    "elapsed_label": "Elapsed {time}"
   },
   "Nav": {
     "home": "Home",

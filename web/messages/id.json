@@ -9,7 +9,8 @@
     "deploying_body": "Versi baru sedang di-deploy. Sebentar ya — aplikasi akan otomatis tersedia kembali dalam beberapa menit. Mohon tidak mengirim formulir atau melakukan perubahan saat ini.",
     "failed_title": "Pembaruan gagal",
     "failed_body": "Deploy terbaru tidak selesai. Tim sedang menanganinya. Anda bisa coba refresh halaman ini setelah beberapa menit.",
-    "auto_refresh_note": "Pemberitahuan ini akan hilang otomatis saat deploy selesai · ~5 detik delay."
+    "auto_refresh_note": "Pemberitahuan ini akan hilang otomatis saat deploy selesai · ~5 detik delay.",
+    "elapsed_label": "Berlangsung {time}"
   },
   "Nav": {
     "home": "Beranda",

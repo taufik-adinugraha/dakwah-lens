@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { AlertCircle, Loader2 } from "lucide-react";
+import { AlertCircle, Clock, Loader2 } from "lucide-react";
 
 import type { DeployStatus } from "@/lib/deploy-status";
 
@@ -33,6 +33,15 @@ export function DeployOverlay({
 }) {
   const t = useTranslations("Deploy");
   const [status, setStatus] = useState<DeployStatus>(initialStatus);
+  // Tick once per second so the elapsed-time chip updates live. Cheap
+  // — a single setState per second only while the overlay is mounted,
+  // i.e. only while a deploy is actually in flight.
+  const [nowMs, setNowMs] = useState<number>(() => Date.now());
+  useEffect(() => {
+    if (status.state === "idle") return;
+    const interval = window.setInterval(() => setNowMs(Date.now()), 1000);
+    return () => window.clearInterval(interval);
+  }, [status.state]);
 
   useEffect(() => {
     let mounted = true;
@@ -74,6 +83,22 @@ export function DeployOverlay({
     ? "from-rose-500 to-rose-600"
     : "from-emerald-500 to-emerald-600";
 
+  // Elapsed time since the deploy started. Skips render when
+  // `startedAt` is missing or unparseable — same shape as the
+  // commit-metadata block: only render when we have data.
+  const startedMs = status.startedAt
+    ? Date.parse(status.startedAt)
+    : NaN;
+  const elapsedSec = Number.isFinite(startedMs)
+    ? Math.max(0, Math.floor((nowMs - startedMs) / 1000))
+    : null;
+  // mm:ss formatting reads cleanly in both Indonesian + English and
+  // avoids "d" / "s" / "dtk" suffix ambiguity.
+  const elapsedLabel =
+    elapsedSec === null
+      ? null
+      : `${Math.floor(elapsedSec / 60)}:${String(elapsedSec % 60).padStart(2, "0")}`;
+
   return (
     <div
       role="dialog"
@@ -111,6 +136,21 @@ export function DeployOverlay({
         <p className="mt-2 text-pretty text-center text-sm leading-relaxed text-slate-600">
           {isFailed ? t("failed_body") : t("deploying_body")}
         </p>
+
+        {/* Live elapsed timer — ticks every second so the user can see
+            progress at a glance. Only shown while deploy is in-flight
+            and we know when it started. */}
+        {!isFailed && elapsedLabel !== null && (
+          <div className="mt-4 flex justify-center">
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold tabular-nums text-emerald-800"
+              aria-label={t("elapsed_label", { time: elapsedLabel })}
+            >
+              <Clock className="h-3.5 w-3.5" aria-hidden />
+              {t("elapsed_label", { time: elapsedLabel })}
+            </span>
+          </div>
+        )}
 
         {/* Commit metadata (if provided) — small, muted; only render
             during in-flight deploy so the failure case stays terse. */}
