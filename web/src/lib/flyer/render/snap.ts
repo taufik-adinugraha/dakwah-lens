@@ -122,14 +122,12 @@ export async function snapHtmlToPdf(html: string): Promise<Buffer> {
       printBackground: true,
       preferCSSPageSize: true,
       margin: { top: 0, right: 0, bottom: 0, left: 0 },
-      // Tagged PDF — adds MarkedContent operators with ActualText
-      // metadata to each text block. Without this, Chromium emits
-      // multi-line bold text as positioned glyphs and the raw text
-      // stream loses word boundaries ("wajib,kenapa" instead of
-      // "wajib, kenapa"). With tags, even raw extractors (and the
-      // Claude API's PDF reader, screen readers, and basic web
-      // PDF tools) get the canonical text via the tag dictionary.
-      tagged: true,
+      // Tagged PDF was tried + reverted (2026-05-24): enabling it
+      // collapsed the rendered content height to ~65% of the A4
+      // page (visible white band at the bottom of every poster).
+      // Chromium's tagged-PDF rendering path apparently doesn't
+      // respect `preferCSSPageSize` correctly with `h-[297mm]` —
+      // accessibility upgrade isn't worth the broken visual.
     });
     return Buffer.from(pdf);
   } finally {

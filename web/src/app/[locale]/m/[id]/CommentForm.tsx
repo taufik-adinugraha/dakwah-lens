@@ -3,8 +3,6 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   Bell,
-  ChevronDown,
-  ChevronUp,
   CornerDownRight,
   MessageSquare,
   Pencil,
@@ -13,6 +11,14 @@ import {
 } from "lucide-react";
 
 import { localeAwareFormatDateTime } from "@/lib/date-id";
+
+type ReplyItem = {
+  id: string;
+  displayName: string;
+  body: string;
+  createdAt: string;
+  editedAt?: string | null;
+};
 
 type CommentItem = {
   id: string;
@@ -26,6 +32,10 @@ type CommentItem = {
   /** Server-provided count of approved replies. Only meaningful on
    *  top-level rows (reply rows themselves can't be replied to). */
   replyCount?: number;
+  /** Approved replies under this top-level row. Rendered inline
+   *  (no collapse) so a moderator scanning the thread doesn't miss
+   *  approved content hidden behind a toggle. Server-fetched. */
+  replies?: ReplyItem[];
 };
 
 type Labels = {
@@ -183,18 +193,13 @@ export function CommentForm({
   const [replyBody, setReplyBody] = useState("");
   const [replySubmitting, setReplySubmitting] = useState(false);
 
-  // Per-parent reply state — cached after first expand so a re-expand
-  // doesn't re-fetch unnecessarily. `expanded` decides visibility;
-  // `loading` shows a skeleton when first fetched.
-  const [repliesByParent, setRepliesByParent] = useState<
-    Record<string, CommentItem[]>
+  // Replies are server-rendered inline under each top-level row.
+  // Client-side state only tracks newly-submitted replies that need
+  // to be appended optimistically before the next page revalidation
+  // ships down a fresh server-render with the new row attached.
+  const [extraRepliesByParent, setExtraRepliesByParent] = useState<
+    Record<string, ReplyItem[]>
   >({});
-  const [repliesExpanded, setRepliesExpanded] = useState<
-    Record<string, boolean>
-  >({});
-  const [repliesLoading, setRepliesLoading] = useState<Record<string, boolean>>(
-    {},
-  );
 
   useEffect(() => {
     hydrateOwnership({ setOwnedIds });
@@ -500,40 +505,6 @@ export function CommentForm({
     setReplyBody("");
   }, []);
 
-  const fetchReplies = useCallback(
-    async (parentId: string) => {
-      setRepliesLoading((m) => ({ ...m, [parentId]: true }));
-      try {
-        const r = await fetch(
-          `/api/m/${encodeURIComponent(briefingSlug)}/comments/${encodeURIComponent(
-            parentId,
-          )}/replies`,
-          { cache: "no-store" },
-        );
-        if (!r.ok) return;
-        const data = (await r.json()) as { items: CommentItem[] };
-        setRepliesByParent((m) => ({ ...m, [parentId]: data.items }));
-      } finally {
-        setRepliesLoading((m) => ({ ...m, [parentId]: false }));
-      }
-    },
-    [briefingSlug],
-  );
-
-  const toggleReplies = useCallback(
-    async (parentId: string, replyCount: number) => {
-      const wasExpanded = repliesExpanded[parentId] === true;
-      setRepliesExpanded((m) => ({ ...m, [parentId]: !wasExpanded }));
-      // First expand → fetch. After that the cache is reused; only
-      // a fresh-submit path mutates `repliesByParent` to keep it in
-      // sync with reality without a re-fetch.
-      if (!wasExpanded && !repliesByParent[parentId] && replyCount > 0) {
-        await fetchReplies(parentId);
-      }
-    },
-    [repliesExpanded, repliesByParent, fetchReplies],
-  );
-
   const submitReply = useCallback(
     async (parentId: string) => {
       if (replySubmitting) return;
@@ -597,22 +568,24 @@ export function CommentForm({
           cancelReply();
           return;
         }
-        // Approved — optimistically append to the cached thread and
-        // bump the parent's reply count so the badge updates.
+        // Approved — optimistically append to the inline replies
+        // bucket for this parent so the new comment appears under
+        // its target right away. The next server-render will pick
+        // it up via the inline-replies query and the bucket can be
+        // dropped on hydration; until then this keeps the UI honest.
         const newId = data.id ?? `local-${Date.now()}`;
         if (data.id) rememberOwnership(data.id);
-        const newReply: CommentItem = {
+        const newReply: ReplyItem = {
           id: newId,
           displayName: trimmedName,
           body: trimmedBody,
           createdAt: new Date().toISOString(),
           editedAt: null,
         };
-        setRepliesByParent((m) => ({
+        setExtraRepliesByParent((m) => ({
           ...m,
           [parentId]: [...(m[parentId] ?? []), newReply],
         }));
-        setRepliesExpanded((m) => ({ ...m, [parentId]: true }));
         setItems((prev) =>
           prev.map((c) =>
             c.id === parentId
@@ -814,16 +787,14 @@ export function CommentForm({
             withinWindow &&
             !isAdminReply;
           const isEditingThis = editingId === c.id;
-          const replyCount = c.replyCount ?? 0;
-          const repliesAreExpanded = repliesExpanded[c.id] === true;
           const isReplyingHere = replyingToId === c.id;
-          const threadReplies = repliesByParent[c.id] ?? [];
-          const repliesIsLoading = repliesLoading[c.id] === true;
+          // Server-rendered replies + any optimistic ones added
+          // since hydration. Always rendered inline (no collapse).
+          const threadReplies = [
+            ...(c.replies ?? []),
+            ...(extraRepliesByParent[c.id] ?? []),
+          ];
           const canReply = !muted && !isReplyingHere;
-          const replyCountLabel =
-            replyCount === 1
-              ? labels.replyCountOne
-              : labels.replyCountMany.replace("{count}", String(replyCount));
           return (
             <li
               key={c.id}
@@ -930,37 +901,18 @@ export function CommentForm({
                 </p>
               )}
 
-              {/* Reply controls — Balas button + reply-count toggle. */}
-              {(canReply || replyCount > 0) && !isEditingThis && (
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  {canReply && (
-                    <button
-                      type="button"
-                      onClick={() => openReply(c.id)}
-                      className="inline-flex h-7 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 text-[11px] font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-900"
-                    >
-                      <MessageSquare className="h-3 w-3" />
-                      {labels.reply}
-                    </button>
-                  )}
-                  {replyCount > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => toggleReplies(c.id, replyCount)}
-                      className="inline-flex h-7 items-center gap-1.5 rounded-full px-2.5 text-[11px] font-semibold transition"
-                      style={{
-                        background: palette.accent + "12",
-                        color: palette.accentDeep,
-                      }}
-                    >
-                      {repliesAreExpanded ? (
-                        <ChevronUp className="h-3 w-3" />
-                      ) : (
-                        <ChevronDown className="h-3 w-3" />
-                      )}
-                      {replyCountLabel}
-                    </button>
-                  )}
+              {/* Reply control — Balas button only. Reply count is
+                  implicit from the rendered replies block below. */}
+              {canReply && !isEditingThis && (
+                <div className="mt-3">
+                  <button
+                    type="button"
+                    onClick={() => openReply(c.id)}
+                    className="inline-flex h-7 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 text-[11px] font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-900"
+                  >
+                    <MessageSquare className="h-3 w-3" />
+                    {labels.reply}
+                  </button>
                 </div>
               )}
 
@@ -1040,23 +992,11 @@ export function CommentForm({
               {/* Replies — visually offset (indent + accent left rail
                   + tinted background) so the hierarchy reads clearly
                   even without a heavy outer container. */}
-              {repliesAreExpanded && (
+              {threadReplies.length > 0 && (
                 <div
                   className="mt-3 space-y-2 border-l-2 pl-4 sm:pl-5"
                   style={{ borderColor: palette.accent + "55" }}
                 >
-                  {repliesIsLoading && threadReplies.length === 0 && (
-                    <p className="text-[12px] italic text-slate-400">
-                      {labels.repliesLoading}
-                    </p>
-                  )}
-                  {!repliesIsLoading &&
-                    threadReplies.length === 0 &&
-                    replyCount > 0 && (
-                      <p className="text-[12px] italic text-slate-400">
-                        {labels.repliesEmpty}
-                      </p>
-                    )}
                   {threadReplies.map((r) => {
                     const replyIsAdmin = /^dakwah[\s.\-_·]*lens/i.test(
                       r.displayName,

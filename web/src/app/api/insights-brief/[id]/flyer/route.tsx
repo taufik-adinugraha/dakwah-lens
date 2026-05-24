@@ -105,7 +105,15 @@ export async function GET(
     return new Response(new Uint8Array(pdf), {
       headers: {
         "Content-Type": "application/pdf",
-        "Cache-Control": "public, max-age=3600, immutable",
+        // Short cache + must-revalidate so a render-side fix lands
+        // promptly. `immutable` was wrong here: the PDF/PNG render
+        // path changes when we ship layout fixes, but `immutable`
+        // tells the browser to never re-check — which left users
+        // staring at stale assets for hours after we deployed a
+        // fresh build. 5-min cache is plenty for the busy window
+        // after a briefing is published; `must-revalidate` forces
+        // the browser to ask the server again past that window.
+        "Cache-Control": "public, max-age=300, must-revalidate",
         "Content-Disposition": `inline; filename="dakwah-lens_${id}_poster-mahasiswa.pdf"`,
       },
     });
@@ -123,7 +131,7 @@ export async function GET(
   return new Response(new Uint8Array(png), {
     headers: {
       "Content-Type": "image/png",
-      "Cache-Control": "public, max-age=3600, immutable",
+      "Cache-Control": "public, max-age=300, must-revalidate",
     },
   });
 }

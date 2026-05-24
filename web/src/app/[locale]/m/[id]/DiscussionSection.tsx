@@ -1,4 +1,4 @@
-import { and, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull } from "drizzle-orm";
 import { Lock, MessagesSquare } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
@@ -40,15 +40,11 @@ export async function DiscussionSection({
 }) {
   const t = await getTranslations("Discussion");
 
-  // `replyCount` matches the /comments GET shape: number of approved
-  // replies hanging off each top-level row. Replies themselves load
-  // lazily via /comments/{id}/replies when the user expands a thread.
-  const replyCountSql = sql<number>`(
-    SELECT COUNT(*)::int FROM ${schema.mahasiswaComments} AS r
-    WHERE r.parent_id = ${schema.mahasiswaComments.id}
-      AND r.status = 'approved'
-  )`;
-  const [rows, [roomRow]] = await Promise.all([
+  // Top-level rows first, then a follow-up batch query for every
+  // reply hanging off them. Replies render inline (no collapse) —
+  // moderators wondering "where did this approved comment go?" would
+  // otherwise miss replies hidden behind the toggle.
+  const [topRows, [roomRow]] = await Promise.all([
     db
       .select({
         id: schema.mahasiswaComments.id,
@@ -57,7 +53,6 @@ export async function DiscussionSection({
         createdAt: schema.mahasiswaComments.createdAt,
         pinned: schema.mahasiswaComments.pinned,
         editedAt: schema.mahasiswaComments.editedAt,
-        replyCount: replyCountSql,
       })
       .from(schema.mahasiswaComments)
       .where(
@@ -80,16 +75,60 @@ export async function DiscussionSection({
   ]);
 
   const isMuted = !!roomRow?.mutedAt;
-  const hasMore = rows.length > INITIAL_PAGE_SIZE;
-  const initialItems = rows.slice(0, INITIAL_PAGE_SIZE).map((r) => ({
-    id: r.id,
-    displayName: r.displayName,
-    body: r.body,
-    createdAt: r.createdAt.toISOString(),
-    pinned: r.pinned,
-    editedAt: r.editedAt ? r.editedAt.toISOString() : null,
-    replyCount: r.replyCount,
-  }));
+  const hasMore = topRows.length > INITIAL_PAGE_SIZE;
+  const pageRows = topRows.slice(0, INITIAL_PAGE_SIZE);
+
+  // Pull all approved replies for the visible top-level rows in one
+  // round-trip, then group by parent. Empty when no rows on this page.
+  const parentIds = pageRows.map((r) => r.id);
+  const replyRows =
+    parentIds.length === 0
+      ? []
+      : await db
+          .select({
+            id: schema.mahasiswaComments.id,
+            parentId: schema.mahasiswaComments.parentId,
+            displayName: schema.mahasiswaComments.displayName,
+            body: schema.mahasiswaComments.body,
+            createdAt: schema.mahasiswaComments.createdAt,
+            editedAt: schema.mahasiswaComments.editedAt,
+          })
+          .from(schema.mahasiswaComments)
+          .where(
+            and(
+              eq(schema.mahasiswaComments.status, "approved"),
+              inArray(schema.mahasiswaComments.parentId, parentIds),
+            ),
+          )
+          .orderBy(asc(schema.mahasiswaComments.createdAt));
+
+  const repliesByParent = new Map<string, typeof replyRows>();
+  for (const r of replyRows) {
+    if (!r.parentId) continue;
+    const list = repliesByParent.get(r.parentId) ?? [];
+    list.push(r);
+    repliesByParent.set(r.parentId, list);
+  }
+
+  const initialItems = pageRows.map((r) => {
+    const childReplies = repliesByParent.get(r.id) ?? [];
+    return {
+      id: r.id,
+      displayName: r.displayName,
+      body: r.body,
+      createdAt: r.createdAt.toISOString(),
+      pinned: r.pinned,
+      editedAt: r.editedAt ? r.editedAt.toISOString() : null,
+      replyCount: childReplies.length,
+      replies: childReplies.map((c) => ({
+        id: c.id,
+        displayName: c.displayName,
+        body: c.body,
+        createdAt: c.createdAt.toISOString(),
+        editedAt: c.editedAt ? c.editedAt.toISOString() : null,
+      })),
+    };
+  });
 
   return (
     <section
