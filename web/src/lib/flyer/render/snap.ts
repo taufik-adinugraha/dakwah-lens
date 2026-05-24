@@ -123,11 +123,13 @@ export async function snapHtmlToPdf(html: string): Promise<Buffer> {
       preferCSSPageSize: true,
       margin: { top: 0, right: 0, bottom: 0, left: 0 },
       // Tagged PDF was tried + reverted (2026-05-24): enabling it
-      // collapsed the rendered content height to ~65% of the A4
+      // collapses the rendered content height to ~65% of the A4
       // page (visible white band at the bottom of every poster).
-      // Chromium's tagged-PDF rendering path apparently doesn't
-      // respect `preferCSSPageSize` correctly with `h-[297mm]` —
-      // accessibility upgrade isn't worth the broken visual.
+      // Recent Chromium / Puppeteer versions DEFAULT this to true,
+      // so simply omitting the option isn't enough — we have to
+      // pass `tagged: false` explicitly to opt out. Accessibility
+      // upgrade isn't worth the broken visual.
+      tagged: false,
     });
     return Buffer.from(pdf);
   } finally {
