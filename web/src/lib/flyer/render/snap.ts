@@ -122,6 +122,14 @@ export async function snapHtmlToPdf(html: string): Promise<Buffer> {
       printBackground: true,
       preferCSSPageSize: true,
       margin: { top: 0, right: 0, bottom: 0, left: 0 },
+      // Tagged PDF — adds MarkedContent operators with ActualText
+      // metadata to each text block. Without this, Chromium emits
+      // multi-line bold text as positioned glyphs and the raw text
+      // stream loses word boundaries ("wajib,kenapa" instead of
+      // "wajib, kenapa"). With tags, even raw extractors (and the
+      // Claude API's PDF reader, screen readers, and basic web
+      // PDF tools) get the canonical text via the tag dictionary.
+      tagged: true,
     });
     return Buffer.from(pdf);
   } finally {

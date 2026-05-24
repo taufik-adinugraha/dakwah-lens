@@ -1,3 +1,7 @@
+import {
+  smartTruncateTranslation,
+  TRANSLATION_MAX_CHARS,
+} from "../translation-fit";
 import type { FlyerLayoutComponent } from "./types";
 
 /**
@@ -21,11 +25,18 @@ export const HeroHeadline: FlyerLayoutComponent = ({
 }) => {
   const { daleel, headline, message, dateLabel, brand } = content;
   const isEnglish = locale === "en";
-  const translation = daleel
+  const rawTranslation = daleel
     ? isEnglish
       ? daleel.translation_en || daleel.translation_id || ""
       : daleel.translation_id || daleel.translation_en || ""
     : "";
+  const transLen = rawTranslation.length;
+  const transSize =
+    transLen < 220 ? 22 : transLen < 340 ? 19 : transLen < 420 ? 17 : 15;
+  const translation = smartTruncateTranslation(
+    rawTranslation,
+    TRANSLATION_MAX_CHARS.heroHeadline,
+  );
 
   const bgStops = palette.bgGradient;
   const bgStyle = {
@@ -167,9 +178,14 @@ export const HeroHeadline: FlyerLayoutComponent = ({
               borderColor: palette.accentSoft,
               boxShadow: `0 12px 28px ${palette.accent}40`,
               transform: "rotate(-1.5deg)",
+              maxHeight: "260px",
+              overflow: "hidden",
             }}
           >
-            <div className="text-[20px] italic leading-[1.45] text-slate-800">
+            <div
+              className="italic leading-[1.45] text-slate-800"
+              style={{ fontSize: `${transSize}px` }}
+            >
               &ldquo;{translation}&rdquo;
             </div>
             <div

@@ -1,3 +1,7 @@
+import {
+  smartTruncateTranslation,
+  TRANSLATION_MAX_CHARS,
+} from "../translation-fit";
 import type { FlyerLayoutComponent } from "./types";
 
 /**
@@ -19,11 +23,18 @@ export const QuoteCard: FlyerLayoutComponent = ({
 }) => {
   const { daleel, headline, message, dateLabel, brand } = content;
   const isEnglish = locale === "en";
-  const translation = daleel
+  const rawTranslation = daleel
     ? isEnglish
       ? daleel.translation_en || daleel.translation_id || ""
       : daleel.translation_id || daleel.translation_en || ""
     : "";
+  const transLen = rawTranslation.length;
+  const transSize =
+    transLen < 280 ? 22 : transLen < 440 ? 19 : transLen < 560 ? 17 : 15;
+  const translation = smartTruncateTranslation(
+    rawTranslation,
+    TRANSLATION_MAX_CHARS.quoteCard,
+  );
 
   const bgStops = palette.bgGradient;
   const bgStyle = {
@@ -98,9 +109,14 @@ export const QuoteCard: FlyerLayoutComponent = ({
               style={{
                 boxShadow: `0 18px 48px ${palette.accentDeep}88`,
                 borderTop: `8px solid ${palette.accent}`,
+                maxHeight: "340px",
+                overflow: "hidden",
               }}
             >
-              <div className="text-[20px] italic leading-[1.45] text-slate-800">
+              <div
+                className="italic leading-[1.45] text-slate-800"
+                style={{ fontSize: `${transSize}px` }}
+              >
                 &ldquo;{translation}&rdquo;
               </div>
               <div
@@ -173,9 +189,14 @@ export const QuoteCard: FlyerLayoutComponent = ({
               style={{
                 boxShadow: `0 14px 36px ${palette.accent}55`,
                 borderTop: `8px solid ${palette.accent}`,
+                maxHeight: "340px",
+                overflow: "hidden",
               }}
             >
-              <div className="text-[20px] italic leading-[1.45] text-slate-800">
+              <div
+                className="italic leading-[1.45] text-slate-800"
+                style={{ fontSize: `${transSize}px` }}
+              >
                 &ldquo;{translation}&rdquo;
               </div>
               <div className="text-[15px] font-extrabold tracking-wider" style={{ color: palette.accent }}>
@@ -254,9 +275,16 @@ export const QuoteCard: FlyerLayoutComponent = ({
             {daleel && translation && (
               <div
                 className="flex flex-col gap-2 rounded-2xl bg-white px-6 py-4 shadow-lg"
-                style={{ borderLeft: `6px solid ${palette.accent}` }}
+                style={{
+                  borderLeft: `6px solid ${palette.accent}`,
+                  maxHeight: "260px",
+                  overflow: "hidden",
+                }}
               >
-                <div className="text-[18px] italic leading-[1.4] text-slate-800">
+                <div
+                  className="italic leading-[1.4] text-slate-800"
+                  style={{ fontSize: `${Math.min(transSize, 18)}px` }}
+                >
                   &ldquo;{translation}&rdquo;
                 </div>
                 <div

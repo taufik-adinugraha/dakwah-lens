@@ -1,3 +1,7 @@
+import {
+  smartTruncateTranslation,
+  TRANSLATION_MAX_CHARS,
+} from "../translation-fit";
 import type { FlyerLayoutComponent } from "./types";
 
 /**
@@ -45,28 +49,28 @@ export const DuaHero: FlyerLayoutComponent = ({
   // (e.g. QS. Al-Anbiya: 87 "Lā ilāha illā anta…") gets very large
   // typography; long du'a (Hisnul Muslim morning adhkar paragraphs)
   // step down so the whole text still fits inside the canvas.
-  // Tiers were tightened 2026-05-24 after Riyad as-Salihin 776 (a
-  // ~640-char evening-adhkar paragraph) blew through the canvas and
-  // pushed the translation card past the bottom edge — the bottom
-  // bounds at 32/28 px keep even the longest Hisnul Muslim entries
-  // inside the Arabic slot.
+  // Tightened twice (2026-05-24): once after RaS 776 (~640 chars)
+  // overflowed, again after RaS 753 (~400 visible-line chars) also
+  // overflowed under the previous tiers — bottom-half sizes pulled
+  // down so even at the longest du'a the Arabic stays inside the
+  // ~430px slot (530px outer minus the 100px decorative glyph).
   const arLen = arabic.length;
   const arabicSize =
     arLen < 70
       ? "108px"
       : arLen < 130
-        ? "84px"
+        ? "82px"
         : arLen < 200
-          ? "62px"
+          ? "58px"
           : arLen < 300
-            ? "48px"
-            : arLen < 450
-              ? "38px"
-              : arLen < 650
-                ? "32px"
-                : "28px";
+            ? "44px"
+            : arLen < 400
+              ? "34px"
+              : arLen < 550
+                ? "28px"
+                : "24px";
   const arabicLine =
-    arLen < 130 ? "1.7" : arLen < 300 ? "1.75" : arLen < 650 ? "1.6" : "1.5";
+    arLen < 130 ? "1.7" : arLen < 300 ? "1.7" : arLen < 550 ? "1.55" : "1.45";
 
   // Translation card sits absolutely at the bottom of the canvas
   // (~300px max-height after the layout refactor). The translation
@@ -82,43 +86,16 @@ export const DuaHero: FlyerLayoutComponent = ({
   // needs aggressive font shrink" case too.
   const weight = arLen * 3 + transRaw.length;
   let transSize = 22;
-  let transMax = 520;
-  if (weight > 700) {
-    transSize = 20;
-    transMax = 560;
-  }
-  if (weight > 1100) {
-    transSize = 17;
-    transMax = 640;
-  }
-  if (weight > 1700) {
-    transSize = 15;
-    transMax = 760;
-  }
-  // Truncate at the last sentence/word boundary BEFORE the cap so
-  // the cut never lands mid-word ("tiada s…"). Order of preference:
-  // 1) last sentence end (. ! ?) in the back half of the budget
-  // 2) last comma / semicolon / colon
-  // 3) last whitespace
-  // 4) hard cut as the final fallback
-  const truncatedTranslation = (() => {
-    if (transRaw.length <= transMax) return transRaw;
-    const head = transRaw.slice(0, transMax);
-    const sentenceCut = head.search(/[.!?](?=[^.!?]*$)/);
-    const halfway = Math.floor(transMax * 0.5);
-    if (sentenceCut >= halfway) {
-      return head.slice(0, sentenceCut + 1) + " …";
-    }
-    const commaCut = head.lastIndexOf(",");
-    if (commaCut >= halfway) {
-      return head.slice(0, commaCut) + " …";
-    }
-    const wordCut = head.lastIndexOf(" ");
-    if (wordCut > 0) {
-      return head.slice(0, wordCut).replace(/[,;:.]$/, "") + " …";
-    }
-    return head + "…";
-  })();
+  if (weight > 700) transSize = 20;
+  if (weight > 1100) transSize = 17;
+  if (weight > 1700) transSize = 15;
+  // Smart truncation (sentence → comma → word → hard cut). Shared
+  // with the other layouts so the truncation calibration lives in
+  // one place — see web/src/lib/flyer/translation-fit.ts.
+  const truncatedTranslation = smartTruncateTranslation(
+    transRaw,
+    TRANSLATION_MAX_CHARS.duaHero,
+  );
 
   return (
     <div

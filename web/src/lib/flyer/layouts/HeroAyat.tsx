@@ -1,3 +1,7 @@
+import {
+  smartTruncateTranslation,
+  TRANSLATION_MAX_CHARS,
+} from "../translation-fit";
 import type { FlyerLayoutComponent } from "./types";
 
 /**
@@ -19,11 +23,18 @@ export const HeroAyat: FlyerLayoutComponent = ({
 }) => {
   const { daleel, headline, message, dateLabel, brand } = content;
   const isEnglish = locale === "en";
-  const translation = daleel
+  const rawTranslation = daleel
     ? isEnglish
       ? daleel.translation_en || daleel.translation_id || ""
       : daleel.translation_id || daleel.translation_en || ""
     : "";
+  const transLen = rawTranslation.length;
+  const transSize =
+    transLen < 240 ? 22 : transLen < 360 ? 19 : transLen < 440 ? 17 : 15;
+  const translation = smartTruncateTranslation(
+    rawTranslation,
+    TRANSLATION_MAX_CHARS.heroAyat,
+  );
 
   const headlineSize =
     headline.length < 18 ? "108px" : headline.length < 28 ? "92px" : "76px";
@@ -130,16 +141,23 @@ export const HeroAyat: FlyerLayoutComponent = ({
           )}
         </div>
 
-        {/* Translation-only daleel card */}
+        {/* Translation-only daleel card. Bounded height + dynamic
+            font so a long hadith narration can't push the citation
+            off the canvas. */}
         {daleel && translation && (
           <div
             className="flex max-w-[940px] flex-col gap-[12px] rounded-3xl px-7 py-6"
             style={{
               backgroundColor: "rgba(255,255,255,0.94)",
               boxShadow: `0 12px 32px ${palette.accentDeep}55`,
+              maxHeight: "280px",
+              overflow: "hidden",
             }}
           >
-            <div className="text-[22px] italic leading-[1.45] text-slate-800">
+            <div
+              className="italic leading-[1.45] text-slate-800"
+              style={{ fontSize: `${transSize}px` }}
+            >
               &ldquo;{translation}&rdquo;
             </div>
             <div

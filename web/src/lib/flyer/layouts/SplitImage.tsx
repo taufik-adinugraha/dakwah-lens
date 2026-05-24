@@ -1,3 +1,7 @@
+import {
+  smartTruncateTranslation,
+  TRANSLATION_MAX_CHARS,
+} from "../translation-fit";
 import type { FlyerLayoutComponent } from "./types";
 
 /**
@@ -18,11 +22,22 @@ export const SplitImage: FlyerLayoutComponent = ({
 }) => {
   const { daleel, headline, message, dateLabel, brand } = content;
   const isEnglish = locale === "en";
-  const translation = daleel
+  const rawTranslation = daleel
     ? isEnglish
       ? daleel.translation_en || daleel.translation_id || ""
       : daleel.translation_id || daleel.translation_en || ""
     : "";
+  // Cap + shrink the translation so a long hadith narration can't
+  // push the citation off the canvas bottom. Font drops with raw
+  // length; truncation cuts at a sentence/word boundary, never
+  // mid-word.
+  const transLen = rawTranslation.length;
+  const transSize =
+    transLen < 240 ? 19 : transLen < 380 ? 17 : transLen < 480 ? 16 : 14;
+  const translation = smartTruncateTranslation(
+    rawTranslation,
+    TRANSLATION_MAX_CHARS.splitImage,
+  );
 
   const isHorizontalSplit = layoutVariant !== 2;
   const isPhotoLeft = layoutVariant === 0;
@@ -108,9 +123,20 @@ export const SplitImage: FlyerLayoutComponent = ({
       {daleel && translation && (
         <div
           className="flex flex-col gap-3 border-l-4 pl-5"
-          style={{ borderColor: palette.accent }}
+          style={{
+            borderColor: palette.accent,
+            // Hard ceiling so even a misjudged truncation can't push
+            // the citation past the canvas bottom — content beyond
+            // this is clipped, but the smart truncation above should
+            // keep us inside it for every realistic du'a length.
+            maxHeight: "300px",
+            overflow: "hidden",
+          }}
         >
-          <div className="text-[19px] italic leading-[1.45] text-slate-700">
+          <div
+            className="italic leading-[1.45] text-slate-700"
+            style={{ fontSize: `${transSize}px` }}
+          >
             &ldquo;{translation}&rdquo;
           </div>
           <div

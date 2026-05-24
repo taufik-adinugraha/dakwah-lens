@@ -14,6 +14,7 @@ filtering, etc.), promote and extend.
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 import structlog
@@ -24,6 +25,36 @@ from api.config import settings
 from api.services.usage import gemini_output_tokens, record_usage
 
 log = structlog.get_logger()
+
+# Unicode ranges for Arabic harakat (tashkeel) — fathah, kasrah,
+# dhammah, sukun, shadda, tanwin variants, plus the Quran-specific
+# marks. A du'a is "recitable" if the density of harakat-to-letters
+# is at least RECITABLE_HARAKAT_MIN — without these marks, non-Arab
+# readers can't pronounce the text.
+_HARAKAT_RE = re.compile(r"[ً-ٰٟۖ-ۭ]")
+_ARABIC_LETTER_RE = re.compile(r"[ء-يٱ-ۓ]")
+RECITABLE_HARAKAT_MIN = 0.30
+"""Drop adhkar where harakat density falls below this threshold —
+calibrated empirically: Quran / Bukhari / Muslim entries cluster
+around 0.75-0.85, Riyad as-Salihin entries sit at 0.00. A 0.30 floor
+keeps the well-marked corpora and rejects the unmarked ones with
+generous headroom."""
+
+
+def _is_recitable_du_a(arabic: str) -> bool:
+    """Return True iff the Arabic text carries enough harakat marks
+    for a non-Arab reader to actually recite it. Empty / non-Arabic
+    text → False (caller will treat as ineligible for adhkar slot)."""
+    if not arabic or not arabic.strip():
+        return False
+    letters = len(_ARABIC_LETTER_RE.findall(arabic))
+    marks = len(_HARAKAT_RE.findall(arabic))
+    if letters < 8:
+        # Too short to evaluate meaningfully — accept by default so we
+        # don't accidentally reject short Quran verses with low absolute
+        # mark counts.
+        return marks > 0
+    return (marks / letters) >= RECITABLE_HARAKAT_MIN
 
 # Collection names match the embed scripts in api/src/api/scripts/embed_*.py
 COLLECTION_NAMES: dict[str, str] = {
@@ -329,6 +360,21 @@ def retrieve_dua(
                 continue
             normalized = _normalize_hit(corpus, hit)
             if normalized["ref_id"] in DALEEL_DENYLIST:
+                continue
+            # Harakat gate — du'a in Pesan Flyer 5 + 6 is meant to be
+            # READ ALOUD by the audience. Without harakat the text
+            # can't be pronounced by non-Arabs, defeating the purpose
+            # of the flyer. Riyad as-Salihin entries are seeded
+            # without harakat and would otherwise dominate the pool
+            # for many themes. The kitab page still surfaces them
+            # via the thematic retrieval path; this filter only
+            # applies to the recitable-du'a pool.
+            if not _is_recitable_du_a(normalized.get("arabic", "")):
+                log.debug(
+                    "adhkar_retrieval.unrecitable_dropped",
+                    ref_id=normalized["ref_id"],
+                    citation=normalized.get("citation"),
+                )
                 continue
             all_hits.append(normalized)
 
