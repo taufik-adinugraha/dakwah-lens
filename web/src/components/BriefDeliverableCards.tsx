@@ -8,6 +8,7 @@ import {
   Check,
   Copy,
   Download,
+  ExternalLink,
   HandHeart,
   Home,
   Mic,
@@ -62,6 +63,9 @@ type Labels = {
   print: string;
   /** Modal toolbar: "Unduh Flyer" / "Download Flyer". */
   flyer: string;
+  /** Modal toolbar: "Kunjungi halaman" / "Visit page" — opens the
+   *  standalone /d/{slug}/{kind} share page in a new tab. */
+  visit: string;
   /** Modal close (aria). */
   close: string;
 };
@@ -177,6 +181,9 @@ function classifyHeading(heading: string): CardKind | null {
   )
     return "content";
   if (
+    lower.includes("mahasiswa") ||
+    lower.includes("kampus") ||
+    lower.includes("campus") ||
     lower.includes("gen z") ||
     lower.includes("gen-z") ||
     lower.includes("reaching gen")
@@ -331,25 +338,48 @@ export function BriefDeliverableCards({
         </p>
       )}
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        {orderedCards.map((card, i) => (
-          <DeliverableCardTile
-            key={`${card.heading}-${i}`}
-            card={card}
-            openLabel={labels.open}
-            onOpen={() => onOpenCard(i)}
-            shareUrl={
-              card.kind
-                ? `/d/${briefBasePath.replace(/^\/?(?:[a-z]{2}\/)?insights\/brief\//, "")}/${card.kind}`
-                : null
-            }
-          />
-        ))}
+        {orderedCards.map((card, i) => {
+          const briefSlug = briefBasePath.replace(
+            /^\/?(?:[a-z]{2}\/)?insights\/brief\//,
+            "",
+          );
+          return (
+            <DeliverableCardTile
+              key={`${card.heading}-${i}`}
+              card={card}
+              openLabel={labels.open}
+              onOpen={() => onOpenCard(i)}
+              shareUrl={card.kind ? `/d/${briefSlug}/${card.kind}` : null}
+              pdfUrl={
+                card.kind
+                  ? `/api/d/${briefSlug}/${card.kind}/pdf`
+                  : null
+              }
+            />
+          );
+        })}
       </div>
       {openIndex !== null && orderedCards[openIndex] && (
         <DeliverableModal
           card={orderedCards[openIndex]}
           labels={labels}
           onClose={onCloseModal}
+          pdfUrl={
+            orderedCards[openIndex].kind
+              ? `/api/d/${briefBasePath.replace(
+                  /^\/?(?:[a-z]{2}\/)?insights\/brief\//,
+                  "",
+                )}/${orderedCards[openIndex].kind}/pdf`
+              : null
+          }
+          pageUrl={
+            orderedCards[openIndex].kind
+              ? `/d/${briefBasePath.replace(
+                  /^\/?(?:[a-z]{2}\/)?insights\/brief\//,
+                  "",
+                )}/${orderedCards[openIndex].kind}`
+              : null
+          }
         />
       )}
     </>
@@ -361,11 +391,13 @@ function DeliverableCardTile({
   openLabel,
   onOpen,
   shareUrl,
+  pdfUrl,
 }: {
   card: DeliverableCard;
   openLabel: string;
   onOpen: () => void;
   shareUrl: string | null;
+  pdfUrl: string | null;
 }) {
   const Icon = card.kind ? KIND_ICON[card.kind] : BookOpen;
   const tone = card.kind
@@ -403,16 +435,34 @@ function DeliverableCardTile({
       <p className="text-pretty text-[13px] leading-relaxed text-slate-600">
         {previewOf(card.body, 160)}
       </p>
-      <div className="mt-auto flex items-center justify-between gap-2">
+      <div className="mt-auto flex flex-wrap items-center justify-between gap-2">
         <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 transition group-hover:gap-1.5">
           {openLabel}
           <span aria-hidden>→</span>
         </span>
-        {shareUrl && (
-          <CardShareButton url={shareUrl} title={card.heading} />
-        )}
+        <div className="flex items-center gap-1.5">
+          {pdfUrl && <CardDownloadButton url={pdfUrl} />}
+          {shareUrl && (
+            <CardShareButton url={shareUrl} title={card.heading} />
+          )}
+        </div>
       </div>
     </div>
+  );
+}
+
+function CardDownloadButton({ url }: { url: string }) {
+  return (
+    <a
+      href={url}
+      download
+      onClick={(e) => e.stopPropagation()}
+      aria-label="Unduh PDF"
+      className="inline-flex h-7 items-center gap-1 rounded-full border border-slate-200 bg-white/90 px-2.5 text-[11px] font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-white"
+    >
+      <Download className="h-3 w-3" />
+      PDF
+    </a>
   );
 }
 
@@ -468,7 +518,9 @@ function CardShareButton({ url, title }: { url: string; title: string }) {
  * Focus-mode modal. Bottom-sheet on mobile, centered card on desktop.
  *  - Esc + click-outside close
  *  - Body scroll locked while open
- *  - Per-modal Copy (text-stripped) / Download (.md) / Print buttons
+ *  - Per-modal Copy (text-stripped) / Download (PDF) / Print buttons
+ *  - Download now points at the server-side Puppeteer PDF route so the
+ *    file lands as a properly-formatted A4 doc instead of raw .md.
  *  - Print uses CSS to hide the rest of the page (see globals.css block
  *    on `.printing-deliverable`).
  */
@@ -476,10 +528,21 @@ function DeliverableModal({
   card,
   labels,
   onClose,
+  pdfUrl,
+  pageUrl,
 }: {
   card: DeliverableCard;
   labels: Labels;
   onClose: () => void;
+  /** Server PDF endpoint for this deliverable. When null (card has no
+   *  recognized kind) we fall back to a client-side .md blob — same
+   *  behavior as before the PDF route existed. */
+  pdfUrl: string | null;
+  /** Public standalone share page at /d/{slug}/{kind}. Surfaced as the
+   *  "Kunjungi halaman" toolbar button so a viewer can jump from the
+   *  modal to the magazine-style standalone page. Null when the card
+   *  has no recognized kind (no dedicated page to link to). */
+  pageUrl: string | null;
 }) {
   const [copyOk, setCopyOk] = useState(false);
 
@@ -529,6 +592,16 @@ function DeliverableModal({
   }
 
   function handleDownload() {
+    // PDF path (preferred) — server-rendered A4 portrait via the
+    // Puppeteer route that already serves the /d/{slug}/{deliverable}
+    // share pages.
+    if (pdfUrl) {
+      window.location.href = pdfUrl;
+      return;
+    }
+    // Fallback for cards whose heading didn't classify into a known
+    // kind — keep the original .md blob download so the user still
+    // gets a file rather than a broken button.
     const slug = card.heading
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
@@ -638,6 +711,17 @@ function DeliverableModal({
 
         {/* Action bar */}
         <div className="flex flex-wrap items-center justify-end gap-2 border-t border-slate-200 bg-slate-50/60 px-5 py-3 sm:px-6">
+          {pageUrl && (
+            <a
+              href={pageUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-9 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              {labels.visit}
+            </a>
+          )}
           <button
             type="button"
             onClick={handleCopy}

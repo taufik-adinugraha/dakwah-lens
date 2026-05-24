@@ -24,6 +24,7 @@ import {
   ImageIcon,
   Inbox,
   LayoutDashboard,
+  MessagesSquare,
   Newspaper,
   Settings,
   ShieldCheck,
@@ -31,7 +32,9 @@ import {
   Workflow,
   Video,
 } from "lucide-react";
+import { and, eq, sql } from "drizzle-orm";
 
+import { db, schema } from "@/db";
 import { Link } from "@/i18n/navigation";
 import { requireSystemAccess } from "@/lib/superadmin";
 import {
@@ -42,6 +45,11 @@ import {
 const NAV = [
   { href: "/admin/system", label: "Overview", icon: LayoutDashboard },
   { href: "/admin/system/inbox", label: "Inbox", icon: Inbox },
+  {
+    href: "/admin/system/discussion",
+    label: "Discussion",
+    icon: MessagesSquare,
+  },
   { href: "/admin/system/followups", label: "Follow-ups", icon: Bell },
   { href: "/admin/system/audit", label: "Audit log", icon: ClipboardList },
   { href: "/admin/system/infra", label: "Infrastructure", icon: Cpu },
@@ -70,7 +78,19 @@ export default async function SystemAdminLayout({
   // most pages are read-only for them — Inbox + Donations are the
   // exceptions where they have full write access.
   await ensureTermsFollowups();
-  const pendingCount = await countPendingFollowups();
+  const [pendingCount, blockedRow] = await Promise.all([
+    countPendingFollowups(),
+    db
+      .select({ n: sql<number>`COUNT(*)::int` })
+      .from(schema.mahasiswaComments)
+      .where(
+        and(
+          eq(schema.mahasiswaComments.status, "blocked"),
+          sql`created_at >= now() - interval '24 hours'`,
+        ),
+      ),
+  ]);
+  const blockedCount24h = blockedRow[0]?.n ?? 0;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
@@ -109,8 +129,12 @@ export default async function SystemAdminLayout({
         <nav className="space-y-1">
           {NAV.map((item) => {
             const Icon = item.icon;
-            const showBadge =
-              item.href === "/admin/system/followups" && pendingCount > 0;
+            const badgeCount =
+              item.href === "/admin/system/followups"
+                ? pendingCount
+                : item.href === "/admin/system/discussion"
+                  ? blockedCount24h
+                  : 0;
             return (
               <Link
                 key={item.href}
@@ -119,9 +143,9 @@ export default async function SystemAdminLayout({
               >
                 <Icon className="h-4 w-4 text-slate-500" />
                 <span className="flex-1">{item.label}</span>
-                {showBadge && (
+                {badgeCount > 0 && (
                   <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-600 px-1.5 text-[10px] font-semibold text-white">
-                    {pendingCount}
+                    {badgeCount}
                   </span>
                 )}
               </Link>

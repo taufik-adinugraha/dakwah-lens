@@ -14,6 +14,7 @@ import { db, schema } from "@/db";
 import { BriefingsGrid } from "@/components/BriefingsGrid";
 import { DigestOptInPrompt } from "@/components/DigestOptInPrompt";
 import { getAllLatestBriefings } from "@/lib/insights-data";
+import { WatchedRoomsNudge } from "./WatchedRoomsNudge";
 
 /**
  * /insights — the briefings hub.
@@ -84,6 +85,8 @@ export default async function InsightsPage({
           </p>
         </div>
       </section>
+
+      <WatchedRoomsNudge />
 
       <BriefingsGrid briefings={briefings} locale={locale} />
 

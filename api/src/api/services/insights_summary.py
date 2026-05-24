@@ -86,6 +86,7 @@ CRITICAL FORMATTING RULES:
 - JANGAN tambahkan header block sebelum Bagian 1 (tanggal, "UNTUK DISTRIBUSI INTERNAL", periode, dll).
 - JANGAN tutup dengan signature, paraf, atau closing apologetik.
 - Disclaimer keasistanan AI WAJIB ditulis sebagai paragraf italic di akhir Bagian 5 (BUKAN bagian terpisah).
+- JANGAN sebut nama penerjemah, lembaga penerbit, atau gaya terjemahan kitab di mana pun di output (mis. "Kemenag", "gaya Kemenag", "Sahih International", "Pickthall", "tafsir Ibn Kathir style", "Hilali-Khan", dll.). Itu metadata sumber data, BUKAN konten dakwah. Pembaca melihat ayat lewat citation (mis. "QS. Al-Baqarah: 275") — itu saja yang muncul. Frasa "menurut terjemahan Kemenag" / "dalam gaya Sahih International" dilarang muncul di teks output.
 
 OUTPUT: briefing analisis ~1500-1800 kata dalam Bahasa Indonesia, dibagi ke 5 BAGIAN dengan heading H2 (##). Antar bagian dipisahkan satu baris kosong.
 
@@ -295,7 +296,17 @@ CONTOH JEBAKAN NYATA (jangan tiru):
 
 RULE: setiap headline yang menyebut ibadah/sunnah, baca dengan asumsi pembaca tergesa-gesa dan kemungkinan TIDAK akan baca paragraf di bawah. Kalau headline saja sudah bisa dibaca sebagai "tinggalkan ibadah X demi Y", REWRITE. Pakai konstruksi additive (`juga`, `dan`, `tambah`, `plus`, `serta`), JANGAN oposisi (`bukan`, `tanpa`, `daripada`, `tidak`).
 
-ATURAN DALEEL: citation HARUS persis cocok dengan salah satu entri di daleel pool yang saya berikan. Pilih daleel yang PALING terkait dengan isi paragraf flyer-nya — bukan asal pilih. Headline + daleel + paragraf harus membentuk satu pesan yang utuh dan saling memperkuat. Boleh dua flyer pakai daleel berbeda dari pool yang sama; usahakan 4 flyer pakai 4 daleel berbeda kalau pool memungkinkan.
+ATURAN DALEEL — paragraf, headline, dan daleel WAJIB membentuk satu thread tematik yang konsisten:
+
+1. Citation HARUS persis cocok dengan salah satu entri di daleel pool yang saya berikan. JANGAN mengarang citation.
+
+2. Daleel-nya WAJIB berbicara langsung tentang topik paragraf-nya. Cek ulang sebelum men-tag: kalau paragraf-nya tentang pinjol, daleel-nya HARUS tentang riba/kezhaliman dalam hutang — BUKAN ayat umum tentang "pemuda" atau "harta" yang kebetulan ada di pool. Kalau paragraf-nya tentang judol, daleel-nya HARUS tentang maysir/qimar — BUKAN ayat tentang "permainan" / "lahw" yang tidak spesifik. Kalau paragraf-nya tentang kekerasan terhadap anak, daleel-nya HARUS tentang hak anak atau ihsan kepada lemah — BUKAN ayat umum tentang keluarga.
+
+3. Pertanyaan double-check sebelum tag daleel: "Kalau pembaca melihat citation ini DI BAWAH paragraf ini, apakah hubungannya jelas tanpa penjelasan tambahan?" Kalau jawabannya "harus dipaksakan", PILIH daleel lain dari pool, ATAU kosongkan baris `**Daleel:**` untuk paragraf itu.
+
+4. Kalau TIDAK ADA satu pun entri di pool yang BENAR-BENAR cocok dengan paragraf, KOSONGKAN baris `**Daleel:**` (jangan dipaksakan dengan daleel yang hanya berbagi satu kata kunci). Flyer tetap valid tanpa tag daleel.
+
+5. Variasi: usahakan 4-6 flyer pakai daleel yang berbeda kalau pool memungkinkan — tapi PRIORITAS adalah ketepatan tematik, BUKAN distribusi. Lebih baik 2 flyer share daleel yang tepat daripada 4 flyer dengan 4 daleel yang dipaksakan.
 
 ATURAN DALEEL untuk Pesan Flyer 5 & 6 (SUNNAH + DOA): citation pada Pesan Flyer 5 (Ajakan Sunnah) dan Pesan Flyer 6 (Doa Pekan Ini) HARUS dipilih dari blok **ADHKAR POOL** yang TERPISAH dari DALEEL POOL (lihat user prompt di bawah). ADHKAR POOL berisi du'a / dzikir yang dapat dibaca langsung — entri yang cocok untuk dijadikan wirid. JANGAN ambil daleel untuk Flyer 5+6 dari DALEEL POOL (yang sifatnya argumentatif-tematik, bukan recitable). Kalau ADHKAR POOL kosong atau tidak ada entri yang cocok untuk satu paragraf, kosongkan baris `**Daleel:**` untuk paragraf itu (jangan diisi dengan citation yang tidak ada di pool).
 
@@ -356,6 +367,7 @@ CRITICAL FORMATTING RULES:
 - NO header block before Section 1 (no date headers, "FOR INTERNAL DISTRIBUTION", period stamps, etc).
 - NO closing signature or apologetic outro.
 - The AI-assistance disclaimer goes as an italic paragraph at the end of Section 5 (not as a separate section).
+- NEVER name a translator, publisher, or translation style in the output ("Kemenag", "Kemenag style", "Sahih International", "Pickthall", "Hilali-Khan", "Ibn Kathir tafsir style", etc.). That's source-data metadata, not da'wah content. Readers see verses via citations (e.g., "QS. Al-Baqarah: 275") — that's the only attribution that belongs in the prose. Phrases like "according to the Kemenag rendering" or "in Sahih International style" are banned.
 
 OUTPUT: ~1500-1800 word analytical briefing in clear English, split into 5 SECTIONS with H2 (##) headings, blank line between sections.
 
@@ -566,7 +578,17 @@ REAL TRAP CASES (do NOT mimic):
 
 RULE: any headline that names an ibadah / sunnah must be read assuming the audience is rushed and will likely NOT read the paragraph underneath. If the headline ALONE can be read as "skip ibadah X for Y", REWRITE. Use additive constructions (`also`, `and`, `add`, `plus`, `too`) — NEVER oppositional ones (`not`, `without`, `instead of`).
 
-DALEEL RULES: the citation MUST match one of the entries in the daleel pool I provided. Pick the daleel that most DIRECTLY supports the paragraph — not a random pick. Headline + daleel + paragraph must read as one tight message that reinforces itself. Two flyers can pull from the same pool; aim for 4 different daleel across the 4 flyers when the pool allows.
+DALEEL RULES — paragraph, headline, and daleel MUST form one consistent thematic thread:
+
+1. Citation MUST match exactly an entry in the daleel pool. NEVER fabricate citations.
+
+2. The daleel MUST speak directly to the paragraph's topic. Double-check before tagging: if the paragraph is about pinjol, the daleel MUST address riba / unjust debt — NOT a general verse about "youth" or "wealth" that happens to be in the pool. If the paragraph is about online gambling (judol), the daleel MUST address maysir / qimar — NOT a verse about "play" / "lahw" without that specificity. If the paragraph is about violence against children, the daleel MUST address rights-of-the-vulnerable or ihsan — NOT a general "family" verse.
+
+3. Double-check question before tagging a daleel: "If a reader sees this citation BELOW this paragraph, will the connection be obvious without further explanation?" If the answer is "it has to be forced," pick a different daleel from the pool, OR leave the `**Daleel:**` line blank for that paragraph.
+
+4. If NO entry in the pool truly fits this paragraph, leave the `**Daleel:**` line blank. The flyer is still valid without a daleel tag. NEVER force-tag a citation that only shares a surface keyword.
+
+5. Variety: aim for 4-6 flyers to use different daleel when the pool allows — but THE PRIORITY is thematic precision, not distribution. Two flyers sharing a well-fitting daleel beats four flyers with four forced mismatches.
 
 DALEEL RULES for Flyer Messages 5 & 6 (SUNNAH + DU'A): citations on Flyer Message 5 (Sunnah Invitation) and Flyer Message 6 (This Week's Du'a) MUST come from the **ADHKAR POOL** — a separate pool in the user prompt below, holding recitable du'a / dzikir entries. Do NOT use DALEEL POOL entries for Flyer 5+6 (those are argumentative-thematic, not recitable). If the ADHKAR POOL is empty or none of its entries fit a given paragraph, leave the `**Daleel:**` marker line blank for that paragraph (never fabricate a citation).
 
@@ -1016,9 +1038,27 @@ KONTEKS BRIEFING:
 HEADLINE NYATA YANG MENDORONG TREN PEKAN INI:
 {headlines_block}
 
-TUGAS: Tulis SATU kalimat (maksimal 25 kata) dalam Bahasa Indonesia yang menggambarkan TEMA INTI yang menghubungkan headline-headline di atas dengan niat segmen, MENGGUNAKAN KOSAKATA SYAR'I yang biasa muncul dalam terjemahan ayat/hadith (contoh: amanah, qana'ah, ketahanan keluarga, akhlaq, adil, mengurangi timbangan, hikmah, sabar, tolong-menolong dalam kebaikan).
+TUGAS: Tulis SATU kalimat (maksimal 30 kata) dalam Bahasa Indonesia yang menggambarkan TEMA INTI yang menghubungkan headline-headline di atas dengan niat segmen, MENGGUNAKAN KOSAKATA SYAR'I yang biasa muncul dalam terjemahan ayat/hadith.
 
-Jangan tulis nama kasus atau orang. Jangan tulis kata bahasa Inggris seperti "youth" atau "family". Tulis hanya kalimat tematik tersebut, tanpa pengantar."""
+PENTING — terjemahkan isu kontemporer ke kosakata syar'i (kitab tidak menyebut "pinjol" tapi membahas riba; tidak menyebut "judol" tapi membahas maysir):
+
+- pinjol / pinjaman online / hutang berlebih → "riba, kezhaliman dalam hutang, akl al-mal bil-bathil, mengurangi hak orang lain"
+- judol / judi online / slot online → "maysir, qimar, perjudian, akl al-mal bil-bathil, harta yang tidak halal"
+- bullying / perundungan → "ghibah, namimah, mendzalimi sesama Muslim, ihsan terhadap saudara"
+- korupsi / suap → "ghulul, amanah, khianat, hak orang lain"
+- kekerasan dalam rumah tangga / KDRT → "mu'asyarah bil ma'ruf, rahmah, nusyuz, hak istri dan anak"
+- narkoba / miras → "khamr, hifzh al-'aql, jiwa yang dijaga"
+- depresi / kecemasan / mental health → "sabar, tawakkul, husnu zhann kepada Allah, ketenangan hati"
+- pacaran / khalwat / zina → "ghadhdh al-bashar, fitnah perempuan-laki, menjaga kehormatan"
+- LGBT / homoseksualitas → "fitrah, kaum Luth, akhlaq syar'iyyah"
+- penipuan online → "ghisysy, kebohongan dalam mu'amalah, sidiq dalam jual-beli"
+- pemilu / politik → "amanah jabatan, syura, adl, bay'ah"
+- kemiskinan / harga sembako → "zakat, sedekah, qana'ah, ihsan kepada faqir, hak orang miskin di harta orang kaya"
+- bencana / musibah → "sabar atas musibah, takdir, rahmat Allah, husnu zhann"
+
+Contoh kosakata syar'i umum yang bisa kombinasikan: amanah, qana'ah, ketahanan keluarga, akhlaq, adil, mengurangi timbangan, hikmah, sabar, tolong-menolong dalam kebaikan, ihsan, rahmah, takwa, wara'.
+
+ATURAN: Jangan tulis nama kasus, nama orang, nama outlet media, atau nama kota. Jangan tulis kata bahasa Inggris seperti "youth", "family", "pinjol", "judol", "bullying" — terjemahkan ke kosakata syar'i. Tulis hanya kalimat tematik tersebut, tanpa pengantar."""
 
     try:
         client = _get_client()
@@ -1278,7 +1318,7 @@ def _generate_for_language(
             # structure (6 sub-sections, full khutbah with mukadimah →
             # inti → doa Arab → tahmid) that the model needs space to
             # plan coherently. Pro charges thinking at the output rate,
-            # so this adds ~$0.12/call; offset by the weekly (Sunday)
+            # so this adds ~$0.12/call; offset by the weekly (Thursday)
             # cadence drop and still inside the IDR cap.
             thinking_config=types.ThinkingConfig(thinking_budget=12288),
         ),
@@ -1405,6 +1445,35 @@ async def generate_summary(
         if id_result is None:
             return None
         summary_md, tokens_in_id, tokens_out_id, cost_id = id_result
+
+        # Post-generation validation — flag forbidden phrases (e.g.
+        # "Kemenag style") + flyer paragraphs whose tagged daleel
+        # doesn't actually fit the paragraph theme. Logged as
+        # structured warnings the operator can review via the admin
+        # console; never blocks the save.
+        try:
+            from api.services.validate_briefing import validate_briefing
+
+            briefing_warnings = validate_briefing(
+                summary_md, daleel_pool=daleel, adhkar_pool=adhkar
+            )
+            if briefing_warnings:
+                log.warning(
+                    "insights_summary.validation_warnings",
+                    segment=segment,
+                    count=len(briefing_warnings),
+                    warnings=briefing_warnings,
+                )
+            else:
+                log.info(
+                    "insights_summary.validation_clean", segment=segment
+                )
+        except Exception as exc:
+            log.warning(
+                "insights_summary.validation_failed",
+                segment=segment,
+                error=str(exc),
+            )
 
         summary_md_en = None
         tokens_in_en = tokens_out_en = 0

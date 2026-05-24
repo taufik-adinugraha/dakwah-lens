@@ -368,6 +368,130 @@ class IngestQuery(Base, TimestampMixin):
     )
 
 
+class MahasiswaComment(Base):
+    """Public discussion entry on the /m/{slug} Mahasiswa article page.
+
+    No auth — anyone can post a `display_name` + `body`. Server-side
+    moderation (regex blocklist + Flash-Lite fallback) runs at insert
+    time; only `approved` rows are listed back. `ip_hash`/`ua_hash`
+    are SHA-256 over (value | secret) and used purely for rate
+    limiting + spam scoring — never displayed, never reversed back
+    to raw IPs.
+    """
+
+    __tablename__ = "mahasiswa_comments"
+
+    id: Mapped[UUID] = mapped_column(
+        primary_key=True, default=uuid4, server_default=text("gen_random_uuid()")
+    )
+    briefing_slug: Mapped[str] = mapped_column(String(64), nullable=False)
+    """Slug of the briefing (`YYYY-MM-DD-{segment}`). FK-less on
+    purpose — comments survive a hypothetical briefing wipe."""
+
+    display_name: Mapped[str] = mapped_column(String(40), nullable=False)
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+
+    ip_hash: Mapped[str | None] = mapped_column(String(64))
+    ua_hash: Mapped[str | None] = mapped_column(String(64))
+
+    visitor_token_hash: Mapped[str | None] = mapped_column(String(64))
+    """SHA-256 of an anonymous visitor UUID set in an httpOnly cookie
+    on first comment. Lets us count distinct participants across
+    IP / UA changes without persisting any PII."""
+
+    status: Mapped[str] = mapped_column(
+        String(16), nullable=False, server_default=text("'approved'")
+    )
+    """One of: approved, blocked, pending."""
+
+    block_reason: Mapped[str | None] = mapped_column(String(64))
+    """Short tag explaining why the moderator blocked: `gambling`,
+    `pinjol`, `profanity`, `shortener`, `gibberish`, `llm_unsafe`."""
+
+    pinned: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, server_default=text("false")
+    )
+    """Admin-pinned to the top of the public thread."""
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
+    )
+
+    __table_args__ = (
+        Index(
+            "ix_mahasiswa_comments_slug_status_time",
+            "briefing_slug",
+            "status",
+            "created_at",
+        ),
+        Index("ix_mahasiswa_comments_ip_time", "ip_hash", "created_at"),
+    )
+
+
+class MahasiswaSubscriber(Base):
+    """Email opt-in subscriber for one /m/{slug} discussion room.
+
+    Created when a poster checks the "kabari saya" checkbox on the
+    comment form AND provides an email. Powers admin notification:
+    when an admin posts a reply or offline-invite, every opted-in
+    subscriber for that room is emailed (1 per 24h throttle).
+
+    Privacy: emails are stored plain so we can mail to them. Every
+    notification email includes the unsubscribe URL with this
+    token; the unsubscribe handler sets `unsubscribed_at` so future
+    sends skip this row.
+    """
+
+    __tablename__ = "mahasiswa_subscribers"
+
+    id: Mapped[UUID] = mapped_column(
+        primary_key=True, default=uuid4, server_default=text("gen_random_uuid()")
+    )
+    briefing_slug: Mapped[str] = mapped_column(String(64), nullable=False)
+    comment_id: Mapped[UUID | None] = mapped_column()
+    email: Mapped[str] = mapped_column(String(255), nullable=False)
+    email_normalized: Mapped[str] = mapped_column(String(255), nullable=False)
+    unsubscribe_token: Mapped[str] = mapped_column(String(64), nullable=False)
+
+    subscribed_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
+    )
+    unsubscribed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    last_notified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    __table_args__ = (
+        UniqueConstraint(
+            "briefing_slug",
+            "email_normalized",
+            name="uq_mahasiswa_subscribers_slug_email",
+        ),
+        UniqueConstraint(
+            "unsubscribe_token",
+            name="uq_mahasiswa_subscribers_unsub_token",
+        ),
+    )
+
+
+class MahasiswaRoomSettings(Base):
+    """Per-room moderation state — one row per `briefing_slug` once
+    an admin acts on it. No row = default open. Carries the mute
+    flag for now; designed to grow into other room-level settings.
+    """
+
+    __tablename__ = "mahasiswa_room_settings"
+
+    briefing_slug: Mapped[str] = mapped_column(String(64), primary_key=True)
+    muted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    """When non-NULL the room is muted — public POST returns 423.
+    Setting back to NULL re-opens it."""
+
+    muted_by_user_id: Mapped[UUID | None] = mapped_column()
+    mute_reason: Mapped[str | None] = mapped_column(String(120))
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
+    )
+
+
 class ContactMessage(Base, TimestampMixin):
     """Inbound message from the public /contact form.
 
@@ -614,7 +738,7 @@ class InsightsSummary(Base):
     """Weekly AI-narrated executive briefing — surfaced as the hero card
     on the public `/insights` page.
 
-    Generated by a Celery beat task every Sunday at 05:00 WIB (one hour
+    Generated by a Celery beat task every Thursday at 05:00 WIB (one hour
     after the 04:00 Gemini topic-discovery pass, so the narrative reads
     from fresh cluster labels). Append-only — never updated after insert.
     UI reads the most-recent row only.

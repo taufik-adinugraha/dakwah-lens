@@ -156,8 +156,12 @@ celery_app.conf.update(
         },
         # Insights briefing generation — PAUSED 2026-05-23 for cost.
         #
+        # Scheduled day moved Sunday → Thursday 2026-05-24 so the
+        # weekly content kit lands a day before Friday khutbah prep
+        # (giving the da'i 24h to adapt the khutbah deliverable).
+        #
         # Gemini 2.5 Pro at the current 7300-9800-word target costs
-        # ~$0.30-0.50 per briefing × 5 segments × 4 Sundays/month ≈
+        # ~$0.30-0.50 per briefing × 5 segments × 4 Thursdays/month ≈
         # $6-10/mo. Modest in absolute terms but the user is tightening
         # the budget during the development phase, so we disabled the
         # auto schedule and switched to manual generation via Claude.
@@ -174,15 +178,22 @@ celery_app.conf.update(
         # constants in services/insights_summary.py if changed.
         # "generate-insights-summary": {
         #     "task": "api.workers.ingest.generate_insights_summary",
-        #     "schedule": crontab(minute=0, hour=5, day_of_week=0),
+        #     # day_of_week=4 = Thursday in Celery's crontab (Sun=0).
+        #     "schedule": crontab(minute=0, hour=5, day_of_week=4),
         # },
-        # Weekly email digest — Sunday 18:00 WIB. Late-evening before
-        # Monday morning so Indonesian audiences see it in their
-        # Sunday-evening inbox routine. Free up to 3K emails/month on
-        # Resend's free tier.
+        # Weekly email digest — Thursday 18:00 WIB. Same day as the
+        # briefing publish (Thursday 05:00); the 13-hour gap gives the
+        # generation pipeline a full window even when retries fire, and
+        # lands in the inbox in time for Friday khutbah preparation.
+        # Free up to 3K emails/month on Resend's free tier.
+        #
+        # Moved from Sunday 18:00 → Thursday 18:00 on 2026-05-24 so the
+        # digest tracks the briefing day (briefing also moved Sun → Thu
+        # the same day; see the generate-insights-summary block above).
         "send-weekly-digest": {
             "task": "api.workers.ingest.send_weekly_digest",
-            "schedule": crontab(minute=0, hour=18, day_of_week=0),
+            # day_of_week=4 = Thursday in Celery's crontab (Sun=0).
+            "schedule": crontab(minute=0, hour=18, day_of_week=4),
         },
         # Trending overlay paused 2026-05-20 — fans out X scrapes
         # which are themselves paused pending verification.

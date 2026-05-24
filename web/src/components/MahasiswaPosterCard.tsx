@@ -30,6 +30,7 @@ export function MahasiswaPosterCard({
     body: string;
     openLarge: string;
     download: string;
+    downloadPdf: string;
     print: string;
     loading: string;
     close: string;
@@ -37,7 +38,9 @@ export function MahasiswaPosterCard({
 }) {
   const lang = locale === "en" ? "en" : "id";
   const posterUrl = `/api/insights-brief/${briefId}/flyer?variant=poster&lang=${lang}`;
+  const posterPdfUrl = `/api/insights-brief/${briefId}/flyer?variant=poster&lang=${lang}&format=pdf`;
   const downloadName = `dakwah-lens_${briefId}_poster-mahasiswa.png`;
+  const downloadPdfName = `dakwah-lens_${briefId}_poster-mahasiswa.pdf`;
 
   const [zoomed, setZoomed] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -97,31 +100,43 @@ export function MahasiswaPosterCard({
             <p className="mt-2 text-slate-600">{labels.body}</p>
           </div>
 
-          <div className="mt-auto flex flex-col gap-2 sm:flex-row">
+          <div className="mt-auto flex flex-col gap-2">
+            {/* Primary: PDF (A4 portrait, clickable URL + QR). */}
             <a
-              href={posterUrl}
-              download={downloadName}
-              className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full bg-indigo-700 px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-indigo-800"
+              href={posterPdfUrl}
+              download={downloadPdfName}
+              className="inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-indigo-700 px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-indigo-800"
             >
               <Download className="h-3.5 w-3.5" />
-              {labels.download}
+              {labels.downloadPdf}
             </a>
-            <button
-              type="button"
-              onClick={() => {
-                const win = window.open(posterUrl, "_blank");
-                if (win) {
-                  win.addEventListener("load", () => {
-                    win.focus();
-                    win.print();
-                  });
-                }
-              }}
-              className="inline-flex h-10 items-center justify-center gap-1.5 rounded-full border border-indigo-300 bg-white px-4 text-xs font-semibold text-indigo-800 transition hover:border-indigo-500 hover:bg-indigo-50"
-            >
-              <Printer className="h-3.5 w-3.5" />
-              {labels.print}
-            </button>
+            {/* Secondary: PNG (1080×1080, social shares). */}
+            <div className="flex gap-2">
+              <a
+                href={posterUrl}
+                download={downloadName}
+                className="inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-full border border-indigo-300 bg-white px-3 text-[11.5px] font-semibold text-indigo-800 transition hover:border-indigo-500 hover:bg-indigo-50"
+              >
+                <Download className="h-3 w-3" />
+                {labels.download}
+              </a>
+              <button
+                type="button"
+                onClick={() => {
+                  const win = window.open(posterPdfUrl, "_blank");
+                  if (win) {
+                    win.addEventListener("load", () => {
+                      win.focus();
+                      win.print();
+                    });
+                  }
+                }}
+                className="inline-flex h-9 items-center justify-center gap-1.5 rounded-full border border-indigo-300 bg-white px-3 text-[11.5px] font-semibold text-indigo-800 transition hover:border-indigo-500 hover:bg-indigo-50"
+              >
+                <Printer className="h-3 w-3" />
+                {labels.print}
+              </button>
+            </div>
           </div>
         </div>
       </article>

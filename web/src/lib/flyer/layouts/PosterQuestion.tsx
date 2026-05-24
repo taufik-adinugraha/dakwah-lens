@@ -3,7 +3,11 @@ import type { FlyerLayoutComponent } from "./types";
 /** QR + URL badge — a white card with the article-page QR code on top
  *  and the visible URL underneath, so a phoneless reader can still
  *  type the URL by hand. White background guarantees the QR remains
- *  scannable on any palette / photo backdrop. */
+ *  scannable on any palette / photo backdrop.
+ *
+ *  The italicized invitation under the URL nudges the scanner past
+ *  passive reading into the public discussion section — the article
+ *  page hosts a moderated comment thread per slug. */
 function ArticleBadge({
   qrDataUrl,
   url,
@@ -18,9 +22,9 @@ function ArticleBadge({
   if (!qrDataUrl || !url) return null;
   const justify =
     align === "right"
-      ? "items-end"
+      ? "items-end text-right"
       : align === "center"
-        ? "items-center"
+        ? "items-center text-center"
         : "items-start";
   return (
     <div className={`flex flex-col gap-3 ${justify}`}>
@@ -37,12 +41,18 @@ function ArticleBadge({
           style={{ width: `${size}px`, height: `${size}px` }}
         />
       </div>
-      <div className="flex flex-col gap-0.5">
+      <div className="flex flex-col gap-1">
         <div className="text-[14px] font-bold uppercase tracking-[0.18em] opacity-70">
           Scan / Kunjungi
         </div>
         <div className="text-[20px] font-extrabold tracking-tight">
           {url}
+        </div>
+        <div
+          className="mt-1.5 max-w-[440px] text-[14px] font-semibold italic leading-snug"
+          style={{ opacity: 0.85 }}
+        >
+          Yuk lanjut diskusi — tulis pikiranmu di artikel.
         </div>
       </div>
     </div>

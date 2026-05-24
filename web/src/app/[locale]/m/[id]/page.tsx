@@ -5,8 +5,12 @@ import { ArrowLeft, MessageSquareQuote, Sparkles } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import { getBriefingBySlug } from "@/lib/insights-data";
+import { localeAwareFormat } from "@/lib/date-id";
 import { extractMahasiswaContent } from "@/lib/flyer/content";
+import { ShareButton } from "../../d/[brief]/[deliverable]/ShareButton";
 import { Article } from "./Article";
+import { DiscussionSection } from "./DiscussionSection";
+import { OtherRoomsSection } from "./OtherRoomsSection";
 
 /**
  * Mahasiswa article page — the destination behind the poster's QR
@@ -25,6 +29,11 @@ import { Article } from "./Article";
 type Props = {
   params: Promise<{ id: string; locale: string }>;
 };
+
+// Opt out of route-level caching. The page mints a per-visit HMAC
+// submission token in the discussion section + lists the latest
+// approved comments — both need a fresh server render every time.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id, locale } = await params;
@@ -63,7 +72,7 @@ export default async function MahasiswaArticlePage({ params }: Props) {
   // visual identity its poster already carried, so a scanner sees
   // continuity between the printed sheet and the screen.
   const palette = palettes[brief.segment ?? "all"];
-  const dateLabel = brief.generatedAt.toLocaleDateString(locale, {
+  const dateLabel = localeAwareFormat(brief.generatedAt, locale, {
     weekday: "long",
     year: "numeric",
     month: "long",
@@ -132,9 +141,16 @@ export default async function MahasiswaArticlePage({ params }: Props) {
           </h1>
 
           <p className="mt-6 max-w-xl text-pretty text-[13px] leading-relaxed text-white/85 sm:text-sm">
-            Diskusi terbuka. Logika lebih dulu, daleel mengikuti. Boleh
-            kamu setujui, boleh kamu bantah — yang penting kamu pikir.
+            Diskusi terbuka. Boleh kamu setujui, boleh kamu bantah — yang
+            penting kamu pikir.
           </p>
+
+          <div className="mt-6">
+            <ShareButton
+              title={m.question || "Dakwah-Lens"}
+              pdfUrl={`/api/m/${id}/pdf?lang=${locale}`}
+            />
+          </div>
         </div>
       </section>
 
@@ -147,6 +163,16 @@ export default async function MahasiswaArticlePage({ params }: Props) {
           locale === "en" ? "Honest Pushback" : "Pertanyaan Sulit"
         }
       />
+
+      {/* DISCUSSION — public, moderated. Hidden in print. */}
+      <DiscussionSection
+        briefingSlug={id}
+        locale={locale}
+        palette={palette}
+      />
+
+      {/* OTHER ROOMS — cross-link to peer Mahasiswa packs. Hidden in print. */}
+      <OtherRoomsSection currentSlug={id} locale={locale} />
 
       {/* FOOTER */}
       <footer className="border-t border-slate-200 bg-white">

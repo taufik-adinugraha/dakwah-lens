@@ -72,3 +72,59 @@ export async function snapHtmlToPng(
     await page.close().catch(() => {});
   }
 }
+
+/**
+ * Render a self-contained HTML document to an A4-portrait PDF.
+ *
+ * Same Puppeteer pipeline as `snapHtmlToPng`, but the output is a
+ * vector PDF — `<a href>` tags become real clickable link annotations
+ * in the PDF, CSS @page sets paper size, `printBackground` keeps the
+ * gradient + photo backgrounds.
+ *
+ * Use for the printable poster + any other surface that benefits from
+ * a tappable URL (vs the PNG, which is pixels-only).
+ */
+export async function snapHtmlToPdf(html: string): Promise<Buffer> {
+  const browser = await getBrowser();
+  const page = await browser.newPage();
+  try {
+    // The viewport is the "screen size" Puppeteer renders at before
+    // converting to PDF paper. 794×1123 ≈ A4 at 96 DPI, which keeps
+    // CSS px ↔ PDF mm math clean (1 mm ≈ 3.78 px).
+    await page.setViewport({ width: 794, height: 1123, deviceScaleFactor: 2 });
+    await page.emulateMediaType("print");
+    await page.setContent(html, { waitUntil: "load", timeout: 15000 });
+    await page.evaluate(async () => {
+      const fontsReady =
+        (document as Document & { fonts?: { ready: Promise<unknown> } }).fonts
+          ?.ready ?? Promise.resolve();
+      const imgs = Array.from(document.images);
+      const imgsReady = Promise.all(
+        imgs.map((img) =>
+          img.complete
+            ? Promise.resolve()
+            : new Promise<void>((resolve) => {
+                img.addEventListener("load", () => resolve(), { once: true });
+                img.addEventListener("error", () => resolve(), { once: true });
+              }),
+        ),
+      );
+      await Promise.all([fontsReady, imgsReady]);
+    });
+    await page.evaluate(
+      () =>
+        new Promise<void>((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+        ),
+    );
+    const pdf = await page.pdf({
+      format: "A4",
+      printBackground: true,
+      preferCSSPageSize: true,
+      margin: { top: 0, right: 0, bottom: 0, left: 0 },
+    });
+    return Buffer.from(pdf);
+  } finally {
+    await page.close().catch(() => {});
+  }
+}

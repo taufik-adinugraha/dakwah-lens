@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
+import { localeAwareFormat } from "@/lib/date-id";
 import {
   DELIVERABLE_HEADING_PATTERNS,
   extractDeliverableSection,
@@ -93,7 +94,7 @@ export default async function DeliverablePage({ params }: Props) {
 
   const palette = palettes[row.segment ?? "all"];
   const Icon = KIND_ICON[deliverable];
-  const dateLabel = row.generatedAt.toLocaleDateString(locale, {
+  const dateLabel = localeAwareFormat(row.generatedAt, locale, {
     weekday: "long",
     year: "numeric",
     month: "long",
@@ -158,7 +159,10 @@ export default async function DeliverablePage({ params }: Props) {
           </h1>
 
           <div className="mt-6">
-            <ShareButton title={heroTitle} />
+            <ShareButton
+              title={heroTitle}
+              pdfUrl={`/api/d/${brief}/${deliverable}/pdf?lang=${locale}`}
+            />
           </div>
         </div>
       </section>

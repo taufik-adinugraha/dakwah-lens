@@ -904,6 +904,58 @@ export async function setContactStatus(formData: FormData) {
 }
 
 /* ────────────────────────────────────────────────────────────
+ * Discussion moderation (/admin/system/discussion)
+ * ────────────────────────────────────────────────────────────
+ * Two-way flip between approved ↔ blocked. False positives go
+ * approved=true; missed spam goes approved=false. Same access
+ * rules as the inbox — admins can write (not just superadmin),
+ * since this is reactive moderation in response to alerts.
+ */
+
+export async function setCommentStatus(formData: FormData) {
+  const session = await requireSystemAccess();
+  const id = String(formData.get("id") ?? "");
+  const status = String(formData.get("status") ?? "");
+  if (!id || !["approved", "blocked"].includes(status)) return;
+  const [row] = await db
+    .select({
+      briefingSlug: schema.mahasiswaComments.briefingSlug,
+      displayName: schema.mahasiswaComments.displayName,
+    })
+    .from(schema.mahasiswaComments)
+    .where(eq(schema.mahasiswaComments.id, id))
+    .limit(1);
+  if (!row) return;
+  await db
+    .update(schema.mahasiswaComments)
+    .set({
+      status,
+      // Admin override clears the auto-block reason so the audit
+      // trail differentiates "regex caught it" from "admin restored it".
+      blockReason: status === "approved" ? null : "admin_override",
+    })
+    .where(eq(schema.mahasiswaComments.id, id));
+  await logAdminAction({
+    actorId: session.user.id,
+    action: "comment.status_change",
+    targetType: "mahasiswa_comment",
+    targetId: id,
+    payload: {
+      slug: row.briefingSlug,
+      display_name: row.displayName,
+      new_status: status,
+    },
+  });
+  revalidatePath("/admin/system/discussion");
+  revalidatePath("/admin/system");
+  revalidatePath(`/m/${row.briefingSlug}`);
+  // Approve/Block changes the approved-comments count surfaced on
+  // /insights (OtherRoomsSection cards + admin-rooms tiles).
+  revalidatePath("/insights");
+  revalidatePath("/admin/rooms");
+}
+
+/* ────────────────────────────────────────────────────────────
  * Ingest-query CRUD (keyword rotation, /admin/system/queries)
  * ──────────────────────────────────────────────────────────── */
 

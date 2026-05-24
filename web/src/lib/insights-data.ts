@@ -10,6 +10,7 @@
 import { and, count, countDistinct, desc, eq, isNotNull, sql } from "drizzle-orm";
 
 import { db, schema } from "@/db";
+import { extractMahasiswaContent } from "@/lib/flyer/content";
 
 /**
  * The 9 PRD da'wah categories the Gemini classifier assigns to every post.
@@ -576,6 +577,92 @@ export function extractFirstBriefingSection(body: string): string {
   return lines.slice(start, end).join("\n").trim();
 }
 
+/**
+ * Other Mahasiswa rooms — surfaced at the bottom of /m/{slug} to
+ * cross-link the QR-landed reader into other discussion threads.
+ *
+ * Returns at most `limit` rooms, sorted newest first, excluding the
+ * current slug. Each row carries the poster question (so the card
+ * can show "Apakah kita …?" rather than just a date) plus comment
+ * aggregates feeding the status pill (`baru` / `aktif` / `tenang`).
+ *
+ * Rooms without a parseable Mahasiswa block are dropped — older
+ * briefings predating the Mahasiswa pack would otherwise show with
+ * an empty question.
+ */
+export type OtherRoom = {
+  slug: string;
+  segment: string | null;
+  generatedAt: Date;
+  /** Poster question — already trimmed, may be up to ~300 chars. */
+  question: string;
+  approvedTotal: number;
+  approved7d: number;
+  lastActivityAt: Date | null;
+};
+
+export async function getOtherMahasiswaRooms(
+  currentSlug: string,
+  limit = 8,
+): Promise<OtherRoom[]> {
+  type Row = {
+    summaryMd: string;
+    segment: string | null;
+    generatedAt: Date | string;
+    approvedTotal: number;
+    approved7d: number;
+    lastActivityAt: Date | string | null;
+  };
+
+  // Over-fetch by 4× so the JS filter (drop rows without a parseable
+  // Mahasiswa block) has plenty of headroom. The bottleneck card
+  // section caps at `limit` regardless. Cheap at our scale —
+  // 32 rows × ~5 KB each is well under any meaningful budget.
+  const rows = (await db.execute(sql`
+    SELECT
+      i.summary_md                    AS "summaryMd",
+      i.segment                       AS "segment",
+      i.generated_at                  AS "generatedAt",
+      COALESCE(SUM(CASE WHEN c.status = 'approved' THEN 1 ELSE 0 END), 0)::int           AS "approvedTotal",
+      COALESCE(SUM(CASE WHEN c.status = 'approved' AND c.created_at >= now() - interval '7 days' THEN 1 ELSE 0 END), 0)::int AS "approved7d",
+      MAX(CASE WHEN c.status = 'approved' THEN c.created_at END)                          AS "lastActivityAt"
+    FROM insights_summaries i
+    LEFT JOIN mahasiswa_comments c
+      ON c.briefing_slug =
+         to_char(i.generated_at AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD')
+           || '-' || COALESCE(i.segment, 'all')
+    WHERE to_char(i.generated_at AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD')
+            || '-' || COALESCE(i.segment, 'all') <> ${currentSlug}
+      AND i.generated_at >= now() - interval '90 days'
+    GROUP BY i.summary_md, i.segment, i.generated_at
+    ORDER BY i.generated_at DESC
+    LIMIT ${limit * 4}
+  `)) as unknown as Row[];
+
+  const out: OtherRoom[] = [];
+  for (const r of rows) {
+    const m = extractMahasiswaContent(r.summaryMd);
+    if (!m.question || !m.question.trim()) continue;
+    const generatedAt =
+      r.generatedAt instanceof Date ? r.generatedAt : new Date(r.generatedAt);
+    out.push({
+      slug: briefingSlug(generatedAt, r.segment),
+      segment: r.segment,
+      generatedAt,
+      question: m.question.trim(),
+      approvedTotal: r.approvedTotal,
+      approved7d: r.approved7d,
+      lastActivityAt: r.lastActivityAt
+        ? r.lastActivityAt instanceof Date
+          ? r.lastActivityAt
+          : new Date(r.lastActivityAt)
+        : null,
+    });
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
 /** Canonical slug for a briefing — used for share links + RSS later. */
 export function briefingSlug(generatedAt: Date, segment: string | null): string {
   // Convert UTC → WIB by adding 7h, then take date portion. Done manually
@@ -643,7 +730,7 @@ export type BriefingNavigation = {
  *
  * Strategy: peer briefings are scoped to the SAME WIB date as the current
  * brief — that's the cleanest definition of "this edition" given the
- * weekly Sunday cron may drift by minutes. For prev/next we strictly compare
+ * weekly Thursday cron may drift by minutes. For prev/next we strictly compare
  * `generated_at` of the SAME segment.
  */
 export async function getBriefingNavigation(
@@ -676,7 +763,23 @@ export async function getBriefingNavigation(
     });
   }
 
-  // Previous edition of the same segment.
+  // Previous / next edition of the same segment.
+  //
+  // We compare on WIB-date (not raw generated_at) so a regeneration
+  // that landed on the same day as the current row doesn't get
+  // surfaced as "previous" / "next" — both would carry the same date
+  // label and resolve back to the same slug (getBriefingBySlug
+  // collapses by WIB-date).
+  const currentTs = currentGeneratedAt.toISOString();
+  const segmentClause =
+    currentSegment === null
+      ? sql`segment IS NULL`
+      : sql`segment = ${currentSegment}`;
+  const differentDay = sql`
+    (generated_at AT TIME ZONE 'Asia/Jakarta')::date <>
+    (${currentTs}::timestamptz AT TIME ZONE 'Asia/Jakarta')::date
+  `;
+
   const [prevRow] = await db
     .select({
       generatedAt: schema.insightsSummaries.generatedAt,
@@ -684,11 +787,7 @@ export async function getBriefingNavigation(
     })
     .from(schema.insightsSummaries)
     .where(
-      sql`generated_at < ${currentGeneratedAt.toISOString()}::timestamptz AND ${
-        currentSegment === null
-          ? sql`segment IS NULL`
-          : sql`segment = ${currentSegment}`
-      }`,
+      sql`generated_at < ${currentTs}::timestamptz AND ${segmentClause} AND ${differentDay}`,
     )
     .orderBy(desc(schema.insightsSummaries.generatedAt))
     .limit(1);
@@ -702,11 +801,7 @@ export async function getBriefingNavigation(
       })
       .from(schema.insightsSummaries)
       .where(
-        sql`generated_at > ${currentGeneratedAt.toISOString()}::timestamptz AND ${
-          currentSegment === null
-            ? sql`segment IS NULL`
-            : sql`segment = ${currentSegment}`
-        }`,
+        sql`generated_at > ${currentTs}::timestamptz AND ${segmentClause} AND ${differentDay}`,
       )
       .orderBy(schema.insightsSummaries.generatedAt)
       .limit(1)

@@ -6,6 +6,7 @@ import {
   ChevronDown,
   LayoutDashboard,
   LogOut,
+  MessagesSquare,
   ScrollText,
   ShieldCheck,
   Sparkles,
@@ -141,6 +142,16 @@ export function UserMenu({ email, name, status, role }: Props) {
               >
                 <ShieldCheck className="h-4 w-4 text-brand-600" />
                 {tAdmin("nav_admin")}
+              </Link>
+            )}
+            {isAdmin && (
+              <Link
+                href="/admin/rooms"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-900"
+              >
+                <MessagesSquare className="h-4 w-4 text-brand-600" />
+                Rooms
               </Link>
             )}
             {isSuperadmin && (

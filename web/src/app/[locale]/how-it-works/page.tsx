@@ -642,7 +642,7 @@ function BriefPipeline({ t }: { t: T }) {
  * the current manual operator flow, and /insights/brief/[id] for the
  * public viewer.
  *
- * The cron is wired for Sunday 05:00 WIB but currently PAUSED
+ * The cron is wired for Thursday 05:00 WIB but currently PAUSED
  * (2026-05-23) — operator runs manually via Claude-in-the-loop to keep
  * Gemini Pro spend at zero during the dev phase.
  */
@@ -998,7 +998,7 @@ function ModelsTable({ t }: { t: T }) {
  *   YT — daily, free quota
  *   mainstream RSS — every 2h, free
  *   topic discovery — daily 04:00 WIB
- *   briefings — weekly Sunday 05:00 WIB cron (currently PAUSED — manual via scripts/manual_briefing.py)
+ *   briefings — weekly Thursday 05:00 WIB cron (currently PAUSED — manual via scripts/manual_briefing.py)
  *
  * Validated against `usage_events` 7-day rollup on 2026-05-22 — earlier
  * estimates undercounted Pro briefings ($0 → ~$9/mo) and overcounted
@@ -1010,9 +1010,9 @@ function MonthlyCost({ t }: { t: T }) {
       provider: "Gemini 2.5 Pro (briefings, scheduled — currently paused)",
       use: t("cost_gemini_pro_use"),
       // Paused per 2026-05-23 to keep dev-phase spend at zero. Projected
-      // $5/mo if cron flips back on: 5 briefings × 4 Sundays × ~$0.26.
+      // $5/mo if cron flips back on: 5 briefings × 4 Thursdays × ~$0.26.
       monthly: 0,
-      note: "Paused; would be ~$5/mo if re-enabled (5 segmen × 1 bahasa × Ahad × ~$0.26)",
+      note: "Paused; would be ~$5/mo if re-enabled (5 segmen × 1 bahasa × Kamis × ~$0.26)",
     },
     {
       provider: "Gemini Flash-Lite",

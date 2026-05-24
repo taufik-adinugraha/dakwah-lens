@@ -66,6 +66,7 @@ function stripFlyerMessagesSection(md: string): string {
 export function BriefingNarrative({
   text,
   daleelRefs,
+  adhkarRefs,
   citedDaleelLabel,
   briefBasePath,
   briefId,
@@ -76,6 +77,12 @@ export function BriefingNarrative({
 }: {
   text: string;
   daleelRefs: DaleelRef[] | null;
+  /** Du'a / dzikir pool retrieved alongside the thematic daleel. The
+   *  Sunnah-call (Pesan Flyer 5) + Du'a hero (Flyer 6) cite from this
+   *  pool. Surfaced in the same "Dalil yang dirujuk" chip list as
+   *  daleelRefs (de-duped by citation) so a reader can click any
+   *  cited passage — thematic OR sunnah/du'a — from one place. */
+  adhkarRefs?: DaleelRef[] | null;
   /** Header label for the collapsible daleel chips section below the
    *  narrative. Locale-aware via translations from parent. */
   citedDaleelLabel: string;
@@ -98,6 +105,7 @@ export function BriefingNarrative({
     download: string;
     print: string;
     flyer: string;
+    visit: string;
     close: string;
   };
   /** Deep-link slug: opens the matching modal on mount. */
@@ -119,6 +127,7 @@ export function BriefingNarrative({
     body: string;
     openLarge: string;
     download: string;
+    downloadPdf: string;
     print: string;
     loading: string;
     close: string;
@@ -180,9 +189,10 @@ export function BriefingNarrative({
         )}
       </article>
 
-      {daleelRefs && daleelRefs.length > 0 && (
+      {((daleelRefs && daleelRefs.length > 0) ||
+        (adhkarRefs && adhkarRefs.length > 0)) && (
         <DaleelChips
-          refs={daleelRefs}
+          refs={mergeRefs(daleelRefs, adhkarRefs)}
           mode="cards"
           headerLabel={citedDaleelLabel}
         />
@@ -475,4 +485,34 @@ function makeMarkdownComponents(): Components {
       <hr className="my-6 border-0 border-t border-dashed border-slate-300" />
     ),
   };
+}
+
+/** Merge the thematic daleel pool + the adhkar (du'a / sunnah) pool
+ *  into a single chip list for "Dalil yang dirujuk · klik untuk
+ *  membaca". De-duped by citation (case-insensitive, punctuation-
+ *  tolerant) so an entry that happens to land in both pools shows up
+ *  once — thematic pool wins ordering. Stable ordering: thematic
+ *  entries first in their original sequence, then adhkar entries
+ *  that didn't already appear. */
+function mergeRefs(
+  daleel: DaleelRef[] | null | undefined,
+  adhkar: DaleelRef[] | null | undefined,
+): DaleelRef[] {
+  const out: DaleelRef[] = [];
+  const seen = new Set<string>();
+  const key = (r: DaleelRef) =>
+    r.citation.toLowerCase().replace(/\s+/g, " ").replace(/[.,;:]+/g, "").trim();
+  for (const r of daleel ?? []) {
+    const k = key(r);
+    if (seen.has(k)) continue;
+    seen.add(k);
+    out.push(r);
+  }
+  for (const r of adhkar ?? []) {
+    const k = key(r);
+    if (seen.has(k)) continue;
+    seen.add(k);
+    out.push(r);
+  }
+  return out;
 }

@@ -259,9 +259,14 @@ def retrieve_dua(
         return []
 
     parts = [
-        f"doa dan munajat tentang {theme}",
-        "memohon kepada Allah, dzikir pagi dan petang",
-        "perlindungan, hidayah, ketetapan hati, ampunan, tazkiyatun nafs",
+        f"doa, dzikir, dan ibadah sunnah tentang {theme}",
+        "memohon kepada Allah, dzikir pagi dan petang, perlindungan, hidayah, ampunan, tazkiyatun nafs",
+        # Sunnah practice hadith — Flyer 5 (Ajakan Sunnah) needs the
+        # hadith that ESTABLISHES the practice (Arafah / Tarwiyah /
+        # Asyura / Senin-Kamis fasting, sedekah pagi, sholat Dhuha,
+        # qiyamul lail, baca Surat Al-Kahfi Jumat, dll.) — not only
+        # recitable du'a.
+        "sunnah Nabi shallallahu alaihi wa sallam: puasa Arafah, puasa Tarwiyah, puasa Asyura, puasa Senin Kamis, puasa Ayyamul Bidh, sholat Dhuha, sholat Tahajjud, qiyamul lail, sedekah Subuh, dzikir setelah sholat, membaca Al-Kahfi Jumat, takbir Idul Adha",
     ]
     if hijri_context and hijri_context.strip():
         parts.insert(1, f"konteks Hijriyah: {hijri_context.strip()}")
@@ -493,14 +498,26 @@ def rerank_daleel(
 
 Berikut adalah {len(candidates)} kandidat daleel dari Qur'an dan hadith yang ditemukan oleh pencarian embedding. Beberapa cocok dengan tema, beberapa hanya cocok pada kata kunci permukaan saja (tidak relevan secara tematik).
 
-Pilih INDEX dari {top_n} daleel yang PALING relevan secara TEMATIK untuk tema di atas. Pertimbangkan:
-- Apakah ayat/hadith ini benar-benar BERBICARA tentang tema, atau hanya berbagi kata kunci?
-- Apakah seorang da'i akan mengutipnya untuk topik ini, atau itu akan terasa dipaksakan?
+TUGAS: Pilih INDEX daleel yang BENAR-BENAR relevan secara TEMATIK untuk tema di atas.
+
+ATURAN PENILAIAN — wajib ketat:
+- Daleel TIDAK COCOK jika hanya berbagi kata permukaan tapi konteks asli berbeda. Contoh kesalahan yang HARUS Anda tolak:
+  * tema "pinjol/riba" + daleel tentang "pemuda yang taat di Gua Kahfi" → TIDAK COCOK (sama-sama "muda", tapi tema-nya kepatuhan vs muamalah)
+  * tema "judol/maysir" + daleel tentang "permainan anak-anak" → TIDAK COCOK (kata "lahw" tidak otomatis = perjudian)
+  * tema "kekerasan terhadap anak" + daleel tentang "perlindungan harta yatim" → LEMAH (terkait, tapi tema sebenarnya kekerasan fisik, bukan harta)
+  * tema "depresi/mental health" + daleel tentang "kesabaran nabi atas kafir Quraysy" → LEMAH (sabar tapi konteks dakwah-ke-luar, bukan ketenangan jiwa)
+- Daleel COCOK kalau ayat/hadith-nya BENAR-BENAR berbicara tentang inti tema-nya, bukan hanya berbagi satu kata. Contoh yang BENAR:
+  * tema "pinjol/riba" + daleel QS Al-Baqarah:275-281 (larangan riba) → COCOK
+  * tema "judol/maysir" + daleel QS Al-Maidah:90-91 (khamr & maysir) → COCOK
+  * tema "bullying/ghibah" + hadith tentang lisan yang menjaga saudara → COCOK
+  * tema "korupsi/amanah" + ayat tentang menunaikan amanah → COCOK
+
+PRINSIP TERAKHIR: lebih baik mengembalikan SEDIKIT daleel yang benar-benar tematik daripada memaksa {top_n} entri ketika hanya sebagian yang benar-benar relevan. Da'i akan mengutip ulang daleel ini di mimbar — daleel yang dipaksakan akan terasa janggal dan merusak kredibilitas pesan.
 
 Kandidat:
 {numbered}
 
-Kembalikan JSON: {{"indices": [i1, i2, i3]}} dengan {top_n} index daleel terbaik, diurutkan dari yang paling relevan."""
+Kembalikan JSON: {{"indices": [i1, i2, ...]}} dengan SEMUA index daleel yang BENAR-BENAR cocok (jumlah bisa antara 0 hingga {top_n}, urutan dari paling relevan). Kalau tidak ada satu pun yang cocok secara tematik, kembalikan {{"indices": []}}."""
 
     try:
         resp = client.models.generate_content(
@@ -552,14 +569,24 @@ Kembalikan JSON: {{"indices": [i1, i2, i3]}} dengan {top_n} index daleel terbaik
             candidates_in=len(candidates),
             picked=len(picked),
         )
-        # If the LLM picked fewer than top_n (or returned garbage), fall back
-        # to topping up from the original (similarity-sorted) list.
-        if len(picked) < top_n:
-            for c in candidates:
-                if c not in picked:
-                    picked.append(c)
-                    if len(picked) >= top_n:
-                        break
+        # IMPORTANT: do NOT top up the picked list with weak candidates.
+        # The previous behavior backfilled with the original similarity-
+        # sorted list to always return top_n, which re-introduced the
+        # surface-keyword matches the rerank was specifically asked to
+        # reject. Trust the rerank's verdict — the brief LLM can handle
+        # a pool of < top_n daleel; it CANNOT recover from forced
+        # mis-citations.
+        #
+        # If the rerank returned literally zero candidates (and at least
+        # one input was given) we DO take the single top-similarity hit
+        # as a last-resort fallback so the brief still has something to
+        # cite for Section 5. Anything more aggressive would mask bugs.
+        if not picked and candidates:
+            picked = [candidates[0]]
+            log.warning(
+                "kitab_retrieval.rerank_returned_empty_fallback_to_top1",
+                theme=theme[:80],
+            )
         return picked
     except Exception as exc:
         log.warning("kitab_retrieval.rerank_failed", error=str(exc))

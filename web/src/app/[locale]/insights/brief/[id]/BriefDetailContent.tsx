@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ArrowLeft, Clock, Sparkles } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
+import { localeAwareFormatDateTime } from "@/lib/date-id";
 import { BriefingNarrative } from "@/components/BriefingNarrative";
 import {
   getBriefingBySlug,
@@ -67,7 +68,7 @@ export async function BriefDetailContent({
   // ~200 wpm (Indonesian average); cap to whole minutes, min 1.
   const readingMinutes = Math.max(1, Math.round(wordCount / 200));
 
-  const generatedLabel = brief.generatedAt.toLocaleString(locale, {
+  const generatedLabel = localeAwareFormatDateTime(brief.generatedAt, locale, {
     weekday: "long",
     year: "numeric",
     month: "long",
@@ -179,6 +180,7 @@ export async function BriefDetailContent({
             <BriefingNarrative
               text={body}
               daleelRefs={brief.daleelRefs}
+              adhkarRefs={brief.adhkarRefs}
               citedDaleelLabel={t("exec_daleel_label")}
               briefBasePath={briefBasePath}
               briefId={id}
@@ -191,6 +193,7 @@ export async function BriefDetailContent({
                 download: t("brief_deliverable_download"),
                 print: t("brief_deliverable_print"),
                 flyer: t("brief_deliverable_flyer"),
+                visit: t("brief_deliverable_visit"),
                 close: t("brief_deliverable_close"),
               }}
               posterLabels={{
@@ -199,6 +202,7 @@ export async function BriefDetailContent({
                 body: t("brief_poster_section_body"),
                 openLarge: t("brief_poster_open_large"),
                 download: t("brief_poster_download"),
+                downloadPdf: t("brief_poster_download_pdf"),
                 print: t("brief_poster_print"),
                 loading: t("brief_poster_loading"),
                 close: t("brief_poster_close"),

@@ -8,7 +8,7 @@ import {
   PageHeader,
   StatTile,
 } from "../_ui";
-import { BriefBars, DailyBars, StackedBar } from "./Bars.client";
+import { BriefBars, DailyBars, HourlyBars, StackedBar } from "./Bars.client";
 
 /**
  * Shared exclusion filter for analytics queries. We strip:
@@ -55,6 +55,7 @@ export default async function AnalyticsPage() {
     [{ anon7d = 0 } = { anon7d: 0 }],
     topPaths,
     perDay,
+    perHour,
     topReferers,
     // ── Brief generation metrics ──
     [
@@ -119,6 +120,28 @@ export default async function AnalyticsPage() {
       ORDER BY day
     `) as unknown as Promise<
       Array<{ day: string; hits: number; uniques: number }>
+    >,
+    // Last 24 hours, bucketed by hour in Asia/Jakarta (WIB). We
+    // truncate AT TIME ZONE 'Asia/Jakarta' so the hour boundaries align
+    // with how the operator reads the day locally — not UTC midnight.
+    // Returns the bucket as ISO-ish "YYYY-MM-DD HH:00" in WIB so the
+    // client component can render the hour label without re-zoning.
+    db.execute(sql`
+      SELECT
+        TO_CHAR(
+          DATE_TRUNC('hour', occurred_at AT TIME ZONE 'Asia/Jakarta'),
+          'YYYY-MM-DD HH24:00'
+        ) AS hour,
+        COUNT(*)::int AS hits,
+        COUNT(DISTINCT session_id)::int AS uniques
+      FROM page_views
+      WHERE occurred_at >= now() - interval '24 hours'
+        AND path NOT LIKE '/admin%'
+        AND path NOT LIKE '/api%'
+      GROUP BY hour
+      ORDER BY hour
+    `) as unknown as Promise<
+      Array<{ hour: string; hits: number; uniques: number }>
     >,
     db.execute(sql`
       SELECT referer, COUNT(*)::int AS hits
@@ -227,6 +250,19 @@ export default async function AnalyticsPage() {
 
   const localeTotal = localeSplit.reduce((s, r) => s + r.sessions, 0);
   const regionTotal = regionSplit.reduce((s, r) => s + r.sessions, 0);
+
+  // Backfill the hour buckets so an idle 24-h stretch still renders as
+  // 24 zero-height bars (instead of collapsing into 3 narrow bars).
+  // We anchor on the current WIB hour and walk back 23 hours.
+  const hourRows = padHourBuckets(perHour as Array<{ hour: string; hits: number; uniques: number }>);
+  const totalLast24h = hourRows.reduce((s, r) => s + r.hits, 0);
+  const uniquesLast24h = new Set<string>();
+  // Sum unique counts per bucket is NOT distinct-sessions for the whole
+  // window — but each bucket's `uniques` is already distinct WITHIN
+  // that hour, which is what the bar visualizes. Window-total uniques
+  // would need its own COUNT(DISTINCT session_id) query. Skip for now;
+  // header just shows total views.
+  void uniquesLast24h;
 
   return (
     <>
@@ -385,6 +421,20 @@ export default async function AnalyticsPage() {
           </ul>
         </Card>
       )}
+
+      <Card
+        title="Hourly traffic (last 24 hours)"
+        hint={`${totalLast24h.toLocaleString()} views · WIB buckets`}
+      >
+        {totalLast24h > 0 ? (
+          <HourlyBars rows={hourRows} />
+        ) : (
+          <EmptyState
+            title="No traffic in the last 24h"
+            hint="As soon as someone visits a page, the bars light up."
+          />
+        )}
+      </Card>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-[2fr_1fr]">
         <Card title="Daily traffic (last 14 days)">
@@ -551,3 +601,61 @@ export default async function AnalyticsPage() {
 // DailyBars + BriefBars moved to ./Bars.client.tsx — they're client
 // components now because of the hover-tooltip state. Server side just
 // hands them the data fetched above.
+
+/**
+ * Backfill missing hour buckets so the last-24h chart renders a steady
+ * 24-bar strip regardless of how busy each hour was. Postgres only
+ * returns rows for hours that HAD page-views; idle stretches need to
+ * appear as zero-height columns or the x-axis spacing implodes.
+ *
+ * Anchor on the current WIB hour and walk back 23 hours. For each
+ * slot, look up the matching row (key = "YYYY-MM-DD HH:00" in WIB)
+ * or emit a zero row.
+ */
+function padHourBuckets(
+  rows: Array<{ hour: string; hits: number; uniques: number }>,
+): Array<{ hour: string; hits: number; uniques: number }> {
+  const index = new Map<string, { hits: number; uniques: number }>();
+  for (const r of rows) index.set(r.hour, { hits: r.hits, uniques: r.uniques });
+
+  // Format a Date as "YYYY-MM-DD HH:00" in Asia/Jakarta. We don't have
+  // a "give me the WIB civil time" helper baked in, so do it via
+  // `toLocaleString` and a known formatter — same shape as the SQL
+  // TO_CHAR output above.
+  const fmtWib = (d: Date) => {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Jakarta",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      hour12: false,
+    }).formatToParts(d);
+    const lookup = (k: string) =>
+      parts.find((p) => p.type === k)?.value ?? "00";
+    // `Intl.DateTimeFormat` can return "24" for hour=24 on some impls;
+    // normalize to "00".
+    const hh = lookup("hour") === "24" ? "00" : lookup("hour");
+    return `${lookup("year")}-${lookup("month")}-${lookup("day")} ${hh}:00`;
+  };
+
+  const now = new Date();
+  // Round DOWN to the start of the current hour (UTC ms boundary).
+  // Walking back N hours from this anchor gives us 24 consecutive
+  // bucket keys in WIB without DST surprises (Indonesia doesn't
+  // observe DST anyway).
+  const HOUR_MS = 3_600_000;
+  const anchor = new Date(Math.floor(now.getTime() / HOUR_MS) * HOUR_MS);
+  const out: Array<{ hour: string; hits: number; uniques: number }> = [];
+  for (let i = 23; i >= 0; i--) {
+    const t = new Date(anchor.getTime() - i * HOUR_MS);
+    const key = fmtWib(t);
+    const row = index.get(key);
+    out.push({
+      hour: key,
+      hits: row?.hits ?? 0,
+      uniques: row?.uniques ?? 0,
+    });
+  }
+  return out;
+}

@@ -806,7 +806,7 @@ export const adminLogs = pgTable(
 /**
  * Weekly AI-narrated executive briefing for /insights. One row per
  * generation. Celery beat `generate_insights_summary` task writes
- * this every Sunday at 05:00 WIB (one hour after the topic-discovery
+ * this every Thursday at 05:00 WIB (one hour after the topic-discovery
  * pass). The /insights page reads the most-recent row to render the
  * hero card.
  */
@@ -937,3 +937,102 @@ export const flyerAssets = pgTable(
   },
   (table) => [index("ix_flyer_assets_kind").on(table.kind)],
 );
+
+/**
+ * Public discussion entries on /m/{slug} (Mahasiswa article page).
+ *
+ * No auth — `display_name` is the only field the writer controls.
+ * Server-side moderation (regex + Flash-Lite fallback) runs at
+ * insert; only `status = 'approved'` rows are listed back.
+ * `ip_hash` / `ua_hash` are SHA-256 over (value | secret) and used
+ * only for rate-limit / spam-score lookups — never displayed.
+ */
+export const mahasiswaComments = pgTable(
+  "mahasiswa_comments",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    briefingSlug: text("briefing_slug").notNull(),
+    displayName: text("display_name").notNull(),
+    body: text("body").notNull(),
+    ipHash: text("ip_hash"),
+    uaHash: text("ua_hash"),
+    /** SHA-256 of an anonymous visitor UUID set in an httpOnly cookie
+     *  on first comment. Lets us count distinct participants across
+     *  IP / UA changes without persisting any PII. */
+    visitorTokenHash: text("visitor_token_hash"),
+    /** One of: 'approved' | 'blocked' | 'pending'. */
+    status: text("status").notNull().default("approved"),
+    /** Short tag: gambling | pinjol | profanity | shortener |
+     *  gibberish | llm_unsafe. NULL when status = approved. */
+    blockReason: text("block_reason"),
+    /** Admin-pinned to the top of the public thread. */
+    pinned: boolean("pinned").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => [
+    index("ix_mahasiswa_comments_slug_status_time").on(
+      table.briefingSlug,
+      table.status,
+      table.createdAt,
+    ),
+    index("ix_mahasiswa_comments_ip_time").on(table.ipHash, table.createdAt),
+  ],
+);
+
+/**
+ * Email opt-in subscribers per room.
+ *
+ * One row per (briefing_slug, email_normalized). Powers admin
+ * notification: when an admin posts a reply / offline-invite in a
+ * room, every opted-in subscriber gets an email (throttled to 1
+ * per 24h per recipient per room).
+ *
+ * Privacy: emails stored plain so we can mail them. Every notification
+ * includes the unsubscribe URL with this token.
+ */
+export const mahasiswaSubscribers = pgTable(
+  "mahasiswa_subscribers",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    briefingSlug: text("briefing_slug").notNull(),
+    commentId: uuid("comment_id"),
+    email: text("email").notNull(),
+    /** Lowercased + trimmed form used for the uniqueness constraint. */
+    emailNormalized: text("email_normalized").notNull(),
+    unsubscribeToken: text("unsubscribe_token").notNull(),
+    subscribedAt: timestamp("subscribed_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    unsubscribedAt: timestamp("unsubscribed_at", { withTimezone: true }),
+    lastNotifiedAt: timestamp("last_notified_at", { withTimezone: true }),
+  },
+  (table) => [
+    uniqueIndex("uq_mahasiswa_subscribers_slug_email").on(
+      table.briefingSlug,
+      table.emailNormalized,
+    ),
+    uniqueIndex("uq_mahasiswa_subscribers_unsub_token").on(
+      table.unsubscribeToken,
+    ),
+  ],
+);
+
+/**
+ * Per-room moderation state. One row per `briefing_slug` once an
+ * admin acts on it (no row = default open). Currently carries the
+ * mute flag; designed to grow into other room-level settings later
+ * without bloating `insights_summaries`.
+ */
+export const mahasiswaRoomSettings = pgTable("mahasiswa_room_settings", {
+  briefingSlug: text("briefing_slug").primaryKey(),
+  /** When non-NULL the room is muted — public POST returns 423.
+   *  Setting back to NULL re-opens it. */
+  mutedAt: timestamp("muted_at", { withTimezone: true }),
+  mutedByUserId: uuid("muted_by_user_id"),
+  muteReason: text("mute_reason"),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .default(sql`now()`),
+});

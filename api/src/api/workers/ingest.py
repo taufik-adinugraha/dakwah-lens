@@ -325,9 +325,10 @@ def recluster_all() -> dict[str, int]:
 def send_weekly_digest() -> dict[str, object]:
     """Send the weekly insights digest to every opted-in user.
 
-    Runs Sunday 18:00 WIB via Celery beat. Uses the most-recent row
-    of `insights_summaries` as the body. Free up to 3K emails/month
-    via Resend.
+    Runs Thursday 18:00 WIB via Celery beat — same day as the briefing
+    publish (Thursday 05:00). Uses the most-recent row of
+    `insights_summaries` as the body. Free up to 3K emails/month via
+    Resend.
     """
     try:
         result = asyncio.run(email_digest.send_weekly_digests())
@@ -346,7 +347,7 @@ def generate_insights_summary() -> dict[str, object]:
     in passages retrieved from Qdrant — the LLM is constrained to cite
     only those (PRD §12).
 
-    Runs Sunday 05:00 WIB — one hour after the 04:00 Gemini topic-
+    Runs Thursday 05:00 WIB — one hour after the 04:00 Gemini topic-
     discovery pass so the LLM sees the freshest theme labels. Five
     Gemini 2.5 Pro calls + five OpenAI embedding calls, ~$0.10-0.30
     per run total.

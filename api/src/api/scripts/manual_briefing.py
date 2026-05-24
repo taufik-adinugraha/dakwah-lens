@@ -25,7 +25,7 @@ Segment values:
   all spiritual family youth justice
   ("all" → segment IS NULL, the cross-platform briefing)
 
-Example flow (one Sunday morning):
+Example flow (one Thursday morning):
   for seg in all spiritual family youth justice; do
     uv run python -m api.scripts.manual_briefing dump $seg \\
       --output /tmp/briefing-$seg-prompt.md
@@ -313,6 +313,27 @@ async def cmd_save(segment: str, markdown_path: str) -> None:
             f"  cost=$0.00\n",
         )
 
+    # Post-save validation — surface mismatched daleel + forbidden
+    # phrases (e.g., "Kemenag style") so the operator can re-prompt or
+    # hand-edit before publishing. Best-effort: validation errors are
+    # logged but never block the save.
+    try:
+        from api.services.validate_briefing import (
+            format_warnings_for_stderr,
+            validate_briefing,
+        )
+
+        warnings = validate_briefing(
+            summary_md, daleel_pool=daleel, adhkar_pool=adhkar
+        )
+        report = format_warnings_for_stderr(warnings)
+        if report:
+            sys.stderr.write("\n" + report + "\n")
+        else:
+            sys.stderr.write("✓ Validation: no issues found.\n")
+    except Exception as exc:
+        sys.stderr.write(f"⚠ Validation pass failed (non-fatal): {exc}\n")
+
 
 # ──────────────────────────────────────────────────────────────────
 # Subcommand: list
@@ -321,7 +342,7 @@ async def cmd_save(segment: str, markdown_path: str) -> None:
 
 async def cmd_list() -> None:
     """Show the most-recent briefing per segment so the operator knows
-    which segments are stale heading into a fresh Sunday cycle."""
+    which segments are stale heading into a fresh Thursday cycle."""
     from sqlalchemy import desc, select
 
     async with SessionLocal() as session:

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
 import { getBriefingBySlug } from "@/lib/insights-data";
+import { localeAwareFormat } from "@/lib/date-id";
 import {
   BriefDetailContent,
   type DeliverableSlug,
@@ -58,7 +59,7 @@ export async function generateMetadata({
   const scopeLabel = brief.segment
     ? t(`segment_${brief.segment}_title` as Parameters<typeof t>[0])
     : t("brief_scope_all");
-  const dateStr = brief.generatedAt.toLocaleDateString(locale, {
+  const dateStr = localeAwareFormat(brief.generatedAt, locale, {
     weekday: "long",
     month: "long",
     day: "numeric",

@@ -444,10 +444,13 @@ function layoutForSlot(slot: FlyerSlot): LayoutId {
     return slot.variant === "a" ? "hero-headline" : "quote-card";
   }
   if (slot.kind === "sunnah") {
-    // Sunnah invitation reads best in split-image (action call + photo
-    // of sunnah practice). Du'a hero uses HeroAyat which gives the
-    // Arabic translation card center-stage.
-    return slot.variant === "a" ? "split-image" : "hero-ayat";
+    // Sunnah invitation (variant a) reads best in split-image (action
+    // call + photo of sunnah practice + a small daleel card for the
+    // hadith that establishes the practice).
+    // Du'a hero (variant b) uses the dedicated DuaHero layout that
+    // makes Arabic with full harakat the visual centerpiece — the
+    // whole point of the card is for a reader to recite the du'a.
+    return slot.variant === "a" ? "split-image" : "dua-hero";
   }
   if (slot.kind === "poster") {
     return "poster-question";
@@ -641,6 +644,13 @@ async function buildContent(ctx: FlyerContext): Promise<FlyerContent> {
         : dedicatedBlock?.body) ||
       fallbackMessage ||
       "";
+    // BOTH variants surface a daleel card now — Sunnah call (variant a)
+    // needs the hadith that ESTABLISHES the practice (e.g. HR. Muslim
+    // 1162 for puasa Arafah, HR. Bukhari 969 for the 10 days of
+    // Dzulhijjah). Earlier we hid the card on variant a; that left a
+    // ritual sunnah call without its evidence, which doesn't fly per
+    // PRD §12 (every Islamic reference must be retrieved + cited).
+    const resolvedDaleel = adhkarPoolDaleel ?? inlineDua;
     return {
       brand,
       dateLabel,
@@ -650,10 +660,7 @@ async function buildContent(ctx: FlyerContext): Promise<FlyerContent> {
           ? "Ajakan Sunnah Pekan Ini"
           : "Doa Pekan Ini"),
       message: rawMessage,
-      daleel:
-        ctx.slot.variant === "b"
-          ? adhkarPoolDaleel ?? inlineDua
-          : null,
+      daleel: resolvedDaleel,
     };
   }
 

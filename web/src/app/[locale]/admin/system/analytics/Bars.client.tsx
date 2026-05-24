@@ -71,6 +71,91 @@ export function DailyBars({
   );
 }
 
+/**
+ * Hourly traffic bars (last 24 hours). One bar per hour bucket; bucket
+ * timestamp is already converted to Asia/Jakarta on the server so the
+ * label reads in WIB regardless of viewer's timezone. Empty buckets
+ * (no traffic that hour) still render as a 0-height column so the
+ * x-axis stays evenly spaced.
+ */
+export function HourlyBars({
+  rows,
+}: {
+  rows: Array<{ hour: string; hits: number; uniques: number }>;
+}) {
+  const [active, setActive] = useState<number | null>(null);
+  const max = Math.max(...rows.map((r) => r.hits), 1);
+
+  return (
+    <div className="flex h-40 items-stretch gap-[3px]">
+      {rows.map((r, i) => {
+        const pct = (r.hits / max) * 100;
+        const upct = (r.uniques / max) * 100;
+        // `hour` is "YYYY-MM-DD HH:00" in WIB — show the hour part as the
+        // axis label, plus the day-roll marker every 6 hours so the
+        // 24-bar strip stays scannable.
+        const d = new Date(r.hour.replace(" ", "T") + "+07:00");
+        const hh = d.toLocaleString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+          timeZone: "Asia/Jakarta",
+        });
+        const dayLabel = d.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          timeZone: "Asia/Jakarta",
+        });
+        const showHourLabel = i % 4 === 0 || i === rows.length - 1;
+        const isActive = active === i;
+        return (
+          <div
+            key={r.hour}
+            className="relative flex flex-1 flex-col items-center"
+            onMouseEnter={() => setActive(i)}
+            onMouseLeave={() => setActive((cur) => (cur === i ? null : cur))}
+          >
+            <div className="flex w-full flex-1 flex-col-reverse">
+              <div
+                className={`w-full rounded-sm transition-colors ${isActive ? "bg-brand-300" : "bg-brand-200"}`}
+                style={{ height: `${pct}%` }}
+              />
+              <div
+                className={`-mb-px w-full rounded-sm opacity-90 transition-colors ${isActive ? "bg-brand-700" : "bg-brand-600"}`}
+                style={{ height: `${upct}%` }}
+              />
+            </div>
+            <p className="mt-1 text-[9px] text-slate-500">
+              {showHourLabel ? hh : ""}
+            </p>
+            {isActive && (
+              <ChartTooltip>
+                <p className="font-semibold text-white">
+                  {dayLabel} · {hh} WIB
+                </p>
+                <p>
+                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-brand-300" />{" "}
+                  Views:{" "}
+                  <span className="tabular-nums">
+                    {r.hits.toLocaleString()}
+                  </span>
+                </p>
+                <p>
+                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-brand-700" />{" "}
+                  Unique:{" "}
+                  <span className="tabular-nums">
+                    {r.uniques.toLocaleString()}
+                  </span>
+                </p>
+              </ChartTooltip>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function BriefBars({
   rows,
 }: {
