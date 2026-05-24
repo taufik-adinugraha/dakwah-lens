@@ -3,6 +3,7 @@ import "server-only";
 import { sql } from "drizzle-orm";
 
 import { db } from "@/db";
+import { extractPosterQuestion } from "@/lib/flyer/content";
 
 /**
  * Public-facing view of a single discussion room. Mirrors the admin
@@ -20,6 +21,11 @@ export type PublicRoomOverview = {
   /** Briefing publish time. The WIB date portion is the "week" the
    *  room belongs to in the listing filters. */
   generatedAt: Date;
+  /** The discussion question extracted from the Mahasiswa section
+   *  of the briefing markdown — same headline that's on the
+   *  `/m/{slug}` hero. `null` when the briefing markdown didn't
+   *  carry a Poster Question marker (older briefings, mostly). */
+  title: string | null;
   /** Approved (public) comments under this room. */
   totalApproved: number;
   /** Approved comments in the last 7 days. Drives the active /
@@ -51,18 +57,24 @@ export async function listPublicRoomOverviews(
     slug: string;
     segment: string | null;
     generated_at: Date | string;
+    summary_md: string | null;
     total_approved: number;
     approved_7d: number;
     last_activity_at: Date | string | null;
     muted: boolean;
   };
+  // CTE picks the freshest briefing per (WIB-date, segment) — same
+  // dedup as the admin query — and surfaces the summary_md so the
+  // post-query extractor can pull the discussion title without a
+  // second round-trip.
   const rows = (await db.execute(sql`
     WITH latest_briefings AS (
       SELECT DISTINCT ON (briefing_slug)
         to_char(generated_at AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD')
           || '-' || COALESCE(segment, 'all') AS briefing_slug,
         segment,
-        generated_at
+        generated_at,
+        summary_md
       FROM insights_summaries
       WHERE generated_at >= now() - (${windowDays} || ' days')::interval
       ORDER BY briefing_slug, generated_at DESC
@@ -71,6 +83,7 @@ export async function listPublicRoomOverviews(
       lb.briefing_slug AS slug,
       lb.segment       AS segment,
       lb.generated_at  AS generated_at,
+      lb.summary_md    AS summary_md,
       COALESCE(SUM(CASE WHEN c.status = 'approved' THEN 1 ELSE 0 END), 0)::int AS total_approved,
       COALESCE(SUM(CASE WHEN c.status = 'approved' AND c.created_at >= now() - interval '7 days' THEN 1 ELSE 0 END), 0)::int AS approved_7d,
       MAX(CASE WHEN c.status = 'approved' THEN c.created_at END) AS last_activity_at,
@@ -80,25 +93,33 @@ export async function listPublicRoomOverviews(
       ON c.briefing_slug = lb.briefing_slug
     LEFT JOIN mahasiswa_room_settings r
       ON r.briefing_slug = lb.briefing_slug
-    GROUP BY lb.briefing_slug, lb.segment, lb.generated_at, r.muted_at
+    GROUP BY lb.briefing_slug, lb.segment, lb.generated_at, lb.summary_md, r.muted_at
     ORDER BY MAX(CASE WHEN c.status = 'approved' THEN c.created_at END) DESC NULLS LAST,
              lb.generated_at DESC
   `)) as unknown as Row[];
 
-  return rows.map((r) => ({
-    slug: r.slug,
-    segment: r.segment,
-    generatedAt:
-      r.generated_at instanceof Date ? r.generated_at : new Date(r.generated_at),
-    totalApproved: r.total_approved,
-    approved7d: r.approved_7d,
-    lastActivityAt: r.last_activity_at
-      ? r.last_activity_at instanceof Date
-        ? r.last_activity_at
-        : new Date(r.last_activity_at)
-      : null,
-    muted: r.muted,
-  }));
+  return rows.map((r) => {
+    const extractedTitle = r.summary_md
+      ? extractPosterQuestion(r.summary_md)
+      : "";
+    return {
+      slug: r.slug,
+      segment: r.segment,
+      generatedAt:
+        r.generated_at instanceof Date
+          ? r.generated_at
+          : new Date(r.generated_at),
+      title: extractedTitle.trim() || null,
+      totalApproved: r.total_approved,
+      approved7d: r.approved_7d,
+      lastActivityAt: r.last_activity_at
+        ? r.last_activity_at instanceof Date
+          ? r.last_activity_at
+          : new Date(r.last_activity_at)
+        : null,
+      muted: r.muted,
+    };
+  });
 }
 
 /** WIB-date of a briefing as the canonical "week" string the URL

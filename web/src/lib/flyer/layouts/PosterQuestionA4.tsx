@@ -59,11 +59,15 @@ export const PosterQuestionA4: FlyerLayoutComponent = ({
       <div
         className="relative flex h-[297mm] w-[210mm] flex-col items-center justify-between overflow-hidden text-white"
         style={{
-          // Tonally-consistent deep gradient. Both stops sit inside the
-          // same color family — no jarring transition. Direction is a
-          // shallow diagonal to give the page subtle depth without
-          // breaking the "single tone" feel.
-          background: `linear-gradient(155deg, ${palette.bgGradient[1]} 0%, ${palette.accentDeep} 100%)`,
+          // Both stops sit in the dark half of the brand family so
+          // the white text + chip stay legible everywhere on the
+          // canvas. Earlier version went `bgGradient[1]` (near-white)
+          // → `accentDeep` (dark) — produced bad white-on-near-white
+          // contrast at the top-left corner where the brand + date
+          // chips sit. Now `accent` (mid-dark) → `accentDeep` (dark)
+          // keeps the subtle diagonal depth while making the top
+          // region readable.
+          background: `linear-gradient(155deg, ${palette.accent} 0%, ${palette.accentDeep} 100%)`,
           padding: "12mm",
         }}
       >

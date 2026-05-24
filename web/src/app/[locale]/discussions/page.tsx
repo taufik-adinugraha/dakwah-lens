@@ -37,6 +37,7 @@ export default async function DiscussionsPage({
     segment: r.segment,
     generatedAt: r.generatedAt.toISOString(),
     weekKey: wibDateString(r.generatedAt),
+    title: r.title,
     totalApproved: r.totalApproved,
     approved7d: r.approved7d,
     lastActivityAt: r.lastActivityAt

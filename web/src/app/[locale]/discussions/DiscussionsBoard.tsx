@@ -22,6 +22,11 @@ type RoomItem = {
   segment: string | null;
   generatedAt: string;
   weekKey: string;
+  /** Discussion question pulled from the briefing markdown — the
+   *  same headline that's on the `/m/{slug}` hero. May be null
+   *  on older briefings that didn't carry a Poster Question marker;
+   *  the card falls back to rendering the slug in that case. */
+  title: string | null;
   totalApproved: number;
   approved7d: number;
   lastActivityAt: string | null;
@@ -450,8 +455,13 @@ function RoomCard({
         </div>
 
         <h3 className="mt-3 text-balance text-[15px] font-bold leading-snug text-slate-900">
-          {room.slug}
+          {room.title ?? room.slug}
         </h3>
+        {room.title && (
+          <p className="mt-1 font-mono text-[10.5px] text-slate-400">
+            {room.slug}
+          </p>
+        )}
 
         <div className="mt-3 flex items-center gap-2 text-[12px] text-slate-500">
           <MessageSquare className="h-3.5 w-3.5" />
