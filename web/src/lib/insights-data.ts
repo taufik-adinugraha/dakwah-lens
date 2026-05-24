@@ -13,6 +13,35 @@ import { db, schema } from "@/db";
 import { extractMahasiswaContent } from "@/lib/flyer/content";
 
 /**
+ * Strip word-count annotations the LLM echoes back from the prompt's
+ * structural headings — e.g. `### Khutbah Jumat (2300-3200 kata)` →
+ * `### Khutbah Jumat`. Those parentheticals are length instructions
+ * FOR the model, not content FOR the reader; they read as confusing
+ * noise in the published briefing.
+ *
+ * Applied at every data-access boundary that returns `summary_md` /
+ * `summary_md_en` so downstream renderers (BriefingNarrative,
+ * deliverable share pages, .md/.pdf/.txt downloads, flyer compose,
+ * Mahasiswa article extract) all see clean copy.
+ *
+ * Patterns handled (id + en, parenthetical only):
+ *   (2300-3200 kata)    (~80 kata)    (300-450 kata Arab)
+ *   (2300-3200 words)   (~80 words)
+ * Both ASCII hyphen and en-dash separators accepted.
+ */
+export function stripWordCountAnnotations(md: string | null): string | null {
+  if (md == null) return md;
+  return md
+    .replace(
+      /\s*\(\s*~?\d+(?:\s*[-–]\s*\d+)?\s*(?:kata|words?)(?:\s+[A-Za-z]+)?\s*\)/gi,
+      "",
+    )
+    // Collapse "Heading  :" or "Heading  ." double-spaces left by the
+    // strip. Only intra-line — never crosses newlines.
+    .replace(/ {2,}/g, " ");
+}
+
+/**
  * The 9 PRD da'wah categories the Gemini classifier assigns to every post.
  * Source of truth: `api/src/api/services/relevance.py`. Mirror here because
  * the web side aggregates per-category scores from the `categories` JSONB
@@ -416,6 +445,8 @@ export async function getLatestInsightsSummary(
   if (!row) return null;
   return {
     ...row,
+    summaryMd: stripWordCountAnnotations(row.summaryMd) as string,
+    summaryMdEn: stripWordCountAnnotations(row.summaryMdEn),
     headlineStats: row.headlineStats as LatestInsightsSummary["headlineStats"],
     daleelRefs: (row.daleelRefs as schema.DaleelRef[] | null) ?? null,
     adhkarRefs: (row.adhkarRefs as schema.DaleelRef[] | null) ?? null,
@@ -543,6 +574,8 @@ export async function getBriefingBySlug(
   if (!row) return null;
   return {
     ...row,
+    summaryMd: stripWordCountAnnotations(row.summaryMd) as string,
+    summaryMdEn: stripWordCountAnnotations(row.summaryMdEn),
     headlineStats: row.headlineStats as LatestInsightsSummary["headlineStats"],
     daleelRefs: (row.daleelRefs as schema.DaleelRef[] | null) ?? null,
     adhkarRefs: (row.adhkarRefs as schema.DaleelRef[] | null) ?? null,

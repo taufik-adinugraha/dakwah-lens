@@ -118,6 +118,7 @@ select = ["E", "F", "I", "W", "UP", "B"]
 "src/api/services/insights_summary.py" = ["E501"]
 "src/api/services/email_digest.py" = ["E501"]
 "src/api/services/kitab_retrieval.py" = ["E501"]
+"src/api/services/validate_briefing.py" = ["E501"]
 
 [tool.mypy]
 python_version = "3.12"

@@ -52,11 +52,42 @@ export const DuaHero: FlyerLayoutComponent = ({
       : arLen < 130
         ? "84px"
         : arLen < 200
-          ? "68px"
+          ? "62px"
           : arLen < 300
-            ? "54px"
-            : "44px";
-  const arabicLine = arLen < 130 ? "1.7" : "1.85";
+            ? "48px"
+            : "38px";
+  const arabicLine = arLen < 130 ? "1.7" : arLen < 300 ? "1.75" : "1.6";
+
+  // Translation card sits at the bottom of the 1080-tall canvas. The
+  // Arabic block above consumes vertical space proportional to its
+  // length × font-size, so the translation must scale DOWN as Arabic
+  // grows, and the text itself must truncate when even the smallest
+  // size won't fit. Numbers below are calibrated to keep the card
+  // inside the canvas across short-Quran (50 chars) → long-hadith
+  // (500+ chars) content.
+  const transRaw = translation;
+  // Combined "weight": Arabic contributes ~3x its length, translation
+  // its own length. Captures the "even small Arabic with massive
+  // translation needs aggressive truncation" case too.
+  const weight = arLen * 3 + transRaw.length;
+  let transSize = 22;
+  let transMax = 360;
+  if (weight > 700) {
+    transSize = 20;
+    transMax = 320;
+  }
+  if (weight > 1100) {
+    transSize = 17;
+    transMax = 280;
+  }
+  if (weight > 1700) {
+    transSize = 15;
+    transMax = 240;
+  }
+  const truncatedTranslation =
+    transRaw.length > transMax
+      ? transRaw.slice(0, transMax).trimEnd().replace(/[,;:.]$/, "") + "…"
+      : transRaw;
 
   return (
     <div
@@ -207,7 +238,9 @@ export const DuaHero: FlyerLayoutComponent = ({
           ))}
         </svg>
 
-        {/* Translation + citation card */}
+        {/* Translation + citation card. Bounded in height + given a
+            dynamic font-size so long-hadith translations don't spill
+            past the bottom edge of the 1080-tall canvas. */}
         {(translation || citation) && (
           <div
             className="mx-auto mt-auto flex max-w-[940px] flex-col gap-3 rounded-3xl px-7 py-6"
@@ -215,11 +248,23 @@ export const DuaHero: FlyerLayoutComponent = ({
               backgroundColor: "rgba(255,255,255,0.94)",
               boxShadow: `0 14px 36px ${palette.accentDeep}40`,
               border: `1px solid ${palette.accentSoft}`,
+              // Hard ceiling — anything beyond this height gets cut by
+              // overflow:hidden on the parent canvas. With the
+              // truncation above we should always land inside this,
+              // but the cap is defense-in-depth.
+              maxHeight: "330px",
+              overflow: "hidden",
             }}
           >
-            {translation && (
-              <div className="text-[22px] italic leading-[1.5] text-slate-800">
-                &ldquo;{translation}&rdquo;
+            {truncatedTranslation && (
+              <div
+                className="italic text-slate-800"
+                style={{
+                  fontSize: `${transSize}px`,
+                  lineHeight: 1.45,
+                }}
+              >
+                &ldquo;{truncatedTranslation}&rdquo;
               </div>
             )}
             {citation && (

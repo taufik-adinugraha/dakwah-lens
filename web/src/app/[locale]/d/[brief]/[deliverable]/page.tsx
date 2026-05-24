@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import {
   ArrowLeft,
@@ -75,6 +75,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function DeliverablePage({ params }: Props) {
   const { brief, deliverable, locale } = await params;
   if (!isDeliverableSlug(deliverable)) notFound();
+
+  // The Mahasiswa pack has its own canonical URL `/m/{slug}` with the
+  // public discussion section + "other rooms" rail. The /d/{brief}/genz
+  // share URL used to render only the article — confusing because the
+  // same article on /m/{slug} carries discussion chrome. Redirect
+  // here so there's exactly one Mahasiswa page; previously-shared
+  // /d/.../genz links still land the reader in the right place.
+  if (deliverable === "genz") {
+    redirect(`/m/${brief}`);
+  }
+
   setRequestLocale(locale);
   const t = await getTranslations("Insights");
 

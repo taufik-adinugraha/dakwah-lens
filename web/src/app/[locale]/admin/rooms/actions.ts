@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, gte, sql } from "drizzle-orm";
 
 import { auth } from "@/auth";
 import { db, schema } from "@/db";
@@ -100,8 +100,41 @@ export async function postOfflineInvite(formData: FormData): Promise<void> {
 
   const body =
     "Diskusi ini menarik dan kami senang membacanya — yuk lanjut tatap muka. " +
-    "Hubungi kami via /contact, kami senang ngobrol lebih panjang offline " +
-    "(atau via video call kalau berbeda kota). ✦ Dakwah-Lens";
+    "Yang berminat, silakan reply di sini dengan usulan tanggal, waktu, dan " +
+    "lokasi (atau via video call kalau beda kota). Nanti kami pilih jadwal " +
+    "yang paling cocok dan konfirmasi balik. ✦ Dakwah-Lens";
+
+  // Idempotency: refuse to post a second offline-invite to the same
+  // room within 24h. Without this, an accidental double-click puts
+  // two identical pinned comments + emails every subscriber twice.
+  // 24h cooldown is identical to the per-recipient email throttle in
+  // notify-subscribers.ts so the two layers stay coherent.
+  const cutoff = new Date(Date.now() - 24 * 60 * 60_000);
+  const [recent] = await db
+    .select({ n: sql<number>`count(*)::int` })
+    .from(schema.mahasiswaComments)
+    .where(
+      and(
+        eq(schema.mahasiswaComments.briefingSlug, slug),
+        eq(schema.mahasiswaComments.displayName, ADMIN_DISPLAY_NAME),
+        eq(schema.mahasiswaComments.body, body),
+        gte(schema.mahasiswaComments.createdAt, cutoff),
+      ),
+    );
+  if ((recent?.n ?? 0) > 0) {
+    // Already posted within 24h — log + bail silently. The admin
+    // will see the existing pin already on the room card and can
+    // tell what happened.
+    await logAdminAction({
+      actorId,
+      action: "room.offline_invite_skipped",
+      targetType: "mahasiswa_room",
+      targetId: slug,
+      payload: { reason: "duplicate_within_24h" },
+    });
+    revalidatePath("/admin/rooms");
+    return;
+  }
 
   await db.insert(schema.mahasiswaComments).values({
     briefingSlug: slug,
@@ -282,12 +315,28 @@ export async function listRoomOverviews(): Promise<RoomOverview[]> {
     admin_replies: number;
     muted: boolean;
   };
+  // Dedupe insights_summaries by (WIB-date, segment) FIRST, keeping
+  // only the latest row per logical edition. Every briefing
+  // regeneration appends a new row, but they all share the same
+  // `briefing_slug` and therefore the same comment thread — so the
+  // listing should show one card per logical room, not one per row.
+  // Without this dedupe, a room regenerated 5× appears as 5 separate
+  // "dormant" entries with identical slugs.
   const rows = (await db.execute(sql`
+    WITH latest_briefings AS (
+      SELECT DISTINCT ON (briefing_slug)
+        to_char(generated_at AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD')
+          || '-' || COALESCE(segment, 'all') AS briefing_slug,
+        segment,
+        generated_at
+      FROM insights_summaries
+      WHERE generated_at >= now() - interval '90 days'
+      ORDER BY briefing_slug, generated_at DESC
+    )
     SELECT
-      to_char(i.generated_at AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD')
-        || '-' || COALESCE(i.segment, 'all')      AS slug,
-      i.segment                                    AS segment,
-      i.generated_at                               AS generated_at,
+      lb.briefing_slug                             AS slug,
+      lb.segment                                   AS segment,
+      lb.generated_at                              AS generated_at,
       COALESCE(SUM(CASE WHEN c.status = 'approved'                    THEN 1 ELSE 0 END), 0)::int  AS total_approved,
       COALESCE(SUM(CASE WHEN c.status = 'blocked'                     THEN 1 ELSE 0 END), 0)::int  AS total_blocked,
       COALESCE(SUM(CASE WHEN c.pinned                                  THEN 1 ELSE 0 END), 0)::int  AS total_pinned,
@@ -298,19 +347,14 @@ export async function listRoomOverviews(): Promise<RoomOverview[]> {
       MAX(CASE WHEN c.status = 'approved' THEN c.created_at END)                                                                 AS last_activity_at,
       COALESCE(SUM(CASE WHEN c.status = 'approved' AND c.display_name = ${ADMIN_DISPLAY_NAME} THEN 1 ELSE 0 END), 0)::int        AS admin_replies,
       (r.muted_at IS NOT NULL)                                                                                                    AS muted
-    FROM insights_summaries i
+    FROM latest_briefings lb
     LEFT JOIN mahasiswa_comments c
-      ON c.briefing_slug =
-         to_char(i.generated_at AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD')
-           || '-' || COALESCE(i.segment, 'all')
+      ON c.briefing_slug = lb.briefing_slug
     LEFT JOIN mahasiswa_room_settings r
-      ON r.briefing_slug =
-         to_char(i.generated_at AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD')
-           || '-' || COALESCE(i.segment, 'all')
-    WHERE i.generated_at >= now() - interval '90 days'
-    GROUP BY i.generated_at, i.segment, r.muted_at
+      ON r.briefing_slug = lb.briefing_slug
+    GROUP BY lb.briefing_slug, lb.segment, lb.generated_at, r.muted_at
     ORDER BY MAX(CASE WHEN c.status = 'approved' THEN c.created_at END) DESC NULLS LAST,
-             i.generated_at DESC
+             lb.generated_at DESC
     LIMIT 120
   `)) as unknown as Row[];
 

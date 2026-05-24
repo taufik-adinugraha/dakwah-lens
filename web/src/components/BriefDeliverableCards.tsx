@@ -343,45 +343,57 @@ export function BriefDeliverableCards({
             /^\/?(?:[a-z]{2}\/)?insights\/brief\//,
             "",
           );
+          // Mahasiswa (genz) lives on its own canonical /m/{slug} URL
+          // — that's where the discussion section + other-rooms rail
+          // are mounted. Skip /d/.../genz to avoid the redirect hop.
+          const shareUrl = !card.kind
+            ? null
+            : card.kind === "genz"
+              ? `/m/${briefSlug}`
+              : `/d/${briefSlug}/${card.kind}`;
+          const pdfUrl = !card.kind
+            ? null
+            : card.kind === "genz"
+              ? `/api/m/${briefSlug}/pdf`
+              : `/api/d/${briefSlug}/${card.kind}/pdf`;
           return (
             <DeliverableCardTile
               key={`${card.heading}-${i}`}
               card={card}
               openLabel={labels.open}
               onOpen={() => onOpenCard(i)}
-              shareUrl={card.kind ? `/d/${briefSlug}/${card.kind}` : null}
-              pdfUrl={
-                card.kind
-                  ? `/api/d/${briefSlug}/${card.kind}/pdf`
-                  : null
-              }
+              shareUrl={shareUrl}
+              pdfUrl={pdfUrl}
             />
           );
         })}
       </div>
-      {openIndex !== null && orderedCards[openIndex] && (
-        <DeliverableModal
-          card={orderedCards[openIndex]}
-          labels={labels}
-          onClose={onCloseModal}
-          pdfUrl={
-            orderedCards[openIndex].kind
-              ? `/api/d/${briefBasePath.replace(
-                  /^\/?(?:[a-z]{2}\/)?insights\/brief\//,
-                  "",
-                )}/${orderedCards[openIndex].kind}/pdf`
-              : null
-          }
-          pageUrl={
-            orderedCards[openIndex].kind
-              ? `/d/${briefBasePath.replace(
-                  /^\/?(?:[a-z]{2}\/)?insights\/brief\//,
-                  "",
-                )}/${orderedCards[openIndex].kind}`
-              : null
-          }
-        />
-      )}
+      {openIndex !== null && orderedCards[openIndex] && (() => {
+        const openCard = orderedCards[openIndex];
+        const briefSlug = briefBasePath.replace(
+          /^\/?(?:[a-z]{2}\/)?insights\/brief\//,
+          "",
+        );
+        const modalPageUrl = !openCard.kind
+          ? null
+          : openCard.kind === "genz"
+            ? `/m/${briefSlug}`
+            : `/d/${briefSlug}/${openCard.kind}`;
+        const modalPdfUrl = !openCard.kind
+          ? null
+          : openCard.kind === "genz"
+            ? `/api/m/${briefSlug}/pdf`
+            : `/api/d/${briefSlug}/${openCard.kind}/pdf`;
+        return (
+          <DeliverableModal
+            card={openCard}
+            labels={labels}
+            onClose={onCloseModal}
+            pdfUrl={modalPdfUrl}
+            pageUrl={modalPageUrl}
+          />
+        );
+      })()}
     </>
   );
 }

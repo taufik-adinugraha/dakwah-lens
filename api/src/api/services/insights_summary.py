@@ -87,8 +87,28 @@ CRITICAL FORMATTING RULES:
 - JANGAN tutup dengan signature, paraf, atau closing apologetik.
 - Disclaimer keasistanan AI WAJIB ditulis sebagai paragraf italic di akhir Bagian 5 (BUKAN bagian terpisah).
 - JANGAN sebut nama penerjemah, lembaga penerbit, atau gaya terjemahan kitab di mana pun di output (mis. "Kemenag", "gaya Kemenag", "Sahih International", "Pickthall", "tafsir Ibn Kathir style", "Hilali-Khan", dll.). Itu metadata sumber data, BUKAN konten dakwah. Pembaca melihat ayat lewat citation (mis. "QS. Al-Baqarah: 275") — itu saja yang muncul. Frasa "menurut terjemahan Kemenag" / "dalam gaya Sahih International" dilarang muncul di teks output.
+- JANGAN echo kembali anotasi panjang seperti "(3450-4800 kata)", "(~80 kata)", "(300-450 kata Arab)", "(N words)" di heading sub-section atau di body. Itu instruksi panjang UNTUK Anda — bukan informasi UNTUK pembaca. Tulis heading bersih: `### Khutbah Jumat` (BUKAN `### Khutbah Jumat (3450-4800 kata)`). Sama untuk inline guidance dalam body — sebut langkah-nya tanpa parenthetical word-count.
 
-OUTPUT: briefing analisis ~1500-1800 kata dalam Bahasa Indonesia, dibagi ke 5 BAGIAN dengan heading H2 (##). Antar bagian dipisahkan satu baris kosong.
+CRITICAL — SELF-ITERATION LOOP (gunakan thinking/chain-of-thought, JANGAN munculkan reasoning di output):
+
+Untuk SETIAP paragraf flyer, SETIAP saran aksi, SETIAP rekomendasi tindakan di output, jalankan loop berikut SEBELUM commit ke output:
+
+  1. DRAFT — tulis versi pertama.
+  2. SELF-CHECK — tanya pada diri sendiri (jawab di internal thinking, bukan di output):
+     a. SANITY ADVICE: Apakah saran/tindakan ini PRAKTIS, MASUK AKAL, dan REALISTIS untuk jamaah Muslim Indonesia? Apakah ada interpretasi yang membuatnya terdengar ABSURD atau ANEH? Contoh kesalahan nyata yang HARUS dihindari:
+        - ❌ "Adopsi tetangga yang sedang hamil" — tidak masuk akal sebagai saran umum, terdengar aneh, ambigu, bisa salah-tafsir. Yang dimaksud kemungkinan: "kunjungi/tengok tetangga yang sedang hamil", "bantu kebutuhan tetangga yang hamil dengan masakan / antar ke posyandu". Tulis versi yang TIDAK AMBIGU.
+        - ❌ "Bergabung dengan korban kekerasan" — ambigu, terdengar seolah ikut menjadi korban. Yang dimaksud: "kunjungi keluarga korban", "tawarkan bantuan finansial / hukum kepada korban".
+        - ❌ "Hapus media sosial demi anak" — terlalu ekstrim sebagai saran umum. Yang dimaksud kemungkinan: "batasi waktu media sosial Anda saat bersama anak", "ganti satu jam scroll dengan satu jam main bersama anak".
+     b. DALEEL-PARAGRAF FIT (khusus flyer + sub-section): apakah daleel yang ditag SECARA MANDIRI berbicara tentang tema paragraf? Tanyakan: "Kalau saya lepaskan daleel ini dari paragraf, apakah ia tetap relevan dengan topik paragraf?" Kalau hanya berbagi 1-2 kata permukaan (mis. paragraf tentang pinjol + daleel tentang "pemuda" umum) → MISMATCH, ganti atau kosongkan.
+     c. KONTEKS LENGKAP: apakah ada konteks yang HILANG yang membuat saran terdengar mengambang / setengah jadi? Tambahkan satu kalimat klarifikasi.
+     d. NADA: apakah saran terasa menghakimi, paternalistik, atau mengindoktrinasi? Reframe jadi observasional + invitasi, bukan perintah.
+  3. KALAU JAWABAN ada yang "tidak/ya-tapi-terdengar-aneh" — KEMBALI ke step 1 dan REWRITE.
+  4. Loop sampai SEMUA self-check jawabannya "ya, ini sound + on-topic + nadanya tepat".
+  5. Output HANYA versi FINAL yang lulus. JANGAN tampilkan reasoning loop.
+
+PRINSIP UTAMA: "Kalau saya membaca ini di mimbar masjid, apakah saya akan merasa malu/bingung/salah-eja saran ini?" Kalau jawabannya "ya" → REWRITE.
+
+OUTPUT: briefing analisis dalam Bahasa Indonesia, dibagi ke 5 BAGIAN dengan heading H2 (##). Antar bagian dipisahkan satu baris kosong.
 
 ## Ringkasan Eksekutif (100-130 kata, satu paragraf)
 - Sebut top 3 kategori dengan share-pct
@@ -111,7 +131,7 @@ CRITICAL — SCOPE OF PERCENTAGES: baca SEGMENT_SCOPE di input. Jika "all", pers
 - Hindari kata kerja perintah ("wajib", "harus", "pentingnya"). Gunakan observasional ("menyoroti", "memetakan", "menunjukkan", "tercermin dari")
 - HANYA gunakan headlines dari pool yang saya berikan. JANGAN mengarang cerita.
 
-## Strategi & Aksi Dakwah (5700-7800 kata)
+## Strategi & Aksi Dakwah (6850-9400 kata)
 Ini adalah CONTENT KIT — bukan saran strategis. Setiap sub-section harus berupa DRAFT SIAP-PAKAI yang bisa dibaca / dipakai langsung oleh dai, ustadzah, kreator, atau pengurus komunitas tanpa harus menulis ulang dari nol. WAJIB 6 sub-section dengan ### H3.
 
 RUJUKAN DALEEL DI SECTION 4 — pool yang saya sediakan berisi 10 daleel hasil rerank tematik. Setiap sub-section di bawah WAJIB merujuk 2-3 daleel dari pool ini secara INLINE (bukan ditumpuk semua di Section 5):
@@ -120,20 +140,20 @@ RUJUKAN DALEEL DI SECTION 4 — pool yang saya sediakan berisi 10 daleel hasil r
 - Sub-section berbeda BOLEH mengutip daleel yang sama jika memang paling pas, tapi USAHAKAN variasi supaya 8-10 daleel pool terdistribusi (khutbah ~3-4 daleel, kajian ~2-3, pengajaran ~1-2, kreator ~1, gen-z ~2, aksi ~1-2)
 - JANGAN mengarang ayat atau hadits di luar pool. Citation yang muncul di Section 4 HARUS persis cocok dengan citation di pool
 
-### Khutbah Jumat (2300-3200 kata)
-Tulis KHUTBAH JUMAT LENGKAP siap-baca dari pembuka sampai penutup, terdiri dari Khutbah Pertama dan Khutbah Kedua. Bahasa Indonesia formal-mengalir, bisa dipahami jamaah umum, jangan terlalu akademis. Panjang khutbah harus sebanding dengan khutbah Jumat Indonesia standar (15-22 menit ucapan = ~2300-3200 kata) — JANGAN terlalu pendek.
+### Khutbah Jumat (3450-4800 kata)
+Tulis KHUTBAH JUMAT LENGKAP siap-baca dari pembuka sampai penutup, terdiri dari Khutbah Pertama dan Khutbah Kedua. Bahasa Indonesia formal-mengalir, bisa dipahami jamaah umum, jangan terlalu akademis. Panjang khutbah harus sebanding dengan khutbah Jumat Indonesia standar yang lengkap dan bernapas panjang (22-30 menit ucapan = ~3450-4800 kata) — JANGAN terlalu pendek, beri ruang argumen berkembang dengan 3-4 daleel, 2-3 cerita konkret pekan ini, dan refleksi yang dalam.
 
-KHUTBAH PERTAMA (1800-2500 kata):
+KHUTBAH PERTAMA (2700-3750 kata):
 - Mukadimah singkat (hamdalah → sholawat → syahadat → wasiat takwa, ~70 kata, AKSARA ARAB DENGAN HARAKAT lengkap — bukan transliterasi Latin). Khateeb membaca langsung dari teks di mimbar.
 - Ayat Quran pembuka yang relevan dengan tema pekan — TULIS AYAT DALAM AKSARA ARAB BERHARAKAT, lalu sebut nama surah + nomor ayat, lalu TERJEMAHAN Bahasa Indonesia. JANGAN gunakan transliterasi Latin untuk ayat Quran.
-- Pengantar tema (4-6 paragraf Bahasa Indonesia): hubungkan ayat dengan 2-3 peristiwa NYATA pekan ini dari pool sample_headlines. PENTING: dalam khutbah JANGAN sebut nama outlet media (Detik, Republika, Kompas, CNN, dst.) — khutbah bukan ulasan pers. Gunakan framing umum seperti "dari berita pekan ini kita ketahui...", "ramai diperbincangkan pekan ini...", "kabar yang sampai kepada kita...", "publik dikejutkan oleh berita...". Ceritakan inti peristiwanya dengan tetap akurat ke headline, tanpa atribusi outlet.
-- Inti khutbah (6-9 paragraf prosa mengalir, jangan pakai sub-judul): satu argumen yang BERKEMBANG sepanjang khutbah, didukung 2-3 daleel tambahan DARI POOL. Untuk setiap daleel: tulis citation bold inline `**citation**`, AYAT/HADITS DALAM AKSARA ARAB BERHARAKAT (jika tersedia di pool), lalu terjemahan Bahasa Indonesia. Setiap paragraf harus mengembangkan argumen, BUKAN paraphrase paragraf sebelumnya.
-- Bersisi praktis: 3-4 tindakan konkret untuk jamaah pekan ini.
+- Pengantar tema (6-9 paragraf Bahasa Indonesia): hubungkan ayat dengan 3-4 peristiwa NYATA pekan ini dari pool sample_headlines. PENTING: dalam khutbah JANGAN sebut nama outlet media (Detik, Republika, Kompas, CNN, dst.) — khutbah bukan ulasan pers. Gunakan framing umum seperti "dari berita pekan ini kita ketahui...", "ramai diperbincangkan pekan ini...", "kabar yang sampai kepada kita...", "publik dikejutkan oleh berita...". Ceritakan inti peristiwanya dengan tetap akurat ke headline, tanpa atribusi outlet.
+- Inti khutbah (9-13 paragraf prosa mengalir, jangan pakai sub-judul): satu argumen yang BERKEMBANG sepanjang khutbah, didukung 3-4 daleel tambahan DARI POOL. Untuk setiap daleel: tulis citation bold inline `**citation**`, AYAT/HADITS DALAM AKSARA ARAB BERHARAKAT (jika tersedia di pool), lalu terjemahan Bahasa Indonesia. Setiap paragraf harus mengembangkan argumen, BUKAN paraphrase paragraf sebelumnya. Beri ruang untuk: (a) penjelasan teologis ayat/hadits, (b) contoh dari sirah Nabi atau kisah sahabat yang relevan, (c) refleksi langsung ke konteks pekan ini, (d) implikasi untuk jamaah di Indonesia 2026.
+- Bersisi praktis: 4-6 tindakan konkret untuk jamaah pekan ini, dengan deskripsi singkat per-tindakan (bukan hanya bullet pendek).
 - Tutup khutbah pertama dengan formula standar DALAM AKSARA ARAB BERHARAKAT (~80 kata): "بَارَكَ اللهُ لِيْ وَلَكُمْ فِي الْقُرْآنِ الْعَظِيْمِ، وَنَفَعَنِيْ وَإِيَّاكُمْ بِمَا فِيْهِ مِنَ الْآيَاتِ وَالذِّكْرِ الْحَكِيْمِ…" dst. JANGAN transliterasi Latin.
 
-KHUTBAH KEDUA (500-700 kata):
+KHUTBAH KEDUA (750-1050 kata):
 - Mukadimah singkat (hamdalah + sholawat + syahadat, AKSARA ARAB DENGAN HARAKAT lengkap, ~50 kata).
-- Penegasan inti khutbah pertama (2-3 paragraf reflektif dalam Bahasa Indonesia).
+- Penegasan inti khutbah pertama (3-5 paragraf reflektif dalam Bahasa Indonesia, masing-masing menggali satu sisi dari argumen khutbah pertama lebih dalam — bukan ringkasan, melainkan amplifikasi).
 - DOA PENUTUP DALAM AKSARA ARAB DENGAN HARAKAT LENGKAP (300-450 kata Arab). Ini bagian utama khutbah kedua. JANGAN tulis transliterasi Latin, JANGAN tulis Bahasa Indonesia — TULIS DALAM HURUF ARAB ASLI dengan tanda syakal/harakat (fathah, kasrah, dhammah, sukūn, syaddah, dst.) supaya khateeb bisa membaca langsung di mimbar. Gunakan rangkaian doa standar khutbah Jumat Indonesia, struktur:
   * Doa untuk seluruh umat (mukminin, mukminat, muslimin, muslimat, yang hidup dan yang wafat):
     اَللّٰهُمَّ اغْفِرْ لِلْمُؤْمِنِيْنَ وَالْمُؤْمِنَاتِ، وَالْمُسْلِمِيْنَ وَالْمُسْلِمَاتِ، الْأَحْيَاءِ مِنْهُمْ وَالْأَمْوَاتِ، إِنَّكَ سَمِيْعٌ قَرِيْبٌ مُجِيْبُ الدَّعَوَاتِ.
@@ -310,6 +330,8 @@ ATURAN DALEEL — paragraf, headline, dan daleel WAJIB membentuk satu thread tem
 
 ATURAN DALEEL untuk Pesan Flyer 5 & 6 (SUNNAH + DOA): citation pada Pesan Flyer 5 (Ajakan Sunnah) dan Pesan Flyer 6 (Doa Pekan Ini) HARUS dipilih dari blok **ADHKAR POOL** yang TERPISAH dari DALEEL POOL (lihat user prompt di bawah). ADHKAR POOL berisi du'a / dzikir yang dapat dibaca langsung — entri yang cocok untuk dijadikan wirid. JANGAN ambil daleel untuk Flyer 5+6 dari DALEEL POOL (yang sifatnya argumentatif-tematik, bukan recitable). Kalau ADHKAR POOL kosong atau tidak ada entri yang cocok untuk satu paragraf, kosongkan baris `**Daleel:**` untuk paragraf itu (jangan diisi dengan citation yang tidak ada di pool).
 
+ATURAN PANJANG DU'A untuk Pesan Flyer 6: pilih entri ADHKAR POOL yang BENAR-BENAR sebuah du'a/dzikir pendek yang bisa langsung diwirid (rule of thumb: teks Arab < 200 karakter, terjemahan < 280 karakter). JANGAN pilih hadits panjang dengan rantai perawi ("ḥaddatsanā fulān… 'an fulān…") atau narasi cerita panjang sebagai "du'a" — itu hadits historis, bukan du'a recitable. Kalau satu-satunya pilihan di pool adalah riwayat panjang, lebih baik kosongkan `**Daleel:**` Flyer 6 daripada memaksa entri yang tidak cocok untuk format flyer 1080×1080.
+
 LARANGAN MUTLAK pada keempat paragraf:
 - JANGAN tulis "mari kita tutup khutbah ini" / "khutbah pertama" / "khutbah ini"
 - JANGAN tulis "diskusi malam ini" / "diskusi ini" / "kajian ini" / "sesi ini"
@@ -368,8 +390,28 @@ CRITICAL FORMATTING RULES:
 - NO closing signature or apologetic outro.
 - The AI-assistance disclaimer goes as an italic paragraph at the end of Section 5 (not as a separate section).
 - NEVER name a translator, publisher, or translation style in the output ("Kemenag", "Kemenag style", "Sahih International", "Pickthall", "Hilali-Khan", "Ibn Kathir tafsir style", etc.). That's source-data metadata, not da'wah content. Readers see verses via citations (e.g., "QS. Al-Baqarah: 275") — that's the only attribution that belongs in the prose. Phrases like "according to the Kemenag rendering" or "in Sahih International style" are banned.
+- NEVER echo word-count annotations back in the output — e.g. headings like `### Friday Khutbah (3450-4800 words)` or inline guidance like `Opening (~80 words):`. Those are length instructions FOR you, not information FOR the reader. Write clean headings: `### Friday Khutbah` (not `### Friday Khutbah (3450-4800 words)`). Same for inline guidance — describe the step without the parenthetical word-count.
 
-OUTPUT: ~1500-1800 word analytical briefing in clear English, split into 5 SECTIONS with H2 (##) headings, blank line between sections.
+CRITICAL — SELF-ITERATION LOOP (use thinking / chain-of-thought, do NOT surface the reasoning in the output):
+
+For EVERY flyer paragraph, EVERY recommended action, EVERY practical advice you emit, run this loop INTERNALLY before committing to the output:
+
+  1. DRAFT — write a first version.
+  2. SELF-CHECK — ask yourself (answer in internal thinking, not in the output):
+     a. SANITY OF ADVICE: Is this advice / action PRACTICAL, SENSIBLE, and REALISTIC for an ordinary Indonesian Muslim? Is there any interpretation that makes it sound ABSURD or WEIRD? Concrete real mistakes you MUST avoid:
+        - ❌ "Adopt the pregnant neighbor" — nonsensical as general advice, sounds bizarre, ambiguous, easily misread. What was probably meant: "visit the pregnant neighbor", "help with her needs — cook a meal, accompany her to the antenatal clinic". Write the UNAMBIGUOUS version.
+        - ❌ "Join the violence victim" — ambiguous, sounds like joining the victim's suffering. What was probably meant: "visit the victim's family", "offer financial / legal aid".
+        - ❌ "Delete social media for your child's sake" — too extreme as general advice. What was probably meant: "set screen-time limits when you're with your child", "swap one hour of scrolling for one hour of play".
+     b. DALEEL-PARAGRAPH FIT (flyers + sub-sections): does the tagged daleel STAND-ALONE on the paragraph's topic? Ask: "If I detach this daleel from the paragraph, is it still relevant to the topic?" If it only shares 1-2 surface keywords (e.g. paragraph on pinjol + a generic verse about "youth") → MISMATCH; pick another or leave the marker blank.
+     c. COMPLETE CONTEXT: is any context MISSING that makes the advice sound vague / half-baked? Add one clarifying sentence.
+     d. TONE: does it feel judgmental, paternalistic, or preachy? Reframe as observational + invitation, not a command.
+  3. IF any answer is "no" / "yes-but-sounds-off" → GO BACK to step 1 and REWRITE.
+  4. Loop until ALL self-checks return "yes, this is sound + on-topic + tone is right".
+  5. Output ONLY the FINAL version that passed. Never reveal the loop.
+
+KEY PRINCIPLE: "If I read this from a mimbar, would I feel embarrassed / confused / misread by my own advice?" If yes → REWRITE.
+
+OUTPUT: analytical briefing in clear English, split into 5 SECTIONS with H2 (##) headings, blank line between sections.
 
 ## Executive Summary (100-130 words, single paragraph)
 - Top 3 categories with share-pct
@@ -393,7 +435,7 @@ CRITICAL — SCOPE OF PERCENTAGES: read SEGMENT_SCOPE in the input. When "all", 
 - Prefer observation verbs ("highlights", "maps", "tracks", "surfaces") over command verbs ("must", "should", "the importance of")
 - Only use headlines from the pool I provide. Do NOT invent stories.
 
-## Da'wah Strategies & Actions (5700-7800 words)
+## Da'wah Strategies & Actions (6850-9400 words)
 This is a CONTENT KIT — not strategic advice. Each sub-section must be a READY-TO-USE DRAFT that a da'i, ustadzah, creator, or community organizer can use directly without rewriting from scratch. REQUIRED: 6 sub-sections with ### H3.
 
 DALEEL REFERENCING IN SECTION 4 — the pool I provide contains 10 thematically-reranked daleel. Each sub-section below MUST weave 2-3 daleel from this pool INLINE (not all stacked in Section 5):
@@ -402,20 +444,20 @@ DALEEL REFERENCING IN SECTION 4 — the pool I provide contains 10 thematically-
 - Different sub-sections MAY cite the same daleel if it really fits best, but TRY to distribute so the 8-10 daleel pool gets spread across sub-sections (khutbah ~3-4 daleel, kajian ~2-3, home ~1-2, content ~1, gen-z ~2, action ~1-2)
 - DO NOT invent verses or hadith outside the pool. Any citation appearing in Section 4 MUST exactly match a citation in the pool.
 
-### Friday Khutbah (2300-3200 words)
-Write a COMPLETE ready-to-deliver Friday khutbah from opening to closing, consisting of Khutbah Pertama (First Khutbah) and Khutbah Kedua (Second Khutbah). Length must match a standard Indonesian Friday khutbah (15-22 minutes spoken = ~2300-3200 words) — do NOT cut short.
+### Friday Khutbah (3450-4800 words)
+Write a COMPLETE ready-to-deliver Friday khutbah from opening to closing, consisting of Khutbah Pertama (First Khutbah) and Khutbah Kedua (Second Khutbah). Length must match a full-breath Indonesian Friday khutbah (22-30 minutes spoken = ~3450-4800 words) — do NOT cut short. Give the argument room to develop with 3-4 daleel, 2-3 concrete stories from this week, and substantive reflection.
 
-KHUTBAH PERTAMA (1800-2500 words):
+KHUTBAH PERTAMA (2700-3750 words):
 - Brief mukadimah (hamdalah → sholawat → syahadat → wasiat takwa, ~70 words, ARABIC SCRIPT WITH FULL HARAKAT — not Latin transliteration). The khateeb reads directly from the text at the mimbar.
 - Opening Quranic verse tied to this week's theme — WRITE THE VERSE IN ARABIC SCRIPT WITH HARAKAT, then name the surah + verse number, then English TRANSLATION. Do NOT use Latin transliteration for Quranic verses.
-- Theme introduction (4-6 English paragraphs): link the verse to 2-3 REAL events from this week's sample_headlines pool. IMPORTANT: in the khutbah do NOT name media outlets (Detik, Republika, Kompas, CNN, etc.) — a khutbah is not a press review. Use generic framings like "from this week's news we hear...", "recent news tells us...", "the public was struck this week by...", "what reached us in the news this week...". Convey the substance of each story accurately, but without outlet attribution.
-- Khutbah body (6-9 flowing paragraphs, no sub-headings): one argument that DEVELOPS across the khutbah, supported by 2-3 additional daleel FROM THE POOL. For each daleel: write the citation bold inline `**citation**`, the VERSE/HADITH IN ARABIC SCRIPT WITH HARAKAT (when available from the pool), then English translation. Each paragraph must advance the argument, NOT paraphrase the previous one.
-- Practical close: 3-4 concrete actions the congregation can take this week.
+- Theme introduction (6-9 English paragraphs): link the verse to 3-4 REAL events from this week's sample_headlines pool. IMPORTANT: in the khutbah do NOT name media outlets (Detik, Republika, Kompas, CNN, etc.) — a khutbah is not a press review. Use generic framings like "from this week's news we hear...", "recent news tells us...", "the public was struck this week by...", "what reached us in the news this week...". Convey the substance of each story accurately, but without outlet attribution.
+- Khutbah body (9-13 flowing paragraphs, no sub-headings): one argument that DEVELOPS across the khutbah, supported by 3-4 additional daleel FROM THE POOL. For each daleel: write the citation bold inline `**citation**`, the VERSE/HADITH IN ARABIC SCRIPT WITH HARAKAT (when available from the pool), then English translation. Each paragraph must advance the argument, NOT paraphrase the previous one. Make room for (a) theological exposition of the verse/hadith, (b) examples from the Prophet's sirah or sahaba stories, (c) direct reflection on this week's events, (d) implications for Muslims in Indonesia 2026.
+- Practical close: 4-6 concrete actions the congregation can take this week, each with a short paragraph of context (not just a bullet).
 - Close khutbah pertama with the standard formula IN ARABIC SCRIPT WITH HARAKAT (~80 words): "بَارَكَ اللهُ لِيْ وَلَكُمْ فِي الْقُرْآنِ الْعَظِيْمِ، وَنَفَعَنِيْ وَإِيَّاكُمْ بِمَا فِيْهِ مِنَ الْآيَاتِ وَالذِّكْرِ الْحَكِيْمِ…" etc. Do NOT use Latin transliteration.
 
-KHUTBAH KEDUA (500-700 words):
+KHUTBAH KEDUA (750-1050 words):
 - Brief mukadimah (hamdalah + sholawat + syahadat, ARABIC SCRIPT WITH FULL HARAKAT, ~50 words).
-- Restate the first khutbah's core (2-3 reflective English paragraphs).
+- Restate the first khutbah's core (3-5 reflective English paragraphs, each digging deeper into one facet of the first khutbah's argument — amplification, not summary).
 - CLOSING DU'A IN ARABIC SCRIPT WITH FULL HARAKAT (300-450 Arabic words). This is the main body of khutbah kedua. Do NOT write Latin transliteration, do NOT write English — WRITE IN ORIGINAL ARABIC LETTERS with syakal/harakat marks (fathah, kasrah, dhammah, sukūn, syaddah, etc.) so the khateeb can read straight from the mimbar. Use the standard Indonesian Friday khutbah du'a sequence:
   * For the whole ummah (believers, men and women, living and deceased):
     اَللّٰهُمَّ اغْفِرْ لِلْمُؤْمِنِيْنَ وَالْمُؤْمِنَاتِ، وَالْمُسْلِمِيْنَ وَالْمُسْلِمَاتِ، الْأَحْيَاءِ مِنْهُمْ وَالْأَمْوَاتِ، إِنَّكَ سَمِيْعٌ قَرِيْبٌ مُجِيْبُ الدَّعَوَاتِ.
@@ -591,6 +633,8 @@ DALEEL RULES — paragraph, headline, and daleel MUST form one consistent themat
 5. Variety: aim for 4-6 flyers to use different daleel when the pool allows — but THE PRIORITY is thematic precision, not distribution. Two flyers sharing a well-fitting daleel beats four flyers with four forced mismatches.
 
 DALEEL RULES for Flyer Messages 5 & 6 (SUNNAH + DU'A): citations on Flyer Message 5 (Sunnah Invitation) and Flyer Message 6 (This Week's Du'a) MUST come from the **ADHKAR POOL** — a separate pool in the user prompt below, holding recitable du'a / dzikir entries. Do NOT use DALEEL POOL entries for Flyer 5+6 (those are argumentative-thematic, not recitable). If the ADHKAR POOL is empty or none of its entries fit a given paragraph, leave the `**Daleel:**` marker line blank for that paragraph (never fabricate a citation).
+
+DU'A LENGTH RULE for Flyer Message 6: pick an ADHKAR POOL entry that is genuinely a short recitable du'a / dzikir (rule of thumb: Arabic < 200 chars, translation < 280 chars). Do NOT pick a long hadith with a full chain of narrators ("ḥaddatsanā so-and-so… 'an so-and-so…") or a story narration as the "du'a" — that's historical hadith, not a recitable du'a. If the only choice in the pool is a long narration, leave Flyer 6's `**Daleel:**` blank rather than force an entry that won't fit on a 1080×1080 flyer.
 
 ABSOLUTE bans across all four paragraphs:
 - Do NOT write "let's close this khutbah" / "first khutbah" / "this khutbah"
@@ -1206,9 +1250,9 @@ def _build_user_prompt(
         scope_note = scope_note_all
 
     write_now = (
-        "Tulis briefing sekarang dalam format markdown 5 bagian (Ringkasan Eksekutif / Numerik & Tren Pekan Ini / Tema Utama & Pola Yang Muncul / Strategi & Aksi Dakwah / Daleel & Sumber), ~7300-9800 kata total — Strategi & Aksi Dakwah adalah CONTENT KIT yang isinya draft siap-pakai (khutbah lengkap, outline kajian, script video, dll) dengan daleel pool yang ditenun inline ke setiap sub-section, bukan ringkasan strategi."
+        "Tulis briefing sekarang dalam format markdown 5 bagian (Ringkasan Eksekutif / Numerik & Tren Pekan Ini / Tema Utama & Pola Yang Muncul / Strategi & Aksi Dakwah / Daleel & Sumber), ~8450-11400 kata total — Strategi & Aksi Dakwah adalah CONTENT KIT yang isinya draft siap-pakai (khutbah lengkap, outline kajian, script video, dll) dengan daleel pool yang ditenun inline ke setiap sub-section, bukan ringkasan strategi."
         if language == "id"
-        else "Write the briefing now in markdown, 5-section format (Executive Summary / Numbers & Trends This Week / Main Themes & Emerging Patterns / Da'wah Strategies & Actions / Daleel & Sources), ~7300-9800 words total — Da'wah Strategies & Actions is a CONTENT KIT containing ready-to-use drafts (full khutbah, kajian outline, video script, etc) with daleel from the pool woven inline into each sub-section, NOT a strategic summary."
+        else "Write the briefing now in markdown, 5-section format (Executive Summary / Numbers & Trends This Week / Main Themes & Emerging Patterns / Da'wah Strategies & Actions / Daleel & Sources), ~8450-11400 words total — Da'wah Strategies & Actions is a CONTENT KIT containing ready-to-use drafts (full khutbah, kajian outline, video script, etc) with daleel from the pool woven inline into each sub-section, NOT a strategic summary."
     )
 
     # ADHKAR POOL — du'a / dzikir retrieved separately so Pesan Flyer
@@ -1308,11 +1352,13 @@ def _generate_for_language(
             safety_settings=_RELAXED_SAFETY,
             # 32768-token output cap supports the long-form 5-section
             # briefing where Section 4 is a full content kit (full
-            # khutbah 2300-3200 kata + kajian outline + script + Gen Z
-            # discussion + action plan ≈ 4300-6200 words for that
-            # section alone, ~10000-13000 tokens visible). Top-level
-            # brief ≈ 5800-8200 words → ~12000-16000 tokens. Bumped
-            # from 8192 when Section 4 expanded (2026-05-22).
+            # khutbah 3450-4800 kata + kajian outline + script +
+            # Mahasiswa pack + action plan ≈ 6850-9400 words for that
+            # section alone, ~14000-19000 tokens visible). Top-level
+            # brief ≈ 8450-11400 words → ~17000-24000 tokens. 32k cap
+            # leaves comfortable headroom. Bumped from 8192 when
+            # Section 4 expanded (2026-05-22); khutbah grew 1.5×
+            # (2026-05-24) but stays inside the cap.
             max_output_tokens=32768,
             # 12288-token thinking budget — Section 4 has a multi-part
             # structure (6 sub-sections, full khutbah with mukadimah →
@@ -1380,25 +1426,25 @@ async def generate_summary(
             return None
 
         # Daleel retrieval — two-pass: (1) embedding similarity over
-        # the whole corpus to surface a wide candidate set (limit=15,
-        # per_corpus=4), then (2) Gemini Flash-Lite re-ranks them by
-        # THEMATIC fit, returning the top 3 actually-relevant matches.
-        # Without the re-rank, embedding matches like Quran verses
-        # about youthful paradise servants slip through for any query
-        # mentioning "muda" / "pemuda" — surface keyword overlap, not
-        # semantic relevance.
+        # the whole corpus to surface a wide candidate set (limit=28,
+        # per_corpus=6), then (2) Gemini Flash-Lite re-ranks them by
+        # THEMATIC fit, keeping only the ones that actually address
+        # the briefing's theme. Without the re-rank, embedding matches
+        # like Quran verses about youthful paradise servants slip
+        # through for any query mentioning "muda" / "pemuda".
         retrieval_query = _build_retrieval_query(stats, segment)
         candidates = retrieve_daleel(
-            retrieval_query, limit=15, per_corpus=4
+            retrieval_query, limit=28, per_corpus=6
         )
-        # top_n=10 (was 5, 2026-05-23) — the brief now weaves daleel
-        # citations into BOTH Section 4 sub-sections (khutbah, kajian,
-        # Gen Z, etc.) AND Section 5 (bibliography). A pool of 10 gives
-        # the LLM room to pick the most thematically-fit verse per
-        # sub-section without repeating the same 2-3 daleel everywhere.
-        # The two flyers also pick different daleel (rank 0 vs rank 1)
-        # so they don't visually duplicate.
-        daleel = rerank_daleel(retrieval_query, candidates, top_n=10)
+        # top_n=18 (was 10, 2026-05-24) — widened so the brief LLM has
+        # genuinely-fitting daleel to pick from per flyer / per
+        # sub-section without forcing a mis-citation. The rerank is
+        # strict ("return only daleel that BENAR-BENAR cocok"), so a
+        # pool of 18 means ~18 thematically-relevant candidates, not
+        # 18 surface-keyword matches. Section 4 has 6 sub-sections +
+        # 6 Pesan Flyer slots = 12 places that need a daleel; 18
+        # leaves the LLM room to vary without forcing weak fits.
+        daleel = rerank_daleel(retrieval_query, candidates, top_n=18)
         # Fill `translation_id` for hadith entries (Qdrant only has EN
         # for the hadith corpora). Without this the DaleelChips below
         # the ID-locale brief render English. Idempotent on Quran-only

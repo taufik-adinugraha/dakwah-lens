@@ -32,7 +32,13 @@ log = structlog.get_logger(__name__)
 class BriefingWarning(TypedDict):
     """One issue surfaced by `validate_briefing`."""
 
-    kind: Literal["forbidden_phrase", "daleel_mismatch", "daleel_weak", "missing_daleel"]
+    kind: Literal[
+        "forbidden_phrase",
+        "daleel_mismatch",
+        "daleel_weak",
+        "missing_daleel",
+        "absurd_advice",
+    ]
     severity: Literal["low", "medium", "high"]
     where: str  # human-readable locator, e.g. "Pesan Flyer 2"
     message: str
@@ -215,6 +221,145 @@ Jawaban (satu kata):"""
         return "unknown"
 
 
+def _score_advice_sanity(paragraph: str) -> tuple[Literal["ok", "absurd", "unknown"], str]:
+    """Flash-Lite sanity check: does this flyer paragraph contain
+    absurd / ambiguous / nonsensical advice that would embarrass the
+    da'i if read at a mimbar?
+
+    Returns ("absurd", explanation) for issues, ("ok", "") otherwise.
+    Catches the kind of mistake the user flagged ("adopsi tetangga
+    yang sedang hamil" — bizarre as general advice).
+    """
+    if not settings.gemini_api_key:
+        return "unknown", ""
+
+    from google import genai
+    from google.genai import types as genai_types
+
+    para = paragraph.strip()[:800]
+    prompt = f"""Saya menilai apakah saran/tindakan dalam paragraf flyer dakwah ini PRAKTIS dan MASUK AKAL untuk jamaah Muslim Indonesia.
+
+PARAGRAF:
+{para}
+
+CONTOH SARAN ABSURD YANG HARUS DIBLOKIR:
+- "Adopsi tetangga yang sedang hamil" — tidak masuk akal sebagai saran umum, ambigu, terdengar aneh. (Yang dimaksud kemungkinan: kunjungi/bantu tetangga.)
+- "Bergabung dengan korban kekerasan" — ambigu, seolah ikut jadi korban.
+- "Hapus media sosial demi anak" — terlalu ekstrim sebagai saran umum.
+
+Tugas Anda: jawab dalam format JSON SINGKAT.
+
+Apakah paragraf mengandung saran/tindakan yang ABSURD/AMBIGU/TIDAK MASUK AKAL?
+
+- Kalau TIDAK ada masalah, jawab: {{"verdict": "ok"}}
+- Kalau ADA, jawab: {{"verdict": "absurd", "phrase": "<kutipan singkat 5-12 kata>", "why": "<1 kalimat alasan kenapa janggal>"}}
+
+JSON only, no preamble:"""
+
+    try:
+        client = genai.Client(api_key=settings.gemini_api_key)
+        resp = client.models.generate_content(
+            model="gemini-2.5-flash-lite",
+            contents=prompt,
+            config=genai_types.GenerateContentConfig(
+                response_mime_type="application/json",
+                temperature=0.0,
+                max_output_tokens=200,
+                thinking_config=genai_types.ThinkingConfig(thinking_budget=0),
+            ),
+        )
+        usage_md = getattr(resp, "usage_metadata", None)
+        record_usage(
+            provider="gemini",
+            operation="advice_sanity",
+            model="gemini-2.5-flash-lite",
+            tokens_in=getattr(usage_md, "prompt_token_count", None),
+            tokens_out=gemini_output_tokens(usage_md),
+        )
+        data = json.loads(resp.text or "{}")
+        if data.get("verdict") == "absurd":
+            phrase = str(data.get("phrase", "")).strip()
+            why = str(data.get("why", "")).strip()
+            details = (
+                f"'{phrase}' — {why}" if phrase and why else why or phrase
+            )
+            return "absurd", details[:240]
+        return "ok", ""
+    except Exception as exc:
+        log.warning("validate_briefing.sanity_failed", error=str(exc))
+        return "unknown", ""
+
+
+def _suggest_replacement_daleel(
+    paragraph: str,
+    pool: list[dict[str, Any]],
+) -> str | None:
+    """When a flyer's tagged daleel mismatches the paragraph, do a
+    focused re-retrieval against THIS PARAGRAPH'S theme + pick the
+    best pool entry. Returns the suggested citation (string) or None.
+
+    Re-retrieval = a Flash-Lite call that picks the best-fitting
+    pool entry for the paragraph's specific theme. We don't hit
+    Qdrant a second time — the existing pool of N daleel is wide
+    enough; we're just asking the LLM to pick a DIFFERENT entry
+    that fits better than the one the brief LLM originally chose.
+    """
+    if not pool or not settings.gemini_api_key:
+        return None
+
+    from google import genai
+    from google.genai import types as genai_types
+
+    para = paragraph.strip()[:600]
+    candidates_text = "\n".join(
+        f"[{i}] {c.get('citation', '')}\n"
+        f"    {((c.get('translation_id') or c.get('translation_en') or '')[:240])}"
+        for i, c in enumerate(pool)
+    )
+    prompt = f"""Saya mencari daleel paling cocok dari pool berikut untuk paragraf flyer dakwah ini.
+
+PARAGRAF:
+{para}
+
+POOL DALEEL (urut tidak relevan):
+{candidates_text}
+
+Pilih SATU index daleel yang PALING tematik & cocok untuk paragraf di atas. Tolak daleel yang hanya berbagi 1-2 kata kunci permukaan.
+
+Kalau tidak ada satu pun yang BENAR-BENAR cocok, jawab dengan index -1.
+
+Format jawaban (JSON only): {{"best_index": <int>}}"""
+
+    try:
+        client = genai.Client(api_key=settings.gemini_api_key)
+        resp = client.models.generate_content(
+            model="gemini-2.5-flash-lite",
+            contents=prompt,
+            config=genai_types.GenerateContentConfig(
+                response_mime_type="application/json",
+                temperature=0.0,
+                max_output_tokens=40,
+                thinking_config=genai_types.ThinkingConfig(thinking_budget=0),
+            ),
+        )
+        usage_md = getattr(resp, "usage_metadata", None)
+        record_usage(
+            provider="gemini",
+            operation="daleel_resuggest",
+            model="gemini-2.5-flash-lite",
+            tokens_in=getattr(usage_md, "prompt_token_count", None),
+            tokens_out=gemini_output_tokens(usage_md),
+        )
+        data = json.loads(resp.text or "{}")
+        idx = data.get("best_index")
+        if isinstance(idx, int) and 0 <= idx < len(pool):
+            return pool[idx].get("citation") or None
+        return None
+    except Exception as exc:
+        log.warning("validate_briefing.resuggest_failed", error=str(exc))
+        return None
+
+
 def check_flyer_daleel_alignment(
     markdown: str,
     daleel_pool: list[dict[str, Any]],
@@ -274,31 +419,60 @@ def check_flyer_daleel_alignment(
             b["body"],
             flags=re.IGNORECASE,
         ).strip()
-        verdict = _score_paragraph_daleel_fit(para_body, entry)
-        if verdict == "weak":
+
+        # Sanity check the advice in the paragraph BEFORE checking
+        # daleel-fit. An absurd-advice paragraph is the more urgent
+        # issue (operator needs to rewrite the copy, not just swap
+        # citations).
+        sanity, sanity_detail = _score_advice_sanity(para_body)
+        if sanity == "absurd":
             warnings.append(
                 {
-                    "kind": "daleel_weak",
-                    "severity": "medium",
-                    "where": flyer_label,
-                    "message": (
-                        f"daleel '{citation}' weakly fits "
-                        "— consider another pool entry or leave empty"
-                    ),
-                }
-            )
-        elif verdict == "mismatch":
-            warnings.append(
-                {
-                    "kind": "daleel_mismatch",
+                    "kind": "absurd_advice",
                     "severity": "high",
                     "where": flyer_label,
                     "message": (
-                        f"daleel '{citation}' does NOT match "
-                        "paragraph theme — pick a better one or leave empty"
+                        "advice may sound absurd / ambiguous — "
+                        f"{sanity_detail or 'rewrite for clarity'}"
                     ),
                 }
             )
+
+        verdict = _score_paragraph_daleel_fit(para_body, entry)
+        if verdict in ("weak", "mismatch"):
+            # Focused re-retrieval — ask Flash-Lite to pick the best
+            # pool entry for THIS paragraph specifically. Surfaced
+            # to the operator as a concrete replacement suggestion.
+            replacement = _suggest_replacement_daleel(para_body, pool)
+            suggestion = (
+                f" Suggested replacement from pool: '{replacement}'."
+                if replacement and replacement != citation
+                else " Leave the **Daleel:** marker empty if no pool entry fits."
+            )
+            if verdict == "weak":
+                warnings.append(
+                    {
+                        "kind": "daleel_weak",
+                        "severity": "medium",
+                        "where": flyer_label,
+                        "message": (
+                            f"daleel '{citation}' weakly fits."
+                            + suggestion
+                        ),
+                    }
+                )
+            else:
+                warnings.append(
+                    {
+                        "kind": "daleel_mismatch",
+                        "severity": "high",
+                        "where": flyer_label,
+                        "message": (
+                            f"daleel '{citation}' does NOT match "
+                            "paragraph theme." + suggestion
+                        ),
+                    }
+                )
     return warnings
 
 

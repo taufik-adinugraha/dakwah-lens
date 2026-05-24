@@ -40,6 +40,11 @@ function stripFlyerMessagesSection(md: string): string {
   return md;
 }
 
+// NOTE: word-count annotations like `(2300-3200 kata)` / `(~80 kata)`
+// are stripped at the data-access layer (`stripWordCountAnnotations`
+// in @/lib/insights-data) before the markdown ever reaches this
+// component. We don't strip again here — single source of truth.
+
 /**
  * Renders the AI-narrated weekly briefing.
  *
