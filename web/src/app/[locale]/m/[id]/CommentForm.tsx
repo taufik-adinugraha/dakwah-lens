@@ -8,9 +8,11 @@ import {
   Pencil,
   Pin,
   Send,
+  Trash2,
 } from "lucide-react";
 
 import { localeAwareFormatDateTime } from "@/lib/date-id";
+import { deleteComment } from "@/app/[locale]/admin/system/actions";
 
 type ReplyItem = {
   id: string;
@@ -85,6 +87,8 @@ type Labels = {
   repliesHide: string;
   repliesLoading: string;
   repliesEmpty: string;
+  modDelete: string;
+  modDeleteConfirm: string;
 };
 
 /** Must match EDIT_WINDOW_MINUTES in the PATCH route. UI uses this to
@@ -110,6 +114,7 @@ export function CommentForm({
   briefingSlug,
   submitToken,
   muted = false,
+  viewerCanModerate = false,
   palette,
   labels,
   initialItems,
@@ -124,6 +129,11 @@ export function CommentForm({
   /** Admin-muted: existing thread stays visible but the form is
    *  hidden. */
   muted?: boolean;
+  /** When true (server-decided based on the viewer's role), every
+   *  comment + reply gets an inline Delete button that calls the
+   *  same `deleteComment` server action used by the admin
+   *  moderation page. */
+  viewerCanModerate?: boolean;
   palette: Palette;
   labels: Labels;
   initialItems: CommentItem[];
@@ -619,6 +629,54 @@ export function CommentForm({
     ],
   );
 
+  // Moderator delete — only wired when `viewerCanModerate` is true.
+  // Calls the same server action /admin/system/discussion uses; the
+  // server re-checks the role and audit-logs the delete. Optimistic
+  // UI: pull the row from local state immediately, server
+  // revalidation lands shortly after.
+  const moderatorDelete = useCallback(
+    async (commentId: string, parentId: string | null) => {
+      if (!viewerCanModerate) return;
+      if (!window.confirm(labels.modDeleteConfirm)) return;
+      // Optimistic remove. If the action fails (e.g. session
+      // expired) the next page revalidation puts the row back.
+      if (parentId) {
+        // Reply — drop from the parent's reply list + decrement
+        // the parent's reply count chip if we ever render it.
+        setItems((prev) =>
+          prev.map((c) =>
+            c.id === parentId
+              ? {
+                  ...c,
+                  replies: (c.replies ?? []).filter((r) => r.id !== commentId),
+                  replyCount: Math.max(0, (c.replyCount ?? 0) - 1),
+                }
+              : c,
+          ),
+        );
+        setExtraRepliesByParent((m) => ({
+          ...m,
+          [parentId]: (m[parentId] ?? []).filter((r) => r.id !== commentId),
+        }));
+      } else {
+        // Top-level — drop the whole card.
+        setItems((prev) => prev.filter((c) => c.id !== commentId));
+      }
+      try {
+        const fd = new FormData();
+        fd.set("id", commentId);
+        await deleteComment(fd);
+      } catch (err) {
+        // Action threw (network / auth) — surface a notice so the
+        // moderator knows the optimistic remove may un-revert on
+        // the next page load.
+        console.warn("[mod-delete] action failed:", err);
+        setNotice({ tone: "error", message: labels.errorGeneric });
+      }
+    },
+    [viewerCanModerate, labels.modDeleteConfirm, labels.errorGeneric],
+  );
+
   return (
     <div>
       {!muted && (
@@ -857,6 +915,17 @@ export function CommentForm({
                       {labels.edit}
                     </button>
                   )}
+                  {viewerCanModerate && !isEditingThis && (
+                    <button
+                      type="button"
+                      onClick={() => moderatorDelete(c.id, null)}
+                      className="inline-flex h-6 items-center gap-1 rounded-full border border-slate-200 bg-white px-2 text-[10px] font-semibold text-slate-500 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700"
+                      title={labels.modDelete}
+                    >
+                      <Trash2 className="h-2.5 w-2.5" />
+                      {labels.modDelete}
+                    </button>
+                  )}
                 </div>
               </div>
               {isEditingThis ? (
@@ -1047,6 +1116,19 @@ export function CommentForm({
                         <p className="mt-1 whitespace-pre-wrap text-pretty text-[13px] leading-relaxed text-slate-700">
                           {r.body}
                         </p>
+                        {viewerCanModerate && (
+                          <div className="mt-2">
+                            <button
+                              type="button"
+                              onClick={() => moderatorDelete(r.id, c.id)}
+                              className="inline-flex h-6 items-center gap-1 rounded-full border border-slate-200 bg-white px-2 text-[10px] font-semibold text-slate-500 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700"
+                              title={labels.modDelete}
+                            >
+                              <Trash2 className="h-2.5 w-2.5" />
+                              {labels.modDelete}
+                            </button>
+                          </div>
+                        )}
                       </div>
                     );
                   })}

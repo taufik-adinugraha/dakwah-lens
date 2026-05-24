@@ -2145,6 +2145,8 @@
     "replies_show": "Show replies",
     "replies_hide": "Hide replies",
     "replies_loading": "Loading replies…",
-    "replies_empty": "No replies to show yet."
+    "replies_empty": "No replies to show yet.",
+    "mod_delete": "Delete",
+    "mod_delete_confirm": "Permanently delete this comment? This cannot be undone."
   }
 }

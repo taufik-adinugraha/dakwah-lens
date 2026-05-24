@@ -2070,6 +2070,8 @@
     "replies_show": "Tampilkan balasan",
     "replies_hide": "Sembunyikan balasan",
     "replies_loading": "Memuat balasan…",
-    "replies_empty": "Belum ada balasan untuk ditampilkan."
+    "replies_empty": "Belum ada balasan untuk ditampilkan.",
+    "mod_delete": "Hapus",
+    "mod_delete_confirm": "Hapus komentar ini permanen? Tidak bisa dibatalkan."
   }
 }

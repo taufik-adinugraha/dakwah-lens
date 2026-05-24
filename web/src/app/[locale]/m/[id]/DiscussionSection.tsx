@@ -2,6 +2,7 @@ import { and, asc, desc, eq, inArray, isNull } from "drizzle-orm";
 import { Lock, MessagesSquare } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
+import { auth } from "@/auth";
 import { db, schema } from "@/db";
 import { issueCommentToken } from "@/lib/comment-token";
 import { localeAwareFormatDateTime } from "@/lib/date-id";
@@ -39,6 +40,14 @@ export async function DiscussionSection({
   palette: Palette;
 }) {
   const t = await getTranslations("Discussion");
+
+  // Admins + superadmins get an inline Delete button on every
+  // comment + reply, so moderation doesn't require bouncing to
+  // /admin/system/discussion for an obvious spam post sitting
+  // right in front of them.
+  const session = await auth();
+  const viewerCanModerate =
+    session?.user?.role === "admin" || session?.user?.role === "superadmin";
 
   // Top-level rows first, then a follow-up batch query for every
   // reply hanging off them. Replies render inline (no collapse) —
@@ -175,6 +184,7 @@ export async function DiscussionSection({
             briefingSlug={briefingSlug}
             submitToken={issueCommentToken(briefingSlug)}
             muted={isMuted}
+            viewerCanModerate={viewerCanModerate}
             palette={{
               accent: palette.accent,
               accentDeep: palette.accentDeep,
@@ -227,6 +237,8 @@ export async function DiscussionSection({
               repliesHide: t("replies_hide"),
               repliesLoading: t("replies_loading"),
               repliesEmpty: t("replies_empty"),
+              modDelete: t("mod_delete"),
+              modDeleteConfirm: t("mod_delete_confirm"),
             }}
             initialItems={initialItems}
             initialHasMore={hasMore}
