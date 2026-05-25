@@ -69,7 +69,12 @@ CRITICAL: read the OUTCOME and the dominant frame of the post, not just the unde
 POSITIVE — score positive when the post reports a good OUTCOME:
 - JUSTICE SERVED: prosecutions advancing, arrests of suspects, convictions, asset seizures from corrupt officials, sentence demands accepted as fair, drug busts, criminals caught BEFORE acting. The crime itself is sad, but the news here is the resolution. ARREST/CONVICTION VERBS that ALWAYS mark justice-served: "diringkus", "ditangkap", "ditembak" (when applied to perpetrators), "divonis", "dibekuk", "diciduk", "dijerat", "didakwa" (when the actor is the criminal, not victim), "kabur tertangkap". When a headline names a crime AND uses one of these verbs, the lead is the resolution → POSITIVE.
 - CONSUMER BENEFITS: subsidies, discounts (electricity, fuel, transport), 13th-month salary payments, prices going DOWN, wage protections (driver share %, gig-worker rights), worker dispute resolved.
-- CHARITY / DAKWAH / RELIGIOUS PRACTICE: donations, kurban (Eid sacrifice), Hajj milestones ("jamaah RI tiba di Tanah Suci", "X persen jamaah berangkat", "calon haji"), mosque renovations, religious teachings, humanitarian aid, tahfidz/hafidz achievement. Any post about a religious figure or congregation engaging in worship-adjacent practice is positive — even if the framing sounds offhand ("Ustaz Solmed Gak Pasang Batasan Untuk Kurban" is still a positive kurban story).
+- CHARITY / DAKWAH / RELIGIOUS PRACTICE: donations, kurban (Eid sacrifice), Hajj milestones ("jamaah RI tiba di Tanah Suci", "X persen jamaah berangkat", "calon haji"), mosque renovations, religious teachings, humanitarian aid, tahfidz/hafidz achievement. Any post about a religious figure or congregation engaging in worship-adjacent practice is positive — even if the framing sounds offhand ("Ustaz Solmed Gak Pasang Batasan Untuk Kurban" is still a positive kurban story). This INCLUDES dry-titled religious teaching content that doesn't carry obvious emotional cues:
+  · Quran recitation / murottal — titles naming a surah or reciter ("SURAT AL MAIDAH 32", "Murottal Al-Kahfi", "QS Yasin / Hareth Al Argaly") → positive.
+  · Fiqh Q&A — Islamic legal questions with channel signals (Al-Bahjah TV, Rumah Fiqih, Yufid EDU, NU Online) or formulas like "Bolehkah X?", "Hukum X", "Bait ke-N", "Fiqih Mazhab X" → positive.
+  · Islamic history / tarikh — biographies of sahabah / khalifah / nabi, calendar history ("Umar Bin Khatab dan Sejarah Penetapan Kalender Hijriah") → positive.
+  · Hadith / sirah teachings — "Bahkan Seorang Nabi Pun Bersikap Sungkan", "Sabda Nabi", any sirah excerpt → positive.
+  · Religious figure self-improvement talks (Felix Siauw, Hanan Attaki, Khalid Basalamah on focus / akhlaq / parenting) → positive.
 - COOPERATION / SOLIDARITY: anti-imperialist solidarity speeches, regional cooperation, post-disaster mutual aid, inclusive accessibility initiatives. Supportive opinion tweets calling to defend good causes (anti-corruption, justice) count here too.
 - ACHIEVEMENT: research progress, exports growing, industry milestones, **currency strengthening ("rupiah menguat", "IHSG rebound", "BI-rate keputusan")**, awards won by Indonesian institutions/communities ("raih penghargaan", "raih predikat", "sertifikasi nasional"). Personal achievements that inspire — earning a doctorate (especially cumlaude), success stories of small entrepreneurs ("Kisah Sukses X"), regenerasi positif in sports/work, individual lulus / juara / berhasil framings.
 - ANTI-CORRUPTION ACTION: state body actively engaging a corruption case — at ANY stage of the process. Investigation-initiation verbs ALWAYS count: "Usut", "Akui Usut", "Tangani" (when the actor is KPK/Kejagung/Polda and the object is "kasus korupsi"), "Tetapkan tersangka", "Terbitkan sprindik", "Periksa", "Selidiki", "Kembangkan kasus", "Geledah". Seizures: "Sita", "Lelang aset". Drug busts: "Gagalkan peredaran", "Tangkap" (perpetrator). Preventive policing ("Tim Pemburu Begal", "Patroli Karhutla"). When the lead names a state action against crime/corruption, score positive — the existence of a crime is data; the institutional response is the news. "KPK Akui Usut Dugaan Korupsi X" → positive (institution acting).
@@ -99,6 +104,8 @@ NEUTRAL — score neutral when there's no clear good/bad OUTCOME:
 - FOREIGN RELIGIOUS / CULTURAL CONTENT: Balinese Hindu calendar, horoscopes, Christian Bible launches, foreign religious events. These are other communities' practices — not negative for Indonesian Muslims; treat as routine cultural reporting unless they describe an actual harm.
 - HOAX DEBUNKED: "Hoaks! …" stories are factual corrections — neutral, not negative.
 - TECHNICAL / INFORMATIONAL: medical explanation pieces, opinion analyses, market commentary without major movement.
+- EDUTAINMENT HISTORICAL / EXPLAINER: YouTube edutainment channels (Sepulang Sekolah, Kok Bisa, NerveDamage, etc.) doing historical, geopolitical, or business explainers — even when the topic vocabulary sounds alarming ("SKANDAL KFC di China", "GULA MEMPERPARAH PENJAJAHAN", "Slave Trade", "Kolonialisme"). Past or distant-place harm framed as education is NOT the kind of "ongoing harm" the negative rules target. Score neutral unless the content describes contemporary Indonesian harm.
+- WORKPLACE / LIFESTYLE BANTER: relatable office humor, deadline jokes, generational stereotypes ("Ini yang Gen Z lakukan ketika dikejar deadline"), gym/cooking/dating content. Trigger-warning labels on humor don't make humor negative. Score neutral.
 - SELF-DEPRECATING HUMOR / BANTER: throwaway jokes without sentiment ("kalo bisa korupsi gua korupsi nih cuma apa yang mau di korupsi"), playful exchanges, balanced nuanced opinions ("ada kebijakan kurang tepat sasaran, tapi ada juga yang sangat membantu").
 
 WHEN UNCERTAIN — DEFAULT TO NEUTRAL, NOT POSITIVE:
@@ -149,6 +156,13 @@ Tweet/social examples:
 - "Saya percaya Nadiem bersih... dia tidak korupsi" → positive (defensive support of an individual)
 - "KPK Akui Usut Dugaan Korupsi Dishub DKI" → positive (institutional anti-corruption action)
 - "Kejagung Usut Dugaan Korupsi di Kementan" → positive (investigation = anti-corruption action)
+- "SURAT AL MAIDAH 32 / HARETH AL ARGALY" → positive (Quran recitation)
+- "Bolehkah Dam Haji Disembelih di Tanah Air? / Buya Yahya" → positive (fiqh Q&A)
+- "Umar Bin Khatab dan Sejarah Penetapan Kalender Hijriah" → positive (Islamic history teaching)
+- "Bahkan Seorang Nabi Pun Bersikap Sungkan kepada Istrinya" → positive (sirah teaching)
+- "Kenapa KFC Kuasai China? Padahal Banyak SKANDAL!" → neutral (edutainment business explainer)
+- "Gimana GULA MEMPERPARAH PENJAJAHAN? Jutaan Diperbudak" → neutral (edutainment historical explainer)
+- "Ini yang Gen Z lakukan ketika dikejar deadline" → neutral (workplace banter)
 - "kalo bisa korupsi gua korupsi nih cuma apa yang mau di korupsi" → neutral (self-deprecating joke, no sentiment)
 - "Mengkritik kebijakan Nadiem bukan berarti bilang dia korupsi... Ada kebijakan yang kurang tepat sasaran. Tapi ada juga yang sangat membantu" → neutral (balanced, nuanced opinion)
 
