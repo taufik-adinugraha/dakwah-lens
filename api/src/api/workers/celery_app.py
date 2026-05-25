@@ -131,16 +131,23 @@ celery_app.conf.update(
             "schedule": crontab(minute=0, hour=22, day_of_week=3),
             "kwargs": {"platform": "x", "limit": 500, "n_keywords": 999},
         },
-        # "ingest-tiktok": {
-        #     "task": "api.workers.ingest.rotating_ingest",
-        #     "schedule": crontab(minute=20, hour=0, day_of_week=2),
-        #     "kwargs": {"platform": "tiktok", "limit": 20, "n_keywords": 999},
-        # },
-        # "ingest-instagram": {
-        #     "task": "api.workers.ingest.rotating_ingest",
-        #     "schedule": crontab(minute=30, hour=0, day_of_week=1),
-        #     "kwargs": {"platform": "instagram", "limit": 20, "n_keywords": 999},
-        # },
+        # TikTok + Instagram — weekly Wed evening, staggered after X so the
+        # paid-Apify burst lands together and a single Thu 04:00 recluster
+        # covers all three. Enabled 2026-05-25 for one-week evaluation.
+        # Cost @ limit=20 × 49 keywords:
+        #   · TikTok ($0.004/item)    ≈ $3.92/run → $16/mo
+        #   · Instagram ($0.0023/item) ≈ $2.25/run → $9/mo
+        # Keep limit at 20 — bumping higher pushes TT past budget cap.
+        "ingest-tiktok-weekly": {
+            "task": "api.workers.ingest.rotating_ingest",
+            "schedule": crontab(minute=10, hour=22, day_of_week=3),
+            "kwargs": {"platform": "tiktok", "limit": 20, "n_keywords": 999},
+        },
+        "ingest-instagram-weekly": {
+            "task": "api.workers.ingest.rotating_ingest",
+            "schedule": crontab(minute=20, hour=22, day_of_week=3),
+            "kwargs": {"platform": "instagram", "limit": 20, "n_keywords": 999},
+        },
         # Re-cluster topics. Split across two beat entries to match the
         # ingest cadence of each platform — re-running Gemini topic
         # discovery on the same corpus does no work but still costs
@@ -155,13 +162,14 @@ celery_app.conf.update(
             "schedule": crontab(minute=0, hour=4),
             "kwargs": {"platforms": ["mainstream", "youtube"]},
         },
-        # Thursday 04:00 WIB → X only, 6h after the Wed 22:00 WIB X
-        # ingest. Running daily would re-cluster the identical X corpus
-        # 6 days a week for no new signal.
-        "recluster-x-weekly": {
+        # Thursday 04:00 WIB → weekly-ingest social platforms (X +
+        # TikTok + Instagram), 6h after the Wed 22:00 WIB social burst.
+        # Running daily would re-cluster the identical corpus 6 days a
+        # week for no new signal.
+        "recluster-social-weekly": {
             "task": "api.workers.ingest.recluster_all",
             "schedule": crontab(minute=0, hour=4, day_of_week=4),
-            "kwargs": {"platforms": ["x"]},
+            "kwargs": {"platforms": ["x", "tiktok", "instagram"]},
         },
         # Insights briefing generation — PAUSED 2026-05-23 for cost.
         #

@@ -241,7 +241,6 @@ function StackGrid({ t }: { t: T }) {
         { name: "OpenAI Embeddings", role: t("stack_ai_openai") },
         { name: "Gemini 2.5 Pro / Flash-Lite", role: t("stack_ai_gemini") },
         { name: "Anthropic Claude Sonnet 4.5", role: t("stack_ai_anthropic") },
-        { name: "IndoBERT", role: t("stack_ai_indobert") },
         { name: "trafilatura", role: t("stack_ai_trafilatura") },
       ],
     },
@@ -907,13 +906,6 @@ function BriefingAnatomy({ t }: { t: T }) {
 function ModelsTable({ t }: { t: T }) {
   const rows = [
     {
-      name: "IndoBERT",
-      id: "mdhugol/indonesia-bert-sentiment-classification",
-      role: t("models_indobert_role"),
-      why: t("models_indobert_why"),
-      where: t("models_indobert_where"),
-    },
-    {
       name: "Gemini 2.5 Flash-Lite",
       id: "gemini-2.5-flash-lite",
       role: t("models_flash_role"),
@@ -1051,32 +1043,32 @@ function MonthlyCost({ t }: { t: T }) {
       monthly: 30,
       note: "≈ Rp 500K/bulan · server + DB + Redis + Qdrant",
     },
-    // ── PAUSED platforms — Apify scrapers (X / TT / IG / Trending) ──
-    // Real cost = $0 while paused. Listed for transparency about what's
-    // scheduled to come back online; rebudget at re-enable.
+    // ── Apify scrapers ── X + trending re-activated 2026-05-25 after
+    // IndoBERT retirement. TikTok + Instagram enabled 2026-05-25 for
+    // one-week evaluation; reassess after first run.
     {
       provider: "Apify · X (apidojo)",
       use: t("cost_x_use"),
-      monthly: 0,
-      note: t("cost_paused"),
+      monthly: 8,
+      note: t("cost_active"),
     },
     {
       provider: "Apify · Instagram",
       use: t("cost_ig_use"),
-      monthly: 0,
-      note: t("cost_paused"),
+      monthly: 9,
+      note: t("cost_eval"),
     },
     {
       provider: "Apify · TikTok (free actor)",
       use: t("cost_tt_use"),
-      monthly: 0,
-      note: t("cost_paused"),
+      monthly: 16,
+      note: t("cost_eval"),
     },
     {
       provider: "Apify · Trending overlay (X)",
       use: t("cost_trending_use"),
-      monthly: 0,
-      note: t("cost_paused"),
+      monthly: 1,
+      note: t("cost_active"),
     },
   ];
 
