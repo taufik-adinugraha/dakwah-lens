@@ -29,6 +29,14 @@ const BEAT_SCHEDULE = [
   { name: "snapshot-system", task: "snapshot_system", platform: "host", cron: "every 60s", query: "—" },
 ] as const;
 
+// Background tasks (Celery `recluster_all`, `snapshot_system`,
+// `reconcile_apify_costs`, ingest workers) write to ingest_runs /
+// system_metrics / usage_events without firing `revalidatePath`.
+// Force-dynamic so this page always reflects the latest write
+// instead of serving a cached render with the previous tick's
+// "Latest run" timestamp.
+export const dynamic = "force-dynamic";
+
 export default async function PipelinePage() {
   // Three tasks don't write to ingest_runs at all — they predate the
   // run-tracking convention and write directly to their own tables:

@@ -61,6 +61,83 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ────────────────────────────────────────────────────────────────
+ * Interactive control polish — applies to every <button>, submit
+ * input, and anchor explicitly marked as a button. We layer this in
+ * `@layer base` so per-component utility classes still win for
+ * color / spacing / shadow, while the BASE state (cursor, focus
+ * ring, active-press scale, disabled) is consistent app-wide.
+ *
+ * Why: the dashboard + admin surfaces had buttons that gave NO
+ * visible feedback on click — users were retrying because they
+ * weren't sure the first click registered. This was the cheapest
+ * fix: add baseline interaction states without touching ~80 button
+ * declarations across the codebase.
+ * ──────────────────────────────────────────────────────────────── */
+@layer base {
+  button,
+  [type="button"],
+  [type="submit"],
+  [type="reset"],
+  [role="button"],
+  [role="tab"] {
+    cursor: pointer;
+    /* Smooth transition for visual properties commonly toggled by
+       hover/active/disabled state. Property list (rather than `all`)
+       so we don't animate layout/font-rendering which can feel
+       sluggish. */
+    transition:
+      transform 120ms ease-out,
+      opacity 120ms ease-out,
+      background-color 150ms ease-out,
+      color 150ms ease-out,
+      box-shadow 150ms ease-out,
+      border-color 150ms ease-out;
+  }
+
+  /* Pressed feedback — slight scale-down so the click feels tactile.
+     `:not(:disabled)` avoids the press effect on greyed-out buttons. */
+  button:active:not(:disabled),
+  [type="button"]:active:not(:disabled),
+  [type="submit"]:active:not(:disabled),
+  [type="reset"]:active:not(:disabled),
+  [role="button"]:active:not(:disabled),
+  [role="tab"]:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  /* Keyboard-only focus ring (mouse clicks skip via :focus-visible). */
+  button:focus-visible,
+  [type="button"]:focus-visible,
+  [type="submit"]:focus-visible,
+  [type="reset"]:focus-visible,
+  [role="button"]:focus-visible,
+  [role="tab"]:focus-visible,
+  a:focus-visible {
+    outline: 2px solid var(--color-accent-500);
+    outline-offset: 2px;
+    border-radius: 0.375rem; /* matches our most common rounded-md */
+  }
+
+  /* Disabled — slightly dimmed + cursor cue, no press effect. */
+  button:disabled,
+  [type="button"]:disabled,
+  [type="submit"]:disabled,
+  [type="reset"]:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  /* Anchors that are intentionally styled as buttons (via `role="button"`
+     or our `.btn-link` opt-in utility) get the same press cue.
+     Plain text/nav links don't — the page navigation itself is feedback,
+     and a scale shudder on every nav-link click would feel jittery. */
+  a[role="button"]:active,
+  a.btn-link:active {
+    transform: scale(0.98);
+  }
+}
+
 .text-gradient-brand {
   background: linear-gradient(120deg, #2563eb 0%, #06b6d4 45%, #10b981 100%);
   -webkit-background-clip: text;

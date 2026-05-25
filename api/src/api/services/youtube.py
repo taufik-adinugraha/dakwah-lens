@@ -35,7 +35,6 @@ import structlog
 
 from api.config import settings
 from api.services.apify import ScrapeResult
-from api.services.language import detect_lang
 
 log = structlog.get_logger()
 
@@ -189,14 +188,19 @@ def scrape_youtube_uploads(
     # `id.videoId` + `snippet.title/description/channelTitle/publishedAt`.
     # playlistItems gives us `snippet.resourceId.videoId` instead.
     reshaped: list[dict[str, Any]] = []
-    dropped_non_id = 0
+    # `dropped_no_video_id` was previously also incremented for
+    # langdetect non-ID drops; the language gate was removed
+    # 2026-05-25 (see below), so this now exclusively counts the rare
+    # case of a playlistItems row with a missing `resourceId.videoId`.
+    # Should be ~0 in practice.
+    dropped_no_video_id = 0
     dropped_stale = 0
     for it in raw_items:
         snippet = it.get("snippet") or {}
         resource = snippet.get("resourceId") or {}
         video_id = resource.get("videoId")
         if not video_id:
-            dropped_non_id += 1
+            dropped_no_video_id += 1
             continue
 
         # publishedAt comes back as ISO-8601 UTC string. Drop anything
@@ -215,15 +219,18 @@ def scrape_youtube_uploads(
                 # publishedAt parsing will sort it out.
                 pass
 
-        title = (snippet.get("title") or "").strip()
-        description = (snippet.get("description") or "").strip()
-        # Channels do occasionally post bilingual / English uploads; the
-        # langdetect gate that protected the search.list path applies
-        # equally well here.
-        probe = f"{title}\n{description}"
-        if probe and detect_lang(probe) != "id":
-            dropped_non_id += 1
-            continue
+        # Language gate removed 2026-05-25. Rationale: the langdetect
+        # filter was legacy from the keyword `search.list` path, where
+        # we had zero trust in the result set and needed a defence
+        # against cross-language pollution (Kerala matchmaking spam,
+        # Indian wedding shorts, etc.). With the whitelist-only path
+        # the channel itself is the trust boundary — an admin verified
+        # it via the /admin/system/youtube-channels Verify button.
+        # Channels with clickbait English titles on Indonesian-content
+        # videos (Refly Harun, Bennix, parts of Deddy Corbuzier) lost
+        # 30-60% of their uploads to this gate. The downstream Gemini
+        # `dawah_relevance` classifier will still drop genuinely off-
+        # topic English-content uploads, so we're not blind here.
         reshaped.append(
             {
                 "id": {"videoId": video_id},
@@ -281,7 +288,7 @@ def scrape_youtube_uploads(
         channel_id=channel_id,
         channel_name=channel_name,
         results=len(reshaped),
-        dropped_non_id=dropped_non_id,
+        dropped_no_video_id=dropped_no_video_id,
         dropped_stale=dropped_stale,
         duration_s=round(duration_s, 2),
     )

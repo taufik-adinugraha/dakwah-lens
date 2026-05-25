@@ -42,6 +42,13 @@ type ReconcileRow = {
   updated_at: string;
 };
 
+// `usage_events` rows land via background workers (every Celery
+// task that records usage), and `manual_costs` is mutated via
+// operator-driven server actions that DO revalidate — but the
+// background path doesn't. Force-dynamic keeps the totals tile +
+// per-provider table fresh on every load.
+export const dynamic = "force-dynamic";
+
 export default async function ApiCostsPage() {
   const usdToIdr = await getUsdToIdr();
   const capUsd = BUDGET_CAP_IDR / usdToIdr;

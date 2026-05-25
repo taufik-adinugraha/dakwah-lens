@@ -20,6 +20,12 @@ import {
 import { ConfirmForm } from "../_ConfirmForm";
 import { KNOWN_PROVIDERS, providerLabel } from "@/lib/cost-providers";
 
+// The Apify-reconcile Celery task writes to `usage_events` and
+// `manual_costs` without firing revalidatePath, so this page can
+// drift if cached. Force-dynamic keeps the donations vs spend
+// ledger fresh on every load.
+export const dynamic = "force-dynamic";
+
 export default async function CostsPage({
   searchParams,
 }: {

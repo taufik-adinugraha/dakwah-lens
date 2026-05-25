@@ -60,6 +60,16 @@ type Filter = (typeof FILTERS)[number];
 // Raw `searchParams` type rather than `PageProps<"…">` because Next.js's
 // typed-routes generator only picks up the new directory after a build,
 // and the inline type is functionally identical for this route.
+// `dynamic = "force-dynamic"` so the bucket-delta strip + per-channel
+// health row always reflect the latest DB state. Background tasks
+// (Celery YT ingest, manual cleanups via psql) don't fire
+// `revalidatePath`, so without this directive Next.js can serve a
+// cached render with stale view counts long after the underlying
+// data changed. The page is admin-only with a tiny audience; the
+// per-request DB cost is well under the alternative (operators
+// chasing ghost numbers).
+export const dynamic = "force-dynamic";
+
 export default async function YoutubeChannelsPage({
   searchParams,
 }: {

@@ -19,27 +19,35 @@ import type { Flash } from "@/lib/flash";
  * the next flash slides in cleanly.
  */
 export function FlashToast({ initial }: { initial: Flash | null }) {
+  // Local mirror of the server-provided flash so the toast stays
+  // visible for its full 5-second budget even after the parent
+  // re-renders with `initial = null` (cookie was cleared on the
+  // server side on first read).
   const [flash, setFlash] = useState<Flash | null>(initial);
   const [visible, setVisible] = useState<boolean>(Boolean(initial));
-  // `serial` increments whenever we receive a new flash from the server,
-  // even if the message text is identical to the previous one. Without
-  // it React would diff "same flash, no change" and skip the re-show
-  // animation on a repeated action.
+  // `serial` ticks every time we receive a NEW flash from the server,
+  // even when the message text is identical to the previous one.
+  // Without it React would diff "same value, no change" and skip the
+  // re-show animation on a repeated action.
   const [serial, setSerial] = useState(0);
+  // State (not a ref) tracks the last-seen `initial` instance so the
+  // "adjust state during render" pattern below fires exactly once per
+  // new flash. React 19's `refs-in-render` rule disallows
+  // `ref.current` access during render — state is the blessed
+  // alternative. (See React docs: "Adjusting some state when a prop
+  // changes".) The setState calls are conditional, so they don't loop.
+  const [lastSeen, setLastSeen] = useState<Flash | null>(initial);
 
-  // Sync server-provided flash → local state when it changes between
-  // renders. The layout passes a fresh value after every navigation.
-  useEffect(() => {
-    if (initial) {
-      setFlash(initial);
-      setVisible(true);
-      setSerial((s) => s + 1);
-    }
-  }, [initial]);
+  if (initial && initial !== lastSeen) {
+    setLastSeen(initial);
+    setFlash(initial);
+    setVisible(true);
+    setSerial((s) => s + 1);
+  }
 
-  // Auto-dismiss timer. Reset whenever `serial` ticks so a fresh flash
-  // gets its full 5-second budget even if the previous one was halfway
-  // through dismissal.
+  // Auto-dismiss timer. Resets whenever `serial` ticks so a fresh
+  // flash gets its full 5-second budget even if the previous one was
+  // mid-dismissal.
   useEffect(() => {
     if (!visible) return;
     const id = window.setTimeout(() => setVisible(false), 5000);
