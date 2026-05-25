@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useCallback, useSyncExternalStore, type ReactNode } from "react";
 import { Sparkles, BarChart3 } from "lucide-react";
 
 /**
@@ -26,6 +26,38 @@ import { Sparkles, BarChart3 } from "lucide-react";
 type Tab = "kit" | "data";
 
 const STORAGE_KEY = "dashboard.tab";
+const TAB_CHANGE_EVENT = "dashboard-tab:change";
+
+/**
+ * Subscribe to localStorage for THIS key. Cross-tab updates fire the
+ * native `storage` event; same-tab updates need a synthetic event since
+ * the platform doesn't dispatch one to its own window.
+ */
+function subscribeTab(callback: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener("storage", callback);
+  window.addEventListener(TAB_CHANGE_EVENT, callback);
+  return () => {
+    window.removeEventListener("storage", callback);
+    window.removeEventListener(TAB_CHANGE_EVENT, callback);
+  };
+}
+
+function getTabSnapshot(): Tab {
+  if (typeof window === "undefined") return "kit";
+  try {
+    const v = window.localStorage.getItem(STORAGE_KEY);
+    return v === "data" || v === "kit" ? v : "kit";
+  } catch {
+    return "kit";
+  }
+}
+
+// SSR + first client paint both render "kit" (matches SSR snapshot),
+// then useSyncExternalStore swaps to the persisted value after
+// hydration. No setState-in-effect needed — React handles the
+// post-hydration transition.
+const getServerTabSnapshot = (): Tab => "kit";
 
 export function DashboardTabs({
   kit,
@@ -41,29 +73,23 @@ export function DashboardTabs({
     data_subtitle: string;
   };
 }) {
-  const [tab, setTab] = useState<Tab>("kit");
-  const [hydrated, setHydrated] = useState(false);
+  const tab = useSyncExternalStore(
+    subscribeTab,
+    getTabSnapshot,
+    getServerTabSnapshot,
+  );
 
-  useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem(STORAGE_KEY);
-      if (stored === "data" || stored === "kit") {
-        setTab(stored);
-      }
-    } catch {
-      // localStorage disabled / SSR — keep default
-    }
-    setHydrated(true);
-  }, []);
-
-  const pick = (next: Tab) => {
-    setTab(next);
+  const pick = useCallback((next: Tab) => {
     try {
       window.localStorage.setItem(STORAGE_KEY, next);
+      // Same-window update — the native `storage` event only fires
+      // cross-tab, so we kick our synthetic event so the local
+      // subscriber re-snapshots immediately.
+      window.dispatchEvent(new Event(TAB_CHANGE_EVENT));
     } catch {
       // localStorage disabled — silent
     }
-  };
+  }, []);
 
   return (
     <div className="mt-6">
@@ -90,21 +116,22 @@ export function DashboardTabs({
         />
       </div>
 
-      {/* During hydration, render the default tab eagerly. After
-          hydration, swap to the stored preference. `hidden` (not
-          `display: none` directly) plays nicely with internal links
-          and screen readers. */}
+      {/* `useSyncExternalStore` returns the SSR snapshot ("kit") for
+          both server render and first client paint, then swaps to the
+          persisted value after hydration. React handles that transition
+          without a manual `hydrated` flag. `hidden` (not display:none
+          directly) plays nicely with internal links + screen readers. */}
       <div
         role="tabpanel"
-        aria-hidden={hydrated && tab !== "kit"}
-        hidden={hydrated && tab !== "kit"}
+        aria-hidden={tab !== "kit"}
+        hidden={tab !== "kit"}
       >
         {kit}
       </div>
       <div
         role="tabpanel"
-        aria-hidden={hydrated && tab !== "data"}
-        hidden={!hydrated || tab !== "data"}
+        aria-hidden={tab !== "data"}
+        hidden={tab !== "data"}
       >
         {data}
       </div>
