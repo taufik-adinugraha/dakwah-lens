@@ -1,6 +1,7 @@
 import { desc, sql } from "drizzle-orm";
 
 import { db, schema } from "@/db";
+import { Link } from "@/i18n/navigation";
 import { getUsdToIdr } from "@/lib/settings";
 import {
   Card,
@@ -31,6 +32,16 @@ function formatProvider(provider: string): string {
   return PROVIDER_DISPLAY[provider] ?? provider;
 }
 
+type ReconcileRow = {
+  covers_provider: string;
+  amount_idr: number;
+  period_start: string;
+  period_end: string;
+  vendor: string;
+  note: string | null;
+  updated_at: string;
+};
+
 export default async function ApiCostsPage() {
   const usdToIdr = await getUsdToIdr();
   const capUsd = BUDGET_CAP_IDR / usdToIdr;
@@ -40,7 +51,7 @@ export default async function ApiCostsPage() {
     recent,
     [{ total30 = 0 } = { total30: 0 }],
     [{ total7 = 0 } = { total7: 0 }],
-    [{ total24 = 0 } = { total24: 0 }],
+    reconciles,
   ] = await Promise.all([
     db.execute(sql`
       SELECT
@@ -96,11 +107,26 @@ export default async function ApiCostsPage() {
       .select({ total7: sql<number>`COALESCE(SUM(cost_usd), 0)::float` })
       .from(schema.usageEvents)
       .where(sql`occurred_at >= now() - interval '7 days'`),
-    db
-      .select({ total24: sql<number>`COALESCE(SUM(cost_usd), 0)::float` })
-      .from(schema.usageEvents)
-      .where(sql`occurred_at >= now() - interval '24 hours'`),
+    // Latest manual reconcile per provider. Operators paste authoritative
+    // dashboard totals (AI Studio for Gemini, Apify billing, etc.) into
+    // `manual_costs` to close the gap between what our token-counting
+    // estimated and what the provider actually billed. The per-provider
+    // table below uses these to show side-by-side "tracked vs reconciled".
+    db.execute(sql`
+      SELECT DISTINCT ON (covers_provider)
+        covers_provider, amount_idr, period_start, period_end, vendor, note, updated_at
+      FROM manual_costs
+      WHERE covers_provider IS NOT NULL
+      ORDER BY covers_provider, updated_at DESC
+    `) as unknown as Promise<ReconcileRow[]>,
   ]);
+
+  const reconcileByProvider = new Map<string, ReconcileRow>(
+    (Array.isArray(reconciles) ? reconciles : []).map((r) => [
+      r.covers_provider,
+      r,
+    ]),
+  );
 
   const monthlyProjection = total7 * (30 / 7);
 
@@ -112,6 +138,26 @@ export default async function ApiCostsPage() {
       />
 
       <HelpCallout>
+        <p>
+          <strong>What this page shows:</strong> only the spend the
+          system itself <em>recorded</em> at request time —{" "}
+          <code>record_usage(...)</code> writes a row into{" "}
+          <code>usage_events</code> for each paid call from the Python
+          (<code>services/usage.py</code>) and TS (
+          <code>lib/usage-log.ts</code>) sides. Some real spend never
+          shows up here: dev-env experiments, ad-hoc shell calls, manual
+          probes, and a few legacy code paths that predate{" "}
+          <code>record_usage</code>. The authoritative monthly total
+          lives on the <Link
+            href="/admin/system/costs"
+            className="font-medium text-brand-700 underline-offset-2 hover:underline"
+          >
+            Total cost
+          </Link>{" "}
+          page, where operators paste provider-dashboard totals (AI
+          Studio, Apify billing, etc.) as reconciliation rows. The
+          Reconciled column below shows the gap.
+        </p>
         <p>
           On the Python side, <code>services/usage.py</code> exposes{" "}
           <code>record_usage(...)</code>. Every call site
@@ -133,14 +179,18 @@ export default async function ApiCostsPage() {
           Resend&apos;s free tier covers 3,000 emails/month, so cost rows show
           $0 even as the unit counter ticks up.
         </p>
+        <p>
+          <strong>Tracked vs Reconciled:</strong> the IDR column is what our
+          token-counting estimated; the Reconciled column is the authoritative
+          provider-dashboard total operators paste into{" "}
+          <code>/admin/system/costs</code>. Gemini typically under-counts
+          because thinking tokens, Pro pricing nuances, and missed{" "}
+          <code>record_usage(...)</code> call sites all leak into the bill but
+          not the row. The delta tells you how big that gap is.
+        </p>
       </HelpCallout>
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <StatTile
-          label="24h"
-          value={formatUsdCompact(total24)}
-          hint={formatIdr(total24, usdToIdr)}
-        />
         <StatTile
           label="7d"
           value={formatUsdCompact(total7)}
@@ -158,20 +208,12 @@ export default async function ApiCostsPage() {
           hint={`${formatIdr(monthlyProjection, usdToIdr)} · from last 7d`}
           accent={monthlyProjection > capUsd * 0.8 ? "amber" : "emerald"}
         />
-        <StatTile
-          label="Budget cap"
-          value={formatIdr(capUsd, usdToIdr)}
-          hint="IDR 1M/month (PRD §13)"
-        />
-        <StatTile
-          label="Headroom"
-          value={`${Math.max(0, 100 - (monthlyProjection / capUsd) * 100).toFixed(0)}%`}
-          hint="under cap"
-          accent={monthlyProjection > capUsd * 0.8 ? "rose" : "emerald"}
-        />
       </div>
 
-      <Card title="By provider (30d)">
+      <Card
+        title="By provider (30d)"
+        hint="Reconciled = authoritative dashboard total from /admin/system/costs"
+      >
         {Array.isArray(perProvider) && perProvider.length > 0 ? (
           <table className="w-full text-sm max-md:block max-md:overflow-x-auto">
             <thead>
@@ -180,31 +222,61 @@ export default async function ApiCostsPage() {
                 <th className="py-2 text-right">Calls</th>
                 <th className="py-2 text-right">Tokens in</th>
                 <th className="py-2 text-right">Tokens out</th>
-                <th className="py-2 text-right">Cost USD</th>
-                <th className="py-2 text-right">Cost IDR</th>
+                <th className="py-2 text-right">Tracked (USD)</th>
+                <th className="py-2 text-right">Tracked (IDR)</th>
+                <th className="py-2 text-right">Reconciled (IDR)</th>
               </tr>
             </thead>
             <tbody>
-              {perProvider.map((p) => (
-                <tr key={p.provider} className="border-b border-slate-50 last:border-0">
-                  <td className="py-2 font-semibold capitalize text-slate-900">
-                    {formatProvider(p.provider)}
-                  </td>
-                  <td className="py-2 text-right tabular-nums">{p.calls}</td>
-                  <td className="py-2 text-right tabular-nums text-slate-600">
-                    {p.tokens_in.toLocaleString()}
-                  </td>
-                  <td className="py-2 text-right tabular-nums text-slate-600">
-                    {p.tokens_out.toLocaleString()}
-                  </td>
-                  <td className="py-2 text-right tabular-nums">
-                    {formatUsd(p.cost_usd)}
-                  </td>
-                  <td className="py-2 text-right tabular-nums text-slate-500">
-                    {formatIdr(p.cost_usd, usdToIdr)}
-                  </td>
-                </tr>
-              ))}
+              {perProvider.map((p) => {
+                const rec = reconcileByProvider.get(p.provider);
+                const trackedIdr = p.cost_usd * usdToIdr;
+                const delta = rec ? rec.amount_idr - trackedIdr : 0;
+                return (
+                  <tr
+                    key={p.provider}
+                    className="border-b border-slate-50 last:border-0"
+                  >
+                    <td className="py-2 font-semibold capitalize text-slate-900">
+                      {formatProvider(p.provider)}
+                    </td>
+                    <td className="py-2 text-right tabular-nums">{p.calls}</td>
+                    <td className="py-2 text-right tabular-nums text-slate-600">
+                      {p.tokens_in.toLocaleString()}
+                    </td>
+                    <td className="py-2 text-right tabular-nums text-slate-600">
+                      {p.tokens_out.toLocaleString()}
+                    </td>
+                    <td className="py-2 text-right tabular-nums">
+                      {formatUsd(p.cost_usd)}
+                    </td>
+                    <td className="py-2 text-right tabular-nums text-slate-500">
+                      {formatIdr(p.cost_usd, usdToIdr)}
+                    </td>
+                    <td className="py-2 text-right tabular-nums">
+                      {rec ? (
+                        <div className="flex flex-col items-end">
+                          <span
+                            className="font-medium text-slate-900"
+                            title={rec.note ?? undefined}
+                          >
+                            Rp{" "}
+                            {Math.round(rec.amount_idr).toLocaleString("id-ID")}
+                          </span>
+                          <span className="text-[10px] text-slate-400">
+                            {delta > 0
+                              ? `+Rp ${Math.round(delta).toLocaleString("id-ID")} vs tracked`
+                              : "in sync"}{" "}
+                            · synced {formatRelative(rec.updated_at)}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-slate-300">—</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         ) : (

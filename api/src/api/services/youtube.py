@@ -1,17 +1,22 @@
-"""YouTube Data API v3 wrappers — search + channel uploads.
+"""YouTube Data API v3 wrapper — channel uploads only.
 
-Two entry points:
-  - `scrape_youtube(query)`        — keyword search.list (100 quota units).
-                                     Kept for ad-hoc + weekly discovery only.
-  - `scrape_youtube_uploads(channel_id)` — pull one channel's recent uploads
-                                     via playlistItems.list (1 quota unit).
-                                     This is the everyday path; see
-                                     `api/src/api/models/admin.py::YoutubeChannel`
-                                     for the whitelist.
+One entry point: `scrape_youtube_uploads(channel_id)` pulls a single
+channel's recent uploads via `playlistItems.list` (1 quota unit) and
+batches their stats via `videos.list` (1 quota unit). 2 units per
+channel total.
+
+A keyword `search.list` path used to exist alongside this — deleted
+2026-05-25. It was 100 units per call and pulled in cross-language
+spam (Kerala matchmaking, Indian wedding shorts scoring 1.0 on words
+like "nikah"). The whitelist + uploads path eliminates spam by
+construction. See `api/src/api/scripts/seed_youtube_channels.py` for
+the one-off resolution step that turns curated names into channel_id
+values via `search.list` — that's the only place we still touch
+search.list, amortized over ~80 names = ~8K units one-time.
 
 We hit the YouTube Data API directly rather than going through Apify:
-  - 10K free quota units/day; uploads-playlist scraping is 100× cheaper
-    than search per-call so 50 curated channels cost ~50 units total.
+  - 10K free quota units/day; 75 verified channels × 2 = 150/day,
+    well inside the free tier.
   - Apify YouTube actors are 100× more expensive per result.
 
 Auth: requires `YOUTUBE_API_KEY` in env. The key only needs the *YouTube Data
@@ -35,8 +40,9 @@ from api.services.language import detect_lang
 log = structlog.get_logger()
 
 _BASE = "https://www.googleapis.com/youtube/v3"
-# Search.list costs 100 quota units regardless of maxResults (1-50), so we
-# always ask for the max we want — no benefit to batching.
+# `playlistItems.list` and `videos.list` are 1 quota unit regardless of
+# maxResults (1-50), so always request the max we want — no benefit to
+# paginating across more calls when one batch suffices.
 _MAX_PER_CALL = 50
 
 # Time window for "recent uploads" — matches the briefing 7-day window
@@ -111,101 +117,6 @@ def _fetch_video_stats(
             "comments": int(stats.get("commentCount") or 0),
         }
     return out
-
-
-def scrape_youtube(query: str, *, max_items: int = 20) -> ScrapeResult:
-    """Search YouTube for videos matching `query` (Indonesian preferred).
-
-    `max_items` caps at 50 per single call. Paginate with `pageToken` if you
-    need more, but for da'wah intelligence the most recent 30-50 is plenty.
-    """
-    if not settings.youtube_api_key:
-        raise RuntimeError(
-            "YOUTUBE_API_KEY is not set. Add it to .env (Google Cloud Console → "
-            "APIs & Services → Credentials → Create API key)."
-        )
-
-    started = time.time()
-    capped = min(max_items, _MAX_PER_CALL)
-    log.info("youtube.search.start", query=query, max=capped)
-
-    with httpx.Client(timeout=30) as client:
-        resp = client.get(
-            f"{_BASE}/search",
-            params={
-                "part": "snippet",
-                "q": query,
-                "type": "video",
-                "maxResults": capped,
-                # `viewCount` = most-watched-first. We deliberately give up
-                # chronological freshness to drop zero-view spam (Indian
-                # wedding shorts, no-name uploads using our keywords). The
-                # da'i wants "what's resonating," not the raw timestamp
-                # firehose. Same rationale as the X→Top sort flip.
-                "order": "viewCount",
-                "relevanceLanguage": "id",
-                "regionCode": "ID",
-                "key": settings.youtube_api_key,
-            },
-        )
-        resp.raise_for_status()
-        payload = resp.json()
-
-    raw_items: list[dict[str, Any]] = payload.get("items", [])
-
-    # Strict Indonesian-only filter. `relevanceLanguage=id` is a *soft*
-    # hint to YouTube's ranker; in practice ~30% of results are Hindi/
-    # Urdu/Bengali content tagged with words that overlap Indonesian
-    # (e.g. "nikah"). langdetect on title+description (the only text we
-    # have at search-list time) is cheap and catches the overwhelming
-    # majority of cross-language pollution.
-    items: list[dict[str, Any]] = []
-    dropped = 0
-    for it in raw_items:
-        snippet = it.get("snippet") or {}
-        title = (snippet.get("title") or "").strip()
-        description = (snippet.get("description") or "").strip()
-        probe = f"{title}\n{description}"
-        if not probe:
-            dropped += 1
-            continue
-        if detect_lang(probe) != "id":
-            dropped += 1
-            continue
-        items.append(it)
-
-    duration_s = time.time() - started
-    log.info(
-        "youtube.search.done",
-        query=query,
-        results=len(items),
-        dropped_non_id=dropped,
-        duration_s=round(duration_s, 2),
-    )
-
-    # Log against the YouTube provider so the admin dashboard can show
-    # quota burn even though there's no USD cost. search.list = 100 units.
-    from api.services.usage import record_usage
-
-    record_usage(
-        provider="youtube",
-        operation="search",
-        model="search.list",
-        units=100,
-        cost_usd=0.0,
-        meta={"query": query, "results": len(items)},
-    )
-
-    return ScrapeResult(
-        items=items,
-        actor_id="youtube_data_api_v3",
-        run_id=payload.get("nextPageToken", "no_token"),
-        # YouTube Data API is free up to 10K units/day; per-call cost is
-        # accounted in *quota units*, not USD. Reporting 0 here so the
-        # ingest CLI's cost printout reflects "no marginal $".
-        cost_usd=0.0,
-        duration_s=duration_s,
-    )
 
 
 def _uploads_playlist_id(channel_id: str) -> str:

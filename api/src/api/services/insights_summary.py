@@ -911,16 +911,20 @@ async def _compute_stats(
     ).all()
     top_topics: list[dict[str, Any]] = []
     for r in topic_rows:
+        # Order by relevance, then by engagement so within equal-relevance
+        # content the most-watched videos surface first — gives the LLM
+        # "ramai dibicarakan" headlines with real reach behind them.
         headline_rows = (
             await session.execute(
                 text(
                     f"""
                     {post_filter}
-                    SELECT text, author
+                    SELECT text, author, engagement_views, engagement_score, url
                     FROM filtered
                     WHERE topic_id = :tid AND text IS NOT NULL
                       AND dominant_cat = ANY ({cats_sql_array})
-                    ORDER BY dawah_relevance DESC NULLS LAST
+                    ORDER BY dawah_relevance DESC NULLS LAST,
+                             engagement_score DESC NULLS LAST
                     LIMIT 3
                     """
                 ),
@@ -939,13 +943,44 @@ async def _compute_stats(
                 sample_headlines.append({
                     "title": first[:140],
                     "author": h.author,
+                    # Engagement_views is YT-only today. NULL for mainstream
+                    # RSS — the prompt-side formatter renders the views
+                    # line conditionally so non-YT entries stay clean.
+                    "views": (
+                        int(h.engagement_views)
+                        if h.engagement_views is not None
+                        else None
+                    ),
                 })
+        # Per-topic engagement aggregate — total views across the topic's
+        # YT videos this week. Useful for "X juta total views pekan ini"
+        # framings the brief LLM can pick up.
+        topic_engagement = await session.execute(
+            text(
+                f"""
+                {post_filter}
+                SELECT
+                  COALESCE(SUM(engagement_views), 0)::bigint AS total_views,
+                  COUNT(*) FILTER (WHERE engagement_views IS NOT NULL)::int AS yt_count
+                FROM filtered
+                WHERE topic_id = :tid
+                  AND dominant_cat = ANY ({cats_sql_array})
+                """
+            ),
+            {"tid": r.id},
+        )
+        eng_row = topic_engagement.one()
         top_topics.append({
             "label": r.label,
             "platform": r.platform,
             "keywords": list(r.keywords or [])[:5],
             "post_count": int(r.seg_post_count or 0),
             "sample_headlines": sample_headlines,
+            # Roll-up engagement: only meaningful when the topic has YT
+            # videos in it; mainstream-only topics report 0 here and the
+            # prompt skips the views line.
+            "total_views": int(eng_row.total_views or 0),
+            "yt_video_count": int(eng_row.yt_count or 0),
         })
 
     # 5. Per-platform breakdown — within segment.
@@ -1364,15 +1399,44 @@ def _build_user_prompt(
 
     # Pretty-print top topics with their sample headlines so the model
     # can write about specific stories, not just category percentages.
+    # YT headlines carry their `views` count when available — the brief
+    # LLM uses these to write "ramai dibicarakan dengan X juta views"
+    # framings instead of generic "trending".
+    def _fmt_views(n: int | None) -> str:
+        if n is None or n <= 0:
+            return ""
+        if n >= 1_000_000:
+            return f" · {n / 1_000_000:.1f}M views"
+        if n >= 1_000:
+            return f" · {n / 1_000:.0f}K views"
+        return f" · {n} views"
+
     top_topics_block_lines: list[str] = []
     for t in stats.get("top_topics", [])[:5]:
-        top_topics_block_lines.append(
-            f"- {t['label']} ({t['post_count']} posts · platform={t['platform']})"
+        topic_header = (
+            f"- {t['label']} ({t['post_count']} posts · platform={t['platform']}"
         )
+        total_views = t.get("total_views") or 0
+        yt_count = t.get("yt_video_count") or 0
+        if yt_count > 0 and total_views > 0:
+            tv_fmt = (
+                f"{total_views / 1_000_000:.1f}M"
+                if total_views >= 1_000_000
+                else (
+                    f"{total_views / 1_000:.0f}K"
+                    if total_views >= 1_000
+                    else str(total_views)
+                )
+            )
+            topic_header += (
+                f" · {yt_count} YT videos · {tv_fmt} total views"
+            )
+        topic_header += ")"
+        top_topics_block_lines.append(topic_header)
         for h in t.get("sample_headlines", [])[:3]:
             author = h.get("author") or "?"
             top_topics_block_lines.append(
-                f"    · [{author}] {h['title']}"
+                f"    · [{author}] {h['title']}{_fmt_views(h.get('views'))}"
             )
     top_topics_block = (
         "\n".join(top_topics_block_lines)

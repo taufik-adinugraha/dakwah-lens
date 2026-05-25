@@ -5,6 +5,10 @@ import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
 import {
+  getBucketEngagementDelta,
+  getChannelHealth,
+} from "@/lib/dashboard-metrics";
+import {
   deleteYoutubeChannel,
   toggleYoutubeChannel,
 } from "../actions";
@@ -64,10 +68,22 @@ export default async function YoutubeChannelsPage({
   const session = await auth();
   const isSuperadmin = session?.user?.role === "superadmin";
 
-  const channels = await db
-    .select()
-    .from(schema.youtubeChannels)
-    .orderBy(asc(schema.youtubeChannels.category), asc(schema.youtubeChannels.name));
+  const [channels, healthRows, bucketDeltas] = await Promise.all([
+    db
+      .select()
+      .from(schema.youtubeChannels)
+      .orderBy(
+        asc(schema.youtubeChannels.category),
+        asc(schema.youtubeChannels.name),
+      ),
+    getChannelHealth(),
+    getBucketEngagementDelta(),
+  ]);
+
+  // Keyed by channel_id for per-row lookup in the list below. Channels
+  // never ingested yet won't appear here (the health query INNER-derives
+  // on `youtube_channels` so all verified rows are represented with zeros).
+  const healthById = new Map(healthRows.map((h) => [h.channelId, h]));
 
   const countByCategory: Record<string, number> = {};
   for (const c of channels) {
@@ -115,6 +131,8 @@ export default async function YoutubeChannelsPage({
           insight surfaces.
         </p>
       </HelpCallout>
+
+      <BucketDeltaStrip rows={bucketDeltas} />
 
       {isSuperadmin && (
         <Card title="Add a channel">
@@ -197,6 +215,9 @@ export default async function YoutubeChannelsPage({
                       </span>
                     )}
                   </p>
+                  <ChannelHealthLine
+                    health={healthById.get(c.channelId)}
+                  />
                 </div>
                 <CategoryControl
                   id={c.id}
@@ -320,6 +341,126 @@ function ReadOnlyStatusPill({ enabled }: { enabled: boolean }) {
  *  (just reads the row's `verified`) — the VerifyButton component
  *  re-renders ITS OWN local mirror to reflect post-click state
  *  immediately. Both will converge after the next page render. */
+/**
+ * Per-channel health line under the channel ID. Shows 7-day reach so
+ * an operator can spot dead whitelist entries at a glance. Three states:
+ *   - no ingest yet (videos7d === 0): amber "no uploads this week"
+ *   - some uploads (videos7d > 0):    "Yv · Xviews 7d"
+ *   - never ingested (no row at all): silent (the section is informative,
+ *                                     not blocking; just show nothing)
+ */
+function ChannelHealthLine({
+  health,
+}: {
+  health:
+    | {
+        videos7d: number;
+        totalViews7d: number;
+        avgViews7d: number;
+        lastUploadAt: string | null;
+      }
+    | undefined;
+}) {
+  if (!health) {
+    return null;
+  }
+  if (health.videos7d === 0) {
+    return (
+      <p className="mt-0.5 text-[11px] text-amber-700">
+        no uploads in last 7d
+      </p>
+    );
+  }
+  const totalFmt =
+    health.totalViews7d >= 1_000_000
+      ? `${(health.totalViews7d / 1_000_000).toFixed(1)}M`
+      : health.totalViews7d >= 1_000
+        ? `${(health.totalViews7d / 1_000).toFixed(0)}K`
+        : String(health.totalViews7d);
+  const avgFmt =
+    health.avgViews7d >= 1_000_000
+      ? `${(health.avgViews7d / 1_000_000).toFixed(1)}M`
+      : health.avgViews7d >= 1_000
+        ? `${(health.avgViews7d / 1_000).toFixed(0)}K`
+        : String(Math.round(health.avgViews7d));
+  return (
+    <p className="mt-0.5 text-[11px] text-slate-500">
+      {health.videos7d} videos · {totalFmt} views (avg {avgFmt}) · 7d
+    </p>
+  );
+}
+
+
+/**
+ * Per-bucket strip: 7-day total YouTube views per category with the
+ * week-over-week delta. Renders 8 tiles in a wrap grid; categories with
+ * no data show muted "0 views" so the operator can still see which
+ * buckets are silent. Hidden entirely if NO bucket has any 7d data
+ * (e.g. fresh install before any YT ingest fired).
+ */
+function BucketDeltaStrip({
+  rows,
+}: {
+  rows: Array<{
+    category: string;
+    viewsThisWeek: number;
+    viewsLastWeek: number;
+    deltaPct: number | null;
+  }>;
+}) {
+  const hasAnyData = rows.some((r) => r.viewsThisWeek > 0 || r.viewsLastWeek > 0);
+  if (!hasAnyData) return null;
+
+  const fmt = (n: number) =>
+    n >= 1_000_000
+      ? `${(n / 1_000_000).toFixed(1)}M`
+      : n >= 1_000
+        ? `${(n / 1_000).toFixed(0)}K`
+        : String(n);
+
+  return (
+    <Card title="Bucket reach (7d vs prior 7d)">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {rows.map((r) => {
+          const dir =
+            r.deltaPct === null
+              ? "—"
+              : r.deltaPct > 0
+                ? "up"
+                : r.deltaPct < 0
+                  ? "down"
+                  : "flat";
+          const deltaClass =
+            dir === "up"
+              ? "text-emerald-700"
+              : dir === "down"
+                ? "text-rose-700"
+                : "text-slate-500";
+          return (
+            <div
+              key={r.category}
+              className="rounded-xl border border-slate-100 bg-slate-50/60 p-3"
+            >
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                {r.category.replace("_", " ")}
+              </div>
+              <div className="mt-0.5 text-sm font-semibold tabular-nums text-slate-900">
+                {fmt(r.viewsThisWeek)} views
+              </div>
+              <div className={`text-[11px] tabular-nums ${deltaClass}`}>
+                {r.deltaPct === null
+                  ? "no baseline yet"
+                  : `${r.deltaPct >= 0 ? "+" : ""}${r.deltaPct.toFixed(0)}% vs last week`}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </Card>
+  );
+}
+
+
 function VerifyStatusBadge({ verified }: { verified: boolean }) {
   if (verified) {
     return (

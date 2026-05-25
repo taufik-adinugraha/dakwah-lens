@@ -98,6 +98,17 @@ async def _fetch_recent_posts(platform: str) -> list[dict[str, Any]]:
         day_bucket = func.date_trunc(
             "day", func.timezone(DAY_TZ, SocialPost.posted_at)
         )
+        # Composite ranking: dawah_opportunity × engagement_score.
+        # For mainstream RSS rows (no engagement metrics), engagement_score
+        # is NULL → fallback to 1.0 so opportunity alone drives the sort.
+        # For YouTube rows, both factors multiply: high-relevance content
+        # that's actually being watched floats to the top. The score is
+        # used ONLY for sample selection inside the day partition; the
+        # 0.4 opportunity floor still gates entry into the pool.
+        composite_score = (
+            func.coalesce(SocialPost.dawah_opportunity, 0.0)
+            * func.coalesce(SocialPost.engagement_score, 1.0)
+        )
         ranked = (
             select(
                 SocialPost.id,
@@ -106,7 +117,7 @@ async def _fetch_recent_posts(platform: str) -> list[dict[str, Any]]:
                 func.row_number()
                 .over(
                     partition_by=day_bucket,
-                    order_by=SocialPost.posted_at.desc(),
+                    order_by=(composite_score.desc(), SocialPost.posted_at.desc()),
                 )
                 .label("rn"),
             )

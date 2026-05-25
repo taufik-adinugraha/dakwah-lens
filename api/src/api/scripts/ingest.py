@@ -49,7 +49,7 @@ from api.services.relevance import (
 )
 from api.services.rss import scrape_mainstream
 from api.services.sentiment import classify_batch as classify_sentiment
-from api.services.youtube import scrape_youtube, scrape_youtube_uploads
+from api.services.youtube import scrape_youtube_uploads
 
 log = structlog.get_logger()
 
@@ -59,9 +59,13 @@ SCRAPERS = {
     "tiktok": scrape_tiktok,
     "instagram": scrape_instagram,
     "facebook": scrape_facebook,
-    "youtube": scrape_youtube,
     "mainstream": scrape_mainstream,
 }
+# `youtube` intentionally absent — its only entry point is the
+# whitelist path `scrape_youtube_uploads(channel_id)`, dispatched
+# explicitly in `_run` below. The keyword search.list path was
+# removed 2026-05-25; see `api/src/api/services/youtube.py`
+# docstring for context.
 
 
 def _scrape(
@@ -86,12 +90,18 @@ async def _run(
     actor_id: str | None = None,
     channel_id: str | None = None,
 ) -> int:
-    # 1. Scrape — two YouTube paths: channel-based (whitelisted uploads
-    # via playlistItems.list, 1 quota unit) and keyword search.list
-    # (100 units). `channel_id` opts into the cheap, curated path; when
-    # NULL we fall back to the legacy `_scrape()` dispatcher which
-    # routes by `platform`.
-    if channel_id and platform == "youtube":
+    # 1. Scrape — YouTube is whitelist-only (`scrape_youtube_uploads`
+    # via playlistItems.list, 2 quota units per channel). Every YT job
+    # MUST carry a `channel_id`; the keyword search.list fallback was
+    # removed 2026-05-25 because it produced cross-language spam and
+    # burned 100 quota per call. Other platforms route through the
+    # generic `_scrape` dispatcher.
+    if platform == "youtube":
+        if not channel_id:
+            raise ValueError(
+                "youtube ingest requires a channel_id (whitelist-only). "
+                "Dispatch via `youtube_channels_ingest`, not a raw query."
+            )
         result = scrape_youtube_uploads(
             channel_id, max_items=limit, channel_name=query or None
         )
@@ -328,6 +338,46 @@ async def _run(
         )
         await session.execute(stmt)
         await session.commit()
+
+        # 4b. Append engagement snapshots for time-series.
+        # The upsert above OVERWRITES yesterday's stats; this preserves
+        # history so we can compute velocity ("views grew 5K → 200K in
+        # 24h"). YT-only today — mainstream/X/etc. have no engagement
+        # signal, so we'd be storing empty rows for them.
+        if platform == "youtube":
+            yt_rows = [
+                r
+                for r in rows
+                if r.get("engagement_views") is not None
+                or r.get("engagement_score") is not None
+            ]
+            if yt_rows:
+                external_ids_yt = [r["external_id"] for r in yt_rows]
+                id_map_res = await session.execute(
+                    select(SocialPost.id, SocialPost.external_id).where(
+                        SocialPost.platform == platform,
+                        SocialPost.external_id.in_(external_ids_yt),
+                    )
+                )
+                id_by_ext = {eid: pid for pid, eid in id_map_res.all()}
+                metric_rows = [
+                    {
+                        "social_post_id": id_by_ext[r["external_id"]],
+                        "engagement_views": r.get("engagement_views"),
+                        "engagement_likes": r.get("engagement_likes"),
+                        "engagement_comments": r.get("engagement_comments"),
+                        "engagement_score": r.get("engagement_score"),
+                    }
+                    for r in yt_rows
+                    if r["external_id"] in id_by_ext
+                ]
+                if metric_rows:
+                    from api.models.social import SocialPostMetric
+
+                    await session.execute(
+                        insert(SocialPostMetric).values(metric_rows)
+                    )
+                    await session.commit()
 
     # 5. Summary — top 5 of this platform by relevance
     async with SessionLocal() as session:

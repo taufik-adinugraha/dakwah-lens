@@ -733,6 +733,99 @@ export async function addManualCost(formData: FormData) {
   revalidatePath("/admin/system");
 }
 
+/**
+ * Edit an existing manual_costs row in place. Fields that mirror the
+ * add form: kind, vendor, amount_idr, period_start/end, note,
+ * covers_provider. Attachment isn't edited here — invoice mistakes are
+ * rare enough that re-upload-by-delete-and-re-add is fine; keeping the
+ * edit path attachment-free avoids extra disk lifecycle work.
+ *
+ * Re-uses the same KNOWN_PROVIDERS allow-list + length caps as
+ * addManualCost so the two paths can't drift.
+ */
+export async function updateManualCost(formData: FormData) {
+  const session = await requireSuperadmin();
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+
+  const kind = String(formData.get("kind") ?? "").trim().slice(0, 32);
+  const vendor = String(formData.get("vendor") ?? "").trim().slice(0, 64);
+  const amount = Number(formData.get("amount_idr") ?? 0);
+  const start = String(formData.get("period_start") ?? "");
+  const end = String(formData.get("period_end") ?? "");
+  const rawNote = (formData.get("note") ?? "").toString().trim();
+  const note = rawNote ? rawNote.slice(0, 2000) : null;
+  if (!kind || !vendor || !amount || !start || !end) return;
+
+  const rawCoversProvider = (
+    formData.get("covers_provider") ?? ""
+  ).toString();
+  const coversProvider = (KNOWN_PROVIDERS as readonly string[]).includes(
+    rawCoversProvider,
+  )
+    ? rawCoversProvider
+    : null;
+
+  // Capture the prior row so the audit payload includes the diff,
+  // not just the new state. Manual costs touch real money; an audit
+  // log without the "from" side would only catch half a mistake.
+  const [before] = await db
+    .select({
+      kind: schema.manualCosts.kind,
+      vendor: schema.manualCosts.vendor,
+      amountIdr: schema.manualCosts.amountIdr,
+      periodStart: schema.manualCosts.periodStart,
+      periodEnd: schema.manualCosts.periodEnd,
+      note: schema.manualCosts.note,
+      coversProvider: schema.manualCosts.coversProvider,
+    })
+    .from(schema.manualCosts)
+    .where(eq(schema.manualCosts.id, id))
+    .limit(1);
+  if (!before) return;
+
+  await db
+    .update(schema.manualCosts)
+    .set({
+      kind,
+      vendor,
+      amountIdr: amount,
+      periodStart: new Date(start),
+      periodEnd: new Date(end),
+      note,
+      coversProvider,
+      updatedAt: new Date(),
+    })
+    .where(eq(schema.manualCosts.id, id));
+
+  await logAdminAction({
+    actorId: session.user.id,
+    action: "cost.update",
+    targetType: "manual_cost",
+    targetId: id,
+    payload: {
+      before: {
+        kind: before.kind,
+        vendor: before.vendor,
+        amount_idr: before.amountIdr,
+        covers_provider: before.coversProvider,
+        note: before.note,
+      },
+      after: {
+        kind,
+        vendor,
+        amount_idr: amount,
+        covers_provider: coversProvider,
+        note,
+      },
+    },
+  });
+  revalidatePath("/admin/system/costs");
+  revalidatePath("/admin/system/api-costs");
+  revalidatePath("/admin/system");
+}
+
+
 export async function deleteManualCost(formData: FormData) {
   const session = await requireSuperadmin();
   const id = String(formData.get("id") ?? "");

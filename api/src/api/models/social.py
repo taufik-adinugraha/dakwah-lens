@@ -146,3 +146,44 @@ class SocialPost(Base, TimestampMixin):
         Index("ix_social_posts_platform_posted", "platform", "posted_at"),
         Index("ix_social_posts_platform_region", "platform", "region"),
     )
+
+
+class SocialPostMetric(Base):
+    """Time-series snapshot of one post's engagement at one scrape.
+
+    Append-only. The current `social_posts.engagement_*` columns hold the
+    LATEST snapshot (for cheap top-N reads); this table holds the full
+    history (for "viral growth" / velocity detection). One row per
+    (social_post_id, captured_at) — typically one per daily YT scrape.
+
+    Currently populated only for `platform='youtube'` since other
+    platforms don't have engagement signal yet.
+    """
+
+    __tablename__ = "social_post_metrics"
+
+    id: Mapped[UUID] = mapped_column(
+        primary_key=True, default=uuid4, server_default=text("gen_random_uuid()")
+    )
+    social_post_id: Mapped[UUID] = mapped_column(
+        ForeignKey("social_posts.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    captured_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("now()"),
+    )
+    engagement_views: Mapped[int | None] = mapped_column(BigInteger)
+    engagement_likes: Mapped[int | None] = mapped_column(BigInteger)
+    engagement_comments: Mapped[int | None] = mapped_column(BigInteger)
+    engagement_score: Mapped[float | None] = mapped_column(Float)
+
+    __table_args__ = (
+        Index(
+            "ix_social_post_metrics_post_time",
+            "social_post_id",
+            "captured_at",
+        ),
+        Index("ix_social_post_metrics_captured_at", "captured_at"),
+    )

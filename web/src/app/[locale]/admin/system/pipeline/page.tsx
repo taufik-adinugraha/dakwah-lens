@@ -30,8 +30,20 @@ const BEAT_SCHEDULE = [
 ] as const;
 
 export default async function PipelinePage() {
-  const [recent, perPlatform, latestPerPlatform, postsClassified7d] =
-    await Promise.all([
+  // Three tasks don't write to ingest_runs at all — they predate the
+  // run-tracking convention and write directly to their own tables:
+  //   - snapshot_system → system_metrics (every 60s)
+  //   - reconcile_apify_costs → usage_events (operation='billing_reconcile')
+  // Pull their latest timestamps separately so the schedule table can
+  // show "ran X minutes ago" instead of a misleading "no runs yet".
+  const [
+    recent,
+    perPlatform,
+    latestPerTask,
+    latestSystemMetric,
+    latestApifyReconcile,
+    postsClassified7d,
+  ] = await Promise.all([
     db
       .select()
       .from(schema.ingestRuns)
@@ -57,15 +69,18 @@ export default async function PipelinePage() {
         posts: number;
       }>
     >,
+    // Latest run per (task_name, platform) — matches the BEAT_SCHEDULE
+    // key shape so the schedule table can find each row reliably.
+    // `platform IS NULL` is INCLUDED (some tasks have no platform).
     db.execute(sql`
-      SELECT DISTINCT ON (platform)
-        platform, status, started_at, finished_at, items_stored, error
+      SELECT DISTINCT ON (task_name, COALESCE(platform, ''))
+        task_name, platform, status, started_at, finished_at, items_stored, error
       FROM ingest_runs
-      WHERE platform IS NOT NULL
-      ORDER BY platform, started_at DESC
+      ORDER BY task_name, COALESCE(platform, ''), started_at DESC
     `) as unknown as Promise<
       Array<{
-        platform: string;
+        task_name: string;
+        platform: string | null;
         status: string;
         started_at: string;
         finished_at: string | null;
@@ -73,6 +88,15 @@ export default async function PipelinePage() {
         error: string | null;
       }>
     >,
+    db.execute(sql`
+      SELECT captured_at FROM system_metrics
+      ORDER BY captured_at DESC LIMIT 1
+    `) as unknown as Promise<Array<{ captured_at: string }>>,
+    db.execute(sql`
+      SELECT occurred_at FROM usage_events
+      WHERE operation = 'billing_reconcile'
+      ORDER BY occurred_at DESC LIMIT 1
+    `) as unknown as Promise<Array<{ occurred_at: string }>>,
     // Unique posts that completed Gemini classification in the last
     // 7 days. Matches the homepage's "postingan dianalisis" metric
     // (same `social_posts` table, same `dawah_relevance IS NOT NULL`
@@ -177,9 +201,57 @@ export default async function PipelinePage() {
           </thead>
           <tbody>
             {BEAT_SCHEDULE.map((s) => {
-              const latest = Array.isArray(latestPerPlatform)
-                ? latestPerPlatform.find((l) => l.platform === s.platform)
-                : null;
+              // Look up latest run for this schedule row. Three tasks
+              // bypass ingest_runs and we resolve their freshness from
+              // their actual destination tables.
+              let cell: React.ReactNode;
+              if (s.task === "snapshot_system") {
+                const ts = latestSystemMetric[0]?.captured_at;
+                cell = ts ? (
+                  <span className="text-emerald-700">
+                    success · {formatRelative(ts)}
+                  </span>
+                ) : (
+                  <span className="text-slate-400">no snapshots yet</span>
+                );
+              } else if (s.task === "reconcile_apify_costs") {
+                const ts = latestApifyReconcile[0]?.occurred_at;
+                cell = ts ? (
+                  <span className="text-emerald-700">
+                    success · {formatRelative(ts)}
+                  </span>
+                ) : (
+                  <span className="text-slate-400">no reconcile yet</span>
+                );
+              } else {
+                // Match by task_name (+ platform if it disambiguates).
+                // recluster-topics has platform="all" in BEAT_SCHEDULE
+                // but ingest_runs stores per-platform rows, so we fall
+                // back to "any platform" when the schedule-row platform
+                // doesn't exist in DB.
+                const matches = Array.isArray(latestPerTask)
+                  ? latestPerTask.filter((l) => l.task_name === s.task)
+                  : [];
+                const latest =
+                  matches.find((l) => l.platform === s.platform) ??
+                  matches[0] ??
+                  null;
+                cell = latest ? (
+                  <span
+                    className={
+                      latest.status === "success"
+                        ? "text-emerald-700"
+                        : latest.status === "failed"
+                          ? "text-rose-700"
+                          : "text-slate-500"
+                    }
+                  >
+                    {latest.status} · {formatRelative(latest.started_at)}
+                  </span>
+                ) : (
+                  <span className="text-slate-400">no runs yet</span>
+                );
+              }
               return (
                 <tr key={s.name} className="border-b border-slate-50 last:border-0">
                   <td className="py-2 font-mono text-xs text-slate-800">
@@ -188,23 +260,7 @@ export default async function PipelinePage() {
                   <td className="py-2 text-xs capitalize">{s.platform}</td>
                   <td className="py-2 text-xs text-slate-600">{s.cron}</td>
                   <td className="py-2 text-xs text-slate-500">{s.query}</td>
-                  <td className="py-2 text-xs">
-                    {latest ? (
-                      <span
-                        className={
-                          latest.status === "success"
-                            ? "text-emerald-700"
-                            : latest.status === "failed"
-                              ? "text-rose-700"
-                              : "text-slate-500"
-                        }
-                      >
-                        {latest.status} · {formatRelative(latest.started_at)}
-                      </span>
-                    ) : (
-                      <span className="text-slate-400">no runs yet</span>
-                    )}
-                  </td>
+                  <td className="py-2 text-xs">{cell}</td>
                 </tr>
               );
             })}

@@ -1,10 +1,11 @@
-import { Trash2 } from "lucide-react";
+import { Pencil, Trash2, X } from "lucide-react";
 import { desc, sql } from "drizzle-orm";
 
 import { auth } from "@/auth";
 import { db, schema } from "@/db";
+import { Link } from "@/i18n/navigation";
 import { getUsdToIdr } from "@/lib/settings";
-import { addManualCost, deleteManualCost } from "../actions";
+import { addManualCost, deleteManualCost, updateManualCost } from "../actions";
 import {
   Card,
   EmptyState,
@@ -19,11 +20,17 @@ import {
 import { ConfirmForm } from "../_ConfirmForm";
 import { KNOWN_PROVIDERS, providerLabel } from "@/lib/cost-providers";
 
-export default async function CostsPage() {
+export default async function CostsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ edit?: string }>;
+}) {
   // Layout gates access; we read the role to decide whether write
   // controls (add + delete) render. Admins still see the listings.
   const session = await auth();
   const isSuperadmin = session?.user?.role === "superadmin";
+  const sp = await searchParams;
+  const editId = typeof sp.edit === "string" ? sp.edit : null;
 
   const [
     usdToIdr,
@@ -127,6 +134,11 @@ export default async function CostsPage() {
     (total, row) => total + allocatedToThisMonth(row),
     0,
   );
+
+  // If `?edit=<id>` points to an existing row, swap the top form into
+  // edit mode for that row. Stale IDs (row deleted since the link was
+  // copied) fall back to add mode silently.
+  const editRow = editId ? manual.find((r) => r.id === editId) ?? null : null;
 
   // Per-provider subscription allocated to this month — feeds the
   // rollup table at the bottom of the page. Group by covers_provider,
@@ -243,18 +255,30 @@ export default async function CostsPage() {
       </div>
 
       {isSuperadmin && (
-      <Card title="Add a manual cost entry">
+      <Card
+        title={editRow ? `Edit cost entry — ${editRow.vendor}` : "Add a manual cost entry"}
+        hint={
+          editRow
+            ? "Editing an existing row. Attachment isn't editable here — delete and re-add if the invoice file needs changing."
+            : undefined
+        }
+      >
         <form
-          action={addManualCost}
+          id="manual-cost-form"
+          action={editRow ? updateManualCost : addManualCost}
           className="space-y-4"
           encType="multipart/form-data"
         >
+          {editRow && (
+            <input type="hidden" name="id" value={editRow.id} />
+          )}
           {/* Row 1 — what */}
           <div className="grid gap-3 sm:grid-cols-[200px_1fr_1fr]">
             <FormField label="Kind">
               <select
                 name="kind"
                 required
+                defaultValue={editRow?.kind ?? "infra"}
                 className="h-9 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm"
               >
                 <option value="infra">Infra (monthly VPS)</option>
@@ -271,6 +295,7 @@ export default async function CostsPage() {
                 placeholder="IDCloudHost, Niagahoster…"
                 required
                 maxLength={64}
+                defaultValue={editRow?.vendor ?? ""}
                 className="h-9 w-full rounded-lg border border-slate-200 px-3 text-sm placeholder:text-slate-400"
               />
             </FormField>
@@ -282,6 +307,7 @@ export default async function CostsPage() {
                 step="1"
                 placeholder="e.g. 150000"
                 required
+                defaultValue={editRow ? Math.round(editRow.amountIdr) : ""}
                 className="h-9 w-full rounded-lg border border-slate-200 px-3 text-sm placeholder:text-slate-400"
               />
             </FormField>
@@ -294,6 +320,9 @@ export default async function CostsPage() {
                 name="period_start"
                 type="date"
                 required
+                defaultValue={
+                  editRow ? toDateInput(editRow.periodStart) : ""
+                }
                 className="h-9 w-full rounded-lg border border-slate-200 px-3 text-sm"
               />
             </FormField>
@@ -302,6 +331,9 @@ export default async function CostsPage() {
                 name="period_end"
                 type="date"
                 required
+                defaultValue={
+                  editRow ? toDateInput(editRow.periodEnd) : ""
+                }
                 className="h-9 w-full rounded-lg border border-slate-200 px-3 text-sm"
               />
             </FormField>
@@ -312,7 +344,8 @@ export default async function CostsPage() {
             <input
               name="note"
               placeholder="Invoice #INV-2026-0042"
-              maxLength={200}
+              maxLength={2000}
+              defaultValue={editRow?.note ?? ""}
               className="h-9 w-full rounded-lg border border-slate-200 px-3 text-sm placeholder:text-slate-400"
             />
           </FormField>
@@ -326,7 +359,7 @@ export default async function CostsPage() {
           >
             <select
               name="covers_provider"
-              defaultValue=""
+              defaultValue={editRow?.coversProvider ?? ""}
               className="h-9 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm"
             >
               <option value="">— (none, pure infra / domain)</option>
@@ -338,26 +371,38 @@ export default async function CostsPage() {
             </select>
           </FormField>
 
-          {/* Optional invoice attachment */}
-          <FormField
-            label="Invoice file"
-            hint="Optional · PDF / JPG / PNG / WebP · max 5 MB"
-          >
-            <input
-              name="attachment"
-              type="file"
-              accept="application/pdf,image/jpeg,image/png,image/webp"
-              className="block w-full text-sm text-slate-700 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-slate-700 hover:file:bg-slate-200"
-            />
-          </FormField>
+          {/* Optional invoice attachment — only on ADD; editing an
+              attachment requires delete + re-add (rare enough). */}
+          {!editRow && (
+            <FormField
+              label="Invoice file"
+              hint="Optional · PDF / JPG / PNG / WebP · max 5 MB"
+            >
+              <input
+                name="attachment"
+                type="file"
+                accept="application/pdf,image/jpeg,image/png,image/webp"
+                className="block w-full text-sm text-slate-700 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-slate-700 hover:file:bg-slate-200"
+              />
+            </FormField>
+          )}
 
-          {/* Submit — right-aligned, prominent */}
-          <div className="flex justify-end pt-1">
+          {/* Submit — right-aligned. In edit mode we also surface a
+              Cancel link so the operator can back out without saving. */}
+          <div className="flex items-center justify-end gap-3 pt-1">
+            {editRow && (
+              <Link
+                href="/admin/system/costs"
+                className="text-sm font-medium text-slate-500 hover:text-slate-700"
+              >
+                Cancel
+              </Link>
+            )}
             <button
               type="submit"
               className="inline-flex h-9 items-center justify-center rounded-lg bg-slate-900 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
             >
-              Save entry
+              {editRow ? "Save changes" : "Save entry"}
             </button>
           </div>
         </form>
@@ -418,20 +463,48 @@ export default async function CostsPage() {
                     )}
                   </td>
                   {isSuperadmin && (
-                    <td className="px-3 py-2 text-right last:pr-0">
-                      <ConfirmForm
-                        action={deleteManualCost}
-                        confirmMessage={`Delete the ${m.vendor} entry (${formatRupiah(m.amountIdr)})? This also unlinks any attached invoice.`}
-                      >
-                        <input type="hidden" name="id" value={m.id} />
-                        <button
-                          type="submit"
-                          className="inline-flex h-7 w-7 items-center justify-center rounded-full text-slate-400 hover:bg-rose-50 hover:text-rose-700"
-                          aria-label="Delete"
+                    <td className="px-3 py-2 text-right last:pr-0 whitespace-nowrap">
+                      <div className="inline-flex items-center gap-1">
+                        {/* Edit — sets ?edit=<id> on the page so the
+                            top form swaps into edit mode for this row.
+                            The fragment scrolls the form into view if
+                            the table is long. */}
+                        {editId === m.id ? (
+                          <Link
+                            href="/admin/system/costs"
+                            className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-amber-50 text-amber-700"
+                            aria-label="Cancel edit"
+                            title="Currently editing"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </Link>
+                        ) : (
+                          <Link
+                            href={{
+                              pathname: "/admin/system/costs",
+                              query: { edit: m.id },
+                              hash: "manual-cost-form",
+                            }}
+                            className="inline-flex h-7 w-7 items-center justify-center rounded-full text-slate-400 hover:bg-amber-50 hover:text-amber-700"
+                            aria-label="Edit"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Link>
+                        )}
+                        <ConfirmForm
+                          action={deleteManualCost}
+                          confirmMessage={`Delete the ${m.vendor} entry (${formatRupiah(m.amountIdr)})? This also unlinks any attached invoice.`}
                         >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </ConfirmForm>
+                          <input type="hidden" name="id" value={m.id} />
+                          <button
+                            type="submit"
+                            className="inline-flex h-7 w-7 items-center justify-center rounded-full text-slate-400 hover:bg-rose-50 hover:text-rose-700"
+                            aria-label="Delete"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </ConfirmForm>
+                      </div>
                     </td>
                   )}
                 </tr>
@@ -599,6 +672,20 @@ const KIND_LABELS: Record<string, string> = {
   api_usage: "API Usage",
   other: "Other",
 };
+
+/**
+ * Format a Date (or ISO string from drizzle) into the `YYYY-MM-DD`
+ * shape that `<input type="date">` requires. Manual-cost dates are
+ * day-precision; using toISOString().slice(0, 10) is fine — no TZ
+ * sensitivity because the value gets `new Date(start)` back at parse
+ * time which interprets day-only strings as UTC midnight, identical
+ * to how addManualCost originally wrote it.
+ */
+function toDateInput(d: Date | string): string {
+  const date = d instanceof Date ? d : new Date(d);
+  return date.toISOString().slice(0, 10);
+}
+
 
 function kindLabel(kind: string): string {
   return (

@@ -5,10 +5,12 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import {
   ArrowRight,
   BookOpenCheck,
+  Bookmark,
   Clock,
   Compass,
   Flame,
   Globe2,
+  Mic2,
   ScrollText,
   Sparkles,
   TrendingUp,
@@ -23,14 +25,25 @@ import { TopIssueCards } from "@/components/TopIssueCards";
 import {
   getBriefsThisWeek,
   getDailyInsights,
+  getLatestKhutbah,
   getPulseSnapshot,
+  getRecentSaved,
+  getRisingVideos,
+  getSegmentBriefingChoices,
+  getSentimentTrend7d,
   getTopIssues,
   getTrendingCount24h,
   type DailyInsights as DailyInsightsData,
+  type LatestKhutbah,
   type PulseSnapshot,
+  type RisingVideo,
+  type SavedItem,
+  type SegmentBriefingChoice,
+  type SentimentTrendPoint,
   type TopIssue,
 } from "@/lib/dashboard-metrics";
 import { formatPanggilan } from "@/lib/panggilan";
+import { DashboardTabs } from "./DashboardTabs";
 
 export async function generateMetadata({
   params,
@@ -82,57 +95,96 @@ export default async function DashboardPage({
   // Fetch everything in parallel — these are all independent queries.
   // Briefs queries are skipped entirely for non-admin so we don't burn
   // round-trips fetching a list they won't see.
-  const [recentBriefs, pulse, trendingCount, briefsThisWeek, topIssues, insights] =
-    await Promise.all([
-      canCreateBriefs
-        ? db
-            .select({
-              id: schema.briefs.id,
-              topicTitle: schema.briefs.topicTitle,
-              segment: schema.briefs.segment,
-              tone: schema.briefs.tone,
-              isPlaceholder: schema.briefs.isPlaceholder,
-              createdAt: schema.briefs.createdAt,
-            })
-            .from(schema.briefs)
-            .where(eq(schema.briefs.userId, session.user.id))
-            .orderBy(desc(schema.briefs.createdAt))
-            .limit(5)
-        : Promise.resolve([]),
-      getPulseSnapshot(),
-      getTrendingCount24h(),
-      canCreateBriefs
-        ? getBriefsThisWeek(session.user.id)
-        : Promise.resolve(0),
-      getTopIssues(3),
-      getDailyInsights(),
-    ]);
+  const [
+    recentBriefs,
+    pulse,
+    trendingCount,
+    briefsThisWeek,
+    topIssues,
+    insights,
+    risingVideos,
+    latestKhutbah,
+    segmentChoices,
+    savedItems,
+    sentimentTrend,
+  ] = await Promise.all([
+    canCreateBriefs
+      ? db
+          .select({
+            id: schema.briefs.id,
+            topicTitle: schema.briefs.topicTitle,
+            segment: schema.briefs.segment,
+            tone: schema.briefs.tone,
+            isPlaceholder: schema.briefs.isPlaceholder,
+            createdAt: schema.briefs.createdAt,
+          })
+          .from(schema.briefs)
+          .where(eq(schema.briefs.userId, session.user.id))
+          .orderBy(desc(schema.briefs.createdAt))
+          .limit(5)
+      : Promise.resolve([]),
+    getPulseSnapshot(),
+    getTrendingCount24h(),
+    canCreateBriefs
+      ? getBriefsThisWeek(session.user.id)
+      : Promise.resolve(0),
+    getTopIssues(3),
+    getDailyInsights(),
+    getRisingVideos(5),
+    getLatestKhutbah(),
+    getSegmentBriefingChoices(),
+    getRecentSaved(session.user.id),
+    getSentimentTrend7d(),
+  ]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
-      <GreetingPulse
-        name={greetingName}
-        pulse={pulse}
-        trendingCount={trendingCount}
-        briefsThisWeek={briefsThisWeek}
-        t={t}
-        canCreateBriefs={canCreateBriefs}
+      <DashboardHeader name={greetingName} t={t} />
+      <DashboardTabs
+        labels={{
+          kit: t("tab_kit_title"),
+          kit_subtitle: t("tab_kit_subtitle"),
+          data: t("tab_data_title"),
+          data_subtitle: t("tab_data_subtitle"),
+        }}
+        kit={
+          <div className="space-y-8">
+            <KhutbahHero khutbah={latestKhutbah} t={t} locale={locale} />
+            <SegmentBriefingChooser choices={segmentChoices} t={t} />
+            <SavedItemsCard items={savedItems} t={t} />
+            {canCreateBriefs && (
+              <RecentBriefs
+                briefs={recentBriefs}
+                t={t}
+                tBriefs={tBriefs}
+                locale={locale}
+              />
+            )}
+            <KitQuickLinks t={t} canCreateBriefs={canCreateBriefs} />
+            {canCreateBriefs && (
+              <BriefsStatTile briefsThisWeek={briefsThisWeek} t={t} />
+            )}
+          </div>
+        }
+        data={
+          <div className="space-y-8">
+            <DataPulseHero
+              pulse={pulse}
+              trendingCount={trendingCount}
+              t={t}
+            />
+            <SentimentTrendChart points={sentimentTrend} t={t} />
+            <TopIssues
+              issues={topIssues}
+              t={t}
+              canCreateBriefs={canCreateBriefs}
+            />
+            <DailyInsights insights={insights} t={t} />
+            <RisingVideosCard videos={risingVideos} t={t} />
+            <DataQuickLinks t={t} />
+          </div>
+        }
       />
-      <TopIssues
-        issues={topIssues}
-        t={t}
-        canCreateBriefs={canCreateBriefs}
-      />
-      <DailyInsights insights={insights} t={t} />
-      {canCreateBriefs && (
-        <RecentBriefs
-          briefs={recentBriefs}
-          t={t}
-          tBriefs={tBriefs}
-          locale={locale}
-        />
-      )}
-      <QuickLinks t={t} canCreateBriefs={canCreateBriefs} />
     </div>
   );
 }
@@ -140,43 +192,295 @@ export default async function DashboardPage({
 type T = Awaited<ReturnType<typeof getTranslations<"Dashboard">>>;
 type TBriefs = Awaited<ReturnType<typeof getTranslations<"Briefs">>>;
 
-function GreetingPulse({
-  name,
-  pulse,
-  trendingCount,
+function DashboardHeader({ name, t }: { name: string; t: T }) {
+  // Slim greeting strip above the tabs — keeps the personal hello
+  // intact but drops the heavy stat tiles that used to live here.
+  // Stats now belong inside their respective tabs where they make
+  // editorial sense (pulse → Data, briefs-this-week → Kit).
+  return (
+    <header className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50/80 p-5 shadow-sm sm:p-6">
+      <p className="text-pretty text-xs font-medium uppercase tracking-wider text-slate-500">
+        {t("subtitle")}
+      </p>
+      <h1 className="mt-1.5 text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+        {t("greeting", { name })}
+      </h1>
+      <I18nText
+        text={t("dashboard_header_explainer")}
+        className="mt-3 block text-pretty text-sm leading-relaxed text-slate-600"
+      />
+    </header>
+  );
+}
+
+// ── KIT TAB ──────────────────────────────────────────────────────
+
+function KhutbahHero({
+  khutbah,
+  t,
+  locale,
+}: {
+  khutbah: LatestKhutbah | null;
+  t: T;
+  locale: string;
+}) {
+  if (!khutbah) {
+    return (
+      <section>
+        <SectionHeader
+          title={t("section_khutbah_hero_title")}
+          subtitle={t("section_khutbah_hero_subtitle")}
+        />
+        <div className="mt-3 rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-8 text-center text-sm text-slate-500">
+          {t("khutbah_hero_empty")}
+        </div>
+      </section>
+    );
+  }
+
+  const generatedAt = new Date(khutbah.generatedAt);
+  return (
+    <section>
+      <SectionHeader
+        title={t("section_khutbah_hero_title")}
+        subtitle={t("section_khutbah_hero_subtitle")}
+      />
+      <Link
+        href={`/insights/brief/${khutbah.briefId}`}
+        className="group mt-3 block overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/70 via-white to-white p-5 shadow-sm transition hover:border-emerald-300 hover:shadow-md sm:p-6"
+      >
+        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-emerald-700">
+          <Mic2 className="h-3.5 w-3.5" />
+          {t("khutbah_hero_pill")}
+          <span className="text-slate-400">·</span>
+          <span className="text-slate-500">
+            {generatedAt.toLocaleDateString(locale === "id" ? "id-ID" : "en-US", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
+          </span>
+        </div>
+        <p className="mt-3 text-pretty text-sm leading-relaxed text-slate-700 sm:text-base">
+          {khutbah.excerpt}
+        </p>
+        <p className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-emerald-700 transition group-hover:gap-2">
+          {t("khutbah_hero_cta")}
+          <ArrowRight className="h-4 w-4" />
+        </p>
+      </Link>
+    </section>
+  );
+}
+
+function SegmentBriefingChooser({
+  choices,
+  t,
+}: {
+  choices: SegmentBriefingChoice[];
+  t: T;
+}) {
+  if (choices.length === 0) {
+    return null;
+  }
+  const segLabel = (s: SegmentBriefingChoice["segment"]) =>
+    t(`segment_label_${s}` as Parameters<T>[0]);
+
+  return (
+    <section>
+      <SectionHeader
+        title={t("section_segment_chooser_title")}
+        subtitle={t("section_segment_chooser_subtitle")}
+      />
+      <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+        {choices.map((c) => (
+          <Link
+            key={c.segment}
+            href={`/insights/segment/${c.segment === "all" ? "all" : c.segment}`}
+            className="group flex flex-col gap-1 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300 hover:shadow-md"
+          >
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+              {segLabel(c.segment)}
+            </span>
+            <span className="text-base font-semibold leading-snug text-slate-900 group-hover:text-emerald-700">
+              {t(`segment_card_title_${c.segment}` as Parameters<T>[0])}
+            </span>
+            <span className="mt-auto text-[11px] tabular-nums text-slate-400">
+              {c.postsThisWeek.toLocaleString()} posts · 7d
+            </span>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function SavedItemsCard({ items, t }: { items: SavedItem[]; t: T }) {
+  if (items.length === 0) {
+    return (
+      <section>
+        <SectionHeader
+          title={t("section_saved_title")}
+          subtitle={t("section_saved_subtitle")}
+        />
+        <div className="mt-3 rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-6 text-center text-sm text-slate-500">
+          {t("saved_empty")}
+        </div>
+      </section>
+    );
+  }
+
+  const kindIcon = {
+    kitab: BookOpenCheck,
+    brief: ScrollText,
+    post: Sparkles,
+  };
+
+  return (
+    <section>
+      <SectionHeader
+        title={t("section_saved_title")}
+        subtitle={t("section_saved_subtitle")}
+        action={
+          <Link
+            href="/saved"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:underline"
+          >
+            {t("saved_view_all")} <ArrowRight className="h-3 w-3" />
+          </Link>
+        }
+      />
+      <ul className="mt-3 divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white">
+        {items.map((item) => {
+          const Icon = kindIcon[item.kind] ?? Bookmark;
+          const title =
+            (item.payload?.title as string) ||
+            (item.payload?.citation as string) ||
+            item.refId;
+          const subtitle =
+            (item.payload?.corpus as string) ||
+            (item.payload?.segment as string) ||
+            t(`saved_kind_${item.kind}` as Parameters<T>[0]);
+          const href =
+            item.kind === "brief"
+              ? `/insights/brief/${item.refId}`
+              : item.kind === "kitab"
+                ? `/kitab/${item.refId}`
+                : "/saved";
+          return (
+            <li key={item.id} className="p-3 sm:p-4">
+              <Link
+                href={href}
+                className="flex items-start gap-3 text-left hover:text-emerald-700"
+              >
+                <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600">
+                  <Icon className="h-3.5 w-3.5" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-semibold text-slate-900">
+                    {title}
+                  </span>
+                  <span className="block text-[11px] text-slate-500">
+                    {subtitle}
+                  </span>
+                </span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
+function BriefsStatTile({
   briefsThisWeek,
+  t,
+}: {
+  briefsThisWeek: number;
+  t: T;
+}) {
+  return (
+    <MiniStat
+      tone="amber"
+      icon={ScrollText}
+      label={t("stat_briefs_this_week_label")}
+      value={briefsThisWeek.toString()}
+      hint={t("stat_briefs_this_week_hint")}
+      href={briefsThisWeek > 0 ? "/briefs" : "/briefs/new"}
+    />
+  );
+}
+
+function KitQuickLinks({
   t,
   canCreateBriefs,
 }: {
-  name: string;
-  pulse: PulseSnapshot;
-  trendingCount: number;
-  briefsThisWeek: number;
   t: T;
   canCreateBriefs: boolean;
 }) {
-  // Pulse rendering — three states: real score, insufficient data, no movement.
+  return (
+    <section>
+      <SectionHeader title={t("section_quick")} />
+      <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <QuickLinkCard
+          icon={BookOpenCheck}
+          label={t("quick_kitab")}
+          href="/kitab"
+        />
+        <QuickLinkCard
+          icon={Sparkles}
+          label={t("quick_trends")}
+          href="/insights"
+        />
+        {canCreateBriefs && (
+          <QuickLinkCard
+            icon={ScrollText}
+            label={t("quick_briefs")}
+            href="/briefs"
+          />
+        )}
+      </div>
+    </section>
+  );
+}
+
+// ── DATA TAB ─────────────────────────────────────────────────────
+
+function DataPulseHero({
+  pulse,
+  trendingCount,
+  t,
+}: {
+  pulse: PulseSnapshot;
+  trendingCount: number;
+  t: T;
+}) {
   const hasScore = pulse.score !== null;
   const deltaSign =
-    pulse.delta === null ? "flat" : pulse.delta > 0 ? "up" : pulse.delta < 0 ? "down" : "flat";
+    pulse.delta === null
+      ? "flat"
+      : pulse.delta > 0
+        ? "up"
+        : pulse.delta < 0
+          ? "down"
+          : "flat";
 
   return (
-    <section className="grid gap-4 sm:grid-cols-[1.4fr_1fr] sm:gap-5">
+    <section className="grid gap-3 sm:grid-cols-[1.4fr_1fr] sm:gap-4">
       <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-        <p className="text-pretty text-sm leading-relaxed text-slate-500">
-          {t("subtitle")}
-        </p>
-        <h1 className="mt-1 text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-          {t("greeting", { name })}
-        </h1>
-
-        <div className="mt-5 flex items-end gap-4">
+        <div className="flex items-center gap-2">
+          <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+            <TrendingUp className="h-3.5 w-3.5" />
+          </span>
+          <I18nText
+            text={t("pulse_label")}
+            className="text-[10px] font-semibold uppercase tracking-wider text-slate-500"
+          />
+        </div>
+        <div className="mt-3 flex items-end gap-4">
           <div>
-            <I18nText
-              text={t("pulse_label")}
-              className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500"
-            />
-            <p className="mt-0.5 flex items-baseline gap-2">
+            <p className="flex items-baseline gap-2">
               <span className="text-5xl font-bold tabular-nums text-slate-900">
                 {hasScore ? pulse.score!.toFixed(1) : "—"}
               </span>
@@ -201,14 +505,12 @@ function GreetingPulse({
                     : deltaSign === "down"
                       ? "pulse_delta_down"
                       : "pulse_delta_flat",
-                  deltaSign === "flat" ? {} : { delta: Math.abs(pulse.delta).toFixed(1) },
+                  deltaSign === "flat"
+                    ? {}
+                    : { delta: Math.abs(pulse.delta).toFixed(1) },
                 )}
               </p>
             ) : (
-              // Two distinct "no chip" states share styling but not copy:
-              //   - !hasScore        → score itself isn't ready (thin this-week)
-              //   - hasScore + !delta → score is real, last-week is thin so the
-              //                         delta can't be computed
               <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
                 {t(hasScore ? "pulse_no_comparison" : "pulse_no_score")}
               </p>
@@ -216,40 +518,172 @@ function GreetingPulse({
           </div>
           <PulseSparkline points={pulse.sparkline} />
         </div>
-
         <I18nText
           text={t("pulse_explainer")}
           className="mt-4 block text-pretty text-xs leading-relaxed text-slate-500"
         />
       </div>
+      <MiniStat
+        tone="brand"
+        icon={Flame}
+        label={t("stat_trending_label")}
+        value={trendingCount.toString()}
+        hint={t("stat_trending_hint")}
+        href="/insights#trending"
+      />
+    </section>
+  );
+}
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-1 sm:gap-4">
-        {/* Trending count → /insights#trending (jumps to the Trending
-            topics section, not the page top). */}
-        <MiniStat
-          tone="brand"
-          icon={Flame}
-          label={t("stat_trending_label")}
-          value={trendingCount.toString()}
-          hint={t("stat_trending_hint")}
-          href="/insights#trending"
-        />
-        {/* Briefs this week → admin/superadmin only while the feature
-            is experimental. Hidden entirely for regular approved users
-            so they're not tempted to click into a page that would
-            redirect them away. */}
-        {canCreateBriefs && (
-          <MiniStat
-            tone="amber"
-            icon={ScrollText}
-            label={t("stat_briefs_this_week_label")}
-            value={briefsThisWeek.toString()}
-            hint={t("stat_briefs_this_week_hint")}
-            href={briefsThisWeek > 0 ? "/briefs" : "/briefs/new"}
-          />
-        )}
+function SentimentTrendChart({
+  points,
+  t,
+}: {
+  points: SentimentTrendPoint[];
+  t: T;
+}) {
+  // Need 3+ data points for the line to be meaningful
+  if (points.length < 3) {
+    return null;
+  }
+  const w = 600;
+  const h = 110;
+  const padX = 8;
+  const padY = 16;
+  const max = 100;
+  const stepX = points.length > 1 ? (w - padX * 2) / (points.length - 1) : 0;
+
+  const buildPath = (key: "negPct" | "posPct") =>
+    points
+      .map((p, i) => {
+        const x = padX + stepX * i;
+        const y = padY + ((max - p[key]) / max) * (h - padY * 2);
+        return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+      })
+      .join(" ");
+
+  const negPath = buildPath("negPct");
+  const posPath = buildPath("posPct");
+
+  return (
+    <section>
+      <SectionHeader
+        title={t("section_sentiment_trend_title")}
+        subtitle={t("section_sentiment_trend_subtitle")}
+      />
+      <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+        <div className="mb-2 flex items-center gap-4 text-[11px] text-slate-500">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="inline-block h-2.5 w-2.5 rounded-full bg-rose-500" />
+            {t("sentiment_legend_negative")}
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <span className="inline-block h-2.5 w-2.5 rounded-full bg-emerald-500" />
+            {t("sentiment_legend_positive")}
+          </span>
+        </div>
+        <svg
+          viewBox={`0 0 ${w} ${h}`}
+          preserveAspectRatio="none"
+          className="h-28 w-full"
+          aria-label={t("section_sentiment_trend_title")}
+        >
+          {/* baseline grid at 25/50/75 % */}
+          {[25, 50, 75].map((pct) => {
+            const y = padY + ((max - pct) / max) * (h - padY * 2);
+            return (
+              <line
+                key={pct}
+                x1={padX}
+                x2={w - padX}
+                y1={y}
+                y2={y}
+                stroke="#e2e8f0"
+                strokeDasharray="2 4"
+              />
+            );
+          })}
+          <path d={posPath} fill="none" stroke="#10b981" strokeWidth="2" />
+          <path d={negPath} fill="none" stroke="#f43f5e" strokeWidth="2" />
+          {points.map((p, i) => {
+            const x = padX + stepX * i;
+            const yPos =
+              padY + ((max - p.posPct) / max) * (h - padY * 2);
+            const yNeg =
+              padY + ((max - p.negPct) / max) * (h - padY * 2);
+            return (
+              <g key={p.day}>
+                <circle cx={x} cy={yPos} r={2.5} fill="#10b981" />
+                <circle cx={x} cy={yNeg} r={2.5} fill="#f43f5e" />
+              </g>
+            );
+          })}
+        </svg>
+        <div className="mt-1.5 flex justify-between text-[10px] tabular-nums text-slate-400">
+          <span>
+            {new Date(points[0].day).toLocaleDateString(undefined, {
+              month: "short",
+              day: "numeric",
+            })}
+          </span>
+          <span>
+            {new Date(points[points.length - 1].day).toLocaleDateString(
+              undefined,
+              { month: "short", day: "numeric" },
+            )}
+          </span>
+        </div>
       </div>
     </section>
+  );
+}
+
+function DataQuickLinks({ t }: { t: T }) {
+  return (
+    <section>
+      <SectionHeader title={t("section_quick")} />
+      <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <QuickLinkCard
+          icon={Sparkles}
+          label={t("quick_trends")}
+          href="/insights"
+        />
+        <QuickLinkCard
+          icon={Globe2}
+          label={t("quick_explore")}
+          href="/insights/explore"
+        />
+        <QuickLinkCard
+          icon={Compass}
+          label={t("quick_discussions")}
+          href="/discussions"
+        />
+      </div>
+    </section>
+  );
+}
+
+// Compact card used by KitQuickLinks + DataQuickLinks.
+function QuickLinkCard({
+  icon: Icon,
+  label,
+  href,
+}: {
+  icon: typeof BookOpenCheck;
+  label: string;
+  href: "/kitab" | "/insights" | "/briefs" | "/insights/explore" | "/discussions";
+}) {
+  return (
+    <Link
+      href={href}
+      className="group flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm transition hover:border-slate-300 hover:shadow-md"
+    >
+      <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700 transition group-hover:bg-emerald-50 group-hover:text-emerald-700">
+        <Icon className="h-4 w-4" />
+      </span>
+      <span className="text-sm font-semibold text-slate-900">{label}</span>
+      <ArrowRight className="ml-auto h-4 w-4 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-emerald-700" />
+    </Link>
   );
 }
 
@@ -529,6 +963,71 @@ function DailyInsights({
   );
 }
 
+function RisingVideosCard({
+  videos,
+  t,
+}: {
+  videos: RisingVideo[];
+  t: T;
+}) {
+  // Hide entirely until the time-series table has 2+ days of data
+  // (otherwise the section is just "no data yet" noise on every load).
+  // The query already guards minBaseline; we just don't render a card
+  // for an empty list at all.
+  if (videos.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="mt-8">
+      <SectionHeader
+        title={t("section_rising_videos")}
+        subtitle={t("section_rising_videos_subtitle")}
+      />
+      <ul className="mt-3 divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white">
+        {videos.map((v) => (
+          <li key={v.postId} className="flex items-start gap-3 p-4">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-rose-50 text-xs font-bold text-rose-700 tabular-nums">
+              +{Math.round(v.deltaPct)}%
+            </div>
+            <div className="min-w-0 flex-1">
+              {v.url ? (
+                <a
+                  href={v.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block truncate text-sm font-semibold text-slate-900 hover:text-rose-700"
+                >
+                  {v.title}
+                </a>
+              ) : (
+                <p className="truncate text-sm font-semibold text-slate-900">
+                  {v.title}
+                </p>
+              )}
+              <p className="mt-0.5 text-xs text-slate-500">
+                <span className="font-medium text-slate-700">{v.channel}</span>
+                {" · "}
+                {formatCompactInt(v.viewsNow)} views ·{" "}
+                <span className="text-emerald-700">
+                  +{formatCompactInt(v.delta)}
+                </span>{" "}
+                vs 24h ago
+              </p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function formatCompactInt(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
+  return String(n);
+}
+
 function RecentBriefs({
   briefs,
   t,
@@ -617,60 +1116,29 @@ function RecentBriefs({
   );
 }
 
-function QuickLinks({
-  t,
-  canCreateBriefs,
-}: {
-  t: T;
-  canCreateBriefs: boolean;
-}) {
-  const links = [
-    { href: "/insights", label: t("quick_trends"), icon: Globe2 },
-    { href: "/kitab", label: t("quick_kitab"), icon: BookOpenCheck },
-    // /briefs hidden for non-admin while the feature is experimental.
-    ...(canCreateBriefs
-      ? [{ href: "/briefs", label: t("quick_briefs"), icon: ScrollText }]
-      : []),
-  ] as const;
-
-  return (
-    <section className="mt-12 mb-6">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-        {t("section_quick")}
-      </p>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {links.map(({ href, label, icon: Icon }) => (
-          <Link
-            key={href}
-            href={href}
-            className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
-          >
-            <Icon className="h-3.5 w-3.5 text-brand-600" />
-            {label}
-          </Link>
-        ))}
-      </div>
-    </section>
-  );
-}
 
 function SectionHeader({
   title,
   subtitle,
+  action,
 }: {
   title: string;
   subtitle?: string;
+  action?: React.ReactNode;
 }) {
   return (
-    <div>
-      <h2 className="text-balance text-lg font-semibold text-slate-900 sm:text-xl">
-        <I18nText text={title} />
-      </h2>
-      {subtitle && (
-        <p className="mt-1 text-pretty text-xs leading-relaxed text-slate-500 sm:text-sm">
-          <I18nText text={subtitle} />
-        </p>
-      )}
+    <div className="flex items-start justify-between gap-3">
+      <div className="min-w-0">
+        <h2 className="text-balance text-lg font-semibold text-slate-900 sm:text-xl">
+          <I18nText text={title} />
+        </h2>
+        {subtitle && (
+          <p className="mt-1 text-pretty text-xs leading-relaxed text-slate-500 sm:text-sm">
+            <I18nText text={subtitle} />
+          </p>
+        )}
+      </div>
+      {action && <div className="shrink-0 pt-1">{action}</div>}
     </div>
   );
 }
