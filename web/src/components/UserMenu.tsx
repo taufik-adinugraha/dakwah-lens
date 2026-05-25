@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
+  BookmarkCheck,
   ChevronDown,
   LayoutDashboard,
   LogOut,
@@ -101,14 +102,24 @@ export function UserMenu({ email, name, status, role }: Props) {
 
           <div className="p-1.5">
             {approved && (
-              <Link
-                href="/dashboard"
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-900"
-              >
-                <LayoutDashboard className="h-4 w-4 text-brand-600" />
-                Dashboard
-              </Link>
+              <>
+                <Link
+                  href="/dashboard"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-900"
+                >
+                  <LayoutDashboard className="h-4 w-4 text-brand-600" />
+                  Dashboard
+                </Link>
+                <Link
+                  href="/saved"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-900"
+                >
+                  <BookmarkCheck className="h-4 w-4 text-brand-600" />
+                  {t("saved")}
+                </Link>
+              </>
             )}
             {/* Brief creation is admin-only while the feature is
                 experimental — non-admin approved users can still

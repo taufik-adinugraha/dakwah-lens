@@ -283,17 +283,28 @@ function AnonymousCtas({ t }: { t: LandingT }) {
         {t("hero_no_login_required")}
       </p>
 
-      {/* Bridge text: login is for personalization + team review. */}
+      {/* Bridge text: login is for personalization + team review.
+          The follow-up link gives a concrete path for users who decide
+          they want beta access — the open self-serve sign-up button
+          stays hidden (manual approval queue) but the intent has
+          somewhere to go. */}
       <p className="mt-6 max-w-md text-center text-xs leading-relaxed text-slate-500">
         {t("hero_login_purpose")}
       </p>
+      <Link
+        href="/contact"
+        className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 transition hover:underline"
+      >
+        {t("hero_request_access")}
+        <ArrowRight className="h-3 w-3" />
+      </Link>
 
       {/* Secondary actions */}
       {/* Sign-up CTA hidden 2026-05-23 — beta quota is limited; we review
           each request manually before approving access, so the front-door
           flow is "read public insights, contact us if you need access"
           rather than an open self-serve sign-up button. */}
-      <div className="mt-3 flex flex-col items-stretch justify-center gap-2 sm:flex-row sm:items-center sm:gap-3">
+      <div className="mt-4 flex flex-col items-stretch justify-center gap-2 sm:flex-row sm:items-center sm:gap-3">
         <Link
           href="#how-it-works"
           className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
@@ -689,28 +700,7 @@ function HowItWorks({
           </h2>
         </div>
 
-        {/* Pipeline status banner — honest disclosure that only the RSS
-            leg is live right now. Social pipelines (X/IG/TikTok/YT) are
-            implemented but paused while we verify quality + cost; the
-            three-steps narrative above shouldn't oversell. */}
-        <div className="mx-auto mt-6 max-w-2xl">
-          <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50/70 px-4 py-3 text-left text-sm leading-relaxed text-amber-900 shadow-sm">
-            <span
-              aria-hidden
-              className="mt-0.5 inline-flex h-2 w-2 shrink-0 rounded-full bg-amber-500 ring-4 ring-amber-200/60"
-            />
-            <div>
-              <p className="font-semibold text-amber-900">
-                {t("how_pipeline_status_title")}
-              </p>
-              <p className="mt-0.5 text-amber-800">
-                {t("how_pipeline_status_body")}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <ol className="mt-14 grid gap-6 sm:grid-cols-3">
+        <ol className="mt-10 grid gap-6 sm:grid-cols-3">
           {steps.map(({ icon: Icon, title, body }, i) => (
             <li
               key={title}

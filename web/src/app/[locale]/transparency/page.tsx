@@ -186,6 +186,7 @@ export default async function TransparencyPage({
             t={t}
             idLocale={idLocale}
           />
+          <PrepaidDisclaimer t={t} />
         </div>
       </section>
 
@@ -321,6 +322,18 @@ function FxDisclaimer({
           })}
         </p>
         <p>{t("fx_caveat")}</p>
+      </div>
+    </aside>
+  );
+}
+
+function PrepaidDisclaimer({ t }: { t: T }) {
+  return (
+    <aside className="mt-3 flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 text-sm text-slate-700">
+      <Info className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
+      <div className="space-y-1 leading-relaxed">
+        <p className="font-semibold text-slate-900">{t("prepaid_title")}</p>
+        <p>{t("prepaid_body")}</p>
       </div>
     </aside>
   );
