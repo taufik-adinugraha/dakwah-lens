@@ -57,8 +57,8 @@ MIN_POSTS_FOR_DISCOVERY = 20
 # (or only sub-floor `dawah_opportunity`) contribute zero — no
 # bookkeeping for empty days.
 TOPIC_DISCOVERY_WINDOW_DAYS = 7
-PER_DAY_CAP = 800
-SAMPLE_HARD_CEILING = PER_DAY_CAP * TOPIC_DISCOVERY_WINDOW_DAYS  # 5600
+PER_DAY_CAP = 1000
+SAMPLE_HARD_CEILING = PER_DAY_CAP * TOPIC_DISCOVERY_WINDOW_DAYS  # 7000
 
 # Day buckets are computed in Asia/Jakarta so a post at 23:00 WIB lands
 # in the same day as one at 06:00 WIB — what readers would call "the

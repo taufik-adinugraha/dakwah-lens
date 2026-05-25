@@ -551,7 +551,7 @@ function DataPulseHero({
         label={t("stat_trending_label")}
         value={trendingCount.toString()}
         hint={t("stat_trending_hint")}
-        href="/insights#trending"
+        href="/insights/explore#trending"
       />
     </section>
   );
@@ -818,8 +818,8 @@ function DailyInsights({
         deltaSign: deltaPp > 0 ? "+" : deltaPp < 0 ? "−" : "",
         deltaAbs: Math.abs(deltaPp),
       }),
-      // Drill into the full sentiment view on /insights.
-      href: "/insights",
+      // Drill into the full sentiment view on /insights/explore.
+      href: "/insights/explore#sentiment",
     });
   }
 
@@ -834,7 +834,7 @@ function DailyInsights({
         volume: insights.emerging.volume,
       }),
       // Open the trending topics list — the emerging topic is in there.
-      href: "/insights",
+      href: "/insights/explore#trending",
     });
   }
 
@@ -877,7 +877,9 @@ function DailyInsights({
         category: insights.daleelOpportunity.category,
         count: insights.daleelOpportunity.nPosts,
       }),
-      href: segment ? `/insights/segment/${segment}` : "/insights",
+      href: segment
+        ? `/insights/segment/${segment}?from=dashboard`
+        : "/insights",
     });
   }
 
@@ -894,7 +896,10 @@ function DailyInsights({
 
   return (
     <section className="mt-12">
-      <SectionHeader title={t("section_insights")} subtitle={t("section_insights_subtitle")} />
+      <SectionHeader
+        title={t("section_insights")}
+        subtitle={t("section_insights_subtitle", { count: cards.length })}
+      />
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map(({ key, tone, icon: Icon, title, body, href }) => {

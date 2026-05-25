@@ -101,16 +101,28 @@ export async function generateMetadata({
 
 export default async function SegmentPage({
   params,
+  searchParams,
 }: {
   params: Promise<PageParams>;
   searchParams: Promise<SearchParams>;
 }) {
   const { locale, focus } = await params;
+  const sp = await searchParams;
   setRequestLocale(locale);
   if (!ALL_FOCI.includes(focus)) notFound();
 
   const def = FOCUS_DEFINITIONS[focus]!;
   const t = await getTranslations({ locale, namespace: "Insights" });
+
+  // Back-link routes to the page the user came from. Dashboard is the
+  // only non-default origin today (via the daleel insight card); other
+  // entries (briefings hub, deep link, /insights/explore) all fall
+  // through to /insights.
+  const fromDashboard = sp.from === "dashboard";
+  const backHref = fromDashboard ? "/dashboard" : "/insights";
+  const backLabel = fromDashboard
+    ? t("segment_back_dashboard")
+    : t("segment_back");
 
   // Posts whose DOMINANT category is in this focus's category set.
   // Take the GLOBAL top-1 category (no inner segment filter — see
@@ -207,11 +219,11 @@ export default async function SegmentPage({
       <section className="pt-12 pb-8 sm:pt-16">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
           <Link
-            href="/insights"
+            href={backHref}
             className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 transition hover:text-slate-900"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            {t("segment_back")}
+            {backLabel}
           </Link>
           <div className="mt-4 flex items-start gap-3">
             <span

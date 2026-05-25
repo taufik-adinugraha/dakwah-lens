@@ -175,7 +175,10 @@ export default async function InsightsExplorePage({
             )}
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div
+            id="sentiment"
+            className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm scroll-mt-24"
+          >
             <h2 className="text-balance text-base font-semibold text-slate-900 sm:text-lg">
               <I18nText text={t("section_sentiment")} />
             </h2>
