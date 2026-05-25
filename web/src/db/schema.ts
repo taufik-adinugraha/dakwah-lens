@@ -830,7 +830,7 @@ export const insightsSummaries = pgTable(
     tokensIn: integer("tokens_in"),
     tokensOut: integer("tokens_out"),
     costUsd: doublePrecision("cost_usd"),
-    /** NULL = all-platform briefing. Otherwise one of `spiritual` /
+    /** NULL = overall-view briefing. Otherwise one of `spiritual` /
      *  `family` / `youth` / `justice` per the 2026-05-20 expansion. */
     segment: text("segment"),
     /** Kitab passages the LLM was permitted to cite for this

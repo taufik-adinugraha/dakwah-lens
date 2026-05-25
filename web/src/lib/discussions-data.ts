@@ -16,7 +16,7 @@ export type PublicRoomOverview = {
   /** Briefing slug — `YYYY-MM-DD-{segment}`. Doubles as the room's
    *  canonical URL: /m/{slug}. */
   slug: string;
-  /** Topic — null for the cross-platform briefing. */
+  /** Topic — null for the overall-view briefing. */
   segment: string | null;
   /** Briefing publish time. The WIB date portion is the "week" the
    *  room belongs to in the listing filters. */

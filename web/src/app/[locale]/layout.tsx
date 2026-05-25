@@ -7,10 +7,12 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { ActiveNotice } from "@/components/ActiveNotice";
 import { DeployOverlay } from "@/components/DeployOverlay";
+import { FlashToast } from "@/components/FlashToast";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { PageTracker } from "@/components/PageTracker";
 import { PendingApprovalBanner } from "@/components/PendingApprovalBanner";
+import { popFlash } from "@/lib/flash";
 import { readDeployStatus } from "@/lib/deploy-status";
 import "../globals.css";
 
@@ -72,6 +74,11 @@ export default async function RootLayout({
   // as idle).
   const deployStatus = await readDeployStatus().catch(() => null);
 
+  // Pop the flash cookie set by the most recent server action (if any).
+  // This is the one-shot read; the cookie gets cleared in the same
+  // response so the toast only ever fires once.
+  const flash = await popFlash();
+
   return (
     <html
       lang={locale}
@@ -85,6 +92,7 @@ export default async function RootLayout({
           <main className="flex flex-col">{children}</main>
           <Footer />
           <PageTracker locale={locale} />
+          <FlashToast initial={flash} />
           {deployStatus && <DeployOverlay initialStatus={deployStatus} />}
         </NextIntlClientProvider>
       </body>

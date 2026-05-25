@@ -264,6 +264,16 @@ export default async function CostsPage({
         }
       >
         <form
+          // `key` forces React to remount the form (and re-apply every
+          // `defaultValue`) when switching between add mode and edit
+          // mode, or between editing one row and editing another.
+          // Without this, the `<select name="kind">` keeps whatever
+          // option it last rendered with — which is why the kind
+          // appeared to "flip to Infra" when clicking pencil on a row
+          // with a different kind. `defaultValue` is uncontrolled and
+          // only honored on the FIRST mount of an element; subsequent
+          // navigations to ?edit=<id> would reuse the same DOM node.
+          key={editRow?.id ?? "add"}
           id="manual-cost-form"
           action={editRow ? updateManualCost : addManualCost}
           className="space-y-4"

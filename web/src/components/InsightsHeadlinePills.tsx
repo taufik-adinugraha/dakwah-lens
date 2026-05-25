@@ -4,7 +4,7 @@ import type { LatestInsightsSummary } from "@/lib/insights-data";
  * Pill row that lives beneath the AI-narrated executive briefing.
  *
  * Used on both:
- *   - /insights — the all-platform hero
+ *   - /insights — the overall-view hero
  *   - /insights/segment/[focus] — the per-segment hero
  *
  * Shared between the two because the underlying `headline_stats`
@@ -61,7 +61,7 @@ export function InsightsHeadlinePills({
 
       {/* Top category pill. On segment pages this surfaces which of the
        *  segment's sub-categories dominates (family vs health, muamalah
-       *  vs social_justice). On the all-platform page it's the dominant
+       *  vs social_justice). On the overall-view page it's the dominant
        *  of all 9 dakwah categories. */}
       {topCategory && (
         <HeadlinePill

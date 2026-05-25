@@ -17,7 +17,7 @@ import type { DaleelRef } from "@/db/schema";
  * what was actually cited; the "Open in Kitab" link is still there
  * for users who want the full context.
  *
- * Shared between /insights (all-platform briefing) and
+ * Shared between /insights (overall-view briefing) and
  * /insights/segment/[focus] (per-segment briefings) — the daleel shape
  * is identical across both.
  */

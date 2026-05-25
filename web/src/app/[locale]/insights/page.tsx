@@ -26,7 +26,7 @@ import { WatchedRoomsNudge } from "./WatchedRoomsNudge";
  * and a footer CTA for anonymous visitors.
  *
  * Briefings-first redesign 2026-05-23 — previously the page led with
- * one big "all-platform" hero and buried the 4 segment briefings as
+ * one big "overall-view" hero and buried the 4 segment briefings as
  * small chips. User research showed first-time visitors didn't realize
  * we publish 5 distinct briefings per week.
  */

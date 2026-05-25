@@ -10,7 +10,7 @@ import {
   Compass,
   Flame,
   Globe2,
-  Mic2,
+  MessageSquare,
   ScrollText,
   Sparkles,
   TrendingUp,
@@ -23,27 +23,28 @@ import { db, schema } from "@/db";
 import { I18nText } from "@/components/I18nText";
 import { TopIssueCards } from "@/components/TopIssueCards";
 import {
+  getActiveDiscussionRooms,
   getBriefsThisWeek,
   getDailyInsights,
-  getLatestKhutbah,
+  getKitSegments,
   getPulseSnapshot,
   getRecentSaved,
   getRisingVideos,
-  getSegmentBriefingChoices,
   getSentimentTrend7d,
   getTopIssues,
   getTrendingCount24h,
+  type ActiveRoom,
   type DailyInsights as DailyInsightsData,
-  type LatestKhutbah,
   type PulseSnapshot,
   type RisingVideo,
   type SavedItem,
-  type SegmentBriefingChoice,
   type SentimentTrendPoint,
   type TopIssue,
 } from "@/lib/dashboard-metrics";
 import { formatPanggilan } from "@/lib/panggilan";
+import { hashVisitorToken, readVisitorToken } from "@/lib/visitor-cookie";
 import { DashboardTabs } from "./DashboardTabs";
+import { KitTabs } from "./KitTabs";
 
 export async function generateMetadata({
   params,
@@ -66,6 +67,9 @@ export default async function DashboardPage({
 
   const t = await getTranslations("Dashboard");
   const tBriefs = await getTranslations("Briefs");
+  // Pulled from the Insights namespace so the segment names in the
+  // Kit tab strip match /insights/segment/[focus] verbatim.
+  const tInsights = await getTranslations("Insights");
 
   // Indonesian context: addressing someone by their bare first name is too
   // direct. We fetch the profile + use the panggilan helper so the greeting
@@ -95,6 +99,14 @@ export default async function DashboardPage({
   // Fetch everything in parallel — these are all independent queries.
   // Briefs queries are skipped entirely for non-admin so we don't burn
   // round-trips fetching a list they won't see.
+  // Identify the visitor for the "active discussion rooms" card.
+  // Comments are anonymous-by-design (visitor_token_hash, not userId),
+  // so we read the same cookie the comment API stamps on first post.
+  // Returning null when the cookie is missing → the section silently
+  // hides for users who haven't commented anywhere yet.
+  const visitorToken = await readVisitorToken();
+  const visitorHash = visitorToken ? hashVisitorToken(visitorToken) : null;
+
   const [
     recentBriefs,
     pulse,
@@ -103,10 +115,10 @@ export default async function DashboardPage({
     topIssues,
     insights,
     risingVideos,
-    latestKhutbah,
-    segmentChoices,
+    kitSegments,
     savedItems,
     sentimentTrend,
+    activeRooms,
   ] = await Promise.all([
     canCreateBriefs
       ? db
@@ -131,10 +143,10 @@ export default async function DashboardPage({
     getTopIssues(3),
     getDailyInsights(),
     getRisingVideos(5),
-    getLatestKhutbah(),
-    getSegmentBriefingChoices(),
+    getKitSegments(),
     getRecentSaved(session.user.id),
     getSentimentTrend7d(),
+    getActiveDiscussionRooms(visitorHash, 14, 6),
   ]);
 
   return (
@@ -149,8 +161,42 @@ export default async function DashboardPage({
         }}
         kit={
           <div className="space-y-8">
-            <KhutbahHero khutbah={latestKhutbah} t={t} locale={locale} />
-            <SegmentBriefingChooser choices={segmentChoices} t={t} />
+            <KitTabs
+              segments={kitSegments}
+              labels={{
+                // Canonical labels — same keys /insights/segment/[focus]
+                // uses for its hero ("Spiritual & Akhlaq", etc.). Keeps
+                // segment names consistent across surfaces so a user
+                // doesn't see "Spiritual" here vs "Spiritual & Akhlaq"
+                // on /insights and wonder if they're the same thing.
+                segments: {
+                  all: tInsights("brief_scope_all"),
+                  spiritual: tInsights("segment_spiritual_title"),
+                  family: tInsights("segment_family_title"),
+                  youth: tInsights("segment_youth_title"),
+                  justice: tInsights("segment_justice_title"),
+                },
+                sections: {
+                  ringkasan: t("kit_section_ringkasan"),
+                  numerik: t("kit_section_numerik"),
+                  tema: t("kit_section_tema"),
+                  strategi: t("kit_section_strategi"),
+                  dalil: t("kit_section_dalil"),
+                },
+                empty: t("kit_tabs_empty"),
+                kit_card_cta: t("kit_card_cta"),
+                kit_card_words: t("kit_card_words"),
+                poster_flyer_title: t("overall_kits_poster_flyer_title"),
+                poster_flyer_subtitle_tpl: t(
+                  "overall_kits_poster_flyer_subtitle",
+                  { flyers: "{flyers}" },
+                ),
+                poster_pill: t("poster_preview_pill"),
+                poster_cta: t("poster_preview_cta"),
+                flyer_label_tpl: t("flyer_label", { n: "{n}" }),
+              }}
+            />
+            <ActiveRoomsCard rooms={activeRooms} t={t} />
             <SavedItemsCard items={savedItems} t={t} />
             {canCreateBriefs && (
               <RecentBriefs
@@ -160,7 +206,6 @@ export default async function DashboardPage({
                 locale={locale}
               />
             )}
-            <KitQuickLinks t={t} canCreateBriefs={canCreateBriefs} />
             {canCreateBriefs && (
               <BriefsStatTile briefsThisWeek={briefsThisWeek} t={t} />
             )}
@@ -181,7 +226,6 @@ export default async function DashboardPage({
             />
             <DailyInsights insights={insights} t={t} />
             <RisingVideosCard videos={risingVideos} t={t} />
-            <DataQuickLinks t={t} />
           </div>
         }
       />
@@ -197,6 +241,10 @@ function DashboardHeader({ name, t }: { name: string; t: T }) {
   // intact but drops the heavy stat tiles that used to live here.
   // Stats now belong inside their respective tabs where they make
   // editorial sense (pulse → Data, briefs-this-week → Kit).
+  //
+  // The explainer uses next-intl's `t.rich` so the <strong> tags in
+  // the message file render as real DOM bold instead of literal text.
+  // I18nText only strips `*…*` markers, not HTML.
   return (
     <header className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50/80 p-5 shadow-sm sm:p-6">
       <p className="text-pretty text-xs font-medium uppercase tracking-wider text-slate-500">
@@ -205,115 +253,19 @@ function DashboardHeader({ name, t }: { name: string; t: T }) {
       <h1 className="mt-1.5 text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
         {t("greeting", { name })}
       </h1>
-      <I18nText
-        text={t("dashboard_header_explainer")}
-        className="mt-3 block text-pretty text-sm leading-relaxed text-slate-600"
-      />
+      <p className="mt-3 text-pretty text-sm leading-relaxed text-slate-600">
+        {t.rich("dashboard_header_explainer", {
+          strong: (chunks) => (
+            <strong className="font-semibold text-slate-900">{chunks}</strong>
+          ),
+        })}
+      </p>
     </header>
   );
 }
 
 // ── KIT TAB ──────────────────────────────────────────────────────
 
-function KhutbahHero({
-  khutbah,
-  t,
-  locale,
-}: {
-  khutbah: LatestKhutbah | null;
-  t: T;
-  locale: string;
-}) {
-  if (!khutbah) {
-    return (
-      <section>
-        <SectionHeader
-          title={t("section_khutbah_hero_title")}
-          subtitle={t("section_khutbah_hero_subtitle")}
-        />
-        <div className="mt-3 rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-8 text-center text-sm text-slate-500">
-          {t("khutbah_hero_empty")}
-        </div>
-      </section>
-    );
-  }
-
-  const generatedAt = new Date(khutbah.generatedAt);
-  return (
-    <section>
-      <SectionHeader
-        title={t("section_khutbah_hero_title")}
-        subtitle={t("section_khutbah_hero_subtitle")}
-      />
-      <Link
-        href={`/insights/brief/${khutbah.briefId}`}
-        className="group mt-3 block overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/70 via-white to-white p-5 shadow-sm transition hover:border-emerald-300 hover:shadow-md sm:p-6"
-      >
-        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-emerald-700">
-          <Mic2 className="h-3.5 w-3.5" />
-          {t("khutbah_hero_pill")}
-          <span className="text-slate-400">·</span>
-          <span className="text-slate-500">
-            {generatedAt.toLocaleDateString(locale === "id" ? "id-ID" : "en-US", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}
-          </span>
-        </div>
-        <p className="mt-3 text-pretty text-sm leading-relaxed text-slate-700 sm:text-base">
-          {khutbah.excerpt}
-        </p>
-        <p className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-emerald-700 transition group-hover:gap-2">
-          {t("khutbah_hero_cta")}
-          <ArrowRight className="h-4 w-4" />
-        </p>
-      </Link>
-    </section>
-  );
-}
-
-function SegmentBriefingChooser({
-  choices,
-  t,
-}: {
-  choices: SegmentBriefingChoice[];
-  t: T;
-}) {
-  if (choices.length === 0) {
-    return null;
-  }
-  const segLabel = (s: SegmentBriefingChoice["segment"]) =>
-    t(`segment_label_${s}` as Parameters<T>[0]);
-
-  return (
-    <section>
-      <SectionHeader
-        title={t("section_segment_chooser_title")}
-        subtitle={t("section_segment_chooser_subtitle")}
-      />
-      <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
-        {choices.map((c) => (
-          <Link
-            key={c.segment}
-            href={`/insights/segment/${c.segment === "all" ? "all" : c.segment}`}
-            className="group flex flex-col gap-1 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300 hover:shadow-md"
-          >
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-              {segLabel(c.segment)}
-            </span>
-            <span className="text-base font-semibold leading-snug text-slate-900 group-hover:text-emerald-700">
-              {t(`segment_card_title_${c.segment}` as Parameters<T>[0])}
-            </span>
-            <span className="mt-auto text-[11px] tabular-nums text-slate-400">
-              {c.postsThisWeek.toLocaleString()} posts · 7d
-            </span>
-          </Link>
-        ))}
-      </div>
-    </section>
-  );
-}
 
 function SavedItemsCard({ items, t }: { items: SavedItem[]; t: T }) {
   if (items.length === 0) {
@@ -412,35 +364,59 @@ function BriefsStatTile({
   );
 }
 
-function KitQuickLinks({
+function ActiveRoomsCard({
+  rooms,
   t,
-  canCreateBriefs,
 }: {
+  rooms: ActiveRoom[];
   t: T;
-  canCreateBriefs: boolean;
 }) {
+  // Hide the entire section when the visitor hasn't commented in any
+  // room in the window. Empty-state copy would just create noise on
+  // the dashboard for users who don't participate in discussions.
+  if (rooms.length === 0) return null;
+
   return (
     <section>
-      <SectionHeader title={t("section_quick")} />
-      <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <QuickLinkCard
-          icon={BookOpenCheck}
-          label={t("quick_kitab")}
-          href="/kitab"
-        />
-        <QuickLinkCard
-          icon={Sparkles}
-          label={t("quick_trends")}
-          href="/insights"
-        />
-        {canCreateBriefs && (
-          <QuickLinkCard
-            icon={ScrollText}
-            label={t("quick_briefs")}
-            href="/briefs"
-          />
-        )}
-      </div>
+      <SectionHeader
+        title={t("section_active_rooms_title")}
+        subtitle={t("section_active_rooms_subtitle")}
+      />
+      <ul className="mt-3 divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white">
+        {rooms.map((room) => {
+          const d = room.daysSinceLast;
+          const lastLabel =
+            d === 0
+              ? t("active_rooms_today")
+              : t("active_rooms_days_ago", { n: d });
+          return (
+            <li key={room.briefingSlug} className="p-3 sm:p-4">
+              <Link
+                href={`/m/${room.briefingSlug}`}
+                className="group flex items-start gap-3 text-left hover:text-emerald-700"
+              >
+                <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
+                  <MessageSquare className="h-3.5 w-3.5" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-semibold text-slate-900 group-hover:text-emerald-700">
+                    {room.title ?? room.briefingSlug}
+                  </span>
+                  <span className="block text-[11px] text-slate-500">
+                    {t("active_rooms_my_comments", { n: room.myCommentCount })}
+                    {" · "}
+                    {t("active_rooms_total_comments", {
+                      n: room.totalApprovedCount,
+                    })}
+                    {" · "}
+                    {lastLabel}
+                  </span>
+                </span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
     </section>
   );
 }
@@ -635,55 +611,6 @@ function SentimentTrendChart({
         </div>
       </div>
     </section>
-  );
-}
-
-function DataQuickLinks({ t }: { t: T }) {
-  return (
-    <section>
-      <SectionHeader title={t("section_quick")} />
-      <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <QuickLinkCard
-          icon={Sparkles}
-          label={t("quick_trends")}
-          href="/insights"
-        />
-        <QuickLinkCard
-          icon={Globe2}
-          label={t("quick_explore")}
-          href="/insights/explore"
-        />
-        <QuickLinkCard
-          icon={Compass}
-          label={t("quick_discussions")}
-          href="/discussions"
-        />
-      </div>
-    </section>
-  );
-}
-
-// Compact card used by KitQuickLinks + DataQuickLinks.
-function QuickLinkCard({
-  icon: Icon,
-  label,
-  href,
-}: {
-  icon: typeof BookOpenCheck;
-  label: string;
-  href: "/kitab" | "/insights" | "/briefs" | "/insights/explore" | "/discussions";
-}) {
-  return (
-    <Link
-      href={href}
-      className="group flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm transition hover:border-slate-300 hover:shadow-md"
-    >
-      <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700 transition group-hover:bg-emerald-50 group-hover:text-emerald-700">
-        <Icon className="h-4 w-4" />
-      </span>
-      <span className="text-sm font-semibold text-slate-900">{label}</span>
-      <ArrowRight className="ml-auto h-4 w-4 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-emerald-700" />
-    </Link>
   );
 }
 

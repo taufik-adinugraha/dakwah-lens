@@ -702,23 +702,164 @@ export async function getBucketEngagementDelta(): Promise<BucketDelta[]> {
  * Helpers for the revamped /dashboard layout.
  * ───────────────────────────────────────────────────────────── */
 
-export type LatestKhutbah = {
-  briefId: string;
-  generatedAt: string;
+export type KitDeliverable = {
+  slug: "khutbah" | "kajian" | "home" | "content" | "genz" | "action";
+  title: string;
   excerpt: string;
+  href: string;
   wordCount: number;
 };
 
+export type FlyerMessage = {
+  n: number;
+  headline: string;
+  daleel: string | null;
+  body: string;
+};
+
+export type OverallViewKits = {
+  briefSlug: string;
+  generatedAt: string;
+  kits: KitDeliverable[];
+  posterQuestion: string | null;
+  posterHref: string | null;
+  flyers: FlyerMessage[];
+};
+
 /**
- * Pull the latest cross-platform briefing's `### Khutbah Jumat` slice
- * and return a hero-card-ready excerpt. We don't load the whole 4K-word
- * khutbah into the dashboard payload — just the opening ~200 words and
- * a link to the full read.
- *
- * Returns null when no insights_summary exists yet, or when the markdown
- * doesn't have a Khutbah Jumat section (e.g. mid-migration formats).
+ * Extract one H3-bounded section from a briefing's markdown by matching
+ * the heading text against a regex. Returns the headline-stripped body
+ * (everything until the next H3 or H2 boundary).
  */
-export async function getLatestKhutbah(): Promise<LatestKhutbah | null> {
+function extractH3Block(md: string, matcher: RegExp): string | null {
+  const lines = md.split("\n");
+  let start = -1;
+  for (let i = 0; i < lines.length; i++) {
+    const m = lines[i].match(/^###\s+(.+?)\s*$/);
+    if (m && matcher.test(m[1])) {
+      start = i + 1;
+      break;
+    }
+  }
+  if (start === -1) return null;
+  let end = lines.length;
+  for (let i = start; i < lines.length; i++) {
+    if (lines[i].startsWith("### ") || lines[i].startsWith("## ")) {
+      end = i;
+      break;
+    }
+  }
+  return lines.slice(start, end).join("\n").trim();
+}
+
+/**
+ * Walk a section's prose and pull the first `wordCap` words, skipping
+ * structural noise: Arabic-only lines (would dominate the excerpt and
+ * render poorly at body size), parenthetical word-counts left in by
+ * the LLM, all-caps headers like "**KHUTBAH PERTAMA**", and bullet
+ * markers. Used to build the per-kit teaser on the dashboard.
+ */
+function buildExcerpt(section: string, wordCap = 110): string {
+  const lines = section
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => l.length > 0)
+    .filter((l) => !l.startsWith("(")) // word-count parenthetical
+    .filter((l) => !/^\*\*[A-Z\s]+\*\*\s*:?$/.test(l)); // ALL-CAPS bold header
+  const words: string[] = [];
+  for (const line of lines) {
+    if (words.length >= wordCap) break;
+    if (/^[؀-ۿ\s]+$/.test(line)) continue; // Arabic-only
+    // Strip leading bullet markers + bold markers for a cleaner teaser
+    const cleaned = line
+      .replace(/^[-*•]\s+/, "")
+      .replace(/\*\*/g, "")
+      .replace(/^>\s+/, "");
+    words.push(...cleaned.split(/\s+/));
+  }
+  const out = words.slice(0, wordCap).join(" ");
+  return out + (words.length > wordCap ? "…" : "");
+}
+
+const KIT_DEFS: ReadonlyArray<{
+  slug: KitDeliverable["slug"];
+  title: string;
+  matcher: RegExp;
+}> = [
+  { slug: "khutbah", title: "Khutbah Jumat", matcher: /khutbah|friday/i },
+  { slug: "kajian", title: "Kajian Ibu-ibu", matcher: /kajian|majelis/i },
+  { slug: "home", title: "Pengajaran di Rumah", matcher: /rumah|home|teaching at/i },
+  { slug: "content", title: "Kreator Konten", matcher: /konten|kreator|content creator|digital content/i },
+  {
+    slug: "genz",
+    title: "Mahasiswa: Poster + Artikel + Diskusi",
+    matcher: /mahasiswa|university\s+student|gen[\s-]?z/i,
+  },
+  {
+    slug: "action",
+    title: "Aksi Sosial & Khidmah Umat",
+    matcher: /aksi|khidmah|ummah|social action|service to/i,
+  },
+];
+
+/**
+ * Parse the `## Pesan Flyer` section into structured per-flyer rows.
+ * Each flyer in the markdown follows the format:
+ *
+ *   ### Pesan Flyer N — Suara {{kategori}}
+ *   **Headline:** "{{headline}}"
+ *   **Dalil:** {{citation}}
+ *
+ *   {{paragraph body}}
+ *
+ * Returns [] when no Pesan Flyer block is present.
+ */
+function extractFlyers(md: string): FlyerMessage[] {
+  const sectionIdx = md.indexOf("## Pesan Flyer");
+  if (sectionIdx === -1) return [];
+  const after = md.slice(sectionIdx);
+  // Stop at the next H2 boundary; otherwise consume to end of doc.
+  const nextH2 = after.slice(15).search(/\n## /);
+  const section =
+    nextH2 === -1 ? after : after.slice(0, 15 + nextH2);
+
+  const flyers: FlyerMessage[] = [];
+  // Split on each `### Pesan Flyer N` header. The first chunk is the
+  // section preamble and is discarded.
+  const chunks = section.split(/\n### Pesan Flyer\s+(\d+)[^\n]*\n/);
+  // chunks: [preamble, "1", body1, "2", body2, ...]
+  for (let i = 1; i < chunks.length; i += 2) {
+    const n = Number(chunks[i]);
+    const body = chunks[i + 1] ?? "";
+    const headline = body.match(/\*\*Headline:\*\*\s*"?([^"\n]+?)"?\s*$/m)?.[1]?.trim() ?? "";
+    const daleel = body.match(/\*\*Dalil:\*\*\s*([^\n]+?)\s*$/m)?.[1]?.trim() ?? null;
+    // Paragraph body = everything after the marker lines, first 80 words.
+    const paragraph = body
+      .replace(/\*\*Headline:\*\*[^\n]+/, "")
+      .replace(/\*\*Dalil:\*\*[^\n]+/, "")
+      .trim();
+    flyers.push({
+      n,
+      headline,
+      daleel,
+      body: buildExcerpt(paragraph, 80),
+    });
+  }
+  return flyers;
+}
+
+/**
+ * Latest overall-view briefing decomposed into per-kit slices for the
+ * dashboard. Replaces the older single-khutbah hero with the full
+ * content kit so users see every deliverable at a glance. Each kit
+ * carries a `href` pointing to the public read page (`/d/{slug}/{kit}`
+ * for most, `/m/{slug}` for Mahasiswa where the article + discussion
+ * live together).
+ *
+ * Returns null when no overall-view briefing exists yet OR the markdown
+ * lacks the Section-4 deliverable block (mid-migration formats).
+ */
+export async function getOverallViewKits(): Promise<OverallViewKits | null> {
   const rows = (await db.execute(sql`
     SELECT id::text AS id, generated_at, summary_md
     FROM insights_summaries
@@ -735,44 +876,56 @@ export async function getLatestKhutbah(): Promise<LatestKhutbah | null> {
   const row = rows[0];
   if (!row) return null;
 
-  // Find "### Khutbah Jumat" then take from the first non-heading line
-  // forward until we hit the next H3 or run out of room. Truncate at
-  // ~220 words for an excerpt that fills a hero card without scrolling.
   const md = row.summary_md;
-  const startMarker = "### Khutbah Jumat";
-  const startIdx = md.indexOf(startMarker);
-  if (startIdx === -1) return null;
-  const after = md.slice(startIdx + startMarker.length);
-  const nextH3 = after.search(/\n### /);
-  const section = nextH3 === -1 ? after : after.slice(0, nextH3);
+  // Build the same `{YYYY-MM-DD}-all` slug the `/d/{brief}/...` and
+  // `/m/{slug}` routes expect. Date is interpreted in WIB so a brief
+  // generated at 05:00 WIB lands on today's date in the URL.
+  const generatedAtDate = new Date(row.generated_at);
+  const wibIso = new Date(
+    generatedAtDate.getTime() + 7 * 60 * 60 * 1000,
+  )
+    .toISOString()
+    .slice(0, 10);
+  const briefSlug = `${wibIso}-all`;
 
-  // Strip leading whitespace, skip pre-amble like "(3450-4800 kata)" if
-  // it slipped through, then walk forward collecting prose until ~220 words.
-  const lines = section
-    .split("\n")
-    .map((l) => l.trim())
-    .filter(
-      (l) =>
-        l.length > 0 &&
-        !l.startsWith("(") && // word-count parenthetical
-        !l.startsWith("**KHUTBAH"), // mukadimah header
-    );
-
-  const words: string[] = [];
-  for (const line of lines) {
-    if (words.length >= 220) break;
-    // Skip lines that look like Arabic ayat — they'd dominate the excerpt
-    // visually and most desktop fonts won't render them well at body size.
-    if (/^[؀-ۿ\s]+$/.test(line)) continue;
-    words.push(...line.split(/\s+/));
+  const kits: KitDeliverable[] = [];
+  for (const def of KIT_DEFS) {
+    const section = extractH3Block(md, def.matcher);
+    if (!section) continue;
+    const excerpt = buildExcerpt(section, 110);
+    const wordCount = section.split(/\s+/).filter(Boolean).length;
+    const href =
+      def.slug === "genz"
+        ? `/m/${briefSlug}`
+        : `/d/${briefSlug}/${def.slug}`;
+    kits.push({
+      slug: def.slug,
+      title: def.title,
+      excerpt,
+      href,
+      wordCount,
+    });
   }
-  const excerpt = words.slice(0, 220).join(" ") + (words.length > 220 ? "…" : "");
+
+  // Mahasiswa section also carries the "Poster Question" we surface as
+  // the campus-poster artifact. The poster preview shares the /m/{slug}
+  // page (no separate route).
+  const mahasiswaSection = extractH3Block(md, /mahasiswa|university\s+student|gen[\s-]?z/i);
+  const posterQuestion =
+    mahasiswaSection
+      ?.match(/\*\*Poster Question:\*\*\s*"?([^"\n]+?)"?\s*$/m)?.[1]
+      ?.trim() ?? null;
+  const posterHref = posterQuestion ? `/m/${briefSlug}` : null;
+
+  const flyers = extractFlyers(md);
 
   return {
-    briefId: row.id,
+    briefSlug,
     generatedAt: row.generated_at,
-    excerpt,
-    wordCount: words.length,
+    kits,
+    posterQuestion,
+    posterHref,
+    flyers,
   };
 }
 
@@ -902,4 +1055,294 @@ export async function getSentimentTrend7d(): Promise<SentimentTrendPoint[]> {
       posPct: safeTotal > 0 ? (Number(r.pos) / safeTotal) * 100 : 0,
     };
   });
+}
+
+/* ─────────────────────────────────────────────────────────────
+ * Active discussion rooms — rooms where THIS user has commented
+ * in the last N days
+ * ───────────────────────────────────────────────────────────── */
+
+export type ActiveRoom = {
+  briefingSlug: string;
+  title: string | null;
+  myCommentCount: number;
+  totalApprovedCount: number;
+  lastInteractionAt: string;
+  /** Pre-computed days since last interaction (floor, capped at 0).
+   *  Server-side so the client doesn't need `Date.now()` in render —
+   *  React's purity rule flags impure calls inside components. Adequate
+   *  granularity for the "N days ago" label on the dashboard card. */
+  daysSinceLast: number;
+};
+
+/**
+ * Rooms (Mahasiswa discussion threads) the current visitor has posted
+ * an approved comment in within the last `days`. Identifies the
+ * visitor by `visitor_token_hash` — set on first comment via the
+ * `dl_visitor` cookie. Anonymous-by-design (no userId join needed),
+ * matches how the rest of the discussion system already works.
+ *
+ * Returns [] when the visitor has never commented OR the cookie has
+ * expired / been cleared. That's the correct empty state for the
+ * dashboard card.
+ *
+ * `title` is parsed from the briefing's Mahasiswa Poster Question via
+ * the same extractor used elsewhere — when the briefing predates the
+ * Poster format we fall back to the slug. Caller renders both.
+ */
+export async function getActiveDiscussionRooms(
+  visitorTokenHash: string | null,
+  days = 14,
+  limit = 6,
+): Promise<ActiveRoom[]> {
+  if (!visitorTokenHash) return [];
+
+  const rows = (await db.execute(sql`
+    WITH my_activity AS (
+      SELECT
+        briefing_slug,
+        COUNT(*)::int AS my_comments,
+        MAX(created_at) AS last_at
+      FROM mahasiswa_comments
+      WHERE visitor_token_hash = ${visitorTokenHash}
+        AND status = 'approved'
+        AND created_at >= now() - (${days} || ' days')::interval
+      GROUP BY briefing_slug
+    ),
+    totals AS (
+      SELECT briefing_slug, COUNT(*)::int AS total_approved
+      FROM mahasiswa_comments
+      WHERE status = 'approved'
+        AND briefing_slug IN (SELECT briefing_slug FROM my_activity)
+      GROUP BY briefing_slug
+    )
+    SELECT
+      m.briefing_slug,
+      m.my_comments,
+      COALESCE(t.total_approved, 0)::int AS total_approved,
+      m.last_at,
+      i.summary_md
+    FROM my_activity m
+    LEFT JOIN totals t ON t.briefing_slug = m.briefing_slug
+    LEFT JOIN LATERAL (
+      SELECT summary_md FROM insights_summaries
+      WHERE (
+        CASE
+          WHEN m.briefing_slug LIKE '%-all'
+            THEN segment IS NULL
+          ELSE segment = split_part(m.briefing_slug, '-', 4)
+        END
+      )
+      AND to_char(date_trunc('day', generated_at AT TIME ZONE 'Asia/Jakarta'),
+                  'YYYY-MM-DD')
+          = substring(m.briefing_slug FROM 1 FOR 10)
+      LIMIT 1
+    ) i ON TRUE
+    ORDER BY m.last_at DESC
+    LIMIT ${limit}
+  `)) as unknown as Array<{
+    briefing_slug: string;
+    my_comments: number;
+    total_approved: number;
+    last_at: string;
+    summary_md: string | null;
+  }>;
+
+  // Pin "now" once per query call; daysSinceLast on each row uses this
+  // single reference so all rows in the returned list are comparable
+  // even if assembling takes a few ms.
+  const now = Date.now();
+  return rows.map((r) => {
+    // Best-effort title: parse the Mahasiswa section's Poster Question
+    // ("**Poster Question:** "..."") if present; otherwise null and
+    // the UI falls back to the slug.
+    let title: string | null = null;
+    if (r.summary_md) {
+      const m = r.summary_md.match(
+        /\*\*Poster Question:\*\*\s*"?([^"\n]+?)"?\s*$/m,
+      );
+      if (m) title = m[1].trim();
+    }
+    const daysSinceLast = Math.max(
+      0,
+      Math.floor((now - new Date(r.last_at).getTime()) / 86400000),
+    );
+    return {
+      briefingSlug: r.briefing_slug,
+      title,
+      myCommentCount: Number(r.my_comments),
+      totalApprovedCount: Number(r.total_approved),
+      lastInteractionAt: r.last_at,
+      daysSinceLast,
+    };
+  });
+}
+
+/* ─────────────────────────────────────────────────────────────
+ * Kit segments — all 5 briefings parsed into H2 sections for the
+ * Kit-tab in-page tab switcher.
+ * ───────────────────────────────────────────────────────────── */
+
+export type SegmentKey = "all" | "spiritual" | "family" | "youth" | "justice";
+
+export type KitSegmentData = {
+  segment: SegmentKey;
+  briefSlug: string;
+  generatedAt: string;
+  /** Briefing H2 sections, raw markdown slices, render with ReactMarkdown
+   *  in the client tab. Strategi is exposed BOTH as raw markdown (in
+   *  case the operator wants prose view) AND as parsed `strategi` below
+   *  so the deliverable card grid + poster/flyer collapse can be
+   *  rendered without re-parsing client-side. */
+  sections: {
+    ringkasan: string;
+    numerik: string;
+    tema: string;
+    strategi: string;
+    dalil: string;
+  };
+  strategi: {
+    kits: KitDeliverable[];
+    posterQuestion: string | null;
+    posterHref: string | null;
+    flyers: FlyerMessage[];
+  };
+};
+
+/**
+ * Extract one H2-bounded section from a briefing's markdown by exact
+ * heading prefix. Returns the body INCLUDING any nested H3 children
+ * (so Strategi's 6 sub-sections come through as a single string the
+ * client can either re-parse or render whole).
+ */
+function extractH2Block(md: string, heading: string): string {
+  const marker = `## ${heading}`;
+  const start = md.indexOf(marker);
+  if (start === -1) return "";
+  const after = md.slice(start + marker.length);
+  const nextH2 = after.search(/\n## /);
+  return (nextH2 === -1 ? after : after.slice(0, nextH2)).trim();
+}
+
+const SEGMENT_HEADINGS = {
+  ringkasan: ["Ringkasan Eksekutif", "Executive Summary"],
+  numerik: [
+    "Numerik & Tren Pekan Ini",
+    "Numbers & Trends This Week",
+    "Numerik & Tren",
+  ],
+  tema: [
+    "Tema Utama & Pola Yang Muncul",
+    "Main Themes & Emerging Patterns",
+    "Tema Utama",
+  ],
+  strategi: ["Strategi & Aksi Dakwah", "Da'wah Strategies & Actions"],
+  dalil: ["Dalil & Sumber", "Daleel & Sources", "Daleel & Sumber"],
+} as const;
+
+function pickSection(md: string, candidates: readonly string[]): string {
+  for (const c of candidates) {
+    const v = extractH2Block(md, c);
+    if (v) return v;
+  }
+  return "";
+}
+
+/**
+ * Load all 5 latest briefings (one per segment) and structure each into
+ * the 5 H2 sections + the parsed Strategi block for the kit-card grid.
+ * Ordered all → spiritual → family → youth → justice so the segment
+ * tabs render in a predictable left-to-right sequence.
+ */
+export async function getKitSegments(): Promise<KitSegmentData[]> {
+  const rows = (await db.execute(sql`
+    SELECT DISTINCT ON (COALESCE(segment, 'all'))
+      COALESCE(segment, 'all') AS segment,
+      id::text AS id,
+      generated_at,
+      summary_md
+    FROM insights_summaries
+    WHERE summary_md IS NOT NULL
+    ORDER BY COALESCE(segment, 'all'), generated_at DESC
+  `)) as unknown as Array<{
+    segment: string;
+    id: string;
+    generated_at: string;
+    summary_md: string;
+  }>;
+
+  const order: SegmentKey[] = ["all", "spiritual", "family", "youth", "justice"];
+  const bySeg = new Map(rows.map((r) => [r.segment, r]));
+  const out: KitSegmentData[] = [];
+
+  for (const seg of order) {
+    const row = bySeg.get(seg);
+    if (!row) continue;
+    const md = row.summary_md;
+
+    // Slug for the deliverable + Mahasiswa URLs. Date interpreted in WIB
+    // so a brief generated at 05:00 WIB lands on the local-calendar day.
+    const generatedAtDate = new Date(row.generated_at);
+    const wibIso = new Date(
+      generatedAtDate.getTime() + 7 * 60 * 60 * 1000,
+    )
+      .toISOString()
+      .slice(0, 10);
+    const segSuffix = seg === "all" ? "all" : seg;
+    const briefSlug = `${wibIso}-${segSuffix}`;
+
+    // H2 section slices — raw markdown so the client can ReactMarkdown
+    // them (or use a custom renderer for Strategi).
+    const sections = {
+      ringkasan: pickSection(md, SEGMENT_HEADINGS.ringkasan),
+      numerik: pickSection(md, SEGMENT_HEADINGS.numerik),
+      tema: pickSection(md, SEGMENT_HEADINGS.tema),
+      strategi: pickSection(md, SEGMENT_HEADINGS.strategi),
+      dalil: pickSection(md, SEGMENT_HEADINGS.dalil),
+    };
+
+    // Parse Strategi into the kit-card structure + posters + flyers.
+    // Reuses the same helpers as `getOverallViewKits` so the UX is
+    // consistent across segments.
+    const kits: KitDeliverable[] = [];
+    for (const def of KIT_DEFS) {
+      const section = extractH3Block(md, def.matcher);
+      if (!section) continue;
+      const excerpt = buildExcerpt(section, 110);
+      const wordCount = section.split(/\s+/).filter(Boolean).length;
+      const href =
+        def.slug === "genz"
+          ? `/m/${briefSlug}`
+          : `/d/${briefSlug}/${def.slug}`;
+      kits.push({
+        slug: def.slug,
+        title: def.title,
+        excerpt,
+        href,
+        wordCount,
+      });
+    }
+
+    const mahasiswaSection = extractH3Block(
+      md,
+      /mahasiswa|university\s+student|gen[\s-]?z/i,
+    );
+    const posterQuestion =
+      mahasiswaSection
+        ?.match(/\*\*Poster Question:\*\*\s*"?([^"\n]+?)"?\s*$/m)?.[1]
+        ?.trim() ?? null;
+    const posterHref = posterQuestion ? `/m/${briefSlug}` : null;
+
+    const flyers = extractFlyers(md);
+
+    out.push({
+      segment: seg,
+      briefSlug,
+      generatedAt: row.generated_at,
+      sections,
+      strategi: { kits, posterQuestion, posterHref, flyers },
+    });
+  }
+
+  return out;
 }

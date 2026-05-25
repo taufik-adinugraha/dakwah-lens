@@ -5,6 +5,7 @@ import { eq, inArray } from "drizzle-orm";
 
 import { db, schema } from "@/db";
 import { logAdminAction } from "@/lib/admin-log";
+import { setFlash } from "@/lib/flash";
 import {
   deleteAttachment,
   writeAttachment,
@@ -268,6 +269,9 @@ export async function addYoutubeChannel(formData: FormData) {
       targetId: inserted.id,
       payload: { channel_id: channelId, name, category },
     });
+    await setFlash("success", `Added · ${name}`);
+  } else {
+    await setFlash("info", `Already in list · ${name}`);
   }
   revalidatePath("/admin/system/youtube-channels");
 }
@@ -295,6 +299,10 @@ export async function toggleYoutubeChannel(formData: FormData) {
     targetId: id,
     payload: { name: row.name, enabled: newEnabled },
   });
+  await setFlash(
+    "success",
+    `${newEnabled ? "Enabled" : "Disabled"} · ${row.name}`,
+  );
   revalidatePath("/admin/system/youtube-channels");
 }
 
@@ -321,6 +329,7 @@ export async function updateYoutubeChannelCategory(formData: FormData) {
     targetId: id,
     payload: { name: row.name, category: rawCategory },
   });
+  await setFlash("success", `Moved to ${rawCategory} · ${row.name}`);
   revalidatePath("/admin/system/youtube-channels");
 }
 
@@ -347,6 +356,7 @@ export async function deleteYoutubeChannel(formData: FormData) {
     targetId: id,
     payload: { name: row.name, channel_id: row.channelId },
   });
+  await setFlash("success", `Removed · ${row.name}`);
   revalidatePath("/admin/system/youtube-channels");
 }
 
@@ -729,6 +739,7 @@ export async function addManualCost(formData: FormData) {
       },
     });
   }
+  await setFlash("success", `Saved · ${vendor} Rp ${amount.toLocaleString("id-ID")}`);
   revalidatePath("/admin/system/costs");
   revalidatePath("/admin/system");
 }
@@ -820,6 +831,7 @@ export async function updateManualCost(formData: FormData) {
       },
     },
   });
+  await setFlash("success", `Updated · ${vendor} Rp ${amount.toLocaleString("id-ID")}`);
   revalidatePath("/admin/system/costs");
   revalidatePath("/admin/system/api-costs");
   revalidatePath("/admin/system");
@@ -861,6 +873,7 @@ export async function deleteManualCost(formData: FormData) {
       covers_provider: row.coversProvider,
     },
   });
+  await setFlash("success", `Deleted · ${row.vendor} entry`);
   revalidatePath("/admin/system/costs");
 }
 
@@ -1039,6 +1052,10 @@ export async function setCommentStatus(formData: FormData) {
       new_status: status,
     },
   });
+  await setFlash(
+    "success",
+    `Comment ${status === "approved" ? "approved" : "blocked"} · ${row.displayName}`,
+  );
   revalidatePath("/admin/system/discussion");
   revalidatePath("/admin/system");
   revalidatePath(`/m/${row.briefingSlug}`);
@@ -1091,6 +1108,7 @@ export async function deleteComment(formData: FormData) {
       prior_status: row.status,
     },
   });
+  await setFlash("success", `Comment deleted · ${row.displayName}`);
   revalidatePath("/admin/system/discussion");
   revalidatePath("/admin/system");
   revalidatePath(`/m/${row.briefingSlug}`);

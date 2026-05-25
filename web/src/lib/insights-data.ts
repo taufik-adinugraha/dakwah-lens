@@ -337,7 +337,7 @@ export async function getPlatformInsights(
 }
 
 /* ──────────────────────────────────────────────────────────────────
- * Cross-platform overview used by the public `/insights` landing.
+ * Overall-View overview used by the public `/insights` landing.
  *
  * Same shape ideas as the per-platform queries but aggregated over
  * every platform with no scope filter. Returns `null` when the
@@ -416,7 +416,7 @@ export type LatestInsightsSummary = {
 };
 
 /** Most-recent AI-narrated executive briefing for a given segment.
- *  `segment` = null returns the all-platform briefing. Returns null
+ *  `segment` = null returns the overall-view briefing. Returns null
  *  when no row exists yet (briefing job hasn't fired). */
 export async function getLatestInsightsSummary(
   segment: string | null = null,
@@ -593,7 +593,7 @@ export async function getBriefingBySlug(
  * Falls back to returning the whole body if no second H2 exists (old
  * 3-paragraph rows from before the 2026-05-21 long-form migration).
  *
- * Used by the /insights all-platform hero AND each /insights/segment/
+ * Used by the /insights overall-view hero AND each /insights/segment/
  * [focus] page to render only the executive summary + a CTA to the
  * standalone /insights/brief/[id] view.
  */

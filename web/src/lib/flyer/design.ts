@@ -100,7 +100,7 @@ export const DELIVERABLE_PALETTE: Record<
 };
 
 /** Per-segment palette for the MAIN brief flyer (no specific deliverable).
- *  Tones picked so each segment is visually distinct + the "all-platform"
+ *  Tones picked so each segment is visually distinct + the "overall-view"
  *  flyer uses the emerald brand color. */
 export const SEGMENT_PALETTE: Record<
   SegmentSlug,

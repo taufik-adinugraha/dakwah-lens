@@ -237,7 +237,7 @@ export default async function SegmentPage({
       {/* Per-segment AI briefing — preview only (Section 1 + daleel
           chips + CTA). The full long-form briefing lives on
           /insights/brief/[slug]; this card mirrors the /insights
-          all-platform hero so both surfaces use the same
+          overall-view hero so both surfaces use the same
           scannable-preview-plus-CTA shape. */}
       {segmentBriefing && (() => {
         const briefingBody =
@@ -281,7 +281,7 @@ export default async function SegmentPage({
                 </Link>
 
                 {/* Segment-filtered headline pills — same shape as the
-                    all-platform hero, but the underlying stats are scoped
+                    overall-view hero, but the underlying stats are scoped
                     to this segment's category set. */}
                 <InsightsHeadlinePills
                   stats={segmentBriefing.headlineStats}
