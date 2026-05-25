@@ -3,7 +3,6 @@ import { getLocale, getTranslations } from "next-intl/server";
 
 import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
-import { marketingSectionLink } from "@/lib/marketing-href";
 import { Logo } from "./Logo";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import { MobileNav } from "./MobileNav";
@@ -16,10 +15,6 @@ export async function Header() {
     getLocale(),
   ]);
   const user = session?.user;
-  const sectionLink = marketingSectionLink(
-    user?.status === "approved",
-    locale,
-  );
 
   // Briefs library is gated to admin only while the feature is
   // experimental (per the briefs admin-gate in commit 39ef38a). The
@@ -29,25 +24,23 @@ export async function Header() {
   const isAdmin =
     user?.role === "admin" || user?.role === "superadmin";
 
-  // Mobile-menu items mirror the desktop nav. Plain `<a>` everywhere
-  // (sectionLink already returns locale-prefixed absolute URLs; we
-  // build the same shape for the routed pages) so the browser does
-  // full nav + native hash scroll consistently — matches the same
-  // pattern the desktop hash links use to avoid Next.js App Router's
-  // cross-page hash-scroll quirk.
+  // Mobile-menu items mirror the desktop nav. Plain `<a>` with
+  // locale-prefixed paths matches the routed-page shape consistently.
   // Insights is the primary product surface (5 weekly briefings) — call
   // it out with the "insights" tone so MobileNav renders it as an
   // emerald-tinted CTA, and the desktop nav matches with a pill-style
   // link below.
   const mobileItems = [
     { href: `/${locale}`, label: t("home") },
+    ...(user
+      ? [{ href: `/${locale}/dashboard`, label: t("dashboard") }]
+      : []),
     { href: `/${locale}/insights`, label: t("insights") },
     { href: `/${locale}/discussions`, label: t("discussions") },
     { href: `/${locale}/kitab`, label: t("kitab") },
     ...(isAdmin
       ? [{ href: `/${locale}/briefs/public`, label: t("briefs_library") }]
       : []),
-    { href: sectionLink("#donate"), label: t("donate") },
   ];
 
   return (
@@ -82,6 +75,14 @@ export async function Header() {
           </Link>
 
           <nav className="hidden items-center gap-7 text-sm font-medium text-slate-600 md:flex">
+            {user && (
+              <Link
+                href="/dashboard"
+                className="hover:text-slate-900 transition"
+              >
+                {t("dashboard")}
+              </Link>
+            )}
             <Link href="/insights" className="hover:text-slate-900 transition">
               {t("insights")}
             </Link>
@@ -102,12 +103,6 @@ export async function Header() {
                 {t("briefs_library")}
               </Link>
             )}
-            <a
-              href={sectionLink("#donate")}
-              className="hover:text-slate-900 transition"
-            >
-              {t("donate")}
-            </a>
           </nav>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
