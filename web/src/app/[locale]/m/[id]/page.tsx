@@ -160,7 +160,7 @@ export default async function MahasiswaArticlePage({ params }: Props) {
         qa={m.qa}
         palette={palette}
         qaLabel={
-          locale === "en" ? "Honest Pushback" : "Pertanyaan Sulit"
+          locale === "en" ? "Honest Pushback" : "Pertanyaan"
         }
       />
 

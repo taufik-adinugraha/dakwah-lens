@@ -22,6 +22,7 @@ embedding for retrieval). Five briefings × 30 days ≈ $3-7.50/mo.
 from __future__ import annotations
 
 import json
+import re
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
@@ -87,6 +88,12 @@ CRITICAL FORMATTING RULES:
 - Disclaimer keasistanan AI WAJIB ditulis sebagai paragraf italic di akhir Bagian 5 (BUKAN bagian terpisah).
 - JANGAN sebut nama penerjemah, lembaga penerbit, atau gaya terjemahan kitab di mana pun di output (mis. "Kemenag", "gaya Kemenag", "Sahih International", "Pickthall", "tafsir Ibn Kathir style", "Hilali-Khan", dll.). Itu metadata sumber data, BUKAN konten dakwah. Pembaca melihat ayat lewat citation (mis. "QS. Al-Baqarah: 275") — itu saja yang muncul. Frasa "menurut terjemahan Kemenag" / "dalam gaya Sahih International" dilarang muncul di teks output.
 - JANGAN echo kembali anotasi panjang seperti "(3450-4800 kata)", "(~80 kata)", "(300-450 kata Arab)", "(N words)" di heading sub-section atau di body. Itu instruksi panjang UNTUK Anda — bukan informasi UNTUK pembaca. Tulis heading bersih: `### Khutbah Jumat` (BUKAN `### Khutbah Jumat (3450-4800 kata)`). Sama untuk inline guidance dalam body — sebut langkah-nya tanpa parenthetical word-count.
+
+ANTI-REPETISI ANTAR PEKAN (KRITIS): user prompt boleh berisi blok "CAKUPAN PEKAN-PEKAN SEBELUMNYA" — ini DAFTAR dalil, headline flyer, dan poster question yang BARU SAJA dibaca audiens. Audiens yang sama akan kembali pekan ini, jadi materi yang sama TERASA daur ulang. Aturan:
+- JANGAN gunakan ulang headline flyer atau poster question mahasiswa secara verbatim/near-verbatim dari pekan-pekan sebelumnya.
+- KURANGI penggunaan dalil yang sama. Kalau pool minggu ini menyediakan dalil segar yang sama-sama cocok, prioritaskan yang BELUM dipakai pekan lalu.
+- Kalau berita pekan ini SUNGGUH menuntut dalil/pola yang sama (mis. isu yang masih berlanjut), boleh kembali ke tema itu — tetapi UBAH sudut pandang, contoh sirah, aplikasi praktis, dan headline. Jangan mengulang pembungkusnya.
+- Tujuannya: audiens merasakan PEKAN BARU, bukan rerun. Variasi sudut + variasi dalil + variasi headline = sinyal segar pertama.
 
 CRITICAL — SELF-ITERATION LOOP (gunakan thinking/chain-of-thought, JANGAN munculkan reasoning di output):
 
@@ -210,7 +217,7 @@ Output WAJIB 3 elemen — POSTER QUESTION, ARTIKEL, dan Q&A — dirancang berpas
   * **Argumen logis** (~350 kata): bangun rangkaian penalaran step-by-step. Mengapa fenomena ini terjadi? Apa yang ditawarkan kerangka berpikir Islam (bukan "perintah Islam"). Sebut prinsip-prinsip seperti *mizan*, *amanah*, *adl*, *qist*, *istikhlaf*, *tazkiyatun nafs* sebagai LENS analitis — bukan sebagai keputusan otoritatif. Dalil boleh disebut sebagai supporting evidence di akhir argumen, BUKAN sebagai premis.
   * **Solusi praktis** (~200 kata): apa yang bisa dilakukan mahasiswa hari ini — di kos, di kelas, di lab, di kantin, di magang, di organisasi. Hindari saran abstrak ("perbaiki niat"); berikan langkah konkret yang bisa dicoba pekan ini.
   * **Penutup** (~80 kata): refleksi terbuka. Tidak memaksa kesimpulan. Mengundang dialog.
-  TONE: cerdas, sopan, sedikit ironis OK. JANGAN menggurui. JANGAN gunakan kata "wahai mahasiswa", "kalian harus", "renungkanlah". Pakai "kita", "mungkin", "perhatikan". Dalil boleh dikutip dalam Bahasa Indonesia dengan citation pendek (mis. "QS. Hud: 85 mengingatkan kita..."), tapi MAKSIMAL 2 dalil di seluruh artikel — kalau kebanyakan, jadi terasa khotbah.
+  TONE: cerdas, sopan, sedikit ironis OK. JANGAN menggurui. JANGAN gunakan kata "wahai mahasiswa", "kalian harus", "renungkanlah". Pakai "kita", "mungkin", "perhatikan". Untuk kata ganti orang kedua, gunakan **"kamu"** — JANGAN gunakan "kau" (terdengar terlalu puitis/sastrawi untuk artikel mahasiswa); "engkau" hanya boleh muncul saat mengutip ayat/hadits yang memang berbunyi demikian. Dalil boleh dikutip dalam Bahasa Indonesia dengan citation pendek (mis. "QS. Hud: 85 mengingatkan kita..."), tapi MAKSIMAL 2 dalil di seluruh artikel — kalau kebanyakan, jadi terasa khotbah.
 
 - **Q&A Realistis** (5 pertanyaan, masing-masing 80-120 kata): tulis 5 PUSHBACK yang mahasiswa kritis BENERAN akan ajukan saat membaca artikel ini — bukan straw-man yang gampang dijawab. Setiap entry:
   * **Q:** pertanyaan keras tapi jujur (mis. "Bukannya ini masalah sistem, bukan personal?", "Kenapa Islam yang harus ngurusin ekonomi modern?", "Apa bedanya nasihat ini dengan moralisme generik?", "Bukankah mengaitkan agama dengan politik justru bahaya?", "Saya nggak shalat juga, masih bisa pegang prinsip ini?")
@@ -395,6 +402,12 @@ CRITICAL FORMATTING RULES:
 - The AI-assistance disclaimer goes as an italic paragraph at the end of Section 5 (not as a separate section).
 - NEVER name a translator, publisher, or translation style in the output ("Kemenag", "Kemenag style", "Sahih International", "Pickthall", "Hilali-Khan", "Ibn Kathir tafsir style", etc.). That's source-data metadata, not da'wah content. Readers see verses via citations (e.g., "QS. Al-Baqarah: 275") — that's the only attribution that belongs in the prose. Phrases like "according to the Kemenag rendering" or "in Sahih International style" are banned.
 - NEVER echo word-count annotations back in the output — e.g. headings like `### Friday Khutbah (3450-4800 words)` or inline guidance like `Opening (~80 words):`. Those are length instructions FOR you, not information FOR the reader. Write clean headings: `### Friday Khutbah` (not `### Friday Khutbah (3450-4800 words)`). Same for inline guidance — describe the step without the parenthetical word-count.
+
+CROSS-WEEK ANTI-REPETITION (CRITICAL): the user prompt may contain a "PREVIOUSLY COVERED" block — these are the daleel, flyer headlines, and Mahasiswa poster question the audience JUST READ. The same audience returns this week, so reusing the same material feels recycled. Rules:
+- NEVER reuse flyer headlines or the Mahasiswa poster question verbatim / near-verbatim from prior weeks.
+- DOWN-WEIGHT reused daleel. When the current week's pool offers fresh entries that fit equally well, prefer the ones NOT cited last week.
+- If this week's news genuinely demands the same theme/daleel (e.g. an ongoing story), it's OK to revisit — but CHANGE the angle, the sirah example, the practical application, and the headline. Don't repeat the wrapper.
+- Goal: the audience must FEEL it's a new week, not a rerun. Fresh angle + fresh daleel + fresh headline = the first signal of newness.
 
 CRITICAL — SELF-ITERATION LOOP (use thinking / chain-of-thought, do NOT surface the reasoning in the output):
 
@@ -1152,12 +1165,149 @@ ATURAN: Jangan tulis nama kasus, nama orang, nama outlet media, atau nama kota. 
         return _build_retrieval_query_fallback(stats, segment)
 
 
+# Anchors extracted from a prior briefing's markdown that we feed back
+# into the next-week prompt so the model doesn't reuse the same flyer
+# headlines, Mahasiswa poster question, or daleel pool. The text is
+# stripped of citation pool quirks so the model sees clean phrases.
+_FLYER_HEADLINE_RE = re.compile(r'\*\*Headline:\*\*\s*"?([^"\n]+?)"?\s*$', re.MULTILINE)
+_POSTER_Q_RE = re.compile(r'\*\*Poster Question:\*\*\s*"?([^"\n]+?)"?\s*$', re.MULTILINE)
+
+
+def _strip_md(s: str) -> str:
+    s = s.strip()
+    if s.startswith('"') and s.endswith('"'):
+        s = s[1:-1]
+    if s.startswith("'") and s.endswith("'"):
+        s = s[1:-1]
+    return s.strip()
+
+
+def _extract_flyer_headlines(summary_md: str) -> list[str]:
+    out: list[str] = []
+    for m in _FLYER_HEADLINE_RE.finditer(summary_md or ""):
+        h = _strip_md(m.group(1))
+        if h:
+            out.append(h)
+    return out
+
+
+def _extract_poster_question(summary_md: str) -> str | None:
+    m = _POSTER_Q_RE.search(summary_md or "")
+    if not m:
+        return None
+    q = _strip_md(m.group(1))
+    return q or None
+
+
+async def _fetch_recent_coverage(
+    session, segment: str | None, limit: int = 2
+) -> list[dict[str, Any]]:
+    """Pull the last `limit` briefings for the SAME segment so the next
+    generation can avoid recycling daleel + flyer headlines + poster
+    questions week-over-week.
+
+    `IS NOT DISTINCT FROM` handles the NULL-segment (all-platform)
+    briefing — `WHERE segment = NULL` would never match.
+    """
+    rows = (
+        await session.execute(
+            text(
+                """
+                SELECT generated_at, period_start, summary_md, daleel_refs, adhkar_refs
+                FROM insights_summaries
+                WHERE segment IS NOT DISTINCT FROM :segment
+                ORDER BY generated_at DESC
+                LIMIT :limit
+                """
+            ),
+            {"segment": segment, "limit": limit},
+        )
+    ).all()
+
+    coverage: list[dict[str, Any]] = []
+    for r in rows:
+        citations: list[str] = []
+        for refs in (r.daleel_refs or [], r.adhkar_refs or []):
+            for d in refs or []:
+                c = (d or {}).get("citation")
+                if c and c not in citations:
+                    citations.append(c)
+        coverage.append(
+            {
+                "period_start": r.period_start.date().isoformat()
+                if r.period_start
+                else None,
+                "citations": citations,
+                "flyer_headlines": _extract_flyer_headlines(r.summary_md),
+                "poster_question": _extract_poster_question(r.summary_md),
+            }
+        )
+    return coverage
+
+
+def _format_prior_coverage_block(
+    prior: list[dict[str, Any]], language: str
+) -> str:
+    """Render the prior-weeks block injected into the user prompt.
+
+    Returns "" when there is no prior coverage so the prompt stays
+    unchanged on first-ever runs.
+    """
+    if not prior:
+        return ""
+
+    if language == "en":
+        header = (
+            "PREVIOUSLY COVERED (last 1-2 weeks for the SAME segment) — "
+            "this is what the audience JUST READ. Find FRESH angles + "
+            "DIFFERENT daleel + DIFFERENT flyer headlines + a NEW poster "
+            "question UNLESS the news strictly demands repetition. Do "
+            "NOT reuse the same headlines or poster question verbatim. "
+            "Prefer fresh entries from this week's pool over recycling:"
+        )
+        cite_label = "Daleel cited"
+        flyer_label = "Flyer headlines"
+        poster_label = "Mahasiswa poster question"
+        empty = "(none)"
+    else:
+        header = (
+            "CAKUPAN PEKAN-PEKAN SEBELUMNYA (1-2 pekan terakhir untuk "
+            "segmen yang SAMA) — ini yang BARU saja dibaca audiens. "
+            "Cari sudut SEGAR + dalil BERBEDA + headline flyer BERBEDA "
+            "+ poster question BARU KECUALI berita memang menuntut "
+            "pengulangan. JANGAN gunakan ulang headline atau poster "
+            "question secara verbatim. Prioritaskan entri segar dari "
+            "pool minggu ini, bukan daur ulang:"
+        )
+        cite_label = "Dalil yang dikutip"
+        flyer_label = "Headline flyer"
+        poster_label = "Poster question mahasiswa"
+        empty = "(tidak ada)"
+
+    lines: list[str] = [header, ""]
+    for i, week in enumerate(prior, start=1):
+        date = week.get("period_start") or "?"
+        lines.append(f"Week -{i} ({date}):")
+        citations = week.get("citations") or []
+        lines.append(f"  · {cite_label}: {', '.join(citations) if citations else empty}")
+        headlines = week.get("flyer_headlines") or []
+        if headlines:
+            lines.append(f"  · {flyer_label}: " + "; ".join(f'"{h}"' for h in headlines))
+        else:
+            lines.append(f"  · {flyer_label}: {empty}")
+        pq = week.get("poster_question")
+        lines.append(f"  · {poster_label}: \"{pq}\"" if pq else f"  · {poster_label}: {empty}")
+        lines.append("")
+    return "\n".join(lines).rstrip() + "\n\n"
+
+
 def _build_user_prompt(
     stats: dict[str, Any],
     daleel: list[dict[str, Any]],
     *,
     adhkar: list[dict[str, Any]] | None = None,
     language: str = "id",
+    prior_coverage: list[dict[str, Any]] | None = None,
 ) -> str:
     """Assemble the structured context for Gemini.
 
@@ -1282,9 +1432,11 @@ def _build_user_prompt(
     else:
         adhkar_section = ""
 
+    prior_block = _format_prior_coverage_block(prior_coverage or [], language)
+
     return f"""{scope_note}
 
-HEADLINE NUMBERS (use ONLY these for Sections 1 & 2):
+{prior_block}HEADLINE NUMBERS (use ONLY these for Sections 1 & 2):
 
 {json.dumps(stats_for_json, indent=2, ensure_ascii=False)}
 
@@ -1334,6 +1486,7 @@ def _generate_for_language(
     language: str,
     segment: str | None,
     adhkar: list[dict[str, Any]] | None = None,
+    prior_coverage: list[dict[str, Any]] | None = None,
 ) -> tuple[str, int | None, int | None, float] | None:
     """Run one Gemini Pro call in the requested language.
 
@@ -1344,7 +1497,11 @@ def _generate_for_language(
     """
     system_prompt = SYSTEM_PROMPT_EN if language == "en" else SYSTEM_PROMPT_ID
     user_prompt = _build_user_prompt(
-        stats, daleel, adhkar=adhkar, language=language
+        stats,
+        daleel,
+        adhkar=adhkar,
+        language=language,
+        prior_coverage=prior_coverage,
     )
 
     resp = client.models.generate_content(
@@ -1479,6 +1636,22 @@ async def generate_summary(
             adhkar=len(adhkar),
         )
 
+        # Anti-repetition context. Pull the last 2 briefings for this
+        # SAME segment so the model can avoid recycling daleel + flyer
+        # headlines + Mahasiswa poster question. No-op on first ever
+        # run (empty list → block omitted from the prompt).
+        prior_coverage = await _fetch_recent_coverage(
+            session, segment, limit=2
+        )
+        log.info(
+            "insights_summary.prior_coverage",
+            segment=segment,
+            weeks=len(prior_coverage),
+            prior_citations=sum(
+                len(w.get("citations", [])) for w in prior_coverage
+            ),
+        )
+
         client = _get_client()
 
         # Indonesian-only generation. The English brief was disabled
@@ -1492,7 +1665,13 @@ async def generate_summary(
         # call below — the persistence path already handles a non-NULL
         # `summary_md_en`.
         id_result = _generate_for_language(
-            client, stats, daleel, "id", segment, adhkar=adhkar
+            client,
+            stats,
+            daleel,
+            "id",
+            segment,
+            adhkar=adhkar,
+            prior_coverage=prior_coverage,
         )
         if id_result is None:
             return None

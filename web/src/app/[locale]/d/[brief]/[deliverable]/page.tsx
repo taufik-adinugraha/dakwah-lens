@@ -186,7 +186,7 @@ export default async function DeliverablePage({ params }: Props) {
           article={mahasiswa.article}
           qa={mahasiswa.qa}
           palette={palette}
-          qaLabel={locale === "en" ? "Honest Pushback" : "Pertanyaan Sulit"}
+          qaLabel={locale === "en" ? "Honest Pushback" : "Pertanyaan"}
         />
       ) : (
         <DeliverableBody markdown={section.body} palette={palette} />
