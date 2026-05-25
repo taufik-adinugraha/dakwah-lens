@@ -292,8 +292,13 @@ def trending_ingest() -> dict[str, object]:
 
 
 @celery_app.task(name="api.workers.ingest.recluster_all")
-def recluster_all() -> dict[str, int]:
-    """Re-run Gemini topic discovery on every platform that has enough posts.
+def recluster_all(platforms: list[str] | None = None) -> dict[str, int]:
+    """Re-run Gemini topic discovery on the requested platforms.
+
+    `platforms=None` clusters every platform that has posts (legacy
+    behavior). Pass an explicit list to scope the run — used by beat
+    to split daily-ingest platforms (RSS, YT) from weekly-ingest X,
+    so we don't re-cluster the same X corpus 6 days in a row.
 
     Idempotent — each run truncates the platform's topics and writes
     fresh ones from the most recent corpus.
@@ -301,7 +306,8 @@ def recluster_all() -> dict[str, int]:
 
     async def _runner() -> dict[str, int]:
         out: dict[str, int] = {}
-        for platform in await cluster_topics._list_platforms_with_data():
+        targets = platforms or await cluster_topics._list_platforms_with_data()
+        for platform in targets:
             run_id = await ingest_runs.start_run(
                 task_name="recluster_all", platform=platform
             )

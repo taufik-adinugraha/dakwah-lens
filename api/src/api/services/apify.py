@@ -169,7 +169,12 @@ def scrape(
 # ── Per-platform convenience wrappers ───────────────────────────────
 
 
-def scrape_x(query: str, *, max_items: int = 50) -> ScrapeResult:
+def scrape_x(
+    query: str,
+    *,
+    max_items: int = 50,
+    since_days: int = 7,
+) -> ScrapeResult:
     """Search X (Twitter) for tweets matching `query`.
 
     `query` accepts hashtags (`#islam`), keywords, or X's full search syntax
@@ -179,9 +184,22 @@ def scrape_x(query: str, *, max_items: int = 50) -> ScrapeResult:
     "Latest". For a da'wah-audience-intelligence product, engagement is the
     relevant signal — what's resonating, not just what was posted most
     recently. Trade-off: we may miss low-engagement fresh posts that haven't
-    accrued likes/retweets yet. Acceptable at our weekly-ish per-keyword
-    cadence; bumps to dual-mode if needed later.
+    accrued likes/retweets yet.
+
+    `since_days` constrains the actor to tweets posted in the last N days.
+    Combined with the weekly-cron cadence (Wed 22:00 WIB), this gives a
+    near-zero overlap fetch — Apify charges per item RETURNED, so without
+    a time bound we'd pay for the same engagement-sticky top tweets every
+    run. Set to 7 by default to match the briefing's 7-day window; bump
+    higher if a future run needs a wider corpus. `apidojo/tweet-scraper`
+    accepts ISO date strings via `start`/`end` and translates them to X's
+    `since:`/`until:` search operators server-side.
     """
+    from datetime import UTC, datetime, timedelta
+
+    start = (datetime.now(UTC) - timedelta(days=since_days)).strftime(
+        "%Y-%m-%d"
+    )
     return scrape(
         platform="x",
         run_input={
@@ -190,6 +208,7 @@ def scrape_x(query: str, *, max_items: int = 50) -> ScrapeResult:
             "sort": "Top",
             "tweetLanguage": "id",
             "onlyVerifiedUsers": False,
+            "start": start,
         },
         max_items=max_items,
     )

@@ -120,21 +120,17 @@ celery_app.conf.update(
         #     "schedule": crontab(minute=0, hour=0),
         #     "kwargs": {"limit": 50},
         # },
-        # "ingest-x-mon": {
-        #     "task": "api.workers.ingest.rotating_ingest",
-        #     "schedule": crontab(minute=10, hour=0, day_of_week=1),
-        #     "kwargs": {"platform": "x", "limit": 20, "n_keywords": 999},
-        # },
-        # "ingest-x-wed": {
-        #     "task": "api.workers.ingest.rotating_ingest",
-        #     "schedule": crontab(minute=10, hour=0, day_of_week=3),
-        #     "kwargs": {"platform": "x", "limit": 20, "n_keywords": 999},
-        # },
-        # "ingest-x-fri": {
-        #     "task": "api.workers.ingest.rotating_ingest",
-        #     "schedule": crontab(minute=10, hour=0, day_of_week=5),
-        #     "kwargs": {"platform": "x", "limit": 20, "n_keywords": 999},
-        # },
+        # X — weekly Wed 22:00 WIB. Since briefings became weekly
+        # (Sun 05:00 WIB), 3× daily X fanouts were paying for the same
+        # engagement-sticky "Top" tweets multiple times. One weekly run
+        # with a 500-item cap and a 7d window via `since_days` lands
+        # ~5–10× more unique signal per dollar (cap is a ceiling — the
+        # actor returned 205 items for `korupsi` in smoke).
+        "ingest-x-weekly": {
+            "task": "api.workers.ingest.rotating_ingest",
+            "schedule": crontab(minute=0, hour=22, day_of_week=3),
+            "kwargs": {"platform": "x", "limit": 500, "n_keywords": 999},
+        },
         # "ingest-tiktok": {
         #     "task": "api.workers.ingest.rotating_ingest",
         #     "schedule": crontab(minute=20, hour=0, day_of_week=2),
@@ -145,15 +141,27 @@ celery_app.conf.update(
         #     "schedule": crontab(minute=30, hour=0, day_of_week=1),
         #     "kwargs": {"platform": "instagram", "limit": 20, "n_keywords": 999},
         # },
-        # Re-cluster topics nightly. 04:00 WIB — 1–2h after the daily
-        # X/YT/TT/IG fanouts finish (~02:00) so we have fresh data, but
-        # well before the workday so the public /insights page shows
-        # current themes. Was 08:00 WIB but that wasted 4 fresh-data
-        # hours of public visibility. The task handles "not enough
-        # posts" gracefully, so safe to fire even on quiet platforms.
-        "recluster-topics": {
+        # Re-cluster topics. Split across two beat entries to match the
+        # ingest cadence of each platform — re-running Gemini topic
+        # discovery on the same corpus does no work but still costs
+        # ~$0.05/platform/run, so we only re-cluster when there's fresh
+        # data to find themes in.
+        #
+        # Daily 04:00 WIB → RSS (every-2h ingest) and YouTube (daily
+        # ingest). 1–2h after RSS's 02:00 WIB tick gives fresh material;
+        # well before the workday so /insights shows current themes.
+        "recluster-daily": {
             "task": "api.workers.ingest.recluster_all",
             "schedule": crontab(minute=0, hour=4),
+            "kwargs": {"platforms": ["mainstream", "youtube"]},
+        },
+        # Thursday 04:00 WIB → X only, 6h after the Wed 22:00 WIB X
+        # ingest. Running daily would re-cluster the identical X corpus
+        # 6 days a week for no new signal.
+        "recluster-x-weekly": {
+            "task": "api.workers.ingest.recluster_all",
+            "schedule": crontab(minute=0, hour=4, day_of_week=4),
+            "kwargs": {"platforms": ["x"]},
         },
         # Insights briefing generation — PAUSED 2026-05-23 for cost.
         #

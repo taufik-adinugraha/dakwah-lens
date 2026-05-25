@@ -1470,7 +1470,7 @@ export async function getTopicDistribution7d(
       t.id::text AS id,
       t.label,
       t.platform,
-      COALESCE(t.keywords, '[]'::jsonb) AS keywords,
+      t.keywords AS keywords,
       count(sp.id)::int AS post_count,
       (SELECT n FROM total) AS corpus_total
     FROM topics t
