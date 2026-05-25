@@ -2,23 +2,19 @@
 
 import { useState } from "react";
 import {
-  ArrowRight,
   BookOpenCheck,
   Compass,
-  Flame,
   Layers,
-  Mic2,
   Sparkles,
   Users,
 } from "lucide-react";
 import ReactMarkdown, { type Components } from "react-markdown";
 
-import type {
-  KitDeliverable,
-  KitSegmentData,
-  FlyerMessage,
-  SegmentKey,
-} from "@/lib/dashboard-metrics";
+import { BriefDeliverableCards } from "@/components/BriefDeliverableCards";
+import { BriefFlyerSection } from "@/components/BriefFlyerSection";
+import { MahasiswaPosterCard } from "@/components/MahasiswaPosterCard";
+
+import type { KitSegmentData, SegmentKey } from "@/lib/dashboard-metrics";
 
 /**
  * Two-level tab switcher for the Dakwah Kit tab.
@@ -44,13 +40,31 @@ type Labels = {
   segments: Record<SegmentKey, string>;
   sections: Record<SectionKey, string>;
   empty: string;
-  kit_card_cta: string;
-  kit_card_words: string;
-  poster_flyer_title: string;
-  poster_flyer_subtitle_tpl: string;
-  poster_pill: string;
-  poster_cta: string;
-  flyer_label_tpl: string;
+  /** Labels for the briefings-style deliverable cards we reuse here.
+   *  Shape matches what `<BriefDeliverableCards>` needs — passed straight
+   *  through from the Insights i18n namespace on the server. */
+  deliverable: {
+    open: string;
+    copy: string;
+    copied: string;
+    download: string;
+    print: string;
+    flyer: string;
+    visit: string;
+    close: string;
+  };
+  /** Labels for `<MahasiswaPosterCard>`. */
+  poster: {
+    eyebrow: string;
+    title: string;
+    body: string;
+    openLarge: string;
+    download: string;
+    downloadPdf: string;
+    print: string;
+    loading: string;
+    close: string;
+  };
 };
 
 const SEGMENT_ORDER: SegmentKey[] = [
@@ -80,9 +94,14 @@ const SECTION_ORDER: SectionKey[] = [
 export function KitTabs({
   segments,
   labels,
+  locale,
 }: {
   segments: KitSegmentData[];
   labels: Labels;
+  /** Locale string (`"id"` | `"en"`) — used to build the `briefBasePath`
+   *  the modal-routing code inside <BriefDeliverableCards> needs, and
+   *  passed to <MahasiswaPosterCard> for its lang-aware PDF endpoint. */
+  locale: string;
 }) {
   const [activeSegment, setActiveSegment] = useState<SegmentKey>("all");
   const [activeSection, setActiveSection] = useState<SectionKey>("strategi");
@@ -173,7 +192,12 @@ export function KitTabs({
       {/* Content area */}
       <div className="mt-5">
         {activeSection === "strategi" ? (
-          <StrategiPane data={seg.strategi} labels={labels} />
+          <StrategiPane
+            briefSlug={seg.briefSlug}
+            strategiMarkdown={seg.sections.strategi}
+            labels={labels}
+            locale={locale}
+          />
         ) : (
           <ProseSection markdown={seg.sections[activeSection]} />
         )}
@@ -183,24 +207,44 @@ export function KitTabs({
 }
 
 /**
- * Strategi rendering: kit-card grid (one card per ready-to-use
- * deliverable) + collapsed Poster & Flyer details. Mirrors what the
- * old standalone OverallViewKitsCard rendered, now scoped to the
- * currently-active segment.
+ * Strategi rendering — REUSES the exact same components the
+ * `/insights/brief/[id]` page renders:
+ *   - `<BriefDeliverableCards>` for the 6 kit cards (Khutbah / Kajian /
+ *     Home / Content / Genz / Action) with the "Baca selengkapnya"
+ *     modal flow, PDF download, and Bagikan share buttons.
+ *   - `<MahasiswaPosterCard>` for the Mahasiswa campus poster image
+ *     (1080×1080 PNG with download + zoom).
+ *   - `<BriefFlyerSection>` for the 6 share-ready flyer PNGs.
+ *
+ * Why we duplicate-render (vs link out to /insights/brief/{slug}):
+ * the dashboard is the "operator console" — users come here to
+ * BROWSE all 5 segments quickly and grab content. Forcing a full
+ * page nav per segment would slow that workflow. Reusing the
+ * components keeps the visual + interaction language identical to
+ * the briefing detail page.
+ *
+ * Note on modal-close behavior: the BriefDeliverableCards modal
+ * pushes `/insights/brief/{slug}/{kind}` on open and replaces with
+ * `/insights/brief/{slug}` on close. After closing, the user lands
+ * on the brief detail page (not the dashboard). That's intentional:
+ * they've engaged with one specific kit; the detail page is where
+ * they can now read the full briefing context for that deliverable.
  */
 function StrategiPane({
-  data,
+  briefSlug,
+  strategiMarkdown,
   labels,
+  locale,
 }: {
-  data: {
-    kits: KitDeliverable[];
-    posterQuestion: string | null;
-    posterHref: string | null;
-    flyers: FlyerMessage[];
-  };
+  briefSlug: string;
+  /** Raw markdown of the briefing's `## Strategi & Aksi Dakwah` section
+   *  — passed straight through to BriefDeliverableCards which parses
+   *  the H3 sub-sections into individual cards. */
+  strategiMarkdown: string;
   labels: Labels;
+  locale: string;
 }) {
-  if (data.kits.length === 0 && data.flyers.length === 0) {
+  if (!strategiMarkdown.trim()) {
     return (
       <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-8 text-center text-sm text-slate-500">
         {labels.empty}
@@ -208,106 +252,28 @@ function StrategiPane({
     );
   }
 
-  const KIT_ICON: Record<string, typeof Mic2> = {
-    khutbah: Mic2,
-    kajian: Users,
-    home: Sparkles,
-    content: Flame,
-    genz: BookOpenCheck,
-    action: Compass,
-  };
+  // `briefBasePath` is the URL prefix the modal-routing code uses to
+  // push `/{path}/{kind}` on open and replace `/{path}` on close.
+  // Locale-prefixed so the i18n proxy doesn't re-resolve it through
+  // the `[locale]` segment.
+  const briefBasePath = `/${locale}/insights/brief/${briefSlug}`;
 
   return (
-    <div className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-2">
-        {data.kits.map((kit) => {
-          const Icon = KIT_ICON[kit.slug] ?? Sparkles;
-          return (
-            <a
-              key={kit.slug}
-              href={kit.href}
-              className="group flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-emerald-300 hover:shadow-md sm:p-5"
-            >
-              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-emerald-700">
-                <Icon className="h-3.5 w-3.5" />
-                {kit.title}
-              </div>
-              <p className="text-pretty text-sm leading-relaxed text-slate-700">
-                {kit.excerpt}
-              </p>
-              <p className="mt-auto inline-flex items-center gap-1 pt-1 text-xs font-semibold text-emerald-700 transition group-hover:gap-2">
-                {labels.kit_card_cta} · {kit.wordCount.toLocaleString()}{" "}
-                {labels.kit_card_words}
-                <ArrowRight className="h-3.5 w-3.5" />
-              </p>
-            </a>
-          );
-        })}
-      </div>
-
-      {(data.posterQuestion || data.flyers.length > 0) && (
-        <details className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-          <summary className="flex cursor-pointer items-center justify-between gap-3 list-none">
-            <div>
-              <p className="text-sm font-semibold text-slate-900">
-                {labels.poster_flyer_title}
-              </p>
-              <p className="mt-0.5 text-xs text-slate-500">
-                {labels.poster_flyer_subtitle_tpl.replace(
-                  "{flyers}",
-                  String(data.flyers.length),
-                )}
-              </p>
-            </div>
-            <ArrowRight className="h-4 w-4 shrink-0 text-slate-400" />
-          </summary>
-
-          <div className="mt-4 space-y-4">
-            {data.posterQuestion && data.posterHref && (
-              <a
-                href={data.posterHref}
-                className="group block rounded-xl border border-amber-200 bg-amber-50/40 p-4 transition hover:border-amber-300"
-              >
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-amber-700">
-                  {labels.poster_pill}
-                </p>
-                <p className="mt-1 text-pretty text-sm font-medium leading-snug text-slate-900">
-                  &ldquo;{data.posterQuestion}&rdquo;
-                </p>
-                <p className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-amber-700 transition group-hover:gap-2">
-                  {labels.poster_cta} <ArrowRight className="h-3 w-3" />
-                </p>
-              </a>
-            )}
-
-            {data.flyers.length > 0 && (
-              <ul className="grid gap-2 sm:grid-cols-2">
-                {data.flyers.map((flyer) => (
-                  <li
-                    key={flyer.n}
-                    className="rounded-xl border border-slate-100 bg-slate-50/60 p-3"
-                  >
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                      {labels.flyer_label_tpl.replace("{n}", String(flyer.n))}
-                    </p>
-                    <p className="mt-1 text-pretty text-sm font-semibold leading-snug text-slate-900">
-                      &ldquo;{flyer.headline}&rdquo;
-                    </p>
-                    {flyer.daleel && (
-                      <p className="mt-0.5 text-[11px] text-slate-500">
-                        {flyer.daleel}
-                      </p>
-                    )}
-                    <p className="mt-2 text-[12px] leading-relaxed text-slate-600 line-clamp-3">
-                      {flyer.body}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </details>
-      )}
+    // Re-key on briefSlug so when the user switches segments, the
+    // inner client state (openIndex modal state) resets cleanly
+    // instead of leaking across briefings.
+    <div key={briefSlug} className="space-y-4">
+      <BriefDeliverableCards
+        section4Markdown={strategiMarkdown}
+        labels={labels.deliverable}
+        briefBasePath={briefBasePath}
+      />
+      <MahasiswaPosterCard
+        briefId={briefSlug}
+        locale={locale === "en" ? "en" : "id"}
+        labels={labels.poster}
+      />
+      <BriefFlyerSection briefId={briefSlug} />
     </div>
   );
 }

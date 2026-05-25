@@ -163,12 +163,11 @@ export default async function DashboardPage({
           <div className="space-y-8">
             <KitTabs
               segments={kitSegments}
+              locale={locale}
               labels={{
                 // Canonical labels — same keys /insights/segment/[focus]
                 // uses for its hero ("Spiritual & Akhlaq", etc.). Keeps
-                // segment names consistent across surfaces so a user
-                // doesn't see "Spiritual" here vs "Spiritual & Akhlaq"
-                // on /insights and wonder if they're the same thing.
+                // segment names consistent across surfaces.
                 segments: {
                   all: tInsights("brief_scope_all"),
                   spiritual: tInsights("segment_spiritual_title"),
@@ -184,16 +183,30 @@ export default async function DashboardPage({
                   dalil: t("kit_section_dalil"),
                 },
                 empty: t("kit_tabs_empty"),
-                kit_card_cta: t("kit_card_cta"),
-                kit_card_words: t("kit_card_words"),
-                poster_flyer_title: t("overall_kits_poster_flyer_title"),
-                poster_flyer_subtitle_tpl: t(
-                  "overall_kits_poster_flyer_subtitle",
-                  { flyers: "{flyers}" },
-                ),
-                poster_pill: t("poster_preview_pill"),
-                poster_cta: t("poster_preview_cta"),
-                flyer_label_tpl: t("flyer_label", { n: "{n}" }),
+                // Reuses the exact same i18n keys the briefings page uses
+                // so the kit cards / poster / flyer carry identical
+                // copy on both surfaces.
+                deliverable: {
+                  open: tInsights("brief_deliverable_open"),
+                  copy: tInsights("brief_deliverable_copy"),
+                  copied: tInsights("brief_deliverable_copied"),
+                  download: tInsights("brief_deliverable_download"),
+                  print: tInsights("brief_deliverable_print"),
+                  flyer: tInsights("brief_deliverable_flyer"),
+                  visit: tInsights("brief_deliverable_visit"),
+                  close: tInsights("brief_deliverable_close"),
+                },
+                poster: {
+                  eyebrow: tInsights("brief_poster_section_eyebrow"),
+                  title: tInsights("brief_poster_section_title"),
+                  body: tInsights("brief_poster_section_body"),
+                  openLarge: tInsights("brief_poster_open_large"),
+                  download: tInsights("brief_poster_download"),
+                  downloadPdf: tInsights("brief_poster_download_pdf"),
+                  print: tInsights("brief_poster_print"),
+                  loading: tInsights("brief_poster_loading"),
+                  close: tInsights("brief_poster_close"),
+                },
               }}
             />
             <ActiveRoomsCard rooms={activeRooms} t={t} />

@@ -54,7 +54,7 @@ SEED_CHANNELS: list[tuple[str, str]] = [
     ("The Sungkars Family", "family"),
     ("Oki Setiana Dewi", "family"),
     ("Mommies Daily", "family"),
-    # ── Youth / Podcast / Lifestyle (12) ───────────────────────────────
+    # ── Youth / Podcast / Lifestyle (17) ───────────────────────────────
     ("Deddy Corbuzier", "youth"),
     ("Raditya Dika", "youth"),
     ("VINDES Vincent Desta", "youth"),
@@ -67,6 +67,13 @@ SEED_CHANNELS: list[tuple[str, str]] = [
     ("Maell Lee Arif Muhammad", "youth"),
     ("Cinta Laura Kiehl", "youth"),
     ("Girls Beyond", "youth"),
+    # 2026-05-25 — added another batch of podcast/talk/lifestyle channels
+    # after a re-curation pass.
+    ("SUARA BERKELAS", "youth"),
+    ("Cleansound Studio", "youth"),
+    ("Eno Bening", "youth"),
+    ("Menjadi Manusia", "youth"),
+    ("Makna Talks", "youth"),
     # ── Muamalah (10) ──────────────────────────────────────────────────
     ("Yufid Edu", "muamalah"),
     ("Masyarakat Ekonomi Syariah", "muamalah"),
@@ -78,7 +85,7 @@ SEED_CHANNELS: list[tuple[str, str]] = [
     ("Bayt Al-Hikmah Bayt Al-Quran", "muamalah"),
     ("Muamalah Daily", "muamalah"),
     ("KEUSY OJK Syariah", "muamalah"),
-    # ── Social Justice / Accountability (15) ───────────────────────────
+    # ── Social Justice / Accountability (22) ───────────────────────────
     # Narasi Newsroom dropped 2026-05-23 — duplicate of Narasi.
     # ILC / Sekretariat Presiden / Bennix / Kemkomdigi added 2026-05-25
     # after a re-check found the bucket too thin (7 active channels).
@@ -97,6 +104,15 @@ SEED_CHANNELS: list[tuple[str, str]] = [
     ("Sekretariat Presiden", "social_justice"),
     ("Bennix", "social_justice"),
     ("Kemkomdigi TV", "social_justice"),
+    # 2026-05-25 — political-commentary expansion: pundit/talk shows
+    # + active politician channels + Greenpeace.
+    ("Keadilan TV", "social_justice"),
+    ("Helmy Yahya Bicara", "social_justice"),
+    ("Mahfud MD Official", "social_justice"),
+    ("Anies Baswedan", "social_justice"),
+    ("Basuki Tjahaja Purnama", "social_justice"),
+    ("Greenpeace Indonesia", "social_justice"),
+    ("COKRO TV", "social_justice"),
     # ── Health (11) ────────────────────────────────────────────────────
     ("dr Richard Lee MARS", "health"),
     ("Tirta PengPengPeng", "health"),
@@ -109,7 +125,7 @@ SEED_CHANNELS: list[tuple[str, str]] = [
     ("Yulia Baltschun", "health"),
     ("Emasuperr", "health"),
     ("dr Frieda", "health"),
-    # ── Education / Edukasi (10) ───────────────────────────────────────
+    # ── Education / Edukasi (11) ───────────────────────────────────────
     # Ruangguru dropped 2026-05-23 — commercial edu-tech, not da'wah-shaped content.
     ("Malaka Project", "education"),
     ("Kok Bisa", "education"),
@@ -121,6 +137,9 @@ SEED_CHANNELS: list[tuple[str, str]] = [
     ("Kontekstual", "education"),
     ("Cania Citta Irlanie", "education"),
     ("Makin Pandai", "education"),
+    # Nat Geo Indonesia added 2026-05-25 — science / nature / exploration
+    # content that gives kid + youth dakwah surfaces a different angle.
+    ("Nat Geo Indonesia", "education"),
     # ── Cultural / Budaya & Travel (6) ─────────────────────────────────
     # Farida Nurhan dropped 2026-05-23 — food/travel content, edge of da'wah scope.
     ("IndonesiaKaya Galeri Indonesia Kaya", "cultural"),
