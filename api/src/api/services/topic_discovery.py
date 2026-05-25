@@ -26,7 +26,23 @@ from api.config import settings
 
 log = structlog.get_logger()
 
-MODEL = "gemini-2.5-flash-lite"
+MODEL = "gemini-2.5-flash"
+# Switched 2026-05-25 from `gemini-2.5-flash-lite`. Flash-Lite at the
+# 1200-post-corpus scale had two recurring failure modes:
+#   1. Thinking spiral — `thoughts_token_count` ballooned to 32K (the
+#      entire output budget) despite `thinking_budget=4096`, leaving
+#      `candidates_token_count=0` and an empty `{}` response. Yielded
+#      `topic_discovery.done themes=0` → `_persist` early-return → no
+#      topics persisted → dashboard "isu naik" = 0.
+#   2. Hallucinated indices — when output WAS generated, `post_indices`
+#      contained contiguous integer runs (e.g. 5034, 5035, … 5090, …)
+#      far outside the actual sample range (max 1237), then truncated
+#      mid-number against `max_output_tokens=32768`.
+#
+# Flash + `thinking_budget=0` on the same 1238-post sample produced 10
+# distinct themes with 92% sample coverage, zero out-of-range indices,
+# clean STOP finish_reason, ~$0.05 per call. Cost delta vs Flash-Lite
+# is ~$1.40/mo — negligible vs the dashboard signal we get back.
 
 # Hard cap on how many posts we ever send to Gemini in one call.
 # Sized to match the caller's stratified sample ceiling (PER_DAY_CAP ×
@@ -196,21 +212,25 @@ def discover_topics(
                     response_mime_type="application/json",
                     response_schema=response_schema,
                     temperature=0.2,
-                    # Output budget bumped 16K → 32K on 2026-05-22 after
-                    # observing a Flash-Lite call truncate mid-array
-                    # despite the 16K cap. With 354 posts in 6-10 themes
-                    # each carrying its full post_indices list, real
-                    # output can hit 5-8K tokens; the bigger cap gives
-                    # headroom against model-side overshoots.
-                    max_output_tokens=32768,
-                    # Thinking budget raised 0 → 4096. Setting it to 0
-                    # was meant to disable thinking but Flash-Lite still
-                    # spent ~45s deliberating internally and exhausted
-                    # the implicit thinking allocation, leaving the
-                    # output truncated. A modest explicit budget lets
-                    # the model reason about cluster boundaries without
-                    # racing past the output cap.
-                    thinking_config=types.ThinkingConfig(thinking_budget=4096),
+                    # 16K output cap. With 1238 posts across 10 themes,
+                    # measured real output ~9K tokens; 16K leaves ample
+                    # headroom without giving the model room to spiral
+                    # into long out-of-range index dumps. Flash-Lite at
+                    # 32K had a runaway-output failure mode where the
+                    # response continued past the sample range emitting
+                    # contiguous integer runs (5000+) then truncated;
+                    # the tighter cap on Flash, combined with the schema,
+                    # forces clean concise output.
+                    max_output_tokens=16384,
+                    # Disable thinking entirely. The Flash-Lite history
+                    # of `thinking_budget=0 → 4096 → 0` reflects this:
+                    # explicit thinking budget on Flash-Lite was burned
+                    # by silent reasoning spirals (`thoughts_token_count`
+                    # = 32765 with `candidates_token_count=0`), zeroing
+                    # the actual output. Flash with thinking_budget=0
+                    # produces structured JSON reliably; this task is
+                    # extraction, not reasoning — no thinking required.
+                    thinking_config=types.ThinkingConfig(thinking_budget=0),
                 ),
             )
             raw = resp.text or "{}"

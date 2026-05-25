@@ -45,17 +45,16 @@ SEED_CHANNELS: list[tuple[str, str]] = [
     ("NU Online", "religious"),
     ("Gus Iqdam Sabilu Taubah", "religious"),
     ("Gus Muwafiq Channel", "religious"),
-    # ── Family / Vlog Keluarga (9) ─────────────────────────────────────
-    ("Rans Entertainment", "family"),
-    ("AH Atta Halilintar", "family"),
-    ("Ricis Official", "family"),
-    ("Gen Halilintar", "family"),
+    # ── Family / Muslim Family Life (3) ────────────────────────────────
+    # Revamped 2026-05-25: dropped Halilintar cluster (AH, Aurel, GEN,
+    # SAAI) + secular celebrity homes (Rans, Ricis, Anneth, Leonardo,
+    # Onad) — they generated entertainment signal, not muslim-family-
+    # life signal that the `family` briefing segment needs. Replaced
+    # with explicitly Islamic-family channels.
     ("The Sungkars Family", "family"),
-    ("Aurel Hermansyah", "family"),
-    ("SAAIHALILINTAR", "family"),
-    ("Anneth Delliecia", "family"),
-    ("Onad Vlog", "family"),
-    # ── Youth / Podcast / Lifestyle (11) ───────────────────────────────
+    ("Oki Setiana Dewi", "family"),
+    ("Mommies Daily", "family"),
+    # ── Youth / Podcast / Lifestyle (12) ───────────────────────────────
     ("Deddy Corbuzier", "youth"),
     ("Raditya Dika", "youth"),
     ("VINDES Vincent Desta", "youth"),
@@ -67,6 +66,7 @@ SEED_CHANNELS: list[tuple[str, str]] = [
     ("Boy William", "youth"),
     ("Maell Lee Arif Muhammad", "youth"),
     ("Cinta Laura Kiehl", "youth"),
+    ("Girls Beyond", "youth"),
     # ── Muamalah (10) ──────────────────────────────────────────────────
     ("Yufid Edu", "muamalah"),
     ("Masyarakat Ekonomi Syariah", "muamalah"),
@@ -78,8 +78,10 @@ SEED_CHANNELS: list[tuple[str, str]] = [
     ("Bayt Al-Hikmah Bayt Al-Quran", "muamalah"),
     ("Muamalah Daily", "muamalah"),
     ("KEUSY OJK Syariah", "muamalah"),
-    # ── Social Justice / Accountability (11) ───────────────────────────
+    # ── Social Justice / Accountability (15) ───────────────────────────
     # Narasi Newsroom dropped 2026-05-23 — duplicate of Narasi.
+    # ILC / Sekretariat Presiden / Bennix / Kemkomdigi added 2026-05-25
+    # after a re-check found the bucket too thin (7 active channels).
     ("Najwa Shihab Mata Najwa", "social_justice"),
     ("Narasi", "social_justice"),
     ("Watchdoc Documentary", "social_justice"),
@@ -91,6 +93,10 @@ SEED_CHANNELS: list[tuple[str, str]] = [
     ("Bocor Alus Politik Tempo", "social_justice"),
     ("KontraS", "social_justice"),
     ("Magdalene", "social_justice"),
+    ("Indonesia Lawyers Club", "social_justice"),
+    ("Sekretariat Presiden", "social_justice"),
+    ("Bennix", "social_justice"),
+    ("Kemkomdigi TV", "social_justice"),
     # ── Health (11) ────────────────────────────────────────────────────
     ("dr Richard Lee MARS", "health"),
     ("Tirta PengPengPeng", "health"),
