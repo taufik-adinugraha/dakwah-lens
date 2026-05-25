@@ -17,8 +17,7 @@ See `Dakwah-Lens_PRD_v0.4.pdf` for the full product spec.
 ┌──────────────────────────┴──────────────────────────────────┐
 │  api/   FastAPI + Celery workers                            │
 │   ├─ ingestion   (RSS + YouTube + Apify actors)             │
-│   ├─ ml          (IndoBERT for social-media sentiment;      │
-│   │              Gemini Flash-Lite for news sentiment +     │
+│   ├─ ml          (Gemini Flash-Lite for sentiment +         │
 │   │              da'wah classifier + topic discovery)       │
 │   ├─ rag         (OpenAI embeddings → Qdrant retrieval)     │
 │   └─ briefs      (Gemini 2.5 Pro primary,                   │

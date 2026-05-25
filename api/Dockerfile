@@ -9,10 +9,8 @@
 #   - `beat`   → celery beat              — scheduler
 # docker-compose.prod.yml selects which one via `command:` override.
 #
-# Heavy deps (torch, transformers) install in a separate cached layer,
-# isolated from the source copy so code-only edits don't re-pull ~1.5 GB
-# of ML wheels. PyTorch from PyPI on linux/x86_64 ships CPU-only by
-# default — we never want CUDA on this 4 GB VM.
+# Dependencies install in a separate cached layer, isolated from the
+# source copy so code-only edits don't re-pull wheels.
 # ─────────────────────────────────────────────────────────────────
 
 FROM python:3.12-slim AS builder

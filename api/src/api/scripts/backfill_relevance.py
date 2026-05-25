@@ -9,15 +9,17 @@ Why this exists:
     (3) adds a focused `dawah_opportunity` second-pass score.
   - The migration left `dawah_opportunity = NULL` on existing rows. The UI
     falls back to the old `dawah_relevance` for them, which is broken.
-  - News-sentiment prompt was retuned 2026-05-21 with arrest-verb /
+  - Gemini sentiment prompt was retuned 2026-05-21 with arrest-verb /
     political-courtesy / personal-achievement / death rules; ~16% of
     existing mainstream labels disagree with the new prompt (97% bench).
 
 This script re-runs THREE classifiers over every already-classified post:
   1. relevance (9-category, mean-of-top-2 aggregate) — all platforms
   2. dawah_opportunity (focused "would a da'i use this") — all platforms
-  3. news sentiment — MAINSTREAM ONLY (other platforms use IndoBERT
-     which wasn't retuned; only the Gemini news prompt changed)
+  3. sentiment — MAINSTREAM ONLY. We could re-sentiment X / YT / IG too
+     now that Gemini is the universal classifier (2026-05-25 IndoBERT
+     retirement), but that would re-bill on every historical social
+     row. Run a separate one-off if you want that.
 
 Usage:
     uv run python -m api.scripts.backfill_relevance               # all
@@ -39,13 +41,13 @@ from sqlalchemy import select, update
 
 from api.db import SessionLocal
 from api.models.social import SocialPost
-from api.services.news_sentiment import classify_batch as classify_news_sentiment
 from api.services.relevance import (
     classify_batch as classify_relevance,
 )
 from api.services.relevance import (
     classify_opportunity_batch as classify_opportunity,
 )
+from api.services.sentiment import classify_batch as classify_sentiment
 
 CHUNK = 50  # posts per loop iteration; classifiers batch to 10/Gemini call
 
@@ -110,9 +112,9 @@ async def run(
             )
             continue
 
-        # Sentiment is mainstream-only — IndoBERT (other platforms) wasn't
-        # retuned this round, only the Gemini news prompt was. Build a
-        # parallel-aligned list with None gaps for non-mainstream rows.
+        # Sentiment scoped to mainstream to avoid re-billing on every
+        # historical social row. Build a parallel-aligned list with
+        # None gaps for non-mainstream rows.
         # Same defensive try/except as relevance — sentiment outage shouldn't
         # block relevance/opportunity from landing.
         sentiments: list[object | None] = [None] * len(chunk)
@@ -121,7 +123,7 @@ async def run(
             mainstream_texts = [texts[i] for i in mainstream_idx]
             if mainstream_texts:
                 try:
-                    scored = classify_news_sentiment(mainstream_texts)
+                    scored = classify_sentiment(mainstream_texts)
                     for li, s in zip(mainstream_idx, scored, strict=False):
                         sentiments[li] = s
                 except Exception as exc:

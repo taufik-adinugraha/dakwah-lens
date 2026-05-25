@@ -5,10 +5,9 @@ a `--query` (hashtag or keyword), and `--limit`. The pipeline:
 
     1. scrape via Apify (`services/apify.scrape_<platform>`)
     2. normalize per platform (`services/normalizers.NORMALIZERS[platform]`)
-    3. classify sentiment — three-way split:
-         · mainstream         → Gemini Flash-Lite (news-valence prompt)
-         · social + ID lang   → IndoBERT (on-device)
-         · social + non-ID    → Gemini Flash-Lite fallback
+    3. classify sentiment via Gemini Flash-Lite
+       (`services/sentiment` — single classifier across all platforms
+        since 2026-05-25)
     4. classify relevance (Gemini Flash-Lite, 9 da'wah categories, batched)
     5. upsert into `social_posts` on `(platform, external_id)`
     6. print top-5 by relevance for a quick sanity check
@@ -39,7 +38,6 @@ from api.services.apify import (
     scrape_x,
 )
 from api.services.language import detect_lang
-from api.services.news_sentiment import classify_batch as classify_news_sentiment
 from api.services.normalizers import NORMALIZERS
 from api.services.relevance import (
     classify_batch as classify_relevance,
@@ -199,7 +197,6 @@ async def _run(
         i for i, r in enumerate(rows) if r["external_id"] not in cached
     ]
     fresh_texts = [texts[i] for i in fresh_indices]
-    fresh_languages = [languages[i] for i in fresh_indices]
     overlap_pct = (
         round(100.0 * len(cached) / len(rows), 1) if rows else 0.0
     )
@@ -221,44 +218,17 @@ async def _run(
         f"({overlap_pct}% overlap), running on {len(fresh_indices)} new items …"
     )
 
-    # Dispatch sentiment by platform AND language, on FRESH items only:
-    #   - mainstream + youtube  → Gemini news-valence. Mainstream because
-    #                             IndoBERT misfires ~95% neutral on news;
-    #                             YT because video descriptions run 500-
-    #                             5000 chars and IndoBERT's 128-token cap
-    #                             throws away the body (added 2026-05-23
-    #                             alongside the YT pipeline optimization).
-    #   - else, ID language     → IndoBERT (free, on-device, well-tuned
-    #                             for Indonesian tweets/captions).
-    #   - else, non-ID language → Gemini Flash-Lite fallback.
+    # Single Gemini Flash-Lite classifier for every platform. We
+    # previously routed mainstream → Gemini and social → IndoBERT, but
+    # the 2026-05-25 manual eval on X tweets showed IndoBERT mislabelled
+    # 6/7 positives (sarcasm + supportive opinion both read wrong).
+    # Per-item cost ~$0.0001, well inside the IDR 1M LLM cap.
     sentiment_by_index: dict[int, object] = {}
     if fresh_texts:
-        if platform in {"mainstream", "youtube"}:
-            print(f"  Running Gemini news-sentiment on {len(fresh_texts)} posts …")
-            fresh_sentiments = classify_news_sentiment(fresh_texts)
-            for idx, s in zip(fresh_indices, fresh_sentiments, strict=False):
-                sentiment_by_index[idx] = s
-        else:
-            id_local = [
-                i for i, lang in enumerate(fresh_languages) if lang == "id"
-            ]
-            non_id_local = [
-                i for i, lang in enumerate(fresh_languages) if lang != "id"
-            ]
-            id_texts = [fresh_texts[i] for i in id_local]
-            non_id_texts = [fresh_texts[i] for i in non_id_local]
-            print(
-                f"  IndoBERT on {len(id_texts)} ID posts, "
-                f"Gemini fallback on {len(non_id_texts)} non-ID posts …"
-            )
-            id_sentiments = classify_sentiment(id_texts) if id_texts else []
-            non_id_sentiments = (
-                classify_news_sentiment(non_id_texts) if non_id_texts else []
-            )
-            for li, s in zip(id_local, id_sentiments, strict=False):
-                sentiment_by_index[fresh_indices[li]] = s
-            for li, s in zip(non_id_local, non_id_sentiments, strict=False):
-                sentiment_by_index[fresh_indices[li]] = s
+        print(f"  Running Gemini sentiment on {len(fresh_texts)} posts …")
+        fresh_sentiments = classify_sentiment(fresh_texts)
+        for idx, s in zip(fresh_indices, fresh_sentiments, strict=False):
+            sentiment_by_index[idx] = s
 
         # Gemini relevance handles ID + EN natively. Two passes:
         # (1) 9-category topical relevance (mean-of-top-2 aggregate)

@@ -371,9 +371,10 @@ def normalize_mainstream(item: dict[str, Any]) -> dict[str, Any] | None:
         return None
 
     # Strip any HTML tags + decode entities. Republika and a few others
-    # inject `<img>` and `&nbsp;` into the summary, which biases IndoBERT
-    # toward neutral. Trafilatura output (`_full_text`) is already plain
-    # text — `_strip_html` is a cheap no-op on those.
+    # inject `<img>` and `&nbsp;` into the summary, which biases the
+    # classifier and clutters the stored text. Trafilatura output
+    # (`_full_text`) is already plain text — `_strip_html` is a cheap
+    # no-op on those.
     title_clean = _strip_html(title)
     if not title_clean:
         return None

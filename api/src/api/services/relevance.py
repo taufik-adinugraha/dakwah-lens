@@ -49,7 +49,7 @@ MAX_BATCH = 10
 # backoff (4s, 8s, 16s) absorbs typical 10-30s overload windows. After
 # all retries fail, the chunk falls through to the existing zero-result
 # fallback so the rest of the ingest still commits. Mirrors the same
-# pattern in `news_sentiment._classify_chunk`.
+# pattern in `sentiment._classify_chunk`.
 MAX_RETRIES = 3
 RETRY_BASE_SLEEP_S = 4.0
 # Texts shorter than this are almost always headline fragments or thumbnail
@@ -291,7 +291,7 @@ def classify_batch(texts: list[str]) -> list[RelevanceResult]:
             try:
                 scored.extend(_classify_chunk(chunk))
             except Exception:
-                # Mirror news_sentiment's soft-fallback (2026-05-21): a
+                # Mirror sentiment's soft-fallback (2026-05-21): a
                 # Gemini 503 / quota / transient outage shouldn't fail
                 # the whole ingest. Default the chunk to zero-relevance
                 # so the rest of the pipeline (upsert, sentiment) still

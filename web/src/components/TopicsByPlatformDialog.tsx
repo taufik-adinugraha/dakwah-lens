@@ -1,0 +1,148 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { LayoutGrid, X } from "lucide-react";
+
+import type { TopicByPlatformGroup } from "@/lib/dashboard-metrics";
+
+export type TopicsByPlatformLabels = {
+  iconAriaLabel: string;
+  dialogTitle: string;
+  dialogSubtitle: string;
+  closeLabel: string;
+  noData: string;
+  platformMainstream: string;
+};
+
+export function TopicsByPlatformDialog({
+  groups,
+  labels,
+}: {
+  groups: TopicByPlatformGroup[];
+  labels: TopicsByPlatformLabels;
+}) {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label={labels.iconAriaLabel}
+        className="inline-flex h-6 w-6 items-center justify-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+      >
+        <LayoutGrid className="h-3.5 w-3.5" />
+      </button>
+
+      {open && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="topics-by-platform-title"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-0 backdrop-blur-sm sm:items-center sm:p-4"
+          onClick={() => setOpen(false)}
+        >
+          <div
+            className="relative max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-t-3xl bg-white shadow-2xl sm:rounded-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="sticky top-0 z-10 flex items-start justify-between gap-3 border-b border-slate-100 bg-white/95 px-6 py-4 backdrop-blur">
+              <div className="min-w-0 flex-1">
+                <h3
+                  id="topics-by-platform-title"
+                  className="text-balance text-lg font-bold text-slate-900 sm:text-xl"
+                >
+                  {labels.dialogTitle}
+                </h3>
+                <p className="mt-1 text-xs leading-relaxed text-slate-500">
+                  {labels.dialogSubtitle}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                aria-label={labels.closeLabel}
+                className="rounded-full p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <ul className="space-y-4 px-6 py-5">
+              {groups.map((g) => (
+                <PlatformGroup key={g.platform} group={g} labels={labels} />
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function PlatformGroup({
+  group,
+  labels,
+}: {
+  group: TopicByPlatformGroup;
+  labels: TopicsByPlatformLabels;
+}) {
+  const displayName =
+    group.platform === "mainstream"
+      ? labels.platformMainstream
+      : group.platform;
+  const totalPosts = group.topics.reduce((s, t) => s + t.count, 0);
+
+  return (
+    <li className="rounded-2xl border border-slate-200 bg-white p-4">
+      <div className="flex items-baseline justify-between gap-3">
+        <p className="text-sm font-semibold capitalize text-slate-900">
+          {displayName}
+        </p>
+        {totalPosts > 0 && (
+          <p className="text-xs tabular-nums text-slate-500">
+            {totalPosts.toLocaleString()}
+          </p>
+        )}
+      </div>
+
+      {group.topics.length === 0 ? (
+        <p className="mt-3 text-xs text-slate-400">{labels.noData}</p>
+      ) : (
+        <ul className="mt-3 space-y-1.5">
+          {group.topics.map((t) => (
+            <li key={t.id}>
+              <div className="flex items-center justify-between gap-2 text-[11px]">
+                <span className="truncate font-medium text-slate-700">
+                  {t.label}
+                </span>
+                <span className="shrink-0 tabular-nums text-slate-500">
+                  {t.count}
+                </span>
+              </div>
+              <div className="mt-0.5 h-1 overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className="h-full rounded-full bg-emerald-500"
+                  style={{ width: `${Math.max(t.pct, 2)}%` }}
+                />
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </li>
+  );
+}

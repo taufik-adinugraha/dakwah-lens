@@ -8,8 +8,9 @@ later debugging / re-classification without re-scraping.
 
 Per PRD §05 / §08 the post flows through this lifecycle:
   raw_payload      → just-scraped, no classification yet
-  + sentiment_*    → after sentiment pass: Gemini Flash-Lite for mainstream
-                     news, IndoBERT for social-media (X / IG / TikTok / YT)
+  + sentiment_*    → after sentiment pass: Gemini Flash-Lite (unified
+                     classifier across mainstream + social platforms
+                     since 2026-05-25)
   + categories     → after Gemini Flash-Lite da'wah classifier
   + topic_id       → after Gemini Flash-Lite topic discovery clusters posts
                      into themes; runs nightly at 04:00 WIB.
@@ -90,9 +91,11 @@ class SocialPost(Base, TimestampMixin):
     """Original API/scraper response. Useful for re-classification later."""
 
     # ── sentiment (Stage 2) ─────────────────────────────────────────
-    # Source depends on platform: Gemini Flash-Lite for mainstream news
-    # (IndoBERT mis-fires ~95% neutral on news), IndoBERT for ID-language
-    # social-media posts, Gemini Flash-Lite fallback for non-ID social.
+    # Single classifier across all platforms: Gemini Flash-Lite reading
+    # event valence (`services/sentiment.py`). Was a hybrid Gemini-for-
+    # news / IndoBERT-for-social setup until 2026-05-25 — IndoBERT was
+    # ~14% accurate on X positives (sarcasm + supportive opinion both
+    # mislabelled).
     sentiment_label: Mapped[str | None] = mapped_column(String(20))
     sentiment_score: Mapped[float | None] = mapped_column(Float)
     """Confidence of the predicted label, 0-1."""

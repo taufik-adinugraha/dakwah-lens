@@ -6,9 +6,9 @@ This script does two things on every `platform='mainstream'` row:
        `text` is HTML-stripped + entity-decoded. Idempotent — already-
        clean rows aren't touched.
 
-    2. Re-runs sentiment via the NEW Gemini news-valence classifier
-       (`services/news_sentiment`). The previous IndoBERT-based labels
-       were ~95% neutral on news (wrong tool: IndoBERT was trained on
+    2. Re-runs sentiment via the unified Gemini Flash-Lite classifier
+       (`services/sentiment`). The previous IndoBERT-based labels were
+       ~95% neutral on news (wrong tool: IndoBERT was trained on
        tweets/reviews) and need a full rollback, not just on rows
        whose text changed. Cost is negligible (~$0.0001/item).
 
@@ -32,8 +32,8 @@ from sqlalchemy import select, update
 
 from api.db import SessionLocal
 from api.models.social import SocialPost
-from api.services.news_sentiment import classify_batch as classify_news_sentiment
 from api.services.normalizers import normalize_mainstream
+from api.services.sentiment import classify_batch as classify_sentiment
 
 log = structlog.get_logger()
 
@@ -81,9 +81,9 @@ async def _run(dry_run: bool) -> int:
         return n_text_changed
 
     # Step 2: call Gemini once for every row's (cleaned) text.
-    print(f"  Running Gemini news-sentiment on {len(posts)} posts …")
+    print(f"  Running Gemini sentiment on {len(posts)} posts …")
     texts = [text_by_id[str(p.id)] for p in posts]
-    new_sentiments = classify_news_sentiment(texts)
+    new_sentiments = classify_sentiment(texts)
 
     # Step 3: write everything back. We always update text (idempotent
     # if unchanged) + sentiment fields. Relevance is left alone.
@@ -123,7 +123,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
             "Backfill mainstream posts: HTML-strip text + relabel sentiment "
-            "via Gemini news-valence. Replaces IndoBERT labels."
+            "via Gemini Flash-Lite."
         )
     )
     parser.add_argument(

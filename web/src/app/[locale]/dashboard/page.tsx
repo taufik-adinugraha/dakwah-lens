@@ -32,10 +32,12 @@ import {
   getPulseSnapshot,
   getRecentSaved,
   getRisingVideos,
+  getSentimentByPlatform7d,
   getSentimentDistribution7d,
   getSentimentTrend7d,
   getTopIssues,
   getTopicDistribution7d,
+  getTopicsByPlatform7d,
   getTrendingCount24h,
   type ActiveRoom,
   type DailyInsights as DailyInsightsData,
@@ -128,7 +130,9 @@ export default async function DashboardPage({
     activeRooms,
     platformDist,
     sentimentDist,
+    sentimentByPlatform,
     topicDist,
+    topicsByPlatform,
   ] = await Promise.all([
     canCreateBriefs
       ? db
@@ -159,7 +163,9 @@ export default async function DashboardPage({
     getActiveDiscussionRooms(visitorHash, 14, 6),
     getPlatformDistribution7d(),
     getSentimentDistribution7d(),
+    getSentimentByPlatform7d(),
     getTopicDistribution7d(10),
+    getTopicsByPlatform7d(5),
   ]);
 
   return (
@@ -248,7 +254,9 @@ export default async function DashboardPage({
             <CoverageBreakdown
               platforms={platformDist}
               sentiment={sentimentDist}
+              sentimentByPlatform={sentimentByPlatform}
               topics={topicDist}
+              topicsByPlatform={topicsByPlatform}
               labels={{
                 sectionTitle: t("section_coverage_title"),
                 sectionSubtitle: t("section_coverage_subtitle"),
@@ -261,8 +269,27 @@ export default async function DashboardPage({
                 sentimentNeutral: t("sentiment_neutral"),
                 sentimentNegative: t("sentiment_negative"),
                 unlabelledTpl: t("coverage_unlabelled", { n: "{n}" }),
+                sentimentByPlatform: {
+                  cta: t("coverage_sentiment_by_platform_cta"),
+                  dialogTitle: t("coverage_sentiment_by_platform_title"),
+                  dialogSubtitle: t("coverage_sentiment_by_platform_subtitle"),
+                  closeLabel: t("coverage_sentiment_by_platform_close"),
+                  positive: t("sentiment_positive"),
+                  neutral: t("sentiment_neutral"),
+                  negative: t("sentiment_negative"),
+                  noData: t("coverage_sentiment_by_platform_no_data"),
+                  platformMainstream: t("coverage_platform_mainstream"),
+                },
                 topicsTitle: t("coverage_topics_title"),
                 topicsCountSuffix: t("coverage_topics_count_suffix"),
+                topicsByPlatform: {
+                  iconAriaLabel: t("coverage_topics_by_platform_aria"),
+                  dialogTitle: t("coverage_topics_by_platform_title"),
+                  dialogSubtitle: t("coverage_topics_by_platform_subtitle"),
+                  closeLabel: t("coverage_sentiment_by_platform_close"),
+                  noData: t("coverage_topics_by_platform_no_data"),
+                  platformMainstream: t("coverage_platform_mainstream"),
+                },
               }}
             />
             <TopIssues

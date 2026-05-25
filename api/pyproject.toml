@@ -31,10 +31,6 @@ dependencies = [
     "apify-client>=1.8.0",
     "feedparser>=6.0.11",
 
-    # ML — IndoBERT sentiment (loaded once at module level)
-    "transformers>=4.45.0",
-    "torch>=2.4.0",
-
     # Queue
     "celery[redis]>=5.4.0",
     "redis>=5.2.0",
@@ -46,10 +42,6 @@ dependencies = [
     "openai>=1.55.0",
     "anthropic>=0.40.0",
     "google-genai>=0.3.0",
-
-    # ML (added in week 3 but pinned now to lock versions)
-    # "transformers>=4.46.0",
-    # "torch>=2.5.0",
 
     # Scraping / parsing
     "httpx>=0.27.0",
@@ -65,8 +57,9 @@ dependencies = [
     "python-multipart>=0.0.19",
     "tenacity>=9.0.0",
     "psutil>=6.1.0",
-    # Language detection for routing IndoBERT sentiment only at Indonesian
-    # text. Tiny pure-Python lib, ~3MB with all language profiles.
+    # Language detection for dropping non-Indonesian rows on social
+    # platforms (X's `tweetLanguage: "id"` filter leaks Hausa / Urdu /
+    # Bengali). Tiny pure-Python lib, ~3MB with all language profiles.
     "langdetect>=1.0.9",
 ]
 
@@ -86,20 +79,6 @@ api = "api.cli:main"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-# ─── uv: CPU-only PyTorch ────────────────────────────────────────────
-# Default `torch` wheels on PyPI bundle CUDA libs (~750 MB per wheel),
-# which we'll NEVER use on the CPU-only IDCloudHost VM. The CPU index
-# at download.pytorch.org publishes ~200 MB wheels with the same Python
-# API. Saves ~3 GB across image + cache, and shaves several minutes
-# off the build (smaller download + faster layer export).
-[tool.uv.sources]
-torch = { index = "pytorch-cpu" }
-
-[[tool.uv.index]]
-name = "pytorch-cpu"
-url = "https://download.pytorch.org/whl/cpu"
-explicit = true
-
 [tool.ruff]
 line-length = 100
 target-version = "py312"
@@ -113,7 +92,7 @@ select = ["E", "F", "I", "W", "UP", "B"]
 [tool.ruff.lint.per-file-ignores]
 "src/api/scripts/*.py" = ["E501"]
 "src/api/services/relevance.py" = ["E501"]
-"src/api/services/news_sentiment.py" = ["E501"]
+"src/api/services/sentiment.py" = ["E501"]
 "src/api/services/topic_discovery.py" = ["E501"]
 "src/api/services/insights_summary.py" = ["E501"]
 "src/api/services/email_digest.py" = ["E501"]

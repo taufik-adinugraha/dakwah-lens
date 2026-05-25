@@ -3,7 +3,7 @@
 Phase-1 end-to-end ingestion CLI:
   1. Scrape `--limit` recent tweets matching `--query` via Apify
   2. Insert into `social_posts` (upserting on (platform, external_id))
-  3. Run IndoBERT sentiment over the texts
+  3. Run Gemini sentiment over the texts
   4. Run Gemini relevance classifier over the texts
   5. Update each row with sentiment + categories + relevance
 
@@ -145,7 +145,7 @@ async def _run(query: str, limit: int) -> int:
 
     # 3. Classify (sentiment + relevance + opportunity)
     texts = [r["text"] for r in rows]
-    print("  Running IndoBERT sentiment …")
+    print("  Running Gemini sentiment …")
     sentiments = classify_sentiment(texts)
     print("  Running Gemini relevance + opportunity …")
     relevances = classify_relevance(texts)
@@ -154,8 +154,10 @@ async def _run(query: str, limit: int) -> int:
     for row, s, r, o in zip(
         rows, sentiments, relevances, opportunities, strict=False
     ):
-        row["sentiment_label"] = s.label
-        row["sentiment_score"] = s.score
+        # Gemini can return None if a chunk exhausted its retry budget;
+        # leave the label NULL so `retry_failed_sentiment` picks it up.
+        row["sentiment_label"] = s.label if s else None
+        row["sentiment_score"] = s.score if s else None
         row["dawah_relevance"] = r.dawah_relevance
         row["dawah_opportunity"] = o
         row["categories"] = r.categories

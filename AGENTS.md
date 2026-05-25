@@ -6,16 +6,15 @@ Read the PRD (`Dakwah-Lens_PRD_v0.4.pdf`) for full product context. Owner: Sukse
 
 - `web/` — Next.js 16 frontend. See `web/AGENTS.md` for Next.js-specific rules.
 - `api/` — FastAPI + Celery backend. See `api/` files; uv-managed Python 3.12 in `src/api/`.
-- `docker-compose.yml` — local Postgres, Qdrant, Redis. IndoBERT runs in-process inside the `worker` container, not a separate service.
+- `docker-compose.yml` — local Postgres, Qdrant, Redis.
 
-## Locked decisions (current as of 2026-05-22)
+## Locked decisions (current as of 2026-05-25)
 
 | Decision | Value |
 |---|---|
 | Languages | Indonesian (primary) + English via next-intl |
 | Embedding model | `text-embedding-3-large` (OpenAI) |
-| Sentiment — mainstream news | Gemini Flash-Lite (`services/news_sentiment.py`) — IndoBERT misfires ~95% neutral on news |
-| Sentiment — social (X / IG / TikTok / YouTube) | IndoBERT, self-hosted in worker container; Gemini Flash-Lite fallback for non-ID text |
+| Sentiment (all platforms) | Gemini Flash-Lite (`services/sentiment.py`) — single classifier across mainstream + social since 2026-05-25; IndoBERT removed after a manual eval showed ~14% accuracy on X positives |
 | Da'wah classifier / opportunity / topic discovery / rerank | Gemini 2.5 Flash-Lite |
 | Brief synthesis | Gemini 2.5 Pro (fallback: Claude Sonnet 4.6) |
 | Vector store | Self-hosted Qdrant in docker compose |

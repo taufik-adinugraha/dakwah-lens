@@ -46,25 +46,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # IndoBERT sentiment service — added in week 3 when we extract sentiment
-  # classification out of the Celery worker process. For now IndoBERT runs
-  # in-process inside the Celery worker (see api/src/api/services/sentiment.py),
-  # and its CPU + memory budget is governed there.
-  # indobert:
-  #   build: ./services/indobert
-  #   ports:
-  #     - "8001:8000"
-  #   environment:
-  #     OMP_NUM_THREADS: "1"
-  #     MKL_NUM_THREADS: "1"
-  #     OPENBLAS_NUM_THREADS: "1"
-  #     TOKENIZERS_PARALLELISM: "false"
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: "1.0"
-  #         memory: 2G
-
 volumes:
   postgres_data:
   qdrant_data:

@@ -368,12 +368,12 @@ def generate_insights_summary() -> dict[str, object]:
 
 @celery_app.task(name="api.workers.ingest.retry_failed_sentiment")
 def retry_failed_sentiment() -> dict[str, int]:
-    """Re-classify mainstream posts whose sentiment label is NULL.
+    """Re-classify posts whose sentiment label is NULL.
 
     These rows result from sustained Gemini 5xx outages that exhausted
-    the in-line retry budget inside `news_sentiment._classify_chunk`.
-    Rather than burning $0.09 on a full reclean we just pick up the
-    stragglers — usually 0-25 rows after each ingest tick.
+    the in-line retry budget inside `sentiment._classify_chunk`. Covers
+    every platform (mainstream + X + YT + IG + TT) since the 2026-05-25
+    cutover to a single Gemini classifier.
 
     Scoped to the last 14 days so a backlog from an old outage doesn't
     grow unbounded. Caps at 200 rows per run so a worst-case batch
@@ -387,9 +387,7 @@ def retry_failed_sentiment() -> dict[str, int]:
 
     from api.db import SessionLocal
     from api.models.social import SocialPost
-    from api.services.news_sentiment import (
-        classify_batch as classify_news_sentiment,
-    )
+    from api.services.sentiment import classify_batch as classify_sentiment
 
     cutoff = datetime.now(UTC) - timedelta(days=14)
 
@@ -400,7 +398,6 @@ def retry_failed_sentiment() -> dict[str, int]:
                     select(SocialPost.id, SocialPost.text)
                     .where(
                         and_(
-                            SocialPost.platform == "mainstream",
                             SocialPost.sentiment_label.is_(None),
                             SocialPost.text.is_not(None),
                             SocialPost.posted_at >= cutoff,
@@ -417,7 +414,7 @@ def retry_failed_sentiment() -> dict[str, int]:
 
             ids = [r.id for r in rows]
             texts = [r.text or "" for r in rows]
-            scored = classify_news_sentiment(texts)
+            scored = classify_sentiment(texts)
 
             relabeled = 0
             still_failed = 0

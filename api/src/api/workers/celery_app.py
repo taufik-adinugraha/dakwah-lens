@@ -204,12 +204,21 @@ celery_app.conf.update(
             # day_of_week=4 = Thursday in Celery's crontab (Sun=0).
             "schedule": crontab(minute=0, hour=18, day_of_week=4),
         },
-        # Trending overlay paused 2026-05-20 — fans out X scrapes
-        # which are themselves paused pending verification.
-        # "trending-ingest": {
-        #     "task": "api.workers.ingest.trending_ingest",
-        #     "schedule": crontab(minute=0, hour=12),
-        # },
+        # Trending overlay — daily 12:00 WIB. Complements the weekly
+        # curated X sweep (49 fixed keywords on Wed 22:00) by catching
+        # news-cycle topics that emerge mid-week. Sources are free
+        # (Google Trends ID + News RSS + YouTube Data API); Gemini
+        # Flash-Lite filters for da'wah-relevance; surviving keywords
+        # fan out to X scrapes (apidojo $0.0004/item × 20 items ×
+        # ~3-5 keywords/day ≈ $1/mo).
+        #
+        # Re-enabled 2026-05-25 after the weekly X schedule landed —
+        # was paused 2026-05-20 because it depended on X scrapes which
+        # were themselves paused.
+        "trending-ingest": {
+            "task": "api.workers.ingest.trending_ingest",
+            "schedule": crontab(minute=0, hour=12),
+        },
         # Daily 06:00 WIB reconcile of Apify's authoritative monthly
         # spend against our per-run usage_events. Closes the gap between
         # `run.usageTotalUsd` (best-effort, lags) and Apify's billing

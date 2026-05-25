@@ -1,12 +1,14 @@
-"""Language detection for ingest-time routing.
+"""Language detection for ingest-time filtering.
 
-We use `langdetect` (pure-Python port of Google's language-detection library)
-because the only thing we need is a coarse "is this Indonesian or English?"
-signal — not full multilingual NLP. It's tiny and has no network calls.
+We use `langdetect` (pure-Python port of Google's language-detection
+library) because the only thing we need is a coarse "is this Indonesian
+or English?" signal — not full multilingual NLP. It's tiny and has no
+network calls.
 
-The output is consumed by `scripts/ingest.py` to gate IndoBERT: that model
-is fine-tuned on Indonesian only, so feeding it English text produces a
-confident-looking but meaningless label. We'd rather store NULL.
+The output is consumed by `scripts/ingest.py` to drop non-Indonesian
+items on social platforms (X's `tweetLanguage: "id"` is a soft hint
+that lets Hausa / Urdu / Bengali tweets leak through) and to stamp
+`social_posts.language` for downstream analytics.
 """
 
 from __future__ import annotations
@@ -36,9 +38,9 @@ def detect_lang(text: str, *, fallback: str = "id") -> str:
 
     Why the Indonesian default: the corpus is overwhelmingly Indonesian, and
     langdetect's mis-classifications on short text often land on `ms`
-    (Malay — linguistically related, IndoBERT handles it acceptably) or
-    `tl` (Tagalog — wrong but rare). Defaulting to ID preserves more
-    sentiment signal than dropping it.
+    (Malay — linguistically close to Indonesian, treat as ID) or `tl`
+    (Tagalog — wrong but rare). Defaulting to ID preserves more rows
+    through the lang-filter than dropping them.
     """
     if not text or len(text.strip()) < MIN_CONFIDENCE_CHARS:
         return fallback
@@ -50,7 +52,7 @@ def detect_lang(text: str, *, fallback: str = "id") -> str:
         return fallback
 
     # Treat Malay as Indonesian for downstream purposes — close enough
-    # linguistically that IndoBERT sentiment classification still applies.
+    # linguistically that we'd rather keep the row than drop it.
     if code == "ms":
         return "id"
 

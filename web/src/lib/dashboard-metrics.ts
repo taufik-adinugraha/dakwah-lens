@@ -1436,6 +1436,66 @@ export async function getSentimentDistribution7d(): Promise<SentimentBreakdown> 
   };
 }
 
+export type SentimentByPlatformRow = {
+  platform: string;
+  positive: { count: number; pct: number };
+  neutral: { count: number; pct: number };
+  negative: { count: number; pct: number };
+  total: number;
+  unlabelled: number;
+};
+
+/**
+ * Per-platform sentiment composition for the 7d window. Returns one
+ * row for each of the 5 product-supported platforms in a fixed order
+ * (mainstream, x, youtube, tiktok, instagram) — including zero-volume
+ * platforms so the "show by platform" dialog can render a stable
+ * 5-row grid regardless of ingest state.
+ */
+export async function getSentimentByPlatform7d(): Promise<
+  SentimentByPlatformRow[]
+> {
+  const rows = (await db.execute(sql`
+    SELECT
+      platform,
+      count(*) FILTER (WHERE sentiment_label = 'positive')::int AS positive,
+      count(*) FILTER (WHERE sentiment_label = 'neutral')::int  AS neutral,
+      count(*) FILTER (WHERE sentiment_label = 'negative')::int AS negative,
+      count(*) FILTER (WHERE sentiment_label IS NULL)::int      AS unlabelled
+    FROM social_posts
+    WHERE created_at >= now() - interval '7 days'
+    GROUP BY platform
+  `)) as unknown as Array<{
+    platform: string;
+    positive: number;
+    neutral: number;
+    negative: number;
+    unlabelled: number;
+  }>;
+
+  const byPlatform = new Map(rows.map((r) => [r.platform, r]));
+  // Fixed display order — keeps the dialog UI consistent even when a
+  // platform has zero rows.
+  const ORDER = ["mainstream", "x", "youtube", "tiktok", "instagram"];
+  return ORDER.map((platform) => {
+    const r = byPlatform.get(platform);
+    const pos = Number(r?.positive ?? 0);
+    const neu = Number(r?.neutral ?? 0);
+    const neg = Number(r?.negative ?? 0);
+    const unl = Number(r?.unlabelled ?? 0);
+    const total = pos + neu + neg;
+    const pct = (n: number) => (total > 0 ? (n / total) * 100 : 0);
+    return {
+      platform,
+      positive: { count: pos, pct: pct(pos) },
+      neutral: { count: neu, pct: pct(neu) },
+      negative: { count: neg, pct: pct(neg) },
+      total,
+      unlabelled: unl,
+    };
+  });
+}
+
 export type TopicBucket = {
   id: string;
   label: string;
@@ -1507,4 +1567,68 @@ export async function getTopicDistribution7d(
       pct: total > 0 ? (count / total) * 100 : 0,
     };
   });
+}
+
+export type TopicByPlatformGroup = {
+  platform: string;
+  topics: Array<{ id: string; label: string; count: number; pct: number }>;
+};
+
+/**
+ * Top N topics per platform for the 7d window. Returns one entry per
+ * product-supported platform in fixed order (mainstream, x, youtube,
+ * tiktok, instagram) — empty `topics: []` if the platform has no
+ * topics yet. `pct` is share of that platform's total topic volume
+ * (so percentages sum to ~100 within each platform, not across).
+ *
+ * Used by the "topics by platform" dialog on the coverage breakdown.
+ */
+export async function getTopicsByPlatform7d(
+  perPlatform = 5,
+): Promise<TopicByPlatformGroup[]> {
+  const rows = (await db.execute(sql`
+    SELECT platform, id, label, post_count, platform_total
+    FROM (
+      SELECT
+        t.platform,
+        t.id::text AS id,
+        t.label,
+        t.post_count,
+        SUM(t.post_count) OVER (PARTITION BY t.platform) AS platform_total,
+        row_number() OVER (
+          PARTITION BY t.platform ORDER BY t.post_count DESC
+        ) AS rn
+      FROM topics t
+      WHERE t.post_count > 0
+    ) ranked
+    WHERE rn <= ${perPlatform}
+    ORDER BY platform, post_count DESC
+  `)) as unknown as Array<{
+    platform: string;
+    id: string;
+    label: string;
+    post_count: number;
+    platform_total: number;
+  }>;
+
+  const byPlatform = new Map<string, TopicByPlatformGroup["topics"]>();
+  for (const r of rows) {
+    const total = Number(r.platform_total ?? 0);
+    const count = Number(r.post_count);
+    const entry = {
+      id: r.id,
+      label: r.label,
+      count,
+      pct: total > 0 ? (count / total) * 100 : 0,
+    };
+    const list = byPlatform.get(r.platform) ?? [];
+    list.push(entry);
+    byPlatform.set(r.platform, list);
+  }
+
+  const ORDER = ["mainstream", "x", "youtube", "tiktok", "instagram"];
+  return ORDER.map((platform) => ({
+    platform,
+    topics: byPlatform.get(platform) ?? [],
+  }));
 }

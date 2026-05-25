@@ -1,8 +1,18 @@
 import type {
   PlatformBucket,
   SentimentBreakdown,
+  SentimentByPlatformRow,
   TopicBucket,
+  TopicByPlatformGroup,
 } from "@/lib/dashboard-metrics";
+import {
+  SentimentByPlatformDialog,
+  type SentimentByPlatformLabels,
+} from "./SentimentByPlatformDialog";
+import {
+  TopicsByPlatformDialog,
+  type TopicsByPlatformLabels,
+} from "./TopicsByPlatformDialog";
 
 /**
  * Three coverage breakdowns rendered side-by-side under one section
@@ -33,19 +43,25 @@ export type CoverageLabels = {
   sentimentNeutral: string;
   sentimentNegative: string;
   unlabelledTpl: string; // contains `{n}`
+  sentimentByPlatform: SentimentByPlatformLabels;
   topicsTitle: string;
   topicsCountSuffix: string;
+  topicsByPlatform: TopicsByPlatformLabels;
 };
 
 export function CoverageBreakdown({
   platforms,
   sentiment,
+  sentimentByPlatform,
   topics,
+  topicsByPlatform,
   labels,
 }: {
   platforms: PlatformBucket[];
   sentiment: SentimentBreakdown;
+  sentimentByPlatform: SentimentByPlatformRow[];
   topics: TopicBucket[];
+  topicsByPlatform: TopicByPlatformGroup[];
   labels: CoverageLabels;
 }) {
   if (
@@ -66,8 +82,16 @@ export function CoverageBreakdown({
       </p>
       <div className="mt-3 grid gap-3 md:grid-cols-3">
         <PlatformCard data={platforms} labels={labels} />
-        <SentimentCard data={sentiment} labels={labels} />
-        <TopicsCard data={topics} labels={labels} />
+        <SentimentCard
+          data={sentiment}
+          byPlatform={sentimentByPlatform}
+          labels={labels}
+        />
+        <TopicsCard
+          data={topics}
+          byPlatform={topicsByPlatform}
+          labels={labels}
+        />
       </div>
     </section>
   );
@@ -124,9 +148,11 @@ function PlatformCard({
 
 function SentimentCard({
   data,
+  byPlatform,
   labels,
 }: {
   data: SentimentBreakdown;
+  byPlatform: SentimentByPlatformRow[];
   labels: CoverageLabels;
 }) {
   return (
@@ -189,6 +215,10 @@ function SentimentCard({
               )}
             </p>
           )}
+          <SentimentByPlatformDialog
+            rows={byPlatform}
+            labels={labels.sentimentByPlatform}
+          />
         </>
       )}
     </div>
@@ -221,9 +251,11 @@ function SentimentRow({
 
 function TopicsCard({
   data,
+  byPlatform,
   labels,
 }: {
   data: TopicBucket[];
+  byPlatform: TopicByPlatformGroup[];
   labels: CoverageLabels;
 }) {
   return (
@@ -231,12 +263,18 @@ function TopicsCard({
       <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
         {labels.topicsTitle}
       </p>
-      <p className="mt-0.5 text-2xl font-bold tabular-nums text-slate-900">
-        {data.length}
-        <span className="ml-1 text-xs font-medium text-slate-400">
-          {labels.topicsCountSuffix}
-        </span>
-      </p>
+      <div className="mt-0.5 flex items-center justify-between gap-2">
+        <p className="text-2xl font-bold tabular-nums text-slate-900">
+          {data.length}
+          <span className="ml-1 text-xs font-medium text-slate-400">
+            {labels.topicsCountSuffix}
+          </span>
+        </p>
+        <TopicsByPlatformDialog
+          groups={byPlatform}
+          labels={labels.topicsByPlatform}
+        />
+      </div>
       {data.length === 0 ? (
         <p className="mt-3 text-xs text-slate-400">—</p>
       ) : (

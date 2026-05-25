@@ -192,15 +192,6 @@ services:
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-large}
       CLASSIFIER_MODEL: ${CLASSIFIER_MODEL:-gemini-2.0-flash}
       TZ: Asia/Jakarta
-      # IndoBERT (and any other HuggingFace model) caches its weights
-      # under $HF_HOME. Default would be ~/.cache/huggingface which
-      # inside the container is /app/.cache — that path occasionally
-      # picks up a stale lock between task retries and blocks the
-      # download. Pointing it at a bind-mounted dir we own avoids the
-      # lock contention AND survives container restarts so the model
-      # doesn't have to re-download each deploy.
-      HF_HOME: /data/hf-cache
-      TRANSFORMERS_CACHE: /data/hf-cache
     command:
       [
         "celery",
@@ -212,7 +203,6 @@ services:
       ]
     volumes:
       - /srv/dakwah-lens/data/attachments:/data/attachments
-      - /srv/dakwah-lens/data/hf-cache:/data/hf-cache
     depends_on:
       redis:
         condition: service_healthy
