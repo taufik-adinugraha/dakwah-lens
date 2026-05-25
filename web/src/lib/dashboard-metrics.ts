@@ -1346,3 +1346,165 @@ export async function getKitSegments(): Promise<KitSegmentData[]> {
 
   return out;
 }
+
+/* ─────────────────────────────────────────────────────────────
+ * Coverage breakdowns — 7d snapshots that complement the existing
+ * sparkline + top-issue cards on the Data tab. Three slices:
+ *   - per-platform post counts (where the signal came from)
+ *   - sentiment composition (positive / neutral / negative)
+ *   - topic distribution (top N labelled clusters)
+ *
+ * All three pull from `social_posts` and use the same 7d window so
+ * the percentages are comparable across cards.
+ * ───────────────────────────────────────────────────────────── */
+
+export type PlatformBucket = {
+  platform: string;
+  count: number;
+  pct: number;
+};
+
+/**
+ * Posts ingested per platform in the last 7 days. Sorted descending
+ * by count so the dominant source surfaces first. Empty platforms
+ * (paused scrapers) are simply absent from the list, which is the
+ * correct empty-state — no row for X / IG / TikTok while they're
+ * paused per `project_pipeline_verification_state`.
+ */
+export async function getPlatformDistribution7d(): Promise<PlatformBucket[]> {
+  const rows = (await db.execute(sql`
+    SELECT platform, count(*)::int AS count
+    FROM social_posts
+    WHERE created_at >= now() - interval '7 days'
+    GROUP BY platform
+    ORDER BY count DESC
+  `)) as unknown as Array<{ platform: string; count: number }>;
+
+  const total = rows.reduce((s, r) => s + Number(r.count), 0);
+  return rows.map((r) => ({
+    platform: r.platform,
+    count: Number(r.count),
+    pct: total > 0 ? (Number(r.count) / total) * 100 : 0,
+  }));
+}
+
+export type SentimentBreakdown = {
+  positive: { count: number; pct: number };
+  neutral: { count: number; pct: number };
+  negative: { count: number; pct: number };
+  total: number;
+  /** Posts ingested but not yet classified (still null). Useful as a
+   *  "data freshness" cue — if this is high, sentiment lines on other
+   *  cards may be skewed by the unlabelled tail. */
+  unlabelled: number;
+};
+
+/**
+ * Overall sentiment composition for the 7d window. Excludes
+ * unlabelled rows from the percentage denominator so percentages
+ * always sum to ~100. Reports unlabelled separately so the UI can
+ * surface the "classification in progress" signal if it's high.
+ */
+export async function getSentimentDistribution7d(): Promise<SentimentBreakdown> {
+  const [row] = (await db.execute(sql`
+    SELECT
+      count(*) FILTER (WHERE sentiment_label = 'positive')::int AS positive,
+      count(*) FILTER (WHERE sentiment_label = 'neutral')::int AS neutral,
+      count(*) FILTER (WHERE sentiment_label = 'negative')::int AS negative,
+      count(*) FILTER (WHERE sentiment_label IS NULL)::int AS unlabelled
+    FROM social_posts
+    WHERE created_at >= now() - interval '7 days'
+  `)) as unknown as Array<{
+    positive: number;
+    neutral: number;
+    negative: number;
+    unlabelled: number;
+  }>;
+
+  const pos = Number(row?.positive ?? 0);
+  const neu = Number(row?.neutral ?? 0);
+  const neg = Number(row?.negative ?? 0);
+  const unlabelled = Number(row?.unlabelled ?? 0);
+  const total = pos + neu + neg;
+  const pct = (n: number) => (total > 0 ? (n / total) * 100 : 0);
+  return {
+    positive: { count: pos, pct: pct(pos) },
+    neutral: { count: neu, pct: pct(neu) },
+    negative: { count: neg, pct: pct(neg) },
+    total,
+    unlabelled,
+  };
+}
+
+export type TopicBucket = {
+  id: string;
+  label: string;
+  platform: string;
+  keywords: string[];
+  count: number;
+  pct: number;
+};
+
+/**
+ * Top N topics by post count in the last 7 days. Distinguishes from
+ * `getTopIssues` (which returns 3 with full sentiment+sample details
+ * for the hero cards) — this returns a leaner list of ~10 for the
+ * "everything else" distribution card. No sentiment / sample posts;
+ * just `(label, platform, count, pct)`.
+ *
+ * `pct` is share of TOTAL 7d posts (not topic-only), so reading
+ * "X% of all this week's posts cluster here" is correct.
+ */
+export async function getTopicDistribution7d(
+  limit = 10,
+): Promise<TopicBucket[]> {
+  // One round-trip — JOIN topics → counted posts, scalar subquery for
+  // the corpus total. Keeps the math consistent if posts and topics
+  // race against each other (very rare at our cadence, but safer).
+  const rows = (await db.execute(sql`
+    WITH total AS (
+      SELECT count(*)::int AS n FROM social_posts
+      WHERE created_at >= now() - interval '7 days'
+    )
+    SELECT
+      t.id::text AS id,
+      t.label,
+      t.platform,
+      COALESCE(t.keywords, '[]'::jsonb) AS keywords,
+      count(sp.id)::int AS post_count,
+      (SELECT n FROM total) AS corpus_total
+    FROM topics t
+    LEFT JOIN social_posts sp
+      ON sp.topic_id = t.id
+     AND sp.created_at >= now() - interval '7 days'
+    GROUP BY t.id, t.label, t.platform, t.keywords
+    HAVING count(sp.id) > 0
+    ORDER BY post_count DESC
+    LIMIT ${limit}
+  `)) as unknown as Array<{
+    id: string;
+    label: string;
+    platform: string;
+    keywords: unknown;
+    post_count: number;
+    corpus_total: number;
+  }>;
+
+  return rows.map((r) => {
+    const kw = Array.isArray(r.keywords)
+      ? (r.keywords as string[])
+      : typeof r.keywords === "string"
+        ? (JSON.parse(r.keywords) as string[])
+        : [];
+    const total = Number(r.corpus_total ?? 0);
+    const count = Number(r.post_count);
+    return {
+      id: r.id,
+      label: r.label,
+      platform: r.platform,
+      keywords: kw.slice(0, 5),
+      count,
+      pct: total > 0 ? (count / total) * 100 : 0,
+    };
+  });
+}

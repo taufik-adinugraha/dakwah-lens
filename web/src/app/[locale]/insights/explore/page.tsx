@@ -16,10 +16,16 @@ import clsx from "clsx";
 
 import { Link } from "@/i18n/navigation";
 import { BackToInsightsLink } from "@/components/BackToInsightsLink";
+import { CoverageBreakdown } from "@/components/CoverageBreakdown";
 import { I18nText } from "@/components/I18nText";
 import { TrendingTopicsList } from "@/components/TrendingTopicsList";
 import { getOverviewInsights } from "@/lib/insights-data";
-import { getTopIssues } from "@/lib/dashboard-metrics";
+import {
+  getPlatformDistribution7d,
+  getSentimentDistribution7d,
+  getTopIssues,
+  getTopicDistribution7d,
+} from "@/lib/dashboard-metrics";
 
 /**
  * Data-exploration hub. Surfaces what used to live BELOW the briefing
@@ -47,9 +53,18 @@ export default async function InsightsExplorePage({
 
   const t = await getTranslations("Insights");
 
-  const [overview, topIssues] = await Promise.all([
+  const [
+    overview,
+    topIssues,
+    platformDist,
+    sentimentDist,
+    topicDist,
+  ] = await Promise.all([
     getOverviewInsights(),
     getTopIssues(5),
+    getPlatformDistribution7d(),
+    getSentimentDistribution7d(),
+    getTopicDistribution7d(10),
   ]);
 
   const trendingRows = topIssues;
@@ -103,6 +118,36 @@ export default async function InsightsExplorePage({
               {t("explore_subtitle")}
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* Coverage breakdown (platform / sentiment / topic distributions).
+          Mirrors what /dashboard Data tab shows — exposed on this public
+          /insights/explore page so anonymous visitors can see the same
+          snapshot of "who's talking, how they feel, what about" without
+          needing to log in. */}
+      <section className="pb-10 sm:pb-12">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <CoverageBreakdown
+            platforms={platformDist}
+            sentiment={sentimentDist}
+            topics={topicDist}
+            labels={{
+              sectionTitle: t("coverage_section_title"),
+              sectionSubtitle: t("coverage_section_subtitle"),
+              platformsTitle: t("coverage_platforms_title"),
+              postsSuffix: t("coverage_posts_7d"),
+              platformMainstream: t("coverage_platform_mainstream"),
+              sentimentTitle: t("coverage_sentiment_title"),
+              classifiedSuffix: t("coverage_classified_7d"),
+              sentimentPositive: t("coverage_sentiment_positive"),
+              sentimentNeutral: t("coverage_sentiment_neutral"),
+              sentimentNegative: t("coverage_sentiment_negative"),
+              unlabelledTpl: t("coverage_unlabelled_tpl", { n: "{n}" }),
+              topicsTitle: t("coverage_topics_title"),
+              topicsCountSuffix: t("coverage_topics_count_suffix"),
+            }}
+          />
         </div>
       </section>
 

@@ -20,6 +20,7 @@ import {
 import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
+import { CoverageBreakdown } from "@/components/CoverageBreakdown";
 import { I18nText } from "@/components/I18nText";
 import { TopIssueCards } from "@/components/TopIssueCards";
 import {
@@ -27,19 +28,25 @@ import {
   getBriefsThisWeek,
   getDailyInsights,
   getKitSegments,
+  getPlatformDistribution7d,
   getPulseSnapshot,
   getRecentSaved,
   getRisingVideos,
+  getSentimentDistribution7d,
   getSentimentTrend7d,
   getTopIssues,
+  getTopicDistribution7d,
   getTrendingCount24h,
   type ActiveRoom,
   type DailyInsights as DailyInsightsData,
+  type PlatformBucket,
   type PulseSnapshot,
   type RisingVideo,
   type SavedItem,
+  type SentimentBreakdown,
   type SentimentTrendPoint,
   type TopIssue,
+  type TopicBucket,
 } from "@/lib/dashboard-metrics";
 import { formatPanggilan } from "@/lib/panggilan";
 import { hashVisitorToken, readVisitorToken } from "@/lib/visitor-cookie";
@@ -119,6 +126,9 @@ export default async function DashboardPage({
     savedItems,
     sentimentTrend,
     activeRooms,
+    platformDist,
+    sentimentDist,
+    topicDist,
   ] = await Promise.all([
     canCreateBriefs
       ? db
@@ -147,6 +157,9 @@ export default async function DashboardPage({
     getRecentSaved(session.user.id),
     getSentimentTrend7d(),
     getActiveDiscussionRooms(visitorHash, 14, 6),
+    getPlatformDistribution7d(),
+    getSentimentDistribution7d(),
+    getTopicDistribution7d(10),
   ]);
 
   return (
@@ -232,6 +245,26 @@ export default async function DashboardPage({
               t={t}
             />
             <SentimentTrendChart points={sentimentTrend} t={t} />
+            <CoverageBreakdown
+              platforms={platformDist}
+              sentiment={sentimentDist}
+              topics={topicDist}
+              labels={{
+                sectionTitle: t("section_coverage_title"),
+                sectionSubtitle: t("section_coverage_subtitle"),
+                platformsTitle: t("coverage_platforms_title"),
+                postsSuffix: t("coverage_posts_7d"),
+                platformMainstream: t("coverage_platform_mainstream"),
+                sentimentTitle: t("coverage_sentiment_title"),
+                classifiedSuffix: t("coverage_classified_7d"),
+                sentimentPositive: t("sentiment_positive"),
+                sentimentNeutral: t("sentiment_neutral"),
+                sentimentNegative: t("sentiment_negative"),
+                unlabelledTpl: t("coverage_unlabelled", { n: "{n}" }),
+                topicsTitle: t("coverage_topics_title"),
+                topicsCountSuffix: t("coverage_topics_count_suffix"),
+              }}
+            />
             <TopIssues
               issues={topIssues}
               t={t}
@@ -715,6 +748,7 @@ function MiniStat({
   }
   return <div className={baseClass}>{inner}</div>;
 }
+
 
 function TopIssues({
   issues,
