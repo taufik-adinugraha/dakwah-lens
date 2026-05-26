@@ -80,28 +80,27 @@ export default async function PublicFlyersPage({
   const session = await auth();
   const langParam = locale === "en" ? "en" : "id";
 
-  // ── Pull system flyers from the last 60 days of briefings ──────
-  // Each briefing → 6 system flyer cards (one per share variant).
-  // Capped at 12 briefings (= 72 cards) so this surface scales when
-  // the corpus grows; sorted newest first.
+  // ── Pull the MOST-RECENT briefing per segment ─────────────────
+  // The gallery used to surface every briefing in the last 60 days
+  // (12 × 6 = 72 cards) but that buried this-week's content under
+  // archive material. Now we surface one row per segment (5 max) and
+  // generate 6 share-variant cards from each → at most 30 cards.
   //
-  // The 60-day cutoff is computed in SQL (`now() - interval '60 days'`)
-  // rather than via `Date.now()` in the component body — the latter
-  // trips React 19's "impure call during render" lint and pushes
-  // non-determinism into the route.
-  const briefingRows = await db
-    .select({
-      id: schema.insightsSummaries.id,
-      generatedAt: schema.insightsSummaries.generatedAt,
-      segment: schema.insightsSummaries.segment,
-    })
-    .from(schema.insightsSummaries)
-    .where(sql`generated_at >= now() - interval '60 days'`)
-    .orderBy(desc(schema.insightsSummaries.generatedAt))
-    .limit(12);
+  // `DISTINCT ON` keeps the newest row per segment (`segment` IS NULL
+  // is treated as its own group — that's the "all" briefing).
+  const briefingRows = (await db.execute(sql`
+    SELECT DISTINCT ON (segment) id, generated_at, segment
+    FROM insights_summaries
+    ORDER BY segment NULLS FIRST, generated_at DESC
+  `)) as unknown as Array<{
+    id: string;
+    generated_at: Date;
+    segment: string | null;
+  }>;
 
   const systemFlyers = briefingRows.flatMap((b) => {
-    const dateStr = formatWibDate(b.generatedAt);
+    const generatedAt = new Date(b.generated_at);
+    const dateStr = formatWibDate(generatedAt);
     const segmentKey = b.segment ?? "all";
     const slug = `${dateStr}-${segmentKey}`;
     const segLabel = SEGMENT_LABEL_ID[segmentKey] ?? segmentKey;
@@ -109,7 +108,7 @@ export default async function PublicFlyersPage({
       id: `system:${b.id}:${v}`,
       headline: `${VARIANT_LABEL[v]} — ${segLabel}`,
       visibility: "public" as const,
-      createdAt: b.generatedAt.toISOString(),
+      createdAt: generatedAt.toISOString(),
       kind: "system" as const,
       pngUrl: `/api/insights-brief/${slug}/flyer?variant=${v}&lang=${langParam}`,
     }));
