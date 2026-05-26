@@ -30,6 +30,10 @@ export function LoginForm({
   const callbackUrl = searchParams.get("callbackUrl") ?? "/";
   // Banner triggered after the user clicks the verification link.
   const justVerified = searchParams.get("verified") === "1";
+  // Context the visitor was bounced here from — currently only `bookmark`
+  // (BookmarkButton sets this when an anonymous user tries to save). Used
+  // to render a small contextual banner so the redirect isn't surprising.
+  const redirectReason = searchParams.get("reason");
 
   const [mode, setMode] = useState<Mode>(initialMode);
   const [error, setError] = useState<string | null>(null);
@@ -107,6 +111,15 @@ export function LoginForm({
         </div>
       )}
 
+      {/* Context banner — visible when the user was redirected here from
+          an anonymous-only-action (e.g. clicking Save on a kitab). */}
+      {redirectReason === "bookmark" && !justVerified && (
+        <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50/70 px-4 py-3 text-sm text-amber-900">
+          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
+          <p>{t("redirect_reason_bookmark")}</p>
+        </div>
+      )}
+
       {mode !== "forgot" && (
         <Tabs
           mode={mode === "signin" ? "signin" : "signup"}
@@ -164,6 +177,7 @@ export function LoginForm({
             autoComplete="name"
             required
             maxLength={120}
+            autoFocus
           />
         )}
         <Field
@@ -172,6 +186,7 @@ export function LoginForm({
           type="email"
           placeholder={t("field_email_placeholder")}
           autoComplete="email"
+          inputMode="email"
           required
           maxLength={254}
         />
@@ -349,6 +364,8 @@ function Field({
   required,
   minLength,
   maxLength,
+  inputMode,
+  autoFocus,
 }: {
   label: string;
   name: string;
@@ -358,6 +375,8 @@ function Field({
   required?: boolean;
   minLength?: number;
   maxLength?: number;
+  inputMode?: "text" | "email" | "tel" | "url" | "search" | "numeric" | "decimal" | "none";
+  autoFocus?: boolean;
 }) {
   return (
     <label className="block text-left">
@@ -370,6 +389,8 @@ function Field({
         required={required}
         minLength={minLength}
         maxLength={maxLength}
+        inputMode={inputMode}
+        autoFocus={autoFocus}
         className="mt-1.5 block h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
       />
     </label>

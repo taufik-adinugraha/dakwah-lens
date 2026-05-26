@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
 import { Download, FileText, ImageDown, Printer } from "lucide-react";
 
@@ -33,12 +33,25 @@ export function BriefDownloadMenu({
   const locale = useLocale();
   const flyerLang = locale === "en" ? "en" : "id";
 
+  // Close on Esc to match the Share dropdown sibling + the rest of the
+  // app's dialog conventions.
+  useEffect(() => {
+    if (!open) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
+
   return (
     <div className="relative">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        className="inline-flex h-10 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
       >
         <Download className="h-3.5 w-3.5" />
         {labels.trigger}

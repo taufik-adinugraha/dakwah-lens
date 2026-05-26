@@ -721,7 +721,15 @@ export function CommentForm({
             required
             minLength={2}
           />
-          <div className="mt-1 text-right text-xs text-slate-400">
+          <div
+            className={`mt-1 text-right text-xs ${
+              body.length >= Math.floor(BODY_MAX * 0.95)
+                ? "font-semibold text-rose-600"
+                : body.length >= Math.floor(BODY_MAX * 0.8)
+                  ? "text-amber-600"
+                  : "text-slate-400"
+            }`}
+          >
             {body.length}/{BODY_MAX}
           </div>
         </div>

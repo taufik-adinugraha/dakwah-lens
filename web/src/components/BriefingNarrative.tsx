@@ -173,6 +173,19 @@ export function BriefingNarrative({
                   briefBasePath={briefBasePath!}
                   initialDeliverable={initialDeliverable ?? null}
                 />
+                {/* Separator between the core deliverable cards and the
+                    visual extras (Mahasiswa poster, share-ready flyers).
+                    Both downstream blocks have their own eyebrow + title,
+                    but without the dashed rule + spacing they bled into
+                    the deliverable grid above and looked like more cards.
+                    Audit 2026-05-26 P0 — visitors expecting a unified
+                    "content kit" couldn't tell where it ended. */}
+                {briefId && (posterLabels || true) && (
+                  <hr
+                    aria-hidden
+                    className="my-10 border-t border-dashed border-slate-200"
+                  />
+                )}
                 {briefId && posterLabels && (
                   <MahasiswaPosterCard
                     briefId={briefId}

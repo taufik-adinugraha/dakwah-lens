@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Check,
   Copy,
@@ -48,6 +48,19 @@ export function BriefShareMenu({
 }) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState<"link" | "markdown" | null>(null);
+
+  // Close on Esc so the dropdown matches the rest of the app's modal
+  // conventions (Daleel modal, MobileNav, UserMenu, dialogs). Without
+  // this, keyboard users were stuck having to Tab + Shift+Tab back to
+  // the trigger to close.
+  useEffect(() => {
+    if (!open) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
 
   // Compute share URL only in the client — typeof window guard for SSR.
   const shareUrl =
@@ -126,7 +139,9 @@ export function BriefShareMenu({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        className="inline-flex h-10 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
       >
         <Share2 className="h-3.5 w-3.5" />
         {labels.trigger}
