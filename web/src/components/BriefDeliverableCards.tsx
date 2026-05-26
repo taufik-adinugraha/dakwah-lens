@@ -278,13 +278,21 @@ export function BriefDeliverableCards({
   labels,
   briefBasePath,
   initialDeliverable,
+  routeOnOpen = true,
 }: {
   section4Markdown: string;
   labels: Labels;
   /** Path of the brief detail route — e.g. `/insights/brief/2026-05-22-all`.
-   *  Closing the modal navigates here; opening pushes `${path}/${kind}`. */
+   *  Still used to build share + PDF URLs for the modal even when
+   *  `routeOnOpen` is false. */
   briefBasePath: string;
   initialDeliverable?: CardKind | null;
+  /** When true (default), opening a card pushes `${briefBasePath}/${kind}`
+   *  to the URL so the back button closes the modal and the deep-link
+   *  is shareable. Set false on surfaces that just want the modal
+   *  in-place (e.g. the dashboard kit-tab usage, where pushing the URL
+   *  would navigate the user away to the briefing detail route). */
+  routeOnOpen?: boolean;
 }) {
   const router = useRouter();
   const { intro, cards } = parseSection4(section4Markdown);
@@ -318,6 +326,7 @@ export function BriefDeliverableCards({
 
   const onOpenCard = (i: number) => {
     setOpenIndex(i);
+    if (!routeOnOpen) return;
     const kind = orderedCards[i]?.kind;
     if (kind) {
       // Push (not replace) so back-button closes the modal.
@@ -327,6 +336,7 @@ export function BriefDeliverableCards({
 
   const onCloseModal = () => {
     setOpenIndex(null);
+    if (!routeOnOpen) return;
     // Replace so the URL change doesn't pile a history entry on top of
     // the open-modal entry — the user-experience-correct stack is:
     //   /brief/[id]  →  /brief/[id]/khutbah  →  (close)  →  /brief/[id]

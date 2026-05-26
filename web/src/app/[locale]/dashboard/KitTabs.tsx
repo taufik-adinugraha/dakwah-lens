@@ -269,6 +269,7 @@ function StrategiPane({
         section4Markdown={strategiMarkdown}
         labels={labels.deliverable}
         briefBasePath={briefBasePath}
+        routeOnOpen={false}
       />
       <MahasiswaPosterCard
         briefId={briefSlug}

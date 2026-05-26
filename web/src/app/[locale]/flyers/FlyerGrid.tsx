@@ -2,8 +2,16 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { Download, Eye, Globe, Lock, Sparkles, Trash2 } from "lucide-react";
-import { useState, useTransition } from "react";
+import {
+  Download,
+  Eye,
+  Globe,
+  Lock,
+  Sparkles,
+  Trash2,
+  X,
+} from "lucide-react";
+import { useEffect, useState, useTransition } from "react";
 
 type Flyer = {
   id: string;
@@ -69,6 +77,7 @@ function FlyerTile({
   onDeleted: () => void;
 }) {
   const [pending, startTransition] = useTransition();
+  const [zoomed, setZoomed] = useState(false);
   const kind = flyer.kind ?? "user";
   const png = flyer.pngUrl ?? `/api/user-flyers/${flyer.id}/png`;
   // System flyers (from weekly briefings) have no DELETE endpoint —
@@ -87,11 +96,11 @@ function FlyerTile({
 
   return (
     <li className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <a
-        href={png}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block aspect-square overflow-hidden bg-slate-100"
+      <button
+        type="button"
+        onClick={() => setZoomed(true)}
+        aria-label={labels.openLarge}
+        className="block aspect-square w-full overflow-hidden bg-slate-100"
       >
         <img
           src={png}
@@ -99,7 +108,7 @@ function FlyerTile({
           loading="lazy"
           className="h-full w-full object-cover transition hover:scale-[1.02]"
         />
-      </a>
+      </button>
       <div className="space-y-2 p-3">
         <div className="flex items-start justify-between gap-2">
           <p className="line-clamp-2 text-sm font-semibold text-slate-900">
@@ -137,15 +146,14 @@ function FlyerTile({
           })}
         </p>
         <div className="flex flex-wrap gap-1.5">
-          <a
-            href={png}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            type="button"
+            onClick={() => setZoomed(true)}
             className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-50"
           >
             <Eye className="h-3 w-3" />
             {labels.openLarge}
-          </a>
+          </button>
           <a
             href={png}
             download={`dakwah-lens-flyer-${flyer.id}.png`}
@@ -167,6 +175,81 @@ function FlyerTile({
           )}
         </div>
       </div>
+
+      {zoomed && (
+        <ZoomOverlay
+          src={png}
+          alt={flyer.headline}
+          downloadName={`dakwah-lens-flyer-${flyer.id}.png`}
+          downloadLabel={labels.download}
+          closeLabel={labels.openLarge}
+          onClose={() => setZoomed(false)}
+        />
+      )}
     </li>
+  );
+}
+
+function ZoomOverlay({
+  src,
+  alt,
+  downloadName,
+  downloadLabel,
+  closeLabel,
+  onClose,
+}: {
+  src: string;
+  alt: string;
+  downloadName: string;
+  downloadLabel: string;
+  closeLabel: string;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 p-4 backdrop-blur-sm"
+    >
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label={closeLabel}
+        className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-slate-900 shadow-md transition hover:bg-white"
+      >
+        <X className="h-5 w-5" />
+      </button>
+      <div
+        className="relative flex max-h-[92vh] max-w-[92vw] flex-col items-center gap-3"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <img
+          src={src}
+          alt={alt}
+          className="max-h-[80vh] max-w-[88vw] rounded-2xl shadow-2xl"
+        />
+        <a
+          href={src}
+          download={downloadName}
+          className="inline-flex items-center gap-1.5 rounded-full bg-white/95 px-4 py-2 text-xs font-semibold text-slate-900 shadow-md transition hover:bg-white"
+        >
+          <Download className="h-3.5 w-3.5" />
+          {downloadLabel}
+        </a>
+      </div>
+    </div>
   );
 }
