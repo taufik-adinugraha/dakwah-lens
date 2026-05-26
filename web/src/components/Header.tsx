@@ -38,6 +38,7 @@ export async function Header() {
     { href: `/${locale}/insights`, label: t("insights") },
     { href: `/${locale}/discussions`, label: t("discussions") },
     { href: `/${locale}/kitab`, label: t("kitab") },
+    { href: `/${locale}/flyers/public`, label: t("flyers_library") },
     ...(isAdmin
       ? [{ href: `/${locale}/briefs/public`, label: t("briefs_library") }]
       : []),
@@ -94,6 +95,12 @@ export async function Header() {
             </Link>
             <Link href="/kitab" className="hover:text-slate-900 transition">
               {t("kitab")}
+            </Link>
+            <Link
+              href="/flyers/public"
+              className="hover:text-slate-900 transition"
+            >
+              {t("flyers_library")}
             </Link>
             {isAdmin && (
               <Link
