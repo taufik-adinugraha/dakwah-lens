@@ -54,6 +54,18 @@ elif [[ "$(stat -c %u "$ATTACH_DIR")" != "1001" ]]; then
   sudo chown -R 1001:1001 "$ATTACH_DIR"
 fi
 
+# User-uploaded flyer images (POST /flyers/new "Unggah Gambar" tab).
+# Same uid:gid as attachments — bind-mounted into the web container at
+# /app/public/flyer-assets/user-uploads/.
+USER_FLYER_DIR=/srv/dakwah-lens/data/flyer-user-uploads
+if [[ ! -d "$USER_FLYER_DIR" ]]; then
+  say "▶ creating $USER_FLYER_DIR"
+  sudo install -d -o 1001 -g 1001 -m 755 "$USER_FLYER_DIR"
+elif [[ "$(stat -c %u "$USER_FLYER_DIR")" != "1001" ]]; then
+  say "▶ chowning $USER_FLYER_DIR to 1001:1001"
+  sudo chown -R 1001:1001 "$USER_FLYER_DIR"
+fi
+
 # 1.5 Sync Caddy config ────────────────────────────────────────
 # Caddyfile lives in deploy/ inside the repo so a fresh-VM provision
 # automatically gets the right routing. We use `install` (not cp) and
