@@ -14,6 +14,8 @@
 
 import { createHash, randomUUID } from "crypto";
 
+import { NEXTAUTH_SECRET } from "./secrets";
+
 import type { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
@@ -54,8 +56,9 @@ export function setVisitorCookie(res: NextResponse, token: string): void {
 
 /** SHA-256 hash with the auth secret as salt. Same primitive the
  *  POST route uses for ip_hash / ua_hash, kept consistent so admins
- *  can reason about both side-by-side. */
+ *  can reason about both side-by-side. Secret resolution (with
+ *  prod-time hard-fail if NEXTAUTH_SECRET is missing) lives in
+ *  `./secrets`. */
 export function hashVisitorToken(token: string): string {
-  const secret = process.env.NEXTAUTH_SECRET || "dakwah-lens-fallback-secret";
-  return createHash("sha256").update(`${token}|${secret}`).digest("hex");
+  return createHash("sha256").update(`${token}|${NEXTAUTH_SECRET}`).digest("hex");
 }

@@ -23,8 +23,9 @@
 
 import { createHmac, timingSafeEqual } from "crypto";
 
-const SECRET =
-  process.env.NEXTAUTH_SECRET || "dakwah-lens-fallback-comment-secret";
+import { NEXTAUTH_SECRET } from "./secrets";
+
+const SECRET = NEXTAUTH_SECRET;
 
 /** Minimum seconds between page load and submit. Humans typing a 50-
  *  word comment need ≥ 8 seconds; setting the floor at 3 catches

@@ -10,6 +10,7 @@ import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { moderateComment, MODERATION_LIMITS } from "@/lib/comment-moderation";
 import { verifyCommentToken } from "@/lib/comment-token";
 import { getBriefingBySlug } from "@/lib/insights-data";
+import { NEXTAUTH_SECRET } from "@/lib/secrets";
 import {
   hashVisitorToken,
   mintVisitorToken,
@@ -60,8 +61,9 @@ const PER_IP_DB_WINDOW_LIMIT = 5;
 
 function hashWithSecret(value: string | null | undefined): string | null {
   if (!value) return null;
-  const secret = process.env.NEXTAUTH_SECRET || "dakwah-lens-fallback-secret";
-  return createHash("sha256").update(`${value}|${secret}`).digest("hex");
+  return createHash("sha256")
+    .update(`${value}|${NEXTAUTH_SECRET}`)
+    .digest("hex");
 }
 
 export async function GET(
