@@ -51,10 +51,12 @@ import {
   type TopicBucket,
 } from "@/lib/dashboard-metrics";
 import { formatPanggilan } from "@/lib/panggilan";
+import { getQuotaSnapshot } from "@/lib/user-flyer/quota";
 import { hashVisitorToken, readVisitorToken } from "@/lib/visitor-cookie";
 import { DashboardTabs } from "./DashboardTabs";
+import { FlyerBuilderCard } from "./FlyerBuilderCard";
 import { KitTabs } from "./KitTabs";
-import { SavedKitabItem } from "./SavedKitabItem";
+import { SavedItemRow } from "./SavedItemRow";
 import { SentimentTrendCard } from "./SentimentTrendCard";
 
 export async function generateMetadata({
@@ -135,6 +137,7 @@ export default async function DashboardPage({
     sentimentByPlatform,
     topicDist,
     topicsByPlatform,
+    flyerQuota,
   ] = await Promise.all([
     canCreateBriefs
       ? db
@@ -168,6 +171,7 @@ export default async function DashboardPage({
     getSentimentByPlatform7d(),
     getTopicDistribution7d(10),
     getTopicsByPlatform7d(5),
+    getQuotaSnapshot(session.user.id),
   ]);
 
   return (
@@ -232,6 +236,20 @@ export default async function DashboardPage({
                 },
               }}
             />
+            <FlyerBuilderCard
+              quota={flyerQuota}
+              labels={{
+                title: t("section_flyer_builder_title"),
+                subtitle: t("section_flyer_builder_subtitle"),
+                cta: t("section_flyer_builder_cta"),
+                mine: t("section_flyer_builder_mine"),
+                public: t("section_flyer_builder_public"),
+                quotaTpl: t("section_flyer_builder_quota", {
+                  remaining: "{remaining}",
+                  limit: "{limit}",
+                }),
+              }}
+            />
             <ActiveRoomsCard rooms={activeRooms} t={t} />
             <SavedItemsCard items={savedItems} t={t} />
             {canCreateBriefs && (
@@ -242,9 +260,12 @@ export default async function DashboardPage({
                 locale={locale}
               />
             )}
-            {canCreateBriefs && (
-              <BriefsStatTile briefsThisWeek={briefsThisWeek} t={t} />
-            )}
+            <div className="grid gap-3 sm:grid-cols-2">
+              {canCreateBriefs && (
+                <BriefsStatTile briefsThisWeek={briefsThisWeek} t={t} />
+              )}
+              <FlyersStatTile flyersThisWeek={flyerQuota.used} t={t} />
+            </div>
           </div>
         }
         data={
@@ -377,12 +398,6 @@ function SavedItemsCard({ items, t }: { items: SavedItem[]; t: T }) {
     );
   }
 
-  const kindIcon = {
-    kitab: BookOpenCheck,
-    brief: ScrollText,
-    post: Sparkles,
-  };
-
   return (
     <section>
       <SectionHeader
@@ -399,65 +414,35 @@ function SavedItemsCard({ items, t }: { items: SavedItem[]; t: T }) {
       />
       <ul className="mt-3 divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white">
         {items.map((item) => {
-          const Icon = kindIcon[item.kind] ?? Bookmark;
           const title =
             (item.payload?.title as string) ||
             (item.payload?.citation as string) ||
             item.refId;
+          // Kitab citation already names the kitab + number, so the
+          // corpus subtitle is redundant — suppress it. For brief/post
+          // the subtitle adds segment or kind info, so keep it.
           const subtitle =
-            (item.payload?.corpus as string) ||
-            (item.payload?.segment as string) ||
-            t(`saved_kind_${item.kind}` as Parameters<T>[0]);
-
-          // Kitab bookmarks have no per-citation route, but the
-          // bookmark payload already carries the full Arabic +
-          // translation snapshot — render it inline via a modal
-          // instead of routing to a dead URL.
-          if (item.kind === "kitab") {
-            return (
-              <li key={item.id} className="p-3 sm:p-4">
-                <SavedKitabItem
-                  title={title}
-                  subtitle={subtitle}
-                  payload={item.payload as {
-                    corpus?: string;
-                    citation?: string;
-                    arabic?: string;
-                    translation?: string;
-                  }}
-                  labels={{
-                    close: t("saved_kitab_modal_close"),
-                    noArabic: t("saved_kitab_modal_no_arabic"),
-                    noTranslation: t("saved_kitab_modal_no_translation"),
-                  }}
-                />
-              </li>
-            );
-          }
-
-          const href =
-            item.kind === "brief"
-              ? `/insights/brief/${item.refId}`
-              : "/saved";
+            item.kind === "kitab"
+              ? undefined
+              : (item.payload?.segment as string) ||
+                t(`saved_kind_${item.kind}` as Parameters<T>[0]);
           return (
-            <li key={item.id} className="p-3 sm:p-4">
-              <Link
-                href={href}
-                className="flex items-start gap-3 text-left hover:text-emerald-700"
-              >
-                <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600">
-                  <Icon className="h-3.5 w-3.5" />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-semibold text-slate-900">
-                    {title}
-                  </span>
-                  <span className="block text-xs text-slate-500">
-                    {subtitle}
-                  </span>
-                </span>
-              </Link>
-            </li>
+            <SavedItemRow
+              key={item.id}
+              id={item.id}
+              kind={item.kind}
+              refId={item.refId}
+              title={title}
+              subtitle={subtitle}
+              payload={item.payload}
+              labels={{
+                close: t("saved_kitab_modal_close"),
+                noArabic: t("saved_kitab_modal_no_arabic"),
+                noTranslation: t("saved_kitab_modal_no_translation"),
+                removeAria: t("saved_remove_aria"),
+                removeConfirm: t("saved_remove_confirm"),
+              }}
+            />
           );
         })}
       </ul>
@@ -480,6 +465,25 @@ function BriefsStatTile({
       value={briefsThisWeek.toString()}
       hint={t("stat_briefs_this_week_hint")}
       href={briefsThisWeek > 0 ? "/briefs" : "/briefs/new"}
+    />
+  );
+}
+
+function FlyersStatTile({
+  flyersThisWeek,
+  t,
+}: {
+  flyersThisWeek: number;
+  t: T;
+}) {
+  return (
+    <MiniStat
+      tone="emerald"
+      icon={Sparkles}
+      label={t("stat_flyers_this_week_label")}
+      value={flyersThisWeek.toString()}
+      hint={t("stat_flyers_this_week_hint")}
+      href={flyersThisWeek > 0 ? "/flyers/mine" : "/flyers/new"}
     />
   );
 }

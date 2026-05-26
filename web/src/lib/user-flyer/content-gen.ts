@@ -12,6 +12,7 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 
+import { formatCalendarContext } from "@/lib/islamic-calendar";
 import { recordUsage } from "@/lib/usage-log";
 
 export type UserFlyerContent = {
@@ -79,16 +80,27 @@ export async function generateUserFlyerContent({
 }): Promise<UserFlyerContent> {
   const client = getClient();
 
+  // Hijri calendar awareness — same helper the brief generator + Insights
+  // pipeline use. Without this the LLM has no idea what TODAY is in the
+  // Hijri calendar and inferred-date errors slip in (e.g. saying "Arafah
+  // is coming soon" when today IS Arafah).
+  const { promptBlock: calendarBlock } = formatCalendarContext(
+    new Date(),
+    10,
+  );
+
   const newsBlock = news
     ? `\n\nKONTEKS BERITA PEKAN INI (gunakan sebagai LATAR / pemicu, jangan ulang fakta-fakta-nya — pembaca sudah tahu beritanya):\n- Kategori dominan: ${news.topCategory}\n- Topik trending: ${news.topTopics.slice(0, 5).join("; ")}`
     : "";
 
-  const userBlock = `PERMINTAAN PENGGUNA (free text, mungkin singkat atau samar — silakan tafsirkan dengan baik):
+  const userBlock = `${calendarBlock}
+
+PERMINTAAN PENGGUNA (free text, mungkin singkat atau samar — silakan tafsirkan dengan baik):
 """
 ${userPrompt.trim()}
 """${newsBlock}
 
-Tulis copy flyer sesuai aturan di atas. Output WAJIB JSON dengan field headline, body, search_theme.`;
+Tulis copy flyer sesuai aturan di atas. Pastikan headline + body KONSISTEN dengan konteks kalender Hijriyah di atas (kalau hari ini adalah event tertentu, jangan menulis "akan datang" atau "sebentar lagi"). Output WAJIB JSON dengan field headline, body, search_theme.`;
 
   const resp = await client.models.generateContent({
     model: "gemini-2.5-flash-lite",

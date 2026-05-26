@@ -54,6 +54,9 @@ export function estimateBriefTokens(input: {
   topicTitle: string;
   extraContext?: string | null;
   locale: "id" | "en";
+  /** Target length 1-4 pages. Default 2. Scales the output-token
+   *  estimate so the cost preview tracks the actual generation budget. */
+  pages?: number;
 }): { tokensIn: number; tokensOut: number } {
   const baseIn = 3500; // system prompt + daleel pool + segment/tone framing
   const extraIn =
@@ -61,7 +64,14 @@ export function estimateBriefTokens(input: {
     Math.round((input.extraContext?.length ?? 0) * 0.3);
   const tokensIn = baseIn + extraIn;
 
-  const tokensOut = input.locale === "id" ? 5800 : 4500;
+  // Output tokens scale with the requested page count. Calibrated against
+  // historic 4-page briefs: ID ≈ 5800 tokens / EN ≈ 4500 tokens at 4
+  // pages. Linear scale keeps the estimate within ±20% across the 1-4
+  // range. Floor at 2-page volume so 1-page briefs still reflect the
+  // structured-JSON scaffolding cost.
+  const pages = Math.max(1, Math.min(4, input.pages ?? 2));
+  const perPage = input.locale === "id" ? 1450 : 1125;
+  const tokensOut = Math.max(perPage * 2, perPage * pages);
 
   return { tokensIn, tokensOut };
 }
@@ -100,6 +110,7 @@ export function estimateBriefCost(input: {
   topicTitle: string;
   extraContext?: string | null;
   locale: "id" | "en";
+  pages?: number;
 }): CostBreakdown {
   const { tokensIn, tokensOut } = estimateBriefTokens(input);
   return computeCost({

@@ -12,6 +12,8 @@ import {
   Upload,
 } from "lucide-react";
 
+import { LayoutThumbnail } from "./LayoutThumbnail";
+
 import { Link } from "@/i18n/navigation";
 import type { QuotaSnapshot } from "@/lib/user-flyer/quota";
 import { uploadUserFlyerImage } from "../upload-action";
@@ -235,17 +237,15 @@ export function NewFlyerForm({
                 key={l}
                 type="button"
                 onClick={() => setLayout(l)}
-                className={`flex flex-col rounded-2xl border p-3 text-left transition ${
+                className={`flex items-center gap-3 rounded-2xl border p-3 text-left transition ${
                   active
                     ? "border-emerald-500 bg-emerald-50 ring-1 ring-emerald-200"
                     : "border-slate-200 bg-white hover:border-slate-300"
                 }`}
               >
+                <LayoutThumbnail layout={l} active={active} />
                 <span className="text-sm font-semibold text-slate-900">
                   {labels.layouts[l].title}
-                </span>
-                <span className="mt-1 text-xs leading-relaxed text-slate-600">
-                  {labels.layouts[l].hint}
                 </span>
               </button>
             );
@@ -276,7 +276,7 @@ export function NewFlyerForm({
         </div>
 
         {tab === "collection" && (
-          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+          <div className="grid max-h-[22rem] grid-cols-3 gap-2 overflow-y-auto rounded-xl border border-slate-200 bg-slate-50/50 p-2 sm:max-h-[26rem] sm:grid-cols-4 lg:max-h-[22rem] lg:grid-cols-6">
             {photos.map((p) => {
               const active = imageRef === p.id;
               return (

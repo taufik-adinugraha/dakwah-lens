@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, gte, lt, sql } from "drizzle-orm";
 import { ArrowRight, Plus, ScrollText, Sparkles } from "lucide-react";
 
 import { auth } from "@/auth";
+import { MonthPickerPager } from "@/components/MonthPickerPager";
 import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
+import {
+  monthRangeUtc,
+  parseMonthParam,
+  parsePageParam,
+} from "@/lib/month-filter";
 
 export async function generateMetadata({
   params,
@@ -16,8 +22,11 @@ export async function generateMetadata({
   return { title: t("page_title_list") };
 }
 
+const PAGE_SIZE = 20;
+
 export default async function MyBriefsPage({
   params,
+  searchParams,
 }: PageProps<"/[locale]/briefs">) {
   const { locale } = await params;
   setRequestLocale(locale);
@@ -28,6 +37,53 @@ export default async function MyBriefsPage({
   }
 
   const t = await getTranslations("Briefs");
+  const sp = await searchParams;
+  const selectedMonth = parseMonthParam(sp.month);
+  const page = parsePageParam(sp.page);
+
+  // Months available for THIS user — drives the dropdown. WIB-anchored
+  // so a row created near midnight stays in the user-visible day.
+  const monthRows = (await db.execute(sql`
+    SELECT DISTINCT
+      EXTRACT(YEAR FROM (created_at AT TIME ZONE 'Asia/Jakarta'))::int AS year,
+      EXTRACT(MONTH FROM (created_at AT TIME ZONE 'Asia/Jakarta'))::int AS month
+    FROM briefs
+    WHERE user_id = ${session.user.id}
+    ORDER BY year DESC, month DESC
+  `)) as unknown as Array<{ year: number; month: number }>;
+  const monthsAvailable = monthRows.map((r) => ({
+    year: Number(r.year),
+    month: Number(r.month),
+  }));
+
+  const baseWhere = eq(schema.briefs.userId, session.user.id);
+  const filterWhere = selectedMonth
+    ? (() => {
+        const { startUtc, endUtc } = monthRangeUtc(
+          selectedMonth.year,
+          selectedMonth.month,
+        );
+        return and(
+          baseWhere,
+          gte(schema.briefs.createdAt, startUtc),
+          lt(schema.briefs.createdAt, endUtc),
+        )!;
+      })()
+    : baseWhere;
+
+  const [{ total }] = (await db.execute(sql`
+    SELECT count(*)::int AS total
+    FROM briefs
+    WHERE user_id = ${session.user.id}
+    ${
+      selectedMonth
+        ? sql`AND created_at >= ${monthRangeUtc(selectedMonth.year, selectedMonth.month).startUtc.toISOString()}
+              AND created_at <  ${monthRangeUtc(selectedMonth.year, selectedMonth.month).endUtc.toISOString()}`
+        : sql``
+    }
+  `)) as unknown as Array<{ total: number }>;
+  const totalPages = Math.max(1, Math.ceil(Number(total) / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
 
   const userBriefs = await db
     .select({
@@ -41,8 +97,10 @@ export default async function MyBriefsPage({
       createdAt: schema.briefs.createdAt,
     })
     .from(schema.briefs)
-    .where(eq(schema.briefs.userId, session.user.id))
-    .orderBy(desc(schema.briefs.createdAt));
+    .where(filterWhere)
+    .orderBy(desc(schema.briefs.createdAt))
+    .limit(PAGE_SIZE)
+    .offset((safePage - 1) * PAGE_SIZE);
 
   return (
     <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
@@ -86,10 +144,28 @@ export default async function MyBriefsPage({
         </div>
       </div>
 
+      {monthsAvailable.length > 0 && (
+        <MonthPickerPager
+          baseHref="/briefs"
+          monthsAvailable={monthsAvailable}
+          selectedMonth={selectedMonth}
+          page={safePage}
+          totalPages={totalPages}
+          locale={locale}
+          labels={{
+            monthLabel: t("filter_month_label"),
+            allTime: t("filter_all_time"),
+            pageOf: t("filter_page_of"),
+            prev: t("filter_prev"),
+            next: t("filter_next"),
+          }}
+        />
+      )}
+
       {userBriefs.length === 0 ? (
         <EmptyState t={t} />
       ) : (
-        <div className="mt-8 grid gap-3">
+        <div className="mt-4 grid gap-3">
           {userBriefs.map((b) => (
             <BriefRow key={b.id} brief={b} t={t} locale={locale} />
           ))}

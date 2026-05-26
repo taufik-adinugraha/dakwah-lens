@@ -203,11 +203,28 @@ export async function retrieveDaleel(
     throw new RetrievalUnavailableError("OPENAI_API_KEY not configured");
   }
 
+  // Flash-Lite query expansion — same helper `searchKitabBrowse` uses.
+  // Without this, raw user topics like "belajar agama utk gen z atau
+  // alpha" land at <0.40 cosine similarity (the kitab corpus has no
+  // "gen z" tokens) and trigger WeakRelevanceError even when the
+  // theme IS covered. The expander rewrites colloquial / code-switched
+  // Indonesian into syariah-vocabulary equivalents that the corpus
+  // actually contains. Falls through to the raw query on any failure.
+  const expandedQuery = await expandQuery(query);
+  if (expandedQuery !== query) {
+    console.info(
+      "[kitab-retrieval] query expanded:",
+      JSON.stringify(query),
+      "→",
+      JSON.stringify(expandedQuery),
+    );
+  }
+
   let vector: number[] | undefined;
   try {
     const emb = await openai.embeddings.create({
       model: EMBEDDING_MODEL,
-      input: query,
+      input: expandedQuery,
     });
     vector = emb.data[0]?.embedding;
     void recordUsage({

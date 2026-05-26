@@ -49,10 +49,18 @@ const SEGMENTS = [
   "urban_gen_z",
   "working_professionals",
   "parents_families",
+  "ibu_pengajian",
   "rural_communities",
   "students",
 ] as const;
-const TONES = ["scholarly", "casual", "motivational", "empathetic"] as const;
+const TONES = [
+  "scholarly",
+  "casual",
+  "motivational",
+  "empathetic",
+  "fiery",
+  "gentle",
+] as const;
 const LOCALES = ["en", "id"] as const;
 
 const GenerateSchema = z.object({
@@ -69,6 +77,10 @@ const GenerateSchema = z.object({
     .max(2000, "extra_context_too_long")
     .optional()
     .transform((v) => (v && v.length > 0 ? v : undefined)),
+  /** Target length 1-4 pages. Default 2. Scales the LLM's maxOutputTokens
+   *  budget (≈2000 tokens/page Indonesian). `z.coerce.number` handles the
+   *  string-typed FormData value. */
+  pages: z.coerce.number().int().min(1).max(4).default(2),
 });
 
 export type GenerateResult =
@@ -90,11 +102,12 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
     tone: formData.get("tone"),
     locale: formData.get("locale"),
     extra_context: formData.get("extra_context"),
+    pages: formData.get("pages") ?? 2,
   });
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0].message };
   }
-  const { topic_title, segment, tone, locale, extra_context } = parsed.data;
+  const { topic_title, segment, tone, locale, extra_context, pages } = parsed.data;
 
   // 1) Retrieve daleel via Qdrant semantic search across the full kitab
   // corpus. Enrich the query with the target segment so retrieved daleel
@@ -204,6 +217,7 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
       daleel,
       profile,
       extraContext: extra_context,
+      pages,
     });
     content = generated.content;
     provider = generated.provider;
@@ -288,6 +302,7 @@ const EstimateSchema = z.object({
     .max(2000, "extra_context_too_long")
     .optional()
     .transform((v) => (v && v.length > 0 ? v : undefined)),
+  pages: z.coerce.number().int().min(1).max(4).default(2),
 });
 
 export type EstimateResult =
@@ -325,6 +340,7 @@ export async function estimateBriefCostAction(
     topic_title: formData.get("topic_title"),
     locale: formData.get("locale"),
     extra_context: formData.get("extra_context"),
+    pages: formData.get("pages") ?? 2,
   });
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0].message };
@@ -334,6 +350,7 @@ export async function estimateBriefCostAction(
     topicTitle: parsed.data.topic_title,
     extraContext: parsed.data.extra_context,
     locale: parsed.data.locale,
+    pages: parsed.data.pages,
   });
 
   return {
@@ -351,6 +368,7 @@ const SEGMENT_LABELS: Record<string, { id: string; en: string }> = {
   urban_gen_z: { id: "Gen Z Perkotaan", en: "Urban Gen Z" },
   working_professionals: { id: "Profesional Muda", en: "Working Professionals" },
   parents_families: { id: "Orang Tua & Keluarga", en: "Parents & Families" },
+  ibu_pengajian: { id: "Ibu-Ibu Pengajian", en: "Mothers' Study Circle" },
   rural_communities: { id: "Komunitas Pedesaan", en: "Rural Communities" },
   students: { id: "Pelajar & Mahasiswa", en: "Students" },
 };

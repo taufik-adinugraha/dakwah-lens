@@ -2,7 +2,15 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { ArrowLeft, ArrowRight, Coins, Plus, Sparkles } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Coins,
+  Minus,
+  Plus,
+  Sparkles,
+  X,
+} from "lucide-react";
 import clsx from "clsx";
 
 import {
@@ -17,10 +25,18 @@ const SEGMENTS = [
   "urban_gen_z",
   "working_professionals",
   "parents_families",
+  "ibu_pengajian",
   "rural_communities",
   "students",
 ] as const;
-const TONES = ["scholarly", "casual", "motivational", "empathetic"] as const;
+const TONES = [
+  "scholarly",
+  "casual",
+  "motivational",
+  "empathetic",
+  "fiery",
+  "gentle",
+] as const;
 const LOCALES = ["en", "id"] as const;
 
 const CONTEXT_PRESETS = [
@@ -49,8 +65,11 @@ export function BriefForm({
   const [error, setError] = useState<string | null>(null);
   const [isEstimating, startEstimateTransition] = useTransition();
   const [isGenerating, startGenerateTransition] = useTransition();
+  const [topic, setTopic] = useState(defaultTopic);
   const [extraContext, setExtraContext] = useState("");
+  const [pages, setPages] = useState(2);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const topicRef = useRef<HTMLInputElement | null>(null);
   // Snapshot of the form FormData taken at the moment the user clicked
   // "Estimate cost". We replay it on the final "Generate" submit so the
   // user can't tweak the form between steps and end up with a brief that
@@ -113,17 +132,34 @@ export function BriefForm({
   return (
     <form onSubmit={onSubmitForm} className="space-y-5">
       <Field label={t("field_topic")} hint={t("field_topic_hint")}>
-        <input
-          name="topic_title"
-          type="text"
-          required
-          minLength={4}
-          maxLength={200}
-          autoFocus={!defaultTopic}
-          defaultValue={defaultTopic}
-          placeholder={t("field_topic_placeholder")}
-          className="block h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
-        />
+        <div className="relative">
+          <input
+            ref={topicRef}
+            name="topic_title"
+            type="text"
+            required
+            minLength={4}
+            maxLength={200}
+            autoFocus={!defaultTopic}
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            placeholder={t("field_topic_placeholder")}
+            className="block h-11 w-full rounded-lg border border-slate-200 bg-white px-3 pr-10 text-sm text-slate-900 shadow-sm transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
+          />
+          {topic.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                setTopic("");
+                topicRef.current?.focus();
+              }}
+              aria-label="Clear"
+              className="absolute right-2 top-1/2 inline-flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
       </Field>
 
       <Field label={t("field_segment")}>
@@ -146,6 +182,33 @@ export function BriefForm({
         />
       </Field>
 
+      <Field label={t("field_pages")} hint={t("field_pages_hint")}>
+        <div className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
+          <button
+            type="button"
+            onClick={() => setPages((p) => Math.max(1, p - 1))}
+            disabled={pages <= 1}
+            aria-label="Decrease pages"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-300"
+          >
+            <Minus className="h-4 w-4" />
+          </button>
+          <span className="min-w-6 text-center text-sm font-semibold tabular-nums text-slate-900">
+            {pages}
+          </span>
+          <button
+            type="button"
+            onClick={() => setPages((p) => Math.min(4, p + 1))}
+            disabled={pages >= 4}
+            aria-label="Increase pages"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-300"
+          >
+            <Plus className="h-4 w-4" />
+          </button>
+        </div>
+        <input type="hidden" name="pages" value={pages} />
+      </Field>
+
       <Field
         label={t("field_extra_context")}
         hint={t("field_extra_context_hint")}
@@ -163,16 +226,31 @@ export function BriefForm({
             </button>
           ))}
         </div>
-        <textarea
-          ref={textareaRef}
-          name="extra_context"
-          maxLength={2000}
-          rows={4}
-          value={extraContext}
-          onChange={(e) => setExtraContext(e.target.value)}
-          placeholder={t("field_extra_context_placeholder")}
-          className="block w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
-        />
+        <div className="relative">
+          <textarea
+            ref={textareaRef}
+            name="extra_context"
+            maxLength={2000}
+            rows={4}
+            value={extraContext}
+            onChange={(e) => setExtraContext(e.target.value)}
+            placeholder={t("field_extra_context_placeholder")}
+            className="block w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-2 pr-10 text-sm text-slate-900 shadow-sm transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
+          />
+          {extraContext.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                setExtraContext("");
+                textareaRef.current?.focus();
+              }}
+              aria-label="Clear"
+              className="absolute right-2 top-2 inline-flex h-6 w-6 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
         <p className="mt-1 text-right text-[10px] tabular-nums text-slate-400">
           {extraContext.length} / 2000
         </p>

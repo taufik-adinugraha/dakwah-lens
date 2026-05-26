@@ -7,6 +7,7 @@ import { z } from "zod";
 import { auth } from "@/auth";
 import { db, schema } from "@/db";
 import { getOverviewInsights } from "@/lib/insights-data";
+import { translateHadithToId } from "@/lib/hadith-translation";
 import { searchKitabBrowse, type KitabCorpus } from "@/lib/kitab-retrieval";
 import {
   generateUserFlyerContent,
@@ -192,10 +193,25 @@ export async function POST(req: Request): Promise<NextResponse> {
     });
     const top = hits[0];
     if (top && top.arabic && top.translation && top.citation) {
+      // Hadith corpora ship only EN in Qdrant — without this enrichment
+      // Indonesian flyers show English daleel even when the user asked
+      // for Bahasa. Hits the (corpus, hadithnumber) cache first; falls
+      // back to a Flash-Lite translate-then-persist on miss. Quran hits
+      // already carry Kemenag ID — skip them.
+      let translation = top.translation;
+      if (top.corpus !== "quran" && top.corpus !== "tafsir" && top.hadithNumber !== undefined) {
+        const id = await translateHadithToId({
+          corpus: top.corpus,
+          hadithNumber: top.hadithNumber,
+          textEn: top.translation,
+        });
+        if (id) translation = id;
+      }
+
       daleel = {
         citation: top.citation,
         arabic: top.arabic,
-        translation: top.translation,
+        translation,
         corpus: top.corpus,
       };
     }

@@ -21,10 +21,18 @@ const SEGMENTS = [
   "urban_gen_z",
   "working_professionals",
   "parents_families",
+  "ibu_pengajian",
   "rural_communities",
   "students",
 ] as const;
-const TONES = ["scholarly", "casual", "motivational", "empathetic"] as const;
+const TONES = [
+  "scholarly",
+  "casual",
+  "motivational",
+  "empathetic",
+  "fiery",
+  "gentle",
+] as const;
 const LOCALES_FILTER = ["id", "en"] as const;
 
 type BriefRow = {

@@ -1042,6 +1042,30 @@ export const mahasiswaSubscribers = pgTable(
  * mute flag; designed to grow into other room-level settings later
  * without bloating `insights_summaries`.
  */
+/**
+ * One-shot Gemini Flash-Lite translation of a hadith's English text into
+ * Indonesian. The seeded kitab corpus has no Bahasa translations for the
+ * hadith corpora (Bukhari, Muslim, Riyad, Bulugh) — without this cache
+ * every hadith-cited flyer renders in English even when the user asked
+ * for Bahasa.
+ *
+ * Written from both the Python pipeline (services/hadith_translation.py)
+ * and the web flyer generator. Idempotent — re-translate only when
+ * `text_en` changes (upstream corpus refresh).
+ */
+export const hadithTranslationsId = pgTable("hadith_translations_id", {
+  /** Full corpus slug, e.g. `riyad_as_salihin`, `bulugh_al_maram`. */
+  corpus: text("corpus").notNull(),
+  hadithnumber: text("hadithnumber").notNull(),
+  textEn: text("text_en").notNull(),
+  textId: text("text_id").notNull(),
+  model: text("model").notNull(),
+  // No `id` PK — natural composite key. Drizzle needs at least one
+  // primary key per table; declare it via the table-constraints array.
+}, (table) => ({
+  pk: primaryKey({ columns: [table.corpus, table.hadithnumber] }),
+}));
+
 export const mahasiswaRoomSettings = pgTable("mahasiswa_room_settings", {
   briefingSlug: text("briefing_slug").primaryKey(),
   /** When non-NULL the room is muted — public POST returns 423.

@@ -261,11 +261,19 @@ def trending_ingest() -> dict[str, object]:
     anyway) and YouTube (its own popular-chart fetch is already one of
     the trending signal sources). TikTok was here too but dropped
     2026-05-20 — TT is fully disabled until we make a product decision,
-    and the "free" actor isn't free ($0.004/item). Budget impact:
-    ~$0.1/mo Apify, ~3-5 trending keywords/day × $0.0004 × 20 items.
+    and the "free" actor isn't free ($0.004/item). Budget impact at
+    LIMIT=100: ~8 keywords/day × $0.0004 × 100 = $0.32/day = ~$9.6/mo.
+    Stays well inside the IDR cap; the relevance filter upstream keeps
+    keyword count to the dakwah-signal subset (~8/day observed).
     """
     PLATFORMS = ("x",)
-    LIMIT = 20
+    # Per-keyword cap. Bumped 20 → 100 (2026-05-26) so each trending
+    # topic returns a broader sample — at 20/kw most popular topics hit
+    # the cap with no room for sentiment / opinion diversity, which
+    # bottlenecks both topic-clustering downstream and the briefing
+    # synthesis's "sample headlines" surface. 100 buys 5× the depth at
+    # ~$8/mo extra Apify spend.
+    LIMIT = 100
 
     keywords = trending_topics.get_trending_keywords()
     if not keywords:

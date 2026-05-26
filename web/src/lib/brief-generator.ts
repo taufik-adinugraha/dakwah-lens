@@ -9,6 +9,7 @@
 import { z } from "zod";
 
 import { generateJson, type LlmProvider } from "@/lib/llm";
+import { formatCalendarContext } from "@/lib/islamic-calendar";
 import type { BriefContent, BriefDaleel } from "@/db/schema";
 
 const SEGMENT_LABELS: Record<string, { en: string; id: string }> = {
@@ -18,6 +19,10 @@ const SEGMENT_LABELS: Record<string, { en: string; id: string }> = {
     id: "Profesional Muda (usia 25-40)",
   },
   parents_families: { en: "Parents & Families", id: "Orang Tua & Keluarga" },
+  ibu_pengajian: {
+    en: "Mothers' Study Circle (Ibu-Ibu Pengajian)",
+    id: "Ibu-Ibu Pengajian",
+  },
   rural_communities: { en: "Rural Communities", id: "Komunitas Pedesaan" },
   students: { en: "Students & Young Learners", id: "Pelajar & Mahasiswa" },
 };
@@ -92,6 +97,20 @@ const SEGMENT_PROFILES: Record<string, SegmentProfile> = {
     current_context:
       "TikTok / YouTube Shorts captured kids' attention spans, post-COVID online-learning fatigue + reading deficit, perundungan (bullying) news cycle making parents over-monitor, SIT (Sekolah Islam Terpadu) vs negeri vs pesantren choice agony, anak indigo / sensory parenting trends, mom-shaming on socmed, rising tuition + uang gedung, RUU KIA + maternal-leave discourse, ChatGPT for school assignments crisis ('anak nggak mau mikir lagi'), boycott decisions affecting kids' favourite snacks/toys.",
   },
+  ibu_pengajian: {
+    psychology:
+      "Spiritual anchors of the household, looking for guidance that feeds both their own iman AND their role as mothers / wives / community members. Bond strongly through shared learning — pengajian is as much sisterhood as it is study. Want material they can immediately bring home to family and into community WhatsApp groups.",
+    demographics:
+      "Predominantly 35-60, ibu rumah tangga or working mothers in suburban / peri-urban Java (Bandung, Bekasi, Tangerang, Yogyakarta) plus other major regions. Regular weekly majelis taklim or RT-level pengajian. Mixed religious literacy — many have years of Qur'an reading + classical fiqh exposure, some are newer learners. Value teachers who balance kelembutan with depth.",
+    delivery:
+      "Warm, conversational, story-rich — they have time and prefer narrative to bullet-point efficiency. Use Prophetic-household examples (Khadijah, Aisha, Fatimah RA) and stories of sahabiyah liberally. Connect every theme back to family + neighbourhood + bersilaturahmi. Speak as 'kita' not 'anda', sister-to-sister. Sprinkle Indonesian Islamic idioms (insya Allah, masyaAllah, alhamdulillah, barakallah) naturally — it's how they actually talk. Doa hafalan + dzikir suggestions land especially well.",
+    hooks:
+      "Sabar in ujian rumah tangga, mendidik anak yang sholih/sholihah, suami sebagai kepala keluarga vs. partner, menjaga lisan + ghibah di grup WA, sedekah harian yang ringan, dzikir pagi-petang sebagai jangkar, silaturahmi yang sehat, menua dengan iman, harapan yang tidak putus.",
+    avoid:
+      "Lecturing tone, infantilising vocabulary ('begini ya bu...'), generic 'jadilah ibu yang baik' platitudes without specifics, harsh rebuke of household choices, pretending modern stresses (pinjol, KDRT, anak nakal) aren't real concerns. Don't speak ABOUT them as a third-person audience — speak WITH them.",
+    current_context:
+      "Anak susah lepas dari layar / TikTok / game online, pinjol / arisan online bermasalah merebak di komunitas ibu (banyak yang malu cerita ke keluarga), KDRT cases in the news triggering grup-WA discussions about how to support tetangga yang terindikasi, sandwich generation guilt (merawat orang tua + anak sekolah), suami kena PHK, biaya sekolah TK/SD/SMP terus naik, ghibah-shaming + cek-cek info hoaks di grup, viral ustazah / muballighah on IG affecting which manhaj reach the pengajian, persiapan menjelang Idul Adha (kurban patungan, masak bersama, distribusi daging), nisfu Sya'ban / Ramadhan-prep rituals.",
+  },
   rural_communities: {
     psychology:
       "Strong community ties, traditional values, may feel distant from urban Islamic 'modernization', connection to land / agriculture / local mosque, less exposure to mainstream Islamic media — but rich in lived practice.",
@@ -127,6 +146,14 @@ const TONE_LABELS: Record<string, { en: string; id: string }> = {
   casual: { en: "Casual — conversational, relatable, warm", id: "Santai — mengalir, dekat, hangat" },
   motivational: { en: "Motivational — uplifting, action-oriented", id: "Motivasional — menyemangati, mengajak bertindak" },
   empathetic: { en: "Empathetic — gentle, validating, understanding", id: "Empatik — lembut, memahami, menenangkan" },
+  fiery: {
+    en: "Fiery — passionate, urgent, prophetic-warning register; sharp imperatives without becoming hostile",
+    id: "Membara — bergelora, mendesak, register peringatan kenabian; tajam dan tegas tanpa menyakiti",
+  },
+  gentle: {
+    en: "Gentle — soft, patient, almost whispered counsel; never raises its voice, leans on tenderness and mercy",
+    id: "Lembut — perlahan, sabar, hampir berbisik; tidak meninggikan nada, bertumpu pada kasih sayang dan rahma",
+  },
 };
 
 /* ─────────────────────────────────────────────────────────────
@@ -311,6 +338,9 @@ export type GenerateBriefInput = {
    *  audience events, format constraints (Friday khutbah, IG reel),
    *  misconceptions to address, etc. */
   extraContext?: string | null;
+  /** Target length in pages (1-4). Scales maxOutputTokens and gives the
+   *  LLM a target word count. Default 2. */
+  pages?: number;
 };
 
 export type GeneratedBrief = {
@@ -324,7 +354,16 @@ export type GeneratedBrief = {
 export async function generateBriefContent(
   input: GenerateBriefInput,
 ): Promise<GeneratedBrief> {
-  const { topic, segment, tone, locale, daleel, profile, extraContext } = input;
+  const {
+    topic,
+    segment,
+    tone,
+    locale,
+    daleel,
+    profile,
+    extraContext,
+    pages = 2,
+  } = input;
 
   const segLabel = SEGMENT_LABELS[segment]?.[locale] ?? segment;
   const toneLabel = TONE_LABELS[tone]?.[locale] ?? tone;
@@ -354,11 +393,32 @@ export async function generateBriefContent(
   const profileBlock = renderProfileBlock(profile);
   const trimmedExtra = extraContext?.trim() ?? "";
 
+  // Hijri calendar context — surfaces today's Hijri date + curated
+  // events in the next 7-10 days so the brief's sunnah / du'a
+  // recommendations are TIMELY rather than generic. Mirrors what the
+  // weekly Insights pipeline does on the Python side.
+  const { promptBlock: calendarBlock } = formatCalendarContext(
+    new Date(),
+    10,
+  );
+
+  // pages → maxTokens scaling. The brief JSON has fixed-size scaffolding
+  // (audience_segmentation, sources, etc.) plus variable-size prose
+  // (issue_analysis, khutbah outline). Floor 4000 covers the JSON
+  // skeleton; +2000/page beyond that gives the LLM headroom for longer
+  // prose at higher page counts. Caps at 10k so a rogue input can't
+  // blow our token budget.
+  const targetWords = (locale === "id" ? 350 : 250) * pages;
+  const maxTokens = Math.min(10_000, Math.max(4_000, pages * 2_000));
+
   const userPrompt = [
+    calendarBlock,
+    "",
     `Topic: ${topic}`,
     `Audience segment: ${segLabel}`,
     `Tone: ${toneLabel}`,
     `Output language: ${localeLabel}`,
+    `Target length: ~${pages} page(s), roughly ${targetWords} ${locale === "id" ? "kata" : "words"} of substantive prose across the variable-length fields (issue_analysis, recommendations bodies, khutbah outline). Don't pad — write tightly to this target.`,
     audienceBlock
       ? `\nAudience profile (INTERNALISE — never quote verbatim, never name the labels in the output; this is how the brief should *feel* to the reader):\n${audienceBlock}`
       : "",
@@ -381,13 +441,7 @@ export async function generateBriefContent(
     systemPrompt: SYSTEM_PROMPT,
     userPrompt,
     responseSchema: RESPONSE_JSON_SCHEMA,
-    // Brief is now a substantial 4-page document: 5-7 paragraph issue
-    // analysis + 8-12 recommendations + 4-5 objections (each with a
-    // multi-sentence response) + 4-6 illustrations + 10-section khutbah
-    // outline + the retrieved daleel block (top-2 per corpus, scales
-    // with library size). 8000 cap leaves headroom for Indonesian (~30%
-    // more tokens than English for the same content) without truncation.
-    maxTokens: 8000,
+    maxTokens,
     temperature: 0.6,
   });
 
