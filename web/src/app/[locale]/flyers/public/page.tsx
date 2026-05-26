@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { and, desc, eq, gte, lt } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Sparkles } from "lucide-react";
 
@@ -84,7 +84,11 @@ export default async function PublicFlyersPage({
   // Each briefing → 6 system flyer cards (one per share variant).
   // Capped at 12 briefings (= 72 cards) so this surface scales when
   // the corpus grows; sorted newest first.
-  const briefingCutoff = new Date(Date.now() - 60 * 86_400_000);
+  //
+  // The 60-day cutoff is computed in SQL (`now() - interval '60 days'`)
+  // rather than via `Date.now()` in the component body — the latter
+  // trips React 19's "impure call during render" lint and pushes
+  // non-determinism into the route.
   const briefingRows = await db
     .select({
       id: schema.insightsSummaries.id,
@@ -92,7 +96,7 @@ export default async function PublicFlyersPage({
       segment: schema.insightsSummaries.segment,
     })
     .from(schema.insightsSummaries)
-    .where(gte(schema.insightsSummaries.generatedAt, briefingCutoff))
+    .where(sql`generated_at >= now() - interval '60 days'`)
     .orderBy(desc(schema.insightsSummaries.generatedAt))
     .limit(12);
 
@@ -124,7 +128,7 @@ export default async function PublicFlyersPage({
     .where(
       and(
         eq(schema.userFlyers.visibility, "public"),
-        gte(schema.userFlyers.createdAt, briefingCutoff),
+        sql`${schema.userFlyers.createdAt} >= now() - interval '60 days'`,
       ),
     )
     .orderBy(desc(schema.userFlyers.createdAt))
