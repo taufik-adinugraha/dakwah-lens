@@ -198,6 +198,8 @@ export async function BriefDetailContent({
                 print: t("brief_poster_print"),
                 loading: t("brief_poster_loading"),
                 close: t("brief_poster_close"),
+                show: t("brief_poster_section_show"),
+                hide: t("brief_poster_section_hide"),
               }}
             />
 

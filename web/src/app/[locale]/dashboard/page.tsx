@@ -54,6 +54,7 @@ import { formatPanggilan } from "@/lib/panggilan";
 import { hashVisitorToken, readVisitorToken } from "@/lib/visitor-cookie";
 import { DashboardTabs } from "./DashboardTabs";
 import { KitTabs } from "./KitTabs";
+import { SavedKitabItem } from "./SavedKitabItem";
 import { SentimentTrendCard } from "./SentimentTrendCard";
 
 export async function generateMetadata({
@@ -226,6 +227,8 @@ export default async function DashboardPage({
                   print: tInsights("brief_poster_print"),
                   loading: tInsights("brief_poster_loading"),
                   close: tInsights("brief_poster_close"),
+                  show: tInsights("brief_poster_section_show"),
+                  hide: tInsights("brief_poster_section_hide"),
                 },
               }}
             />
@@ -405,12 +408,37 @@ function SavedItemsCard({ items, t }: { items: SavedItem[]; t: T }) {
             (item.payload?.corpus as string) ||
             (item.payload?.segment as string) ||
             t(`saved_kind_${item.kind}` as Parameters<T>[0]);
+
+          // Kitab bookmarks have no per-citation route, but the
+          // bookmark payload already carries the full Arabic +
+          // translation snapshot — render it inline via a modal
+          // instead of routing to a dead URL.
+          if (item.kind === "kitab") {
+            return (
+              <li key={item.id} className="p-3 sm:p-4">
+                <SavedKitabItem
+                  title={title}
+                  subtitle={subtitle}
+                  payload={item.payload as {
+                    corpus?: string;
+                    citation?: string;
+                    arabic?: string;
+                    translation?: string;
+                  }}
+                  labels={{
+                    close: t("saved_kitab_modal_close"),
+                    noArabic: t("saved_kitab_modal_no_arabic"),
+                    noTranslation: t("saved_kitab_modal_no_translation"),
+                  }}
+                />
+              </li>
+            );
+          }
+
           const href =
             item.kind === "brief"
               ? `/insights/brief/${item.refId}`
-              : item.kind === "kitab"
-                ? `/kitab/${item.refId}`
-                : "/saved";
+              : "/saved";
           return (
             <li key={item.id} className="p-3 sm:p-4">
               <Link

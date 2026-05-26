@@ -136,6 +136,8 @@ export function BriefingNarrative({
     print: string;
     loading: string;
     close: string;
+    show: string;
+    hide: string;
   };
   /** @deprecated — was the inline "Nasihah" badge label for the old short
    *  format. Kept in the prop signature so existing callers don't break;

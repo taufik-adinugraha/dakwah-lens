@@ -1343,6 +1343,7 @@ def _build_user_prompt(
     adhkar: list[dict[str, Any]] | None = None,
     language: str = "id",
     prior_coverage: list[dict[str, Any]] | None = None,
+    calendar_context: str | None = None,
 ) -> str:
     """Assemble the structured context for Gemini.
 
@@ -1498,9 +1499,17 @@ def _build_user_prompt(
 
     prior_block = _format_prior_coverage_block(prior_coverage or [], language)
 
+    # Hijri-aware sunnah / du'a hints for Pesan Flyer 5 + 6. Block is
+    # injected high in the prompt so the LLM sees the calendar context
+    # before tackling those two paragraphs. Empty when the caller didn't
+    # compute it (e.g. unit tests, manual_briefing.py).
+    calendar_block = (
+        f"{calendar_context}\n\n" if calendar_context else ""
+    )
+
     return f"""{scope_note}
 
-{prior_block}HEADLINE NUMBERS (use ONLY these for Sections 1 & 2):
+{calendar_block}{prior_block}HEADLINE NUMBERS (use ONLY these for Sections 1 & 2):
 
 {json.dumps(stats_for_json, indent=2, ensure_ascii=False)}
 
@@ -1551,6 +1560,7 @@ def _generate_for_language(
     segment: str | None,
     adhkar: list[dict[str, Any]] | None = None,
     prior_coverage: list[dict[str, Any]] | None = None,
+    calendar_context: str | None = None,
 ) -> tuple[str, int | None, int | None, float] | None:
     """Run one Gemini Pro call in the requested language.
 
@@ -1566,6 +1576,7 @@ def _generate_for_language(
         adhkar=adhkar,
         language=language,
         prior_coverage=prior_coverage,
+        calendar_context=calendar_context,
     )
 
     resp = client.models.generate_content(
@@ -1678,6 +1689,28 @@ async def generate_summary(
 
         daleel = await enrich_daleel_translations(session, daleel)
 
+        # Hijri-aware calendar context — feeds two consumers:
+        #   1. `retrieve_dua(hijri_context=...)` biases the embedding
+        #      query toward seasonal du'a (Arafah, Asyura, Lailatul
+        #      Qadr) when those days land inside the lookahead window.
+        #   2. The synthesis prompt gets an "ISLAMIC CALENDAR CONTEXT"
+        #      block listing today's Hijri date + curated event hints
+        #      for next 10 days, so Pesan Flyer 5 (Ajakan Sunnah) +
+        #      Flyer 6 (Du'a Pekan Ini) name TIMELY sunnah instead of
+        #      generic ones. See services/islamic_calendar.py.
+        from datetime import date as _date
+
+        from api.services.islamic_calendar import format_calendar_context
+
+        calendar_block, hijri_short = format_calendar_context(
+            _date.today(), lookahead_days=10
+        )
+        log.info(
+            "insights_summary.calendar_context",
+            segment=segment,
+            hijri_short=hijri_short,
+        )
+
         # Adhkar pool — du'a-biased retrieval over the same kitab
         # corpus, fed to Pesan Flyer 5 (Sunnah call) + Flyer 6 (Du'a
         # hero) so those slots cite a recitable du'a sourced from the
@@ -1687,7 +1720,10 @@ async def generate_summary(
         from api.services.kitab_retrieval import rerank_dua, retrieve_dua
 
         dua_candidates = retrieve_dua(
-            retrieval_query, limit=15, per_corpus=4
+            retrieval_query,
+            hijri_context=hijri_short,
+            limit=15,
+            per_corpus=4,
         )
         adhkar = rerank_dua(retrieval_query, dua_candidates, top_n=6)
         adhkar = await enrich_daleel_translations(session, adhkar)
@@ -1736,6 +1772,7 @@ async def generate_summary(
             segment,
             adhkar=adhkar,
             prior_coverage=prior_coverage,
+            calendar_context=calendar_block,
         )
         if id_result is None:
             return None

@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Download, Image as ImageIcon, Maximize2, Sparkles } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Download,
+  Image as ImageIcon,
+  Maximize2,
+  Sparkles,
+} from "lucide-react";
 
 /* eslint-disable @next/next/no-img-element */
 
@@ -43,6 +50,10 @@ export function BriefFlyerSection({ briefId }: { briefId: string }) {
   const t = useTranslations("Insights");
   const lang = locale === "en" ? "en" : "id";
 
+  // Previews are heavy (6 × 1080² PNGs) and visually dominate the
+  // page. Default-collapsed lets users keep their place in the brief
+  // until they explicitly want to look at the flyers.
+  const [expanded, setExpanded] = useState(false);
   const [zoomed, setZoomed] = useState<Variant | null>(null);
 
   const flyerUrl = (v: Variant) =>
@@ -65,22 +76,40 @@ export function BriefFlyerSection({ briefId }: { briefId: string }) {
         </div>
       </div>
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-2">
-        {VARIANTS.map((v) => (
-          <FlyerCard
-            key={v}
-            variant={v}
-            previewUrl={flyerUrl(v)}
-            downloadName={`dakwah-lens_${briefId}_flyer-${v}.png`}
-            title={t(`brief_flyer_${cardKey(v)}_title`)}
-            body={t(`brief_flyer_${cardKey(v)}_body`)}
-            openLabel={t("brief_flyer_open_large")}
-            downloadLabel={t("brief_flyer_download_short")}
-            loadingLabel={t("brief_flyer_loading")}
-            onZoom={() => setZoomed(v)}
-          />
-        ))}
-      </div>
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        aria-expanded={expanded}
+        className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-fuchsia-200 bg-white px-3 py-1.5 text-xs font-semibold text-fuchsia-700 transition hover:border-fuchsia-300 hover:bg-fuchsia-50"
+      >
+        {expanded ? (
+          <ChevronUp className="h-3.5 w-3.5" />
+        ) : (
+          <ChevronDown className="h-3.5 w-3.5" />
+        )}
+        {expanded
+          ? t("brief_flyer_section_hide")
+          : t("brief_flyer_section_show")}
+      </button>
+
+      {expanded && (
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          {VARIANTS.map((v) => (
+            <FlyerCard
+              key={v}
+              variant={v}
+              previewUrl={flyerUrl(v)}
+              downloadName={`dakwah-lens_${briefId}_flyer-${v}.png`}
+              title={t(`brief_flyer_${cardKey(v)}_title`)}
+              body={t(`brief_flyer_${cardKey(v)}_body`)}
+              openLabel={t("brief_flyer_open_large")}
+              downloadLabel={t("brief_flyer_download_short")}
+              loadingLabel={t("brief_flyer_loading")}
+              onZoom={() => setZoomed(v)}
+            />
+          ))}
+        </div>
+      )}
 
       {zoomed && (
         <ZoomOverlay

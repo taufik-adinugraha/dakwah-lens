@@ -144,13 +144,27 @@ async def _prepare_context(
 
         daleel = await enrich_daleel_translations(session, daleel)
 
+        # Hijri-aware calendar context — same as production path so a
+        # `manual_briefing dump` reflects what `generate_summary` will
+        # actually send. See services/islamic_calendar.py.
+        from datetime import date as _date
+
+        from api.services.islamic_calendar import format_calendar_context
+
+        calendar_block, hijri_short = format_calendar_context(
+            _date.today(), lookahead_days=10
+        )
+
         # Du'a / dzikir retrieval — same theme, different query shape,
         # different pool. Feeds Pesan Flyer 5 (Sunnah call) + Flyer 6
         # (Du'a hero) so those flyers cite a recitable du'a sourced
         # from the existing kitab corpus instead of relying on the
         # LLM's parametric memory.
         dua_candidates = retrieve_dua(
-            retrieval_query, limit=15, per_corpus=4
+            retrieval_query,
+            hijri_context=hijri_short,
+            limit=15,
+            per_corpus=4,
         )
         adhkar = rerank_dua(retrieval_query, dua_candidates, top_n=6)
         adhkar = await enrich_daleel_translations(session, adhkar)
@@ -161,10 +175,15 @@ async def _prepare_context(
             daleel_count=len(daleel),
             adhkar_count=len(adhkar),
             posts_7d=stats["totals"]["posts_7d"],
+            hijri_short=hijri_short,
         )
 
     user_prompt = _build_user_prompt(
-        stats, daleel, adhkar=adhkar, language="id"
+        stats,
+        daleel,
+        adhkar=adhkar,
+        language="id",
+        calendar_context=calendar_block,
     )
     return stats, daleel, adhkar, SYSTEM_PROMPT_ID, user_prompt
 

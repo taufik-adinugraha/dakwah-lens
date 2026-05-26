@@ -61,6 +61,10 @@ dependencies = [
     # platforms (X's `tweetLanguage: "id"` filter leaks Hausa / Urdu /
     # Bengali). Tiny pure-Python lib, ~3MB with all language profiles.
     "langdetect>=1.0.9",
+    # Umm al-Qura Hijri converter — used by services/islamic_calendar.py
+    # to inject today's Hijri date + upcoming events into the briefing
+    # synthesis prompt so Pesan Flyer 5+6 land on timely sunnah/du'a.
+    "hijridate>=2.6.0",
 ]
 
 [dependency-groups]

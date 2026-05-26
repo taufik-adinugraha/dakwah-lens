@@ -64,6 +64,8 @@ type Labels = {
     print: string;
     loading: string;
     close: string;
+    show: string;
+    hide: string;
   };
 };
 

@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Download, GraduationCap, Maximize2, Printer } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Download,
+  GraduationCap,
+  Maximize2,
+  Printer,
+} from "lucide-react";
 
 /* eslint-disable @next/next/no-img-element */
 
@@ -34,6 +41,8 @@ export function MahasiswaPosterCard({
     print: string;
     loading: string;
     close: string;
+    show: string;
+    hide: string;
   };
 }) {
   const lang = locale === "en" ? "en" : "id";
@@ -42,6 +51,10 @@ export function MahasiswaPosterCard({
   const downloadName = `dakwah-lens_${briefId}_poster-mahasiswa.png`;
   const downloadPdfName = `dakwah-lens_${briefId}_poster-mahasiswa.pdf`;
 
+  // Heavy 1080² preview + download chrome — default-collapsed so users
+  // reading the briefing don't get visually pulled into the poster
+  // before they're ready to grab share assets.
+  const [expanded, setExpanded] = useState(false);
   const [zoomed, setZoomed] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
@@ -62,6 +75,21 @@ export function MahasiswaPosterCard({
         </div>
       </div>
 
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        aria-expanded={expanded}
+        className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-indigo-200 bg-white px-3 py-1.5 text-xs font-semibold text-indigo-700 transition hover:border-indigo-300 hover:bg-indigo-50"
+      >
+        {expanded ? (
+          <ChevronUp className="h-3.5 w-3.5" />
+        ) : (
+          <ChevronDown className="h-3.5 w-3.5" />
+        )}
+        {expanded ? labels.hide : labels.show}
+      </button>
+
+      {expanded && (
       <article className="mt-5 grid gap-4 overflow-hidden rounded-2xl border border-indigo-200/70 bg-gradient-to-br from-indigo-50 via-white to-violet-50 shadow-sm ring-1 ring-indigo-200/60 sm:grid-cols-[3fr_2fr]">
         <button
           type="button"
@@ -140,6 +168,7 @@ export function MahasiswaPosterCard({
           </div>
         </div>
       </article>
+      )}
 
       {zoomed && (
         <ZoomOverlay
