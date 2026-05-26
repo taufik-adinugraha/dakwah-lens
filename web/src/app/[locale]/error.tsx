@@ -4,6 +4,8 @@ import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { AlertTriangle, Compass, RotateCw } from "lucide-react";
 
+import { Link } from "@/i18n/navigation";
+
 /**
  * Locale-scoped error boundary. App Router calls this when a server
  * component (or its children) throws during render. Replaces the
@@ -64,13 +66,13 @@ export default function ErrorBoundary({
             <RotateCw className="h-4 w-4" />
             {t("error_cta_retry")}
           </button>
-          <a
+          <Link
             href="/insights"
             className="inline-flex h-11 items-center gap-2 rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300"
           >
             <Compass className="h-4 w-4" />
             {t("error_cta_insights")}
-          </a>
+          </Link>
         </div>
       </div>
     </section>
