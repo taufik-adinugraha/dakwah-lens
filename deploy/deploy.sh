@@ -43,28 +43,41 @@ say "   at $(git rev-parse --short HEAD): $(git log -1 --pretty=%s)"
 # 1.3 Ensure shared volume dirs exist + writable by the container user
 # The web/api/worker containers all run as UID 1001 (web=nextjs:nogroup,
 # api/worker=app:app). The bind-mounted host dir must match — otherwise
-# uploads fail with EACCES at mkdir time. Idempotent: only chowns when
-# the ownership doesn't match, so reruns are no-ops on a healthy host.
-ATTACH_DIR=/srv/dakwah-lens/data/attachments
-if [[ ! -d "$ATTACH_DIR" ]]; then
-  say "▶ creating $ATTACH_DIR"
-  sudo install -d -o 1001 -g 1001 -m 755 "$ATTACH_DIR"
-elif [[ "$(stat -c %u "$ATTACH_DIR")" != "1001" ]]; then
-  say "▶ chowning $ATTACH_DIR to 1001:1001"
-  sudo chown -R 1001:1001 "$ATTACH_DIR"
-fi
+# uploads fail with EACCES at mkdir time.
+#
+# Why we don't `sudo chown -R` to fix wrong ownership: the deploy user's
+# sudoers whitelist covers `install -d`, `chown` on /etc/caddy, and
+# `systemctl reload caddy` — but NOT generic `chown -R`. A wrong-owned
+# leftover dir (typically created by docker-compose when the bind mount
+# pointed at a missing host path) gets handled by rmdir + recreate. The
+# rmdir works without sudo because the deploy user owns the parent
+# `/srv/dakwah-lens/data/`. Only safe when the dir is empty.
+fix_volume_dir() {
+  local dir="$1"
+  if [[ ! -d "$dir" ]]; then
+    say "▶ creating $dir"
+    sudo install -d -o 1001 -g 1001 -m 755 "$dir"
+    return
+  fi
+  if [[ "$(stat -c %u "$dir")" == "1001" ]]; then
+    return  # already 1001-owned, nothing to do
+  fi
+  if [[ -z "$(ls -A "$dir" 2>/dev/null)" ]]; then
+    say "▶ recreating $dir (wrong-owned but empty)"
+    rmdir "$dir"
+    sudo install -d -o 1001 -g 1001 -m 755 "$dir"
+  else
+    say "▶ chowning $dir to 1001:1001 (non-empty)"
+    sudo chown -R 1001:1001 "$dir"
+  fi
+}
 
+fix_volume_dir /srv/dakwah-lens/data/attachments
+# Admin-uploaded flyer assets — same pattern, dir lives under the
+# `uploads/` subpath the admin actions write to.
+fix_volume_dir /srv/dakwah-lens/data/flyer-assets-uploads
 # User-uploaded flyer images (POST /flyers/new "Unggah Gambar" tab).
-# Same uid:gid as attachments — bind-mounted into the web container at
-# /app/public/flyer-assets/user-uploads/.
-USER_FLYER_DIR=/srv/dakwah-lens/data/flyer-user-uploads
-if [[ ! -d "$USER_FLYER_DIR" ]]; then
-  say "▶ creating $USER_FLYER_DIR"
-  sudo install -d -o 1001 -g 1001 -m 755 "$USER_FLYER_DIR"
-elif [[ "$(stat -c %u "$USER_FLYER_DIR")" != "1001" ]]; then
-  say "▶ chowning $USER_FLYER_DIR to 1001:1001"
-  sudo chown -R 1001:1001 "$USER_FLYER_DIR"
-fi
+fix_volume_dir /srv/dakwah-lens/data/flyer-user-uploads
 
 # 1.5 Sync Caddy config ────────────────────────────────────────
 # Caddyfile lives in deploy/ inside the repo so a fresh-VM provision
