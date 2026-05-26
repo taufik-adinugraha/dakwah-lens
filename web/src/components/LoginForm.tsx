@@ -143,7 +143,7 @@ export function LoginForm({
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-slate-200" />
             </div>
-            <div className="relative flex justify-center text-[11px]">
+            <div className="relative flex justify-center text-xs">
               <span className="bg-white px-3 uppercase tracking-wider text-slate-500">
                 {t("divider")}
               </span>

@@ -362,7 +362,7 @@ function FilterChip({
 }) {
   const base =
     size === "sm"
-      ? "h-7 px-2.5 text-[11px]"
+      ? "h-7 px-2.5 text-xs"
       : "h-8 px-3.5 text-xs";
   if (active) {
     if (tone === "emerald") {
@@ -498,7 +498,7 @@ function RoomCard({
                 ? labels.statusActive
                 : labels.statusDormant}
           </span>
-          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 transition group-hover:text-slate-900">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 transition group-hover:text-slate-900">
             {labels.open}
             <ArrowUpRight className="h-3 w-3" />
           </span>

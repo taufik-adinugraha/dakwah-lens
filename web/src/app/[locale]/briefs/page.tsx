@@ -50,7 +50,7 @@ export default async function MyBriefsPage({
           experimental. The proxy already gates non-admin access; this
           notice reminds the admins viewing the page that the surface
           isn't yet production-ready. */}
-      <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-amber-700">
+      <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-amber-700">
         <Sparkles className="h-3 w-3" />
         Experimental · Admin only
       </div>
@@ -171,7 +171,7 @@ function BriefRow({
             </span>
           )}
         </div>
-        <p className="mt-0.5 truncate text-[11px] text-slate-500">
+        <p className="mt-0.5 truncate text-xs text-slate-500">
           <span className="font-medium text-slate-700">{segmentLabel}</span>
           <span className="text-slate-300"> · </span>
           {toneLabel}

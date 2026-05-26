@@ -109,7 +109,7 @@ export async function BriefPagination({
                   <p className="mt-2.5 text-sm font-bold text-slate-900">
                     {title}
                   </p>
-                  <p className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-emerald-700">
+                  <p className="mt-2 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-emerald-700">
                     <CheckCircle2 className="h-3 w-3" />
                     {t("brief_nav_current")}
                   </p>
@@ -134,7 +134,7 @@ export async function BriefPagination({
                   <p className="mt-2.5 text-sm font-bold text-slate-900">
                     {title}
                   </p>
-                  <p className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 transition group-hover:text-slate-900">
+                  <p className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-slate-500 transition group-hover:text-slate-900">
                     {t("brief_nav_open")}
                     <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
                   </p>
@@ -156,7 +156,7 @@ export async function BriefPagination({
                 <p className="mt-2.5 text-sm font-bold text-slate-500">
                   {title}
                 </p>
-                <p className="mt-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                <p className="mt-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
                   {t("brief_nav_missing")}
                 </p>
               </div>

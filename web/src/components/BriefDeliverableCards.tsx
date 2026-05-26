@@ -473,7 +473,7 @@ function CardDownloadButton({ url }: { url: string }) {
       download
       onClick={(e) => e.stopPropagation()}
       aria-label="Unduh PDF"
-      className="inline-flex h-7 items-center gap-1 rounded-full border border-slate-200 bg-white/90 px-2.5 text-[11px] font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-white"
+      className="inline-flex h-7 items-center gap-1 rounded-full border border-slate-200 bg-white/90 px-2.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-white"
     >
       <Download className="h-3 w-3" />
       PDF
@@ -512,7 +512,7 @@ function CardShareButton({ url, title }: { url: string; title: string }) {
         setCopied(true);
         window.setTimeout(() => setCopied(false), 1800);
       }}
-      className="inline-flex h-7 items-center gap-1 rounded-full border border-slate-200 bg-white/90 px-2.5 text-[11px] font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-white"
+      className="inline-flex h-7 items-center gap-1 rounded-full border border-slate-200 bg-white/90 px-2.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-white"
     >
       {copied ? (
         <>
@@ -863,7 +863,7 @@ function makeModalMarkdownComponents(kind: CardKind | null): Components {
     ),
     h3: ({ children }) => (
       <h3
-        className={`mt-6 mb-2 inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.15em] ${accentText} ${
+        className={`mt-6 mb-2 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-extrabold uppercase tracking-[0.15em] ${accentText} ${
           kind ? KIND_ICON_TONE[kind] : "bg-slate-100"
         }`}
       >

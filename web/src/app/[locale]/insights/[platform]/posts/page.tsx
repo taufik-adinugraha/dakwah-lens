@@ -273,7 +273,7 @@ export default async function PostsBrowsePage({
                 key={p.id}
                 className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md sm:p-5"
               >
-                <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
+                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
                   {p.sentimentLabel && (
                     <span
                       className={`inline-flex items-center rounded-full px-2 py-0.5 font-semibold ring-1 ${
@@ -308,7 +308,7 @@ export default async function PostsBrowsePage({
                     href={p.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="mt-2 inline-block text-[11px] font-medium text-brand-700 hover:underline"
+                    className="mt-2 inline-block text-xs font-medium text-brand-700 hover:underline"
                   >
                     {t("posts_open_source")} ↗
                   </a>

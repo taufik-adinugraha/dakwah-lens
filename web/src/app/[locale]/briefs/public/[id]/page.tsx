@@ -140,7 +140,7 @@ export default async function PublicBriefDetailPage({
 
       {/* Suitable-for callout */}
       <div className="mt-6 rounded-2xl border border-brand-100 bg-brand-50/60 p-5">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-brand-700">
+        <p className="text-xs font-semibold uppercase tracking-wider text-brand-700">
           {t("suitable_label")}
         </p>
         <p className="mt-2 text-pretty text-sm leading-relaxed text-slate-700">
@@ -232,7 +232,7 @@ export default async function PublicBriefDetailPage({
                   </p>
 
                   {d.also_found_in?.length ? (
-                    <p className="mt-2 text-[11px] leading-relaxed text-emerald-800/80">
+                    <p className="mt-2 text-xs leading-relaxed text-emerald-800/80">
                       <span className="font-semibold">
                         {tBriefs("daleel_also_found_in_label")}:
                       </span>{" "}
@@ -386,7 +386,7 @@ function SubField({
 }) {
   return (
     <div>
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+      <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
         {label}
       </p>
       <p className="mt-1 text-pretty">{children}</p>

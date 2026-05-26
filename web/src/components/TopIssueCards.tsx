@@ -68,7 +68,7 @@ export function TopIssueCards({
             <h3 className="text-balance text-base font-semibold text-slate-900 sm:text-lg">
               {i.title}
             </h3>
-            <p className="mt-1 text-[11px] font-medium uppercase tracking-wider text-slate-500">
+            <p className="mt-1 text-xs font-medium uppercase tracking-wider text-slate-500">
               {i.platform}
               {i.keywords.length > 0 && (
                 <span className="text-slate-300"> · </span>

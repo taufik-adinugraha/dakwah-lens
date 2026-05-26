@@ -189,9 +189,9 @@ function RoomCard({
             </span>
           </div>
           <div className="mt-1 flex items-center justify-between">
-            <span className="text-[11px] text-slate-500">{dateLabel}</span>
+            <span className="text-xs text-slate-500">{dateLabel}</span>
             <span
-              className={`inline-flex items-center gap-1 text-[11px] font-semibold transition group-hover:gap-1.5 ${palette.openText}`}
+              className={`inline-flex items-center gap-1 text-xs font-semibold transition group-hover:gap-1.5 ${palette.openText}`}
             >
               {labels.open}
               <ArrowUpRight className="h-3 w-3" />

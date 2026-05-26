@@ -266,7 +266,7 @@ export default async function InsightsExplorePage({
               <div className="mt-3 space-y-2">
                 {categories.map((c) => (
                   <div key={c.label} className="text-xs">
-                    <div className="mb-1 flex items-center justify-between text-[11px] text-slate-600">
+                    <div className="mb-1 flex items-center justify-between text-xs text-slate-600">
                       <span>{c.label}</span>
                       <span className="tabular-nums">
                         {c.volume.toLocaleString()}
@@ -462,7 +462,7 @@ function PlatformsBreakdown({
               ) : null,
             )}
           </div>
-          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-[11px]">
+          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-xs">
             {rows.map((r) => (
               <span
                 key={r.platform}
@@ -500,7 +500,7 @@ function PlatformsBreakdown({
                     <p className="truncate text-sm font-semibold text-slate-900">
                       {t(`platform_${visual.key}_name` as Parameters<typeof t>[0])}
                     </p>
-                    <div className="mt-0.5 flex items-center gap-2 text-[11px] text-slate-500">
+                    <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-500">
                       <span className="tabular-nums">
                         {hasData ? (
                           `${posts.toLocaleString()} posts`
@@ -529,7 +529,7 @@ function PlatformsBreakdown({
                       {topTopic?.label ?? t("platform_top_topic_pending")}
                     </p>
                     {(topTopic?.keywords.length || categoryLabel) && (
-                      <p className="mt-0.5 text-[11px] text-slate-500">
+                      <p className="mt-0.5 text-xs text-slate-500">
                         {topTopic?.keywords.slice(0, 3).join(" · ") || categoryLabel}
                       </p>
                     )}
@@ -537,7 +537,7 @@ function PlatformsBreakdown({
                 )}
 
                 {hasData && href && (
-                  <p className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-brand-700 group-hover:text-brand-900">
+                  <p className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-brand-700 group-hover:text-brand-900">
                     {t("platform_view_breakdown")}
                     <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
                   </p>

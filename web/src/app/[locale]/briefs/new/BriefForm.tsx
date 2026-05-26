@@ -156,7 +156,7 @@ export function BriefForm({
               key={key}
               type="button"
               onClick={() => appendPreset(key)}
-              className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+              className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
             >
               <Plus className="h-3 w-3 text-slate-400" />
               {t(`${key}_label` as Parameters<typeof t>[0])}
@@ -265,7 +265,7 @@ function EstimateConfirmCard({
           <Stat label={t("estimate_cost_idr")} value={`~${formatIdr(estimate.totalIdr)}`} accent />
         </dl>
 
-        <p className="mt-4 text-[11px] leading-relaxed text-slate-500">
+        <p className="mt-4 text-xs leading-relaxed text-slate-500">
           {t("estimate_disclaimer", {
             provider: estimate.provider,
             model: estimate.model,
@@ -359,7 +359,7 @@ function Field({
   return (
     <label className="block text-left">
       <span className="text-xs font-semibold text-slate-700">{label}</span>
-      {hint && <span className="ml-2 text-[11px] text-slate-500">{hint}</span>}
+      {hint && <span className="ml-2 text-xs text-slate-500">{hint}</span>}
       <div className="mt-1.5">{children}</div>
     </label>
   );

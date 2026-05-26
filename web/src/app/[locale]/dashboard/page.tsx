@@ -407,7 +407,7 @@ function SavedItemsCard({ items, t }: { items: SavedItem[]; t: T }) {
                   <span className="block truncate text-sm font-semibold text-slate-900">
                     {title}
                   </span>
-                  <span className="block text-[11px] text-slate-500">
+                  <span className="block text-xs text-slate-500">
                     {subtitle}
                   </span>
                 </span>
@@ -477,7 +477,7 @@ function ActiveRoomsCard({
                   <span className="block truncate text-sm font-semibold text-slate-900 group-hover:text-emerald-700">
                     {room.title ?? room.briefingSlug}
                   </span>
-                  <span className="block text-[11px] text-slate-500">
+                  <span className="block text-xs text-slate-500">
                     {t("active_rooms_my_comments", { n: room.myCommentCount })}
                     {" · "}
                     {t("active_rooms_total_comments", {
@@ -539,7 +539,7 @@ function DataPulseHero({
             </p>
             {hasScore && pulse.delta !== null ? (
               <p
-                className={`mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                className={`mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
                   deltaSign === "up"
                     ? "bg-emerald-50 text-emerald-700"
                     : deltaSign === "down"
@@ -562,7 +562,7 @@ function DataPulseHero({
                 )}
               </p>
             ) : (
-              <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
+              <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
                 {t(hasScore ? "pulse_no_comparison" : "pulse_no_score")}
               </p>
             )}
@@ -623,7 +623,7 @@ function SentimentTrendChart({
         subtitle={t("section_sentiment_trend_subtitle")}
       />
       <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-        <div className="mb-2 flex items-center gap-4 text-[11px] text-slate-500">
+        <div className="mb-2 flex items-center gap-4 text-xs text-slate-500">
           <span className="inline-flex items-center gap-1.5">
             <span className="inline-block h-2.5 w-2.5 rounded-full bg-rose-500" />
             {t("sentiment_legend_negative")}
@@ -756,7 +756,7 @@ function MiniStat({
   const inner = (
     <>
       <div className="flex items-center justify-between">
-        <p className="text-[11px] font-medium uppercase tracking-wider opacity-80">
+        <p className="text-xs font-medium uppercase tracking-wider opacity-80">
           {label}
         </p>
         <Icon className="h-4 w-4 opacity-70" />
@@ -764,7 +764,7 @@ function MiniStat({
       <p className="mt-1 text-3xl font-bold tabular-nums text-slate-900">
         {value}
       </p>
-      <p className="text-[11px] text-slate-500">{hint}</p>
+      <p className="text-xs text-slate-500">{hint}</p>
     </>
   );
 
@@ -800,7 +800,7 @@ function TopIssues({
           </p>
           <I18nText
             text={t("top_issues_empty_body")}
-            className="block max-w-md text-[11px] leading-relaxed text-slate-500"
+            className="block max-w-md text-xs leading-relaxed text-slate-500"
           />
         </div>
       ) : (
@@ -1077,7 +1077,7 @@ function RecentBriefs({
         >
           <Sparkles className="h-5 w-5 text-brand-600" />
           <p className="text-sm font-medium text-slate-700">{t("no_briefs_yet")}</p>
-          <p className="text-[11px] text-slate-500">{tBriefs("list_create")}</p>
+          <p className="text-xs text-slate-500">{tBriefs("list_create")}</p>
         </Link>
       ) : (
         <div className="mt-5 grid gap-2">
@@ -1099,7 +1099,7 @@ function RecentBriefs({
                     </span>
                   )}
                 </div>
-                <p className="mt-0.5 truncate text-[11px] text-slate-500">
+                <p className="mt-0.5 truncate text-xs text-slate-500">
                   {tBriefs(`segment_${b.segment}` as Parameters<typeof tBriefs>[0])}
                   <span className="text-slate-300"> · </span>
                   <span className="tabular-nums">

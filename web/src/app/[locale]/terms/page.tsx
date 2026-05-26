@@ -69,7 +69,7 @@ function Hero({ t, lastUpdated }: { t: T; lastUpdated: string }) {
         <p className="mx-auto mt-4 max-w-2xl text-pretty text-base leading-relaxed text-slate-600 sm:text-lg">
           {t("hero_subtitle")}
         </p>
-        <p className="mt-4 text-[11px] uppercase tracking-wider text-slate-400">
+        <p className="mt-4 text-xs uppercase tracking-wider text-slate-400">
           {t("hero_last_updated", { date: lastUpdated })}
         </p>
       </div>
@@ -252,7 +252,7 @@ function SectionCard({
         >
           <Icon className={`h-5 w-5 ${palette.icon}`} />
         </span>
-        <span className="ml-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400 sm:ml-0">
+        <span className="ml-3 text-xs font-semibold uppercase tracking-wider text-slate-400 sm:ml-0">
           §{index}
         </span>
       </div>

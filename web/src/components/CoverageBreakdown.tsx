@@ -128,7 +128,7 @@ function PlatformCard({
         <ul className="mt-3 space-y-1.5">
           {data.map((p) => (
             <li key={p.platform}>
-              <div className="flex items-center justify-between text-[11px]">
+              <div className="flex items-center justify-between text-xs">
                 <span className="font-medium capitalize text-slate-700">
                   {p.platform === "mainstream"
                     ? labels.platformMainstream
@@ -195,7 +195,7 @@ function SentimentCard({
               title={`${labels.sentimentPositive} ${data.positive.pct.toFixed(0)}%`}
             />
           </div>
-          <ul className="mt-3 space-y-1 text-[11px]">
+          <ul className="mt-3 space-y-1 text-xs">
             <SentimentRow
               dot="bg-emerald-500"
               label={labels.sentimentPositive}
@@ -291,7 +291,7 @@ function TopicsCard({
         <ul className="mt-3 space-y-1.5">
           {data.map((topic) => (
             <li key={topic.id}>
-              <div className="flex items-center justify-between gap-2 text-[11px]">
+              <div className="flex items-center justify-between gap-2 text-xs">
                 <span className="truncate font-medium text-slate-700">
                   {topic.label}
                 </span>

@@ -272,11 +272,11 @@ function StatTile({
             : "—"}
       </p>
       {valueIdrFromUsd != null && (
-        <p className="text-[11px] tabular-nums text-slate-500">
+        <p className="text-xs tabular-nums text-slate-500">
           ≈ Rp {Math.round(valueIdrFromUsd).toLocaleString("id-ID")}
         </p>
       )}
-      <p className="mt-1 text-[11px] leading-relaxed text-slate-500">{hint}</p>
+      <p className="mt-1 text-xs leading-relaxed text-slate-500">{hint}</p>
     </div>
   );
 }
@@ -452,7 +452,7 @@ function DonationsList({
                       ? t("anonymous_donor")
                       : d.donor}
                   </p>
-                  <p className="mt-0.5 text-[11px] text-slate-500">
+                  <p className="mt-0.5 text-xs text-slate-500">
                     {new Date(d.receivedAt).toLocaleDateString(idLocale, {
                       year: "numeric",
                       month: "short",

@@ -141,7 +141,7 @@ function TLDR({ t }: { t: T }) {
             </div>
           </div>
 
-          <p className="mt-4 text-center text-[11px] text-slate-500">
+          <p className="mt-4 text-center text-xs text-slate-500">
             {t("tldr_license")}
           </p>
         </div>
@@ -411,7 +411,7 @@ function DiagramBox({
       className={`rounded-xl border ${styles.bg} ${tone === "brand" ? "border-brand-200" : tone === "emerald" ? "border-emerald-200" : tone === "amber" ? "border-amber-200" : "border-violet-200"} px-3 py-3 text-center shadow-sm`}
     >
       <p className={`text-sm font-bold ${styles.icon}`}>{title}</p>
-      <p className="mt-0.5 text-[11px] font-mono text-slate-600">{sub}</p>
+      <p className="mt-0.5 text-xs font-mono text-slate-600">{sub}</p>
     </div>
   );
 }
@@ -490,7 +490,7 @@ function IngestionPipeline({ t }: { t: T }) {
               key={i}
               className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
             >
-              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-[11px] font-bold text-white">
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">
                 {i + 1}
               </span>
               <p className="mt-3 text-sm font-bold text-slate-900">
@@ -606,7 +606,7 @@ function BriefPipeline({ t }: { t: T }) {
               key={i}
               className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
             >
-              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-700 text-[11px] font-bold text-white">
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-700 text-xs font-bold text-white">
                 {i + 1}
               </span>
               <p className="mt-3 text-sm font-bold text-slate-900">
@@ -687,7 +687,7 @@ function InsightsBriefingPipeline({ t }: { t: T }) {
               key={i}
               className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
             >
-              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-brand-700 text-[11px] font-bold text-white">
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-brand-700 text-xs font-bold text-white">
                 {i + 1}
               </span>
               <p className="mt-3 text-sm font-bold text-slate-900">
@@ -821,7 +821,7 @@ function BriefingAnatomy({ t }: { t: T }) {
               <p className="mt-2 text-[13px] font-bold text-slate-900">
                 {s.title}
               </p>
-              <p className="mt-1 text-[11px] leading-relaxed text-slate-600">
+              <p className="mt-1 text-xs leading-relaxed text-slate-600">
                 {s.body}
               </p>
             </li>
@@ -858,7 +858,7 @@ function BriefingAnatomy({ t }: { t: T }) {
                   ~{d.words}
                 </span>
               </div>
-              <p className="mt-1 text-[11px] leading-relaxed text-slate-600">
+              <p className="mt-1 text-xs leading-relaxed text-slate-600">
                 {d.body}
               </p>
             </li>
@@ -882,7 +882,7 @@ function BriefingAnatomy({ t }: { t: T }) {
             <p className="text-[13px] font-bold text-slate-900">
               {t("anatomy_flyer_general_title")}
             </p>
-            <p className="mt-1 text-[11px] leading-relaxed text-slate-600">
+            <p className="mt-1 text-xs leading-relaxed text-slate-600">
               {t("anatomy_flyer_general_body")}
             </p>
           </li>
@@ -890,12 +890,12 @@ function BriefingAnatomy({ t }: { t: T }) {
             <p className="text-[13px] font-bold text-slate-900">
               {t("anatomy_flyer_genz_title")}
             </p>
-            <p className="mt-1 text-[11px] leading-relaxed text-slate-600">
+            <p className="mt-1 text-xs leading-relaxed text-slate-600">
               {t("anatomy_flyer_genz_body")}
             </p>
           </li>
         </ul>
-        <p className="mt-3 text-[11px] text-slate-500">
+        <p className="mt-3 text-xs text-slate-500">
           {t("anatomy_flyer_footnote")}
         </p>
       </div>
@@ -1314,7 +1314,7 @@ function Repo({ t }: { t: T }) {
             {t("repo_cta")}
             <ArrowRight className="h-4 w-4" />
           </a>
-          <p className="mt-4 font-mono text-[11px] text-white/50">
+          <p className="mt-4 font-mono text-xs text-white/50">
             {GITHUB_URL.replace("https://", "")}
           </p>
         </div>

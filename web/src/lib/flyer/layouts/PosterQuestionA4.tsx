@@ -116,7 +116,7 @@ export const PosterQuestionA4: FlyerLayoutComponent = ({
             chip → huge headline → tiny invitation. */}
         <section className="relative z-10 flex flex-col items-center text-center">
           <span
-            className="inline-block rounded-full px-3.5 py-1 text-[11px] font-bold uppercase tracking-[0.18em]"
+            className="inline-block rounded-full px-3.5 py-1 text-xs font-bold uppercase tracking-[0.18em]"
             style={{
               background: "rgba(255,255,255,0.95)",
               color: palette.accentDeep,

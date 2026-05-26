@@ -61,14 +61,14 @@ export function DigestOptInPrompt({
             type="button"
             onClick={optIn}
             disabled={pending}
-            className="inline-flex items-center gap-1.5 rounded-full bg-emerald-700 px-3 py-1 text-[11px] font-semibold text-white transition hover:bg-emerald-800 disabled:opacity-60"
+            className="inline-flex items-center gap-1.5 rounded-full bg-emerald-700 px-3 py-1 text-xs font-semibold text-white transition hover:bg-emerald-800 disabled:opacity-60"
           >
             {yesLabel}
           </button>
           <button
             type="button"
             onClick={dismiss}
-            className="inline-flex items-center rounded-full border border-emerald-200 bg-white px-3 py-1 text-[11px] font-semibold text-emerald-800 hover:bg-emerald-50"
+            className="inline-flex items-center rounded-full border border-emerald-200 bg-white px-3 py-1 text-xs font-semibold text-emerald-800 hover:bg-emerald-50"
           >
             {noLabel}
           </button>

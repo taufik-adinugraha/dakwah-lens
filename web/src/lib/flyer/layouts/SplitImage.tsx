@@ -80,7 +80,7 @@ export const SplitImage: FlyerLayoutComponent = ({
       </div>
       {daleel && (
         <div className="absolute bottom-[50px] left-[40px] right-[40px] text-white">
-          <div className="text-[11px] font-bold uppercase tracking-[0.25em] opacity-80">
+          <div className="text-xs font-bold uppercase tracking-[0.25em] opacity-80">
             {dateLabel}
           </div>
           <div className="mt-2 text-[20px] font-extrabold leading-tight">

@@ -241,7 +241,7 @@ export default async function SegmentPage({
               <p className="mt-2 max-w-2xl text-pretty text-sm leading-relaxed text-slate-600">
                 {t(def.descriptionKey as Parameters<typeof t>[0])}
               </p>
-              <p className="mt-2 text-[11px] text-slate-400">
+              <p className="mt-2 text-xs text-slate-400">
                 {t("segment_post_count", { count: total })}
               </p>
             </div>

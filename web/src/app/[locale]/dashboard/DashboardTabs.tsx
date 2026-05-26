@@ -180,7 +180,7 @@ function TabButton({
         </span>
         <span
           className={
-            "block truncate text-[11px] leading-tight " +
+            "block truncate text-xs leading-tight " +
             (active ? "text-white/70" : "text-slate-500")
           }
         >

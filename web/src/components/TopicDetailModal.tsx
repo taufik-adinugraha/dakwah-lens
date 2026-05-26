@@ -201,7 +201,7 @@ export function TopicDetailModal({
                       key={p.id}
                       className="rounded-xl border border-slate-200 bg-white p-3"
                     >
-                      <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
                         <Newspaper className="h-3 w-3 shrink-0" />
                         {p.author && (
                           <span className="font-semibold text-slate-700">
@@ -229,7 +229,7 @@ export function TopicDetailModal({
                           href={p.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-medium text-brand-700 hover:underline"
+                          className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-brand-700 hover:underline"
                         >
                           Open source
                           <ArrowUpRight className="h-3 w-3" />
@@ -246,7 +246,7 @@ export function TopicDetailModal({
         {/* Sticky footer — CTA only shown when the viewer can actually
             create a brief (admin-only while experimental). */}
         <div className="sticky bottom-0 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 bg-white/95 px-6 py-3 backdrop-blur">
-          <p className="text-[11px] text-slate-500">
+          <p className="text-xs text-slate-500">
             Showing top {topic.samplePosts.length} of {topic.volume} posts in last 7 days
           </p>
           {canCreateBriefs && (

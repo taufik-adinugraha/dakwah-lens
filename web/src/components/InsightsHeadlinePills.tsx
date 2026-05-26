@@ -154,7 +154,7 @@ export function HeadlinePill({
         )}
       </div>
       {hint && (
-        <p className="mt-0.5 truncate text-[11px] text-slate-500">{hint}</p>
+        <p className="mt-0.5 truncate text-xs text-slate-500">{hint}</p>
       )}
     </div>
   );

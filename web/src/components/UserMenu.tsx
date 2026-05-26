@@ -93,7 +93,7 @@ export function UserMenu({ email, name, status, role }: Props) {
             <p className="truncate text-sm font-semibold text-slate-900">
               {name ?? email.split("@")[0]}
             </p>
-            <p className="mt-0.5 truncate text-[11px] text-slate-500">{email}</p>
+            <p className="mt-0.5 truncate text-xs text-slate-500">{email}</p>
             <div className="mt-2 flex flex-wrap items-center gap-1">
               <StatusPill status={status} />
               {role !== "user" && <RolePill role={role} />}

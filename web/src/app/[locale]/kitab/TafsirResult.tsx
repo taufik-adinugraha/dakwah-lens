@@ -66,7 +66,7 @@ export function TafsirResult({
             type="button"
             onClick={() => setExpanded((v) => !v)}
             aria-expanded={expanded}
-            className="group inline-flex items-center gap-1 text-[11px] font-medium text-violet-700 transition hover:text-violet-900"
+            className="group inline-flex items-center gap-1 text-xs font-medium text-violet-700 transition hover:text-violet-900"
           >
             {expanded ? t("tafsir_hide_full") : t("tafsir_show_full")}
             <ChevronDown

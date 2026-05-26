@@ -44,7 +44,7 @@ export function SentimentByPlatformDialog({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="mt-3 inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+        className="mt-3 inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
       >
         {labels.cta}
         <ArrowUpRight className="h-3 w-3" />
@@ -138,7 +138,7 @@ function PlatformRow({
               title={`${labels.positive} ${row.positive.pct.toFixed(0)}%`}
             />
           </div>
-          <ul className="mt-2.5 grid grid-cols-3 gap-2 text-[11px]">
+          <ul className="mt-2.5 grid grid-cols-3 gap-2 text-xs">
             <PlatformStat
               dot="bg-emerald-500"
               label={labels.positive}

@@ -684,7 +684,7 @@ export function CommentForm({
         <div>
           <label
             htmlFor="comment-name"
-            className="block text-[11px] font-bold uppercase tracking-[0.15em] text-slate-500"
+            className="block text-xs font-bold uppercase tracking-[0.15em] text-slate-500"
           >
             {labels.nameLabel}
           </label>
@@ -705,7 +705,7 @@ export function CommentForm({
         <div>
           <label
             htmlFor="comment-body"
-            className="block text-[11px] font-bold uppercase tracking-[0.15em] text-slate-500"
+            className="block text-xs font-bold uppercase tracking-[0.15em] text-slate-500"
           >
             {labels.bodyLabel}
           </label>
@@ -721,7 +721,7 @@ export function CommentForm({
             required
             minLength={2}
           />
-          <div className="mt-1 text-right text-[11px] text-slate-400">
+          <div className="mt-1 text-right text-xs text-slate-400">
             {body.length}/{BODY_MAX}
           </div>
         </div>
@@ -764,7 +764,7 @@ export function CommentForm({
                 className="block w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-[13px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2"
                 style={{ ["--tw-ring-color" as string]: palette.accent }}
               />
-              <p className="text-[11px] leading-snug text-slate-500">
+              <p className="text-xs leading-snug text-slate-500">
                 {labels.notifyPrivacy}
               </p>
             </div>
@@ -896,7 +896,7 @@ export function CommentForm({
                   )}
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-slate-400">
+                  <span className="text-xs text-slate-400">
                     {localeAwareFormatDateTime(new Date(c.createdAt), locale, {
                       month: "short",
                       day: "numeric",
@@ -977,7 +977,7 @@ export function CommentForm({
                   <button
                     type="button"
                     onClick={() => openReply(c.id)}
-                    className="inline-flex h-7 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 text-[11px] font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-900"
+                    className="inline-flex h-7 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-900"
                   >
                     <MessageSquare className="h-3 w-3" />
                     {labels.reply}

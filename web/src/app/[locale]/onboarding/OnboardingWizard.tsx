@@ -281,14 +281,14 @@ export function OnboardingWizard() {
     <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6 sm:py-16">
       {/* Progress + skip */}
       <div className="flex items-center justify-between gap-4">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
           {t("progress_label", { current: step + 1, total })}
         </span>
         <button
           type="button"
           onClick={skipAll}
           disabled={pending}
-          className="text-[11px] font-medium text-slate-500 hover:text-slate-900 disabled:opacity-50"
+          className="text-xs font-medium text-slate-500 hover:text-slate-900 disabled:opacity-50"
         >
           {t("skip_all")}
         </button>
@@ -402,7 +402,7 @@ export function OnboardingWizard() {
         )}
 
         {current.kind === "multi" && current.max && (
-          <p className="mt-2 text-[11px] text-slate-500">
+          <p className="mt-2 text-xs text-slate-500">
             {t("multi_pick_hint", { max: current.max })}
           </p>
         )}

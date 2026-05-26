@@ -87,8 +87,13 @@ export async function BriefDetailContent({
   return (
     <section className="pt-10 pb-16 sm:pt-14 sm:pb-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        {/* Top breadcrumb — hidden in print mode. */}
-        <div className="print:hidden">
+        {/* Top breadcrumb — sticky on mobile so the back affordance
+            stays reachable during long-form reading. Briefings can
+            run 7-10K words; without this users have to scroll back
+            to the top every time they want out. Desktop has a TOC
+            sidebar so the sticky isn't needed there. Hidden in print
+            mode. */}
+        <div className="sticky top-16 z-10 -mx-4 bg-white/95 px-4 py-2 backdrop-blur-sm md:relative md:top-auto md:z-auto md:mx-0 md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-none print:hidden">
           <Link
             href="/insights"
             className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 transition hover:text-slate-900"
@@ -112,7 +117,7 @@ export async function BriefDetailContent({
           <h1 className="mt-3 text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
             {t("brief_page_h1", { scope: scopeLabel })}
           </h1>
-          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500">
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
             <span>{generatedLabel}</span>
             <span aria-hidden>·</span>
             <span className="inline-flex items-center gap-1">

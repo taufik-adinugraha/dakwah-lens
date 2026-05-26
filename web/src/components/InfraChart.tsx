@@ -187,7 +187,7 @@ export function InfraChart({
           {/* Tooltip (HTML overlay, positioned in % of viewBox so it scales) */}
           {hoverPoint && hover && (
             <div
-              className="pointer-events-none absolute z-10 -translate-x-1/2 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] shadow-md"
+              className="pointer-events-none absolute z-10 -translate-x-1/2 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs shadow-md"
               style={{
                 left: `${(hover.x / w) * 100}%`,
                 top: `${(hover.y / h) * 100}%`,

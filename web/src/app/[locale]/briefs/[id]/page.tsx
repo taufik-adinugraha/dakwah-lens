@@ -164,7 +164,7 @@ export default async function BriefDetailPage({
         <ol className="space-y-2 text-sm leading-relaxed text-slate-700">
           {content.recommendations.map((r, i) => (
             <li key={i} className="flex gap-3">
-              <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-50 text-[11px] font-semibold text-brand-700">
+              <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-700">
                 {i + 1}
               </span>
               <span className="text-pretty">{r}</span>
@@ -207,7 +207,7 @@ export default async function BriefDetailPage({
           <ol className="space-y-2 text-sm leading-relaxed text-slate-700">
             {content.story_illustrations.map((s, i) => (
               <li key={i} className="flex gap-3">
-                <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-50 text-[11px] font-semibold text-amber-700">
+                <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-50 text-xs font-semibold text-amber-700">
                   {i + 1}
                 </span>
                 <span className="text-pretty">{s}</span>
@@ -330,7 +330,7 @@ function DaleelCard({
       </div>
 
       {d.also_found_in?.length ? (
-        <p className="mt-2 text-[11px] leading-relaxed text-emerald-800/80">
+        <p className="mt-2 text-xs leading-relaxed text-emerald-800/80">
           <span className="font-semibold">
             {t("daleel_also_found_in_label")}:
           </span>{" "}
@@ -394,7 +394,7 @@ function BriefCostStrip({
   tokensLabel: string;
 }) {
   return (
-    <div className="mt-3 inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-[11px] text-slate-600 print:hidden">
+    <div className="mt-3 inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-600 print:hidden">
       <span className="font-semibold uppercase tracking-wider text-slate-500">
         {label}
       </span>

@@ -108,7 +108,7 @@ export default async function MahasiswaArticlePage({ params }: Props) {
         <div className="relative z-10 mx-auto max-w-3xl px-5 pt-10 pb-16 sm:px-8 sm:pt-12 sm:pb-20">
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.15em] text-white/80 transition hover:text-white"
+            className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.15em] text-white/80 transition hover:text-white"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             dakwah-lens.id
@@ -127,7 +127,7 @@ export default async function MahasiswaArticlePage({ params }: Props) {
             >
               {segmentLabel}
             </span>
-            <span className="text-[11px] font-semibold uppercase tracking-[0.15em] text-white/70">
+            <span className="text-xs font-semibold uppercase tracking-[0.15em] text-white/70">
               {dateLabel}
             </span>
           </div>
@@ -177,7 +177,7 @@ export default async function MahasiswaArticlePage({ params }: Props) {
       {/* FOOTER */}
       <footer className="border-t border-slate-200 bg-white">
         <div className="mx-auto max-w-3xl px-5 py-10 text-center sm:px-8">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
             Dakwah-Lens — Briefing Mingguan untuk Dakwah Indonesia
           </p>
           <p className="mt-3 text-pretty text-xs leading-relaxed text-slate-500">

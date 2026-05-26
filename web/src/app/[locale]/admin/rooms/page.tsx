@@ -317,7 +317,7 @@ export default async function RoomsPage({
               <div className="flex items-center gap-2">
                 <Icon className={`h-3.5 w-3.5 ${m.text}`} />
                 <span
-                  className={`text-[11px] font-bold uppercase tracking-wider ${m.text}`}
+                  className={`text-xs font-bold uppercase tracking-wider ${m.text}`}
                 >
                   {m.label}
                 </span>
@@ -337,7 +337,7 @@ export default async function RoomsPage({
           via URL searchParams so filters are bookmarkable + shareable. */}
       <div className="mb-5 rounded-2xl border border-slate-200 bg-slate-50/60 p-3 sm:p-4">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-slate-600">
+          <span className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-slate-600">
             <Filter className="h-3 w-3" />
             Segment
           </span>
@@ -352,8 +352,8 @@ export default async function RoomsPage({
                 href={next}
                 className={
                   isActive
-                    ? "inline-flex h-7 items-center rounded-full bg-slate-900 px-3 text-[11px] font-bold uppercase tracking-wider text-white"
-                    : "inline-flex h-7 items-center rounded-full border border-slate-200 bg-white px-3 text-[11px] font-semibold text-slate-700 hover:bg-slate-100"
+                    ? "inline-flex h-7 items-center rounded-full bg-slate-900 px-3 text-xs font-bold uppercase tracking-wider text-white"
+                    : "inline-flex h-7 items-center rounded-full border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 hover:bg-slate-100"
                 }
               >
                 {SEGMENT_LABEL[seg] ?? seg}
@@ -391,13 +391,13 @@ export default async function RoomsPage({
           {hasAnyFilter && (
             <Link
               href="/admin/rooms"
-              className="inline-flex h-7 items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-3 text-[11px] font-semibold text-rose-700 hover:bg-rose-100"
+              className="inline-flex h-7 items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-3 text-xs font-semibold text-rose-700 hover:bg-rose-100"
             >
               <X className="h-3 w-3" />
               Clear filters
             </Link>
           )}
-          <span className="ml-auto text-[11px] text-slate-500">
+          <span className="ml-auto text-xs text-slate-500">
             {filtered.length === 0
               ? `0 of ${allRooms.length}`
               : `${pageOffset + 1}–${Math.min(pageOffset + rooms.length, filtered.length)} of ${filtered.length}`}
@@ -734,7 +734,7 @@ function RoomCard({
             className="block w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-2 text-[13px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300"
           />
           <div className="flex flex-wrap items-center gap-2">
-            <label className="inline-flex items-center gap-1.5 text-[11px] text-slate-600">
+            <label className="inline-flex items-center gap-1.5 text-xs text-slate-600">
               <input
                 type="checkbox"
                 name="pinned"

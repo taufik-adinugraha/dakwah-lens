@@ -45,7 +45,7 @@ export function ConfirmFormButton({
       <input type="hidden" name="user_id" value={userId} />
       <button
         type="submit"
-        className={`inline-flex h-8 items-center gap-1 rounded-full border px-3 text-[11px] font-semibold transition ${cls}`}
+        className={`inline-flex h-8 items-center gap-1 rounded-full border px-3 text-xs font-semibold transition ${cls}`}
       >
         {label}
       </button>

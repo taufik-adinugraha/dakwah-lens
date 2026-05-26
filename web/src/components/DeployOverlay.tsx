@@ -170,7 +170,7 @@ export function DeployOverlay({
         )}
 
         {/* Footnote — sets expectations: typically 2-3 min. */}
-        <p className="mt-4 text-center text-[11px] text-slate-400">
+        <p className="mt-4 text-center text-xs text-slate-400">
           {t("auto_refresh_note")}
         </p>
       </div>

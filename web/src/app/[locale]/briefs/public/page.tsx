@@ -103,7 +103,7 @@ export default async function PublicBriefsPage({
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           {/* Filter row */}
           <div className="flex flex-wrap items-baseline gap-x-4 gap-y-3">
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500">
               <Filter className="h-3 w-3" />
               {t("filter_label")}
             </span>
@@ -136,14 +136,14 @@ export default async function PublicBriefsPage({
             {(seg || tone || loc) && (
               <Link
                 href="/briefs/public"
-                className="text-[11px] font-semibold text-rose-700 hover:text-rose-900"
+                className="text-xs font-semibold text-rose-700 hover:text-rose-900"
               >
                 {t("filter_clear")}
               </Link>
             )}
           </div>
 
-          <p className="mt-3 text-[11px] text-slate-500">
+          <p className="mt-3 text-xs text-slate-500">
             {t("results_count", { count: briefs.length })}
           </p>
 
@@ -202,7 +202,7 @@ function Hero({ t }: { t: T }) {
         <p className="mx-auto mt-4 max-w-2xl text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
           {t("hero_subtitle")}
         </p>
-        <p className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
+        <p className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-slate-500">
           <Clock className="h-3 w-3" />
           {t("recency_hint", { days: RECENCY_DAYS })}
         </p>
@@ -266,8 +266,8 @@ function FilterGroup<O extends readonly string[]>({
 
 function pillClass(active: boolean): string {
   return active
-    ? "inline-flex h-7 items-center rounded-full border border-slate-900 bg-slate-900 px-2.5 text-[11px] font-semibold text-white"
-    : "inline-flex h-7 items-center rounded-full border border-slate-200 bg-white px-2.5 text-[11px] font-medium text-slate-600 transition hover:border-slate-300 hover:text-slate-900";
+    ? "inline-flex h-7 items-center rounded-full border border-slate-900 bg-slate-900 px-2.5 text-xs font-semibold text-white"
+    : "inline-flex h-7 items-center rounded-full border border-slate-200 bg-white px-2.5 text-xs font-medium text-slate-600 transition hover:border-slate-300 hover:text-slate-900";
 }
 
 function Empty({ t }: { t: T }) {
@@ -321,7 +321,7 @@ function BriefCard({
         {preview}
       </p>
 
-      <div className="mt-auto flex items-baseline justify-between gap-3 border-t border-slate-100 pt-3 text-[11px]">
+      <div className="mt-auto flex items-baseline justify-between gap-3 border-t border-slate-100 pt-3 text-xs">
         <span className="inline-flex items-center gap-1 text-slate-500">
           <Users className="h-3 w-3" />
           <span className="truncate">{audience}</span>

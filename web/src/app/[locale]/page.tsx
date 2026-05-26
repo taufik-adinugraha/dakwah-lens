@@ -278,7 +278,7 @@ function AnonymousCtas({ t }: { t: LandingT }) {
       {/* No-login reassurance under the primary card — directly addresses
            user research showing first-time visitors assumed they needed to
            sign up before reading anything. */}
-      <p className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-medium text-emerald-700">
+      <p className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700">
         <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
         {t("hero_no_login_required")}
       </p>
@@ -1226,7 +1226,7 @@ function SignupJourney({ t }: { t: LandingT }) {
                 key={title}
                 className="relative rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
               >
-                <span className="absolute -top-3 left-5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-[11px] font-bold text-white">
+                <span className="absolute -top-3 left-5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">
                   {i + 1}
                 </span>
                 <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-700">

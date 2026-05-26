@@ -28,7 +28,7 @@ export async function Footer() {
             <p className="text-sm font-semibold">Dakwah-Lens</p>
             <I18nText
               text={t("tagline")}
-              className="mt-0.5 block max-w-xs text-pretty text-[11px] leading-relaxed text-slate-400"
+              className="mt-0.5 block max-w-xs text-pretty text-xs leading-relaxed text-slate-400"
             />
           </div>
         </div>
@@ -109,7 +109,7 @@ export async function Footer() {
       </div>
 
       <div className="border-t border-white/10">
-        <div className="mx-auto flex max-w-6xl items-center justify-center px-4 py-3 text-[11px] text-slate-400 sm:px-6">
+        <div className="mx-auto flex max-w-6xl items-center justify-center px-4 py-3 text-xs text-slate-400 sm:px-6">
           <span>© {new Date().getFullYear()} Sukses & Berkah Group</span>
         </div>
       </div>

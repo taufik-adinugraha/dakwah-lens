@@ -58,7 +58,7 @@ export function BookmarkButton({
       disabled={pending}
       aria-pressed={saved}
       aria-label={saved ? "Remove bookmark" : "Save"}
-      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-semibold transition disabled:opacity-60 ${
+      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition disabled:opacity-60 ${
         saved
           ? "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
           : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"

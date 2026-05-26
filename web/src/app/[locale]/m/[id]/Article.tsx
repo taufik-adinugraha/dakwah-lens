@@ -121,7 +121,7 @@ function makeArticleComponents(palette: Palette): Components {
     ),
     h3: ({ children }) => (
       <h3
-        className="mt-8 mb-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.18em]"
+        className="mt-8 mb-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-extrabold uppercase tracking-[0.18em]"
         style={{ background: palette.quoteBg, color: palette.accentDeep }}
       >
         {children}

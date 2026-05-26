@@ -134,7 +134,7 @@ export function WatchedRoomsNudge() {
         <button
           type="button"
           onClick={dismiss}
-          className="text-[11px] font-semibold text-slate-500 hover:text-slate-900"
+          className="text-xs font-semibold text-slate-500 hover:text-slate-900"
           aria-label="Dismiss"
         >
           Tutup

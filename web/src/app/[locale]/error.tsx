@@ -52,7 +52,7 @@ export default function ErrorBoundary({
           {t("error_body")}
         </p>
         {error.digest && (
-          <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 font-mono text-[11px] text-slate-600">
+          <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 font-mono text-xs text-slate-600">
             {t("error_digest_label")}: {error.digest}
           </p>
         )}

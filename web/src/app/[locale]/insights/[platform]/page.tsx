@@ -170,24 +170,24 @@ function ScopePicker({
     <section className="border-b border-slate-100 bg-slate-50/50 py-6">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
             {tInsights("scope_picker_label")}
           </span>
           <Link
             href="/insights/mainstream"
-            className={`inline-flex h-7 items-center rounded-full border px-3 text-[11px] font-semibold transition ${pill(activeScope === "all" && !activeRegion)}`}
+            className={`inline-flex h-7 items-center rounded-full border px-3 text-xs font-semibold transition ${pill(activeScope === "all" && !activeRegion)}`}
           >
             {tInsights("scope_all")}
           </Link>
           <Link
             href="/insights/mainstream?scope=national"
-            className={`inline-flex h-7 items-center rounded-full border px-3 text-[11px] font-semibold transition ${pill(activeScope === "national" && !activeRegion)}`}
+            className={`inline-flex h-7 items-center rounded-full border px-3 text-xs font-semibold transition ${pill(activeScope === "national" && !activeRegion)}`}
           >
             {tInsights("scope_national")}
           </Link>
           <Link
             href="/insights/mainstream?scope=regional"
-            className={`inline-flex h-7 items-center rounded-full border px-3 text-[11px] font-semibold transition ${pill(activeScope === "regional" && !activeRegion)}`}
+            className={`inline-flex h-7 items-center rounded-full border px-3 text-xs font-semibold transition ${pill(activeScope === "regional" && !activeRegion)}`}
           >
             {tInsights("scope_regional_all")}
           </Link>
@@ -196,7 +196,7 @@ function ScopePicker({
             <Link
               key={r}
               href={`/insights/mainstream?region=${r}`}
-              className={`inline-flex h-7 items-center rounded-full border px-3 text-[11px] font-medium transition ${pill(activeRegion === r)}`}
+              className={`inline-flex h-7 items-center rounded-full border px-3 text-xs font-medium transition ${pill(activeRegion === r)}`}
             >
               {tInsights(`loc_${r}` as Parameters<typeof tInsights>[0])}
             </Link>
@@ -250,7 +250,7 @@ async function RealCategoryClusters({
           <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
             {tInsights("section_real_clusters_subtitle")}
           </p>
-          <p className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
+          <p className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
             <Radio className="h-3 w-3" />
             {tInsights("real_clusters_live_label", {
               count: totalDominant.toLocaleString(),
@@ -304,7 +304,7 @@ async function RealCategoryClusters({
                     style={{ width: `${sharePct}%` }}
                   />
                 </div>
-                <p className="mt-3 text-[11px] font-medium text-brand-700 opacity-0 transition group-hover:opacity-100">
+                <p className="mt-3 text-xs font-medium text-brand-700 opacity-0 transition group-hover:opacity-100">
                   {tInsights("category_view_posts")} →
                 </p>
               </Link>
@@ -406,14 +406,14 @@ async function DiscoveredTopics({
                     {topic.keywords.slice(0, 6).map((kw) => (
                       <span
                         key={kw}
-                        className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-700"
+                        className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-700"
                       >
                         {kw}
                       </span>
                     ))}
                   </div>
                 )}
-                <p className="mt-3 text-[11px] font-medium text-brand-700 opacity-0 transition group-hover:opacity-100">
+                <p className="mt-3 text-xs font-medium text-brand-700 opacity-0 transition group-hover:opacity-100">
                   {tInsights("category_view_posts")} →
                 </p>
               </Link>
@@ -583,7 +583,7 @@ function ClusterCards({ config, t }: { config: DrilldownConfig; t: T }) {
                   {c.outlets.map((o) => (
                     <span
                       key={o}
-                      className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-700"
+                      className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-700"
                     >
                       {o}
                     </span>
@@ -628,7 +628,7 @@ function TopOutlets({
             {t("section_outlets_subtitle")}
           </p>
           {useLive && (
-            <p className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
+            <p className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
               <Radio className="h-3 w-3" />
               Real-time · from {live!.totalPosts.toLocaleString()} ingested posts
             </p>
@@ -737,7 +737,7 @@ function LiveStream({
               <span className="bg-slate-300" style={{ width: `${neuPct}%` }} />
               <span className="bg-amber-500" style={{ width: `${negPct}%` }} />
             </div>
-            <div className="mt-2 flex justify-between text-[11px] tabular-nums text-slate-600">
+            <div className="mt-2 flex justify-between text-xs tabular-nums text-slate-600">
               <span>
                 <span className="font-semibold text-emerald-700">{posPct}%</span>{" "}
                 {tInsights("live_sentiment_positive")}
@@ -801,7 +801,7 @@ function TopStories({
             {t("section_stories_subtitle")}
           </p>
           {useLive && (
-            <p className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
+            <p className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
               <Radio className="h-3 w-3" />
               Real-time · top posts by da&apos;wah relevance
             </p>
@@ -827,7 +827,7 @@ function TopStories({
                     <p className="truncate text-sm font-medium text-slate-800">
                       {title.slice(0, 130) || "(no headline)"}
                     </p>
-                    <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-slate-500">
+                    <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-500">
                       {post.author && (
                         <>
                           <span className="font-medium text-slate-700">

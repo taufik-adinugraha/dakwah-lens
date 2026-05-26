@@ -215,7 +215,7 @@ function KitabSaveCard({
 }) {
   return (
     <>
-      <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2 py-0.5 font-semibold uppercase tracking-wider text-slate-700">
           <BookmarkCheck className="h-3 w-3" /> {payload.corpus}
         </span>
@@ -263,7 +263,7 @@ function BriefSaveCard({
 }) {
   return (
     <>
-      <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-2 py-0.5 font-semibold uppercase tracking-wider text-brand-700">
           <BookmarkCheck className="h-3 w-3" /> brief
         </span>
@@ -276,12 +276,12 @@ function BriefSaveCard({
       <p className="mt-2 text-sm font-semibold text-slate-900">
         {payload.topic_title}
       </p>
-      <p className="mt-0.5 text-[11px] text-slate-500">
+      <p className="mt-0.5 text-xs text-slate-500">
         {payload.segment} · {payload.tone}
       </p>
       <Link
         href={`/briefs/${refId}`}
-        className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-brand-700 hover:underline"
+        className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-brand-700 hover:underline"
       >
         {label} <ExternalLink className="h-3 w-3" />
       </Link>
@@ -302,7 +302,7 @@ function PostSaveCard({
 }) {
   return (
     <>
-      <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-cyan-50 px-2 py-0.5 font-semibold uppercase tracking-wider text-cyan-700">
           <BookmarkCheck className="h-3 w-3" /> {payload.platform}
         </span>
@@ -326,7 +326,7 @@ function PostSaveCard({
           href={payload.url}
           target="_blank"
           rel="noreferrer"
-          className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-brand-700 hover:underline"
+          className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-brand-700 hover:underline"
         >
           {label} <ExternalLink className="h-3 w-3" />
         </a>

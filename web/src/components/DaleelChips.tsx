@@ -93,7 +93,7 @@ export function DaleelChips({
                     type="button"
                     onClick={() => setActiveId(d.ref_id)}
                     title={d.translation_id || d.translation_en || ""}
-                    className="group inline-flex max-w-full items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] text-emerald-900 transition hover:border-emerald-300 hover:bg-emerald-100"
+                    className="group inline-flex max-w-full items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs text-emerald-900 transition hover:border-emerald-300 hover:bg-emerald-100"
                   >
                     <span className="text-[9px] font-semibold uppercase tracking-wider text-emerald-700">
                       {d.corpus.replace(/_/g, " ")}
@@ -262,7 +262,7 @@ function DaleelModal({
                 {t("exec_daleel_arabic_label")}
               </p>
               <p
-                className="text-pretty text-right text-xl leading-loose text-slate-900"
+                className="text-pretty text-right font-amiri text-lg leading-loose text-slate-900 sm:text-xl md:text-2xl"
                 dir="rtl"
                 lang="ar"
               >

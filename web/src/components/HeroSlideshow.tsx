@@ -76,7 +76,7 @@ export function HeroSlideshow() {
                   type="button"
                   onClick={() => setIndex(i)}
                   className={clsx(
-                    "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-1 text-[11px] font-semibold transition sm:px-3 sm:text-xs",
+                    "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-1 text-xs font-semibold transition sm:px-3 sm:text-xs",
                     isActive
                       ? "border-slate-900 bg-slate-900 text-white"
                       : "border-slate-200 bg-white text-slate-600 hover:border-slate-300",
@@ -165,10 +165,10 @@ function BrowserChrome({ url, live }: { url: string; live: string }) {
         <span className="h-2.5 w-2.5 rounded-full bg-amber-300" />
         <span className="h-2.5 w-2.5 rounded-full bg-emerald-300" />
       </div>
-      <span className="truncate px-2 text-[11px] font-medium text-slate-500">
+      <span className="truncate px-2 text-xs font-medium text-slate-500">
         {url}
       </span>
-      <span className="flex items-center gap-1 text-[11px] font-medium text-emerald-600">
+      <span className="flex items-center gap-1 text-xs font-medium text-emerald-600">
         <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
         {live}
       </span>
@@ -277,11 +277,11 @@ function StatCard({
     <div
       className={`rounded-lg border border-slate-200/70 bg-gradient-to-br ${tones[tone]} p-3`}
     >
-      <p className="text-[11px] font-medium uppercase tracking-wider opacity-80">
+      <p className="text-xs font-medium uppercase tracking-wider opacity-80">
         {label}
       </p>
       <p className="mt-1 text-2xl font-bold text-slate-900">{value}</p>
-      <p className="text-[11px] text-slate-500">{hint}</p>
+      <p className="text-xs text-slate-500">{hint}</p>
     </div>
   );
 }
@@ -305,7 +305,7 @@ function IssueRow({
         </p>
         <p className="text-[10px] text-slate-500">{tag}</p>
       </div>
-      <span className="hidden text-[11px] font-medium tabular-nums text-slate-500 sm:inline">
+      <span className="hidden text-xs font-medium tabular-nums text-slate-500 sm:inline">
         {volume}
       </span>
       <div className="hidden h-1.5 w-16 overflow-hidden rounded-full bg-slate-100 sm:block">
@@ -314,7 +314,7 @@ function IssueRow({
           style={{ width: `${sentiment}%` }}
         />
       </div>
-      <span className="hidden w-8 text-right text-[11px] font-medium text-slate-500 sm:inline">
+      <span className="hidden w-8 text-right text-xs font-medium text-slate-500 sm:inline">
         {sentiment}%
       </span>
     </div>
@@ -489,14 +489,14 @@ function BriefSlide({ t }: { t: T }) {
         <h4 className="text-balance text-sm font-semibold text-slate-900 sm:text-base">
           {t("brief_title")}
         </h4>
-        <p className="mt-1 text-[11px] text-slate-500">{t("brief_meta")}</p>
+        <p className="mt-1 text-xs text-slate-500">{t("brief_meta")}</p>
       </div>
 
       <div className="rounded-lg border border-slate-200 bg-white p-2.5">
         <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
           {t("brief_section_summary")}
         </p>
-        <p className="mt-1 text-pretty text-[11px] leading-relaxed text-slate-700">
+        <p className="mt-1 text-pretty text-xs leading-relaxed text-slate-700">
           {t("brief_summary")}
         </p>
       </div>
@@ -538,7 +538,7 @@ function BriefSlide({ t }: { t: T }) {
         >
           {t("brief_daleel_arabic")}
         </p>
-        <p className="mt-1 text-pretty text-[11px] leading-relaxed text-slate-700">
+        <p className="mt-1 text-pretty text-xs leading-relaxed text-slate-700">
           {t("brief_daleel_translation")}
         </p>
         <p className="mt-1 text-[10px] font-medium text-emerald-700">
@@ -556,7 +556,7 @@ function BriefSlide({ t }: { t: T }) {
           <Lightbulb className="h-3 w-3 text-amber-500" />
           {t("brief_section_recommendations")}
         </p>
-        <ol className="space-y-1 text-[11px] text-slate-700">
+        <ol className="space-y-1 text-xs text-slate-700">
           {[1, 2, 3].map((n) => (
             <li key={n} className="flex items-start gap-2">
               <span className="mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[9px] font-semibold text-white">
@@ -594,7 +594,7 @@ function AudienceCell({
       <p className="text-[9px] font-semibold uppercase tracking-wider opacity-80">
         {label}
       </p>
-      <p className="mt-0.5 text-[11px] font-medium leading-tight">{value}</p>
+      <p className="mt-0.5 text-xs font-medium leading-tight">{value}</p>
     </div>
   );
 }
@@ -690,14 +690,14 @@ function KitabSlide({ t }: { t: T }) {
                 {s.languages}
               </span>
             </div>
-            <p className="text-[11px] leading-snug text-slate-600">
+            <p className="text-xs leading-snug text-slate-600">
               {s.meta}
             </p>
           </div>
         ))}
       </div>
 
-      <p className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-center text-[11px] leading-relaxed text-slate-600">
+      <p className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-center text-xs leading-relaxed text-slate-600">
         <BookOpenCheck className="mr-1 inline h-3 w-3 align-text-bottom text-emerald-600" />
         {t("kitab_promise")}
       </p>

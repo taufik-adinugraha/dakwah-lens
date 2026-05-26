@@ -296,7 +296,7 @@ function UserRowCard({
           <StatusPill status={user.status} t={t} />
           {user.role !== "user" && <RolePill role={user.role} t={t} />}
         </div>
-        <p className="mt-0.5 truncate text-[11px] text-slate-500">
+        <p className="mt-0.5 truncate text-xs text-slate-500">
           {user.email}
           <span className="text-slate-300"> · </span>
           {t("joined_label")}{" "}
@@ -435,7 +435,7 @@ function AdminFormButton({
       <input type="hidden" name="user_id" value={userId} />
       <button
         type="submit"
-        className={`inline-flex h-8 items-center gap-1 rounded-full border px-3 text-[11px] font-semibold transition ${cls}`}
+        className={`inline-flex h-8 items-center gap-1 rounded-full border px-3 text-xs font-semibold transition ${cls}`}
       >
         {Icon && <Icon className="h-3.5 w-3.5" />}
         {label}

@@ -93,7 +93,7 @@ export async function BriefingsGrid({
                     <h3 className="mt-3 text-sm font-bold text-slate-600">
                       {title}
                     </h3>
-                    <p className="mt-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                    <p className="mt-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
                       {t("hub_card_missing")}
                     </p>
                   </div>

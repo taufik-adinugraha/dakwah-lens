@@ -60,7 +60,7 @@ export function TrendingTopicsList({
                 <p className="truncate text-sm font-medium text-slate-800">
                   {t.title}
                 </p>
-                <p className="truncate text-[11px] text-slate-500">
+                <p className="truncate text-xs text-slate-500">
                   {t.keywords.slice(0, 4).join(" · ") || t.platform}
                 </p>
               </div>

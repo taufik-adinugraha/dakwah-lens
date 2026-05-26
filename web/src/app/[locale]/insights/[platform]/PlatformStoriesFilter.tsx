@@ -132,7 +132,7 @@ export function PlatformStoriesFilter({
                   key={s.id}
                   className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300"
                 >
-                  <div className="flex flex-wrap items-center gap-2 text-[11px]">
+                  <div className="flex flex-wrap items-center gap-2 text-xs">
                     {s.author && (
                       <span className="font-semibold text-slate-700">
                         @{s.author}
@@ -171,7 +171,7 @@ export function PlatformStoriesFilter({
                       href={s.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 hover:text-slate-900"
+                      className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-900"
                     >
                       {openOriginalLabel}
                       <ArrowUpRight className="h-3 w-3" />

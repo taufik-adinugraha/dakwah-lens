@@ -125,7 +125,7 @@ function PlatformGroup({
         <ul className="mt-3 space-y-1.5">
           {group.topics.map((t) => (
             <li key={t.id}>
-              <div className="flex items-center justify-between gap-2 text-[11px]">
+              <div className="flex items-center justify-between gap-2 text-xs">
                 <span className="truncate font-medium text-slate-700">
                   {t.label}
                 </span>

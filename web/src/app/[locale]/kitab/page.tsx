@@ -278,7 +278,7 @@ function SearchForm({
                 />
               );
             })}
-            <span className="ml-auto text-[11px] text-slate-400">
+            <span className="ml-auto text-xs text-slate-400">
               {t("search_hint")}
             </span>
           </div>
@@ -327,7 +327,7 @@ function Results({
                 key={i}
                 className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md"
               >
-                <div className="flex flex-wrap items-center justify-between gap-2 text-[11px]">
+                <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2 py-0.5 font-semibold uppercase tracking-wider text-slate-700">
                     {t(KITAB_META[h.corpus].labelKey as Parameters<typeof t>[0])}
                   </span>
@@ -343,8 +343,9 @@ function Results({
 
                 {h.arabic && h.corpus !== "tafsir" && (
                   <p
-                    className="mt-3 text-right font-amiri text-xl leading-relaxed text-slate-900"
+                    className="mt-3 text-right font-amiri text-lg leading-relaxed text-slate-900 sm:text-xl md:text-2xl"
                     dir="rtl"
+                    lang="ar"
                   >
                     {h.arabic}
                   </p>

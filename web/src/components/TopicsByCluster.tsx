@@ -62,7 +62,7 @@ export function TopicsByCluster({ config }: { config: DrilldownConfig }) {
                       {t(`cluster_${cluster.key}_name` as Parameters<typeof t>[0])}
                     </span>
                   </div>
-                  <span className="text-[11px] font-medium text-slate-500">
+                  <span className="text-xs font-medium text-slate-500">
                     {clusterTopics.length}
                   </span>
                 </div>
@@ -77,14 +77,14 @@ export function TopicsByCluster({ config }: { config: DrilldownConfig }) {
                           i > 0 && "border-t border-slate-100",
                         )}
                       >
-                        <span className="text-[11px] font-semibold tabular-nums text-slate-400">
+                        <span className="text-xs font-semibold tabular-nums text-slate-400">
                           #{i + 1}
                         </span>
                         <div className="min-w-0">
                           <p className="truncate text-sm font-medium text-slate-800">
                             {t(`topic_${topic.id}_title` as Parameters<typeof t>[0])}
                           </p>
-                          <p className="mt-0.5 text-[11px] text-slate-500">
+                          <p className="mt-0.5 text-xs text-slate-500">
                             {t(`topic_${topic.id}_tag` as Parameters<typeof t>[0])}
                             <span className="text-slate-300"> · </span>
                             <span className="tabular-nums text-slate-600">
@@ -197,7 +197,7 @@ function TopicModal({
       >
         <div className="flex items-start justify-between gap-3 border-b border-slate-100 px-6 py-4">
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-semibold tracking-wider text-slate-500 uppercase">
+            <p className="text-xs font-semibold tracking-wider text-slate-500 uppercase">
               {t(`topic_${topic.id}_tag`)}
             </p>
             <h3

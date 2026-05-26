@@ -59,7 +59,7 @@ export function CitationShare({
         href={waUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-1 text-[11px] font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+        className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700"
         aria-label="Share to WhatsApp"
       >
         <Share2 className="h-3 w-3" />
@@ -68,7 +68,7 @@ export function CitationShare({
       <button
         type="button"
         onClick={copy}
-        className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold text-slate-700 transition hover:bg-slate-50"
+        className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
         aria-label={copied ? "Copied to clipboard" : "Copy citation"}
       >
         {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
