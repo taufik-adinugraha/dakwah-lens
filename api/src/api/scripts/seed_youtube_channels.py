@@ -45,6 +45,11 @@ SEED_CHANNELS: list[tuple[str, str]] = [
     ("NU Online", "religious"),
     ("Gus Iqdam Sabilu Taubah", "religious"),
     ("Gus Muwafiq Channel", "religious"),
+    # 2026-05-26 — Cak Nun ecosystem (cultural-religious philosophy +
+    # community-driven da'wah). Sabrang is Cak Nun's son; Kenduri Cinta
+    # is the long-running community gathering channel.
+    ("Sabrang MDP", "religious"),
+    ("Komunitas Kenduri Cinta", "religious"),
     # ── Family / Muslim Family Life (3) ────────────────────────────────
     # Revamped 2026-05-25: dropped Halilintar cluster (AH, Aurel, GEN,
     # SAAI) + secular celebrity homes (Rans, Ricis, Anneth, Leonardo,
@@ -74,6 +79,11 @@ SEED_CHANNELS: list[tuple[str, str]] = [
     ("Eno Bening", "youth"),
     ("Menjadi Manusia", "youth"),
     ("Makna Talks", "youth"),
+    # 2026-05-26 — finance/lifestyle/coaching channels with young
+    # adult reach; complements existing finance-creator coverage.
+    ("Leon Hartono", "youth"),
+    ("Tom MC Ifle", "youth"),
+    ("Kasisolusi", "youth"),
     # ── Muamalah (10) ──────────────────────────────────────────────────
     ("Yufid Edu", "muamalah"),
     ("Masyarakat Ekonomi Syariah", "muamalah"),
@@ -113,6 +123,18 @@ SEED_CHANNELS: list[tuple[str, str]] = [
     ("Basuki Tjahaja Purnama", "social_justice"),
     ("Greenpeace Indonesia", "social_justice"),
     ("COKRO TV", "social_justice"),
+    # 2026-05-26 — political-analysis / investigative-journalism
+    # expansion. Rocky Gerung (philosophy + politics), Hendri Satrio
+    # + Rujak Politik + ID Baru (commentary), Dirty Vote (Dandhy
+    # Laksono investigation docs), Bro Gamal (provocative political-
+    # religious commentary), Fristian Griec (political-media analysis).
+    ("Rocky Gerung Official", "social_justice"),
+    ("Hendri Satrio", "social_justice"),
+    ("Rujak Politik", "social_justice"),
+    ("ID Baru", "social_justice"),
+    ("Dirty Vote", "social_justice"),
+    ("Bro Gamal", "social_justice"),
+    ("Fristian Griec Media", "social_justice"),
     # ── Health (11) ────────────────────────────────────────────────────
     ("dr Richard Lee MARS", "health"),
     ("Tirta PengPengPeng", "health"),
@@ -140,6 +162,11 @@ SEED_CHANNELS: list[tuple[str, str]] = [
     # Nat Geo Indonesia added 2026-05-25 — science / nature / exploration
     # content that gives kid + youth dakwah surfaces a different angle.
     ("Nat Geo Indonesia", "education"),
+    # 2026-05-26 — academic-business / policy podcast. Rhenald Kasali
+    # (business prof); Gita Wirjawan's Endgame podcast (policy + economy
+    # long-form interviews).
+    ("Rhenald Kasali", "education"),
+    ("Gita Wirjawan", "education"),
     # ── Cultural / Budaya & Travel (6) ─────────────────────────────────
     # Farida Nurhan dropped 2026-05-23 — food/travel content, edge of da'wah scope.
     ("IndonesiaKaya Galeri Indonesia Kaya", "cultural"),
