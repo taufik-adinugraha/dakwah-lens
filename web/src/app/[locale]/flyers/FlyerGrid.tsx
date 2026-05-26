@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { Download, Eye, Globe, Lock, Trash2 } from "lucide-react";
+import { Download, Eye, Globe, Lock, Sparkles, Trash2 } from "lucide-react";
 import { useState, useTransition } from "react";
 
 type Flyer = {
@@ -10,11 +10,20 @@ type Flyer = {
   headline: string;
   visibility: "private" | "public";
   createdAt: string;
+  /** "user" = generated via /flyers/new (has DELETE endpoint).
+   *  "system" = derived from a weekly briefing; no delete.
+   *  Defaults to "user" for back-compat. */
+  kind?: "user" | "system";
+  /** Override the PNG URL. User flyers default to /api/user-flyers/{id}/png;
+   *  system flyers point at the briefing flyer endpoint. */
+  pngUrl?: string;
 };
 
 type Labels = {
   visibilityBadgePublic: string;
   visibilityBadgePrivate: string;
+  /** "Mingguan" / "Weekly" — badge for system flyers from briefings. */
+  badgeSystem?: string;
   deleteButton: string;
   deleteConfirm: string;
   openLarge: string;
@@ -60,7 +69,11 @@ function FlyerTile({
   onDeleted: () => void;
 }) {
   const [pending, startTransition] = useTransition();
-  const png = `/api/user-flyers/${flyer.id}/png`;
+  const kind = flyer.kind ?? "user";
+  const png = flyer.pngUrl ?? `/api/user-flyers/${flyer.id}/png`;
+  // System flyers (from weekly briefings) have no DELETE endpoint —
+  // suppress the trash button regardless of `showDelete`.
+  const canDelete = showDelete && kind === "user";
 
   function onDelete(): void {
     if (!confirm(labels.deleteConfirm)) return;
@@ -92,22 +105,29 @@ function FlyerTile({
           <p className="line-clamp-2 text-sm font-semibold text-slate-900">
             {flyer.headline}
           </p>
-          <span
-            className={`inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
-              flyer.visibility === "public"
-                ? "bg-sky-50 text-sky-700"
-                : "bg-slate-100 text-slate-600"
-            }`}
-          >
-            {flyer.visibility === "public" ? (
-              <Globe className="h-2.5 w-2.5" />
-            ) : (
-              <Lock className="h-2.5 w-2.5" />
-            )}
-            {flyer.visibility === "public"
-              ? labels.visibilityBadgePublic
-              : labels.visibilityBadgePrivate}
-          </span>
+          {kind === "system" ? (
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700">
+              <Sparkles className="h-2.5 w-2.5" />
+              {labels.badgeSystem ?? "Weekly"}
+            </span>
+          ) : (
+            <span
+              className={`inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
+                flyer.visibility === "public"
+                  ? "bg-sky-50 text-sky-700"
+                  : "bg-slate-100 text-slate-600"
+              }`}
+            >
+              {flyer.visibility === "public" ? (
+                <Globe className="h-2.5 w-2.5" />
+              ) : (
+                <Lock className="h-2.5 w-2.5" />
+              )}
+              {flyer.visibility === "public"
+                ? labels.visibilityBadgePublic
+                : labels.visibilityBadgePrivate}
+            </span>
+          )}
         </div>
         <p className="text-[11px] text-slate-500">
           {new Date(flyer.createdAt).toLocaleDateString(undefined, {
@@ -134,7 +154,7 @@ function FlyerTile({
             <Download className="h-3 w-3" />
             {labels.download}
           </a>
-          {showDelete && (
+          {canDelete && (
             <button
               type="button"
               onClick={onDelete}

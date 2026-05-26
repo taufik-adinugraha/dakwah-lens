@@ -2359,6 +2359,7 @@
     "cta_new_flyer": "Create New Flyer",
     "visibility_badge_public": "Public",
     "visibility_badge_private": "Private",
+    "badge_system": "Weekly",
     "auth_required_title": "Sign in to create flyers.",
     "auth_required_body": "This feature is for registered users — free.",
     "auth_required_cta": "Sign in / Register"

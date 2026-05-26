@@ -2284,6 +2284,7 @@
     "cta_new_flyer": "Buat Flyer Baru",
     "visibility_badge_public": "Publik",
     "visibility_badge_private": "Privat",
+    "badge_system": "Mingguan",
     "auth_required_title": "Masuk dulu untuk membuat flyer.",
     "auth_required_body": "Fitur ini hanya untuk pengguna terdaftar — gratis.",
     "auth_required_cta": "Masuk / Daftar"
