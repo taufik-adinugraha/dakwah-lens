@@ -47,6 +47,10 @@ export type CoverageLabels = {
   topicsTitle: string;
   topicsCountSuffix: string;
   topicsByPlatform: TopicsByPlatformLabels;
+  /** Shared "no data this week yet" copy. Renders inside each card
+   *  when its slice has zero rows — replaces the bare em-dash that
+   *  used to leave users guessing whether the product was broken. */
+  noDataYet: string;
 };
 
 export function CoverageBreakdown({
@@ -117,7 +121,9 @@ function PlatformCard({
         </span>
       </p>
       {data.length === 0 ? (
-        <p className="mt-3 text-xs text-slate-400">—</p>
+        <p className="mt-3 rounded-lg border border-dashed border-slate-200 bg-slate-50/60 px-3 py-2.5 text-center text-xs leading-relaxed text-slate-500">
+          {labels.noDataYet}
+        </p>
       ) : (
         <ul className="mt-3 space-y-1.5">
           {data.map((p) => (
@@ -167,7 +173,9 @@ function SentimentCard({
         </span>
       </p>
       {data.total === 0 ? (
-        <p className="mt-3 text-xs text-slate-400">—</p>
+        <p className="mt-3 rounded-lg border border-dashed border-slate-200 bg-slate-50/60 px-3 py-2.5 text-center text-xs leading-relaxed text-slate-500">
+          {labels.noDataYet}
+        </p>
       ) : (
         <>
           <div className="mt-3 flex h-2.5 overflow-hidden rounded-full bg-slate-100">
@@ -276,7 +284,9 @@ function TopicsCard({
         />
       </div>
       {data.length === 0 ? (
-        <p className="mt-3 text-xs text-slate-400">—</p>
+        <p className="mt-3 rounded-lg border border-dashed border-slate-200 bg-slate-50/60 px-3 py-2.5 text-center text-xs leading-relaxed text-slate-500">
+          {labels.noDataYet}
+        </p>
       ) : (
         <ul className="mt-3 space-y-1.5">
           {data.map((topic) => (

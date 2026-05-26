@@ -10,6 +10,7 @@ import {
   Compass,
   Flame,
   Globe2,
+  Mail,
   MessageSquare,
   ScrollText,
   Sparkles,
@@ -282,6 +283,7 @@ export default async function DashboardPage({
                 },
                 topicsTitle: t("coverage_topics_title"),
                 topicsCountSuffix: t("coverage_topics_count_suffix"),
+                noDataYet: t("coverage_no_data_yet"),
                 topicsByPlatform: {
                   iconAriaLabel: t("coverage_topics_by_platform_aria"),
                   dialogTitle: t("coverage_topics_by_platform_title"),
@@ -1175,6 +1177,13 @@ function PendingDashboard({ name, t }: { name: string; t: T }) {
         >
           <BookOpenCheck className="h-4 w-4" />
           {t("pending_button_kitab")}
+        </Link>
+        <Link
+          href="/contact"
+          className="inline-flex h-11 items-center gap-2 rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300"
+        >
+          <Mail className="h-4 w-4" />
+          {t("pending_button_contact")}
         </Link>
       </div>
     </section>

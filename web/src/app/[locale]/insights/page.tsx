@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ArrowRight, BarChart3, Eye, Sparkles } from "lucide-react";
+import { ArrowRight, BarChart3, Eye, Info, Sparkles } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 
@@ -40,11 +40,17 @@ export async function generateMetadata({
 
 export default async function InsightsPage({
   params,
+  searchParams,
 }: PageProps<"/[locale]/insights">) {
   const { locale } = await params;
+  const sp = await searchParams;
   setRequestLocale(locale);
 
   const t = await getTranslations("Insights");
+  // Proxy.ts redirects non-admin users hitting /briefs/* here with
+  // `?notice=briefs-admin-only` — render a small banner so they know
+  // why they got bounced (was previously silent, see audit 2026-05-26).
+  const showBriefsAdminNotice = sp.notice === "briefs-admin-only";
 
   const [briefings, session] = await Promise.all([
     getAllLatestBriefings(),
@@ -63,6 +69,27 @@ export default async function InsightsPage({
 
   return (
     <>
+      {showBriefsAdminNotice && (
+        <div className="mx-auto mt-4 max-w-3xl px-4 sm:px-6">
+          <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50/70 px-4 py-3 text-sm leading-relaxed text-amber-900 shadow-sm">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
+            <div>
+              <p className="font-semibold">
+                {t("briefs_admin_only_title")}
+              </p>
+              <p className="mt-0.5 text-amber-800">
+                {t("briefs_admin_only_body")}{" "}
+                <Link
+                  href="/contact"
+                  className="font-semibold underline hover:text-amber-950"
+                >
+                  {t("briefs_admin_only_link")}
+                </Link>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
       <section className="relative isolate overflow-hidden pt-12 pb-8 sm:pt-16 sm:pb-10">
         <div
           aria-hidden

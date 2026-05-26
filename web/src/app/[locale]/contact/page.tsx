@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Mail, MessageSquare } from "lucide-react";
+import { Info, Mail, MessageSquare } from "lucide-react";
 
 import { ContactForm } from "./ContactForm";
 
@@ -46,6 +46,19 @@ export default async function ContactPage({
 
       <section className="pb-16 sm:pb-24">
         <div className="mx-auto max-w-2xl px-4 sm:px-6">
+          {/* Beta-access framing — the landing page now sends visitors
+              here via "Hubungi tim untuk akses beta", so call out the
+              expected flow up front instead of leaving people to guess
+              what to write in the message body. */}
+          <div className="mb-5 flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/70 px-4 py-3 text-sm leading-relaxed text-emerald-900 shadow-sm">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" />
+            <div>
+              <p className="font-semibold">{t("beta_access_title")}</p>
+              <p className="mt-0.5 text-emerald-800">
+                {t("beta_access_body")}
+              </p>
+            </div>
+          </div>
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
             <ContactForm />
           </div>

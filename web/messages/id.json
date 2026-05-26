@@ -574,6 +574,7 @@
     "coverage_topics_by_platform_no_data": "Belum ada topik dari platform ini.",
     "coverage_topics_title": "Distribusi topik",
     "coverage_topics_count_suffix": "topik dominan",
+    "coverage_no_data_yet": "Belum ada data minggu ini — pipeline akan mengisi setelah run berikutnya.",
     "section_sentiment_trend_title": "Tren sentimen 7 hari",
     "section_sentiment_trend_subtitle": "Komposisi sentimen percakapan publik per hari WIB. Hari dengan <5 postingan tidak digambar untuk hindari noise.",
     "sentiment_legend_negative": "Negatif",
@@ -596,7 +597,8 @@
     "pending_title": "Terima kasih — akun Anda sedang ditinjau",
     "pending_body": "Tim kami akan segera meninjau pendaftaran Anda. Sambil menunggu, silakan jelajahi Insights publik dan pustaka kitab.",
     "pending_button_insights": "Jelajahi Insights publik",
-    "pending_button_kitab": "Buka pustaka kitab"
+    "pending_button_kitab": "Buka pustaka kitab",
+    "pending_button_contact": "Tanyakan status"
   },
   "Admin": {
     "page_title": "Admin · Pengguna",
@@ -642,6 +644,9 @@
     "title": "Apa yang sedang menjadi perbincangan media di Indonesia",
     "subtitle": "Ringkasan tren da'wah dari media arus utama dan media sosial Indonesia — tanpa perlu mendaftar.",
     "hub_hero_subtitle": "Tiap Kamis kami menerbitkan 5 briefing — satu ikhtisar umum plus empat per segmen topik. Pilih yang paling cocok untuk konteks dakwah Anda pekan ini.",
+    "briefs_admin_only_title": "Pustaka Kajian hanya untuk admin saat ini.",
+    "briefs_admin_only_body": "Fitur penulisan kajian masih dalam fase beta dan dibatasi ke tim. Briefing mingguan di halaman ini tetap bisa diakses penuh — tanpa login.",
+    "briefs_admin_only_link": "Hubungi tim untuk akses",
     "hub_briefings_eyebrow": "5 briefing mingguan",
     "hub_briefings_title": "Briefing Pekan Ini",
     "hub_briefings_body": "Satu briefing ikhtisar umum yang mencakup seluruh tema dakwah pekan ini, lalu empat briefing yang fokus ke segmen topik berbeda. Di dalam setiap topik tersedia angle untuk audiens yang berbeda (khateeb, ustadzah, kreator, orang tua, mahasiswa). Klik kartu mana saja untuk membaca versi lengkap (khutbah Jumat, outline kajian, script konten, dan lain-lain).",
@@ -667,6 +672,7 @@
     "coverage_topics_by_platform_no_data": "Belum ada topik dari platform ini.",
     "coverage_topics_title": "Distribusi topik",
     "coverage_topics_count_suffix": "topik dominan",
+    "coverage_no_data_yet": "Belum ada data minggu ini — pipeline akan mengisi setelah run berikutnya.",
     "hub_card_all_title": "Pandangan Umum",
     "hub_card_cta": "Baca briefing",
     "hub_card_missing": "Belum tersedia",
@@ -2071,6 +2077,8 @@
     "sent_title": "Diterima — jazakallahu khayran sudah menghubungi kami.",
     "sent_body": "Pesan Anda sudah masuk. Insya Allah kami balas via email ke alamat yang Anda berikan dalam 7 hari kerja.",
     "footer_note": "Email Anda hanya kami pakai untuk membalas. Kami tidak memasukkan Anda ke milis apa pun, dan tidak mencatat alamat IP Anda. Lihat halaman privasi untuk detail lengkapnya.",
+    "beta_access_title": "Datang dari CTA akses beta?",
+    "beta_access_body": "Tulis di pesan apa yang ingin Anda lakukan dengan personalisasi briefing — komunitas mana yang dilayani, audiens utama, dan format yang paling berguna. Tim kami review tiap permintaan manual; kuota beta terbatas dan kami balas via email biasanya dalam 1-3 hari kerja.",
     "error_name_required": "Mohon isi nama Anda.",
     "error_invalid_email": "Silakan masukkan email yang valid.",
     "error_message_too_short": "Pesan terlalu pendek — minimal satu kalimat utuh.",
@@ -2137,7 +2145,7 @@
     "edit_error_limit": "Sudah mencapai batas edit untuk komentar ini.",
     "edit_error_forbidden": "Hanya pembuat komentar yang bisa mengedit di perangkat ini.",
     "discussions_index_title": "Diskusi Terbuka",
-    "discussions_index_subtitle": "Setiap edisi briefing punya ruang diskusi-nya sendiri. Pilih satu, baca, lalu sampaikan pemikiranmu.",
+    "discussions_index_subtitle": "Ruang follow-up di tiap briefing mingguan — tanya hal yang masih nge-ganjel, share apa yang berhasil di komunitas Anda, atau debat sehat antar da'i. Komentar anonim, moderasi ringan.",
     "discussions_filter_all": "Semua",
     "discussions_filter_mine": "Saya ikut",
     "discussions_filter_active": "Aktif",
@@ -2176,5 +2184,16 @@
     "replies_empty": "Belum ada balasan untuk ditampilkan.",
     "mod_delete": "Hapus",
     "mod_delete_confirm": "Hapus komentar ini permanen? Tidak bisa dibatalkan."
+  },
+  "Errors": {
+    "notfound_title": "Halaman tidak ditemukan.",
+    "notfound_body": "URL yang Anda buka mungkin sudah pindah atau salah ketik. Briefing mingguan dan pustaka kitab tetap bisa diakses langsung.",
+    "notfound_cta_insights": "Buka Insights",
+    "notfound_cta_home": "Ke beranda",
+    "error_title": "Terjadi error sementara.",
+    "error_body": "Halaman ini gagal dimuat karena masalah di server kami. Coba muat ulang — kalau masih error, kabari tim kami dengan kode di bawah.",
+    "error_digest_label": "Kode error",
+    "error_cta_retry": "Coba lagi",
+    "error_cta_insights": "Buka Insights"
   }
 }

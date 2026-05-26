@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-// Always render on demand — segment focus pages query `insights_summaries`
-// and `social_posts` aggregates that aren't available at build time.
-export const dynamic = "force-dynamic";
+// Revalidate every 5 minutes. Segment briefings publish weekly and the
+// post-aggregation queries roll forward on the recluster cadence
+// (mainstream+YT daily 04:00 WIB; X+TT+IG Thu 04:00). 5-min cache means
+// each (locale, focus) combination renders heavy queries at most once
+// per 5min. No auth() in the path, so per-user keys don't apply.
+export const revalidate = 300;
 import { and, desc, sql } from "drizzle-orm";
 import { ArrowLeft, ArrowRight, Layers } from "lucide-react";
 

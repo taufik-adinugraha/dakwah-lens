@@ -578,6 +578,7 @@
     "coverage_topics_by_platform_no_data": "No topics from this platform yet.",
     "coverage_topics_title": "Topic distribution",
     "coverage_topics_count_suffix": "leading topics",
+    "coverage_no_data_yet": "No data this week yet — the pipeline fills this in after its next run.",
     "section_sentiment_trend_title": "Sentiment trend, last 7 days",
     "section_sentiment_trend_subtitle": "Daily sentiment composition in WIB. Days with fewer than 5 classified posts are skipped to avoid noise.",
     "sentiment_legend_negative": "Negative",
@@ -600,7 +601,8 @@
     "pending_title": "Welcome — your account is pending review",
     "pending_body": "Our team will review your sign-up shortly. While you wait, you can explore public insights and the Kitab library.",
     "pending_button_insights": "Browse public insights",
-    "pending_button_kitab": "View kitab library"
+    "pending_button_kitab": "View kitab library",
+    "pending_button_contact": "Ask about your status"
   },
   "Admin": {
     "page_title": "Admin · Users",
@@ -646,6 +648,9 @@
     "title": "What Indonesian media is saying right now",
     "subtitle": "A read-only window into da'wah-relevant trends across Indonesian news and social media. No signup required.",
     "hub_hero_subtitle": "Every Thursday we publish 5 briefings — one overall view plus four per-topic segments. Pick whichever fits your da'wah context this week.",
+    "briefs_admin_only_title": "Brief authoring is admin-only right now.",
+    "briefs_admin_only_body": "Brief authoring is still in beta and limited to the team. The weekly briefings on this page stay fully open — no login needed.",
+    "briefs_admin_only_link": "Contact the team for access",
     "hub_briefings_eyebrow": "5 weekly briefings",
     "hub_briefings_title": "This Week's Briefings",
     "hub_briefings_body": "One overall-view briefing covering all dakwah themes for the week, then four briefings each focused on a distinct topic segment. Within each topic you'll find angles for different audiences (khateeb, ustadzah, creator, parents, students). Click any card to read the full version (Friday khutbah, kajian outline, content scripts, and more).",
@@ -671,6 +676,7 @@
     "coverage_topics_by_platform_no_data": "No topics from this platform yet.",
     "coverage_topics_title": "Topic distribution",
     "coverage_topics_count_suffix": "leading topics",
+    "coverage_no_data_yet": "No data this week yet — the pipeline fills this in after its next run.",
     "hub_card_all_title": "Overall View",
     "hub_card_cta": "Read briefing",
     "hub_card_missing": "Not available",
@@ -2146,6 +2152,8 @@
     "sent_title": "Got it — jazakallahu khayran for reaching out.",
     "sent_body": "Your message is on its way. We'll reply by email at the address you gave, in sha Allah within 7 working days.",
     "footer_note": "Your email is used only to reply to you. We do not add you to any mailing list, and we do not log your IP address. See the privacy page for the full rundown.",
+    "beta_access_title": "Here for beta access?",
+    "beta_access_body": "Tell us in the message what you want to do with personalized briefings — which community you serve, your primary audience, and the format that would help most. Each request gets a manual review; beta quota is limited and we reply by email, usually within 1-3 business days.",
     "error_name_required": "Please tell us your name.",
     "error_invalid_email": "Please enter a valid email address.",
     "error_message_too_short": "Message is too short — give us at least a sentence to work with.",
@@ -2212,7 +2220,7 @@
     "edit_error_limit": "You've reached the edit limit for this comment.",
     "edit_error_forbidden": "Only the author can edit, and only from the same browser.",
     "discussions_index_title": "Open Discussions",
-    "discussions_index_subtitle": "Every briefing edition has its own discussion room. Pick one, read it, then share your thinking.",
+    "discussions_index_subtitle": "Follow-up rooms for each weekly briefing — ask what's still unclear, share what worked at your community, or debate respectfully with other da'i. Anonymous comments, light moderation.",
     "discussions_filter_all": "All",
     "discussions_filter_mine": "My rooms",
     "discussions_filter_active": "Active",
@@ -2251,5 +2259,16 @@
     "replies_empty": "No replies to show yet.",
     "mod_delete": "Delete",
     "mod_delete_confirm": "Permanently delete this comment? This cannot be undone."
+  },
+  "Errors": {
+    "notfound_title": "Page not found.",
+    "notfound_body": "The URL you opened may have moved or been mistyped. Weekly briefings and the kitab library are still one click away.",
+    "notfound_cta_insights": "Open Insights",
+    "notfound_cta_home": "Back to home",
+    "error_title": "Something went wrong.",
+    "error_body": "This page failed to load because of a server-side issue. Try reloading — if it keeps happening, send us the code below.",
+    "error_digest_label": "Error code",
+    "error_cta_retry": "Try again",
+    "error_cta_insights": "Open Insights"
   }
 }

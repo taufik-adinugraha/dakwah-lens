@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-// Always render on demand — getOverviewInsights + getTopIssues query
-// `social_posts` aggregates that aren't available at build time.
-export const dynamic = "force-dynamic";
+// Revalidate every 5 minutes. The page queries social_posts aggregates
+// that update on the ingest schedule (RSS every 2h, X+TT+IG weekly).
+// A 5-min cache means the heavy multi-query render hits the DB at most
+// once per 5min per locale — huge p95 improvement for anonymous visitors
+// who would otherwise pay the full Promise.all every page view. We were
+// `force-dynamic` until 2026-05-26 when an audit showed no auth() call
+// in the request path, so per-user caching keys don't apply here.
+export const revalidate = 300;
 import {
   ArrowRight,
   BarChart3,
@@ -165,6 +170,7 @@ export default async function InsightsExplorePage({
               },
               topicsTitle: t("coverage_topics_title"),
               topicsCountSuffix: t("coverage_topics_count_suffix"),
+              noDataYet: t("coverage_no_data_yet"),
               topicsByPlatform: {
                 iconAriaLabel: t("coverage_topics_by_platform_aria"),
                 dialogTitle: t("coverage_topics_by_platform_title"),
