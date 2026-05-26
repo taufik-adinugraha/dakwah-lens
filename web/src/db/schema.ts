@@ -1053,3 +1053,81 @@ export const mahasiswaRoomSettings = pgTable("mahasiswa_room_settings", {
     .notNull()
     .default(sql`now()`),
 });
+
+/**
+ * Per-user uploaded images backing user-generated flyers. Separate from
+ * `flyer_assets` (admin-curated pool) so a user upload doesn't bleed into
+ * briefing flyers. Files live on disk under
+ * /public/flyer-assets/user-uploads/<uuid>.<ext>.
+ */
+export const userFlyerUploads = pgTable(
+  "user_flyer_uploads",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    src: text("src").notNull(),
+    mime: text("mime").notNull(),
+    sizeBytes: integer("size_bytes").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => [
+    index("ix_user_flyer_uploads_user_time").on(
+      table.userId,
+      table.createdAt,
+    ),
+  ],
+);
+
+/**
+ * One row per flyer a logged-in user generated via /flyers/new.
+ *
+ * The PNG is NOT stored — `/api/user-flyers/[id].png` re-renders on
+ * demand from this row's `layout` + `imageRef` + content fields,
+ * reusing the same `composeFlyer()` pipeline the briefing flyers use.
+ *
+ * `daleel_*` columns snapshot the kitab corpus hit chosen at
+ * generation time (Qdrant retrieval result) — never re-fetched, so
+ * the flyer is stable even if the corpus changes.
+ *
+ * Quota (5/user/week, Sunday WIB-reset) is enforced at write time
+ * via a COUNT(*) on this table — no separate counter.
+ */
+export const userFlyers = pgTable(
+  "user_flyers",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** Layout slug — one of: hero-ayat | hero-headline | split-image |
+     *  quote-card | dua-hero. Enforced by a CHECK constraint at the DB. */
+    layout: text("layout").notNull(),
+    /** Either a `flyer_assets.id` (admin pool) or `upload:<uploadId>`. */
+    imageRef: text("image_ref").notNull(),
+    headline: text("headline").notNull(),
+    body: text("body").notNull(),
+    daleelCitation: text("daleel_citation"),
+    daleelArabic: text("daleel_arabic"),
+    daleelTranslation: text("daleel_translation"),
+    daleelCorpus: text("daleel_corpus"),
+    userPrompt: text("user_prompt").notNull(),
+    includeNewsContext: boolean("include_news_context")
+      .notNull()
+      .default(false),
+    /** 'private' (default) or 'public'. */
+    visibility: text("visibility").notNull().default("private"),
+    /** Free-form: model version, token counts, cost. Not surfaced in UI. */
+    meta: jsonb("meta").$type<Record<string, unknown>>().notNull().default({}),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => [
+    index("ix_user_flyers_user_time").on(table.userId, table.createdAt),
+    index("ix_user_flyers_quota").on(table.userId, table.createdAt),
+  ],
+);

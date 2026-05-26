@@ -121,6 +121,10 @@ services:
       # photos}/) — only the `uploads/` subdir is host-mounted because
       # only that subdir gets written to at runtime.
       - /srv/dakwah-lens/data/flyer-assets-uploads:/app/public/flyer-assets/uploads
+      # User-uploaded images backing /flyers/new — separate host dir
+      # from the admin pool so the surfaces stay independent and a wipe
+      # of one doesn't take the other down with it.
+      - /srv/dakwah-lens/data/flyer-user-uploads:/app/public/flyer-assets/user-uploads
     ports:
       # Caddy lives on the host and reverse-proxies localhost:3000.
       # Binding to 127.0.0.1 means the port is unreachable from outside

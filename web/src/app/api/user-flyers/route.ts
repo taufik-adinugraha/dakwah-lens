@@ -1,0 +1,275 @@
+import "server-only";
+
+import { and, desc, eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
+import { z } from "zod";
+
+import { auth } from "@/auth";
+import { db, schema } from "@/db";
+import { getOverviewInsights } from "@/lib/insights-data";
+import { searchKitabBrowse, type KitabCorpus } from "@/lib/kitab-retrieval";
+import {
+  generateUserFlyerContent,
+  FlyerGenUnavailableError,
+} from "@/lib/user-flyer/content-gen";
+import {
+  assertQuotaAvailable,
+  getQuotaSnapshot,
+  QuotaExceededError,
+} from "@/lib/user-flyer/quota";
+
+/**
+ * GET  /api/user-flyers           — list THIS user's flyers (auth required)
+ * POST /api/user-flyers           — generate a new flyer (auth required, quota-gated)
+ *
+ * The PNG itself is served by a sibling route `[id]/png`.
+ *
+ * POST body shape (`UserFlyerCreateInput`):
+ *   {
+ *     layout: "hero-ayat" | "hero-headline" | "split-image" | "quote-card" | "dua-hero",
+ *     imageRef: string,                    // `flyer_assets.id` OR "upload:<uploadId>"
+ *     userPrompt: string,                  // free-text intent, 4-400 chars
+ *     includeNewsContext: boolean,
+ *     visibility: "private" | "public",
+ *   }
+ *
+ * On success: { id, headline, body, daleel, quota }
+ * On quota exhaustion: 429 { error: "quota_exhausted", quota: { ... } }
+ * On bad input: 400 { error: "invalid_input", issues: [...] }
+ * On LLM/retrieval failure: 503 { error: "generation_failed", detail: ... }
+ */
+
+const LAYOUTS = [
+  "hero-ayat",
+  "hero-headline",
+  "split-image",
+  "quote-card",
+  "dua-hero",
+] as const;
+
+const CreateInput = z.object({
+  layout: z.enum(LAYOUTS),
+  imageRef: z.string().min(1).max(200),
+  userPrompt: z.string().trim().min(4).max(400),
+  includeNewsContext: z.boolean(),
+  visibility: z.enum(["private", "public"]),
+});
+
+// Corpora to consult for daleel retrieval. Skip tafsir (commentary, not
+// stand-alone daleel) — matches the briefing-flyer default.
+const KITAB_FOR_USER_FLYERS: KitabCorpus[] = [
+  "quran",
+  "bukhari",
+  "muslim",
+  "riyad",
+  "bulugh",
+];
+
+export async function GET(): Promise<NextResponse> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  const rows = await db
+    .select({
+      id: schema.userFlyers.id,
+      layout: schema.userFlyers.layout,
+      imageRef: schema.userFlyers.imageRef,
+      headline: schema.userFlyers.headline,
+      body: schema.userFlyers.body,
+      visibility: schema.userFlyers.visibility,
+      createdAt: schema.userFlyers.createdAt,
+    })
+    .from(schema.userFlyers)
+    .where(eq(schema.userFlyers.userId, session.user.id))
+    .orderBy(desc(schema.userFlyers.createdAt))
+    .limit(50);
+
+  const quota = await getQuotaSnapshot(session.user.id);
+  return NextResponse.json({ items: rows, quota });
+}
+
+export async function POST(req: Request): Promise<NextResponse> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+  const userId = session.user.id;
+
+  let raw: unknown;
+  try {
+    raw = await req.json();
+  } catch {
+    return NextResponse.json({ error: "invalid_json" }, { status: 400 });
+  }
+
+  const parsed = CreateInput.safeParse(raw);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "invalid_input", issues: parsed.error.issues },
+      { status: 400 },
+    );
+  }
+  const input = parsed.data;
+
+  // Validate imageRef shape — either a known flyer_assets.id or an
+  // "upload:<uuid>" pointer the user owns.
+  const imageRefOk = await validateImageRef(userId, input.imageRef);
+  if (!imageRefOk) {
+    return NextResponse.json({ error: "invalid_image_ref" }, { status: 400 });
+  }
+
+  // Quota gate BEFORE we spend on LLM / Qdrant.
+  try {
+    await assertQuotaAvailable(userId);
+  } catch (err) {
+    if (err instanceof QuotaExceededError) {
+      return NextResponse.json(
+        { error: "quota_exhausted", quota: err.snapshot },
+        { status: 429 },
+      );
+    }
+    throw err;
+  }
+
+  // Optional news context — only pulled when the user opted in. The
+  // overview helper hits aggregate tables that are already cached.
+  let news = null;
+  if (input.includeNewsContext) {
+    try {
+      const overview = await getOverviewInsights();
+      const topCat = overview?.dominantCategories?.[0]?.category ?? null;
+      const trending = (overview?.trendingTopics ?? [])
+        .map((t) => t.label)
+        .filter(Boolean)
+        .slice(0, 5);
+      if (topCat) {
+        news = { topCategory: topCat, topTopics: trending };
+      }
+    } catch (err) {
+      // Non-fatal — degrade to no-news-context mode.
+      console.warn(
+        "[user-flyers] news context fetch failed:",
+        err instanceof Error ? err.message : err,
+      );
+    }
+  }
+
+  // 1. Flash-Lite writes the copy + search theme.
+  let content;
+  try {
+    content = await generateUserFlyerContent({
+      userPrompt: input.userPrompt,
+      news,
+    });
+  } catch (err) {
+    if (err instanceof FlyerGenUnavailableError) {
+      return NextResponse.json(
+        { error: "generation_unavailable" },
+        { status: 503 },
+      );
+    }
+    const msg = err instanceof Error ? err.message : String(err);
+    return NextResponse.json(
+      { error: "generation_failed", detail: msg },
+      { status: 503 },
+    );
+  }
+
+  // 2. Retrieve daleel from Qdrant — never invent. PRD §12.
+  let daleel: {
+    citation: string;
+    arabic: string;
+    translation: string;
+    corpus: string;
+  } | null = null;
+  try {
+    const hits = await searchKitabBrowse(content.searchTheme, {
+      corpora: KITAB_FOR_USER_FLYERS,
+      limit: 5,
+      locale: "id",
+    });
+    const top = hits[0];
+    if (top && top.arabic && top.translation && top.citation) {
+      daleel = {
+        citation: top.citation,
+        arabic: top.arabic,
+        translation: top.translation,
+        corpus: top.corpus,
+      };
+    }
+  } catch (err) {
+    // Non-fatal — flyer still renders without a daleel card. Some
+    // layouts (HeroHeadline, QuoteCard) don't surface one anyway.
+    console.warn(
+      "[user-flyers] daleel retrieval failed:",
+      err instanceof Error ? err.message : err,
+    );
+  }
+
+  // 3. Persist.
+  const [row] = await db
+    .insert(schema.userFlyers)
+    .values({
+      userId,
+      layout: input.layout,
+      imageRef: input.imageRef,
+      headline: content.headline,
+      body: content.body,
+      daleelCitation: daleel?.citation ?? null,
+      daleelArabic: daleel?.arabic ?? null,
+      daleelTranslation: daleel?.translation ?? null,
+      daleelCorpus: daleel?.corpus ?? null,
+      userPrompt: input.userPrompt,
+      includeNewsContext: input.includeNewsContext,
+      visibility: input.visibility,
+      meta: {
+        searchTheme: content.searchTheme,
+        newsTopCategory: news?.topCategory ?? null,
+      },
+    })
+    .returning({ id: schema.userFlyers.id });
+
+  const quota = await getQuotaSnapshot(userId);
+
+  return NextResponse.json(
+    {
+      id: row.id,
+      headline: content.headline,
+      body: content.body,
+      daleel,
+      quota,
+    },
+    { status: 201 },
+  );
+}
+
+async function validateImageRef(
+  userId: string,
+  imageRef: string,
+): Promise<boolean> {
+  if (imageRef.startsWith("upload:")) {
+    const uploadId = imageRef.slice("upload:".length);
+    if (!/^[0-9a-f-]{36}$/i.test(uploadId)) return false;
+    const [up] = await db
+      .select({ id: schema.userFlyerUploads.id })
+      .from(schema.userFlyerUploads)
+      .where(
+        and(
+          eq(schema.userFlyerUploads.id, uploadId),
+          eq(schema.userFlyerUploads.userId, userId),
+        ),
+      )
+      .limit(1);
+    return !!up;
+  }
+
+  // Otherwise must reference an existing flyer_assets row (admin pool).
+  const [asset] = await db
+    .select({ id: schema.flyerAssets.id })
+    .from(schema.flyerAssets)
+    .where(eq(schema.flyerAssets.id, imageRef))
+    .limit(1);
+  return !!asset;
+}

@@ -307,7 +307,15 @@ export type FlyerMessageSlot = 0 | 1 | 2 | 3 | 4 | 5;
 export type FlyerMessageBlock = {
   headline?: string;
   daleelCitation?: string;
+  /** Display-ready prose: `**Headline:**` + `**Daleel:**` lines removed,
+   *  markdown stripped, sentences trimmed, Arabic-heavy lines dropped. */
   body: string;
+  /** Block content with ONLY the marker lines (`**Headline:**`,
+   *  `**Daleel:**`) stripped — Arabic + Markdown formatting + full
+   *  prose preserved. parseInlineDua uses this so it can locate the
+   *  du'a's Arabic + translation + citation, which `trimToSentences`
+   *  would otherwise drop. */
+  rawBody: string;
 };
 
 /** Pull one of the 4 standalone messages from the `## Pesan Flyer`
@@ -408,7 +416,7 @@ export function extractDedicatedFlyerBlock(
     : undefined;
   const daleelCitation = daleelMatch?.[1]?.trim();
 
-  return { headline, daleelCitation, body };
+  return { headline, daleelCitation, body, rawBody: bodyMd.trim() };
 }
 
 /** Convenience wrapper for callers that only need the message body —
@@ -429,7 +437,10 @@ export function extractDedicatedFlyerMessage(
  *  instead of falling back to a random pool entry scoped to the
  *  week's news theme. */
 export function parseInlineDua(block: FlyerMessageBlock): DaleelRef | null {
-  const md = block.body;
+  // `rawBody` preserves Arabic + Markdown that `body` strips. Without
+  // it the longest-Arabic-run search lands on an empty string and we
+  // return null even for blocks that clearly carry an inline du'a.
+  const md = block.rawBody;
 
   // Longest Arabic run in the block — captures the du'a sentence(s)
   // even if commas / spaces break it into shorter chunks.
@@ -441,11 +452,15 @@ export function parseInlineDua(block: FlyerMessageBlock): DaleelRef | null {
     .reduce((longest, r) => (r.length > longest.length ? r : longest), "");
   if (arabic.length < 10) return null;
 
-  // ID translation — italic-quoted sentence near the Arabic. The
-  // prompt format is roughly: Arabic line → blank → *"translation"*
-  // (citation). Match the first 20-220 char quoted phrase.
+  // ID translation — quoted sentence near the Arabic. Accept BOTH
+  // `*"translation"*` (italic-wrapped, older Pro output style) and
+  // `"translation"` (plain quotes, the format used by manual writes
+  // and the post-2026-05-26 prompt). The lazy `\*?` on each side
+  // means the regex matches either shape. Length floor 20 + cap 260
+  // keeps it well above the `**Headline:** "..."` line (which was
+  // already stripped above) and below run-on prose.
   const transMatch = md.match(
-    /\*\s*["“]([^"”*\n]{20,260})["”]\s*\*/,
+    /\*?\s*["“]([^"”*\n]{20,260})["”]\s*\*?/,
   );
   const translation = transMatch?.[1]?.trim() ?? "";
 
@@ -478,23 +493,30 @@ export function parseInlineDua(block: FlyerMessageBlock): DaleelRef | null {
  *  Returns the original body unchanged if any step doesn't match — the
  *  caller can decide to fall back to the full paragraph. */
 export function stripInlineDua(block: FlyerMessageBlock): string {
-  let body = block.body;
+  // Work on rawBody so we can locate Arabic + the matching translation;
+  // the trimmed `body` no longer has Arabic, so the regex below would
+  // be a no-op. We re-strip Markdown after the targeted removals.
+  let body = block.rawBody;
   // Drop Arabic-heavy lines / runs entirely.
   body = body.replace(
     /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-ﻰ\sؐ-ًؚ-ٟ]{12,}/g,
     " ",
   );
-  // Drop the italic-quoted translation immediately following.
-  body = body.replace(/\*\s*["“][^"”*\n]{20,260}["”]\s*\*/g, " ");
+  // Drop the quoted translation immediately following. Matches both
+  // `*"..."*` (older italic-wrapped style) and `"..."` (plain quotes,
+  // post-2026-05-26 default) — same lax `\*?` boundary as parseInlineDua.
+  body = body.replace(/\*?\s*["“][^"”*\n]{20,260}["”]\s*\*?/g, " ");
   // Drop the inline citation parenthetical (now redundant — we surface
   // it as the daleel card citation).
   body = body.replace(
     /\((?:HR\.|QS\.|Hisnul Muslim|Sahih|Bukhari|Muslim|Tirmidzi|Abu Dawud|Bulugh|Riyad)[^)]{2,80}\)/gi,
     "",
   );
-  // Collapse the whitespace we left behind.
+  // Collapse the whitespace we left behind, then strip Markdown so
+  // the returned prose matches `body`'s display shape (no `**bold**`,
+  // no `*italic*`, no `### headings`).
   body = body.replace(/\s+/g, " ").trim();
-  return body;
+  return trimToSentences(stripMd(body), 4, 360);
 }
 
 /** Find the daleel in the retrieved pool whose `citation` (case- and
