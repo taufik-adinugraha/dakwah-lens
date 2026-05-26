@@ -23,9 +23,7 @@
 
 import { createHmac, timingSafeEqual } from "crypto";
 
-import { NEXTAUTH_SECRET } from "./secrets";
-
-const SECRET = NEXTAUTH_SECRET;
+import { getNextAuthSecret } from "./secrets";
 
 /** Minimum seconds between page load and submit. Humans typing a 50-
  *  word comment need ≥ 8 seconds; setting the floor at 3 catches
@@ -79,7 +77,7 @@ export function verifyCommentToken(
 }
 
 function sign(slug: string, ts: number): string {
-  return createHmac("sha256", SECRET)
+  return createHmac("sha256", getNextAuthSecret())
     .update(`${slug}|${ts}`)
     .digest("base64url");
 }

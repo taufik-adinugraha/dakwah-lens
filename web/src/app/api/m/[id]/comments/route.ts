@@ -10,7 +10,7 @@ import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { moderateComment, MODERATION_LIMITS } from "@/lib/comment-moderation";
 import { verifyCommentToken } from "@/lib/comment-token";
 import { getBriefingBySlug } from "@/lib/insights-data";
-import { NEXTAUTH_SECRET } from "@/lib/secrets";
+import { getNextAuthSecret } from "@/lib/secrets";
 import {
   hashVisitorToken,
   mintVisitorToken,
@@ -62,7 +62,7 @@ const PER_IP_DB_WINDOW_LIMIT = 5;
 function hashWithSecret(value: string | null | undefined): string | null {
   if (!value) return null;
   return createHash("sha256")
-    .update(`${value}|${NEXTAUTH_SECRET}`)
+    .update(`${value}|${getNextAuthSecret()}`)
     .digest("hex");
 }
 

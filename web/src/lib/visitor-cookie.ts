@@ -14,7 +14,7 @@
 
 import { createHash, randomUUID } from "crypto";
 
-import { NEXTAUTH_SECRET } from "./secrets";
+import { getNextAuthSecret } from "./secrets";
 
 import type { NextResponse } from "next/server";
 import { cookies } from "next/headers";
@@ -60,5 +60,5 @@ export function setVisitorCookie(res: NextResponse, token: string): void {
  *  prod-time hard-fail if NEXTAUTH_SECRET is missing) lives in
  *  `./secrets`. */
 export function hashVisitorToken(token: string): string {
-  return createHash("sha256").update(`${token}|${NEXTAUTH_SECRET}`).digest("hex");
+  return createHash("sha256").update(`${token}|${getNextAuthSecret()}`).digest("hex");
 }
