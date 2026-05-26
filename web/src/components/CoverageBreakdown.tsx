@@ -289,7 +289,7 @@ function TopicsCard({
         </p>
       ) : (
         <ul className="mt-3 space-y-1.5">
-          {data.map((topic) => (
+          {data.slice(0, 5).map((topic) => (
             <li key={topic.id}>
               <div className="flex items-center justify-between gap-2 text-xs">
                 <span className="truncate font-medium text-slate-700">
@@ -297,6 +297,9 @@ function TopicsCard({
                 </span>
                 <span className="shrink-0 tabular-nums text-slate-500">
                   {topic.count}
+                  <span className="ml-1 text-slate-400">
+                    · {topic.pct.toFixed(0)}%
+                  </span>
                 </span>
               </div>
               <div className="mt-0.5 h-1 overflow-hidden rounded-full bg-slate-100">

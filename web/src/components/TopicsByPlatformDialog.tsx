@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LayoutGrid, X } from "lucide-react";
+import { ArrowUpRight, X } from "lucide-react";
 
 import type { TopicByPlatformGroup } from "@/lib/dashboard-metrics";
 
 export type TopicsByPlatformLabels = {
-  iconAriaLabel: string;
+  cta: string;
   dialogTitle: string;
   dialogSubtitle: string;
   closeLabel: string;
@@ -41,10 +41,10 @@ export function TopicsByPlatformDialog({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label={labels.iconAriaLabel}
-        className="inline-flex h-6 w-6 items-center justify-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+        className="inline-flex shrink-0 items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
       >
-        <LayoutGrid className="h-3.5 w-3.5" />
+        {labels.cta}
+        <ArrowUpRight className="h-3 w-3" />
       </button>
 
       {open && (
@@ -131,6 +131,9 @@ function PlatformGroup({
                 </span>
                 <span className="shrink-0 tabular-nums text-slate-500">
                   {t.count}
+                  <span className="ml-1 text-slate-400">
+                    · {t.pct.toFixed(0)}%
+                  </span>
                 </span>
               </div>
               <div className="mt-0.5 h-1 overflow-hidden rounded-full bg-slate-100">

@@ -1021,40 +1021,86 @@ export type SentimentTrendPoint = {
   total: number;
 };
 
+export type SentimentTrend30d = {
+  /** Aggregate across all platforms — what the default chart renders. */
+  overall: SentimentTrendPoint[];
+  /** One series per product-supported platform, fixed order. Used by the
+   *  "view by platform" dialog. Empty arrays are kept so the dialog can
+   *  render a stable 5-row grid even for paused platforms. */
+  byPlatform: Array<{ platform: string; points: SentimentTrendPoint[] }>;
+};
+
 /**
- * 7-day rolling sentiment composition. Each point is a WIB-calendar day.
- * Days with fewer than `MIN_DAILY_LABELLED` classified posts are still
- * returned but with total=0 so the chart can render gaps gracefully.
+ * 30-day rolling sentiment composition. Each point is a WIB-calendar day.
+ * Days with fewer than `MIN_DAILY_LABELLED` classified posts (per series)
+ * are still returned but with `total=0` so the chart can render gaps
+ * gracefully.
+ *
+ * Returns both the aggregate series AND per-platform series in a single
+ * SQL roll-up to keep the dashboard's parallel-await tight.
  */
-export async function getSentimentTrend7d(): Promise<SentimentTrendPoint[]> {
+export async function getSentimentTrend30d(): Promise<SentimentTrend30d> {
   const MIN_DAILY_LABELLED = 5;
   const rows = (await db.execute(sql`
     SELECT
       to_char(date_trunc('day', timezone('Asia/Jakarta', created_at)), 'YYYY-MM-DD') AS day,
+      platform,
       COUNT(*) FILTER (WHERE sentiment_label IS NOT NULL)::int AS total,
       COUNT(*) FILTER (WHERE sentiment_label = 'negative')::int AS neg,
       COUNT(*) FILTER (WHERE sentiment_label = 'positive')::int AS pos
     FROM social_posts
-    WHERE created_at >= now() - interval '7 days'
-    GROUP BY day
+    WHERE created_at >= now() - interval '30 days'
+    GROUP BY day, platform
     ORDER BY day
   `)) as unknown as Array<{
     day: string;
+    platform: string;
     total: number;
     neg: number;
     pos: number;
   }>;
 
-  return rows.map((r) => {
+  // Roll up into per-platform daily buckets plus an "all" aggregate.
+  type DayBucket = { total: number; neg: number; pos: number };
+  const overallByDay = new Map<string, DayBucket>();
+  const byPlatformDay = new Map<string, Map<string, DayBucket>>();
+
+  for (const r of rows) {
     const total = Number(r.total);
-    const safeTotal = total >= MIN_DAILY_LABELLED ? total : 0;
-    return {
-      day: r.day,
-      total,
-      negPct: safeTotal > 0 ? (Number(r.neg) / safeTotal) * 100 : 0,
-      posPct: safeTotal > 0 ? (Number(r.pos) / safeTotal) * 100 : 0,
-    };
-  });
+    const neg = Number(r.neg);
+    const pos = Number(r.pos);
+
+    const o = overallByDay.get(r.day) ?? { total: 0, neg: 0, pos: 0 };
+    o.total += total;
+    o.neg += neg;
+    o.pos += pos;
+    overallByDay.set(r.day, o);
+
+    const pm = byPlatformDay.get(r.platform) ?? new Map<string, DayBucket>();
+    pm.set(r.day, { total, neg, pos });
+    byPlatformDay.set(r.platform, pm);
+  }
+
+  const toSeries = (m: Map<string, DayBucket>): SentimentTrendPoint[] =>
+    Array.from(m.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([day, b]) => {
+        const safe = b.total >= MIN_DAILY_LABELLED ? b.total : 0;
+        return {
+          day,
+          total: b.total,
+          negPct: safe > 0 ? (b.neg / safe) * 100 : 0,
+          posPct: safe > 0 ? (b.pos / safe) * 100 : 0,
+        };
+      });
+
+  const ORDER = ["mainstream", "x", "youtube", "tiktok", "instagram"];
+  const byPlatform = ORDER.map((platform) => ({
+    platform,
+    points: toSeries(byPlatformDay.get(platform) ?? new Map()),
+  }));
+
+  return { overall: toSeries(overallByDay), byPlatform };
 }
 
 /* ─────────────────────────────────────────────────────────────

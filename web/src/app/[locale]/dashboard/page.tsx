@@ -35,7 +35,7 @@ import {
   getRisingVideos,
   getSentimentByPlatform7d,
   getSentimentDistribution7d,
-  getSentimentTrend7d,
+  getSentimentTrend30d,
   getTopIssues,
   getTopicDistribution7d,
   getTopicsByPlatform7d,
@@ -47,7 +47,6 @@ import {
   type RisingVideo,
   type SavedItem,
   type SentimentBreakdown,
-  type SentimentTrendPoint,
   type TopIssue,
   type TopicBucket,
 } from "@/lib/dashboard-metrics";
@@ -55,6 +54,7 @@ import { formatPanggilan } from "@/lib/panggilan";
 import { hashVisitorToken, readVisitorToken } from "@/lib/visitor-cookie";
 import { DashboardTabs } from "./DashboardTabs";
 import { KitTabs } from "./KitTabs";
+import { SentimentTrendCard } from "./SentimentTrendCard";
 
 export async function generateMetadata({
   params,
@@ -160,7 +160,7 @@ export default async function DashboardPage({
     getRisingVideos(5),
     getKitSegments(),
     getRecentSaved(session.user.id),
-    getSentimentTrend7d(),
+    getSentimentTrend30d(),
     getActiveDiscussionRooms(visitorHash, 14, 6),
     getPlatformDistribution7d(),
     getSentimentDistribution7d(),
@@ -251,7 +251,24 @@ export default async function DashboardPage({
               trendingCount={trendingCount}
               t={t}
             />
-            <SentimentTrendChart points={sentimentTrend} t={t} />
+            <SentimentTrendCard
+              data={sentimentTrend}
+              labels={{
+                title: t("section_sentiment_trend_title"),
+                subtitle: t("section_sentiment_trend_subtitle"),
+                legendNegative: t("sentiment_legend_negative"),
+                legendPositive: t("sentiment_legend_positive"),
+                viewByPlatformCta: t("sentiment_trend_view_by_platform"),
+                dialogTitle: t("sentiment_trend_by_platform_title"),
+                dialogSubtitle: t("sentiment_trend_by_platform_subtitle"),
+                closeLabel: t("coverage_sentiment_by_platform_close"),
+                noDataPlatform: t("sentiment_trend_no_data_platform"),
+                platformMainstream: t("coverage_platform_mainstream"),
+                tooltipClassifiedTpl: t("sentiment_trend_tooltip_classified", {
+                  n: "{n}",
+                }),
+              }}
+            />
             <CoverageBreakdown
               platforms={platformDist}
               sentiment={sentimentDist}
@@ -285,7 +302,7 @@ export default async function DashboardPage({
                 topicsCountSuffix: t("coverage_topics_count_suffix"),
                 noDataYet: t("coverage_no_data_yet"),
                 topicsByPlatform: {
-                  iconAriaLabel: t("coverage_topics_by_platform_aria"),
+                  cta: t("coverage_topics_by_platform_cta"),
                   dialogTitle: t("coverage_topics_by_platform_title"),
                   dialogSubtitle: t("coverage_topics_by_platform_subtitle"),
                   closeLabel: t("coverage_sentiment_by_platform_close"),
@@ -581,110 +598,8 @@ function DataPulseHero({
         value={trendingCount.toString()}
         hint={t("stat_trending_hint")}
         href="/insights/explore#trending"
+        openInNewTab
       />
-    </section>
-  );
-}
-
-function SentimentTrendChart({
-  points,
-  t,
-}: {
-  points: SentimentTrendPoint[];
-  t: T;
-}) {
-  // Need 3+ data points for the line to be meaningful
-  if (points.length < 3) {
-    return null;
-  }
-  const w = 600;
-  const h = 110;
-  const padX = 8;
-  const padY = 16;
-  const max = 100;
-  const stepX = points.length > 1 ? (w - padX * 2) / (points.length - 1) : 0;
-
-  const buildPath = (key: "negPct" | "posPct") =>
-    points
-      .map((p, i) => {
-        const x = padX + stepX * i;
-        const y = padY + ((max - p[key]) / max) * (h - padY * 2);
-        return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
-      })
-      .join(" ");
-
-  const negPath = buildPath("negPct");
-  const posPath = buildPath("posPct");
-
-  return (
-    <section>
-      <SectionHeader
-        title={t("section_sentiment_trend_title")}
-        subtitle={t("section_sentiment_trend_subtitle")}
-      />
-      <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-        <div className="mb-2 flex items-center gap-4 text-xs text-slate-500">
-          <span className="inline-flex items-center gap-1.5">
-            <span className="inline-block h-2.5 w-2.5 rounded-full bg-rose-500" />
-            {t("sentiment_legend_negative")}
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <span className="inline-block h-2.5 w-2.5 rounded-full bg-emerald-500" />
-            {t("sentiment_legend_positive")}
-          </span>
-        </div>
-        <svg
-          viewBox={`0 0 ${w} ${h}`}
-          preserveAspectRatio="none"
-          className="h-28 w-full"
-          aria-label={t("section_sentiment_trend_title")}
-        >
-          {/* baseline grid at 25/50/75 % */}
-          {[25, 50, 75].map((pct) => {
-            const y = padY + ((max - pct) / max) * (h - padY * 2);
-            return (
-              <line
-                key={pct}
-                x1={padX}
-                x2={w - padX}
-                y1={y}
-                y2={y}
-                stroke="#e2e8f0"
-                strokeDasharray="2 4"
-              />
-            );
-          })}
-          <path d={posPath} fill="none" stroke="#10b981" strokeWidth="2" />
-          <path d={negPath} fill="none" stroke="#f43f5e" strokeWidth="2" />
-          {points.map((p, i) => {
-            const x = padX + stepX * i;
-            const yPos =
-              padY + ((max - p.posPct) / max) * (h - padY * 2);
-            const yNeg =
-              padY + ((max - p.negPct) / max) * (h - padY * 2);
-            return (
-              <g key={p.day}>
-                <circle cx={x} cy={yPos} r={2.5} fill="#10b981" />
-                <circle cx={x} cy={yNeg} r={2.5} fill="#f43f5e" />
-              </g>
-            );
-          })}
-        </svg>
-        <div className="mt-1.5 flex justify-between text-[10px] tabular-nums text-slate-400">
-          <span>
-            {new Date(points[0].day).toLocaleDateString(undefined, {
-              month: "short",
-              day: "numeric",
-            })}
-          </span>
-          <span>
-            {new Date(points[points.length - 1].day).toLocaleDateString(
-              undefined,
-              { month: "short", day: "numeric" },
-            )}
-          </span>
-        </div>
-      </div>
     </section>
   );
 }
@@ -733,6 +648,7 @@ function MiniStat({
   value,
   hint,
   href,
+  openInNewTab,
 }: {
   tone: "brand" | "amber" | "emerald";
   icon: typeof Flame;
@@ -742,6 +658,8 @@ function MiniStat({
   /** When provided, the tile becomes a clickable Link routing into the
    *  detail surface (e.g. /insights for the trending count tile). */
   href?: string;
+  /** Open in a new tab so the dashboard stays as the user's home base. */
+  openInNewTab?: boolean;
 }) {
   const tones = {
     brand: "from-brand-50 to-brand-100/40 text-brand-700",
@@ -770,7 +688,13 @@ function MiniStat({
 
   if (href) {
     return (
-      <Link href={href} className={`${baseClass}${interactiveClass}`}>
+      <Link
+        href={href}
+        className={`${baseClass}${interactiveClass}`}
+        {...(openInNewTab
+          ? { target: "_blank", rel: "noopener noreferrer" }
+          : {})}
+      >
         {inner}
       </Link>
     );
@@ -954,6 +878,8 @@ function DailyInsights({
               <Link
                 key={key}
                 href={href}
+                target="_blank"
+                rel="noopener noreferrer"
                 className={`${baseClass} transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md`}
               >
                 {inner}

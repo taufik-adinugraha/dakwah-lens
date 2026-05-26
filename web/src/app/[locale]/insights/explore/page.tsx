@@ -70,7 +70,10 @@ export default async function InsightsExplorePage({
     topicsByPlatform,
   ] = await Promise.all([
     getOverviewInsights(),
-    getTopIssues(5),
+    // High cap, not "no limit" — the SQL HAVING count >= 2 already
+    // does the real curation; this just protects against a pathological
+    // ingest spike spamming the page.
+    getTopIssues(100),
     getPlatformDistribution7d(),
     getSentimentDistribution7d(),
     getSentimentByPlatform7d(),
@@ -88,13 +91,11 @@ export default async function InsightsExplorePage({
     "bg-rose-500",
     "bg-violet-500",
   ];
-  const categories = (overview?.dominantCategories ?? [])
-    .slice(0, 6)
-    .map((c, i) => ({
-      label: localizeCategory(t, c.category),
-      volume: c.posts,
-      tone: CATEGORY_TONES[i % CATEGORY_TONES.length],
-    }));
+  const categories = (overview?.dominantCategories ?? []).map((c, i) => ({
+    label: localizeCategory(t, c.category),
+    volume: c.posts,
+    tone: CATEGORY_TONES[i % CATEGORY_TONES.length],
+  }));
   const catMax = categories.length
     ? Math.max(...categories.map((c) => c.volume))
     : 1;
@@ -172,7 +173,7 @@ export default async function InsightsExplorePage({
               topicsCountSuffix: t("coverage_topics_count_suffix"),
               noDataYet: t("coverage_no_data_yet"),
               topicsByPlatform: {
-                iconAriaLabel: t("coverage_topics_by_platform_aria"),
+                cta: t("coverage_topics_by_platform_cta"),
                 dialogTitle: t("coverage_topics_by_platform_title"),
                 dialogSubtitle: t("coverage_topics_by_platform_subtitle"),
                 closeLabel: t("coverage_sentiment_by_platform_close"),

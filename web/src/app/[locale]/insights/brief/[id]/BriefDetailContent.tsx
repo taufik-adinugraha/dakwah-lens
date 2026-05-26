@@ -10,7 +10,6 @@ import {
   getBriefingNavigation,
 } from "@/lib/insights-data";
 import { BriefShareMenu } from "./BriefShareMenu";
-import { BriefDownloadMenu } from "./BriefDownloadMenu";
 import { BriefTOC } from "./BriefTOC";
 import { BriefPagination } from "./BriefPagination";
 
@@ -145,18 +144,6 @@ export async function BriefDetailContent({
                   scope: scopeLabel,
                 }),
                 copied: t("brief_share_copied"),
-              }}
-            />
-            <BriefDownloadMenu
-              briefId={id}
-              labels={{
-                trigger: t("brief_download"),
-                pdf: t("brief_download_pdf"),
-                markdown: t("brief_download_markdown"),
-                text: t("brief_download_text"),
-                print: t("brief_download_print"),
-                print_hint: t("brief_download_print_hint"),
-                flyer: t("brief_flyer_download"),
               }}
             />
           </div>
