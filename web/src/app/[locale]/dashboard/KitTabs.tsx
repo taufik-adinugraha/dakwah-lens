@@ -3,6 +3,7 @@
 import { useState } from "react";
 import {
   BookOpenCheck,
+  ChevronDown,
   Compass,
   Layers,
   Sparkles,
@@ -127,12 +128,37 @@ export function KitTabs({
 
   return (
     <section>
+      {/* Mobile (< sm): two compact dropdowns instead of horizontal-scroll
+          strips — no awkward swiping, and both filters fit in one row.
+          The visible pill/tab strips below take over from sm upward. */}
+      <div className="grid grid-cols-2 gap-2 sm:hidden">
+        <SelectControl
+          ariaLabel="Segment"
+          value={activeSegment}
+          onChange={(v) => setActiveSegment(v as SegmentKey)}
+          options={SEGMENT_ORDER.map((segKey) => ({
+            value: segKey,
+            label: labels.segments[segKey],
+            disabled: !availableSegments.has(segKey),
+          }))}
+        />
+        <SelectControl
+          ariaLabel="Section"
+          value={activeSection}
+          onChange={(v) => setActiveSection(v as SectionKey)}
+          options={SECTION_ORDER.map((secKey) => ({
+            value: secKey,
+            label: labels.sections[secKey],
+          }))}
+        />
+      </div>
+
       {/* Segment tabs — horizontal scroll on narrow screens so all 5
           stay reachable without wrapping awkwardly. */}
       <div
         role="tablist"
         aria-label="Segment"
-        className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1"
+        className="-mx-1 hidden gap-1.5 overflow-x-auto px-1 pb-1 sm:flex"
       >
         {SEGMENT_ORDER.map((segKey) => {
           const Icon = SEGMENT_ICON[segKey];
@@ -168,7 +194,7 @@ export function KitTabs({
       <div
         role="tablist"
         aria-label="Section"
-        className="mt-4 flex gap-1 overflow-x-auto border-b border-slate-200"
+        className="mt-4 hidden gap-1 overflow-x-auto border-b border-slate-200 sm:flex"
       >
         {SECTION_ORDER.map((secKey) => {
           const active = secKey === activeSection;
@@ -205,6 +231,42 @@ export function KitTabs({
         )}
       </div>
     </section>
+  );
+}
+
+/**
+ * Native-select filter used on mobile in place of the scrollable pill /
+ * tab strips. Native `<select>` gives the OS picker (comfortable on
+ * touch) and keeps unavailable segments selectable-but-disabled. The
+ * chevron is drawn manually since we strip the browser's default arrow.
+ */
+function SelectControl({
+  ariaLabel,
+  value,
+  onChange,
+  options,
+}: {
+  ariaLabel: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: { value: string; label: string; disabled?: boolean }[];
+}) {
+  return (
+    <div className="relative">
+      <select
+        aria-label={ariaLabel}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full appearance-none truncate rounded-xl border border-slate-200 bg-white py-2.5 pl-3 pr-9 text-sm font-semibold text-slate-800 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+      >
+        {options.map((o) => (
+          <option key={o.value} value={o.value} disabled={o.disabled}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+    </div>
   );
 }
 

@@ -178,9 +178,13 @@ function TabButton({
         <span className="block text-sm font-semibold leading-tight">
           {label}
         </span>
+        {/* Subtitle is hidden on mobile: at ~50% width the two long
+            subtitles bloated the buttons and pushed the second tab past
+            the clipped page edge, making it unreachable. Title-only keeps
+            both tabs fully visible on narrow screens. */}
         <span
           className={
-            "block truncate text-xs leading-tight " +
+            "mt-0.5 hidden truncate text-xs leading-tight sm:block " +
             (active ? "text-white/70" : "text-slate-500")
           }
         >

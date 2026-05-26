@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 
 import { routing } from "@/i18n/routing";
 import { ActiveNotice } from "@/components/ActiveNotice";
+import { BackButton } from "@/components/BackButton";
 import { BackToTop } from "@/components/BackToTop";
 import { DeployOverlay } from "@/components/DeployOverlay";
 import { FlashToast } from "@/components/FlashToast";
@@ -91,6 +92,7 @@ export default async function RootLayout({
         <NextIntlClientProvider>
           <PendingApprovalBanner />
           <Header />
+          <BackButton label={tApp("back")} />
           <ActiveNotice locale={locale} />
           {/* Plain block (NOT flex). When main was `flex flex-col`, page
               roots that use `mx-auto` (auto cross-axis margins) opted out

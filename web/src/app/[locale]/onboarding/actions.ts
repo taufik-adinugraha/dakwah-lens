@@ -102,31 +102,65 @@ export async function saveProfileAction(formData: FormData): Promise<void> {
     redirect("/login?callbackUrl=/onboarding");
   }
 
+  const honorific = pick(formData.get("honorific"), HONORIFICS);
+  const honorificOther =
+    formData.get("honorific") === "other"
+      ? trimText(formData.get("honorific_other"), 30)
+      : undefined;
+  const ageRange = pick(formData.get("age_range"), AGE_RANGES);
+  const ageRangeOther =
+    formData.get("age_range") === "other"
+      ? trimText(formData.get("age_range_other"), 60)
+      : undefined;
+  const location = pick(formData.get("location"), LOCATIONS);
+  const locationOther =
+    formData.get("location") === "other"
+      ? trimText(formData.get("location_other"), 120)
+      : undefined;
+  const profession = pick(formData.get("profession"), PROFESSIONS);
+  const professionOther =
+    formData.get("profession") === "other"
+      ? trimText(formData.get("profession_other"), 120)
+      : undefined;
+  const audience = pickMany(formData.getAll("audience"), AUDIENCES);
+  const focus = pickMany(formData.getAll("focus"), FOCUS_CATEGORIES);
+  const outputLang = pick(formData.get("output_lang"), OUTPUT_LANGS);
+
+  // Onboarding is mandatory — every step must be answered. The wizard
+  // already gates this client-side, but we re-check here so a crafted or
+  // partial submission can't write an incomplete profile + flip the
+  // onboarded flag. A "single" step counts as answered when it has a
+  // value (and free text when the value is "other"); a "multi" step needs
+  // at least one selection.
+  const singleAnswered = (
+    value: string | undefined,
+    other: string | undefined,
+  ) => (value === "other" ? !!other : !!value);
+  const complete =
+    singleAnswered(honorific, honorificOther) &&
+    singleAnswered(ageRange, ageRangeOther) &&
+    singleAnswered(location, locationOther) &&
+    singleAnswered(profession, professionOther) &&
+    audience.length > 0 &&
+    focus.length > 0 &&
+    !!outputLang;
+  if (!complete) {
+    redirect("/onboarding");
+  }
+
   const profile: UserProfile = {
-    honorific: pick(formData.get("honorific"), HONORIFICS),
-    honorific_other:
-      formData.get("honorific") === "other"
-        ? trimText(formData.get("honorific_other"), 30)
-        : undefined,
-    age_range: pick(formData.get("age_range"), AGE_RANGES),
-    age_range_other:
-      formData.get("age_range") === "other"
-        ? trimText(formData.get("age_range_other"), 60)
-        : undefined,
-    location: pick(formData.get("location"), LOCATIONS),
-    location_other:
-      formData.get("location") === "other"
-        ? trimText(formData.get("location_other"), 120)
-        : undefined,
-    profession: pick(formData.get("profession"), PROFESSIONS),
-    profession_other:
-      formData.get("profession") === "other"
-        ? trimText(formData.get("profession_other"), 120)
-        : undefined,
-    audience: pickMany(formData.getAll("audience"), AUDIENCES),
+    honorific,
+    honorific_other: honorificOther,
+    age_range: ageRange,
+    age_range_other: ageRangeOther,
+    location,
+    location_other: locationOther,
+    profession,
+    profession_other: professionOther,
+    audience,
     audience_other: trimText(formData.get("audience_other"), 200),
-    focus: pickMany(formData.getAll("focus"), FOCUS_CATEGORIES),
-    output_lang: pick(formData.get("output_lang"), OUTPUT_LANGS) ?? "id",
+    focus,
+    output_lang: outputLang,
   };
 
   await db
@@ -140,23 +174,6 @@ export async function saveProfileAction(formData: FormData): Promise<void> {
 
   // Where to land them next: pending users go to /insights to browse while
   // they wait for approval; approved users go to /dashboard.
-  const dest = session.user.status === "approved" ? "/dashboard" : "/insights";
-  redirect(dest);
-}
-
-/** Skip onboarding without saving anything — sets onboarded_at so we don't
- *  keep redirecting them. Profile stays NULL → brief prompts use defaults. */
-export async function skipOnboardingAction(): Promise<void> {
-  const session = await auth();
-  if (!session?.user?.id) {
-    redirect("/login?callbackUrl=/onboarding");
-  }
-
-  await db
-    .update(schema.users)
-    .set({ onboardedAt: new Date(), updatedAt: new Date() })
-    .where(eq(schema.users.id, session.user.id));
-
   const dest = session.user.status === "approved" ? "/dashboard" : "/insights";
   redirect(dest);
 }

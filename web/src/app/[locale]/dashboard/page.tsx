@@ -1021,7 +1021,7 @@ function RecentBriefs({
         />
         <Link
           href="/briefs"
-          className="inline-flex items-center gap-1 text-xs font-semibold text-brand-700 hover:text-brand-900"
+          className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-semibold text-brand-700 hover:text-brand-900"
         >
           {t("recent_view_all")}
           <ArrowRight className="h-3 w-3" />

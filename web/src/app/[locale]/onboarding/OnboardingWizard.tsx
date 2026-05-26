@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import { Spinner } from "@/components/Spinner";
 import clsx from "clsx";
 
-import { saveProfileAction, skipOnboardingAction } from "./actions";
+import { saveProfileAction } from "./actions";
 
 // Loose translator signature — keeps the existing call sites
 // (`t(key)`, `t(key, { vars })`) working without per-call key narrowing.
@@ -269,29 +269,15 @@ export function OnboardingWizard() {
     });
   }
 
-  function skipAll() {
-    startTransition(async () => {
-      await skipOnboardingAction();
-    });
-  }
-
   const isLast = step === total - 1;
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6 sm:py-16">
-      {/* Progress + skip */}
+      {/* Progress */}
       <div className="flex items-center justify-between gap-4">
         <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
           {t("progress_label", { current: step + 1, total })}
         </span>
-        <button
-          type="button"
-          onClick={skipAll}
-          disabled={pending}
-          className="text-xs font-medium text-slate-500 hover:text-slate-900 disabled:opacity-50"
-        >
-          {t("skip_all")}
-        </button>
       </div>
       <div className="mt-2 h-1 overflow-hidden rounded-full bg-slate-100">
         <div

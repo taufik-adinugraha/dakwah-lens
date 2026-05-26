@@ -154,13 +154,18 @@ celery_app.conf.update(
         # ~$0.05/platform/run, so we only re-cluster when there's fresh
         # data to find themes in.
         #
-        # Daily 04:00 WIB → RSS (every-2h ingest) and YouTube (daily
-        # ingest). 1–2h after RSS's 02:00 WIB tick gives fresh material;
-        # well before the workday so /insights shows current themes.
+        # Daily 04:00 WIB → RSS (every-2h ingest). 1–2h after RSS's
+        # 02:00 WIB tick gives fresh material; well before the workday so
+        # /insights shows current themes.
+        #
+        # YouTube was dropped from this list 2026-05-27: its daily ingest
+        # is paused (commented out above), so reclustering "youtube" found
+        # no new rows yet still cost ~$0.05/run. Add it back here when the
+        # `ingest-youtube-channels` beat entry is re-enabled.
         "recluster-daily": {
             "task": "api.workers.ingest.recluster_all",
             "schedule": crontab(minute=0, hour=4),
-            "kwargs": {"platforms": ["mainstream", "youtube"]},
+            "kwargs": {"platforms": ["mainstream"]},
         },
         # Thursday 04:00 WIB → weekly-ingest social platforms (X +
         # TikTok + Instagram), 6h after the Wed 22:00 WIB social burst.
