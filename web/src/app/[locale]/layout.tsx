@@ -92,16 +92,16 @@ export default async function RootLayout({
           <PendingApprovalBanner />
           <Header />
           <ActiveNotice locale={locale} />
-          {/* `[&>*]:min-w-0` lets each page-root (a flex item of this
-              column) shrink to the viewport instead of growing to fit a
-              wide descendant (markdown tables, long Arabic runs) — the
-              classic flexbox `min-width:auto` overflow that was clipping
-              the dashboard's text off the right edge on mobile.
-              `overflow-x-clip` is a final safety net so nothing can
-              produce a horizontal scrollbar. */}
-          <main className="flex flex-col overflow-x-clip [&>*]:min-w-0">
-            {children}
-          </main>
+          {/* Plain block (NOT flex). When main was `flex flex-col`, page
+              roots that use `mx-auto` (auto cross-axis margins) opted out
+              of flex stretch and sized to their *content's max-content*
+              — which on the dashboard ballooned the root to ~675px on a
+              375px viewport, wrapping every line of text off the right
+              edge. As a block, an `mx-auto` child fills the width (capped
+              by its own max-w-*) and content wraps correctly.
+              `overflow-x-clip` stays as a safety net against any single
+              wide descendant (e.g. a markdown table). */}
+          <main className="overflow-x-clip">{children}</main>
           <Footer />
           <BackToTop label={tApp("back_to_top")} />
           <PageTracker locale={locale} />

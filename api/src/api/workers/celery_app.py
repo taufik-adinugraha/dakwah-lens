@@ -198,19 +198,19 @@ celery_app.conf.update(
         #     # day_of_week=4 = Thursday in Celery's crontab (Sun=0).
         #     "schedule": crontab(minute=0, hour=5, day_of_week=4),
         # },
-        # Weekly email digest — Thursday 18:00 WIB. Same day as the
-        # briefing publish (Thursday 05:00); the 13-hour gap gives the
-        # generation pipeline a full window even when retries fire, and
-        # lands in the inbox in time for Friday khutbah preparation.
-        # Free up to 3K emails/month on Resend's free tier.
+        # Weekly email digest — Thursday 08:00 WIB. Same day as the
+        # briefing publish (Thursday 05:00); the 3-hour gap gives the
+        # generation pipeline a window even when retries fire, and lands
+        # in the inbox first thing Thursday morning — well ahead of
+        # Friday khutbah preparation. Free up to 3K emails/month on
+        # Resend's free tier.
         #
-        # Moved from Sunday 18:00 → Thursday 18:00 on 2026-05-24 so the
-        # digest tracks the briefing day (briefing also moved Sun → Thu
-        # the same day; see the generate-insights-summary block above).
+        # Moved Sunday 18:00 → Thursday 18:00 (2026-05-24, tracking the
+        # briefing day) → Thursday 08:00 (2026-05-27, morning delivery).
         "send-weekly-digest": {
             "task": "api.workers.ingest.send_weekly_digest",
             # day_of_week=4 = Thursday in Celery's crontab (Sun=0).
-            "schedule": crontab(minute=0, hour=18, day_of_week=4),
+            "schedule": crontab(minute=0, hour=8, day_of_week=4),
         },
         # Trending overlay — daily 12:00 WIB. Complements the weekly
         # curated X sweep (49 fixed keywords on Wed 22:00) by catching

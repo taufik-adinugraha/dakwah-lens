@@ -144,7 +144,7 @@
     "how_coverage_posts_hint": "Sentiment + relevance classified, last 30 days",
     "how_coverage_posts_empty": "Posts analyzed will appear here once ingestion starts.",
     "how_schedule_intro": "Pipeline runs automatically:",
-    "how_schedule_detail": "mainstream every 2 hours · X swept every Wednesday 22:00 WIB (500-item cap, 7-day window) · TikTok 22:10 WIB and Instagram 22:20 WIB same day · X trending overlay 12:00 WIB daily · topic discovery for mainstream + YouTube 04:00 WIB daily · X + TikTok + Instagram topic discovery every Thursday 04:00 WIB · email digest every Thursday 18:00 WIB.",
+    "how_schedule_detail": "mainstream every 2 hours · X swept every Wednesday 22:00 WIB · TikTok 22:10 WIB and Instagram 22:20 WIB same day · X trending overlay 12:00 WIB daily · topic discovery for mainstream + YouTube 04:00 WIB daily · X + TikTok + Instagram topic discovery every Thursday 04:00 WIB · email digest every Thursday 08:00 WIB.",
     "how_technical_link": "See the full technical breakdown",
     "how_step_1_title": "Watch the landscape",
     "how_step_1_body": "Dakwah-Lens reads Indonesian news, social media, and video 24/7.",
@@ -292,6 +292,7 @@
   },
   "Kitab": {
     "page_title": "Kitab Library",
+    "id_translation_notice": "Most kitab in this library are in Arabic and English — we're in the process of curating texts with Indonesian translations. For direct search like this, results are not translated to Bahasa Indonesia to save cost.",
     "badge": "Verified library",
     "title": "Every citation, traceable to its source",
     "body": "Each citation in a Dakwah-Lens brief comes from a real, verified kitab — never invented by AI. This is the cornerstone of the trust we work to earn.",
@@ -2009,7 +2010,7 @@
     "ingest_stage_4_body": "Conflict on (platform, external_id) → update text + classifications + region. Re-running a scrape never produces duplicates.",
     "ingest_stage_5_title": "Topic discovery",
     "ingest_stage_5_body": "Daily Gemini Flash-Lite topic discovery per platform, fired at 04:00 WIB by Celery beat. Reads every post from the last 7 days above a da'wah-opportunity floor (typically 300–600 mainstream posts) and asks Gemini to identify 6–10 themes with human-readable Bahasa Indonesia labels framed from a da'wah angle, then writes them to `topics`.",
-    "ingest_schedule_note": "Scheduled via Celery beat (Asia/Jakarta): mainstream RSS every 2 hours · X weekly every Wednesday 22:00 WIB (500-item cap/keyword, 7-day window) — re-enabled 2026-05-25 after end-to-end verification · TikTok weekly Wednesday 22:10 WIB and Instagram weekly Wednesday 22:20 WIB (limit 20 items/keyword, 1-week evaluation phase since 2026-05-25) · X trending overlay at 12:00 WIB daily · Gemini topic discovery at 04:00 WIB daily (mainstream + YouTube) · X + TikTok + Instagram topic discovery every Thursday 04:00 WIB · insights briefings every Thursday 05:00 WIB — one day before the Friday khutbah (moved from Sunday to Thursday on 2026-05-24; currently paused for cost, triggered manually via Claude) · email digest every Thursday 18:00 WIB · Apify billing reconcile at 06:00 WIB daily. YouTube scraper remains in end-to-end verification — code path wired, re-enabling after verification. Manual runs via `uv run python -m api.scripts.ingest`.",
+    "ingest_schedule_note": "Scheduled via Celery beat (Asia/Jakarta): mainstream RSS every 2 hours · X weekly every Wednesday 22:00 WIB (500-item cap/keyword, 7-day window) — re-enabled 2026-05-25 after end-to-end verification · TikTok weekly Wednesday 22:10 WIB and Instagram weekly Wednesday 22:20 WIB (limit 20 items/keyword, 1-week evaluation phase since 2026-05-25) · X trending overlay at 12:00 WIB daily · Gemini topic discovery at 04:00 WIB daily (mainstream + YouTube) · X + TikTok + Instagram topic discovery every Thursday 04:00 WIB · insights briefings every Thursday 05:00 WIB — one day before the Friday khutbah (moved from Sunday to Thursday on 2026-05-24; currently paused for cost, triggered manually via Claude) · email digest every Thursday 08:00 WIB · Apify billing reconcile at 06:00 WIB daily. YouTube scraper remains in end-to-end verification — code path wired, re-enabling after verification. Manual runs via `uv run python -m api.scripts.ingest`.",
 
     "discovery_title": "Keyword discovery: curated rotation + trending overlay.",
     "discovery_subtitle": "Two complementary layers. The weekly curated sweep guarantees structural coverage across the 9 da'wah categories; the daily trending overlay catches today's named events the curated list could never anticipate.",

@@ -192,6 +192,17 @@ export default async function KitabPage({
         corporaSelection={corporaSelection}
         counts={counts}
       />
+      {/* Indonesian-only notice: most corpora ship AR + EN, and ad-hoc
+          search results aren't auto-translated to Bahasa to save the
+          per-result LLM cost. English readers don't need this caveat,
+          so it's gated to the `id` locale. */}
+      {locale === "id" && (
+        <div className="mx-auto max-w-3xl px-4 sm:px-6">
+          <p className="rounded-xl border border-amber-200 bg-amber-50/70 px-4 py-3 text-xs leading-relaxed text-amber-900">
+            {t("id_translation_notice")}
+          </p>
+        </div>
+      )}
       {query ? (
         <Results t={t} hits={hits} query={query} savedFlags={savedFlags} signedIn={signedIn} />
       ) : (
