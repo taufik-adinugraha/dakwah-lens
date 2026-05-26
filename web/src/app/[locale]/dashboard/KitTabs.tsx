@@ -300,7 +300,30 @@ function ProseSection({ markdown }: { markdown: string }) {
   }
   const components: Components = {
     p: ({ children }) => (
-      <p className="my-3 text-sm leading-relaxed text-slate-700">{children}</p>
+      <p className="my-3 break-words text-sm leading-relaxed text-slate-700">
+        {children}
+      </p>
+    ),
+    // The Numerik section often emits a multi-column stats table. A bare
+    // <table> sizes to its content and blows out the page width on
+    // mobile — wrap it in a horizontal-scroll container so it scrolls
+    // inside the card instead of stretching the whole layout.
+    table: ({ children }) => (
+      <div className="my-3 -mx-1 overflow-x-auto px-1">
+        <table className="w-full min-w-[28rem] border-collapse text-left text-xs">
+          {children}
+        </table>
+      </div>
+    ),
+    th: ({ children }) => (
+      <th className="border-b border-slate-200 px-2 py-1.5 font-semibold text-slate-700">
+        {children}
+      </th>
+    ),
+    td: ({ children }) => (
+      <td className="border-b border-slate-100 px-2 py-1.5 text-slate-600">
+        {children}
+      </td>
     ),
     h3: ({ children }) => (
       <h3 className="mt-6 mb-2 text-base font-semibold text-slate-900">

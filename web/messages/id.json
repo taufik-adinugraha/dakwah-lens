@@ -2,7 +2,8 @@
   "App": {
     "name": "Dakwah-Lens",
     "tagline": "Pahami apa yang sedang dibutuhkan umat — sebelum mereka bertanya.",
-    "description": "Platform media intelligence berbasis AI untuk para da'i di Indonesia. Gratis selamanya."
+    "description": "Platform media intelligence berbasis AI untuk para da'i di Indonesia. Gratis selamanya.",
+    "back_to_top": "Kembali ke atas"
   },
   "Deploy": {
     "deploying_title": "Aplikasi sedang diperbarui",

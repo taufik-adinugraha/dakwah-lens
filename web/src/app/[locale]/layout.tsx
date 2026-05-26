@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 
 import { routing } from "@/i18n/routing";
 import { ActiveNotice } from "@/components/ActiveNotice";
+import { BackToTop } from "@/components/BackToTop";
 import { DeployOverlay } from "@/components/DeployOverlay";
 import { FlashToast } from "@/components/FlashToast";
 import { Footer } from "@/components/Footer";
@@ -79,6 +80,8 @@ export default async function RootLayout({
   // response so the toast only ever fires once.
   const flash = await popFlash();
 
+  const tApp = await getTranslations({ locale, namespace: "App" });
+
   return (
     <html
       lang={locale}
@@ -89,8 +92,18 @@ export default async function RootLayout({
           <PendingApprovalBanner />
           <Header />
           <ActiveNotice locale={locale} />
-          <main className="flex flex-col">{children}</main>
+          {/* `[&>*]:min-w-0` lets each page-root (a flex item of this
+              column) shrink to the viewport instead of growing to fit a
+              wide descendant (markdown tables, long Arabic runs) — the
+              classic flexbox `min-width:auto` overflow that was clipping
+              the dashboard's text off the right edge on mobile.
+              `overflow-x-clip` is a final safety net so nothing can
+              produce a horizontal scrollbar. */}
+          <main className="flex flex-col overflow-x-clip [&>*]:min-w-0">
+            {children}
+          </main>
           <Footer />
+          <BackToTop label={tApp("back_to_top")} />
           <PageTracker locale={locale} />
           <FlashToast initial={flash} />
           {deployStatus && <DeployOverlay initialStatus={deployStatus} />}

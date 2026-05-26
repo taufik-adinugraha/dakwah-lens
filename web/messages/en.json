@@ -2,7 +2,8 @@
   "App": {
     "name": "Dakwah-Lens",
     "tagline": "See what your ummah needs — before they ask.",
-    "description": "AI-powered media intelligence platform for Indonesian da'i. Free forever."
+    "description": "AI-powered media intelligence platform for Indonesian da'i. Free forever.",
+    "back_to_top": "Back to top"
   },
   "Deploy": {
     "deploying_title": "App update in progress",
