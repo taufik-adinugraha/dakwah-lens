@@ -35,6 +35,7 @@ import structlog
 
 from api.config import settings
 from api.services.apify import ScrapeResult
+from api.services.language import detect_lang
 
 log = structlog.get_logger()
 
@@ -312,6 +313,169 @@ def scrape_youtube_uploads(
     return ScrapeResult(
         items=reshaped,
         actor_id="youtube_data_api_v3",
+        run_id=payload.get("nextPageToken", "no_token"),
+        cost_usd=0.0,
+        duration_s=duration_s,
+    )
+
+
+# `search.list` is 100 quota units (vs 1 for the uploads path), so this
+# is reserved for the daily trending pipeline — a handful of da'wah-
+# relevant keywords/day — NOT the bulk corpus sweep, which stays on the
+# cheap whitelist uploads path.
+_SEARCH_COST_UNITS = 100
+
+
+def search_youtube_videos(
+    query: str,
+    *,
+    max_items: int = 25,
+    region_code: str = "ID",
+    relevance_language: str = "id",
+) -> ScrapeResult:
+    """Keyword search across ALL of YouTube (not channel-bounded), for the
+    trending pipeline.
+
+    This is the deliberately-UNBOUNDED counterpart to
+    `scrape_youtube_uploads`. The whitelist uploads path is the trust
+    boundary for the weekly corpus; this search path has none, so it
+    re-applies the langdetect gate the channel path was allowed to drop.
+    Without it, `search.list` pulls cross-language spam that scores high on
+    shared Arabic-derived vocabulary (Kerala matchmaking / Indian wedding
+    Shorts on "nikah") — the exact failure that got the old search path
+    deleted 2026-05-25. `regionCode=ID` + `relevanceLanguage=id` bias the
+    result set toward Indonesian *before* the gate; Gemini `dawah_relevance`
+    is the final filter downstream.
+
+    Cost: 100 quota units per `search.list` call + 1 for the batched
+    `videos.list` stats fetch. At ~8 trending keywords/day that's ~800
+    units/day — well inside the 10K/day free tier.
+    """
+    if not settings.youtube_api_key:
+        raise RuntimeError(
+            "YOUTUBE_API_KEY is not set. Add it to .env (Google Cloud Console → "
+            "APIs & Services → Credentials → Create API key)."
+        )
+
+    started = time.time()
+    capped = min(max_items, _MAX_PER_CALL)
+    window_start = datetime.now(UTC) - timedelta(days=RECENT_WINDOW_DAYS)
+    published_after = window_start.strftime("%Y-%m-%dT%H:%M:%SZ")
+    log.info(
+        "youtube.search.start",
+        query=query,
+        max=capped,
+        region=region_code,
+    )
+
+    with httpx.Client(timeout=30) as client:
+        resp = client.get(
+            f"{_BASE}/search",
+            params={
+                "part": "snippet",
+                "q": query,
+                "type": "video",
+                "order": "relevance",
+                "regionCode": region_code,
+                "relevanceLanguage": relevance_language,
+                "publishedAfter": published_after,
+                "maxResults": capped,
+                "key": settings.youtube_api_key,
+            },
+        )
+        resp.raise_for_status()
+        payload = resp.json()
+
+    raw_items: list[dict[str, Any]] = payload.get("items", [])
+
+    reshaped: list[dict[str, Any]] = []
+    dropped_no_video_id = 0
+    dropped_non_id = 0
+    for it in raw_items:
+        id_obj = it.get("id") or {}
+        snippet = it.get("snippet") or {}
+        video_id = id_obj.get("videoId")
+        if not video_id:
+            dropped_no_video_id += 1
+            continue
+
+        # Language gate — RESTORED for this path (the channel path drops
+        # it because the channel itself is the trust boundary). Detect on
+        # title + description; drop anything not Indonesian. `detect_lang`
+        # already folds Malay → id and defaults short/garbled text to id,
+        # so this errs toward keeping borderline rows.
+        title = snippet.get("title") or ""
+        description = snippet.get("description") or ""
+        if detect_lang(f"{title} {description}") != "id":
+            dropped_non_id += 1
+            continue
+
+        reshaped.append(
+            {
+                "id": {"videoId": video_id},
+                "snippet": {
+                    "title": title,
+                    "description": description,
+                    "channelTitle": snippet.get("channelTitle"),
+                    "publishedAt": snippet.get("publishedAt"),
+                    "channelId": snippet.get("channelId"),
+                },
+            }
+        )
+
+    # Enrich with engagement stats in ONE batched videos.list call (1 unit).
+    if reshaped:
+        with httpx.Client(timeout=20) as stats_client:
+            try:
+                stats_map = _fetch_video_stats(
+                    stats_client,
+                    [it["id"]["videoId"] for it in reshaped],
+                    settings.youtube_api_key,
+                )
+            except httpx.HTTPError as exc:
+                log.warning("youtube.search.stats_fetch_failed", error=str(exc))
+                stats_map = {}
+
+        for it in reshaped:
+            stats = stats_map.get(it["id"]["videoId"])
+            if stats:
+                it["snippet"]["statistics"] = {
+                    "views": stats["views"],
+                    "likes": stats["likes"],
+                    "comments": stats["comments"],
+                    "score": _engagement_score(
+                        stats["views"], stats["likes"], stats["comments"]
+                    ),
+                }
+
+    duration_s = time.time() - started
+    log.info(
+        "youtube.search.done",
+        query=query,
+        results=len(reshaped),
+        dropped_no_video_id=dropped_no_video_id,
+        dropped_non_id=dropped_non_id,
+        duration_s=round(duration_s, 2),
+    )
+
+    from api.services.usage import record_usage
+
+    record_usage(
+        provider="youtube",
+        operation="search",
+        model="search.list+videos.list",
+        units=_SEARCH_COST_UNITS + (1 if reshaped else 0),
+        cost_usd=0.0,
+        meta={
+            "query": query,
+            "results": len(reshaped),
+            "dropped_non_id": dropped_non_id,
+        },
+    )
+
+    return ScrapeResult(
+        items=reshaped,
+        actor_id="youtube_data_api_v3_search",
         run_id=payload.get("nextPageToken", "no_token"),
         cost_usd=0.0,
         duration_s=duration_s,

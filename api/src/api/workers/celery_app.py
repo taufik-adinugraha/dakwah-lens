@@ -103,23 +103,25 @@ celery_app.conf.update(
         # Subtotal sweep: ~$32/mo. Add trending overlay (X only, ~$0.1)
         # → ~$32/mo total Apify usage. Inside the IDR 1M ($60) cap.
         # Track real costs at /admin/system/api-costs.
-        # ── PAUSED 2026-05-20 ───────────────────────────────────────
-        # Only `mainstream` RSS is verified end-to-end against the new
-        # dedup-before-classify + lang-filter + Top-sort + relevance
-        # JSON-fix code path. X / TT / IG / YT remain unvalidated and
-        # we don't want to leave them firing unattended while the user
-        # is off-server. Re-enable one at a time after running a single
-        # manual trigger and confirming items_stored + distribution +
-        # `ingest.lang_filter` log entries look sane.
+        # YouTube — WEEKLY channel scan, Wed 21:00 WIB (1h before the X
+        # social burst). This is the trusted-voices half of the YT split:
+        # the verified-channel whitelist via the cheap uploads path (2
+        # quota units/channel). The UNBOUNDED half lives in the daily
+        # `trending-ingest` task, which keyword-searches all of YouTube.
         #
-        # YT specifically also needs a one-time
-        # `uv run python -m api.scripts.seed_youtube_channels`
-        # before the daily ingest will find any channels to scrape.
-        # "ingest-youtube-channels": {
-        #     "task": "api.workers.ingest.youtube_channels_ingest",
-        #     "schedule": crontab(minute=0, hour=0),
-        #     "kwargs": {"limit": 50},
-        # },
+        # Weekly (not daily) because curated da'i channels publish a
+        # handful of videos/week — a daily sweep would mostly re-see the
+        # same uploads. The 7-day publishedAt window in
+        # `scrape_youtube_uploads` matches this cadence.
+        #
+        # Needs a one-time `uv run python -m api.scripts.seed_youtube_channels`
+        # + admin Verify before it finds any channels; until then the task
+        # is a harmless no-op (logs `youtube_channels_ingest.no_channels`).
+        "ingest-youtube-channels": {
+            "task": "api.workers.ingest.youtube_channels_ingest",
+            "schedule": crontab(minute=0, hour=21, day_of_week=3),
+            "kwargs": {"limit": 50},
+        },
         # X — weekly Wed 22:00 WIB. Since briefings became weekly
         # (Sun 05:00 WIB), 3× daily X fanouts were paying for the same
         # engagement-sticky "Top" tweets multiple times. One weekly run
@@ -154,18 +156,20 @@ celery_app.conf.update(
         # ~$0.05/platform/run, so we only re-cluster when there's fresh
         # data to find themes in.
         #
-        # Daily 04:00 WIB → RSS (every-2h ingest). 1–2h after RSS's
-        # 02:00 WIB tick gives fresh material; well before the workday so
-        # /insights shows current themes.
+        # Daily 04:00 WIB → RSS (every-2h ingest) + YouTube. 1–2h after
+        # RSS's 02:00 WIB tick gives fresh material; well before the
+        # workday so /insights shows current themes.
         #
-        # YouTube was dropped from this list 2026-05-27: its daily ingest
-        # is paused (commented out above), so reclustering "youtube" found
-        # no new rows yet still cost ~$0.05/run. Add it back here when the
-        # `ingest-youtube-channels` beat entry is re-enabled.
+        # YouTube earns its daily slot via the `trending-ingest` task
+        # (daily 12:00 WIB), which keyword-searches all of YouTube — so
+        # the `youtube` platform gets fresh rows every day, not just on
+        # the weekly channel-scan day. (Briefly dropped 2026-05-27 when YT
+        # had no daily source; restored 2026-05-27 alongside the trending
+        # YT search.)
         "recluster-daily": {
             "task": "api.workers.ingest.recluster_all",
             "schedule": crontab(minute=0, hour=4),
-            "kwargs": {"platforms": ["mainstream"]},
+            "kwargs": {"platforms": ["mainstream", "youtube"]},
         },
         # Thursday 04:00 WIB → weekly-ingest social platforms (X +
         # TikTok + Instagram), 6h after the Wed 22:00 WIB social burst.

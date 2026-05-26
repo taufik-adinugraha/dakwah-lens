@@ -47,7 +47,7 @@ from api.services.relevance import (
 )
 from api.services.rss import scrape_mainstream
 from api.services.sentiment import classify_batch as classify_sentiment
-from api.services.youtube import scrape_youtube_uploads
+from api.services.youtube import scrape_youtube_uploads, search_youtube_videos
 
 log = structlog.get_logger()
 
@@ -87,22 +87,28 @@ async def _run(
     *,
     actor_id: str | None = None,
     channel_id: str | None = None,
+    youtube_search: bool = False,
 ) -> int:
-    # 1. Scrape — YouTube is whitelist-only (`scrape_youtube_uploads`
-    # via playlistItems.list, 2 quota units per channel). Every YT job
-    # MUST carry a `channel_id`; the keyword search.list fallback was
-    # removed 2026-05-25 because it produced cross-language spam and
-    # burned 100 quota per call. Other platforms route through the
-    # generic `_scrape` dispatcher.
+    # 1. Scrape — YouTube has two paths:
+    #   • whitelist uploads (`scrape_youtube_uploads`, 2 quota units/
+    #     channel) — the cheap bulk corpus path; needs a `channel_id`.
+    #   • unbounded keyword search (`search_youtube_videos`, 100 units/
+    #     call) — ONLY for the trending pipeline, gated behind the
+    #     explicit `youtube_search` flag so the expensive/spam-prone
+    #     search path can't be triggered accidentally by a stray query.
+    # Other platforms route through the generic `_scrape` dispatcher.
     if platform == "youtube":
-        if not channel_id:
-            raise ValueError(
-                "youtube ingest requires a channel_id (whitelist-only). "
-                "Dispatch via `youtube_channels_ingest`, not a raw query."
+        if youtube_search:
+            result = search_youtube_videos(query, max_items=limit)
+        elif channel_id:
+            result = scrape_youtube_uploads(
+                channel_id, max_items=limit, channel_name=query or None
             )
-        result = scrape_youtube_uploads(
-            channel_id, max_items=limit, channel_name=query or None
-        )
+        else:
+            raise ValueError(
+                "youtube ingest requires either a channel_id (whitelist "
+                "uploads) or youtube_search=True (trending keyword search)."
+            )
     else:
         result = _scrape(platform, query, limit, actor_id=actor_id)
     cost = result.cost_usd or 0
@@ -378,10 +384,15 @@ async def _run(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Ingest social posts from any platform.")
+    # `youtube` isn't in SCRAPERS (it has two bespoke paths, not the
+    # generic Apify dispatcher) but we expose it here so the YT split can
+    # be verified with a single manual run before enabling beat:
+    #   --platform youtube --youtube-search --query "nikah beda agama"
+    #   --platform youtube --channel-id UCxxxx --query "Channel Name"
     parser.add_argument(
         "--platform",
         required=True,
-        choices=sorted(SCRAPERS.keys()),
+        choices=sorted([*SCRAPERS.keys(), "youtube"]),
         help="Which platform to ingest from.",
     )
     parser.add_argument(
@@ -392,10 +403,28 @@ def main() -> None:
     parser.add_argument(
         "--limit", type=int, default=20, help="Max items to ingest (default 20)."
     )
+    parser.add_argument(
+        "--channel-id",
+        default=None,
+        help="YouTube only: scrape this channel's uploads (whitelist path).",
+    )
+    parser.add_argument(
+        "--youtube-search",
+        action="store_true",
+        help="YouTube only: unbounded keyword search.list path (trending).",
+    )
     args = parser.parse_args()
 
     try:
-        count = asyncio.run(_run(args.platform, args.query, args.limit))
+        count = asyncio.run(
+            _run(
+                args.platform,
+                args.query,
+                args.limit,
+                channel_id=args.channel_id,
+                youtube_search=args.youtube_search,
+            )
+        )
     except Exception as e:
         log.error("ingest.failed", error=str(e))
         sys.exit(1)

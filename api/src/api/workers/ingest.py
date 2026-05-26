@@ -41,6 +41,7 @@ def run_ingest(
     limit: int = 20,
     actor_id: str | None = None,
     channel_id: str | None = None,
+    youtube_search: bool = False,
 ) -> int:
     """Scrape + classify + upsert one platform. Returns post count.
 
@@ -51,6 +52,10 @@ def run_ingest(
     `channel_id` (YouTube only) routes this task through the curated
     playlistItems.list path instead of keyword search.list — 100×
     cheaper on YT quota. `query` becomes a display name in that path.
+
+    `youtube_search=True` (YouTube only) routes through the unbounded
+    keyword `search.list` path used by the trending pipeline — NOT
+    channel-bounded, with a langdetect gate restored in the scraper.
 
     Errors auto-retry with exponential backoff. Most failures we've seen are
     transient (Apify rate-limit, RSS outlet 5xx, Gemini quota) and resolve
@@ -70,6 +75,7 @@ def run_ingest(
                 limit,
                 actor_id=actor_id,
                 channel_id=channel_id,
+                youtube_search=youtube_search,
             )
             await ingest_runs.finish_run(
                 run_id, status="success", items_stored=n, items_scraped=n
@@ -256,24 +262,29 @@ def trending_ingest() -> dict[str, object]:
     its own time budget (the parent finishes in <1 min regardless of how
     many scrapes fan out).
 
-    Platforms scraped: X (apidojo at $0.0004/item). Skipping IG (most
-    expensive + 30-day lookback duplicates the weekly curated sweep
-    anyway) and YouTube (its own popular-chart fetch is already one of
-    the trending signal sources). TikTok was here too but dropped
-    2026-05-20 — TT is fully disabled until we make a product decision,
-    and the "free" actor isn't free ($0.004/item). Budget impact at
-    LIMIT=100: ~8 keywords/day × $0.0004 × 100 = $0.32/day = ~$9.6/mo.
-    Stays well inside the IDR cap; the relevance filter upstream keeps
-    keyword count to the dakwah-signal subset (~8/day observed).
+    Platforms scraped per keyword:
+      • X — apidojo at $0.0004/item, 100 items/keyword. Budget at ~8
+        keywords/day: ~$0.32/day ≈ $9.6/mo.
+      • YouTube — unbounded `search.list` keyword search (free YouTube
+        Data API, 100 quota units/call), 25 items/keyword. This is the
+        UNBOUNDED-by-channel counterpart to the weekly whitelist uploads
+        sweep: weekly = trusted da'i voices, trending = whatever da'wah-
+        relevant content is spiking. The mostPopular-ID chart is still
+        only a keyword *signal* source (above); here we actually ingest
+        the matching videos. ~8 keywords/day × ~101 units ≈ 800 units/day,
+        well inside the 10K/day free tier.
+
+    Skipping IG (most expensive + 30-day lookback duplicates the weekly
+    curated sweep) and TikTok (disabled pending a product decision; the
+    "free" actor isn't free at $0.004/item). The relevance filter upstream
+    keeps keyword count to the dakwah-signal subset (~8/day observed).
     """
-    PLATFORMS = ("x",)
-    # Per-keyword cap. Bumped 20 → 100 (2026-05-26) so each trending
-    # topic returns a broader sample — at 20/kw most popular topics hit
-    # the cap with no room for sentiment / opinion diversity, which
-    # bottlenecks both topic-clustering downstream and the briefing
-    # synthesis's "sample headlines" surface. 100 buys 5× the depth at
-    # ~$8/mo extra Apify spend.
-    LIMIT = 100
+    # Per-keyword caps. X bumped 20 → 100 (2026-05-26) for sample depth
+    # (sentiment / opinion diversity for clustering + briefing headlines).
+    # YouTube capped at 25 — search.list maxResults ceils at 50, and 25
+    # keeps the per-keyword quota footprint small across the day's set.
+    X_LIMIT = 100
+    YT_LIMIT = 25
 
     keywords = trending_topics.get_trending_keywords()
     if not keywords:
@@ -281,20 +292,26 @@ def trending_ingest() -> dict[str, object]:
         return {"keywords": [], "dispatched": 0}
 
     dispatched = 0
-    for platform in PLATFORMS:
-        for keyword in keywords:
-            run_ingest.delay(platform=platform, query=keyword, limit=LIMIT)
-            dispatched += 1
+    for keyword in keywords:
+        run_ingest.delay(platform="x", query=keyword, limit=X_LIMIT)
+        run_ingest.delay(
+            platform="youtube",
+            query=keyword,
+            limit=YT_LIMIT,
+            youtube_search=True,
+        )
+        dispatched += 2
 
+    platforms = ["x", "youtube"]
     log.info(
         "trending_ingest.dispatched",
         keywords=keywords,
-        platforms=list(PLATFORMS),
+        platforms=platforms,
         dispatched=dispatched,
     )
     return {
         "keywords": keywords,
-        "platforms": list(PLATFORMS),
+        "platforms": platforms,
         "dispatched": dispatched,
     }
 
