@@ -480,6 +480,8 @@
     "filter_page_of": "Halaman {current} dari {total}",
     "filter_prev": "Sebelumnya",
     "filter_next": "Berikutnya",
+    "list_delete_aria": "Hapus kajian",
+    "list_delete_confirm": "Hapus kajian ini? Tidak bisa dibatalkan.",
     "nav_my_briefs": "Kajian saya"
   },
   "Dashboard": {

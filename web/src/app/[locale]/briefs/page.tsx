@@ -14,6 +14,8 @@ import {
   parsePageParam,
 } from "@/lib/month-filter";
 
+import { BriefDeleteButton } from "./BriefDeleteButton";
+
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/briefs">): Promise<Metadata> {
@@ -229,45 +231,54 @@ function BriefRow({
   const localeLabel = t(`locale_${brief.locale}` as Parameters<typeof t>[0]);
 
   return (
-    <Link
-      href={`/briefs/${brief.id}`}
-      className="group flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300 hover:shadow-md"
-    >
-      <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-emerald-500 text-white shadow-sm">
-        <ScrollText className="h-4 w-4" />
-      </span>
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <p className="truncate text-sm font-semibold text-slate-900 sm:text-base">
-            {brief.topicTitle}
-          </p>
-          {brief.isPlaceholder && process.env.NODE_ENV !== "production" && (
-            <span className="inline-flex items-center rounded-full bg-amber-50 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber-700">
-              placeholder
-            </span>
-          )}
-        </div>
-        <p className="mt-0.5 truncate text-xs text-slate-500">
-          <span className="font-medium text-slate-700">{segmentLabel}</span>
-          <span className="text-slate-300"> · </span>
-          {toneLabel}
-          <span className="text-slate-300"> · </span>
-          {localeLabel}
-          <span className="text-slate-300"> · </span>
-          <span className="tabular-nums">
-            {new Date(brief.createdAt).toLocaleDateString(
-              locale === "id" ? "id-ID" : "en-US",
-              {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-                timeZone: "Asia/Jakarta",
-              },
+    <div className="group flex items-stretch gap-1 rounded-2xl border border-slate-200 bg-white pr-2 shadow-sm transition hover:border-slate-300 hover:shadow-md">
+      <Link
+        href={`/briefs/${brief.id}`}
+        className="flex flex-1 items-center gap-3 p-4"
+      >
+        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-emerald-500 text-white shadow-sm">
+          <ScrollText className="h-4 w-4" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <p className="truncate text-sm font-semibold text-slate-900 sm:text-base">
+              {brief.topicTitle}
+            </p>
+            {brief.isPlaceholder && process.env.NODE_ENV !== "production" && (
+              <span className="inline-flex items-center rounded-full bg-amber-50 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber-700">
+                placeholder
+              </span>
             )}
-          </span>
-        </p>
-      </div>
-      <ArrowRight className="h-4 w-4 shrink-0 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-slate-700" />
-    </Link>
+          </div>
+          <p className="mt-0.5 truncate text-xs text-slate-500">
+            <span className="font-medium text-slate-700">{segmentLabel}</span>
+            <span className="text-slate-300"> · </span>
+            {toneLabel}
+            <span className="text-slate-300"> · </span>
+            {localeLabel}
+            <span className="text-slate-300"> · </span>
+            <span className="tabular-nums">
+              {new Date(brief.createdAt).toLocaleDateString(
+                locale === "id" ? "id-ID" : "en-US",
+                {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  timeZone: "Asia/Jakarta",
+                },
+              )}
+            </span>
+          </p>
+        </div>
+        <ArrowRight className="h-4 w-4 shrink-0 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-slate-700" />
+      </Link>
+      <BriefDeleteButton
+        briefId={brief.id}
+        labels={{
+          aria: t("list_delete_aria"),
+          confirm: t("list_delete_confirm"),
+        }}
+      />
+    </div>
   );
 }

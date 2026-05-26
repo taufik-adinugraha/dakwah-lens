@@ -1,7 +1,8 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { auth } from "@/auth";
@@ -372,3 +373,50 @@ const SEGMENT_LABELS: Record<string, { id: string; en: string }> = {
   rural_communities: { id: "Komunitas Pedesaan", en: "Rural Communities" },
   students: { id: "Pelajar & Mahasiswa", en: "Students" },
 };
+
+/* ────────────────────────────────────────────────────────────
+ * Delete a brief.
+ *
+ * Owner-only — non-owners get a not_found response (we don't leak
+ * existence). After deletion we revalidate /briefs so the list re-
+ * renders without the row. Per-brief detail page returns 404 on its
+ * own (DB row gone) so no extra cleanup needed.
+ * ──────────────────────────────────────────────────────────── */
+
+const DeleteBriefSchema = z.object({
+  brief_id: z.string().uuid(),
+});
+
+export type DeleteBriefResult =
+  | { ok: true }
+  | { ok: false; error: "auth_required" | "not_found" };
+
+export async function deleteBriefAction(
+  briefId: string,
+): Promise<DeleteBriefResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { ok: false, error: "auth_required" };
+  }
+  const parsed = DeleteBriefSchema.safeParse({ brief_id: briefId });
+  if (!parsed.success) {
+    return { ok: false, error: "not_found" };
+  }
+
+  const res = await db
+    .delete(schema.briefs)
+    .where(
+      and(
+        eq(schema.briefs.id, parsed.data.brief_id),
+        eq(schema.briefs.userId, session.user.id),
+      ),
+    )
+    .returning({ id: schema.briefs.id });
+
+  if (res.length === 0) {
+    return { ok: false, error: "not_found" };
+  }
+
+  revalidatePath("/briefs");
+  return { ok: true };
+}

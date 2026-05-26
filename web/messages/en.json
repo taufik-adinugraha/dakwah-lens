@@ -484,6 +484,8 @@
     "filter_page_of": "Page {current} of {total}",
     "filter_prev": "Previous",
     "filter_next": "Next",
+    "list_delete_aria": "Delete brief",
+    "list_delete_confirm": "Delete this brief? This cannot be undone.",
     "nav_my_briefs": "My briefs"
   },
   "Dashboard": {
