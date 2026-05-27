@@ -35,8 +35,20 @@ export async function resolveAssets(
     }),
   );
 
-  const [primary, ...rest] = await Promise.all([
+  // Open-mushaf photo for the du'a flyer background. Resolved from a
+  // literal asset (disk path) rather than the DB so it's robust even if
+  // the `quran-open` row was pruned — the file lives in public/.
+  const quranAsset: FlyerImageAsset = {
+    id: "quran-open",
+    kind: "photo",
+    src: "/flyer-assets/photos/quran-open.jpg",
+    aspect: "1:1",
+    tags: ["quran"],
+  };
+
+  const [primary, quranBg, ...rest] = await Promise.all([
     assetToDataUrl(primaryAsset),
+    assetToDataUrl(quranAsset),
     ...sharedAssets.map((a) => assetToDataUrl(a)),
   ]);
 
@@ -44,6 +56,7 @@ export async function resolveAssets(
 
   return {
     primary,
+    quranBg,
     starsRow,
     dotsPattern,
     arabesque,

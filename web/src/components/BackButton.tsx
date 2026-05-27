@@ -5,9 +5,9 @@ import { ArrowLeft } from "lucide-react";
 import { usePathname, useRouter } from "@/i18n/navigation";
 
 /**
- * Dynamic "back" control — a FLOATING fixed pill at the bottom-left,
- * mirroring the BackToTop button at the bottom-right so the two pair up
- * without colliding and stay reachable on long pages.
+ * Dynamic "back" control — a FLOATING fixed pill at the top-left, just
+ * below the sticky header (conventional "back" placement). The
+ * BackToTop button floats at the bottom-right, so the two never collide.
  *
  * It mirrors the browser's own back button — `router.back()` returns the
  * user to whatever page they actually came from, so the destination is
@@ -45,7 +45,7 @@ export function BackButton({ label }: { label: string }) {
       onClick={onClick}
       aria-label={label}
       title={label}
-      className="fixed bottom-5 left-4 z-40 inline-flex h-11 items-center gap-1.5 rounded-full bg-slate-900 pl-3 pr-4 text-sm font-semibold text-white shadow-lg shadow-slate-900/25 transition hover:bg-slate-700 sm:bottom-6 sm:left-6"
+      className="fixed left-4 top-20 z-40 inline-flex h-10 items-center gap-1.5 rounded-full bg-slate-900 pl-3 pr-4 text-sm font-semibold text-white shadow-lg shadow-slate-900/25 transition hover:bg-slate-700 sm:left-6"
     >
       <ArrowLeft className="h-4 w-4" />
       {label}

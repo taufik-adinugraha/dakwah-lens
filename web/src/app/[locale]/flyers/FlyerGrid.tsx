@@ -3,6 +3,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import {
+  ChevronDown,
   Download,
   Eye,
   Globe,
@@ -25,6 +26,22 @@ type Flyer = {
   /** Override the PNG URL. User flyers default to /api/user-flyers/{id}/png;
    *  system flyers point at the briefing flyer endpoint. */
   pngUrl?: string;
+  /** Type/topic — drive the gallery filters. Set for system flyers
+   *  (type = "Doa Pekan Ini" etc, topic = segment). Undefined for user
+   *  flyers (no fixed type/topic). */
+  typeLabel?: string;
+  topicLabel?: string;
+};
+
+type FilterLabels = {
+  source: string;
+  type: string;
+  topic: string;
+  month: string;
+  all: string;
+  sourceWeekly: string;
+  sourceUser: string;
+  empty: string;
 };
 
 type Labels = {
@@ -36,32 +53,163 @@ type Labels = {
   deleteConfirm: string;
   openLarge: string;
   download: string;
+  /** When present, the gallery renders the source/type/topic/month
+   *  filter bar. Omitted on /flyers/mine (single-source, no filters). */
+  filters?: FilterLabels;
 };
+
+function monthKey(iso: string): string {
+  return iso.slice(0, 7); // "YYYY-MM"
+}
 
 export function FlyerGrid({
   flyers,
   showDelete,
   labels,
+  locale,
 }: {
   flyers: Flyer[];
   /** When true, each tile shows a delete affordance. /flyers/mine sets this;
    *  /flyers/public doesn't (viewers can't delete other people's flyers). */
   showDelete?: boolean;
   labels: Labels;
+  /** For localized month labels in the filter dropdown. */
+  locale?: string;
 }) {
   const [items, setItems] = useState<Flyer[]>(flyers);
+  const [source, setSource] = useState("all");
+  const [type, setType] = useState("all");
+  const [topic, setTopic] = useState("all");
+  const [month, setMonth] = useState("all");
+
+  const f = labels.filters;
+
+  // Distinct option lists derived from the data (so options only show
+  // when they actually exist in the gallery).
+  const typeOptions = Array.from(
+    new Set(items.map((x) => x.typeLabel).filter(Boolean)),
+  ) as string[];
+  const topicOptions = Array.from(
+    new Set(items.map((x) => x.topicLabel).filter(Boolean)),
+  ) as string[];
+  const monthKeys = Array.from(new Set(items.map((x) => monthKey(x.createdAt))))
+    .sort()
+    .reverse();
+  const monthLabel = (key: string) => {
+    const [y, m] = key.split("-").map(Number);
+    return new Date(y, m - 1, 1).toLocaleDateString(locale || undefined, {
+      month: "long",
+      year: "numeric",
+    });
+  };
+
+  const filtered = items.filter((x) => {
+    if (source !== "all" && (x.kind ?? "user") !== source) return false;
+    if (type !== "all" && x.typeLabel !== type) return false;
+    if (topic !== "all" && x.topicLabel !== topic) return false;
+    if (month !== "all" && monthKey(x.createdAt) !== month) return false;
+    return true;
+  });
+
   return (
-    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {items.map((f) => (
-        <FlyerTile
-          key={f.id}
-          flyer={f}
-          showDelete={!!showDelete}
-          labels={labels}
-          onDeleted={() => setItems((xs) => xs.filter((x) => x.id !== f.id))}
-        />
-      ))}
-    </ul>
+    <>
+      {f && (
+        <div className="mb-6 flex flex-wrap gap-2">
+          <FilterSelect
+            label={f.source}
+            value={source}
+            onChange={setSource}
+            allLabel={f.all}
+            options={[
+              { value: "system", label: f.sourceWeekly },
+              { value: "user", label: f.sourceUser },
+            ]}
+          />
+          {typeOptions.length > 0 && (
+            <FilterSelect
+              label={f.type}
+              value={type}
+              onChange={setType}
+              allLabel={f.all}
+              options={typeOptions.map((o) => ({ value: o, label: o }))}
+            />
+          )}
+          {topicOptions.length > 0 && (
+            <FilterSelect
+              label={f.topic}
+              value={topic}
+              onChange={setTopic}
+              allLabel={f.all}
+              options={topicOptions.map((o) => ({ value: o, label: o }))}
+            />
+          )}
+          {monthKeys.length > 1 && (
+            <FilterSelect
+              label={f.month}
+              value={month}
+              onChange={setMonth}
+              allLabel={f.all}
+              options={monthKeys.map((k) => ({ value: k, label: monthLabel(k) }))}
+            />
+          )}
+        </div>
+      )}
+
+      {filtered.length === 0 ? (
+        <p className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center text-sm text-slate-500">
+          {f?.empty ?? ""}
+        </p>
+      ) : (
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((flyer) => (
+            <FlyerTile
+              key={flyer.id}
+              flyer={flyer}
+              showDelete={!!showDelete}
+              labels={labels}
+              onDeleted={() =>
+                setItems((xs) => xs.filter((x) => x.id !== flyer.id))
+              }
+            />
+          ))}
+        </ul>
+      )}
+    </>
+  );
+}
+
+function FilterSelect({
+  label,
+  value,
+  onChange,
+  allLabel,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  allLabel: string;
+  options: { value: string; label: string }[];
+}) {
+  return (
+    <div className="relative">
+      <select
+        aria-label={label}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="appearance-none rounded-full border border-slate-200 bg-white py-1.5 pl-3.5 pr-8 text-xs font-semibold text-slate-700 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+      >
+        <option value="all">
+          {label}: {allLabel}
+        </option>
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {label}: {o.label}
+          </option>
+        ))}
+      </select>
+      <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+    </div>
   );
 }
 

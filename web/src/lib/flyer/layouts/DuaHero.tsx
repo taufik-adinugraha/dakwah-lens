@@ -36,12 +36,6 @@ export const DuaHero: FlyerLayoutComponent = ({
     : "";
   const citation = daleel?.citation ?? "";
 
-  const bgStops = palette.bgGradient;
-  const bgStyle = {
-    // Soft 2-stop light gradient so the dark Arabic text stays readable.
-    background: `linear-gradient(155deg, ${bgStops[0]} 0%, ${bgStops[1]} 100%)`,
-  };
-
   // Tier the Arabic font size against character count — short du'a
   // (e.g. QS. Al-Anbiya: 87 "Lā ilāha illā anta…") gets very large
   // typography; long du'a (Hisnul Muslim morning adhkar paragraphs)
@@ -89,10 +83,25 @@ export const DuaHero: FlyerLayoutComponent = ({
   if (weight > 1700) transSize = 15;
 
   return (
-    <div
-      className="relative flex h-[1080px] w-[1080px] flex-col overflow-hidden"
-      style={bgStyle}
-    >
+    <div className="relative flex h-[1080px] w-[1080px] flex-col overflow-hidden bg-white">
+      {/* Default du'a-flyer backdrop: an open-mushaf photo under a heavy
+          white veil — white-dominated so the dark Arabic stays crisp and
+          the page reads calm + clean. The photo anchors lower so the top
+          (brand + Arabic) sits on near-pure white. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={assets.quranBg}
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.9) 45%, rgba(255,255,255,0.74) 100%)",
+        }}
+      />
+
       {/* Corner ornament — variant rotates star border / arabesque /
           geometric arcs. All three are subtle so the Arabic stays
           dominant. */}

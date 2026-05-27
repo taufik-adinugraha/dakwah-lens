@@ -110,6 +110,10 @@ export default async function PublicFlyersPage({
       visibility: "public" as const,
       createdAt: generatedAt.toISOString(),
       kind: "system" as const,
+      // Drives the gallery's Type + Topic filters. User flyers leave
+      // these undefined (they have no fixed type/segment).
+      typeLabel: VARIANT_LABEL[v],
+      topicLabel: segLabel,
       pngUrl: `/api/insights-brief/${slug}/flyer?variant=${v}&lang=${langParam}`,
     }));
   });
@@ -180,6 +184,7 @@ export default async function PublicFlyersPage({
       ) : (
         <FlyerGrid
           flyers={flyers}
+          locale={locale}
           labels={{
             visibilityBadgePublic: t("visibility_badge_public"),
             visibilityBadgePrivate: t("visibility_badge_private"),
@@ -188,6 +193,16 @@ export default async function PublicFlyersPage({
             deleteConfirm: t("delete_confirm"),
             openLarge: t("result_open_large"),
             download: t("result_download"),
+            filters: {
+              source: t("filter_source"),
+              type: t("filter_type"),
+              topic: t("filter_topic"),
+              month: t("filter_month"),
+              all: t("filter_all"),
+              sourceWeekly: t("filter_source_weekly"),
+              sourceUser: t("filter_source_user"),
+              empty: t("filter_empty"),
+            },
           }}
         />
       )}

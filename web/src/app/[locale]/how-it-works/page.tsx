@@ -7,9 +7,14 @@ import {
   Database,
   ExternalLink,
   GitBranch,
+  Globe2,
+  Hash,
   Layers,
+  MessageSquare,
+  Newspaper,
   ShieldCheck,
   Sparkles,
+  Video,
   Workflow,
 } from "lucide-react";
 
@@ -40,6 +45,7 @@ export default async function HowItWorksPage({
       <SystemDiagram t={t} />
       <IngestionPipeline t={t} />
       <DiscoveryStrategy t={t} />
+      <PlatformStrategy t={t} />
       <InsightsBriefingPipeline t={t} />
       <BriefPipeline t={t} />
       <ModelsTable t={t} />
@@ -558,6 +564,92 @@ function DiscoveryStrategy({ t }: { t: T }) {
         </div>
         <p className="mx-auto mt-6 max-w-3xl text-pretty text-center text-xs text-slate-500">
           {t("discovery_why_note")}
+        </p>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Per-platform ingest strategy. The DiscoveryStrategy section above
+ * explains the curated-vs-trending layering of keywords; this one
+ * spells out HOW each platform is actually scraped, since the method
+ * differs: RSS reads whole feeds (no keywords), the paid-Apify socials
+ * use keywords/hashtags weekly, and YouTube runs two paths at once
+ * (weekly whitelist channels + daily unbounded keyword search).
+ */
+function PlatformStrategy({ t }: { t: T }) {
+  const cards: Array<{
+    icon: typeof Layers;
+    tone: keyof typeof TONE_STYLES;
+    title: string;
+    body: string;
+  }> = [
+    {
+      icon: Newspaper,
+      tone: "amber",
+      title: t("platforms_rss_title"),
+      body: t("platforms_rss_body"),
+    },
+    {
+      icon: MessageSquare,
+      tone: "slate",
+      title: t("platforms_x_title"),
+      body: t("platforms_x_body"),
+    },
+    {
+      icon: Video,
+      tone: "slate",
+      title: t("platforms_tiktok_title"),
+      body: t("platforms_tiktok_body"),
+    },
+    {
+      icon: Hash,
+      tone: "violet",
+      title: t("platforms_ig_title"),
+      body: t("platforms_ig_body"),
+    },
+    {
+      icon: Globe2,
+      tone: "emerald",
+      title: t("platforms_yt_title"),
+      body: t("platforms_yt_body"),
+    },
+  ];
+
+  return (
+    <section className="border-y border-slate-100 bg-slate-50/40 py-12 sm:py-16">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <SectionHeader
+          title={t("platforms_title")}
+          subtitle={t("platforms_subtitle")}
+        />
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {cards.map((c) => {
+            const Icon = c.icon;
+            const s = TONE_STYLES[c.tone];
+            return (
+              <article
+                key={c.title}
+                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+              >
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${s.bg}`}
+                  >
+                    <Icon className={`h-4 w-4 ${s.icon}`} />
+                  </span>
+                  <h3 className="text-sm font-bold text-slate-900">{c.title}</h3>
+                </div>
+                <p className="mt-3 text-pretty text-sm leading-relaxed text-slate-600">
+                  {c.body}
+                </p>
+              </article>
+            );
+          })}
+        </div>
+        <p className="mx-auto mt-6 max-w-3xl text-pretty text-center text-xs text-slate-500">
+          {t("platforms_note")}
         </p>
       </div>
     </section>

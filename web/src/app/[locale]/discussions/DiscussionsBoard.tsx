@@ -105,7 +105,16 @@ export function DiscussionsBoard({
 }) {
   const [segment, setSegment] = useState<string>("all");
   const [status, setStatus] = useState<StatusFilter>("all");
-  const [week, setWeek] = useState<string>("all");
+  // Default to the most recent week so the board opens on this week's
+  // discussions; the user can widen to "all" via the dropdown. weekKey
+  // is a WIB date string (YYYY-MM-DD), so the lexical max is the newest.
+  const [week, setWeek] = useState<string>(() => {
+    let newest = "all";
+    for (const r of initialItems) {
+      if (newest === "all" || r.weekKey > newest) newest = r.weekKey;
+    }
+    return newest;
+  });
   const [onlyMine, setOnlyMine] = useState(false);
   const [page, setPage] = useState(1);
   const [mineSlugs, setMineSlugs] = useState<Set<string>>(() => new Set());
