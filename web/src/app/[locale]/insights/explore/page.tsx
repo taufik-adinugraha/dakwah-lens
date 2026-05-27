@@ -77,7 +77,7 @@ export default async function InsightsExplorePage({
     getPlatformDistribution7d(),
     getSentimentDistribution7d(),
     getSentimentByPlatform7d(),
-    getTopicDistribution7d(10),
+    getTopicDistribution7d(5),
     getTopicsByPlatform7d(5),
   ]);
 
