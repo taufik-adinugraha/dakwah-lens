@@ -45,10 +45,9 @@ export function BackButton({ label }: { label: string }) {
       onClick={onClick}
       aria-label={label}
       title={label}
-      className="fixed left-4 top-20 z-40 inline-flex h-10 items-center gap-1.5 rounded-full bg-slate-900 pl-3 pr-4 text-sm font-semibold text-white shadow-lg shadow-slate-900/25 transition hover:bg-slate-700 sm:left-6"
+      className="fixed left-4 top-20 z-40 inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-white shadow-lg shadow-slate-900/25 transition hover:bg-slate-700 sm:left-6"
     >
       <ArrowLeft className="h-4 w-4" />
-      {label}
     </button>
   );
 }
