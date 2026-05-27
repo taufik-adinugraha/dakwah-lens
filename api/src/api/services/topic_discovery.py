@@ -212,16 +212,19 @@ def discover_topics(
                     response_mime_type="application/json",
                     response_schema=response_schema,
                     temperature=0.2,
-                    # 16K output cap. With 1238 posts across 10 themes,
-                    # measured real output ~9K tokens; 16K leaves ample
-                    # headroom without giving the model room to spiral
-                    # into long out-of-range index dumps. Flash-Lite at
-                    # 32K had a runaway-output failure mode where the
-                    # response continued past the sample range emitting
-                    # contiguous integer runs (5000+) then truncated;
-                    # the tighter cap on Flash, combined with the schema,
-                    # forces clean concise output.
-                    max_output_tokens=16384,
+                    # 32K output cap. The unified pool (all platforms in
+                    # one pass) is much larger than the old per-platform
+                    # corpus — ~3K posts vs ~1.2K — and the post_indices
+                    # output scales with assigned-post count. At 16K the
+                    # 2997-post pool truncated mid-JSON (FinishReason.
+                    # MAX_TOKENS at ~16.3K tokens_out → parse failure on
+                    # every retry → no themes persisted). The old runaway
+                    # failure mode (Flash-Lite at 32K emitting contiguous
+                    # 5000+ integer runs) was a Flash-Lite quirk; Flash
+                    # with thinking_budget=0 + the response_schema stays
+                    # disciplined, so 32K just buys the headroom the
+                    # larger pool needs.
+                    max_output_tokens=32768,
                     # Disable thinking entirely. The Flash-Lite history
                     # of `thinking_budget=0 → 4096 → 0` reflects this:
                     # explicit thinking budget on Flash-Lite was burned
