@@ -1,17 +1,25 @@
 """Topic discovery over `social_posts` — refreshes the `topics` table.
 
-Driven by a Gemini Flash-Lite call (see `services/topic_discovery`).
+Driven by a Gemini Flash call (see `services/topic_discovery`).
 
-Pipeline (per platform):
-  1. Pull recent posts for the platform (text + id + posted_at).
-  2. Hand them to `services.topic_discovery.discover_topics`, which
-     samples ~100, asks Gemini for 5-8 themes with Indonesian labels,
-     and returns `[{label, keywords, post_ids}]`.
-  3. Truncate `topics` for this platform, insert new rows, update each
-     post's `topic_id`. Posts not assigned to any theme get `topic_id = NULL`.
+UNIFIED across platforms (2026-05-27): topic discovery runs ONCE over the
+whole recent corpus (mainstream + X + YouTube + …), producing a single
+set of cross-platform themes stored with `platform = "all"`. Previously
+each platform was clustered independently, which produced near-duplicate
+themes (e.g. mainstream "Ibadah Haji & Idul Adha" + YouTube "Persiapan
+Haji & Idul Adha"). One pooled pass dedupes by construction; per-platform
+breakdowns are derived downstream from each post's own `platform`.
+
+Pipeline:
+  1. Pull recent posts across ALL platforms (text + id + posted_at),
+     stratified per WIB day, above the da'wah-opportunity floor.
+  2. Hand them to `services.topic_discovery.discover_topics`, which asks
+     Gemini for 6-10 themes with Indonesian labels and returns
+     `[{label, keywords, post_ids}]`.
+  3. Truncate `topics`, insert the new unified rows, re-point each post's
+     `topic_id`. Posts not assigned to any theme get `topic_id = NULL`.
 
 Usage:
-    uv run python -m api.scripts.cluster_topics --platform x
     uv run python -m api.scripts.cluster_topics --all
 """
 
@@ -74,9 +82,15 @@ DAY_TZ = "Asia/Jakarta"
 # don't accidentally exclude content that just hasn't been re-classified.
 MIN_OPPORTUNITY_FOR_DISCOVERY = 0.4
 
+# Sentinel platform for the unified topic set. All discovered topics are
+# stored under this value; the per-platform breakdown is derived from
+# each post's own `social_posts.platform` downstream.
+UNIFIED_PLATFORM = "all"
 
-async def _fetch_recent_posts(platform: str) -> list[dict[str, Any]]:
-    """Pull stratified recent posts above the da'wah-opportunity floor.
+
+async def _fetch_recent_posts() -> list[dict[str, Any]]:
+    """Pull stratified recent posts across ALL platforms, above the
+    da'wah-opportunity floor.
 
     Mainstream RSS publishes ~50% routine news the model can't form a
     da'wah theme out of (stock prices, sports scores, traffic alerts).
@@ -85,7 +99,8 @@ async def _fetch_recent_posts(platform: str) -> list[dict[str, Any]]:
 
     Stratification: PER_DAY_CAP posts per WIB day, newest-first within
     each day. Returns up to SAMPLE_HARD_CEILING rows ordered overall
-    newest-first.
+    newest-first. Pooling every platform means the whole week's corpus
+    (mainstream + X + YouTube + …) feeds one discovery pass.
     """
     async with SessionLocal() as session:
         window_start = datetime.now(UTC) - timedelta(
@@ -121,7 +136,6 @@ async def _fetch_recent_posts(platform: str) -> list[dict[str, Any]]:
                 )
                 .label("rn"),
             )
-            .where(SocialPost.platform == platform)
             .where(SocialPost.posted_at >= window_start)
             .where(
                 sql_or(
@@ -153,13 +167,12 @@ async def _fetch_recent_posts(platform: str) -> list[dict[str, Any]]:
 
 
 async def _persist(
-    platform: str,
     posts: list[dict[str, Any]],
     themes: list[dict[str, Any]],
 ) -> int:
-    """Replace this platform's topics, then re-point each post to its theme."""
+    """Replace ALL topics with the unified set, then re-point each post."""
     if not themes:
-        log.warning("topics.no_themes", platform=platform)
+        log.warning("topics.no_themes")
         return 0
 
     # Aggregate per-theme posted_at range. We don't have it inside the
@@ -167,14 +180,10 @@ async def _persist(
     post_by_id: dict[UUID, dict[str, Any]] = {p["id"]: p for p in posts}
 
     async with SessionLocal() as session:
-        # Clear FKs from posts (FK is ON DELETE SET NULL so technically
-        # unnecessary, but doing it explicitly keeps DB state legible).
-        await session.execute(
-            update(SocialPost)
-            .where(SocialPost.platform == platform)
-            .values(topic_id=None)
-        )
-        await session.execute(delete(Topic).where(Topic.platform == platform))
+        # Full rebuild: drop every topic. The FK `social_posts.topic_id`
+        # is ON DELETE SET NULL, so this auto-clears every post's
+        # topic_id — no separate UPDATE needed.
+        await session.execute(delete(Topic))
 
         n_persisted = 0
         for cluster_id, theme in enumerate(themes):
@@ -194,7 +203,7 @@ async def _persist(
                     stats_last = posted
 
             topic_row = Topic(
-                platform=platform,
+                platform=UNIFIED_PLATFORM,
                 cluster_id=cluster_id,
                 label=theme["label"],
                 keywords=theme["keywords"],
@@ -219,23 +228,24 @@ async def _persist(
     return n_persisted
 
 
-async def _run(platform: str) -> int:
-    posts = await _fetch_recent_posts(platform)
+async def _run() -> int:
+    """Run one unified discovery pass over the whole recent corpus."""
+    posts = await _fetch_recent_posts()
     if len(posts) < MIN_POSTS_FOR_DISCOVERY:
         print(
-            f"⚠ Only {len(posts)} posts for `{platform}` — need >= "
+            f"⚠ Only {len(posts)} posts in the corpus — need >= "
             f"{MIN_POSTS_FOR_DISCOVERY} for meaningful themes. Skipping."
         )
         return 0
 
-    print(f"  Discovering themes on {len(posts)} `{platform}` posts via Gemini …")
-    themes = discover_topics(posts, platform=platform)
+    print(f"  Discovering themes on {len(posts)} posts (all platforms) via Gemini …")
+    themes = discover_topics(posts, platform=UNIFIED_PLATFORM)
 
-    n_themes = await _persist(platform, posts, themes)
+    n_themes = await _persist(posts, themes)
     n_assigned = sum(len(t["post_ids"]) for t in themes)
     n_orphan = len(posts) - n_assigned
     print(
-        f"✓ Discovered {n_themes} themes on `{platform}` "
+        f"✓ Discovered {n_themes} unified themes "
         f"({n_assigned} assigned, {n_orphan} orphan)"
     )
     for t in themes:
@@ -244,42 +254,21 @@ async def _run(platform: str) -> int:
     return n_themes
 
 
-async def _list_platforms_with_data() -> list[str]:
-    async with SessionLocal() as session:
-        res = await session.execute(select(SocialPost.platform).distinct())
-        return [row[0] for row in res.all()]
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Discover topics over social_posts using Gemini Flash-Lite."
-    )
-    parser.add_argument(
-        "--platform",
-        help="Single platform to cluster (e.g. x, tiktok, youtube, mainstream).",
-    )
-    parser.add_argument(
-        "--all",
-        action="store_true",
-        help="Cluster every platform with enough posts.",
-    )
-    args = parser.parse_args()
-
-    if not args.platform and not args.all:
-        parser.error("Pass --platform <name> or --all")
-
-    async def runner() -> None:
-        platforms = (
-            [args.platform] if args.platform else await _list_platforms_with_data()
+        description=(
+            "Discover topics over social_posts using Gemini Flash. Runs one "
+            "UNIFIED pass over all platforms (no per-platform split)."
         )
-        for p in platforms:
-            try:
-                await _run(p)
-            except Exception as exc:
-                log.error("cluster.failed", platform=p, error=str(exc))
+    )
+    # `--all` / `--platform` retained as no-ops for backward compat with
+    # existing cron + muscle memory; clustering is always unified now.
+    parser.add_argument("--all", action="store_true", help="(default; no-op)")
+    parser.add_argument("--platform", help="(deprecated; ignored — clustering is unified)")
+    parser.parse_args()
 
     try:
-        asyncio.run(runner())
+        asyncio.run(_run())
     except Exception as e:
         log.error("cluster.failed", error=str(e))
         sys.exit(1)

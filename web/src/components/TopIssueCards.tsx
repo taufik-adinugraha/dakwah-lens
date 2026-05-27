@@ -69,9 +69,16 @@ export function TopIssueCards({
               {i.title}
             </h3>
             <p className="mt-1 text-xs font-medium uppercase tracking-wider text-slate-500">
-              {i.platform}
-              {i.keywords.length > 0 && (
-                <span className="text-slate-300"> · </span>
+              {/* Topics are unified across platforms (platform="all"); the
+                  per-card platform label is only meaningful for legacy
+                  single-platform topics, so hide it for "all". */}
+              {i.platform && i.platform !== "all" && (
+                <>
+                  {i.platform}
+                  {i.keywords.length > 0 && (
+                    <span className="text-slate-300"> · </span>
+                  )}
+                </>
               )}
               {i.keywords.slice(0, 2).join(" · ")}
             </p>

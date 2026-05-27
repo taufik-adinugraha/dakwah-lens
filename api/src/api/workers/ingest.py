@@ -318,36 +318,32 @@ def trending_ingest() -> dict[str, object]:
 
 @celery_app.task(name="api.workers.ingest.recluster_all")
 def recluster_all(platforms: list[str] | None = None) -> dict[str, int]:
-    """Re-run Gemini topic discovery on the requested platforms.
+    """Re-run UNIFIED Gemini topic discovery over the whole corpus.
 
-    `platforms=None` clusters every platform that has posts (legacy
-    behavior). Pass an explicit list to scope the run — used by beat
-    to split daily-ingest platforms (RSS, YT) from weekly-ingest X,
-    so we don't re-cluster the same X corpus 6 days in a row.
+    Since 2026-05-27 clustering is unified across all platforms into a
+    single topic set (`platform="all"`) — pooling one pass dedupes the
+    near-identical themes the old per-platform split produced. The
+    `platforms` arg is accepted for backward-compat with existing beat
+    kwargs but IGNORED.
 
-    Idempotent — each run truncates the platform's topics and writes
-    fresh ones from the most recent corpus.
+    Idempotent — each run truncates `topics` and writes fresh unified
+    rows from the most recent corpus.
     """
 
     async def _runner() -> dict[str, int]:
-        out: dict[str, int] = {}
-        targets = platforms or await cluster_topics._list_platforms_with_data()
-        for platform in targets:
-            run_id = await ingest_runs.start_run(
-                task_name="recluster_all", platform=platform
+        run_id = await ingest_runs.start_run(
+            task_name="recluster_all", platform="all"
+        )
+        try:
+            n = await cluster_topics._run()
+            await ingest_runs.finish_run(
+                run_id, status="success", items_stored=n
             )
-            try:
-                n = await cluster_topics._run(platform)
-                out[platform] = n
-                await ingest_runs.finish_run(
-                    run_id, status="success", items_stored=n
-                )
-            except Exception as exc:
-                await ingest_runs.finish_run(
-                    run_id, status="failed", error=str(exc)
-                )
-                log.exception("recluster.failed", platform=platform)
-        return out
+            return {"all": n}
+        except Exception as exc:
+            await ingest_runs.finish_run(run_id, status="failed", error=str(exc))
+            log.exception("recluster.failed")
+            return {"all": 0}
 
     return asyncio.run(_runner())
 

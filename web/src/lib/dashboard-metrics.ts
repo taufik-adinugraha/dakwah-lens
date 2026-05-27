@@ -1627,6 +1627,13 @@ export type TopicByPlatformGroup = {
  * topics yet. `pct` is share of that platform's total topic volume
  * (so percentages sum to ~100 within each platform, not across).
  *
+ * Topics are now UNIFIED (cluster_topics clusters all platforms into one
+ * set, `topics.platform = "all"`), so the per-platform breakdown is
+ * derived from each POST's own `social_posts.platform`: for each
+ * platform, the top unified topics that have posts from it in the 7d
+ * window. A topic can therefore appear under multiple platforms (e.g. a
+ * theme discussed on both mainstream and YouTube).
+ *
  * Used by the "topics by platform" dialog on the coverage breakdown.
  */
 export async function getTopicsByPlatform7d(
@@ -1636,16 +1643,19 @@ export async function getTopicsByPlatform7d(
     SELECT platform, id, label, post_count, platform_total
     FROM (
       SELECT
-        t.platform,
+        sp.platform AS platform,
         t.id::text AS id,
-        t.label,
-        t.post_count,
-        SUM(t.post_count) OVER (PARTITION BY t.platform) AS platform_total,
+        t.label AS label,
+        count(sp.id) AS post_count,
+        SUM(count(sp.id)) OVER (PARTITION BY sp.platform) AS platform_total,
         row_number() OVER (
-          PARTITION BY t.platform ORDER BY t.post_count DESC
+          PARTITION BY sp.platform ORDER BY count(sp.id) DESC
         ) AS rn
       FROM topics t
-      WHERE t.post_count > 0
+      JOIN social_posts sp
+        ON sp.topic_id = t.id
+       AND sp.posted_at >= now() - interval '7 days'
+      GROUP BY sp.platform, t.id, t.label
     ) ranked
     WHERE rn <= ${perPlatform}
     ORDER BY platform, post_count DESC

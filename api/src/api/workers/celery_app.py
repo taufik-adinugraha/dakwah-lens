@@ -156,29 +156,20 @@ celery_app.conf.update(
         # ~$0.05/platform/run, so we only re-cluster when there's fresh
         # data to find themes in.
         #
-        # Daily 04:00 WIB → RSS (every-2h ingest) + YouTube. 1–2h after
-        # RSS's 02:00 WIB tick gives fresh material; well before the
-        # workday so /insights shows current themes.
+        # Daily 04:00 WIB → ONE unified topic-discovery pass over the
+        # whole corpus (mainstream + X + TikTok + IG + YouTube). 1–2h
+        # after RSS's 02:00 WIB tick gives fresh material; well before
+        # the workday so /insights shows current themes.
         #
-        # YouTube earns its daily slot via the `trending-ingest` task
-        # (daily 12:00 WIB), which keyword-searches all of YouTube — so
-        # the `youtube` platform gets fresh rows every day, not just on
-        # the weekly channel-scan day. (Briefly dropped 2026-05-27 when YT
-        # had no daily source; restored 2026-05-27 alongside the trending
-        # YT search.)
+        # Unified since 2026-05-27 (was split daily mainstream+YT /
+        # weekly social): per-platform clustering produced near-duplicate
+        # themes across platforms. One pooled pass dedupes by
+        # construction; per-platform breakdowns are derived downstream
+        # from each post's own platform. Re-clustering the whole corpus
+        # daily costs ~$0.05/run on Gemini Flash — negligible.
         "recluster-daily": {
             "task": "api.workers.ingest.recluster_all",
             "schedule": crontab(minute=0, hour=4),
-            "kwargs": {"platforms": ["mainstream", "youtube"]},
-        },
-        # Thursday 04:00 WIB → weekly-ingest social platforms (X +
-        # TikTok + Instagram), 6h after the Wed 22:00 WIB social burst.
-        # Running daily would re-cluster the identical corpus 6 days a
-        # week for no new signal.
-        "recluster-social-weekly": {
-            "task": "api.workers.ingest.recluster_all",
-            "schedule": crontab(minute=0, hour=4, day_of_week=4),
-            "kwargs": {"platforms": ["x", "tiktok", "instagram"]},
         },
         # Insights briefing generation — PAUSED 2026-05-23 for cost.
         #
