@@ -71,7 +71,10 @@ export const DuaHero: FlyerLayoutComponent = ({
     assets.duaBackgrounds.length > 0 ? assets.duaBackgrounds : [assets.primary];
   const rot = hashStr(`${citation}|${arLen}|${dateLabel}`);
   const bgSrc = bgPool[rot % bgPool.length];
-  const composition = rot % 3;
+  // Decorrelate composition from the bg index (different bits of the
+  // hash) so image and layout vary independently — otherwise composition
+  // i would always pair with background i.
+  const composition = (rot >>> 8) % 3;
 
   const p: DuaProps = {
     arabic,

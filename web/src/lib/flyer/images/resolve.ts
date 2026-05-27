@@ -39,11 +39,13 @@ export async function resolveAssets(
   // rotates through these (by edition variant) so successive du'a
   // flyers don't all look the same. Resolved from literal disk paths
   // (robust if the DB rows were pruned; the files live in public/).
+  // Hand-vetted to ONLY clean, on-theme Islamic photos. The pool's
+  // `open-book.jpg` (a coffee mug reading "The Adventure Begins") and
+  // `dome-interior.jpg` (a city skyline) are mislabeled junk — excluded.
   const DUA_BG_SRCS = [
-    "/flyer-assets/photos/quran-open.jpg",
-    "/flyer-assets/photos/open-book.jpg",
-    "/flyer-assets/photos/dome-interior.jpg",
-    "/flyer-assets/photos/mosque-interior.jpg",
+    "/flyer-assets/photos/quran-open.jpg", // open mushaf on a stand (warm)
+    "/flyer-assets/photos/minaret-sky.jpg", // blue-dome mosque, golden sky
+    "/flyer-assets/photos/mosque-interior.jpg", // navy mushaf cover
   ];
   const duaBgAssets: FlyerImageAsset[] = DUA_BG_SRCS.map((src, i) => ({
     id: `dua-bg-${i}`,
