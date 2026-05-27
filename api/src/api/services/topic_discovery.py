@@ -1,12 +1,28 @@
-"""LLM-driven topic discovery via Gemini Flash-Lite.
+"""LLM-driven topic discovery via Gemini Flash — index-free design.
 
-Gemini handles this job well for our corpus:
+Gemini handles theme NAMING well for our corpus:
   - Native Indonesian + English support
   - Short tweets/captions (<140 chars) are fine
   - Produces human-readable Bahasa Indonesia labels
   - Picks meaningful themes, not surface-form keyword noise
 
-One Gemini call per platform per day → ~$0.36/mo total.
+POST→THEME ASSIGNMENT is done OURSELVES via embedding similarity, NOT by
+the LLM (2026-05-27 rewrite). History: the model used to echo back a
+`post_indices` array for every theme, so output size scaled linearly
+with corpus size. At the unified ~3K-post pool that output ran away —
+the model emitted near-contiguous integer runs (… 1532, 1533, 1534 …)
+and truncated against the output-token cap on every retry (16K AND 32K
+both failed), persisting zero themes. Decoupling assignment from the LLM
+makes Gemini output tiny and CONSTANT (just 6-10 labels + keywords)
+regardless of how big the pipeline grows, and kills the hallucinated /
+runaway-index failure mode for good.
+
+Pipeline:
+  1. Gemini reads the sampled corpus → returns 6-10 themes, each just
+     {label, keywords}. Bounded output (~hundreds of tokens).
+  2. Embed each theme (label + keywords) and each post via OpenAI.
+  3. Assign every post to its nearest theme by cosine similarity, above
+     a floor; posts below the floor stay orphan (topic_id NULL).
 
 Writes to the `topics` table; `/insights/[platform]` reads from there.
 """
@@ -17,47 +33,58 @@ import json
 import time
 from typing import Any
 
+import numpy as np
 import structlog
 from google import genai
 from google.genai import errors as genai_errors
 from google.genai import types
+from openai import OpenAI
 
 from api.config import settings
 
 log = structlog.get_logger()
 
 MODEL = "gemini-2.5-flash"
-# Switched 2026-05-25 from `gemini-2.5-flash-lite`. Flash-Lite at the
-# 1200-post-corpus scale had two recurring failure modes:
-#   1. Thinking spiral — `thoughts_token_count` ballooned to 32K (the
-#      entire output budget) despite `thinking_budget=4096`, leaving
-#      `candidates_token_count=0` and an empty `{}` response. Yielded
-#      `topic_discovery.done themes=0` → `_persist` early-return → no
-#      topics persisted → dashboard "isu naik" = 0.
-#   2. Hallucinated indices — when output WAS generated, `post_indices`
-#      contained contiguous integer runs (e.g. 5034, 5035, … 5090, …)
-#      far outside the actual sample range (max 1237), then truncated
-#      mid-number against `max_output_tokens=32768`.
-#
-# Flash + `thinking_budget=0` on the same 1238-post sample produced 10
-# distinct themes with 92% sample coverage, zero out-of-range indices,
-# clean STOP finish_reason, ~$0.05 per call. Cost delta vs Flash-Lite
-# is ~$1.40/mo — negligible vs the dashboard signal we get back.
+# Flash (not Flash-Lite) + thinking_budget=0. Flash-Lite had a
+# thinking-spiral failure mode (thoughts_token_count ate the whole
+# budget, candidates_token_count=0 → empty response). Flash with
+# thinking disabled produces clean structured JSON. With assignment now
+# off-loaded to embeddings the output is tiny either way, but Flash's
+# labels are noticeably better than Lite's, and the cost delta on a
+# labels-only response is negligible.
 
-# Hard cap on how many posts we ever send to Gemini in one call.
-# Sized to match the caller's stratified sample ceiling (PER_DAY_CAP ×
-# TOPIC_DISCOVERY_WINDOW_DAYS = 800 × 7 = 5600 in
-# cluster_topics.py). At ~200 chars each + system prompt this lands
-# around 280K input tokens — well inside Flash-Lite's 1M context, ~$0.03
-# per recluster call. Earlier values: 100 (truncated 80% of input,
-# 2026-05-21) → 2000 (clipped to 1.6 days at busy news pace,
-# 2026-05-22) → 5600 stratified (2026-05-23).
+# Hard cap on how many posts we send to Gemini in one call (for naming)
+# and embed for assignment. Input-only now that the model no longer
+# echoes indices, so this bounds input tokens + embedding spend, not
+# output. At ~200 chars each this lands ~280K input tokens for Gemini
+# (well inside Flash's 1M context) and ~180K embedding tokens (~$0.004
+# at text-embedding-3-small). Caller's stratified pool tops out lower
+# (PER_DAY_CAP × WINDOW = 7000) so this is rarely the binding limit.
 SAMPLE_SIZE = 5600
 
-# Truncate each post's text to control input tokens. Tweets / captions
-# usually fit in 200 chars; mainstream articles get cut to the lede
-# which is the most theme-bearing part anyway.
+# Truncate each post's text to control input + embedding tokens. Tweets
+# / captions usually fit in 200 chars; mainstream articles get cut to
+# the lede which is the most theme-bearing part anyway. The SAME
+# truncation feeds both Gemini (naming) and the embedder (assignment) so
+# the model and the vectors see identical text.
 MAX_TEXT_CHARS = 200
+
+# A post is assigned to its nearest theme only if cosine similarity
+# clears this floor; otherwise it's left orphan (topic_id NULL — same
+# outcome as the old design omitting an unclustered post). Tuned for
+# text-embedding-3-small, where related short Indonesian texts sit around
+# 0.3-0.5 and unrelated ones around 0.1-0.2. 0.28 keeps plausible matches
+# while dropping noise. OBSERVE the orphan rate after deploy: too many
+# orphans → lower this; themes polluted by weak matches → raise it.
+MIN_SIMILARITY = 0.28
+
+# A theme needs at least this many assigned posts to survive. Mirrors the
+# old prompt rule ("a theme needs at least 2 posts"); a 1-post theme is
+# usually an embedding fluke, not a trend.
+MIN_POSTS_PER_THEME = 2
+
+# OpenAI caps inputs per embeddings request; chunk well under it.
+EMBED_BATCH = 1000
 
 
 SYSTEM_PROMPT = """You analyze recent Indonesian news posts and group them into themes a DA'I would actually pick up for khutbah, kajian, or da'wah content this week.
@@ -89,15 +116,11 @@ Return 6-10 distinct themes (target: closer to 8-10 when the input pool is large
 
   Rule of thumb: if the label sounds like a Kompas/Detik section header, REPHRASE it from a da'wah angle. The label should make a da'i say "yes, I can build a khutbah from that this week."
 
-- keywords: 3-5 distinctive keywords (Bahasa Indonesia preferred). Avoid stopwords (yang, dan, atau, dengan, untuk, akan, masih, sebelum, terkait, dari, ke) and URL artifacts (republikacoid, kompascom).
-
-- post_indices: 0-based input indices that fit this theme.
+- keywords: 3-5 distinctive keywords (Bahasa Indonesia preferred). These keywords are ALSO used to match posts to this theme by meaning, so pick words that are specific and central to the theme. Avoid stopwords (yang, dan, atau, dengan, untuk, akan, masih, sebelum, terkait, dari, ke) and URL artifacts (republikacoid, kompascom).
 
 Rules:
-- Each post belongs to AT MOST ONE theme. If it fits multiple, pick the strongest da'wah angle.
-- A theme needs at least 2 posts. Don't create a theme for a single story unless it's an unmistakable event (e.g. one major political assassination would deserve its own theme).
 - Themes must be DISTINCT — don't split one theme into two near-duplicates.
-- Cover the bulk of the input. Posts that genuinely don't cluster can be omitted.
+- Cover the main currents in the input. You don't need to account for every post; posts that don't fit any theme are fine to leave out (they will simply not be assigned).
 - If multiple stories share a clear pattern (e.g. 3 separate child-abuse cases involving religious figures), group them under ONE specific theme ("Pelecehan oleh Tokoh Agama"), not three "miscellaneous crime" entries.
 
 PREFER SUBDIVIDE OVER GENERALIZE:
@@ -109,11 +132,12 @@ When you're tempted to widen a label (e.g. "Kekerasan dan Kriminalitas Jalanan")
 A da'i can build a specific khutbah from a tight theme; a generic bucket gives no angle.
 
 Return ONLY valid JSON:
-{"themes": [{"label": "...", "keywords": ["...", ...], "post_indices": [0, 5, ...]}, ...]}
+{"themes": [{"label": "...", "keywords": ["...", ...]}, ...]}
 """
 
 
 _client: genai.Client | None = None
+_openai_client: OpenAI | None = None
 
 
 def _get_client() -> genai.Client:
@@ -125,17 +149,56 @@ def _get_client() -> genai.Client:
     return _client
 
 
+def _get_openai() -> OpenAI:
+    if not settings.openai_api_key:
+        raise RuntimeError("OPENAI_API_KEY is not set. Add to .env.")
+    global _openai_client
+    if _openai_client is None:
+        _openai_client = OpenAI(api_key=settings.openai_api_key)
+    return _openai_client
+
+
+def _embed_texts(texts: list[str]) -> np.ndarray:
+    """Embed `texts` via OpenAI, returning an L2-normalized (N, D) matrix.
+
+    Batches to stay under the per-request input cap and records spend on
+    the api-costs dashboard. Normalizing here lets the caller compute
+    cosine similarity as a plain dot product.
+    """
+    from api.services.usage import record_usage
+
+    openai = _get_openai()
+    vectors: list[list[float]] = []
+    for start in range(0, len(texts), EMBED_BATCH):
+        batch = texts[start : start + EMBED_BATCH]
+        emb = openai.embeddings.create(model=settings.embedding_model, input=batch)
+        vectors.extend(d.embedding for d in emb.data)
+        record_usage(
+            provider="openai",
+            operation="embedding",
+            model=settings.embedding_model,
+            tokens_in=getattr(emb.usage, "total_tokens", None),
+            meta={"context": "topic_discovery", "n": len(batch)},
+        )
+
+    mat = np.asarray(vectors, dtype=np.float32)
+    norms = np.linalg.norm(mat, axis=1, keepdims=True)
+    norms[norms == 0] = 1.0  # guard against a zero vector
+    return mat / norms
+
+
 def discover_topics(
     posts: list[dict[str, Any]],
     *,
     platform: str,
     sample_size: int = SAMPLE_SIZE,
 ) -> list[dict[str, Any]]:
-    """Identify themes in a corpus via Gemini Flash-Lite.
+    """Identify themes in a corpus and assign posts to them.
 
     `posts` is a list of dicts with at least {id, text}. We sample the
     most recent `sample_size` posts (assumed already sorted recent-first
-    by the caller) and ask Gemini to cluster them by theme.
+    by the caller), ask Gemini to NAME 6-10 themes, then assign each post
+    to its nearest theme by embedding cosine similarity.
 
     Returns a list of theme dicts:
         [{"label": str, "keywords": list[str], "post_ids": list[UUID]}]
@@ -147,19 +210,19 @@ def discover_topics(
         return []
 
     sample = posts[:sample_size]
-    numbered_texts = []
+    indexed_texts: list[tuple[int, str]] = []
     for i, p in enumerate(sample):
         text = (p.get("text") or "")[:MAX_TEXT_CHARS].replace("\n", " ").strip()
         if text:
-            numbered_texts.append(f"[{i}] {text}")
+            indexed_texts.append((i, text))
 
-    if not numbered_texts:
+    if not indexed_texts:
         return []
 
     user_prompt = (
         f"Platform: {platform}\n"
-        f"Posts ({len(numbered_texts)} of {len(posts)} sampled):\n\n"
-        + "\n".join(numbered_texts)
+        f"Posts ({len(indexed_texts)} of {len(posts)} sampled):\n\n"
+        + "\n".join(f"- {t}" for _, t in indexed_texts)
     )
 
     response_schema = {
@@ -175,12 +238,8 @@ def discover_topics(
                             "type": "array",
                             "items": {"type": "string"},
                         },
-                        "post_indices": {
-                            "type": "array",
-                            "items": {"type": "integer"},
-                        },
                     },
-                    "required": ["label", "keywords", "post_indices"],
+                    "required": ["label", "keywords"],
                 },
             },
         },
@@ -188,18 +247,12 @@ def discover_topics(
     }
 
     client = _get_client()
-    # Wrap the full generate+parse cycle in tenacity. Two failure modes
-    # we want to retry on:
-    #   1. ServerError (transient 503 "model overloaded") — 2026-05-22
-    #      04:00 WIB hit this; recluster persisted 0 topics for the day.
-    #   2. Truncated/malformed JSON — Gemini sometimes returns HTTP 200
-    #      with the response body cut off mid-array (observed 2026-05-22
-    #      08:54 WIB: 45s call returned just the first theme's opening
-    #      brace before truncation). Treating this as transient gives us
-    #      a clean second attempt instead of giving up on the day.
-    # 3 attempts with exponential backoff (10s, 20s, 40s ... capped 120s).
-    # Final fallback: empty themes → recluster returns 0 → existing topic
-    # rows stay intact (defensive design preserved).
+    # Retry the generate+parse cycle on transient ServerError (503 "model
+    # overloaded") or malformed JSON. Output is tiny now (labels only), so
+    # MAX_TOKENS truncation should never recur — but the retry keeps us
+    # robust against transient 503s. 3 attempts, exponential backoff.
+    # Final fallback: empty themes → recluster persists nothing → existing
+    # topic rows stay intact.
     resp = None
     parsed = None
     for attempt_idx in range(3):
@@ -212,27 +265,11 @@ def discover_topics(
                     response_mime_type="application/json",
                     response_schema=response_schema,
                     temperature=0.2,
-                    # 32K output cap. The unified pool (all platforms in
-                    # one pass) is much larger than the old per-platform
-                    # corpus — ~3K posts vs ~1.2K — and the post_indices
-                    # output scales with assigned-post count. At 16K the
-                    # 2997-post pool truncated mid-JSON (FinishReason.
-                    # MAX_TOKENS at ~16.3K tokens_out → parse failure on
-                    # every retry → no themes persisted). The old runaway
-                    # failure mode (Flash-Lite at 32K emitting contiguous
-                    # 5000+ integer runs) was a Flash-Lite quirk; Flash
-                    # with thinking_budget=0 + the response_schema stays
-                    # disciplined, so 32K just buys the headroom the
-                    # larger pool needs.
-                    max_output_tokens=32768,
-                    # Disable thinking entirely. The Flash-Lite history
-                    # of `thinking_budget=0 → 4096 → 0` reflects this:
-                    # explicit thinking budget on Flash-Lite was burned
-                    # by silent reasoning spirals (`thoughts_token_count`
-                    # = 32765 with `candidates_token_count=0`), zeroing
-                    # the actual output. Flash with thinking_budget=0
-                    # produces structured JSON reliably; this task is
-                    # extraction, not reasoning — no thinking required.
+                    # Labels-only output: 6-10 themes × (label + 5 short
+                    # keywords) is a few hundred tokens. 4K is generous
+                    # headroom and can't run away — assignment no longer
+                    # lives in this response.
+                    max_output_tokens=4096,
                     thinking_config=types.ThinkingConfig(thinking_budget=0),
                 ),
             )
@@ -247,9 +284,6 @@ def discover_topics(
                 error=str(exc)[:200],
             )
         except json.JSONDecodeError:
-            # Log enough to diagnose: finish_reason tells us if it was
-            # MAX_TOKENS / SAFETY / STOP; tokens_out tells us how much
-            # the model actually emitted before truncating.
             finish_reason = None
             tokens_out = None
             try:
@@ -269,7 +303,6 @@ def discover_topics(
                 raw_len=len(resp.text or "") if resp else 0,
                 raw_tail=(resp.text or "")[-200:] if resp else "",
             )
-        # Exponential backoff before next attempt.
         if attempt_idx < 2:
             time.sleep(10 * (2 ** attempt_idx))
 
@@ -277,9 +310,7 @@ def discover_topics(
         log.error("topic_discovery.gave_up", platform=platform)
         return []
 
-    themes_raw = parsed.get("themes") or []
-
-    # Record cost so the api-costs dashboard sees this spend.
+    # Record Gemini naming cost.
     from api.services.usage import gemini_output_tokens, record_usage
 
     usage_md = getattr(resp, "usage_metadata", None) if resp else None
@@ -292,26 +323,67 @@ def discover_topics(
         meta={"platform": platform, "sample_size": len(sample)},
     )
 
-    # Map indices → post UUIDs. Gemini may hallucinate indices outside
-    # the sample range; drop those defensively.
+    themes_raw = parsed.get("themes") or []
+    themes = [
+        {
+            "label": str(t.get("label", "")).strip(),
+            "keywords": [str(k).strip() for k in (t.get("keywords") or []) if str(k).strip()],
+        }
+        for t in themes_raw
+        if str(t.get("label", "")).strip()
+    ]
+    if not themes:
+        log.warning("topic_discovery.no_themes_named", platform=platform)
+        return []
+
+    # Embed themes + posts, then assign each post to its nearest theme.
+    # Theme text = label + keywords so both the human-facing name and the
+    # distinctive terms steer the vector.
+    theme_texts = [
+        f"{t['label']}. {', '.join(t['keywords'])}".strip(". ") for t in themes
+    ]
+    post_texts = [t for _, t in indexed_texts]
+
+    try:
+        theme_vecs = _embed_texts(theme_texts)
+        post_vecs = _embed_texts(post_texts)
+    except Exception as exc:
+        log.error("topic_discovery.embed_failed", platform=platform, error=str(exc)[:200])
+        return []
+
+    # Cosine similarity (vectors are L2-normalized) → (n_posts, n_themes).
+    sims = post_vecs @ theme_vecs.T
+    best_theme = sims.argmax(axis=1)
+    best_score = sims.max(axis=1)
+
+    theme_post_ids: list[list[Any]] = [[] for _ in themes]
+    assigned = 0
+    for row, (sample_i, _) in enumerate(indexed_texts):
+        if best_score[row] < MIN_SIMILARITY:
+            continue  # orphan — no theme fits well enough
+        theme_post_ids[best_theme[row]].append(sample[sample_i]["id"])
+        assigned += 1
+
     results: list[dict[str, Any]] = []
-    for theme in themes_raw:
-        indices = theme.get("post_indices") or []
-        post_ids = [sample[i]["id"] for i in indices if 0 <= i < len(sample)]
-        if not post_ids:
+    for theme, post_ids in zip(themes, theme_post_ids, strict=True):
+        if len(post_ids) < MIN_POSTS_PER_THEME:
             continue
-        results.append({
-            "label": str(theme.get("label", "")).strip()
-            or f"theme {len(results) + 1}",
-            "keywords": [str(k).strip() for k in (theme.get("keywords") or [])],
-            "post_ids": post_ids,
-        })
+        results.append(
+            {
+                "label": theme["label"],
+                "keywords": theme["keywords"],
+                "post_ids": post_ids,
+            }
+        )
 
     log.info(
         "topic_discovery.done",
         platform=platform,
-        themes=len(results),
+        themes_named=len(themes),
+        themes_kept=len(results),
         sampled=len(sample),
+        assigned=assigned,
+        orphan=len(indexed_texts) - assigned,
     )
 
     return results
