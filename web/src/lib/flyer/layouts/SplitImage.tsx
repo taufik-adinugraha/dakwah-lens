@@ -1,7 +1,4 @@
-import {
-  smartTruncateTranslation,
-  TRANSLATION_MAX_CHARS,
-} from "../translation-fit";
+import { Citation } from "./decor";
 import type { FlyerLayoutComponent } from "./types";
 
 /**
@@ -27,17 +24,13 @@ export const SplitImage: FlyerLayoutComponent = ({
       ? daleel.translation_en || daleel.translation_id || ""
       : daleel.translation_id || daleel.translation_en || ""
     : "";
-  // Cap + shrink the translation so a long hadith narration can't
-  // push the citation off the canvas bottom. Font drops with raw
-  // length; truncation cuts at a sentence/word boundary, never
-  // mid-word.
+  // Starting font; the runtime auto-fit pass (snap.ts) scales the card
+  // to fit the FULL text, so a long hadith narration shrinks instead of
+  // being truncated.
   const transLen = rawTranslation.length;
   const transSize =
     transLen < 240 ? 19 : transLen < 380 ? 17 : transLen < 480 ? 16 : 14;
-  const translation = smartTruncateTranslation(
-    rawTranslation,
-    TRANSLATION_MAX_CHARS.splitImage,
-  );
+  const translation = rawTranslation;
 
   const isHorizontalSplit = layoutVariant !== 2;
   const isPhotoLeft = layoutVariant === 0;
@@ -122,29 +115,24 @@ export const SplitImage: FlyerLayoutComponent = ({
 
       {daleel && translation && (
         <div
+          data-autofit
+          data-fit-min="12"
           className="flex flex-col gap-3 border-l-4 pl-5"
           style={{
             borderColor: palette.accent,
-            // Hard ceiling so even a misjudged truncation can't push
-            // the citation past the canvas bottom — content beyond
-            // this is clipped, but the smart truncation above should
-            // keep us inside it for every realistic du'a length.
+            // Bounded box for the auto-fit pass: the full translation +
+            // citation are scaled down together until they fit here.
             maxHeight: "300px",
             overflow: "hidden",
           }}
         >
           <div
-            className="italic leading-[1.45] text-slate-700"
+            className="font-medium italic leading-[1.45] text-slate-700"
             style={{ fontSize: `${transSize}px` }}
           >
             &ldquo;{translation}&rdquo;
           </div>
-          <div
-            className="text-[14px] font-extrabold tracking-wider"
-            style={{ color: palette.accent }}
-          >
-            {daleel.citation}
-          </div>
+          <Citation citation={daleel.citation} color={palette.accent} />
         </div>
       )}
 

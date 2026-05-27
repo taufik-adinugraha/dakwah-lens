@@ -549,6 +549,32 @@ function messageForGenZB(body: string): string {
   });
 }
 
+/**
+ * Last-resort headline when neither the dedicated `**Headline:**` marker
+ * nor the legacy tagline extractors produced one. Pulls a short punch
+ * line from the opening clause of the message body — a specific fragment
+ * is always better than a static "Renungan/Pesan Pekan Ini" (which the
+ * synthesis prompt now explicitly bans). Returns null when the body is
+ * too thin to yield anything meaningful, so the caller's static default
+ * still applies.
+ */
+function deriveHeadlineFromBody(body: string, maxWords = 6): string | null {
+  const firstSentence =
+    (body || "").replace(/\s+/g, " ").trim().split(/(?<=[.!?])\s/)[0] ?? "";
+  // First clause only — stop at the first comma / semicolon / dash so the
+  // headline is a single crisp thought, not a run-on.
+  const clause = firstSentence.split(/[,;:—-]/)[0]?.trim() ?? "";
+  const words = clause.split(" ").filter(Boolean);
+  if (words.length < 2) return null;
+  const picked = words
+    .slice(0, maxWords)
+    .join(" ")
+    // Don't let the headline dangle on a conjunction/preposition.
+    .replace(/\s+(dan|atau|yang|untuk|dari|ke|di|pada|serta|agar)$/i, "")
+    .trim();
+  return picked.length >= 3 ? picked : null;
+}
+
 async function buildContent(ctx: FlyerContext): Promise<FlyerContent> {
   const lang = ctx.locale;
   const brand = "dakwah-lens.id";
@@ -583,6 +609,7 @@ async function buildContent(ctx: FlyerContext): Promise<FlyerContent> {
       headline:
         dedicatedBlock?.headline ||
         fallbackHeadline ||
+        deriveHeadlineFromBody(message || ctx.body) ||
         "Pesan Pekan Ini",
       message: message || "",
       daleel,
@@ -604,6 +631,7 @@ async function buildContent(ctx: FlyerContext): Promise<FlyerContent> {
       headline:
         dedicatedBlock?.headline ||
         fallbackHeadline ||
+        deriveHeadlineFromBody(message || ctx.body) ||
         "Renungan Pekan Ini",
       message: message || "",
       daleel,

@@ -279,21 +279,21 @@ Aksi yang menghormati kapasitas + kebijaksanaan lansia — mereka jadi PELAKU/su
 Di akhir Bagian 5, tutup dengan satu paragraf italic:
 *Briefing ini AI-assisted, BUKAN fatwa otoritatif. Tanggung jawab keagamaan tetap pada penyusun konten dakwah.*
 
-## Pesan Flyer (~400 kata, dirender ke 4 flyer 1080×1080 yang dibagikan ke IG/WA)
+## Pesan Flyer (~520 kata, dirender ke 6 flyer 1080×1080 yang dibagikan ke IG/WA)
 
-Bagian ini WAJIB ada SETELAH Bagian 5. Output-nya 4 paragraf flyer pendek (masing-masing 3-4 kalimat, ~70-90 kata) yang BERDIRI SENDIRI — flyer dibaca terpisah dari khutbah / kajian / kreator script / diskusi Gen Z, jadi konten di sini TIDAK BOLEH menyebut atau merujuk ke salah satu format itu.
+Bagian ini WAJIB ada SETELAH Bagian 5. Output-nya 6 paragraf flyer pendek (masing-masing 3-4 kalimat, ~70-90 kata) yang BERDIRI SENDIRI — flyer dibaca terpisah dari khutbah / kajian / kreator script / diskusi Gen Z, jadi konten di sini TIDAK BOLEH menyebut atau merujuk ke salah satu format itu. Keenam slot (1-6) WAJIB ada, masing-masing dengan baris **Headline:** sendiri — jangan lewati slot 5 & 6.
 
 STRUKTUR WAJIB setiap pesan flyer — dua baris marker DULU, baru paragraf:
 
 ```
 ### Pesan Flyer N — Suara {{kategori}}
-**Headline:** "{{4-6 kata yang impactful, powerful, langsung menyampaikan inti}}"
+**Headline:** "{{4-5 kata punch yang menyampaikan PESAN UTAMA flyer}}"
 **Dalil:** {{citation persis dari dalil pool — mis. "QS. Ar-Rahmaan: 9"}}
 
 {{paragraf 70-90 kata}}
 ```
 
-ATURAN HEADLINE: 4-6 kata, kalimat aktif, langsung menyentuh inti pesan. Hindari nama deliverable, hindari clickbait, hindari pertanyaan retoris. Contoh GOOD: "Mulai Adil dari Meja Sendiri", "Hadir untuk Tetangga yang Lemah", "Mulai Bela yang Lemah di RT", "Pulang Dulu, Cari Makna Kemudian". Contoh BAD: "Khutbah Pertama", "Pesan Pekan Ini", "Renungan Mingguan", "Apa yang Terjadi Pekan Ini?".
+ATURAN HEADLINE: TEPAT 4-5 kata, kalimat aktif, langsung menyampaikan PESAN UTAMA paragraf (bukan tema/kategori). Headline harus bisa berdiri sendiri tanpa membaca paragraf — pembaca yang hanya melihat headline sudah menangkap inti seruan. Hindari nama deliverable, hindari clickbait, hindari pertanyaan retoris, hindari frasa template generik. Contoh GOOD: "Mulai Adil dari Meja Sendiri", "Hadir untuk Tetangga yang Lemah", "Mulai Bela yang Lemah di RT", "Pulang Dulu, Cari Makna Kemudian". Contoh BAD (generik/kosong, DILARANG): "Khutbah Pertama", "Pesan Pekan Ini", "Renungan Mingguan", "Renungan Pekan Ini", "Refleksi Pekan Ini", "Apa yang Terjadi Pekan Ini?".
 
 ATURAN ANTI-AMBIGUITAS (KRITIS): baca ulang setiap headline dengan asumsi pembaca tergesa-gesa dan hanya akan menginterpretasi sekali. Hindari konstruksi preposisi yang BISA dibaca dua arti — terutama `X dari Y`, `X oleh Y`, `X kepada Y` yang melibatkan subjek yang seharusnya kita lindungi.
 
@@ -351,7 +351,11 @@ LARANGAN MUTLAK pada keempat paragraf:
 - JANGAN tulis "Bagian ini" / "Strategi & Aksi Dakwah" — flyer tidak tahu tentang struktur briefing
 - JANGAN buka dengan "Pekan ini, percakapan menyoroti..." atau bahasa stats-narration lainnya
 
-YANG WAJIB ADA di setiap paragraf: (1) satu kalimat masalah inti pekan, (2) satu kalimat hubungan ke nilai Islami (tanpa nama deliverable), (3) satu-dua kalimat langkah kecil yang BISA langsung dilakukan pembaca individual hari ini / pekan ini. Suara aktif, kalimat pendek, tanpa istilah teknis briefing.
+YANG WAJIB ADA di setiap paragraf, TIGA komponen BERURUTAN:
+(1) FAKTA — satu kalimat fakta spesifik dari situasi pekan ini (lokasi/pelaku/korban/angka), dicocokkan dengan sample_headlines yang Anda terima. Bukan framing emosional kosong, bukan stats-narration.
+(2) MASALAH — satu kalimat yang menamai ketegangan / akar masalah di balik fakta itu: apa yang terancam, kenapa ini penting bagi umat.
+(3) SOLUSI — satu-dua kalimat langkah konkret yang BISA langsung dilakukan pembaca (mulai dari diri/individual, lalu lingkungan terdekat) hari ini / pekan ini.
+Dalil yang di-tag WAJIB MENOPANG argumen ini — mendukung prinsip di balik solusi, bukan sekadar berbagi satu kata kunci dengan fakta. Suara aktif, kalimat pendek, tanpa istilah teknis briefing.
 
 ### Pesan Flyer 1 — Suara Khutbah (~75 kata)
 Sudut: refleksi spiritual + langkah audit-diri. Tone: tenang, observatif, ajak. Audiens: dewasa, jamaah masjid. JANGAN gunakan kata "khutbah", "jamaah", "hadirin", "sidang Jumat" — flyer ini berdiri sendiri.
@@ -366,10 +370,10 @@ Sudut: pesan hook untuk feed IG/TikTok. Tone: percakapan, bahasa anak muda Indon
 Sudut: refleksi yang langsung memberi panduan + langkah, BUKAN sekadar pertanyaan menggantung. Tone: jujur, hangat, tanpa nada moralistik. Audiens: Gen Z. JANGAN buka dengan "Guys," / "Thanks guys" / "Diskusi malam ini" — ini posting standalone. Tutup dengan kalimat ringkas yang ngarahin ke satu tindakan / sikap, bisa di-screenshot dan dibagi.
 
 ### Pesan Flyer 5 — Ajakan Sunnah Pekan Ini (~75 kata)
-Sudut: ajakan sunnah yang TIMELY untuk pekan ini — pertimbangkan kalender Hijriyah saat ini (mis. menjelang Dzulhijjah = puasa Arafah/Tarwiyah/9 hari awal; bulan Syawal = puasa 6 hari; Muharram = puasa Asyura; Rajab/Sya'ban = persiapan Ramadhan; pekan biasa = puasa Senin-Kamis, sedekah Subuh, sholat Dhuha, qiyamul lail, dzikir pagi-petang). Tone: hangat, mengajak, BUKAN menyalahkan yang belum ikut. Audiens: umum Muslim Indonesia. Struktur paragraf: (1) sebutkan sunnah-nya + waktunya yang spesifik, (2) hubungkan ringkas dengan keadaan publik pekan ini (mis. "saat kabar pekan ini terasa berat, sunnah ini menjadi cahaya"), (3) ajakan konkret + 1-2 baris du'a pendek (Arab + terjemahan ID) yang relevan dengan sunnah-nya (boleh kutip dari adhkar pagi-petang / Hisnul Muslim / Quran / hadits otentik). JANGAN gunakan kata "wajib" untuk sunnah — pakai "dianjurkan", "diteladankan Nabi", "sangat disukai". Tutup dengan kalimat yang ringan dan penuh harapan.
+Sudut: ajakan sunnah yang TIMELY. WAJIB baca blok KONTEKS KALENDER HIJRIYAH di atas: kalau ada event dalam 7-14 hari ke depan (mis. Arafah, Tarwiyah, Asyura, Ayyamul Bidh, puasa 6 Syawal), PRIORITASKAN sunnah yang terkait event itu DAN sebutkan tanggal/harinya secara spesifik ("Senin depan, 9 Dzulhijjah" dst.). Hanya kalau window kalender kosong, pakai sunnah rutin (puasa Senin-Kamis, sedekah Subuh, sholat Dhuha, qiyamul lail, dzikir pagi-petang). Tone: hangat, mengajak, BUKAN menyalahkan yang belum ikut. Audiens: umum Muslim Indonesia. Struktur paragraf: (1) sebutkan sunnah-nya + waktunya yang spesifik, (2) hubungkan ringkas dengan keadaan publik pekan ini (mis. "saat kabar pekan ini terasa berat, sunnah ini menjadi cahaya"), (3) ajakan konkret + 1-2 baris du'a pendek (Arab + terjemahan ID) yang relevan dengan sunnah-nya (boleh kutip dari adhkar pagi-petang / Hisnul Muslim / Quran / hadits otentik). JANGAN gunakan kata "wajib" untuk sunnah — pakai "dianjurkan", "diteladankan Nabi", "sangat disukai". Tutup dengan kalimat yang ringan dan penuh harapan.
 
 ### Pesan Flyer 6 — Du'a Pekan Ini (~75 kata)
-Sudut: SATU du'a otentik yang relevan dengan tema pekan ini — pembaca bisa langsung membaca dan menjadikannya wirid pribadi. Audiens: umum Muslim Indonesia, dewasa dan remaja. Struktur:
+Sudut: SATU du'a otentik yang relevan — pembaca bisa langsung membaca dan menjadikannya wirid pribadi. Kalau blok KONTEKS KALENDER HIJRIYAH menandai event dalam 7-14 hari ke depan, PILIH du'a yang sesuai event itu (mis. du'a hari Arafah menjelang Arafah). Audiens: umum Muslim Indonesia, dewasa dan remaja. Struktur:
 1. **Pengantar singkat** (1 kalimat, ~15 kata): hubungkan keadaan pekan ini dengan kebutuhan akan du'a tertentu — mis. "Pekan ini banyak ujian amanah; mari sandarkan langkah pada satu doa yang Nabi ajarkan."
 2. **Du'a** (Arab berharakat lengkap, 1 baris untuk doa pendek atau 2-3 baris untuk doa panjang) — DARI sumber otentik: adhkar pagi-petang (Hisnul Muslim), du'a-du'a Nabi dalam Quran (mis. doa Nabi Yunus, Nabi Ibrahim, Nabi Sulaiman), atau doa-doa pendek dari Riyad as-Salihin / Bukhari / Muslim. Setelah Arab, beri terjemahan Bahasa Indonesia 1 baris.
 3. **Citation 1 baris**: sumber persis (mis. "HR. Bukhari & Muslim", "QS. Al-Anbiya: 87", "Hisnul Muslim — Dzikir Pagi").
@@ -378,7 +382,7 @@ Sudut: SATU du'a otentik yang relevan dengan tema pekan ini — pembaca bisa lan
 CRITICAL: du'a harus OTENTIK dengan sumber jelas. JANGAN mengarang du'a. Kalau citation muncul di dalil pool yang saya berikan, gunakan citation yang persis cocok di marker `**Dalil:**`. Kalau bukan dari pool (mis. adhkar Hisnul Muslim), tetap tulis citation lengkap di paragraf — marker `**Dalil:**` boleh kosongkan ATAU pakai citation pool yang paling tematik. Du'a dalam Arab WAJIB berharakat lengkap (fathah, kasrah, dhammah, sukūn, syaddah, mad).
 
 ATURAN UMUM untuk SEMUA 6 pesan flyer:
-- SOLUTIF, bukan provokatif. Setiap pesan harus berisi (a) konteks ringkas masalah, (b) prinsip Islami yang relevan, (c) langkah konkret individu, (d) langkah konkret komunitas/lingkungan. JANGAN tutup hanya dengan pertanyaan retoris tanpa arahan — pembaca harus tahu APA yang bisa dia kerjakan hari ini.
+- SOLUTIF, bukan provokatif. Pertahankan urutan Fakta → Masalah → Solusi: (a) fakta + masalah spesifik pekan ini, (b) prinsip Islami yang relevan (ditopang dalil), (c) langkah konkret individu, (d) langkah konkret komunitas/lingkungan. JANGAN tutup hanya dengan pertanyaan retoris tanpa arahan — pembaca harus tahu APA yang bisa dia kerjakan hari ini.
 - HEADLINE harus JELAS, tidak ambigu, langsung menyampaikan inti pesan. Hindari clickbait ("KENAPA DUNIA KAYAK SEKARANG?"), pilih frasa yang langsung memberi inti ("Mulai Adil dari Dapur Sendiri"). Pembaca yang scroll cepat harus tahu pesan flyer DALAM 2 DETIK.
 - Bahasa LEMBUT. JANGAN gunakan kata-kata keras / menghakimi seperti: "pengkhianatan", "pengkhianat", "merusak", "menjajah", "rezim", "tikus", "bejat", "biadab", "kebobrokan". Pakai kata yang lebih lembut + observasional: "amanah yang belum tertunaikan", "harapan yang kita rindukan", "ruang yang perlu kita rawat", "kepercayaan publik yang sedang diuji". Khususnya saat membicarakan pemerintah, instansi, atau organisasi — fokus pada SOLUSI + DOA, bukan kecaman.
 
@@ -1702,8 +1706,12 @@ async def generate_summary(
 
         from api.services.islamic_calendar import format_calendar_context
 
+        # 14-day lookahead so Pesan Flyer 5 (sunnah) + 6 (du'a) can
+        # anchor to events landing across the coming 1-2 weeks — a
+        # briefing published Thursday should still flag, e.g., Arafah/
+        # Asyura/Ayyamul Bidh that fall 8-13 days out.
         calendar_block, hijri_short = format_calendar_context(
-            _date.today(), lookahead_days=10
+            _date.today(), lookahead_days=14
         )
         log.info(
             "insights_summary.calendar_context",

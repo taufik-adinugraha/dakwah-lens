@@ -1,7 +1,4 @@
-import {
-  smartTruncateTranslation,
-  TRANSLATION_MAX_CHARS,
-} from "../translation-fit";
+import { Citation } from "./decor";
 import type { FlyerLayoutComponent } from "./types";
 
 /**
@@ -33,10 +30,8 @@ export const HeroHeadline: FlyerLayoutComponent = ({
   const transLen = rawTranslation.length;
   const transSize =
     transLen < 220 ? 22 : transLen < 340 ? 19 : transLen < 420 ? 17 : 15;
-  const translation = smartTruncateTranslation(
-    rawTranslation,
-    TRANSLATION_MAX_CHARS.heroHeadline,
-  );
+  // Auto-fit (snap.ts) scales the card to fit the full text; no truncation.
+  const translation = rawTranslation;
 
   const bgStops = palette.bgGradient;
   const bgStyle = {
@@ -173,6 +168,8 @@ export const HeroHeadline: FlyerLayoutComponent = ({
         {/* Translation-only daleel card */}
         {daleel && translation && (
           <div
+            data-autofit
+            data-fit-min="13"
             className={`flex flex-col gap-3 rounded-3xl border-2 bg-white px-7 py-6 shadow-xl ${contentWidth}`}
             style={{
               borderColor: palette.accentSoft,
@@ -183,17 +180,12 @@ export const HeroHeadline: FlyerLayoutComponent = ({
             }}
           >
             <div
-              className="italic leading-[1.45] text-slate-800"
+              className="font-medium italic leading-[1.45] text-slate-800"
               style={{ fontSize: `${transSize}px` }}
             >
               &ldquo;{translation}&rdquo;
             </div>
-            <div
-              className="text-[16px] font-extrabold tracking-wider"
-              style={{ color: palette.accent }}
-            >
-              — {daleel.citation}
-            </div>
+            <Citation citation={daleel.citation} color={palette.accent} />
           </div>
         )}
       </div>

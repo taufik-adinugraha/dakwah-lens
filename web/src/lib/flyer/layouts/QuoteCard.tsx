@@ -1,7 +1,4 @@
-import {
-  smartTruncateTranslation,
-  TRANSLATION_MAX_CHARS,
-} from "../translation-fit";
+import { Citation, QuoteGlyph } from "./decor";
 import type { FlyerLayoutComponent } from "./types";
 
 /**
@@ -31,10 +28,8 @@ export const QuoteCard: FlyerLayoutComponent = ({
   const transLen = rawTranslation.length;
   const transSize =
     transLen < 280 ? 22 : transLen < 440 ? 19 : transLen < 560 ? 17 : 15;
-  const translation = smartTruncateTranslation(
-    rawTranslation,
-    TRANSLATION_MAX_CHARS.quoteCard,
-  );
+  // Auto-fit (snap.ts) scales each card to fit the full text; no truncation.
+  const translation = rawTranslation;
 
   const bgStops = palette.bgGradient;
   const bgStyle = {
@@ -105,7 +100,9 @@ export const QuoteCard: FlyerLayoutComponent = ({
 
           {daleel && translation && (
             <div
-              className="flex max-w-[860px] flex-col gap-3 rounded-3xl bg-white px-8 py-6 shadow-2xl"
+              data-autofit
+              data-fit-min="13"
+              className="relative flex max-w-[860px] flex-col gap-3 rounded-3xl bg-white px-8 py-6 shadow-2xl"
               style={{
                 boxShadow: `0 18px 48px ${palette.accentDeep}88`,
                 borderTop: `8px solid ${palette.accent}`,
@@ -113,18 +110,21 @@ export const QuoteCard: FlyerLayoutComponent = ({
                 overflow: "hidden",
               }}
             >
+              <QuoteGlyph
+                color={palette.accent}
+                className="absolute left-4 top-1 z-0"
+              />
               <div
-                className="italic leading-[1.45] text-slate-800"
+                className="relative z-10 font-medium italic leading-[1.45] text-slate-800"
                 style={{ fontSize: `${transSize}px` }}
               >
                 &ldquo;{translation}&rdquo;
               </div>
-              <div
-                className="text-[15px] font-extrabold tracking-wider"
-                style={{ color: palette.accent }}
-              >
-                — {daleel.citation}
-              </div>
+              <Citation
+                citation={daleel.citation}
+                color={palette.accent}
+                className="relative z-10"
+              />
             </div>
           )}
         </div>
@@ -185,6 +185,8 @@ export const QuoteCard: FlyerLayoutComponent = ({
 
           {daleel && translation && (
             <div
+              data-autofit
+              data-fit-min="13"
               className="flex max-w-[880px] flex-col gap-3 rounded-3xl bg-white px-8 py-6 shadow-2xl"
               style={{
                 boxShadow: `0 14px 36px ${palette.accent}55`,
@@ -194,14 +196,12 @@ export const QuoteCard: FlyerLayoutComponent = ({
               }}
             >
               <div
-                className="italic leading-[1.45] text-slate-800"
+                className="font-medium italic leading-[1.45] text-slate-800"
                 style={{ fontSize: `${transSize}px` }}
               >
                 &ldquo;{translation}&rdquo;
               </div>
-              <div className="text-[15px] font-extrabold tracking-wider" style={{ color: palette.accent }}>
-                — {daleel.citation}
-              </div>
+              <Citation citation={daleel.citation} color={palette.accent} />
             </div>
           )}
         </div>
@@ -274,6 +274,8 @@ export const QuoteCard: FlyerLayoutComponent = ({
             )}
             {daleel && translation && (
               <div
+                data-autofit
+                data-fit-min="12"
                 className="flex flex-col gap-2 rounded-2xl bg-white px-6 py-4 shadow-lg"
                 style={{
                   borderLeft: `6px solid ${palette.accent}`,
@@ -282,17 +284,12 @@ export const QuoteCard: FlyerLayoutComponent = ({
                 }}
               >
                 <div
-                  className="italic leading-[1.4] text-slate-800"
+                  className="font-medium italic leading-[1.4] text-slate-800"
                   style={{ fontSize: `${Math.min(transSize, 18)}px` }}
                 >
                   &ldquo;{translation}&rdquo;
                 </div>
-                <div
-                  className="text-[14px] font-extrabold tracking-wider"
-                  style={{ color: palette.accent }}
-                >
-                  — {daleel.citation}
-                </div>
+                <Citation citation={daleel.citation} color={palette.accent} />
               </div>
             )}
           </div>

@@ -1,7 +1,4 @@
-import {
-  smartTruncateTranslation,
-  TRANSLATION_MAX_CHARS,
-} from "../translation-fit";
+import { Citation } from "./decor";
 import type { FlyerLayoutComponent } from "./types";
 
 /**
@@ -81,21 +78,15 @@ export const DuaHero: FlyerLayoutComponent = ({
   // when the card could be pushed off-canvas — that's not a concern
   // anymore so we can keep more translation text on screen.
   const transRaw = translation;
-  // Combined "weight": Arabic contributes ~3x its length, translation
-  // its own. Captures the "even small Arabic with massive translation
-  // needs aggressive font shrink" case too.
+  // Starting translation size — the runtime auto-fit pass (snap.ts,
+  // `data-autofit`) shrinks from here until the FULL text fits the
+  // card, so we no longer truncate. This is just a sensible ceiling so
+  // a short du'a translation doesn't render comically large.
   const weight = arLen * 3 + transRaw.length;
   let transSize = 22;
   if (weight > 700) transSize = 20;
   if (weight > 1100) transSize = 17;
   if (weight > 1700) transSize = 15;
-  // Smart truncation (sentence → comma → word → hard cut). Shared
-  // with the other layouts so the truncation calibration lives in
-  // one place — see web/src/lib/flyer/translation-fit.ts.
-  const truncatedTranslation = smartTruncateTranslation(
-    transRaw,
-    TRANSLATION_MAX_CHARS.duaHero,
-  );
 
   return (
     <div
@@ -223,7 +214,9 @@ export const DuaHero: FlyerLayoutComponent = ({
           <div
             dir="rtl"
             lang="ar"
-            className="mt-[8px] max-w-[920px] text-center font-amiri"
+            data-autofit
+            data-fit-min="20"
+            className="mt-[8px] w-full max-w-[920px] text-center font-amiri"
             style={{
               fontSize: arabicSize,
               lineHeight: arabicLine,
@@ -231,13 +224,6 @@ export const DuaHero: FlyerLayoutComponent = ({
               flex: "1 1 0%",
               minHeight: 0,
               overflow: "hidden",
-              // Soft fade at the bottom so a clipped long du'a reads
-              // as "more below" rather than abruptly cut. No-op when
-              // the text fits comfortably.
-              maskImage:
-                "linear-gradient(to bottom, black 88%, transparent 100%)",
-              WebkitMaskImage:
-                "linear-gradient(to bottom, black 88%, transparent 100%)",
             }}
           >
             {arabic}
@@ -289,31 +275,35 @@ export const DuaHero: FlyerLayoutComponent = ({
               backgroundColor: "rgba(255,255,255,0.94)",
               boxShadow: `0 14px 36px ${palette.accentDeep}40`,
               border: `1px solid ${palette.accentSoft}`,
-              // Hard ceiling matches the bottom-410px reservation
-              // above. Translation truncation guarantees we land
-              // inside this; the cap is defense-in-depth.
+              // Hard ceiling matches the bottom-410px reservation above.
+              // The card is a flex column: when the translation is long
+              // and the card hits this ceiling, the translation row
+              // (flex-1, min-h-0) is the bounded box the auto-fit pass
+              // shrinks the FULL text into — so nothing is truncated.
               maxHeight: "300px",
               overflow: "hidden",
             }}
           >
-            {truncatedTranslation && (
+            {transRaw && (
               <div
-                className="italic text-slate-800"
+                data-autofit
+                data-fit-min="13"
+                className="min-h-0 flex-1 overflow-hidden text-center font-medium italic text-slate-800"
                 style={{
                   fontSize: `${transSize}px`,
                   lineHeight: 1.45,
                 }}
               >
-                &ldquo;{truncatedTranslation}&rdquo;
+                &ldquo;{transRaw}&rdquo;
               </div>
             )}
             {citation && (
-              <div
-                className="text-[16px] font-extrabold tracking-wider"
-                style={{ color: palette.accentDeep }}
-              >
-                — {citation}
-              </div>
+              <Citation
+                citation={citation}
+                color={palette.accentDeep}
+                align="center"
+                className="shrink-0"
+              />
             )}
           </div>
         )}

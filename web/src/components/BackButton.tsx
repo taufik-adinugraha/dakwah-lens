@@ -5,7 +5,9 @@ import { ArrowLeft } from "lucide-react";
 import { usePathname, useRouter } from "@/i18n/navigation";
 
 /**
- * Dynamic "back" control rendered globally just under the header.
+ * Dynamic "back" control — a FLOATING fixed pill at the bottom-left,
+ * mirroring the BackToTop button at the bottom-right so the two pair up
+ * without colliding and stay reachable on long pages.
  *
  * It mirrors the browser's own back button — `router.back()` returns the
  * user to whatever page they actually came from, so the destination is
@@ -38,15 +40,15 @@ export function BackButton({ label }: { label: string }) {
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pt-4 sm:px-6">
-      <button
-        type="button"
-        onClick={onClick}
-        className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
-      >
-        <ArrowLeft className="h-3.5 w-3.5" />
-        {label}
-      </button>
-    </div>
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+      className="fixed bottom-5 left-4 z-40 inline-flex h-11 items-center gap-1.5 rounded-full bg-slate-900 pl-3 pr-4 text-sm font-semibold text-white shadow-lg shadow-slate-900/25 transition hover:bg-slate-700 sm:bottom-6 sm:left-6"
+    >
+      <ArrowLeft className="h-4 w-4" />
+      {label}
+    </button>
   );
 }

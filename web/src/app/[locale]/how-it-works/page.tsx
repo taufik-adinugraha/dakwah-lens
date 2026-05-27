@@ -985,16 +985,18 @@ function ModelsTable({ t }: { t: T }) {
  * — the real numbers live in `/admin/system/api-costs` (superadmin). The
  * point of this section is to be transparent about cost discipline.
  *
- * Numbers reflect the schedule as of 2026-05-22:
- *   X / TT / IG / Trending — PAUSED (verification phase, see project note)
- *   YT — daily, free quota
+ * Numbers reflect the schedule as of 2026-05-27:
  *   mainstream RSS — every 2h, free
- *   topic discovery — daily 04:00 WIB
+ *   X — weekly Wed 22:00 WIB · TikTok/IG — weekly Wed (eval phase)
+ *   X trending overlay — daily 12:00 WIB
+ *   YouTube — weekly whitelist channel sweep (Wed 21:00) + daily
+ *     unbounded trending search (12:00); both free Data API quota
+ *   topic discovery — daily 04:00 WIB (mainstream + YouTube)
  *   briefings — weekly Thursday 05:00 WIB cron (currently PAUSED — manual via scripts/manual_briefing.py)
  *
- * Validated against `usage_events` 7-day rollup on 2026-05-22 — earlier
- * estimates undercounted Pro briefings ($0 → ~$9/mo) and overcounted
- * paused Apify scrapers (~$34/mo → $0).
+ * The YouTube split (2026-05-27) adds no cost line — both paths run on
+ * the free 10K/day Data API quota (~800 units/day search + 160/wk
+ * channels). Apify spend is unchanged.
  */
 function MonthlyCost({ t }: { t: T }) {
   const rows = [

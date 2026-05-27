@@ -1,6 +1,52 @@
 import "server-only";
+import type { Page } from "puppeteer";
 import { getBrowser } from "./browser";
 import { FLYER_HEIGHT, FLYER_WIDTH } from "../design";
+
+/**
+ * Shrink-to-fit pass. Any element marked `data-autofit` (a BOUNDED box —
+ * flex `flex-1 min-h-0`, or an explicit height/max-height + overflow
+ * hidden) gets its text scaled DOWN (never up) until its content no
+ * longer overflows — `scrollHeight ≤ clientHeight` and `scrollWidth ≤
+ * clientWidth` — or its text hits `data-fit-min` (px).
+ *
+ * It scales every text-bearing descendant proportionally (or the
+ * element itself when it's a text leaf), so one attribute on a card
+ * fits the whole card — translation + citation + Arabic shrink together
+ * and keep their relative hierarchy.
+ *
+ * This replaces the old "tier the font by character count + hard-clip
+ * the overflow + truncate the string" approach, which guessed at sizing
+ * and still clipped long Arabic du'a / long hadith translations.
+ * Auto-fit measures the real rendered box (after fonts load) so nothing
+ * gets cut. Runs AFTER fonts settle.
+ */
+async function applyAutofit(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const cards = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-autofit]"),
+    );
+    for (const card of cards) {
+      const min = parseFloat(card.getAttribute("data-fit-min") || "12");
+      const kids = Array.from(card.querySelectorAll<HTMLElement>("*"));
+      const nodes = kids.length ? kids : [card];
+      const bases = nodes.map(
+        (n) => parseFloat(getComputedStyle(n).fontSize) || 16,
+      );
+      const overflowing = () =>
+        card.scrollHeight > card.clientHeight + 1 ||
+        card.scrollWidth > card.clientWidth + 1;
+      let scale = 1;
+      let guard = 80;
+      while (guard-- > 0 && scale > 0.45 && overflowing()) {
+        scale -= 0.03;
+        nodes.forEach((n, i) => {
+          n.style.fontSize = `${Math.max(min, bases[i] * scale)}px`;
+        });
+      }
+    }
+  });
+}
 
 /**
  * Render a self-contained HTML document to a 1080×1080 PNG.
@@ -54,6 +100,9 @@ export async function snapHtmlToPng(
       );
       await Promise.all([fontsReady, imgsReady]);
     });
+    // Shrink-to-fit any `data-autofit` text now that fonts are loaded
+    // (so measurements are accurate), before the settle frame.
+    await applyAutofit(page);
     // Wait one extra animation frame so any layout shift from Tailwind
     // JIT or font loading is settled.
     await page.evaluate(
@@ -111,6 +160,7 @@ export async function snapHtmlToPdf(html: string): Promise<Buffer> {
       );
       await Promise.all([fontsReady, imgsReady]);
     });
+    await applyAutofit(page);
     await page.evaluate(
       () =>
         new Promise<void>((resolve) =>

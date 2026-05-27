@@ -1,7 +1,4 @@
-import {
-  smartTruncateTranslation,
-  TRANSLATION_MAX_CHARS,
-} from "../translation-fit";
+import { Citation, HeadlineRule } from "./decor";
 import type { FlyerLayoutComponent } from "./types";
 
 /**
@@ -29,12 +26,11 @@ export const HeroAyat: FlyerLayoutComponent = ({
       : daleel.translation_id || daleel.translation_en || ""
     : "";
   const transLen = rawTranslation.length;
+  // Starting size; the runtime auto-fit pass (snap.ts) scales the card
+  // down to fit the FULL text, so we no longer truncate.
   const transSize =
     transLen < 240 ? 22 : transLen < 360 ? 19 : transLen < 440 ? 17 : 15;
-  const translation = smartTruncateTranslation(
-    rawTranslation,
-    TRANSLATION_MAX_CHARS.heroAyat,
-  );
+  const translation = rawTranslation;
 
   const headlineSize =
     headline.length < 18 ? "108px" : headline.length < 28 ? "92px" : "76px";
@@ -131,6 +127,7 @@ export const HeroAyat: FlyerLayoutComponent = ({
           >
             {headline}
           </div>
+          <HeadlineRule palette={palette} />
           {message && (
             <div
               className="max-w-[920px] text-[26px] font-medium leading-[1.45]"
@@ -146,6 +143,8 @@ export const HeroAyat: FlyerLayoutComponent = ({
             off the canvas. */}
         {daleel && translation && (
           <div
+            data-autofit
+            data-fit-min="13"
             className="flex max-w-[940px] flex-col gap-[12px] rounded-3xl px-7 py-6"
             style={{
               backgroundColor: "rgba(255,255,255,0.94)",
@@ -155,17 +154,12 @@ export const HeroAyat: FlyerLayoutComponent = ({
             }}
           >
             <div
-              className="italic leading-[1.45] text-slate-800"
+              className="font-medium italic leading-[1.45] text-slate-800"
               style={{ fontSize: `${transSize}px` }}
             >
               &ldquo;{translation}&rdquo;
             </div>
-            <div
-              className="text-[16px] font-extrabold tracking-wider"
-              style={{ color: palette.accent }}
-            >
-              — {daleel.citation}
-            </div>
+            <Citation citation={daleel.citation} color={palette.accent} />
           </div>
         )}
       </div>
