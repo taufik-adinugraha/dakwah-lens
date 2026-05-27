@@ -82,25 +82,37 @@ export const DuaHero: FlyerLayoutComponent = ({
   if (weight > 1100) transSize = 17;
   if (weight > 1700) transSize = 15;
 
+  // Rotate the backdrop photo + white-veil treatment by edition variant
+  // so successive du'a flyers don't look identical. Always white-
+  // dominated (the veil keeps min ~0.7 white), so the dark Arabic stays
+  // crisp whichever photo lands.
+  const bgPool =
+    assets.duaBackgrounds.length > 0 ? assets.duaBackgrounds : [assets.primary];
+  const bgSrc = bgPool[layoutVariant % bgPool.length];
+  const veils = [
+    // image strongest at the bottom
+    "linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.9) 45%, rgba(255,255,255,0.74) 100%)",
+    // image strongest at the top
+    "linear-gradient(0deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.9) 45%, rgba(255,255,255,0.76) 100%)",
+    // image faint, concentrated lower-center
+    "radial-gradient(120% 90% at 50% 78%, rgba(255,255,255,0.66) 0%, rgba(255,255,255,0.9) 55%, rgba(255,255,255,0.98) 100%)",
+    // image strongest on the right
+    "linear-gradient(270deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 50%, rgba(255,255,255,0.76) 100%)",
+  ];
+  const veil = veils[layoutVariant % veils.length];
+
   return (
     <div className="relative flex h-[1080px] w-[1080px] flex-col overflow-hidden bg-white">
-      {/* Default du'a-flyer backdrop: an open-mushaf photo under a heavy
-          white veil — white-dominated so the dark Arabic stays crisp and
-          the page reads calm + clean. The photo anchors lower so the top
-          (brand + Arabic) sits on near-pure white. */}
+      {/* Default du'a-flyer backdrop: a calm contemplative photo (rotated
+          per edition) under a heavy white veil — white-dominated so the
+          dark Arabic stays crisp and the page reads clean. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={assets.quranBg}
+        src={bgSrc}
         alt=""
         className="absolute inset-0 h-full w-full object-cover"
       />
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.9) 45%, rgba(255,255,255,0.74) 100%)",
-        }}
-      />
+      <div className="absolute inset-0" style={{ background: veil }} />
 
       {/* Corner ornament — variant rotates star border / arabesque /
           geometric arcs. All three are subtle so the Arabic stays

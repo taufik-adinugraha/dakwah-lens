@@ -58,9 +58,11 @@ export type FlyerComposition = {
 export type ResolvedAssets = {
   /** The composition.image, already converted to a data URL. */
   primary: string;
-  /** Open-mushaf photo, always resolved — the DuaHero (du'a flyer)
-   *  layout uses it as a white-veiled background. */
-  quranBg: string;
+  /** Curated set of calm, contemplative photos (mushaf, open book,
+   *  mosque/dome interiors) the DuaHero (du'a flyer) layout rotates
+   *  through as a white-veiled background — so successive editions
+   *  don't look identical. */
+  duaBackgrounds: string[];
   /** Shared decorative SVGs. Each layout uses a subset. */
   starsRow: string;
   dotsPattern: string;

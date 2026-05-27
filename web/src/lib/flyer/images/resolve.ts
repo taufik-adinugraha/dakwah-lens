@@ -35,28 +35,38 @@ export async function resolveAssets(
     }),
   );
 
-  // Open-mushaf photo for the du'a flyer background. Resolved from a
-  // literal asset (disk path) rather than the DB so it's robust even if
-  // the `quran-open` row was pruned — the file lives in public/.
-  const quranAsset: FlyerImageAsset = {
-    id: "quran-open",
+  // Curated calm backgrounds for the du'a flyer — the DuaHero layout
+  // rotates through these (by edition variant) so successive du'a
+  // flyers don't all look the same. Resolved from literal disk paths
+  // (robust if the DB rows were pruned; the files live in public/).
+  const DUA_BG_SRCS = [
+    "/flyer-assets/photos/quran-open.jpg",
+    "/flyer-assets/photos/open-book.jpg",
+    "/flyer-assets/photos/dome-interior.jpg",
+    "/flyer-assets/photos/mosque-interior.jpg",
+  ];
+  const duaBgAssets: FlyerImageAsset[] = DUA_BG_SRCS.map((src, i) => ({
+    id: `dua-bg-${i}`,
     kind: "photo",
-    src: "/flyer-assets/photos/quran-open.jpg",
+    src,
     aspect: "1:1",
-    tags: ["quran"],
-  };
+    tags: ["quran", "calm"],
+  }));
 
-  const [primary, quranBg, ...rest] = await Promise.all([
+  const results = await Promise.all([
     assetToDataUrl(primaryAsset),
-    assetToDataUrl(quranAsset),
+    ...duaBgAssets.map((a) => assetToDataUrl(a)),
     ...sharedAssets.map((a) => assetToDataUrl(a)),
   ]);
 
-  const [starsRow, dotsPattern, arabesque, arch, star8, lantern, calligraphyFrame] = rest;
+  const primary = results[0];
+  const duaBackgrounds = results.slice(1, 1 + duaBgAssets.length);
+  const [starsRow, dotsPattern, arabesque, arch, star8, lantern, calligraphyFrame] =
+    results.slice(1 + duaBgAssets.length);
 
   return {
     primary,
-    quranBg,
+    duaBackgrounds,
     starsRow,
     dotsPattern,
     arabesque,
