@@ -573,6 +573,50 @@ async def cmd_list() -> None:
             )
 
 
+async def cmd_clear(assume_yes: bool) -> None:
+    """Delete ALL briefings (insights_summaries).
+
+    Destructive: the system flyers render live FROM these rows, so they
+    disappear until you regenerate via `dump` → Claude → `save`. Scoped
+    strictly to `insights_summaries` — `user_flyers` (users' own
+    creations) and discussion comments (keyed by briefing_slug, a plain
+    text column with no FK to this table) are NOT touched.
+
+    Requires typing the exact confirmation phrase, or `--yes` for
+    scripted use.
+    """
+    from sqlalchemy import delete, func, select
+
+    async with SessionLocal() as session:
+        total = (
+            await session.execute(select(func.count()).select_from(InsightsSummary))
+        ).scalar() or 0
+        if total == 0:
+            sys.stderr.write("insights_summaries is already empty — nothing to delete.\n")
+            return
+
+        sys.stderr.write(
+            f"About to DELETE ALL {total} briefing row(s) from insights_summaries.\n"
+            "This removes every weekly briefing + its rendered flyers. user_flyers\n"
+            "and discussion comments are NOT touched. This cannot be undone.\n"
+        )
+        if not assume_yes:
+            sys.stderr.write('Type "DELETE ALL BRIEFINGS" to confirm: ')
+            sys.stderr.flush()
+            if input().strip() != "DELETE ALL BRIEFINGS":
+                raise SystemExit("Aborted — confirmation phrase did not match.")
+
+        await session.execute(delete(InsightsSummary))
+        await session.commit()
+        remaining = (
+            await session.execute(select(func.count()).select_from(InsightsSummary))
+        ).scalar() or 0
+        sys.stderr.write(
+            f"✓ Deleted {total} row(s). insights_summaries now has {remaining}.\n"
+            "  Regenerate with: dump <segment> → Claude → save <segment> <reply.md>\n"
+        )
+
+
 # ──────────────────────────────────────────────────────────────────
 # Argparse + entry
 # ──────────────────────────────────────────────────────────────────
@@ -613,6 +657,19 @@ def main() -> None:
 
     sub.add_parser("list", help="Show the most-recent briefing per segment.")
 
+    p_clear = sub.add_parser(
+        "clear",
+        help=(
+            "Delete ALL briefings (insights_summaries). Destructive — system "
+            "flyers regenerate from fresh briefings. user_flyers untouched."
+        ),
+    )
+    p_clear.add_argument(
+        "--yes",
+        action="store_true",
+        help="Skip the typed confirmation prompt (scripted use).",
+    )
+
     p_apply = sub.add_parser(
         "apply-swaps",
         help=(
@@ -645,6 +702,8 @@ def main() -> None:
         asyncio.run(cmd_save(args.segment, args.markdown_file))
     elif args.cmd == "list":
         asyncio.run(cmd_list())
+    elif args.cmd == "clear":
+        asyncio.run(cmd_clear(args.yes))
     elif args.cmd == "apply-swaps":
         _validate_segment(args.segment)
         asyncio.run(cmd_apply_swaps(args.segment, args.swaps_file))
