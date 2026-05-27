@@ -126,7 +126,7 @@ OUTPUT: briefing analisis dalam Bahasa Indonesia, dibagi ke 5 BAGIAN dengan head
 - Ekspos angka dengan konteks — jangan sekadar daftar, hubungkan ke cerita
 - Cantumkan top 5 kategori, komposisi sentimen, volume
 - JIKA `delta_pp`/`delta_pp_negative` null: tulis "belum ada baseline mingguan untuk perbandingan". JANGAN memfabrikasi tren naik/turun.
-- Sebut platform mix
+- Sebut platform mix, lalu BACA `platform_stats`: tiap platform punya karakter sendiri — kontraskan sentimen + kategori dominan antar-platform memakai angka dari `platform_stats` (mis. "media arus utama didominasi berita kebijakan & korupsi dengan sentimen X% negatif, sementara konten YouTube lebih reflektif/ibadah"). Sebutkan MINIMAL satu perbedaan nyata antar-platform bila ada >1 platform berdata; kalau hanya satu platform punya data, lewati tanpa mengarang. JANGAN ratakan semua platform jadi satu angka saja.
 
 CRITICAL — SCOPE OF PERCENTAGES: baca SEGMENT_SCOPE di input. Jika "all", persentase di `top_categories` adalah share dari seluruh percakapan mingguan. Jika SEGMENT_SCOPE adalah segmen spesifik (spiritual/family/youth/justice), persentase tersebut adalah share *WITHIN segmen itu saja* — frasa "di antara konten segmen keluarga, kategori family mendominasi 89%" atau "dalam diskursus segmen ini X memimpin 89%". JANGAN tulis "percakapan publik didominasi family 89%" saat scope adalah segmen — itu overclaim.
 
@@ -444,7 +444,7 @@ OUTPUT: analytical briefing in clear English, split into 5 SECTIONS with H2 (##)
 - Numbers in context — connect to stories, don't just list
 - Top 5 categories, sentiment composition, volume
 - IF `delta_pp`/`delta_pp_negative` is null: write "no weekly baseline yet for comparison". DO NOT fabricate rising/falling trends.
-- Mention platform mix
+- Mention platform mix, then READ `platform_stats`: each platform has its own character — contrast the sentiment + dominant categories ACROSS platforms using the numbers in `platform_stats` (e.g. "mainstream is dominated by policy & corruption news at X% negative, while YouTube content skews more reflective/worship"). Call out AT LEAST one real cross-platform difference when >1 platform has data; if only one platform has data, skip it without inventing. DO NOT flatten every platform into a single blended number.
 
 CRITICAL — SCOPE OF PERCENTAGES: read SEGMENT_SCOPE in the input. When "all", percentages in `top_categories` are share of all weekly conversation. When SEGMENT_SCOPE is a specific segment (spiritual/family/youth/justice), they are share *WITHIN that segment only* — phrase as "within family-segment content, the family category leads at 89%" or "in this segment's discourse, X leads with 89%". DO NOT write "public conversation is dominated by family 89%" when scope is a segment — that overclaims.
 
@@ -1007,6 +1007,76 @@ async def _compute_stats(
         {"platform": r.platform, "posts": int(r.posts)} for r in plat_rows
     ]
 
+    # 5b. PER-PLATFORM stats — sentiment mix + top categories within each
+    # platform. Mainstream news, X, and YouTube each carry their own
+    # character (e.g. X skews more negative/reactive, YouTube more
+    # reflective), so the briefing should read each platform's own
+    # signal, not just the blended overall numbers.
+    plat_sent_rows = (
+        await session.execute(
+            text(
+                f"""
+                {post_filter}
+                SELECT platform,
+                  count(*)::int AS posts,
+                  count(*) FILTER (WHERE sentiment_label = 'negative')::int AS neg,
+                  count(*) FILTER (WHERE sentiment_label = 'neutral')::int AS neu,
+                  count(*) FILTER (WHERE sentiment_label = 'positive')::int AS pos,
+                  count(*) FILTER (WHERE sentiment_label IS NOT NULL)::int AS sent_total
+                FROM filtered
+                WHERE posted_at >= :start AND dominant_cat = ANY ({cats_sql_array})
+                GROUP BY platform
+                ORDER BY posts DESC
+                """
+            ),
+            {"start": period_start},
+        )
+    ).all()
+    plat_cat_rows = (
+        await session.execute(
+            text(
+                f"""
+                {post_filter}
+                SELECT platform, dominant_cat AS category, count(*)::int AS n
+                FROM filtered
+                WHERE posted_at >= :start AND dominant_cat = ANY ({cats_sql_array})
+                GROUP BY platform, dominant_cat
+                """
+            ),
+            {"start": period_start},
+        )
+    ).all()
+    cats_by_platform: dict[str, list[tuple[str, int]]] = {}
+    for r in plat_cat_rows:
+        cats_by_platform.setdefault(r.platform, []).append(
+            (r.category, int(r.n))
+        )
+    platform_stats: list[dict[str, Any]] = []
+    for r in plat_sent_rows:
+        st = int(r.sent_total or 0)
+        posts = int(r.posts or 0)
+        top_cats = sorted(
+            cats_by_platform.get(r.platform, []),
+            key=lambda kv: kv[1],
+            reverse=True,
+        )[:3]
+        platform_stats.append({
+            "platform": r.platform,
+            "posts": posts,
+            "sentiment": {
+                "pct_negative": round(100 * int(r.neg or 0) / st, 1) if st else 0.0,
+                "pct_neutral": round(100 * int(r.neu or 0) / st, 1) if st else 0.0,
+                "pct_positive": round(100 * int(r.pos or 0) / st, 1) if st else 0.0,
+            },
+            "top_categories": [
+                {
+                    "category": c,
+                    "share_pct": round(100 * n / posts, 1) if posts else 0.0,
+                }
+                for c, n in top_cats
+            ],
+        })
+
     return {
         "period_start": period_start.isoformat(),
         "period_end": period_end.isoformat(),
@@ -1051,6 +1121,7 @@ async def _compute_stats(
         ],
         "top_topics": top_topics,
         "platforms": platform_breakdown,
+        "platform_stats": platform_stats,
     }
 
 
