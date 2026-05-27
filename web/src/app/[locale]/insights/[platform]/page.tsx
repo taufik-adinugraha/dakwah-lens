@@ -128,13 +128,12 @@ export default async function PlatformDrilldownPage({
         <LiveStream live={live} t={t} tInsights={tInsights} />
       )}
       {useRealClusters ? (
-        <RealCategoryClusters live={live!} locale={locale} platform={platform} />
+        <CategoryTopicCharts live={live!} locale={locale} platform={platform} />
       ) : (
-        <ClusterCards config={config} t={t} />
-      )}
-      {!useRealClusters && <TopicsByCluster config={config} />}
-      {live && live.discoveredTopics.length > 0 && (
-        <DiscoveredTopics live={live} locale={locale} platform={platform} />
+        <>
+          <ClusterCards config={config} t={t} />
+          <TopicsByCluster config={config} />
+        </>
       )}
       <TopOutlets config={config} t={t} live={live} platform={platform} />
       <TopStories config={config} t={t} live={live} platform={platform} />
@@ -222,7 +221,21 @@ const CATEGORY_TONES: Record<string, keyof typeof CLUSTER_TONES> = {
 
 // DAWAH_CATEGORIES is imported from @/lib/insights-data (single source).
 
-async function RealCategoryClusters({
+/**
+ * Da'wah categories + discovered topics, rendered as two side-by-side
+ * horizontal bar charts (stacked on mobile, lg:grid-cols-2 on desktop).
+ *
+ * Replaces the earlier two separate card-grid sections. Each panel is a
+ * single "frame": one bar per item, scaled to the panel's own max so the
+ * largest item fills the track. Bars stay clickable — a row links to the
+ * filtered post list, same as the old cards.
+ *
+ * The two are distinct axes: `categories` is the fixed 9-segment PRD
+ * taxonomy from the relevance classifier (ALL 9 shown, 0-filled, so the
+ * chart reads complete); `topics` are emergent Gemini-labelled clusters
+ * showing what the week is actually *about*, with per-platform counts.
+ */
+async function CategoryTopicCharts({
   live,
   locale,
   platform,
@@ -231,202 +244,142 @@ async function RealCategoryClusters({
   locale: string;
   platform: string;
 }) {
-  // Use the shared Insights namespace for da'wah category labels so they're
-  // consistent across platforms and properly localized.
   const tInsights = await getTranslations({ locale, namespace: "Insights" });
-  // Show ALL 9 PRD da'wah segments, not only the ones that "win" as some
-  // post's dominant category. Segments with no dominant posts still render
-  // (0 posts · 0%) so the taxonomy reads as complete — a da'i can see at a
-  // glance which angles the week's coverage is NOT touching.
+
+  // All 9 PRD segments, 0-filled and sorted desc.
   const dominantByCategory = new Map(
     live.dominantCategories.map((c) => [c.category, c.posts]),
   );
-  const allSegments = DAWAH_CATEGORIES.map((category) => ({
+  const segments = DAWAH_CATEGORIES.map((category) => ({
     category,
     posts: dominantByCategory.get(category) ?? 0,
   })).sort((a, b) => b.posts - a.posts);
-  const totalDominant = allSegments.reduce((s, c) => s + c.posts, 0);
-  const totalForShare = Math.max(1, totalDominant);
+  const segTotal = segments.reduce((s, c) => s + c.posts, 0);
+  const segMax = Math.max(1, ...segments.map((s) => s.posts));
+
+  // Per-platform discovered topics (already sorted desc by the data layer).
+  const topics = live.discoveredTopics;
+  const topTotal = topics.reduce((s, t) => s + t.postCount, 0);
+  const topMax = Math.max(1, ...topics.map((t) => t.postCount));
+  const TOPIC_TONES: Array<keyof typeof CLUSTER_TONES> = [
+    "brand",
+    "emerald",
+    "amber",
+    "violet",
+    "rose",
+    "cyan",
+  ];
+  const hasTopics = topics.length > 0;
 
   return (
     <section className="py-12 sm:py-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-            {tInsights("section_real_clusters_title")}
-          </h2>
-          <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
-            {tInsights("section_real_clusters_subtitle")}
-          </p>
-          <p className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
-            <Radio className="h-3 w-3" />
-            {tInsights("real_clusters_live_label", {
-              count: totalDominant.toLocaleString(),
-            })}
-          </p>
-        </div>
+        <div className={clsx("grid gap-6", hasTopics && "lg:grid-cols-2")}>
+          {/* ── Da'wah categories ── */}
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+            <h2 className="text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
+              {tInsights("section_real_clusters_title")}
+            </h2>
+            <p className="mt-1 text-sm leading-relaxed text-slate-600">
+              {tInsights("section_real_clusters_subtitle")}
+            </p>
+            <p className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
+              <Radio className="h-3 w-3" />
+              {tInsights("real_clusters_live_label", {
+                count: segTotal.toLocaleString(),
+              })}
+            </p>
 
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {allSegments.map((c) => {
-            const toneKey = CATEGORY_TONES[c.category] ?? "brand";
-            const tone = CLUSTER_TONES[toneKey];
-            const sharePct = ((c.posts / totalForShare) * 100).toFixed(1);
-            const label = DAWAH_CATEGORIES.includes(
-              c.category as (typeof DAWAH_CATEGORIES)[number],
-            )
-              ? tInsights(
-                  `dawah_category_${c.category}` as Parameters<typeof tInsights>[0],
+            <div className="mt-5 space-y-1">
+              {segments.map((c) => {
+                const tone = CLUSTER_TONES[CATEGORY_TONES[c.category] ?? "brand"];
+                const label = DAWAH_CATEGORIES.includes(
+                  c.category as (typeof DAWAH_CATEGORIES)[number],
                 )
-              : c.category;
-            return (
-              <Link
-                key={c.category}
-                href={`/insights/${platform}/posts?category=${c.category}`}
-                className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-base font-semibold text-slate-900 sm:text-lg">
-                      {label}
-                    </p>
-                    <p className="mt-1 text-xs text-slate-500">
-                      {tInsights("real_clusters_post_count", {
-                        count: c.posts.toLocaleString(),
-                      })}
-                    </p>
-                  </div>
-                  <span
-                    className={clsx(
-                      "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1",
-                      tone.chipBg,
-                      tone.chipText,
-                      tone.ring,
-                    )}
+                  ? tInsights(
+                      `dawah_category_${c.category}` as Parameters<typeof tInsights>[0],
+                    )
+                  : c.category;
+                const sharePct = segTotal
+                  ? ((c.posts / segTotal) * 100).toFixed(1)
+                  : "0.0";
+                return (
+                  <Link
+                    key={c.category}
+                    href={`/insights/${platform}/posts?category=${c.category}`}
+                    className="group block rounded-lg px-2 py-1.5 transition hover:bg-slate-50"
                   >
-                    {sharePct}%
-                  </span>
-                </div>
-                <div className="mt-4 h-1 overflow-hidden rounded-full bg-slate-100">
-                  <div
-                    className={`h-full ${tone.bar}`}
-                    style={{ width: `${sharePct}%` }}
-                  />
-                </div>
-                <p className="mt-3 text-xs font-medium text-brand-700 opacity-0 transition group-hover:opacity-100">
-                  {tInsights("category_view_posts")} →
-                </p>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/**
- * Topics discovered by the Gemini topic-discovery pass.
- * Distinct from the 9 PRD `categories`: categories are a fixed taxonomy
- * from the relevance classifier; topics are emergent clusters with
- * Gemini-authored Bahasa labels that surface what the conversation is
- * actually *about* this week. Each card links to the posts in the cluster.
- */
-async function DiscoveredTopics({
-  live,
-  locale,
-  platform,
-}: {
-  live: PlatformInsights;
-  locale: string;
-  platform: string;
-}) {
-  const tInsights = await getTranslations({ locale, namespace: "Insights" });
-  const totalPosts = live.discoveredTopics.reduce(
-    (s, t) => s + t.postCount,
-    0,
-  );
-  const totalForShare = Math.max(1, totalPosts);
-
-  return (
-    <section className="border-t border-slate-100 bg-gradient-to-b from-white to-slate-50/40 py-12 sm:py-16">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
-            <Sparkles className="h-3 w-3" />
-            {tInsights("section_topics_discovered_badge")}
-          </span>
-          <h2 className="mt-3 text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-            {tInsights("section_topics_discovered_title")}
-          </h2>
-          <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
-            {tInsights("section_topics_discovered_subtitle")}
-          </p>
-        </div>
-
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {live.discoveredTopics.map((topic, idx) => {
-            const toneKeys: Array<keyof typeof CLUSTER_TONES> = [
-              "brand",
-              "emerald",
-              "amber",
-              "violet",
-              "rose",
-              "cyan",
-            ];
-            const tone = CLUSTER_TONES[toneKeys[idx % toneKeys.length]];
-            const sharePct = ((topic.postCount / totalForShare) * 100).toFixed(
-              1,
-            );
-            return (
-              <Link
-                key={topic.id}
-                href={`/insights/${platform}/posts?topic=${topic.id}`}
-                className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <p className="text-base font-semibold leading-snug text-slate-900">
-                    {topic.label}
-                  </p>
-                  <span
-                    className={clsx(
-                      "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1",
-                      tone.chipBg,
-                      tone.chipText,
-                      tone.ring,
-                    )}
-                  >
-                    {sharePct}%
-                  </span>
-                </div>
-                <p className="mt-1 text-xs text-slate-500">
-                  {tInsights("real_clusters_post_count", {
-                    count: topic.postCount.toLocaleString(),
-                  })}
-                </p>
-                <div className="mt-3 h-1 overflow-hidden rounded-full bg-slate-100">
-                  <div
-                    className={`h-full ${tone.bar}`}
-                    style={{ width: `${sharePct}%` }}
-                  />
-                </div>
-                {topic.keywords.length > 0 && (
-                  <div className="mt-4 flex flex-wrap gap-1.5">
-                    {topic.keywords.slice(0, 6).map((kw) => (
-                      <span
-                        key={kw}
-                        className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-700"
-                      >
-                        {kw}
+                    <div className="flex items-baseline justify-between gap-3">
+                      <span className="truncate text-sm font-medium text-slate-800">
+                        {label}
                       </span>
-                    ))}
-                  </div>
-                )}
-                <p className="mt-3 text-xs font-medium text-brand-700 opacity-0 transition group-hover:opacity-100">
-                  {tInsights("category_view_posts")} →
-                </p>
-              </Link>
-            );
-          })}
+                      <span className="shrink-0 text-xs tabular-nums text-slate-500">
+                        {c.posts.toLocaleString()}
+                        <span className="text-slate-400"> · {sharePct}%</span>
+                      </span>
+                    </div>
+                    <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-slate-100">
+                      <div
+                        className={`h-full rounded-full ${tone.bar}`}
+                        style={{ width: `${(c.posts / segMax) * 100}%` }}
+                      />
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ── Discovered topics ── */}
+          {hasTopics && (
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
+                  {tInsights("section_topics_discovered_title")}
+                </h2>
+                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
+                  <Sparkles className="h-3 w-3" />
+                  {tInsights("section_topics_discovered_badge")}
+                </span>
+              </div>
+              <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                {tInsights("section_topics_discovered_subtitle")}
+              </p>
+
+              <div className="mt-5 space-y-1">
+                {topics.map((topic, idx) => {
+                  const tone =
+                    CLUSTER_TONES[TOPIC_TONES[idx % TOPIC_TONES.length]];
+                  const sharePct = topTotal
+                    ? ((topic.postCount / topTotal) * 100).toFixed(1)
+                    : "0.0";
+                  return (
+                    <Link
+                      key={topic.id}
+                      href={`/insights/${platform}/posts?topic=${topic.id}`}
+                      className="group block rounded-lg px-2 py-1.5 transition hover:bg-slate-50"
+                    >
+                      <div className="flex items-baseline justify-between gap-3">
+                        <span className="truncate text-sm font-medium text-slate-800">
+                          {topic.label}
+                        </span>
+                        <span className="shrink-0 text-xs tabular-nums text-slate-500">
+                          {topic.postCount.toLocaleString()}
+                          <span className="text-slate-400"> · {sharePct}%</span>
+                        </span>
+                      </div>
+                      <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-slate-100">
+                        <div
+                          className={`h-full rounded-full ${tone.bar}`}
+                          style={{ width: `${(topic.postCount / topMax) * 100}%` }}
+                        />
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>
