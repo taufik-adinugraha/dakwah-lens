@@ -91,8 +91,20 @@ def _to_datetime(value: Any) -> datetime | None:
         except (OverflowError, OSError, ValueError):
             return None
     if isinstance(value, str):
+        value = value.strip()
+        if not value:
+            return None
         try:
             return datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError:
+            pass
+        # Twitter/X legacy "ctime" format, e.g. "Tue May 26 16:50:01
+        # +0000 2026" — what apidojo/tweet-scraper returns under
+        # `createdAt`. fromisoformat can't parse it, so without this
+        # branch every X post lands with posted_at=NULL and is invisible
+        # to the 7-day window (topic discovery + dashboard).
+        try:
+            return datetime.strptime(value, "%a %b %d %H:%M:%S %z %Y")
         except ValueError:
             return None
     return None
