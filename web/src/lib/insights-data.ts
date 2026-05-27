@@ -298,18 +298,33 @@ export async function getPlatformInsights(
     }
   }
 
-  // Discovered topics for this platform (latest topic-discovery batch).
-  const topicRows = await db
+  // Discovered topics for this platform. Topic discovery is UNIFIED across
+  // platforms (rows stored with platform="all" since 2026-05-27), so we
+  // CANNOT filter `topics.platform = <platform>` — that returns nothing.
+  // Instead we derive the per-platform breakdown by joining each topic to
+  // its assigned posts and counting only this platform's (region-scoped)
+  // rows. `topics.post_count` is the cross-platform total and is ignored
+  // here. innerJoin drops topics with no posts on this platform.
+  const topicRows = (await db
     .select({
       id: schema.topics.id,
       label: schema.topics.label,
       keywords: schema.topics.keywords,
-      postCount: schema.topics.postCount,
+      postCount: count(schema.socialPosts.id),
     })
     .from(schema.topics)
-    .where(eq(schema.topics.platform, platform))
-    .orderBy(desc(schema.topics.postCount))
-    .limit(8);
+    .innerJoin(
+      schema.socialPosts,
+      eq(schema.socialPosts.topicId, schema.topics.id),
+    )
+    .where(platformWhere)
+    .groupBy(schema.topics.id, schema.topics.label, schema.topics.keywords)
+    .orderBy(desc(count(schema.socialPosts.id)))) as Array<{
+    id: string;
+    label: string;
+    keywords: string[] | null;
+    postCount: number;
+  }>;
 
   return {
     totalPosts,

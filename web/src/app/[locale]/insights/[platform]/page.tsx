@@ -234,10 +234,18 @@ async function RealCategoryClusters({
   // Use the shared Insights namespace for da'wah category labels so they're
   // consistent across platforms and properly localized.
   const tInsights = await getTranslations({ locale, namespace: "Insights" });
-  const totalDominant = live.dominantCategories.reduce(
-    (s, c) => s + c.posts,
-    0,
+  // Show ALL 9 PRD da'wah segments, not only the ones that "win" as some
+  // post's dominant category. Segments with no dominant posts still render
+  // (0 posts · 0%) so the taxonomy reads as complete — a da'i can see at a
+  // glance which angles the week's coverage is NOT touching.
+  const dominantByCategory = new Map(
+    live.dominantCategories.map((c) => [c.category, c.posts]),
   );
+  const allSegments = DAWAH_CATEGORIES.map((category) => ({
+    category,
+    posts: dominantByCategory.get(category) ?? 0,
+  })).sort((a, b) => b.posts - a.posts);
+  const totalDominant = allSegments.reduce((s, c) => s + c.posts, 0);
   const totalForShare = Math.max(1, totalDominant);
 
   return (
@@ -259,7 +267,7 @@ async function RealCategoryClusters({
         </div>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {live.dominantCategories.map((c) => {
+          {allSegments.map((c) => {
             const toneKey = CATEGORY_TONES[c.category] ?? "brand";
             const tone = CLUSTER_TONES[toneKey];
             const sharePct = ((c.posts / totalForShare) * 100).toFixed(1);
