@@ -1,4 +1,5 @@
 import { Citation } from "./decor";
+import { TRANSLATION_MAX_CHARS, smartTruncateTranslation } from "../translation-fit";
 import type { FlyerLayoutComponent } from "./types";
 
 /**
@@ -24,13 +25,13 @@ export const SplitImage: FlyerLayoutComponent = ({
       ? daleel.translation_en || daleel.translation_id || ""
       : daleel.translation_id || daleel.translation_en || ""
     : "";
-  // Starting font; the runtime auto-fit pass (snap.ts) scales the card
-  // to fit the FULL text, so a long hadith narration shrinks instead of
-  // being truncated.
-  const transLen = rawTranslation.length;
+  const translation = smartTruncateTranslation(
+    rawTranslation,
+    TRANSLATION_MAX_CHARS.splitImage,
+  );
+  const transLen = translation.length;
   const transSize =
     transLen < 240 ? 19 : transLen < 380 ? 17 : transLen < 480 ? 16 : 14;
-  const translation = rawTranslation;
 
   const isHorizontalSplit = layoutVariant !== 2;
   const isPhotoLeft = layoutVariant === 0;

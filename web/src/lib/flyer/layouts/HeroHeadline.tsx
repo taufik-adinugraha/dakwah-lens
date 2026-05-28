@@ -1,4 +1,5 @@
 import { Citation } from "./decor";
+import { TRANSLATION_MAX_CHARS, smartTruncateTranslation } from "../translation-fit";
 import type { FlyerLayoutComponent } from "./types";
 
 /**
@@ -27,11 +28,13 @@ export const HeroHeadline: FlyerLayoutComponent = ({
       ? daleel.translation_en || daleel.translation_id || ""
       : daleel.translation_id || daleel.translation_en || ""
     : "";
-  const transLen = rawTranslation.length;
+  const translation = smartTruncateTranslation(
+    rawTranslation,
+    TRANSLATION_MAX_CHARS.heroHeadline,
+  );
+  const transLen = translation.length;
   const transSize =
     transLen < 220 ? 22 : transLen < 340 ? 19 : transLen < 420 ? 17 : 15;
-  // Auto-fit (snap.ts) scales the card to fit the full text; no truncation.
-  const translation = rawTranslation;
 
   const bgStops = palette.bgGradient;
   const bgStyle = {

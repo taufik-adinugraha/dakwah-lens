@@ -1,4 +1,5 @@
 import { Citation, QuoteGlyph } from "./decor";
+import { TRANSLATION_MAX_CHARS, smartTruncateTranslation } from "../translation-fit";
 import type { FlyerLayoutComponent } from "./types";
 
 /**
@@ -25,11 +26,13 @@ export const QuoteCard: FlyerLayoutComponent = ({
       ? daleel.translation_en || daleel.translation_id || ""
       : daleel.translation_id || daleel.translation_en || ""
     : "";
-  const transLen = rawTranslation.length;
+  const translation = smartTruncateTranslation(
+    rawTranslation,
+    TRANSLATION_MAX_CHARS.quoteCard,
+  );
+  const transLen = translation.length;
   const transSize =
     transLen < 280 ? 22 : transLen < 440 ? 19 : transLen < 560 ? 17 : 15;
-  // Auto-fit (snap.ts) scales each card to fit the full text; no truncation.
-  const translation = rawTranslation;
 
   const bgStops = palette.bgGradient;
   const bgStyle = {
