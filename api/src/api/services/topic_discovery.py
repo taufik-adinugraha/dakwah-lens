@@ -69,19 +69,32 @@ SAMPLE_SIZE = 5600
 # the model and the vectors see identical text.
 MAX_TEXT_CHARS = 200
 
-# A post is assigned to its nearest theme only if cosine similarity
-# clears this floor; otherwise it's left orphan (topic_id NULL — same
-# outcome as the old design omitting an unclustered post). Tuned for
-# text-embedding-3-small, where related short Indonesian texts sit around
-# 0.3-0.5 and unrelated ones around 0.1-0.2. 0.28 keeps plausible matches
-# while dropping noise. OBSERVE the orphan rate after deploy: too many
-# orphans → lower this; themes polluted by weak matches → raise it.
-MIN_SIMILARITY = 0.28
+# GLOBAL similarity floor — a post is assigned to its nearest theme only
+# if cosine similarity clears this floor; otherwise it's left orphan
+# (collected into the "Lainnya — Tidak Terklasifikasi" bucket so it stays
+# visible rather than disappearing). Tuned for text-embedding-3-small,
+# where related short Indonesian texts sit around 0.3-0.5 and unrelated
+# ones around 0.1-0.2. Raised from 0.28 → 0.32 (2026-05-29) after a
+# manual audit showed ~67% per-topic accuracy with significant spillover
+# into broad themes (Judol grabbing all "scam" content, Palestina
+# grabbing all "humanitarian"). The floor is the DEFAULT — each theme
+# may override with its own `min_similarity` (see prompt).
+MIN_SIMILARITY = 0.32
 
 # A theme needs at least this many assigned posts to survive. Mirrors the
 # old prompt rule ("a theme needs at least 2 posts"); a 1-post theme is
 # usually an embedding fluke, not a trend.
 MIN_POSTS_PER_THEME = 2
+
+# Label for the synthetic catch-all topic that holds posts which fail
+# every theme's similarity floor or hit a negative pivot. Persisting these
+# under a real topic_id (instead of leaving them as NULL) gives the UI a
+# visible home for unclassified content and stops them from looking like
+# "missing data" in audit queries.
+FALLBACK_LABEL = "Lainnya — Tidak Terklasifikasi"
+# Only emit the fallback bucket when it has at least this many posts —
+# below this it's just noise.
+MIN_POSTS_FOR_FALLBACK = 10
 
 # OpenAI caps inputs per embeddings request; chunk well under it.
 EMBED_BATCH = 1000
@@ -131,8 +144,19 @@ When you're tempted to widen a label (e.g. "Kekerasan dan Kriminalitas Jalanan")
   ✅ Split into: "Bullying & Kekerasan di Sekolah" + "Judi Online & Eksploitasi Digital Pemuda"
 A da'i can build a specific khutbah from a tight theme; a generic bucket gives no angle.
 
+ASSIGNMENT CONTROLS — each theme MAY include two extra optional fields that protect it from false-positive assignment:
+
+- `exclude_keywords`: 0-6 short Indonesian terms that DISQUALIFY a post from this theme even when the vector is similar. Use this for themes whose semantic space bleeds into adjacent concepts. Examples that came from a real audit:
+  * "Judi Online & Pinjol" was grabbing romance scams, WO catering scams, saham investment talk, and game-developer complaints — all "scam"-shaped but not judol/pinjol. Set `exclude_keywords: ["WO", "wedding organizer", "saham", "investasi", "game developer", "TNI gadungan"]`.
+  * "Konflik Palestina" was grabbing Afghanistan history, skin-whitening rants, and unrelated humanitarian crises. Set `exclude_keywords: ["skin care", "skincare", "putih instan", "Afghanistan"]`.
+  * "Korupsi Pejabat" was grabbing education policy and labor lawsuits. Set `exclude_keywords: ["UU Ciptaker", "kecelakaan tol", "sekolah swasta"]`.
+  Tight themes ("Kriminalitas Jalanan", "Ibadah Haji & Kurban") rarely need this — leave empty.
+
+- `min_similarity`: float in [0.30, 0.55]. Override the default 0.32 cosine floor for this theme. Raise it (e.g. 0.40-0.45) for themes whose centroid is broad and likely to attract weak matches: "Lainnya"-flavored buckets, "Kesehatan Mental" (the word "mental" is used in unrelated snark), "Krisis Kemanusiaan" (broad). Leave at default for tight, well-bounded themes.
+
 Return ONLY valid JSON:
-{"themes": [{"label": "...", "keywords": ["...", ...]}, ...]}
+{"themes": [{"label": "...", "keywords": ["...", ...], "exclude_keywords": ["...", ...], "min_similarity": 0.40}, ...]}
+The two extra fields are OPTIONAL — omit them when not needed.
 """
 
 
@@ -238,6 +262,11 @@ def discover_topics(
                             "type": "array",
                             "items": {"type": "string"},
                         },
+                        "exclude_keywords": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                        },
+                        "min_similarity": {"type": "number"},
                     },
                     "required": ["label", "keywords"],
                 },
@@ -324,14 +353,40 @@ def discover_topics(
     )
 
     themes_raw = parsed.get("themes") or []
-    themes = [
-        {
-            "label": str(t.get("label", "")).strip(),
-            "keywords": [str(k).strip() for k in (t.get("keywords") or []) if str(k).strip()],
-        }
-        for t in themes_raw
-        if str(t.get("label", "")).strip()
-    ]
+    themes: list[dict[str, Any]] = []
+    for t in themes_raw:
+        label = str(t.get("label", "")).strip()
+        if not label:
+            continue
+        # Per-theme similarity override clamps to [global_floor, 0.55] —
+        # the LLM can ask for stricter assignment but can't loosen below
+        # the global noise floor.
+        per_theme_floor = t.get("min_similarity")
+        try:
+            per_theme_floor = (
+                float(per_theme_floor) if per_theme_floor is not None else None
+            )
+        except (TypeError, ValueError):
+            per_theme_floor = None
+        if per_theme_floor is None or per_theme_floor < MIN_SIMILARITY:
+            per_theme_floor = MIN_SIMILARITY
+        per_theme_floor = min(per_theme_floor, 0.55)
+        themes.append(
+            {
+                "label": label,
+                "keywords": [
+                    str(k).strip()
+                    for k in (t.get("keywords") or [])
+                    if str(k).strip()
+                ],
+                "exclude_keywords": [
+                    str(k).strip().lower()
+                    for k in (t.get("exclude_keywords") or [])
+                    if str(k).strip()
+                ],
+                "min_similarity": per_theme_floor,
+            }
+        )
     if not themes:
         log.warning("topic_discovery.no_themes_named", platform=platform)
         return []
@@ -353,26 +408,63 @@ def discover_topics(
 
     # Cosine similarity (vectors are L2-normalized) → (n_posts, n_themes).
     sims = post_vecs @ theme_vecs.T
-    best_theme = sims.argmax(axis=1)
-    best_score = sims.max(axis=1)
+    # Iterate themes in decreasing similarity per post — when a post's
+    # top-1 theme excludes it (via exclude_keywords or per-theme floor),
+    # fall through to the next-best theme rather than dropping the post.
+    order = np.argsort(-sims, axis=1)
 
     theme_post_ids: list[list[Any]] = [[] for _ in themes]
+    orphan_ids: list[Any] = []
     assigned = 0
-    for row, (sample_i, _) in enumerate(indexed_texts):
-        if best_score[row] < MIN_SIMILARITY:
-            continue  # orphan — no theme fits well enough
-        theme_post_ids[best_theme[row]].append(sample[sample_i]["id"])
-        assigned += 1
+    excluded_by_keyword = 0
+    excluded_by_floor = 0
+
+    for row, (sample_i, post_text) in enumerate(indexed_texts):
+        post_lower = post_text.lower()
+        placed = False
+        for theme_idx in order[row]:
+            theme = themes[theme_idx]
+            sim = sims[row, theme_idx]
+            if sim < theme["min_similarity"]:
+                # All remaining themes have even lower similarity → bail.
+                excluded_by_floor += 1
+                break
+            # Negative-pivot check: any exclude_keyword present as a
+            # case-insensitive substring disqualifies this assignment;
+            # try the next theme. Word-boundary match would be cleaner
+            # but Indonesian inflection + multi-word keywords make
+            # substring the pragmatic choice.
+            if any(kw in post_lower for kw in theme["exclude_keywords"]):
+                excluded_by_keyword += 1
+                continue
+            theme_post_ids[theme_idx].append(sample[sample_i]["id"])
+            assigned += 1
+            placed = True
+            break
+        if not placed:
+            orphan_ids.append(sample[sample_i]["id"])
 
     results: list[dict[str, Any]] = []
     for theme, post_ids in zip(themes, theme_post_ids, strict=True):
         if len(post_ids) < MIN_POSTS_PER_THEME:
+            # Posts that landed on a too-small theme become orphans
+            # rather than disappearing.
+            orphan_ids.extend(post_ids)
             continue
         results.append(
             {
                 "label": theme["label"],
                 "keywords": theme["keywords"],
                 "post_ids": post_ids,
+            }
+        )
+
+    if len(orphan_ids) >= MIN_POSTS_FOR_FALLBACK:
+        results.append(
+            {
+                "label": FALLBACK_LABEL,
+                "keywords": ["lainnya"],
+                "post_ids": orphan_ids,
             }
         )
 
@@ -383,7 +475,10 @@ def discover_topics(
         themes_kept=len(results),
         sampled=len(sample),
         assigned=assigned,
-        orphan=len(indexed_texts) - assigned,
+        orphan=len(orphan_ids),
+        excluded_by_keyword=excluded_by_keyword,
+        excluded_by_floor=excluded_by_floor,
+        fallback_bucket=len(orphan_ids) >= MIN_POSTS_FOR_FALLBACK,
     )
 
     return results
