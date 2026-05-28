@@ -56,4 +56,12 @@ def detect_lang(text: str, *, fallback: str = "id") -> str:
     if code == "ms":
         return "id"
 
-    return code if code in SUPPORTED else fallback
+    # Return the detected code as-is. The previous behaviour rewrote any
+    # non-SUPPORTED code to the fallback ("id"), which silently mislabelled
+    # confidently-detected Dutch / German / Portuguese / etc. posts as
+    # Indonesian — so the downstream lang_filter at ingest.py never dropped
+    # them. The IG hashtag scraper in particular pulled ~27% foreign posts
+    # via tag-collisions on words like #ZINA / #Guru / #Hajj that exist in
+    # other languages. Returning the real code lets the filter do its job;
+    # the SUPPORTED set is still useful elsewhere for whitelisting analytics.
+    return code
