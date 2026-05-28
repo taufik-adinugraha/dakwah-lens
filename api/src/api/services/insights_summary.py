@@ -132,7 +132,7 @@ CRITICAL — SCOPE OF PERCENTAGES: baca SEGMENT_SCOPE di input. Jika "all", pers
 
 ## Tema Utama & Pola Yang Muncul (500-700 kata)
 - PROSA NARATIF MURNI. Pembaca sudah membaca data di section "Numerik & Tren Pekan Ini" — di sini mereka butuh cerita, bukan data ulang. Audiens sebelumnya mengeluh "pusing kalau angka dan referensi dicampur di bagian narasi"; tugas section ini adalah memberi mereka jeda data.
-- DILARANG MUNCUL DI SECTION INI: (a) angka apa pun (jumlah postingan, persentase, views, delta mingguan) — semua tinggal di section Numerik & Tren; (b) kutipan langsung dengan atribusi outlet atau akun ("Liputan6 melaporkan…", "menurut Banjarmasin Post…", "user X menulis…") — karakterisasi pola berita boleh, tanpa sumber; (c) sitasi ayat/hadits inline (`**QS. …**`, `**Bukhari …**`) — semua dalil ditahan untuk Section 4 (Strategi & Aksi Dakwah) dan Section 5 (Daleel & Sumber).
+- DILARANG MUNCUL DI SECTION INI: (a) angka apa pun (jumlah postingan, persentase, views, delta mingguan) — semua tinggal di section Numerik & Tren; (b) kutipan langsung dengan atribusi outlet atau akun ("Liputan6 melaporkan…", "menurut Banjarmasin Post…", "user X menulis…") — karakterisasi pola berita boleh, tanpa sumber; (c) sitasi ayat/hadits inline (`**QS. …**`, `**Bukhari …**`) — semua dalil ditahan untuk Section 4 (Strategi & Aksi Dakwah) dan Section 5 (Dalil & Sumber).
 - Gunakan headlines dari pool untuk MENGENALI POLA, lalu deskripsikan polanya dengan bahasa observasional. Contoh transformasi: alih-alih "562 postingan korupsi dan 440 postingan pinjol membentuk benang ekonomi", tulis "korupsi pejabat bertumpukan dengan jeratan pinjol pada pekan yang sama, membentuk benang keprihatinan ekonomi yang nyata".
 - Struktur: 2-3 BENANG (atau SPIRAL) utama, tiap benang ~150-200 kata yang menjelaskan apa polanya, kenapa muncul bersama, dan apa implikasinya bagi audiens dakwah. Tutup dengan satu paragraf benang merah lintas-tema.
 - Verba observasional ("menyoroti", "memetakan", "menunjukkan", "tercermin dari", "menenun"), bukan perintah ("wajib", "harus", "pentingnya").
@@ -1568,7 +1568,7 @@ def _build_user_prompt(
         scope_note = scope_note_all
 
     write_now = (
-        "Tulis briefing sekarang dalam format markdown 5 bagian (Ringkasan Eksekutif / Numerik & Tren Pekan Ini / Tema Utama & Pola Yang Muncul / Strategi & Aksi Dakwah / Daleel & Sumber), ~8450-11400 kata total — Strategi & Aksi Dakwah adalah CONTENT KIT yang isinya draft siap-pakai (khutbah lengkap, outline kajian, script video, dll) dengan daleel pool yang ditenun inline ke setiap sub-section, bukan ringkasan strategi."
+        "Tulis briefing sekarang dalam format markdown 5 bagian (Ringkasan Eksekutif / Numerik & Tren Pekan Ini / Tema Utama & Pola Yang Muncul / Strategi & Aksi Dakwah / Dalil & Sumber), ~8450-11400 kata total — Strategi & Aksi Dakwah adalah CONTENT KIT yang isinya draft siap-pakai (khutbah lengkap, outline kajian, script video, dll) dengan daleel pool yang ditenun inline ke setiap sub-section, bukan ringkasan strategi."
         if language == "id"
         else "Write the briefing now in markdown, 5-section format (Executive Summary / Numbers & Trends This Week / Main Themes & Emerging Patterns / Da'wah Strategies & Actions / Daleel & Sources), ~8450-11400 words total — Da'wah Strategies & Actions is a CONTENT KIT containing ready-to-use drafts (full khutbah, kajian outline, video script, etc) with daleel from the pool woven inline into each sub-section, NOT a strategic summary."
     )
