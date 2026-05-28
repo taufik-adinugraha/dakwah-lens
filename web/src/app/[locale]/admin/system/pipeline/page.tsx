@@ -15,17 +15,27 @@ import {
  * you can see "this is what was *supposed* to fire" next to "this is what
  * actually ran." Source of truth is `workers/celery_app.py`.
  */
+// Mirror of `api/src/api/workers/celery_app.py` beat_schedule. Keep in
+// sync when you add/move a task: this table is what the admin page
+// renders, and the `task` + `platform` fields are how rows are joined
+// to ingest_runs / usage_events for the "Latest run" cell.
+//
+// Three special task names bypass ingest_runs and resolve freshness
+// from another table — see the matcher below for the lookups:
+//   snapshot_system          → system_metrics.captured_at
+//   reconcile_apify_costs    → usage_events.operation='billing_reconcile'
+//   trending_ingest          → usage_events.operation='trending_filter'
 const BEAT_SCHEDULE = [
-  { name: "ingest-mainstream", task: "run_ingest", platform: "mainstream", cron: "every 2 hours", query: "(all RSS)" },
-  { name: "ingest-youtube", task: "rotating_ingest", platform: "youtube", cron: "00:00 WIB daily", query: "(all enabled)" },
-  { name: "ingest-x-mon", task: "rotating_ingest", platform: "x", cron: "Mon 00:10 WIB", query: "(all enabled)" },
-  { name: "ingest-x-wed", task: "rotating_ingest", platform: "x", cron: "Wed 00:10 WIB", query: "(all enabled)" },
-  { name: "ingest-x-fri", task: "rotating_ingest", platform: "x", cron: "Fri 00:10 WIB", query: "(all enabled)" },
-  { name: "ingest-tiktok", task: "rotating_ingest", platform: "tiktok", cron: "Tue 00:20 WIB", query: "(all enabled, free actor)" },
-  { name: "ingest-instagram", task: "rotating_ingest", platform: "instagram", cron: "Mon 00:30 WIB", query: "(all enabled)" },
-  { name: "trending-ingest", task: "trending_ingest", platform: "x", cron: "12:00 WIB daily", query: "(trending overlay)" },
+  { name: "ingest-mainstream", task: "run_ingest", platform: "mainstream", cron: "every 2h (even hours WIB)", query: "(all enabled RSS feeds)" },
+  { name: "retry-failed-sentiment", task: "retry_failed_sentiment", platform: "—", cron: "every 2h (odd hours WIB)", query: "(re-classify failed sentiment rows)" },
+  { name: "ingest-youtube-channels", task: "run_ingest", platform: "youtube", cron: "Wed 21:00 WIB", query: "(channel whitelist uploads)" },
+  { name: "ingest-x-weekly", task: "run_ingest", platform: "x", cron: "Wed 22:00 WIB", query: "(rotating ingest_queries, lang:id)" },
+  { name: "ingest-tiktok-weekly", task: "run_ingest", platform: "tiktok", cron: "Wed 22:10 WIB", query: "(rotating ingest_queries)" },
+  { name: "ingest-instagram-weekly", task: "run_ingest", platform: "instagram", cron: "Wed 22:20 WIB", query: "(rotating ingest_queries)" },
+  { name: "recluster-daily", task: "recluster_all", platform: "all", cron: "04:00 WIB daily", query: "(Gemini topic discovery)" },
+  { name: "send-weekly-digest", task: "send_weekly_digest", platform: "—", cron: "Thu 08:00 WIB", query: "(Resend → opt-in users)" },
+  { name: "trending-ingest", task: "trending_ingest", platform: "x+youtube", cron: "12:00 WIB daily", query: "(Trends + News RSS + YT mostPopular)" },
   { name: "reconcile-apify-costs", task: "reconcile_apify_costs", platform: "—", cron: "06:00 WIB daily", query: "(Apify billing reconcile)" },
-  { name: "recluster-topics", task: "recluster_all", platform: "all", cron: "04:00 WIB daily", query: "(Gemini topic discovery)" },
   { name: "snapshot-system", task: "snapshot_system", platform: "host", cron: "every 60s", query: "—" },
 ] as const;
 
@@ -50,6 +60,7 @@ export default async function PipelinePage() {
     latestPerTask,
     latestSystemMetric,
     latestApifyReconcile,
+    latestTrendingFilter,
     postsClassified7d,
   ] = await Promise.all([
     db
@@ -103,6 +114,17 @@ export default async function PipelinePage() {
     db.execute(sql`
       SELECT occurred_at FROM usage_events
       WHERE operation = 'billing_reconcile'
+      ORDER BY occurred_at DESC LIMIT 1
+    `) as unknown as Promise<Array<{ occurred_at: string }>>,
+    // trending_ingest itself doesn't log to ingest_runs — its fan-out
+    // sub-runs land under task_name='run_ingest' (one per trending
+    // keyword), indistinguishable from the weekly X/YT scrapes. The
+    // one signal that's unique to trending is the single Gemini-Flash
+    // "distill trending keywords" call recorded as a usage_event with
+    // operation='trending_filter'. That's our freshness proxy.
+    db.execute(sql`
+      SELECT occurred_at FROM usage_events
+      WHERE operation = 'trending_filter'
       ORDER BY occurred_at DESC LIMIT 1
     `) as unknown as Promise<Array<{ occurred_at: string }>>,
     // Unique posts that completed Gemini classification in the last
@@ -230,6 +252,15 @@ export default async function PipelinePage() {
                   </span>
                 ) : (
                   <span className="text-slate-400">no reconcile yet</span>
+                );
+              } else if (s.task === "trending_ingest") {
+                const ts = latestTrendingFilter[0]?.occurred_at;
+                cell = ts ? (
+                  <span className="text-emerald-700">
+                    success · {formatRelative(ts)}
+                  </span>
+                ) : (
+                  <span className="text-slate-400">no runs yet</span>
                 );
               } else {
                 // Match by task_name (+ platform if it disambiguates).
