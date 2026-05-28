@@ -709,12 +709,11 @@ function LiveStream({
               })}
               className="mt-1.5 block text-pretty text-sm text-slate-600"
             />
-            <I18nText
-              text={tInsights("live_section_top50_note", {
-                count: live.totalPosts.toLocaleString(),
-              })}
-              className="mt-1 block text-pretty text-xs italic text-slate-500"
-            />
+            {/* The "chart vs chip count" disclaimer was only needed while
+                the post list was capped at 50 (and later 1000) — chip
+                counts now match the chart because the list shows every
+                post (sentiment classification is 100% coverage), so the
+                note is omitted to reduce footer noise. */}
           </div>
 
           {/* Sentiment mix mini-chart */}

@@ -142,7 +142,12 @@ export default async function PostsBrowsePage({
     .from(schema.socialPosts)
     .where(and(...queryFilters))
     .orderBy(desc(schema.socialPosts.postedAt))
-    .limit(50);
+    // Drilldown browser — was capped at 50 but the platform page now
+    // shows up to 1000 via the collapsible LiveStream, so the drilldown
+    // shouldn't be the more-restrictive view. 1000 covers any reasonable
+    // browse session; proper paging can land later if a category builds
+    // up beyond that.
+    .limit(1000);
 
   // Per-sentiment totals, ignoring the current sentiment chip so each
   // chip shows "how many would I see if I switched to this".

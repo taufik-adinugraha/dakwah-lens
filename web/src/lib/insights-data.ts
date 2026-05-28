@@ -218,11 +218,16 @@ export async function getPlatformInsights(
         + LEAST(LN(1 + COALESCE(${schema.socialPosts.engagementScore}, 0)) / 12.0, 1.0)
       )`),
     )
-    // Up from 50: the platform page now collapses the post list by
-    // default, so we can afford a deeper pool for users who explicitly
-    // expand it. 1000 covers x / yt / tt / ig comfortably and clips the
-    // mainstream long tail (6K+) at a payload that still loads quickly.
-    .limit(1000);
+    // No cap — return every post for the platform. The list is
+    // collapsed by default so the initial paint pays no rendering cost
+    // for the larger payload; only users who explicitly expand take the
+    // DOM hit. Removing the cap also makes the chip-filter counts equal
+    // the Sentiment-mix chart (sentiment classification is currently
+    // 100% across all platforms), eliminating the "why are these
+    // numbers different" disclaimer that previously sat under the
+    // section header. Mainstream is the largest at ~8K posts; transfer
+    // size is acceptable with the collapsed default.
+;
 
   // Sentiment mix — count per label.
   const sentimentRows = (await db

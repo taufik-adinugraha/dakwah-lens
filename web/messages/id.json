@@ -774,7 +774,7 @@
     "posts_browse_title": "Jelajahi postingan",
     "posts_browse_title_platform": "Semua postingan {platform}",
     "posts_browse_title_with_category": "{platform} · {category}",
-    "posts_browse_count": "Menampilkan {count} postingan terbaru",
+    "posts_browse_count": "Menampilkan {count} postingan, terbaru di atas",
     "posts_back_to_platform": "Kembali ke ringkasan platform",
     "posts_sentiment_filter_label": "Sentimen:",
     "posts_sentiment_all": "Semua",

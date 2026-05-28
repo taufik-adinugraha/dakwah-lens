@@ -778,7 +778,7 @@
     "posts_browse_title": "Browse posts",
     "posts_browse_title_platform": "All {platform} posts",
     "posts_browse_title_with_category": "{platform} · {category}",
-    "posts_browse_count": "Showing {count} most recent posts",
+    "posts_browse_count": "Showing {count} posts, newest first",
     "posts_back_to_platform": "Back to platform overview",
     "posts_sentiment_filter_label": "Sentiment:",
     "posts_sentiment_all": "All",
