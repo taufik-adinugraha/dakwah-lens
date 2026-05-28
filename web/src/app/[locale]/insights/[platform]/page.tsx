@@ -37,7 +37,12 @@ import {
   type ScopeFilter,
   type TopEngagedPost,
 } from "@/lib/insights-data";
-import { getRisingVideos, type RisingVideo } from "@/lib/dashboard-metrics";
+import {
+  getDawahCategoryReachDelta,
+  getRisingVideos,
+  type DawahCategoryReach,
+  type RisingVideo,
+} from "@/lib/dashboard-metrics";
 
 export function generateStaticParams() {
   // Pre-render every (locale, platform) combination.
@@ -114,14 +119,26 @@ export default async function PlatformDrilldownPage({
   //   - Mainstream / TT / FB: skip — no useful engagement signal.
   const isYouTube = platform === "youtube";
   const hasEngagement = platform === "x" || platform === "instagram";
-  const [live, session, risingVideos, topEngaged] = await Promise.all([
-    getPlatformInsights(platform, filters),
-    auth(),
-    isYouTube ? getRisingVideos(10) : Promise.resolve([] as RisingVideo[]),
-    hasEngagement
-      ? getTopEngagedPosts(platform, 10)
-      : Promise.resolve([] as TopEngagedPost[]),
-  ]);
+  // Bucket-reach widget is meaningful on every platform that has either
+  // engagement (YT/X/IG, sums views) or a per-article count (mainstream,
+  // sums articles). Skip on TikTok (disabled) and Facebook (no data).
+  const showBucketReach =
+    platform === "youtube" ||
+    platform === "x" ||
+    platform === "instagram" ||
+    platform === "mainstream";
+  const [live, session, risingVideos, topEngaged, bucketReach] =
+    await Promise.all([
+      getPlatformInsights(platform, filters),
+      auth(),
+      isYouTube ? getRisingVideos(10) : Promise.resolve([] as RisingVideo[]),
+      hasEngagement
+        ? getTopEngagedPosts(platform, 10)
+        : Promise.resolve([] as TopEngagedPost[]),
+      showBucketReach
+        ? getDawahCategoryReachDelta(platform)
+        : Promise.resolve([] as DawahCategoryReach[]),
+    ]);
 
   // Use real da'wah-category clusters when we have a meaningful number of
   // classified posts; below that threshold the mock editorial clusters are
@@ -141,6 +158,9 @@ export default async function PlatformDrilldownPage({
           activeRegion={region}
           tInsights={tInsights}
         />
+      )}
+      {bucketReach.length > 0 && (
+        <BucketReachPanel rows={bucketReach} tInsights={tInsights} />
       )}
       {live && live.totalPosts > 0 && (
         <LiveStream live={live} t={t} tInsights={tInsights} />
@@ -1102,4 +1122,82 @@ function formatCompactInt(n: number): string {
   if (n < 1000) return String(n);
   if (n < 1_000_000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}K`;
   return `${(n / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`;
+}
+
+/* ───────────────────────────────────────────────────────────────────
+ * BucketReachPanel — week-over-week reach by da'wah category.
+ *
+ * Bucket = post's dominant da'wah category (from the 9-cat JSONB).
+ * Metric = SUM(engagement_views) on platforms with engagement
+ * (YT/X/IG), or COUNT(*) on mainstream where RSS has no per-article
+ * views. Same widget shape on every platform; the unit label flips
+ * to "articles" on mainstream so the number reads honestly.
+ * ─────────────────────────────────────────────────────────────────── */
+function BucketReachPanel({
+  rows,
+  tInsights,
+}: {
+  rows: DawahCategoryReach[];
+  tInsights: Awaited<ReturnType<typeof getTranslations>>;
+}) {
+  return (
+    <section className="border-y border-slate-100 bg-slate-50/40 py-10 sm:py-12">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <h2 className="text-base font-semibold tracking-tight text-slate-900 sm:text-lg">
+          {tInsights("section_bucket_reach_title")}
+        </h2>
+
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {rows.map((r) => {
+            const dir =
+              r.deltaPct === null
+                ? "—"
+                : r.deltaPct > 0
+                  ? "up"
+                  : r.deltaPct < 0
+                    ? "down"
+                    : "flat";
+            const deltaClass =
+              dir === "up"
+                ? "text-emerald-700"
+                : dir === "down"
+                  ? "text-rose-700"
+                  : "text-slate-500";
+            const label = DAWAH_CATEGORIES.includes(
+              r.category as (typeof DAWAH_CATEGORIES)[number],
+            )
+              ? tInsights(
+                  `dawah_category_${r.category}` as Parameters<typeof tInsights>[0],
+                )
+              : r.category;
+            const unitLabel =
+              r.unit === "articles"
+                ? tInsights("bucket_reach_unit_articles")
+                : tInsights("bucket_reach_unit_views");
+            return (
+              <div
+                key={r.category}
+                className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm"
+              >
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                  {label}
+                </div>
+                <div className="mt-0.5 text-sm font-semibold tabular-nums text-slate-900">
+                  {formatCompactInt(r.valueThisWeek)} {unitLabel}
+                </div>
+                <div className={`text-[11px] tabular-nums ${deltaClass}`}>
+                  {r.deltaPct === null
+                    ? tInsights("bucket_reach_no_baseline")
+                    : tInsights("bucket_reach_delta", {
+                        sign: r.deltaPct >= 0 ? "+" : "",
+                        pct: r.deltaPct.toFixed(0),
+                      })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
 }

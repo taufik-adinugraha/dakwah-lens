@@ -707,6 +707,94 @@ export async function getBucketEngagementDelta(): Promise<BucketDelta[]> {
 }
 
 /* ─────────────────────────────────────────────────────────────
+ * Bucket reach by da'wah category — 7d vs prior 7d, per-platform.
+ *
+ * Distinct from `getBucketEngagementDelta` (admin/youtube-channels):
+ * that one buckets by `youtube_channels.category` (an editorial
+ * channel-genre enum), this one buckets by the post's DOMINANT
+ * da'wah category from the 9-category JSONB taxonomy populated on
+ * EVERY platform. Used by /insights/<platform> so the same widget
+ * shape works across YT / X / IG / mainstream.
+ *
+ * Metric per platform:
+ *   mainstream  → COUNT(*) (no engagement_views from RSS), unit='articles'
+ *   else        → SUM(engagement_views),                   unit='views'
+ *
+ * Returns sorted desc by `valueThisWeek` so the biggest bucket leads
+ * the strip.
+ * ───────────────────────────────────────────────────────────── */
+
+export type DawahCategoryReach = {
+  category: string;
+  valueThisWeek: number;
+  valueLastWeek: number;
+  deltaPct: number | null;
+  unit: "views" | "articles";
+};
+
+const DAWAH_CATS_SQL = sql.raw(
+  ["aqidah", "akhlaq", "muamalah", "social_justice", "family", "youth",
+    "education", "economic_ethics", "health"]
+    .map((c) => `'${c}'`)
+    .join(","),
+);
+
+export async function getDawahCategoryReachDelta(
+  platform: string,
+): Promise<DawahCategoryReach[]> {
+  const isMainstream = platform === "mainstream";
+  // Use COUNT(*) for mainstream (no engagement_views from RSS) so the
+  // section stays meaningful; SUM(engagement_views) for everyone else
+  // since the engagement_score backfill populated that column 100%.
+  const metricExpr = isMainstream
+    ? sql`COUNT(*)`
+    : sql`COALESCE(SUM(sp.engagement_views), 0)`;
+
+  const rows = (await db.execute(sql`
+    SELECT
+      dominant.cat AS category,
+      ${metricExpr} FILTER (
+        WHERE sp.posted_at >= now() - interval '7 days'
+      )::bigint AS metric_this,
+      ${metricExpr} FILTER (
+        WHERE sp.posted_at >= now() - interval '14 days'
+          AND sp.posted_at <  now() - interval '7 days'
+      )::bigint AS metric_last
+    FROM social_posts sp
+    CROSS JOIN LATERAL (
+      SELECT key AS cat
+      FROM jsonb_each_text(sp.categories)
+      WHERE key = ANY (ARRAY[${DAWAH_CATS_SQL}])
+        AND value::numeric > 0.1
+      ORDER BY value::numeric DESC
+      LIMIT 1
+    ) dominant
+    WHERE sp.platform = ${platform}
+      AND sp.posted_at >= now() - interval '14 days'
+      AND sp.categories IS NOT NULL
+    GROUP BY dominant.cat
+    ORDER BY metric_this DESC
+  `)) as unknown as Array<{
+    category: string;
+    metric_this: number;
+    metric_last: number;
+  }>;
+
+  return rows.map((r) => {
+    const thisWeek = Number(r.metric_this);
+    const lastWeek = Number(r.metric_last);
+    return {
+      category: r.category,
+      valueThisWeek: thisWeek,
+      valueLastWeek: lastWeek,
+      deltaPct:
+        lastWeek > 0 ? ((thisWeek - lastWeek) / lastWeek) * 100 : null,
+      unit: isMainstream ? ("articles" as const) : ("views" as const),
+    };
+  });
+}
+
+/* ─────────────────────────────────────────────────────────────
  * Dashboard tabs — Kit + Data surfaces
  * Helpers for the revamped /dashboard layout.
  * ───────────────────────────────────────────────────────────── */
