@@ -145,7 +145,10 @@ export default async function MyFlyersPage({
           labels={{
             monthLabel: tBriefs("filter_month_label"),
             allTime: tBriefs("filter_all_time"),
-            pageOf: tBriefs("filter_page_of"),
+            pageOf: tBriefs("filter_page_of", {
+              current: safePage,
+              total: totalPages,
+            }),
             prev: tBriefs("filter_prev"),
             next: tBriefs("filter_next"),
           }}

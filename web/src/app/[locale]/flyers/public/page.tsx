@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, gte, lt, sql } from "drizzle-orm";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Sparkles } from "lucide-react";
 
 import { auth } from "@/auth";
+import { MonthPickerPager } from "@/components/MonthPickerPager";
 import { db, schema } from "@/db";
 import { Link } from "@/i18n/navigation";
+import {
+  monthRangeUtc,
+  parseMonthParam,
+  parsePageParam,
+} from "@/lib/month-filter";
 
 import { FlyerGrid } from "../FlyerGrid";
 
@@ -14,6 +20,8 @@ import { FlyerGrid } from "../FlyerGrid";
 // fresh weekly briefing lands. 1-min cache keeps the page snappy
 // without serving very stale state.
 export const revalidate = 60;
+
+const PAGE_SIZE = 30;
 
 /**
  * Subset of /api/insights-brief/{slug}/flyer variants we surface in
@@ -72,31 +80,81 @@ function formatWibDate(d: Date): string {
 
 export default async function PublicFlyersPage({
   params,
+  searchParams,
 }: PageProps<"/[locale]/flyers/public">) {
   const { locale } = await params;
   setRequestLocale(locale);
 
   const t = await getTranslations("UserFlyers");
+  const tBriefs = await getTranslations("Briefs");
   const session = await auth();
   const langParam = locale === "en" ? "en" : "id";
+  const sp = await searchParams;
+  const selectedMonth = parseMonthParam(sp.month);
+  const page = parsePageParam(sp.page);
 
-  // ── Pull the MOST-RECENT briefing per segment ─────────────────
-  // The gallery used to surface every briefing in the last 60 days
-  // (12 × 6 = 72 cards) but that buried this-week's content under
-  // archive material. Now we surface one row per segment (5 max) and
-  // generate 6 share-variant cards from each → at most 30 cards.
-  //
-  // `DISTINCT ON` keeps the newest row per segment (`segment` IS NULL
-  // is treated as its own group — that's the "all" briefing).
-  const briefingRows = (await db.execute(sql`
-    SELECT DISTINCT ON (segment) id, generated_at, segment
-    FROM insights_summaries
-    ORDER BY segment NULLS FIRST, generated_at DESC
-  `)) as unknown as Array<{
+  // ── Months available for the picker dropdown ──────────────────
+  // Union of months that have at least one briefing OR at least one
+  // public user_flyer. WIB-anchored so a row at 2026-04-30 23:00 UTC
+  // (= 2026-05-01 06:00 WIB) shows up under May, matching the user's
+  // local-clock intuition.
+  const monthRows = (await db.execute(sql`
+    SELECT year, month FROM (
+      SELECT DISTINCT
+        EXTRACT(YEAR FROM (generated_at AT TIME ZONE 'Asia/Jakarta'))::int AS year,
+        EXTRACT(MONTH FROM (generated_at AT TIME ZONE 'Asia/Jakarta'))::int AS month
+      FROM insights_summaries
+      UNION
+      SELECT DISTINCT
+        EXTRACT(YEAR FROM (created_at AT TIME ZONE 'Asia/Jakarta'))::int AS year,
+        EXTRACT(MONTH FROM (created_at AT TIME ZONE 'Asia/Jakarta'))::int AS month
+      FROM user_flyers
+      WHERE visibility = 'public'
+    ) months
+    ORDER BY year DESC, month DESC
+  `)) as unknown as Array<{ year: number; month: number }>;
+  const monthsAvailable = monthRows.map((r) => ({
+    year: Number(r.year),
+    month: Number(r.month),
+  }));
+
+  // ── Briefings to render ───────────────────────────────────────
+  // Default (no month selected): the most-recent briefing per segment
+  // — keeps this-week's drop on top and caps cards at ~30. Picking a
+  // month switches to archive mode and pulls every briefing within
+  // that WIB month.
+  let briefingRows: Array<{
     id: string;
     generated_at: Date;
     segment: string | null;
   }>;
+  if (selectedMonth) {
+    const { startUtc, endUtc } = monthRangeUtc(
+      selectedMonth.year,
+      selectedMonth.month,
+    );
+    briefingRows = (await db.execute(sql`
+      SELECT id, generated_at, segment
+      FROM insights_summaries
+      WHERE generated_at >= ${startUtc.toISOString()}
+        AND generated_at <  ${endUtc.toISOString()}
+      ORDER BY generated_at DESC, segment NULLS FIRST
+    `)) as unknown as Array<{
+      id: string;
+      generated_at: Date;
+      segment: string | null;
+    }>;
+  } else {
+    briefingRows = (await db.execute(sql`
+      SELECT DISTINCT ON (segment) id, generated_at, segment
+      FROM insights_summaries
+      ORDER BY segment NULLS FIRST, generated_at DESC
+    `)) as unknown as Array<{
+      id: string;
+      generated_at: Date;
+      segment: string | null;
+    }>;
+  }
 
   const systemFlyers = briefingRows.flatMap((b) => {
     const generatedAt = new Date(b.generated_at);
@@ -118,8 +176,26 @@ export default async function PublicFlyersPage({
     }));
   });
 
-  // ── Pull user-published flyers (last 60 days; future-proof, the
-  // page paginates so the cap stays low). ──────────────────────
+  // ── User-published flyers ─────────────────────────────────────
+  // Same scoping rule as briefings: by-month when a month is picked,
+  // otherwise last 60 days (current behavior).
+  const userFlyerWhere = selectedMonth
+    ? (() => {
+        const { startUtc, endUtc } = monthRangeUtc(
+          selectedMonth.year,
+          selectedMonth.month,
+        );
+        return and(
+          eq(schema.userFlyers.visibility, "public"),
+          gte(schema.userFlyers.createdAt, startUtc),
+          lt(schema.userFlyers.createdAt, endUtc),
+        )!;
+      })()
+    : and(
+        eq(schema.userFlyers.visibility, "public"),
+        sql`${schema.userFlyers.createdAt} >= now() - interval '60 days'`,
+      )!;
+
   const userRows = await db
     .select({
       id: schema.userFlyers.id,
@@ -128,14 +204,9 @@ export default async function PublicFlyersPage({
       createdAt: schema.userFlyers.createdAt,
     })
     .from(schema.userFlyers)
-    .where(
-      and(
-        eq(schema.userFlyers.visibility, "public"),
-        sql`${schema.userFlyers.createdAt} >= now() - interval '60 days'`,
-      ),
-    )
+    .where(userFlyerWhere)
     .orderBy(desc(schema.userFlyers.createdAt))
-    .limit(60);
+    .limit(selectedMonth ? 240 : 60);
 
   const userFlyers = userRows.map((r) => ({
     id: r.id,
@@ -145,9 +216,15 @@ export default async function PublicFlyersPage({
     kind: "user" as const,
   }));
 
-  // Merge + sort newest first.
-  const flyers = [...systemFlyers, ...userFlyers].sort((a, b) =>
+  // Merge + sort newest first, then paginate.
+  const allFlyers = [...systemFlyers, ...userFlyers].sort((a, b) =>
     a.createdAt < b.createdAt ? 1 : -1,
+  );
+  const totalPages = Math.max(1, Math.ceil(allFlyers.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pageFlyers = allFlyers.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE,
   );
 
   return (
@@ -172,7 +249,31 @@ export default async function PublicFlyersPage({
         )}
       </header>
 
-      {flyers.length === 0 ? (
+      {monthsAvailable.length > 0 && (
+        <MonthPickerPager
+          baseHref="/flyers/public"
+          monthsAvailable={monthsAvailable}
+          selectedMonth={selectedMonth}
+          page={safePage}
+          totalPages={totalPages}
+          locale={locale}
+          labels={{
+            monthLabel: tBriefs("filter_month_label"),
+            // Default ("no month") view is this-week's drop only, not
+            // every public flyer ever — so override the picker's
+            // generic "All time" label to match.
+            allTime: tBriefs("filter_latest_week"),
+            pageOf: tBriefs("filter_page_of", {
+              current: safePage,
+              total: totalPages,
+            }),
+            prev: tBriefs("filter_prev"),
+            next: tBriefs("filter_next"),
+          }}
+        />
+      )}
+
+      {pageFlyers.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center">
           <p className="text-sm font-semibold text-slate-700">
             {t("empty_public_title")}
@@ -183,7 +284,7 @@ export default async function PublicFlyersPage({
         </div>
       ) : (
         <FlyerGrid
-          flyers={flyers}
+          flyers={pageFlyers}
           locale={locale}
           labels={{
             visibilityBadgePublic: t("visibility_badge_public"),

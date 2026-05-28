@@ -486,6 +486,7 @@
     "list_locale_label": "Language",
     "filter_month_label": "Month",
     "filter_all_time": "All time",
+    "filter_latest_week": "Latest week",
     "filter_page_of": "Page {current} of {total}",
     "filter_prev": "Previous",
     "filter_next": "Next",

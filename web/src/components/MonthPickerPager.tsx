@@ -22,7 +22,7 @@ export function MonthPickerPager({
 }: {
   /** Path WITHOUT query string — e.g. "/briefs" or "/flyers/mine". The
    *  picker preserves it and only swaps `?month=...&page=...`. */
-  baseHref: "/briefs" | "/flyers/mine";
+  baseHref: "/briefs" | "/flyers/mine" | "/flyers/public";
   /** Distinct (year, month) tuples that have at least one row for this
    *  user. Newest first. The "All time" option is always prepended. */
   monthsAvailable: Array<{ year: number; month: number }>;
@@ -33,7 +33,12 @@ export function MonthPickerPager({
   labels: {
     monthLabel: string;
     allTime: string;
-    pageOf: string; // "Halaman {current} dari {total}"
+    /** Fully formatted pagination label, e.g. "Halaman 2 dari 5". The
+     *  caller is responsible for the substitution because next-intl's
+     *  t() throws when ICU variables are missing — so doing the
+     *  replacement here would force every caller to either pass dummy
+     *  vars or end up with the raw "namespace.key" fallback in the UI. */
+    pageOf: string;
     prev: string;
     next: string;
   };
@@ -108,11 +113,7 @@ export function MonthPickerPager({
           >
             <ChevronLeft className="h-3.5 w-3.5" />
           </Link>
-          <span className="px-2 tabular-nums">
-            {labels.pageOf
-              .replace("{current}", String(page))
-              .replace("{total}", String(totalPages))}
-          </span>
+          <span className="px-2 tabular-nums">{labels.pageOf}</span>
           <Link
             href={`${baseHref}?month=${monthParam}&page=${nextPage}`}
             aria-label={labels.next}

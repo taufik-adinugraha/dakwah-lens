@@ -482,6 +482,7 @@
     "list_locale_label": "Bahasa",
     "filter_month_label": "Bulan",
     "filter_all_time": "Semua waktu",
+    "filter_latest_week": "Pekan terbaru",
     "filter_page_of": "Halaman {current} dari {total}",
     "filter_prev": "Sebelumnya",
     "filter_next": "Berikutnya",

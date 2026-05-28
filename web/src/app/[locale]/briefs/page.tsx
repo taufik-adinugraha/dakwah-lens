@@ -157,7 +157,10 @@ export default async function MyBriefsPage({
           labels={{
             monthLabel: t("filter_month_label"),
             allTime: t("filter_all_time"),
-            pageOf: t("filter_page_of"),
+            pageOf: t("filter_page_of", {
+              current: safePage,
+              total: totalPages,
+            }),
             prev: t("filter_prev"),
             next: t("filter_next"),
           }}
