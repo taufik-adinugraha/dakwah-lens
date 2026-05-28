@@ -644,17 +644,19 @@ async function buildContent(ctx: FlyerContext): Promise<FlyerContent> {
     // The Pesan Flyer 5 / 6 paragraphs carry the relevant du'a +
     // citation INLINE — that's the whole point of these flyers.
     //
-    // Strategy (in priority order):
-    //   1. The briefing's `adhkarRefs` pool — du'a retrieved from the
-    //      kitab corpus via the du'a-biased query path. The LLM cites
-    //      from this pool when it writes Pesan Flyer 5+6, so the
-    //      `**Daleel:**` marker on the block should match one of
-    //      these entries. This is the verified path.
-    //   2. parseInlineDua — fallback when the briefing was written
-    //      before the 2026-05-23 adhkar split (adhkarRefs is null) or
-    //      the marker citation didn't match a pool entry. Extracts
-    //      the Arabic + translation + citation from the paragraph
-    //      itself.
+    // Strategy (in priority order — UPDATED 2026-05-28):
+    //   1. parseInlineDua — when the LLM (or operator) wrote the clean
+    //      du'a portion inline in the Pesan Flyer block, USE THAT.
+    //      Adhkar pool entries are often hadits panjang dengan isnad
+    //      (600-800 char). Rendering the whole hadits on a 1080×1080
+    //      flyer drowns the recitable du'a in narration. The LLM is
+    //      instructed (prompt: "ATURAN JENIS KONTEN") to extract only
+    //      the actual `الله ُمَّ ...` invocation portion and write it
+    //      inline — that's the recitable du'a we want to render.
+    //   2. The briefing's `adhkarRefs` pool — fallback when inline
+    //      parsing fails (no Arabic in block, or no Indonesian quote).
+    //      Citation still refers to a hadits in the pool; pool entry
+    //      shows up as-is (long isnad and all). Last resort.
     //   3. null — for variant a (Sunnah call) we explicitly skip the
     //      daleel card so the inline short du'a in the message
     //      paragraph stays the only du'a reference.
@@ -678,7 +680,7 @@ async function buildContent(ctx: FlyerContext): Promise<FlyerContent> {
     // Dzulhijjah). Earlier we hid the card on variant a; that left a
     // ritual sunnah call without its evidence, which doesn't fly per
     // PRD §12 (every Islamic reference must be retrieved + cited).
-    const resolvedDaleel = adhkarPoolDaleel ?? inlineDua;
+    const resolvedDaleel = inlineDua ?? adhkarPoolDaleel;
     return {
       brand,
       dateLabel,
