@@ -797,12 +797,22 @@ export async function getDawahCategoryReachDelta(
   return rows.map((r) => {
     const thisWeek = Number(r.metric_this);
     const lastWeek = Number(r.metric_last);
+    // Suppress delta% when the baseline is so thin the percent is
+    // dominated by data-pipeline warm-up, not real growth. Bar: prior
+    // 7d must have ≥10 items AND ≥5% of this week. Otherwise we'd
+    // render "+1,350,043%" type numbers that are arithmetically right
+    // but read as misleading "everything's viral!" when really the
+    // ingest pipeline just came online. Self-heals once the pipeline
+    // has had two stable weeks (then 5% of this-week is always cleared).
+    const thinBaseline = lastWeek < Math.max(10, thisWeek * 0.05);
     return {
       category: r.category,
       valueThisWeek: thisWeek,
       valueLastWeek: lastWeek,
       deltaPct:
-        lastWeek > 0 ? ((thisWeek - lastWeek) / lastWeek) * 100 : null,
+        lastWeek > 0 && !thinBaseline
+          ? ((thisWeek - lastWeek) / lastWeek) * 100
+          : null,
       unit,
     };
   });
