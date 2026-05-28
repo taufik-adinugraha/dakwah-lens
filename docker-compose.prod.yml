@@ -154,6 +154,11 @@ services:
       CLASSIFIER_MODEL: ${CLASSIFIER_MODEL:-gemini-2.0-flash}
       BRIEF_MODEL: ${BRIEF_MODEL:-gemini-2.5-pro}
       BRIEF_FALLBACK_MODEL: ${BRIEF_FALLBACK_MODEL:-claude-sonnet-4-6}
+      # Resend mirror of the `web` block — admin endpoints on /api may
+      # trigger a digest send, so the api needs the same credentials the
+      # worker uses for the Thursday 08:00 weekly digest task.
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      EMAIL_FROM: ${EMAIL_FROM}
       TZ: Asia/Jakarta
     volumes:
       - /srv/dakwah-lens/data/attachments:/data/attachments
@@ -195,6 +200,12 @@ services:
       YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-large}
       CLASSIFIER_MODEL: ${CLASSIFIER_MODEL:-gemini-2.0-flash}
+      # Resend — required by the Thursday 08:00 WIB `send_weekly_digest`
+      # Celery task. Without these the task logs `email_digest.no_resend_key`
+      # and silently no-ops (which is what was happening every Thursday
+      # before this block was added).
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      EMAIL_FROM: ${EMAIL_FROM}
       TZ: Asia/Jakarta
     command:
       [

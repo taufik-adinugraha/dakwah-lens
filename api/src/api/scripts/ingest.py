@@ -171,6 +171,34 @@ async def _run(
             print("⚠ All items were non-Indonesian — skipping")
             return 0
 
+    # 3a-bis. Dedup within the current batch by `external_id`. The upsert
+    # below uses ON CONFLICT (platform, external_id) DO UPDATE, and
+    # Postgres rejects any single statement that would update the same
+    # target row twice ("ON CONFLICT DO UPDATE command cannot affect row
+    # a second time"). Mainstream RSS triggers this whenever two outlets
+    # republish the same article — observed in prod 2026-05-28 (mainstream
+    # 04:00 + 06:00 runs both failed with CardinalityViolationError, four
+    # hours of coverage missed before this guard landed). Keep the LAST
+    # occurrence so a refreshed body / engagement / region wins over an
+    # older mirror with the same id.
+    if rows:
+        last_seen: dict[str, int] = {}
+        for i, r in enumerate(rows):
+            last_seen[r["external_id"]] = i
+        if len(last_seen) < len(rows):
+            keep = sorted(last_seen.values())
+            dropped = len(rows) - len(keep)
+            log.info(
+                "ingest.dedup_within_batch",
+                platform=platform,
+                dropped=dropped,
+            )
+            print(
+                f"  Within-batch dedup: dropped {dropped} duplicate external_ids"
+            )
+            rows = [rows[i] for i in keep]
+            texts = [texts[i] for i in keep]
+
     # 3b. Look up rows we've already classified — RSS feeds carry items
     # for ~24h and beat fires every 2h, so a naive re-classify burns
     # ~80% of Gemini calls on items already in the DB. Skip the LLM for
