@@ -92,6 +92,7 @@ export default async function InsightsExplorePage({
     "bg-violet-500",
   ];
   const categories = (overview?.dominantCategories ?? []).map((c, i) => ({
+    key: c.category,
     label: localizeCategory(t, c.category),
     volume: c.posts,
     tone: CATEGORY_TONES[i % CATEGORY_TONES.length],
@@ -264,11 +265,17 @@ export default async function InsightsExplorePage({
                 <I18nText text={t("how_coverage_posts_empty")} />
               </div>
             ) : (
-              <div className="mt-3 space-y-2">
+              <div className="mt-3 space-y-1">
                 {categories.map((c) => (
-                  <div key={c.label} className="text-xs">
+                  <Link
+                    key={c.key}
+                    href={`/insights/category/${c.key}`}
+                    className="group block rounded-md px-1.5 py-1 text-xs transition hover:bg-slate-50"
+                  >
                     <div className="mb-1 flex items-center justify-between text-xs text-slate-600">
-                      <span>{c.label}</span>
+                      <span className="font-medium text-slate-700 group-hover:text-slate-900">
+                        {c.label}
+                      </span>
                       <span className="tabular-nums">
                         {c.volume.toLocaleString()}
                       </span>
@@ -279,7 +286,7 @@ export default async function InsightsExplorePage({
                         style={{ width: `${(c.volume / catMax) * 100}%` }}
                       />
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             )}
@@ -371,7 +378,11 @@ const PLATFORM_VISUALS: Record<
     key: "instagram",
     Icon: InstagramIcon,
     iconBg: "bg-gradient-to-br from-fuchsia-500 via-rose-500 to-amber-400",
-    barColor: "bg-rose-500",
+    // Was bg-rose-500 — visually identical to YouTube's bg-red-500 on
+    // the source-mix bar. Swap to emerald so the two platforms are
+    // distinguishable. Icon keeps its native gradient; only the chart
+    // bar / legend dot use this color.
+    barColor: "bg-emerald-500",
     href: "/insights/instagram",
   },
   facebook: {

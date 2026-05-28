@@ -140,28 +140,21 @@ celery_app.conf.update(
         #   · TikTok ($0.004/item)    ≈ $3.92/run → $16/mo
         #   · Instagram ($0.0023/item) ≈ $2.25/run → $9/mo
         # Keep limit at 20 — bumping higher pushes TT past budget cap.
-        # ingest-tiktok-weekly DISABLED 2026-05-28.
-        # Reasons:
-        #   1. TikTok's hashtag scraper hit 30.1% foreign-language noise
-        #      (cross-language collisions on words like #zina, #guru, etc.)
-        #      — confirmed by the language-cleanup pass that deleted 129
-        #      of 429 weekly posts.
-        #   2. clockworks/free-tiktok-scraper is $0.056/item (14× IG,
-        #      140× X), so the foreign waste is the dominant social-
-        #      Apify cost line (~$5-7/wk wasted on dropped posts alone).
-        #   3. Topical signal heavily overlaps YouTube (same Indonesian
-        #      da'i preachers cross-post to both platforms), so removing
-        #      TT does not blind the insights pipeline materially.
-        # Re-enable as a channel-driven scrape (small TT-native creator
-        # whitelist, profile/uploads endpoint) if TT-specific Gen Z
-        # short-form signal becomes a product priority. Belt-and-suspenders:
-        # ingest_queries.enabled=false is also applied to all TT rows so
-        # an accidental manual `--platform tiktok` run is a no-op.
-        # "ingest-tiktok-weekly": {
-        #     "task": "api.workers.ingest.rotating_ingest",
-        #     "schedule": crontab(minute=10, hour=22, day_of_week=3),
-        #     "kwargs": {"platform": "tiktok", "limit": 20, "n_keywords": 999},
-        # },
+        # ingest-tiktok-weekly RE-ENABLED 2026-05-28 with a pruned seed
+        # list (36 Indonesian-distinctive seeds, down from 49) — 13
+        # collision-prone English/multilingual hashtags (#anime, #crypto,
+        # #film, #game, #guru, #healing, #kpop, #mental, #parenting,
+        # #viral, #zina, #burnout, #childfree) were marked enabled=false
+        # in ingest_queries because TT's $0.056/item rate makes each
+        # foreign-language pull expensive (was 30.1% foreign noise before
+        # the audit). Watch the next Wed 22:10 WIB run's foreign-rate via
+        # the language-cleanup script; if still >15%, prune further from:
+        # genz / stres / bully (Indonesian-used but English-loanword).
+        "ingest-tiktok-weekly": {
+            "task": "api.workers.ingest.rotating_ingest",
+            "schedule": crontab(minute=10, hour=22, day_of_week=3),
+            "kwargs": {"platform": "tiktok", "limit": 20, "n_keywords": 999},
+        },
         "ingest-instagram-weekly": {
             "task": "api.workers.ingest.rotating_ingest",
             "schedule": crontab(minute=20, hour=22, day_of_week=3),
