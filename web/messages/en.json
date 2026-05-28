@@ -621,7 +621,7 @@
     "quick_explore": "Data explorer",
     "quick_discussions": "Discussions",
     "section_rising_videos": "Trending videos this week",
-    "section_rising_videos_subtitle": "YouTube videos whose audience grew fastest in the last 24h — a signal of what's resonating with the ummah right now.",
+    "section_rising_videos_subtitle": "YouTube videos whose audience grew fastest in the last 24h — a signal of what's resonating with the ummah right now. The number on the left = percent of total views that came from the past 24h.",
     "rising_videos_empty": "No velocity data yet — needs at least 2 days of YouTube snapshots to compute deltas.",
     "rising_videos_delta_tpl": "+{delta} views ({pct}%)",
     "rising_videos_views_now_tpl": "{views} views now",

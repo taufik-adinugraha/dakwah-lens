@@ -17,6 +17,7 @@ that needs touching.
 from __future__ import annotations
 
 import html
+import math
 import re
 from collections.abc import Callable
 from datetime import UTC, datetime
@@ -116,6 +117,53 @@ def _str_or_none(value: Any, max_len: int = 255) -> str | None:
     return None
 
 
+def _int_or_none(value: Any) -> int | None:
+    """Best-effort int coercion for engagement counts.
+
+    Apify actors are inconsistent: some return ints, some strings, some
+    occasionally booleans for empty values. Coerce sensibly and clamp at
+    zero so a stray negative doesn't poison the engagement_score log.
+    """
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int | float):
+        try:
+            return max(0, int(value))
+        except (OverflowError, ValueError):
+            return None
+    if isinstance(value, str):
+        s = value.replace(",", "").strip()
+        if not s:
+            return None
+        try:
+            return max(0, int(float(s)))
+        except (ValueError, OverflowError):
+            return None
+    return None
+
+
+def _engagement_score(
+    views: int | None,
+    likes: int | None,
+    comments: int | None,
+) -> float | None:
+    """Composite engagement score — mirrors the YouTube formula in
+    `models/social.py` so cross-platform ranking is comparable:
+        log10(views+1) + 0.5 * log10(comments+1) + 0.3 * log10(likes+1)
+    Views dominate the magnitude; comments outweigh likes because they
+    signal stronger audience reaction. Returns None when no signal at
+    all is present (so COALESCE downstream can treat "no data" distinctly
+    from "real zero engagement").
+    """
+    if views is None and likes is None and comments is None:
+        return None
+    return (
+        math.log10((views or 0) + 1)
+        + 0.5 * math.log10((comments or 0) + 1)
+        + 0.3 * math.log10((likes or 0) + 1)
+    )
+
+
 # ── X (Twitter) ────────────────────────────────────────────────────
 
 
@@ -164,6 +212,13 @@ def normalize_x(item: dict[str, Any]) -> dict[str, Any] | None:
         or (f"https://x.com/{author}/status/{external_id}" if author else None)
     )
 
+    # apidojo/tweet-scraper returns: viewCount, likeCount, replyCount,
+    # retweetCount, quoteCount, bookmarkCount. We map the three that line
+    # up with the views/likes/comments schema; retweet/quote/bookmark are
+    # left in raw_payload for future use.
+    views = _int_or_none(item.get("viewCount"))
+    likes = _int_or_none(item.get("likeCount") or item.get("favouriteCount"))
+    comments = _int_or_none(item.get("replyCount"))
     return {
         "platform": "x",
         "external_id": str(external_id),
@@ -174,6 +229,10 @@ def normalize_x(item: dict[str, Any]) -> dict[str, Any] | None:
         "posted_at": _to_datetime(
             item.get("created_at") or item.get("createdAt") or item.get("date")
         ),
+        "engagement_views": views,
+        "engagement_likes": likes,
+        "engagement_comments": comments,
+        "engagement_score": _engagement_score(views, likes, comments),
         "raw_payload": item,
     }
 
@@ -205,6 +264,13 @@ def normalize_tiktok(item: dict[str, Any]) -> dict[str, Any] | None:
 
     url = item.get("webVideoUrl") or item.get("url") or item.get("videoUrl")
 
+    # clockworks/free-tiktok-scraper returns: playCount, diggCount (=likes),
+    # commentCount, shareCount, collectCount. shareCount/collectCount are
+    # left in raw_payload — engagement_* columns store views/likes/comments
+    # so the cross-platform composite score stays apples-to-apples.
+    views = _int_or_none(item.get("playCount") or item.get("viewCount"))
+    likes = _int_or_none(item.get("diggCount") or item.get("likeCount"))
+    comments = _int_or_none(item.get("commentCount"))
     return {
         "platform": "tiktok",
         "external_id": str(external_id),
@@ -219,6 +285,10 @@ def normalize_tiktok(item: dict[str, Any]) -> dict[str, Any] | None:
             or item.get("createTime")
             or item.get("createdAt")
         ),
+        "engagement_views": views,
+        "engagement_likes": likes,
+        "engagement_comments": comments,
+        "engagement_score": _engagement_score(views, likes, comments),
         "raw_payload": item,
     }
 
@@ -257,6 +327,17 @@ def normalize_instagram(item: dict[str, Any]) -> dict[str, Any] | None:
         f"https://www.instagram.com/p/{external_id}/" if external_id else None
     )
 
+    # apify/instagram-hashtag-scraper returns: likesCount, commentsCount.
+    # Views only on video posts (videoViewCount / videoPlayCount); image
+    # posts have no view count — that's fine, engagement_score copes with
+    # missing views.
+    views = _int_or_none(
+        item.get("videoViewCount")
+        or item.get("videoPlayCount")
+        or item.get("viewCount")
+    )
+    likes = _int_or_none(item.get("likesCount") or item.get("likeCount"))
+    comments = _int_or_none(item.get("commentsCount") or item.get("commentCount"))
     return {
         "platform": "instagram",
         "external_id": str(external_id),
@@ -267,6 +348,10 @@ def normalize_instagram(item: dict[str, Any]) -> dict[str, Any] | None:
         "posted_at": _to_datetime(
             item.get("timestamp") or item.get("taken_at") or item.get("createdAt")
         ),
+        "engagement_views": views,
+        "engagement_likes": likes,
+        "engagement_comments": comments,
+        "engagement_score": _engagement_score(views, likes, comments),
         "raw_payload": item,
     }
 

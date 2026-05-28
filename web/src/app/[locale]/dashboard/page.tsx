@@ -954,7 +954,7 @@ function RisingVideosCard({
         {videos.map((v) => (
           <li key={v.postId} className="flex items-start gap-3 p-4">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-rose-50 text-xs font-bold text-rose-700 tabular-nums">
-              +{Math.round(v.deltaPct)}%
+              {Math.round(v.deltaPct)}%
             </div>
             <div className="min-w-0 flex-1">
               {v.url ? (

@@ -558,6 +558,15 @@ export async function getRisingVideos(
     const viewsNow = Number(r.views_now);
     const viewsThen = Number(r.views_then);
     const delta = viewsNow - viewsThen;
+    // `deltaPct` is "share of total views that came from the past 24h"
+    // = delta / views_now × 100, bounded 0-100. Previously this was
+    // delta / views_then × 100 (growth-rate vs prior baseline), which
+    // was mathematically correct but produced eye-watering "+3436%"
+    // numbers for breakout videos with tiny pre-baselines. The new
+    // metric reads cleanly ("97% of total views are from the past
+    // 24h") and stays bounded, while the sort order is unchanged
+    // (still ORDER BY absolute delta DESC).
+    const deltaPct = viewsNow > 0 ? (delta / viewsNow) * 100 : 0;
     return {
       postId: r.post_id,
       title: (r.title?.split("\n")[0] ?? r.title ?? "").slice(0, 120),
@@ -566,7 +575,7 @@ export async function getRisingVideos(
       viewsNow,
       viewsThen,
       delta,
-      deltaPct: viewsThen > 0 ? (delta / viewsThen) * 100 : 0,
+      deltaPct,
     };
   });
 }

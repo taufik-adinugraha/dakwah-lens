@@ -617,7 +617,7 @@
     "quick_explore": "Eksplorasi data",
     "quick_discussions": "Ruang diskusi",
     "section_rising_videos": "Video sedang viral pekan ini",
-    "section_rising_videos_subtitle": "YouTube video yang penonton-nya tumbuh paling cepat 24 jam terakhir — sinyal apa yang sedang resonan di umat.",
+    "section_rising_videos_subtitle": "YouTube video yang penonton-nya tumbuh paling cepat 24 jam terakhir — sinyal apa yang sedang resonan di umat. Angka di kiri = persen total view yang datang dari 24 jam terakhir.",
     "rising_videos_empty": "Belum ada data viral — butuh minimal 2 hari snapshot YouTube untuk hitung deltanya.",
     "rising_videos_delta_tpl": "+{delta} views ({pct}%)",
     "rising_videos_views_now_tpl": "{views} views sekarang",
