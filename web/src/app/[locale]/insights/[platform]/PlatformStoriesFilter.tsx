@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, ChevronDown, ChevronUp } from "lucide-react";
 
 import { ShowMoreList } from "@/components/ShowMoreList";
 
@@ -45,6 +45,8 @@ export function PlatformStoriesFilter({
   showMoreLabel,
   openOriginalLabel,
   emptyMessage,
+  expandLabel,
+  collapseLabel,
 }: {
   stories: PlatformStory[];
   filterLabels: {
@@ -56,8 +58,14 @@ export function PlatformStoriesFilter({
   showMoreLabel: string;
   openOriginalLabel: string;
   emptyMessage: string;
+  /** Toggle copy for the collapse/expand button — passed in so the page
+   *  controls localization. The list is collapsed by default to keep
+   *  initial render light even on platforms with 1000+ posts. */
+  expandLabel: string;
+  collapseLabel: string;
 }) {
   const [filter, setFilter] = useState<SentimentFilter>("all");
+  const [expanded, setExpanded] = useState(false);
 
   const counts: Record<SentimentFilter, number> = {
     all: stories.length,
@@ -104,11 +112,30 @@ export function PlatformStoriesFilter({
         />
       </div>
 
-      {visible.length === 0 ? (
+      {/* Collapse toggle — list is hidden by default so the platform
+          page paints fast even when topStories has ~1000 rows. */}
+      <div className="mt-4">
+        <button
+          type="button"
+          onClick={() => setExpanded((e) => !e)}
+          aria-expanded={expanded}
+          className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+        >
+          {expanded ? (
+            <ChevronUp className="h-3.5 w-3.5" />
+          ) : (
+            <ChevronDown className="h-3.5 w-3.5" />
+          )}
+          {expanded ? collapseLabel : expandLabel}
+          <span className="tabular-nums text-slate-500">({visible.length})</span>
+        </button>
+      </div>
+
+      {expanded && visible.length === 0 ? (
         <div className="mt-6 rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-8 text-center text-sm text-slate-500">
           {emptyMessage}
         </div>
-      ) : (
+      ) : expanded ? (
         <div className="mt-6 grid gap-3">
           <ShowMoreList pageSize={8} moreLabel={showMoreLabel}>
             {visible.map((s) => {
@@ -182,7 +209,7 @@ export function PlatformStoriesFilter({
             })}
           </ShowMoreList>
         </div>
-      )}
+      ) : null}
     </>
   );
 }

@@ -726,6 +726,8 @@ function LiveStream({
           showMoreLabel={tInsights("show_more")}
           openOriginalLabel={tInsights("posts_open_source")}
           emptyMessage={tInsights("how_coverage_posts_empty")}
+          expandLabel={tInsights("livestream_show_posts")}
+          collapseLabel={tInsights("livestream_hide_posts")}
         />
       </div>
     </section>

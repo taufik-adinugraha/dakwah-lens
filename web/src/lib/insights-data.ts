@@ -183,10 +183,19 @@ export async function getPlatformInsights(
     .orderBy(desc(count()))
     .limit(8)) as Array<{ name: string | null; articles: number }>;
 
-  // Top posts: sort by da'wah opportunity (the 2026-05-21 focused-prompt
-  // signal), falling back to dawahRelevance when opportunity is NULL
-  // on rows ingested before the migration. COALESCE keeps the ranking
-  // continuous across the cutover.
+  // Top posts ranked by a composite of relevance + recency + engagement
+  // (each normalized 0-1, summed 0-3, sorted desc). The old single-axis
+  // "opportunity OR relevance" sort buried fresh high-engagement posts
+  // behind older high-relevance ones. Equal weights so the three signals
+  // each get a fair say:
+  //   - relevance: opportunity, falling back to dawahRelevance (rows
+  //     ingested before the 2026-05-21 opportunity migration)
+  //   - recency:   linear decay from posted_at, 1 → 0 across 7 days
+  //   - engagement: log-scaled engagement_score (only YT populates this
+  //     today; ln(1+x)/12 caps at ~1 around 160K views)
+  // The list is collapsed-by-default in the UI, so the larger result
+  // pool here doesn't pay an initial-render cost — only when a user
+  // explicitly expands the section.
   const topStories = await db
     .select({
       id: schema.socialPosts.id,
@@ -203,13 +212,17 @@ export async function getPlatformInsights(
     .from(schema.socialPosts)
     .where(platformWhere)
     .orderBy(
-      desc(
-        sql`COALESCE(${schema.socialPosts.dawahOpportunity}, ${schema.socialPosts.dawahRelevance})`,
-      ),
+      desc(sql`(
+        COALESCE(${schema.socialPosts.dawahOpportunity}, ${schema.socialPosts.dawahRelevance}, 0)
+        + GREATEST(0, 1 - EXTRACT(EPOCH FROM (now() - ${schema.socialPosts.postedAt})) / (7 * 86400.0))
+        + LEAST(LN(1 + COALESCE(${schema.socialPosts.engagementScore}, 0)) / 12.0, 1.0)
+      )`),
     )
-    // Fetch a deeper pool; UI uses <ShowMoreList /> to reveal 8 at
-    // a time. 50 is enough for ~6 "show more" clicks before exhaust.
-    .limit(50);
+    // Up from 50: the platform page now collapses the post list by
+    // default, so we can afford a deeper pool for users who explicitly
+    // expand it. 1000 covers x / yt / tt / ig comfortably and clips the
+    // mainstream long tail (6K+) at a payload that still loads quickly.
+    .limit(1000);
 
   // Sentiment mix — count per label.
   const sentimentRows = (await db
