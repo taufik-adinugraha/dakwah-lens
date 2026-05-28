@@ -746,20 +746,21 @@ export async function getDawahCategoryReachDelta(
   // Use COUNT(*) for mainstream (no engagement_views from RSS) so the
   // section stays meaningful; SUM(engagement_views) for everyone else
   // since the engagement_score backfill populated that column 100%.
-  const metricExpr = isMainstream
-    ? sql`COUNT(*)`
-    : sql`COALESCE(SUM(sp.engagement_views), 0)`;
+  //
+  // FILTER must attach to the aggregate DIRECTLY in Postgres — not to
+  // an expression wrapping it. So `COALESCE(SUM(...), 0) FILTER (...)`
+  // throws "syntax error at or near FILTER"; the only legal shape is
+  // `COALESCE(SUM(...) FILTER (...), 0)`. Build per-window via a helper.
+  const windowedMetric = (where: ReturnType<typeof sql>) =>
+    isMainstream
+      ? sql`COUNT(*) FILTER (WHERE ${where})`
+      : sql`COALESCE(SUM(sp.engagement_views) FILTER (WHERE ${where}), 0)`;
 
   const rows = (await db.execute(sql`
     SELECT
       dominant.cat AS category,
-      ${metricExpr} FILTER (
-        WHERE sp.posted_at >= now() - interval '7 days'
-      )::bigint AS metric_this,
-      ${metricExpr} FILTER (
-        WHERE sp.posted_at >= now() - interval '14 days'
-          AND sp.posted_at <  now() - interval '7 days'
-      )::bigint AS metric_last
+      ${windowedMetric(sql`sp.posted_at >= now() - interval '7 days'`)}::bigint AS metric_this,
+      ${windowedMetric(sql`sp.posted_at >= now() - interval '14 days' AND sp.posted_at < now() - interval '7 days'`)}::bigint AS metric_last
     FROM social_posts sp
     CROSS JOIN LATERAL (
       SELECT key AS cat
