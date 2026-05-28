@@ -5,10 +5,12 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowUpRight,
+  Flame,
   Info,
   Newspaper,
   Radio,
   Sparkles,
+  TrendingUp,
 } from "lucide-react";
 import clsx from "clsx";
 
@@ -29,10 +31,13 @@ import { routing } from "@/i18n/routing";
 import {
   DAWAH_CATEGORIES,
   getPlatformInsights,
+  getTopEngagedPosts,
   type InsightsFilters,
   type PlatformInsights,
   type ScopeFilter,
+  type TopEngagedPost,
 } from "@/lib/insights-data";
+import { getRisingVideos, type RisingVideo } from "@/lib/dashboard-metrics";
 
 export function generateStaticParams() {
   // Pre-render every (locale, platform) combination.
@@ -100,9 +105,22 @@ export default async function PlatformDrilldownPage({
   // platform yet, in which case all sections fall back to mock content.
   // `session` gates the "Apply for Full Access" CTA at the page bottom —
   // signed-in users have already converted, so they don't need that pitch.
-  const [live, session] = await Promise.all([
+  //
+  // Per-platform secondary signals fetched in parallel:
+  //   - YouTube: rising videos (time-series 24h Δ, the only platform we
+  //     snapshot today).
+  //   - X / Instagram: top-engaged posts (no time series, sorted by the
+  //     log10 engagement_score populated by the normalizers).
+  //   - Mainstream / TT / FB: skip — no useful engagement signal.
+  const isYouTube = platform === "youtube";
+  const hasEngagement = platform === "x" || platform === "instagram";
+  const [live, session, risingVideos, topEngaged] = await Promise.all([
     getPlatformInsights(platform, filters),
     auth(),
+    isYouTube ? getRisingVideos(10) : Promise.resolve([] as RisingVideo[]),
+    hasEngagement
+      ? getTopEngagedPosts(platform, 10)
+      : Promise.resolve([] as TopEngagedPost[]),
   ]);
 
   // Use real da'wah-category clusters when we have a meaningful number of
@@ -136,6 +154,17 @@ export default async function PlatformDrilldownPage({
         </>
       )}
       <TopOutlets config={config} t={t} live={live} platform={platform} />
+      {risingVideos.length > 0 && (
+        <RisingVideosPanel videos={risingVideos} tInsights={tInsights} />
+      )}
+      {topEngaged.length > 0 && (
+        <TopEngagedPanel
+          posts={topEngaged}
+          platform={platform}
+          tInsights={tInsights}
+          locale={locale}
+        />
+      )}
       <TopStories config={config} t={t} live={live} platform={platform} />
       {/* Apply-for-Full-Access CTA hidden (2026-05-23). */}
       {false && !session?.user && <CTA t={t} />}
@@ -884,4 +913,194 @@ function CTA({ t }: { t: T }) {
       </div>
     </section>
   );
+}
+
+/* ───────────────────────────────────────────────────────────────────
+ * RisingVideosPanel — YouTube only.
+ *
+ * Mirrors the dashboard's "Video sedang viral pekan ini" but rendered
+ * as a /insights/youtube section. The badge percentage is "% of total
+ * views that came from the past 24h" (bounded 0-100) — see
+ * dashboard-metrics.ts:getRisingVideos for the metric rationale.
+ * ─────────────────────────────────────────────────────────────────── */
+function RisingVideosPanel({
+  videos,
+  tInsights,
+}: {
+  videos: RisingVideo[];
+  tInsights: Awaited<ReturnType<typeof getTranslations>>;
+}) {
+  return (
+    <section className="bg-rose-50/30 py-12 sm:py-16">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
+        <div className="mx-auto max-w-2xl text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700">
+            <Flame className="h-3 w-3" />
+            {tInsights("section_rising_videos_badge")}
+          </span>
+          <h2 className="mt-3 text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+            {tInsights("section_rising_videos_title")}
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
+            {tInsights("section_rising_videos_subtitle_platform")}
+          </p>
+        </div>
+
+        <ul className="mt-8 divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          {videos.map((v) => (
+            <li key={v.postId} className="flex items-start gap-3 p-4 sm:p-5">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-50 text-xs font-bold text-rose-700 tabular-nums">
+                {Math.round(v.deltaPct)}%
+              </div>
+              <div className="min-w-0 flex-1">
+                {v.url ? (
+                  <a
+                    href={v.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block truncate text-sm font-semibold text-slate-900 hover:text-rose-700"
+                  >
+                    {v.title}
+                  </a>
+                ) : (
+                  <p className="truncate text-sm font-semibold text-slate-900">
+                    {v.title}
+                  </p>
+                )}
+                <p className="mt-0.5 text-xs text-slate-500">
+                  <span className="font-medium text-slate-700">
+                    {v.channel}
+                  </span>
+                  {" · "}
+                  {formatCompactInt(v.viewsNow)} views ·{" "}
+                  <span className="text-emerald-700">
+                    +{formatCompactInt(v.delta)}
+                  </span>{" "}
+                  {tInsights("rising_videos_vs_24h_ago")}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+/* ───────────────────────────────────────────────────────────────────
+ * TopEngagedPanel — X / Instagram.
+ *
+ * No time-series available for these platforms, so we surface posts
+ * ranked by absolute engagement_score (log10 composite of
+ * views + comments + likes). Distinct from LiveStream which sorts
+ * by relevance + recency + engagement composite — this is a pure
+ * "what's been engaged with most" feed, useful for spotting viral
+ * moments the relevance sort might bury.
+ * ─────────────────────────────────────────────────────────────────── */
+function TopEngagedPanel({
+  posts,
+  platform,
+  tInsights,
+  locale,
+}: {
+  posts: TopEngagedPost[];
+  platform: string;
+  tInsights: Awaited<ReturnType<typeof getTranslations>>;
+  locale: string;
+}) {
+  return (
+    <section className="bg-amber-50/30 py-12 sm:py-16">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
+        <div className="mx-auto max-w-2xl text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
+            <TrendingUp className="h-3 w-3" />
+            {tInsights("section_top_engaged_badge")}
+          </span>
+          <h2 className="mt-3 text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+            {tInsights("section_top_engaged_title", { platform })}
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
+            {tInsights("section_top_engaged_subtitle")}
+          </p>
+        </div>
+
+        <ul className="mt-8 space-y-3">
+          {posts.map((p, idx) => {
+            const title =
+              (p.text ?? "").split("\n").find((s) => s.trim())?.slice(0, 200) ??
+              "";
+            const inner = (
+              <>
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-700 tabular-nums">
+                  {idx + 1}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-slate-900 group-hover:text-amber-700">
+                    {title || "(no title)"}
+                  </p>
+                  <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-500">
+                    {p.author && (
+                      <span className="font-medium text-slate-700">
+                        @{p.author}
+                      </span>
+                    )}
+                    {p.views !== null && (
+                      <span className="tabular-nums">
+                        {formatCompactInt(p.views)}{" "}
+                        {tInsights("top_engaged_views")}
+                      </span>
+                    )}
+                    {p.likes !== null && (
+                      <span className="tabular-nums">
+                        {formatCompactInt(p.likes)}{" "}
+                        {tInsights("top_engaged_likes")}
+                      </span>
+                    )}
+                    {p.comments !== null && (
+                      <span className="tabular-nums">
+                        {formatCompactInt(p.comments)}{" "}
+                        {tInsights("top_engaged_comments")}
+                      </span>
+                    )}
+                    {p.postedAt && (
+                      <span className="text-slate-400">
+                        {new Date(p.postedAt).toLocaleDateString(locale, {
+                          timeZone: "Asia/Jakarta",
+                        })}
+                      </span>
+                    )}
+                  </p>
+                </div>
+                <ArrowUpRight className="h-4 w-4 shrink-0 text-slate-300" />
+              </>
+            );
+            return (
+              <li key={p.id}>
+                {p.url ? (
+                  <a
+                    href={p.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-amber-300 hover:shadow-md"
+                  >
+                    {inner}
+                  </a>
+                ) : (
+                  <div className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                    {inner}
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+function formatCompactInt(n: number): string {
+  if (n < 1000) return String(n);
+  if (n < 1_000_000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}K`;
+  return `${(n / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`;
 }

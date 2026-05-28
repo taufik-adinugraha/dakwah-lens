@@ -365,6 +365,72 @@ export async function getPlatformInsights(
 }
 
 /* ──────────────────────────────────────────────────────────────────
+ * Top-engaged posts per platform — ranked by engagement_score (the
+ * log10 composite of views/comments/likes populated by the normalizers).
+ *
+ * Used by /insights/[platform] to surface "what's resonating" as a
+ * complement to the relevance-sorted top stories. Returns [] for
+ * platforms with no engagement signal (mainstream RSS) so the caller
+ * can skip the section entirely instead of rendering an empty card.
+ *
+ * Distinct from getRisingVideos (dashboard-metrics) which uses the
+ * social_post_metrics time-series to compute Δ over 24h — that's a
+ * YouTube-only signal because YT is the only platform we currently
+ * snapshot. For X/IG we have absolute engagement at ingest time but
+ * no time series, so "top engaged" is the closest analog.
+ * ────────────────────────────────────────────────────────────────── */
+export type TopEngagedPost = {
+  id: string;
+  text: string;
+  author: string | null;
+  url: string | null;
+  postedAt: Date | null;
+  views: number | null;
+  likes: number | null;
+  comments: number | null;
+  score: number;
+};
+
+export async function getTopEngagedPosts(
+  platform: string,
+  limit = 10,
+): Promise<TopEngagedPost[]> {
+  const rows = await db
+    .select({
+      id: schema.socialPosts.id,
+      text: schema.socialPosts.text,
+      author: schema.socialPosts.author,
+      url: schema.socialPosts.url,
+      postedAt: schema.socialPosts.postedAt,
+      views: schema.socialPosts.engagementViews,
+      likes: schema.socialPosts.engagementLikes,
+      comments: schema.socialPosts.engagementComments,
+      score: schema.socialPosts.engagementScore,
+    })
+    .from(schema.socialPosts)
+    .where(
+      and(
+        eq(schema.socialPosts.platform, platform),
+        isNotNull(schema.socialPosts.engagementScore),
+      ),
+    )
+    .orderBy(desc(schema.socialPosts.engagementScore))
+    .limit(limit);
+
+  return rows.map((r) => ({
+    id: r.id,
+    text: r.text,
+    author: r.author,
+    url: r.url,
+    postedAt: r.postedAt,
+    views: r.views === null ? null : Number(r.views),
+    likes: r.likes === null ? null : Number(r.likes),
+    comments: r.comments === null ? null : Number(r.comments),
+    score: Number(r.score),
+  }));
+}
+
+/* ──────────────────────────────────────────────────────────────────
  * Overall-View overview used by the public `/insights` landing.
  *
  * Same shape ideas as the per-platform queries but aggregated over
