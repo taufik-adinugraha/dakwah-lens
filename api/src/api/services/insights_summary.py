@@ -130,12 +130,13 @@ OUTPUT: briefing analisis dalam Bahasa Indonesia, dibagi ke 5 BAGIAN dengan head
 
 CRITICAL — SCOPE OF PERCENTAGES: baca SEGMENT_SCOPE di input. Jika "all", persentase di `top_categories` adalah share dari seluruh percakapan mingguan. Jika SEGMENT_SCOPE adalah segmen spesifik (spiritual/family/youth/justice), persentase tersebut adalah share *WITHIN segmen itu saja* — frasa "di antara konten segmen keluarga, kategori family mendominasi 89%" atau "dalam diskursus segmen ini X memimpin 89%". JANGAN tulis "percakapan publik didominasi family 89%" saat scope adalah segmen — itu overclaim.
 
-## Tema Utama & Pola Yang Muncul (500-650 kata)
-- Analisis per top topic. Untuk SETIAP topic dari pool, beri 2-3 cerita konkret dari sample_headlines DENGAN OUTLET (e.g. "Liputan6 melaporkan…", "menurut Banjarmasin Post…")
-- BUKAN sekadar daftar — identifikasi POLA yang menghubungkan cerita-cerita itu. Misal: "kekerasan terhadap anak di Tanahlaut, kamar mandi masjid, dan penjualan bayi menunjukkan satu pola: ruang yang seharusnya aman justru menjadi panggung pelanggaran."
-- IDENTIFIKASI BENANG MERAH antar topik di akhir bagian
-- Hindari kata kerja perintah ("wajib", "harus", "pentingnya"). Gunakan observasional ("menyoroti", "memetakan", "menunjukkan", "tercermin dari")
-- HANYA gunakan headlines dari pool yang saya berikan. JANGAN mengarang cerita.
+## Tema Utama & Pola Yang Muncul (500-700 kata)
+- PROSA NARATIF MURNI. Pembaca sudah membaca data di section "Numerik & Tren Pekan Ini" — di sini mereka butuh cerita, bukan data ulang. Audiens sebelumnya mengeluh "pusing kalau angka dan referensi dicampur di bagian narasi"; tugas section ini adalah memberi mereka jeda data.
+- DILARANG MUNCUL DI SECTION INI: (a) angka apa pun (jumlah postingan, persentase, views, delta mingguan) — semua tinggal di section Numerik & Tren; (b) kutipan langsung dengan atribusi outlet atau akun ("Liputan6 melaporkan…", "menurut Banjarmasin Post…", "user X menulis…") — karakterisasi pola berita boleh, tanpa sumber; (c) sitasi ayat/hadits inline (`**QS. …**`, `**Bukhari …**`) — semua dalil ditahan untuk Section 4 (Strategi & Aksi Dakwah) dan Section 5 (Daleel & Sumber).
+- Gunakan headlines dari pool untuk MENGENALI POLA, lalu deskripsikan polanya dengan bahasa observasional. Contoh transformasi: alih-alih "562 postingan korupsi dan 440 postingan pinjol membentuk benang ekonomi", tulis "korupsi pejabat bertumpukan dengan jeratan pinjol pada pekan yang sama, membentuk benang keprihatinan ekonomi yang nyata".
+- Struktur: 2-3 BENANG (atau SPIRAL) utama, tiap benang ~150-200 kata yang menjelaskan apa polanya, kenapa muncul bersama, dan apa implikasinya bagi audiens dakwah. Tutup dengan satu paragraf benang merah lintas-tema.
+- Verba observasional ("menyoroti", "memetakan", "menunjukkan", "tercermin dari", "menenun"), bukan perintah ("wajib", "harus", "pentingnya").
+- HANYA pola yang berakar di pool sample_headlines. JANGAN mengarang cerita atau mengangkat tema yang tidak hadir di data.
 
 ## Strategi & Aksi Dakwah (6850-9400 kata)
 Ini adalah CONTENT KIT — bukan saran strategis. Setiap sub-section harus berupa DRAFT SIAP-PAKAI yang bisa dibaca / dipakai langsung oleh dai, ustadzah, kreator, atau pengurus komunitas tanpa harus menulis ulang dari nol. WAJIB 6 sub-section dengan ### H3.
