@@ -340,7 +340,15 @@ ATURAN DALIL — paragraf, headline, dan dalil WAJIB membentuk satu thread temat
 
 5. Variasi: usahakan 4-6 flyer pakai dalil yang berbeda kalau pool memungkinkan — tapi PRIORITAS adalah ketepatan tematik, BUKAN distribusi. Lebih baik 2 flyer share dalil yang tepat daripada 4 flyer dengan 4 dalil yang dipaksakan.
 
-6. PANJANG DALIL untuk format flyer (semua Pesan Flyer 1-4): flyer 1080×1080 hanya muat ~3-4 baris dalil. Saat lebih dari satu entri pool sama-sama relevan secara tematik, PILIH yang lebih pendek. Hindari mengutip seluruh hadits panjang dengan rantai perawi — kalau hadits-nya panjang tapi maknanya inti bisa dipadatkan, sebut citation di marker `**Dalil:**` tapi parafrase inti maknanya 1 kalimat di paragraf (tidak menampilkan rantai perawi di flyer).
+6. PANJANG DALIL — RULE WAJIB untuk Pesan Flyer 1-5 (KRITIS, tidak boleh dilewati): flyer 1080×1080 hanya muat ~3-4 baris terjemahan dengan font yang masih nyaman dibaca di layar phone. JANGAN PERNAH memilih entri pool yang terjemahan Indonesianya > 400 karakter ATAU yang Arab-nya > 350 karakter sebagai citation flyer — renderer TIDAK akan memotong daleel (kita haram mempotong daleel di tengah karena konteks hilang), jadi entri panjang akan mengecilkan teks sampai tidak terbaca atau merusak komposisi.
+
+Cara memilih untuk SETIAP Pesan Flyer 1-5:
+- Scan DALIL POOL dan saring entri yang `arabic.length ≤ 350` DAN `translation_id.length ≤ 400`.
+- Dari subset pendek itu, pilih yang paling tematis-cocok dengan paragraf.
+- Kalau TIDAK ADA entri di subset pendek yang relevan tematis: KOSONGKAN baris `**Dalil:**` untuk slot itu (flyer tetap valid tanpa marker dalil). JANGAN pernah memaksakan entri panjang sebagai kompromi.
+- Boleh-kah ayat panjang seperti QS. Al-Baqara: 177 / 282 / 286? TIDAK untuk flyer — pakai potongan ayat pendek dari surah lain yang menyentuh tema yang sama, atau kosongkan.
+
+Verifikasi sebelum tag: setelah memilih citation, cek `length(translation_id)` dan `length(arabic)` dari entri itu di pool. Kalau melebihi batas, MUNDUR dan pilih ulang.
 
 ATURAN DALIL untuk Pesan Flyer 5 & 6 (SUNNAH + DOA): citation pada Pesan Flyer 5 (Ajakan Sunnah) dan Pesan Flyer 6 (Doa Pekan Ini) HARUS dipilih dari blok **ADHKAR POOL** yang TERPISAH dari DALIL POOL (lihat user prompt di bawah). ADHKAR POOL berisi du'a / dzikir yang dapat dibaca langsung — entri yang cocok untuk dijadikan wirid. JANGAN ambil dalil untuk Flyer 5+6 dari DALIL POOL (yang sifatnya argumentatif-tematik, bukan recitable). Kalau ADHKAR POOL kosong atau tidak ada entri yang cocok untuk satu paragraf, kosongkan baris `**Dalil:**` untuk paragraf itu (jangan diisi dengan citation yang tidak ada di pool).
 

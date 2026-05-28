@@ -1,5 +1,4 @@
 import { Citation } from "./decor";
-import { TRANSLATION_MAX_CHARS, smartTruncateTranslation } from "../translation-fit";
 import type { FlyerLayoutComponent } from "./types";
 
 /**
@@ -23,15 +22,11 @@ export const HeroHeadline: FlyerLayoutComponent = ({
 }) => {
   const { daleel, headline, message, dateLabel, brand } = content;
   const isEnglish = locale === "en";
-  const rawTranslation = daleel
+  const translation = daleel
     ? isEnglish
       ? daleel.translation_en || daleel.translation_id || ""
       : daleel.translation_id || daleel.translation_en || ""
     : "";
-  const translation = smartTruncateTranslation(
-    rawTranslation,
-    TRANSLATION_MAX_CHARS.heroHeadline,
-  );
   const transLen = translation.length;
   const transSize =
     transLen < 220 ? 22 : transLen < 340 ? 19 : transLen < 420 ? 17 : 15;

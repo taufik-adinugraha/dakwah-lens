@@ -1,5 +1,4 @@
 import { Citation, QuoteGlyph } from "./decor";
-import { TRANSLATION_MAX_CHARS, smartTruncateTranslation } from "../translation-fit";
 import type { FlyerLayoutComponent } from "./types";
 
 /**
@@ -21,15 +20,11 @@ export const QuoteCard: FlyerLayoutComponent = ({
 }) => {
   const { daleel, headline, message, dateLabel, brand } = content;
   const isEnglish = locale === "en";
-  const rawTranslation = daleel
+  const translation = daleel
     ? isEnglish
       ? daleel.translation_en || daleel.translation_id || ""
       : daleel.translation_id || daleel.translation_en || ""
     : "";
-  const translation = smartTruncateTranslation(
-    rawTranslation,
-    TRANSLATION_MAX_CHARS.quoteCard,
-  );
   const transLen = translation.length;
   const transSize =
     transLen < 280 ? 22 : transLen < 440 ? 19 : transLen < 560 ? 17 : 15;

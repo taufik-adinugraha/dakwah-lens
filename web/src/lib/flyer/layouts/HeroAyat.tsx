@@ -1,5 +1,4 @@
 import { Citation, HeadlineRule } from "./decor";
-import { TRANSLATION_MAX_CHARS, smartTruncateTranslation } from "../translation-fit";
 import type { FlyerLayoutComponent } from "./types";
 
 /**
@@ -21,19 +20,11 @@ export const HeroAyat: FlyerLayoutComponent = ({
 }) => {
   const { daleel, headline, message, dateLabel, brand } = content;
   const isEnglish = locale === "en";
-  const rawTranslation = daleel
+  const translation = daleel
     ? isEnglish
       ? daleel.translation_en || daleel.translation_id || ""
       : daleel.translation_id || daleel.translation_en || ""
     : "";
-  // Truncate at sentence boundary so the autofit pass doesn't have to
-  // shrink the font into an unreadable 13px block. The autofit is the
-  // safety net; the truncate is what keeps long hadith narrations from
-  // dominating the 1080×1080 canvas in the first place.
-  const translation = smartTruncateTranslation(
-    rawTranslation,
-    TRANSLATION_MAX_CHARS.heroAyat,
-  );
   const transLen = translation.length;
   const transSize =
     transLen < 240 ? 22 : transLen < 360 ? 19 : transLen < 440 ? 17 : 15;
