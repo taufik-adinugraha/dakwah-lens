@@ -1173,7 +1173,9 @@ function BucketReachPanel({
             const unitLabel =
               r.unit === "articles"
                 ? tInsights("bucket_reach_unit_articles")
-                : tInsights("bucket_reach_unit_views");
+                : r.unit === "posts"
+                  ? tInsights("bucket_reach_unit_posts")
+                  : tInsights("bucket_reach_unit_views");
             return (
               <div
                 key={r.category}

@@ -804,6 +804,7 @@
     "bucket_reach_delta": "{sign}{pct}% vs last week",
     "bucket_reach_unit_views": "views",
     "bucket_reach_unit_articles": "articles",
+    "bucket_reach_unit_posts": "posts",
     "section_rising_videos_badge": "Trending now",
     "section_rising_videos_title": "Trending YouTube videos",
     "section_rising_videos_subtitle_platform": "Videos whose audience grew fastest in the last 24h. The number on the left = percent of total views that came from the past 24h.",

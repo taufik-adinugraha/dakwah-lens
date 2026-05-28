@@ -729,7 +729,7 @@ export type DawahCategoryReach = {
   valueThisWeek: number;
   valueLastWeek: number;
   deltaPct: number | null;
-  unit: "views" | "articles";
+  unit: "views" | "articles" | "posts";
 };
 
 const DAWAH_CATS_SQL = sql.raw(
@@ -742,17 +742,30 @@ const DAWAH_CATS_SQL = sql.raw(
 export async function getDawahCategoryReachDelta(
   platform: string,
 ): Promise<DawahCategoryReach[]> {
-  const isMainstream = platform === "mainstream";
-  // Use COUNT(*) for mainstream (no engagement_views from RSS) so the
-  // section stays meaningful; SUM(engagement_views) for everyone else
-  // since the engagement_score backfill populated that column 100%.
-  //
+  // Which aggregate makes the chart MEANINGFUL per platform:
+  //   - mainstream → COUNT(*): RSS has no per-article views at all.
+  //   - instagram  → COUNT(*): the IG hashtag scraper only fills
+  //                  videoViewCount for VIDEO posts; the bulk of IG
+  //                  posts are images and have NULL views, so
+  //                  SUM(views) would render every bucket as ~0
+  //                  (looks like the panel is broken). COUNT is the
+  //                  truthful "how much activity" signal for IG.
+  //   - YT / X / TT → SUM(engagement_views): engagement is 100%
+  //                   populated post-backfill, views are the real
+  //                   "reach" measure for video/microblog platforms.
+  const useCount = platform === "mainstream" || platform === "instagram";
+  const unit: DawahCategoryReach["unit"] = useCount
+    ? platform === "mainstream"
+      ? "articles"
+      : "posts"
+    : "views";
+
   // FILTER must attach to the aggregate DIRECTLY in Postgres — not to
   // an expression wrapping it. So `COALESCE(SUM(...), 0) FILTER (...)`
   // throws "syntax error at or near FILTER"; the only legal shape is
   // `COALESCE(SUM(...) FILTER (...), 0)`. Build per-window via a helper.
   const windowedMetric = (where: ReturnType<typeof sql>) =>
-    isMainstream
+    useCount
       ? sql`COUNT(*) FILTER (WHERE ${where})`
       : sql`COALESCE(SUM(sp.engagement_views) FILTER (WHERE ${where}), 0)`;
 
@@ -790,7 +803,7 @@ export async function getDawahCategoryReachDelta(
       valueLastWeek: lastWeek,
       deltaPct:
         lastWeek > 0 ? ((thisWeek - lastWeek) / lastWeek) * 100 : null,
-      unit: isMainstream ? ("articles" as const) : ("views" as const),
+      unit,
     };
   });
 }

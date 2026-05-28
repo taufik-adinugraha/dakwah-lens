@@ -800,6 +800,7 @@
     "bucket_reach_delta": "{sign}{pct}% vs minggu lalu",
     "bucket_reach_unit_views": "views",
     "bucket_reach_unit_articles": "artikel",
+    "bucket_reach_unit_posts": "postingan",
     "section_rising_videos_badge": "Sedang viral",
     "section_rising_videos_title": "Video sedang viral di YouTube",
     "section_rising_videos_subtitle_platform": "Video yang penonton-nya tumbuh paling cepat 24 jam terakhir. Angka di kiri = persen total view yang datang dari 24 jam terakhir.",
