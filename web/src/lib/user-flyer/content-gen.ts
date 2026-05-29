@@ -71,12 +71,55 @@ const RESPONSE_SCHEMA = {
   required: ["headline", "body", "search_theme"],
 };
 
+/** Tone presets — mirrored from the brief generator so a da'i moving
+ *  between brief + flyer flows sees the same vocabulary. */
+export type FlyerTone =
+  | "scholarly"
+  | "casual"
+  | "motivational"
+  | "empathetic"
+  | "fiery"
+  | "gentle";
+
+/** Audience segments — also mirrored from the brief generator. */
+export type FlyerAudience =
+  | "general"
+  | "urban_gen_z"
+  | "working_professionals"
+  | "parents_families"
+  | "ibu_pengajian"
+  | "rural_communities"
+  | "students";
+
+const TONE_HINT_ID: Record<FlyerTone, string> = {
+  scholarly: "ilmiah dan terukur — kutip rujukan secara tersirat, hindari jargon akademis",
+  casual: "santai dan hangat, seperti obrolan WhatsApp dengan teman",
+  motivational: "memotivasi dan present-tense, beri urgensi tanpa menggurui",
+  empathetic: "lembut dan empatik, akui kesulitan pembaca dulu sebelum menasihati",
+  fiery: "tegas dan menggugah, langsung ke akar masalah",
+  gentle: "lembut dan tenang, beri ruang untuk pembaca merenung sendiri",
+};
+
+const AUDIENCE_HINT_ID: Record<FlyerAudience, string> = {
+  general: "umum Muslim Indonesia — register netral",
+  urban_gen_z: "Gen Z perkotaan (18-26 th) — bahasa kasual, contoh anxiety karier / media sosial / krisis identitas; light Gen Z markers (relate, vibes, FOMO) OK",
+  working_professionals: "profesional muda (25-40 th) — fokus etika kerja, manajemen waktu, ihtisab di tempat kerja, tekanan finansial",
+  parents_families: "orang tua + keluarga — fokus pendidikan anak, hak suami-istri, dinamika antar-generasi, tarbiyah keluarga",
+  ibu_pengajian: "ibu-ibu majelis taklim — bahasa hangat, contoh keseharian rumah tangga, doa praktis untuk anak",
+  rural_communities: "komunitas pedesaan — bahasa sederhana, contoh konkret dari kehidupan agraris/pesisir, jangan pakai jargon kota",
+  students: "pelajar/mahasiswa — fokus integritas akademik, persiapan masa depan, peer pressure, godaan judol/pinjol",
+};
+
 export async function generateUserFlyerContent({
   userPrompt,
   news,
+  tone,
+  audience,
 }: {
   userPrompt: string;
   news: NewsContext | null;
+  tone?: FlyerTone;
+  audience?: FlyerAudience;
 }): Promise<UserFlyerContent> {
   const client = getClient();
 
@@ -93,12 +136,22 @@ export async function generateUserFlyerContent({
     ? `\n\nKONTEKS BERITA PEKAN INI (gunakan sebagai LATAR / pemicu, jangan ulang fakta-fakta-nya — pembaca sudah tahu beritanya):\n- Kategori dominan: ${news.topCategory}\n- Topik trending: ${news.topTopics.slice(0, 5).join("; ")}`
     : "";
 
+  // Tone + audience hints are short directives the LLM weights when
+  // writing the headline + body. Both default to neutral when omitted
+  // so existing callers (and existing flyers re-rendered later) keep
+  // their historical behaviour.
+  const styleBlock = tone || audience
+    ? "\n\nGAYA + AUDIENS:" +
+      (tone ? `\n- Tone: ${TONE_HINT_ID[tone]}` : "") +
+      (audience ? `\n- Audiens: ${AUDIENCE_HINT_ID[audience]}` : "")
+    : "";
+
   const userBlock = `${calendarBlock}
 
 PERMINTAAN PENGGUNA (free text, mungkin singkat atau samar — silakan tafsirkan dengan baik):
 """
 ${userPrompt.trim()}
-"""${newsBlock}
+"""${newsBlock}${styleBlock}
 
 Tulis copy flyer sesuai aturan di atas. Pastikan headline + body KONSISTEN dengan konteks kalender Hijriyah di atas (kalau hari ini adalah event tertentu, jangan menulis "akan datang" atau "sebentar lagi"). Output WAJIB JSON dengan field headline, body, search_theme.`;
 

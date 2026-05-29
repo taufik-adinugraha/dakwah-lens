@@ -48,12 +48,35 @@ const LAYOUTS = [
   "dua-hero",
 ] as const;
 
+const TONES = [
+  "scholarly",
+  "casual",
+  "motivational",
+  "empathetic",
+  "fiery",
+  "gentle",
+] as const;
+const AUDIENCES = [
+  "general",
+  "urban_gen_z",
+  "working_professionals",
+  "parents_families",
+  "ibu_pengajian",
+  "rural_communities",
+  "students",
+] as const;
+
 const CreateInput = z.object({
   layout: z.enum(LAYOUTS),
   imageRef: z.string().min(1).max(200),
   userPrompt: z.string().trim().min(4).max(400),
   includeNewsContext: z.boolean(),
   visibility: z.enum(["private", "public"]),
+  // Tone + audience are optional and default to "gentle" / "general"
+  // when the client doesn't send them — older clients (before the
+  // 2026-05-29 form expansion) keep working without sending them.
+  tone: z.enum(TONES).optional().default("gentle"),
+  audience: z.enum(AUDIENCES).optional().default("general"),
 });
 
 // Corpora to consult for daleel retrieval. Skip tafsir (commentary, not
@@ -163,6 +186,8 @@ export async function POST(req: Request): Promise<NextResponse> {
     content = await generateUserFlyerContent({
       userPrompt: input.userPrompt,
       news,
+      tone: input.tone,
+      audience: input.audience,
     });
   } catch (err) {
     if (err instanceof FlyerGenUnavailableError) {
@@ -243,6 +268,11 @@ export async function POST(req: Request): Promise<NextResponse> {
       meta: {
         searchTheme: content.searchTheme,
         newsTopCategory: news?.topCategory ?? null,
+        // Tone + audience persisted to meta so a future PNG re-render
+        // could re-derive the prompt; no schema column yet because the
+        // sort/filter UI doesn't need them as indexed fields.
+        tone: input.tone,
+        audience: input.audience,
       },
     })
     .returning({ id: schema.userFlyers.id });

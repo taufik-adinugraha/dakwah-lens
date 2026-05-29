@@ -29,6 +29,30 @@ const LAYOUT_ORDER: Layout[] = [
   "dua-hero",
 ];
 
+// Mirrors the brief generator's tone presets. Stored on user_flyers
+// in the `meta` JSONB blob (no schema change required) and threaded
+// through to generateUserFlyerContent as a prompt hint.
+const TONES = [
+  "scholarly",
+  "casual",
+  "motivational",
+  "empathetic",
+  "fiery",
+  "gentle",
+] as const;
+type Tone = (typeof TONES)[number];
+
+const AUDIENCES = [
+  "general",
+  "urban_gen_z",
+  "working_professionals",
+  "parents_families",
+  "ibu_pengajian",
+  "rural_communities",
+  "students",
+] as const;
+type Audience = (typeof AUDIENCES)[number];
+
 type Labels = {
   stepLayout: string;
   stepImage: string;
@@ -71,6 +95,12 @@ type Labels = {
   previewConfirm: string;
   previewClose: string;
   previewArabicPlaceholder: string;
+  toneLabel: string;
+  toneHint: string;
+  tones: Record<Tone, string>;
+  audienceLabel: string;
+  audienceHint: string;
+  audiences: Record<Audience, string>;
 };
 
 type Photo = { id: string; src: string };
@@ -95,7 +125,13 @@ export function NewFlyerForm({
   );
   const [tab, setTab] = useState<"collection" | "upload">("collection");
   const [userPrompt, setUserPrompt] = useState("");
-  const [includeNews, setIncludeNews] = useState(true);
+  const [tone, setTone] = useState<Tone>("gentle");
+  const [audience, setAudience] = useState<Audience>("general");
+  // Off by default — the news context biases the LLM toward this
+  // week's news cycle, which most flyer uses (a generic da'wah card
+  // not tied to a current event) don't want. Operator can opt-in
+  // explicitly when their flyer DOES respond to news.
+  const [includeNews, setIncludeNews] = useState(false);
   const [visibility, setVisibility] = useState<"private" | "public">(
     "private",
   );
@@ -162,6 +198,8 @@ export function NewFlyerForm({
             userPrompt: userPrompt.trim(),
             includeNewsContext: includeNews,
             visibility,
+            tone,
+            audience,
           }),
         });
         const data = (await res.json()) as {
@@ -242,7 +280,17 @@ export function NewFlyerForm({
               <button
                 key={l}
                 type="button"
-                onClick={() => setPreviewLayout(l)}
+                onClick={() => {
+                  // Card click both SELECTS and opens preview. Earlier
+                  // version (commit 1827c57) only opened the preview and
+                  // required a "Pilih layout ini" click inside the modal
+                  // to actually commit selection — users naturally
+                  // assumed the card click was the selection and closed
+                  // the preview via X/Esc, leaving the default split-image
+                  // active. So generated flyers ignored their visual pick.
+                  setLayout(l);
+                  setPreviewLayout(l);
+                }}
                 className={`flex items-center gap-3 rounded-2xl border p-3 text-left transition ${
                   active
                     ? "border-emerald-500 bg-emerald-50 ring-1 ring-emerald-200"
@@ -264,12 +312,11 @@ export function NewFlyerForm({
             subtitle={labels.previewSubtitle}
             photos={photos}
             arabicPlaceholder={labels.previewArabicPlaceholder}
+            // Selection already committed on card click — the modal is
+            // pure preview now. Both buttons just close.
             confirmLabel={labels.previewConfirm}
             closeLabel={labels.previewClose}
-            onConfirm={() => {
-              setLayout(previewLayout);
-              setPreviewLayout(null);
-            }}
+            onConfirm={() => setPreviewLayout(null)}
             onClose={() => setPreviewLayout(null)}
           />
         )}
@@ -407,6 +454,62 @@ export function NewFlyerForm({
             </span>
           </span>
         </label>
+
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="block text-xs font-medium text-slate-700">
+              {labels.toneLabel}
+            </label>
+            <p className="mt-0.5 text-[11px] leading-snug text-slate-500">
+              {labels.toneHint}
+            </p>
+            <div className="mt-2 grid grid-cols-2 gap-1.5">
+              {TONES.map((tn) => (
+                <button
+                  key={tn}
+                  type="button"
+                  onClick={() => setTone(tn)}
+                  aria-pressed={tone === tn}
+                  className={
+                    "rounded-lg border px-2.5 py-1.5 text-xs font-medium transition " +
+                    (tone === tn
+                      ? "border-slate-900 bg-slate-900 text-white shadow-sm"
+                      : "border-slate-200 bg-white text-slate-700 hover:border-slate-300")
+                  }
+                >
+                  {labels.tones[tn]}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-slate-700">
+              {labels.audienceLabel}
+            </label>
+            <p className="mt-0.5 text-[11px] leading-snug text-slate-500">
+              {labels.audienceHint}
+            </p>
+            <div className="mt-2 grid grid-cols-2 gap-1.5">
+              {AUDIENCES.map((a) => (
+                <button
+                  key={a}
+                  type="button"
+                  onClick={() => setAudience(a)}
+                  aria-pressed={audience === a}
+                  className={
+                    "rounded-lg border px-2.5 py-1.5 text-xs font-medium transition " +
+                    (audience === a
+                      ? "border-slate-900 bg-slate-900 text-white shadow-sm"
+                      : "border-slate-200 bg-white text-slate-700 hover:border-slate-300")
+                  }
+                >
+                  {labels.audiences[a]}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Step 4: Settings */}

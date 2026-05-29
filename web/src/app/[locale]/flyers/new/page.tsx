@@ -120,6 +120,27 @@ export default async function NewFlyerPage({
           previewConfirm: t("preview_confirm"),
           previewClose: t("preview_close"),
           previewArabicPlaceholder: t("preview_arabic_placeholder"),
+          toneLabel: t("tone_label"),
+          toneHint: t("tone_hint"),
+          tones: {
+            scholarly: t("tone_scholarly"),
+            casual: t("tone_casual"),
+            motivational: t("tone_motivational"),
+            empathetic: t("tone_empathetic"),
+            fiery: t("tone_fiery"),
+            gentle: t("tone_gentle"),
+          },
+          audienceLabel: t("audience_label"),
+          audienceHint: t("audience_hint"),
+          audiences: {
+            general: t("audience_general"),
+            urban_gen_z: t("audience_urban_gen_z"),
+            working_professionals: t("audience_working_professionals"),
+            parents_families: t("audience_parents_families"),
+            ibu_pengajian: t("audience_ibu_pengajian"),
+            rural_communities: t("audience_rural_communities"),
+            students: t("audience_students"),
+          },
         }}
       />
 
