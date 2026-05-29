@@ -77,6 +77,7 @@ export default async function AnalyticsPage() {
     topCreators,
     localeSplit,
     regionSplit,
+    deviceSplit,
   ] = await Promise.all([
     db
       .select({ sessions7d: sql<number>`COUNT(DISTINCT session_id)::int` })
@@ -246,10 +247,43 @@ export default async function AnalyticsPage() {
       GROUP BY COALESCE(region, 'unknown')
       ORDER BY sessions DESC
     `) as unknown as Promise<Array<{ region: string; sessions: number }>>,
+    // Device split — classify UA into mobile / desktop, last 7 days,
+    // distinct sessions. Bot UAs and rows with NULL user_agent are
+    // dropped — they aren't real device categories. Tablets count as
+    // mobile (touch-first). Pattern order matters: check 'mobi' BEFORE
+    // platform tokens so a UA with both still lands in mobile.
+    db.execute(sql`
+      SELECT
+        CASE
+          WHEN user_agent ~* '(mobi|android|iphone|ipad|ipod|windows phone|kindle|opera mini|blackberry)'
+            THEN 'mobile'
+          ELSE 'desktop'
+        END AS device,
+        COUNT(*)::int AS hits,
+        COUNT(DISTINCT session_id)::int AS sessions
+      FROM page_views
+      WHERE occurred_at >= now() - interval '7 days'
+        AND path NOT LIKE '/admin%'
+        AND path NOT LIKE '/api%'
+        AND user_agent IS NOT NULL
+        AND user_agent !~* '(bot|spider|crawler|preview|yandex|baidu|wget|curl|python-|node-fetch|httpx|axios)'
+      GROUP BY device
+      ORDER BY sessions DESC
+    `) as unknown as Promise<
+      Array<{ device: string; hits: number; sessions: number }>
+    >,
   ]);
 
   const localeTotal = localeSplit.reduce((s, r) => s + r.sessions, 0);
   const regionTotal = regionSplit.reduce((s, r) => s + r.sessions, 0);
+
+  // Device split — extract mobile + desktop counts (the SQL only ever
+  // returns these two buckets, post-bot-filtering).
+  const deviceMobile =
+    deviceSplit.find((r) => r.device === "mobile")?.sessions ?? 0;
+  const deviceDesktop =
+    deviceSplit.find((r) => r.device === "desktop")?.sessions ?? 0;
+  const deviceTotal = deviceMobile + deviceDesktop;
 
   // Backfill the hour buckets so an idle 24-h stretch still renders as
   // 24 zero-height bars (instead of collapsing into 3 narrow bars).
@@ -349,6 +383,64 @@ export default async function AnalyticsPage() {
                   </span>
                   <span className="tabular-nums text-slate-600">
                     {row.sessions.toLocaleString()}{" "}
+                    <span className="text-slate-400">· {pct.toFixed(1)}%</span>
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </Card>
+      )}
+
+      {/* Device split — mobile vs desktop, distinct sessions in the
+          last 7 days. Bots and rows with NULL user_agent are excluded
+          server-side. Tablets count as mobile (touch-first). */}
+      {deviceTotal > 0 && (
+        <Card
+          title="Device · 7d"
+          hint={`${deviceTotal.toLocaleString("en-US")} distinct sessions · bots excluded`}
+        >
+          <p className="text-[11px] text-slate-500">
+            Inferred from the User-Agent header. Mobile bucket includes
+            phones + tablets. Bots, crawlers, and rows without a UA
+            string are dropped — only real humans counted.
+          </p>
+          <div className="mt-3">
+            <StackedBar
+              total={deviceTotal}
+              segments={[
+                {
+                  key: "mobile",
+                  label: "Mobile",
+                  color: "bg-emerald-500",
+                  value: deviceMobile,
+                },
+                {
+                  key: "desktop",
+                  label: "Desktop",
+                  color: "bg-sky-500",
+                  value: deviceDesktop,
+                },
+              ]}
+            />
+          </div>
+          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+            {[
+              { key: "mobile", label: "Mobile", dot: "bg-emerald-500", value: deviceMobile },
+              { key: "desktop", label: "Desktop", dot: "bg-sky-500", value: deviceDesktop },
+            ].map((row) => {
+              const pct = (row.value / deviceTotal) * 100;
+              return (
+                <li
+                  key={row.key}
+                  className="flex items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2 text-xs"
+                >
+                  <span className="inline-flex items-center gap-2 font-medium text-slate-700">
+                    <span className={`inline-block h-2.5 w-2.5 rounded-full ${row.dot}`} />
+                    {row.label}
+                  </span>
+                  <span className="tabular-nums text-slate-600">
+                    {row.value.toLocaleString("en-US")}{" "}
                     <span className="text-slate-400">· {pct.toFixed(1)}%</span>
                   </span>
                 </li>

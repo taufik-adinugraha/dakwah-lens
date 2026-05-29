@@ -125,9 +125,19 @@ export function DiscussionsBoard({
   //   - `dl_owned` map keys are comment-ids, NOT slugs, so they can't
   //      be matched directly here; that map only powers the per-row
   //      Edit pencil. `dl_watched` is the canonical room set.
+  //
+  // INTERSECT with `validSlugs` so deleted-server-side rooms drop off
+  // the count + chip — otherwise the visitor sees "1 ruang yang kamu
+  // ikuti" while the list is empty (which is what happens when the
+  // underlying briefing has been removed). Stale entries get pruned
+  // from localStorage too so the next session starts clean.
+  const validSlugs = useMemo(
+    () => new Set(initialItems.map((r) => r.slug)),
+    [initialItems],
+  );
   useEffect(() => {
-    hydrateMineSlugs({ setMineSlugs });
-  }, []);
+    hydrateMineSlugs({ setMineSlugs, validSlugs });
+  }, [validSlugs]);
 
   // Reset paging when filters change. Uses the "adjust state during
   // render" pattern (https://react.dev/reference/react/useState#storing-information-from-previous-renders)
@@ -330,24 +340,46 @@ export function DiscussionsBoard({
 }
 
 /**
- * Hydrate the "my rooms" set from localStorage. Extracted out so the
- * mount-effect doesn't trip the cascade-render lint — same one-shot
- * hydration pattern used elsewhere.
+ * Hydrate the "my rooms" set from localStorage and intersect with the
+ * server-side set of currently-visible rooms.
+ *
+ * Two failure modes this prevents:
+ *   1. The "you follow 1 discussion" chip showing 1 while the list is
+ *      empty (the underlying briefing was deleted but the visitor's
+ *      `dl_watched` map still has the slug).
+ *   2. localStorage growing unbounded over time as deleted rooms
+ *      accumulate. We prune stale slugs on every hydrate so the map
+ *      shrinks to the intersection.
  */
 function hydrateMineSlugs({
   setMineSlugs,
+  validSlugs,
 }: {
   setMineSlugs: (s: Set<string>) => void;
+  validSlugs: Set<string>;
 }): void {
   try {
     const raw = window.localStorage.getItem(WATCHED_KEY);
     if (!raw) return;
     const map = JSON.parse(raw) as Record<string, number>;
     const next = new Set<string>();
-    for (const slug of Object.keys(map)) {
-      if (typeof slug === "string") next.add(slug);
+    const pruned: Record<string, number> = {};
+    let didPrune = false;
+    for (const [slug, ts] of Object.entries(map)) {
+      if (typeof slug !== "string") continue;
+      if (validSlugs.has(slug)) {
+        next.add(slug);
+        pruned[slug] = ts;
+      } else {
+        didPrune = true;
+      }
     }
     setMineSlugs(next);
+    // Write back if anything was pruned so the local map stays in sync
+    // with reality across sessions.
+    if (didPrune) {
+      window.localStorage.setItem(WATCHED_KEY, JSON.stringify(pruned));
+    }
   } catch {
     /* storage unavailable — silent no-op */
   }

@@ -1,5 +1,3 @@
-import "server-only";
-
 import { cookies } from "next/headers";
 
 /**
@@ -49,25 +47,19 @@ export async function setFlash(kind: FlashKind, message: string): Promise<void> 
 }
 
 /**
- * Read + clear the flash for THIS render. Returns null when no flash
- * is pending. Safe to call from a server component layout; the cookie
- * delete is part of the same response so the client never sees the
- * value twice.
- *
- * IMPORTANT: must be called inside a server-component render that has
- * mutable cookies access (e.g. a layout or page that hasn't been
- * statically optimized). Calling this from a static route is a no-op.
+ * Read the flash for THIS render. Returns null when no flash is
+ * pending. Does NOT delete the cookie — server components have
+ * read-only cookies in Next.js 16, so `cookies().delete()` would
+ * silently fail and the flash would reappear on every subsequent
+ * render until the 60s TTL expired (this was the Astronacci-stuck-
+ * toast bug, 2026-05-29). Instead the client-side FlashToast component
+ * calls `clearFlashCookie` (below) via a server action right after it
+ * mounts, which deletes the cookie reliably.
  */
 export async function popFlash(): Promise<Flash | null> {
   const c = await cookies();
   const raw = c.get(COOKIE);
   if (!raw?.value) return null;
-  try {
-    c.delete(COOKIE);
-  } catch {
-    // cookies() is read-only in this context — silent no-op. The
-    // cookie will linger for at most maxAge seconds.
-  }
   try {
     const parsed = JSON.parse(raw.value) as Flash;
     if (
@@ -83,4 +75,18 @@ export async function popFlash(): Promise<Flash | null> {
   } catch {
     return null;
   }
+}
+
+/**
+ * Server action: clear the flash cookie. Called from the client toast
+ * after it has displayed the flash once. Server actions DO have a
+ * mutable cookie API, so `c.delete()` here actually works.
+ *
+ * Safe to call from any client component — no auth required, no DB
+ * touch, just one cookie mutation.
+ */
+export async function clearFlashCookie(): Promise<void> {
+  "use server";
+  const c = await cookies();
+  c.delete(COOKIE);
 }

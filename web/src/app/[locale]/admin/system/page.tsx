@@ -126,7 +126,11 @@ export default async function SystemOverviewPage() {
     db
       .select({ pendingUsers: count() })
       .from(schema.users)
-      .where(sql`status = 'pending'`),
+      // Mirror the /admin/users page filter: only count VERIFIED accounts
+      // whose status is pending. Un-verified accounts (email_verified
+      // IS NULL) are hidden from /admin/users entirely, so counting them
+      // here surfaces an "X user pending" alert the admin can't act on.
+      .where(sql`status = 'pending' AND email_verified IS NOT NULL`),
     db
       .select({ recentFailures: count() })
       .from(schema.ingestRuns)
@@ -382,18 +386,25 @@ export default async function SystemOverviewPage() {
       </HelpCallout>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatTile label="Users" value={String(totalUsers)} />
+        <StatTile label="Users" value={Number(totalUsers).toLocaleString("en-US")} />
         <StatTile
           label="Sessions · 30d"
-          value={uniqSessions30d.toLocaleString()}
+          value={uniqSessions30d.toLocaleString("en-US")}
           hint="unique visitor sessions"
           accent="emerald"
         />
-        <StatTile label="Social posts" value={String(totalPosts)} accent="brand" />
-        <StatTile label="Briefs generated" value={String(totalBriefs)} />
+        <StatTile
+          label="Social posts"
+          value={Number(totalPosts).toLocaleString("en-US")}
+          accent="brand"
+        />
+        <StatTile
+          label="Briefs generated"
+          value={Number(totalBriefs).toLocaleString("en-US")}
+        />
         <StatTile
           label="Page views · 24h"
-          value={pviews24h.toLocaleString()}
+          value={pviews24h.toLocaleString("en-US")}
         />
         <StatTile
           label="API cost (other than Apify)"

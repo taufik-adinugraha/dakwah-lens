@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { AlertCircle, CheckCircle2, Info, X } from "lucide-react";
 
-import type { Flash } from "@/lib/flash";
+import { clearFlashCookie, type Flash } from "@/lib/flash";
 
 /**
  * One-shot toast notification rendered above the page chrome.
@@ -44,6 +44,22 @@ export function FlashToast({ initial }: { initial: Flash | null }) {
     setVisible(true);
     setSerial((s) => s + 1);
   }
+
+  // Clear the flash cookie immediately after the toast displays once.
+  // Server components have read-only cookies in Next.js 16, so the
+  // layout's `popFlash()` can't delete the cookie itself — without
+  // this client-side server-action call, the cookie would linger for
+  // its full 60s TTL and re-trigger the toast on every layout render
+  // (e.g. another admin action that calls revalidatePath would
+  // resurface the same toast). Fire-and-forget; if the action fails
+  // the cookie still auto-expires after 60s.
+  useEffect(() => {
+    if (initial) {
+      clearFlashCookie().catch(() => {
+        /* best-effort — cookie will TTL out either way */
+      });
+    }
+  }, [initial]);
 
   // Auto-dismiss timer. Resets whenever `serial` ticks so a fresh
   // flash gets its full 5-second budget even if the previous one was

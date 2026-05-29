@@ -216,6 +216,13 @@ export function InfraChart({
   );
 }
 
+// All chart times are pinned to Asia/Jakarta (WIB) regardless of the
+// admin's browser timezone — the host VM is in Jakarta, the metrics
+// snapshot writes are WIB-anchored, and the team standard is WIB.
+// Without an explicit `timeZone` arg `toLocale*` uses browser-local,
+// which silently mis-labelled charts for admins outside Indonesia.
+const CHART_TZ = "Asia/Jakarta";
+
 function formatTime(
   iso: string,
   locale: string,
@@ -233,23 +240,27 @@ function formatTime(
       hour: "2-digit",
       minute: "2-digit",
       hour12: false,
+      timeZone: CHART_TZ,
     });
   }
   // 7d / 30d — show date
   return d.toLocaleDateString(locale, {
     month: "short",
     day: "numeric",
+    timeZone: CHART_TZ,
   });
 }
 
 function formatTooltip(iso: string, locale: string): string {
   if (!iso) return "";
   const d = new Date(iso);
-  return d.toLocaleString(locale, {
+  const stamp = d.toLocaleString(locale, {
     month: "short",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
+    timeZone: CHART_TZ,
   });
+  return `${stamp} WIB`;
 }

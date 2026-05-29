@@ -1134,8 +1134,11 @@ function MonthlyCost({ t }: { t: T }) {
     {
       provider: "VPS · IDCloudHost (Jakarta)",
       use: t("cost_vps_use"),
-      monthly: 30,
-      note: "≈ Rp 500K/bulan · server + DB + Redis + Qdrant",
+      // Rp 300K/bulan @ rate ≈ Rp 16,300/USD → ~$18.40. Spec as of
+      // 2026-05-29: 2 vCPU · 4 GB RAM · 30 GB disk. Update both
+      // `monthly` and the `note` together when the plan changes.
+      monthly: 18,
+      note: "≈ Rp 300K/bulan · 2 vCPU · 4 GB RAM · 30 GB disk",
     },
     // ── Apify scrapers ── X + trending re-activated 2026-05-25 after
     // IndoBERT retirement. TikTok + Instagram enabled 2026-05-25 for

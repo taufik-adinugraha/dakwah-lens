@@ -82,6 +82,13 @@ export function DailyBars({
  *
  * `hour` arrives as "YYYY-MM-DD HH:00" in WIB; we render the HH:00
  * label every 4 buckets so the x-axis stays scannable.
+ *
+ * 2026-05-29: the data-point dots used to be drawn INSIDE the
+ * `preserveAspectRatio="none"` SVG, which stretched them horizontally
+ * into flat ovals (the chart's aspect ratio is ~10:1). Dots are now
+ * rendered as absolutely-positioned CSS spans in a sibling overlay,
+ * so they stay perfectly round regardless of container width.
+ * Legend added at the same time.
  */
 export function HourlyBars({
   rows,
@@ -115,81 +122,80 @@ export function HourlyBars({
 
   return (
     <div className="relative">
-      <svg
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
-        className="h-40 w-full"
-        aria-label="Hourly traffic — last 24 hours"
+      {/* Legend — color swatch + label + one-line definition so a
+          first-time reader knows what each metric means. */}
+      <div
+        className="mb-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-600"
+        aria-hidden
       >
-        {/* Faint horizontal gridlines at 25 / 50 / 75 %. */}
-        {[25, 50, 75].map((y) => (
-          <line
-            key={y}
-            x1={0}
-            x2={100}
-            y1={y}
-            y2={y}
+        <span className="inline-flex items-center gap-1.5">
+          <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-brand-300" />
+          <span className="font-semibold text-slate-800">Views</span>
+          <span className="text-slate-500">total page-loads (reloads count)</span>
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-brand-700" />
+          <span className="font-semibold text-slate-800">Uniques</span>
+          <span className="text-slate-500">distinct anonymous sessions</span>
+        </span>
+      </div>
+
+      {/* Chart surface — fixed height, polylines stretch to fill,
+          dot overlay sits on top of the SVG in CSS-pixel space so the
+          dots stay round. */}
+      <div className="relative h-40 w-full">
+        <svg
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          className="absolute inset-0 h-full w-full"
+          aria-label="Hourly traffic — last 24 hours"
+        >
+          {/* Faint horizontal gridlines at 25 / 50 / 75 %. */}
+          {[25, 50, 75].map((y) => (
+            <line
+              key={y}
+              x1={0}
+              x2={100}
+              y1={y}
+              y2={y}
+              stroke="currentColor"
+              strokeWidth={0.15}
+              className="text-slate-200"
+              vectorEffect="non-scaling-stroke"
+            />
+          ))}
+
+          {/* Views line (brand-300) */}
+          <polyline
+            fill="none"
             stroke="currentColor"
-            strokeWidth={0.15}
-            className="text-slate-200"
+            strokeWidth={1.4}
+            className="text-brand-300"
+            strokeLinejoin="round"
+            strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
+            points={hitsPoints}
           />
-        ))}
+          {/* Uniques line (brand-700) */}
+          <polyline
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.4}
+            className="text-brand-700"
+            strokeLinejoin="round"
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+            points={uniquesPoints}
+          />
 
-        {/* Views line (brand-300) */}
-        <polyline
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={1.4}
-          className="text-brand-300"
-          strokeLinejoin="round"
-          strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
-          points={hitsPoints}
-        />
-        {/* Uniques line (brand-700) */}
-        <polyline
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={1.4}
-          className="text-brand-700"
-          strokeLinejoin="round"
-          strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
-          points={uniquesPoints}
-        />
-
-        {/* Points + invisible hover columns. */}
-        {rows.map((r, i) => {
-          const x = xAt(i);
-          const isActive = active === i;
-          const ptRadius = isActive ? 1.6 : 1.0;
-          return (
-            <g key={r.hour}>
-              <circle
-                cx={x}
-                cy={yAt(r.hits)}
-                r={ptRadius}
-                className="text-brand-300"
-                fill="currentColor"
-                stroke="white"
-                strokeWidth={0.4}
-                vectorEffect="non-scaling-stroke"
-              />
-              <circle
-                cx={x}
-                cy={yAt(r.uniques)}
-                r={ptRadius}
-                className="text-brand-700"
-                fill="currentColor"
-                stroke="white"
-                strokeWidth={0.4}
-                vectorEffect="non-scaling-stroke"
-              />
-              {/* Invisible hover column — covers a slice wider than
-                  the gap between points so the cursor doesn't have
-                  to land on the dot itself. */}
+          {/* Invisible hover columns — full-height slices wider than
+              the gap between points so the cursor doesn't have to
+              land on the dot itself. */}
+          {rows.map((r, i) => {
+            const x = xAt(i);
+            return (
               <rect
+                key={`hit-${r.hour}`}
                 x={x - 50 / Math.max(n - 1, 1)}
                 y={0}
                 width={100 / Math.max(n - 1, 1)}
@@ -200,10 +206,31 @@ export function HourlyBars({
                   setActive((cur) => (cur === i ? null : cur))
                 }
               />
-            </g>
-          );
-        })}
-      </svg>
+            );
+          })}
+        </svg>
+
+        {/* Round dot overlay — CSS-positioned absolutes so they don't
+            inherit the SVG's non-uniform aspect-ratio scaling. */}
+        <div className="pointer-events-none absolute inset-0">
+          {rows.map((r, i) => {
+            const isActive = active === i;
+            const sizeCls = isActive ? "h-2.5 w-2.5" : "h-1.5 w-1.5";
+            return (
+              <span key={r.hour}>
+                <span
+                  className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-300 ring-2 ring-white transition-[width,height] ${sizeCls}`}
+                  style={{ left: `${xAt(i)}%`, top: `${yAt(r.hits)}%` }}
+                />
+                <span
+                  className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-700 ring-2 ring-white transition-[width,height] ${sizeCls}`}
+                  style={{ left: `${xAt(i)}%`, top: `${yAt(r.uniques)}%` }}
+                />
+              </span>
+            );
+          })}
+        </div>
+      </div>
 
       {/* x-axis labels — laid out as an absolutely-positioned strip
           so percentages match the SVG x-coordinates exactly. */}
