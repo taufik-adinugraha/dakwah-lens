@@ -126,11 +126,11 @@ export default async function SystemOverviewPage() {
     db
       .select({ pendingUsers: count() })
       .from(schema.users)
-      // Mirror the /admin/users page filter: only count VERIFIED accounts
-      // whose status is pending. Un-verified accounts (email_verified
-      // IS NULL) are hidden from /admin/users entirely, so counting them
-      // here surfaces an "X user pending" alert the admin can't act on.
-      .where(sql`status = 'pending' AND email_verified IS NOT NULL`),
+      // Mirrors /admin/users: bucket by status alone. The email_verified
+      // column is NULL for every Google-OAuth user (DrizzleAdapter never
+      // writes it), so guarding on it would hide most genuine pending
+      // signups from this alert.
+      .where(sql`status = 'pending'`),
     db
       .select({ recentFailures: count() })
       .from(schema.ingestRuns)
