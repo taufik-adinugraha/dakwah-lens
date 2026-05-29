@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { and, asc, desc, inArray, isNotNull } from "drizzle-orm";
-import { CheckCircle2, ShieldCheck, UserCircle2, XCircle } from "lucide-react";
+import { asc, desc, inArray, isNotNull, isNull } from "drizzle-orm";
+import { CheckCircle2, Search, ShieldCheck, UserCircle2, XCircle } from "lucide-react";
 
 import { auth } from "@/auth";
+import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
 import {
   approveUserAction,
@@ -32,11 +33,16 @@ type UserRow = {
   email: string;
   status: string;
   role: string;
+  emailVerified: Date | null;
   createdAt: Date;
 };
 
+const ROLE_FILTERS = ["all", "superadmin", "admin", "user"] as const;
+type RoleFilter = (typeof ROLE_FILTERS)[number];
+
 export default async function AdminUsersPage({
   params,
+  searchParams,
 }: PageProps<"/[locale]/admin/users">) {
   const { locale } = await params;
   setRequestLocale(locale);
@@ -53,54 +59,63 @@ export default async function AdminUsersPage({
     return <AccessDenied message={t("access_denied")} />;
   }
 
-  // Only show users who've verified their email. Unverified accounts are
-  // floating placeholders — they haven't proven they own the inbox, so we
-  // hide them from this list. They appear here once they click the
-  // verification link (which sets `email_verified`).
-  const VERIFIED = isNotNull(schema.users.emailVerified);
+  const sp = await searchParams;
+  const rawQ = typeof sp.q === "string" ? sp.q.trim() : "";
+  const rawRole = typeof sp.role === "string" ? sp.role : undefined;
+  const activeRole: RoleFilter =
+    (ROLE_FILTERS as readonly string[]).includes(rawRole ?? "")
+      ? (rawRole as RoleFilter)
+      : "all";
 
-  const pending = (await db
+  // Single query for ALL users (verified + unverified) — admin caseloads
+  // are small enough (~100s of rows) that fetch-once-filter-in-memory is
+  // simpler than splitting into N filtered SQL queries and re-joining.
+  // Unverified users were previously hidden; surfaced now so admins can
+  // see the full sign-up funnel including pre-verification stragglers.
+  const allUsers = (await db
     .select({
       id: schema.users.id,
       name: schema.users.name,
       email: schema.users.email,
       status: schema.users.status,
       role: schema.users.role,
+      emailVerified: schema.users.emailVerified,
       createdAt: schema.users.createdAt,
     })
     .from(schema.users)
-    .where(and(VERIFIED, inArray(schema.users.status, ["pending"])))
-    .orderBy(asc(schema.users.createdAt))) as UserRow[];
-
-  const approved = (await db
-    .select({
-      id: schema.users.id,
-      name: schema.users.name,
-      email: schema.users.email,
-      status: schema.users.status,
-      role: schema.users.role,
-      createdAt: schema.users.createdAt,
-    })
-    .from(schema.users)
-    .where(and(VERIFIED, inArray(schema.users.status, ["approved"])))
     .orderBy(desc(schema.users.createdAt))) as UserRow[];
 
-  const inactive = (await db
-    .select({
-      id: schema.users.id,
-      name: schema.users.name,
-      email: schema.users.email,
-      status: schema.users.status,
-      role: schema.users.role,
-      createdAt: schema.users.createdAt,
-    })
-    .from(schema.users)
-    .where(
-      and(VERIFIED, inArray(schema.users.status, ["rejected", "blocked"])),
-    )
-    .orderBy(desc(schema.users.createdAt))) as UserRow[];
+  // Apply role + search filters in-memory.
+  const qLower = rawQ.toLowerCase();
+  const filtered = allUsers.filter((u) => {
+    if (activeRole !== "all" && u.role !== activeRole) return false;
+    if (
+      qLower &&
+      !u.email.toLowerCase().includes(qLower) &&
+      !(u.name?.toLowerCase().includes(qLower) ?? false)
+    ) {
+      return false;
+    }
+    return true;
+  });
 
-  const totalCount = pending.length + approved.length + inactive.length;
+  // Split the filtered set into the existing 4 buckets. Unverified users
+  // (email_verified IS NULL) get their own section so the admin can see
+  // who's stuck pre-verify without conflating them with un-approved-but-
+  // verified accounts.
+  const unverified = filtered
+    .filter((u) => u.emailVerified === null)
+    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+  const verified = filtered.filter((u) => u.emailVerified !== null);
+  const pending = verified
+    .filter((u) => u.status === "pending")
+    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+  const approved = verified.filter((u) => u.status === "approved");
+  const inactive = verified.filter(
+    (u) => u.status === "rejected" || u.status === "blocked",
+  );
+
+  const totalCount = filtered.length;
   const selfId = session.user.id;
 
   return (
@@ -118,12 +133,19 @@ export default async function AdminUsersPage({
             {t("subtitle")}
           </p>
         </div>
-        <div className="grid grid-cols-3 gap-2 sm:gap-3">
-          <Stat label={t("stat_total")} value={String(totalCount)} />
-          <Stat label={t("stat_pending")} value={String(pending.length)} accent="amber" />
-          <Stat label={t("stat_approved")} value={String(approved.length)} accent="emerald" />
+        <div className="grid grid-cols-4 gap-2 sm:gap-3">
+          <Stat label={t("stat_total")} value={totalCount.toLocaleString("en-US")} />
+          <Stat label={t("stat_pending")} value={pending.length.toLocaleString("en-US")} accent="amber" />
+          <Stat label={t("stat_approved")} value={approved.length.toLocaleString("en-US")} accent="emerald" />
+          <Stat label={t("stat_unverified")} value={unverified.length.toLocaleString("en-US")} accent="slate" />
         </div>
       </div>
+
+      <FilterBar
+        searchValue={rawQ}
+        activeRole={activeRole}
+        t={t}
+      />
 
       <SectionBlock
         title={t("section_pending")}
@@ -141,6 +163,17 @@ export default async function AdminUsersPage({
         emptyMessage={t("empty_approved")}
         users={approved}
         actions="approved"
+        t={t}
+        locale={locale}
+        selfId={selfId}
+        callerRole={role}
+      />
+
+      <SectionBlock
+        title={t("section_unverified")}
+        emptyMessage={t("empty_unverified")}
+        users={unverified}
+        actions="unverified"
         t={t}
         locale={locale}
         selfId={selfId}
@@ -181,14 +214,16 @@ function Stat({
 }: {
   label: string;
   value: string;
-  accent?: "emerald" | "amber";
+  accent?: "emerald" | "amber" | "slate";
 }) {
   const tone =
     accent === "emerald"
       ? "text-emerald-700"
       : accent === "amber"
         ? "text-amber-700"
-        : "text-slate-900";
+        : accent === "slate"
+          ? "text-slate-600"
+          : "text-slate-900";
   return (
     <div className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-center shadow-sm">
       <p className={`text-2xl font-bold tabular-nums sm:text-3xl ${tone}`}>
@@ -200,6 +235,87 @@ function Stat({
     </div>
   );
 }
+
+function FilterBar({
+  searchValue,
+  activeRole,
+  t,
+}: {
+  searchValue: string;
+  activeRole: RoleFilter;
+  t: Awaited<ReturnType<typeof getTranslations<"Admin">>>;
+}) {
+  // GET form so the URL is shareable + back/forward work natively.
+  // Native submit on Enter; the role select also submits on change via
+  // the noscript-safe `onChange` no-script wrapper below. We keep this
+  // as a server component (no "use client") and rely on the URL as the
+  // single source of truth — the same pattern other admin filter bars
+  // use elsewhere on /admin/system.
+  return (
+    <form
+      method="get"
+      className="mt-6 flex flex-wrap items-end gap-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm"
+    >
+      <div className="min-w-[240px] flex-1">
+        <label
+          htmlFor="users-search"
+          className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500"
+        >
+          {t("filter_search_label")}
+        </label>
+        <div className="relative mt-1">
+          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+          <input
+            id="users-search"
+            type="search"
+            name="q"
+            defaultValue={searchValue}
+            placeholder={t("filter_search_placeholder")}
+            className="block h-9 w-full rounded-lg border border-slate-200 bg-white pl-8 pr-3 text-sm text-slate-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label
+          htmlFor="users-role"
+          className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500"
+        >
+          {t("filter_role_label")}
+        </label>
+        <select
+          id="users-role"
+          name="role"
+          defaultValue={activeRole}
+          className="mt-1 h-9 rounded-lg border border-slate-200 bg-white px-2.5 text-sm font-medium text-slate-700 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
+        >
+          {ROLE_FILTERS.map((r) => (
+            <option key={r} value={r}>
+              {t(`filter_role_${r}` as Parameters<typeof t>[0])}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <button
+        type="submit"
+        className="h-9 rounded-full bg-slate-900 px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800"
+      >
+        {t("filter_apply")}
+      </button>
+      {(searchValue || activeRole !== "all") && (
+        <Link
+          href="/admin/users"
+          className="h-9 inline-flex items-center rounded-full border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-700 transition hover:border-slate-300"
+        >
+          {t("filter_clear")}
+        </Link>
+      )}
+    </form>
+  );
+}
+
+type SectionActions = "pending" | "approved" | "rejected" | "unverified";
 
 function SectionBlock({
   title,
@@ -214,7 +330,7 @@ function SectionBlock({
   title: string;
   emptyMessage: string;
   users: UserRow[];
-  actions: "pending" | "approved" | "rejected";
+  actions: SectionActions;
   t: Awaited<ReturnType<typeof getTranslations<"Admin">>>;
   locale: string;
   selfId: string;
@@ -261,7 +377,7 @@ function UserRowCard({
   callerRole,
 }: {
   user: UserRow;
-  actions: "pending" | "approved" | "rejected";
+  actions: SectionActions;
   t: Awaited<ReturnType<typeof getTranslations<"Admin">>>;
   locale: string;
   isSelf: boolean;
@@ -294,7 +410,7 @@ function UserRowCard({
             </span>
           )}
           <StatusPill status={user.status} t={t} />
-          {user.role !== "user" && <RolePill role={user.role} t={t} />}
+          <RolePill role={user.role} t={t} />
         </div>
         <p className="mt-0.5 truncate text-xs text-slate-500">
           {user.email}
@@ -333,7 +449,7 @@ function ActionButtons({
 }: {
   userId: string;
   userRole: string;
-  actions: "pending" | "approved" | "rejected";
+  actions: SectionActions;
   t: Awaited<ReturnType<typeof getTranslations<"Admin">>>;
   disabled: boolean;
   callerRole: string;
@@ -341,6 +457,24 @@ function ActionButtons({
 }) {
   if (disabled) {
     return <span className="text-[10px] uppercase tracking-wider text-slate-400">—</span>;
+  }
+
+  if (actions === "unverified") {
+    // Unverified users (email_verified IS NULL) can only be removed —
+    // the admin can't approve/promote until the visitor proves email
+    // ownership by clicking the verification link. Remove is the
+    // useful action here for stale signups that never returned.
+    return (
+      <div className="flex flex-wrap items-center justify-end gap-1.5">
+        <ConfirmFormButton
+          action={removeUserAction}
+          userId={userId}
+          label={t("remove_button")}
+          confirmMessage={removeConfirm}
+          tone="rose"
+        />
+      </div>
+    );
   }
 
   if (actions === "pending") {

@@ -1291,7 +1291,13 @@ export async function getActiveDiscussionRooms(
       i.summary_md
     FROM my_activity m
     LEFT JOIN totals t ON t.briefing_slug = m.briefing_slug
-    LEFT JOIN LATERAL (
+    -- INNER JOIN against insights_summaries via a LATERAL subquery so
+    -- rooms whose underlying briefing has been deleted drop out of the
+    -- "active rooms" list. (Previously a LEFT JOIN — those rooms stayed
+    -- visible with a NULL title, pointing at a /m/<slug> page that no
+    -- longer renders anything.) Re-published briefings reincarnate the
+    -- card automatically the next time the dashboard loads.
+    JOIN LATERAL (
       SELECT summary_md FROM insights_summaries
       WHERE (
         CASE

@@ -21,7 +21,11 @@ import { FlyerGrid } from "../FlyerGrid";
 // without serving very stale state.
 export const revalidate = 60;
 
-const PAGE_SIZE = 30;
+// 6 per page (was 30) so the gallery is browsable in shorter scroll
+// chunks. With the typical 30-card "this week" default still rendering
+// fully in one view via 5 segments × 6 variants, this matters most for
+// archive (month-filtered) browsing.
+const PAGE_SIZE = 6;
 
 /**
  * Subset of /api/insights-brief/{slug}/flyer variants we surface in

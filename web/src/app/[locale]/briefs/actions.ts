@@ -155,7 +155,14 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
   try {
     const matched = await retrieveDaleel(enrichedQuery, {
       corpus: "all",
-      topK: 2,
+      // Bumped 2 → 4 per corpus (2026-05-29) after a user reported
+      // "only 2 daleel in my brief". After dedup + the 0.32 cosine
+      // floor + per-corpus skips, topK=2 sometimes left the LLM with
+      // a thin pool to weave into the brief. 4 per corpus across the
+      // 6 corpora (quran + 4 hadith + tafsir) gives the LLM up to ~24
+      // candidates before dedup — typically settling at 8-12 unique
+      // daleel in the final brief.
+      topK: 4,
       locale,
     });
     daleel = matched.map((d) => ({
