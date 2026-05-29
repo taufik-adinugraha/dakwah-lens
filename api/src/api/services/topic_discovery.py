@@ -100,40 +100,42 @@ MIN_POSTS_FOR_FALLBACK = 10
 EMBED_BATCH = 1000
 
 
-SYSTEM_PROMPT = """You analyze recent Indonesian news posts and group them into themes a DA'I would actually pick up for khutbah, kajian, or da'wah content this week.
+SYSTEM_PROMPT = """You analyze recent Indonesian posts and group them into themes that describe what the conversation is actually about this week. Output is consumed by da'wah analysts, but YOUR job is to map the conversation faithfully — not to force every theme through a da'wah lens. Some themes will have an obvious da'wah angle (haji, korupsi, palestina); others (health, education, sport, lifestyle, finance) won't, and that's fine — surface them anyway so the analyst can decide which to act on.
 
-The posts you receive have already been pre-filtered for da'wah relevance — they DO have a hook. Your job is to find what those hooks are, not to re-classify whether they're relevant.
+The posts you receive have already been pre-filtered for da'wah relevance — they DO have a hook. Your job is to find what the week's conversation is, not to re-classify whether each post is relevant.
 
-Return 6-10 distinct themes (target: closer to 8-10 when the input pool is large, e.g. >200 posts; closer to 6-8 when it's smaller). For each theme:
-- label: short human-readable name in Bahasa Indonesia (3-6 words). Frame by DA'WAH ANGLE, not by newsroom department.
+Return 8-12 distinct themes (target: closer to 10-12 when the input pool is large, e.g. >200 posts; closer to 8-10 when it's smaller). Lean toward MORE themes when the pool spans many domains: undersizing pushes 20-30% of posts into an "uncategorized" bucket that's then useless for analysis. For each theme:
+- label: short human-readable name in Bahasa Indonesia (3-6 words). Be CONCRETE about what the theme is — name the actual subject matter, not a generic newsroom department.
 
-  GOOD labels — these read as themes a da'i would actually preach about:
+  GOOD labels — concrete, name what the cluster is actually about:
     "Pelecehan oleh Tokoh Agama"           (NOT "Hukum & Kriminalitas")
     "WNI Tertahan di Israel"               (NOT "Diplomasi Internasional")
-    "Persiapan Haji & Idul Adha"           (NOT "Keagamaan & Spiritualitas")
+    "Persiapan Haji & Idul Adha"           (specific religious event)
     "Tekanan Ekonomi Petani & Nelayan"     (NOT "Kebijakan Ekonomi")
-    "Ancaman Judi Online & AI bagi Pemuda" (NOT "Pendidikan")
+    "Judi Online & Pinjol bagi Pemuda"     (specific phenomenon)
     "Solidaritas untuk Palestina & Gaza"   (NOT "Konflik Internasional")
-    "Korupsi Pejabat & Keadilan Hukum"     (NOT "Pemerintahan")
-    "Kekerasan terhadap Anak & Remaja"     (NOT "Hukum & Kriminalitas")
-    "Inspirasi Penghafal Qur'an"           (NOT "Pendidikan & Sekolah")
-    "Bencana Alam & Ketabahan Umat"        (NOT "Bencana & Lingkungan")
-    "Ujian Iman di Masa Pailit"            (NOT "Krisis Ekonomi")
+    "Korupsi Pejabat & Keadilan Hukum"     (specific pattern)
+    "Kekerasan terhadap Anak & Remaja"     (specific victim class)
+    "Kanker & Penyakit Kronis"             (concrete health cluster — OK even without obvious da'wah angle)
+    "Kajian & Hadits Akhlaq"               (concrete content type — kajian videos, akhlaq lessons)
+    "Pendidikan & Sekolah Inklusif"        (concrete education cluster)
+    "Pasar Saham & Investasi Pribadi"      (concrete finance cluster)
+    "Bencana Alam & Tanggap Darurat"       (concrete event class)
 
-  BAD labels — generic newsroom buckets that a da'i can't directly preach from:
+  BAD labels — generic buckets that mix unrelated stories:
     "Berita Politik"                       (too broad)
-    "Pemerintahan & Birokrasi"             (newsroom department, not da'wah theme)
-    "Hukum & Kriminalitas"                 (mixes 5 unrelated stories)
-    "Olahraga & Prestasi"                  (no da'wah hook)
+    "Pemerintahan & Birokrasi"             (department-level, not a theme)
+    "Hukum & Kriminalitas"                 (mixes 5 unrelated stories — split into specifics)
+    "Isu Sosial"                           (mixes everything)
     "barat · nasional · masih"             (stopwords joined by dots)
 
-  Rule of thumb: if the label sounds like a Kompas/Detik section header, REPHRASE it from a da'wah angle. The label should make a da'i say "yes, I can build a khutbah from that this week."
+  Rule of thumb: a good label names a SPECIFIC subject the analyst can scan and decide on. A bad label is a section-header so broad the analyst still has to read every post to know what's in it.
 
 - keywords: 3-5 distinctive keywords (Bahasa Indonesia preferred). These keywords are ALSO used to match posts to this theme by meaning, so pick words that are specific and central to the theme. Avoid stopwords (yang, dan, atau, dengan, untuk, akan, masih, sebelum, terkait, dari, ke) and URL artifacts (republikacoid, kompascom).
 
 Rules:
 - Themes must be DISTINCT — don't split one theme into two near-duplicates.
-- Cover the main currents in the input. You don't need to account for every post; posts that don't fit any theme are fine to leave out (they will simply not be assigned).
+- Aim for BREADTH: the themes you return should jointly cover the great majority (≥80%) of the posts in the pool. If you notice a sizable slice you haven't covered (health stories, education stories, finance/investasi posts, kajian/akhlaq content, sport, lifestyle), add a theme for it rather than letting it drop to "uncategorized". The downstream system has its own cosine-similarity floor that filters borderline matches — you don't need to be conservative here. Undersizing themes is more costly than oversizing.
 - If multiple stories share a clear pattern (e.g. 3 separate child-abuse cases involving religious figures), group them under ONE specific theme ("Pelecehan oleh Tokoh Agama"), not three "miscellaneous crime" entries.
 
 PREFER SUBDIVIDE OVER GENERALIZE:
@@ -142,7 +144,7 @@ When you're tempted to widen a label (e.g. "Kekerasan dan Kriminalitas Jalanan")
   ✅ Split into: "Begal & Kejahatan Jalanan" + "Operasi Narkoba & Penyalahgunaan Obat" + "Kecelakaan & Pelanggaran Lalu Lintas"
   ❌ "Isu Sosial Pemuda" (mixes bullying + judi online + kecurangan ujian + gang violence)
   ✅ Split into: "Bullying & Kekerasan di Sekolah" + "Judi Online & Eksploitasi Digital Pemuda"
-A da'i can build a specific khutbah from a tight theme; a generic bucket gives no angle.
+A reader can scan a tight, specific theme and decide what to do with it; a generic bucket forces them to read every post to know what's inside.
 
 ASSIGNMENT CONTROLS — each theme MAY include two extra optional fields that protect it from false-positive assignment:
 
