@@ -116,6 +116,10 @@ export default async function NewFlyerPage({
           resultCreateAnother: t("result_create_another"),
           errorGenerationFailed: t("error_generation_failed"),
           errorInvalidInput: t("error_invalid_input"),
+          previewSubtitle: t("preview_subtitle"),
+          previewConfirm: t("preview_confirm"),
+          previewClose: t("preview_close"),
+          previewArabicPlaceholder: t("preview_arabic_placeholder"),
         }}
       />
 

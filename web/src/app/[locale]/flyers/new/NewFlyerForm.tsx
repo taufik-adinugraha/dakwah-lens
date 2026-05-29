@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import { LayoutThumbnail } from "./LayoutThumbnail";
+import { LayoutPreviewModal } from "./LayoutPreviewModal";
 
 import { Link } from "@/i18n/navigation";
 import type { QuotaSnapshot } from "@/lib/user-flyer/quota";
@@ -66,6 +67,10 @@ type Labels = {
   resultCreateAnother: string;
   errorGenerationFailed: string;
   errorInvalidInput: string;
+  previewSubtitle: string;
+  previewConfirm: string;
+  previewClose: string;
+  previewArabicPlaceholder: string;
 };
 
 type Photo = { id: string; src: string };
@@ -81,6 +86,7 @@ export function NewFlyerForm({
 }) {
   const [quota, setQuota] = useState<QuotaSnapshot>(initialQuota);
   const [layout, setLayout] = useState<Layout>("split-image");
+  const [previewLayout, setPreviewLayout] = useState<Layout | null>(null);
   const [imageRef, setImageRef] = useState<string | null>(
     photos[0]?.id ?? null,
   );
@@ -236,7 +242,7 @@ export function NewFlyerForm({
               <button
                 key={l}
                 type="button"
-                onClick={() => setLayout(l)}
+                onClick={() => setPreviewLayout(l)}
                 className={`flex items-center gap-3 rounded-2xl border p-3 text-left transition ${
                   active
                     ? "border-emerald-500 bg-emerald-50 ring-1 ring-emerald-200"
@@ -251,6 +257,22 @@ export function NewFlyerForm({
             );
           })}
         </div>
+        {previewLayout && (
+          <LayoutPreviewModal
+            layout={previewLayout}
+            title={labels.layouts[previewLayout].title}
+            subtitle={labels.previewSubtitle}
+            photos={photos}
+            arabicPlaceholder={labels.previewArabicPlaceholder}
+            confirmLabel={labels.previewConfirm}
+            closeLabel={labels.previewClose}
+            onConfirm={() => {
+              setLayout(previewLayout);
+              setPreviewLayout(null);
+            }}
+            onClose={() => setPreviewLayout(null)}
+          />
+        )}
       </section>
 
       {/* Step 2: Image */}
