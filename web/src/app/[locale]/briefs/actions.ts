@@ -108,9 +108,10 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
   if (!session?.user?.id) {
     return { ok: false, error: "auth_required" };
   }
-  if (session.user.status !== "approved") {
-    return { ok: false, error: "account_not_approved" };
-  }
+  // Brief generation is open to all signed-in users (2026-05-29).
+  // Approval (status === "approved") still gates admin surfaces and
+  // any per-user privilege beyond the default quota — but the brief
+  // wizard itself is now part of the standard onboarding journey.
 
   const parsed = GenerateSchema.safeParse({
     topic_title: formData.get("topic_title"),
@@ -367,9 +368,9 @@ export async function estimateBriefCostAction(
   if (!session?.user?.id) {
     return { ok: false, error: "auth_required" };
   }
-  if (session.user.status !== "approved") {
-    return { ok: false, error: "account_not_approved" };
-  }
+  // Estimate is intentionally open to all signed-in users — same
+  // policy as generateBriefAction (the wizard's two halves should
+  // gate identically).
 
   const parsed = EstimateSchema.safeParse({
     topic_title: formData.get("topic_title"),

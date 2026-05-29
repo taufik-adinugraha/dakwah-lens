@@ -24,10 +24,11 @@ const PROTECTED_PREFIXES = [
 const PUBLIC_OVERRIDES = ["/briefs/public"];
 
 // Routes that require an admin (or superadmin) role even when the user is
-// signed in + approved. Personalized brief generation is gated behind this
-// while the feature is still experimental — only admins should be able to
-// create / list / view briefs. /briefs/public is exempt via PUBLIC_OVERRIDES.
-const ADMIN_ONLY_PREFIXES = ["/briefs"];
+// signed in + approved. Empty since 2026-05-29 — brief generation was
+// previously gated to admins while the feature was experimental; now open
+// to all signed-in users. The mechanism is kept (vs. deleting it) so a
+// future feature can drop a prefix in without re-wiring the gate.
+const ADMIN_ONLY_PREFIXES: string[] = [];
 
 // Routes that require auth but must NOT trigger the onboarding redirect —
 // the wizard itself, login, and logout. Adding /admin would defeat the
