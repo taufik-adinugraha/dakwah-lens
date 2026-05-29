@@ -412,22 +412,33 @@ export async function generateBriefContent(
 
   // pages → maxTokens scaling. The brief JSON has fixed-size scaffolding
   // (audience_segmentation, sources, etc.) plus variable-size prose
-  // (issue_analysis, khutbah outline). Floor 4000 covers the JSON
-  // skeleton; +2000/page beyond that gives the LLM headroom for longer
-  // prose at higher page counts. Caps at 16k so a rogue input can't
-  // blow our token budget.
+  // (issue_analysis, khutbah outline).
   //
-  // Khutbah Jumat mode produces a much longer document — a full Friday-
-  // khutbah with Khutbah Pertama (2700-3750 kata) + Khutbah Kedua
-  // (750-1050 kata) + Arabic with harakat, plus the standard brief
-  // scaffolding. The default cap (4-10k) truncated Gemini mid-JSON in
-  // prod (2026-05-29, "Unterminated string at position 4185"). For
-  // this format we bump the floor + cap so the LLM has room to finish.
+  // IMPORTANT: gemini-2.5-pro is a *reasoning* model — its internal
+  // thinking tokens count against maxOutputTokens. Typical reasoning
+  // spend on a structured-JSON task is 2-10k tokens depending on
+  // prompt complexity; without enough headroom on top of the expected
+  // JSON output, response truncates mid-string. Observed twice in
+  // prod 2026-05-29: kajian_umum at 4k cap AND at 12k cap, both
+  // truncated at ~4700 chars because thinking ate most of the budget.
+  //
+  // Sizing (rough targets at Indonesian ~5 tokens/kata):
+  //   kajian_umum  · target 350 kata/page → ~1.8k output tokens/page
+  //                  + 2-5k thinking → cap = 16k floor / 32k ceiling
+  //                  with per-page bump of 6k.
+  //   khutbah_jumat · target 850-1200 kata/page (full Khutbah Pertama
+  //                  + Kedua) → ~5k output tokens/page + 5-10k
+  //                  thinking → cap = 28k floor / 56k ceiling with
+  //                  per-page bump of 10k.
+  //
+  // gemini-2.5-pro supports up to 65,536 output tokens so these caps
+  // stay within model limits. Higher caps don't increase BILLED cost
+  // when the model writes fewer tokens; they just provide headroom.
   const targetWords = (locale === "id" ? 350 : 250) * pages;
   const maxTokens =
     format === "khutbah_jumat"
-      ? Math.min(16_000, Math.max(12_000, pages * 3_000))
-      : Math.min(10_000, Math.max(4_000, pages * 2_000));
+      ? Math.min(56_000, Math.max(28_000, pages * 10_000))
+      : Math.min(32_000, Math.max(16_000, pages * 6_000));
 
   // KHUTBAH JUMAT mode — when the user picks this format, inject a hard
   // directive block that mirrors the weekly briefing's Khutbah Jumat

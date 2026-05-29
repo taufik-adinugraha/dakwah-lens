@@ -220,6 +220,19 @@ async function callGemini<T>(
 
   const tokensIn = response.usageMetadata?.promptTokenCount ?? null;
   const tokensOut = response.usageMetadata?.candidatesTokenCount ?? null;
+  // gemini-2.5-pro is a reasoning model — thinking spend lands in
+  // `thoughtsTokenCount`. Surface it in logs alongside finish_reason
+  // so the next time output truncates mid-string we can tell at a
+  // glance whether the cap was too low or the model ran into safety
+  // / length limits.
+  const finishReason =
+    response.candidates?.[0]?.finishReason ?? "unknown";
+  const thoughtsTokens =
+    (response.usageMetadata as { thoughtsTokenCount?: number } | undefined)
+      ?.thoughtsTokenCount ?? null;
+  console.info(
+    `[llm] gemini done · finish=${finishReason} · tokens in/out/thinking=${tokensIn}/${tokensOut}/${thoughtsTokens} · cap=${req.maxTokens ?? 2000}`,
+  );
 
   void recordUsage({
     provider: "gemini",
