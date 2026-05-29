@@ -69,6 +69,20 @@ export function BriefForm({
   const [topic, setTopic] = useState(defaultTopic);
   const [extraContext, setExtraContext] = useState("");
   const [pages, setPages] = useState(2);
+  // All SelectGrid + checkbox state lifted to this parent so it
+  // survives the form's `step === "estimate"` re-mount cycle. Earlier
+  // bug (2026-05-29): SelectGrid held its own useState, so after the
+  // user clicked Cancel on the estimate step the form re-mounted and
+  // every grid silently reverted to its default value while
+  // `snapshotRef` still held the original selection. User saw "Kajian
+  // umum" in the UI but got a Khutbah Jumat brief back.
+  const [segment, setSegment] = useState<(typeof SEGMENTS)[number]>(
+    SEGMENTS[0],
+  );
+  const [tone, setTone] = useState<(typeof TONES)[number]>(TONES[0]);
+  const [format, setFormat] = useState<(typeof FORMATS)[number]>("kajian_umum");
+  const [locale, setLocale] = useState<(typeof LOCALES)[number]>(defaultLocale);
+  const [includeProfile, setIncludeProfile] = useState(true);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const topicRef = useRef<HTMLInputElement | null>(null);
   // Snapshot of the form FormData taken at the moment the user clicked
@@ -166,6 +180,8 @@ export function BriefForm({
       <Field label={t("field_segment")}>
         <SelectGrid
           name="segment"
+          value={segment}
+          onChange={(v) => setSegment(v as (typeof SEGMENTS)[number])}
           options={SEGMENTS.map((s) => ({
             value: s,
             label: t(`segment_${s}` as Parameters<typeof t>[0]),
@@ -176,6 +192,8 @@ export function BriefForm({
       <Field label={t("field_tone")}>
         <SelectGrid
           name="tone"
+          value={tone}
+          onChange={(v) => setTone(v as (typeof TONES)[number])}
           options={TONES.map((tn) => ({
             value: tn,
             label: t(`tone_${tn}` as Parameters<typeof t>[0]),
@@ -186,11 +204,12 @@ export function BriefForm({
       <Field label={t("field_format")} hint={t("field_format_hint")}>
         <SelectGrid
           name="format"
+          value={format}
+          onChange={(v) => setFormat(v as (typeof FORMATS)[number])}
           options={FORMATS.map((f) => ({
             value: f,
             label: t(`format_${f}` as Parameters<typeof t>[0]),
           }))}
-          defaultValue="kajian_umum"
         />
       </Field>
 
@@ -202,7 +221,8 @@ export function BriefForm({
           <input
             type="checkbox"
             name="include_profile"
-            defaultChecked
+            checked={includeProfile}
+            onChange={(e) => setIncludeProfile(e.target.checked)}
             className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
           />
           <span className="flex flex-col gap-0.5">
@@ -293,11 +313,12 @@ export function BriefForm({
       <Field label={t("field_locale")}>
         <SelectGrid
           name="locale"
+          value={locale}
+          onChange={(v) => setLocale(v as (typeof LOCALES)[number])}
           options={LOCALES.map((l) => ({
             value: l,
             label: t(`locale_${l}` as Parameters<typeof t>[0]),
           }))}
-          defaultValue={defaultLocale}
         />
       </Field>
 
@@ -477,27 +498,33 @@ function Field({
   );
 }
 
+/**
+ * Controlled tile picker. State MUST live in the parent so it
+ * survives the form's `step === "estimate"` re-mount cycle — see the
+ * comment in BriefForm where the lifted state is declared.
+ */
 function SelectGrid({
   name,
+  value,
+  onChange,
   options,
-  defaultValue,
 }: {
   name: string;
+  value: string;
+  onChange: (v: string) => void;
   options: { value: string; label: string }[];
-  defaultValue?: string;
 }) {
-  const [selected, setSelected] = useState(defaultValue ?? options[0].value);
   return (
     <>
-      <input type="hidden" name={name} value={selected} />
+      <input type="hidden" name={name} value={value} />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         {options.map((o) => {
-          const active = o.value === selected;
+          const active = o.value === value;
           return (
             <button
               key={o.value}
               type="button"
-              onClick={() => setSelected(o.value)}
+              onClick={() => onChange(o.value)}
               aria-pressed={active}
               className={clsx(
                 "rounded-lg border px-3 py-2 text-xs font-medium transition",

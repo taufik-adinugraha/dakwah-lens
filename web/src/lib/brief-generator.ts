@@ -414,10 +414,20 @@ export async function generateBriefContent(
   // (audience_segmentation, sources, etc.) plus variable-size prose
   // (issue_analysis, khutbah outline). Floor 4000 covers the JSON
   // skeleton; +2000/page beyond that gives the LLM headroom for longer
-  // prose at higher page counts. Caps at 10k so a rogue input can't
+  // prose at higher page counts. Caps at 16k so a rogue input can't
   // blow our token budget.
+  //
+  // Khutbah Jumat mode produces a much longer document — a full Friday-
+  // khutbah with Khutbah Pertama (2700-3750 kata) + Khutbah Kedua
+  // (750-1050 kata) + Arabic with harakat, plus the standard brief
+  // scaffolding. The default cap (4-10k) truncated Gemini mid-JSON in
+  // prod (2026-05-29, "Unterminated string at position 4185"). For
+  // this format we bump the floor + cap so the LLM has room to finish.
   const targetWords = (locale === "id" ? 350 : 250) * pages;
-  const maxTokens = Math.min(10_000, Math.max(4_000, pages * 2_000));
+  const maxTokens =
+    format === "khutbah_jumat"
+      ? Math.min(16_000, Math.max(12_000, pages * 3_000))
+      : Math.min(10_000, Math.max(4_000, pages * 2_000));
 
   // KHUTBAH JUMAT mode — when the user picks this format, inject a hard
   // directive block that mirrors the weekly briefing's Khutbah Jumat
