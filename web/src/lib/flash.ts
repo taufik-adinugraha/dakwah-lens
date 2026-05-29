@@ -1,3 +1,5 @@
+import "server-only";
+
 import { cookies } from "next/headers";
 
 /**
@@ -77,16 +79,6 @@ export async function popFlash(): Promise<Flash | null> {
   }
 }
 
-/**
- * Server action: clear the flash cookie. Called from the client toast
- * after it has displayed the flash once. Server actions DO have a
- * mutable cookie API, so `c.delete()` here actually works.
- *
- * Safe to call from any client component — no auth required, no DB
- * touch, just one cookie mutation.
- */
-export async function clearFlashCookie(): Promise<void> {
-  "use server";
-  const c = await cookies();
-  c.delete(COOKIE);
-}
+// `clearFlashCookie` lives in `flash-actions.ts` (a "use server"
+// module) so client components like FlashToast can call it without
+// pulling this server-only file into the client bundle.

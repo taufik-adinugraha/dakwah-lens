@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { AlertCircle, CheckCircle2, Info, X } from "lucide-react";
 
-import { clearFlashCookie, type Flash } from "@/lib/flash";
+import type { Flash } from "@/lib/flash";
+import { clearFlashCookie } from "@/lib/flash-actions";
 
 /**
  * One-shot toast notification rendered above the page chrome.
