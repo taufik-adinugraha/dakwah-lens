@@ -85,7 +85,7 @@ export function computeCost(input: {
   model: string;
 }): CostBreakdown {
   const price =
-    PRICING[input.model] ?? PRICING["claude-sonnet-4-5"]; // safe default
+    PRICING[input.model] ?? PRICING["gemini-2.5-pro"]; // safe default
 
   const inputUsd = (input.tokensIn / 1_000_000) * price.inputPerMillion;
   const outputUsd = (input.tokensOut / 1_000_000) * price.outputPerMillion;
@@ -104,8 +104,11 @@ export function computeCost(input: {
 }
 
 /** Estimate the cost a brief would incur if generated with the default
- *  provider. Defaults to Claude pricing (the primary in our fallback
- *  chain); actual cost depends on which provider responded first.  */
+ *  provider. Uses Gemini pricing because gemini-2.5-pro is the primary
+ *  in our fallback chain (llm.ts tries Gemini first; Anthropic only
+ *  fires when GEMINI fails AND ANTHROPIC_API_KEY is set). Anthropic
+ *  isn't even configured in prod today, so the estimate would have
+ *  been ~6× actual cost if we kept showing Sonnet rates. */
 export function estimateBriefCost(input: {
   topicTitle: string;
   extraContext?: string | null;
@@ -116,8 +119,8 @@ export function estimateBriefCost(input: {
   return computeCost({
     tokensIn,
     tokensOut,
-    provider: "anthropic",
-    model: "claude-sonnet-4-5",
+    provider: "gemini",
+    model: "gemini-2.5-pro",
   });
 }
 
