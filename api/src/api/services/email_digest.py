@@ -77,6 +77,12 @@ async def send_weekly_digests() -> dict[str, Any]:
 
         # Users who opted in — also issue an unsubscribe token if they
         # don't have one yet (first-digest users).
+        # No email_verified guard: NextAuth's DrizzleAdapter doesn't
+        # populate users.email_verified for Google OAuth sign-ups, so
+        # that column is NULL for the entire user base. The opt-in
+        # toggle itself requires being signed in (Google has already
+        # verified the address) so the extra guard was a no-op-or-
+        # always-false depending on signup path.
         users = (
             await session.execute(
                 text(
@@ -84,7 +90,6 @@ async def send_weekly_digests() -> dict[str, Any]:
                     SELECT id, email, name, digest_unsubscribe_token
                     FROM users
                     WHERE email_digest_opt_in = true
-                      AND email_verified IS NOT NULL
                     """
                 )
             )
@@ -116,7 +121,6 @@ async def send_weekly_digests() -> dict[str, Any]:
                         SELECT id, email, name, digest_unsubscribe_token
                         FROM users
                         WHERE email_digest_opt_in = true
-                          AND email_verified IS NOT NULL
                         """
                     )
                 )
