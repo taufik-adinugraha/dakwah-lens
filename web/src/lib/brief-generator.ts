@@ -168,6 +168,17 @@ const BriefResponseSchema = z.object({
     perception: z.string().min(40),
     angle: z.string().min(40),
   }),
+  // 2-3 sentence relevance note per retrieved daleel — keyed by the
+  // 1-based daleel index the user prompt passes in. Stored alongside
+  // each BriefDaleel server-side and rendered under the citation card.
+  daleel_explanations: z
+    .array(
+      z.object({
+        index: z.number().int().min(1),
+        explanation: z.string().min(40),
+      }),
+    )
+    .optional(),
   recommendations: z.array(z.string().min(20)).min(8).max(12),
   anticipated_objections: z
     .array(
@@ -223,6 +234,27 @@ const RESPONSE_JSON_SCHEMA = {
         },
       },
       required: ["primary", "perception", "angle"],
+    },
+    daleel_explanations: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          index: {
+            type: "integer",
+            description:
+              "1-based index of the daleel in the RETRIEVED DALEEL block provided in the user prompt. Must match a daleel that was actually given to you — do NOT invent indices beyond what was provided.",
+          },
+          explanation: {
+            type: "string",
+            description:
+              "2-3 sentence relevance note in the requested output language explaining WHY this specific daleel matters for THIS topic + audience. Tie the meaning to a concrete situation the audience faces, not a generic restatement of the translation. Mention what the daleel adds to the argument that the brief makes — what would be missing without it. Do NOT re-quote the Arabic or repeat the translation verbatim; the UI renders those separately. Do NOT invent additional citations.",
+          },
+        },
+        required: ["index", "explanation"],
+      },
+      description:
+        "ONE explanation entry per retrieved daleel the brief actually uses. Index matches the 1-based number from the RETRIEVED DALEEL block. Aim to explain EVERY daleel that was provided; skip an index only if it truly doesn't fit the topic. Order doesn't matter — index is the key.",
     },
     recommendations: {
       type: "array",
@@ -483,6 +515,8 @@ export async function generateBriefContent(
     "RETRIEVED DALEEL (chosen by semantic search; do not invent more):",
     daleelBlock,
     "",
+    `IMPORTANT: For EACH daleel above (1..${daleel.length}), produce one entry in \`daleel_explanations\` with the matching 1-based index and a 2-3 sentence relevance note in ${localeLabel}. The note must explain WHY this specific daleel matters for the topic and audience — tied to a concrete situation, not a generic restatement of the translation. The UI renders the Arabic + translation + source separately; your job is the explanation that connects them to the argument the brief is making.`,
+    "",
     `Produce the structured brief JSON. Use the audience name "${segLabel}" verbatim in audience_segmentation.primary.`,
   ]
     .filter(Boolean)
@@ -508,9 +542,30 @@ export async function generateBriefContent(
     );
   }
 
+  // Merge the LLM's per-daleel explanations onto the retrieved daleel
+  // objects. The LLM keys by 1-based index matching how the daleel are
+  // numbered in the user prompt's "RETRIEVED DALEEL" block; we
+  // translate that to the array offset here. Missing or extra indices
+  // are tolerated — a daleel without an explanation just renders the
+  // raw text (same as pre-2026-05-29 behaviour).
+  const explanationByIdx = new Map<number, string>();
+  for (const e of parsed.data.daleel_explanations ?? []) {
+    if (e.index >= 1 && e.index <= daleel.length) {
+      explanationByIdx.set(e.index - 1, e.explanation);
+    }
+  }
+  const enrichedDaleel = daleel.map((d, i) => {
+    const explanation = explanationByIdx.get(i);
+    return explanation ? { ...d, explanation } : d;
+  });
+
+  // Strip the auxiliary explanations field — it's already been folded
+  // into the daleel objects, no need to persist it separately.
+  const { daleel_explanations: _ignore, ...rest } = parsed.data;
+  void _ignore;
   const content: BriefContent = {
-    ...parsed.data,
-    daleel, // append the retrieved daleel — LLM never authors these
+    ...rest,
+    daleel: enrichedDaleel,
   };
 
   return { content, provider, model, tokensIn, tokensOut };

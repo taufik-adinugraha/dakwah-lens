@@ -201,6 +201,11 @@ export type BriefDaleel = {
   translation: string;
   /** Citation string, e.g. "QS. An-Nahl: 125" or "Qur'an, An-Nahl 16:125". */
   source: string;
+  /** 2-3 sentence explanation of WHY this daleel is relevant to the
+   *  brief's topic — written by the LLM during synthesis, NOT retrieved
+   *  from the kitab corpus. Undefined for pre-2026-05-29 briefs that
+   *  were generated before the field existed. */
+  explanation?: string;
   /** Where this daleel came from — Qdrant semantic search or keyword fallback. */
   retrieval_source?: "qdrant" | "keyword";
   /** Cosine similarity score from Qdrant (0–1). Undefined for keyword fallback. */

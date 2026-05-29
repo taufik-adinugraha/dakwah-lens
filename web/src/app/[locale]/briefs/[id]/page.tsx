@@ -357,6 +357,21 @@ function DaleelCard({
           </p>
         </div>
       ) : null}
+
+      {/* LLM-written relevance note. Why this daleel matters for THIS
+          topic + audience — written during brief synthesis, NOT
+          retrieved from the kitab corpus. Pre-2026-05-29 briefs don't
+          have it; the conditional handles both cases. */}
+      {d.explanation ? (
+        <div className="mt-3 rounded-xl border border-emerald-200/70 bg-white/70 p-3">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+            {t("daleel_relevance_label")}
+          </p>
+          <p className="mt-1.5 text-pretty text-sm leading-relaxed text-slate-700">
+            {d.explanation}
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }
