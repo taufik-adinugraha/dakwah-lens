@@ -685,6 +685,7 @@
     "stat_pending": "Pending",
     "stat_approved": "Approved",
     "stat_unverified": "Unverified",
+    "unverified_pill_label": "Unverified email",
     "filter_search_label": "Search",
     "filter_search_placeholder": "Name or email…",
     "filter_role_label": "Role",

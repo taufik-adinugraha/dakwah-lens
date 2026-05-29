@@ -681,6 +681,7 @@
     "stat_pending": "Menunggu",
     "stat_approved": "Disetujui",
     "stat_unverified": "Belum verifikasi",
+    "unverified_pill_label": "Belum verifikasi email",
     "filter_search_label": "Cari",
     "filter_search_placeholder": "Nama atau email…",
     "filter_role_label": "Role",

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { asc, desc, inArray, isNotNull, isNull } from "drizzle-orm";
+import { desc } from "drizzle-orm";
 import { CheckCircle2, Search, ShieldCheck, UserCircle2, XCircle } from "lucide-react";
 
 import { auth } from "@/auth";
@@ -99,19 +99,18 @@ export default async function AdminUsersPage({
     return true;
   });
 
-  // Split the filtered set into the existing 4 buckets. Unverified users
-  // (email_verified IS NULL) get their own section so the admin can see
-  // who's stuck pre-verify without conflating them with un-approved-but-
-  // verified accounts.
-  const unverified = filtered
-    .filter((u) => u.emailVerified === null)
-    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-  const verified = filtered.filter((u) => u.emailVerified !== null);
-  const pending = verified
+  // Bucket by status, not by email_verified. The Drizzle NextAuth adapter
+  // doesn't set users.email_verified on Google OAuth sign-up, so that
+  // column is NULL for nearly everyone — including approved superadmins.
+  // Using it as a section selector hides legitimate pending reviews
+  // behind a phantom "Unverified" bucket. Rows that genuinely haven't
+  // verified are still marked inline via an "unverified" pill so the
+  // admin can decide whether to approve.
+  const pending = filtered
     .filter((u) => u.status === "pending")
     .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-  const approved = verified.filter((u) => u.status === "approved");
-  const inactive = verified.filter(
+  const approved = filtered.filter((u) => u.status === "approved");
+  const inactive = filtered.filter(
     (u) => u.status === "rejected" || u.status === "blocked",
   );
 
@@ -133,11 +132,10 @@ export default async function AdminUsersPage({
             {t("subtitle")}
           </p>
         </div>
-        <div className="grid grid-cols-4 gap-2 sm:gap-3">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
           <Stat label={t("stat_total")} value={totalCount.toLocaleString("en-US")} />
           <Stat label={t("stat_pending")} value={pending.length.toLocaleString("en-US")} accent="amber" />
           <Stat label={t("stat_approved")} value={approved.length.toLocaleString("en-US")} accent="emerald" />
-          <Stat label={t("stat_unverified")} value={unverified.length.toLocaleString("en-US")} accent="slate" />
         </div>
       </div>
 
@@ -163,17 +161,6 @@ export default async function AdminUsersPage({
         emptyMessage={t("empty_approved")}
         users={approved}
         actions="approved"
-        t={t}
-        locale={locale}
-        selfId={selfId}
-        callerRole={role}
-      />
-
-      <SectionBlock
-        title={t("section_unverified")}
-        emptyMessage={t("empty_unverified")}
-        users={unverified}
-        actions="unverified"
         t={t}
         locale={locale}
         selfId={selfId}
@@ -315,7 +302,7 @@ function FilterBar({
   );
 }
 
-type SectionActions = "pending" | "approved" | "rejected" | "unverified";
+type SectionActions = "pending" | "approved" | "rejected";
 
 function SectionBlock({
   title,
@@ -411,6 +398,9 @@ function UserRowCard({
           )}
           <StatusPill status={user.status} t={t} />
           <RolePill role={user.role} t={t} />
+          {user.status === "pending" && user.emailVerified === null && (
+            <UnverifiedPill label={t("unverified_pill_label")} />
+          )}
         </div>
         <p className="mt-0.5 truncate text-xs text-slate-500">
           {user.email}
@@ -457,24 +447,6 @@ function ActionButtons({
 }) {
   if (disabled) {
     return <span className="text-[10px] uppercase tracking-wider text-slate-400">—</span>;
-  }
-
-  if (actions === "unverified") {
-    // Unverified users (email_verified IS NULL) can only be removed —
-    // the admin can't approve/promote until the visitor proves email
-    // ownership by clicking the verification link. Remove is the
-    // useful action here for stale signups that never returned.
-    return (
-      <div className="flex flex-wrap items-center justify-end gap-1.5">
-        <ConfirmFormButton
-          action={removeUserAction}
-          userId={userId}
-          label={t("remove_button")}
-          confirmMessage={removeConfirm}
-          tone="rose"
-        />
-      </div>
-    );
   }
 
   if (actions === "pending") {
@@ -672,6 +644,14 @@ function StatusPill({
       className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ring-1 ${tone}`}
     >
       {t(key)}
+    </span>
+  );
+}
+
+function UnverifiedPill({ label }: { label: string }) {
+  return (
+    <span className="inline-flex items-center rounded-full bg-slate-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-600 ring-1 ring-slate-200">
+      {label}
     </span>
   );
 }
