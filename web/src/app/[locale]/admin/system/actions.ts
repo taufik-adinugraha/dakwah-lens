@@ -250,12 +250,34 @@ export async function addYoutubeChannel(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim().slice(0, 255);
   const handle = String(formData.get("handle") ?? "").trim().slice(0, 128) || null;
   const rawCategory = String(formData.get("category") ?? "");
-  if (!channelId || !name) return;
-  if (!isValidYtChannelId(channelId)) return;
+  // Surface the rejection reason via flash so the operator isn't left
+  // wondering why their submit vanished (every early-return below used
+  // to fail silently — same symptom as: form re-renders empty, no row
+  // in DB, no error message).
+  if (!channelId || !name) {
+    await setFlash(
+      "error",
+      "Missing required field — both channel ID and name are required.",
+    );
+    return;
+  }
+  if (!isValidYtChannelId(channelId)) {
+    await setFlash(
+      "error",
+      `Invalid channel ID format. Expected 24 chars starting with "UC" (e.g. UCXxXxXxXxXxXxXxXxXxXxXx). Paste the channel_id, NOT the @handle. Got: ${channelId.slice(0, 30)}${channelId.length > 30 ? "…" : ""}`,
+    );
+    return;
+  }
   const category = (YT_CATEGORIES as readonly string[]).includes(rawCategory)
     ? rawCategory
     : null;
-  if (!category) return;
+  if (!category) {
+    await setFlash(
+      "error",
+      `Invalid category "${rawCategory}". Pick one from the dropdown.`,
+    );
+    return;
+  }
   const [inserted] = await db
     .insert(schema.youtubeChannels)
     .values({ channelId, name, handle, category, enabled: true })
@@ -537,6 +559,12 @@ export async function verifyYoutubeChannel(
         verified: true,
         verifiedAt: new Date(),
         updatedAt: new Date(),
+        // Persist the YT-reported subscriber count so the admin sort-by-
+        // followers UI has data. NULL when the YT response omitted it
+        // (rare — typically only on hidden-stats channels).
+        subscriberCount: result.subscriberCount ?? null,
+        subscribersUpdatedAt:
+          result.subscriberCount != null ? new Date() : null,
       })
       .where(eq(schema.youtubeChannels.id, id));
     verifiedNow = true;
@@ -610,6 +638,19 @@ export async function verifyAllYoutubeChannels(): Promise<VerifyAllYoutubeChanne
     if (r.outcome === "ok") {
       counts.ok += 1;
       verifiedNow = true;
+      // Persist this channel's subscriber_count inline. The verified
+      // flag is bulk-updated below for speed, but subscriber counts
+      // are per-row data so they have to land individually. ~80 rows
+      // × ~3ms each = trivial next to the ~10-20s YT API time.
+      if (r.subscriberCount != null) {
+        await db
+          .update(schema.youtubeChannels)
+          .set({
+            subscriberCount: r.subscriberCount,
+            subscribersUpdatedAt: new Date(),
+          })
+          .where(eq(schema.youtubeChannels.id, row.id));
+      }
     } else if (r.outcome === "private") {
       counts.private_ += 1;
       verifiedNow = false;

@@ -54,8 +54,26 @@ const CATEGORY_COLORS: Record<Category, { bg: string; text: string; ring: string
   cultural: { bg: "bg-fuchsia-50", text: "text-fuchsia-700", ring: "ring-fuchsia-100" },
 };
 
-const FILTERS = ["all", ...CATEGORIES] as const;
+// Verified / Unverified are status filters orthogonal to the category
+// buckets, but we collapse them into the same single-select bar to
+// avoid a 2-dim filter state. Operator-flow audit (2026-05-29): most
+// admin tasks are "find the unverified ones to chase" — the cross-cut
+// with category isn't load-bearing.
+const STATUS_FILTERS = ["verified", "unverified"] as const;
+const FILTERS = ["all", ...STATUS_FILTERS, ...CATEGORIES] as const;
 type Filter = (typeof FILTERS)[number];
+
+// Sort independent of the filter. URL param `sort=`. Default mirrors
+// the historical (category, name) order so existing bookmarks land
+// on the same page they used to see.
+const SORTS = ["category", "name", "recent", "followers"] as const;
+type Sort = (typeof SORTS)[number];
+const SORT_LABELS: Record<Sort, string> = {
+  category: "Category",
+  name: "Name (A–Z)",
+  recent: "Recently added",
+  followers: "Followers",
+};
 
 // Raw `searchParams` type rather than `PageProps<"…">` because Next.js's
 // typed-routes generator only picks up the new directory after a build,
@@ -73,7 +91,7 @@ export const dynamic = "force-dynamic";
 export default async function YoutubeChannelsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ show?: string }>;
+  searchParams: Promise<{ show?: string; sort?: string }>;
 }) {
   const session = await auth();
   const isSuperadmin = session?.user?.role === "superadmin";
@@ -96,8 +114,12 @@ export default async function YoutubeChannelsPage({
   const healthById = new Map(healthRows.map((h) => [h.channelId, h]));
 
   const countByCategory: Record<string, number> = {};
+  let countVerified = 0;
+  let countUnverified = 0;
   for (const c of channels) {
     countByCategory[c.category] = (countByCategory[c.category] ?? 0) + 1;
+    if (c.verified) countVerified += 1;
+    else countUnverified += 1;
   }
 
   const sp = await searchParams;
@@ -106,10 +128,59 @@ export default async function YoutubeChannelsPage({
     (FILTERS as readonly string[]).includes(rawFilter ?? "")
       ? (rawFilter as Filter)
       : "all";
+  const rawSort = typeof sp.sort === "string" ? sp.sort : undefined;
+  const activeSort: Sort =
+    (SORTS as readonly string[]).includes(rawSort ?? "")
+      ? (rawSort as Sort)
+      : "category";
 
-  const visible = channels.filter((c) =>
-    activeFilter === "all" ? true : c.category === activeFilter,
-  );
+  // Helper: preserve the other URL param when building a new link.
+  const linkWith = (overrides: { show?: string; sort?: string }) => {
+    const params = new URLSearchParams();
+    const show = overrides.show ?? (activeFilter === "all" ? undefined : activeFilter);
+    const sort = overrides.sort ?? (activeSort === "category" ? undefined : activeSort);
+    if (show) params.set("show", show);
+    if (sort) params.set("sort", sort);
+    const qs = params.toString();
+    return qs
+      ? `/admin/system/youtube-channels?${qs}`
+      : "/admin/system/youtube-channels";
+  };
+
+  const visible = channels.filter((c) => {
+    if (activeFilter === "all") return true;
+    if (activeFilter === "verified") return c.verified;
+    if (activeFilter === "unverified") return !c.verified;
+    return c.category === activeFilter;
+  });
+
+  // Apply the sort. Returns a NEW array so we don't mutate the
+  // category-ordered SQL result (which other admins viewing different
+  // sorts in parallel would clobber via the shared in-memory rows).
+  const sortedVisible = [...visible].sort((a, b) => {
+    if (activeSort === "name") {
+      return a.name.localeCompare(b.name, "en", { sensitivity: "base" });
+    }
+    if (activeSort === "recent") {
+      const aT = new Date(a.createdAt).getTime();
+      const bT = new Date(b.createdAt).getTime();
+      return bT - aT; // newest first
+    }
+    if (activeSort === "followers") {
+      // NULL → bottom of the list (channels never verified, no count
+      // available yet). Otherwise descending — biggest audience first.
+      const aS = a.subscriberCount ?? -1;
+      const bS = b.subscriberCount ?? -1;
+      if (aS === bS) {
+        return a.name.localeCompare(b.name, "en", { sensitivity: "base" });
+      }
+      return bS - aS;
+    }
+    // category (default) — same ordering as the SQL ORDER BY.
+    const catCmp = a.category.localeCompare(b.category);
+    if (catCmp !== 0) return catCmp;
+    return a.name.localeCompare(b.name, "en", { sensitivity: "base" });
+  });
 
   return (
     <>
@@ -153,20 +224,35 @@ export default async function YoutubeChannelsPage({
       <Card title={`Whitelisted channels (${channels.length})`}>
         <VerifyAllBar totalChannels={channels.length} />
 
-        <div className="mb-4 flex flex-wrap items-center gap-1.5">
+        <div className="mb-3 flex flex-wrap items-center gap-1.5">
           <span className="mr-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
             Show
           </span>
           <FilterPill
-            href="/admin/system/youtube-channels"
+            href={linkWith({ show: undefined })}
             active={activeFilter === "all"}
             label="All"
             count={channels.length}
           />
+          <FilterPill
+            href={linkWith({ show: "verified" })}
+            active={activeFilter === "verified"}
+            label="Verified"
+            count={countVerified}
+            tone="emerald"
+          />
+          <FilterPill
+            href={linkWith({ show: "unverified" })}
+            active={activeFilter === "unverified"}
+            label="Unverified"
+            count={countUnverified}
+            tone="amber"
+          />
+          <span aria-hidden className="mx-1 h-4 w-px bg-slate-200" />
           {CATEGORIES.map((cat) => (
             <FilterPill
               key={cat}
-              href={`/admin/system/youtube-channels?show=${cat}`}
+              href={linkWith({ show: cat })}
               active={activeFilter === cat}
               label={CATEGORY_LABELS[cat]}
               count={countByCategory[cat] ?? 0}
@@ -174,7 +260,22 @@ export default async function YoutubeChannelsPage({
           ))}
         </div>
 
-        {visible.length === 0 ? (
+        <div className="mb-4 flex flex-wrap items-center gap-1.5">
+          <span className="mr-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+            Sort
+          </span>
+          {SORTS.map((s) => (
+            <FilterPill
+              key={s}
+              href={linkWith({ sort: s === "category" ? undefined : s })}
+              active={activeSort === s}
+              label={SORT_LABELS[s]}
+              count={null}
+            />
+          ))}
+        </div>
+
+        {sortedVisible.length === 0 ? (
           <EmptyState
             title="No channels in this category yet"
             hint={
@@ -185,7 +286,7 @@ export default async function YoutubeChannelsPage({
           />
         ) : (
           <ul className="divide-y divide-slate-50">
-            {visible.map((c) => (
+            {sortedVisible.map((c) => (
               <li
                 key={c.id}
                 className={
@@ -286,25 +387,39 @@ function FilterPill({
   active,
   label,
   count,
+  tone = "default",
 }: {
   href: string;
   active: boolean;
   label: string;
-  count: number;
+  /** Optional row-count badge after the label. Pass `null` for pills
+   *  that don't have a count (the sort row). */
+  count: number | null;
+  tone?: "default" | "emerald" | "amber";
 }) {
+  // Inactive pills carry a faint tone tint for Verified / Unverified so
+  // operators can scan the bar without reading every label. Active pill
+  // always uses the dark `slate-900` selection style so "this is the
+  // current view" stays visually unambiguous regardless of tone.
+  const inactive =
+    tone === "emerald"
+      ? "border-emerald-200 bg-emerald-50/60 text-emerald-800 hover:border-emerald-300"
+      : tone === "amber"
+        ? "border-amber-200 bg-amber-50/60 text-amber-800 hover:border-amber-300"
+        : "border-slate-200 bg-white text-slate-700 hover:border-slate-300";
   return (
     <Link
       href={href}
       className={`inline-flex h-7 items-center gap-1.5 rounded-full border px-3 text-[11px] font-semibold transition ${
-        active
-          ? "border-slate-900 bg-slate-900 text-white"
-          : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+        active ? "border-slate-900 bg-slate-900 text-white" : inactive
       }`}
     >
       {label}
-      <span className={`tabular-nums ${active ? "text-white/80" : "text-slate-400"}`}>
-        {count}
-      </span>
+      {count !== null && (
+        <span className={`tabular-nums ${active ? "text-white/80" : "opacity-70"}`}>
+          {count}
+        </span>
+      )}
     </Link>
   );
 }

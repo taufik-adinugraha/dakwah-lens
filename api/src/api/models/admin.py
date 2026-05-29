@@ -29,6 +29,7 @@ from datetime import datetime
 from uuid import UUID, uuid4
 
 from sqlalchemy import (
+    BigInteger,
     Boolean,
     DateTime,
     Float,
@@ -231,6 +232,19 @@ class YoutubeChannel(Base, TimestampMixin):
         DateTime(timezone=True),
         comment="Updated each time this channel is scraped. NULL = never; "
         "picked first on rotation.",
+    )
+
+    # Subscriber count surfaced by the YT Data API at verify time. NULL
+    # until the row has been verified once; refreshed on every verify
+    # round-trip (cheap — 1 quota unit, same call that flips `verified`).
+    subscriber_count: Mapped[int | None] = mapped_column(
+        BigInteger,
+        comment="YouTube subscriber count at last verify. NULL = never "
+        "verified. Drives the admin sort-by-followers UI.",
+    )
+    subscribers_updated_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        comment="When subscriber_count was last refreshed (= last verify).",
     )
 
 

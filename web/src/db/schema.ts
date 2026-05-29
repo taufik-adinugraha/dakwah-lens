@@ -460,6 +460,12 @@ export const youtubeChannels = pgTable(
     verified: boolean("verified").notNull().default(false),
     verifiedAt: timestamp("verified_at", { withTimezone: true }),
     lastRunAt: timestamp("last_run_at", { withTimezone: true }),
+    // Populated on every verify round-trip (and on verify-all). NULL
+    // until first verify. Drives the admin sort-by-followers UI.
+    subscriberCount: bigint("subscriber_count", { mode: "number" }),
+    subscribersUpdatedAt: timestamp("subscribers_updated_at", {
+      withTimezone: true,
+    }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .default(sql`now()`),
