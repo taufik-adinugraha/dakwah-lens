@@ -38,6 +38,7 @@ const TONES = [
   "gentle",
 ] as const;
 const LOCALES = ["en", "id"] as const;
+const FORMATS = ["kajian_umum", "khutbah_jumat"] as const;
 
 const CONTEXT_PRESETS = [
   "preset_khutbah_jumat",
@@ -180,6 +181,39 @@ export function BriefForm({
             label: t(`tone_${tn}` as Parameters<typeof t>[0]),
           }))}
         />
+      </Field>
+
+      <Field label={t("field_format")} hint={t("field_format_hint")}>
+        <SelectGrid
+          name="format"
+          options={FORMATS.map((f) => ({
+            value: f,
+            label: t(`format_${f}` as Parameters<typeof t>[0]),
+          }))}
+          defaultValue="kajian_umum"
+        />
+      </Field>
+
+      <Field label={t("field_include_profile")}>
+        <label
+          className="group inline-flex cursor-pointer items-start gap-2.5 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm transition hover:border-slate-300"
+          title={t("field_include_profile_tooltip")}
+        >
+          <input
+            type="checkbox"
+            name="include_profile"
+            defaultChecked
+            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+          />
+          <span className="flex flex-col gap-0.5">
+            <span className="font-medium text-slate-900">
+              {t("field_include_profile_label")}
+            </span>
+            <span className="text-xs leading-relaxed text-slate-500">
+              {t("field_include_profile_hint")}
+            </span>
+          </span>
+        </label>
       </Field>
 
       <Field label={t("field_pages")} hint={t("field_pages_hint")}>

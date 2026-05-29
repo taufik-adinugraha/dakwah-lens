@@ -64,11 +64,26 @@ const TONES = [
 ] as const;
 const LOCALES = ["en", "id"] as const;
 
+/** Output format. `kajian_umum` = current default (general da'wah brief).
+ *  `khutbah_jumat` = formal Friday-khutbah style (Khutbah Pertama + Kedua,
+ *  Arabic with harakat, traditional opening/closing formulas) — mirrors
+ *  the weekly briefing's Khutbah Jumat sub-section rules. */
+const FORMATS = ["kajian_umum", "khutbah_jumat"] as const;
+
 const GenerateSchema = z.object({
   topic_title: z.string().trim().min(4, "topic_too_short").max(200),
   segment: z.enum(SEGMENTS),
   tone: z.enum(TONES),
   locale: z.enum(LOCALES),
+  format: z.enum(FORMATS).default("kajian_umum"),
+  /** Whether the LLM should personalize examples + framing using the
+   *  caller's onboarding profile (honorific, location, profession,
+   *  audience, focus). FormData carries it as "on"/"off" or absent;
+   *  coerce to boolean with default true (the historical behaviour). */
+  include_profile: z
+    .union([z.literal("on"), z.literal("true"), z.literal("false"), z.literal("")])
+    .optional()
+    .transform((v) => v === "on" || v === "true"),
   /** Free-text notes appended to the LLM prompt for this brief. Capped at
    *  2k chars so a runaway paste can't blow our token budget. Trimmed on
    *  parse; empty → undefined. */
@@ -102,13 +117,24 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
     segment: formData.get("segment"),
     tone: formData.get("tone"),
     locale: formData.get("locale"),
+    format: formData.get("format") ?? "kajian_umum",
+    include_profile: formData.get("include_profile") ?? "",
     extra_context: formData.get("extra_context"),
     pages: formData.get("pages") ?? 2,
   });
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0].message };
   }
-  const { topic_title, segment, tone, locale, extra_context, pages } = parsed.data;
+  const {
+    topic_title,
+    segment,
+    tone,
+    locale,
+    format,
+    include_profile,
+    extra_context,
+    pages,
+  } = parsed.data;
 
   // 1) Retrieve daleel via Qdrant semantic search across the full kitab
   // corpus. Enrich the query with the target segment so retrieved daleel
@@ -168,39 +194,46 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
       );
       await logBriefError({
         ...errCtx,
-        errorCode: "error_weak_relevance",
+        errorCode: "weak_relevance",
         errorMessage: `top_score=${err.topScore}`,
       });
-      return { ok: false, error: "error_weak_relevance" };
+      // Returned codes are UN-prefixed; the client wraps them as
+      // `t("error_" + code)` for the i18n lookup. (Prefixing here used
+      // to double-prefix into "error_error_weak_relevance" and render
+      // the raw key in the UI.)
+      return { ok: false, error: "weak_relevance" };
     }
     if (err instanceof RetrievalUnavailableError) {
       console.error("[brief] retrieval unavailable:", err.reason);
       await logBriefError({
         ...errCtx,
-        errorCode: "error_retrieval_unavailable",
+        errorCode: "retrieval_unavailable",
         errorMessage: err.reason,
       });
-      return { ok: false, error: "error_retrieval_unavailable" };
+      return { ok: false, error: "retrieval_unavailable" };
     }
     console.error("[brief] retrieval error:", err);
     await logBriefError({
       ...errCtx,
-      errorCode: "error_generation_failed",
+      errorCode: "generation_failed",
       errorMessage: err instanceof Error ? err.message : String(err),
     });
-    return { ok: false, error: "error_generation_failed" };
+    return { ok: false, error: "generation_failed" };
   }
 
   // Load the requester's onboarding profile so the LLM can tailor the
   // angle to their region / role / audience. Profile may be null (skipped
-  // onboarding) — that's fine, the prompt just omits the personalization
-  // block in that case.
-  const [profileRow] = await db
-    .select({ profile: schema.users.profile })
-    .from(schema.users)
-    .where(eq(schema.users.id, session.user.id))
-    .limit(1);
-  const profile: UserProfile | null = profileRow?.profile ?? null;
+  // onboarding, or user explicitly toggled "include profile" off for this
+  // brief) — the prompt just omits the personalization block.
+  let profile: UserProfile | null = null;
+  if (include_profile) {
+    const [profileRow] = await db
+      .select({ profile: schema.users.profile })
+      .from(schema.users)
+      .where(eq(schema.users.id, session.user.id))
+      .limit(1);
+    profile = profileRow?.profile ?? null;
+  }
 
   // 2) Generate the brief content via the LLM fallback chain:
   //    Anthropic Claude → Gemini → throw.
@@ -215,6 +248,7 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
       segment,
       tone,
       locale,
+      format,
       daleel,
       profile,
       extraContext: extra_context,
@@ -237,18 +271,18 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
       console.error("[brief] all LLM providers failed:", err.message);
       await logBriefError({
         ...errCtx,
-        errorCode: "error_llm_unavailable",
+        errorCode: "llm_unavailable",
         errorMessage: err.message,
       });
-      return { ok: false, error: "error_llm_unavailable" };
+      return { ok: false, error: "llm_unavailable" };
     }
     console.error("[brief] generation error:", err);
     await logBriefError({
       ...errCtx,
-      errorCode: "error_generation_failed",
+      errorCode: "generation_failed",
       errorMessage: err instanceof Error ? err.message : String(err),
     });
-    return { ok: false, error: "error_generation_failed" };
+    return { ok: false, error: "generation_failed" };
   }
 
   // Compute actual cost from the tokens the provider reported. NULL

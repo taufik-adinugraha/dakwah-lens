@@ -330,9 +330,16 @@ export type GenerateBriefInput = {
   segment: string;
   tone: string;
   locale: "en" | "id";
+  /** Output format. `kajian_umum` = the historical default (general
+   *  da'wah brief). `khutbah_jumat` = produce a formal Friday-khutbah
+   *  document mirroring the weekly briefing's Khutbah Jumat sub-section
+   *  rules (Khutbah Pertama + Kedua, Arabic with harakat, traditional
+   *  opening/closing). */
+  format?: "kajian_umum" | "khutbah_jumat";
   daleel: BriefDaleel[];
   /** Optional onboarding profile for personalization. The brief LLM uses
-   *  these to tailor examples to the da'i's audience, region, and focus. */
+   *  these to tailor examples to the da'i's audience, region, and focus.
+   *  Pass `null` to skip personalization for this brief. */
   profile?: import("@/db/schema").UserProfile | null;
   /** Optional free-text notes from the da'i for THIS brief — recent
    *  audience events, format constraints (Friday khutbah, IG reel),
@@ -359,6 +366,7 @@ export async function generateBriefContent(
     segment,
     tone,
     locale,
+    format = "kajian_umum",
     daleel,
     profile,
     extraContext,
@@ -411,6 +419,27 @@ export async function generateBriefContent(
   const targetWords = (locale === "id" ? 350 : 250) * pages;
   const maxTokens = Math.min(10_000, Math.max(4_000, pages * 2_000));
 
+  // KHUTBAH JUMAT mode — when the user picks this format, inject a hard
+  // directive block that mirrors the weekly briefing's Khutbah Jumat
+  // sub-section rules. Lives inside the user prompt (not the system
+  // prompt) so it scopes to this single brief without touching other
+  // briefs in the same session.
+  const khutbahDirective =
+    format === "khutbah_jumat"
+      ? [
+          "",
+          "FORMAT: KHUTBAH JUMAT (formal Friday-khutbah; same rules as the weekly briefing's Khutbah Jumat sub-section).",
+          "- Lean the brief's khutbah_outline + issue_analysis into a COMPLETE Friday-khutbah document ready to read at the mimbar.",
+          "- Structure: Khutbah Pertama (mukadimah → wasiat takwa → ayat pembuka → inti khutbah 3-4 dalil dari pool → doa penutup khutbah pertama) + Khutbah Kedua (mukadimah → amplifikasi argumen utama → doa penutup panjang dalam Arab berharakat).",
+          "- Bahasa Indonesia formal-mengalir untuk prosa (bukan akademis, bukan kasual).",
+          "- AKSARA ARAB DENGAN HARAKAT lengkap (fathah, kasrah, dhammah, sukūn, syaddah, mad) untuk: mukadimah hamdalah+sholawat+syahadat+wasiat takwa, setiap ayat/hadits yang dikutip, formula penutup khutbah pertama (\"بَارَكَ اللهُ لِيْ وَلَكُمْ…\"), dan doa penutup khutbah kedua. JANGAN gunakan transliterasi Latin untuk ayat/hadits/formula khutbah.",
+          "- Setiap dalil dari pool: tulis citation bold inline, Arab berharakat (jika tersedia), lalu terjemahan Bahasa Indonesia.",
+          "- JANGAN sebut nama outlet media (Detik, Republika, dll.); gunakan framing \"kabar yang sampai kepada kita pekan ini…\"",
+          "- Doa penutup khutbah kedua harus mencakup: doa umum mukminin/mukminat, doa pertolongan, doa untuk mustadh'afin (sebut Palestina + konteks pekan ini), doa untuk pemimpin, doa untuk diri+keluarga, penutup standar (إِنَّ اللهَ يَأْمُرُ بِالْعَدْلِ…). Semua dalam aksara Arab berharakat.",
+          "",
+        ].join("\n")
+      : "";
+
   const userPrompt = [
     calendarBlock,
     "",
@@ -419,6 +448,7 @@ export async function generateBriefContent(
     `Tone: ${toneLabel}`,
     `Output language: ${localeLabel}`,
     `Target length: ~${pages} page(s), roughly ${targetWords} ${locale === "id" ? "kata" : "words"} of substantive prose across the variable-length fields (issue_analysis, recommendations bodies, khutbah outline). Don't pad — write tightly to this target.`,
+    khutbahDirective,
     audienceBlock
       ? `\nAudience profile (INTERNALISE — never quote verbatim, never name the labels in the output; this is how the brief should *feel* to the reader):\n${audienceBlock}`
       : "",

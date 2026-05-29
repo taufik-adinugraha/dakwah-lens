@@ -65,17 +65,33 @@ export class WeakRelevanceError extends Error {
 
 /**
  * Cosine-similarity floor below which a hit is considered too weak to
- * include in a brief. Calibrated against text-embedding-3-large output
- * for our query-enrichment style ("<topic> for <segment> audience"):
- *   ≥ 0.7  strongly on-topic
- *   ≥ 0.55 solidly related
- *   ≥ 0.45 loosely related  ← floor
- *   < 0.45 padding / generic guidance
- * Tune after observing real-brief retrieval logs. If briefs feel padded,
- * raise to 0.5. If too many WeakRelevanceError events for legit topics,
- * drop to 0.4.
+ * include in a brief. Recalibrated 2026-05-29 against an 11-query probe
+ * (text-embedding-3-large + Gemini-Flash-Lite query expansion, run
+ * against the live prod corpus). Observed score bands:
+ *
+ *   ≥ 0.55 strongly on-topic   ("sabar menghadapi musibah" → 0.62,
+ *                                "berbakti kepada orang tua" → 0.56,
+ *                                "amanah pejabat" → 0.55)
+ *   ≥ 0.40 solidly related     ("judi online" → 0.44, "burnout
+ *                                profesional muda" → 0.41, "manajemen
+ *                                waktu pelajar" → 0.41)
+ *   ≥ 0.32 loosely related ← floor  ("kesehatan mental" → 0.35,
+ *                                    "bullying sekolah" → 0.35)
+ *   < 0.32 off-topic            ("nasi goreng" → 0.26,
+ *                                "film bioskop" → 0.23)
+ *
+ * Quran consistently scores higher than hadith because its Kemenag
+ * Indonesian translations embed cleaner into the model's vector space.
+ * The previous 0.45 floor was carryover from an obsolete calibration
+ * and rejected most legitimate modern-phrased topics (burnout, judi
+ * online, kesehatan mental). 0.32 keeps a comfortable margin above the
+ * highest observed off-topic score (0.26).
+ *
+ * Tune after observing more real-brief retrieval logs. If briefs feel
+ * padded with weak hits, raise toward 0.36. If too many legit topics
+ * trip WeakRelevanceError, drop toward 0.30.
  */
-const MIN_RELEVANCE = 0.45;
+const MIN_RELEVANCE = 0.32;
 
 export type KitabCorpus =
   | "quran"
