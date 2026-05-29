@@ -76,7 +76,13 @@ export function FlyerGrid({
   /** For localized month labels in the filter dropdown. */
   locale?: string;
 }) {
-  const [items, setItems] = useState<Flyer[]>(flyers);
+  // Deleted-id set lives client-side so the tile vanishes optimistically
+  // on /mine. Deriving `items` from the `flyers` prop (not from useState)
+  // lets server-driven pagination flow through — useState would freeze
+  // the first page's data because React doesn't reseed initialValue when
+  // props change.
+  const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
+  const items = flyers.filter((x) => !deletedIds.has(x.id));
   const [source, setSource] = useState("all");
   const [type, setType] = useState("all");
   const [topic, setTopic] = useState("all");
@@ -84,8 +90,6 @@ export function FlyerGrid({
 
   const f = labels.filters;
 
-  // Distinct option lists derived from the data (so options only show
-  // when they actually exist in the gallery).
   const typeOptions = Array.from(
     new Set(items.map((x) => x.typeLabel).filter(Boolean)),
   ) as string[];
@@ -168,7 +172,11 @@ export function FlyerGrid({
               showDelete={!!showDelete}
               labels={labels}
               onDeleted={() =>
-                setItems((xs) => xs.filter((x) => x.id !== flyer.id))
+                setDeletedIds((s) => {
+                  const next = new Set(s);
+                  next.add(flyer.id);
+                  return next;
+                })
               }
             />
           ))}
