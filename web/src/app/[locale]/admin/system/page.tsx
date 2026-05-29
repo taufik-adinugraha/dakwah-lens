@@ -145,10 +145,12 @@ export default async function SystemOverviewPage() {
     db
       .select({ zeroResultRuns24h: count() })
       .from(schema.ingestRuns)
+      // YouTube excluded: trending overlay's per-keyword fan-out yields expected zero-results.
       .where(
         sql`status = 'success'
             AND items_stored = 0
             AND task_name = 'run_ingest'
+            AND platform IN ('mainstream', 'x', 'instagram', 'tiktok')
             AND started_at >= now() - interval '24 hours'`,
       ),
     db
