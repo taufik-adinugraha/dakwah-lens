@@ -31,7 +31,7 @@ export default async function ScrapersPage() {
     <>
       <PageHeader
         title="Scrapers setup"
-        subtitle="Apify actors for Facebook, Instagram, TikTok, X · YouTube Data API · RSS for mainstream media."
+        subtitle="Apify actors for X · Instagram · TikTok · YouTube Data API · RSS for mainstream media. Facebook is configured but paused (not in beat)."
       />
 
       <HelpCallout>
@@ -42,6 +42,12 @@ export default async function ScrapersPage() {
           both Python (<code>config.py</code>) and Next.js (
           <code>process.env</code>). Restart the dev server + Celery
           worker after editing.
+        </p>
+        <p>
+          <strong>Canonical schedule</strong> (Asia/Jakarta):
+          mainstream RSS every 2 hours · YouTube channel whitelist Wed
+          21:00 · X Wed 22:00 · TikTok Wed 22:10 · Instagram Wed 22:20 ·
+          X + YouTube trending overlay 12:00 daily.
         </p>
       </HelpCallout>
 
@@ -76,7 +82,7 @@ export default async function ScrapersPage() {
             via="Apify"
             actor={status.actors.x}
             env="APIFY_ACTOR_X"
-            cost="~$0.40 per 1K tweets"
+            cost="Wed 22:00 WIB · 49 keys × cap 500 · 7d window"
             notes={
               <>
                 <p>
@@ -100,12 +106,13 @@ export default async function ScrapersPage() {
             via="Apify"
             actor={status.actors.instagram}
             env="APIFY_ACTOR_INSTAGRAM"
-            cost="~$2 per 1K posts"
+            cost="Wed 22:20 WIB · 37 keys × 20 items"
             notes={
               <p>
                 Pass a hashtag (with or without <code>#</code>) as the
                 query. Public posts only — IG no longer allows private
-                profile scraping.
+                profile scraping. Re-enabled 2026-05-25 for evaluation
+                after the IndoBERT retirement.
               </p>
             }
           />
@@ -114,30 +121,33 @@ export default async function ScrapersPage() {
             via="Apify"
             actor={status.actors.tiktok}
             env="APIFY_ACTOR_TIKTOK"
-            cost="~$17/mo · Tuesday weekly · 49 keys × 20 items × $0.004"
+            cost="Wed 22:10 WIB · 37 keys × 20 items × $0.004 ≈ $3.92/run"
             notes={
               <>
                 <p>
-                  Weekly sweep only — fires Tuesday 00:20 WIB via{" "}
-                  <code>clockworks/free-tiktok-scraper</code>. The actor name
-                  is misleading: &quot;free&quot; means free trial, not free
-                  cost. Apify still charges $0.004/result, so a daily sweep
-                  at our 49-keyword pool would cost ~$118/mo and blow the
-                  IDR 1M ($60) budget cap.
+                  Weekly sweep only — fires Wednesday 22:10 WIB via{" "}
+                  <code>clockworks/free-tiktok-scraper</code>. Re-enabled
+                  2026-05-28 after a seed-list audit (the original 49-key
+                  pool included 13 collision-prone English/multilingual
+                  tags — #anime, #crypto, #healing, #kpop, #mental,
+                  #parenting, etc. — that pulled 30% foreign-language
+                  noise; pruned to a 37-key Indonesian-distinctive set).
+                </p>
+                <p>
+                  Actor name is misleading: &quot;free&quot; means free
+                  trial, not free cost. Apify still charges $0.004/result.
+                  A daily sweep at the current 37-key pool would cost
+                  ~$87/mo and blow the IDR 1M ($60) budget cap, so we
+                  stick to Wednesday weekly.
                 </p>
                 <p>
                   Crossover math: free actor breaks even with the $45/mo
                   paid subscription (<code>clockworks/tiktok-scraper</code>)
                   at ~12 runs/month. Below that, free is cheaper; above
-                  daily cadence, paid wins. At Tue-only (4.3 runs/mo), free
-                  is the right choice.
-                </p>
-                <p>
-                  If you ever want to switch actors, set{" "}
+                  daily cadence, paid wins. At Wed-only (4.3 runs/mo), free
+                  is the right choice. If you ever want to switch, set{" "}
                   <code>APIFY_ACTOR_TIKTOK=clockworks/tiktok-scraper</code>{" "}
-                  in <code>.env</code>. The paid-actor beat entry was
-                  removed on 2026-05-20 — restore it from git history if
-                  you re-subscribe.
+                  in <code>.env</code>.
                 </p>
               </>
             }
@@ -162,16 +172,41 @@ export default async function ScrapersPage() {
           <Platform
             name="YouTube"
             via="YouTube Data API v3"
-            actor="search.list (100 quota units per call)"
+            actor="playlistItems.list (1 unit/call) + search.list (100 units/call, daily overlay only)"
             env="YOUTUBE_API_KEY"
             cost="free up to 10K units/day"
             notes={
-              <p>
-                Direct API access (not via Apify) for ~100× cost savings.
-                Returns video title + channel + publishedAt; descriptions
-                are clipped — fetch full text via <code>videos.list</code>{" "}
-                if you need it (1 unit/call).
-              </p>
+              <>
+                <p>
+                  Direct API access (not via Apify) for ~100× cost savings.
+                  Two paths:
+                </p>
+                <ul className="ml-4 list-disc space-y-1">
+                  <li>
+                    <strong>Channel whitelist sweep · Wed 21:00 WIB</strong> —{" "}
+                    <code>playlistItems.list</code> on each verified
+                    channel&apos;s uploads playlist. 1 quota unit per call ·
+                    near-free at our channel count. Configured at{" "}
+                    <Link
+                      href="/admin/system/youtube-channels"
+                      className="font-semibold text-brand-700 hover:underline"
+                    >
+                      /admin/system/youtube-channels
+                    </Link>
+                    .
+                  </li>
+                  <li>
+                    <strong>Trending overlay · 12:00 WIB daily</strong> —{" "}
+                    <code>search.list</code> on da&apos;wah-relevant keywords
+                    with a language gate. 100 quota units per call · still
+                    well under the 10K/day budget.
+                  </li>
+                </ul>
+                <p>
+                  Descriptions are clipped in both paths — fetch full text
+                  via <code>videos.list</code> if you need it (1 unit/call).
+                </p>
+              </>
             }
           />
           <Platform
@@ -179,7 +214,7 @@ export default async function ScrapersPage() {
             via="RSS"
             actor="feedparser (Python)"
             env="(none)"
-            cost="free"
+            cost="free · every 2 hours · 28 outlets"
             notes={
               <p>
                 List of outlets is editable at{" "}
@@ -189,7 +224,9 @@ export default async function ScrapersPage() {
                 >
                   /admin/system/rss
                 </Link>
-                . Six Indonesian outlets are seeded by default.
+                . Currently 28 Indonesian outlets (Republika, Okezone,
+                Tribunnews, Antara, RRI, Detik, CNN Indonesia, the
+                Tribun-regional cluster, and more).
               </p>
             }
           />
