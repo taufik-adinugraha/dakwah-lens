@@ -11,9 +11,11 @@ import {
   ExternalLink,
   HandHeart,
   Home,
+  MessageSquareText,
   Mic,
   Printer,
   Quote,
+  Scroll,
   Share2,
   Smartphone,
   Users,
@@ -38,7 +40,9 @@ import ReactMarkdown, { type Components } from "react-markdown";
 
 type CardKind =
   | "khutbah"
+  | "kultum"
   | "kajian"
+  | "kisah"
   | "home"
   | "content"
   | "genz"
@@ -70,10 +74,14 @@ type Labels = {
   close: string;
 };
 
-/** Cards rendered in this order regardless of the order in the markdown. */
+/** Cards rendered in this order regardless of the order in the markdown.
+ *  Kultum sits next to Khutbah (mosque-context twins). Kisah sits next
+ *  to Kajian (narrative/story format pairs with classroom format). */
 const KIND_ORDER: CardKind[] = [
   "khutbah",
+  "kultum",
   "kajian",
+  "kisah",
   "home",
   "content",
   "genz",
@@ -82,7 +90,9 @@ const KIND_ORDER: CardKind[] = [
 
 const KIND_ICON: Record<CardKind, typeof BookOpen> = {
   khutbah: BookOpen,
+  kultum: MessageSquareText,
   kajian: Users,
+  kisah: Scroll,
   home: Home,
   content: Smartphone,
   genz: Mic,
@@ -92,7 +102,9 @@ const KIND_ICON: Record<CardKind, typeof BookOpen> = {
 /** Light accent tint per card so the grid scans quickly. */
 const KIND_TONE: Record<CardKind, string> = {
   khutbah: "from-emerald-50 to-white ring-emerald-200/60",
+  kultum: "from-orange-50 to-white ring-orange-200/60",
   kajian: "from-rose-50 to-white ring-rose-200/60",
+  kisah: "from-indigo-50 to-white ring-indigo-200/60",
   home: "from-amber-50 to-white ring-amber-200/60",
   content: "from-sky-50 to-white ring-sky-200/60",
   genz: "from-violet-50 to-white ring-violet-200/60",
@@ -101,7 +113,9 @@ const KIND_TONE: Record<CardKind, string> = {
 
 const KIND_ICON_TONE: Record<CardKind, string> = {
   khutbah: "bg-emerald-100 text-emerald-700",
+  kultum: "bg-orange-100 text-orange-700",
   kajian: "bg-rose-100 text-rose-700",
+  kisah: "bg-indigo-100 text-indigo-700",
   home: "bg-amber-100 text-amber-700",
   content: "bg-sky-100 text-sky-700",
   genz: "bg-violet-100 text-violet-700",
@@ -113,7 +127,9 @@ const KIND_ICON_TONE: Record<CardKind, string> = {
  *  visual continuity between clicking and reading. */
 const KIND_HEADER_BG: Record<CardKind, string> = {
   khutbah: "bg-gradient-to-r from-emerald-50 via-white to-emerald-50",
+  kultum: "bg-gradient-to-r from-orange-50 via-white to-orange-50",
   kajian: "bg-gradient-to-r from-rose-50 via-white to-rose-50",
+  kisah: "bg-gradient-to-r from-indigo-50 via-white to-indigo-50",
   home: "bg-gradient-to-r from-amber-50 via-white to-amber-50",
   content: "bg-gradient-to-r from-sky-50 via-white to-sky-50",
   genz: "bg-gradient-to-r from-violet-50 via-white to-violet-50",
@@ -126,7 +142,9 @@ const KIND_HEADER_BG: Record<CardKind, string> = {
 const KIND_BODY_BG: Record<CardKind, string> = {
   khutbah:
     "bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/50",
+  kultum: "bg-gradient-to-br from-orange-50/70 via-white to-amber-50/50",
   kajian: "bg-gradient-to-br from-rose-50/70 via-white to-pink-50/50",
+  kisah: "bg-gradient-to-br from-indigo-50/70 via-white to-blue-50/50",
   home: "bg-gradient-to-br from-amber-50/70 via-white to-yellow-50/50",
   content: "bg-gradient-to-br from-sky-50/70 via-white to-blue-50/50",
   genz: "bg-gradient-to-br from-violet-50/70 via-white to-fuchsia-50/50",
@@ -137,7 +155,9 @@ const KIND_BODY_BG: Record<CardKind, string> = {
  *  inside the modal body as well. */
 const KIND_ACCENT_BORDER: Record<CardKind, string> = {
   khutbah: "border-emerald-200",
+  kultum: "border-orange-200",
   kajian: "border-rose-200",
+  kisah: "border-indigo-200",
   home: "border-amber-200",
   content: "border-sky-200",
   genz: "border-violet-200",
@@ -149,7 +169,9 @@ const KIND_ACCENT_BORDER: Record<CardKind, string> = {
  *  reads violet, etc. */
 const KIND_QUOTE: Record<CardKind, { bg: string; border: string; icon: string }> = {
   khutbah: { bg: "bg-emerald-50/70", border: "border-emerald-400", icon: "text-emerald-500" },
+  kultum: { bg: "bg-orange-50/70", border: "border-orange-400", icon: "text-orange-500" },
   kajian: { bg: "bg-rose-50/70", border: "border-rose-400", icon: "text-rose-500" },
+  kisah: { bg: "bg-indigo-50/70", border: "border-indigo-400", icon: "text-indigo-500" },
   home: { bg: "bg-amber-50/70", border: "border-amber-400", icon: "text-amber-500" },
   content: { bg: "bg-sky-50/70", border: "border-sky-400", icon: "text-sky-500" },
   genz: { bg: "bg-violet-50/70", border: "border-violet-400", icon: "text-violet-500" },
@@ -165,6 +187,11 @@ const KIND_QUOTE: Record<CardKind, { bg: string; border: string; icon: string }>
  */
 function classifyHeading(heading: string): CardKind | null {
   const lower = heading.toLowerCase();
+  // Kultum BEFORE khutbah: a heading like "Kultum Jumat" would otherwise
+  // match /khutbah/... wait, it wouldn't share that root. But ordering
+  // before khutbah is still defensive against future "Khutbah Singkat /
+  // Kultum" hybrid labels the LLM might emit.
+  if (lower.includes("kultum") || lower.includes("short talk")) return "kultum";
   if (lower.includes("khutbah") || lower.includes("friday")) return "khutbah";
   // Mahasiswa / Gen Z must be checked BEFORE kajian — the LLM sometimes
   // generates "### Kajian Mahasiswa: ..." which would otherwise match the
@@ -178,6 +205,9 @@ function classifyHeading(heading: string): CardKind | null {
     lower.includes("reaching gen")
   )
     return "genz";
+  // Kisah BEFORE kajian: "Kisah dari Hadits" doesn't include "kajian"
+  // but defensive ordering protects against "Kajian Kisah..." mash-ups.
+  if (lower.includes("kisah") || lower.includes("story from")) return "kisah";
   if (lower.includes("kajian") || lower.includes("majelis")) return "kajian";
   if (
     lower.includes("rumah") ||

@@ -138,13 +138,13 @@ CRITICAL — SCOPE OF PERCENTAGES: baca SEGMENT_SCOPE di input. Jika "all", pers
 - Verba observasional ("menyoroti", "memetakan", "menunjukkan", "tercermin dari", "menenun"), bukan perintah ("wajib", "harus", "pentingnya").
 - HANYA pola yang berakar di pool sample_headlines. JANGAN mengarang cerita atau mengangkat tema yang tidak hadir di data.
 
-## Strategi & Aksi Dakwah (6850-9400 kata)
-Ini adalah CONTENT KIT — bukan saran strategis. Setiap sub-section harus berupa DRAFT SIAP-PAKAI yang bisa dibaca / dipakai langsung oleh dai, ustadzah, kreator, atau pengurus komunitas tanpa harus menulis ulang dari nol. WAJIB 6 sub-section dengan ### H3.
+## Strategi & Aksi Dakwah (9350-12650 kata)
+Ini adalah CONTENT KIT — bukan saran strategis. Setiap sub-section harus berupa DRAFT SIAP-PAKAI yang bisa dibaca / dipakai langsung oleh dai, ustadzah, kreator, atau pengurus komunitas tanpa harus menulis ulang dari nol. WAJIB 8 sub-section dengan ### H3.
 
-RUJUKAN DALIL DI SECTION 4 — pool yang saya sediakan berisi 10 dalil hasil rerank tematik. Setiap sub-section di bawah WAJIB merujuk 2-3 dalil dari pool ini secara INLINE (bukan ditumpuk semua di Section 5):
+RUJUKAN DALIL DI SECTION 4 — pool yang saya sediakan berisi 10 dalil hasil rerank tematik. Setiap sub-section di bawah WAJIB merujuk 1-3 dalil dari pool ini secara INLINE (bukan ditumpuk semua di Section 5):
 - Pilih dalil yang paling SUPPORT argumen sub-section tersebut — bukan asal comot, bukan random pertama
 - Format inline: `**{{citation}}**` (mis. `**QS. Hud: 85**` atau `**Riyad as-Salihin 1420**`) langsung diikuti 1 kalimat parafrase singkat Bahasa Indonesia
-- Sub-section berbeda BOLEH mengutip dalil yang sama jika memang paling pas, tapi USAHAKAN variasi supaya 8-10 dalil pool terdistribusi (khutbah ~3-4 dalil, kajian ~2-3, pengajaran ~1-2, kreator ~1, gen-z ~2, aksi ~1-2)
+- Sub-section berbeda BOLEH mengutip dalil yang sama jika memang paling pas, tapi USAHAKAN variasi supaya 8-10 dalil pool terdistribusi (khutbah ~3-4 dalil, kultum ~1-2, kajian ~2-3, kisah ~1 sebagai centerpiece, pengajaran ~1-2, kreator ~1, mahasiswa ~2, aksi ~1-2)
 - JANGAN mengarang ayat atau hadits di luar pool. Citation yang muncul di Section 4 HARUS persis cocok dengan citation di pool
 
 ### Khutbah Jumat (3450-4800 kata)
@@ -175,6 +175,22 @@ KHUTBAH KEDUA (750-1050 kata):
 
 - Penutup standar (~120 kata Arab): aksara Arab berharakat penuh untuk sequence "إِنَّ اللهَ وَمَلَائِكَتَهُ يُصَلُّوْنَ عَلَى النَّبِيّ…" → sholawat lengkap "اَللّٰهُمَّ صَلِّ عَلٰى سَيِّدِنَا مُحَمَّدٍ وَعَلٰى آلِ سَيِّدِنَا مُحَمَّدٍ…" → "عِبَادَ اللهِ، إِنَّ اللهَ يَأْمُرُ بِالْعَدْلِ وَالْإِحْسَانِ وَإِيْتَاءِ ذِي الْقُرْبٰى…" → tahmid akhir "وَاذْكُرُوا اللهَ الْعَظِيْمَ يَذْكُرْكُمْ، وَاشْكُرُوْهُ عَلٰى نِعَمِهِ يَزِدْكُمْ، وَلَذِكْرُ اللهِ أَكْبَرُ." Semua dalam aksara Arab, harakat lengkap.
 
+### Kultum (1100-1500 kata)
+Tulis KULTUM 7-10 menit siap-baca, format ringkas tapi LENGKAP dari pembuka sampai penutup. Audience: jamaah ba'da sholat (Subuh / Maghrib / Isya), Ramadhan tarawih, atau acara komunitas singkat — orang yang sudah sholat dan tidak ingin terlalu lama berdiri, tapi mau pulang dengan satu pesan yang menempel. Bahasa Indonesia mengalir-konversasional (bukan setegang khutbah Jumat), satu argumen tajam yang tidak melebar.
+
+STRUKTUR WAJIB (urutan ini, jangan ditukar):
+
+- **Pembuka** (~150 kata): mulai dengan TA'AWUDH + BASMALAH + HAMDALAH SINGKAT dalam aksara Arab berharakat (`أَعُوذُ بِاللهِ مِنَ الشَّيْطَانِ الرَّجِيْمِ، بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ، اَلْحَمْدُ لِلهِ رَبِّ الْعَالَمِيْنَ…`), diikuti satu kalimat sholawat singkat `وَالصَّلَاةُ وَالسَّلَامُ عَلٰى رَسُوْلِ اللهِ، وَعَلٰى آلِهِ وَصَحْبِهِ أَجْمَعِيْنَ، أَمَّا بَعْدُ`. Lalu salam pembuka Bahasa Indonesia ke jamaah (~30 kata) yang langsung menyebutkan KONTEKS pekan — bukan "Hadirin yang dirahmati Allah, alhamdulillah kita bersyukur..." (terlalu generik). Lebih baik: "Jamaah yang saya hormati, di pekan kita yang baru saja melewati [peristiwa konkret pekan ini], ada satu pesan yang ingin saya bagikan malam ini..."
+- **Hook & ayat pembuka** (~200 kata): satu kalimat pembuka yang langsung menarik perhatian — boleh pertanyaan retorika, boleh observasi tajam tentang peristiwa pekan ini, boleh fakta yang mengusik. Lalu satu ayat Quran dari pool (TULIS DALAM AKSARA ARAB BERHARAKAT, sebut nama surah + ayat, lalu terjemahan Bahasa Indonesia, lalu 1-2 kalimat tafsir kontekstual). Jika pool tidak memuat ayat yang cocok, boleh ganti dengan hadits dari pool — kutip lengkap citation + terjemahan.
+- **Inti pesan** (~600-850 kata, 4-5 paragraf prosa mengalir tanpa sub-judul): satu argumen TUNGGAL yang berkembang. Jangan loncat-loncat antar pesan. Struktur per paragraf yang baik:
+  * Paragraf 1: jelaskan ayat/hadits pembuka dalam konteks pekan ini.
+  * Paragraf 2: 1-2 cerita konkret dari pekan ini (dari pool sample_headlines) — JANGAN sebut nama outlet, gunakan framing "pekan ini kita dengar...", "kabar yang sampai ke kita...".
+  * Paragraf 3: rujukan dalil tambahan (1 dari pool, citation bold inline + terjemahan singkat). Hubungkan dengan inti pesan.
+  * Paragraf 4-5: refleksi praktis — apa yang harus jamaah lakukan SETELAH pulang dari sholat malam ini? Beri 2-3 tindakan konkret yang bisa dilakukan dalam 24 jam ke depan. Bukan teori — tindakan riil.
+- **Tutup** (~150 kata): satu kalimat ringkas yang menyimpulkan inti pesan (bisa dibawa pulang jamaah ke kepala mereka), lalu DOA PENUTUP DALAM AKSARA ARAB BERHARAKAT (~80 kata) — minimal: doa untuk diri-keluarga + doa tematik singkat yang relevan dengan tema kultum + penutup `رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ`. Diakhiri salam penutup `وَالسَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ`.
+
+NADA: hangat, pribadi, langsung. JANGAN tirukan formalitas khutbah Jumat — kultum lebih dekat ke ngobrol setelah sholat. Penceramah berdiri SAMA SAMA dengan jamaah, bukan di mimbar formal. Boleh sesekali menyebut "saya" pribadi, "kita sebagai jamaah". HINDARI frase template ("marilah kita renungkan", "alhamdulillah kita masih diberi nikmat sehat") di tengah teks — boleh sekali di pembuka, tidak diulang.
+
 ### Kajian Ibu-ibu & Majelis Taklim (1400-1800 kata)
 Tulis OUTLINE KAJIAN 60-MENIT siap-pakai, format hands-on bukan ceramah teoritis. Lebih panjang dari sub-section lain karena ibu-ibu sering minta detail praktis ("kalau di rumah saya gimana, Ustadzah?") dan butuh ruang untuk cerita konkret + Q&A yang jujur.
 
@@ -190,6 +206,38 @@ Tulis OUTLINE KAJIAN 60-MENIT siap-pakai, format hands-on bukan ceramah teoritis
 - Penutup (~120 kata): doa singkat untuk keluarga, ringkasan satu kalimat yang bisa diingat di dapur besok pagi, dan ajakan praktis (mis. "pekan ini, satu menit lebih lama menatap anak sebelum kasih HP").
 
 TONE KAJIAN: hangat seperti tante yang dipercaya, BUKAN ustadzah yang berjarak. Tertawa bersama, bukan ditertawakan. Humor harus AMAN — tidak menyentuh suami, anak, atau pekerjaan rumah tangga secara merendahkan, tidak menyentuh kelas sosial, tidak menyentuh fisik. Yang aman: kebiasaan kita sendiri (WhatsApp, scrolling, lupa nama tetangga, dll.).
+
+### Kisah dari Hadits (1400-1750 kata)
+Tulis SATU KISAH dari hadits yang DI-PILIH dari pool dalil yang saya berikan — biasanya dari Sahih Bukhari / Sahih Muslim / Riyad as-Salihin. Format: 7 menit bacaan (~1400-1750 kata) yang membuat pembaca/pendengar HANYUT seperti membaca cerpen, BUKAN tafsir akademis. Di akhir, satu paragraf yang menarik pelajaran konkret dari kisah ke kehidupan pekan ini.
+
+CRITICAL — SUMBER KISAH: kisah HARUS bersumber dari satu hadits di pool. JANGAN mengarang kisah dari memori. Jika pool tidak memuat hadits yang naratif (kebanyakan dalil bersifat hikmah pendek, bukan kisah), pilih hadits yang menyebut peristiwa konkret (mis. kisah seorang sahabat, dialog Rasulullah ﷺ dengan seseorang, kejadian di Madinah/Makkah) lalu kembangkan KONTEKSNYA dengan latar yang masuk akal — tetapi DIALOG dan TINDAKAN inti HARUS persis dari hadits. Tutup paragraf pembuka dengan citation hadits yang sedang Anda ceritakan, format `**{{citation}}**`.
+
+STRUKTUR WAJIB:
+
+- **Pembuka — kerangka kisah** (~120 kata): satu paragraf yang memperkenalkan kisah TANPA membocorkan inti pesannya. Sebut citation hadits dalam kalimat pertama atau kedua (`**Sahih Bukhari 6094**`), tapi JANGAN bocorkan pelajaran moralnya di pembuka — biarkan pembaca masuk ke kisah dulu. Boleh: "Di sebuah malam di Madinah, terjadi sesuatu yang Rasulullah ﷺ ceritakan kembali kepada para sahabat. Kisah ini diriwayatkan dalam **Sahih Bukhari 6094**…"
+
+- **Latar — setting fisik & emosional** (~250 kata, 2 paragraf): tempatkan pembaca dalam scene. Apa yang sedang terjadi di Madinah / di kebun / di pasar / di rumah saat kejadian itu? Siapa yang hadir? Apa cuacanya, suaranya, baunya? Apa yang dirasakan tokoh kisah SEBELUM peristiwa utama terjadi? Gunakan detail sensorik yang plausible berdasarkan konteks sirah — JANGAN mengarang detail tarikh yang tidak ada di hadits. Tulis dalam aspect "pembaca melihat" — sudut pandang kamera, bukan ringkasan.
+
+- **Inti kisah — peristiwa & dialog** (~700-900 kata, 4-5 paragraf): nyatakan kejadian PERSIS seperti yang tercatat di hadits, tapi diberi tarikan naratif. Untuk dialog: kutip dengan kalimat berbahasa Indonesia mengalir, tetap akurat ke makna hadits. Format DIALOG yang jelas:
+  * Gunakan tanda kutip ganda untuk ucapan langsung: "Apakah engkau telah memberi makan tamumu malam ini?"
+  * Beri petunjuk emosi tokoh: "tanya beliau ﷺ dengan suara yang menahan keheranan" atau "jawab sahabat itu pelan, kepalanya tertunduk"
+  * Sertakan jeda + reaksi internal antar dialog ("Beliau ﷺ terdiam sejenak. Mata beliau memandang langit Madinah yang terhias bintang.")
+  * Untuk hadits panjang dengan banyak dialog, JANGAN potong — pertahankan urutan asli supaya pembaca mengikuti progresi natural.
+
+  PROHIBITED dalam paragraf inti:
+  * Menyisipkan tafsir / penjelasan modern di tengah kisah — itu memecahkan immersion. Tunda semua interpretasi ke bagian pelajaran di akhir.
+  * Memanggil pembaca langsung ("Hadirin sekalian, perhatikan bahwa Rasulullah…") — pertahankan jarak naratif.
+  * Mengarang ucapan tokoh yang tidak ada di hadits. Jika hadits hanya menyebut tindakan, ceritakan tindakan; jangan menambah dialog fiktif.
+
+- **Klimaks / titik balik** (~150 kata, 1 paragraf): puncak kisah — momen di mana sesuatu BERGESER (sahabat tersadar, sebuah keputusan diambil, sebuah doa terkabul, sebuah teguran Rasulullah ﷺ datang). Tulis dengan ritme yang lebih lambat dari paragraf sebelumnya — kalimat lebih pendek, jeda lebih sering, supaya pembaca BERHENTI di titik ini.
+
+- **Pelajaran** (~250 kata, 2 paragraf, JUDUL H4 `#### Pelajaran dari Kisah Ini`): SEKARANG baru tarik pelajaran. Struktur:
+  * Paragraf 1: identifikasi 1-2 pelajaran inti dari kisah. JANGAN list 5-6 pelajaran umum — fokus ke 1-2 yang paling kuat. Jelaskan SECARA EKSPLISIT mengapa pelajaran itu muncul dari kisah ini (kembalikan ke detail kisah).
+  * Paragraf 2: hubungkan pelajaran ke peristiwa NYATA pekan ini. Sebut 1-2 konteks dari sample_headlines (tanpa nama outlet) di mana pelajaran ini berlaku. Tutup dengan 1-2 tindakan praktis yang bisa dilakukan pembaca/pendengar pekan ini.
+
+NADA: bercerita seperti seorang nenek yang mahir mendongeng cucunya — hangat, sabar, jelas, tidak terburu-buru. Pembaca yang tergesa-gesa harus tetap merasa peristiwa ini ZAMAN itu DEKAT ke dirinya. Hindari bahasa khutbah formal ("Wahai sekalian manusia", "marilah kita renungkan") di sepanjang kisah — gunakan hanya di sub-section Pelajaran. Gunakan **kamu** untuk kata ganti orang kedua (bukan "engkau", kecuali memang kutipan hadits), supaya pembaca generasi sekarang merasa diajak ngobrol.
+
+PANJANG: target ~1400-1750 kata untuk waktu baca 7 menit. JANGAN lebih pendek — pembaca tidak bisa "hanyut" dalam <1000 kata. JANGAN melebar ke >1750 — kisah jadi melar.
 
 ### Pengajaran di Rumah (500-700 kata)
 Tulis 3-4 CONVERSATION SCRIPT untuk orang tua dengan anak, masing-masing format:
@@ -480,13 +528,13 @@ CRITICAL — SCOPE OF PERCENTAGES: read SEGMENT_SCOPE in the input. When "all", 
 - Prefer observation verbs ("highlights", "maps", "tracks", "surfaces") over command verbs ("must", "should", "the importance of")
 - Only use headlines from the pool I provide. Do NOT invent stories.
 
-## Da'wah Strategies & Actions (6850-9400 words)
-This is a CONTENT KIT — not strategic advice. Each sub-section must be a READY-TO-USE DRAFT that a da'i, ustadzah, creator, or community organizer can use directly without rewriting from scratch. REQUIRED: 6 sub-sections with ### H3.
+## Da'wah Strategies & Actions (9350-12650 words)
+This is a CONTENT KIT — not strategic advice. Each sub-section must be a READY-TO-USE DRAFT that a da'i, ustadzah, creator, or community organizer can use directly without rewriting from scratch. REQUIRED: 8 sub-sections with ### H3.
 
-DALEEL REFERENCING IN SECTION 4 — the pool I provide contains 10 thematically-reranked daleel. Each sub-section below MUST weave 2-3 daleel from this pool INLINE (not all stacked in Section 5):
+DALEEL REFERENCING IN SECTION 4 — the pool I provide contains 10 thematically-reranked daleel. Each sub-section below MUST weave 1-3 daleel from this pool INLINE (not all stacked in Section 5):
 - Pick daleel that genuinely SUPPORT each sub-section's argument — not random first picks
 - Inline format: `**{{citation}}**` (e.g. `**QS. Hud: 85**` or `**Riyad as-Salihin 1420**`) immediately followed by 1 sentence English paraphrase
-- Different sub-sections MAY cite the same daleel if it really fits best, but TRY to distribute so the 8-10 daleel pool gets spread across sub-sections (khutbah ~3-4 daleel, kajian ~2-3, home ~1-2, content ~1, gen-z ~2, action ~1-2)
+- Different sub-sections MAY cite the same daleel if it really fits best, but TRY to distribute so the 8-10 daleel pool gets spread across sub-sections (khutbah ~3-4 daleel, kultum ~1-2, kajian ~2-3, hadith story ~1 as centerpiece, home ~1-2, content ~1, mahasiswa ~2, action ~1-2)
 - DO NOT invent verses or hadith outside the pool. Any citation appearing in Section 4 MUST exactly match a citation in the pool.
 
 ### Friday Khutbah (3450-4800 words)
@@ -517,6 +565,22 @@ KHUTBAH KEDUA (750-1050 words):
 
 - Standard closing (~120 Arabic words) in ARABIC SCRIPT WITH FULL HARAKAT: the sequence "إِنَّ اللهَ وَمَلَائِكَتَهُ يُصَلُّوْنَ عَلَى النَّبِيّ…" → full sholawat "اَللّٰهُمَّ صَلِّ عَلٰى سَيِّدِنَا مُحَمَّدٍ وَعَلٰى آلِ سَيِّدِنَا مُحَمَّدٍ…" → "عِبَادَ اللهِ، إِنَّ اللهَ يَأْمُرُ بِالْعَدْلِ وَالْإِحْسَانِ وَإِيْتَاءِ ذِي الْقُرْبٰى…" → final tahmid "وَاذْكُرُوا اللهَ الْعَظِيْمَ يَذْكُرْكُمْ، وَاشْكُرُوْهُ عَلٰى نِعَمِهِ يَزِدْكُمْ، وَلَذِكْرُ اللهِ أَكْبَرُ." All in Arabic letters with harakat.
 
+### Kultum / Short Talk (1100-1500 words)
+Write a READY-TO-DELIVER 7-10 minute kultum — concise but COMPLETE from opening to closing. Audience: congregants right after sholat (Subuh / Maghrib / Isya), tarawih, or short community gatherings — people who've just prayed, don't want to stand long, but want to leave with one message that sticks. Flowing conversational English (NOT the formal cadence of a Friday khutbah), one sharp argument that does not wander.
+
+REQUIRED STRUCTURE (in this order):
+
+- **Opening** (~150 words): start with TA'AWUDH + BASMALAH + brief HAMDALAH in Arabic script with full harakat (`أَعُوذُ بِاللهِ مِنَ الشَّيْطَانِ الرَّجِيْمِ، بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ، اَلْحَمْدُ لِلهِ رَبِّ الْعَالَمِيْنَ…`), followed by one brief sholawat line `وَالصَّلَاةُ وَالسَّلَامُ عَلٰى رَسُوْلِ اللهِ، وَعَلٰى آلِهِ وَصَحْبِهِ أَجْمَعِيْنَ، أَمَّا بَعْدُ`. Then a short English greeting (~30 words) that names THIS WEEK's context — not generic "Brothers and sisters, alhamdulillah we gather tonight" (too template). Better: "Brothers and sisters, in this past week we lived through [concrete event from this week], and there's one thought I want to share with you tonight…"
+- **Hook & opening verse** (~200 words): one sentence that grabs attention immediately — rhetorical question, sharp observation about this week's events, or a fact that unsettles. Then one Quranic verse from the pool (WRITE IN ARABIC SCRIPT WITH HARAKAT, name surah + verse, English translation, 1-2 sentences of contextual tafsir). If the pool lacks a suitable verse, substitute one hadith from the pool — full citation + translation.
+- **Body** (~600-850 words, 4-5 flowing prose paragraphs, no sub-headings): ONE single argument that develops. No topic-hopping. Good per-paragraph structure:
+  * Paragraph 1: explain the opening verse/hadith in this week's context.
+  * Paragraph 2: 1-2 concrete stories from this week (from the sample_headlines pool) — DO NOT name outlets, use framings like "this week we heard…", "the news that reached us…".
+  * Paragraph 3: a supporting daleel (1 from the pool, citation bold inline + brief translation). Tie it to the core message.
+  * Paragraphs 4-5: practical reflection — what should the audience DO when they leave tonight? Give 2-3 concrete actions doable within 24 hours. No theory — real steps.
+- **Closing** (~150 words): one concise sentence summarizing the core message (one the audience can carry home), then CLOSING DU'A IN ARABIC SCRIPT WITH HARAKAT (~80 words) — minimum: du'a for self + family + thematic du'a relevant to the kultum + closer `رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ`. End with closing salam `وَالسَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ`.
+
+TONE: warm, personal, direct. DO NOT imitate Friday khutbah formality — kultum is closer to a chat after prayer. The speaker stands AT THE SAME LEVEL as the audience, not on a formal mimbar. May say "I" personally, "we as the jama'ah". AVOID template phrases ("let us reflect", "alhamdulillah we are still given health") mid-text — fine once in the opening, never repeated.
+
 ### Women's Kajian & Majelis Taklim (800-1100 words)
 Write a 45-MINUTE KAJIAN OUTLINE ready for delivery — hands-on, NOT theoretical lecture:
 - Opening (~80 words): basmalah, salam, an ice-breaker question tied to ibu-ibu's lived experience this week (e.g. "Whose grocery bill went up this week?").
@@ -527,6 +591,38 @@ Write a 45-MINUTE KAJIAN OUTLINE ready for delivery — hands-on, NOT theoretica
   * Practical application for the kitchen / family (2-3 actions)
 - Q&A section (~100 words): write 3 questions the audience IS LIKELY to ask + honest brief answers (don't be overly idealistic).
 - Closing (~50 words): a short prayer for the family, a one-sentence takeaway.
+
+### Story from a Hadith (1400-1750 words)
+Write ONE STORY drawn from a hadith CHOSEN from the daleel pool I provide — usually from Sahih Bukhari / Sahih Muslim / Riyad as-Salihin. Format: a 7-minute read (~1400-1750 words) that pulls the listener/reader IN like a short story, NOT an academic tafsir. At the end, one paragraph that extracts a concrete lesson from the story and ties it to this week's events.
+
+CRITICAL — SOURCE OF THE STORY: the story MUST come from one hadith in the pool. DO NOT invent stories from memory. If the pool has no narrative hadith (most daleel are brief wisdom sayings, not stories), pick a hadith that names a concrete event (e.g. a sahabi's experience, a dialogue between Rasulullah ﷺ and someone, a moment in Madinah/Makkah) and develop the CONTEXT around it with plausible setting — but the core DIALOGUE and ACTIONS must come exactly from the hadith. Close the opening paragraph with the citation of the hadith you're retelling, formatted `**{{citation}}**`.
+
+REQUIRED STRUCTURE:
+
+- **Opening — frame the story** (~120 words): one paragraph that introduces the story WITHOUT revealing its core lesson. Name the hadith citation in the first or second sentence (`**Sahih Bukhari 6094**`), but DO NOT give away the moral upfront — let the reader enter the story first. Acceptable opener: "One night in Madinah, something happened that the Messenger of Allah ﷺ later retold to his companions. The story is preserved in **Sahih Bukhari 6094**…"
+
+- **Setting — physical & emotional landscape** (~250 words, 2 paragraphs): place the reader inside the scene. What was happening in Madinah / in the garden / in the market / at home when this event took place? Who was present? What was the weather, the sounds, the smells? What did the central character feel BEFORE the main event happened? Use sensory detail that's plausible against the sirah context — DO NOT fabricate tarikh details that aren't in the hadith. Write in the "the reader sees" aspect — camera-eye, not summary.
+
+- **Core story — events & dialogue** (~700-900 words, 4-5 paragraphs): state the events EXACTLY as recorded in the hadith, but with narrative pull. For dialogue: quote in flowing English while staying accurate to the hadith's meaning. Clear DIALOGUE format:
+  * Use double quotes for direct speech: "Have you fed your guest tonight?"
+  * Add emotional cues for characters: "the Prophet ﷺ asked, his voice holding back surprise" or "the sahabi answered softly, his head bowed"
+  * Insert pauses + internal reactions between exchanges ("He ﷺ was silent for a moment. His gaze rested on the Madinah sky strewn with stars.")
+  * For long hadith with much dialogue, DO NOT cut — preserve the original order so the reader follows the natural progression.
+
+  PROHIBITED in body paragraphs:
+  * Inserting tafsir / modern explanation mid-story — that breaks immersion. Defer ALL interpretation to the lesson section at the end.
+  * Addressing the reader directly ("Notice, dear readers, how the Prophet…") — preserve narrative distance.
+  * Inventing speech for characters that isn't in the hadith. If the hadith only mentions an action, narrate the action; do not add fictional dialogue.
+
+- **Climax / turning point** (~150 words, 1 paragraph): the story's peak — the moment something SHIFTS (the sahabi realizes, a decision is made, a prayer is answered, a gentle correction from the Prophet ﷺ arrives). Write at a slower rhythm than the previous paragraph — shorter sentences, more pauses, so the reader STOPS at this point.
+
+- **Lesson** (~250 words, 2 paragraphs, H4 heading `#### The Lesson`): NOW extract the lesson. Structure:
+  * Paragraph 1: name 1-2 core lessons from the story. DO NOT list 5-6 generic lessons — focus on the 1-2 strongest. Explain EXPLICITLY why the lesson emerges from this particular story (return to the story's details).
+  * Paragraph 2: connect the lesson to REAL events from this week. Cite 1-2 contexts from sample_headlines (without outlet names) where this lesson applies. Close with 1-2 practical actions the listener/reader can take this week.
+
+TONE: tell the story like a grandmother skilled at narrating to her grandchildren — warm, patient, clear, unhurried. A hurried reader must still feel that THAT era is CLOSE to their own life. Avoid formal khutbah register ("O mankind", "let us ponder") throughout the story — use it only in the Lesson sub-section. Use **you** for second-person (not "thou", except where a hadith quotation literally reads so), so a contemporary reader feels personally addressed.
+
+LENGTH: target ~1400-1750 words for a 7-minute read. DO NOT go shorter — a reader can't be "absorbed" in <1000 words. DO NOT exceed 1750 — the story stretches thin.
 
 ### Teaching at Home (500-700 words)
 Write 3-4 CONVERSATION SCRIPTS for parents with their children, each in the format:
@@ -1568,9 +1664,9 @@ def _build_user_prompt(
         scope_note = scope_note_all
 
     write_now = (
-        "Tulis briefing sekarang dalam format markdown 5 bagian (Ringkasan Eksekutif / Numerik & Tren Pekan Ini / Tema Utama & Pola Yang Muncul / Strategi & Aksi Dakwah / Dalil & Sumber), ~8450-11400 kata total — Strategi & Aksi Dakwah adalah CONTENT KIT yang isinya draft siap-pakai (khutbah lengkap, outline kajian, script video, dll) dengan daleel pool yang ditenun inline ke setiap sub-section, bukan ringkasan strategi."
+        "Tulis briefing sekarang dalam format markdown 5 bagian (Ringkasan Eksekutif / Numerik & Tren Pekan Ini / Tema Utama & Pola Yang Muncul / Strategi & Aksi Dakwah / Dalil & Sumber), ~10950-14650 kata total — Strategi & Aksi Dakwah adalah CONTENT KIT 8 sub-section yang isinya draft siap-pakai (khutbah lengkap, kultum, kajian, kisah dari hadits, pengajaran rumah, script video, mahasiswa pack, aksi sosial) dengan daleel pool yang ditenun inline ke setiap sub-section, bukan ringkasan strategi."
         if language == "id"
-        else "Write the briefing now in markdown, 5-section format (Executive Summary / Numbers & Trends This Week / Main Themes & Emerging Patterns / Da'wah Strategies & Actions / Daleel & Sources), ~8450-11400 words total — Da'wah Strategies & Actions is a CONTENT KIT containing ready-to-use drafts (full khutbah, kajian outline, video script, etc) with daleel from the pool woven inline into each sub-section, NOT a strategic summary."
+        else "Write the briefing now in markdown, 5-section format (Executive Summary / Numbers & Trends This Week / Main Themes & Emerging Patterns / Da'wah Strategies & Actions / Daleel & Sources), ~10950-14650 words total — Da'wah Strategies & Actions is a CONTENT KIT of 8 sub-sections containing ready-to-use drafts (full khutbah, kultum, kajian, hadith story, home teaching scripts, video script, mahasiswa pack, social action) with daleel from the pool woven inline into each sub-section, NOT a strategic summary."
     )
 
     # ADHKAR POOL — du'a / dzikir retrieved separately so Pesan Flyer
@@ -1685,23 +1781,23 @@ def _generate_for_language(
             system_instruction=system_prompt,
             temperature=0.5,
             safety_settings=_RELAXED_SAFETY,
-            # 32768-token output cap supports the long-form 5-section
-            # briefing where Section 4 is a full content kit (full
-            # khutbah 3450-4800 kata + kajian outline + script +
-            # Mahasiswa pack + action plan ≈ 6850-9400 words for that
-            # section alone, ~14000-19000 tokens visible). Top-level
-            # brief ≈ 8450-11400 words → ~17000-24000 tokens. 32k cap
-            # leaves comfortable headroom. Bumped from 8192 when
-            # Section 4 expanded (2026-05-22); khutbah grew 1.5×
-            # (2026-05-24) but stays inside the cap.
-            max_output_tokens=32768,
-            # 12288-token thinking budget — Section 4 has a multi-part
-            # structure (6 sub-sections, full khutbah with mukadimah →
-            # inti → doa Arab → tahmid) that the model needs space to
-            # plan coherently. Pro charges thinking at the output rate,
-            # so this adds ~$0.12/call; offset by the weekly (Thursday)
-            # cadence drop and still inside the IDR cap.
-            thinking_config=types.ThinkingConfig(thinking_budget=12288),
+            # 49152-token output cap. Section 4 is now an 8 sub-section
+            # content kit (khutbah 3450-4800 + kultum 1100-1500 + kajian
+            # 1400-1800 + hadith story 1400-1750 + home 500-700 + content
+            # 100-130 + mahasiswa 900-1200 + aksi 600-900 ≈ 9350-12650
+            # words for Section 4 alone). Top-level brief ≈ 10950-14650
+            # words → ~22000-29300 tokens. 49k leaves room for the model
+            # to drift slightly over without truncation. Bumped from
+            # 32768 (2026-05-30) when Kultum + Kisah dari Hadits joined.
+            max_output_tokens=49152,
+            # 16384-token thinking budget — Section 4 now has 8 sub-
+            # sections (khutbah, kultum, kajian, hadith story, home,
+            # content, mahasiswa, aksi) each with its own structure
+            # that the model needs to plan coherently. Pro charges
+            # thinking at the output rate so this adds ~$0.16/call;
+            # offset by the weekly (Thursday) cadence drop and inside
+            # the IDR cap.
+            thinking_config=types.ThinkingConfig(thinking_budget=16384),
         ),
     )
     summary_md = (resp.text or "").strip()

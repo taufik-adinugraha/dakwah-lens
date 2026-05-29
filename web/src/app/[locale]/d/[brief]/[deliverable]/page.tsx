@@ -6,7 +6,9 @@ import {
   BookOpen,
   HandHeart,
   Home as HomeIcon,
+  MessageSquareText,
   Mic,
+  Scroll,
   Smartphone,
   Sparkles,
   Users,
@@ -49,7 +51,9 @@ function isDeliverableSlug(s: string): s is DeliverableSlug {
 
 const KIND_ICON: Record<DeliverableSlug, typeof BookOpen> = {
   khutbah: BookOpen,
+  kultum: MessageSquareText,
   kajian: Users,
+  kisah: Scroll,
   home: HomeIcon,
   content: Smartphone,
   genz: Mic,

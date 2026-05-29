@@ -564,9 +564,22 @@ export const DELIVERABLE_HEADING_PATTERNS: Record<
     matcher: (h) => /khutbah|friday/i.test(h),
     title: "Khutbah Jumat",
   },
+  kultum: {
+    // Match BEFORE kajian: a kultum heading like "Kultum Subuh" must not
+    // fall through to a kajian matcher. The current /kultum|short talk/
+    // pattern is tight enough that it won't shadow kajian's own match.
+    matcher: (h) => /kultum|short\s*talk/i.test(h),
+    title: "Kultum",
+  },
   kajian: {
     matcher: (h) => /kajian|majelis/i.test(h),
     title: "Kajian",
+  },
+  kisah: {
+    // "Kisah dari Hadits" / "Story from a Hadith" — a 7-min narrative
+    // retelling of one hadith from the daleel pool.
+    matcher: (h) => /kisah|story\s+from/i.test(h),
+    title: "Kisah dari Hadits",
   },
   home: {
     matcher: (h) => /rumah|home|teaching at/i.test(h),
