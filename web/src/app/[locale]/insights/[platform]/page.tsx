@@ -112,13 +112,16 @@ export default async function PlatformDrilldownPage({
   // signed-in users have already converted, so they don't need that pitch.
   //
   // Per-platform secondary signals fetched in parallel:
-  //   - YouTube: rising videos (time-series 24h Δ, the only platform we
-  //     snapshot today).
-  //   - X / Instagram: top-engaged posts (no time series, sorted by the
-  //     log10 engagement_score populated by the normalizers).
+  //   - YouTube: BOTH — rising videos (24h Δ, the only platform we
+  //     snapshot today) AND top-engaged posts (absolute view count).
+  //     Rising = "what's surging right now"; top-engaged = "what's
+  //     dominating this week overall". Both signals are useful and
+  //     complement each other.
+  //   - X / Instagram: top-engaged posts only (no time series).
   //   - Mainstream / TT / FB: skip — no useful engagement signal.
   const isYouTube = platform === "youtube";
-  const hasEngagement = platform === "x" || platform === "instagram";
+  const hasEngagement =
+    platform === "x" || platform === "instagram" || platform === "youtube";
   // Bucket-reach widget is meaningful on every platform that has either
   // engagement (YT/X/IG, sums views) or a per-article count (mainstream,
   // sums articles). Skip on TikTok (disabled) and Facebook (no data).
