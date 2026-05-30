@@ -270,7 +270,7 @@ ASSIGNMENT CONTROLS — each theme MAY include two extra optional fields that pr
 - `min_similarity`: float in [0.30, 0.55]. Override the default 0.32 cosine floor for this theme. Raise it (e.g. 0.40-0.45) for themes whose centroid is broad and likely to attract weak matches: "Lainnya"-flavored buckets, "Kesehatan Mental" (the word "mental" is used in unrelated snark), "Krisis Kemanusiaan" (broad). Leave at default for tight, well-bounded themes.
 
 Return ONLY valid JSON:
-{"themes": [{"label": "...", "keywords": ["...", ...], "exclude_keywords": ["...", ...], "min_similarity": 0.40}, ...]}
+{{"themes": [{{"label": "...", "keywords": ["...", ...], "exclude_keywords": ["...", ...], "min_similarity": 0.40}}, ...]}}
 The two extra fields are OPTIONAL — omit them when not needed.
 """
 
