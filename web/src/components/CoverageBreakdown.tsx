@@ -288,30 +288,75 @@ function TopicsCard({
           {labels.noDataYet}
         </p>
       ) : (
-        <ul className="mt-3 space-y-1.5">
-          {data.slice(0, 5).map((topic) => (
-            <li key={topic.id}>
-              <div className="flex items-center justify-between gap-2 text-xs">
-                <span className="truncate font-medium text-slate-700">
-                  {topic.label}
-                </span>
-                <span className="shrink-0 tabular-nums text-slate-500">
-                  {topic.count}
-                  <span className="ml-1 text-slate-400">
-                    · {topic.pct.toFixed(0)}%
-                  </span>
-                </span>
-              </div>
-              <div className="mt-0.5 h-1 overflow-hidden rounded-full bg-slate-100">
-                <div
-                  className="h-full rounded-full bg-emerald-500"
-                  style={{ width: `${Math.max(topic.pct, 2)}%` }}
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
+        <GroupedTopicsList topics={data} />
       )}
+    </div>
+  );
+}
+
+/**
+ * Renders the topic list grouped by `topic.group` (the coarse-grained
+ * THEME_GROUPS classification). Groups are ordered by total post
+ * count; topics within each group are ordered by their own count. A
+ * group's bar shows the aggregate share of that group; nested topics
+ * show their individual share.
+ *
+ * Trade-off vs the old flat top-5 view: scans slower at a glance, but
+ * gives operators a much better mental map of "what kind of
+ * conversation is happening this week" — labor + agriculture sit
+ * together under "Pekerja & Pertanian Rakyat" rather than scattered
+ * by raw count.
+ */
+function GroupedTopicsList({ topics }: { topics: TopicBucket[] }) {
+  // Aggregate topics by their coarse group. Preserves ordering by
+  // first appearance in the THEME_GROUPS list, but the final sort below
+  // re-orders groups by total count desc.
+  const groupMap = new Map<string, { topics: TopicBucket[]; total: number; pct: number }>();
+  for (const t of topics) {
+    const g = groupMap.get(t.group) ?? { topics: [], total: 0, pct: 0 };
+    g.topics.push(t);
+    g.total += t.count;
+    g.pct += t.pct;
+    groupMap.set(t.group, g);
+  }
+  const groups = Array.from(groupMap.entries())
+    .map(([group, g]) => ({ group, ...g }))
+    .sort((a, b) => b.total - a.total);
+
+  return (
+    <div className="mt-3 space-y-3">
+      {groups.map((g) => (
+        <div key={g.group}>
+          <div className="flex items-baseline justify-between gap-2 text-xs">
+            <span className="truncate font-semibold text-slate-900">{g.group}</span>
+            <span className="shrink-0 tabular-nums text-slate-600">
+              {g.total}
+              <span className="ml-1 text-slate-400">· {g.pct.toFixed(0)}%</span>
+            </span>
+          </div>
+          <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-100">
+            <div
+              className="h-full rounded-full bg-emerald-500"
+              style={{ width: `${Math.max(g.pct, 2)}%` }}
+            />
+          </div>
+          <ul className="mt-1.5 space-y-1 pl-3">
+            {g.topics
+              .sort((a, b) => b.count - a.count)
+              .map((t) => (
+                <li
+                  key={t.id}
+                  className="flex items-center justify-between gap-2 text-[11px]"
+                >
+                  <span className="truncate text-slate-600">{t.label}</span>
+                  <span className="shrink-0 tabular-nums text-slate-400">
+                    {t.count} · {t.pct.toFixed(0)}%
+                  </span>
+                </li>
+              ))}
+          </ul>
+        </div>
+      ))}
     </div>
   );
 }

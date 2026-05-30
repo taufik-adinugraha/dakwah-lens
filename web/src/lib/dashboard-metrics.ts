@@ -1781,6 +1781,22 @@ export const THEME_GROUPS: ReadonlyArray<{ group: string; patterns: RegExp[] }> 
     patterns: [/judi online/i, /pinjol/i, /pinjaman online/i, /narkoba/i, /penyalahgunaan obat/i],
   },
   {
+    group: "Pekerja & Pertanian Rakyat",
+    patterns: [
+      /buruh/i,
+      /tenaga kerja/i,
+      /pekerja rumah tangga/i,
+      /upah minimum/i,
+      /bpjs ketenagakerjaan/i,
+      /ketahanan pangan/i,
+      /pertanian/i,
+      /petani/i,
+      /pupuk/i,
+      /bulog/i,
+      /nelayan/i,
+    ],
+  },
+  {
     group: "Konflik & Geopolitik",
     patterns: [
       /palestina/i,
@@ -1989,7 +2005,14 @@ export async function getTopicDistribution7d(
 
 export type TopicByPlatformGroup = {
   platform: string;
-  topics: Array<{ id: string; label: string; count: number; pct: number }>;
+  topics: Array<{
+    id: string;
+    label: string;
+    count: number;
+    pct: number;
+    /** Coarse-grained group, derived from label via THEME_GROUPS. */
+    group: string;
+  }>;
 };
 
 /**
@@ -2048,6 +2071,7 @@ export async function getTopicsByPlatform7d(
       label: r.label,
       count,
       pct: total > 0 ? (count / total) * 100 : 0,
+      group: classifyThemeGroup(r.label),
     };
     const list = byPlatform.get(r.platform) ?? [];
     list.push(entry);

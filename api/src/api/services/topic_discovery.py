@@ -74,12 +74,23 @@ MAX_TEXT_CHARS = 200
 # (collected into the "Lainnya — Tidak Terklasifikasi" bucket so it stays
 # visible rather than disappearing). Tuned for text-embedding-3-small,
 # where related short Indonesian texts sit around 0.3-0.5 and unrelated
-# ones around 0.1-0.2. Raised from 0.28 → 0.32 (2026-05-29) after a
-# manual audit showed ~67% per-topic accuracy with significant spillover
-# into broad themes (Judol grabbing all "scam" content, Palestina
-# grabbing all "humanitarian"). The floor is the DEFAULT — each theme
-# may override with its own `min_similarity` (see prompt).
-MIN_SIMILARITY = 0.32
+# ones around 0.1-0.2.
+#
+# History:
+#   · 2026-05-29: raised 0.28 → 0.32 after Judol grabbed all "scam"
+#     content and Palestina grabbed all "humanitarian".
+#   · 2026-05-30: lowered 0.32 → 0.28 after an audit of 443 unclassified
+#     posts showed ~50% were floor-casualties with clear matching
+#     themes that fell just under 0.32 (Polemik Aqidah & Sektarian got
+#     0 posts despite ~2 obvious matches in a 25-post sample). The
+#     earlier spillover risk is now mitigated because every broad
+#     theme carries strict `exclude_keywords` (Judol excludes WO/
+#     wedding-organizer/saham, Palestina excludes skin-care/Afghanistan)
+#     and the theme set is finer-grained (31 → 33 themes), so
+#     borderline posts land on narrower fits.
+# The floor is the DEFAULT — each theme may override with its own
+# `min_similarity` (see prompt).
+MIN_SIMILARITY = 0.28
 
 # A theme needs at least this many assigned posts to survive. Mirrors the
 # old prompt rule ("a theme needs at least 2 posts"); a 1-post theme is
@@ -300,6 +311,39 @@ STATIC_THEMES: list[dict[str, Any]] = [
         "exclude_keywords": ["judol", "judi online", "pinjol"],
         "min_similarity": MIN_SIMILARITY,
     },
+    # ── Added 2026-05-30 (round 3) after a second audit of 443 posts
+    #    revealed two more missing-theme clusters (~12% each):
+    #    labor-rights content (Demo Indomaret, ART abuse, BPJS
+    #    Ketenagakerjaan) and food-security / agriculture content
+    #    (Bulog beras, pupuk sawit, DPRD pertanian).
+    {
+        "label": "Buruh, Pekerja & Hak Tenaga Kerja",
+        "keywords": [
+            "buruh",
+            "tenaga kerja",
+            "demo pegawai",
+            "pekerja rumah tangga",
+            "bpjs ketenagakerjaan",
+            "upah minimum",
+        ],
+        "exclude_keywords": [],
+        "min_similarity": MIN_SIMILARITY,
+    },
+    {
+        "label": "Ketahanan Pangan & Pertanian",
+        "keywords": [
+            "ketahanan pangan",
+            "pertanian",
+            "petani",
+            "stok beras",
+            "pupuk",
+            "produktivitas sawah",
+            "bulog",
+            "nelayan",
+        ],
+        "exclude_keywords": [],
+        "min_similarity": MIN_SIMILARITY,
+    },
 ]
 
 # Render the static labels into the prompt so Gemini knows not to propose
@@ -365,7 +409,7 @@ ASSIGNMENT CONTROLS — each theme MAY include two extra optional fields that pr
   * "Korupsi Pejabat" was grabbing education policy and labor lawsuits. Set `exclude_keywords: ["UU Ciptaker", "kecelakaan tol", "sekolah swasta"]`.
   Tight themes ("Kriminalitas Jalanan", "Ibadah Haji & Kurban") rarely need this — leave empty.
 
-- `min_similarity`: float in [0.30, 0.55]. Override the default 0.32 cosine floor for this theme. Raise it (e.g. 0.40-0.45) for themes whose centroid is broad and likely to attract weak matches: "Lainnya"-flavored buckets, "Kesehatan Mental" (the word "mental" is used in unrelated snark), "Krisis Kemanusiaan" (broad). Leave at default for tight, well-bounded themes.
+- `min_similarity`: float in [0.28, 0.55]. Override the default 0.28 cosine floor for this theme. Raise it (e.g. 0.40-0.45) for themes whose centroid is broad and likely to attract weak matches: "Lainnya"-flavored buckets, "Kesehatan Mental" (the word "mental" is used in unrelated snark), "Krisis Kemanusiaan" (broad). Leave at default for tight, well-bounded themes.
 
 Return ONLY valid JSON:
 {{"themes": [{{"label": "...", "keywords": ["...", ...], "exclude_keywords": ["...", ...], "min_similarity": 0.40}}, ...]}}

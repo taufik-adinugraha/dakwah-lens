@@ -169,7 +169,9 @@ export default async function DashboardPage({
     getPlatformDistribution7d(),
     getSentimentDistribution7d(),
     getSentimentByPlatform7d(),
-    getTopicDistribution7d(5),
+    // Bumped 5 → 30 so the grouped view in CoverageBreakdown has
+    // enough granularity to populate all 12 THEME_GROUPS.
+    getTopicDistribution7d(30),
     getTopicsByPlatform7d(5),
     getQuotaSnapshot(session.user.id),
   ]);

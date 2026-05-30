@@ -77,7 +77,10 @@ export default async function InsightsExplorePage({
     getPlatformDistribution7d(),
     getSentimentDistribution7d(),
     getSentimentByPlatform7d(),
-    getTopicDistribution7d(5),
+    // Bumped 5 → 30 so the grouped view in CoverageBreakdown has
+    // enough granularity to populate all 12 groups (THEME_GROUPS).
+    // The component aggregates by group + caps display naturally.
+    getTopicDistribution7d(30),
     getTopicsByPlatform7d(5),
   ]);
 
