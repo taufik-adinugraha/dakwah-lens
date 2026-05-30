@@ -217,7 +217,7 @@ IMPORTANT — STATIC THEMES ARE ALREADY GUARANTEED, DO NOT DUPLICATE THEM:
 The downstream system automatically appends the following CHRONIC da'wah-concern themes to every run, even if you don't propose them. DO NOT include any of these in your output (they'd be duplicates and waste a slot):
 {_STATIC_LABEL_LIST}
 
-Your job: propose 5-7 DYNAMIC themes for what's distinctive about THIS WEEK's conversation — emerging stories, new patterns, week-specific events — that the static themes above don't already capture. Lean toward MORE themes when the pool spans many domains: undersizing pushes 20-30% of posts into an "uncategorized" bucket that's then useless for analysis. For each theme:
+Your job: propose 8-12 DYNAMIC themes for what's distinctive about THIS WEEK's conversation — emerging stories, new patterns, week-specific events, broad domains (politics, education, health, lifestyle, sport) — that the static themes above don't already capture. The static themes are narrow chronic-concern slots; you should still cover the BREADTH of this week's pool with your dynamic themes. Lean toward MORE themes when the pool spans many domains: undersizing pushes 20-30% of posts into an "uncategorized" bucket that's then useless for analysis. For each theme:
 - label: short human-readable name in Bahasa Indonesia (3-6 words). Be CONCRETE about what the theme is — name the actual subject matter, not a generic newsroom department.
 
   GOOD labels — concrete, name what the cluster is actually about:
