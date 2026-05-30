@@ -158,7 +158,18 @@ celery_app.conf.update(
         "ingest-instagram-weekly": {
             "task": "api.workers.ingest.rotating_ingest",
             "schedule": crontab(minute=20, hour=22, day_of_week=3),
-            "kwargs": {"platform": "instagram", "limit": 20, "n_keywords": 999},
+            # limit bumped 20 → 60 (2026-05-30). 2026-05-27 audit showed
+            # 7 of 38 yielding keywords pinned at the 20-cap + 11 at 19.
+            # 60 gives top-yielding hashtags room to clear (~40-50 items
+            # for the cap-bound ones), without paying for deep-scroll
+            # on every hashtag. The actor's documented Starter pricing
+            # is $0.0023/item (Pay Per Result); the prod-recorded $0.16
+            # for the 5/27 run was under-counted by ~10× (the 5/28 06:00
+            # billing_reconcile absorbed the gap), so cost forecasts
+            # should use the docs rate. Expected: ~1,300-1,500 items
+            # ≈ $3-3.45/run ≈ $13-15/mo. Re-evaluate after next Wed run
+            # against the per-item rate that actually bills.
+            "kwargs": {"platform": "instagram", "limit": 60, "n_keywords": 999},
         },
         # Re-cluster topics. Split across two beat entries to match the
         # ingest cadence of each platform — re-running Gemini topic

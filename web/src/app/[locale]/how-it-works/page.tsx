@@ -651,6 +651,20 @@ function PlatformStrategy({ t }: { t: T }) {
         <p className="mx-auto mt-6 max-w-3xl text-pretty text-center text-xs text-slate-500">
           {t("platforms_note")}
         </p>
+
+        {/* FAQ: addresses the "why are IG/TT counts so low?" question
+            that operators ask when they see the dashboard. Two paragraphs:
+            (1) cost is the binding constraint, (2) signal value justifies
+            keeping them on despite the low volume. */}
+        <div className="mx-auto mt-8 max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 className="text-balance text-base font-bold text-slate-900 sm:text-lg">
+            {t("platforms_faq_q_low_count")}
+          </h3>
+          <div className="mt-3 space-y-3 text-pretty text-sm leading-relaxed text-slate-700">
+            <p>{t("platforms_faq_a_low_count_cost")}</p>
+            <p>{t("platforms_faq_a_low_count_signal")}</p>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -1077,40 +1091,63 @@ function ModelsTable({ t }: { t: T }) {
  * — the real numbers live in `/admin/system/api-costs` (superadmin). The
  * point of this section is to be transparent about cost discipline.
  *
- * Numbers reflect the schedule as of 2026-05-27:
- *   mainstream RSS — every 2h, free
- *   X — weekly Wed 22:00 WIB · TikTok/IG — weekly Wed (eval phase)
- *   X trending overlay — daily 12:00 WIB
- *   YouTube — weekly whitelist channel sweep (Wed 21:00) + daily
- *     unbounded trending search (12:00); both free Data API quota
- *   topic discovery — daily 04:00 WIB (mainstream + YouTube)
- *   briefings — weekly Thursday 05:00 WIB cron (currently PAUSED — manual via scripts/manual_briefing.py)
+ * Numbers updated 2026-05-30 to reflect actual prod billing + the
+ * keyword + cap changes:
+ *   · TT pruned 49 → 28 enabled keywords (-10 zero-yielders, +judol)
+ *   · IG limit bumped 20 → 60 (~50% of yielding keywords were cap-bound)
+ *   · X added "judol" (49 → 50 enabled)
  *
- * The YouTube split (2026-05-27) adds no cost line — both paths run on
- * the free 10K/day Data API quota (~800 units/day search + 160/wk
- * channels). Apify spend is unchanged.
+ * Apify per-row numbers use the documented Starter-plan rates
+ * ($0.0023/IG · $0.004/TT · $0.0004/X), NOT the recorded per-call
+ * usage_events, which under-count on IG (the daily 06:00
+ * billing_reconcile job catches the gap). Apify Starter is $29/mo
+ * including $29 of platform credit — these rows project to ~$29/mo
+ * total Apify, exactly at the included quota.
+ *
+ * Gemini Flash-Lite row reflects the post-2026-05-25 IndoBERT→Gemini
+ * sentiment switch (~30-40% higher per-post LLM cost than the prior
+ * 30d aggregate); current 7d run-rate is $4.04 → $17.40/mo.
+ *
+ * Briefings cron is still paused per 2026-05-23; the Gemini Pro row
+ * now reflects ONLY on-demand user briefs (the 5/27 + 5/28 manual
+ * weekly briefings went through Claude, not Gemini Pro).
  */
 function MonthlyCost({ t }: { t: T }) {
   const rows = [
     {
-      provider: "Gemini 2.5 Pro (briefings, scheduled — currently paused)",
+      provider: "Gemini 2.5 Pro (user briefs only)",
       use: t("cost_gemini_pro_use"),
-      // Paused per 2026-05-23 to keep dev-phase spend at zero. Projected
-      // $5/mo if cron flips back on: 5 briefings × 4 Thursdays × ~$0.26.
-      monthly: 0,
-      note: "Paused; would be ~$5/mo if re-enabled (5 segmen × 1 bahasa × Kamis × ~$0.26)",
+      // Auto-briefing cron paused since 2026-05-23; the manual 5/27 +
+      // 5/28 generations went through Claude (not Gemini Pro). Pro now
+      // only serves the on-demand `synth_brief` path (user-initiated
+      // briefs via /briefs/new). 7d observed: 3 synth_brief events at
+      // $0.065 total → $0.28/mo at current usage. Scales with user
+      // adoption — bump this when /briefs/new traffic ramps.
+      monthly: 0.3,
+      note: "On-demand user briefs only · ~$0.07/brief · auto-cron paused",
     },
     {
       provider: "Gemini Flash-Lite",
       use: t("cost_gemini_use"),
-      monthly: 2.6,
-      note: "$0.10/$0.40 per 1M tokens · klasifikasi + topik + rerank",
+      // 7d observed = $4.04 → $17.40/mo run-rate at the post-2026-05-25
+      // state (sentiment switched from IndoBERT to Gemini Flash-Lite
+      // after the IndoBERT eval showed ~14% accuracy on X positives).
+      // Breakdown by pipeline trigger:
+      //   · Every-2h RSS classifier        ~$7.80/mo (rel + news-sent + opp)
+      //   · Weekly social Wed scrape       ~$5.60/mo (Wed burst across X/TT/IG)
+      //   · Daily 04:00 recluster          ~$2.70/mo (topic_discovery)
+      //   · Daily 12:00 trending           ~$1.30/mo (trending_filter + fan-out classify)
+      //   · Misc rerank/translate/flyer    ~$0.10/mo
+      monthly: 17.4,
+      note: "Per-post classifier + daily topic-discovery + daily trending fan-out + weekly social burst",
     },
     {
       provider: "OpenAI embeddings",
       use: t("cost_openai_use"),
-      monthly: 0.1,
-      note: "Embedding query daleel + one-shot corpus",
+      // Real 30d observed: $0.20. Mostly topic-recluster embedding
+      // (daily 04:00) plus kitab-query embeddings on user briefs.
+      monthly: 0.2,
+      note: "Topic-recluster vectors + per-brief kitab query embeddings",
     },
     {
       provider: "YouTube Data API",
@@ -1140,32 +1177,39 @@ function MonthlyCost({ t }: { t: T }) {
       monthly: 18,
       note: "≈ Rp 300K/bulan · 2 vCPU · 4 GB RAM · 30 GB disk",
     },
-    // ── Apify scrapers ── X + trending re-activated 2026-05-25 after
-    // IndoBERT retirement. TikTok + Instagram enabled 2026-05-25 for
-    // one-week evaluation; reassess after first run.
+    // ── Apify scrapers ── per-row projections at documented Starter
+    // rates. Combined target ≤ $29/mo (Apify Starter included credit).
     {
       provider: "Apify · X (apidojo)",
       use: t("cost_x_use"),
-      monthly: 8,
-      note: t("cost_active"),
+      // 50 enabled keywords × ~$0.025/call weekly = $5.50/mo. Plus
+      // judol added 2026-05-30 — marginal +$0.10/mo.
+      monthly: 5.5,
+      note: "50 enabled keywords (incl. judol) · ~$0.025/call · weekly Wed 22:00",
     },
     {
       provider: "Apify · Instagram",
       use: t("cost_ig_use"),
-      monthly: 9,
-      note: t("cost_eval"),
+      // limit=60 since 2026-05-30. Projected ~1,300 items/run at
+      // documented $0.0023/item Starter rate = ~$3/run × 4.33 wk.
+      monthly: 14,
+      note: "37 kw × limit=60 · ~$0.0023/item · weekly Wed 22:20 · biggest Apify line item",
     },
     {
-      provider: "Apify · TikTok (free actor)",
+      provider: "Apify · TikTok",
       use: t("cost_tt_use"),
-      monthly: 16,
-      note: t("cost_eval"),
+      // Post 2026-05-30 prune: 28 enabled keywords × ~$0.058/call =
+      // $1.65/run × 4.33 wk. Down from $16/mo at 49-kw config.
+      monthly: 7.14,
+      note: "28 enabled kw (post-prune) · ~$0.058/call · weekly Wed 22:10",
     },
     {
       provider: "Apify · Trending overlay (X)",
       use: t("cost_trending_use"),
-      monthly: 1,
-      note: t("cost_active"),
+      // Daily noon fan-out: ~8 trending keywords × ~$0.01/call ≈
+      // $0.08/day × 30 days. Real 30d observed: $2.40.
+      monthly: 2.4,
+      note: "~8 trending kw/day · daily 12:00 WIB · ~$0.08/day",
     },
   ];
 
