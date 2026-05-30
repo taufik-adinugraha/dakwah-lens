@@ -1678,6 +1678,115 @@ export type TopicBucket = {
   pct: number;
 };
 
+export type PickerTopic = {
+  id: string;
+  label: string;
+  keywords: string[];
+  postCount: number;
+};
+
+/**
+ * Topics available to surface in the brief + flyer "pick a current
+ * topic" dropdowns. Excludes the synthetic fallback bucket
+ * ("Lainnya — Tidak Terklasifikasi") since picking it would yield no
+ * useful context. Ordered by post count desc; pulls topics that have
+ * any posts in the last 7d.
+ */
+export async function getCurrentTopicsForPicker(
+  limit = 20,
+): Promise<PickerTopic[]> {
+  const rows = (await db.execute(sql`
+    SELECT
+      t.id::text AS id,
+      t.label,
+      t.keywords AS keywords,
+      count(sp.id)::int AS post_count
+    FROM topics t
+    LEFT JOIN social_posts sp
+      ON sp.topic_id = t.id
+     AND sp.created_at >= now() - interval '7 days'
+    WHERE t.label != 'Lainnya — Tidak Terklasifikasi'
+    GROUP BY t.id, t.label, t.keywords
+    HAVING count(sp.id) > 0
+    ORDER BY post_count DESC
+    LIMIT ${limit}
+  `)) as unknown as Array<{
+    id: string;
+    label: string;
+    keywords: unknown;
+    post_count: number;
+  }>;
+  return rows.map((r) => {
+    const kw = Array.isArray(r.keywords)
+      ? (r.keywords as string[])
+      : typeof r.keywords === "string"
+        ? (JSON.parse(r.keywords) as string[])
+        : [];
+    return {
+      id: r.id,
+      label: r.label,
+      keywords: kw.slice(0, 8),
+      postCount: Number(r.post_count),
+    };
+  });
+}
+
+/**
+ * Fetch one picker topic + a few sample post headlines under it for
+ * use as LLM context. Called from briefs/actions.ts and the user-
+ * flyers API when the user has picked a specific current topic. Keeps
+ * the query tight (id + label + keywords + 5 headlines) so the
+ * generation pipeline gets a focused anchor instead of the broad
+ * "top trending" blob.
+ */
+export async function getCurrentTopicContext(
+  topicId: string,
+): Promise<{
+  id: string;
+  label: string;
+  keywords: string[];
+  sampleHeadlines: string[];
+} | null> {
+  const [topicRow] = (await db.execute(sql`
+    SELECT id::text AS id, label, keywords
+    FROM topics
+    WHERE id = ${topicId}::uuid
+    LIMIT 1
+  `)) as unknown as Array<{
+    id: string;
+    label: string;
+    keywords: unknown;
+  }>;
+  if (!topicRow) return null;
+
+  const sampleRows = (await db.execute(sql`
+    SELECT regexp_replace(split_part(text, E'\n', 1), '\s+', ' ', 'g') AS headline
+    FROM social_posts
+    WHERE topic_id = ${topicId}::uuid
+      AND created_at >= now() - interval '7 days'
+      AND text IS NOT NULL
+      AND length(text) > 20
+    ORDER BY (engagement_score IS NOT NULL) DESC, engagement_score DESC NULLS LAST, created_at DESC
+    LIMIT 5
+  `)) as unknown as Array<{ headline: string | null }>;
+
+  const kw = Array.isArray(topicRow.keywords)
+    ? (topicRow.keywords as string[])
+    : typeof topicRow.keywords === "string"
+      ? (JSON.parse(topicRow.keywords) as string[])
+      : [];
+
+  return {
+    id: topicRow.id,
+    label: topicRow.label,
+    keywords: kw.slice(0, 8),
+    sampleHeadlines: sampleRows
+      .map((r) => (r.headline ?? "").trim())
+      .filter((h) => h.length > 0)
+      .map((h) => h.slice(0, 200)),
+  };
+}
+
 /**
  * Top N topics by post count in the last 7 days. Distinguishes from
  * `getTopIssues` (which returns 3 with full sentiment+sample details

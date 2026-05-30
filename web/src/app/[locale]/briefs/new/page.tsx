@@ -7,6 +7,7 @@ import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { BriefForm } from "./BriefForm";
 import { PlaceholderBanner } from "@/components/PlaceholderBadge";
+import { getCurrentTopicsForPicker } from "@/lib/dashboard-metrics";
 
 export async function generateMetadata({
   params,
@@ -38,6 +39,11 @@ export default async function NewBriefPage({
   const rawTopic = sp.topic;
   const defaultTopic =
     typeof rawTopic === "string" ? rawTopic.trim().slice(0, 200) : "";
+
+  // Topics surfaced in the "use a currently-trending topic" dropdown.
+  // Top-N from the last 7d corpus, fallback bucket excluded. Empty list
+  // (cold start) just hides the dropdown — the form still works.
+  const currentTopics = await getCurrentTopicsForPicker(20);
 
   return (
     <section className="relative isolate flex flex-1 items-start justify-center overflow-hidden py-12 sm:py-16">
@@ -81,6 +87,7 @@ export default async function NewBriefPage({
             <BriefForm
               defaultLocale={locale as "en" | "id"}
               defaultTopic={defaultTopic}
+              currentTopics={currentTopics}
             />
           </div>
         </div>

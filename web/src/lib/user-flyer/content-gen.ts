@@ -23,10 +23,19 @@ export type UserFlyerContent = {
 };
 
 export type NewsContext = {
-  /** "akhlaq" | "social_justice" | etc. */
+  /** "akhlaq" | "social_justice" | etc. — OR, when the caller hydrated
+   *  from a specific picked topic, that topic's label (so the prompt's
+   *  "Kategori dominan" line still has a meaningful anchor). */
   topCategory: string;
   /** Short list of trending topic labels this week. */
   topTopics: string[];
+  /** When the user picked a specific topic from the dropdown, these
+   *  fields carry that topic's actual signal. The prompt branches: if
+   *  `pickedLabel` is set it renders a tighter "ground in this
+   *  specific conversation" block instead of the broad-aggregate one. */
+  pickedLabel?: string;
+  pickedKeywords?: string[];
+  pickedSampleHeadlines?: string[];
 };
 
 export class FlyerGenUnavailableError extends Error {
@@ -132,9 +141,22 @@ export async function generateUserFlyerContent({
     10,
   );
 
-  const newsBlock = news
-    ? `\n\nKONTEKS BERITA PEKAN INI (gunakan sebagai LATAR / pemicu, jangan ulang fakta-fakta-nya — pembaca sudah tahu beritanya):\n- Kategori dominan: ${news.topCategory}\n- Topik trending: ${news.topTopics.slice(0, 5).join("; ")}`
-    : "";
+  const newsBlock = (() => {
+    if (!news) return "";
+    if (news.pickedLabel && news.pickedSampleHeadlines && news.pickedSampleHeadlines.length > 0) {
+      // User picked a specific current topic → ground the flyer in
+      // concrete headlines from that topic instead of the broad
+      // top-category + 5-trending blob.
+      const kwLine = news.pickedKeywords && news.pickedKeywords.length > 0
+        ? `\n- Kata kunci: ${news.pickedKeywords.join(", ")}`
+        : "";
+      const headlines = news.pickedSampleHeadlines
+        .map((h, i) => `  ${i + 1}. ${h}`)
+        .join("\n");
+      return `\n\nKONTEKS TOPIK PEKAN INI (pengguna memilih topik ini sebagai pemicu — gunakan headline di bawah sebagai LATAR konkret, jangan ulang fakta-fakta-nya verbatim, JANGAN sebut nama outlet media):\n- Topik: "${news.pickedLabel}"${kwLine}\n- Sample headline:\n${headlines}`;
+    }
+    return `\n\nKONTEKS BERITA PEKAN INI (gunakan sebagai LATAR / pemicu, jangan ulang fakta-fakta-nya — pembaca sudah tahu beritanya):\n- Kategori dominan: ${news.topCategory}\n- Topik trending: ${news.topTopics.slice(0, 5).join("; ")}`;
+  })();
 
   // Tone + audience hints are short directives the LLM weights when
   // writing the headline + body. Both default to neutral when omitted

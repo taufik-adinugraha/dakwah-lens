@@ -53,12 +53,22 @@ type Step = "form" | "estimate";
 
 type EstimateOk = Extract<EstimateResult, { ok: true }>;
 
+type PickerTopic = {
+  id: string;
+  label: string;
+  postCount: number;
+};
+
 export function BriefForm({
   defaultLocale,
   defaultTopic = "",
+  currentTopics = [],
 }: {
   defaultLocale: "en" | "id";
   defaultTopic?: string;
+  /** Topics surfaced in the "Berdasarkan topik yang sedang ramai"
+   *  dropdown. Empty list hides the entire checkbox + dropdown UI. */
+  currentTopics?: PickerTopic[];
 }) {
   const t = useTranslations("Briefs");
   const [step, setStep] = useState<Step>("form");
@@ -67,6 +77,13 @@ export function BriefForm({
   const [isEstimating, startEstimateTransition] = useTransition();
   const [isGenerating, startGenerateTransition] = useTransition();
   const [topic, setTopic] = useState(defaultTopic);
+  // "Berdasarkan topik yang sedang ramai" — when ticked, the dropdown
+  // appears and the picked topic's label autofills `topic`. The picked
+  // id is also threaded server-side to enrich daleel retrieval +
+  // anchor headlines from the topic's actual posts. Off by default so
+  // free-text typing remains the primary path.
+  const [useCurrentTopic, setUseCurrentTopic] = useState(false);
+  const [currentTopicId, setCurrentTopicId] = useState<string>("");
   const [extraContext, setExtraContext] = useState("");
   const [pages, setPages] = useState(2);
   // All SelectGrid + checkbox state lifted to this parent so it
@@ -146,6 +163,59 @@ export function BriefForm({
 
   return (
     <form onSubmit={onSubmitForm} className="space-y-5">
+      {currentTopics.length > 0 && (
+        <Field label={t("field_current_topic")} hint={t("field_current_topic_hint")}>
+          <label
+            className="group inline-flex cursor-pointer items-start gap-2.5 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm transition hover:border-slate-300"
+          >
+            <input
+              type="checkbox"
+              checked={useCurrentTopic}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                setUseCurrentTopic(checked);
+                if (!checked) setCurrentTopicId("");
+              }}
+              className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+            />
+            <span className="flex flex-col gap-0.5">
+              <span className="font-medium text-slate-900">
+                {t("field_current_topic_label")}
+              </span>
+              <span className="text-xs leading-relaxed text-slate-500">
+                {t("field_current_topic_checkbox_hint")}
+              </span>
+            </span>
+          </label>
+          {useCurrentTopic && (
+            <div className="relative mt-2">
+              <select
+                value={currentTopicId}
+                onChange={(e) => {
+                  const id = e.target.value;
+                  setCurrentTopicId(id);
+                  const picked = currentTopics.find((tp) => tp.id === id);
+                  if (picked) setTopic(picked.label);
+                }}
+                className="block h-11 w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 pr-10 text-sm text-slate-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
+              >
+                <option value="">{t("field_current_topic_placeholder")}</option>
+                {currentTopics.map((tp) => (
+                  <option key={tp.id} value={tp.id}>
+                    {tp.label} · {tp.postCount.toLocaleString("en-US")}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="hidden"
+                name="current_topic_id"
+                value={currentTopicId}
+              />
+            </div>
+          )}
+        </Field>
+      )}
+
       <Field label={t("field_topic")} hint={t("field_topic_hint")}>
         <div className="relative">
           <input

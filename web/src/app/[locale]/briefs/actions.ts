@@ -14,6 +14,7 @@ import {
 } from "@/lib/kitab-retrieval";
 import { generateBriefContent } from "@/lib/brief-generator";
 import { computeCost, estimateBriefCost } from "@/lib/brief-cost";
+import { getCurrentTopicContext } from "@/lib/dashboard-metrics";
 import { LlmUnavailableError } from "@/lib/llm";
 import type { BriefDaleel, UserProfile } from "@/db/schema";
 
@@ -97,6 +98,17 @@ const GenerateSchema = z.object({
    *  budget (≈2000 tokens/page Indonesian). `z.coerce.number` handles the
    *  string-typed FormData value. */
   pages: z.coerce.number().int().min(1).max(4).default(2),
+  /** Optional. When the user ticks "Berdasarkan topik yang sedang ramai"
+   *  and picks a topic from the dropdown, its UUID arrives here. The
+   *  action fetches the topic's keywords + 5 sample headlines and
+   *  threads them into the LLM prompt as "anchor headlines" so the
+   *  brief grounds itself in this week's actual conversation rather
+   *  than generic examples. */
+  current_topic_id: z
+    .string()
+    .uuid()
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
 });
 
 export type GenerateResult =
@@ -122,6 +134,7 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
     include_profile: formData.get("include_profile") ?? "",
     extra_context: formData.get("extra_context"),
     pages: formData.get("pages") ?? 2,
+    current_topic_id: formData.get("current_topic_id") ?? "",
   });
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0].message };
@@ -135,6 +148,7 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
     include_profile,
     extra_context,
     pages,
+    current_topic_id,
   } = parsed.data;
 
   // 1) Retrieve daleel via Qdrant semantic search across the full kitab
@@ -243,6 +257,24 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
     profile = profileRow?.profile ?? null;
   }
 
+  // Optional "anchor to this week's actual topic" context. When the
+  // user ticked the "current topic" checkbox + picked one from the
+  // dropdown, we hydrate the topic's keywords + 5 sample headlines so
+  // the LLM grounds the brief in real conversation rather than
+  // invented examples. Best-effort: a stale topic id (deleted between
+  // page-load and submit) silently degrades to no-anchor mode.
+  let currentTopic = null;
+  if (current_topic_id) {
+    try {
+      currentTopic = await getCurrentTopicContext(current_topic_id);
+    } catch (err) {
+      console.warn(
+        "[brief] current-topic context fetch failed:",
+        err instanceof Error ? err.message : err,
+      );
+    }
+  }
+
   // 2) Generate the brief content via the LLM fallback chain:
   //    Anthropic Claude → Gemini → throw.
   let content;
@@ -261,6 +293,7 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
       profile,
       extraContext: extra_context,
       pages,
+      currentTopic,
     });
     content = generated.content;
     provider = generated.provider;

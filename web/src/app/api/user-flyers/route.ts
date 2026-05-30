@@ -7,6 +7,7 @@ import { z } from "zod";
 import { auth } from "@/auth";
 import { db, schema } from "@/db";
 import { getOverviewInsights } from "@/lib/insights-data";
+import { getCurrentTopicContext } from "@/lib/dashboard-metrics";
 import { translateHadithToId } from "@/lib/hadith-translation";
 import { searchKitabBrowse, type KitabCorpus } from "@/lib/kitab-retrieval";
 import {
@@ -77,6 +78,12 @@ const CreateInput = z.object({
   // 2026-05-29 form expansion) keep working without sending them.
   tone: z.enum(TONES).optional().default("gentle"),
   audience: z.enum(AUDIENCES).optional().default("general"),
+  // Optional. When the user ticked includeNewsContext AND picked a
+  // specific topic from the dropdown, this carries its UUID. The route
+  // hydrates the topic's keywords + 5 sample headlines and threads
+  // them into the LLM prompt as a focused anchor instead of the broad
+  // top-category + top-5 trending aggregate.
+  selectedTopicId: z.string().uuid().nullable().optional(),
 });
 
 // Corpora to consult for daleel retrieval. Skip tafsir (commentary, not
@@ -157,19 +164,49 @@ export async function POST(req: Request): Promise<NextResponse> {
     throw err;
   }
 
-  // Optional news context — only pulled when the user opted in. The
-  // overview helper hits aggregate tables that are already cached.
-  let news = null;
+  // Optional news context — only pulled when the user opted in.
+  // Two modes:
+  //  · Specific topic picked from the dropdown → hydrate THAT topic's
+  //    keywords + 5 sample headlines so the LLM grounds the flyer in
+  //    concrete current conversation.
+  //  · No specific topic → fall back to the broad aggregate (top
+  //    category + top 5 trending topic labels).
+  let news: {
+    topCategory: string;
+    topTopics: string[];
+    pickedLabel?: string;
+    pickedKeywords?: string[];
+    pickedSampleHeadlines?: string[];
+  } | null = null;
   if (input.includeNewsContext) {
     try {
-      const overview = await getOverviewInsights();
-      const topCat = overview?.dominantCategories?.[0]?.category ?? null;
-      const trending = (overview?.trendingTopics ?? [])
-        .map((t) => t.label)
-        .filter(Boolean)
-        .slice(0, 5);
-      if (topCat) {
-        news = { topCategory: topCat, topTopics: trending };
+      if (input.selectedTopicId) {
+        const ctx = await getCurrentTopicContext(input.selectedTopicId);
+        if (ctx) {
+          news = {
+            // topCategory is required downstream as the "primary
+            // anchor"; reuse the picked topic's label there so the
+            // generator's existing schema doesn't need a new field.
+            topCategory: ctx.label,
+            topTopics: ctx.keywords.slice(0, 5),
+            pickedLabel: ctx.label,
+            pickedKeywords: ctx.keywords,
+            pickedSampleHeadlines: ctx.sampleHeadlines,
+          };
+        }
+      }
+      // Fallback: stale topic-id (deleted between page-load and submit)
+      // or no topic picked → broad aggregate.
+      if (!news) {
+        const overview = await getOverviewInsights();
+        const topCat = overview?.dominantCategories?.[0]?.category ?? null;
+        const trending = (overview?.trendingTopics ?? [])
+          .map((t) => t.label)
+          .filter(Boolean)
+          .slice(0, 5);
+        if (topCat) {
+          news = { topCategory: topCat, topTopics: trending };
+        }
       }
     } catch (err) {
       // Non-fatal — degrade to no-news-context mode.

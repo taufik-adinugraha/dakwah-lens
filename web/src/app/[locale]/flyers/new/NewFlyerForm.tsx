@@ -73,6 +73,9 @@ type Labels = {
   contentHelp: string;
   includeNewsLabel: string;
   includeNewsHint: string;
+  currentTopicLabel: string;
+  currentTopicHint: string;
+  currentTopicPlaceholder: string;
   visibilityLabel: string;
   visibilityPrivate: string;
   visibilityPrivateHint: string;
@@ -105,14 +108,25 @@ type Labels = {
 
 type Photo = { id: string; src: string };
 
+type PickerTopic = {
+  id: string;
+  label: string;
+  postCount: number;
+};
+
 export function NewFlyerForm({
   photos,
   initialQuota,
   labels,
+  currentTopics = [],
 }: {
   photos: Photo[];
   initialQuota: QuotaSnapshot;
   labels: Labels;
+  /** Topics surfaced in the dropdown that appears when `includeNews`
+   *  is ticked. Empty list hides the dropdown — flyer still generates
+   *  with the broad-aggregate news context. */
+  currentTopics?: PickerTopic[];
 }) {
   const [quota, setQuota] = useState<QuotaSnapshot>(initialQuota);
   const [layout, setLayout] = useState<Layout>("split-image");
@@ -132,6 +146,11 @@ export function NewFlyerForm({
   // not tied to a current event) don't want. Operator can opt-in
   // explicitly when their flyer DOES respond to news.
   const [includeNews, setIncludeNews] = useState(false);
+  // Optional. When the user picks a specific topic from the dropdown
+  // (shown only while `includeNews` is true), this carries its UUID
+  // through to the API. Empty string = "all current trends" (the
+  // historical broad-aggregate behaviour).
+  const [currentTopicId, setCurrentTopicId] = useState<string>("");
   const [visibility, setVisibility] = useState<"private" | "public">(
     "private",
   );
@@ -197,6 +216,8 @@ export function NewFlyerForm({
             imageRef,
             userPrompt: userPrompt.trim(),
             includeNewsContext: includeNews,
+            selectedTopicId:
+              includeNews && currentTopicId ? currentTopicId : null,
             visibility,
             tone,
             audience,
@@ -442,7 +463,11 @@ export function NewFlyerForm({
           <input
             type="checkbox"
             checked={includeNews}
-            onChange={(e) => setIncludeNews(e.target.checked)}
+            onChange={(e) => {
+              const checked = e.target.checked;
+              setIncludeNews(checked);
+              if (!checked) setCurrentTopicId("");
+            }}
             className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
           />
           <span>
@@ -454,6 +479,29 @@ export function NewFlyerForm({
             </span>
           </span>
         </label>
+
+        {includeNews && currentTopics.length > 0 && (
+          <div className="mt-3 ml-6">
+            <label className="block text-xs font-medium text-slate-700">
+              {labels.currentTopicLabel}
+            </label>
+            <p className="mt-0.5 text-[11px] leading-snug text-slate-500">
+              {labels.currentTopicHint}
+            </p>
+            <select
+              value={currentTopicId}
+              onChange={(e) => setCurrentTopicId(e.target.value)}
+              className="mt-1.5 block h-10 w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-200"
+            >
+              <option value="">{labels.currentTopicPlaceholder}</option>
+              {currentTopics.map((tp) => (
+                <option key={tp.id} value={tp.id}>
+                  {tp.label} · {tp.postCount.toLocaleString("en-US")}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           <div>

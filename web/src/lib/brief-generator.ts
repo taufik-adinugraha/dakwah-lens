@@ -380,6 +380,17 @@ export type GenerateBriefInput = {
   /** Target length in pages (1-4). Scales maxOutputTokens and gives the
    *  LLM a target word count. Default 2. */
   pages?: number;
+  /** Optional. When the user picked a currently-trending topic from the
+   *  brief form dropdown, this carries that topic's actual keywords +
+   *  5 sample headlines. The prompt threads them as "this week's
+   *  anchor coverage" so the brief grounds its examples in real
+   *  conversation rather than fabricated illustrations. */
+  currentTopic?: {
+    id: string;
+    label: string;
+    keywords: string[];
+    sampleHeadlines: string[];
+  } | null;
 };
 
 export type GeneratedBrief = {
@@ -403,6 +414,7 @@ export async function generateBriefContent(
     profile,
     extraContext,
     pages = 2,
+    currentTopic,
   } = input;
 
   const segLabel = SEGMENT_LABELS[segment]?.[locale] ?? segment;
@@ -432,6 +444,28 @@ export async function generateBriefContent(
 
   const profileBlock = renderProfileBlock(profile);
   const trimmedExtra = extraContext?.trim() ?? "";
+
+  // When the user anchored this brief to a currently-trending topic
+  // (dropdown on the brief form), render it as a "this week's anchor
+  // coverage" block. Tells the LLM: ground your contemporary examples
+  // in THESE concrete headlines + keywords, not in generic invented
+  // events. Without it, the LLM hallucinates plausible-sounding stories
+  // that won't match what readers actually saw this week.
+  const currentTopicBlock =
+    currentTopic && currentTopic.sampleHeadlines.length > 0
+      ? [
+          "",
+          `This week's anchor coverage (USER PICKED — ground your contemporary examples in this conversation, not in invented stories):`,
+          `- Topic label: "${currentTopic.label}"`,
+          currentTopic.keywords.length > 0
+            ? `- Keywords trending in this topic: ${currentTopic.keywords.join(", ")}`
+            : "",
+          `- Sample headlines from this week's actual posts under this topic (use 2-3 as concrete illustrations; do NOT name outlets — use framings like "from this week's news we hear…"):`,
+          ...currentTopic.sampleHeadlines.map((h, i) => `  ${i + 1}. ${h}`),
+        ]
+          .filter(Boolean)
+          .join("\n")
+      : "";
 
   // Hijri calendar context — surfaces today's Hijri date + curated
   // events in the next 7-10 days so the brief's sunnah / du'a
@@ -511,6 +545,7 @@ export async function generateBriefContent(
     trimmedExtra
       ? `\nAdditional context from the da'i for THIS brief — weight this heavily, it overrides defaults where they conflict:\n${trimmedExtra}`
       : "",
+    currentTopicBlock,
     "",
     "RETRIEVED DALEEL (chosen by semantic search; do not invent more):",
     daleelBlock,

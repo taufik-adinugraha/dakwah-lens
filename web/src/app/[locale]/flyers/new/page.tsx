@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { getAssetsByKind } from "@/lib/flyer/images/registry";
 import { getQuotaSnapshot } from "@/lib/user-flyer/quota";
+import { getCurrentTopicsForPicker } from "@/lib/dashboard-metrics";
 import { Link } from "@/i18n/navigation";
 
 import { NewFlyerForm } from "./NewFlyerForm";
@@ -30,11 +31,16 @@ export default async function NewFlyerPage({
 
   const t = await getTranslations("UserFlyers");
 
-  const [photos, quota] = await Promise.all([
+  const [photos, quota, currentTopics] = await Promise.all([
     // Only photos — ornaments / patterns are decorative and don't make
     // sense as a primary visual for a user-authored flyer.
     getAssetsByKind("photo"),
     getQuotaSnapshot(session.user.id),
+    // Topics surfaced in the "pick a specific current topic" dropdown
+    // that appears once the user ticks "Sertakan konteks berita pekan
+    // ini". Empty (cold start) → dropdown stays hidden; flyer still
+    // generates with the broad-aggregate news context.
+    getCurrentTopicsForPicker(20),
   ]);
 
   return (
@@ -51,11 +57,15 @@ export default async function NewFlyerPage({
       <NewFlyerForm
         photos={photos.map((p) => ({ id: p.id, src: p.src }))}
         initialQuota={quota}
+        currentTopics={currentTopics}
         labels={{
           stepLayout: t("step_layout"),
           stepImage: t("step_image"),
           stepContent: t("step_content"),
           stepSettings: t("step_settings"),
+          currentTopicLabel: t("current_topic_label"),
+          currentTopicHint: t("current_topic_hint"),
+          currentTopicPlaceholder: t("current_topic_placeholder"),
           layouts: {
             "hero-ayat": {
               title: t("layout_hero_ayat"),
