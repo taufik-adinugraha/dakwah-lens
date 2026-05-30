@@ -202,6 +202,104 @@ STATIC_THEMES: list[dict[str, Any]] = [
         "exclude_keywords": [],
         "min_similarity": MIN_SIMILARITY,
     },
+    # ── Added 2026-05-30 after audit of the 838 unclassified posts
+    #    showed ~40% had no matching theme. These 4 cover the most
+    #    common "missing theme" patterns from that audit.
+    {
+        "label": "Bisnis & Wirausaha",
+        "keywords": [
+            "wirausaha",
+            "umkm",
+            "entrepreneur",
+            "bisnis",
+            "modal usaha",
+            "kewirausahaan",
+        ],
+        "exclude_keywords": ["judol", "judi online", "pinjol"],
+        "min_similarity": MIN_SIMILARITY,
+    },
+    {
+        "label": "Pemerintahan & Otonomi Daerah",
+        "keywords": [
+            "pemerintahan",
+            "otonomi daerah",
+            "kebijakan publik",
+            "birokrasi",
+            "pelayanan publik",
+            "kepala daerah",
+        ],
+        "exclude_keywords": ["korupsi"],
+        "min_similarity": MIN_SIMILARITY,
+    },
+    {
+        "label": "Kesehatan Mental & Kesejahteraan Jiwa",
+        "keywords": [
+            "kesehatan mental",
+            "depresi",
+            "stres",
+            "burnout",
+            "kecemasan",
+            "bunuh diri",
+        ],
+        "exclude_keywords": [],
+        "min_similarity": MIN_SIMILARITY,
+    },
+    {
+        "label": "Polemik Aqidah & Sektarian",
+        "keywords": [
+            "aqidah",
+            "syiah",
+            "ahmadiyah",
+            "aliran sesat",
+            "sektarian",
+            "polemik teologi",
+        ],
+        "exclude_keywords": ["mualaf", "hijrah"],
+        "min_similarity": MIN_SIMILARITY,
+    },
+    # ── Added 2026-05-30 (round 2) after grouping infrastructure made
+    #    a wider static set safe to dashboard. These are the most-
+    #    frequent missing-theme patterns from the 20-post audit that
+    #    weren't covered by the round-1 additions.
+    {
+        "label": "Inspirasi & Kisah Hidup Pribadi",
+        "keywords": [
+            "kisah inspirasi",
+            "perjalanan hidup",
+            "pengalaman pribadi",
+            "renungan",
+            "motivasi",
+            "pelajaran hidup",
+        ],
+        "exclude_keywords": ["hijrah", "mualaf"],
+        "min_similarity": MIN_SIMILARITY,
+    },
+    {
+        "label": "Toleransi & Lintas-Iman",
+        "keywords": [
+            "toleransi",
+            "keberagaman",
+            "lintas iman",
+            "kerukunan umat",
+            "pluralisme",
+            "moderasi beragama",
+        ],
+        "exclude_keywords": [],
+        "min_similarity": MIN_SIMILARITY,
+    },
+    {
+        "label": "Crypto, Trading & Investasi Spekulatif",
+        "keywords": [
+            "crypto",
+            "kripto",
+            "trading saham",
+            "investasi saham",
+            "fintech",
+            "spekulasi finansial",
+        ],
+        "exclude_keywords": ["judol", "judi online", "pinjol"],
+        "min_similarity": MIN_SIMILARITY,
+    },
 ]
 
 # Render the static labels into the prompt so Gemini knows not to propose
@@ -217,7 +315,7 @@ IMPORTANT — STATIC THEMES ARE ALREADY GUARANTEED, DO NOT DUPLICATE THEM:
 The downstream system automatically appends the following CHRONIC da'wah-concern themes to every run, even if you don't propose them. DO NOT include any of these in your output (they'd be duplicates and waste a slot):
 {_STATIC_LABEL_LIST}
 
-Your job: propose 8-12 DYNAMIC themes for what's distinctive about THIS WEEK's conversation — emerging stories, new patterns, week-specific events, broad domains (politics, education, health, lifestyle, sport) — that the static themes above don't already capture. The static themes are narrow chronic-concern slots; you should still cover the BREADTH of this week's pool with your dynamic themes. Lean toward MORE themes when the pool spans many domains: undersizing pushes 20-30% of posts into an "uncategorized" bucket that's then useless for analysis. For each theme:
+Your job: propose 12-16 DYNAMIC themes for what's distinctive about THIS WEEK's conversation — emerging stories, new patterns, week-specific events, broad domains (politics, education, health, lifestyle, sport) — that the static themes above don't already capture. The static themes are narrow chronic-concern slots; you should still cover the BREADTH of this week's pool with your dynamic themes. The downstream UI groups themes into ~10 thematic clusters (Hukum & Keadilan, Sosial & Keluarga, Ekonomi & Bisnis, Aqidah & Spiritualitas, Kesehatan & Kehidupan, Pendidikan, Lingkungan & Bencana, Pemerintahan, Patologi Sosial Digital, Konflik Global) so a higher theme count won't clutter the dashboard — readers see the groups first and can drill into fine themes when needed. Lean toward MORE themes when the pool spans many domains: undersizing pushes 20-30% of posts into an "uncategorized" bucket that's then useless for analysis. For each theme:
 - label: short human-readable name in Bahasa Indonesia (3-6 words). Be CONCRETE about what the theme is — name the actual subject matter, not a generic newsroom department.
 
   GOOD labels — concrete, name what the cluster is actually about:

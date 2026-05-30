@@ -1686,7 +1686,132 @@ export type TopicBucket = {
   keywords: string[];
   count: number;
   pct: number;
+  /** Coarse-grained group (e.g. "Hukum & Keadilan", "Ekonomi & Bisnis").
+   *  Derived from the topic label via THEME_GROUPS regex matching.
+   *  UI can use this to render a collapsed group-first view that
+   *  expands into the fine themes. */
+  group: string;
 };
+
+/** Maps fine-grained topic labels to coarse-grained groups. Each group
+ *  has 0+ regex patterns; the first match wins. Labels that match no
+ *  pattern fall into "Lainnya" (catch-all group, NOT the same as the
+ *  Tidak Terklasifikasi fallback topic).
+ *
+ *  Defined in code (not DB) so it can be edited freely without
+ *  migrations and applied as a presentation projection. Static themes
+ *  always end up in their intended group; dynamic Gemini themes match
+ *  by regex on their generated label. */
+export const THEME_GROUPS: ReadonlyArray<{ group: string; patterns: RegExp[] }> = [
+  {
+    group: "Hukum & Keadilan",
+    patterns: [
+      /korupsi/i,
+      /pengkhianatan amanah/i,
+      /kriminalitas/i,
+      /kejahatan/i,
+      /pembunuhan/i,
+      /penipuan/i,
+    ],
+  },
+  {
+    group: "Sosial & Keluarga",
+    patterns: [
+      /kekerasan seksual/i,
+      /perlindungan anak/i,
+      /isu sosial/i,
+      /keluarga/i,
+      /kdrt/i,
+    ],
+  },
+  {
+    group: "Ekonomi & Bisnis",
+    patterns: [
+      /ekonomi/i,
+      /kesejahteraan rakyat/i,
+      /bisnis/i,
+      /wirausaha/i,
+      /rupiah/i,
+      /crypto/i,
+      /trading/i,
+      /investasi/i,
+      /umkm/i,
+    ],
+  },
+  {
+    group: "Aqidah & Spiritualitas",
+    patterns: [
+      /ibadah/i,
+      /haji/i,
+      /kurban/i,
+      /idul adha/i,
+      /hijrah/i,
+      /mualaf/i,
+      /inspirasi spiritual/i,
+      /fatwa/i,
+      /hukum islam/i,
+      /polemik aqidah/i,
+      /sektarian/i,
+    ],
+  },
+  {
+    group: "Kesehatan & Kehidupan",
+    patterns: [/kesehatan/i, /penyakit/i, /kesehatan mental/i, /kesejahteraan jiwa/i],
+  },
+  {
+    group: "Pendidikan & SDM",
+    patterns: [/pendidikan/i, /sekolah/i, /literasi/i, /sdm/i, /kualitas sdm/i],
+  },
+  {
+    group: "Lingkungan & Bencana",
+    patterns: [/bencana/i, /lingkungan/i, /pengelolaan sampah/i, /tragedi/i],
+  },
+  {
+    group: "Pemerintahan & Kebijakan",
+    patterns: [
+      /pemerintahan/i,
+      /otonomi daerah/i,
+      /kebijakan publik/i,
+      /birokrasi/i,
+      /otda/i,
+    ],
+  },
+  {
+    group: "Patologi Sosial Digital",
+    patterns: [/judi online/i, /pinjol/i, /pinjaman online/i, /narkoba/i, /penyalahgunaan obat/i],
+  },
+  {
+    group: "Konflik & Geopolitik",
+    patterns: [
+      /palestina/i,
+      /solidaritas umat/i,
+      /konflik internasional/i,
+      /hubungan internasional/i,
+      /geopolitik/i,
+    ],
+  },
+  {
+    group: "Inspirasi & Kisah Pribadi",
+    patterns: [/inspirasi/i, /kisah hidup/i, /pengalaman pribadi/i, /renungan/i, /motivasi/i],
+  },
+  {
+    group: "Toleransi & Lintas-Iman",
+    patterns: [/toleransi/i, /keberagaman/i, /lintas[\s-]?iman/i, /moderasi beragama/i, /pluralisme/i],
+  },
+];
+
+/** Apply THEME_GROUPS to derive the coarse group for a topic label.
+ *  First-match wins. Falls back to "Lainnya" when no pattern matches —
+ *  this is distinct from the "Tidak Terklasifikasi" fallback topic
+ *  (which is a topic that lives in the topics table). "Lainnya" here
+ *  means "we have a topic but it doesn't fit any of our groups yet,"
+ *  which is a signal to extend THEME_GROUPS rather than a problem. */
+export function classifyThemeGroup(label: string): string {
+  for (const { group, patterns } of THEME_GROUPS) {
+    if (patterns.some((p) => p.test(label))) return group;
+  }
+  return "Lainnya";
+}
 
 export type PickerTopic = {
   id: string;
@@ -1857,6 +1982,7 @@ export async function getTopicDistribution7d(
       keywords: kw.slice(0, 5),
       count,
       pct: total > 0 ? (count / total) * 100 : 0,
+      group: classifyThemeGroup(r.label),
     };
   });
 }
