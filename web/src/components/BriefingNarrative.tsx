@@ -116,7 +116,9 @@ export function BriefingNarrative({
   /** Deep-link slug: opens the matching modal on mount. */
   initialDeliverable?:
     | "khutbah"
+    | "kultum"
     | "kajian"
+    | "kisah"
     | "home"
     | "content"
     | "genz"

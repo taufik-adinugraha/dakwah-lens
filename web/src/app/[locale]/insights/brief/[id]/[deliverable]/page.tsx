@@ -13,7 +13,9 @@ import {
  * Deep-link sub-route for a single Section-4 deliverable inside a brief.
  *
  *   /insights/brief/{slug}/khutbah   → opens the Khutbah Jumat modal
+ *   /insights/brief/{slug}/kultum    → opens Kultum modal
  *   /insights/brief/{slug}/kajian    → opens Kajian Ibu-ibu modal
+ *   /insights/brief/{slug}/kisah     → opens Kisah dari Hadits modal
  *   /insights/brief/{slug}/home      → opens Pengajaran di Rumah modal
  *   /insights/brief/{slug}/content   → opens Kreator Konten Digital modal
  *   /insights/brief/{slug}/genz      → opens Pendekatan Gen Z modal
@@ -30,7 +32,9 @@ import {
 
 const VALID_SLUGS: ReadonlySet<DeliverableSlug> = new Set([
   "khutbah",
+  "kultum",
   "kajian",
+  "kisah",
   "home",
   "content",
   "genz",

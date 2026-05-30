@@ -824,7 +824,15 @@ export async function getDawahCategoryReachDelta(
  * ───────────────────────────────────────────────────────────── */
 
 export type KitDeliverable = {
-  slug: "khutbah" | "kajian" | "home" | "content" | "genz" | "action";
+  slug:
+    | "khutbah"
+    | "kultum"
+    | "kajian"
+    | "kisah"
+    | "home"
+    | "content"
+    | "genz"
+    | "action";
   title: string;
   excerpt: string;
   href: string;
@@ -908,7 +916,9 @@ const KIT_DEFS: ReadonlyArray<{
   matcher: RegExp;
 }> = [
   { slug: "khutbah", title: "Khutbah Jumat", matcher: /khutbah|friday/i },
+  { slug: "kultum", title: "Kultum", matcher: /kultum|short\s*talk/i },
   { slug: "kajian", title: "Kajian Ibu-ibu", matcher: /kajian|majelis/i },
+  { slug: "kisah", title: "Kisah dari Hadits", matcher: /kisah|story\s+from/i },
   { slug: "home", title: "Pengajaran di Rumah", matcher: /rumah|home|teaching at/i },
   { slug: "content", title: "Kreator Konten", matcher: /konten|kreator|content creator|digital content/i },
   {

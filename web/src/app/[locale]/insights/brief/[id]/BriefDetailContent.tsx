@@ -26,7 +26,9 @@ import { BriefPagination } from "./BriefPagination";
  */
 export type DeliverableSlug =
   | "khutbah"
+  | "kultum"
   | "kajian"
+  | "kisah"
   | "home"
   | "content"
   | "genz"
