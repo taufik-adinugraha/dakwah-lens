@@ -100,11 +100,124 @@ MIN_POSTS_FOR_FALLBACK = 10
 EMBED_BATCH = 1000
 
 
-SYSTEM_PROMPT = """You analyze recent Indonesian posts and group them into themes that describe what the conversation is actually about this week. Output is consumed by da'wah analysts, but YOUR job is to map the conversation faithfully — not to force every theme through a da'wah lens. Some themes will have an obvious da'wah angle (haji, korupsi, palestina); others (health, education, sport, lifestyle, finance) won't, and that's fine — surface them anyway so the analyst can decide which to act on.
+# Static themes: ALWAYS present in the final theme set, regardless of what
+# Gemini proposes this run. These are chronic da'wah-relevant concerns the
+# project has decided should never disappear between reclusters even when
+# the week's content drifts away from them.
+#
+# Each row has the same shape as the dynamic themes Gemini returns:
+# `label`, `keywords`, `exclude_keywords`, `min_similarity`. The
+# embedding + cosine-floor assignment treats them identically — what
+# makes them "static" is just that they're guaranteed to be in the theme
+# set every run.
+#
+# Rationale for each (chosen 2026-05-30):
+#   · Korupsi & Pengkhianatan Amanah — chronic Indonesia issue, high da'wah hook
+#   · Kekerasan Seksual & Perlindungan Anak — recurring + critical
+#   · Judi Online & Pinjaman Online — Indonesia-specific scourge (Gemini
+#     dropped this in 2026-05-30 recluster; that's the kind of volatility
+#     this static set fixes)
+#   · Narkoba & Penyalahgunaan Obat — chronic public-health crisis
+#   · Konflik Palestina & Solidaritas Umat — ongoing global concern for ummah
+#   · Hijrah, Mualaf & Inspirasi Spiritual — captures personal-devotion +
+#     mualaf-story content that historically lands in unclassified
+#   · Fatwa & Hukum Islam Kontemporer — captures ulama/fatwa news that
+#     also historically lands in unclassified
+#
+# To add/remove: edit this list. The prompt explicitly tells Gemini the
+# static labels so it won't propose duplicates.
+STATIC_THEMES: list[dict[str, Any]] = [
+    {
+        "label": "Korupsi & Pengkhianatan Amanah",
+        "keywords": ["korupsi", "suap", "gratifikasi", "kpk", "ghulul", "amanah pejabat"],
+        "exclude_keywords": [],
+        "min_similarity": MIN_SIMILARITY,
+    },
+    {
+        "label": "Kekerasan Seksual & Perlindungan Anak",
+        "keywords": [
+            "pelecehan seksual",
+            "kekerasan anak",
+            "pesantren cabul",
+            "perlindungan anak",
+            "kdrt",
+        ],
+        "exclude_keywords": [],
+        "min_similarity": MIN_SIMILARITY,
+    },
+    {
+        "label": "Judi Online & Pinjaman Online",
+        "keywords": ["judol", "judi online", "pinjol", "slot online", "paylater"],
+        "exclude_keywords": [
+            "wedding organizer",
+            "WO",
+            "saham",
+            "investasi",
+            "game developer",
+        ],
+        "min_similarity": MIN_SIMILARITY,
+    },
+    {
+        "label": "Narkoba & Penyalahgunaan Obat",
+        "keywords": ["narkoba", "sabu", "pil koplo", "bnn", "kecanduan obat"],
+        "exclude_keywords": [],
+        "min_similarity": MIN_SIMILARITY,
+    },
+    {
+        "label": "Konflik Palestina & Solidaritas Umat",
+        "keywords": [
+            "palestina",
+            "gaza",
+            "mustadh'afin",
+            "solidaritas",
+            "israel",
+            "al-quds",
+        ],
+        "exclude_keywords": ["skin care", "skincare", "putih instan", "Afghanistan"],
+        "min_similarity": MIN_SIMILARITY,
+    },
+    {
+        "label": "Hijrah, Mualaf & Inspirasi Spiritual",
+        "keywords": [
+            "hijrah",
+            "mualaf",
+            "taubat",
+            "kisah inspirasi",
+            "dakwah personal",
+            "perjalanan iman",
+        ],
+        "exclude_keywords": [],
+        "min_similarity": MIN_SIMILARITY,
+    },
+    {
+        "label": "Fatwa & Hukum Islam Kontemporer",
+        "keywords": [
+            "fatwa",
+            "hukum islam",
+            "ulama",
+            "mui",
+            "kontroversi keagamaan",
+            "ijtihad",
+        ],
+        "exclude_keywords": [],
+        "min_similarity": MIN_SIMILARITY,
+    },
+]
+
+# Render the static labels into the prompt so Gemini knows not to propose
+# duplicates. Kept in sync with STATIC_THEMES automatically.
+_STATIC_LABEL_LIST = "\n".join(f"  - {t['label']}" for t in STATIC_THEMES)
+
+
+SYSTEM_PROMPT = f"""You analyze recent Indonesian posts and group them into themes that describe what the conversation is actually about this week. Output is consumed by da'wah analysts, but YOUR job is to map the conversation faithfully — not to force every theme through a da'wah lens. Some themes will have an obvious da'wah angle (haji, korupsi, palestina); others (health, education, sport, lifestyle, finance) won't, and that's fine — surface them anyway so the analyst can decide which to act on.
 
 The posts you receive have already been pre-filtered for da'wah relevance — they DO have a hook. Your job is to find what the week's conversation is, not to re-classify whether each post is relevant.
 
-Return 8-12 distinct themes (target: closer to 10-12 when the input pool is large, e.g. >200 posts; closer to 8-10 when it's smaller). Lean toward MORE themes when the pool spans many domains: undersizing pushes 20-30% of posts into an "uncategorized" bucket that's then useless for analysis. For each theme:
+IMPORTANT — STATIC THEMES ARE ALREADY GUARANTEED, DO NOT DUPLICATE THEM:
+The downstream system automatically appends the following CHRONIC da'wah-concern themes to every run, even if you don't propose them. DO NOT include any of these in your output (they'd be duplicates and waste a slot):
+{_STATIC_LABEL_LIST}
+
+Your job: propose 5-7 DYNAMIC themes for what's distinctive about THIS WEEK's conversation — emerging stories, new patterns, week-specific events — that the static themes above don't already capture. Lean toward MORE themes when the pool spans many domains: undersizing pushes 20-30% of posts into an "uncategorized" bucket that's then useless for analysis. For each theme:
 - label: short human-readable name in Bahasa Indonesia (3-6 words). Be CONCRETE about what the theme is — name the actual subject matter, not a generic newsroom department.
 
   GOOD labels — concrete, name what the cluster is actually about:
@@ -389,9 +502,33 @@ def discover_topics(
                 "min_similarity": per_theme_floor,
             }
         )
+
+    # Merge static themes. Drop any dynamic theme whose label collides
+    # with a static theme (Gemini occasionally proposes one despite the
+    # prompt directive — static wins because its keywords are curated
+    # and stable across runs). Static themes are deep-copied so the
+    # downstream embedding+assignment doesn't mutate the global constant.
+    static_labels_lower = {t["label"].strip().lower() for t in STATIC_THEMES}
+    themes = [t for t in themes if t["label"].strip().lower() not in static_labels_lower]
+    themes.extend(
+        {
+            "label": t["label"],
+            "keywords": list(t["keywords"]),
+            "exclude_keywords": list(t.get("exclude_keywords") or []),
+            "min_similarity": float(t.get("min_similarity") or MIN_SIMILARITY),
+        }
+        for t in STATIC_THEMES
+    )
+
     if not themes:
         log.warning("topic_discovery.no_themes_named", platform=platform)
         return []
+    log.info(
+        "topic_discovery.themes_assembled",
+        dynamic_count=len(themes) - len(STATIC_THEMES),
+        static_count=len(STATIC_THEMES),
+        total=len(themes),
+    )
 
     # Embed themes + posts, then assign each post to its nearest theme.
     # Theme text = label + keywords so both the human-facing name and the
