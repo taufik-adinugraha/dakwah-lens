@@ -232,6 +232,33 @@ export type BriefContent = {
   situation_summary: string;
   issue_analysis: string;
   daleel: BriefDaleel[];
+  /** Per-platform post-count + sentiment snapshot for the topic, captured
+   *  at draft-generation time so the "Statistik" section on the detail
+   *  page stays a frozen-in-time view (rather than re-querying each
+   *  visit and drifting). Optional — older briefs (pre-2026-05-31)
+   *  don't have it; the UI skips the section when absent. */
+  platform_stats?: Array<{
+    platform: string;
+    total: number;
+    positive: number;
+    neutral: number;
+    negative: number;
+    other: number;
+  }>;
+  /** Sample posts threaded into the LLM prompt at draft-generation time.
+   *  Persisted so the draft detail page can render a "Sumber percakapan"
+   *  section — visible evidence of what real ingestion data the
+   *  paragraph-1 platform breakdown was grounded in. Optional on legacy
+   *  briefs. */
+  platform_samples?: Array<{
+    platform: string;
+    samples: Array<{
+      text: string;
+      author: string | null;
+      postedAt: string | null;
+      sentimentLabel: string | null;
+    }>;
+  }>;
   /** Audience-tailored sections — deprecated for new drafts as of
    *  2026-05-31. Drafts are now audience-neutral research scaffolds; the
    *  audience-specific work (perception, angle, recommendations,

@@ -17,7 +17,10 @@ import {
 import { generateBriefContent } from "@/lib/brief-generator";
 import { computeCost, estimateBriefCost } from "@/lib/brief-cost";
 import { getCurrentTopicContext } from "@/lib/dashboard-metrics";
-import { getPlatformSamplesForTopic } from "@/lib/draft-grounding";
+import {
+  getPlatformSamplesForTopic,
+  getPlatformStatsForTopic,
+} from "@/lib/draft-grounding";
 import { currentWeekStartUtc } from "@/lib/user-flyer/quota";
 import { LlmUnavailableError } from "@/lib/llm";
 import type { BriefDaleel, UserProfile } from "@/db/schema";
@@ -314,25 +317,50 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
     }
   }
 
-  // Real per-platform sample posts for the topic. Threads actual
-  // social_posts rows into the prompt so paragraph 1 (the platform
-  // breakdown) cites real conversations instead of the LLM's
-  // training-data stereotypes of each platform. Two match paths:
-  // topic_id when the user picked a trending topic, ILIKE-keyword
-  // match otherwise. Best-effort: query failure or zero samples just
-  // degrades to a no-platform-grounding draft (prompt tells the LLM
-  // to label para 1 as "pola umum" in that case).
+  // Real per-platform sample posts + per-platform sentiment stats for
+  // the topic. Both go through the SAME topic_id resolution path the
+  // weekly briefings use (no ILIKE on text). Best-effort: query
+  // failure or zero matches just degrades to a no-platform-grounding
+  // draft. Fetched in parallel since they share the resolution cost
+  // but query distinct subsets.
   let platformSamples: Awaited<
     ReturnType<typeof getPlatformSamplesForTopic>
   > = [];
+  let platformStats: Awaited<
+    ReturnType<typeof getPlatformStatsForTopic>
+  > = [];
   try {
-    platformSamples = await getPlatformSamplesForTopic({
-      topicText: topic_title,
-      topicId: current_topic_id ?? null,
-    });
+    [platformSamples, platformStats] = await Promise.all([
+      getPlatformSamplesForTopic({
+        topicText: topic_title,
+        topicId: current_topic_id ?? null,
+      }),
+      getPlatformStatsForTopic({
+        topicText: topic_title,
+        topicId: current_topic_id ?? null,
+      }),
+    ]);
+    const totalSamples = platformSamples.reduce(
+      (acc, g) => acc + g.samples.length,
+      0,
+    );
+    const totalPosts = platformStats.reduce((acc, s) => acc + s.total, 0);
+    console.info(
+      "[brief] platform grounding:",
+      JSON.stringify({
+        topic: topic_title.slice(0, 80),
+        topic_id_provided: !!current_topic_id,
+        samples_fetched: totalSamples,
+        posts_in_stats: totalPosts,
+        per_platform: platformStats.map((s) => ({
+          p: s.platform,
+          n: s.total,
+        })),
+      }),
+    );
   } catch (err) {
     console.warn(
-      "[brief] platform-samples fetch failed:",
+      "[brief] platform-grounding fetch failed:",
       err instanceof Error ? err.message : err,
     );
   }
@@ -402,6 +430,33 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
         }).totalUsd
       : null;
 
+  // Freeze the grounding snapshot onto the brief BEFORE insert.
+  // Stats + samples are computed at draft-generation time; persisting
+  // them means the detail page renders the same numbers later even
+  // after ingestion has moved on, AND gives the da'i visible
+  // evidence ("Sumber percakapan" section) of which real posts the
+  // LLM's paragraph-1 platform breakdown was anchored to.
+  const contentWithGrounding = {
+    ...content,
+    platform_stats: platformStats.map((s) => ({
+      platform: s.platform,
+      total: s.total,
+      positive: s.positive,
+      neutral: s.neutral,
+      negative: s.negative,
+      other: s.other,
+    })),
+    platform_samples: platformSamples.map((g) => ({
+      platform: g.platform,
+      samples: g.samples.map((s) => ({
+        text: s.text,
+        author: s.author,
+        postedAt: s.postedAt,
+        sentimentLabel: s.sentimentLabel,
+      })),
+    })),
+  };
+
   const [row] = await db
     .insert(schema.briefs)
     .values({
@@ -411,7 +466,7 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
       tone,
       locale,
       isPlaceholder: false,
-      content,
+      content: contentWithGrounding,
       status: "draft",
       tokensIn,
       tokensOut,

@@ -4,8 +4,10 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { eq, and } from "drizzle-orm";
 import {
   ArrowLeft,
+  BarChart3,
   BookOpenCheck,
   ChevronRight,
+  MessageSquareText,
   Sparkles,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
@@ -101,6 +103,23 @@ export default async function BriefDetailPage({
         </p>
       </Section>
 
+      {content.platform_stats && content.platform_stats.some((s) => s.total > 0) && (
+        <Section icon={BarChart3} title={t("section_statistics")}>
+          <PlatformStatsTable
+            stats={content.platform_stats}
+            labels={{
+              platform: t("stats_platform"),
+              total: t("stats_total"),
+              positive: t("stats_positive"),
+              neutral: t("stats_neutral"),
+              negative: t("stats_negative"),
+              other: t("stats_other"),
+              empty: t("stats_empty_row"),
+            }}
+          />
+        </Section>
+      )}
+
       <Section icon={ChevronRight} title={t("section_analysis")}>
         <div className="prose prose-slate max-w-none text-pretty leading-relaxed text-slate-700 prose-p:my-3 prose-li:my-1 prose-strong:text-slate-900 prose-ul:my-3">
           <ReactMarkdown>{content.issue_analysis}</ReactMarkdown>
@@ -114,6 +133,26 @@ export default async function BriefDetailPage({
           ))}
         </div>
       </Section>
+
+      {content.platform_samples &&
+        content.platform_samples.some((g) => g.samples.length > 0) && (
+          <Section icon={MessageSquareText} title={t("section_sources")}>
+            <p className="text-xs leading-relaxed text-slate-500">
+              {t("section_sources_hint")}
+            </p>
+            <div className="mt-3 space-y-4">
+              {content.platform_samples.map((group) =>
+                group.samples.length === 0 ? null : (
+                  <PlatformSampleGroup
+                    key={group.platform}
+                    group={group}
+                    platformLabel={platformLabel(group.platform)}
+                  />
+                ),
+              )}
+            </div>
+          </Section>
+        )}
 
       <div className="mt-12 print:hidden">
         <DeliverableGeneratorForm
@@ -148,6 +187,188 @@ function Section({
       </div>
       <div className="mt-3">{children}</div>
     </section>
+  );
+}
+
+const PLATFORM_LABEL: Record<string, string> = {
+  x: "X (Twitter)",
+  tiktok: "TikTok",
+  instagram: "Instagram",
+  youtube: "YouTube",
+  mainstream: "Berita arus utama",
+};
+
+function platformLabel(p: string): string {
+  return PLATFORM_LABEL[p] ?? p;
+}
+
+type PlatformStatRow = {
+  platform: string;
+  total: number;
+  positive: number;
+  neutral: number;
+  negative: number;
+  other: number;
+};
+
+function PlatformStatsTable({
+  stats,
+  labels,
+}: {
+  stats: PlatformStatRow[];
+  labels: {
+    platform: string;
+    total: string;
+    positive: string;
+    neutral: string;
+    negative: string;
+    other: string;
+    empty: string;
+  };
+}) {
+  const grandTotal = stats.reduce((a, s) => a + s.total, 0);
+  return (
+    <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-slate-200 bg-slate-50/60 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+            <th className="px-4 py-2">{labels.platform}</th>
+            <th className="px-4 py-2 text-right">{labels.total}</th>
+            <th className="px-4 py-2 text-right text-emerald-700">
+              {labels.positive}
+            </th>
+            <th className="px-4 py-2 text-right text-slate-700">
+              {labels.neutral}
+            </th>
+            <th className="px-4 py-2 text-right text-rose-700">
+              {labels.negative}
+            </th>
+            <th className="px-4 py-2 text-right text-slate-500">
+              {labels.other}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {stats.map((s) => {
+            const isEmpty = s.total === 0;
+            return (
+              <tr
+                key={s.platform}
+                className="border-b border-slate-100 last:border-b-0"
+              >
+                <td className="px-4 py-2 font-medium text-slate-900">
+                  {platformLabel(s.platform)}
+                </td>
+                {isEmpty ? (
+                  <td
+                    colSpan={5}
+                    className="px-4 py-2 text-right text-xs italic text-slate-400"
+                  >
+                    {labels.empty}
+                  </td>
+                ) : (
+                  <>
+                    <td className="px-4 py-2 text-right font-semibold tabular-nums text-slate-900">
+                      {s.total.toLocaleString("id-ID")}
+                    </td>
+                    <td className="px-4 py-2 text-right tabular-nums text-emerald-700">
+                      {s.positive.toLocaleString("id-ID")}
+                    </td>
+                    <td className="px-4 py-2 text-right tabular-nums text-slate-700">
+                      {s.neutral.toLocaleString("id-ID")}
+                    </td>
+                    <td className="px-4 py-2 text-right tabular-nums text-rose-700">
+                      {s.negative.toLocaleString("id-ID")}
+                    </td>
+                    <td className="px-4 py-2 text-right tabular-nums text-slate-500">
+                      {s.other.toLocaleString("id-ID")}
+                    </td>
+                  </>
+                )}
+              </tr>
+            );
+          })}
+          <tr className="bg-slate-50/60 font-semibold">
+            <td className="px-4 py-2 text-slate-700">Σ</td>
+            <td className="px-4 py-2 text-right tabular-nums text-slate-900">
+              {grandTotal.toLocaleString("id-ID")}
+            </td>
+            <td className="px-4 py-2 text-right tabular-nums text-emerald-700">
+              {stats
+                .reduce((a, s) => a + s.positive, 0)
+                .toLocaleString("id-ID")}
+            </td>
+            <td className="px-4 py-2 text-right tabular-nums text-slate-700">
+              {stats.reduce((a, s) => a + s.neutral, 0).toLocaleString("id-ID")}
+            </td>
+            <td className="px-4 py-2 text-right tabular-nums text-rose-700">
+              {stats
+                .reduce((a, s) => a + s.negative, 0)
+                .toLocaleString("id-ID")}
+            </td>
+            <td className="px-4 py-2 text-right tabular-nums text-slate-500">
+              {stats.reduce((a, s) => a + s.other, 0).toLocaleString("id-ID")}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+type PlatformSampleEntry = {
+  text: string;
+  author: string | null;
+  postedAt: string | null;
+  sentimentLabel: string | null;
+};
+
+function PlatformSampleGroup({
+  group,
+  platformLabel,
+}: {
+  group: { platform: string; samples: PlatformSampleEntry[] };
+  platformLabel: string;
+}) {
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white p-4">
+      <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+        {platformLabel}
+      </p>
+      <ul className="mt-2 space-y-3 text-sm leading-relaxed">
+        {group.samples.map((s, i) => {
+          const meta = [
+            s.author ? `@${s.author}` : null,
+            s.postedAt ? new Date(s.postedAt).toLocaleDateString("id-ID") : null,
+          ]
+            .filter(Boolean)
+            .join(" · ");
+          const sentClass =
+            s.sentimentLabel === "positive"
+              ? "bg-emerald-50 text-emerald-700"
+              : s.sentimentLabel === "negative"
+                ? "bg-rose-50 text-rose-700"
+                : s.sentimentLabel === "neutral"
+                  ? "bg-slate-100 text-slate-700"
+                  : "bg-slate-50 text-slate-500";
+          return (
+            <li key={i} className="border-l-2 border-slate-200 pl-3">
+              <p className="text-slate-800">{s.text}</p>
+              <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-slate-500">
+                {meta && <span>{meta}</span>}
+                {s.sentimentLabel && (
+                  <span
+                    className={`inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${sentClass}`}
+                  >
+                    {s.sentimentLabel}
+                  </span>
+                )}
+              </p>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }
 
