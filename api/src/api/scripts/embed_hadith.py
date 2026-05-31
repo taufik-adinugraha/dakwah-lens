@@ -18,11 +18,12 @@ the next `corpus: "all"` query fires.
 
 What we embed
 -------------
-English text only — the Arabic embedding is much weaker on classical
-prose than modern English with `text-embedding-3-*`. Queries arrive in
-ID or EN; either way the EN embedding works well as a retrieval target.
-The Arabic stays in the Qdrant payload so the brief renderer can display
-both sides at quote-time.
+EN + ID concatenated when the entry has an Indonesian translation
+(currently Sahih Muslim only — translated manually 2026-05); EN-only for
+the rest. Same approach Quran uses (`embed_quran.py`): the bilingual
+vector lifts both ID and EN query recall without paying for two embeds
+per row. The Arabic stays in the Qdrant payload so the brief renderer
+can display all sides at quote-time.
 
 Each hadith is short (1-3 paragraphs), so we embed each as a single
 vector — no chunking. To bias the embedding toward the right semantic
@@ -39,12 +40,11 @@ drops + recreates it; otherwise the existing collection is reused.
 
 Cost preview
 ------------
-~14,793 hadith × ~150 tokens avg ≈ 2.2M tokens (English-only).
-  text-embedding-3-small ($0.020/1M)  → ~$0.04 one-time
-  text-embedding-3-large ($0.130/1M)  → ~$0.29 one-time
-
-Use `--dry-run` to see exact counts + cost preview WITHOUT calling
-OpenAI or Qdrant, before committing to the real run.
+Use `--dry-run` for exact counts + cost preview without calling OpenAI
+or Qdrant — Muslim now embeds bilingual (EN+ID) so tokens roughly double
+versus the prior EN-only baseline. Even so the absolute cost is small:
+text-embedding-3-large at $0.130/1M tokens is well under $1 for the full
+~14.8k hadith corpus.
 
 Run
 ---
@@ -138,16 +138,24 @@ def _build_inputs(
 ) -> tuple[list[str], list[dict[str, object]], list[int]]:
     """Build parallel (texts, payloads, ids) lists from a hadith JSON file.
 
-    Skips rows with empty English text — those slip through the download
-    when the source CDN didn't have a translation. Embedding an empty
-    string would produce a vector that matches everything weakly.
+    Skips rows with no translation in either language — those are
+    placeholder entries from the source CDN. Embedding an empty string
+    would produce a vector that matches everything weakly.
+
+    When a row has both EN and an Indonesian `id` field (currently Sahih
+    Muslim only, manually translated 2026-05), we embed `EN\\nID` — the
+    same bilingual concatenation `embed_quran.py` uses. This lifts both
+    ID and EN query recall vs an EN-only vector without paying for two
+    embeddings per row. Books without `id` (Bukhari, Riyad, Bulugh) fall
+    back to EN-only embedding.
     """
     texts: list[str] = []
     payloads: list[dict[str, object]] = []
     ids: list[int] = []
     for r in rows:
         en = str(r.get("en") or "").strip()
-        if not en:
+        id_text = str(r.get("id") or "").strip()
+        if not en and not id_text:
             continue
         num = r.get("hadithnumber")
         if num is None:
@@ -155,21 +163,30 @@ def _build_inputs(
         # Prepend the citation as a header to bias the embedding toward
         # the right book/section. Helps when two hadith have similar
         # wording but different topical context.
-        citation = str(r.get("citation_en") or "")
-        embed_text = f"{citation}\n\n{en}" if citation else en
+        citation_en = str(r.get("citation_en") or "")
+        citation_id = str(r.get("citation_id") or "")
+        body = f"{en}\n{id_text}" if (en and id_text) else (en or id_text)
+        header = citation_en or citation_id
+        embed_text = f"{header}\n\n{body}" if header else body
         texts.append(embed_text)
-        payloads.append(
-            {
-                "collection": str(r.get("collection") or ""),
-                "hadithnumber": int(num),
-                "in_book_number": r.get("in_book_number"),
-                "book": r.get("book"),
-                "ar": str(r.get("ar") or ""),
-                "en": en,
-                "citation_en": citation,
-                "grades": r.get("grades") or [],
-            }
-        )
+        payload: dict[str, object] = {
+            "collection": str(r.get("collection") or ""),
+            "hadithnumber": int(num),
+            "in_book_number": r.get("in_book_number"),
+            "book": r.get("book"),
+            "ar": str(r.get("ar") or ""),
+            "en": en,
+            "citation_en": citation_en,
+            "grades": r.get("grades") or [],
+        }
+        # Only attach the ID fields when present so retrieval can use
+        # `payload.id ?? payload.en` as a clean locale fallback (existing
+        # corpora without ID translations stay backward-compatible).
+        if id_text:
+            payload["id"] = id_text
+        if citation_id:
+            payload["citation_id"] = citation_id
+        payloads.append(payload)
         ids.append(int(num))
     return texts, payloads, ids
 

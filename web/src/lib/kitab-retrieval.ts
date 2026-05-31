@@ -555,14 +555,25 @@ function normalizeHit(
     corpus === "riyad" ||
     corpus === "bulugh"
   ) {
-    // All three hadith books share the same payload shape (AR + EN +
-    // citation_en + hadithnumber). Only EN translation exists for hadith
-    // today (per the AR+EN-only download script).
+    // Hadith payload shape: AR + EN (+ optional ID for manually translated
+    // corpora) + citation_en (+ optional citation_id) + hadithnumber.
+    // Muslim was manually translated to Indonesian 2026-05; the embed
+    // script now writes `id` and `citation_id` for any row that has them.
+    // Bukhari / Riyad / Bulugh stay EN-only until they too are translated,
+    // and the `?? p.en` fallback keeps the brief renderer working until
+    // then (so we don't ship empty Indonesian translations for un-yet-
+    // translated corpora).
     return {
       corpus,
       arabic: String(p.ar ?? p.arabic ?? ""),
-      translation: String(p.en ?? ""),
-      citation: String(p.citation_en ?? p.citation ?? ""),
+      translation: String(
+        locale === "id" ? (p.id ?? p.en ?? "") : (p.en ?? p.id ?? ""),
+      ),
+      citation: String(
+        locale === "id"
+          ? (p.citation_id ?? p.citation_en ?? p.citation ?? "")
+          : (p.citation_en ?? p.citation_id ?? p.citation ?? ""),
+      ),
       hadithNumber: typeof p.hadithnumber === "number" ? p.hadithnumber : undefined,
       score,
       retrievalSource: "qdrant",
