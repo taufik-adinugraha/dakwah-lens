@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { and, eq } from "drizzle-orm";
+import { and, count, eq, gte } from "drizzle-orm";
 import { z } from "zod";
 
 import { redirect } from "next/navigation";
@@ -17,6 +17,7 @@ import {
 import { generateBriefContent } from "@/lib/brief-generator";
 import { computeCost, estimateBriefCost } from "@/lib/brief-cost";
 import { getCurrentTopicContext } from "@/lib/dashboard-metrics";
+import { currentWeekStartUtc } from "@/lib/user-flyer/quota";
 import { LlmUnavailableError } from "@/lib/llm";
 import type { BriefDaleel, UserProfile } from "@/db/schema";
 
@@ -121,6 +122,9 @@ export type GenerateResult =
   | { ok: true; briefId: string }
   | { ok: false; error: string };
 
+/** Max draft kajian a user may generate per rolling 7-day window. */
+const DRAFTS_PER_WEEK = 5;
+
 export async function generateBriefAction(formData: FormData): Promise<GenerateResult> {
   const session = await auth();
   if (!session?.user?.id) {
@@ -130,6 +134,23 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
   // Approval (status === "approved") still gates admin surfaces and
   // any per-user privilege beyond the default quota — but the brief
   // wizard itself is now part of the standard onboarding journey.
+
+  // Per-user weekly cap (2026-05-31). Anchored to Sunday-00:00 WIB so
+  // the draft, kajian, and flyer quota meters all reset together —
+  // matches `currentWeekStartUtc` from lib/user-flyer/quota.ts.
+  const weekStart = currentWeekStartUtc();
+  const [weekCount] = await db
+    .select({ n: count() })
+    .from(schema.briefs)
+    .where(
+      and(
+        eq(schema.briefs.userId, session.user.id),
+        gte(schema.briefs.createdAt, weekStart),
+      ),
+    );
+  if (Number(weekCount?.n ?? 0) >= DRAFTS_PER_WEEK) {
+    return { ok: false, error: "weekly_limit_reached" };
+  }
 
   const parsed = GenerateSchema.safeParse({
     topic_title: formData.get("topic_title"),

@@ -199,7 +199,18 @@ const RESPONSE_JSON_SCHEMA = {
     issue_analysis: {
       type: "string",
       description:
-        "6-8 paragraphs of substantive analytical depth. AUDIENCE-NEUTRAL — this is a research scaffold a da'i reviews before deciding who to address. Cover (in this order): (1) what the issue actually looks like in Indonesian daily life today — concrete examples; (2) the underlying drivers and root causes; (3) the relevant cultural / economic / generational context across Indonesian Muslim communities; (4) why this matters from a da'wah lens — name the categories it intersects (akhlaq, muamalah, aqidah, tarbiyah, ibadah, sosial) and connect explicitly to the retrieved Qur'an verses, hadith, and tafsir passages — quoting the citation strings inline; (5) what's at stake if unaddressed — individual, family, ummah; (6) where common secular / materialist / sectarian framings go wrong and what the Islamic framing adds; (7) the spectrum of how this issue lands across different Indonesian audiences (urban Gen Z, working professionals, families, students, rural communities, ibu-ibu pengajian) — 1 sentence each on what's distinctive about how each group encounters it. Concrete, never generic. Each paragraph 4-6 sentences. The da'i will use this analysis to pick a format + audience downstream — don't pre-commit to one.",
+        "FOUR paragraphs, separated by blank lines (use \\n\\n between paragraphs). Each 4-6 sentences. STRUCTURE WAJIB — jangan campur urutan, jangan gabungkan ke satu paragraf besar:\\n\\n" +
+        "PARAGRAF 1 — Bagaimana isu ini muncul di tiap platform, dan siapa audiens utama yang terdampak di sana. Pecah ke baris per-platform supaya dapat dipindai cepat. Format yang diharapkan (markdown OK):\\n" +
+        "- **TikTok / Reels:** [bagaimana isu ini muncul di sana] — audiens dominan: [Gen Z / pelajar / ibu muda / dll].\\n" +
+        "- **X (Twitter):** [bagaimana isu ini muncul] — audiens dominan: [profesional muda / aktivis / dll].\\n" +
+        "- **Instagram:** [bagaimana isu ini muncul] — audiens dominan: [...].\\n" +
+        "- **YouTube:** [bagaimana isu ini muncul] — audiens dominan: [...].\\n" +
+        "- **Berita arus utama (RSS):** [bagaimana isu ini diframing media] — pembaca: [...].\\n" +
+        "Sebut minimal 4 platform. Boleh skip satu kalau memang isunya tidak hadir di sana, tapi jangan kosongkan — kasih satu kalimat tentang ketiadaannya.\\n\\n" +
+        "PARAGRAF 2 — Problem statement: apa SEBENARNYA inti masalahnya. Lepas dari platform; bahas fenomena itu sendiri. Sebut akar penyebab, konteks sosial-ekonomi Indonesia, dan apa yang dipertaruhkan kalau dibiarkan. Tidak perlu mengutip dalil di paragraf ini — ini bagian diagnosis.\\n\\n" +
+        "PARAGRAF 3 — Tinjauan syariah + dalil. Bagaimana Islam memandang isu ini. KUTIP minimal 2 dari dalil yang diberikan di RETRIEVED DALEEL — pakai citation string inline (mis. 'QS. Al-Baqarah: 195', 'Sahih al-Bukhari 6018'). Jelaskan kenapa dalil tersebut relevan dengan inti masalah di Paragraf 2. JANGAN mengarang dalil baru. Sebutkan juga kategori da'wah yang bersinggungan (akhlaq, muamalah, aqidah, tarbiyah, ibadah, sosial).\\n\\n" +
+        "PARAGRAF 4 — Implementasi nyata. Langkah konkret yang bisa diambil — di tingkat individu, keluarga, komunitas masjid, dan organisasi/lembaga. Aksi spesifik, bisa dilakukan minggu ini, bukan saran abstrak. Boleh berupa bullet list.\\n\\n" +
+        "Penting: ini AUDIENCE-NEUTRAL — paragraf 1 menyebut audiens per platform, tapi keseluruhan analisis tidak boleh memilih SATU audiens target. Da'i akan memilih target audience saat membuat kajian dari draf ini.",
     },
     daleel_explanations: {
       type: "array",

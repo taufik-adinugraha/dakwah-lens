@@ -457,6 +457,7 @@
     "error_topic_too_short": "Topik minimal 4 karakter.",
     "error_extra_context_too_long": "Konteks tambahan maksimal 2000 karakter.",
     "error_llm_unavailable": "Layanan penyusunan kajian sedang tidak tersedia. Tim kami sudah mendapat notifikasi.",
+    "error_weekly_limit_reached": "Anda sudah membuat 5 draf kajian minggu ini. Kuota direset tiap Ahad pukul 00.00 WIB.",
     "error_retrieval_unavailable": "Pencarian dalil sedang tidak tersedia — setiap kajian wajib mengutip dari pustaka kitab, jadi belum bisa disusun sekarang. Silakan coba lagi beberapa menit ke depan.",
     "error_weak_relevance": "Kami belum menemukan dalil yang cukup kuat untuk topik ini di pustaka kitab. Coba rumusan yang lebih luas atau tema yang berkaitan — misalnya, ganti istilah yang sangat spesifik dengan konsep yang mendasarinya.",
     "error_generation_failed": "Belum bisa menyusun kajian — silakan coba lagi sebentar.",
@@ -646,6 +647,7 @@
     "no_kajian_yet": "Belum ada kajian.",
     "no_kajian_yet_hint": "Buka salah satu draf di atas, lalu klik \"Buat Kajian\".",
     "pustaka_kajian_link": "Pustaka Kajian",
+    "weekly_quota_label": "Sisa minggu ini",
     "section_quick": "Akses cepat",
     "quick_trends": "Insights publik",
     "quick_kitab": "Pustaka kitab",
@@ -1938,6 +1940,7 @@
     "error_no_daleel_selected": "Pilih setidaknya satu dalil.",
     "error_llm_unavailable": "Layanan AI sedang tidak tersedia.",
     "error_generation_failed": "Gagal menyusun kajian. Coba lagi sebentar.",
+    "error_weekly_limit_reached": "Anda sudah membuat 5 kajian minggu ini. Kuota direset tiap Ahad pukul 00.00 WIB.",
     "error_extra_context_too_long": "Konteks tambahan maksimal 2000 karakter."
   },
   "PustakaKajian": {

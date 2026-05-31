@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { and, eq } from "drizzle-orm";
+import { and, count, eq, gte } from "drizzle-orm";
 import { z } from "zod";
 
 import { redirect } from "next/navigation";
@@ -14,6 +14,7 @@ import {
 } from "@/lib/deliverable-generator";
 import { computeCost } from "@/lib/brief-cost";
 import { LlmUnavailableError } from "@/lib/llm";
+import { currentWeekStartUtc } from "@/lib/user-flyer/quota";
 import type { Brief, BriefDaleel, KajianFormat } from "@/db/schema";
 
 const SEGMENTS = [
@@ -60,12 +61,35 @@ export type GenerateKajianResult =
   | { ok: true; kajianId: string }
   | { ok: false; error: string };
 
+/** Max finished kajian a user may generate per rolling 7-day window.
+ *  Counted separately from draft kajian — a user gets 5 of each per week. */
+const KAJIAN_PER_WEEK = 5;
+
 export async function generateKajianAction(
   formData: FormData,
 ): Promise<GenerateKajianResult> {
   const session = await auth();
   if (!session?.user?.id) {
     return { ok: false, error: "auth_required" };
+  }
+
+  // Per-user weekly cap (2026-05-31). Anchored to Sunday-00:00 WIB so
+  // the draft, kajian, and flyer quotas all reset together. Counts
+  // ALL deliverables (draft + published) the user has created so the
+  // limit applies to the expensive Gemini Pro call, not to the cheap
+  // publish-toggle flip.
+  const weekStart = currentWeekStartUtc();
+  const [weekCount] = await db
+    .select({ n: count() })
+    .from(schema.deliverables)
+    .where(
+      and(
+        eq(schema.deliverables.userId, session.user.id),
+        gte(schema.deliverables.createdAt, weekStart),
+      ),
+    );
+  if (Number(weekCount?.n ?? 0) >= KAJIAN_PER_WEEK) {
+    return { ok: false, error: "weekly_limit_reached" };
   }
 
   const parsed = GenerateKajianSchema.safeParse({

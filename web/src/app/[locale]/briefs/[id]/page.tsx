@@ -8,12 +8,12 @@ import {
   ChevronRight,
   Sparkles,
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
 import type { BriefContent, BriefDaleel } from "@/db/schema";
-import { formatIdr, formatUsd, SPOT_USD_TO_IDR } from "@/lib/brief-cost";
 import { PlaceholderBanner, PlaceholderChip } from "@/components/PlaceholderBadge";
 import { PrintButton } from "@/components/PrintButton";
 import { DeliverableGeneratorForm } from "@/app/[locale]/kajian/DeliverableGeneratorForm";
@@ -85,17 +85,6 @@ export default async function BriefDetailPage({
         </span>
       </div>
 
-      {brief.costUsd != null && (
-        <BriefCostStrip
-          costUsd={Number(brief.costUsd)}
-          tokensIn={brief.tokensIn}
-          tokensOut={brief.tokensOut}
-          provider={brief.provider}
-          model={brief.model}
-          label={t("cost_actual_label")}
-          tokensLabel={t("cost_tokens_label")}
-        />
-      )}
 
       {brief.isPlaceholder && (
         <div className="mt-6">
@@ -113,9 +102,9 @@ export default async function BriefDetailPage({
       </Section>
 
       <Section icon={ChevronRight} title={t("section_analysis")}>
-        <p className="text-pretty leading-relaxed text-slate-700">
-          {content.issue_analysis}
-        </p>
+        <div className="prose prose-slate max-w-none text-pretty leading-relaxed text-slate-700 prose-p:my-3 prose-li:my-1 prose-strong:text-slate-900 prose-ul:my-3">
+          <ReactMarkdown>{content.issue_analysis}</ReactMarkdown>
+        </div>
       </Section>
 
       <Section icon={BookOpenCheck} title={t("section_daleel")} tone="emerald">
@@ -267,50 +256,3 @@ function DaleelCard({
   );
 }
 
-/** Compact actual-cost row shown under the brief header. Print-hidden
- *  because cost isn't relevant on a printed handout. */
-function BriefCostStrip({
-  costUsd,
-  tokensIn,
-  tokensOut,
-  provider,
-  model,
-  label,
-  tokensLabel,
-}: {
-  costUsd: number;
-  tokensIn: number | null;
-  tokensOut: number | null;
-  provider: string | null;
-  model: string | null;
-  label: string;
-  tokensLabel: string;
-}) {
-  return (
-    <div className="mt-3 inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-600 print:hidden">
-      <span className="font-semibold uppercase tracking-wider text-slate-500">
-        {label}
-      </span>
-      <span className="font-bold tabular-nums text-slate-900">
-        {formatUsd(costUsd)}
-      </span>
-      <span className="tabular-nums text-slate-500">
-        ({formatIdr(costUsd * SPOT_USD_TO_IDR)})
-      </span>
-      {tokensIn != null && tokensOut != null && (
-        <>
-          <span className="text-slate-300">·</span>
-          <span className="tabular-nums">
-            {tokensIn.toLocaleString()} + {tokensOut.toLocaleString()} {tokensLabel}
-          </span>
-        </>
-      )}
-      {(provider || model) && (
-        <>
-          <span className="text-slate-300">·</span>
-          <span className="text-slate-500">{model ?? provider}</span>
-        </>
-      )}
-    </div>
-  );
-}

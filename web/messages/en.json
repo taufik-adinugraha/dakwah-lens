@@ -461,6 +461,7 @@
     "error_topic_too_short": "Topic must be at least 4 characters.",
     "error_extra_context_too_long": "Extra context must be 2000 characters or fewer.",
     "error_llm_unavailable": "Brief generation is temporarily unavailable. The team has been notified.",
+    "error_weekly_limit_reached": "You've already drafted 5 kajian this week. The quota resets every Sunday at 00:00 WIB.",
     "error_retrieval_unavailable": "Daleel retrieval is temporarily unavailable — every brief must cite the kitab corpus, so we can't generate one right now. Please try again in a few minutes.",
     "error_weak_relevance": "We couldn't find strong scriptural support for this topic in the kitab corpus. Try a broader framing or a related theme — for example, swap a very specific term for the underlying concept it touches.",
     "error_generation_failed": "We couldn't generate this brief — please try again in a moment.",
@@ -650,6 +651,7 @@
     "no_kajian_yet": "No kajian yet.",
     "no_kajian_yet_hint": "Open one of the drafts above, then click \"Generate kajian\".",
     "pustaka_kajian_link": "Pustaka Kajian",
+    "weekly_quota_label": "This week",
     "section_quick": "Quick links",
     "quick_trends": "Public insights",
     "quick_kitab": "Kitab library",
@@ -1991,6 +1993,7 @@
     "error_no_daleel_selected": "Select at least one daleel.",
     "error_llm_unavailable": "AI service is currently unavailable.",
     "error_generation_failed": "Couldn't generate the kajian. Try again in a moment.",
+    "error_weekly_limit_reached": "You've already generated 5 kajian this week. The quota resets every Sunday at 00:00 WIB.",
     "error_extra_context_too_long": "Additional context capped at 2000 characters."
   },
   "PustakaKajian": {

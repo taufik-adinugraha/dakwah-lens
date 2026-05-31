@@ -27,6 +27,7 @@ import { TopIssueCards } from "@/components/TopIssueCards";
 import {
   getActiveDiscussionRooms,
   getBriefsThisWeek,
+  getKajianThisWeek,
   getDailyInsights,
   getKitSegments,
   getPlatformDistribution7d,
@@ -128,6 +129,7 @@ export default async function DashboardPage({
     pulse,
     trendingCount,
     briefsThisWeek,
+    kajianThisWeek,
     topIssues,
     insights,
     risingVideos,
@@ -176,6 +178,9 @@ export default async function DashboardPage({
     getTrendingCount24h(),
     canCreateBriefs
       ? getBriefsThisWeek(session.user.id)
+      : Promise.resolve(0),
+    canCreateBriefs
+      ? getKajianThisWeek(session.user.id)
       : Promise.resolve(0),
     getTopIssues(3),
     getDailyInsights(),
@@ -273,6 +278,8 @@ export default async function DashboardPage({
             {canCreateBriefs && (
               <RecentBriefs
                 briefs={recentBriefs}
+                remaining={Math.max(0, 5 - briefsThisWeek)}
+                limit={5}
                 t={t}
                 tBriefs={tBriefs}
                 locale={locale}
@@ -281,6 +288,8 @@ export default async function DashboardPage({
             {canCreateBriefs && (
               <RecentKajian
                 kajian={recentKajian}
+                remaining={Math.max(0, 5 - kajianThisWeek)}
+                limit={5}
                 t={t}
                 tBriefs={tBriefs}
                 tKajian={tKajian}
@@ -1024,6 +1033,8 @@ function formatCompactInt(n: number): string {
 
 function RecentBriefs({
   briefs,
+  remaining,
+  limit,
   t,
   tBriefs,
   locale,
@@ -1036,6 +1047,8 @@ function RecentBriefs({
     isPlaceholder: boolean;
     createdAt: Date;
   }>;
+  remaining: number;
+  limit: number;
   t: T;
   tBriefs: TBriefs;
   locale: string;
@@ -1047,13 +1060,16 @@ function RecentBriefs({
           title={t("section_recent_briefs")}
           subtitle={t("section_recent_briefs_subtitle")}
         />
-        <Link
-          href="/briefs"
-          className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-semibold text-brand-700 hover:text-brand-900"
-        >
-          {t("recent_view_all")}
-          <ArrowRight className="h-3 w-3" />
-        </Link>
+        <div className="flex shrink-0 items-center gap-2">
+          <QuotaChip remaining={remaining} limit={limit} label={t("weekly_quota_label")} />
+          <Link
+            href="/briefs"
+            className="inline-flex items-center gap-1 whitespace-nowrap text-xs font-semibold text-brand-700 hover:text-brand-900"
+          >
+            {t("recent_view_all")}
+            <ArrowRight className="h-3 w-3" />
+          </Link>
+        </div>
       </div>
 
       {briefs.length === 0 ? (
@@ -1123,6 +1139,8 @@ function RecentBriefs({
 
 function RecentKajian({
   kajian,
+  remaining,
+  limit,
   t,
   tBriefs,
   tKajian,
@@ -1136,6 +1154,8 @@ function RecentKajian({
     status: string;
     createdAt: Date;
   }>;
+  remaining: number;
+  limit: number;
   t: T;
   tBriefs: TBriefs;
   tKajian: TKajian;
@@ -1148,13 +1168,16 @@ function RecentKajian({
           title={t("section_recent_kajian")}
           subtitle={t("section_recent_kajian_subtitle")}
         />
-        <Link
-          href="/pustaka-kajian"
-          className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-semibold text-brand-700 hover:text-brand-900"
-        >
-          {t("pustaka_kajian_link")}
-          <ArrowRight className="h-3 w-3" />
-        </Link>
+        <div className="flex shrink-0 items-center gap-2">
+          <QuotaChip remaining={remaining} limit={limit} label={t("weekly_quota_label")} />
+          <Link
+            href="/pustaka-kajian"
+            className="inline-flex items-center gap-1 whitespace-nowrap text-xs font-semibold text-brand-700 hover:text-brand-900"
+          >
+            {t("pustaka_kajian_link")}
+            <ArrowRight className="h-3 w-3" />
+          </Link>
+        </div>
       </div>
 
       {kajian.length === 0 ? (
@@ -1240,6 +1263,37 @@ function SectionHeader({
       </div>
       {action && <div className="shrink-0 pt-1">{action}</div>}
     </div>
+  );
+}
+
+/** Tiny pill showing "X dari N tersisa minggu ini" beside the section
+ *  header. Tinted amber when only 1-2 remain, rose when at 0, slate
+ *  otherwise so the user catches the limit before clicking generate
+ *  and bouncing off the server-side cap. */
+function QuotaChip({
+  remaining,
+  limit,
+  label,
+}: {
+  remaining: number;
+  limit: number;
+  label: string;
+}) {
+  const tone =
+    remaining === 0
+      ? "border-rose-200 bg-rose-50 text-rose-700"
+      : remaining <= 2
+        ? "border-amber-200 bg-amber-50 text-amber-700"
+        : "border-slate-200 bg-slate-50 text-slate-600";
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider tabular-nums ${tone}`}
+    >
+      <span>{label}</span>
+      <span>
+        {remaining}/{limit}
+      </span>
+    </span>
   );
 }
 
