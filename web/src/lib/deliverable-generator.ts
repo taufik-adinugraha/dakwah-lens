@@ -116,15 +116,22 @@ const ObjectionJson = {
 
 /* ─── Format-specific Zod schemas ──────────────────────────────────── */
 
+// Khutbah Jumat is a one-way delivery from the mimbar; no Q&A or
+// speaker-asides, so the shared story_illustrations + anticipated_
+// objections fields don't apply to this format. Kultum + Kajian Umum
+// both keep them.
+//
+// Length floors: a 15-min Friday khutbah is typically ~2500-3500
+// kata total (pertama ~2000-2800, kedua ~600-900). Earlier mins
+// (800 + 300 chars) let the LLM produce under-spec output — bumped
+// to enforce mimbar-grade depth.
 const KhutbahJumatSchema = z.object({
   title: z.string().min(8).max(120),
   summary: z.string().min(40).max(800),
   dua_opening: DuaSchema,
   dua_closing: DuaSchema,
-  khutbah_pertama: z.string().min(800),
-  khutbah_kedua: z.string().min(300),
-  story_illustrations: z.array(StorySchema).min(2).max(5),
-  anticipated_objections: z.array(ObjectionSchema).min(2).max(4),
+  khutbah_pertama: z.string().min(10000),
+  khutbah_kedua: z.string().min(3000),
 });
 
 const KultumSchema = z.object({
@@ -146,7 +153,7 @@ const KajianUmumSchema = z.object({
     .array(
       z.object({
         heading: z.string().min(5).max(120),
-        body: z.string().min(1500),
+        body: z.string().min(7000),
       }),
     )
     .min(3)
@@ -160,8 +167,10 @@ const KajianUmumSchema = z.object({
     )
     .min(3)
     .max(5),
+  // Kajian Umum has formal Q&A (above) so anticipated_objections
+  // would be redundant — it's covered by the qna section. Only
+  // story_illustrations carries over.
   story_illustrations: z.array(StorySchema).min(2).max(4),
-  anticipated_objections: z.array(ObjectionSchema).min(2).max(3),
 });
 
 /* ─── Format-specific JSON Schemas for the LLM ─────────────────────── */
@@ -182,24 +191,12 @@ const KhutbahJumatJson = {
     khutbah_pertama: {
       type: "string",
       description:
-        "Khutbah Pertama LENGKAP — siap dibacakan di mimbar. Struktur: (1) mukadimah (hamdalah + sholawat + syahadat + wasiat takwa, semua dalam Arab berharakat); (2) ayat pembuka (Arab berharakat + terjemahan); (3) inti khutbah 3-4 dalil dari pool dengan elaborasi audiens; (4) penutup khutbah pertama dengan formula \"بَارَكَ اللهُ لِيْ وَلَكُمْ…\" (Arab berharakat). Setiap ayat/hadits dari pool: kutip dalam Arab berharakat (kalau tersedia) + terjemahan ID + citation bold inline. JANGAN sebut nama outlet media; gunakan framing 'kabar yang sampai kepada kita…'. Bahasa Indonesia formal-mengalir, BUKAN akademis kaku. Markdown diperbolehkan (## untuk sub-bab).",
+        "Khutbah Pertama LENGKAP — siap dibacakan di mimbar (~12-15 menit bacaan = TARGET ~2200-3000 kata / 11000-15000 karakter). JANGAN potong demi ringkas — kalau pendek, kembangkan elaborasi konteks, asbabun nuzul, dan aplikasi audiens. Struktur: (1) mukadimah (hamdalah + sholawat + syahadat + wasiat takwa, semua dalam Arab berharakat); (2) ayat pembuka (Arab berharakat + terjemahan); (3) inti khutbah 3-4 dalil dari pool dengan elaborasi audiens MENDALAM (3-5 paragraf per dalil — bukan satu kalimat transisi); (4) penutup khutbah pertama dengan formula \"بَارَكَ اللهُ لِيْ وَلَكُمْ…\" (Arab berharakat). Setiap ayat/hadits dari pool: kutip dalam Arab berharakat (kalau tersedia) + terjemahan ID + citation bold inline. JANGAN sebut nama outlet media; gunakan framing 'kabar yang sampai kepada kita…'. Bahasa Indonesia formal-mengalir, BUKAN akademis kaku. Markdown diperbolehkan (## untuk sub-bab).",
     },
     khutbah_kedua: {
       type: "string",
       description:
-        "Khutbah Kedua: (1) mukadimah pendek (hamdalah + sholawat dalam Arab berharakat); (2) amplifikasi argumen utama dari khutbah pertama, 1-2 paragraf; (3) doa penutup panjang dalam Arab berharakat — wajib mencakup: doa untuk mukminin/mukminat, doa pertolongan, doa untuk mustadh'afin (sebut Palestina), doa untuk pemimpin Muslim, doa untuk diri+keluarga, penutup standar (إِنَّ اللهَ يَأْمُرُ بِالْعَدْلِ…). Semua dalam aksara Arab berharakat.",
-    },
-    story_illustrations: {
-      type: "array",
-      items: StoryJson,
-      description:
-        "2-5 anekdot konkret yang bisa diselipkan dalam khutbah — bukan sekadar 'misalnya kita yang sering…'; berikan situasi spesifik dengan detail yang bisa dibayangkan.",
-    },
-    anticipated_objections: {
-      type: "array",
-      items: ObjectionJson,
-      description:
-        "2-4 sanggahan yang mungkin muncul dari jamaah setelah khutbah — siapkan jawabannya sebelum naik mimbar.",
+        "Khutbah Kedua (~5-7 menit bacaan = TARGET ~700-1100 kata / 3500-5500 karakter): (1) mukadimah pendek (hamdalah + sholawat dalam Arab berharakat); (2) amplifikasi argumen utama dari khutbah pertama, 2-3 paragraf yang mengikat satu pesan inti; (3) doa penutup panjang dalam Arab berharakat — wajib mencakup: doa untuk mukminin/mukminat, doa pertolongan, doa untuk mustadh'afin (sebut Palestina), doa untuk pemimpin Muslim, doa untuk diri+keluarga, penutup standar (إِنَّ اللهَ يَأْمُرُ بِالْعَدْلِ…). Semua dalam aksara Arab berharakat.",
     },
   },
   required: [
@@ -209,8 +206,6 @@ const KhutbahJumatJson = {
     "dua_closing",
     "khutbah_pertama",
     "khutbah_kedua",
-    "story_illustrations",
-    "anticipated_objections",
   ],
 };
 
@@ -288,7 +283,7 @@ const KajianUmumJson = {
           body: {
             type: "string",
             description:
-              "3-5 paragraf elaborasi (~400-600 kata per talking point). STRUKTUR per talking point:\\n" +
+              "8-12 paragraf elaborasi MENDALAM (~1500-2000 kata / 8000-11000 karakter per talking point — ini sub-bab buku kajian, bukan ringkasan). STRUKTUR per talking point:\\n" +
               "(a) **Bukaan grounded** — kalau ada CONTOH POST / RINGKASAN SITUASI dari draf yang relevan dengan sudut pandang ini, kutip secara umum (anonim, jangan sebut nama orang/lokasi spesifik). Kalau tidak ada yang langsung relevan, mulai dari prinsip yang akan dibahas.\\n" +
               "(b) **Dalil utama dari pool** (Arab berharakat + terjemah, citation bold inline). Pilih yang LANGSUNG menyentuh sudut pandang ini — bukan analogi historis yang harus diregangkan.\\n" +
               "(c) **Tafsir / elaborasi audiens** — bridge dari dalil ke realitas hidup audiens (sesuai segment label di prompt). Voice harus pas (Gen Z: santai+vulnerable, ibu pengajian: hangat+pengalaman, professionals: ringkas+aplikatif, dst).\\n" +
@@ -329,11 +324,6 @@ const KajianUmumJson = {
       items: StoryJson,
       description: "2-4 ilustrasi konkret untuk diselipkan dalam kajian.",
     },
-    anticipated_objections: {
-      type: "array",
-      items: ObjectionJson,
-      description: "2-3 sanggahan + jawaban (selain QnA — ini yang lebih ideologis).",
-    },
   },
   required: [
     "title",
@@ -343,7 +333,6 @@ const KajianUmumJson = {
     "talking_points",
     "qna",
     "story_illustrations",
-    "anticipated_objections",
   ],
 };
 
@@ -442,7 +431,7 @@ export async function generateDeliverable(
       ? "FORMAT: Khutbah Jumat (2-bagian, 12-15 menit total). Khutbah Pertama lebih panjang (isi argumen + dalil), Khutbah Kedua lebih pendek (amplifikasi + doa panjang). Wajib aksara Arab berharakat untuk: mukadimah, ayat/hadits yang dikutip, formula penutup khutbah pertama, dan doa penutup khutbah kedua."
       : format === "kultum"
         ? "FORMAT: Kultum (~7 menit, ~1000 kata). Single-thread, hook → satu dalil utama → elaborasi → 1-2 dalil pendukung → call to action 1 langkah → penutup. Aksara Arab berharakat untuk: ayat/hadits yang dikutip + dua pembuka/penutup."
-        : "FORMAT: Kajian Umum (30-45 menit, format kelas). 3 talking point inti + Q&A. Aksara Arab berharakat untuk: ayat/hadits + dua pembuka/penutup.";
+        : "FORMAT: Kajian Umum (35-45 menit, format kelas). TOTAL panjang ~4500-6000 kata di 3 talking point + Q&A — bukan singkat seperti kultum, ini sesi belajar yang mendalam dengan eksplorasi tafsir, konteks historis, dan diskusi multi-sudut. Tiap talking point WAJIB ~1500-2000 kata (8000-11000 karakter) — bukan ringkasan, tapi pembahasan lengkap layaknya satu sub-bab buku kajian. Aksara Arab berharakat untuk: ayat/hadits + dua pembuka/penutup. JANGAN potong elaborasi demi ringkas — kalau ada kecenderungan untuk merangkum, tambah paragraf yang membahas: (a) konteks asbabun nuzul / asbabul wurud kalau dalil punya itu; (b) penjelasan istilah teknis; (c) contoh kasus konkret dari draf; (d) refleksi yang relate ke segment audiens.";
 
   const userPrompt = [
     `Topik: ${brief.topicTitle}`,
@@ -485,9 +474,19 @@ export async function generateDeliverable(
         ? KultumJson
         : KajianUmumJson;
 
-  // Khutbah Jumat needs the most output budget (full 2-khutbah document
-  // + long Arabic dua). Kultum and Kajian umum are tighter.
-  const maxTokens = format === "khutbah_jumat" ? 40_000 : 24_000;
+  // Output budget per format:
+  // - Khutbah Jumat: 2-khutbah document + long Arabic dua (40k).
+  // - Kajian Umum: 35-45 min class-style, 3 deep talking points
+  //   (~1500-2000 kata each) + Q&A. Heavier than Kultum — bumped to
+  //   40k to avoid truncation with gemini-2.5-pro thinking-token
+  //   overhead.
+  // - Kultum: 7-min single-thread, ~1000 kata. Tighter (24k).
+  const maxTokens =
+    format === "khutbah_jumat"
+      ? 40_000
+      : format === "kajian_umum"
+        ? 40_000
+        : 24_000;
 
   const { data, provider, model, tokensIn, tokensOut } =
     await generateJson<unknown>({
@@ -517,8 +516,6 @@ export async function generateDeliverable(
   const baseContent = {
     summary: validated.summary,
     daleel: selectedDaleel,
-    story_illustrations: validated.story_illustrations,
-    anticipated_objections: validated.anticipated_objections,
     dua_opening: validated.dua_opening,
     dua_closing: validated.dua_closing,
   };
@@ -538,6 +535,8 @@ export async function generateDeliverable(
       ...baseContent,
       format: "kultum",
       body: v.body,
+      story_illustrations: v.story_illustrations,
+      anticipated_objections: v.anticipated_objections,
     } satisfies KultumContent;
   } else {
     const v = validated as z.infer<typeof KajianUmumSchema>;
@@ -546,6 +545,7 @@ export async function generateDeliverable(
       format: "kajian_umum",
       talking_points: v.talking_points,
       qna: v.qna,
+      story_illustrations: v.story_illustrations,
     } satisfies KajianUmumContent;
   }
 

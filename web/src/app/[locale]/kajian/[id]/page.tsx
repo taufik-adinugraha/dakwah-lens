@@ -14,6 +14,7 @@ import type {
   KultumContent,
   KajianUmumContent,
 } from "@/db/schema";
+import { MarkdownBody } from "../MarkdownBody";
 import { PublishToggle } from "../PublishToggle";
 import { KajianDeleteButton } from "../KajianDeleteButton";
 import { DaleelList } from "../DaleelList";
@@ -161,36 +162,49 @@ export default async function KajianDetailPage({
           heading={t("section_daleel")}
         />
 
-        {content.story_illustrations.length > 0 && (
-          <section className="rounded-2xl border border-amber-200 bg-amber-50/40 p-6">
-            <h2 className="flex items-center gap-2 text-base font-semibold text-amber-900">
-              <Quote className="h-4 w-4" />
-              {t("section_stories")}
-            </h2>
-            <ul className="mt-3 space-y-3 text-sm leading-relaxed text-amber-950">
-              {content.story_illustrations.map((s, i) => (
-                <li key={i}>{s}</li>
-              ))}
-            </ul>
-          </section>
-        )}
+        {/* Stories exist on Kultum + Kajian Umum (Khutbah Jumat is
+            one-way mimbar delivery). Anticipated objections exist
+            only on Kultum — Kajian Umum has a formal Q&A section
+            (qna above) that already covers audience-pushback prep. */}
+        {format !== "khutbah_jumat" &&
+          (content as KultumContent | KajianUmumContent).story_illustrations
+            ?.length > 0 && (
+            <section className="rounded-2xl border border-amber-200 bg-amber-50/40 p-6">
+              <h2 className="flex items-center gap-2 text-base font-semibold text-amber-900">
+                <Quote className="h-4 w-4" />
+                {t("section_stories")}
+              </h2>
+              <ul className="mt-3 space-y-3 text-sm leading-relaxed text-amber-950">
+                {(
+                  content as KultumContent | KajianUmumContent
+                ).story_illustrations.map((s, i) => (
+                  <li key={i}>{s}</li>
+                ))}
+              </ul>
+            </section>
+          )}
 
-        {content.anticipated_objections.length > 0 && (
-          <section className="rounded-2xl border border-slate-200 bg-slate-50/40 p-6">
-            <h2 className="flex items-center gap-2 text-base font-semibold text-slate-900">
-              <BookOpenCheck className="h-4 w-4" />
-              {t("section_objections")}
-            </h2>
-            <ul className="mt-3 space-y-4 text-sm leading-relaxed">
-              {content.anticipated_objections.map((o, i) => (
-                <li key={i} className="border-l-2 border-slate-300 pl-3">
-                  <p className="font-medium text-slate-900">{o.objection}</p>
-                  <p className="mt-1 text-slate-700">{o.response}</p>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+        {format === "kultum" &&
+          (content as KultumContent).anticipated_objections?.length > 0 && (
+            <section className="rounded-2xl border border-slate-200 bg-slate-50/40 p-6">
+              <h2 className="flex items-center gap-2 text-base font-semibold text-slate-900">
+                <BookOpenCheck className="h-4 w-4" />
+                {t("section_objections")}
+              </h2>
+              <ul className="mt-3 space-y-4 text-sm leading-relaxed">
+                {(content as KultumContent).anticipated_objections.map(
+                  (o, i) => (
+                    <li key={i} className="border-l-2 border-slate-300 pl-3">
+                      <p className="font-medium text-slate-900">
+                        {o.objection}
+                      </p>
+                      <p className="mt-1 text-slate-700">{o.response}</p>
+                    </li>
+                  ),
+                )}
+              </ul>
+            </section>
+          )}
       </div>
     </article>
   );
@@ -207,14 +221,14 @@ function KhutbahJumatBody({
     <div className="space-y-10">
       <section>
         <h2 className="text-lg font-semibold text-slate-900">{labels.pertama}</h2>
-        <div className="prose prose-slate mt-3 max-w-none whitespace-pre-wrap text-sm leading-relaxed">
-          {content.khutbah_pertama}
+        <div className="mt-3">
+          <MarkdownBody text={content.khutbah_pertama} />
         </div>
       </section>
       <section>
         <h2 className="text-lg font-semibold text-slate-900">{labels.kedua}</h2>
-        <div className="prose prose-slate mt-3 max-w-none whitespace-pre-wrap text-sm leading-relaxed">
-          {content.khutbah_kedua}
+        <div className="mt-3">
+          <MarkdownBody text={content.khutbah_kedua} />
         </div>
       </section>
     </div>
@@ -231,8 +245,8 @@ function KultumBody({
   return (
     <section>
       <h2 className="text-lg font-semibold text-slate-900">{label}</h2>
-      <div className="prose prose-slate mt-3 max-w-none whitespace-pre-wrap text-sm leading-relaxed">
-        {content.body}
+      <div className="mt-3">
+        <MarkdownBody text={content.body} />
       </div>
     </section>
   );
@@ -251,14 +265,14 @@ function KajianUmumBody({
         <h2 className="text-lg font-semibold text-slate-900">
           {labels.talkingPoints}
         </h2>
-        <ol className="mt-3 space-y-6">
+        <ol className="mt-3 space-y-8">
           {content.talking_points.map((p, i) => (
             <li key={i} className="border-l-2 border-brand-300 pl-4">
               <h3 className="text-base font-semibold text-slate-900">
                 {i + 1}. {p.heading}
               </h3>
-              <div className="prose prose-slate mt-2 max-w-none whitespace-pre-wrap text-sm leading-relaxed">
-                {p.body}
+              <div className="mt-2">
+                <MarkdownBody text={p.body} />
               </div>
             </li>
           ))}
@@ -268,11 +282,11 @@ function KajianUmumBody({
         <h2 className="text-lg font-semibold text-slate-900">{labels.qna}</h2>
         <ul className="mt-3 space-y-4">
           {content.qna.map((q, i) => (
-            <li key={i} className="rounded-lg bg-slate-50 p-4">
+            <li key={i} className="rounded-xl bg-slate-50 p-4">
               <p className="font-medium text-slate-900">{q.question}</p>
-              <p className="mt-1 text-sm leading-relaxed text-slate-700">
-                {q.answer}
-              </p>
+              <div className="mt-1 text-sm sm:text-base">
+                <MarkdownBody text={q.answer} />
+              </div>
             </li>
           ))}
         </ul>

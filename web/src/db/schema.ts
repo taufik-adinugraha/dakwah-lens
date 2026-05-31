@@ -896,17 +896,10 @@ type Dua = {
 };
 
 type DeliverableBase = {
-  /** One-line summary shown on cards in /pustaka-kajian. ≤180 chars. */
+  /** One-line summary shown on cards in /pustaka-kajian. */
   summary: string;
   /** Reranked daleel pool inherited (and possibly filtered) from the draft. */
   daleel: BriefDaleel[];
-  /** Concrete anecdotes the da'i can drop into delivery. */
-  story_illustrations: string[];
-  /** Anticipated audience pushback + concrete responses. */
-  anticipated_objections: Array<{
-    objection: string;
-    response: string;
-  }>;
 };
 
 export type KhutbahJumatContent = DeliverableBase & {
@@ -929,6 +922,14 @@ export type KultumContent = DeliverableBase & {
   dua_closing: Dua;
   /** Single-thread body (~7-min delivery, ~1000 words). */
   body: string;
+  /** Concrete anecdotes the da'i can drop into delivery. */
+  story_illustrations: string[];
+  /** Anticipated audience pushback + concrete responses — kultum has
+   *  no formal Q&A, so this is the da'i's pre-mimbar prep. */
+  anticipated_objections: Array<{
+    objection: string;
+    response: string;
+  }>;
 };
 
 export type KajianUmumContent = DeliverableBase & {
@@ -942,11 +943,14 @@ export type KajianUmumContent = DeliverableBase & {
     heading: string;
     body: string;
   }>;
-  /** Anticipated Q&A — questions the audience is likely to ask. */
+  /** Anticipated Q&A — the formal post-kajian dialogue, already
+   *  covering the role `anticipated_objections` plays for Kultum. */
   qna: Array<{
     question: string;
     answer: string;
   }>;
+  /** Concrete anecdotes the da'i can drop into talking points. */
+  story_illustrations: string[];
 };
 
 export type DeliverableContent =
