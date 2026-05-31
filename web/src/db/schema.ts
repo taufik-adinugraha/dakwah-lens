@@ -761,6 +761,143 @@ export type User = typeof users.$inferSelect;
 export type Account = typeof accounts.$inferSelect;
 export type Organization = typeof organizations.$inferSelect;
 export type Brief = typeof briefs.$inferSelect;
+
+/* ─── Deliverables ────────────────────────────────────────────────────────
+ * A "kajian" — a publish-ready artifact derived from a draft brief.
+ *
+ * Briefs are research scaffolds: LLM-generated daleel pools + analysis the
+ * da'i reviews. Deliverables are the publish-grade output in a specific
+ * liturgical format the da'i actually delivers (khutbah Jumat, kultum,
+ * kajian umum). One draft → many deliverables (same topic, three formats).
+ *
+ * Publishing is opt-in: status defaults to "draft"; only published rows
+ * appear in /pustaka-kajian. Authoring keeps the da'i in control over what
+ * the public sees.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+export const KAJIAN_FORMATS = ["khutbah_jumat", "kultum", "kajian_umum"] as const;
+export type KajianFormat = (typeof KAJIAN_FORMATS)[number];
+
+export const KAJIAN_STATUSES = ["draft", "published"] as const;
+export type KajianStatus = (typeof KAJIAN_STATUSES)[number];
+
+export const deliverables = pgTable(
+  "deliverables",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    briefId: uuid("brief_id")
+      .notNull()
+      .references(() => briefs.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    format: text("format").notNull().$type<KajianFormat>(),
+    /** Audience segment chosen at deliverable-generation time (not draft
+     *  time). Drafts are audience-neutral; the same draft can spawn
+     *  multiple deliverables for different audiences. */
+    segment: text("segment").notNull(),
+    /** Voice/tone chosen at deliverable-generation time. */
+    tone: text("tone").notNull(),
+    /** Output locale chosen at deliverable-generation time. */
+    locale: text("locale").notNull().default("id"),
+    /** Target length in pages (1-4). Affects LLM maxTokens budget. */
+    pages: integer("pages").notNull().default(2),
+    /** Whether to personalize with the da'i's onboarding profile. */
+    includeProfile: boolean("include_profile").notNull().default(true),
+    status: text("status").notNull().default("draft").$type<KajianStatus>(),
+    title: text("title").notNull(),
+    content: jsonb("content").notNull().$type<DeliverableContent>(),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    tokensIn: integer("tokens_in"),
+    tokensOut: integer("tokens_out"),
+    costUsd: numeric("cost_usd", { precision: 10, scale: 6 }),
+    provider: text("provider"),
+    model: text("model"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => [
+    index("ix_deliverables_user_id").on(table.userId),
+    index("ix_deliverables_brief_id").on(table.briefId),
+    index("ix_deliverables_status_published_at").on(
+      table.status,
+      table.publishedAt,
+    ),
+  ],
+);
+
+export type Deliverable = typeof deliverables.$inferSelect;
+
+/* Format-specific content schemas ─────────────────────────────────────── */
+
+type Dua = {
+  arabic: string;
+  translation: string;
+  source?: string;
+};
+
+type DeliverableBase = {
+  /** One-line summary shown on cards in /pustaka-kajian. ≤180 chars. */
+  summary: string;
+  /** Reranked daleel pool inherited (and possibly filtered) from the draft. */
+  daleel: BriefDaleel[];
+  /** Concrete anecdotes the da'i can drop into delivery. */
+  story_illustrations: string[];
+  /** Anticipated audience pushback + concrete responses. */
+  anticipated_objections: Array<{
+    objection: string;
+    response: string;
+  }>;
+};
+
+export type KhutbahJumatContent = DeliverableBase & {
+  format: "khutbah_jumat";
+  /** Dua pembukaan (khutbatul hajah). Arabic with harakat. */
+  dua_opening: Dua;
+  /** Dua penutup (closing dua). Arabic with harakat. */
+  dua_closing: Dua;
+  /** Khutbah Pertama — full markdown text including ayat berharakat. */
+  khutbah_pertama: string;
+  /** Khutbah Kedua — shorter, focused on doa for the ummah. */
+  khutbah_kedua: string;
+};
+
+export type KultumContent = DeliverableBase & {
+  format: "kultum";
+  /** Opening greeting + dua. */
+  dua_opening: Dua;
+  /** Closing dua. */
+  dua_closing: Dua;
+  /** Single-thread body (~7-min delivery, ~1000 words). */
+  body: string;
+};
+
+export type KajianUmumContent = DeliverableBase & {
+  format: "kajian_umum";
+  /** Opening dua + greeting. */
+  dua_opening: Dua;
+  /** Closing dua. */
+  dua_closing: Dua;
+  /** 3 main talking points, each with sub-bullets. */
+  talking_points: Array<{
+    heading: string;
+    body: string;
+  }>;
+  /** Anticipated Q&A — questions the audience is likely to ask. */
+  qna: Array<{
+    question: string;
+    answer: string;
+  }>;
+};
+
+export type DeliverableContent =
+  | KhutbahJumatContent
+  | KultumContent
+  | KajianUmumContent;
 export type SocialPost = typeof socialPosts.$inferSelect;
 export type Topic = typeof topics.$inferSelect;
 export type UsageEvent = typeof usageEvents.$inferSelect;

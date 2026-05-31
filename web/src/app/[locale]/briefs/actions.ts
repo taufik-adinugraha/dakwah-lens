@@ -74,9 +74,13 @@ const FORMATS = ["kajian_umum", "khutbah_jumat"] as const;
 
 const GenerateSchema = z.object({
   topic_title: z.string().trim().min(4, "topic_too_short").max(200),
-  segment: z.enum(SEGMENTS),
-  tone: z.enum(TONES),
-  locale: z.enum(LOCALES),
+  // Drafts are audience-neutral as of 2026-05-31 — segment/tone/locale
+  // are picked at deliverable-generation time, not here. Defaults below
+  // give the brief LLM something to lean on for the research phase
+  // (neutral analytical voice; Indonesian by default).
+  segment: z.enum(SEGMENTS).default("urban_gen_z"),
+  tone: z.enum(TONES).default("scholarly"),
+  locale: z.enum(LOCALES).default("id"),
   format: z.enum(FORMATS).default("kajian_umum"),
   /** Whether the LLM should personalize examples + framing using the
    *  caller's onboarding profile (honorific, location, profession,
@@ -128,9 +132,12 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
 
   const parsed = GenerateSchema.safeParse({
     topic_title: formData.get("topic_title"),
-    segment: formData.get("segment"),
-    tone: formData.get("tone"),
-    locale: formData.get("locale"),
+    // segment/tone/locale removed from /briefs/new (2026-05-31). Schema
+    // defaults apply via `formData.get() ?? undefined` so legacy callers
+    // that still send these continue to work.
+    segment: formData.get("segment") ?? undefined,
+    tone: formData.get("tone") ?? undefined,
+    locale: formData.get("locale") ?? undefined,
     format: formData.get("format") ?? "kajian_umum",
     include_profile: formData.get("include_profile") ?? "",
     extra_context: formData.get("extra_context"),
@@ -375,7 +382,7 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
 
 const EstimateSchema = z.object({
   topic_title: z.string().trim().min(4, "topic_too_short").max(200),
-  locale: z.enum(LOCALES),
+  locale: z.enum(LOCALES).default("id"),
   extra_context: z
     .string()
     .trim()
@@ -418,7 +425,7 @@ export async function estimateBriefCostAction(
 
   const parsed = EstimateSchema.safeParse({
     topic_title: formData.get("topic_title"),
-    locale: formData.get("locale"),
+    locale: formData.get("locale") ?? undefined,
     extra_context: formData.get("extra_context"),
     pages: formData.get("pages") ?? 2,
   });

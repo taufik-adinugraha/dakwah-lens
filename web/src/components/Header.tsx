@@ -16,14 +16,6 @@ export async function Header() {
   ]);
   const user = session?.user;
 
-  // Briefs library is gated to admin only while the feature is
-  // experimental (per the briefs admin-gate in commit 39ef38a). The
-  // Header was still rendering the "Pustaka Kajian" link to anonymous
-  // visitors, which leaked an admin-only destination into the public
-  // nav. Hide unless the viewer is admin / superadmin.
-  const isAdmin =
-    user?.role === "admin" || user?.role === "superadmin";
-
   // Mobile-menu items mirror the desktop nav. Plain `<a>` with
   // locale-prefixed paths matches the routed-page shape consistently.
   // Insights is the primary product surface (5 weekly briefings) — call
@@ -39,9 +31,7 @@ export async function Header() {
     { href: `/${locale}/discussions`, label: t("discussions") },
     { href: `/${locale}/kitab`, label: t("kitab") },
     { href: `/${locale}/flyers/public`, label: t("flyers_library") },
-    ...(isAdmin
-      ? [{ href: `/${locale}/briefs/public`, label: t("briefs_library") }]
-      : []),
+    { href: `/${locale}/pustaka-kajian`, label: t("pustaka_kajian") },
   ];
 
   return (
@@ -102,14 +92,12 @@ export async function Header() {
             >
               {t("flyers_library")}
             </Link>
-            {isAdmin && (
-              <Link
-                href="/briefs/public"
-                className="hover:text-slate-900 transition"
-              >
-                {t("briefs_library")}
-              </Link>
-            )}
+            <Link
+              href="/pustaka-kajian"
+              className="hover:text-slate-900 transition"
+            >
+              {t("pustaka_kajian")}
+            </Link>
           </nav>
 
           <div className="flex items-center gap-1.5 sm:gap-2">

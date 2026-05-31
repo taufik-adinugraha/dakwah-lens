@@ -121,13 +121,6 @@ export default async function MyBriefsPage({
         </div>
         <div className="hidden shrink-0 items-center gap-2 sm:inline-flex">
           <Link
-            href="/briefs/public"
-            className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
-          >
-            <Sparkles className="h-4 w-4 text-brand-600" />
-            {t("list_public_link")}
-          </Link>
-          <Link
             href="/briefs/new"
             className="inline-flex items-center gap-1.5 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
           >

@@ -20,6 +20,7 @@ import type { BriefContent, BriefDaleel } from "@/db/schema";
 import { formatIdr, formatUsd, SPOT_USD_TO_IDR } from "@/lib/brief-cost";
 import { PlaceholderBanner, PlaceholderChip } from "@/components/PlaceholderBadge";
 import { PrintButton } from "@/components/PrintButton";
+import { DeliverableGeneratorForm } from "@/app/[locale]/kajian/DeliverableGeneratorForm";
 
 export async function generateMetadata({
   params,
@@ -229,6 +230,14 @@ export default async function BriefDetailPage({
           />
         </div>
       </Section>
+
+      <div className="mt-12 print:hidden">
+        <DeliverableGeneratorForm
+          briefId={brief.id}
+          daleel={content.daleel}
+          defaultLocale={brief.locale === "en" ? "en" : "id"}
+        />
+      </div>
     </article>
   );
 }

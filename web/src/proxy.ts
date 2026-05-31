@@ -21,7 +21,11 @@ const PROTECTED_PREFIXES = [
 // Routes that match a PROTECTED_PREFIX but should NOT require auth — public
 // surfaces nested under an otherwise-private root. Order matters: the public
 // exemption is checked first so it short-circuits the prefix check.
-const PUBLIC_OVERRIDES = ["/briefs/public"];
+//
+// /pustaka-kajian listed since 2026-05-31 — replaces the removed
+// /briefs/public catalogue. Only publish-toggled deliverables appear; drafts
+// stay private to their author.
+const PUBLIC_OVERRIDES: string[] = ["/pustaka-kajian"];
 
 // Routes that require an admin (or superadmin) role even when the user is
 // signed in + approved. Empty since 2026-05-29 — brief generation was
@@ -47,8 +51,7 @@ function isPublicOverride(stripped: string): boolean {
 
 function isProtected(pathname: string): boolean {
   const stripped = stripLocale(pathname);
-  // Public override wins — e.g. /briefs is protected, but /briefs/public
-  // is explicitly carved out.
+  // Public override wins for any path listed in PUBLIC_OVERRIDES.
   if (isPublicOverride(stripped)) return false;
   return PROTECTED_PREFIXES.some(
     (p) => stripped === p || stripped.startsWith(`${p}/`),

@@ -81,6 +81,7 @@ export default async function DashboardPage({
 
   const t = await getTranslations("Dashboard");
   const tBriefs = await getTranslations("Briefs");
+  const tKajian = await getTranslations("Kajian");
   // Pulled from the Insights namespace so the segment names in the
   // Kit tab strip match /insights/segment/[focus] verbatim.
   const tInsights = await getTranslations("Insights");
@@ -123,6 +124,7 @@ export default async function DashboardPage({
 
   const [
     recentBriefs,
+    recentKajian,
     pulse,
     trendingCount,
     briefsThisWeek,
@@ -153,6 +155,21 @@ export default async function DashboardPage({
           .from(schema.briefs)
           .where(eq(schema.briefs.userId, session.user.id))
           .orderBy(desc(schema.briefs.createdAt))
+          .limit(5)
+      : Promise.resolve([]),
+    canCreateBriefs
+      ? db
+          .select({
+            id: schema.deliverables.id,
+            title: schema.deliverables.title,
+            format: schema.deliverables.format,
+            segment: schema.deliverables.segment,
+            status: schema.deliverables.status,
+            createdAt: schema.deliverables.createdAt,
+          })
+          .from(schema.deliverables)
+          .where(eq(schema.deliverables.userId, session.user.id))
+          .orderBy(desc(schema.deliverables.createdAt))
           .limit(5)
       : Promise.resolve([]),
     getPulseSnapshot(),
@@ -261,6 +278,15 @@ export default async function DashboardPage({
                 locale={locale}
               />
             )}
+            {canCreateBriefs && (
+              <RecentKajian
+                kajian={recentKajian}
+                t={t}
+                tBriefs={tBriefs}
+                tKajian={tKajian}
+                locale={locale}
+              />
+            )}
             <div className="grid gap-3 sm:grid-cols-2">
               {canCreateBriefs && (
                 <BriefsStatTile briefsThisWeek={briefsThisWeek} t={t} />
@@ -352,6 +378,7 @@ export default async function DashboardPage({
 
 type T = Awaited<ReturnType<typeof getTranslations<"Dashboard">>>;
 type TBriefs = Awaited<ReturnType<typeof getTranslations<"Briefs">>>;
+type TKajian = Awaited<ReturnType<typeof getTranslations<"Kajian">>>;
 
 function DashboardHeader({ name, t }: { name: string; t: T }) {
   // Slim greeting strip above the tabs — keeps the personal hello
@@ -1094,6 +1121,101 @@ function RecentBriefs({
   );
 }
 
+function RecentKajian({
+  kajian,
+  t,
+  tBriefs,
+  tKajian,
+  locale,
+}: {
+  kajian: Array<{
+    id: string;
+    title: string;
+    format: string;
+    segment: string;
+    status: string;
+    createdAt: Date;
+  }>;
+  t: T;
+  tBriefs: TBriefs;
+  tKajian: TKajian;
+  locale: string;
+}) {
+  return (
+    <section className="mt-8">
+      <div className="flex items-end justify-between gap-3">
+        <SectionHeader
+          title={t("section_recent_kajian")}
+          subtitle={t("section_recent_kajian_subtitle")}
+        />
+        <Link
+          href="/pustaka-kajian"
+          className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-semibold text-brand-700 hover:text-brand-900"
+        >
+          {t("pustaka_kajian_link")}
+          <ArrowRight className="h-3 w-3" />
+        </Link>
+      </div>
+
+      {kajian.length === 0 ? (
+        <div className="mt-5 rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-10 text-center">
+          <p className="text-sm font-medium text-slate-700">
+            {t("no_kajian_yet")}
+          </p>
+          <p className="mt-1 text-xs text-slate-500">{t("no_kajian_yet_hint")}</p>
+        </div>
+      ) : (
+        <div className="mt-5 grid gap-2">
+          {kajian.map((k) => (
+            <Link
+              key={k.id}
+              href={`/kajian/${k.id}`}
+              className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm transition hover:border-slate-300 hover:shadow-md"
+            >
+              <BookOpenCheck className="h-4 w-4 shrink-0 text-slate-400" />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <p className="truncate text-sm font-medium text-slate-900">
+                    {k.title}
+                  </p>
+                  <span
+                    className={
+                      k.status === "published"
+                        ? "inline-flex items-center rounded-full bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-700"
+                        : "inline-flex items-center rounded-full bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-600"
+                    }
+                  >
+                    {k.status === "published"
+                      ? tKajian("status_published")
+                      : tKajian("status_draft")}
+                  </span>
+                </div>
+                <p className="mt-0.5 truncate text-xs text-slate-500">
+                  {tKajian(`format_${k.format}` as Parameters<typeof tKajian>[0])}
+                  <span className="text-slate-300"> · </span>
+                  {tBriefs(`segment_${k.segment}` as Parameters<typeof tBriefs>[0])}
+                  <span className="text-slate-300"> · </span>
+                  <span className="tabular-nums">
+                    {new Date(k.createdAt).toLocaleDateString(
+                      locale === "id" ? "id-ID" : "en-US",
+                      {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                        timeZone: "Asia/Jakarta",
+                      },
+                    )}
+                  </span>
+                </p>
+              </div>
+              <ArrowRight className="h-4 w-4 shrink-0 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-slate-700" />
+            </Link>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
 
 function SectionHeader({
   title,

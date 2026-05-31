@@ -6,7 +6,6 @@ import {
   ArrowLeft,
   ArrowRight,
   Coins,
-  Minus,
   Plus,
   Sparkles,
   X,
@@ -21,31 +20,9 @@ import {
 import { formatIdr, formatUsd } from "@/lib/brief-cost";
 import { Spinner } from "@/components/Spinner";
 
-const SEGMENTS = [
-  "urban_gen_z",
-  "working_professionals",
-  "parents_families",
-  "ibu_pengajian",
-  "rural_communities",
-  "students",
-] as const;
-const TONES = [
-  "scholarly",
-  "casual",
-  "motivational",
-  "empathetic",
-  "fiery",
-  "gentle",
-] as const;
-const LOCALES = ["en", "id"] as const;
-
 const CONTEXT_PRESETS = [
-  "preset_khutbah_jumat",
   "preset_counter_misconception",
-  "preset_current_events",
-  "preset_social_video",
   "preset_action_steps",
-  "preset_for_youth",
 ] as const;
 
 type Step = "form" | "estimate";
@@ -84,20 +61,9 @@ export function BriefForm({
   const [useCurrentTopic, setUseCurrentTopic] = useState(false);
   const [currentTopicId, setCurrentTopicId] = useState<string>("");
   const [extraContext, setExtraContext] = useState("");
-  const [pages, setPages] = useState(2);
-  // All SelectGrid + checkbox state lifted to this parent so it
-  // survives the form's `step === "estimate"` re-mount cycle. Earlier
-  // bug (2026-05-29): SelectGrid held its own useState, so after the
-  // user clicked Cancel on the estimate step the form re-mounted and
-  // every grid silently reverted to its default value while
-  // `snapshotRef` still held the original selection. User saw "Kajian
-  // umum" in the UI but got a Khutbah Jumat brief back.
-  const [segment, setSegment] = useState<(typeof SEGMENTS)[number]>(
-    SEGMENTS[0],
-  );
-  const [tone, setTone] = useState<(typeof TONES)[number]>(TONES[0]);
-  const [locale, setLocale] = useState<(typeof LOCALES)[number]>(defaultLocale);
-  const [includeProfile, setIncludeProfile] = useState(true);
+  // Draft generation is audience-neutral — segment/tone/profile/pages/locale
+  // are chosen later, when the da'i generates a deliverable from this draft.
+  // The server action defaults these to neutral values (see actions.ts).
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const topicRef = useRef<HTMLInputElement | null>(null);
   // Snapshot of the form FormData taken at the moment the user clicked
@@ -245,80 +211,6 @@ export function BriefForm({
         </div>
       </Field>
 
-      <Field label={t("field_segment")}>
-        <SelectGrid
-          name="segment"
-          value={segment}
-          onChange={(v) => setSegment(v as (typeof SEGMENTS)[number])}
-          options={SEGMENTS.map((s) => ({
-            value: s,
-            label: t(`segment_${s}` as Parameters<typeof t>[0]),
-          }))}
-        />
-      </Field>
-
-      <Field label={t("field_tone")}>
-        <SelectGrid
-          name="tone"
-          value={tone}
-          onChange={(v) => setTone(v as (typeof TONES)[number])}
-          options={TONES.map((tn) => ({
-            value: tn,
-            label: t(`tone_${tn}` as Parameters<typeof t>[0]),
-          }))}
-        />
-      </Field>
-
-      <Field label={t("field_include_profile")}>
-        <label
-          className="group inline-flex cursor-pointer items-start gap-2.5 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm transition hover:border-slate-300"
-          title={t("field_include_profile_tooltip")}
-        >
-          <input
-            type="checkbox"
-            name="include_profile"
-            checked={includeProfile}
-            onChange={(e) => setIncludeProfile(e.target.checked)}
-            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
-          />
-          <span className="flex flex-col gap-0.5">
-            <span className="font-medium text-slate-900">
-              {t("field_include_profile_label")}
-            </span>
-            <span className="text-xs leading-relaxed text-slate-500">
-              {t("field_include_profile_hint")}
-            </span>
-          </span>
-        </label>
-      </Field>
-
-      <Field label={t("field_pages")} hint={t("field_pages_hint")}>
-        <div className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
-          <button
-            type="button"
-            onClick={() => setPages((p) => Math.max(1, p - 1))}
-            disabled={pages <= 1}
-            aria-label="Decrease pages"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-300"
-          >
-            <Minus className="h-4 w-4" />
-          </button>
-          <span className="min-w-6 text-center text-sm font-semibold tabular-nums text-slate-900">
-            {pages}
-          </span>
-          <button
-            type="button"
-            onClick={() => setPages((p) => Math.min(4, p + 1))}
-            disabled={pages >= 4}
-            aria-label="Increase pages"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-300"
-          >
-            <Plus className="h-4 w-4" />
-          </button>
-        </div>
-        <input type="hidden" name="pages" value={pages} />
-      </Field>
-
       <Field
         label={t("field_extra_context")}
         hint={t("field_extra_context_hint")}
@@ -364,18 +256,6 @@ export function BriefForm({
         <p className="mt-1 text-right text-[10px] tabular-nums text-slate-400">
           {extraContext.length} / 2000
         </p>
-      </Field>
-
-      <Field label={t("field_locale")}>
-        <SelectGrid
-          name="locale"
-          value={locale}
-          onChange={(v) => setLocale(v as (typeof LOCALES)[number])}
-          options={LOCALES.map((l) => ({
-            value: l,
-            label: t(`locale_${l}` as Parameters<typeof t>[0]),
-          }))}
-        />
       </Field>
 
       {error && (
