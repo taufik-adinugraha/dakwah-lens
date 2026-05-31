@@ -2,32 +2,15 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Coins,
-  Plus,
-  Sparkles,
-  X,
-} from "lucide-react";
-import clsx from "clsx";
+import { ArrowRight, Plus, Sparkles, X } from "lucide-react";
 
-import {
-  estimateBriefCostAction,
-  generateBriefAction,
-  type EstimateResult,
-} from "@/app/[locale]/briefs/actions";
-import { formatIdr, formatUsd } from "@/lib/brief-cost";
+import { generateBriefAction } from "@/app/[locale]/briefs/actions";
 import { Spinner } from "@/components/Spinner";
 
 const CONTEXT_PRESETS = [
   "preset_counter_misconception",
   "preset_action_steps",
 ] as const;
-
-type Step = "form" | "estimate";
-
-type EstimateOk = Extract<EstimateResult, { ok: true }>;
 
 type PickerTopic = {
   id: string;
@@ -47,10 +30,7 @@ export function BriefForm({
   currentTopics?: PickerTopic[];
 }) {
   const t = useTranslations("Briefs");
-  const [step, setStep] = useState<Step>("form");
-  const [estimate, setEstimate] = useState<EstimateOk | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isEstimating, startEstimateTransition] = useTransition();
   const [isGenerating, startGenerateTransition] = useTransition();
   const [topic, setTopic] = useState(defaultTopic);
   // "Berdasarkan topik yang sedang ramai" — when ticked, the dropdown
@@ -66,11 +46,6 @@ export function BriefForm({
   // The server action defaults these to neutral values (see actions.ts).
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const topicRef = useRef<HTMLInputElement | null>(null);
-  // Snapshot of the form FormData taken at the moment the user clicked
-  // "Estimate cost". We replay it on the final "Generate" submit so the
-  // user can't tweak the form between steps and end up with a brief that
-  // doesn't match the estimate they saw.
-  const snapshotRef = useRef<FormData | null>(null);
 
   function appendPreset(key: string) {
     const snippet = t(`${key}_value` as Parameters<typeof t>[0]);
@@ -82,47 +57,13 @@ export function BriefForm({
     e.preventDefault();
     setError(null);
     const form = new FormData(e.currentTarget);
-    snapshotRef.current = form;
-    startEstimateTransition(async () => {
-      const result = await estimateBriefCostAction(form);
-      if (!result.ok) {
-        setError(result.error);
-        return;
-      }
-      setEstimate(result);
-      setStep("estimate");
-    });
-  }
-
-  async function onConfirmGenerate() {
-    if (!snapshotRef.current) return;
-    setError(null);
-    const form = snapshotRef.current;
     startGenerateTransition(async () => {
       const result = await generateBriefAction(form);
       if (!result.ok) {
         setError(result.error);
-        setStep("form");
       }
       // On success the action redirects; nothing more to do here.
     });
-  }
-
-  function onCancelEstimate() {
-    setEstimate(null);
-    setStep("form");
-  }
-
-  if (step === "estimate" && estimate) {
-    return (
-      <EstimateConfirmCard
-        estimate={estimate}
-        isGenerating={isGenerating}
-        onConfirm={onConfirmGenerate}
-        onCancel={onCancelEstimate}
-        error={error ? t(`error_${error}` as Parameters<typeof t>[0]) : null}
-      />
-    );
   }
 
   return (
@@ -269,150 +210,23 @@ export function BriefForm({
 
       <button
         type="submit"
-        disabled={isEstimating}
+        disabled={isGenerating}
         className="group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-slate-900 px-6 text-sm font-semibold text-white shadow-lg shadow-slate-900/15 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isEstimating ? (
+        {isGenerating ? (
           <>
             <Spinner size="md" />
-            {t("estimate_loading")}
+            {t("submit_loading")}
           </>
         ) : (
           <>
-            <Coins className="h-4 w-4" />
-            {t("estimate_submit")}
+            <Sparkles className="h-4 w-4" />
+            {t("submit")}
             <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
           </>
         )}
       </button>
     </form>
-  );
-}
-
-/**
- * Cost confirmation card — appears after the user clicks "Estimate".
- * Shows token + USD + IDR breakdown, plus Confirm/Cancel buttons.
- */
-function EstimateConfirmCard({
-  estimate,
-  isGenerating,
-  onConfirm,
-  onCancel,
-  error,
-}: {
-  estimate: EstimateOk;
-  isGenerating: boolean;
-  onConfirm: () => void;
-  onCancel: () => void;
-  error: string | null;
-}) {
-  const t = useTranslations("Briefs");
-  return (
-    <div className="space-y-5">
-      <div className="rounded-2xl border-2 border-sky-200 bg-gradient-to-br from-sky-50 to-white p-6 shadow-sm">
-        <div className="flex items-start gap-3">
-          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sky-100 text-sky-700">
-            <Coins className="h-5 w-5" />
-          </span>
-          <div className="flex-1">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-sky-700">
-              {t("estimate_eyebrow")}
-            </p>
-            <h3 className="mt-1 text-balance text-lg font-bold text-sky-950 sm:text-xl">
-              {t("estimate_title")}
-            </h3>
-            <p className="mt-1.5 text-sm leading-relaxed text-sky-900">
-              {t("estimate_body")}
-            </p>
-          </div>
-        </div>
-
-        <dl className="mt-5 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
-          <Stat label={t("estimate_tokens_in")} value={estimate.tokensIn.toLocaleString()} />
-          <Stat label={t("estimate_tokens_out")} value={estimate.tokensOut.toLocaleString()} />
-          <Stat label={t("estimate_cost_usd")} value={`~${formatUsd(estimate.totalUsd)}`} accent />
-          <Stat label={t("estimate_cost_idr")} value={`~${formatIdr(estimate.totalIdr)}`} accent />
-        </dl>
-
-        <p className="mt-4 text-xs leading-relaxed text-slate-500">
-          {t("estimate_disclaimer", {
-            provider: estimate.provider,
-            model: estimate.model,
-          })}
-        </p>
-      </div>
-
-      {error && (
-        <p
-          role="alert"
-          className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"
-        >
-          {error}
-        </p>
-      )}
-
-      <div className="flex flex-col gap-2 sm:flex-row">
-        <button
-          type="button"
-          onClick={onCancel}
-          disabled={isGenerating}
-          className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-6 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 sm:w-1/3"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          {t("estimate_cancel")}
-        </button>
-        <button
-          type="button"
-          onClick={onConfirm}
-          disabled={isGenerating}
-          className="group inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-emerald-700 px-6 text-sm font-semibold text-white shadow-lg shadow-emerald-700/15 transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {isGenerating ? (
-            <>
-              <Spinner size="md" />
-              {t("submit_loading")}
-            </>
-          ) : (
-            <>
-              <Sparkles className="h-4 w-4" />
-              {t("estimate_confirm")}
-              <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-            </>
-          )}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function Stat({
-  label,
-  value,
-  accent,
-}: {
-  label: string;
-  value: string;
-  accent?: boolean;
-}) {
-  return (
-    <div
-      className={clsx(
-        "rounded-xl border bg-white px-3 py-2.5",
-        accent ? "border-sky-300 bg-sky-50/60" : "border-slate-200",
-      )}
-    >
-      <dt className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-        {label}
-      </dt>
-      <dd
-        className={clsx(
-          "mt-1 text-sm font-bold tabular-nums",
-          accent ? "text-sky-900" : "text-slate-900",
-        )}
-      >
-        {value}
-      </dd>
-    </div>
   );
 }
 
@@ -434,46 +248,3 @@ function Field({
   );
 }
 
-/**
- * Controlled tile picker. State MUST live in the parent so it
- * survives the form's `step === "estimate"` re-mount cycle — see the
- * comment in BriefForm where the lifted state is declared.
- */
-function SelectGrid({
-  name,
-  value,
-  onChange,
-  options,
-}: {
-  name: string;
-  value: string;
-  onChange: (v: string) => void;
-  options: { value: string; label: string }[];
-}) {
-  return (
-    <>
-      <input type="hidden" name={name} value={value} />
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        {options.map((o) => {
-          const active = o.value === value;
-          return (
-            <button
-              key={o.value}
-              type="button"
-              onClick={() => onChange(o.value)}
-              aria-pressed={active}
-              className={clsx(
-                "rounded-lg border px-3 py-2 text-xs font-medium transition",
-                active
-                  ? "border-slate-900 bg-slate-900 text-white shadow-sm"
-                  : "border-slate-200 bg-white text-slate-700 hover:border-slate-300",
-              )}
-            >
-              {o.label}
-            </button>
-          );
-        })}
-      </div>
-    </>
-  );
-}
