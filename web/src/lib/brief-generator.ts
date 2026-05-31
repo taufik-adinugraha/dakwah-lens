@@ -12,7 +12,9 @@ import { generateJson, type LlmProvider } from "@/lib/llm";
 import { formatCalendarContext } from "@/lib/islamic-calendar";
 import {
   renderPlatformSamplesBlock,
+  renderPlatformStatsBlock,
   type PlatformSampleGroup,
+  type PlatformStat,
 } from "@/lib/draft-grounding";
 import type { BriefContent, BriefDaleel } from "@/db/schema";
 
@@ -204,13 +206,13 @@ const RESPONSE_JSON_SCHEMA = {
       type: "string",
       description:
         "FOUR paragraphs, separated by blank lines (use \\n\\n between paragraphs). Each 4-6 sentences. STRUCTURE WAJIB — jangan campur urutan, jangan gabungkan ke satu paragraf besar:\\n\\n" +
-        "PARAGRAF 1 — Bagaimana isu ini muncul di tiap platform, berdasarkan CONTOH POST PER PLATFORM yang diberikan di prompt (bukan tebakan umum). Tiap baris platform harus: (a) merangkum karakter post nyata yang muncul, (b) sebut sentimen dominan dari label sentiment yang ada di sample (positive / neutral / negative / concerned), (c) sebutkan audiens utama yang kemungkinan terdampak. Format yang diharapkan (markdown OK):\\n" +
-        "- **TikTok:** [karakter post yang sebenarnya muncul di sample] — sentimen dominan: [...] — audiens utama: [...].\\n" +
-        "- **X (Twitter):** [...] — sentimen dominan: [...] — audiens utama: [...].\\n" +
-        "- **Instagram:** [...] — sentimen dominan: [...] — audiens utama: [...].\\n" +
-        "- **YouTube:** [...] — sentimen dominan: [...] — audiens utama: [...].\\n" +
-        "- **Berita arus utama (RSS):** [...] — sentimen dominan: [...] — pembaca: [...].\\n" +
-        "Kalau bucket platform kosong di CONTOH POST, tulis 'tidak terlihat di ingestion pekan ini' untuk baris itu — JANGAN diisi dengan pola umum. Kalau seluruh CONTOH POST kosong (catatan ada di prompt), ganti paragraf ini menjadi narasi 'pola umum percakapan publik' tanpa pecahan per platform.\\n\\n" +
+        "PARAGRAF 1 — Bagaimana isu ini muncul di tiap platform, berdasarkan STATISTIK PERCAKAPAN + CONTOH POST PER PLATFORM yang diberikan di prompt (bukan tebakan umum). Tiap baris platform WAJIB: (a) sebut angka kuantitatif dari STATISTIK (mis. 'N=47, 32 negatif'), (b) rangkum karakter post nyata dari CONTOH POST, (c) sebut sentimen dominan berdasarkan distribusi di STATISTIK (positif/netral/negatif), (d) sebutkan audiens utama yang kemungkinan terdampak. Format yang diharapkan (markdown OK):\\n" +
+        "- **TikTok (n=N, X negatif / Y netral / Z positif):** [karakter post dari sample] — audiens utama: [...].\\n" +
+        "- **X (Twitter) (n=N, ...):** [...] — audiens utama: [...].\\n" +
+        "- **Instagram (n=N, ...):** [...] — audiens utama: [...].\\n" +
+        "- **YouTube (n=N, ...):** [...] — audiens utama: [...].\\n" +
+        "- **Berita arus utama (RSS) (n=N, ...):** [...] — pembaca: [...].\\n" +
+        "Kalau bucket platform kosong di STATISTIK (n=0), tulis 'tidak terlihat di ingestion pekan ini' untuk baris itu — JANGAN diisi dengan pola umum. Kalau seluruh STATISTIK kosong (catatan ada di prompt), ganti paragraf ini menjadi narasi 'pola umum percakapan publik' tanpa pecahan per platform.\\n\\n" +
         "PARAGRAF 2 — Problem statement: apa SEBENARNYA inti masalahnya. Lepas dari platform; bahas fenomena itu sendiri. Sebut akar penyebab, konteks sosial-ekonomi Indonesia, dan apa yang dipertaruhkan kalau dibiarkan. Tidak perlu mengutip dalil di paragraf ini — ini bagian diagnosis.\\n\\n" +
         "PARAGRAF 3 — Tinjauan syariah + dalil. Bagaimana Islam memandang isu ini. KUTIP minimal 2 dari dalil yang diberikan di RETRIEVED DALEEL — pakai citation string inline (mis. 'QS. Al-Baqarah: 195', 'Sahih al-Bukhari 6018'). Jelaskan kenapa dalil tersebut relevan dengan inti masalah di Paragraf 2. JANGAN mengarang dalil baru. Sebutkan juga kategori da'wah yang bersinggungan (akhlaq, muamalah, aqidah, tarbiyah, ibadah, sosial).\\n\\n" +
         "PARAGRAF 4 — Implementasi nyata. Langkah konkret yang bisa diambil — di tingkat individu, keluarga, komunitas masjid, dan organisasi/lembaga. Aksi spesifik, bisa dilakukan minggu ini, bukan saran abstrak. Boleh berupa bullet list.\\n\\n" +
@@ -319,6 +321,12 @@ export type GenerateBriefInput = {
    *  the prompt falls back to a "pola umum" (general patterns)
    *  framing without inventing per-platform specifics. */
   platformSamples?: PlatformSampleGroup[];
+  /** Per-platform sentiment counts for the topic (same window as
+   *  platformSamples). Lets the LLM cite specific numbers like
+   *  "32 of 47 posts on TikTok carry negative sentiment" instead
+   *  of inferring tone from just the 3 sample posts. Empty array
+   *  or all-zero entries = stats block omitted from the prompt. */
+  platformStats?: PlatformStat[];
 };
 
 export type GeneratedBrief = {
@@ -344,6 +352,7 @@ export async function generateBriefContent(
     pages = 2,
     currentTopic,
     platformSamples = [],
+    platformStats = [],
   } = input;
 
   const segLabel = SEGMENT_LABELS[segment]?.[locale] ?? segment;
@@ -413,6 +422,19 @@ export async function generateBriefContent(
       ].join("\n")
     : "";
 
+  // Per-platform sentiment totals — lets paragraf 1 cite specific
+  // numbers ("47 post di TikTok, 32 negatif") instead of inferring
+  // tone from just the 3 sample texts.
+  const platformStatsBlock = renderPlatformStatsBlock(platformStats);
+  const hasPlatformStats = platformStatsBlock.length > 0;
+  const platformStatsPromptBlock = hasPlatformStats
+    ? [
+        "",
+        "STATISTIK PERCAKAPAN — agregat total post + breakdown sentimen per platform untuk topik ini (14 hari terakhir). Pakai angka-angka di tabel ini untuk MEMBERI BOBOT KUANTITATIF pada paragraf 1: tulis 'X dari Y post' atau 'mayoritas negatif (N/M)' atau 'dominan netral' — anchor ke ANGKA NYATA, bukan kira-kira. Kalau total < 5 untuk satu platform, sebut 'sedikit (n=N)' tapi jangan lebay.",
+        platformStatsBlock,
+      ].join("\n")
+    : "";
+
   // Hijri calendar context — surfaces today's Hijri date + curated
   // events in the next 7-10 days so the brief's sunnah / du'a
   // recommendations are TIMELY rather than generic. Mirrors what the
@@ -451,6 +473,7 @@ export async function generateBriefContent(
       ? `\nAdditional context from the da'i for THIS draft — weight this heavily:\n${trimmedExtra}`
       : "",
     currentTopicBlock,
+    platformStatsPromptBlock,
     platformSamplesPromptBlock,
     hasPlatformSamples
       ? ""

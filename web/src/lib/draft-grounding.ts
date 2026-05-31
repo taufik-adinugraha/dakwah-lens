@@ -369,6 +369,50 @@ export async function getPlatformStatsForTopic(
   return PLATFORM_BUCKETS.map((p) => byPlatform.get(p)!);
 }
 
+/** Render the per-platform stats block for the LLM user prompt — terse
+ *  numeric summary the LLM can cite alongside the sample-quote analysis.
+ *  Returns "" when every platform has zero posts so the caller can skip
+ *  the section entirely. */
+export function renderPlatformStatsBlock(stats: PlatformStat[]): string {
+  if (!stats.some((s) => s.total > 0)) return "";
+  const platformLabel: Record<PlatformBucket, string> = {
+    x: "X (Twitter)",
+    tiktok: "TikTok",
+    instagram: "Instagram",
+    youtube: "YouTube",
+    mainstream: "Berita arus utama (RSS)",
+  };
+  const lines: string[] = [
+    "| Platform | Total | Positif | Netral | Negatif | Lain |",
+    "|---|---:|---:|---:|---:|---:|",
+  ];
+  let totalAll = 0;
+  let posAll = 0;
+  let neuAll = 0;
+  let negAll = 0;
+  let othAll = 0;
+  for (const s of stats) {
+    if (s.total === 0) {
+      lines.push(
+        `| ${platformLabel[s.platform]} | 0 | — | — | — | — |`,
+      );
+      continue;
+    }
+    totalAll += s.total;
+    posAll += s.positive;
+    neuAll += s.neutral;
+    negAll += s.negative;
+    othAll += s.other;
+    lines.push(
+      `| ${platformLabel[s.platform]} | ${s.total} | ${s.positive} | ${s.neutral} | ${s.negative} | ${s.other} |`,
+    );
+  }
+  lines.push(
+    `| **Total** | **${totalAll}** | **${posAll}** | **${neuAll}** | **${negAll}** | **${othAll}** |`,
+  );
+  return lines.join("\n");
+}
+
 /** Render the per-platform samples block for the LLM user prompt.
  *  Returns an empty string when every platform has zero samples — caller
  *  should then skip the platform-breakdown directive entirely. */

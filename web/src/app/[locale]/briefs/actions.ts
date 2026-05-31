@@ -385,6 +385,7 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
       pages,
       currentTopic,
       platformSamples,
+      platformStats,
     });
     content = generated.content;
     provider = generated.provider;
