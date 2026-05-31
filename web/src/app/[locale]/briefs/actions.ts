@@ -8,6 +8,7 @@ import { z } from "zod";
 import { auth } from "@/auth";
 import { db, schema } from "@/db";
 import {
+  rerankDaleel,
   retrieveDaleel,
   RetrievalUnavailableError,
   WeakRelevanceError,
@@ -169,17 +170,20 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
   try {
     const matched = await retrieveDaleel(enrichedQuery, {
       corpus: "all",
-      // Bumped 2 → 4 per corpus (2026-05-29) after a user reported
-      // "only 2 daleel in my brief". After dedup + the 0.32 cosine
-      // floor + per-corpus skips, topK=2 sometimes left the LLM with
-      // a thin pool to weave into the brief. 4 per corpus across the
-      // 6 corpora (quran + 4 hadith + tafsir) gives the LLM up to ~24
-      // candidates before dedup — typically settling at 8-12 unique
-      // daleel in the final brief.
-      topK: 4,
+      // 10 per corpus × 6 corpora = up to ~60 candidates before dedup +
+      // the 0.32 cosine floor + per-corpus skips. Gives the rerank step
+      // a wider pool so it can drop surface-keyword matches and the
+      // synthesis LLM only sees thematically-strong hits.
+      topK: 10,
       locale,
     });
-    daleel = matched.map((d) => ({
+    // Gemini Flash-Lite thematic rerank. Cosine alone surfaces passages
+    // that share surface tokens with the topic (e.g. "pemuda" matching
+    // verses about youthful paradise servants instead of real-world
+    // youth issues). The rerank reads each candidate against the topic
+    // and picks the ones that ACTUALLY discuss the theme. ~$0.0001/call.
+    const reranked = await rerankDaleel(enrichedQuery, matched, { topN: 10 });
+    daleel = reranked.map((d) => ({
       surah: d.surah ?? 0,
       ayah: d.ayah ?? 0,
       arabic: d.arabic,

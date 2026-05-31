@@ -38,7 +38,6 @@ const TONES = [
   "gentle",
 ] as const;
 const LOCALES = ["en", "id"] as const;
-const FORMATS = ["kajian_umum", "khutbah_jumat"] as const;
 
 const CONTEXT_PRESETS = [
   "preset_khutbah_jumat",
@@ -97,7 +96,6 @@ export function BriefForm({
     SEGMENTS[0],
   );
   const [tone, setTone] = useState<(typeof TONES)[number]>(TONES[0]);
-  const [format, setFormat] = useState<(typeof FORMATS)[number]>("kajian_umum");
   const [locale, setLocale] = useState<(typeof LOCALES)[number]>(defaultLocale);
   const [includeProfile, setIncludeProfile] = useState(true);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -267,18 +265,6 @@ export function BriefForm({
           options={TONES.map((tn) => ({
             value: tn,
             label: t(`tone_${tn}` as Parameters<typeof t>[0]),
-          }))}
-        />
-      </Field>
-
-      <Field label={t("field_format")} hint={t("field_format_hint")}>
-        <SelectGrid
-          name="format"
-          value={format}
-          onChange={(v) => setFormat(v as (typeof FORMATS)[number])}
-          options={FORMATS.map((f) => ({
-            value: f,
-            label: t(`format_${f}` as Parameters<typeof t>[0]),
           }))}
         />
       </Field>

@@ -315,6 +315,145 @@ export async function retrieveDaleel(
 }
 
 /**
+ * Re-rank embedding-retrieved daleel candidates by THEMATIC fit
+ * using Gemini Flash-Lite.
+ *
+ * Cosine similarity matches passages whose embedding tokens overlap
+ * the query — for "isu youth" it surfaces verses that contain `muda`
+ * or `pemuda` regardless of context (e.g. Quran verses about youthful
+ * paradise servants instead of real-world youth issues). This re-rank
+ * asks a cheap LLM to score the *thematic relevance* of each candidate
+ * to the theme.
+ *
+ * Falls back to the input order on any error (defense in depth — a
+ * rerank failure must never break the brief pipeline).
+ *
+ * Ported from api/src/api/services/kitab_retrieval.py::rerank_daleel
+ * so the brief flow gets the same quality lift the insights pipeline
+ * already enjoys.
+ */
+export async function rerankDaleel(
+  theme: string,
+  candidates: KitabHit[],
+  opts: { topN: number },
+): Promise<KitabHit[]> {
+  const { topN } = opts;
+  if (candidates.length === 0 || candidates.length <= topN) {
+    return candidates.slice(0, topN);
+  }
+  if (!process.env.GEMINI_API_KEY) {
+    return candidates.slice(0, topN);
+  }
+
+  const numbered = candidates
+    .map(
+      (c, i) =>
+        `[${i}] ${c.corpus.toUpperCase()} ${c.citation}\n` +
+        `    Arab: ${c.arabic.slice(0, 200)}\n` +
+        `    Terjemah: ${c.translation.slice(0, 300)}`,
+    )
+    .join("\n");
+
+  const prompt = `Theme da'i akan diangkat pekan ini:
+${theme}
+
+Berikut adalah ${candidates.length} kandidat daleel dari Qur'an dan hadith yang ditemukan oleh pencarian embedding. Beberapa cocok dengan tema, beberapa hanya cocok pada kata kunci permukaan saja (tidak relevan secara tematik).
+
+TUGAS: Pilih INDEX daleel yang BENAR-BENAR relevan secara TEMATIK untuk tema di atas.
+
+ATURAN PENILAIAN — wajib ketat:
+- Daleel TIDAK COCOK jika hanya berbagi kata permukaan tapi konteks asli berbeda. Contoh kesalahan yang HARUS Anda tolak:
+  * tema "pinjol/riba" + daleel tentang "pemuda yang taat di Gua Kahfi" → TIDAK COCOK (sama-sama "muda", tapi tema-nya kepatuhan vs muamalah)
+  * tema "judol/maysir" + daleel tentang "permainan anak-anak" → TIDAK COCOK (kata "lahw" tidak otomatis = perjudian)
+  * tema "kekerasan terhadap anak" + daleel tentang "perlindungan harta yatim" → LEMAH (terkait, tapi tema sebenarnya kekerasan fisik, bukan harta)
+  * tema "depresi/mental health" + daleel tentang "kesabaran nabi atas kafir Quraysy" → LEMAH (sabar tapi konteks dakwah-ke-luar, bukan ketenangan jiwa)
+- Daleel COCOK kalau ayat/hadith-nya BENAR-BENAR berbicara tentang inti tema-nya, bukan hanya berbagi satu kata. Contoh yang BENAR:
+  * tema "pinjol/riba" + daleel QS Al-Baqarah:275-281 (larangan riba) → COCOK
+  * tema "judol/maysir" + daleel QS Al-Maidah:90-91 (khamr & maysir) → COCOK
+  * tema "bullying/ghibah" + hadith tentang lisan yang menjaga saudara → COCOK
+  * tema "korupsi/amanah" + ayat tentang menunaikan amanah → COCOK
+
+PRINSIP TERAKHIR: lebih baik mengembalikan SEDIKIT daleel yang benar-benar tematik daripada memaksa ${topN} entri ketika hanya sebagian yang benar-benar relevan. Da'i akan mengutip ulang daleel ini di mimbar — daleel yang dipaksakan akan terasa janggal dan merusak kredibilitas pesan.
+
+Kandidat:
+${numbered}
+
+Kembalikan JSON: {"indices": [i1, i2, ...]} dengan SEMUA index daleel yang BENAR-BENAR cocok (jumlah bisa antara 0 hingga ${topN}, urutan dari paling relevan). Kalau tidak ada satu pun yang cocok secara tematik, kembalikan {"indices": []}.`;
+
+  try {
+    const genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const resp = await genai.models.generateContent({
+      model: "gemini-2.5-flash-lite",
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        temperature: 0.1,
+        maxOutputTokens: 200,
+        thinkingConfig: { thinkingBudget: 0 },
+      },
+    });
+    void recordUsage({
+      provider: "gemini",
+      operation: "daleel_rerank",
+      model: "gemini-2.5-flash-lite",
+      tokensIn: resp.usageMetadata?.promptTokenCount ?? null,
+      tokensOut: resp.usageMetadata?.candidatesTokenCount ?? null,
+    });
+
+    const raw = resp.text ?? "{}";
+    const data: unknown = JSON.parse(raw);
+    if (
+      !data ||
+      typeof data !== "object" ||
+      !Array.isArray((data as { indices?: unknown }).indices)
+    ) {
+      throw new Error("indices not a list");
+    }
+    const indices = (data as { indices: unknown[] }).indices;
+    const picked: KitabHit[] = [];
+    const seen = new Set<number>();
+    for (const idx of indices) {
+      if (
+        typeof idx === "number" &&
+        Number.isInteger(idx) &&
+        idx >= 0 &&
+        idx < candidates.length &&
+        !seen.has(idx)
+      ) {
+        picked.push(candidates[idx]);
+        seen.add(idx);
+        if (picked.length >= topN) break;
+      }
+    }
+    console.info(
+      "[kitab-retrieval] reranked",
+      JSON.stringify({
+        theme: theme.slice(0, 80),
+        candidates_in: candidates.length,
+        picked: picked.length,
+      }),
+    );
+    // Do NOT top up with weak candidates — the rerank's whole point is
+    // to drop surface-keyword matches. If it returned literally zero,
+    // fall back to the single top-cosine hit so the brief still has
+    // something to cite (mirrors the Python rerank's last-resort path).
+    if (picked.length === 0) {
+      console.warn(
+        "[kitab-retrieval] rerank returned empty — falling back to top-1 cosine hit",
+      );
+      return [candidates[0]];
+    }
+    return picked;
+  } catch (err) {
+    console.warn(
+      "[kitab-retrieval] rerank failed:",
+      err instanceof Error ? err.message : err,
+    );
+    return candidates.slice(0, topN);
+  }
+}
+
+/**
  * How many points each corpus collection holds. Used by the public
  * /kitab page to show the corpus size next to each kitab card. Reads
  * Qdrant collection info (fast, no embed) and returns 0 for any
