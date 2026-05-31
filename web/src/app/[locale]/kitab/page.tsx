@@ -46,9 +46,11 @@ const RESULTS_LIMIT = 20;
 //
 // `languages` reflects what's actually embedded in Qdrant per the embed
 // scripts (api/src/api/scripts/embed_*.py). Quran has all three from the
-// AGENTS.md corpus pick (AR + Kemenag ID + Sahih International EN); the
-// hadith corpora ship AR + EN only because Indonesian translations aren't
-// in the source data; Tafsir Ibn Kathir is AR + EN (Mubarakpuri abridged).
+// AGENTS.md corpus pick (AR + Kemenag ID + Sahih International EN);
+// Sahih Muslim was manually translated to Bahasa 2026-05 (AR + ID + EN);
+// the remaining hadith corpora (Bukhari, Riyad, Bulugh) still ship AR +
+// EN only — their Indonesian translations aren't curated yet. Tafsir
+// Ibn Kathir is AR + EN (Mubarakpuri abridged).
 const KITAB_META: Record<
   KitabCorpus,
   {
@@ -78,7 +80,7 @@ const KITAB_META: Record<
     metaKey: "kitab_muslim_meta",
     tone: "from-cyan-50 to-cyan-100/40",
     iconTone: "bg-cyan-600",
-    languages: ["AR", "EN"],
+    languages: ["AR", "ID", "EN"],
   },
   riyad: {
     labelKey: "kitab_riyad_title",
@@ -452,8 +454,9 @@ function KitabGrid({
                       {t(m.metaKey as Parameters<typeof t>[0])}
                     </p>
                     {/* Language pills — which translations are actually
-                        embedded for this corpus. Quran has all three;
-                        hadith corpora are AR + EN only. */}
+                        embedded for this corpus. Quran and Sahih Muslim
+                        have all three (AR + ID + EN); the other hadith
+                        corpora and tafsir are AR + EN only. */}
                     <div className="mt-2 flex flex-wrap gap-1">
                       {m.languages.map((lang) => (
                         <span

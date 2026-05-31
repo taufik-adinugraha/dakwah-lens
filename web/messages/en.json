@@ -294,7 +294,7 @@
   },
   "Kitab": {
     "page_title": "Kitab Library",
-    "id_translation_notice": "Most kitab in this library are in Arabic and English — we're in the process of curating texts with Indonesian translations. For direct search like this, results are not translated to Bahasa Indonesia to save cost.",
+    "id_translation_notice": "The Qur'an and Sahih Muslim are available in Bahasa Indonesia (manual translation). The remaining hadith collections (Bukhari, Riyad as-Salihin, Bulugh al-Maram) and Tafsir Ibn Kathir are still English-only — we're curating Indonesian translations for them.",
     "badge": "Verified library",
     "title": "Every citation, traceable to its source",
     "body": "Each citation in a Dakwah-Lens brief comes from a real, verified kitab — never invented by AI. This is the cornerstone of the trust we work to earn.",
@@ -318,7 +318,7 @@
     "kitab_bukhari_translations": "Translation: English (sunnah.com)",
     "kitab_muslim_title": "Sahih Muslim",
     "kitab_muslim_meta": "Imam Muslim · ~7,500 hadith · 56 books",
-    "kitab_muslim_translations": "Translation: English (sunnah.com)",
+    "kitab_muslim_translations": "Translations: Bahasa Indonesia (manual) · English (sunnah.com)",
     "kitab_riyad_title": "Riyad as-Salihin",
     "kitab_riyad_meta": "Imam an-Nawawi · 1,896 hadith · 372 chapters",
     "kitab_riyad_translations": "Translation: English (sunnah.com)",

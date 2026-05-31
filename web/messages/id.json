@@ -290,7 +290,7 @@
   },
   "Kitab": {
     "page_title": "Pustaka Kitab",
-    "id_translation_notice": "Sebagian besar kitab dalam pustaka ini tersedia dalam bahasa Arab dan Inggris — kami sedang dalam proses mengkurasi kitab dengan terjemahan Bahasa Indonesia. Khusus untuk pencarian langsung seperti ini, demi menghemat biaya, hasil pencarian tidak kami terjemahkan ke Bahasa Indonesia.",
+    "id_translation_notice": "Al-Qur'an dan Sahih Muslim sudah tersedia dalam Bahasa Indonesia (terjemah manual). Kitab hadits lain (Bukhari, Riyad as-Salihin, Bulugh al-Maram) dan Tafsir Ibn Katsir masih dalam bahasa Inggris — kami sedang dalam proses mengkurasinya.",
     "badge": "Pustaka Terverifikasi",
     "title": "Setiap kutipan dapat Anda telusuri sampai ke sumber aslinya",
     "body": "Setiap kutipan dalam kajian Dakwah-Lens bersumber dari kitab nyata yang sudah diverifikasi — bukan karangan AI. Inilah bagian terpenting dari kepercayaan yang kami bangun.",
@@ -314,7 +314,7 @@
     "kitab_bukhari_translations": "Terjemah: English (sunnah.com)",
     "kitab_muslim_title": "Sahih Muslim",
     "kitab_muslim_meta": "Imam Muslim · ~7.500 hadits · 56 kitab",
-    "kitab_muslim_translations": "Terjemah: English (sunnah.com)",
+    "kitab_muslim_translations": "Terjemah: Bahasa Indonesia (manual) · English (sunnah.com)",
     "kitab_riyad_title": "Riyad as-Salihin",
     "kitab_riyad_meta": "Imam an-Nawawi · 1.896 hadits · 372 bab",
     "kitab_riyad_translations": "Terjemah: English (sunnah.com)",
