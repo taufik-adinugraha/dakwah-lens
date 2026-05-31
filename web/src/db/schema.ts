@@ -231,26 +231,28 @@ export type BriefDaleel = {
 export type BriefContent = {
   situation_summary: string;
   issue_analysis: string;
-  audience_segmentation: {
+  daleel: BriefDaleel[];
+  /** Audience-tailored sections — deprecated for new drafts as of
+   *  2026-05-31. Drafts are now audience-neutral research scaffolds; the
+   *  audience-specific work (perception, angle, recommendations,
+   *  objections, stories, khutbah outline, social caption) happens
+   *  inside the deliverable generator instead, where the da'i picks the
+   *  audience + tone + format. These fields stay in the type so legacy
+   *  brief rows generated before the cut-over continue to render. */
+  audience_segmentation?: {
     primary: string;
     perception: string;
     angle: string;
   };
-  daleel: BriefDaleel[];
-  recommendations: string[];
-  content_templates: {
+  recommendations?: string[];
+  content_templates?: {
     khutbah_outline: string;
     social_caption: string;
   };
-  /** Anticipated audience pushback + concrete responses. Optional on the
-   *  TS type so older briefs in the DB still type-check; the LLM schema
-   *  requires it for newly generated briefs. */
   anticipated_objections?: Array<{
     objection: string;
     response: string;
   }>;
-  /** 2-3 concrete narrative hooks / illustrations the da'i can drop into
-   *  delivery. Same back-compat story as above. */
   story_illustrations?: string[];
 };
 

@@ -1,9 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
+
+import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
 import { db, schema } from "@/db";
@@ -180,7 +181,7 @@ export async function generateKajianAction(
 
   revalidatePath("/dashboard");
   revalidatePath(`/briefs/${brief.id}`);
-  redirect(`/kajian/${row.id}`);
+  redirect(`/${locale}/kajian/${row.id}`);
 }
 
 /* ─── Publish / unpublish / delete ─────────────────────────────────── */

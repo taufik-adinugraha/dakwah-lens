@@ -160,14 +160,15 @@ const TONE_LABELS: Record<string, { en: string; id: string }> = {
  * Zod schema for the LLM response (runtime validation)
  * ───────────────────────────────────────────────────────────── */
 
+// Draft schema (audience-neutral research scaffold). The audience-tailored
+// fields — recommendations, anticipated_objections, story_illustrations,
+// content_templates, audience_segmentation — moved to the deliverable
+// generator (kajian/), where the da'i picks audience + tone + format and
+// the LLM tailors the prose to that target. A draft only needs to set up
+// the topic + analysis + the daleel pool the da'i will draw from.
 const BriefResponseSchema = z.object({
   situation_summary: z.string().min(80),
   issue_analysis: z.string().min(400),
-  audience_segmentation: z.object({
-    primary: z.string().min(2),
-    perception: z.string().min(40),
-    angle: z.string().min(40),
-  }),
   // 2-3 sentence relevance note per retrieved daleel — keyed by the
   // 1-based daleel index the user prompt passes in. Stored alongside
   // each BriefDaleel server-side and rendered under the citation card.
@@ -179,21 +180,6 @@ const BriefResponseSchema = z.object({
       }),
     )
     .optional(),
-  recommendations: z.array(z.string().min(20)).min(8).max(12),
-  anticipated_objections: z
-    .array(
-      z.object({
-        objection: z.string().min(15),
-        response: z.string().min(40),
-      }),
-    )
-    .min(4)
-    .max(5),
-  story_illustrations: z.array(z.string().min(40)).min(4).max(6),
-  content_templates: z.object({
-    khutbah_outline: z.string().min(300),
-    social_caption: z.string().min(20),
-  }),
 });
 
 type BriefResponse = z.infer<typeof BriefResponseSchema>;
@@ -208,32 +194,12 @@ const RESPONSE_JSON_SCHEMA = {
     situation_summary: {
       type: "string",
       description:
-        "2-3 sentences describing the current public discourse on the topic among the target audience.",
+        "2-4 sentences describing what's happening with this topic in Indonesian society right now — the cultural conversation, the lived reality, the typical framings. Audience-neutral; don't lean toward a specific demographic. This is the orientation paragraph a da'i reads first to understand the lay of the land.",
     },
     issue_analysis: {
       type: "string",
       description:
-        "5-7 paragraphs of real depth, FILTERED THROUGH the audience profile. Cover (in this order): (1) what this issue actually looks like in their daily reality — concrete, situated, specific to their life stage; (2) the underlying drivers / root causes — what makes this hard right now; (3) the cultural / economic / generational context unique to Indonesian Muslims facing this issue; (4) why this matters from a da'wah lens — name the da'wah categories it intersects (akhlaq, muamalah, aqidah, tarbiyah, ibadah, sosial) and connect explicitly to the retrieved Qur'an verses, hadith, and tafsir passages; (5) what's at stake if it goes unaddressed — for them, their families, the ummah; (6) where common framings of this issue go wrong (secular, materialist, or sectarian framings) and what the Islamic framing adds. Concrete, never generic. Each paragraph 4-6 sentences.",
-    },
-    audience_segmentation: {
-      type: "object",
-      properties: {
-        primary: {
-          type: "string",
-          description: "The target audience segment, written verbatim.",
-        },
-        perception: {
-          type: "string",
-          description:
-            "1-2 sentences on how this audience PSYCHOLOGICALLY frames the issue — fears, motivations, internal narrative — not how outsiders see them. Draw on the audience profile.",
-        },
-        angle: {
-          type: "string",
-          description:
-            "1-2 sentences on the recommended messaging angle. Include the emotional pacing (e.g. acknowledge first, then redirect) and what to lead with, based on the audience's delivery preferences.",
-        },
-      },
-      required: ["primary", "perception", "angle"],
+        "6-8 paragraphs of substantive analytical depth. AUDIENCE-NEUTRAL — this is a research scaffold a da'i reviews before deciding who to address. Cover (in this order): (1) what the issue actually looks like in Indonesian daily life today — concrete examples; (2) the underlying drivers and root causes; (3) the relevant cultural / economic / generational context across Indonesian Muslim communities; (4) why this matters from a da'wah lens — name the categories it intersects (akhlaq, muamalah, aqidah, tarbiyah, ibadah, sosial) and connect explicitly to the retrieved Qur'an verses, hadith, and tafsir passages — quoting the citation strings inline; (5) what's at stake if unaddressed — individual, family, ummah; (6) where common secular / materialist / sectarian framings go wrong and what the Islamic framing adds; (7) the spectrum of how this issue lands across different Indonesian audiences (urban Gen Z, working professionals, families, students, rural communities, ibu-ibu pengajian) — 1 sentence each on what's distinctive about how each group encounters it. Concrete, never generic. Each paragraph 4-6 sentences. The da'i will use this analysis to pick a format + audience downstream — don't pre-commit to one.",
     },
     daleel_explanations: {
       type: "array",
@@ -248,100 +214,40 @@ const RESPONSE_JSON_SCHEMA = {
           explanation: {
             type: "string",
             description:
-              "2-3 sentence relevance note in the requested output language explaining WHY this specific daleel matters for THIS topic + audience. Tie the meaning to a concrete situation the audience faces, not a generic restatement of the translation. Mention what the daleel adds to the argument that the brief makes — what would be missing without it. Do NOT re-quote the Arabic or repeat the translation verbatim; the UI renders those separately. Do NOT invent additional citations.",
+              "2-3 sentence relevance note in the requested output language explaining WHY this specific daleel matters for THIS topic. Tie the meaning to a concrete Indonesian situation, not a generic restatement of the translation. Mention what the daleel adds to the argument the brief is building — what would be missing without it. Audience-neutral; don't tailor to a single demographic. Do NOT re-quote the Arabic or repeat the translation verbatim; the UI renders those separately. Do NOT invent additional citations.",
           },
         },
         required: ["index", "explanation"],
       },
       description:
-        "ONE explanation entry per retrieved daleel the brief actually uses. Index matches the 1-based number from the RETRIEVED DALEEL block. Aim to explain EVERY daleel that was provided; skip an index only if it truly doesn't fit the topic. Order doesn't matter — index is the key.",
-    },
-    recommendations: {
-      type: "array",
-      items: { type: "string" },
-      description:
-        "8 to 12 practical, audience-calibrated bullet points. Each should be something THIS audience can actually do this week — using their tools, fitting their constraints, in language they speak. Cover the FULL range — include at least: 2 mindset shifts, 2 concrete daily habits, 2 social/relational actions, 1 du'a or dhikr practice tied to the topic, 1 specific Qur'an/hadith passage to memorize from the retrieved daleel, 1 self-reflection prompt. Each item should be 2-3 sentences, specific enough that someone can act on it without further interpretation. Avoid generic 'make more du'a' platitudes.",
-    },
-    anticipated_objections: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          objection: {
-            type: "string",
-            description:
-              "A realistic concern, pushback, or 'but what about...' question that this specific audience would actually raise on this topic. Phrase it in their voice — first person, conversational, in their natural vocabulary.",
-          },
-          response: {
-            type: "string",
-            description:
-              "A compassionate, hikmah-grounded 2-3 sentence reply that validates the concern's legitimacy before redirecting. Where natural, tie back to the retrieved daleel — do not invent new citations.",
-          },
-        },
-        required: ["objection", "response"],
-      },
-      description:
-        "4 to 5 anticipated objections + responses. These let the da'i prepare for real audience pushback before they're in front of the room. Drawn from the audience profile's psychology + 'avoid' list. Cover a range — at least one practical concern ('I don't have time'), one ideological pushback ('this is outdated' / 'this isn't relevant in modern life'), one social-pressure objection ('what will people think'), one theological doubt ('but doesn't Islam also say X?'). Responses 3-4 sentences each.",
-    },
-    story_illustrations: {
-      type: "array",
-      items: { type: "string" },
-      description:
-        "4 to 6 short narrative hooks the da'i can drop into delivery to ground the abstract in the concrete. Each is 3-4 sentences. Mix sources: (a) at least 2 scenes from the Prophet ﷺ's life or the lives of the Sahabah, drawn from the retrieved daleel where possible; (b) at least 2 contemporary scenarios from THIS audience's world (their workplace, dorm, family room, sawah) — fictional but plausible; (c) optionally a parable or analogy from classical scholarship. Each must clearly illustrate one point from the issue analysis.",
-    },
-    content_templates: {
-      type: "object",
-      properties: {
-        khutbah_outline: {
-          type: "string",
-          description:
-            "Full khutbah skeleton in 10 sections, with rich talking points underneath each — total 25-35 lines. Tailored to the audience's attention rhythm and reference points. Use newlines to separate. Sections (use these headings verbatim, in this order):\\n  1) Opening hamd + salawat (2 lines — convention but should feel sincere, not rote)\\n  2) Opening hook (a real moment / feeling from THIS audience's life — 2-3 lines)\\n  3) Context (what the audience is grappling with right now — 3-4 lines)\\n  4) Main Qur'anic daleel (cite ONE from the retrieved Qur'an hits with the source string, then 2-3 lines of substantive reflection — not just a transition)\\n  5) Supporting hadith (cite ONE from the retrieved hadith hits with the source string, then 2-3 lines tying it to the Qur'anic theme)\\n  6) Classical commentary (cite ONE from the retrieved tafsir hits with the source string, then 2 lines on what the scholarly tradition adds)\\n  7) Practical application (3-4 specific, situated actions they can take this week — bulleted; concrete enough that someone can act on them tonight)\\n  8) Anticipating pushback (acknowledge 1-2 of the anticipated_objections briefly, with the compassionate response — 2-3 lines)\\n  9) Call to action + community framing (2-3 lines on how this lands in the listener's family / mosque / workplace)\\n  10) Closing du'a + call to mercy (2-3 lines, end on rahma + hikmah, not fear).",
-        },
-        social_caption: {
-          type: "string",
-          description:
-            "1-2 sentence caption suitable for the platforms this audience actually uses. Match their voice — Gen Z gets a different cadence than rural elders. Hook + invitation.",
-        },
-      },
-      required: ["khutbah_outline", "social_caption"],
+        "ONE explanation entry per retrieved daleel. Index matches the 1-based number from the RETRIEVED DALEEL block. Aim to explain EVERY daleel that was provided; skip an index only if it truly doesn't fit the topic. Order doesn't matter — index is the key.",
     },
   },
-  required: [
-    "situation_summary",
-    "issue_analysis",
-    "audience_segmentation",
-    "recommendations",
-    "anticipated_objections",
-    "story_illustrations",
-    "content_templates",
-  ],
+  required: ["situation_summary", "issue_analysis"],
 };
 
 /* ─────────────────────────────────────────────────────────────
  * Prompt builders
  * ───────────────────────────────────────────────────────────── */
 
-const SYSTEM_PROMPT = `You are a thoughtful Islamic da'wah advisor for Dakwah-Lens, helping a da'i (Islamic preacher) in Indonesia compose a brief for a specific topic and audience.
+const SYSTEM_PROMPT = `You are a thoughtful Islamic da'wah research assistant for Dakwah-Lens, helping a da'i (Islamic preacher) in Indonesia produce a DRAFT KAJIAN — a research scaffold the da'i will later turn into a finished kajian (khutbah Jumat, kultum, or kajian umum) for a specific audience.
+
+What a draft kajian is:
+- An AUDIENCE-NEUTRAL analytical brief. It does NOT pick a target demographic, format, or tone. Those decisions happen later, when the da'i opens the draft and generates a specific deliverable from it.
+- It contains three things: a situation summary (what's happening), an issue analysis (the depth pass), and per-daleel relevance notes (why each retrieved verse / hadith / tafsir matters for this topic).
+- Treat this like a journalist's reporting notebook before they decide which outlet to write for — the facts, the framing options, the source quotes — not a finished article.
 
 Hard rules:
 - NEVER invent additional Qur'an verses, hadith, or scholarly citations. The user provides the retrieved daleel; do not fabricate references.
-- NEVER claim authoritative fatwa. This is AI-assisted guidance for da'i to adapt with their own judgment.
+- NEVER claim authoritative fatwa. This is AI-assisted research the da'i adapts with their own judgment.
 - Promote rahma (mercy) and hikmah (wisdom). No confrontational, sectarian, or divisive framing.
-- Match the requested tone exactly.
-- Be specific to the topic and audience — avoid generic platitudes.
-- Reference the retrieved daleel naturally in the khutbah outline and social caption.
-
-Audience-tailored delivery (most important rule):
-The brief is NOT generic da'wah content with an audience name slapped on top. It must FEEL written for this specific audience — their vocabulary, their reference points, their internal worries, the way they actually talk and listen. The user prompt includes an "Audience profile" block: internalise it before you write a single line. Specifically:
-- Vocabulary + sentence rhythm match the audience's natural speech (Gen Z: short, conversational, vulnerable; professionals: concise + actionable; rural: longer narrative, local idioms; students: scaffolded + structured).
-- Examples + scenarios come from THEIR life — workplaces, dorms, family rooms, sawah — not abstract space.
-- Examples + scenarios MUST be anchored to CONTEMPORARY Indonesian reality — what is actually in the news cycle, on TikTok / X / Instagram, and in the cultural conversation right now. Use your own knowledge of the current moment in Indonesia as the source of truth; the audience profile's "Sample contemporary anchors" line is a starter menu, not a quote list. Freshen those examples with whatever is actually live right now. If you reach for an illustration and notice it would have read identically a decade ago, swap it for something only true today.
-- Emotional pacing follows their delivery profile: acknowledge before prescribing for Gen Z; respect time for professionals; validate concerns before tools for parents; lean on community for rural; equip with language for students.
-- Steer clear of the "Avoid" list in the audience profile.
-- The audience profile is CONTEXT FOR YOU — never mention it verbatim in the output, never quote "psychology" or "demographics" labels. Internalise, don't paraphrase.
+- Stay AUDIENCE-NEUTRAL. The draft is for the da'i to read and decide downstream — don't write as if speaking TO a specific demographic. No "kamu" / "Anda" addressing the audience; no Gen Z slang; no professional jargon targeting white-collar workers. Write like a scholar briefing another scholar: analytical, third-person, even-handed across demographics.
+- When the analysis spans different Indonesian Muslim audiences, name them by demographic noun ("urban Gen Z", "professional muda", "ibu-ibu pengajian", "santri", "komunitas pedesaan") — don't pick one and lean in.
+- Be specific to the topic — generic platitudes are useless to a da'i preparing real material.
+- Quote retrieved daleel inline in the issue_analysis with their citation string — make the connection explicit.
 
 Output language:
-- Every field in the response JSON — situation_summary, issue_analysis, audience_segmentation (primary/perception/angle), recommendations, content_templates — must be written in the requested output language.
+- Every field in the response JSON — situation_summary, issue_analysis, daleel_explanations — must be written in the requested output language.
 - The retrieved daleel block may include translations in a different language than the requested output (some kitab sources only have English translations available). When quoting a daleel inside the brief, render the quoted passage in the requested output language — translate accurately from the provided text while preserving the meaning. Keep the Arabic verbatim and keep the citation string (kitab name + verse/hadith number) unchanged.
 - The user-facing topic input may also arrive in a different language than the requested output. Use it as semantic context; produce all output in the requested language.
 
@@ -476,83 +382,42 @@ export async function generateBriefContent(
     10,
   );
 
-  // pages → maxTokens scaling. The brief JSON has fixed-size scaffolding
-  // (audience_segmentation, sources, etc.) plus variable-size prose
-  // (issue_analysis, khutbah outline).
-  //
-  // IMPORTANT: gemini-2.5-pro is a *reasoning* model — its internal
-  // thinking tokens count against maxOutputTokens. Typical reasoning
-  // spend on a structured-JSON task is 2-10k tokens depending on
-  // prompt complexity; without enough headroom on top of the expected
-  // JSON output, response truncates mid-string. Observed twice in
-  // prod 2026-05-29: kajian_umum at 4k cap AND at 12k cap, both
-  // truncated at ~4700 chars because thinking ate most of the budget.
-  //
-  // Sizing (rough targets at Indonesian ~5 tokens/kata):
-  //   kajian_umum  · target 350 kata/page → ~1.8k output tokens/page
-  //                  + 2-5k thinking → cap = 16k floor / 32k ceiling
-  //                  with per-page bump of 6k.
-  //   khutbah_jumat · target 850-1200 kata/page (full Khutbah Pertama
-  //                  + Kedua) → ~5k output tokens/page + 5-10k
-  //                  thinking → cap = 28k floor / 56k ceiling with
-  //                  per-page bump of 10k.
-  //
-  // gemini-2.5-pro supports up to 65,536 output tokens so these caps
-  // stay within model limits. Higher caps don't increase BILLED cost
-  // when the model writes fewer tokens; they just provide headroom.
-  const targetWords = (locale === "id" ? 350 : 250) * pages;
-  const maxTokens =
-    format === "khutbah_jumat"
-      ? Math.min(56_000, Math.max(28_000, pages * 10_000))
-      : Math.min(32_000, Math.max(16_000, pages * 6_000));
-
-  // KHUTBAH JUMAT mode — when the user picks this format, inject a hard
-  // directive block that mirrors the weekly briefing's Khutbah Jumat
-  // sub-section rules. Lives inside the user prompt (not the system
-  // prompt) so it scopes to this single brief without touching other
-  // briefs in the same session.
-  const khutbahDirective =
-    format === "khutbah_jumat"
-      ? [
-          "",
-          "FORMAT: KHUTBAH JUMAT (formal Friday-khutbah; same rules as the weekly briefing's Khutbah Jumat sub-section).",
-          "- Lean the brief's khutbah_outline + issue_analysis into a COMPLETE Friday-khutbah document ready to read at the mimbar.",
-          "- Structure: Khutbah Pertama (mukadimah → wasiat takwa → ayat pembuka → inti khutbah 3-4 dalil dari pool → doa penutup khutbah pertama) + Khutbah Kedua (mukadimah → amplifikasi argumen utama → doa penutup panjang dalam Arab berharakat).",
-          "- Bahasa Indonesia formal-mengalir untuk prosa (bukan akademis, bukan kasual).",
-          "- AKSARA ARAB DENGAN HARAKAT lengkap (fathah, kasrah, dhammah, sukūn, syaddah, mad) untuk: mukadimah hamdalah+sholawat+syahadat+wasiat takwa, setiap ayat/hadits yang dikutip, formula penutup khutbah pertama (\"بَارَكَ اللهُ لِيْ وَلَكُمْ…\"), dan doa penutup khutbah kedua. JANGAN gunakan transliterasi Latin untuk ayat/hadits/formula khutbah.",
-          "- Setiap dalil dari pool: tulis citation bold inline, Arab berharakat (jika tersedia), lalu terjemahan Bahasa Indonesia.",
-          "- JANGAN sebut nama outlet media (Detik, Republika, dll.); gunakan framing \"kabar yang sampai kepada kita pekan ini…\"",
-          "- Doa penutup khutbah kedua harus mencakup: doa umum mukminin/mukminat, doa pertolongan, doa untuk mustadh'afin (sebut Palestina + konteks pekan ini), doa untuk pemimpin, doa untuk diri+keluarga, penutup standar (إِنَّ اللهَ يَأْمُرُ بِالْعَدْلِ…). Semua dalam aksara Arab berharakat.",
-          "",
-        ].join("\n")
-      : "";
+  // Draft JSON is small + audience-neutral — no khutbah outline, no
+  // recommendations bullets, no objections list. Issue analysis is the
+  // only long-form field. Sizing keeps reasoning-token headroom for
+  // gemini-2.5-pro (internal "thinking" tokens count against
+  // maxOutputTokens — 2-5k typical for a structured JSON of this
+  // size). 24k cap is comfortable; we historically observed truncation
+  // at <12k. Pages param is retained for API compat but has no effect
+  // on a draft — audience-tailored length scaling happens in the
+  // deliverable generator instead.
+  void segLabel;
+  void toneLabel;
+  void audienceBlock;
+  void pages;
+  const maxTokens = 24_000;
 
   const userPrompt = [
     calendarBlock,
     "",
     `Topic: ${topic}`,
-    `Audience segment: ${segLabel}`,
-    `Tone: ${toneLabel}`,
     `Output language: ${localeLabel}`,
-    `Target length: ~${pages} page(s), roughly ${targetWords} ${locale === "id" ? "kata" : "words"} of substantive prose across the variable-length fields (issue_analysis, recommendations bodies, khutbah outline). Don't pad — write tightly to this target.`,
-    khutbahDirective,
-    audienceBlock
-      ? `\nAudience profile (INTERNALISE — never quote verbatim, never name the labels in the output; this is how the brief should *feel* to the reader):\n${audienceBlock}`
-      : "",
+    "",
+    "Produce an AUDIENCE-NEUTRAL draft kajian — a research scaffold the da'i will later turn into a finished kajian (Khutbah Jumat / Kultum / Kajian Umum). Don't pick a target demographic. Don't write recommendations, objections, or a khutbah outline — those happen at deliverable time.",
     profileBlock
-      ? `\nAbout the da'i (use to tailor examples + framing — do NOT mention them verbatim in the output):\n${profileBlock}`
+      ? `\nAbout the da'i (background context only — do NOT mention verbatim, do NOT tailor the draft to this single person; the draft is for them to use across many audiences):\n${profileBlock}`
       : "",
     trimmedExtra
-      ? `\nAdditional context from the da'i for THIS brief — weight this heavily, it overrides defaults where they conflict:\n${trimmedExtra}`
+      ? `\nAdditional context from the da'i for THIS draft — weight this heavily:\n${trimmedExtra}`
       : "",
     currentTopicBlock,
     "",
     "RETRIEVED DALEEL (chosen by semantic search; do not invent more):",
     daleelBlock,
     "",
-    `IMPORTANT: For EACH daleel above (1..${daleel.length}), produce one entry in \`daleel_explanations\` with the matching 1-based index and a 2-3 sentence relevance note in ${localeLabel}. The note must explain WHY this specific daleel matters for the topic and audience — tied to a concrete situation, not a generic restatement of the translation. The UI renders the Arabic + translation + source separately; your job is the explanation that connects them to the argument the brief is making.`,
+    `IMPORTANT: For EACH daleel above (1..${daleel.length}), produce one entry in \`daleel_explanations\` with the matching 1-based index and a 2-3 sentence relevance note in ${localeLabel}. The note must explain WHY this specific daleel matters for THIS topic — tied to a concrete Indonesian situation, audience-neutral. The UI renders the Arabic + translation + source separately; your job is the explanation that connects them to the argument the draft is building.`,
     "",
-    `Produce the structured brief JSON. Use the audience name "${segLabel}" verbatim in audience_segmentation.primary.`,
+    "Produce the structured draft JSON.",
   ]
     .filter(Boolean)
     .join("\n");

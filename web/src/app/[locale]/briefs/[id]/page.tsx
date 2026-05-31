@@ -6,11 +6,7 @@ import {
   ArrowLeft,
   BookOpenCheck,
   ChevronRight,
-  Lightbulb,
-  MessageCircleQuestion,
-  Quote,
   Sparkles,
-  Users,
 } from "lucide-react";
 
 import { auth } from "@/auth";
@@ -53,13 +49,7 @@ export default async function BriefDetailPage({
   if (!brief) notFound();
 
   const t = await getTranslations("Briefs");
-  const tSeg = await getTranslations("Briefs");
   const content = brief.content as BriefContent;
-
-  const segmentLabel = tSeg(
-    `segment_${brief.segment}` as Parameters<typeof tSeg>[0],
-  );
-  const toneLabel = tSeg(`tone_${brief.tone}` as Parameters<typeof tSeg>[0]);
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16 print:py-0">
@@ -82,14 +72,6 @@ export default async function BriefDetailPage({
       </h1>
 
       <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-500">
-        <span>
-          <span className="font-medium text-slate-700">{segmentLabel}</span>
-        </span>
-        <span className="text-slate-300">·</span>
-        <span>
-          {t("field_tone")}: <span className="font-medium text-slate-700">{toneLabel}</span>
-        </span>
-        <span className="text-slate-300">·</span>
         <span className="tabular-nums">
           {new Date(brief.createdAt).toLocaleDateString(
             locale === "id" ? "id-ID" : "en-US",
@@ -136,98 +118,11 @@ export default async function BriefDetailPage({
         </p>
       </Section>
 
-      <Section icon={Users} title={t("section_audience")}>
-        <div className="grid gap-3 sm:grid-cols-3">
-          <AudiencePanel
-            label={t("section_audience_primary")}
-            body={content.audience_segmentation.primary}
-          />
-          <AudiencePanel
-            label={t("section_audience_perception")}
-            body={content.audience_segmentation.perception}
-          />
-          <AudiencePanel
-            label={t("section_audience_angle")}
-            body={content.audience_segmentation.angle}
-          />
-        </div>
-      </Section>
-
       <Section icon={BookOpenCheck} title={t("section_daleel")} tone="emerald">
         <div className="space-y-4">
           {content.daleel.map((d: BriefDaleel, i) => (
             <DaleelCard key={`${d.surah}_${d.ayah}_${i}`} d={d} t={t} />
           ))}
-        </div>
-      </Section>
-
-      <Section icon={Sparkles} title={t("section_recommendations")}>
-        <ol className="space-y-2 text-sm leading-relaxed text-slate-700">
-          {content.recommendations.map((r, i) => (
-            <li key={i} className="flex gap-3">
-              <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-700">
-                {i + 1}
-              </span>
-              <span className="text-pretty">{r}</span>
-            </li>
-          ))}
-        </ol>
-      </Section>
-
-      {content.anticipated_objections?.length ? (
-        <Section
-          icon={MessageCircleQuestion}
-          title={t("section_objections")}
-        >
-          <div className="space-y-4">
-            {content.anticipated_objections.map((o, i) => (
-              <div
-                key={i}
-                className="rounded-xl border border-slate-200 bg-slate-50/60 p-4"
-              >
-                <p className="text-sm font-medium text-slate-900">
-                  <span className="mr-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                    {t("objection_label")}
-                  </span>
-                  {o.objection}
-                </p>
-                <p className="mt-2 text-sm leading-relaxed text-slate-700">
-                  <span className="mr-2 text-[10px] font-semibold uppercase tracking-wider text-brand-700">
-                    {t("response_label")}
-                  </span>
-                  {o.response}
-                </p>
-              </div>
-            ))}
-          </div>
-        </Section>
-      ) : null}
-
-      {content.story_illustrations?.length ? (
-        <Section icon={Lightbulb} title={t("section_illustrations")}>
-          <ol className="space-y-2 text-sm leading-relaxed text-slate-700">
-            {content.story_illustrations.map((s, i) => (
-              <li key={i} className="flex gap-3">
-                <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-50 text-xs font-semibold text-amber-700">
-                  {i + 1}
-                </span>
-                <span className="text-pretty">{s}</span>
-              </li>
-            ))}
-          </ol>
-        </Section>
-      ) : null}
-
-      <Section icon={Quote} title={t("section_templates")}>
-        <div className="space-y-4">
-          <TemplateBlock
-            label={t("template_khutbah")}
-            body={content.content_templates.khutbah_outline}
-          />
-          <TemplateBlock
-            label={t("template_social")}
-            body={content.content_templates.social_caption}
-          />
         </div>
       </Section>
 
@@ -264,19 +159,6 @@ function Section({
       </div>
       <div className="mt-3">{children}</div>
     </section>
-  );
-}
-
-function AudiencePanel({ label, body }: { label: string; body: string }) {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-        {label}
-      </p>
-      <p className="mt-1.5 text-pretty text-sm leading-relaxed text-slate-700">
-        {body}
-      </p>
-    </div>
   );
 }
 
@@ -381,19 +263,6 @@ function DaleelCard({
           </p>
         </div>
       ) : null}
-    </div>
-  );
-}
-
-function TemplateBlock({ label, body }: { label: string; body: string }) {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-        {label}
-      </p>
-      <pre className="mt-2 whitespace-pre-wrap font-sans text-sm leading-relaxed text-slate-700">
-        {body}
-      </pre>
     </div>
   );
 }

@@ -1,9 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
+
+import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
 import { db, schema } from "@/db";
@@ -172,7 +173,12 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
   // OpenAI embed failed), kitab-retrieval throws RetrievalUnavailableError
   // and we refuse to generate the brief — per PRD §12, a brief must never
   // ship without verified daleel.
-  const enrichedQuery = `${topic_title} for ${SEGMENT_LABELS[segment].en} audience`;
+  // Drafts are audience-neutral (2026-05-31) — no segment suffix on the
+  // query. The deliverable generator does audience-specific work later
+  // when the da'i picks a target.
+  const enrichedQuery = topic_title;
+  void segment;
+  void SEGMENT_LABELS;
   let daleel: BriefDaleel[];
   try {
     const matched = await retrieveDaleel(enrichedQuery, {
@@ -372,7 +378,11 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
   console.info(
     `[brief] generated via ${provider} (id=${row.id}, tokens=${tokensIn}/${tokensOut}, cost=$${costUsd?.toFixed(4) ?? "?"})`,
   );
-  redirect(`/briefs/${row.id}`);
+  // Include the locale prefix explicitly. Without it the redirect lands
+  // at `/briefs/{id}`, the next-intl middleware re-routes it to
+  // `/{locale}/briefs/{id}`, and the auth context gets dropped during
+  // that hop — user lands on /login instead of the new brief.
+  redirect(`/${locale}/briefs/${row.id}`);
 }
 
 /* ──────────────────────────────────────────────────────────────
