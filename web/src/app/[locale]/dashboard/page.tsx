@@ -53,6 +53,7 @@ import {
 import { formatPanggilan } from "@/lib/panggilan";
 import { getQuotaSnapshot } from "@/lib/user-flyer/quota";
 import { hashVisitorToken, readVisitorToken } from "@/lib/visitor-cookie";
+import { BriefDeleteButton } from "@/app/[locale]/briefs/BriefDeleteButton";
 import { DashboardTabs } from "./DashboardTabs";
 import { FlyerBuilderCard } from "./FlyerBuilderCard";
 import { KitTabs } from "./KitTabs";
@@ -1040,41 +1041,52 @@ function RecentBriefs({
       ) : (
         <div className="mt-5 grid gap-2">
           {briefs.map((b) => (
-            <Link
+            <div
               key={b.id}
-              href={`/briefs/${b.id}`}
-              className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm transition hover:border-slate-300 hover:shadow-md"
+              className="group flex items-stretch gap-1 rounded-xl border border-slate-200 bg-white pr-2 shadow-sm transition hover:border-slate-300 hover:shadow-md"
             >
-              <ScrollText className="h-4 w-4 shrink-0 text-slate-400" />
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <p className="truncate text-sm font-medium text-slate-900">
-                    {b.topicTitle}
-                  </p>
-                  {b.isPlaceholder && process.env.NODE_ENV !== "production" && (
-                    <span className="inline-flex items-center rounded-full bg-amber-50 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber-700">
-                      placeholder
-                    </span>
-                  )}
-                </div>
-                <p className="mt-0.5 truncate text-xs text-slate-500">
-                  {tBriefs(`segment_${b.segment}` as Parameters<typeof tBriefs>[0])}
-                  <span className="text-slate-300"> · </span>
-                  <span className="tabular-nums">
-                    {new Date(b.createdAt).toLocaleDateString(
-                      locale === "id" ? "id-ID" : "en-US",
-                      {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                        timeZone: "Asia/Jakarta",
-                      },
+              <Link
+                href={`/briefs/${b.id}`}
+                className="flex flex-1 items-center gap-3 px-4 py-3"
+              >
+                <ScrollText className="h-4 w-4 shrink-0 text-slate-400" />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <p className="truncate text-sm font-medium text-slate-900">
+                      {b.topicTitle}
+                    </p>
+                    {b.isPlaceholder && process.env.NODE_ENV !== "production" && (
+                      <span className="inline-flex items-center rounded-full bg-amber-50 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber-700">
+                        placeholder
+                      </span>
                     )}
-                  </span>
-                </p>
-              </div>
-              <ArrowRight className="h-4 w-4 shrink-0 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-slate-700" />
-            </Link>
+                  </div>
+                  <p className="mt-0.5 truncate text-xs text-slate-500">
+                    {tBriefs(`segment_${b.segment}` as Parameters<typeof tBriefs>[0])}
+                    <span className="text-slate-300"> · </span>
+                    <span className="tabular-nums">
+                      {new Date(b.createdAt).toLocaleDateString(
+                        locale === "id" ? "id-ID" : "en-US",
+                        {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          timeZone: "Asia/Jakarta",
+                        },
+                      )}
+                    </span>
+                  </p>
+                </div>
+                <ArrowRight className="h-4 w-4 shrink-0 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-slate-700" />
+              </Link>
+              <BriefDeleteButton
+                briefId={b.id}
+                labels={{
+                  aria: tBriefs("list_delete_aria"),
+                  confirm: tBriefs("list_delete_confirm"),
+                }}
+              />
+            </div>
           ))}
         </div>
       )}
