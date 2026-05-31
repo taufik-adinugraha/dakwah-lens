@@ -10,6 +10,10 @@ import { z } from "zod";
 
 import { generateJson, type LlmProvider } from "@/lib/llm";
 import { formatCalendarContext } from "@/lib/islamic-calendar";
+import {
+  renderPlatformSamplesBlock,
+  type PlatformSampleGroup,
+} from "@/lib/draft-grounding";
 import type { BriefContent, BriefDaleel } from "@/db/schema";
 
 const SEGMENT_LABELS: Record<string, { en: string; id: string }> = {
@@ -200,13 +204,13 @@ const RESPONSE_JSON_SCHEMA = {
       type: "string",
       description:
         "FOUR paragraphs, separated by blank lines (use \\n\\n between paragraphs). Each 4-6 sentences. STRUCTURE WAJIB — jangan campur urutan, jangan gabungkan ke satu paragraf besar:\\n\\n" +
-        "PARAGRAF 1 — Bagaimana isu ini muncul di tiap platform, dan siapa audiens utama yang terdampak di sana. Pecah ke baris per-platform supaya dapat dipindai cepat. Format yang diharapkan (markdown OK):\\n" +
-        "- **TikTok / Reels:** [bagaimana isu ini muncul di sana] — audiens dominan: [Gen Z / pelajar / ibu muda / dll].\\n" +
-        "- **X (Twitter):** [bagaimana isu ini muncul] — audiens dominan: [profesional muda / aktivis / dll].\\n" +
-        "- **Instagram:** [bagaimana isu ini muncul] — audiens dominan: [...].\\n" +
-        "- **YouTube:** [bagaimana isu ini muncul] — audiens dominan: [...].\\n" +
-        "- **Berita arus utama (RSS):** [bagaimana isu ini diframing media] — pembaca: [...].\\n" +
-        "Sebut minimal 4 platform. Boleh skip satu kalau memang isunya tidak hadir di sana, tapi jangan kosongkan — kasih satu kalimat tentang ketiadaannya.\\n\\n" +
+        "PARAGRAF 1 — Bagaimana isu ini muncul di tiap platform, berdasarkan CONTOH POST PER PLATFORM yang diberikan di prompt (bukan tebakan umum). Tiap baris platform harus: (a) merangkum karakter post nyata yang muncul, (b) sebut sentimen dominan dari label sentiment yang ada di sample (positive / neutral / negative / concerned), (c) sebutkan audiens utama yang kemungkinan terdampak. Format yang diharapkan (markdown OK):\\n" +
+        "- **TikTok:** [karakter post yang sebenarnya muncul di sample] — sentimen dominan: [...] — audiens utama: [...].\\n" +
+        "- **X (Twitter):** [...] — sentimen dominan: [...] — audiens utama: [...].\\n" +
+        "- **Instagram:** [...] — sentimen dominan: [...] — audiens utama: [...].\\n" +
+        "- **YouTube:** [...] — sentimen dominan: [...] — audiens utama: [...].\\n" +
+        "- **Berita arus utama (RSS):** [...] — sentimen dominan: [...] — pembaca: [...].\\n" +
+        "Kalau bucket platform kosong di CONTOH POST, tulis 'tidak terlihat di ingestion pekan ini' untuk baris itu — JANGAN diisi dengan pola umum. Kalau seluruh CONTOH POST kosong (catatan ada di prompt), ganti paragraf ini menjadi narasi 'pola umum percakapan publik' tanpa pecahan per platform.\\n\\n" +
         "PARAGRAF 2 — Problem statement: apa SEBENARNYA inti masalahnya. Lepas dari platform; bahas fenomena itu sendiri. Sebut akar penyebab, konteks sosial-ekonomi Indonesia, dan apa yang dipertaruhkan kalau dibiarkan. Tidak perlu mengutip dalil di paragraf ini — ini bagian diagnosis.\\n\\n" +
         "PARAGRAF 3 — Tinjauan syariah + dalil. Bagaimana Islam memandang isu ini. KUTIP minimal 2 dari dalil yang diberikan di RETRIEVED DALEEL — pakai citation string inline (mis. 'QS. Al-Baqarah: 195', 'Sahih al-Bukhari 6018'). Jelaskan kenapa dalil tersebut relevan dengan inti masalah di Paragraf 2. JANGAN mengarang dalil baru. Sebutkan juga kategori da'wah yang bersinggungan (akhlaq, muamalah, aqidah, tarbiyah, ibadah, sosial).\\n\\n" +
         "PARAGRAF 4 — Implementasi nyata. Langkah konkret yang bisa diambil — di tingkat individu, keluarga, komunitas masjid, dan organisasi/lembaga. Aksi spesifik, bisa dilakukan minggu ini, bukan saran abstrak. Boleh berupa bullet list.\\n\\n" +
@@ -308,6 +312,13 @@ export type GenerateBriefInput = {
     keywords: string[];
     sampleHeadlines: string[];
   } | null;
+  /** Real per-platform sample posts matching the topic, fetched from
+   *  `social_posts` by the action layer. Threaded into the prompt so
+   *  paragraph 1 (platform breakdown) cites actual conversations
+   *  rather than the LLM's training-data stereotypes. Empty array =
+   *  the prompt falls back to a "pola umum" (general patterns)
+   *  framing without inventing per-platform specifics. */
+  platformSamples?: PlatformSampleGroup[];
 };
 
 export type GeneratedBrief = {
@@ -332,6 +343,7 @@ export async function generateBriefContent(
     extraContext,
     pages = 2,
     currentTopic,
+    platformSamples = [],
   } = input;
 
   const segLabel = SEGMENT_LABELS[segment]?.[locale] ?? segment;
@@ -384,6 +396,23 @@ export async function generateBriefContent(
           .join("\n")
       : "";
 
+  // Real per-platform posts pulled from social_posts for this topic.
+  // Threaded as a CONTOH-POSTS block so paragraph 1 of issue_analysis
+  // (the platform breakdown) anchors to actual conversations the
+  // ingestion pipeline captured, not the LLM's training-data
+  // stereotypes of each platform. Includes the ingestion classifier's
+  // sentiment label per sample so the LLM can describe the EMOTIONAL
+  // texture per platform (positive / negative / concerned) accurately.
+  const platformSamplesBlock = renderPlatformSamplesBlock(platformSamples);
+  const hasPlatformSamples = platformSamplesBlock.length > 0;
+  const platformSamplesPromptBlock = hasPlatformSamples
+    ? [
+        "",
+        "CONTOH POST PER PLATFORM — fetched from social_posts for THIS topic (last 14 days). Use these as the ONLY source for paragraf 1 (breakdown per platform). Anchor each platform-line to the actual texts + sentiment below; do NOT invent platform-specific patterns the samples don't support. When a platform's bucket is empty, say honestly 'tidak terlihat dalam ingestion pekan ini' — jangan diisi tebakan.",
+        platformSamplesBlock,
+      ].join("\n")
+    : "";
+
   // Hijri calendar context — surfaces today's Hijri date + curated
   // events in the next 7-10 days so the brief's sunnah / du'a
   // recommendations are TIMELY rather than generic. Mirrors what the
@@ -422,6 +451,10 @@ export async function generateBriefContent(
       ? `\nAdditional context from the da'i for THIS draft — weight this heavily:\n${trimmedExtra}`
       : "",
     currentTopicBlock,
+    platformSamplesPromptBlock,
+    hasPlatformSamples
+      ? ""
+      : "\nCATATAN: tidak ada CONTOH POST per platform yang berhasil ditarik dari ingestion untuk topik ini (kemungkinan ingestion belum mencatat post yang cocok dengan kata kunci). Untuk paragraf 1, JANGAN mengarang detail per platform. Tulis paragraf 1 sebagai 'pola umum percakapan di ruang publik Indonesia' tanpa menyebut platform-platform spesifik.",
     "",
     "RETRIEVED DALEEL (chosen by semantic search; do not invent more):",
     daleelBlock,

@@ -17,6 +17,7 @@ import {
 import { generateBriefContent } from "@/lib/brief-generator";
 import { computeCost, estimateBriefCost } from "@/lib/brief-cost";
 import { getCurrentTopicContext } from "@/lib/dashboard-metrics";
+import { getPlatformSamplesForTopic } from "@/lib/draft-grounding";
 import { currentWeekStartUtc } from "@/lib/user-flyer/quota";
 import { LlmUnavailableError } from "@/lib/llm";
 import type { BriefDaleel, UserProfile } from "@/db/schema";
@@ -313,6 +314,29 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
     }
   }
 
+  // Real per-platform sample posts for the topic. Threads actual
+  // social_posts rows into the prompt so paragraph 1 (the platform
+  // breakdown) cites real conversations instead of the LLM's
+  // training-data stereotypes of each platform. Two match paths:
+  // topic_id when the user picked a trending topic, ILIKE-keyword
+  // match otherwise. Best-effort: query failure or zero samples just
+  // degrades to a no-platform-grounding draft (prompt tells the LLM
+  // to label para 1 as "pola umum" in that case).
+  let platformSamples: Awaited<
+    ReturnType<typeof getPlatformSamplesForTopic>
+  > = [];
+  try {
+    platformSamples = await getPlatformSamplesForTopic({
+      topicText: topic_title,
+      topicId: current_topic_id ?? null,
+    });
+  } catch (err) {
+    console.warn(
+      "[brief] platform-samples fetch failed:",
+      err instanceof Error ? err.message : err,
+    );
+  }
+
   // 2) Generate the brief content via the LLM fallback chain:
   //    Anthropic Claude → Gemini → throw.
   let content;
@@ -332,6 +356,7 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
       extraContext: extra_context,
       pages,
       currentTopic,
+      platformSamples,
     });
     content = generated.content;
     provider = generated.provider;
