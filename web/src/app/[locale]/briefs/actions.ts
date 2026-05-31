@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { and, count, eq, gte } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { redirect } from "next/navigation";
@@ -21,7 +21,7 @@ import {
   getPlatformSamplesForTopic,
   getPlatformStatsForTopic,
 } from "@/lib/draft-grounding";
-import { currentWeekStartUtc } from "@/lib/user-flyer/quota";
+import { reserveWeeklyQuota } from "@/lib/weekly-quota";
 import { LlmUnavailableError } from "@/lib/llm";
 import type { BriefDaleel, UserProfile } from "@/db/schema";
 
@@ -126,9 +126,6 @@ export type GenerateResult =
   | { ok: true; briefId: string }
   | { ok: false; error: string };
 
-/** Max draft kajian a user may generate per rolling 7-day window. */
-const DRAFTS_PER_WEEK = 5;
-
 export async function generateBriefAction(formData: FormData): Promise<GenerateResult> {
   const session = await auth();
   if (!session?.user?.id) {
@@ -139,20 +136,13 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
   // any per-user privilege beyond the default quota — but the brief
   // wizard itself is now part of the standard onboarding journey.
 
-  // Per-user weekly cap (2026-05-31). Anchored to Sunday-00:00 WIB so
-  // the draft, kajian, and flyer quota meters all reset together —
-  // matches `currentWeekStartUtc` from lib/user-flyer/quota.ts.
-  const weekStart = currentWeekStartUtc();
-  const [weekCount] = await db
-    .select({ n: count() })
-    .from(schema.briefs)
-    .where(
-      and(
-        eq(schema.briefs.userId, session.user.id),
-        gte(schema.briefs.createdAt, weekStart),
-      ),
-    );
-  if (Number(weekCount?.n ?? 0) >= DRAFTS_PER_WEEK) {
+  // Per-user weekly cap. Reservation is atomic via
+  // INSERT ... ON CONFLICT WHERE and counts against an immutable
+  // `weekly_quota_usage` row, so deleting a brief later doesn't free
+  // up a slot. Reserved BEFORE the LLM call so a failed generation
+  // still costs a slot — prevents retry abuse.
+  const reservation = await reserveWeeklyQuota(session.user.id, "briefs");
+  if (!reservation.ok) {
     return { ok: false, error: "weekly_limit_reached" };
   }
 
@@ -454,6 +444,7 @@ export async function generateBriefAction(formData: FormData): Promise<GenerateR
         author: s.author,
         postedAt: s.postedAt,
         sentimentLabel: s.sentimentLabel,
+        url: s.url,
       })),
     })),
   };

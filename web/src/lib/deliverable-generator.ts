@@ -15,8 +15,15 @@
 import { z } from "zod";
 
 import { generateJson, type LlmProvider } from "@/lib/llm";
+import {
+  renderPlatformSamplesBlock,
+  renderPlatformStatsBlock,
+  type PlatformSampleGroup,
+  type PlatformStat,
+} from "@/lib/draft-grounding";
 import type {
   Brief,
+  BriefContent,
   BriefDaleel,
   DeliverableContent,
   KajianFormat,
@@ -320,13 +327,17 @@ const KajianUmumJson = {
 
 const SYSTEM_PROMPT = `Anda adalah asisten dakwah yang membantu seorang da'i menyusun deliverable yang siap dibawakan di mimbar.
 
+KONTEKS PIPELINE (penting):
+Anda akan menerima OUTPUT DRAF KAJIAN dari da'i (ringkasan situasi, analisis isu, statistik percakapan per platform, contoh post nyata dari ingestion sosial-media + berita). Draf itu sudah berisi research yang sudah diverifikasi datanya. TUGAS Anda adalah MENGUBAH research itu menjadi format yang siap dibawakan — bukan re-analisis ulang, bukan tambah klaim baru. Setiap klaim faktual / framing / contoh kasus / angka di output Anda harus turunan dari konteks draf. Kalau Anda merasa perlu menambah klaim yang tidak ada di draf, jangan — kembali ke yang ada.
+
 PRINSIP:
 1. Dalil yang Anda terima sudah diverifikasi dari pustaka kitab (Qur'an, Bukhari, Muslim, Riyad as-Salihin, Bulugh al-Maram, Tafsir Ibn Katsir). JANGAN mengarang dalil baru, JANGAN mengubah nomor ayat/hadits.
 2. Output dalam Bahasa Indonesia kecuali untuk aksara Arab (yang harus berharakat lengkap).
 3. Promosikan rahma dan hikmah. Hindari nada konfrontatif, divisif, atau sektarian.
 4. Output Anda adalah deliverable AKHIR — siap dibacakan, bukan sketsa. Tulis dengan lengkap, bukan dengan placeholder.
 5. JANGAN sebut nama outlet media (Detik, Republika, dll). Gunakan framing 'kabar yang sampai kepada kita pekan ini'.
-6. Jangan tampilkan label internal sistem (segment id, tone enum) di output yang dibaca audiens.`;
+6. JANGAN mengarang nama korban / pelaku / lokasi spesifik. Kalau draf menyebut kasus tertentu, boleh kutip secara umum ("kasus santriwati di Pekalongan" → "kasus santriwati di salah satu pesantren yang baru-baru ini diberitakan"). Kalau draf tidak menyebut kasus spesifik, JANGAN diisi rekaan.
+7. Jangan tampilkan label internal sistem (segment id, tone enum) di output yang dibaca audiens.`;
 
 const SEGMENT_LABELS_ID: Record<string, string> = {
   urban_gen_z: "Gen Z Perkotaan (18-24)",
@@ -374,11 +385,33 @@ export async function generateDeliverable(
 
   const segLabel = SEGMENT_LABELS_ID[segment] ?? segment;
   const toneLabel = TONE_LABELS_ID[tone] ?? tone;
-  void brief; // brief is kept on input for future personalization use
   void locale; // ID-only deliverables in v1; locale stored for the catalog filter
   void pages; // pages scales maxTokens below if needed; placeholder for length scaling
   const daleelBlock = renderDaleelBlock(selectedDaleel);
   const trimmedExtra = extraContext?.trim() ?? "";
+
+  // Lift the draft's research into the kajian prompt so the LLM
+  // builds ON the analysis the brief already did, instead of
+  // re-analysing from scratch with just topic + audience. Without
+  // this the kajian forfeits the platform breakdown, the
+  // problem-statement work, and the verified sample posts the draft
+  // collected — and ends up with weaker grounding than the draft
+  // itself.
+  const briefContent = brief.content as BriefContent | null;
+  const draftSummary = briefContent?.situation_summary?.trim() ?? "";
+  const draftAnalysis = briefContent?.issue_analysis?.trim() ?? "";
+  const draftStats: PlatformStat[] = Array.isArray(
+    briefContent?.platform_stats,
+  )
+    ? (briefContent!.platform_stats as PlatformStat[])
+    : [];
+  const draftSamples: PlatformSampleGroup[] = Array.isArray(
+    briefContent?.platform_samples,
+  )
+    ? (briefContent!.platform_samples as unknown as PlatformSampleGroup[])
+    : [];
+  const draftStatsBlock = renderPlatformStatsBlock(draftStats);
+  const draftSamplesBlock = renderPlatformSamplesBlock(draftSamples);
 
   const formatDirective =
     format === "khutbah_jumat"
@@ -394,8 +427,24 @@ export async function generateDeliverable(
     "",
     formatDirective,
     "",
+    // Draft-side research — the brief already did the analytical work
+    // (situation summary + 4-paragraph analysis with platform breakdown
+    // + sentiment stats + real sample posts). Pass it all here so the
+    // kajian builds ON it instead of starting over.
+    draftSummary
+      ? `RINGKASAN SITUASI (dari draf — pakai sebagai latar awal kajian, bukan paraphrase ulang panjang lebar):\n${draftSummary}\n`
+      : "",
+    draftAnalysis
+      ? `ANALISIS ISU (dari draf — pakai sebagai sumber argumen untuk inti kajian. Setiap klaim faktual / framing di kajian Anda HARUS turunan dari sini, BUKAN karangan baru. Boleh dipendekkan, tidak boleh ditambah-tambahi):\n${draftAnalysis}\n`
+      : "",
+    draftStatsBlock
+      ? `STATISTIK PERCAKAPAN (snapshot draf — pakai untuk anchor numerik kalau menyebut tren/sentimen publik):\n${draftStatsBlock}\n`
+      : "",
+    draftSamplesBlock
+      ? `CONTOH POST DARI DRAF (post nyata dari ingestion — pakai untuk MENGUTIP situasi spesifik. JANGAN sebut nama outlet; framing 'kabar yang sampai pekan ini' / 'banyak diperbincangkan di media sosial pekan ini'. JANGAN mengarang nama korban / pelaku / lokasi yang tidak ada di sini):\n${draftSamplesBlock}\n`
+      : "",
     trimmedExtra
-      ? `Konteks tambahan dari da'i untuk deliverable INI — prioritaskan ini di atas default:\n${trimmedExtra}\n`
+      ? `KONTEKS TAMBAHAN dari da'i untuk deliverable INI — prioritaskan ini di atas default:\n${trimmedExtra}\n`
       : "",
     "DALIL YANG DIPILIH DA'I (gunakan SEMUA dalil ini dalam deliverable — jangan abaikan satu pun; JANGAN tambahkan dalil baru di luar daftar ini):",
     daleelBlock,

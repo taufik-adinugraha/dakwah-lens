@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { and, count, eq, gte } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { redirect } from "next/navigation";
@@ -14,7 +14,7 @@ import {
 } from "@/lib/deliverable-generator";
 import { computeCost } from "@/lib/brief-cost";
 import { LlmUnavailableError } from "@/lib/llm";
-import { currentWeekStartUtc } from "@/lib/user-flyer/quota";
+import { reserveWeeklyQuota } from "@/lib/weekly-quota";
 import type { Brief, BriefDaleel, KajianFormat } from "@/db/schema";
 
 const SEGMENTS = [
@@ -61,10 +61,6 @@ export type GenerateKajianResult =
   | { ok: true; kajianId: string }
   | { ok: false; error: string };
 
-/** Max finished kajian a user may generate per rolling 7-day window.
- *  Counted separately from draft kajian — a user gets 5 of each per week. */
-const KAJIAN_PER_WEEK = 5;
-
 export async function generateKajianAction(
   formData: FormData,
 ): Promise<GenerateKajianResult> {
@@ -73,22 +69,12 @@ export async function generateKajianAction(
     return { ok: false, error: "auth_required" };
   }
 
-  // Per-user weekly cap (2026-05-31). Anchored to Sunday-00:00 WIB so
-  // the draft, kajian, and flyer quotas all reset together. Counts
-  // ALL deliverables (draft + published) the user has created so the
-  // limit applies to the expensive Gemini Pro call, not to the cheap
-  // publish-toggle flip.
-  const weekStart = currentWeekStartUtc();
-  const [weekCount] = await db
-    .select({ n: count() })
-    .from(schema.deliverables)
-    .where(
-      and(
-        eq(schema.deliverables.userId, session.user.id),
-        gte(schema.deliverables.createdAt, weekStart),
-      ),
-    );
-  if (Number(weekCount?.n ?? 0) >= KAJIAN_PER_WEEK) {
+  // Atomic per-user weekly reservation — counts against the immutable
+  // `weekly_quota_usage` row so deleting a kajian doesn't free up a
+  // slot. Reserved BEFORE the LLM call so a failed generation still
+  // costs a slot.
+  const reservation = await reserveWeeklyQuota(session.user.id, "kajian");
+  if (!reservation.ok) {
     return { ok: false, error: "weekly_limit_reached" };
   }
 

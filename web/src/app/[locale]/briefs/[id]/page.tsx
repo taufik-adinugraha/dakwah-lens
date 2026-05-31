@@ -321,6 +321,7 @@ type PlatformSampleEntry = {
   author: string | null;
   postedAt: string | null;
   sentimentLabel: string | null;
+  url?: string | null;
 };
 
 function PlatformSampleGroup({
@@ -362,6 +363,16 @@ function PlatformSampleGroup({
                   >
                     {s.sentimentLabel}
                   </span>
+                )}
+                {s.url && (
+                  <a
+                    href={s.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-0.5 text-[11px] font-medium text-brand-700 hover:text-brand-900 hover:underline"
+                  >
+                    Lihat sumber ↗
+                  </a>
                 )}
               </p>
             </li>

@@ -155,6 +155,31 @@ export const orgMembers = pgTable(
   ],
 );
 
+/**
+ * Immutable per-user weekly quota counter. INSERT-on-generate,
+ * never decremented on delete, so users can't game the 5/week cap by
+ * deleting old briefs/kajian. Window key is the Sunday-00:00 WIB
+ * boundary (`currentWeekStartUtc()`).
+ */
+export const weeklyQuotaUsage = pgTable(
+  "weekly_quota_usage",
+  {
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    weekStartUtc: timestamp("week_start_utc", { withTimezone: true })
+      .notNull(),
+    briefsUsed: integer("briefs_used").notNull().default(0),
+    kajianUsed: integer("kajian_used").notNull().default(0),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => [
+    primaryKey({ columns: [table.userId, table.weekStartUtc] }),
+  ],
+);
+
 export const briefs = pgTable(
   "briefs",
   {
@@ -257,6 +282,7 @@ export type BriefContent = {
       author: string | null;
       postedAt: string | null;
       sentimentLabel: string | null;
+      url?: string | null;
     }>;
   }>;
   /** Audience-tailored sections — deprecated for new drafts as of

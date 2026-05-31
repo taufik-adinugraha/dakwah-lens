@@ -44,6 +44,10 @@ export type PlatformSample = {
    *  Typically one of: positive / neutral / negative / concerned.
    *  NULL on legacy rows or platforms with sentiment disabled. */
   sentimentLabel: string | null;
+  /** Original post URL — lets the "Sumber percakapan" UI link out so
+   *  the da'i can verify the case before quoting in a kajian. NULL
+   *  when the ingester didn't capture a canonical URL. */
+  url: string | null;
 };
 
 export type PlatformSampleGroup = {
@@ -221,11 +225,18 @@ export async function getPlatformSamplesForTopic(
   // objects (unlike the typed `db.select()` API). Typing as `string |
   // null` and normalising downstream avoids the
   // `a.posted_at.toISOString is not a function` crash.
+  // `dawah_relevance >= 0.4` floor: drops posts the ingest classifier
+  // wasn't confident on. Topic clustering sometimes pulls in
+  // marginally-relevant posts (e.g. a Narasi explainer on AI ending
+  // up in the "Kekerasan Seksual di Lingkungan Pendidikan" cluster
+  // because both touch "pendidikan"). The floor filters those out
+  // before they pollute the prompt.
   const rows = (await db.execute(sql`
     WITH ranked AS (
       SELECT
         platform,
         text,
+        url,
         posted_at,
         author,
         engagement_score,
@@ -241,13 +252,15 @@ export async function getPlatformSamplesForTopic(
         AND posted_at >= now() - (${daysBack} || ' days')::interval
         AND text IS NOT NULL
         AND length(text) > 20
+        AND dawah_relevance >= 0.4
     )
-    SELECT platform, text, posted_at, author, engagement_score, sentiment_label
+    SELECT platform, text, url, posted_at, author, engagement_score, sentiment_label
     FROM ranked
     WHERE rn <= ${perPlatformLimit}
   `)) as unknown as Array<{
     platform: string;
     text: string;
+    url: string | null;
     posted_at: string | Date | null;
     author: string | null;
     engagement_score: number | null;
@@ -275,6 +288,7 @@ export async function getPlatformSamplesForTopic(
       author: r.author,
       engagementScore: r.engagement_score,
       sentimentLabel: r.sentiment_label,
+      url: r.url,
     });
   }
 
@@ -320,6 +334,9 @@ export async function getPlatformStatsForTopic(
     }));
   }
 
+  // Same dawah_relevance floor as the sample fetcher — keeps the
+  // displayed stats consistent with the prompt's CONTOH POST and
+  // prevents off-topic cluster-noise from inflating the totals.
   const rows = (await db.execute(sql`
     SELECT
       platform,
@@ -334,6 +351,7 @@ export async function getPlatformStatsForTopic(
     FROM social_posts
     WHERE topic_id = ${resolvedTopicId}::uuid
       AND posted_at >= now() - (${daysBack} || ' days')::interval
+      AND dawah_relevance >= 0.4
     GROUP BY platform
   `)) as unknown as Array<{
     platform: string;
