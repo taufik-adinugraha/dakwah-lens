@@ -76,11 +76,17 @@ export async function reserveWeeklyQuota(
   // INSERT new row with usage=1 OR increment existing row by 1 — but
   // ONLY when the resulting value would still be ≤ limit. The WHERE
   // clause on DO UPDATE skips the bump when the user is at cap.
+  //
+  // `weekStart` is serialised to ISO string before binding: the
+  // raw-execute path is strict about timestamptz parameter types and
+  // rejects a JS Date instance (typed `db.insert()` would handle it,
+  // but we need the ON CONFLICT WHERE clause which is raw-SQL only).
+  const weekStartIso = weekStart.toISOString();
   const rows = (await db.execute(sql`
     INSERT INTO weekly_quota_usage (user_id, week_start_utc, briefs_used, kajian_used, updated_at)
     VALUES (
       ${userId}::uuid,
-      ${weekStart},
+      ${weekStartIso}::timestamptz,
       ${kind === "briefs" ? 1 : 0},
       ${kind === "kajian" ? 1 : 0},
       now()
