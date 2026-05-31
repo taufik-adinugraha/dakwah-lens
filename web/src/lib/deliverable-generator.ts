@@ -118,7 +118,7 @@ const ObjectionJson = {
 
 const KhutbahJumatSchema = z.object({
   title: z.string().min(8).max(120),
-  summary: z.string().min(40).max(280),
+  summary: z.string().min(40).max(800),
   dua_opening: DuaSchema,
   dua_closing: DuaSchema,
   khutbah_pertama: z.string().min(800),
@@ -129,24 +129,24 @@ const KhutbahJumatSchema = z.object({
 
 const KultumSchema = z.object({
   title: z.string().min(8).max(120),
-  summary: z.string().min(40).max(280),
+  summary: z.string().min(40).max(800),
   dua_opening: DuaSchema,
   dua_closing: DuaSchema,
-  body: z.string().min(600),
+  body: z.string().min(3500),
   story_illustrations: z.array(StorySchema).min(2).max(4),
   anticipated_objections: z.array(ObjectionSchema).min(2).max(3),
 });
 
 const KajianUmumSchema = z.object({
   title: z.string().min(8).max(120),
-  summary: z.string().min(40).max(280),
+  summary: z.string().min(40).max(800),
   dua_opening: DuaSchema,
   dua_closing: DuaSchema,
   talking_points: z
     .array(
       z.object({
         heading: z.string().min(5).max(120),
-        body: z.string().min(150),
+        body: z.string().min(1500),
       }),
     )
     .min(3)
@@ -175,7 +175,7 @@ const KhutbahJumatJson = {
     },
     summary: {
       type: "string",
-      description: "Ringkasan 1-2 kalimat (≤200 kata) untuk kartu pustaka.",
+      description: "Ringkasan 1-2 kalimat (target ~60 kata / 400 karakter; hard cap 800 karakter) untuk kartu pustaka.",
     },
     dua_opening: DuaJson,
     dua_closing: DuaJson,
@@ -223,14 +223,23 @@ const KultumJson = {
     },
     summary: {
       type: "string",
-      description: "Ringkasan 1-2 kalimat untuk kartu pustaka.",
+      description: "Ringkasan 1-2 kalimat (target ~60 kata / 400 karakter; hard cap 800 karakter) untuk kartu pustaka.",
     },
     dua_opening: DuaJson,
     dua_closing: DuaJson,
     body: {
       type: "string",
       description:
-        "Body kultum (~7 menit, ~900-1100 kata). Struktur single-thread: hook → 1 dalil utama dari pool (Arab berharakat + terjemah) → elaborasi audiens → 1-2 dalil pendukung dari pool → call to action 1 langkah praktis untuk minggu ini → penutup. Bahasa Indonesia ringan tapi tetap khidmat. Markdown OK (## untuk sub-bagian).",
+        "Body kultum (~7 menit, ~900-1100 kata). STRUKTUR WAJIB (urut, jangan dilompati):\\n" +
+        "(1) **Hook konkret** — buka dengan SATU fenomena spesifik dari CONTOH POST atau RINGKASAN SITUASI draf, bukan generic 'akhir-akhir ini kita prihatin'. Kalau draf menyebut pola tertentu (mis. 'KDRT oleh suami', 'majikan terhadap PRT'), pakai pola itu sebagai pintu masuk — anonim, tidak menyebut nama.\\n" +
+        "(2) **Anchor numerik** (SATU kalimat) — kalau STATISTIK PERCAKAPAN ada angka, sebut sekali untuk grounding urgensi: 'lebih dari [total] percakapan publik tentang isu ini pekan lalu, mayoritas [sentimen dominan]'. Cukup satu kalimat — bukan tabel.\\n" +
+        "(3) **Dalil utama dari pool** (Arab berharakat + terjemah) — pilih yang paling LANGSUNG menyentuh fenomena modern di hook, bukan analogi historis yang harus diregangkan.\\n" +
+        "(4) **Elaborasi audiens** — bridging dari dalil ke realitas hidup audiens yang dipilih (lihat label audiens di prompt). Voice + contoh harus sesuai segmen.\\n" +
+        "(5) **1-2 dalil pendukung dari pool** (Arab berharakat + terjemah) — gunakan untuk memperdalam, bukan repetisi.\\n" +
+        "(6) **Akui pelindung sosial** (1-2 kalimat) — kalau RINGKASAN/ANALISIS draf menyebut regulasi, lembaga, atau jalur hukum (UU TPKS, Komnas Perempuan, Permendikbud, dll.), SEBUTKAN sebagai resource pelindung agar jamaah tahu ada jalur formal — BUKAN sebagai advokasi kebijakan. Format: 'Selain itu, kita patut bersyukur ada [nama lembaga / UU] yang bisa kita rujuk kalau...'. SKIP kalau draf tidak menyebut.\\n" +
+        "(7) **Call to action SATU langkah** — konkret, bisa dimulai pekan ini, sesuai segmen audiens.\\n" +
+        "(8) **Penutup pendek + ajakan doa** — wassalam ada di dua_closing, jangan dobel.\\n" +
+        "Bahasa: Indonesia ringan tapi khidmat. Markdown ## untuk sub-bagian opsional. JANGAN mengarang kasus / nama / lokasi.",
     },
     story_illustrations: {
       type: "array",
@@ -263,7 +272,7 @@ const KajianUmumJson = {
     },
     summary: {
       type: "string",
-      description: "Ringkasan 1-2 kalimat untuk kartu pustaka.",
+      description: "Ringkasan 1-2 kalimat (target ~60 kata / 400 karakter; hard cap 800 karakter) untuk kartu pustaka.",
     },
     dua_opening: DuaJson,
     dua_closing: DuaJson,
@@ -274,31 +283,46 @@ const KajianUmumJson = {
         properties: {
           heading: {
             type: "string",
-            description: "Judul talking point, ringkas (≤12 kata).",
+            description: "Judul talking point, ringkas (≤12 kata). Setiap heading harus menggambarkan satu sudut pandang berbeda — jangan paralel/tumpang-tindih.",
           },
           body: {
             type: "string",
             description:
-              "2-4 paragraf elaborasi: hubungkan ke dalil dari pool (Arab berharakat + terjemah), lalu aplikasi konkret untuk audiens. Markdown OK.",
+              "3-5 paragraf elaborasi (~400-600 kata per talking point). STRUKTUR per talking point:\\n" +
+              "(a) **Bukaan grounded** — kalau ada CONTOH POST / RINGKASAN SITUASI dari draf yang relevan dengan sudut pandang ini, kutip secara umum (anonim, jangan sebut nama orang/lokasi spesifik). Kalau tidak ada yang langsung relevan, mulai dari prinsip yang akan dibahas.\\n" +
+              "(b) **Dalil utama dari pool** (Arab berharakat + terjemah, citation bold inline). Pilih yang LANGSUNG menyentuh sudut pandang ini — bukan analogi historis yang harus diregangkan.\\n" +
+              "(c) **Tafsir / elaborasi audiens** — bridge dari dalil ke realitas hidup audiens (sesuai segment label di prompt). Voice harus pas (Gen Z: santai+vulnerable, ibu pengajian: hangat+pengalaman, professionals: ringkas+aplikatif, dst).\\n" +
+              "(d) **Aplikasi konkret** — 2-3 langkah spesifik yang bisa dipraktikkan jamaah pekan ini berkaitan dengan sudut pandang ini. Bullet list OK.\\n" +
+              "Markdown ## untuk sub-bagian opsional dalam body.",
           },
         },
         required: ["heading", "body"],
       },
       description:
-        "Persis 3 talking point inti. Tiap point harus tertaut ke setidaknya satu dalil dari pool yang diberikan.",
+        "PERSIS 3 talking point inti — bukan 2, bukan 4. Tiap point WAJIB tertaut ke setidaknya satu dalil dari pool yang diberikan, dan WAJIB membahas sudut pandang berbeda (jangan paralel). Suggested structure across 3 points:\\n" +
+        "  TP1 — **Diagnosis & realitas saat ini**: pakai RINGKASAN SITUASI + ANALISIS ISU + STATISTIK PERCAKAPAN dari draf. Kalau STATISTIK ada angka, sebut SATU kalimat numerik di sini ('lebih dari [total] percakapan publik pekan lalu...').\\n" +
+        "  TP2 — **Pandangan syariah**: dalil utama + tafsir + bagaimana Islam memandang inti masalah.\\n" +
+        "  TP3 — **Aplikasi nyata untuk audiens**: ajakan praktis yang sesuai segment. Kalau ANALISIS ISU draf menyebut regulasi/lembaga (UU TPKS, Komnas Perempuan, Permendikbud, dll.) yang relevan untuk segment audiens, sebut sebagai resource pelindung — BUKAN advokasi kebijakan. Format: 'Selain ikhtiar pribadi, ada [nama lembaga/UU] yang bisa dirujuk kalau...'. Skip kalau draf tidak menyebut.\\n" +
+        "Da'i boleh menukar urutan TP2/TP3 kalau lebih cocok dengan topik, tapi TP1 selalu pintu masuk (grounding ke realitas).",
     },
     qna: {
       type: "array",
       items: {
         type: "object",
         properties: {
-          question: { type: "string" },
-          answer: { type: "string" },
+          question: {
+            type: "string",
+            description: "Pertanyaan ditulis dengan suara JAMAAH (orang pertama, percakapan, vocab natural sesuai segment). Bukan pertanyaan akademis hasil parafrase.",
+          },
+          answer: {
+            type: "string",
+            description: "Jawaban 3-5 kalimat: (1) validasi kekhawatiran/keraguan dulu, (2) arahkan dengan hikmah, (3) kalau relevan tautkan ke dalil dari pool atau resource sosial yang sudah disebut di talking points. JANGAN mengarang dalil baru.",
+          },
         },
         required: ["question", "answer"],
       },
       description:
-        "3-5 pertanyaan yang kemungkinan ditanyakan jamaah, lengkap dengan jawaban 2-3 kalimat per pertanyaan.",
+        "3-5 pertanyaan + jawaban. Pertanyaan harus mencerminkan keraguan/kekhawatiran NYATA audiens, drawn from ANTICIPATED_OBJECTIONS atau dari nuansa CONTOH POST di prompt (mis. kalau banyak post negatif soal aparat, jamaah mungkin tanya 'kenapa pelaku sering lolos hukum?'). Variasikan tipe: 1 pertanyaan praktis-aplikatif, 1 pertanyaan keraguan teologis, 1 pertanyaan sosial-pressure, 1-2 pertanyaan lain sesuai topik.",
     },
     story_illustrations: {
       type: "array",

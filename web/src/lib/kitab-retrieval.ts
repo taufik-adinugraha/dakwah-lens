@@ -367,11 +367,14 @@ ATURAN PENILAIAN — wajib ketat:
   * tema "judol/maysir" + daleel tentang "permainan anak-anak" → TIDAK COCOK (kata "lahw" tidak otomatis = perjudian)
   * tema "kekerasan terhadap anak" + daleel tentang "perlindungan harta yatim" → LEMAH (terkait, tapi tema sebenarnya kekerasan fisik, bukan harta)
   * tema "depresi/mental health" + daleel tentang "kesabaran nabi atas kafir Quraysy" → LEMAH (sabar tapi konteks dakwah-ke-luar, bukan ketenangan jiwa)
+  * tema "KDRT / kekerasan seksual" + daleel tentang "mengubur anak perempuan hidup-hidup di zaman Jahiliyah" → LEMAH (ayat berbicara TENTANG kebudayaan kuno; konteks modern sebagai metafora terlalu jauh — da'i harus melakukan bridging rhetoric yang berisiko terasa janggal)
+- TES APLIKABILITAS MODERN: untuk SETIAP daleel kandidat, tanya: "Kalau da'i mengutip ayat/hadith ini di mimbar untuk topik ini, apakah jamaah modern bisa langsung menangkap relevansinya, atau da'i perlu menjelaskan panjang lebar konteks aslinya?" Kalau perlu bridging > 2 kalimat → daleel ini LEMAH untuk topik ini, walaupun secara abstrak berbagi tema (perlindungan, keadilan, dll). Pilih daleel yang berbicara LANGSUNG tentang fenomena modern yang dibahas, bukan analogi historis yang harus diregangkan.
 - Daleel COCOK kalau ayat/hadith-nya BENAR-BENAR berbicara tentang inti tema-nya, bukan hanya berbagi satu kata. Contoh yang BENAR:
   * tema "pinjol/riba" + daleel QS Al-Baqarah:275-281 (larangan riba) → COCOK
   * tema "judol/maysir" + daleel QS Al-Maidah:90-91 (khamr & maysir) → COCOK
   * tema "bullying/ghibah" + hadith tentang lisan yang menjaga saudara → COCOK
   * tema "korupsi/amanah" + ayat tentang menunaikan amanah → COCOK
+  * tema "KDRT" + hadith Bukhari/Muslim tentang larangan memukul istri / perintah perlakuan baik terhadap perempuan → COCOK (berbicara LANGSUNG tentang fenomena)
 
 PRINSIP TERAKHIR: lebih baik mengembalikan SEDIKIT daleel yang benar-benar tematik daripada memaksa ${topN} entri ketika hanya sebagian yang benar-benar relevan. Da'i akan mengutip ulang daleel ini di mimbar — daleel yang dipaksakan akan terasa janggal dan merusak kredibilitas pesan.
 
