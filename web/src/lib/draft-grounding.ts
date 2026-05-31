@@ -217,6 +217,10 @@ export async function getPlatformSamplesForTopic(
   // (`dawah_relevance`) leads, engagement is the tie-break. This is
   // what the published weekly briefings draw their daleel-anchor
   // headlines from — keeping the draft consistent.
+  // `db.execute(sql\`...\`)` returns timestamps as ISO strings, not Date
+  // objects (unlike the typed `db.select()` API). Typing as `string |
+  // null` and normalising downstream avoids the
+  // `a.posted_at.toISOString is not a function` crash.
   const rows = (await db.execute(sql`
     WITH ranked AS (
       SELECT
@@ -244,7 +248,7 @@ export async function getPlatformSamplesForTopic(
   `)) as unknown as Array<{
     platform: string;
     text: string;
-    posted_at: Date | null;
+    posted_at: string | Date | null;
     author: string | null;
     engagement_score: number | null;
     sentiment_label: string | null;
@@ -265,7 +269,9 @@ export async function getPlatformSamplesForTopic(
     if (!cleaned) continue;
     bucket.push({
       text: cleaned,
-      postedAt: r.posted_at ? r.posted_at.toISOString() : null,
+      // Coerce via `new Date(...)` so we accept both string (raw
+      // db.execute path) and Date (legacy callers).
+      postedAt: r.posted_at ? new Date(r.posted_at).toISOString() : null,
       author: r.author,
       engagementScore: r.engagement_score,
       sentimentLabel: r.sentiment_label,
