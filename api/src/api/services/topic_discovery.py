@@ -389,7 +389,22 @@ Your job: propose 12-16 DYNAMIC themes for what's distinctive about THIS WEEK's 
 - keywords: 3-5 distinctive keywords (Bahasa Indonesia preferred). These keywords are ALSO used to match posts to this theme by meaning, so pick words that are specific and central to the theme. Avoid stopwords (yang, dan, atau, dengan, untuk, akan, masih, sebelum, terkait, dari, ke) and URL artifacts (republikacoid, kompascom).
 
 Rules:
-- Themes must be DISTINCT — don't split one theme into two near-duplicates.
+- Themes must be DISTINCT — don't split one theme into two near-duplicates. Two themes are near-duplicates if a da'i preparing a kajian would use the SAME daleel and the SAME framing for both. Setting / context variation (school vs. domestic vs. workplace, urban vs. rural, online vs. offline) is NOT enough to justify a separate theme — fold it into ONE theme. The downstream system has a post-emit cosine-merge step at 0.85 that will collapse near-duplicates automatically, but it's a safety net, not a substitute for clean labeling.
+
+  ❌ BAD — three rows on one theme (real audit, 2026-05-31):
+      "Kekerasan Seksual & Perlindungan Anak"
+      "Pelecehan & Kekerasan terhadap Perempuan dan Anak"
+      "Kekerasan Seksual di Lingkungan Pendidikan"
+    The da'i quotes the same Qur'anic verses (An-Nisa, An-Nahl on mustadh'afin) for all three; the setting differences belong INSIDE one cluster, not as separate clusters.
+  ✅ GOOD — one canonical row covering the scope:
+      "Pelecehan & Kekerasan terhadap Perempuan dan Anak"
+
+  ❌ BAD — two rows differing only in framing angle:
+      "Kriminalitas & Kejahatan Jalanan"
+      "Kriminalitas & Penegakan Hukum"
+  ✅ GOOD:
+      "Kriminalitas & Penegakan Hukum"
+
 - Aim for BREADTH: the themes you return should jointly cover the great majority (≥80%) of the posts in the pool. If you notice a sizable slice you haven't covered (health stories, education stories, finance/investasi posts, kajian/akhlaq content, sport, lifestyle), add a theme for it rather than letting it drop to "uncategorized". The downstream system has its own cosine-similarity floor that filters borderline matches — you don't need to be conservative here. Undersizing themes is more costly than oversizing.
 - If multiple stories share a clear pattern (e.g. 3 separate child-abuse cases involving religious figures), group them under ONE specific theme ("Pelecehan oleh Tokoh Agama"), not three "miscellaneous crime" entries.
 
@@ -686,6 +701,95 @@ def discover_topics(
     except Exception as exc:
         log.error("topic_discovery.embed_failed", platform=platform, error=str(exc)[:200])
         return []
+
+    # Post-emit near-duplicate merge. The system prompt asks Gemini for
+    # DISTINCT themes (line ~392), but the model occasionally outputs
+    # near-duplicates that differ only in framing or setting (e.g. a
+    # 2026-05-31 audit found three rows for sexual-violence variants:
+    # by victim class, by setting, by act-vs-protection angle). We fold
+    # them here using pairwise cosine on theme vectors — same embedding
+    # space used downstream for post-assignment, so the threshold is
+    # interpretable.
+    #
+    # Threshold 0.85: empirically catches the audit's three-way split
+    # while leaving genuinely-distinct adjacent themes alone (e.g.
+    # "Krisis Ekonomi & Daya Beli" vs. "Ketahanan Pangan & Pertanian"
+    # share economic vocab but score < 0.80 in practice).
+    #
+    # Static themes are NEVER merged away — they're the curated stable
+    # set. Dynamic-vs-static near-duplicate: drop the dynamic, keep
+    # the static. Dynamic-vs-dynamic: keep the shorter label (proxy
+    # for "more canonical"), union the keyword lists.
+    n_static = len(STATIC_THEMES)
+    static_offset = len(themes) - n_static  # static themes are at the tail
+    merge_threshold = 0.85
+    # Pairwise similarity matrix (n_themes, n_themes).
+    theme_sims = theme_vecs @ theme_vecs.T
+    drop_idx: set[int] = set()
+    merge_log: list[tuple[str, str, float]] = []
+    n_themes = len(themes)
+    for i in range(n_themes):
+        if i in drop_idx:
+            continue
+        for j in range(i + 1, n_themes):
+            if j in drop_idx:
+                continue
+            sim = float(theme_sims[i, j])
+            if sim < merge_threshold:
+                continue
+            i_is_static = i >= static_offset
+            j_is_static = j >= static_offset
+            if i_is_static and j_is_static:
+                # Two static themes near-dup — curated set, log only.
+                log.warning(
+                    "topic_discovery.static_static_collision",
+                    a=themes[i]["label"],
+                    b=themes[j]["label"],
+                    similarity=round(sim, 3),
+                )
+                continue
+            # Pick keep + drop. Static always wins. Otherwise keep the
+            # shorter label (proxy for "more canonical").
+            if j_is_static or (
+                not i_is_static
+                and len(themes[i]["label"]) > len(themes[j]["label"])
+            ):
+                keep, drop = j, i
+            else:
+                keep, drop = i, j
+            # Union the dropped theme's keywords into the kept one.
+            kept_kw = set(k.lower() for k in themes[keep]["keywords"])
+            for kw in themes[drop]["keywords"]:
+                if kw.lower() not in kept_kw:
+                    themes[keep]["keywords"].append(kw)
+                    kept_kw.add(kw.lower())
+            # Union exclude_keywords too — the dropped theme's excludes
+            # are still relevant guardrails on the merged centroid.
+            kept_ex = set(themes[keep].get("exclude_keywords") or [])
+            for ex in themes[drop].get("exclude_keywords") or []:
+                if ex not in kept_ex:
+                    themes[keep].setdefault("exclude_keywords", []).append(ex)
+                    kept_ex.add(ex)
+            drop_idx.add(drop)
+            merge_log.append(
+                (themes[keep]["label"], themes[drop]["label"], sim)
+            )
+            if drop == i:
+                # Just dropped i; stop scanning j's for this i.
+                break
+    if drop_idx:
+        log.info(
+            "topic_discovery.merged_near_duplicates",
+            merged_count=len(drop_idx),
+            pairs=[
+                {"kept": k, "dropped": d, "sim": round(s, 3)}
+                for k, d, s in merge_log
+            ],
+        )
+        # Compact themes + theme_vecs (and theme_texts though unused below).
+        keep_mask = [i not in drop_idx for i in range(n_themes)]
+        themes = [t for t, m in zip(themes, keep_mask) if m]
+        theme_vecs = theme_vecs[keep_mask]
 
     # Cosine similarity (vectors are L2-normalized) → (n_posts, n_themes).
     sims = post_vecs @ theme_vecs.T
