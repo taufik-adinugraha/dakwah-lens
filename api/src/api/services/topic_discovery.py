@@ -687,6 +687,80 @@ def discover_topics(
         total=len(themes),
     )
 
+    # String-overlap dedup pass — runs BEFORE the cosine merge so the
+    # high-confidence dynamic-vs-static duplicates get caught even when
+    # their label embeddings don't quite cross the 0.78 cosine threshold.
+    #
+    # Real example (2026-06-02 manual recluster): Gemini proposed dynamic
+    # "Pelecehan & Kekerasan Seksual" while the static set already had
+    # "Kekerasan Seksual & Perlindungan Anak". Embedding cosine sat
+    # ~0.80 — just under the merge threshold — so both survived, splitting
+    # 442 posts across two near-identical clusters. String-overlap is
+    # deterministic, no false positives on conceptually-distinct themes.
+    _STRING_DEDUP_STOPWORDS = {
+        "dan", "atau", "di", "ke", "dalam", "yang", "kepada", "untuk",
+        "oleh", "pada", "para", "umum", "lainnya", "terhadap", "antara",
+        "isu", "polemik", "konflik",
+    }
+
+    def _label_tokens(label: str) -> set[str]:
+        """Tokenize for overlap-match: lowercase, alphanumeric runs only,
+        drop stopwords + short tokens. Single source of truth for
+        what counts as a 'distinctive' token in the dedup pass."""
+        import re
+
+        return {
+            tok
+            for tok in re.findall(r"[a-z]+", label.lower())
+            if len(tok) >= 4 and tok not in _STRING_DEDUP_STOPWORDS
+        }
+
+    static_offset_pre_merge = len(themes) - len(STATIC_THEMES)
+    static_token_sets = [
+        _label_tokens(themes[i]["label"])
+        for i in range(static_offset_pre_merge, len(themes))
+    ]
+    string_dedup_dropped: list[tuple[str, str]] = []
+    survived_dynamic: list[dict[str, Any]] = []
+    for i in range(static_offset_pre_merge):
+        dyn = themes[i]
+        dyn_tokens = _label_tokens(dyn["label"])
+        merge_into: int | None = None
+        for j, static_tokens in enumerate(static_token_sets):
+            overlap = dyn_tokens & static_tokens
+            if len(overlap) >= 2:
+                merge_into = static_offset_pre_merge + j
+                break
+        if merge_into is None:
+            survived_dynamic.append(dyn)
+            continue
+        # Drop the dynamic; union its keyword + exclude lists into the
+        # static so the merged keyword pool drives the embedding-based
+        # post-assignment downstream.
+        kept = themes[merge_into]
+        kept_kw = {k.lower() for k in kept["keywords"]}
+        for kw in dyn["keywords"]:
+            if kw.lower() not in kept_kw:
+                kept["keywords"].append(kw)
+                kept_kw.add(kw.lower())
+        kept_ex = set(kept.get("exclude_keywords") or [])
+        for ex in dyn.get("exclude_keywords") or []:
+            if ex not in kept_ex:
+                kept.setdefault("exclude_keywords", []).append(ex)
+                kept_ex.add(ex)
+        string_dedup_dropped.append((kept["label"], dyn["label"]))
+
+    if string_dedup_dropped:
+        themes = survived_dynamic + themes[static_offset_pre_merge:]
+        log.info(
+            "topic_discovery.string_dedup_dropped",
+            count=len(string_dedup_dropped),
+            pairs=[
+                {"kept_static": k, "dropped_dynamic": d}
+                for k, d in string_dedup_dropped
+            ],
+        )
+
     # Embed themes + posts, then assign each post to its nearest theme.
     # Theme text = label + keywords so both the human-facing name and the
     # distinctive terms steer the vector.
@@ -711,10 +785,13 @@ def discover_topics(
     # space used downstream for post-assignment, so the threshold is
     # interpretable.
     #
-    # Threshold 0.85: empirically catches the audit's three-way split
-    # while leaving genuinely-distinct adjacent themes alone (e.g.
-    # "Krisis Ekonomi & Daya Beli" vs. "Ketahanan Pangan & Pertanian"
-    # share economic vocab but score < 0.80 in practice).
+    # Threshold 0.78: lowered from 0.85 (2026-06-02) after the manual
+    # recluster produced "Pelecehan & Kekerasan Seksual" alongside the
+    # static "Kekerasan Seksual & Perlindungan Anak" — cosine ~0.80,
+    # just below the old 0.85 floor. 0.78 catches that pair while the
+    # string-overlap dedup above handles the high-confidence cases
+    # deterministically; together the two layers cover both the
+    # label-embedding-similar and the label-token-similar duplicates.
     #
     # Static themes are NEVER merged away — they're the curated stable
     # set. Dynamic-vs-static near-duplicate: drop the dynamic, keep
@@ -722,7 +799,7 @@ def discover_topics(
     # for "more canonical"), union the keyword lists.
     n_static = len(STATIC_THEMES)
     static_offset = len(themes) - n_static  # static themes are at the tail
-    merge_threshold = 0.85
+    merge_threshold = 0.78
     # Pairwise similarity matrix (n_themes, n_themes).
     theme_sims = theme_vecs @ theme_vecs.T
     drop_idx: set[int] = set()
