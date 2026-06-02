@@ -696,6 +696,59 @@ def discover_topics(
         total=len(themes),
     )
 
+    # Elastic-word exclude-keyword auto-inject. The SYSTEM_PROMPT asks
+    # Gemini to add a minimum exclude_keywords list whenever a theme
+    # label uses an emotionally-elastic word ("misterius", "horor",
+    # "tragis", etc.) — but the LLM doesn't reliably comply. Real
+    # 2026-06-02 failure: "Fenomena Api Misterius & Gas Metana"
+    # shipped without any exclude_keywords and vacuumed in ~60% of
+    # unrelated kebakaran news (Kemayoran, Tambora, etc.) via embedding
+    # similarity. Enforcing in code is deterministic — every elastic-
+    # word theme gets the minimum list union'd in regardless of what
+    # Gemini set, before post assignment runs.
+    ELASTIC_WORDS = {
+        "misterius",
+        "horor",
+        "aneh",
+        "tragis",
+        "tragedi",
+        "viral",
+        "polemik",
+        "kontroversi",
+        "heboh",
+        "geger",
+    }
+    ELASTIC_MIN_EXCLUDES = [
+        "keracunan",
+        "kebakaran",
+        "kecelakaan",
+        "tenggelam",
+        "hanyut",
+        "tewas",
+        "banjir",
+        "korban",
+    ]
+    elastic_augmented: list[str] = []
+    for theme in themes:
+        label_lower = theme["label"].lower()
+        if not any(word in label_lower for word in ELASTIC_WORDS):
+            continue
+        existing = {ex.lower() for ex in (theme.get("exclude_keywords") or [])}
+        added: list[str] = []
+        for ex in ELASTIC_MIN_EXCLUDES:
+            if ex not in existing:
+                theme.setdefault("exclude_keywords", []).append(ex)
+                existing.add(ex)
+                added.append(ex)
+        if added:
+            elastic_augmented.append(theme["label"])
+    if elastic_augmented:
+        log.info(
+            "topic_discovery.elastic_excludes_injected",
+            count=len(elastic_augmented),
+            themes=elastic_augmented,
+        )
+
     # String-overlap dedup pass — runs BEFORE the cosine merge so the
     # high-confidence dynamic-vs-static duplicates get caught even when
     # their label embeddings don't quite cross the 0.78 cosine threshold.
