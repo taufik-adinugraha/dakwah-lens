@@ -416,6 +416,15 @@ When you're tempted to widen a label (e.g. "Kekerasan dan Kriminalitas Jalanan")
   ✅ Split into: "Bullying & Kekerasan di Sekolah" + "Judi Online & Eksploitasi Digital Pemuda"
 A reader can scan a tight, specific theme and decide what to do with it; a generic bucket forces them to read every post to know what's inside.
 
+ELASTIC-WORD GUARD (HARD RULE):
+Some words in Indonesian are emotionally elastic — they appear in MANY unrelated headlines because journalists overuse them. These words include: "misterius", "horor", "aneh", "tragis", "viral", "polemik", "kontroversi", "heboh", "geger". If you put any of these in a theme label, the embedding centroid pulls in everything with that word — accidents framed as "tewas misterius", deaths framed as "tragis", scandals framed as "polemik". REAL 2026-06-02 audit failure: a theme labeled "Peristiwa Misterius & Horor" sucked in 70% accident/death-news ("tewas misterius di kamping Temanggung", "pria hanyut", "keracunan gas") because every accident headline uses "misterius".
+
+If you propose a theme whose label contains any elastic word above, you MUST EITHER:
+  (a) rename it to a NON-elastic concrete label (e.g. "Peristiwa Misterius & Horor" → "Cerita Pocong & Fenomena Paranormal"), OR
+  (b) set a tight `exclude_keywords` list that filters out the bleed-in. For "misterius/horor": exclude_keywords MUST include at minimum: ["keracunan", "kebakaran", "kecelakaan", "tenggelam", "hanyut", "tewas", "banjir", "korban"]. The exclude list is the ONLY way the bleed-in stops.
+
+If you can't do either confidently, drop the theme entirely and let the static "Lainnya — Tidak Terklasifikasi" bucket catch those posts.
+
 ASSIGNMENT CONTROLS — each theme MAY include two extra optional fields that protect it from false-positive assignment:
 
 - `exclude_keywords`: 0-6 short Indonesian terms that DISQUALIFY a post from this theme even when the vector is similar. Use this for themes whose semantic space bleeds into adjacent concepts. Examples that came from a real audit:
