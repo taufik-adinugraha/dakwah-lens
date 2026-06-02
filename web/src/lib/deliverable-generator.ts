@@ -122,16 +122,18 @@ const ObjectionJson = {
 // both keep them.
 //
 // Length floors: a 15-min Friday khutbah is typically ~2500-3500
-// kata total (pertama ~2000-2800, kedua ~600-900). Earlier mins
-// (800 + 300 chars) let the LLM produce under-spec output — bumped
-// to enforce mimbar-grade depth.
+// kata total. The PROMPT pushes for the upper end of that range
+// (~2200-3000 kata pertama, ~700-1100 kata kedua); these Zod mins
+// are the FLOOR below which we reject — calibrated to be safely
+// reachable (~50-70% above pre-tightening baseline) without
+// validation-rejecting otherwise-good outputs.
 const KhutbahJumatSchema = z.object({
   title: z.string().min(8).max(120),
   summary: z.string().min(40).max(800),
   dua_opening: DuaSchema,
   dua_closing: DuaSchema,
-  khutbah_pertama: z.string().min(10000),
-  khutbah_kedua: z.string().min(3000),
+  khutbah_pertama: z.string().min(5000),
+  khutbah_kedua: z.string().min(1800),
 });
 
 const KultumSchema = z.object({
@@ -153,7 +155,11 @@ const KajianUmumSchema = z.object({
     .array(
       z.object({
         heading: z.string().min(5).max(120),
-        body: z.string().min(7000),
+        // Floor: ~50% above the pre-tightening baseline (2000-2500
+        // chars), reachable but enforces "no thin TPs". Prompt still
+        // pushes the LLM toward 1500-2000 kata / 8000-11000 chars per
+        // TP — this is the rejection threshold, not the target.
+        body: z.string().min(3500),
       }),
     )
     .min(3)

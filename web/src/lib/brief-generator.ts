@@ -205,17 +205,37 @@ const RESPONSE_JSON_SCHEMA = {
     issue_analysis: {
       type: "string",
       description:
-        "FOUR paragraphs, separated by blank lines (use \\n\\n between paragraphs). Each 4-6 sentences. STRUCTURE WAJIB — jangan campur urutan, jangan gabungkan ke satu paragraf besar:\\n\\n" +
-        "PARAGRAF 1 — Bagaimana isu ini muncul di tiap platform, BERSUMBER LANGSUNG dari STATISTIK PERCAKAPAN + CONTOH POST yang diberikan di prompt. Format SETIAP baris platform WAJIB seperti contoh berikut (n, breakdown sentimen, isi kalimat, audiens) — bukan opsional:\\n" +
-        "- **TikTok (n=47, 32 negatif / 12 netral / 3 positif):** Konten didominasi klip pendek kronologi kasus dan reaksi emosional korban-keluarga. Audiens utama: Gen Z dan ibu muda yang mengonsumsi berita lewat feed pendek.\\n" +
+        "STRUKTUR BULLET POINTS — bukan paragraf prose, bukan satu blok besar. Pecah ke 4 sub-bagian markdown ## supaya da'i bisa scan cepat. SETIAP butir HARUS scannable: kata kunci tebal, angka eksplisit, kasus konkret. Hindari kalimat panjang lebar.\\n\\n" +
+        "## Percakapan per Platform\\n" +
+        "Bersumber LANGSUNG dari STATISTIK PERCAKAPAN + CONTOH POST di prompt. Format setiap baris platform WAJIB seperti contoh (n, breakdown sentimen, karakter post, audiens):\\n" +
+        "- **TikTok (n=47, 32 negatif / 12 netral / 3 positif):** Konten didominasi klip pendek kronologi kasus dan reaksi emosional korban-keluarga. Audiens utama: Gen Z dan ibu muda.\\n" +
         "- **X (Twitter) (n=63, 48 negatif / 11 netral / 4 positif):** [karakter post nyata dari sample]. Audiens utama: [...].\\n" +
         "- ... (sebut SEMUA 5 platform)\\n" +
-        "Setelah daftar platform, tambah SATU baris ringkasan: '**Yang paling rentan:** [audiens dengan paparan paling tinggi berdasarkan sample, mis. santri perempuan di lingkungan tertutup]' — ini membantu da'i memilih target audience saat membuat kajian dari draf ini.\\n" +
-        "Kalau bucket platform 0 post di STATISTIK, tulis 'tidak terlihat di ingestion pekan ini' untuk baris itu — JANGAN diisi pola umum. Kalau CONTOH POST untuk satu platform tidak sesuai topik (sentimen / isi melenceng dari topik draft), tandai: '— CATATAN: sampel tidak cocok topik, kemungkinan misklasifikasi cluster'. Kalau seluruh STATISTIK kosong, ganti paragraf ini menjadi narasi 'pola umum percakapan publik' tanpa pecahan per platform.\\n\\n" +
-        "PARAGRAF 2 — Problem statement: apa SEBENARNYA inti masalahnya. Lepas dari platform; bahas fenomena itu sendiri. Sebut akar penyebab, konteks sosial-ekonomi Indonesia, dan apa yang dipertaruhkan kalau dibiarkan. Tidak perlu mengutip dalil di paragraf ini — ini bagian diagnosis.\\n\\n" +
-        "PARAGRAF 3 — Tinjauan syariah + dalil. Bagaimana Islam memandang isu ini. KUTIP minimal 2 dari dalil yang diberikan di RETRIEVED DALEEL — pakai citation string inline (mis. 'QS. Al-Baqarah: 195', 'Sahih al-Bukhari 6018'). Jelaskan kenapa dalil tersebut relevan dengan inti masalah di Paragraf 2. JANGAN mengarang dalil baru. Sebutkan juga kategori da'wah yang bersinggungan (akhlaq, muamalah, aqidah, tarbiyah, ibadah, sosial).\\n\\n" +
-        "PARAGRAF 4 — Implementasi nyata. Langkah konkret di empat tingkat: individu, keluarga, komunitas/masjid/lembaga pendidikan, dan organisasi/regulator. Aksi spesifik bisa dilakukan minggu ini, bukan abstrak. Format bullet list. WAJIB: kalau topik bersinggungan dengan kebijakan publik / hukum / regulasi Indonesia, sebut nama spesifik regulasi atau lembaga yang relevan (mis. UU TPKS, Permendikbud 30/2021 Satgas PPKS, KPAI, Komnas Perempuan, MUI Fatwa No., dst.) — bukan generik 'pemerintah harus...'. Kalau menyangkut fiqh / akhlaq tanpa irisan kebijakan, cukup tingkat individu+keluarga+komunitas tanpa memaksakan lembaga negara.\\n\\n" +
-        "Penting: ini AUDIENCE-NEUTRAL — paragraf 1 menyebut audiens per platform, tapi keseluruhan analisis tidak boleh memilih SATU audiens target. Da'i akan memilih target audience saat membuat kajian dari draf ini.",
+        "Setelah daftar platform, satu baris: '**Yang paling rentan:** [audiens dengan paparan paling tinggi]'.\\n" +
+        "Bucket dengan 0 post → 'tidak terlihat di ingestion pekan ini'. Sampel off-topic → tandai '— CATATAN: sampel tidak cocok topik, kemungkinan misklasifikasi cluster'. Seluruh STATISTIK kosong → ganti dengan narasi 'pola umum percakapan publik' tanpa pecahan per platform.\\n\\n" +
+        "## Diagnosis Masalah\\n" +
+        "Kupas inti masalah dalam BULLET — jangan paragraf. Tiap butir ≤2 kalimat. Wajib mencakup:\\n" +
+        "- **Kasus / peristiwa kunci:** sebut 2-3 peristiwa konkret (anonim, generalisasi nama) dari CONTOH POST yang merepresentasikan pola. Format: '**[label peristiwa]** — [1-2 kalimat penjelasan]'.\\n" +
+        "- **Angka kunci:** sebut 1-2 angka dari STATISTIK yang menggambarkan skala/intensitas (mis. '**~67% post berlabel negatif**' atau '**>150 post lintas-platform pekan lalu**').\\n" +
+        "- **Akar masalah:** 2-3 bullet — apa SEBENARNYA yang menyebabkan ini muncul berulang. Format: '**[label akar]:** [1-2 kalimat]'.\\n" +
+        "- **Konteks Indonesia:** 1-2 bullet konteks lokal (sosial / ekonomi / budaya) yang memperburuk masalah.\\n" +
+        "- **Yang dipertaruhkan:** 1-2 bullet — kerusakan kalau dibiarkan, di tingkat individu / keluarga / ummah.\\n" +
+        "- **Insight kunci:** 1 bullet '**Insight:** [satu kalimat yang menangkap pola yang da'i mungkin tidak sadari tanpa data ini]'.\\n" +
+        "JANGAN kutip dalil di sub-bagian ini — diagnosis dulu, tinjauan syariah di sub-bagian berikutnya.\\n\\n" +
+        "## Tinjauan Syariah\\n" +
+        "Format bullet, bukan paragraf. KUTIP minimal 2 dari dalil di RETRIEVED DALEEL — pakai citation string inline. JANGAN mengarang dalil baru. Struktur:\\n" +
+        "- **Frame Islam:** 1-2 kalimat bagaimana Islam memandang inti masalah ini.\\n" +
+        "- **[QS. Al-Baqarah: 195]** — [1-2 kalimat kenapa ayat ini menyentuh akar masalah dari Diagnosis di atas].\\n" +
+        "- **[Sahih al-Bukhari 6018]** — [1-2 kalimat aplikasi terhadap fenomena modern].\\n" +
+        "- (tambah dalil ke-3/4 dari pool kalau relevan)\\n" +
+        "- **Kategori dakwah:** [akhlaq / muamalah / aqidah / tarbiyah / ibadah / sosial — sebut yang bersinggungan, boleh lebih dari satu].\\n\\n" +
+        "## Implementasi Nyata\\n" +
+        "Format bullet list, sudah berbentuk butir per default. Tiap butir = aksi spesifik yang bisa dilakukan minggu ini, bukan abstrak. Wajib 4 lapis:\\n" +
+        "- **Individu:** [aksi konkret minggu ini, ≤2 kalimat].\\n" +
+        "- **Keluarga:** [...].\\n" +
+        "- **Komunitas / Masjid / Lembaga Pendidikan:** [...].\\n" +
+        "- **Organisasi / Regulator:** [...]. WAJIB sebut nama regulasi / lembaga spesifik kalau topik bersinggungan dengan kebijakan publik (UU TPKS, Permendikbud 30/2021 Satgas PPKS, KPAI, Komnas Perempuan, MUI Fatwa No., dst.) — bukan generik 'pemerintah harus...'. Kalau topik murni fiqh / akhlaq tanpa irisan kebijakan, lapis ke-4 boleh dihilangkan.\\n\\n" +
+        "PENTING: ini AUDIENCE-NEUTRAL. Sub-bagian platform menyebut audiens per platform, tapi keseluruhan analisis tidak boleh memilih SATU audiens target. Da'i akan memilih target audience saat membuat kajian dari draf ini.",
     },
     daleel_explanations: {
       type: "array",

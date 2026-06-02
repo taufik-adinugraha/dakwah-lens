@@ -102,8 +102,8 @@ export function InfraChart({
           <svg
             ref={svgRef}
             viewBox={`0 0 ${w} ${h}`}
-            preserveAspectRatio="none"
-            className="block h-56 w-full"
+            preserveAspectRatio="xMidYMid meet"
+            className="block aspect-[3/1] w-full"
             onPointerMove={handlePointerMove}
             onPointerLeave={() => setHover(null)}
           >

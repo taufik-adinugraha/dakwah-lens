@@ -48,11 +48,16 @@ export default async function InfraPage({
       .from(schema.systemMetrics)
       .orderBy(desc(schema.systemMetrics.capturedAt))
       .limit(1),
+    // to_timestamp() returns timestamptz in UTC by default, which is
+    // exactly what we want. Earlier "AT TIME ZONE 'UTC'" stripped the
+    // timezone, leaving a naive timestamp that node-postgres parsed via
+    // the container's TZ env (Asia/Jakarta on prod) — shifting every
+    // bucket 7h earlier than reality.
     db.execute(sql`
       SELECT
         to_timestamp(
           floor(extract(epoch from captured_at) / ${range.bucketSec}) * ${range.bucketSec}
-        ) AT TIME ZONE 'UTC' AS bucket,
+        ) AS bucket,
         avg(cpu_pct)::float AS cpu_pct,
         avg(mem_used_mb)::float AS mem_used_mb,
         avg(mem_total_mb)::float AS mem_total_mb,

@@ -126,17 +126,29 @@ export default async function BriefDetailPage({
         </div>
       </Section>
 
-      <Section icon={BookOpenCheck} title={t("section_daleel")} tone="emerald">
+      <CollapsibleSection
+        icon={BookOpenCheck}
+        title={t("section_daleel")}
+        tone="emerald"
+        summarySuffix={`${content.daleel.length} dalil`}
+      >
         <div className="space-y-4">
           {content.daleel.map((d: BriefDaleel, i) => (
             <DaleelCard key={`${d.surah}_${d.ayah}_${i}`} d={d} t={t} />
           ))}
         </div>
-      </Section>
+      </CollapsibleSection>
 
       {content.platform_samples &&
         content.platform_samples.some((g) => g.samples.length > 0) && (
-          <Section icon={MessageSquareText} title={t("section_sources")}>
+          <CollapsibleSection
+            icon={MessageSquareText}
+            title={t("section_sources")}
+            summarySuffix={`${content.platform_samples.reduce(
+              (acc, g) => acc + g.samples.length,
+              0,
+            )} post`}
+          >
             <p className="text-xs leading-relaxed text-slate-500">
               {t("section_sources_hint")}
             </p>
@@ -151,7 +163,7 @@ export default async function BriefDetailPage({
                 ),
               )}
             </div>
-          </Section>
+          </CollapsibleSection>
         )}
 
       <div className="mt-12 print:hidden">
@@ -187,6 +199,45 @@ function Section({
       </div>
       <div className="mt-3">{children}</div>
     </section>
+  );
+}
+
+/** Same visual structure as `Section` but rendered as `<details>` so
+ *  the body is collapsed by default and toggleable without any JS.
+ *  Native browser disclosure triangle replaced by a Tailwind-styled
+ *  chevron that rotates via `[&[open]>summary>...]:rotate-90`. */
+function CollapsibleSection({
+  icon: Icon,
+  title,
+  tone = "slate",
+  summarySuffix,
+  children,
+}: {
+  icon: typeof Sparkles;
+  title: string;
+  tone?: "slate" | "emerald";
+  /** Optional small label after the title (e.g. "10 dalil") so the
+   *  user knows what's hidden without expanding. */
+  summarySuffix?: string;
+  children: React.ReactNode;
+}) {
+  const iconCls = tone === "emerald" ? "text-emerald-600" : "text-brand-600";
+  return (
+    <details className="group mt-10">
+      <summary className="flex cursor-pointer list-none items-center gap-2 [&::-webkit-details-marker]:hidden print:cursor-default">
+        <Icon className={`h-4 w-4 ${iconCls}`} />
+        <h2 className="text-balance text-base font-semibold text-slate-900 sm:text-lg">
+          {title}
+        </h2>
+        {summarySuffix && (
+          <span className="ml-1 inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
+            {summarySuffix}
+          </span>
+        )}
+        <ChevronRight className="ml-auto h-4 w-4 text-slate-400 transition-transform group-open:rotate-90 print:hidden" />
+      </summary>
+      <div className="mt-3">{children}</div>
+    </details>
   );
 }
 
