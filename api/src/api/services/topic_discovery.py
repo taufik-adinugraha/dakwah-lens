@@ -788,7 +788,7 @@ def discover_topics(
         )
         # Compact themes + theme_vecs (and theme_texts though unused below).
         keep_mask = [i not in drop_idx for i in range(n_themes)]
-        themes = [t for t, m in zip(themes, keep_mask) if m]
+        themes = [t for t, m in zip(themes, keep_mask, strict=True) if m]
         theme_vecs = theme_vecs[keep_mask]
 
     # Cosine similarity (vectors are L2-normalized) → (n_posts, n_themes).
