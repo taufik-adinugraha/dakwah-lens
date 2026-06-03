@@ -1203,9 +1203,12 @@ export async function getOverviewInsights(): Promise<OverviewInsights | null> {
   // 14-group + Lainnya bucketing — joins social_posts → topics for
   // the 7-day window, then maps each topic's label to its THEME_GROUP
   // via the regex classifier (same one used by the briefing pipeline).
-  // Posts with no topic_id assignment are dropped entirely — they
-  // would otherwise pollute Lainnya with un-clustered noise. Sorted
-  // by post count desc; the consumer caps to top-N at render time.
+  // Posts whose topic_id is NULL (~60% of the historical corpus —
+  // keyword-overlap backfill couldn't match them to any topic) are
+  // counted into the LAINNYA bucket so the chart total reconciles
+  // with "posts ingested" instead of silently dropping them. Sorted
+  // by post count desc with Lainnya pinned to the bottom by the
+  // consumer.
   const topicRows = (await db.execute(sql`
     SELECT t.label AS label, COUNT(sp.id)::int AS posts
     FROM social_posts sp
@@ -1218,6 +1221,23 @@ export async function getOverviewInsights(): Promise<OverviewInsights | null> {
     if (!r || typeof r.label !== "string") continue;
     const grp = classifyThemeGroup(r.label);
     groupCounts.set(grp, (groupCounts.get(grp) ?? 0) + Number(r.posts ?? 0));
+  }
+  // Add the NULL-topic 7d posts to Lainnya — separate query so a
+  // schema change to the JOIN above doesn't accidentally double-count.
+  const nullTopicRow = (await db.execute(sql`
+    SELECT COUNT(*)::int AS posts
+    FROM social_posts
+    WHERE topic_id IS NULL
+      AND posted_at >= now() - interval '7 days'
+  `)) as unknown as Array<{ posts: number }>;
+  const nullTopicCount = Number(
+    (Array.isArray(nullTopicRow) ? nullTopicRow[0]?.posts : 0) ?? 0,
+  );
+  if (nullTopicCount > 0) {
+    groupCounts.set(
+      LAINNYA_GROUP,
+      (groupCounts.get(LAINNYA_GROUP) ?? 0) + nullTopicCount,
+    );
   }
   // Emit all 14 groups + Lainnya so the chart legend stays stable
   // week-over-week even when a group has zero posts this week (renders

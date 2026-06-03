@@ -8,7 +8,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 // No auth() in the path so per-user caching keys don't apply.
 export const revalidate = 300;
 
-import { and, desc, inArray, sql } from "drizzle-orm";
+import { and, desc, inArray, isNull, or, sql } from "drizzle-orm";
 import { ArrowLeft, ArrowRight, Compass, Layers } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
@@ -16,6 +16,7 @@ import { db, schema } from "@/db";
 import {
   classifyThemeGroup,
   GROUP_BY_SLUG,
+  LAINNYA_GROUP,
 } from "@/lib/dashboard-metrics";
 import { briefingSlug, getLatestInsightsSummary } from "@/lib/insights-data";
 import { I18nText } from "@/components/I18nText";
@@ -79,9 +80,13 @@ export default async function GroupLandingPage({
   );
   const groupTopicIds = groupTopics.map((t) => t.id);
 
-  // 2. Recent posts in those topics (last 14d, capped at 25). When a
-  //    group has zero topics this week we render an empty-state card
-  //    instead of an empty list.
+  // 2. Recent posts in this group's topics (last 14d, capped at 25).
+  //    Special case: the Lainnya group also adopts posts with
+  //    topic_id IS NULL — those are the keyword-overlap-backfill
+  //    rejects (off-taxonomy items the matcher couldn't fit anywhere).
+  //    Counting them as Lainnya keeps the chart honest + gives the
+  //    reader somewhere to browse them.
+  const isLainnya = group === LAINNYA_GROUP;
   let recentPosts: Array<{
     id: string;
     text: string;
@@ -91,7 +96,15 @@ export default async function GroupLandingPage({
     postedAt: Date | null;
     sentimentLabel: string | null;
   }> = [];
-  if (groupTopicIds.length > 0) {
+  if (groupTopicIds.length > 0 || isLainnya) {
+    const topicMatch = groupTopicIds.length > 0
+      ? inArray(schema.socialPosts.topicId, groupTopicIds)
+      : null;
+    const nullMatch = isLainnya ? isNull(schema.socialPosts.topicId) : null;
+    const idClause =
+      topicMatch && nullMatch
+        ? or(topicMatch, nullMatch)
+        : (topicMatch ?? nullMatch)!;
     recentPosts = await db
       .select({
         id: schema.socialPosts.id,
@@ -105,7 +118,7 @@ export default async function GroupLandingPage({
       .from(schema.socialPosts)
       .where(
         and(
-          inArray(schema.socialPosts.topicId, groupTopicIds),
+          idClause,
           sql`posted_at >= now() - interval '14 days'`,
         ),
       )
