@@ -696,31 +696,45 @@ def discover_topics(
         total=len(themes),
     )
 
-    # Elastic-word exclude-keyword auto-inject. The SYSTEM_PROMPT asks
-    # Gemini to add a minimum exclude_keywords list whenever a theme
-    # label uses an emotionally-elastic word ("misterius", "horor",
-    # "tragis", etc.) — but the LLM doesn't reliably comply. Real
-    # 2026-06-02 failure: "Fenomena Api Misterius & Gas Metana"
-    # shipped without any exclude_keywords and vacuumed in ~60% of
-    # unrelated kebakaran news (Kemayoran, Tambora, etc.) via embedding
-    # similarity. Enforcing in code is deterministic — every elastic-
-    # word theme gets the minimum list union'd in regardless of what
-    # Gemini set, before post assignment runs.
-    ELASTIC_WORDS = {
-        "misterius",
-        "horor",
-        "aneh",
-        "tragis",
-        "tragedi",
-        "viral",
-        "polemik",
-        "kontroversi",
-        "heboh",
-        "geger",
-    }
+    # Mystery/horror auto-inject. Targets THE specific failure mode we
+    # observed: themes labeled "misterius / horor / aneh" empirically
+    # vacuum in unrelated fire & accident news because Indonesian
+    # journalists frame ANY death/fire/disaster with those words
+    # ("api misterius", "tewas misterius", "kejadian aneh"). The
+    # auto-inject below ONLY trips on these three labels — other
+    # elastic words (polemik, tragis, kontroversi, viral, heboh, geger)
+    # are still gated by the prompt-side rule but NOT auto-augmented
+    # here because their excludes would actually break legitimate
+    # clusters:
+    #   - "Tragedi Glamping Temanggung" needs `tewas/korban/keracunan`
+    #     in scope (they're the topic, not the bleed-in)
+    #   - "Polemik Sapi Kurban Presiden" needs `korban` (sapi korban =
+    #     sapi kurban offering — narrowing it would drop legitimate
+    #     kurban-discussion posts)
+    #   - "Kontroversi Pemilu" / "Heboh PDI-P" have no canonical
+    #     bleed-pattern to exclude
+    # If a new bleed-in pattern emerges for those elastic words,
+    # extend ELASTIC_WORDS + add a separate excludes list per pattern.
+    ELASTIC_WORDS = {"misterius", "horor", "aneh"}
+    # Indonesian morphology: a single verb root sprouts many surface
+    # forms (bakar / terbakar / dibakar / membakar / kobaran / hangus).
+    # The exclude check is literal substring on post text, so each
+    # form needs to be listed. Catches the 2026-06-03 04:00 WIB
+    # auto-recluster failure where "Fenomena Api Misterius di Sleman"
+    # vacuumed posts like "Motornya Hangus Dibakar Massa" and "Tembus
+    # Kobaran Api Ruko" because the post text matched the cluster's
+    # embedding centroid AND didn't contain the literal token
+    # "kebakaran".
     ELASTIC_MIN_EXCLUDES = [
-        "keracunan",
+        # Fire / burning — all morphological variants
         "kebakaran",
+        "terbakar",
+        "dibakar",
+        "membakar",
+        "hangus",
+        "kobaran",
+        # Other accident / disaster framings
+        "keracunan",
         "kecelakaan",
         "tenggelam",
         "hanyut",
@@ -992,6 +1006,44 @@ def discover_topics(
             }
         )
 
+    # Purity audit — for each assigned theme, fraction of posts whose
+    # text contains at least one of the theme's keywords (literal
+    # substring, case-insensitive). Low purity = the embedding centroid
+    # is attracting posts that don't share surface vocabulary with the
+    # theme — usually a bleed-in pattern worth investigating. Logged
+    # alongside `topic_discovery.done` so it's grep-able from worker
+    # logs. Doesn't change behaviour — purely observational.
+    #
+    # Skip the fallback bucket (its keyword "lainnya" never matches
+    # any real post). Threshold 0.40 flags clusters where >60% of
+    # assigned posts don't even mention a single keyword — strong
+    # signal of bleed-in or over-broad label.
+    id_to_text = {p["id"]: p.get("text", "") for p in sample}
+    purity_per_theme: list[dict[str, Any]] = []
+    low_purity: list[str] = []
+    for t_idx, theme in enumerate(themes):
+        post_ids = theme_post_ids.get(t_idx, [])
+        if not post_ids:
+            continue
+        keywords_lower = [kw.lower() for kw in theme.get("keywords", []) if kw]
+        if not keywords_lower:
+            continue
+        matched = 0
+        for pid in post_ids:
+            text_lower = id_to_text.get(pid, "").lower()
+            if any(kw in text_lower for kw in keywords_lower):
+                matched += 1
+        purity = matched / len(post_ids)
+        purity_per_theme.append(
+            {
+                "label": theme["label"],
+                "n": len(post_ids),
+                "purity": round(purity, 2),
+            }
+        )
+        if purity < 0.40:
+            low_purity.append(theme["label"])
+
     log.info(
         "topic_discovery.done",
         platform=platform,
@@ -1003,6 +1055,13 @@ def discover_topics(
         excluded_by_keyword=excluded_by_keyword,
         excluded_by_floor=excluded_by_floor,
         fallback_bucket=len(orphan_ids) >= MIN_POSTS_FOR_FALLBACK,
+    )
+    log.info(
+        "topic_discovery.purity_audit",
+        platform=platform,
+        themes=purity_per_theme,
+        low_purity_count=len(low_purity),
+        low_purity_labels=low_purity,
     )
 
     return results

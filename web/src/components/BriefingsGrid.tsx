@@ -2,34 +2,34 @@ import { getTranslations } from "next-intl/server";
 import {
   ArrowRight,
   Clock,
-  HeartHandshake,
+  Compass,
   Layers,
-  Scale,
   Sparkles,
-  Users,
 } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
+import { slugifyGroup } from "@/lib/dashboard-metrics";
 import {
-  BRIEFING_SEGMENTS,
+  BRIEFING_GROUPS,
   briefingSlug,
   extractFirstBriefingSection,
   type LatestInsightsSummary,
 } from "@/lib/insights-data";
 
 /**
- * The /insights hub's focal element — 5 equal-sized briefing cards
- * laid out in a responsive 1/2/5-column grid. Each card previews a
- * 1-sentence hook from the briefing's Section 1 (Ringkasan Eksekutif)
- * and CTAs into the long-form read.
+ * The /insights hub's focal element — 14 equal-sized group cards laid
+ * out in a responsive grid.
  *
- * Equal sizing is intentional: the briefings-first redesign treats the
- * 5 perspectives as peers rather than hero + supporting. The reader
- * sees we offer 5 distinct lenses on the same week, picks whichever
- * speaks to their context.
+ * Each card represents one THEME_GROUP. The auto-pipeline generates
+ * weekly briefings for the TOP 5 groups by 7d post volume; cards for
+ * those groups get a 1-sentence Section-1 preview + "Read briefing"
+ * CTA into /insights/brief/[slug]. The other 9 group cards show an
+ * "Explore topics & posts" CTA pointing at /insights/group/[slug],
+ * a lightweight landing showing the group's topics + recent posts
+ * without a full LLM briefing.
  *
- * Missing briefings (e.g. a segment's Pro call failed) render as a
- * dimmed placeholder card — same shape, honest about the gap.
+ * Group-based redesign 2026-06-03 — replaces the prior 5-segment
+ * (all + spiritual + family + youth + justice) layout.
  */
 export async function BriefingsGrid({
   briefings,
@@ -47,6 +47,17 @@ export async function BriefingsGrid({
       year: "numeric",
       timeZone: "Asia/Jakarta",
     });
+
+  // Sort: groups with a briefing first (so the cards a reader can
+  // actually click "Read briefing" on appear above the fold), then
+  // un-briefed groups in canonical order.
+  const briefedGroups: string[] = [];
+  const unbriefedGroups: string[] = [];
+  for (const group of BRIEFING_GROUPS) {
+    if (briefings.has(group)) briefedGroups.push(group);
+    else unbriefedGroups.push(group);
+  }
+  const orderedGroups = [...briefedGroups, ...unbriefedGroups];
 
   return (
     <section className="pb-10 sm:pb-14">
@@ -66,89 +77,85 @@ export async function BriefingsGrid({
           </div>
         </div>
 
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          {BRIEFING_SEGMENTS.map((segment) => {
-            const key = segment ?? "all";
-            const brief = briefings.get(key);
-            const meta = SEGMENT_META[key as keyof typeof SEGMENT_META];
-            const titleKey =
-              segment === null
-                ? "hub_card_all_title"
-                : (`segment_${segment}_title` as Parameters<typeof t>[0]);
-            const title = t(titleKey);
-            const Icon = meta.icon;
+        {/* Note explaining the top-5 auto-generation model so a reader
+            seeing 5 read-ready cards above 9 explore-only cards
+            doesn't think the others are broken. */}
+        <p className="mb-5 max-w-3xl rounded-2xl border border-slate-200 bg-slate-50/60 px-4 py-2.5 text-xs leading-relaxed text-slate-600">
+          {t("hub_top_n_note")}
+        </p>
 
-            if (!brief) {
+        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {orderedGroups.map((group) => {
+            const brief = briefings.get(group);
+            const groupSlug = slugifyGroup(group);
+
+            if (brief) {
+              const body =
+                locale === "en" && brief.summaryMdEn
+                  ? brief.summaryMdEn
+                  : brief.summaryMd;
+              const previewSection = extractFirstBriefingSection(body);
+              const previewLine = excerpt(previewSection, 170);
+              const wordCount = body.trim().split(/\s+/).length;
+              const readingMinutes = Math.max(1, Math.round(wordCount / 200));
+              const slug = briefingSlug(brief.generatedAt, brief.segment);
+
               return (
-                <li key={key}>
-                  <div
-                    className={`flex h-full flex-col rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-5 text-slate-400`}
-                    aria-disabled="true"
+                <li key={group}>
+                  <Link
+                    href={`/insights/brief/${slug}`}
+                    className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50/50 to-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-emerald-500 hover:shadow-lg"
                   >
-                    <span
-                      className={`inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-400`}
-                    >
-                      <Icon className="h-4 w-4" />
+                    <div
+                      aria-hidden
+                      className="pointer-events-none absolute -top-12 -right-12 h-28 w-28 rounded-full bg-emerald-200 opacity-50 blur-3xl"
+                    />
+                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+                      <Layers className="h-4 w-4" />
                     </span>
-                    <h3 className="mt-3 text-sm font-bold text-slate-600">
-                      {title}
+                    <h3 className="mt-3 text-base font-bold text-slate-900">
+                      {group}
                     </h3>
-                    <p className="mt-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
-                      {t("hub_card_missing")}
+                    <p className="mt-2 line-clamp-4 text-[13px] leading-relaxed text-slate-600">
+                      {previewLine}
                     </p>
-                  </div>
+                    <div className="mt-4 flex items-center justify-between gap-2 text-[10px] text-slate-500">
+                      <span>{formatDate(brief.generatedAt)}</span>
+                      <span className="inline-flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {t("brief_reading_time", { minutes: readingMinutes })}
+                      </span>
+                    </div>
+                    <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 transition group-hover:gap-2">
+                      {t("hub_card_cta")}
+                      <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+                    </div>
+                  </Link>
                 </li>
               );
             }
 
-            const body =
-              locale === "en" && brief.summaryMdEn
-                ? brief.summaryMdEn
-                : brief.summaryMd;
-            const previewSection = extractFirstBriefingSection(body);
-            const previewLine = excerpt(previewSection, 170);
-            const wordCount = body.trim().split(/\s+/).length;
-            const readingMinutes = Math.max(1, Math.round(wordCount / 200));
-            const slug = briefingSlug(brief.generatedAt, brief.segment);
-
+            // No briefing this week — link to the group landing page.
             return (
-              <li key={key}>
+              <li key={group}>
                 <Link
-                  href={`/insights/brief/${slug}`}
-                  className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border ${meta.idleBorder} ${meta.idleBg} p-5 shadow-sm transition hover:-translate-y-1 ${meta.hoverBorder} hover:shadow-lg`}
+                  href={`/insights/group/${groupSlug}`}
+                  className="group relative flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-slate-900 hover:shadow-md"
                 >
-                  {/* Soft decorative blob behind the icon */}
-                  <div
-                    aria-hidden
-                    className={`pointer-events-none absolute -top-12 -right-12 h-28 w-28 rounded-full ${meta.blob} opacity-50 blur-3xl`}
-                  />
-                  <span
-                    className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${meta.iconBg} ${meta.iconText}`}
-                  >
-                    <Icon className="h-4 w-4" />
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition group-hover:bg-slate-900 group-hover:text-white">
+                    <Compass className="h-4 w-4" />
                   </span>
-
                   <h3 className="mt-3 text-base font-bold text-slate-900">
-                    {title}
+                    {group}
                   </h3>
-
-                  <p className="mt-2 line-clamp-4 text-[13px] leading-relaxed text-slate-600">
-                    {previewLine}
+                  <p className="mt-2 line-clamp-3 text-[13px] leading-relaxed text-slate-500">
+                    {t("hub_card_explore_body")}
                   </p>
-
-                  <div className="mt-4 flex items-center justify-between gap-2 text-[10px] text-slate-500">
-                    <span>{formatDate(brief.generatedAt)}</span>
-                    <span className="inline-flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {t("brief_reading_time", { minutes: readingMinutes })}
-                    </span>
-                  </div>
-
-                  <div
-                    className={`mt-3 inline-flex items-center gap-1.5 text-xs font-semibold ${meta.cta} transition group-hover:gap-2`}
-                  >
-                    {t("hub_card_cta")}
-                    <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+                  <div className="mt-auto pt-4">
+                    <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 transition group-hover:gap-2">
+                      {t("hub_card_explore_cta")}
+                      <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+                    </div>
                   </div>
                 </Link>
               </li>
@@ -177,58 +184,3 @@ function excerpt(section: string, max: number): string {
     ? stripped.slice(0, max - 1).trimEnd() + "…"
     : stripped;
 }
-
-/** Per-segment palette — mirrors BriefingNarrative section themes and
- *  BriefPagination cards so a reader's color memory stays coherent. */
-const SEGMENT_META = {
-  all: {
-    icon: Layers,
-    iconBg: "bg-slate-900",
-    iconText: "text-white",
-    idleBorder: "border-slate-200",
-    idleBg: "bg-gradient-to-br from-white to-slate-50",
-    hoverBorder: "hover:border-slate-900",
-    blob: "bg-slate-300",
-    cta: "text-slate-700",
-  },
-  spiritual: {
-    icon: Sparkles,
-    iconBg: "bg-emerald-100",
-    iconText: "text-emerald-700",
-    idleBorder: "border-emerald-100",
-    idleBg: "bg-gradient-to-br from-emerald-50/50 to-white",
-    hoverBorder: "hover:border-emerald-500",
-    blob: "bg-emerald-200",
-    cta: "text-emerald-700",
-  },
-  family: {
-    icon: HeartHandshake,
-    iconBg: "bg-rose-100",
-    iconText: "text-rose-700",
-    idleBorder: "border-rose-100",
-    idleBg: "bg-gradient-to-br from-rose-50/50 to-white",
-    hoverBorder: "hover:border-rose-500",
-    blob: "bg-rose-200",
-    cta: "text-rose-700",
-  },
-  youth: {
-    icon: Users,
-    iconBg: "bg-sky-100",
-    iconText: "text-sky-700",
-    idleBorder: "border-sky-100",
-    idleBg: "bg-gradient-to-br from-sky-50/50 to-white",
-    hoverBorder: "hover:border-sky-500",
-    blob: "bg-sky-200",
-    cta: "text-sky-700",
-  },
-  justice: {
-    icon: Scale,
-    iconBg: "bg-amber-100",
-    iconText: "text-amber-700",
-    idleBorder: "border-amber-100",
-    idleBg: "bg-gradient-to-br from-amber-50/50 to-white",
-    hoverBorder: "hover:border-amber-500",
-    blob: "bg-amber-200",
-    cta: "text-amber-700",
-  },
-} as const;

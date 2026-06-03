@@ -6,35 +6,49 @@ end-to-end (stats compute, daleel retrieval, prompt assembly) — you
 just hand-roll the LLM step by pasting the prompt into Claude (chat
 interface) and the response back into this script.
 
+Group model since 2026-06-03: a briefing is keyed by ONE of the 14
+THEME_GROUPS (e.g. "Hukum & Keadilan", "Aqidah & Ibadah") instead of
+the prior 4 audience-segments. The CLI accepts EITHER the group's
+slug (`hukum-keadilan`, `aqidah-ibadah`, ...) OR the literal label
+("Hukum & Keadilan") — slugs are stable and shell-safe; pass labels
+in quotes when convenient.
+
 Subcommands:
-  dump <segment> [--output FILE]
+  dump <group> [--output FILE]
       Compute stats + retrieve daleel + assemble the prompt. Writes the
       system + user prompt to stdout or `FILE`. Paste into Claude.
 
-  save <segment> <markdown-file>
+  save <group> <markdown-file>
       Read the LLM's response markdown from disk, persist to
       insights_summaries with cost=0 and model="claude-manual". Re-uses
       the stats + daleel from the most-recent matching `dump` so the
       bibliography stays anchored to the same retrieval.
 
   list
-      Show all 5 segments + the date of the most-recent briefing for
+      Show all 14 groups + the date of the most-recent briefing for
       each. Sanity-check before running a fresh dump.
 
-Segment values:
-  all spiritual family youth justice
-  ("all" → segment IS NULL, the cross-platform briefing)
+  apply-swaps <group> [--swaps-file FILE]
+      Apply operator-authored daleel-citation swaps to the latest
+      briefing for the group.
+
+Group values (slug form):
+  hukum-keadilan, sosial-keluarga, ekonomi-bisnis, aqidah-ibadah,
+  kesehatan-kehidupan, pendidikan-sdm, lingkungan-bencana,
+  pemerintahan-kebijakan, patologi-sosial-digital, teknologi-ai,
+  pekerja-pertanian-rakyat, konflik-geopolitik,
+  inspirasi-kisah-pribadi, toleransi-lintas-iman
 
 Example flow (one Thursday morning):
-  for seg in all spiritual family youth justice; do
-    uv run python -m api.scripts.manual_briefing dump $seg \\
-      --output /tmp/briefing-$seg-prompt.md
+  for g in hukum-keadilan aqidah-ibadah; do
+    uv run python -m api.scripts.manual_briefing dump $g \\
+      --output /tmp/briefing-$g-prompt.md
   done
-  # → for each segment: paste the prompt into Claude → save reply as
-  #   /tmp/briefing-<seg>-reply.md
-  for seg in all spiritual family youth justice; do
-    uv run python -m api.scripts.manual_briefing save $seg \\
-      /tmp/briefing-$seg-reply.md
+  # → for each group: paste the prompt into Claude → save reply as
+  #   /tmp/briefing-<g>-reply.md
+  for g in hukum-keadilan aqidah-ibadah; do
+    uv run python -m api.scripts.manual_briefing save $g \\
+      /tmp/briefing-$g-reply.md
   done
 """
 
@@ -64,10 +78,14 @@ from api.services.kitab_retrieval import (
     retrieve_daleel,
     retrieve_dua,
 )
+from api.services.theme_groups import (
+    GROUP_BY_SLUG,
+    THEME_GROUPS,
+    slugify_group,
+)
 
 log = structlog.get_logger(__name__)
 
-VALID_SEGMENTS = {"all", "spiritual", "family", "youth", "justice"}
 MODEL_TAG = "claude-manual"
 
 # Where we stash the (stats, daleel) snapshot produced by `dump` so the
@@ -77,33 +95,42 @@ MODEL_TAG = "claude-manual"
 _CACHE_DIR = Path("/tmp/dakwah-manual-briefing")
 
 
-def _segment_arg(s: str | None) -> str | None:
-    """Map CLI string to the DB segment column. 'all' → None."""
-    if s is None:
-        return None
-    return None if s == "all" else s
+# ──────────────────────────────────────────────────────────────────
+# Group resolution
+# ──────────────────────────────────────────────────────────────────
 
 
-def _segment_key(s: str | None) -> str:
-    """Inverse of `_segment_arg` for cache filenames."""
-    return s if s else "all"
+def _resolve_group(arg: str) -> str:
+    """Accept either a slug ("hukum-keadilan") or a label
+    ("Hukum & Keadilan"). Returns the canonical THEME_GROUPS label.
+    SystemExit with the slug menu on miss."""
+    if arg in GROUP_BY_SLUG:
+        return GROUP_BY_SLUG[arg]
+    # Literal label match
+    for tg in THEME_GROUPS:
+        if tg.group == arg:
+            return tg.group
+    # Be forgiving: slugify whatever was passed in and look that up.
+    sl = slugify_group(arg)
+    if sl in GROUP_BY_SLUG:
+        return GROUP_BY_SLUG[sl]
+    menu = ", ".join(sorted(GROUP_BY_SLUG.keys()))
+    raise SystemExit(
+        f"Unknown group: {arg!r}. Use one of (slug form): {menu}"
+    )
 
 
-def _validate_segment(s: str) -> str:
-    if s not in VALID_SEGMENTS:
-        raise SystemExit(
-            f"Invalid segment: '{s}'. Use one of: {', '.join(sorted(VALID_SEGMENTS))}"
-        )
-    return s
+def _group_slug(group: str) -> str:
+    return slugify_group(group)
 
 
-def _cache_path(segment_key: str) -> Path:
+def _cache_path(group_slug: str) -> Path:
     _CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    return _CACHE_DIR / f"{segment_key}.json"
+    return _CACHE_DIR / f"{group_slug}.json"
 
 
 async def _prepare_context(
-    segment: str | None,
+    group: str,
 ) -> tuple[
     dict[str, Any],
     list[dict[str, Any]],
@@ -119,14 +146,14 @@ async def _prepare_context(
     prompt.
     """
     async with SessionLocal() as session:
-        stats = await _compute_stats(session, segment)
+        stats = await _compute_stats(session, group)
         if stats["totals"]["posts_7d"] == 0:
             raise SystemExit(
-                f"No posts in the 7-day window for segment '{_segment_key(segment)}'. "
+                f"No posts in the 7-day window for group '{group}'. "
                 "Aborting — there's nothing to brief on."
             )
 
-        retrieval_query = _build_retrieval_query(stats, segment)
+        retrieval_query = _build_retrieval_query(stats, group)
         # Same widened-pool params as the auto pipeline
         # (generate_summary in insights_summary.py). limit=28
         # candidates + top_n=18 reranked gives the brief LLM a
@@ -171,7 +198,7 @@ async def _prepare_context(
 
         log.info(
             "manual_briefing.context_ready",
-            segment=segment,
+            group=group,
             daleel_count=len(daleel),
             adhkar_count=len(adhkar),
             posts_7d=stats["totals"]["posts_7d"],
@@ -193,22 +220,22 @@ async def _prepare_context(
 # ──────────────────────────────────────────────────────────────────
 
 
-async def cmd_dump(segment: str, output_path: str | None) -> None:
-    seg = _segment_arg(segment)
-    seg_key = _segment_key(seg)
+async def cmd_dump(group_arg: str, output_path: str | None) -> None:
+    group = _resolve_group(group_arg)
+    slug = _group_slug(group)
     stats, daleel, adhkar, system_prompt, user_prompt = await _prepare_context(
-        seg
+        group
     )
 
     # Cache the (stats, daleel, adhkar) for the matching `save` step.
     # JSON keeps this tool inspectable + portable across script
     # invocations.
-    cache_path = _cache_path(seg_key)
+    cache_path = _cache_path(slug)
     cache_path.write_text(
         json.dumps(
             {
-                "segment": seg,
-                "segment_key": seg_key,
+                "group": group,
+                "slug": slug,
                 "stats": stats,
                 "daleel": daleel,
                 "adhkar": adhkar,
@@ -226,10 +253,10 @@ async def cmd_dump(segment: str, output_path: str | None) -> None:
     # what the auto pipeline produces.
     composed = (
         f"<!-- DAKWAH-LENS MANUAL BRIEFING PROMPT -->\n"
-        f"<!-- segment: {seg_key}  dumped: {datetime.now(UTC).isoformat()} -->\n"
+        f"<!-- group: {group} ({slug})  dumped: {datetime.now(UTC).isoformat()} -->\n"
         f"<!-- daleel pool: {len(daleel)} entries · adhkar pool: {len(adhkar)} entries -->\n"
         f"<!-- After Claude responds, save the reply as a .md file and run: -->\n"
-        f"<!--   uv run python -m api.scripts.manual_briefing save {seg_key} <reply.md> -->\n\n"
+        f"<!--   uv run python -m api.scripts.manual_briefing save {slug} <reply.md> -->\n\n"
         "================================================================\n"
         "SYSTEM INSTRUCTION (this is the persona + format rules)\n"
         "================================================================\n\n"
@@ -251,7 +278,7 @@ async def cmd_dump(segment: str, output_path: str | None) -> None:
         sys.stdout.write(composed)
         sys.stderr.write(
             f"\n[stderr] Cache: {cache_path}\n"
-            f"[stderr] Next: pipe Claude's reply into `save {seg_key} <file.md>`\n",
+            f"[stderr] Next: pipe Claude's reply into `save {slug} <file.md>`\n",
         )
 
 
@@ -273,23 +300,23 @@ def _basic_validate_briefing(md: str) -> None:
             f"Briefing is suspiciously short ({len(md):,} chars). "
             "Expected a 7,000-10,000 word content kit. Aborting save."
         )
-    if md.count("\n## ") < 4:
+    if md.count("\n## ") < 5:
         raise SystemExit(
             f"Only {md.count(chr(10) + '## ')} `## ` H2 sections found. "
-            "Expected 5 (Ringkasan / Numerik / Tema / Strategi / Dalil). "
-            "Did Claude truncate? Aborting save."
+            "Expected 6 (Ringkasan / Numerik / Tema / Poin Kunci / "
+            "Strategi / Dalil). Did Claude truncate? Aborting save."
         )
 
 
-async def cmd_save(segment: str, markdown_path: str) -> None:
-    seg = _segment_arg(segment)
-    seg_key = _segment_key(seg)
+async def cmd_save(group_arg: str, markdown_path: str) -> None:
+    group = _resolve_group(group_arg)
+    slug = _group_slug(group)
 
-    cache_path = _cache_path(seg_key)
+    cache_path = _cache_path(slug)
     if not cache_path.exists():
         raise SystemExit(
-            f"No cached context for segment '{seg_key}'. "
-            f"Run `dump {seg_key}` first so we know which stats/daleel pool to attach."
+            f"No cached context for group '{group}'. "
+            f"Run `dump {slug}` first so we know which stats/daleel pool to attach."
         )
 
     md_path = Path(markdown_path)
@@ -310,7 +337,7 @@ async def cmd_save(segment: str, markdown_path: str) -> None:
     age_hours = (datetime.now(UTC) - dumped_at).total_seconds() / 3600.0
     if age_hours > 48:
         sys.stderr.write(
-            f"⚠ Warning: cached context for '{seg_key}' is {age_hours:.1f}h old.\n"
+            f"⚠ Warning: cached context for '{group}' is {age_hours:.1f}h old.\n"
             f"  Stats / daleel may be stale. Consider re-running `dump` first.\n"
             "  Continue anyway? [y/N] ",
         )
@@ -352,7 +379,9 @@ async def cmd_save(segment: str, markdown_path: str) -> None:
             tokens_in=0,
             tokens_out=0,
             cost_usd=0.0,
-            segment=seg,
+            # `segment` column carries the canonical group label
+            # since 2026-06-03 (was a 4-segment slug).
+            segment=group,
             daleel_refs=daleel,
             adhkar_refs=adhkar,
         )
@@ -360,7 +389,7 @@ async def cmd_save(segment: str, markdown_path: str) -> None:
         await session.commit()
 
         sys.stderr.write(
-            f"✓ Briefing saved for segment '{seg_key}'.\n"
+            f"✓ Briefing saved for group '{group}'.\n"
             f"  model={MODEL_TAG} (manual)\n"
             f"  daleel_refs={len(daleel)} · adhkar_refs={len(adhkar)}\n"
             f"  body={len(final_md):,} chars\n"
@@ -382,11 +411,11 @@ async def cmd_save(segment: str, markdown_path: str) -> None:
 
 
 # ──────────────────────────────────────────────────────────────────
-# Subcommand: list
+# Subcommand: apply-swaps
 # ──────────────────────────────────────────────────────────────────
 
 
-async def cmd_apply_swaps(segment: str, swaps_file: str | None) -> None:
+async def cmd_apply_swaps(group_arg: str, swaps_file: str | None) -> None:
     """Apply a list of daleel-citation swaps to the latest briefing.
 
     The swap list is operator-authored — typically copy-pasted from
@@ -458,27 +487,22 @@ async def cmd_apply_swaps(segment: str, swaps_file: str | None) -> None:
             }
         )
 
-    seg = _segment_arg(segment)
-    seg_key = _segment_key(seg)
+    group = _resolve_group(group_arg)
 
     async with SessionLocal() as session:
         result = await session.execute(
             select(InsightsSummary)
-            .where(
-                InsightsSummary.segment.is_(None)
-                if seg is None
-                else InsightsSummary.segment == seg
-            )
+            .where(InsightsSummary.segment == group)
             .order_by(desc(InsightsSummary.generated_at))
             .limit(1)
         )
         row = result.scalar_one_or_none()
         if row is None:
-            raise SystemExit(f"No briefing found for segment '{seg_key}'.")
+            raise SystemExit(f"No briefing found for group '{group}'.")
 
         original_md = row.summary_md
         sys.stderr.write(
-            f"Loaded latest briefing for '{seg_key}'\n"
+            f"Loaded latest briefing for '{group}'\n"
             f"  generated_at={row.generated_at.isoformat()}\n"
             f"  body={len(original_md):,} chars\n"
             f"  swaps requested: {len(swaps)}\n\n"
@@ -507,7 +531,7 @@ async def cmd_apply_swaps(segment: str, swaps_file: str | None) -> None:
         await session.commit()
 
         sys.stderr.write(
-            f"✓ Updated briefing for '{seg_key}' "
+            f"✓ Updated briefing for '{group}' "
             f"({len(applied)} citation"
             f"{'s' if len(applied) != 1 else ''} rewritten)\n"
         )
@@ -524,26 +548,26 @@ async def cmd_apply_swaps(segment: str, swaps_file: str | None) -> None:
                 )
 
 
+# ──────────────────────────────────────────────────────────────────
+# Subcommand: list
+# ──────────────────────────────────────────────────────────────────
+
+
 async def cmd_list() -> None:
-    """Show the most-recent briefing per segment so the operator knows
-    which segments are stale heading into a fresh Thursday cycle."""
+    """Show the most-recent briefing per THEME_GROUP so the operator
+    knows which groups are stale heading into a fresh Thursday cycle."""
     from sqlalchemy import desc, select
 
     async with SessionLocal() as session:
-        rows: list[tuple[str | None, datetime, str]] = []
-        for seg_key in ["all", "spiritual", "family", "youth", "justice"]:
-            seg = _segment_arg(seg_key)
+        rows: list[tuple[str, datetime, str]] = []
+        for tg in THEME_GROUPS:
             stmt = (
                 select(
                     InsightsSummary.segment,
                     InsightsSummary.generated_at,
                     InsightsSummary.model,
                 )
-                .where(
-                    InsightsSummary.segment.is_(None)
-                    if seg is None
-                    else InsightsSummary.segment == seg
-                )
+                .where(InsightsSummary.segment == tg.group)
                 .order_by(desc(InsightsSummary.generated_at))
                 .limit(1)
             )
@@ -552,15 +576,16 @@ async def cmd_list() -> None:
             if row:
                 rows.append((row[0], row[1], row[2]))
             else:
-                rows.append((seg, datetime.fromtimestamp(0, tz=UTC), "—"))
+                rows.append((tg.group, datetime.fromtimestamp(0, tz=UTC), "—"))
 
-    sys.stdout.write(f"{'SEGMENT':<12} {'LAST GENERATED (UTC)':<26} {'MODEL':<24} {'AGE':>8}\n")
-    sys.stdout.write("-" * 75 + "\n")
+    sys.stdout.write(
+        f"{'GROUP':<32} {'LAST GENERATED (UTC)':<22} {'MODEL':<24} {'AGE':>8}\n"
+    )
+    sys.stdout.write("-" * 90 + "\n")
     now = datetime.now(UTC)
-    for seg, ts, model in rows:
-        seg_key = _segment_key(seg)
+    for group, ts, model in rows:
         if ts.timestamp() == 0:
-            sys.stdout.write(f"{seg_key:<12} {'(never)':<26} {'—':<24} {'∞':>8}\n")
+            sys.stdout.write(f"{group:<32} {'(never)':<22} {'—':<24} {'∞':>8}\n")
         else:
             age = now - ts
             age_str = (
@@ -569,7 +594,7 @@ async def cmd_list() -> None:
                 else f"{int(age.total_seconds() / 3600)}h"
             )
             sys.stdout.write(
-                f"{seg_key:<12} {ts.strftime('%Y-%m-%d %H:%M'):<26} {model:<24} {age_str:>8}\n"
+                f"{group:<32} {ts.strftime('%Y-%m-%d %H:%M'):<22} {model:<24} {age_str:>8}\n"
             )
 
 
@@ -613,7 +638,7 @@ async def cmd_clear(assume_yes: bool) -> None:
         ).scalar() or 0
         sys.stderr.write(
             f"✓ Deleted {total} row(s). insights_summaries now has {remaining}.\n"
-            "  Regenerate with: dump <segment> → Claude → save <segment> <reply.md>\n"
+            "  Regenerate with: dump <group> → Claude → save <group> <reply.md>\n"
         )
 
 
@@ -632,13 +657,15 @@ def main() -> None:
     )
     sub = parser.add_subparsers(dest="cmd", required=True)
 
+    group_help = (
+        "Group slug (e.g. 'hukum-keadilan') or label "
+        "('Hukum & Keadilan'). See module docstring for the full list."
+    )
+
     p_dump = sub.add_parser(
         "dump", help="Compute stats + daleel, emit the prompt to feed Claude."
     )
-    p_dump.add_argument(
-        "segment",
-        help=f"Segment name. One of: {', '.join(sorted(VALID_SEGMENTS))}",
-    )
+    p_dump.add_argument("group", help=group_help)
     p_dump.add_argument(
         "--output",
         "-o",
@@ -649,13 +676,10 @@ def main() -> None:
     p_save = sub.add_parser(
         "save", help="Persist Claude's reply markdown as an insights_summaries row."
     )
-    p_save.add_argument(
-        "segment",
-        help=f"Segment name. One of: {', '.join(sorted(VALID_SEGMENTS))}",
-    )
+    p_save.add_argument("group", help=group_help)
     p_save.add_argument("markdown_file", help="Path to Claude's reply (.md)")
 
-    sub.add_parser("list", help="Show the most-recent briefing per segment.")
+    sub.add_parser("list", help="Show the most-recent briefing per group.")
 
     p_clear = sub.add_parser(
         "clear",
@@ -674,17 +698,14 @@ def main() -> None:
         "apply-swaps",
         help=(
             "Apply operator-authored daleel-citation swaps to the latest "
-            "briefing for SEGMENT. The swap list is JSON (file or stdin) of "
+            "briefing for GROUP. The swap list is JSON (file or stdin) of "
             "the form "
             "[{\"flyer_index\": N, \"from\": \"X\", \"to\": \"Y\"}, ...]. "
             "No API-LLM is called — the operator's Claude session does the "
             "paragraph↔daleel judgment in-chat, then pipes the swaps here."
         ),
     )
-    p_apply.add_argument(
-        "segment",
-        help=f"Segment name. One of: {', '.join(sorted(VALID_SEGMENTS))}",
-    )
+    p_apply.add_argument("group", help=group_help)
     p_apply.add_argument(
         "--swaps-file",
         "-f",
@@ -695,18 +716,15 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.cmd == "dump":
-        _validate_segment(args.segment)
-        asyncio.run(cmd_dump(args.segment, args.output))
+        asyncio.run(cmd_dump(args.group, args.output))
     elif args.cmd == "save":
-        _validate_segment(args.segment)
-        asyncio.run(cmd_save(args.segment, args.markdown_file))
+        asyncio.run(cmd_save(args.group, args.markdown_file))
     elif args.cmd == "list":
         asyncio.run(cmd_list())
     elif args.cmd == "clear":
         asyncio.run(cmd_clear(args.yes))
     elif args.cmd == "apply-swaps":
-        _validate_segment(args.segment)
-        asyncio.run(cmd_apply_swaps(args.segment, args.swaps_file))
+        asyncio.run(cmd_apply_swaps(args.group, args.swaps_file))
 
 
 if __name__ == "__main__":

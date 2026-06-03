@@ -10,6 +10,13 @@
 import { and, count, countDistinct, desc, eq, isNotNull, sql } from "drizzle-orm";
 
 import { db, schema } from "@/db";
+import {
+  ALL_GROUP_LABELS,
+  classifyThemeGroup,
+  GROUP_BY_SLUG,
+  LAINNYA_GROUP,
+  slugifyGroup,
+} from "@/lib/dashboard-metrics";
 import { extractMahasiswaContent } from "@/lib/flyer/content";
 
 /**
@@ -451,6 +458,12 @@ export type OverviewInsights = {
   categoryTotals: Record<string, number>;
   /** Post count per dominant da'wah category. Sorted desc. */
   dominantCategories: Array<{ category: string; posts: number }>;
+  /** Post count per THEME_GROUP for the last 7 days. Always emits all
+   *  14 groups + Lainnya (zero-count groups render as a 0-width bar)
+   *  so the legend stays stable week-over-week. Sorted by count desc
+   *  with Lainnya pinned to the bottom. Replaces dominantCategories
+   *  for the dashboard activity chart since 2026-06-03. */
+  dominantGroups: Array<{ group: string; posts: number }>;
   /** Top Gemini-discovered topics across platforms. */
   trendingTopics: Array<{
     id: string;
@@ -514,11 +527,18 @@ export type LatestInsightsSummary = {
   adhkarRefs: schema.DaleelRef[] | null;
 };
 
-/** Most-recent AI-narrated executive briefing for a given segment.
- *  `segment` = null returns the overall-view briefing. Returns null
- *  when no row exists yet (briefing job hasn't fired). */
+/** Most-recent AI-narrated executive briefing for a given group label.
+ *
+ *  Pass the canonical THEME_GROUPS label ("Hukum & Keadilan", etc.).
+ *  Returns null when no row exists yet (briefing job hasn't fired,
+ *  or this group wasn't in the auto-pipeline's top-5 this week).
+ *
+ *  Legacy 4-segment briefings (segment in {"spiritual","family",...})
+ *  are no longer reachable through this entry point — they remain in
+ *  the DB but the web app surfaces only the new group structure since
+ *  2026-06-03. */
 export async function getLatestInsightsSummary(
-  segment: string | null = null,
+  group: string,
 ): Promise<LatestInsightsSummary | null> {
   const [row] = await db
     .select({
@@ -534,11 +554,7 @@ export async function getLatestInsightsSummary(
       adhkarRefs: schema.insightsSummaries.adhkarRefs,
     })
     .from(schema.insightsSummaries)
-    .where(
-      segment === null
-        ? sql`segment IS NULL`
-        : eq(schema.insightsSummaries.segment, segment),
-    )
+    .where(eq(schema.insightsSummaries.segment, group))
     .orderBy(desc(schema.insightsSummaries.generatedAt))
     .limit(1);
   if (!row) return null;
@@ -654,11 +670,15 @@ export function extractDeliverableSection(
 export async function getBriefingBySlug(
   slug: string,
 ): Promise<LatestInsightsSummary | null> {
-  // Strict regex match — slug is YYYY-MM-DD followed by -segment.
-  const m = slug.match(/^(\d{4}-\d{2}-\d{2})-(all|family|youth|justice|spiritual)$/);
+  // Slug = `YYYY-MM-DD-<group-slug>` since 2026-06-03 (was 5-segment
+  // before that). The group-slug must match one of the 14 THEME_GROUPS
+  // slugs — anything else returns null so the route 404s cleanly.
+  const dateRe = /^(\d{4}-\d{2}-\d{2})-(.+)$/;
+  const m = slug.match(dateRe);
   if (!m) return null;
-  const [, date, segmentLabel] = m;
-  const segment = segmentLabel === "all" ? null : segmentLabel;
+  const [, date, groupSlug] = m;
+  const group = GROUP_BY_SLUG[groupSlug];
+  if (!group) return null;
 
   const [row] = await db
     .select({
@@ -675,11 +695,7 @@ export async function getBriefingBySlug(
     })
     .from(schema.insightsSummaries)
     .where(
-      sql`(generated_at AT TIME ZONE 'Asia/Jakarta')::date = ${date}::date AND ${
-        segment === null
-          ? sql`segment IS NULL`
-          : sql`segment = ${segment}`
-      }`,
+      sql`(generated_at AT TIME ZONE 'Asia/Jakarta')::date = ${date}::date AND segment = ${group}`,
     )
     .orderBy(desc(schema.insightsSummaries.generatedAt))
     .limit(1);
@@ -763,6 +779,22 @@ export async function getOtherMahasiswaRooms(
   // Mahasiswa block) has plenty of headroom. The bottleneck card
   // section caps at `limit` regardless. Cheap at our scale —
   // 32 rows × ~5 KB each is well under any meaningful budget.
+  //
+  // Group-slugification in SQL: `segment` now stores the THEME_GROUPS
+  // label (e.g. "Hukum & Keadilan") instead of the old 4-segment slug.
+  // We slugify inline so the join key matches `briefingSlug()` output
+  // — lowercase, ` & ` → ` `, non-alnum-or-hyphen → space, collapse
+  // spaces to hyphens. Mirrors `slugifyGroup` in dashboard-metrics.ts
+  // and `slugify_group` in api/services/theme_groups.py.
+  const slugifySql = sql`regexp_replace(
+    trim(
+      regexp_replace(
+        regexp_replace(lower(COALESCE(i.segment, 'all')), '\\s*&\\s*', ' ', 'g'),
+        '[^a-z0-9-]+', ' ', 'g'
+      )
+    ),
+    '\\s+', '-', 'g'
+  )`;
   const rows = (await db.execute(sql`
     SELECT
       i.summary_md                    AS "summaryMd",
@@ -775,9 +807,9 @@ export async function getOtherMahasiswaRooms(
     LEFT JOIN mahasiswa_comments c
       ON c.briefing_slug =
          to_char(i.generated_at AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD')
-           || '-' || COALESCE(i.segment, 'all')
+           || '-' || ${slugifySql}
     WHERE to_char(i.generated_at AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD')
-            || '-' || COALESCE(i.segment, 'all') <> ${currentSlug}
+            || '-' || ${slugifySql} <> ${currentSlug}
       AND i.generated_at >= now() - interval '90 days'
     GROUP BY i.summary_md, i.segment, i.generated_at
     ORDER BY i.generated_at DESC
@@ -808,7 +840,16 @@ export async function getOtherMahasiswaRooms(
   return out;
 }
 
-/** Canonical slug for a briefing — used for share links + RSS later. */
+/** Canonical slug for a briefing — `YYYY-MM-DD-{group-slug}`.
+ *
+ *  The `segment` column carries the THEME_GROUPS group LABEL since
+ *  2026-06-03 (it was a 4-segment slug before). We slugify here so
+ *  URL paths stay lowercase + hyphen-only regardless of the label's
+ *  spaces/ampersands ("Hukum & Keadilan" → "hukum-keadilan").
+ *
+ *  Legacy rows whose `segment` is null or one of the old 4-segment
+ *  slugs still produce a slug — they just won't resolve via
+ *  `getBriefingBySlug` (which only accepts current group slugs). */
 export function briefingSlug(generatedAt: Date, segment: string | null): string {
   // Convert UTC → WIB by adding 7h, then take date portion. Done manually
   // so we don't pull a tz library on the server hot path.
@@ -816,38 +857,38 @@ export function briefingSlug(generatedAt: Date, segment: string | null): string 
   const y = wib.getUTCFullYear();
   const m = String(wib.getUTCMonth() + 1).padStart(2, "0");
   const d = String(wib.getUTCDate()).padStart(2, "0");
-  return `${y}-${m}-${d}-${segment ?? "all"}`;
+  // Slugify whatever's in segment — the function tolerates legacy
+  // values too. Null → "all" (legacy cross-segment briefings).
+  const tail = segment ? slugifyGroup(segment) : "all";
+  return `${y}-${m}-${d}-${tail}`;
 }
 
-/** All 5 segment keys in canonical reading order. `null` represents the
- *  cross-segment "all" briefing. Kept here (not in a shared constants file)
- *  because briefing navigation is the only place this exact order matters. */
-export const BRIEFING_SEGMENTS: (string | null)[] = [
-  null,
-  "spiritual",
-  "family",
-  "youth",
-  "justice",
-];
+/** All 14 THEME_GROUPS labels in canonical reading order. The
+ *  cross-platform "all" briefing was removed 2026-06-03; navigation
+ *  is now group-keyed. */
+export const BRIEFING_GROUPS: readonly string[] = ALL_GROUP_LABELS;
 
 /**
- * Fetch the latest briefing per segment in one batch. Returns a 5-entry
- * map keyed by segment ("all" for the cross-segment briefing) — missing
- * keys mean that segment's generation failed for the most recent cycle.
+ * Fetch the latest briefing per group in one batch. Returns a Map
+ * keyed by group label — only groups that have ever been briefed
+ * appear as keys (the auto-pipeline generates briefings for the
+ * top-5 by 7d post volume; the other 9 groups stay empty until
+ * their volume earns them a slot in a future week).
  *
- * Used by /insights to render all 5 briefings side-by-side as the
- * primary nav hub (briefings-first redesign, 2026-05-23).
+ * Used by /insights to render the 14-group grid: groups with an
+ * entry get a "Read briefing" CTA, groups without get an "Explore
+ * topics & posts" CTA pointing at /insights/group/[slug].
  */
 export async function getAllLatestBriefings(): Promise<
   Map<string, LatestInsightsSummary>
 > {
   const rows = await Promise.all(
-    BRIEFING_SEGMENTS.map((seg) => getLatestInsightsSummary(seg)),
+    BRIEFING_GROUPS.map((group) => getLatestInsightsSummary(group)),
   );
   const out = new Map<string, LatestInsightsSummary>();
-  BRIEFING_SEGMENTS.forEach((seg, i) => {
+  BRIEFING_GROUPS.forEach((group, i) => {
     const row = rows[i];
-    if (row) out.set(seg ?? "all", row);
+    if (row) out.set(group, row);
   });
   return out;
 }
@@ -873,17 +914,19 @@ export type BriefingNavigation = {
 /**
  * Data feeder for the in-page brief pagination widget.
  *
- * Strategy: peer briefings are scoped to the SAME WIB date as the current
- * brief — that's the cleanest definition of "this edition" given the
- * weekly Thursday cron may drift by minutes. For prev/next we strictly compare
- * `generated_at` of the SAME segment.
+ * Strategy: peer briefings are scoped to the SAME WIB date as the
+ * current brief — that's the cleanest definition of "this edition"
+ * given the weekly Thursday cron may drift by minutes. Up to 5 peers
+ * exist per edition (the auto-pipeline picks top-5 groups by 7d
+ * post volume). For prev/next we strictly compare `generated_at`
+ * of the SAME group.
  */
 export async function getBriefingNavigation(
-  currentSegment: string | null,
+  currentGroup: string,
   currentGeneratedAt: Date,
 ): Promise<BriefingNavigation> {
-  // Peers in the same edition — one row per segment, freshest wins if
-  // somehow two briefings landed on the same WIB date for the same segment.
+  // Peers in the same edition — one row per group, freshest wins if
+  // somehow two briefings landed on the same WIB date for the same group.
   const peerRows = (await db.execute(sql`
     SELECT DISTINCT ON (segment)
       generated_at AS "generatedAt",
@@ -891,24 +934,25 @@ export async function getBriefingNavigation(
     FROM insights_summaries
     WHERE (generated_at AT TIME ZONE 'Asia/Jakarta')::date
         = (${currentGeneratedAt.toISOString()}::timestamptz AT TIME ZONE 'Asia/Jakarta')::date
-    ORDER BY segment NULLS FIRST, generated_at DESC
+      AND segment IS NOT NULL
+    ORDER BY segment, generated_at DESC
   `)) as unknown as Array<{ generatedAt: Date; segment: string | null }>;
 
   const peers = new Map<string, BriefingNavLink>();
   for (const row of peerRows) {
+    if (!row.segment) continue;
     const generatedAt =
       row.generatedAt instanceof Date
         ? row.generatedAt
         : new Date(row.generatedAt);
-    const key = row.segment ?? "all";
-    peers.set(key, {
+    peers.set(row.segment, {
       segment: row.segment,
       generatedAt,
       slug: briefingSlug(generatedAt, row.segment),
     });
   }
 
-  // Previous / next edition of the same segment.
+  // Previous / next edition of the same group.
   //
   // We compare on WIB-date (not raw generated_at) so a regeneration
   // that landed on the same day as the current row doesn't get
@@ -916,10 +960,7 @@ export async function getBriefingNavigation(
   // label and resolve back to the same slug (getBriefingBySlug
   // collapses by WIB-date).
   const currentTs = currentGeneratedAt.toISOString();
-  const segmentClause =
-    currentSegment === null
-      ? sql`segment IS NULL`
-      : sql`segment = ${currentSegment}`;
+  const segmentClause = sql`segment = ${currentGroup}`;
   const differentDay = sql`
     (generated_at AT TIME ZONE 'Asia/Jakarta')::date <>
     (${currentTs}::timestamptz AT TIME ZONE 'Asia/Jakarta')::date
@@ -1159,12 +1200,46 @@ export async function getOverviewInsights(): Promise<OverviewInsights | null> {
     topCategory: topCategoryByPlatform.get(r.platform) ?? null,
   }));
 
+  // 14-group + Lainnya bucketing — joins social_posts → topics for
+  // the 7-day window, then maps each topic's label to its THEME_GROUP
+  // via the regex classifier (same one used by the briefing pipeline).
+  // Posts with no topic_id assignment are dropped entirely — they
+  // would otherwise pollute Lainnya with un-clustered noise. Sorted
+  // by post count desc; the consumer caps to top-N at render time.
+  const topicRows = (await db.execute(sql`
+    SELECT t.label AS label, COUNT(sp.id)::int AS posts
+    FROM social_posts sp
+    JOIN topics t ON sp.topic_id = t.id
+    WHERE sp.posted_at >= now() - interval '7 days'
+    GROUP BY t.label
+  `)) as unknown as Array<{ label: string; posts: number }>;
+  const groupCounts = new Map<string, number>();
+  for (const r of Array.isArray(topicRows) ? topicRows : []) {
+    if (!r || typeof r.label !== "string") continue;
+    const grp = classifyThemeGroup(r.label);
+    groupCounts.set(grp, (groupCounts.get(grp) ?? 0) + Number(r.posts ?? 0));
+  }
+  // Emit all 14 groups + Lainnya so the chart legend stays stable
+  // week-over-week even when a group has zero posts this week (renders
+  // as a 0-width bar — honest "this group went quiet"). Ordered by
+  // count desc with Lainnya pinned to the bottom so it doesn't visually
+  // outweigh real themes when un-grouped topics spike.
+  const dominantGroupsSorted = [...ALL_GROUP_LABELS]
+    .map((g) => ({ group: g, posts: groupCounts.get(g) ?? 0 }))
+    .sort((a, b) => b.posts - a.posts);
+  const lainnyaCount = groupCounts.get(LAINNYA_GROUP) ?? 0;
+  const dominantGroups = [
+    ...dominantGroupsSorted,
+    { group: LAINNYA_GROUP, posts: lainnyaCount },
+  ];
+
   return {
     totalPosts,
     classifiedPosts,
     sentimentMix,
     categoryTotals,
     dominantCategories,
+    dominantGroups,
     trendingTopics: trendingTopics.map((t) => ({
       id: t.id,
       label: t.label,

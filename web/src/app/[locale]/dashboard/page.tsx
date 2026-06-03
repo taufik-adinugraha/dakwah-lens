@@ -213,20 +213,15 @@ export default async function DashboardPage({
               segments={kitSegments}
               locale={locale}
               labels={{
-                // Canonical labels — same keys /insights/segment/[focus]
-                // uses for its hero ("Spiritual & Akhlaq", etc.). Keeps
-                // segment names consistent across surfaces.
-                segments: {
-                  all: tInsights("brief_scope_all"),
-                  spiritual: tInsights("segment_spiritual_title"),
-                  family: tInsights("segment_family_title"),
-                  youth: tInsights("segment_youth_title"),
-                  justice: tInsights("segment_justice_title"),
-                },
+                // Group labels are emitted directly by getKitSegments
+                // (each row's `segment` is a THEME_GROUPS label like
+                // "Hukum & Keadilan"). KitTabs renders them verbatim
+                // — no labels.segments lookup needed since 2026-06-03.
                 sections: {
                   ringkasan: t("kit_section_ringkasan"),
                   numerik: t("kit_section_numerik"),
                   tema: t("kit_section_tema"),
+                  poin: t("kit_section_poin"),
                   strategi: t("kit_section_strategi"),
                   dalil: t("kit_section_dalil"),
                 },
@@ -877,19 +872,11 @@ function DailyInsights({
 
   if (insights.daleelOpportunity) {
     // Map the dominant category to the segment page that covers it.
-    const SEGMENT_BY_CATEGORY: Record<string, string> = {
-      aqidah: "spiritual",
-      akhlaq: "spiritual",
-      family: "family",
-      health: "family",
-      youth: "youth",
-      education: "youth",
-      social_justice: "justice",
-      economic_ethics: "justice",
-      muamalah: "justice",
-    };
-    const segment =
-      SEGMENT_BY_CATEGORY[insights.daleelOpportunity.category] ?? null;
+    // The 9 PRD da'wah categories were retired as the navigation
+    // taxonomy on 2026-06-03 (replaced by the 14 THEME_GROUPS). The
+    // daleel-opportunity insight card now always lands the user on
+    // /insights — pickin a specific group from the 9-category
+    // signal would be a noisy heuristic at best.
     cards.push({
       key: "daleel",
       tone: "emerald",
@@ -899,9 +886,7 @@ function DailyInsights({
         category: insights.daleelOpportunity.category,
         count: insights.daleelOpportunity.nPosts,
       }),
-      href: segment
-        ? `/insights/segment/${segment}?from=dashboard`
-        : "/insights",
+      href: "/insights",
     });
   }
 

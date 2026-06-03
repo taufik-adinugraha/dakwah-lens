@@ -1383,14 +1383,23 @@ export async function getActiveDiscussionRooms(
 }
 
 /* ─────────────────────────────────────────────────────────────
- * Kit segments — all 5 briefings parsed into H2 sections for the
+ * Kit segments — briefings parsed into H2 sections for the
  * Kit-tab in-page tab switcher.
+ *
+ * Pre-2026-06-03 this was a fixed list of 5 audience-segments
+ * (all + spiritual/family/youth/justice). Since the topic-group
+ * migration the `segment` field carries a THEME_GROUPS label
+ * (e.g. "Hukum & Keadilan") and the auto-pipeline emits up to 5
+ * group briefings per week (top-N by post volume). The dashboard
+ * KitTabs now renders the tab strip dynamically from this list
+ * instead of a hardcoded enum.
  * ───────────────────────────────────────────────────────────── */
 
-export type SegmentKey = "all" | "spiritual" | "family" | "youth" | "justice";
-
 export type KitSegmentData = {
-  segment: SegmentKey;
+  /** Group label from THEME_GROUPS, or one of the legacy values
+   *  ("all", "spiritual", "family", "youth", "justice") on rows
+   *  generated before 2026-06-03. */
+  segment: string;
   briefSlug: string;
   generatedAt: string;
   /** Briefing H2 sections, raw markdown slices, render with ReactMarkdown
@@ -1402,6 +1411,11 @@ export type KitSegmentData = {
     ringkasan: string;
     numerik: string;
     tema: string;
+    /** Senior-da'i bullet recap: 4-6 items, each with **Masalah:** +
+     *  **Aksi:**. Added 2026-06-03 — sits between Tema and Strategi
+     *  for readers who don't need the full prose. Older briefings
+     *  (pre-2026-06-03) won't carry this H2 and the slot is "". */
+    poin: string;
     strategi: string;
     dalil: string;
   };
@@ -1440,6 +1454,11 @@ const SEGMENT_HEADINGS = {
     "Main Themes & Emerging Patterns",
     "Tema Utama",
   ],
+  poin: [
+    "Poin Kunci untuk Da'i Senior",
+    "Key Points for Senior Da'i",
+    "Poin Kunci",
+  ],
   strategi: ["Strategi & Aksi Dakwah", "Da'wah Strategies & Actions"],
   dalil: ["Dalil & Sumber", "Daleel & Sources", "Daleel & Sumber"],
 } as const;
@@ -1453,21 +1472,30 @@ function pickSection(md: string, candidates: readonly string[]): string {
 }
 
 /**
- * Load all 5 latest briefings (one per segment) and structure each into
- * the 5 H2 sections + the parsed Strategi block for the kit-card grid.
- * Ordered all → spiritual → family → youth → justice so the segment
- * tabs render in a predictable left-to-right sequence.
+ * Load the latest briefing per group (the top-5 the auto-pipeline
+ * picked this week) and structure each into the 5 H2 sections + the
+ * parsed Strategi block for the kit-card grid.
+ *
+ * Returns rows ORDERED BY generated_at DESC. The dashboard KitTabs
+ * renders the strip dynamically — there's no hardcoded enum or
+ * required ordering anymore.
+ *
+ * Filters out the legacy 4-segment + null briefings so they don't
+ * pollute the dashboard's new group-keyed view. They remain in the
+ * DB for historical record but aren't reachable through this surface.
  */
 export async function getKitSegments(): Promise<KitSegmentData[]> {
   const rows = (await db.execute(sql`
-    SELECT DISTINCT ON (COALESCE(segment, 'all'))
-      COALESCE(segment, 'all') AS segment,
+    SELECT DISTINCT ON (segment)
+      segment,
       id::text AS id,
       generated_at,
       summary_md
     FROM insights_summaries
     WHERE summary_md IS NOT NULL
-    ORDER BY COALESCE(segment, 'all'), generated_at DESC
+      AND segment IS NOT NULL
+      AND segment NOT IN ('spiritual', 'family', 'youth', 'justice')
+    ORDER BY segment, generated_at DESC
   `)) as unknown as Array<{
     segment: string;
     id: string;
@@ -1475,13 +1503,18 @@ export async function getKitSegments(): Promise<KitSegmentData[]> {
     summary_md: string;
   }>;
 
-  const order: SegmentKey[] = ["all", "spiritual", "family", "youth", "justice"];
-  const bySeg = new Map(rows.map((r) => [r.segment, r]));
+  // Sort across segments by generated_at DESC so the freshest
+  // briefing surfaces as the default tab. Within a single Thursday
+  // cron firing all rows share a generated_at within minutes, so
+  // ties fall back to alphabetical for stability week-over-week.
+  const sortedRows = [...rows].sort((a, b) => {
+    const dt = new Date(b.generated_at).getTime() - new Date(a.generated_at).getTime();
+    return dt !== 0 ? dt : a.segment.localeCompare(b.segment);
+  });
   const out: KitSegmentData[] = [];
 
-  for (const seg of order) {
-    const row = bySeg.get(seg);
-    if (!row) continue;
+  for (const row of sortedRows) {
+    const seg = row.segment;
     const md = row.summary_md;
 
     // Slug for the deliverable + Mahasiswa URLs. Date interpreted in WIB
@@ -1492,8 +1525,7 @@ export async function getKitSegments(): Promise<KitSegmentData[]> {
     )
       .toISOString()
       .slice(0, 10);
-    const segSuffix = seg === "all" ? "all" : seg;
-    const briefSlug = `${wibIso}-${segSuffix}`;
+    const briefSlug = `${wibIso}-${slugifyGroup(seg)}`;
 
     // H2 section slices — raw markdown so the client can ReactMarkdown
     // them (or use a custom renderer for Strategi).
@@ -1501,6 +1533,7 @@ export async function getKitSegments(): Promise<KitSegmentData[]> {
       ringkasan: pickSection(md, SEGMENT_HEADINGS.ringkasan),
       numerik: pickSection(md, SEGMENT_HEADINGS.numerik),
       tema: pickSection(md, SEGMENT_HEADINGS.tema),
+      poin: pickSection(md, SEGMENT_HEADINGS.poin),
       strategi: pickSection(md, SEGMENT_HEADINGS.strategi),
       dalil: pickSection(md, SEGMENT_HEADINGS.dalil),
     };
@@ -1760,7 +1793,7 @@ export const THEME_GROUPS: ReadonlyArray<{ group: string; patterns: RegExp[] }> 
     ],
   },
   {
-    group: "Aqidah & Spiritualitas",
+    group: "Aqidah & Ibadah",
     patterns: [
       /ibadah/i,
       /haji/i,
@@ -1785,7 +1818,14 @@ export const THEME_GROUPS: ReadonlyArray<{ group: string; patterns: RegExp[] }> 
   },
   {
     group: "Lingkungan & Bencana",
-    patterns: [/bencana/i, /lingkungan/i, /pengelolaan sampah/i, /tragedi/i],
+    patterns: [
+      /bencana/i,
+      /lingkungan/i,
+      /pengelolaan sampah/i,
+      /tragedi/i,
+      /kecelakaan/i,
+      /lalu lintas/i,
+    ],
   },
   {
     group: "Pemerintahan & Kebijakan",
@@ -1795,11 +1835,26 @@ export const THEME_GROUPS: ReadonlyArray<{ group: string; patterns: RegExp[] }> 
       /kebijakan publik/i,
       /birokrasi/i,
       /otda/i,
+      /program pemerintah/i,
+      /makan bergizi/i,
+      /\bmbg\b/i,
     ],
   },
   {
     group: "Patologi Sosial Digital",
     patterns: [/judi online/i, /pinjol/i, /pinjaman online/i, /narkoba/i, /penyalahgunaan obat/i],
+  },
+  {
+    group: "Teknologi & AI",
+    patterns: [
+      /teknologi/i,
+      /kecerdasan buatan/i,
+      /\bai\b/i,
+      /chatgpt/i,
+      /gemini/i,
+      /artificial intelligence/i,
+      /machine learning/i,
+    ],
   },
   {
     group: "Pekerja & Pertanian Rakyat",
@@ -1847,8 +1902,35 @@ export function classifyThemeGroup(label: string): string {
   for (const { group, patterns } of THEME_GROUPS) {
     if (patterns.some((p) => p.test(label))) return group;
   }
-  return "Lainnya";
+  return LAINNYA_GROUP;
 }
+
+export const LAINNYA_GROUP = "Lainnya" as const;
+
+/** Stable URL/storage slug for a group name. Mirror of the Python
+ *  `slugify_group` in `api/services/theme_groups.py` — keep these
+ *  in sync if you tweak either. Examples:
+ *    "Hukum & Keadilan"          → "hukum-keadilan"
+ *    "Pekerja & Pertanian Rakyat" → "pekerja-pertanian-rakyat"
+ *    "Teknologi & AI"            → "teknologi-ai"
+ *    "Toleransi & Lintas-Iman"   → "toleransi-lintas-iman"
+ */
+export function slugifyGroup(group: string): string {
+  return group
+    .toLowerCase()
+    .replace(/\s*&\s*/g, " ")          // drop ampersands without leaving "--"
+    .replace(/[^a-z0-9-]+/g, " ")       // anything else (incl. accented) → space
+    .trim()
+    .replace(/\s+/g, "-");              // collapse spaces → hyphens
+}
+
+/** Precomputed slug → label map for fast inverse lookup. */
+export const GROUP_BY_SLUG: Readonly<Record<string, string>> = Object.freeze(
+  Object.fromEntries(THEME_GROUPS.map((tg) => [slugifyGroup(tg.group), tg.group])),
+);
+
+/** All 14 group labels in canonical reading order (matches THEME_GROUPS). */
+export const ALL_GROUP_LABELS: readonly string[] = THEME_GROUPS.map((tg) => tg.group);
 
 export type PickerTopic = {
   id: string;

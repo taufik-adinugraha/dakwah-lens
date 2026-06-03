@@ -1,13 +1,24 @@
-"""Daily executive briefing(s) for the public /insights page.
+"""Weekly executive briefing(s) per topic group for the public /insights page.
 
-Five briefings per day after the 2026-05-20 expansion:
-  - 1 all-platform (segment IS NULL)
-  - 4 per-segment (spiritual / family / youth / justice)
+As of 2026-06-03 the briefing structure is: weekly auto-pipeline picks
+the TOP 5 of 14 THEME_GROUPS by 7-day post volume (above a
+`MIN_POSTS_PER_GROUP_FOR_BRIEFING` floor) and synthesizes one Gemini
+Pro briefing per group. The other 9 groups stay un-briefed by the auto
+pipeline but remain explorable via the web's group landing pages
+(topics + recent posts). Users who want a fully-synthesized brief on
+a specific topic in those groups go through the standard /briefs/new
+topic-pick flow.
 
-Each briefing now contains three layers:
-  1. Description — what trended this week, grounded in numeric stats
-  2. Nasihah — a short Islamic admonition / practical takeaway
-  3. Daleel — citations from the kitab corpus
+Replaces the prior 5-briefing structure (all-platform + 4 audience-
+segments: spiritual/family/youth/justice). The original 2026-06-03
+plan was "one briefing per group" — narrowed to top-5 on the same
+date for cost discipline.
+
+Per-briefing layers:
+  1. Numerik & Tren — what trended this week within this group
+  2. Tema Utama — narrative pattern recognition (no numbers)
+  3. Strategi & Aksi Dakwah — 8-section ready-to-use content kit
+  4. Dalil — citations from the kitab corpus
 
 PRD §12 — Sharia compliance. The LLM is RESTRICTED to citing only daleel
 that we RETRIEVED from Qdrant for this briefing. Daleel that's not in
@@ -16,7 +27,7 @@ retrieved daleel as context and a strict system instruction; failure
 to comply would be a logged warning.
 
 Cost per briefing: ~$0.02–0.05 (Gemini 2.5 Pro narrative + OpenAI
-embedding for retrieval). Five briefings × 30 days ≈ $3-7.50/mo.
+embedding for retrieval). 5 briefings × ~4 weeks ≈ $0.4-1.0/month.
 """
 
 from __future__ import annotations
@@ -38,33 +49,66 @@ from api.services.kitab_retrieval import (
     rerank_daleel,
     retrieve_daleel,
 )
+from api.services.theme_groups import THEME_GROUPS, classify_theme_group
 from api.services.usage import gemini_output_tokens
 
 log = structlog.get_logger()
 
 MODEL = "gemini-2.5-pro"
 
-# Segment → category set mapping. MUST match the canonical mapping in
-# web/src/app/[locale]/insights/segment/[focus]/page.tsx — if the web
-# side moves, mirror here. `None` segment means "all categories".
-SEGMENT_CATEGORIES: dict[str, list[str]] = {
-    "spiritual": ["aqidah", "akhlaq"],
-    "family": ["family", "health"],
-    "youth": ["youth", "education"],
-    "justice": ["social_justice", "economic_ethics", "muamalah"],
+# Minimum posts in a group to justify a briefing. Below this, the
+# group is skipped — pool too thin for a useful narrative + would
+# waste a Gemini Pro call. Surfaces in the orchestrator log as
+# `insights_summary.skip_thin_group`.
+MIN_POSTS_PER_GROUP_FOR_BRIEFING = 30
+
+# Short intent line per theme group — gives the LLM 1-sentence
+# framing for what the group typically covers from a da'wah lens.
+# Used in the synthesis prompt so the briefing voice tracks the
+# group's center of gravity. Order mirrors THEME_GROUPS.
+GROUP_INTENT: dict[str, str] = {
+    "Hukum & Keadilan": "korupsi, kriminalitas, penipuan, pembunuhan — keadilan sebagai pilar tatanan sosial Islam.",
+    "Sosial & Keluarga": "KS, KDRT, isu keluarga, perlindungan anak — keluarga & ruang sosial sebagai unit dakwah dasar.",
+    "Ekonomi & Bisnis": "ekonomi rakyat, bisnis halal, investasi (crypto/trading/UMKM) — muamalah & etika ekonomi Islam.",
+    "Aqidah & Ibadah": "ibadah pilar (haji/kurban/idul adha), hijrah/mualaf, fatwa, polemik aqidah — inti tawhid + amaliah.",
+    "Kesehatan & Kehidupan": "kesehatan fisik dan mental, kesejahteraan jiwa — tubuh & jiwa sebagai amanah.",
+    "Pendidikan & SDM": "pendidikan, sekolah, literasi, pembangunan SDM — tarbiyah lintas generasi.",
+    "Lingkungan & Bencana": "bencana alam, kecelakaan, lingkungan, pengelolaan sampah — sabar atas musibah + amanah khilafah bumi.",
+    "Pemerintahan & Kebijakan": "pemerintahan, kebijakan publik, otonomi daerah, program pemerintah (MBG dll) — amanah kepemimpinan.",
+    "Patologi Sosial Digital": "judi online, pinjol, narkoba — penyakit sosial yang ditularkan platform digital.",
+    "Teknologi & AI": "kecerdasan buatan, teknologi baru, dampaknya pada manusia — etika digital dalam frame Islam.",
+    "Pekerja & Pertanian Rakyat": "buruh, tenaga kerja, petani, nelayan, ketahanan pangan — keadilan kerja & pangan rakyat.",
+    "Konflik & Geopolitik": "Palestina, konflik internasional, geopolitik — solidaritas umat & posisi Indonesia di dunia Muslim.",
+    "Inspirasi & Kisah Pribadi": "kisah hidup, pengalaman pribadi, renungan, motivasi — dakwah lewat narasi personal.",
+    "Toleransi & Lintas-Iman": "moderasi beragama, pluralisme, keberagaman, lintas-iman — koeksistensi yang adil.",
 }
 
-ALL_CATEGORIES = [
-    "aqidah",
-    "akhlaq",
-    "muamalah",
-    "social_justice",
-    "family",
-    "youth",
-    "education",
-    "economic_ethics",
-    "health",
-]
+
+def _group_slug(group: str) -> str:
+    """Stable slug used in the `insights_summaries.segment` column +
+    URL paths. Stays compatible with the existing column (String(32))
+    because all 14 group slugs are <30 chars. Imported lazily from
+    theme_groups to avoid a circular import at module load."""
+    from api.services.theme_groups import slugify_group
+
+    return slugify_group(group)
+
+
+async def _topic_ids_in_group(session, group: str) -> list[str]:
+    """List topic IDs whose label maps to the requested group. Used to
+    build the `topic_id = ANY(...)` filter in _compute_stats — the
+    new model groups posts by their assigned topic_id's mapped group,
+    not by the dawah categories JSONB classifier output."""
+    rows = (
+        await session.execute(text("SELECT id::text AS id, label FROM topics"))
+    ).all()
+    return [r.id for r in rows if classify_theme_group(r.label) == group]
+
+
+# Compatibility shim: any caller still importing SEGMENT_CATEGORIES
+# from this module gets an empty mapping. Kept so a stale import
+# fails LOUDLY (KeyError) rather than silently doing the wrong thing.
+SEGMENT_CATEGORIES: dict[str, list[str]] = {}
 
 
 _PERSONA_ID = """Anda seorang analis dakwah Indonesia yang bekerja untuk Sukses & Berkah Group — yayasan nirlaba yang membantu ekosistem dakwah Indonesia (da'i, ustadzah, kreator konten, orang tua, pengurus komunitas). Tugas Anda menyusun briefing analisis MINGGUAN, bukan khutbah. Suara Anda observasional dan pragmatis: Anda memetakan pola percakapan publik dengan jernih, lalu memberikan handle praktis untuk berbagai surface dakwah. Anda berakar pada Qur'an + sunnah ahlu sunnah wal jama'ah, netral pada perbedaan mazhab, paham konteks sosial Indonesia kontemporer."""
@@ -128,7 +172,7 @@ OUTPUT: briefing analisis dalam Bahasa Indonesia, dibagi ke 5 BAGIAN dengan head
 - JIKA `delta_pp`/`delta_pp_negative` null: tulis "belum ada baseline mingguan untuk perbandingan". JANGAN memfabrikasi tren naik/turun.
 - Sebut platform mix, lalu BACA `platform_stats`: tiap platform punya karakter sendiri — kontraskan sentimen + kategori dominan antar-platform memakai angka dari `platform_stats` (mis. "media arus utama didominasi berita kebijakan & korupsi dengan sentimen X% negatif, sementara konten YouTube lebih reflektif/ibadah"). Sebutkan MINIMAL satu perbedaan nyata antar-platform bila ada >1 platform berdata; kalau hanya satu platform punya data, lewati tanpa mengarang. JANGAN ratakan semua platform jadi satu angka saja.
 
-CRITICAL — SCOPE OF PERCENTAGES: baca SEGMENT_SCOPE di input. Jika "all", persentase di `top_categories` adalah share dari seluruh percakapan mingguan. Jika SEGMENT_SCOPE adalah segmen spesifik (spiritual/family/youth/justice), persentase tersebut adalah share *WITHIN segmen itu saja* — frasa "di antara konten segmen keluarga, kategori family mendominasi 89%" atau "dalam diskursus segmen ini X memimpin 89%". JANGAN tulis "percakapan publik didominasi family 89%" saat scope adalah segmen — itu overclaim.
+CRITICAL — SCOPE OF PERCENTAGES: baca TOPIC_GROUP di input. Briefing ini fokus pada SATU kelompok tema (mis. "Hukum & Keadilan", "Aqidah & Ibadah"). Persentase di `top_categories` adalah share *WITHIN post yang masuk kelompok itu* — bukan share dari seluruh percakapan mingguan. Frasa "di antara post yang masuk kelompok Hukum & Keadilan, kategori social_justice mendominasi 89%" atau "dalam diskursus kelompok ini X memimpin 89%". JANGAN tulis "percakapan publik didominasi X 89%" — itu overclaim karena angka dibatasi kelompok ini saja.
 
 ## Tema Utama & Pola Yang Muncul (500-700 kata)
 - PROSA NARATIF MURNI. Pembaca sudah membaca data di section "Numerik & Tren Pekan Ini" — di sini mereka butuh cerita, bukan data ulang. Audiens sebelumnya mengeluh "pusing kalau angka dan referensi dicampur di bagian narasi"; tugas section ini adalah memberi mereka jeda data.
@@ -137,6 +181,29 @@ CRITICAL — SCOPE OF PERCENTAGES: baca SEGMENT_SCOPE di input. Jika "all", pers
 - Struktur: 2-3 BENANG (atau SPIRAL) utama, tiap benang ~150-200 kata yang menjelaskan apa polanya, kenapa muncul bersama, dan apa implikasinya bagi audiens dakwah. Tutup dengan satu paragraf benang merah lintas-tema.
 - Verba observasional ("menyoroti", "memetakan", "menunjukkan", "tercermin dari", "menenun"), bukan perintah ("wajib", "harus", "pentingnya").
 - HANYA pola yang berakar di pool sample_headlines. JANGAN mengarang cerita atau mengangkat tema yang tidak hadir di data.
+
+## Poin Kunci untuk Da'i Senior (180-260 kata)
+Ringkasan padat untuk da'i senior yang sudah membaca berita pekan ini dan tidak butuh narasi panjang — hanya ingin daftar persoalan + handle praktis. JANGAN ulang narasi prosa "Tema Utama"; di sini struktur sengaja BERBEDA: hanya bullet, tiap bullet berdiri sendiri.
+
+FORMAT WAJIB (markdown list `- `):
+- 4 sampai 6 poin. Tidak lebih, tidak kurang.
+- Tiap poin TUNGGAL berisi DUA bagian terpisah dengan baris baru yang DIINDENT (2 spasi) di bawahnya:
+  - `**Masalah:**` satu kalimat yang menyatakan persoalan inti — fakta atau pola yang terobservasi, bukan narasi. Maksimal 22 kata.
+  - `**Aksi:**` satu kalimat yang menyatakan tindakan/sikap dakwah praktis yang bisa diambil dai/komunitas — verba aktif, fokus pada apa yang DILAKUKAN, bukan apa yang DIRASAKAN. Maksimal 22 kata.
+- Boleh menyebut TIDAK LEBIH dari satu citation dalil INLINE per poin (format `**QS. Al-…: N**` atau `**Riyad as-Salihin N**`), tapi opsional — kalau citation tidak menambah ketajaman, lewati saja. JANGAN paksa.
+- JANGAN tulis kalimat pembuka seperti "Berikut poin-poinnya:" atau penutup. Langsung bullet.
+
+LARANGAN:
+- JANGAN tulis angka/persentase di section ini — itu di Numerik & Tren.
+- JANGAN tulis nama outlet/akun ("Liputan6", "user X") — abstraksikan polanya.
+- JANGAN ulang frasa atau ide dari Tema Utama secara verbatim — ringkas dengan kata berbeda dan sudut yang berbeda (cause→action).
+- JANGAN mengangkat masalah yang tidak hadir di pool sample_headlines.
+
+Contoh format (jangan diiris persis, hanya pola):
+- **Masalah:** Pinjol ilegal melonjak menjelang akhir bulan dengan target rumah tangga berpenghasilan rendah.
+  **Aksi:** Sisipkan 5 menit edukasi riba & alternatif simpan-pinjam syariah di setiap kajian rutin pekan ini.
+- **Masalah:** Korupsi dana bansos memicu krisis kepercayaan publik di daerah tertentu. **QS. An-Nisa: 58**
+  **Aksi:** Buka khutbah dengan amanah jabatan; ajak jamaah memantau program desa lewat musyawarah RT.
 
 ## Strategi & Aksi Dakwah (9350-12650 kata)
 Ini adalah CONTENT KIT — bukan saran strategis. Setiap sub-section harus berupa DRAFT SIAP-PAKAI yang bisa dibaca / dipakai langsung oleh dai, ustadzah, kreator, atau pengurus komunitas tanpa harus menulis ulang dari nol. WAJIB 8 sub-section dengan ### H3.
@@ -411,7 +478,7 @@ ATURAN PANJANG DU'A untuk Pesan Flyer 6 (KRITIS — flyer 1080×1080 harus nyama
 
 ATURAN AKURASI SITASI (KRITIS untuk Pesan Flyer 6 + 5): teks Arab yang Anda tulis di paragraf HARUS persis adalah teks dari citation yang Anda tag di `**Dalil:**`. JANGAN tulis du'a "Rabbana atina fid-dunya hasanah" (yang itu QS. Al-Baqara: 201) lalu cite sebagai "QS. Al-Baqara: 203" (yang itu adalah "wadhkurullah fi ayyamin ma'dudat"). Verifikasi: setelah menulis Arab, cek ulang nomor ayat/hadits-nya — kalau ragu, ambil verbatim dari entri pool yang dipilih.
 
-ATURAN VARIASI ANTAR-SEGMEN (untuk operator yang generate briefing 5-segment sekaligus): briefing untuk pekan yang sama tetapi segmen berbeda WAJIB pakai du'a Pesan Flyer 6 yang BERBEDA — flyer Doa Pekan Ini muncul berdampingan di gallery publik, jadi semua sama akan terlihat malas. PILIH du'a yang paling relevan dengan tema SEGMEN (mis. spiritual → dzikir pagi-petang yang dalam, family → du'a sabar + keluarga seperti Taa-Haa:130 atau Al-Kahf:28, youth → du'a pendek yang mudah dihafal seperti Al-Insaan:25, justice → du'a tawadhu' seperti Al-A'raaf:205, all → du'a universal singkat). Kalau pool overlap antar-segmen, prioritaskan SEGMEN yang punya pool sempit, biarkan segmen lain pakai opsi yang tersisa.
+ATURAN VARIASI ANTAR-KELOMPOK (untuk operator yang generate briefing 14-kelompok sekaligus): briefing untuk pekan yang sama tetapi KELOMPOK TEMA berbeda WAJIB pakai du'a Pesan Flyer 6 yang BERBEDA — flyer Doa Pekan Ini muncul berdampingan di gallery publik, jadi semua sama akan terlihat malas. PILIH du'a yang paling relevan dengan TOPIC_GROUP (mis. Hukum & Keadilan → du'a istiqomah & keadilan, Sosial & Keluarga → du'a sabar + keluarga seperti Taa-Haa:130 atau Al-Kahf:28, Aqidah & Ibadah → dzikir pagi-petang yang dalam, Pekerja & Pertanian Rakyat → du'a rezeki halal, Konflik & Geopolitik → du'a tolong-menolong umat). Kalau pool overlap antar-kelompok, prioritaskan kelompok yang punya pool sempit, biarkan kelompok lain pakai opsi yang tersisa.
 
 LARANGAN MUTLAK pada keempat paragraf:
 - JANGAN tulis "mari kita tutup khutbah ini" / "khutbah pertama" / "khutbah ini"
@@ -525,7 +592,7 @@ OUTPUT: analytical briefing in clear English, split into 5 SECTIONS with H2 (##)
 - IF `delta_pp`/`delta_pp_negative` is null: write "no weekly baseline yet for comparison". DO NOT fabricate rising/falling trends.
 - Mention platform mix, then READ `platform_stats`: each platform has its own character — contrast the sentiment + dominant categories ACROSS platforms using the numbers in `platform_stats` (e.g. "mainstream is dominated by policy & corruption news at X% negative, while YouTube content skews more reflective/worship"). Call out AT LEAST one real cross-platform difference when >1 platform has data; if only one platform has data, skip it without inventing. DO NOT flatten every platform into a single blended number.
 
-CRITICAL — SCOPE OF PERCENTAGES: read SEGMENT_SCOPE in the input. When "all", percentages in `top_categories` are share of all weekly conversation. When SEGMENT_SCOPE is a specific segment (spiritual/family/youth/justice), they are share *WITHIN that segment only* — phrase as "within family-segment content, the family category leads at 89%" or "in this segment's discourse, X leads with 89%". DO NOT write "public conversation is dominated by family 89%" when scope is a segment — that overclaims.
+CRITICAL — SCOPE OF PERCENTAGES: read TOPIC_GROUP in the input. This briefing covers ONE topic group (e.g. "Hukum & Keadilan", "Aqidah & Ibadah"). Percentages in `top_categories` are share *WITHIN posts assigned to that group's topics* — NOT share of all weekly conversation. Phrase as "within posts in the Hukum & Keadilan group, the social_justice category leads at 89%" or "in this group's discourse, X leads with 89%". DO NOT write "public conversation is dominated by X 89%" — that overclaims because the count is restricted to this group only.
 
 ## Main Themes & Emerging Patterns (500-650 words)
 - Per-topic analysis. For EACH topic in the pool, give 2-3 concrete stories from sample_headlines WITH OUTLET attribution (e.g. "Liputan6 reports…", "according to Banjarmasin Post…")
@@ -534,6 +601,23 @@ CRITICAL — SCOPE OF PERCENTAGES: read SEGMENT_SCOPE in the input. When "all", 
 - IDENTIFY THE OVERARCHING THROUGHLINE between topics at the end
 - Prefer observation verbs ("highlights", "maps", "tracks", "surfaces") over command verbs ("must", "should", "the importance of")
 - Only use headlines from the pool I provide. Do NOT invent stories.
+
+## Key Points for Senior Da'i (180-260 words)
+A dense bullet list for senior da'i who already follow the news and don't need the prose — they want the list of problems + practical handles. Do NOT repeat the "Main Themes" prose; the structure here is intentionally DIFFERENT: bullets only, each bullet stands alone.
+
+REQUIRED FORMAT (markdown list `- `):
+- 4 to 6 points. No more, no less.
+- Each point is a SINGLE bullet with TWO labelled parts on separate INDENTED lines (2 spaces) under it:
+  - `**Problem:**` one sentence stating the core issue — an observed fact or pattern, not narrative. Maximum 22 words.
+  - `**Action:**` one sentence stating the practical da'wah action / stance a da'i or community can take — active verbs, focused on what is DONE, not what is FELT. Maximum 22 words.
+- You MAY cite at most one daleel citation INLINE per point (format `**QS. Al-…: N**` or `**Riyad as-Salihin N**`), but it is OPTIONAL — if a citation doesn't sharpen the point, skip it. Do NOT force it.
+- Do NOT write an opening line like "Here are the points:" or a closing line. Bullets only.
+
+PROHIBITED:
+- Do NOT write numbers/percentages in this section — those belong in Numbers & Trends.
+- Do NOT name media outlets/accounts — abstract the pattern.
+- Do NOT echo phrases or ideas from Main Themes verbatim — re-cut with different words and a different angle (cause→action).
+- Do NOT raise issues that aren't present in the sample_headlines pool.
 
 ## Da'wah Strategies & Actions (9350-12650 words)
 This is a CONTENT KIT — not strategic advice. Each sub-section must be a READY-TO-USE DRAFT that a da'i, ustadzah, creator, or community organizer can use directly without rewriting from scratch. REQUIRED: 8 sub-sections with ### H3.
@@ -842,42 +926,45 @@ TONE GUARDRAILS (PRD §12):
 
 
 async def _compute_stats(
-    session, segment: str | None
+    session, group: str
 ) -> dict[str, Any]:
-    """Pull headline numbers from social_posts + topics + categories.
+    """Pull headline numbers for ONE theme group.
 
-    If `segment` is given, restrict everything to posts whose
-    dominant category falls in `SEGMENT_CATEGORIES[segment]`.
+    Restricts everything to posts whose `topic_id` belongs to a topic
+    that maps to the requested `group` (via classify_theme_group). The
+    old 5-segment model filtered by `social_posts.categories` JSONB
+    (Gemini classifier output, 9 da'wah buckets); the new 14-group
+    model filters by topic clustering, which is more precise + matches
+    the dashboard's coverage breakdown UI.
+
+    The `dominant_cat` CTE is kept for REPORTING — top_categories
+    still surfaces the dawah-category mix within this group (e.g.
+    "Hukum & Keadilan" group: 60% social_justice, 30% muamalah,
+    10% economic_ethics) — a useful sub-signal even though it doesn't
+    drive the filter.
     """
     now = datetime.now(UTC)
     period_end = now
     period_start = now - timedelta(days=7)
     prev_period_start = now - timedelta(days=14)
 
-    cats_filter = (
-        SEGMENT_CATEGORIES[segment] if segment else ALL_CATEGORIES
-    )
-    # Postgres array literal for the IN/ANY filter.
-    cats_sql_array = "ARRAY[" + ",".join(f"'{c}'" for c in cats_filter) + "]"
+    topic_ids = await _topic_ids_in_group(session, group)
+    if not topic_ids:
+        # No topics map to this group right now (Gemini may not have
+        # proposed any matching label this week). Empty result; caller
+        # detects via totals.posts_7d == 0 and skips the briefing.
+        topic_ids_sql_array = "ARRAY[]::uuid[]"
+    else:
+        topic_ids_sql_array = (
+            "ARRAY[" + ",".join(f"'{tid}'" for tid in topic_ids) + "]::uuid[]"
+        )
 
-    # Helper: a CTE that tags each post with its GLOBAL top-1 category
-    # (argmax over the categories JSONB), then downstream queries filter
-    # rows where `dominant_cat = ANY (cats_filter)`. Earlier we put the
-    # `key = ANY (cats_filter)` filter inside the inner SELECT — that
-    # returned the highest-scoring key *among the segment's set*, so any
-    # post with a tiny non-zero score in a segment key was counted in
-    # the segment. That made all four segment summaries converge to the
-    # same numbers (2026-05-21 bugfix).
-    # Floor raised to > 0.1 on 2026-05-22 — about 28% of mainstream
-    # posts came back from the classifier with ALL nine categories
-    # tied at exactly 0.1 (the LLM punted with a flat default instead
-    # of actually scoring). With the old > 0 threshold the argmax
-    # picked whichever key came first in Postgres's jsonb iteration
-    # order — effectively random — and a Bea Cukai corruption post
-    # ended up tagged `youth`, contaminating the youth-segment
-    # briefing. Floor > 0.1 means a post needs at least one category
-    # the classifier actually picked above the flat default; punted
-    # rows fall out of segment queries entirely.
+    # Same `filtered` CTE as before — kept because the
+    # top_categories report (line ~990 below) buckets posts by their
+    # global-top-1 dawah category. The CTE still tags every social
+    # post with `dominant_cat`; downstream queries that previously
+    # filtered on `dominant_cat = ANY(cats)` now filter on
+    # `topic_id = ANY(topic_ids)` instead.
     post_filter = """
       WITH filtered AS (
         SELECT sp.*, (
@@ -897,8 +984,8 @@ async def _compute_stats(
                 f"""
                 {post_filter}
                 SELECT
-                  count(*) FILTER (WHERE posted_at >= :start AND dominant_cat = ANY ({cats_sql_array})) AS posts_7d,
-                  count(*) FILTER (WHERE posted_at >= :prev AND posted_at < :start AND dominant_cat = ANY ({cats_sql_array})) AS posts_prev_7d
+                  count(*) FILTER (WHERE posted_at >= :start AND topic_id = ANY ({topic_ids_sql_array})) AS posts_7d,
+                  count(*) FILTER (WHERE posted_at >= :prev AND posted_at < :start AND topic_id = ANY ({topic_ids_sql_array})) AS posts_prev_7d
                 FROM filtered
                 """
             ),
@@ -920,7 +1007,7 @@ async def _compute_stats(
                   count(*) FILTER (WHERE sentiment_label = 'positive') AS pos,
                   count(*) FILTER (WHERE sentiment_label IS NOT NULL) AS total
                 FROM filtered
-                WHERE posted_at >= :start AND dominant_cat = ANY ({cats_sql_array})
+                WHERE posted_at >= :start AND topic_id = ANY ({topic_ids_sql_array})
                 """
             ),
             {"start": period_start},
@@ -952,7 +1039,7 @@ async def _compute_stats(
                   count(*) FILTER (WHERE sentiment_label = 'negative') AS neg,
                   count(*) FILTER (WHERE sentiment_label IS NOT NULL) AS total
                 FROM filtered
-                WHERE posted_at >= :prev AND posted_at < :start AND dominant_cat = ANY ({cats_sql_array})
+                WHERE posted_at >= :prev AND posted_at < :start AND topic_id = ANY ({topic_ids_sql_array})
                 """
             ),
             {"prev": prev_period_start, "start": period_start},
@@ -973,7 +1060,7 @@ async def _compute_stats(
                 {post_filter}
                 SELECT dominant_cat AS category, count(*)::int AS posts
                 FROM filtered
-                WHERE posted_at >= :start AND dominant_cat = ANY ({cats_sql_array})
+                WHERE posted_at >= :start AND topic_id = ANY ({topic_ids_sql_array})
                 GROUP BY dominant_cat
                 ORDER BY posts DESC
                 LIMIT 5
@@ -999,7 +1086,7 @@ async def _compute_stats(
                 {post_filter}
                 SELECT dominant_cat AS category, count(*)::int AS posts
                 FROM filtered
-                WHERE posted_at >= :prev AND posted_at < :start AND dominant_cat = ANY ({cats_sql_array})
+                WHERE posted_at >= :prev AND posted_at < :start AND topic_id = ANY ({topic_ids_sql_array})
                 GROUP BY dominant_cat
                 """
             ),
@@ -1037,7 +1124,7 @@ async def _compute_stats(
                        count(f.id)::int AS seg_post_count
                 FROM topics t
                 JOIN filtered f ON f.topic_id = t.id
-                WHERE f.dominant_cat = ANY ({cats_sql_array})
+                WHERE f.topic_id = ANY ({topic_ids_sql_array})
                   AND f.posted_at >= :start
                 GROUP BY t.id, t.label, t.platform, t.keywords
                 ORDER BY seg_post_count DESC
@@ -1060,7 +1147,7 @@ async def _compute_stats(
                     SELECT text, author, engagement_views, engagement_score, url
                     FROM filtered
                     WHERE topic_id = :tid AND text IS NOT NULL
-                      AND dominant_cat = ANY ({cats_sql_array})
+                      AND topic_id = ANY ({topic_ids_sql_array})
                     ORDER BY dawah_relevance DESC NULLS LAST,
                              engagement_score DESC NULLS LAST
                     LIMIT 3
@@ -1102,7 +1189,7 @@ async def _compute_stats(
                   COUNT(*) FILTER (WHERE engagement_views IS NOT NULL)::int AS yt_count
                 FROM filtered
                 WHERE topic_id = :tid
-                  AND dominant_cat = ANY ({cats_sql_array})
+                  AND topic_id = ANY ({topic_ids_sql_array})
                 """
             ),
             {"tid": r.id},
@@ -1129,7 +1216,7 @@ async def _compute_stats(
                 {post_filter}
                 SELECT platform, count(*)::int AS posts
                 FROM filtered
-                WHERE posted_at >= :start AND dominant_cat = ANY ({cats_sql_array})
+                WHERE posted_at >= :start AND topic_id = ANY ({topic_ids_sql_array})
                 GROUP BY platform
                 ORDER BY posts DESC
                 """
@@ -1158,7 +1245,7 @@ async def _compute_stats(
                   count(*) FILTER (WHERE sentiment_label = 'positive')::int AS pos,
                   count(*) FILTER (WHERE sentiment_label IS NOT NULL)::int AS sent_total
                 FROM filtered
-                WHERE posted_at >= :start AND dominant_cat = ANY ({cats_sql_array})
+                WHERE posted_at >= :start AND topic_id = ANY ({topic_ids_sql_array})
                 GROUP BY platform
                 ORDER BY posts DESC
                 """
@@ -1173,7 +1260,7 @@ async def _compute_stats(
                 {post_filter}
                 SELECT platform, dominant_cat AS category, count(*)::int AS n
                 FROM filtered
-                WHERE posted_at >= :start AND dominant_cat = ANY ({cats_sql_array})
+                WHERE posted_at >= :start AND topic_id = ANY ({topic_ids_sql_array})
                 GROUP BY platform, dominant_cat
                 """
             ),
@@ -1214,7 +1301,11 @@ async def _compute_stats(
     return {
         "period_start": period_start.isoformat(),
         "period_end": period_end.isoformat(),
-        "segment": segment,
+        # The output key stays "segment" for backwards compatibility
+        # with downstream consumers (web UI, DB column) — but it now
+        # carries the group name (one of 14 THEME_GROUPS) instead of
+        # the old 4-segment slug.
+        "segment": group,
         "totals": {
             "posts_7d": posts_7d,
             "posts_prev_7d": posts_prev_7d,
@@ -1259,7 +1350,7 @@ async def _compute_stats(
     }
 
 
-def _build_retrieval_query_fallback(stats: dict[str, Any], segment: str | None) -> str:
+def _build_retrieval_query_fallback(stats: dict[str, Any], group: str) -> str:
     """Token-concatenation fallback when LLM query generation fails.
 
     Used to be the primary retrieval-query builder. Token-matches verses
@@ -1283,21 +1374,11 @@ def _build_retrieval_query_fallback(stats: dict[str, Any], segment: str | None) 
         bits.append(f"yang sedang meningkat: {rising['category']}")
     if stats["top_topics"]:
         bits.append(stats["top_topics"][0]["label"])
-    if segment:
-        bits.append(f"dalam konteks {segment}")
+    bits.append(f"dalam konteks {group}")
     return ". ".join(bits) or "tema dakwah umum minggu ini"
 
 
-_SEGMENT_INTENT = {
-    None: "isu dakwah umum yang relevan ke audiens Muslim Indonesia minggu ini",
-    "spiritual": "pembinaan aqidah dan akhlaq Muslim",
-    "family": "ketahanan keluarga, peran orang tua, dan kesehatan rumah tangga",
-    "youth": "pembinaan pemuda Muslim, pendidikan, dan tantangan generasi muda",
-    "justice": "keadilan sosial, etika ekonomi, dan muamalah",
-}
-
-
-def _build_retrieval_query(stats: dict[str, Any], segment: str | None) -> str:
+def _build_retrieval_query(stats: dict[str, Any], group: str) -> str:
     """LLM-generated thematic search query for Qdrant retrieval.
 
     Why an LLM call: token-concatenation of category names
@@ -1316,7 +1397,7 @@ def _build_retrieval_query(stats: dict[str, Any], segment: str | None) -> str:
     pipeline never breaks because of this enhancement.
     """
     if not settings.gemini_api_key:
-        return _build_retrieval_query_fallback(stats, segment)
+        return _build_retrieval_query_fallback(stats, group)
 
     headline_lines: list[str] = []
     for t in stats.get("top_topics", [])[:5]:
@@ -1331,14 +1412,16 @@ def _build_retrieval_query(stats: dict[str, Any], segment: str | None) -> str:
         if stats.get("top_categories")
         else "umum"
     )
-    intent = _SEGMENT_INTENT.get(segment, _SEGMENT_INTENT[None])
+    intent = GROUP_INTENT.get(
+        group, "isu dakwah relevan ke audiens Muslim Indonesia minggu ini"
+    )
 
     prompt = f"""Saya ingin mencari ayat Qur'an dan hadith dari basis data vektor untuk dijadikan daleel dalam briefing da'i.
 
 KONTEKS BRIEFING:
-- Segmen: {segment or 'umum (semua)'}
-- Niat tematik segmen ini: {intent}
-- Kategori dominan pekan ini: {top_cat}
+- Kelompok tema: {group}
+- Niat tematik kelompok ini: {intent}
+- Kategori dakwah dominan dalam kelompok ini pekan ini: {top_cat}
 
 HEADLINE NYATA YANG MENDORONG TREN PEKAN INI:
 {headlines_block}
@@ -1381,7 +1464,7 @@ ATURAN: Jangan tulis nama kasus, nama orang, nama outlet media, atau nama kota. 
         )
         query = (resp.text or "").strip().strip('"').strip("'")
         if not query:
-            return _build_retrieval_query_fallback(stats, segment)
+            return _build_retrieval_query_fallback(stats, group)
 
         usage_md = getattr(resp, "usage_metadata", None)
         from api.services.usage import record_usage as _record_usage
@@ -1392,21 +1475,21 @@ ATURAN: Jangan tulis nama kasus, nama orang, nama outlet media, atau nama kota. 
             model="gemini-2.5-flash-lite",
             tokens_in=getattr(usage_md, "prompt_token_count", None),
             tokens_out=gemini_output_tokens(usage_md),
-            meta={"segment": segment},
+            meta={"group": group},
         )
         log.info(
             "insights_summary.retrieval_query_generated",
-            segment=segment,
+            group=group,
             query=query[:120],
         )
         return query
     except Exception as exc:
         log.warning(
             "insights_summary.retrieval_query_failed",
-            segment=segment,
+            group=group,
             error=str(exc),
         )
-        return _build_retrieval_query_fallback(stats, segment)
+        return _build_retrieval_query_fallback(stats, group)
 
 
 # Anchors extracted from a prior briefing's markdown that we feed back
@@ -1444,14 +1527,15 @@ def _extract_poster_question(summary_md: str) -> str | None:
 
 
 async def _fetch_recent_coverage(
-    session, segment: str | None, limit: int = 2
+    session, group: str, limit: int = 2
 ) -> list[dict[str, Any]]:
-    """Pull the last `limit` briefings for the SAME segment so the next
+    """Pull the last `limit` briefings for the SAME group so the next
     generation can avoid recycling daleel + flyer headlines + poster
     questions week-over-week.
 
-    `IS NOT DISTINCT FROM` handles the NULL-segment (all-platform)
-    briefing — `WHERE segment = NULL` would never match.
+    The `insights_summaries.segment` column carries the group label
+    since the 2026-06-03 model shift (was a 4-segment slug; now a
+    14-group label) — DB schema unchanged.
     """
     rows = (
         await session.execute(
@@ -1459,12 +1543,12 @@ async def _fetch_recent_coverage(
                 """
                 SELECT generated_at, period_start, summary_md, daleel_refs, adhkar_refs
                 FROM insights_summaries
-                WHERE segment IS NOT DISTINCT FROM :segment
+                WHERE segment = :group
                 ORDER BY generated_at DESC
                 LIMIT :limit
                 """
             ),
-            {"segment": segment, "limit": limit},
+            {"group": group, "limit": limit},
         )
     ).all()
 
@@ -1502,7 +1586,7 @@ def _format_prior_coverage_block(
 
     if language == "en":
         header = (
-            "PREVIOUSLY COVERED (last 1-2 weeks for the SAME segment) — "
+            "PREVIOUSLY COVERED (last 1-2 weeks for the SAME topic group) — "
             "this is what the audience JUST READ. Find FRESH angles + "
             "DIFFERENT daleel + DIFFERENT flyer headlines + a NEW poster "
             "question UNLESS the news strictly demands repetition. Do "
@@ -1516,7 +1600,7 @@ def _format_prior_coverage_block(
     else:
         header = (
             "CAKUPAN PEKAN-PEKAN SEBELUMNYA (1-2 pekan terakhir untuk "
-            "segmen yang SAMA) — ini yang BARU saja dibaca audiens. "
+            "KELOMPOK TEMA yang SAMA) — ini yang BARU saja dibaca audiens. "
             "Cari sudut SEGAR + dalil BERBEDA + headline flyer BERBEDA "
             "+ poster question BARU KECUALI berita memang menuntut "
             "pengulangan. JANGAN gunakan ulang headline atau poster "
@@ -1570,19 +1654,9 @@ def _build_user_prompt(
     if language == "en":
         empty_marker = "(no daleel found for this theme)"
         translation_label = "Translation (EN)"
-        scope_note_all = (
-            "SEGMENT_SCOPE: all\n"
-            "Top_categories percentages are share of all categorized "
-            "conversation this week. Phrase as 'public conversation' is fine."
-        )
     else:
         empty_marker = "(tidak ada daleel yang ditemukan untuk tema ini)"
         translation_label = "Terjemahan ID"
-        scope_note_all = (
-            "SEGMENT_SCOPE: all\n"
-            "Top_categories percentages are share of all categorized "
-            "conversation this week. Phrase as 'percakapan publik' is fine."
-        )
 
     def _translation_for(d: dict[str, Any]) -> str:
         if language == "en":
@@ -1664,18 +1738,23 @@ def _build_user_prompt(
         ],
     }
 
-    segment = stats.get("segment")
-    scope_label = segment if segment else "all"
-    if segment:
-        seg_cats = SEGMENT_CATEGORIES.get(segment, [])
-        scope_note = (
-            f"SEGMENT_SCOPE: {scope_label}\n"
-            f"Top_categories percentages are share WITHIN this segment's "
-            f"categories ({', '.join(seg_cats)}) — not share of all weekly "
-            f"conversation. Phrase accordingly (see system instructions)."
-        )
-    else:
-        scope_note = scope_note_all
+    # In the new 14-group model, the stats dict always carries a
+    # concrete group name in the "segment" key (DB column name
+    # unchanged for back-compat). The scope note tells the LLM the
+    # briefing covers ONE topic area, and percentages in
+    # top_categories are share WITHIN posts assigned to that
+    # group's topics — not share of all weekly conversation.
+    group = stats.get("segment") or "umum"
+    scope_label = group
+    group_intent = GROUP_INTENT.get(group, "isu dakwah relevan minggu ini")
+    scope_note = (
+        f"TOPIC_GROUP: {scope_label}\n"
+        f"Niat tematik kelompok ini: {group_intent}\n"
+        f"Top_categories percentages are share WITHIN this group's "
+        f"topics — not share of all weekly conversation. "
+        f"Frame as 'di antara post yang masuk kelompok {scope_label}, kategori X mendominasi N%' — "
+        f"jangan tulis 'percakapan publik didominasi X N%' (overclaim)."
+    )
 
     write_now = (
         "Tulis briefing sekarang dalam format markdown 5 bagian (Ringkasan Eksekutif / Numerik & Tren Pekan Ini / Tema Utama & Pola Yang Muncul / Strategi & Aksi Dakwah / Dalil & Sumber), ~10950-14650 kata total — Strategi & Aksi Dakwah adalah CONTENT KIT 8 sub-section yang isinya draft siap-pakai (khutbah lengkap, kultum, kajian, kisah dari hadits, pengajaran rumah, script video, mahasiswa pack, aksi sosial) dengan daleel pool yang ditenun inline ke setiap sub-section, bukan ringkasan strategi."
@@ -1849,19 +1928,24 @@ def _generate_for_language(
 
 
 async def generate_summary(
-    segment: str | None = None,
+    group: str,
 ) -> dict[str, Any] | None:
     """Compute stats, retrieve daleel, ask Gemini Pro to narrate.
 
     Args:
-      segment: `None` for the all-platform briefing, otherwise one of
-        the keys in `SEGMENT_CATEGORIES`.
+      group: One of the 14 THEME_GROUPS group names (e.g.
+        "Hukum & Keadilan"). The legacy "all" / per-audience-segment
+        mode was removed 2026-06-03; briefings are now per topic-group
+        with a `MIN_POSTS_PER_GROUP_FOR_BRIEFING` floor enforced by
+        the orchestrator below.
 
-    Persists one `insights_summaries` row and returns its payload.
-    Returns None when there's no data for the requested segment.
+    Persists one `insights_summaries` row (storing the group name in
+    the legacy `segment` column for back-compat) and returns its
+    payload. Returns None when this group has zero posts this week.
     """
+    segment = group  # alias: DB column + log fields keep old name
     async with SessionLocal() as session:
-        stats = await _compute_stats(session, segment)
+        stats = await _compute_stats(session, group)
 
         if stats["totals"]["posts_7d"] == 0:
             log.info(
@@ -1877,7 +1961,7 @@ async def generate_summary(
         # the briefing's theme. Without the re-rank, embedding matches
         # like Quran verses about youthful paradise servants slip
         # through for any query mentioning "muda" / "pemuda".
-        retrieval_query = _build_retrieval_query(stats, segment)
+        retrieval_query = _build_retrieval_query(stats, group)
         candidates = retrieve_daleel(
             retrieval_query, limit=28, per_corpus=6
         )
@@ -2111,25 +2195,123 @@ async def generate_summary(
         }
 
 
-async def generate_all_summaries() -> dict[str, Any]:
-    """Generate all 5 daily summaries: 1 all-platform + 4 per-segment.
+TOP_N_GROUPS_FOR_BRIEFING = 5
 
-    Returns a per-segment status dict, useful for the Celery task to
-    log a single observable line and for ops to spot which ones
-    failed.
+
+async def generate_all_summaries() -> dict[str, Any]:
+    """Generate weekly briefings for the TOP `TOP_N_GROUPS_FOR_BRIEFING`
+    THEME_GROUPS by 7-day post volume (filtered by the
+    `MIN_POSTS_PER_GROUP_FOR_BRIEFING` floor).
+
+    Why top-N (not all 14): Gemini Pro is the dominant cost line item
+    and 14 briefings × 4 weeks would push past the IDR cap. The 5
+    groups with the highest weekly volume are the ones with strongest
+    user signal — readers see the topics that are actually shaping the
+    week. The other 9 groups can still be explored via the web's group
+    landing pages (topics + posts), and users who want a fully-
+    synthesized brief on a specific topic in those groups can use the
+    standard /briefs/new topic-pick flow.
+
+    Returns a dict keyed by group name with status:
+      - True       → briefing generated and persisted (top-N + above floor)
+      - False      → generation attempted but failed (logged)
+      - "skipped:thin"     → below MIN_POSTS_PER_GROUP_FOR_BRIEFING
+      - "skipped:not_top"  → above floor but not in the top-N this week
+      - "skipped:no_topics" → no topics map to this group this week
+
+    The all-platform / per-audience-segment briefings were removed
+    2026-06-03 in favor of this topic-group structure (see
+    project_insights_briefings memory). The top-N selection was added
+    on the same date after a course correction from the original
+    "briefing for every group" plan.
     """
     results: dict[str, Any] = {}
-    # all-platform first — its stats compute over the broadest set
-    results["__all__"] = await generate_summary(None) is not None
-    for segment in SEGMENT_CATEGORIES:
+    # Pre-check pass: a single shared session resolves each group's
+    # topic IDs and counts last-7d posts. We use the counts to RANK
+    # groups and pick the top-N above the floor for actual generation.
+    counts: dict[str, int] = {}
+    async with SessionLocal() as session:
+        for tg in THEME_GROUPS:
+            group = tg.group
+            try:
+                topic_ids = await _topic_ids_in_group(session, group)
+                if not topic_ids:
+                    log.info(
+                        "insights_summary.group_skip_no_topics",
+                        segment=group,
+                    )
+                    results[group] = "skipped:no_topics"
+                    continue
+                topic_ids_sql = (
+                    "ARRAY[" + ",".join(f"'{t}'::uuid" for t in topic_ids) + "]"
+                )
+                row = (
+                    await session.execute(
+                        text(
+                            "SELECT COUNT(*) FROM posts "
+                            "WHERE posted_at >= NOW() - INTERVAL '7 days' "
+                            f"AND topic_id = ANY ({topic_ids_sql})"
+                        )
+                    )
+                ).first()
+                counts[group] = int(row[0]) if row else 0
+            except Exception as exc:
+                log.exception(
+                    "insights_summary.group_precheck_failed",
+                    segment=group,
+                    error=str(exc),
+                )
+                results[group] = False
+
+    # Rank by volume desc, drop anything below the floor, take top-N.
+    above_floor = [
+        (g, c) for g, c in counts.items() if c >= MIN_POSTS_PER_GROUP_FOR_BRIEFING
+    ]
+    above_floor.sort(key=lambda kv: kv[1], reverse=True)
+    top_groups = [g for g, _ in above_floor[:TOP_N_GROUPS_FOR_BRIEFING]]
+    top_set = set(top_groups)
+
+    log.info(
+        "insights_summary.top_n_selected",
+        top_n=TOP_N_GROUPS_FOR_BRIEFING,
+        floor=MIN_POSTS_PER_GROUP_FOR_BRIEFING,
+        selected=[(g, counts[g]) for g in top_groups],
+        not_selected_above_floor=[
+            (g, c) for g, c in above_floor[TOP_N_GROUPS_FOR_BRIEFING:]
+        ],
+    )
+
+    for tg in THEME_GROUPS:
+        group = tg.group
+        if group in results:  # precheck decided (no_topics/failed)
+            continue
+        count = counts.get(group, 0)
+        if count < MIN_POSTS_PER_GROUP_FOR_BRIEFING:
+            log.info(
+                "insights_summary.group_skip_thin",
+                segment=group,
+                posts_7d=count,
+                floor=MIN_POSTS_PER_GROUP_FOR_BRIEFING,
+            )
+            results[group] = "skipped:thin"
+            continue
+        if group not in top_set:
+            log.info(
+                "insights_summary.group_skip_not_top",
+                segment=group,
+                posts_7d=count,
+                top_n=TOP_N_GROUPS_FOR_BRIEFING,
+            )
+            results[group] = "skipped:not_top"
+            continue
         try:
-            ok = await generate_summary(segment) is not None
+            ok = await generate_summary(group) is not None
         except Exception as exc:
             log.exception(
-                "insights_summary.segment_failed",
-                segment=segment,
+                "insights_summary.group_failed",
+                segment=group,
                 error=str(exc),
             )
             ok = False
-        results[segment] = ok
+        results[group] = ok
     return results

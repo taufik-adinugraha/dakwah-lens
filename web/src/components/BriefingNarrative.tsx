@@ -48,14 +48,17 @@ function stripFlyerMessagesSection(md: string): string {
 /**
  * Renders the AI-narrated weekly briefing.
  *
- * The LLM emits a 5-section markdown document (~1700-2000 words):
+ * The LLM emits a 6-section markdown document (~1900-2300 words):
  *   1. Ringkasan Eksekutif / Executive Summary
  *   2. Numerik & Tren Pekan Ini / Numbers & Trends This Week
  *   3. Tema Utama & Pola Yang Muncul / Main Themes & Emerging Patterns
- *   4. Strategi & Aksi Dakwah / Da'wah Strategies & Actions
+ *   4. Poin Kunci untuk Da'i Senior / Key Points for Senior Da'i
+ *      — 4-6 bullets, each with **Masalah:** + **Aksi:**. Added
+ *        2026-06-03 for readers who want bullets instead of prose.
+ *   5. Strategi & Aksi Dakwah / Da'wah Strategies & Actions
  *      — has ### sub-headings per channel + audience + action:
  *        khutbah / kajian / pengajaran / kreator / Gen Z / aksi sosial
- *   5. Daleel & Sumber / Daleel & Sources
+ *   6. Daleel & Sumber / Daleel & Sources
  *      — citations with > blockquote translation + 1-2 sentence context
  *
  * Replaced the 3-paragraph short-form renderer on 2026-05-21 after the

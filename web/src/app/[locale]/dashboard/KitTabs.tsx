@@ -1,29 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import {
-  BookOpenCheck,
-  ChevronDown,
-  Compass,
-  Layers,
-  Sparkles,
-  Users,
-} from "lucide-react";
+import { ChevronDown, Layers } from "lucide-react";
 import ReactMarkdown, { type Components } from "react-markdown";
 
 import { BriefDeliverableCards } from "@/components/BriefDeliverableCards";
 import { BriefFlyerSection } from "@/components/BriefFlyerSection";
 import { MahasiswaPosterCard } from "@/components/MahasiswaPosterCard";
 
-import type { KitSegmentData, SegmentKey } from "@/lib/dashboard-metrics";
+import type { KitSegmentData } from "@/lib/dashboard-metrics";
 
 /**
  * Two-level tab switcher for the Dakwah Kit tab.
  *
- * Top row — segment tabs (5): Overall View / Spiritual / Family /
- * Youth / Justice. Default = "all" (Overall View). Switches drive the
- * inner content; URL is not touched (no router.push) so a user can
- * compare segments without losing their place.
+ * Top row — one tab per group briefing emitted by the weekly
+ * auto-pipeline (up to 5 of the 14 THEME_GROUPS, picked by 7d post
+ * volume). Tab labels mirror the group label verbatim ("Hukum &
+ * Keadilan", "Aqidah & Ibadah") so the dashboard taxonomy matches
+ * the /insights surface. Switches drive the inner content; URL is
+ * not touched (no router.push) so a user can compare groups without
+ * losing their place.
  *
  * Below — section tabs (5): Ringkasan / Numerik / Tema / Strategi /
  * Dalil. Default = "strategi" since that's where the ready-to-use
@@ -35,10 +31,15 @@ import type { KitSegmentData, SegmentKey } from "@/lib/dashboard-metrics";
  * raw H2 slice through ReactMarkdown.
  */
 
-type SectionKey = "ringkasan" | "numerik" | "tema" | "strategi" | "dalil";
+type SectionKey =
+  | "ringkasan"
+  | "numerik"
+  | "tema"
+  | "poin"
+  | "strategi"
+  | "dalil";
 
 type Labels = {
-  segments: Record<SegmentKey, string>;
   sections: Record<SectionKey, string>;
   empty: string;
   /** Labels for the briefings-style deliverable cards we reuse here.
@@ -70,26 +71,11 @@ type Labels = {
   };
 };
 
-const SEGMENT_ORDER: SegmentKey[] = [
-  "all",
-  "spiritual",
-  "family",
-  "youth",
-  "justice",
-];
-
-const SEGMENT_ICON: Record<SegmentKey, typeof Layers> = {
-  all: Layers,
-  spiritual: BookOpenCheck,
-  family: Users,
-  youth: Sparkles,
-  justice: Compass,
-};
-
 const SECTION_ORDER: SectionKey[] = [
   "ringkasan",
   "numerik",
   "tema",
+  "poin",
   "strategi",
   "dalil",
 ];
@@ -106,13 +92,10 @@ export function KitTabs({
    *  passed to <MahasiswaPosterCard> for its lang-aware PDF endpoint. */
   locale: string;
 }) {
-  const [activeSegment, setActiveSegment] = useState<SegmentKey>("all");
+  const firstSegmentKey = segments[0]?.segment ?? "";
+  const [activeSegment, setActiveSegment] = useState<string>(firstSegmentKey);
   const [activeSection, setActiveSection] = useState<SectionKey>("strategi");
 
-  // If the requested segment doesn't have data yet (e.g. only mainstream
-  // briefings landed), gracefully fall back to the first available one
-  // for rendering. The tab button itself stays clickable so users can
-  // see which segments exist.
   const seg =
     segments.find((s) => s.segment === activeSegment) ?? segments[0] ?? null;
 
@@ -124,8 +107,6 @@ export function KitTabs({
     );
   }
 
-  const availableSegments = new Set(segments.map((s) => s.segment));
-
   return (
     <section>
       {/* Mobile (< sm): two compact dropdowns instead of horizontal-scroll
@@ -133,13 +114,12 @@ export function KitTabs({
           The visible pill/tab strips below take over from sm upward. */}
       <div className="grid grid-cols-2 gap-2 sm:hidden">
         <SelectControl
-          ariaLabel="Segment"
+          ariaLabel="Group"
           value={activeSegment}
-          onChange={(v) => setActiveSegment(v as SegmentKey)}
-          options={SEGMENT_ORDER.map((segKey) => ({
-            value: segKey,
-            label: labels.segments[segKey],
-            disabled: !availableSegments.has(segKey),
+          onChange={(v) => setActiveSegment(v)}
+          options={segments.map((s) => ({
+            value: s.segment,
+            label: s.segment,
           }))}
         />
         <SelectControl
@@ -153,35 +133,30 @@ export function KitTabs({
         />
       </div>
 
-      {/* Segment tabs — horizontal scroll on narrow screens so all 5
-          stay reachable without wrapping awkwardly. */}
+      {/* Group tabs — horizontal scroll on narrow screens so all
+          available groups stay reachable without wrapping awkwardly. */}
       <div
         role="tablist"
-        aria-label="Segment"
+        aria-label="Group"
         className="-mx-1 hidden gap-1.5 overflow-x-auto px-1 pb-1 sm:flex"
       >
-        {SEGMENT_ORDER.map((segKey) => {
-          const Icon = SEGMENT_ICON[segKey];
-          const available = availableSegments.has(segKey);
-          const active = segKey === activeSegment;
+        {segments.map((s) => {
+          const active = s.segment === activeSegment;
           return (
             <button
-              key={segKey}
+              key={s.segment}
               role="tab"
               aria-selected={active}
-              onClick={() => setActiveSegment(segKey)}
-              disabled={!available}
+              onClick={() => setActiveSegment(s.segment)}
               className={
                 "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition " +
                 (active
                   ? "border-emerald-700 bg-emerald-700 text-white shadow-sm"
-                  : available
-                    ? "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
-                    : "border-slate-100 bg-slate-50 text-slate-300 cursor-not-allowed")
+                  : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50")
               }
             >
-              <Icon className="h-3.5 w-3.5" />
-              {labels.segments[segKey]}
+              <Layers className="h-3.5 w-3.5" />
+              {s.segment}
             </button>
           );
         })}

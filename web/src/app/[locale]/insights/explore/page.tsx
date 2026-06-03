@@ -32,6 +32,7 @@ import {
   getTopIssues,
   getTopicDistribution7d,
   getTopicsByPlatform7d,
+  slugifyGroup,
 } from "@/lib/dashboard-metrics";
 
 /**
@@ -91,14 +92,20 @@ export default async function InsightsExplorePage({
     "bg-rose-500",
     "bg-violet-500",
   ];
-  const categories = (overview?.dominantCategories ?? []).map((c, i) => ({
-    key: c.category,
-    label: localizeCategory(t, c.category),
-    volume: c.posts,
+  // 14 THEME_GROUPS + Lainnya — replaced the 9 PRD da'wah categories
+  // on 2026-06-03 so the dashboard chart matches the briefing /
+  // navigation taxonomy. `dominantGroups` always emits all 15 buckets,
+  // sorted by post count desc with Lainnya pinned to the bottom by
+  // the data layer. Group cards link to /insights/group/[slug] for
+  // explore (not /insights/category/[key]).
+  const categories = (overview?.dominantGroups ?? []).map((g, i) => ({
+    key: slugifyGroup(g.group),
+    label: g.group,
+    volume: g.posts,
     tone: CATEGORY_TONES[i % CATEGORY_TONES.length],
   }));
   const catMax = categories.length
-    ? Math.max(...categories.map((c) => c.volume))
+    ? Math.max(...categories.map((c) => c.volume), 1)
     : 1;
 
   const mix = overview?.sentimentMix ?? {
@@ -269,7 +276,7 @@ export default async function InsightsExplorePage({
                 {categories.map((c) => (
                   <Link
                     key={c.key}
-                    href={`/insights/category/${c.key}`}
+                    href={`/insights/group/${c.key}`}
                     className="group block rounded-md px-1.5 py-1 text-xs transition hover:bg-slate-50"
                   >
                     <div className="mb-1 flex items-center justify-between text-xs text-slate-600">
@@ -637,6 +644,3 @@ function SentimentRow({
   );
 }
 
-function localizeCategory(t: T, category: string): string {
-  return t(`dawah_category_${category}` as Parameters<typeof t>[0]);
-}

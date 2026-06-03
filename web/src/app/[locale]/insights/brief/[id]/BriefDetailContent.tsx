@@ -48,9 +48,14 @@ export async function BriefDetailContent({
 
   const brief = await getBriefingBySlug(id);
   if (!brief) notFound();
+  // brief.segment now carries the THEME_GROUPS label (e.g. "Hukum &
+  // Keadilan"). Legacy null/4-segment briefings exist in the DB but
+  // aren't reachable via this route since getBriefingBySlug only
+  // resolves current group slugs. Treat missing segment defensively.
+  const briefGroup = brief.segment ?? "Lainnya";
 
   const navigation = await getBriefingNavigation(
-    brief.segment,
+    briefGroup,
     brief.generatedAt,
   );
 
@@ -79,9 +84,11 @@ export async function BriefDetailContent({
     timeZone: "Asia/Jakarta",
   });
 
-  const scopeLabel = brief.segment
-    ? t(`segment_${brief.segment}_title` as Parameters<typeof t>[0])
-    : t("brief_scope_all");
+  // Group labels (e.g. "Hukum & Keadilan", "Aqidah & Ibadah") are
+  // already human-readable in Indonesian — use them verbatim instead
+  // of mapping through i18n keys. Da'wah-specific terms are
+  // first-class per AGENTS.md and don't get translated to English.
+  const scopeLabel = briefGroup;
 
   const briefBasePath = `/insights/brief/${id}`;
 
@@ -208,7 +215,7 @@ export async function BriefDetailContent({
             <BriefPagination
               locale={locale}
               navigation={navigation}
-              currentSegment={brief.segment}
+              currentGroup={briefGroup}
             />
           </article>
         </div>
