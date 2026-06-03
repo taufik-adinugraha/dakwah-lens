@@ -214,18 +214,32 @@ async def _run(
                 SocialPost.dawah_relevance,
                 SocialPost.dawah_opportunity,
                 SocialPost.categories,
+                SocialPost.theme_group,
             ).where(
                 SocialPost.platform == platform,
                 SocialPost.external_id.in_(external_ids),
                 SocialPost.categories.is_not(None),
             )
         )
+        # 6-element tuple since 2026-06-03 — theme_group joins the
+        # cached set so re-encountered rows don't get re-classified
+        # by Gemini just to fill the new column. Rows whose
+        # theme_group is NULL (historical, pre-Gemini-judged) stay
+        # NULL through this path — the one-shot backfill script
+        # populates them out-of-band.
         cached: dict[
             str,
-            tuple[str | None, float | None, float | None, float | None, dict],
+            tuple[
+                str | None,
+                float | None,
+                float | None,
+                float | None,
+                dict,
+                str | None,
+            ],
         ] = {
-            eid: (label, score, rel, opp, cats)
-            for (eid, label, score, rel, opp, cats) in existing_res.all()
+            eid: (label, score, rel, opp, cats, tg)
+            for (eid, label, score, rel, opp, cats, tg) in existing_res.all()
         }
     fresh_indices = [
         i for i, r in enumerate(rows) if r["external_id"] not in cached
@@ -287,12 +301,13 @@ async def _run(
 
     for i, row in enumerate(rows):
         if row["external_id"] in cached:
-            label, score, rel, opp, cats = cached[row["external_id"]]
+            label, score, rel, opp, cats, tg = cached[row["external_id"]]
             row["sentiment_label"] = label
             row["sentiment_score"] = score
             row["dawah_relevance"] = rel
             row["dawah_opportunity"] = opp
             row["categories"] = cats
+            row["theme_group"] = tg
         else:
             s = sentiment_by_index.get(i)
             r = relevance_by_index.get(i)
@@ -301,6 +316,7 @@ async def _run(
             row["dawah_relevance"] = getattr(r, "dawah_relevance", None)
             row["dawah_opportunity"] = opportunity_by_index.get(i)
             row["categories"] = getattr(r, "categories", None)
+            row["theme_group"] = getattr(r, "theme_group", None)
 
         # Normalize engagement keys — non-YT platforms don't populate
         # these in their normalizers, but `insert.values(rows)` needs a
@@ -326,6 +342,7 @@ async def _run(
                     "dawah_relevance": insert(SocialPost).excluded.dawah_relevance,
                     "dawah_opportunity": insert(SocialPost).excluded.dawah_opportunity,
                     "categories": insert(SocialPost).excluded.categories,
+                    "theme_group": insert(SocialPost).excluded.theme_group,
                     "region": insert(SocialPost).excluded.region,
                     "raw_payload": insert(SocialPost).excluded.raw_payload,
                     # Engagement REFRESHED on every upsert (view counts

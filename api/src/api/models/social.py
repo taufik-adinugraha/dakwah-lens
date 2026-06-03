@@ -117,6 +117,15 @@ class SocialPost(Base, TimestampMixin):
     categories: Mapped[dict[str, float] | None] = mapped_column(JSONB)
     """Per-category scores: `{ "akhlaq": 0.78, "muamalah": 0.12, … }`."""
 
+    theme_group: Mapped[str | None] = mapped_column(Text)
+    """Coarse THEME_GROUPS bucket — one of the 14 group labels or
+    'Lainnya'. Populated at INGEST time by the same Gemini Flash-Lite
+    call that fills `categories` (see `services.relevance.classify_batch`)
+    — adds ~10 output tokens to the existing per-post call, no new
+    round-trip. Rows pre-2026-06-03 (and any post whose Gemini call
+    fails before this field could be set) stay NULL; read paths fall
+    back to `classify_theme_group(topic.label)` regex in that case."""
+
     # ── engagement (YouTube videos.list stats — 2026-05-23) ─────────
     # Per-video interaction counts. Populated for platforms with public
     # engagement metrics (YT today, X / IG / TikTok when those scrapers

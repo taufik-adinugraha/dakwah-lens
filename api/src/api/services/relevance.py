@@ -97,6 +97,14 @@ class RelevanceResult:
     categories: dict[str, float]
     # 0-1 aggregate — max of category scores. Above ~0.5 = brief-worthy.
     dawah_relevance: float
+    # One of the 14 THEME_GROUPS or "Lainnya". Asked in the SAME
+    # Gemini call as `categories` (just ~10 extra output tokens
+    # per post), so this is essentially free. Replaces the
+    # read-time `classify_theme_group(topic.label)` regex fallback
+    # with a Gemini-judged per-post bucket. None when the model
+    # didn't emit it or emitted an invalid name — caller persists
+    # None and the read paths fall back to the topic-label regex.
+    theme_group: str | None = None
 
 
 _client: genai.Client | None = None
@@ -170,7 +178,31 @@ Calibrated examples (read carefully — these mirror real misclassifications):
 - "Survei: 25% Gen Z Indonesia Mengaku Tidak Beragama" → aqidah 0.75, youth 0.6 (modern challenge to belief; classic aqidah da'wah hook for da'i working with youth)
 - "Polemik Imbauan Tutup Tempat Hiburan saat Ramadhan" → aqidah 0.45, akhlaq 0.4, social_justice 0.4 (ritual-observance debate touches creed AND social adab)
 
+ALSO classify each post into ONE coarse THEME_GROUP (the dashboard / briefing bucketing taxonomy). This is INDEPENDENT of the 9 category scores above — pick the single best-fit group using the post's SEMANTIC meaning, not surface keyword matches.
+
+THEME_GROUPS — pick EXACTLY ONE per post (literal name, in Indonesian):
+{THEME_GROUP_LIST_PLACEHOLDER}
+
+KEY ROUTING RULES (these are the bugs the regex got wrong):
+- A political/accountability story about a state ritual (e.g. "Polemik Sapi Kurban Presiden" — controversy over how the President's kurban was procured) → "Pemerintahan & Kebijakan", NOT "Aqidah & Ibadah". Aqidah & Ibadah is only for posts that are themselves about practicing the ibadah.
+- National-day commemorations and state ideology (e.g. "Peringatan Hari Lahir Pancasila") → "Pemerintahan & Kebijakan".
+- Mysterious-fire / mass-fire / disaster fenomena (e.g. "Fenomena Api Misterius di Sleman") → "Lingkungan & Bencana".
+- Local crime + corruption → "Hukum & Keadilan". State policy / officials → "Pemerintahan & Kebijakan".
+- Only use "Lainnya" when the post genuinely fits no group above (sports scores, weather, foreign-religion festivals, etc.).
+
+Return field `theme_group` as a STRING, exact match to one of the names above.
+
 Return only valid JSON, one object per input."""
+
+
+def _system_prompt_with_groups() -> str:
+    """Inject the live THEME_GROUPS list into SYSTEM_PROMPT at call time
+    so the prompt + the regex registry can never drift."""
+    from api.services.theme_groups import llm_group_options_prompt
+
+    return SYSTEM_PROMPT.replace(
+        "{THEME_GROUP_LIST_PLACEHOLDER}", llm_group_options_prompt()
+    )
 
 
 OPPORTUNITY_SYSTEM_PROMPT = """You score Indonesian or English news posts for DA'WAH OPPORTUNITY — the chance a da'i could credibly use this in a khutbah, kajian, or da'wah content piece this week.
@@ -338,9 +370,14 @@ def _classify_chunk(texts: list[str]) -> list[RelevanceResult]:
         "items": {
             "type": "object",
             "properties": {
-                cat: {"type": "number"} for cat in CATEGORY_KEYS
+                **{cat: {"type": "number"} for cat in CATEGORY_KEYS},
+                # New since 2026-06-03 — Gemini-judged THEME_GROUPS
+                # bucket. One of 14 group labels or "Lainnya". Added to
+                # the existing per-post call (no new round-trip), so
+                # marginal cost is ~10 output tokens per post.
+                "theme_group": {"type": "string"},
             },
-            "required": list(CATEGORY_KEYS),
+            "required": [*CATEGORY_KEYS, "theme_group"],
         },
     }
 
@@ -355,7 +392,10 @@ def _classify_chunk(texts: list[str]) -> list[RelevanceResult]:
                 model=MODEL,
                 contents=user_prompt,
                 config=types.GenerateContentConfig(
-                    system_instruction=SYSTEM_PROMPT,
+                    # Use the live-rendered prompt so the THEME_GROUPS
+                    # list in the prompt is always in sync with the
+                    # registry.
+                    system_instruction=_system_prompt_with_groups(),
                     response_mime_type="application/json",
                     response_schema=response_schema,
                     temperature=0.2,
@@ -418,13 +458,23 @@ def _classify_chunk(texts: list[str]) -> list[RelevanceResult]:
         meta={"batch_size": len(texts)},
     )
 
+    from api.services.theme_groups import ALL_GROUP_NAMES
+
     results: list[RelevanceResult] = []
     for cats in parsed:
         clean = {k: float(cats.get(k, 0.0)) for k in CATEGORY_KEYS}
+        # Validate theme_group: must be one of the 14 + Lainnya
+        # exactly. Anything else (typo, missing field, hallucinated
+        # name) → None and the read paths fall back to the regex.
+        tg_raw = cats.get("theme_group")
+        theme_group = (
+            tg_raw if isinstance(tg_raw, str) and tg_raw in ALL_GROUP_NAMES else None
+        )
         results.append(
             RelevanceResult(
                 categories=clean,
                 dawah_relevance=_aggregate_relevance(clean),
+                theme_group=theme_group,
             )
         )
 

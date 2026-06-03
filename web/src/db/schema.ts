@@ -340,6 +340,14 @@ export const socialPosts = pgTable(
     dawahOpportunity: doublePrecision("dawah_opportunity"),
     categories: jsonb("categories").$type<Record<string, number>>(),
 
+    // Coarse THEME_GROUPS bucket — one of the 14 group labels or
+    // 'Lainnya'. Populated at INGEST time by the same Gemini Flash-
+    // Lite call that fills `categories` (relevance.py). Adds ~10
+    // output tokens per post — no new round-trip. Rows pre-2026-06-03
+    // are NULL; the bucketing SQL in insights-data.ts falls back to
+    // `classify_theme_group(topic.label)` regex when NULL.
+    themeGroup: text("theme_group"),
+
     // Per-video engagement metrics (YouTube videos.list stats; planned
     // to extend to X/IG/TT as their scrapers come back online). NULL for
     // mainstream RSS where no per-article counts exist.
@@ -369,6 +377,11 @@ export const socialPosts = pgTable(
     index("ix_social_posts_relevance").on(table.dawahRelevance),
     index("ix_social_posts_topic_id").on(table.topicId),
     index("ix_social_posts_platform_region").on(table.platform, table.region),
+    // Partial composite — only non-NULL theme_group rows are indexed.
+    // Matches the briefings / dashboard chart predicate exactly.
+    index("ix_social_posts_theme_group_posted_at")
+      .on(table.themeGroup, table.postedAt)
+      .where(sql`theme_group IS NOT NULL`),
     uniqueIndex("uq_social_post_platform_external").on(
       table.platform,
       table.externalId,

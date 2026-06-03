@@ -161,6 +161,7 @@ async def _run(query: str, limit: int) -> int:
         row["dawah_relevance"] = r.dawah_relevance
         row["dawah_opportunity"] = o
         row["categories"] = r.categories
+        row["theme_group"] = r.theme_group
 
     # 4. Upsert into Postgres
     async with SessionLocal() as session:
@@ -176,6 +177,7 @@ async def _run(query: str, limit: int) -> int:
                     "dawah_relevance": insert(SocialPost).excluded.dawah_relevance,
                     "dawah_opportunity": insert(SocialPost).excluded.dawah_opportunity,
                     "categories": insert(SocialPost).excluded.categories,
+                    "theme_group": insert(SocialPost).excluded.theme_group,
                     "raw_payload": insert(SocialPost).excluded.raw_payload,
                 },
             )

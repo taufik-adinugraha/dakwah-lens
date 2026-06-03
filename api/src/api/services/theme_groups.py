@@ -210,3 +210,73 @@ def slugify_group(group: str) -> str:
 # Pre-computed slug → group map for fast inverse lookup.
 GROUP_BY_SLUG: dict[str, str] = {slugify_group(tg.group): tg.group for tg in THEME_GROUPS}
 LAINNYA_SLUG: str = slugify_group(LAINNYA_GROUP)
+
+
+# Per-group one-line semantic hint — fed to the relevance.py prompt
+# so Gemini classifies each post into the right THEME_GROUP using
+# meaning (not surface keyword match). Order mirrors THEME_GROUPS;
+# the read-time regex `classify_theme_group` stays as a fallback for
+# rows the LLM hasn't tagged yet.
+GROUP_INTENT_HINTS: dict[str, str] = {
+    "Hukum & Keadilan": (
+        "korupsi, kriminalitas, penipuan, pembunuhan, keadilan publik "
+        "(BUKAN polemik kebijakan/pejabat — itu Pemerintahan & Kebijakan)"
+    ),
+    "Sosial & Keluarga": "KS, KDRT, perlindungan anak, dinamika sosial",
+    "Ekonomi & Bisnis": (
+        "ekonomi rakyat, bisnis halal, investasi, UMKM, daya beli"
+    ),
+    "Aqidah & Ibadah": (
+        "ibadah pilar (haji/kurban/idul adha), hijrah, fatwa, polemik "
+        "aqidah — HANYA untuk konten yang murni ibadah; cerita politik "
+        "tentang ibadah masuk Pemerintahan & Kebijakan"
+    ),
+    "Kesehatan & Kehidupan": "kesehatan fisik & mental, kesejahteraan jiwa",
+    "Pendidikan & SDM": "sekolah, literasi, pembangunan SDM",
+    "Lingkungan & Bencana": (
+        "bencana alam, kebakaran, kecelakaan, lingkungan, fenomena alam "
+        "misterius"
+    ),
+    "Pemerintahan & Kebijakan": (
+        "pemerintahan, kebijakan publik, otonomi daerah, program negara, "
+        "ideologi negara (Pancasila), polemik kebijakan/pejabat, hari "
+        "nasional"
+    ),
+    "Patologi Sosial Digital": "judi online, pinjol, narkoba",
+    "Teknologi & AI": "kecerdasan buatan, teknologi baru, etika digital",
+    "Pekerja & Pertanian Rakyat": (
+        "buruh, tenaga kerja, petani, nelayan, ketahanan pangan"
+    ),
+    "Konflik & Geopolitik": (
+        "Palestina, konflik internasional, geopolitik, hubungan luar negeri"
+    ),
+    "Inspirasi & Kisah Pribadi": (
+        "kisah hidup, pengalaman pribadi, renungan, motivasi"
+    ),
+    "Toleransi & Lintas-Iman": (
+        "moderasi beragama, pluralisme, lintas-iman"
+    ),
+}
+
+
+def llm_group_options_prompt() -> str:
+    """Render the 14 groups + Lainnya as a labelled list for the
+    relevance.py system prompt — gives Gemini a semantic anchor per
+    group instead of just a bare name.
+
+    Public so the relevance prompt builder can pull it directly
+    without restating the hints (keeps the two in sync)."""
+    lines = [
+        f"- {g}: {GROUP_INTENT_HINTS[g]}" for g in (tg.group for tg in THEME_GROUPS)
+    ]
+    lines.append(
+        f"- {LAINNYA_GROUP}: tidak fit ke salah satu kategori di atas"
+    )
+    return "\n".join(lines)
+
+
+# All valid group names (14 + Lainnya) — used by relevance.py to
+# validate Gemini output and by backfills.
+ALL_GROUP_NAMES: frozenset[str] = frozenset(
+    [tg.group for tg in THEME_GROUPS] + [LAINNYA_GROUP]
+)

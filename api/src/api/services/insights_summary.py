@@ -948,23 +948,44 @@ async def _compute_stats(
     period_start = now - timedelta(days=7)
     prev_period_start = now - timedelta(days=14)
 
+    # Hybrid bucketing predicate. Primary path is the per-post
+    # `theme_group` column (Gemini-judged at ingest, since 2026-06-03).
+    # Posts whose `theme_group` is still NULL (historical, pre-Gemini-
+    # judged) fall back to the legacy `topic_id → topic.label → regex`
+    # chain — that path keeps the briefings honest until the one-shot
+    # backfill catches everything up.
     topic_ids = await _topic_ids_in_group(session, group)
     if not topic_ids:
-        # No topics map to this group right now (Gemini may not have
-        # proposed any matching label this week). Empty result; caller
-        # detects via totals.posts_7d == 0 and skips the briefing.
         topic_ids_sql_array = "ARRAY[]::uuid[]"
     else:
         topic_ids_sql_array = (
             "ARRAY[" + ",".join(f"'{tid}'" for tid in topic_ids) + "]::uuid[]"
         )
+    # Single SQL fragment reused in every WHERE clause below. The
+    # filter is OR-of-two to keep the index hit on the primary
+    # branch (theme_group = 'X' uses the partial index added in the
+    # 2026-06-03 migration) while the secondary branch handles
+    # back-compat. SQL-quoting `group` via :group_name keeps things
+    # safe even though the values come from a closed enum.
+    group_filter_clause = (
+        "(theme_group = :group_name "
+        f"OR (theme_group IS NULL AND topic_id = ANY ({topic_ids_sql_array})))"
+    )
+    # Same predicate with an `f.` alias prefix — for queries that pull
+    # from the `filtered` CTE via a join (e.g. the topic_rows scan
+    # below joins topics + filtered).
+    group_filter_clause_f = (
+        "(f.theme_group = :group_name "
+        f"OR (f.theme_group IS NULL AND f.topic_id = ANY ({topic_ids_sql_array})))"
+    )
 
     # Same `filtered` CTE as before — kept because the
     # top_categories report (line ~990 below) buckets posts by their
     # global-top-1 dawah category. The CTE still tags every social
     # post with `dominant_cat`; downstream queries that previously
-    # filtered on `dominant_cat = ANY(cats)` now filter on
-    # `topic_id = ANY(topic_ids)` instead.
+    # filtered on `dominant_cat = ANY(cats)` now filter on the
+    # hybrid `group_filter_clause` (theme_group column with regex
+    # fallback) instead.
     post_filter = """
       WITH filtered AS (
         SELECT sp.*, (
@@ -984,12 +1005,12 @@ async def _compute_stats(
                 f"""
                 {post_filter}
                 SELECT
-                  count(*) FILTER (WHERE posted_at >= :start AND topic_id = ANY ({topic_ids_sql_array})) AS posts_7d,
-                  count(*) FILTER (WHERE posted_at >= :prev AND posted_at < :start AND topic_id = ANY ({topic_ids_sql_array})) AS posts_prev_7d
+                  count(*) FILTER (WHERE posted_at >= :start AND {group_filter_clause}) AS posts_7d,
+                  count(*) FILTER (WHERE posted_at >= :prev AND posted_at < :start AND {group_filter_clause}) AS posts_prev_7d
                 FROM filtered
                 """
             ),
-            {"start": period_start, "prev": prev_period_start},
+            {"start": period_start, "prev": prev_period_start, "group_name": group},
         )
     ).one()
     posts_7d = int(total_row.posts_7d or 0)
@@ -1007,10 +1028,10 @@ async def _compute_stats(
                   count(*) FILTER (WHERE sentiment_label = 'positive') AS pos,
                   count(*) FILTER (WHERE sentiment_label IS NOT NULL) AS total
                 FROM filtered
-                WHERE posted_at >= :start AND topic_id = ANY ({topic_ids_sql_array})
+                WHERE posted_at >= :start AND {group_filter_clause}
                 """
             ),
-            {"start": period_start},
+            {"start": period_start, "group_name": group},
         )
     ).one()
     sentiment_total = int(sentiment_row.total or 0)
@@ -1039,10 +1060,10 @@ async def _compute_stats(
                   count(*) FILTER (WHERE sentiment_label = 'negative') AS neg,
                   count(*) FILTER (WHERE sentiment_label IS NOT NULL) AS total
                 FROM filtered
-                WHERE posted_at >= :prev AND posted_at < :start AND topic_id = ANY ({topic_ids_sql_array})
+                WHERE posted_at >= :prev AND posted_at < :start AND {group_filter_clause}
                 """
             ),
-            {"prev": prev_period_start, "start": period_start},
+            {"prev": prev_period_start, "start": period_start, "group_name": group},
         )
     ).one()
     baseline_total = int(baseline_row.total or 0)
@@ -1060,13 +1081,13 @@ async def _compute_stats(
                 {post_filter}
                 SELECT dominant_cat AS category, count(*)::int AS posts
                 FROM filtered
-                WHERE posted_at >= :start AND topic_id = ANY ({topic_ids_sql_array})
+                WHERE posted_at >= :start AND {group_filter_clause}
                 GROUP BY dominant_cat
                 ORDER BY posts DESC
                 LIMIT 5
                 """
             ),
-            {"start": period_start},
+            {"start": period_start, "group_name": group},
         )
     ).all()
     cat_total_now = sum(int(r.posts) for r in cat_rows) or 1
@@ -1086,11 +1107,11 @@ async def _compute_stats(
                 {post_filter}
                 SELECT dominant_cat AS category, count(*)::int AS posts
                 FROM filtered
-                WHERE posted_at >= :prev AND posted_at < :start AND topic_id = ANY ({topic_ids_sql_array})
+                WHERE posted_at >= :prev AND posted_at < :start AND {group_filter_clause}
                 GROUP BY dominant_cat
                 """
             ),
-            {"prev": prev_period_start, "start": period_start},
+            {"prev": prev_period_start, "start": period_start, "group_name": group},
         )
     ).all()
     cat_total_prev_real = sum(int(r.posts) for r in prev_cat_rows)
@@ -1124,14 +1145,14 @@ async def _compute_stats(
                        count(f.id)::int AS seg_post_count
                 FROM topics t
                 JOIN filtered f ON f.topic_id = t.id
-                WHERE f.topic_id = ANY ({topic_ids_sql_array})
+                WHERE {group_filter_clause_f}
                   AND f.posted_at >= :start
                 GROUP BY t.id, t.label, t.platform, t.keywords
                 ORDER BY seg_post_count DESC
                 LIMIT 8
                 """
             ),
-            {"start": period_start},
+            {"start": period_start, "group_name": group},
         )
     ).all()
     top_topics: list[dict[str, Any]] = []
@@ -1147,7 +1168,6 @@ async def _compute_stats(
                     SELECT text, author, engagement_views, engagement_score, url
                     FROM filtered
                     WHERE topic_id = :tid AND text IS NOT NULL
-                      AND topic_id = ANY ({topic_ids_sql_array})
                     ORDER BY dawah_relevance DESC NULLS LAST,
                              engagement_score DESC NULLS LAST
                     LIMIT 3
@@ -1189,7 +1209,6 @@ async def _compute_stats(
                   COUNT(*) FILTER (WHERE engagement_views IS NOT NULL)::int AS yt_count
                 FROM filtered
                 WHERE topic_id = :tid
-                  AND topic_id = ANY ({topic_ids_sql_array})
                 """
             ),
             {"tid": r.id},
@@ -1216,12 +1235,12 @@ async def _compute_stats(
                 {post_filter}
                 SELECT platform, count(*)::int AS posts
                 FROM filtered
-                WHERE posted_at >= :start AND topic_id = ANY ({topic_ids_sql_array})
+                WHERE posted_at >= :start AND {group_filter_clause}
                 GROUP BY platform
                 ORDER BY posts DESC
                 """
             ),
-            {"start": period_start},
+            {"start": period_start, "group_name": group},
         )
     ).all()
     platform_breakdown = [
@@ -1245,12 +1264,12 @@ async def _compute_stats(
                   count(*) FILTER (WHERE sentiment_label = 'positive')::int AS pos,
                   count(*) FILTER (WHERE sentiment_label IS NOT NULL)::int AS sent_total
                 FROM filtered
-                WHERE posted_at >= :start AND topic_id = ANY ({topic_ids_sql_array})
+                WHERE posted_at >= :start AND {group_filter_clause}
                 GROUP BY platform
                 ORDER BY posts DESC
                 """
             ),
-            {"start": period_start},
+            {"start": period_start, "group_name": group},
         )
     ).all()
     plat_cat_rows = (
@@ -1260,11 +1279,11 @@ async def _compute_stats(
                 {post_filter}
                 SELECT platform, dominant_cat AS category, count(*)::int AS n
                 FROM filtered
-                WHERE posted_at >= :start AND topic_id = ANY ({topic_ids_sql_array})
+                WHERE posted_at >= :start AND {group_filter_clause}
                 GROUP BY platform, dominant_cat
                 """
             ),
-            {"start": period_start},
+            {"start": period_start, "group_name": group},
         )
     ).all()
     cats_by_platform: dict[str, list[tuple[str, int]]] = {}
@@ -2235,26 +2254,34 @@ async def generate_all_summaries() -> dict[str, Any]:
             group = tg.group
             try:
                 topic_ids = await _topic_ids_in_group(session, group)
-                if not topic_ids:
+                # Empty topic_ids is no longer a hard skip — posts may
+                # still bucket into the group via theme_group column
+                # alone. Use the hybrid predicate in the count below.
+                topic_ids_sql = (
+                    "ARRAY["
+                    + ",".join(f"'{t}'::uuid" for t in topic_ids)
+                    + "]::uuid[]"
+                ) if topic_ids else "ARRAY[]::uuid[]"
+                row = (
+                    await session.execute(
+                        text(
+                            "SELECT COUNT(*) FROM social_posts "
+                            "WHERE posted_at >= NOW() - INTERVAL '7 days' "
+                            f"AND (theme_group = :group_name "
+                            f"OR (theme_group IS NULL "
+                            f"AND topic_id = ANY ({topic_ids_sql})))"
+                        ),
+                        {"group_name": group},
+                    )
+                ).first()
+                counts[group] = int(row[0]) if row else 0
+                if counts[group] == 0:
                     log.info(
-                        "insights_summary.group_skip_no_topics",
+                        "insights_summary.group_skip_no_posts",
                         segment=group,
                     )
                     results[group] = "skipped:no_topics"
                     continue
-                topic_ids_sql = (
-                    "ARRAY[" + ",".join(f"'{t}'::uuid" for t in topic_ids) + "]"
-                )
-                row = (
-                    await session.execute(
-                        text(
-                            "SELECT COUNT(*) FROM posts "
-                            "WHERE posted_at >= NOW() - INTERVAL '7 days' "
-                            f"AND topic_id = ANY ({topic_ids_sql})"
-                        )
-                    )
-                ).first()
-                counts[group] = int(row[0]) if row else 0
             except Exception as exc:
                 log.exception(
                     "insights_summary.group_precheck_failed",

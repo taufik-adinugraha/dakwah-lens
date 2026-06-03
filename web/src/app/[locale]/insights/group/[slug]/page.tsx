@@ -8,7 +8,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 // No auth() in the path so per-user caching keys don't apply.
 export const revalidate = 300;
 
-import { and, desc, inArray, isNull, or, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNull, or, sql } from "drizzle-orm";
 import { ArrowLeft, ArrowRight, Compass, Layers } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
@@ -80,51 +80,52 @@ export default async function GroupLandingPage({
   );
   const groupTopicIds = groupTopics.map((t) => t.id);
 
-  // 2. Recent posts in this group's topics (last 14d, capped at 25).
-  //    Special case: the Lainnya group also adopts posts with
-  //    topic_id IS NULL — those are the keyword-overlap-backfill
-  //    rejects (off-taxonomy items the matcher couldn't fit anywhere).
-  //    Counting them as Lainnya keeps the chart honest + gives the
-  //    reader somewhere to browse them.
+  // 2. Recent posts in this group (last 14d, capped at 25). Hybrid
+  //    predicate matching the briefing pipeline:
+  //      - Primary: `theme_group = $group` (Gemini-judged at ingest)
+  //      - Fallback: `theme_group IS NULL AND topic_id ∈ groupTopics`
+  //                  (legacy chain for pre-2026-06-03 rows)
+  //    For the Lainnya group ALSO catches truly un-classified rows
+  //    (both theme_group and topic_id NULL) — those land on the
+  //    Lainnya page so the reader can browse them too.
   const isLainnya = group === LAINNYA_GROUP;
-  let recentPosts: Array<{
-    id: string;
-    text: string;
-    author: string | null;
-    url: string | null;
-    platform: string;
-    postedAt: Date | null;
-    sentimentLabel: string | null;
-  }> = [];
-  if (groupTopicIds.length > 0 || isLainnya) {
-    const topicMatch = groupTopicIds.length > 0
-      ? inArray(schema.socialPosts.topicId, groupTopicIds)
+  const themeMatch = eq(schema.socialPosts.themeGroup, group);
+  const legacyTopicMatch =
+    groupTopicIds.length > 0
+      ? and(
+          isNull(schema.socialPosts.themeGroup),
+          inArray(schema.socialPosts.topicId, groupTopicIds),
+        )!
       : null;
-    const nullMatch = isLainnya ? isNull(schema.socialPosts.topicId) : null;
-    const idClause =
-      topicMatch && nullMatch
-        ? or(topicMatch, nullMatch)
-        : (topicMatch ?? nullMatch)!;
-    recentPosts = await db
-      .select({
-        id: schema.socialPosts.id,
-        text: schema.socialPosts.text,
-        author: schema.socialPosts.author,
-        url: schema.socialPosts.url,
-        platform: schema.socialPosts.platform,
-        postedAt: schema.socialPosts.postedAt,
-        sentimentLabel: schema.socialPosts.sentimentLabel,
-      })
-      .from(schema.socialPosts)
-      .where(
-        and(
-          idClause,
-          sql`posted_at >= now() - interval '14 days'`,
-        ),
-      )
-      .orderBy(desc(schema.socialPosts.postedAt))
-      .limit(25);
-  }
+  const lainnyaNullMatch = isLainnya
+    ? and(
+        isNull(schema.socialPosts.themeGroup),
+        isNull(schema.socialPosts.topicId),
+      )!
+    : null;
+  const branches = [themeMatch, legacyTopicMatch, lainnyaNullMatch].filter(
+    (b): b is NonNullable<typeof b> => b !== null,
+  );
+  const idClause = branches.length > 1 ? or(...branches)! : branches[0];
+  const recentPosts = await db
+    .select({
+      id: schema.socialPosts.id,
+      text: schema.socialPosts.text,
+      author: schema.socialPosts.author,
+      url: schema.socialPosts.url,
+      platform: schema.socialPosts.platform,
+      postedAt: schema.socialPosts.postedAt,
+      sentimentLabel: schema.socialPosts.sentimentLabel,
+    })
+    .from(schema.socialPosts)
+    .where(
+      and(
+        idClause,
+        sql`posted_at >= now() - interval '14 days'`,
+      ),
+    )
+    .orderBy(desc(schema.socialPosts.postedAt))
+    .limit(25);
 
   // 3. Recompute per-topic 7-day counts (the topics.post_count column
   //    is cross-platform lifetime). Cheaper than per-topic queries:

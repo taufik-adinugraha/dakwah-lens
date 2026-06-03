@@ -1200,34 +1200,58 @@ export async function getOverviewInsights(): Promise<OverviewInsights | null> {
     topCategory: topCategoryByPlatform.get(r.platform) ?? null,
   }));
 
-  // 14-group + Lainnya bucketing — joins social_posts → topics for
-  // the 7-day window, then maps each topic's label to its THEME_GROUP
-  // via the regex classifier (same one used by the briefing pipeline).
-  // Posts whose topic_id is NULL (~60% of the historical corpus —
-  // keyword-overlap backfill couldn't match them to any topic) are
-  // counted into the LAINNYA bucket so the chart total reconciles
-  // with "posts ingested" instead of silently dropping them. Sorted
-  // by post count desc with Lainnya pinned to the bottom by the
-  // consumer.
+  // 14-group + Lainnya bucketing. Two-pass strategy:
+  //
+  // 1. Posts WITH theme_group set (Gemini-judged at ingest since
+  //    2026-06-03): aggregate by that column directly. Hits the
+  //    partial index added in the 2026-06-03 migration.
+  //
+  // 2. Posts WHERE theme_group IS NULL (historical): fall back to
+  //    the legacy `topic_id → topic.label → classifyThemeGroup`
+  //    regex chain. Pure JS classify so we don't have to re-codify
+  //    the THEME_GROUPS regex in SQL. Posts with NULL theme_group
+  //    AND NULL topic_id (truly un-classified) all go to Lainnya.
+  //
+  // Combining both keeps the chart consistent during the rollout
+  // window while the backfill catches everything up to the new
+  // taxonomy.
+  const groupCounts = new Map<string, number>();
+
+  // Pass 1 — the new column.
+  const tgRows = (await db.execute(sql`
+    SELECT theme_group AS group, COUNT(*)::int AS posts
+    FROM social_posts
+    WHERE theme_group IS NOT NULL
+      AND posted_at >= now() - interval '7 days'
+    GROUP BY theme_group
+  `)) as unknown as Array<{ group: string; posts: number }>;
+  for (const r of Array.isArray(tgRows) ? tgRows : []) {
+    if (!r || typeof r.group !== "string") continue;
+    groupCounts.set(r.group, (groupCounts.get(r.group) ?? 0) + Number(r.posts ?? 0));
+  }
+
+  // Pass 2 — legacy fallback for rows the new column doesn't cover.
   const topicRows = (await db.execute(sql`
     SELECT t.label AS label, COUNT(sp.id)::int AS posts
     FROM social_posts sp
     JOIN topics t ON sp.topic_id = t.id
-    WHERE sp.posted_at >= now() - interval '7 days'
+    WHERE sp.theme_group IS NULL
+      AND sp.posted_at >= now() - interval '7 days'
     GROUP BY t.label
   `)) as unknown as Array<{ label: string; posts: number }>;
-  const groupCounts = new Map<string, number>();
   for (const r of Array.isArray(topicRows) ? topicRows : []) {
     if (!r || typeof r.label !== "string") continue;
     const grp = classifyThemeGroup(r.label);
     groupCounts.set(grp, (groupCounts.get(grp) ?? 0) + Number(r.posts ?? 0));
   }
-  // Add the NULL-topic 7d posts to Lainnya — separate query so a
-  // schema change to the JOIN above doesn't accidentally double-count.
+
+  // Truly un-classified — no theme_group AND no topic_id — bucket
+  // straight into Lainnya.
   const nullTopicRow = (await db.execute(sql`
     SELECT COUNT(*)::int AS posts
     FROM social_posts
-    WHERE topic_id IS NULL
+    WHERE theme_group IS NULL
+      AND topic_id IS NULL
       AND posted_at >= now() - interval '7 days'
   `)) as unknown as Array<{ posts: number }>;
   const nullTopicCount = Number(
