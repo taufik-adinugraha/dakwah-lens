@@ -764,7 +764,7 @@
     "hub_card_missing": "Not available",
     "hub_card_explore_body": "No auto-briefing this week for this group — explore the topics and recent posts directly.",
     "hub_card_explore_cta": "Explore topics & posts",
-    "hub_top_n_note": "Note: of 14 theme groups, full briefings are auto-published each week only for the top 5 by discussion volume (≥30 posts in 7 days). The others remain explorable — open any card to see the group's topics and recent posts.",
+    "hub_top_n_note": "Note: of 14 theme groups, full briefings are auto-published each week only for the top 5 by discussion volume (≥30 posts in 7 days). To explore the other groups, use the topic distribution on the Explore Data page.",
     "group_page_title": "{group} — Theme Group",
     "group_eyebrow": "Theme group",
     "group_page_intro": "This page collects {topics} active topics classified under the <strong>{group}</strong> theme group. No auto-briefing was published for this group this week — use the topics and posts below to explore.",

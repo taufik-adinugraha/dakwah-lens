@@ -48,16 +48,13 @@ export async function BriefingsGrid({
       timeZone: "Asia/Jakarta",
     });
 
-  // Sort: groups with a briefing first (so the cards a reader can
-  // actually click "Read briefing" on appear above the fold), then
-  // un-briefed groups in canonical order.
-  const briefedGroups: string[] = [];
-  const unbriefedGroups: string[] = [];
-  for (const group of BRIEFING_GROUPS) {
-    if (briefings.has(group)) briefedGroups.push(group);
-    else unbriefedGroups.push(group);
-  }
-  const orderedGroups = [...briefedGroups, ...unbriefedGroups];
+  // Show only the top-5 groups that the auto-pipeline actually
+  // generated a briefing for this week. Hides the other 9 entirely
+  // (since 2026-06-04) — they were producing visual noise + diluting
+  // the "this is what the week is about" signal. Readers who want to
+  // explore non-briefed groups still get there through the explore
+  // page (/insights/explore) chart links.
+  const orderedGroups = BRIEFING_GROUPS.filter((g) => briefings.has(g));
 
   return (
     <section className="pb-10 sm:pb-14">

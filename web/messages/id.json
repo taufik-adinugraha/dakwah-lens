@@ -760,7 +760,7 @@
     "hub_card_missing": "Belum tersedia",
     "hub_card_explore_body": "Belum ada briefing pekan ini untuk kelompok ini — eksplor topik & postingan terkini langsung.",
     "hub_card_explore_cta": "Eksplor topik & postingan",
-    "hub_top_n_note": "Catatan: dari 14 kelompok tema, briefing penuh otomatis diterbitkan setiap pekan hanya untuk 5 kelompok dengan volume diskusi tertinggi (≥30 postingan dalam 7 hari). Kelompok lainnya tetap bisa dieksplor — pilih kartu untuk lihat topik + postingan terkini.",
+    "hub_top_n_note": "Catatan: dari 14 kelompok tema, briefing penuh otomatis diterbitkan setiap pekan hanya untuk 5 kelompok dengan volume diskusi tertinggi (≥30 postingan dalam 7 hari). Untuk eksplorasi kelompok lain, gunakan distribusi topik di halaman Data Mentah.",
     "group_page_title": "{group} — Kelompok Tema",
     "group_eyebrow": "Kelompok tema",
     "group_page_intro": "Halaman ini mengumpulkan {topics} topik aktif yang terklasifikasi ke kelompok <strong>{group}</strong>. Belum ada briefing penuh otomatis pekan ini untuk kelompok ini — gunakan list topik + postingan di bawah untuk eksplorasi.",

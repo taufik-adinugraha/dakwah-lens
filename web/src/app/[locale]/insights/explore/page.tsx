@@ -32,6 +32,7 @@ import {
   getTopIssues,
   getTopicDistribution7d,
   getTopicsByPlatform7d,
+  LAINNYA_GROUP,
   slugifyGroup,
 } from "@/lib/dashboard-metrics";
 
@@ -92,21 +93,26 @@ export default async function InsightsExplorePage({
     "bg-rose-500",
     "bg-violet-500",
   ];
-  // 14 THEME_GROUPS + Lainnya — replaced the 9 PRD da'wah categories
-  // on 2026-06-03 so the dashboard chart matches the briefing /
-  // navigation taxonomy. `dominantGroups` always emits all 15 buckets,
-  // sorted by post count desc with Lainnya pinned to the bottom by
-  // the data layer. Group cards link to /insights/group/[slug] for
-  // explore (not /insights/category/[key]).
-  const categories = (overview?.dominantGroups ?? []).map((g, i) => ({
-    key: slugifyGroup(g.group),
-    label: g.group,
-    volume: g.posts,
-    tone: CATEGORY_TONES[i % CATEGORY_TONES.length],
-  }));
+  // 14 THEME_GROUPS — Lainnya is split off so it doesn't dominate the
+  // chart math. Bars are sized RELATIVE to the largest *named* group;
+  // Lainnya gets a separate dim footer ("+ N uncategorized") so the
+  // reader still knows the gap exists but doesn't see it crowd out the
+  // signal-bearing groups.
+  const allGroups = overview?.dominantGroups ?? [];
+  const categories = allGroups
+    .filter((g) => g.group !== LAINNYA_GROUP)
+    .map((g, i) => ({
+      key: slugifyGroup(g.group),
+      label: g.group,
+      volume: g.posts,
+      tone: CATEGORY_TONES[i % CATEGORY_TONES.length],
+    }));
+  const lainnyaVolume =
+    allGroups.find((g) => g.group === LAINNYA_GROUP)?.posts ?? 0;
   const catMax = categories.length
     ? Math.max(...categories.map((c) => c.volume), 1)
     : 1;
+  const namedTotal = categories.reduce((s, c) => s + c.volume, 0);
 
   const mix = overview?.sentimentMix ?? {
     positive: 0,
@@ -273,28 +279,40 @@ export default async function InsightsExplorePage({
               </div>
             ) : (
               <div className="mt-3 space-y-1">
-                {categories.map((c) => (
-                  <Link
-                    key={c.key}
-                    href={`/insights/group/${c.key}`}
-                    className="group block rounded-md px-1.5 py-1 text-xs transition hover:bg-slate-50"
-                  >
-                    <div className="mb-1 flex items-center justify-between text-xs text-slate-600">
-                      <span className="font-medium text-slate-700 group-hover:text-slate-900">
-                        {c.label}
-                      </span>
-                      <span className="tabular-nums">
-                        {c.volume.toLocaleString()}
-                      </span>
-                    </div>
-                    <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
-                      <div
-                        className={`h-full rounded-full ${c.tone}`}
-                        style={{ width: `${(c.volume / catMax) * 100}%` }}
-                      />
-                    </div>
-                  </Link>
-                ))}
+                {categories.map((c) => {
+                  const pct = namedTotal > 0 ? (c.volume / namedTotal) * 100 : 0;
+                  return (
+                    <Link
+                      key={c.key}
+                      href={`/insights/group/${c.key}`}
+                      className="group block rounded-md px-1.5 py-1 text-xs transition hover:bg-slate-50"
+                    >
+                      <div className="mb-1 flex items-center justify-between text-xs text-slate-600">
+                        <span className="font-medium text-slate-700 group-hover:text-slate-900">
+                          {c.label}
+                        </span>
+                        <span className="tabular-nums">
+                          {c.volume.toLocaleString()}
+                          <span className="ml-1 text-slate-400">
+                            ({pct.toFixed(1)}%)
+                          </span>
+                        </span>
+                      </div>
+                      <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
+                        <div
+                          className={`h-full rounded-full ${c.tone}`}
+                          style={{ width: `${(c.volume / catMax) * 100}%` }}
+                        />
+                      </div>
+                    </Link>
+                  );
+                })}
+                {lainnyaVolume > 0 && (
+                  <p className="mt-2 px-1.5 text-[10px] italic text-slate-400">
+                    + {lainnyaVolume.toLocaleString()} posts uncategorized
+                    (excluded from %)
+                  </p>
+                )}
               </div>
             )}
             {totalPosts > 0 && (

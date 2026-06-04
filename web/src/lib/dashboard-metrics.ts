@@ -2065,26 +2065,33 @@ export async function getTopicDistribution7d(
   limit = 10,
 ): Promise<TopicBucket[]> {
   // One round-trip — JOIN topics → counted posts, scalar subquery for
-  // the corpus total. Keeps the math consistent if posts and topics
-  // race against each other (very rare at our cadence, but safer).
+  // the per-topic-classified total. The Lainnya catch-all is excluded
+  // from BOTH the result set AND the denominator since 2026-06-04:
+  // including it visually drowned out signal-bearing topics + inflated
+  // the denominator so every real topic's pct looked smaller than its
+  // share-of-conversation actually was. Posts with NULL topic_id are
+  // also excluded (they're effectively uncategorized).
   const rows = (await db.execute(sql`
-    WITH total AS (
-      SELECT count(*)::int AS n FROM social_posts
-      WHERE created_at >= now() - interval '7 days'
-    )
+    WITH classified AS (
+      SELECT sp.id, sp.topic_id
+      FROM social_posts sp
+      JOIN topics t ON sp.topic_id = t.id
+      WHERE sp.created_at >= now() - interval '7 days'
+        AND t.label != 'Lainnya — Tidak Terklasifikasi'
+    ),
+    total AS (SELECT count(*)::int AS n FROM classified)
     SELECT
       t.id::text AS id,
       t.label,
       t.platform,
       t.keywords AS keywords,
-      count(sp.id)::int AS post_count,
+      count(c.id)::int AS post_count,
       (SELECT n FROM total) AS corpus_total
     FROM topics t
-    LEFT JOIN social_posts sp
-      ON sp.topic_id = t.id
-     AND sp.created_at >= now() - interval '7 days'
+    LEFT JOIN classified c ON c.topic_id = t.id
+    WHERE t.label != 'Lainnya — Tidak Terklasifikasi'
     GROUP BY t.id, t.label, t.platform, t.keywords
-    HAVING count(sp.id) > 0
+    HAVING count(c.id) > 0
     ORDER BY post_count DESC
     LIMIT ${limit}
   `)) as unknown as Array<{
@@ -2147,6 +2154,10 @@ export type TopicByPlatformGroup = {
 export async function getTopicsByPlatform7d(
   perPlatform = 5,
 ): Promise<TopicByPlatformGroup[]> {
+  // Lainnya catch-all excluded from both the result set AND the
+  // platform_total denominator (since 2026-06-04) so per-topic
+  // percentages represent share-of-classified-content, not share-of-
+  // all-content (which Lainnya would skew downward).
   const rows = (await db.execute(sql`
     SELECT platform, id, label, post_count, platform_total
     FROM (
@@ -2163,6 +2174,7 @@ export async function getTopicsByPlatform7d(
       JOIN social_posts sp
         ON sp.topic_id = t.id
        AND sp.posted_at >= now() - interval '7 days'
+      WHERE t.label != 'Lainnya — Tidak Terklasifikasi'
       GROUP BY sp.platform, t.id, t.label
     ) ranked
     WHERE rn <= ${perPlatform}
