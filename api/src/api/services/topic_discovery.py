@@ -1022,7 +1022,12 @@ def discover_topics(
     purity_per_theme: list[dict[str, Any]] = []
     low_purity: list[str] = []
     for t_idx, theme in enumerate(themes):
-        post_ids = theme_post_ids.get(t_idx, [])
+        # theme_post_ids is a list[list], not a dict — index by t_idx
+        # directly. Was .get(t_idx, []) prior to 2026-06-04 which
+        # crashed every recluster after the purity-audit code landed
+        # (commit 8910a28); recluster 2026-06-04 04:00 WIB failed
+        # this way, leaving topics stale at 06-03 04:00 WIB.
+        post_ids = theme_post_ids[t_idx]
         if not post_ids:
             continue
         keywords_lower = [kw.lower() for kw in theme.get("keywords", []) if kw]
