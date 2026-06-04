@@ -765,6 +765,8 @@
     "hub_card_explore_body": "No auto-briefing this week for this group — explore the topics and recent posts directly.",
     "hub_card_explore_cta": "Explore topics & posts",
     "hub_top_n_note": "Note: of 14 theme groups, full briefings are auto-published each week only for the top 5 by discussion volume (≥30 posts in 7 days). To explore the other groups, use the topic distribution on the Explore Data page.",
+    "category_chart_offtaxonomy_label": "{n} posts outside our da'wah focus.",
+    "category_chart_offtaxonomy_body": "Not every public-conversation post is relevant to our 14 da'wah theme groups — some are sports scores, weather forecasts, light entertainment, or niche topics that give a da'i no concrete handle to act on. We deliberately exclude those from the percentages above so the numbers reflect share-of-attention within the conversation that actually matters to da'wah, rather than being diluted by content that would never make it into a briefing.",
     "group_page_title": "{group} — Theme Group",
     "group_eyebrow": "Theme group",
     "group_page_intro": "This page collects {topics} active topics classified under the <strong>{group}</strong> theme group. No auto-briefing was published for this group this week — use the topics and posts below to explore.",

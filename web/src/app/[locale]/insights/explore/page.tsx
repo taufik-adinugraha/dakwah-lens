@@ -308,10 +308,16 @@ export default async function InsightsExplorePage({
                   );
                 })}
                 {lainnyaVolume > 0 && (
-                  <p className="mt-2 px-1.5 text-[10px] italic text-slate-400">
-                    + {lainnyaVolume.toLocaleString()} posts uncategorized
-                    (excluded from %)
-                  </p>
+                  <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50/60 px-3 py-2 text-[11px] leading-relaxed text-slate-500">
+                    <p>
+                      <span className="font-semibold text-slate-600">
+                        {t("category_chart_offtaxonomy_label", {
+                          n: lainnyaVolume.toLocaleString(),
+                        })}
+                      </span>{" "}
+                      {t("category_chart_offtaxonomy_body")}
+                    </p>
+                  </div>
                 )}
               </div>
             )}

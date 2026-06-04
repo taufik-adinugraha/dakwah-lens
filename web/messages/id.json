@@ -761,6 +761,8 @@
     "hub_card_explore_body": "Belum ada briefing pekan ini untuk kelompok ini — eksplor topik & postingan terkini langsung.",
     "hub_card_explore_cta": "Eksplor topik & postingan",
     "hub_top_n_note": "Catatan: dari 14 kelompok tema, briefing penuh otomatis diterbitkan setiap pekan hanya untuk 5 kelompok dengan volume diskusi tertinggi (≥30 postingan dalam 7 hari). Untuk eksplorasi kelompok lain, gunakan distribusi topik di halaman Data Mentah.",
+    "category_chart_offtaxonomy_label": "{n} postingan di luar fokus dakwah kami.",
+    "category_chart_offtaxonomy_body": "Tidak semua percakapan publik relevan ke 14 kelompok tema dakwah kami — sebagian berisi berita olahraga, prakiraan cuaca, hiburan ringan, atau topik niche yang tidak memberi handle dakwah konkret. Postingan ini sengaja kami keluarkan dari hitungan persentase di atas supaya angka yang Anda baca mencerminkan share-of-attention di dalam ruang yang memang menjadi fokus dakwah, bukan ditipiskan oleh konten yang tidak akan pernah masuk briefing.",
     "group_page_title": "{group} — Kelompok Tema",
     "group_eyebrow": "Kelompok tema",
     "group_page_intro": "Halaman ini mengumpulkan {topics} topik aktif yang terklasifikasi ke kelompok <strong>{group}</strong>. Belum ada briefing penuh otomatis pekan ini untuk kelompok ini — gunakan list topik + postingan di bawah untuk eksplorasi.",
