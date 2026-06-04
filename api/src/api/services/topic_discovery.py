@@ -111,277 +111,104 @@ MIN_POSTS_FOR_FALLBACK = 10
 EMBED_BATCH = 1000
 
 
-# Static themes: ALWAYS present in the final theme set, regardless of what
-# Gemini proposes this run. These are chronic da'wah-relevant concerns the
-# project has decided should never disappear between reclusters even when
-# the week's content drifts away from them.
+# Beats we ALWAYS want Gemini to look for, but never as rigid pre-set
+# labels. The 2026-06-04 audit found that injecting these as static
+# themes produced generic, editorially flat buckets ("Korupsi" with 94
+# posts) that competed with the concrete dynamic theme Gemini already
+# discovered ("Korupsi Program MBG & BGN" with 455 posts) — splitting
+# attention and burying the actual headline.
 #
-# Each row has the same shape as the dynamic themes Gemini returns:
-# `label`, `keywords`, `exclude_keywords`, `min_similarity`. The
-# embedding + cosine-floor assignment treats them identically — what
-# makes them "static" is just that they're guaranteed to be in the theme
-# set every run.
+# Replaced 2026-06-04: these are now PROMPT HINTS only. We list each
+# beat + its intent + an example of GOOD week-specific naming, then
+# trust Gemini to:
+#   - Surface the beat ONLY IF it's actually present this week
+#   - Name it CONCRETELY based on the specific story driving it,
+#     not the generic category
 #
-# Rationale for each (chosen 2026-05-30):
-#   · Korupsi — chronic Indonesia issue, high da'wah hook
-#   · Kekerasan Seksual & Perlindungan Anak — recurring + critical
-#   · Judi & Utang — Indonesia-specific scourge (Gemini
-#     dropped this in 2026-05-30 recluster; that's the kind of volatility
-#     this static set fixes)
-#   · Narkoba & Penyalahgunaan Obat — chronic public-health crisis
-#   · Konflik Palestina & Solidaritas Umat — ongoing global concern for ummah
-#   · Hijrah, Mualaf & Inspirasi Spiritual — captures personal-devotion +
-#     mualaf-story content that historically lands in unclassified
-#   · Fatwa & Hukum Islam Kontemporer — captures ulama/fatwa news that
-#     also historically lands in unclassified
-#
-# To add/remove: edit this list. The prompt explicitly tells Gemini the
-# static labels so it won't propose duplicates.
-STATIC_THEMES: list[dict[str, Any]] = [
-    {
-        # Renamed 2026-06-04 from "Korupsi & Pengkhianatan Amanah" — the
-        # shorter "Korupsi" reads cleaner in the briefing UI and matches
-        # how Indonesian readers refer to the issue. Keywords unchanged;
-        # the ghulul/amanah anchors keep the da'wah framing intact at
-        # retrieval time.
-        "label": "Korupsi",
-        "keywords": ["korupsi", "suap", "gratifikasi", "kpk", "ghulul", "amanah pejabat"],
-        "exclude_keywords": [],
-        "min_similarity": MIN_SIMILARITY,
-    },
-    {
-        "label": "Kekerasan Seksual & Perlindungan Anak",
-        "keywords": [
-            "pelecehan seksual",
-            "kekerasan anak",
-            "pesantren cabul",
-            "perlindungan anak",
-            "kdrt",
-        ],
-        "exclude_keywords": [],
-        "min_similarity": MIN_SIMILARITY,
-    },
-    {
-        # Renamed + merged 2026-06-04. Was "Judi Online & Pinjaman
-        # Online"; absorbed the dynamic "Pinjaman & Utang" theme Gemini
-        # was producing as a near-duplicate (cosine merge floor at 0.78
-        # didn't catch it because the labels share no surface tokens).
-        # Single bucket reflects how readers actually experience this —
-        # judol predation funds itself through pinjol/paylater debt
-        # cycles, so the moral frame is one continuous story.
-        "label": "Judi & Utang",
-        "keywords": [
-            "judol",
-            "judi online",
-            "slot online",
-            "pinjol",
-            "paylater",
-            "hutang",
-            "cicilan",
-            "debtfree",
-            "keuangan",
-        ],
-        "exclude_keywords": [
-            "wedding organizer",
-            "WO",
-            "saham",
-            "investasi",
-            "game developer",
-        ],
-        "min_similarity": MIN_SIMILARITY,
-    },
-    {
-        "label": "Narkoba & Penyalahgunaan Obat",
-        "keywords": ["narkoba", "sabu", "pil koplo", "bnn", "kecanduan obat"],
-        "exclude_keywords": [],
-        "min_similarity": MIN_SIMILARITY,
-    },
-    {
-        "label": "Konflik Palestina & Solidaritas Umat",
-        "keywords": [
-            "palestina",
-            "gaza",
-            "mustadh'afin",
-            "solidaritas",
-            "israel",
-            "al-quds",
-        ],
-        "exclude_keywords": ["skin care", "skincare", "putih instan", "Afghanistan"],
-        "min_similarity": MIN_SIMILARITY,
-    },
-    {
-        "label": "Hijrah, Mualaf & Inspirasi Spiritual",
-        "keywords": [
-            "hijrah",
-            "mualaf",
-            "taubat",
-            "kisah inspirasi",
-            "dakwah personal",
-            "perjalanan iman",
-        ],
-        "exclude_keywords": [],
-        "min_similarity": MIN_SIMILARITY,
-    },
-    {
-        "label": "Fatwa & Hukum Islam Kontemporer",
-        "keywords": [
-            "fatwa",
-            "hukum islam",
-            "ulama",
-            "mui",
-            "kontroversi keagamaan",
-            "ijtihad",
-        ],
-        "exclude_keywords": [],
-        "min_similarity": MIN_SIMILARITY,
-    },
-    # ── Added 2026-05-30 after audit of the 838 unclassified posts
-    #    showed ~40% had no matching theme. These 4 cover the most
-    #    common "missing theme" patterns from that audit.
-    {
-        "label": "Bisnis & Wirausaha",
-        "keywords": [
-            "wirausaha",
-            "umkm",
-            "entrepreneur",
-            "bisnis",
-            "modal usaha",
-            "kewirausahaan",
-        ],
-        "exclude_keywords": ["judol", "judi online", "pinjol"],
-        "min_similarity": MIN_SIMILARITY,
-    },
-    {
-        "label": "Pemerintahan & Otonomi Daerah",
-        "keywords": [
-            "pemerintahan",
-            "otonomi daerah",
-            "kebijakan publik",
-            "birokrasi",
-            "pelayanan publik",
-            "kepala daerah",
-        ],
-        "exclude_keywords": ["korupsi"],
-        "min_similarity": MIN_SIMILARITY,
-    },
-    {
-        "label": "Kesehatan Mental & Kesejahteraan Jiwa",
-        "keywords": [
-            "kesehatan mental",
-            "depresi",
-            "stres",
-            "burnout",
-            "kecemasan",
-            "bunuh diri",
-        ],
-        "exclude_keywords": [],
-        "min_similarity": MIN_SIMILARITY,
-    },
-    {
-        "label": "Polemik Aqidah & Sektarian",
-        "keywords": [
-            "aqidah",
-            "syiah",
-            "ahmadiyah",
-            "aliran sesat",
-            "sektarian",
-            "polemik teologi",
-        ],
-        "exclude_keywords": ["mualaf", "hijrah"],
-        "min_similarity": MIN_SIMILARITY,
-    },
-    # ── Added 2026-05-30 (round 2) after grouping infrastructure made
-    #    a wider static set safe to dashboard. These are the most-
-    #    frequent missing-theme patterns from the 20-post audit that
-    #    weren't covered by the round-1 additions.
-    {
-        "label": "Inspirasi & Kisah Hidup Pribadi",
-        "keywords": [
-            "kisah inspirasi",
-            "perjalanan hidup",
-            "pengalaman pribadi",
-            "renungan",
-            "motivasi",
-            "pelajaran hidup",
-        ],
-        "exclude_keywords": ["hijrah", "mualaf"],
-        "min_similarity": MIN_SIMILARITY,
-    },
-    {
-        "label": "Toleransi & Lintas-Iman",
-        "keywords": [
-            "toleransi",
-            "keberagaman",
-            "lintas iman",
-            "kerukunan umat",
-            "pluralisme",
-            "moderasi beragama",
-        ],
-        "exclude_keywords": [],
-        "min_similarity": MIN_SIMILARITY,
-    },
-    {
-        "label": "Crypto, Trading & Investasi Spekulatif",
-        "keywords": [
-            "crypto",
-            "kripto",
-            "trading saham",
-            "investasi saham",
-            "fintech",
-            "spekulasi finansial",
-        ],
-        "exclude_keywords": ["judol", "judi online", "pinjol"],
-        "min_similarity": MIN_SIMILARITY,
-    },
-    # ── Added 2026-05-30 (round 3) after a second audit of 443 posts
-    #    revealed two more missing-theme clusters (~12% each):
-    #    labor-rights content (Demo Indomaret, ART abuse, BPJS
-    #    Ketenagakerjaan) and food-security / agriculture content
-    #    (Bulog beras, pupuk sawit, DPRD pertanian).
-    {
-        "label": "Buruh, Pekerja & Hak Tenaga Kerja",
-        "keywords": [
-            "buruh",
-            "tenaga kerja",
-            "demo pegawai",
-            "pekerja rumah tangga",
-            "bpjs ketenagakerjaan",
-            "upah minimum",
-        ],
-        "exclude_keywords": [],
-        "min_similarity": MIN_SIMILARITY,
-    },
-    {
-        "label": "Ketahanan Pangan & Pertanian",
-        "keywords": [
-            "ketahanan pangan",
-            "pertanian",
-            "petani",
-            "stok beras",
-            "pupuk",
-            "produktivitas sawah",
-            "bulog",
-            "nelayan",
-        ],
-        "exclude_keywords": [],
-        "min_similarity": MIN_SIMILARITY,
-    },
-]
+# Old behavior: "Palestina" guaranteed every run, generic label.
+# New behavior: this week Gemini might call it "Bantuan WNI ke Gaza"
+# (concrete + this-week-specific); next week if nothing's happening
+# in Palestina, no Palestina topic at all and the slot goes to
+# whatever's actually driving the conversation.
+THEMES_TO_WATCH: tuple[tuple[str, str, str], ...] = (
+    # (beat, intent hint, example of a concrete week-specific label)
+    (
+        "Korupsi & penyalahgunaan amanah pejabat",
+        "Pejabat publik / institusi pemerintah; suap, gratifikasi, KPK, ghulul",
+        "Korupsi Dana Bansos di Kementerian X / Suap Hakim Y",
+    ),
+    (
+        "Kekerasan seksual & perlindungan anak",
+        "Pelecehan, KDRT, kekerasan terhadap anak — termasuk di pesantren, sekolah, rumah tangga",
+        "Pelecehan oleh Tokoh Agama di Pesantren / KS Anak di Sekolah",
+    ),
+    (
+        "Judi online & jeratan utang konsumtif",
+        "Judol, slot online, pinjol, paylater, hutang konsumtif rumah tangga",
+        "Operasi Judol Skala Besar / Pinjol Mencekik Buruh",
+    ),
+    (
+        "Narkoba & penyalahgunaan obat",
+        "Sabu, pil koplo, BNN, rehabilitasi, kecanduan obat",
+        "Tangkapan Sabu di Pelabuhan / Rehabilitasi Pesantren",
+    ),
+    (
+        "Konflik Palestina & solidaritas umat",
+        "Palestina, Gaza, mustadh'afin, hubungan Indonesia-Palestina",
+        "Bantuan WNI ke Gaza / Demo Palestina di Kota X",
+    ),
+    (
+        "Hijrah, mualaf & cerita iman personal",
+        "Cerita hijrah, mualaf, dakwah personal, perjalanan iman",
+        "Hijrah Selebritas X / Mualaf di Komunitas Y",
+    ),
+    (
+        "Fatwa & polemik hukum Islam kontemporer",
+        "Fatwa MUI / ulama, kontroversi keagamaan, ijtihad isu modern",
+        "Fatwa MUI soal Crypto / Polemik Vaksin Dosis Berikut",
+    ),
+    (
+        "Kekerasan dalam rumah tangga (KDRT)",
+        "KDRT, kekerasan domestik, kasus perceraian dengan kekerasan",
+        "Kasus KDRT Selebritas X / Sweeping KDRT di Kelurahan Y",
+    ),
+    (
+        "Polemik aqidah & sektarian",
+        "Aliran sesat, sektarian, polemik Syiah/Ahmadiyah, pelurusan aqidah",
+        "Polemik Aliran X / MUI Sesatkan Kelompok Y",
+    ),
+    (
+        "Toleransi & lintas-iman",
+        "Moderasi beragama, pluralisme, kerukunan umat",
+        "Konflik Rumah Ibadah di Kota X / Dialog Lintas Iman",
+    ),
+)
 
-# Render the static labels into the prompt so Gemini knows not to propose
-# duplicates. Kept in sync with STATIC_THEMES automatically.
-_STATIC_LABEL_LIST = "\n".join(f"  - {t['label']}" for t in STATIC_THEMES)
+# Render THEMES_TO_WATCH as a senior-editor-style hint block. Each
+# beat shows up as "Beat name → intent (e.g. concrete label)". Gemini
+# uses this to know what to LOOK FOR, but is explicitly told to name
+# the theme based on this week's actual story, NOT to reuse the
+# generic beat name.
+_THEMES_TO_WATCH_BLOCK = "\n".join(
+    f'  - {beat}\n      intent: {intent}\n      example concrete label: "{example}"'
+    for beat, intent, example in THEMES_TO_WATCH
+)
 
 
 SYSTEM_PROMPT = f"""You analyze recent Indonesian posts and group them into themes that describe what the conversation is actually about this week. Output is consumed by da'wah analysts, but YOUR job is to map the conversation faithfully — not to force every theme through a da'wah lens. Some themes will have an obvious da'wah angle (haji, korupsi, palestina); others (health, education, sport, lifestyle, finance) won't, and that's fine — surface them anyway so the analyst can decide which to act on.
 
 The posts you receive have already been pre-filtered for da'wah relevance — they DO have a hook. Your job is to find what the week's conversation is, not to re-classify whether each post is relevant.
 
-IMPORTANT — STATIC THEMES ARE ALREADY GUARANTEED, DO NOT DUPLICATE THEM:
-The downstream system automatically appends the following CHRONIC da'wah-concern themes to every run, even if you don't propose them. DO NOT include any of these in your output (they'd be duplicates and waste a slot):
-{_STATIC_LABEL_LIST}
+THEMES TO WATCH (chronic da'wah-concern beats — surface them ONLY IF a real story is happening, and NAME THEM CONCRETELY based on this week's news):
+{_THEMES_TO_WATCH_BLOCK}
 
-Your job: propose 12-16 DYNAMIC themes for what's distinctive about THIS WEEK's conversation — emerging stories, new patterns, week-specific events, broad domains (politics, education, health, lifestyle, sport) — that the static themes above don't already capture. The static themes are narrow chronic-concern slots; you should still cover the BREADTH of this week's pool with your dynamic themes. The downstream UI groups themes into ~10 thematic clusters (Hukum & Keadilan, Sosial & Keluarga, Ekonomi & Bisnis, Aqidah & Spiritualitas, Kesehatan & Kehidupan, Pendidikan, Lingkungan & Bencana, Pemerintahan, Patologi Sosial Digital, Konflik Global) so a higher theme count won't clutter the dashboard — readers see the groups first and can drill into fine themes when needed. Lean toward MORE themes when the pool spans many domains: undersizing pushes 20-30% of posts into an "uncategorized" bucket that's then useless for analysis. For each theme:
+How to use the THEMES TO WATCH block:
+- These are BEATS we always care about, not rigid labels to reuse verbatim. Think like a senior editor: you watch for these patterns, but you write the HEADLINE based on what's actually happening.
+- If a beat IS present this week, propose a theme with a CONCRETE label naming the specific story, not the generic beat name. Example: a corruption case at BGN → label "Korupsi MBG & BGN", NOT "Korupsi". A pilgrim transport accident → label "Kecelakaan Jamaah Haji di Mekkah", NOT "Ibadah Haji & Umrah".
+- If a beat is NOT present this week (or only marginally, < ~10 posts), DO NOT force a generic theme just to cover the beat. Let those posts land in Lainnya or in adjacent themes.
+- Never use the generic beat name as your label — that produces editorially flat clusters that compete with the real-story clusters for the same posts.
+
+Your job: propose 12-16 themes for what's distinctive about THIS WEEK's conversation — concrete week-specific stories (from the THEMES TO WATCH list when present + anything else emerging), plus broad-domain themes (politics, education, health, lifestyle, sport) to cover the breadth of the pool. The downstream UI groups themes into 14 coarse THEME_GROUPS (Hukum & Keadilan, Sosial & Keluarga, Ekonomi & Bisnis, Aqidah & Ibadah, Kesehatan & Kehidupan, Pendidikan & SDM, Lingkungan & Bencana, Pemerintahan & Kebijakan, Patologi Sosial Digital, Teknologi & AI, Pekerja & Pertanian Rakyat, Konflik & Geopolitik, Inspirasi & Kisah Pribadi, Toleransi & Lintas-Iman) so a higher theme count won't clutter the dashboard — readers see the groups first and can drill into fine themes when needed. Lean toward MORE themes when the pool spans many domains: undersizing pushes 20-30% of posts into an "uncategorized" bucket that's then useless for analysis. For each theme:
 - label: short human-readable name in Bahasa Indonesia (3-6 words). Be CONCRETE about what the theme is — name the actual subject matter, not a generic newsroom department.
 
   GOOD labels — concrete, name what the cluster is actually about:
@@ -691,30 +518,16 @@ def discover_topics(
             }
         )
 
-    # Merge static themes. Drop any dynamic theme whose label collides
-    # with a static theme (Gemini occasionally proposes one despite the
-    # prompt directive — static wins because its keywords are curated
-    # and stable across runs). Static themes are deep-copied so the
-    # downstream embedding+assignment doesn't mutate the global constant.
-    static_labels_lower = {t["label"].strip().lower() for t in STATIC_THEMES}
-    themes = [t for t in themes if t["label"].strip().lower() not in static_labels_lower]
-    themes.extend(
-        {
-            "label": t["label"],
-            "keywords": list(t["keywords"]),
-            "exclude_keywords": list(t.get("exclude_keywords") or []),
-            "min_similarity": float(t.get("min_similarity") or MIN_SIMILARITY),
-        }
-        for t in STATIC_THEMES
-    )
-
+    # Static-theme merge removed 2026-06-04. Every theme is now
+    # dynamic — Gemini decides what's present this week using the
+    # THEMES TO WATCH hint block in the system prompt for editorial
+    # guidance. No post-emit injection.
     if not themes:
         log.warning("topic_discovery.no_themes_named", platform=platform)
         return []
     log.info(
         "topic_discovery.themes_assembled",
-        dynamic_count=len(themes) - len(STATIC_THEMES),
-        static_count=len(STATIC_THEMES),
+        dynamic_count=len(themes),
         total=len(themes),
     )
 
@@ -785,79 +598,13 @@ def discover_topics(
             themes=elastic_augmented,
         )
 
-    # String-overlap dedup pass — runs BEFORE the cosine merge so the
-    # high-confidence dynamic-vs-static duplicates get caught even when
-    # their label embeddings don't quite cross the 0.78 cosine threshold.
-    #
-    # Real example (2026-06-02 manual recluster): Gemini proposed dynamic
-    # "Pelecehan & Kekerasan Seksual" while the static set already had
-    # "Kekerasan Seksual & Perlindungan Anak". Embedding cosine sat
-    # ~0.80 — just under the merge threshold — so both survived, splitting
-    # 442 posts across two near-identical clusters. String-overlap is
-    # deterministic, no false positives on conceptually-distinct themes.
-    _STRING_DEDUP_STOPWORDS = {
-        "dan", "atau", "di", "ke", "dalam", "yang", "kepada", "untuk",
-        "oleh", "pada", "para", "umum", "lainnya", "terhadap", "antara",
-        "isu", "polemik", "konflik",
-    }
-
-    def _label_tokens(label: str) -> set[str]:
-        """Tokenize for overlap-match: lowercase, alphanumeric runs only,
-        drop stopwords + short tokens. Single source of truth for
-        what counts as a 'distinctive' token in the dedup pass."""
-        import re
-
-        return {
-            tok
-            for tok in re.findall(r"[a-z]+", label.lower())
-            if len(tok) >= 4 and tok not in _STRING_DEDUP_STOPWORDS
-        }
-
-    static_offset_pre_merge = len(themes) - len(STATIC_THEMES)
-    static_token_sets = [
-        _label_tokens(themes[i]["label"])
-        for i in range(static_offset_pre_merge, len(themes))
-    ]
-    string_dedup_dropped: list[tuple[str, str]] = []
-    survived_dynamic: list[dict[str, Any]] = []
-    for i in range(static_offset_pre_merge):
-        dyn = themes[i]
-        dyn_tokens = _label_tokens(dyn["label"])
-        merge_into: int | None = None
-        for j, static_tokens in enumerate(static_token_sets):
-            overlap = dyn_tokens & static_tokens
-            if len(overlap) >= 2:
-                merge_into = static_offset_pre_merge + j
-                break
-        if merge_into is None:
-            survived_dynamic.append(dyn)
-            continue
-        # Drop the dynamic; union its keyword + exclude lists into the
-        # static so the merged keyword pool drives the embedding-based
-        # post-assignment downstream.
-        kept = themes[merge_into]
-        kept_kw = {k.lower() for k in kept["keywords"]}
-        for kw in dyn["keywords"]:
-            if kw.lower() not in kept_kw:
-                kept["keywords"].append(kw)
-                kept_kw.add(kw.lower())
-        kept_ex = set(kept.get("exclude_keywords") or [])
-        for ex in dyn.get("exclude_keywords") or []:
-            if ex not in kept_ex:
-                kept.setdefault("exclude_keywords", []).append(ex)
-                kept_ex.add(ex)
-        string_dedup_dropped.append((kept["label"], dyn["label"]))
-
-    if string_dedup_dropped:
-        themes = survived_dynamic + themes[static_offset_pre_merge:]
-        log.info(
-            "topic_discovery.string_dedup_dropped",
-            count=len(string_dedup_dropped),
-            pairs=[
-                {"kept_static": k, "dropped_dynamic": d}
-                for k, d in string_dedup_dropped
-            ],
-        )
+    # String-overlap dedup pass removed 2026-06-04 along with the
+    # static themes — it was specifically a dynamic-vs-static safety
+    # net (catching e.g. dynamic "Pelecehan & Kekerasan Seksual" that
+    # cosine-merge missed against static "Kekerasan Seksual &
+    # Perlindungan Anak"). Now every theme is dynamic, so the post-
+    # emit cosine merge at 0.78 below handles all near-duplicate
+    # collapsing on its own.
 
     # Embed themes + posts, then assign each post to its nearest theme.
     # Theme text = label + keywords so both the human-facing name and the
@@ -875,30 +622,18 @@ def discover_topics(
         return []
 
     # Post-emit near-duplicate merge. The system prompt asks Gemini for
-    # DISTINCT themes (line ~392), but the model occasionally outputs
-    # near-duplicates that differ only in framing or setting (e.g. a
-    # 2026-05-31 audit found three rows for sexual-violence variants:
-    # by victim class, by setting, by act-vs-protection angle). We fold
-    # them here using pairwise cosine on theme vectors — same embedding
-    # space used downstream for post-assignment, so the threshold is
-    # interpretable.
+    # DISTINCT themes, but the model occasionally outputs near-duplicates
+    # that differ only in framing or setting (e.g. a 2026-05-31 audit
+    # found three rows for sexual-violence variants: by victim class,
+    # by setting, by act-vs-protection angle). We fold them here using
+    # pairwise cosine on theme vectors — same embedding space used
+    # downstream for post-assignment, so the threshold is interpretable.
     #
-    # Threshold 0.78: lowered from 0.85 (2026-06-02) after the manual
-    # recluster produced "Pelecehan & Kekerasan Seksual" alongside the
-    # static "Kekerasan Seksual & Perlindungan Anak" — cosine ~0.80,
-    # just below the old 0.85 floor. 0.78 catches that pair while the
-    # string-overlap dedup above handles the high-confidence cases
-    # deterministically; together the two layers cover both the
-    # label-embedding-similar and the label-token-similar duplicates.
-    #
-    # Static themes are NEVER merged away — they're the curated stable
-    # set. Dynamic-vs-static near-duplicate: drop the dynamic, keep
-    # the static. Dynamic-vs-dynamic: keep the shorter label (proxy
-    # for "more canonical"), union the keyword lists.
-    n_static = len(STATIC_THEMES)
-    static_offset = len(themes) - n_static  # static themes are at the tail
+    # Threshold 0.78: lowered from 0.85 on 2026-06-02. With all-
+    # dynamic themes (post 2026-06-04 STATIC_THEMES removal) we keep
+    # the SHORTER label (proxy for "more canonical") and union the
+    # keyword + exclude lists into it.
     merge_threshold = 0.78
-    # Pairwise similarity matrix (n_themes, n_themes).
     theme_sims = theme_vecs @ theme_vecs.T
     drop_idx: set[int] = set()
     merge_log: list[tuple[str, str, float]] = []
@@ -912,23 +647,9 @@ def discover_topics(
             sim = float(theme_sims[i, j])
             if sim < merge_threshold:
                 continue
-            i_is_static = i >= static_offset
-            j_is_static = j >= static_offset
-            if i_is_static and j_is_static:
-                # Two static themes near-dup — curated set, log only.
-                log.warning(
-                    "topic_discovery.static_static_collision",
-                    a=themes[i]["label"],
-                    b=themes[j]["label"],
-                    similarity=round(sim, 3),
-                )
-                continue
-            # Pick keep + drop. Static always wins. Otherwise keep the
-            # shorter label (proxy for "more canonical").
-            if j_is_static or (
-                not i_is_static
-                and len(themes[i]["label"]) > len(themes[j]["label"])
-            ):
+            # Keep the shorter label (more canonical proxy); union the
+            # other's keywords + excludes into it.
+            if len(themes[i]["label"]) > len(themes[j]["label"]):
                 keep, drop = j, i
             else:
                 keep, drop = i, j
