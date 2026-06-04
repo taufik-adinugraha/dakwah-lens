@@ -130,16 +130,33 @@ export default async function GroupLandingPage({
   // 3. Recompute per-topic 7-day counts (the topics.post_count column
   //    is cross-platform lifetime). Cheaper than per-topic queries:
   //    one aggregate over the same id-set.
+  //
+  //    NB on the SQL: Drizzle interpolates a JS array as a comma-
+  //    separated parameter sequence — `($1, $2, $3)` — which is a
+  //    TUPLE, not an array. `ANY ((..)::uuid[])` then fails because
+  //    you can't cast a tuple to uuid[]. We instead use drizzle's
+  //    `inArray` predicate inside a normal `db.select` query, which
+  //    emits `topic_id IN ($1, $2, ...)` correctly.
   type CountRow = { topicId: string; posts: number };
   let topicCounts: CountRow[] = [];
   if (groupTopicIds.length > 0) {
-    topicCounts = (await db.execute(sql`
-      SELECT topic_id::text AS "topicId", COUNT(*)::int AS posts
-      FROM social_posts
-      WHERE topic_id = ANY (${groupTopicIds}::uuid[])
-        AND posted_at >= now() - interval '7 days'
-      GROUP BY topic_id
-    `)) as unknown as CountRow[];
+    const rows = await db
+      .select({
+        topicId: schema.socialPosts.topicId,
+        posts: sql<number>`COUNT(*)::int`,
+      })
+      .from(schema.socialPosts)
+      .where(
+        and(
+          inArray(schema.socialPosts.topicId, groupTopicIds),
+          sql`posted_at >= now() - interval '7 days'`,
+        ),
+      )
+      .groupBy(schema.socialPosts.topicId);
+    topicCounts = rows.map((r) => ({
+      topicId: String(r.topicId),
+      posts: Number(r.posts),
+    }));
   }
   const countByTopicId = new Map(
     (Array.isArray(topicCounts) ? topicCounts : []).map((r) => [
