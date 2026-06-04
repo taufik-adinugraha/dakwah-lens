@@ -1842,7 +1842,17 @@ export const THEME_GROUPS: ReadonlyArray<{ group: string; patterns: RegExp[] }> 
   },
   {
     group: "Patologi Sosial Digital",
-    patterns: [/judi online/i, /pinjol/i, /pinjaman online/i, /narkoba/i, /penyalahgunaan obat/i],
+    patterns: [
+      /judi online/i,
+      /\bjudi\b/i,
+      /\bjudol\b/i,
+      /pinjol/i,
+      /pinjaman online/i,
+      /\butang\b/i,
+      /\bhutang\b/i,
+      /narkoba/i,
+      /penyalahgunaan obat/i,
+    ],
   },
   {
     group: "Teknologi & AI",

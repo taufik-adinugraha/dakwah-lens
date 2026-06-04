@@ -123,9 +123,9 @@ EMBED_BATCH = 1000
 # set every run.
 #
 # Rationale for each (chosen 2026-05-30):
-#   · Korupsi & Pengkhianatan Amanah — chronic Indonesia issue, high da'wah hook
+#   · Korupsi — chronic Indonesia issue, high da'wah hook
 #   · Kekerasan Seksual & Perlindungan Anak — recurring + critical
-#   · Judi Online & Pinjaman Online — Indonesia-specific scourge (Gemini
+#   · Judi & Utang — Indonesia-specific scourge (Gemini
 #     dropped this in 2026-05-30 recluster; that's the kind of volatility
 #     this static set fixes)
 #   · Narkoba & Penyalahgunaan Obat — chronic public-health crisis
@@ -139,7 +139,12 @@ EMBED_BATCH = 1000
 # static labels so it won't propose duplicates.
 STATIC_THEMES: list[dict[str, Any]] = [
     {
-        "label": "Korupsi & Pengkhianatan Amanah",
+        # Renamed 2026-06-04 from "Korupsi & Pengkhianatan Amanah" — the
+        # shorter "Korupsi" reads cleaner in the briefing UI and matches
+        # how Indonesian readers refer to the issue. Keywords unchanged;
+        # the ghulul/amanah anchors keep the da'wah framing intact at
+        # retrieval time.
+        "label": "Korupsi",
         "keywords": ["korupsi", "suap", "gratifikasi", "kpk", "ghulul", "amanah pejabat"],
         "exclude_keywords": [],
         "min_similarity": MIN_SIMILARITY,
@@ -157,8 +162,25 @@ STATIC_THEMES: list[dict[str, Any]] = [
         "min_similarity": MIN_SIMILARITY,
     },
     {
-        "label": "Judi Online & Pinjaman Online",
-        "keywords": ["judol", "judi online", "pinjol", "slot online", "paylater"],
+        # Renamed + merged 2026-06-04. Was "Judi Online & Pinjaman
+        # Online"; absorbed the dynamic "Pinjaman & Utang" theme Gemini
+        # was producing as a near-duplicate (cosine merge floor at 0.78
+        # didn't catch it because the labels share no surface tokens).
+        # Single bucket reflects how readers actually experience this —
+        # judol predation funds itself through pinjol/paylater debt
+        # cycles, so the moral frame is one continuous story.
+        "label": "Judi & Utang",
+        "keywords": [
+            "judol",
+            "judi online",
+            "slot online",
+            "pinjol",
+            "paylater",
+            "hutang",
+            "cicilan",
+            "debtfree",
+            "keuangan",
+        ],
         "exclude_keywords": [
             "wedding organizer",
             "WO",

@@ -117,8 +117,12 @@ THEME_GROUPS: tuple[ThemeGroup, ...] = (
         "Patologi Sosial Digital",
         _patterns(
             r"judi online",
+            r"\bjudi\b",
+            r"\bjudol\b",
             r"pinjol",
             r"pinjaman online",
+            r"\butang\b",
+            r"\bhutang\b",
             r"narkoba",
             r"penyalahgunaan obat",
         ),
