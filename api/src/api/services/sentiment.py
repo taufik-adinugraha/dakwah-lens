@@ -184,7 +184,23 @@ KEY ROUTING RULES (these are the bugs surface-regex got wrong):
 - National-day commemorations and state ideology (e.g. "Peringatan Hari Lahir Pancasila") → "Pemerintahan & Kebijakan".
 - Mysterious-fire / mass-fire / disaster fenomena (e.g. "Fenomena Api Misterius di Sleman") → "Lingkungan & Bencana".
 - Local crime + corruption → "Hukum & Keadilan". State policy / officials → "Pemerintahan & Kebijakan".
-- Only use "Lainnya" when the post genuinely fits no group above (sports scores, weather, foreign-religion festivals, etc.).
+- Diplomatic visits, foreign trips, summits, bilateral meetings between governments → "Pemerintahan & Kebijakan".
+- University news (rektor, SPMB, akreditasi, pelatihan vokasi, beasiswa, pesantren operations, sekolah rakyat) → "Pendidikan & SDM".
+- Stock prices, IHSG, forex, commodity prices, harga emas, corporate financial moves, dividen, investasi → "Ekonomi & Bisnis".
+- Quran recitation, surah/ayat explanations, ceramah, khutbah, tausiyah videos → "Aqidah & Ibadah" (route by FORMAT, not by the surah's subject — a recitation of Al-Zalzalah is Aqidah & Ibadah even though "zalzalah" means earthquake).
+- DPR/parliament/political party events, ministerial statements, RDP, Munas, fraksi politics → "Pemerintahan & Kebijakan".
+- Earthquakes, floods, landslides, weather emergencies, accidents involving natural forces → "Lingkungan & Bencana".
+- Crime, arrests, police operations, consumer fraud (WO scams, pinjol scams, online crime) → "Hukum & Keadilan".
+- Da'wah ceramah, pengajian, tausiyah, Islamic talks by ustadz/kyai/buya → "Aqidah & Ibadah" (not Inspirasi & Kisah Pribadi — Inspirasi is for personal first-person reflections without religious-teaching framing).
+
+- "Lainnya" is the LAST RESORT. Use it ONLY for posts that are genuinely off-taxonomy:
+    sports scores, weather forecasts, product/commerce promos, entertainment/celebrity gossip
+    that isn't about a family/marriage issue, anime/manhwa/gaming clips, generic music videos,
+    food/recipe posts, generic ASMR/lifestyle, horror-fiction narratives.
+  If the post mentions ANY concrete real-world entity (named politician, ministry, university,
+  company, court case, named city's disaster, weapon, Islamic preacher), you MUST pick the
+  matching theme group — DO NOT default to "Lainnya". When uncertain between "Lainnya" and a
+  specific group, ALWAYS pick the specific group.
 
 Return field `theme_group` as a STRING, exact match to one of the names above.
 
