@@ -7,7 +7,7 @@ import { auth } from "@/auth";
 import { db, schema } from "@/db";
 import { logAdminAction } from "@/lib/admin-log";
 import { extractMahasiswaContent } from "@/lib/flyer/content";
-import { getBriefingBySlug } from "@/lib/insights-data";
+import { getBriefingBySlug } from "@/lib/briefing-data";
 import { notifySubscribers } from "@/lib/notify-subscribers";
 
 const ADMIN_DISPLAY_NAME = "Dakwah-Lens · Admin";

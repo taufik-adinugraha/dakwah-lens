@@ -84,7 +84,7 @@ export default async function DashboardPage({
   const tBriefs = await getTranslations("Briefs");
   const tKajian = await getTranslations("Kajian");
   // Pulled from the Insights namespace so the segment names in the
-  // Kit tab strip match /insights/segment/[focus] verbatim.
+  // Kit tab strip match /briefings/segment/[focus] verbatim.
   const tInsights = await getTranslations("Insights");
 
   // Indonesian context: addressing someone by their bare first name is too
@@ -661,7 +661,7 @@ function DataPulseHero({
         label={t("stat_trending_label")}
         value={trendingCount.toString()}
         hint={t("stat_trending_hint")}
-        href="/insights/explore#trending"
+        href="/radar#trending"
         openInNewTab
       />
     </section>
@@ -720,7 +720,7 @@ function MiniStat({
   value: string;
   hint: string;
   /** When provided, the tile becomes a clickable Link routing into the
-   *  detail surface (e.g. /insights for the trending count tile). */
+   *  detail surface (e.g. /briefings for the trending count tile). */
   href?: string;
   /** Open in a new tab so the dashboard stays as the user's home base. */
   openInNewTab?: boolean;
@@ -835,8 +835,8 @@ function DailyInsights({
         deltaSign: deltaPp > 0 ? "+" : deltaPp < 0 ? "−" : "",
         deltaAbs: Math.abs(deltaPp),
       }),
-      // Drill into the full sentiment view on /insights/explore.
-      href: "/insights/explore#sentiment",
+      // Drill into the full sentiment view on /radar.
+      href: "/radar#sentiment",
     });
   }
 
@@ -851,7 +851,7 @@ function DailyInsights({
         volume: insights.emerging.volume,
       }),
       // Open the trending topics list — the emerging topic is in there.
-      href: "/insights/explore#trending",
+      href: "/radar#trending",
     });
   }
 
@@ -866,7 +866,7 @@ function DailyInsights({
         share: insights.topPlatform.share,
       }),
       // Direct link to that platform's drilldown.
-      href: `/insights/${insights.topPlatform.platform}`,
+      href: `/briefings/${insights.topPlatform.platform}`,
     });
   }
 
@@ -875,7 +875,7 @@ function DailyInsights({
     // The 9 PRD da'wah categories were retired as the navigation
     // taxonomy on 2026-06-03 (replaced by the 14 THEME_GROUPS). The
     // daleel-opportunity insight card now always lands the user on
-    // /insights — pickin a specific group from the 9-category
+    // /briefings — pickin a specific group from the 9-category
     // signal would be a noisy heuristic at best.
     cards.push({
       key: "daleel",
@@ -886,7 +886,7 @@ function DailyInsights({
         category: insights.daleelOpportunity.category,
         count: insights.daleelOpportunity.nPosts,
       }),
-      href: "/insights",
+      href: "/briefings",
     });
   }
 
@@ -1296,7 +1296,7 @@ function PendingDashboard({ name, t }: { name: string; t: T }) {
       </p>
       <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
         <Link
-          href="/insights"
+          href="/briefings"
           className="inline-flex h-11 items-center gap-2 rounded-full bg-slate-900 px-5 text-sm font-semibold text-white shadow transition hover:bg-slate-800"
         >
           <Globe2 className="h-4 w-4" />

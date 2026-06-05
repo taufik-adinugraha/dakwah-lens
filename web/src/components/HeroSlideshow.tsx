@@ -324,7 +324,7 @@ function IssueRow({
 /* ────────────────────────────────────────────────────────────
  * Slide 2 — Trends Explorer
  * Two-column: trending table on the left, sentiment + category
- * volume panel on the right (mirrors /insights split).
+ * volume panel on the right (mirrors /briefings split).
  * ──────────────────────────────────────────────────────────── */
 
 function TrendsSlide({ t }: { t: T }) {

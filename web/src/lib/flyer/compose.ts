@@ -1,7 +1,7 @@
 import QRCode from "qrcode";
 
 import type { DaleelRef } from "@/db/schema";
-import { briefingSlug } from "@/lib/insights-data";
+import { briefingSlug } from "@/lib/briefing-data";
 
 /** Hostname used inside the poster's article link + QR. Production
  *  domain by default; can be overridden by `PUBLIC_SITE_URL` for

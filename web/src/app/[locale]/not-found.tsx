@@ -41,7 +41,7 @@ export default async function NotFound() {
 
         <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
           <Link
-            href="/insights"
+            href="/briefings"
             className="inline-flex h-11 items-center gap-2 rounded-full bg-slate-900 px-5 text-sm font-semibold text-white shadow transition hover:bg-slate-800"
           >
             <Compass className="h-4 w-4" />

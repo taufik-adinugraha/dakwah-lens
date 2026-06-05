@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ArrowLeft, MessageSquareQuote, Sparkles } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
-import { getBriefingBySlug } from "@/lib/insights-data";
+import { getBriefingBySlug } from "@/lib/briefing-data";
 import { localeAwareFormat } from "@/lib/date-id";
 import { extractMahasiswaContent } from "@/lib/flyer/content";
 import { ShareButton } from "../../d/[brief]/[deliverable]/ShareButton";
@@ -71,7 +71,7 @@ export default async function MahasiswaArticlePage({ params }: Props) {
   // Segment-driven palette — each briefing's article inherits the
   // visual identity its poster already carried, so a scanner sees
   // continuity between the printed sheet and the screen.
-  const palette = palettes[brief.segment ?? "all"];
+  const palette = palettes[brief.themeGroup ?? "all"];
   const dateLabel = localeAwareFormat(brief.generatedAt, locale, {
     weekday: "long",
     year: "numeric",
@@ -79,8 +79,8 @@ export default async function MahasiswaArticlePage({ params }: Props) {
     day: "numeric",
     timeZone: "Asia/Jakarta",
   });
-  const segmentLabel = brief.segment
-    ? t(`segment_${brief.segment}_title` as Parameters<typeof t>[0])
+  const segmentLabel = brief.themeGroup
+    ? t(`segment_${brief.themeGroup}_title` as Parameters<typeof t>[0])
     : t("brief_scope_all");
 
   return (
@@ -185,7 +185,7 @@ export default async function MahasiswaArticlePage({ params }: Props) {
             jawab keagamaan tetap pada penyusun konten dakwah.
           </p>
           <Link
-            href="/insights"
+            href="/briefings"
             className="mt-6 inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition"
             style={{
               background: palette.accentDeep,
@@ -201,7 +201,7 @@ export default async function MahasiswaArticlePage({ params }: Props) {
   );
 }
 
-// Segment → palette mapping. Keys mirror the briefing.segment column
+// Segment → palette mapping. Keys mirror the briefing.themeGroup column
 // (null → "all"). Values mirror the poster palette families so a
 // scanner sees visual continuity.
 const palettes: Record<

@@ -30,7 +30,7 @@ from datetime import UTC, datetime, timedelta
 from sqlalchemy import select, update
 
 from api.db import SessionLocal
-from api.models.admin import InsightsSummary
+from api.models.admin import Briefing
 
 _MAHASISWA_HEADINGS = (
     "### Mahasiswa: Poster, Artikel & Diskusi",
@@ -88,9 +88,9 @@ async def main(apply: bool, days: int) -> None:
     async with SessionLocal() as session:
         rows = (
             await session.execute(
-                select(InsightsSummary)
-                .where(InsightsSummary.generated_at >= cutoff)
-                .order_by(InsightsSummary.generated_at.desc())
+                select(Briefing)
+                .where(Briefing.generated_at >= cutoff)
+                .order_by(Briefing.generated_at.desc())
             )
         ).scalars().all()
 
@@ -116,8 +116,8 @@ async def main(apply: bool, days: int) -> None:
 
             if apply:
                 await session.execute(
-                    update(InsightsSummary)
-                    .where(InsightsSummary.id == r.id)
+                    update(Briefing)
+                    .where(Briefing.id == r.id)
                     .values(summary_md=new_md)
                 )
 

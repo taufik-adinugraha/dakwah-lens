@@ -28,7 +28,7 @@ export const revalidate = 60;
 const PAGE_SIZE = 6;
 
 /**
- * Subset of /api/insights-brief/{slug}/flyer variants we surface in
+ * Subset of /api/briefings/{slug}/flyer variants we surface in
  * the public gallery. Skips `poster` (Mahasiswa-only, A4 portrait —
  * doesn't fit the 1080×1080 share-tile model) and `genz-a`/`genz-b`
  * since they're already covered by the segment-specific briefings.
@@ -176,7 +176,7 @@ export default async function PublicFlyersPage({
       // these undefined (they have no fixed type/segment).
       typeLabel: VARIANT_LABEL[v],
       topicLabel: segLabel,
-      pngUrl: `/api/insights-brief/${slug}/flyer?variant=${v}&lang=${langParam}`,
+      pngUrl: `/api/briefings/${slug}/flyer?variant=${v}&lang=${langParam}`,
     }));
   });
 

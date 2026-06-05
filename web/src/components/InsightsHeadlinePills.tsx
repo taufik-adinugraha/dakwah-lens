@@ -1,18 +1,18 @@
-import type { LatestInsightsSummary } from "@/lib/insights-data";
+import type { LatestBriefing } from "@/lib/briefing-data";
 
 /**
  * Pill row that lives beneath the AI-narrated executive briefing.
  *
  * Used on both:
- *   - /insights — the overall-view hero
- *   - /insights/segment/[focus] — the per-segment hero
+ *   - /briefings — the overall-view hero
+ *   - /briefings/segment/[focus] — the per-segment hero
  *
  * Shared between the two because the underlying `headline_stats`
  * JSONB shape is the same; only the source row differs (segment NULL
  * vs segment = focus). Keeps the visual consistent and avoids the
  * code-drift that comes from duplicating the JSX in two places.
  */
-type HeadlineStats = LatestInsightsSummary["headlineStats"];
+type HeadlineStats = LatestBriefing["headlineStats"];
 
 type Locale = string;
 

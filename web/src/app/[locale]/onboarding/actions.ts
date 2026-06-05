@@ -172,8 +172,8 @@ export async function saveProfileAction(formData: FormData): Promise<void> {
     })
     .where(eq(schema.users.id, session.user.id));
 
-  // Where to land them next: pending users go to /insights to browse while
+  // Where to land them next: pending users go to /briefings to browse while
   // they wait for approval; approved users go to /dashboard.
-  const dest = session.user.status === "approved" ? "/dashboard" : "/insights";
+  const dest = session.user.status === "approved" ? "/dashboard" : "/briefings";
   redirect(dest);
 }

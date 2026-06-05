@@ -9,7 +9,7 @@ import { appUrl, renderEmail, sendEmail } from "@/lib/email";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { moderateComment, MODERATION_LIMITS } from "@/lib/comment-moderation";
 import { verifyCommentToken } from "@/lib/comment-token";
-import { getBriefingBySlug } from "@/lib/insights-data";
+import { getBriefingBySlug } from "@/lib/briefing-data";
 import { getNextAuthSecret } from "@/lib/secrets";
 import {
   hashVisitorToken,

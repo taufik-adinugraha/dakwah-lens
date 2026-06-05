@@ -6,7 +6,7 @@ import { ChevronRight } from "lucide-react";
 import { TopicDetailModal, type TopicDetail } from "./TopicDetailModal";
 
 /**
- * Trending-topics rows on /insights — each row is a clickable button
+ * Trending-topics rows on /briefings — each row is a clickable button
  * that opens the same TopicDetailModal used by the dashboard.
  *
  * Visual: background bar width = post_count / max(post_count). The bar
@@ -58,6 +58,9 @@ export function TrendingTopicsList({
               />
               <div className="relative min-w-0">
                 <p className="truncate text-sm font-medium text-slate-800">
+                  <span className="mr-1.5 tabular-nums text-slate-400">
+                    {i + 1}.
+                  </span>
                   {t.title}
                 </p>
                 <p className="truncate text-xs text-slate-500">

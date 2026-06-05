@@ -30,7 +30,7 @@ import structlog
 from sqlalchemy import select, update
 
 from api.db import SessionLocal
-from api.models.admin import InsightsSummary
+from api.models.admin import Briefing
 from api.services.hadith_translation import translate_hadith_to_id
 
 log = structlog.get_logger(__name__)
@@ -76,13 +76,13 @@ async def backfill(
     dry_run: bool,
 ) -> None:
     async with SessionLocal() as session:
-        stmt = select(InsightsSummary).order_by(
-            InsightsSummary.generated_at.desc()
+        stmt = select(Briefing).order_by(
+            Briefing.generated_at.desc()
         )
         if segment_filter == "all":
-            stmt = stmt.where(InsightsSummary.segment.is_(None))
+            stmt = stmt.where(Briefing.theme_group.is_(None))
         elif segment_filter:
-            stmt = stmt.where(InsightsSummary.segment == segment_filter)
+            stmt = stmt.where(Briefing.theme_group == segment_filter)
 
         result = await session.execute(stmt)
         rows = result.scalars().all()
@@ -113,8 +113,8 @@ async def backfill(
             if dry_run:
                 continue
             await session.execute(
-                update(InsightsSummary)
-                .where(InsightsSummary.id == row.id)
+                update(Briefing)
+                .where(Briefing.id == row.id)
                 .values(daleel_refs=new_daleel, adhkar_refs=new_adhkar)
             )
             await session.commit()

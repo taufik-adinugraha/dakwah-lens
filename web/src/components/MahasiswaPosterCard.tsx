@@ -46,8 +46,8 @@ export function MahasiswaPosterCard({
   };
 }) {
   const lang = locale === "en" ? "en" : "id";
-  const posterUrl = `/api/insights-brief/${briefId}/flyer?variant=poster&lang=${lang}`;
-  const posterPdfUrl = `/api/insights-brief/${briefId}/flyer?variant=poster&lang=${lang}&format=pdf`;
+  const posterUrl = `/api/briefings/${briefId}/flyer?variant=poster&lang=${lang}`;
+  const posterPdfUrl = `/api/briefings/${briefId}/flyer?variant=poster&lang=${lang}&format=pdf`;
   const downloadName = `dakwah-lens_${briefId}_poster-mahasiswa.png`;
   const downloadPdfName = `dakwah-lens_${briefId}_poster-mahasiswa.pdf`;
 

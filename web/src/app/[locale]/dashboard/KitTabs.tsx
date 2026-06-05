@@ -17,7 +17,7 @@ import type { KitSegmentData } from "@/lib/dashboard-metrics";
  * auto-pipeline (up to 5 of the 14 THEME_GROUPS, picked by 7d post
  * volume). Tab labels mirror the group label verbatim ("Hukum &
  * Keadilan", "Aqidah & Ibadah") so the dashboard taxonomy matches
- * the /insights surface. Switches drive the inner content; URL is
+ * the /briefings surface. Switches drive the inner content; URL is
  * not touched (no router.push) so a user can compare groups without
  * losing their place.
  *
@@ -247,7 +247,7 @@ function SelectControl({
 
 /**
  * Strategi rendering — REUSES the exact same components the
- * `/insights/brief/[id]` page renders:
+ * `/briefings/[id]` page renders:
  *   - `<BriefDeliverableCards>` for the 6 kit cards (Khutbah / Kajian /
  *     Home / Content / Genz / Action) with the "Baca selengkapnya"
  *     modal flow, PDF download, and Bagikan share buttons.
@@ -255,7 +255,7 @@ function SelectControl({
  *     (1080×1080 PNG with download + zoom).
  *   - `<BriefFlyerSection>` for the 6 share-ready flyer PNGs.
  *
- * Why we duplicate-render (vs link out to /insights/brief/{slug}):
+ * Why we duplicate-render (vs link out to /briefings/{slug}):
  * the dashboard is the "operator console" — users come here to
  * BROWSE all 5 segments quickly and grab content. Forcing a full
  * page nav per segment would slow that workflow. Reusing the
@@ -263,8 +263,8 @@ function SelectControl({
  * the briefing detail page.
  *
  * Note on modal-close behavior: the BriefDeliverableCards modal
- * pushes `/insights/brief/{slug}/{kind}` on open and replaces with
- * `/insights/brief/{slug}` on close. After closing, the user lands
+ * pushes `/briefings/{slug}/{kind}` on open and replaces with
+ * `/briefings/{slug}` on close. After closing, the user lands
  * on the brief detail page (not the dashboard). That's intentional:
  * they've engaged with one specific kit; the detail page is where
  * they can now read the full briefing context for that deliverable.
@@ -295,7 +295,7 @@ function StrategiPane({
   // push `/{path}/{kind}` on open and replace `/{path}` on close.
   // Locale-prefixed so the i18n proxy doesn't re-resolve it through
   // the `[locale]` segment.
-  const briefBasePath = `/${locale}/insights/brief/${briefSlug}`;
+  const briefBasePath = `/${locale}/briefings/${briefSlug}`;
 
   return (
     // Re-key on briefSlug so when the user switches segments, the

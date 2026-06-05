@@ -42,7 +42,7 @@ function stripFlyerMessagesSection(md: string): string {
 
 // NOTE: word-count annotations like `(2300-3200 kata)` / `(~80 kata)`
 // are stripped at the data-access layer (`stripWordCountAnnotations`
-// in @/lib/insights-data) before the markdown ever reaches this
+// in @/lib/briefing-data) before the markdown ever reaches this
 // component. We don't strip again here — single source of truth.
 
 /**
@@ -97,7 +97,7 @@ export function BriefingNarrative({
   /** Path of the brief detail route. When provided, Section 4 of the
    *  markdown is rendered as a card grid (BriefDeliverableCards) instead
    *  of inline scroll, with each ### h3 opening a focus modal. Omit on
-   *  preview surfaces (e.g. /insights hero) — there we want the plain
+   *  preview surfaces (e.g. /briefings hero) — there we want the plain
    *  inline render. */
   briefBasePath?: string;
   /** Brief slug (e.g. `2026-05-22-all`) — used to construct the

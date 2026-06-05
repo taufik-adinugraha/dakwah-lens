@@ -331,7 +331,7 @@ export function CommentForm({
           // because Safari's private mode can throw on setItem.
           try {
             window.localStorage.setItem("dl_dn", trimmedName);
-            // Track this slug as "watched" so /insights can show a
+            // Track this slug as "watched" so /briefings can show a
             // sticky-nudge chip when the room has new activity.
             // Prune entries older than 90 days on each write so the
             // map can't grow unbounded over years.

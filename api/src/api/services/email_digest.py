@@ -194,23 +194,21 @@ def _render_html(
     """Bulletproof transactional email HTML — tables, inline styles,
     no fancy CSS. Renders consistently in Gmail/Outlook/Apple Mail."""
     sentiment = stats.get("sentiment") or {}
-    top_cat = (stats.get("top_categories") or [{}])[0]
-    top_topic = (stats.get("top_topics") or [{}])[0]
+    top_topics = stats.get("top_topics") or []
 
     pill_rows = []
     if sentiment.get("current_pct_negative") is not None:
         pill_rows.append(
             ("Nada negatif", f"{round(sentiment['current_pct_negative'])}%")
         )
-    if top_cat.get("category"):
-        pill_rows.append(
-            (
-                "Kategori utama",
-                f"{top_cat['category']} ({round(top_cat.get('share_pct', 0))}%)",
-            )
-        )
-    if top_topic.get("label"):
-        pill_rows.append(("Topik utama", top_topic["label"]))
+    # The "kategori utama" pill was retired 2026-06-05 along with the
+    # 9-PRD scoring. Replaced with the SECOND top topic (the first one
+    # is already in the briefing headline), giving readers a sharper
+    # "this week's #1 + #2 stories" peek at the email pill row.
+    if top_topics:
+        pill_rows.append(("Topik utama", top_topics[0].get("label") or ""))
+    if len(top_topics) > 1 and top_topics[1].get("label"):
+        pill_rows.append(("Topik kedua", top_topics[1]["label"]))
 
     pill_html = "".join(
         f"""<tr><td style="padding:6px 0;color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:0.05em">{k}</td><td style="padding:6px 0;color:#0f172a;font-weight:600;text-align:right">{v}</td></tr>"""

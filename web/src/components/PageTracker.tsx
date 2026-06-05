@@ -21,7 +21,7 @@ export function PageTracker({ locale }: { locale: string }) {
     if (lastTracked.current === pathname) return;
     lastTracked.current = pathname;
     // Strip locale prefix so the path is consistent across `id`/`en` for
-    // aggregation. `/en/insights/x` → `/insights/x`.
+    // aggregation. `/en/radar/x` → `/radar/x`.
     const normalized =
       pathname.replace(/^\/(en|id)(?=\/|$)/, "") || "/";
     // Fire-and-forget — page views are nice-to-have, never block UX.

@@ -213,26 +213,26 @@ celery_app.conf.update(
         #   uv run python -m api.scripts.manual_briefing save all /tmp/r.md
         #
         # Re-enable by uncommenting this block + restoring the schedule
-        # constants in services/insights_summary.py if changed.
-        # "generate-insights-summary": {
-        #     "task": "api.workers.ingest.generate_insights_summary",
+        # constants in services/briefing.py if changed.
+        # "generate-briefings": {
+        #     "task": "api.workers.ingest.generate_briefings",
         #     # day_of_week=4 = Thursday in Celery's crontab (Sun=0).
         #     "schedule": crontab(minute=0, hour=5, day_of_week=4),
         # },
-        # Weekly email digest — Thursday 08:00 WIB. Same day as the
-        # briefing publish (Thursday 05:00); the 3-hour gap gives the
-        # generation pipeline a window even when retries fire, and lands
-        # in the inbox first thing Thursday morning — well ahead of
-        # Friday khutbah preparation. Free up to 3K emails/month on
-        # Resend's free tier.
+        # Weekly email digest — DISABLED 2026-06-05 while the 9-PRD
+        # categories retirement reshapes the digest body. Re-enable by
+        # uncommenting once the new topic-driven pill rows have been
+        # eyeballed on a live run. Resend API key also pending rotation,
+        # so the schedule sitting idle is fine.
         #
-        # Moved Sunday 18:00 → Thursday 18:00 (2026-05-24, tracking the
-        # briefing day) → Thursday 08:00 (2026-05-27, morning delivery).
-        "send-weekly-digest": {
-            "task": "api.workers.ingest.send_weekly_digest",
-            # day_of_week=4 = Thursday in Celery's crontab (Sun=0).
-            "schedule": crontab(minute=0, hour=8, day_of_week=4),
-        },
+        # Previous cadence: Thursday 08:00 WIB, same-day delivery after
+        # the briefing publish, free up to 3K emails/month on Resend.
+        #
+        # "send-weekly-digest": {
+        #     "task": "api.workers.ingest.send_weekly_digest",
+        #     # day_of_week=4 = Thursday in Celery's crontab (Sun=0).
+        #     "schedule": crontab(minute=0, hour=8, day_of_week=4),
+        # },
         # Trending overlay — daily 12:00 WIB. Complements the weekly
         # curated X sweep (49 fixed keywords on Wed 22:00) by catching
         # news-cycle topics that emerge mid-week. Sources are free

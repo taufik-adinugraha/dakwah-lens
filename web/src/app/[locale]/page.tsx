@@ -248,7 +248,7 @@ function AnonymousCtas({ t }: { t: LandingT }) {
     <div className="mt-10 flex flex-col items-center">
       {/* Primary: Insights card */}
       <Link
-        href="/insights"
+        href="/briefings"
         className="group relative w-full max-w-xl overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 px-7 py-7 text-left shadow-xl shadow-emerald-500/25 transition hover:shadow-2xl hover:shadow-emerald-500/35 hover:scale-[1.01] sm:px-9 sm:py-8"
       >
         {/* Subtle radial glow in top-right corner */}
@@ -344,7 +344,7 @@ function SignedInCtas({
           // Approved user (but not admin) → brief generation is paused
           // for them while the feature is experimental. Steer to insights.
           <Link
-            href="/insights"
+            href="/briefings"
             className="group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-slate-900 px-6 text-sm font-semibold text-white shadow-lg shadow-slate-900/15 transition hover:bg-slate-800 sm:w-auto"
           >
             <Sparkles className="h-4 w-4" />
@@ -358,7 +358,7 @@ function SignedInCtas({
           </span>
         )}
         <Link
-          href="/insights"
+          href="/briefings"
           className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-emerald-200 bg-emerald-50/80 px-6 text-sm font-semibold text-emerald-700 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-100 sm:w-auto"
         >
           <Globe2 className="h-4 w-4" />
@@ -462,7 +462,7 @@ function Features({ t }: { t: LandingT }) {
  * briefing, the schedule cadence, and links to the briefings hub.
  *
  * Keeps the homepage's "what you'll get" story concrete and removes the
- * need for new visitors to click through to /insights to understand
+ * need for new visitors to click through to /briefings to understand
  * what we actually publish.
  */
 function BriefingShowcase({ t }: { t: LandingT }) {
@@ -539,7 +539,7 @@ function BriefingShowcase({ t }: { t: LandingT }) {
           </ul>
 
           <Link
-            href="/insights"
+            href="/briefings"
             className="mt-7 inline-flex h-11 items-center gap-2 rounded-full bg-emerald-700 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800"
           >
             {t("briefing_showcase_cta")}
@@ -1049,7 +1049,7 @@ function FinalCTA({ t, viewer }: { t: LandingT; viewer: Viewer }) {
     variant === "create_brief"
       ? "/briefs/new"
       : variant === "pending_explore"
-        ? "/insights"
+        ? "/briefings"
         : "/login?mode=signup";
 
   return (
@@ -1096,10 +1096,10 @@ function FinalCTA({ t, viewer }: { t: LandingT; viewer: Viewer }) {
  *
  * Communicates three things:
  *   1. The concrete benefits of a personalized account (vs. the public
- *      briefings everyone gets at /insights).
+ *      briefings everyone gets at /briefings).
  *   2. The registration process (profiling → team review → approval).
  *   3. The current pause on new approvals — with a direct nudge to
- *      /insights as the right starting point right now.
+ *      /briefings as the right starting point right now.
  *
  * Hidden for already-approved users (the section is sales/onboarding
  * copy, not relevant once they're in).
@@ -1170,7 +1170,7 @@ function SignupJourney({ t }: { t: LandingT }) {
                 {t("signup_pause_body")}
               </p>
               <Link
-                href="/insights"
+                href="/briefings"
                 className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-amber-700 px-4 py-2 text-xs font-semibold text-white transition hover:bg-amber-800"
               >
                 <Eye className="h-3.5 w-3.5" />
@@ -1284,7 +1284,7 @@ function SignupJourney({ t }: { t: LandingT }) {
             {t("signup_closing_pointer")}
           </p>
           <Link
-            href="/insights"
+            href="/briefings"
             className="mt-3 inline-flex h-11 items-center gap-2 rounded-full bg-emerald-700 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800"
           >
             <Eye className="h-4 w-4" />

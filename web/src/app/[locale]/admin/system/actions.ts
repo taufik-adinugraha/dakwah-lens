@@ -1101,8 +1101,8 @@ export async function setCommentStatus(formData: FormData) {
   revalidatePath("/admin/system");
   revalidatePath(`/m/${row.briefingSlug}`);
   // Approve/Block changes the approved-comments count surfaced on
-  // /insights (OtherRoomsSection cards + admin-rooms tiles).
-  revalidatePath("/insights");
+  // /briefings (OtherRoomsSection cards + admin-rooms tiles).
+  revalidatePath("/briefings");
   revalidatePath("/admin/rooms");
 }
 
@@ -1153,7 +1153,7 @@ export async function deleteComment(formData: FormData) {
   revalidatePath("/admin/system/discussion");
   revalidatePath("/admin/system");
   revalidatePath(`/m/${row.briefingSlug}`);
-  revalidatePath("/insights");
+  revalidatePath("/briefings");
   revalidatePath("/admin/rooms");
 }
 

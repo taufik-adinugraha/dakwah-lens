@@ -734,7 +734,7 @@ export async function getBucketEngagementDelta(): Promise<BucketDelta[]> {
  * that one buckets by `youtube_channels.category` (an editorial
  * channel-genre enum), this one buckets by the post's DOMINANT
  * da'wah category from the 9-category JSONB taxonomy populated on
- * EVERY platform. Used by /insights/<platform> so the same widget
+ * EVERY platform. Used by /briefings/<platform> so the same widget
  * shape works across YT / X / IG / mainstream.
  *
  * Metric per platform:
@@ -828,6 +828,77 @@ export async function getDawahCategoryReachDelta(
     const thinBaseline = lastWeek < Math.max(10, thisWeek * 0.05);
     return {
       category: r.category,
+      valueThisWeek: thisWeek,
+      valueLastWeek: lastWeek,
+      deltaPct:
+        lastWeek > 0 && !thinBaseline
+          ? ((thisWeek - lastWeek) / lastWeek) * 100
+          : null,
+      unit,
+    };
+  });
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+ * THEME-GROUP REACH per platform — WoW.
+ *
+ * Replaces the 9-PRD dawah-category panel on /briefings/[platform].
+ * Same shape (per-bucket value + delta + unit), but buckets are the
+ * 14 THEME_GROUPS (+ Lainnya) instead of the 9 internal scoring
+ * categories. The 9 categories stay as a sub-signal inside briefings;
+ * the public per-platform surface uses theme groups only since
+ * 2026-06-05.
+ *
+ * Filter: rows with `theme_group IS NOT NULL` (Gemini-judged at
+ * ingest since 2026-06-04). Older rows without theme_group fall to
+ * Lainnya here so the panel always tallies the full platform pool.
+ * ───────────────────────────────────────────────────────────── */
+export type ThemeGroupReach = {
+  group: string;
+  valueThisWeek: number;
+  valueLastWeek: number;
+  deltaPct: number | null;
+  unit: "views" | "articles" | "posts";
+};
+
+export async function getThemeGroupReachDelta(
+  platform: string,
+): Promise<ThemeGroupReach[]> {
+  const useCount = platform === "mainstream" || platform === "instagram";
+  const unit: ThemeGroupReach["unit"] = useCount
+    ? platform === "mainstream"
+      ? "articles"
+      : "posts"
+    : "views";
+
+  const windowedMetric = (where: ReturnType<typeof sql>) =>
+    useCount
+      ? sql`COUNT(*) FILTER (WHERE ${where})`
+      : sql`COALESCE(SUM(sp.engagement_views) FILTER (WHERE ${where}), 0)`;
+
+  const rows = (await db.execute(sql`
+    SELECT
+      COALESCE(sp.theme_group, 'Lainnya') AS theme_group,
+      ${windowedMetric(sql`sp.posted_at >= now() - interval '7 days'`)}::bigint AS metric_this,
+      ${windowedMetric(sql`sp.posted_at >= now() - interval '14 days' AND sp.posted_at < now() - interval '7 days'`)}::bigint AS metric_last
+    FROM social_posts sp
+    WHERE sp.platform = ${platform}
+      AND sp.posted_at >= now() - interval '14 days'
+    GROUP BY COALESCE(sp.theme_group, 'Lainnya')
+    ORDER BY metric_this DESC
+  `)) as unknown as Array<{
+    theme_group: string;
+    metric_this: number;
+    metric_last: number;
+  }>;
+
+  return rows.map((r) => {
+    const thisWeek = Number(r.metric_this);
+    const lastWeek = Number(r.metric_last);
+    const thinBaseline = lastWeek < Math.max(10, thisWeek * 0.05);
+    return {
+      group: r.theme_group,
       valueThisWeek: thisWeek,
       valueLastWeek: lastWeek,
       deltaPct:

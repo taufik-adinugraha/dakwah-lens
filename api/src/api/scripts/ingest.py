@@ -40,9 +40,6 @@ from api.services.apify import (
 from api.services.language import detect_lang
 from api.services.normalizers import NORMALIZERS
 from api.services.relevance import (
-    classify_batch as classify_relevance,
-)
-from api.services.relevance import (
     classify_opportunity_batch as classify_opportunity,
 )
 from api.services.rss import scrape_mainstream
@@ -273,27 +270,23 @@ async def _run(
     # Per-item cost ~$0.0001, well inside the IDR 1M LLM cap.
     sentiment_by_index: dict[int, object] = {}
     if fresh_texts:
-        print(f"  Running Gemini sentiment on {len(fresh_texts)} posts …")
+        # Sentiment + theme_group come from the SAME Gemini call as of
+        # 2026-06-05 (theme_group folded into sentiment.py). Opportunity
+        # is still a separate call — independent calibration anchors,
+        # different prompt shape, runs sequentially since Flash-Lite is
+        # rate-limited per minute.
+        print(
+            f"  Running Gemini sentiment + theme_group on {len(fresh_texts)} posts …"
+        )
         fresh_sentiments = classify_sentiment(fresh_texts)
         for idx, s in zip(fresh_indices, fresh_sentiments, strict=False):
             sentiment_by_index[idx] = s
 
-        # Gemini relevance handles ID + EN natively. Two passes:
-        # (1) 9-category topical relevance (mean-of-top-2 aggregate)
-        # (2) focused da'wah-opportunity score — what UI sorts on
-        # Run them sequentially rather than parallel — Gemini Flash-Lite
-        # is rate-limited per minute, and the second pass benefits from
-        # being independent of the categorical pass anyway.
-        print("  Running Gemini relevance + opportunity …")
-        fresh_relevances = classify_relevance(fresh_texts)
+        print("  Running Gemini opportunity …")
         fresh_opportunities = classify_opportunity(fresh_texts)
     else:
-        fresh_relevances = []
         fresh_opportunities = []
 
-    relevance_by_index = {
-        idx: r for idx, r in zip(fresh_indices, fresh_relevances, strict=False)
-    }
     opportunity_by_index = {
         idx: o
         for idx, o in zip(fresh_indices, fresh_opportunities, strict=False)
@@ -301,22 +294,22 @@ async def _run(
 
     for i, row in enumerate(rows):
         if row["external_id"] in cached:
-            label, score, rel, opp, cats, tg = cached[row["external_id"]]
+            label, score, _rel_deprecated, opp, _cats_deprecated, tg = cached[
+                row["external_id"]
+            ]
             row["sentiment_label"] = label
             row["sentiment_score"] = score
-            row["dawah_relevance"] = rel
+            # dawah_relevance + categories were retired 2026-06-05.
+            # Existing rows preserve their values; we don't overwrite,
+            # we just stop populating them on new rows.
             row["dawah_opportunity"] = opp
-            row["categories"] = cats
             row["theme_group"] = tg
         else:
             s = sentiment_by_index.get(i)
-            r = relevance_by_index.get(i)
             row["sentiment_label"] = getattr(s, "label", None)
             row["sentiment_score"] = getattr(s, "score", None)
-            row["dawah_relevance"] = getattr(r, "dawah_relevance", None)
             row["dawah_opportunity"] = opportunity_by_index.get(i)
-            row["categories"] = getattr(r, "categories", None)
-            row["theme_group"] = getattr(r, "theme_group", None)
+            row["theme_group"] = getattr(s, "theme_group", None)
 
         # Normalize engagement keys — non-YT platforms don't populate
         # these in their normalizers, but `insert.values(rows)` needs a
@@ -339,9 +332,11 @@ async def _run(
                     "language": insert(SocialPost).excluded.language,
                     "sentiment_label": insert(SocialPost).excluded.sentiment_label,
                     "sentiment_score": insert(SocialPost).excluded.sentiment_score,
-                    "dawah_relevance": insert(SocialPost).excluded.dawah_relevance,
+                    # dawah_relevance + categories deliberately omitted from
+                    # the upsert SET since 2026-06-05 — those columns are
+                    # retired but kept in the schema. Existing values are
+                    # preserved; new rows just get NULL by column default.
                     "dawah_opportunity": insert(SocialPost).excluded.dawah_opportunity,
-                    "categories": insert(SocialPost).excluded.categories,
                     "theme_group": insert(SocialPost).excluded.theme_group,
                     "region": insert(SocialPost).excluded.region,
                     "raw_payload": insert(SocialPost).excluded.raw_payload,

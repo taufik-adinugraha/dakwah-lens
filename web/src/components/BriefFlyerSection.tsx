@@ -57,7 +57,7 @@ export function BriefFlyerSection({ briefId }: { briefId: string }) {
   const [zoomed, setZoomed] = useState<Variant | null>(null);
 
   const flyerUrl = (v: Variant) =>
-    `/api/insights-brief/${briefId}/flyer?variant=${v}&lang=${lang}`;
+    `/api/briefings/${briefId}/flyer?variant=${v}&lang=${lang}`;
 
   return (
     <section className="mt-10 mb-6">

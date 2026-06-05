@@ -8,7 +8,7 @@ import {
 import { getTranslations } from "next-intl/server";
 
 import { localeAwareFormat } from "@/lib/date-id";
-import { getOtherMahasiswaRooms, type OtherRoom } from "@/lib/insights-data";
+import { getOtherMahasiswaRooms, type OtherRoom } from "@/lib/briefing-data";
 
 /**
  * "Lihat diskusi lain" rail at the bottom of /m/{slug}.
@@ -119,12 +119,12 @@ function RoomCard({
   locale: string;
   labels: Labels;
 }) {
-  const palette = SEGMENT_PALETTE[room.segment ?? "all"];
+  const palette = SEGMENT_PALETTE[room.themeGroup ?? "all"];
   const status = deriveStatus(room);
   const statusMeta = STATUS_META[status];
   const segmentLabel =
     labels[
-      `segment_${room.segment ?? "all"}` as keyof Labels
+      `segment_${room.themeGroup ?? "all"}` as keyof Labels
     ] ?? labels.segment_all;
 
   const dateLabel = localeAwareFormat(room.generatedAt, locale, {

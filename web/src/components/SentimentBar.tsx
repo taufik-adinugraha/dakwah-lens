@@ -2,7 +2,7 @@
 
 /**
  * Three-segment sentiment bar (positive / neutral / concerned) shown
- * across the dashboard, /insights, and topic detail modal.
+ * across the dashboard, /briefings, and topic detail modal.
  *
  * Two visual modes:
  *   - "compact" (default) — 8px bar with % labels below.

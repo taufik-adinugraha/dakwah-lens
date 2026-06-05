@@ -20,7 +20,7 @@ import {
   DELIVERABLE_HEADING_PATTERNS,
   extractDeliverableSection,
   getBriefingBySlug,
-} from "@/lib/insights-data";
+} from "@/lib/briefing-data";
 import { Article } from "../../../m/[id]/Article";
 import { extractMahasiswaContent } from "@/lib/flyer/content";
 import { ShareButton } from "./ShareButton";
@@ -107,7 +107,7 @@ export default async function DeliverablePage({ params }: Props) {
   const mahasiswa =
     deliverable === "genz" ? extractMahasiswaContent(body) : null;
 
-  const palette = palettes[row.segment ?? "all"];
+  const palette = palettes[row.themeGroup ?? "all"];
   const Icon = KIND_ICON[deliverable];
   const dateLabel = localeAwareFormat(row.generatedAt, locale, {
     weekday: "long",
@@ -116,8 +116,8 @@ export default async function DeliverablePage({ params }: Props) {
     day: "numeric",
     timeZone: "Asia/Jakarta",
   });
-  const segmentLabel = row.segment
-    ? t(`segment_${row.segment}_title` as Parameters<typeof t>[0])
+  const segmentLabel = row.themeGroup
+    ? t(`segment_${row.themeGroup}_title` as Parameters<typeof t>[0])
     : t("brief_scope_all");
 
   const heroTitle = mahasiswa?.question || section.heading;
@@ -206,7 +206,7 @@ export default async function DeliverablePage({ params }: Props) {
             jawab keagamaan tetap pada penyusun konten dakwah.
           </p>
           <Link
-            href="/insights"
+            href="/briefings"
             className="mt-6 inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition"
             style={{ background: palette.accentDeep, color: "#ffffff" }}
           >

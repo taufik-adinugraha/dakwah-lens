@@ -300,7 +300,7 @@ function parseSection4(md: string): { intro: string; cards: DeliverableCard[] } 
  *
  * `initialDeliverable` is the URL-slug variant of `CardKind` (kebab-stable
  * across locales). When set on mount, we open that modal immediately —
- * supports deep-link URLs like `/insights/brief/[id]/khutbah`. Card click
+ * supports deep-link URLs like `/briefings/[id]/khutbah`. Card click
  * pushes the matching slug into the URL; close pops back to `briefBasePath`.
  */
 export function BriefDeliverableCards({
@@ -312,7 +312,7 @@ export function BriefDeliverableCards({
 }: {
   section4Markdown: string;
   labels: Labels;
-  /** Path of the brief detail route — e.g. `/insights/brief/2026-05-22-all`.
+  /** Path of the brief detail route — e.g. `/briefings/2026-05-22-all`.
    *  Still used to build share + PDF URLs for the modal even when
    *  `routeOnOpen` is false. */
   briefBasePath: string;

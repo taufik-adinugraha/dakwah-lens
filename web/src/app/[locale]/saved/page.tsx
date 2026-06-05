@@ -67,7 +67,7 @@ export default async function SavedPage({
         : and(
             eq(schema.bookmarks.userId, session.user.id),
             // Drop brief bookmarks from the list view for non-admin
-            // users — the links would 302 to /insights anyway.
+            // users — the links would 302 to /briefings anyway.
             ...(canAccessBriefs ? [] : [ne(schema.bookmarks.kind, "brief")]),
           ),
     )

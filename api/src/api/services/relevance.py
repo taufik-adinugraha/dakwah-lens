@@ -1,19 +1,24 @@
-"""Da'wah relevance classifier — Gemini Flash, 9-category scoring per PRD §08.
+"""Da'wah opportunity classifier — Gemini Flash-Lite, single 0-1 score.
 
-For each post we return:
-  - per-category scores 0-1 across (aqidah, akhlaq, muamalah, social_justice,
-    family, youth, education, economic_ethics, health)
-  - aggregate `dawah_relevance` score 0-1 — the max of the category scores,
-    used for filtering "is this worth a brief?"
+Scopes down to ONE classifier as of 2026-06-05. The earlier 9-category
+scoring (aqidah / akhlaq / muamalah / social_justice / family / youth /
+education / economic_ethics / health) was dropped — those scores never
+made it onto the user-facing UI, and the per-post `categories` JSONB
+they fed has been retired. The theme_group emission they used to
+piggyback on now lives in `services.sentiment` (folded into the same
+call as sentiment classification, saving one Gemini round-trip per
+post).
 
-Cost: ~$0.0001 per classification on `gemini-2.5-flash-lite` (free tier
-covers ~50K classifications/day, paid is ~$5/100K). Batched up to 50 per
-Gemini call to amortize the system-prompt overhead — going from 10 to 50
-cuts per-prompt overhead ~3× and saves ~$10/mo at our daily volume.
+What remains here:
+  - `_should_skip` heuristic (very short text / pure gossip) used by
+    the opportunity scorer to protect the Gemini quota
+  - `classify_opportunity_batch` — scores each text 0-1 on "would a
+    da'i credibly use this in da'wah this week", calibrated against
+    anchors at 0.2 / 0.4 / 0.6 / 0.8
 
-A pre-filter heuristic also drops items unlikely to be da'wah-relevant
-(very short text, pure celebrity gossip) before they hit Gemini, saving
-~50% of calls while preserving ~95% of substantive content.
+Cost: ~$0.0001 per classification on `gemini-2.5-flash-lite`. Pre-
+filter heuristic drops ~50% of calls (short/gossipy items get 0.0
+without ever hitting Gemini).
 """
 
 from __future__ import annotations
@@ -21,8 +26,6 @@ from __future__ import annotations
 import json
 import re
 import time
-from dataclasses import dataclass
-from typing import Literal
 
 import structlog
 from google import genai
@@ -66,45 +69,6 @@ _GOSSIP_RE = re.compile(
     re.IGNORECASE,
 )
 
-CATEGORY_KEYS: tuple[str, ...] = (
-    "aqidah",
-    "akhlaq",
-    "muamalah",
-    "social_justice",
-    "family",
-    "youth",
-    "education",
-    "economic_ethics",
-    "health",
-)
-
-CategoryName = Literal[
-    "aqidah",
-    "akhlaq",
-    "muamalah",
-    "social_justice",
-    "family",
-    "youth",
-    "education",
-    "economic_ethics",
-    "health",
-]
-
-
-@dataclass(frozen=True)
-class RelevanceResult:
-    # 0-1 per category.
-    categories: dict[str, float]
-    # 0-1 aggregate — max of category scores. Above ~0.5 = brief-worthy.
-    dawah_relevance: float
-    # One of the 14 THEME_GROUPS or "Lainnya". Asked in the SAME
-    # Gemini call as `categories` (just ~10 extra output tokens
-    # per post), so this is essentially free. Replaces the
-    # read-time `classify_theme_group(topic.label)` regex fallback
-    # with a Gemini-judged per-post bucket. None when the model
-    # didn't emit it or emitted an invalid name — caller persists
-    # None and the read paths fall back to the topic-label regex.
-    theme_group: str | None = None
 
 
 _client: genai.Client | None = None
@@ -118,91 +82,6 @@ def _get_client() -> genai.Client:
         _client = genai.Client(api_key=settings.gemini_api_key)
     return _client
 
-
-SYSTEM_PROMPT = """You score how much da'wah SUBSTANCE a piece of Indonesian or English text carries for each of nine da'wah categories.
-
-For each text, return a continuous score 0-1 per category. USE THE FULL RANGE — most posts deserve scores like 0.15, 0.32, 0.55, 0.78. Do NOT round to {0.0, 0.5, 1.0} — that loses the signal a da'i needs to triage.
-
-ABSOLUTELY FORBIDDEN — flat-default returns:
-  DO NOT return the same score (e.g. 0.1 across all 9 categories) as a safe hedge for ambiguous content. Every post has at least ONE category that should win, even if weakly. If you genuinely cannot find ANY da'wah angle for a post:
-    - Return 0.0 across all 9 (not 0.1, not 0.15) — this signals "no da'wah relevance, drop from segment queries"
-    - Examples that warrant flat 0.0: pure stock-tickers update, sports score recap with no human story, weather forecast, a tech product launch with no muamalah/ethics angle.
-  If there IS even a weak hook, ONE category must clearly beat the others by at least 0.1 — pick the closest fit, score that 0.2-0.3, leave the rest at 0.0-0.1. Tied flat-0.1 returns are treated as classifier punts downstream and the post is excluded from segment queries — costing us coverage.
-
-Anchor points to calibrate:
-  0.0  — completely irrelevant; nothing a da'i could use for this category (use this freely on flat-irrelevant categories — better than padding to 0.1)
-  0.2  — surface-keyword mention only (e.g. "anak" appears once in a sports event recap)
-  0.4  — the category is genuinely the topic but the post offers no moral / spiritual / da'wah dimension
-  0.6  — the post raises a question a da'i could address (an issue, a tension, a behaviour worth commenting on)
-  0.8  — clear da'wah substance: a story, statistic, or behavioural pattern a da'i could BUILD a khutbah or kajian segment around
-  1.0  — the post is itself da'wah content, OR a textbook case study for the category (kurban story, child-abuse case from religious setting, riba scandal, etc.)
-
-CRITICAL DISTINCTION — TOPIC vs DA'WAH SUBSTANCE:
-A stock-market dip mentions banking → that's TOPIC overlap with muamalah, not da'wah substance. Score it 0.2-0.3. A story about a riba scandal where a community lost money → 0.8.
-A school event with kids → TOPIC overlap with youth/education. Score 0.2-0.3. A story about youth gang violence or pesantren reform → 0.7+.
-A celebrity birth announcement → TOPIC overlap with family. Score 0.2. A story about a divorce settlement involving guardianship of children → 0.7.
-
-The question to ask each time: "Could a da'i credibly cite this in a khutbah, kajian, or da'wah content piece this week without forcing the connection?"
-
-Categories:
-- aqidah          — creed and belief-system content: tauhid, shirik (dukun/jimat/jin-power/mystical-money-multipliers/pesugihan), sectarian theology disputes (mazhab, aliran, Syiah/Sunni, Ahmadiyya, fringe sect rulings by MUI), atheism / agnosticism / "no-religion" trends, prophethood, afterlife/eschatology, ritual-correctness debates (qibla, isbal, prayer-form), tafsir/aqidah-curriculum disputes, philosophical challenges to belief.
-  AQIDAH IS NOT A FALLBACK for generic religious content — score 0 if there's no creed/belief angle. But DO score aqidah > 0.5 whenever a story has a clear shirik / sectarian-theology / atheism / ritual-correctness hook, even if it could ALSO be akhlaq.
-- akhlaq          — ethics, character, adab, moral conduct, real moral failures or examples.
-  NOTE: do NOT default to akhlaq for any story with a moral angle. Score akhlaq 0.2-0.4 for routine crime / hoax / corruption news where the lesson is generic ("don't steal", "don't lie"). Reserve 0.6+ for stories where a da'i would specifically point to a NAMED character trait — sabar, amanah, hilm, hasad, ghibah, riya', tawadhu' — as the lesson. If aqidah / muamalah / family / etc. captures the actual da'wah hook better, let them lead and keep akhlaq lower.
-- muamalah        — finance ethics, halal/haram dealings, riba, zakat, contracts, real-world business morality
-- social_justice  — oppression, injustice, public-good policy, Muslim-community welfare, anti-imperialism
-- family          — marriage, parenting practice, kinship, real family-life issues a da'i would address
-- youth           — youth-specific tensions: identity, peer pressure, mental health, career anxiety, moral pressure
-- education       — knowledge-seeking, pesantren, schools, Islamic learning, reform in education
-- economic_ethics — work ethics, halal income, honesty in business, gig-worker rights, exploitative practices
-- health          — physical/mental health from an Islamic lens, real concerns parents/community grapple with
-
-Calibrated examples (read carefully — these mirror real misclassifications):
-- "Suku Bunga Naik, BI Pastikan Likuiditas Bank Tetap Longgar" → muamalah ~0.25 (banking topic only; no halal/riba angle; pure policy news)
-- "Komplotan Pencuri Aset Tower Seluler Diringkus" → social_justice ~0.35 (justice served is positive but routine crime news, low da'wah pull)
-- "Diversifikasi Bisnis ke Energi Terbarukan Topang MBAP" → economic_ethics ~0.15 (stock story, no ethics angle)
-- "Pria Cabuli Bocah di Kamar Mandi Masjid" → akhlaq 0.95, family 0.7, social_justice 0.5 (textbook da'wah case)
-- "Petani Sawit Kaltim Terjepit Ekonomi Global" → muamalah 0.55, economic_ethics 0.6, social_justice 0.7 (clear injustice + da'wah hook)
-- "Bupati Membuka O2SN dan FLS3N SMP" → youth 0.2, education 0.2 (event opening, no substance)
-- "Guru di Cirebon Dapat Pelatihan Dampingi Anak Berkebutuhan Khusus" → education 0.75, akhlaq 0.6 (inclusive practice da'wah hook)
-- "Rifky Alhabsyi Ceritakan Persalinan Istri" → family 0.25 (celebrity birth, no parenting depth)
-- "GPCI Dorong Pembebasan WNI Ditangkap Israel" → social_justice 0.85 (oppression of Muslims, strong da'wah hook)
-- "BIJB Kertajati Jadi MRO Hercules" → social_justice 0.2 (military maintenance facility, no umma angle)
-- "Remaja di Pasar Rebo Dibacok Geng Motor" → youth 0.75, akhlaq 0.65 (gang violence, real da'wah opportunity)
-- "Prabowo Kurban 25 Limousin di Sulsel" → akhlaq 0.7, muamalah 0.4 (kurban practice, da'wah-relevant by topic)
-- "Susu Formula Masuk MBG? IDAI Soroti ASI Eksklusif" → family 0.7, health 0.7 (parenting + nutrition advocacy)
-- "Hoaks! Purbaya Pangkas Gaji ke-13 PNS" → akhlaq 0.3 (hoax-debunk, mild ethics angle on misinformation)
-- "Industri Herbal Nasional Bidik Pasar Global" → muamalah 0.2, health 0.25 (business news, weak hook)
-- "Dukun Tipu Korban Rp 2 M Pakai Jimat Pengganda Uang" → aqidah 0.85, akhlaq 0.5 (textbook shirik case — pesugihan / supernatural-money-multiplier; pure aqidah da'wah territory)
-- "MUI Tetapkan Aliran X Sesat Soal Tafsir Akhirat" → aqidah 0.8, social_justice 0.3 (sectarian theology — aqidah leads, not akhlaq)
-- "Survei: 25% Gen Z Indonesia Mengaku Tidak Beragama" → aqidah 0.75, youth 0.6 (modern challenge to belief; classic aqidah da'wah hook for da'i working with youth)
-- "Polemik Imbauan Tutup Tempat Hiburan saat Ramadhan" → aqidah 0.45, akhlaq 0.4, social_justice 0.4 (ritual-observance debate touches creed AND social adab)
-
-ALSO classify each post into ONE coarse THEME_GROUP (the dashboard / briefing bucketing taxonomy). This is INDEPENDENT of the 9 category scores above — pick the single best-fit group using the post's SEMANTIC meaning, not surface keyword matches.
-
-THEME_GROUPS — pick EXACTLY ONE per post (literal name, in Indonesian):
-{THEME_GROUP_LIST_PLACEHOLDER}
-
-KEY ROUTING RULES (these are the bugs the regex got wrong):
-- A political/accountability story about a state ritual (e.g. "Polemik Sapi Kurban Presiden" — controversy over how the President's kurban was procured) → "Pemerintahan & Kebijakan", NOT "Aqidah & Ibadah". Aqidah & Ibadah is only for posts that are themselves about practicing the ibadah.
-- National-day commemorations and state ideology (e.g. "Peringatan Hari Lahir Pancasila") → "Pemerintahan & Kebijakan".
-- Mysterious-fire / mass-fire / disaster fenomena (e.g. "Fenomena Api Misterius di Sleman") → "Lingkungan & Bencana".
-- Local crime + corruption → "Hukum & Keadilan". State policy / officials → "Pemerintahan & Kebijakan".
-- Only use "Lainnya" when the post genuinely fits no group above (sports scores, weather, foreign-religion festivals, etc.).
-
-Return field `theme_group` as a STRING, exact match to one of the names above.
-
-Return only valid JSON, one object per input."""
-
-
-def _system_prompt_with_groups() -> str:
-    """Inject the live THEME_GROUPS list into SYSTEM_PROMPT at call time
-    so the prompt + the regex registry can never drift."""
-    from api.services.theme_groups import llm_group_options_prompt
-
-    return SYSTEM_PROMPT.replace(
-        "{THEME_GROUP_LIST_PLACEHOLDER}", llm_group_options_prompt()
-    )
 
 
 OPPORTUNITY_SYSTEM_PROMPT = """You score Indonesian or English news posts for DA'WAH OPPORTUNITY — the chance a da'i could credibly use this in a khutbah, kajian, or da'wah content piece this week.
@@ -257,33 +136,6 @@ Calibrated examples:
 Return only valid JSON: an array of objects, each `{"opportunity": <number>}`, in input order."""
 
 
-def _zero_result() -> RelevanceResult:
-    return RelevanceResult(
-        categories={k: 0.0 for k in CATEGORY_KEYS},
-        dawah_relevance=0.0,
-    )
-
-
-def _aggregate_relevance(categories: dict[str, float]) -> float:
-    """Mean of the top-2 category scores.
-
-    Was `max()` until 2026-05-21 — that let any single-keyword surface
-    match dominate (e.g. "bank" → muamalah=1.0 → overall=1.0 even when
-    the rest were 0). Mean-of-top-2 forces a post to score on at least
-    two categories before it can rank high, which empirically tracks
-    "does this have real da'wah substance" better than a single peak.
-
-    Falls back to the single top score when only one category has
-    non-zero signal (the second-best is 0 anyway, so it averages to
-    half — but that's correct: a post that only hits one category
-    weakly should rank lower than one that hits two solidly).
-    """
-    if not categories:
-        return 0.0
-    sorted_scores = sorted(categories.values(), reverse=True)
-    top1 = sorted_scores[0]
-    top2 = sorted_scores[1] if len(sorted_scores) > 1 else 0.0
-    return (top1 + top2) / 2.0
 
 
 def _should_skip(text: str) -> bool:
@@ -293,199 +145,6 @@ def _should_skip(text: str) -> bool:
     if len(stripped) < MIN_TEXT_CHARS:
         return True
     return bool(_GOSSIP_RE.search(stripped))
-
-
-def classify(text: str) -> RelevanceResult:
-    return classify_batch([text])[0]
-
-
-def classify_batch(texts: list[str]) -> list[RelevanceResult]:
-    if not texts:
-        return []
-
-    # Pre-filter: items the heuristic rejects get a zero-relevance result
-    # without hitting Gemini. We carry indices forward so the final list
-    # preserves caller order.
-    results: list[RelevanceResult | None] = [None] * len(texts)
-    keep_indices: list[int] = []
-    keep_texts: list[str] = []
-    for i, t in enumerate(texts):
-        if _should_skip(t):
-            results[i] = _zero_result()
-        else:
-            keep_indices.append(i)
-            keep_texts.append(t)
-
-    if keep_texts:
-        scored: list[RelevanceResult] = []
-        for start in range(0, len(keep_texts), MAX_BATCH):
-            chunk = keep_texts[start : start + MAX_BATCH]
-            try:
-                scored.extend(_classify_chunk(chunk))
-            except Exception:
-                # Mirror sentiment's soft-fallback (2026-05-21): a
-                # Gemini 503 / quota / transient outage shouldn't fail
-                # the whole ingest. Default the chunk to zero-relevance
-                # so the rest of the pipeline (upsert, sentiment) still
-                # commits its work. Items can be re-scored by a later
-                # backfill pass once Gemini stabilizes.
-                log.exception("relevance.chunk_failed", batch_size=len(chunk))
-                scored.extend(_zero_result() for _ in chunk)
-        for idx, r in zip(keep_indices, scored, strict=False):
-            results[idx] = r
-
-    # Backfill anything still None (defensive — shouldn't happen, but a
-    # truncated Gemini response would leave gaps and we'd rather store
-    # zeros than crash the ingest).
-    for i, r in enumerate(results):
-        if r is None:
-            log.warning("relevance.missing_result", index=i)
-            results[i] = _zero_result()
-
-    log.info(
-        "relevance.batch_done",
-        total=len(texts),
-        skipped_by_heuristic=len(texts) - len(keep_texts),
-        scored=len(keep_texts),
-    )
-    return [r for r in results if r is not None]
-
-
-def _classify_chunk(texts: list[str]) -> list[RelevanceResult]:
-    """Single Gemini call for up to MAX_BATCH texts. Caller is responsible
-    for chunking; pre-filtering happens upstream."""
-    client = _get_client()
-
-    numbered = "\n\n".join(
-        f"[{i + 1}] {t[:1000]}" for i, t in enumerate(texts)
-    )
-    user_prompt = (
-        f"Score each of the following {len(texts)} text(s). "
-        f"Return an array of {len(texts)} score objects, in input order.\n\n"
-        f"{numbered}"
-    )
-
-    response_schema = {
-        "type": "array",
-        "items": {
-            "type": "object",
-            "properties": {
-                **{cat: {"type": "number"} for cat in CATEGORY_KEYS},
-                # New since 2026-06-03 — Gemini-judged THEME_GROUPS
-                # bucket. One of 14 group labels or "Lainnya". Added to
-                # the existing per-post call (no new round-trip), so
-                # marginal cost is ~10 output tokens per post.
-                "theme_group": {"type": "string"},
-            },
-            "required": [*CATEGORY_KEYS, "theme_group"],
-        },
-    }
-
-    # Retry loop on transient 5xx. After MAX_RETRIES the exception
-    # bubbles to `classify_batch`'s chunk-level try/except, which falls
-    # back to zero-result for the chunk — same outcome as before, just
-    # less often.
-    resp = None
-    for attempt in range(MAX_RETRIES):
-        try:
-            resp = client.models.generate_content(
-                model=MODEL,
-                contents=user_prompt,
-                config=types.GenerateContentConfig(
-                    # Use the live-rendered prompt so the THEME_GROUPS
-                    # list in the prompt is always in sync with the
-                    # registry.
-                    system_instruction=_system_prompt_with_groups(),
-                    response_mime_type="application/json",
-                    response_schema=response_schema,
-                    temperature=0.2,
-                ),
-            )
-            break
-        except genai_errors.ServerError as exc:
-            if attempt == MAX_RETRIES - 1:
-                log.warning(
-                    "relevance.gemini_5xx_giveup",
-                    attempt=attempt + 1,
-                    batch_size=len(texts),
-                    error=str(exc)[:200],
-                )
-                raise
-            wait_s = RETRY_BASE_SLEEP_S * (2**attempt)
-            log.info(
-                "relevance.gemini_5xx_retry",
-                attempt=attempt + 1,
-                wait_s=wait_s,
-                batch_size=len(texts),
-            )
-            time.sleep(wait_s)
-    assert resp is not None  # noqa: S101 — loop above guarantees this or raises
-
-    raw = resp.text or "[]"
-    try:
-        parsed: list[dict[str, float]] = json.loads(raw)
-    except json.JSONDecodeError as exc:
-        # Gemini's structured-output mode is best-effort. We've observed
-        # the model emit a 6932-line / 123KB malformed JSON for a 50-item
-        # batch — likely a truncation or thinking-token-leak edge case.
-        # MAX_BATCH=10 should eliminate this, but the try/except is a
-        # safety net so a single bad call can't kill the whole ingest.
-        # Items still land in social_posts with zero relevance; they'll
-        # surface once a subsequent classify pass succeeds.
-        usage_md_local = getattr(resp, "usage_metadata", None)
-        log.warning(
-            "relevance.json_decode_failed",
-            error=str(exc),
-            raw_chars=len(raw),
-            raw_head=raw[:500],
-            raw_tail=raw[-500:],
-            batch_size=len(texts),
-            output_tokens=getattr(
-                usage_md_local, "candidates_token_count", None
-            ),
-        )
-        parsed = []
-
-    from api.services.usage import gemini_output_tokens, record_usage
-
-    usage_md = getattr(resp, "usage_metadata", None)
-    record_usage(
-        provider="gemini",
-        operation="classify_relevance",
-        model=MODEL,
-        tokens_in=getattr(usage_md, "prompt_token_count", None),
-        tokens_out=gemini_output_tokens(usage_md),
-        meta={"batch_size": len(texts)},
-    )
-
-    from api.services.theme_groups import ALL_GROUP_NAMES
-
-    results: list[RelevanceResult] = []
-    for cats in parsed:
-        clean = {k: float(cats.get(k, 0.0)) for k in CATEGORY_KEYS}
-        # Validate theme_group: must be one of the 14 + Lainnya
-        # exactly. Anything else (typo, missing field, hallucinated
-        # name) → None and the read paths fall back to the regex.
-        tg_raw = cats.get("theme_group")
-        theme_group = (
-            tg_raw if isinstance(tg_raw, str) and tg_raw in ALL_GROUP_NAMES else None
-        )
-        results.append(
-            RelevanceResult(
-                categories=clean,
-                dawah_relevance=_aggregate_relevance(clean),
-                theme_group=theme_group,
-            )
-        )
-
-    if len(results) != len(texts):
-        log.warning(
-            "relevance.size_mismatch",
-            expected=len(texts),
-            got=len(results),
-        )
-
-    return results
 
 
 # ─── Opportunity classifier (second pass) ──────────────────────────────────

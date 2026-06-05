@@ -45,7 +45,7 @@ export async function setDigestOptIn(optIn: boolean): Promise<{
       .where(eq(schema.users.id, session.user.id));
   }
 
-  revalidatePath("/insights");
+  revalidatePath("/briefings");
   revalidatePath("/saved");
   return { saved: true };
 }

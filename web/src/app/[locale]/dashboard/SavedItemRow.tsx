@@ -93,7 +93,7 @@ export function SavedItemRow(props: SavedItemRowProps) {
           <Link
             href={
               kind === "brief"
-                ? `/insights/brief/${refId}`
+                ? `/briefings/${refId}`
                 : "/saved"
             }
             className="flex items-start gap-3 text-left transition hover:text-emerald-700"

@@ -48,7 +48,7 @@ export type Cluster = {
 
 export type DrilldownConfig = {
   platform: PlatformKey;
-  /** Slug used in URL (`/insights/<slug>`). */
+  /** Slug used in URL (`/briefings/<slug>`). */
   slug: string;
   /** i18n namespace for platform-specific copy. */
   namespace:

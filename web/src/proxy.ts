@@ -66,9 +66,54 @@ function isAdminOnly(pathname: string): boolean {
   );
 }
 
+// Back-compat redirects for the 2026-06-05 URL restructure (Scope C
+// terminology cleanup). The /insights/* URL tree was split into:
+//   /briefings/         ← weekly briefings list (was /insights)
+//   /briefings/[id]     ← briefing detail (was /insights/brief/[id])
+//   /briefings/[id]/[deliverable]  (was /insights/brief/[id]/[deliverable])
+//   /groups/[slug]      ← theme-group landing (was /insights/group/[slug])
+//   /radar              ← data dashboard (was /insights/explore)
+//   /radar/[platform]   ← per-platform radar (was /insights/[platform])
+// Deleted: /insights/category/* (legacy 9-PRD page) — redirects to /radar.
+//
+// Returns a 308 (permanent) so search engines + bookmarks reflow.
+// Preserves query string + locale prefix.
+function rewriteLegacyInsightsPath(stripped: string): string | null {
+  // Order matters: longest prefix first to avoid partial-match
+  // misroutes (e.g. `/insights/explore` must match before `/insights`).
+  if (stripped === "/insights" || stripped === "/insights/") return "/briefings";
+  if (stripped.startsWith("/insights/brief/")) {
+    return "/briefings/" + stripped.slice("/insights/brief/".length);
+  }
+  if (stripped.startsWith("/insights/group/")) {
+    return "/groups/" + stripped.slice("/insights/group/".length);
+  }
+  if (stripped === "/insights/explore") return "/radar";
+  if (stripped.startsWith("/insights/category/")) return "/radar";
+  // /insights/[platform] — only mainstream / x / youtube / tiktok /
+  // instagram are real platforms; everything else falls through.
+  const platMatch = stripped.match(
+    /^\/insights\/(mainstream|x|youtube|tiktok|instagram)(\/.*)?$/,
+  );
+  if (platMatch) {
+    return "/radar/" + platMatch[1] + (platMatch[2] ?? "");
+  }
+  return null;
+}
+
+
 export default auth((req) => {
-  const { pathname } = req.nextUrl;
+  const { pathname, search } = req.nextUrl;
   const stripped = stripLocale(pathname);
+
+  // Legacy /insights/* → /briefings or /radar or /groups (Scope C).
+  const legacyTarget = rewriteLegacyInsightsPath(stripped);
+  if (legacyTarget) {
+    // Preserve the locale prefix so /id/insights/* lands at /id/briefings/*.
+    const localePrefix = pathname.slice(0, pathname.length - stripped.length);
+    const target = new URL(localePrefix + legacyTarget + search, req.nextUrl);
+    return NextResponse.redirect(target, 308);
+  }
 
   if (isProtected(pathname) && !req.auth) {
     const loginUrl = new URL("/login", req.nextUrl);
@@ -79,11 +124,11 @@ export default auth((req) => {
   // Admin-only gate. /briefs/* is currently admin/superadmin only —
   // brief generation is still experimental, regular users shouldn't be
   // able to reach the create / list / detail views. Bounce them to
-  // /insights with a notice they can see.
+  // /briefings with a notice they can see.
   if (isAdminOnly(pathname)) {
     const role = req.auth?.user?.role;
     if (role !== "admin" && role !== "superadmin") {
-      const target = new URL("/insights", req.nextUrl);
+      const target = new URL("/briefings", req.nextUrl);
       target.searchParams.set("notice", "briefs-admin-only");
       return NextResponse.redirect(target);
     }

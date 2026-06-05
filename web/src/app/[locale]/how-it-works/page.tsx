@@ -744,7 +744,7 @@ function BriefPipeline({ t }: { t: T }) {
  * that combine 5 markdown sections + 6 ready-to-use deliverables in
  * Section 4 + 2 share-ready flyers per briefing. See
  * insights_summary.py for the pipeline, scripts/manual_briefing.py for
- * the current manual operator flow, and /insights/brief/[id] for the
+ * the current manual operator flow, and /briefings/[id] for the
  * public viewer.
  *
  * The cron is wired for Thursday 05:00 WIB but currently PAUSED
@@ -775,7 +775,7 @@ function InsightsBriefingPipeline({ t }: { t: T }) {
     },
     {
       title: t("insights_brief_stage_5_title"),
-      module: "insights_summaries → /insights/brief/[id] + Puppeteer flyers",
+      module: "insights_summaries → /briefings/[id] + Puppeteer flyers",
       body: t("insights_brief_stage_5_body"),
     },
   ];

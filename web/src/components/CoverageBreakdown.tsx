@@ -17,7 +17,7 @@ import {
 /**
  * Three coverage breakdowns rendered side-by-side under one section
  * header. Shared between the logged-in dashboard's Data tab and the
- * public `/insights/explore` page — both surfaces want to answer
+ * public `/radar` page — both surfaces want to answer
  * "who's talking, how do they feel, what are they talking about?"
  * with identical UX. Labels are passed in via the `labels` prop so
  * each call site can supply its own i18n namespace (Dashboard vs

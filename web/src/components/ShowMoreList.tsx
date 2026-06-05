@@ -5,7 +5,7 @@ import { ChevronDown } from "lucide-react";
 
 /**
  * Reveals a list `pageSize` items at a time. Click "Show more" to
- * reveal another batch. Used on /insights/[platform] and segment pages
+ * reveal another batch. Used on /briefings/[platform] and segment pages
  * to keep the top of the list focused on the most-relevant items
  * without hiding everything else.
  *

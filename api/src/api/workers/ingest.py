@@ -21,10 +21,10 @@ from api.scripts import cluster_topics
 from api.scripts import ingest as ingest_script
 from api.services import (
     billing,
+    briefing,
     email_digest,
     ingest_queries,
     ingest_runs,
-    insights_summary,
     metrics,
     trending_topics,
 )
@@ -365,25 +365,26 @@ def send_weekly_digest() -> dict[str, object]:
         return {"error": "send_failed"}
 
 
-@celery_app.task(name="api.workers.ingest.generate_insights_summary")
-def generate_insights_summary() -> dict[str, object]:
-    """Generate all 5 weekly executive briefings for /insights.
+@celery_app.task(name="api.workers.ingest.generate_briefings")
+def generate_briefings() -> dict[str, object]:
+    """Generate weekly briefings — top 5 THEME_GROUPS by 7d post volume.
 
-    1 all-platform briefing + 4 per-segment (spiritual / family /
-    youth / justice). Each briefing now grounds its `daleel` paragraph
-    in passages retrieved from Qdrant — the LLM is constrained to cite
-    only those (PRD §12).
+    Each briefing grounds its `daleel` paragraph in passages retrieved
+    from Qdrant — the LLM is constrained to cite only those (PRD §12).
 
-    Runs Thursday 05:00 WIB — one hour after the 04:00 Gemini topic-
-    discovery pass so the LLM sees the freshest theme labels. Five
-    Gemini 2.5 Pro calls + five OpenAI embedding calls, ~$0.10-0.30
+    Runs Thursday 05:00 WIB (one hour after the 04:00 Gemini topic-
+    discovery pass so the LLM sees the freshest theme labels). Up to
+    5 Gemini 2.5 Pro calls + 5 OpenAI embedding calls, ~$0.10-0.30
     per run total.
+
+    Renamed from `generate_insights_summary` 2026-06-05 (Scope C
+    terminology cleanup).
     """
     try:
-        result = asyncio.run(insights_summary.generate_all_summaries())
+        result = asyncio.run(briefing.generate_all_briefings())
         return result
     except Exception:
-        log.exception("insights_summary.failed")
+        log.exception("briefing.failed")
         return {"error": "generate_failed"}
 
 

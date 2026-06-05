@@ -331,21 +331,19 @@ export const socialPosts = pgTable(
     sentimentLabel: text("sentiment_label"),
     sentimentScore: doublePrecision("sentiment_score"),
 
-    // Relevance (Gemini Flash-Lite, 9-category) — mean-of-top-2 since
-    // 2026-05-21 (was max(); see relevance.py for rationale).
-    dawahRelevance: doublePrecision("dawah_relevance"),
-    // 'Would a da'i actually use this?' second-pass score, 0-1
-    // continuous. UI sorts top-posts by this; falls back to
-    // dawahRelevance when NULL on pre-migration rows.
+    // 'Would a da'i actually use this?' relevance score, 0-1
+    // continuous. UI sorts top-posts by this. The legacy 9-PRD
+    // `categories` JSONB + `dawahRelevance` aggregate were retired
+    // 2026-06-05 (Scope C cleanup) along with the DB columns.
     dawahOpportunity: doublePrecision("dawah_opportunity"),
-    categories: jsonb("categories").$type<Record<string, number>>(),
 
     // Coarse THEME_GROUPS bucket — one of the 14 group labels or
     // 'Lainnya'. Populated at INGEST time by the same Gemini Flash-
-    // Lite call that fills `categories` (relevance.py). Adds ~10
-    // output tokens per post — no new round-trip. Rows pre-2026-06-03
-    // are NULL; the bucketing SQL in insights-data.ts falls back to
-    // `classify_theme_group(topic.label)` regex when NULL.
+    // Lite call that produces sentiment (`services.sentiment` in
+    // the API). ~10 extra output tokens per post — no new round-
+    // trip. Rows whose Gemini call failed before this field could
+    // be set are NULL; bucketing SQL falls back to
+    // `classifyThemeGroup(topic.label)` regex when NULL.
     themeGroup: text("theme_group"),
 
     // Per-video engagement metrics (YouTube videos.list stats; planned
@@ -374,7 +372,6 @@ export const socialPosts = pgTable(
   },
   (table) => [
     index("ix_social_posts_platform").on(table.platform),
-    index("ix_social_posts_relevance").on(table.dawahRelevance),
     index("ix_social_posts_topic_id").on(table.topicId),
     index("ix_social_posts_platform_region").on(table.platform, table.region),
     // Partial composite — only non-NULL theme_group rows are indexed.
@@ -1024,14 +1021,14 @@ export const adminLogs = pgTable(
 );
 
 /**
- * Weekly AI-narrated executive briefing for /insights. One row per
+ * Weekly AI-narrated executive briefing for /briefings. One row per
  * generation. Celery beat `generate_insights_summary` task writes
  * this every Thursday at 05:00 WIB (one hour after the topic-discovery
- * pass). The /insights page reads the most-recent row to render the
+ * pass). The /briefings page reads the most-recent row to render the
  * hero card.
  */
-export const insightsSummaries = pgTable(
-  "insights_summaries",
+export const briefings = pgTable(
+  "briefings",
   {
     id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
     generatedAt: timestamp("generated_at", { withTimezone: true })
@@ -1050,9 +1047,9 @@ export const insightsSummaries = pgTable(
     tokensIn: integer("tokens_in"),
     tokensOut: integer("tokens_out"),
     costUsd: doublePrecision("cost_usd"),
-    /** NULL = overall-view briefing. Otherwise one of `spiritual` /
-     *  `family` / `youth` / `justice` per the 2026-05-20 expansion. */
-    segment: text("segment"),
+    /** Theme group this briefing covers (one of 14 THEME_GROUPS labels
+     *  or 'Lainnya'). Renamed from `segment` 2026-06-05 (Scope C). */
+    themeGroup: text("theme_group"),
     /** Kitab passages the LLM was permitted to cite for this
      *  briefing. The render layer surfaces these as clickable chips
      *  beneath the narrative. Shape:
@@ -1067,12 +1064,12 @@ export const insightsSummaries = pgTable(
     adhkarRefs: jsonb("adhkar_refs").$type<DaleelRef[] | null>(),
   },
   (table) => [
-    index("ix_insights_summaries_generated_at").on(table.generatedAt),
-    index("ix_insights_summaries_segment").on(table.segment, table.generatedAt),
+    index("ix_briefings_generated_at").on(table.generatedAt),
+    index("ix_briefings_theme_group").on(table.themeGroup, table.generatedAt),
   ],
 );
 
-/** Shape of one item in `insightsSummaries.daleelRefs`. Mirrors what the
+/** Shape of one item in `briefings.daleelRefs`. Mirrors what the
  *  Python service writes — kept in sync by convention. */
 export type DaleelRef = {
   corpus: string;

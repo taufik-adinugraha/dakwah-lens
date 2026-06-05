@@ -13,18 +13,18 @@ import {
   BRIEFING_GROUPS,
   briefingSlug,
   extractFirstBriefingSection,
-  type LatestInsightsSummary,
-} from "@/lib/insights-data";
+  type LatestBriefing,
+} from "@/lib/briefing-data";
 
 /**
- * The /insights hub's focal element — 14 equal-sized group cards laid
+ * The /briefings hub's focal element — 14 equal-sized group cards laid
  * out in a responsive grid.
  *
  * Each card represents one THEME_GROUP. The auto-pipeline generates
  * weekly briefings for the TOP 5 groups by 7d post volume; cards for
  * those groups get a 1-sentence Section-1 preview + "Read briefing"
- * CTA into /insights/brief/[slug]. The other 9 group cards show an
- * "Explore topics & posts" CTA pointing at /insights/group/[slug],
+ * CTA into /briefings/[slug]. The other 9 group cards show an
+ * "Explore topics & posts" CTA pointing at /groups/[slug],
  * a lightweight landing showing the group's topics + recent posts
  * without a full LLM briefing.
  *
@@ -35,7 +35,7 @@ export async function BriefingsGrid({
   briefings,
   locale,
 }: {
-  briefings: Map<string, LatestInsightsSummary>;
+  briefings: Map<string, LatestBriefing>;
   locale: string;
 }) {
   const t = await getTranslations("Insights");
@@ -53,7 +53,7 @@ export async function BriefingsGrid({
   // (since 2026-06-04) — they were producing visual noise + diluting
   // the "this is what the week is about" signal. Readers who want to
   // explore non-briefed groups still get there through the explore
-  // page (/insights/explore) chart links.
+  // page (/radar) chart links.
   const orderedGroups = BRIEFING_GROUPS.filter((g) => briefings.has(g));
 
   return (
@@ -95,12 +95,12 @@ export async function BriefingsGrid({
               const previewLine = excerpt(previewSection, 170);
               const wordCount = body.trim().split(/\s+/).length;
               const readingMinutes = Math.max(1, Math.round(wordCount / 200));
-              const slug = briefingSlug(brief.generatedAt, brief.segment);
+              const slug = briefingSlug(brief.generatedAt, brief.themeGroup);
 
               return (
                 <li key={group}>
                   <Link
-                    href={`/insights/brief/${slug}`}
+                    href={`/briefings/${slug}`}
                     className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50/50 to-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-emerald-500 hover:shadow-lg"
                   >
                     <div
@@ -136,7 +136,7 @@ export async function BriefingsGrid({
             return (
               <li key={group}>
                 <Link
-                  href={`/insights/group/${groupSlug}`}
+                  href={`/groups/${groupSlug}`}
                   className="group relative flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-slate-900 hover:shadow-md"
                 >
                   <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition group-hover:bg-slate-900 group-hover:text-white">

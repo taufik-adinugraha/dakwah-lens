@@ -123,7 +123,7 @@ export function UserMenu({ email, name, status, role }: Props) {
             )}
             {/* Brief creation is admin-only while the feature is
                 experimental — non-admin approved users can still
-                reach /dashboard and /insights but won't see entry
+                reach /dashboard and /briefings but won't see entry
                 points to brief generation here. */}
             {isAdmin && (
               <>
@@ -177,7 +177,7 @@ export function UserMenu({ email, name, status, role }: Props) {
             )}
             {!approved && (
               <Link
-                href="/insights"
+                href="/briefings"
                 onClick={() => setOpen(false)}
                 className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50 hover:text-slate-900"
               >

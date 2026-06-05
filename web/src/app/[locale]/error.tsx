@@ -67,7 +67,7 @@ export default function ErrorBoundary({
             {t("error_cta_retry")}
           </button>
           <Link
-            href="/insights"
+            href="/briefings"
             className="inline-flex h-11 items-center gap-2 rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300"
           >
             <Compass className="h-4 w-4" />

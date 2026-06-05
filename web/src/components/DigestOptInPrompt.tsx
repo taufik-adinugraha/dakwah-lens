@@ -6,7 +6,7 @@ import { Mail, X } from "lucide-react";
 import { setDigestOptIn } from "@/app/[locale]/digest/actions";
 
 /**
- * Small inline prompt on /insights — "Get this each Thursday in your
+ * Small inline prompt on /briefings — "Get this each Thursday in your
  * inbox?". Hidden once the user opts in or dismisses (localStorage).
  *
  * We only render this for signed-in users who haven't already opted in;

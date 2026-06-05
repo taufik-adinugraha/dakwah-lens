@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import { db, schema } from "@/db";
 
 /**
- * Compact activity probe used by the /insights sticky-nudge chip.
+ * Compact activity probe used by the /briefings sticky-nudge chip.
  *
  * GET /api/m/rooms/activity?slugs=a,b,c
  *   → { rooms: [{ slug, approvedTotal, lastActivityAt }] }

@@ -2,7 +2,7 @@ import "server-only";
 import { NextResponse } from "next/server";
 
 import { getBrowser } from "@/lib/flyer/render/browser";
-import { getBriefingBySlug } from "@/lib/insights-data";
+import { getBriefingBySlug } from "@/lib/briefing-data";
 
 /**
  * GET /api/m/{briefSlug}/pdf

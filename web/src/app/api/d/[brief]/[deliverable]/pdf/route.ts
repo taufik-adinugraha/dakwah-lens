@@ -5,7 +5,7 @@ import { getBrowser } from "@/lib/flyer/render/browser";
 import {
   DELIVERABLE_HEADING_PATTERNS,
   getBriefingBySlug,
-} from "@/lib/insights-data";
+} from "@/lib/briefing-data";
 
 /**
  * GET /api/d/{briefSlug}/{deliverable}/pdf

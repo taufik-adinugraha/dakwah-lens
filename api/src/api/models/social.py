@@ -100,31 +100,26 @@ class SocialPost(Base, TimestampMixin):
     sentiment_score: Mapped[float | None] = mapped_column(Float)
     """Confidence of the predicted label, 0-1."""
 
-    # ── relevance (Gemini Flash-Lite, Stage 4) ─────────────────────
-    dawah_relevance: Mapped[float | None] = mapped_column(Float)
-    """Topical relevance, 0-1. Aggregated as mean-of-top-2 category
-    scores so single-keyword matches don't dominate (was max() until
-    2026-05-21). Used by segment filtering + topic discovery."""
-
+    # ── da'wah scoring ─────────────────────────────────────────────
+    # `dawah_relevance` + `categories` (9 PRD scores) removed
+    # 2026-06-05 — see Alembic migration a7c9d0e1f2g3. The classifier
+    # now produces a single `dawah_opportunity` score plus the
+    # `theme_group` bucket below.
     dawah_opportunity: Mapped[float | None] = mapped_column(Float)
     """'Would a da'i credibly use this?' score, 0-1 continuous.
-    Independent second-pass classifier with prompt-side calibration
-    anchors at 0.2/0.4/0.6/0.8 — addresses the bucketing pathology
-    where the topical relevance score collapsed to {0.0, 0.5, 1.0}.
-    UI sorts 'Top posts' by this; falls back to dawah_relevance when
-    NULL (rows from before the 2026-05-21 migration)."""
-
-    categories: Mapped[dict[str, float] | None] = mapped_column(JSONB)
-    """Per-category scores: `{ "akhlaq": 0.78, "muamalah": 0.12, … }`."""
+    Gemini Flash-Lite with prompt-side calibration anchors at
+    0.2/0.4/0.6/0.8. The UI sorts 'Top posts' by this — it's the
+    single relevance signal since the 9-PRD scoring was retired
+    2026-06-05."""
 
     theme_group: Mapped[str | None] = mapped_column(Text)
     """Coarse THEME_GROUPS bucket — one of the 14 group labels or
     'Lainnya'. Populated at INGEST time by the same Gemini Flash-Lite
-    call that fills `categories` (see `services.relevance.classify_batch`)
-    — adds ~10 output tokens to the existing per-post call, no new
-    round-trip. Rows pre-2026-06-03 (and any post whose Gemini call
-    fails before this field could be set) stay NULL; read paths fall
-    back to `classify_theme_group(topic.label)` regex in that case."""
+    call that produces sentiment (`services.sentiment.classify_batch`)
+    — adds ~10 output tokens to that call, no new round-trip. Rows
+    whose Gemini call failed before this field could be set stay NULL;
+    read paths fall back to `classify_theme_group(topic.label)` regex
+    in that case."""
 
     # ── engagement (YouTube videos.list stats — 2026-05-23) ─────────
     # Per-video interaction counts. Populated for platforms with public
@@ -153,7 +148,6 @@ class SocialPost(Base, TimestampMixin):
         UniqueConstraint(
             "platform", "external_id", name="uq_social_post_platform_external"
         ),
-        Index("ix_social_posts_relevance", "dawah_relevance"),
         Index("ix_social_posts_opportunity", "dawah_opportunity"),
         Index("ix_social_posts_platform_posted", "platform", "posted_at"),
         Index("ix_social_posts_platform_region", "platform", "region"),

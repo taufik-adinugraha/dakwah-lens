@@ -30,9 +30,6 @@ from api.db import SessionLocal
 from api.models.social import SocialPost
 from api.services.apify import scrape_x
 from api.services.relevance import (
-    classify_batch as classify_relevance,
-)
-from api.services.relevance import (
     classify_opportunity_batch as classify_opportunity,
 )
 from api.services.sentiment import classify_batch as classify_sentiment
@@ -143,25 +140,21 @@ async def _run(query: str, limit: int) -> int:
         return 0
     print(f"  Normalized {len(rows)} usable rows")
 
-    # 3. Classify (sentiment + relevance + opportunity)
+    # 3. Classify (sentiment+theme_group bundled, opportunity separate)
     texts = [r["text"] for r in rows]
-    print("  Running Gemini sentiment …")
+    # Sentiment + theme_group from one Gemini call since 2026-06-05.
+    print("  Running Gemini sentiment + theme_group …")
     sentiments = classify_sentiment(texts)
-    print("  Running Gemini relevance + opportunity …")
-    relevances = classify_relevance(texts)
+    print("  Running Gemini opportunity …")
     opportunities = classify_opportunity(texts)
 
-    for row, s, r, o in zip(
-        rows, sentiments, relevances, opportunities, strict=False
-    ):
+    for row, s, o in zip(rows, sentiments, opportunities, strict=False):
         # Gemini can return None if a chunk exhausted its retry budget;
         # leave the label NULL so `retry_failed_sentiment` picks it up.
         row["sentiment_label"] = s.label if s else None
         row["sentiment_score"] = s.score if s else None
-        row["dawah_relevance"] = r.dawah_relevance
         row["dawah_opportunity"] = o
-        row["categories"] = r.categories
-        row["theme_group"] = r.theme_group
+        row["theme_group"] = s.theme_group if s else None
 
     # 4. Upsert into Postgres
     async with SessionLocal() as session:
@@ -174,9 +167,10 @@ async def _run(query: str, limit: int) -> int:
                     "text": insert(SocialPost).excluded.text,
                     "sentiment_label": insert(SocialPost).excluded.sentiment_label,
                     "sentiment_score": insert(SocialPost).excluded.sentiment_score,
-                    "dawah_relevance": insert(SocialPost).excluded.dawah_relevance,
+                    # dawah_relevance + categories retired 2026-06-05;
+                    # omitted from SET so existing values stay intact
+                    # for historical rows. New rows just have them NULL.
                     "dawah_opportunity": insert(SocialPost).excluded.dawah_opportunity,
-                    "categories": insert(SocialPost).excluded.categories,
                     "theme_group": insert(SocialPost).excluded.theme_group,
                     "raw_payload": insert(SocialPost).excluded.raw_payload,
                 },

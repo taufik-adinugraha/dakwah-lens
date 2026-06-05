@@ -65,8 +65,8 @@ from typing import Any
 import structlog
 
 from api.db import SessionLocal
-from api.models.admin import InsightsSummary
-from api.services.insights_summary import (
+from api.models.admin import Briefing
+from api.services.briefing import (
     SYSTEM_PROMPT_ID,
     _build_retrieval_query,
     _build_user_prompt,
@@ -155,7 +155,7 @@ async def _prepare_context(
 
         retrieval_query = _build_retrieval_query(stats, group)
         # Same widened-pool params as the auto pipeline
-        # (generate_summary in insights_summary.py). limit=28
+        # (generate_summary in briefing.py). limit=28
         # candidates + top_n=18 reranked gives the brief LLM a
         # genuinely thematic pool to pick from — 6 sub-sections + 6
         # Pesan Flyer slots = 12 needs, so a pool of 18 leaves real
@@ -368,7 +368,7 @@ async def cmd_save(group_arg: str, markdown_path: str) -> None:
         sys.stderr.write(f"⚠ Validation pass failed (non-fatal): {exc}\n")
 
     async with SessionLocal() as session:
-        row = InsightsSummary(
+        row = Briefing(
             generated_at=datetime.now(UTC),
             period_start=datetime.fromisoformat(stats["period_start"]),
             period_end=datetime.fromisoformat(stats["period_end"]),
@@ -381,7 +381,7 @@ async def cmd_save(group_arg: str, markdown_path: str) -> None:
             cost_usd=0.0,
             # `segment` column carries the canonical group label
             # since 2026-06-03 (was a 4-segment slug).
-            segment=group,
+            theme_group=group,
             daleel_refs=daleel,
             adhkar_refs=adhkar,
         )
@@ -491,9 +491,9 @@ async def cmd_apply_swaps(group_arg: str, swaps_file: str | None) -> None:
 
     async with SessionLocal() as session:
         result = await session.execute(
-            select(InsightsSummary)
-            .where(InsightsSummary.segment == group)
-            .order_by(desc(InsightsSummary.generated_at))
+            select(Briefing)
+            .where(Briefing.theme_group == group)
+            .order_by(desc(Briefing.generated_at))
             .limit(1)
         )
         row = result.scalar_one_or_none()
@@ -524,8 +524,8 @@ async def cmd_apply_swaps(group_arg: str, swaps_file: str | None) -> None:
             return
 
         await session.execute(
-            update(InsightsSummary)
-            .where(InsightsSummary.id == row.id)
+            update(Briefing)
+            .where(Briefing.id == row.id)
             .values(summary_md=new_md)
         )
         await session.commit()
@@ -563,12 +563,12 @@ async def cmd_list() -> None:
         for tg in THEME_GROUPS:
             stmt = (
                 select(
-                    InsightsSummary.segment,
-                    InsightsSummary.generated_at,
-                    InsightsSummary.model,
+                    Briefing.theme_group,
+                    Briefing.generated_at,
+                    Briefing.model,
                 )
-                .where(InsightsSummary.segment == tg.group)
-                .order_by(desc(InsightsSummary.generated_at))
+                .where(Briefing.theme_group == tg.group)
+                .order_by(desc(Briefing.generated_at))
                 .limit(1)
             )
             result = await session.execute(stmt)
@@ -614,7 +614,7 @@ async def cmd_clear(assume_yes: bool) -> None:
 
     async with SessionLocal() as session:
         total = (
-            await session.execute(select(func.count()).select_from(InsightsSummary))
+            await session.execute(select(func.count()).select_from(Briefing))
         ).scalar() or 0
         if total == 0:
             sys.stderr.write("insights_summaries is already empty — nothing to delete.\n")
@@ -631,10 +631,10 @@ async def cmd_clear(assume_yes: bool) -> None:
             if input().strip() != "DELETE ALL BRIEFINGS":
                 raise SystemExit("Aborted — confirmation phrase did not match.")
 
-        await session.execute(delete(InsightsSummary))
+        await session.execute(delete(Briefing))
         await session.commit()
         remaining = (
-            await session.execute(select(func.count()).select_from(InsightsSummary))
+            await session.execute(select(func.count()).select_from(Briefing))
         ).scalar() or 0
         sys.stderr.write(
             f"✓ Deleted {total} row(s). insights_summaries now has {remaining}.\n"

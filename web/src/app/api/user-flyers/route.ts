@@ -6,7 +6,7 @@ import { z } from "zod";
 
 import { auth } from "@/auth";
 import { db, schema } from "@/db";
-import { getOverviewInsights } from "@/lib/insights-data";
+import { getOverviewInsights } from "@/lib/briefing-data";
 import { getCurrentTopicContext } from "@/lib/dashboard-metrics";
 import { translateHadithToId } from "@/lib/hadith-translation";
 import { searchKitabBrowse, type KitabCorpus } from "@/lib/kitab-retrieval";
@@ -196,16 +196,18 @@ export async function POST(req: Request): Promise<NextResponse> {
         }
       }
       // Fallback: stale topic-id (deleted between page-load and submit)
-      // or no topic picked → broad aggregate.
+      // or no topic picked → broad aggregate. Uses the top THEME_GROUP
+      // (was top 9-PRD category before Scope C cleanup 2026-06-05).
       if (!news) {
         const overview = await getOverviewInsights();
-        const topCat = overview?.dominantCategories?.[0]?.category ?? null;
+        const topGroup =
+          overview?.dominantGroups?.find((g) => g.posts > 0)?.group ?? null;
         const trending = (overview?.trendingTopics ?? [])
           .map((t) => t.label)
           .filter(Boolean)
           .slice(0, 5);
-        if (topCat) {
-          news = { topCategory: topCat, topTopics: trending };
+        if (topGroup) {
+          news = { topCategory: topGroup, topTopics: trending };
         }
       }
     } catch (err) {

@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 
 /**
- * Small breadcrumb-style back-link to `/insights`.
+ * Small breadcrumb-style back-link to `/briefings`.
  *
  * Placed at the top of every page reachable FROM the insights hub
  * (per-platform pages, segment-focus pages, /kitab) so readers can
@@ -20,7 +20,7 @@ export async function BackToInsightsLink({
   const t = await getTranslations("Insights");
   return (
     <Link
-      href="/insights"
+      href="/briefings"
       className={`inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 transition hover:text-slate-900 print:hidden ${className}`}
     >
       <ArrowLeft className="h-3.5 w-3.5" />

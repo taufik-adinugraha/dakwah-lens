@@ -27,7 +27,7 @@ export async function Header() {
     ...(user
       ? [{ href: `/${locale}/dashboard`, label: t("dashboard") }]
       : []),
-    { href: `/${locale}/insights`, label: t("insights") },
+    { href: `/${locale}/briefings`, label: t("insights") },
     { href: `/${locale}/discussions`, label: t("discussions") },
     { href: `/${locale}/kitab`, label: t("kitab") },
     { href: `/${locale}/flyers/public`, label: t("flyers_library") },
@@ -74,7 +74,7 @@ export async function Header() {
                 {t("dashboard")}
               </Link>
             )}
-            <Link href="/insights" className="hover:text-slate-900 transition">
+            <Link href="/briefings" className="hover:text-slate-900 transition">
               {t("insights")}
             </Link>
             <Link
