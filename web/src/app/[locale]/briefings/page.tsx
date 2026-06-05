@@ -34,7 +34,7 @@ export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/briefings">): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "Insights" });
+  const t = await getTranslations({ locale, namespace: "Briefing" });
   return { title: t("page_title") };
 }
 
@@ -46,7 +46,7 @@ export default async function InsightsPage({
   const sp = await searchParams;
   setRequestLocale(locale);
 
-  const t = await getTranslations("Insights");
+  const t = await getTranslations("Briefing");
   // Proxy.ts redirects non-admin users hitting /briefs/* here with
   // `?notice=briefs-admin-only` — render a small banner so they know
   // why they got bounced (was previously silent, see audit 2026-05-26).

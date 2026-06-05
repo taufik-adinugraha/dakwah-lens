@@ -40,7 +40,7 @@ export function DaleelChips({
   mode?: "chips" | "cards";
   headerLabel?: string;
 }) {
-  const t = useTranslations("Insights");
+  const t = useTranslations("Briefing");
   const locale = useLocale();
   const [activeId, setActiveId] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
@@ -181,7 +181,7 @@ function DaleelModal({
   daleel: DaleelRef;
   onClose: () => void;
 }) {
-  const t = useTranslations("Insights");
+  const t = useTranslations("Briefing");
   const locale = useLocale();
   // Locale-aware default: when the user reads in id, only ID translation
   // shows; when in en, only EN. A toggle reveals the other translation

@@ -31,7 +31,7 @@ export async function BriefPagination({
   navigation: BriefingNavigation;
   currentGroup: string;
 }) {
-  const t = await getTranslations("Insights");
+  const t = await getTranslations("Briefing");
 
   const formatEditionDate = (d: Date) =>
     d.toLocaleDateString(locale, {

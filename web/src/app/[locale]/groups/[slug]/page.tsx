@@ -46,7 +46,7 @@ export async function generateMetadata({
   const { slug, locale } = await params;
   const group = GROUP_BY_SLUG[slug];
   if (!group) return { title: "Group not found" };
-  const t = await getTranslations({ locale, namespace: "Insights" });
+  const t = await getTranslations({ locale, namespace: "Briefing" });
   return { title: t("group_page_title", { group }) };
 }
 
@@ -61,7 +61,7 @@ export default async function GroupLandingPage({
   const group = GROUP_BY_SLUG[slug];
   if (!group) notFound();
 
-  const t = await getTranslations("Insights");
+  const t = await getTranslations("Briefing");
 
   // 1. Resolve which topics belong to this group. The regex lives in
   //    application code (dashboard-metrics.ts THEME_GROUPS), not SQL,

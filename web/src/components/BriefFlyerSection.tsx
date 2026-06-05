@@ -47,7 +47,7 @@ const VARIANTS: Variant[] = [
 
 export function BriefFlyerSection({ briefId }: { briefId: string }) {
   const locale = useLocale();
-  const t = useTranslations("Insights");
+  const t = useTranslations("Briefing");
   const lang = locale === "en" ? "en" : "id";
 
   // Previews are heavy (6 × 1080² PNGs) and visually dominate the

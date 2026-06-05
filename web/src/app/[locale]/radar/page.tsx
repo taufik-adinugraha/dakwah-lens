@@ -50,7 +50,7 @@ export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/radar">): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "Insights" });
+  const t = await getTranslations({ locale, namespace: "Briefing" });
   return { title: t("explore_page_title") };
 }
 
@@ -60,7 +60,7 @@ export default async function InsightsExplorePage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const t = await getTranslations("Insights");
+  const t = await getTranslations("Briefing");
 
   const [
     overview,
@@ -373,7 +373,7 @@ export default async function InsightsExplorePage({
   );
 }
 
-type T = Awaited<ReturnType<typeof getTranslations<"Insights">>>;
+type T = Awaited<ReturnType<typeof getTranslations<"Briefing">>>;
 
 const PLATFORM_VISUALS: Record<
   string,

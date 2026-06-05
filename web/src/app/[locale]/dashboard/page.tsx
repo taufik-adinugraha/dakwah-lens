@@ -85,7 +85,7 @@ export default async function DashboardPage({
   const tKajian = await getTranslations("Kajian");
   // Pulled from the Insights namespace so the segment names in the
   // Kit tab strip match /briefings/segment/[focus] verbatim.
-  const tInsights = await getTranslations("Insights");
+  const tInsights = await getTranslations("Briefing");
 
   // Indonesian context: addressing someone by their bare first name is too
   // direct. We fetch the profile + use the panggilan helper so the greeting

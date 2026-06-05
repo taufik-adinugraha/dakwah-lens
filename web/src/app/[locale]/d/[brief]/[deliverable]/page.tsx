@@ -91,7 +91,7 @@ export default async function DeliverablePage({ params }: Props) {
   }
 
   setRequestLocale(locale);
-  const t = await getTranslations("Insights");
+  const t = await getTranslations("Briefing");
 
   const row = await getBriefingBySlug(brief);
   if (!row) notFound();

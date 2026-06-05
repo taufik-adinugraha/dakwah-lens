@@ -17,7 +17,7 @@ export async function BackToInsightsLink({
 }: {
   className?: string;
 }) {
-  const t = await getTranslations("Insights");
+  const t = await getTranslations("Briefing");
   return (
     <Link
       href="/briefings"

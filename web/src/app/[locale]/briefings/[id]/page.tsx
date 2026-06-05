@@ -32,7 +32,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string; id: string }>;
 }): Promise<Metadata> {
   const { locale, id } = await params;
-  const t = await getTranslations({ locale, namespace: "Insights" });
+  const t = await getTranslations({ locale, namespace: "Briefing" });
   const brief = await getBriefingBySlug(id);
   if (!brief) {
     return { title: t("brief_not_found_title") };

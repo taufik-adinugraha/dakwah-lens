@@ -58,7 +58,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function MahasiswaArticlePage({ params }: Props) {
   const { id, locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations("Insights");
+  const t = await getTranslations("Briefing");
 
   const brief = await getBriefingBySlug(id);
   if (!brief) notFound();

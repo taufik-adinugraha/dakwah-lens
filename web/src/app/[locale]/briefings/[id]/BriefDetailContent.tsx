@@ -44,7 +44,7 @@ export async function BriefDetailContent({
   initialDeliverable: DeliverableSlug | null;
 }) {
   setRequestLocale(locale);
-  const t = await getTranslations("Insights");
+  const t = await getTranslations("Briefing");
 
   const brief = await getBriefingBySlug(id);
   if (!brief) notFound();

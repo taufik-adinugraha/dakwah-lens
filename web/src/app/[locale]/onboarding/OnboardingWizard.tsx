@@ -184,7 +184,7 @@ export function OnboardingWizard() {
   // key strings (titleKey/hintKey are looked up at runtime). Cast through
   // the loose T alias so the call sites stay readable.
   const t = useTranslations("Onboarding") as unknown as T;
-  const tInsights = useTranslations("Insights") as unknown as T;
+  const tInsights = useTranslations("Briefing") as unknown as T;
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
   const [pending, startTransition] = useTransition();

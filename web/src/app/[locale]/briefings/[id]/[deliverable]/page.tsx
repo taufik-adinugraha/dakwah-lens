@@ -56,7 +56,7 @@ export async function generateMetadata({
   const slug = asDeliverable(deliverable);
   if (!slug) return { title: "Not found" };
 
-  const t = await getTranslations({ locale, namespace: "Insights" });
+  const t = await getTranslations({ locale, namespace: "Briefing" });
   const brief = await getBriefingBySlug(id);
   if (!brief) return { title: t("brief_not_found_title") };
 

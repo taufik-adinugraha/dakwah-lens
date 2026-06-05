@@ -85,7 +85,7 @@ export default async function PlatformDrilldownPage({
   if (!config) notFound();
 
   const t = await getTranslations(config.namespace);
-  const tInsights = await getTranslations({ locale, namespace: "Insights" });
+  const tInsights = await getTranslations({ locale, namespace: "Briefing" });
 
   // Scope-aware filters — only meaningful on `mainstream`. Defaults to
   // "all" so we don't surprise existing users. Region wins when both are
@@ -295,7 +295,7 @@ async function CategoryTopicCharts({
   locale: string;
   platform: string;
 }) {
-  const tInsights = await getTranslations({ locale, namespace: "Insights" });
+  const tInsights = await getTranslations({ locale, namespace: "Briefing" });
 
   // 9 PRD categories pane retired 2026-06-05 — the per-platform
   // theme-group breakdown lives in the ThemeGroupReachPanel WoW

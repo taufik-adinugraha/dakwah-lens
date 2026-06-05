@@ -38,7 +38,7 @@ export default async function SavedPage({
   if (!session?.user?.id) redirect("/login?callbackUrl=/saved");
 
   const t = await getTranslations({ locale, namespace: "Saved" });
-  const tInsights = await getTranslations({ locale, namespace: "Insights" });
+  const tInsights = await getTranslations({ locale, namespace: "Briefing" });
 
   // Brief generation is admin-only while the feature is experimental
   // (2026-05-23). Non-admin users can't reach the brief detail pages,

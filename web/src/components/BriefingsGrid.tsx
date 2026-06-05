@@ -38,7 +38,7 @@ export async function BriefingsGrid({
   briefings: Map<string, LatestBriefing>;
   locale: string;
 }) {
-  const t = await getTranslations("Insights");
+  const t = await getTranslations("Briefing");
 
   const formatDate = (d: Date) =>
     d.toLocaleDateString(locale, {
