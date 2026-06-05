@@ -1,18 +1,18 @@
-"""Weekly executive briefing(s) per topic group for the public /insights page.
+"""Weekly executive briefing(s) per theme group for the public /briefings page.
 
-As of 2026-06-03 the briefing structure is: weekly auto-pipeline picks
-the TOP 5 of 14 THEME_GROUPS by 7-day post volume (above a
-`MIN_POSTS_PER_GROUP_FOR_BRIEFING` floor) and synthesizes one Gemini
-Pro briefing per group. The other 9 groups stay un-briefed by the auto
-pipeline but remain explorable via the web's group landing pages
-(topics + recent posts). Users who want a fully-synthesized brief on
-a specific topic in those groups go through the standard /briefs/new
+As of 2026-06-05 the briefing structure is: weekly auto-pipeline
+generates one Gemini Pro briefing for every THEME_GROUP that crossed
+the `MIN_POSTS_PER_GROUP_FOR_BRIEFING` 7-day volume floor (no top-N
+cap). Groups below the floor or with zero posts are skipped; users
+who want a brief on those can still use the standard /briefs/new
 topic-pick flow.
 
 Replaces the prior 5-briefing structure (all-platform + 4 audience-
-segments: spiritual/family/youth/justice). The original 2026-06-03
-plan was "one briefing per group" — narrowed to top-5 on the same
-date for cost discipline.
+segments: spiritual/family/youth/justice) on 2026-06-03 with a
+per-group structure that was initially capped at top-5 for cost
+discipline. The cap was removed 2026-06-05 once the cost projection
+(~$3.40/mo for 14 briefings × 4 weeks) confirmed comfortable
+headroom under the IDR cap.
 
 Per-briefing layers:
   1. Numerik & Tren — what trended this week within this group
@@ -2111,35 +2111,27 @@ async def generate_briefing(
         }
 
 
-TOP_N_GROUPS_FOR_BRIEFING = 5
-
-
 async def generate_all_briefings() -> dict[str, Any]:
-    """Generate weekly briefings for the TOP `TOP_N_GROUPS_FOR_BRIEFING`
-    THEME_GROUPS by 7-day post volume (filtered by the
-    `MIN_POSTS_PER_GROUP_FOR_BRIEFING` floor).
+    """Generate weekly briefings for every THEME_GROUP that crossed
+    the `MIN_POSTS_PER_GROUP_FOR_BRIEFING` 7-day volume floor.
 
-    Why top-N (not all 14): Gemini Pro is the dominant cost line item
-    and 14 briefings × 4 weeks would push past the IDR cap. The 5
-    groups with the highest weekly volume are the ones with strongest
-    user signal — readers see the topics that are actually shaping the
-    week. The other 9 groups can still be explored via the web's group
-    landing pages (topics + posts), and users who want a fully-
-    synthesized brief on a specific topic in those groups can use the
-    standard /briefs/new topic-pick flow.
+    Widened from top-5 to all-above-floor 2026-06-05: the original
+    top-5 cap was a cost-cap workaround, but at ~$0.06 per briefing
+    × 14 groups × 4 weeks ≈ $3.40/mo we're well under the IDR cap.
+    Every group now gets its own briefing when there's enough signal
+    to ground one (≥30 posts/7d), which makes the per-group landing
+    pages (/groups/[slug]) consistently useful rather than going dark
+    9 weeks out of 14.
 
     Returns a dict keyed by group name with status:
-      - True       → briefing generated and persisted (top-N + above floor)
-      - False      → generation attempted but failed (logged)
+      - True               → briefing generated and persisted
+      - False              → generation attempted but failed (logged)
       - "skipped:thin"     → below MIN_POSTS_PER_GROUP_FOR_BRIEFING
-      - "skipped:not_top"  → above floor but not in the top-N this week
-      - "skipped:no_topics" → no topics map to this group this week
+      - "skipped:no_topics" → group has zero posts in the 7d window
 
     The all-platform / per-audience-segment briefings were removed
     2026-06-03 in favor of this topic-group structure (see
-    project_insights_briefings memory). The top-N selection was added
-    on the same date after a course correction from the original
-    "briefing for every group" plan.
+    project_insights_briefings memory).
     """
     results: dict[str, Any] = {}
     # Pre-check pass: a single shared session resolves each group's
@@ -2187,22 +2179,17 @@ async def generate_all_briefings() -> dict[str, Any]:
                 )
                 results[group] = False
 
-    # Rank by volume desc, drop anything below the floor, take top-N.
+    # Rank by volume desc (logging only — every group above the floor
+    # is generated regardless of rank).
     above_floor = [
         (g, c) for g, c in counts.items() if c >= MIN_POSTS_PER_GROUP_FOR_BRIEFING
     ]
     above_floor.sort(key=lambda kv: kv[1], reverse=True)
-    top_groups = [g for g, _ in above_floor[:TOP_N_GROUPS_FOR_BRIEFING]]
-    top_set = set(top_groups)
 
     log.info(
-        "briefing.top_n_selected",
-        top_n=TOP_N_GROUPS_FOR_BRIEFING,
+        "briefing.groups_selected",
         floor=MIN_POSTS_PER_GROUP_FOR_BRIEFING,
-        selected=[(g, counts[g]) for g in top_groups],
-        not_selected_above_floor=[
-            (g, c) for g, c in above_floor[TOP_N_GROUPS_FOR_BRIEFING:]
-        ],
+        selected=above_floor,
     )
 
     for tg in THEME_GROUPS:
@@ -2218,15 +2205,6 @@ async def generate_all_briefings() -> dict[str, Any]:
                 floor=MIN_POSTS_PER_GROUP_FOR_BRIEFING,
             )
             results[group] = "skipped:thin"
-            continue
-        if group not in top_set:
-            log.info(
-                "briefing.group_skip_not_top",
-                theme_group=group,
-                posts_7d=count,
-                top_n=TOP_N_GROUPS_FOR_BRIEFING,
-            )
-            results[group] = "skipped:not_top"
             continue
         try:
             ok = await generate_briefing(group) is not None

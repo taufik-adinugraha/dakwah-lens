@@ -367,18 +367,20 @@ def send_weekly_digest() -> dict[str, object]:
 
 @celery_app.task(name="api.workers.ingest.generate_briefings")
 def generate_briefings() -> dict[str, object]:
-    """Generate weekly briefings — top 5 THEME_GROUPS by 7d post volume.
+    """Generate weekly briefings — one per THEME_GROUP that crossed the
+    `MIN_POSTS_PER_GROUP_FOR_BRIEFING` volume floor in the last 7 days.
 
     Each briefing grounds its `daleel` paragraph in passages retrieved
     from Qdrant — the LLM is constrained to cite only those (PRD §12).
 
     Runs Thursday 05:00 WIB (one hour after the 04:00 Gemini topic-
     discovery pass so the LLM sees the freshest theme labels). Up to
-    5 Gemini 2.5 Pro calls + 5 OpenAI embedding calls, ~$0.10-0.30
-    per run total.
+    14 Gemini 2.5 Pro calls + 14 OpenAI embedding calls per run; cost
+    scales to ~$0.30-0.85 per cycle (~$3.40/month at ~$0.06 per
+    briefing × 14 × 4 weeks).
 
-    Renamed from `generate_insights_summary` 2026-06-05 (Scope C
-    terminology cleanup).
+    Renamed from `generate_insights_summary` 2026-06-05 (Scope C).
+    Widened from top-5 to all-above-floor 2026-06-05.
     """
     try:
         result = asyncio.run(briefing.generate_all_briefings())
