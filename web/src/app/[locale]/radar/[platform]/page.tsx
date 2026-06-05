@@ -606,15 +606,7 @@ function TopOutlets({
               );
               const gridClasses =
                 "grid grid-cols-[140px_1fr_auto] items-center gap-3 rounded-lg px-2 py-2 sm:grid-cols-[200px_1fr_auto]";
-              return useLive ? (
-                <Link
-                  key={o.name}
-                  href={`/briefings/${platform}/posts?author=${encodeURIComponent(o.name)}`}
-                  className={`${gridClasses} transition hover:bg-slate-50`}
-                >
-                  {rowInner}
-                </Link>
-              ) : (
+              return (
                 <div key={o.name} className={gridClasses}>
                   {rowInner}
                 </div>
