@@ -181,28 +181,22 @@ THEME_GROUPS — pick EXACTLY ONE per post (literal name, in Indonesian):
 
 KEY ROUTING RULES (these are the bugs surface-regex got wrong):
 - A political/accountability story about a state ritual (e.g. "Polemik Sapi Kurban Presiden" — controversy over how the President's kurban was procured) → "Pemerintahan & Kebijakan", NOT "Aqidah & Ibadah". Aqidah & Ibadah is only for posts that are themselves about practicing the ibadah.
-- National-day commemorations and state ideology (e.g. "Peringatan Hari Lahir Pancasila", "Upacara Bendera", "Presiden pidato di Gedung Pancasila") → "Pemerintahan & Kebijakan". Includes when a political party (PDIP/Gerindra/etc) hosts a Pancasila-day flag ceremony — the EVENT is state-ideology, not religious or social.
-- Gaji ke-13/14 ASN/TNI/Polri/PNS/pensiunan cair → "Pemerintahan & Kebijakan" (state-budget compensation, not Lainnya). PPPK paruh waktu / PNS regulasi labor issues → "Pemerintahan & Kebijakan" OR "Pekerja & Pertanian Rakyat" (latter if framing is labor-rights focused).
+- National-day commemorations and state ideology (e.g. "Peringatan Hari Lahir Pancasila") → "Pemerintahan & Kebijakan".
 - Mysterious-fire / mass-fire / disaster fenomena (e.g. "Fenomena Api Misterius di Sleman") → "Lingkungan & Bencana".
 - Local crime + corruption → "Hukum & Keadilan". State policy / officials → "Pemerintahan & Kebijakan".
 - Diplomatic visits, foreign trips, summits, bilateral meetings between governments → "Pemerintahan & Kebijakan".
 - University news (rektor, SPMB, akreditasi, pelatihan vokasi, beasiswa, pesantren operations, sekolah rakyat) → "Pendidikan & SDM".
 - Stock prices, IHSG, forex, commodity prices, harga emas, corporate financial moves, dividen, investasi → "Ekonomi & Bisnis".
-- Daily harga emas price tables — "Harga Emas Antam Hari Ini", "Harga Emas UBS / Galeri24 / Pegadaian" routinely published by Tribun Palu / infobanktv / Tanya Emas Indonesia / Bloomberg Technoz / Ojo Lali Emas channels → ALWAYS "Ekonomi & Bisnis", never Lainnya. The format is literally a commodity price feed.
-- PMI / inflasi / surplus perdagangan / nilai tukar / Bank Indonesia / OJK rate decisions → "Ekonomi & Bisnis".
 - Quran recitation, surah/ayat explanations, ceramah, khutbah, tausiyah videos → "Aqidah & Ibadah" (route by FORMAT, not by the surah's subject — a recitation of Al-Zalzalah is Aqidah & Ibadah even though "zalzalah" means earthquake).
 - DPR/parliament/political party events, ministerial statements, RDP, Munas, fraksi politics → "Pemerintahan & Kebijakan".
 - Earthquakes, floods, landslides, weather emergencies, accidents involving natural forces → "Lingkungan & Bencana".
 - Crime, arrests, police operations, consumer fraud (WO scams, pinjol scams, online crime) → "Hukum & Keadilan".
 - Da'wah ceramah, pengajian, tausiyah, Islamic talks by ustadz/kyai/buya → "Aqidah & Ibadah" (not Inspirasi & Kisah Pribadi — Inspirasi is for personal first-person reflections without religious-teaching framing).
-- POSTS BY NAMED INDONESIAN DA'WAH PREACHERS — Buya Yahya, Felix Siauw, Hanan Attaki, Khalid Basalamah, Ustadz Adi Hidayat, Habib Jafar, Gus Baha, Buya Hamka, Ustadz Abdul Somad, OR YouTube channels Yufid.TV, Al-Bahjah TV, NU Online, Rumah Fiqih, Yufid EDU — ALWAYS → "Aqidah & Ibadah", even when the topic is parenting ("cara menghadapi anak belum shalat"), love ("Cinta Itu Menjaga dari Maksiat"), or gratitude ("Mensyukuri Nikmat"). These are dakwah outputs by definition; the framing wraps the lesson in everyday subjects.
-- Mualaf stories — non-Muslim converts to Islam, mualaf journey, "memeluk Islam", "masuk Islam after wedding" → "Aqidah & Ibadah" (not Sosial & Keluarga, even when family/marriage is in the story).
 - Sports of any kind — football matches (Timnas, Liga, FIFA, club transfers), MotoGP/Moto3, badminton tournaments (Indonesia Open), tennis cups, futsal, racing, Olympic events, fan-club events, athlete profiles, sport line-ups, sport line scores, club-vs-club news — ALWAYS → "Lainnya", even when:
     a government body hosts the event (Pemkot/Pemkab/Kemenpora tennis cup → "Lainnya", not "Pemerintahan & Kebijakan"),
     the national team or named Indonesian athlete is featured (Timnas vs Oman line-up → "Lainnya", not "Pemerintahan"; Veda Ega MotoGP → "Lainnya", not "Pekerja & Pertanian Rakyat"),
     the article is about transfer fees / contracts (AC Milan transfer → "Lainnya", not "Ekonomi & Bisnis").
-- Music releases, single launches, MV / album drops, artist comebacks, K-pop voting campaigns, sinetron (Indonesian soap operas like "Terikat Janji"), drama mini series, K-drama, manhwa/anime reviews, gaming streams → "Lainnya" (not "Ekonomi & Bisnis", not Inspirasi, not Sosial).
-- Christian devotionals ("Renungan Harian Kristen", Lukas/Matius verse readings), Buddhist Waisak content not tied to political ceremony, Hindu festivals, interfaith disputes about places-of-worship (church bombings, gereja pembubaran, "Jabar Barbar konflik rumah ibadah") → "Toleransi & Lintas-Iman". This is the catch-all for non-Islamic religious content + interfaith tension. NOT Aqidah & Ibadah (that's reserved for Islamic ibadah practice) and NOT Lainnya.
+- Music releases, single launches, MV / album drops, artist comebacks → "Lainnya" (not "Ekonomi & Bisnis", even though they're commercial).
 - Traffic accidents, vehicle collisions, gas poisoning, electric shocks, accidental drownings → route by AGENT: if police investigation or criminal negligence → "Hukum & Keadilan"; if pure accident with no crime angle → "Lainnya". NOT "Lingkungan & Bencana" (that's reserved for natural forces like floods, earthquakes, volcanoes, mass-fires).
 - LPSK / Komnas HAM / witness-protection / journalist-doxing / HAM watchdog cases → "Hukum & Keadilan" (not Sosial & Keluarga, even when family members are mentioned).
 
