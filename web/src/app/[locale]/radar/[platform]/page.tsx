@@ -344,10 +344,9 @@ async function CategoryTopicCharts({
                     ? ((topic.postCount / topTotal) * 100).toFixed(1)
                     : "0.0";
                   return (
-                    <Link
+                    <div
                       key={topic.id}
-                      href={`/briefings/${platform}/posts?topic=${topic.id}`}
-                      className="group block rounded-lg px-2 py-1.5 transition hover:bg-slate-50"
+                      className="block rounded-lg px-2 py-1.5"
                     >
                       <div className="flex items-baseline justify-between gap-3">
                         <span className="truncate text-sm font-medium text-slate-800">
@@ -364,7 +363,7 @@ async function CategoryTopicCharts({
                           style={{ width: `${(topic.postCount / topMax) * 100}%` }}
                         />
                       </div>
-                    </Link>
+                    </div>
                   );
                 })}
               </div>
