@@ -767,7 +767,7 @@
     "category_chart_offtaxonomy_body": "Tidak semua percakapan publik relevan ke 14 kelompok tema dakwah kami — sebagian berisi berita olahraga, prakiraan cuaca, hiburan ringan, atau topik niche yang tidak memberi handle dakwah konkret. Postingan ini sengaja kami keluarkan dari hitungan persentase di atas supaya angka yang Anda baca mencerminkan share-of-attention di dalam ruang yang memang menjadi fokus dakwah, bukan ditipiskan oleh konten yang tidak akan pernah masuk briefing.",
     "group_page_title": "{group} — Kelompok Tema",
     "group_eyebrow": "Kelompok tema",
-    "group_page_intro": "Halaman ini mengumpulkan {topics} topik aktif yang terklasifikasi ke kelompok <strong>{group}</strong>. Belum ada briefing penuh otomatis pekan ini untuk kelompok ini — gunakan list topik + postingan di bawah untuk eksplorasi.",
+    "group_page_intro": "Halaman ini mengumpulkan {topics} topik aktif yang terklasifikasi ke kelompok {group}. Belum ada briefing penuh otomatis pekan ini untuk kelompok ini — gunakan list topik + postingan di bawah untuk eksplorasi.",
     "group_briefing_available_title": "Briefing pekan ini tersedia",
     "group_briefing_available_body": "Kelompok ini masuk top-5 pekan ini — briefing penuh (khutbah, kajian, kreator, dll.) sudah diterbitkan.",
     "group_topics_title": "Topik di kelompok ini",
@@ -2134,7 +2134,6 @@
     "brief_stage_5_body": "Zod memvalidasi bentuk respons, melekatkan array dalil yang diambil, lalu menyimpan ke `briefs`. Kegagalan muncul sebagai error bertipe ke form — tidak pernah berakhir menjadi baris setengah jadi.",
     "brief_callout_strong": "Aturan keras per PRD §12:",
     "brief_callout_body": "system prompt secara eksplisit melarang LLM mengarang ayat Al-Qur'an atau kutipan hadits tambahan. Model hanya melihat array dalil yang kami ambil — kalau mencoba menambah, validasi akan menangkapnya.",
-
     "insights_brief_title": "Briefing insights mingguan.",
     "insights_brief_subtitle": "Apa yang sistem (atau operator) tulis tiap Kamis untuk semua orang — hingga 5 briefing per cycle (top kelompok tema dengan volume diskusi tertinggi pekan ini) dalam Bahasa Indonesia. Publik di /briefings/{tanggal}-{kelompok-slug}. Setiap briefing adalah content kit lengkap 11.000-14.700 kata dengan 8 deliverable siap-pakai + 1 poster kampus + 6 flyer share-ready.",
     "insights_brief_stage_1_title": "Trigger",
@@ -2182,7 +2181,6 @@
     "anatomy_flyer_genz_title": "Flyer Gen Z — bolder & headline-led",
     "anatomy_flyer_genz_body": "Headline punchy 64-78px sebagai focal element, palette violet→fuchsia→amber, ayat sebagai supporting card miring. Dirancang khusus untuk feed IG / TikTok.",
     "anatomy_flyer_footnote": "Plus 6 flyer per-deliverable (khutbah / kajian / home / content / genz / action) yang muncul di modal kartu Section 4. Total 8 flyer × 5 briefing = 40 PNG share-ready per cycle, semua dirender Puppeteer (no LLM call, no extra cost).",
-
     "models_title": "Model yang dipakai, dan kenapa.",
     "models_subtitle": "Setiap pilihan adalah model terkecil yang menyelesaikan tugasnya dengan baik, bukan yang terbesar yang tersedia.",
     "models_th_model": "Model",
