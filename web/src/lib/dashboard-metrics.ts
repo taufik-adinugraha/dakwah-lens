@@ -300,7 +300,7 @@ export async function getTopIssues(limit = 3): Promise<TopIssue[]> {
         sp.posted_at AS posted_at,
         ROW_NUMBER() OVER (
           PARTITION BY sp.topic_id
-          ORDER BY COALESCE(sp.dawah_opportunity, sp.dawah_relevance, 0) DESC,
+          ORDER BY COALESCE(sp.dawah_opportunity, 0) DESC,
                    sp.posted_at DESC
         ) AS rn
       FROM social_posts sp
@@ -404,21 +404,7 @@ export type DailyInsights = {
   emerging: { label: string; volume: number } | null;
   /** Most active platform by 7-day post count. */
   topPlatform: { platform: string; share: number } | null;
-  /** Strongest da'wah category by avg `dawah_relevance` over last 7 days. */
-  daleelOpportunity: { category: string; nPosts: number } | null;
 };
-
-const DAWAH_CATEGORIES = [
-  "aqidah",
-  "akhlaq",
-  "muamalah",
-  "social_justice",
-  "family",
-  "youth",
-  "education",
-  "economic_ethics",
-  "health",
-] as const;
 
 export async function getDailyInsights(): Promise<DailyInsights> {
   // ── Sentiment shift ──
@@ -474,36 +460,7 @@ export async function getDailyInsights(): Promise<DailyInsights> {
         }
       : null;
 
-  // ── Da'wah category with the most "strong-signal" posts (relevance ≥ 0.7) ──
-  // categories jsonb stores per-category 0-1 scores; we count rows where the
-  // category's score is ≥ 0.7. The category-with-max-count wins.
-  const categoryRows = (await db.execute(sql`
-    SELECT category, count(*)::int AS n_posts
-    FROM (
-      SELECT
-        jsonb_each_text(coalesce(categories, '{}'::jsonb)) AS kv
-      FROM social_posts
-      WHERE created_at >= now() - interval '7 days'
-        AND dawah_relevance >= 0.5
-        AND categories IS NOT NULL
-    ) AS expanded,
-    LATERAL (SELECT (expanded.kv).key AS category, (expanded.kv).value::float AS score) AS pair
-    WHERE pair.score >= 0.7
-    GROUP BY category
-    ORDER BY n_posts DESC
-    LIMIT 1
-  `)) as unknown as Array<{ category: string; n_posts: number }>;
-  const daleelOpportunity =
-    categoryRows.length > 0 &&
-    categoryRows[0].n_posts >= 2 &&
-    (DAWAH_CATEGORIES as readonly string[]).includes(categoryRows[0].category)
-      ? {
-          category: categoryRows[0].category,
-          nPosts: Number(categoryRows[0].n_posts),
-        }
-      : null;
-
-  return { sentiment, emerging, topPlatform, daleelOpportunity };
+  return { sentiment, emerging, topPlatform };
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -1085,8 +1042,8 @@ function extractFlyers(md: string): FlyerMessage[] {
 export async function getOverallViewKits(): Promise<OverallViewKits | null> {
   const rows = (await db.execute(sql`
     SELECT id::text AS id, generated_at, summary_md
-    FROM insights_summaries
-    WHERE segment IS NULL
+    FROM briefings
+    WHERE theme_group IS NULL
       AND summary_md IS NOT NULL
     ORDER BY generated_at DESC
     LIMIT 1
@@ -1170,13 +1127,13 @@ export async function getSegmentBriefingChoices(): Promise<
   SegmentBriefingChoice[]
 > {
   const rows = (await db.execute(sql`
-    SELECT DISTINCT ON (COALESCE(segment, 'all'))
-      COALESCE(segment, 'all') AS segment,
+    SELECT DISTINCT ON (COALESCE(theme_group, 'all'))
+      COALESCE(theme_group, 'all') AS segment,
       id::text AS id,
       generated_at,
       COALESCE((headline_stats->'totals'->>'posts_7d')::int, 0) AS posts_7d
-    FROM insights_summaries
-    ORDER BY COALESCE(segment, 'all'), generated_at DESC
+    FROM briefings
+    ORDER BY COALESCE(theme_group, 'all'), generated_at DESC
   `)) as unknown as Array<{
     segment: string;
     id: string;
@@ -1393,19 +1350,19 @@ export async function getActiveDiscussionRooms(
       i.summary_md
     FROM my_activity m
     LEFT JOIN totals t ON t.briefing_slug = m.briefing_slug
-    -- INNER JOIN against insights_summaries via a LATERAL subquery so
-    -- rooms whose underlying briefing has been deleted drop out of the
+    -- INNER JOIN against briefings via a LATERAL subquery so rooms
+    -- whose underlying briefing has been deleted drop out of the
     -- "active rooms" list. (Previously a LEFT JOIN — those rooms stayed
     -- visible with a NULL title, pointing at a /m/<slug> page that no
     -- longer renders anything.) Re-published briefings reincarnate the
     -- card automatically the next time the dashboard loads.
     JOIN LATERAL (
-      SELECT summary_md FROM insights_summaries
+      SELECT summary_md FROM briefings
       WHERE (
         CASE
           WHEN m.briefing_slug LIKE '%-all'
-            THEN segment IS NULL
-          ELSE segment = split_part(m.briefing_slug, '-', 4)
+            THEN theme_group IS NULL
+          ELSE theme_group = split_part(m.briefing_slug, '-', 4)
         END
       )
       AND to_char(date_trunc('day', generated_at AT TIME ZONE 'Asia/Jakarta'),
@@ -1557,16 +1514,16 @@ function pickSection(md: string, candidates: readonly string[]): string {
  */
 export async function getKitSegments(): Promise<KitSegmentData[]> {
   const rows = (await db.execute(sql`
-    SELECT DISTINCT ON (segment)
-      segment,
+    SELECT DISTINCT ON (theme_group)
+      theme_group AS segment,
       id::text AS id,
       generated_at,
       summary_md
-    FROM insights_summaries
+    FROM briefings
     WHERE summary_md IS NOT NULL
-      AND segment IS NOT NULL
-      AND segment NOT IN ('spiritual', 'family', 'youth', 'justice')
-    ORDER BY segment, generated_at DESC
+      AND theme_group IS NOT NULL
+      AND theme_group NOT IN ('spiritual', 'family', 'youth', 'justice')
+    ORDER BY theme_group, generated_at DESC
   `)) as unknown as Array<{
     segment: string;
     id: string;

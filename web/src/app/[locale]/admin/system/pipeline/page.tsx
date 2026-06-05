@@ -129,7 +129,7 @@ export default async function PipelinePage() {
     `) as unknown as Promise<Array<{ occurred_at: string }>>,
     // Unique posts that completed Gemini classification in the last
     // 7 days. Matches the homepage's "postingan dianalisis" metric
-    // (same `social_posts` table, same `dawah_relevance IS NOT NULL`
+    // (same `social_posts` table, same `dawah_opportunity IS NOT NULL`
     // filter, just a tighter 7d window for pipeline-health context).
     // Apples-to-apples with the homepage so operators can mentally
     // scale: this number × ~4 ≈ the 30d homepage figure.
@@ -137,7 +137,7 @@ export default async function PipelinePage() {
       SELECT COUNT(*)::int AS n
       FROM social_posts
       WHERE created_at >= now() - interval '7 days'
-        AND dawah_relevance IS NOT NULL
+        AND dawah_opportunity IS NOT NULL
     `) as unknown as Promise<Array<{ n: number }>>,
   ]);
   const classifiedCount = postsClassified7d[0]?.n ?? 0;

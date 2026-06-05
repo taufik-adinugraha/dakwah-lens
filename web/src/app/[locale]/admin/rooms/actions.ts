@@ -315,21 +315,21 @@ export async function listRoomOverviews(): Promise<RoomOverview[]> {
     admin_replies: number;
     muted: boolean;
   };
-  // Dedupe insights_summaries by (WIB-date, segment) FIRST, keeping
-  // only the latest row per logical edition. Every briefing
-  // regeneration appends a new row, but they all share the same
-  // `briefing_slug` and therefore the same comment thread — so the
-  // listing should show one card per logical room, not one per row.
-  // Without this dedupe, a room regenerated 5× appears as 5 separate
-  // "dormant" entries with identical slugs.
+  // Dedupe briefings by (WIB-date, theme_group) FIRST, keeping only
+  // the latest row per logical edition. Every briefing regeneration
+  // appends a new row, but they all share the same `briefing_slug`
+  // and therefore the same comment thread — so the listing should
+  // show one card per logical room, not one per row. Without this
+  // dedupe, a room regenerated 5× appears as 5 separate "dormant"
+  // entries with identical slugs.
   const rows = (await db.execute(sql`
     WITH latest_briefings AS (
       SELECT DISTINCT ON (briefing_slug)
         to_char(generated_at AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD')
-          || '-' || COALESCE(segment, 'all') AS briefing_slug,
-        segment,
+          || '-' || COALESCE(theme_group, 'all') AS briefing_slug,
+        theme_group AS segment,
         generated_at
-      FROM insights_summaries
+      FROM briefings
       WHERE generated_at >= now() - interval '90 days'
       ORDER BY briefing_slug, generated_at DESC
     )

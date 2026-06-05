@@ -107,7 +107,7 @@ export default async function PublicFlyersPage({
       SELECT DISTINCT
         EXTRACT(YEAR FROM (generated_at AT TIME ZONE 'Asia/Jakarta'))::int AS year,
         EXTRACT(MONTH FROM (generated_at AT TIME ZONE 'Asia/Jakarta'))::int AS month
-      FROM insights_summaries
+      FROM briefings
       UNION
       SELECT DISTINCT
         EXTRACT(YEAR FROM (created_at AT TIME ZONE 'Asia/Jakarta'))::int AS year,
@@ -138,11 +138,11 @@ export default async function PublicFlyersPage({
       selectedMonth.month,
     );
     briefingRows = (await db.execute(sql`
-      SELECT id, generated_at, segment
-      FROM insights_summaries
+      SELECT id, generated_at, theme_group AS segment
+      FROM briefings
       WHERE generated_at >= ${startUtc.toISOString()}
         AND generated_at <  ${endUtc.toISOString()}
-      ORDER BY generated_at DESC, segment NULLS FIRST
+      ORDER BY generated_at DESC, theme_group NULLS FIRST
     `)) as unknown as Array<{
       id: string;
       generated_at: Date;
@@ -150,9 +150,9 @@ export default async function PublicFlyersPage({
     }>;
   } else {
     briefingRows = (await db.execute(sql`
-      SELECT DISTINCT ON (segment) id, generated_at, segment
-      FROM insights_summaries
-      ORDER BY segment NULLS FIRST, generated_at DESC
+      SELECT DISTINCT ON (theme_group) id, generated_at, theme_group AS segment
+      FROM briefings
+      ORDER BY theme_group NULLS FIRST, generated_at DESC
     `)) as unknown as Array<{
       id: string;
       generated_at: Date;

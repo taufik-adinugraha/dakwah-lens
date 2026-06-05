@@ -216,21 +216,21 @@ export async function getPlatformSamplesForTopic(
     return PLATFORM_BUCKETS.map((p) => ({ platform: p, samples: [] }));
   }
 
-  // Ranking mirrors `api/src/api/services/insights_summary.py` ~line
-  // 1055 (sample posts per topic): the Gemini ingest-classifier score
-  // (`dawah_relevance`) leads, engagement is the tie-break. This is
+  // Ranking mirrors the briefing service (sample posts per topic):
+  // the Gemini ingest-classifier score (`dawah_opportunity`) leads,
+  // engagement is the tie-break. Keeps the draft consistent with
   // what the published weekly briefings draw their daleel-anchor
-  // headlines from — keeping the draft consistent.
+  // headlines from.
   // `db.execute(sql\`...\`)` returns timestamps as ISO strings, not Date
   // objects (unlike the typed `db.select()` API). Typing as `string |
   // null` and normalising downstream avoids the
   // `a.posted_at.toISOString is not a function` crash.
-  // `dawah_relevance >= 0.4` floor: drops posts the ingest classifier
-  // wasn't confident on. Topic clustering sometimes pulls in
-  // marginally-relevant posts (e.g. a Narasi explainer on AI ending
-  // up in the "Kekerasan Seksual di Lingkungan Pendidikan" cluster
-  // because both touch "pendidikan"). The floor filters those out
-  // before they pollute the prompt.
+  // `dawah_opportunity >= 0.4` floor: drops posts the ingest
+  // classifier wasn't confident on. Topic clustering sometimes pulls
+  // in marginally-relevant posts (e.g. a Narasi explainer on AI
+  // ending up in the "Kekerasan Seksual di Lingkungan Pendidikan"
+  // cluster because both touch "pendidikan"). The floor filters
+  // those out before they pollute the prompt.
   const rows = (await db.execute(sql`
     WITH ranked AS (
       SELECT
@@ -243,7 +243,7 @@ export async function getPlatformSamplesForTopic(
         sentiment_label,
         row_number() OVER (
           PARTITION BY platform
-          ORDER BY dawah_relevance DESC NULLS LAST,
+          ORDER BY dawah_opportunity DESC NULLS LAST,
                    engagement_score DESC NULLS LAST,
                    posted_at DESC NULLS LAST
         ) AS rn
@@ -252,7 +252,7 @@ export async function getPlatformSamplesForTopic(
         AND posted_at >= now() - (${daysBack} || ' days')::interval
         AND text IS NOT NULL
         AND length(text) > 20
-        AND dawah_relevance >= 0.4
+        AND dawah_opportunity >= 0.4
     )
     SELECT platform, text, url, posted_at, author, engagement_score, sentiment_label
     FROM ranked
@@ -334,7 +334,7 @@ export async function getPlatformStatsForTopic(
     }));
   }
 
-  // Same dawah_relevance floor as the sample fetcher — keeps the
+  // Same dawah_opportunity floor as the sample fetcher — keeps the
   // displayed stats consistent with the prompt's CONTOH POST and
   // prevents off-topic cluster-noise from inflating the totals.
   const rows = (await db.execute(sql`
@@ -351,7 +351,7 @@ export async function getPlatformStatsForTopic(
     FROM social_posts
     WHERE topic_id = ${resolvedTopicId}::uuid
       AND posted_at >= now() - (${daysBack} || ' days')::interval
-      AND dawah_relevance >= 0.4
+      AND dawah_opportunity >= 0.4
     GROUP BY platform
   `)) as unknown as Array<{
     platform: string;

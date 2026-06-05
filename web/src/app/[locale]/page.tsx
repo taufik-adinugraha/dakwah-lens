@@ -66,7 +66,7 @@ async function getCoverage(): Promise<Coverage> {
       .where(
         and(
           sql`created_at >= now() - interval '30 days'`,
-          sql`dawah_relevance IS NOT NULL`,
+          sql`dawah_opportunity IS NOT NULL`,
         ),
       ),
   ]);

@@ -870,26 +870,6 @@ function DailyInsights({
     });
   }
 
-  if (insights.daleelOpportunity) {
-    // Map the dominant category to the segment page that covers it.
-    // The 9 PRD da'wah categories were retired as the navigation
-    // taxonomy on 2026-06-03 (replaced by the 14 THEME_GROUPS). The
-    // daleel-opportunity insight card now always lands the user on
-    // /briefings — pickin a specific group from the 9-category
-    // signal would be a noisy heuristic at best.
-    cards.push({
-      key: "daleel",
-      tone: "emerald",
-      icon: BookOpenCheck,
-      title: t("insight_daleel_title"),
-      body: t("insight_daleel_body_tpl", {
-        category: insights.daleelOpportunity.category,
-        count: insights.daleelOpportunity.nPosts,
-      }),
-      href: "/briefings",
-    });
-  }
-
   const toneClasses = {
     rose: "bg-rose-50 text-rose-700 ring-rose-100",
     brand: "bg-brand-50 text-brand-700 ring-brand-100",

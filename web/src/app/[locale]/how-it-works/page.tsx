@@ -775,7 +775,7 @@ function InsightsBriefingPipeline({ t }: { t: T }) {
     },
     {
       title: t("insights_brief_stage_5_title"),
-      module: "insights_summaries → /briefings/[id] + Puppeteer flyers",
+      module: "briefings → /briefings/[id] + Puppeteer flyers",
       body: t("insights_brief_stage_5_body"),
     },
   ];

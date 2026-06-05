@@ -71,11 +71,11 @@ export async function listPublicRoomOverviews(
     WITH latest_briefings AS (
       SELECT DISTINCT ON (briefing_slug)
         to_char(generated_at AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD')
-          || '-' || COALESCE(segment, 'all') AS briefing_slug,
-        segment,
+          || '-' || COALESCE(theme_group, 'all') AS briefing_slug,
+        theme_group AS segment,
         generated_at,
         summary_md
-      FROM insights_summaries
+      FROM briefings
       WHERE generated_at >= now() - (${windowDays} || ' days')::interval
       ORDER BY briefing_slug, generated_at DESC
     )
