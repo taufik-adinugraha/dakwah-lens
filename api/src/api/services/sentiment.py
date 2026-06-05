@@ -192,6 +192,13 @@ KEY ROUTING RULES (these are the bugs surface-regex got wrong):
 - Earthquakes, floods, landslides, weather emergencies, accidents involving natural forces → "Lingkungan & Bencana".
 - Crime, arrests, police operations, consumer fraud (WO scams, pinjol scams, online crime) → "Hukum & Keadilan".
 - Da'wah ceramah, pengajian, tausiyah, Islamic talks by ustadz/kyai/buya → "Aqidah & Ibadah" (not Inspirasi & Kisah Pribadi — Inspirasi is for personal first-person reflections without religious-teaching framing).
+- Sports of any kind — football matches (Timnas, Liga, FIFA, club transfers), MotoGP/Moto3, badminton tournaments (Indonesia Open), tennis cups, futsal, racing, Olympic events, fan-club events, athlete profiles, sport line-ups, sport line scores, club-vs-club news — ALWAYS → "Lainnya", even when:
+    a government body hosts the event (Pemkot/Pemkab/Kemenpora tennis cup → "Lainnya", not "Pemerintahan & Kebijakan"),
+    the national team or named Indonesian athlete is featured (Timnas vs Oman line-up → "Lainnya", not "Pemerintahan"; Veda Ega MotoGP → "Lainnya", not "Pekerja & Pertanian Rakyat"),
+    the article is about transfer fees / contracts (AC Milan transfer → "Lainnya", not "Ekonomi & Bisnis").
+- Music releases, single launches, MV / album drops, artist comebacks → "Lainnya" (not "Ekonomi & Bisnis", even though they're commercial).
+- Traffic accidents, vehicle collisions, gas poisoning, electric shocks, accidental drownings → route by AGENT: if police investigation or criminal negligence → "Hukum & Keadilan"; if pure accident with no crime angle → "Lainnya". NOT "Lingkungan & Bencana" (that's reserved for natural forces like floods, earthquakes, volcanoes, mass-fires).
+- LPSK / Komnas HAM / witness-protection / journalist-doxing / HAM watchdog cases → "Hukum & Keadilan" (not Sosial & Keluarga, even when family members are mentioned).
 
 - "Lainnya" is the LAST RESORT. Use it ONLY for posts that are genuinely off-taxonomy:
     sports scores, weather forecasts, product/commerce promos, entertainment/celebrity gossip
