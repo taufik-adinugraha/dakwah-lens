@@ -315,7 +315,15 @@ export default async function GroupLandingPage({
                             </span>
                           )}
                           {p.sentimentLabel && (
-                            <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[9px] font-semibold uppercase text-slate-600">
+                            <span
+                              className={`rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase ring-1 ${
+                                p.sentimentLabel === "positive"
+                                  ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
+                                  : p.sentimentLabel === "negative"
+                                    ? "bg-amber-50 text-amber-700 ring-amber-100"
+                                    : "bg-slate-50 text-slate-700 ring-slate-200"
+                              }`}
+                            >
                               {p.sentimentLabel}
                             </span>
                           )}
