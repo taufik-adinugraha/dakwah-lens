@@ -1113,7 +1113,7 @@ async def _compute_stats(
                     SELECT text, author, engagement_views, engagement_score, url
                     FROM filtered
                     WHERE topic_id = :tid AND text IS NOT NULL
-                    ORDER BY dawah_relevance DESC NULLS LAST,
+                    ORDER BY dawah_opportunity DESC NULLS LAST,
                              engagement_score DESC NULLS LAST
                     LIMIT 3
                     """

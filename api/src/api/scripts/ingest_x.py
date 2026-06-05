@@ -184,21 +184,18 @@ async def _run(query: str, limit: int) -> int:
         result = await session.execute(
             select(SocialPost)
             .where(SocialPost.platform == PLATFORM)
-            .order_by(SocialPost.dawah_relevance.desc().nulls_last())
+            .order_by(SocialPost.dawah_opportunity.desc().nulls_last())
             .limit(5)
         )
         top = result.scalars().all()
 
-    print(f"\n✓ Stored {len(rows)} posts. Top {len(top)} by da'wah relevance:")
+    print(f"\n✓ Stored {len(rows)} posts. Top {len(top)} by da'wah opportunity:")
     for p in top:
-        cat = max(
-            (p.categories or {}).items(), key=lambda kv: kv[1], default=("?", 0.0)
-        )
         print(
-            f"  {(p.dawah_relevance or 0):.2f}  "
+            f"  {(p.dawah_opportunity or 0):.2f}  "
             f"[{p.sentiment_label or '?':<8}]  "
             f"@{p.author or '?':<15}  "
-            f"({cat[0]} {cat[1]:.2f})  "
+            f"({p.theme_group or '?'})  "
             f"{(p.text or '')[:80]}"
         )
 

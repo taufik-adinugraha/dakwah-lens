@@ -208,35 +208,25 @@ async def _run(
                 SocialPost.external_id,
                 SocialPost.sentiment_label,
                 SocialPost.sentiment_score,
-                SocialPost.dawah_relevance,
                 SocialPost.dawah_opportunity,
-                SocialPost.categories,
                 SocialPost.theme_group,
             ).where(
                 SocialPost.platform == platform,
                 SocialPost.external_id.in_(external_ids),
-                SocialPost.categories.is_not(None),
+                SocialPost.sentiment_label.is_not(None),
             )
         )
-        # 6-element tuple since 2026-06-03 — theme_group joins the
-        # cached set so re-encountered rows don't get re-classified
-        # by Gemini just to fill the new column. Rows whose
-        # theme_group is NULL (historical, pre-Gemini-judged) stay
-        # NULL through this path — the one-shot backfill script
-        # populates them out-of-band.
+        # 4-field cache (was 6 before Scope C). The "already
+        # classified" predicate was `categories.is_not(None)` before
+        # 2026-06-05 dropped that column; now it's
+        # `sentiment_label.is_not(None)` — same signal: did Gemini
+        # ever run on this row.
         cached: dict[
             str,
-            tuple[
-                str | None,
-                float | None,
-                float | None,
-                float | None,
-                dict,
-                str | None,
-            ],
+            tuple[str | None, float | None, float | None, str | None],
         ] = {
-            eid: (label, score, rel, opp, cats, tg)
-            for (eid, label, score, rel, opp, cats, tg) in existing_res.all()
+            eid: (label, score, opp, tg)
+            for (eid, label, score, opp, tg) in existing_res.all()
         }
     fresh_indices = [
         i for i, r in enumerate(rows) if r["external_id"] not in cached
@@ -294,14 +284,9 @@ async def _run(
 
     for i, row in enumerate(rows):
         if row["external_id"] in cached:
-            label, score, _rel_deprecated, opp, _cats_deprecated, tg = cached[
-                row["external_id"]
-            ]
+            label, score, opp, tg = cached[row["external_id"]]
             row["sentiment_label"] = label
             row["sentiment_score"] = score
-            # dawah_relevance + categories were retired 2026-06-05.
-            # Existing rows preserve their values; we don't overwrite,
-            # we just stop populating them on new rows.
             row["dawah_opportunity"] = opp
             row["theme_group"] = tg
         else:
@@ -395,27 +380,25 @@ async def _run(
                     )
                     await session.commit()
 
-    # 5. Summary — top 5 of this platform by relevance
+    # 5. Summary — top 5 of this platform by opportunity score
     async with SessionLocal() as session:
         res = await session.execute(
             select(SocialPost)
             .where(SocialPost.platform == platform)
-            .order_by(SocialPost.dawah_relevance.desc().nulls_last())
+            .order_by(SocialPost.dawah_opportunity.desc().nulls_last())
             .limit(5)
         )
         top = res.scalars().all()
 
-    print(f"\n✓ Stored {len(rows)} posts. Top {len(top)} on `{platform}` by relevance:")
+    print(f"\n✓ Stored {len(rows)} posts. Top {len(top)} on `{platform}` by opportunity:")
     for p in top:
-        cats = p.categories or {}
-        cat = max(cats.items(), key=lambda kv: kv[1], default=("?", 0.0))
         author = (p.author or "?")[:15]
         snippet = (p.text or "").replace("\n", " ")[:75]
         print(
-            f"  {(p.dawah_relevance or 0):.2f}  "
+            f"  {(p.dawah_opportunity or 0):.2f}  "
             f"[{(p.sentiment_label or '?'):<8}]  "
             f"@{author:<15}  "
-            f"({cat[0]} {cat[1]:.2f})  "
+            f"({p.theme_group or '?'})  "
             f"{snippet}"
         )
 
