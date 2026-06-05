@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ArrowLeft, Clock, Sparkles } from "lucide-react";
+import { Clock, Sparkles } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import { localeAwareFormatDateTime } from "@/lib/date-id";
@@ -95,24 +95,8 @@ export async function BriefDetailContent({
   return (
     <section className="pt-10 pb-16 sm:pt-14 sm:pb-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        {/* Top breadcrumb — sticky on mobile so the back affordance
-            stays reachable during long-form reading. Briefings can
-            run 7-10K words; without this users have to scroll back
-            to the top every time they want out. Desktop has a TOC
-            sidebar so the sticky isn't needed there. Hidden in print
-            mode. */}
-        <div className="sticky top-16 z-10 -mx-4 bg-white/95 px-4 py-2 backdrop-blur-sm md:relative md:top-auto md:z-auto md:mx-0 md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-none print:hidden">
-          <Link
-            href="/briefings"
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 transition hover:text-slate-900"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            {t("brief_back_to_insights")}
-          </Link>
-        </div>
-
         {/* Header block. */}
-        <header className="mt-4 border-b border-slate-200 pb-6">
+        <header className="border-b border-slate-200 pb-6">
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
               <Sparkles className="h-3 w-3" />

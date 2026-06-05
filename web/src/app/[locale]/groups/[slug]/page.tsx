@@ -9,7 +9,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 export const revalidate = 300;
 
 import { and, desc, eq, inArray, isNull, or, sql } from "drizzle-orm";
-import { ArrowLeft, ArrowRight, Compass, Layers, X } from "lucide-react";
+import { ArrowRight, Compass, Layers, X } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
@@ -248,15 +248,7 @@ export default async function GroupLandingPage({
   return (
     <section className="pt-10 pb-16 sm:pt-14 sm:pb-20">
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
-        <Link
-          href="/briefings"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 transition hover:text-slate-900"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          {t("brief_back_to_insights")}
-        </Link>
-
-        <header className="mt-4 border-b border-slate-200 pb-6">
+        <header className="border-b border-slate-200 pb-6">
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-700">
               <Compass className="h-3 w-3" />

@@ -20,7 +20,6 @@ import {
 import clsx from "clsx";
 
 import { Link } from "@/i18n/navigation";
-import { BackToInsightsLink } from "@/components/BackToInsightsLink";
 import { CoverageBreakdown } from "@/components/CoverageBreakdown";
 import { I18nText } from "@/components/I18nText";
 import { TrendingTopicsList } from "@/components/TrendingTopicsList";
@@ -131,8 +130,7 @@ export default async function InsightsExplorePage({
     <>
       <section className="pt-10 pb-6 sm:pt-14">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <BackToInsightsLink />
-          <div className="mt-4">
+          <div>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-brand-200 bg-brand-50/80 px-3 py-1 text-xs font-medium text-brand-700">
               <BarChart3 className="h-3.5 w-3.5" />
               {t("explore_eyebrow")}

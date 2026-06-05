@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import {
-  ArrowLeft,
   ArrowRight,
   ArrowUpRight,
   Flame,
@@ -16,7 +15,6 @@ import clsx from "clsx";
 
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
-import { BackToInsightsLink } from "@/components/BackToInsightsLink";
 import { I18nText } from "@/components/I18nText";
 import { TopicsByCluster } from "@/components/TopicsByCluster";
 import { PlatformStoriesFilter } from "./PlatformStoriesFilter";
@@ -37,11 +35,20 @@ import {
   type TopEngagedPost,
 } from "@/lib/briefing-data";
 import {
+  classifyThemeGroup,
+  GROUP_BY_SLUG,
   getRisingVideos,
   getThemeGroupReachDelta,
   type RisingVideo,
   type ThemeGroupReach,
 } from "@/lib/dashboard-metrics";
+
+/** Inverse of GROUP_BY_SLUG so we can route topics → their group page. */
+const SLUG_BY_GROUP: Readonly<Record<string, string>> = Object.freeze(
+  Object.fromEntries(
+    Object.entries(GROUP_BY_SLUG).map(([slug, group]) => [group, slug]),
+  ),
+);
 
 export function generateStaticParams() {
   // Pre-render every (locale, platform) combination.
@@ -149,9 +156,6 @@ export default async function PlatformDrilldownPage({
 
   return (
     <>
-      <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
-        <BackToInsightsLink />
-      </div>
       <Hero config={config} t={t} live={live} />
       {platform === "mainstream" && (
         <ScopePicker
@@ -343,13 +347,24 @@ async function CategoryTopicCharts({
                   const sharePct = topTotal
                     ? ((topic.postCount / topTotal) * 100).toFixed(1)
                     : "0.0";
+                  // Route each topic to its theme-group page with a
+                  // ?topic filter so the user lands on the existing
+                  // group view scoped to this topic (posts list +
+                  // sentiment bar both re-scope). Falls back to the
+                  // Lainnya group if the label doesn't match any of
+                  // the 14 theme regexes.
+                  const groupSlug =
+                    SLUG_BY_GROUP[classifyThemeGroup(topic.label)] ??
+                    Object.keys(GROUP_BY_SLUG)[0];
+                  const href = `/groups/${groupSlug}?topic=${topic.id}`;
                   return (
-                    <div
+                    <Link
                       key={topic.id}
-                      className="block rounded-lg px-2 py-1.5"
+                      href={href}
+                      className="group block rounded-lg px-2 py-1.5 transition hover:bg-slate-50"
                     >
                       <div className="flex items-baseline justify-between gap-3">
-                        <span className="truncate text-sm font-medium text-slate-800">
+                        <span className="truncate text-sm font-medium text-slate-800 group-hover:text-slate-900">
                           {topic.label}
                         </span>
                         <span className="shrink-0 text-xs tabular-nums text-slate-500">
@@ -363,7 +378,7 @@ async function CategoryTopicCharts({
                           style={{ width: `${(topic.postCount / topMax) * 100}%` }}
                         />
                       </div>
-                    </div>
+                    </Link>
                   );
                 })}
               </div>
@@ -402,15 +417,7 @@ function Hero({
       </div>
 
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <Link
-          href="/briefings"
-          className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          {t("breadcrumb_back")}
-        </Link>
-
-        <div className="mt-4 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 shadow-sm">
