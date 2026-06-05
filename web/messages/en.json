@@ -1046,7 +1046,14 @@
     "cta_title": "Want personalized briefs and the full library?",
     "cta_body": "Free with sign-up. Briefly reviewed by our team to maintain content quality.",
     "cta_button": "Apply for Full Access",
-    "data_note": "Mock data for the prototype. Real signals will replace these once ingestion lands."
+    "data_note": "Mock data for the prototype. Real signals will replace these once ingestion lands.",
+    "group_sentiment_title": "Sentiment mix",
+    "group_sentiment_subtitle_tpl": "From {count} posts in this group over the past 14 days.",
+    "group_sentiment_subtitle_topic_tpl": "From {count} posts about the \"{topic}\" topic over the past 14 days.",
+    "group_sentiment_empty": "No sentiment-labelled posts to summarise yet.",
+    "group_topic_filter_active_tpl": "Filtering posts for topic: {topic}",
+    "group_topic_filter_clear": "Clear topic filter",
+    "group_posts_filter_label": "Sentiment filter:"
   },
   "Youtube": {
     "page_title": "YouTube",

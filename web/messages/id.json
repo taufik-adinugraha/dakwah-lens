@@ -1046,7 +1046,14 @@
     "cta_title": "Ingin kajian personal dan akses penuh ke pustaka?",
     "cta_body": "Gratis setelah Anda mendaftar. Ada peninjauan singkat oleh tim kami untuk menjaga kualitas konten.",
     "cta_button": "Daftar Sekarang",
-    "data_note": "Data tiruan untuk prototype. Akan diganti dengan sinyal asli setelah pipeline ingest siap."
+    "data_note": "Data tiruan untuk prototype. Akan diganti dengan sinyal asli setelah pipeline ingest siap.",
+    "group_sentiment_title": "Komposisi sentimen",
+    "group_sentiment_subtitle_tpl": "Dari {count} postingan di kelompok ini dalam 14 hari terakhir.",
+    "group_sentiment_subtitle_topic_tpl": "Dari {count} postingan tentang topik \"{topic}\" dalam 14 hari terakhir.",
+    "group_sentiment_empty": "Belum ada postingan ber-label sentimen untuk dirangkum.",
+    "group_topic_filter_active_tpl": "Memfilter postingan untuk topik: {topic}",
+    "group_topic_filter_clear": "Hapus filter topik",
+    "group_posts_filter_label": "Filter sentimen:"
   },
   "Youtube": {
     "page_title": "YouTube",

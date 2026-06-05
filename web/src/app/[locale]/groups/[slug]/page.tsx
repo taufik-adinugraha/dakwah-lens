@@ -9,7 +9,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 export const revalidate = 300;
 
 import { and, desc, eq, inArray, isNull, or, sql } from "drizzle-orm";
-import { ArrowLeft, ArrowRight, Compass, Layers } from "lucide-react";
+import { ArrowLeft, ArrowRight, Compass, Layers, X } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
@@ -20,6 +20,7 @@ import {
 } from "@/lib/dashboard-metrics";
 import { briefingSlug, getLatestBriefing } from "@/lib/briefing-data";
 import { I18nText } from "@/components/I18nText";
+import { GroupPostsFilter, type GroupPost } from "./GroupPostsFilter";
 
 /**
  * Lightweight landing for one of the 14 THEME_GROUPS.
@@ -37,6 +38,7 @@ import { I18nText } from "@/components/I18nText";
  */
 
 type PageParams = { locale: string; slug: string };
+type PageSearchParams = { topic?: string };
 
 export async function generateMetadata({
   params,
@@ -52,10 +54,13 @@ export async function generateMetadata({
 
 export default async function GroupLandingPage({
   params,
+  searchParams,
 }: {
   params: Promise<PageParams>;
+  searchParams: Promise<PageSearchParams>;
 }) {
   const { locale, slug } = await params;
+  const { topic: topicFilterRaw } = await searchParams;
   setRequestLocale(locale);
 
   const group = GROUP_BY_SLUG[slug];
@@ -107,6 +112,23 @@ export default async function GroupLandingPage({
     (b): b is NonNullable<typeof b> => b !== null,
   );
   const idClause = branches.length > 1 ? or(...branches)! : branches[0];
+
+  // Optional topic-filter (from ?topic=<uuid>). When the param matches
+  // one of this group's topic IDs, every query below scopes to that
+  // single topic — posts list, sentiment aggregate, the active-topic
+  // banner. Anything else (missing, malformed, out-of-group) falls
+  // back to the full group-scope query.
+  const topicFilter =
+    topicFilterRaw && groupTopicIds.includes(topicFilterRaw)
+      ? topicFilterRaw
+      : null;
+  const activeTopic = topicFilter
+    ? (groupTopics.find((t) => t.id === topicFilter) ?? null)
+    : null;
+  const scopedClause = topicFilter
+    ? eq(schema.socialPosts.topicId, topicFilter)
+    : idClause;
+
   const recentPosts = await db
     .select({
       id: schema.socialPosts.id,
@@ -120,12 +142,38 @@ export default async function GroupLandingPage({
     .from(schema.socialPosts)
     .where(
       and(
-        idClause,
+        scopedClause,
         sql`posted_at >= now() - interval '14 days'`,
       ),
     )
     .orderBy(desc(schema.socialPosts.postedAt))
     .limit(25);
+
+  // Sentiment aggregate over the same 14d window + same scope. Groups
+  // NULL/unknown labels into the "other" bucket so the bar totals
+  // match the count shown in the subtitle.
+  const sentimentRows = await db
+    .select({
+      label: schema.socialPosts.sentimentLabel,
+      n: sql<number>`COUNT(*)::int`,
+    })
+    .from(schema.socialPosts)
+    .where(
+      and(
+        scopedClause,
+        sql`posted_at >= now() - interval '14 days'`,
+      ),
+    )
+    .groupBy(schema.socialPosts.sentimentLabel);
+  const sentimentCounts = { positive: 0, neutral: 0, negative: 0 };
+  for (const r of sentimentRows) {
+    const k = r.label;
+    if (k === "positive" || k === "neutral" || k === "negative") {
+      sentimentCounts[k] = Number(r.n);
+    }
+  }
+  const sentimentTotal =
+    sentimentCounts.positive + sentimentCounts.neutral + sentimentCounts.negative;
 
   // 3. Recompute per-topic 7-day counts (the topics.post_count column
   //    is cross-platform lifetime). Cheaper than per-topic queries:
@@ -178,6 +226,24 @@ export default async function GroupLandingPage({
       postCount7d: countByTopicId.get(topic.id) ?? 0,
     }))
     .sort((a, b) => b.postCount7d - a.postCount7d);
+
+  // Pre-format dates server-side so the client component doesn't
+  // need to import next-intl + a Locale to render them.
+  const dtf = new Intl.DateTimeFormat(locale, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "Asia/Jakarta",
+  });
+  const postsForClient: GroupPost[] = recentPosts.map((p) => ({
+    id: p.id,
+    text: p.text,
+    author: p.author,
+    url: p.url,
+    platform: p.platform,
+    postedAt: p.postedAt ? dtf.format(p.postedAt) : null,
+    sentimentLabel: p.sentimentLabel,
+  }));
 
   return (
     <section className="pt-10 pb-16 sm:pt-14 sm:pb-20">
@@ -247,94 +313,147 @@ export default async function GroupLandingPage({
             </p>
           ) : (
             <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-              {sortedTopics.map((topic) => (
-                <li key={topic.id}>
-                  <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                    <p className="text-sm font-semibold text-slate-900">
-                      {topic.label}
-                    </p>
-                    <p className="mt-1 text-[11px] text-slate-500">
-                      {t("group_topic_count", {
-                        count: topic.postCount7d,
-                      })}
-                    </p>
-                    {topic.keywords && topic.keywords.length > 0 && (
-                      <p className="mt-2 line-clamp-2 text-[11px] leading-relaxed text-slate-500">
-                        {topic.keywords.slice(0, 5).join(" · ")}
-                      </p>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-
-        {/* Recent posts in this group. */}
-        <section className="mt-10">
-          <h2 className="text-balance text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
-            {t("group_posts_title")}
-          </h2>
-          {recentPosts.length === 0 ? (
-            <p className="mt-3 rounded-lg border border-dashed border-slate-200 bg-slate-50/60 p-4 text-center text-xs text-slate-500">
-              {t("group_posts_empty")}
-            </p>
-          ) : (
-            <ul className="mt-4 space-y-2">
-              {recentPosts.map((p) => {
-                const first =
-                  (p.text || "")
-                    .split("\n")
-                    .map((s) => s.trim())
-                    .find((s) => s.length > 0) ?? "";
+              {sortedTopics.map((topic) => {
+                const isActive = topicFilter === topic.id;
                 return (
-                  <li key={p.id}>
-                    <a
-                      href={p.url ?? "#"}
-                      target={p.url ? "_blank" : undefined}
-                      rel={p.url ? "noopener noreferrer" : undefined}
-                      className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-3 transition hover:-translate-y-0.5 hover:border-slate-900 hover:shadow-md"
+                  <li key={topic.id}>
+                    <Link
+                      href={`/groups/${slug}?topic=${topic.id}`}
+                      className={`block rounded-2xl border bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
+                        isActive
+                          ? "border-emerald-500 ring-2 ring-emerald-100"
+                          : "border-slate-200 hover:border-slate-900"
+                      }`}
                     >
-                      <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-[10px] font-semibold uppercase text-slate-600">
-                        {p.platform.slice(0, 2)}
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="line-clamp-2 text-sm leading-relaxed text-slate-800">
-                          {first.slice(0, 220)}
-                        </span>
-                        <span className="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-slate-500">
-                          {p.author && <span>{p.author}</span>}
-                          {p.postedAt && (
-                            <span>
-                              {p.postedAt.toLocaleDateString(locale, {
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric",
-                                timeZone: "Asia/Jakarta",
-                              })}
-                            </span>
-                          )}
-                          {p.sentimentLabel && (
-                            <span
-                              className={`rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase ring-1 ${
-                                p.sentimentLabel === "positive"
-                                  ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
-                                  : p.sentimentLabel === "negative"
-                                    ? "bg-amber-50 text-amber-700 ring-amber-100"
-                                    : "bg-slate-50 text-slate-700 ring-slate-200"
-                              }`}
-                            >
-                              {p.sentimentLabel}
-                            </span>
-                          )}
-                        </span>
-                      </span>
-                    </a>
+                      <p className="text-sm font-semibold text-slate-900">
+                        {topic.label}
+                      </p>
+                      <p className="mt-1 text-[11px] text-slate-500">
+                        {t("group_topic_count", {
+                          count: topic.postCount7d,
+                        })}
+                      </p>
+                      {topic.keywords && topic.keywords.length > 0 && (
+                        <p className="mt-2 line-clamp-2 text-[11px] leading-relaxed text-slate-500">
+                          {topic.keywords.slice(0, 5).join(" · ")}
+                        </p>
+                      )}
+                    </Link>
                   </li>
                 );
               })}
             </ul>
           )}
+        </section>
+
+        {/* Sentiment composition (14d window, scoped to active topic
+            if one is selected). Stacked horizontal bar + count
+            legend. Hidden when the group has zero labelled posts. */}
+        <section className="mt-10">
+          <h2 className="text-balance text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
+            {t("group_sentiment_title")}
+          </h2>
+          <p className="mt-1 text-sm leading-relaxed text-slate-600">
+            {activeTopic
+              ? t("group_sentiment_subtitle_topic_tpl", {
+                  count: sentimentTotal,
+                  topic: activeTopic.label,
+                })
+              : t("group_sentiment_subtitle_tpl", { count: sentimentTotal })}
+          </p>
+          {sentimentTotal === 0 ? (
+            <p className="mt-3 rounded-lg border border-dashed border-slate-200 bg-slate-50/60 p-4 text-center text-xs text-slate-500">
+              {t("group_sentiment_empty")}
+            </p>
+          ) : (
+            <>
+              <div
+                className="mt-4 flex h-3 overflow-hidden rounded-full bg-slate-100"
+                role="img"
+                aria-label={t("group_sentiment_title")}
+              >
+                {sentimentCounts.positive > 0 && (
+                  <div
+                    className="bg-emerald-500"
+                    style={{
+                      width: `${(sentimentCounts.positive / sentimentTotal) * 100}%`,
+                    }}
+                  />
+                )}
+                {sentimentCounts.neutral > 0 && (
+                  <div
+                    className="bg-slate-400"
+                    style={{
+                      width: `${(sentimentCounts.neutral / sentimentTotal) * 100}%`,
+                    }}
+                  />
+                )}
+                {sentimentCounts.negative > 0 && (
+                  <div
+                    className="bg-amber-500"
+                    style={{
+                      width: `${(sentimentCounts.negative / sentimentTotal) * 100}%`,
+                    }}
+                  />
+                )}
+              </div>
+              <div className="mt-3 flex flex-wrap gap-3 text-xs">
+                <SentimentLegend
+                  swatch="bg-emerald-500"
+                  label={t("coverage_sentiment_positive")}
+                  count={sentimentCounts.positive}
+                  total={sentimentTotal}
+                />
+                <SentimentLegend
+                  swatch="bg-slate-400"
+                  label={t("coverage_sentiment_neutral")}
+                  count={sentimentCounts.neutral}
+                  total={sentimentTotal}
+                />
+                <SentimentLegend
+                  swatch="bg-amber-500"
+                  label={t("coverage_sentiment_negative")}
+                  count={sentimentCounts.negative}
+                  total={sentimentTotal}
+                />
+              </div>
+            </>
+          )}
+        </section>
+
+        {/* Recent posts in this group — filterable by sentiment.
+            When a topic filter is active, shows a banner with a
+            clear-filter button. */}
+        <section className="mt-10">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-2">
+            <h2 className="text-balance text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
+              {t("group_posts_title")}
+            </h2>
+            {activeTopic && (
+              <Link
+                href={`/groups/${slug}`}
+                className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 transition hover:border-slate-900"
+              >
+                <X className="h-3.5 w-3.5" />
+                {t("group_topic_filter_clear")}
+              </Link>
+            )}
+          </div>
+          {activeTopic && (
+            <p className="mt-2 rounded-lg border border-emerald-200 bg-emerald-50/60 px-3 py-2 text-xs text-emerald-800">
+              {t("group_topic_filter_active_tpl", { topic: activeTopic.label })}
+            </p>
+          )}
+          <GroupPostsFilter
+            posts={postsForClient}
+            emptyMessage={t("group_posts_empty")}
+            filterLabels={{
+              all: t("filter_all"),
+              positive: t("filter_positive"),
+              neutral: t("filter_neutral"),
+              negative: t("filter_negative"),
+            }}
+          />
         </section>
 
         {/* Encourage on-demand briefing via the topic-pick brief flow. */}
@@ -357,6 +476,29 @@ export default async function GroupLandingPage({
         </section>
       </div>
     </section>
+  );
+}
+
+function SentimentLegend({
+  swatch,
+  label,
+  count,
+  total,
+}: {
+  swatch: string;
+  label: string;
+  count: number;
+  total: number;
+}) {
+  const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+  return (
+    <span className="inline-flex items-center gap-1.5 text-slate-600">
+      <span className={`inline-block h-2.5 w-2.5 rounded-sm ${swatch}`} />
+      <span className="font-medium">{label}</span>
+      <span className="tabular-nums text-slate-500">
+        {count.toLocaleString()} · {pct}%
+      </span>
+    </span>
   );
 }
 
