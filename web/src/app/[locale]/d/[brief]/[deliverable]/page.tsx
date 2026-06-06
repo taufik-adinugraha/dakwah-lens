@@ -107,7 +107,13 @@ export default async function DeliverablePage({ params }: Props) {
   const mahasiswa =
     deliverable === "genz" ? extractMahasiswaContent(body) : null;
 
-  const palette = palettes[row.themeGroup ?? "all"];
+  // Palette keys are legacy 4-segment slugs (all/spiritual/family/youth/
+  // justice); briefings now use 14-group labels ("Hukum & Keadilan",
+  // "Aqidah & Ibadah", etc.) that don't match — fall back to `all` so
+  // the page never crashes on a missing palette. Per-group color is
+  // planned but lives on the /briefings hub for now, not this share
+  // surface.
+  const palette = palettes[row.themeGroup ?? "all"] ?? palettes.all;
   const Icon = KIND_ICON[deliverable];
   const dateLabel = localeAwareFormat(row.generatedAt, locale, {
     weekday: "long",
@@ -116,9 +122,11 @@ export default async function DeliverablePage({ params }: Props) {
     day: "numeric",
     timeZone: "Asia/Jakarta",
   });
-  const segmentLabel = row.themeGroup
-    ? t(`segment_${row.themeGroup}_title` as Parameters<typeof t>[0])
-    : t("brief_scope_all");
+  // Group labels (e.g. "Hukum & Keadilan") are already human-readable
+  // Indonesian; use verbatim instead of routing through legacy
+  // segment_${slug}_title i18n keys that no longer exist for the
+  // 14-group scheme.
+  const segmentLabel = row.themeGroup ?? t("brief_scope_all");
 
   const heroTitle = mahasiswa?.question || section.heading;
 

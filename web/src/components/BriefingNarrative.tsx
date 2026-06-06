@@ -360,24 +360,37 @@ function themeForHeading(text: string) {
 }
 
 /**
- * Heuristic — does this paragraph look like Arabic du'a / dhikr text?
+ * Heuristic — does this paragraph look like Arabic du'a / dhikr text
+ * that deserves the centered Amiri "du'a card" treatment?
  *
- * Triggers on EITHER:
- *   - Native Arabic script (U+0600-U+06FF range, ≥10 chars) — what
- *     khutbah blocks contain since the 2026-05-23 prompt switch from
- *     Latin transliteration to actual Arabic with harakat.
- *   - Latin transliteration (legacy briefs pre-2026-05-23 still have
- *     "Allāhumma ighfir lil mu'minīna..." prose).
+ * Triggers when the paragraph is PREDOMINANTLY Arabic, not just when
+ * it contains an inline citation. The earlier ≥10-char threshold (false
+ * positive 2026-06-06) was boxing Indonesian prose paragraphs that
+ * quoted one ayat inline — making khutbah body paragraphs render as
+ * a stack of green du'a cards instead of flowing text.
  *
- * False positives are cheap (paragraph just gets the serif/Amiri
- * treatment). False negatives mean the du'a renders as normal prose.
+ * The two true-positive cases are:
+ *   - Native Arabic-only blocks (khutbah opening hamdalah, closing
+ *     du'a, ayat block in Section 5 "Dalil & Sumber") — Arabic should
+ *     dominate the paragraph's non-whitespace characters.
+ *   - Latin transliteration (legacy briefs pre-2026-05-23) — still
+ *     allowed via the strong-token / diacritic-density path below.
+ *
+ * False positives are cheap (paragraph gets serif/Amiri); false
+ * negatives mean a du'a renders as normal prose. Optimised for the
+ * inline-citation-in-prose case.
  */
 function looksLikeArabicTransliteration(text: string): boolean {
-  // Native Arabic-script detection — anything in the Arabic Unicode
-  // blocks beyond a token threshold. Counts the full Arabic + Arabic
-  // Supplement + Arabic Extended-A ranges so harakat marks register.
+  // Native Arabic-script ratio test. Boxing requires Arabic to
+  // dominate the paragraph — not just be present alongside Indonesian
+  // prose. Threshold (40% of non-whitespace chars) calibrated against
+  // sample khutbah body paragraphs whose Arabic inline-citation share
+  // sits at 5-20%, vs pure ayat/du'a blocks at 80-100%.
   const arabicChars = text.match(/[؀-ۿݐ-ݿࢠ-ࣿ]/g);
-  if (arabicChars && arabicChars.length >= 10) return true;
+  if (arabicChars && arabicChars.length >= 20) {
+    const nonWhitespace = text.replace(/\s/g, "").length || 1;
+    if (arabicChars.length / nonWhitespace >= 0.4) return true;
+  }
 
   if (text.length < 40) return false;
   // Strong tokens that almost guarantee a Latin-transliterated du'a.

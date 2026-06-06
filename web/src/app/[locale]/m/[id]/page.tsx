@@ -68,10 +68,10 @@ export default async function MahasiswaArticlePage({ params }: Props) {
   const m = extractMahasiswaContent(body);
   if (!m.question && !m.article) notFound();
 
-  // Segment-driven palette — each briefing's article inherits the
-  // visual identity its poster already carried, so a scanner sees
-  // continuity between the printed sheet and the screen.
-  const palette = palettes[brief.themeGroup ?? "all"];
+  // Segment-driven palette — palette keys are legacy 4-segment slugs;
+  // 14-group themeGroup labels miss the map, so fall back to `all` to
+  // prevent the page from crashing on `${palette.bgLight}`.
+  const palette = palettes[brief.themeGroup ?? "all"] ?? palettes.all;
   const dateLabel = localeAwareFormat(brief.generatedAt, locale, {
     weekday: "long",
     year: "numeric",
@@ -79,9 +79,10 @@ export default async function MahasiswaArticlePage({ params }: Props) {
     day: "numeric",
     timeZone: "Asia/Jakarta",
   });
-  const segmentLabel = brief.themeGroup
-    ? t(`segment_${brief.themeGroup}_title` as Parameters<typeof t>[0])
-    : t("brief_scope_all");
+  // 14-group labels (e.g. "Hukum & Keadilan") are human-readable
+  // Indonesian — use verbatim instead of routing through legacy
+  // segment_${slug}_title i18n keys that no longer exist.
+  const segmentLabel = brief.themeGroup ?? t("brief_scope_all");
 
   return (
     <main className="min-h-screen bg-slate-50">
