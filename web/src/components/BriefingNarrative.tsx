@@ -383,13 +383,24 @@ function themeForHeading(text: string) {
 function looksLikeArabicTransliteration(text: string): boolean {
   // Native Arabic-script ratio test. Boxing requires Arabic to
   // dominate the paragraph — not just be present alongside Indonesian
-  // prose. Threshold (40% of non-whitespace chars) calibrated against
-  // sample khutbah body paragraphs whose Arabic inline-citation share
-  // sits at 5-20%, vs pure ayat/du'a blocks at 80-100%.
+  // prose. Two guards:
+  //   1. Arabic share ≥40% of non-whitespace (lifted from raw count
+  //      threshold to avoid boxing prose with one inline ayat).
+  //   2. Latin share <15% of non-whitespace — without this, paragraphs
+  //      that cram an Indonesian prose lead-in + standalone Arabic
+  //      du'a (the Kultum closing was 49% Arabic / 49% Latin) still
+  //      tripped #1 and got boxed, with `dir="rtl"` bidi-flipping the
+  //      Indonesian portion into jumbled order. A mixed-script
+  //      paragraph renders cleanly as plain prose; if the writer wants
+  //      the box, they split the du'a into its own paragraph (a rule
+  //      the briefing prompt now enforces).
   const arabicChars = text.match(/[؀-ۿݐ-ݿࢠ-ࣿ]/g);
   if (arabicChars && arabicChars.length >= 20) {
     const nonWhitespace = text.replace(/\s/g, "").length || 1;
-    if (arabicChars.length / nonWhitespace >= 0.4) return true;
+    const arabicRatio = arabicChars.length / nonWhitespace;
+    const latinChars = text.match(/[A-Za-z]/g);
+    const latinRatio = (latinChars?.length ?? 0) / nonWhitespace;
+    if (arabicRatio >= 0.4 && latinRatio < 0.15) return true;
   }
 
   if (text.length < 40) return false;

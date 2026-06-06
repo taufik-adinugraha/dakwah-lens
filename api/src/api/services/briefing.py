@@ -132,6 +132,23 @@ CRITICAL FORMATTING RULES:
 - Disclaimer keasistanan AI WAJIB ditulis sebagai paragraf italic di akhir Bagian 5 (BUKAN bagian terpisah).
 - JANGAN sebut nama penerjemah, lembaga penerbit, atau gaya terjemahan kitab di mana pun di output (mis. "Kemenag", "gaya Kemenag", "Sahih International", "Pickthall", "tafsir Ibn Kathir style", "Hilali-Khan", dll.). Itu metadata sumber data, BUKAN konten dakwah. Pembaca melihat ayat lewat citation (mis. "QS. Al-Baqarah: 275") — itu saja yang muncul. Frasa "menurut terjemahan Kemenag" / "dalam gaya Sahih International" dilarang muncul di teks output.
 - JANGAN echo kembali anotasi panjang seperti "(3450-4800 kata)", "(~80 kata)", "(300-450 kata Arab)", "(N words)" di heading sub-section atau di body. Itu instruksi panjang UNTUK Anda — bukan informasi UNTUK pembaca. Tulis heading bersih: `### Khutbah Jumat` (BUKAN `### Khutbah Jumat (3450-4800 kata)`). Sama untuk inline guidance dalam body — sebut langkah-nya tanpa parenthetical word-count.
+- AKSARA ARAB WAJIB DI PARAGRAF SENDIRI. Setiap blok aksara Arab ≥3 kata (ayat, hadits, du'a, dzikir, sholawat, ta'awudz, basmalah, hamdalah, salam Arab) WAJIB berdiri sebagai paragraf TERPISAH — diapit blank line di atas dan di bawah. JANGAN PERNAH menempel Arabic di akhir paragraf prosa Indonesia atau menyisipkannya di tengah kalimat Indonesia. Renderer membungkus paragraf 100% Arabic dengan font Amiri + `dir="rtl"` (presentasi yang benar untuk Arabic recitable); paragraf yang mencampur prosa Indonesia + blok Arab akan ditampilkan sebagai prosa biasa (tanpa font Amiri, tanpa box) supaya bidi reorder tidak mengacak teks Indonesia.
+
+  CONTOH SALAH (jangan tiru — paragraf Kultum Hukum & Keadilan 2026-06-06 yang harus dipecah):
+  ```
+  Akhirnya, jamaah, mari saya tutup dengan doa pendek. Ya Allah, jadikan rezeki kami halal ... dan teguhkan kaki mereka di atas kebenaran. اَللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكَسَلِ ... وَالسَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ.
+  ```
+
+  CONTOH BENAR (3 paragraf terpisah dengan blank line):
+  ```
+  Akhirnya, jamaah, mari saya tutup dengan doa pendek. Ya Allah, jadikan rezeki kami halal ... dan teguhkan kaki mereka di atas kebenaran.
+
+  اَللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكَسَلِ وَالْهَرَمِ وَالْمَغْرَمِ وَالْمَأْثَمِ، رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ.
+
+  وَالسَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ.
+  ```
+
+  Kecuali yang berikut TETAP boleh inline dalam paragraf prosa: (a) citation bold `**QS. X: Y**` SAJA tanpa Arabic — di mana Arabic-nya menyusul di paragraf SENDIRI di bawah, (b) 1-2 kata Arab pendek seperti `Allahu Akbar`, `subḥānallāh`, `inshā'allāh` sebagai istilah dakwah yang sudah menyatu dengan bahasa Indonesia, (c) nama Allah / nama Nabi dengan suffix `ﷺ` / `'alaihissalam`. Selain itu — pecah ke paragraf sendiri.
 
 ANTI-REPETISI ANTAR PEKAN (KRITIS): user prompt boleh berisi blok "CAKUPAN PEKAN-PEKAN SEBELUMNYA" — ini DAFTAR dalil, headline flyer, dan poster question yang BARU SAJA dibaca audiens. Audiens yang sama akan kembali pekan ini, jadi materi yang sama TERASA daur ulang. Aturan:
 - JANGAN gunakan ulang headline flyer atau poster question mahasiswa secara verbatim/near-verbatim dari pekan-pekan sebelumnya.

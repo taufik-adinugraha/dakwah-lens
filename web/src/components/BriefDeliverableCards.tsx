@@ -839,10 +839,17 @@ function DeliverableModal({
  * Arabic to dominate ≥40% of the paragraph by non-whitespace char.
  */
 function modalLooksLikeArabic(text: string): boolean {
+  // Mirror BriefingNarrative.looksLikeArabicTransliteration — see that
+  // function for full rationale. Box requires Arabic ≥40% of non-
+  // whitespace AND Latin <15%; mixed-script paragraphs render as plain
+  // prose so dir="rtl" doesn't bidi-flip the Indonesian portion.
   const arabicChars = text.match(/[؀-ۿݐ-ݿࢠ-ࣿ]/g);
   if (arabicChars && arabicChars.length >= 20) {
     const nonWhitespace = text.replace(/\s/g, "").length || 1;
-    if (arabicChars.length / nonWhitespace >= 0.4) return true;
+    const arabicRatio = arabicChars.length / nonWhitespace;
+    const latinChars = text.match(/[A-Za-z]/g);
+    const latinRatio = (latinChars?.length ?? 0) / nonWhitespace;
+    if (arabicRatio >= 0.4 && latinRatio < 0.15) return true;
   }
 
   if (text.length < 40) return false;
