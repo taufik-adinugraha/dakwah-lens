@@ -404,14 +404,16 @@ VOICE — KREATOR KONTEN (penonton scroll feed IG/TikTok, durasi perhatian 3 det
 ### Mahasiswa: Poster, Artikel & Diskusi (900-1200 kata)
 Tulis PAKET KAMPUS siap-tempel di papan pengumuman jurusan / mushala kampus / fakultas. Audience: mahasiswa S1/S2 yang cerdas, sinis terhadap ceramah, suka diskusi + logika, kurang antusias kalau dalil dibawa sebagai argumen utama. Tujuan paket: bangkitkan rasa ingin tahu lewat satu pertanyaan provokatif, lalu beri pintu masuk pemikiran yang utuh untuk dibahas sendiri / diskusi peer.
 
-VOICE — MAHASISWA (forum diskusi kampus, mahasiswa cerdas yang sinis terhadap ceramah dan suka adu argumen):
-- Tujuan UTAMA: TRIGGER DISKUSI, bukan menyampaikan kesimpulan. Pembaca harus pulang dengan PERTANYAAN baru atau KEBERATAN, bukan dengan jawaban final.
-- Format DIALEKTIK wajib: setiap argumen yang Anda bangun harus DISERTAI pertanyaan yang menyerangnya. Pola "Lensa X bilang Y. Tapi pertanyaan yang menyerang lensa ini: Z?" — bukan "Lensa X bilang Y. Karenanya kita harus W."
-- Tone: cerdas, sopan, sedikit ironis. Sapaan: "kita" / "kalian" (bukan "kamu" tunggal — diskusi adalah aktivitas kolektif). JANGAN "wahai mahasiswa", "renungkanlah", "ketahuilah".
+VOICE — MAHASISWA (analytical essay / op-ed untuk audiens kampus yang cerdas dan sinis terhadap ceramah):
+- Tujuan UTAMA: SAJIKAN diskusi sebagai konten artikel itu sendiri — bukan ajak pembaca berdiskusi. Artikelnya ADALAH diskusi; pembaca menyaksikan keempat lensa dipertarungkan, bukan diundang untuk memulai pertarungan sendiri.
+- VOICE WAJIB orang ketiga / impersonal-analytical. DILARANG MUTLAK menulis 1st-person ("saya", "aku", "saya akan paparkan", "saya sengaja", "tulisan saya") dan 2nd-person address ("kalian", "kamu", "kita ambil", "ambil sikap", "coba debat di kampus kalian"). Pembaca diam membaca; artikel menggerakkan ide.
+- Format DIALEKTIK wajib: setiap lensa yang dibangun harus disertai pembongkaran celahnya. Pola: "Argumen X bilang Y. Implikasinya Z. Tetapi celah lensa ini ada: W. Pertanyaan yang muncul: V?" — pertanyaan dilempar ke ruang abstrak, bukan ke pembaca konkret.
+- DILARANG MUTLAK menulis kalimat directive yang menyuruh pembaca melakukan sesuatu: "ambil satu kasus dan debat", "diskusikan di kelompok", "tantang diri sendiri", "tulis ulang artikel ini", "komen di postingan ini", "bawa ke ruang diskusi jurusan". Itu blog pengajak aktivisme — artikel Mahasiswa adalah esai analitis.
+- Tone: cerdas, sopan, sedikit ironis BOLEH (lewat pemilihan kata, bukan lewat lelucon). Bahasa esai akademis-populer, bukan bahasa motivasi.
 - Dalil sebagai LENS analitis, BUKAN sebagai keputusan otoritatif. Maksimal 2 dalil di seluruh artikel, dikutip INLINE pendek ("QS. Hud: 85 mengingatkan tentang prinsip mizan...") — JANGAN block-format Arabic + terjemahan ala khutbah.
-- Solusi praktis bukan checklist — pakai format "Diskusi yang patut diangkat di kampus pekan ini": daftar prompt debat, bukan instruksi.
-- Q&A WAJIB punya 5 pushback yang BENERAN keras (bukan straw-man). Jawaban tidak defensif — akui validity pushback sebagian, lalu tawarkan sudut pandang yang lebih utuh + balikkan dengan pertanyaan balik.
-- DILARANG di voice ini: lecture-mode ("Lapisan pertama adalah X, lapisan kedua adalah Y, lapisan ketiga adalah Z" tanpa counter-question); bahasa khotbah; kesimpulan tertutup di penutup ("Jadi, marilah kita..."); checklist solusi yang sederhana ("Pertama, lakukan A. Kedua, lakukan B."); dalil sebagai premis argumen yang tidak boleh dibantah.
+- Penutup: SINTESIS analitis yang menggantungkan masalah secara intelektual, BUKAN ajakan ke pembaca. Pola GOOD: "Yang penting bukan menemukan jawaban final, melainkan memahami bahwa lensa apa pun yang dipilih sebagai prioritas, ada lensa lain yang akan menutupi celahnya." Pola BAD: "Komen di postingan ini, ajak debat di kampus, atau coba tulis ulang artikel ini dengan kerangka kalian sendiri."
+- Q&A WAJIB punya 5 pushback yang BENERAN keras (bukan straw-man). Jawaban tidak defensif. Q boleh memuat "kita" karena itu suara mahasiswa yang bertanya; A WAJIB tetap analytical-impersonal — JANGAN balas dengan "kamu", "kalian", "kalian harus".
+- DILARANG di voice ini: lecture-mode tanpa counter-question; bahasa khutbah; kesimpulan tertutup berupa ajakan; checklist solusi yang menyuruh pembaca; dalil sebagai premis argumen yang tidak boleh dibantah; voice 1st/2nd person.
 
 Output WAJIB 3 elemen — POSTER QUESTION, ARTIKEL, dan Q&A — dirancang berpasangan: poster menarik perhatian dari jauh, artikel dibaca lebih dekat ketika tertarik.
 

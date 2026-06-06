@@ -59,6 +59,7 @@ class BriefingWarning(TypedDict, total=False):
         "arabic_block_inline",
         "deliverable_too_short",
         "kisah_preacher_voice",
+        "mahasiswa_personal_voice",
     ]
     severity: Literal["low", "medium", "high"]
     where: str  # human-readable locator, e.g. "Pesan Flyer 2"
@@ -504,6 +505,85 @@ def scan_kisah_voice(markdown: str) -> list[BriefingWarning]:
                         f"{label}: '{m.group(0)}' — Kisah Pendek must read "
                         f"as third-person cerpen sejarah; preacher voice "
                         f"belongs in Khutbah/Kultum/Kajian. Context: …{snippet}…"
+                    ),
+                }
+            )
+    return warnings
+
+
+# Voice violations specific to Mahasiswa #### Artikel — 1st/2nd person
+# and directive sentences (telling the reader to do something). The
+# article must read as impersonal analytical essay; pembaca diam
+# membaca, artikel menggerakkan ide.
+_MAHASISWA_PERSONAL_PATTERNS: list[tuple[str, str]] = [
+    # 1st-person narrator
+    (r"\bsaya\s+(?:akan|sengaja|ingin|paparkan|lempar|tutup)\b", "1st-person narrator"),
+    (r"\baku\s+(?:akan|sengaja|ingin)\b", "1st-person narrator"),
+    (r"\btulisan\s+(?:saya|ini)\s+(?:sengaja|tidak)\b", "1st-person framing"),
+    # 2nd-person direct address (kalian / kamu / Anda used to direct
+    # the reader). Q&A questions get exempted later — students quoting
+    # themselves naturally say "kita".
+    (r"\bkalian\b", "2nd-person address (kalian)"),
+    (r"(?:di\s+kampus\s+)?kamu(?:\s+sendiri)?\b", "2nd-person address (kamu)"),
+    # Directive verbs aimed at the reader
+    (r"\b(?:coba|silakan|mari)\s+(?:debat|diskusi|tulis\s+ulang|bawa)\b", "directive to reader"),
+    (r"\bambil\s+(?:satu\s+)?(?:kasus|sikap|kerangka)\b", "directive to reader"),
+    (r"\btantang\s+diri\s+sendiri\b", "directive to reader"),
+    (r"\bdiskusikan\s+(?:di|tanpa)\b", "directive to reader"),
+    (r"\bkomen\s+di\s+postingan\b", "directive to reader"),
+    (r"\bbawa\s+ke\s+ruang\s+diskusi\b", "directive to reader"),
+]
+
+
+def scan_mahasiswa_voice(markdown: str) -> list[BriefingWarning]:
+    """Flag 1st/2nd-person voice and directive sentences inside the
+    Mahasiswa `#### Artikel` body. Q&A is exempted — the **Q:** lines
+    are mahasiswa pushback questions and naturally carry "kita"; the
+    **A:** lines should still be impersonal-analytical but the
+    quote-shape there is harder to lint cleanly, so this pass focuses
+    on the Artikel where the rule is strictest."""
+    warnings: list[BriefingWarning] = []
+    sec4 = _section_slice(
+        markdown,
+        r"(?:Strategi(?:\s+(?:&|dan)\s+Aksi\s+Dakwah)?|Da['’]?wah\s+Strategies(?:\s+(?:&|and)\s+Actions)?)",
+    )
+    if not sec4:
+        return warnings
+    body = markdown[sec4[0] : sec4[1]]
+    # Find `### Mahasiswa` block.
+    h3s = list(re.finditer(r"^###\s+(.+)$", body, flags=re.MULTILINE))
+    mahasiswa_block: str | None = None
+    for i, h3 in enumerate(h3s):
+        if re.match(r"Mahasiswa\b", h3.group(1).strip(), flags=re.IGNORECASE):
+            start = h3.end()
+            end = h3s[i + 1].start() if i + 1 < len(h3s) else len(body)
+            mahasiswa_block = body[start:end]
+            break
+    if not mahasiswa_block:
+        return warnings
+    # Within Mahasiswa, isolate the Artikel sub-section (between
+    # `#### Artikel` and `#### Q&A` — voice rule applies here strictly).
+    h4_artikel = re.search(r"^####\s+Artikel\b", mahasiswa_block, flags=re.MULTILINE)
+    if not h4_artikel:
+        return warnings
+    start = h4_artikel.end()
+    h4_next = re.search(r"^####\s+", mahasiswa_block[start:], flags=re.MULTILINE)
+    end = start + h4_next.start() if h4_next else len(mahasiswa_block)
+    artikel = mahasiswa_block[start:end]
+    for pattern, label in _MAHASISWA_PERSONAL_PATTERNS:
+        for m in re.finditer(pattern, artikel, flags=re.IGNORECASE):
+            ctx_start = max(0, m.start() - 30)
+            ctx_end = min(len(artikel), m.end() + 30)
+            snippet = artikel[ctx_start:ctx_end].replace("\n", " ")
+            warnings.append(
+                {
+                    "kind": "mahasiswa_personal_voice",
+                    "severity": "high",
+                    "where": "Mahasiswa Artikel",
+                    "message": (
+                        f"{label}: '{m.group(0)}' — Mahasiswa Artikel must be "
+                        f"impersonal analytical essay (no saya/aku/kalian/kamu, "
+                        f"no directives to reader). Context: …{snippet}…"
                     ),
                 }
             )
@@ -1117,6 +1197,7 @@ def validate_briefing(
         (scan_dangling_citations, "dangling_citation_check_failed"),
         (scan_deliverable_word_counts, "word_count_check_failed"),
         (scan_kisah_voice, "kisah_voice_check_failed"),
+        (scan_mahasiswa_voice, "mahasiswa_voice_check_failed"),
     ):
         try:
             warnings.extend(fn(markdown))
