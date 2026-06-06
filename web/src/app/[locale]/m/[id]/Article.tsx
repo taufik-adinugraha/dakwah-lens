@@ -1,5 +1,7 @@
 import ReactMarkdown, { type Components } from "react-markdown";
 
+import { wrapInlineArabic } from "@/lib/inline-arabic";
+
 import type { MahasiswaQAPair } from "@/lib/flyer/content";
 
 type Palette = {
@@ -140,6 +142,10 @@ function makeArticleComponents(palette: Palette): Components {
     p: ({ children }) => {
       const lead = isFirstPara;
       isFirstPara = false;
+      // Inline-Arabic isolation — Arabic phrases in prose get a bdi +
+      // Amiri wrapper so they read as sacred text without flipping the
+      // surrounding Indonesian into bidi-reordered jumble.
+      const body = wrapInlineArabic(children);
       if (lead) {
         return (
           <p
@@ -151,13 +157,13 @@ function makeArticleComponents(palette: Palette): Components {
               className="absolute left-0 top-2 bottom-2 w-1.5 rounded-full"
               style={{ background: palette.accent, opacity: 0.7 }}
             />
-            {children}
+            {body}
           </p>
         );
       }
       return (
         <p className="mt-4 text-pretty text-[15px] leading-[1.85] text-slate-700 sm:text-base">
-          {children}
+          {body}
         </p>
       );
     },

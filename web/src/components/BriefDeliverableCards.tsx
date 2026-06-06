@@ -23,6 +23,8 @@ import {
 } from "lucide-react";
 import ReactMarkdown, { type Components } from "react-markdown";
 
+import { wrapInlineArabic } from "@/lib/inline-arabic";
+
 /**
  * Section 4 of the briefing ("Strategi & Aksi Dakwah") is no longer rendered
  * as one long markdown scroll — it's now a card grid where each ### h3
@@ -958,6 +960,11 @@ function makeModalMarkdownComponents(kind: CardKind | null): Components {
       }
       const lead = isFirstPara;
       isFirstPara = false;
+      // Mixed-script paragraphs land here. wrapInlineArabic isolates
+      // each Arabic run in a <bdi> + Amiri font so a 1-2-line Arabic
+      // phrase mid-sentence reads as sacred text without flipping the
+      // surrounding Indonesian into bidi-reordered jumble.
+      const body = wrapInlineArabic(children);
       if (lead) {
         return (
           <p
@@ -967,13 +974,13 @@ function makeModalMarkdownComponents(kind: CardKind | null): Components {
               aria-hidden
               className={`absolute left-0 top-1.5 bottom-1.5 w-1 rounded-full ${accentDot} opacity-60`}
             />
-            {children}
+            {body}
           </p>
         );
       }
       return (
         <p className="mt-3 text-pretty leading-[1.78] text-slate-800">
-          {children}
+          {body}
         </p>
       );
     },

@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import type { DaleelRef } from "@/db/schema";
+import { wrapInlineArabic } from "@/lib/inline-arabic";
 import { BriefDeliverableCards } from "./BriefDeliverableCards";
 import { BriefFlyerSection } from "./BriefFlyerSection";
 import { DaleelChips } from "./DaleelChips";
@@ -485,9 +486,12 @@ function makeMarkdownComponents(): Components {
           </p>
         );
       }
+      // Mixed-script paragraphs (prose + inline Arabic phrase) fall
+      // through to here. wrapInlineArabic isolates each Arabic run in
+      // a <bdi> so the surrounding Indonesian doesn't bidi-flip.
       return (
         <p className="mt-2 text-pretty leading-relaxed text-slate-700">
-          {children}
+          {wrapInlineArabic(children)}
         </p>
       );
     },

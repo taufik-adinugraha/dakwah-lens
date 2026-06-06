@@ -52,6 +52,11 @@ class BriefingWarning(TypedDict, total=False):
         "daleel_weak",
         "missing_daleel",
         "absurd_advice",
+        "poin_kunci_missing_dalil",
+        "flyer_inline_arabic",
+        "mixed_script_paragraph",
+        "dangling_citation",
+        "arabic_block_inline",
     ]
     severity: Literal["low", "medium", "high"]
     where: str  # human-readable locator, e.g. "Pesan Flyer 2"
@@ -105,6 +110,256 @@ def scan_forbidden_phrases(markdown: str) -> list[BriefingWarning]:
                     "message": f"{label}: '{m.group(0)}' — context: …{snippet}…",
                 }
             )
+    return warnings
+
+
+# ──────────────────────────────────────────────────────────────────
+# Pass 1b — structural anti-patterns (added 2026-06-06 after a series
+# of manual-briefing regressions where the renderer fired du'a-box on
+# mixed-script paragraphs, the flyer truncated on inline citations,
+# and Poin Kunci bullets dropped Dalil. Catches them at save time so
+# the broken markdown never reaches the DB.)
+# ──────────────────────────────────────────────────────────────────
+
+# Unicode ranges covering Arabic script (Arabic + Supplement + Extended-A
+# + presentation forms). Compiled once.
+_ARABIC_CHAR_RE = re.compile(r"[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]")
+_LATIN_CHAR_RE = re.compile(r"[A-Za-z]")
+
+# Sentence fragments that read as the wind-up to an inline citation —
+# mirrors the renderer's CITATION_LEADIN_RE in
+# web/src/lib/flyer/content.ts. Kept in sync by hand; both layers stop
+# the same anti-pattern at the same shape so a regression here is
+# caught either at save (this) or at render (that).
+_DANGLING_CITATION_RE = re.compile(
+    r"(?:dalam\s+(?:QS|HR|Hadits)\.?\s*$|berfirman\s*[:：]?\s*$|bersabda\s*[:：]?\s*$|"
+    r"berkata\s*[:：]?\s*$|menyebutkan\s*[:：]?\s*$|mengatakan\s*[:：]?\s*$|"
+    r"firman\s+Allah\s*[:：]?\s*$|sabda\s+(?:Nabi|Rasulullah)[^.]{0,40}[:：]?\s*$|"
+    r"Allah\s+(?:Ta'ala|SWT|swt)\s+(?:dalam|berfirman)[^.]{0,30}\s*$)",
+    re.IGNORECASE | re.MULTILINE,
+)
+
+
+def _section_slice(markdown: str, h2_pattern: str) -> tuple[int, int] | None:
+    """Return (start, end) char offsets of the H2 section whose heading
+    matches `h2_pattern`. End is the start of the next H2 (or EOF)."""
+    m = re.search(rf"^##\s+{h2_pattern}\b", markdown, flags=re.MULTILINE)
+    if not m:
+        return None
+    start = m.end()
+    nxt = re.search(r"^##\s+", markdown[start:], flags=re.MULTILINE)
+    end = start + nxt.start() if nxt else len(markdown)
+    return (start, end)
+
+
+def scan_poin_kunci_missing_dalil(markdown: str) -> list[BriefingWarning]:
+    """Every Poin Kunci bullet must carry **Masalah** + **Aksi** +
+    **Dalil** (3 indented fields). Pre-2026-06-06 prompts allowed Dalil
+    to be optional, which led to inconsistent rendering."""
+    warnings: list[BriefingWarning] = []
+    slc = _section_slice(markdown, r"Poin\s+Kunci(?:\s+\([^)]*\))?")
+    if not slc:
+        return warnings
+    section = markdown[slc[0] : slc[1]]
+    # Split bullets on top-level `- ` at line start.
+    bullets = re.split(r"^- ", section, flags=re.MULTILINE)[1:]
+    for i, bullet in enumerate(bullets, 1):
+        # Each well-formed bullet contains "**Masalah:**", "**Aksi:**",
+        # and "**Dalil:**" markers. Surface any that are missing.
+        missing = [
+            field
+            for field in ("Masalah", "Aksi", "Dalil")
+            if not re.search(rf"\*\*\s*{field}\s*:\*\*", bullet, flags=re.IGNORECASE)
+        ]
+        if missing:
+            warnings.append(
+                {
+                    "kind": "poin_kunci_missing_dalil",
+                    "severity": "high",
+                    "where": f"Poin Kunci bullet #{i}",
+                    "message": (
+                        f"bullet missing {', '.join(missing)} field(s) — "
+                        f"format must be 3 indented lines: **Masalah:** / "
+                        f"**Aksi:** / **Dalil:**"
+                    ),
+                }
+            )
+    return warnings
+
+
+def scan_pesan_flyer_inline_arabic(markdown: str) -> list[BriefingWarning]:
+    """Pesan Flyer 1-4 paragraphs must be 100% Indonesian prose. Inline
+    Arabic in the body breaks `trimToSentences` (citation lead-in
+    truncates the prose) and clutters the 1080×1080 layout."""
+    warnings: list[BriefingWarning] = []
+    slc = _section_slice(markdown, r"Pesan\s+Flyer")
+    if not slc:
+        return warnings
+    section = markdown[slc[0] : slc[1]]
+    h3_iter = list(
+        re.finditer(
+            r"^###\s+Pesan\s+Flyer\s+(\d)[^\n]*$",
+            section,
+            flags=re.MULTILINE | re.IGNORECASE,
+        )
+    )
+    for i, h3 in enumerate(h3_iter):
+        slot = int(h3.group(1))
+        if slot >= 5:
+            continue  # Flyers 5 + 6 explicitly allow Arabic du'a inline.
+        body_start = h3.end()
+        body_end = h3_iter[i + 1].start() if i + 1 < len(h3_iter) else len(section)
+        body = section[body_start:body_end]
+        # Strip the **Headline:** + **Dalil:** marker lines before
+        # counting — the citation marker is allowed to contain Arabic
+        # in surah names (won't happen with current pool, but defensive).
+        body_prose = re.sub(
+            r"^\s*\*\*\s*(?:Headline|Judul|Tema|Dalil|Daleel)\s*:\*\*[^\n]*$",
+            "",
+            body,
+            flags=re.MULTILINE | re.IGNORECASE,
+        )
+        arabic_chars = _ARABIC_CHAR_RE.findall(body_prose)
+        # ≥15 Arabic chars roughly = 3-4 Arabic words. Below that is a
+        # single token like "Allah Ta'ala" or honorific ﷺ — allowed.
+        if len(arabic_chars) >= 15:
+            warnings.append(
+                {
+                    "kind": "flyer_inline_arabic",
+                    "severity": "high",
+                    "where": f"Pesan Flyer {slot}",
+                    "message": (
+                        f"body contains {len(arabic_chars)} Arabic chars inline "
+                        f"— flyer 1-4 bodies must be 100% Indonesian prose. "
+                        f"Daleel goes in the **Dalil:** marker only; renderer "
+                        f"surfaces it visually below the message."
+                    ),
+                }
+            )
+    return warnings
+
+
+def scan_mixed_script_paragraphs(markdown: str) -> list[BriefingWarning]:
+    """Paragraphs with substantial Arabic AND substantial Latin trigger
+    the du'a-box renderer's plain-prose fallback (correct behavior) but
+    are usually a sign the writer forgot to split the Arabic into its
+    own paragraph. Flag at save time so the writer can split before the
+    reader sees a dense mixed-script wall."""
+    warnings: list[BriefingWarning] = []
+    # Skip Section 5 (Dalil & Sumber) — its entries are by design
+    # `**citation**` + Arabic + translation on adjacent lines and may
+    # collapse into one paragraph after stripping. Also skip the
+    # YAML/frontmatter region (none here, defensive).
+    cutoff = markdown.find("\n## Dalil & Sumber")
+    body = markdown[:cutoff] if cutoff >= 0 else markdown
+    paragraphs = re.split(r"\n{2,}", body)
+    for idx, para in enumerate(paragraphs):
+        line = para.strip()
+        if len(line) < 120:
+            continue
+        if line.startswith("#") or line.startswith("-") or line.startswith("|"):
+            continue
+        if line.startswith(">"):
+            continue
+        nonws = sum(1 for c in line if not c.isspace()) or 1
+        ar = len(_ARABIC_CHAR_RE.findall(line))
+        lat = len(_LATIN_CHAR_RE.findall(line))
+        if ar < 20:
+            continue
+        ar_ratio = ar / nonws
+        lat_ratio = lat / nonws
+        # Mirror the renderer's rule: box fires when Arabic ≥40% AND
+        # Latin <15%. The hazard zone is Arabic ≥40% AND Latin ≥15% —
+        # the renderer falls back to plain prose (correct) but the
+        # writer almost certainly intended a standalone Arabic block.
+        if ar_ratio >= 0.4 and lat_ratio >= 0.15:
+            preview = line[:80].replace("\n", " ")
+            warnings.append(
+                {
+                    "kind": "mixed_script_paragraph",
+                    "severity": "medium",
+                    "where": f"paragraph #{idx + 1}",
+                    "message": (
+                        f"paragraph mixes {ar_ratio:.0%} Arabic + {lat_ratio:.0%} "
+                        f"Latin in one block — split the Arabic into its own "
+                        f"paragraph (blank line before + after) so the "
+                        f"renderer can present it cleanly. Preview: '{preview}…'"
+                    ),
+                }
+            )
+    return warnings
+
+
+# A citation lead-in ("…Allah berfirman:") is orphaned ONLY when the
+# next paragraph doesn't carry the actual citation/quote. Allowed next-
+# paragraph shapes: a citation marker like `**QS. X: Y**` or `**Sahih
+# Muslim N**`, or a paragraph that begins with Arabic script. Either
+# means the bridge is complete across the paragraph break — the
+# standalone-Arabic convention introduced 2026-06-06.
+_NEXT_PARA_CITATION_RE = re.compile(
+    # `\b` after `QS.` doesn't fire (both sides non-word). Use a lookahead
+    # for whitespace or alpha to anchor the prefix without false matches.
+    r"^\s*\*\*\s*(?:QS|HR|Hadits|Sahih|Riyad|Bulugh|Hisnul|Surat|Surah)(?:\.|\s|\b)",
+    re.IGNORECASE,
+)
+
+
+def _starts_with_arabic(para: str) -> bool:
+    stripped = para.lstrip()
+    # Skip any leading markdown decoration (**, *, _, quotes) before
+    # checking the first script-carrying char.
+    stripped = re.sub(r"^[\*_>\"'\s]+", "", stripped)
+    if not stripped:
+        return False
+    return bool(_ARABIC_CHAR_RE.match(stripped))
+
+
+def scan_dangling_citations(markdown: str) -> list[BriefingWarning]:
+    """A sentence ending '...Allah Ta'ala dalam QS.' or '...berfirman:'
+    is a wind-up that only makes sense if the citation actually
+    follows. The "standalone Arabic paragraph" rule (added 2026-06-06)
+    allows the citation to sit in the NEXT paragraph as a `**…**`
+    marker or as an Arabic block — so this check only fires when
+    NEITHER the same paragraph nor the next one carries the bridge."""
+    warnings: list[BriefingWarning] = []
+    paragraphs = re.split(r"\n{2,}", markdown)
+    for idx, para in enumerate(paragraphs):
+        text = para.strip()
+        if not text or text.startswith("#") or text.startswith(">"):
+            continue
+        # Check the trailing sentence — split on `.!?` and look at the
+        # last non-empty fragment.
+        sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", text) if s.strip()]
+        if not sentences:
+            continue
+        last = sentences[-1].rstrip(".!?").strip()
+        if not _DANGLING_CITATION_RE.search(last):
+            continue
+        # Look ahead: does this paragraph itself contain Arabic (bridge
+        # completed inline), or does the next paragraph carry a
+        # citation marker / Arabic block (bridge across paragraphs —
+        # the new convention)?
+        bridge_inline = bool(_ARABIC_CHAR_RE.search(text))
+        next_para = paragraphs[idx + 1].strip() if idx + 1 < len(paragraphs) else ""
+        bridge_next = bool(
+            _NEXT_PARA_CITATION_RE.match(next_para) or _starts_with_arabic(next_para)
+        )
+        if bridge_inline or bridge_next:
+            continue
+        preview = last[-60:]
+        warnings.append(
+            {
+                "kind": "dangling_citation",
+                "severity": "high",
+                "where": f"paragraph #{idx + 1}",
+                "message": (
+                    f"paragraph ends with citation lead-in '…{preview}' "
+                    f"but neither this nor the next paragraph carries the "
+                    f"actual citation marker (e.g. **QS. X: Y**) or an "
+                    f"Arabic quote. Renderer drops the orphan stub."
+                ),
+            }
+        )
     return warnings
 
 
@@ -656,6 +911,19 @@ def validate_briefing(
         warnings.extend(scan_forbidden_phrases(markdown))
     except Exception as exc:
         log.warning("validate_briefing.forbidden_scan_failed", error=str(exc))
+    # Structural anti-patterns (added 2026-06-06). Each pass is
+    # independent — one regex throwing doesn't block the others. None
+    # of these call out to an API LLM; safe on the manual save path.
+    for fn, key in (
+        (scan_poin_kunci_missing_dalil, "poin_kunci_check_failed"),
+        (scan_pesan_flyer_inline_arabic, "flyer_arabic_check_failed"),
+        (scan_mixed_script_paragraphs, "mixed_script_check_failed"),
+        (scan_dangling_citations, "dangling_citation_check_failed"),
+    ):
+        try:
+            warnings.extend(fn(markdown))
+        except Exception as exc:
+            log.warning(f"validate_briefing.{key}", error=str(exc))
     if llm_judgments:
         # Paragraph↔daleel fit + absurd-advice scoring + replacement
         # suggester all call Gemini Flash-Lite. Skipped on the manual
