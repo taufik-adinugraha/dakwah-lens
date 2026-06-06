@@ -43,7 +43,12 @@ async def update_briefing_md(briefing_id: str, markdown_path: str, *, skip_valid
     if not md_path.exists():
         raise SystemExit(f"markdown file not found: {markdown_path}")
 
-    new_md = md_path.read_text(encoding="utf-8")
+    # Normalise trailing newline — the length-check below would
+    # otherwise complain about a 1-char drift if the file ends with
+    # \n but the DB stores it without (Postgres TEXT preserves all
+    # whitespace; the drift is real but always a single trailing
+    # newline). Stripping it makes both sides agree.
+    new_md = md_path.read_text(encoding="utf-8").rstrip("\n")
     if not new_md.strip():
         raise SystemExit("markdown is empty; aborting")
 

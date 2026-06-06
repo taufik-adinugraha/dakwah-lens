@@ -244,10 +244,11 @@ RUJUKAN DALIL DI SECTION 4 — pool yang saya sediakan berisi 10 dalil hasil rer
 Tulis KHUTBAH JUMAT LENGKAP siap-baca dari pembuka sampai penutup, terdiri dari Khutbah Pertama dan Khutbah Kedua. Bahasa Indonesia formal-mengalir, bisa dipahami jamaah umum, jangan terlalu akademis. Panjang khutbah harus sebanding dengan khutbah Jumat Indonesia standar yang lengkap dan bernapas panjang (22-30 menit ucapan = ~3450-4800 kata) — JANGAN terlalu pendek, beri ruang argumen berkembang dengan 3-4 dalil, 2-3 cerita konkret pekan ini, dan refleksi yang dalam.
 
 VOICE — KHUTBAH JUMAT (audiens duduk di masjid, khateeb berdiri di mimbar):
-- Anda adalah khateeb yang berbicara LANGSUNG kepada jamaah yang hadir Jumat ini. Sapaan langsung WAJIB dipakai: "hadirin yang dimuliakan Allah", "jamaah Jumat", "ma'asyiral muslimin rahimakumullah" — ini bahasa mimbar yang benar.
+- Khateeb berbicara LANGSUNG kepada jamaah yang hadir Jumat ini. Sapaan langsung WAJIB dipakai: "hadirin yang dimuliakan Allah", "jamaah Jumat", "ma'asyiral muslimin rahimakumullah" — ini bahasa mimbar yang benar.
+- KATA GANTI WAJIB "kita" — BUKAN "Anda". Khateeb memposisikan dirinya SEBAGAI BAGIAN dari jamaah, bukan terpisah. "Tugas kita pekan ini" (BENAR) vs "Tugas Anda pekan ini" (SALAH — terdengar seperti dosen ke murid, bukan khateeb ke jamaah). "Kita semua" / "kita yang berdagang" / "kita sebagai suami" — inklusi adalah bahasa mimbar yang sehat.
 - Tone formal-mengalir, bukan akademis dan bukan percakapan kasual. Pakai kalimat panjang yang bernapas, jeda yang membuat jamaah ikut merenung.
 - Setiap dalil dibawa sebagai PREMIS argumen (bukan sekadar tag): kutip citation, kutip teks Arab lengkap dengan harakat, kutip terjemahan, lalu jelaskan tafsirnya dalam 2-3 paragraf prosa yang menghubungkan ke konteks pekan ini.
-- DILARANG di voice ini: "kamu", "kalian" (terlalu kasual untuk mimbar — pakai "jamaah", "kita semua", "hadirin"); jokes (mimbar bukan stand-up); slogan medsos ("mari kita move on", "ini gila banget").
+- DILARANG di voice ini: "Anda" (kata ganti yang menempatkan jarak — pakai "kita"); "kamu", "kalian" (terlalu kasual untuk mimbar); jokes (mimbar bukan stand-up); slogan medsos ("mari kita move on", "ini gila banget").
 
 KHUTBAH PERTAMA (2700-3750 kata):
 - Mukadimah singkat (hamdalah → sholawat → syahadat → wasiat takwa, ~70 kata, AKSARA ARAB DENGAN HARAKAT lengkap — bukan transliterasi Latin). Khateeb membaca langsung dari teks di mimbar.
@@ -279,10 +280,11 @@ Tulis KULTUM 10-15 menit siap-baca, format ringkas tapi LENGKAP dari pembuka sam
 
 VOICE — KULTUM (audiens duduk ba'da sholat, penyampai berdiri / duduk di depan, suasana lebih dekat dari khutbah Jumat):
 - Sapaan WAJIB lebih hangat dari khutbah Jumat: "jamaah yang saya hormati", "para jamaah", "saudara-saudara sekalian". JANGAN pakai sapaan formal mimbar Jumat ("ma'asyiral muslimin").
+- KATA GANTI WAJIB "kita" — BUKAN "Anda". Penyampai memposisikan dirinya sebagai bagian dari jamaah. "Mari kita ukur diri sendiri" (BENAR) vs "Mari Anda ukur diri sendiri" (SALAH — terdengar seperti instruktur, bukan saudara seperjuangan). "Kita semua" / "kita pernah merasa" — inklusi adalah ciri khas voice kultum.
 - Tone percakapan-reflektif: kalimat lebih pendek, jeda untuk berpikir, sesekali pertanyaan retoris yang mengajak jamaah ikut menjawab dalam hati ("siapa di sini yang pekan ini pernah merasa...").
 - Argumen TUNGGAL yang tajam — kultum bukan tempat membahas 4 lapis analisis. Pilih satu sudut, kembangkan dalam, beri 2 dalil maksimum (cukup citation + Arabic + terjemahan, tafsirnya singkat).
 - Boleh selipkan satu humor ringan yang relatable (observasional, bukan menyindir). Boleh sebut nama tokoh-tokoh sahabat / ulama dengan akrab.
-- DILARANG di voice ini: mukadimah panjang ala khutbah Jumat (cukup ta'awudh + basmalah + hamdalah singkat); 4+ dalil bertubi-tubi; kalimat-kalimat yang berputar tidak fokus.
+- DILARANG di voice ini: "Anda" (kata ganti yang menempatkan jarak — pakai "kita"); mukadimah panjang ala khutbah Jumat (cukup ta'awudh + basmalah + hamdalah singkat); 4+ dalil bertubi-tubi; kalimat-kalimat yang berputar tidak fokus.
 
 STRUKTUR WAJIB (urutan ini, jangan ditukar):
 
@@ -302,12 +304,13 @@ NADA: hangat, pribadi, langsung. JANGAN tirukan formalitas khutbah Jumat — kul
 Tulis OUTLINE KAJIAN 60-MENIT siap-pakai, format hands-on bukan ceramah teoritis. Lebih panjang dari sub-section lain karena ibu-ibu sering minta detail praktis ("kalau di rumah saya gimana, Ustadzah?") dan butuh ruang untuk cerita konkret + Q&A yang jujur.
 
 VOICE — KAJIAN IBU-IBU (suasana ruang tamu masjid, ibu-ibu duduk lesehan, ustadzah seperti tante yang dipercaya):
-- Sapaan: "ibu-ibu yang dirahmati Allah", "para ibu", "jamaah majelis taklim". Boleh sesekali "kita ibu-ibu" untuk membangun in-group warmth.
+- Sapaan: "ibu-ibu yang dirahmati Allah", "para ibu", "jamaah majelis taklim". Pakai "kita ibu-ibu" untuk membangun in-group warmth.
+- KATA GANTI WAJIB "kita" — BUKAN "Anda". Ustadzah memposisikan dirinya sebagai SESAMA ibu, bukan tante yang turun mengajar. "Tugas kita sebagai ibu" (BENAR) vs "Tugas Anda sebagai ibu" (SALAH — terdengar seperti konsultan parenting, bukan tante yang ikut sayang sama anak Ibu). "Mari kita renungkan" / "kita semua tahu" / "anak kita" — keseluruhan kajian harus terasa OBROLAN bukan tutorial.
 - Tone HANGAT seperti tante yang dipercaya, BUKAN ustadzah yang berjarak. Tertawa BERSAMA, bukan ditertawakan.
 - Contoh konkret WAJIB dari dapur / kamar tidur / WhatsApp grup ibu-ibu / antar-tetangga / pasar — bukan contoh kantoran atau politik tinggi (ibu-ibu lebih mengerti pasar Senen dari rapat DPR).
 - Humor AMAN: tentang kebiasaan kita sendiri (scroll TikTok, lupa nama tetangga, kebanyakan beli skincare). JANGAN tentang suami yang merendahkan, anak yang merendahkan, kelas sosial, fisik.
 - Q&A WAJIB ada — minimal 4 pertanyaan yang BENERAN akan diajukan ibu-ibu di majelis (ada yang berat, ada yang lucu).
-- DILARANG di voice ini: bahasa khotbah formal ("ma'asyiral muslimin", "hadirin", "wahai sekalian"); analisis akademik panjang; istilah teknis tanpa dijelaskan dalam bahasa dapur; menggurui ("wahai ibu-ibu, ketahuilah").
+- DILARANG di voice ini: "Anda" (kata ganti yang menempatkan jarak — pakai "kita"); bahasa khotbah formal ("ma'asyiral muslimin", "hadirin", "wahai sekalian"); analisis akademik panjang; istilah teknis tanpa dijelaskan dalam bahasa dapur; menggurui ("wahai ibu-ibu, ketahuilah").
 
 - Pembuka (~120 kata): basmalah, salam, ice-breaker / pertanyaan ringan terkait pengalaman ibu-ibu pekan ini ("Siapa yang harga sembako-nya naik minggu ini?", "Ada yang anaknya minta beli skincare karena lihat artis di TikTok?"). Boleh selipkan satu humor ringan yang relatable buat ibu-ibu — TIDAK menyindir, TIDAK merendahkan, hanya pengamatan jujur tentang kehidupan rumah. Contoh nada: "Wahai ibu-ibu, kalau di grup WhatsApp lebih ramai dari pasar Senen, ini pertanda kita semua butuh tarbiyah kembali — termasuk saya."
 - Inti — 4 talking points (masing-masing 250-320 kata) dengan struktur per-poin:

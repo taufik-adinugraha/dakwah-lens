@@ -61,6 +61,7 @@ class BriefingWarning(TypedDict, total=False):
         "kisah_preacher_voice",
         "mahasiswa_personal_voice",
         "pengajaran_preacher_voice",
+        "preacher_anda_voice",
     ]
     severity: Literal["low", "medium", "high"]
     where: str  # human-readable locator, e.g. "Pesan Flyer 2"
@@ -675,6 +676,79 @@ def scan_pengajaran_voice(markdown: str) -> list[BriefingWarning]:
     return warnings
 
 
+# Section heading patterns for the 3 deliverables where "Anda" is
+# wrong voice (mimbar / ba'da-sholat / majelis taklim — speaker is
+# part of the audience, not separate from it). Other deliverables
+# (Mahasiswa is impersonal, Pengajaran has its own rule, Kreator
+# uses "kamu"/"kalian", Pesan Flyer addresses individual reader) are
+# untouched by this scan.
+_ANDA_TARGET_HEADINGS = [
+    (r"Khutbah(?:\s+Jumat)?", "Khutbah Jumat"),
+    (r"Kultum(?:\s+/\s+Short\s+Talk)?", "Kultum"),
+    (
+        r"Kajian(?:\s+Ibu-ibu)?(?:\s+(?:&|dan)\s+Majelis\s+Taklim)?",
+        "Kajian Ibu-ibu",
+    ),
+]
+
+
+def scan_preacher_anda(markdown: str) -> list[BriefingWarning]:
+    """Flag any use of 'Anda' in Khutbah / Kultum / Kajian sections —
+    the speaker (khateeb, ustadz, ustadzah) must position themselves
+    as part of the audience using 'kita', not separate from it using
+    'Anda'. The latter creates a dosen-to-murid distance that breaks
+    the mimbar / ba'da-sholat / majelis taklim voice.
+
+    Quoted dialog inside scripts (e.g., Q&A questions naturally
+    carrying 'Anda' as the asker's voice) is preserved by checking
+    paragraph-level positioning — Q: lines inside Q&A are kept."""
+    warnings: list[BriefingWarning] = []
+    sec4 = _section_slice(
+        markdown,
+        r"(?:Strategi(?:\s+(?:&|dan)\s+Aksi\s+Dakwah)?|Da['’]?wah\s+Strategies(?:\s+(?:&|and)\s+Actions)?)",
+    )
+    if not sec4:
+        return warnings
+    body = markdown[sec4[0] : sec4[1]]
+    h3s = list(re.finditer(r"^###\s+(.+)$", body, flags=re.MULTILINE))
+    for heading_pattern, label in _ANDA_TARGET_HEADINGS:
+        rx = re.compile(rf"^{heading_pattern}\b", re.IGNORECASE)
+        for i, h3 in enumerate(h3s):
+            heading_text = h3.group(1).strip()
+            if not rx.match(heading_text):
+                continue
+            start = h3.end()
+            end = h3s[i + 1].start() if i + 1 < len(h3s) else len(body)
+            section = body[start:end]
+            # Strip Q&A questions — the **Q:** lines naturally quote
+            # jamaah questions that may use Anda. Keep the rest of the
+            # body (including A: answers, which should NOT use Anda).
+            section_no_q = re.sub(
+                r"^\s*\*\*Q:\*\*[^\n]*$",
+                "",
+                section,
+                flags=re.MULTILINE,
+            )
+            for m in re.finditer(r"\bAnda\b", section_no_q):
+                ctx_start = max(0, m.start() - 30)
+                ctx_end = min(len(section_no_q), m.end() + 30)
+                snippet = section_no_q[ctx_start:ctx_end].replace("\n", " ")
+                warnings.append(
+                    {
+                        "kind": "preacher_anda_voice",
+                        "severity": "high",
+                        "where": label,
+                        "message": (
+                            f"'Anda' in {label} — voice creates dosen-to-murid "
+                            f"distance. Replace with 'kita' (speaker as part of "
+                            f"audience). Context: …{snippet}…"
+                        ),
+                    }
+                )
+            break
+    return warnings
+
+
 def scan_dangling_citations(markdown: str) -> list[BriefingWarning]:
     """A sentence ending '...Allah Ta'ala dalam QS.' or '...berfirman:'
     is a wind-up that only makes sense if the citation actually
@@ -1284,6 +1358,7 @@ def validate_briefing(
         (scan_kisah_voice, "kisah_voice_check_failed"),
         (scan_mahasiswa_voice, "mahasiswa_voice_check_failed"),
         (scan_pengajaran_voice, "pengajaran_voice_check_failed"),
+        (scan_preacher_anda, "preacher_anda_check_failed"),
     ):
         try:
             warnings.extend(fn(markdown))
