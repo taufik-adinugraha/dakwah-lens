@@ -3,6 +3,7 @@ import {
   ArrowRight,
   Banknote,
   Boxes,
+  Clock,
   Cpu,
   Globe2,
   GraduationCap,
@@ -147,6 +148,13 @@ const GROUP_THEME: Record<
 
 const DEFAULT_THEME = GROUP_THEME["Lainnya"];
 
+// Cards whose briefing is older than this many days adopt a neutral
+// grey tone so readers see at a glance that the content is stale. Set
+// by user request 2026-06-07 — operators ship a fresh briefing on
+// Sunday, so anything past ~5 days has missed at least one weekly
+// cycle and should look "needs refresh" rather than "this week's read".
+const STALE_DAYS = 5;
+
 /**
  * The /briefings hub's focal element — all 14 THEME_GROUPS rendered as
  * colorful cards sorted by 7d post volume descending, each linking to
@@ -176,6 +184,7 @@ export async function BriefingsGrid({
 }) {
   const t = await getTranslations("Briefing");
   const nf = new Intl.NumberFormat(locale);
+  const nowMs = Date.now();
 
   // Sort by 7d volume desc; ties fall back to canonical reading order.
   const sortedGroups = [...BRIEFING_GROUPS].sort((a, b) => {
@@ -223,7 +232,18 @@ export async function BriefingsGrid({
             const href = brief
               ? `/briefings/${briefingSlug(brief.generatedAt, brief.themeGroup)}`
               : `/briefings/${groupSlug}`;
-            const theme = GROUP_THEME[group] ?? DEFAULT_THEME;
+            const ageDays = brief
+              ? Math.max(
+                  0,
+                  Math.floor(
+                    (nowMs - brief.generatedAt.getTime()) / 86_400_000,
+                  ),
+                )
+              : null;
+            const isStale = ageDays !== null && ageDays > STALE_DAYS;
+            const theme = isStale
+              ? DEFAULT_THEME
+              : (GROUP_THEME[group] ?? DEFAULT_THEME);
             const Icon = theme.Icon;
             return (
               <li key={group}>
@@ -237,12 +257,29 @@ export async function BriefingsGrid({
                     >
                       <Icon className="h-4 w-4" />
                     </span>
-                    {/* Trend chip — +N% / -N% vs prior 7d. "Baru" when
-                        the group went from zero baseline to current
-                        activity (deltaPct === null with current > 0).
-                        Hidden entirely when there's no signal in either
-                        window so we don't show a meaningless "—". */}
-                    {(current > 0 || (vol?.previous ?? 0) > 0) && (
+                    <div className="flex flex-wrap items-center justify-end gap-1">
+                      {/* Age badge — "3d" / "1d" / "0d". Slate when fresh,
+                          amber when stale (>STALE_DAYS) so readers spot
+                          weeks that missed their Sunday refresh. */}
+                      {ageDays !== null && (
+                        <span
+                          className={`inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-semibold tabular-nums ${
+                            isStale
+                              ? "bg-amber-100 text-amber-800"
+                              : "bg-slate-100 text-slate-700"
+                          }`}
+                          title={t("hub_card_age_tooltip", { n: ageDays })}
+                        >
+                          <Clock className="h-2.5 w-2.5" />
+                          {ageDays}d
+                        </span>
+                      )}
+                      {/* Trend chip — +N% / -N% vs prior 7d. "Baru" when
+                          the group went from zero baseline to current
+                          activity (deltaPct === null with current > 0).
+                          Hidden entirely when there's no signal in either
+                          window so we don't show a meaningless "—". */}
+                      {(current > 0 || (vol?.previous ?? 0) > 0) && (
                       <span
                         className={`inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${
                           deltaPct === null
@@ -277,6 +314,7 @@ export async function BriefingsGrid({
                         )}
                       </span>
                     )}
+                    </div>
                   </div>
                   <h3 className="mt-3 line-clamp-2 text-sm font-bold leading-snug text-slate-900">
                     {group}
