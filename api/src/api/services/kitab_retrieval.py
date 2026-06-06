@@ -64,6 +64,7 @@ COLLECTION_NAMES: dict[str, str] = {
     "riyad_as_salihin": "riyad_as_salihin",
     "bulugh_al_maram": "bulugh_al_maram",
     "tafsir_ibn_kathir": "tafsir_ibn_kathir",
+    "bidayat_al_hidayah": "bidayat_al_hidayah",
 }
 
 # Per-corpus minimum cosine similarity for a hit to count as a usable
@@ -82,6 +83,10 @@ MIN_SCORE: dict[str, float] = {
     "riyad_as_salihin": 0.28,
     "bulugh_al_maram": 0.28,
     "tafsir_ibn_kathir": 0.28,
+    # Bidayatul Hidayah is short (~46k chars across 28 sections) and AR-only
+    # for now — same recall posture as hadith. Threshold provisional;
+    # recalibrate after a few weeks of live retrieval if too lax or strict.
+    "bidayat_al_hidayah": 0.30,
 }
 
 # Verse / hadith IDs that we never want to surface UNGROUNDED in a
@@ -149,6 +154,15 @@ def _normalize_hit(corpus: str, hit: Any) -> dict[str, Any]:
         ref_id = (
             f"quran::{payload.get('surah','')}:{payload.get('ayah','')}"
         )
+    elif corpus == "bidayat_al_hidayah":
+        # AR-only kitab payload (2026-06-08). `translation_id` /
+        # `translation_en` deliberately empty — re-embed pass will
+        # backfill them when translations land.
+        citation = payload.get("citation") or "Bidayatul Hidayah"
+        arabic = payload.get("ar") or ""
+        translation_id = ""
+        translation_en = ""
+        ref_id = f"{corpus}::{payload.get('section_id','')}"
     else:
         # All four hadith corpora share the same payload shape.
         citation = payload.get("citation_en") or ""

@@ -102,6 +102,16 @@ const KITAB_META: Record<
     iconTone: "bg-violet-600",
     languages: ["AR", "EN"],
   },
+  // Bidayatul Hidayah added 2026-06-08. AR-only for now; translation
+  // pass is planned but deferred. Languages chip shows only AR until
+  // that lands so the UI doesn't claim a translation that isn't there.
+  bidayat: {
+    labelKey: "kitab_bidayat_title",
+    metaKey: "kitab_bidayat_meta",
+    tone: "from-fuchsia-50 to-fuchsia-100/40",
+    iconTone: "bg-fuchsia-600",
+    languages: ["AR"],
+  },
 };
 
 // Tailwind classes per language code — emerald/amber/violet for AR/ID/EN

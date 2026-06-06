@@ -792,6 +792,35 @@ export async function getAllLatestBriefings(): Promise<
   return out;
 }
 
+/**
+ * 7d post volume per theme group, used by the /briefings hub to sort
+ * group cards by activity. Counts `social_posts.theme_group` directly
+ * (Gemini-judged at ingest) — legacy NULL-theme rows are folded into
+ * Lainnya to match how /groups/lainnya scopes them. Posts whose
+ * theme_group is non-canonical (typo / dropped label) are excluded.
+ *
+ * Returns a Map with every BRIEFING_GROUPS key initialized to 0 so the
+ * UI always has 14 entries even when a group has no posts this week.
+ */
+export async function getGroupVolumes7d(): Promise<Map<string, number>> {
+  const rows = await db
+    .select({
+      themeGroup: schema.socialPosts.themeGroup,
+      n: sql<number>`COUNT(*)::int`,
+    })
+    .from(schema.socialPosts)
+    .where(sql`posted_at >= now() - interval '7 days'`)
+    .groupBy(schema.socialPosts.themeGroup);
+
+  const out = new Map<string, number>();
+  for (const g of BRIEFING_GROUPS) out.set(g, 0);
+  for (const r of rows) {
+    const key = r.themeGroup ?? LAINNYA_GROUP;
+    if (out.has(key)) out.set(key, (out.get(key) ?? 0) + Number(r.n));
+  }
+  return out;
+}
+
 export type BriefingNavLink = {
   slug: string;
   themeGroup: string | null;

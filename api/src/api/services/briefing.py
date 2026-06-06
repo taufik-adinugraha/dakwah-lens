@@ -1312,7 +1312,21 @@ def _build_retrieval_query(stats: dict[str, Any], group: str) -> str:
     kritisme politik yang konstruktif"), giving the embedding step a
     fair shot at thematic-fit verses instead of surface-keyword matches.
 
-    Cost: ~$0.0005 per call · 5 calls/day → ~$0.075/mo. Negligible.
+    Trilingual since 2026-06-08: the prompt asks for THREE parallel
+    sentences — ID, EN, and classical Arabic — each using shar'i Arabic
+    vocabulary (riba, ghulul, maysir, not "usury" / "gambling"). The
+    three are joined by `\n` into ONE embedding input. Why all three:
+      · ID lifts recall on Sahih Muslim's manually-translated Bahasa
+        column (since 2026-05-31).
+      · EN lifts recall on the 4 English-only hadith corpora (Bukhari,
+        Riyad, Bulugh, Tafsir Ibn Kathir).
+      · AR lifts recall on the Quran's Arabic verses and (downstream)
+        any classical kitab ingested AR-only.
+    `text-embedding-3-large` is multilingual so cross-lingual cosine
+    already lands above MIN_SCORE for relevant content; the same-
+    language additions are a free recall lift on top.
+
+    Cost: ~$0.0015 per call · 5 calls/day → ~$0.22/mo. Negligible.
 
     Falls back to the legacy token-concat builder on any error so the
     pipeline never breaks because of this enhancement.
@@ -1347,7 +1361,12 @@ KONTEKS BRIEFING:
 HEADLINE NYATA YANG MENDORONG TREN PEKAN INI:
 {headlines_block}
 
-TUGAS: Tulis SATU kalimat (maksimal 30 kata) dalam Bahasa Indonesia yang menggambarkan TEMA INTI yang menghubungkan headline-headline di atas dengan niat segmen, MENGGUNAKAN KOSAKATA SYAR'I yang biasa muncul dalam terjemahan ayat/hadith.
+TUGAS: Tulis TIGA kalimat singkat paralel — satu Bahasa Indonesia, satu English, satu Arab klasik (fusha) — yang menggambarkan TEMA INTI yang menghubungkan headline-headline di atas dengan niat segmen, MENGGUNAKAN KOSAKATA SYAR'I yang biasa muncul dalam terjemahan ayat/hadith.
+
+Ketiga kalimat digabung jadi SATU query embedding untuk pencarian vektor:
+- Bahasa Indonesia: cocok dengan teks Bahasa pada corpus Quran Kemenag dan Sahih Muslim (terjemah manual).
+- English: cocok dengan corpus hadith English-only (Bukhari, Riyad as-Salihin, Bulugh al-Maram, Tafsir Ibn Kathir).
+- Arab klasik (fusha): cocok dengan teks Arabic Qur'an dan kitab klasik lain yang tersimpan dalam Arab saja.
 
 PENTING — terjemahkan isu kontemporer ke kosakata syar'i (kitab tidak menyebut "pinjol" tapi membahas riba; tidak menyebut "judol" tapi membahas maysir):
 
@@ -1365,9 +1384,19 @@ PENTING — terjemahkan isu kontemporer ke kosakata syar'i (kitab tidak menyebut
 - kemiskinan / harga sembako → "zakat, sedekah, qana'ah, ihsan kepada faqir, hak orang miskin di harta orang kaya"
 - bencana / musibah → "sabar atas musibah, takdir, rahmat Allah, husnu zhann"
 
-Contoh kosakata syar'i umum yang bisa kombinasikan: amanah, qana'ah, ketahanan keluarga, akhlaq, adil, mengurangi timbangan, hikmah, sabar, tolong-menolong dalam kebaikan, ihsan, rahmah, takwa, wara'.
+Contoh kosakata syar'i umum: amanah, qana'ah, ketahanan keluarga, akhlaq, adil, mengurangi timbangan, hikmah, sabar, tolong-menolong dalam kebaikan, ihsan, rahmah, takwa, wara'.
 
-ATURAN: Jangan tulis nama kasus, nama orang, nama outlet media, atau nama kota. Jangan tulis kata bahasa Inggris seperti "youth", "family", "pinjol", "judol", "bullying" — terjemahkan ke kosakata syar'i. Tulis hanya kalimat tematik tersebut, tanpa pengantar."""
+ATURAN:
+- Maksimal 25 kata per kalimat.
+- Kalimat English HARUS pakai kosakata Arab/syar'i yang sama (riba, ghulul, maysir, hifzh al-'aql, ihsan, sabar, tawakkul, mu'asyarah bil ma'ruf, etc.) — JANGAN terjemahkan literal ke English biasa ("usury", "gambling", "wisdom", "patience"). Terjemahan hadith klasik Inggris memakai istilah Arab transliterasi, jadi embedding cocok pada istilah itu.
+- Kalimat Arab HARUS klasik (fusha) dengan kosakata Qur'an/hadith. Harakat opsional, tapi gunakan istilah aslinya: الربا، الغلول، الميسر، حفظ العقل، الإحسان، الصبر، التوكل، المعاشرة بالمعروف، الأمانة، التقوى، الزكاة، الرحمة. Hindari Arab modern/jurnalistik.
+- Jangan tulis nama kasus, nama orang, nama outlet media, atau nama kota di kalimat mana pun.
+- Jangan tulis istilah kontemporer mentah ("pinjol", "judol", "youth", "bullying") — terjemahkan ke kosakata syar'i di KETIGA bahasa.
+
+FORMAT OUTPUT EKSAK (tanpa pengantar, tanpa baris kosong tambahan):
+ID: <kalimat Bahasa Indonesia>
+EN: <kalimat English>
+AR: <kalimat Arab klasik>"""
 
     try:
         client = _get_client()
@@ -1376,14 +1405,21 @@ ATURAN: Jangan tulis nama kasus, nama orang, nama outlet media, atau nama kota. 
             contents=prompt,
             config=types.GenerateContentConfig(
                 temperature=0.2,
-                max_output_tokens=120,
+                # Tripled from 120 (trilingual output: ID + EN + AR).
+                # Worst-case ~80 tokens per language; 300 leaves headroom
+                # without inflating the budget meaningfully. AR with
+                # harakat counts more tokens per word than EN/ID, so
+                # the per-language allowance is generous.
+                max_output_tokens=300,
                 # thinking disabled — this is a simple template-fill task,
                 # no reasoning needed. Saves ~512 tokens of thinking budget
                 # per call. Flash-Lite minimum if thinking IS enabled is 512.
                 thinking_config=types.ThinkingConfig(thinking_budget=0),
             ),
         )
-        query = (resp.text or "").strip().strip('"').strip("'")
+        raw = (resp.text or "").strip()
+        id_line, en_line, ar_line = _parse_multilingual_query(raw)
+        query = "\n".join(part for part in (id_line, en_line, ar_line) if part)
         if not query:
             return _build_retrieval_query_fallback(stats, group)
 
@@ -1401,7 +1437,10 @@ ATURAN: Jangan tulis nama kasus, nama orang, nama outlet media, atau nama kota. 
         log.info(
             "briefing.retrieval_query_generated",
             group=group,
-            query=query[:120],
+            query_id=id_line[:120],
+            query_en=en_line[:120],
+            query_ar=ar_line[:120],
+            langs_returned=sum(bool(x) for x in (id_line, en_line, ar_line)),
         )
         return query
     except Exception as exc:
@@ -1411,6 +1450,32 @@ ATURAN: Jangan tulis nama kasus, nama orang, nama outlet media, atau nama kota. 
             error=str(exc),
         )
         return _build_retrieval_query_fallback(stats, group)
+
+
+def _parse_multilingual_query(raw: str) -> tuple[str, str, str]:
+    """Split Flash-Lite's `ID: …\\nEN: …\\nAR: …` output into (id, en, ar).
+
+    Tolerant of leading bullets, quotes, and case variation on the
+    labels. Any missing line returns as "" — the caller filters those
+    out before joining. If NO labels match (model ignored the format),
+    falls back to treating the whole blob as the ID line so we degrade
+    gracefully instead of returning empty.
+    """
+    parts = {"ID": "", "EN": "", "AR": ""}
+    for raw_line in raw.splitlines():
+        line = raw_line.strip().lstrip("-*•").strip().strip('"').strip("'")
+        if not line:
+            continue
+        upper = line.upper()
+        for key in parts:
+            if upper.startswith(f"{key}:") or upper.startswith(f"{key} :"):
+                parts[key] = line.split(":", 1)[1].strip().strip('"').strip("'")
+                break
+    if not any(parts.values()):
+        parts["ID"] = " ".join(
+            line.strip() for line in raw.splitlines() if line.strip()
+        )
+    return parts["ID"], parts["EN"], parts["AR"]
 
 
 # Anchors extracted from a prior briefing's markdown that we feed back

@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useRef, useState, useTransition } from "react";
+
+import { loadGroupPosts } from "./actions";
 
 export type GroupPost = {
   id: string;
@@ -14,24 +16,39 @@ export type GroupPost = {
 };
 
 type SentimentFilter = "all" | "positive" | "neutral" | "negative";
+type FilterCounts = Record<SentimentFilter, number>;
 
 /**
- * Sentiment-filterable posts list for /groups/[slug].
+ * Sentiment-filterable, paginated posts list for /groups/[slug].
  *
- * Mirrors the chip-filter pattern from PlatformStoriesFilter on
- * /radar/[platform], but tuned for the smaller group-page card
- * (no expand toggle, no opportunity-score column — just text +
- * author + date + sentiment chip).
- *
- * The parent (server) pre-formats `postedAt` as a locale-aware
- * string so this component doesn't need to import next-intl.
+ * The parent (server) renders the first PAGE_SIZE rows; this client
+ * component manages "Muat lebih banyak" + sentiment filter switches
+ * via the loadGroupPosts server action. Filter chip totals come from
+ * server-side aggregates over the full 14d window — they don't drift
+ * as the user paginates.
  */
 export function GroupPostsFilter({
-  posts,
+  initialPosts,
+  initialHasMore,
+  groupSlug,
+  topicId,
+  locale,
+  pageSize,
+  filterCounts,
   emptyMessage,
   filterLabels,
+  loadMoreLabel,
+  loadingLabel,
+  endLabel,
+  errorLabel,
 }: {
-  posts: GroupPost[];
+  initialPosts: GroupPost[];
+  initialHasMore: boolean;
+  groupSlug: string;
+  topicId: string | null;
+  locale: string;
+  pageSize: number;
+  filterCounts: FilterCounts;
   emptyMessage: string;
   filterLabels: {
     all: string;
@@ -39,103 +56,194 @@ export function GroupPostsFilter({
     neutral: string;
     negative: string;
   };
+  loadMoreLabel: string;
+  loadingLabel: string;
+  endLabel: string;
+  errorLabel: string;
 }) {
   const [filter, setFilter] = useState<SentimentFilter>("all");
+  const [posts, setPosts] = useState<GroupPost[]>(initialPosts);
+  const [hasMore, setHasMore] = useState(initialHasMore);
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
 
-  const counts: Record<SentimentFilter, number> = {
-    all: posts.length,
-    positive: posts.filter((p) => p.sentimentLabel === "positive").length,
-    neutral: posts.filter((p) => p.sentimentLabel === "neutral").length,
-    negative: posts.filter((p) => p.sentimentLabel === "negative").length,
-  };
-  const visible =
-    filter === "all"
-      ? posts
-      : posts.filter((p) => p.sentimentLabel === filter);
+  // Cancel-on-rerun: ignore in-flight responses if the user kicks off
+  // a newer fetch (e.g. mashes filter chips). React Transitions don't
+  // auto-cancel, so we track a generation counter.
+  const reqGen = useRef(0);
+
+  const changeFilter = useCallback(
+    (next: SentimentFilter) => {
+      if (next === filter || isPending) return;
+      setFilter(next);
+      setError(null);
+      const gen = ++reqGen.current;
+      startTransition(async () => {
+        try {
+          const res = await loadGroupPosts({
+            groupSlug,
+            topicId,
+            sentiment: next,
+            offset: 0,
+            limit: pageSize,
+            locale,
+          });
+          if (gen !== reqGen.current) return;
+          setPosts(res.posts);
+          setHasMore(res.hasMore);
+        } catch {
+          if (gen !== reqGen.current) return;
+          setError(errorLabel);
+        }
+      });
+    },
+    [filter, isPending, groupSlug, topicId, pageSize, locale, errorLabel],
+  );
+
+  const loadMore = useCallback(() => {
+    if (isPending || !hasMore) return;
+    setError(null);
+    const gen = ++reqGen.current;
+    const offset = posts.length;
+    startTransition(async () => {
+      try {
+        const res = await loadGroupPosts({
+          groupSlug,
+          topicId,
+          sentiment: filter,
+          offset,
+          limit: pageSize,
+          locale,
+        });
+        if (gen !== reqGen.current) return;
+        setPosts((cur) => [...cur, ...res.posts]);
+        setHasMore(res.hasMore);
+      } catch {
+        if (gen !== reqGen.current) return;
+        setError(errorLabel);
+      }
+    });
+  }, [
+    isPending,
+    hasMore,
+    posts.length,
+    groupSlug,
+    topicId,
+    filter,
+    pageSize,
+    locale,
+    errorLabel,
+  ]);
+
+  // Note: topic-filter changes (?topic=…) are handled by the parent
+  // passing a `key={topicFilter}` so React remounts this component
+  // with fresh initial state — no useEffect reset needed here.
 
   return (
     <>
       <div className="mt-4 flex flex-wrap gap-2">
         <FilterChip
           label={filterLabels.all}
-          count={counts.all}
+          count={filterCounts.all}
           active={filter === "all"}
-          onClick={() => setFilter("all")}
+          onClick={() => changeFilter("all")}
           tone="slate"
         />
         <FilterChip
           label={filterLabels.positive}
-          count={counts.positive}
+          count={filterCounts.positive}
           active={filter === "positive"}
-          onClick={() => setFilter("positive")}
+          onClick={() => changeFilter("positive")}
           tone="emerald"
         />
         <FilterChip
           label={filterLabels.neutral}
-          count={counts.neutral}
+          count={filterCounts.neutral}
           active={filter === "neutral"}
-          onClick={() => setFilter("neutral")}
+          onClick={() => changeFilter("neutral")}
           tone="slate"
         />
         <FilterChip
           label={filterLabels.negative}
-          count={counts.negative}
+          count={filterCounts.negative}
           active={filter === "negative"}
-          onClick={() => setFilter("negative")}
+          onClick={() => changeFilter("negative")}
           tone="amber"
         />
       </div>
 
-      {visible.length === 0 ? (
+      {posts.length === 0 && !isPending ? (
         <p className="mt-4 rounded-lg border border-dashed border-slate-200 bg-slate-50/60 p-4 text-center text-xs text-slate-500">
           {emptyMessage}
         </p>
       ) : (
-        <ul className="mt-4 space-y-2">
-          {visible.map((p) => {
-            const first =
-              (p.text || "")
-                .split("\n")
-                .map((s) => s.trim())
-                .find((s) => s.length > 0) ?? "";
-            const sentTone =
-              p.sentimentLabel === "positive"
-                ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
-                : p.sentimentLabel === "negative"
-                  ? "bg-amber-50 text-amber-700 ring-amber-100"
-                  : "bg-slate-50 text-slate-700 ring-slate-200";
-            return (
-              <li key={p.id}>
-                <a
-                  href={p.url ?? "#"}
-                  target={p.url ? "_blank" : undefined}
-                  rel={p.url ? "noopener noreferrer" : undefined}
-                  className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-3 transition hover:-translate-y-0.5 hover:border-slate-900 hover:shadow-md"
-                >
-                  <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-[10px] font-semibold uppercase text-slate-600">
-                    {p.platform.slice(0, 2)}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="line-clamp-2 text-sm leading-relaxed text-slate-800">
-                      {first.slice(0, 220)}
+        <>
+          <ul className="mt-4 space-y-2">
+            {posts.map((p) => {
+              const first =
+                (p.text || "")
+                  .split("\n")
+                  .map((s) => s.trim())
+                  .find((s) => s.length > 0) ?? "";
+              const sentTone =
+                p.sentimentLabel === "positive"
+                  ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
+                  : p.sentimentLabel === "negative"
+                    ? "bg-amber-50 text-amber-700 ring-amber-100"
+                    : "bg-slate-50 text-slate-700 ring-slate-200";
+              return (
+                <li key={p.id}>
+                  <a
+                    href={p.url ?? "#"}
+                    target={p.url ? "_blank" : undefined}
+                    rel={p.url ? "noopener noreferrer" : undefined}
+                    className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-3 transition hover:-translate-y-0.5 hover:border-slate-900 hover:shadow-md"
+                  >
+                    <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-[10px] font-semibold uppercase text-slate-600">
+                      {p.platform.slice(0, 2)}
                     </span>
-                    <span className="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-slate-500">
-                      {p.author && <span>{p.author}</span>}
-                      {p.postedAt && <span>{p.postedAt}</span>}
-                      {p.sentimentLabel && (
-                        <span
-                          className={`rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase ring-1 ${sentTone}`}
-                        >
-                          {p.sentimentLabel}
-                        </span>
-                      )}
+                    <span className="min-w-0 flex-1">
+                      <span className="line-clamp-2 text-sm leading-relaxed text-slate-800">
+                        {first.slice(0, 220)}
+                      </span>
+                      <span className="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-slate-500">
+                        {p.author && <span>{p.author}</span>}
+                        {p.postedAt && <span>{p.postedAt}</span>}
+                        {p.sentimentLabel && (
+                          <span
+                            className={`rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase ring-1 ${sentTone}`}
+                          >
+                            {p.sentimentLabel}
+                          </span>
+                        )}
+                      </span>
                     </span>
-                  </span>
-                </a>
-              </li>
-            );
-          })}
-        </ul>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+
+          <div className="mt-5 flex flex-col items-center gap-2">
+            {hasMore ? (
+              <button
+                type="button"
+                onClick={loadMore}
+                disabled={isPending}
+                className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-900 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isPending ? loadingLabel : loadMoreLabel}
+              </button>
+            ) : posts.length > 0 ? (
+              <span className="text-[11px] text-slate-500">{endLabel}</span>
+            ) : null}
+            {error && (
+              <p className="text-[11px] text-amber-700" role="alert">
+                {error}
+              </p>
+            )}
+          </div>
+        </>
       )}
     </>
   );

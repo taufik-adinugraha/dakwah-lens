@@ -13,7 +13,7 @@ import { eq } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { BriefingsGrid } from "@/components/BriefingsGrid";
 import { DigestOptInPrompt } from "@/components/DigestOptInPrompt";
-import { getAllLatestBriefings } from "@/lib/briefing-data";
+import { getAllLatestBriefings, getGroupVolumes7d } from "@/lib/briefing-data";
 import { WatchedRoomsNudge } from "./WatchedRoomsNudge";
 
 /**
@@ -52,8 +52,9 @@ export default async function InsightsPage({
   // why they got bounced (was previously silent, see audit 2026-05-26).
   const showBriefsAdminNotice = sp.notice === "briefs-admin-only";
 
-  const [briefings, session] = await Promise.all([
+  const [briefings, volumes, session] = await Promise.all([
     getAllLatestBriefings(),
+    getGroupVolumes7d(),
     auth(),
   ]);
 
@@ -115,7 +116,7 @@ export default async function InsightsPage({
 
       <WatchedRoomsNudge />
 
-      <BriefingsGrid briefings={briefings} locale={locale} />
+      <BriefingsGrid briefings={briefings} volumes={volumes} locale={locale} />
 
       {showDigestPrompt && (
         <div className="mx-auto max-w-6xl px-4 pb-8 sm:px-6">

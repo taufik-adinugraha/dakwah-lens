@@ -8,19 +8,20 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 // No auth() in the path so per-user caching keys don't apply.
 export const revalidate = 300;
 
-import { and, desc, eq, inArray, isNull, or, sql } from "drizzle-orm";
+import { and, desc, inArray, sql } from "drizzle-orm";
 import { ArrowRight, Compass, Layers, X } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
-import {
-  classifyThemeGroup,
-  GROUP_BY_SLUG,
-  LAINNYA_GROUP,
-} from "@/lib/dashboard-metrics";
+import { classifyThemeGroup, GROUP_BY_SLUG } from "@/lib/dashboard-metrics";
 import { briefingSlug, getLatestBriefing } from "@/lib/briefing-data";
 import { I18nText } from "@/components/I18nText";
 import { GroupPostsFilter, type GroupPost } from "./GroupPostsFilter";
+import { buildGroupScopeClause } from "./scope";
+
+/** Initial server-rendered page size. The "Load more" button
+ *  on the client fetches subsequent pages of the same size. */
+const PAGE_SIZE = 25;
 
 /**
  * Lightweight landing for one of the 14 THEME_GROUPS.
@@ -85,39 +86,11 @@ export default async function GroupLandingPage({
   );
   const groupTopicIds = groupTopics.map((t) => t.id);
 
-  // 2. Recent posts in this group (last 14d, capped at 25). Hybrid
-  //    predicate matching the briefing pipeline:
-  //      - Primary: `theme_group = $group` (Gemini-judged at ingest)
-  //      - Fallback: `theme_group IS NULL AND topic_id ∈ groupTopics`
-  //                  (legacy chain for pre-2026-06-03 rows)
-  //    For the Lainnya group ALSO catches truly un-classified rows
-  //    (both theme_group and topic_id NULL) — those land on the
-  //    Lainnya page so the reader can browse them too.
-  const isLainnya = group === LAINNYA_GROUP;
-  const themeMatch = eq(schema.socialPosts.themeGroup, group);
-  const legacyTopicMatch =
-    groupTopicIds.length > 0
-      ? and(
-          isNull(schema.socialPosts.themeGroup),
-          inArray(schema.socialPosts.topicId, groupTopicIds),
-        )!
-      : null;
-  const lainnyaNullMatch = isLainnya
-    ? and(
-        isNull(schema.socialPosts.themeGroup),
-        isNull(schema.socialPosts.topicId),
-      )!
-    : null;
-  const branches = [themeMatch, legacyTopicMatch, lainnyaNullMatch].filter(
-    (b): b is NonNullable<typeof b> => b !== null,
-  );
-  const idClause = branches.length > 1 ? or(...branches)! : branches[0];
-
-  // Optional topic-filter (from ?topic=<uuid>). When the param matches
-  // one of this group's topic IDs, every query below scopes to that
-  // single topic — posts list, sentiment aggregate, the active-topic
-  // banner. Anything else (missing, malformed, out-of-group) falls
-  // back to the full group-scope query.
+  // 2. Recent posts in this group (last 14d, server-rendered first page).
+  //    Subsequent pages come from the loadGroupPosts server action.
+  //    Optional topic-filter (from ?topic=<uuid>) collapses scope to a
+  //    single topic; anything missing/malformed/out-of-group falls back
+  //    to the full group-scope query.
   const topicFilter =
     topicFilterRaw && groupTopicIds.includes(topicFilterRaw)
       ? topicFilterRaw
@@ -125,10 +98,14 @@ export default async function GroupLandingPage({
   const activeTopic = topicFilter
     ? (groupTopics.find((t) => t.id === topicFilter) ?? null)
     : null;
-  const scopedClause = topicFilter
-    ? eq(schema.socialPosts.topicId, topicFilter)
-    : idClause;
+  const scopedClause = buildGroupScopeClause({
+    group,
+    groupTopicIds,
+    topicFilter,
+  });
 
+  // Fetch PAGE_SIZE+1 to know whether a second page exists without
+  // running a separate COUNT — the +1 row, if present, is sliced off.
   const recentPosts = await db
     .select({
       id: schema.socialPosts.id,
@@ -147,7 +124,11 @@ export default async function GroupLandingPage({
       ),
     )
     .orderBy(desc(schema.socialPosts.postedAt))
-    .limit(25);
+    .limit(PAGE_SIZE + 1);
+  const initialHasMore = recentPosts.length > PAGE_SIZE;
+  const firstPagePosts = initialHasMore
+    ? recentPosts.slice(0, PAGE_SIZE)
+    : recentPosts;
 
   // Sentiment aggregate over the same 14d window + same scope. Groups
   // NULL/unknown labels into the "other" bucket so the bar totals
@@ -166,14 +147,20 @@ export default async function GroupLandingPage({
     )
     .groupBy(schema.socialPosts.sentimentLabel);
   const sentimentCounts = { positive: 0, neutral: 0, negative: 0 };
+  let nullSentimentCount = 0;
   for (const r of sentimentRows) {
     const k = r.label;
     if (k === "positive" || k === "neutral" || k === "negative") {
       sentimentCounts[k] = Number(r.n);
+    } else {
+      nullSentimentCount += Number(r.n);
     }
   }
   const sentimentTotal =
     sentimentCounts.positive + sentimentCounts.neutral + sentimentCounts.negative;
+  // "all" filter on the posts list returns NULL-sentiment rows too —
+  // include them so the chip count matches what the user sees.
+  const allPostsCount = sentimentTotal + nullSentimentCount;
 
   // 3. Recompute per-topic 7-day counts (the topics.post_count column
   //    is cross-platform lifetime). Cheaper than per-topic queries:
@@ -235,7 +222,7 @@ export default async function GroupLandingPage({
     year: "numeric",
     timeZone: "Asia/Jakarta",
   });
-  const postsForClient: GroupPost[] = recentPosts.map((p) => ({
+  const postsForClient: GroupPost[] = firstPagePosts.map((p) => ({
     id: p.id,
     text: p.text,
     author: p.author,
@@ -437,7 +424,19 @@ export default async function GroupLandingPage({
             </p>
           )}
           <GroupPostsFilter
-            posts={postsForClient}
+            key={topicFilter ?? "__all__"}
+            initialPosts={postsForClient}
+            initialHasMore={initialHasMore}
+            groupSlug={slug}
+            topicId={topicFilter}
+            locale={locale}
+            pageSize={PAGE_SIZE}
+            filterCounts={{
+              all: allPostsCount,
+              positive: sentimentCounts.positive,
+              neutral: sentimentCounts.neutral,
+              negative: sentimentCounts.negative,
+            }}
             emptyMessage={t("group_posts_empty")}
             filterLabels={{
               all: t("filter_all"),
@@ -445,6 +444,10 @@ export default async function GroupLandingPage({
               neutral: t("filter_neutral"),
               negative: t("filter_negative"),
             }}
+            loadMoreLabel={t("group_posts_load_more")}
+            loadingLabel={t("group_posts_loading")}
+            endLabel={t("group_posts_end")}
+            errorLabel={t("group_posts_load_error")}
           />
         </section>
 

@@ -99,7 +99,8 @@ export type KitabCorpus =
   | "muslim"
   | "riyad"
   | "bulugh"
-  | "tafsir";
+  | "tafsir"
+  | "bidayat";
 
 const COLLECTION_NAMES: Record<KitabCorpus, string> = {
   quran: "quran",
@@ -108,6 +109,7 @@ const COLLECTION_NAMES: Record<KitabCorpus, string> = {
   riyad: "riyad_as_salihin",
   bulugh: "bulugh_al_maram",
   tafsir: "tafsir_ibn_kathir",
+  bidayat: "bidayat_al_hidayah",
 };
 
 // MUST match the model used in `api/src/api/scripts/embed_quran.py`,
@@ -211,7 +213,7 @@ export async function retrieveDaleel(
   const topK = opts.topK ?? 2;
   const corpora: KitabCorpus[] =
     !opts.corpus || opts.corpus === "all"
-      ? ["quran", "bukhari", "muslim", "riyad", "bulugh", "tafsir"]
+      ? ["quran", "bukhari", "muslim", "riyad", "bulugh", "tafsir", "bidayat"]
       : [opts.corpus];
 
   const openai = getOpenai();
@@ -686,6 +688,21 @@ function normalizeHit(
       ),
       surah: typeof p.surah === "number" ? p.surah : undefined,
       ayah: typeof p.ayah === "number" ? p.ayah : undefined,
+      score,
+      retrievalSource: "qdrant",
+    };
+  }
+
+  if (corpus === "bidayat") {
+    // Bidayatul Hidayah is AR-only (decision 2026-06-08) until a
+    // translation pass adds `id` / `en` to the payload. Until then the
+    // chip falls back to rendering Arabic; a re-embed run will backfill
+    // translations later without changing the retrieval contract.
+    return {
+      corpus,
+      arabic: String(p.ar ?? ""),
+      translation: "",
+      citation: String(p.citation ?? "Bidayatul Hidayah"),
       score,
       retrievalSource: "qdrant",
     };

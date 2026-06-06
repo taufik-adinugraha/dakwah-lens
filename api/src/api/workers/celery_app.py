@@ -133,44 +133,30 @@ celery_app.conf.update(
             "schedule": crontab(minute=0, hour=22, day_of_week=3),
             "kwargs": {"platform": "x", "limit": 500, "n_keywords": 999},
         },
-        # TikTok + Instagram — weekly Wed evening, staggered after X so the
-        # paid-Apify burst lands together and a single Thu 04:00 recluster
-        # covers all three. Enabled 2026-05-25 for one-week evaluation.
-        # Cost @ limit=20 × 49 keywords:
-        #   · TikTok ($0.004/item)    ≈ $3.92/run → $16/mo
-        #   · Instagram ($0.0023/item) ≈ $2.25/run → $9/mo
-        # Keep limit at 20 — bumping higher pushes TT past budget cap.
-        # ingest-tiktok-weekly RE-ENABLED 2026-05-28 with a pruned seed
-        # list (36 Indonesian-distinctive seeds, down from 49) — 13
-        # collision-prone English/multilingual hashtags (#anime, #crypto,
-        # #film, #game, #guru, #healing, #kpop, #mental, #parenting,
-        # #viral, #zina, #burnout, #childfree) were marked enabled=false
-        # in ingest_queries because TT's $0.056/item rate makes each
-        # foreign-language pull expensive (was 30.1% foreign noise before
-        # the audit). Watch the next Wed 22:10 WIB run's foreign-rate via
-        # the language-cleanup script; if still >15%, prune further from:
-        # genz / stres / bully (Indonesian-used but English-loanword).
-        "ingest-tiktok-weekly": {
-            "task": "api.workers.ingest.rotating_ingest",
-            "schedule": crontab(minute=10, hour=22, day_of_week=3),
-            "kwargs": {"platform": "tiktok", "limit": 20, "n_keywords": 999},
-        },
-        "ingest-instagram-weekly": {
-            "task": "api.workers.ingest.rotating_ingest",
-            "schedule": crontab(minute=20, hour=22, day_of_week=3),
-            # limit bumped 20 → 60 (2026-05-30). 2026-05-27 audit showed
-            # 7 of 38 yielding keywords pinned at the 20-cap + 11 at 19.
-            # 60 gives top-yielding hashtags room to clear (~40-50 items
-            # for the cap-bound ones), without paying for deep-scroll
-            # on every hashtag. The actor's documented Starter pricing
-            # is $0.0023/item (Pay Per Result); the prod-recorded $0.16
-            # for the 5/27 run was under-counted by ~10× (the 5/28 06:00
-            # billing_reconcile absorbed the gap), so cost forecasts
-            # should use the docs rate. Expected: ~1,300-1,500 items
-            # ≈ $3-3.45/run ≈ $13-15/mo. Re-evaluate after next Wed run
-            # against the per-item rate that actually bills.
-            "kwargs": {"platform": "instagram", "limit": 60, "n_keywords": 999},
-        },
+        # TikTok + Instagram — PAUSED 2026-06-08 to claw back budget for
+        # higher-value LLM work (briefings, daleel pool widening). Three
+        # weekly cycles (May 20, 27, Jun 3) showed:
+        #   · TikTok: 3 runs × ~770 items ≈ $2.60/run → $10-11/mo billed
+        #   · Instagram: 3 runs × ~1,000-2,100 items ≈ $1-3.70/run, very
+        #     volatile (Jun 3 cycle alone burnt $3.68 — 2× expected — as
+        #     hashtag yield doubled vs the limit=60 calibration).
+        # Combined ~$23/month for two platforms whose signal overlaps
+        # heavily with X (which we keep) on the same trending topics.
+        #
+        # Re-enable by uncommenting both blocks. No code changes needed —
+        # the `ingest_queries` rows for tiktok/instagram remain in place
+        # (admin-editable at /admin/system/queries), so the next cycle
+        # picks up the existing keyword list immediately.
+        # "ingest-tiktok-weekly": {
+        #     "task": "api.workers.ingest.rotating_ingest",
+        #     "schedule": crontab(minute=10, hour=22, day_of_week=3),
+        #     "kwargs": {"platform": "tiktok", "limit": 20, "n_keywords": 999},
+        # },
+        # "ingest-instagram-weekly": {
+        #     "task": "api.workers.ingest.rotating_ingest",
+        #     "schedule": crontab(minute=20, hour=22, day_of_week=3),
+        #     "kwargs": {"platform": "instagram", "limit": 60, "n_keywords": 999},
+        # },
         # Re-cluster topics. Split across two beat entries to match the
         # ingest cadence of each platform — re-running Gemini topic
         # discovery on the same corpus does no work but still costs
