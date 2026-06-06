@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
 type Flyer = {
   id: string;
   headline: string;
@@ -67,6 +69,10 @@ export function FlyerGrid({
   showDelete,
   labels,
   locale,
+  typeOptions: typeOptionsProp,
+  topicOptions: topicOptionsProp,
+  filterValues,
+  filterBasePath,
 }: {
   flyers: Flyer[];
   /** When true, each tile shows a delete affordance. /flyers/mine sets this;
@@ -75,7 +81,34 @@ export function FlyerGrid({
   labels: Labels;
   /** For localized month labels in the filter dropdown. */
   locale?: string;
+  /** Optional override for the Type filter dropdown. When provided,
+   *  the dropdown reflects the FULL result set (across paginated
+   *  pages); when omitted, options are derived from `flyers` (the
+   *  current page only). Set this from /flyers/public so cross-page
+   *  filtering works. */
+  typeOptions?: string[];
+  /** Same as `typeOptions` but for the Topic filter. */
+  topicOptions?: string[];
+  /** When provided, source/type/topic filters become URL-driven
+   *  (mode = "server"). The parent server component reads `?source=…
+   *  &type=…&topic=…` and filters its result set BEFORE pagination, so
+   *  picking a topic from page 1 re-paginates the matching subset
+   *  instead of just narrowing the visible page. Omit to keep the
+   *  legacy current-page-only client-side filter (used by /flyers/mine
+   *  where the dataset isn't paginated). */
+  filterValues?: {
+    source: "all" | "system" | "user";
+    type: string; // "" = all
+    topic: string; // "" = all
+  };
+  /** Required when `filterValues` is set — locale-relative base path
+   *  the filter selects navigate to (e.g. "/flyers/public"). */
+  filterBasePath?: string;
 }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const urlDriven = !!filterValues && !!filterBasePath;
   // Deleted-id set lives client-side so the tile vanishes optimistically
   // on /mine. Deriving `items` from the `flyers` prop (not from useState)
   // lets server-driven pagination flow through — useState would freeze
@@ -83,19 +116,63 @@ export function FlyerGrid({
   // props change.
   const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
   const items = flyers.filter((x) => !deletedIds.has(x.id));
-  const [source, setSource] = useState("all");
-  const [type, setType] = useState("all");
-  const [topic, setTopic] = useState("all");
+  // Local-state filters — only used in legacy (non-urlDriven) mode.
+  // In urlDriven mode the server already filtered the result set
+  // before pagination, so re-filtering here would be a no-op.
+  const [sourceLocal, setSourceLocal] = useState("all");
+  const [typeLocal, setTypeLocal] = useState("all");
+  const [topicLocal, setTopicLocal] = useState("all");
   const [month, setMonth] = useState("all");
+  const source = urlDriven ? (filterValues!.source as string) : sourceLocal;
+  const type = urlDriven ? filterValues!.type || "all" : typeLocal;
+  const topic = urlDriven ? filterValues!.topic || "all" : topicLocal;
+
+  // Build the locale-aware base path once. next-intl's `Link`/router
+  // automatically prefixes the locale, but we're using next/navigation's
+  // router here (since it accepts a string URL); read the locale from
+  // the current pathname so the navigation stays on the same language.
+  const localePrefix = (() => {
+    const first = (pathname ?? "").split("/").filter(Boolean)[0];
+    return first === "en" || first === "id" ? `/${first}` : "";
+  })();
+
+  function buildFilterUrl(patch: Record<string, string>): string {
+    const params = new URLSearchParams(searchParams?.toString() ?? "");
+    for (const [k, v] of Object.entries(patch)) {
+      if (v && v !== "all") params.set(k, v);
+      else params.delete(k);
+    }
+    // Any filter change resets the page.
+    params.delete("page");
+    const qs = params.toString();
+    return `${localePrefix}${filterBasePath}${qs ? `?${qs}` : ""}`;
+  }
+
+  const setSource = (v: string) => {
+    if (urlDriven) router.push(buildFilterUrl({ source: v }));
+    else setSourceLocal(v);
+  };
+  const setType = (v: string) => {
+    if (urlDriven) router.push(buildFilterUrl({ type: v }));
+    else setTypeLocal(v);
+  };
+  const setTopic = (v: string) => {
+    if (urlDriven) router.push(buildFilterUrl({ topic: v }));
+    else setTopicLocal(v);
+  };
 
   const f = labels.filters;
 
-  const typeOptions = Array.from(
-    new Set(items.map((x) => x.typeLabel).filter(Boolean)),
-  ) as string[];
-  const topicOptions = Array.from(
-    new Set(items.map((x) => x.topicLabel).filter(Boolean)),
-  ) as string[];
+  const typeOptions =
+    typeOptionsProp ??
+    (Array.from(
+      new Set(items.map((x) => x.typeLabel).filter(Boolean)),
+    ) as string[]);
+  const topicOptions =
+    topicOptionsProp ??
+    (Array.from(
+      new Set(items.map((x) => x.topicLabel).filter(Boolean)),
+    ) as string[]);
   const monthKeys = Array.from(new Set(items.map((x) => monthKey(x.createdAt))))
     .sort()
     .reverse();
@@ -107,13 +184,21 @@ export function FlyerGrid({
     });
   };
 
-  const filtered = items.filter((x) => {
-    if (source !== "all" && (x.kind ?? "user") !== source) return false;
-    if (type !== "all" && x.typeLabel !== type) return false;
-    if (topic !== "all" && x.topicLabel !== topic) return false;
-    if (month !== "all" && monthKey(x.createdAt) !== month) return false;
-    return true;
-  });
+  // In urlDriven mode the server already applied source/type/topic
+  // filtering before pagination, so only month (which the
+  // MonthPickerPager handles separately) needs a client-side pass —
+  // and even that is a no-op here since month is also URL-driven on
+  // /flyers/public via MonthPickerPager. Keep the legacy filter loop
+  // for callers (/flyers/mine) that don't pass filterValues.
+  const filtered = urlDriven
+    ? items
+    : items.filter((x) => {
+        if (source !== "all" && (x.kind ?? "user") !== source) return false;
+        if (type !== "all" && x.typeLabel !== type) return false;
+        if (topic !== "all" && x.topicLabel !== topic) return false;
+        if (month !== "all" && monthKey(x.createdAt) !== month) return false;
+        return true;
+      });
 
   return (
     <>
@@ -147,7 +232,11 @@ export function FlyerGrid({
               options={topicOptions.map((o) => ({ value: o, label: o }))}
             />
           )}
-          {monthKeys.length > 1 && (
+          {/* urlDriven callers (e.g. /flyers/public) render the
+              MonthPickerPager separately, so the Month dropdown here
+              would be a duplicate control. Keep it for legacy callers
+              (/flyers/mine) that don't paginate. */}
+          {!urlDriven && monthKeys.length > 1 && (
             <FilterSelect
               label={f.month}
               value={month}

@@ -97,6 +97,14 @@ export default async function PublicFlyersPage({
   const sp = await searchParams;
   const selectedMonth = parseMonthParam(sp.month);
   const page = parsePageParam(sp.page);
+  // Source / type / topic filters are URL-driven (since 2026-06-07) so
+  // they apply BEFORE pagination — picking a topic re-paginates the
+  // matching subset instead of just narrowing the visible page.
+  const rawSource = typeof sp.source === "string" ? sp.source : "";
+  const selectedSource: "all" | "system" | "user" =
+    rawSource === "system" || rawSource === "user" ? rawSource : "all";
+  const selectedType = typeof sp.type === "string" && sp.type ? sp.type : "";
+  const selectedTopic = typeof sp.topic === "string" && sp.topic ? sp.topic : "";
 
   // ── Months available for the picker dropdown ──────────────────
   // Union of months that have at least one briefing OR at least one
@@ -229,13 +237,47 @@ export default async function PublicFlyersPage({
     kind: "user" as const,
   }));
 
-  // Merge + sort newest first, then paginate.
+  // Merge + sort newest first. Filter BEFORE paginating so picking a
+  // topic on page 1 re-paginates the matching subset instead of
+  // appearing to "find nothing" until the user clicks Next.
   const allFlyers = [...systemFlyers, ...userFlyers].sort((a, b) =>
     a.createdAt < b.createdAt ? 1 : -1,
   );
-  const totalPages = Math.max(1, Math.ceil(allFlyers.length / PAGE_SIZE));
+  // Filter dropdowns reflect the FULL pre-filter result set (across
+  // all pages), so a user can always see what topics/types exist even
+  // after they've narrowed the view.
+  const allTypeOptions = Array.from(
+    new Set(
+      allFlyers
+        .map((x) => ("typeLabel" in x ? x.typeLabel : undefined))
+        .filter(Boolean) as string[],
+    ),
+  ).sort();
+  const allTopicOptions = Array.from(
+    new Set(
+      allFlyers
+        .map((x) => ("topicLabel" in x ? x.topicLabel : undefined))
+        .filter(Boolean) as string[],
+    ),
+  ).sort();
+  const filteredFlyers = allFlyers.filter((x) => {
+    if (selectedSource !== "all" && (x.kind ?? "user") !== selectedSource)
+      return false;
+    if (
+      selectedType &&
+      ("typeLabel" in x ? x.typeLabel : undefined) !== selectedType
+    )
+      return false;
+    if (
+      selectedTopic &&
+      ("topicLabel" in x ? x.topicLabel : undefined) !== selectedTopic
+    )
+      return false;
+    return true;
+  });
+  const totalPages = Math.max(1, Math.ceil(filteredFlyers.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
-  const pageFlyers = allFlyers.slice(
+  const pageFlyers = filteredFlyers.slice(
     (safePage - 1) * PAGE_SIZE,
     safePage * PAGE_SIZE,
   );
@@ -299,6 +341,14 @@ export default async function PublicFlyersPage({
         <FlyerGrid
           flyers={pageFlyers}
           locale={locale}
+          typeOptions={allTypeOptions}
+          topicOptions={allTopicOptions}
+          filterValues={{
+            source: selectedSource,
+            type: selectedType,
+            topic: selectedTopic,
+          }}
+          filterBasePath="/flyers/public"
           labels={{
             visibilityBadgePublic: t("visibility_badge_public"),
             visibilityBadgePrivate: t("visibility_badge_private"),
