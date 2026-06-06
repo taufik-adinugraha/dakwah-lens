@@ -243,6 +243,12 @@ RUJUKAN DALIL DI SECTION 4 — pool yang saya sediakan berisi 10 dalil hasil rer
 ### Khutbah Jumat (3450-4800 kata)
 Tulis KHUTBAH JUMAT LENGKAP siap-baca dari pembuka sampai penutup, terdiri dari Khutbah Pertama dan Khutbah Kedua. Bahasa Indonesia formal-mengalir, bisa dipahami jamaah umum, jangan terlalu akademis. Panjang khutbah harus sebanding dengan khutbah Jumat Indonesia standar yang lengkap dan bernapas panjang (22-30 menit ucapan = ~3450-4800 kata) — JANGAN terlalu pendek, beri ruang argumen berkembang dengan 3-4 dalil, 2-3 cerita konkret pekan ini, dan refleksi yang dalam.
 
+VOICE — KHUTBAH JUMAT (audiens duduk di masjid, khateeb berdiri di mimbar):
+- Anda adalah khateeb yang berbicara LANGSUNG kepada jamaah yang hadir Jumat ini. Sapaan langsung WAJIB dipakai: "hadirin yang dimuliakan Allah", "jamaah Jumat", "ma'asyiral muslimin rahimakumullah" — ini bahasa mimbar yang benar.
+- Tone formal-mengalir, bukan akademis dan bukan percakapan kasual. Pakai kalimat panjang yang bernapas, jeda yang membuat jamaah ikut merenung.
+- Setiap dalil dibawa sebagai PREMIS argumen (bukan sekadar tag): kutip citation, kutip teks Arab lengkap dengan harakat, kutip terjemahan, lalu jelaskan tafsirnya dalam 2-3 paragraf prosa yang menghubungkan ke konteks pekan ini.
+- DILARANG di voice ini: "kamu", "kalian" (terlalu kasual untuk mimbar — pakai "jamaah", "kita semua", "hadirin"); jokes (mimbar bukan stand-up); slogan medsos ("mari kita move on", "ini gila banget").
+
 KHUTBAH PERTAMA (2700-3750 kata):
 - Mukadimah singkat (hamdalah → sholawat → syahadat → wasiat takwa, ~70 kata, AKSARA ARAB DENGAN HARAKAT lengkap — bukan transliterasi Latin). Khateeb membaca langsung dari teks di mimbar.
 - Ayat Quran pembuka yang relevan dengan tema pekan — TULIS AYAT DALAM AKSARA ARAB BERHARAKAT, lalu sebut nama surah + nomor ayat, lalu TERJEMAHAN Bahasa Indonesia. JANGAN gunakan transliterasi Latin untuk ayat Quran.
@@ -271,6 +277,13 @@ KHUTBAH KEDUA (750-1050 kata):
 ### Kultum (1650-2250 kata)
 Tulis KULTUM 10-15 menit siap-baca, format ringkas tapi LENGKAP dari pembuka sampai penutup. Audience: jamaah ba'da sholat (Subuh / Maghrib / Isya), Ramadhan tarawih, atau acara komunitas singkat — orang yang sudah sholat dan tidak ingin terlalu lama berdiri, tapi mau pulang dengan satu pesan yang menempel. Bahasa Indonesia mengalir-konversasional (bukan setegang khutbah Jumat), satu argumen tajam yang tidak melebar.
 
+VOICE — KULTUM (audiens duduk ba'da sholat, penyampai berdiri / duduk di depan, suasana lebih dekat dari khutbah Jumat):
+- Sapaan WAJIB lebih hangat dari khutbah Jumat: "jamaah yang saya hormati", "para jamaah", "saudara-saudara sekalian". JANGAN pakai sapaan formal mimbar Jumat ("ma'asyiral muslimin").
+- Tone percakapan-reflektif: kalimat lebih pendek, jeda untuk berpikir, sesekali pertanyaan retoris yang mengajak jamaah ikut menjawab dalam hati ("siapa di sini yang pekan ini pernah merasa...").
+- Argumen TUNGGAL yang tajam — kultum bukan tempat membahas 4 lapis analisis. Pilih satu sudut, kembangkan dalam, beri 2 dalil maksimum (cukup citation + Arabic + terjemahan, tafsirnya singkat).
+- Boleh selipkan satu humor ringan yang relatable (observasional, bukan menyindir). Boleh sebut nama tokoh-tokoh sahabat / ulama dengan akrab.
+- DILARANG di voice ini: mukadimah panjang ala khutbah Jumat (cukup ta'awudh + basmalah + hamdalah singkat); 4+ dalil bertubi-tubi; kalimat-kalimat yang berputar tidak fokus.
+
 STRUKTUR WAJIB (urutan ini, jangan ditukar):
 
 - **Pembuka** (~180 kata): mulai dengan TA'AWUDH + BASMALAH + HAMDALAH SINGKAT dalam aksara Arab berharakat (`أَعُوذُ بِاللهِ مِنَ الشَّيْطَانِ الرَّجِيْمِ، بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ، اَلْحَمْدُ لِلهِ رَبِّ الْعَالَمِيْنَ…`), diikuti satu kalimat sholawat singkat `وَالصَّلَاةُ وَالسَّلَامُ عَلٰى رَسُوْلِ اللهِ، وَعَلٰى آلِهِ وَصَحْبِهِ أَجْمَعِيْنَ، أَمَّا بَعْدُ`. Lalu salam pembuka Bahasa Indonesia ke jamaah (~30-40 kata) yang langsung menyebutkan KONTEKS pekan — bukan "Hadirin yang dirahmati Allah, alhamdulillah kita bersyukur..." (terlalu generik). Lebih baik: "Jamaah yang saya hormati, di pekan kita yang baru saja melewati [peristiwa konkret pekan ini], ada satu pesan yang ingin saya bagikan malam ini..."
@@ -287,6 +300,14 @@ NADA: hangat, pribadi, langsung. JANGAN tirukan formalitas khutbah Jumat — kul
 
 ### Kajian Ibu-ibu & Majelis Taklim (1400-1800 kata)
 Tulis OUTLINE KAJIAN 60-MENIT siap-pakai, format hands-on bukan ceramah teoritis. Lebih panjang dari sub-section lain karena ibu-ibu sering minta detail praktis ("kalau di rumah saya gimana, Ustadzah?") dan butuh ruang untuk cerita konkret + Q&A yang jujur.
+
+VOICE — KAJIAN IBU-IBU (suasana ruang tamu masjid, ibu-ibu duduk lesehan, ustadzah seperti tante yang dipercaya):
+- Sapaan: "ibu-ibu yang dirahmati Allah", "para ibu", "jamaah majelis taklim". Boleh sesekali "kita ibu-ibu" untuk membangun in-group warmth.
+- Tone HANGAT seperti tante yang dipercaya, BUKAN ustadzah yang berjarak. Tertawa BERSAMA, bukan ditertawakan.
+- Contoh konkret WAJIB dari dapur / kamar tidur / WhatsApp grup ibu-ibu / antar-tetangga / pasar — bukan contoh kantoran atau politik tinggi (ibu-ibu lebih mengerti pasar Senen dari rapat DPR).
+- Humor AMAN: tentang kebiasaan kita sendiri (scroll TikTok, lupa nama tetangga, kebanyakan beli skincare). JANGAN tentang suami yang merendahkan, anak yang merendahkan, kelas sosial, fisik.
+- Q&A WAJIB ada — minimal 4 pertanyaan yang BENERAN akan diajukan ibu-ibu di majelis (ada yang berat, ada yang lucu).
+- DILARANG di voice ini: bahasa khotbah formal ("ma'asyiral muslimin", "hadirin", "wahai sekalian"); analisis akademik panjang; istilah teknis tanpa dijelaskan dalam bahasa dapur; menggurui ("wahai ibu-ibu, ketahuilah").
 
 - Pembuka (~120 kata): basmalah, salam, ice-breaker / pertanyaan ringan terkait pengalaman ibu-ibu pekan ini ("Siapa yang harga sembako-nya naik minggu ini?", "Ada yang anaknya minta beli skincare karena lihat artis di TikTok?"). Boleh selipkan satu humor ringan yang relatable buat ibu-ibu — TIDAK menyindir, TIDAK merendahkan, hanya pengamatan jujur tentang kehidupan rumah. Contoh nada: "Wahai ibu-ibu, kalau di grup WhatsApp lebih ramai dari pasar Senen, ini pertanda kita semua butuh tarbiyah kembali — termasuk saya."
 - Inti — 4 talking points (masing-masing 250-320 kata) dengan struktur per-poin:
@@ -353,6 +374,13 @@ LARANGAN VOICE (KRITIS, berlaku untuk SELURUH Kisah Pendek dari Pembuka sampai K
 PANJANG: target ~1800-2200 kata untuk waktu baca 10 menit. JANGAN lebih pendek — pembaca tidak bisa "hanyut" dalam <1500 kata. JANGAN melebar ke >2200 — kisah jadi melar.
 
 ### Pengajaran di Rumah (500-700 kata)
+
+VOICE — PENGAJARAN DI RUMAH (orang tua sedang ngobrol dengan anak setelah maghrib atau sebelum tidur):
+- BUKAN ditujukan ke audiens jamaah — ditujukan ke ORANG TUA, dengan instruksi tentang cara mengobrol dengan anak. Format: ada "narator ke orang tua" (kerangka), lalu contoh dialog "orang tua ke anak" (ilustrasi).
+- Sapaan: "ayah", "bunda", "orang tua" — tidak pakai "hadirin" atau "jamaah".
+- Bahasa anak WAJIB digunakan saat menulis contoh dialog: kalimat pendek, tidak ada istilah teknis, satu konsep per kalimat.
+- Berikan SCRIPT konkret yang orang tua bisa langsung pakai: pertanyaan pembuka, jawaban anak yang mungkin muncul, respons orang tua, dll.
+- DILARANG: bahasa khutbah; dalil panjang dengan tafsir akademik (cukup satu dalil pendek yang relevan + 1 kalimat penjelasan); kalimat motivational ke orang tua ("wahai para ibu, sadarilah...").
 Tulis 3-4 CONVERSATION SCRIPT untuk orang tua dengan anak, masing-masing format:
 - Setting: kapan (sarapan / di mobil / sebelum tidur) + usia anak (SD / SMP / SMA)
 - Pertanyaan pembuka orang tua (1-2 kalimat — pertanyaan, bukan ceramah).
@@ -365,10 +393,25 @@ Tulis SCRIPT VIDEO siap-pakai 60-90 detik untuk TikTok / IG Reels / YouTube Shor
 - HOOK (5 detik / ~10 kata): kalimat pertama yang menghentikan scroll. Boleh pertanyaan, boleh kontras, boleh fakta yang mengejutkan dari berita pekan ini.
 - BODY (40-60 detik / 80-100 kata): satu argumen jernih + satu rujukan dalil singkat DARI POOL (sebut citation persis seperti di pool dalam Bahasa Indonesia — JANGAN kutip teks Arab di video, JANGAN mengarang citation).
 - CTA (5-10 detik / ~15 kata): ajakan konkret yang bisa langsung dilakukan penonton.
-Hindari frasa khas khutbah ("hadirin yang dirahmati Allah", "marilah kita renungkan").
+
+VOICE — KREATOR KONTEN (penonton scroll feed IG/TikTok, durasi perhatian 3 detik, dibuka dengan hook yang menghentikan jempol):
+- Bahasa anak muda Indonesia kekinian: "guys", "btw", "literally", "vibes", "scroll", "feed", "udah deh", "intinya". Boleh code-mix dengan English ringan kalau natural.
+- Kalimat SANGAT pendek — maksimal 12-15 kata per kalimat. Penonton mendengar, tidak membaca.
+- Aktif menjawab pertanyaan implisit penonton: "kamu mungkin mikir...", "yang sering ditanya...".
+- Dalil dirujuk sebagai SUMBER, bukan dibacakan: "ini sebenarnya dibahas di QS. Hud: 85 — intinya...". JANGAN baca teks Arabnya di video.
+- DILARANG di voice ini: "hadirin", "ma'asyiral muslimin", "marilah kita renungkan", "wahai saudaraku" — itu khutbah, bukan reel; kalimat panjang yang penonton lupa awalnya; tutorial mendalam (durasi tidak cukup).
 
 ### Mahasiswa: Poster, Artikel & Diskusi (900-1200 kata)
 Tulis PAKET KAMPUS siap-tempel di papan pengumuman jurusan / mushala kampus / fakultas. Audience: mahasiswa S1/S2 yang cerdas, sinis terhadap ceramah, suka diskusi + logika, kurang antusias kalau dalil dibawa sebagai argumen utama. Tujuan paket: bangkitkan rasa ingin tahu lewat satu pertanyaan provokatif, lalu beri pintu masuk pemikiran yang utuh untuk dibahas sendiri / diskusi peer.
+
+VOICE — MAHASISWA (forum diskusi kampus, mahasiswa cerdas yang sinis terhadap ceramah dan suka adu argumen):
+- Tujuan UTAMA: TRIGGER DISKUSI, bukan menyampaikan kesimpulan. Pembaca harus pulang dengan PERTANYAAN baru atau KEBERATAN, bukan dengan jawaban final.
+- Format DIALEKTIK wajib: setiap argumen yang Anda bangun harus DISERTAI pertanyaan yang menyerangnya. Pola "Lensa X bilang Y. Tapi pertanyaan yang menyerang lensa ini: Z?" — bukan "Lensa X bilang Y. Karenanya kita harus W."
+- Tone: cerdas, sopan, sedikit ironis. Sapaan: "kita" / "kalian" (bukan "kamu" tunggal — diskusi adalah aktivitas kolektif). JANGAN "wahai mahasiswa", "renungkanlah", "ketahuilah".
+- Dalil sebagai LENS analitis, BUKAN sebagai keputusan otoritatif. Maksimal 2 dalil di seluruh artikel, dikutip INLINE pendek ("QS. Hud: 85 mengingatkan tentang prinsip mizan...") — JANGAN block-format Arabic + terjemahan ala khutbah.
+- Solusi praktis bukan checklist — pakai format "Diskusi yang patut diangkat di kampus pekan ini": daftar prompt debat, bukan instruksi.
+- Q&A WAJIB punya 5 pushback yang BENERAN keras (bukan straw-man). Jawaban tidak defensif — akui validity pushback sebagian, lalu tawarkan sudut pandang yang lebih utuh + balikkan dengan pertanyaan balik.
+- DILARANG di voice ini: lecture-mode ("Lapisan pertama adalah X, lapisan kedua adalah Y, lapisan ketiga adalah Z" tanpa counter-question); bahasa khotbah; kesimpulan tertutup di penutup ("Jadi, marilah kita..."); checklist solusi yang sederhana ("Pertama, lakukan A. Kedua, lakukan B."); dalil sebagai premis argumen yang tidak boleh dibantah.
 
 Output WAJIB 3 elemen — POSTER QUESTION, ARTIKEL, dan Q&A — dirancang berpasangan: poster menarik perhatian dari jauh, artikel dibaca lebih dekat ketika tertarik.
 
@@ -389,6 +432,13 @@ FORMAT output H4 untuk sub-section: gunakan `#### Poster Question`, `#### Artike
 
 ### Aksi Sosial & Khidmah Umat (600-900 kata)
 Tulis SET aksi kecil-berdampak yang bisa dijalankan oleh komunitas LOKAL — RT, RW, masjid lingkungan, keluarga, pengurus pengajian, karang taruna. BUKAN ceramah, BUKAN konten — kegiatan nyata yang bisa diluncurkan dalam 1-2 minggu dengan EFFORT KECIL (1-5 orang penggerak, tanpa sertifikasi profesional) dan BUDGET KECIL (total di bawah Rp 2.000.000).
+
+VOICE — AKSI SOSIAL (action plan untuk pengurus RT/RW/masjid yang mau eksekusi minggu depan):
+- Format OPERATIONAL, bukan inspirational. Setiap aksi harus jawab: label, penggerak (siapa, berapa orang, kualifikasi), lokasi, jadwal, materi, output langsung, budget rinci dengan harga rupiah, dampak terukur dengan angka.
+- Tone seperti briefing tim project: tegas, ringkas, no fluff. JANGAN paragraf reflektif panjang ("mari kita renungkan...") — cukup trigger 1-2 kalimat kenapa aksi ini perlu, lalu langsung ke tabel/struktur aksi.
+- WAJIB segmentasi 4 audiens (anak-anak / pemuda / dewasa / lansia) — masing-masing satu aksi konkret yang BERBEDA, bukan versi modifikasi dari yang sama.
+- Budget WAJIB pakai angka rupiah aktual yang realistis untuk komunitas RT/RW Indonesia (jangan kasih harga ala Jakarta Selatan untuk komunitas kampung).
+- DILARANG di voice ini: ceramah ("hadirin", "wahai jamaah"); kata "renungkanlah" / "perhatikan" / "marilah kita"; pesan motivational generik ("mari berbuat baik untuk umat") tanpa langkah konkret; aksi yang butuh sertifikasi profesional (pengacara, psikolog klinis, dokter) — penggeraknya harus orang awam terlatih.
 
 Skala dampak: tetangga + lingkungan langsung. BUKAN program nasional, BUKAN platform tech ambisius, BUKAN partnership dengan kementerian / lembaga besar.
 
