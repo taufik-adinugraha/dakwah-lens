@@ -58,6 +58,7 @@ class BriefingWarning(TypedDict, total=False):
         "dangling_citation",
         "arabic_block_inline",
         "deliverable_too_short",
+        "kisah_preacher_voice",
     ]
     severity: Literal["low", "medium", "high"]
     where: str  # human-readable locator, e.g. "Pesan Flyer 2"
@@ -429,6 +430,83 @@ def scan_deliverable_word_counts(markdown: str) -> list[BriefingWarning]:
                         ),
                     }
                 )
+    return warnings
+
+
+# Preacher-voice phrases that break the cerpen-sejarah immersion of
+# Kisah Pendek. The Pelajaran sub-section is excluded — voice there
+# is allowed to shift gently toward essayist-with-reader ("kita").
+# Matched as whole phrases (case-insensitive) so a substring like
+# "hadirin" inside a quoted dialog won't trip the check.
+_KISAH_PREACHER_PATTERNS: list[tuple[str, str]] = [
+    (r"\bhadirin\s+yang\s+(?:dimuliakan|dirahmati|saya\s+hormati)\b", "preacher salutation"),
+    (r"\bjamaah\s+yang\s+(?:dimuliakan|dirahmati|saya\s+hormati)\b", "preacher salutation"),
+    (r"\bpara\s+jamaah\b", "preacher salutation"),
+    (r"\bsaudara-?saudara(?:\s+sekalian)?\b", "preacher 2nd-person address"),
+    (r"\bwahai\s+sekalian\s+(?:manusia|muslim|hadirin)\b", "preacher 2nd-person address"),
+    (r"\bizinkan\s+saya\s+(?:menceritakan|berbagi|mengisahkan|menyampaikan)\b", "preacher framing"),
+    (r"\bsaya\s+akan\s+(?:bercerita|menceritakan|mengisahkan)\b", "1st-person narrator"),
+    (r"\bmari\s+kita\s+(?:simak|dengarkan|renungkan|mulai)\b", "preacher invitation"),
+    (r"\bcoba\s+bayangkan,\s+hadirin\b", "direct address"),
+    (r"\bperhatikan\s+(?:bahwa\s+)?(?:Rasulullah|Nabi)\b.*ﷺ", "preacher commentary inside narrative"),
+]
+
+
+def scan_kisah_voice(markdown: str) -> list[BriefingWarning]:
+    """Flag preacher-voice phrases inside the Kisah Pendek narrative
+    sub-section. The cerpen-sejarah format breaks when the narrator
+    suddenly addresses the reader as a jamaah — pulls the reader out
+    of the historical scene. Carves out `#### Pelajaran` (mild "kita"
+    is allowed there to land the moral) and `#### Sumber Asli` (just
+    raw Arabic). Only checks the Pembuka / Latar / Inti / Klimaks
+    body."""
+    warnings: list[BriefingWarning] = []
+    # Locate the `### Kisah Pendek` block within Section 4. Section 4
+    # heading match is loose to allow both `Strategi & Aksi Dakwah`
+    # and the English variant.
+    sec4 = _section_slice(
+        markdown,
+        r"(?:Strategi(?:\s+(?:&|dan)\s+Aksi\s+Dakwah)?|Da['’]?wah\s+Strategies(?:\s+(?:&|and)\s+Actions)?)",
+    )
+    if not sec4:
+        return warnings
+    body = markdown[sec4[0] : sec4[1]]
+    h3s = list(re.finditer(r"^###\s+(.+)$", body, flags=re.MULTILINE))
+    kisah_block: str | None = None
+    for i, h3 in enumerate(h3s):
+        if re.match(r"Kisah(?:\s+Pendek)?\b", h3.group(1).strip(), flags=re.IGNORECASE):
+            start = h3.end()
+            end = h3s[i + 1].start() if i + 1 < len(h3s) else len(body)
+            kisah_block = body[start:end]
+            break
+    if not kisah_block:
+        return warnings
+    # Strip the Pelajaran + Sumber Asli sub-sections — voice there is
+    # allowed to shift toward essayist tone (mild "kita") and the
+    # source dump is just raw Arabic.
+    narrative_only = re.split(
+        r"^####\s+(?:Pelajaran|Sumber\s+Asli)\b",
+        kisah_block,
+        maxsplit=1,
+        flags=re.MULTILINE | re.IGNORECASE,
+    )[0]
+    for pattern, label in _KISAH_PREACHER_PATTERNS:
+        for m in re.finditer(pattern, narrative_only, flags=re.IGNORECASE):
+            start = max(0, m.start() - 30)
+            end = min(len(narrative_only), m.end() + 30)
+            snippet = narrative_only[start:end].replace("\n", " ")
+            warnings.append(
+                {
+                    "kind": "kisah_preacher_voice",
+                    "severity": "high",
+                    "where": "Kisah Pendek (narrative)",
+                    "message": (
+                        f"{label}: '{m.group(0)}' — Kisah Pendek must read "
+                        f"as third-person cerpen sejarah; preacher voice "
+                        f"belongs in Khutbah/Kultum/Kajian. Context: …{snippet}…"
+                    ),
+                }
+            )
     return warnings
 
 
@@ -1038,6 +1116,7 @@ def validate_briefing(
         (scan_mixed_script_paragraphs, "mixed_script_check_failed"),
         (scan_dangling_citations, "dangling_citation_check_failed"),
         (scan_deliverable_word_counts, "word_count_check_failed"),
+        (scan_kisah_voice, "kisah_voice_check_failed"),
     ):
         try:
             warnings.extend(fn(markdown))
