@@ -100,7 +100,11 @@ export type KitabCorpus =
   | "riyad"
   | "bulugh"
   | "tafsir"
-  | "bidayat";
+  | "bidayat"
+  | "umm"
+  | "bn"
+  | "nashaih"
+  | "fs";
 
 const COLLECTION_NAMES: Record<KitabCorpus, string> = {
   quran: "quran",
@@ -110,6 +114,10 @@ const COLLECTION_NAMES: Record<KitabCorpus, string> = {
   bulugh: "bulugh_al_maram",
   tafsir: "tafsir_ibn_kathir",
   bidayat: "bidayat_al_hidayah",
+  umm: "al_umm",
+  bn: "al_bidayah_wan_nihayah",
+  nashaih: "nashaihul_ibad",
+  fs: "fiqh_as_sunnah",
 };
 
 // MUST match the model used in `api/src/api/scripts/embed_quran.py`,
@@ -213,7 +221,7 @@ export async function retrieveDaleel(
   const topK = opts.topK ?? 2;
   const corpora: KitabCorpus[] =
     !opts.corpus || opts.corpus === "all"
-      ? ["quran", "bukhari", "muslim", "riyad", "bulugh", "tafsir", "bidayat"]
+      ? ["quran", "bukhari", "muslim", "riyad", "bulugh", "tafsir", "bidayat", "umm", "bn", "nashaih", "fs"]
       : [opts.corpus];
 
   const openai = getOpenai();
@@ -693,16 +701,27 @@ function normalizeHit(
     };
   }
 
-  if (corpus === "bidayat") {
-    // Bidayatul Hidayah is AR-only (decision 2026-06-08) until a
-    // translation pass adds `id` / `en` to the payload. Until then the
-    // chip falls back to rendering Arabic; a re-embed run will backfill
-    // translations later without changing the retrieval contract.
+  if (
+    corpus === "bidayat" ||
+    corpus === "umm" ||
+    corpus === "bn" ||
+    corpus === "nashaih" ||
+    corpus === "fs"
+  ) {
+    // AR-only kitab payload (decision 2026-06-08). Translation backfill
+    // is planned; chip falls back to rendering Arabic until then.
+    const defaultCitations: Record<typeof corpus, string> = {
+      bidayat: "Bidayatul Hidayah",
+      umm: "Al-Umm",
+      bn: "Al-Bidayah wan-Nihayah",
+      nashaih: "Nashaihul Ibad",
+      fs: "Fiqh as-Sunnah",
+    };
     return {
       corpus,
       arabic: String(p.ar ?? ""),
       translation: "",
-      citation: String(p.citation ?? "Bidayatul Hidayah"),
+      citation: String(p.citation ?? defaultCitations[corpus]),
       score,
       retrievalSource: "qdrant",
     };

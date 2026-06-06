@@ -26,6 +26,11 @@ const ALL_CORPORA: KitabCorpus[] = [
   "riyad",
   "bulugh",
   "tafsir",
+  "bidayat",
+  "umm",
+  "bn",
+  "nashaih",
+  "fs",
 ];
 
 // Default selection when the user hasn't picked anything yet. Tafsir is
@@ -110,6 +115,42 @@ const KITAB_META: Record<
     metaKey: "kitab_bidayat_meta",
     tone: "from-fuchsia-50 to-fuchsia-100/40",
     iconTone: "bg-fuchsia-600",
+    languages: ["AR"],
+  },
+  // Al-Umm (Imam Shafi'i) added 2026-06-08, same AR-only posture.
+  umm: {
+    labelKey: "kitab_umm_title",
+    metaKey: "kitab_umm_meta",
+    tone: "from-indigo-50 to-indigo-100/40",
+    iconTone: "bg-indigo-600",
+    languages: ["AR"],
+  },
+  // Al-Bidayah wan-Nihayah (Ibn Kathir) — historical narrative,
+  // prophets → Sirah → caliphates. AR-only, same posture.
+  bn: {
+    labelKey: "kitab_bn_title",
+    metaKey: "kitab_bn_meta",
+    tone: "from-rose-50 to-rose-100/40",
+    iconTone: "bg-rose-600",
+    languages: ["AR"],
+  },
+  // Nashaihul Ibad (Sheikh Nawawi al-Bantani's sharh of Ibn Hajar's
+  // Munabbihat) — akhlak + tasawuf advice, canonical in Indonesian
+  // pesantren tradition. AR-only, same posture.
+  nashaih: {
+    labelKey: "kitab_nashaih_title",
+    metaKey: "kitab_nashaih_meta",
+    tone: "from-teal-50 to-teal-100/40",
+    iconTone: "bg-teal-600",
+    languages: ["AR"],
+  },
+  // Fiqh as-Sunnah (Sayyid Sabiq) — modern topical fiqh organised by
+  // ruling rather than madhhab, widely studied in Indonesia.
+  fs: {
+    labelKey: "kitab_fs_title",
+    metaKey: "kitab_fs_meta",
+    tone: "from-orange-50 to-orange-100/40",
+    iconTone: "bg-orange-600",
     languages: ["AR"],
   },
 };

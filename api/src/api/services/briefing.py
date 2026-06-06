@@ -211,7 +211,7 @@ Ini adalah CONTENT KIT — bukan saran strategis. Setiap sub-section harus berup
 RUJUKAN DALIL DI SECTION 4 — pool yang saya sediakan berisi 10 dalil hasil rerank tematik. Setiap sub-section di bawah WAJIB merujuk 1-3 dalil dari pool ini secara INLINE (bukan ditumpuk semua di Section 5):
 - Pilih dalil yang paling SUPPORT argumen sub-section tersebut — bukan asal comot, bukan random pertama
 - Format inline: `**{{citation}}**` (mis. `**QS. Hud: 85**` atau `**Riyad as-Salihin 1420**`) langsung diikuti 1 kalimat parafrase singkat Bahasa Indonesia
-- Sub-section berbeda BOLEH mengutip dalil yang sama jika memang paling pas, tapi USAHAKAN variasi supaya 8-10 dalil pool terdistribusi (khutbah ~3-4 dalil, kultum ~1-2, kajian ~2-3, kisah ~1 sebagai centerpiece, pengajaran ~1-2, kreator ~1, mahasiswa ~2, aksi ~1-2)
+- Sub-section berbeda BOLEH mengutip dalil yang sama jika memang paling pas, tapi USAHAKAN variasi supaya 8-10 dalil pool terdistribusi (khutbah ~3-4 dalil, kultum ~1-2, kajian ~2-3, pengajaran ~1-2, kreator ~1, mahasiswa ~2, aksi ~1-2). Kisah Pendek TIDAK ikut alokasi ini — sub-section itu pakai sumber sendiri (KISAH POOL dari Al-Bidayah wan-Nihayah).
 - JANGAN mengarang ayat atau hadits di luar pool. Citation yang muncul di Section 4 HARUS persis cocok dengan citation di pool
 
 ### Khutbah Jumat (3450-4800 kata)
@@ -221,7 +221,7 @@ KHUTBAH PERTAMA (2700-3750 kata):
 - Mukadimah singkat (hamdalah → sholawat → syahadat → wasiat takwa, ~70 kata, AKSARA ARAB DENGAN HARAKAT lengkap — bukan transliterasi Latin). Khateeb membaca langsung dari teks di mimbar.
 - Ayat Quran pembuka yang relevan dengan tema pekan — TULIS AYAT DALAM AKSARA ARAB BERHARAKAT, lalu sebut nama surah + nomor ayat, lalu TERJEMAHAN Bahasa Indonesia. JANGAN gunakan transliterasi Latin untuk ayat Quran.
 - Pengantar tema (6-9 paragraf Bahasa Indonesia): hubungkan ayat dengan 3-4 peristiwa NYATA pekan ini dari pool sample_headlines. PENTING: dalam khutbah JANGAN sebut nama outlet media (Detik, Republika, Kompas, CNN, dst.) — khutbah bukan ulasan pers. Gunakan framing umum seperti "dari berita pekan ini kita ketahui...", "ramai diperbincangkan pekan ini...", "kabar yang sampai kepada kita...", "publik dikejutkan oleh berita...". Ceritakan inti peristiwanya dengan tetap akurat ke headline, tanpa atribusi outlet.
-- Inti khutbah (9-13 paragraf prosa mengalir, jangan pakai sub-judul): satu argumen yang BERKEMBANG sepanjang khutbah, didukung 3-4 dalil tambahan DARI POOL. Untuk setiap dalil: tulis citation bold inline `**citation**`, AYAT/HADITS DALAM AKSARA ARAB BERHARAKAT (jika tersedia di pool), lalu terjemahan Bahasa Indonesia. Setiap paragraf harus mengembangkan argumen, BUKAN paraphrase paragraf sebelumnya. Beri ruang untuk: (a) penjelasan teologis ayat/hadits, (b) contoh dari sirah Nabi atau kisah sahabat yang relevan, (c) refleksi langsung ke konteks pekan ini, (d) implikasi untuk jamaah di Indonesia 2026.
+- Inti khutbah (9-13 paragraf prosa mengalir, jangan pakai sub-judul): satu argumen yang BERKEMBANG sepanjang khutbah, didukung 3-4 dalil tambahan DARI POOL. Untuk setiap dalil: tulis citation bold inline `**citation**`, lalu AYAT/HADITS DALAM AKSARA ARAB BERHARAKAT dari field `arabic` di pool (WAJIB — JANGAN PERNAH menampilkan dalil hanya dalam terjemahan; khateeb harus melafalkan aksara aslinya di mimbar), LALU terjemahan Bahasa Indonesia. Setiap paragraf harus mengembangkan argumen, BUKAN paraphrase paragraf sebelumnya. Beri ruang untuk: (a) penjelasan teologis ayat/hadits, (b) contoh dari sirah Nabi atau kisah sahabat yang relevan, (c) refleksi langsung ke konteks pekan ini, (d) implikasi untuk jamaah di Indonesia 2026.
 - Bersisi praktis: 4-6 tindakan konkret untuk jamaah pekan ini, dengan deskripsi singkat per-tindakan (bukan hanya bullet pendek).
 - Tutup khutbah pertama dengan formula standar DALAM AKSARA ARAB BERHARAKAT (~80 kata): "بَارَكَ اللهُ لِيْ وَلَكُمْ فِي الْقُرْآنِ الْعَظِيْمِ، وَنَفَعَنِيْ وَإِيَّاكُمْ بِمَا فِيْهِ مِنَ الْآيَاتِ وَالذِّكْرِ الْحَكِيْمِ…" dst. JANGAN transliterasi Latin.
 
@@ -266,7 +266,7 @@ Tulis OUTLINE KAJIAN 60-MENIT siap-pakai, format hands-on bukan ceramah teoritis
 - Inti — 4 talking points (masing-masing 250-320 kata) dengan struktur per-poin:
   * Pernyataan inti (1 kalimat) yang langsung menyentuh keseharian.
   * Konteks dari berita pekan ini — JANGAN sebut nama media tertentu (Detik, CNN, Tribun, Tempo, Antara, Republika, Liputan6, Kompas, Okezone, Sindo, dll.). Gunakan frasa generik: "dari media, kita dapatkan kabar bahwa...", "pekan ini ramai dibicarakan...", "berita yang sampai ke kita...". Ini menjaga kajian tetap fokus pada pesan, bukan promosi outlet.
-  * Rujukan dalil singkat dari pool — tulis `**citation**` lalu 1-2 kalimat terjemahan + 1 kalimat tafsir kontekstual yang relevan dengan dapur/keluarga.
+  * Rujukan dalil dari pool — tulis `**citation**`, LALU AYAT/HADITS DALAM AKSARA ARAB BERHARAKAT dari field `arabic` di pool (WAJIB — jamaah ibu-ibu butuh mendengar lafadz aslinya supaya kajian terasa otentik, JANGAN tampilkan dalil hanya dalam terjemahan), LALU 1-2 kalimat terjemahan + 1 kalimat tafsir kontekstual yang relevan dengan dapur/keluarga.
   * Cerita pendek konkret dari pengalaman jamaah / sirah / fiqh perempuan — bukan paragraf abstrak.
   * Aplikasi praktis untuk dapur / keluarga (3-4 tindakan spesifik, bukan slogan).
   * Selipkan satu humor ringan di salah satu poin — observasional, hangat, MIRROR ibu-ibu sendiri, JANGAN candaan tentang suami/anak yang merendahkan. Contoh yang OK: "Kadang kita lebih cepat baca pesan WA dari sebelah daripada baca surat An-Nisa — padahal An-Nisa itu untuk kita."
@@ -275,43 +275,49 @@ Tulis OUTLINE KAJIAN 60-MENIT siap-pakai, format hands-on bukan ceramah teoritis
 
 TONE KAJIAN: hangat seperti tante yang dipercaya, BUKAN ustadzah yang berjarak. Tertawa bersama, bukan ditertawakan. Humor harus AMAN — tidak menyentuh suami, anak, atau pekerjaan rumah tangga secara merendahkan, tidak menyentuh kelas sosial, tidak menyentuh fisik. Yang aman: kebiasaan kita sendiri (WhatsApp, scrolling, lupa nama tetangga, dll.).
 
-### Kisah dari Hadits (1400-1750 kata)
-Tulis SATU KISAH dari hadits yang DI-PILIH dari pool dalil yang saya berikan — biasanya dari Sahih Bukhari / Sahih Muslim / Riyad as-Salihin. Format: 7 menit bacaan (~1400-1750 kata) yang membuat pembaca/pendengar HANYUT seperti membaca cerpen, BUKAN tafsir akademis. Di akhir, satu paragraf yang menarik pelajaran konkret dari kisah ke kehidupan pekan ini.
+### Kisah Pendek (1800-2200 kata)
+Tulis SATU KISAH retelling dari kitab **Al-Bidayah wan-Nihayah** karya Ibn Katsir, bersumber EKSKLUSIF dari KISAH POOL yang saya berikan di atas. Format: 10 menit bacaan (~1800-2200 kata) yang membuat pembaca/pendengar HANYUT seperti membaca cerpen sejarah, BUKAN tafsir akademis.
 
-CRITICAL — SUMBER KISAH: kisah HARUS bersumber dari satu hadits di pool. JANGAN mengarang kisah dari memori. Jika pool tidak memuat hadits yang naratif (kebanyakan dalil bersifat hikmah pendek, bukan kisah), pilih hadits yang menyebut peristiwa konkret (mis. kisah seorang sahabat, dialog Rasulullah ﷺ dengan seseorang, kejadian di Madinah/Makkah) lalu kembangkan KONTEKSNYA dengan latar yang masuk akal — tetapi DIALOG dan TINDAKAN inti HARUS persis dari hadits. Tutup paragraf pembuka dengan citation hadits yang sedang Anda ceritakan, format `**{{citation}}**`.
+CRITICAL — SUMBER KISAH (aturan keras, jangan dilanggar):
+- KISAH POOL berisi BEBERAPA FASAL BERURUTAN dari Al-Bidayah wan-Nihayah (urutan asli kitab — paling kecil section_id dulu, lalu menaik). Itu SATU episode kontinyu yang sengaja ditarik berdekatan supaya kisahnya utuh.
+- Ceritakan ulang fasal-fasal itu sebagai SATU narasi utuh. JANGAN potong di tengah, JANGAN melompat keluar urutan.
+- JANGAN mengambil dari DALEEL POOL untuk sub-section ini. JANGAN sebut hadits Bukhari / Muslim / Riyad sebagai sumber kisah. Kisah ini MURNI dari Al-Bidayah wan-Nihayah.
+- JANGAN mengarang detail tarikh / dialog / tindakan yang tidak ada di fasal yang diberikan. Boleh tambah setting sensorik (cuaca, suara, bau) yang plausible berdasarkan konteks sejarah, TETAPI dialog dan tindakan inti HARUS persis sesuai teks Arab di KISAH POOL.
+- Jika KISAH POOL bertanda "(kitab Al-Bidayah wan-Nihayah belum tersedia...)", LEWATI sub-section ini sepenuhnya — tulis hanya satu baris "*Kisah Pendek tidak tersedia untuk tema ini pekan ini.*" lalu langsung lanjut ke sub-section berikutnya.
 
 STRUKTUR WAJIB:
 
-- **Pembuka — kerangka kisah** (~120 kata): satu paragraf yang memperkenalkan kisah TANPA membocorkan inti pesannya. Sebut citation hadits dalam kalimat pertama atau kedua (`**Sahih Bukhari 6094**`), tapi JANGAN bocorkan pelajaran moralnya di pembuka — biarkan pembaca masuk ke kisah dulu. Boleh: "Di sebuah malam di Madinah, terjadi sesuatu yang Rasulullah ﷺ ceritakan kembali kepada para sahabat. Kisah ini diriwayatkan dalam **Sahih Bukhari 6094**…"
+- **Pembuka — kerangka kisah** (~150 kata): satu paragraf yang memperkenalkan kisah TANPA membocorkan inti pesannya. Sebut citation FASAL PERTAMA dari KISAH POOL di kalimat pertama atau kedua (mis. `**Al-Bidayah wan-Nihayah — Fasal Hijrah Rasulullah ﷺ ke Madinah**`), tapi JANGAN bocorkan pelajaran moralnya di pembuka — biarkan pembaca masuk ke kisah dulu. Boleh: "Di sebuah musim panas yang terik di Makkah, sesuatu yang akan mengubah arah sejarah umat manusia bergerak diam-diam dari satu rumah ke rumah lain. Kisah ini Ibn Katsir himpun dalam **Al-Bidayah wan-Nihayah — Fasal Hijrah Rasulullah ﷺ ke Madinah**…"
 
-- **Latar — setting fisik & emosional** (~250 kata, 2 paragraf): tempatkan pembaca dalam scene. Apa yang sedang terjadi di Madinah / di kebun / di pasar / di rumah saat kejadian itu? Siapa yang hadir? Apa cuacanya, suaranya, baunya? Apa yang dirasakan tokoh kisah SEBELUM peristiwa utama terjadi? Gunakan detail sensorik yang plausible berdasarkan konteks sirah — JANGAN mengarang detail tarikh yang tidak ada di hadits. Tulis dalam aspect "pembaca melihat" — sudut pandang kamera, bukan ringkasan.
+- **Latar — setting fisik & emosional** (~280 kata, 2 paragraf): tempatkan pembaca dalam scene. Apa yang sedang terjadi di Makkah / di Madinah / di medan perang / di rumah para sahabat saat kejadian itu? Siapa yang hadir? Apa cuacanya, suaranya, baunya? Apa yang dirasakan tokoh-tokohnya SEBELUM peristiwa utama terjadi? Gunakan detail sensorik yang plausible berdasarkan konteks sirah — JANGAN mengarang detail tarikh yang tidak ada di fasal Al-Bidayah. Tulis dalam aspek "pembaca melihat" — sudut pandang kamera, bukan ringkasan.
 
-- **Inti kisah — peristiwa & dialog** (~700-900 kata, 4-5 paragraf): nyatakan kejadian PERSIS seperti yang tercatat di hadits, tapi diberi tarikan naratif. Untuk dialog: kutip dengan kalimat berbahasa Indonesia mengalir, tetap akurat ke makna hadits. Format DIALOG yang jelas:
+- **Inti kisah — peristiwa & dialog** (~900-1150 kata, 5-6 paragraf): nyatakan kejadian PERSIS seperti yang tercatat di fasal-fasal KISAH POOL, tapi diberi tarikan naratif. JANGAN melompati fasal — ceritakan SEMUA fasal berurutan supaya pembaca mengikuti progresi natural sebagaimana Ibn Katsir menyusunnya. Untuk dialog: kutip dengan kalimat berbahasa Indonesia mengalir, tetap akurat ke makna teks Arab.
+  Format DIALOG yang jelas:
   * Gunakan tanda kutip ganda untuk ucapan langsung: "Apakah engkau telah memberi makan tamumu malam ini?"
   * Beri petunjuk emosi tokoh: "tanya beliau ﷺ dengan suara yang menahan keheranan" atau "jawab sahabat itu pelan, kepalanya tertunduk"
   * Sertakan jeda + reaksi internal antar dialog ("Beliau ﷺ terdiam sejenak. Mata beliau memandang langit Madinah yang terhias bintang.")
-  * Untuk hadits panjang dengan banyak dialog, JANGAN potong — pertahankan urutan asli supaya pembaca mengikuti progresi natural.
+  * Untuk fasal panjang dengan banyak dialog, JANGAN potong — pertahankan urutan asli.
 
   PROHIBITED dalam paragraf inti:
   * Menyisipkan tafsir / penjelasan modern di tengah kisah — itu memecahkan immersion. Tunda semua interpretasi ke bagian pelajaran di akhir.
   * Memanggil pembaca langsung ("Hadirin sekalian, perhatikan bahwa Rasulullah…") — pertahankan jarak naratif.
-  * Mengarang ucapan tokoh yang tidak ada di hadits. Jika hadits hanya menyebut tindakan, ceritakan tindakan; jangan menambah dialog fiktif.
+  * Mengarang ucapan tokoh yang tidak ada di teks Arab KISAH POOL. Jika fasal hanya menyebut tindakan, ceritakan tindakan; jangan menambah dialog fiktif.
 
-- **Klimaks / titik balik** (~150 kata, 1 paragraf): puncak kisah — momen di mana sesuatu BERGESER (sahabat tersadar, sebuah keputusan diambil, sebuah doa terkabul, sebuah teguran Rasulullah ﷺ datang). Tulis dengan ritme yang lebih lambat dari paragraf sebelumnya — kalimat lebih pendek, jeda lebih sering, supaya pembaca BERHENTI di titik ini.
+- **Klimaks / titik balik** (~180 kata, 1 paragraf): puncak kisah — momen di mana sesuatu BERGESER (sahabat tersadar, sebuah keputusan diambil, sebuah doa terkabul, sebuah teguran Rasulullah ﷺ datang, sebuah peristiwa yang menentukan masa depan). Tulis dengan ritme yang lebih lambat dari paragraf sebelumnya — kalimat lebih pendek, jeda lebih sering, supaya pembaca BERHENTI di titik ini.
 
-- **Pelajaran** (~250 kata, 2 paragraf, JUDUL H4 `#### Pelajaran dari Kisah Ini`): SEKARANG baru tarik pelajaran. Struktur:
+- **Pelajaran** (~290 kata, 2 paragraf, JUDUL H4 `#### Pelajaran dari Kisah Ini`): SEKARANG baru tarik pelajaran. Struktur:
   * Paragraf 1: identifikasi 1-2 pelajaran inti dari kisah. JANGAN list 5-6 pelajaran umum — fokus ke 1-2 yang paling kuat. Jelaskan SECARA EKSPLISIT mengapa pelajaran itu muncul dari kisah ini (kembalikan ke detail kisah).
   * Paragraf 2: hubungkan pelajaran ke peristiwa NYATA pekan ini. Sebut 1-2 konteks dari sample_headlines (tanpa nama outlet) di mana pelajaran ini berlaku. Tutup dengan 1-2 tindakan praktis yang bisa dilakukan pembaca/pendengar pekan ini.
 
-- **Hadits Lengkap** (WAJIB, JUDUL H4 `#### Hadits Lengkap`): tampilkan teks ASLI hadits dari pool — Arabic dulu, lalu terjemahan Bahasa Indonesia. Format:
-  * Baris pertama: `**{{citation}}**` (mis. `**Sahih Muslim 106**`)
-  * Blok berikutnya: AKSARA ARAB BERHARAKAT lengkap dari `arabic` field di pool — pertahankan tanda baca, sanad, dan harakat persis seperti tersedia di pool. JANGAN dipangkas, JANGAN ditranskrip Latin.
-  * Blok terakhir: terjemahan Bahasa Indonesia dari `translation_id` field di pool, dalam format italic blockquote.
-  Tujuan blok ini adalah agar pembaca/pendengar yang ingin memverifikasi atau menghafal hadits punya teks aslinya langsung di akhir kisah, tanpa harus mencari ke kitab.
+- **Sumber Asli** (WAJIB, JUDUL H4 `#### Sumber Asli — Al-Bidayah wan-Nihayah`): tampilkan teks ARAB ASLI dari KISAH POOL — semua fasal berurutan supaya pembaca yang ingin memverifikasi punya teks lengkap di akhir kisah. Format:
+  * Untuk setiap fasal dalam KISAH POOL: tulis baris `**{{citation fasal itu}}**` (mis. `**Al-Bidayah wan-Nihayah — Fasal Hijrah Rasulullah ﷺ ke Madinah**`)
+  * Blok berikutnya: AKSARA ARAB lengkap dari `Arabic` field fasal itu — pertahankan teks persis seperti tersedia di pool. JANGAN dipangkas, JANGAN ditranskrip Latin.
+  * Pisahkan tiap fasal dengan satu baris kosong + horizontal rule `---`.
+  Tujuan blok ini agar pembaca yang ingin memverifikasi atau membaca konteks lebih luas punya teks aslinya langsung di akhir kisah, tanpa harus mencari ke kitab.
 
-NADA: bercerita seperti seorang nenek yang mahir mendongeng cucunya — hangat, sabar, jelas, tidak terburu-buru. Pembaca yang tergesa-gesa harus tetap merasa peristiwa ini ZAMAN itu DEKAT ke dirinya. Hindari bahasa khutbah formal ("Wahai sekalian manusia", "marilah kita renungkan") di sepanjang kisah — gunakan hanya di sub-section Pelajaran. Gunakan **kamu** untuk kata ganti orang kedua (bukan "engkau", kecuali memang kutipan hadits), supaya pembaca generasi sekarang merasa diajak ngobrol.
+NADA: bercerita seperti seorang nenek yang mahir mendongeng cucunya — hangat, sabar, jelas, tidak terburu-buru. Pembaca yang tergesa-gesa harus tetap merasa peristiwa ini ZAMAN itu DEKAT ke dirinya. Hindari bahasa khutbah formal ("Wahai sekalian manusia", "marilah kita renungkan") di sepanjang kisah — gunakan hanya di sub-section Pelajaran. Gunakan **kamu** untuk kata ganti orang kedua (bukan "engkau", kecuali memang kutipan teks Arab), supaya pembaca generasi sekarang merasa diajak ngobrol.
 
-PANJANG: target ~1400-1750 kata untuk waktu baca 7 menit. JANGAN lebih pendek — pembaca tidak bisa "hanyut" dalam <1000 kata. JANGAN melebar ke >1750 — kisah jadi melar.
+PANJANG: target ~1800-2200 kata untuk waktu baca 10 menit. JANGAN lebih pendek — pembaca tidak bisa "hanyut" dalam <1500 kata. JANGAN melebar ke >2200 — kisah jadi melar.
 
 ### Pengajaran di Rumah (500-700 kata)
 Tulis 3-4 CONVERSATION SCRIPT untuk orang tua dengan anak, masing-masing format:
@@ -625,7 +631,7 @@ This is a CONTENT KIT — not strategic advice. Each sub-section must be a READY
 DALEEL REFERENCING IN SECTION 4 — the pool I provide contains 10 thematically-reranked daleel. Each sub-section below MUST weave 1-3 daleel from this pool INLINE (not all stacked in Section 5):
 - Pick daleel that genuinely SUPPORT each sub-section's argument — not random first picks
 - Inline format: `**{{citation}}**` (e.g. `**QS. Hud: 85**` or `**Riyad as-Salihin 1420**`) immediately followed by 1 sentence English paraphrase
-- Different sub-sections MAY cite the same daleel if it really fits best, but TRY to distribute so the 8-10 daleel pool gets spread across sub-sections (khutbah ~3-4 daleel, kultum ~1-2, kajian ~2-3, hadith story ~1 as centerpiece, home ~1-2, content ~1, mahasiswa ~2, action ~1-2)
+- Different sub-sections MAY cite the same daleel if it really fits best, but TRY to distribute so the 8-10 daleel pool gets spread across sub-sections (khutbah ~3-4 daleel, kultum ~1-2, kajian ~2-3, home ~1-2, content ~1, mahasiswa ~2, action ~1-2). Kisah Pendek is NOT part of this allocation — that sub-section uses its own source (KISAH POOL from Al-Bidayah wan-Nihayah).
 - DO NOT invent verses or hadith outside the pool. Any citation appearing in Section 4 MUST exactly match a citation in the pool.
 
 ### Friday Khutbah (3450-4800 words)
@@ -635,7 +641,7 @@ KHUTBAH PERTAMA (2700-3750 words):
 - Brief mukadimah (hamdalah → sholawat → syahadat → wasiat takwa, ~70 words, ARABIC SCRIPT WITH FULL HARAKAT — not Latin transliteration). The khateeb reads directly from the text at the mimbar.
 - Opening Quranic verse tied to this week's theme — WRITE THE VERSE IN ARABIC SCRIPT WITH HARAKAT, then name the surah + verse number, then English TRANSLATION. Do NOT use Latin transliteration for Quranic verses.
 - Theme introduction (6-9 English paragraphs): link the verse to 3-4 REAL events from this week's sample_headlines pool. IMPORTANT: in the khutbah do NOT name media outlets (Detik, Republika, Kompas, CNN, etc.) — a khutbah is not a press review. Use generic framings like "from this week's news we hear...", "recent news tells us...", "the public was struck this week by...", "what reached us in the news this week...". Convey the substance of each story accurately, but without outlet attribution.
-- Khutbah body (9-13 flowing paragraphs, no sub-headings): one argument that DEVELOPS across the khutbah, supported by 3-4 additional daleel FROM THE POOL. For each daleel: write the citation bold inline `**citation**`, the VERSE/HADITH IN ARABIC SCRIPT WITH HARAKAT (when available from the pool), then English translation. Each paragraph must advance the argument, NOT paraphrase the previous one. Make room for (a) theological exposition of the verse/hadith, (b) examples from the Prophet's sirah or sahaba stories, (c) direct reflection on this week's events, (d) implications for Muslims in Indonesia 2026.
+- Khutbah body (9-13 flowing paragraphs, no sub-headings): one argument that DEVELOPS across the khutbah, supported by 3-4 additional daleel FROM THE POOL. For each daleel: write the citation bold inline `**citation**`, THEN the VERSE/HADITH IN ARABIC SCRIPT WITH HARAKAT from the pool's `arabic` field (REQUIRED — NEVER show a daleel as translation only; the khateeb must recite the original Arabic at the mimbar), THEN the English translation. Each paragraph must advance the argument, NOT paraphrase the previous one. Make room for (a) theological exposition of the verse/hadith, (b) examples from the Prophet's sirah or sahaba stories, (c) direct reflection on this week's events, (d) implications for Muslims in Indonesia 2026.
 - Practical close: 4-6 concrete actions the congregation can take this week, each with a short paragraph of context (not just a bullet).
 - Close khutbah pertama with the standard formula IN ARABIC SCRIPT WITH HARAKAT (~80 words): "بَارَكَ اللهُ لِيْ وَلَكُمْ فِي الْقُرْآنِ الْعَظِيْمِ، وَنَفَعَنِيْ وَإِيَّاكُمْ بِمَا فِيْهِ مِنَ الْآيَاتِ وَالذِّكْرِ الْحَكِيْمِ…" etc. Do NOT use Latin transliteration.
 
@@ -679,48 +685,53 @@ Write a 45-MINUTE KAJIAN OUTLINE ready for delivery — hands-on, NOT theoretica
 - Core — 3 talking points (150-200 words each) with per-point structure:
   * Core statement (one sentence)
   * Concrete example from this week's news (name the outlet)
-  * Brief daleel reference from the pool — write `**citation**` then 1 sentence translation
+  * Daleel reference from the pool — write `**citation**`, THEN the VERSE/HADITH IN ARABIC SCRIPT WITH HARAKAT from the pool's `arabic` field (REQUIRED — the audience needs to hear the original Arabic for the kajian to feel authentic; DO NOT show daleel as translation only), THEN 1 sentence translation
   * Practical application for the kitchen / family (2-3 actions)
 - Q&A section (~100 words): write 3 questions the audience IS LIKELY to ask + honest brief answers (don't be overly idealistic).
 - Closing (~50 words): a short prayer for the family, a one-sentence takeaway.
 
-### Story from a Hadith (1400-1750 words)
-Write ONE STORY drawn from a hadith CHOSEN from the daleel pool I provide — usually from Sahih Bukhari / Sahih Muslim / Riyad as-Salihin. Format: a 7-minute read (~1400-1750 words) that pulls the listener/reader IN like a short story, NOT an academic tafsir. At the end, one paragraph that extracts a concrete lesson from the story and ties it to this week's events.
+### Kisah Pendek — Short Story (1800-2200 words)
+Write ONE retelling drawn from **Al-Bidayah wan-Nihayah** by Ibn Kathir, sourced EXCLUSIVELY from the KISAH POOL I supplied above. Format: a 10-minute read (~1800-2200 words) that pulls the reader IN like a historical short story, NOT academic tafsir.
 
-CRITICAL — SOURCE OF THE STORY: the story MUST come from one hadith in the pool. DO NOT invent stories from memory. If the pool has no narrative hadith (most daleel are brief wisdom sayings, not stories), pick a hadith that names a concrete event (e.g. a sahabi's experience, a dialogue between Rasulullah ﷺ and someone, a moment in Madinah/Makkah) and develop the CONTEXT around it with plausible setting — but the core DIALOGUE and ACTIONS must come exactly from the hadith. Close the opening paragraph with the citation of the hadith you're retelling, formatted `**{{citation}}**`.
+CRITICAL — SOURCE RULES (hard, do not break):
+- KISAH POOL contains SEVERAL SEQUENTIAL fasal from Al-Bidayah wan-Nihayah (in original kitab order — lowest section_id first, then ascending). They are ONE continuous episode deliberately pulled in adjacency so the story stays whole.
+- Retell those fasal as ONE unified narrative. DO NOT cut mid-episode, DO NOT jump out of sequence.
+- DO NOT draw from DALEEL POOL for this sub-section. DO NOT cite Bukhari / Muslim / Riyad as the story's source. This story comes EXCLUSIVELY from Al-Bidayah wan-Nihayah.
+- DO NOT invent tarikh details / dialogue / actions absent from the supplied fasal. Sensory setting (weather, sounds, smells) plausible to the historical context is fine, BUT the core dialogue and actions MUST match the Arabic text in KISAH POOL precisely.
+- If KISAH POOL is marked "(Al-Bidayah wan-Nihayah unavailable…)", SKIP this sub-section entirely — write only a single line "*Kisah Pendek not available for this theme this week.*" and move on to the next sub-section.
 
 REQUIRED STRUCTURE:
 
-- **Opening — frame the story** (~120 words): one paragraph that introduces the story WITHOUT revealing its core lesson. Name the hadith citation in the first or second sentence (`**Sahih Bukhari 6094**`), but DO NOT give away the moral upfront — let the reader enter the story first. Acceptable opener: "One night in Madinah, something happened that the Messenger of Allah ﷺ later retold to his companions. The story is preserved in **Sahih Bukhari 6094**…"
+- **Opening — frame the story** (~150 words): one paragraph that introduces the story WITHOUT revealing its core lesson. Name the citation of the FIRST FASAL from KISAH POOL in the first or second sentence (e.g. `**Al-Bidayah wan-Nihayah — Fasal Hijrah Rasulullah ﷺ to Madinah**`), but DO NOT give away the moral upfront — let the reader enter the story first. Acceptable opener: "On a scorching summer in Makkah, something that would alter the course of human history began moving quietly from house to house. Ibn Kathir gathered this story in **Al-Bidayah wan-Nihayah — Fasal Hijrah Rasulullah ﷺ to Madinah**…"
 
-- **Setting — physical & emotional landscape** (~250 words, 2 paragraphs): place the reader inside the scene. What was happening in Madinah / in the garden / in the market / at home when this event took place? Who was present? What was the weather, the sounds, the smells? What did the central character feel BEFORE the main event happened? Use sensory detail that's plausible against the sirah context — DO NOT fabricate tarikh details that aren't in the hadith. Write in the "the reader sees" aspect — camera-eye, not summary.
+- **Setting — physical & emotional landscape** (~280 words, 2 paragraphs): place the reader inside the scene. What was happening in Makkah / Madinah / on the battlefield / at the sahaba's home when this event took place? Who was present? What was the weather, the sounds, the smells? What did the characters feel BEFORE the main event happened? Use sensory detail that's plausible against the sirah context — DO NOT fabricate tarikh details that aren't in the Al-Bidayah fasal. Write in the "the reader sees" aspect — camera-eye, not summary.
 
-- **Core story — events & dialogue** (~700-900 words, 4-5 paragraphs): state the events EXACTLY as recorded in the hadith, but with narrative pull. For dialogue: quote in flowing English while staying accurate to the hadith's meaning. Clear DIALOGUE format:
+- **Core story — events & dialogue** (~900-1150 words, 5-6 paragraphs): state the events EXACTLY as recorded in the KISAH POOL fasal, with narrative pull. DO NOT skip fasal — retell EVERY fasal in order so the reader follows the natural progression as Ibn Kathir arranged it. For dialogue: quote in flowing English while staying accurate to the Arabic text. Clear DIALOGUE format:
   * Use double quotes for direct speech: "Have you fed your guest tonight?"
   * Add emotional cues for characters: "the Prophet ﷺ asked, his voice holding back surprise" or "the sahabi answered softly, his head bowed"
   * Insert pauses + internal reactions between exchanges ("He ﷺ was silent for a moment. His gaze rested on the Madinah sky strewn with stars.")
-  * For long hadith with much dialogue, DO NOT cut — preserve the original order so the reader follows the natural progression.
+  * For long fasal with much dialogue, DO NOT cut — preserve the original order.
 
   PROHIBITED in body paragraphs:
   * Inserting tafsir / modern explanation mid-story — that breaks immersion. Defer ALL interpretation to the lesson section at the end.
   * Addressing the reader directly ("Notice, dear readers, how the Prophet…") — preserve narrative distance.
-  * Inventing speech for characters that isn't in the hadith. If the hadith only mentions an action, narrate the action; do not add fictional dialogue.
+  * Inventing speech for characters that isn't in the KISAH POOL Arabic text. If a fasal only mentions an action, narrate the action; do not add fictional dialogue.
 
-- **Climax / turning point** (~150 words, 1 paragraph): the story's peak — the moment something SHIFTS (the sahabi realizes, a decision is made, a prayer is answered, a gentle correction from the Prophet ﷺ arrives). Write at a slower rhythm than the previous paragraph — shorter sentences, more pauses, so the reader STOPS at this point.
+- **Climax / turning point** (~180 words, 1 paragraph): the story's peak — the moment something SHIFTS (the sahabi realizes, a decision is made, a prayer is answered, a gentle correction from the Prophet ﷺ arrives, an event that determines the future). Write at a slower rhythm than the previous paragraph — shorter sentences, more pauses, so the reader STOPS at this point.
 
-- **Lesson** (~250 words, 2 paragraphs, H4 heading `#### The Lesson`): NOW extract the lesson. Structure:
+- **Lesson** (~290 words, 2 paragraphs, H4 heading `#### The Lesson`): NOW extract the lesson. Structure:
   * Paragraph 1: name 1-2 core lessons from the story. DO NOT list 5-6 generic lessons — focus on the 1-2 strongest. Explain EXPLICITLY why the lesson emerges from this particular story (return to the story's details).
   * Paragraph 2: connect the lesson to REAL events from this week. Cite 1-2 contexts from sample_headlines (without outlet names) where this lesson applies. Close with 1-2 practical actions the listener/reader can take this week.
 
-- **Full Hadith** (REQUIRED, H4 heading `#### Full Hadith`): show the ORIGINAL hadith text from the pool — Arabic first, then English translation. Format:
-  * First line: `**{{citation}}**` (e.g. `**Sahih Muslim 106**`)
-  * Next block: FULL ARABIC SCRIPT WITH HARAKAT from the `arabic` field in the pool — preserve punctuation, sanad chain, and harakat exactly as available in the pool. DO NOT abbreviate, DO NOT transliterate to Latin.
-  * Final block: English translation from the `translation_en` field in the pool, in italic blockquote format.
-  The purpose of this block is so that any reader/listener who wants to verify or memorize the hadith has the original text immediately at the end of the story, without needing to search the kitab.
+- **Original Source** (REQUIRED, H4 heading `#### Original Source — Al-Bidayah wan-Nihayah`): show the ORIGINAL Arabic text from KISAH POOL — every fasal in order so a reader who wants to verify has the full source at the end. Format:
+  * For each fasal in KISAH POOL: write `**{{that fasal's citation}}**` (e.g. `**Al-Bidayah wan-Nihayah — Fasal Hijrah Rasulullah ﷺ to Madinah**`)
+  * Next block: FULL ARABIC SCRIPT from that fasal's `Arabic` field — preserve text exactly as supplied. DO NOT abbreviate, DO NOT transliterate to Latin.
+  * Separate each fasal with one blank line + a horizontal rule `---`.
+  The purpose of this block is so that any reader/listener who wants to verify or read the broader context has the original text immediately at the end of the story, without needing to search the kitab.
 
-TONE: tell the story like a grandmother skilled at narrating to her grandchildren — warm, patient, clear, unhurried. A hurried reader must still feel that THAT era is CLOSE to their own life. Avoid formal khutbah register ("O mankind", "let us ponder") throughout the story — use it only in the Lesson sub-section. Use **you** for second-person (not "thou", except where a hadith quotation literally reads so), so a contemporary reader feels personally addressed.
+TONE: tell the story like a grandmother skilled at narrating to her grandchildren — warm, patient, clear, unhurried. A hurried reader must still feel that THAT era is CLOSE to their own life. Avoid formal khutbah register ("O mankind", "let us ponder") throughout the story — use it only in the Lesson sub-section. Use **you** for second-person (not "thou", except where an Arabic quotation literally reads so), so a contemporary reader feels personally addressed.
 
-LENGTH: target ~1400-1750 words for a 7-minute read. DO NOT go shorter — a reader can't be "absorbed" in <1000 words. DO NOT exceed 1750 — the story stretches thin.
+LENGTH: target ~1800-2200 words for a 10-minute read. DO NOT go shorter — a reader can't be "absorbed" in <1500 words. DO NOT exceed 2200 — the story stretches thin.
 
 ### Teaching at Home (500-700 words)
 Write 3-4 CONVERSATION SCRIPTS for parents with their children, each in the format:
@@ -1619,6 +1630,7 @@ def _build_user_prompt(
     daleel: list[dict[str, Any]],
     *,
     adhkar: list[dict[str, Any]] | None = None,
+    kisah: dict[str, Any] | None = None,
     language: str = "id",
     prior_coverage: list[dict[str, Any]] | None = None,
     calendar_context: str | None = None,
@@ -1635,6 +1647,15 @@ def _build_user_prompt(
     block so the LLM cites recitable du'a for Pesan Flyer 5 + 6
     (Sunnah invitation + Du'a hero) instead of inventing them from
     parametric memory. None / empty list → block hidden entirely.
+
+    `kisah` is the contiguous Al-Bidayah wan-Nihayah excerpt retrieved
+    via `retrieve_kisah_pendek`. When supplied, it surfaces as the
+    KISAH POOL block — the dedicated source for the Kisah Pendek
+    content-kit slot (one storytelling deliverable, 10-min read drawn
+    EXCLUSIVELY from Ibn Kathir's history, never from the daleel pool).
+    None means Al-Bidayah is unavailable or the theme had no fit; in
+    that case the prompt instructs the LLM to skip the Kisah Pendek
+    sub-section entirely.
     """
     if language == "en":
         empty_marker = "(no daleel found for this theme)"
@@ -1739,9 +1760,9 @@ def _build_user_prompt(
     )
 
     write_now = (
-        "Tulis briefing sekarang dalam format markdown 5 bagian (Ringkasan Eksekutif / Numerik & Tren Pekan Ini / Tema Utama & Pola Yang Muncul / Strategi & Aksi Dakwah / Dalil & Sumber), ~10950-14650 kata total — Strategi & Aksi Dakwah adalah CONTENT KIT 8 sub-section yang isinya draft siap-pakai (khutbah lengkap, kultum, kajian, kisah dari hadits, pengajaran rumah, script video, mahasiswa pack, aksi sosial) dengan daleel pool yang ditenun inline ke setiap sub-section, bukan ringkasan strategi."
+        "Tulis briefing sekarang dalam format markdown 5 bagian (Ringkasan Eksekutif / Numerik & Tren Pekan Ini / Tema Utama & Pola Yang Muncul / Strategi & Aksi Dakwah / Dalil & Sumber), ~11400-15100 kata total — Strategi & Aksi Dakwah adalah CONTENT KIT 8 sub-section yang isinya draft siap-pakai (khutbah lengkap, kultum, kajian, kisah pendek dari Al-Bidayah wan-Nihayah, pengajaran rumah, script video, mahasiswa pack, aksi sosial) dengan daleel pool yang ditenun inline ke setiap sub-section, bukan ringkasan strategi."
         if language == "id"
-        else "Write the briefing now in markdown, 5-section format (Executive Summary / Numbers & Trends This Week / Main Themes & Emerging Patterns / Da'wah Strategies & Actions / Daleel & Sources), ~10950-14650 words total — Da'wah Strategies & Actions is a CONTENT KIT of 8 sub-sections containing ready-to-use drafts (full khutbah, kultum, kajian, hadith story, home teaching scripts, video script, mahasiswa pack, social action) with daleel from the pool woven inline into each sub-section, NOT a strategic summary."
+        else "Write the briefing now in markdown, 5-section format (Executive Summary / Numbers & Trends This Week / Main Themes & Emerging Patterns / Da'wah Strategies & Actions / Daleel & Sources), ~11400-15100 words total — Da'wah Strategies & Actions is a CONTENT KIT of 8 sub-sections containing ready-to-use drafts (full khutbah, kultum, kajian, kisah pendek from Al-Bidayah wan-Nihayah, home teaching scripts, video script, mahasiswa pack, social action) with daleel from the pool woven inline into each sub-section, NOT a strategic summary."
     )
 
     # ADHKAR POOL — du'a / dzikir retrieved separately so Pesan Flyer
@@ -1767,6 +1788,63 @@ def _build_user_prompt(
     else:
         adhkar_section = ""
 
+    # KISAH POOL — contiguous Al-Bidayah wan-Nihayah excerpt for the
+    # "Kisah Pendek" content-kit slot. When the retrieval returned no
+    # contiguous block (collection empty / theme had no fit), we emit
+    # an explicit sentinel so the prompt's Kisah Pendek section knows
+    # to skip itself instead of inventing a story or pulling from the
+    # daleel pool (which would violate the single-source rule).
+    if kisah and kisah.get("fasal"):
+        fasal_blocks: list[str] = []
+        for f in kisah["fasal"]:
+            header = (
+                f"Fasal #{f['section_id']} — {f['title']}"
+                if f.get("title")
+                else f"Fasal #{f['section_id']}"
+            )
+            fasal_blocks.append(
+                f"### {header}\n"
+                f"Citation: {f.get('citation') or 'Al-Bidayah wan-Nihayah'}\n"
+                f"Arabic: {f['ar']}"
+            )
+        kisah_body = "\n\n".join(fasal_blocks)
+        if language == "en":
+            kisah_section = (
+                "\n\nKISAH POOL — Al-Bidayah wan-Nihayah (Ibn Kathir), "
+                f"{len(kisah['fasal'])} CONSECUTIVE fasal in original kitab order "
+                f"(seed score {kisah.get('seed_score', 0):.2f}). This is the "
+                "EXCLUSIVE source for the Kisah Pendek sub-section — retell "
+                "this single contiguous episode as one complete story. DO NOT "
+                "draw from DALEEL POOL for this sub-section, DO NOT mix in "
+                "other narratives, DO NOT invent details outside these fasal.\n\n"
+                f"{kisah_body}"
+            )
+        else:
+            kisah_section = (
+                "\n\nKISAH POOL — Al-Bidayah wan-Nihayah (Ibn Katsir), "
+                f"{len(kisah['fasal'])} fasal BERURUTAN sesuai urutan asli kitab "
+                f"(skor seed {kisah.get('seed_score', 0):.2f}). Ini sumber TUNGGAL "
+                "untuk sub-section Kisah Pendek — ceritakan ulang SATU episode "
+                "kontinyu ini sebagai satu kisah utuh. JANGAN ambil dari DALEEL "
+                "POOL untuk sub-section ini, JANGAN campur dengan kisah lain, "
+                "JANGAN mengarang detail di luar fasal-fasal ini.\n\n"
+                f"{kisah_body}"
+            )
+    else:
+        kisah_section = (
+            "\n\nKISAH POOL: (kitab Al-Bidayah wan-Nihayah belum tersedia atau "
+            "tidak ada fasal yang cocok dengan tema ini — LEWATI sub-section "
+            "Kisah Pendek seluruhnya, JANGAN ganti dengan kisah dari kitab lain "
+            "atau dari memori; cukup tulis baris singkat di posisinya: "
+            "*\"Kisah Pendek tidak tersedia untuk tema ini pekan ini.\"*)"
+            if language == "id"
+            else "\n\nKISAH POOL: (Al-Bidayah wan-Nihayah unavailable or no fasal "
+            "matched this theme — SKIP the Kisah Pendek sub-section entirely, "
+            "DO NOT substitute a story from another kitab or from memory; "
+            "just write a single line in its place: "
+            "*\"Kisah Pendek not available for this theme this week.\"*)"
+        )
+
     prior_block = _format_prior_coverage_block(prior_coverage or [], language)
 
     # Hijri-aware sunnah / du'a hints for Pesan Flyer 5 + 6. Block is
@@ -1789,7 +1867,7 @@ TOP TOPICS WITH SAMPLE HEADLINES (Section 3 MUST name specific stories from thes
 
 DALEEL POOL (use for Section 5, cite 4-5 from here; the `Citation` field is what goes in your heading):
 
-{daleel_block}{adhkar_section}
+{daleel_block}{adhkar_section}{kisah_section}
 
 {write_now}"""
 
@@ -1829,6 +1907,7 @@ def _generate_for_language(
     language: str,
     theme_group: str | None,
     adhkar: list[dict[str, Any]] | None = None,
+    kisah: dict[str, Any] | None = None,
     prior_coverage: list[dict[str, Any]] | None = None,
     calendar_context: str | None = None,
 ) -> tuple[str, int | None, int | None, float] | None:
@@ -1844,6 +1923,7 @@ def _generate_for_language(
         stats,
         daleel,
         adhkar=adhkar,
+        kisah=kisah,
         language=language,
         prior_coverage=prior_coverage,
         calendar_context=calendar_context,
@@ -1858,15 +1938,16 @@ def _generate_for_language(
             safety_settings=_RELAXED_SAFETY,
             # 49152-token output cap. Section 4 is now an 8 sub-section
             # content kit (khutbah 3450-4800 + kultum 1100-1500 + kajian
-            # 1400-1800 + hadith story 1400-1750 + home 500-700 + content
-            # 100-130 + mahasiswa 900-1200 + aksi 600-900 ≈ 9350-12650
-            # words for Section 4 alone). Top-level brief ≈ 10950-14650
-            # words → ~22000-29300 tokens. 49k leaves room for the model
+            # 1400-1800 + kisah pendek 1800-2200 + home 500-700 + content
+            # 100-130 + mahasiswa 900-1200 + aksi 600-900 ≈ 9750-13100
+            # words for Section 4 alone). Top-level brief ≈ 11400-15100
+            # words → ~22800-30200 tokens. 49k leaves room for the model
             # to drift slightly over without truncation. Bumped from
-            # 32768 (2026-05-30) when Kultum + Kisah dari Hadits joined.
+            # 32768 (2026-05-30) when Kultum + Kisah joined; Kisah extended
+            # to 10-min length 2026-06-06 when it moved to Al-Bidayah.
             max_output_tokens=49152,
             # 16384-token thinking budget — Section 4 now has 8 sub-
-            # sections (khutbah, kultum, kajian, hadith story, home,
+            # sections (khutbah, kultum, kajian, kisah pendek, home,
             # content, mahasiswa, aksi) each with its own structure
             # that the model needs to plan coherently. Pro charges
             # thinking at the output rate so this adds ~$0.16/call;
@@ -2005,6 +2086,17 @@ async def generate_briefing(
         )
         adhkar = rerank_dua(retrieval_query, dua_candidates, top_n=6)
         adhkar = await enrich_daleel_translations(session, adhkar)
+
+        # Kisah Pendek source — contiguous Al-Bidayah wan-Nihayah excerpt.
+        # Single source by product rule (2026-06-06): the storytelling
+        # slot uses Ibn Kathir's history EXCLUSIVELY and the fasal must
+        # land in the prompt in original kitab order so the LLM has one
+        # complete episode to retell, not a scattered top-K. None when
+        # the collection's empty or no fasal scored above threshold —
+        # prompt handles that by skipping the section.
+        from api.services.kitab_retrieval import retrieve_kisah_pendek
+
+        kisah = retrieve_kisah_pendek(retrieval_query)
         log.info(
             "briefing.retrieved_daleel",
             theme_group=group,
@@ -2012,6 +2104,7 @@ async def generate_briefing(
             candidates=len(candidates),
             final=len(daleel),
             adhkar=len(adhkar),
+            kisah_fasal=len(kisah["fasal"]) if kisah else 0,
         )
 
         # Anti-repetition context. Pull the last 2 briefings for this
@@ -2049,6 +2142,7 @@ async def generate_briefing(
             "id",
             group,
             adhkar=adhkar,
+            kisah=kisah,
             prior_coverage=prior_coverage,
             calendar_context=calendar_block,
         )

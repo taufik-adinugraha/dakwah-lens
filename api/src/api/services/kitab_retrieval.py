@@ -65,6 +65,10 @@ COLLECTION_NAMES: dict[str, str] = {
     "bulugh_al_maram": "bulugh_al_maram",
     "tafsir_ibn_kathir": "tafsir_ibn_kathir",
     "bidayat_al_hidayah": "bidayat_al_hidayah",
+    "al_umm": "al_umm",
+    "al_bidayah_wan_nihayah": "al_bidayah_wan_nihayah",
+    "nashaihul_ibad": "nashaihul_ibad",
+    "fiqh_as_sunnah": "fiqh_as_sunnah",
 }
 
 # Per-corpus minimum cosine similarity for a hit to count as a usable
@@ -83,11 +87,41 @@ MIN_SCORE: dict[str, float] = {
     "riyad_as_salihin": 0.28,
     "bulugh_al_maram": 0.28,
     "tafsir_ibn_kathir": 0.28,
-    # Bidayatul Hidayah is short (~46k chars across 28 sections) and AR-only
-    # for now — same recall posture as hadith. Threshold provisional;
-    # recalibrate after a few weeks of live retrieval if too lax or strict.
-    "bidayat_al_hidayah": 0.30,
+    # AR-only kitabs (Bidayat, Al-Umm, Al-Bidayah, Nashaih, Fiqh as-Sunnah)
+    # all sit at 0.28 — dropped from 0.30 on 2026-06-06 after a 10-theme
+    # probe (see probe_kitab_scores.py) found AR-only kitabs averaging
+    # ~0.38 top-1 vs Quran's ~0.55 even with trilingual ID+EN+AR query
+    # enrichment. Bidayat short (~46k chars / 28 sections); Al-Umm large
+    # (~5.7M / 1,332); Al-Bidayah historical narrative (~3.7M / 2,529);
+    # Nashaih small akhlak corpus (~77k / 34); Fiqh as-Sunnah modern
+    # topical fiqh (~900k / 866). 0.28 keeps comfortable margin above
+    # the highest off-topic score observed (~0.27) while admitting more
+    # of the 0.28-0.30 band of borderline-relevant content.
+    "bidayat_al_hidayah": 0.28,
+    "al_umm": 0.28,
+    "al_bidayah_wan_nihayah": 0.28,
+    "nashaihul_ibad": 0.28,
+    "fiqh_as_sunnah": 0.28,
 }
+
+# AR-only kitabs get a +2 boost on the per-corpus quota — they score
+# ~0.15 lower in absolute cosine than translation-bearing corpora (per
+# the 2026-06-06 probe), so more candidates pre-threshold improves their
+# chances of clearing MIN_SCORE and landing in the brief. Lifts
+# proportionally with whatever `per_corpus` the caller passes (default
+# 3 → 5, prod briefing's 6 → 8).
+_AR_ONLY_CORPORA: frozenset[str] = frozenset({
+    "bidayat_al_hidayah",
+    "al_umm",
+    "al_bidayah_wan_nihayah",
+    "nashaihul_ibad",
+    "fiqh_as_sunnah",
+})
+
+
+def _per_corpus_for(corpus: str, default: int) -> int:
+    """Effective per-corpus topK after the AR-only boost."""
+    return default + 2 if corpus in _AR_ONLY_CORPORA else default
 
 # Verse / hadith IDs that we never want to surface UNGROUNDED in a
 # briefing. These passages have legitimate scholarly readings but are
@@ -154,11 +188,25 @@ def _normalize_hit(corpus: str, hit: Any) -> dict[str, Any]:
         ref_id = (
             f"quran::{payload.get('surah','')}:{payload.get('ayah','')}"
         )
-    elif corpus == "bidayat_al_hidayah":
+    elif corpus in (
+        "bidayat_al_hidayah",
+        "al_umm",
+        "al_bidayah_wan_nihayah",
+        "nashaihul_ibad",
+        "fiqh_as_sunnah",
+    ):
         # AR-only kitab payload (2026-06-08). `translation_id` /
         # `translation_en` deliberately empty — re-embed pass will
         # backfill them when translations land.
-        citation = payload.get("citation") or "Bidayatul Hidayah"
+        _default_citations = {
+            "bidayat_al_hidayah": "Bidayatul Hidayah",
+            "al_umm": "Al-Umm",
+            "al_bidayah_wan_nihayah": "Al-Bidayah wan-Nihayah",
+            "nashaihul_ibad": "Nashaihul Ibad",
+            "fiqh_as_sunnah": "Fiqh as-Sunnah",
+        }
+        default_citation = _default_citations[corpus]
+        citation = payload.get("citation") or default_citation
         arabic = payload.get("ar") or ""
         translation_id = ""
         translation_en = ""
@@ -231,7 +279,7 @@ def retrieve_daleel(
             qr = qdrant.query_points(
                 collection_name=collection,
                 query=vector,
-                limit=per_corpus,
+                limit=_per_corpus_for(corpus, per_corpus),
                 with_payload=True,
             )
             results = qr.points
@@ -267,6 +315,163 @@ def retrieve_daleel(
         top_score=all_hits[0]["score"] if all_hits else None,
     )
     return all_hits[:limit]
+
+
+def retrieve_kisah_pendek(
+    theme: str,
+    *,
+    window_before: int = 2,
+    window_after: int = 6,
+    max_chars: int = 14000,
+) -> dict[str, Any] | None:
+    """Retrieve a CONTIGUOUS narrative passage from Al-Bidayah wan-Nihayah.
+
+    Why contiguous, not top-K: Al-Bidayah is Ibn Kathir's universal
+    history split into 2,529 sequential fasal (~1.5k chars each). A
+    top-K cosine search lands scattered fasal from across the kitab —
+    great for daleel retrieval, useless for retelling a single STORY.
+    For the "Kisah Pendek" content kit slot we need a self-contained
+    episode, which means: pick the best-matching seed fasal, then walk
+    the surrounding fasal in their original kitab order so the LLM
+    receives the scene → core event → denouement as a coherent block.
+
+    Window: `window_before` fasal preceding the seed + `window_after`
+    fasal following it. Defaults (2 + 6) give ~9 fasal ≈ 13k Arabic
+    chars, roughly 2-3k Indonesian words to retell as a 10-min read.
+
+    `max_chars` caps total Arabic chars so an over-long episode doesn't
+    blow the prompt budget — when crossed, the window is truncated at
+    the natural fasal boundary that fits.
+
+    Returns None when:
+      - Al-Bidayah collection is empty / unreachable
+      - Top seed scored below MIN_SCORE (no thematic fit in the kitab)
+      - Seed payload lacks `section_id` (shouldn't happen, defensive)
+
+    Per the 2026-06-06 product decision: the Kisah Pendek slot uses
+    Al-Bidayah EXCLUSIVELY. The caller's prompt is responsible for
+    SKIPPING the section gracefully when this returns None — DO NOT
+    fall back to hadith pool here.
+    """
+    if not theme.strip():
+        return None
+    openai = _get_openai()
+    try:
+        emb = openai.embeddings.create(
+            model=settings.embedding_model, input=theme
+        )
+        vector = emb.data[0].embedding
+        record_usage(
+            provider="openai",
+            operation="embedding",
+            model=settings.embedding_model,
+            tokens_in=getattr(emb.usage, "total_tokens", None),
+            meta={"purpose": "kisah_retrieval"},
+        )
+    except Exception as exc:
+        log.warning("kisah_retrieval.embed_failed", error=str(exc))
+        return None
+
+    qdrant = _get_qdrant()
+    collection = COLLECTION_NAMES.get(
+        "al_bidayah_wan_nihayah", "al_bidayah_wan_nihayah"
+    )
+    try:
+        qr = qdrant.query_points(
+            collection_name=collection,
+            query=vector,
+            limit=1,
+            with_payload=True,
+        )
+        results = qr.points
+    except Exception as exc:
+        log.debug("kisah_retrieval.query_failed", error=str(exc))
+        return None
+    if not results:
+        log.info("kisah_retrieval.no_results", theme=theme[:80])
+        return None
+
+    seed = results[0]
+    threshold = MIN_SCORE.get("al_bidayah_wan_nihayah", 0.28)
+    if seed.score is None or seed.score < threshold:
+        log.info(
+            "kisah_retrieval.below_threshold",
+            score=seed.score,
+            threshold=threshold,
+            theme=theme[:80],
+        )
+        return None
+
+    seed_payload = dict(seed.payload or {})
+    seed_id = int(seed_payload.get("section_id", 0) or 0)
+    if seed_id <= 0:
+        return None
+
+    # Point IDs in al_bidayah_wan_nihayah equal section_id (set by the
+    # embed script), so a direct retrieve-by-id pulls the contiguous
+    # window without another vector search.
+    window_ids = list(
+        range(
+            max(1, seed_id - window_before),
+            seed_id + window_after + 1,
+        )
+    )
+    try:
+        points = qdrant.retrieve(
+            collection_name=collection,
+            ids=window_ids,
+            with_payload=True,
+        )
+    except Exception as exc:
+        log.warning("kisah_retrieval.window_failed", error=str(exc))
+        # Seed alone is degraded but better than dropping the whole slot.
+        points = [seed]
+
+    # Qdrant doesn't guarantee retrieve() order — sort by section_id so
+    # the narrative reads forward.
+    indexed: list[tuple[int, dict[str, Any]]] = []
+    for pt in points:
+        p = dict(pt.payload or {})
+        sid = int(p.get("section_id", 0) or 0)
+        if sid > 0:
+            indexed.append((sid, p))
+    indexed.sort(key=lambda kv: kv[0])
+    if not indexed:
+        return None
+
+    fasal: list[dict[str, Any]] = []
+    total_chars = 0
+    for sid, p in indexed:
+        ar = str(p.get("ar") or "")
+        if not ar:
+            continue
+        if total_chars + len(ar) > max_chars and fasal:
+            break
+        fasal.append({
+            "section_id": sid,
+            "title": p.get("title") or "",
+            "qism": p.get("qism") or "",
+            "citation": p.get("citation") or "Al-Bidayah wan-Nihayah",
+            "ar": ar,
+        })
+        total_chars += len(ar)
+
+    if not fasal:
+        return None
+
+    log.info(
+        "kisah_retrieval.assembled",
+        seed_id=seed_id,
+        seed_score=float(seed.score),
+        fasal_count=len(fasal),
+        total_chars=total_chars,
+    )
+    return {
+        "fasal": fasal,
+        "seed_section_id": seed_id,
+        "seed_score": float(seed.score),
+        "total_chars": total_chars,
+    }
 
 
 def retrieve_dua(

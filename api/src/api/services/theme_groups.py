@@ -231,12 +231,19 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "ekonomi rakyat, bisnis halal, investasi, UMKM, daya beli"
     ),
     "Aqidah & Ibadah": (
-        "ibadah pilar (haji/kurban/idul adha), hijrah, fatwa, polemik "
-        "aqidah — HANYA untuk konten yang murni ibadah; cerita politik "
-        "tentang ibadah masuk Pemerintahan & Kebijakan"
+        "ibadah ISLAM pilar (haji/kurban/idul adha), hijrah, fatwa, polemik "
+        "aqidah, hadith/ayat dengan framing pengajaran Islam — HANYA untuk "
+        "konten Islam; konten Kristen/Katolik/Buddha/Hindu/lintas-iman → "
+        "Toleransi & Lintas-Iman; cerita politik tentang ibadah → "
+        "Pemerintahan & Kebijakan"
     ),
     "Kesehatan & Kehidupan": "kesehatan fisik & mental, kesejahteraan jiwa",
-    "Pendidikan & SDM": "sekolah, literasi, pembangunan SDM",
+    "Pendidikan & SDM": (
+        "sekolah, kampus, literasi, pembangunan SDM kelembagaan — BUKAN "
+        "akademi sepak bola/sport (itu Lainnya), BUKAN wisata yang "
+        "kebetulan menyasar libur sekolah (itu Lainnya), BUKAN HR "
+        "awards korporasi (itu Lainnya)"
+    ),
     "Lingkungan & Bencana": (
         "bencana alam, kebakaran, kecelakaan, lingkungan, fenomena alam "
         "misterius"
@@ -246,7 +253,11 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "ideologi negara (Pancasila), polemik kebijakan/pejabat, hari "
         "nasional"
     ),
-    "Patologi Sosial Digital": "judi online, pinjol, narkoba",
+    "Patologi Sosial Digital": (
+        "judi online, pinjol, narkoba, kekerasan berbasis gender online "
+        "(AI deepfake nude tanpa persetujuan, sextortion, doxing korban), "
+        "porn-spam thread"
+    ),
     "Teknologi & AI": "kecerdasan buatan, teknologi baru, etika digital",
     "Pekerja & Pertanian Rakyat": (
         "buruh, tenaga kerja, petani, nelayan, ketahanan pangan"
@@ -255,7 +266,11 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "Palestina, konflik internasional, geopolitik, hubungan luar negeri"
     ),
     "Inspirasi & Kisah Pribadi": (
-        "kisah hidup, pengalaman pribadi, renungan, motivasi"
+        "kisah hidup orang BIASA (bukan selebritas/atlet), pengalaman "
+        "pribadi reflektif, renungan, motivasi — BUKAN K-pop chart, "
+        "BUKAN profil aktris/atlet, BUKAN pengajaran hadith (itu Aqidah & "
+        "Ibadah), BUKAN ajaran agama non-Islam (itu Toleransi & "
+        "Lintas-Iman)"
     ),
     "Toleransi & Lintas-Iman": (
         "moderasi beragama, pluralisme, lintas-iman"

@@ -77,6 +77,7 @@ from api.services.kitab_retrieval import (
     rerank_dua,
     retrieve_daleel,
     retrieve_dua,
+    retrieve_kisah_pendek,
 )
 from api.services.theme_groups import (
     GROUP_BY_SLUG,
@@ -135,6 +136,7 @@ async def _prepare_context(
     dict[str, Any],
     list[dict[str, Any]],
     list[dict[str, Any]],
+    dict[str, Any] | None,
     str,
     str,
 ]:
@@ -196,11 +198,18 @@ async def _prepare_context(
         adhkar = rerank_dua(retrieval_query, dua_candidates, top_n=6)
         adhkar = await enrich_daleel_translations(session, adhkar)
 
+        # Kisah Pendek source — contiguous Al-Bidayah wan-Nihayah excerpt.
+        # Mirrors `generate_briefing` so manual + auto paths render the
+        # same content kit shape. None when Al-Bidayah is empty or the
+        # theme had no fit; the prompt handles that by skipping the slot.
+        kisah = retrieve_kisah_pendek(retrieval_query)
+
         log.info(
             "manual_briefing.context_ready",
             group=group,
             daleel_count=len(daleel),
             adhkar_count=len(adhkar),
+            kisah_fasal=len(kisah["fasal"]) if kisah else 0,
             posts_7d=stats["totals"]["posts_7d"],
             hijri_short=hijri_short,
         )
@@ -209,10 +218,11 @@ async def _prepare_context(
         stats,
         daleel,
         adhkar=adhkar,
+        kisah=kisah,
         language="id",
         calendar_context=calendar_block,
     )
-    return stats, daleel, adhkar, SYSTEM_PROMPT_ID, user_prompt
+    return stats, daleel, adhkar, kisah, SYSTEM_PROMPT_ID, user_prompt
 
 
 # ──────────────────────────────────────────────────────────────────
@@ -223,12 +233,12 @@ async def _prepare_context(
 async def cmd_dump(group_arg: str, output_path: str | None) -> None:
     group = _resolve_group(group_arg)
     slug = _group_slug(group)
-    stats, daleel, adhkar, system_prompt, user_prompt = await _prepare_context(
-        group
+    stats, daleel, adhkar, kisah, system_prompt, user_prompt = (
+        await _prepare_context(group)
     )
 
-    # Cache the (stats, daleel, adhkar) for the matching `save` step.
-    # JSON keeps this tool inspectable + portable across script
+    # Cache the (stats, daleel, adhkar, kisah) for the matching `save`
+    # step. JSON keeps this tool inspectable + portable across script
     # invocations.
     cache_path = _cache_path(slug)
     cache_path.write_text(
@@ -239,6 +249,7 @@ async def cmd_dump(group_arg: str, output_path: str | None) -> None:
                 "stats": stats,
                 "daleel": daleel,
                 "adhkar": adhkar,
+                "kisah": kisah,
                 "dumped_at_utc": datetime.now(UTC).isoformat(),
             },
             indent=2,
@@ -254,7 +265,7 @@ async def cmd_dump(group_arg: str, output_path: str | None) -> None:
     composed = (
         f"<!-- DAKWAH-LENS MANUAL BRIEFING PROMPT -->\n"
         f"<!-- group: {group} ({slug})  dumped: {datetime.now(UTC).isoformat()} -->\n"
-        f"<!-- daleel pool: {len(daleel)} entries · adhkar pool: {len(adhkar)} entries -->\n"
+        f"<!-- daleel pool: {len(daleel)} entries · adhkar pool: {len(adhkar)} entries · kisah pool: {len(kisah['fasal']) if kisah else 0} fasal -->\n"
         f"<!-- After Claude responds, save the reply as a .md file and run: -->\n"
         f"<!--   uv run python -m api.scripts.manual_briefing save {slug} <reply.md> -->\n\n"
         "================================================================\n"
