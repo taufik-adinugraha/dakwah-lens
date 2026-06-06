@@ -827,16 +827,23 @@ function DeliverableModal({
 }
 
 /**
- * Same Arabic detection used by `BriefingNarrative` — fires on EITHER
- * native Arabic script (U+0600 block, ≥10 chars — the format khutbah
- * du'a use since the 2026-05-23 prompt change) OR Latin transliteration
- * (legacy briefs from earlier). Paragraphs that match get the sacred-
- * text card styling so the khateeb / pembaca can read the du'a
- * comfortably off a phone screen.
+ * Same Arabic detection used by `BriefingNarrative` — fires on a
+ * paragraph that's DOMINANTLY sacred-text (a standalone ayat / du'a /
+ * dzikir), NOT prose that just quotes one inline. The bug we fixed
+ * 2026-06-06: the old "≥10 Arabic chars → box" threshold matched the
+ * khutbah opening "...izinkan khotib membuka khutbah dengan ayat
+ * <Arabic ayat> — Allah berfirman..." (~70 Arabic chars in ~600 Latin
+ * chars), turning Indonesian prose into a green du'a card AND
+ * direction-flipping the whole paragraph (bidi reordered "Allah
+ * berfirman" to appear AFTER the Arabic). The new rule requires the
+ * Arabic to dominate ≥40% of the paragraph by non-whitespace char.
  */
 function modalLooksLikeArabic(text: string): boolean {
   const arabicChars = text.match(/[؀-ۿݐ-ݿࢠ-ࣿ]/g);
-  if (arabicChars && arabicChars.length >= 10) return true;
+  if (arabicChars && arabicChars.length >= 20) {
+    const nonWhitespace = text.replace(/\s/g, "").length || 1;
+    if (arabicChars.length / nonWhitespace >= 0.4) return true;
+  }
 
   if (text.length < 40) return false;
   const strong = /(allahumma|al[\s-]?ḥamdu|inna [aA]llaha|rabbana|subḥāna|wa[\s-]?ṣalli|allāhumma)/i;

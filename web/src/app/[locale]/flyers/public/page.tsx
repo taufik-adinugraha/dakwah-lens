@@ -7,6 +7,7 @@ import { auth } from "@/auth";
 import { MonthPickerPager } from "@/components/MonthPickerPager";
 import { db, schema } from "@/db";
 import { Link } from "@/i18n/navigation";
+import { slugifyGroup } from "@/lib/dashboard-metrics";
 import {
   monthRangeUtc,
   parseMonthParam,
@@ -163,9 +164,17 @@ export default async function PublicFlyersPage({
   const systemFlyers = briefingRows.flatMap((b) => {
     const generatedAt = new Date(b.generated_at);
     const dateStr = formatWibDate(generatedAt);
-    const segmentKey = b.segment ?? "all";
-    const slug = `${dateStr}-${segmentKey}`;
-    const segLabel = SEGMENT_LABEL_ID[segmentKey] ?? segmentKey;
+    // `segment` carries either the legacy 4-segment slug (all/spiritual/
+    // family/youth/justice) for pre-2026-06-03 briefings, or the
+    // 14-group THEME_GROUPS label ("Hukum & Keadilan", ...) for current
+    // ones. The flyer-render URL needs a URL-safe slug — kebab-case the
+    // group label so spaces + `&` don't break the API path. Legacy
+    // 4-segment values already kebab-safe so slugifyGroup is a no-op
+    // for those.
+    const segmentRaw = b.segment ?? "all";
+    const slugTail = slugifyGroup(segmentRaw) || "all";
+    const slug = `${dateStr}-${slugTail}`;
+    const segLabel = SEGMENT_LABEL_ID[segmentRaw] ?? segmentRaw;
     return SYSTEM_VARIANTS.map((v) => ({
       id: `system:${b.id}:${v}`,
       headline: `${VARIANT_LABEL[v]} — ${segLabel}`,
