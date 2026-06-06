@@ -31,7 +31,9 @@ export async function Header() {
     { href: `/${locale}/discussions`, label: t("discussions") },
     { href: `/${locale}/kitab`, label: t("kitab") },
     { href: `/${locale}/flyers/public`, label: t("flyers_library") },
-    { href: `/${locale}/pustaka-kajian`, label: t("pustaka_kajian") },
+    // Pustaka Kajian hidden from header nav 2026-06-06 while the
+    // generation flow is being reworked. Route still accessible via
+    // direct URL for operators.
   ];
 
   return (
@@ -92,12 +94,9 @@ export async function Header() {
             >
               {t("flyers_library")}
             </Link>
-            <Link
-              href="/pustaka-kajian"
-              className="hover:text-slate-900 transition"
-            >
-              {t("pustaka_kajian")}
-            </Link>
+            {/* Pustaka Kajian hidden from header nav 2026-06-06 — the
+                /pustaka-kajian route still works via direct URL for
+                operators, just no link surface for visitors. */}
           </nav>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
