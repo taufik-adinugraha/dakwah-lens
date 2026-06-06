@@ -184,6 +184,11 @@ export async function BriefingsGrid({
 }) {
   const t = await getTranslations("Briefing");
   const nf = new Intl.NumberFormat(locale);
+  // Server component, one evaluation per request — the react-hooks
+  // purity rule flags Date.now() as impure (correct for client
+  // components, overly strict here). The request-time `now` is
+  // exactly what we want to compute briefing age against.
+  // eslint-disable-next-line react-hooks/purity
   const nowMs = Date.now();
 
   // Sort by 7d volume desc; ties fall back to canonical reading order.
