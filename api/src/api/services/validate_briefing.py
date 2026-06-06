@@ -57,6 +57,7 @@ class BriefingWarning(TypedDict, total=False):
         "mixed_script_paragraph",
         "dangling_citation",
         "arabic_block_inline",
+        "deliverable_too_short",
     ]
     severity: Literal["low", "medium", "high"]
     where: str  # human-readable locator, e.g. "Pesan Flyer 2"
@@ -312,6 +313,123 @@ def _starts_with_arabic(para: str) -> bool:
     if not stripped:
         return False
     return bool(_ARABIC_CHAR_RE.match(stripped))
+
+
+# Word-count targets per Section-4 deliverable, mirrors the ranges in
+# briefing.py's `## Strategi & Aksi Dakwah` prompt. Each entry: a regex
+# matching the H3 heading (case-insensitive, language-tolerant) plus
+# `(min, max)` words. We only flag at 70% of `min` so authors with a
+# tight-but-on-target draft don't get nagged — the real failure mode
+# we're guarding against is the v5 Kultum that landed at 400 words on
+# a 1650-word target (24% of min, clearly under-delivered).
+_DELIVERABLE_WORD_TARGETS: list[tuple[str, tuple[int, int]]] = [
+    (r"^###\s+Khutbah(?:\s+Jumat)?(?:\s+/\s+Friday\s+Khutbah)?\b", (3450, 4800)),
+    (r"^###\s+Kultum(?:\s+/\s+Short\s+Talk)?\b", (1650, 2250)),
+    (r"^###\s+Kajian(?:\s+Ibu-ibu)?(?:\s+(?:&|and)\s+Majelis\s+Taklim)?\b", (1400, 1800)),
+    (r"^###\s+Kisah(?:\s+Pendek)?(?:\s+(?:—|-)\s+Short\s+Story)?\b", (1800, 2200)),
+    (r"^###\s+Pengajaran(?:\s+di\s+Rumah)?(?:\s+/\s+Home\s+Teaching)?\b", (500, 700)),
+    (r"^###\s+Kreator\s+Konten(?:\s+Digital)?(?:\s+/\s+Content\s+Creator)?\b", (100, 130)),
+    (r"^###\s+Mahasiswa\b", (900, 1200)),
+    (r"^###\s+Aksi\s+Sosial(?:\s+(?:&|dan)\s+Khidmah(?:\s+Umat)?)?\b", (600, 900)),
+]
+# Pesan Flyer 1-6 each target ~75 words. We use a 50-word floor to
+# avoid flagging the legitimate Flyer 6 du'a-only slot (short prose +
+# Arabic du'a that gets stripped by the word-count regex).
+_FLYER_SLOT_TARGETS: tuple[int, int] = (50, 100)
+
+
+def _count_words(text: str) -> int:
+    """Count Latin + accented word tokens. Skips Arabic glyphs so an
+    Arabic-heavy block doesn't get counted as 'long' on Arabic chars
+    alone — the threshold is meant to measure Indonesian/English prose
+    delivery time, not aksara Arab volume."""
+    return len(re.findall(r"\b[\wÀ-ʯ]+\b", text))
+
+
+def scan_deliverable_word_counts(markdown: str) -> list[BriefingWarning]:
+    """Flag any Section-4 deliverable or Pesan Flyer slot whose word
+    count falls below 70% of its prompt-specified minimum. Catches
+    under-delivered sub-sections at save time so they don't reach
+    readers — the v5 Kultum (400 words on a 1650-word target) was the
+    motivating regression."""
+    warnings: list[BriefingWarning] = []
+
+    # Section 4 deliverables. Slice from `## Strategi & Aksi Dakwah`
+    # (or `## Da'wah Strategies & Actions`) to the next H2.
+    sec4 = _section_slice(markdown, r"(?:Strategi(?:\s+(?:&|dan)\s+Aksi\s+Dakwah)?|Da['’]?wah\s+Strategies(?:\s+(?:&|and)\s+Actions)?)")
+    if sec4:
+        body = markdown[sec4[0] : sec4[1]]
+        # Capture each `### …` heading + its slice up to the next ###
+        # (or section end).
+        h3s = list(re.finditer(r"^###\s+.+$", body, flags=re.MULTILINE))
+        for i, h3 in enumerate(h3s):
+            heading = h3.group(0)
+            start = h3.end()
+            end = h3s[i + 1].start() if i + 1 < len(h3s) else len(body)
+            block = body[start:end]
+            for pattern, (lo, hi) in _DELIVERABLE_WORD_TARGETS:
+                if re.match(pattern, heading, flags=re.IGNORECASE):
+                    words = _count_words(block)
+                    floor = int(lo * 0.7)
+                    if words < floor:
+                        warnings.append(
+                            {
+                                "kind": "deliverable_too_short",
+                                "severity": "high",
+                                "where": heading.lstrip("# ").strip(),
+                                "message": (
+                                    f"section is {words} words but prompt "
+                                    f"targets {lo}-{hi}. Below 70% of min "
+                                    f"({floor}) — under-delivered. Expand "
+                                    f"with more concrete examples, dalil "
+                                    f"cycles, or aplikasi praktis."
+                                ),
+                            }
+                        )
+                    break
+
+    # Pesan Flyer slots. Same structure but a single floor for all 6.
+    pf = _section_slice(markdown, r"Pesan\s+Flyer")
+    if pf:
+        body = markdown[pf[0] : pf[1]]
+        h3_iter = list(
+            re.finditer(
+                r"^###\s+Pesan\s+Flyer\s+(\d)[^\n]*$",
+                body,
+                flags=re.MULTILINE | re.IGNORECASE,
+            )
+        )
+        for i, h3 in enumerate(h3_iter):
+            slot = int(h3.group(1))
+            start = h3.end()
+            end = h3_iter[i + 1].start() if i + 1 < len(h3_iter) else len(body)
+            # Strip the marker lines (Headline / Dalil) before counting
+            # so the count reflects the prose paragraph only.
+            block = body[start:end]
+            prose = re.sub(
+                r"^\s*\*\*\s*(?:Headline|Judul|Tema|Dalil|Daleel)\s*:\*\*[^\n]*$",
+                "",
+                block,
+                flags=re.MULTILINE | re.IGNORECASE,
+            )
+            words = _count_words(prose)
+            lo, _hi = _FLYER_SLOT_TARGETS
+            floor = int(lo * 0.7)
+            if words < floor:
+                warnings.append(
+                    {
+                        "kind": "deliverable_too_short",
+                        "severity": "medium",
+                        "where": f"Pesan Flyer {slot}",
+                        "message": (
+                            f"flyer body is {words} words; target is "
+                            f"~75. Below {floor} reads as too short on a "
+                            f"1080×1080 share tile — expand the "
+                            f"Fakta→Masalah→Solusi paragraph."
+                        ),
+                    }
+                )
+    return warnings
 
 
 def scan_dangling_citations(markdown: str) -> list[BriefingWarning]:
@@ -919,6 +1037,7 @@ def validate_briefing(
         (scan_pesan_flyer_inline_arabic, "flyer_arabic_check_failed"),
         (scan_mixed_script_paragraphs, "mixed_script_check_failed"),
         (scan_dangling_citations, "dangling_citation_check_failed"),
+        (scan_deliverable_word_counts, "word_count_check_failed"),
     ):
         try:
             warnings.extend(fn(markdown))
