@@ -30,6 +30,7 @@ Writes to the `topics` table; `/insights/[platform]` reads from there.
 from __future__ import annotations
 
 import json
+import re
 import time
 from typing import Any
 
@@ -286,6 +287,14 @@ If you propose a theme whose label contains any elastic word above, you MUST EIT
 
 If you can't do either confidently, drop the theme entirely and let the static "Lainnya — Tidak Terklasifikasi" bucket catch those posts.
 
+CATCH-ALL THEMES ARE FORBIDDEN (HARD RULE — added 2026-06-07):
+You MUST NOT mint a theme whose purpose is to be a leftover/uncategorized bucket. The downstream system ALREADY appends a single canonical static bucket called "Lainnya — Tidak Terklasifikasi" (with em-dash) AFTER your themes are processed — it is your safety net, not your responsibility. Concretely, DO NOT return any theme whose label is or normalises to:
+  · "Lainnya" / "Lainnya - Tidak Terklasifikasi" (hyphen) / "Lainnya Tidak Terklasifikasi" (no dash) — these are duplicates of the canonical em-dash bucket and the system will reject them
+  · "Misc" / "Miscellaneous" / "Other" / "Others" / "Uncategorized" / "Unclassified" — English variants are equally forbidden
+  · "Umum Lainnya" / "Catch-all" / "Lain-lain"
+  · ANY label whose intent is "stuff I couldn't classify"
+A 2026-06-07 audit found Gemini minting "Lainnya - Tidak Terklasifikasi" (hyphen variant) alongside the canonical em-dash bucket, creating duplicate rows. Even if you think the variant is "more accurate" or "covers different posts," it's wrong — the system has exactly ONE leftover bucket and you do not own it. If a post does not fit any of your concrete themes, leave it unassigned and the static bucket will pick it up.
+
 ASSIGNMENT CONTROLS — each theme MAY include two extra optional fields that protect it from false-positive assignment:
 
 - `exclude_keywords`: 0-6 short Indonesian terms that DISQUALIFY a post from this theme even when the vector is similar. Use this for themes whose semantic space bleeds into adjacent concepts. Examples that came from a real audit:
@@ -534,6 +543,59 @@ def discover_topics(
     # dynamic — Gemini decides what's present this week using the
     # THEMES TO WATCH hint block in the system prompt for editorial
     # guidance. No post-emit injection.
+
+    # Catch-all collision filter (added 2026-06-07). The prompt instructs
+    # Gemini at line 287 to NOT mint themes for unclassified content —
+    # "let the static 'Lainnya — Tidak Terklasifikasi' bucket catch
+    # those posts." Despite this, the 2026-06-07 audit found Gemini
+    # occasionally minted near-duplicates of the static fallback
+    # ("Lainnya - Tidak Terklasifikasi" with a hyphen instead of em-
+    # dash, "Lainnya Tidak Terklasifikasi" without dash, "Misc", "Other
+    # — Uncategorized"). The pre-existing cosine-merge step at 0.78
+    # didn't catch these because the static fallback isn't part of the
+    # LLM-discovered theme set at that point — it's appended later.
+    # Filter them here BEFORE the cosine pass so the posts that would
+    # have landed in the duplicate funnel through to the canonical
+    # static bucket instead.
+    def _is_catchall_label(label: str) -> bool:
+        norm = re.sub(r"[^a-z0-9]+", " ", label.lower()).strip()
+        # Match canonical (lainnya tidak terklasifikasi), shorter
+        # variants (just "lainnya", just "tidak terklasifikasi"),
+        # English borrowings (misc, other, uncategorized,
+        # unclassified), and explicit "catch-all" phrasings.
+        catchall_tokens = {
+            "lainnya tidak terklasifikasi",
+            "tidak terklasifikasi",
+            "lainnya",
+            "lain lain",
+            "lain-lain",
+            "miscellaneous",
+            "misc",
+            "other",
+            "others",
+            "uncategorized",
+            "unclassified",
+            "catch all",
+            "umum lainnya",
+        }
+        return norm in catchall_tokens
+
+    rejected_catchall: list[str] = []
+    kept_themes: list[dict[str, Any]] = []
+    for t in themes:
+        if _is_catchall_label(t["label"]):
+            rejected_catchall.append(t["label"])
+        else:
+            kept_themes.append(t)
+    themes = kept_themes
+    if rejected_catchall:
+        log.info(
+            "topic_discovery.catchall_themes_filtered",
+            count=len(rejected_catchall),
+            labels=rejected_catchall,
+            reason="LLM minted a Lainnya/Misc-flavored theme; posts will route to the canonical static fallback bucket instead",
+        )
+
     if not themes:
         log.warning("topic_discovery.no_themes_named", platform=platform)
         return []

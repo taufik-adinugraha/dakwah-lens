@@ -272,6 +272,13 @@ export async function getTopIssues(limit = 3): Promise<TopIssue[]> {
     JOIN social_posts p
       ON p.topic_id = t.id
      AND p.posted_at >= now() - interval '7 days'
+    -- Exclude the canonical catch-all bucket "Lainnya — Tidak
+    -- Terklasifikasi" and any historical variants (added 2026-06-07).
+    -- With ~25% of weekly posts landing in the fallback it would
+    -- otherwise dominate the trending list AND the bar-width
+    -- normalization in TrendingTopicsList — the filtered universe
+    -- here re-normalises the bars to the actually-trending themes.
+    WHERE t.label NOT ILIKE 'lainnya%'
     GROUP BY t.id, t.label, t.platform, t.keywords
     HAVING count(p.id) >= 2
     ORDER BY volume DESC
