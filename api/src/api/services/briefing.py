@@ -375,12 +375,19 @@ PANJANG: target ~1800-2200 kata untuk waktu baca 10 menit. JANGAN lebih pendek �
 
 ### Pengajaran di Rumah (500-700 kata)
 
-VOICE — PENGAJARAN DI RUMAH (orang tua sedang ngobrol dengan anak setelah maghrib atau sebelum tidur):
-- BUKAN ditujukan ke audiens jamaah — ditujukan ke ORANG TUA, dengan instruksi tentang cara mengobrol dengan anak. Format: ada "narator ke orang tua" (kerangka), lalu contoh dialog "orang tua ke anak" (ilustrasi).
-- Sapaan: "ayah", "bunda", "orang tua" — tidak pakai "hadirin" atau "jamaah".
-- Bahasa anak WAJIB digunakan saat menulis contoh dialog: kalimat pendek, tidak ada istilah teknis, satu konsep per kalimat.
-- Berikan SCRIPT konkret yang orang tua bisa langsung pakai: pertanyaan pembuka, jawaban anak yang mungkin muncul, respons orang tua, dll.
-- DILARANG: bahasa khutbah; dalil panjang dengan tafsir akademik (cukup satu dalil pendek yang relevan + 1 kalimat penjelasan); kalimat motivational ke orang tua ("wahai para ibu, sadarilah...").
+VOICE — PENGAJARAN DI RUMAH (panduan teknis untuk orang tua — format INSTRUKSI bukan ceramah):
+- BUKAN ceramah ke orang tua. BUKAN narator yang mengajak orang tua. Format adalah RESEP / SOP / LANGKAH-LANGKAH yang orang tua bisa langsung jalankan tanpa membaca dua kali.
+- VOICE NARATOR WAJIB impersonal-instructional. DILARANG MUTLAK menulis 1st-person ("saya", "kita", "kami akan tunjukkan") atau 2nd-person address ke orang tua ("ayah, bunda", "anda perlu", "kalian sebagai orang tua", "wahai para ibu"). Narator berbicara tentang sesi, bukan kepada orang tua.
+- STRUKTUR WAJIB seperti instruksi teknis:
+  * **Tujuan sesi** — 1 paragraf yang menyatakan apa yang akan ditanamkan dan berapa lama sesi.
+  * **Materi yang dibutuhkan** — daftar singkat alat / bahan / catatan.
+  * **Langkah 1, 2, 3, ...** — masing-masing diberi durasi, tujuan, dan skrip dialog yang siap pakai.
+  * **Skenario respons anak** — di setiap langkah, jelaskan apa yang harus dilakukan jika anak menjawab A vs jika menjawab B (decision tree).
+  * **Catatan untuk pelaksana** — 1-2 paragraf operasional (bukan refleksi spiritual ke orang tua).
+  * **Penutup sesi** — doa pendek + bagaimana menutup.
+- Skrip dialog orang tua ↔ anak HARUS dikutip dalam tanda kutip. Di DALAM kutipan boleh pakai "Bunda", "kamu", "Nak" — itu BAGIAN dari skrip yang akan dibaca orang tua. Di LUAR kutipan, voice tetap impersonal: "Tunggu jawaban", "Berikan respons singkat", "JANGAN marah".
+- Dalil cukup 1 yang singkat. Untuk anak SD, cukup terjemahan; untuk SMP/SMA boleh sertakan Arab pendek + terjemahan. JANGAN tafsir akademik panjang.
+- DILARANG di voice ini: bahasa khutbah ("hadirin", "marilah kita"); sapaan langsung ke orang tua ("ayah, bunda"); kalimat motivational ("sadarilah betapa pentingnya..."); refleksi spiritual yang ditujukan ke orang tua sebagai audiens; dalil panjang dengan tafsir berlapis.
 Tulis 3-4 CONVERSATION SCRIPT untuk orang tua dengan anak, masing-masing format:
 - Setting: kapan (sarapan / di mobil / sebelum tidur) + usia anak (SD / SMP / SMA)
 - Pertanyaan pembuka orang tua (1-2 kalimat — pertanyaan, bukan ceramah).

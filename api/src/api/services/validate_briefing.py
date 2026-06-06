@@ -60,6 +60,7 @@ class BriefingWarning(TypedDict, total=False):
         "deliverable_too_short",
         "kisah_preacher_voice",
         "mahasiswa_personal_voice",
+        "pengajaran_preacher_voice",
     ]
     severity: Literal["low", "medium", "high"]
     where: str  # human-readable locator, e.g. "Pesan Flyer 2"
@@ -584,6 +585,78 @@ def scan_mahasiswa_voice(markdown: str) -> list[BriefingWarning]:
                         f"{label}: '{m.group(0)}' — Mahasiswa Artikel must be "
                         f"impersonal analytical essay (no saya/aku/kalian/kamu, "
                         f"no directives to reader). Context: …{snippet}…"
+                    ),
+                }
+            )
+    return warnings
+
+
+# Voice violations specific to Pengajaran di Rumah — narrator
+# voice must be impersonal-instructional ("Tunggu jawaban", "JANGAN
+# marah"), NOT addressing orang tua as audience ("ayah, bunda, ingin
+# saya ajak..."). The QUOTED dialog inside the script legitimately
+# uses "Bunda" / "kamu" / "Nak" — that's the script parent reads to
+# child — so the validator strips quoted strings before scanning.
+_PENGAJARAN_PREACHER_PATTERNS: list[tuple[str, str]] = [
+    (r"\bsaya\s+(?:akan|ingin|ajak|ajak\s+kita)\b", "1st-person narrator"),
+    (r"\bkita\s+(?:akan|sebagai\s+orang\s+tua|para\s+ayah|para\s+bunda)\b", "1st-person plural addressing parents"),
+    (r"\b(?:ayah|bunda)\s*,\s*(?:pengajaran|sesi|mari)\b", "direct address to ayah/bunda"),
+    # Common opener pattern: "Ayah, bunda —" / "Ayah, bunda, " starting a paragraph
+    (r"(?:^|\n)\s*Ayah\s*,?\s*bunda\s*[—,\-]\s*\S", "direct address to ayah, bunda (opener)"),
+    (r"(?:^|\n)\s*Para\s+(?:ayah|orang\s+tua)\b", "direct address to ayah/orang tua (opener)"),
+    (r"\bayah\s+dan\s+bunda\s+(?:perlu|wajib|harus)\b", "direct address to ayah dan bunda"),
+    (r"\banda\s+(?:perlu|harus|wajib)\b", "2nd-person address to orang tua"),
+    (r"\bwahai\s+(?:para\s+)?(?:ayah|bunda|ibu|orang\s+tua)\b", "preacher salutation"),
+    (r"\bkalian\s+sebagai\s+orang\s+tua\b", "2nd-person address"),
+    (r"\bmarilah\s+kita\b", "preacher invitation"),
+]
+
+
+def scan_pengajaran_voice(markdown: str) -> list[BriefingWarning]:
+    """Flag preacher / 1st-2nd-person voice in Pengajaran di Rumah
+    narrator body. Quoted dialog (the parent-to-child script) is
+    stripped before scanning — inside quotes, "Bunda" / "kamu" / "Nak"
+    are part of the recipe, not narrator voice."""
+    warnings: list[BriefingWarning] = []
+    sec4 = _section_slice(
+        markdown,
+        r"(?:Strategi(?:\s+(?:&|dan)\s+Aksi\s+Dakwah)?|Da['’]?wah\s+Strategies(?:\s+(?:&|and)\s+Actions)?)",
+    )
+    if not sec4:
+        return warnings
+    body = markdown[sec4[0] : sec4[1]]
+    h3s = list(re.finditer(r"^###\s+(.+)$", body, flags=re.MULTILINE))
+    pengajaran_block: str | None = None
+    for i, h3 in enumerate(h3s):
+        if re.match(
+            r"Pengajaran(?:\s+di\s+Rumah)?\b",
+            h3.group(1).strip(),
+            flags=re.IGNORECASE,
+        ):
+            start = h3.end()
+            end = h3s[i + 1].start() if i + 1 < len(h3s) else len(body)
+            pengajaran_block = body[start:end]
+            break
+    if not pengajaran_block:
+        return warnings
+    # Strip quoted dialog (any "..." or "…" run) — voice rules apply
+    # only to narrator prose, not to the script parent reads to child.
+    narrator_only = re.sub(r"[\"“][^\"”]*[\"”]", "", pengajaran_block)
+    for pattern, label in _PENGAJARAN_PREACHER_PATTERNS:
+        for m in re.finditer(pattern, narrator_only, flags=re.IGNORECASE):
+            ctx_start = max(0, m.start() - 30)
+            ctx_end = min(len(narrator_only), m.end() + 30)
+            snippet = narrator_only[ctx_start:ctx_end].replace("\n", " ")
+            warnings.append(
+                {
+                    "kind": "pengajaran_preacher_voice",
+                    "severity": "high",
+                    "where": "Pengajaran di Rumah",
+                    "message": (
+                        f"{label}: '{m.group(0)}' — narrator must be "
+                        f"impersonal-instructional. Voice goes inside the "
+                        f"quoted parent-to-child script, not in the "
+                        f"recipe prose. Context: …{snippet}…"
                     ),
                 }
             )
@@ -1198,6 +1271,7 @@ def validate_briefing(
         (scan_deliverable_word_counts, "word_count_check_failed"),
         (scan_kisah_voice, "kisah_voice_check_failed"),
         (scan_mahasiswa_voice, "mahasiswa_voice_check_failed"),
+        (scan_pengajaran_voice, "pengajaran_voice_check_failed"),
     ):
         try:
             warnings.extend(fn(markdown))
