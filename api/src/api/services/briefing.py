@@ -204,11 +204,18 @@ Ringkasan padat untuk pembaca yang sudah membaca berita pekan ini dan tidak butu
 
 FORMAT WAJIB (markdown list `- `):
 - 4 sampai 6 poin. Tidak lebih, tidak kurang.
-- Tiap poin TUNGGAL berisi DUA bagian terpisah dengan baris baru yang DIINDENT (2 spasi) di bawahnya:
+- Tiap poin TUNGGAL berisi TIGA bagian terpisah dengan baris baru yang DIINDENT (2 spasi) di bawahnya. KETIGANYA WAJIB ADA — JANGAN PERNAH melewati salah satunya:
   - `**Masalah:**` satu kalimat yang menyatakan persoalan inti — fakta atau pola yang terobservasi, bukan narasi. Maksimal 22 kata.
   - `**Aksi:**` satu kalimat yang menyatakan tindakan/sikap dakwah praktis yang bisa diambil dai/komunitas — verba aktif, fokus pada apa yang DILAKUKAN, bukan apa yang DIRASAKAN. Maksimal 22 kata.
-- Boleh menyebut TIDAK LEBIH dari satu citation dalil INLINE per poin (format `**QS. Al-…: N**` atau `**Riyad as-Salihin N**`), tapi opsional — kalau citation tidak menambah ketajaman, lewati saja. JANGAN paksa.
+  - `**Dalil:**` SATU citation dari pool yang menopang masalah/aksi — format `QS. Al-…: N` / `Sahih al-Bukhari N` / `Riyad as-Salihin N` / `Bulugh al-Maram N`. CITATION SAJA — JANGAN sertakan terjemahan, JANGAN sertakan Arab, JANGAN sertakan komentar. Cukup nama kitab + nomor. Pembaca melihat dalil lengkap di Section 5; di sini hanya tag pointer.
+- JANGAN PERNAH menempel citation di akhir baris Masalah (mis. `**Masalah:** ... rakyat. **QS. Hud: 85**`) — itu menyebabkan citation berdempet dengan baris Aksi saat di-render. Citation HARUS di baris `**Dalil:**` sendiri.
 - JANGAN tulis kalimat pembuka seperti "Berikut poin-poinnya:" atau penutup. Langsung bullet.
+
+ATURAN PEMILIHAN DALIL untuk Poin Kunci:
+- Citation HARUS berasal dari DALIL POOL yang saya berikan — JANGAN mengarang.
+- Citation HARUS thematis cocok dengan Masalah/Aksi-nya. Cek ulang sebelum tag: kalau bullet bicara tentang korupsi gaji pejabat, dalil HARUS tentang amanah/keadilan/zhulm — bukan ayat umum tentang "pemuda" yang kebetulan ada di pool.
+- Boleh dalil yang sama dengan dalil di Section 4 atau Section 5 — Poin Kunci adalah ringkasan, wajar ada overlap.
+- Kalau pool benar-benar tidak punya citation yang cocok, tulis `**Dalil:** —` (em dash) sebagai placeholder eksplisit — itu lebih jujur daripada memaksakan citation yang tidak nyambung. Tapi situasi ini langka — pool 10 dalil hampir selalu punya minimal 1 yang relevan untuk tiap masalah pekan ini.
 
 LARANGAN:
 - JANGAN tulis angka/persentase di section ini — itu di Numerik & Tren.
@@ -219,8 +226,10 @@ LARANGAN:
 Contoh format (jangan diiris persis, hanya pola):
 - **Masalah:** Pinjol ilegal melonjak menjelang akhir bulan dengan target rumah tangga berpenghasilan rendah.
   **Aksi:** Sisipkan 5 menit edukasi riba & alternatif simpan-pinjam syariah di setiap kajian rutin pekan ini.
-- **Masalah:** Korupsi dana bansos memicu krisis kepercayaan publik di daerah tertentu. **QS. An-Nisa: 58**
+  **Dalil:** QS. Al-Baqarah: 275
+- **Masalah:** Korupsi dana bansos memicu krisis kepercayaan publik di daerah tertentu.
   **Aksi:** Buka khutbah dengan amanah jabatan; ajak jamaah memantau program desa lewat musyawarah RT.
+  **Dalil:** QS. An-Nisa: 58
 
 ## Strategi & Aksi Dakwah (9350-12650 kata)
 Ini adalah CONTENT KIT — bukan saran strategis. Setiap sub-section harus berupa DRAFT SIAP-PAKAI yang bisa dibaca / dipakai langsung oleh dai, ustadzah, kreator, atau pengurus komunitas tanpa harus menulis ulang dari nol. WAJIB 8 sub-section dengan ### H3.

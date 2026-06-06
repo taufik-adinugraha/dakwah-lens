@@ -19,6 +19,14 @@ import type { FlyerImageAsset } from "./registry";
 
 const cache = new Map<string, string>();
 
+/** 1×1 transparent PNG — returned in place of a missing asset so one
+ *  orphaned DB row (deleted upload, mis-synced volume, etc.) can't
+ *  500 the entire flyer render. Sized to be ignorable when stretched
+ *  into a layout's photo slot. The caller still gets a valid data URL,
+ *  the puppeteer pipeline keeps flowing. */
+const TRANSPARENT_PIXEL =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+
 function publicPath(srcRelative: string): string {
   // `src` in the registry starts with "/flyer-assets/...". Strip the
   // leading slash and resolve against `public/`.
@@ -47,7 +55,22 @@ export async function assetToDataUrl(asset: FlyerImageAsset): Promise<string> {
   if (cached) return cached;
 
   const filePath = publicPath(asset.src);
-  const buf = await readFile(filePath);
+  let buf: Buffer;
+  try {
+    buf = await readFile(filePath);
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === "ENOENT") {
+      // Orphaned DB row (file uploaded then deleted, volume mismatch,
+      // etc.). Fall back to a transparent pixel + cache so we don't
+      // keep hammering the FS, and let the rest of the flyer render.
+      // Upstream cleanup of the orphan row is the real fix; this just
+      // prevents the entire flyer from 500ing on a single bad asset.
+      console.warn(`[flyer] asset missing on disk, using transparent: ${asset.src}`);
+      cache.set(asset.src, TRANSPARENT_PIXEL);
+      return TRANSPARENT_PIXEL;
+    }
+    throw err;
+  }
   const ext = path.extname(asset.src);
   const mime = mimeForExt(ext);
   let dataUrl: string;
