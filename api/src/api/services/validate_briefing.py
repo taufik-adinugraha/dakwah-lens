@@ -372,6 +372,18 @@ def scan_deliverable_word_counts(markdown: str) -> list[BriefingWarning]:
             block = body[start:end]
             for pattern, (lo, hi) in _DELIVERABLE_WORD_TARGETS:
                 if re.match(pattern, heading, flags=re.IGNORECASE):
+                    # Kisah Pendek prompt explicitly allows a placeholder
+                    # line when KISAH POOL is empty (no Al-Bidayah fasal
+                    # available for the theme). Detect that case and
+                    # skip word-count flagging — the placeholder is the
+                    # legitimate output, not under-delivery.
+                    if re.match(r"^###\s+Kisah", heading, flags=re.IGNORECASE):
+                        if re.search(
+                            r"tidak\s+tersedia\s+untuk\s+tema\s+ini",
+                            block,
+                            flags=re.IGNORECASE,
+                        ):
+                            break
                     words = _count_words(block)
                     floor = int(lo * 0.7)
                     if words < floor:
