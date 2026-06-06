@@ -568,15 +568,31 @@ export function extractDeliverableSection(
 export async function getBriefingBySlug(
   slug: string,
 ): Promise<LatestBriefing | null> {
-  // Slug = `YYYY-MM-DD-<group-slug>` since 2026-06-03 (was 5-segment
-  // before that). The group-slug must match one of the 14 THEME_GROUPS
-  // slugs — anything else returns null so the route 404s cleanly.
+  // Two slug shapes are accepted:
+  //   1. `YYYY-MM-DD-<group-slug>` — canonical shareable URL since
+  //      2026-06-03. Resolves to the briefing for that exact WIB date
+  //      and group.
+  //   2. `<group-slug>` — bare group slug, used when the /briefings hub
+  //      card has no specific edition to point at yet. Resolves to the
+  //      LATEST briefing for that group, regardless of date. Returns
+  //      null when the group has no briefings at all yet.
+  // Anything else (unknown slug, malformed) returns null so the route
+  // 404s cleanly.
   const dateRe = /^(\d{4}-\d{2}-\d{2})-(.+)$/;
   const m = slug.match(dateRe);
-  if (!m) return null;
-  const [, date, groupSlug] = m;
-  const group = GROUP_BY_SLUG[groupSlug];
-  if (!group) return null;
+
+  let group: string | undefined;
+  let dateClause = sql``;
+  if (m) {
+    const [, date, groupSlug] = m;
+    group = GROUP_BY_SLUG[groupSlug];
+    if (!group) return null;
+    dateClause = sql`AND (generated_at AT TIME ZONE 'Asia/Jakarta')::date = ${date}::date`;
+  } else {
+    group = GROUP_BY_SLUG[slug];
+    if (!group) return null;
+    // No date clause — pick the latest briefing for this group.
+  }
 
   const [row] = await db
     .select({
@@ -592,9 +608,7 @@ export async function getBriefingBySlug(
       adhkarRefs: schema.briefings.adhkarRefs,
     })
     .from(schema.briefings)
-    .where(
-      sql`(generated_at AT TIME ZONE 'Asia/Jakarta')::date = ${date}::date AND theme_group = ${group}`,
-    )
+    .where(sql`theme_group = ${group} ${dateClause}`)
     .orderBy(desc(schema.briefings.generatedAt))
     .limit(1);
   if (!row) return null;
@@ -792,31 +806,59 @@ export async function getAllLatestBriefings(): Promise<
   return out;
 }
 
+export type GroupVolume = {
+  /** Posts in the last 7 days. */
+  current: number;
+  /** Posts in days 8-14 ago (the prior 7d window). */
+  previous: number;
+  /**
+   * Percent change current vs previous. NULL when previous is 0 (can't
+   * divide); +Infinity when current grew from a zero baseline.
+   */
+  deltaPct: number | null;
+};
+
 /**
- * 7d post volume per theme group, used by the /briefings hub to sort
- * group cards by activity. Counts `social_posts.theme_group` directly
- * (Gemini-judged at ingest) — legacy NULL-theme rows are folded into
- * Lainnya to match how /groups/lainnya scopes them. Posts whose
- * theme_group is non-canonical (typo / dropped label) are excluded.
+ * 7d post volume per theme group + a same-length comparison against
+ * days 8-14 ago, so the /briefings hub can show "X posts · ▲12%" trend
+ * chips alongside each card. Single SQL pass with two FILTER clauses —
+ * one round-trip, no separate prior-period query.
  *
- * Returns a Map with every BRIEFING_GROUPS key initialized to 0 so the
- * UI always has 14 entries even when a group has no posts this week.
+ * Legacy NULL-theme rows are folded into Lainnya to match how
+ * /groups/lainnya scopes them. Non-canonical labels are excluded.
+ * Returns a Map with every BRIEFING_GROUPS key initialized to a zero
+ * record so the UI always has 14 entries.
  */
-export async function getGroupVolumes7d(): Promise<Map<string, number>> {
+export async function getGroupVolumes7d(): Promise<Map<string, GroupVolume>> {
   const rows = await db
     .select({
       themeGroup: schema.socialPosts.themeGroup,
-      n: sql<number>`COUNT(*)::int`,
+      current: sql<number>`COUNT(*) FILTER (WHERE posted_at >= now() - interval '7 days')::int`,
+      previous: sql<number>`COUNT(*) FILTER (WHERE posted_at >= now() - interval '14 days' AND posted_at < now() - interval '7 days')::int`,
     })
     .from(schema.socialPosts)
-    .where(sql`posted_at >= now() - interval '7 days'`)
+    .where(sql`posted_at >= now() - interval '14 days'`)
     .groupBy(schema.socialPosts.themeGroup);
 
-  const out = new Map<string, number>();
-  for (const g of BRIEFING_GROUPS) out.set(g, 0);
+  const out = new Map<string, GroupVolume>();
+  for (const g of BRIEFING_GROUPS) {
+    out.set(g, { current: 0, previous: 0, deltaPct: null });
+  }
   for (const r of rows) {
     const key = r.themeGroup ?? LAINNYA_GROUP;
-    if (out.has(key)) out.set(key, (out.get(key) ?? 0) + Number(r.n));
+    const existing = out.get(key);
+    if (!existing) continue;
+    existing.current += Number(r.current);
+    existing.previous += Number(r.previous);
+  }
+  // Compute deltaPct now that totals are settled.
+  for (const v of out.values()) {
+    v.deltaPct =
+      v.previous === 0
+        ? v.current === 0
+          ? 0
+          : null // grew from zero baseline — surface as "new"
+        : Math.round(((v.current - v.previous) / v.previous) * 100);
   }
   return out;
 }

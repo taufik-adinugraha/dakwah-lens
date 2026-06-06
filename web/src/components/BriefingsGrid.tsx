@@ -1,27 +1,169 @@
 import { getTranslations } from "next-intl/server";
-import { ArrowRight, Compass, Layers, Sparkles, TrendingUp } from "lucide-react";
+import {
+  ArrowRight,
+  Banknote,
+  Boxes,
+  Cpu,
+  Globe2,
+  GraduationCap,
+  HandHeart,
+  Heart,
+  HeartPulse,
+  Landmark,
+  LandPlot,
+  Leaf,
+  Minus,
+  Scale,
+  Smartphone,
+  Sparkles,
+  TrendingDown,
+  TrendingUp,
+  Users2,
+  Wheat,
+} from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import { slugifyGroup } from "@/lib/dashboard-metrics";
 import {
   BRIEFING_GROUPS,
   briefingSlug,
+  type GroupVolume,
   type LatestBriefing,
 } from "@/lib/briefing-data";
 
 /**
+ * Per-group visual tone — tailwind classes for the card bg gradient,
+ * the icon chip background, and the icon glyph. One-stop styling so a
+ * group always reads the same color across the app. Each tone is
+ * deliberately distinct enough to survive at thumbnail size; saturation
+ * sits at the 50/100 band so cards stay readable, not loud.
+ *
+ * Icon picks: each glyph should evoke the bucket's tema (Scale for
+ * justice, Heart for family/social, Mosque for ibadah, Globe2 for
+ * geopolitik, etc.) — abstract enough that an unfamiliar reader can
+ * still pattern-match the row.
+ */
+const GROUP_THEME: Record<
+  string,
+  { tone: string; iconBg: string; iconText: string; Icon: typeof Scale }
+> = {
+  "Hukum & Keadilan": {
+    tone: "from-rose-50/80 to-white border-rose-200 hover:border-rose-500",
+    iconBg: "bg-rose-100",
+    iconText: "text-rose-700",
+    Icon: Scale,
+  },
+  "Sosial & Keluarga": {
+    tone: "from-pink-50/80 to-white border-pink-200 hover:border-pink-500",
+    iconBg: "bg-pink-100",
+    iconText: "text-pink-700",
+    Icon: Users2,
+  },
+  "Ekonomi & Bisnis": {
+    tone: "from-amber-50/80 to-white border-amber-200 hover:border-amber-500",
+    iconBg: "bg-amber-100",
+    iconText: "text-amber-700",
+    Icon: Banknote,
+  },
+  "Aqidah & Ibadah": {
+    tone:
+      "from-emerald-50/80 to-white border-emerald-200 hover:border-emerald-500",
+    iconBg: "bg-emerald-100",
+    iconText: "text-emerald-700",
+    Icon: Landmark, // mosque-ish silhouette; lucide doesn't ship a mosque glyph
+  },
+  "Kesehatan & Kehidupan": {
+    tone: "from-teal-50/80 to-white border-teal-200 hover:border-teal-500",
+    iconBg: "bg-teal-100",
+    iconText: "text-teal-700",
+    Icon: HeartPulse,
+  },
+  "Pendidikan & SDM": {
+    tone: "from-sky-50/80 to-white border-sky-200 hover:border-sky-500",
+    iconBg: "bg-sky-100",
+    iconText: "text-sky-700",
+    Icon: GraduationCap,
+  },
+  "Lingkungan & Bencana": {
+    tone: "from-lime-50/80 to-white border-lime-200 hover:border-lime-500",
+    iconBg: "bg-lime-100",
+    iconText: "text-lime-700",
+    Icon: Leaf,
+  },
+  "Pemerintahan & Kebijakan": {
+    tone:
+      "from-indigo-50/80 to-white border-indigo-200 hover:border-indigo-500",
+    iconBg: "bg-indigo-100",
+    iconText: "text-indigo-700",
+    Icon: LandPlot,
+  },
+  "Patologi Sosial Digital": {
+    tone:
+      "from-orange-50/80 to-white border-orange-200 hover:border-orange-500",
+    iconBg: "bg-orange-100",
+    iconText: "text-orange-700",
+    Icon: Smartphone,
+  },
+  "Teknologi & AI": {
+    tone:
+      "from-violet-50/80 to-white border-violet-200 hover:border-violet-500",
+    iconBg: "bg-violet-100",
+    iconText: "text-violet-700",
+    Icon: Cpu,
+  },
+  "Pekerja & Pertanian Rakyat": {
+    tone:
+      "from-yellow-50/80 to-white border-yellow-200 hover:border-yellow-500",
+    iconBg: "bg-yellow-100",
+    iconText: "text-yellow-700",
+    Icon: Wheat,
+  },
+  "Konflik & Geopolitik": {
+    tone: "from-red-50/80 to-white border-red-200 hover:border-red-500",
+    iconBg: "bg-red-100",
+    iconText: "text-red-700",
+    Icon: Globe2,
+  },
+  "Inspirasi & Kisah Pribadi": {
+    tone:
+      "from-fuchsia-50/80 to-white border-fuchsia-200 hover:border-fuchsia-500",
+    iconBg: "bg-fuchsia-100",
+    iconText: "text-fuchsia-700",
+    Icon: Heart,
+  },
+  "Toleransi & Lintas-Iman": {
+    tone: "from-cyan-50/80 to-white border-cyan-200 hover:border-cyan-500",
+    iconBg: "bg-cyan-100",
+    iconText: "text-cyan-700",
+    Icon: HandHeart,
+  },
+  Lainnya: {
+    tone: "from-slate-50/80 to-white border-slate-200 hover:border-slate-500",
+    iconBg: "bg-slate-100",
+    iconText: "text-slate-600",
+    Icon: Boxes,
+  },
+};
+
+const DEFAULT_THEME = GROUP_THEME["Lainnya"];
+
+/**
  * The /briefings hub's focal element — all 14 THEME_GROUPS rendered as
- * compact cards sorted by 7d post volume descending.
+ * colorful cards sorted by 7d post volume descending, each linking to
+ * the latest briefing for that group.
  *
- * Each card shows the group label + 7d post count. Groups that the
- * auto-pipeline has generated a briefing for (top-5 by volume each
- * Thursday) are marked with a "Briefing" badge and link straight to
- * /briefings/[slug]; the other 9 link to /groups/[slug] (topics +
- * recent posts, no full LLM briefing).
+ * Card content: per-group color tone + glyph, group label, 7d post
+ * count, and a trend chip showing +/- vs the prior 7d window. Groups
+ * that don't have a briefing yet still link to /briefings/[slug] (the
+ * detail route handles a no-briefing-yet placeholder); we never bounce
+ * to /groups/[slug] from this surface — that's the data-exploration
+ * page, not the briefing destination.
  *
- * 2026-06-08 redesign — replaces the prior 5-card preview-text layout
- * with a uniform compact grid so all 14 groups are visible at a glance
- * and the volume signal is the primary visual sort.
+ * Redesign log:
+ *   2026-06-08 — uniform compact grid sorted by volume, replaced 5-card
+ *     preview text layout.
+ *   2026-06-06 — per-group tones + glyphs + 7d-delta chip; every card
+ *     now points at the briefing route (no more statistic-page detour).
  */
 export async function BriefingsGrid({
   briefings,
@@ -29,7 +171,7 @@ export async function BriefingsGrid({
   locale,
 }: {
   briefings: Map<string, LatestBriefing>;
-  volumes: Map<string, number>;
+  volumes: Map<string, GroupVolume>;
   locale: string;
 }) {
   const t = await getTranslations("Briefing");
@@ -37,8 +179,8 @@ export async function BriefingsGrid({
 
   // Sort by 7d volume desc; ties fall back to canonical reading order.
   const sortedGroups = [...BRIEFING_GROUPS].sort((a, b) => {
-    const va = volumes.get(a) ?? 0;
-    const vb = volumes.get(b) ?? 0;
+    const va = volumes.get(a)?.current ?? 0;
+    const vb = volumes.get(b)?.current ?? 0;
     if (vb !== va) return vb - va;
     return BRIEFING_GROUPS.indexOf(a) - BRIEFING_GROUPS.indexOf(b);
   });
@@ -61,9 +203,6 @@ export async function BriefingsGrid({
           </div>
         </div>
 
-        {/* Note explaining the top-5 auto-generation model so a reader
-            seeing some cards with the "Briefing" badge and others
-            without doesn't think the latter are broken. */}
         <p className="mb-5 max-w-3xl rounded-2xl border border-slate-200 bg-slate-50/60 px-4 py-2.5 text-xs leading-relaxed text-slate-600">
           {t("hub_top_n_note")}
         </p>
@@ -71,40 +210,71 @@ export async function BriefingsGrid({
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {sortedGroups.map((group) => {
             const brief = briefings.get(group);
-            const volume = volumes.get(group) ?? 0;
+            const vol = volumes.get(group);
+            const current = vol?.current ?? 0;
+            const deltaPct = vol?.deltaPct ?? null;
             const groupSlug = slugifyGroup(group);
-            const hasBriefing = !!brief;
-            const href = hasBriefing
+            // Every card lands on the briefing route. If a briefing
+            // exists, use the date-stamped slug for direct latest-edition
+            // load; otherwise fall through to the bare group-slug, which
+            // the /briefings/[id] route resolves to "latest for this
+            // group" or renders a friendly "awaiting first briefing"
+            // placeholder. Never link to /groups/[slug] from here.
+            const href = brief
               ? `/briefings/${briefingSlug(brief.generatedAt, brief.themeGroup)}`
-              : `/groups/${groupSlug}`;
-
+              : `/briefings/${groupSlug}`;
+            const theme = GROUP_THEME[group] ?? DEFAULT_THEME;
+            const Icon = theme.Icon;
             return (
               <li key={group}>
                 <Link
                   href={href}
-                  className={`group relative flex h-full flex-col rounded-2xl border p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
-                    hasBriefing
-                      ? "border-emerald-200 bg-gradient-to-br from-emerald-50/40 to-white hover:border-emerald-500"
-                      : "border-slate-200 bg-white hover:border-slate-900"
-                  }`}
+                  className={`group relative flex h-full flex-col rounded-2xl border bg-gradient-to-br p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${theme.tone}`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <span
-                      className={`inline-flex h-7 w-7 items-center justify-center rounded-full ${
-                        hasBriefing
-                          ? "bg-emerald-100 text-emerald-700"
-                          : "bg-slate-100 text-slate-600"
-                      }`}
+                      className={`inline-flex h-8 w-8 items-center justify-center rounded-full ${theme.iconBg} ${theme.iconText}`}
                     >
-                      {hasBriefing ? (
-                        <Layers className="h-3.5 w-3.5" />
-                      ) : (
-                        <Compass className="h-3.5 w-3.5" />
-                      )}
+                      <Icon className="h-4 w-4" />
                     </span>
-                    {hasBriefing && (
-                      <span className="rounded-full bg-emerald-700 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-white">
-                        {t("hub_card_briefing_badge")}
+                    {/* Trend chip — +N% / -N% vs prior 7d. "Baru" when
+                        the group went from zero baseline to current
+                        activity (deltaPct === null with current > 0).
+                        Hidden entirely when there's no signal in either
+                        window so we don't show a meaningless "—". */}
+                    {(current > 0 || (vol?.previous ?? 0) > 0) && (
+                      <span
+                        className={`inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${
+                          deltaPct === null
+                            ? "bg-emerald-100 text-emerald-800"
+                            : deltaPct > 0
+                              ? "bg-emerald-100 text-emerald-800"
+                              : deltaPct < 0
+                                ? "bg-rose-100 text-rose-800"
+                                : "bg-slate-100 text-slate-700"
+                        }`}
+                        title={t("hub_card_delta_tooltip")}
+                      >
+                        {deltaPct === null ? (
+                          <>
+                            <Sparkles className="h-2.5 w-2.5" />
+                            {t("hub_card_delta_new")}
+                          </>
+                        ) : deltaPct > 0 ? (
+                          <>
+                            <TrendingUp className="h-2.5 w-2.5" />+{deltaPct}%
+                          </>
+                        ) : deltaPct < 0 ? (
+                          <>
+                            <TrendingDown className="h-2.5 w-2.5" />
+                            {deltaPct}%
+                          </>
+                        ) : (
+                          <>
+                            <Minus className="h-2.5 w-2.5" />
+                            0%
+                          </>
+                        )}
                       </span>
                     )}
                   </div>
@@ -112,22 +282,19 @@ export async function BriefingsGrid({
                     {group}
                   </h3>
                   <div className="mt-3 flex items-baseline gap-1.5">
-                    <TrendingUp className="h-3 w-3 shrink-0 text-slate-400" />
                     <span className="text-base font-bold tabular-nums text-slate-900">
-                      {nf.format(volume)}
+                      {nf.format(current)}
                     </span>
                     <span className="text-[10px] text-slate-500">
                       {t("hub_card_volume_unit")}
                     </span>
                   </div>
                   <div
-                    className={`mt-3 inline-flex items-center gap-1 text-[11px] font-semibold transition group-hover:gap-1.5 ${
-                      hasBriefing ? "text-emerald-700" : "text-slate-700"
-                    }`}
+                    className={`mt-3 inline-flex items-center gap-1 text-[11px] font-semibold transition group-hover:gap-1.5 ${theme.iconText}`}
                   >
-                    {hasBriefing
+                    {brief
                       ? t("hub_card_cta")
-                      : t("hub_card_explore_cta")}
+                      : t("hub_card_no_briefing_yet")}
                     <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
                   </div>
                 </Link>
