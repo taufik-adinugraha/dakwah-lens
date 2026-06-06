@@ -26,8 +26,10 @@ export const HeroAyat: FlyerLayoutComponent = ({
       : daleel.translation_id || daleel.translation_en || ""
     : "";
   const transLen = translation.length;
+  // Bumped 2026-06-06 to match QuoteCard — the old floor (15px) was
+  // dwarfed by the message body on the 1080×1080 canvas.
   const transSize =
-    transLen < 240 ? 22 : transLen < 360 ? 19 : transLen < 440 ? 17 : 15;
+    transLen < 220 ? 28 : transLen < 320 ? 24 : transLen < 440 ? 21 : transLen < 560 ? 19 : 17;
 
   const headlineSize =
     headline.length < 18 ? "108px" : headline.length < 28 ? "92px" : "76px";

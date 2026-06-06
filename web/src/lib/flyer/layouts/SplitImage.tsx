@@ -25,8 +25,9 @@ export const SplitImage: FlyerLayoutComponent = ({
       : daleel.translation_id || daleel.translation_en || ""
     : "";
   const transLen = translation.length;
+  // Bumped 2026-06-06 — see QuoteCard for rationale.
   const transSize =
-    transLen < 240 ? 19 : transLen < 380 ? 17 : transLen < 480 ? 16 : 14;
+    transLen < 220 ? 25 : transLen < 320 ? 22 : transLen < 440 ? 19 : transLen < 560 ? 17 : 15;
 
   const isHorizontalSplit = layoutVariant !== 2;
   const isPhotoLeft = layoutVariant === 0;

@@ -84,10 +84,19 @@ const FORMAT_REFERENCE_RE = /\b(?:mari kita tutup|kita tutup|khutbah ini|kajian 
  *  script when its prose is lifted into the flyer message. */
 const STAGE_CUE_RE = /\(visual:|\(scene:|\(transisi|\(b-roll|\(teks (?:di|akhir|layar)/i;
 
+/** Sentence fragments that read as the WIND-UP to an inline citation:
+ *  "...Allah Ta'ala dalam QS." / "...Rasulullah ﷺ bersabda:" /
+ *  "...berfirman:" — only meaningful if the ayat / Arabic that follows
+ *  actually renders. When the next sentence is Arabic-heavy and gets
+ *  dropped by isArabicHeavy, this wind-up turns into a dangling stub
+ *  ("Allah Ta'ala dalam QS.") that the flyer should NOT show. */
+const CITATION_LEADIN_RE =
+  /(?:dalam\s+(?:QS|HR|Hadits)\.?\s*$|berfirman\s*[:：]?\s*$|bersabda\s*[:：]?\s*$|berkata\s*[:：]?\s*$|menyebutkan\s*[:：]?\s*$|mengatakan\s*[:：]?\s*$|firman\s+Allah\s*[:：]?\s*$|sabda\s+(?:Nabi|Rasulullah)[^.]{0,40}[:：]?\s*$|Allah\s+(?:Ta'ala|SWT|swt)\s+(?:dalam|berfirman)[^.]{0,30}\s*$)/i;
+
 /** Trim a body block to ~3-4 short sentences, capped at maxChars.
  *  Drops Arabic-heavy passages, drops sentences with deliverable
- *  format references, drops stage cues. Result is suitable for a
- *  standalone flyer message. */
+ *  format references, drops stage cues, drops orphaned citation
+ *  lead-ins. Result is suitable for a standalone flyer message. */
 function trimToSentences(raw: string, targetSentences = 3, maxChars = 320): string {
   const clean = stripMd(raw);
   if (isArabicHeavy(clean)) return "";
@@ -97,7 +106,16 @@ function trimToSentences(raw: string, targetSentences = 3, maxChars = 320): stri
   // ended up showing "menabung Rp 1." — meaningless. Protect numeric
   // periods with a private-use placeholder, split, then restore.
   const SEP = "\uE000";
-  const protectedText = clean.replace(/(\d)\.(?=\d)/g, `$1${SEP}`);
+  let protectedText = clean.replace(/(\d)\.(?=\d)/g, `$1${SEP}`);
+  // Citation abbreviations carry a trailing dot in Indonesian dakwah
+  // prose ("Allah Ta'ala dalam QS. Al-Baqarah: 2 berfirman..."). Without
+  // protection, the split treats that dot as a sentence end → the
+  // Arabic-heavy follow-up gets dropped by isArabicHeavy → flyer body
+  // ends mid-bridge as "...Allah Ta'ala dalam QS." (real regression).
+  protectedText = protectedText.replace(
+    /\b(QS|HR|Hadits|Sahih|Riyad|Bulugh|Hisnul|Surat|Surah|hlm|Jilid|Vol|Bab|No)\.(?=\s|[A-Z0-9])/gi,
+    `$1${SEP}`,
+  );
   const sentences = (protectedText.match(/[^.!?]+[.!?]+/g) ?? [protectedText]).map(
     (s) => s.replace(new RegExp(SEP, "g"), "."),
   );
@@ -108,6 +126,21 @@ function trimToSentences(raw: string, targetSentences = 3, maxChars = 320): stri
     if (isArabicHeavy(s)) continue;
     if (FORMAT_REFERENCE_RE.test(s)) continue;
     if (STAGE_CUE_RE.test(s)) continue;
+    // Citation lead-in handling. A sentence like "...Allah Ta'ala dalam
+    // QS. Al-Baqarah: 2 berfirman:" is meaningful only if the ayat
+    // that follows actually lands. When the next sentence is Arabic-
+    // heavy / format-ref / would overflow, the lead-in is orphaned and
+    // reads as truncated prose ("...dalam QS."). Drop it in that case.
+    if (CITATION_LEADIN_RE.test(s.trim())) {
+      const peek = sentences[i + 1];
+      const peekRenderable =
+        peek &&
+        !isArabicHeavy(peek) &&
+        !FORMAT_REFERENCE_RE.test(peek) &&
+        !STAGE_CUE_RE.test(peek) &&
+        (out + " " + s + " " + peek).trim().length <= maxChars;
+      if (!peekRenderable) continue;
+    }
     const next = (out + " " + s).trim();
     if (next.length > maxChars && out.length > 0) break;
     out = next;

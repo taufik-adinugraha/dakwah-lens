@@ -486,13 +486,20 @@ ATURAN AKURASI SITASI (KRITIS untuk Pesan Flyer 6 + 5): teks Arab yang Anda tuli
 
 ATURAN VARIASI ANTAR-KELOMPOK (untuk operator yang generate briefing 14-kelompok sekaligus): briefing untuk pekan yang sama tetapi KELOMPOK TEMA berbeda WAJIB pakai du'a Pesan Flyer 6 yang BERBEDA — flyer Doa Pekan Ini muncul berdampingan di gallery publik, jadi semua sama akan terlihat malas. PILIH du'a yang paling relevan dengan TOPIC_GROUP (mis. Hukum & Keadilan → du'a istiqomah & keadilan, Sosial & Keluarga → du'a sabar + keluarga seperti Taa-Haa:130 atau Al-Kahf:28, Aqidah & Ibadah → dzikir pagi-petang yang dalam, Pekerja & Pertanian Rakyat → du'a rezeki halal, Konflik & Geopolitik → du'a tolong-menolong umat). Kalau pool overlap antar-kelompok, prioritaskan kelompok yang punya pool sempit, biarkan kelompok lain pakai opsi yang tersisa.
 
-LARANGAN MUTLAK pada keempat paragraf:
-- JANGAN tulis "mari kita tutup khutbah ini" / "khutbah pertama" / "khutbah ini"
-- JANGAN tulis "diskusi malam ini" / "diskusi ini" / "kajian ini" / "sesi ini"
-- JANGAN tulis "thanks guys" / "ma'asyiral muslimin" / "hadirin" / "jamaah" / "sidang Jumat"
-- JANGAN tulis "video ini" / "reel ini" / "caption ini" / "outline ini"
-- JANGAN tulis "Bagian ini" / "Strategi & Aksi Dakwah" — flyer tidak tahu tentang struktur briefing
-- JANGAN buka dengan "Pekan ini, percakapan menyoroti..." atau bahasa stats-narration lainnya
+LARANGAN MUTLAK pada keenam paragraf:
+- JANGAN PERNAH menyebut format dakwah (khutbah / khotbah / Jumat / jamaah / hadirin / sidang / kajian / majelis / diskusi / video / reel / caption / outline). Flyer ini DIBACA TERPISAH oleh follower IG/WA yang tidak tahu apa-apa tentang khutbah Jumat ini. Setiap referensi ke deliverable lain MEMBINGUNGKAN pembaca. JANGAN tulis "Khotbah Jumat ini mengingatkan", "Pada khutbah pekan ini", "Diskusi malam ini", "Pada kajian ini", "Video ini", "Reel ini", "Caption ini", "Outline ini", "thanks guys", "ma'asyiral muslimin", "Bagian ini", "Strategi & Aksi Dakwah".
+- JANGAN PERNAH menyisipkan citation atau ayat secara INLINE di paragraf. Daleel tidak diketik di prose — daleel sudah ada di marker `**Dalil:**` di atas paragraf, dan renderer akan menampilkannya secara visual di flyer. Setiap pola "Allah Ta'ala dalam QS. X: Y berfirman: '...'" / "Rasulullah ﷺ bersabda: '...'" / "Hadits Bukhari N menyebut: '...'" / "Firman Allah:" / Arabic text apa pun di body — DILARANG. Body paragraf 100% prose Indonesia, TANPA Arabic, TANPA citation marker, TANPA "berfirman/bersabda + kutipan". KECUALI: Flyer 5 (Ajakan Sunnah) boleh memuat 1 baris du'a Arab pendek + terjemahan singkat sebagai PENUTUP, dan Flyer 6 (Du'a Pekan Ini) WAJIB memuat 1 du'a Arab pendek + terjemahan. Flyer 1, 2, 3, 4 — ZERO Arabic + ZERO citation inline.
+- JANGAN buka dengan "Pekan ini, percakapan menyoroti..." atau bahasa stats-narration lainnya.
+
+CONTOH JEBAKAN NYATA (jangan tiru — kalimat-kalimat ini muncul di briefing produksi 2026-06-06 dan menyebabkan flyer ter-truncate):
+- ❌ "Khotbah Jumat ini mengingatkan: amanah bukan beban menteri saja." → menyebut "Khotbah Jumat" (referensi deliverable). REWRITE: "Amanah bukan beban menteri saja — setiap pegawai punya satu pos amanah yang tidak boleh dikhianati."
+- ❌ "Allah Ta'ala dalam QS. Hud: 85 berfirman lewat Nabi Syu'aib: 'Cukupkanlah takaran...'" → inline citation + inline ayat translation. Renderer akan menampilkan dalil otomatis dari marker `**Dalil:**`, JANGAN duplikasi di prose. REWRITE: hapus seluruh kalimat ini, biarkan dalil tampil di footer flyer saja.
+- ❌ "Sahih Muslim 6577: 'Kezaliman adalah kegelapan pada Hari Kiamat.'" → inline hadits citation + terjemahan. REWRITE: hapus, paragraf cukup menyatakan prinsip ("kezaliman menggelapkan masa depan kita") tanpa quote.
+
+URUTAN TULIS YANG BENAR untuk setiap flyer (1-4):
+1. Tulis marker `**Headline:**` dan `**Dalil:**` di atas (dalil = citation pool entry SAJA, bukan diterjemahkan)
+2. Tulis paragraf 70-90 kata yang BERDIRI SENDIRI: fakta spesifik pekan ini → masalah → solusi konkret
+3. Paragraf TIDAK MENYINGGUNG dalil, tidak menyebut "Allah berfirman", tidak menyebut "Rasulullah bersabda". Pembaca akan melihat dalil di footer flyer secara visual — prose hanya memberi konteks situasi + solusi.
 
 YANG WAJIB ADA di setiap paragraf, TIGA komponen BERURUTAN:
 (1) FAKTA — satu kalimat fakta spesifik dari situasi pekan ini (lokasi/pelaku/korban/angka), dicocokkan dengan sample_headlines yang Anda terima. Bukan framing emosional kosong, bukan stats-narration.
@@ -501,7 +508,7 @@ YANG WAJIB ADA di setiap paragraf, TIGA komponen BERURUTAN:
 Dalil yang di-tag WAJIB MENOPANG argumen ini — mendukung prinsip di balik solusi, bukan sekadar berbagi satu kata kunci dengan fakta. Suara aktif, kalimat pendek, tanpa istilah teknis briefing.
 
 ### Pesan Flyer 1 — Suara Khutbah (~75 kata)
-Sudut: refleksi spiritual + langkah audit-diri. Tone: tenang, observatif, ajak. Audiens: dewasa, jamaah masjid. JANGAN gunakan kata "khutbah", "jamaah", "hadirin", "sidang Jumat" — flyer ini berdiri sendiri.
+Sudut: refleksi spiritual + langkah audit-diri DEWASA. Tone: tenang, observatif, ajak. Audiens: pembaca dewasa di feed IG/WA — BUKAN jamaah yang sedang duduk di masjid. JANGAN tulis kata "khutbah", "khotbah", "jamaah", "hadirin", "sidang Jumat", "ma'asyiral muslimin", "Jumat ini", "pekan ini di mimbar", "khotbah pekan ini mengingatkan", "khotbah ini mengajak". Label slot "Suara Khutbah" adalah INFO INTERNAL — pembaca flyer tidak tahu (dan tidak perlu tahu) bahwa konten ini lahir dari draft khutbah. Tulis seolah Anda sedang menulis caption refleksi yang siap di-share, BUKAN ringkasan khutbah.
 
 ### Pesan Flyer 2 — Suara Aksi Sosial (~75 kata)
 Sudut: panggilan aksi lingkungan kecil. Tone: konkret, langsung. Audiens: pengurus RT, takmir, karang taruna, ibu PKK. Sebut secara ringkas: ini bisa dimulai di mana (lingkungan terdekat — RT/masjid/keluarga), oleh siapa (orang biasa, bukan tunggu kementerian), dengan langkah apa (satu tindakan kecil yang nyata).

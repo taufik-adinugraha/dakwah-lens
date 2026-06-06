@@ -74,7 +74,7 @@ export function Citation({
         style={{ backgroundColor: color }}
       />
       <span
-        className="text-[15px] font-extrabold uppercase leading-tight tracking-[0.12em]"
+        className="text-[20px] font-extrabold uppercase leading-tight tracking-[0.12em]"
         style={{ color }}
       >
         {citation}

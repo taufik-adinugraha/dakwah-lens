@@ -383,7 +383,7 @@ export function BriefDeliverableCards({
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         {orderedCards.map((card, i) => {
           const briefSlug = briefBasePath.replace(
-            /^\/?(?:[a-z]{2}\/)?insights\/brief\//,
+            /^\/?(?:[a-z]{2}\/)?(?:insights\/brief|briefings)\//,
             "",
           );
           // Mahasiswa (genz) lives on its own canonical /m/{slug} URL
@@ -414,7 +414,7 @@ export function BriefDeliverableCards({
       {openIndex !== null && orderedCards[openIndex] && (() => {
         const openCard = orderedCards[openIndex];
         const briefSlug = briefBasePath.replace(
-          /^\/?(?:[a-z]{2}\/)?insights\/brief\//,
+          /^\/?(?:[a-z]{2}\/)?(?:insights\/brief|briefings)\//,
           "",
         );
         const modalPageUrl = !openCard.kind

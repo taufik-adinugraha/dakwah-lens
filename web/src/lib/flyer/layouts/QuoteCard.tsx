@@ -26,8 +26,12 @@ export const QuoteCard: FlyerLayoutComponent = ({
       : daleel.translation_id || daleel.translation_en || ""
     : "";
   const transLen = translation.length;
+  // Bumped 2026-06-06 — daleel on a 1080×1080 flyer was reading much
+  // smaller than the message body, undermining the citation's weight.
+  // Floor lifted from 15px → 18px and the short-translation step from
+  // 22px → 28px so the daleel sits within visual reach of the body.
   const transSize =
-    transLen < 280 ? 22 : transLen < 440 ? 19 : transLen < 560 ? 17 : 15;
+    transLen < 220 ? 30 : transLen < 320 ? 26 : transLen < 460 ? 22 : transLen < 580 ? 20 : 18;
 
   const bgStops = palette.bgGradient;
   const bgStyle = {
