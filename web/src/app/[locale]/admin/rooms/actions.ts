@@ -322,11 +322,24 @@ export async function listRoomOverviews(): Promise<RoomOverview[]> {
   // show one card per logical room, not one per row. Without this
   // dedupe, a room regenerated 5× appears as 5 separate "dormant"
   // entries with identical slugs.
+  // SQL slugify mirrors `slugifyGroup` in dashboard-metrics.ts +
+  // `slugify_group` in api/services/theme_groups.py — kebab-cases the
+  // theme_group label so the briefing_slug matches the canonical
+  // URL shape (`hukum-keadilan`, not raw `Hukum & Keadilan`).
+  const slugifyTheme = sql`regexp_replace(
+    trim(
+      regexp_replace(
+        regexp_replace(lower(COALESCE(theme_group, 'all')), '\\s*&\\s*', ' ', 'g'),
+        '[^a-z0-9-]+', ' ', 'g'
+      )
+    ),
+    '\\s+', '-', 'g'
+  )`;
   const rows = (await db.execute(sql`
     WITH latest_briefings AS (
       SELECT DISTINCT ON (briefing_slug)
         to_char(generated_at AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD')
-          || '-' || COALESCE(theme_group, 'all') AS briefing_slug,
+          || '-' || ${slugifyTheme} AS briefing_slug,
         theme_group AS segment,
         generated_at
       FROM briefings

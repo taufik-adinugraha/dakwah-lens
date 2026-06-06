@@ -63,6 +63,21 @@ export async function listPublicRoomOverviews(
     last_activity_at: Date | string | null;
     muted: boolean;
   };
+  // SQL slugify mirrors `slugifyGroup` in dashboard-metrics.ts +
+  // `slugify_group` in api/services/theme_groups.py — keep all three
+  // in sync. Without this, `theme_group = 'Hukum & Keadilan'` was
+  // landing in the slug raw (spaces + &), producing /m/2026-06-06-
+  // Hukum%20&%20Keadilan URLs that 404'd because `GROUP_BY_SLUG`
+  // only has the kebab "hukum-keadilan".
+  const slugifyTheme = sql`regexp_replace(
+    trim(
+      regexp_replace(
+        regexp_replace(lower(COALESCE(theme_group, 'all')), '\\s*&\\s*', ' ', 'g'),
+        '[^a-z0-9-]+', ' ', 'g'
+      )
+    ),
+    '\\s+', '-', 'g'
+  )`;
   // CTE picks the freshest briefing per (WIB-date, segment) — same
   // dedup as the admin query — and surfaces the summary_md so the
   // post-query extractor can pull the discussion title without a
@@ -71,7 +86,7 @@ export async function listPublicRoomOverviews(
     WITH latest_briefings AS (
       SELECT DISTINCT ON (briefing_slug)
         to_char(generated_at AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD')
-          || '-' || COALESCE(theme_group, 'all') AS briefing_slug,
+          || '-' || ${slugifyTheme} AS briefing_slug,
         theme_group AS segment,
         generated_at,
         summary_md

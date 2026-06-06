@@ -581,15 +581,23 @@ export async function getBriefingBySlug(
   const dateRe = /^(\d{4}-\d{2}-\d{2})-(.+)$/;
   const m = slug.match(dateRe);
 
+  // Tolerate legacy / hand-typed URLs that carry the raw group label
+  // ("Hukum & Keadilan") instead of the kebab slug ("hukum-keadilan").
+  // The slug-builder bug in discussions-data + admin/rooms was fixed
+  // separately; this lookup-side fallback covers stale bookmarks +
+  // copy-paste links from earlier sessions.
+  const resolveGroup = (raw: string): string | undefined =>
+    GROUP_BY_SLUG[raw] ?? GROUP_BY_SLUG[slugifyGroup(raw)];
+
   let group: string | undefined;
   let dateClause = sql``;
   if (m) {
     const [, date, groupSlug] = m;
-    group = GROUP_BY_SLUG[groupSlug];
+    group = resolveGroup(groupSlug);
     if (!group) return null;
     dateClause = sql`AND (generated_at AT TIME ZONE 'Asia/Jakarta')::date = ${date}::date`;
   } else {
-    group = GROUP_BY_SLUG[slug];
+    group = resolveGroup(slug);
     if (!group) return null;
     // No date clause — pick the latest briefing for this group.
   }
