@@ -341,7 +341,14 @@ STRUKTUR WAJIB:
   * Pisahkan tiap fasal dengan satu baris kosong + horizontal rule `---`.
   Tujuan blok ini agar pembaca yang ingin memverifikasi atau membaca konteks lebih luas punya teks aslinya langsung di akhir kisah, tanpa harus mencari ke kitab.
 
-NADA: bercerita seperti seorang nenek yang mahir mendongeng cucunya — hangat, sabar, jelas, tidak terburu-buru. Pembaca yang tergesa-gesa harus tetap merasa peristiwa ini ZAMAN itu DEKAT ke dirinya. Hindari bahasa khutbah formal ("Wahai sekalian manusia", "marilah kita renungkan") di sepanjang kisah — gunakan hanya di sub-section Pelajaran. Gunakan **kamu** untuk kata ganti orang kedua (bukan "engkau", kecuali memang kutipan teks Arab), supaya pembaca generasi sekarang merasa diajak ngobrol.
+NADA: bercerita seperti SEORANG NARATOR pihak ketiga yang menulis cerpen sejarah — bukan dai/khatib yang sedang berdiri di mimbar mengajak jamaah. Pembaca yang tergesa-gesa harus tetap merasa peristiwa ini ZAMAN itu DEKAT ke dirinya.
+
+LARANGAN VOICE (KRITIS, berlaku untuk SELURUH Kisah Pendek dari Pembuka sampai Klimaks — Pelajaran boleh sedikit beralih ke "kita"):
+- JANGAN PERNAH membuka dengan "Hadirin yang dimuliakan Allah", "Jamaah yang saya hormati", "Izinkan saya menceritakan", "Saya akan bercerita", "Mari kita simak" — itu voice kultum/khutbah. Pembaca masuk ke Kisah Pendek lewat klik tab di feed atau kartu briefing, bukan lewat duduk di majelis.
+- JANGAN memanggil pembaca langsung ("Hadirin sekalian, perhatikan bahwa Rasulullah ﷺ…", "Saudara-saudara, lihatlah bagaimana…", "Coba bayangkan, hadirin…") — pertahankan jarak naratif. Pembaca diam mengikuti; narator menggerakkan kamera.
+- JANGAN gunakan kata "kita" / "Anda" / "engkau" di Pembuka, Latar, Inti, atau Klimaks. Tokoh-tokoh di dalam kisah berbicara satu sama lain (boleh "engkau" antar tokoh dalam dialog historis); narator tidak berbicara ke pembaca.
+- BUKA dengan SETTING atau TOKOH atau ATMOSFER — bukan dengan salam atau permohonan izin. Contoh GOOD: "Di sebuah musim panas yang terik di Damaskus, suasana di istana khalifah baru saja berubah." Contoh BAD: "Hadirin yang dimuliakan Allah, izinkan saya menceritakan satu kisah…"
+- Di sub-section "Pelajaran dari Kisah Ini" SAJA boleh sedikit beralih ke voice yang lebih dekat ke pembaca ("kita") supaya pelajaran tertanam — tapi tetap bukan voice khutbah; lebih ke voice esais yang mengamati bersama pembaca.
 
 PANJANG: target ~1800-2200 kata untuk waktu baca 10 menit. JANGAN lebih pendek — pembaca tidak bisa "hanyut" dalam <1500 kata. JANGAN melebar ke >2200 — kisah jadi melar.
 
