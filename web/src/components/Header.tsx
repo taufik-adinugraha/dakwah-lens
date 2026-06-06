@@ -102,21 +102,17 @@ export async function Header() {
 
           <div className="flex items-center gap-1.5 sm:gap-2">
             <LocaleSwitcher />
-            {user?.email ? (
+            {user?.email && (
               <UserMenu
                 email={user.email}
                 name={user.name}
                 status={user.status ?? "pending"}
                 role={user.role ?? "user"}
               />
-            ) : (
-              <Link
-                href="/login"
-                className="inline-flex h-8 items-center rounded-full bg-slate-900 px-3.5 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-800 sm:h-9 sm:px-4 sm:text-sm"
-              >
-                {t("login")}
-              </Link>
             )}
+            {/* Anonymous-visitor login button intentionally hidden 2026-06-06
+                while signups are paused / product is admin-only. The /login
+                route still works for direct-URL access by operators. */}
           </div>
         </div>
       </div>

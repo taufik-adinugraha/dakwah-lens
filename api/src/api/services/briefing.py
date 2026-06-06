@@ -182,8 +182,8 @@ CRITICAL — TOPIC_GROUP SCOPE: baca TOPIC_GROUP di input. Briefing ini fokus pa
 - Verba observasional ("menyoroti", "memetakan", "menunjukkan", "tercermin dari", "menenun"), bukan perintah ("wajib", "harus", "pentingnya").
 - HANYA pola yang berakar di pool sample_headlines. JANGAN mengarang cerita atau mengangkat tema yang tidak hadir di data.
 
-## Poin Kunci untuk Da'i Senior (180-260 kata)
-Ringkasan padat untuk da'i senior yang sudah membaca berita pekan ini dan tidak butuh narasi panjang — hanya ingin daftar persoalan + handle praktis. JANGAN ulang narasi prosa "Tema Utama"; di sini struktur sengaja BERBEDA: hanya bullet, tiap bullet berdiri sendiri.
+## Poin Kunci (180-260 kata)
+Ringkasan padat untuk pembaca yang sudah membaca berita pekan ini dan tidak butuh narasi panjang — hanya ingin daftar persoalan + handle praktis. JANGAN ulang narasi prosa "Tema Utama"; di sini struktur sengaja BERBEDA: hanya bullet, tiap bullet berdiri sendiri.
 
 FORMAT WAJIB (markdown list `- `):
 - 4 sampai 6 poin. Tidak lebih, tidak kurang.
@@ -608,8 +608,8 @@ CRITICAL — TOPIC_GROUP SCOPE: read TOPIC_GROUP in the input. This briefing cov
 - Prefer observation verbs ("highlights", "maps", "tracks", "surfaces") over command verbs ("must", "should", "the importance of")
 - Only use headlines from the pool I provide. Do NOT invent stories.
 
-## Key Points for Senior Da'i (180-260 words)
-A dense bullet list for senior da'i who already follow the news and don't need the prose — they want the list of problems + practical handles. Do NOT repeat the "Main Themes" prose; the structure here is intentionally DIFFERENT: bullets only, each bullet stands alone.
+## Key Points (180-260 words)
+A dense bullet list for readers who already follow the news and don't need the prose — they want the list of problems + practical handles. Do NOT repeat the "Main Themes" prose; the structure here is intentionally DIFFERENT: bullets only, each bullet stands alone.
 
 REQUIRED FORMAT (markdown list `- `):
 - 4 to 6 points. No more, no less.
