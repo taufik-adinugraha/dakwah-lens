@@ -378,6 +378,42 @@ async def cmd_save(group_arg: str, markdown_path: str) -> None:
     except Exception as exc:
         sys.stderr.write(f"⚠ Validation pass failed (non-fatal): {exc}\n")
 
+    # HARD BLOCK: flyer Dalil markers that don't exist in the saved
+    # pool render with the WRONG daleel — the flyer renderer silently
+    # falls back to pickFlyerDaleel(rank) when the citation lookup
+    # misses. That ships mis-attributed daleel to production.
+    #
+    # Real bug surfaced 2026-06-07: chained `dump → save` re-ran dump
+    # between writing and saving, re-retrieving a different pool from
+    # Qdrant. Operator's brief was tagged against pool A; save stored
+    # pool B; renderer used pool B and rendered the wrong daleel for
+    # ~55% of flyers across all briefings.
+    #
+    # Fail early here so the operator notices BEFORE the briefing
+    # ships. Other warnings stay non-fatal (informational).
+    pool_warnings = [
+        w for w in heuristic_warnings
+        if w.get("kind") == "flyer_dalil_not_in_pool"
+    ]
+    if pool_warnings:
+        sys.stderr.write(
+            "\n✗ SAVE BLOCKED — flyer Dalil markers reference citations "
+            "NOT in the saved daleel/adhkar pool. The renderer would "
+            "silently render the wrong daleel on those flyers.\n\n"
+        )
+        for w in pool_warnings:
+            sys.stderr.write(f"  · {w['where']}: {w['message']}\n")
+        sys.stderr.write(
+            "\n  Fix options:\n"
+            "    (a) Edit the brief's `**Dalil:**` markers to use "
+            "citations from the actual stored pool (re-run "
+            "`dump` to see the current pool), OR\n"
+            "    (b) Replace the offending `**Dalil:**` line with "
+            "'`**Dalil:** —`' to skip the daleel card.\n\n"
+            "  Save aborted. No row written.\n"
+        )
+        raise SystemExit(1)
+
     async with SessionLocal() as session:
         row = Briefing(
             generated_at=datetime.now(UTC),

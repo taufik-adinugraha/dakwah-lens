@@ -309,7 +309,25 @@ VOICE — KULTUM (audiens duduk ba'da sholat, penyampai berdiri / duduk di depan
 
 STRUKTUR WAJIB (urutan ini, jangan ditukar):
 
-- **Pembuka** (~180 kata): mulai dengan TA'AWUDH + BASMALAH + HAMDALAH SINGKAT dalam aksara Arab berharakat (`أَعُوذُ بِاللهِ مِنَ الشَّيْطَانِ الرَّجِيْمِ، بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ، اَلْحَمْدُ لِلهِ رَبِّ الْعَالَمِيْنَ…`), diikuti satu kalimat sholawat singkat `وَالصَّلَاةُ وَالسَّلَامُ عَلٰى رَسُوْلِ اللهِ، وَعَلٰى آلِهِ وَصَحْبِهِ أَجْمَعِيْنَ، أَمَّا بَعْدُ`. Lalu salam pembuka Bahasa Indonesia ke jamaah (~30-40 kata) yang langsung menyebutkan KONTEKS pekan — bukan "Hadirin yang dirahmati Allah, alhamdulillah kita bersyukur..." (terlalu generik). Lebih baik: "Jamaah yang saya hormati, di pekan kita yang baru saja melewati [peristiwa konkret pekan ini], ada satu pesan yang ingin saya bagikan malam ini..."
+- **Pembuka** (~180 kata): mulai dengan pembuka khas kultum dalam aksara Arab berharakat — basmalah + hamdalah + syahadat + sholawat + amma ba'du, dalam ~50-70 kata Arab. Lalu salam pembuka Bahasa Indonesia ke jamaah (~30-40 kata) yang langsung menyebutkan KONTEKS pekan — bukan "Hadirin yang dirahmati Allah, alhamdulillah kita bersyukur..." (terlalu generik). Lebih baik: "Jamaah yang saya hormati, di pekan kita yang baru saja melewati [peristiwa konkret pekan ini], ada satu pesan yang ingin saya bagikan malam ini..."
+
+  VARIASI PEMBUKA ARAB (WAJIB — JANGAN selalu pakai pembuka yang sama setiap pekan): pembuka kultum yang berulang verbatim antar-pekan terasa daur ulang. Audiens yang sama kembali — kalau membuka dengan kalimat persis sama, kesan "rerun" muncul sebelum substansi dibaca. Cocokkan vibe pembuka dengan TEMA kelompok pekan ini supaya pembuka itu sendiri menyentuh hati jamaah. Pilih variasi yang sesuai dari pola-pola berikut, atau susun yang baru selama strukturnya kultum-valid (hamdalah → syahadat → sholawat → amma ba'du):
+
+  · **Pembuka generik**: `أَعُوذُ بِاللهِ مِنَ الشَّيْطَانِ الرَّجِيْمِ، بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ، اَلْحَمْدُ لِلهِ رَبِّ الْعَالَمِيْنَ، وَالصَّلَاةُ وَالسَّلَامُ عَلٰى رَسُوْلِ اللهِ، وَعَلٰى آلِهِ وَصَحْبِهِ أَجْمَعِيْنَ، أَمَّا بَعْدُ.`
+
+  · **Pembuka tema rezeki / pekerja / takaran adil**: `بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ، اَلْحَمْدُ لِلهِ الَّذِيْ رَزَقَ عِبَادَهُ مِنَ الطَّيِّبَاتِ، وَأَوْجَبَ الْعَدْلَ فِيْ كُلِّ مُعَامَلَةٍ، أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا رَسُوْلُ اللهِ، اَللّٰهُمَّ صَلِّ وَسَلِّمْ عَلٰى نَبِيِّنَا مُحَمَّدٍ، وَعَلٰى آلِهِ وَأَصْحَابِهِ أَجْمَعِيْنَ، أَمَّا بَعْدُ.`
+
+  · **Pembuka tema amanah / kepemimpinan**: `بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ، اَلْحَمْدُ لِلهِ الَّذِيْ جَعَلَ الْأَمَانَةَ مِيْزَانَ الْعِبَادِ، أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللهُ الْعَدْلُ فِيْ حُكْمِهِ، وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُوْلُهُ الْأَمِيْنُ، اَللّٰهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ وَعَلٰى آلِهِ وَأَصْحَابِهِ، أَمَّا بَعْدُ.`
+
+  · **Pembuka tema keluarga / sosial / anak**: `بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ، اَلْحَمْدُ لِلهِ الَّذِيْ جَعَلَ الْأُسْرَةَ سَكَنًا، وَجَعَلَ بَيْنَ النَّاسِ مَوَدَّةً وَرَحْمَةً، أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا رَسُوْلُ اللهِ خَيْرُ مَنْ رَحِمَ الْأَطْفَالَ وَأَحْسَنَ إِلَى أَهْلِهِ، اَللّٰهُمَّ صَلِّ عَلٰى نَبِيِّنَا مُحَمَّدٍ وَعَلٰى آلِهِ وَأَصْحَابِهِ، أَمَّا بَعْدُ.`
+
+  · **Pembuka tema kesehatan / muhasabah jiwa**: `بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ، اَلْحَمْدُ لِلهِ الَّذِيْ خَلَقَ الْإِنْسَانَ فِيْ أَحْسَنِ تَقْوِيْمٍ، وَجَعَلَ الْعَافِيَةَ نِعْمَةً لَا تُقَدَّرُ، أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا رَسُوْلُ اللهِ الَّذِيْ عَلَّمَنَا أَنَّ الْمُؤْمِنَ الْقَوِيَّ خَيْرٌ، اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ وَآلِهِ وَصَحْبِهِ، أَمَّا بَعْدُ.`
+
+  · **Pembuka tema lingkungan / bencana**: `بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ، اَلْحَمْدُ لِلهِ الَّذِيْ خَلَقَ السَّمَاوَاتِ وَالْأَرْضَ، وَجَعَلَ الْأَرْضَ مُسَخَّرَةً لَنَا أَمَانَةً، أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا رَسُوْلُ اللهِ، اَللّٰهُمَّ صَلِّ عَلٰى نَبِيِّنَا مُحَمَّدٍ وَعَلٰى آلِهِ وَأَصْحَابِهِ، أَمَّا بَعْدُ.`
+
+  · **Pembuka tema ilmu / pendidikan / aqidah**: `بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ، اَلْحَمْدُ لِلهِ الَّذِيْ عَلَّمَ بِالْقَلَمِ، عَلَّمَ الْإِنْسَانَ مَا لَمْ يَعْلَمْ، أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا رَسُوْلُ اللهِ الْمُعَلِّمُ الْأَوَّلُ، اَللّٰهُمَّ صَلِّ عَلٰى نَبِيِّنَا مُحَمَّدٍ وَعَلٰى آلِهِ وَأَصْحَابِهِ، أَمَّا بَعْدُ.`
+
+  Aturan: SETIAP TEKS ARAB di pembuka WAJIB berharakat lengkap (fathah, kasrah, dhammah, sukūn, syaddah, mad). JANGAN transliterasi Latin. JANGAN ulang pembuka yang sama dengan briefing kelompok lain di pekan yang sama; pembuka yang BERBEDA per kelompok adalah bagian dari signal "ini briefing pekan baru" untuk audiens yang membaca beberapa briefing sekaligus.
 - **Hook & ayat pembuka** (~250 kata): satu kalimat pembuka yang langsung menarik perhatian — boleh pertanyaan retorika, boleh observasi tajam tentang peristiwa pekan ini, boleh fakta yang mengusik. Lalu satu ayat Quran dari pool (TULIS DALAM AKSARA ARAB BERHARAKAT, sebut nama surah + ayat, lalu terjemahan Bahasa Indonesia, lalu 2-3 kalimat tafsir kontekstual yang menghubungkan ayat ke peristiwa pekan ini). Jika pool tidak memuat ayat yang cocok, boleh ganti dengan hadits dari pool — kutip lengkap citation + terjemahan + konteks.
 - **Inti pesan** (~1000-1400 kata, 6-8 paragraf prosa mengalir tanpa sub-judul): satu argumen TUNGGAL yang berkembang. Jangan loncat-loncat antar pesan. Struktur per paragraf yang baik:
   * Paragraf 1-2: jelaskan ayat/hadits pembuka dalam konteks pekan ini, kembangkan implikasinya dengan detail.
@@ -576,6 +594,26 @@ ATURAN DALIL — paragraf, headline, dan dalil WAJIB membentuk satu thread temat
 
 1. Citation HARUS persis cocok dengan salah satu entri di dalil pool yang saya berikan. JANGAN mengarang citation.
 
+CITATION VERBATIM CHECK (HARD RULE — KRITIS, jangan dilanggar untuk Pesan Flyer 1-6):
+Setiap `**Dalil:**` yang Anda tag di Pesan Flyer 1-6 WAJIB persis sama dengan salah satu `Citation:` di DALEEL POOL (untuk Flyer 1-4) atau ADHKAR POOL (untuk Flyer 5-6). PERSIS — bukan paraphrase, bukan sinonim, bukan citation lain yang kelihatannya cocok. Renderer flyer mencari entri pool dengan citation yang Anda tag; kalau TIDAK KETEMU di pool, renderer SILENTLY MEM-FALLBACK ke pickFlyerDaleel(rank) — yang akan menampilkan daleel ACAK dari pool, BUKAN yang Anda maksudkan. Pembaca tidak tahu itu jatuh ke fallback; mereka percaya daleel yang muncul itu yang Anda pilih.
+
+REAL BUG 2026-06-07: audit lintas-briefing menemukan 50 dari 90 marker `**Dalil:**` di flyer di-tag dengan citation yang TIDAK ada di stored pool. Konsekuensi: ~55% flyer di prod menampilkan daleel yang mismatch dengan headline + body — kontradiksi yang merusak kepercayaan da'i.
+
+CARA KERJA YANG BENAR untuk SETIAP Pesan Flyer:
+1. Buka blok `DALEEL POOL` (untuk Flyer 1-4) atau `ADHKAR POOL` (untuk Flyer 5-6) di user prompt.
+2. Pilih SATU entri yang paling cocok tematik. Copy citation-nya PERSIS — termasuk titik, koma, dan tanda baca lain.
+3. Paste ke baris `**Dalil:** <citation>` di flyer block.
+4. Verifikasi: scan kembali pool — apakah citation yang Anda paste itu MUNCUL PERSIS di pool? Kalau nggak ketemu, kembali ke step 2 dan pilih ulang.
+
+CONTOH JEBAKAN NYATA (jangan tiru):
+- ❌ Pool punya `QS. Al-Muminoon: 8`. Saya tulis `**Dalil:** QS. Al-Mu'minoon: 8` (dengan apostrof). FAIL — citation berbeda karena ada apostrof; renderer tidak match.
+- ❌ Pool punya `Sahih al-Bukhari 7138`. Saya tulis `**Dalil:** Bukhari 7138` (singkat). FAIL — bukan prefix-match.
+- ❌ Pool punya `Bulugh al-Maram 1023`. Saya tulis `**Dalil:** QS. Al-Ahzaab: 72` (tag citation yang TIDAK ada di pool). FAIL — renderer akan fallback ke daleel pertama di pool, yang mungkin sama sekali tidak relevan dengan flyer ini.
+
+KALAU TIDAK ADA satu pun entri di pool yang BENAR-BENAR cocok dengan flyer Anda, JANGAN ngarang citation. Kosongkan baris dengan: `**Dalil:** —` (em dash). Renderer akan skip daleel card untuk flyer itu — lebih baik tanpa daleel daripada daleel yang mismatch.
+
+VALIDATOR HARD-FAIL: `manual_briefing save` SEKARANG akan menolak (exit code 1) kalau ada `**Dalil:**` di Pesan Flyer yang tidak ditemukan di pool. Save aborted, tidak ada row tertulis ke DB. Operator harus fix sebelum bisa save. Ini hard guardrail; bukan saran.
+
 2. Dalil-nya WAJIB berbicara langsung tentang topik paragraf-nya. Cek ulang sebelum men-tag: kalau paragraf-nya tentang pinjol, dalil-nya HARUS tentang riba/kezhaliman dalam hutang — BUKAN ayat umum tentang "pemuda" atau "harta" yang kebetulan ada di pool. Kalau paragraf-nya tentang judol, dalil-nya HARUS tentang maysir/qimar — BUKAN ayat tentang "permainan" / "lahw" yang tidak spesifik. Kalau paragraf-nya tentang kekerasan terhadap anak, dalil-nya HARUS tentang hak anak atau ihsan kepada lemah — BUKAN ayat umum tentang keluarga.
 
 3. Pertanyaan double-check sebelum tag dalil: "Kalau pembaca melihat citation ini DI BAWAH paragraf ini, apakah hubungannya jelas tanpa penjelasan tambahan?" Kalau jawabannya "harus dipaksakan", PILIH dalil lain dari pool, ATAU kosongkan baris `**Dalil:**` untuk paragraf itu.
@@ -811,7 +849,25 @@ Write a READY-TO-DELIVER 10-15 minute kultum — concise but COMPLETE from openi
 
 REQUIRED STRUCTURE (in this order):
 
-- **Opening** (~180 words): start with TA'AWUDH + BASMALAH + brief HAMDALAH in Arabic script with full harakat (`أَعُوذُ بِاللهِ مِنَ الشَّيْطَانِ الرَّجِيْمِ، بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ، اَلْحَمْدُ لِلهِ رَبِّ الْعَالَمِيْنَ…`), followed by one brief sholawat line `وَالصَّلَاةُ وَالسَّلَامُ عَلٰى رَسُوْلِ اللهِ، وَعَلٰى آلِهِ وَصَحْبِهِ أَجْمَعِيْنَ، أَمَّا بَعْدُ`. Then a short English greeting (~30-40 words) that names THIS WEEK's context — not generic "Brothers and sisters, alhamdulillah we gather tonight" (too template). Better: "Brothers and sisters, in this past week we lived through [concrete event from this week], and there's one thought I want to share with you tonight…"
+- **Opening** (~180 words): start with the standard kultum opening in Arabic script with full harakat — basmalah + hamdalah + shahadat + sholawat + amma ba'du, ~50-70 Arabic words. Then a short English greeting (~30-40 words) that names THIS WEEK's context — not generic "Brothers and sisters, alhamdulillah we gather tonight" (too template). Better: "Brothers and sisters, in this past week we lived through [concrete event from this week], and there's one thought I want to share with you tonight…"
+
+  VARY THE ARABIC OPENING WEEK-TO-WEEK (REQUIRED — never reuse the same opening verbatim across weeks). A kultum opening that repeats word-for-word feels recycled to the same returning audience. Match the vibe of the opening to THIS WEEK's group theme so the opening itself prepares the heart. Pick a variant that fits, or compose a new one as long as the structure is kultum-valid (hamdalah → shahadat → sholawat → amma ba'du):
+
+  · **Generic opening**: `أَعُوذُ بِاللهِ مِنَ الشَّيْطَانِ الرَّجِيْمِ، بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ، اَلْحَمْدُ لِلهِ رَبِّ الْعَالَمِيْنَ، وَالصَّلَاةُ وَالسَّلَامُ عَلٰى رَسُوْلِ اللهِ، وَعَلٰى آلِهِ وَصَحْبِهِ أَجْمَعِيْنَ، أَمَّا بَعْدُ.`
+
+  · **Rezeki / worker / fair-measure theme**: `بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ، اَلْحَمْدُ لِلهِ الَّذِيْ رَزَقَ عِبَادَهُ مِنَ الطَّيِّبَاتِ، وَأَوْجَبَ الْعَدْلَ فِيْ كُلِّ مُعَامَلَةٍ، أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا رَسُوْلُ اللهِ، اَللّٰهُمَّ صَلِّ وَسَلِّمْ عَلٰى نَبِيِّنَا مُحَمَّدٍ، وَعَلٰى آلِهِ وَأَصْحَابِهِ أَجْمَعِيْنَ، أَمَّا بَعْدُ.`
+
+  · **Amanah / leadership theme**: `بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ، اَلْحَمْدُ لِلهِ الَّذِيْ جَعَلَ الْأَمَانَةَ مِيْزَانَ الْعِبَادِ، أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللهُ الْعَدْلُ فِيْ حُكْمِهِ، وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُوْلُهُ الْأَمِيْنُ، اَللّٰهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ وَعَلٰى آلِهِ وَأَصْحَابِهِ، أَمَّا بَعْدُ.`
+
+  · **Family / social / children theme**: `بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ، اَلْحَمْدُ لِلهِ الَّذِيْ جَعَلَ الْأُسْرَةَ سَكَنًا، وَجَعَلَ بَيْنَ النَّاسِ مَوَدَّةً وَرَحْمَةً، أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا رَسُوْلُ اللهِ خَيْرُ مَنْ رَحِمَ الْأَطْفَالَ، اَللّٰهُمَّ صَلِّ عَلٰى نَبِيِّنَا مُحَمَّدٍ وَعَلٰى آلِهِ وَأَصْحَابِهِ، أَمَّا بَعْدُ.`
+
+  · **Health / muhasabah theme**: `بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ، اَلْحَمْدُ لِلهِ الَّذِيْ خَلَقَ الْإِنْسَانَ فِيْ أَحْسَنِ تَقْوِيْمٍ، وَجَعَلَ الْعَافِيَةَ نِعْمَةً لَا تُقَدَّرُ، أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا رَسُوْلُ اللهِ، اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ وَآلِهِ وَصَحْبِهِ، أَمَّا بَعْدُ.`
+
+  · **Environment / disaster theme**: `بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ، اَلْحَمْدُ لِلهِ الَّذِيْ خَلَقَ السَّمَاوَاتِ وَالْأَرْضَ، وَجَعَلَ الْأَرْضَ مُسَخَّرَةً لَنَا أَمَانَةً، أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا رَسُوْلُ اللهِ، اَللّٰهُمَّ صَلِّ عَلٰى نَبِيِّنَا مُحَمَّدٍ وَعَلٰى آلِهِ وَأَصْحَابِهِ، أَمَّا بَعْدُ.`
+
+  · **Knowledge / education / aqidah theme**: `بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ، اَلْحَمْدُ لِلهِ الَّذِيْ عَلَّمَ بِالْقَلَمِ، عَلَّمَ الْإِنْسَانَ مَا لَمْ يَعْلَمْ، أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا رَسُوْلُ اللهِ الْمُعَلِّمُ الْأَوَّلُ، اَللّٰهُمَّ صَلِّ عَلٰى نَبِيِّنَا مُحَمَّدٍ وَعَلٰى آلِهِ وَأَصْحَابِهِ، أَمَّا بَعْدُ.`
+
+  Rule: EVERY Arabic line in the opening MUST carry full harakat (fathah, kasrah, dhammah, sukūn, syaddah, mad). NEVER use Latin transliteration. NEVER reuse the same opening across multiple theme-groups within the same week — distinct openings per group are part of the "this is a fresh week" signal for cross-briefing readers.
 - **Hook & opening verse** (~250 words): one sentence that grabs attention immediately — rhetorical question, sharp observation about this week's events, or a fact that unsettles. Then one Quranic verse from the pool (WRITE IN ARABIC SCRIPT WITH HARAKAT, name surah + verse, English translation, 2-3 sentences of contextual tafsir linking the verse to this week's events). If the pool lacks a suitable verse, substitute one hadith from the pool — full citation + translation + context.
 - **Body** (~1000-1400 words, 6-8 flowing prose paragraphs, no sub-headings): ONE single argument that develops. No topic-hopping. Good per-paragraph structure:
   * Paragraphs 1-2: explain the opening verse/hadith in this week's context, develop its implications with detail.
@@ -1017,6 +1073,26 @@ RULE: any headline that names an ibadah / sunnah must be read assuming the audie
 DALEEL RULES — paragraph, headline, and daleel MUST form one consistent thematic thread:
 
 1. Citation MUST match exactly an entry in the daleel pool. NEVER fabricate citations.
+
+CITATION VERBATIM CHECK (HARD RULE — CRITICAL, do not break for Flyer Messages 1-6):
+Every `**Daleel:**` you tag on Flyer Messages 1-6 MUST match a `Citation:` field in the DALEEL POOL (for Flyer 1-4) or ADHKAR POOL (for Flyer 5-6) EXACTLY. EXACTLY — not paraphrased, not a synonym, not a different but-similar-looking citation. The flyer renderer looks up the pool entry by the citation you tag; if NOT FOUND in the pool, the renderer SILENTLY FALLS BACK to `pickFlyerDaleel(rank)` — displaying a RANDOM daleel from the pool, NOT the one you meant. The reader has no signal that this was a fallback; they assume the rendered daleel is your choice.
+
+REAL BUG 2026-06-07: cross-briefing audit found 50 of 90 `**Daleel:**` markers on flyers tagged citations NOT in the stored pool. Consequence: ~55% of production flyers showed daleel that mismatched the headline + body — a contradiction that damages the trust of every da'i who shares.
+
+CORRECT WORKFLOW for EACH Flyer Message:
+1. Open the `DALEEL POOL` block (for Flyer 1-4) or `ADHKAR POOL` (for Flyer 5-6) in the user prompt.
+2. Pick ONE entry that fits thematically. Copy its citation EXACTLY — including periods, commas, apostrophes, every punctuation mark.
+3. Paste into the `**Daleel:** <citation>` line of the flyer block.
+4. Verify: scan the pool again — does the citation you pasted appear VERBATIM in the pool? If you can't find it, return to step 2 and pick again.
+
+REAL TRAPS (do not imitate):
+- ❌ Pool has `QS. Al-Muminoon: 8`. You write `**Daleel:** QS. Al-Mu'minoon: 8` (with apostrophe). FAIL — citation differs because of the apostrophe; renderer fails to match.
+- ❌ Pool has `Sahih al-Bukhari 7138`. You write `**Daleel:** Bukhari 7138` (shortened). FAIL — not a prefix match.
+- ❌ Pool has `Bulugh al-Maram 1023`. You write `**Daleel:** QS. Al-Ahzaab: 72` (tag a citation NOT in the pool). FAIL — renderer falls back to the first daleel in the pool, which may be entirely unrelated to your flyer.
+
+IF NO POOL ENTRY genuinely fits your flyer, DO NOT fabricate a citation. Leave the line as: `**Daleel:** —` (em dash). The renderer will skip the daleel card for that flyer — better no daleel than a mismatched one.
+
+VALIDATOR HARD-FAIL: `manual_briefing save` now REJECTS (exit code 1) when any flyer `**Daleel:**` doesn't match the saved pool. Save aborts, no row written. The operator must fix before saving. Hard guardrail — not advisory.
 
 2. The daleel MUST speak directly to the paragraph's topic. Double-check before tagging: if the paragraph is about pinjol, the daleel MUST address riba / unjust debt — NOT a general verse about "youth" or "wealth" that happens to be in the pool. If the paragraph is about online gambling (judol), the daleel MUST address maysir / qimar — NOT a verse about "play" / "lahw" without that specificity. If the paragraph is about violence against children, the daleel MUST address rights-of-the-vulnerable or ihsan — NOT a general "family" verse.
 

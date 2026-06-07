@@ -63,6 +63,7 @@ class BriefingWarning(TypedDict, total=False):
         "pengajaran_preacher_voice",
         "preacher_anda_voice",
         "firman_hadith_mismatch",
+        "flyer_dalil_not_in_pool",
     ]
     severity: Literal["low", "medium", "high"]
     where: str  # human-readable locator, e.g. "Pesan Flyer 2"
@@ -855,6 +856,113 @@ def scan_firman_hadith_mismatch(markdown: str) -> list[BriefingWarning]:
     return warnings
 
 
+def _norm_citation(s: str) -> str:
+    """Same normalization as web's findDaleelByCitation — lowercase,
+    strip punctuation, collapse whitespace. Two citations match iff
+    their normalized forms are equal OR one is a prefix of the other."""
+    return re.sub(r"\s+", " ", re.sub(r"[.,;:]+", "", s.lower())).strip()
+
+
+# Pull every "### Pesan Flyer N — …" header + its `**Dalil:** X` line.
+# The header has to come AFTER the `## Pesan Flyer` H2 section start —
+# inline citations elsewhere in the briefing (Khutbah/Kultum/Kajian)
+# are NOT looked up by the flyer renderer and don't need to match the
+# pool. Only the 6 Pesan Flyer Dalil markers do.
+_FLYER_SECTION_RE = re.compile(r"##\s+Pesan\s+Flyer\b", re.IGNORECASE)
+_FLYER_HEADER_RE = re.compile(
+    r"###\s+Pesan\s+Flyer\s+(\d+)\b", re.IGNORECASE
+)
+_FLYER_DALIL_RE = re.compile(
+    r"\*\*Dalil:\*\*\s*([^\n]+?)\s*$", re.MULTILINE
+)
+
+
+def scan_flyer_dalil_in_pool(
+    markdown: str,
+    daleel_pool: list[dict[str, Any]] | None = None,
+    adhkar_pool: list[dict[str, Any]] | None = None,
+) -> list[BriefingWarning]:
+    """Each `### Pesan Flyer N` block carries a `**Dalil:**` line that
+    pins which pool entry the flyer renderer uses for the daleel card.
+    If the cited string doesn't match any pool entry (normalized,
+    prefix-tolerant), the renderer silently falls back to
+    `pickFlyerDaleel(rank)` — picking a daleel by position that has
+    NOTHING to do with the flyer's message. That mis-rendered daleel
+    ships to production unnoticed.
+
+    Real bug surfaced in the 2026-06-07 audit: 50/90 flyer markers
+    across all briefings cited daleel NOT in the stored pool, because
+    the chained `dump → save` command re-ran dump between writing and
+    saving, re-retrieving a different pool from Qdrant.
+
+    Strategy:
+      - Locate the `## Pesan Flyer` section header. Below it, find every
+        `### Pesan Flyer N` block.
+      - For each block, extract the `**Dalil:** X` line.
+      - Flyers 1-4 cite from `daleel_pool`. Flyers 5-6 cite from
+        `adhkar_pool`. If a flyer cites a citation that isn't in its
+        designated pool (case-insensitive, prefix-tolerant), flag it
+        at severity=high.
+
+    Returns empty list if no pools provided or no Pesan Flyer section.
+    """
+    if not daleel_pool and not adhkar_pool:
+        return []
+    sec_m = _FLYER_SECTION_RE.search(markdown)
+    if not sec_m:
+        return []
+    flyer_section = markdown[sec_m.start():]
+    daleel_norms = {_norm_citation(d.get("citation", "")) for d in (daleel_pool or [])}
+    adhkar_norms = {_norm_citation(d.get("citation", "")) for d in (adhkar_pool or [])}
+    # Combined pool — accept either daleel or adhkar match. Slot
+    # discipline (flyer 5/6 must be adhkar) is enforced separately by
+    # the renderer; for the "citation exists at all" check, either
+    # pool is fine.
+    all_norms = daleel_norms | adhkar_norms
+
+    def _in_pool(nc: str) -> bool:
+        if nc in all_norms:
+            return True
+        # Prefix-tolerant — matches "QS. Al-Ma'aarij" vs "QS. Al-Ma'aarij: 32"
+        return any(p.startswith(nc) or nc.startswith(p) for p in all_norms if p)
+
+    warnings: list[BriefingWarning] = []
+    headers = list(_FLYER_HEADER_RE.finditer(flyer_section))
+    for idx, h in enumerate(headers):
+        flyer_n = h.group(1)
+        block_start = h.start()
+        block_end = (
+            headers[idx + 1].start() if idx + 1 < len(headers) else len(flyer_section)
+        )
+        block = flyer_section[block_start:block_end]
+        dalil_m = _FLYER_DALIL_RE.search(block)
+        if not dalil_m:
+            continue
+        cited = dalil_m.group(1).strip()
+        # Allow explicit "no daleel" markers — `—`, `-`, `–`, empty.
+        if cited in ("—", "-", "–", ""):
+            continue
+        if _in_pool(_norm_citation(cited)):
+            continue
+        warnings.append(
+            {
+                "kind": "flyer_dalil_not_in_pool",
+                "severity": "high",
+                "where": f"Pesan Flyer {flyer_n}",
+                "message": (
+                    f"Dalil marker '{cited}' is NOT in the saved daleel/"
+                    f"adhkar pool. Renderer will silently fall back to "
+                    f"pickFlyerDaleel(rank) and display a mismatched "
+                    f"daleel. Fix: replace '{cited}' with one of the "
+                    f"actual pool entries (lihat DALEEL POOL / ADHKAR "
+                    f"POOL block in the dump), or — if no pool entry "
+                    f"fits — replace with '—' to skip the daleel card."
+                ),
+            }
+        )
+    return warnings
+
+
 def scan_dangling_citations(markdown: str) -> list[BriefingWarning]:
     """A sentence ending '...Allah Ta'ala dalam QS.' or '...berfirman:'
     is a wind-up that only makes sense if the citation actually
@@ -1471,6 +1579,15 @@ def validate_briefing(
             warnings.extend(fn(markdown))
         except Exception as exc:
             log.warning(f"validate_briefing.{key}", error=str(exc))
+    # Pool-aware checks — only run when caller passed the pools.
+    try:
+        warnings.extend(
+            scan_flyer_dalil_in_pool(markdown, daleel_pool, adhkar_pool)
+        )
+    except Exception as exc:
+        log.warning(
+            "validate_briefing.flyer_dalil_in_pool_check_failed", error=str(exc)
+        )
     if llm_judgments:
         # Paragraph↔daleel fit + absurd-advice scoring + replacement
         # suggester all call Gemini Flash-Lite. Skipped on the manual
