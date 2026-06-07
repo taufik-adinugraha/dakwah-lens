@@ -62,6 +62,7 @@ class BriefingWarning(TypedDict, total=False):
         "mahasiswa_personal_voice",
         "pengajaran_preacher_voice",
         "preacher_anda_voice",
+        "firman_hadith_mismatch",
     ]
     severity: Literal["low", "medium", "high"]
     where: str  # human-readable locator, e.g. "Pesan Flyer 2"
@@ -749,6 +750,111 @@ def scan_preacher_anda(markdown: str) -> list[BriefingWarning]:
     return warnings
 
 
+# Patterns for "Allah berfirman"-style framing (case-insensitive). These
+# phrases are reserved for Qur'an citations only — using them before a
+# hadith is an aqidah-level mis-attribution. The trigger windows up to
+# 600 chars ahead (covers one short paragraph) for a citation marker.
+_FIRMAN_TRIGGER_RE = re.compile(
+    r"(?i)\b("
+    r"Allah\s+(?:Ta'?ala\s+)?berfirman"
+    r"|Allah\s+(?:Ta'?ala\s+)?berkata"
+    r"|firman\s+Allah(?:\s+Ta'?ala)?"
+    r"|Allah\s+(?:Ta'?ala\s+)?mengingatkan\s+dalam\s+(?:ayat|Kitab)"
+    r"|Allah\s+menyebutkan\s+dalam\s+(?:ayat|Kitab)"
+    r"|Allah\s+says"
+    r"|Allah's\s+word"
+    r"|Allah\s+declares"
+    r")\b"
+)
+
+# Citations that unambiguously point to a hadith collection (i.e. the
+# Prophet ﷺ's sayings, not Allah's direct word). If a "Allah berfirman"
+# trigger fires shortly before one of these, that's the mis-attribution.
+_HADITH_CITATION_RE = re.compile(
+    r"(?i)\b("
+    r"Sahih\s+al[- ]?Bukhari"
+    r"|Sahih\s+Muslim"
+    r"|Bulugh\s+al[- ]?Maram"
+    r"|Riyad\s+as[- ]?Salihin"
+    r"|Sunan\s+(?:Ibn\s+Majah|Abu\s+Dawud|an[- ]?Nasa'?i|Tirmidzi|Tirmidhi)"
+    r"|Musnad\s+Ahmad"
+    r"|Muwatta(?:\s+Malik)?"
+    r"|HR\.?\s+(?:Bukhari|Muslim|Tirmidzi|Tirmidhi|Abu\s+Dawud|Nasa'?i|Ibn\s+Majah|Ahmad)"
+    r"|(?:Bukhari|Muslim)\s+\d+"
+    r")\b"
+)
+
+# Allow "hadits qudsi" exception — if the prose explicitly tags the
+# upcoming citation as hadits qudsi, "Allah berfirman" is acceptable
+# because the Prophet ﷺ is relaying Allah's word that is NOT in the
+# Qur'an. Window the qudsi marker check to the same 600-char span.
+_HADITH_QUDSI_RE = re.compile(r"(?i)\bhadi(?:t|th)s?\s+qudsi\b")
+
+# Qur'an citation pattern — if the trigger is followed by `QS.` /
+# `Quran` instead of a hadith citation, the framing is correct and we
+# don't fire.
+_QURAN_CITATION_RE = re.compile(r"(?i)\b(?:QS\.|Qur'?an|Quran|Q\d+:)")
+
+
+def scan_firman_hadith_mismatch(markdown: str) -> list[BriefingWarning]:
+    """Flag "Allah berfirman" / "Allah Ta'ala berfirman" / "firman Allah"
+    framing that precedes a HADITH citation — these phrases are
+    reserved for Qur'an verses only.
+
+    Real bug surfaced in Kultum Aqidah & Ibadah 2026-06-06:
+        > Allah berfirman tentang ini.
+        > **Bulugh al-Maram 890** — "Pekerjaan tangan ..."
+    Bulugh al-Maram is a hadith collection; the Prophet ﷺ said it, not
+    Allah. Mis-attribution at this level is an aqidah error, not a
+    cosmetic typo.
+
+    Strategy: for each "Allah berfirman" trigger, look at the next 600
+    characters. If they contain a hadith citation BEFORE any Qur'an
+    citation AND there's no "hadits qudsi" disclaimer, warn.
+    """
+    warnings: list[BriefingWarning] = []
+    for match in _FIRMAN_TRIGGER_RE.finditer(markdown):
+        trigger_end = match.end()
+        window = markdown[trigger_end : trigger_end + 600]
+        hadith_match = _HADITH_CITATION_RE.search(window)
+        if not hadith_match:
+            continue
+        # The hadith citation has to appear BEFORE any Qur'an citation
+        # — otherwise the prose is referring to a Qur'anic verse and
+        # the hadith mention is a separate aside.
+        quran_match = _QURAN_CITATION_RE.search(window)
+        if quran_match and quran_match.start() < hadith_match.start():
+            continue
+        # Hadits qudsi exception — the qualifier must appear in the same
+        # window (either before or alongside the citation).
+        if _HADITH_QUDSI_RE.search(window):
+            continue
+        trigger_text = match.group(0)
+        citation_text = hadith_match.group(0)
+        # Locate the trigger in the markdown for a more useful "where"
+        # locator (paragraph index).
+        prefix = markdown[: match.start()]
+        paragraph_idx = prefix.count("\n\n") + 1
+        warnings.append(
+            {
+                "kind": "firman_hadith_mismatch",
+                "severity": "high",
+                "where": f"paragraph #{paragraph_idx}",
+                "message": (
+                    f"'{trigger_text}' framing is reserved for Qur'an "
+                    f"verses, but it's followed by a HADITH citation "
+                    f"({citation_text}). The Prophet ﷺ said it, not "
+                    f"Allah directly. Replace with 'Rasulullah ﷺ "
+                    f"bersabda' / 'Nabi ﷺ mengajarkan' / 'diriwayatkan "
+                    f"bahwa ...'. If this is intentionally a hadits "
+                    f"qudsi, add 'dalam hadits qudsi' to the prose so "
+                    f"the reader knows the source genre."
+                ),
+            }
+        )
+    return warnings
+
+
 def scan_dangling_citations(markdown: str) -> list[BriefingWarning]:
     """A sentence ending '...Allah Ta'ala dalam QS.' or '...berfirman:'
     is a wind-up that only makes sense if the citation actually
@@ -1359,6 +1465,7 @@ def validate_briefing(
         (scan_mahasiswa_voice, "mahasiswa_voice_check_failed"),
         (scan_pengajaran_voice, "pengajaran_voice_check_failed"),
         (scan_preacher_anda, "preacher_anda_check_failed"),
+        (scan_firman_hadith_mismatch, "firman_hadith_check_failed"),
     ):
         try:
             warnings.extend(fn(markdown))

@@ -150,6 +150,27 @@ CRITICAL FORMATTING RULES:
 
   Kecuali yang berikut TETAP boleh inline dalam paragraf prosa: (a) citation bold `**QS. X: Y**` SAJA tanpa Arabic — di mana Arabic-nya menyusul di paragraf SENDIRI di bawah, (b) 1-2 kata Arab pendek seperti `Allahu Akbar`, `subḥānallāh`, `inshā'allāh` sebagai istilah dakwah yang sudah menyatu dengan bahasa Indonesia, (c) nama Allah / nama Nabi dengan suffix `ﷺ` / `'alaihissalam`. Selain itu — pecah ke paragraf sendiri.
 
+ATRIBUSI SUMBER (HARD RULE — KRITIS, jangan dilanggar):
+"Allah berfirman" / "firman Allah" / "Allah berkata" / "Allah Ta'ala dalam ayat-Nya" HANYA boleh dipakai untuk MENGUTIP AYAT AL-QUR'AN. JANGAN PERNAH dipakai untuk mengutip hadits — hadits adalah sabda Nabi ﷺ, bukan firman Allah secara langsung. Kalau dalil yang Anda kutip berasal dari Bukhari / Muslim / Riyad as-Salihin / Bulugh al-Maram / Sahih al-Bukhari / Sahih Muslim / sunan / musnad / muwatta, itu HADITS — pakai frasa yang benar:
+
+✓ Untuk ayat Quran (citation = `QS. ...`): "Allah berfirman", "Allah Ta'ala mengingatkan", "Allah memerintahkan dalam Al-Quran", "firman Allah", "Allah menyebutkan dalam Kitab-Nya"
+✓ Untuk hadits (citation = "Bukhari N", "Muslim N", "Riyad as-Salihin N", "Bulugh al-Maram N", dll.): "Rasulullah ﷺ bersabda", "Nabi ﷺ mengajarkan", "Rasulullah ﷺ memberi peringatan", "diriwayatkan dari ... bahwa Rasulullah ﷺ bersabda", "dalam sebuah hadits, Rasulullah ﷺ menyebutkan"
+
+CONTOH JEBAKAN NYATA (jangan tiru — keluar di Kultum Aqidah & Ibadah 2026-06-06):
+- ❌ "Allah berfirman tentang ini. **Bulugh al-Maram 890** — 'Pekerjaan tangan seorang lelaki sendiri dan setiap jual-beli yang mabrur.'"
+  → Bulugh al-Maram = hadits. Mustahil "Allah berfirman" di sini. REWRITE: "Rasulullah ﷺ bersabda tentang ini. **Bulugh al-Maram 890** — '...'"
+- ❌ "Sebagaimana Allah berfirman dalam Sahih al-Bukhari ..." → Sahih al-Bukhari = hadits. REWRITE: "Sebagaimana Rasulullah ﷺ bersabda dalam riwayat Bukhari ..."
+- ❌ "Allah Ta'ala dalam hadits Muslim memberi peringatan ..." → "hadits Muslim" tidak pernah firman Allah. REWRITE: "Dalam riwayat Muslim, Rasulullah ﷺ memberi peringatan ..."
+
+PENGECUALIAN — HADITS QUDSI: ada genre hadits di mana Rasulullah ﷺ mengutip firman Allah yang TIDAK ada di Al-Quran (hadits qudsi, mis. "Allah Ta'ala berfirman dalam hadits qudsi yang diriwayatkan Bukhari: ..."). Untuk genre ini SAJA, "Allah berfirman" boleh dipakai TETAPI WAJIB dengan kualifikasi eksplisit "dalam hadits qudsi" — supaya pembaca tahu sumbernya beda dari ayat Quran. JANGAN diam-diam memakai "Allah berfirman" untuk hadits biasa dengan harapan menjadikan hadits itu lebih berbobot — itu pemalsuan atribusi yang merusak amanah ilmu.
+
+PROSES CHECKING SEBELUM TULIS:
+1. Lihat citation: apakah dimulai dengan `QS.` atau `Quran` atau nomor surah:ayat? → AYAT → boleh "Allah berfirman"
+2. Citation berisi "Bukhari", "Muslim", "Riyad", "Bulugh", "Tirmidzi", "Abu Dawud", "Nasa'i", "Ibn Majah", "Ahmad", "Muwatta", "Sunan", "Musnad" → HADITS → WAJIB "Rasulullah ﷺ bersabda" atau frasa hadits lainnya
+3. Ragu? → Pakai frasa netral seperti "Diriwayatkan bahwa ..." atau "Dalam sebuah riwayat ..." yang aman untuk hadits, JANGAN paksakan "Allah berfirman"
+
+Aturan ini berlaku untuk SEMUA sub-section (Khutbah, Kultum, Kajian, Mahasiswa, Pengajaran, Kisah, Aksi, Flyer) — bukan hanya untuk salah satu. Salah atribusi adalah salah aqidah; ini bukan kosmetik.
+
 ANTI-REPETISI ANTAR PEKAN (KRITIS): user prompt boleh berisi blok "CAKUPAN PEKAN-PEKAN SEBELUMNYA" — ini DAFTAR dalil, headline flyer, dan poster question yang BARU SAJA dibaca audiens. Audiens yang sama akan kembali pekan ini, jadi materi yang sama TERASA daur ulang. Aturan:
 - JANGAN gunakan ulang headline flyer atau poster question mahasiswa secara verbatim/near-verbatim dari pekan-pekan sebelumnya.
 - KURANGI penggunaan dalil yang sama. Kalau pool minggu ini menyediakan dalil segar yang sama-sama cocok, prioritaskan yang BELUM dipakai pekan lalu.
@@ -660,6 +681,27 @@ CRITICAL FORMATTING RULES:
 - The AI-assistance disclaimer goes as an italic paragraph at the end of Section 5 (not as a separate section).
 - NEVER name a translator, publisher, or translation style in the output ("Kemenag", "Kemenag style", "Sahih International", "Pickthall", "Hilali-Khan", "Ibn Kathir tafsir style", etc.). That's source-data metadata, not da'wah content. Readers see verses via citations (e.g., "QS. Al-Baqarah: 275") — that's the only attribution that belongs in the prose. Phrases like "according to the Kemenag rendering" or "in Sahih International style" are banned.
 - NEVER echo word-count annotations back in the output — e.g. headings like `### Friday Khutbah (3450-4800 words)` or inline guidance like `Opening (~80 words):`. Those are length instructions FOR you, not information FOR the reader. Write clean headings: `### Friday Khutbah` (not `### Friday Khutbah (3450-4800 words)`). Same for inline guidance — describe the step without the parenthetical word-count.
+
+SOURCE ATTRIBUTION (HARD RULE — CRITICAL, do not break):
+"Allah says" / "Allah's word" / "Allah declares" / "the Almighty in His verse" may ONLY introduce a QUR'AN VERSE quotation. NEVER use this framing for a hadith — a hadith is the Prophet ﷺ's saying, not Allah's direct speech. If the daleel you cite is from Bukhari / Muslim / Riyad as-Salihin / Bulugh al-Maram / sunan / musnad / muwatta, it's a HADITH — use the correct framing:
+
+✓ For Qur'an (citation = `QS. ...`): "Allah says", "Allah Ta'ala reminds us", "Allah declares in the Qur'an", "Allah's word", "Allah mentions in His Book"
+✓ For hadith (citation = "Bukhari N", "Muslim N", "Riyad as-Salihin N", "Bulugh al-Maram N", etc.): "The Prophet ﷺ said", "Rasulullah ﷺ taught", "The Prophet ﷺ warned", "It is narrated from ... that the Prophet ﷺ said", "In a hadith, the Prophet ﷺ mentions"
+
+REAL TRAPS (do not imitate — surfaced in Kultum Aqidah & Ibadah 2026-06-06):
+- ❌ "Allah says about this. **Bulugh al-Maram 890** — 'A man's labor with his own hand and every honest sale (mabrur).'"
+  → Bulugh al-Maram = hadith. "Allah says" is impossible here. REWRITE: "The Prophet ﷺ said about this. **Bulugh al-Maram 890** — '...'"
+- ❌ "As Allah says in Sahih al-Bukhari ..." → Sahih al-Bukhari = hadith. REWRITE: "As the Prophet ﷺ said in Bukhari's narration ..."
+- ❌ "Allah Ta'ala in a Muslim hadith warns ..." → a "Muslim hadith" is never Allah's direct speech. REWRITE: "In Muslim's narration, the Prophet ﷺ warned ..."
+
+EXCEPTION — HADITH QUDSI: there is a genre of hadith in which the Prophet ﷺ relays Allah's word that is NOT in the Qur'an (hadith qudsi, e.g. "Allah Ta'ala said in a hadith qudsi narrated by Bukhari: ..."). For this genre ONLY, "Allah says" is acceptable BUT requires the explicit qualifier "in a hadith qudsi" — so the reader knows the source differs from a Qur'anic verse. Never quietly use "Allah says" for an ordinary hadith hoping to amplify its weight — that's a falsified attribution that breaks scholarly trust (amanah ilmu).
+
+PRE-WRITE CHECK:
+1. Look at the citation: does it start with `QS.` / `Quran` / a surah:verse number? → VERSE → "Allah says" is OK
+2. Citation contains "Bukhari", "Muslim", "Riyad", "Bulugh", "Tirmidzi", "Abu Dawud", "Nasa'i", "Ibn Majah", "Ahmad", "Muwatta", "Sunan", "Musnad" → HADITH → use "The Prophet ﷺ said" or another hadith-appropriate phrase
+3. Unsure? → Use a neutral framing like "It is narrated that ..." or "In a narration ..." which is safe for a hadith; do NOT force "Allah says"
+
+This applies to ALL sub-sections (Khutbah, Kultum, Kajian, Mahasiswa, Pengajaran, Kisah, Aksi, Flyer) — not just one. Mis-attribution is an aqidah error; it isn't cosmetic.
 
 CROSS-WEEK ANTI-REPETITION (CRITICAL): the user prompt may contain a "PREVIOUSLY COVERED" block — these are the daleel, flyer headlines, and Mahasiswa poster question the audience JUST READ. The same audience returns this week, so reusing the same material feels recycled. Rules:
 - NEVER reuse flyer headlines or the Mahasiswa poster question verbatim / near-verbatim from prior weeks.
