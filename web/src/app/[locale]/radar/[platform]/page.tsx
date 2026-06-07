@@ -35,20 +35,11 @@ import {
   type TopEngagedPost,
 } from "@/lib/briefing-data";
 import {
-  classifyThemeGroup,
-  GROUP_BY_SLUG,
   getRisingVideos,
   getThemeGroupReachDelta,
   type RisingVideo,
   type ThemeGroupReach,
 } from "@/lib/dashboard-metrics";
-
-/** Inverse of GROUP_BY_SLUG so we can route topics → their group page. */
-const SLUG_BY_GROUP: Readonly<Record<string, string>> = Object.freeze(
-  Object.fromEntries(
-    Object.entries(GROUP_BY_SLUG).map(([slug, group]) => [group, slug]),
-  ),
-);
 
 export function generateStaticParams() {
   // Pre-render every (locale, platform) combination.
@@ -347,43 +338,14 @@ async function CategoryTopicCharts({
                   const sharePct = topTotal
                     ? ((topic.postCount / topTotal) * 100).toFixed(1)
                     : "0.0";
-                  // Route each topic to its theme-group page with a
-                  // ?topic filter so the user lands on the existing
-                  // group view scoped to this topic (posts list +
-                  // sentiment bar both re-scope). If classifyThemeGroup
-                  // can't bucket the label (returns "Lainnya"), render
-                  // the row as plain text rather than silently routing
-                  // to whichever group happens to be first in the map —
-                  // pre-2026-06-07 fallback `Object.keys(GROUP_BY_SLUG)[0]`
-                  // sent every unclassified topic to "Hukum & Keadilan"
-                  // which surprised users (e.g. "Isu LGBT" landing on
-                  // the corruption page).
-                  const classifiedGroup = classifyThemeGroup(topic.label);
-                  const groupSlug = SLUG_BY_GROUP[classifiedGroup];
-                  const href = groupSlug
-                    ? `/groups/${groupSlug}?topic=${topic.id}`
-                    : null;
-                  const Wrapper = href
-                    ? ({ children }: { children: React.ReactNode }) => (
-                        <Link
-                          href={href}
-                          className="group block rounded-lg px-2 py-1.5 transition hover:bg-slate-50"
-                        >
-                          {children}
-                        </Link>
-                      )
-                    : ({ children }: { children: React.ReactNode }) => (
-                        <div
-                          className="group block rounded-lg px-2 py-1.5"
-                          title="Belum termasuk dalam salah satu 14 kelompok tema"
-                        >
-                          {children}
-                        </div>
-                      );
+                  // Read-only chart rows — clicking through to the
+                  // theme-group page surprised users (per-platform
+                  // numbers didn't match the cross-platform group view).
+                  // Render as plain divs.
                   return (
-                    <Wrapper key={topic.id}>
+                    <div key={topic.id} className="block rounded-lg px-2 py-1.5">
                       <div className="flex items-baseline justify-between gap-3">
-                        <span className="truncate text-sm font-medium text-slate-800 group-hover:text-slate-900">
+                        <span className="truncate text-sm font-medium text-slate-800">
                           {topic.label}
                         </span>
                         <span className="shrink-0 text-xs tabular-nums text-slate-500">
@@ -397,7 +359,7 @@ async function CategoryTopicCharts({
                           style={{ width: `${(topic.postCount / topMax) * 100}%` }}
                         />
                       </div>
-                    </Wrapper>
+                    </div>
                   );
                 })}
               </div>
