@@ -119,7 +119,13 @@ function RoomCard({
   locale: string;
   labels: Labels;
 }) {
-  const palette = SEGMENT_PALETTE[room.themeGroup ?? "all"];
+  // SEGMENT_PALETTE keys are the legacy 4-segment slugs (all/spiritual/
+  // family/youth/justice). Briefings since 2026-06-03 use the 14-group
+  // THEME_GROUPS labels ("Pemerintahan & Kebijakan", "Teknologi & AI",
+  // …) which miss the map. Fall back to `all` so the card still renders
+  // — same defensive pattern as palettes lookup in m/[id]/page.tsx:74.
+  const palette =
+    SEGMENT_PALETTE[room.themeGroup ?? "all"] ?? SEGMENT_PALETTE.all;
   const status = deriveStatus(room);
   const statusMeta = STATUS_META[status];
   const segmentLabel =
