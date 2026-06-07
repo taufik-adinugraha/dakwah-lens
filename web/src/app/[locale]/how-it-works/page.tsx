@@ -1087,30 +1087,29 @@ function ModelsTable({ t }: { t: T }) {
 }
 
 /**
- * Estimated monthly API spend across all providers. Hard-coded snapshot
- * — the real numbers live in `/admin/system/api-costs` (superadmin). The
- * point of this section is to be transparent about cost discipline.
+ * Estimated monthly API spend across all providers. Snapshot pulled
+ * from the live billing endpoints + usage_events — the live numbers
+ * live in `/admin/system/api-costs` (superadmin).
  *
- * Numbers updated 2026-05-30 to reflect actual prod billing + the
- * keyword + cap changes:
- *   · TT pruned 49 → 28 enabled keywords (-10 zero-yielders, +judol)
- *   · IG limit bumped 20 → 60 (~50% of yielding keywords were cap-bound)
- *   · X added "judol" (49 → 50 enabled)
+ * Apify rows refreshed 2026-06-07 from authoritative `/v2/users/me/limits`
+ * for cycle 2026-05-19 → 2026-06-18:
+ *   · cycle spent so far: $24.80 / $29 Starter cap (85.5% used)
+ *   · day 20 of 31 — daily avg $1.24/day
+ *   · projected cycle-end: ~$38 (WILL exceed $29 plan cap by ~$9)
  *
- * Apify per-row numbers use the documented Starter-plan rates
- * ($0.0023/IG · $0.004/TT · $0.0004/X), NOT the recorded per-call
- * usage_events, which under-count on IG (the daily 06:00
- * billing_reconcile job catches the gap). Apify Starter is $29/mo
- * including $29 of platform credit — these rows project to ~$29/mo
- * total Apify, exactly at the included quota.
+ * Per-platform extrapolated from tracked `scrape` rows × (31/20),
+ * with the daily 06:00 `billing_reconcile` delta ($9.15/cycle, mostly
+ * apidojo/tweet-scraper late-billed events) folded into X. TikTok is
+ * the highest per-call line ($0.063/call) despite the 49→28 keyword
+ * prune; Instagram volume is running ~40% of the projection that
+ * assumed limit=60 would saturate.
  *
- * Gemini Flash-Lite row reflects the post-2026-05-25 IndoBERT→Gemini
- * sentiment switch (~30-40% higher per-post LLM cost than the prior
- * 30d aggregate); current 7d run-rate is $4.04 → $17.40/mo.
+ * Gemini Flash-Lite reflects post-2026-05-25 IndoBERT→Gemini sentiment
+ * switch PLUS the 14-theme-group classifier added 2026-06-05.
  *
- * Briefings cron is still paused per 2026-05-23; the Gemini Pro row
- * now reflects ONLY on-demand user briefs (the 5/27 + 5/28 manual
- * weekly briefings went through Claude, not Gemini Pro).
+ * Briefings cron still paused per 2026-05-23; Gemini Pro row covers
+ * only on-demand user briefs (manual weekly briefings go through
+ * Claude, not Gemini Pro).
  */
 function MonthlyCost({ t }: { t: T }) {
   const rows = [
@@ -1180,36 +1179,32 @@ function MonthlyCost({ t }: { t: T }) {
     // ── Apify scrapers ── per-row projections at documented Starter
     // rates. Combined target ≤ $29/mo (Apify Starter included credit).
     {
-      provider: "Apify · X (apidojo)",
+      provider: "Apify · X (apidojo, incl. late-bill)",
       use: t("cost_x_use"),
-      // 50 enabled keywords × ~$0.025/call weekly = $5.50/mo. Plus
-      // judol added 2026-05-30 — marginal +$0.10/mo.
-      monthly: 5.5,
-      note: "50 enabled keywords (incl. judol) · ~$0.025/call · weekly Wed 22:00",
+      // Cycle 2026-05-19→06-18 day 20: tracked-scrape $3.89 + the
+      // bulk of $9.15 billing_reconcile delta (apidojo bills per-event
+      // late, captured by daily 06:00 reconcile job). Extrapolated
+      // ($3.89 + $9.15) × 31/20 = $20.21/mo.
+      monthly: 20.21,
+      note: "Weekly Wed 22:00 + daily trending overlay · ~$0.016/tracked-call · apidojo bills late, captured by daily reconcile",
     },
     {
       provider: "Apify · Instagram",
       use: t("cost_ig_use"),
-      // limit=60 since 2026-05-30. Projected ~1,300 items/run at
-      // documented $0.0023/item Starter rate = ~$3/run × 4.33 wk.
-      monthly: 14,
-      note: "37 kw × limit=60 · ~$0.0023/item · weekly Wed 22:20 · biggest Apify line item",
+      // Cycle observed: $3.85 (83 calls × $0.046/call avg) ×
+      // 31/20 = $5.97/mo. Real volume ~40% of the projected $14
+      // (limit=60 didn't saturate as expected).
+      monthly: 5.97,
+      note: "37 kw · weekly Wed 22:20 · ~$0.046/item · real volume ~40% of projection",
     },
     {
       provider: "Apify · TikTok",
       use: t("cost_tt_use"),
-      // Post 2026-05-30 prune: 28 enabled keywords × ~$0.058/call =
-      // $1.65/run × 4.33 wk. Down from $16/mo at 49-kw config.
-      monthly: 7.14,
-      note: "28 enabled kw (post-prune) · ~$0.058/call · weekly Wed 22:10",
-    },
-    {
-      provider: "Apify · Trending overlay (X)",
-      use: t("cost_trending_use"),
-      // Daily noon fan-out: ~8 trending keywords × ~$0.01/call ≈
-      // $0.08/day × 30 days. Real 30d observed: $2.40.
-      monthly: 2.4,
-      note: "~8 trending kw/day · daily 12:00 WIB · ~$0.08/day",
+      // Cycle observed: $7.92 (126 calls × $0.063/call avg, highest
+      // per-call cost in the stack) × 31/20 = $12.28/mo. Even after
+      // 49→28 keyword prune, TT is the dominant Apify line item.
+      monthly: 12.28,
+      note: "28 kw (post-prune) · weekly Wed 22:10 · ~$0.063/call (highest per-call in stack)",
     },
   ];
 
