@@ -93,6 +93,19 @@ MAX_TEXT_CHARS = 200
 # `min_similarity` (see prompt).
 MIN_SIMILARITY = 0.28
 
+# Second-pass rescue floor (added 2026-06-07 after the 1394-post Lainnya
+# audit). When a post lands in Lainnya at the strict MIN_SIMILARITY but
+# already carries a coarse theme_group from the upstream classifier, we
+# retry it against ONLY the themes whose own theme_group matches the
+# post's. The relaxed floor (0.20 vs 0.28) accepts the false-orphan
+# pattern where cosine fell below 0.28 but the post obviously belongs
+# in the group's biggest theme (e.g. a "Tony Robbins MBG" post that
+# cosines 0.22 to "Korupsi MBG & BGN"). Cross-group bleed is impossible
+# because the candidate pool is gated by theme_group agreement, so this
+# loosening doesn't reintroduce the noise the strict floor exists to
+# block.
+RESCUE_FLOOR = 0.20
+
 # A theme needs at least this many assigned posts to survive. Mirrors the
 # old prompt rule ("a theme needs at least 2 posts"); a 1-post theme is
 # usually an embedding fluke, not a trend.
@@ -360,6 +373,97 @@ def _embed_texts(texts: list[str]) -> np.ndarray:
     norms = np.linalg.norm(mat, axis=1, keepdims=True)
     norms[norms == 0] = 1.0  # guard against a zero vector
     return mat / norms
+
+
+def _derive_theme_groups(
+    theme_post_ids: list[list[Any]],
+    sample: list[dict[str, Any]],
+) -> list[str | None]:
+    """Derive each theme's coarse theme_group by majority vote across
+    its assigned posts' `theme_group` field.
+
+    Returns one entry per theme (same length as theme_post_ids):
+      - None if the theme has no assigned posts yet, OR
+      - None if no assigned post carries a non-empty theme_group, OR
+      - the modal theme_group across assigned posts.
+
+    Pure function (no I/O) — extracted for unit testing.
+    """
+    id_to_group: dict[Any, str | None] = {
+        p["id"]: p.get("theme_group") for p in sample
+    }
+    out: list[str | None] = []
+    for pids in theme_post_ids:
+        if not pids:
+            out.append(None)
+            continue
+        counts: dict[str, int] = {}
+        for pid in pids:
+            tg = id_to_group.get(pid)
+            if tg:
+                counts[tg] = counts.get(tg, 0) + 1
+        if not counts:
+            out.append(None)
+            continue
+        out.append(max(counts.items(), key=lambda kv: kv[1])[0])
+    return out
+
+
+def _rescue_in_group_orphans(
+    *,
+    orphan_rows: list[int],
+    orphan_metadata: list[tuple[int, str, str | None]],
+    sims: np.ndarray,
+    themes: list[dict[str, Any]],
+    theme_group_per_theme: list[str | None],
+    rescue_floor: float,
+) -> list[tuple[int, int]]:
+    """Second-pass rescue for orphans that already carry a coarse
+    theme_group from the upstream classifier.
+
+    For each orphan post:
+      - Skip if its theme_group is missing or "Lainnya" (nothing to
+        constrain the candidate pool with).
+      - Restrict candidates to themes whose own (majority-vote)
+        theme_group matches the post's.
+      - Pick the highest-cosine candidate. Accept if cosine ≥
+        rescue_floor AND no exclude_keyword disqualifies.
+
+    Returns a list of (orphan_position, theme_idx) — caller moves those
+    orphans into theme_post_ids[theme_idx] and removes them from the
+    orphan list.
+
+    `orphan_position` is the index into the caller's orphan_rows /
+    orphan_metadata / orphan_ids arrays (which are kept in lockstep).
+
+    Pure function (no I/O, no global state) — extracted for unit
+    testing with synthetic sims matrices.
+    """
+    rescues: list[tuple[int, int]] = []
+    for pos, (row, (sample_i, post_text, pg)) in enumerate(
+        zip(orphan_rows, orphan_metadata, strict=True)
+    ):
+        del sample_i  # not needed here — caller has it
+        if not pg or pg == "Lainnya":
+            continue
+        in_group_idxs = [
+            t_idx
+            for t_idx, tg in enumerate(theme_group_per_theme)
+            if tg == pg
+        ]
+        if not in_group_idxs:
+            continue
+        # Pick the in-group theme with highest cosine to this post.
+        best_idx = max(in_group_idxs, key=lambda i: sims[row, i])
+        if sims[row, best_idx] < rescue_floor:
+            continue
+        post_lower = post_text.lower()
+        if any(
+            kw in post_lower for kw in themes[best_idx]["exclude_keywords"]
+        ):
+            continue
+        rescues.append((pos, int(best_idx)))
+    return rescues
 
 
 def discover_topics(
@@ -770,6 +874,11 @@ def discover_topics(
 
     theme_post_ids: list[list[Any]] = [[] for _ in themes]
     orphan_ids: list[Any] = []
+    # Parallel arrays to orphan_ids — needed by the second-pass rescue
+    # below. orphan_rows[i] is the row index into `sims` for orphan i,
+    # orphan_metadata[i] is (sample_i, post_text, theme_group).
+    orphan_rows: list[int] = []
+    orphan_metadata: list[tuple[int, str, str | None]] = []
     assigned = 0
     excluded_by_keyword = 0
     excluded_by_floor = 0
@@ -798,6 +907,47 @@ def discover_topics(
             break
         if not placed:
             orphan_ids.append(sample[sample_i]["id"])
+            orphan_rows.append(row)
+            orphan_metadata.append(
+                (sample_i, post_text, sample[sample_i].get("theme_group"))
+            )
+
+    # Second-pass rescue (added 2026-06-07 after the Lainnya bleed-in
+    # audit). For orphans that already carry a coarse theme_group from
+    # the upstream classifier, retry them against ONLY themes whose own
+    # majority-vote theme_group matches, at the relaxed RESCUE_FLOOR.
+    # The strict MIN_SIMILARITY floor still gates cross-group bleed-in
+    # (a "kemiskinan" rant cosining 0.22 to "Korupsi MBG" stays orphan
+    # because its theme_group is "Ekonomi & Bisnis", not "Hukum &
+    # Keadilan" like the MBG theme).
+    rescued_positions: set[int] = set()
+    if orphan_ids:
+        theme_group_per_theme = _derive_theme_groups(theme_post_ids, sample)
+        rescues = _rescue_in_group_orphans(
+            orphan_rows=orphan_rows,
+            orphan_metadata=orphan_metadata,
+            sims=sims,
+            themes=themes,
+            theme_group_per_theme=theme_group_per_theme,
+            rescue_floor=RESCUE_FLOOR,
+        )
+        for pos, theme_idx in rescues:
+            sample_i, _post_text, _pg = orphan_metadata[pos]
+            theme_post_ids[theme_idx].append(sample[sample_i]["id"])
+            rescued_positions.add(pos)
+            assigned += 1
+        if rescued_positions:
+            orphan_ids = [
+                oid
+                for i, oid in enumerate(orphan_ids)
+                if i not in rescued_positions
+            ]
+        log.info(
+            "topic_discovery.orphan_rescue",
+            rescued=len(rescued_positions),
+            remaining_orphans=len(orphan_ids),
+            floor=RESCUE_FLOOR,
+        )
 
     results: list[dict[str, Any]] = []
     for theme, post_ids in zip(themes, theme_post_ids, strict=True):

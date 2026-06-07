@@ -129,6 +129,7 @@ async def _fetch_recent_posts() -> list[dict[str, Any]]:
                 SocialPost.id,
                 SocialPost.text,
                 SocialPost.posted_at,
+                SocialPost.theme_group,
                 func.row_number()
                 .over(
                     partition_by=day_bucket,
@@ -147,12 +148,26 @@ async def _fetch_recent_posts() -> list[dict[str, Any]]:
         )
 
         res = await session.execute(
-            select(ranked.c.id, ranked.c.text, ranked.c.posted_at)
+            select(
+                ranked.c.id,
+                ranked.c.text,
+                ranked.c.posted_at,
+                ranked.c.theme_group,
+            )
             .where(ranked.c.rn <= PER_DAY_CAP)
             .order_by(ranked.c.posted_at.desc())
         )
+        # `theme_group` is the coarse 14-bucket label set at ingest by
+        # the sentiment/theme-group classifier. The orphan-rescue pass
+        # inside discover_topics() uses it to constrain the in-group
+        # cosine retry — see RESCUE_FLOOR in services/topic_discovery.py.
         rows = [
-            {"id": row.id, "text": row.text, "posted_at": row.posted_at}
+            {
+                "id": row.id,
+                "text": row.text,
+                "posted_at": row.posted_at,
+                "theme_group": row.theme_group,
+            }
             for row in res.all()
             if row.text
         ]
