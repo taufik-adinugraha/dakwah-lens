@@ -236,6 +236,12 @@ export async function getPlatformInsights(
   // its assigned posts and counting only this platform's (region-scoped)
   // rows. `topics.post_count` is the cross-platform total and is ignored
   // here. innerJoin drops topics with no posts on this platform.
+  // Exclude the canonical catch-all bucket "Lainnya — Tidak
+  // Terklasifikasi" (and any historical variants) — with ~25% of
+  // weekly posts landing there it would dominate the per-platform
+  // discovered-topics column and crowd out the actually-trending
+  // themes. Same filter as `getTopIssues` in dashboard-metrics.ts
+  // since 2026-06-07.
   const topicRows = (await db
     .select({
       id: schema.topics.id,
@@ -248,7 +254,9 @@ export async function getPlatformInsights(
       schema.socialPosts,
       eq(schema.socialPosts.topicId, schema.topics.id),
     )
-    .where(platformWhere)
+    .where(
+      and(platformWhere, sql`${schema.topics.label} NOT ILIKE 'lainnya%'`)!,
+    )
     .groupBy(schema.topics.id, schema.topics.label, schema.topics.keywords)
     .orderBy(desc(count(schema.socialPosts.id)))) as Array<{
     id: string;

@@ -350,19 +350,38 @@ async function CategoryTopicCharts({
                   // Route each topic to its theme-group page with a
                   // ?topic filter so the user lands on the existing
                   // group view scoped to this topic (posts list +
-                  // sentiment bar both re-scope). Falls back to the
-                  // Lainnya group if the label doesn't match any of
-                  // the 14 theme regexes.
-                  const groupSlug =
-                    SLUG_BY_GROUP[classifyThemeGroup(topic.label)] ??
-                    Object.keys(GROUP_BY_SLUG)[0];
-                  const href = `/groups/${groupSlug}?topic=${topic.id}`;
+                  // sentiment bar both re-scope). If classifyThemeGroup
+                  // can't bucket the label (returns "Lainnya"), render
+                  // the row as plain text rather than silently routing
+                  // to whichever group happens to be first in the map —
+                  // pre-2026-06-07 fallback `Object.keys(GROUP_BY_SLUG)[0]`
+                  // sent every unclassified topic to "Hukum & Keadilan"
+                  // which surprised users (e.g. "Isu LGBT" landing on
+                  // the corruption page).
+                  const classifiedGroup = classifyThemeGroup(topic.label);
+                  const groupSlug = SLUG_BY_GROUP[classifiedGroup];
+                  const href = groupSlug
+                    ? `/groups/${groupSlug}?topic=${topic.id}`
+                    : null;
+                  const Wrapper = href
+                    ? ({ children }: { children: React.ReactNode }) => (
+                        <Link
+                          href={href}
+                          className="group block rounded-lg px-2 py-1.5 transition hover:bg-slate-50"
+                        >
+                          {children}
+                        </Link>
+                      )
+                    : ({ children }: { children: React.ReactNode }) => (
+                        <div
+                          className="group block rounded-lg px-2 py-1.5"
+                          title="Belum termasuk dalam salah satu 14 kelompok tema"
+                        >
+                          {children}
+                        </div>
+                      );
                   return (
-                    <Link
-                      key={topic.id}
-                      href={href}
-                      className="group block rounded-lg px-2 py-1.5 transition hover:bg-slate-50"
-                    >
+                    <Wrapper key={topic.id}>
                       <div className="flex items-baseline justify-between gap-3">
                         <span className="truncate text-sm font-medium text-slate-800 group-hover:text-slate-900">
                           {topic.label}
@@ -378,7 +397,7 @@ async function CategoryTopicCharts({
                           style={{ width: `${(topic.postCount / topMax) * 100}%` }}
                         />
                       </div>
-                    </Link>
+                    </Wrapper>
                   );
                 })}
               </div>

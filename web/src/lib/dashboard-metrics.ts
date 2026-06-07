@@ -1811,6 +1811,9 @@ export const THEME_GROUPS: ReadonlyArray<{ group: string; patterns: RegExp[] }> 
       /isu sosial/i,
       /keluarga/i,
       /kdrt/i,
+      /\blgbt\b/i,
+      /kontroversi sosial/i,
+      /pelecehan/i,
     ],
   },
   {
@@ -1873,6 +1876,9 @@ export const THEME_GROUPS: ReadonlyArray<{ group: string; patterns: RegExp[] }> 
       /program pemerintah/i,
       /makan bergizi/i,
       /\bmbg\b/i,
+      /pancasila/i,
+      /integritas bangsa/i,
+      /nasionalisme/i,
     ],
   },
   {
