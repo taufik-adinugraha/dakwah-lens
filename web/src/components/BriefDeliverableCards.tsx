@@ -181,6 +181,32 @@ const KIND_QUOTE: Record<CardKind, { bg: string; border: string; icon: string }>
 };
 
 /**
+ * Strip the optional `— "Specific Topic Title"` suffix from a deliverable
+ * H3 heading, leaving just the category label. The card grid shows only
+ * the category ("Khutbah Jumat", "Kajian Majelis Taklim", "Aksi Sosial
+ * & Khidmah Umat") because the per-edition topic title is shown in the
+ * modal + the dedicated page header below. Older briefings (no suffix)
+ * round-trip unchanged.
+ *
+ * Examples:
+ *   `Khutbah Jumat — "Adil dan Ihsan: Dua Sayap..."` → `Khutbah Jumat`
+ *   `Kajian Majelis Taklim — "Nabi Syu'aib..."` → `Kajian Majelis Taklim`
+ *   `Kisah Pendek` → `Kisah Pendek` (no suffix, unchanged)
+ *   `Aksi Sosial & Khidmah Umat` → `Aksi Sosial & Khidmah Umat`
+ *
+ * Handles both em-dash (—) and en-dash (–) separators; tolerates straight
+ * vs curly quotes around the topic title.
+ */
+function cardLabelFor(heading: string): string {
+  // Split on " — " or " – " (with surrounding spaces so a name like
+  // "Aksi Sosial & Khidmah Umat" — which has no separator — passes
+  // through untouched).
+  const idx = heading.search(/\s+[—–]\s+/);
+  if (idx === -1) return heading.trim();
+  return heading.slice(0, idx).trim();
+}
+
+/**
  * Pattern-match a markdown ### heading to one of the 6 known card kinds.
  * Tolerant of language (id/en) and minor wording variation so the prompt
  * doesn't have to land the exact text every time. Returns null when no
@@ -486,7 +512,7 @@ function DeliverableCardTile({
           <Icon className="h-5 w-5" />
         </span>
         <h3 className="min-w-0 flex-1 text-balance text-base font-semibold leading-tight text-slate-900 sm:text-[17px]">
-          {card.heading}
+          {cardLabelFor(card.heading)}
         </h3>
       </div>
       <p className="text-pretty text-[13px] leading-relaxed text-slate-600">
