@@ -34,6 +34,7 @@ const ALL_CORPORA: KitabCorpus[] = [
   "fmuin",
   "fqarib",
   "adab",
+  "aqidah",
 ];
 
 // Default selection when the user hasn't picked anything yet. Tafsir is
@@ -183,6 +184,16 @@ const KITAB_META: Record<
     metaKey: "kitab_adab_meta",
     tone: "from-pink-50 to-pink-100/40",
     iconTone: "bg-pink-600",
+    languages: ["AR"],
+  },
+  // 'Aqidat al-'Awam (Ahmad al-Marzuqi) — entry-level Ash'ari aqidah
+  // poem taught from kindergarten through ibtidaiyyah in Indonesian
+  // pesantren. Foundation for Nawawi al-Bantani's Nur al-Zalam sharh.
+  aqidah: {
+    labelKey: "kitab_aqidah_title",
+    metaKey: "kitab_aqidah_meta",
+    tone: "from-sky-50 to-sky-100/40",
+    iconTone: "bg-sky-600",
     languages: ["AR"],
   },
 };
