@@ -21,6 +21,7 @@ MAX_BATCH per call to amortize system-prompt tokens.
 from __future__ import annotations
 
 import json
+import re
 import time
 from dataclasses import dataclass
 from typing import Literal
@@ -33,6 +34,92 @@ from google.genai import types
 from api.config import settings
 
 log = structlog.get_logger()
+
+
+# ─────────────────────────────────────────────────────────────────────
+# Non-Indonesian language gate (pre-classifier)
+#
+# Added 2026-06-08 after audit found Hindi-script and English-only spam
+# tweets bleeding into 14-group themes (one got classified as "Toleransi
+# & Lintas-Iman"). Saves the Gemini round-trip AND prevents the bleed by
+# pre-routing obviously-foreign content straight to Lainnya.
+#
+# The classifier prompt also has a non-ID rule, but a code-level gate is
+# cheaper + deterministic for the obvious cases. The prompt still handles
+# borderline ID/EN code-switched posts.
+# ─────────────────────────────────────────────────────────────────────
+
+# Unicode script blocks that are NOT used in Indonesian (Latin) text.
+# Devanagari (Hindi), Han (Chinese), Hangul (Korean), Hiragana, Katakana
+# (Japanese), Cyrillic (Russian), Thai, Hebrew.
+_NON_LATIN_SCRIPT_RE = re.compile(
+    r"[ऀ-ॿ一-鿿가-힯぀-ゟ"
+    r"゠-ヿЀ-ӿ฀-๿֐-׿]"
+)
+
+# Indonesian function words that almost always appear in any natural-
+# Indonesian sentence longer than ~10 words. Their absence in a 50+
+# char Latin-script post is a strong signal the post isn't Indonesian.
+_ID_FUNCTION_WORDS = frozenset(
+    "yang dan di ke dari untuk dengan pada ini itu kita akan sudah "
+    "atau kalau juga ada dalam saya anda tidak tapi jadi maka karena "
+    "saat sebagai oleh lebih telah dapat hanya bisa lalu jika tetapi "
+    "namun pun nya pun setelah selama sambil tentang bagi adalah".split()
+)
+
+# Indonesian-specific entity/topic words. Their presence rescues an
+# English-leaning post (e.g. "Jakarta Post about Prabowo speech") from
+# being mis-gated as foreign — the post is about Indonesia even if the
+# wording is English.
+_ID_ENTITY_RE = re.compile(
+    r"\b(allah|muslim|islam|nabi|hadits|hadith|umat|jamaah|masjid|"
+    r"rakyat|presiden|menteri|dpr|gubernur|polisi|kpk|kejaksaan|"
+    r"pemerintah|negara|warga|kota|kabupaten|provinsi|indonesia|"
+    r"jakarta|surabaya|bandung|medan|bali|sulawesi|papua|jawa|"
+    r"prabowo|jokowi|nadiem|pdip|gerindra|nu|muhammadiyah)\b",
+    re.IGNORECASE,
+)
+
+
+def _is_predominantly_non_indonesian(text: str) -> bool:
+    """Cheap heuristic — return True if `text` is unlikely to be Indonesian.
+
+    Two pathways:
+      1. Substantial non-Latin script content (>30% of non-space chars) →
+         True. Catches Hindi/Tamil/Chinese/Korean/Japanese/Russian/Arabic.
+      2. All-Latin but no Indonesian function words AND no Indonesian
+         entity terms in a 50+ char text → True. Catches English-only,
+         Spanish, Tagalog, etc. that happen to share Latin script.
+
+    Short posts (<20 chars after stripping @-handles/URLs) → True (likely
+    not meaningful content; usually @-mention spam).
+    """
+    if not text:
+        return False
+    raw = text.strip()
+    if len(raw) < 20:
+        return False  # let classifier handle very short posts
+
+    # Strip URLs, @-handles, #hashtags — they aren't useful for language ID
+    cleaned = re.sub(r"https?://\S+|@\w+|#\w+", " ", raw)
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    if len(cleaned) < 20:
+        return True  # post was almost entirely handles/URLs — not real content
+
+    # Pathway 1: non-Latin scripts dominate
+    non_latin = len(_NON_LATIN_SCRIPT_RE.findall(cleaned))
+    non_space_chars = sum(1 for c in cleaned if not c.isspace())
+    if non_space_chars > 0 and (non_latin / non_space_chars) > 0.30:
+        return True
+
+    # Pathway 2: zero Indonesian markers in a long-ish Latin text
+    words = re.findall(r"[A-Za-z]+", cleaned.lower())
+    if len(words) >= 8:
+        id_word_hits = sum(1 for w in words if w in _ID_FUNCTION_WORDS)
+        if id_word_hits == 0 and not _ID_ENTITY_RE.search(cleaned):
+            return True
+
+    return False
 
 MODEL = "gemini-2.5-flash-lite"
 # Was 50; lowered to 25 on 2026-05-21 after observing 503 "model overloaded"
@@ -189,6 +276,11 @@ ABSOLUTE RULES (highest priority — if any apply, route here regardless of othe
 - Writing/language tips threads by influencer authors (ivanlanin, "Ada N cara menulis perincian") → "Lainnya", NEVER "Pendidikan & SDM" (that bucket is for institutional education).
 - Image-based sexual abuse / non-consensual AI-generated nudes / deepfake porn / "viral video bokep" spam threads with sex-tape lists → "Patologi Sosial Digital" (it IS digital social pathology), NEVER "Sosial & Keluarga". Add this to the judol/pinjol/narkoba canonical set in your mental model.
 - Word-overlap traps — "Raja Judi" as a nickname for a casino tycoon's family (e.g. "Gaun Pengantin Menantu Raja Judi") = celebrity gossip → "Lainnya", NOT "Patologi Sosial Digital" (no judol/judi behavior is being discussed). Match SEMANTIC behavior, not surface keyword.
+- 2026-06-08 audit traps (calibrated against small-group misclassifications):
+    * Industry / commerce REGULATION posts — KADIN advocating against a regulation, asosiasi industri menolak kebijakan, industri tembakau menyoroti batas nikotin, business association policy advocacy → "Ekonomi & Bisnis" (or "Pemerintahan & Kebijakan" if the framing is the government's regulation itself). NOT "Patologi Sosial Digital" — the post is about business-regulation discourse, not digital social pathology, even if the regulated substance has health implications.
+    * Healthcare ACCESS / kesehatan masyarakat stories — doctor profiled for service-to-remote-area, akses kesehatan di NTT/Papua/daerah 3T, dokter dapat penghargaan layanan publik, hospital expansion stories, telemedicine to remote areas → "Kesehatan & Kehidupan", NOT "Pekerja & Pertanian Rakyat". The doctor's profession is incidental — the story is healthcare-access, not labor-rights. Pekerja & Pertanian Rakyat is for labor-rights / upah / buruh / petani-economy issues specifically.
+    * Transportation infrastructure — MRT/LRT/KRL station development, tol/jalan tol expansion, pelabuhan kapal/feri, bandara baru, kereta cepat — even when "smart" or "intelligent transport system" is mentioned → "Pemerintahan & Kebijakan" (state infrastructure policy). NOT "Teknologi & AI" — transit infrastructure is government-policy domain. Teknologi & AI is for AI models, deepfake/voice-AI scams, ChatGPT/LLM applications, automation, IT/SaaS startup discourse, cybersecurity, digital privacy in software contexts. Hardware infrastructure that happens to use technology is NOT Teknologi & AI.
+    * NON-INDONESIAN content gate — any post whose text is predominantly in a foreign language (Hindi, Tamil, Urdu, English-only without ID context, Arabic-only without Islamic teaching framing, Chinese, Korean, Tagalog, Japanese, Spanish, etc.) → "Lainnya", regardless of how the @ mentions or hashtags look. Indonesian-spam tweets with mostly @-handles + Hindi/Tamil tail content = "Lainnya", NOT any 14-group theme. Our dashboard audience is Indonesian-speaking; non-ID content is off-taxonomy by definition.
 - Non-Indonesia generic stress / lifestyle / human-interest stories that don't touch Indonesian context ("Pakistani sailor stress", "American school lunch debate") → "Lainnya", NEVER "Sosial & Keluarga" (that bucket is Indonesian family/social dynamics).
 - Violence at pesantren / sekolah — santri dibakar/disekap, pembullyan berujung kekerasan, pengeroyokan murid — when there's a perpetrator and police investigation → "Hukum & Keadilan" (already covered by KDRT rule below; this is the reinforcement for pesantren-context).
 - Hadith / ayat content with explicit Islamic teaching from mainstream Indonesian Islamic outlet (Republika "Jangan Suka Berandai-andai" citing hadith about لو, NU Online akhlak post, Kemenag Q&A) → "Aqidah & Ibadah", NEVER "Inspirasi & Kisah Pribadi" even when framed as life advice. Hadith citation IS the Islamic-teaching marker.
@@ -274,6 +366,19 @@ def classify(text: str) -> SentimentResult | None:
     return classify_batch([text])[0]
 
 
+def _lainnya_pre_result() -> SentimentResult:
+    """Synthetic result for posts the non-ID gate pre-routes to Lainnya.
+    Sentiment defaults to confident-neutral since the post is off-
+    taxonomy; downstream code reads `theme_group='Lainnya'` and filters
+    accordingly."""
+    return SentimentResult(
+        label="neutral",
+        score=1.0,
+        raw={"positive": 0.0, "neutral": 1.0, "negative": 0.0},
+        theme_group="Lainnya",
+    )
+
+
 def classify_batch(texts: list[str]) -> list[SentimentResult | None]:
     """Classify a batch of posts.
 
@@ -282,13 +387,41 @@ def classify_batch(texts: list[str]) -> list[SentimentResult | None]:
     sustained 503 outage). Callers should write `sentiment_label=NULL`
     for None entries so the `retry_failed_sentiment` worker task picks
     them up later.
+
+    Pre-classifier non-Indonesian gate (added 2026-06-08): obvious
+    foreign-language posts skip the Gemini call entirely and get a
+    pre-built `theme_group='Lainnya'` result. Saves cost + prevents
+    the bleed where non-ID content gets misclassified to a permissive
+    14-group theme (real bug: Hindi spam → 'Toleransi & Lintas-Iman').
     """
     if not texts:
         return []
 
+    # Pre-gate: route obviously-foreign posts to Lainnya without calling
+    # Gemini. We only classify posts that pass the gate.
     results: list[SentimentResult | None] = [None] * len(texts)
-    for start in range(0, len(texts), MAX_BATCH):
-        chunk = texts[start : start + MAX_BATCH]
+    indices_to_classify: list[int] = []
+    gate_skipped = 0
+    for i, t in enumerate(texts):
+        if _is_predominantly_non_indonesian(t):
+            results[i] = _lainnya_pre_result()
+            gate_skipped += 1
+        else:
+            indices_to_classify.append(i)
+
+    if gate_skipped:
+        log.info(
+            "sentiment.non_id_gate_skipped",
+            skipped=gate_skipped,
+            kept=len(indices_to_classify),
+            total=len(texts),
+        )
+
+    # Classify only the kept posts. Indices are tracked so we can
+    # write each result back to its original slot.
+    kept_texts = [texts[i] for i in indices_to_classify]
+    for start in range(0, len(kept_texts), MAX_BATCH):
+        chunk = kept_texts[start : start + MAX_BATCH]
         try:
             scored = _classify_chunk(chunk)
         except Exception:
@@ -300,8 +433,9 @@ def classify_batch(texts: list[str]) -> list[SentimentResult | None]:
                 batch_size=len(chunk),
             )
             continue
-        for i, r in enumerate(scored):
-            results[start + i] = r
+        for offset, r in enumerate(scored):
+            kept_idx = indices_to_classify[start + offset]
+            results[kept_idx] = r
 
     return results
 
