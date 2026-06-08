@@ -1078,17 +1078,35 @@ export function extractPosterQuestion(markdown: string): string {
     markdown,
     /^###\s+.*(?:mahasiswa|university\s+student|gen[\s-]?z|pendekatan\s+gen|reaching gen)/i,
   ).join("\n");
-  if (!body) return "";
-  const m = body.match(
-    /^\s*\*\*\s*(?:poster\s+question|pertanyaan\s+poster|pertanyaan\s+pemicu)\s*[:：]\s*\*\*\s*["“]?(.+?)["”]?\s*$/im,
-  );
-  if (m && m[1]) {
-    return m[1]
-      .trim()
-      .replace(/^["“]\s*|\s*["”]$/g, "")
-      .replace(/\s+/g, " ")
-      .trim();
+
+  // PRIMARY: explicit Poster Question marker (older briefings + the
+  // AI-generated template).
+  if (body) {
+    const m = body.match(
+      /^\s*\*\*\s*(?:poster\s+question|pertanyaan\s+poster|pertanyaan\s+pemicu)\s*[:：]\s*\*\*\s*["“]?(.+?)["”]?\s*$/im,
+    );
+    if (m && m[1]) {
+      return m[1]
+        .trim()
+        .replace(/^["“]\s*|\s*["”]$/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
   }
+
+  // FALLBACK: extract the quoted subtitle from the Mahasiswa H3 line.
+  // After 2026-06-08 every deliverable H3 carries a topic title in
+  // the format `### Mahasiswa Pack — "Specific Title"` (added so the
+  // discussion card + popup have content beyond the bare category).
+  // Use that quoted portion when no explicit marker exists — better
+  // than the bare slug.
+  const titleMatch = markdown.match(
+    /^###\s+[^\n—–]*(?:mahasiswa|university\s+student|gen[\s-]?z|pendekatan\s+gen|reaching gen)[^\n—–]*[—–]\s*["“]([^"”\n]+)["”]/im,
+  );
+  if (titleMatch && titleMatch[1]) {
+    return titleMatch[1].trim().replace(/\s+/g, " ");
+  }
+
   return "";
 }
 

@@ -13,6 +13,7 @@ import {
 
 import { Link } from "@/i18n/navigation";
 import { localeAwareFormatDateTime } from "@/lib/date-id";
+import { THEME_GROUP_PALETTE, paletteFor } from "@/lib/theme-group-palette";
 
 /** Client-shaped room item. Dates arrive as ISO strings (server →
  *  client serialization), weekKey is the WIB-date string keyed in
@@ -41,10 +42,6 @@ type Labels = {
   filterWeek: string;
   filterSegment: string;
   segmentAll: string;
-  segmentSpiritual: string;
-  segmentFamily: string;
-  segmentYouth: string;
-  segmentJustice: string;
   statusActive: string;
   statusDormant: string;
   statusMuted: string;
@@ -60,35 +57,7 @@ type Labels = {
   clearFilters: string;
 };
 
-const SEGMENT_KEYS: { key: string | "all"; label: keyof Labels }[] = [
-  { key: "all", label: "segmentAll" },
-  { key: "spiritual", label: "segmentSpiritual" },
-  { key: "family", label: "segmentFamily" },
-  { key: "youth", label: "segmentYouth" },
-  { key: "justice", label: "segmentJustice" },
-];
-
 type StatusFilter = "all" | "active" | "dormant";
-
-const SEGMENT_TONE: Record<string, { bg: string; ring: string; text: string }> = {
-  null: { bg: "bg-slate-100", ring: "ring-slate-200", text: "text-slate-700" },
-  spiritual: {
-    bg: "bg-emerald-50",
-    ring: "ring-emerald-200",
-    text: "text-emerald-700",
-  },
-  family: { bg: "bg-rose-50", ring: "ring-rose-200", text: "text-rose-700" },
-  youth: {
-    bg: "bg-violet-50",
-    ring: "ring-violet-200",
-    text: "text-violet-700",
-  },
-  justice: {
-    bg: "bg-amber-50",
-    ring: "ring-amber-200",
-    text: "text-amber-700",
-  },
-};
 
 const PAGE_SIZE = 24;
 const OWNED_KEY = "dl_owned";
@@ -245,17 +214,31 @@ export function DiscussionsBoard({
 
           <div className="mx-1 h-5 w-px bg-slate-200" aria-hidden />
 
-          {/* Topic / segment */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            {SEGMENT_KEYS.map(({ key, label }) => (
-              <FilterChip
-                key={key}
-                label={labels[label]}
-                active={segment === key}
-                onClick={() => setSegment(key)}
-                size="sm"
-              />
-            ))}
+          {/* Theme-group dropdown — 14 canonical groups (was 4-chip
+              legacy: Spiritual / Keluarga / Pemuda / Keadilan).
+              Dropdown chosen over chips because 14 chips wrap badly on
+              the filter strip; the dropdown stays compact and lets us
+              swap chip color per selection visually downstream. */}
+          <div className="inline-flex items-center gap-1.5">
+            <label className="sr-only" htmlFor="discussion-segment-filter">
+              {labels.filterSegment}
+            </label>
+            <select
+              id="discussion-segment-filter"
+              value={segment}
+              onChange={(e) => setSegment(e.target.value)}
+              className="h-8 rounded-full border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+            >
+              <option value="all">{labels.segmentAll}</option>
+              {Object.entries(THEME_GROUP_PALETTE)
+                .filter(([key]) => key !== "all")
+                .map(([groupName, tone]) => (
+                  <option key={groupName} value={groupName}>
+                    {/* Title-case from upper-case label for the dropdown */}
+                    {groupName}
+                  </option>
+                ))}
+            </select>
           </div>
 
           <div className="mx-1 h-5 w-px bg-slate-200" aria-hidden />
@@ -447,12 +430,11 @@ function RoomCard({
   locale: string;
   labels: Labels;
 }) {
-  const segKey = (room.segment ?? "null") as keyof typeof SEGMENT_TONE;
-  const tone = SEGMENT_TONE[segKey] ?? SEGMENT_TONE.null;
-  const segLabel =
-    labels[
-      `segment${segKey === "null" ? "All" : capitalize(String(room.segment))}` as keyof Labels
-    ] ?? labels.segmentAll;
+  // 14-group palette lookup. room.segment is the raw THEME_GROUPS
+  // label ("Hukum & Keadilan", "Teknologi & AI", …); null/unknown
+  // groups fall back to the neutral palette.
+  const tone = paletteFor(room.segment);
+  const segLabel = tone.label;
   const isActive = room.approved7d > 0 && !room.muted;
   const commentLabel =
     room.totalApproved === 1
@@ -482,11 +464,11 @@ function RoomCard({
     <li>
       <Link
         href={`/m/${room.slug}`}
-        className="group relative flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300 hover:shadow-md"
+        className={`group relative flex h-full flex-col rounded-2xl border ${tone.cardBorder} ${tone.cardBg} p-4 shadow-sm transition hover:shadow-md`}
       >
         <div className="flex items-center justify-between gap-2">
           <span
-            className={`inline-flex items-center gap-1 rounded-full ${tone.bg} px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] ring-1 ${tone.ring} ${tone.text}`}
+            className={`inline-flex items-center gap-1 rounded-full ${tone.chipBg} px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] ${tone.chipText}`}
           >
             {segLabel}
           </span>
@@ -583,7 +565,3 @@ function Pagination({
   );
 }
 
-function capitalize(s: string): string {
-  if (!s) return s;
-  return s[0].toUpperCase() + s.slice(1);
-}

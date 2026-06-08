@@ -9,6 +9,7 @@ import { getTranslations } from "next-intl/server";
 
 import { localeAwareFormat } from "@/lib/date-id";
 import { getOtherMahasiswaRooms, type OtherRoom } from "@/lib/briefing-data";
+import { paletteFor } from "@/lib/theme-group-palette";
 
 /**
  * "Lihat diskusi lain" rail at the bottom of /m/{slug}.
@@ -84,11 +85,6 @@ type Labels = {
   no_activity: string;
   just_now: string;
   open: string;
-  segment_all: string;
-  segment_spiritual: string;
-  segment_family: string;
-  segment_youth: string;
-  segment_justice: string;
 };
 
 function makeLabels(t: Awaited<ReturnType<typeof getTranslations>>): Labels {
@@ -102,11 +98,6 @@ function makeLabels(t: Awaited<ReturnType<typeof getTranslations>>): Labels {
     no_activity: t("no_activity"),
     just_now: t("just_now"),
     open: t("open"),
-    segment_all: t("segment_all"),
-    segment_spiritual: t("segment_spiritual"),
-    segment_family: t("segment_family"),
-    segment_youth: t("segment_youth"),
-    segment_justice: t("segment_justice"),
   };
 }
 
@@ -119,19 +110,16 @@ function RoomCard({
   locale: string;
   labels: Labels;
 }) {
-  // SEGMENT_PALETTE keys are the legacy 4-segment slugs (all/spiritual/
-  // family/youth/justice). Briefings since 2026-06-03 use the 14-group
-  // THEME_GROUPS labels ("Pemerintahan & Kebijakan", "Teknologi & AI",
-  // …) which miss the map. Fall back to `all` so the card still renders
-  // — same defensive pattern as palettes lookup in m/[id]/page.tsx:74.
-  const palette =
-    SEGMENT_PALETTE[room.themeGroup ?? "all"] ?? SEGMENT_PALETTE.all;
+  // 14-group palette lookup — shared with /discussions board. room.themeGroup
+  // is the raw THEME_GROUPS label ("Hukum & Keadilan", "Teknologi & AI", …);
+  // null/unknown groups fall back to the neutral palette. Migrated from the
+  // local 5-key legacy SEGMENT_PALETTE on 2026-06-08 (the legacy keys
+  // — all/spiritual/family/youth/justice — silently dropped every 14-group
+  // briefing into the gray fallback).
+  const palette = paletteFor(room.themeGroup);
   const status = deriveStatus(room);
   const statusMeta = STATUS_META[status];
-  const segmentLabel =
-    labels[
-      `segment_${room.themeGroup ?? "all"}` as keyof Labels
-    ] ?? labels.segment_all;
+  const segmentLabel = palette.label;
 
   const dateLabel = localeAwareFormat(room.generatedAt, locale, {
     day: "numeric",
@@ -261,54 +249,9 @@ const STATUS_META: Record<
   },
 };
 
-// Per-segment palette — mirrors the article hero gradient so a
-// scanner sees the same color identity carried across pages.
-const SEGMENT_PALETTE: Record<
-  string,
-  {
-    cardBorder: string;
-    cardBg: string;
-    chipBg: string;
-    chipText: string;
-    openText: string;
-  }
-> = {
-  all: {
-    cardBorder: "border-indigo-100",
-    cardBg: "bg-gradient-to-br from-indigo-50/40 via-white to-white",
-    chipBg: "bg-indigo-100",
-    chipText: "text-indigo-800",
-    openText: "text-indigo-700 group-hover:text-indigo-900",
-  },
-  spiritual: {
-    cardBorder: "border-emerald-100",
-    cardBg: "bg-gradient-to-br from-emerald-50/50 via-white to-white",
-    chipBg: "bg-emerald-100",
-    chipText: "text-emerald-800",
-    openText: "text-emerald-700 group-hover:text-emerald-900",
-  },
-  family: {
-    cardBorder: "border-rose-100",
-    cardBg: "bg-gradient-to-br from-rose-50/50 via-white to-white",
-    chipBg: "bg-rose-100",
-    chipText: "text-rose-800",
-    openText: "text-rose-700 group-hover:text-rose-900",
-  },
-  youth: {
-    cardBorder: "border-amber-100",
-    cardBg: "bg-gradient-to-br from-amber-50/50 via-white to-white",
-    chipBg: "bg-amber-100",
-    chipText: "text-amber-800",
-    openText: "text-amber-700 group-hover:text-amber-900",
-  },
-  justice: {
-    cardBorder: "border-teal-100",
-    cardBg: "bg-gradient-to-br from-teal-50/50 via-white to-white",
-    chipBg: "bg-teal-100",
-    chipText: "text-teal-800",
-    openText: "text-teal-700 group-hover:text-teal-900",
-  },
-};
+// Per-segment palette lives in `@/lib/theme-group-palette` since
+// 2026-06-08 — was a local 5-key (all/spiritual/family/youth/justice)
+// that silently dropped all 14-group briefings into a gray fallback.
 
 function relativeShort(d: Date, justNow: string): string {
   const diff = Date.now() - d.getTime();
