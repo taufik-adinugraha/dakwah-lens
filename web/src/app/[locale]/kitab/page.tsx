@@ -37,6 +37,7 @@ const ALL_CORPORA: KitabCorpus[] = [
   "aqidah",
   "ts3",
   "syamail",
+  "sirah",
 ];
 
 // Default selection when the user hasn't picked anything yet. Tafsir is
@@ -219,6 +220,17 @@ const KITAB_META: Record<
     metaKey: "kitab_syamail_meta",
     tone: "from-blue-50 to-blue-100/40",
     iconTone: "bg-blue-600",
+    languages: ["AR"],
+  },
+  // Sirah Ibn Hisham — the foundational Prophetic biography, Ibn
+  // Hisham's redaction of Ibn Ishaq's original sirah. Canonical 2-volume
+  // historical narrative covering Arab genealogy, the Prophet's life,
+  // hijrah, battles, and farewell pilgrimage.
+  sirah: {
+    labelKey: "kitab_sirah_title",
+    metaKey: "kitab_sirah_meta",
+    tone: "from-stone-50 to-stone-100/40",
+    iconTone: "bg-stone-600",
     languages: ["AR"],
   },
 };

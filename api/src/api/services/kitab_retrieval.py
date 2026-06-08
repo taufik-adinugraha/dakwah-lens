@@ -75,6 +75,7 @@ COLLECTION_NAMES: dict[str, str] = {
     "aqidah_awam": "aqidah_awam",
     "thalathat_al_usul": "thalathat_al_usul",
     "syamail_muhammadiyyah": "syamail_muhammadiyyah",
+    "sirah_ibn_hisham": "sirah_ibn_hisham",
 }
 
 # Per-corpus minimum cosine similarity for a hit to count as a usable
@@ -114,6 +115,7 @@ MIN_SCORE: dict[str, float] = {
     "aqidah_awam": 0.28,
     "thalathat_al_usul": 0.28,
     "syamail_muhammadiyyah": 0.28,
+    "sirah_ibn_hisham": 0.28,
 }
 
 # AR-only kitabs get a +2 boost on the per-corpus quota — they score
@@ -134,6 +136,7 @@ _AR_ONLY_CORPORA: frozenset[str] = frozenset({
     "aqidah_awam",
     "thalathat_al_usul",
     "syamail_muhammadiyyah",
+    "sirah_ibn_hisham",
 })
 
 
@@ -218,6 +221,7 @@ def _normalize_hit(corpus: str, hit: Any) -> dict[str, Any]:
         "aqidah_awam",
         "thalathat_al_usul",
         "syamail_muhammadiyyah",
+        "sirah_ibn_hisham",
     ):
         # AR-only kitab payload (2026-06-08). `translation_id` /
         # `translation_en` deliberately empty — re-embed pass will
@@ -234,6 +238,7 @@ def _normalize_hit(corpus: str, hit: Any) -> dict[str, Any]:
             "aqidah_awam": "'Aqidat al-'Awam",
             "thalathat_al_usul": "Thalathat al-Usul",
             "syamail_muhammadiyyah": "Ash-Shama'il al-Muhammadiyyah",
+            "sirah_ibn_hisham": "Sirah Ibn Hisham",
         }
         default_citation = _default_citations[corpus]
         citation = payload.get("citation") or default_citation
