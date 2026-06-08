@@ -333,6 +333,8 @@
     "kitab_fs_meta": "Sayyid Sabiq · fiqih kontemporer berbasis daleel (tidak terikat satu madzhab) · 866 bab dalam 62 kitab fiqh (Thaharah, Shalat, Zakat, Haji, Buyu', Nikah, dll) · edisi Dar al-Kitab al-Arabi",
     "kitab_fmuin_title": "Fath al-Mu'in",
     "kitab_fmuin_meta": "Syaikh Zainuddin al-Malibari (w. 987H) · matan fiqih Syafi'i klasik, kurikulum pesantren NU/tradisional · 13 bab utama (Shalat, Zakat, Shaum, Haji, Bai', Nikah, Jinayah, Hudud, Jihad, Qadha', dll)",
+    "kitab_fqarib_title": "Fath al-Qarib al-Mujib",
+    "kitab_fqarib_meta": "Ibnu Qasim al-Ghazzi (w. 918H) · syarah matan At-Taqrib (Ghayatul Ikhtishar) Abu Syuja' · pintu masuk fiqih Syafi'i di pesantren · 212 fasal dalam 17 kitab fiqh (Thaharah, Shalat, Zakat, Shiyam, Haji, Buyu', Nikah, Jinayat, Hudud, Jihad, dll)",
     "kitab_tafsir_translations": "Terjemah: English (ringkasan Mubarakpuri)",
     "tafsir_excerpt_badge": "Cuplikan {idx} dari {total}",
     "tafsir_show_full": "Tampilkan tafsir lengkap",

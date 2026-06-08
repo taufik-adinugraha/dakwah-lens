@@ -333,6 +333,8 @@
     "kitab_fs_meta": "Sayyid Sabiq · modern daleel-grounded fiqh (not bound to a single madhhab) · 866 chapters across 62 fiqh kitabs (Purification, Prayer, Zakat, Hajj, Sales, Marriage, etc.) · Dar al-Kitab al-Arabi edition",
     "kitab_fmuin_title": "Fath al-Mu'in",
     "kitab_fmuin_meta": "Shaykh Zainuddin al-Malibari (d. 987H) · classical Shafi'i fiqh matn, the standard NU/traditional pesantren curriculum across Indonesia · 13 primary chapters (Prayer, Zakat, Fasting, Hajj, Sales, Marriage, Crimes, Punishments, Jihad, Judiciary, etc.)",
+    "kitab_fqarib_title": "Fath al-Qarib al-Mujib",
+    "kitab_fqarib_meta": "Ibn Qasim al-Ghazzi (d. 918H) · commentary on Abu Shuja's At-Taqrib (Ghayat al-Ikhtisar) · entry-level Shafi'i fiqh in the pesantren curriculum · 212 fasal across 17 fiqh kitabs (Purification, Prayer, Zakat, Fasting, Hajj, Sales, Marriage, Crimes, Punishments, Jihad, etc.)",
     "kitab_tafsir_translations": "Translation: English (Mubarakpuri abridged)",
     "tafsir_excerpt_badge": "Excerpt {idx} of {total}",
     "tafsir_show_full": "Show full commentary",

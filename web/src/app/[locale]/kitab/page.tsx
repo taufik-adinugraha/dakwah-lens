@@ -32,6 +32,7 @@ const ALL_CORPORA: KitabCorpus[] = [
   "nashaih",
   "fs",
   "fmuin",
+  "fqarib",
 ];
 
 // Default selection when the user hasn't picked anything yet. Tafsir is
@@ -161,6 +162,16 @@ const KITAB_META: Record<
     metaKey: "kitab_fmuin_meta",
     tone: "from-lime-50 to-lime-100/40",
     iconTone: "bg-lime-600",
+    languages: ["AR"],
+  },
+  // Fath al-Qarib al-Mujib (Ibn Qasim al-Ghazzi) — sharh of Abu Shuja's
+  // Ghayat al-Ikhtisar. Entry-level Shafi'i fiqh in pesantren curriculum,
+  // 212 fasal across 17 fiqh kitabs.
+  fqarib: {
+    labelKey: "kitab_fqarib_title",
+    metaKey: "kitab_fqarib_meta",
+    tone: "from-yellow-50 to-yellow-100/40",
+    iconTone: "bg-yellow-600",
     languages: ["AR"],
   },
 };
