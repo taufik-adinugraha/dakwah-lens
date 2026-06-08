@@ -339,6 +339,8 @@
     "kitab_adab_meta": "Badr al-Din Ibn Jama'ah al-Kinani (d. 733H), Tadhkirat al-Sami' wa al-Mutakallim · foundational source for KH Hasyim Asy'ari's (NU) pesantren adab curriculum · 5 chapters: virtue of knowledge & scholars, etiquette of teachers, etiquette of students, etiquette toward books, etiquette of residing in madrasahs",
     "kitab_aqidah_title": "'Aqidat al-'Awam",
     "kitab_aqidah_meta": "Shaykh Ahmad al-Marzuqi al-Maliki (d. 1262H) · entry-level Ash'ari aqidah poem (nazhm) for beginners · the foundational text for early pesantren creed lessons (kindergarten through ibtidaiyyah) · base matn for Sheikh Nawawi al-Bantani's Nur al-Zalam commentary · sourced from Wikipedia (public-domain matn)",
+    "kitab_ts3_title": "Thalathat al-Usul",
+    "kitab_ts3_meta": "Shaykh Muhammad ibn Abd al-Wahhab (d. 1206H) · short Salafi tawhid matn covering the three fundamental principles every Muslim must know (knowledge of Allah, of the religion, and of the Prophet) · counterpart to 'Aqidat al-'Awam, giving the corpus both Salafi and Ash'ari voices on basic creed",
     "kitab_tafsir_translations": "Translation: English (Mubarakpuri abridged)",
     "tafsir_excerpt_badge": "Excerpt {idx} of {total}",
     "tafsir_show_full": "Show full commentary",

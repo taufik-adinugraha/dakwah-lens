@@ -35,6 +35,7 @@ const ALL_CORPORA: KitabCorpus[] = [
   "fqarib",
   "adab",
   "aqidah",
+  "ts3",
 ];
 
 // Default selection when the user hasn't picked anything yet. Tafsir is
@@ -194,6 +195,18 @@ const KITAB_META: Record<
     metaKey: "kitab_aqidah_meta",
     tone: "from-sky-50 to-sky-100/40",
     iconTone: "bg-sky-600",
+    languages: ["AR"],
+  },
+  // Thalathat al-Usul (Muhammad ibn Abd al-Wahhab) — short Salafi
+  // beginner-level tawhid matn covering the three fundamental principles
+  // (knowledge of Allah / the religion / the Prophet). Pairs with
+  // 'Aqidat al-'Awam to give the corpus both Salafi and Ash'ari voices
+  // on basic creed.
+  ts3: {
+    labelKey: "kitab_ts3_title",
+    metaKey: "kitab_ts3_meta",
+    tone: "from-slate-50 to-slate-100/40",
+    iconTone: "bg-slate-600",
     languages: ["AR"],
   },
 };
