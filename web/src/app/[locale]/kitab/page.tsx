@@ -31,6 +31,7 @@ const ALL_CORPORA: KitabCorpus[] = [
   "bn",
   "nashaih",
   "fs",
+  "fmuin",
 ];
 
 // Default selection when the user hasn't picked anything yet. Tafsir is
@@ -151,6 +152,15 @@ const KITAB_META: Record<
     metaKey: "kitab_fs_meta",
     tone: "from-orange-50 to-orange-100/40",
     iconTone: "bg-orange-600",
+    languages: ["AR"],
+  },
+  // Fath al-Mu'in (Zainuddin al-Malibari) — Shafi'i fiqh matn, the
+  // standard NU/traditional pesantren curriculum across Indonesia.
+  fmuin: {
+    labelKey: "kitab_fmuin_title",
+    metaKey: "kitab_fmuin_meta",
+    tone: "from-lime-50 to-lime-100/40",
+    iconTone: "bg-lime-600",
     languages: ["AR"],
   },
 };

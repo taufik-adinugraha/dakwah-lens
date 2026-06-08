@@ -69,6 +69,7 @@ COLLECTION_NAMES: dict[str, str] = {
     "al_bidayah_wan_nihayah": "al_bidayah_wan_nihayah",
     "nashaihul_ibad": "nashaihul_ibad",
     "fiqh_as_sunnah": "fiqh_as_sunnah",
+    "fath_al_muin": "fath_al_muin",
 }
 
 # Per-corpus minimum cosine similarity for a hit to count as a usable
@@ -102,6 +103,7 @@ MIN_SCORE: dict[str, float] = {
     "al_bidayah_wan_nihayah": 0.28,
     "nashaihul_ibad": 0.28,
     "fiqh_as_sunnah": 0.28,
+    "fath_al_muin": 0.28,
 }
 
 # AR-only kitabs get a +2 boost on the per-corpus quota — they score
@@ -116,6 +118,7 @@ _AR_ONLY_CORPORA: frozenset[str] = frozenset({
     "al_bidayah_wan_nihayah",
     "nashaihul_ibad",
     "fiqh_as_sunnah",
+    "fath_al_muin",
 })
 
 
@@ -194,6 +197,7 @@ def _normalize_hit(corpus: str, hit: Any) -> dict[str, Any]:
         "al_bidayah_wan_nihayah",
         "nashaihul_ibad",
         "fiqh_as_sunnah",
+        "fath_al_muin",
     ):
         # AR-only kitab payload (2026-06-08). `translation_id` /
         # `translation_en` deliberately empty — re-embed pass will
@@ -204,6 +208,7 @@ def _normalize_hit(corpus: str, hit: Any) -> dict[str, Any]:
             "al_bidayah_wan_nihayah": "Al-Bidayah wan-Nihayah",
             "nashaihul_ibad": "Nashaihul Ibad",
             "fiqh_as_sunnah": "Fiqh as-Sunnah",
+            "fath_al_muin": "Fath al-Mu'in",
         }
         default_citation = _default_citations[corpus]
         citation = payload.get("citation") or default_citation

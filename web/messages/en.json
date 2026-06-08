@@ -331,6 +331,8 @@
     "kitab_nashaih_meta": "Sheikh Nawawi al-Bantani · sharh of Ibn Hajar al-'Asqalani's Munabbihat · akhlak & tasawuf advice organised by number (Twos through Tens) · classic pesantren text",
     "kitab_fs_title": "Fiqh as-Sunnah",
     "kitab_fs_meta": "Sayyid Sabiq · modern daleel-grounded fiqh (not bound to a single madhhab) · 866 chapters across 62 fiqh kitabs (Purification, Prayer, Zakat, Hajj, Sales, Marriage, etc.) · Dar al-Kitab al-Arabi edition",
+    "kitab_fmuin_title": "Fath al-Mu'in",
+    "kitab_fmuin_meta": "Shaykh Zainuddin al-Malibari (d. 987H) · classical Shafi'i fiqh matn, the standard NU/traditional pesantren curriculum across Indonesia · 13 primary chapters (Prayer, Zakat, Fasting, Hajj, Sales, Marriage, Crimes, Punishments, Jihad, Judiciary, etc.)",
     "kitab_tafsir_translations": "Translation: English (Mubarakpuri abridged)",
     "tafsir_excerpt_badge": "Excerpt {idx} of {total}",
     "tafsir_show_full": "Show full commentary",

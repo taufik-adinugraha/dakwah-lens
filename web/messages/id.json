@@ -331,6 +331,8 @@
     "kitab_nashaih_meta": "Syaikh Nawawi al-Bantani · syarah Munabbihat Ibn Hajar al-'Asqalani · nasihat akhlak & tasawuf tersusun per bilangan (Tsunai s/d 'Asyari) · kitab klasik pesantren",
     "kitab_fs_title": "Fiqh as-Sunnah",
     "kitab_fs_meta": "Sayyid Sabiq · fiqih kontemporer berbasis daleel (tidak terikat satu madzhab) · 866 bab dalam 62 kitab fiqh (Thaharah, Shalat, Zakat, Haji, Buyu', Nikah, dll) · edisi Dar al-Kitab al-Arabi",
+    "kitab_fmuin_title": "Fath al-Mu'in",
+    "kitab_fmuin_meta": "Syaikh Zainuddin al-Malibari (w. 987H) · matan fiqih Syafi'i klasik, kurikulum pesantren NU/tradisional · 13 bab utama (Shalat, Zakat, Shaum, Haji, Bai', Nikah, Jinayah, Hudud, Jihad, Qadha', dll)",
     "kitab_tafsir_translations": "Terjemah: English (ringkasan Mubarakpuri)",
     "tafsir_excerpt_badge": "Cuplikan {idx} dari {total}",
     "tafsir_show_full": "Tampilkan tafsir lengkap",
