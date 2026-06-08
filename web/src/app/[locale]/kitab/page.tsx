@@ -33,6 +33,7 @@ const ALL_CORPORA: KitabCorpus[] = [
   "fs",
   "fmuin",
   "fqarib",
+  "adab",
 ];
 
 // Default selection when the user hasn't picked anything yet. Tafsir is
@@ -172,6 +173,16 @@ const KITAB_META: Record<
     metaKey: "kitab_fqarib_meta",
     tone: "from-yellow-50 to-yellow-100/40",
     iconTone: "bg-yellow-600",
+    languages: ["AR"],
+  },
+  // Tadhkirat al-Sami' wa al-Mutakallim fi Adab al-'Alim wa al-Muta'allim
+  // (Ibn Jama'ah) — the foundational source for KH Hasyim Asy'ari's 1923
+  // pesantren adab curriculum.
+  adab: {
+    labelKey: "kitab_adab_title",
+    metaKey: "kitab_adab_meta",
+    tone: "from-pink-50 to-pink-100/40",
+    iconTone: "bg-pink-600",
     languages: ["AR"],
   },
 };

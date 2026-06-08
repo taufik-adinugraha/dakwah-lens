@@ -335,6 +335,8 @@
     "kitab_fmuin_meta": "Shaykh Zainuddin al-Malibari (d. 987H) · classical Shafi'i fiqh matn, the standard NU/traditional pesantren curriculum across Indonesia · 13 primary chapters (Prayer, Zakat, Fasting, Hajj, Sales, Marriage, Crimes, Punishments, Jihad, Judiciary, etc.)",
     "kitab_fqarib_title": "Fath al-Qarib al-Mujib",
     "kitab_fqarib_meta": "Ibn Qasim al-Ghazzi (d. 918H) · commentary on Abu Shuja's At-Taqrib (Ghayat al-Ikhtisar) · entry-level Shafi'i fiqh in the pesantren curriculum · 212 fasal across 17 fiqh kitabs (Purification, Prayer, Zakat, Fasting, Hajj, Sales, Marriage, Crimes, Punishments, Jihad, etc.)",
+    "kitab_adab_title": "Adab al-'Alim wa al-Muta'allim",
+    "kitab_adab_meta": "Badr al-Din Ibn Jama'ah al-Kinani (d. 733H), Tadhkirat al-Sami' wa al-Mutakallim · foundational source for KH Hasyim Asy'ari's (NU) pesantren adab curriculum · 5 chapters: virtue of knowledge & scholars, etiquette of teachers, etiquette of students, etiquette toward books, etiquette of residing in madrasahs",
     "kitab_tafsir_translations": "Translation: English (Mubarakpuri abridged)",
     "tafsir_excerpt_badge": "Excerpt {idx} of {total}",
     "tafsir_show_full": "Show full commentary",

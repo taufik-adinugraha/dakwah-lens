@@ -106,7 +106,8 @@ export type KitabCorpus =
   | "nashaih"
   | "fs"
   | "fmuin"
-  | "fqarib";
+  | "fqarib"
+  | "adab";
 
 const COLLECTION_NAMES: Record<KitabCorpus, string> = {
   quran: "quran",
@@ -122,6 +123,7 @@ const COLLECTION_NAMES: Record<KitabCorpus, string> = {
   fs: "fiqh_as_sunnah",
   fmuin: "fath_al_muin",
   fqarib: "fath_al_qarib",
+  adab: "adab_alim_mutaallim",
 };
 
 // MUST match the model used in `api/src/api/scripts/embed_quran.py`,
@@ -225,7 +227,7 @@ export async function retrieveDaleel(
   const topK = opts.topK ?? 2;
   const corpora: KitabCorpus[] =
     !opts.corpus || opts.corpus === "all"
-      ? ["quran", "bukhari", "muslim", "riyad", "bulugh", "tafsir", "bidayat", "umm", "bn", "nashaih", "fs", "fmuin", "fqarib"]
+      ? ["quran", "bukhari", "muslim", "riyad", "bulugh", "tafsir", "bidayat", "umm", "bn", "nashaih", "fs", "fmuin", "fqarib", "adab"]
       : [opts.corpus];
 
   const openai = getOpenai();
@@ -712,7 +714,8 @@ function normalizeHit(
     corpus === "nashaih" ||
     corpus === "fs" ||
     corpus === "fmuin" ||
-    corpus === "fqarib"
+    corpus === "fqarib" ||
+    corpus === "adab"
   ) {
     // AR-only kitab payload (decision 2026-06-08). Translation backfill
     // is planned; chip falls back to rendering Arabic until then.
@@ -724,6 +727,7 @@ function normalizeHit(
       fs: "Fiqh as-Sunnah",
       fmuin: "Fath al-Mu'in",
       fqarib: "Fath al-Qarib",
+      adab: "Adab al-'Alim wa al-Muta'allim",
     };
     return {
       corpus,
