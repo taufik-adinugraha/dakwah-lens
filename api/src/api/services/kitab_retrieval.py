@@ -1044,7 +1044,12 @@ def pick_flyer_daleel(
         )
         return None
 
-    # Sort by score desc, trim to pool size before LLM judge
+    # Sort by cosine score desc, trim to pool size for the LLM judge.
+    # We do NOT pre-filter EN-only entries — that would drop relevant
+    # hadith candidates (the kitab corpus is mostly EN-translated at
+    # embed time). Instead the post-pick stage lazy-translates the
+    # chosen entry to ID if needed. Picks relevance over translation
+    # availability.
     candidates.sort(key=lambda h: h["score"] or -1e9, reverse=True)
     candidates = candidates[:candidate_pool_size]
 
@@ -1161,6 +1166,39 @@ Kembalikan JSON SAJA, salah satu format:
             return candidates[0]
 
         chosen = candidates[picked_idx]
+
+        # ── Stage 4: lazy ID translation if needed ────────────────
+        # Kitab corpora (hadith especially) are mostly EN-only at embed
+        # time. If the judge picked an EN-only entry, translate it to
+        # Indonesian before returning so the flyer renderer can use
+        # `translation_id` without falling back to English. Uses the
+        # sync `_call_gemini` from hadith_translation (skipping the
+        # async DB cache — cost is ~$0.0001 per pick which is fine for
+        # the once-per-flyer call frequency). Added 2026-06-08 after
+        # audit found 42% of flyer cards rendering in English.
+        trans_id = (chosen.get("translation_id") or "").strip()
+        trans_en = (chosen.get("translation_en") or "").strip()
+        if not trans_id and trans_en:
+            try:
+                from api.services.hadith_translation import _call_gemini as _translate_hadith_sync
+                id_text = _translate_hadith_sync(trans_en)
+                if id_text:
+                    chosen = dict(chosen)
+                    chosen["translation_id"] = id_text
+                    log.info(
+                        "flyer_pick.lazy_translated",
+                        citation=chosen["citation"],
+                        chars=len(id_text),
+                    )
+            except Exception as exc:
+                # Translation is best-effort; if it fails the renderer
+                # still has translation_en as fallback.
+                log.warning(
+                    "flyer_pick.lazy_translate_failed",
+                    citation=chosen.get("citation"),
+                    error=str(exc)[:200],
+                )
+
         log.info(
             "flyer_pick.judged",
             headline=(flyer_headline or "")[:60],
@@ -1170,6 +1208,7 @@ Kembalikan JSON SAJA, salah satu format:
                 or chosen.get("translation_en")
                 or ""
             ),
+            had_lazy_translate=bool(not trans_id and trans_en),
             reason=reason[:120],
             is_adhkar=is_adhkar_slot,
         )
