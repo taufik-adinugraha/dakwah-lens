@@ -291,6 +291,27 @@ When you're tempted to widen a label (e.g. "Kekerasan dan Kriminalitas Jalanan")
   ✅ Split into: "Bullying & Kekerasan di Sekolah" + "Judi Online & Eksploitasi Digital Pemuda"
 A reader can scan a tight, specific theme and decide what to do with it; a generic bucket forces them to read every post to know what's inside.
 
+INCIDENT-SPECIFIC LABELS — VOLUME GATE (HARD RULE — added 2026-06-08):
+The "PREFER SUBDIVIDE OVER GENERALIZE" rule above applies to PATTERN clusters (e.g. three child-abuse cases by religious figures → one specific theme). It does NOT mean you should mint a theme named after a SINGLE incident, person, or location unless that incident is dominant in the pool. Incident-specific labels with low pool volume FAIL because the embedding centroid leaks — adjacent-category posts outnumber posts about the actual incident, and the theme fills with off-topic content.
+
+2026-06-08 audit failures (incident-specific label, moderate volume, low purity):
+  ❌ "Pelecehan Seksual Buronan AS di Depok" — 99 posts, purity 0.17. Only ~17 posts about the Buronan AS case; the other 82 were generic sexual-violence news the centroid pulled in.
+  ❌ "Fenomena Api Misterius Seyegan" — 43 posts, purity 0.19. Only ~8 posts about the actual Seyegan fire.
+  ❌ "Korupsi Dana Desa & Pejabat Daerah" — 93 posts, purity 0.17. Only ~16 posts specifically about dana desa; the other 77 were broader corruption news.
+
+Same volume class SUCCEEDED when the incident name was a dominant national story:
+  ✅ "Kasus Korupsi Chromebook Nadiem" — 87 posts, purity 0.80. Nadiem + Chromebook is a single dominant news event; specific-match wins.
+  ✅ "Korupsi MBG & BGN" — 573 posts, purity 0.88. High volume + sharply defined event.
+  ✅ "Korupsi Imigrasi & Silmy Karim" — 401 posts, purity 0.87. Same.
+
+Heuristic:
+- If you estimate <150 posts in the pool are SPECIFICALLY about the incident/person/location you want to label, DO NOT mint that theme. Fold those posts into a broader category theme instead.
+  · "Buronan AS di Depok" → fold into "Pelecehan Seksual & Perlindungan Anak"
+  · "Api Misterius Seyegan" → fold into "Bencana Alam & Tanggap Darurat" or drop and let Lainnya catch it
+  · "Korupsi Dana Desa" → fold into a broader corruption theme such as "Korupsi Pejabat & Aparatur Daerah"
+- If unsure whether an incident is dominant enough, GENERALIZE. A broader theme that's 80% on-topic serves the dashboard better than a narrow theme that's 20% on-topic.
+- Proper nouns in a label (person names, city/regency names, agency acronyms) are a YELLOW FLAG. Only keep them when the incident is unambiguously dominant. When in doubt, replace the proper noun with the broader category.
+
 ELASTIC-WORD GUARD (HARD RULE):
 Some words in Indonesian are emotionally elastic — they appear in MANY unrelated headlines because journalists overuse them. These words include: "misterius", "horor", "aneh", "tragis", "viral", "polemik", "kontroversi", "heboh", "geger". If you put any of these in a theme label, the embedding centroid pulls in everything with that word — accidents framed as "tewas misterius", deaths framed as "tragis", scandals framed as "polemik". REAL 2026-06-02 audit failure: a theme labeled "Peristiwa Misterius & Horor" sucked in 70% accident/death-news ("tewas misterius di kamping Temanggung", "pria hanyut", "keracunan gas") because every accident headline uses "misterius".
 

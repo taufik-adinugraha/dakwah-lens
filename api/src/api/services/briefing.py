@@ -546,6 +546,24 @@ Di akhir Bagian 5, tutup dengan satu paragraf italic:
 
 Bagian ini WAJIB ada SETELAH Bagian 5. Output-nya 6 paragraf flyer pendek (masing-masing 3-4 kalimat, ~70-90 kata) yang BERDIRI SENDIRI — flyer dibaca terpisah dari khutbah / kajian / kreator script / diskusi Gen Z, jadi konten di sini TIDAK BOLEH menyebut atau merujuk ke salah satu format itu. Keenam slot (1-6) WAJIB ada, masing-masing dengan baris **Headline:** sendiri — jangan lewati slot 5 & 6.
 
+ATURAN STRUKTUR HEADING (HARD RULE — KRITIS, ditambah 2026-06-08):
+`## Pesan Flyer` HARUS muncul sebagai H2 TERSENDIRI (bukan di-nest di bawah H2 lain seperti `## Dalil & Sumber`). Web renderer flyer (`web/src/lib/flyer/content.ts::extractDedicatedFlyerBlock`) memakai baris `## Pesan Flyer` sebagai ANCHOR — dia memindai `### Pesan Flyer N` H3 HANYA di dalam section H2 itu. Kalau Anda tulis `## Dalil & Sumber` lalu langsung `### Pesan Flyer 1, 2, …, 6` tanpa H2 `## Pesan Flyer` di antaranya, renderer akan return null, fallback legacy aktif, dan 4-6 flyer akan render konten yang TIDAK BERHUBUNGAN (atau kosong). Bug nyata 2026-06-08: briefing Inspirasi & Kisah Pribadi + Toleransi & Lintas-Iman ship dengan struktur ini, semua flyer broken.
+
+STRUKTUR YANG BENAR di akhir markdown:
+```
+## Dalil & Sumber
+[bibliografi 8-10 dalil]
+...
+
+## Pesan Flyer        ← H2 SENDIRI, bukan nested
+### Pesan Flyer 1 — ...
+### Pesan Flyer 2 — ...
+...
+### Pesan Flyer 6 — ...
+```
+
+VALIDATOR HARD-FAIL: `manual_briefing save` SEKARANG akan menolak (exit code 1) kalau ada `### Pesan Flyer N` tanpa `## Pesan Flyer` H2 yang membungkusnya, atau kalau jumlah H3 ≠ 6.
+
 STRUKTUR WAJIB setiap pesan flyer — dua baris marker DULU, baru paragraf:
 
 ```
@@ -556,7 +574,43 @@ STRUKTUR WAJIB setiap pesan flyer — dua baris marker DULU, baru paragraf:
 {{paragraf 70-90 kata}}
 ```
 
-ATURAN HEADLINE: TEPAT 4-5 kata, kalimat aktif, langsung menyampaikan PESAN UTAMA paragraf (bukan tema/kategori). Headline harus bisa berdiri sendiri tanpa membaca paragraf — pembaca yang hanya melihat headline sudah menangkap inti seruan. Hindari nama deliverable, hindari clickbait, hindari pertanyaan retoris, hindari frasa template generik. Contoh GOOD: "Mulai Adil dari Meja Sendiri", "Hadir untuk Tetangga yang Lemah", "Mulai Bela yang Lemah di RT", "Pulang Dulu, Cari Makna Kemudian". Contoh BAD (generik/kosong, DILARANG): "Khutbah Pertama", "Pesan Pekan Ini", "Renungan Mingguan", "Renungan Pekan Ini", "Refleksi Pekan Ini", "Apa yang Terjadi Pekan Ini?".
+ATURAN HEADLINE (HARD RULE — KRITIS, dipertegas 2026-06-08):
+SETIAP Pesan Flyer 1-6 WAJIB punya baris `**Headline:**` SENDIRI di atas paragraf body. Tanpa marker ini, renderer flyer akan jatuh ke fallback yang mengambil kata pertama dari body sebagai title — sering menghasilkan title kosong seperti "Pekan ini" yang menempel jadi judul flyer. Bug nyata 2026-06-08: briefing Inspirasi & Kisah Pribadi dan Toleransi & Lintas-Iman ship dengan 12 flyer tanpa `**Headline:**`, semua merender title "Pekan ini" di gallery publik.
+
+TEPAT 4-6 kata, kalimat aktif, langsung menyampaikan PESAN UTAMA paragraf (bukan tema/kategori). Headline harus bisa berdiri sendiri tanpa membaca paragraf — pembaca yang hanya melihat headline sudah menangkap inti seruan. Pakai PUNCH WORDS yang menarik mata: kata kerja imperatif ("Mulai", "Tegakkan", "Hadir", "Pulang", "Cukupkan", "Muliakan"), opposite-pairs ("Bukan X, melainkan Y"), atau frasa yang menggambarkan tindakan konkret.
+
+YANG DILARANG (TITLE-GENERIK YANG TIDAK BOLEH dipakai sebagai headline — substring match):
+- "Pekan ini" (apa pun yang dimulai dengan ini)
+- "Pesan Pekan Ini" / "Pesan Mingguan"
+- "Renungan Pekan Ini" / "Renungan Mingguan" / "Renungan"
+- "Refleksi Pekan Ini" / "Refleksi Mingguan"
+- "Doa Pekan Ini" / "Du'a Pekan Ini" (sebagai title — boleh sebagai nama section di H3, BUKAN di **Headline:**)
+- "Ajakan Sunnah" (sebagai title — sama-sama hanya untuk H3, bukan headline)
+- "Tema Kit" / "Kit Konten" / "Konten Pekan Ini"
+- "Khutbah Pertama" / "Khutbah Jumat" / "Kultum Pekan Ini"
+- "Suara Khutbah" / "Suara Aksi Sosial" / "Suara Kreator" / "Suara Gen Z" / "Suara Refleksi Gen Z"
+- "Apa yang Terjadi Pekan Ini?"
+- Frasa template apa pun yang akan terlihat SAMA di semua 14 kelompok briefing — header gallery tidak bisa membedakan flyer satu dari lainnya kalau title-nya generik.
+
+CONTOH GOOD (punchy, action-driven, distinctive):
+- ✓ "Mulai Adil dari Meja Sendiri"
+- ✓ "Cukupkan Takaran di Setiap Transaksi"
+- ✓ "Allah Haramkan Kezaliman atas Diri-Nya"
+- ✓ "Dakwah dengan Hikmah, Bukan Caci"
+- ✓ "Muliakan Saudara Berkebutuhan Khusus"
+- ✓ "Mimbar Cahaya untuk yang Adil"
+- ✓ "Pulang Dulu, Cari Makna Kemudian"
+- ✓ "Hadir untuk Tetangga yang Lemah"
+- ✓ "Sabar yang Memuliakan, Bukan Bungkam"
+- ✓ "Tujuh Hari Muhasabah ke Muharram"
+
+CONTOH BAD (DILARANG di **Headline:** marker — generik/kosong/template):
+- ❌ "Pekan ini" / "Pesan Pekan Ini" — pembaca tidak tahu apa pesannya
+- ❌ "Renungan Mingguan" — generik di semua briefing
+- ❌ "Doa Pekan Ini" — boleh sebagai H3 (### Pesan Flyer 6 — Doa Pekan Ini), TIDAK boleh sebagai **Headline:** flyer 6 (yang harus punchy spesifik tentang ISI du'a)
+- ❌ "Suara Khutbah" — itu KATEGORI flyer 1, BUKAN headline
+
+VALIDATOR HARD-FAIL: `manual_briefing save` akan menolak briefing yang punya flyer tanpa **Headline:** marker, atau dengan headline yang match daftar generik di atas.
 
 ATURAN ANTI-AMBIGUITAS (KRITIS): baca ulang setiap headline dengan asumsi pembaca tergesa-gesa dan hanya akan menginterpretasi sekali. Hindari konstruksi preposisi yang BISA dibaca dua arti — terutama `X dari Y`, `X oleh Y`, `X kepada Y` yang melibatkan subjek yang seharusnya kita lindungi.
 
@@ -577,6 +631,46 @@ CONTOH JEBAKAN (jangan tiru):
 - ✓ "Tiga berita pekan ini menempatkan anak-anak di posisi paling rapuh. Dari Kediri, kasus pencabulan oleh seorang guru ngaji bertambah hingga total 12 korban anak. Di Tanahlaut, seorang kakek mencegat cucunya sepulang pengajian. Di Sukolilo, seorang ayah tiri melukai dua anaknya di rumah." — pembaca tahu persis apa, di mana, berapa.
 
 RULE: setiap framing emosional tentang masalah pekan ini harus diikuti SEGERA (di kalimat yang sama atau kalimat berikutnya) oleh fakta spesifik yang DI-COCOK-KAN dengan sample_headlines yang Anda terima. Setelah masalah disebut spesifik, paragraf yang sama harus juga memuat SOLUSI / LANGKAH konkret — jangan tutup paragraf hanya dengan masalah, selalu pasangkan masalah + solusi.
+
+ATURAN ANTI-ATRIBUSI di Pesan Flyer (HARD RULE — KRITIS, ditambah 2026-06-08):
+JANGAN PERNAH menyebut nama media, outlet, atau akun media sosial di body Pesan Flyer 1-6. Flyer adalah pesan SELF-CONTAINED yang dibagikan ke IG/WA tanpa konteks editorial — pembaca tidak peduli dari mana datangnya kabar, mereka peduli pada KONTEN dan AJAKAN. Atribusi membuat flyer terlihat seperti ringkasan pers, bukan ajakan dakwah, dan bisa terbaca sebagai endorsement/kritik tidak sengaja terhadap outlet/akun yang disebut.
+
+YANG DILARANG di body flyer (substring match, jangan pakai dalam bentuk apa pun):
+- Nama outlet media: "Detik", "Republika", "Kompas", "CNN", "Tribun", "Tempo", "Antara", "Liputan6", "Okezone", "Sindo", "Suara", "Inilah", "Merdeka", "Radar Tegal", "Antara News", "RRI", "Metro TV", dst.
+- Handle akun sosial: "@wolfiesahi", "@_BangFu", "@vita_AVP", "@algazelian", "[akun_xyz]", dst. — semua format @username dan [username]
+- Atribusi langsung: "menurut <X>", "dilaporkan oleh <X>", "<X> melaporkan", "<X> menulis", "sebut <X>", "kata <X>" di mana X adalah media/akun
+
+YANG BOLEH (statistik OK, asal tidak diatribusikan ke outlet/akun spesifik):
+- Angka volume: "160 post pekan ini di kelompok ini", "+52% dari pekan lalu", "14 juta tayangan total" — angka berdiri sendiri menambah bobot, asal tidak dipasangkan dengan nama akun/outlet.
+- Sebut kategori kabar: "kisah inspiratif", "berita korupsi", "kasus KDRT", "polemik LGBT" — kategorinya OK, sumbernya tidak.
+
+CONTOH JEBAKAN NYATA (jangan tiru):
+- ❌ "Republika menerbitkan artikel tentang larangan ingkar janji, dan Ustadz Abdul Somad berbicara di PTIK Jakarta…" — atribusi outlet + lokasi institusional spesifik
+- ❌ "Sindiran [_BangFu] yang viral pekan ini menggugat gap antara ritual ibadah…" — handle akun
+- ❌ "[wolfiesahi] menulis kisah tentang uwa yang penyandang disabilitas (348K view)…" — handle akun (angkanya sendiri OK)
+- ❌ "Menurut Republika, hari ini terjadi…" — atribusi langsung
+
+CONTOH YANG BENAR (konten + statistik OK, tanpa atribusi outlet/akun):
+- ✓ "Pekan ini ramai pesan satir: 'pulang haji, langsung jadi tersangka korupsi'. Sindiran ini mengingatkan kita bahwa hijrah bukan event ritual…"
+- ✓ "Sebuah kisah pendek pekan ini tentang penyandang disabilitas yang dibully menyentuh 348 ribu pembaca — Islam memuliakan saudara-saudara kita yang berkebutuhan khusus…"
+- ✓ "160 post pekan ini di kelompok kisah pribadi (+52% dari pekan lalu) menunjukkan haus akan narasi yang memerdekakan…"
+- ✓ "Hari Lahir Pancasila baru saja melewati kita. Sila kedua dan kelima sangat selaras dengan perintah Al-Qur'an tentang adil dan ihsan…"
+
+CARA MEMBINGKAI ULANG: ambil INTI pesan/peristiwa, tulis dalam suara dakwah yang merangkul. Kalau perlu menyebut konteks, gunakan frasa generik seperti "pekan ini ramai dibicarakan...", "kabar yang sampai ke kita...", "satu pesan yang viral pekan ini berbunyi...", "publik dikejutkan oleh kabar...". Statistik boleh — outlet dan akun tidak. Outlet/akun bersifat efemeral; yang relevan untuk dakwah adalah esensi pesannya.
+
+PESAN-FIRST (HARD RULE — KRITIS, ditambah 2026-06-08):
+Body flyer adalah PESAN DAKWAH, BUKAN ringkasan data. Statistik hanya boleh sebagai PEMBUKA pendek (1 kalimat, opsional) atau JANGKAR konteks (sebuah angka di tengah pesan). Bagian terbesar paragraf (minimal 60% dari 70-90 kata) HARUS berupa: (a) ajakan/teladan/refleksi yang relevan dengan tema flyer, (b) aksi konkret yang bisa dilakukan pembaca, atau (c) hikmah yang menghubungkan situasi pekan ini dengan nilai dakwah.
+
+CONTOH JEBAKAN NYATA (jangan tiru):
+- ❌ "Pekan ini, momentum Hari Lahir Pancasila 1 Juni 2026 memicu lonjakan 70,1% post di kelompok Toleransi & Lintas-Iman — naik dari 97 ke 165 post. Topik Pancasila & Integritas Bangsa muncul sebagai salah satu tema yang paling dibahas, dengan 4 post yang menembus 681 ribu view." — 100% statistik + meta-data tentang radar internal kami. TIDAK ADA pesan dakwah. Pembaca flyer tidak peduli dengan "kelompok Toleransi & Lintas-Iman" — itu nama internal sistem.
+- ❌ "47 dari 160 post pekan ini adalah kisah inspiratif, naik 52% dari pekan lalu. Format naratif mendominasi dengan 7,5 juta tayangan dan 275 video YouTube." — semua angka, tidak ada ajakan, tidak ada hikmah, tidak ada aksi.
+
+CONTOH YANG BENAR (pesan-first + statistik sebagai pendukung):
+- ✓ "Hari Lahir Pancasila baru saja melewati kita. Sila kedua — 'Kemanusiaan yang Adil dan Beradab' — sangat selaras dengan perintah Allah dalam QS. An-Nahl: adil dan ihsan. Pekan ini, percakapan publik tentang integritas bangsa naik tajam — momen yang tepat untuk kita memulai hijrah etis di tempat kerja masing-masing: timbangan yang adil, janji yang ditepati, amanah yang dijaga. Mulailah dari satu keputusan kecil hari ini."
+- ✓ "Kisah-kisah pribadi sedang banjir di feed pekan ini — naik 52% dari pekan lalu. Tapi narasi 'sabar' yang kita kirim ke saudara yang ditimpa musibah tidak boleh sekadar 'sabar aja'. Belajar dari Nabi ﷺ menemani Khabbab: akui beratnya, beri konteks, beri harapan konkret. Tugas kita pekan ini: dengarkan dulu, baru bicara."
+- ✓ "Sindiran 'pulang haji jadi tersangka korupsi' viral pekan ini — mengiris hati karena menyentuh inti pertanyaan: apa arti ibadah kalau tidak mengubah perilaku? Hadits Nabi ﷺ tegas: muhajir adalah yang meninggalkan apa yang dilarang Allah. Hijrah bukan event ritual; hijrah adalah pilihan harian di meja kerja. Pilih satu kebiasaan yang salah, tinggalkan hari ini."
+
+CARA UJI: setelah menulis flyer, baca ulang dan tanya: "Kalau saya hapus semua angka dari paragraf ini, apakah masih ada pesan yang bisa diambil pembaca?" Kalau jawabannya TIDAK, paragraf itu cuma laporan data — rewrite untuk menonjolkan ajakan/hikmah/aksi. Statistik adalah BUMBU, bukan main course.
 
 ATURAN ANTI-MISLEADING IBADAH (KRITIS): headline TIDAK BOLEH menampilkan rukun ibadah atau sunnah (kurban / sholat / puasa / zakat / haji / sedekah / membaca Quran) sebagai sesuatu yang dipertentangkan dengan amal lain. Konstruksi `X, bukan Y` ("X not Y") sangat berbahaya jika Y adalah ibadah riil — pembaca yang sekilas baca akan menafsirkan "tinggalkan Y dan lakukan X" yang bisa berarti merendahkan ibadah pokoknya.
 
@@ -622,7 +716,19 @@ VALIDATOR HARD-FAIL: `manual_briefing save` SEKARANG akan menolak (exit code 1) 
 
 5. Variasi: usahakan 4-6 flyer pakai dalil yang berbeda kalau pool memungkinkan — tapi PRIORITAS adalah ketepatan tematik, BUKAN distribusi. Lebih baik 2 flyer share dalil yang tepat daripada 4 flyer dengan 4 dalil yang dipaksakan.
 
-6. PANJANG DALIL — RULE WAJIB untuk Pesan Flyer 1-5 (KRITIS, tidak boleh dilewati): flyer 1080×1080 hanya muat ~3-4 baris terjemahan dengan font yang masih nyaman dibaca di layar phone. JANGAN PERNAH memilih entri pool yang terjemahan Indonesianya > 400 karakter ATAU yang Arab-nya > 350 karakter sebagai citation flyer — renderer TIDAK akan memotong daleel (kita haram mempotong daleel di tengah karena konteks hilang), jadi entri panjang akan mengecilkan teks sampai tidak terbaca atau merusak komposisi.
+6. PANJANG DALIL — RULE WAJIB untuk Pesan Flyer 1-6 (KRITIS, tidak boleh dilewati — tightened 2026-06-08): flyer 1080×1080 hanya muat ~3-4 baris terjemahan dengan font yang masih nyaman dibaca di layar phone. CAP KETAT: terjemahan Indonesia ≤ 240 karakter, Arab ≤ 200 karakter (sebelumnya 400/350 — diketatkan setelah 2026-06-08 audit menemukan beberapa flyer dengan terjemahan ~330 karakter membuat teks mengecil jadi tidak terbaca). Renderer TIDAK memotong daleel (haram mempotong daleel di tengah karena konteks hilang), jadi entri panjang akan dirender penuh sampai komposisi rusak.
+
+CARA MEMILIH dalil pendek dari pool:
+1. Untuk SETIAP flyer (1-6), buka pool dan cek panjang terjemahan + Arab tiap kandidat.
+2. Singkirkan kandidat dengan terjemahan > 240ch atau Arab > 200ch — meskipun tematik cocok.
+3. Pilih kandidat TERPENDEK di antara yang masih tematik cocok.
+4. Kalau tidak ada satu pun kandidat di pool yang ≤ 240ch DAN cocok tematik, lebih baik kosongkan baris `**Dalil:** —` (em dash, skip card) daripada memaksa daleel panjang yang tidak terbaca.
+
+CONTOH RUJUKAN PANJANG (dari pool nyata):
+- ✓ "QS. Ar-Rahmaan: 9" — 75 chars terjemahan ("Dan tegakkanlah timbangan itu dengan adil dan janganlah kamu mengurangi neraca itu.") — IDEAL.
+- ✓ "QS. An-Nahl: 90" — ~190 chars terjemahan — masih OK.
+- ⚠️ "Sahih Muslim 4721" — ~330 chars terjemahan ("Sesungguhnya orang-orang yang adil akan duduk di atas mimbar-mimbar cahaya...") — MELANGGAR CAP 240ch. Cari pengganti pendek atau skip.
+- ❌ Hadits panjang dengan rantai perawi ("ḥaddatsanā fulān… 'an fulān… qāla qāla rasūlullah…") — JANGAN dipilih sebagai daleel flyer, itu narasi hadits ilmiah, bukan teks dakwah recitable.
 
 Cara memilih untuk SETIAP Pesan Flyer 1-5:
 - Scan DALIL POOL dan saring entri yang `arabic.length ≤ 350` DAN `translation_id.length ≤ 400`.

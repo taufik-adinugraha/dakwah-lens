@@ -64,6 +64,9 @@ class BriefingWarning(TypedDict, total=False):
         "preacher_anda_voice",
         "firman_hadith_mismatch",
         "flyer_dalil_not_in_pool",
+        "flyer_section_malformed",
+        "flyer_outlet_or_handle",
+        "flyer_headline_missing_or_generic",
     ]
     severity: Literal["low", "medium", "high"]
     where: str  # human-readable locator, e.g. "Pesan Flyer 2"
@@ -877,6 +880,328 @@ _FLYER_DALIL_RE = re.compile(
 )
 
 
+_FLYER_H2_LINE_RE = re.compile(
+    r"^##\s+(?:Pesan\s+Flyer|Flyer\s+Messages)\b", re.IGNORECASE | re.MULTILINE
+)
+
+
+# Outlet / handle patterns the flyer body must NOT contain. Statistics
+# (numbers, views, post counts) ARE allowed — the rule only forbids
+# named attribution to media outlets or social accounts.
+#
+# 2026-06-08 v2 tightening: removed standalone single-word outlets that
+# overlap with common Indonesian words ("Detik" = "second", "Radar" =
+# RADAR detection, "Antara" = "between", "Tempo" = "tempo/pace", "Inilah"
+# = "this is"). Only match outlet names that are unambiguous in
+# Indonesian-language text — either compound brand strings or
+# domain-style identifiers.
+_FLYER_OUTLET_NAMES = (
+    "Republika", "Kompas", "Liputan6", "Okezone",
+    "Detik.com", "Detiknews", "DetikNews",
+    "Antara News", "Antaranews", "Kantor Berita Antara",
+    "Radar Tegal", "Radar Jogja", "Radar Bandung", "Radar Surabaya",
+    "Radar Jakarta", "Radar Bogor", "Radar Semarang",
+    "Tribunnews", "Tribun News", "Tribun Jakarta", "Tribun Aceh",
+    "CNN Indonesia", "CNBC Indonesia",
+    "Tempo.co", "Majalah Tempo",
+    "Sindonews", "Sindo News", "iNews.id",
+    "Suara.com", "Merdeka.com", "Pikiran Rakyat",
+    "Berita Satu", "BeritaSatu",
+    "Bisnis Indonesia", "JPNN.com", "Metro TV", "TVOne", "TV One",
+    "Republika Online", "Kompas TV", "Kompas.com",
+)
+_FLYER_OUTLET_RE = re.compile(
+    r"\b(?:" + "|".join(re.escape(n) for n in _FLYER_OUTLET_NAMES) + r")\b",
+    re.IGNORECASE,
+)
+# @handle (X / Instagram / TikTok) and [bracket_handle] (mainstream
+# author tag from the dump). Allow trailing _ and digits; min 3 chars
+# after sigil to avoid false positives on emails / "@" used as "at".
+_FLYER_HANDLE_AT_RE = re.compile(r"(?:^|[^\w@])@([A-Za-z][\w]{2,})")
+_FLYER_HANDLE_BRACKET_RE = re.compile(r"\[([A-Za-z][\w.\-]{2,})\]")
+# Direct attribution patterns: "menurut <Name>", "dilaporkan <Name>",
+# "<Name> melaporkan/menulis/menyebut/menyatakan/mengatakan". Only
+# trigger when the attributed party is a Capitalized proper-noun-like
+# token sequence (≥1 capital word, not generic prose like "menurut
+# saya" / "menurut Islam").
+_FLYER_ATTRIB_RE = re.compile(
+    r"\b(?:[Mm]enurut|[Dd]ilaporkan(?:\s+oleh)?)\s+"
+    r"([A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z.]+){0,3})\b"
+    r"|"
+    r"\b([A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z.]+){0,3})\s+"
+    r"(?:melaporkan|menulis|menerbitkan|menyebut(?:kan)?|menyatakan)\b"
+)
+# Words the attribution regex must NOT match — these are generic
+# concepts, not outlets/accounts (e.g. "menurut Islam", "menurut
+# Al-Qur'an", "Nabi menyebutkan", "Rasulullah menyatakan").
+_FLYER_ATTRIB_ALLOWLIST = {
+    "islam", "muslim", "muslimah", "al-qur'an", "alquran", "al-quran",
+    "qur'an", "quran", "kitab", "sunnah", "hadits", "hadith", "nabi",
+    "rasulullah", "rasul", "allah", "syariat", "ulama", "para", "imam",
+    "khalifah", "sahabat", "khabbab", "suhaib", "ibn", "bin", "anas",
+    "umar", "abu", "abdullah", "abdurrahman", "uthman", "ali", "fatimah",
+    "aisyah", "khadijah", "syu'aib", "musa", "isa", "ibrahim", "yusuf",
+    "ahmad", "syafi'i", "malik", "bukhari", "tirmidzi", "dawud", "nasai",
+    "ghazali", "nawawi", "katsir", "kementerian", "menteri",
+    "pemerintah", "presiden", "kemenkes", "kemenag", "kemendikbud",
+}
+
+
+def scan_flyer_outlet_handle(markdown: str) -> list[BriefingWarning]:
+    """Pesan Flyer bodies must not name media outlets, social handles,
+    or attribute statements to specific accounts. Statistics (post
+    counts, views) ARE allowed; only the attribution is forbidden.
+
+    Real bug surfaced 2026-06-08 in Toleransi & Lintas-Iman briefing:
+    flyer body mentioned 'Republika menerbitkan artikel…', '[_BangFu]',
+    '[vita_AVP]' — all leaked from the headlines pool into the flyer
+    text. The flyer is a self-contained message shared on IG/WA,
+    so editorial attribution is noise + accidental endorsement.
+    """
+    warnings: list[BriefingWarning] = []
+    slc = _section_slice(markdown, r"Pesan\s+Flyer")
+    if not slc:
+        return warnings
+    section = markdown[slc[0] : slc[1]]
+
+    h3_iter = list(
+        re.finditer(
+            r"^###\s+Pesan\s+Flyer\s+(\d)[^\n]*$",
+            section,
+            flags=re.MULTILINE | re.IGNORECASE,
+        )
+    )
+    for i, h3 in enumerate(h3_iter):
+        slot = int(h3.group(1))
+        body_start = h3.end()
+        body_end = (
+            h3_iter[i + 1].start() if i + 1 < len(h3_iter) else len(section)
+        )
+        body = section[body_start:body_end]
+
+        # Strip marker lines (**Headline:**, **Dalil:**) before scanning
+        # — citation strings can legitimately contain "Bukhari" etc.
+        body_prose = re.sub(
+            r"^\s*\*\*\s*(?:Headline|Judul|Tema|Dalil|Daleel)\s*:\*\*[^\n]*$",
+            "",
+            body,
+            flags=re.MULTILINE | re.IGNORECASE,
+        )
+
+        hits: list[str] = []
+
+        for m in _FLYER_OUTLET_RE.finditer(body_prose):
+            hits.append(f"outlet name '{m.group(0)}'")
+
+        for m in _FLYER_HANDLE_AT_RE.finditer(body_prose):
+            hits.append(f"social handle '@{m.group(1)}'")
+
+        for m in _FLYER_HANDLE_BRACKET_RE.finditer(body_prose):
+            # Skip purely-numeric or single-char bracket content
+            # (footnote-style refs like [1], [42] are not handles).
+            handle = m.group(1)
+            if handle.lower() in {"sic", "ed", "redaksi"}:
+                continue
+            hits.append(f"bracket handle '[{handle}]'")
+
+        for m in _FLYER_ATTRIB_RE.finditer(body_prose):
+            attr_subj = (m.group(1) or m.group(2) or "").strip()
+            first_word = attr_subj.split()[0].lower() if attr_subj else ""
+            if first_word in _FLYER_ATTRIB_ALLOWLIST:
+                continue
+            hits.append(f"attribution to '{attr_subj}'")
+
+        if hits:
+            # Dedup while preserving order
+            seen: set[str] = set()
+            uniq = [h for h in hits if not (h in seen or seen.add(h))]
+            warnings.append(
+                {
+                    "kind": "flyer_outlet_or_handle",
+                    "severity": "high",
+                    "where": f"Pesan Flyer {slot}",
+                    "message": (
+                        f"body names outlet/account/attribution: "
+                        f"{', '.join(uniq)}. Flyer is a self-contained "
+                        f"IG/WA share — strip the name(s) and rewrite "
+                        f"using generic framing ('pekan ini ramai...', "
+                        f"'kabar yang sampai ke kita...'). Statistics "
+                        f"(views, post counts) are still allowed."
+                    ),
+                }
+            )
+    return warnings
+
+
+# Generic template phrases forbidden in `**Headline:**` markers.
+# The headline must be punchy + flyer-specific; generic phrases like
+# "Pekan ini" or "Renungan Mingguan" defeat the purpose (every flyer
+# would look identical in the IG gallery and the renderer falls back
+# to the body's first words when the marker is missing, producing the
+# same generic result).
+_FLYER_HEADLINE_RE_M = re.compile(
+    r"^\s*\*\*\s*(?:Headline|Judul|Tema)\s*:\s*\*\*\s*[\"“”']?\s*(.+?)\s*[\"“”']?\s*$",
+    re.MULTILINE | re.IGNORECASE,
+)
+_GENERIC_HEADLINE_PATTERNS = [
+    re.compile(p, re.IGNORECASE)
+    for p in (
+        r"^pekan ini\b",
+        r"^pesan pekan ini$",
+        r"^pesan mingguan$",
+        r"^renungan( pekan ini| mingguan)?$",
+        r"^refleksi( pekan ini| mingguan)?$",
+        r"^doa pekan ini$",
+        r"^du'?a pekan ini$",
+        r"^ajakan sunnah( pekan ini)?$",
+        r"^tema kit$",
+        r"^kit konten\b",
+        r"^konten pekan ini$",
+        r"^khutbah (pertama|jumat|kedua)$",
+        r"^kultum( pekan ini)?$",
+        r"^suara (khutbah|aksi sosial|kreator|kreator konten|gen z|refleksi gen z)$",
+        r"^apa yang terjadi pekan ini\??$",
+    )
+]
+
+
+def scan_flyer_headline_quality(markdown: str) -> list[BriefingWarning]:
+    """Each Pesan Flyer block must carry a `**Headline:**` marker with a
+    punchy, flyer-specific title. Two failure modes:
+
+      (a) MISSING marker — the web flyer renderer falls back to
+          extracting the first words of the body, producing weak titles
+          like "Pekan ini" (real 2026-06-08 bug in Inspirasi & Toleransi
+          briefings).
+      (b) GENERIC marker — title matches a template phrase like
+          "Pesan Pekan Ini" / "Renungan Mingguan" / "Doa Pekan Ini".
+          These look identical across all 14 briefings in the IG
+          gallery and defeat the eye-catching purpose of the title.
+    """
+    warnings: list[BriefingWarning] = []
+    slc = _section_slice(markdown, r"Pesan\s+Flyer")
+    if not slc:
+        return warnings
+    section = markdown[slc[0] : slc[1]]
+    h3s = list(
+        re.finditer(
+            r"^###\s+Pesan\s+Flyer\s+(\d)[^\n]*$",
+            section,
+            flags=re.MULTILINE | re.IGNORECASE,
+        )
+    )
+    for i, h3 in enumerate(h3s):
+        slot = int(h3.group(1))
+        start = h3.end()
+        end = h3s[i + 1].start() if i + 1 < len(h3s) else len(section)
+        block = section[start:end]
+        hl_match = _FLYER_HEADLINE_RE_M.search(block)
+        if not hl_match:
+            warnings.append(
+                {
+                    "kind": "flyer_headline_missing_or_generic",
+                    "severity": "high",
+                    "where": f"Pesan Flyer {slot}",
+                    "message": (
+                        "MISSING `**Headline:**` marker. Web renderer "
+                        "will fall back to extracting the first words "
+                        "of the body and produce a weak title (real "
+                        "2026-06-08 bug: 12 flyers rendered with title "
+                        "\"Pekan ini\"). Add a `**Headline:** \"...\"` "
+                        "line right under the `### Pesan Flyer "
+                        f"{slot}` heading — 4-6 punch words, active "
+                        "voice, flyer-specific."
+                    ),
+                }
+            )
+            continue
+        title = hl_match.group(1).strip().strip("\"“”'")
+        for pat in _GENERIC_HEADLINE_PATTERNS:
+            if pat.match(title):
+                warnings.append(
+                    {
+                        "kind": "flyer_headline_missing_or_generic",
+                        "severity": "high",
+                        "where": f"Pesan Flyer {slot}",
+                        "message": (
+                            f"GENERIC headline '{title}'. This phrase "
+                            f"looks identical across all 14 weekly "
+                            f"briefings in the IG gallery and gives "
+                            f"the reader no reason to stop scrolling. "
+                            f"Replace with a punchy 4-6 word headline "
+                            f"specific to this flyer's message (e.g. "
+                            f"'Mulai Adil dari Meja Sendiri', "
+                            f"'Cukupkan Takaran di Setiap Transaksi')."
+                        ),
+                    }
+                )
+                break
+    return warnings
+
+
+def scan_flyer_section_structure(markdown: str) -> list[BriefingWarning]:
+    """The web flyer renderer (web/src/lib/flyer/content.ts
+    ::extractDedicatedFlyerBlock) requires a top-level `## Pesan Flyer`
+    (or `## Flyer Messages`) H2 section as the anchor — it scans only
+    inside that section for `### Pesan Flyer N` H3 blocks.
+
+    Real bug surfaced 2026-06-08: two briefings (Inspirasi & Kisah
+    Pribadi + Toleransi & Lintas-Iman) nested the H3 blocks under
+    `## Dalil & Sumber` H2 instead of giving them their own H2. The
+    extractor returned null, a legacy fallback fired, and 4 of 6
+    rendered flyers showed unrelated content (one was completely
+    empty).
+
+    This validator catches that shape before save. Two failure modes:
+      (a) No `## Pesan Flyer` H2 line exists at all but H3 blocks do —
+          renderer will silently fall back.
+      (b) Wrong number of `### Pesan Flyer N` H3 blocks — should be
+          exactly 6 (slots 1-6).
+    """
+    warnings: list[BriefingWarning] = []
+    h2_match = _FLYER_H2_LINE_RE.search(markdown)
+    h3_headers = list(_FLYER_HEADER_RE.finditer(markdown))
+
+    if not h2_match and h3_headers:
+        warnings.append(
+            {
+                "kind": "flyer_section_malformed",
+                "severity": "high",
+                "where": "## Pesan Flyer",
+                "message": (
+                    f"Found {len(h3_headers)} `### Pesan Flyer N` H3 "
+                    f"blocks but NO top-level `## Pesan Flyer` H2 "
+                    f"section heading. The web flyer extractor requires "
+                    f"the H2 wrapper — without it, "
+                    f"extractDedicatedFlyerBlock() returns null and a "
+                    f"legacy fallback ships unrelated content as the "
+                    f"flyer body. Fix: add a `## Pesan Flyer` line as "
+                    f"its own H2 (separate from `## Dalil & Sumber`) "
+                    f"above the first `### Pesan Flyer 1` block."
+                ),
+            }
+        )
+        return warnings  # downstream count check is misleading without H2
+
+    if h2_match and len(h3_headers) != 6:
+        warnings.append(
+            {
+                "kind": "flyer_section_malformed",
+                "severity": "high",
+                "where": "## Pesan Flyer",
+                "message": (
+                    f"`## Pesan Flyer` section contains "
+                    f"{len(h3_headers)} `### Pesan Flyer N` H3 blocks "
+                    f"— expected exactly 6 (one per slot 1-6). The "
+                    f"flyer renderer iterates slots 0-5 and will render "
+                    f"blank cards for missing slots or ignore extras."
+                ),
+            }
+        )
+
+    return warnings
+
+
 def scan_flyer_dalil_in_pool(
     markdown: str,
     daleel_pool: list[dict[str, Any]] | None = None,
@@ -1574,6 +1899,9 @@ def validate_briefing(
         (scan_pengajaran_voice, "pengajaran_voice_check_failed"),
         (scan_preacher_anda, "preacher_anda_check_failed"),
         (scan_firman_hadith_mismatch, "firman_hadith_check_failed"),
+        (scan_flyer_section_structure, "flyer_section_structure_check_failed"),
+        (scan_flyer_outlet_handle, "flyer_outlet_handle_check_failed"),
+        (scan_flyer_headline_quality, "flyer_headline_quality_check_failed"),
     ):
         try:
             warnings.extend(fn(markdown))

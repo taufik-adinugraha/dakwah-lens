@@ -414,6 +414,71 @@ async def cmd_save(group_arg: str, markdown_path: str) -> None:
         )
         raise SystemExit(1)
 
+    # Same hard-fail discipline for structural flyer-section problems —
+    # added 2026-06-08 after Inspirasi & Toleransi briefings shipped
+    # with `### Pesan Flyer N` blocks nested under `## Dalil & Sumber`
+    # (no top-level `## Pesan Flyer` H2). The web flyer extractor needs
+    # the H2 wrapper; without it 4 of 6 flyers rendered unrelated
+    # content from a legacy fallback. Catch this BEFORE save so the
+    # operator can re-structure the markdown.
+    structure_warnings = [
+        w for w in heuristic_warnings
+        if w.get("kind") == "flyer_section_malformed"
+    ]
+    if structure_warnings:
+        sys.stderr.write(
+            "\n✗ SAVE BLOCKED — flyer section is structurally malformed. "
+            "The web renderer needs a top-level `## Pesan Flyer` H2 "
+            "containing exactly 6 `### Pesan Flyer N` H3 blocks. "
+            "Without it, the renderer silently falls back to legacy "
+            "extraction and ships unrelated content as the flyer body.\n\n"
+        )
+        for w in structure_warnings:
+            sys.stderr.write(f"  · {w['where']}: {w['message']}\n")
+        sys.stderr.write(
+            "\n  Fix: add `## Pesan Flyer` as its own H2 line "
+            "(separate from `## Dalil & Sumber`) directly above the "
+            "first `### Pesan Flyer 1` block, and ensure all 6 blocks "
+            "live under it.\n\n"
+            "  Save aborted. No row written.\n"
+        )
+        raise SystemExit(1)
+
+    # Same hard-fail discipline for headline-quality problems — added
+    # 2026-06-08 after Inspirasi & Toleransi briefings shipped with 12
+    # flyers MISSING `**Headline:**` markers (renderer fell back to
+    # extracting body's first words → all rendered as title "Pekan
+    # ini"). Generic template headlines like "Pesan Pekan Ini" / "Doa
+    # Pekan Ini" / "Renungan Mingguan" are equally forbidden because
+    # they look identical across all 14 briefings in the IG gallery.
+    headline_warnings = [
+        w for w in heuristic_warnings
+        if w.get("kind") == "flyer_headline_missing_or_generic"
+    ]
+    if headline_warnings:
+        sys.stderr.write(
+            "\n✗ SAVE BLOCKED — flyer headline(s) are MISSING or GENERIC. "
+            "Each Pesan Flyer 1-6 needs a `**Headline:** \"...\"` line "
+            "right under its H3 heading with a punchy 4-6 word title. "
+            "Without a marker the renderer falls back to extracting the "
+            "first words of the body (real bug: 12 flyers rendered with "
+            "title 'Pekan ini'). Generic template phrases defeat the "
+            "eye-catching purpose — every flyer looks identical in the "
+            "IG gallery.\n\n"
+        )
+        for w in headline_warnings:
+            sys.stderr.write(f"  · {w['where']}: {w['message']}\n")
+        sys.stderr.write(
+            "\n  Fix: add or rewrite each flyer's `**Headline:** \"...\"` "
+            "with a punchy 4-6 word title specific to that flyer's "
+            "message (e.g. 'Mulai Adil dari Meja Sendiri', 'Cukupkan "
+            "Takaran di Setiap Transaksi', 'Allah Haramkan Kezaliman "
+            "atas Diri-Nya'). Avoid 'Pekan ini', 'Pesan Pekan Ini', "
+            "'Renungan Mingguan', 'Doa Pekan Ini', 'Suara Khutbah'.\n\n"
+            "  Save aborted. No row written.\n"
+        )
+        raise SystemExit(1)
+
     async with SessionLocal() as session:
         row = Briefing(
             generated_at=datetime.now(UTC),

@@ -864,3 +864,319 @@ Kembalikan JSON: {{"indices": [i1, i2, ...]}} dengan SEMUA index daleel yang BEN
 # now replaced by `api.services.hadith_translation.enrich_daleel_translations`,
 # which translates one hadith per call and caches results in the
 # `hadith_translations_id` table.
+
+
+# ─────────────────────────────────────────────────────────────────────
+# Per-flyer daleel pick (sketched 2026-06-08, not yet wired)
+#
+# Replaces the current "retrieve one big pool per briefing → weave into
+# 6 flyers and hope" approach. Each flyer body gets its OWN Qdrant
+# query + LLM judge, so daleel relevance is per-message rather than
+# per-briefing-theme.
+#
+# Failure mode this fixes (2026-06-08 audit):
+#   - Toleransi briefing pool had ~12 daleel; after the 240ch cap
+#     filter only 4-5 short options remained for 6 flyers. Auto-picker
+#     reused the same short citation across multiple unrelated flyers
+#     ("QS. An-Nahl: 90" appeared 4× across F1/F5/F6 with weak fit).
+#   - Pool was retrieved against one big briefing summary, so flyers
+#     about disparate sub-themes (Pancasila + LGBT + zuhud + muhasabah)
+#     all drew from the same generic-justice candidate set.
+#
+# Pipeline:
+#   1. Embed (headline + first paragraph of body) as a single query.
+#      Body alone misses the headline's punch words; headline alone is
+#      too short for stable embedding (~4-6 words).
+#   2. Qdrant top-candidate_pool across all kitab collections. Reuses
+#      _per_corpus_for + MIN_SCORE + DALEEL_DENYLIST gates already in
+#      retrieve_daleel.
+#   3. Optional adhkar filter (for flyer slots 5+6 — Ajakan Sunnah /
+#      Doa Pekan Ini): drop entries without harakat density above
+#      RECITABLE_HARAKAT_MIN. Same gate retrieve_dua already uses.
+#   4. Gemini Flash-Lite judge: picks the SINGLE best citation given
+#      relevance + length constraints. Explicit instruction: prefer
+#      ≤240ch translation; accept up to 350ch if best-fit is longer;
+#      return None (em-dash) if nothing genuinely relevant exists.
+#
+# Cost: ~$0.001 embedding + ~$0.0002 judge × 6 flyers = $0.007 per
+# briefing. Negligible vs current $0.20 OpenAI line item.
+#
+# Caller flow (briefing.py, after LLM has drafted bodies, BEFORE
+# final markdown assembly):
+#
+#   for slot in range(1, 7):
+#       headline = flyer_drafts[slot]["headline"]
+#       body_first_para = flyer_drafts[slot]["body"].split("\n\n")[0]
+#       pick = pick_flyer_daleel(
+#           flyer_body=body_first_para,
+#           flyer_headline=headline,
+#           is_adhkar_slot=(slot >= 5),
+#       )
+#       flyer_drafts[slot]["dalil_cit"] = pick["citation"] if pick else "—"
+#
+# Validators stay correct: scan_flyer_dalil_in_pool will accept the
+# per-flyer citation because we add the pick to daleel_refs before
+# save. If pick is None, em-dash already bypasses the pool check.
+# ─────────────────────────────────────────────────────────────────────
+
+
+_FLYER_PICK_RELEVANCE_FLOOR_CHARS = 240
+"""Soft cap on translation length the LLM judge prefers. The judge is
+told to accept up to ~350ch if the best-fit candidate is longer, since
+relevance always beats brevity. Strict-cap mode would force bad picks
+from a small pool (the 2026-06-08 failure mode)."""
+
+_FLYER_PICK_HARD_CAP_CHARS = 350
+"""Hard cap. Above this, the judge is told to return None — renderer
+will show em-dash + skip the side-card. Body still carries the daleel
+content inline for slots 5+6 (du'a) so user-visible content survives."""
+
+
+def pick_flyer_daleel(
+    flyer_body: str,
+    flyer_headline: str | None = None,
+    *,
+    is_adhkar_slot: bool = False,
+    candidate_pool_size: int = 10,
+) -> dict[str, Any] | None:
+    """Pick the single best-fitting daleel for ONE flyer's message.
+
+    Args:
+        flyer_body: The 70-90 word prose body of the flyer (first
+            paragraph is enough — that's what the renderer surfaces).
+        flyer_headline: The 4-6 word punch headline. Optional but
+            improves embedding query (headlines carry the active-voice
+            verb that often anchors the thematic intent).
+        is_adhkar_slot: True for slots 5+6 (Ajakan Sunnah, Doa Pekan
+            Ini). Filters candidates to harakat-marked recitable entries
+            only — slots 1-4 accept any kitab.
+        candidate_pool_size: How many embedding-retrieved candidates
+            to feed the judge. Default 10 balances cost ($0.0002 judge)
+            vs catching the right entry when it sits at rank 7-10.
+
+    Returns:
+        A single normalised hit dict (same shape as `retrieve_daleel`
+        entries) ready to be added to `daleel_refs` and tagged in the
+        flyer's `**Dalil:**` marker.
+
+        Returns None when:
+            - flyer_body is empty / too short to embed
+            - Qdrant returns zero candidates above MIN_SCORE
+            - Judge concludes no candidate is genuinely on-topic
+            - All candidates exceed the hard char cap and the judge
+              determines none of them can serve this flyer well
+            - Any error (defense-in-depth — never break briefing flow
+              on a per-flyer pick failure; caller defaults to em-dash).
+    """
+    if not flyer_body or not flyer_body.strip():
+        return None
+
+    # ── Stage 1: build the query embedding ────────────────────────
+    # Concatenate headline (if any) + first paragraph of body. The
+    # OpenAI embedding model handles up to 8K tokens, so we don't need
+    # to truncate aggressively — but body sentences past the first
+    # paragraph dilute the embedding (downstream paragraphs often pivot
+    # to community/individual aksi which is the same across flyers).
+    query_parts = []
+    if flyer_headline and flyer_headline.strip():
+        query_parts.append(flyer_headline.strip())
+    query_parts.append(flyer_body.strip()[:600])
+    query = "\n\n".join(query_parts)
+
+    openai = _get_openai()
+    try:
+        emb = openai.embeddings.create(
+            model=settings.embedding_model, input=query
+        )
+        vector = emb.data[0].embedding
+        record_usage(
+            provider="openai",
+            operation="embedding",
+            model=settings.embedding_model,
+            tokens_in=getattr(emb.usage, "total_tokens", None),
+            meta={"context": "flyer_pick", "is_adhkar": is_adhkar_slot},
+        )
+    except Exception as exc:
+        log.warning("flyer_pick.embed_failed", error=str(exc))
+        return None
+
+    # ── Stage 2: gather candidates from every kitab collection ────
+    qdrant = _get_qdrant()
+    candidates: list[dict[str, Any]] = []
+    # Per-corpus quota: ~3 from each, with the AR-only boost in
+    # _per_corpus_for. With ~11 corpora, this gives 30-40 candidates
+    # pre-filter — we'll trim to candidate_pool_size after merge.
+    for corpus, collection in COLLECTION_NAMES.items():
+        try:
+            qr = qdrant.query_points(
+                collection_name=collection,
+                query=vector,
+                limit=_per_corpus_for(corpus, 3),
+                with_payload=True,
+            )
+            results = qr.points
+        except Exception as exc:
+            log.debug(
+                "flyer_pick.corpus_failed", corpus=corpus, error=str(exc)
+            )
+            continue
+
+        threshold = MIN_SCORE.get(corpus, 0.30)
+        for hit in results:
+            if hit.score is None or hit.score < threshold:
+                continue
+            normalized = _normalize_hit(corpus, hit)
+            if normalized["ref_id"] in DALEEL_DENYLIST:
+                continue
+            # Adhkar filter for slots 5+6: only entries with enough
+            # harakat density to be recitable as a du'a.
+            if is_adhkar_slot and not _is_recitable_du_a(
+                normalized.get("arabic", "")
+            ):
+                continue
+            candidates.append(normalized)
+
+    if not candidates:
+        log.info(
+            "flyer_pick.no_candidates",
+            headline=(flyer_headline or "")[:60],
+            is_adhkar=is_adhkar_slot,
+        )
+        return None
+
+    # Sort by score desc, trim to pool size before LLM judge
+    candidates.sort(key=lambda h: h["score"] or -1e9, reverse=True)
+    candidates = candidates[:candidate_pool_size]
+
+    # ── Stage 3: LLM judge picks the single best fit ──────────────
+    # Lazy import — keeps module light when this path isn't hit.
+    from google import genai
+    from google.genai import types as genai_types
+
+    if not settings.gemini_api_key:
+        # No judge available — fall back to top-1 by cosine. Logged so
+        # we can audit when this fires in prod.
+        log.warning("flyer_pick.no_gemini_key_using_cosine_top1")
+        return candidates[0]
+
+    client = genai.Client(api_key=settings.gemini_api_key)
+
+    numbered = "\n".join(
+        f"[{i}] {c['corpus'].upper()} {c['citation']} ({len(c.get('translation_id') or c.get('translation_en') or '')} ch)\n"
+        f"    Arab: {c['arabic'][:160]}\n"
+        f"    ID:   {(c.get('translation_id') or c.get('translation_en') or '')[:280]}"
+        for i, c in enumerate(candidates)
+    )
+    adhkar_clause = (
+        "\n\nSLOT INI = Ajakan Sunnah / Doa Pekan Ini. Daleel HARUS sebuah du'a / dzikir / ayat yang bisa direcite jamaah — bukan hadits historis panjang dengan rantai perawi."
+        if is_adhkar_slot
+        else ""
+    )
+    headline_clause = (
+        f"\n\nHEADLINE flyer: \"{flyer_headline}\""
+        if flyer_headline and flyer_headline.strip()
+        else ""
+    )
+    prompt = f"""BODY flyer dakwah pekan ini:
+{flyer_body[:600]}{headline_clause}{adhkar_clause}
+
+Berikut {len(candidates)} kandidat daleel dari Qur'an dan kitab hadits yang ditemukan oleh pencarian embedding. PILIH SATU yang PALING TEPAT secara TEMATIK untuk flyer di atas — bukan yang skor kosinusnya tertinggi, tetapi yang BENAR-BENAR berbicara tentang inti pesan flyer.
+
+ATURAN PEMILIHAN (wajib ketat):
+
+1. RELEVANSI > BREVITY. Pilih daleel yang BENAR-BENAR cocok dengan pesan, walaupun terjemahannya agak panjang ({_FLYER_PICK_RELEVANCE_FLOOR_CHARS}ch ideal, sampai {_FLYER_PICK_HARD_CAP_CHARS}ch masih bisa). Daleel yang dipaksakan tematik (kata permukaan sama, konteks berbeda) lebih buruk daripada daleel agak panjang yang persis cocok.
+
+2. TOLAK daleel yang hanya BERBAGI KATA tapi konteksnya berbeda:
+   ❌ flyer tentang "pulang haji jadi tersangka korupsi" + daleel tentang "tawaran harga muslim" → KATA "muslim" sama, KONTEKS beda
+   ❌ flyer tentang "dakwah dengan hikmah ke saudara LGBT" + daleel tentang "timbangan adil" → KATA "adil" sama, KONTEKS beda
+   ❌ flyer tentang "shalat tepi siang muhasabah" + daleel tentang "adil + ihsan" → tema beda
+   ❌ flyer tentang "iklan paylater 0%" + daleel tentang "harta yatim" → keduanya tentang harta tapi tema spesifik beda
+
+3. TERIMA daleel yang ISINYA langsung membahas tema flyer:
+   ✓ flyer tentang "integritas pejabat" + Sahih Muslim 4721 (mimbar cahaya untuk orang adil) → KONTEKS langsung
+   ✓ flyer tentang "dakwah nasihat" + Bulugh al-Maram 1730 ("Agama adalah nasihat") → KONTEKS langsung
+   ✓ flyer tentang "shalat tepi siang" + QS. Hud: 114 (dirikan shalat di kedua tepi siang) → KONTEKS langsung
+   ✓ flyer tentang "kezaliman" + hadits qudsi tentang larangan zhulm → KONTEKS langsung
+
+4. BATAS PANJANG: kalau dua daleel sama-sama tematik, pilih yang TERJEMAHANNYA LEBIH PENDEK. Tapi JANGAN tolak yang relevan hanya karena panjang.
+
+5. KALAU TIDAK ADA satu pun kandidat yang benar-benar cocok, kembalikan {{"picked": null, "reason": "..."}} — em-dash di renderer lebih jujur daripada daleel mismatch.
+
+Kandidat:
+{numbered}
+
+Kembalikan JSON SAJA, salah satu format:
+  {{"picked": <index 0-{len(candidates)-1}>, "reason": "1 kalimat penjelasan kenapa daleel ini paling cocok"}}
+  ATAU
+  {{"picked": null, "reason": "1 kalimat penjelasan kenapa tidak ada yang cocok"}}"""
+
+    try:
+        resp = client.models.generate_content(
+            model="gemini-2.5-flash-lite",
+            contents=prompt,
+            config=genai_types.GenerateContentConfig(
+                response_mime_type="application/json",
+                temperature=0.1,
+                max_output_tokens=200,
+                # Pick + 1-sentence reason = small structured output;
+                # no deliberation needed (same as rerank_daleel).
+                thinking_config=genai_types.ThinkingConfig(thinking_budget=0),
+            ),
+        )
+        raw = resp.text or "{}"
+        import json as _json
+
+        data = _json.loads(raw)
+        picked_idx = data.get("picked")
+        reason = data.get("reason", "")
+
+        usage_md = getattr(resp, "usage_metadata", None)
+        record_usage(
+            provider="gemini",
+            operation="flyer_dalil_pick",
+            model="gemini-2.5-flash-lite",
+            tokens_in=getattr(usage_md, "prompt_token_count", None),
+            tokens_out=gemini_output_tokens(usage_md),
+            meta={"is_adhkar": is_adhkar_slot},
+        )
+
+        if picked_idx is None:
+            log.info(
+                "flyer_pick.judge_returned_none",
+                reason=reason[:120],
+                headline=(flyer_headline or "")[:60],
+            )
+            return None
+
+        if (
+            not isinstance(picked_idx, int)
+            or picked_idx < 0
+            or picked_idx >= len(candidates)
+        ):
+            log.warning(
+                "flyer_pick.judge_bad_index",
+                picked=picked_idx,
+                n_candidates=len(candidates),
+            )
+            return candidates[0]
+
+        chosen = candidates[picked_idx]
+        log.info(
+            "flyer_pick.judged",
+            headline=(flyer_headline or "")[:60],
+            picked_cit=chosen["citation"],
+            picked_trans_len=len(
+                chosen.get("translation_id")
+                or chosen.get("translation_en")
+                or ""
+            ),
+            reason=reason[:120],
+            is_adhkar=is_adhkar_slot,
+        )
+        return chosen
+
+    except Exception as exc:
+        log.warning("flyer_pick.judge_failed", error=str(exc))
+        # Defense in depth: rather than breaking the briefing, fall
+        # back to top-1 by cosine. Logged so anomalies are auditable.
+        return candidates[0]
