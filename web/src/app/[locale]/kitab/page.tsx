@@ -36,6 +36,7 @@ const ALL_CORPORA: KitabCorpus[] = [
   "adab",
   "aqidah",
   "ts3",
+  "syamail",
 ];
 
 // Default selection when the user hasn't picked anything yet. Tafsir is
@@ -207,6 +208,17 @@ const KITAB_META: Record<
     metaKey: "kitab_ts3_meta",
     tone: "from-slate-50 to-slate-100/40",
     iconTone: "bg-slate-600",
+    languages: ["AR"],
+  },
+  // Ash-Shama'il al-Muhammadiyyah (al-Tirmidhi) — canonical hadith
+  // compilation describing the Prophet's physical appearance, character,
+  // food, sleep, prayer, conduct. ~415 hadiths across 55 chapters,
+  // foundational sirah/akhlak material.
+  syamail: {
+    labelKey: "kitab_syamail_title",
+    metaKey: "kitab_syamail_meta",
+    tone: "from-blue-50 to-blue-100/40",
+    iconTone: "bg-blue-600",
     languages: ["AR"],
   },
 };
