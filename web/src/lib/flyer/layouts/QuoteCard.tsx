@@ -1,3 +1,4 @@
+import { pickDaleelTranslation } from "../content";
 import { Citation, QuoteGlyph } from "./decor";
 import type { FlyerLayoutComponent } from "./types";
 
@@ -19,12 +20,9 @@ export const QuoteCard: FlyerLayoutComponent = ({
   layoutVariant,
 }) => {
   const { daleel, headline, message, dateLabel, brand } = content;
-  const isEnglish = locale === "en";
-  const translation = daleel
-    ? isEnglish
-      ? daleel.translation_en || daleel.translation_id || ""
-      : daleel.translation_id || daleel.translation_en || ""
-    : "";
+  const translation = pickDaleelTranslation(daleel, locale, {
+    keywords: [headline, message].filter(Boolean) as string[],
+  });
   const transLen = translation.length;
   // Bumped 2026-06-06 — daleel on a 1080×1080 flyer was reading much
   // smaller than the message body, undermining the citation's weight.

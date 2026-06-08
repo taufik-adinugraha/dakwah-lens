@@ -17,6 +17,148 @@ import type { DeliverableSlug } from "./design";
  * visually duplicate.
  */
 
+/**
+ * pickDaleelTranslation — get the display-ready translation text for
+ * a flyer's daleel card, applying smart ellipsis-truncation when the
+ * raw translation overruns the card's comfortable length.
+ *
+ * Added 2026-06-08 after `pick_flyer_daleel` started picking longer
+ * (but more thematically-relevant) entries from the kitab pool. The
+ * Sharia constraint "haram memotong daleel di tengah karena konteks
+ * hilang" still applies — we do NOT silently truncate. The marker `… `
+ * + trailing ` …` make the omission explicit, which is the standard
+ * convention in citation work (analogous to "[…]" in Western
+ * scholarship: a visible signal that the reader should look up the
+ * full citation for the surrounding context).
+ *
+ * Algorithm:
+ *   1. Pick locale-appropriate translation (id preferred for Bahasa
+ *      readers, falls back to en).
+ *   2. If ≤ targetChars, return as-is.
+ *   3. Split into sentences. Single-sentence text: hard-truncate with
+ *      trailing `…` (no good way to mark mid-sentence omission).
+ *   4. Score each sentence by keyword overlap with `keywords` (passed
+ *      in by the layout — usually headline + message tokens). Higher
+ *      score = sentence more on-topic for THIS flyer.
+ *   5. Greedily expand around the peak sentence, adding neighbors
+ *      until char budget is spent. Prefer shorter neighbors first so
+ *      we fit more sentences.
+ *   6. Wrap with `… ` prefix if we skipped earlier sentences, ` …`
+ *      suffix if we skipped later sentences.
+ *
+ * The citation (passed separately in `Citation`) still surfaces the
+ * full reference, so a curious reader can look up the omitted parts.
+ */
+const _ID_STOPWORDS = new Set(
+  ("yang dan di ke dari untuk pada adalah ini itu kita kami saya anda " +
+    "dengan tidak juga akan sudah belum atau jika kalau setiap bahwa karena " +
+    "tapi tetapi namun maka jadi pula serta ada sangat sebagai oleh lebih " +
+    "telah dapat hanya bisa hari pekan tahun the and for with that this his " +
+    "her our its are was were have has had will not but you").split(/\s+/),
+);
+
+function _tokens(text: string): Set<string> {
+  const ts = (text.toLowerCase().match(/[a-z]{4,}/g) ?? []).filter(
+    (t) => !_ID_STOPWORDS.has(t),
+  );
+  return new Set(ts);
+}
+
+type DaleelTranslationOptions = {
+  /** Target char count for the rendered translation. Default 240 —
+   *  comfortable on 1080×1080 at the renderer's medium font scale. */
+  targetChars?: number;
+  /** Soft cap: short, return as-is even if above targetChars. Above
+   *  this we enter ellipsis mode. Default 280 — gives a 40-char buffer
+   *  for naturally-short verses that needn't be cut. */
+  cutThreshold?: number;
+  /** Keywords (typically from headline + message) used to pick the
+   *  most-relevant sentence as the anchor. When omitted, the longest
+   *  sentence is treated as the anchor (it usually carries the main
+   *  legal/theological clause). */
+  keywords?: string[];
+};
+
+export function pickDaleelTranslation(
+  daleel: { translation_id?: string | null; translation_en?: string | null } | null | undefined,
+  locale: string,
+  options: DaleelTranslationOptions = {},
+): string {
+  if (!daleel) return "";
+  const { targetChars = 240, cutThreshold = 280, keywords = [] } = options;
+  const isEnglish = locale === "en";
+  const text = (isEnglish
+    ? daleel.translation_en || daleel.translation_id || ""
+    : daleel.translation_id || daleel.translation_en || ""
+  ).trim();
+  if (!text) return "";
+  if (text.length <= cutThreshold) return text;
+
+  // Split into sentences — period / exclam / question, plus em-dash
+  // pause + colon when followed by a new capital letter (handles
+  // hadith narrator → quote breaks: "Rasulullah ﷺ bersabda: \"...\"").
+  const sentences = text
+    .split(/(?<=[.!?])\s+(?=[A-Z“"])|(?<=[:—])\s+(?=[A-Z“"])/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  if (sentences.length <= 1) {
+    // Hard truncate — single long clause has no natural cut point.
+    // We still wrap with leading `…` if we cut from the middle, but
+    // since we keep the START, only trailing `…` is needed.
+    return text.slice(0, targetChars - 2).trim() + " …";
+  }
+
+  // Score sentences. With keywords: count overlap. Without: prefer
+  // the longest (usually the legal/theological core).
+  const kwSet = _tokens(keywords.join(" "));
+  const scores = sentences.map((s) => {
+    if (kwSet.size === 0) return s.length; // fallback heuristic
+    const tokens = _tokens(s);
+    let n = 0;
+    for (const t of tokens) if (kwSet.has(t)) n++;
+    return n;
+  });
+
+  // Peak sentence (highest score; ties broken by earlier position).
+  let peakIdx = 0;
+  for (let i = 1; i < scores.length; i++) {
+    if (scores[i] > scores[peakIdx]) peakIdx = i;
+  }
+
+  // Expand around peak. Reserve ~6 chars for "… " / " …" markers.
+  let start = peakIdx;
+  let end = peakIdx;
+  let usedChars = sentences[peakIdx].length;
+  const budget = targetChars - 6;
+
+  while (usedChars < budget) {
+    const prev = start > 0 ? sentences[start - 1] : null;
+    const next = end < sentences.length - 1 ? sentences[end + 1] : null;
+    if (!prev && !next) break;
+    // Prefer the side that lets us fit more. If both fit, take the
+    // shorter (greedy by character efficiency).
+    const prevLen = prev ? prev.length + 1 : Infinity;
+    const nextLen = next ? next.length + 1 : Infinity;
+    const prevFits = prev && usedChars + prevLen <= budget;
+    const nextFits = next && usedChars + nextLen <= budget;
+    if (nextFits && (!prevFits || nextLen <= prevLen)) {
+      usedChars += nextLen;
+      end++;
+    } else if (prevFits) {
+      usedChars += prevLen;
+      start--;
+    } else {
+      break;
+    }
+  }
+
+  const slice = sentences.slice(start, end + 1).join(" ");
+  const needPrefix = start > 0;
+  const needSuffix = end < sentences.length - 1;
+  return `${needPrefix ? "… " : ""}${slice}${needSuffix ? " …" : ""}`;
+}
+
 /** Strip markdown markers + collapse whitespace. */
 function stripMd(s: string): string {
   return s

@@ -1,3 +1,4 @@
+import { pickDaleelTranslation } from "../content";
 import { Citation } from "./decor";
 import type { FlyerLayoutComponent } from "./types";
 
@@ -18,12 +19,9 @@ export const SplitImage: FlyerLayoutComponent = ({
   layoutVariant,
 }) => {
   const { daleel, headline, message, dateLabel, brand } = content;
-  const isEnglish = locale === "en";
-  const translation = daleel
-    ? isEnglish
-      ? daleel.translation_en || daleel.translation_id || ""
-      : daleel.translation_id || daleel.translation_en || ""
-    : "";
+  const translation = pickDaleelTranslation(daleel, locale, {
+    keywords: [headline, message].filter(Boolean) as string[],
+  });
   const transLen = translation.length;
   // Bumped 2026-06-06 — see QuoteCard for rationale.
   const transSize =
