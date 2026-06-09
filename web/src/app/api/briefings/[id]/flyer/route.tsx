@@ -1,4 +1,5 @@
 import { getBriefingBySlug } from "@/lib/briefing-data";
+import { FlyerSlotMissingError } from "@/lib/flyer/compose";
 import { renderFlyerPng, renderPosterPdf } from "@/lib/flyer/render-flyer";
 
 /**
@@ -119,14 +120,28 @@ export async function GET(
     });
   }
 
-  const png = await renderFlyerPng({
-    generatedAt: brief.generatedAt,
-    body,
-    daleelRefs: brief.daleelRefs,
-    adhkarRefs: brief.adhkarRefs,
-    slot,
-    locale: lang,
-  });
+  let png: Buffer;
+  try {
+    png = await renderFlyerPng({
+      generatedAt: brief.generatedAt,
+      body,
+      daleelRefs: brief.daleelRefs,
+      adhkarRefs: brief.adhkarRefs,
+      slot,
+      locale: lang,
+    });
+  } catch (err) {
+    // Strict-mode skip: the briefing has no dedicated `## Pesan Flyer N`
+    // block for this persona slot. Return 404 so the gallery hides the
+    // tile rather than show a fallback-generated flyer with analyst
+    // prose + unfiltered (non-whitelist) dalil.
+    if (err instanceof FlyerSlotMissingError) {
+      return new Response("Flyer slot not present in this briefing", {
+        status: 404,
+      });
+    }
+    throw err;
+  }
 
   return new Response(new Uint8Array(png), {
     headers: {

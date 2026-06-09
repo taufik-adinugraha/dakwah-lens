@@ -1,4 +1,5 @@
 import { getBriefingBySlug } from "@/lib/briefing-data";
+import { FlyerSlotMissingError } from "@/lib/flyer/compose";
 import { renderFlyerPng } from "@/lib/flyer/render-flyer";
 
 /**
@@ -27,13 +28,23 @@ export async function GET(
   const body =
     lang === "en" && brief.summaryMdEn ? brief.summaryMdEn : brief.summaryMd;
 
-  const png = await renderFlyerPng({
-    generatedAt: brief.generatedAt,
-    body,
-    daleelRefs: brief.daleelRefs,
-    slot: { kind: "genz", variant: "a", segment: brief.themeGroup },
-    locale: lang,
-  });
+  let png: Buffer;
+  try {
+    png = await renderFlyerPng({
+      generatedAt: brief.generatedAt,
+      body,
+      daleelRefs: brief.daleelRefs,
+      slot: { kind: "genz", variant: "a", segment: brief.themeGroup },
+      locale: lang,
+    });
+  } catch (err) {
+    if (err instanceof FlyerSlotMissingError) {
+      return new Response("Flyer slot not present in this briefing", {
+        status: 404,
+      });
+    }
+    throw err;
+  }
 
   return new Response(new Uint8Array(png), {
     headers: {

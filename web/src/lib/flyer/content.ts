@@ -940,30 +940,53 @@ export function extractGenZMessage(markdown: string): string {
 }
 
 // ──────────────────────────────────────────────────────────────────
-// Daleel + date helpers (unchanged from earlier version)
+// Daleel + date helpers
 // ──────────────────────────────────────────────────────────────────
+
+/** Corpora allowed as flyer dalil — mirrors `FLYER_ALLOWED_CORPORA` in
+ *  `api/services/kitab_retrieval.py`. Decision recorded 2026-06-08:
+ *  flyers must cite hadith collections (not Qur'an or biographical
+ *  matns), keeping the flyer's argumentative weight on Prophetic
+ *  guidance + classical fiqh primers. Briefings older than this date
+ *  may still carry Quran/sirah entries in `daleelRefs`; the renderer
+ *  filters them out here so old briefings render compliant flyers. */
+export const FLYER_ALLOWED_CORPORA = new Set<string>([
+  "bukhari",
+  "muslim",
+  "riyad_as_salihin",
+  "bulugh_al_maram",
+  "bidayat_al_hidayah",
+  "nashaihul_ibad",
+  "aqidah_awam",
+]);
 
 /** Pick a daleel from the pool for a given variant rank (0-3 → cycles
  *  through the 4 most-relevant entries so the 4 flyers do not share
- *  the same daleel). */
+ *  the same daleel). Filters the pool to `FLYER_ALLOWED_CORPORA` first
+ *  so the 7-kitab whitelist is enforced even when the underlying
+ *  `daleelRefs` includes Qur'an / sirah / other corpora. Returns null
+ *  when no whitelist-eligible entry exists — the layout component
+ *  renders gracefully without a dalil card in that case. */
 export function pickFlyerDaleel(
   refs: DaleelRef[] | null,
   locale: "id" | "en",
   rank = 0,
 ): DaleelRef | null {
   if (!refs || refs.length === 0) return null;
-  const usable = refs.filter((r) => {
+  const eligible = refs.filter((r) => FLYER_ALLOWED_CORPORA.has(r.corpus));
+  if (eligible.length === 0) return null;
+  const usable = eligible.filter((r) => {
     const tr = locale === "en" ? r.translation_en : r.translation_id;
     return r.arabic && tr;
   });
   if (usable.length) {
     return usable[Math.min(rank, usable.length - 1)];
   }
-  const withArabic = refs.filter((r) => r.arabic);
+  const withArabic = eligible.filter((r) => r.arabic);
   if (withArabic.length) {
     return withArabic[Math.min(rank, withArabic.length - 1)];
   }
-  return refs[Math.min(rank, refs.length - 1)];
+  return eligible[Math.min(rank, eligible.length - 1)];
 }
 
 // ──────────────────────────────────────────────────────────────────

@@ -120,6 +120,26 @@ export type FlyerSlot =
       segment: string | null;
     };
 
+/** Thrown by composeFlyer when a message-bearing slot (general / genz /
+ *  sunnah) has no dedicated `## Pesan Flyer N` block in the briefing
+ *  markdown. The legacy behavior was to fall back to extracting analyst
+ *  prose from elsewhere in the briefing — that produced flyers like the
+ *  2026-06-07 Toleransi/genz-b which surfaced platform-mix statistics
+ *  ("Hanya 4 post YouTube...") with a Quran citation (QS. Ar-Rahmaan:
+ *  9) pulled from the unfiltered daleel pool. Now: the caller (API
+ *  route) catches this and returns 404 so the gallery omits the
+ *  persona rather than render garbage. */
+export class FlyerSlotMissingError extends Error {
+  readonly slot: FlyerSlot;
+  constructor(slot: FlyerSlot) {
+    super(
+      `Briefing has no dedicated Pesan Flyer block for slot ${JSON.stringify(slot)}`,
+    );
+    this.name = "FlyerSlotMissingError";
+    this.slot = slot;
+  }
+}
+
 /** Briefing-level context passed into composeFlyer. `daleelRefs` is the
  *  thematic pool (used by general / genz flyers); `adhkarRefs` is the
  *  separate du'a / dzikir pool (used by sunnah / dua flyers).
@@ -588,6 +608,17 @@ async function buildContent(ctx: FlyerContext): Promise<FlyerContent> {
   const pesanSlot = pesanFlyerSlotIndex(ctx.slot);
   const dedicatedBlock =
     pesanSlot !== null ? extractDedicatedFlyerBlock(ctx.body, pesanSlot) : null;
+  // Strict mode (2026-06-09): for message-bearing slots (general / genz
+  // / sunnah), refuse to fall back to analysis-section prose when the
+  // dedicated block is absent. The fallback path was responsible for
+  // the 2026-06-07 Toleransi/genz-b incident where the renderer pulled
+  // platform-mix analyst notes + a Quran citation into a flyer image.
+  // The API route catches this and returns 404 so the gallery omits
+  // the persona rather than show a manufactured flyer. Poster and
+  // deliverable slots are unaffected (they don't use pesanFlyerSlot).
+  if (pesanSlot !== null && !dedicatedBlock) {
+    throw new FlyerSlotMissingError(ctx.slot);
+  }
   const dedicatedDaleel = findDaleelByCitation(
     ctx.daleelRefs,
     dedicatedBlock?.daleelCitation,
