@@ -280,6 +280,17 @@ Rules:
   ✅ GOOD:
       "Kriminalitas & Penegakan Hukum"
 
+NEAR-DUPLICATE GATE (HARD RULE — added 2026-06-09):
+Before emitting two themes, apply this test: tokenize each label (drop stop-words like "di", "dan", "&", "untuk"), lowercase, and compare token sets. If two themes share ≥ 2 content tokens, they are PRESUMED near-duplicate; you MUST justify why they need to be separate by showing they would use different daleel + different framing. If you can't, MERGE.
+
+2026-06-09 audit failure: "Kekerasan Seksual & Perlindungan Anak" + "Pelecehan & Kekerasan Seksual di Kampus" were emitted as separate themes. Shared tokens: {"kekerasan", "seksual"}. The "di Kampus" setting variation did NOT justify the split — the kampus cluster filled with vtuber porn discussion and ojol driver content that wasn't even about violence. RESULT: merge into one theme "Pelecehan & Kekerasan terhadap Perempuan dan Anak".
+
+Other concrete failures from the same gate:
+  ❌ "Korupsi Pejabat & Aparatur Daerah" + "Korupsi Pejabat & Penegakan Hukum" — shared tokens {"korupsi", "pejabat"}, both general catch-alls. Merge.
+  ❌ "Pendidikan & Sekolah" + "Pendidikan & SDM" — shared {"pendidikan"}, ambiguous angle. Merge or pick one.
+
+Apply this gate to YOUR proposed themes BEFORE returning JSON. Removing a duplicate before emit is cheaper than relying on the 0.85 cosine merge to catch it.
+
 - Aim for BREADTH: the themes you return should jointly cover the great majority (≥80%) of the posts in the pool. If you notice a sizable slice you haven't covered (health stories, education stories, finance/investasi posts, kajian/akhlaq content, sport, lifestyle), add a theme for it rather than letting it drop to "uncategorized". The downstream system has its own cosine-similarity floor that filters borderline matches — you don't need to be conservative here. Undersizing themes is more costly than oversizing.
 - If multiple stories share a clear pattern (e.g. 3 separate child-abuse cases involving religious figures), group them under ONE specific theme ("Pelecehan oleh Tokoh Agama"), not three "miscellaneous crime" entries.
 
@@ -312,14 +323,22 @@ Heuristic:
 - If unsure whether an incident is dominant enough, GENERALIZE. A broader theme that's 80% on-topic serves the dashboard better than a narrow theme that's 20% on-topic.
 - Proper nouns in a label (person names, city/regency names, agency acronyms) are a YELLOW FLAG. Only keep them when the incident is unambiguously dominant. When in doubt, replace the proper noun with the broader category.
 
-ELASTIC-WORD GUARD (HARD RULE):
-Some words in Indonesian are emotionally elastic — they appear in MANY unrelated headlines because journalists overuse them. These words include: "misterius", "horor", "aneh", "tragis", "viral", "polemik", "kontroversi", "heboh", "geger". If you put any of these in a theme label, the embedding centroid pulls in everything with that word — accidents framed as "tewas misterius", deaths framed as "tragis", scandals framed as "polemik". REAL 2026-06-02 audit failure: a theme labeled "Peristiwa Misterius & Horor" sucked in 70% accident/death-news ("tewas misterius di kamping Temanggung", "pria hanyut", "keracunan gas") because every accident headline uses "misterius".
+ELASTIC-WORD HARD BAN (UPGRADED 2026-06-09 — STRICT):
+The following words are FORBIDDEN as substrings in your theme labels. No exceptions. The 2026-06-09 audit confirmed that even with previous warnings + the "set exclude_keywords" escape, the model still emitted "Peristiwa Misterius & Paranormal" — and that cluster sucked in arson, abandoned babies, suicides, illegal mining busts, and a Pemkab Gianyar award ceremony. The escape hatch isn't working; the only reliable fix is to keep these words OUT of the label.
 
-If you propose a theme whose label contains any elastic word above, you MUST EITHER:
-  (a) rename it to a NON-elastic concrete label (e.g. "Peristiwa Misterius & Horor" → "Cerita Pocong & Fenomena Paranormal"), OR
-  (b) set a tight `exclude_keywords` list that filters out the bleed-in. For "misterius/horor": exclude_keywords MUST include at minimum: ["keracunan", "kebakaran", "kecelakaan", "tenggelam", "hanyut", "tewas", "banjir", "korban"]. The exclude list is the ONLY way the bleed-in stops.
+FORBIDDEN label substrings (case-insensitive, no partial-match excuses):
+  misterius, horor, aneh, tragis, viral, polemik, kontroversi, heboh, geger, gempar, fenomena
 
-If you can't do either confidently, drop the theme entirely and let the static "Lainnya — Tidak Terklasifikasi" bucket catch those posts.
+If you want to cluster posts about paranormal phenomena, label by the CONCRETE PHENOMENON:
+  ❌ "Peristiwa Misterius & Paranormal"           (uses "misterius")
+  ❌ "Fenomena Api Misterius Seyegan"             (uses both forbidden words)
+  ✅ "Cerita Pocong & Hantu Pulau Jawa"           (concrete phenomenon)
+  ✅ "Penampakan & Cerita Mistik Pesantren"      (concrete subject + setting)
+  ✅ "Kebakaran Berulang Rumah Agus Yani Sleman" (if THIS specific story is dominant — apply incident-specific volume gate)
+
+If neither a concrete-phenomenon label nor a dominant-incident label fits, DROP THE THEME ENTIRELY. The static "Lainnya — Tidak Terklasifikasi" bucket will catch those posts. A no-theme outcome is strictly better than a hard-banned-word theme.
+
+Same hard ban applies to label words that USED to be allowed with exclude_keywords escape — that escape has been retired because it didn't hold in practice.
 
 CATCH-ALL THEMES ARE FORBIDDEN (HARD RULE — added 2026-06-07):
 You MUST NOT mint a theme whose purpose is to be a leftover/uncategorized bucket. The downstream system ALREADY appends a single canonical static bucket called "Lainnya — Tidak Terklasifikasi" (with em-dash) AFTER your themes are processed — it is your safety net, not your responsibility. Concretely, DO NOT return any theme whose label is or normalises to:
@@ -336,6 +355,17 @@ ASSIGNMENT CONTROLS — each theme MAY include two extra optional fields that pr
   * "Konflik Palestina" was grabbing Afghanistan history, skin-whitening rants, and unrelated humanitarian crises. Set `exclude_keywords: ["skin care", "skincare", "putih instan", "Afghanistan"]`.
   * "Korupsi Pejabat" was grabbing education policy and labor lawsuits. Set `exclude_keywords: ["UU Ciptaker", "kecelakaan tol", "sekolah swasta"]`.
   Tight themes ("Kriminalitas Jalanan", "Ibadah Haji & Kurban") rarely need this — leave empty.
+
+REQUIRED-EXCLUDES GATE (HARD RULE — added 2026-06-09):
+If your theme label STARTS WITH or PROMINENTLY CONTAINS any of these category-noun roots, exclude_keywords is REQUIRED and must contain ≥3 items targeting known bleed-in patterns:
+  Korupsi, Kekerasan, Pelecehan, Bencana, Kriminalitas, Peristiwa, Kasus, Pencurian, Penegakan, Konflik, Pelanggaran, Kecelakaan
+
+Why: these category nouns produce centroids that absorb adjacent-domain noise. The 2026-06-09 audit:
+  · "Kekerasan Seksual & Perlindungan Anak" emitted exclude_keywords=[] → pulled in Atta Halilintar gossip about kid falling + parenting humor. Required excludes (minimum): ["selebriti", "gosip", "parenting", "humor", "drama", "trending"]
+  · "Pelecehan & Kekerasan Seksual di Kampus" emitted exclude_keywords=[] → pulled in vtuber porn discussion + ojol driver content. Required excludes (minimum): ["vtuber", "anime", "konten ojol", "driver ojol"]
+  · A "Peristiwa Misterius" theme (now forbidden by the elastic-word ban) had absorbed Pemkab award ceremonies and illegal mining busts.
+
+When you emit any theme matching the category-noun pattern, brainstorm ≥3 likely bleed-in patterns from your sample of the pool and add them as exclude_keywords. Empty `exclude_keywords: []` on a category-noun theme is a rule violation.
 
 - `min_similarity`: float in [0.28, 0.55]. Override the default 0.28 cosine floor for this theme. Raise it (e.g. 0.40-0.45) for themes whose centroid is broad and likely to attract weak matches: "Lainnya"-flavored buckets, "Kesehatan Mental" (the word "mental" is used in unrelated snark), "Krisis Kemanusiaan" (broad), AND any theme whose label is a broad category noun ("Korupsi …", "Kekerasan …", "Ekonomi …", "Bencana …"). The 2026-06-06 audit found these category-noun themes absorbed 50-83% noise at the default floor; raising to 0.40 cuts the bleed dramatically without losing the on-theme posts (their centroid match is usually 0.45+). Leave at default for tight, well-bounded themes ("Konflik Palestina & Lebanon" — 0% noise at default — needs no override).
 
@@ -730,72 +760,73 @@ def discover_topics(
         total=len(themes),
     )
 
-    # Mystery/horror auto-inject. Targets THE specific failure mode we
-    # observed: themes labeled "misterius / horor / aneh" empirically
-    # vacuum in unrelated fire & accident news because Indonesian
-    # journalists frame ANY death/fire/disaster with those words
-    # ("api misterius", "tewas misterius", "kejadian aneh"). The
-    # auto-inject below ONLY trips on these three labels — other
-    # elastic words (polemik, tragis, kontroversi, viral, heboh, geger)
-    # are still gated by the prompt-side rule but NOT auto-augmented
-    # here because their excludes would actually break legitimate
-    # clusters:
-    #   - "Tragedi Glamping Temanggung" needs `tewas/korban/keracunan`
-    #     in scope (they're the topic, not the bleed-in)
-    #   - "Polemik Sapi Kurban Presiden" needs `korban` (sapi korban =
-    #     sapi kurban offering — narrowing it would drop legitimate
-    #     kurban-discussion posts)
-    #   - "Kontroversi Pemilu" / "Heboh PDI-P" have no canonical
-    #     bleed-pattern to exclude
-    # If a new bleed-in pattern emerges for those elastic words,
-    # extend ELASTIC_WORDS + add a separate excludes list per pattern.
-    ELASTIC_WORDS = {"misterius", "horor", "aneh"}
-    # Indonesian morphology: a single verb root sprouts many surface
-    # forms (bakar / terbakar / dibakar / membakar / kobaran / hangus).
-    # The exclude check is literal substring on post text, so each
-    # form needs to be listed. Catches the 2026-06-03 04:00 WIB
-    # auto-recluster failure where "Fenomena Api Misterius di Sleman"
-    # vacuumed posts like "Motornya Hangus Dibakar Massa" and "Tembus
-    # Kobaran Api Ruko" because the post text matched the cluster's
-    # embedding centroid AND didn't contain the literal token
-    # "kebakaran".
-    ELASTIC_MIN_EXCLUDES = [
-        # Fire / burning — all morphological variants
-        "kebakaran",
-        "terbakar",
-        "dibakar",
-        "membakar",
-        "hangus",
-        "kobaran",
-        # Other accident / disaster framings
-        "keracunan",
-        "kecelakaan",
-        "tenggelam",
-        "hanyut",
-        "tewas",
-        "banjir",
-        "korban",
-    ]
-    elastic_augmented: list[str] = []
+    # Elastic-word HARD BAN (upgraded 2026-06-09 from soft auto-augment).
+    # The previous strategy was: when a label contained "misterius / horor
+    # / aneh", auto-augment exclude_keywords with morphological forms of
+    # fire / death / accident / disaster vocabulary. It DIDN'T HOLD:
+    # the 2026-06-09 audit found "Peristiwa Misterius & Paranormal" still
+    # vacuumed in posts that the auto-inject excludes didn't catch —
+    # "Pemkab Gianyar Borong Dua Penghargaan dan Insentif" (government
+    # award), "Penemuan Bayi di Sawah" (abandoned baby), "Gantung Diri"
+    # (suicide), "Polisi Bakar Pondok Tambang Emas Ilegal" (illegal
+    # mining bust — note: "bakar" root, not in old excludes), "Identitas
+    # Pelaku Pembakaran Rumah di Demak" ("pembakaran" not in excludes
+    # either). The exclude list can't enumerate every bleed-in pattern.
+    #
+    # New strategy: REJECT any theme whose label contains a banned
+    # elastic word entirely. Posts that would have routed to that theme
+    # will land in the canonical static "Lainnya — Tidak Terklasifikasi"
+    # bucket instead — which is what we want, because those posts are
+    # genuinely off-topic from any clean cluster the LLM should mint.
+    #
+    # The set below mirrors the prompt's FORBIDDEN label substrings.
+    # Keep both in sync. Words like "tragis" / "viral" / "polemik" /
+    # "kontroversi" / "heboh" / "geger" / "gempar" / "fenomena" never
+    # produced clean clusters either — promoting them to the hard ban.
+    ELASTIC_HARD_BAN = {
+        "misterius",
+        "horor",
+        "aneh",
+        "tragis",
+        "viral",
+        "polemik",
+        "kontroversi",
+        "heboh",
+        "geger",
+        "gempar",
+        "fenomena",
+    }
+    elastic_rejected: list[str] = []
+    kept_after_elastic: list[dict[str, Any]] = []
     for theme in themes:
         label_lower = theme["label"].lower()
-        if not any(word in label_lower for word in ELASTIC_WORDS):
-            continue
-        existing = {ex.lower() for ex in (theme.get("exclude_keywords") or [])}
-        added: list[str] = []
-        for ex in ELASTIC_MIN_EXCLUDES:
-            if ex not in existing:
-                theme.setdefault("exclude_keywords", []).append(ex)
-                existing.add(ex)
-                added.append(ex)
-        if added:
-            elastic_augmented.append(theme["label"])
-    if elastic_augmented:
-        log.info(
-            "topic_discovery.elastic_excludes_injected",
-            count=len(elastic_augmented),
-            themes=elastic_augmented,
+        if any(word in label_lower for word in ELASTIC_HARD_BAN):
+            elastic_rejected.append(theme["label"])
+        else:
+            kept_after_elastic.append(theme)
+    themes = kept_after_elastic
+    if elastic_rejected:
+        log.warning(
+            "topic_discovery.elastic_themes_rejected",
+            count=len(elastic_rejected),
+            labels=elastic_rejected,
+            reason=(
+                "Hard ban on elastic words in labels (2026-06-09 upgrade). "
+                "Posts that would have routed here go to the canonical static "
+                "Lainnya bucket instead, which is the correct outcome."
+            ),
         )
+
+    # Guard against the (unlikely) case where every LLM-proposed theme
+    # was rejected by the elastic filter — return early so we don't try
+    # to embed an empty list. Posts will land in the static Lainnya
+    # bucket which the caller appends.
+    if not themes:
+        log.warning(
+            "topic_discovery.no_themes_after_elastic_filter",
+            platform=platform,
+        )
+        return []
 
     # String-overlap dedup pass removed 2026-06-04 along with the
     # static themes — it was specifically a dynamic-vs-static safety
