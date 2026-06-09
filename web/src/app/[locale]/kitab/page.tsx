@@ -38,6 +38,7 @@ const ALL_CORPORA: KitabCorpus[] = [
   "ts3",
   "syamail",
   "sirah",
+  "hs",
 ];
 
 // Default selection when the user hasn't picked anything yet. Tafsir is
@@ -231,6 +232,18 @@ const KITAB_META: Record<
     metaKey: "kitab_sirah_meta",
     tone: "from-stone-50 to-stone-100/40",
     iconTone: "bg-stone-600",
+    languages: ["AR"],
+  },
+  // Hayat as-Sahabah — Sahabah biographies organised by virtue/topic
+  // (da'wah, iman, jihad, ibadah, etc.). Modern compilation (1965), still
+  // under copyright in Indonesia (life+70 → public domain 2035). Project
+  // owner explicitly authorised inclusion for non-commercial pesantren
+  // retrieval; rights note in download_hs.py header.
+  hs: {
+    labelKey: "kitab_hs_title",
+    metaKey: "kitab_hs_meta",
+    tone: "from-purple-50 to-purple-100/40",
+    iconTone: "bg-purple-600",
     languages: ["AR"],
   },
 };
