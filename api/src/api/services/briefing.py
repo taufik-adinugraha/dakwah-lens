@@ -258,7 +258,7 @@ Ini adalah CONTENT KIT — bukan saran strategis. Setiap sub-section harus berup
 RUJUKAN DALIL DI SECTION 4 — pool yang saya sediakan berisi 10 dalil hasil rerank tematik. Setiap sub-section di bawah WAJIB merujuk 1-3 dalil dari pool ini secara INLINE (bukan ditumpuk semua di Section 5):
 - Pilih dalil yang paling SUPPORT argumen sub-section tersebut — bukan asal comot, bukan random pertama
 - Format inline: `**{{citation}}**` (mis. `**QS. Hud: 85**` atau `**Riyad as-Salihin 1420**`) langsung diikuti 1 kalimat parafrase singkat Bahasa Indonesia
-- Sub-section berbeda BOLEH mengutip dalil yang sama jika memang paling pas, tapi USAHAKAN variasi supaya 8-10 dalil pool terdistribusi (khutbah ~3-4 dalil, kultum ~1-2, kajian ~2-3, pengajaran ~1-2, kreator ~1, mahasiswa ~2, aksi ~1-2). Kisah Pendek TIDAK ikut alokasi ini — sub-section itu pakai sumber sendiri (KISAH POOL dari Al-Bidayah wan-Nihayah).
+- Sub-section berbeda BOLEH mengutip dalil yang sama jika memang paling pas, tapi USAHAKAN variasi supaya 8-10 dalil pool terdistribusi (khutbah ~3-4 dalil, kultum ~1-2, kajian ~2-3, pengajaran ~1-2, kreator ~1, mahasiswa ~2, aksi ~1-2). Kisah Pendek TIDAK ikut alokasi ini — sub-section itu pakai sumber sendiri (KISAH POOL dari «KISAH_LABEL»).
 - JANGAN mengarang ayat atau hadits di luar pool. Citation yang muncul di Section 4 HARUS persis cocok dengan citation di pool
 
 ### Khutbah Jumat (3450-4800 kata)
@@ -365,22 +365,22 @@ VOICE — KAJIAN IBU-IBU (suasana ruang tamu masjid, ibu-ibu duduk lesehan, usta
 TONE KAJIAN: hangat seperti tante yang dipercaya, BUKAN ustadzah yang berjarak. Tertawa bersama, bukan ditertawakan. Humor harus AMAN — tidak menyentuh suami, anak, atau pekerjaan rumah tangga secara merendahkan, tidak menyentuh kelas sosial, tidak menyentuh fisik. Yang aman: kebiasaan kita sendiri (WhatsApp, scrolling, lupa nama tetangga, dll.).
 
 ### Kisah Pendek (1800-2200 kata)
-Tulis SATU KISAH retelling dari kitab **Al-Bidayah wan-Nihayah** karya Ibn Katsir, bersumber EKSKLUSIF dari KISAH POOL yang saya berikan di atas. Format: 10 menit bacaan (~1800-2200 kata) yang membuat pembaca/pendengar HANYUT seperti membaca cerpen sejarah, BUKAN tafsir akademis.
+Tulis SATU KISAH retelling dari kitab **«KISAH_LABEL»** karya «KISAH_AUTHOR», bersumber EKSKLUSIF dari KISAH POOL yang saya berikan di atas. Format: 10 menit bacaan (~1800-2200 kata) yang membuat pembaca/pendengar HANYUT seperti membaca cerpen sejarah, BUKAN tafsir akademis.
 
 CRITICAL — SUMBER KISAH (aturan keras, jangan dilanggar):
-- KISAH POOL berisi BEBERAPA FASAL BERURUTAN dari Al-Bidayah wan-Nihayah (urutan asli kitab — paling kecil section_id dulu, lalu menaik). Itu SATU episode kontinyu yang sengaja ditarik berdekatan supaya kisahnya utuh.
+- KISAH POOL berisi FASAL/BAGIAN dari «KISAH_LABEL» (kalau lebih dari satu fasal, urutan asli kitab — paling kecil section_id dulu, lalu menaik — yaitu SATU episode kontinyu yang sengaja ditarik berdekatan supaya kisahnya utuh; kalau hanya satu fasal, itu memang seksi mandiri yang sudah substansial).
 - Ceritakan ulang fasal-fasal itu sebagai SATU narasi utuh. JANGAN potong di tengah, JANGAN melompat keluar urutan.
-- JANGAN mengambil dari DALEEL POOL untuk sub-section ini. JANGAN sebut hadits Bukhari / Muslim / Riyad sebagai sumber kisah. Kisah ini MURNI dari Al-Bidayah wan-Nihayah.
+- JANGAN mengambil dari DALEEL POOL untuk sub-section ini. JANGAN sebut hadits Bukhari / Muslim / Riyad sebagai sumber kisah. Kisah ini MURNI dari «KISAH_LABEL».
 - JANGAN mengarang detail tarikh / dialog / tindakan yang tidak ada di fasal yang diberikan. Boleh tambah setting sensorik (cuaca, suara, bau) yang plausible berdasarkan konteks sejarah, TETAPI dialog dan tindakan inti HARUS persis sesuai teks Arab di KISAH POOL.
-- Jika KISAH POOL bertanda "(kitab Al-Bidayah wan-Nihayah belum tersedia...)", LEWATI sub-section ini sepenuhnya — tulis hanya satu baris "*Kisah Pendek tidak tersedia untuk tema ini pekan ini.*" lalu langsung lanjut ke sub-section berikutnya.
+- Jika KISAH POOL bertanda "(sumber kisah belum tersedia...)", LEWATI sub-section ini sepenuhnya — tulis hanya satu baris "*Kisah Pendek tidak tersedia untuk tema ini pekan ini.*" lalu langsung lanjut ke sub-section berikutnya.
 
 STRUKTUR WAJIB:
 
-- **Pembuka — kerangka kisah** (~150 kata): satu paragraf yang memperkenalkan kisah TANPA membocorkan inti pesannya. Sebut citation FASAL PERTAMA dari KISAH POOL di kalimat pertama atau kedua (mis. `**Al-Bidayah wan-Nihayah — Fasal Hijrah Rasulullah ﷺ ke Madinah**`), tapi JANGAN bocorkan pelajaran moralnya di pembuka — biarkan pembaca masuk ke kisah dulu. Boleh: "Di sebuah musim panas yang terik di Makkah, sesuatu yang akan mengubah arah sejarah umat manusia bergerak diam-diam dari satu rumah ke rumah lain. Kisah ini Ibn Katsir himpun dalam **Al-Bidayah wan-Nihayah — Fasal Hijrah Rasulullah ﷺ ke Madinah**…"
+- **Pembuka — kerangka kisah** (~150 kata): satu paragraf yang memperkenalkan kisah TANPA membocorkan inti pesannya. Sebut citation FASAL/BAGIAN PERTAMA dari KISAH POOL di kalimat pertama atau kedua (mis. `**«KISAH_LABEL» — [judul fasal/bagian]**`), tapi JANGAN bocorkan pelajaran moralnya di pembuka — biarkan pembaca masuk ke kisah dulu. Boleh: "Di sebuah musim panas yang terik di Makkah, sesuatu yang akan mengubah arah sejarah umat manusia bergerak diam-diam dari satu rumah ke rumah lain. Kisah ini «KISAH_AUTHOR» himpun dalam **«KISAH_LABEL» — [judul fasal/bagian]**…"
 
-- **Latar — setting fisik & emosional** (~280 kata, 2 paragraf): tempatkan pembaca dalam scene. Apa yang sedang terjadi di Makkah / di Madinah / di medan perang / di rumah para sahabat saat kejadian itu? Siapa yang hadir? Apa cuacanya, suaranya, baunya? Apa yang dirasakan tokoh-tokohnya SEBELUM peristiwa utama terjadi? Gunakan detail sensorik yang plausible berdasarkan konteks sirah — JANGAN mengarang detail tarikh yang tidak ada di fasal Al-Bidayah. Tulis dalam aspek "pembaca melihat" — sudut pandang kamera, bukan ringkasan.
+- **Latar — setting fisik & emosional** (~280 kata, 2 paragraf): tempatkan pembaca dalam scene. Apa yang sedang terjadi di Makkah / di Madinah / di medan perang / di rumah para sahabat saat kejadian itu? Siapa yang hadir? Apa cuacanya, suaranya, baunya? Apa yang dirasakan tokoh-tokohnya SEBELUM peristiwa utama terjadi? Gunakan detail sensorik yang plausible berdasarkan konteks sirah — JANGAN mengarang detail tarikh yang tidak ada di fasal KISAH POOL. Tulis dalam aspek "pembaca melihat" — sudut pandang kamera, bukan ringkasan.
 
-- **Inti kisah — peristiwa & dialog** (~900-1150 kata, 5-6 paragraf): nyatakan kejadian PERSIS seperti yang tercatat di fasal-fasal KISAH POOL, tapi diberi tarikan naratif. JANGAN melompati fasal — ceritakan SEMUA fasal berurutan supaya pembaca mengikuti progresi natural sebagaimana Ibn Katsir menyusunnya. Untuk dialog: kutip dengan kalimat berbahasa Indonesia mengalir, tetap akurat ke makna teks Arab.
+- **Inti kisah — peristiwa & dialog** (~900-1150 kata, 5-6 paragraf): nyatakan kejadian PERSIS seperti yang tercatat di fasal-fasal KISAH POOL, tapi diberi tarikan naratif. JANGAN melompati fasal — ceritakan SEMUA fasal berurutan supaya pembaca mengikuti progresi natural sebagaimana «KISAH_AUTHOR» menyusunnya. Untuk dialog: kutip dengan kalimat berbahasa Indonesia mengalir, tetap akurat ke makna teks Arab.
   Format DIALOG yang jelas:
   * Gunakan tanda kutip ganda untuk ucapan langsung: "Apakah engkau telah memberi makan tamumu malam ini?"
   * Beri petunjuk emosi tokoh: "tanya beliau ﷺ dengan suara yang menahan keheranan" atau "jawab sahabat itu pelan, kepalanya tertunduk"
@@ -398,8 +398,8 @@ STRUKTUR WAJIB:
   * Paragraf 1: identifikasi 1-2 pelajaran inti dari kisah. JANGAN list 5-6 pelajaran umum — fokus ke 1-2 yang paling kuat. Jelaskan SECARA EKSPLISIT mengapa pelajaran itu muncul dari kisah ini (kembalikan ke detail kisah).
   * Paragraf 2: hubungkan pelajaran ke peristiwa NYATA pekan ini. Sebut 1-2 konteks dari sample_headlines (tanpa nama outlet) di mana pelajaran ini berlaku. Tutup dengan 1-2 tindakan praktis yang bisa dilakukan pembaca/pendengar pekan ini.
 
-- **Sumber Asli** (WAJIB, JUDUL H4 `#### Sumber Asli — Al-Bidayah wan-Nihayah`): tampilkan teks ARAB ASLI dari KISAH POOL — semua fasal berurutan supaya pembaca yang ingin memverifikasi punya teks lengkap di akhir kisah. Format:
-  * Untuk setiap fasal dalam KISAH POOL: tulis baris `**{{citation fasal itu}}**` (mis. `**Al-Bidayah wan-Nihayah — Fasal Hijrah Rasulullah ﷺ ke Madinah**`)
+- **Sumber Asli** (WAJIB, JUDUL H4 `#### Sumber Asli — «KISAH_LABEL»`): tampilkan teks ARAB ASLI dari KISAH POOL — semua fasal berurutan supaya pembaca yang ingin memverifikasi punya teks lengkap di akhir kisah. Format:
+  * Untuk setiap fasal dalam KISAH POOL: tulis baris `**{{citation fasal itu}}**` (mis. `**«KISAH_LABEL» — [judul fasal/bagian]**`)
   * Blok berikutnya: AKSARA ARAB lengkap dari `Arabic` field fasal itu — pertahankan teks persis seperti tersedia di pool. JANGAN dipangkas, JANGAN ditranskrip Latin.
   * Pisahkan tiap fasal dengan satu baris kosong + horizontal rule `---`.
   Tujuan blok ini agar pembaca yang ingin memverifikasi atau membaca konteks lebih luas punya teks aslinya langsung di akhir kisah, tanpa harus mencari ke kitab.
@@ -919,7 +919,7 @@ This is a CONTENT KIT — not strategic advice. Each sub-section must be a READY
 DALEEL REFERENCING IN SECTION 4 — the pool I provide contains 10 thematically-reranked daleel. Each sub-section below MUST weave 1-3 daleel from this pool INLINE (not all stacked in Section 5):
 - Pick daleel that genuinely SUPPORT each sub-section's argument — not random first picks
 - Inline format: `**{{citation}}**` (e.g. `**QS. Hud: 85**` or `**Riyad as-Salihin 1420**`) immediately followed by 1 sentence English paraphrase
-- Different sub-sections MAY cite the same daleel if it really fits best, but TRY to distribute so the 8-10 daleel pool gets spread across sub-sections (khutbah ~3-4 daleel, kultum ~1-2, kajian ~2-3, home ~1-2, content ~1, mahasiswa ~2, action ~1-2). Kisah Pendek is NOT part of this allocation — that sub-section uses its own source (KISAH POOL from Al-Bidayah wan-Nihayah).
+- Different sub-sections MAY cite the same daleel if it really fits best, but TRY to distribute so the 8-10 daleel pool gets spread across sub-sections (khutbah ~3-4 daleel, kultum ~1-2, kajian ~2-3, home ~1-2, content ~1, mahasiswa ~2, action ~1-2). Kisah Pendek is NOT part of this allocation — that sub-section uses its own source (KISAH POOL from «KISAH_LABEL»).
 - DO NOT invent verses or hadith outside the pool. Any citation appearing in Section 4 MUST exactly match a citation in the pool.
 
 ### Friday Khutbah (3450-4800 words)
@@ -997,22 +997,22 @@ Write a 45-MINUTE KAJIAN OUTLINE ready for delivery — hands-on, NOT theoretica
 - Closing (~50 words): a short prayer for the family, a one-sentence takeaway.
 
 ### Kisah Pendek — Short Story (1800-2200 words)
-Write ONE retelling drawn from **Al-Bidayah wan-Nihayah** by Ibn Kathir, sourced EXCLUSIVELY from the KISAH POOL I supplied above. Format: a 10-minute read (~1800-2200 words) that pulls the reader IN like a historical short story, NOT academic tafsir.
+Write ONE retelling drawn from **«KISAH_LABEL»** by «KISAH_AUTHOR», sourced EXCLUSIVELY from the KISAH POOL I supplied above. Format: a 10-minute read (~1800-2200 words) that pulls the reader IN like a historical short story, NOT academic tafsir.
 
 CRITICAL — SOURCE RULES (hard, do not break):
-- KISAH POOL contains SEVERAL SEQUENTIAL fasal from Al-Bidayah wan-Nihayah (in original kitab order — lowest section_id first, then ascending). They are ONE continuous episode deliberately pulled in adjacency so the story stays whole.
+- KISAH POOL contains FASAL/SECTIONS from «KISAH_LABEL» (if more than one fasal, they're in original kitab order — lowest section_id first, then ascending — i.e. ONE continuous episode deliberately pulled in adjacency so the story stays whole; if only one fasal, it's a standalone substantial section).
 - Retell those fasal as ONE unified narrative. DO NOT cut mid-episode, DO NOT jump out of sequence.
-- DO NOT draw from DALEEL POOL for this sub-section. DO NOT cite Bukhari / Muslim / Riyad as the story's source. This story comes EXCLUSIVELY from Al-Bidayah wan-Nihayah.
+- DO NOT draw from DALEEL POOL for this sub-section. DO NOT cite Bukhari / Muslim / Riyad as the story's source. This story comes EXCLUSIVELY from «KISAH_LABEL».
 - DO NOT invent tarikh details / dialogue / actions absent from the supplied fasal. Sensory setting (weather, sounds, smells) plausible to the historical context is fine, BUT the core dialogue and actions MUST match the Arabic text in KISAH POOL precisely.
-- If KISAH POOL is marked "(Al-Bidayah wan-Nihayah unavailable…)", SKIP this sub-section entirely — write only a single line "*Kisah Pendek not available for this theme this week.*" and move on to the next sub-section.
+- If KISAH POOL is marked "(kisah source unavailable…)", SKIP this sub-section entirely — write only a single line "*Kisah Pendek not available for this theme this week.*" and move on to the next sub-section.
 
 REQUIRED STRUCTURE:
 
-- **Opening — frame the story** (~150 words): one paragraph that introduces the story WITHOUT revealing its core lesson. Name the citation of the FIRST FASAL from KISAH POOL in the first or second sentence (e.g. `**Al-Bidayah wan-Nihayah — Fasal Hijrah Rasulullah ﷺ to Madinah**`), but DO NOT give away the moral upfront — let the reader enter the story first. Acceptable opener: "On a scorching summer in Makkah, something that would alter the course of human history began moving quietly from house to house. Ibn Kathir gathered this story in **Al-Bidayah wan-Nihayah — Fasal Hijrah Rasulullah ﷺ to Madinah**…"
+- **Opening — frame the story** (~150 words): one paragraph that introduces the story WITHOUT revealing its core lesson. Name the citation of the FIRST FASAL/SECTION from KISAH POOL in the first or second sentence (e.g. `**«KISAH_LABEL» — [fasal/section title]**`), but DO NOT give away the moral upfront — let the reader enter the story first. Acceptable opener: "On a scorching summer in Makkah, something that would alter the course of human history began moving quietly from house to house. «KISAH_AUTHOR» gathered this story in **«KISAH_LABEL» — [fasal/section title]**…"
 
-- **Setting — physical & emotional landscape** (~280 words, 2 paragraphs): place the reader inside the scene. What was happening in Makkah / Madinah / on the battlefield / at the sahaba's home when this event took place? Who was present? What was the weather, the sounds, the smells? What did the characters feel BEFORE the main event happened? Use sensory detail that's plausible against the sirah context — DO NOT fabricate tarikh details that aren't in the Al-Bidayah fasal. Write in the "the reader sees" aspect — camera-eye, not summary.
+- **Setting — physical & emotional landscape** (~280 words, 2 paragraphs): place the reader inside the scene. What was happening in Makkah / Madinah / on the battlefield / at the sahaba's home when this event took place? Who was present? What was the weather, the sounds, the smells? What did the characters feel BEFORE the main event happened? Use sensory detail that's plausible against the sirah context — DO NOT fabricate tarikh details that aren't in the KISAH POOL fasal. Write in the "the reader sees" aspect — camera-eye, not summary.
 
-- **Core story — events & dialogue** (~900-1150 words, 5-6 paragraphs): state the events EXACTLY as recorded in the KISAH POOL fasal, with narrative pull. DO NOT skip fasal — retell EVERY fasal in order so the reader follows the natural progression as Ibn Kathir arranged it. For dialogue: quote in flowing English while staying accurate to the Arabic text. Clear DIALOGUE format:
+- **Core story — events & dialogue** (~900-1150 words, 5-6 paragraphs): state the events EXACTLY as recorded in the KISAH POOL fasal, with narrative pull. DO NOT skip fasal — retell EVERY fasal in order so the reader follows the natural progression as «KISAH_AUTHOR» arranged it. For dialogue: quote in flowing English while staying accurate to the Arabic text. Clear DIALOGUE format:
   * Use double quotes for direct speech: "Have you fed your guest tonight?"
   * Add emotional cues for characters: "the Prophet ﷺ asked, his voice holding back surprise" or "the sahabi answered softly, his head bowed"
   * Insert pauses + internal reactions between exchanges ("He ﷺ was silent for a moment. His gaze rested on the Madinah sky strewn with stars.")
@@ -1029,8 +1029,8 @@ REQUIRED STRUCTURE:
   * Paragraph 1: name 1-2 core lessons from the story. DO NOT list 5-6 generic lessons — focus on the 1-2 strongest. Explain EXPLICITLY why the lesson emerges from this particular story (return to the story's details).
   * Paragraph 2: connect the lesson to REAL events from this week. Cite 1-2 contexts from sample_headlines (without outlet names) where this lesson applies. Close with 1-2 practical actions the listener/reader can take this week.
 
-- **Original Source** (REQUIRED, H4 heading `#### Original Source — Al-Bidayah wan-Nihayah`): show the ORIGINAL Arabic text from KISAH POOL — every fasal in order so a reader who wants to verify has the full source at the end. Format:
-  * For each fasal in KISAH POOL: write `**{{that fasal's citation}}**` (e.g. `**Al-Bidayah wan-Nihayah — Fasal Hijrah Rasulullah ﷺ to Madinah**`)
+- **Original Source** (REQUIRED, H4 heading `#### Original Source — «KISAH_LABEL»`): show the ORIGINAL Arabic text from KISAH POOL — every fasal in order so a reader who wants to verify has the full source at the end. Format:
+  * For each fasal in KISAH POOL: write `**{{that fasal's citation}}**` (e.g. `**«KISAH_LABEL» — [fasal/section title]**`)
   * Next block: FULL ARABIC SCRIPT from that fasal's `Arabic` field — preserve text exactly as supplied. DO NOT abbreviate, DO NOT transliterate to Latin.
   * Separate each fasal with one blank line + a horizontal rule `---`.
   The purpose of this block is so that any reader/listener who wants to verify or read the broader context has the original text immediately at the end of the story, without needing to search the kitab.
@@ -1974,14 +1974,16 @@ def _build_user_prompt(
     (Sunnah invitation + Du'a hero) instead of inventing them from
     parametric memory. None / empty list → block hidden entirely.
 
-    `kisah` is the contiguous Al-Bidayah wan-Nihayah excerpt retrieved
-    via `retrieve_kisah_pendek`. When supplied, it surfaces as the
+    `kisah` is the narrative excerpt retrieved via
+    `retrieve_kisah_pendek` from one of four source kitabs (Al-Bidayah
+    wan-Nihayah / Sirah Ibn Hisham / Hayat as-Sahabah / Shama'il
+    al-Muhammadiyyah). When supplied, it surfaces as the
     KISAH POOL block — the dedicated source for the Kisah Pendek
     content-kit slot (one storytelling deliverable, 10-min read drawn
-    EXCLUSIVELY from Ibn Kathir's history, never from the daleel pool).
-    None means Al-Bidayah is unavailable or the theme had no fit; in
-    that case the prompt instructs the LLM to skip the Kisah Pendek
-    sub-section entirely.
+    EXCLUSIVELY from the LLM-chosen narrative kitab, never from the
+    daleel pool). None means no source had an above-threshold seed
+    for the theme; in that case the prompt instructs the LLM to skip
+    the Kisah Pendek sub-section entirely.
     """
     if language == "en":
         empty_marker = "(no daleel found for this theme)"
@@ -2086,9 +2088,9 @@ def _build_user_prompt(
     )
 
     write_now = (
-        "Tulis briefing sekarang dalam format markdown 5 bagian (Ringkasan Eksekutif / Numerik & Tren Pekan Ini / Tema Utama & Pola Yang Muncul / Strategi & Aksi Dakwah / Dalil & Sumber), ~11400-15100 kata total — Strategi & Aksi Dakwah adalah CONTENT KIT 8 sub-section yang isinya draft siap-pakai (khutbah lengkap, kultum, kajian, kisah pendek dari Al-Bidayah wan-Nihayah, pengajaran rumah, script video, mahasiswa pack, aksi sosial) dengan daleel pool yang ditenun inline ke setiap sub-section, bukan ringkasan strategi."
+        "Tulis briefing sekarang dalam format markdown 5 bagian (Ringkasan Eksekutif / Numerik & Tren Pekan Ini / Tema Utama & Pola Yang Muncul / Strategi & Aksi Dakwah / Dalil & Sumber), ~11400-15100 kata total — Strategi & Aksi Dakwah adalah CONTENT KIT 8 sub-section yang isinya draft siap-pakai (khutbah lengkap, kultum, kajian, kisah pendek dari kitab di KISAH POOL, pengajaran rumah, script video, mahasiswa pack, aksi sosial) dengan daleel pool yang ditenun inline ke setiap sub-section, bukan ringkasan strategi."
         if language == "id"
-        else "Write the briefing now in markdown, 5-section format (Executive Summary / Numbers & Trends This Week / Main Themes & Emerging Patterns / Da'wah Strategies & Actions / Daleel & Sources), ~11400-15100 words total — Da'wah Strategies & Actions is a CONTENT KIT of 8 sub-sections containing ready-to-use drafts (full khutbah, kultum, kajian, kisah pendek from Al-Bidayah wan-Nihayah, home teaching scripts, video script, mahasiswa pack, social action) with daleel from the pool woven inline into each sub-section, NOT a strategic summary."
+        else "Write the briefing now in markdown, 5-section format (Executive Summary / Numbers & Trends This Week / Main Themes & Emerging Patterns / Da'wah Strategies & Actions / Daleel & Sources), ~11400-15100 words total — Da'wah Strategies & Actions is a CONTENT KIT of 8 sub-sections containing ready-to-use drafts (full khutbah, kultum, kajian, kisah pendek from the kitab in KISAH POOL, home teaching scripts, video script, mahasiswa pack, social action) with daleel from the pool woven inline into each sub-section, NOT a strategic summary."
     )
 
     # ADHKAR POOL — du'a / dzikir retrieved separately so Pesan Flyer
@@ -2114,13 +2116,23 @@ def _build_user_prompt(
     else:
         adhkar_section = ""
 
-    # KISAH POOL — contiguous Al-Bidayah wan-Nihayah excerpt for the
-    # "Kisah Pendek" content-kit slot. When the retrieval returned no
-    # contiguous block (collection empty / theme had no fit), we emit
-    # an explicit sentinel so the prompt's Kisah Pendek section knows
-    # to skip itself instead of inventing a story or pulling from the
-    # daleel pool (which would violate the single-source rule).
+    # KISAH POOL — narrative excerpt for the "Kisah Pendek" content-kit
+    # slot, drawn from one of four narrative kitabs (Al-Bidayah wan-
+    # Nihayah, Sirah Ibn Hisham, Hayat as-Sahabah, Ash-Shama'il
+    # al-Muhammadiyyah). retrieve_kisah_pendek searches all four and
+    # the LLM picks the most narratively fitting source. When nothing
+    # cleared MIN_SCORE in any source, we emit a sentinel so the
+    # prompt's Kisah Pendek section knows to skip itself instead of
+    # inventing a story or pulling from the daleel pool.
     if kisah and kisah.get("fasal"):
+        source_label = (
+            kisah.get("source_label_en") if language == "en"
+            else kisah.get("source_label_id")
+        ) or "(narrative kitab)"
+        source_author = (
+            kisah.get("source_author_en") if language == "en"
+            else kisah.get("source_author_id")
+        ) or ""
         fasal_blocks: list[str] = []
         for f in kisah["fasal"]:
             header = (
@@ -2130,45 +2142,62 @@ def _build_user_prompt(
             )
             fasal_blocks.append(
                 f"### {header}\n"
-                f"Citation: {f.get('citation') or 'Al-Bidayah wan-Nihayah'}\n"
+                f"Citation: {f.get('citation') or source_label}\n"
                 f"Arabic: {f['ar']}"
             )
         kisah_body = "\n\n".join(fasal_blocks)
+        fasal_n = len(kisah["fasal"])
+        seed_score = kisah.get("seed_score", 0)
         if language == "en":
             kisah_section = (
-                "\n\nKISAH POOL — Al-Bidayah wan-Nihayah (Ibn Kathir), "
-                f"{len(kisah['fasal'])} CONSECUTIVE fasal in original kitab order "
-                f"(seed score {kisah.get('seed_score', 0):.2f}). This is the "
-                "EXCLUSIVE source for the Kisah Pendek sub-section — retell "
-                "this single contiguous episode as one complete story. DO NOT "
-                "draw from DALEEL POOL for this sub-section, DO NOT mix in "
-                "other narratives, DO NOT invent details outside these fasal.\n\n"
+                f"\n\nKISAH POOL — {source_label}"
+                + (f" ({source_author})" if source_author else "")
+                + f", {fasal_n} fasal/section{'s' if fasal_n != 1 else ''} "
+                + (
+                    "in original kitab order "
+                    if fasal_n > 1
+                    else "(standalone substantial section) "
+                )
+                + f"(seed score {seed_score:.2f}). This is the EXCLUSIVE "
+                "source for the Kisah Pendek sub-section — retell this "
+                "as one complete story. DO NOT draw from DALEEL POOL for "
+                "this sub-section, DO NOT mix in other narratives, DO NOT "
+                "invent details outside these fasal.\n\n"
                 f"{kisah_body}"
             )
         else:
             kisah_section = (
-                "\n\nKISAH POOL — Al-Bidayah wan-Nihayah (Ibn Katsir), "
-                f"{len(kisah['fasal'])} fasal BERURUTAN sesuai urutan asli kitab "
-                f"(skor seed {kisah.get('seed_score', 0):.2f}). Ini sumber TUNGGAL "
-                "untuk sub-section Kisah Pendek — ceritakan ulang SATU episode "
-                "kontinyu ini sebagai satu kisah utuh. JANGAN ambil dari DALEEL "
-                "POOL untuk sub-section ini, JANGAN campur dengan kisah lain, "
-                "JANGAN mengarang detail di luar fasal-fasal ini.\n\n"
+                f"\n\nKISAH POOL — {source_label}"
+                + (f" ({source_author})" if source_author else "")
+                + f", {fasal_n} fasal/bagian "
+                + (
+                    "sesuai urutan asli kitab "
+                    if fasal_n > 1
+                    else "(seksi mandiri yang substansial) "
+                )
+                + f"(skor seed {seed_score:.2f}). Ini sumber TUNGGAL "
+                "untuk sub-section Kisah Pendek — ceritakan ulang sebagai "
+                "satu kisah utuh. JANGAN ambil dari DALEEL POOL untuk "
+                "sub-section ini, JANGAN campur dengan kisah lain, JANGAN "
+                "mengarang detail di luar fasal-fasal ini.\n\n"
                 f"{kisah_body}"
             )
     else:
         kisah_section = (
-            "\n\nKISAH POOL: (kitab Al-Bidayah wan-Nihayah belum tersedia atau "
-            "tidak ada fasal yang cocok dengan tema ini — LEWATI sub-section "
-            "Kisah Pendek seluruhnya, JANGAN ganti dengan kisah dari kitab lain "
-            "atau dari memori; cukup tulis baris singkat di posisinya: "
-            "*\"Kisah Pendek tidak tersedia untuk tema ini pekan ini.\"*)"
+            "\n\nKISAH POOL: (sumber kisah belum tersedia atau tidak ada "
+            "fasal/bagian yang cocok dengan tema ini di keempat kitab "
+            "naratif yang dijadikan sumber — LEWATI sub-section Kisah "
+            "Pendek seluruhnya, JANGAN ganti dengan kisah dari kitab "
+            "lain atau dari memori; cukup tulis baris singkat di "
+            "posisinya: *\"Kisah Pendek tidak tersedia untuk tema ini "
+            "pekan ini.\"*)"
             if language == "id"
-            else "\n\nKISAH POOL: (Al-Bidayah wan-Nihayah unavailable or no fasal "
-            "matched this theme — SKIP the Kisah Pendek sub-section entirely, "
-            "DO NOT substitute a story from another kitab or from memory; "
-            "just write a single line in its place: "
-            "*\"Kisah Pendek not available for this theme this week.\"*)"
+            else "\n\nKISAH POOL: (kisah source unavailable or no section "
+            "matched this theme across the four narrative kitabs — SKIP "
+            "the Kisah Pendek sub-section entirely, DO NOT substitute a "
+            "story from another kitab or from memory; just write a "
+            "single line in its place: *\"Kisah Pendek not available "
+            "for this theme this week.\"*)"
         )
 
     prior_block = _format_prior_coverage_block(prior_coverage or [], language)
@@ -2244,7 +2273,29 @@ def _generate_for_language(
     finish reason). Caller decides whether the missing output is fatal
     (Indonesian) or recoverable with fallback (English).
     """
-    system_prompt = SYSTEM_PROMPT_EN if language == "en" else SYSTEM_PROMPT_ID
+    # Substitute the kisah-source sentinels with the actual chosen
+    # kitab name + author. retrieve_kisah_pendek picks one of four
+    # narrative kitabs and the prompt's hardcoded references need to
+    # match — without this, a Sirah-sourced kisah would still be
+    # introduced as "Al-Bidayah wan-Nihayah by Ibn Kathir". Fallbacks
+    # are generic so the prompt still parses cleanly when no kisah was
+    # retrieved (the "skip the section" branch handles non-presence).
+    if kisah and kisah.get("fasal"):
+        kisah_label = (
+            kisah.get("source_label_en") if language == "en"
+            else kisah.get("source_label_id")
+        ) or "(narrative kitab)"
+        kisah_author = (
+            kisah.get("source_author_en") if language == "en"
+            else kisah.get("source_author_id")
+        ) or "the compiler"
+    else:
+        kisah_label = "(narrative kitab)" if language == "en" else "(kitab naratif)"
+        kisah_author = "the compiler" if language == "en" else "penulis kitab"
+    base_prompt = SYSTEM_PROMPT_EN if language == "en" else SYSTEM_PROMPT_ID
+    system_prompt = base_prompt.replace("«KISAH_LABEL»", kisah_label).replace(
+        "«KISAH_AUTHOR»", kisah_author
+    )
     user_prompt = _build_user_prompt(
         stats,
         daleel,
@@ -2413,13 +2464,14 @@ async def generate_briefing(
         adhkar = rerank_dua(retrieval_query, dua_candidates, top_n=6)
         adhkar = await enrich_daleel_translations(session, adhkar)
 
-        # Kisah Pendek source — contiguous Al-Bidayah wan-Nihayah excerpt.
-        # Single source by product rule (2026-06-06): the storytelling
-        # slot uses Ibn Kathir's history EXCLUSIVELY and the fasal must
-        # land in the prompt in original kitab order so the LLM has one
-        # complete episode to retell, not a scattered top-K. None when
-        # the collection's empty or no fasal scored above threshold —
-        # prompt handles that by skipping the section.
+        # Kisah Pendek source — one of four narrative kitabs picked
+        # per-theme by retrieve_kisah_pendek (Al-Bidayah / Sirah Ibn
+        # Hisham / Hayat as-Sahabah / Shama'il). 2026-06-09 expansion
+        # from single-source: the LLM picks the most narratively
+        # fitting source per theme, so an "akhlak Rasulullah" query
+        # gets Shama'il instead of being forced back to Al-Bidayah.
+        # None when no source had an above-threshold seed — prompt
+        # handles that by skipping the section.
         from api.services.kitab_retrieval import retrieve_kisah_pendek
 
         kisah = retrieve_kisah_pendek(retrieval_query)

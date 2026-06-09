@@ -430,50 +430,81 @@ def retrieve_daleel(
     return final_hits
 
 
-def retrieve_kisah_pendek(
-    theme: str,
-    *,
-    window_before: int = 2,
-    window_after: int = 6,
-    max_chars: int = 14000,
-) -> dict[str, Any] | None:
-    """Retrieve a CONTIGUOUS narrative passage from Al-Bidayah wan-Nihayah.
+# ── Kisah Pendek (10-min storytelling slot) ───────────────────────────
+#
+# Source: one of FOUR narrative kitabs. Each has different content shape
+# and section size, so the window strategy is per-corpus:
+#
+#   - al_bidayah_wan_nihayah: Ibn Kathir's universal history split into
+#     ~1.5k-char fasal. A single fasal is too short for a 10-min retell,
+#     so we pull window_before=2 + window_after=6 to assemble ~13k chars
+#     of contiguous narrative (the original 2026-06-06 design).
+#   - sirah_ibn_hisham: 192 sections of ~7k chars each (~3-page windows
+#     of the 2-volume sirah). Each section is already substantial — no
+#     window needed.
+#   - hayat_as_sahabah: 687 thematic Sahabah anecdotes ~3k chars each.
+#     Adjacent sections cover RELATED-but-distinct anecdotes within the
+#     same theme; pulling neighbors would mix unrelated stories. Seed
+#     alone, even at ~3k chars, gives the LLM enough scaffolding for a
+#     1500-2000 word retelling.
+#   - syamail_muhammadiyyah: 74 chapters on specific Prophetic traits
+#     (~6k chars each). Each chapter is a tight self-contained set of
+#     hadiths on ONE trait. Neighbors are different traits — window of
+#     0.
+#
+# Two-step retrieval: cosine top-1 per corpus → Gemini Flash-Lite picks
+# the single most thematically-coherent candidate.
+_KisahCorpusConfig = dict[str, Any]
+KISAH_SOURCE_CONFIG: dict[str, _KisahCorpusConfig] = {
+    "al_bidayah_wan_nihayah": {
+        "label_id": "Al-Bidayah wan-Nihayah",
+        "label_en": "Al-Bidayah wan-Nihayah",
+        "author_id": "Ibn Katsir",
+        "author_en": "Ibn Kathir",
+        "window_before": 2,
+        "window_after": 6,
+        # Point IDs in al_bidayah == section_id, so we can fetch the
+        # window via direct ID arithmetic (cheap, no scroll).
+        "id_scheme": "bare_section_id",
+    },
+    "sirah_ibn_hisham": {
+        "label_id": "Sirah Ibnu Hisyam",
+        "label_en": "Sirah Ibn Hisham",
+        "author_id": "Ibnu Hisyam",
+        "author_en": "Ibn Hisham",
+        "window_before": 0,
+        "window_after": 0,
+        "id_scheme": "section_chunk",  # section_id * 100 + chunk_idx
+    },
+    "hayat_as_sahabah": {
+        "label_id": "Hayatus Shahabah",
+        "label_en": "Hayat as-Sahabah",
+        "author_id": "Syaikh Yusuf al-Kandahlawi",
+        "author_en": "Shaykh Yusuf al-Kandahlawi",
+        "window_before": 0,
+        "window_after": 0,
+        "id_scheme": "section_chunk",
+    },
+    "syamail_muhammadiyyah": {
+        "label_id": "Asy-Syama'il al-Muhammadiyyah",
+        "label_en": "Ash-Shama'il al-Muhammadiyyah",
+        "author_id": "Imam at-Tirmidzi",
+        "author_en": "Imam al-Tirmidhi",
+        "window_before": 0,
+        "window_after": 0,
+        "id_scheme": "section_chunk",
+    },
+}
 
-    Why contiguous, not top-K: Al-Bidayah is Ibn Kathir's universal
-    history split into 2,529 sequential fasal (~1.5k chars each). A
-    top-K cosine search lands scattered fasal from across the kitab —
-    great for daleel retrieval, useless for retelling a single STORY.
-    For the "Kisah Pendek" content kit slot we need a self-contained
-    episode, which means: pick the best-matching seed fasal, then walk
-    the surrounding fasal in their original kitab order so the LLM
-    receives the scene → core event → denouement as a coherent block.
 
-    Window: `window_before` fasal preceding the seed + `window_after`
-    fasal following it. Defaults (2 + 6) give ~9 fasal ≈ 13k Arabic
-    chars, roughly 2-3k Indonesian words to retell as a 10-min read.
-
-    `max_chars` caps total Arabic chars so an over-long episode doesn't
-    blow the prompt budget — when crossed, the window is truncated at
-    the natural fasal boundary that fits.
-
-    Returns None when:
-      - Al-Bidayah collection is empty / unreachable
-      - Top seed scored below MIN_SCORE (no thematic fit in the kitab)
-      - Seed payload lacks `section_id` (shouldn't happen, defensive)
-
-    Per the 2026-06-06 product decision: the Kisah Pendek slot uses
-    Al-Bidayah EXCLUSIVELY. The caller's prompt is responsible for
-    SKIPPING the section gracefully when this returns None — DO NOT
-    fall back to hadith pool here.
-    """
-    if not theme.strip():
-        return None
+def _embed_kisah_query(theme: str) -> list[float] | None:
+    """Embed a kisah query once and record usage. Returns None on
+    failure — the caller logs and skips the slot."""
     openai = _get_openai()
     try:
         emb = openai.embeddings.create(
             model=settings.embedding_model, input=theme
         )
-        vector = emb.data[0].embedding
         record_usage(
             provider="openai",
             operation="embedding",
@@ -481,48 +512,153 @@ def retrieve_kisah_pendek(
             tokens_in=getattr(emb.usage, "total_tokens", None),
             meta={"purpose": "kisah_retrieval"},
         )
+        return emb.data[0].embedding
     except Exception as exc:
         log.warning("kisah_retrieval.embed_failed", error=str(exc))
         return None
 
-    qdrant = _get_qdrant()
-    collection = COLLECTION_NAMES.get(
-        "al_bidayah_wan_nihayah", "al_bidayah_wan_nihayah"
+
+def _pick_kisah_with_llm(
+    theme: str, candidates: list[dict[str, Any]]
+) -> int:
+    """Gemini Flash-Lite picks the single most narrative-suitable
+    candidate for the 10-min Kisah Pendek slot. Returns the index in
+    `candidates`. Falls back to 0 (highest cosine) on any error so the
+    pipeline never breaks on the picker.
+
+    Picker uses the candidate's structural metadata (corpus, title) and
+    a short preview of the body — enough to judge thematic fit and
+    story-shape without sending the whole window to Gemini."""
+    if len(candidates) <= 1:
+        return 0
+
+    from google import genai
+    from google.genai import types as genai_types
+
+    if not settings.gemini_api_key:
+        return 0
+
+    client = genai.Client(api_key=settings.gemini_api_key)
+
+    numbered = "\n\n".join(
+        f"[{i}] {c['source_label_id']} — {c['title'] or '(tanpa judul)'}\n"
+        f"    Skor cosine: {c['score']:.3f}\n"
+        f"    Pratinjau Arab (220 huruf pertama): {c['preview']}"
+        for i, c in enumerate(candidates)
     )
+    prompt = f"""Tema briefing pekan ini:
+{theme}
+
+Berikut {len(candidates)} kandidat kisah dari beberapa kitab naratif.
+Tugas Anda: pilih SATU yang paling cocok untuk dijadikan KISAH PENDEK
+10 menit (target retelling ~1800-2200 kata Bahasa Indonesia).
+
+KARAKTER SUMBER (penting — pilih sesuai bentuk tema):
+- Al-Bidayah wan-Nihayah (Ibn Katsir): sejarah dunia + sirah lengkap.
+  Cocok untuk tema dengan bentuk: peristiwa sejarah besar, kisah
+  khilafah / sahabat era kerajaan, peristiwa lintas-zaman, kisah para
+  nabi terdahulu. Bentang waktu luas.
+- Sirah Ibnu Hisyam: biografi inti Nabi ﷺ. PILIH ini kalau tema soal:
+  hijrah, dakwah Mekkah, ghazwah (Badar/Uhud/Khandaq), perjanjian
+  Madinah, fathu Makkah, haji wada'. Inilah sumber utama untuk SIRAH
+  NABI klasik.
+- Hayatus Shahabah (al-Kandahlawi): anekdot sahabat per tema (dakwah,
+  iman, jihad, ibadah, akhlak). PILIH ini kalau tema soal: kiprah
+  sahabat tertentu, pengorbanan sahabat dalam dakwah, semangat iman
+  sahabat, akhlak para sahabat.
+- Asy-Syama'il al-Muhammadiyyah (at-Tirmidzi): himpunan hadis SIFAT
+  & KESEHARIAN Nabi ﷺ (penampilan, makan, tidur, ibadah, akhlak
+  Rasulullah). PILIH ini kalau tema soal: akhlak / kebiasaan / sifat
+  fisik / adab keseharian Nabi.
+
+KRITERIA PILIHAN (urut prioritas):
+1. KECOCOKAN BENTUK TEMA dengan SPESIALISASI SUMBER (lihat di atas).
+   Kalau tema secara natural adalah biografi inti Nabi → Sirah Ibn
+   Hisham mengalahkan Al-Bidayah meski Al-Bidayah juga punya
+   sirah-content. Kalau tema soal sahabat → Hayatus Shahabah lebih
+   tepat dari Al-Bidayah meski sama-sama menyebut sahabat.
+2. KECOCOKAN TEMATIK isi kandidat: kisah harus benar-benar menyentuh
+   tema, bukan hanya berbagi kata kunci. Mis. tema "korupsi pejabat"
+   cocok dengan kisah ketegasan khalifah terhadap amil zakat, BUKAN
+   dengan kisah pernikahan sahabat hanya karena ada kata "amanah".
+3. BENTUK NARATIF: lebih disukai kisah yang punya struktur cerita
+   (latar → ketegangan/peristiwa → resolusi/pelajaran).
+4. JANGAN DEFAULT KE COSINE TERTINGGI. Skor cosine hanya ditunjukkan
+   sebagai sinyal tambahan, bukan keputusan utama. Sumber dengan
+   cosine lebih rendah bisa lebih tepat kalau spesialisasinya pas.
+
+Kandidat:
+{numbered}
+
+Kembalikan JSON: {{"index": N}} dengan N adalah indeks (0..{len(candidates)-1})
+dari kandidat pilihan."""
+
     try:
-        qr = qdrant.query_points(
-            collection_name=collection,
-            query=vector,
-            limit=1,
-            with_payload=True,
+        resp = client.models.generate_content(
+            model="gemini-2.5-flash-lite",
+            contents=prompt,
+            config=genai_types.GenerateContentConfig(
+                response_mime_type="application/json",
+                temperature=0.1,
+                max_output_tokens=80,
+                thinking_config=genai_types.ThinkingConfig(thinking_budget=0),
+            ),
         )
-        results = qr.points
+        import json as _json
+
+        parsed = _json.loads(resp.text or "{}")
+        idx = int(parsed.get("index", 0))
+        if 0 <= idx < len(candidates):
+            return idx
+        return 0
     except Exception as exc:
-        log.debug("kisah_retrieval.query_failed", error=str(exc))
-        return None
-    if not results:
-        log.info("kisah_retrieval.no_results", theme=theme[:80])
-        return None
-
-    seed = results[0]
-    threshold = MIN_SCORE.get("al_bidayah_wan_nihayah", 0.28)
-    if seed.score is None or seed.score < threshold:
-        log.info(
-            "kisah_retrieval.below_threshold",
-            score=seed.score,
-            threshold=threshold,
-            theme=theme[:80],
+        log.warning(
+            "kisah_retrieval.picker_failed",
+            error=str(exc),
+            fallback_index=0,
         )
-        return None
+        return 0
 
-    seed_payload = dict(seed.payload or {})
+
+def _build_kisah_window(
+    qdrant: QdrantClient,
+    corpus: str,
+    config: _KisahCorpusConfig,
+    seed_payload: dict[str, Any],
+    seed_score: float,
+    max_chars: int,
+) -> list[dict[str, Any]] | None:
+    """Build the contiguous narrative window around `seed_payload` per
+    the corpus's configured strategy. Returns the ordered list of
+    fasal/section dicts that the briefing prompt will render, or None
+    when neither a window nor the seed alone is usable."""
     seed_id = int(seed_payload.get("section_id", 0) or 0)
     if seed_id <= 0:
         return None
 
-    # Point IDs in al_bidayah_wan_nihayah equal section_id (set by the
-    # embed script), so a direct retrieve-by-id pulls the contiguous
-    # window without another vector search.
+    window_before = int(config["window_before"])
+    window_after = int(config["window_after"])
+
+    if window_before == 0 and window_after == 0:
+        # No window — just the seed. Each section in sirah / hayat /
+        # syamail is substantial enough on its own.
+        ar = str(seed_payload.get("ar") or "")
+        if not ar:
+            return None
+        return [{
+            "section_id": seed_id,
+            "title": seed_payload.get("title") or "",
+            "qism": seed_payload.get("qism") or "",
+            "citation": seed_payload.get("citation") or config["label_en"],
+            "ar": ar,
+        }]
+
+    # Windowed retrieval — currently only al_bidayah_wan_nihayah uses
+    # this branch (`id_scheme=bare_section_id`). The other 3 narrative
+    # corpora use `section_id * 100 + chunk_idx` for point IDs, so
+    # direct ID arithmetic doesn't yield neighbors — but they also set
+    # window_before = window_after = 0 above, so we never reach here.
+    collection = COLLECTION_NAMES.get(corpus, corpus)
     window_ids = list(
         range(
             max(1, seed_id - window_before),
@@ -537,11 +673,21 @@ def retrieve_kisah_pendek(
         )
     except Exception as exc:
         log.warning("kisah_retrieval.window_failed", error=str(exc))
-        # Seed alone is degraded but better than dropping the whole slot.
-        points = [seed]
+        points = []
+    if not points:
+        # Window fetch failed — fall back to seed alone rather than
+        # dropping the slot entirely.
+        ar = str(seed_payload.get("ar") or "")
+        if not ar:
+            return None
+        return [{
+            "section_id": seed_id,
+            "title": seed_payload.get("title") or "",
+            "qism": seed_payload.get("qism") or "",
+            "citation": seed_payload.get("citation") or config["label_en"],
+            "ar": ar,
+        }]
 
-    # Qdrant doesn't guarantee retrieve() order — sort by section_id so
-    # the narrative reads forward.
     indexed: list[tuple[int, dict[str, Any]]] = []
     for pt in points:
         p = dict(pt.payload or {})
@@ -564,26 +710,154 @@ def retrieve_kisah_pendek(
             "section_id": sid,
             "title": p.get("title") or "",
             "qism": p.get("qism") or "",
-            "citation": p.get("citation") or "Al-Bidayah wan-Nihayah",
+            "citation": p.get("citation") or config["label_en"],
             "ar": ar,
         })
         total_chars += len(ar)
+    return fasal or None
 
+
+def retrieve_kisah_pendek(
+    theme: str,
+    *,
+    max_chars: int = 14000,
+) -> dict[str, Any] | None:
+    """Pick ONE 10-min storytelling source from four narrative kitabs.
+
+    Sources (per 2026-06-09 expansion):
+      - Al-Bidayah wan-Nihayah (Ibn Kathir) — universal history
+      - Sirah Ibn Hisham — Prophetic biography
+      - Hayat as-Sahabah (al-Kandahlawi) — Sahabah anecdotes
+      - Ash-Shama'il al-Muhammadiyyah (al-Tirmidhi) — Prophetic conduct
+
+    Why multi-source: the original 2026-06-06 design hardcoded
+    Al-Bidayah only. As the corpus grew, themes like "akhlak
+    Rasulullah" or "kisah para sahabat dalam dakwah" had stronger
+    matches in Syamail / Hayat than in Al-Bidayah, but were forced to
+    fall back to Al-Bidayah anyway. Multi-source widens the eligible
+    pool so each theme gets the most narratively fitting kisah.
+
+    Algorithm:
+      1. Embed the theme once.
+      2. Cosine top-1 against each of the 4 source collections.
+      3. Filter by per-corpus MIN_SCORE.
+      4. Gemini Flash-Lite picks the SINGLE most narrative-suitable
+         candidate from what survived (thematic fit + story shape).
+      5. Build the contiguous window per the chosen corpus's strategy
+         (window of 2+6 for Al-Bidayah's small fasal; seed-only for
+         the other 3 whose sections are already substantial).
+
+    `max_chars` caps total Arabic chars so an over-long episode doesn't
+    blow the prompt budget — only matters for Al-Bidayah where the
+    window can balloon; the other 3 corpora's seeds are well within.
+
+    Returns None when no source produced an above-threshold seed.
+    Caller's prompt must skip the section gracefully — DO NOT fall
+    back to the daleel pool.
+
+    The returned dict carries `source_corpus` / `source_label_id` /
+    `source_label_en` / `source_author_id` / `source_author_en` so the
+    briefing prompt can phrase the attribution correctly per kitab.
+    """
+    if not theme.strip():
+        return None
+    vector = _embed_kisah_query(theme)
+    if vector is None:
+        return None
+
+    qdrant = _get_qdrant()
+
+    # Step 1+2: cosine top-1 per source corpus.
+    candidates: list[dict[str, Any]] = []
+    for corpus, config in KISAH_SOURCE_CONFIG.items():
+        collection = COLLECTION_NAMES.get(corpus, corpus)
+        try:
+            qr = qdrant.query_points(
+                collection_name=collection,
+                query=vector,
+                limit=1,
+                with_payload=True,
+            )
+            results = qr.points
+        except Exception as exc:
+            log.debug(
+                "kisah_retrieval.corpus_query_failed",
+                corpus=corpus,
+                error=str(exc),
+            )
+            continue
+        if not results:
+            continue
+        seed = results[0]
+        if seed.score is None:
+            continue
+        threshold = MIN_SCORE.get(corpus, 0.28)
+        if seed.score < threshold:
+            log.debug(
+                "kisah_retrieval.below_threshold",
+                corpus=corpus,
+                score=seed.score,
+                threshold=threshold,
+            )
+            continue
+        payload = dict(seed.payload or {})
+        ar_preview = str(payload.get("ar") or "")[:220]
+        candidates.append({
+            "corpus": corpus,
+            "config": config,
+            "payload": payload,
+            "score": float(seed.score),
+            "title": payload.get("title") or "",
+            "preview": ar_preview,
+            "source_label_id": config["label_id"],
+            "source_label_en": config["label_en"],
+        })
+
+    if not candidates:
+        log.info("kisah_retrieval.no_candidates", theme=theme[:80])
+        return None
+
+    # Highest cosine first — fallback order when the LLM picker errors.
+    candidates.sort(key=lambda c: c["score"], reverse=True)
+
+    # Step 3: LLM picks the single best.
+    chosen_idx = _pick_kisah_with_llm(theme, candidates)
+    chosen = candidates[chosen_idx]
+
+    # Step 4: build window for chosen corpus.
+    fasal = _build_kisah_window(
+        qdrant,
+        chosen["corpus"],
+        chosen["config"],
+        chosen["payload"],
+        chosen["score"],
+        max_chars,
+    )
     if not fasal:
         return None
 
+    total_chars = sum(len(f["ar"]) for f in fasal)
     log.info(
         "kisah_retrieval.assembled",
-        seed_id=seed_id,
-        seed_score=float(seed.score),
+        chosen_corpus=chosen["corpus"],
+        seed_score=chosen["score"],
+        candidate_corpora=[c["corpus"] for c in candidates],
+        candidate_scores=[round(c["score"], 3) for c in candidates],
+        picker_idx=chosen_idx,
         fasal_count=len(fasal),
         total_chars=total_chars,
     )
+    config = chosen["config"]
     return {
         "fasal": fasal,
-        "seed_section_id": seed_id,
-        "seed_score": float(seed.score),
+        "seed_section_id": fasal[0]["section_id"] if fasal else 0,
+        "seed_score": chosen["score"],
         "total_chars": total_chars,
+        "source_corpus": chosen["corpus"],
+        "source_label_id": config["label_id"],
+        "source_label_en": config["label_en"],
+        "source_author_id": config["author_id"],
+        "source_author_en": config["author_en"],
     }
 
 
