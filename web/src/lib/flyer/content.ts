@@ -228,9 +228,17 @@ function sliceSubSection(markdown: string, matcher: RegExp): string[] {
  *  quote nobody opened. */
 function tidyHeadline(raw: string, maxWords = 6): string {
   let h = raw.trim();
-  // Drop trailing em-dash content FIRST so the trailing-quote strip
-  // below can clean up any quote that ended up at the new tail.
-  h = h.replace(/\s*[—–-]\s*.*$/, "");
+  // Drop trailing em-dash / en-dash content FIRST so the trailing-quote
+  // strip below can clean up any quote that ended up at the new tail.
+  // Requires whitespace on BOTH sides — otherwise we'd cut compound
+  // words like "Mini-Dajjal" / "Jakarta-Bandung" at their internal
+  // hyphen (2026-06-09 regression: "Era Mini-Dajjal: Lindungi Wajahmu"
+  // got chopped to "Era Mini" because the regex treated the hyphen
+  // inside "Mini-Dajjal" as a tail-separator em-dash). Em-dash and
+  // en-dash always carry whitespace in our headlines (" — tagline"
+  // pattern), so requiring `\s+` on both sides is safe and the regular
+  // hyphen is removed from the class entirely.
+  h = h.replace(/\s+[—–]\s+.*$/, "");
   // Drop surrounding quotes / asterisks / quotes-with-spaces.
   h = h.replace(/^["“”‘’']\s*/, "").replace(/\s*["“”‘’']$/, "");
   // Drop trailing punctuation.

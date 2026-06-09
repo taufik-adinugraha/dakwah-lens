@@ -619,10 +619,18 @@ async function buildContent(ctx: FlyerContext): Promise<FlyerContent> {
   if (pesanSlot !== null && !dedicatedBlock) {
     throw new FlyerSlotMissingError(ctx.slot);
   }
-  const dedicatedDaleel = findDaleelByCitation(
-    ctx.daleelRefs,
-    dedicatedBlock?.daleelCitation,
-  );
+  // Find the dalil the briefing pinned to this slot. Try daleelRefs
+  // first (the primary thematic pool), then fall back to adhkarRefs
+  // (the separate du'a / dzikir pool). The fallback fixes the 2026-
+  // 06-09 Teknologi/genz-a incident: the slot 3 dalil "Sahih al-Bukhari
+  // 6377" (fitnah Dajjal) lives in adhkarRefs, not daleelRefs — the
+  // validator accepts either pool, but this renderer used to only
+  // search daleelRefs, so the lookup failed and silently fell back
+  // to pickFlyerDaleel(rank), which returned the wrong hadith (Bulugh
+  // 1596) for a body that explicitly framed deepfake = mini-Dajjal.
+  const dedicatedDaleel =
+    findDaleelByCitation(ctx.daleelRefs, dedicatedBlock?.daleelCitation) ??
+    findDaleelByCitation(ctx.adhkarRefs ?? null, dedicatedBlock?.daleelCitation);
   const daleel = dedicatedDaleel ?? pickFlyerDaleel(ctx.daleelRefs, lang, rank);
 
   if (ctx.slot.kind === "general") {
