@@ -411,7 +411,7 @@ def format_calendar_context(
                 f"  · {when_label} ({we.hijri.label_id}) — {we.event.name_id}"
             )
             lines.append(f"    Sunnah: {we.event.sunnah_hint}")
-            lines.append(f"    Du'a yang relevan: {we.event.dua_hint}")
+            lines.append(f"    Doa yang relevan: {we.event.dua_hint}")
     else:
         lines.append("  · (tidak ada event Hijriyah utama dalam window ini)")
         lines.append(f"  · {_always_on_weekly_hint(today)}")
@@ -422,7 +422,7 @@ def format_calendar_context(
             "INSTRUKSI: Pesan Flyer 5 (Ajakan Sunnah) HARUS menyebut sunnah "
             "yang TIMELY dengan event di atas — jangan tulis sunnah generik "
             "kalau ada event spesifik yang jatuh di window ini. Pesan Flyer "
-            "6 (Doa Pekan Ini) HARUS pilih du'a yang sesuai konteks event "
+            "6 (Doa Pekan Ini) HARUS pilih doa yang sesuai konteks event "
             "tersebut. Ambil daleel dari ADHKAR POOL di bawah; kalau tidak "
             "ada entri yang persis cocok, sebutkan citation lengkap pada "
             "paragraf dan boleh kosongkan marker **Dalil:**.",
