@@ -111,7 +111,18 @@ type DuaProps = {
 
 /** Shared: the Arabic du'a block. `flex-1 min-h-0 overflow-hidden` makes
  *  it the bounded box the auto-fit pass shrinks into, so it always fits
- *  whatever slot the composition gives it. */
+ *  whatever slot the composition gives it.
+ *
+ *  Padding rationale (2026-06-09): line-height alone reserves space
+ *  WITHIN the first line-box, but harakat ascenders (fathah, dhammah,
+ *  sukūn, shaddah) on the first line render ABOVE the line-box top —
+ *  and the container's `overflow: hidden` (kept for autofit) clips
+ *  them at the container's top edge. `paddingTop: "0.32em"` gives the
+ *  first-line ascenders headroom that scales with the font size, so
+ *  a 104px Arabic gets ~33px of clearance and a 28px Arabic gets ~9px.
+ *  `paddingBottom: "0.12em"` does the same for kasrah-style descenders
+ *  on the last line. The autofit pass measures clientHeight which
+ *  already includes padding, so no recalibration needed there. */
 function ArabicBlock({
   arabic,
   size,
@@ -138,6 +149,8 @@ function ArabicBlock({
       style={{
         fontSize: size,
         lineHeight: line,
+        paddingTop: "0.32em",
+        paddingBottom: "0.12em",
         color: "#0f172a",
         flex: "1 1 0%",
         minHeight: 0,

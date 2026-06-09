@@ -23,9 +23,12 @@ export const SplitImage: FlyerLayoutComponent = ({
     keywords: [headline, message].filter(Boolean) as string[],
   });
   const transLen = translation.length;
-  // Bumped 2026-06-06 — see QuoteCard for rationale.
+  // Tiers extended 2026-06-09: pickDaleelTranslation v3 returns up to
+  // ~560 chars (was 400), since narrator-intro stripping freed budget
+  // for the teaching. Tier breakpoints widened so longer translations
+  // still land at a reading-friendly size before autofit kicks in.
   const transSize =
-    transLen < 220 ? 25 : transLen < 320 ? 22 : transLen < 440 ? 19 : transLen < 560 ? 17 : 15;
+    transLen < 220 ? 25 : transLen < 320 ? 22 : transLen < 460 ? 19 : transLen < 620 ? 17 : 15;
 
   const isHorizontalSplit = layoutVariant !== 2;
   const isPhotoLeft = layoutVariant === 0;

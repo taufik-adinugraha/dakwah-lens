@@ -21,44 +21,50 @@ import type { DeliverableSlug } from "./design";
  * pickDaleelTranslation — get the display-ready translation text for
  * a flyer's daleel card.
  *
- * Two failure modes from 2026-06-08 audit drove the v2 redesign:
- *   - Keyword-anchored "expand around peak" picked the wrong middle
- *     slice, losing both the narrator intro AND the punchline of
- *     classical hadits.
- *   - When all sentences scored 0 on keyword overlap, peak fell back
- *     to the FIRST sentence (often just "X meriwayatkan:") and the
- *     expand step couldn't fit the long quote that followed —
- *     producing useless "Abdullah meriwayatkan: …" cards.
+ * v3 strategy (2026-06-09) — fix the regression from v2's book-end
+ * truncation. The 2026-06-07 audit showed v2 was dropping the
+ * teaching itself when:
+ *   - Riyad as-Salihin 1172 rendered as "Wahai sekalian manusia! …
+ *     Wahai Rabbku! Padahal makanannya haram…" — the actual teaching
+ *     ("Allah itu baik dan tidak menerima kecuali yang baik") lived
+ *     in the dropped middle, leaving the reader with no answer to the
+ *     headline's "3 syarat" promise.
+ *   - Sahih al-Bukhari 6365 rendered as "Sa'd biasa merekomendasikan
+ *     lima (pernyataan)… (Yaitu) 'Ya Allah! …'" — the 5 protections
+ *     themselves were truncated away, so the reader was invited to
+ *     start a dzikir with no dzikir text to recite.
  *
- * v2 strategy: book-end truncation that preserves the structure of
- * Islamic citations (narrator intro → key teaching → punchline).
- *   1. Pick locale-appropriate translation.
- *   2. If ≤ cutThreshold (default 440ch), return as-is — most hadits
- *      and ayat fit naturally at the renderer's medium font scale.
- *   3. For longer text: split into sentences, keep FIRST + LAST,
- *      drop the middle with `…`. This mirrors how Islamic citation
- *      conventions allow "[…]" elision when the omitted portion is
- *      scholarly narration that doesn't change the legal/theological
- *      meaning conveyed by the bookend portions.
- *   4. If first + last still exceeds budget, fall back to hard-
- *      truncate (keep start, trailing `…`).
+ * v3 changes:
+ *   1. **Strip narrator intro first.** Indonesian hadith translations
+ *      typically begin with "X meriwayatkan bahwa Rasulullah ﷺ
+ *      bersabda: '…'". The intro carries no dakwah meaning — drop it
+ *      so the teaching starts the visible text.
+ *   2. **Accumulate from the start** until budget is hit. The teaching
+ *      lives at the front of the text after narrator strip, so keep
+ *      sentences in order and elide what didn't fit with a trailing
+ *      "…". (v2's book-end was symmetric and dropped the middle —
+ *      exactly where the teaching usually lives.)
+ *   3. **Roomier budget.** Default targetChars bumped from 400 → 560
+ *      and cutThreshold from 440 → 600. With narrator stripped, most
+ *      teachings now fit without any "…" at all. The renderer's
+ *      autofit pass shrinks the font further if a particular flyer
+ *      slot has even tighter bounds.
  *
- * The citation (passed separately in `Citation`) still surfaces the
- * full reference, so a curious reader can look up the omitted parts.
+ * The citation (rendered separately) still surfaces the full
+ * reference, so a curious reader can look up the omitted parts.
  */
 type DaleelTranslationOptions = {
-  /** Target char count for the rendered translation. Default 400 —
-   *  comfortable on 1080×1080 at the renderer's medium font scale
-   *  (21-24px). Raised from 240 in v2 after audit found 240 forced
-   *  the smart-truncate into the broken keyword-anchored path. */
+  /** Target char count for the rendered translation. Default 560 —
+   *  generous, since v3 (2026-06-09) strips the narrator intro first,
+   *  freeing budget for the actual teaching. The renderer's autofit
+   *  pass shrinks the font further if a slot has tighter bounds. */
   targetChars?: number;
   /** Soft cap: short, return as-is even if above targetChars. Above
-   *  this we enter ellipsis mode. Default 440 — accommodates the
-   *  vast majority of natural hadits-translation lengths. */
+   *  this we enter ellipsis mode. Default 600 — pairs with the
+   *  bumped targetChars to leave headroom for full teachings. */
   cutThreshold?: number;
-  /** Kept for back-compat — v2 no longer uses keyword-anchored peak
-   *  selection (book-end strategy is structure-aware, not keyword-
-   *  guided). Callers can pass keywords harmlessly. */
+  /** Kept for back-compat — v2/v3 no longer use keyword-anchored
+   *  peak selection. Callers can pass keywords harmlessly. */
   keywords?: string[];
 };
 
@@ -78,27 +84,65 @@ function _isThinLeadIn(s: string): boolean {
   return s.length < 60 && /[:：]\s*$/.test(s);
 }
 
+/** Strip the narrator preamble that precedes the actual Prophetic
+ *  teaching in a hadith translation. Common Indonesian intros end with
+ *  a colon (or "(Yaitu)" / "(i.e.)" connector) followed by an opening
+ *  quote that wraps the teaching:
+ *    - "Abu Hurairah ... meriwayatkan bahwa Rasulullah ﷺ bersabda: 'TEACHING'"
+ *    - "Diriwayatkan oleh Mus`ab: Sa`d biasa merekomendasikan ... (Yaitu) 'TEACHING'"
+ *    - "X reported. (i.e.) 'TEACHING'"
+ *  Finds the first opening quote whose preceding char is `:` or `.`
+ *  within the first ~280 chars (longer search would risk stripping a
+ *  mid-body quote in an unusually long translation). Returns the
+ *  teaching content with the wrapping quotes removed. Bails out if
+ *  stripping would leave too little content (< 60 chars), which usually
+ *  means the regex matched a quote that wasn't actually the
+ *  intro-to-teaching boundary. */
+function stripNarratorIntro(text: string): string {
+  const head = text.slice(0, 280);
+  // Match: `:` or `.` then ≤ 40 non-quote chars then an opening quote.
+  // The intermediate chars allow connectors like " (Yaitu) " between
+  // the end of the narrator sentence and the opening of the teaching
+  // quote.
+  const match = head.match(/[:.][^'"‘“„]{0,40}\s*(['"‘“„])/);
+  if (!match || match.index === undefined) return text;
+  const quoteEnd = match.index + match[0].length;
+  const stripped = text
+    .slice(quoteEnd)
+    .trim()
+    // Drop the closing quote + optional trailing period at end of text.
+    // Class covers straight + curly single/double quotes.
+    .replace(/['"‘’“”]\s*\.?\s*$/, "")
+    .trim();
+  if (stripped.length < 60) return text;
+  return stripped;
+}
+
 export function pickDaleelTranslation(
   daleel: { translation_id?: string | null; translation_en?: string | null } | null | undefined,
   locale: string,
   options: DaleelTranslationOptions = {},
 ): string {
   if (!daleel) return "";
-  const { targetChars = 400, cutThreshold = 440 } = options;
+  const { targetChars = 560, cutThreshold = 600 } = options;
   const isEnglish = locale === "en";
   const rawText = (isEnglish
     ? daleel.translation_en || daleel.translation_id || ""
     : daleel.translation_id || daleel.translation_en || ""
   ).trim();
   if (!rawText) return "";
-  // Strip trailing attribution clause so the cited reference doesn't
-  // become an empty last-sentence bookend. Citation surfaces separately.
-  const text = rawText.replace(_TRAILING_ATTRIBUTION_RE, "").trim();
+  // v3 (2026-06-09): strip narrator intro + trailing attribution
+  // BEFORE deciding whether to truncate. The teaching now starts the
+  // text, so accumulate-from-start preserves it (v2 book-end was
+  // dropping the teaching as the elided middle).
+  const text = stripNarratorIntro(
+    rawText.replace(_TRAILING_ATTRIBUTION_RE, "").trim(),
+  );
   if (text.length <= cutThreshold) return text;
 
   // Split into sentences — period / exclam / question, plus em-dash
   // pause + colon when followed by a new capital letter (handles
-  // hadith narrator → quote breaks: "Rasulullah ﷺ bersabda: \"...\"").
+  // mid-text hadith quote breaks if the narrator strip missed one).
   const rawSentences = text
     .split(/(?<=[.!?])\s+(?=[A-Z“"])|(?<=[:—])\s+(?=[A-Z“"])/)
     .map((s) => s.trim())
@@ -117,37 +161,24 @@ export function pickDaleelTranslation(
     }
   }
 
-  // Single long sentence — hard-truncate with trailing ellipsis.
-  if (sentences.length <= 1) {
-    const only = sentences[0] || text;
-    if (only.length <= targetChars) return only;
-    return only.slice(0, targetChars - 2).trim() + " …";
+  // Accumulate sentences from the START until the next one would
+  // overflow targetChars. The teaching lives at the front (post
+  // narrator-strip), so this preserves it; the elided portion is the
+  // closing scene / example narrative, which is less critical for a
+  // flyer reader who can look up the full hadith via the citation.
+  if (sentences.length === 0) return "";
+  let result = sentences[0];
+  if (result.length > targetChars) {
+    return result.slice(0, targetChars - 2).trim() + " …";
   }
-
-  // Two sentences — return both as-is if they fit; else first + …
-  if (sentences.length === 2) {
-    const joined = sentences.join(" ");
-    if (joined.length <= targetChars) return joined;
-    return `${sentences[0]} …`;
+  for (let i = 1; i < sentences.length; i++) {
+    const candidate = `${result} ${sentences[i]}`;
+    if (candidate.length > targetChars) {
+      return `${result} …`;
+    }
+    result = candidate;
   }
-
-  // 3+ sentences — book-end strategy: first + " … " + last.
-  // This preserves the narrator intro AND the punchline, which are
-  // the two parts most likely to carry the dakwah/legal meaning
-  // for a flyer reader.
-  const first = sentences[0];
-  const last = sentences[sentences.length - 1];
-  const bookEnd = `${first} … ${last}`;
-  if (bookEnd.length <= targetChars) return bookEnd;
-
-  // Book-end overflows — try just FIRST + …, then LAST + … (the
-  // narrator-only path is more recognizable for an Islamic reader
-  // who can look up the full hadith by citation).
-  if (first.length <= targetChars - 2) return `${first} …`;
-  if (last.length <= targetChars - 2) return `… ${last}`;
-
-  // Both bookends individually too long → hard-truncate from start
-  return text.slice(0, targetChars - 2).trim() + " …";
+  return result;
 }
 
 /** Strip markdown markers + collapse whitespace. */
@@ -187,13 +218,21 @@ function sliceSubSection(markdown: string, matcher: RegExp): string[] {
 
 /** Tidy a headline candidate: trim quotes, em-dashes, trailing
  *  punctuation. Cap at maxWords words so we keep the "punchy tagline"
- *  feel (the user spec is 4-5 words). */
+ *  feel (the user spec is 4-5 words).
+ *
+ *  Order of operations matters (fixed 2026-06-09): drop em-dash
+ *  content FIRST, then strip surrounding quotes. Previously, a
+ *  headline like `"Bukan Urusanku" — Mulai dari yang Allah Titipkan
+ *  Dulu` got the leading `"` stripped, the em-dash tail dropped,
+ *  and was left as `Bukan Urusanku"` — with a dangling closing
+ *  quote nobody opened. */
 function tidyHeadline(raw: string, maxWords = 6): string {
   let h = raw.trim();
-  // Drop surrounding quotes / asterisks / quotes-with-spaces.
-  h = h.replace(/^["“”'']\s*/, "").replace(/\s*["“”'']$/, "");
-  // Drop trailing period / colon / em-dash content.
+  // Drop trailing em-dash content FIRST so the trailing-quote strip
+  // below can clean up any quote that ended up at the new tail.
   h = h.replace(/\s*[—–-]\s*.*$/, "");
+  // Drop surrounding quotes / asterisks / quotes-with-spaces.
+  h = h.replace(/^["“”‘’']\s*/, "").replace(/\s*["“”‘’']$/, "");
   // Drop trailing punctuation.
   h = h.replace(/[.,:;!?]+$/, "");
   // Collapse whitespace.
@@ -283,7 +322,19 @@ function trimToSentences(raw: string, targetSentences = 3, maxChars = 320): stri
   if (out.length > maxChars) {
     out = out.slice(0, maxChars - 1).trimEnd() + "…";
   }
-  return out.replace(/^["“]\s*|\s*["”]$/g, "").trim();
+  // Strip wrapping quotes ONLY when the whole message is a single
+  // quoted thing — i.e., exactly 2 quote chars total, at the ends.
+  // The naive unconditional strip (pre-2026-06-09) was mangling
+  // bodies that START with a quoted phrase, like:
+  //    "Bukan urusan saya" — kalimat yang sering muncul...
+  // The leading `"` got stripped as a wrap, even though the closing
+  // counterpart was internal (right after "saya"), leaving an
+  // orphaned `Bukan urusan saya"` at the start of the rendered body.
+  const quoteCount = (out.match(/["“”]/g) ?? []).length;
+  if (quoteCount === 2 && /^["“]/.test(out) && /["”]$/.test(out)) {
+    out = out.replace(/^["“]\s*|\s*["”]$/g, "").trim();
+  }
+  return out;
 }
 
 /** True if more than 40% of the letter chars are in the Arabic Unicode
@@ -574,11 +625,10 @@ export function extractDedicatedFlyerBlock(
   if (daleelMatch) bodyMd = bodyMd.replace(daleelMatch[0], "");
   const body = trimToSentences(stripMd(bodyMd), 4, 360);
 
+  // tidyHeadline now correctly strips surrounding quotes AFTER em-dash
+  // tail removal (fixed 2026-06-09), so no pre-strip needed here.
   const headline = headlineMatch?.[1]
-    ? tidyHeadline(
-        headlineMatch[1].replace(/^["“”'']\s*/, "").replace(/\s*["”'']$/, ""),
-        8,
-      )
+    ? tidyHeadline(headlineMatch[1], 8)
     : undefined;
   const daleelCitation = daleelMatch?.[1]?.trim();
 

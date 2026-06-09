@@ -24,12 +24,12 @@ export const QuoteCard: FlyerLayoutComponent = ({
     keywords: [headline, message].filter(Boolean) as string[],
   });
   const transLen = translation.length;
-  // Bumped 2026-06-06 — daleel on a 1080×1080 flyer was reading much
-  // smaller than the message body, undermining the citation's weight.
-  // Floor lifted from 15px → 18px and the short-translation step from
-  // 22px → 28px so the daleel sits within visual reach of the body.
+  // Tiers extended 2026-06-09 along with pickDaleelTranslation v3's
+  // 560-char budget. Previously a 470-char translation snapped to the
+  // 20px tier; now it stays at 22px since narrator stripping means
+  // the content density per char is more concentrated (less filler).
   const transSize =
-    transLen < 220 ? 30 : transLen < 320 ? 26 : transLen < 460 ? 22 : transLen < 580 ? 20 : 18;
+    transLen < 220 ? 30 : transLen < 320 ? 26 : transLen < 480 ? 22 : transLen < 620 ? 20 : 18;
 
   const bgStops = palette.bgGradient;
   const bgStyle = {
@@ -61,7 +61,7 @@ export const QuoteCard: FlyerLayoutComponent = ({
           style={{ background: palette.accentSoft, opacity: 0.25 }}
         />
 
-        <div className="relative z-10 flex h-full flex-col justify-between px-[80px] py-[70px]">
+        <div className="relative z-10 flex h-full flex-col justify-between gap-[32px] px-[80px] py-[70px]">
           <div className="flex items-center justify-between">
             <div
               className="inline-flex rounded-full px-5 py-2 text-[18px] font-extrabold tracking-widest"
@@ -90,7 +90,7 @@ export const QuoteCard: FlyerLayoutComponent = ({
             </div>
             {message && (
               <div
-                className="max-w-[900px] text-[24px] font-semibold leading-[1.45]"
+                className="max-w-[900px] text-[24px] font-semibold leading-[1.55]"
                 style={{ color: "#ffffffec" }}
               >
                 {message}
@@ -102,7 +102,7 @@ export const QuoteCard: FlyerLayoutComponent = ({
             <div
               data-autofit
               data-fit-min="13"
-              className="relative flex max-w-[860px] flex-col gap-3 rounded-3xl bg-white px-8 py-6 shadow-2xl"
+              className="relative flex max-w-[860px] flex-col gap-3 rounded-3xl bg-white px-9 py-7 shadow-2xl"
               style={{
                 boxShadow: `0 18px 48px ${palette.accentDeep}88`,
                 borderTop: `8px solid ${palette.accent}`,
@@ -115,7 +115,7 @@ export const QuoteCard: FlyerLayoutComponent = ({
                 className="absolute left-4 top-1 z-0"
               />
               <div
-                className="relative z-10 font-medium italic leading-[1.45] text-slate-800"
+                className="relative z-10 font-medium italic leading-[1.55] text-slate-800"
                 style={{ fontSize: `${transSize}px` }}
               >
                 &ldquo;{translation}&rdquo;
@@ -164,8 +164,8 @@ export const QuoteCard: FlyerLayoutComponent = ({
         </div>
 
         {/* Content */}
-        <div className="relative z-10 flex flex-1 flex-col justify-between px-[80px] pb-[60px] pt-[40px]">
-          <div className="flex flex-col gap-[24px]">
+        <div className="relative z-10 flex flex-1 flex-col justify-between gap-[32px] px-[80px] pb-[60px] pt-[40px]">
+          <div className="flex flex-col gap-[26px]">
             <div
               className="font-black leading-[1.05]"
               style={{
@@ -177,7 +177,7 @@ export const QuoteCard: FlyerLayoutComponent = ({
               {headline}
             </div>
             {message && (
-              <div className="max-w-[920px] text-[24px] font-semibold leading-[1.45]" style={{ color: "#1f1f1f" }}>
+              <div className="max-w-[920px] text-[24px] font-semibold leading-[1.55]" style={{ color: "#1f1f1f" }}>
                 {message}
               </div>
             )}
@@ -187,7 +187,7 @@ export const QuoteCard: FlyerLayoutComponent = ({
             <div
               data-autofit
               data-fit-min="13"
-              className="flex max-w-[880px] flex-col gap-3 rounded-3xl bg-white px-8 py-6 shadow-2xl"
+              className="flex max-w-[880px] flex-col gap-3 rounded-3xl bg-white px-9 py-7 shadow-2xl"
               style={{
                 boxShadow: `0 14px 36px ${palette.accent}55`,
                 borderTop: `8px solid ${palette.accent}`,
@@ -196,7 +196,7 @@ export const QuoteCard: FlyerLayoutComponent = ({
               }}
             >
               <div
-                className="font-medium italic leading-[1.45] text-slate-800"
+                className="font-medium italic leading-[1.55] text-slate-800"
                 style={{ fontSize: `${transSize}px` }}
               >
                 &ldquo;{translation}&rdquo;
@@ -253,7 +253,7 @@ export const QuoteCard: FlyerLayoutComponent = ({
           </div>
 
           {/* Text column */}
-          <div className="flex flex-1 flex-col gap-[22px]">
+          <div className="flex flex-1 flex-col gap-[28px]">
             <div
               className="font-black leading-[1.05]"
               style={{
@@ -266,7 +266,7 @@ export const QuoteCard: FlyerLayoutComponent = ({
             </div>
             {message && (
               <div
-                className="text-[22px] font-semibold leading-[1.45]"
+                className="text-[22px] font-semibold leading-[1.55]"
                 style={{ color: "#1f1f1f" }}
               >
                 {message}
@@ -276,7 +276,7 @@ export const QuoteCard: FlyerLayoutComponent = ({
               <div
                 data-autofit
                 data-fit-min="12"
-                className="flex flex-col gap-2 rounded-2xl bg-white px-6 py-4 shadow-lg"
+                className="flex flex-col gap-2 rounded-2xl bg-white px-7 py-5 shadow-lg"
                 style={{
                   borderLeft: `6px solid ${palette.accent}`,
                   maxHeight: "260px",
@@ -284,7 +284,7 @@ export const QuoteCard: FlyerLayoutComponent = ({
                 }}
               >
                 <div
-                  className="font-medium italic leading-[1.4] text-slate-800"
+                  className="font-medium italic leading-[1.55] text-slate-800"
                   style={{ fontSize: `${Math.min(transSize, 18)}px` }}
                 >
                   &ldquo;{translation}&rdquo;
