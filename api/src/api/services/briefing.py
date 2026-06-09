@@ -2624,12 +2624,13 @@ async def generate_briefing(
         # never calls an API LLM on operator-driven runs — the
         # operator's Claude session does that judgment in-chat.
         try:
+            from api.services.kitab_retrieval import (
+                FLYER_ALLOWED_CORPORA as _flyer_allowed_corpora,
+            )
             from api.services.validate_briefing import (
                 apply_daleel_autofixes,
                 validate_briefing,
             )
-
-            from api.services.kitab_retrieval import FLYER_ALLOWED_CORPORA as _flyer_allowed_corpora
 
             _flyer_allowed = set(_flyer_allowed_corpora)
             _flyer_daleel = [
