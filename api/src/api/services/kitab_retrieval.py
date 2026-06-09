@@ -80,44 +80,59 @@ COLLECTION_NAMES: dict[str, str] = {
 }
 
 # Per-corpus minimum cosine similarity for a hit to count as a usable
-# daleel. Calibrated against a 11-query test set on 2026-05-21
-# (strong / medium / weak / noise tiers). Scores observed:
-#   - Quran tops STRONG queries: 0.36-0.60; NOISE never above 0.27.
-#   - Hadith tops STRONG queries: 0.27-0.46; NOISE never above 0.19.
-# Quran embeds higher than hadith for the same query because the
-# translations are cleaner Bahasa text. Setting separate thresholds
-# rather than a single global one — a global cut high enough to
-# block Quran noise would block most legitimate hadith hits.
+# daleel. Recalibrated 2026-06-09 against 27 real recent topic labels
+# pulled from `topics.label` (the actual queries the briefing pipeline
+# runs) + 17 deliberately-off-topic "noise" queries (K-pop, gadget,
+# sport, drakor). For each corpus we measured the top-1 cosine for
+# both buckets and set MIN_SCORE just above each corpus's noise ceiling.
+#
+# Why the original 2026-05 calibration drifted: it assumed noise capped
+# at 0.27 universally. That only held for Quran's Bahasa-anchored
+# payload. Once we added 13 AR-only kitabs (Fath al-Mu'in, 'Aqidat
+# al-'Awam, Sirah, Hayat as-Sahabah, etc.), the absolute score scale
+# collapsed because the embedder maps Bahasa queries → Arabic payloads
+# at consistently lower cosine. A 0.28 floor was rejecting 90%+ of real
+# matches for these corpora — they were effectively absent from the
+# briefing pool.
+#
+# Headline shifts:
+#   - quran (0.35) + muslim (0.28) KEPT — first verification pass showed
+#     raising them to noise_max dropped recall from 24/27 → 19/27 (quran)
+#     and 24/27 → 12/27 (muslim) for no real quality gain, because the
+#     reranker already catches the noise that slips through. Those two
+#     corpora have meaningful real-vs-noise distribution overlap, so the
+#     original empirical thresholds remain the right tradeoff.
+#   - The other 17 corpora dropped to noise_max + ~0.01 buffer — recall
+#     went 0-3/27 → 6-17/27 across the board.
+#
+# Rationale for setting MIN_SCORE = noise_max + small buffer (not p90):
+# the Flash-Lite reranker is the actual quality gate and only costs
+# ~$0.0004 per call. Cost of too-LOW threshold = wasted reranker tokens
+# on a few junk candidates. Cost of too-HIGH threshold = silent recall
+# loss across the whole corpus. The asymmetry favours erring low.
 MIN_SCORE: dict[str, float] = {
+    # Translation-bearing corpora — Bahasa or English in payload.
     "quran": 0.35,
-    "bukhari": 0.28,
     "muslim": 0.28,
-    "riyad_as_salihin": 0.28,
-    "bulugh_al_maram": 0.28,
-    "tafsir_ibn_kathir": 0.28,
-    # AR-only kitabs (Bidayat, Al-Umm, Al-Bidayah, Nashaih, Fiqh as-Sunnah)
-    # all sit at 0.28 — dropped from 0.30 on 2026-06-06 after a 10-theme
-    # probe (see probe_kitab_scores.py) found AR-only kitabs averaging
-    # ~0.38 top-1 vs Quran's ~0.55 even with trilingual ID+EN+AR query
-    # enrichment. Bidayat short (~46k chars / 28 sections); Al-Umm large
-    # (~5.7M / 1,332); Al-Bidayah historical narrative (~3.7M / 2,529);
-    # Nashaih small akhlak corpus (~77k / 34); Fiqh as-Sunnah modern
-    # topical fiqh (~900k / 866). 0.28 keeps comfortable margin above
-    # the highest off-topic score observed (~0.27) while admitting more
-    # of the 0.28-0.30 band of borderline-relevant content.
-    "bidayat_al_hidayah": 0.28,
-    "al_umm": 0.28,
-    "al_bidayah_wan_nihayah": 0.28,
-    "nashaihul_ibad": 0.28,
-    "fiqh_as_sunnah": 0.28,
-    "fath_al_muin": 0.28,
-    "fath_al_qarib": 0.28,
-    "adab_alim_mutaallim": 0.28,
-    "aqidah_awam": 0.28,
-    "thalathat_al_usul": 0.28,
-    "syamail_muhammadiyyah": 0.28,
-    "sirah_ibn_hisham": 0.28,
-    "hayat_as_sahabah": 0.28,
+    "bukhari": 0.26,
+    "bulugh_al_maram": 0.23,
+    "riyad_as_salihin": 0.19,
+    "tafsir_ibn_kathir": 0.18,
+    # AR-only corpora — embedder maps ID query → AR payload at lower
+    # absolute cosine, so thresholds sit much lower.
+    "fiqh_as_sunnah": 0.22,
+    "hayat_as_sahabah": 0.21,
+    "al_bidayah_wan_nihayah": 0.19,
+    "al_umm": 0.17,
+    "aqidah_awam": 0.16,
+    "sirah_ibn_hisham": 0.16,
+    "fath_al_qarib": 0.15,
+    "nashaihul_ibad": 0.15,
+    "fath_al_muin": 0.14,
+    "adab_alim_mutaallim": 0.14,
+    "syamail_muhammadiyyah": 0.13,
+    "bidayat_al_hidayah": 0.12,
+    "thalathat_al_usul": 0.10,
 }
 
 # AR-only kitabs get a +2 boost on the per-corpus quota — they score
@@ -311,6 +326,12 @@ def retrieve_daleel(
     qdrant = _get_qdrant()
     all_hits: list[dict[str, Any]] = []
     below_threshold = 0
+    # Per-corpus contribution tally — added 2026-06-09 so future
+    # MIN_SCORE drift can be detected from production logs without
+    # running an ad-hoc probe. `kept` is how many candidates from that
+    # corpus cleared MIN_SCORE; `top` is the highest score we saw from
+    # that corpus before threshold filtering.
+    per_corpus_stats: dict[str, dict[str, Any]] = {}
     for corpus, collection in COLLECTION_NAMES.items():
         try:
             # qdrant-client 1.18 removed `.search()` — the new API is
@@ -332,7 +353,11 @@ def retrieve_daleel(
             )
             continue
         threshold = MIN_SCORE.get(corpus, 0.30)
+        corpus_kept = 0
+        corpus_top = None
         for hit in results:
+            if corpus_top is None or (hit.score or 0) > corpus_top:
+                corpus_top = hit.score
             if hit.score is None or hit.score < threshold:
                 below_threshold += 1
                 continue
@@ -345,14 +370,27 @@ def retrieve_daleel(
                 )
                 continue
             all_hits.append(normalized)
+            corpus_kept += 1
+        per_corpus_stats[corpus] = {
+            "kept": corpus_kept,
+            "top": round(corpus_top, 3) if corpus_top is not None else None,
+            "thr": threshold,
+        }
 
     all_hits.sort(key=lambda h: h["score"] or -1e9, reverse=True)
+    # Corpora that returned zero candidates — early signal of MIN_SCORE
+    # drift or a broken collection. Tracked separately so the dashboard
+    # can chart "which kitabs are silent this week" without parsing the
+    # per_corpus_stats blob.
+    silent_corpora = sorted(c for c, s in per_corpus_stats.items() if s["kept"] == 0)
     log.info(
         "kitab_retrieval.scored",
         query=query[:80],
         kept=len(all_hits),
         below_threshold=below_threshold,
         top_score=all_hits[0]["score"] if all_hits else None,
+        per_corpus=per_corpus_stats,
+        silent_corpora=silent_corpora,
     )
     return all_hits[:limit]
 
