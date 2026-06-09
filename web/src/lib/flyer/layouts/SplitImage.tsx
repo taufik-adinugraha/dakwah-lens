@@ -80,9 +80,17 @@ export const SplitImage: FlyerLayoutComponent = ({
   );
 
   // Re-usable content panel.
+  //
+  // `gap-[32px]` on the outer flex sets the MINIMUM vertical breathing
+  // room between sections (title → message → daleel → stars). Combined
+  // with `justify-between`, any excess vertical space is then
+  // distributed on top of that floor — so dense content (long body +
+  // long daleel) doesn't squeeze sections to touch each other (the
+  // 2026-06-09 incident: title and body merged into the daleel quote
+  // box with zero gap, making the panel feel cramped).
   const ContentPanel = (
     <div
-      className="relative flex h-full w-full flex-col justify-between"
+      className="relative flex h-full w-full flex-col justify-between gap-[32px]"
       style={{
         padding: isHorizontalSplit ? "60px 55px" : "70px 80px",
       }}
@@ -117,7 +125,11 @@ export const SplitImage: FlyerLayoutComponent = ({
             borderColor: palette.accent,
             // Bounded box for the auto-fit pass: the full translation +
             // citation are scaled down together until they fit here.
-            maxHeight: "300px",
+            // Reduced from 300px → 260px (2026-06-09) so the outer
+            // `gap-[32px]` always has room to apply even on full
+            // densely-packed flyers (title + 4-sentence body + long
+            // hadith translation).
+            maxHeight: "260px",
             overflow: "hidden",
           }}
         >
