@@ -73,9 +73,24 @@ type DaleelTranslationOptions = {
  *  Stripped before sentence-splitting so the last bookend is real
  *  content (the doa/punchline) not citation metadata. The full
  *  citation still shows in the separate `Citation` component below
- *  the daleel card. */
+ *  the daleel card.
+ *
+ *  Two patterns covered:
+ *    (a) Bracketed: "(HR. Bukhari)" / "[Related by Muslim]"
+ *    (b) Sentence-end:
+ *        "... .  Diriwayatkan oleh Muslim."
+ *        "... .' Diriwayatkan oleh Muslim."   ← close-quote between .
+ *                                              and the keyword (2026-06-09
+ *                                              Toleransi/1 leakage). The
+ *                                              hadith translation ends a
+ *                                              quoted dialog, then has the
+ *                                              attribution AFTER the close-
+ *                                              quote. The regex now allows
+ *                                              an optional close-quote +
+ *                                              whitespace between `.` and
+ *                                              the attribution keyword. */
 const _TRAILING_ATTRIBUTION_RE =
-  /\s*(?:[(\[]\s*(?:HR\.|H\.R\.|Muttafaq|Related by|Diriwayatkan oleh|Narrated by|Reported by|Akhrajahu|Rawahu)[^)\]]*[)\]]|\.\s*(?:HR\.|H\.R\.|Muttafaq|Related by|Diriwayatkan oleh|Narrated by|Reported by|Akhrajahu|Rawahu)[^.]*\.?)\s*\.?\s*$/i;
+  /\s*(?:[(\[]\s*(?:HR\.|H\.R\.|Muttafaq|Related by|Diriwayatkan oleh|Narrated by|Reported by|Akhrajahu|Rawahu)[^)\]]*[)\]]|\.['"”’]?\s*(?:HR\.|H\.R\.|Muttafaq|Related by|Diriwayatkan oleh|Narrated by|Reported by|Akhrajahu|Rawahu)[^.]*\.?['"”’]?)\s*\.?\s*$/i;
 
 /** A "thin" lead-in sentence — typically just "X meriwayatkan:" with
  *  the actual content following in the next sentence. Merge thin
