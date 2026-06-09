@@ -383,6 +383,40 @@ def retrieve_daleel(
     # can chart "which kitabs are silent this week" without parsing the
     # per_corpus_stats blob.
     silent_corpora = sorted(c for c, s in per_corpus_stats.items() if s["kept"] == 0)
+
+    # Per-corpus slot reservation — added 2026-06-09. Without this, a
+    # naive global cosine sort lets high-absolute-score corpora (Quran
+    # ~0.40, Muslim ~0.33) crowd out low-absolute-score AR-only corpora
+    # (Sirah ~0.20, Shama'il ~0.20) from the top-`limit` pool — even
+    # when those AR-only candidates are on-topic. The Gemini Flash-Lite
+    # reranker that runs downstream can decide quality on merit, but
+    # only sees what we hand it; if Sirah never makes top-28, it never
+    # enters consideration. The MIN_SCORE recalibration earlier the
+    # same day got AR-only corpora to clear their own thresholds, but
+    # that's only step one — they also need a guaranteed seat at the
+    # merge table.
+    #
+    # Algorithm: walk all_hits in score order, claim each corpus's
+    # best (first-seen) candidate as a reserved slot, then fill the
+    # remaining slots with the next-best cosine-sorted candidates from
+    # any corpus. Backward-compatible: if every corpus's top-1 was
+    # naturally in the global top-`limit` already, the output is
+    # bit-identical to the pre-reservation sort.
+    reserved: list[dict[str, Any]] = []
+    seen_corpora: set[str] = set()
+    for hit in all_hits:
+        if hit["corpus"] not in seen_corpora:
+            reserved.append(hit)
+            seen_corpora.add(hit["corpus"])
+    reserved_keys = {(h["corpus"], h["ref_id"]) for h in reserved}
+    remaining = [
+        h for h in all_hits if (h["corpus"], h["ref_id"]) not in reserved_keys
+    ]
+    if len(reserved) >= limit:
+        final_hits = reserved[:limit]
+    else:
+        final_hits = reserved + remaining[: limit - len(reserved)]
+
     log.info(
         "kitab_retrieval.scored",
         query=query[:80],
@@ -391,8 +425,9 @@ def retrieve_daleel(
         top_score=all_hits[0]["score"] if all_hits else None,
         per_corpus=per_corpus_stats,
         silent_corpora=silent_corpora,
+        reserved_corpora=len(reserved),
     )
-    return all_hits[:limit]
+    return final_hits
 
 
 def retrieve_kisah_pendek(

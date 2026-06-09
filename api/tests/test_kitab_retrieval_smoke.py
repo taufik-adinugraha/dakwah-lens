@@ -56,28 +56,26 @@ def _credentials_available() -> bool:
     not _credentials_available(),
     reason="OPENAI_API_KEY or QDRANT_URL not set — integration probe skipped",
 )
-def test_min_score_keeps_most_corpora_contributing() -> None:
-    """Across the 13-query realistic set, at least 17 of 19 corpora
-    must contribute at least one candidate to at least one query's
-    top-28.
+def test_no_corpus_silent_across_probe_set() -> None:
+    """Across the 13-query realistic set, EVERY registered corpus must
+    contribute at least ONE candidate to at least ONE query's top-28.
 
-    Why not "all 19 always": a separate architectural detail — after
-    MIN_SCORE filtering, `retrieve_daleel` sorts ALL surviving
-    candidates by raw cosine, then truncates to `limit=28`. AR-only
-    matns score 0.15-0.27 cosine on a Bahasa query (the embedder maps
-    cross-lingually at a lower absolute scale) while translation-
-    bearing payloads score 0.30-0.50. So a few of the smallest AR-only
-    corpora (currently Sirah Ibn Hisham + Shama'il, ~~p90 ≈ 0.24~~ for
-    the corpus's top-1 over typical queries) get crowded out of top-28
-    even when their content is on-topic. The reranker would rebalance
-    them but only sees what makes the top-28. Improving that is a
-    separate piece of work (per-corpus slot quotas in the final merge
-    instead of global cosine sort).
+    Two architectural pieces support this invariant:
+      1. MIN_SCORE recalibration (2026-06-09 morning) — per-corpus
+         thresholds set to noise_max + buffer, so AR-only matns can
+         actually clear the threshold for on-topic queries.
+      2. Per-corpus slot reservation in `retrieve_daleel` (same day) —
+         after threshold filtering, each corpus's BEST surviving hit
+         gets a reserved seat in the top-`limit` pool, with remaining
+         slots filled by global cosine. This stops high-absolute-score
+         corpora (Quran ~0.40, Muslim ~0.33) from crowding out
+         low-absolute-score AR-only candidates (Sirah ~0.20) that the
+         reranker would otherwise pick on merit.
 
-    The threshold this test enforces — 17/19 — catches the regression
-    that 2026-06-09 recalibration fixed (under the old 0.28 universal
-    floor, 13 of 19 corpora were silent across all queries) while
-    accepting the known architectural ceiling.
+    Without piece 2, the smoke test reliably found Sirah + Shama'il
+    silent across all queries even after MIN_SCORE was correct. They
+    were clearing their own thresholds but losing the global cosine
+    sort in the merge step.
     """
     from api.services.kitab_retrieval import COLLECTION_NAMES, retrieve_daleel
 
@@ -87,12 +85,12 @@ def test_min_score_keeps_most_corpora_contributing() -> None:
         contributing_corpora.update(h["corpus"] for h in hits)
 
     silent = set(COLLECTION_NAMES) - contributing_corpora
-    min_contributing = len(COLLECTION_NAMES) - 2
-    assert len(contributing_corpora) >= min_contributing, (
-        f"Only {len(contributing_corpora)}/{len(COLLECTION_NAMES)} corpora "
-        f"contributed across the probe set. Silent: {sorted(silent)}. "
-        f"Either MIN_SCORE drifted too strict, the collections are empty, "
-        f"or the embedding model changed."
+    assert not silent, (
+        f"Corpora silent across all {len(REPRESENTATIVE_QUERIES)} probe queries: "
+        f"{sorted(silent)}. Either MIN_SCORE drifted too strict for these "
+        f"corpora, the per-corpus slot reservation in retrieve_daleel "
+        f"regressed, the collections are empty, or the embedding model "
+        f"changed."
     )
 
 
