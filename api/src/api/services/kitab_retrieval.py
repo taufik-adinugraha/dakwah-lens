@@ -177,6 +177,23 @@ DALEEL_DENYLIST: frozenset[str] = frozenset({
 })
 
 
+# Whitelist of corpora the flyer picker is allowed to draw from. The
+# rationale lives inline in pick_flyer_daleel where this is iterated;
+# the short version: flyers are 1080x1080 graphics with ~3-4 lines of
+# daleel text, so we want short, well-known hadith + pesantren matns
+# and exclude Qur'an / tafsir / sirah / fiqh-heavy kitabs that don't
+# render well in the format.
+FLYER_ALLOWED_CORPORA: tuple[str, ...] = (
+    "bukhari",
+    "muslim",
+    "riyad_as_salihin",
+    "bulugh_al_maram",
+    "bidayat_al_hidayah",
+    "nashaihul_ibad",
+    "aqidah_awam",
+)
+
+
 _openai_client: OpenAI | None = None
 _qdrant_client: QdrantClient | None = None
 
@@ -1387,13 +1404,36 @@ def pick_flyer_daleel(
         log.warning("flyer_pick.embed_failed", error=str(exc))
         return None
 
-    # ── Stage 2: gather candidates from every kitab collection ────
+    # ── Stage 2: gather candidates from the flyer-source whitelist ──
+    # The flyer surface is a 1080x1080 image with ~3-4 lines of daleel
+    # text — it has different curation needs than the briefing daleel
+    # pool. By 2026-06-09 product call, flyer daleel comes from a
+    # tight 7-kitab whitelist:
+    #   - Hadith canon: Bukhari + Muslim + Riyad as-Salihin + Bulugh
+    #     al-Maram. These have clean citations, manageable hadith
+    #     lengths, and well-known weight in Indonesian audiences.
+    #   - Pesantren staples: Bidayatul Hidayah (Al-Ghazali — adab/
+    #     spiritual matn) + Nashaihul Ibad (Nawawi al-Bantani — akhlak)
+    #     + 'Aqidat al-'Awam (al-Marzuqi — Ash'ari creed nadham).
+    # Explicit exclusions worth calling out:
+    #   - Qur'an — the curator's product decision (verses can carry
+    #     more weight than a 1080x1080 graphic deserves; verses also
+    #     tend toward longer translations that overflow the card).
+    #   - Sirah/biographical kitabs (Sirah Ibn Hisham, Hayat as-Sahabah,
+    #     Al-Bidayah wan-Nihayah, Shama'il) — those are narrative
+    #     sources for the Kisah Pendek slot, not pull-quote material.
+    #   - Fiqh-heavy kitabs (Al-Umm, Fath al-Mu'in, Fath al-Qarib,
+    #     Fiqh as-Sunnah, Adab al-'Alim) — ruling-style passages are
+    #     hard to translate to a 240-char punchy flyer line.
+    #   - Tafsir Ibn Kathir — same overflow problem as Qur'an.
+    #   - Thalathat al-Usul — Salafi creed matn; left out to avoid
+    #     mixing manhaj voices on creed flyers (creed slot defers to
+    #     'Aqidat al-'Awam instead).
     qdrant = _get_qdrant()
     candidates: list[dict[str, Any]] = []
-    # Per-corpus quota: ~3 from each, with the AR-only boost in
-    # _per_corpus_for. With ~11 corpora, this gives 30-40 candidates
-    # pre-filter — we'll trim to candidate_pool_size after merge.
-    for corpus, collection in COLLECTION_NAMES.items():
+    flyer_corpora = [c for c in FLYER_ALLOWED_CORPORA if c in COLLECTION_NAMES]
+    for corpus in flyer_corpora:
+        collection = COLLECTION_NAMES[corpus]
         try:
             qr = qdrant.query_points(
                 collection_name=collection,

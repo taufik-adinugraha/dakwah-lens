@@ -640,37 +640,40 @@ YANG DILARANG di body flyer (substring match, jangan pakai dalam bentuk apa pun)
 - Handle akun sosial: "@wolfiesahi", "@_BangFu", "@vita_AVP", "@algazelian", "[akun_xyz]", dst. — semua format @username dan [username]
 - Atribusi langsung: "menurut <X>", "dilaporkan oleh <X>", "<X> melaporkan", "<X> menulis", "sebut <X>", "kata <X>" di mana X adalah media/akun
 
-YANG BOLEH (statistik OK, asal tidak diatribusikan ke outlet/akun spesifik):
-- Angka volume: "160 post pekan ini di kelompok ini", "+52% dari pekan lalu", "14 juta tayangan total" — angka berdiri sendiri menambah bobot, asal tidak dipasangkan dengan nama akun/outlet.
-- Sebut kategori kabar: "kisah inspiratif", "berita korupsi", "kasus KDRT", "polemik LGBT" — kategorinya OK, sumbernya tidak.
+YANG DILARANG di body flyer (substring match — di luar daftar outlet/handle di atas):
+- Angka statistik dalam bentuk apa pun: jumlah post, persentase, views, "+/- N%", "N juta tayangan", "N post pekan ini", "naik X% dari pekan lalu". Tightened 2026-06-09 dari aturan sebelumnya yang membolehkan stats sebagai "bumbu" — sekarang BANNED outright. Lihat alasan di "PESAN-FIRST (NO STATS)" di bawah.
+- Sebut kategori kabar masih BOLEH ("kisah inspiratif", "berita korupsi", "polemik LGBT") — kategorinya kontekstual, bukan data.
 
 CONTOH JEBAKAN NYATA (jangan tiru):
 - ❌ "Republika menerbitkan artikel tentang larangan ingkar janji, dan Ustadz Abdul Somad berbicara di PTIK Jakarta…" — atribusi outlet + lokasi institusional spesifik
 - ❌ "Sindiran [_BangFu] yang viral pekan ini menggugat gap antara ritual ibadah…" — handle akun
-- ❌ "[wolfiesahi] menulis kisah tentang uwa yang penyandang disabilitas (348K view)…" — handle akun (angkanya sendiri OK)
+- ❌ "[wolfiesahi] menulis kisah tentang uwa yang penyandang disabilitas (348K view)…" — handle akun + angka views
 - ❌ "Menurut Republika, hari ini terjadi…" — atribusi langsung
 
-CONTOH YANG BENAR (konten + statistik OK, tanpa atribusi outlet/akun):
+CONTOH YANG BENAR (pesan dakwah tanpa angka, tanpa atribusi outlet/akun):
 - ✓ "Pekan ini ramai pesan satir: 'pulang haji, langsung jadi tersangka korupsi'. Sindiran ini mengingatkan kita bahwa hijrah bukan event ritual…"
-- ✓ "Sebuah kisah pendek pekan ini tentang penyandang disabilitas yang dibully menyentuh 348 ribu pembaca — Islam memuliakan saudara-saudara kita yang berkebutuhan khusus…"
-- ✓ "160 post pekan ini di kelompok kisah pribadi (+52% dari pekan lalu) menunjukkan haus akan narasi yang memerdekakan…"
+- ✓ "Sebuah kisah pendek pekan ini tentang penyandang disabilitas yang dibully menyentuh hati banyak pembaca — Islam memuliakan saudara-saudara kita yang berkebutuhan khusus…" (tanpa angka view-count)
 - ✓ "Hari Lahir Pancasila baru saja melewati kita. Sila kedua dan kelima sangat selaras dengan perintah Al-Qur'an tentang adil dan ihsan…"
 
-CARA MEMBINGKAI ULANG: ambil INTI pesan/peristiwa, tulis dalam suara dakwah yang merangkul. Kalau perlu menyebut konteks, gunakan frasa generik seperti "pekan ini ramai dibicarakan...", "kabar yang sampai ke kita...", "satu pesan yang viral pekan ini berbunyi...", "publik dikejutkan oleh kabar...". Statistik boleh — outlet dan akun tidak. Outlet/akun bersifat efemeral; yang relevan untuk dakwah adalah esensi pesannya.
+CARA MEMBINGKAI ULANG: ambil INTI pesan/peristiwa, tulis dalam suara dakwah yang merangkul. Kalau perlu menyebut konteks, gunakan frasa generik seperti "pekan ini ramai dibicarakan...", "kabar yang sampai ke kita...", "satu pesan yang viral pekan ini berbunyi...", "publik dikejutkan oleh kabar...". Yang relevan untuk dakwah adalah esensi pesannya — bukan jumlah view, bukan outlet, bukan akun.
 
-PESAN-FIRST (HARD RULE — KRITIS, ditambah 2026-06-08):
-Body flyer adalah PESAN DAKWAH, BUKAN ringkasan data. Statistik hanya boleh sebagai PEMBUKA pendek (1 kalimat, opsional) atau JANGKAR konteks (sebuah angka di tengah pesan). Bagian terbesar paragraf (minimal 60% dari 70-90 kata) HARUS berupa: (a) ajakan/teladan/refleksi yang relevan dengan tema flyer, (b) aksi konkret yang bisa dilakukan pembaca, atau (c) hikmah yang menghubungkan situasi pekan ini dengan nilai dakwah.
+PESAN-FIRST (NO STATS) — HARD RULE — KRITIS (tightened 2026-06-09):
+Body flyer adalah PESAN DAKWAH, BUKAN ringkasan data. JANGAN MEMASUKKAN ANGKA STATISTIK APA PUN di body Pesan Flyer 1-6 — tidak sebagai pembuka, tidak sebagai jangkar, tidak sebagai bumbu. Pembaca flyer di IG/WA tidak butuh tahu "+52% dari pekan lalu" atau "160 post" — mereka butuh AJAKAN, HIKMAH, atau AKSI yang bisa langsung dipakai. Angka adalah bahan baku untuk Section 2 (Numerik & Tren) — bukan untuk flyer.
+
+100% body flyer (semua ~70-90 kata) HARUS berupa: (a) ajakan/teladan/refleksi yang relevan dengan tema flyer, (b) aksi konkret yang bisa dilakukan pembaca, atau (c) hikmah yang menghubungkan situasi pekan ini dengan nilai dakwah. Konteks pekan ini boleh disebut secara KUALITATIF ("ramai dibicarakan pekan ini", "satu kabar yang menyentuh hati", "isu yang muncul pekan ini") tanpa angka.
 
 CONTOH JEBAKAN NYATA (jangan tiru):
-- ❌ "Pekan ini, momentum Hari Lahir Pancasila 1 Juni 2026 memicu lonjakan 70,1% post di kelompok Toleransi & Lintas-Iman — naik dari 97 ke 165 post. Topik Pancasila & Integritas Bangsa muncul sebagai salah satu tema yang paling dibahas, dengan 4 post yang menembus 681 ribu view." — 100% statistik + meta-data tentang radar internal kami. TIDAK ADA pesan dakwah. Pembaca flyer tidak peduli dengan "kelompok Toleransi & Lintas-Iman" — itu nama internal sistem.
-- ❌ "47 dari 160 post pekan ini adalah kisah inspiratif, naik 52% dari pekan lalu. Format naratif mendominasi dengan 7,5 juta tayangan dan 275 video YouTube." — semua angka, tidak ada ajakan, tidak ada hikmah, tidak ada aksi.
+- ❌ "Pekan ini, momentum Hari Lahir Pancasila 1 Juni 2026 memicu lonjakan 70,1% post di kelompok Toleransi & Lintas-Iman — naik dari 97 ke 165 post." — angka + meta-data internal
+- ❌ "47 dari 160 post pekan ini adalah kisah inspiratif, naik 52% dari pekan lalu. Format naratif mendominasi dengan 7,5 juta tayangan dan 275 video YouTube." — semua angka
+- ❌ "Kisah-kisah pribadi sedang banjir di feed pekan ini — naik 52% dari pekan lalu. Tapi…" — pembuka berbasis angka, walau diikuti pesan
+- ❌ "Sebuah kisah menyentuh 348 ribu pembaca pekan ini…" — angka view-count
 
-CONTOH YANG BENAR (pesan-first + statistik sebagai pendukung):
-- ✓ "Hari Lahir Pancasila baru saja melewati kita. Sila kedua — 'Kemanusiaan yang Adil dan Beradab' — sangat selaras dengan perintah Allah dalam QS. An-Nahl: adil dan ihsan. Pekan ini, percakapan publik tentang integritas bangsa naik tajam — momen yang tepat untuk kita memulai hijrah etis di tempat kerja masing-masing: timbangan yang adil, janji yang ditepati, amanah yang dijaga. Mulailah dari satu keputusan kecil hari ini."
-- ✓ "Kisah-kisah pribadi sedang banjir di feed pekan ini — naik 52% dari pekan lalu. Tapi narasi 'sabar' yang kita kirim ke saudara yang ditimpa musibah tidak boleh sekadar 'sabar aja'. Belajar dari Nabi ﷺ menemani Khabbab: akui beratnya, beri konteks, beri harapan konkret. Tugas kita pekan ini: dengarkan dulu, baru bicara."
+CONTOH YANG BENAR (pesan-first murni, NOL angka):
+- ✓ "Hari Lahir Pancasila baru saja melewati kita. Sila kedua — 'Kemanusiaan yang Adil dan Beradab' — sangat selaras dengan perintah Allah dalam QS. An-Nahl: adil dan ihsan. Momen yang tepat untuk memulai hijrah etis di tempat kerja masing-masing: timbangan yang adil, janji yang ditepati, amanah yang dijaga. Mulailah dari satu keputusan kecil hari ini."
+- ✓ "Kisah-kisah pribadi sedang banjir di feed pekan ini. Tapi narasi 'sabar' yang kita kirim ke saudara yang ditimpa musibah tidak boleh sekadar 'sabar aja'. Belajar dari Nabi ﷺ menemani Khabbab: akui beratnya, beri konteks, beri harapan konkret. Tugas kita pekan ini: dengarkan dulu, baru bicara."
 - ✓ "Sindiran 'pulang haji jadi tersangka korupsi' viral pekan ini — mengiris hati karena menyentuh inti pertanyaan: apa arti ibadah kalau tidak mengubah perilaku? Hadits Nabi ﷺ tegas: muhajir adalah yang meninggalkan apa yang dilarang Allah. Hijrah bukan event ritual; hijrah adalah pilihan harian di meja kerja. Pilih satu kebiasaan yang salah, tinggalkan hari ini."
 
-CARA UJI: setelah menulis flyer, baca ulang dan tanya: "Kalau saya hapus semua angka dari paragraf ini, apakah masih ada pesan yang bisa diambil pembaca?" Kalau jawabannya TIDAK, paragraf itu cuma laporan data — rewrite untuk menonjolkan ajakan/hikmah/aksi. Statistik adalah BUMBU, bukan main course.
+CARA UJI: setelah menulis flyer, scan paragraf untuk angka apa pun (digit 0-9, persen, "ribu", "juta"). Kalau ketemu, REWRITE — ganti dengan kata kualitatif ("ramai", "banyak", "menyentuh hati banyak orang") atau hapus seluruhnya. Cara cek kedua: "Kalau pembaca melihat flyer ini di story IG tanpa konteks lain, apakah masih ada ajakan/hikmah/aksi yang bisa dia ambil?" Kalau jawabannya cuma "data tentang berita", REWRITE.
 
 ATURAN ANTI-MISLEADING IBADAH (KRITIS): headline TIDAK BOLEH menampilkan rukun ibadah atau sunnah (kurban / sholat / puasa / zakat / haji / sedekah / membaca Quran) sebagai sesuatu yang dipertentangkan dengan amal lain. Konstruksi `X, bukan Y` ("X not Y") sangat berbahaya jika Y adalah ibadah riil — pembaca yang sekilas baca akan menafsirkan "tinggalkan Y dan lakukan X" yang bisa berarti merendahkan ibadah pokoknya.
 
@@ -689,12 +692,12 @@ ATURAN DALIL — paragraf, headline, dan dalil WAJIB membentuk satu thread temat
 1. Citation HARUS persis cocok dengan salah satu entri di dalil pool yang saya berikan. JANGAN mengarang citation.
 
 CITATION VERBATIM CHECK (HARD RULE — KRITIS, jangan dilanggar untuk Pesan Flyer 1-6):
-Setiap `**Dalil:**` yang Anda tag di Pesan Flyer 1-6 WAJIB persis sama dengan salah satu `Citation:` di DALEEL POOL (untuk Flyer 1-4) atau ADHKAR POOL (untuk Flyer 5-6). PERSIS — bukan paraphrase, bukan sinonim, bukan citation lain yang kelihatannya cocok. Renderer flyer mencari entri pool dengan citation yang Anda tag; kalau TIDAK KETEMU di pool, renderer SILENTLY MEM-FALLBACK ke pickFlyerDaleel(rank) — yang akan menampilkan daleel ACAK dari pool, BUKAN yang Anda maksudkan. Pembaca tidak tahu itu jatuh ke fallback; mereka percaya daleel yang muncul itu yang Anda pilih.
+Setiap `**Dalil:**` yang Anda tag di Pesan Flyer 1-6 WAJIB persis sama dengan salah satu `Citation:` di FLYER DALEEL POOL (untuk Flyer 1-4) atau FLYER ADHKAR POOL (untuk Flyer 5-6). PERSIS — bukan paraphrase, bukan sinonim, bukan citation lain yang kelihatannya cocok. JANGAN ambil dari DALEEL POOL atau ADHKAR POOL yang luas — keduanya dipakai sub-section lain (khutbah/kultum/kajian) tapi BUKAN untuk flyer. Flyer dibatasi ke 7 kitab whitelist (Bukhari, Muslim, Riyad as-Salihin, Bulugh al-Maram, Bidayatul Hidayah, Nashaihul Ibad, 'Aqidat al-'Awam) yang format pull-quote-nya pas untuk graphic 1080×1080. Renderer flyer mencari entri pool dengan citation yang Anda tag; kalau TIDAK KETEMU di FLYER POOL, renderer SILENTLY MEM-FALLBACK ke pickFlyerDaleel(rank) — yang akan menampilkan daleel ACAK dari pool, BUKAN yang Anda maksudkan. Pembaca tidak tahu itu jatuh ke fallback; mereka percaya daleel yang muncul itu yang Anda pilih.
 
 REAL BUG 2026-06-07: audit lintas-briefing menemukan 50 dari 90 marker `**Dalil:**` di flyer di-tag dengan citation yang TIDAK ada di stored pool. Konsekuensi: ~55% flyer di prod menampilkan daleel yang mismatch dengan headline + body — kontradiksi yang merusak kepercayaan da'i.
 
 CARA KERJA YANG BENAR untuk SETIAP Pesan Flyer:
-1. Buka blok `DALEEL POOL` (untuk Flyer 1-4) atau `ADHKAR POOL` (untuk Flyer 5-6) di user prompt.
+1. Buka blok `FLYER DALEEL POOL` (untuk Flyer 1-4) atau `FLYER ADHKAR POOL` (untuk Flyer 5-6) di user prompt — BUKAN DALEEL POOL atau ADHKAR POOL yang lebih luas.
 2. Pilih SATU entri yang paling cocok tematik. Copy citation-nya PERSIS — termasuk titik, koma, dan tanda baca lain.
 3. Paste ke baris `**Dalil:** <citation>` di flyer block.
 4. Verifikasi: scan kembali pool — apakah citation yang Anda paste itu MUNCUL PERSIS di pool? Kalau nggak ketemu, kembali ke step 2 dan pilih ulang.
@@ -738,7 +741,7 @@ Cara memilih untuk SETIAP Pesan Flyer 1-5:
 
 Verifikasi sebelum tag: setelah memilih citation, cek `length(translation_id)` dan `length(arabic)` dari entri itu di pool. Kalau melebihi batas, MUNDUR dan pilih ulang.
 
-ATURAN DALIL untuk Pesan Flyer 5 & 6 (SUNNAH + DOA): citation pada Pesan Flyer 5 (Ajakan Sunnah) dan Pesan Flyer 6 (Doa Pekan Ini) HARUS dipilih dari blok **ADHKAR POOL** yang TERPISAH dari DALIL POOL (lihat user prompt di bawah). ADHKAR POOL berisi du'a / dzikir yang dapat dibaca langsung — entri yang cocok untuk dijadikan wirid. JANGAN ambil dalil untuk Flyer 5+6 dari DALIL POOL (yang sifatnya argumentatif-tematik, bukan recitable). Kalau ADHKAR POOL kosong atau tidak ada entri yang cocok untuk satu paragraf, kosongkan baris `**Dalil:**` untuk paragraf itu (jangan diisi dengan citation yang tidak ada di pool).
+ATURAN DALIL untuk Pesan Flyer 5 & 6 (SUNNAH + DOA): citation pada Pesan Flyer 5 (Ajakan Sunnah) dan Pesan Flyer 6 (Doa Pekan Ini) HARUS dipilih dari blok **FLYER ADHKAR POOL** yang TERPISAH (lihat user prompt di bawah). FLYER ADHKAR POOL berisi du'a / dzikir yang dapat dibaca langsung dari 7 kitab whitelist flyer — entri yang cocok untuk dijadikan wirid. JANGAN ambil dalil untuk Flyer 5+6 dari DALEEL POOL atau ADHKAR POOL yang luas, dan JANGAN dari FLYER DALEEL POOL (itu untuk Flyer 1-4). Kalau FLYER ADHKAR POOL kosong atau tidak ada entri yang cocok untuk satu paragraf, kosongkan baris `**Dalil:**` untuk paragraf itu (jangan diisi dengan citation yang tidak ada di pool).
 
 ATURAN PANJANG DU'A untuk Pesan Flyer 6 (KRITIS — flyer 1080×1080 harus nyaman dibaca dalam 1 layar): pilih entri ADHKAR POOL yang BENAR-BENAR sebuah du'a/dzikir pendek yang bisa langsung diwirid. TARGET: Arab ≤ 150 karakter (≈1-3 baris di flyer), terjemahan ≤ 200 karakter. JANGAN pilih hadits panjang dengan rantai perawi ("ḥaddatsanā fulān… 'an fulān…") atau narasi cerita panjang sebagai "du'a" — itu hadits historis, bukan du'a recitable. Kalau pool TIDAK ada entri ≤ 150ch yang relevan, pilih entri terpendek yang relevan, ATAU kosongkan `**Dalil:**` Flyer 6 (lebih baik tanpa marker daripada flyer yang teksnya luber dan tidak terbaca).
 
@@ -1181,12 +1184,12 @@ DALEEL RULES — paragraph, headline, and daleel MUST form one consistent themat
 1. Citation MUST match exactly an entry in the daleel pool. NEVER fabricate citations.
 
 CITATION VERBATIM CHECK (HARD RULE — CRITICAL, do not break for Flyer Messages 1-6):
-Every `**Daleel:**` you tag on Flyer Messages 1-6 MUST match a `Citation:` field in the DALEEL POOL (for Flyer 1-4) or ADHKAR POOL (for Flyer 5-6) EXACTLY. EXACTLY — not paraphrased, not a synonym, not a different but-similar-looking citation. The flyer renderer looks up the pool entry by the citation you tag; if NOT FOUND in the pool, the renderer SILENTLY FALLS BACK to `pickFlyerDaleel(rank)` — displaying a RANDOM daleel from the pool, NOT the one you meant. The reader has no signal that this was a fallback; they assume the rendered daleel is your choice.
+Every `**Daleel:**` you tag on Flyer Messages 1-6 MUST match a `Citation:` field in the FLYER DALEEL POOL (for Flyer 1-4) or FLYER ADHKAR POOL (for Flyer 5-6) EXACTLY. EXACTLY — not paraphrased, not a synonym, not a different but-similar-looking citation. DO NOT use the broader DALEEL POOL or ADHKAR POOL — those are for other sub-sections (khutbah/kultum/kajian). Flyers are restricted to a 7-kitab whitelist (Bukhari, Muslim, Riyad as-Salihin, Bulugh al-Maram, Bidayatul Hidayah, Nashaihul Ibad, 'Aqidat al-'Awam) that fits the 1080×1080 pull-quote format. The flyer renderer looks up the pool entry by the citation you tag; if NOT FOUND in the FLYER POOL, the renderer SILENTLY FALLS BACK to `pickFlyerDaleel(rank)` — displaying a RANDOM daleel from the pool, NOT the one you meant.
 
 REAL BUG 2026-06-07: cross-briefing audit found 50 of 90 `**Daleel:**` markers on flyers tagged citations NOT in the stored pool. Consequence: ~55% of production flyers showed daleel that mismatched the headline + body — a contradiction that damages the trust of every da'i who shares.
 
 CORRECT WORKFLOW for EACH Flyer Message:
-1. Open the `DALEEL POOL` block (for Flyer 1-4) or `ADHKAR POOL` (for Flyer 5-6) in the user prompt.
+1. Open the `FLYER DALEEL POOL` block (for Flyer 1-4) or `FLYER ADHKAR POOL` (for Flyer 5-6) in the user prompt — NOT the broader DALEEL POOL or ADHKAR POOL.
 2. Pick ONE entry that fits thematically. Copy its citation EXACTLY — including periods, commas, apostrophes, every punctuation mark.
 3. Paste into the `**Daleel:** <citation>` line of the flyer block.
 4. Verify: scan the pool again — does the citation you pasted appear VERBATIM in the pool? If you can't find it, return to step 2 and pick again.
@@ -1208,7 +1211,7 @@ VALIDATOR HARD-FAIL: `manual_briefing save` now REJECTS (exit code 1) when any f
 
 5. Variety: aim for 4-6 flyers to use different daleel when the pool allows — but THE PRIORITY is thematic precision, not distribution. Two flyers sharing a well-fitting daleel beats four flyers with four forced mismatches.
 
-DALEEL RULES for Flyer Messages 5 & 6 (SUNNAH + DU'A): citations on Flyer Message 5 (Sunnah Invitation) and Flyer Message 6 (This Week's Du'a) MUST come from the **ADHKAR POOL** — a separate pool in the user prompt below, holding recitable du'a / dzikir entries. Do NOT use DALEEL POOL entries for Flyer 5+6 (those are argumentative-thematic, not recitable). If the ADHKAR POOL is empty or none of its entries fit a given paragraph, leave the `**Daleel:**` marker line blank for that paragraph (never fabricate a citation).
+DALEEL RULES for Flyer Messages 5 & 6 (SUNNAH + DU'A): citations on Flyer Message 5 (Sunnah Invitation) and Flyer Message 6 (This Week's Du'a) MUST come from the **FLYER ADHKAR POOL** — a separate pool in the user prompt below, holding recitable du'a / dzikir entries from the 7-kitab flyer whitelist. Do NOT use the broader DALEEL POOL, ADHKAR POOL, or FLYER DALEEL POOL for Flyer 5+6. If the FLYER ADHKAR POOL is empty or none of its entries fit a given paragraph, leave the `**Daleel:**` marker line blank for that paragraph (never fabricate a citation).
 
 DU'A LENGTH RULE for Flyer Message 6: pick an ADHKAR POOL entry that is genuinely a short recitable du'a / dzikir (rule of thumb: Arabic < 200 chars, translation < 280 chars). Do NOT pick a long hadith with a full chain of narrators ("ḥaddatsanā so-and-so… 'an so-and-so…") or a story narration as the "du'a" — that's historical hadith, not a recitable du'a. If the only choice in the pool is a long narration, leave Flyer 6's `**Daleel:**` blank rather than force an entry that won't fit on a 1080×1080 flyer.
 
@@ -1960,6 +1963,8 @@ def _build_user_prompt(
     language: str = "id",
     prior_coverage: list[dict[str, Any]] | None = None,
     calendar_context: str | None = None,
+    flyer_daleel_pool: list[dict[str, Any]] | None = None,
+    flyer_adhkar_pool: list[dict[str, Any]] | None = None,
 ) -> str:
     """Assemble the structured context for Gemini.
 
@@ -2093,11 +2098,11 @@ def _build_user_prompt(
         else "Write the briefing now in markdown, 5-section format (Executive Summary / Numbers & Trends This Week / Main Themes & Emerging Patterns / Da'wah Strategies & Actions / Daleel & Sources), ~11400-15100 words total — Da'wah Strategies & Actions is a CONTENT KIT of 8 sub-sections containing ready-to-use drafts (full khutbah, kultum, kajian, kisah pendek from the kitab in KISAH POOL, home teaching scripts, video script, mahasiswa pack, social action) with daleel from the pool woven inline into each sub-section, NOT a strategic summary."
     )
 
-    # ADHKAR POOL — du'a / dzikir retrieved separately so Pesan Flyer
-    # 5 (Sunnah invitation) and Flyer 6 (Du'a hero) cite a recitable
-    # du'a sourced from the kitab corpus. We render it whether or not
-    # the LLM uses every entry; the prompt instructs Pesan Flyer 5 + 6
-    # to pin their `**Daleel:**` markers to citations from THIS pool.
+    # ADHKAR POOL — du'a / dzikir retrieved separately so the sub-
+    # section content kit (kultum + kajian) can cite recitable du'a
+    # sourced from authentic kitab. Pesan Flyer 5 + 6 pin to a
+    # SEPARATE filtered pool (FLYER ADHKAR POOL below) — only the
+    # 7 flyer-whitelist corpora.
     if adhkar:
         adhkar_block = "\n\n".join(
             f"Citation: {a['citation']}\n"
@@ -2106,15 +2111,65 @@ def _build_user_prompt(
             for a in adhkar
         )
         adhkar_section = (
-            "\n\nADHKAR POOL (for Pesan Flyer 5 — Ajakan Sunnah dan "
-            "Flyer 6 — Doa Pekan Ini; the `**Daleel:**` marker on those "
-            "two flyer paragraphs MUST cite from THIS pool — these are "
-            "recitable du'a sourced from authentic kitab, distinct from "
-            "the thematic DALEEL POOL above):\n\n"
+            "\n\nADHKAR POOL (recitable du'a / dzikir sourced from "
+            "authentic kitab, distinct from the thematic DALEEL POOL "
+            "above; sub-section content kit may cite these as fits):\n\n"
             f"{adhkar_block}"
         )
     else:
         adhkar_section = ""
+
+    # FLYER POOLS — restricted to the 7-kitab flyer whitelist
+    # (Bukhari + Muslim + Riyad + Bulugh + Bidayatul Hidayah +
+    # Nashaihul Ibad + 'Aqidat al-'Awam). The flyer surface is a
+    # 1080x1080 graphic with only ~3-4 lines of daleel text, so we
+    # exclude Qur'an / tafsir (verses overflow) and the longer
+    # fiqh/sirah corpora that don't render as punchy pull quotes.
+    # Pesan Flyer 1-6 MUST cite ONLY from these pools, enforced both
+    # by prompt instruction and validator hard-fail.
+    flyer_pool_section = ""
+    if flyer_daleel_pool:
+        flyer_daleel_block = "\n\n".join(
+            f"Citation: {d['citation']}\n"
+            f"Arabic: {d['arabic'][:300]}\n"
+            f"{translation_label}: {_translation_for(d)[:500]}"
+            for d in flyer_daleel_pool
+        )
+        flyer_pool_section += (
+            "\n\nFLYER DALEEL POOL (for Pesan Flyer 1-4; the "
+            "`**Daleel:**` marker on flyer 1-4 paragraphs MUST cite "
+            "from THIS pool, NOT the broader DALEEL POOL above — "
+            "limited to 7 kitabs curated for the 1080x1080 flyer "
+            "format):\n\n"
+            f"{flyer_daleel_block}"
+        )
+    else:
+        flyer_pool_section += (
+            "\n\nFLYER DALEEL POOL: (no whitelist-eligible entries "
+            "matched this theme — for Pesan Flyer 1-4, leave the "
+            "`**Daleel:**` line empty with em dash `—`; do NOT fall "
+            "back to the broader DALEEL POOL)."
+        )
+    if flyer_adhkar_pool:
+        flyer_adhkar_block = "\n\n".join(
+            f"Citation: {a['citation']}\n"
+            f"Arabic: {a['arabic'][:300]}\n"
+            f"{translation_label}: {_translation_for(a)[:500]}"
+            for a in flyer_adhkar_pool
+        )
+        flyer_pool_section += (
+            "\n\nFLYER ADHKAR POOL (for Pesan Flyer 5 + 6; same "
+            "whitelist as FLYER DALEEL POOL, filtered to recitable "
+            "du'a / dzikir — Pesan Flyer 5 (Ajakan Sunnah) and Flyer "
+            "6 (Doa Pekan Ini) MUST cite from THIS pool):\n\n"
+            f"{flyer_adhkar_block}"
+        )
+    else:
+        flyer_pool_section += (
+            "\n\nFLYER ADHKAR POOL: (no whitelist-eligible recitable "
+            "du'a matched this theme — for Pesan Flyer 5 + 6, leave "
+            "the `**Daleel:**` line empty with em dash `—`)."
+        )
 
     # KISAH POOL — narrative excerpt for the "Kisah Pendek" content-kit
     # slot, drawn from one of four narrative kitabs (Al-Bidayah wan-
@@ -2222,7 +2277,7 @@ TOP TOPICS WITH SAMPLE HEADLINES (Section 3 MUST name specific stories from thes
 
 DALEEL POOL (use for Section 5, cite 4-5 from here; the `Citation` field is what goes in your heading):
 
-{daleel_block}{adhkar_section}{kisah_section}
+{daleel_block}{adhkar_section}{flyer_pool_section}{kisah_section}
 
 {write_now}"""
 
@@ -2296,6 +2351,30 @@ def _generate_for_language(
     system_prompt = base_prompt.replace("«KISAH_LABEL»", kisah_label).replace(
         "«KISAH_AUTHOR»", kisah_author
     )
+    # Build flyer-specific pools — restricted to the 7-kitab whitelist
+    # (FLYER_ALLOWED_CORPORA). This isolates the flyer surface from
+    # corpora that don't render well in the 1080x1080 graphic format
+    # (Qur'an / tafsir overflow the card; sirah/fiqh-heavy kitabs are
+    # too long for punchy pull quotes). Sub-sections (khutbah/kultum/
+    # kajian) still use the full daleel pool.
+    from api.services.kitab_retrieval import FLYER_ALLOWED_CORPORA
+
+    flyer_allowed = set(FLYER_ALLOWED_CORPORA)
+    flyer_daleel_pool = [
+        d for d in (daleel or []) if d.get("corpus") in flyer_allowed
+    ]
+    flyer_adhkar_pool = [
+        a for a in (adhkar or []) if a.get("corpus") in flyer_allowed
+    ]
+    log.info(
+        "briefing.flyer_pools",
+        theme_group=theme_group,
+        flyer_daleel=len(flyer_daleel_pool),
+        flyer_adhkar=len(flyer_adhkar_pool),
+        daleel_total=len(daleel or []),
+        adhkar_total=len(adhkar or []),
+    )
+
     user_prompt = _build_user_prompt(
         stats,
         daleel,
@@ -2304,6 +2383,8 @@ def _generate_for_language(
         language=language,
         prior_coverage=prior_coverage,
         calendar_context=calendar_context,
+        flyer_daleel_pool=flyer_daleel_pool,
+        flyer_adhkar_pool=flyer_adhkar_pool,
     )
 
     resp = client.models.generate_content(
@@ -2548,10 +2629,21 @@ async def generate_briefing(
                 validate_briefing,
             )
 
+            from api.services.kitab_retrieval import FLYER_ALLOWED_CORPORA as _flyer_allowed_corpora
+
+            _flyer_allowed = set(_flyer_allowed_corpora)
+            _flyer_daleel = [
+                d for d in (daleel or []) if d.get("corpus") in _flyer_allowed
+            ]
+            _flyer_adhkar = [
+                a for a in (adhkar or []) if a.get("corpus") in _flyer_allowed
+            ]
             briefing_warnings = validate_briefing(
                 summary_md,
                 daleel_pool=daleel,
                 adhkar_pool=adhkar,
+                flyer_daleel_pool=_flyer_daleel,
+                flyer_adhkar_pool=_flyer_adhkar,
                 llm_judgments=True,
             )
             summary_md, applied_swaps = apply_daleel_autofixes(
@@ -2564,6 +2656,8 @@ async def generate_briefing(
                     summary_md,
                     daleel_pool=daleel,
                     adhkar_pool=adhkar,
+                    flyer_daleel_pool=_flyer_daleel,
+                    flyer_adhkar_pool=_flyer_adhkar,
                     llm_judgments=True,
                 )
                 log.info(

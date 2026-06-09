@@ -1865,11 +1865,22 @@ def validate_briefing(
     *,
     daleel_pool: list[dict[str, Any]],
     adhkar_pool: list[dict[str, Any]] | None = None,
+    flyer_daleel_pool: list[dict[str, Any]] | None = None,
+    flyer_adhkar_pool: list[dict[str, Any]] | None = None,
     llm_judgments: bool = False,
 ) -> list[BriefingWarning]:
     """Run all validators. Never raises — failures inside individual
     passes are logged and the pass returns no warnings for that
     branch.
+
+    `flyer_daleel_pool` / `flyer_adhkar_pool` (added 2026-06-09) are
+    the corpus-restricted pools the LLM was instructed to draw flyer
+    citations from. When supplied, the flyer-specific checks
+    (scan_flyer_dalil_in_pool + check_flyer_daleel_alignment) use
+    THESE pools instead of the broader daleel/adhkar pools — so a
+    flyer citing a non-whitelist corpus fails the in-pool check.
+    Backwards-compatible: when omitted, those checks fall back to
+    the broader pools (the pre-2026-06-09 behaviour).
 
     `llm_judgments` gates the API-LLM-based passes:
       - False (default, manual flow): only regex/heuristic checks
@@ -1880,6 +1891,12 @@ def validate_briefing(
         for daleel alignment + advice sanity. Fine in the auto path
         since it's already an API-LLM context.
     """
+    flyer_dpool = (
+        flyer_daleel_pool if flyer_daleel_pool is not None else daleel_pool
+    )
+    flyer_apool = (
+        flyer_adhkar_pool if flyer_adhkar_pool is not None else adhkar_pool
+    )
     warnings: list[BriefingWarning] = []
     try:
         warnings.extend(scan_forbidden_phrases(markdown))
@@ -1907,10 +1924,12 @@ def validate_briefing(
             warnings.extend(fn(markdown))
         except Exception as exc:
             log.warning(f"validate_briefing.{key}", error=str(exc))
-    # Pool-aware checks — only run when caller passed the pools.
+    # Pool-aware flyer checks use the FLYER-restricted pools (7-kitab
+    # whitelist) when supplied — so any flyer citing a non-whitelist
+    # corpus fails the in-pool check and gets caught at save time.
     try:
         warnings.extend(
-            scan_flyer_dalil_in_pool(markdown, daleel_pool, adhkar_pool)
+            scan_flyer_dalil_in_pool(markdown, flyer_dpool, flyer_apool)
         )
     except Exception as exc:
         log.warning(
@@ -1924,7 +1943,7 @@ def validate_briefing(
         try:
             warnings.extend(
                 check_flyer_daleel_alignment(
-                    markdown, daleel_pool, adhkar_pool=adhkar_pool
+                    markdown, flyer_dpool, adhkar_pool=flyer_apool
                 )
             )
         except Exception as exc:
