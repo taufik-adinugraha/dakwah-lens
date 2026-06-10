@@ -171,13 +171,19 @@ export default async function CostsPage({
     usageUsdByProvider.set(row.provider, row.usd);
   }
 
-  // Use the calendar-month API spend (not the rolling 30-day figure)
-  // so this number lines up with the manual allocation above.
+  // 2026-06-10 change: "Total cost" tracks ONLY the manually-recorded
+  // invoice entries (VPS, domain, subscriptions). API usage is shown
+  // separately on this page + on /admin/system/api-costs, but is not
+  // rolled into the total — the auto-logged usage_events are advisory
+  // signal, while the invoice rows are the authoritative "money out
+  // the door" record the operator has to fund. apiThisMonthIdr /
+  // apiAllTimeIdr are kept here only because the api-spend tiles
+  // below still surface them as a separate signal.
   const apiThisMonthIdr = apiThisMonthUsd * usdToIdr;
-  const totalThisMonthIdr = manualThisMonthIdr + apiThisMonthIdr;
+  const totalThisMonthIdr = manualThisMonthIdr;
   const apiAllTimeIdr = apiUsdAll * usdToIdr;
   const manualAllTimeIdr = manual.reduce((s, r) => s + r.amountIdr, 0);
-  const totalSpendAllTimeIdr = apiAllTimeIdr + manualAllTimeIdr;
+  const totalSpendAllTimeIdr = manualAllTimeIdr;
   const netBalanceIdr = donationsTotal - totalSpendAllTimeIdr;
   const capIdr = 1_000_000;
 
@@ -185,7 +191,7 @@ export default async function CostsPage({
     <>
       <PageHeader
         title="Total cost"
-        subtitle="API spend (auto) + infrastructure & domain (manual) → unified monthly view in IDR."
+        subtitle="Manual invoice entries (infrastructure, domain, subscriptions) in IDR. API usage is tracked separately under /admin/system/api-costs."
       />
 
       <HelpCallout>
@@ -217,7 +223,7 @@ export default async function CostsPage({
         <StatTile
           label="This month · total"
           value={formatRupiah(totalThisMonthIdr)}
-          hint="API + infra + domain (allocated)"
+          hint="infra + domain + subscriptions (manual only)"
           accent={totalThisMonthIdr > capIdr ? "rose" : "emerald"}
         />
         <StatTile
@@ -250,7 +256,7 @@ export default async function CostsPage({
         <StatTile
           label="Spend · all-time"
           value={formatRupiah(totalSpendAllTimeIdr)}
-          hint="API + manual (raw)"
+          hint="manual invoice entries only"
         />
         <StatTile
           label="Net balance"

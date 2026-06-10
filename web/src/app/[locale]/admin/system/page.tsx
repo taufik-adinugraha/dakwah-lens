@@ -193,8 +193,12 @@ export default async function SystemOverviewPage() {
     (total, row) => total + allocatedToThisMonth(row),
     0,
   );
-  const apiThisMonthIdr = apiThisMonthUsd * usdToIdr;
-  const totalThisMonthIdr = manualThisMonthIdr + apiThisMonthIdr;
+  // 2026-06-10: "Total cost" excludes auto-logged API usage by request —
+  // tracks only the manually-entered invoice rows. The apiThisMonthUsd
+  // query above is still issued because the Apify tile + api-costs page
+  // surface it as a separate signal, but it no longer feeds this total.
+  void apiThisMonthUsd;
+  const totalThisMonthIdr = manualThisMonthIdr;
   const capUsagePct = (totalThisMonthIdr / BUDGET_CAP_IDR) * 100;
 
   // Apify subscription credit allocated to this month (sums all
