@@ -70,6 +70,18 @@ class Settings(BaseSettings):
         ),
     )
 
+    # ─── Feature flags ───────────────────────────────────
+    # When True, briefing.py post-processes the `## Pesan Flyer` section
+    # (slots 1-4) using the daleel-first content pipeline in
+    # services/flyer_content.py — picker chooses the daleel + LLM-driven
+    # truncation, then writes message+title FROM the chosen daleel. Off
+    # by default to make the rollout reversible; flip in .env once the
+    # A/B comparison confirms the new flow is at least parity with the
+    # in-prompt flyer generation. Slots 5-6 (inline du'a) are untouched.
+    flyer_daleel_first_enabled: bool = Field(
+        default=False, alias="DALEEL_FIRST_FLYERS"
+    )
+
     @field_validator("cors_origins", "supported_locales", mode="before")
     @classmethod
     def _split_csv(cls, v: object) -> object:
