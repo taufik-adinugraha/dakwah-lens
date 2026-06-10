@@ -667,6 +667,11 @@ CONTOH JEBAKAN NYATA (jangan tiru):
 - ❌ "47 dari 160 post pekan ini adalah kisah inspiratif, naik 52% dari pekan lalu. Format naratif mendominasi dengan 7,5 juta tayangan dan 275 video YouTube." — semua angka
 - ❌ "Kisah-kisah pribadi sedang banjir di feed pekan ini — naik 52% dari pekan lalu. Tapi…" — pembuka berbasis angka, walau diikuti pesan
 - ❌ "Sebuah kisah menyentuh 348 ribu pembaca pekan ini…" — angka view-count
+- ❌ "Pekan ini 82 postingan tentang jeratan judol dan pinjol berseliweran di feed…" — post-count pembuka, audit 2026-06-11
+- ❌ "Pekan ini 191 cerita kekerasan seksual dan perlindungan anak…" — cerita-count pembuka, audit 2026-06-11
+- ❌ "Pekan ini 37 cerita keluarga dengan anak berkebutuhan khusus mengangkat satu pesan…" — cerita-count, audit 2026-06-11
+- ❌ "menembus 348 ribu view", "13,8 juta views", "954 ribu views" — semua view-count, off-brand untuk dakwah surface
+- ❌ Pola umum yang dilarang: bilangan + "postingan" / "post" / "cerita" / "view" / "view-count" / "viral" + angka di kalimat manapun di body flyer. Bahkan kalau angka itu kelihatan kecil dan ditulis di akhir kalimat sebagai "warna" — TETAP DILARANG. Boleh angka HANYA kalau itu fakta dari beritanya sendiri (Rp 145 miliar nilai kasus, 19 unit kendaraan disita, gaji Rp 400 ribu) — BUKAN angka dari analitik radar kita.
 
 CONTOH YANG BENAR (pesan-first murni, NOL angka):
 - ✓ "Hari Lahir Pancasila baru saja melewati kita. Sila kedua — 'Kemanusiaan yang Adil dan Beradab' — sangat selaras dengan perintah Allah dalam QS. An-Nahl: adil dan ihsan. Momen yang tepat untuk memulai hijrah etis di tempat kerja masing-masing: timbangan yang adil, janji yang ditepati, amanah yang dijaga. Mulailah dari satu keputusan kecil hari ini."

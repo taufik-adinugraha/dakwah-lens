@@ -463,6 +463,8 @@ PEDOMAN paragraf:
 
 OPENING YANG DIHINDARI — frase abstrak generic kayak "banjir berita korupsi", "rentetan kasus", "maraknya...", "fenomena...", "berita-berita yang kita lihat", "di tengah hiruk-pikuk" — kalau anchor di atas punya nama/angka spesifik, PAKAI itu, bukan generic abstraction. Tapi kalau anchor mengandung satu nama spesifik yang sama dengan flyer lain, ANGLE-nya yang dibedakan (mis. dampak korban vs respons institusi).
 
+JANGAN MENGUTIP COUNTER ANALITIK — flyer adalah surface DAKWAH, bukan dashboard data. JANGAN sebut angka post count internal dari radar kita: "Pekan ini 82 postingan tentang...", "X juta view", "Y ribu view", "Z cerita di feed", "naik X% dari baseline", "menembus N juta view". Angka analitik (volume postingan, view count, engagement %) adalah konteks operator, bukan konten flyer. Ganti dengan deskripsi kualitatif: "Pekan ini ramai diskusi tentang...", "Pekan ini muncul kasus...", "banyak cerita pribadi". Boleh sebut angka yang merupakan FAKTA dari berita itu sendiri (Rp 145 miliar nilai kasus, 19 unit kendaraan disita, gaji Rp 400 ribu) — tapi BUKAN angka dari analitik internal kita.
+
 ATURAN:
 - BAHASA INDONESIA 100% — tidak ada Arab, tidak ada potongan ayat/hadits dikutip langsung, tidak ada marker citation.
 - Panjang TARGET ~70 kata. Lebih boleh kalau memang butuh untuk narasi (cap ~90 kata). Jangan ngotot 70 kalau bikin paragraf jadi terpotong.
