@@ -42,8 +42,8 @@ const BEAT_SCHEDULE = [
   { name: "retry-failed-sentiment", task: "retry_failed_sentiment", beatTask: "retry_failed_sentiment", beatPlatform: "all", platform: "—", cron: "every 2h (odd hours WIB)", query: "(re-classify failed sentiment rows)" },
   { name: "ingest-youtube-channels", task: "run_ingest", beatTask: "youtube_channels_ingest", beatPlatform: "all", platform: "youtube", cron: "Wed 21:00 WIB", query: "(channel whitelist uploads)" },
   { name: "ingest-x-weekly", task: "run_ingest", beatTask: "rotating_ingest", beatPlatform: "x", platform: "x", cron: "Wed 22:00 WIB", query: "(rotating ingest_queries, lang:id)" },
-  { name: "ingest-tiktok-weekly", task: "run_ingest", beatTask: "rotating_ingest", beatPlatform: "tiktok", platform: "tiktok", cron: "Wed 22:10 WIB", query: "(rotating ingest_queries)" },
-  { name: "ingest-instagram-weekly", task: "run_ingest", beatTask: "rotating_ingest", beatPlatform: "instagram", platform: "instagram", cron: "Wed 22:20 WIB", query: "(rotating ingest_queries)" },
+  { name: "ingest-tiktok-weekly", task: "run_ingest", beatTask: "rotating_ingest", beatPlatform: "tiktok", platform: "tiktok", cron: "Wed 22:10 WIB", query: "(rotating ingest_queries)", pausedInBeat: true },
+  { name: "ingest-instagram-weekly", task: "run_ingest", beatTask: "rotating_ingest", beatPlatform: "instagram", platform: "instagram", cron: "Wed 22:20 WIB", query: "(rotating ingest_queries)", pausedInBeat: true },
   { name: "recluster-daily", task: "recluster_all", beatTask: "recluster_all", beatPlatform: "all", platform: "all", cron: "04:00 WIB daily", query: "(Gemini topic discovery)" },
   { name: "send-weekly-digest", task: "send_weekly_digest", beatTask: "send_weekly_digest", beatPlatform: "all", platform: "—", cron: "Thu 08:00 WIB", query: "(Resend → opt-in users)" },
   { name: "trending-ingest", task: "trending_ingest", beatTask: "trending_ingest", beatPlatform: "all", platform: "x+youtube", cron: "12:00 WIB daily", query: "(Trends + News RSS + YT mostPopular)" },
@@ -316,11 +316,18 @@ export default async function PipelinePage() {
               }
               const fkey = pipelineFlagKey(s.beatTask, s.beatPlatform);
               const enabled = flagsMap.get(fkey) ?? true;
+              // Rows whose entry is COMMENTED OUT in the Celery beat
+              // schedule render as "PAUSED" instead of an active toggle
+              // — toggling the kill switch would be misleading because
+              // beat won't fire them regardless. The row stays visible
+              // so the operator can see the historical schedule.
+              const pausedInBeat =
+                "pausedInBeat" in s && s.pausedInBeat === true;
               return (
                 <tr
                   key={s.name}
                   className={`border-b border-slate-50 last:border-0 ${
-                    enabled ? "" : "bg-slate-50/60"
+                    pausedInBeat || !enabled ? "bg-slate-50/60" : ""
                   }`}
                 >
                   <td className="py-2 font-mono text-xs text-slate-800">
@@ -331,7 +338,14 @@ export default async function PipelinePage() {
                   <td className="py-2 text-xs text-slate-500">{s.query}</td>
                   <td className="py-2 text-xs">{cell}</td>
                   <td className="py-2 text-right">
-                    {isSuperadmin ? (
+                    {pausedInBeat ? (
+                      <span
+                        title="Commented out in celery_app.py — re-add the schedule entry to make it fire again."
+                        className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-700 ring-1 ring-amber-200"
+                      >
+                        Paused in beat
+                      </span>
+                    ) : isSuperadmin ? (
                       <PipelineToggleSwitch
                         task={s.beatTask}
                         platform={s.beatPlatform}
