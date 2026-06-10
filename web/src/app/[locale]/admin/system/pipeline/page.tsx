@@ -270,10 +270,18 @@ export default async function PipelinePage() {
                   <span className="text-slate-400">no reconcile yet</span>
                 );
               } else {
-                // Match by parent (beatTask) + platform. Falls back to
-                // the legacy run_ingest match for schedules that
-                // haven't fired since the parent-row instrumentation
-                // landed (transient — clears after one beat tick).
+                // Match strictly by parent (beatTask + beatPlatform) —
+                // the row the schedule writes itself via the parent-level
+                // instrumentation (2026-06-10). No legacy fan-out
+                // fallback: the prior `task=run_ingest + platform` fallback
+                // latched onto fan-out children from OTHER schedules (e.g.
+                // trending_ingest's YouTube/X scrapers wrote `run_ingest,
+                // youtube`/`run_ingest, x` rows that this UI then attributed
+                // to ingest-youtube-channels / ingest-x-weekly, showing
+                // them as "2h ago" the day trending ran). Until the
+                // schedule's own beat tick has fired since instrumentation
+                // landed, we show "no runs yet" — accurate, and clears
+                // itself on the next legitimate run.
                 const matches = Array.isArray(latestPerTask)
                   ? latestPerTask.filter(
                       (l) =>
@@ -281,17 +289,7 @@ export default async function PipelinePage() {
                         l.platform === s.beatPlatform,
                     )
                   : [];
-                // Legacy fallback for the transient window between this
-                // code shipping and the first beat tick that writes the
-                // new parent-level ingest_runs row. Platform-strict so
-                // we don't reintroduce the cross-schedule conflation.
-                const legacyFallback = Array.isArray(latestPerTask)
-                  ? latestPerTask.filter(
-                      (l) =>
-                        l.task_name === s.task && l.platform === s.platform,
-                    )
-                  : [];
-                const latest = matches[0] ?? legacyFallback[0] ?? null;
+                const latest = matches[0] ?? null;
                 cell = latest ? (
                   <span
                     className={
