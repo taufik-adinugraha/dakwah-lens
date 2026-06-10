@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getLocale } from "next-intl/server";
 import { and, eq, inArray, ne } from "drizzle-orm";
 
 import { db, schema } from "@/db";
@@ -1322,11 +1323,24 @@ export async function updateIngestQuery(formData: FormData) {
   await setFlash("success", `Updated · ${query}`);
   revalidatePath("/admin/system/queries");
   // Drop ?edit=<id> from the URL so the row goes back to read-only view.
+  // CRITICAL (2026-06-10): the redirect target MUST include the locale
+  // prefix. `localePrefix: "always"` (see i18n/routing.ts) requires every
+  // URL to be `/id/…` or `/en/…`. A bare `/admin/system/queries` redirect
+  // from a Server Action makes Next.js's RSC-router navigate the client
+  // to the un-localized path, where the [locale]/layout.tsx server
+  // component receives `locale=undefined`. The layout's `auth()` then
+  // returns null in that broken context and `requireSystemAccess` falls
+  // through to a streaming `redirect('/login')`. Because the layout has
+  // already started streaming (Header awaits auth), Next.js can't 3xx
+  // and instead embeds a `<meta http-equiv="refresh">` — visible to the
+  // user as "URL bar stuck on /queries but the body is the login page".
+  // AGENTS.md flags this anti-pattern: i18n-aware redirects only.
+  const locale = await getLocale();
   const returnTo = String(formData.get("return_to") ?? "");
   if (returnTo.startsWith("/admin/system/queries")) {
-    redirect(returnTo);
+    redirect(`/${locale}${returnTo}`);
   }
-  redirect("/admin/system/queries");
+  redirect(`/${locale}/admin/system/queries`);
 }
 
 export async function deleteIngestQuery(formData: FormData) {
