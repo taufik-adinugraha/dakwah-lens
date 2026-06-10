@@ -676,6 +676,39 @@ def discover_topics(
             per_theme_floor = None
         if per_theme_floor is None or per_theme_floor < MIN_SIMILARITY:
             per_theme_floor = MIN_SIMILARITY
+        # CATEGORY-NOUN AUTO-RAISE (added 2026-06-10).
+        # When a label starts with a broad category noun (e.g. "Korupsi …",
+        # "Kekerasan …", "Pelecehan …", "Bencana …"), the centroid is wide
+        # and absorbs adjacent-domain noise at the global floor. The 2026-
+        # 06-10 audit of the morning recluster found:
+        #   · "Kekerasan Seksual & Penegakan Hukum" (224 posts) absorbed
+        #     an animal-attack story ("Bocah Tewas Digigit 4 Anjing
+        #     Pemburu Babi Hutan"), a Chinese-drama review, a political
+        #     stalking case, and a film-controversy thread.
+        #   · "Pelecehan & Kekerasan terhadap Anak" (250 posts) absorbed
+        #     a village-water-access news item and KPop parenting humor.
+        # Both themes emitted min_similarity at the global default; the
+        # prompt's soft guidance ("raise to 0.40 for broad nouns") was
+        # ignored by the LLM. Auto-raise these to 0.40 server-side so
+        # weak-cosine bleed-in routes to Lainnya instead of polluting
+        # the cluster.
+        _CATEGORY_NOUN_ROOTS = (
+            "korupsi",
+            "kekerasan",
+            "pelecehan",
+            "bencana",
+            "kriminalitas",
+            "peristiwa",
+            "kasus",
+            "penegakan",
+            "konflik",
+            "pelanggaran",
+            "kecelakaan",
+            "pencurian",
+        )
+        first_word = label.split()[0].lower() if label.split() else ""
+        if first_word in _CATEGORY_NOUN_ROOTS and per_theme_floor < 0.40:
+            per_theme_floor = 0.40
         per_theme_floor = min(per_theme_floor, 0.55)
         themes.append(
             {
