@@ -698,9 +698,19 @@ export function parseInlineDua(block: FlyerMessageBlock): DaleelRef | null {
   // means the regex matches either shape. Length floor 20 + cap 260
   // keeps it well above the `**Headline:** "..."` line (which was
   // already stripped above) and below run-on prose.
-  const transMatch = md.match(
-    /\*?\s*["“]([^"”*\n]{20,260})["”]\s*\*?/,
-  );
+  //
+  // PREFER the quote that appears AFTER the Arabic. Briefings sometimes
+  // include an explanation quote earlier in the body (e.g. "Beliau
+  // menjawab: '...'" describing the hadith context) which a simple
+  // first-match grabs instead of the actual du'a translation. The
+  // du'a translation by convention appears on the line immediately
+  // below the Arabic — so we search the slice after the Arabic first,
+  // and only fall back to the whole block when nothing matches there.
+  const quoteRegex = /\*?\s*["“]([^"”*\n]{20,260})["”]\s*\*?/;
+  const arabicEnd =
+    arabic.length > 0 ? md.indexOf(arabic) + arabic.length : -1;
+  const afterArabic = arabicEnd > -1 ? md.slice(arabicEnd) : "";
+  const transMatch = afterArabic.match(quoteRegex) ?? md.match(quoteRegex);
   const translation = transMatch?.[1]?.trim() ?? "";
 
   // Citation — prefer the explicit `**Daleel:**` marker on the block,
