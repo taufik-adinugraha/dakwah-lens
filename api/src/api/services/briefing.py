@@ -481,6 +481,14 @@ Output WAJIB 3 elemen — POSTER QUESTION, ARTIKEL, dan Q&A — dirancang berpas
 
 FORMAT output H4 untuk sub-section: gunakan `#### Poster Question`, `#### Artikel`, `#### Q&A Realistis`. Di dalam Q&A, gunakan bold inline `**Q:** ...` dan `**A:** ...`.
 
+**🚨 MANDATORY FORMAT — ANTI-DRIFT (2026-06-10):** untuk topik yang condong ke akademis (filsafat keadilan, kritik teori, romantisasi narasi, hermeneutika kitab, dll), LLM cenderung "drift" ke struktur jurnal akademis (Bagian I / Bagian II / Bagian III dengan bold-inline). INI DILARANG. Yang WAJIB:
+
+1. H3 heading PERSIS: `### Mahasiswa: Poster, Artikel & Diskusi — "<judul punchy>"`. JANGAN tulis `### Mahasiswa Pack — ...` atau variasi lain.
+2. Baris setelah H3 PERSIS satu baris `**Poster Question:** "..."` — JANGAN ganti dengan `**Topik artikel:**` / `**Latar belakang:**` / etc.
+3. H4 PERSIS `#### Artikel` — JANGAN pakai bold-inline `**Bagian I — ...**` / `**Bagian II — ...**` / `**Pembuka**` sebagai pengganti H4. Struktur 4-bagian (Pembuka / Argumen logis / Solusi praktis / Penutup) ada DI DALAM `#### Artikel`, sebagai paragraf mengalir — bukan sebagai sub-heading bold yang terpisah.
+4. H4 PERSIS `#### Q&A Realistis` dengan 5 pasang `**Q:** ... **A:** ...`. JANGAN HILANGKAN section ini, bahkan kalau topiknya sangat akademis — justru topik akademis BUTUH pushback paling banyak.
+5. Total panjang 900-1200 kata. Kalau lewat 1300 kata, kemungkinan besar struktur sudah drift ke jurnal akademis — periksa ulang.
+
 ### Aksi Sosial & Khidmah Umat (600-900 kata)
 Tulis SET aksi kecil-berdampak yang bisa dijalankan oleh komunitas LOKAL — RT, RW, masjid lingkungan, keluarga, pengurus pengajian, karang taruna. BUKAN ceramah, BUKAN konten — kegiatan nyata yang bisa diluncurkan dalam 1-2 minggu dengan EFFORT KECIL (1-5 orang penggerak, tanpa sertifikasi profesional) dan BUDGET KECIL (total di bawah Rp 2.000.000).
 
