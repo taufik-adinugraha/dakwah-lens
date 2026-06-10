@@ -1,4 +1,4 @@
-import { Pencil, Trash2, X } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { and, asc, eq, sql, type SQL } from "drizzle-orm";
 
 import { auth } from "@/auth";
@@ -8,7 +8,6 @@ import {
   addIngestQuery,
   deleteIngestQuery,
   toggleIngestQuery,
-  updateIngestQuery,
 } from "../actions";
 import {
   Card,
@@ -18,6 +17,7 @@ import {
   formatRelative,
 } from "../_ui";
 import { ConfirmForm } from "../_ConfirmForm";
+import { EditQueryRowForm } from "./EditQueryRowForm";
 import { QuerySearchForm } from "./QuerySearchForm";
 
 // YouTube migrated to a curated channel whitelist on 2026-05-20 — see
@@ -382,54 +382,14 @@ export default async function QueriesPage({
                         colSpan={isSuperadmin ? 6 : 5}
                         className="py-2"
                       >
-                        <form
-                          action={updateIngestQuery}
-                          className="flex flex-wrap items-center gap-2"
-                        >
-                          <input type="hidden" name="id" value={q.id} />
-                          <input
-                            type="hidden"
-                            name="return_to"
-                            value={returnTo}
-                          />
-                          <span className="inline-flex h-8 items-center rounded-md bg-slate-100 px-2 text-[11px] font-semibold uppercase tracking-wider text-slate-600">
-                            {q.platform}
-                          </span>
-                          <input
-                            name="query"
-                            defaultValue={q.query}
-                            required
-                            maxLength={160}
-                            autoFocus
-                            className="h-8 flex-1 min-w-[12rem] rounded-md border border-slate-300 px-2 font-mono text-xs"
-                          />
-                          <select
-                            name="category"
-                            defaultValue={q.category ?? ""}
-                            className="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs"
-                          >
-                            <option value="">(none)</option>
-                            {CATEGORIES.map((c) => (
-                              <option key={c} value={c}>
-                                {c.replace(/_/g, " ")}
-                              </option>
-                            ))}
-                          </select>
-                          <button
-                            type="submit"
-                            className="inline-flex h-8 items-center justify-center rounded-md bg-slate-900 px-3 text-xs font-semibold text-white hover:bg-slate-800"
-                          >
-                            Save
-                          </button>
-                          <Link
-                            href={returnTo}
-                            scroll={false}
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-                            aria-label="Cancel edit"
-                          >
-                            <X className="h-4 w-4" />
-                          </Link>
-                        </form>
+                        <EditQueryRowForm
+                          id={q.id}
+                          platform={q.platform}
+                          initialQuery={q.query}
+                          initialCategory={q.category}
+                          returnTo={returnTo}
+                          categories={CATEGORIES}
+                        />
                       </td>
                     </tr>
                   );
