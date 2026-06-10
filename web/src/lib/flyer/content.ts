@@ -1156,14 +1156,29 @@ export function extractMahasiswaContent(markdown: string): MahasiswaContent {
   const body = sliceMahasiswaSection(markdown);
   if (!body) return { question: "", article: "", qa: [] };
 
-  // Poster Question marker — same regex as extractPosterQuestion below.
+  // Poster Question marker — primary form, used by briefings that
+  // follow the prescribed Hukum-style template.
   const qMatch = body.match(
     /^\s*\*\*\s*(?:poster\s+question|pertanyaan\s+poster|pertanyaan\s+pemicu)\s*[:：]\s*\*\*\s*["“]?(.+?)["”]?\s*$/im,
   );
-  const question = qMatch?.[1]?.trim().replace(/^["“]\s*|\s*["”]$/g, "") ?? "";
+  // Fallback: some briefings (e.g. Inspirasi, Toleransi from 2026-06-07)
+  // ship a `**Topik artikel:**` marker instead. Use that as the title
+  // when Poster Question is absent — gives the /m/{slug} hero card a
+  // headline so the page still renders.
+  const topikMatch = body.match(
+    /^\s*\*\*\s*(?:topik\s+artikel|article\s+topic)\s*[:：]\s*\*\*\s*["“]?(.+?)["”]?\s*$/im,
+  );
+  // Last resort: pull the H3 title's quoted phrase (e.g.
+  // `### Mahasiswa Pack — "Romantisasi Kemiskinan..."`).
+  const headingTitle = markdown.match(
+    /^###\s+(?:Mahasiswa|University Student)[^\n]*?["“]([^"”]+)["”]/im,
+  );
+  const question =
+    (qMatch?.[1] ?? topikMatch?.[1] ?? headingTitle?.[1] ?? "")
+      .trim()
+      .replace(/^["“]\s*|\s*["”]$/g, "");
 
-  // Article section — everything between `#### Artikel` and the next
-  // `#### ` heading (which is `#### Q&A Realistis` / `Q & A`).
+  // Article section — primary form: between `#### Artikel` and `#### Q&A`.
   const articleStart = body.search(
     /^####\s+(?:artikel|article)\b/im,
   );
@@ -1175,6 +1190,24 @@ export function extractMahasiswaContent(markdown: string): MahasiswaContent {
       .slice(articleStart, aEnd)
       .replace(/^####\s+[^\n]+\n?/, "")
       .trim();
+  } else {
+    // Fallback: no `#### Artikel` heading — assume the entire section
+    // body IS the article (after stripping the `**Topik artikel:**`
+    // metadata line and any leading blank lines). This handles the
+    // Inspirasi/Toleransi "Bagian I / Bagian II / ..." format the LLM
+    // sometimes emits instead of `#### Artikel`.
+    const aEnd = qaStart >= 0 ? qaStart : body.length;
+    article = body
+      .slice(0, aEnd)
+      .replace(
+        /^\s*\*\*\s*(?:topik\s+artikel|article\s+topic)\s*[:：]\s*\*\*[^\n]*\n?/im,
+        "",
+      )
+      .replace(
+        /^\s*\*\*\s*(?:poster\s+question|pertanyaan\s+poster|pertanyaan\s+pemicu)\s*[:：]\s*\*\*[^\n]*\n?/im,
+        "",
+      )
+      .trim();
   }
 
   // Q&A block — pull each **Q:** / **A:** pair.
@@ -1184,9 +1217,6 @@ export function extractMahasiswaContent(markdown: string): MahasiswaContent {
   }
   const qa: MahasiswaQAPair[] = [];
   if (qaBody) {
-    // Pair regex tolerates the LLM occasionally writing `**Q:**\n…` or
-    // wrapping the answer in a new paragraph. We just grab the chunks
-    // between successive Q markers.
     const qSplits = qaBody
       .split(/^\s*\*\*\s*Q\s*[:：]\s*\*\*\s*/im)
       .slice(1);
