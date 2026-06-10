@@ -115,11 +115,20 @@ function _isThinLeadIn(s: string): boolean {
  *  intro-to-teaching boundary. */
 function stripNarratorIntro(text: string): string {
   const head = text.slice(0, 280);
-  // Match: `:` or `.` then ≤ 40 non-quote chars then an opening quote.
-  // The intermediate chars allow connectors like " (Yaitu) " between
-  // the end of the narrator sentence and the opening of the teaching
-  // quote.
-  const match = head.match(/[:.][^'"‘“„]{0,40}\s*(['"‘“„])/);
+  // Match: `:` or `.` then ≤ 40 non-quote chars then ≥1 whitespace
+  // then an opening quote. The intermediate chars allow connectors like
+  // " (Yaitu) " between the narrator sentence and the teaching quote.
+  //
+  // The `\s+` (was `\s*` until 2026-06-11) is load-bearing: it prevents
+  // the regex from matching the straight-single-quote `'` (U+0027) in
+  // words like "Qur'an" or "Allah's" as the teaching opening. Real bug:
+  // Sahih al-Bukhari 2675's translation "... Lalu turunlah ayat
+  // Al-Qur'an berikut: \"Sesungguhnya...\"" was getting sliced AFTER
+  // the apostrophe in "Qur'an", leaving the daleel card rendering
+  // "an berikut: \"Sesungguhnya...\"". Apostrophes inside words have
+  // zero whitespace before them, so requiring `\s+` cleanly rejects
+  // them while still matching "intro: 'TEACHING'" (space before quote).
+  const match = head.match(/[:.][^'"‘“„]{0,40}\s+(['"‘“„])/);
   if (!match || match.index === undefined) return text;
   const quoteEnd = match.index + match[0].length;
   const stripped = text
@@ -646,7 +655,15 @@ export function extractDedicatedFlyerBlock(
   let bodyMd = rawBlock;
   if (headlineMatch) bodyMd = bodyMd.replace(headlineMatch[0], "");
   if (daleelMatch) bodyMd = bodyMd.replace(daleelMatch[0], "");
-  const body = trimToSentences(stripMd(bodyMd), 4, 360);
+  // Cap raised from (4, 360) → (5, 600) on 2026-06-11 because the
+  // hand-composed daleel-first flyer bodies run 5 sentences and
+  // ~400-550 chars (briefing-anchor sentence + daleel bridge + voice
+  // development + concrete action + timeframe). The old cap dropped
+  // the action handle, which is the most load-bearing sentence on
+  // Aksi Sosial flyers. SplitImage's content panel has ~330px of
+  // vertical room at 22px font + 1.5 line-height before the daleel
+  // card (maxHeight 260px) would have to compress.
+  const body = trimToSentences(stripMd(bodyMd), 5, 600);
 
   // tidyHeadline now correctly strips surrounding quotes AFTER em-dash
   // tail removal (fixed 2026-06-09), so no pre-strip needed here.
