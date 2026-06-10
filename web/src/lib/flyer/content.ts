@@ -782,7 +782,15 @@ export function stripInlineDua(block: FlyerMessageBlock): string {
   // the returned prose matches `body`'s display shape (no `**bold**`,
   // no `*italic*`, no `### headings`).
   body = body.replace(/\s+/g, " ").trim();
-  return trimToSentences(stripMd(body), 4, 360);
+  // Cap matched to extractDedicatedFlyerBlock (5, 600) on 2026-06-11
+  // — the inline-du'a slots (5 + 6) carry the same ~80-word bodies as
+  // the regular slots, and the old (4, 360) was sliding the post-strip
+  // body down to a single date-stub sentence ("Sembilan hari lagi 1
+  // Muharram 1448 H tiba.") on Konflik slot 5, dropping the actual
+  // sunnah teaching + the action handle. The Arabic+translation card
+  // takes less vertical room than a kitab daleel card, so the body has
+  // even more space here than on regular slots.
+  return trimToSentences(stripMd(body), 5, 600);
 }
 
 /** Find the daleel in the retrieved pool whose `citation` (case- and
