@@ -376,6 +376,68 @@ Hindari nested subordinate clauses, register formal scholar, kerangka analisis. 
 
 **FORMATTING — tidak boleh ALL CAPS untuk emphasis** (per memory rule). Gunakan markdown **bold** atau *italic* jika perlu emphasis. JANGAN tulis kata kunci dalam huruf kapital semua ("BUKAN", "TIDAK", "HARUS") — itu shouty WhatsApp style.
 
+**🎯 CANONICAL TEMPLATE (etched 2026-06-10, follow this shape):**
+
+```
+### Kisah Pendek — "[Judul singkat & evocative]"
+
+[Pembuka 1 paragraf ~70 kata: bridge ke tema pekan ini dalam 1 kalimat,
+lalu perkenalkan kisah + sebut kitab/fasal di kalimat ke-2 atau 3.
+Jangan bocorkan ibrah-nya.]
+
+[Paragraf cerita 1 — buka adegan dengan tokoh + setting konkret. Kalimat
+pendek. Contoh: "Abu Thalhah sahabat Madinah yang kaya. Punya banyak
+kebun kurma. Yang paling beliau cintai bernama Bayrahā'."]
+
+[Paragraf cerita 2 — kembangkan adegan. Vivid detail.]
+
+[Saat kutip Arab dari teks asli, gunakan block-quote `> ...` di baris
+sendiri:]
+
+> لَن تَنَالُوا۟ ٱلْبِرَّ حَتَّىٰ تُنفِقُوا۟ مِمَّا تُحِبُّونَ
+
+"[Terjemahan dalam Bahasa Indonesia yang mengalir.]" (QS. Ali Imran: 92)
+
+[Lanjut paragraf cerita berikutnya. Dialog langsung dengan tanda kutip
+ganda. "Apakah engkau telah memberi makan tamumu malam ini?" Beri
+petunjuk emosi tokoh dengan ringkas.]
+
+[Paragraf cerita 3-7 — pace tetap cepat. Setiap paragraf 2-5 kalimat.]
+
+#### Pelajaran
+
+[1 paragraf ringkas ~120-160 kata: tarik SATU ibrah inti dari kisah,
+kembali ke detail spesifik kisah supaya konkret. Boleh 1-2 kalimat
+penutup yang menghubungkan ke pembaca pekan ini. **Jangan struktur 3
+lapis** ("Pelajaran pertama / kedua / ketiga") — itu format kultum.]
+
+#### Sumber Asli
+
+**[KISAH_LABEL] — [judul fasal/bagian]**
+
+> [Teks Arab asli, dipotong agar pas — boleh `…` untuk penghematan jika
+> fasal asli sangat panjang.]
+
+> [Fasal berikutnya jika ada, block-quote terpisah.]
+```
+
+**Target metrics** (per 2026-06-10 sample Aqidah v2 yang user approved):
+- Total chars: 5,000-7,000 (termasuk Arabic appendix)
+- Total words: 700-1,100
+- Pembuka: 1 paragraf, 60-90 kata
+- Retell: 6-10 short paragraphs total (rata-rata 50-100 kata per paragraf, lebih pendek lebih baik)
+- Pelajaran: 1 paragraf, 120-180 kata (BUKAN multi-lapis)
+- Sumber Asli: 2-4 block-quote Arab terpisah, masing-masing 100-300 chars
+
+**Anti-patterns yang sering muncul (HINDARI):**
+- Multi-paragraph Pelajaran dengan "Pertama... Kedua... Ketiga..." → ini format kultum, bukan kisah
+- Q&A asides di tengah retell
+- Long contextual essay di pembuka (referensi statistik pekan, multi-kalimat tentang feed publik)
+- Inline transliterasi Latin Arab di tengah kalimat ("kata Rasulullah ﷺ: bakhin bakhin")
+- Nested subordinate clauses ("yang... yang... yang...")
+- Voice akademis ("dari perspektif teologi", "kerangka analisis")
+- ALL CAPS untuk emphasis
+
 CRITICAL — SUMBER KISAH (aturan keras, jangan dilanggar):
 - KISAH POOL berisi FASAL/BAGIAN dari «KISAH_LABEL» (kalau lebih dari satu fasal, urutan asli kitab — paling kecil section_id dulu, lalu menaik — yaitu SATU episode kontinyu yang sengaja ditarik berdekatan supaya kisahnya utuh; kalau hanya satu fasal, itu memang seksi mandiri yang sudah substansial).
 - Ceritakan ulang fasal-fasal itu sebagai SATU narasi utuh. JANGAN potong di tengah, JANGAN melompat keluar urutan.
