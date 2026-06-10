@@ -28,6 +28,7 @@ from api.services import (
     metrics,
     trending_topics,
 )
+from api.services.pipeline_flags import is_task_enabled
 from api.workers.celery_app import celery_app
 
 log = structlog.get_logger()
@@ -63,6 +64,21 @@ def run_ingest(
     just retry twice and then give up — beat will fire again on the next
     schedule tick anyway.
     """
+    # Kill-switch ONLY for the direct-from-beat mainstream invocation
+    # (no channel_id, no youtube_search, no actor override → this isn't
+    # a fan-out child from rotating_ingest / youtube_channels_ingest /
+    # trending_ingest, all of which have their own kill switch upstream
+    # and pass these args). Disabling the mainstream toggle in the admin
+    # UI must NOT silently block fan-out children.
+    is_direct_mainstream_beat = (
+        platform == "mainstream"
+        and channel_id is None
+        and not youtube_search
+        and actor_id is None
+    )
+    if is_direct_mainstream_beat and not is_task_enabled("run_ingest", "mainstream"):
+        log.info("pipeline.disabled", task="run_ingest", platform="mainstream")
+        return 0
 
     async def _runner() -> int:
         run_id = await ingest_runs.start_run(
@@ -130,6 +146,9 @@ def rotating_ingest(
     failed — that would starve the rest of the rotation. Admin can
     disable a structurally-broken keyword via /admin/system/queries.
     """
+    if not is_task_enabled("rotating_ingest", platform):
+        log.info("pipeline.disabled", task="rotating_ingest", platform=platform)
+        return {"disabled": True, "dispatched": 0, "platform": platform}
 
     async def _pick_and_mark() -> list[tuple]:
         picked = await ingest_queries.pick_next_queries(platform, n=n_keywords)
@@ -191,6 +210,10 @@ def youtube_channels_ingest(self, limit: int = 50) -> dict[str, object]:
     — same rationale as the keyword rotator: a failing child shouldn't
     starve the rest of the curated whitelist.
     """
+    if not is_task_enabled("youtube_channels_ingest", "all"):
+        log.info("pipeline.disabled", task="youtube_channels_ingest")
+        return {"disabled": True, "dispatched": 0, "channels": []}
+
     from sqlalchemy import select, update
 
     from api.db import SessionLocal
@@ -279,6 +302,10 @@ def trending_ingest() -> dict[str, object]:
     "free" actor isn't free at $0.004/item). The relevance filter upstream
     keeps keyword count to the dakwah-signal subset (~8/day observed).
     """
+    if not is_task_enabled("trending_ingest", "all"):
+        log.info("pipeline.disabled", task="trending_ingest")
+        return {"disabled": True, "keywords": [], "dispatched": 0}
+
     # Per-keyword caps. X bumped 20 → 100 (2026-05-26) for sample depth
     # (sentiment / opinion diversity for clustering + briefing headlines).
     # YouTube capped at 25 — search.list maxResults ceils at 50, and 25
@@ -329,6 +356,9 @@ def recluster_all(platforms: list[str] | None = None) -> dict[str, int]:
     Idempotent — each run truncates `topics` and writes fresh unified
     rows from the most recent corpus.
     """
+    if not is_task_enabled("recluster_all", "all"):
+        log.info("pipeline.disabled", task="recluster_all")
+        return {"all": 0, "disabled": True}
 
     async def _runner() -> dict[str, int]:
         run_id = await ingest_runs.start_run(
@@ -357,6 +387,10 @@ def send_weekly_digest() -> dict[str, object]:
     `insights_summaries` as the body. Free up to 3K emails/month via
     Resend.
     """
+    if not is_task_enabled("send_weekly_digest", "all"):
+        log.info("pipeline.disabled", task="send_weekly_digest")
+        return {"disabled": True}
+
     try:
         result = asyncio.run(email_digest.send_weekly_digests())
         return result or {"skipped": True}
@@ -382,6 +416,10 @@ def generate_briefings() -> dict[str, object]:
     Renamed from `generate_insights_summary` 2026-06-05 (Scope C).
     Widened from top-5 to all-above-floor 2026-06-05.
     """
+    if not is_task_enabled("generate_briefings", "all"):
+        log.info("pipeline.disabled", task="generate_briefings")
+        return {"disabled": True}
+
     try:
         result = asyncio.run(briefing.generate_all_briefings())
         return result
@@ -407,6 +445,10 @@ def retry_failed_sentiment() -> dict[str, int]:
     … WIB). The offset means an RSS-induced 503 has a full hour to
     recover before we try the failed rows again.
     """
+    if not is_task_enabled("retry_failed_sentiment", "all"):
+        log.info("pipeline.disabled", task="retry_failed_sentiment")
+        return {"checked": 0, "relabeled": 0, "still_failed": 0, "disabled": True}
+
     from sqlalchemy import and_, select, update
 
     from api.db import SessionLocal
@@ -485,6 +527,10 @@ def reconcile_apify_costs() -> dict[str, object]:
     failed runs + rounds small runs to $0) and the real dashboard total.
     Idempotent — re-runs the same day are no-ops.
     """
+    if not is_task_enabled("reconcile_apify_costs", "all"):
+        log.info("pipeline.disabled", task="reconcile_apify_costs")
+        return {"disabled": True}
+
     try:
         return asyncio.run(billing.reconcile_apify_monthly())
     except Exception:
@@ -500,6 +546,9 @@ def snapshot_system() -> None:
     100% local syscalls) get logged but don't retry: we'd rather miss one
     sample than queue up failures.
     """
+    if not is_task_enabled("snapshot_system", "host"):
+        return None
+
     try:
         asyncio.run(metrics.persist_snapshot())
     except Exception:

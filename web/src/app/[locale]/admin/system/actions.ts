@@ -13,7 +13,11 @@ import {
   type AttachmentKind,
 } from "@/lib/attachments";
 import { KNOWN_PROVIDERS } from "@/lib/cost-providers";
-import { getUsdToIdr, setUsdToIdr } from "@/lib/settings";
+import {
+  getUsdToIdr,
+  setPipelineEnabled,
+  setUsdToIdr,
+} from "@/lib/settings";
 import { requireSuperadmin, requireSystemAccess } from "@/lib/superadmin";
 
 /** Pull an uploaded file from FormData, persist it to disk, return
@@ -1387,6 +1391,35 @@ export async function deleteContactMessage(formData: FormData) {
 /* ────────────────────────────────────────────────────────────
  * App settings — currently just the USD→IDR display rate.
  * ──────────────────────────────────────────────────────────── */
+
+/* ────────────────────────────────────────────────────────────
+ * Pipeline kill switches — toggle a Celery beat schedule entry
+ * without redeploying. Backed by app_settings via setPipelineEnabled.
+ * The Python side reads the same row at the top of each task body —
+ * see api/src/api/services/pipeline_flags.py.
+ * ──────────────────────────────────────────────────────────── */
+
+export async function togglePipelineSchedule(formData: FormData) {
+  const session = await requireSuperadmin();
+  const task = String(formData.get("task") ?? "").trim();
+  const platform = String(formData.get("platform") ?? "").trim();
+  const currentEnabled = formData.get("enabled") === "true";
+  if (!task || !platform) return;
+  const newEnabled = !currentEnabled;
+  await setPipelineEnabled(task, platform, newEnabled);
+  await logAdminAction({
+    actorId: session.user.id,
+    action: "pipeline.toggle",
+    targetType: "pipeline_schedule",
+    targetId: `${task}:${platform}`,
+    payload: { task, platform, enabled: newEnabled },
+  });
+  await setFlash(
+    "success",
+    `${newEnabled ? "Enabled" : "Disabled"} · ${task} (${platform})`,
+  );
+  revalidatePath("/admin/system/pipeline");
+}
 
 export async function updateFxRate(formData: FormData) {
   const session = await requireSuperadmin();

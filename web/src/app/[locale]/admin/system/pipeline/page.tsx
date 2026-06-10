@@ -1,6 +1,12 @@
 import { desc, sql } from "drizzle-orm";
 
+import { auth } from "@/auth";
 import { db, schema } from "@/db";
+import {
+  getPipelineFlagsMap,
+  pipelineFlagKey,
+} from "@/lib/settings";
+import { togglePipelineSchedule } from "../actions";
 import {
   Card,
   EmptyState,
@@ -25,18 +31,24 @@ import {
 //   snapshot_system          → system_metrics.captured_at
 //   reconcile_apify_costs    → usage_events.operation='billing_reconcile'
 //   trending_ingest          → usage_events.operation='trending_filter'
+//
+// `beatTask` + `beatPlatform` are the schedule's actual top-level
+// Celery task (NOT the per-platform `run_ingest` children fanned out
+// underneath). They key the kill-switch row in `app_settings`. The
+// Python side at `services/pipeline_flags.py::is_task_enabled` reads
+// the same pair at the top of each beat-level task.
 const BEAT_SCHEDULE = [
-  { name: "ingest-mainstream", task: "run_ingest", platform: "mainstream", cron: "every 2h (even hours WIB)", query: "(all enabled RSS feeds)" },
-  { name: "retry-failed-sentiment", task: "retry_failed_sentiment", platform: "—", cron: "every 2h (odd hours WIB)", query: "(re-classify failed sentiment rows)" },
-  { name: "ingest-youtube-channels", task: "run_ingest", platform: "youtube", cron: "Wed 21:00 WIB", query: "(channel whitelist uploads)" },
-  { name: "ingest-x-weekly", task: "run_ingest", platform: "x", cron: "Wed 22:00 WIB", query: "(rotating ingest_queries, lang:id)" },
-  { name: "ingest-tiktok-weekly", task: "run_ingest", platform: "tiktok", cron: "Wed 22:10 WIB", query: "(rotating ingest_queries)" },
-  { name: "ingest-instagram-weekly", task: "run_ingest", platform: "instagram", cron: "Wed 22:20 WIB", query: "(rotating ingest_queries)" },
-  { name: "recluster-daily", task: "recluster_all", platform: "all", cron: "04:00 WIB daily", query: "(Gemini topic discovery)" },
-  { name: "send-weekly-digest", task: "send_weekly_digest", platform: "—", cron: "Thu 08:00 WIB", query: "(Resend → opt-in users)" },
-  { name: "trending-ingest", task: "trending_ingest", platform: "x+youtube", cron: "12:00 WIB daily", query: "(Trends + News RSS + YT mostPopular)" },
-  { name: "reconcile-apify-costs", task: "reconcile_apify_costs", platform: "—", cron: "06:00 WIB daily", query: "(Apify billing reconcile)" },
-  { name: "snapshot-system", task: "snapshot_system", platform: "host", cron: "every 60s", query: "—" },
+  { name: "ingest-mainstream", task: "run_ingest", beatTask: "run_ingest", beatPlatform: "mainstream", platform: "mainstream", cron: "every 2h (even hours WIB)", query: "(all enabled RSS feeds)" },
+  { name: "retry-failed-sentiment", task: "retry_failed_sentiment", beatTask: "retry_failed_sentiment", beatPlatform: "all", platform: "—", cron: "every 2h (odd hours WIB)", query: "(re-classify failed sentiment rows)" },
+  { name: "ingest-youtube-channels", task: "run_ingest", beatTask: "youtube_channels_ingest", beatPlatform: "all", platform: "youtube", cron: "Wed 21:00 WIB", query: "(channel whitelist uploads)" },
+  { name: "ingest-x-weekly", task: "run_ingest", beatTask: "rotating_ingest", beatPlatform: "x", platform: "x", cron: "Wed 22:00 WIB", query: "(rotating ingest_queries, lang:id)" },
+  { name: "ingest-tiktok-weekly", task: "run_ingest", beatTask: "rotating_ingest", beatPlatform: "tiktok", platform: "tiktok", cron: "Wed 22:10 WIB", query: "(rotating ingest_queries)" },
+  { name: "ingest-instagram-weekly", task: "run_ingest", beatTask: "rotating_ingest", beatPlatform: "instagram", platform: "instagram", cron: "Wed 22:20 WIB", query: "(rotating ingest_queries)" },
+  { name: "recluster-daily", task: "recluster_all", beatTask: "recluster_all", beatPlatform: "all", platform: "all", cron: "04:00 WIB daily", query: "(Gemini topic discovery)" },
+  { name: "send-weekly-digest", task: "send_weekly_digest", beatTask: "send_weekly_digest", beatPlatform: "all", platform: "—", cron: "Thu 08:00 WIB", query: "(Resend → opt-in users)" },
+  { name: "trending-ingest", task: "trending_ingest", beatTask: "trending_ingest", beatPlatform: "all", platform: "x+youtube", cron: "12:00 WIB daily", query: "(Trends + News RSS + YT mostPopular)" },
+  { name: "reconcile-apify-costs", task: "reconcile_apify_costs", beatTask: "reconcile_apify_costs", beatPlatform: "all", platform: "—", cron: "06:00 WIB daily", query: "(Apify billing reconcile)" },
+  { name: "snapshot-system", task: "snapshot_system", beatTask: "snapshot_system", beatPlatform: "host", platform: "host", cron: "every 60s", query: "—" },
 ] as const;
 
 // Background tasks (Celery `recluster_all`, `snapshot_system`,
@@ -48,6 +60,16 @@ const BEAT_SCHEDULE = [
 export const dynamic = "force-dynamic";
 
 export default async function PipelinePage() {
+  const session = await auth();
+  const isSuperadmin = session?.user?.role === "superadmin";
+  // Resolve the per-schedule kill-switch state. One settings row per
+  // (task, platform) pair; default-true when no row exists so an
+  // un-touched install keeps the historical "beat fires everything"
+  // behavior. Mirrors Python `services/pipeline_flags.is_task_enabled`.
+  const flagKeys = BEAT_SCHEDULE.map((s) =>
+    pipelineFlagKey(s.beatTask, s.beatPlatform),
+  );
+  const flagsMap = await getPipelineFlagsMap(flagKeys);
   // Three tasks don't write to ingest_runs at all — they predate the
   // run-tracking convention and write directly to their own tables:
   //   - snapshot_system → system_metrics (every 60s)
@@ -227,6 +249,7 @@ export default async function PipelinePage() {
               <th className="py-2">Cron</th>
               <th className="py-2">Query</th>
               <th className="py-2">Latest run</th>
+              <th className="py-2 text-right">State</th>
             </tr>
           </thead>
           <tbody>
@@ -291,8 +314,15 @@ export default async function PipelinePage() {
                   <span className="text-slate-400">no runs yet</span>
                 );
               }
+              const fkey = pipelineFlagKey(s.beatTask, s.beatPlatform);
+              const enabled = flagsMap.get(fkey) ?? true;
               return (
-                <tr key={s.name} className="border-b border-slate-50 last:border-0">
+                <tr
+                  key={s.name}
+                  className={`border-b border-slate-50 last:border-0 ${
+                    enabled ? "" : "bg-slate-50/60"
+                  }`}
+                >
                   <td className="py-2 font-mono text-xs text-slate-800">
                     {s.name}
                   </td>
@@ -300,6 +330,26 @@ export default async function PipelinePage() {
                   <td className="py-2 text-xs text-slate-600">{s.cron}</td>
                   <td className="py-2 text-xs text-slate-500">{s.query}</td>
                   <td className="py-2 text-xs">{cell}</td>
+                  <td className="py-2 text-right">
+                    {isSuperadmin ? (
+                      <PipelineToggleSwitch
+                        task={s.beatTask}
+                        platform={s.beatPlatform}
+                        enabled={enabled}
+                        label={s.name}
+                      />
+                    ) : (
+                      <span
+                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ring-1 ${
+                          enabled
+                            ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
+                            : "bg-slate-100 text-slate-500 ring-slate-200"
+                        }`}
+                      >
+                        {enabled ? "Enabled" : "Disabled"}
+                      </span>
+                    )}
+                  </td>
                 </tr>
               );
             })}
@@ -395,5 +445,39 @@ export default async function PipelinePage() {
         ) : null}
       </Card>
     </>
+  );
+}
+
+function PipelineToggleSwitch({
+  task,
+  platform,
+  enabled,
+  label,
+}: {
+  task: string;
+  platform: string;
+  enabled: boolean;
+  label: string;
+}) {
+  return (
+    <form action={togglePipelineSchedule} className="inline-flex">
+      <input type="hidden" name="task" value={task} />
+      <input type="hidden" name="platform" value={platform} />
+      <input type="hidden" name="enabled" value={String(enabled)} />
+      <button
+        type="submit"
+        aria-pressed={enabled}
+        aria-label={`${enabled ? "Disable" : "Enable"} ${label}`}
+        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors ${
+          enabled ? "bg-emerald-500" : "bg-slate-200"
+        }`}
+      >
+        <span
+          className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${
+            enabled ? "translate-x-[18px]" : "translate-x-0.5"
+          }`}
+        />
+      </button>
+    </form>
   );
 }
