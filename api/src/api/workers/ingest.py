@@ -150,18 +150,37 @@ def rotating_ingest(
         log.info("pipeline.disabled", task="rotating_ingest", platform=platform)
         return {"disabled": True, "dispatched": 0, "platform": platform}
 
-    async def _pick_and_mark() -> list[tuple]:
-        picked = await ingest_queries.pick_next_queries(platform, n=n_keywords)
-        if picked:
-            await ingest_queries.mark_used_many([qid for qid, _ in picked])
-        return picked
+    # Parent-level ingest_runs row so the /admin/system/pipeline UI can
+    # distinguish "this weekly schedule fired" from "trending_ingest's
+    # daily fan-out for the same platform fired". The fan-out children
+    # below ALSO log their own per-keyword ingest_runs row (task_name
+    # = "run_ingest") — both layers are useful: parent for schedule
+    # health, children for per-keyword scrape outcome.
+    async def _runner() -> dict[str, object]:
+        run_id = await ingest_runs.start_run(
+            task_name="rotating_ingest", platform=platform
+        )
+        try:
+            picked = await ingest_queries.pick_next_queries(platform, n=n_keywords)
+            if picked:
+                await ingest_queries.mark_used_many([qid for qid, _ in picked])
+            await ingest_runs.finish_run(
+                run_id, status="success", items_stored=len(picked)
+            )
+            return {"picked": picked, "run_id": str(run_id)}
+        except Exception as exc:
+            await ingest_runs.finish_run(
+                run_id, status="failed", error=str(exc)
+            )
+            raise
 
     try:
-        picked = asyncio.run(_pick_and_mark())
+        result = asyncio.run(_runner())
     except Exception as exc:
         log.exception("rotating_ingest.pick_failed", platform=platform)
         raise self.retry(exc=exc, countdown=300 * (2**self.request.retries)) from exc
 
+    picked = result["picked"]
     if not picked:
         log.warning("rotating_ingest.no_queries", platform=platform)
         return {"platform": platform, "dispatched": 0, "keywords": []}
@@ -219,30 +238,49 @@ def youtube_channels_ingest(self, limit: int = 50) -> dict[str, object]:
     from api.db import SessionLocal
     from api.models.admin import YoutubeChannel
 
-    async def _pick_and_mark() -> list[tuple[str, str]]:
-        async with SessionLocal() as session:
-            res = await session.execute(
-                select(
-                    YoutubeChannel.id,
-                    YoutubeChannel.channel_id,
-                    YoutubeChannel.name,
+    # Parent-level ingest_runs row — see the rotating_ingest comment.
+    # platform="all" mirrors the schedule's beatPlatform in the admin
+    # BEAT_SCHEDULE (and the kill-switch key) so the pipeline UI can
+    # match (youtube_channels_ingest, all) cleanly.
+    async def _runner() -> list[tuple[str, str]]:
+        run_id = await ingest_runs.start_run(
+            task_name="youtube_channels_ingest", platform="all"
+        )
+        try:
+            async with SessionLocal() as session:
+                res = await session.execute(
+                    select(
+                        YoutubeChannel.id,
+                        YoutubeChannel.channel_id,
+                        YoutubeChannel.name,
+                    )
+                    .where(YoutubeChannel.enabled.is_(True))
+                    .where(YoutubeChannel.verified.is_(True))
                 )
-                .where(YoutubeChannel.enabled.is_(True))
-                .where(YoutubeChannel.verified.is_(True))
+                rows = list(res.all())
+                if not rows:
+                    await ingest_runs.finish_run(
+                        run_id, status="success", items_stored=0
+                    )
+                    return []
+                await session.execute(
+                    update(YoutubeChannel)
+                    .where(YoutubeChannel.id.in_([r[0] for r in rows]))
+                    .values(last_run_at=datetime.now(UTC))
+                )
+                await session.commit()
+            await ingest_runs.finish_run(
+                run_id, status="success", items_stored=len(rows)
             )
-            rows = list(res.all())
-            if not rows:
-                return []
-            await session.execute(
-                update(YoutubeChannel)
-                .where(YoutubeChannel.id.in_([r[0] for r in rows]))
-                .values(last_run_at=datetime.now(UTC))
-            )
-            await session.commit()
             return [(r[1], r[2]) for r in rows]
+        except Exception as exc:
+            await ingest_runs.finish_run(
+                run_id, status="failed", error=str(exc)
+            )
+            raise
 
     try:
-        picked = asyncio.run(_pick_and_mark())
+        picked = asyncio.run(_runner())
     except Exception as exc:
         log.exception("youtube_channels_ingest.pick_failed")
         raise self.retry(exc=exc, countdown=300 * (2**self.request.retries)) from exc
@@ -313,7 +351,36 @@ def trending_ingest() -> dict[str, object]:
     X_LIMIT = 100
     YT_LIMIT = 25
 
-    keywords = trending_topics.get_trending_keywords()
+    # Parent-level ingest_runs row — see the rotating_ingest comment.
+    # platform="all" mirrors the schedule's beatPlatform in the admin
+    # BEAT_SCHEDULE so the pipeline UI matches (trending_ingest, all)
+    # against this parent row rather than the run_ingest fan-out
+    # children (which would also match for platform = x or youtube
+    # alone — exactly the conflation we're fixing).
+    async def _runner() -> tuple[list[str], int]:
+        run_id = await ingest_runs.start_run(
+            task_name="trending_ingest", platform="all"
+        )
+        try:
+            kw = trending_topics.get_trending_keywords()
+            await ingest_runs.finish_run(
+                run_id,
+                status="success",
+                items_stored=len(kw) * 2 if kw else 0,
+            )
+            return kw, len(kw) * 2 if kw else 0
+        except Exception as exc:
+            await ingest_runs.finish_run(
+                run_id, status="failed", error=str(exc)
+            )
+            raise
+
+    try:
+        keywords, _ = asyncio.run(_runner())
+    except Exception:
+        log.exception("trending_ingest.keyword_fetch_failed")
+        return {"keywords": [], "dispatched": 0}
+
     if not keywords:
         log.info("trending_ingest.no_keywords")
         return {"keywords": [], "dispatched": 0}

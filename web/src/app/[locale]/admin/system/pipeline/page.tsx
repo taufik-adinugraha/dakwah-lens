@@ -82,7 +82,6 @@ export default async function PipelinePage() {
     latestPerTask,
     latestSystemMetric,
     latestApifyReconcile,
-    latestTrendingFilter,
     postsClassified7d,
   ] = await Promise.all([
     db
@@ -136,17 +135,6 @@ export default async function PipelinePage() {
     db.execute(sql`
       SELECT occurred_at FROM usage_events
       WHERE operation = 'billing_reconcile'
-      ORDER BY occurred_at DESC LIMIT 1
-    `) as unknown as Promise<Array<{ occurred_at: string }>>,
-    // trending_ingest itself doesn't log to ingest_runs — its fan-out
-    // sub-runs land under task_name='run_ingest' (one per trending
-    // keyword), indistinguishable from the weekly X/YT scrapes. The
-    // one signal that's unique to trending is the single Gemini-Flash
-    // "distill trending keywords" call recorded as a usage_event with
-    // operation='trending_filter'. That's our freshness proxy.
-    db.execute(sql`
-      SELECT occurred_at FROM usage_events
-      WHERE operation = 'trending_filter'
       ORDER BY occurred_at DESC LIMIT 1
     `) as unknown as Promise<Array<{ occurred_at: string }>>,
     // Unique posts that completed Gemini classification in the last
@@ -254,11 +242,16 @@ export default async function PipelinePage() {
           </thead>
           <tbody>
             {BEAT_SCHEDULE.map((s) => {
-              // Look up latest run for this schedule row. Three tasks
-              // bypass ingest_runs and we resolve their freshness from
-              // their actual destination tables.
+              // Look up latest run for this schedule row. Most schedules
+              // now have parent-level ingest_runs rows (added 2026-06-10
+              // to fix the fan-out conflation where multiple schedules
+              // logged via task_name="run_ingest"); we match by the
+              // BEAT-LEVEL task name (`s.beatTask`) + platform, NOT the
+              // fan-out child task name. Two schedules still bypass
+              // ingest_runs and have to be resolved from their actual
+              // destination tables.
               let cell: React.ReactNode;
-              if (s.task === "snapshot_system") {
+              if (s.beatTask === "snapshot_system") {
                 const ts = latestSystemMetric[0]?.captured_at;
                 cell = ts ? (
                   <span className="text-emerald-700">
@@ -267,7 +260,7 @@ export default async function PipelinePage() {
                 ) : (
                   <span className="text-slate-400">no snapshots yet</span>
                 );
-              } else if (s.task === "reconcile_apify_costs") {
+              } else if (s.beatTask === "reconcile_apify_costs") {
                 const ts = latestApifyReconcile[0]?.occurred_at;
                 cell = ts ? (
                   <span className="text-emerald-700">
@@ -276,28 +269,29 @@ export default async function PipelinePage() {
                 ) : (
                   <span className="text-slate-400">no reconcile yet</span>
                 );
-              } else if (s.task === "trending_ingest") {
-                const ts = latestTrendingFilter[0]?.occurred_at;
-                cell = ts ? (
-                  <span className="text-emerald-700">
-                    success · {formatRelative(ts)}
-                  </span>
-                ) : (
-                  <span className="text-slate-400">no runs yet</span>
-                );
               } else {
-                // Match by task_name (+ platform if it disambiguates).
-                // recluster-topics has platform="all" in BEAT_SCHEDULE
-                // but ingest_runs stores per-platform rows, so we fall
-                // back to "any platform" when the schedule-row platform
-                // doesn't exist in DB.
+                // Match by parent (beatTask) + platform. Falls back to
+                // the legacy run_ingest match for schedules that
+                // haven't fired since the parent-row instrumentation
+                // landed (transient — clears after one beat tick).
                 const matches = Array.isArray(latestPerTask)
-                  ? latestPerTask.filter((l) => l.task_name === s.task)
+                  ? latestPerTask.filter(
+                      (l) =>
+                        l.task_name === s.beatTask &&
+                        l.platform === s.beatPlatform,
+                    )
                   : [];
-                const latest =
-                  matches.find((l) => l.platform === s.platform) ??
-                  matches[0] ??
-                  null;
+                // Legacy fallback for the transient window between this
+                // code shipping and the first beat tick that writes the
+                // new parent-level ingest_runs row. Platform-strict so
+                // we don't reintroduce the cross-schedule conflation.
+                const legacyFallback = Array.isArray(latestPerTask)
+                  ? latestPerTask.filter(
+                      (l) =>
+                        l.task_name === s.task && l.platform === s.platform,
+                    )
+                  : [];
+                const latest = matches[0] ?? legacyFallback[0] ?? null;
                 cell = latest ? (
                   <span
                     className={
