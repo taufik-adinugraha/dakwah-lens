@@ -552,19 +552,21 @@ async function expandQuery(query: string): Promise<string> {
   const prompt = `User search query for an Islamic kitab library: "${trimmed}"
 
 Output the same query enriched for semantic search across an Arabic-Indonesian-English corpus. Detect the input language and add:
-- The equivalent term(s) in the OTHER language (id ↔ en)
-- 1-2 close thematic synonyms in either language
-- If the input is a transliteration of Arabic (e.g. "sabr"), include the Indonesian + English equivalents
+- The equivalent term(s) in the other Latin-script languages (id ↔ en)
+- 1-2 close thematic synonyms in id/en
+- The Arabic-SCRIPT equivalent term(s). CRITICAL: sirah, syamail al-muhammadiyyah, hayat as-sahabah, and al-bidayah wan-nihayah are embedded in Arabic only — without an Arabic-script term in the query, these kitabs will never rank well for non-Arabic queries.
 
 Output ONLY the expanded query as a single space-separated string. No JSON, no labels, no quotes, no explanation.
 
 Examples:
-- "judi" → judi gambling betting maysir
-- "gambling" → gambling judi maysir
-- "sabar" → sabar patience perseverance
-- "patience" → patience sabar tabah
-- "anak yatim" → anak yatim orphan yatama
-- "pinjol" → pinjol online lending riba interest
+- "judi" → judi gambling betting maysir الميسر القمار
+- "gambling" → gambling judi maysir الميسر القمار
+- "sabar" → sabar patience perseverance الصبر
+- "patience" → patience sabar tabah الصبر
+- "anak yatim" → anak yatim orphan yatama اليتيم
+- "pinjol" → pinjol online lending riba interest الربا
+- "masa kecil nabi" → masa kecil nabi childhood of prophet طفولة النبي صلى الله عليه وسلم
+- "akhlak rasulullah" → akhlak rasulullah character of prophet أخلاق الرسول الشمائل
 
 Expanded query:`;
 
@@ -574,7 +576,10 @@ Expanded query:`;
       contents: prompt,
       config: {
         temperature: 0.2,
-        maxOutputTokens: 60,
+        // Bumped 60 → 120 (2026-06-10): adding Arabic-script terms costs
+        // extra tokens; 60 was clipping the AR portion on multi-word
+        // queries.
+        maxOutputTokens: 120,
         // No reasoning needed — this is template-fill.
         thinkingConfig: { thinkingBudget: 0 },
       },
@@ -588,8 +593,10 @@ Expanded query:`;
       tokensOut: resp.usageMetadata?.candidatesTokenCount ?? null,
     });
     // Sanity check — if expansion returned empty or weirdly long
-    // (~runaway generation), fall back to the original.
-    if (!expanded || expanded.length > 300) return trimmed;
+    // (~runaway generation), fall back to the original. Cap raised
+    // 300 → 500 to accommodate the Arabic-script terms (Arabic +
+    // harakat is ~2-3× the char count of the Latin equivalent).
+    if (!expanded || expanded.length > 500) return trimmed;
     return expanded;
   } catch (err) {
     console.warn(
