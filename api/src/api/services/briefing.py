@@ -364,8 +364,17 @@ VOICE — KAJIAN IBU-IBU (suasana ruang tamu masjid, ibu-ibu duduk lesehan, usta
 
 TONE KAJIAN: hangat seperti tante yang dipercaya, BUKAN ustadzah yang berjarak. Tertawa bersama, bukan ditertawakan. Humor harus AMAN — tidak menyentuh suami, anak, atau pekerjaan rumah tangga secara merendahkan, tidak menyentuh kelas sosial, tidak menyentuh fisik. Yang aman: kebiasaan kita sendiri (WhatsApp, scrolling, lupa nama tetangga, dll.).
 
-### Kisah Pendek (1800-2200 kata)
-Tulis SATU KISAH retelling dari kitab **«KISAH_LABEL»** karya «KISAH_AUTHOR», bersumber EKSKLUSIF dari KISAH POOL yang saya berikan di atas. Format: 10 menit bacaan (~1800-2200 kata) yang membuat pembaca/pendengar HANYUT seperti membaca cerpen sejarah, BUKAN tafsir akademis.
+### Kisah Pendek (700-1100 kata)
+Tulis SATU KISAH retelling pendek dari kitab **«KISAH_LABEL»** karya «KISAH_AUTHOR», bersumber EKSKLUSIF dari KISAH POOL yang saya berikan di atas. Format: 5 menit bacaan (~700-1100 kata) — RETELL ceritanya saja + ibrah singkat di akhir. **Bukan kultum, bukan diskusi, bukan analisis berlapis.** Slot ini adalah storytelling slot; kultum, kajian, dan mahasiswa pack adalah slot lain di briefing yang sama.
+
+**LANGUAGE — like a light novel:** prosa Indonesia harus terasa seperti membaca light novel — kalimat pendek, kosakata sehari-hari, paragraf cepat, detail sensorik vivid. **BUKAN** prosa akademis, **bukan** voice khutbah formal. Contoh:
+- GOOD: "Khabbab disiksa di Mekah. Punggungnya dibakar. Dia tidak mengeluh."
+- BAD: "Khabbab yang sedang disiksa di Mekah dengan punggung yang dibakar tetap tidak mengeluh karena keimanannya."
+- GOOD: "Api itu pelan-pelan padam karena lemak punggungnya yang meleleh."
+- BAD: "Beliau menanggung penyiksaan yang sangat berat."
+Hindari nested subordinate clauses, register formal scholar, kerangka analisis. Pertahankan formal: kutipan Arab harus akurat, nama ulama dengan gelar (rahimahullah, radhiyallahu 'anhu).
+
+**FORMATTING — tidak boleh ALL CAPS untuk emphasis** (per memory rule). Gunakan markdown **bold** atau *italic* jika perlu emphasis. JANGAN tulis kata kunci dalam huruf kapital semua ("BUKAN", "TIDAK", "HARUS") — itu shouty WhatsApp style.
 
 CRITICAL — SUMBER KISAH (aturan keras, jangan dilanggar):
 - KISAH POOL berisi FASAL/BAGIAN dari «KISAH_LABEL» (kalau lebih dari satu fasal, urutan asli kitab — paling kecil section_id dulu, lalu menaik — yaitu SATU episode kontinyu yang sengaja ditarik berdekatan supaya kisahnya utuh; kalau hanya satu fasal, itu memang seksi mandiri yang sudah substansial).
@@ -374,31 +383,15 @@ CRITICAL — SUMBER KISAH (aturan keras, jangan dilanggar):
 - JANGAN mengarang detail tarikh / dialog / tindakan yang tidak ada di fasal yang diberikan. Boleh tambah setting sensorik (cuaca, suara, bau) yang plausible berdasarkan konteks sejarah, TETAPI dialog dan tindakan inti HARUS persis sesuai teks Arab di KISAH POOL.
 - Jika KISAH POOL bertanda "(sumber kisah belum tersedia...)", LEWATI sub-section ini sepenuhnya — tulis hanya satu baris "*Kisah Pendek tidak tersedia untuk tema ini pekan ini.*" lalu langsung lanjut ke sub-section berikutnya.
 
-STRUKTUR WAJIB:
+STRUKTUR WAJIB (compact, ~700-1100 kata total):
 
-- **Pembuka — kerangka kisah** (~150 kata): satu paragraf yang memperkenalkan kisah TANPA membocorkan inti pesannya. Sebut citation FASAL/BAGIAN PERTAMA dari KISAH POOL di kalimat pertama atau kedua (mis. `**«KISAH_LABEL» — [judul fasal/bagian]**`), tapi JANGAN bocorkan pelajaran moralnya di pembuka — biarkan pembaca masuk ke kisah dulu. Boleh: "Di sebuah musim panas yang terik di Makkah, sesuatu yang akan mengubah arah sejarah umat manusia bergerak diam-diam dari satu rumah ke rumah lain. Kisah ini «KISAH_AUTHOR» himpun dalam **«KISAH_LABEL» — [judul fasal/bagian]**…"
+- **Pembuka** (1 paragraf, ~80 kata): bridge singkat — satu kalimat menghubungkan ke tema pekan ini (boleh sebut konteks ringan dari sample_headlines, JANGAN sebut statistik atau jumlah post), satu kalimat memperkenalkan kisah + sebut citation kitab di kalimat kedua/ketiga ("Imam Ibn Katsir rahimahullah dalam **«KISAH_LABEL» — [judul fasal/bagian]** menghimpun..."). JANGAN bocorkan ibrah-nya di pembuka.
 
-- **Latar — setting fisik & emosional** (~280 kata, 2 paragraf): tempatkan pembaca dalam scene. Apa yang sedang terjadi di Makkah / di Madinah / di medan perang / di rumah para sahabat saat kejadian itu? Siapa yang hadir? Apa cuacanya, suaranya, baunya? Apa yang dirasakan tokoh-tokohnya SEBELUM peristiwa utama terjadi? Gunakan detail sensorik yang plausible berdasarkan konteks sirah — JANGAN mengarang detail tarikh yang tidak ada di fasal KISAH POOL. Tulis dalam aspek "pembaca melihat" — sudut pandang kamera, bukan ringkasan.
+- **Retell kisahnya** (5-9 paragraf, ~500-800 kata): ceritakan ulang fasal-fasal KISAH POOL berurutan, dengan voice light novel (kalimat pendek, vivid detail, dialog langsung). Kutipan Arab penting dari teks asli ditulis di baris terpisah (block-quote `> ...`) — JANGAN inline transliterasi Latin (lihat rule [[arabic-not-latin-in-kisah]]). Setiap kutipan Arab diikuti terjemahan Indonesia langsung di paragraf berikutnya. Tetap akurat ke teks Arab — JANGAN tambah dialog atau tindakan fiktif yang tidak ada di KISAH POOL. Boleh tambah detail sensorik (cuaca, suara, atmosfer) yang plausible secara sirah.
 
-- **Inti kisah — peristiwa & dialog** (~900-1150 kata, 5-6 paragraf): nyatakan kejadian PERSIS seperti yang tercatat di fasal-fasal KISAH POOL, tapi diberi tarikan naratif. JANGAN melompati fasal — ceritakan SEMUA fasal berurutan supaya pembaca mengikuti progresi natural sebagaimana «KISAH_AUTHOR» menyusunnya. Untuk dialog: kutip dengan kalimat berbahasa Indonesia mengalir, tetap akurat ke makna teks Arab.
-  Format DIALOG yang jelas:
-  * Gunakan tanda kutip ganda untuk ucapan langsung: "Apakah engkau telah memberi makan tamumu malam ini?"
-  * Beri petunjuk emosi tokoh: "tanya beliau ﷺ dengan suara yang menahan keheranan" atau "jawab sahabat itu pelan, kepalanya tertunduk"
-  * Sertakan jeda + reaksi internal antar dialog ("Beliau ﷺ terdiam sejenak. Mata beliau memandang langit Madinah yang terhias bintang.")
-  * Untuk fasal panjang dengan banyak dialog, JANGAN potong — pertahankan urutan asli.
+- **`#### Pelajaran`** (1-2 paragraf singkat, ~120-180 kata): SATU ibrah inti, bukan tiga. Tarik PELAJARAN dari kisah, kembali ke detail kisah supaya ibrah-nya terasa konkret. Boleh 1 kalimat penutup yang menghubungkan ke konteks pembaca pekan ini. **JANGAN** struktur "Pelajaran pertama... pelajaran kedua... pelajaran ketiga" — itu kultum format. **JANGAN** Q&A. **JANGAN** ajak diskusi.
 
-  PROHIBITED dalam paragraf inti:
-  * Menyisipkan tafsir / penjelasan modern di tengah kisah — itu memecahkan immersion. Tunda semua interpretasi ke bagian pelajaran di akhir.
-  * Memanggil pembaca langsung ("Hadirin sekalian, perhatikan bahwa Rasulullah…") — pertahankan jarak naratif.
-  * Mengarang ucapan tokoh yang tidak ada di teks Arab KISAH POOL. Jika fasal hanya menyebut tindakan, ceritakan tindakan; jangan menambah dialog fiktif.
-
-- **Klimaks / titik balik** (~180 kata, 1 paragraf): puncak kisah — momen di mana sesuatu BERGESER (sahabat tersadar, sebuah keputusan diambil, sebuah doa terkabul, sebuah teguran Rasulullah ﷺ datang, sebuah peristiwa yang menentukan masa depan). Tulis dengan ritme yang lebih lambat dari paragraf sebelumnya — kalimat lebih pendek, jeda lebih sering, supaya pembaca BERHENTI di titik ini.
-
-- **Pelajaran** (~290 kata, 2 paragraf, JUDUL H4 `#### Pelajaran dari Kisah Ini`): SEKARANG baru tarik pelajaran. Struktur:
-  * Paragraf 1: identifikasi 1-2 pelajaran inti dari kisah. JANGAN list 5-6 pelajaran umum — fokus ke 1-2 yang paling kuat. Jelaskan SECARA EKSPLISIT mengapa pelajaran itu muncul dari kisah ini (kembalikan ke detail kisah).
-  * Paragraf 2: hubungkan pelajaran ke peristiwa NYATA pekan ini. Sebut 1-2 konteks dari sample_headlines (tanpa nama outlet) di mana pelajaran ini berlaku. Tutup dengan 1-2 tindakan praktis yang bisa dilakukan pembaca/pendengar pekan ini.
-
-- **Sumber Asli** (WAJIB, JUDUL H4 `#### Sumber Asli — «KISAH_LABEL»`): tampilkan teks ARAB ASLI dari KISAH POOL — semua fasal berurutan supaya pembaca yang ingin memverifikasi punya teks lengkap di akhir kisah. Format:
+- **`#### Sumber Asli`** (WAJIB): tampilkan teks ARAB ASLI dari KISAH POOL — semua fasal berurutan supaya pembaca yang ingin memverifikasi punya teks lengkap di akhir kisah. Format:
   * Untuk setiap fasal dalam KISAH POOL: tulis baris `**{{citation fasal itu}}**` (mis. `**«KISAH_LABEL» — [judul fasal/bagian]**`)
   * Blok berikutnya: AKSARA ARAB lengkap dari `Arabic` field fasal itu — pertahankan teks persis seperti tersedia di pool. JANGAN dipangkas, JANGAN ditranskrip Latin.
   * Pisahkan tiap fasal dengan satu baris kosong + horizontal rule `---`.
