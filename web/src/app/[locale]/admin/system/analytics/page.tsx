@@ -24,6 +24,21 @@ const EXCLUDE_PATHS = sql`
   AND path NOT LIKE '/api%'
 `;
 
+// The 8 Indonesia region buckets — used to filter the region chart
+// to ID-only AND to fold ID into a single "id" entry on the country
+// chart.
+const ID_REGION_KEYS = [
+  "jabodetabek",
+  "jawa_barat",
+  "jawa_tengah_diy",
+  "jawa_timur",
+  "sumatera",
+  "kalimantan",
+  "sulawesi",
+  "indonesia_timur",
+] as const;
+const ID_REGION_SET = new Set<string>(ID_REGION_KEYS);
+
 const REGION_LABELS: Record<string, string> = {
   jabodetabek: "Jabodetabek",
   jawa_barat: "Jawa Barat",
@@ -33,7 +48,7 @@ const REGION_LABELS: Record<string, string> = {
   kalimantan: "Kalimantan",
   sulawesi: "Sulawesi",
   indonesia_timur: "Indonesia Timur",
-  unknown: "Unknown / outside ID",
+  unknown: "Unknown",
 };
 
 const REGION_COLORS: Record<string, string> = {
@@ -45,6 +60,29 @@ const REGION_COLORS: Record<string, string> = {
   kalimantan: "bg-violet-500",
   sulawesi: "bg-fuchsia-500",
   indonesia_timur: "bg-slate-500",
+  unknown: "bg-slate-300",
+};
+
+// Country-level buckets — used by the country chart only. Folds the
+// 8 ID region buckets into one "id" entry and renders the 5 non-ID
+// buckets alongside.
+const COUNTRY_LABELS: Record<string, string> = {
+  id: "Indonesia",
+  sg_my: "Singapore + Malaysia",
+  mena: "Middle East & N. Africa",
+  eu: "Europe (EU + UK + EEA)",
+  us: "USA + Canada",
+  other_intl: "Other International",
+  unknown: "Unknown",
+};
+
+const COUNTRY_COLORS: Record<string, string> = {
+  id: "bg-brand-500",
+  sg_my: "bg-emerald-500",
+  mena: "bg-amber-500",
+  eu: "bg-cyan-500",
+  us: "bg-violet-500",
+  other_intl: "bg-rose-500",
   unknown: "bg-slate-300",
 };
 
@@ -76,6 +114,7 @@ export default async function AnalyticsPage() {
     briefsPerDay,
     topCreators,
     localeSplit,
+    countrySplit,
     regionSplit,
     deviceSplit,
   ] = await Promise.all([
@@ -233,18 +272,41 @@ export default async function AnalyticsPage() {
       GROUP BY COALESCE(locale, 'unknown')
       ORDER BY sessions DESC
     `) as unknown as Promise<Array<{ locale: string; sessions: number }>>,
-    // Region split — distinct sessions per IP-derived Indonesian region.
-    // NULL bucket means non-Indonesia visitor, dev/local IP, or pre-
-    // geolocation rows (anything inserted before the page_views.region
-    // column was added).
+    // Country split — distinct sessions per geo bucket. Folds the
+    // 8 Indonesia region buckets into a single "id" entry, leaves
+    // the 5 non-ID buckets (eu / us / sg_my / mena / other_intl)
+    // intact, NULL → unknown.
     db.execute(sql`
-      SELECT COALESCE(region, 'unknown') AS region,
+      SELECT
+        CASE
+          WHEN region IN ('jabodetabek','jawa_barat','jawa_tengah_diy','jawa_timur',
+                          'sumatera','kalimantan','sulawesi','indonesia_timur')
+            THEN 'id'
+          WHEN region IS NULL THEN 'unknown'
+          ELSE region
+        END AS country,
+        COUNT(DISTINCT session_id)::int AS sessions
+      FROM page_views
+      WHERE occurred_at >= now() - interval '7 days'
+        AND path NOT LIKE '/admin%'
+        AND path NOT LIKE '/api%'
+      GROUP BY country
+      ORDER BY sessions DESC
+    `) as unknown as Promise<Array<{ country: string; sessions: number }>>,
+    // Indonesia-only region split — distinct sessions per ID province
+    // bucket. Excludes non-ID buckets so this chart stays focused on
+    // the domestic geography (Jabodetabek / Jawa / Sumatera / etc.).
+    // Non-ID visitors are visible in the country chart above.
+    db.execute(sql`
+      SELECT region,
              COUNT(DISTINCT session_id)::int AS sessions
       FROM page_views
       WHERE occurred_at >= now() - interval '7 days'
         AND path NOT LIKE '/admin%'
         AND path NOT LIKE '/api%'
-      GROUP BY COALESCE(region, 'unknown')
+        AND region IN ('jabodetabek','jawa_barat','jawa_tengah_diy','jawa_timur',
+                       'sumatera','kalimantan','sulawesi','indonesia_timur')
+      GROUP BY region
       ORDER BY sessions DESC
     `) as unknown as Promise<Array<{ region: string; sessions: number }>>,
     // Device split — classify UA into mobile / desktop, last 7 days,
@@ -275,7 +337,11 @@ export default async function AnalyticsPage() {
   ]);
 
   const localeTotal = localeSplit.reduce((s, r) => s + r.sessions, 0);
+  const countryTotal = countrySplit.reduce((s, r) => s + r.sessions, 0);
   const regionTotal = regionSplit.reduce((s, r) => s + r.sessions, 0);
+  // Suppress unused-key warnings for the country bucket constants —
+  // they're indirectly referenced through the labels/colors maps.
+  void ID_REGION_SET;
 
   // Device split — extract mobile + desktop counts (the SQL only ever
   // returns these two buckets, post-bot-filtering).
@@ -343,16 +409,71 @@ export default async function AnalyticsPage() {
         />
       </div>
 
-      {/* Region split — distinct sessions per IP-derived Indonesian
-          region. Pure infrastructure metric (no IPs stored). */}
-      {regionTotal > 0 && (
+      {/* Country split — distinct sessions per geo bucket. Folds the
+          8 Indonesia regions into one "Indonesia" entry, alongside
+          non-ID country buckets (EU, US, MENA, SG/MY, other). Added
+          2026-06-11 so European + international visitors are visible
+          in the dashboard instead of falling into NULL. */}
+      {countryTotal > 0 && (
         <Card
-          title="Region · 7d"
-          hint={`${regionTotal.toLocaleString()} distinct sessions`}
+          title="Country · 7d"
+          hint={`${countryTotal.toLocaleString()} distinct sessions`}
         >
           <p className="text-[11px] text-slate-500">
-            Indonesian region inferred from IP at request time. The IP
-            itself is never stored — only the region bucket (PDP §15).
+            Country bucket inferred from IP at request time. The IP
+            itself is never stored — only the bucket label (PDP §15).
+          </p>
+          <div className="mt-3">
+            <StackedBar
+              total={countryTotal}
+              segments={countrySplit.map((row) => ({
+                key: row.country,
+                label: COUNTRY_LABELS[row.country] ?? row.country,
+                color: COUNTRY_COLORS[row.country] ?? "bg-slate-300",
+                value: row.sessions,
+              }))}
+            />
+          </div>
+          <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {countrySplit.map((row) => {
+              const pct = (row.sessions / countryTotal) * 100;
+              const label = COUNTRY_LABELS[row.country] ?? row.country;
+              const dotColor = COUNTRY_COLORS[row.country] ?? "bg-slate-400";
+              return (
+                <li
+                  key={row.country}
+                  className="flex items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2 text-xs"
+                >
+                  <span className="inline-flex items-center gap-2 font-medium text-slate-700">
+                    <span
+                      className={`inline-block h-2.5 w-2.5 rounded-full ${dotColor}`}
+                    />
+                    {label}
+                  </span>
+                  <span className="tabular-nums text-slate-600">
+                    {row.sessions.toLocaleString()}{" "}
+                    <span className="text-slate-400">· {pct.toFixed(1)}%</span>
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </Card>
+      )}
+
+      {/* Region split — distinct sessions per Indonesian region (8
+          buckets). Non-ID visitors are EXCLUDED here — they appear in
+          the Country chart above. Pure infrastructure metric (no IPs
+          stored). */}
+      {regionTotal > 0 && (
+        <Card
+          title="Region (Indonesia) · 7d"
+          hint={`${regionTotal.toLocaleString()} distinct ID sessions`}
+        >
+          <p className="text-[11px] text-slate-500">
+            Indonesian region inferred from IP. Non-Indonesia visitors
+            are shown in the Country chart above. The IP itself is
+            never stored — only the bucket label (PDP §15).
           </p>
           <div className="mt-3">
             <StackedBar
