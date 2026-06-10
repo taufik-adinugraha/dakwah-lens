@@ -1,4 +1,4 @@
-import { Trash2 } from "lucide-react";
+import { Pencil, Trash2, X } from "lucide-react";
 import { and, asc, eq, sql, type SQL } from "drizzle-orm";
 
 import { auth } from "@/auth";
@@ -8,6 +8,7 @@ import {
   addIngestQuery,
   deleteIngestQuery,
   toggleIngestQuery,
+  updateIngestQuery,
 } from "../actions";
 import {
   Card,
@@ -39,16 +40,20 @@ type PlatformFilter = (typeof PLATFORMS)[number] | "all";
 type CategoryFilter = (typeof CATEGORIES)[number] | "all";
 
 /** Build /admin/system/queries URL while preserving the cross-filters
- *  (toggling one filter shouldn't drop the others). */
+ *  (toggling one filter shouldn't drop the others). `editId` opens the
+ *  inline edit form for one row — also a URL param so it survives a
+ *  full page reload after redirect-on-save. */
 function buildHref(
   platform: PlatformFilter,
   category: CategoryFilter,
   search: string,
+  editId?: string,
 ): string {
   const params = new URLSearchParams();
   if (platform !== "all") params.set("platform", platform);
   if (category !== "all") params.set("category", category);
   if (search) params.set("q", search);
+  if (editId) params.set("edit", editId);
   const qs = params.toString();
   return `/admin/system/queries${qs ? `?${qs}` : ""}`;
 }
@@ -75,6 +80,11 @@ export default async function QueriesPage({
       : "all";
   const search =
     typeof sp.q === "string" ? sp.q.trim().slice(0, 100) : "";
+  // Inline-edit row pointer. Validated against the queries list below
+  // before being honored, so a stale link or hand-typed UUID just falls
+  // back to the read-only view.
+  const editId = typeof sp.edit === "string" ? sp.edit.trim() : "";
+  const returnTo = buildHref(platformFilter, categoryFilter, search);
   // Postgres ILIKE escapes — keep the user's % and _ as literals so
   // searching for "_" doesn't match every row.
   const escapedSearch = search.replace(/\\/g, "\\\\").replace(/%/g, "\\%").replace(/_/g, "\\_");
@@ -360,64 +370,144 @@ export default async function QueriesPage({
               </tr>
             </thead>
             <tbody>
-              {queries.map((q) => (
-                <tr key={q.id} className="border-b border-slate-50 last:border-0">
-                  <td className="py-2 text-xs font-semibold capitalize text-slate-800">
-                    {q.platform}
-                  </td>
-                  <td className="py-2 font-mono text-xs text-slate-700">
-                    {q.query}
-                  </td>
-                  <td className="py-2 text-xs">
-                    {q.category ? (
-                      <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
-                        {q.category.replace(/_/g, " ")}
-                      </span>
-                    ) : (
-                      <span className="text-slate-400">—</span>
-                    )}
-                  </td>
-                  <td className="py-2 text-xs text-slate-500">
-                    {q.lastRunAt ? formatRelative(q.lastRunAt) : "never"}
-                  </td>
-                  <td className="py-2 text-right">
-                    {isSuperadmin ? (
-                      <ToggleSwitch
-                        id={q.id}
-                        enabled={q.enabled}
-                        label={q.query}
-                      />
-                    ) : (
-                      <span
-                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ring-1 ${
-                          q.enabled
-                            ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
-                            : "bg-slate-100 text-slate-500 ring-slate-200"
-                        }`}
+              {queries.map((q) => {
+                const isEditing = isSuperadmin && editId === q.id;
+                if (isEditing) {
+                  return (
+                    <tr
+                      key={q.id}
+                      className="border-b border-slate-50 bg-amber-50/40 last:border-0"
+                    >
+                      <td
+                        colSpan={isSuperadmin ? 6 : 5}
+                        className="py-2"
                       >
-                        {q.enabled ? "Enabled" : "Disabled"}
-                      </span>
-                    )}
-                  </td>
-                  {isSuperadmin && (
-                    <td className="py-2 text-right">
-                      <ConfirmForm
-                        action={deleteIngestQuery}
-                        confirmMessage={`Delete the "${q.query}" query on ${q.platform}? This drops the rotation state — consider disabling instead if you might want it back.`}
-                      >
-                        <input type="hidden" name="id" value={q.id} />
-                        <button
-                          type="submit"
-                          className="inline-flex h-7 w-7 items-center justify-center rounded-full text-slate-400 hover:bg-rose-50 hover:text-rose-700"
-                          aria-label={`Delete ${q.query}`}
+                        <form
+                          action={updateIngestQuery}
+                          className="flex flex-wrap items-center gap-2"
                         >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </ConfirmForm>
+                          <input type="hidden" name="id" value={q.id} />
+                          <input
+                            type="hidden"
+                            name="return_to"
+                            value={returnTo}
+                          />
+                          <span className="inline-flex h-8 items-center rounded-md bg-slate-100 px-2 text-[11px] font-semibold uppercase tracking-wider text-slate-600">
+                            {q.platform}
+                          </span>
+                          <input
+                            name="query"
+                            defaultValue={q.query}
+                            required
+                            maxLength={160}
+                            autoFocus
+                            className="h-8 flex-1 min-w-[12rem] rounded-md border border-slate-300 px-2 font-mono text-xs"
+                          />
+                          <select
+                            name="category"
+                            defaultValue={q.category ?? ""}
+                            className="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs"
+                          >
+                            <option value="">(none)</option>
+                            {CATEGORIES.map((c) => (
+                              <option key={c} value={c}>
+                                {c.replace(/_/g, " ")}
+                              </option>
+                            ))}
+                          </select>
+                          <button
+                            type="submit"
+                            className="inline-flex h-8 items-center justify-center rounded-md bg-slate-900 px-3 text-xs font-semibold text-white hover:bg-slate-800"
+                          >
+                            Save
+                          </button>
+                          <Link
+                            href={returnTo}
+                            scroll={false}
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                            aria-label="Cancel edit"
+                          >
+                            <X className="h-4 w-4" />
+                          </Link>
+                        </form>
+                      </td>
+                    </tr>
+                  );
+                }
+                return (
+                  <tr key={q.id} className="border-b border-slate-50 last:border-0">
+                    <td className="py-2 text-xs font-semibold capitalize text-slate-800">
+                      {q.platform}
                     </td>
-                  )}
-                </tr>
-              ))}
+                    <td className="py-2 font-mono text-xs text-slate-700">
+                      {q.query}
+                    </td>
+                    <td className="py-2 text-xs">
+                      {q.category ? (
+                        <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
+                          {q.category.replace(/_/g, " ")}
+                        </span>
+                      ) : (
+                        <span className="text-slate-400">—</span>
+                      )}
+                    </td>
+                    <td className="py-2 text-xs text-slate-500">
+                      {q.lastRunAt ? formatRelative(q.lastRunAt) : "never"}
+                    </td>
+                    <td className="py-2 text-right">
+                      {isSuperadmin ? (
+                        <ToggleSwitch
+                          id={q.id}
+                          enabled={q.enabled}
+                          label={q.query}
+                        />
+                      ) : (
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ring-1 ${
+                            q.enabled
+                              ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
+                              : "bg-slate-100 text-slate-500 ring-slate-200"
+                          }`}
+                        >
+                          {q.enabled ? "Enabled" : "Disabled"}
+                        </span>
+                      )}
+                    </td>
+                    {isSuperadmin && (
+                      <td className="py-2 text-right">
+                        <div className="inline-flex items-center gap-0.5">
+                          <Link
+                            href={buildHref(
+                              platformFilter,
+                              categoryFilter,
+                              search,
+                              q.id,
+                            )}
+                            scroll={false}
+                            className="inline-flex h-7 w-7 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                            aria-label={`Edit ${q.query}`}
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Link>
+                          <ConfirmForm
+                            action={deleteIngestQuery}
+                            confirmMessage={`Delete the "${q.query}" query on ${q.platform}? This drops the rotation state — consider disabling instead if you might want it back.`}
+                          >
+                            <input type="hidden" name="id" value={q.id} />
+                            <button
+                              type="submit"
+                              className="inline-flex h-7 w-7 items-center justify-center rounded-full text-slate-400 hover:bg-rose-50 hover:text-rose-700"
+                              aria-label={`Delete ${q.query}`}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </ConfirmForm>
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}

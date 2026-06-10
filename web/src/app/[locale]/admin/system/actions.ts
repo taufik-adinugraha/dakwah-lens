@@ -1,7 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { eq, inArray } from "drizzle-orm";
+import { redirect } from "next/navigation";
+import { and, eq, inArray, ne } from "drizzle-orm";
 
 import { db, schema } from "@/db";
 import { logAdminAction } from "@/lib/admin-log";
@@ -1252,6 +1253,76 @@ export async function toggleIngestQuery(formData: FormData) {
     },
   });
   revalidatePath("/admin/system/queries");
+}
+
+export async function updateIngestQuery(formData: FormData) {
+  const session = await requireSuperadmin();
+  const id = String(formData.get("id") ?? "");
+  const query = String(formData.get("query") ?? "").trim().slice(0, 160);
+  const rawCategory = String(formData.get("category") ?? "").trim();
+  if (!id || !query) {
+    await setFlash("error", "Missing query text — cannot save an empty value.");
+    return;
+  }
+  const category =
+    rawCategory && (QUERY_CATEGORIES as readonly string[]).includes(rawCategory)
+      ? rawCategory
+      : null;
+  const [before] = await db
+    .select({
+      platform: schema.ingestQueries.platform,
+      query: schema.ingestQueries.query,
+      category: schema.ingestQueries.category,
+    })
+    .from(schema.ingestQueries)
+    .where(eq(schema.ingestQueries.id, id))
+    .limit(1);
+  if (!before) return;
+  // Pre-check the (platform, query) uniqueness so we can flash a
+  // readable error instead of a 500 from the unique constraint.
+  if (query !== before.query) {
+    const [clash] = await db
+      .select({ id: schema.ingestQueries.id })
+      .from(schema.ingestQueries)
+      .where(
+        and(
+          eq(schema.ingestQueries.platform, before.platform),
+          eq(schema.ingestQueries.query, query),
+          ne(schema.ingestQueries.id, id),
+        ),
+      )
+      .limit(1);
+    if (clash) {
+      await setFlash(
+        "error",
+        `"${query}" already exists on ${before.platform} — pick a different text.`,
+      );
+      return;
+    }
+  }
+  await db
+    .update(schema.ingestQueries)
+    .set({ query, category, updatedAt: new Date() })
+    .where(eq(schema.ingestQueries.id, id));
+  await logAdminAction({
+    actorId: session.user.id,
+    action: "ingest_query.update",
+    targetType: "ingest_query",
+    targetId: id,
+    payload: {
+      platform: before.platform,
+      before: { query: before.query, category: before.category },
+      after: { query, category },
+    },
+  });
+  await setFlash("success", `Updated · ${query}`);
+  revalidatePath("/admin/system/queries");
+  // Drop ?edit=<id> from the URL so the row goes back to read-only view.
+  const returnTo = String(formData.get("return_to") ?? "");
+  if (returnTo.startsWith("/admin/system/queries")) {
+    redirect(returnTo);
+  }
+  redirect("/admin/system/queries");
 }
 
 export async function deleteIngestQuery(formData: FormData) {
