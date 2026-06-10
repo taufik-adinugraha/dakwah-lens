@@ -32,16 +32,19 @@ export const SplitImage: FlyerLayoutComponent = ({
     keywords: [headline, message].filter(Boolean) as string[],
   });
   const transLen = translation.length;
+  // Bumped 2026-06-10 (25/22/19/17/15 → 30/26/22/19/17): the daleel
+  // card now sits on a full-bleed photo + dark overlay; the smaller
+  // tiers were hard to read against that contrast.
   const transSize =
     transLen < 220
-      ? 25
+      ? 30
       : transLen < 320
-        ? 22
+        ? 26
         : transLen < 460
-          ? 19
+          ? 22
           : transLen < 620
-            ? 17
-            : 15;
+            ? 19
+            : 17;
 
   const headlineSize =
     headline.length < 18 ? "92px" : headline.length < 28 ? "76px" : "62px";
@@ -137,12 +140,12 @@ export const SplitImage: FlyerLayoutComponent = ({
         {daleel && translation && (
           <div
             data-autofit
-            data-fit-min="13"
+            data-fit-min="14"
             className="flex max-w-[940px] flex-col gap-3 rounded-3xl bg-white px-7 py-6 shadow-2xl"
             style={{
               borderLeft: `8px solid ${palette.accent}`,
               boxShadow: `0 18px 40px ${dark}aa`,
-              maxHeight: "300px",
+              maxHeight: "360px",
               overflow: "hidden",
             }}
           >

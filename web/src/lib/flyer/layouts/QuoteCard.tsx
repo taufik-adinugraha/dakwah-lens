@@ -33,16 +33,22 @@ export const QuoteCard: FlyerLayoutComponent = ({
     keywords: [headline, message].filter(Boolean) as string[],
   });
   const transLen = translation.length;
+  // Tiered to match the full-bleed photo backdrop (2026-06-10): bumped
+  // from 26/22/19/17/15 → 32/28/24/21/18. The opaque white quote card
+  // sits on a busy photo + dark overlay, so the translation needs to
+  // read as a confident statement; a 26px italic was getting visually
+  // shrunk by the surrounding contrast. Floor stays above autofit's
+  // data-fit-min=14 so we don't slip below readable.
   const transSize =
     transLen < 220
-      ? 26
+      ? 32
       : transLen < 320
-        ? 22
+        ? 28
         : transLen < 480
-          ? 19
+          ? 24
           : transLen < 620
-            ? 17
-            : 15;
+            ? 21
+            : 18;
 
   const headlineSize =
     headline.length < 18 ? "92px" : headline.length < 28 ? "76px" : "60px";
@@ -130,12 +136,12 @@ export const QuoteCard: FlyerLayoutComponent = ({
         {daleel && translation && (
           <div
             data-autofit
-            data-fit-min="13"
+            data-fit-min="14"
             className="relative flex max-w-[940px] flex-col gap-3 rounded-3xl bg-white px-9 py-7 shadow-2xl"
             style={{
               boxShadow: `0 18px 48px ${dark}aa`,
               borderTop: `8px solid ${palette.accent}`,
-              maxHeight: "340px",
+              maxHeight: "360px",
               overflow: "hidden",
             }}
           >
