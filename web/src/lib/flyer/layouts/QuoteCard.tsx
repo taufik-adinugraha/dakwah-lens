@@ -3,14 +3,23 @@ import { Citation, QuoteGlyph } from "./decor";
 import type { FlyerLayoutComponent } from "./types";
 
 /**
- * QuoteCard — photo backdrop + floating content (genz-b slot).
+ * QuoteCard — full-bleed photo background + floating quote card (genz-b
+ * slot, Gen Z dakwah).
  *
- * Three sub-variants:
- *   - variant 0: photo as full backdrop with strong tinted overlay
- *   - variant 1: photo cropped to top-half banner, content on a soft
- *     pattern below
- *   - variant 2: photo as polaroid-style square card centered on
- *     pattern background, content wrapped around it
+ * Photo fills the entire 1080×1080 canvas; content (headline + message +
+ * daleel quote card) sits on top of a dark gradient that keeps text
+ * legible. Three direction variants share the same full-bg image:
+ *
+ *   - variant 0: bottom-up dark gradient, content bottom-anchored
+ *   - variant 1: top-down dark gradient, content top-anchored
+ *   - variant 2: diagonal gradient (top-left → bottom-right), centered
+ *
+ * Earlier iteration rotated between three distinct compositions
+ * (dark-tinted full backdrop / photo top-banner / polaroid card on
+ * pattern bg). Switched to a unified full-bleed photo on 2026-06-10 per
+ * user feedback: "make the image full and overlayed". Git history
+ * preserves the polaroid / top-banner variants if a future rotation
+ * needs them.
  */
 export const QuoteCard: FlyerLayoutComponent = ({
   content,
@@ -24,276 +33,129 @@ export const QuoteCard: FlyerLayoutComponent = ({
     keywords: [headline, message].filter(Boolean) as string[],
   });
   const transLen = translation.length;
-  // Tiers extended 2026-06-09 along with pickDaleelTranslation v3's
-  // 560-char budget. Previously a 470-char translation snapped to the
-  // 20px tier; now it stays at 22px since narrator stripping means
-  // the content density per char is more concentrated (less filler).
   const transSize =
-    transLen < 220 ? 30 : transLen < 320 ? 26 : transLen < 480 ? 22 : transLen < 620 ? 20 : 18;
-
-  const bgStops = palette.bgGradient;
-  const bgStyle = {
-    background: `linear-gradient(135deg, ${bgStops[0]} 0%, ${bgStops[1]} ${bgStops[2] ? "55%" : "100%"}${bgStops[2] ? `, ${bgStops[2]} 100%` : ""})`,
-  };
+    transLen < 220
+      ? 26
+      : transLen < 320
+        ? 22
+        : transLen < 480
+          ? 19
+          : transLen < 620
+            ? 17
+            : 15;
 
   const headlineSize =
     headline.length < 18 ? "92px" : headline.length < 28 ? "76px" : "60px";
 
-  // Variant 0: photo backdrop, dark overlay → text in white
-  if (layoutVariant === 0) {
-    return (
-      <div className="relative flex h-[1080px] w-[1080px] flex-col overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={assets.primary}
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(135deg, ${palette.accent}d0 0%, ${palette.accentDeep}cc 60%, ${palette.accentDeep}f0 100%)`,
-          }}
-        />
-        {/* Decorative offset circles */}
-        <div
-          className="absolute -right-32 -top-32 h-[420px] w-[420px] rounded-full"
-          style={{ background: palette.accentSoft, opacity: 0.25 }}
-        />
+  const dark = palette.accentDeep;
 
-        <div className="relative z-10 flex h-full flex-col justify-between gap-[32px] px-[80px] py-[70px]">
-          <div className="flex items-center justify-between">
-            <div
-              className="inline-flex rounded-full px-5 py-2 text-[18px] font-extrabold tracking-widest"
-              style={{
-                backgroundColor: "rgba(255,255,255,0.95)",
-                color: palette.accentDeep,
-              }}
-            >
-              {brand}
-            </div>
-            <div className="text-[18px] font-bold text-white opacity-90">
-              {dateLabel}
-            </div>
-          </div>
+  const overlayStyle = (() => {
+    if (layoutVariant === 1) {
+      return {
+        background: `linear-gradient(180deg, ${dark}f2 0%, ${dark}cc 35%, ${dark}66 65%, ${dark}10 100%)`,
+      };
+    }
+    if (layoutVariant === 2) {
+      return {
+        background: `linear-gradient(135deg, ${dark}f0 0%, ${dark}b8 45%, ${dark}55 85%, ${dark}10 100%)`,
+      };
+    }
+    return {
+      background: `linear-gradient(0deg, ${dark}f2 0%, ${dark}cc 35%, ${dark}66 65%, ${dark}10 100%)`,
+    };
+  })();
 
-          <div className="flex flex-col gap-[26px]">
-            <div
-              className="font-black leading-[1.05] text-white"
-              style={{
-                fontSize: headlineSize,
-                letterSpacing: "-0.025em",
-                textShadow: "0 2px 12px rgba(0,0,0,0.4)",
-              }}
-            >
-              {headline}
-            </div>
-            {message && (
-              <div
-                className="max-w-[900px] text-[24px] font-semibold leading-[1.55]"
-                style={{ color: "#ffffffec" }}
-              >
-                {message}
-              </div>
-            )}
-          </div>
+  const contentJustify =
+    layoutVariant === 1
+      ? "justify-start"
+      : layoutVariant === 2
+        ? "justify-center"
+        : "justify-end";
 
-          {daleel && translation && (
-            <div
-              data-autofit
-              data-fit-min="13"
-              className="relative flex max-w-[860px] flex-col gap-3 rounded-3xl bg-white px-9 py-7 shadow-2xl"
-              style={{
-                boxShadow: `0 18px 48px ${palette.accentDeep}88`,
-                borderTop: `8px solid ${palette.accent}`,
-                maxHeight: "340px",
-                overflow: "hidden",
-              }}
-            >
-              <QuoteGlyph
-                color={palette.accent}
-                className="absolute left-4 top-1 z-0"
-              />
-              <div
-                className="relative z-10 font-medium italic leading-[1.55] text-slate-800"
-                style={{ fontSize: `${transSize}px` }}
-              >
-                &ldquo;{translation}&rdquo;
-              </div>
-              <Citation
-                citation={daleel.citation}
-                color={palette.accent}
-                className="relative z-10"
-              />
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // Variant 1: photo top-banner, content on gradient pattern below
-  if (layoutVariant === 1) {
-    return (
-      <div className="relative flex h-[1080px] w-[1080px] flex-col overflow-hidden" style={bgStyle}>
-        {/* Top photo banner */}
-        <div className="relative h-[440px] w-full overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={assets.primary}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `linear-gradient(180deg, ${palette.accentDeep}66 0%, transparent 30%, transparent 60%, ${bgStops[bgStops[2] ? 2 : 1]}f0 100%)`,
-            }}
-          />
-          <div className="absolute left-[80px] top-[60px]">
-            <div
-              className="inline-flex rounded-full px-5 py-2 text-[18px] font-extrabold tracking-widest"
-              style={{ backgroundColor: "rgba(255,255,255,0.95)", color: palette.accentDeep }}
-            >
-              {brand}
-            </div>
-          </div>
-          <div className="absolute right-[80px] top-[68px] text-[18px] font-bold text-white opacity-95">
-            {dateLabel}
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="relative z-10 flex flex-1 flex-col justify-between gap-[32px] px-[80px] pb-[60px] pt-[40px]">
-          <div className="flex flex-col gap-[26px]">
-            <div
-              className="font-black leading-[1.05]"
-              style={{
-                fontSize: headlineSize,
-                color: palette.accentDeep,
-                letterSpacing: "-0.025em",
-              }}
-            >
-              {headline}
-            </div>
-            {message && (
-              <div className="max-w-[920px] text-[24px] font-semibold leading-[1.55]" style={{ color: "#1f1f1f" }}>
-                {message}
-              </div>
-            )}
-          </div>
-
-          {daleel && translation && (
-            <div
-              data-autofit
-              data-fit-min="13"
-              className="flex max-w-[880px] flex-col gap-3 rounded-3xl bg-white px-9 py-7 shadow-2xl"
-              style={{
-                boxShadow: `0 14px 36px ${palette.accent}55`,
-                borderTop: `8px solid ${palette.accent}`,
-                maxHeight: "340px",
-                overflow: "hidden",
-              }}
-            >
-              <div
-                className="font-medium italic leading-[1.55] text-slate-800"
-                style={{ fontSize: `${transSize}px` }}
-              >
-                &ldquo;{translation}&rdquo;
-              </div>
-              <Citation citation={daleel.citation} color={palette.accent} />
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // Variant 2: polaroid photo card + content
   return (
-    <div className="relative flex h-[1080px] w-[1080px] flex-col overflow-hidden" style={bgStyle}>
-      <div
-        className="absolute inset-0 opacity-[0.12]"
-        style={{ color: palette.accentDeep }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={assets.dotsPattern} alt="" className="h-full w-full object-cover" />
-      </div>
+    <div className="relative flex h-[1080px] w-[1080px] flex-col overflow-hidden">
+      {/* Full-bleed photo background */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={assets.primary}
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      {/* Dark readable overlay (direction rotates per variant) */}
+      <div className="absolute inset-0" style={overlayStyle} />
 
-      {/* Top frame */}
-      <div className="absolute left-[80px] top-[60px]">
+      {/* Top chrome: brand chip + date — pinned regardless of variant */}
+      <div className="absolute left-[80px] right-[80px] top-[70px] z-20 flex items-center justify-between">
         <div
-          className="inline-flex rounded-full px-5 py-2 text-[18px] font-extrabold tracking-widest"
-          style={{ backgroundColor: palette.accent, color: palette.chipText }}
+          className="inline-flex items-center rounded-full px-5 py-2 text-[18px] font-extrabold tracking-widest"
+          style={{
+            backgroundColor: "rgba(255,255,255,0.95)",
+            color: palette.accentDeep,
+            boxShadow: `0 4px 14px ${dark}88`,
+          }}
         >
           {brand}
         </div>
-      </div>
-      <div
-        className="absolute right-[80px] top-[68px] text-[18px] font-bold"
-        style={{ color: palette.accentDeep }}
-      >
-        {dateLabel}
+        <div className="rounded-full bg-white/90 px-4 py-1.5 text-[18px] font-bold" style={{ color: palette.accentDeep }}>
+          {dateLabel}
+        </div>
       </div>
 
-      <div className="relative z-10 flex h-full items-center justify-center px-[60px]">
-        <div className="flex w-full items-center gap-[40px]">
-          {/* Polaroid photo */}
+      <div
+        className={`relative z-10 flex h-full flex-col ${contentJustify} gap-[32px] px-[80px] pb-[80px] pt-[170px]`}
+      >
+        {/* Headline + message (white over dark overlay) */}
+        <div className="flex max-w-[940px] flex-col gap-[26px]">
           <div
-            className="h-[440px] w-[400px] flex-shrink-0 rounded-3xl bg-white p-3 shadow-2xl"
+            className="font-black leading-[1.05] text-white"
             style={{
-              boxShadow: `0 22px 48px ${palette.accent}55`,
-              transform: "rotate(-3deg)",
+              fontSize: headlineSize,
+              letterSpacing: "-0.025em",
+              textShadow: `0 4px 18px ${dark}cc`,
             }}
           >
-            <div className="h-full w-full overflow-hidden rounded-2xl">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={assets.primary} alt="" className="h-full w-full object-cover" />
-            </div>
+            {headline}
           </div>
-
-          {/* Text column */}
-          <div className="flex flex-1 flex-col gap-[28px]">
+          {message && (
             <div
-              className="font-black leading-[1.05]"
-              style={{
-                fontSize: headlineSize,
-                color: palette.accentDeep,
-                letterSpacing: "-0.025em",
-              }}
+              className="text-[24px] font-semibold leading-[1.55] text-white/95"
+              style={{ textShadow: `0 2px 10px ${dark}aa` }}
             >
-              {headline}
+              {message}
             </div>
-            {message && (
-              <div
-                className="text-[22px] font-semibold leading-[1.55]"
-                style={{ color: "#1f1f1f" }}
-              >
-                {message}
-              </div>
-            )}
-            {daleel && translation && (
-              <div
-                data-autofit
-                data-fit-min="12"
-                className="flex flex-col gap-2 rounded-2xl bg-white px-7 py-5 shadow-lg"
-                style={{
-                  borderLeft: `6px solid ${palette.accent}`,
-                  maxHeight: "260px",
-                  overflow: "hidden",
-                }}
-              >
-                <div
-                  className="font-medium italic leading-[1.55] text-slate-800"
-                  style={{ fontSize: `${Math.min(transSize, 18)}px` }}
-                >
-                  &ldquo;{translation}&rdquo;
-                </div>
-                <Citation citation={daleel.citation} color={palette.accent} />
-              </div>
-            )}
-          </div>
+          )}
         </div>
+
+        {/* Daleel quote card — opaque white, accent top border, decorative quote glyph */}
+        {daleel && translation && (
+          <div
+            data-autofit
+            data-fit-min="13"
+            className="relative flex max-w-[940px] flex-col gap-3 rounded-3xl bg-white px-9 py-7 shadow-2xl"
+            style={{
+              boxShadow: `0 18px 48px ${dark}aa`,
+              borderTop: `8px solid ${palette.accent}`,
+              maxHeight: "340px",
+              overflow: "hidden",
+            }}
+          >
+            <QuoteGlyph
+              color={palette.accent}
+              className="absolute left-4 top-1 z-0"
+            />
+            <div
+              className="relative z-10 font-medium italic leading-[1.55] text-slate-800"
+              style={{ fontSize: `${transSize}px` }}
+            >
+              &ldquo;{translation}&rdquo;
+            </div>
+            <Citation
+              citation={daleel.citation}
+              color={palette.accent}
+              className="relative z-10"
+            />
+          </div>
+        )}
       </div>
     </div>
   );
