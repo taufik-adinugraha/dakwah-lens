@@ -131,7 +131,7 @@ celery_app.conf.update(
         "ingest-x-weekly": {
             "task": "api.workers.ingest.rotating_ingest",
             "schedule": crontab(minute=0, hour=22, day_of_week=3),
-            "kwargs": {"platform": "x", "limit": 500, "n_keywords": 999},
+            "kwargs": {"platform": "x", "limit": 200, "n_keywords": 999},
         },
         # TikTok + Instagram — PAUSED 2026-06-08 to claw back budget for
         # higher-value LLM work (briefings, daleel pool widening). Three
