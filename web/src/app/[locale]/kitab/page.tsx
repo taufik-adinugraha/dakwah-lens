@@ -14,7 +14,7 @@ import {
   type KitabHit,
 } from "@/lib/kitab-retrieval";
 import { TafsirResult } from "./TafsirResult";
-import { KitabPill } from "./KitabPill";
+import { KitabCorpusSelector } from "./KitabCorpusSelector";
 import { KitabSearchInput } from "@/components/KitabSearchInput";
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -398,6 +398,18 @@ function SearchForm({
   const selected = new Set<KitabCorpus>(corporaSelection);
   const allSelected = selected.size === ALL_CORPORA.length;
 
+  // Server-rendered labels map so the client selector doesn't need
+  // access to next-intl directly.
+  const labels: Record<string, string> = {};
+  for (const c of ALL_CORPORA) {
+    labels[c] = t(KITAB_META[c].labelKey as Parameters<typeof t>[0]);
+  }
+  // If the user hasn't submitted yet, treat "all" as "all-on" for the
+  // checkbox initial state — matches the prior behavior.
+  const initialSelection: string[] = allSelected
+    ? [...ALL_CORPORA]
+    : [...selected];
+
   return (
     <section className="pb-8">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
@@ -416,21 +428,15 @@ function SearchForm({
             <span className="font-semibold text-slate-500">
               {t("search_kitab_label")}
             </span>
-            {ALL_CORPORA.map((c) => {
-              const isOn =
-                allSelected /* "all" defaults to all-on for unsubmitted forms */ ||
-                selected.has(c);
-              const count = counts[c] ?? 0;
-              return (
-                <KitabPill
-                  key={c}
-                  corpusKey={c}
-                  label={t(KITAB_META[c].labelKey as Parameters<typeof t>[0])}
-                  count={count}
-                  initialChecked={isOn}
-                />
-              );
-            })}
+            <KitabCorpusSelector
+              corpora={ALL_CORPORA}
+              initialSelection={initialSelection}
+              counts={counts}
+              labels={labels}
+              selectAllLabel={t("search_select_all")}
+              deselectAllLabel={t("search_deselect_all")}
+              countLabel={t("search_selected_count")}
+            />
             <span className="ml-auto text-xs text-slate-400">
               {t("search_hint")}
             </span>

@@ -606,6 +606,10 @@ function AudienceCell({
  * ──────────────────────────────────────────────────────────── */
 
 function KitabSlide({ t }: { t: T }) {
+  // 8 representative kitabs across categories (Qur'an / hadith /
+  // tafsir / sirah / akhlak / fiqh / aqidah). Bumped from 6 → 8 on
+  // 2026-06-10 when the corpus reached 19; the slide's "+11 more"
+  // chip points readers to /kitab for the full list.
   const sources = [
     {
       name: t("kitab_1_name"),
@@ -629,24 +633,36 @@ function KitabSlide({ t }: { t: T }) {
       name: t("kitab_4_name"),
       meta: t("kitab_4_meta"),
       languages: t("kitab_4_languages"),
-      tone: "rose" as const,
+      tone: "violet" as const,
     },
     {
       name: t("kitab_5_name"),
       meta: t("kitab_5_meta"),
       languages: t("kitab_5_languages"),
-      tone: "violet" as const,
+      tone: "rose" as const,
     },
     {
       name: t("kitab_6_name"),
       meta: t("kitab_6_meta"),
       languages: t("kitab_6_languages"),
-      tone: "cyan" as const,
+      tone: "fuchsia" as const,
+    },
+    {
+      name: t("kitab_7_name"),
+      meta: t("kitab_7_meta"),
+      languages: t("kitab_7_languages"),
+      tone: "lime" as const,
+    },
+    {
+      name: t("kitab_8_name"),
+      meta: t("kitab_8_meta"),
+      languages: t("kitab_8_languages"),
+      tone: "sky" as const,
     },
   ];
 
   const tones: Record<
-    "brand" | "emerald" | "amber" | "rose" | "violet" | "cyan",
+    "brand" | "emerald" | "amber" | "rose" | "violet" | "cyan" | "fuchsia" | "lime" | "sky",
     string
   > = {
     brand: "border-brand-200 bg-brand-50/50 text-brand-700",
@@ -655,6 +671,9 @@ function KitabSlide({ t }: { t: T }) {
     rose: "border-rose-200 bg-rose-50/50 text-rose-700",
     violet: "border-violet-200 bg-violet-50/50 text-violet-700",
     cyan: "border-cyan-200 bg-cyan-50/50 text-cyan-700",
+    fuchsia: "border-fuchsia-200 bg-fuchsia-50/50 text-fuchsia-700",
+    lime: "border-lime-200 bg-lime-50/50 text-lime-700",
+    sky: "border-sky-200 bg-sky-50/50 text-sky-700",
   };
 
   return (
@@ -674,7 +693,7 @@ function KitabSlide({ t }: { t: T }) {
         </span>
       </div>
 
-      <div className="grid flex-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid flex-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
         {sources.map((s) => (
           <div
             key={s.name}
@@ -697,10 +716,15 @@ function KitabSlide({ t }: { t: T }) {
         ))}
       </div>
 
-      <p className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-center text-xs leading-relaxed text-slate-600">
-        <BookOpenCheck className="mr-1 inline h-3 w-3 align-text-bottom text-emerald-600" />
-        {t("kitab_promise")}
-      </p>
+      <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+        <p className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs leading-relaxed text-slate-600 sm:flex-1">
+          <BookOpenCheck className="mr-1 inline h-3 w-3 align-text-bottom text-emerald-600" />
+          {t("kitab_promise")}
+        </p>
+        <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50/80 px-3 py-1 text-[11px] font-semibold text-emerald-700">
+          {t("kitab_count_more")}
+        </span>
+      </div>
     </div>
   );
 }
