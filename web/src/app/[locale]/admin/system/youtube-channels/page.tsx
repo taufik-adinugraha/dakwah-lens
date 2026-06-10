@@ -66,13 +66,12 @@ type Filter = (typeof FILTERS)[number];
 // Sort independent of the filter. URL param `sort=`. Default mirrors
 // the historical (category, name) order so existing bookmarks land
 // on the same page they used to see.
-const SORTS = ["category", "name", "recent", "followers"] as const;
+const SORTS = ["category", "name", "recent"] as const;
 type Sort = (typeof SORTS)[number];
 const SORT_LABELS: Record<Sort, string> = {
   category: "Category",
   name: "Name (A–Z)",
   recent: "Recently added",
-  followers: "Followers",
 };
 
 // Raw `searchParams` type rather than `PageProps<"…">` because Next.js's
@@ -135,10 +134,25 @@ export default async function YoutubeChannelsPage({
       : "category";
 
   // Helper: preserve the other URL param when building a new link.
+  // NB: we distinguish "caller didn't pass the key" (preserve current)
+  // from "caller passed undefined" (explicitly clear). The previous `??`
+  // path coalesced both into "preserve current", so the All pill
+  // (which passes `show: undefined`) silently re-added the active
+  // category and the URL never cleared.
   const linkWith = (overrides: { show?: string; sort?: string }) => {
     const params = new URLSearchParams();
-    const show = overrides.show ?? (activeFilter === "all" ? undefined : activeFilter);
-    const sort = overrides.sort ?? (activeSort === "category" ? undefined : activeSort);
+    const show =
+      "show" in overrides
+        ? overrides.show
+        : activeFilter === "all"
+          ? undefined
+          : activeFilter;
+    const sort =
+      "sort" in overrides
+        ? overrides.sort
+        : activeSort === "category"
+          ? undefined
+          : activeSort;
     if (show) params.set("show", show);
     if (sort) params.set("sort", sort);
     const qs = params.toString();
@@ -165,16 +179,6 @@ export default async function YoutubeChannelsPage({
       const aT = new Date(a.createdAt).getTime();
       const bT = new Date(b.createdAt).getTime();
       return bT - aT; // newest first
-    }
-    if (activeSort === "followers") {
-      // NULL → bottom of the list (channels never verified, no count
-      // available yet). Otherwise descending — biggest audience first.
-      const aS = a.subscriberCount ?? -1;
-      const bS = b.subscriberCount ?? -1;
-      if (aS === bS) {
-        return a.name.localeCompare(b.name, "en", { sensitivity: "base" });
-      }
-      return bS - aS;
     }
     // category (default) — same ordering as the SQL ORDER BY.
     const catCmp = a.category.localeCompare(b.category);
@@ -410,6 +414,7 @@ function FilterPill({
   return (
     <Link
       href={href}
+      scroll={false}
       className={`inline-flex h-7 items-center gap-1.5 rounded-full border px-3 text-[11px] font-semibold transition ${
         active ? "border-slate-900 bg-slate-900 text-white" : inactive
       }`}
