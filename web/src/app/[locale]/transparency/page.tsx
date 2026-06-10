@@ -7,14 +7,12 @@ import {
   Heart,
   Info,
   Scale,
-  Sparkles,
 } from "lucide-react";
 
 import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
 import { marketingSectionLink } from "@/lib/marketing-href";
-import { getUsdToIdrRow } from "@/lib/settings";
 
 export async function generateMetadata({
   params,
@@ -42,18 +40,21 @@ export default async function TransparencyPage({
     locale,
   )("#donate");
 
+  // 2026-06-10: API usage is no longer counted in the public-facing
+  // "total spend" + monthly breakdown — same scoping the admin Costs
+  // page adopted. Only manual invoice entries (VPS, domain,
+  // subscriptions) feed the totals here. The auto-logged usage_events
+  // table is still the source of truth for ops on /admin/system/api-costs,
+  // but the /transparency narrative is "donations vs invoiced
+  // expenses" only — no USD↔IDR conversion needed at all on this page.
   const [
-    fxRow,
     [{ donationsTotal = 0 } = { donationsTotal: 0 }],
     [{ donationsCount = 0 } = { donationsCount: 0 }],
     recentDonations,
-    [{ apiUsdAll = 0 } = { apiUsdAll: 0 }],
     manualAll,
     monthlyDonations,
-    monthlyApi,
     monthlyManual,
   ] = await Promise.all([
-    getUsdToIdrRow(),
     db
       .select({
         donationsTotal: sql<number>`COALESCE(SUM(amount_idr), 0)::float`,
@@ -67,11 +68,6 @@ export default async function TransparencyPage({
       .from(schema.donations)
       .orderBy(desc(schema.donations.receivedAt))
       .limit(RECENT_LIMIT),
-    db
-      .select({
-        apiUsdAll: sql<number>`COALESCE(SUM(cost_usd), 0)::float`,
-      })
-      .from(schema.usageEvents),
     db.select().from(schema.manualCosts),
     db.execute(sql`
       SELECT
@@ -87,15 +83,6 @@ export default async function TransparencyPage({
     >,
     db.execute(sql`
       SELECT
-        DATE_TRUNC('month', occurred_at)::date AS month,
-        COALESCE(SUM(cost_usd), 0)::float AS usd
-      FROM usage_events
-      GROUP BY month
-      ORDER BY month DESC
-      LIMIT 12
-    `) as unknown as Promise<Array<{ month: string; usd: number }>>,
-    db.execute(sql`
-      SELECT
         DATE_TRUNC('month', period_start)::date AS month,
         COALESCE(SUM(amount_idr), 0)::float AS idr
       FROM manual_costs
@@ -105,15 +92,14 @@ export default async function TransparencyPage({
     `) as unknown as Promise<Array<{ month: string; idr: number }>>,
   ]);
 
-  const usdToIdr = fxRow.value;
-  const apiAllIdr = apiUsdAll * usdToIdr;
   const manualAllIdr = manualAll.reduce((s, r) => s + r.amountIdr, 0);
-  const totalSpendIdr = apiAllIdr + manualAllIdr;
+  const totalSpendIdr = manualAllIdr;
   const net = donationsTotal - totalSpendIdr;
 
   // Combine monthly streams into a single sorted list, newest first.
+  // Outflow is manual invoices only (per the same scoping decision on
+  // the totals above) — `monthlyApi` is no longer fetched.
   type DonationsRow = { month: string; idr: number; n: number };
-  type ApiRow = { month: string; usd: number };
   type ManualRow = { month: string; idr: number };
   const monthMap = new Map<
     string,
@@ -124,12 +110,6 @@ export default async function TransparencyPage({
     const existing = monthMap.get(key) ?? { incomeIdr: 0, outIdr: 0, n: 0 };
     existing.incomeIdr += Number(r.idr ?? 0);
     existing.n += Number(r.n ?? 0);
-    monthMap.set(key, existing);
-  }
-  for (const r of asArray<ApiRow>(monthlyApi)) {
-    const key = String(r.month);
-    const existing = monthMap.get(key) ?? { incomeIdr: 0, outIdr: 0, n: 0 };
-    existing.outIdr += Number(r.usd ?? 0) * usdToIdr;
     monthMap.set(key, existing);
   }
   for (const r of asArray<ManualRow>(monthlyManual)) {
@@ -148,7 +128,7 @@ export default async function TransparencyPage({
 
       <section className="py-10 sm:py-14">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <div className="grid gap-3 sm:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-3">
             <StatTile
               label={t("stat_donations_label")}
               valueIdr={donationsTotal}
@@ -170,22 +150,8 @@ export default async function TransparencyPage({
               tone={net >= 0 ? "emerald" : "rose"}
               icon={Scale}
             />
-            <StatTile
-              label={t("stat_api_label")}
-              valueUsd={apiUsdAll}
-              valueIdrFromUsd={apiAllIdr}
-              hint={t("stat_api_hint")}
-              tone="brand"
-              icon={Sparkles}
-            />
           </div>
 
-          <FxDisclaimer
-            rate={usdToIdr}
-            updatedAt={fxRow.updatedAt}
-            t={t}
-            idLocale={idLocale}
-          />
           <PrepaidDisclaimer t={t} />
         </div>
       </section>
@@ -291,41 +257,6 @@ const TILE_STYLES = {
   brand: { bg: "bg-brand-50", icon: "text-brand-700", value: "text-slate-900" },
   slate: { bg: "bg-slate-100", icon: "text-slate-700", value: "text-slate-900" },
 } as const;
-
-function FxDisclaimer({
-  rate,
-  updatedAt,
-  t,
-  idLocale,
-}: {
-  rate: number;
-  updatedAt: Date | null;
-  t: T;
-  idLocale: string;
-}) {
-  return (
-    <aside className="mt-6 flex items-start gap-3 rounded-2xl border border-amber-100 bg-amber-50/60 p-4 text-sm text-slate-700">
-      <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
-      <div className="space-y-1 leading-relaxed">
-        <p className="font-semibold text-slate-900">{t("fx_title")}</p>
-        <p>
-          {t("fx_rate_line", {
-            rate: rate.toLocaleString("id-ID"),
-            updated: updatedAt
-              ? new Date(updatedAt).toLocaleDateString(idLocale, {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                  timeZone: "Asia/Jakarta",
-                })
-              : t("fx_factory_default"),
-          })}
-        </p>
-        <p>{t("fx_caveat")}</p>
-      </div>
-    </aside>
-  );
-}
 
 function PrepaidDisclaimer({ t }: { t: T }) {
   return (
