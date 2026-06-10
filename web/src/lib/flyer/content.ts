@@ -282,7 +282,16 @@ function tidyHeadline(raw: string, maxWords = 6): string {
  *  The flyer is read standalone — references to "this khutbah", "this
  *  discussion", "thanks guys", "the X topics above", etc. read as
  *  nonsense in that context. */
-const FORMAT_REFERENCE_RE = /\b(?:mari kita tutup|kita tutup|khutbah ini|kajian ini|diskusi (?:ini|malam ini)|thanks guys|guys,|sidang jum'?at|ma['ʼ]?asyiral|jamaah|jama['ʼ]?ah|hadirin|rahimakumullah|mukmin sekalian|bapak[- ]?ibu|ibu[- ]?ibu yang|kakak[- ]?kakak yang|adik[- ]?adik yang|sekian|wallahu a['ʼ]?lam|video ini|reel ini|caption ini|outline ini|materi ini|sesi ini|pertemuan ini|pekan depan kita|sesi (?:tadi|hari ini)|saat khutbah|saat kajian|topik(?:-topik)? di atas|topik(?:-topik)? tersebut|(?:dua|tiga|empat|lima|enam|tujuh|delapan|sembilan|sepuluh) topik|kategori di atas|ringkasan di atas|bagian di atas|tabel di atas|section\s+(?:above|di atas)|paragraf di atas|the (?:eight|seven|six|five|four|three|two|nine|ten) topics|topics? above|sections? above|the table above|as (?:noted|shown) above)\b/i;
+// Note on `jama['ʼ]?ah` (2026-06-10): we MUST require an audience-address
+// qualifier ("sekalian", "rahimakumullah", "hafizahumullah", "yang
+// dirahmati", "yang berbahagia"). Plain `\bjamaah\b` matches the normal
+// Indonesian noun ("Banyak jamaah", "membantu jamaah") that appears in
+// non-stage-cue prose all the time — leaving it unqualified stripped
+// most of the Aqidah-slot-2 body and forced the renderer to fall back
+// to extractAksiMessage, which pulled the "Empat aksi segmentasi usia…"
+// intro from a totally different section. `ma['ʼ]?asyiral` already
+// covers the "Ma'asyiral jamaah" khutbah opening.
+const FORMAT_REFERENCE_RE = /\b(?:mari kita tutup|kita tutup|khutbah ini|kajian ini|diskusi (?:ini|malam ini)|thanks guys|guys,|sidang jum'?at|ma['ʼ]?asyiral|jama['ʼ]?ah\s+(?:sekalian|rahimakumullah|hafizahumullah|yang\s+(?:dirahmati|berbahagia))|hadirin|rahimakumullah|mukmin sekalian|bapak[- ]?ibu|ibu[- ]?ibu yang|kakak[- ]?kakak yang|adik[- ]?adik yang|sekian|wallahu a['ʼ]?lam|video ini|reel ini|caption ini|outline ini|materi ini|sesi ini|pertemuan ini|pekan depan kita|sesi (?:tadi|hari ini)|saat khutbah|saat kajian|topik(?:-topik)? di atas|topik(?:-topik)? tersebut|(?:dua|tiga|empat|lima|enam|tujuh|delapan|sembilan|sepuluh) topik|kategori di atas|ringkasan di atas|bagian di atas|tabel di atas|section\s+(?:above|di atas)|paragraf di atas|the (?:eight|seven|six|five|four|three|two|nine|ten) topics|topics? above|sections? above|the table above|as (?:noted|shown) above)\b/i;
 
 /** Drop visual-direction / stage cues that creep in from the Kreator
  *  script when its prose is lifted into the flyer message. */
