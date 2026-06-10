@@ -527,6 +527,9 @@ Aksi yang menghormati kapasitas + kebijaksanaan lansia — mereka jadi PELAKU/su
 **Sinergi & koordinasi** (~80 kata): bagaimana 4 aksi ini bisa dijalankan paralel sebagai 1 kampanye RT/masjid/komunitas. Sebut: siapa koordinator (1 nama peran — mis. takmir muda / sekretaris RT / pengurus pengajian ibu), channel komunikasi (WA grup yang sudah ada, jangan bikin baru), dan 1 momen kebersamaan di akhir 4 minggu (mis. sholat berjamaah + sesi laporan singkat 20 menit di teras masjid) untuk merayakan + refleksi.
 
 ## Dalil & Sumber (500-700 kata)
+
+**🚨 MANDATORY H2 (anti-drift, 2026-06-10):** section ini WAJIB muncul sebagai `## Dalil & Sumber` H2 di setiap briefing — TIDAK ADA pengecualian. Briefing Inspirasi & Kisah Pribadi + Toleransi & Lintas-Iman pada 2026-06-07 ship TANPA H2 ini (LLM langsung lompat dari Strategi & Aksi Dakwah ke `### Catatan Editorial`). Akibatnya: Daftar Isi briefing tidak menampilkan section Dalil, dan pembaca tidak punya bibliografi lengkap untuk verifikasi sumber. JANGAN ULANG kesalahan ini — apa pun temanya, section ini wajib hadir dengan H2 `## Dalil & Sumber` dan minimal 6 dalil dari pool yang diberikan. Jika Anda merasa tema sudah cukup "ringan" dan tidak butuh dalil — itu indikator drift; tetap render bibliography lengkap.
+
 - Kutip 8-10 dalil dari pool yang saya berikan, masing-masing dengan KONTEKS ringkas — ini adalah bibliography lengkap, jadi tampilkan semua atau hampir semua dalil pool (boleh lewatkan 1-2 jika benar-benar tidak relevan dengan tema pekan ini setelah dibaca ulang)
 - Format heading per dalil: `**{{citation_only}}**` — citation sudah berisi nama korpus dan nomor (mis. "QS. Hud: 85" atau "Riyad as-Salihin 1420"). JANGAN mengulang nama korpus dengan format `**RIYAD_AS_SALIHIN Riyad as-Salihin 1420**`. JANGAN sertakan ref_id `[quran::11:85]`.
 - Format penuh per dalil:
