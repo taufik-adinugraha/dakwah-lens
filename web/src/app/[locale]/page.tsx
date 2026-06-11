@@ -20,6 +20,7 @@ import {
   Newspaper,
   QrCode,
   Quote,
+  ScrollText,
   Radar,
   Radio,
   ShieldCheck,
@@ -476,6 +477,11 @@ function BriefingShowcase({ t }: { t: LandingT }) {
       icon: Compass,
       title: t("briefing_showcase_item_kajian_title"),
       body: t("briefing_showcase_item_kajian_body"),
+    },
+    {
+      icon: ScrollText,
+      title: t("briefing_showcase_item_kisah_title"),
+      body: t("briefing_showcase_item_kisah_body"),
     },
     {
       icon: Heart,

@@ -1294,37 +1294,88 @@ function MonthlyCost({ t }: { t: T }) {
 }
 
 function KitabCorpus({ t }: { t: T }) {
+  // 19 kitabs grouped into 5 thematic categories. Order within each
+  // group mirrors the /kitab library page so a reader who's been there
+  // sees the same mental model. Update both places together.
+  const categories: Array<{ heading: string; note?: string; items: Array<{ title: string; detail: string }> }> = [
+    {
+      heading: t("kitab_cat_quran_tafsir"),
+      items: [
+        { title: "Al-Qur'an al-Karim", detail: t("kitab_quran") },
+        { title: "Tafsir Ibn Katsir", detail: t("kitab_tafsir") },
+      ],
+    },
+    {
+      heading: t("kitab_cat_hadith"),
+      items: [
+        { title: "Sahih al-Bukhari", detail: t("kitab_bukhari") },
+        { title: "Sahih Muslim", detail: t("kitab_muslim") },
+        { title: "Riyad as-Salihin", detail: t("kitab_riyad") },
+        { title: "Bulugh al-Maram", detail: t("kitab_bulugh") },
+      ],
+    },
+    {
+      heading: t("kitab_cat_sirah"),
+      items: [
+        { title: "Sirah Ibnu Hisyam", detail: t("kitab_sirah") },
+        { title: "Asy-Syama'il al-Muhammadiyyah", detail: t("kitab_syamail") },
+        { title: "Hayatus Shahabah", detail: t("kitab_hs") },
+        { title: "Al-Bidayah wan-Nihayah", detail: t("kitab_bn") },
+      ],
+    },
+    {
+      heading: t("kitab_cat_fiqh"),
+      items: [
+        { title: "Al-Umm", detail: t("kitab_umm") },
+        { title: "Fiqh as-Sunnah", detail: t("kitab_fs") },
+        { title: "Fath al-Mu'in", detail: t("kitab_fmuin") },
+        { title: "Fath al-Qarib al-Mujib", detail: t("kitab_fqarib") },
+      ],
+    },
+    {
+      heading: t("kitab_cat_aqidah_adab"),
+      items: [
+        { title: "Bidayatul Hidayah", detail: t("kitab_bidayat") },
+        { title: "Nashaihul Ibad", detail: t("kitab_nashaih") },
+        { title: "Adab al-'Alim wa al-Muta'allim", detail: t("kitab_adab") },
+        { title: "'Aqidat al-'Awam", detail: t("kitab_aqidah") },
+        { title: "Thalathat al-Ushul", detail: t("kitab_ts3") },
+      ],
+    },
+  ];
+
   return (
     <section className="border-y border-slate-100 bg-gradient-to-b from-emerald-50/30 to-white py-12 sm:py-16">
-      <div className="mx-auto max-w-3xl px-4 sm:px-6">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
         <SectionHeader
           title={t("kitab_title")}
           subtitle={t("kitab_subtitle")}
         />
-        <ul className="mt-8 grid gap-3 sm:grid-cols-2">
-          <KitabItem
-            title="Al-Qur'an al-Karim"
-            detail={t("kitab_quran")}
-          />
-          <KitabItem
-            title="Sahih al-Bukhari"
-            detail={t("kitab_bukhari")}
-          />
-          <KitabItem
-            title="Sahih Muslim"
-            detail={t("kitab_muslim")}
-          />
-          <KitabItem
-            title="Riyad as-Salihin"
-            detail={t("kitab_riyad")}
-          />
-          <KitabItem
-            title="Tafsir Ibn Kathir"
-            detail={t("kitab_tafsir")}
-          />
-        </ul>
-        <p className="mx-auto mt-6 max-w-2xl text-pretty text-center text-xs leading-relaxed text-slate-600">
+        <div className="mt-8 space-y-8">
+          {categories.map((cat) => (
+            <div key={cat.heading}>
+              <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700">
+                {cat.heading}
+              </p>
+              <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+                {cat.items.map((item) => (
+                  <KitabItem key={item.title} title={item.title} detail={item.detail} />
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <p className="mx-auto mt-8 max-w-2xl text-pretty text-center text-xs leading-relaxed text-slate-600">
           {t("kitab_note")}
+        </p>
+        <p className="mt-4 text-center text-xs">
+          <Link
+            href="/kitab"
+            className="inline-flex items-center gap-1 font-semibold text-emerald-700 hover:text-emerald-800"
+          >
+            {t("kitab_browse_library")}
+            <ArrowRight className="h-3 w-3" />
+          </Link>
         </p>
       </div>
     </section>
