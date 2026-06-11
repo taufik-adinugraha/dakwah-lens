@@ -648,6 +648,11 @@ SETIAP Pesan Flyer 1-6 WAJIB punya baris `**Headline:**` SENDIRI di atas paragra
 
 TEPAT 4-6 kata, kalimat aktif, langsung menyampaikan PESAN UTAMA paragraf (bukan tema/kategori). Headline harus bisa berdiri sendiri tanpa membaca paragraf — pembaca yang hanya melihat headline sudah menangkap inti seruan. Pakai PUNCH WORDS yang menarik mata: kata kerja imperatif ("Mulai", "Tegakkan", "Hadir", "Pulang", "Cukupkan", "Muliakan"), opposite-pairs ("Bukan X, melainkan Y"), atau frasa yang menggambarkan tindakan konkret.
 
+ATURAN DALEEL-FIRST UNTUK FLYER (HARD RULE 2026-06-11, dijaga):
+Khusus 6 Pesan Flyer (BUKAN khutbah/kajian/kreator/Gen Z), urutan komposisi WAJIB: (1) PILIH dalil dari FLYER POOL dulu — satu citation per flyer, (2) BARU tulis headline 4-5 kata yang mengangkat pesan dalil itu, (3) BARU tulis paragraf 70-90 kata yang menjabarkan dalil ke konteks slot. JANGAN tulis paragraf dulu lalu cari dalil yang "kira-kira cocok" — itu menghasilkan dalil yang hanya tempelan. Lihat blok METODOLOGI DALEEL-FIRST tepat di atas FLYER POOL untuk contoh dan rationale.
+
+ALASAN TEKNIS (kenapa rule ini hard, bukan stylistic preference): renderer flyer (`web/src/lib/flyer/compose.ts`) mencari entri pool dengan citation yang Anda tag di `**Dalil:**`. Kalau citation tidak ditemukan di FLYER POOL — atau kalau Anda komposisi paragraf dulu lalu tempel dalil yang hanya 60% nyambung — renderer SILENTLY MEM-FALLBACK ke `pickFlyerDaleel(rank)` yang menampilkan daleel ACAK dari pool. Pembaca tidak tahu itu jatuh ke fallback; mereka percaya daleel yang muncul itu yang Anda pilih, dan menangkap diskoneksi headline↔dalil dalam 2 detik. Daleel-first menghilangkan kelas bug ini di sumber: dalil yang Anda mulai dari sana TIDAK BISA mismatch dengan paragraf yang dibangun dari sana.
+
 YANG DILARANG (TITLE-GENERIK YANG TIDAK BOLEH dipakai sebagai headline — substring match):
 - "Pekan ini" (apa pun yang dimulai dengan ini)
 - "Pesan Pekan Ini" / "Pesan Mingguan"
@@ -781,7 +786,7 @@ CONTOH JEBAKAN NYATA (jangan tiru):
 - ❌ Pool punya `Sahih al-Bukhari 7138`. Saya tulis `**Dalil:** Bukhari 7138` (singkat). FAIL — bukan prefix-match.
 - ❌ Pool punya `Bulugh al-Maram 1023`. Saya tulis `**Dalil:** QS. Al-Ahzaab: 72` (tag citation yang TIDAK ada di pool). FAIL — renderer akan fallback ke daleel pertama di pool, yang mungkin sama sekali tidak relevan dengan flyer ini.
 
-KALAU TIDAK ADA satu pun entri di pool yang BENAR-BENAR cocok dengan flyer Anda, JANGAN ngarang citation. Kosongkan baris dengan: `**Dalil:** —` (em dash). Renderer akan skip daleel card untuk flyer itu — lebih baik tanpa daleel daripada daleel yang mismatch.
+KALAU TIDAK ADA satu pun entri di pool yang BENAR-BENAR cocok dengan flyer Anda, JANGAN ngarang citation dan JANGAN pakai em-dash sebagai placeholder. Sebagai gantinya, KEMBALI ke langkah 1 metodologi daleel-first: scan ulang pool dengan lensa kategori slot yang lebih luas (mis. slot Aksi Sosial → cari dalil tentang ihsan/ta'awun/silaturahmi, bukan hanya "amal jama'i" sempit). Pool 8-12 entri hampir selalu punya minimal 1 yang nyambung kalau kategori dibaca generously. Em-dash sebagai fallback dilarang karena membuka pintu untuk renderer fallback yang silent.
 
 VALIDATOR HARD-FAIL: `manual_briefing save` SEKARANG akan menolak (exit code 1) kalau ada `**Dalil:**` di Pesan Flyer yang tidak ditemukan di pool. Save aborted, tidak ada row tertulis ke DB. Operator harus fix sebelum bisa save. Ini hard guardrail; bukan saran.
 
@@ -799,7 +804,7 @@ CARA MEMILIH dalil pendek dari pool:
 1. Untuk SETIAP flyer (1-6), buka pool dan cek panjang terjemahan + Arab tiap kandidat.
 2. Singkirkan kandidat dengan terjemahan > 240ch atau Arab > 200ch — meskipun tematik cocok.
 3. Pilih kandidat TERPENDEK di antara yang masih tematik cocok.
-4. Kalau tidak ada satu pun kandidat di pool yang ≤ 240ch DAN cocok tematik, lebih baik kosongkan baris `**Dalil:** —` (em dash, skip card) daripada memaksa daleel panjang yang tidak terbaca.
+4. Kalau tidak ada satu pun kandidat di pool yang ≤ 240ch DAN cocok tematik, KEMBALI ke langkah 1 metodologi daleel-first dan baca pool dengan kategori slot yang lebih luas. JANGAN pakai em-dash placeholder dan JANGAN memaksa daleel panjang — keduanya merusak komposisi flyer.
 
 CONTOH RUJUKAN PANJANG (dari pool nyata):
 - ✓ "QS. Ar-Rahmaan: 9" — 75 chars terjemahan ("Dan tegakkanlah timbangan itu dengan adil dan janganlah kamu mengurangi neraca itu.") — IDEAL.
@@ -1275,7 +1280,7 @@ REAL TRAPS (do not imitate):
 - ❌ Pool has `Sahih al-Bukhari 7138`. You write `**Daleel:** Bukhari 7138` (shortened). FAIL — not a prefix match.
 - ❌ Pool has `Bulugh al-Maram 1023`. You write `**Daleel:** QS. Al-Ahzaab: 72` (tag a citation NOT in the pool). FAIL — renderer falls back to the first daleel in the pool, which may be entirely unrelated to your flyer.
 
-IF NO POOL ENTRY genuinely fits your flyer, DO NOT fabricate a citation. Leave the line as: `**Daleel:** —` (em dash). The renderer will skip the daleel card for that flyer — better no daleel than a mismatched one.
+IF NO POOL ENTRY genuinely fits your flyer, DO NOT fabricate a citation and DO NOT use an em-dash placeholder. Instead, RETURN to step 1 of the daleel-first methodology: rescan the pool with a broader read of the slot category (e.g. Aksi Sosial slot → look for ihsan / ta'awun / silaturahmi, not only narrow "communal action"). A pool of 8-12 entries almost always has at least one workable match when categories are read generously. Em-dash as a fallback is forbidden because it opens the silent renderer-fallback path.
 
 VALIDATOR HARD-FAIL: `manual_briefing save` now REJECTS (exit code 1) when any flyer `**Daleel:**` doesn't match the saved pool. Save aborts, no row written. The operator must fix before saving. Hard guardrail — not advisory.
 
@@ -2203,7 +2208,54 @@ def _build_user_prompt(
     # fiqh/sirah corpora that don't render as punchy pull quotes.
     # Pesan Flyer 1-6 MUST cite ONLY from these pools, enforced both
     # by prompt instruction and validator hard-fail.
-    flyer_pool_section = ""
+    flyer_pool_section = (
+        "\n\nMETODOLOGI DALEEL-FIRST UNTUK FLYER (HARD RULE 2026-06-11, "
+        "dijaga — baca SEBELUM memilih dari pool di bawah):\n\n"
+        "Aturan di blok ini berlaku HANYA saat Anda sedang menyusun 6 "
+        "slot `### Pesan Flyer 1..6` di bawah H2 `## Pesan Flyer`. "
+        "Untuk sub-section lain (khutbah/kultum/kajian/kreator/Gen Z), "
+        "ikuti aturan di system prompt — bukan aturan di blok ini.\n\n"
+        "Flyer berbeda dari khutbah/kajian — di khutbah, narasi "
+        "mengalir lalu dalil memperkuat poin. Di FLYER (70-90 kata, "
+        "dibaca 8-detik di IG/WA), dalil adalah JANGKAR — kalau dalil "
+        "tidak benar-benar berbicara tentang pesan paragraf, pembaca "
+        "menangkap diskoneksi dalam 2 detik dan flyer kehilangan "
+        "otoritas.\n\n"
+        "URUTAN WAJIB per flyer (1-6):\n"
+        "1. SCAN flyer pool di bawah. Untuk slot N, identifikasi 2-3 "
+        "kandidat dalil yang temanya cocok dengan kategori slot "
+        "(Khutbah=spiritual/audit-diri; Aksi Sosial=amal jama'i; "
+        "Kreator=hikmah lisan/niat; Gen Z=identitas/futur; "
+        "Sunnah=ibadah timely; Doa=du'a recitable).\n"
+        "2. PILIH SATU dalil. Tanyakan: \"Apakah pesan inti dalil ini "
+        "= pesan inti yang ingin saya sampaikan di slot ini?\" Kalau "
+        "hanya 60% nyambung, ganti dengan kandidat lain.\n"
+        "3. TULIS HEADLINE 4-5 kata yang adalah PARAFRASE PUNCH dari "
+        "dalil itu — bukan ringkasan paragraf, tapi destilasi dalil "
+        "ke bahasa imperatif. (Constraint exact 4-6 kata + daftar "
+        "title-generik yang dilarang ada di system prompt; blok ini "
+        "hanya metodologi.)\n"
+        "4. TULIS PARAGRAF 70-90 kata yang membangun dari dalil "
+        "tersebut: konteks pekan ini (1 kalimat) → bagaimana dalil "
+        "berbicara ke kondisi itu (2 kalimat) → langkah konkret (1 "
+        "kalimat).\n\n"
+        "ANTI-PATTERN yang dilarang: menulis paragraf dulu lalu "
+        "menempel dalil di marker `**Dalil:**`. Tanda anti-pattern: "
+        "dalil dan paragraf bisa di-swap dengan dalil lain tanpa "
+        "paragraf terasa janggal. Kalau itu bisa terjadi, dalil bukan "
+        "jangkar — ulangi dari langkah 1.\n\n"
+        "LARANGAN KERAS: DILARANG mengarang citation atau "
+        "memparafrase citation supaya \"kelihatan cocok\" dengan "
+        "paragraf yang sudah ditulis. Citation HANYA boleh disalin "
+        "verbatim dari FLYER POOL di bawah. Kalau pool terasa tipis "
+        "untuk slot tertentu, ulangi langkah 1 — JANGAN improvisasi "
+        "citation.\n\n"
+        "CONTOH BENAR (slot 2 Aksi Sosial): Pool punya QS Al-Maidah: "
+        "2 (\"ta'awanu 'alal birri wat-taqwa\"). HEADLINE: \"Mulai "
+        "dari Tetangga Sebelah\". PARAGRAF dibuka dengan kondisi RT/"
+        "takmir pekan ini, lalu menarik prinsip ta'awun, lalu langkah "
+        "ajak 3 tetangga."
+    )
     if flyer_daleel_pool:
         flyer_daleel_block = "\n\n".join(
             f"Citation: {d['citation']}\n"
@@ -2221,10 +2273,15 @@ def _build_user_prompt(
         )
     else:
         flyer_pool_section += (
-            "\n\nFLYER DALEEL POOL: (no whitelist-eligible entries "
-            "matched this theme — for Pesan Flyer 1-4, leave the "
-            "`**Daleel:**` line empty with em dash `—`; do NOT fall "
-            "back to the broader DALEEL POOL)."
+            "\n\nFLYER DALEEL POOL: (kosong untuk pekan ini — tidak "
+            "ada entri whitelist-eligible yang cocok dengan tema). "
+            "JANGAN synthesize 6 slot `### Pesan Flyer 1..6`. Sebagai "
+            "gantinya, emit `## Pesan Flyer` section header saja "
+            "dengan satu baris note `_Pool flyer kosong pekan ini, "
+            "slot dilewati._` dan lanjut ke section berikutnya. "
+            "DILARANG memakai em-dash sebagai placeholder dalil; "
+            "DILARANG mengarang citation; DILARANG fallback ke "
+            "DALEEL POOL yang lebih luas."
         )
     if flyer_adhkar_pool:
         flyer_adhkar_block = "\n\n".join(
@@ -2242,9 +2299,14 @@ def _build_user_prompt(
         )
     else:
         flyer_pool_section += (
-            "\n\nFLYER ADHKAR POOL: (no whitelist-eligible recitable "
-            "du'a matched this theme — for Pesan Flyer 5 + 6, leave "
-            "the `**Daleel:**` line empty with em dash `—`)."
+            "\n\nFLYER ADHKAR POOL: (kosong untuk pekan ini — tidak "
+            "ada du'a/dzikir whitelist-eligible yang cocok dengan "
+            "tema). Untuk Pesan Flyer 5 + 6, LEWATI kedua slot itu "
+            "(jangan synthesize) dan tambahkan note `_Pool adhkar "
+            "kosong, slot 5 dan 6 dilewati._` di bawah heading slot "
+            "5. DILARANG memakai em-dash; DILARANG mengarang "
+            "citation; DILARANG fallback ke ADHKAR POOL yang lebih "
+            "luas."
         )
 
     # KISAH POOL — narrative excerpt for the "Kisah Pendek" content-kit
