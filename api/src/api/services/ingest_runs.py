@@ -30,7 +30,21 @@ from api.models.admin import IngestRun
 log = structlog.get_logger()
 
 
-async def start_run(task_name: str, *, platform: str | None = None) -> UUID:
+async def start_run(
+    task_name: str,
+    *,
+    platform: str | None = None,
+    query: str | None = None,
+) -> UUID:
+    """Open an `ingest_runs` row in `status=running`. Returns the new row's
+    UUID — caller passes it to `finish_run()` to close the lifecycle.
+
+    `query` records the search keyword for `run_ingest` rows so dead /
+    zero-yield queries are traceable from the run history. Pass None
+    for parent-level rows (rotating_ingest, trending_ingest,
+    youtube_channels_ingest) and for `run_ingest mainstream` (fixed RSS
+    list, no query).
+    """
     async with SessionLocal() as session:
         # `datetime.now(UTC)` not `utcnow()` — utcnow returns a naive
         # datetime that PG (with session TZ=Asia/Jakarta) re-interprets
@@ -39,6 +53,7 @@ async def start_run(task_name: str, *, platform: str | None = None) -> UUID:
         run = IngestRun(
             task_name=task_name,
             platform=platform,
+            query=(query[:160] if query else None),  # match column length
             status="running",
             started_at=datetime.now(UTC),
         )

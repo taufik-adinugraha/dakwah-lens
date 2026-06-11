@@ -81,8 +81,15 @@ def run_ingest(
         return 0
 
     async def _runner() -> int:
+        # Record the query text on the run row so per-query yield is
+        # traceable from history (added 2026-06-11). Mainstream RSS
+        # doesn't use a query — pass None there. Empty/whitespace
+        # query → also None so SQL filters don't see empty strings.
+        run_query = (
+            (query or "").strip() if platform != "mainstream" else None
+        ) or None
         run_id = await ingest_runs.start_run(
-            task_name="run_ingest", platform=platform
+            task_name="run_ingest", platform=platform, query=run_query
         )
         try:
             n = await ingest_script._run(

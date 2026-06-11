@@ -129,6 +129,15 @@ class IngestRun(Base):
     platform: Mapped[str | None] = mapped_column(String(20), index=True)
     """NULL for cross-platform tasks like `recluster_all`."""
 
+    query: Mapped[str | None] = mapped_column(String(160), index=True)
+    """Search query / keyword for `run_ingest` rows (per-query attribution
+    so dead queries can be identified from yield history). NULL for
+    parent-level rows (`rotating_ingest`, `trending_ingest`,
+    `recluster_all`) and for `run_ingest mainstream` runs (which scrape
+    a fixed RSS list, not a query). Added 2026-06-11 after the weekly
+    X run on 2026-06-08 showed 64% zero-yield queries that couldn't be
+    diagnosed because per-query attribution wasn't recorded."""
+
     status: Mapped[str] = mapped_column(String(20), nullable=False)
     """One of: running, success, failed."""
 
