@@ -154,12 +154,24 @@ export function BriefingNarrative({
   // `## Pesan Flyer` is renderer input, not display content — see helper.
   const bodyForDisplay = stripFlyerMessagesSection(text);
 
+  // Detect actual content language from the body, NOT from the locale.
+  // EN generation paused 2026-05-23 → post-cutoff briefings fall back
+  // to Indonesian summary_md when viewed under /en. If we use locale
+  // alone, splitSection4 looks for English headings ("Da'wah Strategies
+  // & Actions") and misses the Indonesian heading actually present
+  // ("Strategi & Aksi Dakwah"), so the cards-and-modal layout never
+  // fires on the EN locale page. Result: /en page renders a flat
+  // markdown chapter instead of the rich deliverable grid.
+  const contentIsEnglish = /(?:^|\n)##\s+(?:Da'wah|Dawah)\s+Strategies/i.test(
+    bodyForDisplay,
+  );
+
   // Try to split out Section 4 only when caller provides cards UI hooks.
   // Otherwise render the whole markdown inline (existing behavior for
   // preview surfaces and back-compat).
   const split =
     briefBasePath && deliverableLabels
-      ? splitSection4(bodyForDisplay, locale === "en")
+      ? splitSection4(bodyForDisplay, contentIsEnglish)
       : null;
 
   return (
