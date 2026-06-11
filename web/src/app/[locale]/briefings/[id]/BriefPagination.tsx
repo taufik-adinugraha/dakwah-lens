@@ -10,6 +10,7 @@ import {
 
 import { Link } from "@/i18n/navigation";
 import { type BriefingNavigation } from "@/lib/briefing-data";
+import { paletteFor } from "@/lib/theme-group-palette";
 
 /**
  * In-page pagination block at the bottom of a briefing.
@@ -76,45 +77,64 @@ export async function BriefPagination({
         </Link>
       </div>
 
-      {/* Peer-group cards — up to 5 per edition (top-5 auto-pipeline). */}
+      {/* Peer-group cards — up to 5 per edition (top-5 auto-pipeline).
+          Per-theme-group palette via paletteFor() (2026-06-11) so the
+          grid reads as a colored mosaic instead of a wall of identical
+          gray cards. "Sedang dibaca" card keeps the strong slate
+          border so the you-are-here anchor stays unambiguous, but its
+          chip + bg + text adopt the current group's palette too. */}
       <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {/* Current group always first. */}
-        <li>
-          <div
-            aria-current="page"
-            className="group relative flex h-full flex-col rounded-2xl border-2 border-slate-900 bg-gradient-to-br from-slate-50 to-white px-4 py-3.5 shadow-sm"
-          >
-            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-slate-700">
-              <Layers className="h-3.5 w-3.5" />
-            </span>
-            <p className="mt-2.5 text-sm font-bold text-slate-900">
-              {currentGroup}
-            </p>
-            <p className="mt-2 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-emerald-700">
-              <CheckCircle2 className="h-3 w-3" />
-              {t("brief_nav_current")}
-            </p>
-          </div>
-        </li>
-        {peers.map(([group, peer]) => (
-          <li key={group}>
-            <Link
-              href={`/briefings/${peer.slug}`}
-              className="group relative flex h-full flex-col rounded-2xl border border-slate-200 bg-white px-4 py-3.5 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-900 hover:shadow-md"
-            >
-              <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition group-hover:bg-slate-900 group-hover:text-white">
-                <Layers className="h-3.5 w-3.5" />
-              </span>
-              <p className="mt-2.5 text-sm font-bold text-slate-900">
-                {group}
-              </p>
-              <p className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-slate-500 transition group-hover:text-slate-900">
-                {t("brief_nav_open")}
-                <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
-              </p>
-            </Link>
-          </li>
-        ))}
+        {(() => {
+          const p = paletteFor(currentGroup);
+          return (
+            <li>
+              <div
+                aria-current="page"
+                className={`group relative flex h-full flex-col rounded-2xl border-2 border-slate-900 px-4 py-3.5 shadow-sm ${p.cardBg}`}
+              >
+                <span
+                  className={`inline-flex h-7 w-7 items-center justify-center rounded-full ${p.chipBg} ${p.chipText}`}
+                >
+                  <Layers className="h-3.5 w-3.5" />
+                </span>
+                <p className="mt-2.5 text-sm font-bold text-slate-900">
+                  {currentGroup}
+                </p>
+                <p className="mt-2 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-emerald-700">
+                  <CheckCircle2 className="h-3 w-3" />
+                  {t("brief_nav_current")}
+                </p>
+              </div>
+            </li>
+          );
+        })()}
+        {peers.map(([group, peer]) => {
+          const p = paletteFor(group);
+          return (
+            <li key={group}>
+              <Link
+                href={`/briefings/${peer.slug}`}
+                className={`group relative flex h-full flex-col rounded-2xl border px-4 py-3.5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${p.cardBorder} ${p.cardBg} hover:border-slate-900`}
+              >
+                <span
+                  className={`inline-flex h-7 w-7 items-center justify-center rounded-full ${p.chipBg} ${p.chipText}`}
+                >
+                  <Layers className="h-3.5 w-3.5" />
+                </span>
+                <p className="mt-2.5 text-sm font-bold text-slate-900">
+                  {group}
+                </p>
+                <p
+                  className={`mt-2 inline-flex items-center gap-1 text-xs font-semibold ${p.openText}`}
+                >
+                  {t("brief_nav_open")}
+                  <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
+                </p>
+              </Link>
+            </li>
+          );
+        })}
       </ul>
 
       {/* Prev/next edition arrows for the SAME group. */}
