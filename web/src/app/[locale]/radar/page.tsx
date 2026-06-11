@@ -145,6 +145,22 @@ export default async function InsightsExplorePage({
         </div>
       </section>
 
+      {/* Pipeline coverage notice (2026-06-11): TikTok + Instagram
+          ingest is paused due to per-item scraper cost. Mainstream RSS,
+          X, and YouTube remain active. Drop this banner when those
+          platforms come back online. */}
+      <section className="pb-4 sm:pb-6">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50/70 px-4 py-3 text-sm text-amber-900 sm:px-5 sm:py-4">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+            <p className="leading-relaxed">
+              <span className="font-semibold">{t("pipeline_pause_title")}</span>{" "}
+              {t("pipeline_pause_body")}
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Coverage breakdown (platform / sentiment / topic distributions).
           Mirrors what /dashboard Data tab shows — exposed on this public
           /radar page so anonymous visitors can see the same

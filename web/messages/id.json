@@ -835,6 +835,8 @@
     "explore_eyebrow": "Data mentah",
     "explore_title": "Explorasi Data",
     "explore_subtitle": "Angka-angka yang menjadi dasar briefing pekan ini — sentimen publik, topik yang trending, dan distribusi per platform.",
+    "pipeline_pause_title": "TikTok & Instagram sementara dijeda.",
+    "pipeline_pause_body": "Dua platform itu adalah scraper paling mahal per item yang kami punya — kami menjeda ingest-nya sambil meninjau anggaran. Mainstream RSS, X, dan YouTube tetap aktif penuh. Angka-angka di halaman ini hanya mencerminkan tiga platform yang sedang berjalan.",
     "explore_back_cta_title": "Kembali ke Briefing",
     "explore_back_cta_body": "Inti yang sudah dipadat dan diberi konteks dakwah ada di briefing mingguan kami — satu per kelompok tema.",
     "back_to_insights": "Kembali ke Briefing",

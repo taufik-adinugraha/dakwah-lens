@@ -835,6 +835,8 @@
     "explore_eyebrow": "Raw data",
     "explore_title": "Explore Data",
     "explore_subtitle": "The numbers behind this week's briefings — public sentiment, trending topics, and per-platform distribution.",
+    "pipeline_pause_title": "TikTok & Instagram are temporarily paused.",
+    "pipeline_pause_body": "Those two are the most expensive per-item scrapers we run — we've paused their ingest while we review the budget. Mainstream RSS, X, and YouTube remain fully active. Numbers on this page reflect only the three platforms still running.",
     "explore_back_cta_title": "Back to Briefings",
     "explore_back_cta_body": "The condensed, da'wah-contextualized takeaways live in our 5 weekly briefings.",
     "back_to_insights": "Back to Briefing",
