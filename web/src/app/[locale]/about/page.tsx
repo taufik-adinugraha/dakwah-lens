@@ -101,6 +101,12 @@ function Story({ t }: { t: T }) {
 }
 
 function Supervisor({ t }: { t: T }) {
+  // Two supervisors as of 2026-06-11: Nasruddin (academic / institutional
+  // discipline) + Abdullah Haidir (syariah / content authority). Both
+  // cards share the same shell — only the portrait, name, role/body keys,
+  // and profile link differ. Kept as two articles stacked under one
+  // section rather than a grid so each profile gets full reading width
+  // (a 2-column grid would compress the body text).
   return (
     <section className="border-y border-slate-100 bg-gradient-to-b from-white to-slate-50/40 py-12 sm:py-16">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
@@ -114,45 +120,86 @@ function Supervisor({ t }: { t: T }) {
           </h2>
         </div>
 
-        <article className="mt-8 grid gap-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:grid-cols-[auto_1fr] sm:items-start sm:gap-6 sm:p-8">
-          <Image
-            src="/team/nasruddin.png"
-            alt="Prof. Dr.-Ing. Ir. Nasruddin, M.Eng."
-            width={64}
-            height={64}
-            className="h-16 w-16 shrink-0 rounded-2xl object-cover shadow-md ring-1 ring-slate-200"
-            priority
-          />
-          {/* Was a gradient avatar with the letter "N" — swapped to the
-              actual portrait on 2026-05-22. File lives in
-              `web/public/team/nasruddin.png`. */}
-          <div>
-            <a
-              href="https://eng.ui.ac.id/personnel/nasruddin/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group inline-flex items-baseline gap-1.5 text-balance text-lg font-bold leading-snug text-slate-900 transition hover:text-brand-700 sm:text-xl"
-            >
-              Prof. Dr.-Ing. Ir. Nasruddin, M.Eng.
-              <ExternalLink className="h-3.5 w-3.5 text-slate-400 transition group-hover:text-brand-600" />
-            </a>
-            <p className="mt-1 text-sm font-medium text-slate-600">
-              {t("supervisor_role")}
-            </p>
-            <p className="mt-3 text-pretty text-sm leading-relaxed text-slate-600">
-              {t("supervisor_body")}
-            </p>
-            <a
-              href="https://eng.ui.ac.id/personnel/nasruddin/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-brand-700 hover:text-brand-900"
-            >
-              {t("supervisor_profile_link")}
-              <ArrowUpRight className="h-3 w-3" />
-            </a>
-          </div>
-        </article>
+        <div className="mt-8 grid gap-5">
+          <article className="grid gap-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:grid-cols-[auto_1fr] sm:items-start sm:gap-6 sm:p-8">
+            <Image
+              src="/team/nasruddin.png"
+              alt="Prof. Dr.-Ing. Ir. Nasruddin, M.Eng."
+              width={64}
+              height={64}
+              className="h-16 w-16 shrink-0 rounded-2xl object-cover shadow-md ring-1 ring-slate-200"
+              priority
+            />
+            {/* Was a gradient avatar with the letter "N" — swapped to the
+                actual portrait on 2026-05-22. File lives in
+                `web/public/team/nasruddin.png`. */}
+            <div>
+              <a
+                href="https://eng.ui.ac.id/personnel/nasruddin/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-baseline gap-1.5 text-balance text-lg font-bold leading-snug text-slate-900 transition hover:text-brand-700 sm:text-xl"
+              >
+                Prof. Dr.-Ing. Ir. Nasruddin, M.Eng.
+                <ExternalLink className="h-3.5 w-3.5 text-slate-400 transition group-hover:text-brand-600" />
+              </a>
+              <p className="mt-1 text-sm font-medium text-slate-600">
+                {t("supervisor_role")}
+              </p>
+              <p className="mt-3 text-pretty text-sm leading-relaxed text-slate-600">
+                {t("supervisor_body")}
+              </p>
+              <a
+                href="https://eng.ui.ac.id/personnel/nasruddin/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-brand-700 hover:text-brand-900"
+              >
+                {t("supervisor_profile_link")}
+                <ArrowUpRight className="h-3 w-3" />
+              </a>
+            </div>
+          </article>
+
+          {/* Ust. Abdullah Haidir — syariah supervisor (added 2026-06-11).
+              Image at web/public/team/uah.png. Profile link goes to
+              manhajuna.com, the dakwah portal he personally curates. */}
+          <article className="grid gap-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:grid-cols-[auto_1fr] sm:items-start sm:gap-6 sm:p-8">
+            <Image
+              src="/team/uah.png"
+              alt="Ust. Abdullah Haidir, Lc."
+              width={64}
+              height={64}
+              className="h-16 w-16 shrink-0 rounded-2xl object-cover shadow-md ring-1 ring-slate-200"
+            />
+            <div>
+              <a
+                href="https://manhajuna.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-baseline gap-1.5 text-balance text-lg font-bold leading-snug text-slate-900 transition hover:text-brand-700 sm:text-xl"
+              >
+                Ust. Abdullah Haidir, Lc.
+                <ExternalLink className="h-3.5 w-3.5 text-slate-400 transition group-hover:text-brand-600" />
+              </a>
+              <p className="mt-1 text-sm font-medium text-slate-600">
+                {t("supervisor_haidir_role")}
+              </p>
+              <p className="mt-3 text-pretty text-sm leading-relaxed text-slate-600">
+                {t("supervisor_haidir_body")}
+              </p>
+              <a
+                href="https://manhajuna.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-brand-700 hover:text-brand-900"
+              >
+                {t("supervisor_haidir_profile_link")}
+                <ArrowUpRight className="h-3 w-3" />
+              </a>
+            </div>
+          </article>
+        </div>
       </div>
     </section>
   );
