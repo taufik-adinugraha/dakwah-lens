@@ -139,12 +139,20 @@ export type KitabCorpus =
  *     bukhari          rank-1 ~0.39, rank-5 ~0.32 — AR+EN hadith
  *     riyad            rank-1 ~0.38, rank-5 ~0.32 — AR+EN hadith
  *
- *   LOWER >= 0.22 floor — AR-only kitabs whose entire score distribution
+ *   LOWER >= 0.26 floor — AR-only kitabs whose entire score distribution
  *   sits ~0.10 below the bilingual corpora because the query is being
  *   matched against pure Arabic text.
  *     fs, umm, bn, fqarib, nashaih, adab, hs, bidayat, fmuin,
  *     aqidah, sirah, syamail, ts3
  *                      rank-1 ~0.28-0.32, rank-5 ~0.22-0.26
+ *
+ * Tightened 2026-06-13 (LOWER 0.22 → 0.26) after the same verification
+ * probe showed AR-only corpora over-retrieving at the original 0.22
+ * floor — many rank-3..5 hits scored in the 0.22-0.25 band but read as
+ * tangentially related (surface-keyword matches, not thematic). Lifting
+ * the floor by ~0.04 trims the long tail without touching the
+ * legitimately strong matches in the 0.26-0.32 band where rank-1/2 hits
+ * sit. The over-fetch (limit=10) still leaves headroom for the filter.
  *
  * The /kitab page surfaces a "limited matches" banner when the OVERALL
  * top score across all returned hits falls below ~0.35 — that catches
@@ -161,19 +169,19 @@ const KITAB_THRESHOLDS: Record<KitabCorpus, number> = {
   bukhari: 0.3,
   riyad: 0.3,
   // LOWER floor — AR-only corpora
-  fs: 0.22,
-  umm: 0.22,
-  bn: 0.22,
-  fqarib: 0.22,
-  nashaih: 0.22,
-  adab: 0.22,
-  hs: 0.22,
-  bidayat: 0.22,
-  fmuin: 0.22,
-  aqidah: 0.22,
-  sirah: 0.22,
-  syamail: 0.22,
-  ts3: 0.22,
+  fs: 0.26,
+  umm: 0.26,
+  bn: 0.26,
+  fqarib: 0.26,
+  nashaih: 0.26,
+  adab: 0.26,
+  hs: 0.26,
+  bidayat: 0.26,
+  fmuin: 0.26,
+  aqidah: 0.26,
+  sirah: 0.26,
+  syamail: 0.26,
+  ts3: 0.26,
 };
 
 /**
@@ -182,8 +190,44 @@ const KITAB_THRESHOLDS: Record<KitabCorpus, number> = {
  * hits to the merged result list. Combined with the threshold filter,
  * this is the effective cap on result size (the legacy `opts.limit` is
  * kept for API stability but no longer drives the cap).
+ *
+ * Tiers mirror KITAB_THRESHOLDS — caps are smaller where the score
+ * distribution is weaker, so a noisy AR-only kitab can't dominate the
+ * merged result list with rank-3..5 entries that barely clear its floor.
+ *
+ *   STRONG  quran                                            → 5
+ *   MID     muslim, tafsir, bulugh, bukhari, riyad           → 5
+ *   LOWER   fs, umm, bn, fqarib, nashaih, adab, hs, bidayat,
+ *           fmuin, aqidah, sirah, syamail, ts3               → 3
+ *
+ * Combined with the higher 0.26 LOWER floor, this caps the long tail
+ * from AR-only corpora at 3 hits each while still letting the
+ * bilingual-strong kitabs return their full top-5.
  */
-const KITAB_PER_CORPUS_TOP_K = 5;
+const KITAB_TOP_K: Record<KitabCorpus, number> = {
+  // STRONG cap — bilingual, well-curated
+  quran: 5,
+  // MID cap — bilingual or EN with strong semantic match
+  muslim: 5,
+  tafsir: 5,
+  bulugh: 5,
+  bukhari: 5,
+  riyad: 5,
+  // LOWER cap — AR-only corpora, tighter to suppress weak long-tail hits
+  fs: 3,
+  umm: 3,
+  bn: 3,
+  fqarib: 3,
+  nashaih: 3,
+  adab: 3,
+  hs: 3,
+  bidayat: 3,
+  fmuin: 3,
+  aqidah: 3,
+  sirah: 3,
+  syamail: 3,
+  ts3: 3,
+};
 
 const COLLECTION_NAMES: Record<KitabCorpus, string> = {
   quran: "quran",
@@ -691,9 +735,9 @@ Expanded query:`;
  *    research)
  *  - No throws on empty — return [] so the UI shows "no results"
  *  - Over-fetch (limit=10) per corpus, then threshold-filter, then take
- *    the top KITAB_PER_CORPUS_TOP_K survivors. This is the effective
- *    cap — `opts.limit` is retained for API stability but no longer
- *    drives result count.
+ *    the top KITAB_TOP_K[corpus] survivors. This is the effective cap —
+ *    `opts.limit` is retained for API stability but no longer drives
+ *    result count.
  *
  * Used by the public `/kitab` page so any visitor can semantic-search
  * the corpus without needing a login or a brief.
@@ -740,9 +784,11 @@ export async function searchKitabBrowse(
   // Over-fetch per corpus (limit=10) so the per-corpus threshold filter
   // has headroom — if we asked for top-5 and 3 fell below threshold,
   // we'd lose the next-best candidates that DO clear the floor. Pulling
-  // 10 then filtering then slicing to KITAB_PER_CORPUS_TOP_K keeps the
+  // 10 then filtering then slicing to KITAB_TOP_K[corpus] keeps the
   // returned set both relevance-floored AND fully populated when the
-  // corpus has good hits to offer.
+  // corpus has good hits to offer. 10 still leaves headroom even with
+  // the higher 0.26 LOWER floor (rank-1..5 in AR-only corpora reliably
+  // sits at 0.26-0.32).
   const OVER_FETCH_PER_CORPUS = 10;
   const perCorpusHits = await Promise.all(
     opts.corpora.map((c) =>
@@ -750,15 +796,17 @@ export async function searchKitabBrowse(
     ),
   );
 
-  // For each corpus: apply its threshold floor, then take top-K of the
-  // survivors. Results are already score-desc from Qdrant.
+  // For each corpus: apply its threshold floor, then take its tier's
+  // top-K cap of the survivors. Results are already score-desc from
+  // Qdrant.
   const filtered: KitabHit[] = [];
   for (let i = 0; i < opts.corpora.length; i++) {
     const corpus = opts.corpora[i];
     const floor = KITAB_THRESHOLDS[corpus];
+    const cap = KITAB_TOP_K[corpus];
     const survivors = perCorpusHits[i]
       .filter((h) => (h.score ?? 0) >= floor)
-      .slice(0, KITAB_PER_CORPUS_TOP_K);
+      .slice(0, cap);
     filtered.push(...survivors);
   }
 
