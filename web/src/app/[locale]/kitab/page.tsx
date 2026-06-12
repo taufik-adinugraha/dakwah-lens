@@ -256,6 +256,87 @@ const LANGUAGE_PILL_TONE: Record<"AR" | "ID" | "EN", string> = {
   EN: "bg-sky-50 text-sky-800 ring-sky-200",
 };
 
+// Left-border tint that pairs with each corpus' iconTone. Mirrors the
+// KITAB_META[c].iconTone palette (bg-X-600 → border-X-500) so the
+// grouped-results sticky header gets a visible corpus accent without
+// rewriting iconTone strings at runtime. Tailwind's JIT needs the full
+// class literals here for them to ship to the bundle.
+const KITAB_BORDER_TONE: Record<KitabCorpus, string> = {
+  quran: "border-emerald-500",
+  bukhari: "border-brand-500",
+  muslim: "border-cyan-500",
+  riyad: "border-amber-500",
+  bulugh: "border-cyan-500",
+  tafsir: "border-violet-500",
+  bidayat: "border-fuchsia-500",
+  umm: "border-indigo-500",
+  bn: "border-rose-500",
+  nashaih: "border-teal-500",
+  fs: "border-orange-500",
+  fmuin: "border-lime-500",
+  fqarib: "border-yellow-500",
+  adab: "border-pink-500",
+  aqidah: "border-sky-500",
+  ts3: "border-slate-500",
+  syamail: "border-blue-500",
+  sirah: "border-stone-500",
+  hs: "border-purple-500",
+};
+
+/**
+ * Bucket KitabHits by corpus, compute each bucket's best (max) cosine
+ * score, and return the buckets sorted by bestScore descending so the
+ * most-relevant kitab leads. Empty corpora are dropped. Within each
+ * bucket, hits stay in the order they arrived in (already relevance-
+ * descending from `searchKitabBrowse`). Tie-breaks on bestScore fall
+ * back to the canonical ALL_CORPORA order so renders are stable.
+ */
+function groupAndRankByBestMatch(
+  hits: KitabHit[],
+  t: T,
+): Array<{
+  corpus: KitabCorpus;
+  displayName: string;
+  iconTone: string;
+  borderTone: string;
+  tone: string;
+  hits: KitabHit[];
+  bestScore: number;
+  count: number;
+}> {
+  const buckets = new Map<KitabCorpus, KitabHit[]>();
+  for (const h of hits) {
+    const existing = buckets.get(h.corpus);
+    if (existing) existing.push(h);
+    else buckets.set(h.corpus, [h]);
+  }
+  const corpusIndex: Record<KitabCorpus, number> = Object.fromEntries(
+    ALL_CORPORA.map((c, i) => [c, i]),
+  ) as Record<KitabCorpus, number>;
+  const groups = Array.from(buckets.entries()).map(([corpus, bucket]) => {
+    let bestScore = 0;
+    for (const h of bucket) {
+      if (h.score !== undefined && h.score > bestScore) bestScore = h.score;
+    }
+    const meta = KITAB_META[corpus];
+    return {
+      corpus,
+      displayName: t(meta.labelKey as Parameters<typeof t>[0]),
+      iconTone: meta.iconTone,
+      borderTone: KITAB_BORDER_TONE[corpus],
+      tone: meta.tone,
+      hits: bucket,
+      bestScore,
+      count: bucket.length,
+    };
+  });
+  groups.sort((a, b) => {
+    if (b.bestScore !== a.bestScore) return b.bestScore - a.bestScore;
+    return corpusIndex[a.corpus] - corpusIndex[b.corpus];
+  });
+  return groups;
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -468,84 +549,142 @@ function Results({
   savedFlags: Record<string, boolean>;
   signedIn: boolean;
 }) {
+  const groups = groupAndRankByBestMatch(hits, t);
+
+  // Even after the per-corpus threshold filter retains hits, the BEST
+  // hit across all corpora can still be marginal — e.g. every kitab
+  // barely clears its own floor at 0.22-0.32. In that case the user's
+  // query is genuinely a poor fit for the corpus; surface a soft hint
+  // to reformulate rather than silently shipping low-confidence rows.
+  const topScore = hits.reduce(
+    (max, h) => ((h.score ?? 0) > max ? (h.score ?? 0) : max),
+    0,
+  );
+  const lowConfidence = hits.length > 0 && topScore < 0.35;
+
   return (
-    <section className="pb-16 sm:pb-20">
+    <section id="kitab-results" className="pb-16 sm:pb-20">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         <p className="mb-4 text-sm text-slate-600">
           {t("results_count", { count: hits.length, query })}
         </p>
+
+        {lowConfidence && (
+          <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-900">
+            <p className="text-sm">
+              <span className="font-medium">
+                {t("low_confidence_title")}
+              </span>{" "}
+              {t("low_confidence_hint")}
+            </p>
+          </div>
+        )}
 
         {hits.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-10 text-center text-sm text-slate-500">
             {t("results_empty")}
           </div>
         ) : (
-          <ul className="space-y-3">
-            {hits.map((h, i) => (
-              <li
-                key={i}
-                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md"
+          <div className="space-y-6">
+            {groups.map((group) => (
+              <section
+                key={group.corpus}
+                aria-label={group.displayName}
+                className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
               >
-                <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2 py-0.5 font-semibold uppercase tracking-wider text-slate-700">
-                    {t(KITAB_META[h.corpus].labelKey as Parameters<typeof t>[0])}
-                  </span>
-                  <div className="flex items-center gap-3 text-slate-500">
-                    <span className="font-mono">{h.citation}</span>
-                    {h.score !== undefined && (
-                      <span className="tabular-nums text-slate-400">
-                        {(h.score * 100).toFixed(0)}%
-                      </span>
-                    )}
+                {/* Sticky header — top-16 clears the global nav (~64px).
+                    Backdrop-blur keeps Arabic readable behind the bar as
+                    the list scrolls underneath. Left border picks up the
+                    corpus accent from KITAB_BORDER_TONE. */}
+                <div
+                  className={`sticky top-16 z-10 flex items-center justify-between gap-3 border-b border-l-4 border-slate-200 bg-gradient-to-r ${group.tone} px-3 py-2 backdrop-blur supports-[backdrop-filter]:bg-white/75 ${group.borderTone}`}
+                >
+                  <div className="flex min-w-0 items-center gap-2">
+                    <span
+                      aria-hidden
+                      className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${group.iconTone}`}
+                    />
+                    <h3 className="truncate text-sm font-semibold text-slate-900">
+                      {group.displayName}
+                    </h3>
+                    <span className="inline-flex shrink-0 items-center rounded-full bg-white/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-700 ring-1 ring-slate-200">
+                      {t("results_group_match_count", { count: group.count })}
+                    </span>
                   </div>
+                  <a
+                    href="#kitab-results"
+                    className="shrink-0 text-[11px] font-medium text-slate-500 hover:text-slate-900"
+                  >
+                    {t("results_group_back_to_top")}
+                  </a>
                 </div>
 
-                {h.arabic && h.corpus !== "tafsir" && (
-                  <p
-                    className="mt-3 text-right font-amiri text-lg leading-relaxed text-slate-900 sm:text-xl md:text-2xl"
-                    dir="rtl"
-                    lang="ar"
-                  >
-                    {h.arabic}
-                  </p>
-                )}
-                {h.corpus === "tafsir" ? (
-                  <TafsirResult
-                    chunk={h.translation}
-                    fullCommentaryEn={h.fullCommentaryEn}
-                    fullCommentaryAr={h.fullCommentaryAr}
-                    chunkIndex={h.chunkIndex}
-                    totalChunks={h.totalChunks}
-                  />
-                ) : (
-                  h.translation && (
-                    <p className="mt-2 text-sm leading-relaxed text-slate-700">
-                      {h.translation}
-                    </p>
-                  )
-                )}
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <BookmarkButton
-                    kind="kitab"
-                    refId={citationRefId(h.corpus, h.citation)}
-                    payload={{
-                      corpus: h.corpus,
-                      citation: h.citation,
-                      arabic: h.arabic,
-                      translation: h.translation,
-                    }}
-                    initialSaved={!!savedFlags[citationRefId(h.corpus, h.citation)]}
-                    signedIn={signedIn}
-                  />
-                  <CitationShare
-                    arabic={h.arabic}
-                    translation={h.translation}
-                    citation={h.citation}
-                  />
-                </div>
-              </li>
+                <ul className="divide-y divide-slate-100">
+                  {group.hits.map((h, i) => (
+                    <li key={i} className="p-5 transition hover:bg-slate-50/60">
+                      <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2 py-0.5 font-semibold uppercase tracking-wider text-slate-700">
+                          {t(KITAB_META[h.corpus].labelKey as Parameters<typeof t>[0])}
+                        </span>
+                        <div className="flex items-center gap-3 text-slate-500">
+                          <span className="font-mono">{h.citation}</span>
+                          {h.score !== undefined && (
+                            <span className="tabular-nums text-slate-400">
+                              {(h.score * 100).toFixed(0)}%
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {h.arabic && h.corpus !== "tafsir" && (
+                        <p
+                          className="mt-3 text-right font-amiri text-lg leading-relaxed text-slate-900 sm:text-xl md:text-2xl"
+                          dir="rtl"
+                          lang="ar"
+                        >
+                          {h.arabic}
+                        </p>
+                      )}
+                      {h.corpus === "tafsir" ? (
+                        <TafsirResult
+                          chunk={h.translation}
+                          fullCommentaryEn={h.fullCommentaryEn}
+                          fullCommentaryAr={h.fullCommentaryAr}
+                          chunkIndex={h.chunkIndex}
+                          totalChunks={h.totalChunks}
+                        />
+                      ) : (
+                        h.translation && (
+                          <p className="mt-2 text-sm leading-relaxed text-slate-700">
+                            {h.translation}
+                          </p>
+                        )
+                      )}
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <BookmarkButton
+                          kind="kitab"
+                          refId={citationRefId(h.corpus, h.citation)}
+                          payload={{
+                            corpus: h.corpus,
+                            citation: h.citation,
+                            arabic: h.arabic,
+                            translation: h.translation,
+                          }}
+                          initialSaved={!!savedFlags[citationRefId(h.corpus, h.citation)]}
+                          signedIn={signedIn}
+                        />
+                        <CitationShare
+                          arabic={h.arabic}
+                          translation={h.translation}
+                          citation={h.citation}
+                        />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </section>
             ))}
-          </ul>
+          </div>
         )}
       </div>
     </section>
