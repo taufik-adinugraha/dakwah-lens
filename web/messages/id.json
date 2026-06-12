@@ -384,6 +384,8 @@
     "low_confidence_hint": "kata kunci Anda hanya menemukan kecocokan rendah di kitab-kitab kami. Coba perjelas kueri (mis. tambahkan kata kunci sinonim, ubah dari Indonesia ke Arab, atau gunakan istilah yang lebih spesifik).",
     "results_group_match_count": "{count} hasil",
     "results_group_back_to_top": "Ke atas",
+    "tab_all_label": "Semua",
+    "tab_empty_in_kitab": "Tidak ada hasil dari kitab ini untuk kueri Anda",
     "kitab_count_embedded": "{count} entri sudah di-embed",
     "kitab_count_not_yet": "Belum di-embed",
     "library_search_hint": "Jalankan pencarian semantik di atas —",

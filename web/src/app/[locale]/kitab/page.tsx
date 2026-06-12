@@ -256,33 +256,6 @@ const LANGUAGE_PILL_TONE: Record<"AR" | "ID" | "EN", string> = {
   EN: "bg-sky-50 text-sky-800 ring-sky-200",
 };
 
-// Left-border tint that pairs with each corpus' iconTone. Mirrors the
-// KITAB_META[c].iconTone palette (bg-X-600 → border-X-500) so the
-// grouped-results sticky header gets a visible corpus accent without
-// rewriting iconTone strings at runtime. Tailwind's JIT needs the full
-// class literals here for them to ship to the bundle.
-const KITAB_BORDER_TONE: Record<KitabCorpus, string> = {
-  quran: "border-emerald-500",
-  bukhari: "border-brand-500",
-  muslim: "border-cyan-500",
-  riyad: "border-amber-500",
-  bulugh: "border-cyan-500",
-  tafsir: "border-violet-500",
-  bidayat: "border-fuchsia-500",
-  umm: "border-indigo-500",
-  bn: "border-rose-500",
-  nashaih: "border-teal-500",
-  fs: "border-orange-500",
-  fmuin: "border-lime-500",
-  fqarib: "border-yellow-500",
-  adab: "border-pink-500",
-  aqidah: "border-sky-500",
-  ts3: "border-slate-500",
-  syamail: "border-blue-500",
-  sirah: "border-stone-500",
-  hs: "border-purple-500",
-};
-
 /**
  * Bucket KitabHits by corpus, compute each bucket's best (max) cosine
  * score, and return the buckets sorted by bestScore descending so the
@@ -298,7 +271,6 @@ function groupAndRankByBestMatch(
   corpus: KitabCorpus;
   displayName: string;
   iconTone: string;
-  borderTone: string;
   tone: string;
   hits: KitabHit[];
   bestScore: number;
@@ -323,7 +295,6 @@ function groupAndRankByBestMatch(
       corpus,
       displayName: t(meta.labelKey as Parameters<typeof t>[0]),
       iconTone: meta.iconTone,
-      borderTone: KITAB_BORDER_TONE[corpus],
       tone: meta.tone,
       hits: bucket,
       bestScore,
@@ -365,6 +336,43 @@ function parseCorpusSelection(
   return requested.length === 0 ? DEFAULT_CORPORA : requested;
 }
 
+type TabValue = "all" | KitabCorpus;
+
+/**
+ * Parse the `?tab=` search param into a validated TabValue. Accepts
+ * "all" (the grouped view) or a corpus slug whitelisted by
+ * ALL_CORPORA. Anything unrecognised (or missing) falls back to "all"
+ * so stale/shared URLs degrade gracefully — we don't 404 or redirect.
+ */
+function parseTab(raw: string | string[] | undefined): TabValue {
+  const v = Array.isArray(raw) ? raw[0] : raw;
+  if (!v) return "all";
+  const s = v.trim();
+  if (s === "all") return "all";
+  if ((ALL_CORPORA as string[]).includes(s)) return s as KitabCorpus;
+  return "all";
+}
+
+/**
+ * Build a `?…` href for the tab pill. Preserves every existing search
+ * param (q, kitab=…, etc.) and overrides only the `tab` key. Multi-
+ * valued params (string[] from `?kitab=a&kitab=b`) are re-emitted as
+ * repeated keys to round-trip the multi-checkbox selection cleanly.
+ */
+function buildTabHref(tab: TabValue, search: SearchParams): string {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(search)) {
+    if (key === "tab" || value === undefined) continue;
+    if (Array.isArray(value)) {
+      for (const v of value) params.append(key, v);
+    } else {
+      params.append(key, value);
+    }
+  }
+  params.set("tab", tab);
+  return `?${params.toString()}#kitab-results`;
+}
+
 export default async function KitabPage({
   params,
   searchParams,
@@ -383,6 +391,7 @@ export default async function KitabPage({
   // `search.kitab` can be a string OR string[] (multi-checkbox forms
   // produce arrays). `parseCorpusSelection` handles both shapes.
   const corporaSelection = parseCorpusSelection(search.kitab);
+  const activeTab = parseTab(search.tab);
 
   // Always show kitab counts so visitors see what's actually embedded.
   const counts = await getKitabCounts();
@@ -414,6 +423,7 @@ export default async function KitabPage({
         query={query}
         corporaSelection={corporaSelection}
         counts={counts}
+        activeTab={activeTab}
       />
       {/* Indonesian-only notice: most corpora ship AR + EN, and ad-hoc
           search results aren't auto-translated to Bahasa to save the
@@ -427,7 +437,15 @@ export default async function KitabPage({
         </div>
       )}
       {query ? (
-        <Results t={t} hits={hits} query={query} savedFlags={savedFlags} signedIn={signedIn} />
+        <Results
+          t={t}
+          hits={hits}
+          query={query}
+          savedFlags={savedFlags}
+          signedIn={signedIn}
+          activeTab={activeTab}
+          search={search}
+        />
       ) : (
         <KitabGrid t={t} counts={counts} />
       )}
@@ -470,11 +488,13 @@ function SearchForm({
   query,
   corporaSelection,
   counts,
+  activeTab,
 }: {
   t: T;
   query: string;
   corporaSelection: KitabCorpus[];
   counts: Record<KitabCorpus, number>;
+  activeTab: TabValue;
 }) {
   const selected = new Set<KitabCorpus>(corporaSelection);
   const allSelected = selected.size === ALL_CORPORA.length;
@@ -498,6 +518,11 @@ function SearchForm({
           method="get"
           className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5"
         >
+          {/* Persist the active tab across new searches: a fresh query
+              submitted from this form would otherwise drop ?tab=… and
+              snap back to "all", which feels jarring when the user has
+              narrowed the view to a single corpus. */}
+          <input type="hidden" name="tab" value={activeTab} />
           <KitabSearchInput
             defaultValue={query}
             placeholder={t("search_placeholder")}
@@ -542,12 +567,16 @@ function Results({
   query,
   savedFlags,
   signedIn,
+  activeTab,
+  search,
 }: {
   t: T;
   hits: KitabHit[];
   query: string;
   savedFlags: Record<string, boolean>;
   signedIn: boolean;
+  activeTab: TabValue;
+  search: SearchParams;
 }) {
   const groups = groupAndRankByBestMatch(hits, t);
 
@@ -562,8 +591,28 @@ function Results({
   );
   const lowConfidence = hits.length > 0 && topScore < 0.35;
 
+  // The tab bar lists "All" plus every corpus that actually has hits
+  // — corpora with 0 hits are hidden so the bar doesn't render dead
+  // pills. The total is the sum of all corpus counts (= hits.length).
+  const totalHits = hits.length;
+  const activeGroup =
+    activeTab === "all"
+      ? null
+      : groups.find((g) => g.corpus === activeTab) ?? null;
+  // If the URL points at a corpus that yielded no hits this round, we
+  // still render the tab bar so the user can navigate, but the body
+  // shows a soft empty-state instead of the flat list.
+  const activeTabIsEmpty =
+    activeTab !== "all" && activeGroup === null && totalHits > 0;
+  const visibleGroups =
+    activeTab === "all"
+      ? groups
+      : activeGroup
+      ? [activeGroup]
+      : [];
+
   return (
-    <section id="kitab-results" className="pb-16 sm:pb-20">
+    <section className="pb-16 sm:pb-20">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         <p className="mb-4 text-sm text-slate-600">
           {t("results_count", { count: hits.length, query })}
@@ -585,109 +634,214 @@ function Results({
             {t("results_empty")}
           </div>
         ) : (
-          <div className="space-y-6">
-            {groups.map((group) => (
-              <section
-                key={group.corpus}
-                aria-label={group.displayName}
-                className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
-              >
-                {/* Sticky header — top-16 clears the global nav (~64px).
-                    Backdrop-blur keeps Arabic readable behind the bar as
-                    the list scrolls underneath. Left border picks up the
-                    corpus accent from KITAB_BORDER_TONE. */}
-                <div
-                  className={`sticky top-16 z-10 flex items-center justify-between gap-3 border-b border-l-4 border-slate-200 bg-gradient-to-r ${group.tone} px-3 py-2 backdrop-blur supports-[backdrop-filter]:bg-white/75 ${group.borderTone}`}
+          <>
+            {/* Tab bar replaces the per-corpus sticky headers as the
+                primary nav affordance. Full-bleed + horizontal scroll
+                on mobile so all 19 corpora can fit without wrapping;
+                pills shrink-wrap on desktop. */}
+            <nav
+              id="kitab-results"
+              role="tablist"
+              aria-label={t("page_title")}
+              className="-mx-4 mb-6 overflow-x-auto sm:mx-0"
+            >
+              <div className="flex gap-2 px-4 sm:px-0">
+                <Link
+                  href={buildTabHref("all", search)}
+                  prefetch
+                  role="tab"
+                  aria-selected={activeTab === "all"}
+                  className={
+                    activeTab === "all"
+                      ? "inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-900 bg-slate-900 px-3 py-1.5 text-sm font-medium text-white whitespace-nowrap"
+                      : "inline-flex shrink-0 items-center gap-2 rounded-full border border-transparent bg-slate-100 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-200 whitespace-nowrap"
+                  }
                 >
-                  <div className="flex min-w-0 items-center gap-2">
-                    <span
-                      aria-hidden
-                      className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${group.iconTone}`}
-                    />
-                    <h3 className="truncate text-sm font-semibold text-slate-900">
-                      {group.displayName}
-                    </h3>
-                    <span className="inline-flex shrink-0 items-center rounded-full bg-white/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-700 ring-1 ring-slate-200">
-                      {t("results_group_match_count", { count: group.count })}
-                    </span>
-                  </div>
-                  <a
-                    href="#kitab-results"
-                    className="shrink-0 text-[11px] font-medium text-slate-500 hover:text-slate-900"
+                  <span>{t("tab_all_label")}</span>
+                  <span className="tabular-nums opacity-75">
+                    ({totalHits})
+                  </span>
+                </Link>
+                {groups.map((group) => {
+                  const isActive = activeTab === group.corpus;
+                  return (
+                    <Link
+                      key={group.corpus}
+                      href={buildTabHref(group.corpus, search)}
+                      prefetch
+                      role="tab"
+                      aria-selected={isActive}
+                      className={
+                        isActive
+                          ? `inline-flex shrink-0 items-center gap-2 rounded-full border border-transparent ${group.iconTone} px-3 py-1.5 text-sm font-medium text-white whitespace-nowrap`
+                          : "inline-flex shrink-0 items-center gap-2 rounded-full border border-transparent bg-slate-100 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-200 whitespace-nowrap"
+                      }
+                    >
+                      <span
+                        aria-hidden
+                        className={
+                          isActive
+                            ? "inline-block h-2 w-2 shrink-0 rounded-full bg-white/80"
+                            : `inline-block h-2 w-2 shrink-0 rounded-full ${group.iconTone}`
+                        }
+                      />
+                      <span>{group.displayName}</span>
+                      <span className="tabular-nums opacity-75">
+                        ({group.count})
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </nav>
+
+            {activeTabIsEmpty ? (
+              <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-10 text-center text-sm text-slate-500">
+                {t("tab_empty_in_kitab")}
+              </div>
+            ) : activeTab === "all" ? (
+              <div className="space-y-6">
+                {visibleGroups.map((group) => (
+                  <section
+                    key={group.corpus}
+                    aria-label={group.displayName}
+                    className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
                   >
-                    {t("results_group_back_to_top")}
-                  </a>
-                </div>
-
-                <ul className="divide-y divide-slate-100">
-                  {group.hits.map((h, i) => (
-                    <li key={i} className="p-5 transition hover:bg-slate-50/60">
-                      <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2 py-0.5 font-semibold uppercase tracking-wider text-slate-700">
-                          {t(KITAB_META[h.corpus].labelKey as Parameters<typeof t>[0])}
-                        </span>
-                        <div className="flex items-center gap-3 text-slate-500">
-                          <span className="font-mono">{h.citation}</span>
-                          {h.score !== undefined && (
-                            <span className="tabular-nums text-slate-400">
-                              {(h.score * 100).toFixed(0)}%
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {h.arabic && h.corpus !== "tafsir" && (
-                        <p
-                          className="mt-3 text-right font-amiri text-lg leading-relaxed text-slate-900 sm:text-xl md:text-2xl"
-                          dir="rtl"
-                          lang="ar"
-                        >
-                          {h.arabic}
-                        </p>
-                      )}
-                      {h.corpus === "tafsir" ? (
-                        <TafsirResult
-                          chunk={h.translation}
-                          fullCommentaryEn={h.fullCommentaryEn}
-                          fullCommentaryAr={h.fullCommentaryAr}
-                          chunkIndex={h.chunkIndex}
-                          totalChunks={h.totalChunks}
+                    {/* Non-sticky group header. The tab bar already
+                        carries the corpus nav; this header just labels
+                        the section in the grouped "all" view. */}
+                    <div
+                      className={`flex items-center justify-between gap-3 border-b border-slate-200 bg-gradient-to-r ${group.tone} px-3 py-2`}
+                    >
+                      <div className="flex min-w-0 items-center gap-2">
+                        <span
+                          aria-hidden
+                          className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${group.iconTone}`}
                         />
-                      ) : (
-                        h.translation && (
-                          <p className="mt-2 text-sm leading-relaxed text-slate-700">
-                            {h.translation}
-                          </p>
-                        )
-                      )}
-                      <div className="mt-3 flex flex-wrap items-center gap-2">
-                        <BookmarkButton
-                          kind="kitab"
-                          refId={citationRefId(h.corpus, h.citation)}
-                          payload={{
-                            corpus: h.corpus,
-                            citation: h.citation,
-                            arabic: h.arabic,
-                            translation: h.translation,
-                          }}
-                          initialSaved={!!savedFlags[citationRefId(h.corpus, h.citation)]}
+                        <h3 className="truncate text-sm font-semibold text-slate-900">
+                          {group.displayName}
+                        </h3>
+                        <span className="inline-flex shrink-0 items-center rounded-full bg-white/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-700 ring-1 ring-slate-200">
+                          {t("results_group_match_count", {
+                            count: group.count,
+                          })}
+                        </span>
+                      </div>
+                    </div>
+
+                    <ul className="divide-y divide-slate-100">
+                      {group.hits.map((h, i) => (
+                        <KitabHitRow
+                          key={i}
+                          t={t}
+                          hit={h}
+                          savedFlags={savedFlags}
                           signedIn={signedIn}
                         />
-                        <CitationShare
-                          arabic={h.arabic}
-                          translation={h.translation}
-                          citation={h.citation}
-                        />
-                      </div>
-                    </li>
+                      ))}
+                    </ul>
+                  </section>
+                ))}
+              </div>
+            ) : (
+              // Single-corpus tab view: flat list, no per-section
+              // header (the active tab pill itself shows which corpus
+              // is being viewed).
+              <section
+                aria-label={activeGroup?.displayName}
+                className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+              >
+                <ul className="divide-y divide-slate-100">
+                  {activeGroup?.hits.map((h, i) => (
+                    <KitabHitRow
+                      key={i}
+                      t={t}
+                      hit={h}
+                      savedFlags={savedFlags}
+                      signedIn={signedIn}
+                    />
                   ))}
                 </ul>
               </section>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </div>
     </section>
+  );
+}
+
+function KitabHitRow({
+  t,
+  hit: h,
+  savedFlags,
+  signedIn,
+}: {
+  t: T;
+  hit: KitabHit;
+  savedFlags: Record<string, boolean>;
+  signedIn: boolean;
+}) {
+  return (
+    <li className="p-5 transition hover:bg-slate-50/60">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2 py-0.5 font-semibold uppercase tracking-wider text-slate-700">
+          {t(KITAB_META[h.corpus].labelKey as Parameters<typeof t>[0])}
+        </span>
+        <div className="flex items-center gap-3 text-slate-500">
+          <span className="font-mono">{h.citation}</span>
+          {h.score !== undefined && (
+            <span className="tabular-nums text-slate-400">
+              {(h.score * 100).toFixed(0)}%
+            </span>
+          )}
+        </div>
+      </div>
+
+      {h.arabic && h.corpus !== "tafsir" && (
+        <p
+          className="mt-3 text-right font-amiri text-lg leading-relaxed text-slate-900 sm:text-xl md:text-2xl"
+          dir="rtl"
+          lang="ar"
+        >
+          {h.arabic}
+        </p>
+      )}
+      {h.corpus === "tafsir" ? (
+        <TafsirResult
+          chunk={h.translation}
+          fullCommentaryEn={h.fullCommentaryEn}
+          fullCommentaryAr={h.fullCommentaryAr}
+          chunkIndex={h.chunkIndex}
+          totalChunks={h.totalChunks}
+        />
+      ) : (
+        h.translation && (
+          <p className="mt-2 text-sm leading-relaxed text-slate-700">
+            {h.translation}
+          </p>
+        )
+      )}
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <BookmarkButton
+          kind="kitab"
+          refId={citationRefId(h.corpus, h.citation)}
+          payload={{
+            corpus: h.corpus,
+            citation: h.citation,
+            arabic: h.arabic,
+            translation: h.translation,
+          }}
+          initialSaved={!!savedFlags[citationRefId(h.corpus, h.citation)]}
+          signedIn={signedIn}
+        />
+        <CitationShare
+          arabic={h.arabic}
+          translation={h.translation}
+          citation={h.citation}
+        />
+      </div>
+    </li>
   );
 }
 

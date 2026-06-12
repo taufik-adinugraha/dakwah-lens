@@ -384,6 +384,8 @@
     "low_confidence_hint": "your query only found low-confidence hits. Try clarifying — add synonyms, switch language, or use more specific terms.",
     "results_group_match_count": "{count} hits",
     "results_group_back_to_top": "Top",
+    "tab_all_label": "All",
+    "tab_empty_in_kitab": "No hits from this kitab for your query",
     "kitab_count_embedded": "{count} entries embedded",
     "kitab_count_not_yet": "Not yet embedded",
     "library_search_hint": "Run a semantic search above —",
