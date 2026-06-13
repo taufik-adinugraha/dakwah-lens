@@ -107,6 +107,15 @@ def _parse_toc(html: str) -> list[TocAnchor]:
 _COPY_BTN_RE = re.compile(r'<a\s+href="#p\d+"[^>]*>.*?</a>', re.DOTALL)
 _ANCHOR_SPAN_RE = re.compile(r'<span[^>]*class="anchor"[^>]*></span>')
 _TAG_RE = re.compile(r"<[^>]+>")
+# islamweb's `<div class="nass">` builds its inner HTML via a client-side
+# JS template literal (`'…' + data.nass + '…'`). When that fragment is
+# emitted server-side without the template being executed, the raw JS
+# source leaks into the rendered HTML and gets captured by this scraper.
+# Strip the leak so it doesn't pollute the corpus (see the 2026-06-13
+# audit that found 7.2KB of these artifacts across all 97 adab sections).
+_JS_TEMPLATE_LEAK_RE = re.compile(
+    r"\s*'\s*\+\s*data\.\w+\s*\+\s*'(?:\s*'\s*\+\s*data\.\w+\s*\+\s*')*\s*"
+)
 
 
 def _extract_nass(html: str) -> str:
@@ -124,6 +133,7 @@ def _extract_nass(html: str) -> str:
         text = _COPY_BTN_RE.sub(" ", m.group(1))
         text = _ANCHOR_SPAN_RE.sub(" ", text)
         text = _TAG_RE.sub(" ", text)
+        text = _JS_TEMPLATE_LEAK_RE.sub(" ", text)
         text = (
             text.replace("&nbsp;", " ")
             .replace("&amp;", "&")
