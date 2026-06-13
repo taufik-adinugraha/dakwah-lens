@@ -32,6 +32,7 @@ from __future__ import annotations
 import json
 import re
 import time
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 import numpy as np
@@ -81,7 +82,6 @@ def _model_for_today() -> tuple[str, int]:
     Other days → Flash + 0 thinking budget (avoids Flash's
     thinking-spiral edge case, matches the historical safe config).
     """
-    from datetime import datetime, timezone, timedelta
     wib_now = datetime.now(timezone(timedelta(hours=7)))
     if wib_now.weekday() == PRO_DOW:
         return MODEL_PRO, 2048
