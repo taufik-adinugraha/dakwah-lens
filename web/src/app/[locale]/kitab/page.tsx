@@ -15,6 +15,7 @@ import {
 } from "@/lib/kitab-retrieval";
 import { TafsirResult } from "./TafsirResult";
 import { KitabCorpusSelector } from "./KitabCorpusSelector";
+import { KitabTranslationBody } from "./KitabTranslationBody";
 import { KitabSearchInput } from "@/components/KitabSearchInput";
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -821,11 +822,7 @@ function KitabHitRow({
           totalChunks={h.totalChunks}
         />
       ) : (
-        h.translation && (
-          <p className="mt-2 text-sm leading-relaxed text-slate-700">
-            {h.translation}
-          </p>
-        )
+        h.translation && <KitabTranslationBody text={h.translation} />
       )}
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <BookmarkButton
