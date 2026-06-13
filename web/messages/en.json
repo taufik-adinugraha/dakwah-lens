@@ -300,7 +300,7 @@
   },
   "Kitab": {
     "page_title": "Kitab Library",
-    "id_translation_notice": "The Qur'an and Sahih Muslim are available in Bahasa Indonesia (manual translation). Other hadith collections (Bukhari, Riyad as-Salihin, Bulugh al-Maram) and Tafsir Ibn Kathir ship in English. Classical kitabs (sirah, akhlak, fiqh, aqidah, syamail) are Arabic-only for now — translations are being curated.",
+    "id_translation_notice": "The Qur'an, Sahih Muslim, and seven classical kitabs (Aqidat al-'Awam, Thalathat al-Usul, Nashaihul Ibad, Adab al-'Alim wa al-Muta'allim, Bidayatul Hidayah, Fath al-Qarib, Shama'il al-Muhammadiyyah) are available in Bahasa Indonesia (manual translation). Other hadith collections (Bukhari, Riyad as-Salihin, Bulugh al-Maram) and Tafsir Ibn Kathir ship in English. The remaining classical kitabs (Al-Umm, Al-Bidayah wan-Nihayah, Fiqh as-Sunnah, Fath al-Mu'in, Sirah Ibn Hisham, Hayat as-Sahabah) are Arabic-only for now — translations are being curated.",
     "badge": "Verified library",
     "title": "Every citation, traceable to its source",
     "body": "Each citation in a Dakwah-Lens brief comes from a real, verified kitab — never invented by AI. This is the cornerstone of the trust we work to earn.",

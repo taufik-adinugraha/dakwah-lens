@@ -873,33 +873,64 @@ function normalizeHit(
 
   if (
     corpus === "bidayat" ||
-    corpus === "umm" ||
-    corpus === "bn" ||
     corpus === "nashaih" ||
-    corpus === "fs" ||
-    corpus === "fmuin" ||
     corpus === "fqarib" ||
     corpus === "adab" ||
     corpus === "aqidah" ||
     corpus === "ts3" ||
-    corpus === "syamail" ||
-    corpus === "sirah" ||
-    corpus === "hs"
+    corpus === "syamail"
   ) {
-    // AR-only kitab payload (decision 2026-06-08). Translation backfill
-    // is planned; chip falls back to rendering Arabic until then.
+    // Seven classical kitabs manually translated by Opus and re-embedded
+    // bilingual AR+ID on 2026-06-13 (see project memory:
+    // kitab-7-classics-bilingual). Payload now carries both `id` (the
+    // Indonesian translation) and `citation_id`, alongside the original
+    // `ar` + `citation`. Picks the Indonesian side when locale=id and
+    // falls back to the English citation otherwise; AR-only briefings
+    // before the backfill still work because `?? p.ar`/`?? p.citation`
+    // keep firing when `id` is missing on any future un-translated row.
     const defaultCitations: Record<typeof corpus, string> = {
       bidayat: "Bidayatul Hidayah",
-      umm: "Al-Umm",
-      bn: "Al-Bidayah wan-Nihayah",
       nashaih: "Nashaihul Ibad",
-      fs: "Fiqh as-Sunnah",
-      fmuin: "Fath al-Mu'in",
       fqarib: "Fath al-Qarib",
       adab: "Adab al-'Alim wa al-Muta'allim",
       aqidah: "'Aqidat al-'Awam",
       ts3: "Thalathat al-Usul",
       syamail: "Ash-Shama'il al-Muhammadiyyah",
+    };
+    return {
+      corpus,
+      arabic: String(p.ar ?? ""),
+      translation:
+        locale === "id"
+          ? String(p.id ?? "")
+          : "",
+      citation: String(
+        locale === "id"
+          ? (p.citation_id ?? p.citation ?? defaultCitations[corpus])
+          : (p.citation ?? defaultCitations[corpus]),
+      ),
+      score,
+      retrievalSource: "qdrant",
+    };
+  }
+
+  if (
+    corpus === "umm" ||
+    corpus === "bn" ||
+    corpus === "fs" ||
+    corpus === "fmuin" ||
+    corpus === "sirah" ||
+    corpus === "hs"
+  ) {
+    // AR-only kitab payload. Translation backfill not yet done for these
+    // six — the chip falls back to rendering Arabic until then. Keep them
+    // separate from the seven bilingual classics above so we don't read
+    // a non-existent `p.id` and ship empty strings.
+    const defaultCitations: Record<typeof corpus, string> = {
+      umm: "Al-Umm",
+      bn: "Al-Bidayah wan-Nihayah",
+      fs: "Fiqh as-Sunnah",
+      fmuin: "Fath al-Mu'in",
       sirah: "Sirah Ibn Hisham",
       hs: "Hayat as-Sahabah",
     };
