@@ -226,16 +226,29 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "korupsi, kriminalitas, penipuan, pembunuhan, keadilan publik "
         "(BUKAN polemik kebijakan/pejabat — itu Pemerintahan & Kebijakan)"
     ),
-    "Sosial & Keluarga": "KS, KDRT, perlindungan anak, dinamika sosial",
+    "Sosial & Keluarga": (
+        "KS, KDRT, perlindungan anak, kebijakan keluarga, dinamika sosial "
+        "berbasis isu/komunitas — BUKAN gosip selebriti / drama perceraian "
+        "artis / reaksi fans K-pop / komentar sinetron / cuitan fandom "
+        "(itu Lainnya)"
+    ),
     "Ekonomi & Bisnis": (
         "ekonomi rakyat, bisnis halal, investasi, UMKM, daya beli"
     ),
     "Aqidah & Ibadah": (
         "ibadah ISLAM pilar (haji/kurban/idul adha), hijrah, fatwa, polemik "
         "aqidah, hadith/ayat dengan framing pengajaran Islam — HANYA untuk "
-        "konten Islam; konten Kristen/Katolik/Buddha/Hindu/lintas-iman → "
-        "Toleransi & Lintas-Iman; cerita politik tentang ibadah → "
-        "Pemerintahan & Kebijakan"
+        "konten Islam dengan SUBSTANSI pengajaran/refleksi/polemik agama. "
+        "BUKAN tasyakuran kelulusan / wisuda santri / pentas seni sekolah "
+        "Islam (itu Pendidikan & SDM). BUKAN bisnis komersial dengan "
+        "branding syar'i / properti / kuliner halal (itu Ekonomi & Bisnis). "
+        "BUKAN kasus pidana yang melibatkan istilah Islam — badal haji "
+        "fiktif, penipuan umrah (itu Hukum & Keadilan). BUKAN nasyid / lagu "
+        "religi pop yang tidak mengajarkan aqidah (itu Lainnya). BUKAN "
+        "oleh-oleh / kebiasaan jamaah haji yang fokus konsumsi (itu "
+        "Lainnya). Cerita politik tentang ibadah → Pemerintahan & "
+        "Kebijakan. Konten SINGLE-FAITH non-Islam (devosional Kristen, "
+        "doa Katolik, kalender Hindu) → Lainnya kecuali ada framing lain"
     ),
     "Kesehatan & Kehidupan": "kesehatan fisik & mental, kesejahteraan jiwa",
     "Pendidikan & SDM": (
@@ -254,9 +267,16 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "nasional"
     ),
     "Patologi Sosial Digital": (
-        "judi online, pinjol, narkoba, kekerasan berbasis gender online "
-        "(AI deepfake nude tanpa persetujuan, sextortion, doxing korban), "
-        "porn-spam thread"
+        "judi online, pinjol, narkoba (konteks distribusi/peredaran digital), "
+        "kekerasan berbasis gender ONLINE (AI deepfake nude tanpa "
+        "persetujuan, sextortion, doxing korban), porn-spam thread, hoax / "
+        "ujaran kebencian sebagai fenomena digital. HARUS punya elemen "
+        "online/digital eksplisit. BUKAN kasus pidana di venue fisik (mis. "
+        "razia THM, pesta gay tempat hiburan) — itu Hukum & Keadilan bila "
+        "penetapan tersangka, atau Sosial & Keluarga bila demo "
+        "warga/moralitas komunitas. BUKAN kesehatan publik (vape, rokok "
+        "elektrik) tanpa dimensi distribusi digital → itu Kesehatan & "
+        "Kehidupan"
     ),
     "Teknologi & AI": "kecerdasan buatan, teknologi baru, etika digital",
     "Pekerja & Pertanian Rakyat": (
@@ -273,7 +293,16 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "Lintas-Iman)"
     ),
     "Toleransi & Lintas-Iman": (
-        "moderasi beragama, pluralisme, lintas-iman"
+        "konten yang SECARA EKSPLISIT mendiskusikan dialog antar-iman, "
+        "moderasi beragama, kerukunan lintas-agama, polemik intoleransi "
+        "antar-agama, atau kebijakan pluralisme. HARUS ada elemen LINTAS "
+        "AGAMA — dua atau lebih agama bertemu dalam satu cerita, atau "
+        "narasi eksplisit tentang toleransi sebagai topik. BUKAN konten "
+        "single-faith non-Islam (devosional/lirik kidung Kristen, doa "
+        "harian Katolik, kalender liturgi Hindu/Bali, jadwal misa, lagu "
+        "rohani) — itu Lainnya kecuali ada framing lain (kebakaran gereja "
+        "→ Lingkungan & Bencana; kasus pidana di rumah ibadah → Hukum & "
+        "Keadilan; ujian agama Katolik di SMA → Pendidikan & SDM)"
     ),
 }
 
