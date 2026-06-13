@@ -347,9 +347,12 @@ def search_youtube_videos(
     result set toward Indonesian *before* the gate; Gemini `dawah_relevance`
     is the final filter downstream.
 
-    Cost: 100 quota units per `search.list` call + 1 for the batched
-    `videos.list` stats fetch. At ~8 trending keywords/day that's ~800
-    units/day — well inside the 10K/day free tier.
+    Cost: 100 quota units per `search.list` call (paginates in batches of
+    50 via `pageToken` to reach `max_items`) + 1 unit per batched
+    `videos.list` stats fetch (also chunked at 50). At 20 trending
+    keywords/day × max_items=200 → up to 4 search calls/kw + 4 stats
+    chunks/kw = ~8200 units/day, inside the 10K/day free tier with
+    headroom for the channel-uploads sweep (~150 units/day).
     """
     if not settings.youtube_api_key:
         raise RuntimeError(
@@ -358,20 +361,27 @@ def search_youtube_videos(
         )
 
     started = time.time()
-    capped = min(max_items, _MAX_PER_CALL)
     window_start = datetime.now(UTC) - timedelta(days=RECENT_WINDOW_DAYS)
     published_after = window_start.strftime("%Y-%m-%dT%H:%M:%SZ")
     log.info(
         "youtube.search.start",
         query=query,
-        max=capped,
+        max=max_items,
         region=region_code,
     )
 
+    # Paginate search.list in batches of _MAX_PER_CALL (50) until we have
+    # max_items or YouTube stops returning a nextPageToken. Each call =
+    # 100 quota units; we count them for accurate usage logging below.
+    raw_items: list[dict[str, Any]] = []
+    page_token: str | None = None
+    search_calls = 0
+    remaining = max_items
+    last_payload: dict[str, Any] = {}
     with httpx.Client(timeout=30) as client:
-        resp = client.get(
-            f"{_BASE}/search",
-            params={
+        while remaining > 0:
+            per_call = min(remaining, _MAX_PER_CALL)
+            params: dict[str, Any] = {
                 "part": "snippet",
                 "q": query,
                 "type": "video",
@@ -379,14 +389,24 @@ def search_youtube_videos(
                 "regionCode": region_code,
                 "relevanceLanguage": relevance_language,
                 "publishedAfter": published_after,
-                "maxResults": capped,
+                "maxResults": per_call,
                 "key": settings.youtube_api_key,
-            },
-        )
-        resp.raise_for_status()
-        payload = resp.json()
-
-    raw_items: list[dict[str, Any]] = payload.get("items", [])
+            }
+            if page_token:
+                params["pageToken"] = page_token
+            resp = client.get(f"{_BASE}/search", params=params)
+            resp.raise_for_status()
+            last_payload = resp.json()
+            search_calls += 1
+            page_items = last_payload.get("items", []) or []
+            raw_items.extend(page_items)
+            page_token = last_payload.get("nextPageToken")
+            remaining = max_items - len(raw_items)
+            # YouTube may return < per_call rows on the last page even if
+            # it gives a token. Stop when we either fill the request, run
+            # out of pages, or get an empty page (defensive).
+            if not page_token or not page_items:
+                break
 
     reshaped: list[dict[str, Any]] = []
     dropped_no_video_id = 0
@@ -423,18 +443,28 @@ def search_youtube_videos(
             }
         )
 
-    # Enrich with engagement stats in ONE batched videos.list call (1 unit).
+    # Enrich with engagement stats — videos.list caps at 50 IDs per call,
+    # so chunk if pagination produced more. Each chunk = 1 quota unit.
+    stats_calls = 0
+    stats_map: dict[str, dict[str, int]] = {}
     if reshaped:
+        ids = [it["id"]["videoId"] for it in reshaped]
         with httpx.Client(timeout=20) as stats_client:
-            try:
-                stats_map = _fetch_video_stats(
-                    stats_client,
-                    [it["id"]["videoId"] for it in reshaped],
-                    settings.youtube_api_key,
-                )
-            except httpx.HTTPError as exc:
-                log.warning("youtube.search.stats_fetch_failed", error=str(exc))
-                stats_map = {}
+            for start in range(0, len(ids), 50):
+                chunk = ids[start : start + 50]
+                try:
+                    stats_map.update(
+                        _fetch_video_stats(
+                            stats_client, chunk, settings.youtube_api_key
+                        )
+                    )
+                    stats_calls += 1
+                except httpx.HTTPError as exc:
+                    log.warning(
+                        "youtube.search.stats_fetch_failed",
+                        error=str(exc),
+                        chunk_start=start,
+                    )
 
         for it in reshaped:
             stats = stats_map.get(it["id"]["videoId"])
@@ -449,10 +479,14 @@ def search_youtube_videos(
                 }
 
     duration_s = time.time() - started
+    total_units = search_calls * _SEARCH_COST_UNITS + stats_calls
     log.info(
         "youtube.search.done",
         query=query,
         results=len(reshaped),
+        search_calls=search_calls,
+        stats_calls=stats_calls,
+        units=total_units,
         dropped_no_video_id=dropped_no_video_id,
         dropped_non_id=dropped_non_id,
         duration_s=round(duration_s, 2),
@@ -464,11 +498,13 @@ def search_youtube_videos(
         provider="youtube",
         operation="search",
         model="search.list+videos.list",
-        units=_SEARCH_COST_UNITS + (1 if reshaped else 0),
+        units=total_units,
         cost_usd=0.0,
         meta={
             "query": query,
             "results": len(reshaped),
+            "search_calls": search_calls,
+            "stats_calls": stats_calls,
             "dropped_non_id": dropped_non_id,
         },
     )
@@ -476,7 +512,7 @@ def search_youtube_videos(
     return ScrapeResult(
         items=reshaped,
         actor_id="youtube_data_api_v3_search",
-        run_id=payload.get("nextPageToken", "no_token"),
+        run_id=last_payload.get("nextPageToken", "no_token"),
         cost_usd=0.0,
         duration_s=duration_s,
     )

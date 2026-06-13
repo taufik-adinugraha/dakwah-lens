@@ -45,14 +45,53 @@ from api.config import settings
 
 log = structlog.get_logger()
 
-MODEL = "gemini-2.5-flash"
-# Flash (not Flash-Lite) + thinking_budget=0. Flash-Lite had a
-# thinking-spiral failure mode (thoughts_token_count ate the whole
-# budget, candidates_token_count=0 → empty response). Flash with
-# thinking disabled produces clean structured JSON. With assignment now
-# off-loaded to embeddings the output is tiny either way, but Flash's
-# labels are noticeably better than Lite's, and the cost delta on a
-# labels-only response is negligible.
+# Two-model split since 2026-06-14: Pro on briefing-day recluster
+# (Thursday), Flash the rest of the week.
+#
+# Why split: a 3-iteration prompt audit hit a Flash compliance ceiling
+# at ~88-90% per-topic precision — Flash ignored the AND-LABEL REJECT
+# LIST + SAME-ENTITY GATE ~40% of the time even after procedural rules.
+# Pro follows hard rules far better (~92-93% forecast). But Pro is
+# ~15× more expensive per run ($0.30 vs $0.02), so paying Pro every
+# day would add $9/mo for marginal dashboard freshness gain.
+#
+# Briefings (Thursday 08:00 WIB) are the only consumer that's truly
+# precision-sensitive — wrong topic centroids → wrong daleel pulls →
+# bad sermons. The daily-dashboard recluster runs need to be FRESH
+# (not yesterday's clusters) but tolerate Flash's quirks.
+#
+# Cost at this split:
+#   Mon-Wed + Fri-Sun: 6 days × $0.02 Flash = $0.12/week
+#   Thursday:          1 day  × $0.30 Pro   = $0.30/week
+#   Total: ~$0.42/week ≈ $1.80/mo (vs $0.60/mo all-Flash, $9/mo all-Pro)
+#
+# Flash-Lite was tried earlier and had a thinking-spiral failure mode
+# (thoughts_token_count ate the budget, candidates_token_count=0 →
+# empty response). Both Flash and Pro avoid that.
+MODEL_PRO = "gemini-2.5-pro"
+MODEL_FLASH = "gemini-2.5-flash"
+# Python weekday(): Monday=0 ... Sunday=6. Thursday = 3.
+PRO_DOW = 3
+
+
+def _model_for_today() -> tuple[str, int]:
+    """Return (model_name, thinking_budget) based on WIB weekday.
+
+    Thursday → Pro + 2048-token thinking budget (briefing day).
+    Other days → Flash + 0 thinking budget (avoids Flash's
+    thinking-spiral edge case, matches the historical safe config).
+    """
+    from datetime import datetime, timezone, timedelta
+    wib_now = datetime.now(timezone(timedelta(hours=7)))
+    if wib_now.weekday() == PRO_DOW:
+        return MODEL_PRO, 2048
+    return MODEL_FLASH, 0
+
+
+# Keep MODEL as alias for backwards compat with anything that imports it
+# (validator scripts, ad-hoc dumps). It snapshots TODAY's choice at
+# import time — for live recluster, _model_for_today() is called fresh.
+MODEL, _ = _model_for_today()
 
 # Hard cap on how many posts we send to Gemini in one call (for naming)
 # and embed for assignment. Input-only now that the model no longer
@@ -89,9 +128,15 @@ MAX_TEXT_CHARS = 200
 #     wedding-organizer/saham, Palestina excludes skin-care/Afghanistan)
 #     and the theme set is finer-grained (31 → 33 themes), so
 #     borderline posts land on narrower fits.
+#   · 2026-06-14: lowered 0.28 → 0.24 after full-corpus audit found
+#     33% of posts (662/2003) landed in Lainnya at 0.28 floor. The
+#     drop pulls borderline matches into their best-fit theme; bleed
+#     risk is contained by the new AND-LABEL TRAP + ACUTE-EVENT FLOOR
+#     + SAME-ENTITY GATE rules added the same day, which shrink the
+#     centroid-leaking themes that previously caused floor-drop pain.
 # The floor is the DEFAULT — each theme may override with its own
 # `min_similarity` (see prompt).
-MIN_SIMILARITY = 0.28
+MIN_SIMILARITY = 0.24
 
 # Second-pass rescue floor (added 2026-06-07 after the 1394-post Lainnya
 # audit). When a post lands in Lainnya at the strict MIN_SIMILARITY but
@@ -291,6 +336,143 @@ Other concrete failures from the same gate:
 
 Apply this gate to YOUR proposed themes BEFORE returning JSON. Removing a duplicate before emit is cheaper than relying on the 0.85 cosine merge to catch it.
 
+SAME-ENTITY GATE (HARD RULE — strengthened 2026-06-14 v2):
+PROCEDURE you MUST follow before emitting JSON:
+  STEP 1: For each theme, extract the primary ENTITY-NOUN. The entity-noun
+          is the proper-noun-or-distinctive-noun the cluster is about:
+            "Kenaikan Harga BBM & Dampak Ekonomi" → entity: BBM
+            "Kelangkaan & Subsidi BBM"            → entity: BBM
+            "Korupsi MBG & BGN"                   → entity: MBG/BGN
+            "Korupsi Imigrasi (Silmy Karim)"      → entity: Imigrasi/Silmy Karim
+            "Konflik AS-Iran"                     → entity: AS-Iran
+  STEP 2: GROUP themes by entity-noun. If TWO OR MORE themes share an
+          entity-noun, you have a SAME-ENTITY VIOLATION. RESOLVE before
+          emitting by choosing ONE of:
+            (a) MERGE: keep ONE theme with the dominant-narrative label,
+                drop the other. Default action.
+            (b) Demonstrate the narratives are TRULY distinct stories
+                with different audiences/daleel (rare — see below).
+  ABSOLUTELY FORBIDDEN: emitting two themes with the same entity-noun and
+  relying on mutual exclude_keywords to keep them separate. The 2026-06-14
+  v1 attempt did exactly that ("Kenaikan BBM" excluded "subsidi" and
+  "Kelangkaan BBM" excluded "Pertamax") — both still leaked. Mutual
+  excludes DO NOT SUBSTITUTE for merging same-entity themes. The downstream
+  cosine-merger sees both centroids close in embedding space and can't
+  pick a winner cleanly.
+
+Concrete 2026-06-14 v1 audit failure (DO NOT REPEAT):
+  ❌ "Kelangkaan & Subsidi BBM" + "Kenaikan Harga BBM & Dampak Ekonomi"
+     → same entity (BBM). MERGE into ONE theme. The dominant narrative
+     this week is the Pertamax 32% hike; the kelangkaan is downstream of
+     it. Correct emit: ONE theme "Kenaikan Pertamax & Antrean Subsidi BBM".
+  ❌ "Korupsi MBG" + "Program MBG" → same entity (MBG). MERGE.
+  ❌ "Demo Mahasiswa" + "Aliansi Rakyat Memanggil" → same entity (the
+     demo). MERGE.
+
+Legitimate exception (rare):
+  ✅ "Konflik AS-Iran & Selat Hormuz" + "Hubungan AS-Indonesia" — both
+     mention AS but the entity-stories are different (Iran war vs
+     bilateral diplomacy). Different daleel, different framing. Keep separate.
+
+Pre-emit checklist: list your entity-nouns. If any appears in ≥2 labels,
+fix it before returning JSON.
+
+AND-LABEL TRAP (HARD RULE — v3 procedural enforcement 2026-06-14):
+PROCEDURE for EVERY label containing "&" or "dan":
+  STEP A: Split the label on "&" or "dan". Call the parts LEFT and RIGHT.
+  STEP B: Take RIGHT and lowercase it. Strip leading words like "Dampak",
+          "& Reformasi", "& Tata Kelola", "& Pengamanan" prefixes.
+  STEP C: Check RIGHT against the AUTOMATIC REJECT LIST below. If RIGHT
+          contains ANY of these substrings (case-insensitive, partial-
+          match allowed), the WHOLE LABEL is INVALID. Rewrite by
+          DROPPING the entire "& RIGHT" portion. Keep only LEFT.
+
+AUTOMATIC REJECT LIST for "& RIGHT" (case-insensitive, partial-match):
+  kritik pemerintah · penegakan hukum · dampak ekonomi · tata kelola
+  pemerintahan · birokrasi · pengamanan demo · pengamanan · kebijakan
+  publik · reformasi birokrasi · pejabat daerah · pejabat lainnya
+  · turnamen nasional · sipil · masyarakat sipil · umum · lainnya
+  · sumber daya manusia · ekonomi makro · isu ekonomi · isu sosial
+  · politik nasional · dinamika sosial · perkembangan terkini
+
+There are NO EXCEPTIONS. exclude_keywords does NOT rescue a label that
+fails this check. The 2026-06-14 v2 attempt allowed this and the model
+emitted "Demo Mahasiswa & Kritik Pemerintah" anyway — precision projected
+at 39% would not improve. The label MUST be rewritten before emit.
+
+CORRECTED REWRITES (apply these patterns to your output):
+  ❌ "Demo Mahasiswa & Kritik Pemerintah"
+     → ✅ "Demo Mahasiswa Aliansi Rakyat Memanggil"
+  ❌ "Keterlibatan TNI/Polri dalam Demo & Sipil"
+     → ✅ "TNI/Polri Pengamanan Demo Mahasiswa"
+  ❌ "Korupsi Pejabat Daerah & Penegakan Hukum"
+     → ✅ "Korupsi Bupati Muara Enim & OTT KPK"   (concrete entities)
+  ❌ "Pergantian Pejabat & Tata Kelola Pemerintahan"
+     → ✅ "Pelantikan Kepala Daerah & Rotasi Birokrasi" (concrete actions)
+  ❌ "Kenaikan Harga BBM & Dampak Ekonomi"
+     → ✅ "Kenaikan Pertamax & Antrean Pertalite"  (concrete entities)
+  ❌ "Olahraga & Turnamen Nasional"
+     → ✅ "Australian Open Badminton 2026"  (concrete event)
+
+LEGITIMATE "&" labels (both halves inseparable aspects of ONE story):
+  ✅ "Korupsi MBG & BGN"       — MBG/BGN = same scandal entity
+  ✅ "Judi Online & Pinjol"    — same financial-trap phenomenon class
+  ✅ "Konflik AS-Iran & Selat Hormuz" — geo entity + sub-location of it
+  ✅ "Bencana Alam & Mitigasi" — disaster + immediate response co-occur
+
+Memorize the REJECT LIST. Before returning JSON, walk every label that
+contains "&" through STEPS A-C and verify NONE of your labels has a
+RIGHT-half hitting the reject list.
+
+ACUTE-EVENT FLOOR (HARD RULE — strengthened 2026-06-14 v2):
+The INCIDENT-SPECIFIC VOLUME GATE above PREVENTS over-splitting (≥150 post threshold to mint an incident theme). This rule prevents the inverse failure — UNDER-splitting, where ≥20 posts about a single discrete news event get absorbed into a chronic-beat theme that obscures the story.
+
+If you observe ≥20 posts in the pool about ONE DISCRETE event (specific gempa, pengesahan UU named, nama-tersangka case, kebijakan flagship launch, demo on specific date/location, vonis specific verdict), you MUST mint a dedicated theme for it.
+
+EVENT-TYPE TRIGGERS (apply this rule whenever you spot ≥20 posts matching any):
+  · A named-person criminal/corruption case
+        ("Yaqut Cholil Qoumas korupsi kuota haji", "Silmy Karim suap WNA",
+         "Raffi Ahmad Bea Cukai", "Vicky Prasetyo penipuan audio")
+  · A specific natural-disaster event with a date/magnitude/location
+        ("Gempa M7,7 Mindanao 8 Juni", "Tsunami Sulut-Sangihe",
+         "Banjir rob Pati Juni 2026")
+  · An RUU/UU pengesahan with a specific number/year
+        ("Pengesahan UU Polri 2026", "RUU Pesantren MK")
+  · A flagship government program with a brand name
+        ("Program Sekolah Rakyat", "Makan Bergizi Gratis",
+         "Bantuan Pangan BUMN")
+  · A viral local-moral-panic story (e.g. LGBT enforcement, ormas demos
+    against specific venues, viral hijab/dress-code rulings)
+        ("Pesta Gay Karawang & Tutup THM" — Satpol PP raid + 5 tersangka
+         + ormas Islam demo + Dedi Mulyadi action + DPR/MUI regulasi
+         response; this cross-cuts Hukum + Sosial + Toleransi but is ONE
+         coherent moral-panic news arc — surface as its OWN theme not
+         absorbed into "Gaya Hidup")
+        ("Pelecehan Buronan AS di Depok")
+  · A HAM/legal verdict named after a victim
+        ("Vonis BIS TNI Air Keras Andrie Yunus")
+  · A diplomatic/foreign-relations specific event
+        ("Konflik AS-Iran Selat Hormuz Juni 2026")
+
+When in doubt about whether an event qualifies: if you can NAME the event
+in a 4-7 word phrase using specific proper nouns (not category nouns), and
+it has ≥20 posts, MINT it. The chronic beat ("Korupsi Lainnya & Penegakan
+Hukum", "Bencana Alam & Mitigasi") can still exist — it just covers the
+long-tail residue.
+
+THRESHOLD CLARIFICATION:
+  · 20–149 posts about a NAMED event → its own theme (ACUTE-EVENT FLOOR)
+  · <20 posts about a NAMED event → fold into chronic beat (volume too low)
+  · ≥150 posts about a NAMED event → its own theme (high-confidence)
+  The 20–149 range is governed by THIS rule; the INCIDENT-SPECIFIC VOLUME
+  GATE only bites when you'd otherwise EXCEED 150 with a centroid-leaky
+  label. The two rules are complementary, not contradictory.
+
+LAINNYA SIZE GATE (added 2026-06-14):
+If your themes are well-bounded, the catch-all "Lainnya — Tidak Terklasifikasi" bucket should hold ≤15% of the pool. The 2026-06-14 run had 33% in Lainnya (662 of 2003) — a third of the conversation invisible to readers.
+
+When you're tempted to skip minting themes for clusters that aren't "important enough" (sports recaps, K-pop/entertainment fandom, gaming, fashion, local event coverage, hyper-local incidents), DON'T — propose them anyway. The dashboard reader would rather see "Sport Recap Sepak Bola Liga 1" with 80 posts than have those posts disappear into Lainnya. They don't need a da'wah angle — surface them anyway.
+
 - Aim for BREADTH: the themes you return should jointly cover the great majority (≥80%) of the posts in the pool. If you notice a sizable slice you haven't covered (health stories, education stories, finance/investasi posts, kajian/akhlaq content, sport, lifestyle), add a theme for it rather than letting it drop to "uncategorized". The downstream system has its own cosine-similarity floor that filters borderline matches — you don't need to be conservative here. Undersizing themes is more costly than oversizing.
 - If multiple stories share a clear pattern (e.g. 3 separate child-abuse cases involving religious figures), group them under ONE specific theme ("Pelecehan oleh Tokoh Agama"), not three "miscellaneous crime" entries.
 
@@ -367,7 +549,58 @@ Why: these category nouns produce centroids that absorb adjacent-domain noise. T
 
 When you emit any theme matching the category-noun pattern, brainstorm ≥3 likely bleed-in patterns from your sample of the pool and add them as exclude_keywords. Empty `exclude_keywords: []` on a category-noun theme is a rule violation.
 
+REQUIRED EXCLUDES for ibadah-event themes (added 2026-06-14):
+A theme named after a specific ibadah EVENT (Haji, Umrah, Idul Adha, Ramadhan, Idul Fitri, Qurban, Maulid) MUST have exclude_keywords listing OTHER Islamic terms whose embeddings sit nearby — without these, ~30-40% of the cluster fills with general Islamic content the centroid pulls in.
+
+2026-06-14 audit failure: "Ibadah Haji & Umrah" reached only 69.5% precision; 67 of 220 posts were general Islamic content (haul KH Mahfuz Amin, marriage in Muharram, MTQ kafilah, qibla direction, Hanan Attaki hijrah self-check, MUI on Al-Aqsa, history of 1 Muharram). These belong in "Agama & Spiritual" not "Ibadah Haji & Umrah".
+
+Required exclude_keywords (minimum):
+  · "Ibadah Haji & Umrah" → ["muharram", "tahun baru hijriah", "MTQ", "al-aqsa", "hijrah spiritual", "kajian akhlak", "hadis", "qibla", "haul"]
+  · "Idul Adha & Qurban" → ["haji", "umrah", "muharram", "MTQ"]
+  · "Ramadhan & Idul Fitri" → ["haji", "umrah", "qurban", "muharram"]
+  · "Maulid Nabi" → ["haji", "umrah", "muharram", "isra mi'raj"]
+
+These excludes prevent the haji centroid from leaking into general Islamic content (which has high cosine to ibadah-event labels) while leaving the actual haji story tightly bounded.
+
 - `min_similarity`: float in [0.28, 0.55]. Override the default 0.28 cosine floor for this theme. Raise it (e.g. 0.40-0.45) for themes whose centroid is broad and likely to attract weak matches: "Lainnya"-flavored buckets, "Kesehatan Mental" (the word "mental" is used in unrelated snark), "Krisis Kemanusiaan" (broad), AND any theme whose label is a broad category noun ("Korupsi …", "Kekerasan …", "Ekonomi …", "Bencana …"). The 2026-06-06 audit found these category-noun themes absorbed 50-83% noise at the default floor; raising to 0.40 cuts the bleed dramatically without losing the on-theme posts (their centroid match is usually 0.45+). Leave at default for tight, well-bounded themes ("Konflik Palestina & Lebanon" — 0% noise at default — needs no override).
+
+PRE-EMIT FINAL CHECKLIST (added 2026-06-14 v3 — run mentally before
+returning the JSON):
+
+  □ 1. AND-LABEL REJECT CHECK — for every label with "&" or "dan", walk
+       STEPS A-C of AND-LABEL TRAP. If the RIGHT half matches the
+       AUTOMATIC REJECT LIST (kritik pemerintah, penegakan hukum, dampak
+       ekonomi, tata kelola, birokrasi, pengamanan, kebijakan publik,
+       reformasi, pejabat daerah, sipil, umum, lainnya, sumber daya
+       manusia, ekonomi makro, isu sosial, politik nasional, dinamika
+       sosial, perkembangan terkini, turnamen nasional), DROP the "& RIGHT"
+       portion and keep only LEFT (or rewrite RIGHT to a concrete entity).
+
+  □ 2. SAME-ENTITY DEDUP — list your entity-nouns. If the same entity-noun
+       appears in ≥2 labels (e.g. BBM in both "Kenaikan" and "Kelangkaan"),
+       merge into ONE theme using the dominant narrative.
+
+  □ 3. ELASTIC-WORD CHECK — no label contains misterius, horor, aneh,
+       tragis, viral, polemik, kontroversi, heboh, geger, gempar, fenomena.
+
+  □ 4. CATEGORY-NOUN EXCLUDES — every label starting with or prominently
+       containing Korupsi/Kekerasan/Pelecehan/Bencana/Kriminalitas/
+       Peristiwa/Kasus/Pencurian/Penegakan/Konflik/Pelanggaran/Kecelakaan
+       has ≥3 exclude_keywords targeting known bleed.
+
+  □ 5. IBADAH-EVENT EXCLUDES — any Haji/Umrah/Idul Adha/Ramadhan/Idul
+       Fitri/Qurban/Maulid label has the REQUIRED EXCLUDES list (muharram,
+       MTQ, al-aqsa, hijrah spiritual, kajian akhlak, hadis, qibla, haul).
+
+  □ 6. ACUTE-EVENT FLOOR — for every event-type trigger present in the
+       pool with ≥20 posts (named-person corruption, dated gempa, UU
+       pengesahan, flagship program, moral-panic story), there is a
+       dedicated theme for it (NOT folded into a chronic beat).
+
+  □ 7. CATCH-ALL CHECK — no theme is named Lainnya/Misc/Umum Lainnya/etc.
+
+If any checkbox fails, FIX before emitting. The downstream cosine-merger
+cannot fix a leaky label — only YOU can.
 
 Return ONLY valid JSON:
 {{"themes": [{{"label": "...", "keywords": ["...", ...], "exclude_keywords": ["...", ...], "min_similarity": 0.40}}, ...]}}
@@ -590,22 +823,31 @@ def discover_topics(
     # topic rows stay intact.
     resp = None
     parsed = None
+    # Pick model + thinking budget per the two-model schedule (Pro on
+    # Thursdays for the briefing-day recluster, Flash otherwise).
+    model_today, thinking_budget = _model_for_today()
     for attempt_idx in range(3):
         try:
             resp = client.models.generate_content(
-                model=MODEL,
+                model=model_today,
                 contents=user_prompt,
                 config=types.GenerateContentConfig(
                     system_instruction=SYSTEM_PROMPT,
                     response_mime_type="application/json",
                     response_schema=response_schema,
                     temperature=0.2,
-                    # Labels-only output: 6-10 themes × (label + 5 short
-                    # keywords) is a few hundred tokens. 4K is generous
-                    # headroom and can't run away — assignment no longer
-                    # lives in this response.
-                    max_output_tokens=4096,
-                    thinking_config=types.ThinkingConfig(thinking_budget=0),
+                    # Labels-only OUTPUT: 6-10 themes × (label + 5 short
+                    # keywords) is a few hundred tokens. With Pro's
+                    # thinking enabled, thoughts count toward the budget
+                    # too — raised to 8K to cover ~2K thinking + ~4K
+                    # output + 2K margin.
+                    max_output_tokens=8192,
+                    # thinking_budget: 2048 for Pro (Thursday), 0 for
+                    # Flash (other days — matches the historical safe
+                    # config that avoided Flash-Lite's thinking-spiral).
+                    thinking_config=types.ThinkingConfig(
+                        thinking_budget=thinking_budget
+                    ),
                 ),
             )
             raw = resp.text or "{}"

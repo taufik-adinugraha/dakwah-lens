@@ -52,13 +52,16 @@ YOUTUBE_API = "https://www.googleapis.com/youtube/v3/videos"
 FILTER_MODEL = "gemini-2.5-flash-lite"
 
 # Per-source pull cap. Too many candidates wastes Gemini tokens; too few
-# starves the merger. 20 each = ~60 candidates → ~3K-token prompt.
-PER_SOURCE_LIMIT = 20
+# starves the merger. 40 each = ~120 candidates → ~6K-token prompt.
+# Bumped 20 → 40 on 2026-06-14 to widen the filter's selection pool —
+# audit showed 8/8 cap utilization with ~50 candidates → 16% pass rate,
+# so a 20-keyword target needs ~120 candidates to fill.
+PER_SOURCE_LIMIT = 40
 
 # Hard cap on how many surviving keywords we'll dispatch for scraping.
-# At 20 items per keyword per platform, 8 keywords × 1 platform = 160
-# items/day, well within the Apify budget headroom.
-TOTAL_KEEP_LIMIT = 8
+# Per-keyword caps live in ingest.py::trending_ingest (X_LIMIT, YT_LIMIT).
+# Bumped 8 → 20 on 2026-06-14 for deeper daily news-cycle coverage.
+TOTAL_KEEP_LIMIT = 20
 
 
 @dataclass(frozen=True)

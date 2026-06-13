@@ -172,8 +172,15 @@ celery_app.conf.update(
         # weekly social): per-platform clustering produced near-duplicate
         # themes across platforms. One pooled pass dedupes by
         # construction; per-platform breakdowns are derived downstream
-        # from each post's own platform. Re-clustering the whole corpus
-        # daily costs ~$0.05/run on Gemini Flash — negligible.
+        # from each post's own platform.
+        #
+        # Cost split since 2026-06-14: Pro on Thursday (briefing day),
+        # Flash other days — see topic_discovery.py::_model_for_today.
+        # Thursday recluster: ~$0.30/run on Pro (better precision on
+        # hard rules → cleaner briefing daleel pulls).
+        # Other days:        ~$0.02/run on Flash (good enough for the
+        # dashboard's daily freshness).
+        # Monthly: ~$1.80/mo total (Flash×26 + Pro×4).
         "recluster-daily": {
             "task": "api.workers.ingest.recluster_all",
             "schedule": crontab(minute=0, hour=4),
@@ -224,8 +231,26 @@ celery_app.conf.update(
         # news-cycle topics that emerge mid-week. Sources are free
         # (Google Trends ID + News RSS + YouTube Data API); Gemini
         # Flash-Lite filters for da'wah-relevance; surviving keywords
-        # fan out to X scrapes (apidojo $0.0004/item × 20 items ×
-        # ~3-5 keywords/day ≈ $1/mo).
+        # fan out to X + YouTube scrapes.
+        #
+        # Cost at current caps (PER_SOURCE_LIMIT=40, TOTAL_KEEP_LIMIT=20,
+        # X_LIMIT=100, YT_LIMIT=200, set 2026-06-14):
+        #   X: 20 kw × ~82 items × 30d × $0.0004 ≈ $20/mo realistic
+        #      ($24/mo ceiling at 100% utilization). Apify history shows
+        #      82.5% per-call utilization at the 100-cap.
+        #   YT: free within quota — 20 kw × 4 search.list calls × 100u
+        #       + ~4 videos.list chunks × 1u ≈ 8200u/day (82% of 10K
+        #       free tier; the weekly channel sweep uses ~150u/day so
+        #       ~1650u/day headroom remains).
+        #   Gemini filter: ~$0.0001/run × 30d ≈ $0.003/mo (trivial)
+        # Prior caps (X=100, KEEP=8) averaged $1.28/mo actual spend —
+        # the 15× jump comes from the keyword-count bump (8 → 20) plus
+        # filling the schedule gap (was running ~17/30 days).
+        #
+        # WARNING: at the new caps this single task can exceed the
+        # ~$60/mo Apify budget. Monitor /admin/system/api-costs after
+        # rollout and dial caps back if monthly run-rate breaches the
+        # IDR 1.5–2M total cap.
         #
         # Re-enabled 2026-05-25 after the weekly X schedule landed —
         # was paused 2026-05-20 because it depended on X scrapes which

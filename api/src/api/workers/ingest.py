@@ -351,12 +351,15 @@ def trending_ingest() -> dict[str, object]:
         log.info("pipeline.disabled", task="trending_ingest")
         return {"disabled": True, "keywords": [], "dispatched": 0}
 
-    # Per-keyword caps. X bumped 20 → 100 (2026-05-26) for sample depth
-    # (sentiment / opinion diversity for clustering + briefing headlines).
-    # YouTube capped at 25 — search.list maxResults ceils at 50, and 25
-    # keeps the per-keyword quota footprint small across the day's set.
+    # Per-keyword caps. X stays at 100 (held steady 2026-06-14 alongside
+    # the kw count bump 8 → 20) — at 2.5× the keyword count, monthly
+    # Apify spend ~triples without re-bumping per-keyword depth.
+    # YouTube: `search_youtube_videos` now paginates (added 2026-06-14)
+    # in 50-result chunks. Bumped 25 → 200 (2026-06-14): 20 kw × 4 calls
+    # × 100 units = 8000 units/day, ~80% of the 10K free-tier quota,
+    # leaves ~2K headroom for the weekly channel-uploads sweep.
     X_LIMIT = 100
-    YT_LIMIT = 25
+    YT_LIMIT = 200
 
     # Parent-level ingest_runs row — see the rotating_ingest comment.
     # platform="all" mirrors the schedule's beatPlatform in the admin
