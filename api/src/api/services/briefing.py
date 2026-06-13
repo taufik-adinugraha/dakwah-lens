@@ -828,6 +828,25 @@ ATURAN AKURASI SITASI (KRITIS untuk Pesan Flyer 6 + 5): teks Arab yang Anda tuli
 
 ATURAN VARIASI ANTAR-KELOMPOK (untuk operator yang generate briefing 14-kelompok sekaligus): briefing untuk pekan yang sama tetapi KELOMPOK TEMA berbeda WAJIB pakai doa Pesan Flyer 6 yang BERBEDA — flyer Doa Pekan Ini muncul berdampingan di gallery publik, jadi semua sama akan terlihat malas. PILIH doa yang paling relevan dengan TOPIC_GROUP (mis. Hukum & Keadilan → doa istiqomah & keadilan, Sosial & Keluarga → doa sabar + keluarga seperti Taa-Haa:130 atau Al-Kahf:28, Aqidah & Ibadah → dzikir pagi-petang yang dalam, Pekerja & Pertanian Rakyat → doa rezeki halal, Konflik & Geopolitik → doa tolong-menolong umat). Kalau pool overlap antar-kelompok, prioritaskan kelompok yang punya pool sempit, biarkan kelompok lain pakai opsi yang tersisa.
 
+ATURAN INLINE DOA (HARD RULE 2026-06-13, dijaga):
+
+Untuk Pesan Flyer 5 (Ajakan Sunnah) dan Pesan Flyer 6 (Doa Pekan Ini), kalau Anda menulis doa Arab + terjemahan Indonesia di dalam body flyer, doa itu HARUS berasal LITERAL dari daleel yang Anda kutip di marker **Dalil:**. Anda hanya boleh menyalin potongan doa yang ADA di teks asli hadits / ayat / dzikir yang dikutip.
+
+DILARANG: menulis doa lain (mis. doa awal tahun, doa popular yang beredar di pesantren) lalu menempelkan citation hadits dakwah lain di marker **Dalil:**. Renderer akan menampilkan doa Anda dengan citation tersebut, menciptakan asosiasi visual yang salah — pembaca akan mengira doa itu berasal dari hadits yang dikutip, padahal tidak.
+
+CONTOH SALAH (jangan tiru — Konflik & Geopolitik flyer 5, 2026-06-11):
+  **Dalil:** Sahih Muslim 1671  ← hadits Abu Dzar tentang sedekah anggota tubuh & sholat Dhuha
+  [narrative tentang Dhuha]
+  اَللّٰهُمَّ بَلِّغْنَا رَأْسَ السَّنَةِ الْجَدِيْدَةِ...  ← doa awal tahun, BUKAN dari Sahih Muslim 1671
+  "Ya Allah, sampaikan kami pada awal tahun baru..."
+
+  Renderer menampilkan doa awal tahun dengan badge "SAHIH MUSLIM 1671" — pembaca tertipu mengira doa itu bersumber dari hadits Abu Dzar.
+
+CARA BENAR:
+  - Pilih: kalau Anda ingin angkat sebuah doa specific, cari doa itu di FLYER ADHKAR POOL dan kutip CITATION-nya yang benar.
+  - Atau: tulis body flyer SAJA tanpa inline doa Arab — renderer akan otomatis menampilkan daleel pool entry sebagai hero card.
+  - JANGAN PERNAH: mencampur doa unsourced dengan citation hadits lain.
+
 LARANGAN MUTLAK pada keenam paragraf:
 - JANGAN PERNAH menyebut format dakwah (khutbah / khotbah / Jumat / jamaah / hadirin / sidang / kajian / majelis / diskusi / video / reel / caption / outline). Flyer ini DIBACA TERPISAH oleh follower IG/WA yang tidak tahu apa-apa tentang khutbah Jumat ini. Setiap referensi ke deliverable lain MEMBINGUNGKAN pembaca. JANGAN tulis "Khotbah Jumat ini mengingatkan", "Pada khutbah pekan ini", "Diskusi malam ini", "Pada kajian ini", "Video ini", "Reel ini", "Caption ini", "Outline ini", "thanks guys", "ma'asyiral muslimin", "Bagian ini", "Strategi & Aksi Dakwah".
 - JANGAN PERNAH menyisipkan citation atau ayat secara INLINE di paragraf. Daleel tidak diketik di prose — daleel sudah ada di marker `**Dalil:**` di atas paragraf, dan renderer akan menampilkannya secara visual di flyer. Setiap pola "Allah Ta'ala dalam QS. X: Y berfirman: '...'" / "Rasulullah ﷺ bersabda: '...'" / "Hadits Bukhari N menyebut: '...'" / "Firman Allah:" / Arabic text apa pun di body — DILARANG. Body paragraf 100% prose Indonesia, TANPA Arabic, TANPA citation marker, TANPA "berfirman/bersabda + kutipan". KECUALI: Flyer 5 (Ajakan Sunnah) boleh memuat 1 baris doa Arab pendek + terjemahan singkat sebagai PENUTUP, dan Flyer 6 (Doa Pekan Ini) WAJIB memuat 1 doa Arab pendek + terjemahan. Flyer 1, 2, 3, 4 — ZERO Arabic + ZERO citation inline.

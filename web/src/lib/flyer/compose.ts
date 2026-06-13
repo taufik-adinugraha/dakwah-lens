@@ -522,6 +522,56 @@ function seedFrom(parts: (string | number)[]): number {
 }
 
 // ──────────────────────────────────────────────────────────────────
+// Inline-du'a vs pool-entry validation
+// ──────────────────────────────────────────────────────────────────
+//
+// BUG / RATIONALE:
+//   parseInlineDua greedily extracts the longest Arabic run from the
+//   Pesan Flyer block + the nearest quoted ID translation + the
+//   block's `**Daleel:**` citation. That citation is the authoritative
+//   pool entry (e.g. HR. Muslim 1162) — but the Arabic run it pairs
+//   with comes from FREE PROSE in the briefing. If the LLM (or an
+//   operator hand-edit) included an Arabic phrase that does NOT
+//   actually appear in the retrieved adhkar pool entry — e.g. a
+//   plausible-looking but synthesized invocation — we'd render
+//   hallucinated Arabic under a valid citation. That violates PRD §12
+//   (every Islamic reference must be RETRIEVED, never freely
+//   generated).
+//
+// FIX:
+//   When BOTH an inline du'a and a matching pool entry exist, verify
+//   the inline Arabic is substantially derived from the pool Arabic
+//   before trusting it. Otherwise fall back to the pool entry as-is
+//   (long isnad and all — pool entries are guaranteed retrieved).
+//   When there is no pool entry to compare against (rare — e.g. QS
+//   citation that isn't in the adhkar pool), we still trust the
+//   inline parse since the alternative is dropping the daleel card
+//   entirely.
+//
+// MATCHING:
+//   Normalize Arabic by stripping whitespace + harakat + special
+//   marks (tatweel, etc.), then check whether the first ~30 chars of
+//   the inline Arabic appear inside the normalized pool Arabic. A
+//   30-char prefix is long enough to be a specific phrase (not a
+//   common stem like "اللهم") and short enough to survive minor
+//   pool-vs-prose punctuation drift.
+function normalizeArabic(s: string): string {
+  return s
+    // Strip harakat / tashkeel + Quranic marks + tatweel.
+    .replace(/[ؐ-ًؚ-ٰٟۖ-ۭـ]/g, "")
+    // Strip all whitespace (incl. NBSP, Arabic spaces).
+    .replace(/\s+/g, "");
+}
+
+function isInlineFromPool(inline: string, pool: string): boolean {
+  const nInline = normalizeArabic(inline);
+  const nPool = normalizeArabic(pool);
+  if (nInline.length < 10 || nPool.length < 10) return false;
+  const prefix = nInline.slice(0, Math.min(30, nInline.length));
+  return nPool.includes(prefix);
+}
+
+// ──────────────────────────────────────────────────────────────────
 // Message routing — wholistic-first, with variant-specific enrichment.
 // ──────────────────────────────────────────────────────────────────
 
@@ -706,6 +756,20 @@ async function buildContent(ctx: FlyerContext): Promise<FlyerContent> {
       dedicatedBlock?.daleelCitation,
     );
     const inlineDua = dedicatedBlock ? parseInlineDua(dedicatedBlock) : null;
+    // Guard against hallucinated inline Arabic — see isInlineFromPool
+    // comment block above. When both inline + pool exist, the inline
+    // Arabic must be substantially derived from the pool entry; if
+    // not, drop the inline parse and render the pool entry directly.
+    // When there is no pool entry to compare against (rare), trust
+    // the inline parse — dropping it would leave the slot without a
+    // daleel card, which is worse than rendering an inline that the
+    // operator authored manually.
+    const validatedInline =
+      inlineDua && adhkarPoolDaleel?.arabic
+        ? isInlineFromPool(inlineDua.arabic, adhkarPoolDaleel.arabic)
+          ? inlineDua
+          : null
+        : inlineDua;
     const fallbackMessage = extractBenangMerah(ctx.body);
     const rawMessage =
       (dedicatedBlock && ctx.slot.variant === "b"
@@ -719,7 +783,7 @@ async function buildContent(ctx: FlyerContext): Promise<FlyerContent> {
     // Dzulhijjah). Earlier we hid the card on variant a; that left a
     // ritual sunnah call without its evidence, which doesn't fly per
     // PRD §12 (every Islamic reference must be retrieved + cited).
-    const resolvedDaleel = inlineDua ?? adhkarPoolDaleel;
+    const resolvedDaleel = validatedInline ?? adhkarPoolDaleel;
     return {
       brand,
       dateLabel,
