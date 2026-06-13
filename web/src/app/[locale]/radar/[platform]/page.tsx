@@ -344,8 +344,8 @@ async function CategoryTopicCharts({
                   // Render as plain divs.
                   return (
                     <div key={topic.id} className="block rounded-lg px-2 py-1.5">
-                      <div className="flex items-baseline justify-between gap-3">
-                        <span className="truncate text-sm font-medium text-slate-800">
+                      <div className="flex min-w-0 items-baseline justify-between gap-3">
+                        <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-800">
                           {topic.label}
                         </span>
                         <span className="shrink-0 text-xs tabular-nums text-slate-500">
