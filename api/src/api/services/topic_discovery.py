@@ -453,6 +453,14 @@ EVENT-TYPE TRIGGERS (apply this rule whenever you spot ≥20 posts matching any)
         ("Vonis BIS TNI Air Keras Andrie Yunus")
   · A diplomatic/foreign-relations specific event
         ("Konflik AS-Iran Selat Hormuz Juni 2026")
+  · A separate active international conflict — DO NOT fold Palestine/Gaza
+    into Iran-Israel or any other Mideast cluster. The Gaza/Palestina
+    narrative (humanitarian crisis, IDF strikes, dakwah solidarity calls,
+    MUI fatwa on Al-Aqsa) has its OWN audience and daleel pool and MUST
+    be its own cluster if ≥20 posts surface. The 2026-06-15 audit found
+    Gaza posts scattered into Lainnya because Iran-Israel absorbed only
+    the Iran arc.
+        ("Konflik Gaza & Solidaritas Palestina")
 
 When in doubt about whether an event qualifies: if you can NAME the event
 in a 4-7 word phrase using specific proper nouns (not category nouns), and
@@ -467,6 +475,37 @@ THRESHOLD CLARIFICATION:
   The 20–149 range is governed by THIS rule; the INCIDENT-SPECIFIC VOLUME
   GATE only bites when you'd otherwise EXCEED 150 with a centroid-leaky
   label. The two rules are complementary, not contradictory.
+
+RECURRING CARVE-OUTS (HARD RULE — added 2026-06-15):
+Three recurring weekly verticals systematically fail to cluster cleanly
+because adjacent broad themes absorb them. If your pool has ≥20 posts
+matching ANY of the following patterns, MINT a dedicated theme even if
+the count is modest. The 2026-06-15 audit found these absorbed into
+broader clusters with high misassignment rates:
+
+  · KEMENAG NON-HAJI POLICY/SCANDAL — sertifikasi penceramah, KUA,
+    BPJPH halal, fatwa MUI, kebijakan Kemenag yang BUKAN urusan haji.
+    The "Ibadah Haji & Umrah" cluster currently absorbs these because
+    Kemenag/MUI/halal tokens sit close to haji embeddings. ≥20 posts →
+    MINT "Kebijakan & Skandal Kementerian Agama" (excludes:
+    ["haji", "umrah", "jemaah", "kepulangan", "kloter"]).
+
+  · SENGKETA TANAH WAKAF & ASET KEAGAMAAN — wakaf dispute, masjid/
+    pesantren land claim, aset Muhammadiyah/NU/Yayasan keagamaan. The
+    "Penggusuran Lahan & Konflik Agraria" cluster currently absorbs
+    these. Dakwah-relevant; the daleel pool (hadith on hifz al-mal,
+    wakaf classical fiqh) is distinct from secular agraria. ≥20 posts
+    → MINT "Sengketa Tanah Wakaf & Aset Keagamaan" (excludes:
+    ["penggusuran umum", "lenteng agung", "agraria sawit", "TPPU tambang"]).
+
+  · KONFLIK GAZA & PALESTINA — already addressed in EVENT-TYPE
+    TRIGGERS above; restated here for emphasis: this is NEVER folded
+    into Iran-Israel or any other Mideast cluster regardless of count.
+
+These three carve-outs trigger at ≥20 posts (lower than the standard
+ACUTE-EVENT floor) because they are RECURRING themes whose total weekly
+yield is consistently in this range AND have distinct dakwah daleel
+pools that would be lost if absorbed.
 
 LAINNYA SIZE GATE (added 2026-06-14):
 If your themes are well-bounded, the catch-all "Lainnya — Tidak Terklasifikasi" bucket should hold ≤15% of the pool. The 2026-06-14 run had 33% in Lainnya (662 of 2003) — a third of the conversation invisible to readers.
@@ -555,7 +594,7 @@ A theme named after a specific ibadah EVENT (Haji, Umrah, Idul Adha, Ramadhan, I
 2026-06-14 audit failure: "Ibadah Haji & Umrah" reached only 69.5% precision; 67 of 220 posts were general Islamic content (haul KH Mahfuz Amin, marriage in Muharram, MTQ kafilah, qibla direction, Hanan Attaki hijrah self-check, MUI on Al-Aqsa, history of 1 Muharram). These belong in "Agama & Spiritual" not "Ibadah Haji & Umrah".
 
 Required exclude_keywords (minimum):
-  · "Ibadah Haji & Umrah" → ["muharram", "tahun baru hijriah", "MTQ", "al-aqsa", "hijrah spiritual", "kajian akhlak", "hadis", "qibla", "haul"]
+  · "Ibadah Haji & Umrah" → ["muharram", "tahun baru hijriah", "MTQ", "al-aqsa", "hijrah spiritual", "kajian akhlak", "hadis", "qibla", "haul", "kajian", "dzikir", "tahajud", "ceramah", "sertifikasi penceramah", "KUA", "BPJPH", "halal MUI", "wakaf", "youtube kajian", "renungan"]
   · "Idul Adha & Qurban" → ["haji", "umrah", "muharram", "MTQ"]
   · "Ramadhan & Idul Fitri" → ["haji", "umrah", "qurban", "muharram"]
   · "Maulid Nabi" → ["haji", "umrah", "muharram", "isra mi'raj"]
