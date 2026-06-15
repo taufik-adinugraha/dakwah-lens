@@ -233,19 +233,19 @@ celery_app.conf.update(
         # Flash-Lite filters for da'wah-relevance; surviving keywords
         # fan out to X + YouTube scrapes.
         #
-        # Cost at current caps (PER_SOURCE_LIMIT=40, TOTAL_KEEP_LIMIT=20,
-        # X_LIMIT=100, YT_LIMIT=200, set 2026-06-14):
-        #   X: 20 kw × ~82 items × 30d × $0.0004 ≈ $20/mo realistic
-        #      ($24/mo ceiling at 100% utilization). Apify history shows
+        # Cost at current caps (PER_SOURCE_LIMIT=40, TOTAL_KEEP_LIMIT=10,
+        # X_LIMIT=100, YT_LIMIT=200, dialed back 2026-06-15 from KEEP=20):
+        #   X: 10 kw × ~82 items × 30d × $0.0004 ≈ $10/mo realistic
+        #      ($12/mo ceiling at 100% utilization). Apify history shows
         #      82.5% per-call utilization at the 100-cap.
-        #   YT: free within quota — 20 kw × 4 search.list calls × 100u
-        #       + ~4 videos.list chunks × 1u ≈ 8200u/day (82% of 10K
+        #   YT: free within quota — 10 kw × 4 search.list calls × 100u
+        #       + ~2 videos.list chunks × 1u ≈ 4100u/day (41% of 10K
         #       free tier; the weekly channel sweep uses ~150u/day so
-        #       ~1650u/day headroom remains).
+        #       ~5750u/day headroom remains).
         #   Gemini filter: ~$0.0001/run × 30d ≈ $0.003/mo (trivial)
-        # Prior caps (X=100, KEEP=8) averaged $1.28/mo actual spend —
-        # the 15× jump comes from the keyword-count bump (8 → 20) plus
-        # filling the schedule gap (was running ~17/30 days).
+        # Original baseline (X=100, KEEP=8) averaged $1.28/mo actual spend.
+        # The brief 2026-06-14 KEEP=20 setting showed ~$0.25/day on the
+        # first full run; at 10 we project ~half that (~$3.50-5/mo).
         #
         # WARNING: at the new caps this single task can exceed the
         # ~$60/mo Apify budget. Monitor /admin/system/api-costs after

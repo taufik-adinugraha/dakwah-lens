@@ -60,8 +60,11 @@ PER_SOURCE_LIMIT = 40
 
 # Hard cap on how many surviving keywords we'll dispatch for scraping.
 # Per-keyword caps live in ingest.py::trending_ingest (X_LIMIT, YT_LIMIT).
-# Bumped 8 → 20 on 2026-06-14 for deeper daily news-cycle coverage.
-TOTAL_KEEP_LIMIT = 20
+# Bumped 8 → 20 on 2026-06-14, then dialed back 20 → 10 on 2026-06-15
+# after one day at the new cap showed ~5× X spend ($0.05 → $0.25) for
+# marginal extra signal — halving keeps the cost-vs-coverage ratio
+# closer to the prior baseline while still 25% wider than the original 8.
+TOTAL_KEEP_LIMIT = 10
 
 
 @dataclass(frozen=True)
