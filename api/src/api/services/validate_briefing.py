@@ -67,6 +67,7 @@ class BriefingWarning(TypedDict, total=False):
         "flyer_section_malformed",
         "flyer_outlet_or_handle",
         "flyer_headline_missing_or_generic",
+        "flyer_independence_violation",
         "news_paraphrase_fabrication",
     ]
     severity: Literal["low", "medium", "high"]
@@ -1034,6 +1035,130 @@ def scan_flyer_outlet_handle(markdown: str) -> list[BriefingWarning]:
     return warnings
 
 
+# Flyer-independence patterns. Pesan Flyer bodies must be self-contained
+# (no references to other deliverables in the SAME briefing, no
+# staged-narrator framing that implies a specific pulpit/audience).
+# Added 2026-06-19 after batch shipped with 80+ flyers opening
+# "Jamaah Jumat pekan ini...", "Mimbar pekan ini...", "Takmir dan
+# pengurus RT pekan ini...", "Kreator dakwah pekan ini...", "Mahasiswa
+# pekan ini..." — leaking briefing scaffolding into IG/WA share-cards
+# that the reader has no briefing context for. See AGENTS.md
+# [FLYER INDEPENDENCE — INVIOLABLE].
+_FLYER_INDEPENDENCE_PATTERNS: list[tuple[re.Pattern[str], str]] = [
+    # Cross-deliverable references — naming other sub-sections of the
+    # same briefing.
+    (re.compile(r"\bkhutbah\s+jum.?at\b", re.IGNORECASE), "khutbah jum'at"),
+    (re.compile(r"\bkhutbah\s+pekan\s+ini\b", re.IGNORECASE), "khutbah pekan ini"),
+    (re.compile(r"\bkhutbah(?:nya)?\s+(?:ini|hari\s+ini)\b", re.IGNORECASE), "khutbah ini/hari ini"),
+    (re.compile(r"\bkultum\s+pekan\s+ini\b", re.IGNORECASE), "kultum pekan ini"),
+    (re.compile(r"\bkajian\s+pekan\s+ini\b", re.IGNORECASE), "kajian pekan ini"),
+    (re.compile(r"\bkajian\s+ibu[-\s]?ibu\b", re.IGNORECASE), "kajian ibu-ibu"),
+    (re.compile(r"\bmajelis\s+taklim\b", re.IGNORECASE), "majelis taklim"),
+    (re.compile(r"\bpengajaran\s+di\s+rumah\b", re.IGNORECASE), "pengajaran di rumah"),
+    (re.compile(r"\bkisah\s+pendek\s+pekan\s+ini\b", re.IGNORECASE), "kisah pendek pekan ini"),
+    (re.compile(r"\bkreator\s+pekan\s+ini\b", re.IGNORECASE), "kreator pekan ini"),
+    (re.compile(r"\bkreator\s+dakwah\s+pekan\s+ini\b", re.IGNORECASE), "kreator dakwah pekan ini"),
+    (re.compile(r"\bkreator\s+konten\s+pekan\s+ini\b", re.IGNORECASE), "kreator konten pekan ini"),
+    (re.compile(r"\baksi\s+sosial\s+pekan\s+ini\b", re.IGNORECASE), "aksi sosial pekan ini"),
+    (re.compile(r"\bartikel\s+mahasiswa\b", re.IGNORECASE), "artikel mahasiswa"),
+    (re.compile(r"\bmahasiswa\s+pekan\s+ini\b", re.IGNORECASE), "mahasiswa pekan ini"),
+
+    # Staged-narrator audience framings. The "X pekan ini ..." opener is
+    # the canonical violation — implies a memo to a specific operator.
+    (re.compile(r"\bjamaah\s+jum.?at\b", re.IGNORECASE), "jamaah jum'at"),
+    (re.compile(r"\bjamaah\s+pekan\s+ini\b", re.IGNORECASE), "jamaah pekan ini"),
+    (re.compile(r"\bmimbar\s+(?:jum.?at|pekan\s+ini|ini)\b", re.IGNORECASE), "mimbar jum'at/pekan-ini/ini"),
+    (re.compile(r"\bdi\s+mimbar\b", re.IGNORECASE), "di mimbar"),
+    (re.compile(r"\bkhateeb\b", re.IGNORECASE), "khateeb"),
+    (re.compile(r"\bkhatib\s+(?:menutup|membingkai|mengajak|memandu|berdiri|menyampaikan)", re.IGNORECASE), "khatib + verb"),
+    (re.compile(r"\bimam\s+masjid\s+pekan\s+ini\b", re.IGNORECASE), "imam masjid pekan ini"),
+    (re.compile(r"\btakmir\b", re.IGNORECASE), "takmir"),
+    (re.compile(r"\bpengurus\s+rt\b", re.IGNORECASE), "pengurus RT"),
+    (re.compile(r"\bsantri\s+pekan\s+ini\b", re.IGNORECASE), "santri pekan ini"),
+
+    # Instructions framed AT another sub-section operator.
+    (re.compile(r"\bbawa\s+(?:ini\s+)?ke\s+khutbah\b", re.IGNORECASE), "bawa ke khutbah"),
+    (re.compile(r"\bjadikan\s+sumbu\s+khutbah\b", re.IGNORECASE), "jadikan sumbu khutbah"),
+    (re.compile(r"\bbuka\s+khutbah\s+dengan\b", re.IGNORECASE), "buka khutbah dengan"),
+    (re.compile(r"\bkhatib\s+menutup\s+dengan\b", re.IGNORECASE), "khatib menutup dengan"),
+    (re.compile(r"\bkhateeb\s+(?:menutup|membingkai|memandu|dapat\s+memandu)\b", re.IGNORECASE), "khateeb + verb"),
+]
+
+
+def scan_flyer_independence(markdown: str) -> list[BriefingWarning]:
+    """Pesan Flyer bodies must be self-contained — no references to
+    other deliverables in the same briefing, no staged-narrator framings
+    (jamaah Jumat / mimbar / takmir / pengurus RT / kreator pekan ini /
+    mahasiswa pekan ini). The flyer is a standalone IG/WA share-card —
+    the reader has no briefing context.
+
+    Live in prod since 2026-06-19 after 80+ of 84 flyers shipped with
+    audience-staged framing. See AGENTS.md
+    [FLYER INDEPENDENCE — INVIOLABLE] for the full rule.
+    """
+    warnings: list[BriefingWarning] = []
+    slc = _section_slice(markdown, r"Pesan\s+Flyer")
+    if not slc:
+        return warnings
+    section = markdown[slc[0] : slc[1]]
+
+    h3_iter = list(
+        re.finditer(
+            r"^###\s+Pesan\s+Flyer\s+(\d)[^\n]*$",
+            section,
+            flags=re.MULTILINE | re.IGNORECASE,
+        )
+    )
+    for i, h3 in enumerate(h3_iter):
+        slot = int(h3.group(1))
+        body_start = h3.end()
+        body_end = (
+            h3_iter[i + 1].start() if i + 1 < len(h3_iter) else len(section)
+        )
+        body = section[body_start:body_end]
+
+        # Strip marker lines + Arabic blocks before scanning — citation
+        # strings may legitimately contain words that overlap with
+        # cross-deliverable tokens.
+        body_prose = re.sub(
+            r"^\s*\*\*\s*(?:Headline|Judul|Tema|Dalil|Daleel)\s*:\*\*[^\n]*$",
+            "",
+            body,
+            flags=re.MULTILINE | re.IGNORECASE,
+        )
+
+        hits: list[str] = []
+        for pat, label in _FLYER_INDEPENDENCE_PATTERNS:
+            if pat.search(body_prose):
+                hits.append(label)
+
+        if hits:
+            seen: set[str] = set()
+            uniq = [h for h in hits if not (h in seen or seen.add(h))]
+            warnings.append(
+                {
+                    "kind": "flyer_independence_violation",
+                    "severity": "high",
+                    "where": f"Pesan Flyer {slot}",
+                    "message": (
+                        f"body references other deliverable / uses "
+                        f"staged-narrator framing: {', '.join(uniq)}. "
+                        f"Flyer is a standalone IG/WA share-card — "
+                        f"reader has NO briefing context. Rewrite the "
+                        f"body universally addressed to the reader, "
+                        f"starting from the daleel's principle or the "
+                        f"contemporary pattern directly. NO 'jamaah "
+                        f"pekan ini ...' / 'takmir pekan ini ...' / "
+                        f"'kreator pekan ini ...' / 'mahasiswa pekan "
+                        f"ini ...' / 'khateeb membingkai ...' / 'bawa "
+                        f"ke khutbah ...' openers. See AGENTS.md "
+                        f"[FLYER INDEPENDENCE — INVIOLABLE]."
+                    ),
+                }
+            )
+    return warnings
+
+
 # Generic template phrases forbidden in `**Headline:**` markers.
 # The headline must be punchy + flyer-specific; generic phrases like
 # "Pekan ini" or "Renungan Mingguan" defeat the purpose (every flyer
@@ -1290,11 +1415,13 @@ def scan_flyer_dalil_in_pool(
                     f"Dalil marker '{cited}' is NOT in the saved daleel/"
                     f"adhkar pool. Renderer will silently fall back to "
                     f"pickFlyerDaleel(rank) and display a mismatched "
-                    f"daleel. Fix: replace '{cited}' with one of the "
-                    f"actual pool entries (lihat DALEEL POOL / ADHKAR "
-                    f"POOL block in the dump), or — if no pool entry "
-                    f"fits — replace with '—' to skip the daleel card."
+                    f"daleel. Fix: save-time refetch will attempt to "
+                    f"pull this citation from Qdrant + top up the pool. "
+                    f"If refetch fails (citation unparseable or no "
+                    f"matching chunk), the save will hard-fail."
                 ),
+                "flyer_index": flyer_n - 1,
+                "current_citation": cited,
             }
         )
     return warnings
@@ -1931,6 +2058,7 @@ def validate_briefing(
         (scan_flyer_section_structure, "flyer_section_structure_check_failed"),
         (scan_flyer_outlet_handle, "flyer_outlet_handle_check_failed"),
         (scan_flyer_headline_quality, "flyer_headline_quality_check_failed"),
+        (scan_flyer_independence, "flyer_independence_check_failed"),
     ):
         try:
             warnings.extend(fn(markdown))

@@ -463,6 +463,242 @@ def retrieve_daleel(
     return final_hits
 
 
+# ── Exact-citation refetch ────────────────────────────────────────────
+#
+# When the brief composer picks a daleel by citation (e.g.
+# "QS. Al-Baqara: 280", "Sahih Muslim 4734") that ISN'T in the pre-fetched
+# pool, `retrieve_by_citation` lets us scroll Qdrant for the exact chunk
+# and top up the pool — instead of em-dashing the marker (silent fallback)
+# or swapping to the nearest pool entry (drifts the message).
+#
+# Why this exists (2026-06-19): the 2026-06-18 batch save path em-dashed
+# 75% of saved flyer Dalil markers because the post-deploy re-dumped pool
+# (semantic search at save time) differed from the compose-time pool, and
+# there was no exact-citation lookup to top up. Renderer fell back to
+# `pickFlyerDaleel(rank)` which returned random pool entries — readers
+# saw correct headlines under wildly off-topic daleels. This function is
+# the structural fix: any composer-picked citation that names a real
+# kitab + identifier can be refetched on demand.
+
+_QURAN_CITATION_RE = re.compile(
+    r"""
+    ^\s*QS\.?\s+               # "QS. " or "QS "
+    (?P<surah>[^:]+?)           # surah translit (Al-Baqara / Al-Baqarah / Aal-i-Imraan / An-Nisaa / etc.)
+    \s*[:.]?\s*                 # ": " or " . " or " "
+    (?P<ayah>\d+)\b             # ayah number
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
+
+# Hadith corpora citations carry the kitab name + a hadith number. The
+# number is keyed on `payload.hadithnumber` (int). Different sources use
+# different numbering systems (USC / Abdul Baqi / Bukhari's own), but
+# the embedder writes whatever `citation_en` carries, so payload.citation_en
+# is the authoritative match field.
+_HADITH_CITATION_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
+    # corpus key, regex that captures hadith number in group 1
+    ("bukhari", re.compile(r"^Sah[ie]h\s+(?:al-)?Bukhari\s+(\d+)", re.IGNORECASE)),
+    ("muslim", re.compile(r"^Sah[ie]h\s+Muslim\s+(\d+)", re.IGNORECASE)),
+    ("riyad_as_salihin", re.compile(r"^Riyad\s+as-Salihin\s+(\d+)", re.IGNORECASE)),
+    ("bulugh_al_maram", re.compile(r"^Bulugh\s+al-Maram\s+(\d+)", re.IGNORECASE)),
+]
+
+# AR-only corpora citations carry the kitab name + a section descriptor
+# (often Arabic text). The full citation string is the authoritative
+# match field — we don't try to parse the section descriptor.
+_AR_ONLY_CITATION_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
+    ("bidayat_al_hidayah", re.compile(r"^Bidayat(?:ul)?\s+Hidayah\b", re.IGNORECASE)),
+    ("nashaihul_ibad", re.compile(r"^Nashaihul\s+Ibad\b", re.IGNORECASE)),
+    ("aqidah_awam", re.compile(r"^'?Aqidat?\s+al-'?Awam", re.IGNORECASE)),
+    ("adab_alim_mutaallim", re.compile(r"^Adab\s+al-'Alim", re.IGNORECASE)),
+    ("thalathat_al_usul", re.compile(r"^Thalathat\s+al-Usul", re.IGNORECASE)),
+    ("syamail_muhammadiyyah", re.compile(r"^Ash-Shama'il\s+(?:al-)?Muhammadiyyah", re.IGNORECASE)),
+    ("sirah_ibn_hisham", re.compile(r"^Sirah\s+Ibn\s+Hisham", re.IGNORECASE)),
+    ("hayat_as_sahabah", re.compile(r"^Hayat\s+as-Sahabah", re.IGNORECASE)),
+    ("fath_al_qarib", re.compile(r"^Fath\s+al-Qarib", re.IGNORECASE)),
+    ("fath_al_muin", re.compile(r"^Fath\s+al-Mu'in", re.IGNORECASE)),
+    ("fiqh_as_sunnah", re.compile(r"^Fiqh\s+as-Sunnah", re.IGNORECASE)),
+    ("al_umm", re.compile(r"^Al-Umm\b", re.IGNORECASE)),
+    ("al_bidayah_wan_nihayah", re.compile(r"^Al-Bidayah\s+wan-Nihayah", re.IGNORECASE)),
+    # Tafsir Ibn Kathir uses a Quran-style citation, special-cased below
+]
+
+
+class _FakeHit:
+    """Adapter so a `scroll`-fetched point can flow through `_normalize_hit`,
+    which expects an object with `.payload` + `.score` attributes."""
+
+    __slots__ = ("payload", "score")
+
+    def __init__(self, payload: dict[str, Any] | None) -> None:
+        self.payload = payload or {}
+        self.score = None
+
+
+def _normalize_surah_name(name: str) -> str:
+    """Normalize Quran surah translit for tolerant matching. Operators
+    write 'Al-Baqara' or 'Al-Baqarah'; the payload uses one canonical
+    form. Compare lowercased + dash-stripped to survive both.
+    """
+    return re.sub(r"[\s'\-]+", "", name).lower()
+
+
+def retrieve_by_citation(citation: str) -> dict[str, Any] | None:
+    """Fetch a specific Qdrant chunk by its human-readable citation.
+
+    Returns the same shape as `retrieve_daleel` hits (via `_normalize_hit`)
+    so callers can append the result directly into `daleel_refs` without
+    re-normalizing. Returns None if the citation can't be parsed, no
+    matching chunk exists in Qdrant, or the qdrant call fails.
+
+    Supported citation forms:
+      - Quran:  "QS. Al-Baqara: 280", "QS. Al-Baqarah: 280",
+                "QS. Aal-i-Imraan: 130", "QS. An-Nisaa: 161"
+      - Hadith: "Sahih al-Bukhari 6377", "Sahih Muslim 1325",
+                "Riyad as-Salihin 1701", "Bulugh al-Maram 951"
+      - AR-only: "Bidayatul Hidayah — القول في معاصى القلب",
+                 "Nashaihul Ibad — باب الثنائي (2/8)",
+                 (matches on the FULL citation string verbatim)
+
+    Notes:
+      - For AR-only kitabs the section descriptor must match exactly;
+        operators should copy the citation from the saved pool verbatim.
+      - Tafsir Ibn Kathir entries use a 'Tafsir Ibn Kathir on <surah>:<ayah>'
+        form — those parse via the Quran patterns.
+    """
+    from qdrant_client import models
+
+    c = citation.strip()
+    if not c:
+        return None
+
+    qdrant = _get_qdrant()
+
+    # ── Quran path ────────────────────────────────────────────────────
+    m = _QURAN_CITATION_RE.match(c)
+    if m:
+        surah_norm = _normalize_surah_name(m.group("surah"))
+        ayah = int(m.group("ayah"))
+        # surah is matched by ayah-number filter + post-filter on
+        # normalized translit (payload's `surah_name_translit` may
+        # be 'Al-Baqarah' while operator wrote 'Al-Baqara'). Scroll
+        # all candidates for that ayah and pick the surah-name match.
+        try:
+            points, _ = qdrant.scroll(
+                collection_name=COLLECTION_NAMES["quran"],
+                scroll_filter=models.Filter(
+                    must=[
+                        models.FieldCondition(
+                            key="ayah",
+                            match=models.MatchValue(value=ayah),
+                        )
+                    ]
+                ),
+                limit=200,  # 114 surahs max for any given ayah number
+                with_payload=True,
+                with_vectors=False,
+            )
+        except Exception as exc:
+            log.warning(
+                "kitab_retrieval.refetch_quran_failed",
+                citation=c,
+                error=str(exc),
+            )
+            return None
+        for p in points:
+            payload = p.payload or {}
+            translit_norm = _normalize_surah_name(
+                str(payload.get("surah_name_translit") or "")
+            )
+            if translit_norm == surah_norm:
+                return _normalize_hit("quran", _FakeHit(payload))
+        log.info(
+            "kitab_retrieval.refetch_quran_not_found",
+            citation=c,
+            surah_normalized=surah_norm,
+            ayah=ayah,
+        )
+        return None
+
+    # ── Hadith path ───────────────────────────────────────────────────
+    for corpus, pattern in _HADITH_CITATION_PATTERNS:
+        m = pattern.match(c)
+        if not m:
+            continue
+        hadithnumber = int(m.group(1))
+        try:
+            points, _ = qdrant.scroll(
+                collection_name=COLLECTION_NAMES[corpus],
+                scroll_filter=models.Filter(
+                    must=[
+                        models.FieldCondition(
+                            key="hadithnumber",
+                            match=models.MatchValue(value=hadithnumber),
+                        )
+                    ]
+                ),
+                limit=2,
+                with_payload=True,
+                with_vectors=False,
+            )
+        except Exception as exc:
+            log.warning(
+                "kitab_retrieval.refetch_hadith_failed",
+                citation=c,
+                corpus=corpus,
+                error=str(exc),
+            )
+            return None
+        if points:
+            return _normalize_hit(corpus, _FakeHit(points[0].payload))
+        log.info(
+            "kitab_retrieval.refetch_hadith_not_found",
+            citation=c,
+            corpus=corpus,
+            hadithnumber=hadithnumber,
+        )
+        return None
+
+    # ── AR-only path (exact citation string match) ───────────────────
+    for corpus, pattern in _AR_ONLY_CITATION_PATTERNS:
+        if not pattern.match(c):
+            continue
+        try:
+            points, _ = qdrant.scroll(
+                collection_name=COLLECTION_NAMES[corpus],
+                scroll_filter=models.Filter(
+                    must=[
+                        models.FieldCondition(
+                            key="citation",
+                            match=models.MatchValue(value=c),
+                        )
+                    ]
+                ),
+                limit=2,
+                with_payload=True,
+                with_vectors=False,
+            )
+        except Exception as exc:
+            log.warning(
+                "kitab_retrieval.refetch_ar_only_failed",
+                citation=c,
+                corpus=corpus,
+                error=str(exc),
+            )
+            return None
+        if points:
+            return _normalize_hit(corpus, _FakeHit(points[0].payload))
+        log.info(
+            "kitab_retrieval.refetch_ar_only_not_found",
+            citation=c,
+            corpus=corpus,
+        )
+        return None
+
+    log.info("kitab_retrieval.refetch_unparsed_citation", citation=c)
+    return None
+
+
 # ── Kisah Pendek (10-min storytelling slot) ───────────────────────────
 #
 # Source: one of FOUR narrative kitabs. Each has different content shape

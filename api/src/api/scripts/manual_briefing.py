@@ -445,41 +445,107 @@ async def cmd_save(group_arg: str, markdown_path: str) -> None:
     except Exception as exc:
         sys.stderr.write(f"⚠ Validation pass failed (non-fatal): {exc}\n")
 
-    # HARD BLOCK: flyer Dalil markers that don't exist in the saved
-    # pool render with the WRONG daleel — the flyer renderer silently
-    # falls back to pickFlyerDaleel(rank) when the citation lookup
-    # misses. That ships mis-attributed daleel to production.
+    # POOL TOP-UP via refetch-by-citation. When a flyer Dalil marker
+    # points to a citation NOT in the saved pool, the renderer silently
+    # falls back to `pickFlyerDaleel(rank)` and ships the WRONG daleel.
+    # Until 2026-06-19 the workaround was either em-dashing the marker
+    # (still triggers the silent fallback — just via a different code
+    # path) or asking the operator to rewrite the Dalil line manually.
+    # Both paths lose the daleel-first methodology.
     #
-    # Real bug surfaced 2026-06-07: chained `dump → save` re-ran dump
-    # between writing and saving, re-retrieving a different pool from
-    # Qdrant. Operator's brief was tagged against pool A; save stored
-    # pool B; renderer used pool B and rendered the wrong daleel for
-    # ~55% of flyers across all briefings.
+    # The structural fix: when a citation doesn't resolve, refetch the
+    # exact chunk from Qdrant via `retrieve_by_citation` and append to
+    # the saved pool. The composer's choice survives end-to-end; the
+    # renderer finds the citation; no fallback; no em-dash. Real bug
+    # 2026-06-18 batch: 75% of saved Dalil markers were em-dashed by
+    # the band-aid path because compose-time + save-time semantic
+    # searches returned different top-K. Refetch closes the gap.
     #
-    # Fail early here so the operator notices BEFORE the briefing
-    # ships. Other warnings stay non-fatal (informational).
+    # If refetch fails (unparseable citation OR no matching chunk in
+    # Qdrant), THEN hard-fail — that's a real composer error, not a
+    # pool-drift artifact. See AGENTS.md
+    # [FLYER DALEEL-FIRST — INVIOLABLE] + 2026-06-19 incident note.
     pool_warnings = [
         w for w in heuristic_warnings
         if w.get("kind") == "flyer_dalil_not_in_pool"
     ]
     if pool_warnings:
-        sys.stderr.write(
-            "\n✗ SAVE BLOCKED — flyer Dalil markers reference citations "
-            "NOT in the saved daleel/adhkar pool. The renderer would "
-            "silently render the wrong daleel on those flyers.\n\n"
-        )
+        from api.services.kitab_retrieval import retrieve_by_citation
+
+        unresolved: list[dict] = []
+        refetched_daleel: list[dict] = []
+        refetched_adhkar: list[dict] = []
         for w in pool_warnings:
-            sys.stderr.write(f"  · {w['where']}: {w['message']}\n")
-        sys.stderr.write(
-            "\n  Fix options:\n"
-            "    (a) Edit the brief's `**Dalil:**` markers to use "
-            "citations from the actual stored pool (re-run "
-            "`dump` to see the current pool), OR\n"
-            "    (b) Replace the offending `**Dalil:**` line with "
-            "'`**Dalil:** —`' to skip the daleel card.\n\n"
-            "  Save aborted. No row written.\n"
-        )
-        raise SystemExit(1)
+            citation = (w.get("current_citation") or "").strip()
+            flyer_idx = w.get("flyer_index")
+            if not citation:
+                unresolved.append(w)
+                continue
+            hit = retrieve_by_citation(citation)
+            if hit is None:
+                unresolved.append(w)
+                continue
+            # Pesan Flyer 5+6 (idx 4, 5 — 0-based) pin to the adhkar pool;
+            # 1-4 pin to the daleel pool.
+            if isinstance(flyer_idx, int) and flyer_idx in (4, 5):
+                refetched_adhkar.append(hit)
+            else:
+                refetched_daleel.append(hit)
+
+        if refetched_daleel or refetched_adhkar:
+            # Dedup against the existing pool by citation string so a
+            # second save doesn't double-insert.
+            existing_d = {d.get("citation", "") for d in daleel}
+            existing_a = {d.get("citation", "") for d in adhkar}
+            added_d = [h for h in refetched_daleel if h["citation"] not in existing_d]
+            added_a = [h for h in refetched_adhkar if h["citation"] not in existing_a]
+            daleel = daleel + added_d
+            adhkar = adhkar + added_a
+            sys.stderr.write(
+                f"\n↻ Refetched {len(added_d)} daleel + {len(added_a)} adhkar "
+                f"by exact citation from Qdrant (top-up). "
+                f"Composer-picked daleel survives end-to-end; renderer "
+                f"will find every Dalil marker. Re-running pool "
+                f"validation.\n"
+            )
+            for h in added_d + added_a:
+                sys.stderr.write(f"    + {h['citation']}\n")
+            # Re-validate with the topped-up pool. The pool_warnings list
+            # should now be empty for any citation that refetched.
+            heuristic_warnings = validate_briefing(
+                summary_md,
+                daleel_pool=daleel,
+                adhkar_pool=adhkar,
+                llm_judgments=False,
+            )
+            pool_warnings = [
+                w for w in heuristic_warnings
+                if w.get("kind") == "flyer_dalil_not_in_pool"
+            ]
+            unresolved = pool_warnings  # whatever's left after refetch
+
+        if unresolved:
+            sys.stderr.write(
+                "\n✗ SAVE BLOCKED — flyer Dalil markers reference "
+                "citations that don't resolve in the saved pool AND "
+                "couldn't be refetched from Qdrant (citation unparseable "
+                "or no matching chunk). Refetch closes the gap when the "
+                "composer picks a real-but-out-of-pool daleel; it can't "
+                "rescue a fabricated citation.\n\n"
+            )
+            for w in unresolved:
+                sys.stderr.write(f"  · {w['where']}: {w['message']}\n")
+            sys.stderr.write(
+                "\n  Fix: verify each unresolved `**Dalil:**` marker "
+                "points to a real chunk in Qdrant (correct kitab name, "
+                "exact verse/hadith number, exact section descriptor "
+                "for AR-only kitabs). Copy the citation verbatim from "
+                "the FLYER POOL block in the original prompt. NEVER use "
+                "`**Dalil:** —` to bypass — that triggers the silent "
+                "fallback we're trying to eliminate.\n\n"
+                "  Save aborted. No row written.\n"
+            )
+            raise SystemExit(1)
 
     # Same hard-fail discipline for structural flyer-section problems —
     # added 2026-06-08 after Inspirasi & Toleransi briefings shipped
@@ -542,6 +608,49 @@ async def cmd_save(group_arg: str, markdown_path: str) -> None:
             "Takaran di Setiap Transaksi', 'Allah Haramkan Kezaliman "
             "atas Diri-Nya'). Avoid 'Pekan ini', 'Pesan Pekan Ini', "
             "'Renungan Mingguan', 'Doa Pekan Ini', 'Suara Khutbah'.\n\n"
+            "  Save aborted. No row written.\n"
+        )
+        raise SystemExit(1)
+
+    # Flyer-independence hard-fail. Added 2026-06-19 after a batch
+    # shipped with 80+ of 84 flyers carrying staged-narrator framings
+    # ("Jamaah Jumat pekan ini...", "Mimbar pekan ini...", "Takmir dan
+    # pengurus RT pekan ini...", "Kreator dakwah pekan ini...",
+    # "Mahasiswa pekan ini...") + cross-deliverable references ("Bawa
+    # ini ke khutbah", "Khateeb membingkai..."). The flyer is a
+    # standalone IG/WA share-card — the reader has no briefing context,
+    # so audience-staged framing leaks scaffolding that doesn't belong.
+    # See AGENTS.md [FLYER INDEPENDENCE — INVIOLABLE].
+    independence_warnings = [
+        w for w in heuristic_warnings
+        if w.get("kind") == "flyer_independence_violation"
+    ]
+    if independence_warnings:
+        sys.stderr.write(
+            "\n✗ SAVE BLOCKED — Pesan Flyer body references another "
+            "deliverable in the same briefing, or uses staged-narrator "
+            "framing. Flyers are STANDALONE IG/WA share-cards — the "
+            "reader has NO briefing context. References to "
+            "khutbah/kultum/kajian/kreator/aksi-sosial/mahasiswa "
+            "leak briefing scaffolding into the share-card. Staged "
+            "narrators (jamaah Jumat / mimbar / takmir / pengurus RT / "
+            "kreator pekan ini / mahasiswa pekan ini) make the flyer "
+            "read like an internal memo, not a public message.\n\n"
+        )
+        for w in independence_warnings:
+            sys.stderr.write(f"  · {w['where']}: {w['message']}\n")
+        sys.stderr.write(
+            "\n  Fix: rewrite the body addressed universally to the "
+            "reader. Open from the daleel's principle directly "
+            "('Hadits ini menamai pelakunya dengan tegas: ...', "
+            "'Ketika fitnah meluas dan banyak orang justru "
+            "bingung...') or from the contemporary pattern without "
+            "a narrator ('Sebagian dari kita tanpa sadar duduk di "
+            "kursi itu...'). The action handle at the end addresses "
+            "the reader ('Audit satu aplikasi malam ini...'), NOT a "
+            "sub-section operator ('Khatib menutup...', 'Takmir "
+            "agendakan...'). See AGENTS.md "
+            "[FLYER INDEPENDENCE — INVIOLABLE].\n\n"
             "  Save aborted. No row written.\n"
         )
         raise SystemExit(1)

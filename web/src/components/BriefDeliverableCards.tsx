@@ -214,7 +214,20 @@ function cardLabelFor(heading: string): string {
  * an icon/meta override.
  */
 function classifyHeading(heading: string): CardKind | null {
-  const lower = heading.toLowerCase();
+  // Strip the quote-title part ("Kultum — 'Allah Pengajar, Rumah
+  // Madrasah Pertama'" → "Kultum") so a section's thematic title
+  // can't accidentally match another section's keyword. Real bug
+  // 2026-06-19 in the parallel matcher (briefing-data.ts
+  // extractDeliverableSection): the Kultum H3 above contained
+  // "Rumah" in the title and was matched as the "home" deliverable
+  // when /d/{slug}/home was resolved. classifyHeading wasn't bitten
+  // in that exact case (kultum check is first), but the same class
+  // of bug threatens every later matcher, so strip here too.
+  const sectionName = (() => {
+    const m = heading.match(/^(.+?)\s+[—–-]\s+/);
+    return (m ? m[1] : heading).trim();
+  })();
+  const lower = sectionName.toLowerCase();
   // Kultum BEFORE khutbah: a heading like "Kultum Jumat" would otherwise
   // match /khutbah/... wait, it wouldn't share that root. But ordering
   // before khutbah is still defensive against future "Khutbah Singkat /

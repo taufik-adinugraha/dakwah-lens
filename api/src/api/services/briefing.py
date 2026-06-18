@@ -887,6 +887,40 @@ CONTOH YANG BENAR (pesan-first murni, NOL angka):
 
 CARA UJI: setelah menulis flyer, scan paragraf untuk angka apa pun (digit 0-9, persen, "ribu", "juta"). Kalau ketemu, REWRITE — ganti dengan kata kualitatif ("ramai", "banyak", "menyentuh hati banyak orang") atau hapus seluruhnya. Cara cek kedua: "Kalau pembaca melihat flyer ini di story IG tanpa konteks lain, apakah masih ada ajakan/hikmah/aksi yang bisa dia ambil?" Kalau jawabannya cuma "data tentang berita", REWRITE.
 
+ATURAN INDEPENDENSI FLYER (HARD RULE — KRITIS, ditambah 2026-06-19):
+Setiap body Pesan Flyer 1-6 adalah PESAN SELF-CONTAINED yang berdiri sendiri di IG/WA/poster cetak — pembacanya TIDAK punya konteks briefing. Body flyer DILARANG menyebut sub-section lain di briefing yang sama, dan DILARANG memakai narator-staged framing yang membuat flyer terlihat seperti memo internal.
+
+YANG DILARANG di body flyer (substring match, dalam bentuk apa pun):
+- Nama sub-section briefing: "khutbah jum'at", "khutbah pekan ini", "kultum pekan ini", "kajian pekan ini", "pengajaran di rumah", "kisah pendek pekan ini", "kreator pekan ini", "kreator dakwah pekan ini", "aksi sosial pekan ini", "mahasiswa pekan ini", "artikel mahasiswa".
+- Narator staged-audience: "Jamaah Jumat pekan ini...", "Mimbar pekan ini...", "Di mimbar...", "Khateeb membingkai...", "Khatib menutup dengan...", "Imam masjid pekan ini...", "Takmir dan pengurus RT pekan ini melihat...", "Pengurus RT pekan ini melihat...", "Santri pekan ini...".
+- Instruksi yang ditujukan ke operator sub-section lain: "Bawa ini ke khutbah", "Jadikan sumbu khutbah", "Buka khutbah dengan ayat ini", "Ajak jamaah pulang...", "Takmir agendakan...", "Khatib menutup dengan...".
+
+PRINSIP: 6 flyer ADALAH pesan dakwah independen — bukan teaser, bukan preview, bukan companion untuk khutbah/kultum/kajian/kreator/aksi sosial/pengajaran/mahasiswa/kisah. Pembaca yang menerima flyer di story IG tidak tahu briefing ada, tidak tahu khutbah/kultum/aksi-sosial mingguan ini ada. Setiap penyebutan sub-section lain memberitahu pembaca "ini sebenarnya bagian dari sesuatu yang lain — tapi kamu hanya dapat potongan" — bocoran scaffolding briefing yang merusak pesan stand-alone-nya.
+
+CARA MENULIS BODY YANG BENAR:
+- Mulai langsung dari prinsip dalil: "Allah menamai pemakan riba dengan gambar yang tajam: ia berdiri terhuyung seperti kerasukan...", "Hadits ini menamai pelakunya dengan tegas: mereka yang mengelola harta umat secara batil akan masuk neraka...", "Empat peran disamakan dalam satu laknat — bukan hanya pemakai, tapi juga pemberi pinjaman, pencatat, dan saksinya...".
+- ATAU mulai dari pola kontemporer yang dibingkai universal (tanpa narator beraudien): "Ketika fitnah meluas dan banyak orang justru bingung...", "Sebagian dari kita tanpa sadar duduk di kursi itu, lalu mengira 'kan cuma bantu'...".
+- Action handle di akhir DITUJUKAN ke pembaca, BUKAN ke operator sub-section: ✓ "Audit satu aplikasi malam ini.", ✓ "Hapus satu paylater sebelum gajian berikutnya datang.", ✗ "Khatib menutup dengan ajakan puasa...", ✗ "Takmir agendakan rapat...", ✗ "Bawa qunut nazilah ke shalat berjamaah...".
+
+CONTOH JEBAKAN NYATA dari batch 2026-06-19 (jangan tiru — semua ini ada di prod, semua harus di-rewrite):
+- ❌ "Jamaah Jumat pekan ini berdiri di antara dua kabar yang berlawanan rasanya..." → narator staged-audience
+- ❌ "Mimbar pekan ini menenangkan jamaah — jaga salat dan amal yang sederhana, itu bobotnya sudah besar. Khatib menutup dengan ajakan puasa Tasu'a dan Asyura..." → narator + instruksi-ke-khatib
+- ❌ "Di banyak grup RT dan takmir pekan ini, percakapan ibu-ibu mudah tergelincir..." → narator staged-audience
+- ❌ "Kreator dakwah pekan ini duduk di depan layar yang sama..." → narator staged-audience
+- ❌ "Mahasiswa pekan ini melihat feed penuh ucapan tahun baru hijriah..." → narator staged-audience
+- ❌ "Khateeb dapat memandu jamaah menurunkan takwa ke amal harian..." → instruksi ke khateeb sub-section lain
+- ❌ "Bawa qunut nazilah ke sholat berjamaah pekan ini" → action ditujukan ke imam, bukan pembaca
+
+CONTOH YANG BENAR (universal, self-contained, addressed to the reader):
+- ✓ "Ketika fitnah meluas dan banyak orang justru menjadi kebingungan, istiqamah dalam ibadah harian dinilai setara dengan hijrah kepada Nabi ﷺ. Hadits ini melegakan: tidak butuh perubahan besar-besaran untuk menggeser timbangan amal — cukup salat dan amal-amal kecil yang dijaga konsisten. Audit satu kebiasaan ringan malam ini — apakah ia dijaga atau bocor — sebelum berpikir tentang hijrah yang besar."
+- ✓ "Empat peran disamakan dalam satu laknat: bukan hanya pemakai riba, tapi juga pemberi pinjaman, pencatat, dan saksinya. Banyak dari kita tanpa sadar duduk di salah satu kursi itu, lalu mengira 'kan cuma bantu teman'. Hadits ini membongkar self-deception itu. Periksa malam ini: aplikasi paylater di handphone, dokumen yang ditandatangani sebagai saksi, rekomendasi pinjol di grup angkatan — hapus satu yang masih bertahan."
+- ✓ "Hadits ini menamai pelakunya dengan tegas: mereka yang mengelola harta umat secara batil akan masuk neraka pada Hari Kiamat — bukan urusan administrasi, melainkan urusan akhirat. Setiap pos amanah kecil yang dipegang — kas himpunan, dana proposal, fasilitas kantor — adalah miniatur ujian yang sama. Buka satu pos malam ini, hitung apa yang masuk dan apa yang dipakai pribadi, kembalikan selisihnya sebelum bantal disandarkan."
+
+CARA UJI INDEPENDENSI: setelah menulis flyer, grep body untuk substring berikut. Kalau ada satu pun match, body MELANGGAR rule independensi — REWRITE:
+`khutbah`, `khateeb`, `khatib`, `mimbar`, `jamaah jum`, `kultum`, `kajian pekan`, `kreator pekan`, `kreator dakwah pekan`, `aksi sosial pekan`, `pengurus rt`, `takmir`, `imam masjid`, `santri pekan`, `mahasiswa pekan`, `pengajaran di rumah`, `artikel mahasiswa`.
+
+VALIDATOR HARD-FAIL: `manual_briefing save` akan menolak (exit code 1) briefing yang punya substring di atas di body Pesan Flyer 1-6. Save aborted, tidak ada row tertulis ke DB. Ini hard guardrail — bukan saran. Lihat juga AGENTS.md `[FLYER INDEPENDENCE — INVIOLABLE]`.
+
 ATURAN ANTI-MISLEADING IBADAH (KRITIS): headline TIDAK BOLEH menampilkan rukun ibadah atau sunnah (kurban / sholat / puasa / zakat / haji / sedekah / membaca Quran) sebagai sesuatu yang dipertentangkan dengan amal lain. Konstruksi `X, bukan Y` ("X not Y") sangat berbahaya jika Y adalah ibadah riil — pembaca yang sekilas baca akan menafsirkan "tinggalkan Y dan lakukan X" yang bisa berarti merendahkan ibadah pokoknya.
 
 CONTOH JEBAKAN NYATA (jangan tiru):

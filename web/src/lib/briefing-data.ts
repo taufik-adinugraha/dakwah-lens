@@ -526,6 +526,27 @@ export const DELIVERABLE_HEADING_PATTERNS: Record<
   },
 };
 
+/** Strip the trailing "— ..." quote-title from an H3 heading so the
+ *  thematic title of one section can't false-match another section's
+ *  keyword. Real bug 2026-06-19: the pendidikan-sdm briefing's Kultum
+ *  H3 was 'Kultum — "Allah Pengajar, Rumah Madrasah Pertama"'. The
+ *  home matcher (`/rumah|home|teaching at/i`) matched the title's
+ *  "Rumah Madrasah" before extractDeliverableSection reached the
+ *  actual "Pengajaran di Rumah" H3, so /d/{slug}/home rendered
+ *  Kultum content. Strip the quote-title so matchers only test the
+ *  section name itself.
+ *
+ *  Pre-title-rule briefings (just "### Pengajaran di Rumah" without a
+ *  quoted title) survive unchanged — split on " — " returns the
+ *  original heading. */
+function sectionNamePrefix(heading: string): string {
+  // Split on " — " (em-dash with surrounding spaces); take the prefix.
+  // Also tolerate the regular hyphen form " - " in case the LLM emits
+  // that variant.
+  const m = heading.match(/^(.+?)\s+[—–-]\s+/);
+  return (m ? m[1] : heading).trim();
+}
+
 /** Extract one Section-4 deliverable sub-section from a briefing's
  *  markdown body. Returns the H3 heading text + the prose / Q&A under
  *  it (everything between that H3 and the next H3 / H2). Returns null
@@ -541,7 +562,7 @@ export function extractDeliverableSection(
   let headingLine = "";
   for (let i = 0; i < lines.length; i++) {
     const m = lines[i].match(/^###\s+(.+?)\s*$/);
-    if (m && matcher(m[1])) {
+    if (m && matcher(sectionNamePrefix(m[1]))) {
       start = i + 1;
       headingLine = m[1].trim();
       break;

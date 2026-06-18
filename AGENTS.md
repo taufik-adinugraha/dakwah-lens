@@ -76,6 +76,19 @@ DO at save-time when citation mismatches the current pool: swap to the nearest s
 
 **[FLYER INLINE DU'A POOL MATCH]** Pesan Flyer 5+6 inline du'a MUST literally come from the cited daleel — never pair a popular du'a with an unrelated citation. Memory: `feedback_flyer_inline_dua_pool_match`.
 
+**[FLYER INDEPENDENCE — INVIOLABLE]** A Pesan Flyer body is **self-contained**: it is its own message, not a teaser/preview/companion for any other deliverable.
+
+DO NOT write — anywhere in a flyer body:
+- ❌ Names of other deliverables: "khutbah jum'at", "khutbah pekan ini", "kultum pekan ini", "kajian pekan ini", "pengajaran di rumah", "kisah pendek pekan ini", "kreator pekan ini", "kreator dakwah pekan ini", "aksi sosial pekan ini", "mahasiswa pekan ini", "artikel mahasiswa".
+- ❌ Staged-narrator framings that imply a specific audience or pulpit: "Jamaah Jumat pekan ini...", "Mimbar pekan ini...", "Di mimbar...", "Khateeb membingkai...", "Khatib mengajak...", "Imam masjid pekan ini...", "Takmir dan pengurus RT pekan ini melihat...", "Pengurus RT pekan ini melihat...", "Santri pekan ini...".
+- ❌ Instructions framed AT another speaker / sub-section: "Bawa ini ke khutbah", "Jadikan sumbu khutbah", "Khatib menutup dengan...", "Buka khutbah dengan ayat ini", "Ajak jamaah pulang...".
+
+DO instead: write the body **universally** — addressed to the human reader who picks up the flyer, no narrator framing, no week-stage scene-setting, no audience tag. Start FROM the daleel's principle, name the contemporary pattern in neutral universal language, end with a concrete action the reader can take. Examples of acceptable openers: "Ketika fitnah meluas dan banyak orang justru bingung...", "Allah menamai pemakan riba dengan gambar yang tajam...", "Hadits ini menamai pelakunya dengan tegas: ...", "Sebagian dari kita tanpa sadar duduk di kursi itu...".
+
+Why: the flyer is a standalone share-card (WhatsApp / IG story / printed poster). The reader who receives it does NOT have the briefing context. Audience-staged framing ("Jamaah Jumat pekan ini...", "Takmir pekan ini...") leaks the briefing's internal scaffolding into a piece that is supposed to stand alone — it sounds like a memo to an internal staff, not a public message. 2026-06-19 incident: 80+ of 84 flyers across 14 themes shipped with audience-staged framing; the user had to manually demand a regenerate. NEVER recur.
+
+How to apply: at compose time, after the daleel and headline are chosen, write the body WITHOUT a "Pekan ini X melihat..." opener. If you find yourself starting with a noun-phrase audience (jamaah / takmir / kreator / mahasiswa / pengurus RT / khatib / imam masjid / santri), STOP and rewrite the opening sentence to start from the daleel's principle or the contemporary pattern directly. The action handle at the end should be addressed to the reader ("Audit satu aplikasi malam ini...", "Hapus satu paylater sebelum gajian..."), not to a sub-section ("Khatib menutup dengan...", "Takmir agendakan..."). Memory: `feedback_flyer_independence`.
+
 **[FACT-CHECK NEWS PARAPHRASE]** When briefing prose paraphrases a news headline:
 1. List proper nouns + roles separately.
 2. Trace each role pair (tersangka↔pengganti, korban↔pelaku, tahanan↔pengirim_surat) back to the source headline verbatim.
