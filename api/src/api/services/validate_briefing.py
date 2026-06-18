@@ -67,6 +67,7 @@ class BriefingWarning(TypedDict, total=False):
         "flyer_section_malformed",
         "flyer_outlet_or_handle",
         "flyer_headline_missing_or_generic",
+        "news_paraphrase_fabrication",
     ]
     severity: Literal["low", "medium", "high"]
     where: str  # human-readable locator, e.g. "Pesan Flyer 2"
@@ -1961,6 +1962,198 @@ def validate_briefing(
             log.warning(
                 "validate_briefing.alignment_check_failed", error=str(exc)
             )
+    return warnings
+
+
+def scan_news_paraphrase_facts(
+    markdown: str,
+    sample_headlines: list[dict[str, Any]] | None,
+) -> list[BriefingWarning]:
+    """LLM-judge fact-check against ground-truth news headlines.
+
+    Spawns a Claude API call (Sonnet 4.6) to scan the briefing body for
+    name-role paraphrase fabrications — the failure mode that the
+    2026-06-18 audit found 12 instances of (pelatih bola Senegal shahada
+    at konferensi pers, pesantren cabul this week, aktivis berinisial X
+    teror dari kementerian, Wakil Ketua KPK menyebut seluruh anggota
+    Komisi XI, buron sejak 1994, dosen senior dipecat jurnal predator,
+    Iran-AS perang aktif post-MoU, etc.).
+
+    These are defamation-risk fabrications that structural validators
+    (forbidden phrases, flyer headlines, dalil-in-pool) cannot catch
+    because they are SEMANTIC mismatches between claimed news event and
+    actual headlines.
+
+    Returns BriefingWarning with severity 'high' for fabrications that
+    would defame a named person/institution; 'medium' for unverified
+    current-week claims; 'low' for tangential issues. Hard-fail callers
+    (manual_briefing.cmd_save) should reject save on any 'high' result.
+
+    Costs ~$0.01-0.03 per call on Sonnet 4.6 (~10-20K input tokens,
+    1-2K output). Skipped (returns []) when anthropic_api_key is unset
+    or sample_headlines is empty.
+
+    Added 2026-06-18 as Layer 3 of the briefing pipeline fact-check
+    architecture. Layer 1 = composer SELF-FACT-CHECK in SYSTEM_PROMPT.
+    Layer 2 = workflow Verify phase (operator-initiated). Layer 3 (this
+    function) = code-side hard gate that fires automatically on save
+    regardless of operator's workflow choice — the missing piece that
+    made the difference between "probably fine" and "structurally safe".
+    """
+    from api.config import settings
+
+    if not settings.anthropic_api_key:
+        log.info("validate_briefing.fact_check_skipped", reason="no_api_key")
+        return []
+
+    headlines = sample_headlines or []
+    if not headlines:
+        log.info("validate_briefing.fact_check_skipped", reason="no_headlines")
+        return []
+
+    # Render headlines as ground truth corpus for the judge
+    headline_lines: list[str] = []
+    for h in headlines[:120]:  # cap to keep prompt budget bounded
+        when = h.get("posted_at_wib") or h.get("posted_at") or ""
+        source = h.get("author") or h.get("platform") or "?"
+        text = (h.get("text") or "").replace("\n", " ").replace("\r", " ").strip()
+        if text:
+            headline_lines.append(f"- [{when}] {source}: {text[:240]}")
+    if not headline_lines:
+        return []
+    headlines_block = "\n".join(headline_lines)
+
+    judge_prompt = f"""You are auditing an Indonesian weekly dakwah briefing for fact-check violations against this week's news ground truth.
+
+GROUND TRUTH — mainstream Indonesian news headlines from this week ({len(headline_lines)} entries):
+
+{headlines_block}
+
+BRIEFING BODY TO AUDIT (Indonesian; ~80-100KB):
+
+{markdown[:90000]}
+
+YOUR TASK:
+Scan the briefing body for paragraphs that pair a NAMED ENTITY (proper noun — person, agency, company, university, ormas, named viral post) with a ROLE VERB (bebas, dicopot, dilantik, ditahan, tersangka, tertangkap, vonis, dibebaskan, dipenjara, dipulihkan, menggantikan, pelaku cabul, korban penculikan, dijatuhi, mengaku menerima teror, buron sejak X, dipecat after melapor, etc.).
+
+For EACH such pair: cross-reference against the ground-truth headlines block above. If the briefing claims a role/event that is NOT in the headlines, flag it.
+
+KNOWN HALLUCINATION PATTERNS (these recurred in the 2026-06-18 audit — flag aggressively if they appear without explicit headline support):
+- "pelatih sepak bola Senegal/Afrika shahada di konferensi pers internasional"
+- "pesantren cabul / kiai pemerkosa pekan ini"
+- "aktivis berinisial X mengaku teror dari kementerian"
+- "Wakil Ketua KPK menyebut seluruh anggota Komisi XI" (or similar collective-defamation claims)
+- "buron sejak 1994 / aset miliaran ditarik pekan ini"
+- "dosen senior dipecat setelah melaporkan jurnal predator"
+- "Iran-AS perang aktif" (this week is POST-MoU damai)
+- Sindiran/satire "pulang haji jadi tersangka korupsi" treated as a real current case
+
+SEVERITY:
+- 'high' = defamation risk: specific person/institution + criminal/negative role NOT in headlines. Save MUST be blocked.
+- 'medium' = current-week event claim not verifiable (viral satire as fact, social-media virality, unverified pattern)
+- 'low' = tangential / unverified detail; no defamation risk
+
+Return STRICT JSON with this exact shape — no preamble, no markdown, just JSON:
+{{
+  "findings": [
+    {{
+      "severity": "high" | "medium" | "low",
+      "where": "section name (e.g. Khutbah Jumat, Kultum, Mahasiswa Artikel)",
+      "quote": "verbatim phrase from briefing (≤200 chars)",
+      "named_entity": "the proper noun in question",
+      "claimed_role": "role the briefing attributes",
+      "actual_situation": "what headlines actually show, or 'no supporting headline found'",
+      "fix_suggestion": "concrete one-sentence fix"
+    }}
+  ]
+}}
+
+If briefing is clean, return {{"findings": []}}.
+"""
+
+    try:
+        from anthropic import Anthropic
+        client = Anthropic(api_key=settings.anthropic_api_key)
+        resp = client.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=4096,
+            messages=[{"role": "user", "content": judge_prompt}],
+        )
+        from api.services.usage import record_usage
+        record_usage(
+            provider="anthropic",
+            operation="briefing_fact_check",
+            model="claude-sonnet-4-6",
+            tokens_in=resp.usage.input_tokens,
+            tokens_out=resp.usage.output_tokens,
+            cost_usd=(
+                resp.usage.input_tokens * 3.0 / 1_000_000
+                + resp.usage.output_tokens * 15.0 / 1_000_000
+            ),
+            meta={"briefing_chars": len(markdown), "headlines_count": len(headline_lines)},
+        )
+        raw = "".join(
+            block.text for block in resp.content if block.type == "text"
+        ).strip()
+    except Exception as exc:
+        log.warning("validate_briefing.fact_check_api_failed", error=str(exc))
+        return []
+
+    # Strip markdown code fences if present
+    if raw.startswith("```"):
+        raw = raw.strip("`").lstrip("json").strip()
+
+    try:
+        parsed = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        log.warning(
+            "validate_briefing.fact_check_unparseable_response",
+            error=str(exc),
+            raw_head=raw[:300],
+        )
+        return []
+
+    findings = parsed.get("findings", [])
+    if not isinstance(findings, list):
+        return []
+
+    warnings: list[BriefingWarning] = []
+    for f in findings:
+        if not isinstance(f, dict):
+            continue
+        sev_in = f.get("severity", "medium")
+        sev: Literal["low", "medium", "high"] = (
+            "high" if sev_in == "high"
+            else "medium" if sev_in == "medium"
+            else "low"
+        )
+        where = f.get("where", "(unknown section)")
+        quote = (f.get("quote") or "")[:200]
+        entity = f.get("named_entity", "?")
+        claimed = f.get("claimed_role", "?")
+        actual = f.get("actual_situation", "no supporting headline found")
+        fix = f.get("fix_suggestion", "")
+        msg = (
+            f"'{entity}' attributed role '{claimed}'. "
+            f"Ground truth: {actual}. "
+            f"Fix: {fix}. "
+            f"Quote: …{quote}…"
+        )
+        warnings.append(
+            {
+                "kind": "news_paraphrase_fabrication",
+                "severity": sev,
+                "where": where,
+                "message": msg,
+            }
+        )
+    log.info(
+        "validate_briefing.fact_check_done",
+        findings=len(findings),
+        high=sum(1 for w in warnings if w["severity"] == "high"),
+        medium=sum(1 for w in warnings if w["severity"] == "medium"),
+        low=sum(1 for w in warnings if w["severity"] == "low"),
+    )
     return warnings
 
 

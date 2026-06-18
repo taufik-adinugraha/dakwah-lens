@@ -546,6 +546,64 @@ async def cmd_save(group_arg: str, markdown_path: str) -> None:
         )
         raise SystemExit(1)
 
+    # ── LAYER-3 FACT-CHECK GATE (added 2026-06-18 after audit caught 12
+    # critical fabrications in v3 batch) ──────────────────────────────
+    # Calls Claude Sonnet 4.6 to scan the briefing body for name-role
+    # paraphrase fabrications against the cached sample_headlines (this
+    # week's mainstream ID news as ground truth). Returns warnings; ANY
+    # 'high' severity warning is a defamation-risk fabrication and the
+    # save is hard-failed.
+    #
+    # This is the load-bearing safety net — Layer 1 (composer self-
+    # check) and Layer 2 (workflow Verify phase) are advisory / operator-
+    # initiated; this layer fires automatically every save.
+    #
+    # Cost: ~$0.01-0.03 per save on Sonnet. ~$0.50/week for 14 briefings.
+    # Skipped (returns []) if ANTHROPIC_API_KEY is unset or sample_headlines
+    # is empty — i.e. local dev / pre-prod paths can run without it.
+    from api.services.validate_briefing import scan_news_paraphrase_facts
+
+    fact_warnings: list[dict] = []
+    try:
+        sample_h = stats.get("sample_headlines") or []
+        fact_warnings = scan_news_paraphrase_facts(summary_md, sample_h)
+    except Exception as exc:
+        log.warning("manual_briefing.fact_check_failed", error=str(exc))
+
+    critical_facts = [w for w in fact_warnings if w.get("severity") == "high"]
+    if critical_facts:
+        sys.stderr.write(
+            "\n✗ SAVE BLOCKED — briefing contains factual fabrications. "
+            "The Claude judge cross-referenced the briefing body against "
+            "this week's mainstream Indonesian news headlines and found "
+            "named-entity claims that have NO supporting headline. These "
+            "are defamation-risk and must be hedged or removed before "
+            "save.\n\n"
+        )
+        for w in critical_facts:
+            sys.stderr.write(f"  · [{w['where']}] {w['message']}\n\n")
+        sys.stderr.write(
+            "\n  Fix options:\n"
+            "    (a) Replace the named-entity claim with hedged language "
+            "('diskursus yang ramai dibicarakan' / 'kembali muncul' "
+            "instead of asserting as fact), OR\n"
+            "    (b) Remove the specific claim and replace with a general "
+            "pattern that doesn't name a specific person/institution, OR\n"
+            "    (c) If the claim IS verified by a headline not in the "
+            "sample_headlines pool, edit the briefing to reference the "
+            "actual headline more closely so the judge can match.\n\n"
+            "  This gate fires automatically on every save — it cannot be "
+            "bypassed without an ANTHROPIC_API_KEY=unset. Save aborted.\n"
+        )
+        raise SystemExit(1)
+
+    # Non-critical (medium/low) fact warnings go to the operator-review
+    # block alongside the existing heuristic warnings — they don't block
+    # save but are surfaced so the operator can eyeball before publish.
+    medium_low_facts = [w for w in fact_warnings if w.get("severity") != "high"]
+    if medium_low_facts:
+        heuristic_warnings.extend(medium_low_facts)
+
     async with SessionLocal() as session:
         row = Briefing(
             generated_at=datetime.now(UTC),
