@@ -131,7 +131,20 @@ CRITICAL FORMATTING RULES:
 - JANGAN tutup dengan signature, paraf, atau closing apologetik.
 - Disclaimer keasistanan AI WAJIB ditulis sebagai paragraf italic di akhir Bagian 5 (BUKAN bagian terpisah).
 - JANGAN sebut nama penerjemah, lembaga penerbit, atau gaya terjemahan kitab di mana pun di output (mis. "Kemenag", "gaya Kemenag", "Sahih International", "Pickthall", "tafsir Ibn Kathir style", "Hilali-Khan", dll.). Itu metadata sumber data, BUKAN konten dakwah. Pembaca melihat ayat lewat citation (mis. "QS. Al-Baqarah: 275") — itu saja yang muncul. Frasa "menurut terjemahan Kemenag" / "dalam gaya Sahih International" dilarang muncul di teks output.
-- JANGAN echo kembali anotasi panjang seperti "(3450-4800 kata)", "(~80 kata)", "(300-450 kata Arab)", "(N words)" di heading sub-section atau di body. Itu instruksi panjang UNTUK Anda — bukan informasi UNTUK pembaca. Tulis heading bersih: `### Khutbah Jumat` (BUKAN `### Khutbah Jumat (3450-4800 kata)`). Sama untuk inline guidance dalam body — sebut langkah-nya tanpa parenthetical word-count.
+- JANGAN echo kembali anotasi panjang seperti "(3450-4800 kata)", "(~80 kata)", "(300-450 kata Arab)", "(N words)" di heading sub-section atau di body. Itu instruksi panjang UNTUK Anda — bukan informasi UNTUK pembaca. Sama untuk inline guidance dalam body — sebut langkah-nya tanpa parenthetical word-count.
+
+- SETIAP sub-section deliverable WAJIB punya theme-specific title di H3 heading-nya, dalam pattern `### <Section Name> — "<judul punchy 4-7 kata>"` (added 2026-06-18 after web renderer at `/d/<date-theme>/<section>` rendered article pages without any visible title because the H3 was just generic). Berlaku untuk SEMUA 8 sub-section deliverable:
+
+  · `### Khutbah Jumat — "<judul khutbah pekan ini>"`  (BUKAN `### Khutbah Jumat`)
+  · `### Kultum — "<judul kultum>"`  (BUKAN `### Kultum`)
+  · `### Kajian Ibu-ibu & Majelis Taklim — "<judul kajian>"`
+  · `### Kisah Pendek — "<judul kisah>"`  (sudah berlaku — pattern teladan)
+  · `### Pengajaran di Rumah — "<judul sesi>"`
+  · `### Kreator Konten Digital — "<hook / angle>"`
+  · `### Mahasiswa: Poster, Artikel & Diskusi — "<judul artikel>"`  (sudah berlaku — pattern teladan)
+  · `### Aksi Sosial & Khidmah Umat — "<judul aksi>"`
+
+  Judul harus SPESIFIK ke topik pekan ini, BUKAN generic ("Pesan Pekan Ini", "Renungan Mingguan", "Khutbah Hari Ini" dilarang). Mengikuti pola Kisah dan Mahasiswa Artikel yang sudah jalan: judul 4-7 kata Indonesian dalam kuotasi, langsung after em-dash. Web renderer membaca H3 sebagai page title; tanpa judul spesifik, halaman terlihat seperti template tanpa hook untuk pembaca yang share link.
 - AKSARA ARAB WAJIB DI PARAGRAF SENDIRI. Setiap blok aksara Arab ≥3 kata (ayat, hadits, du'a, dzikir, sholawat, ta'awudz, basmalah, hamdalah, salam Arab) WAJIB berdiri sebagai paragraf TERPISAH — diapit blank line di atas dan di bawah. JANGAN PERNAH menempel Arabic di akhir paragraf prosa Indonesia atau menyisipkannya di tengah kalimat Indonesia. Renderer membungkus paragraf 100% Arabic dengan font Amiri + `dir="rtl"` (presentasi yang benar untuk Arabic recitable); paragraf yang mencampur prosa Indonesia + blok Arab akan ditampilkan sebagai prosa biasa (tanpa font Amiri, tanpa box) supaya bidi reorder tidak mengacak teks Indonesia.
 
   CONTOH SALAH (jangan tiru — paragraf Kultum Hukum & Keadilan 2026-06-06 yang harus dipecah):
@@ -357,7 +370,7 @@ RUJUKAN DALIL DI SECTION 4 — pool yang saya sediakan berisi 10 dalil hasil rer
 - Sub-section berbeda BOLEH mengutip dalil yang sama jika memang paling pas, tapi USAHAKAN variasi supaya 8-10 dalil pool terdistribusi (khutbah ~3-4 dalil, kultum ~1-2, kajian ~2-3, pengajaran ~1-2, kreator ~1, mahasiswa ~2, aksi ~1-2). Kisah Pendek TIDAK ikut alokasi ini — sub-section itu pakai sumber sendiri (KISAH POOL dari «KISAH_LABEL»).
 - JANGAN mengarang ayat atau hadits di luar pool. Citation yang muncul di Section 4 HARUS persis cocok dengan citation di pool
 
-### Khutbah Jumat (3450-4800 kata)
+### Khutbah Jumat (3450-4800 kata) — WAJIB H3 dengan judul: `### Khutbah Jumat — "<judul khutbah 4-7 kata>"`
 Tulis KHUTBAH JUMAT LENGKAP siap-baca dari pembuka sampai penutup, terdiri dari Khutbah Pertama dan Khutbah Kedua. Bahasa Indonesia formal-mengalir, bisa dipahami jamaah umum, jangan terlalu akademis. Panjang khutbah harus sebanding dengan khutbah Jumat Indonesia standar yang lengkap dan bernapas panjang (22-30 menit ucapan = ~3450-4800 kata) — JANGAN terlalu pendek, beri ruang argumen berkembang dengan 3-4 dalil, 2-3 cerita konkret pekan ini, dan refleksi yang dalam.
 
 VOICE — KHUTBAH JUMAT (audiens duduk di masjid, khateeb berdiri di mimbar):
@@ -392,7 +405,7 @@ KHUTBAH KEDUA (750-1050 kata):
 
 - Penutup standar (~120 kata Arab): aksara Arab berharakat penuh untuk sequence "إِنَّ اللهَ وَمَلَائِكَتَهُ يُصَلُّوْنَ عَلَى النَّبِيّ…" → sholawat lengkap "اَللّٰهُمَّ صَلِّ عَلٰى سَيِّدِنَا مُحَمَّدٍ وَعَلٰى آلِ سَيِّدِنَا مُحَمَّدٍ…" → "عِبَادَ اللهِ، إِنَّ اللهَ يَأْمُرُ بِالْعَدْلِ وَالْإِحْسَانِ وَإِيْتَاءِ ذِي الْقُرْبٰى…" → tahmid akhir "وَاذْكُرُوا اللهَ الْعَظِيْمَ يَذْكُرْكُمْ، وَاشْكُرُوْهُ عَلٰى نِعَمِهِ يَزِدْكُمْ، وَلَذِكْرُ اللهِ أَكْبَرُ." Semua dalam aksara Arab, harakat lengkap.
 
-### Kultum (1650-2250 kata)
+### Kultum (1650-2250 kata) — WAJIB H3 dengan judul: `### Kultum — "<judul kultum 4-7 kata>"`
 Tulis KULTUM 10-15 menit siap-baca, format ringkas tapi LENGKAP dari pembuka sampai penutup. Audience: jamaah ba'da sholat (Subuh / Maghrib / Isya), Ramadhan tarawih, atau acara komunitas singkat — orang yang sudah sholat dan tidak ingin terlalu lama berdiri, tapi mau pulang dengan satu pesan yang menempel. Bahasa Indonesia mengalir-konversasional (bukan setegang khutbah Jumat), satu argumen tajam yang tidak melebar.
 
 VOICE — KULTUM (audiens duduk ba'da sholat, penyampai berdiri / duduk di depan, suasana lebih dekat dari khutbah Jumat):
@@ -435,7 +448,7 @@ STRUKTUR WAJIB (urutan ini, jangan ditukar):
 
 NADA: hangat, pribadi, langsung. JANGAN tirukan formalitas khutbah Jumat — kultum lebih dekat ke ngobrol setelah sholat. Penceramah berdiri SAMA SAMA dengan jamaah, bukan di mimbar formal. Boleh sesekali menyebut "saya" pribadi, "kita sebagai jamaah". HINDARI frase template ("marilah kita renungkan", "alhamdulillah kita masih diberi nikmat sehat") di tengah teks — boleh sekali di pembuka, tidak diulang.
 
-### Kajian Ibu-ibu & Majelis Taklim (1400-1800 kata)
+### Kajian Ibu-ibu & Majelis Taklim (1400-1800 kata) — WAJIB H3 dengan judul: `### Kajian Ibu-ibu & Majelis Taklim — "<judul kajian 4-7 kata>"`
 Tulis OUTLINE KAJIAN 60-MENIT siap-pakai, format hands-on bukan ceramah teoritis. Lebih panjang dari sub-section lain karena ibu-ibu sering minta detail praktis ("kalau di rumah saya gimana, Ustadzah?") dan butuh ruang untuk cerita konkret + Q&A yang jujur.
 
 VOICE — KAJIAN IBU-IBU (suasana ruang tamu masjid, ibu-ibu duduk lesehan, ustadzah seperti tante yang dipercaya):
@@ -567,7 +580,7 @@ LARANGAN VOICE (KRITIS, berlaku untuk SELURUH Kisah Pendek dari Pembuka sampai K
 
 PANJANG: target 700-1100 kata untuk waktu baca 5 menit (per format compact 2026-06-10). Lihat metrics di "🎯 CANONICAL TEMPLATE" di atas. Lebih dari 1200 kata = drift ke format kultum lama.
 
-### Pengajaran di Rumah (500-700 kata)
+### Pengajaran di Rumah (500-700 kata) — WAJIB H3 dengan judul: `### Pengajaran di Rumah — "<judul sesi 4-7 kata>"`
 
 VOICE — PENGAJARAN DI RUMAH (panduan teknis untuk orang tua — format INSTRUKSI bukan ceramah):
 - BUKAN ceramah ke orang tua. BUKAN narator yang mengajak orang tua. Format adalah RESEP / SOP / LANGKAH-LANGKAH yang orang tua bisa langsung jalankan tanpa membaca dua kali.
@@ -589,7 +602,7 @@ Tulis 3-4 CONVERSATION SCRIPT untuk orang tua dengan anak, masing-masing format:
 - Tutup orang tua: satu kalimat yang menyimpulkan tanpa menggurui.
 Topik dipilih dari peristiwa nyata pekan ini.
 
-### Kreator Konten Digital (100-130 kata)
+### Kreator Konten Digital (100-130 kata) — WAJIB H3 dengan judul: `### Kreator Konten Digital — "<hook angle 4-7 kata>"`
 Tulis SCRIPT VIDEO siap-pakai 60-90 detik untuk TikTok / IG Reels / YouTube Shorts — kreator bisa baca langsung di depan kamera tanpa diedit. Bahasa Indonesia percakapan, BUKAN gaya khutbah. Struktur wajib:
 - HOOK (5 detik / ~10 kata): kalimat pertama yang menghentikan scroll. Boleh pertanyaan, boleh kontras, boleh fakta yang mengejutkan dari berita pekan ini.
 - BODY (40-60 detik / 80-100 kata): satu argumen jernih + satu rujukan dalil singkat DARI POOL (sebut citation persis seperti di pool dalam Bahasa Indonesia — JANGAN kutip teks Arab di video, JANGAN mengarang citation).
@@ -667,7 +680,7 @@ FORMAT output H4 untuk sub-section: gunakan `#### Poster Question`, `#### Artike
 4. H4 PERSIS `#### Q&A Realistis` dengan 5 pasang `**Q:** ... **A:** ...`. JANGAN HILANGKAN section ini, bahkan kalau topiknya sangat akademis — justru topik akademis BUTUH pushback paling banyak.
 5. Total panjang 900-1200 kata. Kalau lewat 1300 kata, kemungkinan besar struktur sudah drift ke jurnal akademis — periksa ulang.
 
-### Aksi Sosial & Khidmah Umat (600-900 kata)
+### Aksi Sosial & Khidmah Umat (600-900 kata) — WAJIB H3 dengan judul: `### Aksi Sosial & Khidmah Umat — "<judul aksi 4-7 kata>"`
 Tulis SET aksi kecil-berdampak yang bisa dijalankan oleh komunitas LOKAL — RT, RW, masjid lingkungan, keluarga, pengurus pengajian, karang taruna. BUKAN ceramah, BUKAN konten — kegiatan nyata yang bisa diluncurkan dalam 1-2 minggu dengan EFFORT KECIL (1-5 orang penggerak, tanpa sertifikasi profesional) dan BUDGET KECIL (total di bawah Rp 2.000.000).
 
 VOICE — AKSI SOSIAL (action plan untuk pengurus RT/RW/masjid yang mau eksekusi minggu depan):

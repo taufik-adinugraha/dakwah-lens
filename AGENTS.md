@@ -106,6 +106,8 @@ Memory: `feedback_fact_check_news_paraphrase`. Live enforcement: briefing.py SYS
 
 **[BRIEFING SECTION SPLIT]** Keep numbers and daleel out of the "Tema Utama & Pola" narrative section. Themes are pure narrative. Memory: `feedback_briefing_section_split`.
 
+**[SECTION H3 TITLE REQUIRED]** EVERY deliverable sub-section in a briefing MUST have a theme-specific title in its H3 heading, pattern: `### <Section Name> — "<judul punchy 4-7 kata>"`. Applies to ALL 8 sub-sections (Khutbah Jumat, Kultum, Kajian Ibu-ibu, Kisah Pendek, Pengajaran di Rumah, Kreator Konten Digital, Mahasiswa: Poster Artikel & Diskusi, Aksi Sosial & Khidmah Umat). Web renderer at `/d/<date-theme>/<section>` uses the H3 as the page title — without a theme-specific title the page renders without a hook and looks like an untitled draft. Generic titles ("Pesan Pekan Ini", "Renungan Mingguan", "Khutbah Hari Ini") are forbidden. Title must be SPECIFIC to that week's narrative for that theme. Memory: tracked in `project_briefing_pipeline_v4`. Live in briefing.py SYSTEM_PROMPT 2026-06-18. **2026-06-18 incident**: assistant narrow-read user's "title for each article" as Mahasiswa Artikel only, omitting titles from Khutbah/Kultum/Kajian/Pengajaran/Kreator/Aksi Sosial → web pages rendered without titles.
+
 **[ALWAYS INCLUDE ARABIC]** Khutbah Jumat + kajian majelis taklim deliverables must print Arabic text of every daleel, not only translation. Memory: `feedback_always_include_arabic`.
 
 **[ARABIC SCRIPT NOT LATIN IN KISAH]** Kisah Pendek quotes Arabic in Arabic script on its own line, not inline transliteration. Memory: `feedback_arabic_not_latin_in_kisah`.
