@@ -151,6 +151,33 @@ MIN_SIMILARITY = 0.24
 # block.
 RESCUE_FLOOR = 0.20
 
+# Third-pass any-target rescue floor (added 2026-06-18 after Pro recluster
+# audit found Lainnya leaking ~40% of sampled posts to named-sibling
+# topics that the strict + in-group rescue passes missed). Two failure
+# modes the in-group rescue (RESCUE_FLOOR=0.20 gated by theme_group
+# agreement) doesn't catch:
+#   1. Posts with NULL theme_group (upstream classifier hasn't tagged
+#      them) — can't be theme_group-matched, so in-group rescue skips.
+#   2. Posts whose theme_group disagrees with the target topic's
+#      majority-vote theme_group — in-group rescue blocks the rescue
+#      to prevent cross-group bleed, but the post's nearest centroid
+#      might still be the right home (cross-classifier disagreement is
+#      common for borderline content like "Demo Mahasiswa tolak BBM"
+#      that gets theme_group=Pemerintahan but topic=Demo Mahasiswa).
+#
+# Pass strategy: for posts STILL orphan after the strict + in-group
+# passes, try ALL named centroids at this stricter-than-rescue floor.
+# 0.22 is between MIN_SIMILARITY (0.24, strict) and RESCUE_FLOOR (0.20,
+# theme_group-gated rescue). The gap is intentional: by removing the
+# theme_group gate, we lose a correctness check, so the cosine threshold
+# tightens to compensate.
+#
+# Expected impact (per audit68 sample): ~30-50% of remaining orphans
+# get a clean home. Bleed risk is bounded by the still-strict 0.22 cap
+# — a post that doesn't even cosine 0.22 to ANY named centroid is
+# genuinely off-taxonomy.
+ANY_TARGET_RESCUE_FLOOR = 0.22
+
 # A theme needs at least this many assigned posts to survive. Mirrors the
 # old prompt rule ("a theme needs at least 2 posts"); a 1-post theme is
 # usually an embedding fluke, not a trend.
@@ -423,6 +450,64 @@ LEGITIMATE "&" labels (both halves inseparable aspects of ONE story):
 Memorize the REJECT LIST. Before returning JSON, walk every label that
 contains "&" through STEPS A-C and verify NONE of your labels has a
 RIGHT-half hitting the reject list.
+
+AND-LABEL UNEQUAL-HALVES RULE (HARD RULE — added 2026-06-18 after
+2026-06-18 Pro audit found 5 AND-label clusters with 11-14/20 misassigned
+because the small half acted as a keyword magnet for noise):
+
+For EVERY label containing "&" or "dan", after STEPS A-C pass, run STEP D:
+
+  STEP D — COUNT THE HALVES. Look at your sample of the pool. Count how
+  many posts speak primarily to LEFT vs RIGHT. RIGHT must describe at
+  least 30% of posts in this cluster (i.e., if LEFT is 70%+ of mass,
+  drop RIGHT). If you can name only 2-3 posts that fit RIGHT while 17+
+  fit LEFT, the AND-half is dead weight that will magnet noise.
+
+Concrete failures from 2026-06-18 Pro audit (DO NOT REPEAT):
+
+  ❌ "Tawuran Pelajar & Kejahatan Jalanan" — 168 posts, 12/20 mis.
+     LEFT (Tawuran Pelajar) was 60-70% of mass; RIGHT (Kejahatan Jalanan)
+     pulled in begal/jambret/copet that weren't student-on-student. Right
+     fix: drop "& Kejahatan Jalanan" → "Tawuran Pelajar & Kekerasan Antar-
+     Remaja" (both halves describe the SAME story).
+
+  ❌ "Penipuan Digital, Investasi Bodong & Peretasan" — 125 posts, 10/20 mis.
+     "& Peretasan" had ZERO posts about actual hacking; the RIGHT-half was
+     pure dead label-drag pulling crypto / Elon Musk / unrelated finance.
+     Right fix: drop "& Peretasan" → "Penipuan Online & Investasi Bodong".
+
+  ❌ "Dugaan Korupsi di Bea Cukai & Imigrasi" — 38 posts, 9/20 mis.
+     "& Imigrasi" pulled TKI/Malaysia cross-border crime stories that
+     weren't about the Blueray Bea Cukai suap core. Right fix: drop "&
+     Imigrasi" or replace with named entity: "Skandal Suap Bea Cukai
+     Blueray".
+
+  ❌ "Solidaritas untuk Palestina & Konflik Tepi Barat" — 84 posts, 11/20 mis.
+     Pure Palestina solidarity is ~5/20 of sample; "& Konflik Tepi Barat"
+     pulled Aceh/Papua militarism + Malaysian electoral chatter via
+     "solidaritas / Israel / Zionis" lexical drift. Right fix: drop "&
+     Konflik Tepi Barat" → "Solidaritas untuk Palestina & Gaza" (Gaza is
+     genuine sub-location overlap, not a fragment topic).
+
+  ❌ "Kenaikan Harga BBM Pertamax & Dampaknya" — 88 posts, 7/20 mis.
+     "& Dampaknya" magnetized generic harga-naik content (Minyakita,
+     kedelai, mebel, transit) because "dampak" is too generic. Right fix:
+     drop "& Dampaknya" → "Kenaikan Harga BBM Pertamax & Antrean Pertalite"
+     (concrete second half).
+
+SUCCESSFUL UNEQUAL-HALVES MERGES (legitimate, BOTH halves ≥30% of mass):
+
+  ✅ "Korupsi MBG & BGN"           — MBG and BGN are co-defendants/agencies
+                                     in the SAME case. ~50/50 mass split.
+  ✅ "Judi Online & Pinjol"         — same financial-trap behavior class.
+                                     Posts often mention both; ~50/50 mass.
+  ✅ "Konflik AS-Iran & Selat Hormuz" — Hormuz is the sub-location where the
+                                     conflict plays out. Posts mention both.
+
+Decision procedure when in doubt: if you can write a one-line description
+of the story that NATURALLY mentions BOTH halves, the AND is legitimate.
+If you have to say "this cluster covers X and unrelated-stuff-about-Y",
+drop the Y.
 
 ACUTE-EVENT FLOOR (HARD RULE — strengthened 2026-06-14 v2):
 The INCIDENT-SPECIFIC VOLUME GATE above PREVENTS over-splitting (≥150 post threshold to mint an incident theme). This rule prevents the inverse failure — UNDER-splitting, where ≥20 posts about a single discrete news event get absorbed into a chronic-beat theme that obscures the story.
@@ -1313,6 +1398,42 @@ def discover_topics(
             rescued=len(rescued_positions),
             remaining_orphans=len(orphan_ids),
             floor=RESCUE_FLOOR,
+        )
+
+    # Third-pass ANY-TARGET rescue (added 2026-06-18). For orphans still
+    # remaining after the in-group rescue, try ALL named centroids at the
+    # stricter ANY_TARGET_RESCUE_FLOOR (0.22). This catches the two failure
+    # modes the in-group pass blocks: NULL-theme_group posts and cross-
+    # theme_group cosine matches. See ANY_TARGET_RESCUE_FLOOR comment.
+    any_target_rescued: set[int] = set()
+    if orphan_ids:
+        # Filter to orphans still remaining after in-group rescue.
+        remaining_orphan_positions = [
+            i for i in range(len(orphan_metadata))
+            if i not in rescued_positions
+        ]
+        for pos in remaining_orphan_positions:
+            row = orphan_rows[pos]
+            # sims[row] is the cosine to each theme centroid. Pick the best.
+            best_idx = int(np.argmax(sims[row]))
+            best_score = float(sims[row, best_idx])
+            if best_score < ANY_TARGET_RESCUE_FLOOR:
+                continue
+            sample_i, _post_text, _pg = orphan_metadata[pos]
+            theme_post_ids[best_idx].append(sample[sample_i]["id"])
+            any_target_rescued.add(pos)
+            assigned += 1
+        if any_target_rescued:
+            orphan_ids = [
+                oid
+                for i, oid in enumerate(orphan_ids)
+                if i not in any_target_rescued
+            ]
+        log.info(
+            "topic_discovery.any_target_rescue",
+            rescued=len(any_target_rescued),
+            remaining_orphans=len(orphan_ids),
+            floor=ANY_TARGET_RESCUE_FLOOR,
         )
 
     results: list[dict[str, Any]] = []
