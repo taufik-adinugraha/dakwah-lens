@@ -1183,7 +1183,16 @@ def scan_flyer_section_structure(markdown: str) -> list[BriefingWarning]:
         )
         return warnings  # downstream count check is misleading without H2
 
-    if h2_match and len(h3_headers) != 6:
+    # Allow the documented empty-pool skip path (added 2026-06-18): when
+    # FLYER DALEEL POOL is empty for the week, the prompt instructs the
+    # composer to emit the `## Pesan Flyer` H2 header alone with a single
+    # `_Pool flyer kosong pekan ini, slot dilewati._` note — no H3 blocks
+    # at all. This is a legitimate state (no whitelist-eligible daleel
+    # for the theme this week → no flyers ship; renderer just falls back
+    # to the dashboard's "no flyer this week" empty state). So treat 0
+    # H3 blocks as valid; reject only partial 1-5 (incomplete set risks
+    # blank-card renders).
+    if h2_match and h3_headers and len(h3_headers) != 6:
         warnings.append(
             {
                 "kind": "flyer_section_malformed",
@@ -1192,9 +1201,11 @@ def scan_flyer_section_structure(markdown: str) -> list[BriefingWarning]:
                 "message": (
                     f"`## Pesan Flyer` section contains "
                     f"{len(h3_headers)} `### Pesan Flyer N` H3 blocks "
-                    f"— expected exactly 6 (one per slot 1-6). The "
-                    f"flyer renderer iterates slots 0-5 and will render "
-                    f"blank cards for missing slots or ignore extras."
+                    f"— expected either exactly 6 (one per slot 1-6) or "
+                    f"0 + the documented skip note (when FLYER POOL is "
+                    f"empty for the week). The flyer renderer iterates "
+                    f"slots 0-5 and will render blank cards for missing "
+                    f"slots or ignore extras."
                 ),
             }
         )
