@@ -214,6 +214,31 @@ async def _prepare_context(
             hijri_short=hijri_short,
         )
 
+    # Build flyer-specific pools — restricted to the 7-kitab flyer
+    # whitelist (FLYER_ALLOWED_CORPORA). MIRRORS briefing.py:2567 — the
+    # auto path computes these and passes them; without this block the
+    # manual path emitted "Pool kosong" on every briefing because the
+    # kwargs default to None and the prompt's `if flyer_daleel_pool:`
+    # check falls through to the empty-pool branch. Bug shipped at
+    # least 12 briefings on 2026-06-18 before being caught.
+    from api.services.kitab_retrieval import FLYER_ALLOWED_CORPORA
+
+    flyer_allowed = set(FLYER_ALLOWED_CORPORA)
+    flyer_daleel_pool = [
+        d for d in (daleel or []) if d.get("corpus") in flyer_allowed
+    ]
+    flyer_adhkar_pool = [
+        a for a in (adhkar or []) if a.get("corpus") in flyer_allowed
+    ]
+    log.info(
+        "manual_briefing.flyer_pools",
+        group=group,
+        flyer_daleel=len(flyer_daleel_pool),
+        flyer_adhkar=len(flyer_adhkar_pool),
+        daleel_total=len(daleel or []),
+        adhkar_total=len(adhkar or []),
+    )
+
     user_prompt = _build_user_prompt(
         stats,
         daleel,
@@ -221,6 +246,8 @@ async def _prepare_context(
         kisah=kisah,
         language="id",
         calendar_context=calendar_block,
+        flyer_daleel_pool=flyer_daleel_pool,
+        flyer_adhkar_pool=flyer_adhkar_pool,
     )
     return stats, daleel, adhkar, kisah, SYSTEM_PROMPT_ID, user_prompt
 
