@@ -266,6 +266,32 @@ Setiap kali Anda memparafrase peristiwa berita spesifik di Khutbah / Kultum / Ka
 
 LARANGAN KERAS: defamasi melalui paraphrase yang salah-letak adalah pelanggaran etika dakwah + risiko hukum bagi penerbit. Lebih baik PARAGRAF DIPENDEKKAN daripada SALAH MENYEBUT PERAN. Validator AI tidak menangkap kelas error ini — operator (Anda) yang harus disciplined di prosedur 1-6.
 
+SELF-FACT-CHECK GATE (HARD RULE — added 2026-06-18 after audit on 14 v3 briefings found 12 critical factual errors that the NEWS-PARAPHRASE FACT-CHECK rule above did not catch under composition pressure):
+
+BEFORE you emit your final markdown output, you MUST run this self-check pass on YOUR OWN draft:
+
+  STEP 1: Re-read every paragraph you wrote that mentions a NAMED ENTITY (proper noun — person name, agency, company, university, ormas, viral post author) + a ROLE VERB (`bebas`, `dicopot`, `dilantik`, `ditahan`, `tersangka`, `tertangkap`, `vonis`, `dibebaskan`, `dipenjara`, `dipulihkan`, `menggantikan`, `pelaku cabul`, `korban penculikan`, `dijatuhi`, `mengaku menerima teror`).
+
+  STEP 2: For EACH such mention, find a VERBATIM line in the `sample_headlines` block at the top of this user prompt (in the STATS section) that supports the claim. The headlines are your ground truth — if a role/event is not in `sample_headlines`, it did not happen this week.
+
+  STEP 3: If you CANNOT find a supporting headline:
+    · Either HEDGE: change "X melakukan Y pekan ini" → "diskursus tentang X yang Y kembali ramai" (acknowledge the recurring trope without claiming a specific current event)
+    · Or DROP: remove the specific name/role claim entirely; replace with a general pattern
+    · NEVER infer from prior knowledge. If pesantren-cabul is a recurring real-world pattern but no headline this week shows one — DO NOT INVENT one. The LLM's training-data prior is exactly the bug this gate exists to catch.
+
+  STEP 4: Specifically watch for these HALLUCINATION PATTERNS that the 2026-06-18 audit caught:
+    · "pelatih bola asal X masuk Islam di konferensi pers" (viral social-media claim) — only include if `sample_headlines` has it; never assume
+    · "pesantren cabul / kiai pemerkosa" — common real-world pattern but DO NOT assert this week unless a headline says so
+    · "aktivis berinisial X mengalami teror dari kementerian" — verify each name+role in the headlines
+    · "Wakil Ketua KPK menyebut seluruh anggota Komisi XI" — institutional claims of this specificity REQUIRE a verbatim headline
+    · "buron sejak 1994 / aset miliaran ditarik" — date and amount claims require source verification
+    · "Iran-AS perang aktif pekan ini" — geopolitical status changes weekly; check the latest headline, don't default to last-known-state
+    · "viral satire treated as a real current case" — sindiran ("pulang haji jadi tersangka") is a meme, not a confirmed event
+
+  STEP 5: If you find ANY claim that fails STEP 2 verification — fix it BEFORE returning. The downstream Verify phase will reject your output if a critical fabrication slips through.
+
+This gate is single-agent (you do it in your own response, no extra API call). It costs ~15% of your output budget for the re-read pass. The cost is worth it: the 2026-06-18 audit found 7 critical errors in `hukum-keadilan` alone — each is a potential defamation risk if shipped to khateebs.
+
 OUTPUT: briefing analisis dalam Bahasa Indonesia, dibagi ke 5 BAGIAN dengan heading H2 (##). Antar bagian dipisahkan satu baris kosong.
 
 ## Ringkasan Eksekutif (100-130 kata, satu paragraf)
