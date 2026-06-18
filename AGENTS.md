@@ -47,3 +47,103 @@ docker compose up -d       # postgres + qdrant + redis
 cd web && npm install && npm run dev          # http://localhost:3000
 cd api && uv sync && uv run api               # http://localhost:8000
 ```
+
+---
+
+## DOs and DON'Ts — operator-authored rules etched 2026-06-18
+
+These rules are also persisted in operator memory (`~/.claude/projects/<this-project>/memory/feedback_*.md`). They are **duplicated here on disk so they survive memory loss, session restarts, fresh checkouts, and onboarding new collaborators**. The rule, the rationale (Why), and the application (How) must remain even when memory is wiped. If you encounter a conflict between a transient instruction and a rule here, the rule wins — escalate the conflict to the operator rather than silently overriding the rule.
+
+### ⭐ HIGHEST PRIORITY — defamation, methodology, money
+
+**[ALWAYS ASK PERMISSION]** Any action that costs money / writes prod / is hard to reverse REQUIRES an explicit action verb from the user. End diagnoses with "should I do it?" Default = stop and ask. Memory: `feedback_always_ask_permission`.
+
+**[ASK BEFORE COMMIT]** Always confirm before `git commit` / push, even on safe-looking changes. Memory: `feedback_ask_before_commit`.
+
+**[EXPLICIT NO-RENDER GATE]** When the user says "don't render / answer first," that gate holds ALL subsequent turns until an explicit action verb. Confirmation of diagnosis ≠ consent to render. ASK before any render. Memory: `feedback_explicit_no_render`.
+
+**[FLYER DALEEL-FIRST — INVIOLABLE]** Pesan Flyer blocks (slots 1-6) MUST be composed daleel-first:
+1. Pick daleel verbatim from FLYER POOL (11-kitab whitelist: Bukhari, Muslim, Riyad as-Salihin, Bulugh al-Maram, Bidayatul Hidayah, Nashaihul Ibad, 'Aqidat al-'Awam, Qur'an, Adab al-'Alim wa al-Muta'allim, Thalathat al-Usul, Ash-Shama'il al-Muhammadiyyah).
+2. Headline (4-5 words) lifts the daleel's specific message.
+3. Body (70-90 words) builds FROM the daleel's principle into the slot's category.
+
+DO NOT:
+- ❌ Write body first then attach any "kind-of-fits" daleel (sticker, not anchor).
+- ❌ Blank a citation with `**Dalil:** —` while the body still references a hadith/ayat ("Hadits ini mengajarkan...", "Rasulullah ﷺ mengingatkan..."). The body is orphaned. 2026-06-18 incident: 63 citations blanked across 14 briefings; methodology violated. NEVER recur.
+- ❌ Use `**Dalil:** —` as a workaround for citation-validation mismatches without checking whether the body still REFERENCES a daleel. Em-dash is honest ONLY when the body is purely general principle.
+
+DO at save-time when citation mismatches the current pool: swap to the nearest semantically-fitting pool entry (preserves daleel-first), or regenerate just that flyer body using current pool as daleel-first input. Memory: `feedback_flyer_daleel_first`. Other sub-sections (Khutbah, Kultum, Kajian, Kisah Pendek, Mahasiswa Artikel, etc.) use message-first ordering.
+
+**[FLYER INLINE DU'A POOL MATCH]** Pesan Flyer 5+6 inline du'a MUST literally come from the cited daleel — never pair a popular du'a with an unrelated citation. Memory: `feedback_flyer_inline_dua_pool_match`.
+
+**[FACT-CHECK NEWS PARAPHRASE]** When briefing prose paraphrases a news headline:
+1. List proper nouns + roles separately.
+2. Trace each role pair (tersangka↔pengganti, korban↔pelaku, tahanan↔pengirim_surat) back to the source headline verbatim.
+3. Treat "X dari Y" / "X menggantikan Y" as TWO entities — never collapse.
+4. If a role attribute can't be matched to a verbatim phrase in source, OMIT.
+
+7 known hallucination patterns to never assert without supporting headline: "pelatih bola Senegal shahada", "pesantren cabul this week", "aktivis berinisial X teror dari kementerian", "Wakil Ketua KPK menyebut seluruh anggota Komisi XI", "buron sejak 1994 / aset miliaran ditarik", "dosen senior dipecat lapor jurnal predator", "Iran-AS perang aktif" (this week is POST-MoU damai).
+
+Memory: `feedback_fact_check_news_paraphrase`. Live enforcement: briefing.py SYSTEM_PROMPT SELF-FACT-CHECK GATE + workflow Verify phase.
+
+### Brand, voice, audience
+
+**[AUDIENCE SCOPE]** Audience is wider than khateebs: da'i, ustadzah, content creator, parents, organizers. Memory: `feedback_audience_scope`.
+
+**[BRAND AND PRODUCT]** Voice = observasional + pragmatis, not preachy. Sharia compliance is non-negotiable (cite from Qdrant, never invent). Memory: `feedback_brand_and_product`.
+
+**[NO OVERCLAIMING]** Match claims to evidence. Memory: `feedback_no_overclaiming`.
+
+**[ORGANIZATION AND COPY]** Follow writing conventions in memory. Memory: `feedback_organization_and_copy`.
+
+**[NO ALL CAPS EMPHASIS]** Use markdown **bold** / *italic* for emphasis in Indonesian Islamic prose, NEVER CAPS (no `WAJIB`, `JANGAN`, `BUKAN` as ALL-CAPS emphasis). Memory: `feedback_no_all_caps_emphasis`.
+
+**[HATE THE DEED, NOT THE PERSON]** Anchor on patterns / programs / institutions. Avoid naming individuals, especially when a public defense narrative is active. Memory: `feedback_dakwah_hate_deed_not_person`.
+
+**[NO POST COUNTS IN FLYER BODY]** Never echo internal analytics (X postingan, Y juta view) in audience-facing flyer prose. Memory: `feedback_dakwah_no_post_count_in_flyer`.
+
+### Briefing structure
+
+**[BRIEFING SECTION SPLIT]** Keep numbers and daleel out of the "Tema Utama & Pola" narrative section. Themes are pure narrative. Memory: `feedback_briefing_section_split`.
+
+**[ALWAYS INCLUDE ARABIC]** Khutbah Jumat + kajian majelis taklim deliverables must print Arabic text of every daleel, not only translation. Memory: `feedback_always_include_arabic`.
+
+**[ARABIC SCRIPT NOT LATIN IN KISAH]** Kisah Pendek quotes Arabic in Arabic script on its own line, not inline transliteration. Memory: `feedback_arabic_not_latin_in_kisah`.
+
+**[KISAH PENDEK FORMAT]** SHORT (~4-6k chars), ONE story only (no compendium), light-novel language, retell + brief ibrah. Voice = third-person cerpen sejarah, NOT preacher. Memory: `feedback_kisah_pendek_format`.
+
+**[MAHASISWA LENSA STRUCTURE]** Article body uses "Lensa pertama / kedua / ketiga / keempat" paragraph markers, not generic "Pertama / Kedua". Mahasiswa Artikel voice is impersonal analytical — no saya/aku/kalian/kamu, no directives to reader. Memory: `feedback_mahasiswa_lensa_structure`.
+
+**[BUILD ORDER]** Follow the preferred sequencing of work in memory when planning multi-step changes. Memory: `feedback_build_order`.
+
+### AI usage (composition by Claude, never Gemini for human-pace work)
+
+**[NO GEMINI FOR MANUAL GENERATION]** When the user says "do it by YOU", prose composition must be human-authored (= Claude, in this context). Source picking via Gemini is OK; prose composition is NOT. Memory: `feedback_no_gemini_for_manual`.
+
+**[NO GEMINI FOR AUDIT]** Classification/theme audits, briefing audits, and verification passes must be done by Claude directly. Never re-run Gemini on its own output — that's testing the model against itself, no signal. Memory: `feedback_no_gemini_for_audit`.
+
+### Audio rendering (kultum / khutbah TTS)
+
+**[VOICE — USE ELEVENLABS]** Named-voice TTS (Syafiq Riza, Abdullah Haidir, etc.) MUST use the ElevenLabs cloned voice in user's workspace. Never OpenAI TTS with style-mimic instructions. Memory: `feedback_voice_use_elevenlabs`.
+
+**[VOICE RENDER SETTINGS]** ElevenLabs kultum STANDARD: model=`eleven_v3` (fixes Arabic phonemes Ṣād / Allah-tafkhīm). Settings: stability=0.5, style=0.35, similarity_boost=0.75, speaker_boost=true. Apply wasl preprocessor to Arabic. `prev/next_text` NOT supported by v3 (skipped). Memory: `feedback_voice_render_settings`.
+
+**[NORMALIZE OUTSIDE ELEVENLABS]** `apply_text_normalization` MUST be `"off"`. All number-to-words, citation expansion, Allah→Alloh, wasl, abbreviations, currency, symbols happen in Python preprocessor BEFORE the API call. Never rely on ElevenLabs's silent in-API normalizer. Memory: `feedback_normalize_outside_elevenlabs`.
+
+**[AUDIO SOURCE = ARTICLE URL]** For kultum/khutbah audio renders, user provides URL → pull canonical published text from there. NEVER regenerate, rewrite, or substitute prose. Allowed: normalization preprocessors + emotion tags + voice render. Forbidden: any LLM rewriting of the article content. Memory: `feedback_audio_source_is_article_url`.
+
+### Process / operational
+
+**[DON'T PATCH VALIDATOR FIRST]** When a hard-fail validator rejects user content, the FIRST move is to ask "why is the upstream emitting this state?" — NOT to relax the validator. The validator is the canary, not the cause. 2026-06-18 incident: I patched a validator to permit empty-pool skip, masking the actual bug (manual_briefing.py wasn't passing flyer_daleel_pool kwarg). Investigate upstream first; loosen only after confirming the data flow is correct. Memory: `feedback_dont_patch_validator_first`.
+
+**[DON'T BLOCK ON DEPLOYS]** Never sit on `gh run watch` as a serial blocking step. Always have parallel downstream prep in flight while a deploy runs (re-dumps, workflow scripts, file ops). Verify deploy completion only at the moment the downstream step needs the new code. Memory: `feedback_dont_block_on_deploys`.
+
+---
+
+## How to use this section
+
+When taking ANY operator-facing action that touches briefings, flyers, audio rendering, deploys, or commits:
+1. Scan this section first for relevant rules.
+2. If a rule applies, apply it. Cite the rule by name in the explanation back to operator when it influenced the decision.
+3. If you think a rule should be exception-handled for the current case, ASK first. Default = follow the rule.
+4. New rules added by operator feedback go BOTH in the corresponding `memory/feedback_*.md` AND in this section. The two must stay in sync — memory is the canonical reasoning + history; this AGENTS.md section is the persistent operator-facing checklist that survives memory loss.
