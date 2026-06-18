@@ -181,8 +181,20 @@ DALEEL_DENYLIST: frozenset[str] = frozenset({
 # rationale lives inline in pick_flyer_daleel where this is iterated;
 # the short version: flyers are 1080x1080 graphics with ~3-4 lines of
 # daleel text, so we want short, well-known hadith + pesantren matns
-# and exclude Qur'an / tafsir / sirah / fiqh-heavy kitabs that don't
-# render well in the format.
+# and exclude tafsir / sirah / fiqh-heavy kitabs whose entries are
+# multi-paragraph and don't render in the format.
+#
+# Widened 2026-06-18 from 7 → 11 corpora after audit found the kesehatan
+# theme's FLYER POOL collapsed to 1 entry (a financial-debt hadith
+# stretched across all 4 flyer slots because no thematic alternatives
+# survived the 7-kitab filter). Added: quran (verses are typically
+# short — average <3 lines for non-narrative ayat), adab_alim_mutaallim
+# (Imam Nawawi's adab matns), thalathat_al_usul (Wahab pamphlet),
+# syamail_muhammadiyyah (short hadith descriptions of the Prophet).
+# All four pass the "short pull-quote that fits 1080×1080" test. Length
+# is still enforced at composition time (≤240 char ID, ≤200 char Arabic)
+# via the prompt rules — overly-long Qur'an verses (long Yusuf/Shu'ara
+# narrative sequences) get rejected at headline-write time.
 FLYER_ALLOWED_CORPORA: tuple[str, ...] = (
     "bukhari",
     "muslim",
@@ -191,6 +203,10 @@ FLYER_ALLOWED_CORPORA: tuple[str, ...] = (
     "bidayat_al_hidayah",
     "nashaihul_ibad",
     "aqidah_awam",
+    "quran",
+    "adab_alim_mutaallim",
+    "thalathat_al_usul",
+    "syamail_muhammadiyyah",
 )
 
 

@@ -396,17 +396,29 @@ def format_calendar_context(
     if events:
         # Group by event so the same event spanning multiple days
         # (e.g. Tasyriq 11-13) renders once with its range.
+        # Indonesian day-of-week names so the LLM doesn't have to derive
+        # them from offset arithmetic — added 2026-06-18 after audit
+        # found 4 briefings shipped with Senin/Selasa/Kamis/Jumat
+        # mislabelled for Tasu'a/Asyura. With the day name in the prompt
+        # the LLM can copy it verbatim.
+        from datetime import timedelta as _td
+
+        _DOW_ID = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Ahad"]
         seen: set[tuple[int, int, int]] = set()
         for we in events:
             ev_key = (we.event.month, we.event.day_start, we.event.day_end or we.event.day_start)
             if ev_key in seen:
                 continue
             seen.add(ev_key)
-            when_label = (
-                "hari ini"
-                if we.days_from_today == 0
-                else f"+{we.days_from_today} hari"
-            )
+            event_date = today + _td(days=we.days_from_today)
+            dow_id = _DOW_ID[event_date.weekday()]
+            if we.days_from_today == 0:
+                when_label = f"hari ini ({dow_id})"
+            else:
+                when_label = (
+                    f"+{we.days_from_today} hari ({dow_id} "
+                    f"{event_date.isoformat()})"
+                )
             lines.append(
                 f"  · {when_label} ({we.hijri.label_id}) — {we.event.name_id}"
             )

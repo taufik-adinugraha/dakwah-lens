@@ -592,6 +592,30 @@ FORMAT output H4 untuk sub-section: gunakan `#### Poster Question`, `#### Artike
 1. H3 heading PERSIS: `### Mahasiswa: Poster, Artikel & Diskusi — "<judul punchy>"`. JANGAN tulis `### Mahasiswa Pack — ...` atau variasi lain.
 2. Baris setelah H3 PERSIS satu baris `**Poster Question:** "..."` — JANGAN ganti dengan `**Topik artikel:**` / `**Latar belakang:**` / etc.
 3. H4 PERSIS `#### Artikel` — JANGAN pakai bold-inline `**Bagian I — ...**` / `**Bagian II — ...**` / `**Pembuka**` sebagai pengganti H4. Struktur 4-bagian (Pembuka / Argumen logis / Solusi praktis / Penutup) ada DI DALAM `#### Artikel`, sebagai paragraf mengalir — bukan sebagai sub-heading bold yang terpisah.
+
+3a. WAJIB title at the start (added 2026-06-18): the FIRST line under `#### Artikel` MUST be the article's own title as an H5 — `##### "<judul artikel>"` — repeating the punchy title from the H3 heading. This makes the article scannable as a standalone artefact when reposted/shared outside the briefing (web magazine, screenshot, PDF). The H3-level title (`### Mahasiswa: Poster, Artikel & Diskusi — "..."`) is the section title that includes "Poster + Artikel + Diskusi"; the H5 title under `#### Artikel` is the article's own headline. Use the SAME `"<judul punchy>"` quoted text — do NOT invent a different title.
+
+  Example correct shape:
+  ```
+  ### Mahasiswa: Poster, Artikel & Diskusi — "Empat Lensa Membaca Kebocoran"
+
+  **Poster Question:** "..."
+
+  #### Artikel
+
+  ##### "Empat Lensa Membaca Kebocoran"
+
+  [opening paragraph: hook + thesis...]
+
+  [argumen logis paragraphs...]
+
+  [solusi praktis paragraph...]
+
+  [penutup paragraph...]
+
+  #### Q&A Realistis
+  ...
+  ```
 4. H4 PERSIS `#### Q&A Realistis` dengan 5 pasang `**Q:** ... **A:** ...`. JANGAN HILANGKAN section ini, bahkan kalau topiknya sangat akademis — justru topik akademis BUTUH pushback paling banyak.
 5. Total panjang 900-1200 kata. Kalau lewat 1300 kata, kemungkinan besar struktur sudah drift ke jurnal akademis — periksa ulang.
 
@@ -819,7 +843,7 @@ ATURAN DALIL — paragraf, headline, dan dalil WAJIB membentuk satu thread temat
 1. Citation HARUS persis cocok dengan salah satu entri di dalil pool yang saya berikan. JANGAN mengarang citation.
 
 CITATION VERBATIM CHECK (HARD RULE — KRITIS, jangan dilanggar untuk Pesan Flyer 1-6):
-Setiap `**Dalil:**` yang Anda tag di Pesan Flyer 1-6 WAJIB persis sama dengan salah satu `Citation:` di FLYER DALEEL POOL (untuk Flyer 1-4) atau FLYER ADHKAR POOL (untuk Flyer 5-6). PERSIS — bukan paraphrase, bukan sinonim, bukan citation lain yang kelihatannya cocok. JANGAN ambil dari DALEEL POOL atau ADHKAR POOL yang luas — keduanya dipakai sub-section lain (khutbah/kultum/kajian) tapi BUKAN untuk flyer. Flyer dibatasi ke 7 kitab whitelist (Bukhari, Muslim, Riyad as-Salihin, Bulugh al-Maram, Bidayatul Hidayah, Nashaihul Ibad, 'Aqidat al-'Awam) yang format pull-quote-nya pas untuk graphic 1080×1080. Renderer flyer mencari entri pool dengan citation yang Anda tag; kalau TIDAK KETEMU di FLYER POOL, renderer SILENTLY MEM-FALLBACK ke pickFlyerDaleel(rank) — yang akan menampilkan daleel ACAK dari pool, BUKAN yang Anda maksudkan. Pembaca tidak tahu itu jatuh ke fallback; mereka percaya daleel yang muncul itu yang Anda pilih.
+Setiap `**Dalil:**` yang Anda tag di Pesan Flyer 1-6 WAJIB persis sama dengan salah satu `Citation:` di FLYER DALEEL POOL (untuk Flyer 1-4) atau FLYER ADHKAR POOL (untuk Flyer 5-6). PERSIS — bukan paraphrase, bukan sinonim, bukan citation lain yang kelihatannya cocok. JANGAN ambil dari DALEEL POOL atau ADHKAR POOL yang luas — keduanya dipakai sub-section lain (khutbah/kultum/kajian) tapi BUKAN untuk flyer. Flyer dibatasi ke 11-kitab whitelist (Bukhari, Muslim, Riyad as-Salihin, Bulugh al-Maram, Bidayatul Hidayah, Nashaihul Ibad, 'Aqidat al-'Awam, Qur'an, Adab al-'Alim wa al-Muta'allim, Thalathat al-Usul, Ash-Shama'il al-Muhammadiyyah — widened 2026-06-18 to give thinner themes like kesehatan an actual on-theme daleel pool) yang format pull-quote-nya pas untuk graphic 1080×1080. Renderer flyer mencari entri pool dengan citation yang Anda tag; kalau TIDAK KETEMU di FLYER POOL, renderer SILENTLY MEM-FALLBACK ke pickFlyerDaleel(rank) — yang akan menampilkan daleel ACAK dari pool, BUKAN yang Anda maksudkan. Pembaca tidak tahu itu jatuh ke fallback; mereka percaya daleel yang muncul itu yang Anda pilih.
 
 REAL BUG 2026-06-07: audit lintas-briefing menemukan 50 dari 90 marker `**Dalil:**` di flyer di-tag dengan citation yang TIDAK ada di stored pool. Konsekuensi: ~55% flyer di prod menampilkan daleel yang mismatch dengan headline + body — kontradiksi yang merusak kepercayaan da'i.
 
@@ -868,7 +892,7 @@ Cara memilih untuk SETIAP Pesan Flyer 1-5:
 
 Verifikasi sebelum tag: setelah memilih citation, cek `length(translation_id)` dan `length(arabic)` dari entri itu di pool. Kalau melebihi batas, MUNDUR dan pilih ulang.
 
-ATURAN DALIL untuk Pesan Flyer 5 & 6 (SUNNAH + DOA): citation pada Pesan Flyer 5 (Ajakan Sunnah) dan Pesan Flyer 6 (Doa Pekan Ini) HARUS dipilih dari blok **FLYER ADHKAR POOL** yang TERPISAH (lihat user prompt di bawah). FLYER ADHKAR POOL berisi du'a / dzikir yang dapat dibaca langsung dari 7 kitab whitelist flyer — entri yang cocok untuk dijadikan wirid. JANGAN ambil dalil untuk Flyer 5+6 dari DALEEL POOL atau ADHKAR POOL yang luas, dan JANGAN dari FLYER DALEEL POOL (itu untuk Flyer 1-4). Kalau FLYER ADHKAR POOL kosong atau tidak ada entri yang cocok untuk satu paragraf, kosongkan baris `**Dalil:**` untuk paragraf itu (jangan diisi dengan citation yang tidak ada di pool).
+ATURAN DALIL untuk Pesan Flyer 5 & 6 (SUNNAH + DOA): citation pada Pesan Flyer 5 (Ajakan Sunnah) dan Pesan Flyer 6 (Doa Pekan Ini) HARUS dipilih dari blok **FLYER ADHKAR POOL** yang TERPISAH (lihat user prompt di bawah). FLYER ADHKAR POOL berisi du'a / dzikir yang dapat dibaca langsung dari 11-kitab whitelist flyer — entri yang cocok untuk dijadikan wirid. JANGAN ambil dalil untuk Flyer 5+6 dari DALEEL POOL atau ADHKAR POOL yang luas, dan JANGAN dari FLYER DALEEL POOL (itu untuk Flyer 1-4). Kalau FLYER ADHKAR POOL kosong atau tidak ada entri yang cocok untuk satu paragraf, kosongkan baris `**Dalil:**` untuk paragraf itu (jangan diisi dengan citation yang tidak ada di pool).
 
 ATURAN PANJANG DU'A untuk Pesan Flyer 6 (KRITIS — flyer 1080×1080 harus nyaman dibaca dalam 1 layar): pilih entri ADHKAR POOL yang BENAR-BENAR sebuah du'a/dzikir pendek yang bisa langsung diwirid. TARGET: Arab ≤ 150 karakter (≈1-3 baris di flyer), terjemahan ≤ 200 karakter. JANGAN pilih hadits panjang dengan rantai perawi ("ḥaddatsanā fulān… 'an fulān…") atau narasi cerita panjang sebagai "du'a" — itu hadits historis, bukan du'a recitable. Kalau pool TIDAK ada entri ≤ 150ch yang relevan, pilih entri terpendek yang relevan, ATAU kosongkan `**Dalil:**` Flyer 6 (lebih baik tanpa marker daripada flyer yang teksnya luber dan tidak terbaca).
 
@@ -1332,7 +1356,7 @@ DALEEL RULES — paragraph, headline, and daleel MUST form one consistent themat
 1. Citation MUST match exactly an entry in the daleel pool. NEVER fabricate citations.
 
 CITATION VERBATIM CHECK (HARD RULE — CRITICAL, do not break for Flyer Messages 1-6):
-Every `**Daleel:**` you tag on Flyer Messages 1-6 MUST match a `Citation:` field in the FLYER DALEEL POOL (for Flyer 1-4) or FLYER ADHKAR POOL (for Flyer 5-6) EXACTLY. EXACTLY — not paraphrased, not a synonym, not a different but-similar-looking citation. DO NOT use the broader DALEEL POOL or ADHKAR POOL — those are for other sub-sections (khutbah/kultum/kajian). Flyers are restricted to a 7-kitab whitelist (Bukhari, Muslim, Riyad as-Salihin, Bulugh al-Maram, Bidayatul Hidayah, Nashaihul Ibad, 'Aqidat al-'Awam) that fits the 1080×1080 pull-quote format. The flyer renderer looks up the pool entry by the citation you tag; if NOT FOUND in the FLYER POOL, the renderer SILENTLY FALLS BACK to `pickFlyerDaleel(rank)` — displaying a RANDOM daleel from the pool, NOT the one you meant.
+Every `**Daleel:**` you tag on Flyer Messages 1-6 MUST match a `Citation:` field in the FLYER DALEEL POOL (for Flyer 1-4) or FLYER ADHKAR POOL (for Flyer 5-6) EXACTLY. EXACTLY — not paraphrased, not a synonym, not a different but-similar-looking citation. DO NOT use the broader DALEEL POOL or ADHKAR POOL — those are for other sub-sections (khutbah/kultum/kajian). Flyers are restricted to a 11-kitab whitelist (Bukhari, Muslim, Riyad as-Salihin, Bulugh al-Maram, Bidayatul Hidayah, Nashaihul Ibad, 'Aqidat al-'Awam, Qur'an, Adab al-'Alim wa al-Muta'allim, Thalathat al-Usul, Ash-Shama'il al-Muhammadiyyah — widened 2026-06-18) that fits the 1080×1080 pull-quote format. The flyer renderer looks up the pool entry by the citation you tag; if NOT FOUND in the FLYER POOL, the renderer SILENTLY FALLS BACK to `pickFlyerDaleel(rank)` — displaying a RANDOM daleel from the pool, NOT the one you meant.
 
 REAL BUG 2026-06-07: cross-briefing audit found 50 of 90 `**Daleel:**` markers on flyers tagged citations NOT in the stored pool. Consequence: ~55% of production flyers showed daleel that mismatched the headline + body — a contradiction that damages the trust of every da'i who shares.
 
@@ -1359,7 +1383,7 @@ VALIDATOR HARD-FAIL: `manual_briefing save` now REJECTS (exit code 1) when any f
 
 5. Variety: aim for 4-6 flyers to use different daleel when the pool allows — but THE PRIORITY is thematic precision, not distribution. Two flyers sharing a well-fitting daleel beats four flyers with four forced mismatches.
 
-DALEEL RULES for Flyer Messages 5 & 6 (SUNNAH + DU'A): citations on Flyer Message 5 (Sunnah Invitation) and Flyer Message 6 (This Week's Du'a) MUST come from the **FLYER ADHKAR POOL** — a separate pool in the user prompt below, holding recitable du'a / dzikir entries from the 7-kitab flyer whitelist. Do NOT use the broader DALEEL POOL, ADHKAR POOL, or FLYER DALEEL POOL for Flyer 5+6. If the FLYER ADHKAR POOL is empty or none of its entries fit a given paragraph, leave the `**Daleel:**` marker line blank for that paragraph (never fabricate a citation).
+DALEEL RULES for Flyer Messages 5 & 6 (SUNNAH + DU'A): citations on Flyer Message 5 (Sunnah Invitation) and Flyer Message 6 (This Week's Du'a) MUST come from the **FLYER ADHKAR POOL** — a separate pool in the user prompt below, holding recitable du'a / dzikir entries from the 11-kitab flyer whitelist. Do NOT use the broader DALEEL POOL, ADHKAR POOL, or FLYER DALEEL POOL for Flyer 5+6. If the FLYER ADHKAR POOL is empty or none of its entries fit a given paragraph, leave the `**Daleel:**` marker line blank for that paragraph (never fabricate a citation).
 
 DU'A LENGTH RULE for Flyer Message 6: pick an ADHKAR POOL entry that is genuinely a short recitable du'a / dzikir (rule of thumb: Arabic < 200 chars, translation < 280 chars). Do NOT pick a long hadith with a full chain of narrators ("ḥaddatsanā so-and-so… 'an so-and-so…") or a story narration as the "du'a" — that's historical hadith, not a recitable du'a. If the only choice in the pool is a long narration, leave Flyer 6's `**Daleel:**` blank rather than force an entry that won't fit on a 1080×1080 flyer.
 
