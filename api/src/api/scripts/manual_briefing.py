@@ -93,7 +93,29 @@ MODEL_TAG = "claude-manual"
 # matching `save` can persist with the SAME retrieval — otherwise the
 # daleel_refs would drift between the prompt the LLM saw and the
 # bibliography we store on the row.
-_CACHE_DIR = Path("/tmp/dakwah-manual-briefing")
+#
+# Path priority (resolved at import time):
+#   1. /data/attachments/manual-briefing-cache — PERSISTENT bind-mount in
+#      prod (host /srv/dakwah-lens/data/attachments survives container
+#      restarts). Required because every deploy restarts dakwah-lens-api-1
+#      and wipes /tmp, breaking the dump→edit-in-Claude→save flow whenever
+#      a deploy lands between the two steps. Resolved 2026-06-18 after
+#      every save in a 14-theme batch needed a manual re-dump before save.
+#   2. /tmp/dakwah-manual-briefing — local dev fallback (no /data mount).
+def _resolve_cache_dir() -> Path:
+    persistent = Path("/data/attachments/manual-briefing-cache")
+    try:
+        persistent.mkdir(parents=True, exist_ok=True)
+        # Test write — catches permission errors that mkdir didn't see
+        probe = persistent / ".write_probe"
+        probe.touch()
+        probe.unlink()
+        return persistent
+    except (OSError, PermissionError):
+        return Path("/tmp/dakwah-manual-briefing")
+
+
+_CACHE_DIR = _resolve_cache_dir()
 
 
 # ──────────────────────────────────────────────────────────────────
@@ -352,10 +374,28 @@ async def cmd_save(group_arg: str, markdown_path: str) -> None:
 
     cache_path = _cache_path(slug)
     if not cache_path.exists():
-        raise SystemExit(
-            f"No cached context for group '{group}'. "
-            f"Run `dump {slug}` first so we know which stats/daleel pool to attach."
+        # Auto re-dump fallback (added 2026-06-18): cache may have been
+        # wiped by container restart since the operator last ran `dump`.
+        # Re-running dump here is idempotent — it re-retrieves the daleel
+        # pool and rewrites the cache. Citation validation may produce
+        # mismatches if the pool changed since compose-time (since
+        # retrieve_daleel + rerank are non-deterministic), but the
+        # operator will see the patch prompts and can handle them. Far
+        # better than hard-failing the save and forcing the operator to
+        # remember the manual dump→save dance after every deploy.
+        sys.stderr.write(
+            f"⚠ Cache for '{group}' missing at {cache_path}\n"
+            f"  → Auto-redumping (likely a container restart wiped the cache).\n"
+            f"  → If citation mismatches appear, the daleel pool may have\n"
+            f"    drifted since the briefing was composed. Patch any\n"
+            f"    rejected `**Dalil:** X` lines to `**Dalil:** —` and retry.\n"
         )
+        await cmd_dump(group_arg, None)  # writes cache as side effect
+        if not cache_path.exists():
+            raise SystemExit(
+                f"Auto-redump failed to create cache at {cache_path}. "
+                f"Run `dump {slug}` manually and check logs."
+            )
 
     md_path = Path(markdown_path)
     if not md_path.exists():
