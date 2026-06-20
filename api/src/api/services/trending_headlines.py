@@ -21,7 +21,7 @@ weekly-briefing assembly graph.
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import structlog
@@ -71,7 +71,7 @@ async def fetch_trending_headlines(
     Returns empty list if no posts match. Logged at INFO level so
     the manual_briefing dump output shows what was attached.
     """
-    cutoff = datetime.now(timezone.utc) - timedelta(days=period_days)
+    cutoff = datetime.now(UTC) - timedelta(days=period_days)
 
     where_clauses = [
         "posted_at >= :cutoff",

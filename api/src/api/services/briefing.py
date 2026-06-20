@@ -34,7 +34,7 @@ from __future__ import annotations
 
 import json
 import re
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 import structlog
@@ -2219,6 +2219,263 @@ def _format_prior_coverage_block(
         lines.append(f"  · {poster_label}: \"{pq}\"" if pq else f"  · {poster_label}: {empty}")
         lines.append("")
     return "\n".join(lines).rstrip() + "\n\n"
+
+
+# ──────────────────────────────────────────────────────────────────────
+# OCCASION MODE — 15th briefing track (Islamic-calendar occasions).
+#
+# Lives next to SYSTEM_PROMPT_ID + _build_user_prompt rather than in a
+# separate file because the prompt is derived from the weekly prompt
+# via section splice — keeping both in one module makes the derivation
+# obvious + the assertion-fail at import time loud.
+#
+# v0 covers Indonesian only (mirrors the manual_briefing CLI). English
+# parity (OCCASION_SYSTEM_PROMPT_EN) can be added once the manual
+# operator pipeline is proven.
+# ──────────────────────────────────────────────────────────────────────
+
+_OCCASION_SECTIONS_1_TO_3_ID = """## Ringkasan Eksekutif (100-130 kata, satu paragraf)
+- Sebut nama lengkap acara + tanggal Hijri + tanggal Gregorian + hitung mundur (jumlah hari menuju acara) ATAU posisi dalam acara berjalan (mis. "hari ke-9 dari 30 hari Ramadan")
+- Inti hikmah / teladan acara dalam satu kalimat
+- Satu aksi praktis yang akan dipersiapkan audiens dakwah dalam 14 hari ke depan
+- Bisa di-skim dalam 30 detik
+- JANGAN sebut statistik post / persentase sentimen — angka tersebut tidak diperlukan untuk briefing acara
+
+## Kalender Hijriah Pekan Ini (150-200 kata)
+- Buka dengan POSISI HARI INI dalam kalender Hijri (mis. "Hari ini Senin 6 Muharram 1448 H, bertepatan 21 Juni 2026 M").
+- HITUNG MUNDUR ke acara utama dengan tanggal Gregorian + nama hari (mis. "Tasu'a jatuh Rabu 24 Juni — 3 hari lagi; Asyura Kamis 25 Juni — 4 hari lagi").
+- Sebut tanggal-tanggal SUNNAH yang berdekatan di pekan-pekan ini (puasa Tasu'a + Asyura, puasa Senin / Kamis di pekan ini, Ayyamul Bidh 13-14-15 bulan berjalan bila relevan).
+- Bila acara sudah berlangsung sebagian (mis. pekan ke-2 Ramadan), sebut POSISI dalam acara: "Hari ini hari ke-9 Ramadan dari 30 hari; tersisa N malam untuk Lailatul Qadr di sepuluh malam terakhir".
+- DILARANG: angka statistik post / persentase sentimen / data dari sample_headlines — section ini MURNI kalender, bukan numerik news data.
+
+## Konteks & Hikmah Acara (450-650 kata)
+- PROSA NARATIF — beri pembaca konteks lengkap acara: latar sirah / historis, fiqh praktis ringkas, hikmah yang ditekankan ulama klasik dan kontemporer.
+- Sebut 2-4 SUMBER dari DALIL POOL yang langsung berbicara tentang acara ini, lalu jabarkan maknanya. Citations BOLEH inline di section ini (mis. "Dalam Sahih Muslim 1162, Rasulullah ﷺ bersabda..." atau "QS. Al-Baqara: 185 menggambarkan bulan Ramadan sebagai..."). Tidak seperti Tema Utama mode mingguan, di sini dalil-naratif INTEGRAL — bukan ditahan untuk section Dalil & Sumber.
+- Bila ada `BERITA PENDUKUNG` di STATS BLOCK yang relevan dengan tema acara, Anda BOLEH menjadikannya bahan refleksi — TAPI berita pekan ini adalah AMUNISI PENDUKUNG, bukan headline. Acaranya yang utama; berita hanya menjadi cermin agar pembaca melihat relevansi acara dengan keseharian. Sebutkan berita SECARA KUALITATIF ("kabar yang ramai pekan ini tentang…", "sebuah peristiwa yang menyentuh banyak orang…") — JANGAN angka/persentase, JANGAN nama outlet/akun.
+- STRUKTUR yang disarankan: (1) Latar sirah / historis acara (~100 kata), (2) Fiqh praktis: rukun, sunnah, hal-hal yang dianjurkan (~150 kata), (3) Hikmah ulama klasik & kontemporer dengan kutipan dalil (~200 kata), (4) Jembatan ke kondisi pekan ini bagi audiens dakwah (~100 kata).
+- Verba observasional + reflektif. Hindari "wajib" / "harus" sebagai perintah keras — gunakan "diajarkan", "diteladani", "diingatkan", "mengundang refleksi" — KECUALI saat menyebut rukun / wajib yang memang wajib syar'i.
+- DILARANG: (a) angka statistik post / persentase / view-count (BERITA PENDUKUNG referensikan kualitatif saja); (b) atribusi outlet atau akun media sosial ("Liputan6 melaporkan…", "user X menulis…") — abstraksikan polanya."""
+
+
+def _splice_occasion_system_prompt() -> str:
+    """Build OCCASION_SYSTEM_PROMPT_ID by splicing the occasion-mode
+    Sections 1-3 into SYSTEM_PROMPT_ID. Splice anchors:
+      - prefix ends at the start of `## Ringkasan Eksekutif (100-130`
+      - suffix begins at the start of `## Poin Kunci (180-260`
+
+    Assertion-fails at import if either anchor is missing — that's a
+    signal the weekly prompt was edited in a way that broke the
+    occasion derivation. Sync the anchors with briefing.py's actual
+    H2 markers when that happens (search for the H2 lines in
+    SYSTEM_PROMPT_ID and update the strings below).
+
+    Sections 4 (Poin Kunci), 5 (Strategi & Aksi Dakwah, 8 sub-sections),
+    6 (Dalil & Sumber), 7 (Pesan Flyer) are inherited UNCHANGED from
+    the weekly prompt — including all validator rules, daleel-first
+    methodology, flyer independence, anti-attribution, citation
+    verbatim check, etc. Occasion briefings get the same quality
+    guarantees as weekly briefings for everything below Section 3.
+    """
+    section_1_anchor = "## Ringkasan Eksekutif (100-130 kata,"
+    section_4_anchor = "## Poin Kunci (180-260 kata)"
+
+    i = SYSTEM_PROMPT_ID.find(section_1_anchor)
+    j = SYSTEM_PROMPT_ID.find(section_4_anchor)
+    assert i >= 0, (
+        f"OCCASION_SYSTEM_PROMPT_ID: anchor {section_1_anchor!r} not found "
+        f"in SYSTEM_PROMPT_ID — section names may have drifted."
+    )
+    assert j > i, (
+        f"OCCASION_SYSTEM_PROMPT_ID: anchor {section_4_anchor!r} not found "
+        f"after {section_1_anchor!r} — section ordering may have drifted."
+    )
+    return SYSTEM_PROMPT_ID[:i] + _OCCASION_SECTIONS_1_TO_3_ID + "\n\n" + SYSTEM_PROMPT_ID[j:]
+
+
+OCCASION_SYSTEM_PROMPT_ID: str = _splice_occasion_system_prompt()
+
+
+def _build_occasion_user_prompt(
+    entry: Any,  # api.services.occasion_catalog.OccasionEntry (avoid circular import)
+    *,
+    today_gregorian: date,
+    daleel: list[dict[str, Any]],
+    adhkar: list[dict[str, Any]] | None = None,
+    flyer_daleel_pool: list[dict[str, Any]] | None = None,
+    flyer_adhkar_pool: list[dict[str, Any]] | None = None,
+    trending_headlines: list[dict[str, Any]] | None = None,
+    language: str = "id",
+) -> str:
+    """Assemble the user prompt for a 15th-track Islamic-calendar
+    briefing. Returns the structured context block the composer reads,
+    in the same shape as _build_user_prompt but with:
+
+      - OCCASION CONTEXT (Hijri date + Gregorian date + countdown +
+        notes from YAML) instead of HEADLINE NUMBERS
+      - BERITA PENDUKUNG (top-N last-7d headlines, supporting evidence
+        only) instead of TOP TOPICS WITH SAMPLE HEADLINES
+      - DALEEL POOL / ADHKAR POOL / FLYER DALEEL POOL / FLYER ADHKAR
+        POOL — same shape as weekly briefings
+
+    Args:
+      entry: OccasionEntry from api/catalogs/hijri_occasions.yaml
+      today_gregorian: date the briefing is being generated (used for
+        countdown computation). Pass a `date`, not a `datetime`.
+      daleel: thematic pool from retrieve_occasion_daleel
+      adhkar: du'a pool from retrieve_dua (optional)
+      flyer_daleel_pool / flyer_adhkar_pool: 11-kitab whitelist subsets
+      trending_headlines: from trending_headlines.fetch_trending_headlines
+        — supporting-evidence only, woven into Section 3 if relevant
+      language: 'id' only for v0
+
+    Used by:
+      - api.scripts.manual_briefing (operator dump → compose path)
+      - api.workers.occasion_cron (Sunday 05:00 WIB auto path — Chunk 6)
+    """
+    if language == "en":
+        empty_marker = "(no daleel found for this occasion)"
+        translation_label = "Translation (EN)"
+    else:
+        empty_marker = "(tidak ada daleel yang ditemukan untuk acara ini)"
+        translation_label = "Terjemahan ID"
+
+    def _translation_for(d: dict[str, Any]) -> str:
+        if language == "en":
+            return d.get("translation_en") or d.get("translation_id") or ""
+        return d.get("translation_id") or d.get("translation_en") or ""
+
+    # ── OCCASION CONTEXT ──────────────────────────────────────────
+    days_until = (entry.gregorian_date - today_gregorian).days
+    if days_until > 0:
+        countdown = f"{days_until} hari menuju acara"
+    elif days_until == 0:
+        countdown = "ACARA JATUH HARI INI"
+    else:
+        countdown = (
+            f"acara sudah berlangsung {-days_until} hari yang lalu "
+            f"(masih dalam periode pasca-acara / refleksi)"
+        )
+    occasion_context = (
+        f"OCCASION CONTEXT (Section 2 'Kalender Hijriah Pekan Ini' dan "
+        f"Section 3 'Konteks & Hikmah Acara' WAJIB merujuk pada data ini, "
+        f"BUKAN pada angka post / sample_headlines):\n\n"
+        f"- Slug: {entry.slug}\n"
+        f"- Nama acara: {entry.name}\n"
+        f"- Tahun Hijri: {entry.hijri_year}\n"
+        f"- Tanggal Hijri: {entry.hijri_date}\n"
+        f"- Tanggal Gregorian (primer): {entry.gregorian_date.isoformat()}\n"
+        f"- Hari ini (Gregorian): {today_gregorian.isoformat()}\n"
+        f"- Hitung mundur: {countdown}\n"
+        f"- Query template (semantic search yang digunakan untuk DALEEL POOL): {entry.query_template!r}\n"
+    )
+    if entry.notes:
+        occasion_context += f"- Catatan operator: {entry.notes}\n"
+    if not entry.confirmed:
+        occasion_context += (
+            "- ⚠ Tanggal Gregorian BELUM DIKONFIRMASI vs Kemenag SKB-3-menteri. "
+            "Gunakan sebagai panduan; bila sudah ada SKB resmi yang menggeser tanggal "
+            "±1-2 hari, tetap relevan karena hitung mundur 14 hari ke depan masih akurat.\n"
+        )
+
+    # ── BERITA PENDUKUNG ──────────────────────────────────────────
+    # Top-N last-7d headlines as supporting evidence. Composer is
+    # instructed to use them ONLY as ammunition in Section 3, not as
+    # the lead. When the occasion's catalog entry has
+    # include_trending_headlines=false, the manual dump / cron skips
+    # the fetch entirely and this block is empty.
+    if trending_headlines:
+        headline_lines = []
+        for h in trending_headlines:
+            theme = h.get("theme_group") or "?"
+            platform = h.get("platform") or "?"
+            headline_lines.append(
+                f"- [{theme} · {platform}] {h.get('title','')[:200]}"
+            )
+        berita_pendukung_block = (
+            "BERITA PENDUKUNG (top last-7d headlines untuk AMUNISI Section 3 — "
+            "WAJIB rujuk hanya sebagai bahan refleksi kualitatif, BUKAN headline. "
+            "Acaranya yang utama; berita pekan ini hanya cermin keseharian. "
+            "DILARANG memasukkan angka post / persentase / view-count / nama "
+            "outlet / handle akun ke dalam briefing — abstraksikan polanya):\n\n"
+            + "\n".join(headline_lines)
+        )
+    else:
+        berita_pendukung_block = (
+            "BERITA PENDUKUNG: (kosong — operator memilih untuk fokus murni "
+            "pada konteks acara tanpa rujukan berita pekan ini, atau tidak "
+            "ada headline last-7d yang melewati threshold relevansi)."
+        )
+
+    # ── POOLS ─────────────────────────────────────────────────────
+    # Same shape as _build_user_prompt's pool blocks; inlined here so
+    # the occasion-mode flow is independent of the weekly assembly.
+    # Future chunk may extract a shared _render_pool_block helper if
+    # the duplication becomes painful.
+    def _render_pool(pool: list[dict[str, Any]]) -> str:
+        if not pool:
+            return empty_marker
+        return "\n\n".join(
+            f"Citation: {d['citation']}\n"
+            f"Arabic: {d['arabic'][:300]}\n"
+            f"{translation_label}: {_translation_for(d)[:500]}"
+            for d in pool
+        )
+
+    daleel_block = _render_pool(daleel)
+
+    adhkar_section = (
+        "\n\nADHKAR POOL (recitable du'a / dzikir, untuk sub-section "
+        "Kultum/Kajian + Pesan Flyer 5+6 jika temanya menyangkut wirid):\n\n"
+        + _render_pool(adhkar)
+        if adhkar
+        else ""
+    )
+
+    flyer_pool_section = (
+        "\n\nFLYER DALEEL POOL (untuk `### Pesan Flyer 1-4`; cite verbatim "
+        "dari pool ini, BUKAN dari DALEEL POOL atas — dibatasi 11-kitab "
+        "flyer whitelist):\n\n" + _render_pool(flyer_daleel_pool)
+        if flyer_daleel_pool
+        else (
+            "\n\nFLYER DALEEL POOL: (kosong — tidak ada entri whitelist-"
+            "eligible yang cocok dengan tema acara). JANGAN synthesize 6 "
+            "slot `### Pesan Flyer 1..6`. Emit `## Pesan Flyer` H2 saja + "
+            "satu baris `_Pool flyer kosong untuk acara ini, slot dilewati._`"
+        )
+    )
+    flyer_pool_section += (
+        "\n\nFLYER ADHKAR POOL (untuk `### Pesan Flyer 5+6`; same whitelist):\n\n"
+        + _render_pool(flyer_adhkar_pool)
+        if flyer_adhkar_pool
+        else (
+            "\n\nFLYER ADHKAR POOL: (kosong — LEWATI Pesan Flyer 5 + 6 dan "
+            "tambahkan note `_Pool adhkar kosong, slot 5+6 dilewati._`)"
+        )
+    )
+
+    # ── FINAL ASSEMBLY ────────────────────────────────────────────
+    write_now = (
+        "Tulis briefing acara sekarang dalam format markdown 7 bagian "
+        "(Ringkasan Eksekutif / Kalender Hijriah Pekan Ini / Konteks & "
+        "Hikmah Acara / Poin Kunci / Strategi & Aksi Dakwah / Dalil & "
+        "Sumber / Pesan Flyer). Strategi & Aksi Dakwah adalah CONTENT KIT "
+        "8 sub-section siap-pakai (khutbah lengkap, kultum, kajian, kisah "
+        "pendek, pengajaran rumah, kreator konten, mahasiswa pack, aksi "
+        "sosial) dengan daleel pool yang ditenun inline ke setiap sub-"
+        "section — sama persis dengan format mingguan, hanya frame acara "
+        "menggantikan frame trending news."
+    )
+
+    return f"""{occasion_context}
+
+{berita_pendukung_block}
+
+DALEEL POOL (use for Section 6 Dalil & Sumber, cite 4-6 dari sini; "
+the `Citation` field is what goes in your heading):
+
+{daleel_block}{adhkar_section}{flyer_pool_section}
+
+{write_now}"""
 
 
 def _build_user_prompt(
