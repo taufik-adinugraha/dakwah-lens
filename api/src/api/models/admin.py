@@ -867,6 +867,19 @@ class Briefing(Base):
     its inline-parse path in that case.
     """
 
+    occasion_slug: Mapped[str | None] = mapped_column(String(64))
+    """Identifier for the 15th briefing track — Islamic-calendar
+    occasions (1 Muharram, Asyura, Maulid, Ramadan weekly sub-themes,
+    Hajj season, etc.). Coexists with the 14 weekly theme briefings:
+    when set, `theme_group` is `'Acara Kalender Islam'`. Slug shape:
+    `<occasion>-<hijri_year>` for single-iteration occasions
+    (`asyura-1448`, `maulid-1448`), `<occasion>-<hijri_year>-<sub>`
+    for weekly-refresh occasions (`ramadan-1448-w2`,
+    `dzulhijjah-1448-arafah`). The Sunday 05:00 WIB cron's idempotency
+    check is `SELECT 1 FROM briefings WHERE occasion_slug = ?`.
+    Catalog source: `api/data/hijri_occasions.yaml`. NULL on all
+    14-theme briefings."""
+
 
 class Bookmark(Base):
     """User-saved item (kitab citation, brief, or social post).

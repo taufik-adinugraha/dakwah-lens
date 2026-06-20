@@ -1,0 +1,272 @@
+# Islamic calendar occasions for the 15th briefing track.
+#
+# OPERATOR PLAYBOOK:
+#   - Refresh annually. Replace `confirmed: false` rows with confirmed
+#     Kemenag SKB 3-Menteri dates when the official notice is issued.
+#   - The 14-day lookahead window in the Sunday 05:00 WIB cron absorbs
+#     ±1-2 day rukyat drift, so approximate dates still produce timely
+#     briefings — you just may want to refine the Gregorian date if the
+#     occasion is going to fall noticeably away from the approximation.
+#   - DO NOT change `slug` once an occasion has produced a briefing in
+#     prod (the slug is the dedupe key + URL path component). Add a new
+#     entry instead.
+#
+# Schema per occasion (all required unless marked optional):
+#   slug                     — stable lowercase-dash id, used as
+#                              occasion_slug column + URL path component
+#   name                     — human-readable Indonesian label
+#   hijri_year               — Hijri year (e.g. 1448)
+#   hijri_date               — display string ("9-10 Muharram 1448 H")
+#   gregorian_date           — ISO 8601 date when the occasion lands
+#                              (use the PRIMARY day for multi-day events,
+#                              e.g. 10 Muharram for Asyura)
+#   query_template           — semantic query passed to retrieve_daleel
+#                              (mix occasion-name + key fiqh/sirah terms)
+#   include_trending_headlines  optional, default true — when true, dump
+#                              attaches top-8 last-7d headlines as
+#                              BERITA PENDUKUNG supporting evidence
+#   confirmed                — false until operator verifies vs Kemenag SKB
+#   notes                    optional — operator scratch field
+
+occasions:
+  # ────────────── 1448 H — current cycle (approx 2026-06-17 onward) ──────────────
+
+  - slug: muharram-1448
+    name: "Tahun Baru Hijriah 1448 H"
+    hijri_year: 1448
+    hijri_date: "1 Muharram 1448 H"
+    gregorian_date: 2026-06-17
+    query_template: "tahun baru hijriah muhasabah tahun hijrah Nabi Madinah amalan awal tahun"
+    include_trending_headlines: true
+    confirmed: false
+
+  - slug: asyura-1448
+    name: "Tasu'a + Asyura 1448 H"
+    hijri_year: 1448
+    hijri_date: "9-10 Muharram 1448 H"
+    gregorian_date: 2026-06-26
+    query_template: "puasa Asyura Tasu'a kafarat dosa setahun sirah Nabi Musa Firaun selamat hijrah"
+    include_trending_headlines: false
+    confirmed: false
+
+  - slug: maulid-1448
+    name: "Maulid Nabi 1448 H"
+    hijri_year: 1448
+    hijri_date: "12 Rabi'ul Awwal 1448 H"
+    gregorian_date: 2026-08-27
+    query_template: "maulid Nabi Muhammad sirah akhlak teladan shalawat sirah nabawiyah"
+    include_trending_headlines: false
+    confirmed: false
+
+  - slug: isra-miraj-1448
+    name: "Isra' Mi'raj 1448 H"
+    hijri_year: 1448
+    hijri_date: "27 Rajab 1448 H"
+    gregorian_date: 2027-01-09
+    query_template: "isra mi'raj Nabi Muhammad perjalanan malam Masjidil Aqsa shalat lima waktu"
+    include_trending_headlines: false
+    confirmed: false
+
+  - slug: nisfu-syaban-1448
+    name: "Nisfu Sya'ban 1448 H"
+    hijri_year: 1448
+    hijri_date: "15 Sya'ban 1448 H"
+    gregorian_date: 2027-01-27
+    query_template: "nisfu sya'ban malam pengampunan doa istighfar persiapan Ramadan"
+    include_trending_headlines: false
+    confirmed: false
+
+  # Ramadan 1448 — weekly refresh (5 iterations)
+
+  - slug: ramadan-1448-pre
+    name: "Pra-Ramadan 1448 H"
+    hijri_year: 1448
+    hijri_date: "Pra-1 Ramadan 1448 H"
+    gregorian_date: 2027-02-01
+    query_template: "persiapan Ramadan niat shaum target ibadah qiyamul lail tarawih marhaban"
+    include_trending_headlines: true
+    confirmed: false
+
+  - slug: ramadan-1448-w1
+    name: "Ramadan 1448 H — Pekan 1: Fundamental Puasa"
+    hijri_year: 1448
+    hijri_date: "1-7 Ramadan 1448 H"
+    gregorian_date: 2027-02-12
+    query_template: "shaum Ramadan rukun puasa niat sahur berbuka fiqih puasa Hari Raya"
+    include_trending_headlines: true
+    confirmed: false
+
+  - slug: ramadan-1448-w2
+    name: "Ramadan 1448 H — Pekan 2: Ihsan & Sedekah"
+    hijri_year: 1448
+    hijri_date: "8-14 Ramadan 1448 H"
+    gregorian_date: 2027-02-19
+    query_template: "ihsan Ramadan sedekah zakat fitrah amalan-amalan pertengahan Ramadan"
+    include_trending_headlines: true
+    confirmed: false
+
+  - slug: ramadan-1448-w3
+    name: "Ramadan 1448 H — Pekan 3: Lailatul Qadr"
+    hijri_year: 1448
+    hijri_date: "15-21 Ramadan 1448 H"
+    gregorian_date: 2027-02-26
+    query_template: "Lailatul Qadr i'tikaf 10 hari terakhir Ramadan doa malam mulia"
+    include_trending_headlines: false
+    confirmed: false
+
+  - slug: ramadan-1448-eid
+    name: "Idul Fitri 1448 H + 6 Syawwal"
+    hijri_year: 1448
+    hijri_date: "1 Syawwal + 2-7 Syawwal 1448 H"
+    gregorian_date: 2027-03-14
+    query_template: "idul fitri takbir hari kemenangan puasa enam Syawwal silaturahmi halal bi halal"
+    include_trending_headlines: true
+    confirmed: false
+
+  # 10 Dzulhijjah + Idul Adha + Tasyriq 1448 — weekly refresh (3 iterations)
+
+  - slug: dzulhijjah-1448-pre
+    name: "10 Hari Pertama Dzulhijjah 1448 H"
+    hijri_year: 1448
+    hijri_date: "1-7 Dzulhijjah 1448 H"
+    gregorian_date: 2027-05-12
+    query_template: "10 hari Dzulhijjah amalan paling utama dzikir tahlil takbir tahmid puasa sunnah"
+    include_trending_headlines: false
+    confirmed: false
+
+  - slug: dzulhijjah-1448-arafah
+    name: "Wukuf Arafah + Idul Adha + Tasyriq 1448 H"
+    hijri_year: 1448
+    hijri_date: "9-13 Dzulhijjah 1448 H"
+    gregorian_date: 2027-05-20
+    query_template: "wukuf Arafah puasa Arafah idul adha kurban hari tasyriq haji sirah"
+    include_trending_headlines: true
+    confirmed: false
+
+  - slug: dzulhijjah-1448-post
+    name: "Pasca-Tasyriq 1448 H — Refleksi Haji"
+    hijri_year: 1448
+    hijri_date: "14 Dzulhijjah - akhir bulan 1448 H"
+    gregorian_date: 2027-05-27
+    query_template: "pasca haji muhasabah haji mabrur tindak lanjut amal hijrah ke kebaikan"
+    include_trending_headlines: true
+    confirmed: false
+
+  # ────────────── 1449 H — next cycle (approx 2027-06-06 onward) ──────────────
+
+  - slug: muharram-1449
+    name: "Tahun Baru Hijriah 1449 H"
+    hijri_year: 1449
+    hijri_date: "1 Muharram 1449 H"
+    gregorian_date: 2027-06-06
+    query_template: "tahun baru hijriah muhasabah tahun hijrah Nabi Madinah amalan awal tahun"
+    include_trending_headlines: true
+    confirmed: false
+
+  - slug: asyura-1449
+    name: "Tasu'a + Asyura 1449 H"
+    hijri_year: 1449
+    hijri_date: "9-10 Muharram 1449 H"
+    gregorian_date: 2027-06-15
+    query_template: "puasa Asyura Tasu'a kafarat dosa setahun sirah Nabi Musa Firaun selamat hijrah"
+    include_trending_headlines: false
+    confirmed: false
+
+  - slug: maulid-1449
+    name: "Maulid Nabi 1449 H"
+    hijri_year: 1449
+    hijri_date: "12 Rabi'ul Awwal 1449 H"
+    gregorian_date: 2027-08-16
+    query_template: "maulid Nabi Muhammad sirah akhlak teladan shalawat sirah nabawiyah"
+    include_trending_headlines: false
+    confirmed: false
+
+  - slug: isra-miraj-1449
+    name: "Isra' Mi'raj 1449 H"
+    hijri_year: 1449
+    hijri_date: "27 Rajab 1449 H"
+    gregorian_date: 2027-12-30
+    query_template: "isra mi'raj Nabi Muhammad perjalanan malam Masjidil Aqsa shalat lima waktu"
+    include_trending_headlines: false
+    confirmed: false
+
+  - slug: nisfu-syaban-1449
+    name: "Nisfu Sya'ban 1449 H"
+    hijri_year: 1449
+    hijri_date: "15 Sya'ban 1449 H"
+    gregorian_date: 2028-01-17
+    query_template: "nisfu sya'ban malam pengampunan doa istighfar persiapan Ramadan"
+    include_trending_headlines: false
+    confirmed: false
+
+  - slug: ramadan-1449-pre
+    name: "Pra-Ramadan 1449 H"
+    hijri_year: 1449
+    hijri_date: "Pra-1 Ramadan 1449 H"
+    gregorian_date: 2028-01-22
+    query_template: "persiapan Ramadan niat shaum target ibadah qiyamul lail tarawih marhaban"
+    include_trending_headlines: true
+    confirmed: false
+
+  - slug: ramadan-1449-w1
+    name: "Ramadan 1449 H — Pekan 1: Fundamental Puasa"
+    hijri_year: 1449
+    hijri_date: "1-7 Ramadan 1449 H"
+    gregorian_date: 2028-02-02
+    query_template: "shaum Ramadan rukun puasa niat sahur berbuka fiqih puasa Hari Raya"
+    include_trending_headlines: true
+    confirmed: false
+
+  - slug: ramadan-1449-w2
+    name: "Ramadan 1449 H — Pekan 2: Ihsan & Sedekah"
+    hijri_year: 1449
+    hijri_date: "8-14 Ramadan 1449 H"
+    gregorian_date: 2028-02-09
+    query_template: "ihsan Ramadan sedekah zakat fitrah amalan-amalan pertengahan Ramadan"
+    include_trending_headlines: true
+    confirmed: false
+
+  - slug: ramadan-1449-w3
+    name: "Ramadan 1449 H — Pekan 3: Lailatul Qadr"
+    hijri_year: 1449
+    hijri_date: "15-21 Ramadan 1449 H"
+    gregorian_date: 2028-02-16
+    query_template: "Lailatul Qadr i'tikaf 10 hari terakhir Ramadan doa malam mulia"
+    include_trending_headlines: false
+    confirmed: false
+
+  - slug: ramadan-1449-eid
+    name: "Idul Fitri 1449 H + 6 Syawwal"
+    hijri_year: 1449
+    hijri_date: "1 Syawwal + 2-7 Syawwal 1449 H"
+    gregorian_date: 2028-03-03
+    query_template: "idul fitri takbir hari kemenangan puasa enam Syawwal silaturahmi halal bi halal"
+    include_trending_headlines: true
+    confirmed: false
+
+  - slug: dzulhijjah-1449-pre
+    name: "10 Hari Pertama Dzulhijjah 1449 H"
+    hijri_year: 1449
+    hijri_date: "1-7 Dzulhijjah 1449 H"
+    gregorian_date: 2028-04-30
+    query_template: "10 hari Dzulhijjah amalan paling utama dzikir tahlil takbir tahmid puasa sunnah"
+    include_trending_headlines: false
+    confirmed: false
+
+  - slug: dzulhijjah-1449-arafah
+    name: "Wukuf Arafah + Idul Adha + Tasyriq 1449 H"
+    hijri_year: 1449
+    hijri_date: "9-13 Dzulhijjah 1449 H"
+    gregorian_date: 2028-05-08
+    query_template: "wukuf Arafah puasa Arafah idul adha kurban hari tasyriq haji sirah"
+    include_trending_headlines: true
+    confirmed: false
+
+  - slug: dzulhijjah-1449-post
+    name: "Pasca-Tasyriq 1449 H — Refleksi Haji"
+    hijri_year: 1449
+    hijri_date: "14 Dzulhijjah - akhir bulan 1449 H"
+    gregorian_date: 2028-05-15
+    query_template: "pasca haji muhasabah haji mabrur tindak lanjut amal hijrah ke kebaikan"
+    include_trending_headlines: true
+    confirmed: false
