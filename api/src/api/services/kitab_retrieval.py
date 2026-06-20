@@ -543,6 +543,56 @@ def _normalize_surah_name(name: str) -> str:
     return re.sub(r"[\s'\-]+", "", name).lower()
 
 
+def retrieve_occasion_daleel(
+    occasion_slug: str,
+    *,
+    limit: int = 12,
+    per_corpus: int = 4,
+) -> list[dict[str, Any]]:
+    """Retrieve daleel for an Islamic-calendar occasion (15th briefing
+    track). Wraps the standard ``retrieve_daleel`` with the occasion's
+    ``query_template`` from ``api/catalogs/hijri_occasions.yaml``.
+
+    Returns the same hit shape as ``retrieve_daleel`` so the rest of
+    the briefing pipeline (briefing.py prompt assembly,
+    validate_briefing.scan_flyer_dalil_in_pool, manual_briefing save
+    path) consume it without changes.
+
+    Defaults are slightly more generous than ``retrieve_daleel`` (12
+    vs 5) because occasion briefings need more breadth: the composer
+    has to anchor sirah background + fiqh significance + supporting
+    headlines, often across multiple kitab. Caller can still pass
+    ``limit`` to override.
+
+    Args:
+      occasion_slug: stable slug from the catalog YAML
+        (e.g. ``"asyura-1448"``, ``"ramadan-1448-w2"``).
+      limit: max hits returned across all corpora after merge.
+      per_corpus: how many hits to fetch from each corpus before merging.
+
+    Returns: list of normalized hit dicts. Empty list if the slug is
+    unknown, the query template is empty, or no candidate clears
+    MIN_SCORE in any corpus.
+    """
+    from api.services.occasion_catalog import get_by_slug
+
+    entry = get_by_slug(occasion_slug)
+    if entry is None:
+        log.warning(
+            "kitab_retrieval.occasion_unknown_slug",
+            slug=occasion_slug,
+        )
+        return []
+    query = (entry.query_template or "").strip()
+    if not query:
+        log.warning(
+            "kitab_retrieval.occasion_empty_query",
+            slug=occasion_slug,
+        )
+        return []
+    return retrieve_daleel(query, limit=limit, per_corpus=per_corpus)
+
+
 def retrieve_by_citation(citation: str) -> dict[str, Any] | None:
     """Fetch a specific Qdrant chunk by its human-readable citation.
 
