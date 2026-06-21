@@ -69,6 +69,7 @@ class BriefingWarning(TypedDict, total=False):
         "flyer_headline_missing_or_generic",
         "flyer_independence_violation",
         "news_paraphrase_fabrication",
+        "occasion_section_malformed",
     ]
     severity: Literal["low", "medium", "high"]
     where: str  # human-readable locator, e.g. "Pesan Flyer 2"
@@ -1339,6 +1340,133 @@ def scan_flyer_section_structure(markdown: str) -> list[BriefingWarning]:
     return warnings
 
 
+_OCCASION_KALENDER_H2_RE = re.compile(
+    r"^##\s+Kalender\s+Hijriah\s+Pekan\s+Ini\b",
+    re.MULTILINE | re.IGNORECASE,
+)
+_OCCASION_KONTEKS_H2_RE = re.compile(
+    r"^##\s+Konteks\s+&\s+Hikmah\s+Acara\b",
+    re.MULTILINE | re.IGNORECASE,
+)
+_WEEKLY_NUMERIK_H2_RE = re.compile(
+    r"^##\s+Numerik\s+&\s+Tren(\s+Pekan\s+Ini)?\b",
+    re.MULTILINE | re.IGNORECASE,
+)
+_WEEKLY_TEMA_H2_RE = re.compile(
+    r"^##\s+Tema\s+Utama(\s+&\s+Pola)?",
+    re.MULTILINE | re.IGNORECASE,
+)
+
+
+def scan_occasion_section_structure(markdown: str) -> list[BriefingWarning]:
+    """Structural validator for the 15th-track Islamic-calendar
+    briefings. Confirms an occasion briefing has Sections 2+3 renamed
+    to the occasion-mode H2 markers and has NOT drifted to the weekly
+    template.
+
+    AUTODETECTION: returns [] (no findings) when the markdown does not
+    look like an occasion briefing. Heuristic: presence of EITHER
+    `## Kalender Hijriah Pekan Ini` OR `## Konteks & Hikmah Acara`
+    anchors the document as occasion mode; absence of both means this
+    is a weekly briefing — skip occasion checks.
+
+    Failure modes caught:
+      (a) Only ONE of the two occasion H2s is present (composer wrote
+          one and forgot the other — partial drift)
+      (b) Occasion briefing also has `## Numerik & Tren ...` H2 —
+          composer drifted to the weekly template midway
+      (c) Occasion briefing also has `## Tema Utama & Pola ...` H2 —
+          same drift signal
+
+    All findings are severity=high because shipping an occasion
+    briefing with the wrong section structure breaks the web renderer
+    layout AND the deliverables downstream reference the wrong Section
+    numbers (Poin Kunci's `**Dalil:**` etc.).
+    """
+    warnings: list[BriefingWarning] = []
+    kalender = _OCCASION_KALENDER_H2_RE.search(markdown)
+    konteks = _OCCASION_KONTEKS_H2_RE.search(markdown)
+
+    # Autodetect: if neither marker present, this isn't an occasion
+    # briefing — skip.
+    if not kalender and not konteks:
+        return warnings
+
+    # Partial drift: only one of the two H2s present.
+    if kalender and not konteks:
+        warnings.append(
+            {
+                "kind": "occasion_section_malformed",
+                "severity": "high",
+                "where": "## Konteks & Hikmah Acara",
+                "message": (
+                    "Occasion briefing has `## Kalender Hijriah Pekan Ini` "
+                    "but is MISSING `## Konteks & Hikmah Acara`. Section 3 "
+                    "is mandatory in occasion mode — without it the briefing "
+                    "lacks sirah/fiqh background and the deliverables in "
+                    "Section 5 have no narrative scaffolding to draw from."
+                ),
+            }
+        )
+    if konteks and not kalender:
+        warnings.append(
+            {
+                "kind": "occasion_section_malformed",
+                "severity": "high",
+                "where": "## Kalender Hijriah Pekan Ini",
+                "message": (
+                    "Occasion briefing has `## Konteks & Hikmah Acara` "
+                    "but is MISSING `## Kalender Hijriah Pekan Ini`. "
+                    "Section 2 is mandatory in occasion mode — readers need "
+                    "the Hijri-date countdown + adjacent sunnah dates "
+                    "before the contextual narrative."
+                ),
+            }
+        )
+
+    # Drift to weekly template: occasion briefing must NOT carry the
+    # weekly Section 2/3 H2s. Both signal the composer reverted to the
+    # weekly system prompt instead of OCCASION_SYSTEM_PROMPT_ID midway.
+    numerik = _WEEKLY_NUMERIK_H2_RE.search(markdown)
+    if numerik:
+        warnings.append(
+            {
+                "kind": "occasion_section_malformed",
+                "severity": "high",
+                "where": "## Numerik & Tren",
+                "message": (
+                    "Occasion briefing contains a `## Numerik & Tren ...` "
+                    "H2 — composer drifted to the WEEKLY template. "
+                    "Occasion mode replaces Section 2 with `## Kalender "
+                    "Hijriah Pekan Ini`. Remove the Numerik H2 + content; "
+                    "the occasion's calendar context is the right Section "
+                    "2 (countdown + adjacent sunnah dates, not stats)."
+                ),
+            }
+        )
+
+    tema = _WEEKLY_TEMA_H2_RE.search(markdown)
+    if tema:
+        warnings.append(
+            {
+                "kind": "occasion_section_malformed",
+                "severity": "high",
+                "where": "## Tema Utama",
+                "message": (
+                    "Occasion briefing contains a `## Tema Utama ...` H2 "
+                    "— composer drifted to the WEEKLY template. Occasion "
+                    "mode replaces Section 3 with `## Konteks & Hikmah "
+                    "Acara`. Remove the Tema Utama H2 + content; the "
+                    "occasion's sirah/fiqh/hikmah narrative is the right "
+                    "Section 3 (with daleel inline + supporting news "
+                    "tucked in as qualitative ammunition only)."
+                ),
+            }
+        )
+
+    return warnings
+
+
 def scan_flyer_dalil_in_pool(
     markdown: str,
     daleel_pool: list[dict[str, Any]] | None = None,
@@ -2059,6 +2187,7 @@ def validate_briefing(
         (scan_flyer_outlet_handle, "flyer_outlet_handle_check_failed"),
         (scan_flyer_headline_quality, "flyer_headline_quality_check_failed"),
         (scan_flyer_independence, "flyer_independence_check_failed"),
+        (scan_occasion_section_structure, "occasion_section_structure_check_failed"),
     ):
         try:
             warnings.extend(fn(markdown))
