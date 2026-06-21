@@ -505,6 +505,39 @@ def generate_briefings() -> dict[str, object]:
         return {"error": "generate_failed"}
 
 
+@celery_app.task(name="api.workers.ingest.generate_occasion_briefings")
+def generate_occasion_briefings() -> dict[str, object]:
+    """Generate 15th-track Islamic-calendar briefings — one per
+    upcoming occasion (next 14 days) that hasn't been generated yet.
+
+    Catalog source: api/src/api/catalogs/hijri_occasions.yaml.
+    Idempotent: each generate_occasion_briefing() does a per-slug
+    DB existence check before composing.
+
+    Runs Sunday 05:00 WIB (aligned with the existing weekly briefings
+    schedule). Cost: ~$0.50 per occasion × ~1-2 fires per week ≈
+    ~$10/year, well within the IDR 1.5-2M monthly cap.
+
+    Kill-switch: this task respects `is_task_enabled
+    ('generate_occasion_briefings', 'all')` so the operator can stop
+    auto-spend without redeploying.
+
+    Returns a dict shaped like:
+        {"scanned": N, "fired": M, "skipped_existing": K,
+         "results": {slug: True/False/None}}
+    """
+    if not is_task_enabled("generate_occasion_briefings", "all"):
+        log.info("pipeline.disabled", task="generate_occasion_briefings")
+        return {"disabled": True}
+
+    try:
+        result = asyncio.run(briefing.generate_all_occasion_briefings())
+        return result
+    except Exception:
+        log.exception("briefing.occasion_cron_top_level_failed")
+        return {"error": "generate_failed"}
+
+
 @celery_app.task(name="api.workers.ingest.retry_failed_sentiment")
 def retry_failed_sentiment() -> dict[str, int]:
     """Re-classify posts whose sentiment label is NULL.

@@ -212,6 +212,31 @@ celery_app.conf.update(
         #     # day_of_week=4 = Thursday in Celery's crontab (Sun=0).
         #     "schedule": crontab(minute=0, hour=5, day_of_week=4),
         # },
+        # 15th-track Islamic-calendar briefings — DISABLED by default,
+        # same as the weekly briefings cron above. Re-enable when the
+        # operator is ready to let the Sunday 05:00 WIB cron auto-fire
+        # Gemini 2.5 Pro for the next 14-day occasion window.
+        #
+        # Catalog: api/src/api/catalogs/hijri_occasions.yaml (26 entries
+        # across Hijri years 1448 + 1449). Cost: ~$0.50 per occasion ×
+        # ~14-18 fires per year ≈ ~$10/year — well inside the IDR
+        # 1.5-2M monthly cap.
+        #
+        # Manual pipeline (always available; no cron needed):
+        #   uv run python -m api.scripts.manual_briefing list-occasions
+        #   uv run python -m api.scripts.manual_briefing dump-occasion <slug>
+        #   # paste into Claude → save reply as /tmp/r.md
+        #   uv run python -m api.scripts.manual_briefing save-occasion <slug> /tmp/r.md
+        #
+        # Kill-switch (admin panel): `is_task_enabled
+        # ('generate_occasion_briefings', 'all')` — flip OFF without
+        # redeploying.
+        #
+        # "generate-occasion-briefings": {
+        #     "task": "api.workers.ingest.generate_occasion_briefings",
+        #     # day_of_week=0 = Sunday in Celery's crontab.
+        #     "schedule": crontab(minute=0, hour=5, day_of_week=0),
+        # },
         # Weekly email digest — DISABLED 2026-06-05 while the 9-PRD
         # categories retirement reshapes the digest body. Re-enable by
         # uncommenting once the new topic-driven pill rows have been

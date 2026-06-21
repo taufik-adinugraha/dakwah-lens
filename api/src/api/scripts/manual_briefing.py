@@ -58,7 +58,7 @@ import argparse
 import asyncio
 import json
 import sys
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -989,6 +989,458 @@ async def cmd_clear(assume_yes: bool) -> None:
 
 
 # ──────────────────────────────────────────────────────────────────
+# Subcommands: dump-occasion / save-occasion / list-occasions
+# (15th-track Islamic-calendar briefings — sibling to dump/save above)
+# ──────────────────────────────────────────────────────────────────
+
+
+async def _prepare_occasion_context(
+    slug: str,
+) -> tuple[
+    Any,  # OccasionEntry
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    str,
+    str,
+]:
+    """Data-prep half of the occasion-mode pipeline (everything BEFORE
+    Claude composes). Mirrors `_prepare_context` for the 14-theme path.
+
+    Returns: (entry, daleel, adhkar, flyer_daleel_pool,
+              flyer_adhkar_pool, trending_headlines, system_prompt,
+              user_prompt). All Indonesian (v0 occasion track is ID-only).
+    """
+    from datetime import date as _date
+
+    from api.services.briefing import (
+        OCCASION_SYSTEM_PROMPT_ID,
+        _build_occasion_user_prompt,
+    )
+    from api.services.kitab_retrieval import (
+        FLYER_ALLOWED_CORPORA,
+        retrieve_dua,
+        retrieve_occasion_daleel,
+    )
+    from api.services.occasion_catalog import get_by_slug
+    from api.services.trending_headlines import fetch_trending_headlines
+
+    entry = get_by_slug(slug)
+    if entry is None:
+        raise SystemExit(
+            f"Unknown occasion slug '{slug}'. "
+            "Run `list-occasions` to see upcoming entries from "
+            "api/src/api/catalogs/hijri_occasions.yaml."
+        )
+
+    # Thematic daleel pool — semantic search on YAML query_template.
+    candidates = retrieve_occasion_daleel(slug, limit=24, per_corpus=4)
+    # Cache ID translations (same path the weekly briefings use).
+    async with SessionLocal() as session:
+        from api.services.hadith_translation import enrich_daleel_translations
+
+        daleel = await enrich_daleel_translations(session, candidates)
+
+        # Adhkar pool — du'a/dzikir biased query for Flyer 5+6 slots.
+        # Reuse retrieve_dua with the occasion's query_template + name
+        # as the Hijri context so the embedding lands near seasonal du'a.
+        dua_candidates = retrieve_dua(
+            entry.query_template,
+            hijri_context=entry.hijri_date,
+            limit=15,
+            per_corpus=4,
+        )
+        # No rerank — retrieve_dua already biases the embedding.
+        adhkar = await enrich_daleel_translations(session, dua_candidates)
+
+        # Trending headlines as supporting evidence, only when the
+        # catalog opted in.
+        if entry.include_trending_headlines:
+            trending = await fetch_trending_headlines(
+                session, limit=8, period_days=7
+            )
+        else:
+            trending = []
+
+    # Flyer-pool filter: 11-kitab whitelist subset of daleel + adhkar.
+    flyer_allowed = set(FLYER_ALLOWED_CORPORA)
+    flyer_daleel_pool = [d for d in (daleel or []) if d.get("corpus") in flyer_allowed]
+    flyer_adhkar_pool = [a for a in (adhkar or []) if a.get("corpus") in flyer_allowed]
+
+    log.info(
+        "manual_briefing.occasion_context_ready",
+        slug=slug,
+        daleel_count=len(daleel),
+        adhkar_count=len(adhkar),
+        flyer_daleel=len(flyer_daleel_pool),
+        flyer_adhkar=len(flyer_adhkar_pool),
+        trending=len(trending),
+        gregorian=entry.gregorian_date.isoformat(),
+    )
+
+    user_prompt = _build_occasion_user_prompt(
+        entry,
+        today_gregorian=_date.today(),
+        daleel=daleel,
+        adhkar=adhkar,
+        flyer_daleel_pool=flyer_daleel_pool,
+        flyer_adhkar_pool=flyer_adhkar_pool,
+        trending_headlines=trending,
+        language="id",
+    )
+    return (
+        entry,
+        daleel,
+        adhkar,
+        flyer_daleel_pool,
+        flyer_adhkar_pool,
+        trending,
+        OCCASION_SYSTEM_PROMPT_ID,
+        user_prompt,
+    )
+
+
+async def cmd_dump_occasion(slug: str, output_path: str | None) -> None:
+    """Compute occasion-mode pool + prompt, write cache, emit prompt."""
+    (
+        entry,
+        daleel,
+        adhkar,
+        flyer_daleel_pool,
+        flyer_adhkar_pool,
+        trending,
+        system_prompt,
+        user_prompt,
+    ) = await _prepare_occasion_context(slug)
+
+    cache_path = _cache_path(slug)
+    cache_path.write_text(
+        json.dumps(
+            {
+                "mode": "occasion",
+                "occasion_slug": slug,
+                "entry": {
+                    "slug": entry.slug,
+                    "name": entry.name,
+                    "hijri_year": entry.hijri_year,
+                    "hijri_date": entry.hijri_date,
+                    "gregorian_date": entry.gregorian_date.isoformat(),
+                    "query_template": entry.query_template,
+                    "include_trending_headlines": entry.include_trending_headlines,
+                    "confirmed": entry.confirmed,
+                    "notes": entry.notes,
+                },
+                "daleel": daleel,
+                "adhkar": adhkar,
+                "flyer_daleel_pool": flyer_daleel_pool,
+                "flyer_adhkar_pool": flyer_adhkar_pool,
+                "trending_headlines": trending,
+                "dumped_at_utc": datetime.now(UTC).isoformat(),
+            },
+            indent=2,
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    composed = (
+        f"<!-- DAKWAH-LENS MANUAL OCCASION BRIEFING PROMPT -->\n"
+        f"<!-- occasion: {entry.name} ({entry.slug})  "
+        f"gregorian: {entry.gregorian_date}  "
+        f"dumped: {datetime.now(UTC).isoformat()} -->\n"
+        f"<!-- daleel pool: {len(daleel)} entries · adhkar pool: "
+        f"{len(adhkar)} entries · trending headlines: {len(trending)} -->\n"
+        f"<!-- After Claude responds, save the reply as a .md file and run: -->\n"
+        f"<!--   uv run python -m api.scripts.manual_briefing save-occasion "
+        f"{slug} <reply.md> -->\n\n"
+        "================================================================\n"
+        "SYSTEM INSTRUCTION (occasion-mode persona + 7-section structure)\n"
+        "================================================================\n\n"
+        f"{system_prompt}\n\n"
+        "================================================================\n"
+        "USER PROMPT (occasion context + daleel pool + supporting headlines)\n"
+        "================================================================\n\n"
+        f"{user_prompt}\n"
+    )
+
+    if output_path:
+        Path(output_path).write_text(composed, encoding="utf-8")
+        sys.stderr.write(
+            f"✓ Occasion prompt written to {output_path} "
+            f"({len(composed):,} chars).\n"
+            f"  Cache: {cache_path}\n"
+            f"  Next: paste {output_path} into Claude → save reply → "
+            f"`save-occasion {slug} <reply.md>`.\n",
+        )
+    else:
+        sys.stdout.write(composed)
+        sys.stderr.write(
+            f"\n[stderr] Occasion cache: {cache_path}\n"
+            f"[stderr] Next: pipe Claude's reply into "
+            f"`save-occasion {slug} <file.md>`\n",
+        )
+
+
+async def cmd_save_occasion(slug: str, markdown_path: str) -> None:
+    """Persist Claude's reply for an occasion briefing.
+
+    Same validator chain as the weekly save path — the new
+    `scan_occasion_section_structure` validator fires automatically
+    via `validate_briefing()`. Hard-fails on any `high` severity
+    `occasion_section_malformed` warning (composer drifted to weekly
+    template). Flyer pool refetch + independence + headline checks
+    apply unchanged.
+    """
+    from api.models.admin import Briefing
+    from api.services.occasion_catalog import get_by_slug
+    from api.services.validate_briefing import (
+        format_warnings_for_stderr,
+        validate_briefing,
+    )
+
+    entry = get_by_slug(slug)
+    if entry is None:
+        raise SystemExit(
+            f"Unknown occasion slug '{slug}'. "
+            "Add it to api/src/api/catalogs/hijri_occasions.yaml first."
+        )
+
+    cache_path = _cache_path(slug)
+    if not cache_path.exists():
+        sys.stderr.write(
+            f"⚠ Occasion cache for '{slug}' missing at {cache_path}\n"
+            f"  → Auto-redumping (likely a container restart wiped the cache).\n"
+            f"  → If citation mismatches appear, the daleel pool may have\n"
+            f"    drifted since the briefing was composed; refetch will\n"
+            f"    top up at save time when possible.\n"
+        )
+        await cmd_dump_occasion(slug, None)
+        if not cache_path.exists():
+            raise SystemExit(
+                f"Auto-redump failed to create cache at {cache_path}. "
+                f"Run `dump-occasion {slug}` manually and check logs."
+            )
+
+    md_path = Path(markdown_path)
+    if not md_path.exists():
+        raise SystemExit(f"Markdown file not found: {markdown_path}")
+    summary_md = md_path.read_text(encoding="utf-8").strip()
+    if not summary_md or len(summary_md) < 1500:
+        raise SystemExit(
+            f"Occasion briefing markdown looks empty or truncated "
+            f"({len(summary_md):,} chars). Aborting save."
+        )
+
+    cached = json.loads(cache_path.read_text(encoding="utf-8"))
+    daleel: list[dict[str, Any]] = cached["daleel"]
+    adhkar: list[dict[str, Any]] = cached.get("adhkar", [])
+    flyer_daleel = cached.get("flyer_daleel_pool") or []
+    flyer_adhkar = cached.get("flyer_adhkar_pool") or []
+
+    # Run the standard validator chain. Occasion-mode validator fires
+    # via auto-detection on '## Kalender Hijriah' / '## Konteks & Hikmah'
+    # H2s. Flyer pool checks use the FLYER-restricted pools.
+    try:
+        heuristic_warnings = validate_briefing(
+            summary_md,
+            daleel_pool=daleel,
+            adhkar_pool=adhkar,
+            flyer_daleel_pool=flyer_daleel,
+            flyer_adhkar_pool=flyer_adhkar,
+            llm_judgments=False,
+        )
+    except Exception as exc:
+        sys.stderr.write(f"⚠ Validation pass failed (non-fatal): {exc}\n")
+        heuristic_warnings = []
+
+    # HARD-FAIL on occasion structural drift (composer reverted to
+    # weekly template midway, partial drift, etc.).
+    occ_struct_high = [
+        w
+        for w in heuristic_warnings
+        if w.get("kind") == "occasion_section_malformed"
+        and w.get("severity") == "high"
+    ]
+    if occ_struct_high:
+        sys.stderr.write(
+            "\n✗ SAVE BLOCKED — occasion briefing has structural drift "
+            "between weekly + occasion templates:\n\n"
+        )
+        for w in occ_struct_high:
+            sys.stderr.write(f"  · {w['where']}: {w['message']}\n")
+        sys.stderr.write(
+            "\n  Fix the markdown (rename H2s to occasion-mode names + "
+            "remove any '## Numerik & Tren' / '## Tema Utama' sections "
+            "the composer left behind), then re-run save-occasion.\n"
+            "  Save aborted. No row written.\n"
+        )
+        raise SystemExit(1)
+
+    # Reuse the same flyer pool + headline + structure hard-fails the
+    # weekly save path enforces.
+    pool_warnings = [
+        w
+        for w in heuristic_warnings
+        if w.get("kind") == "flyer_dalil_not_in_pool"
+    ]
+    if pool_warnings:
+        # Try refetch-by-citation top-up before failing.
+        from api.services.kitab_retrieval import retrieve_by_citation
+
+        refetched_d: list[dict[str, Any]] = []
+        refetched_a: list[dict[str, Any]] = []
+        unresolved: list[dict[str, Any]] = []
+        for w in pool_warnings:
+            citation = (w.get("current_citation") or "").strip()
+            flyer_idx = w.get("flyer_index")
+            if not citation:
+                unresolved.append(w)
+                continue
+            hit = retrieve_by_citation(citation)
+            if hit is None:
+                unresolved.append(w)
+                continue
+            if isinstance(flyer_idx, int) and flyer_idx in (4, 5):
+                refetched_a.append(hit)
+            else:
+                refetched_d.append(hit)
+        if refetched_d or refetched_a:
+            existing_d = {d.get("citation", "") for d in daleel}
+            existing_a = {d.get("citation", "") for d in adhkar}
+            added_d = [h for h in refetched_d if h["citation"] not in existing_d]
+            added_a = [h for h in refetched_a if h["citation"] not in existing_a]
+            daleel = daleel + added_d
+            adhkar = adhkar + added_a
+            sys.stderr.write(
+                f"\n↻ Refetched {len(added_d)} daleel + {len(added_a)} "
+                f"adhkar by exact citation. Re-running pool validation.\n"
+            )
+            heuristic_warnings = validate_briefing(
+                summary_md,
+                daleel_pool=daleel,
+                adhkar_pool=adhkar,
+                flyer_daleel_pool=flyer_daleel,
+                flyer_adhkar_pool=flyer_adhkar,
+                llm_judgments=False,
+            )
+            pool_warnings = [
+                w
+                for w in heuristic_warnings
+                if w.get("kind") == "flyer_dalil_not_in_pool"
+            ]
+            unresolved = pool_warnings
+        if unresolved:
+            sys.stderr.write(
+                "\n✗ SAVE BLOCKED — flyer Dalil markers don't resolve in "
+                "pool AND couldn't be refetched.\n\n"
+            )
+            for w in unresolved:
+                sys.stderr.write(f"  · {w['where']}: {w['message']}\n")
+            raise SystemExit(1)
+
+    # Flyer independence hard-fail (same rule as weekly).
+    independence_warnings = [
+        w
+        for w in heuristic_warnings
+        if w.get("kind") == "flyer_independence_violation"
+    ]
+    if independence_warnings:
+        sys.stderr.write(
+            "\n✗ SAVE BLOCKED — Pesan Flyer body references another "
+            "deliverable / uses staged-narrator framing:\n\n"
+        )
+        for w in independence_warnings:
+            sys.stderr.write(f"  · {w['where']}: {w['message']}\n")
+        raise SystemExit(1)
+
+    # Persist. theme_group = 'Acara Kalender Islam' (15th track).
+    # period_start / period_end frame the 14-day window around the
+    # occasion's gregorian date (matches the cron's lookahead).
+    period_start = datetime.combine(
+        entry.gregorian_date - timedelta(days=14),
+        datetime.min.time(),
+    ).replace(tzinfo=UTC)
+    period_end = datetime.combine(
+        entry.gregorian_date + timedelta(days=7),
+        datetime.min.time(),
+    ).replace(tzinfo=UTC)
+
+    async with SessionLocal() as session:
+        row = Briefing(
+            generated_at=datetime.now(UTC),
+            period_start=period_start,
+            period_end=period_end,
+            summary_md=summary_md,
+            summary_md_en=None,
+            headline_stats={
+                "mode": "occasion",
+                "occasion_slug": slug,
+                "occasion_name": entry.name,
+                "hijri_year": entry.hijri_year,
+                "hijri_date": entry.hijri_date,
+                "gregorian_date": entry.gregorian_date.isoformat(),
+                "trending_headlines_used": len(cached.get("trending_headlines", [])),
+            },
+            model=MODEL_TAG,
+            tokens_in=0,
+            tokens_out=0,
+            cost_usd=0.0,
+            theme_group="Acara Kalender Islam",
+            occasion_slug=slug,
+            daleel_refs=daleel,
+            adhkar_refs=adhkar,
+        )
+        session.add(row)
+        await session.commit()
+
+    sys.stderr.write(
+        f"✓ Occasion briefing saved: {entry.name} ({slug}).\n"
+        f"  model={MODEL_TAG} (manual)\n"
+        f"  daleel_refs={len(daleel)} · adhkar_refs={len(adhkar)}\n"
+        f"  body={len(summary_md):,} chars\n"
+        f"  period={period_start.date()} → {period_end.date()}\n"
+    )
+
+    warning_report = format_warnings_for_stderr(heuristic_warnings)
+    if warning_report:
+        sys.stderr.write("\n" + warning_report + "\n")
+
+
+async def cmd_list_occasions(lookahead_days: int = 14) -> None:
+    """Print the occasion catalog entries whose Gregorian date falls
+    within the next `lookahead_days`. Operator uses this to decide
+    which occasion to dump next."""
+    from datetime import date as _date
+
+    from api.services.occasion_catalog import upcoming
+
+    upcoming_entries = upcoming(now=_date.today(), lookahead_days=lookahead_days)
+    if not upcoming_entries:
+        sys.stdout.write(
+            f"No occasions in the next {lookahead_days} days. "
+            "Catalog: api/src/api/catalogs/hijri_occasions.yaml\n"
+        )
+        return
+    sys.stdout.write(
+        f"Upcoming occasions in the next {lookahead_days} days:\n\n"
+    )
+    for o in upcoming_entries:
+        days = (o.gregorian_date - _date.today()).days
+        confirmed = "✓" if o.confirmed else "⚠ approx"
+        sys.stdout.write(
+            f"  {o.slug:<30} {o.hijri_date:<32} "
+            f"{o.gregorian_date.isoformat()} (in {days}d) [{confirmed}]\n"
+            f"  {'':<30} {o.name}\n\n"
+        )
+    sys.stdout.write(
+        "Run: uv run python -m api.scripts.manual_briefing "
+        "dump-occasion <slug>\n"
+    )
+
+
+# ──────────────────────────────────────────────────────────────────
 # Argparse + entry
 # ──────────────────────────────────────────────────────────────────
 
@@ -1040,6 +1492,55 @@ def main() -> None:
         help="Skip the typed confirmation prompt (scripted use).",
     )
 
+    # ── Occasion (15th-track Islamic-calendar briefings) ───────────
+    occasion_help = (
+        "Occasion slug from api/src/api/catalogs/hijri_occasions.yaml "
+        "(e.g. 'asyura-1448', 'ramadan-1448-w2', 'maulid-1448'). Run "
+        "`list-occasions` to see upcoming entries."
+    )
+
+    p_dump_occ = sub.add_parser(
+        "dump-occasion",
+        help=(
+            "Compute occasion daleel + supporting headlines, emit "
+            "occasion-mode prompt to feed Claude. 7-section format "
+            "(Sections 2+3 are Kalender Hijriah + Konteks & Hikmah)."
+        ),
+    )
+    p_dump_occ.add_argument("slug", help=occasion_help)
+    p_dump_occ.add_argument(
+        "--output",
+        "-o",
+        help="Write prompt to this file. Default: stdout.",
+        default=None,
+    )
+
+    p_save_occ = sub.add_parser(
+        "save-occasion",
+        help=(
+            "Persist Claude's reply as an occasion briefing (15th-track). "
+            "Hard-fails on structural drift (Sections 2+3 must be "
+            "occasion-mode H2s, no '## Numerik & Tren' / '## Tema Utama')."
+        ),
+    )
+    p_save_occ.add_argument("slug", help=occasion_help)
+    p_save_occ.add_argument("markdown_file", help="Path to Claude's reply (.md)")
+
+    p_list_occ = sub.add_parser(
+        "list-occasions",
+        help=(
+            "Show occasion catalog entries within the next 14 days "
+            "(default). Operator uses this to decide which occasion "
+            "to dump next."
+        ),
+    )
+    p_list_occ.add_argument(
+        "--days",
+        type=int,
+        default=14,
+        help="Lookahead window in days (default 14).",
+    )
+
     p_apply = sub.add_parser(
         "apply-swaps",
         help=(
@@ -1071,6 +1572,12 @@ def main() -> None:
         asyncio.run(cmd_clear(args.yes))
     elif args.cmd == "apply-swaps":
         asyncio.run(cmd_apply_swaps(args.group, args.swaps_file))
+    elif args.cmd == "dump-occasion":
+        asyncio.run(cmd_dump_occasion(args.slug, args.output))
+    elif args.cmd == "save-occasion":
+        asyncio.run(cmd_save_occasion(args.slug, args.markdown_file))
+    elif args.cmd == "list-occasions":
+        asyncio.run(cmd_list_occasions(args.days))
 
 
 if __name__ == "__main__":

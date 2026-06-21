@@ -164,6 +164,22 @@ export const THEME_GROUP_PALETTE: Readonly<Record<string, ThemeGroupTone>> = Obj
     openText: "text-orange-700 group-hover:text-orange-900",
     label: "TOLERANSI & LINTAS-IMAN",
   },
+
+  // 15th track — Islamic-calendar occasions (Asyura, Maulid, Ramadan,
+  // Hajj season, etc.). Distinct gold tone signals "this isn't a
+  // weekly news theme — it's an event-driven briefing tied to the
+  // Hijri calendar." See:
+  //   - api/src/api/catalogs/hijri_occasions.yaml (catalog)
+  //   - api/src/api/services/occasion_catalog.py (loader)
+  //   - api/src/api/services/briefing.py (OCCASION_SYSTEM_PROMPT_ID)
+  "Acara Kalender Islam": {
+    cardBorder: "border-yellow-300",
+    cardBg: "bg-gradient-to-br from-yellow-50/70 via-white to-white",
+    chipBg: "bg-yellow-100 ring-1 ring-yellow-300",
+    chipText: "text-yellow-900",
+    openText: "text-yellow-800 group-hover:text-yellow-900",
+    label: "ACARA KALENDER ISLAM",
+  },
 });
 
 /** Lookup with neutral fallback. Pass a raw `theme_group` value

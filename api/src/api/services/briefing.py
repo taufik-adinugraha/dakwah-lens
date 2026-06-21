@@ -3460,3 +3460,344 @@ async def generate_all_briefings() -> dict[str, Any]:
             ok = False
         results[group] = ok
     return results
+
+
+# ──────────────────────────────────────────────────────────────────────
+# OCCASION CRON — 15th briefing track, Sunday 05:00 WIB auto-generation
+#
+# Pairs with the manual_briefing CLI (dump-occasion / save-occasion).
+# The cron path uses Gemini 2.5 Pro to compose; the manual path uses
+# Claude in chat per [NO GEMINI FOR MANUAL]. Both share retrieve_
+# occasion_daleel + _build_occasion_user_prompt + OCCASION_SYSTEM_PROMPT_ID
+# from earlier chunks — only the LLM call differs.
+# ──────────────────────────────────────────────────────────────────────
+
+
+async def generate_occasion_briefing(slug: str) -> dict[str, Any] | None:
+    """Generate one occasion briefing end-to-end: retrieve daleel,
+    fetch supporting headlines, call Gemini 2.5 Pro with the occasion
+    system prompt, validate, persist a `briefings` row tagged with
+    `theme_group='Acara Kalender Islam'` + `occasion_slug=slug`.
+
+    Idempotent: returns None and logs `skip_already_generated` if a
+    row already exists for this `occasion_slug` (the Sunday cron's
+    safety net so re-runs within the 14d lookahead window don't
+    double-publish).
+
+    Returns the saved row's payload dict on success, None on skip /
+    failure / empty Gemini response.
+    """
+    from datetime import date as _date
+
+    from sqlalchemy import select
+
+    from api.models.admin import Briefing
+    from api.services.kitab_retrieval import (
+        FLYER_ALLOWED_CORPORA,
+        retrieve_dua,
+        retrieve_occasion_daleel,
+    )
+    from api.services.occasion_catalog import get_by_slug
+    from api.services.trending_headlines import fetch_trending_headlines
+
+    entry = get_by_slug(slug)
+    if entry is None:
+        log.warning("briefing.occasion_unknown_slug", slug=slug)
+        return None
+
+    # ── Idempotency check ─────────────────────────────────────────
+    async with SessionLocal() as session:
+        existing = (
+            await session.execute(
+                select(Briefing.id).where(Briefing.occasion_slug == slug)
+            )
+        ).scalar_one_or_none()
+        if existing is not None:
+            log.info(
+                "briefing.occasion_skip_already_generated",
+                slug=slug,
+                existing_id=str(existing),
+            )
+            return None
+
+        # ── Retrieval ─────────────────────────────────────────────
+        from api.services.hadith_translation import enrich_daleel_translations
+
+        candidates = retrieve_occasion_daleel(slug, limit=24, per_corpus=4)
+        daleel = await enrich_daleel_translations(session, candidates)
+
+        dua_candidates = retrieve_dua(
+            entry.query_template,
+            hijri_context=entry.hijri_date,
+            limit=15,
+            per_corpus=4,
+        )
+        adhkar = await enrich_daleel_translations(session, dua_candidates)
+
+        if entry.include_trending_headlines:
+            trending = await fetch_trending_headlines(
+                session, limit=8, period_days=7
+            )
+        else:
+            trending = []
+
+    flyer_allowed = set(FLYER_ALLOWED_CORPORA)
+    flyer_daleel_pool = [d for d in (daleel or []) if d.get("corpus") in flyer_allowed]
+    flyer_adhkar_pool = [a for a in (adhkar or []) if a.get("corpus") in flyer_allowed]
+
+    log.info(
+        "briefing.occasion_pool_ready",
+        slug=slug,
+        daleel=len(daleel),
+        adhkar=len(adhkar),
+        flyer_daleel=len(flyer_daleel_pool),
+        flyer_adhkar=len(flyer_adhkar_pool),
+        trending=len(trending),
+    )
+
+    user_prompt = _build_occasion_user_prompt(
+        entry,
+        today_gregorian=_date.today(),
+        daleel=daleel,
+        adhkar=adhkar,
+        flyer_daleel_pool=flyer_daleel_pool,
+        flyer_adhkar_pool=flyer_adhkar_pool,
+        trending_headlines=trending,
+        language="id",
+    )
+
+    # ── LLM call ──────────────────────────────────────────────────
+    # Gemini 2.5 Pro with OCCASION_SYSTEM_PROMPT_ID. Same safety
+    # settings + output cap as the weekly path. No KISAH POOL token
+    # substitution needed — the occasion prompt doesn't use the kisah
+    # source sentinels (Kisah Pendek sub-section in Section 5 still
+    # works the same way; the substitution is purely a label hint).
+    client = _get_client()
+    try:
+        resp = client.models.generate_content(
+            model=MODEL,
+            contents=user_prompt,
+            config=types.GenerateContentConfig(
+                system_instruction=OCCASION_SYSTEM_PROMPT_ID,
+                temperature=0.5,
+                safety_settings=_RELAXED_SAFETY,
+                max_output_tokens=49152,
+                thinking_config=types.ThinkingConfig(thinking_budget=16384),
+            ),
+        )
+    except Exception as exc:
+        log.exception(
+            "briefing.occasion_gemini_failed", slug=slug, error=str(exc)
+        )
+        return None
+
+    summary_md = (resp.text or "").strip()
+    if not summary_md:
+        log.warning("briefing.occasion_empty_response", slug=slug)
+        return None
+
+    usage_md = getattr(resp, "usage_metadata", None)
+    tokens_in = getattr(usage_md, "prompt_token_count", None)
+    tokens_out = gemini_output_tokens(usage_md)
+    cost = (
+        (tokens_in or 0) / 1_000_000 * 1.25
+        + (tokens_out or 0) / 1_000_000 * 10.00
+    )
+
+    # ── Validate ──────────────────────────────────────────────────
+    # Same scanner chain as the manual save path; refetch top-up
+    # on pool misses; hard-fail on occasion structural drift +
+    # independence violations.
+    from api.services.kitab_retrieval import retrieve_by_citation
+    from api.services.validate_briefing import validate_briefing
+
+    daleel_final = list(daleel)
+    adhkar_final = list(adhkar)
+    warnings = validate_briefing(
+        summary_md,
+        daleel_pool=daleel_final,
+        adhkar_pool=adhkar_final,
+        flyer_daleel_pool=flyer_daleel_pool,
+        flyer_adhkar_pool=flyer_adhkar_pool,
+        llm_judgments=False,
+    )
+
+    # Hard-fail: occasion structural drift.
+    occ_drift = [
+        w
+        for w in warnings
+        if w.get("kind") == "occasion_section_malformed"
+        and w.get("severity") == "high"
+    ]
+    if occ_drift:
+        log.error(
+            "briefing.occasion_structural_drift",
+            slug=slug,
+            findings=[w.get("where") for w in occ_drift],
+        )
+        return None
+
+    # Hard-fail: independence violations.
+    indep = [
+        w
+        for w in warnings
+        if w.get("kind") == "flyer_independence_violation"
+    ]
+    if indep:
+        log.error(
+            "briefing.occasion_flyer_independence_violation",
+            slug=slug,
+            count=len(indep),
+        )
+        return None
+
+    # Refetch top-up for missing flyer citations.
+    pool_warnings = [
+        w for w in warnings if w.get("kind") == "flyer_dalil_not_in_pool"
+    ]
+    if pool_warnings:
+        added_d, added_a = [], []
+        for w in pool_warnings:
+            cite = (w.get("current_citation") or "").strip()
+            if not cite:
+                continue
+            hit = retrieve_by_citation(cite)
+            if hit is None:
+                continue
+            idx = w.get("flyer_index")
+            if isinstance(idx, int) and idx in (4, 5):
+                if hit["citation"] not in {a.get("citation", "") for a in adhkar_final}:
+                    added_a.append(hit)
+            else:
+                if hit["citation"] not in {d.get("citation", "") for d in daleel_final}:
+                    added_d.append(hit)
+        daleel_final.extend(added_d)
+        adhkar_final.extend(added_a)
+        if added_d or added_a:
+            log.info(
+                "briefing.occasion_refetched",
+                slug=slug,
+                added_daleel=len(added_d),
+                added_adhkar=len(added_a),
+            )
+
+    # ── Persist ───────────────────────────────────────────────────
+    period_start = datetime.combine(
+        entry.gregorian_date - timedelta(days=14),
+        datetime.min.time(),
+    ).replace(tzinfo=UTC)
+    period_end = datetime.combine(
+        entry.gregorian_date + timedelta(days=7),
+        datetime.min.time(),
+    ).replace(tzinfo=UTC)
+
+    async with SessionLocal() as session:
+        # Re-check inside the new session — race window if two cron
+        # workers fired the same slug. Idempotent guard.
+        existing = (
+            await session.execute(
+                select(Briefing.id).where(Briefing.occasion_slug == slug)
+            )
+        ).scalar_one_or_none()
+        if existing is not None:
+            log.info(
+                "briefing.occasion_race_skip", slug=slug, existing_id=str(existing)
+            )
+            return None
+        row = Briefing(
+            generated_at=datetime.now(UTC),
+            period_start=period_start,
+            period_end=period_end,
+            summary_md=summary_md,
+            summary_md_en=None,
+            headline_stats={
+                "mode": "occasion",
+                "occasion_slug": slug,
+                "occasion_name": entry.name,
+                "hijri_year": entry.hijri_year,
+                "hijri_date": entry.hijri_date,
+                "gregorian_date": entry.gregorian_date.isoformat(),
+                "trending_headlines_used": len(trending),
+            },
+            model=MODEL,
+            tokens_in=tokens_in,
+            tokens_out=tokens_out,
+            cost_usd=cost,
+            theme_group="Acara Kalender Islam",
+            occasion_slug=slug,
+            daleel_refs=daleel_final,
+            adhkar_refs=adhkar_final,
+        )
+        session.add(row)
+        await session.commit()
+        log.info(
+            "briefing.occasion_saved",
+            slug=slug,
+            chars=len(summary_md),
+            tokens_in=tokens_in,
+            tokens_out=tokens_out,
+            cost_usd=round(cost, 4),
+        )
+    return {
+        "slug": slug,
+        "chars": len(summary_md),
+        "tokens_in": tokens_in,
+        "tokens_out": tokens_out,
+        "cost_usd": cost,
+    }
+
+
+async def generate_all_occasion_briefings(
+    lookahead_days: int = 14,
+) -> dict[str, Any]:
+    """Sunday 05:00 WIB cron entry point: scan the catalog, fire one
+    generate_occasion_briefing per upcoming occasion that hasn't been
+    generated yet.
+
+    Returns a summary dict suitable for Celery task return:
+        {
+          "scanned": N,
+          "fired": M,
+          "skipped_existing": K,
+          "results": {slug: True/False/None}  # True=saved, False=failed, None=skipped
+        }
+    """
+    from datetime import date as _date
+
+    from api.services.occasion_catalog import upcoming
+
+    upcoming_entries = upcoming(now=_date.today(), lookahead_days=lookahead_days)
+    log.info(
+        "briefing.occasion_cron_scan",
+        scanned=len(upcoming_entries),
+        lookahead_days=lookahead_days,
+    )
+    results: dict[str, bool | None] = {}
+    fired = 0
+    skipped = 0
+    for entry in upcoming_entries:
+        try:
+            payload = await generate_occasion_briefing(entry.slug)
+        except Exception as exc:
+            log.exception(
+                "briefing.occasion_cron_failed",
+                slug=entry.slug,
+                error=str(exc),
+            )
+            results[entry.slug] = False
+            continue
+        if payload is None:
+            # Either already-generated (idempotent skip) or empty/
+            # invalid response. Differentiate by re-checking DB?
+            # For now, treat both as "skipped/no-action".
+            results[entry.slug] = None
+            skipped += 1
+        else:
+            results[entry.slug] = True
+            fired += 1
+    return {
+        "scanned": len(upcoming_entries),
+        "fired": fired,
+        "skipped_existing": skipped,
+        "results": results,
+    }
