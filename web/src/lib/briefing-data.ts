@@ -619,17 +619,35 @@ export async function getBriefingBySlug(
     GROUP_BY_SLUG[raw] ?? GROUP_BY_SLUG[slugifyGroup(raw)];
 
   let group: string | undefined;
+  let occasionSlug: string | undefined;
   let dateClause = sql``;
   if (m) {
-    const [, date, groupSlug] = m;
-    group = resolveGroup(groupSlug);
-    if (!group) return null;
-    dateClause = sql`AND (generated_at AT TIME ZONE 'Asia/Jakarta')::date = ${date}::date`;
+    const [, date, tail] = m;
+    group = resolveGroup(tail);
+    if (group) {
+      dateClause = sql`AND (generated_at AT TIME ZONE 'Asia/Jakarta')::date = ${date}::date`;
+    } else {
+      // Fallback: 15th-track Islamic-calendar occasion briefings carry
+      // an occasion_slug (e.g. 'asyura-1448', 'ramadan-1448-w2') that
+      // isn't in GROUP_BY_SLUG. The URL date is the GENERATION date
+      // (when manual save fired), not the occasion's gregorian_date —
+      // so we resolve by occasion_slug + date filter.
+      occasionSlug = tail;
+      dateClause = sql`AND (generated_at AT TIME ZONE 'Asia/Jakarta')::date = ${date}::date`;
+    }
   } else {
     group = resolveGroup(slug);
-    if (!group) return null;
-    // No date clause — pick the latest briefing for this group.
+    if (!group) {
+      // Bare occasion slug — pick the latest matching row regardless
+      // of generation date.
+      occasionSlug = slug;
+    }
+    // No date clause — pick the latest briefing for this group/slug.
   }
+
+  const whereClause = occasionSlug
+    ? sql`occasion_slug = ${occasionSlug} ${dateClause}`
+    : sql`theme_group = ${group} ${dateClause}`;
 
   const [row] = await db
     .select({
@@ -645,7 +663,7 @@ export async function getBriefingBySlug(
       adhkarRefs: schema.briefings.adhkarRefs,
     })
     .from(schema.briefings)
-    .where(sql`theme_group = ${group} ${dateClause}`)
+    .where(whereClause)
     .orderBy(desc(schema.briefings.generatedAt))
     .limit(1);
   if (!row) return null;

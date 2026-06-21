@@ -1062,6 +1062,14 @@ export const briefings = pgTable(
      *  recitable du'a sourced from the existing kitab corpus. NULL
      *  on briefings written before the 2026-05-23 adhkar split. */
     adhkarRefs: jsonb("adhkar_refs").$type<DaleelRef[] | null>(),
+    /** 15th-track Islamic-calendar occasion identifier (added
+     *  2026-06-21). Set on occasion briefings ('asyura-1448',
+     *  'maulid-1448', 'ramadan-1448-w2', etc.); NULL on the 14
+     *  weekly theme briefings. Paired with theme_group='Acara
+     *  Kalender Islam'. Used as the lookup key by getBriefingBySlug
+     *  when the URL slug doesn't resolve to a known THEME_GROUPS
+     *  group. */
+    occasionSlug: text("occasion_slug"),
   },
   (table) => [
     index("ix_briefings_generated_at").on(table.generatedAt),
