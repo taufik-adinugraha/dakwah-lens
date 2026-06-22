@@ -431,6 +431,11 @@ export type LatestBriefing = {
    *  briefings written before the 2026-05-23 adhkar split. Same item
    *  schema as `daleelRefs`. */
   adhkarRefs: schema.DaleelRef[] | null;
+  /** 15th-track Islamic-calendar occasion identifier ('asyura-1448',
+   *  'maulid-1448', 'ramadan-1448-w2', etc.). NULL on the 14 weekly
+   *  theme briefings; non-null on rows where theme_group = 'Acara
+   *  Kalender Islam'. Used by briefingSlug to build the share URL. */
+  occasionSlug: string | null;
 };
 
 /** Most-recent AI-narrated executive briefing for a given group label.
@@ -458,6 +463,7 @@ export async function getLatestBriefing(
       themeGroup: schema.briefings.themeGroup,
       daleelRefs: schema.briefings.daleelRefs,
       adhkarRefs: schema.briefings.adhkarRefs,
+      occasionSlug: schema.briefings.occasionSlug,
     })
     .from(schema.briefings)
     .where(eq(schema.briefings.themeGroup, group))
@@ -471,6 +477,7 @@ export async function getLatestBriefing(
     headlineStats: row.headlineStats as LatestBriefing["headlineStats"],
     daleelRefs: (row.daleelRefs as schema.DaleelRef[] | null) ?? null,
     adhkarRefs: (row.adhkarRefs as schema.DaleelRef[] | null) ?? null,
+    occasionSlug: row.occasionSlug ?? null,
   };
 }
 
@@ -661,6 +668,7 @@ export async function getBriefingBySlug(
       themeGroup: schema.briefings.themeGroup,
       daleelRefs: schema.briefings.daleelRefs,
       adhkarRefs: schema.briefings.adhkarRefs,
+      occasionSlug: schema.briefings.occasionSlug,
     })
     .from(schema.briefings)
     .where(whereClause)
@@ -674,6 +682,7 @@ export async function getBriefingBySlug(
     headlineStats: row.headlineStats as LatestBriefing["headlineStats"],
     daleelRefs: (row.daleelRefs as schema.DaleelRef[] | null) ?? null,
     adhkarRefs: (row.adhkarRefs as schema.DaleelRef[] | null) ?? null,
+    occasionSlug: row.occasionSlug ?? null,
   };
 }
 
@@ -817,18 +826,72 @@ export async function getOtherMahasiswaRooms(
  *  Legacy rows whose `segment` is null or one of the old 4-segment
  *  slugs still produce a slug — they just won't resolve via
  *  `getBriefingBySlug` (which only accepts current group slugs). */
-export function briefingSlug(generatedAt: Date, themeGroup: string | null): string {
+export function briefingSlug(
+  generatedAt: Date,
+  themeGroup: string | null,
+  occasionSlug?: string | null,
+): string {
   // Convert UTC → WIB by adding 7h, then take date portion. Done manually
   // so we don't pull a tz library on the server hot path.
   const wib = new Date(generatedAt.getTime() + 7 * 3600 * 1000);
   const y = wib.getUTCFullYear();
   const m = String(wib.getUTCMonth() + 1).padStart(2, "0");
   const d = String(wib.getUTCDate()).padStart(2, "0");
-  // Slugify whatever theme-group value the briefing carries — the
-  // function tolerates legacy values too. Null → "all" (legacy rows
-  // from the pre-2026-06-03 cross-segment model).
-  const tail = themeGroup ? slugifyGroup(themeGroup) : "all";
+  // 15th-track Islamic-calendar briefings carry an explicit occasion
+  // slug (e.g. 'asyura-1448', 'ramadan-1448-w2') that distinguishes
+  // each iteration. Use it verbatim. Falls back to the slugified theme
+  // group for the 14 weekly briefings, or 'all' for legacy rows.
+  const tail = occasionSlug
+    ? occasionSlug
+    : themeGroup
+      ? slugifyGroup(themeGroup)
+      : "all";
   return `${y}-${m}-${d}-${tail}`;
+}
+
+
+/**
+ * Latest Islamic-calendar occasion briefing (15th-track) — the one
+ * whose `generated_at` is most recent across all rows where
+ * `occasion_slug IS NOT NULL`. Returns null when no occasion
+ * briefing has been saved yet.
+ *
+ * The /briefings hub renders this row as a FEATURED first card
+ * (yellow tone, distinct from the 14 weekly themes) so operators
+ * and audience see the upcoming Islamic-calendar event front-and-
+ * center the moment a briefing for it lands.
+ */
+export async function getLatestOccasionBriefing(): Promise<
+  LatestBriefing | null
+> {
+  const [row] = await db
+    .select({
+      generatedAt: schema.briefings.generatedAt,
+      periodStart: schema.briefings.periodStart,
+      periodEnd: schema.briefings.periodEnd,
+      summaryMd: schema.briefings.summaryMd,
+      summaryMdEn: schema.briefings.summaryMdEn,
+      headlineStats: schema.briefings.headlineStats,
+      model: schema.briefings.model,
+      themeGroup: schema.briefings.themeGroup,
+      daleelRefs: schema.briefings.daleelRefs,
+      adhkarRefs: schema.briefings.adhkarRefs,
+      occasionSlug: schema.briefings.occasionSlug,
+    })
+    .from(schema.briefings)
+    .where(sql`occasion_slug IS NOT NULL`)
+    .orderBy(desc(schema.briefings.generatedAt))
+    .limit(1);
+  if (!row) return null;
+  return {
+    ...row,
+    summaryMd: stripWordCountAnnotations(row.summaryMd) as string,
+    summaryMdEn: stripWordCountAnnotations(row.summaryMdEn),
+    headlineStats: row.headlineStats as LatestBriefing["headlineStats"],
+    daleelRefs: (row.daleelRefs as schema.DaleelRef[] | null) ?? null,
+    adhkarRefs: (row.adhkarRefs as schema.DaleelRef[] | null) ?? null,
+    occasionSlug: row.occasionSlug ?? null,
+  };
 }
 
 /** All 14 THEME_GROUPS labels in canonical reading order. The

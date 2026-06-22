@@ -3,6 +3,7 @@ import {
   ArrowRight,
   Banknote,
   Boxes,
+  CalendarHeart,
   Clock,
   Cpu,
   Globe2,
@@ -176,10 +177,18 @@ const STALE_DAYS = 5;
 export async function BriefingsGrid({
   briefings,
   volumes,
+  occasion,
   locale,
 }: {
   briefings: Map<string, LatestBriefing>;
   volumes: Map<string, GroupVolume>;
+  /** Latest 15th-track Islamic-calendar occasion briefing
+   *  (theme_group = 'Acara Kalender Islam'). When non-null, rendered
+   *  as a FEATURED first card with the yellow gold-tone palette,
+   *  visually distinct from the 14 weekly theme cards below. NULL
+   *  when no occasion briefing has been saved yet — grid falls back
+   *  to the standard 14-card layout. */
+  occasion: LatestBriefing | null;
   locale: string;
 }) {
   const t = await getTranslations("Briefing");
@@ -222,6 +231,85 @@ export async function BriefingsGrid({
         </p>
 
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {occasion && (() => {
+            // 15th-track Islamic-calendar occasion card — featured first.
+            // Yellow / amber gold tone signals "event-driven, not weekly
+            // news theme". The headline pulled from headlineStats
+            // (manual save writes occasion_name there); falls back to
+            // theme_group label.
+            const stats = occasion.headlineStats as Record<string, unknown>;
+            const occasionName =
+              (typeof stats.occasion_name === "string"
+                ? stats.occasion_name
+                : null) ||
+              occasion.themeGroup ||
+              "Acara Kalender Islam";
+            const hijriDate =
+              typeof stats.hijri_date === "string"
+                ? stats.hijri_date
+                : null;
+            const gregorianDate =
+              typeof stats.gregorian_date === "string"
+                ? stats.gregorian_date
+                : null;
+            const occasionHref = `/briefings/${briefingSlug(
+              occasion.generatedAt,
+              occasion.themeGroup,
+              occasion.occasionSlug,
+            )}`;
+            const ageDays = Math.max(
+              0,
+              Math.floor(
+                (nowMs - occasion.generatedAt.getTime()) / 86_400_000,
+              ),
+            );
+            return (
+              <li key={`__occasion-${occasion.occasionSlug ?? "latest"}`}>
+                <Link
+                  href={occasionHref}
+                  className="group relative flex h-full flex-col rounded-2xl border bg-gradient-to-br p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md from-yellow-50/90 to-white border-yellow-300 hover:border-yellow-500"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-yellow-100 text-yellow-700">
+                      <CalendarHeart className="h-4 w-4" />
+                    </span>
+                    <div className="flex flex-wrap items-center justify-end gap-1">
+                      <span
+                        className="inline-flex items-center gap-0.5 rounded-full bg-yellow-100 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-yellow-800"
+                        title="Acara kalender Hijriah"
+                      >
+                        <Sparkles className="h-2.5 w-2.5" />
+                        Acara
+                      </span>
+                      <span
+                        className="inline-flex items-center gap-0.5 rounded-full bg-slate-100 px-1.5 py-0.5 text-[9px] font-semibold tabular-nums text-slate-700"
+                        title={t("hub_card_age_tooltip", { n: ageDays })}
+                      >
+                        <Clock className="h-2.5 w-2.5" />
+                        {ageDays}d
+                      </span>
+                    </div>
+                  </div>
+                  <h3 className="mt-3 line-clamp-2 text-sm font-bold leading-snug text-slate-900">
+                    {occasionName}
+                  </h3>
+                  {(hijriDate || gregorianDate) && (
+                    <div className="mt-2 line-clamp-2 text-[11px] leading-snug text-slate-600">
+                      {hijriDate}
+                      {hijriDate && gregorianDate && (
+                        <span className="text-slate-400"> · </span>
+                      )}
+                      {gregorianDate}
+                    </div>
+                  )}
+                  <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-yellow-800 transition group-hover:gap-1.5">
+                    Baca briefing acara
+                    <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
+                  </div>
+                </Link>
+              </li>
+            );
+          })()}
           {sortedGroups.map((group) => {
             const brief = briefings.get(group);
             const vol = volumes.get(group);
@@ -235,7 +323,7 @@ export async function BriefingsGrid({
             // group" or renders a friendly "awaiting first briefing"
             // placeholder. Never link to /groups/[slug] from here.
             const href = brief
-              ? `/briefings/${briefingSlug(brief.generatedAt, brief.themeGroup)}`
+              ? `/briefings/${briefingSlug(brief.generatedAt, brief.themeGroup, brief.occasionSlug)}`
               : `/briefings/${groupSlug}`;
             const ageDays = brief
               ? Math.max(
