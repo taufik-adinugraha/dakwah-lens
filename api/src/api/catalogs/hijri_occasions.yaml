@@ -35,19 +35,21 @@ occasions:
     name: "Tahun Baru Hijriah 1448 H"
     hijri_year: 1448
     hijri_date: "1 Muharram 1448 H"
-    gregorian_date: 2026-06-17
+    gregorian_date: 2026-06-16
     query_template: "tahun baru hijriah muhasabah tahun hijrah Nabi Madinah amalan awal tahun"
     include_trending_headlines: true
-    confirmed: false
+    confirmed: true
+    notes: "Operator-confirmed 2026-06-23 (Kemenag SKB-3-menteri Indonesia): 1 Muharram 1448 H jatuh Selasa 16 Juni 2026. Original YAML draft had 2026-06-17 (off by 1 day) — corrected after asyura-1448 briefing shipped with mismatched day-of-week references."
 
   - slug: asyura-1448
     name: "Tasu'a + Asyura 1448 H"
     hijri_year: 1448
     hijri_date: "9-10 Muharram 1448 H"
-    gregorian_date: 2026-06-26
+    gregorian_date: 2026-06-25
     query_template: "puasa Asyura Tasu'a kafarat dosa setahun sirah Nabi Musa Firaun selamat hijrah"
     include_trending_headlines: false
-    confirmed: false
+    confirmed: true
+    notes: "Operator-confirmed 2026-06-23 (Kemenag SKB-3-menteri Indonesia): 9 Muharram (Tasu'a) = Rabu 24 Juni 2026, 10 Muharram (Asyura) = Kamis 25 Juni 2026. Original YAML draft had 2026-06-26 (Friday) — off by 1 day. Briefing saved 2026-06-21 with Friday references; corrected post-save."
 
   - slug: maulid-1448
     name: "Maulid Nabi 1448 H"
