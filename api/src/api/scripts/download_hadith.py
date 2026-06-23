@@ -8,9 +8,20 @@ Sources (all free, no API key, public CDN):
 
 The two sources use different JSON shapes, so we dispatch per collection.
 
-Numbering follows the sunnah.com convention (so "Sahih al-Bukhari 6502"
-maps 1:1 to the row with `hadithnumber=6502`). Indonesian translations
-are not on these CDNs — AR + EN only for now per spec.
+Numbering is normalized to sunnah.com / canonical scholarly references:
+  - Sahih al-Bukhari: fawazahmed0 `hadithnumber` already matches sunnah.com.
+  - Sahih Muslim: fawazahmed0 `hadithnumber` is internal sequential and
+    does NOT match sunnah.com. We remap to the canonical Fuad Abdul Baqi
+    `arabicnumber` from the same source — "Sahih Muslim 1130c" style
+    (sub-letter a/b/c for multi-chain variants of one hadith number).
+  - Riyad as-Salihin: AhmedBaset orders chapters [1..19, 0] but
+    sunnah.com canonical puts Muqaddimat (chapter 0) first — we remap
+    via offset (chapter 0: idInBook - 1217; chapters 1-19: idInBook + 679).
+  - Bulugh al-Maram: NOT yet remapped — its AhmedBaset numbering inflates
+    canonical by ~170 entries (takhrij/annotation fragments treated as
+    standalone hadiths). Deferred to a dedicated migration that uses the
+    sunnah.com API to collapse sub-letter variants properly.
+Indonesian translations are not on these CDNs — AR + EN only for now.
 
 Output: one JSON file per collection in `api/data/`. Each entry shape:
 
@@ -100,11 +111,15 @@ def _from_fawazahmed(
         )
 
     by_num: dict[int, dict[str, Any]] = {}
+    arabic_numbers: dict[int, str] = {}
     for row in ar_rows:
         num = row.get("hadithnumber")
         if num is None:
             continue
         ref = row.get("reference") or {}
+        an = row.get("arabicnumber")
+        if an is not None:
+            arabic_numbers[int(num)] = str(an).strip()
         by_num[int(num)] = {
             "collection": slug,
             "hadithnumber": int(num),
@@ -134,11 +149,50 @@ def _from_fawazahmed(
             by_num[int(num)] = entry
         entry["en"] = row.get("text", "")
 
+    # Citation strategy: for Muslim, fawazahmed0's `hadithnumber` is
+    # their internal sequential (1-7563) and doesn't match sunnah.com /
+    # standard scholarly references. The same source exposes
+    # `arabicnumber` (Fuad Abdul Baqi numbering) which IS canonical.
+    # Build "Sahih Muslim 1130c" style citations (with a/b/c sub-letters
+    # when the source row carries a "1130.03"-style decimal).
+    # Bukhari `hadithnumber` already matches sunnah.com, so no remap.
+    use_canonical = slug == "muslim"
     for entry in by_num.values():
         entry.setdefault("en", "")
-        entry["citation_en"] = f"{citation_prefix} {entry['hadithnumber']}"
+        if use_canonical:
+            an = arabic_numbers.get(entry["hadithnumber"])
+            entry["citation_en"] = _muslim_canonical_citation(
+                citation_prefix, entry["hadithnumber"], an
+            )
+        else:
+            entry["citation_en"] = f"{citation_prefix} {entry['hadithnumber']}"
 
     return sorted(by_num.values(), key=lambda r: r["hadithnumber"])
+
+
+def _muslim_canonical_citation(
+    prefix: str, hadithnumber: int, arabicnumber: str | None
+) -> str:
+    """Translate fawazahmed0 `arabicnumber` (Fuad Abdul Baqi, like
+    "1130" or "1130.03") to sunnah.com display ("Sahih Muslim 1130" or
+    "Sahih Muslim 1130c"). Falls back to fawazahmed0 hadithnumber when
+    arabicnumber is absent (~344 entries in the source).
+    """
+    if not arabicnumber:
+        return f"{prefix} {hadithnumber}"
+    if "." not in arabicnumber:
+        return f"{prefix} {arabicnumber}"
+    head, _, tail = arabicnumber.partition(".")
+    try:
+        sub = int(tail)
+    except ValueError:
+        return f"{prefix} {arabicnumber}"
+    if sub == 0:
+        return f"{prefix} {head}"
+    if 1 <= sub <= 26:
+        letter = chr(ord("a") + sub - 1)
+        return f"{prefix} {head}{letter}"
+    return f"{prefix} {head}.{sub:02d}"
 
 
 def _from_ahmedbaset(
@@ -170,16 +224,32 @@ def _from_ahmedbaset(
         num = h.get("idInBook")
         if num is None:
             continue
+        chapter_id = h.get("chapterId")
+        # Riyad as-Salihin remap: AhmedBaset orders chapters [1..19, 0]
+        # with chapter 0 (Muqaddimat, 679 hadiths) last — idInBook
+        # 1218-1896. Sunnah.com canonical orders [0, 1..19] with
+        # Muqaddimat first (canonical 1-679, then chapters 1-19 at
+        # canonical 680-1896). Bulugh al-Maram is NOT remapped here —
+        # its AhmedBaset numbering doesn't cleanly map to sunnah.com's
+        # sub-letter convention, deferred to a dedicated migration with
+        # the sunnah.com API.
+        if slug == "riyad-as-salihin" and chapter_id is not None:
+            canonical = (
+                int(num) - 1217 if int(chapter_id) == 0 else int(num) + 679
+            )
+            citation_en = f"{citation_prefix} {canonical}"
+        else:
+            citation_en = f"{citation_prefix} {num}"
         out.append(
             {
                 "collection": slug,
                 "hadithnumber": int(num),
                 "in_book_number": int(num),
-                "book": h.get("chapterId"),
+                "book": chapter_id,
                 "ar": h.get("arabic", "") or "",
                 "en": en_text,
                 "grades": [],
-                "citation_en": f"{citation_prefix} {num}",
+                "citation_en": citation_en,
             }
         )
     return sorted(out, key=lambda r: r["hadithnumber"])
