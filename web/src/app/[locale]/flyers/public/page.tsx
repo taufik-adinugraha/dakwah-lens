@@ -7,7 +7,7 @@ import { auth } from "@/auth";
 import { MonthPickerPager } from "@/components/MonthPickerPager";
 import { db, schema } from "@/db";
 import { Link } from "@/i18n/navigation";
-import { slugifyGroup } from "@/lib/dashboard-metrics";
+import { briefingSlug } from "@/lib/briefing-data";
 import {
   monthRangeUtc,
   parseMonthParam,
@@ -61,6 +61,7 @@ const SEGMENT_LABEL_ID: Record<string, string> = {
   family: "Keluarga",
   youth: "Pemuda",
   justice: "Keadilan",
+  "Acara Kalender Islam": "Acara",
 };
 
 export async function generateMetadata({
@@ -69,18 +70,6 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "UserFlyers" });
   return { title: t("page_title_public") };
-}
-
-function formatWibDate(d: Date): string {
-  // YYYY-MM-DD in Asia/Jakarta — the same slug shape getBriefingBySlug
-  // expects.
-  const fmt = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Jakarta",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-  return fmt.format(d);
 }
 
 export default async function PublicFlyersPage({
@@ -140,6 +129,7 @@ export default async function PublicFlyersPage({
     id: string;
     generated_at: Date;
     segment: string | null;
+    occasion_slug: string | null;
   }>;
   if (selectedMonth) {
     const { startUtc, endUtc } = monthRangeUtc(
@@ -147,7 +137,7 @@ export default async function PublicFlyersPage({
       selectedMonth.month,
     );
     briefingRows = (await db.execute(sql`
-      SELECT id, generated_at, theme_group AS segment
+      SELECT id, generated_at, theme_group AS segment, occasion_slug
       FROM briefings
       WHERE generated_at >= ${startUtc.toISOString()}
         AND generated_at <  ${endUtc.toISOString()}
@@ -156,32 +146,30 @@ export default async function PublicFlyersPage({
       id: string;
       generated_at: Date;
       segment: string | null;
+      occasion_slug: string | null;
     }>;
   } else {
     briefingRows = (await db.execute(sql`
-      SELECT DISTINCT ON (theme_group) id, generated_at, theme_group AS segment
+      SELECT DISTINCT ON (theme_group) id, generated_at, theme_group AS segment, occasion_slug
       FROM briefings
       ORDER BY theme_group NULLS FIRST, generated_at DESC
     `)) as unknown as Array<{
       id: string;
       generated_at: Date;
       segment: string | null;
+      occasion_slug: string | null;
     }>;
   }
 
   const systemFlyers = briefingRows.flatMap((b) => {
     const generatedAt = new Date(b.generated_at);
-    const dateStr = formatWibDate(generatedAt);
-    // `segment` carries either the legacy 4-segment slug (all/spiritual/
-    // family/youth/justice) for pre-2026-06-03 briefings, or the
-    // 14-group THEME_GROUPS label ("Hukum & Keadilan", ...) for current
-    // ones. The flyer-render URL needs a URL-safe slug — kebab-case the
-    // group label so spaces + `&` don't break the API path. Legacy
-    // 4-segment values already kebab-safe so slugifyGroup is a no-op
-    // for those.
+    // Occasion briefings (15th-track: asyura-1448, ramadan-1448-w2, ...)
+    // resolve via occasion_slug; weekly briefings via slugified theme
+    // group. briefingSlug() applies that precedence — otherwise the
+    // constructed URL would 404 because `acara-kalender-islam` isn't a
+    // GROUP_BY_SLUG entry.
     const segmentRaw = b.segment ?? "all";
-    const slugTail = slugifyGroup(segmentRaw) || "all";
-    const slug = `${dateStr}-${slugTail}`;
+    const slug = briefingSlug(generatedAt, b.segment, b.occasion_slug);
     const segLabel = SEGMENT_LABEL_ID[segmentRaw] ?? segmentRaw;
     return SYSTEM_VARIANTS.map((v) => ({
       id: `system:${b.id}:${v}`,
