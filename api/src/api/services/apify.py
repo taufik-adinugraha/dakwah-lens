@@ -194,6 +194,19 @@ def scrape_x(
     higher if a future run needs a wider corpus. `apidojo/tweet-scraper`
     accepts ISO date strings via `start`/`end` and translates them to X's
     `since:`/`until:` search operators server-side.
+
+    NO `tweetLanguage` filter (removed 2026-06-25 after Wed 06-24 weekly
+    cron returned 0 items across 90 runs). The apidojo actor validates
+    `tweetLanguage` against ISO 639-1 (which accepts "id" for Indonesian)
+    but X's internal lang tag for Indonesian tweets is "in" (legacy
+    pre-ISO code). The actor passes "id" through to X as a `lang:id`
+    operator which matches zero real Indonesian tweets. Previously this
+    seems to have been silently lenient — actor maybe normalized id→in,
+    or X accepted both. As of 2026-06-24 the actor's `0lUxewaB9bzfq04WU`
+    build no longer normalizes, so `lang:id` filters out all Indonesian
+    content. Live test 2026-06-25 confirmed: removing the filter returns
+    Indonesian tweets (they carry `lang: "in"`) — search terms are
+    Indonesian so foreign-language drift is minimal.
     """
     from datetime import UTC, datetime, timedelta
 
@@ -206,7 +219,6 @@ def scrape_x(
             "searchTerms": [query],
             "maxItems": max_items,
             "sort": "Top",
-            "tweetLanguage": "id",
             "onlyVerifiedUsers": False,
             "start": start,
         },
