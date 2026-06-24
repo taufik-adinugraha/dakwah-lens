@@ -38,7 +38,7 @@ from typing import Any
 
 import httpx
 from qdrant_client import QdrantClient
-from qdrant_client.models import Filter, FieldCondition, MatchValue
+from qdrant_client.models import FieldCondition, Filter, MatchValue
 
 FAWAZAHMED_BASE = "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions"
 AHMEDBASET_BASE = "https://cdn.jsdelivr.net/gh/AhmedBaset/hadith-json@main/db/by_book"

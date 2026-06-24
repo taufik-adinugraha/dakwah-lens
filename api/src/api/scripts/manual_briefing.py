@@ -98,7 +98,6 @@ from api.services.kitab_retrieval import (
     build_kisah_for_corpus,
     retrieve_daleel,
     retrieve_dua,
-    retrieve_kisah_pendek,
     retrieve_kisah_pendek_unranked,
 )
 from api.services.theme_groups import (
@@ -412,10 +411,10 @@ def _format_candidates_markdown(
     misses = candidates["translation_misses"]
 
     lines = [
-        f"<!-- DAKWAH-LENS MANUAL BRIEFING — STAGE 1: candidates -->",
+        "<!-- DAKWAH-LENS MANUAL BRIEFING — STAGE 1: candidates -->",
         f"<!-- group: {group} ({slug})  dumped: {datetime.now(UTC).isoformat()} -->",
         f"<!-- posts_7d: {stats['totals']['posts_7d']}  hijri: {candidates['hijri_short']} -->",
-        f"<!-- After picking, save picks JSON and run: -->",
+        "<!-- After picking, save picks JSON and run: -->",
         f"<!--   manual_briefing dump-prompt {slug} --picks <picks.json> -->",
         "",
         f"# Daleel candidates ({len(daleel)} — pick 18)",
