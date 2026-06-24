@@ -1,10 +1,15 @@
-"""Manual briefing generation — pipeline minus the Gemini Pro call.
+"""Manual briefing generation — pure-Claude two-stage flow.
 
-Used while the Gemini Pro auto-schedule is paused (2026-05-23) to keep
-LLM cost at zero during the development phase. The pipeline still runs
-end-to-end (stats compute, daleel retrieval, prompt assembly) — you
-just hand-roll the LLM step by pasting the prompt into Claude (chat
-interface) and the response back into this script.
+Replaces the old single-pass `dump` (which called Gemini Flash-Lite for
+rerank + kisah picker + hadith translation) with a two-stage flow that
+keeps every LLM judgment with Claude in chat. The retrieval-side
+embedding similarity (OpenAI) still runs in-script; everything that
+USED to call Gemini Flash-Lite is now either:
+  (a) skipped — the full unranked pool is dumped for Claude to filter
+  (b) deferred to Claude in chat (kisah source pick, hadith translation)
+
+Refactor 2026-06-24, per operator rule: "manual workflow must be done
+by YOU (Claude), no Gemini, no Claude API calls from the script."
 
 Group model since 2026-06-03: a briefing is keyed by ONE of the 14
 THEME_GROUPS (e.g. "Hukum & Keadilan", "Aqidah & Ibadah") instead of
@@ -14,23 +19,40 @@ slug (`hukum-keadilan`, `aqidah-ibadah`, ...) OR the literal label
 in quotes when convenient.
 
 Subcommands:
-  dump <group> [--output FILE]
-      Compute stats + retrieve daleel + assemble the prompt. Writes the
-      system + user prompt to stdout or `FILE`. Paste into Claude.
+  dump-candidates <group> [--output FILE]
+      STAGE 1: compute stats + retrieve full unranked pools (28 daleel,
+      15 du'a, 4 kisah seeds). Emits a markdown summary for Claude to
+      read in chat. Cache-misses for hadith ID translations surface as
+      a separate section so Claude can translate them in chat too.
+
+  dump-prompt <group> --picks <picks.json> [--output FILE]
+      STAGE 2: apply Claude's picks (18 daleel citations + 6 du'a
+      citations + 1 kisah kitab slug + optional translation overrides)
+      to the cached candidate pools and emit the final prompt for the
+      composition step.
 
   save <group> <markdown-file>
-      Read the LLM's response markdown from disk, persist to
-      insights_summaries with cost=0 and model="claude-manual". Re-uses
-      the stats + daleel from the most-recent matching `dump` so the
-      bibliography stays anchored to the same retrieval.
+      Read Claude's response markdown from disk, run the 17 scan_*
+      validators (with `llm_judgments=False` — no API LLM judgment),
+      and persist to insights_summaries with cost=0 model="claude-manual".
 
-  list
-      Show all 14 groups + the date of the most-recent briefing for
-      each. Sanity-check before running a fresh dump.
+  cache-translation <citation> <text_en> <text_id>
+      Persist a Claude-supplied hadith ID translation to the
+      `hadith_translations_id` cache so future runs are free SELECTs.
 
-  apply-swaps <group> [--swaps-file FILE]
-      Apply operator-authored daleel-citation swaps to the latest
-      briefing for the group.
+  list / clear / apply-swaps / dump-occasion / save-occasion /
+  list-occasions — unchanged from prior flows.
+
+Picks JSON schema (the operator hands Claude the candidates dump and
+gets back something like this):
+  {
+    "daleel_picks": ["Sahih Muslim 1135", ...],          # exactly 18
+    "dua_picks":    ["QS. Adh-Dhaariyat: 18", ...],      # exactly 6
+    "kisah_kitab":  "al_bidayah_wan_nihayah",            # one of 4 (or null)
+    "hadith_translations": {                              # optional, for cache misses
+      "Sahih al-Bukhari 4737": "<Indonesian translation>"
+    }
+  }
 
 Group values (slug form):
   hukum-keadilan, sosial-keluarga, ekonomi-bisnis, aqidah-ibadah,
@@ -40,16 +62,16 @@ Group values (slug form):
   inspirasi-kisah-pribadi, toleransi-lintas-iman
 
 Example flow (one Thursday morning):
-  for g in hukum-keadilan aqidah-ibadah; do
-    uv run python -m api.scripts.manual_briefing dump $g \\
-      --output /tmp/briefing-$g-prompt.md
-  done
-  # → for each group: paste the prompt into Claude → save reply as
-  #   /tmp/briefing-<g>-reply.md
-  for g in hukum-keadilan aqidah-ibadah; do
-    uv run python -m api.scripts.manual_briefing save $g \\
-      /tmp/briefing-$g-reply.md
-  done
+  uv run python -m api.scripts.manual_briefing dump-candidates hukum-keadilan \\
+    --output /tmp/cand-hukum-keadilan.md
+  # → paste into Claude → Claude returns picks JSON → save to /tmp/picks-h-k.json
+
+  uv run python -m api.scripts.manual_briefing dump-prompt hukum-keadilan \\
+    --picks /tmp/picks-h-k.json \\
+    --output /tmp/prompt-hukum-keadilan.md
+  # → paste into Claude → Claude composes briefing → save reply to /tmp/reply-h-k.md
+
+  uv run python -m api.scripts.manual_briefing save hukum-keadilan /tmp/reply-h-k.md
 """
 
 from __future__ import annotations
@@ -73,11 +95,11 @@ from api.services.briefing import (
     _compute_stats,
 )
 from api.services.kitab_retrieval import (
-    rerank_daleel,
-    rerank_dua,
+    build_kisah_for_corpus,
     retrieve_daleel,
     retrieve_dua,
     retrieve_kisah_pendek,
+    retrieve_kisah_pendek_unranked,
 )
 from api.services.theme_groups import (
     GROUP_BY_SLUG,
@@ -152,22 +174,24 @@ def _cache_path(group_slug: str) -> Path:
     return _CACHE_DIR / f"{group_slug}.json"
 
 
-async def _prepare_context(
+async def _prepare_unranked_candidates(
     group: str,
-) -> tuple[
-    dict[str, Any],
-    list[dict[str, Any]],
-    list[dict[str, Any]],
-    dict[str, Any] | None,
-    str,
-    str,
-]:
-    """Run the data-prep half of the pipeline (everything BEFORE the LLM).
+) -> dict[str, Any]:
+    """Two-stage flow STEP 1: run retrieval, skip every Gemini call.
 
-    Returns: (stats, daleel, adhkar, system_prompt, user_prompt).
-    Indonesian-only because EN generation is paused; switch
-    SYSTEM_PROMPT_EN/ "en" here if you ever need to dump an English
-    prompt.
+    Replaces the old `_prepare_context` (removed 2026-06-24 to pull
+    Gemini Flash-Lite out of the manual loop). The auto pipeline still
+    uses the Flash-Lite reranks — see `briefing.generate_briefing`.
+
+    Pipeline shape:
+      - Embedding retrieval over kitab corpus (OpenAI — kept, not Gemini)
+      - Per-corpus top-1 kisah seeds (4 candidates, NO Flash-Lite picker)
+      - Cache lookup for hadith ID translations (NO Gemini fallback)
+
+    Returns a dict with everything Claude needs to make picks in chat:
+      stats, retrieval_query, daleel_candidates (28), dua_candidates (15),
+      kisah_seeds (≤4), translation_misses (citations needing chat
+      translation), calendar_block, hijri_short.
     """
     async with SessionLocal() as session:
         stats = await _compute_stats(session, group)
@@ -178,26 +202,14 @@ async def _prepare_context(
             )
 
         retrieval_query = _build_retrieval_query(stats, group)
-        # Same widened-pool params as the auto pipeline
-        # (generate_summary in briefing.py). limit=28
-        # candidates + top_n=18 reranked gives the brief LLM a
-        # genuinely thematic pool to pick from — 6 sub-sections + 6
-        # Pesan Flyer slots = 12 needs, so a pool of 18 leaves real
-        # choice without forcing weak fits.
-        candidates = retrieve_daleel(retrieval_query, limit=28, per_corpus=6)
-        daleel = rerank_daleel(retrieval_query, candidates, top_n=18)
-        # Cached per-hadith ID translation. Replaces the old
-        # batch-of-many Gemini call (kept failing silently at
-        # 2000-token output for full pools); this version asks one
-        # hadith at a time and caches in `hadith_translations_id`,
-        # so first run pays the LLM cost and re-runs are SELECTs.
-        from api.services.hadith_translation import enrich_daleel_translations
 
-        daleel = await enrich_daleel_translations(session, daleel)
+        # 28 candidates — no rerank. Auto pipeline reranks to 18 with
+        # Flash-Lite; here Claude picks 18 in chat from the full pool.
+        daleel_candidates = retrieve_daleel(
+            retrieval_query, limit=28, per_corpus=6
+        )
 
-        # Hijri-aware calendar context — same as production path so a
-        # `manual_briefing dump` reflects what `generate_summary` will
-        # actually send. See services/islamic_calendar.py.
+        # Calendar context — local engine, no LLM.
         from datetime import date as _date
 
         from api.services.islamic_calendar import format_calendar_context
@@ -206,59 +218,156 @@ async def _prepare_context(
             _date.today(), lookahead_days=10
         )
 
-        # Du'a / dzikir retrieval — same theme, different query shape,
-        # different pool. Feeds Pesan Flyer 5 (Sunnah call) + Flyer 6
-        # (Du'a hero) so those flyers cite a recitable du'a sourced
-        # from the existing kitab corpus instead of relying on the
-        # LLM's parametric memory.
+        # 15 du'a candidates — no rerank. Same logic as daleel: Claude
+        # picks 6 in chat.
         dua_candidates = retrieve_dua(
             retrieval_query,
             hijri_context=hijri_short,
             limit=15,
             per_corpus=4,
         )
-        adhkar = rerank_dua(retrieval_query, dua_candidates, top_n=6)
-        adhkar = await enrich_daleel_translations(session, adhkar)
 
-        # Kisah Pendek source — contiguous Al-Bidayah wan-Nihayah excerpt.
-        # Mirrors `generate_briefing` so manual + auto paths render the
-        # same content kit shape. None when Al-Bidayah is empty or the
-        # theme had no fit; the prompt handles that by skipping the slot.
-        kisah = retrieve_kisah_pendek(retrieval_query)
+        # Kisah seeds — 4 candidates (per-corpus top-1, no Flash-Lite
+        # source picker). Claude picks one in chat, `dump-prompt` then
+        # materializes the contiguous window via `build_kisah_for_corpus`.
+        kisah_seeds = retrieve_kisah_pendek_unranked(retrieval_query)
+
+        # Translation cache — read-only lookup. Cache hits fill
+        # translation_id in-place; misses surface in `translation_misses`
+        # for Claude to translate in chat (then persist via
+        # `cache-translation` subcommand).
+        from api.services.hadith_translation import lookup_cached_translations
+
+        daleel_candidates, daleel_misses = await lookup_cached_translations(
+            session, daleel_candidates
+        )
+        dua_candidates, dua_misses = await lookup_cached_translations(
+            session, dua_candidates
+        )
+
+        translation_misses = daleel_misses + dua_misses
 
         log.info(
-            "manual_briefing.context_ready",
+            "manual_briefing.candidates_ready",
             group=group,
-            daleel_count=len(daleel),
-            adhkar_count=len(adhkar),
-            kisah_fasal=len(kisah["fasal"]) if kisah else 0,
+            daleel_candidates=len(daleel_candidates),
+            dua_candidates=len(dua_candidates),
+            kisah_seeds=len(kisah_seeds),
+            translation_misses=len(translation_misses),
             posts_7d=stats["totals"]["posts_7d"],
             hijri_short=hijri_short,
         )
 
-    # Build flyer-specific pools — restricted to the 7-kitab flyer
-    # whitelist (FLYER_ALLOWED_CORPORA). MIRRORS briefing.py:2567 — the
-    # auto path computes these and passes them; without this block the
-    # manual path emitted "Pool kosong" on every briefing because the
-    # kwargs default to None and the prompt's `if flyer_daleel_pool:`
-    # check falls through to the empty-pool branch. Bug shipped at
-    # least 12 briefings on 2026-06-18 before being caught.
+    return {
+        "stats": stats,
+        "retrieval_query": retrieval_query,
+        "daleel_candidates": daleel_candidates,
+        "dua_candidates": dua_candidates,
+        "kisah_seeds": kisah_seeds,
+        "translation_misses": translation_misses,
+        "calendar_block": calendar_block,
+        "hijri_short": hijri_short,
+    }
+
+
+def _build_picks_context(
+    group: str,
+    candidates: dict[str, Any],
+    picks: dict[str, Any],
+) -> tuple[
+    dict[str, Any],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    dict[str, Any] | None,
+    str,
+    str,
+]:
+    """Two-stage flow STEP 2: apply Claude's picks to the unranked pools.
+
+    `picks` schema (operator-supplied via `dump-prompt --picks`):
+        {
+          "daleel_picks": ["Sahih Muslim 1135", ...],   # 18 citations
+          "dua_picks":    ["QS. Adh-Dhaariyat: 18", ...], # 6 citations
+          "kisah_kitab":  "al_bidayah_wan_nihayah",     # one of 4 slugs
+          "hadith_translations": {                       # for cache misses
+              "Sahih al-Bukhari 4737": "...ID translation text..."
+          }
+        }
+
+    Returns the same shape `_prepare_context` used to return so the
+    downstream `_build_user_prompt` call is unchanged.
+    """
+    stats = candidates["stats"]
+    daleel_candidates = candidates["daleel_candidates"]
+    dua_candidates = candidates["dua_candidates"]
+    kisah_seeds = candidates["kisah_seeds"]
+    calendar_block = candidates["calendar_block"]
+
+    # Index by citation for O(1) lookup.
+    daleel_by_citation = {d["citation"]: d for d in daleel_candidates}
+    dua_by_citation = {d["citation"]: d for d in dua_candidates}
+
+    # Filter daleel + dua to picks, in picks-supplied order.
+    daleel_picks = picks.get("daleel_picks") or []
+    dua_picks = picks.get("dua_picks") or []
+    daleel = [daleel_by_citation[c] for c in daleel_picks if c in daleel_by_citation]
+    adhkar = [dua_by_citation[c] for c in dua_picks if c in dua_by_citation]
+
+    missing_daleel = [c for c in daleel_picks if c not in daleel_by_citation]
+    missing_dua = [c for c in dua_picks if c not in dua_by_citation]
+    if missing_daleel or missing_dua:
+        raise SystemExit(
+            f"Picks reference citations not in the candidate pool — "
+            f"likely a stale candidates cache.\n"
+            f"  Missing daleel: {missing_daleel}\n"
+            f"  Missing dua:    {missing_dua}\n"
+            f"  Re-run `dump-candidates` to refresh the pool."
+        )
+
+    # Inject Claude-supplied translations for cache misses.
+    overrides = picks.get("hadith_translations") or {}
+    for hit in daleel + adhkar:
+        translation = overrides.get(hit.get("citation"))
+        if translation:
+            hit["translation_id"] = translation
+
+    # Materialize the kisah window for the chosen source.
+    kisah = None
+    kisah_kitab = picks.get("kisah_kitab")
+    if kisah_kitab:
+        seed = next((s for s in kisah_seeds if s["corpus"] == kisah_kitab), None)
+        if seed is None:
+            raise SystemExit(
+                f"Picks reference kisah_kitab={kisah_kitab!r} which is not "
+                f"in the candidate seeds. Available: "
+                f"{[s['corpus'] for s in kisah_seeds]}"
+            )
+        kisah = build_kisah_for_corpus(
+            seed["corpus"], seed["payload"], seed["score"]
+        )
+
+    # Flyer pools — restricted to 11-kitab whitelist (FLYER_ALLOWED_CORPORA).
+    # Auto pipeline applies this same filter; without it the prompt's
+    # `if flyer_daleel_pool:` falls through to the empty-pool branch.
     from api.services.kitab_retrieval import FLYER_ALLOWED_CORPORA
 
     flyer_allowed = set(FLYER_ALLOWED_CORPORA)
     flyer_daleel_pool = [
-        d for d in (daleel or []) if d.get("corpus") in flyer_allowed
+        d for d in daleel if d.get("corpus") in flyer_allowed
     ]
     flyer_adhkar_pool = [
-        a for a in (adhkar or []) if a.get("corpus") in flyer_allowed
+        a for a in adhkar if a.get("corpus") in flyer_allowed
     ]
+
     log.info(
-        "manual_briefing.flyer_pools",
+        "manual_briefing.picks_applied",
         group=group,
+        daleel=len(daleel),
+        adhkar=len(adhkar),
+        kisah_fasal=len(kisah["fasal"]) if kisah else 0,
         flyer_daleel=len(flyer_daleel_pool),
         flyer_adhkar=len(flyer_adhkar_pool),
-        daleel_total=len(daleel or []),
-        adhkar_total=len(adhkar or []),
+        translation_overrides=len(overrides),
     )
 
     user_prompt = _build_user_prompt(
@@ -275,20 +384,168 @@ async def _prepare_context(
 
 
 # ──────────────────────────────────────────────────────────────────
-# Subcommand: dump
+# Subcommand: dump-candidates  (STAGE 1 of the two-stage flow)
 # ──────────────────────────────────────────────────────────────────
 
 
-async def cmd_dump(group_arg: str, output_path: str | None) -> None:
+def _candidates_cache_path(group_slug: str) -> Path:
+    """Companion to `_cache_path` — stores the unranked candidate pools
+    so `dump-prompt` can read them after Claude picks in chat."""
+    _CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    return _CACHE_DIR / f"{group_slug}_candidates.json"
+
+
+def _format_candidates_markdown(
+    group: str, slug: str, candidates: dict[str, Any]
+) -> str:
+    """Human-readable summary of the candidate pools for Claude in chat.
+
+    Lists every daleel (28) + du'a (15) + kisah (4) candidate with its
+    citation, corpus, score, and Arabic preview so Claude can choose
+    18 daleel + 6 du'a + 1 kisah from the full pool — replacing what
+    Gemini Flash-Lite did in the old pipeline.
+    """
+    stats = candidates["stats"]
+    daleel = candidates["daleel_candidates"]
+    dua = candidates["dua_candidates"]
+    kisah = candidates["kisah_seeds"]
+    misses = candidates["translation_misses"]
+
+    lines = [
+        f"<!-- DAKWAH-LENS MANUAL BRIEFING — STAGE 1: candidates -->",
+        f"<!-- group: {group} ({slug})  dumped: {datetime.now(UTC).isoformat()} -->",
+        f"<!-- posts_7d: {stats['totals']['posts_7d']}  hijri: {candidates['hijri_short']} -->",
+        f"<!-- After picking, save picks JSON and run: -->",
+        f"<!--   manual_briefing dump-prompt {slug} --picks <picks.json> -->",
+        "",
+        f"# Daleel candidates ({len(daleel)} — pick 18)",
+        "",
+    ]
+    for i, d in enumerate(daleel, 1):
+        cit = d.get("citation", "?")
+        corpus = d.get("corpus", "?")
+        score = d.get("score") or d.get("similarity", 0)
+        score_s = f"{score:.3f}" if isinstance(score, (int, float)) else "?"
+        ar = (d.get("arabic") or "")[:200].replace("\n", " ")
+        trn = (d.get("translation_id") or d.get("translation_en") or "")[:200].replace("\n", " ")
+        lines.append(f"## {i}. {cit}  [{corpus} · sim={score_s}]")
+        lines.append(f"AR: {ar}")
+        lines.append(f"ID/EN: {trn}")
+        lines.append("")
+
+    lines.append(f"# Du'a candidates ({len(dua)} — pick 6)")
+    lines.append("")
+    for i, d in enumerate(dua, 1):
+        cit = d.get("citation", "?")
+        corpus = d.get("corpus", "?")
+        score = d.get("score") or d.get("similarity", 0)
+        score_s = f"{score:.3f}" if isinstance(score, (int, float)) else "?"
+        ar = (d.get("arabic") or "")[:200].replace("\n", " ")
+        trn = (d.get("translation_id") or d.get("translation_en") or "")[:200].replace("\n", " ")
+        lines.append(f"## {i}. {cit}  [{corpus} · sim={score_s}]")
+        lines.append(f"AR: {ar}")
+        lines.append(f"ID/EN: {trn}")
+        lines.append("")
+
+    lines.append(f"# Kisah Pendek seeds ({len(kisah)} — pick 1 kitab)")
+    lines.append("")
+    if not kisah:
+        lines.append("(no above-threshold seed — picks.kisah_kitab can be null)")
+        lines.append("")
+    for i, k in enumerate(kisah, 1):
+        lines.append(
+            f"## {i}. corpus = `{k['corpus']}`  "
+            f"[{k['source_label_id']} · score={k['score']:.3f}]"
+        )
+        lines.append(f"Title: {k.get('title','(untitled)')}")
+        lines.append(f"AR preview: {k['preview']}")
+        lines.append("")
+
+    if misses:
+        lines.append(f"# Translation cache misses ({len(misses)})")
+        lines.append("")
+        lines.append(
+            "Cache lookup found no Indonesian translation for these hadith. "
+            "Translate each in chat and include them in `picks.hadith_translations`. "
+            "After save, run `cache-translation` to persist for next time."
+        )
+        lines.append("")
+        for m in misses:
+            lines.append(f"## {m['citation']}  [{m['corpus']} · #{m['hadithnumber']}]")
+            lines.append(f"EN: {m['text_en'][:500]}")
+            lines.append("")
+
+    return "\n".join(lines)
+
+
+async def cmd_dump_candidates(group_arg: str, output_path: str | None) -> None:
     group = _resolve_group(group_arg)
     slug = _group_slug(group)
-    stats, daleel, adhkar, kisah, system_prompt, user_prompt = (
-        await _prepare_context(group)
+
+    candidates = await _prepare_unranked_candidates(group)
+
+    # Cache the unranked candidates so `dump-prompt` can apply Claude's
+    # picks without re-running retrieval.
+    cand_path = _candidates_cache_path(slug)
+    cand_path.write_text(
+        json.dumps(
+            {
+                "group": group,
+                "slug": slug,
+                **candidates,
+                "dumped_at_utc": datetime.now(UTC).isoformat(),
+            },
+            indent=2,
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
     )
 
-    # Cache the (stats, daleel, adhkar, kisah) for the matching `save`
-    # step. JSON keeps this tool inspectable + portable across script
-    # invocations.
+    md = _format_candidates_markdown(group, slug, candidates)
+
+    if output_path:
+        Path(output_path).write_text(md, encoding="utf-8")
+        sys.stderr.write(
+            f"✓ Candidates written to {output_path} ({len(md):,} chars).\n"
+            f"  Cache: {cand_path}\n"
+            f"  Misses: {len(candidates['translation_misses'])} hadith need Claude translation\n"
+            f"  Next: paste {output_path} into Claude → get picks.json →\n"
+            f"        manual_briefing dump-prompt {slug} --picks <picks.json>\n",
+        )
+    else:
+        sys.stdout.write(md)
+        sys.stderr.write(
+            f"\n[stderr] Cache: {cand_path}\n"
+            f"[stderr] Misses: {len(candidates['translation_misses'])}\n",
+        )
+
+
+# ──────────────────────────────────────────────────────────────────
+# Subcommand: dump-prompt  (STAGE 2 of the two-stage flow)
+# ──────────────────────────────────────────────────────────────────
+
+
+async def cmd_dump_prompt(
+    group_arg: str, picks_path: str, output_path: str | None
+) -> None:
+    group = _resolve_group(group_arg)
+    slug = _group_slug(group)
+
+    cand_path = _candidates_cache_path(slug)
+    if not cand_path.exists():
+        raise SystemExit(
+            f"Candidates cache missing for {slug}: {cand_path}\n"
+            f"Run `dump-candidates {slug}` first."
+        )
+    candidates = json.loads(cand_path.read_text(encoding="utf-8"))
+
+    picks = json.loads(Path(picks_path).read_text(encoding="utf-8"))
+    stats, daleel, adhkar, kisah, system_prompt, user_prompt = (
+        _build_picks_context(group, candidates, picks)
+    )
+
+    # Write the legacy cache (`<slug>.json`) so `cmd_save` can find the
+    # picks-applied pools — same shape as the old `cmd_dump` wrote.
     cache_path = _cache_path(slug)
     cache_path.write_text(
         json.dumps(
@@ -299,6 +556,7 @@ async def cmd_dump(group_arg: str, output_path: str | None) -> None:
                 "daleel": daleel,
                 "adhkar": adhkar,
                 "kisah": kisah,
+                "picks_source": picks_path,
                 "dumped_at_utc": datetime.now(UTC).isoformat(),
             },
             indent=2,
@@ -307,22 +565,18 @@ async def cmd_dump(group_arg: str, output_path: str | None) -> None:
         encoding="utf-8",
     )
 
-    # Assemble the full prompt as one human-readable document — system
-    # instruction at the top, then the user-side context. Matches what
-    # Gemini Pro receives, so Claude's output should structurally match
-    # what the auto pipeline produces.
     composed = (
-        f"<!-- DAKWAH-LENS MANUAL BRIEFING PROMPT -->\n"
+        f"<!-- DAKWAH-LENS MANUAL BRIEFING — STAGE 2: prompt -->\n"
         f"<!-- group: {group} ({slug})  dumped: {datetime.now(UTC).isoformat()} -->\n"
-        f"<!-- daleel pool: {len(daleel)} entries · adhkar pool: {len(adhkar)} entries · kisah pool: {len(kisah['fasal']) if kisah else 0} fasal -->\n"
+        f"<!-- daleel: {len(daleel)} · adhkar: {len(adhkar)} · kisah: {len(kisah['fasal']) if kisah else 0} fasal -->\n"
         f"<!-- After Claude responds, save the reply as a .md file and run: -->\n"
-        f"<!--   uv run python -m api.scripts.manual_briefing save {slug} <reply.md> -->\n\n"
+        f"<!--   manual_briefing save {slug} <reply.md> -->\n\n"
         "================================================================\n"
-        "SYSTEM INSTRUCTION (this is the persona + format rules)\n"
+        "SYSTEM INSTRUCTION (persona + format rules)\n"
         "================================================================\n\n"
         f"{system_prompt}\n\n"
         "================================================================\n"
-        "USER PROMPT (data context — stats + daleel pool + sample headlines)\n"
+        "USER PROMPT (stats + Claude-picked daleel pool + headlines)\n"
         "================================================================\n\n"
         f"{user_prompt}\n"
     )
@@ -332,14 +586,61 @@ async def cmd_dump(group_arg: str, output_path: str | None) -> None:
         sys.stderr.write(
             f"✓ Prompt written to {output_path} ({len(composed):,} chars).\n"
             f"  Cache: {cache_path}\n"
-            f"  Next: paste {output_path} into Claude → save reply → run `save`.\n",
+            f"  Next: paste {output_path} into Claude → save reply →\n"
+            f"        manual_briefing save {slug} <reply.md>\n",
         )
     else:
         sys.stdout.write(composed)
-        sys.stderr.write(
-            f"\n[stderr] Cache: {cache_path}\n"
-            f"[stderr] Next: pipe Claude's reply into `save {slug} <file.md>`\n",
+
+
+# ──────────────────────────────────────────────────────────────────
+# Subcommand: cache-translation  (persist Claude-supplied translations)
+# ──────────────────────────────────────────────────────────────────
+
+
+async def cmd_cache_translation(
+    citation: str, text_en: str, text_id: str
+) -> None:
+    """Persist a Claude-supplied hadith translation to the cache.
+
+    Lookup keys: `citation` is parsed into corpus + hadithnumber via the
+    same convention used by `lookup_cached_translations`. For citations
+    that don't follow the "<Collection> <number>" shape (e.g.,
+    section-titled classical kitabs), this fails loudly — those have no
+    cache entry to fill.
+    """
+    from api.services.hadith_translation import cache_translation as _cache
+
+    # Citation forms we expect: "Sahih Muslim 1135", "Sahih al-Bukhari 4737",
+    # "Riyad as-Salihin 1251", "Bulugh al-Maram 788". The corpus_id slug
+    # in our DB is lower-cased + hyphenated.
+    citation = citation.strip()
+    corpus_map = {
+        "Sahih Muslim": "muslim",
+        "Sahih al-Bukhari": "bukhari",
+        "Riyad as-Salihin": "riyad_as_salihin",
+        "Bulugh al-Maram": "bulugh_al_maram",
+    }
+    corpus_slug = None
+    hadithnumber = None
+    for prefix, slug in corpus_map.items():
+        if citation.startswith(prefix + " "):
+            corpus_slug = slug
+            hadithnumber = citation[len(prefix) + 1 :].strip()
+            break
+    if corpus_slug is None or not hadithnumber:
+        raise SystemExit(
+            f"Citation {citation!r} doesn't look like a hadith number citation. "
+            f"Supported prefixes: {sorted(corpus_map.keys())}"
         )
+
+    async with SessionLocal() as session:
+        await _cache(
+            session, corpus_slug, hadithnumber, text_en, text_id
+        )
+    sys.stderr.write(
+        f"✓ Cached translation for {citation} ({corpus_slug}:{hadithnumber})\n"
+    )
 
 
 # ──────────────────────────────────────────────────────────────────
@@ -374,28 +675,21 @@ async def cmd_save(group_arg: str, markdown_path: str) -> None:
 
     cache_path = _cache_path(slug)
     if not cache_path.exists():
-        # Auto re-dump fallback (added 2026-06-18): cache may have been
-        # wiped by container restart since the operator last ran `dump`.
-        # Re-running dump here is idempotent — it re-retrieves the daleel
-        # pool and rewrites the cache. Citation validation may produce
-        # mismatches if the pool changed since compose-time (since
-        # retrieve_daleel + rerank are non-deterministic), but the
-        # operator will see the patch prompts and can handle them. Far
-        # better than hard-failing the save and forcing the operator to
-        # remember the manual dump→save dance after every deploy.
-        sys.stderr.write(
-            f"⚠ Cache for '{group}' missing at {cache_path}\n"
-            f"  → Auto-redumping (likely a container restart wiped the cache).\n"
-            f"  → If citation mismatches appear, the daleel pool may have\n"
-            f"    drifted since the briefing was composed. Patch any\n"
-            f"    rejected `**Dalil:** X` lines to `**Dalil:** —` and retry.\n"
+        # No auto-redump in the two-stage flow: a fresh `dump-candidates`
+        # would lose Claude's picks (different pool order, possibly
+        # different candidates). Force the operator to re-run the
+        # two-stage dance with the same picks instead. The persistent
+        # cache dir (/data/attachments/manual-briefing-cache) survives
+        # container restarts so this should rarely trigger.
+        raise SystemExit(
+            f"Cache missing for '{group}' at {cache_path}.\n"
+            f"  → Two-stage flow has no idempotent auto-redump (would\n"
+            f"    drop Claude's picks). Re-run:\n"
+            f"      manual_briefing dump-candidates {slug}\n"
+            f"      # Claude picks in chat → save picks.json\n"
+            f"      manual_briefing dump-prompt {slug} --picks <picks.json>\n"
+            f"    then `save` again."
         )
-        await cmd_dump(group_arg, None)  # writes cache as side effect
-        if not cache_path.exists():
-            raise SystemExit(
-                f"Auto-redump failed to create cache at {cache_path}. "
-                f"Run `dump {slug}` manually and check logs."
-            )
 
     md_path = Path(markdown_path)
     if not md_path.exists():
@@ -1003,15 +1297,20 @@ async def _prepare_occasion_context(
     list[dict[str, Any]],
     list[dict[str, Any]],
     list[dict[str, Any]],
+    list[dict[str, Any]],
     str,
     str,
 ]:
     """Data-prep half of the occasion-mode pipeline (everything BEFORE
-    Claude composes). Mirrors `_prepare_context` for the 14-theme path.
+    Claude composes). Pure-Claude (no Gemini) since 2026-06-24.
 
     Returns: (entry, daleel, adhkar, flyer_daleel_pool,
-              flyer_adhkar_pool, trending_headlines, system_prompt,
-              user_prompt). All Indonesian (v0 occasion track is ID-only).
+              flyer_adhkar_pool, trending_headlines, translation_misses,
+              system_prompt, user_prompt). All Indonesian.
+
+    `translation_misses` lists hadith citations needing Claude
+    translation in chat — write them back later via `cache-translation`.
+    Cache hits are filled in-place on `daleel` / `adhkar`.
     """
     from datetime import date as _date
 
@@ -1036,12 +1335,18 @@ async def _prepare_occasion_context(
         )
 
     # Thematic daleel pool — semantic search on YAML query_template.
+    # NO rerank (occasion path uses the full embedding-ranked pool — same
+    # as the auto path; composer picks via citation, not via Gemini).
     candidates = retrieve_occasion_daleel(slug, limit=24, per_corpus=4)
-    # Cache ID translations (same path the weekly briefings use).
     async with SessionLocal() as session:
-        from api.services.hadith_translation import enrich_daleel_translations
+        # Read-only cache lookup, no Gemini fallback. Cache misses
+        # surface for Claude to translate in chat; persist later via
+        # `manual_briefing cache-translation`.
+        from api.services.hadith_translation import lookup_cached_translations
 
-        daleel = await enrich_daleel_translations(session, candidates)
+        daleel, daleel_misses = await lookup_cached_translations(
+            session, candidates
+        )
 
         # Adhkar pool — du'a/dzikir biased query for Flyer 5+6 slots.
         # Reuse retrieve_dua with the occasion's query_template + name
@@ -1052,8 +1357,10 @@ async def _prepare_occasion_context(
             limit=15,
             per_corpus=4,
         )
-        # No rerank — retrieve_dua already biases the embedding.
-        adhkar = await enrich_daleel_translations(session, dua_candidates)
+        adhkar, dua_misses = await lookup_cached_translations(
+            session, dua_candidates
+        )
+        translation_misses = daleel_misses + dua_misses
 
         # Trending headlines as supporting evidence, only when the
         # catalog opted in.
@@ -1077,6 +1384,7 @@ async def _prepare_occasion_context(
         flyer_daleel=len(flyer_daleel_pool),
         flyer_adhkar=len(flyer_adhkar_pool),
         trending=len(trending),
+        translation_misses=len(translation_misses),
         gregorian=entry.gregorian_date.isoformat(),
     )
 
@@ -1097,13 +1405,21 @@ async def _prepare_occasion_context(
         flyer_daleel_pool,
         flyer_adhkar_pool,
         trending,
+        translation_misses,
         OCCASION_SYSTEM_PROMPT_ID,
         user_prompt,
     )
 
 
 async def cmd_dump_occasion(slug: str, output_path: str | None) -> None:
-    """Compute occasion-mode pool + prompt, write cache, emit prompt."""
+    """Compute occasion-mode pool + prompt, write cache, emit prompt.
+
+    Pure-Claude since 2026-06-24: no Gemini calls in this path. Cache
+    misses for hadith ID translations are appended to the dumped prompt
+    as an explicit "TRANSLATION MISSES" block so Claude can translate
+    them inline during composition. Persist translations later via
+    `manual_briefing cache-translation`.
+    """
     (
         entry,
         daleel,
@@ -1111,6 +1427,7 @@ async def cmd_dump_occasion(slug: str, output_path: str | None) -> None:
         flyer_daleel_pool,
         flyer_adhkar_pool,
         trending,
+        translation_misses,
         system_prompt,
         user_prompt,
     ) = await _prepare_occasion_context(slug)
@@ -1137,6 +1454,7 @@ async def cmd_dump_occasion(slug: str, output_path: str | None) -> None:
                 "flyer_daleel_pool": flyer_daleel_pool,
                 "flyer_adhkar_pool": flyer_adhkar_pool,
                 "trending_headlines": trending,
+                "translation_misses": translation_misses,
                 "dumped_at_utc": datetime.now(UTC).isoformat(),
             },
             indent=2,
@@ -1145,13 +1463,36 @@ async def cmd_dump_occasion(slug: str, output_path: str | None) -> None:
         encoding="utf-8",
     )
 
+    # Translation-miss block — surface cache misses for Claude.
+    if translation_misses:
+        miss_block_lines = [
+            "================================================================",
+            "TRANSLATION CACHE MISSES (translate these in chat)",
+            "================================================================",
+            "",
+            f"The hadith_translations_id cache has no Indonesian translation for "
+            f"the {len(translation_misses)} hadith below. Provide ID translations "
+            f"inline in your briefing where you cite them, then persist them after "
+            f"save with:",
+            "  manual_briefing cache-translation \"<citation>\" \"<text_en>\" \"<text_id>\"",
+            "",
+        ]
+        for m in translation_misses:
+            miss_block_lines.append(f"## {m['citation']}  [{m['corpus']} #{m['hadithnumber']}]")
+            miss_block_lines.append(f"EN: {m['text_en']}")
+            miss_block_lines.append("")
+        miss_block = "\n".join(miss_block_lines) + "\n"
+    else:
+        miss_block = ""
+
     composed = (
-        f"<!-- DAKWAH-LENS MANUAL OCCASION BRIEFING PROMPT -->\n"
+        f"<!-- DAKWAH-LENS MANUAL OCCASION BRIEFING PROMPT (pure-Claude) -->\n"
         f"<!-- occasion: {entry.name} ({entry.slug})  "
         f"gregorian: {entry.gregorian_date}  "
         f"dumped: {datetime.now(UTC).isoformat()} -->\n"
         f"<!-- daleel pool: {len(daleel)} entries · adhkar pool: "
-        f"{len(adhkar)} entries · trending headlines: {len(trending)} -->\n"
+        f"{len(adhkar)} entries · trending headlines: {len(trending)} · "
+        f"translation misses: {len(translation_misses)} -->\n"
         f"<!-- After Claude responds, save the reply as a .md file and run: -->\n"
         f"<!--   uv run python -m api.scripts.manual_briefing save-occasion "
         f"{slug} <reply.md> -->\n\n"
@@ -1162,7 +1503,8 @@ async def cmd_dump_occasion(slug: str, output_path: str | None) -> None:
         "================================================================\n"
         "USER PROMPT (occasion context + daleel pool + supporting headlines)\n"
         "================================================================\n\n"
-        f"{user_prompt}\n"
+        f"{user_prompt}\n\n"
+        f"{miss_block}"
     )
 
     if output_path:
@@ -1171,6 +1513,8 @@ async def cmd_dump_occasion(slug: str, output_path: str | None) -> None:
             f"✓ Occasion prompt written to {output_path} "
             f"({len(composed):,} chars).\n"
             f"  Cache: {cache_path}\n"
+            f"  Translation misses: {len(translation_misses)} "
+            f"(surfaced in prompt for Claude to translate)\n"
             f"  Next: paste {output_path} into Claude → save reply → "
             f"`save-occasion {slug} <reply.md>`.\n",
         )
@@ -1178,6 +1522,7 @@ async def cmd_dump_occasion(slug: str, output_path: str | None) -> None:
         sys.stdout.write(composed)
         sys.stderr.write(
             f"\n[stderr] Occasion cache: {cache_path}\n"
+            f"[stderr] Translation misses: {len(translation_misses)}\n"
             f"[stderr] Next: pipe Claude's reply into "
             f"`save-occasion {slug} <file.md>`\n",
         )
@@ -1209,12 +1554,14 @@ async def cmd_save_occasion(slug: str, markdown_path: str) -> None:
 
     cache_path = _cache_path(slug)
     if not cache_path.exists():
+        # Occasion path's auto-redump is safe: no Claude-judgment step
+        # in dump-occasion (the YAML query + embeddings + cache lookup
+        # are all deterministic). Daleel pool may drift slightly if the
+        # corpus was re-embedded between dump and save, but refetch +
+        # save-time pool top-up handles citation mismatches.
         sys.stderr.write(
             f"⚠ Occasion cache for '{slug}' missing at {cache_path}\n"
             f"  → Auto-redumping (likely a container restart wiped the cache).\n"
-            f"  → If citation mismatches appear, the daleel pool may have\n"
-            f"    drifted since the briefing was composed; refetch will\n"
-            f"    top up at save time when possible.\n"
         )
         await cmd_dump_occasion(slug, None)
         if not cache_path.exists():
@@ -1460,15 +1807,64 @@ def main() -> None:
         "('Hukum & Keadilan'). See module docstring for the full list."
     )
 
-    p_dump = sub.add_parser(
-        "dump", help="Compute stats + daleel, emit the prompt to feed Claude."
+    # Two-stage flow (replaces old single `dump` since 2026-06-24).
+    # Stage 1: dump-candidates — emit full unranked pools for Claude.
+    # Stage 2: dump-prompt --picks — apply Claude's picks, build prompt.
+    # See module docstring for full operational flow.
+    p_dump_c = sub.add_parser(
+        "dump-candidates",
+        help=(
+            "STAGE 1: retrieve full unranked pools (28 daleel, 15 du'a, "
+            "4 kisah seeds) and emit them for Claude to pick from in chat. "
+            "No Gemini calls — replaces the old single-pass `dump`."
+        ),
     )
-    p_dump.add_argument("group", help=group_help)
-    p_dump.add_argument(
+    p_dump_c.add_argument("group", help=group_help)
+    p_dump_c.add_argument(
+        "--output",
+        "-o",
+        help="Write candidates markdown to this file. Default: stdout.",
+        default=None,
+    )
+
+    p_dump_p = sub.add_parser(
+        "dump-prompt",
+        help=(
+            "STAGE 2: apply Claude's picks (18 daleel + 6 du'a + 1 kisah "
+            "source) to the cached candidate pools, emit the final prompt."
+        ),
+    )
+    p_dump_p.add_argument("group", help=group_help)
+    p_dump_p.add_argument(
+        "--picks",
+        required=True,
+        help="Path to picks JSON (see module docstring for schema).",
+    )
+    p_dump_p.add_argument(
         "--output",
         "-o",
         help="Write prompt to this file. Default: stdout.",
         default=None,
+    )
+
+    p_cache_t = sub.add_parser(
+        "cache-translation",
+        help=(
+            "Persist a Claude-supplied hadith ID translation to the "
+            "hadith_translations_id cache so future runs are free SELECTs."
+        ),
+    )
+    p_cache_t.add_argument(
+        "citation",
+        help='Hadith citation, e.g. "Sahih Muslim 1135"',
+    )
+    p_cache_t.add_argument(
+        "text_en",
+        help="The English source text (from the candidates dump)",
+    )
+    p_cache_t.add_argument(
+        "text_id",
+        help="The Claude-supplied Indonesian translation",
     )
 
     p_save = sub.add_parser(
@@ -1562,8 +1958,14 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    if args.cmd == "dump":
-        asyncio.run(cmd_dump(args.group, args.output))
+    if args.cmd == "dump-candidates":
+        asyncio.run(cmd_dump_candidates(args.group, args.output))
+    elif args.cmd == "dump-prompt":
+        asyncio.run(cmd_dump_prompt(args.group, args.picks, args.output))
+    elif args.cmd == "cache-translation":
+        asyncio.run(
+            cmd_cache_translation(args.citation, args.text_en, args.text_id)
+        )
     elif args.cmd == "save":
         asyncio.run(cmd_save(args.group, args.markdown_file))
     elif args.cmd == "list":

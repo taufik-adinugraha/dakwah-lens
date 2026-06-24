@@ -1180,6 +1180,110 @@ def retrieve_kisah_pendek(
     }
 
 
+def retrieve_kisah_pendek_unranked(
+    theme: str,
+) -> list[dict[str, Any]]:
+    """Per-corpus top-1 candidates WITHOUT the Gemini Flash-Lite picker.
+
+    Same retrieval as `retrieve_kisah_pendek` up to step 3 (cosine top-1
+    per corpus, filter by MIN_SCORE). Skips the LLM picker AND the
+    window build. Returns ALL surviving candidates sorted by score so a
+    human (Claude in the manual-briefing two-stage flow) can pick the
+    source kitab themselves and then call `build_kisah_for_corpus` to
+    materialize the contiguous window for the chosen one.
+
+    Empty list when no source has an above-threshold seed.
+    """
+    if not theme.strip():
+        return []
+    vector = _embed_kisah_query(theme)
+    if vector is None:
+        return []
+
+    qdrant = _get_qdrant()
+    candidates: list[dict[str, Any]] = []
+    for corpus, config in KISAH_SOURCE_CONFIG.items():
+        collection = COLLECTION_NAMES.get(corpus, corpus)
+        try:
+            qr = qdrant.query_points(
+                collection_name=collection,
+                query=vector,
+                limit=1,
+                with_payload=True,
+            )
+            results = qr.points
+        except Exception as exc:
+            log.debug(
+                "kisah_unranked.corpus_query_failed",
+                corpus=corpus,
+                error=str(exc),
+            )
+            continue
+        if not results:
+            continue
+        seed = results[0]
+        if seed.score is None:
+            continue
+        threshold = MIN_SCORE.get(corpus, 0.28)
+        if seed.score < threshold:
+            continue
+        payload = dict(seed.payload or {})
+        candidates.append(
+            {
+                "corpus": corpus,
+                "payload": payload,
+                "score": float(seed.score),
+                "title": payload.get("title") or "",
+                "preview": str(payload.get("ar") or "")[:300],
+                "source_label_id": config["label_id"],
+                "source_label_en": config["label_en"],
+                "source_author_id": config["author_id"],
+                "source_author_en": config["author_en"],
+            }
+        )
+
+    candidates.sort(key=lambda c: c["score"], reverse=True)
+    return candidates
+
+
+def build_kisah_for_corpus(
+    corpus: str,
+    payload: dict[str, Any],
+    score: float,
+    *,
+    max_chars: int = 14000,
+) -> dict[str, Any] | None:
+    """Materialize the contiguous fasal window for a chosen kisah source.
+
+    Pair with `retrieve_kisah_pendek_unranked`: caller picks ONE
+    candidate, then calls this to build the full window for prompting.
+
+    Returns the same shape as `retrieve_kisah_pendek` so downstream
+    `_build_user_prompt` consumers are unchanged.
+    """
+    config = KISAH_SOURCE_CONFIG.get(corpus)
+    if config is None:
+        return None
+    qdrant = _get_qdrant()
+    fasal = _build_kisah_window(
+        qdrant, corpus, config, payload, score, max_chars
+    )
+    if not fasal:
+        return None
+    total_chars = sum(len(f["ar"]) for f in fasal)
+    return {
+        "fasal": fasal,
+        "seed_section_id": fasal[0]["section_id"] if fasal else 0,
+        "seed_score": score,
+        "total_chars": total_chars,
+        "source_corpus": corpus,
+        "source_label_id": config["label_id"],
+        "source_label_en": config["label_en"],
+        "source_author_id": config["author_id"],
+        "source_author_en": config["author_en"],
+    }
+
+
 def retrieve_dua(
     theme: str,
     *,

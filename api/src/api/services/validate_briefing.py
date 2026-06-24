@@ -1467,6 +1467,98 @@ def scan_occasion_section_structure(markdown: str) -> list[BriefingWarning]:
     return warnings
 
 
+# ──────────────────────────────────────────────────────────────────
+# scan_flyer_specificity — catches generic-emotion framing in flyer
+# bodies. Enforces the SPECIFICITY RULE in briefing.py SYSTEM_PROMPT
+# line 833: "every time you reference a problem / issue / news item …
+# the reference MUST be specific and traceable to actual sample
+# headlines". Without this validator, composers (Gemini or Claude)
+# sometimes ship "kabar yang menyayat hati" without naming the actual
+# event — the flyer reads as content-free emotional bait.
+# ──────────────────────────────────────────────────────────────────
+
+# Generic-emotion framings that violate the SPECIFICITY RULE. Pulled
+# verbatim from briefing.py SYSTEM_PROMPT line 833 + common variants
+# observed in past audits. Case-insensitive — composers occasionally
+# capitalize the first word at the start of a sentence.
+_FLYER_GENERIC_FRAMING_PATTERNS: list[tuple[str, str]] = [
+    (r"kabar\s+yang\s+menyayat\s+hati", "generic-emotion framing"),
+    (r"kabar\s+yang\s+miris", "generic-emotion framing"),
+    (r"kabar\s+(?:yang\s+)?(?:meng)?khawatirkan", "generic-emotion framing"),
+    (r"berita\s+yang\s+menyayat", "generic-emotion framing"),
+    (r"berita\s+yang\s+membuat\s+hati\s+prihatin", "generic-emotion framing"),
+    (r"berita\s+yang\s+mengejutkan", "generic-emotion framing"),
+    (r"berita\s+yang\s+memprihatinkan", "generic-emotion framing"),
+    (r"berita\s+yang\s+miris", "generic-emotion framing"),
+    (r"ada\s+beberapa\s+kabar\s+tentang", "vague event reference"),
+    (r"ada\s+banyak\s+kejadian", "vague event reference"),
+    (r"beberapa\s+peristiwa\s+pekan\s+ini", "vague event reference"),
+    (r"berbagai\s+peristiwa\s+pekan\s+ini", "vague event reference"),
+    (r"fenomena\s+belakangan\s+ini", "vague trend reference"),
+    (r"fenomena\s+pekan\s+ini", "vague trend reference"),
+    (r"banyak\s+kejadian\s+yang", "vague event reference"),
+    (r"berbagai\s+kabar", "vague event reference"),
+    (r"banyak\s+kabar\s+belakangan", "vague event reference"),
+]
+_FLYER_GENERIC_FRAMING_RES = [
+    (re.compile(p, flags=re.IGNORECASE), label)
+    for p, label in _FLYER_GENERIC_FRAMING_PATTERNS
+]
+
+
+def scan_flyer_specificity(markdown: str) -> list[BriefingWarning]:
+    """Catch generic-emotion framings in flyer bodies.
+
+    Flyers are share-cards that ship to WhatsApp / IG / printed posters
+    WITHOUT the briefing's stats context. The SPECIFICITY RULE
+    (briefing.py SYSTEM_PROMPT line 833) requires every news reference
+    in a flyer body to be specific — name the location, role, count,
+    and what happened. Without this, the audience gets emotional bait
+    with nothing concrete to act on.
+
+    Why hard-fail: this is a credibility AND brand failure simultaneously.
+    A flyer saying "kabar yang menyayat hati" without naming the kabar
+    is exactly the kind of vague engagement-bait the project's
+    `[NO OVERCLAIMING]` rule pushes against. Past audits (2026-06-08
+    and 2026-06-18 batches) caught these post-hoc and required regenerate.
+
+    Slot 5 (Ajakan Sunnah) + Slot 6 (Doa Pekan Ini) are NOT auto-exempt —
+    they should be substantive too. If a sunnah/doa flyer doesn't
+    reference news at all, it passes naturally. If it tries to anchor
+    on a generic framing ("ada beberapa kabar..."), it fails and the
+    composer must rewrite.
+
+    Severity: `high` — exits 1 from `manual_briefing save`.
+    """
+    warnings: list[BriefingWarning] = []
+    blocks = _parse_flyer_blocks(markdown)
+    if not blocks:
+        return warnings
+
+    for i, blk in enumerate(blocks, start=1):
+        body = blk.get("body", "")
+        if not body:
+            continue
+        for pattern, label in _FLYER_GENERIC_FRAMING_RES:
+            for m in pattern.finditer(body):
+                start = max(0, m.start() - 30)
+                end = min(len(body), m.end() + 60)
+                snippet = body[start:end].replace("\n", " ")
+                warnings.append(
+                    {
+                        "kind": "flyer_generic_framing",
+                        "severity": "high",
+                        "where": f"Pesan Flyer {i}: {blk.get('title', '')[:60]}",
+                        "message": (
+                            f"{label}: '{m.group(0)}'. Flyer body must "
+                            f"name the actual headline (location, role, "
+                            f"count, what happened). Context: …{snippet}…"
+                        ),
+                    }
+                )
+    return warnings
+
+
 def scan_flyer_dalil_in_pool(
     markdown: str,
     daleel_pool: list[dict[str, Any]] | None = None,
@@ -2187,6 +2279,7 @@ def validate_briefing(
         (scan_flyer_outlet_handle, "flyer_outlet_handle_check_failed"),
         (scan_flyer_headline_quality, "flyer_headline_quality_check_failed"),
         (scan_flyer_independence, "flyer_independence_check_failed"),
+        (scan_flyer_specificity, "flyer_specificity_check_failed"),
         (scan_occasion_section_structure, "occasion_section_structure_check_failed"),
     ):
         try:

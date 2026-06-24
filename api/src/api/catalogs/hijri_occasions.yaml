@@ -27,9 +27,16 @@
 #                              BERITA PENDUKUNG supporting evidence
 #   confirmed                — false until operator verifies vs Kemenag SKB
 #   notes                    optional — operator scratch field
+#
+# 2026-06-24 RE-PROJECTION: all 1448 H + 1449 H dates regenerated from
+# the confirmed Kemenag SKB-2026 anchor (1 Muharram 1448 H = Selasa 16
+# Juni 2026) using Hisab Madhi 30-29 alternating month lengths. Previous
+# YAML draft had ±5d drift on late-1448 events. Re-verify each entry
+# against Kemenag SKB when it issues (SKB-2027 typically late 2026 /
+# early 2027 for 2027 events).
 
 occasions:
-  # ────────────── 1448 H — current cycle (approx 2026-06-17 onward) ──────────────
+  # ────────────── 1448 H — current cycle (2026-06-16 onward) ──────────────
 
   - slug: muharram-1448
     name: "Tahun Baru Hijriah 1448 H"
@@ -39,7 +46,7 @@ occasions:
     query_template: "tahun baru hijriah muhasabah tahun hijrah Nabi Madinah amalan awal tahun"
     include_trending_headlines: true
     confirmed: true
-    notes: "Operator-confirmed 2026-06-23 (Kemenag SKB-3-menteri Indonesia): 1 Muharram 1448 H jatuh Selasa 16 Juni 2026. Original YAML draft had 2026-06-17 (off by 1 day) — corrected after asyura-1448 briefing shipped with mismatched day-of-week references."
+    notes: "Kemenag SKB-3-menteri 2026: Selasa 16 Juni 2026 = 1 Muharram 1448 H. Anchor for all other 1448 H projections in this file."
 
   - slug: asyura-1448
     name: "Tasu'a + Asyura 1448 H"
@@ -49,34 +56,37 @@ occasions:
     query_template: "puasa Asyura Tasu'a kafarat dosa setahun sirah Nabi Musa Firaun selamat hijrah"
     include_trending_headlines: false
     confirmed: true
-    notes: "Operator-confirmed 2026-06-23 (Kemenag SKB-3-menteri Indonesia): 9 Muharram (Tasu'a) = Rabu 24 Juni 2026, 10 Muharram (Asyura) = Kamis 25 Juni 2026. Original YAML draft had 2026-06-26 (Friday) — off by 1 day. Briefing saved 2026-06-21 with Friday references; corrected post-save."
+    notes: "Operator-confirmed (Kemenag): Tasu'a = Rabu 24 Juni, Asyura = Kamis 25 Juni 2026."
 
   - slug: maulid-1448
     name: "Maulid Nabi 1448 H"
     hijri_year: 1448
     hijri_date: "12 Rabi'ul Awwal 1448 H"
-    gregorian_date: 2026-08-27
+    gregorian_date: 2026-08-25
     query_template: "maulid Nabi Muhammad sirah akhlak teladan shalawat sirah nabawiyah"
     include_trending_headlines: false
-    confirmed: false
+    confirmed: true
+    notes: "Kemenag SKB-3-menteri 2026: Selasa 25 Agustus 2026. Original YAML draft had 2026-08-27 (off by +2d); corrected after SKB cross-check 2026-06-24."
 
   - slug: isra-miraj-1448
     name: "Isra' Mi'raj 1448 H"
     hijri_year: 1448
     hijri_date: "27 Rajab 1448 H"
-    gregorian_date: 2027-01-09
+    gregorian_date: 2027-01-05
     query_template: "isra mi'raj Nabi Muhammad perjalanan malam Masjidil Aqsa shalat lima waktu"
     include_trending_headlines: false
     confirmed: false
+    notes: "Projected (Selasa 5 Januari 2027) from anchor 1 Muharram 1448 H = 16 Juni 2026 + Hisab Madhi 30-29. Verify when SKB-2027 issues."
 
   - slug: nisfu-syaban-1448
     name: "Nisfu Sya'ban 1448 H"
     hijri_year: 1448
     hijri_date: "15 Sya'ban 1448 H"
-    gregorian_date: 2027-01-27
+    gregorian_date: 2027-01-23
     query_template: "nisfu sya'ban malam pengampunan doa istighfar persiapan Ramadan"
     include_trending_headlines: false
     confirmed: false
+    notes: "Projected (Sabtu 23 Januari 2027) from anchor + Hisab Madhi. Verify when SKB-2027 issues."
 
   # Ramadan 1448 — weekly refresh (5 iterations)
 
@@ -84,46 +94,51 @@ occasions:
     name: "Pra-Ramadan 1448 H"
     hijri_year: 1448
     hijri_date: "Pra-1 Ramadan 1448 H"
-    gregorian_date: 2027-02-01
+    gregorian_date: 2027-01-27
     query_template: "persiapan Ramadan niat shaum target ibadah qiyamul lail tarawih marhaban"
     include_trending_headlines: true
     confirmed: false
+    notes: "Projected (Rabu 27 Januari 2027) ~11 days before 1 Ramadan 1448 H. Briefing fires during last 10 days of Sya'ban to set Ramadan expectations."
 
   - slug: ramadan-1448-w1
     name: "Ramadan 1448 H — Pekan 1: Fundamental Puasa"
     hijri_year: 1448
     hijri_date: "1-7 Ramadan 1448 H"
-    gregorian_date: 2027-02-12
+    gregorian_date: 2027-02-07
     query_template: "shaum Ramadan rukun puasa niat sahur berbuka fiqih puasa Hari Raya"
     include_trending_headlines: true
     confirmed: false
+    notes: "Projected (Minggu 7 Februari 2027) = 1 Ramadan 1448 H from anchor + Hisab Madhi. Verify when SKB-2027 issues."
 
   - slug: ramadan-1448-w2
     name: "Ramadan 1448 H — Pekan 2: Ihsan & Sedekah"
     hijri_year: 1448
     hijri_date: "8-14 Ramadan 1448 H"
-    gregorian_date: 2027-02-19
+    gregorian_date: 2027-02-14
     query_template: "ihsan Ramadan sedekah zakat fitrah amalan-amalan pertengahan Ramadan"
     include_trending_headlines: true
     confirmed: false
+    notes: "Projected (Minggu 14 Februari 2027) = 8 Ramadan 1448 H."
 
   - slug: ramadan-1448-w3
     name: "Ramadan 1448 H — Pekan 3: Lailatul Qadr"
     hijri_year: 1448
     hijri_date: "15-21 Ramadan 1448 H"
-    gregorian_date: 2027-02-26
+    gregorian_date: 2027-02-21
     query_template: "Lailatul Qadr i'tikaf 10 hari terakhir Ramadan doa malam mulia"
     include_trending_headlines: false
     confirmed: false
+    notes: "Projected (Minggu 21 Februari 2027) = 15 Ramadan 1448 H."
 
   - slug: ramadan-1448-eid
     name: "Idul Fitri 1448 H + 6 Syawwal"
     hijri_year: 1448
     hijri_date: "1 Syawwal + 2-7 Syawwal 1448 H"
-    gregorian_date: 2027-03-14
+    gregorian_date: 2027-03-09
     query_template: "idul fitri takbir hari kemenangan puasa enam Syawwal silaturahmi halal bi halal"
     include_trending_headlines: true
     confirmed: false
+    notes: "Projected (Selasa 9 Maret 2027) = 1 Syawwal 1448 H. Verify when SKB-2027 issues — rukyat can shift Idul Fitri by ±1 day."
 
   # 10 Dzulhijjah + Idul Adha + Tasyriq 1448 — weekly refresh (3 iterations)
 
@@ -131,144 +146,164 @@ occasions:
     name: "10 Hari Pertama Dzulhijjah 1448 H"
     hijri_year: 1448
     hijri_date: "1-7 Dzulhijjah 1448 H"
-    gregorian_date: 2027-05-12
+    gregorian_date: 2027-05-07
     query_template: "10 hari Dzulhijjah amalan paling utama dzikir tahlil takbir tahmid puasa sunnah"
     include_trending_headlines: false
     confirmed: false
+    notes: "Projected (Jumat 7 Mei 2027) = 1 Dzulhijjah 1448 H."
 
   - slug: dzulhijjah-1448-arafah
     name: "Wukuf Arafah + Idul Adha + Tasyriq 1448 H"
     hijri_year: 1448
     hijri_date: "9-13 Dzulhijjah 1448 H"
-    gregorian_date: 2027-05-20
+    gregorian_date: 2027-05-15
     query_template: "wukuf Arafah puasa Arafah idul adha kurban hari tasyriq haji sirah"
     include_trending_headlines: true
     confirmed: false
+    notes: "Projected (Sabtu 15 Mei 2027) = 9 Dzulhijjah 1448 H (Wukuf Arafah). Verify when SKB-2027 issues."
 
   - slug: dzulhijjah-1448-post
     name: "Pasca-Tasyriq 1448 H — Refleksi Haji"
     hijri_year: 1448
     hijri_date: "14 Dzulhijjah - akhir bulan 1448 H"
-    gregorian_date: 2027-05-27
+    gregorian_date: 2027-05-20
     query_template: "pasca haji muhasabah haji mabrur tindak lanjut amal hijrah ke kebaikan"
     include_trending_headlines: true
     confirmed: false
+    notes: "Projected (Kamis 20 Mei 2027) = 14 Dzulhijjah 1448 H."
 
-  # ────────────── 1449 H — next cycle (approx 2027-06-06 onward) ──────────────
+  # ────────────── 1449 H — next cycle (anchor projected 2027-06-05) ──────────────
+  # All 1449 H dates assume 1448 H = 354 days (non-leap year per standard
+  # 30-year Hijri cycle, year 8). If Kemenag SKB-2027 confirms 1 Muharram
+  # 1449 H falls on a different date (e.g. Minggu 6 Juni 2027 if rukyat
+  # delays), shift all 1449 H entries forward by that delta.
 
   - slug: muharram-1449
     name: "Tahun Baru Hijriah 1449 H"
     hijri_year: 1449
     hijri_date: "1 Muharram 1449 H"
-    gregorian_date: 2027-06-06
+    gregorian_date: 2027-06-05
     query_template: "tahun baru hijriah muhasabah tahun hijrah Nabi Madinah amalan awal tahun"
     include_trending_headlines: true
     confirmed: false
+    notes: "Projected (Sabtu 5 Juni 2027) anchor for 1449 H = 16 Juni 2026 + 354 days (1448 H non-leap). Verify when Kemenag SKB-2027 issues — Kemenag rukyat may delay by 1 day."
 
   - slug: asyura-1449
     name: "Tasu'a + Asyura 1449 H"
     hijri_year: 1449
     hijri_date: "9-10 Muharram 1449 H"
-    gregorian_date: 2027-06-15
+    gregorian_date: 2027-06-14
     query_template: "puasa Asyura Tasu'a kafarat dosa setahun sirah Nabi Musa Firaun selamat hijrah"
     include_trending_headlines: false
     confirmed: false
+    notes: "Projected (Senin 14 Juni 2027) = 10 Muharram 1449 H. Tasu'a = Minggu 13 Juni 2027."
 
   - slug: maulid-1449
     name: "Maulid Nabi 1449 H"
     hijri_year: 1449
     hijri_date: "12 Rabi'ul Awwal 1449 H"
-    gregorian_date: 2027-08-16
+    gregorian_date: 2027-08-14
     query_template: "maulid Nabi Muhammad sirah akhlak teladan shalawat sirah nabawiyah"
     include_trending_headlines: false
     confirmed: false
+    notes: "Projected (Sabtu 14 Agustus 2027) = 12 Rabi'ul Awwal 1449 H."
 
   - slug: isra-miraj-1449
     name: "Isra' Mi'raj 1449 H"
     hijri_year: 1449
     hijri_date: "27 Rajab 1449 H"
-    gregorian_date: 2027-12-30
+    gregorian_date: 2027-12-25
     query_template: "isra mi'raj Nabi Muhammad perjalanan malam Masjidil Aqsa shalat lima waktu"
     include_trending_headlines: false
     confirmed: false
+    notes: "Projected (Sabtu 25 Desember 2027) = 27 Rajab 1449 H."
 
   - slug: nisfu-syaban-1449
     name: "Nisfu Sya'ban 1449 H"
     hijri_year: 1449
     hijri_date: "15 Sya'ban 1449 H"
-    gregorian_date: 2028-01-17
+    gregorian_date: 2028-01-12
     query_template: "nisfu sya'ban malam pengampunan doa istighfar persiapan Ramadan"
     include_trending_headlines: false
     confirmed: false
+    notes: "Projected (Rabu 12 Januari 2028) = 15 Sya'ban 1449 H."
 
   - slug: ramadan-1449-pre
     name: "Pra-Ramadan 1449 H"
     hijri_year: 1449
     hijri_date: "Pra-1 Ramadan 1449 H"
-    gregorian_date: 2028-01-22
+    gregorian_date: 2028-01-16
     query_template: "persiapan Ramadan niat shaum target ibadah qiyamul lail tarawih marhaban"
     include_trending_headlines: true
     confirmed: false
+    notes: "Projected (Minggu 16 Januari 2028) ~11 days before 1 Ramadan 1449 H. Pra-Ramadan briefing fires during last 10 days of Sya'ban."
 
   - slug: ramadan-1449-w1
     name: "Ramadan 1449 H — Pekan 1: Fundamental Puasa"
     hijri_year: 1449
     hijri_date: "1-7 Ramadan 1449 H"
-    gregorian_date: 2028-02-02
+    gregorian_date: 2028-01-27
     query_template: "shaum Ramadan rukun puasa niat sahur berbuka fiqih puasa Hari Raya"
     include_trending_headlines: true
     confirmed: false
+    notes: "Projected (Kamis 27 Januari 2028) = 1 Ramadan 1449 H. Verify when SKB-2028 issues."
 
   - slug: ramadan-1449-w2
     name: "Ramadan 1449 H — Pekan 2: Ihsan & Sedekah"
     hijri_year: 1449
     hijri_date: "8-14 Ramadan 1449 H"
-    gregorian_date: 2028-02-09
+    gregorian_date: 2028-02-03
     query_template: "ihsan Ramadan sedekah zakat fitrah amalan-amalan pertengahan Ramadan"
     include_trending_headlines: true
     confirmed: false
+    notes: "Projected (Kamis 3 Februari 2028) = 8 Ramadan 1449 H."
 
   - slug: ramadan-1449-w3
     name: "Ramadan 1449 H — Pekan 3: Lailatul Qadr"
     hijri_year: 1449
     hijri_date: "15-21 Ramadan 1449 H"
-    gregorian_date: 2028-02-16
+    gregorian_date: 2028-02-10
     query_template: "Lailatul Qadr i'tikaf 10 hari terakhir Ramadan doa malam mulia"
     include_trending_headlines: false
     confirmed: false
+    notes: "Projected (Kamis 10 Februari 2028) = 15 Ramadan 1449 H."
 
   - slug: ramadan-1449-eid
     name: "Idul Fitri 1449 H + 6 Syawwal"
     hijri_year: 1449
     hijri_date: "1 Syawwal + 2-7 Syawwal 1449 H"
-    gregorian_date: 2028-03-03
+    gregorian_date: 2028-02-26
     query_template: "idul fitri takbir hari kemenangan puasa enam Syawwal silaturahmi halal bi halal"
     include_trending_headlines: true
     confirmed: false
+    notes: "Projected (Sabtu 26 Februari 2028) = 1 Syawwal 1449 H. Verify when SKB-2028 issues — rukyat can shift Idul Fitri."
 
   - slug: dzulhijjah-1449-pre
     name: "10 Hari Pertama Dzulhijjah 1449 H"
     hijri_year: 1449
     hijri_date: "1-7 Dzulhijjah 1449 H"
-    gregorian_date: 2028-04-30
+    gregorian_date: 2028-04-25
     query_template: "10 hari Dzulhijjah amalan paling utama dzikir tahlil takbir tahmid puasa sunnah"
     include_trending_headlines: false
     confirmed: false
+    notes: "Projected (Selasa 25 April 2028) = 1 Dzulhijjah 1449 H."
 
   - slug: dzulhijjah-1449-arafah
     name: "Wukuf Arafah + Idul Adha + Tasyriq 1449 H"
     hijri_year: 1449
     hijri_date: "9-13 Dzulhijjah 1449 H"
-    gregorian_date: 2028-05-08
+    gregorian_date: 2028-05-03
     query_template: "wukuf Arafah puasa Arafah idul adha kurban hari tasyriq haji sirah"
     include_trending_headlines: true
     confirmed: false
+    notes: "Projected (Rabu 3 Mei 2028) = 9 Dzulhijjah 1449 H (Wukuf Arafah). Verify when SKB-2028 issues."
 
   - slug: dzulhijjah-1449-post
     name: "Pasca-Tasyriq 1449 H — Refleksi Haji"
     hijri_year: 1449
     hijri_date: "14 Dzulhijjah - akhir bulan 1449 H"
-    gregorian_date: 2028-05-15
+    gregorian_date: 2028-05-08
     query_template: "pasca haji muhasabah haji mabrur tindak lanjut amal hijrah ke kebaikan"
     include_trending_headlines: true
     confirmed: false
+    notes: "Projected (Senin 8 Mei 2028) = 14 Dzulhijjah 1449 H."

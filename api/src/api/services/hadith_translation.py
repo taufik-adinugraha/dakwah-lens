@@ -196,3 +196,94 @@ async def enrich_daleel_translations(
         if translated:
             hit["translation_id"] = translated
     return hits
+
+
+async def lookup_cached_translations(
+    session: AsyncSession,
+    hits: list[dict],
+) -> tuple[list[dict], list[dict]]:
+    """Read-only cache lookup. Does NOT call Gemini for misses.
+
+    Mirrors `enrich_daleel_translations` but stops at the cache layer —
+    used by the manual-briefing two-stage flow so cache misses surface
+    for Claude (in chat) to translate, instead of silently firing a
+    Gemini Flash-Lite call from inside the script.
+
+    Returns: (hits-with-cache-hits-filled, missing-entries).
+    Each missing entry carries enough info to ask Claude in chat for
+    a translation: {"citation", "corpus", "hadithnumber", "text_en"}.
+
+    After Claude supplies translations, persist them with
+    `cache_translation(...)` so future runs are free SELECTs.
+    """
+    misses: list[dict] = []
+    for hit in hits:
+        if hit.get("corpus") == "quran":
+            continue
+        if hit.get("translation_id"):
+            continue
+        text_en = (hit.get("translation_en") or "").strip()
+        if not text_en:
+            continue
+        ref_id = hit.get("ref_id", "")
+        parts = ref_id.split("::", 1)
+        if len(parts) != 2:
+            continue
+        corpus, hadithnumber = parts
+        if not hadithnumber:
+            continue
+        row = await session.get(HadithTranslationId, (corpus, hadithnumber))
+        if row is not None and row.text_en == text_en:
+            hit["translation_id"] = row.text_id
+        else:
+            misses.append(
+                {
+                    "citation": hit.get("citation"),
+                    "corpus": corpus,
+                    "hadithnumber": hadithnumber,
+                    "text_en": text_en,
+                }
+            )
+    return hits, misses
+
+
+async def cache_translation(
+    session: AsyncSession,
+    corpus: str,
+    hadithnumber: str,
+    text_en: str,
+    text_id: str,
+    *,
+    model: str = "claude-manual",
+) -> None:
+    """Write-through cache for a Claude-supplied translation.
+
+    Counterpart to `lookup_cached_translations` for the manual-briefing
+    two-stage flow: after Claude translates a cache-miss hadith in
+    chat, call this to persist the result. Future briefings hit the
+    cache instead of asking Claude (or, in the auto path, instead of
+    firing a Gemini Flash-Lite call).
+
+    `model` tags the row so `/admin/system/translations` can show which
+    translations came from Claude vs Gemini.
+    """
+    stmt = (
+        pg_insert(HadithTranslationId)
+        .values(
+            corpus=corpus,
+            hadithnumber=hadithnumber,
+            text_en=text_en,
+            text_id=text_id,
+            model=model,
+        )
+        .on_conflict_do_update(
+            index_elements=["corpus", "hadithnumber"],
+            set_={
+                "text_en": text_en,
+                "text_id": text_id,
+                "model": model,
+            },
+        )
+    )
+    await session.execute(stmt)
+    await session.commit()
