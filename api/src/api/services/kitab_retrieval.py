@@ -56,6 +56,78 @@ def _is_recitable_du_a(arabic: str) -> bool:
         return marks > 0
     return (marks / letters) >= RECITABLE_HARAKAT_MIN
 
+
+# Markers of an actual SUPPLICATION (du'a) — as opposed to a command /
+# statement verse that merely has harakat (e.g. "وَزِنُوا۟ بِٱلْقِسْطَاسِ",
+# "لَا تَأْكُلُوا۟ ٱلرِّبَوٰا"). `_is_recitable_du_a` only gates on harakat
+# density (pronounceability), so command ayat slip into the du'a pool and
+# end up cited under "Doa Pekan Ini" (slot 6). This catches the real
+# thing: Qur'anic "Rabbana…" or prophetic "Allahumma…/a'ūdhu/as'aluka".
+_DUA_SUPPLICATION_MARKERS = (
+    "اللهم",
+    "اللَّهُمَّ",
+    "اللّٰهُمَّ",
+    "اللّهمّ",
+    "ربنا",
+    "رَبَّنَا",
+    "رَبَّنَآ",
+    "ربّنا",
+    "رب اغفر",
+    "رَبِّ اغْفِرْ",
+    "رب إني",
+    "رَبِّ إِنِّي",
+    "رب اجعلني",
+    "أعوذ",
+    "أَعُوذُ",
+    "اعوذ",
+    "نعوذ",
+    "نَعُوذُ",
+    "أسألك",
+    "أَسْأَلُكَ",
+    "اللهم إني",
+)
+
+
+_TASHKIL_RE = re.compile("[\u0640\u064b-\u0655\u0670]")
+
+
+def _strip_tashkil(s: str) -> str:
+    """Drop harakat / tanwin / sukun / maddah / superscript-alef / tatweel
+    and fold the alif-hamza variants, so supplication-marker matching is
+    immune to vocalization differences between corpora."""
+    s = _TASHKIL_RE.sub("", s or "")
+    for a in ("أ", "إ", "آ", "ٱ", "ٲ", "ٳ"):
+        s = s.replace(a, "ا")
+    return s
+
+
+def _looks_like_supplication(arabic: str) -> bool:
+    """True iff the Arabic reads as a recitable du'a (supplication),
+    not merely a harakat'd command/statement verse. Matching is done on
+    tashkil-stripped text so vocalization variants don't cause misses."""
+    norm = _strip_tashkil(arabic)
+    return any(_strip_tashkil(m) in norm for m in _DUA_SUPPLICATION_MARKERS)
+
+
+# Universal, recitable, flyer-eligible du'a used as a FLOOR for the du'a
+# pool: theme-biased embedding frequently returns only command/principle
+# ayat for a theme (justice, riba, leadership…), leaving slot 5/6
+# ("Doa Pekan Ini") with no actual supplication to cite. We top the pool
+# up from this set so a recitable du'a is ALWAYS available. (Root fix
+# 2026-06-25 after the operator caught 6 "Doa" flyers citing command ayat.)
+_CANONICAL_DUA_CITATIONS = (
+    "Sahih al-Bukhari 6389",  # allāhumma rabbanā ātinā fid-dunyā ḥasanah (most frequent du'a)
+    "Sahih al-Bukhari 6368",  # a'ūdhu min al-ma'tham wal-maghram (sin + debt)
+    "Sahih al-Bukhari 6377",  # a'ūdhu min sharri fitnatil-faqr (poverty)
+    "Sahih al-Bukhari 6323",  # sayyid al-istighfār
+    "Sahih Muslim 2722",  # allāhumma āti nafsī taqwāhā wa zakkihā
+    "Sahih Muslim 2721a",  # as'aluka al-hudā wat-tuqā wal-'afāf wal-ghinā
+    "QS. Al-Baqara: 201",  # rabbanā ātinā fid-dunyā ḥasanah…
+    "QS. Al-Baqara: 286",  # rabbanā lā tu'ākhidhnā…
+)
+_MIN_DUA_SUPPLICATIONS = 4
+
+
 # Collection names match the embed scripts in api/src/api/scripts/embed_*.py
 COLLECTION_NAMES: dict[str, str] = {
     "quran": "quran",
@@ -671,12 +743,50 @@ def retrieve_by_citation(citation: str) -> dict[str, Any] | None:
         return None
 
     # ── Hadith path ───────────────────────────────────────────────────
+    # Match on the canonical citation STRING (citation_en / citation_id),
+    # NOT the legacy integer `hadithnumber`. The 2026-06-23 sunnah.com
+    # renumbering migration rewrote citation_en/citation_id to canonical
+    # numbers but left `hadithnumber` on the OLD sequential numbering — so
+    # filtering by hadithnumber resolves a migrated citation to the WRONG
+    # chunk (e.g. "Sahih Muslim 2721a" → hadithnumber 2721 → the hadith now
+    # labelled "Sahih Muslim 1156e") and silently drops sub-letters
+    # ("2721a" → 2721). The regex still identifies the corpus; we match the
+    # full citation string, keeping hadithnumber only as a legacy fallback.
     for corpus, pattern in _HADITH_CITATION_PATTERNS:
         m = pattern.match(c)
         if not m:
             continue
-        hadithnumber = int(m.group(1))
+        for field in ("citation_en", "citation_id"):
+            try:
+                points, _ = qdrant.scroll(
+                    collection_name=COLLECTION_NAMES[corpus],
+                    scroll_filter=models.Filter(
+                        must=[
+                            models.FieldCondition(
+                                key=field,
+                                match=models.MatchValue(value=c),
+                            )
+                        ]
+                    ),
+                    limit=2,
+                    with_payload=True,
+                    with_vectors=False,
+                )
+            except Exception as exc:
+                log.warning(
+                    "kitab_retrieval.refetch_hadith_failed",
+                    citation=c,
+                    corpus=corpus,
+                    field=field,
+                    error=str(exc),
+                )
+                points = []
+            if points:
+                return _normalize_hit(corpus, _FakeHit(points[0].payload))
+        # Legacy fallback: pre-migration citation whose citation_en/_id
+        # isn't populated — match the parsed integer hadithnumber.
         try:
+            hadithnumber = int(m.group(1))
             points, _ = qdrant.scroll(
                 collection_name=COLLECTION_NAMES[corpus],
                 scroll_filter=models.Filter(
@@ -705,7 +815,6 @@ def retrieve_by_citation(citation: str) -> dict[str, Any] | None:
             "kitab_retrieval.refetch_hadith_not_found",
             citation=c,
             corpus=corpus,
-            hadithnumber=hadithnumber,
         )
         return None
 
@@ -1408,13 +1517,42 @@ def retrieve_dua(
             all_hits.append(normalized)
 
     all_hits.sort(key=lambda h: h["score"] or -1e9, reverse=True)
+    result = all_hits[:limit]
+
+    # Du'a FLOOR: guarantee the pool carries actual recitable supplications
+    # for slot 5/6, not just harakat'd command verses. Top up from the
+    # canonical set (exact-citation refetch) until we have at least
+    # _MIN_DUA_SUPPLICATIONS — but only when the theme-biased retrieval
+    # came up short, so on-theme du'a still win when they exist.
+    n_supp = sum(1 for h in result if _looks_like_supplication(h.get("arabic", "")))
+    if n_supp < _MIN_DUA_SUPPLICATIONS:
+        present = {h.get("citation", "") for h in result}
+        added: list[str] = []
+        for cit in _CANONICAL_DUA_CITATIONS:
+            if n_supp >= _MIN_DUA_SUPPLICATIONS:
+                break
+            if cit in present:
+                continue
+            hit = retrieve_by_citation(cit)
+            if hit and _looks_like_supplication(hit.get("arabic", "")):
+                result.append(hit)
+                added.append(cit)
+                n_supp += 1
+        if added:
+            log.info(
+                "adhkar_retrieval.dua_floor_topup",
+                theme=theme[:60],
+                added=added,
+            )
+
     log.info(
         "adhkar_retrieval.scored",
         theme=theme[:80],
         kept=len(all_hits),
         top_score=all_hits[0]["score"] if all_hits else None,
+        dua_supplications=n_supp,
     )
-    return all_hits[:limit]
+    return result
 
 
 def rerank_dua(

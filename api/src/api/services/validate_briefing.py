@@ -2219,6 +2219,120 @@ def format_autofixes_for_stderr(applied: list[dict[str, str]]) -> str:
     return "\n".join(lines)
 
 
+_DUA_SUPPLICATION_MARKERS = (
+    "اللهم",
+    "اللَّهُمَّ",
+    "اللّٰهُمَّ",
+    "اللّهمّ",
+    "ربنا",
+    "رَبَّنَا",
+    "رَبَّنَآ",
+    "ربّنا",
+    "رب اغفر",
+    "رَبِّ اغْفِرْ",
+    "رب إني",
+    "رَبِّ إِنِّي",
+    "رب اجعلني",
+    "أعوذ",
+    "أَعُوذُ",
+    "اعوذ",
+    "نعوذ",
+    "نَعُوذُ",
+    "أسألك",
+    "أَسْأَلُكَ",
+)
+
+_TASHKIL_RE = re.compile("[\u0640\u064b-\u0655\u0670]")
+
+
+def _strip_tashkil(s: str) -> str:
+    """Drop harakat / tanwin / sukun / maddah / superscript-alef / tatweel
+    and fold alif-hamza variants, so supplication-marker matching is immune
+    to vocalization differences between corpora."""
+    s = _TASHKIL_RE.sub("", s or "")
+    for a in ("أ", "إ", "آ", "ٱ", "ٲ", "ٳ"):
+        s = s.replace(a, "ا")
+    return s
+
+
+def scan_flyer_doa_not_dua(
+    markdown: str,
+    daleel_pool: list[dict[str, Any]] | None = None,
+    adhkar_pool: list[dict[str, Any]] | None = None,
+) -> list[BriefingWarning]:
+    """Flag a 'Doa Pekan Ini' flyer (slot 6) whose cited daleel is a
+    command / statement verse rather than a recitable supplication.
+
+    Slot 6 is literally titled "Doa Pekan Ini" — readers expect a du'a
+    they can recite (Qur'anic "Rabbanā…" or prophetic "Allāhumma…/a'ūdzu/
+    as'aluka"). A theme command ayat ("tegakkan timbangan", "jangan makan
+    riba", "peliharalah shalat") has harakat and passes the renderer's
+    pool check, so it ships under "Doa" while being no supplication at
+    all. Advisory (severity medium): the heuristic is markers-based and
+    only fires when the cited daleel IS in the pool (out-of-pool citations
+    are handled by scan_flyer_dalil_in_pool + the save-time refetch).
+    """
+    if not daleel_pool and not adhkar_pool:
+        return []
+    sec_m = _FLYER_SECTION_RE.search(markdown)
+    if not sec_m:
+        return []
+    flyer_section = markdown[sec_m.start() :]
+    by_norm: dict[str, str] = {}
+    for d in (daleel_pool or []) + (adhkar_pool or []):
+        by_norm[_norm_citation(d.get("citation", ""))] = d.get("arabic", "") or ""
+
+    def _arabic_for(nc: str) -> str | None:
+        if nc in by_norm:
+            return by_norm[nc]
+        for k, v in by_norm.items():
+            if k and (k.startswith(nc) or nc.startswith(k)):
+                return v
+        return None
+
+    def _is_supplication(arabic: str) -> bool:
+        # Match on tashkil-stripped text so vocalization variants between
+        # corpora don't cause misses (mirrors kitab_retrieval).
+        norm = _strip_tashkil(arabic)
+        return any(_strip_tashkil(m) in norm for m in _DUA_SUPPLICATION_MARKERS)
+
+    warnings: list[BriefingWarning] = []
+    headers = list(_FLYER_HEADER_RE.finditer(flyer_section))
+    for idx, h in enumerate(headers):
+        nl = flyer_section.find("\n", h.start())
+        header_line = flyer_section[h.start() : nl if nl != -1 else len(flyer_section)]
+        # Only the "Doa Pekan Ini" slot — identified by its H3 subtitle.
+        if "doa" not in header_line.lower():
+            continue
+        block_end = headers[idx + 1].start() if idx + 1 < len(headers) else len(flyer_section)
+        block = flyer_section[h.start() : block_end]
+        dalil_m = _FLYER_DALIL_RE.search(block)
+        if not dalil_m:
+            continue
+        cited = dalil_m.group(1).strip()
+        if cited in ("—", "-", "–", ""):
+            continue
+        arabic = _arabic_for(_norm_citation(cited))
+        if arabic is None:
+            continue  # not in pool → scan_flyer_dalil_in_pool / refetch handles it
+        if not _is_supplication(arabic):
+            warnings.append(
+                {
+                    "kind": "flyer_doa_not_dua",
+                    "severity": "medium",
+                    "where": header_line.strip(),
+                    "message": (
+                        f"Pesan Flyer 'Doa Pekan Ini' mengutip '{cited}', tetapi Arab-nya "
+                        f"bukan du'a recitable (tidak memuat Allāhumma…/Rabbanā…/a'ūdzu…/"
+                        f"as'aluka…) — tampak ayat perintah/pernyataan, bukan permohonan "
+                        f"yang bisa dilafalkan. Re-anchor slot 6 ke du'a sungguhan dari "
+                        f"FLYER ADHKAR POOL (kini dijamin memuat beberapa du'a recitable)."
+                    ),
+                }
+            )
+    return warnings
+
+
 def validate_briefing(
     markdown: str,
     *,
@@ -2296,6 +2410,14 @@ def validate_briefing(
     except Exception as exc:
         log.warning(
             "validate_briefing.flyer_dalil_in_pool_check_failed", error=str(exc)
+        )
+    try:
+        warnings.extend(
+            scan_flyer_doa_not_dua(markdown, flyer_dpool, flyer_apool)
+        )
+    except Exception as exc:
+        log.warning(
+            "validate_briefing.flyer_doa_not_dua_check_failed", error=str(exc)
         )
     if llm_judgments:
         # Paragraph↔daleel fit + absurd-advice scoring + replacement
