@@ -300,6 +300,11 @@ export default async function PublicFlyersPage({
           page={safePage}
           totalPages={totalPages}
           locale={locale}
+          extraParams={{
+            source: selectedSource === "all" ? undefined : selectedSource,
+            type: selectedType,
+            topic: selectedTopic,
+          }}
           labels={{
             monthLabel: tBriefs("filter_month_label"),
             // Default ("no month") view is this-week's drop only, not

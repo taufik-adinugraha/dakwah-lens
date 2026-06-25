@@ -19,6 +19,7 @@ export function MonthPickerPager({
   totalPages,
   locale,
   labels,
+  extraParams,
 }: {
   /** Path WITHOUT query string — e.g. "/briefs" or "/flyers/mine". The
    *  picker preserves it and only swaps `?month=...&page=...`. */
@@ -42,11 +43,20 @@ export function MonthPickerPager({
     prev: string;
     next: string;
   };
+  /** Other active filters (e.g. type / source / topic) to PRESERVE across
+   *  month-picker + pagination navigation. Falsy values are dropped. Without
+   *  this, paging or switching month silently resets the active filter. */
+  extraParams?: Record<string, string | undefined>;
 }) {
-  const allTimeHref = `${baseHref}?month=all&page=1`;
+  const extra = Object.entries(extraParams ?? {})
+    .filter((entry): entry is [string, string] => Boolean(entry[1]))
+    .map(([k, v]) => `&${k}=${encodeURIComponent(v)}`)
+    .join("");
+
+  const allTimeHref = `${baseHref}?month=all&page=1${extra}`;
 
   const linkFor = (year: number, month: number) =>
-    `${baseHref}?month=${monthIsoKey(year, month)}&page=1`;
+    `${baseHref}?month=${monthIsoKey(year, month)}&page=1${extra}`;
 
   const prevPage = Math.max(1, page - 1);
   const nextPage = Math.min(totalPages, page + 1);
@@ -103,7 +113,7 @@ export function MonthPickerPager({
       {totalPages > 1 && (
         <div className="inline-flex items-center gap-1 text-xs text-slate-600">
           <Link
-            href={`${baseHref}?month=${monthParam}&page=${prevPage}`}
+            href={`${baseHref}?month=${monthParam}&page=${prevPage}${extra}`}
             aria-label={labels.prev}
             className={`inline-flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white transition ${
               page <= 1
@@ -115,7 +125,7 @@ export function MonthPickerPager({
           </Link>
           <span className="px-2 tabular-nums">{labels.pageOf}</span>
           <Link
-            href={`${baseHref}?month=${monthParam}&page=${nextPage}`}
+            href={`${baseHref}?month=${monthParam}&page=${nextPage}${extra}`}
             aria-label={labels.next}
             className={`inline-flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white transition ${
               page >= totalPages
