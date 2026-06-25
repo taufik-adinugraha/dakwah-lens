@@ -32,7 +32,6 @@ from __future__ import annotations
 import json
 import re
 import time
-from datetime import datetime, timedelta, timezone
 from typing import Any
 
 import numpy as np
@@ -68,23 +67,23 @@ log = structlog.get_logger()
 #
 # Flash-Lite was tried earlier and had a thinking-spiral failure mode
 # (thoughts_token_count ate the budget, candidates_token_count=0 →
-# empty response). Both Flash and Pro avoid that.
+# empty response). Flash avoids that and is the standing choice.
+# MODEL_PRO retained for reference / ad-hoc override only — the
+# Thursday-Pro schedule was reverted 2026-06-25 (see _model_for_today).
 MODEL_PRO = "gemini-2.5-pro"
 MODEL_FLASH = "gemini-2.5-flash"
-# Python weekday(): Monday=0 ... Sunday=6. Thursday = 3.
-PRO_DOW = 3
 
 
 def _model_for_today() -> tuple[str, int]:
-    """Return (model_name, thinking_budget) based on WIB weekday.
+    """Return (model_name, thinking_budget).
 
-    Thursday → Pro + 2048-token thinking budget (briefing day).
-    Other days → Flash + 0 thinking budget (avoids Flash's
-    thinking-spiral edge case, matches the historical safe config).
+    Reverted 2026-06-25 to ALWAYS Flash + 0 thinking budget. The
+    Thursday-Pro special case (a briefing-day quality bump) was dropped
+    per operator request — topic discovery is a labels-only task that
+    Flash handles fine, and Pro was ~20-30× the per-call cost. Matches
+    the locked-decision table (topic discovery → Gemini Flash tier) and
+    the historical safe config that avoided Flash-Lite's thinking-spiral.
     """
-    wib_now = datetime.now(timezone(timedelta(hours=7)))
-    if wib_now.weekday() == PRO_DOW:
-        return MODEL_PRO, 2048
     return MODEL_FLASH, 0
 
 
@@ -874,11 +873,36 @@ def _rescue_in_group_orphans(
     return rescues
 
 
+def build_discovery_user_prompt(
+    posts: list[dict[str, Any]],
+    *,
+    platform: str,
+    sample_size: int = SAMPLE_SIZE,
+) -> str:
+    """Build the exact user-prompt that `discover_topics` would send to
+    the LLM for the NAMING step — exposed so the manual (Claude-in-chat)
+    clustering flow can dump it without firing a Gemini call. Mirrors the
+    sampling + truncation inside `discover_topics`.
+    """
+    sample = posts[:sample_size]
+    indexed_texts: list[tuple[int, str]] = []
+    for i, p in enumerate(sample):
+        text = (p.get("text") or "")[:MAX_TEXT_CHARS].replace("\n", " ").strip()
+        if text:
+            indexed_texts.append((i, text))
+    return (
+        f"Platform: {platform}\n"
+        f"Posts ({len(indexed_texts)} of {len(posts)} sampled):\n\n"
+        + "\n".join(f"- {t}" for _, t in indexed_texts)
+    )
+
+
 def discover_topics(
     posts: list[dict[str, Any]],
     *,
     platform: str,
     sample_size: int = SAMPLE_SIZE,
+    themes_override: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
     """Identify themes in a corpus and assign posts to them.
 
@@ -886,6 +910,16 @@ def discover_topics(
     most recent `sample_size` posts (assumed already sorted recent-first
     by the caller), ask Gemini to NAME 6-10 themes, then assign each post
     to its nearest theme by embedding cosine similarity.
+
+    `themes_override`: when provided, SKIP the Gemini naming call entirely
+    and use these themes as the raw LLM output. Used by the manual
+    clustering flow (`cluster_topics.py --inject`) so Claude-in-chat does
+    the naming judgment instead of Gemini — per the operator rule that
+    manual content judgment stays with Claude, never Gemini. Each entry
+    must be {label, keywords[, exclude_keywords, min_similarity]}. All the
+    downstream safety post-processing (per-theme floor clamp, category-noun
+    auto-raise, catch-all + elastic-word rejection, embedding assignment)
+    runs identically — only the source of the raw themes changes.
 
     Returns a list of theme dicts:
         [{"label": str, "keywords": list[str], "post_ids": list[UUID]}]
@@ -938,91 +972,105 @@ def discover_topics(
         "required": ["themes"],
     }
 
-    client = _get_client()
-    # Retry the generate+parse cycle on transient ServerError (503 "model
-    # overloaded") or malformed JSON. Output is tiny now (labels only), so
-    # MAX_TOKENS truncation should never recur — but the retry keeps us
-    # robust against transient 503s. 3 attempts, exponential backoff.
-    # Final fallback: empty themes → recluster persists nothing → existing
-    # topic rows stay intact.
     resp = None
     parsed = None
-    # Pick model + thinking budget per the two-model schedule (Pro on
-    # Thursdays for the briefing-day recluster, Flash otherwise).
-    model_today, thinking_budget = _model_for_today()
-    for attempt_idx in range(3):
-        try:
-            resp = client.models.generate_content(
-                model=model_today,
-                contents=user_prompt,
-                config=types.GenerateContentConfig(
-                    system_instruction=SYSTEM_PROMPT,
-                    response_mime_type="application/json",
-                    response_schema=response_schema,
-                    temperature=0.2,
-                    # Labels-only OUTPUT: 6-10 themes × (label + 5 short
-                    # keywords) is a few hundred tokens. With Pro's
-                    # thinking enabled, thoughts count toward the budget
-                    # too — raised to 8K to cover ~2K thinking + ~4K
-                    # output + 2K margin.
-                    max_output_tokens=8192,
-                    # thinking_budget: 2048 for Pro (Thursday), 0 for
-                    # Flash (other days — matches the historical safe
-                    # config that avoided Flash-Lite's thinking-spiral).
-                    thinking_config=types.ThinkingConfig(
-                        thinking_budget=thinking_budget
-                    ),
-                ),
-            )
-            raw = resp.text or "{}"
-            parsed = json.loads(raw)
-            break  # success
-        except genai_errors.ServerError as exc:
-            log.warning(
-                "topic_discovery.server_error_retry",
-                platform=platform,
-                attempt=attempt_idx + 1,
-                error=str(exc)[:200],
-            )
-        except json.JSONDecodeError:
-            finish_reason = None
-            tokens_out = None
+
+    # Manual clustering path: Claude-in-chat supplied the themes. Skip the
+    # Gemini naming call entirely and feed the injected themes straight
+    # into the same downstream processing (floor clamp / category-noun
+    # raise / catch-all + elastic reject / embedding assignment all run
+    # identically below). No usage recorded — there's no API call.
+    if themes_override is not None:
+        log.info(
+            "topic_discovery.themes_injected",
+            platform=platform,
+            count=len(themes_override),
+        )
+        parsed = {"themes": themes_override}
+    else:
+        client = _get_client()
+        # Retry the generate+parse cycle on transient ServerError (503
+        # "model overloaded") or malformed JSON. Output is tiny (labels
+        # only), so MAX_TOKENS truncation should never recur — but the
+        # retry keeps us robust against transient 503s. 3 attempts,
+        # exponential backoff. Final fallback: empty themes → recluster
+        # persists nothing → existing topic rows stay intact.
+        # Model is always Flash since the 2026-06-25 Pro→Flash revert;
+        # _model_for_today still returns the (model, budget) tuple shape.
+        model_today, thinking_budget = _model_for_today()
+        for attempt_idx in range(3):
             try:
-                if resp and resp.candidates:
-                    finish_reason = getattr(resp.candidates[0], "finish_reason", None)
-                usage_md = getattr(resp, "usage_metadata", None) if resp else None
-                if usage_md:
-                    tokens_out = getattr(usage_md, "candidates_token_count", None)
-            except Exception:
-                pass
-            log.warning(
-                "topic_discovery.bad_json_retry",
-                platform=platform,
-                attempt=attempt_idx + 1,
-                finish_reason=str(finish_reason) if finish_reason else None,
-                tokens_out=tokens_out,
-                raw_len=len(resp.text or "") if resp else 0,
-                raw_tail=(resp.text or "")[-200:] if resp else "",
-            )
-        if attempt_idx < 2:
-            time.sleep(10 * (2 ** attempt_idx))
+                resp = client.models.generate_content(
+                    model=model_today,
+                    contents=user_prompt,
+                    config=types.GenerateContentConfig(
+                        system_instruction=SYSTEM_PROMPT,
+                        response_mime_type="application/json",
+                        response_schema=response_schema,
+                        temperature=0.2,
+                        # Labels-only OUTPUT: 6-10 themes × (label + 5 short
+                        # keywords) is a few hundred tokens. With Pro's
+                        # thinking enabled, thoughts count toward the budget
+                        # too — raised to 8K to cover ~2K thinking + ~4K
+                        # output + 2K margin.
+                        max_output_tokens=8192,
+                        # thinking_budget: 2048 for Pro (Thursday), 0 for
+                        # Flash (other days — matches the historical safe
+                        # config that avoided Flash-Lite's thinking-spiral).
+                        thinking_config=types.ThinkingConfig(
+                            thinking_budget=thinking_budget
+                        ),
+                    ),
+                )
+                raw = resp.text or "{}"
+                parsed = json.loads(raw)
+                break  # success
+            except genai_errors.ServerError as exc:
+                log.warning(
+                    "topic_discovery.server_error_retry",
+                    platform=platform,
+                    attempt=attempt_idx + 1,
+                    error=str(exc)[:200],
+                )
+            except json.JSONDecodeError:
+                finish_reason = None
+                tokens_out = None
+                try:
+                    if resp and resp.candidates:
+                        finish_reason = getattr(resp.candidates[0], "finish_reason", None)
+                    usage_md = getattr(resp, "usage_metadata", None) if resp else None
+                    if usage_md:
+                        tokens_out = getattr(usage_md, "candidates_token_count", None)
+                except Exception:
+                    pass
+                log.warning(
+                    "topic_discovery.bad_json_retry",
+                    platform=platform,
+                    attempt=attempt_idx + 1,
+                    finish_reason=str(finish_reason) if finish_reason else None,
+                    tokens_out=tokens_out,
+                    raw_len=len(resp.text or "") if resp else 0,
+                    raw_tail=(resp.text or "")[-200:] if resp else "",
+                )
+            if attempt_idx < 2:
+                time.sleep(10 * (2 ** attempt_idx))
 
-    if parsed is None:
-        log.error("topic_discovery.gave_up", platform=platform)
-        return []
+        if parsed is None:
+            log.error("topic_discovery.gave_up", platform=platform)
+            return []
 
-    # Record Gemini naming cost.
-    from api.services.usage import gemini_output_tokens, record_usage
+        # Record Gemini naming cost.
+        from api.services.usage import gemini_output_tokens, record_usage
 
-    usage_md = getattr(resp, "usage_metadata", None) if resp else None
-    record_usage(
-        provider="gemini",
-        operation="topic_discovery",
-        model=MODEL,
-        tokens_in=getattr(usage_md, "prompt_token_count", None),
-        tokens_out=gemini_output_tokens(usage_md),
-        meta={"platform": platform, "sample_size": len(sample)},
-    )
+        usage_md = getattr(resp, "usage_metadata", None) if resp else None
+        record_usage(
+            provider="gemini",
+            operation="topic_discovery",
+            model=MODEL,
+            tokens_in=getattr(usage_md, "prompt_token_count", None),
+            tokens_out=gemini_output_tokens(usage_md),
+            meta={"platform": platform, "sample_size": len(sample)},
+        )
 
     themes_raw = parsed.get("themes") or []
     themes: list[dict[str, Any]] = []

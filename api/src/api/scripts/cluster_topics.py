@@ -27,8 +27,10 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import json
 import sys
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from typing import Any
 from uuid import UUID
 
@@ -39,7 +41,11 @@ from sqlalchemy import or_ as sql_or
 from api.db import SessionLocal
 from api.models.social import SocialPost
 from api.models.topics import Topic
-from api.services.topic_discovery import discover_topics
+from api.services.topic_discovery import (
+    SAMPLE_SIZE,
+    build_discovery_user_prompt,
+    discover_topics,
+)
 
 log = structlog.get_logger()
 
@@ -269,21 +275,153 @@ async def _run() -> int:
     return n_themes
 
 
+# ──────────────────────────────────────────────────────────────────
+# Manual (Claude-in-chat) two-stage clustering — zero Gemini.
+#
+# Mirrors the manual_briefing pattern: dump the corpus sample for Claude
+# to read in chat, Claude returns the themes JSON (the NAMING judgment
+# that Gemini would otherwise do), then inject those themes back to run
+# the embedding-assignment + persist. Per the operator rule that manual
+# content judgment stays with Claude, never a Gemini call.
+# ──────────────────────────────────────────────────────────────────
+
+
+def _posts_to_jsonl_record(p: dict[str, Any]) -> dict[str, Any]:
+    """Serialize a fetched post for the dump cache (UUID→str, dt→iso)."""
+    posted = p.get("posted_at")
+    return {
+        "id": str(p["id"]),
+        "text": p.get("text") or "",
+        "posted_at": posted.isoformat() if posted else None,
+        "theme_group": p.get("theme_group"),
+    }
+
+
+def _jsonl_record_to_post(r: dict[str, Any]) -> dict[str, Any]:
+    """Inverse of _posts_to_jsonl_record — restore UUID + datetime so the
+    inject path matches what _fetch_recent_posts would have produced."""
+    return {
+        "id": UUID(r["id"]),
+        "text": r.get("text") or "",
+        "posted_at": (
+            datetime.fromisoformat(r["posted_at"]) if r.get("posted_at") else None
+        ),
+        "theme_group": r.get("theme_group"),
+    }
+
+
+async def cmd_dump_sample(output_path: str) -> None:
+    """STAGE 1: fetch the corpus, cache the full posts list, and write the
+    discovery sample (the exact prompt Gemini would see) for Claude."""
+    posts = await _fetch_recent_posts()
+    if len(posts) < MIN_POSTS_FOR_DISCOVERY:
+        raise SystemExit(
+            f"Only {len(posts)} posts — need >= {MIN_POSTS_FOR_DISCOVERY}. Aborting."
+        )
+
+    base = output_path.rsplit(".", 1)[0]
+    posts_cache = f"{base}.posts.jsonl"
+    with open(posts_cache, "w", encoding="utf-8") as f:
+        for p in posts:
+            f.write(json.dumps(_posts_to_jsonl_record(p), ensure_ascii=False) + "\n")
+
+    user_prompt = build_discovery_user_prompt(
+        posts, platform=UNIFIED_PLATFORM, sample_size=SAMPLE_SIZE
+    )
+    header = (
+        f"<!-- DAKWAH-LENS MANUAL TOPIC CLUSTERING — STAGE 1 -->\n"
+        f"<!-- corpus: {len(posts)} posts · sample feeds naming · "
+        f"posts cache: {posts_cache} -->\n"
+        f"<!-- Read the sample below, return a themes JSON "
+        f'{{"themes":[{{"label","keywords","exclude_keywords","min_similarity"}}]}}, '
+        f"save it, then run: -->\n"
+        f"<!--   cluster_topics inject {posts_cache} <themes.json> -->\n\n"
+    )
+    Path(output_path).write_text(header + user_prompt, encoding="utf-8")
+    sys.stderr.write(
+        f"✓ Sample written to {output_path} ({len(user_prompt):,} chars)\n"
+        f"  Posts cache: {posts_cache} ({len(posts)} posts)\n"
+        f"  Next: paste into Claude → save themes JSON → "
+        f"cluster_topics inject {posts_cache} <themes.json>\n"
+    )
+
+
+async def cmd_inject(posts_path: str, themes_path: str) -> None:
+    """STAGE 2: load the cached posts + Claude's themes, run assignment
+    (embedding cosine) + persist. No Gemini call."""
+    # Split on "\n" ONLY — NOT str.splitlines(), which also breaks on
+    # Unicode line boundaries ( , ₅/NEL, \x0c …) that appear raw
+    # inside tweet text. json.dumps escapes \n and \r but leaves those
+    # other separators literal, so splitlines() would shatter a record
+    # mid-string → "Unterminated string". Records are newline-delimited
+    # by construction (dump writes `json.dumps(...) + "\n"`).
+    posts = [
+        _jsonl_record_to_post(json.loads(line))
+        for line in Path(posts_path).read_text(encoding="utf-8").split("\n")
+        if line.strip()
+    ]
+    if not posts:
+        raise SystemExit(f"No posts loaded from {posts_path}. Aborting.")
+
+    raw = json.loads(Path(themes_path).read_text(encoding="utf-8"))
+    themes_override = raw.get("themes") if isinstance(raw, dict) else raw
+    if not themes_override:
+        raise SystemExit(
+            f"No themes in {themes_path}. Expected {{'themes': [...]}} or a list."
+        )
+
+    print(
+        f"  Injecting {len(themes_override)} Claude-authored themes over "
+        f"{len(posts)} posts (NO Gemini) …"
+    )
+    themes = discover_topics(
+        posts, platform=UNIFIED_PLATFORM, themes_override=themes_override
+    )
+    n_themes = await _persist(posts, themes)
+    n_assigned = sum(len(t["post_ids"]) for t in themes)
+    n_orphan = len(posts) - n_assigned
+    print(
+        f"✓ Persisted {n_themes} themes ({n_assigned} assigned, {n_orphan} orphan)"
+    )
+    for t in themes:
+        print(f"    {len(t['post_ids']):3d} posts · {t['label']}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
-            "Discover topics over social_posts using Gemini Flash. Runs one "
-            "UNIFIED pass over all platforms (no per-platform split)."
+            "Discover topics over social_posts. Default runs one UNIFIED "
+            "Gemini pass; `dump-sample`/`inject` run the manual Claude flow."
         )
     )
+    sub = parser.add_subparsers(dest="cmd")
     # `--all` / `--platform` retained as no-ops for backward compat with
     # existing cron + muscle memory; clustering is always unified now.
     parser.add_argument("--all", action="store_true", help="(default; no-op)")
     parser.add_argument("--platform", help="(deprecated; ignored — clustering is unified)")
-    parser.parse_args()
+
+    p_dump = sub.add_parser(
+        "dump-sample",
+        help="STAGE 1 (manual): write the discovery sample for Claude to name.",
+    )
+    p_dump.add_argument("--output", "-o", required=True, help="Output .md path.")
+
+    p_inject = sub.add_parser(
+        "inject",
+        help="STAGE 2 (manual): assign + persist using Claude-authored themes.",
+    )
+    p_inject.add_argument("posts_file", help="The .posts.jsonl cache from dump-sample.")
+    p_inject.add_argument("themes_file", help="Claude's themes JSON.")
+
+    args = parser.parse_args()
 
     try:
-        asyncio.run(_run())
+        if args.cmd == "dump-sample":
+            asyncio.run(cmd_dump_sample(args.output))
+        elif args.cmd == "inject":
+            asyncio.run(cmd_inject(args.posts_file, args.themes_file))
+        else:
+            asyncio.run(_run())
     except Exception as e:
         log.error("cluster.failed", error=str(e))
         sys.exit(1)
