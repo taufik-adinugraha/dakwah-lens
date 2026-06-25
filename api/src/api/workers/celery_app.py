@@ -125,13 +125,21 @@ celery_app.conf.update(
         # X — weekly Wed 22:00 WIB. Since briefings became weekly
         # (Sun 05:00 WIB), 3× daily X fanouts were paying for the same
         # engagement-sticky "Top" tweets multiple times. One weekly run
-        # with a 500-item cap and a 7d window via `since_days` lands
-        # ~5–10× more unique signal per dollar (cap is a ceiling — the
-        # actor returned 205 items for `korupsi` in smoke).
+        # with a 7d window via `since_days` lands ~5–10× more unique
+        # signal per dollar (cap is a ceiling).
+        #
+        # limit lowered 200 → 100 (2026-06-25). After the tweetLanguage
+        # bug fix the full pool (~80 queries) returns near-max every run;
+        # at limit=200 the 2026-06-25 manual re-ingest billed 14,978
+        # items / $4.94 with ~36% being cross-query duplicate "Top"
+        # tweets (apify charges per item RETURNED, dupes upsert onto
+        # existing rows). limit=100 halves the per-run cost to ~$2.50
+        # while still yielding ~8,000 fresh items — ample for the weekly
+        # briefing's 7d window. Matches the daily trending X_LIMIT=100.
         "ingest-x-weekly": {
             "task": "api.workers.ingest.rotating_ingest",
             "schedule": crontab(minute=0, hour=22, day_of_week=3),
-            "kwargs": {"platform": "x", "limit": 200, "n_keywords": 999},
+            "kwargs": {"platform": "x", "limit": 100, "n_keywords": 999},
         },
         # TikTok + Instagram — PAUSED 2026-06-08 to claw back budget for
         # higher-value LLM work (briefings, daleel pool widening). Three
