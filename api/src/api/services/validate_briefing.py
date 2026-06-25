@@ -1611,7 +1611,7 @@ def scan_flyer_dalil_in_pool(
     warnings: list[BriefingWarning] = []
     headers = list(_FLYER_HEADER_RE.finditer(flyer_section))
     for idx, h in enumerate(headers):
-        flyer_n = h.group(1)
+        flyer_n = int(h.group(1))  # regex captures a digit string; int for `flyer_n - 1`
         block_start = h.start()
         block_end = (
             headers[idx + 1].start() if idx + 1 < len(headers) else len(flyer_section)
