@@ -55,6 +55,10 @@ export async function generateMetadata({
   return {
     title: { default: t("name"), template: `%s · ${t("name")}` },
     description: t("description"),
+    // favicon.ico + apple-icon.png are auto-emitted from src/app/ (Next
+    // file convention). The PWA manifest (android-chrome icons) lives in
+    // public/favicon_io/ and is referenced here.
+    manifest: "/favicon_io/site.webmanifest",
   };
 }
 
