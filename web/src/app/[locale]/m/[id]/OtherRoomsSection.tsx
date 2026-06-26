@@ -34,7 +34,12 @@ export async function OtherRoomsSection({
   locale: string;
 }) {
   const t = await getTranslations("OtherRooms");
-  const rooms = await getOtherMahasiswaRooms(currentSlug, 8);
+  // 13 = the 14 weekly theme groups minus the current room. (Was 8 — a
+  // legacy cap from before the 4-segment → 14-group migration, which left
+  // the rail showing only ~half the week's other rooms.) The query orders
+  // by generated_at DESC over a 90-day window, so the 13 newest are this
+  // week's siblings; older editions don't bleed in.
+  const rooms = await getOtherMahasiswaRooms(currentSlug, 13);
   if (rooms.length === 0) return null;
 
   return (
