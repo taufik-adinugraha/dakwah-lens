@@ -73,6 +73,7 @@ import {
   getAssetsByKind,
   type FlyerImageAsset,
 } from "./images/registry";
+import { DUA_BACKGROUND_SRCS } from "./images/dua-backgrounds";
 import type { LayoutId } from "./layouts";
 import type {
   FlyerComposition,
@@ -521,6 +522,30 @@ function seedFrom(parts: (string | number)[]): number {
   return h;
 }
 
+/** Du'a flyer (slot-6 "Doa Pekan Ini") background. Rotates through the
+ *  vetted DUA_BACKGROUND_SRCS pool by a content-derived hash so
+ *  successive du'a flyers don't repeat, while a given du'a always maps
+ *  to the same photo (stable across re-renders / caches). Returns a
+ *  synthetic photo asset built from a literal src so resolveAssets
+ *  inlines ONLY this one image — not the whole 70-photo pool per render.
+ *  Selection lives here (not in DuaHero) because that's where the du'a
+ *  content + seed are known and only the chosen asset needs resolving. */
+function pickDuaBackground(content: FlyerContent): FlyerImageAsset {
+  const idx =
+    seedFrom([
+      content.daleel?.citation ?? "",
+      content.daleel?.arabic?.length ?? 0,
+      content.dateLabel,
+    ]) % DUA_BACKGROUND_SRCS.length;
+  return {
+    id: `dua-bg-${idx}`,
+    kind: "photo",
+    src: DUA_BACKGROUND_SRCS[idx],
+    aspect: "1:1",
+    tags: ["dua", "calm"],
+  };
+}
+
 // ──────────────────────────────────────────────────────────────────
 // Inline-du'a vs pool-entry validation
 // ──────────────────────────────────────────────────────────────────
@@ -890,8 +915,14 @@ export async function composeFlyer(ctx: FlyerContext): Promise<{
     slotKey,
   ]);
 
-  const image = await pickImage(seed);
   const content = await buildContent(ctx);
+  // The du'a flyer (slot-6) draws its background from the vetted du'a
+  // pool, hashed on the du'a content; every other slot keeps the
+  // generic registry pick seeded by date+slot.
+  const image =
+    layoutId === "dua-hero"
+      ? pickDuaBackground(content)
+      : await pickImage(seed);
   const palette = buildPalette(ctx.slot, seed);
   // Distinct seeds for layout variant so decorations rotate
   // independently of palette + photo (more visual variety). The

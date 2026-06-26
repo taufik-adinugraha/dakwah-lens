@@ -35,40 +35,21 @@ export async function resolveAssets(
     }),
   );
 
-  // Curated calm backgrounds for the du'a flyer — the DuaHero layout
-  // rotates through these (by edition variant) so successive du'a
-  // flyers don't all look the same. Resolved from literal disk paths
-  // (robust if the DB rows were pruned; the files live in public/).
-  // Hand-vetted to ONLY clean, on-theme Islamic photos. The pool's
-  // `open-book.jpg` (a coffee mug reading "The Adventure Begins") and
-  // `dome-interior.jpg` (a city skyline) are mislabeled junk — excluded.
-  const DUA_BG_SRCS = [
-    "/flyer-assets/photos/quran-open.jpg", // open mushaf on a stand (warm)
-    "/flyer-assets/photos/minaret-sky.jpg", // blue-dome mosque, golden sky
-    "/flyer-assets/photos/mosque-interior.jpg", // navy mushaf cover
-  ];
-  const duaBgAssets: FlyerImageAsset[] = DUA_BG_SRCS.map((src, i) => ({
-    id: `dua-bg-${i}`,
-    kind: "photo",
-    src,
-    aspect: "1:1",
-    tags: ["quran", "calm"],
-  }));
-
+  // The du'a flyer background is chosen upstream (compose.ts
+  // pickDuaBackground) and arrives as `primaryAsset`, so only ONE
+  // background resolves to a data URL per render — no separate du'a
+  // pool is inlined here anymore (was 3 photos on EVERY flyer render).
   const results = await Promise.all([
     assetToDataUrl(primaryAsset),
-    ...duaBgAssets.map((a) => assetToDataUrl(a)),
     ...sharedAssets.map((a) => assetToDataUrl(a)),
   ]);
 
   const primary = results[0];
-  const duaBackgrounds = results.slice(1, 1 + duaBgAssets.length);
   const [starsRow, dotsPattern, arabesque, arch, star8, lantern, calligraphyFrame] =
-    results.slice(1 + duaBgAssets.length);
+    results.slice(1);
 
   return {
     primary,
-    duaBackgrounds,
     starsRow,
     dotsPattern,
     arabesque,

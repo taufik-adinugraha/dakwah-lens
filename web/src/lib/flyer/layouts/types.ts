@@ -56,13 +56,10 @@ export type FlyerComposition = {
  *  Pre-resolved because Puppeteer's `setContent` has no base URL, so
  *  relative paths to /flyer-assets/... would 404 at render time. */
 export type ResolvedAssets = {
-  /** The composition.image, already converted to a data URL. */
+  /** The composition.image, already converted to a data URL. For the
+   *  du'a flyer this is the content-hashed pick from the vetted du'a
+   *  background pool (see compose.ts pickDuaBackground). */
   primary: string;
-  /** Curated set of calm, contemplative photos (mushaf, open book,
-   *  mosque/dome interiors) the DuaHero (du'a flyer) layout rotates
-   *  through as a white-veiled background — so successive editions
-   *  don't look identical. */
-  duaBackgrounds: string[];
   /** Shared decorative SVGs. Each layout uses a subset. */
   starsRow: string;
   dotsPattern: string;

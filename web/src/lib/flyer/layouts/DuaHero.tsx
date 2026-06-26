@@ -16,20 +16,11 @@ import type { FlyerLayoutComponent, FlyerPalette } from "./types";
  * backdrop + banner functions were deleted (git history preserves them
  * if a future rotation needs to resurrect).
  *
- * Photos rotate per-du'a via a content-derived hash so successive
- * editions don't all look identical.
+ * The background photo is chosen upstream in compose.ts
+ * (pickDuaBackground) from the vetted 70-photo du'a pool and arrives as
+ * `assets.primary`, hashed on the du'a content so successive du'a
+ * flyers don't all look identical.
  */
-
-// FNV-1a — small stable hash so a given du'a always maps to the same
-// look (good for caching) while different du'a get different looks.
-function hashStr(s: string): number {
-  let h = 2166136261;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return h >>> 0;
-}
 
 export const DuaHero: FlyerLayoutComponent = ({
   content,
@@ -72,10 +63,7 @@ export const DuaHero: FlyerLayoutComponent = ({
   if (weight > 1100) transSize = 17;
   if (weight > 1700) transSize = 15;
 
-  const bgPool =
-    assets.duaBackgrounds.length > 0 ? assets.duaBackgrounds : [assets.primary];
-  const rot = hashStr(`${citation}|${arLen}|${dateLabel}`);
-  const bgSrc = bgPool[rot % bgPool.length];
+  const bgSrc = assets.primary;
 
   const p: DuaProps = {
     arabic,
