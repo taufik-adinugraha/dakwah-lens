@@ -2333,6 +2333,83 @@ def scan_flyer_doa_not_dua(
     return warnings
 
 
+_QA_MIN_PAIRS = 3
+
+
+def scan_mahasiswa_qa(markdown: str) -> list[BriefingWarning]:
+    """Flag a Mahasiswa section whose `#### Q&A` block has no (or too few)
+    parseable `**Q:** … **A:** …` pairs. The /m discussion page renders
+    these pairs; a missing/malformed block leaves the page with no Q&A
+    (2026-06-26 incident: 5 of 14 briefings shipped Q&A with `**A:**`
+    inline on the `**Q:**` line, which the renderer dropped). Mirrors the
+    tolerant renderer parse — `**A:**` may be inline OR on its own line.
+    Soft warning; the operator reviews + reformats before publish.
+    """
+    warnings: list[BriefingWarning] = []
+    sec4 = _section_slice(
+        markdown,
+        r"(?:Strategi(?:\s+(?:&|dan)\s+Aksi\s+Dakwah)?|Da['’]?wah\s+Strategies(?:\s+(?:&|and)\s+Actions)?)",
+    )
+    if not sec4:
+        return warnings
+    body = markdown[sec4[0] : sec4[1]]
+    h3s = list(re.finditer(r"^###\s+(.+)$", body, flags=re.MULTILINE))
+    mahasiswa_block: str | None = None
+    for i, h3 in enumerate(h3s):
+        if re.match(r"Mahasiswa\b", h3.group(1).strip(), flags=re.IGNORECASE):
+            start = h3.end()
+            end = h3s[i + 1].start() if i + 1 < len(h3s) else len(body)
+            mahasiswa_block = body[start:end]
+            break
+    if not mahasiswa_block:
+        return warnings
+    qa_head = re.search(
+        r"^####\s+(?:q\s*&\s*a|q&a)",
+        mahasiswa_block,
+        flags=re.IGNORECASE | re.MULTILINE,
+    )
+    if not qa_head:
+        warnings.append(
+            {
+                "kind": "mahasiswa_qa_missing",
+                "severity": "medium",
+                "where": "Mahasiswa Q&A",
+                "message": (
+                    "Mahasiswa section has no `#### Q&A` block — the /m "
+                    "discussion page renders without Q&A. Add a "
+                    "`#### Q&A Realistis` block with ≥3 `**Q:** … **A:** …` pairs."
+                ),
+            }
+        )
+        return warnings
+    qa_body = mahasiswa_block[qa_head.end() :]
+    pairs = 0
+    for chunk in re.split(
+        r"^\s*\*\*\s*Q\s*[:：]\s*\*\*\s*",
+        qa_body,
+        flags=re.IGNORECASE | re.MULTILINE,
+    )[1:]:
+        # `**A:**` matched ANYWHERE (inline or own-line) — mirrors the
+        # renderer's tolerant split.
+        if len(re.split(r"\s*\*\*\s*A\s*[:：]\s*\*\*\s*", chunk, flags=re.IGNORECASE)) > 1:
+            pairs += 1
+    if pairs < _QA_MIN_PAIRS:
+        warnings.append(
+            {
+                "kind": "mahasiswa_qa_unparseable",
+                "severity": "medium",
+                "where": "Mahasiswa Q&A",
+                "message": (
+                    f"Mahasiswa `#### Q&A` block parsed only {pairs} pair(s) "
+                    f"(expected ≥{_QA_MIN_PAIRS}). Each pair needs a `**Q:**` "
+                    f"marker and an `**A:**` marker (inline or own-line). The /m "
+                    f"page renders these pairs — check the markers."
+                ),
+            }
+        )
+    return warnings
+
+
 def validate_briefing(
     markdown: str,
     *,
@@ -2386,6 +2463,7 @@ def validate_briefing(
         (scan_deliverable_word_counts, "word_count_check_failed"),
         (scan_kisah_voice, "kisah_voice_check_failed"),
         (scan_mahasiswa_voice, "mahasiswa_voice_check_failed"),
+        (scan_mahasiswa_qa, "mahasiswa_qa_check_failed"),
         (scan_pengajaran_voice, "pengajaran_voice_check_failed"),
         (scan_preacher_anda, "preacher_anda_check_failed"),
         (scan_firman_hadith_mismatch, "firman_hadith_check_failed"),

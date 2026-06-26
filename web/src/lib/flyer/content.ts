@@ -1250,7 +1250,13 @@ export function extractMahasiswaContent(markdown: string): MahasiswaContent {
       .split(/^\s*\*\*\s*Q\s*[:：]\s*\*\*\s*/im)
       .slice(1);
     for (const chunk of qSplits) {
-      const [q, ...rest] = chunk.split(/^\s*\*\*\s*A\s*[:：]\s*\*\*\s*/im);
+      // NB: the `**A:**` split is intentionally NOT line-anchored — some
+      // briefings write the answer inline on the same line as the
+      // question ("**Q:** … **A:** …") instead of on its own line. An
+      // earlier `^…/m` anchor silently dropped every such pair, leaving
+      // the /m page with no Q&A. Matching `**A:**` anywhere parses both
+      // the inline and own-line layouts.
+      const [q, ...rest] = chunk.split(/\s*\*\*\s*A\s*[:：]\s*\*\*\s*/i);
       if (rest.length === 0) continue;
       const answer = rest.join("").trim();
       qa.push({ question: q.trim(), answer });
