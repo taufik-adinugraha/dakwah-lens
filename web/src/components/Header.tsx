@@ -1,9 +1,9 @@
 import { Home } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
+import Image from "next/image";
 
 import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
-import { Logo } from "./Logo";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import { MobileNav } from "./MobileNav";
 import { UserMenu } from "./UserMenu";
@@ -64,7 +64,14 @@ export async function Header() {
             className="hidden items-center md:flex"
             aria-label="Dakwah-Lens"
           >
-            <Logo />
+            <Image
+              src="/dakwah-lens-logo-long.jpeg"
+              alt="Dakwah-Lens"
+              width={752}
+              height={281}
+              priority
+              className="h-9 w-auto rounded-lg"
+            />
           </Link>
 
           <nav className="hidden items-center gap-7 text-sm font-medium text-slate-600 md:flex">
