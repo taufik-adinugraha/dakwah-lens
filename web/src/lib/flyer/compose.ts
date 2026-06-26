@@ -584,6 +584,13 @@ function normalizeArabic(s: string): string {
   return s
     // Strip harakat / tashkeel + Quranic marks + tatweel.
     .replace(/[ؐ-ًؚ-ٰٟۖ-ۭـ]/g, "")
+    // Strip punctuation so an operator-written inline du'a (which adds
+    // Arabic commas between clauses, e.g. "تقواها، وزكها") still
+    // matches a pool chunk that omits them. Without this the 30-char
+    // prefix check in isInlineFromPool falsely rejected the inline and
+    // the du'a flyer fell back to rendering the raw pool hadith
+    // (isnad + all) instead of the clean recitable du'a.
+    .replace(/[\u060C\u061B\u061F.,;:!?()\[\]"'\u2018\u2019\u201C\u201D\u200E\u200F-]/g, "")
     // Strip all whitespace (incl. NBSP, Arabic spaces).
     .replace(/\s+/g, "");
 }
