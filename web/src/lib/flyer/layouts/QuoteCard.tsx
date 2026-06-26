@@ -1,5 +1,5 @@
-import { pickDaleelTranslation } from "../content";
-import { Citation, QuoteGlyph } from "./decor";
+import { isQuotableDaleel, pickDaleelTranslation } from "../content";
+import { Citation, DaleelSourceChip, QuoteGlyph } from "./decor";
 import type { FlyerLayoutComponent } from "./types";
 
 /**
@@ -33,6 +33,7 @@ export const QuoteCard: FlyerLayoutComponent = ({
     keywords: [headline, message].filter(Boolean) as string[],
   });
   const transLen = translation.length;
+  const quotable = isQuotableDaleel(daleel, locale);
   // Tiered to match the full-bleed photo backdrop (2026-06-10): bumped
   // from 26/22/19/17/15 → 32/28/24/21/18. The opaque white quote card
   // sits on a busy photo + dark overlay, so the translation needs to
@@ -132,36 +133,46 @@ export const QuoteCard: FlyerLayoutComponent = ({
           )}
         </div>
 
-        {/* Daleel quote card — opaque white, accent top border, decorative quote glyph */}
-        {daleel && translation && (
-          <div
-            data-autofit
-            data-fit-min="14"
-            className="relative flex max-w-[940px] flex-col gap-3 rounded-3xl bg-white px-9 py-7 shadow-2xl"
-            style={{
-              boxShadow: `0 18px 48px ${dark}aa`,
-              borderTop: `8px solid ${palette.accent}`,
-              maxHeight: "360px",
-              overflow: "hidden",
-            }}
-          >
-            <QuoteGlyph
-              color={palette.accent}
-              className="absolute left-4 top-1 z-0"
-            />
+        {/* Daleel quote card — opaque white, accent top border, decorative
+            quote glyph. Section-length classic-kitab daleel (no clean
+            pull-quote) fall back to a compact source chip so the daleel is
+            still credited rather than silently dropped. */}
+        {daleel &&
+          (quotable && translation ? (
             <div
-              className="relative z-10 font-medium italic leading-[1.55] text-slate-800"
-              style={{ fontSize: `${transSize}px` }}
+              data-autofit
+              data-fit-min="14"
+              className="relative flex max-w-[940px] flex-col gap-3 rounded-3xl bg-white px-9 py-7 shadow-2xl"
+              style={{
+                boxShadow: `0 18px 48px ${dark}aa`,
+                borderTop: `8px solid ${palette.accent}`,
+                maxHeight: "360px",
+                overflow: "hidden",
+              }}
             >
-              &ldquo;{translation}&rdquo;
+              <QuoteGlyph
+                color={palette.accent}
+                className="absolute left-4 top-1 z-0"
+              />
+              <div
+                className="relative z-10 font-medium italic leading-[1.55] text-slate-800"
+                style={{ fontSize: `${transSize}px` }}
+              >
+                &ldquo;{translation}&rdquo;
+              </div>
+              <Citation
+                citation={daleel.citation}
+                color={palette.accent}
+                className="relative z-10"
+              />
             </div>
-            <Citation
+          ) : (
+            <DaleelSourceChip
               citation={daleel.citation}
-              color={palette.accent}
-              className="relative z-10"
+              palette={palette}
+              label={locale === "en" ? "Source" : "Sumber"}
             />
-          </div>
-        )}
+          ))}
       </div>
     </div>
   );

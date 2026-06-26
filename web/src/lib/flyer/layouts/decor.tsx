@@ -84,6 +84,55 @@ export function Citation({
 }
 
 /**
+ * Compact source-credit chip — rendered in place of the full
+ * translation quote card when a daleel has no short, flyer-sized
+ * translation (e.g. a section-length classic-kitab chunk whose specific
+ * saying is already woven into the body). Keeps the daleel CREDITED so
+ * the source is never invisible. Opaque white pill so it reads on any
+ * background (pattern or dark-photo overlay).
+ */
+export function DaleelSourceChip({
+  citation,
+  palette,
+  label,
+  align = "start",
+  className = "",
+}: {
+  citation: string;
+  palette: FlyerPalette;
+  label: string;
+  align?: "start" | "center";
+  className?: string;
+}) {
+  return (
+    <div
+      className={`flex ${align === "center" ? "justify-center" : ""} ${className}`}
+    >
+      <div
+        className="inline-flex max-w-[880px] flex-col gap-1.5 rounded-2xl bg-white px-7 py-5 shadow-xl"
+        style={{
+          boxShadow: `0 14px 40px ${palette.accentDeep}55`,
+          borderLeft: `8px solid ${palette.accent}`,
+        }}
+      >
+        <span
+          className="text-[12px] font-extrabold uppercase tracking-[0.2em]"
+          style={{ color: palette.accent }}
+        >
+          {label}
+        </span>
+        <span
+          className="text-[24px] font-extrabold leading-tight"
+          style={{ color: palette.accentDeep }}
+        >
+          {citation}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/**
  * Short rounded accent bar placed under a headline — a small visual
  * anchor lifted from the reference posters' bold-title treatment.
  */

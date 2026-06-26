@@ -1,5 +1,5 @@
-import { pickDaleelTranslation } from "../content";
-import { Citation, HeadlineRule } from "./decor";
+import { isQuotableDaleel, pickDaleelTranslation } from "../content";
+import { Citation, DaleelSourceChip, HeadlineRule } from "./decor";
 import type { FlyerLayoutComponent } from "./types";
 
 /**
@@ -24,6 +24,7 @@ export const HeroAyat: FlyerLayoutComponent = ({
     keywords: [headline, message].filter(Boolean) as string[],
   });
   const transLen = translation.length;
+  const quotable = isQuotableDaleel(daleel, locale);
   // Bumped 2026-06-06 to match QuoteCard — the old floor (15px) was
   // dwarfed by the message body on the 1080×1080 canvas.
   const transSize =
@@ -138,27 +139,34 @@ export const HeroAyat: FlyerLayoutComponent = ({
         {/* Translation-only daleel card. Bounded height + dynamic
             font so a long hadith narration can't push the citation
             off the canvas. */}
-        {daleel && translation && (
-          <div
-            data-autofit
-            data-fit-min="13"
-            className="flex max-w-[940px] flex-col gap-[12px] rounded-3xl px-7 py-6"
-            style={{
-              backgroundColor: "rgba(255,255,255,0.94)",
-              boxShadow: `0 12px 32px ${palette.accentDeep}55`,
-              maxHeight: "280px",
-              overflow: "hidden",
-            }}
-          >
+        {daleel &&
+          (quotable && translation ? (
             <div
-              className="font-medium italic leading-[1.45] text-slate-800"
-              style={{ fontSize: `${transSize}px` }}
+              data-autofit
+              data-fit-min="13"
+              className="flex max-w-[940px] flex-col gap-[12px] rounded-3xl px-7 py-6"
+              style={{
+                backgroundColor: "rgba(255,255,255,0.94)",
+                boxShadow: `0 12px 32px ${palette.accentDeep}55`,
+                maxHeight: "280px",
+                overflow: "hidden",
+              }}
             >
-              &ldquo;{translation}&rdquo;
+              <div
+                className="font-medium italic leading-[1.45] text-slate-800"
+                style={{ fontSize: `${transSize}px` }}
+              >
+                &ldquo;{translation}&rdquo;
+              </div>
+              <Citation citation={daleel.citation} color={palette.accent} />
             </div>
-            <Citation citation={daleel.citation} color={palette.accent} />
-          </div>
-        )}
+          ) : (
+            <DaleelSourceChip
+              citation={daleel.citation}
+              palette={palette}
+              label={locale === "en" ? "Source" : "Sumber"}
+            />
+          ))}
       </div>
     </div>
   );

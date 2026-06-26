@@ -347,9 +347,14 @@ def _normalize_hit(corpus: str, hit: Any) -> dict[str, Any]:
         "sirah_ibn_hisham",
         "hayat_as_sahabah",
     ):
-        # AR-only kitab payload (2026-06-08). `translation_id` /
-        # `translation_en` deliberately empty — re-embed pass will
-        # backfill them when translations land.
+        # Classic-kitab payload. The 7 classics re-embedded bilingually
+        # on 2026-06-13 carry the Indonesian translation under `id` (and
+        # English under `en` when present); still-AR-only corpora in this
+        # branch simply lack those keys, so `.get(...) or ""` leaves them
+        # blank. (Before this, the branch hardcoded both to "" — a stale
+        # 2026-06-08 assumption that silently dropped classic-kitab
+        # translations from the daleel pool, blanking the daleel card on
+        # any flyer citing a classic kitab even though Qdrant had them.)
         _default_citations = {
             "bidayat_al_hidayah": "Bidayatul Hidayah",
             "al_umm": "Al-Umm",
@@ -368,8 +373,8 @@ def _normalize_hit(corpus: str, hit: Any) -> dict[str, Any]:
         default_citation = _default_citations[corpus]
         citation = payload.get("citation") or default_citation
         arabic = payload.get("ar") or ""
-        translation_id = ""
-        translation_en = ""
+        translation_id = payload.get("id") or ""
+        translation_en = payload.get("en") or ""
         ref_id = f"{corpus}::{payload.get('section_id','')}"
     else:
         # All four hadith corpora share the same payload shape.

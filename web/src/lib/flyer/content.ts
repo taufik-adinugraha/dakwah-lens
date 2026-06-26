@@ -205,6 +205,35 @@ export function pickDaleelTranslation(
   return result;
 }
 
+/** Upper bound (raw chars) on a daleel translation that still reads as a
+ *  flyer pull-quote. A single hadith/ayat translation is well under this;
+ *  a classic-kitab chunk is a whole bab with multiple sayings (often
+ *  markdown-structured), 3000+ chars — truncating that into ~560 chars
+ *  yields a messy list fragment, not a quote. Such daleel are credited
+ *  via a source chip instead (their specific saying is woven into the
+ *  flyer body). */
+export const FLYER_QUOTABLE_MAX_CHARS = 2200;
+
+/** True when the daleel's translation is short enough to render as a
+ *  flyer pull-quote (see FLYER_QUOTABLE_MAX_CHARS). False for an empty
+ *  translation or a section-length classic-kitab chunk → the layout
+ *  shows a compact source-citation chip instead, so the daleel is always
+ *  credited and never silently dropped. */
+export function isQuotableDaleel(
+  daleel:
+    | { translation_id?: string | null; translation_en?: string | null }
+    | null
+    | undefined,
+  locale: string,
+): boolean {
+  if (!daleel) return false;
+  const raw = (locale === "en"
+    ? daleel.translation_en || daleel.translation_id || ""
+    : daleel.translation_id || daleel.translation_en || ""
+  ).trim();
+  return raw.length > 0 && raw.length <= FLYER_QUOTABLE_MAX_CHARS;
+}
+
 /** Strip markdown markers + collapse whitespace. */
 function stripMd(s: string): string {
   return s
