@@ -65,7 +65,7 @@ export async function Header() {
             aria-label="Dakwah-Lens"
           >
             <Image
-              src="/dakwah-lens-logo-long.jpeg"
+              src="/dakwah-lens-logo-long-removebg.png"
               alt="Dakwah-Lens"
               width={752}
               height={281}
