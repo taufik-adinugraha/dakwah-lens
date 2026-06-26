@@ -1007,8 +1007,40 @@ async def cmd_save(group_arg: str, markdown_path: str) -> None:
         heuristic_warnings.extend(medium_low_facts)
 
     async with SessionLocal() as session:
+        from sqlalchemy import delete, select
+
+        now = datetime.now(UTC)
+        # One briefing row per (theme_group, calendar day). The web layer
+        # derives each briefing's slug as `YYYY-MM-DD-<group>` (Asia/
+        # Jakarta date), so a same-day re-save must REPLACE the existing
+        # row, not accumulate. A plain INSERT used to leave a duplicate
+        # behind on every re-save — the /m "other rooms" rail then showed
+        # the same theme twice and 81 rows piled up for the 2026-06-18
+        # batch (cleaned 2026-06-26). Drop same-theme rows whose
+        # generated_at lands on today's Jakarta date, then insert.
+        # (Jakarta = UTC+7, no DST, so the +7h shift is exact.)
+        jakarta_today = (now + timedelta(hours=7)).date()
+        existing = (
+            await session.execute(
+                select(Briefing.id, Briefing.generated_at).where(
+                    Briefing.theme_group == group
+                )
+            )
+        ).all()
+        stale = [
+            bid
+            for bid, gen in existing
+            if (gen + timedelta(hours=7)).date() == jakarta_today
+        ]
+        if stale:
+            await session.execute(delete(Briefing).where(Briefing.id.in_(stale)))
+            sys.stderr.write(
+                f"  ↻ replaced {len(stale)} same-day row(s) for "
+                f"'{group}' ({jakarta_today}) — re-save, not duplicate.\n"
+            )
+
         row = Briefing(
-            generated_at=datetime.now(UTC),
+            generated_at=now,
             period_start=datetime.fromisoformat(stats["period_start"]),
             period_end=datetime.fromisoformat(stats["period_end"]),
             summary_md=final_md,
@@ -1714,6 +1746,25 @@ async def cmd_save_occasion(slug: str, markdown_path: str) -> None:
     ).replace(tzinfo=UTC)
 
     async with SessionLocal() as session:
+        from sqlalchemy import delete, select
+
+        # One row per occasion (keyed by occasion_slug). A re-save of the
+        # same occasion REPLACES the prior row instead of accumulating —
+        # same insert-not-upsert bug the weekly cmd_save had (the plain
+        # INSERT left a duplicate on every re-save). Drop prior rows for
+        # this occasion, then insert.
+        existing = (
+            await session.execute(
+                select(Briefing.id).where(Briefing.occasion_slug == slug)
+            )
+        ).scalars().all()
+        if existing:
+            await session.execute(delete(Briefing).where(Briefing.id.in_(existing)))
+            sys.stderr.write(
+                f"  ↻ replaced {len(existing)} prior row(s) for occasion "
+                f"'{slug}' — re-save, not duplicate.\n"
+            )
+
         row = Briefing(
             generated_at=datetime.now(UTC),
             period_start=period_start,
