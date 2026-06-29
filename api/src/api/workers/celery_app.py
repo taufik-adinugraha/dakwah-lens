@@ -189,10 +189,26 @@ celery_app.conf.update(
         # Other days:        ~$0.02/run on Flash (good enough for the
         # dashboard's daily freshness).
         # Monthly: ~$1.80/mo total (Flash×26 + Pro×4).
-        "recluster-daily": {
-            "task": "api.workers.ingest.recluster_all",
-            "schedule": crontab(minute=0, hour=4),
-        },
+        #
+        # PAUSED 2026-06-30 at operator request. Topic discovery is now
+        # driven MANUALLY by Claude (Opus) via the pure-Claude two-stage
+        # dump-sample/inject flow (zero Gemini) — see
+        # api/src/api/scripts/cluster_topics.py and operator memory
+        # `project_manual_topic_clustering`. The daily Gemini auto-pass
+        # would otherwise OVERWRITE the Claude-authored topics table at
+        # 04:00 WIB, so the beat entry is disabled while clustering is
+        # operator-curated. Trigger a manual recluster from a host shell:
+        #
+        #   docker exec -w /app/src dakwah-lens-api-1 python -m \
+        #     api.scripts.cluster_topics dump-sample -o /tmp/sample.md
+        #   # docker cp the .posts.jsonl out, design themes JSON in Claude,
+        #   # then: cluster_topics inject <posts.jsonl> <themes.json>
+        #
+        # Re-enable the Gemini auto-pass by uncommenting this block.
+        # "recluster-daily": {
+        #     "task": "api.workers.ingest.recluster_all",
+        #     "schedule": crontab(minute=0, hour=4),
+        # },
         # Insights briefing generation — PAUSED 2026-05-23 for cost.
         #
         # Scheduled day moved Sunday → Thursday 2026-05-24 so the
