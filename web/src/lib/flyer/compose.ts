@@ -530,12 +530,22 @@ function seedFrom(parts: (string | number)[]): number {
  *  inlines ONLY this one image — not the whole 70-photo pool per render.
  *  Selection lives here (not in DuaHero) because that's where the du'a
  *  content + seed are known and only the chosen asset needs resolving. */
-function pickDuaBackground(content: FlyerContent): FlyerImageAsset {
+function pickDuaBackground(
+  content: FlyerContent,
+  segment: string | null,
+): FlyerImageAsset {
+  // `segment` (the briefing's theme_group) is folded into the hash so
+  // that two themes in the SAME week that happen to cite the same du'a
+  // still get DIFFERENT backgrounds — the canonical-du'a floor
+  // (kitab_retrieval `_CANONICAL_DUA_CITATIONS`) makes repeated citations
+  // common, and without the theme in the seed every such du'a flyer
+  // rendered an identical photo across themes (operator-reported 2026-07).
   const idx =
     seedFrom([
       content.daleel?.citation ?? "",
       content.daleel?.arabic?.length ?? 0,
       content.dateLabel,
+      segment ?? "",
     ]) % DUA_BACKGROUND_SRCS.length;
   return {
     id: `dua-bg-${idx}`,
@@ -928,7 +938,7 @@ export async function composeFlyer(ctx: FlyerContext): Promise<{
   // generic registry pick seeded by date+slot.
   const image =
     layoutId === "dua-hero"
-      ? pickDuaBackground(content)
+      ? pickDuaBackground(content, ctx.slot.segment)
       : await pickImage(seed);
   const palette = buildPalette(ctx.slot, seed);
   // Distinct seeds for layout variant so decorations rotate
