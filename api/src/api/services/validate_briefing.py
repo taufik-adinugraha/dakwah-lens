@@ -338,7 +338,7 @@ _DELIVERABLE_WORD_TARGETS: list[tuple[str, tuple[int, int]]] = [
     (r"^###\s+Khutbah(?:\s+Jumat)?(?:\s+/\s+Friday\s+Khutbah)?\b", (3450, 4800)),
     (r"^###\s+Kultum(?:\s+/\s+Short\s+Talk)?\b", (1650, 2250)),
     (r"^###\s+Kajian(?:\s+Ibu-ibu)?(?:\s+(?:&|and)\s+Majelis\s+Taklim)?\b", (1400, 1800)),
-    (r"^###\s+Kisah(?:\s+Pendek)?(?:\s+(?:—|-)\s+Short\s+Story)?\b", (1800, 2200)),
+    (r"^###\s+Kisah(?:\s+Pendek)?(?:\s+(?:—|-)\s+Short\s+Story)?\b", (700, 1100)),
     (r"^###\s+Pengajaran(?:\s+di\s+Rumah)?(?:\s+/\s+Home\s+Teaching)?\b", (500, 700)),
     (r"^###\s+Kreator\s+Konten(?:\s+Digital)?(?:\s+/\s+Content\s+Creator)?\b", (100, 130)),
     (r"^###\s+Mahasiswa\b", (900, 1200)),
