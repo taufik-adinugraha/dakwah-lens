@@ -1,3 +1,4 @@
+import { ForestWash } from "@/components/ForestWash";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { and, eq } from "drizzle-orm";
@@ -64,27 +65,29 @@ export default async function PustakaKajianDetailPage({
   );
 
   return (
-    <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
+    <main className="relative isolate overflow-hidden bg-paper font-body text-ink">
+      <ForestWash />
+      <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
       <Link
         href="/pustaka-kajian"
-        className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900"
+        className="inline-flex items-center gap-1.5 text-sm text-ink-muted transition hover:text-ink"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
         {t("back_to_pustaka")}
       </Link>
 
-      <header className="mt-6 space-y-2">
-        <p className="text-xs font-medium uppercase tracking-wider text-brand-700">
+      <header className="mt-8 space-y-3">
+        <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-forest">
           {formatLabel}
         </p>
-        <h1 className="text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+        <h1 className="text-balance font-display text-[clamp(1.875rem,4vw,2.75rem)] font-medium leading-[1.15] tracking-[-0.015em] text-ink">
           {row.title}
         </h1>
-        <p className="text-pretty text-sm leading-relaxed text-slate-600">
+        <p className="text-pretty leading-[1.7] text-ink-muted">
           {content.summary}
         </p>
-        <div className="flex flex-wrap items-center gap-2 pt-2 text-xs text-slate-500">
-          <span className="rounded-full bg-slate-100 px-2 py-0.5 font-medium">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-2 text-xs text-ink-faint">
+          <span className="text-[11px] font-medium uppercase tracking-[0.15em]">
             {segmentLabel}
           </span>
           {row.publishedAt && (
@@ -111,7 +114,7 @@ export default async function PustakaKajianDetailPage({
           return (
             <div className="space-y-10">
               <section>
-                <h2 className="text-lg font-semibold text-slate-900">
+                <h2 className="text-lg font-semibold text-ink">
                   {t("khutbah_pertama")}
                 </h2>
                 <div className="mt-3">
@@ -119,7 +122,7 @@ export default async function PustakaKajianDetailPage({
                 </div>
               </section>
               <section>
-                <h2 className="text-lg font-semibold text-slate-900">
+                <h2 className="text-lg font-semibold text-ink">
                   {t("khutbah_kedua")}
                 </h2>
                 <div className="mt-3">
@@ -133,7 +136,7 @@ export default async function PustakaKajianDetailPage({
           const c = content as KultumContent;
           return (
             <section>
-              <h2 className="text-lg font-semibold text-slate-900">
+              <h2 className="text-lg font-semibold text-ink">
                 {t("section_body")}
               </h2>
               <div className="mt-3">
@@ -147,13 +150,13 @@ export default async function PustakaKajianDetailPage({
           return (
             <div className="space-y-10">
               <section>
-                <h2 className="text-lg font-semibold text-slate-900">
+                <h2 className="text-lg font-semibold text-ink">
                   {t("section_talking_points")}
                 </h2>
                 <ol className="mt-3 space-y-8">
                   {c.talking_points.map((p, i) => (
-                    <li key={i} className="border-l-2 border-brand-300 pl-4">
-                      <h3 className="text-base font-semibold text-slate-900">
+                    <li key={i} className="border-l-2 border-forest/40 pl-4">
+                      <h3 className="text-base font-semibold text-ink">
                         {i + 1}. {p.heading}
                       </h3>
                       <div className="mt-2">
@@ -164,13 +167,13 @@ export default async function PustakaKajianDetailPage({
                 </ol>
               </section>
               <section>
-                <h2 className="text-lg font-semibold text-slate-900">
+                <h2 className="text-lg font-semibold text-ink">
                   {t("section_qna")}
                 </h2>
                 <ul className="mt-3 space-y-4">
                   {c.qna.map((q, i) => (
-                    <li key={i} className="rounded-xl bg-slate-50 p-4">
-                      <p className="font-medium text-slate-900">{q.question}</p>
+                    <li key={i} className="rounded-xl bg-paper-deep p-4">
+                      <p className="font-medium text-ink">{q.question}</p>
                       <div className="mt-1 text-sm sm:text-base">
                         <MarkdownBody text={q.answer} />
                       </div>
@@ -212,19 +215,19 @@ export default async function PustakaKajianDetailPage({
 
         {format === "kultum" &&
           (content as KultumContent).anticipated_objections?.length > 0 && (
-            <section className="rounded-2xl border border-slate-200 bg-slate-50/40 p-6">
-              <h2 className="flex items-center gap-2 text-base font-semibold text-slate-900">
+            <section className="rounded-2xl border border-hairline bg-paper-deep/40 p-6">
+              <h2 className="flex items-center gap-2 text-base font-semibold text-ink">
                 <BookOpenCheck className="h-4 w-4" />
                 {t("section_objections")}
               </h2>
               <ul className="mt-3 space-y-4 text-sm leading-relaxed">
                 {(content as KultumContent).anticipated_objections.map(
                   (o, i) => (
-                    <li key={i} className="border-l-2 border-slate-300 pl-3">
-                      <p className="font-medium text-slate-900">
+                    <li key={i} className="border-l-2 border-hairline pl-3">
+                      <p className="font-medium text-ink">
                         {o.objection}
                       </p>
-                      <p className="mt-1 text-slate-700">{o.response}</p>
+                      <p className="mt-1 text-ink-muted">{o.response}</p>
                     </li>
                   ),
                 )}
@@ -232,6 +235,7 @@ export default async function PustakaKajianDetailPage({
             </section>
           )}
       </div>
-    </article>
+      </article>
+    </main>
   );
 }

@@ -1,3 +1,4 @@
+import { ForestWash } from "@/components/ForestWash";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
@@ -11,7 +12,6 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 export const revalidate = 300;
 import {
   ArrowRight,
-  BarChart3,
   ChevronRight,
   Info,
   Newspaper,
@@ -124,21 +124,20 @@ export default async function InsightsExplorePage({
     neutral: sentimentTotal ? (mix.neutral / sentimentTotal) * 100 : 0,
     negative: sentimentTotal ? (mix.negative / sentimentTotal) * 100 : 0,
   };
-  const totalPosts = overview?.totalPosts ?? 0;
 
   return (
-    <>
+    <div className="relative isolate overflow-hidden bg-paper font-body text-ink">
+      <ForestWash />
       <section className="pt-10 pb-6 sm:pt-14">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-brand-200 bg-brand-50/80 px-3 py-1 text-xs font-medium text-brand-700">
-              <BarChart3 className="h-3.5 w-3.5" />
+            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ink-faint">
               {t("explore_eyebrow")}
-            </span>
-            <h1 className="mt-3 text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+            </p>
+            <h1 className="mt-4 text-balance font-display text-[clamp(1.75rem,3.5vw,2.5rem)] font-medium leading-[1.15] tracking-[-0.015em] text-ink">
               {t("explore_title")}
             </h1>
-            <p className="mt-2 max-w-2xl text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
+            <p className="mt-3 max-w-2xl text-pretty text-sm leading-[1.7] text-ink-muted sm:text-base">
               {t("explore_subtitle")}
             </p>
           </div>
@@ -151,10 +150,10 @@ export default async function InsightsExplorePage({
           platforms come back online. */}
       <section className="pb-4 sm:pb-6">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50/70 px-4 py-3 text-sm text-amber-900 sm:px-5 sm:py-4">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+          <div className="flex items-start gap-3 rounded-xl border border-hairline bg-paper-deep/60 px-4 py-3 text-sm text-ink-muted sm:px-5 sm:py-4">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-ink-faint" />
             <p className="leading-relaxed">
-              <span className="font-semibold">{t("pipeline_pause_title")}</span>{" "}
+              <span className="font-semibold text-ink">{t("pipeline_pause_title")}</span>{" "}
               {t("pipeline_pause_body")}
             </p>
           </div>
@@ -217,16 +216,16 @@ export default async function InsightsExplorePage({
         <div className="mx-auto grid max-w-6xl gap-5 px-4 sm:px-6 lg:grid-cols-3">
           <div
             id="trending"
-            className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-2"
+            className="scroll-mt-24 rounded-2xl border border-hairline bg-white p-5 shadow-sm lg:col-span-2"
           >
             <div className="flex items-center justify-between">
-              <h2 className="text-balance text-base font-semibold text-slate-900 sm:text-lg">
+              <h2 className="text-balance font-display text-base font-medium tracking-[-0.015em] text-ink sm:text-lg">
                 {t("section_trending")}
               </h2>
-              <TrendingUp className="h-4 w-4 text-brand-600" />
+              <TrendingUp className="h-4 w-4 text-forest" />
             </div>
             {trendingRows.length === 0 ? (
-              <div className="mt-4 rounded-lg border border-dashed border-slate-200 bg-slate-50/60 p-6 text-center text-xs text-slate-500">
+              <div className="mt-4 rounded-lg border border-dashed border-hairline bg-paper-deep/60 p-6 text-center text-xs text-ink-faint">
                 <I18nText text={t("how_coverage_posts_empty")} />
               </div>
             ) : (
@@ -239,16 +238,16 @@ export default async function InsightsExplorePage({
 
           <div
             id="sentiment"
-            className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm scroll-mt-24"
+            className="rounded-2xl border border-hairline bg-white p-5 shadow-sm scroll-mt-24"
           >
-            <h2 className="text-balance text-base font-semibold text-slate-900 sm:text-lg">
+            <h2 className="text-balance font-display text-base font-medium tracking-[-0.015em] text-ink sm:text-lg">
               <I18nText text={t("section_sentiment")} />
             </h2>
-            <p className="mt-0.5 text-[11px] text-slate-400">
+            <p className="mt-0.5 text-[11px] text-ink-faint">
               {t("chart_window_7d")}
             </p>
             {sentimentTotal === 0 ? (
-              <div className="mt-4 rounded-lg border border-dashed border-slate-200 bg-slate-50/60 p-4 text-center text-xs text-slate-500">
+              <div className="mt-4 rounded-lg border border-dashed border-hairline bg-paper-deep/60 p-4 text-center text-xs text-ink-faint">
                 <I18nText text={t("how_coverage_posts_empty")} />
               </div>
             ) : (
@@ -287,14 +286,14 @@ export default async function InsightsExplorePage({
               </>
             )}
 
-            <h3 className="mt-6 text-balance text-base font-semibold text-slate-900 sm:text-lg">
+            <h3 className="mt-6 text-balance font-display text-base font-medium tracking-[-0.015em] text-ink sm:text-lg">
               {t("section_categories")}
             </h3>
-            <p className="mt-0.5 text-[11px] text-slate-400">
+            <p className="mt-0.5 text-[11px] text-ink-faint">
               {t("chart_window_7d")}
             </p>
             {categories.length === 0 ? (
-              <div className="mt-3 rounded-lg border border-dashed border-slate-200 bg-slate-50/60 p-4 text-center text-xs text-slate-500">
+              <div className="mt-3 rounded-lg border border-dashed border-hairline bg-paper-deep/60 p-4 text-center text-xs text-ink-faint">
                 <I18nText text={t("how_coverage_posts_empty")} />
               </div>
             ) : (
@@ -305,20 +304,20 @@ export default async function InsightsExplorePage({
                     <Link
                       key={c.key}
                       href={`/groups/${c.key}`}
-                      className="group block rounded-md px-1.5 py-1 text-xs transition hover:bg-slate-50"
+                      className="group block rounded-md px-1.5 py-1 text-xs transition hover:bg-paper-deep"
                     >
-                      <div className="mb-1 flex items-center justify-between text-xs text-slate-600">
-                        <span className="font-medium text-slate-700 group-hover:text-slate-900">
+                      <div className="mb-1 flex items-center justify-between text-xs text-ink-muted">
+                        <span className="font-medium text-ink-muted group-hover:text-ink">
                           {c.label}
                         </span>
                         <span className="tabular-nums">
                           {c.volume.toLocaleString()}
-                          <span className="ml-1 text-slate-400">
+                          <span className="ml-1 text-ink-faint">
                             ({pct.toFixed(1)}%)
                           </span>
                         </span>
                       </div>
-                      <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
+                      <div className="h-1.5 overflow-hidden rounded-full bg-paper-deep">
                         <div
                           className={`h-full rounded-full ${c.tone}`}
                           style={{ width: `${(c.volume / catMax) * 100}%` }}
@@ -328,9 +327,9 @@ export default async function InsightsExplorePage({
                   );
                 })}
                 {lainnyaVolume > 0 && (
-                  <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50/60 px-3 py-2 text-[11px] leading-relaxed text-slate-500">
+                  <div className="mt-3 rounded-lg border border-hairline bg-paper-deep/60 px-3 py-2 text-[11px] leading-relaxed text-ink-faint">
                     <p>
-                      <span className="font-semibold text-slate-600">
+                      <span className="font-semibold text-ink-muted">
                         {t("category_chart_offtaxonomy_label", {
                           n: lainnyaVolume.toLocaleString(),
                         })}
@@ -342,7 +341,7 @@ export default async function InsightsExplorePage({
               </div>
             )}
             {(namedTotal + lainnyaVolume) > 0 && (
-              <p className="mt-4 text-[10px] text-slate-400">
+              <p className="mt-4 text-[10px] text-ink-faint">
                 {t("chart_basis_7d", {
                   n: (namedTotal + lainnyaVolume).toLocaleString(),
                 })}
@@ -358,7 +357,7 @@ export default async function InsightsExplorePage({
       />
 
       {process.env.NODE_ENV !== "production" && (
-        <p className="mx-auto mb-12 flex max-w-3xl items-center justify-center gap-1.5 px-4 text-center text-xs text-slate-500 sm:px-6">
+        <p className="mx-auto mb-12 flex max-w-3xl items-center justify-center gap-1.5 px-4 text-center text-xs text-ink-faint sm:px-6">
           <Info className="h-3.5 w-3.5" />
           {t("data_note")}
         </p>
@@ -366,16 +365,16 @@ export default async function InsightsExplorePage({
 
       <section className="pb-16 sm:pb-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-emerald-50/50 to-white p-6 text-center shadow-sm">
-            <h2 className="text-balance text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
+          <div className="rounded-xl border border-hairline bg-forest-tint/50 p-6 text-center">
+            <h2 className="text-balance text-lg font-bold tracking-tight text-ink sm:text-xl">
               {t("explore_back_cta_title")}
             </h2>
-            <p className="mx-auto mt-2 max-w-xl text-pretty text-sm leading-relaxed text-slate-600">
+            <p className="mx-auto mt-2 max-w-xl text-pretty text-sm leading-relaxed text-ink-muted">
               {t("explore_back_cta_body")}
             </p>
             <Link
               href="/briefings"
-              className="mt-4 inline-flex h-10 items-center gap-2 rounded-full bg-emerald-700 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800"
+              className="mt-4 inline-flex h-10 items-center gap-2 rounded-full bg-forest px-5 text-sm font-semibold text-paper transition hover:bg-forest-hover"
             >
               {t("back_to_insights")}
               <ArrowRight className="h-4 w-4" />
@@ -383,7 +382,7 @@ export default async function InsightsExplorePage({
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }
 
@@ -403,7 +402,7 @@ const PLATFORM_VISUALS: Record<
     key: "news",
     Icon: Newspaper,
     iconBg: "bg-slate-900",
-    barColor: "bg-slate-500",
+    barColor: "bg-paper-deep0",
     href: "/radar/mainstream",
   },
   youtube: {
@@ -482,14 +481,14 @@ function PlatformsBreakdown({
       <section className="pb-16 sm:pb-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+            <h2 className="text-balance text-2xl font-bold tracking-tight text-ink sm:text-3xl">
               {t("section_platforms")}
             </h2>
-            <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
+            <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-ink-muted sm:text-base">
               {t("section_platforms_subtitle")}
             </p>
           </div>
-          <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-10 text-center text-sm text-slate-500">
+          <div className="mt-10 rounded-2xl border border-dashed border-hairline bg-paper-deep/60 p-10 text-center text-sm text-ink-faint">
             <I18nText text={t("how_coverage_posts_empty")} />
           </div>
         </div>
@@ -501,16 +500,16 @@ function PlatformsBreakdown({
     <section className="pb-16 sm:pb-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          <h2 className="text-balance text-2xl font-bold tracking-tight text-ink sm:text-3xl">
             {t("section_platforms")}
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
+          <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-ink-muted sm:text-base">
             {t("section_platforms_subtitle")}
           </p>
         </div>
 
-        <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+        <div className="mt-10 rounded-2xl border border-hairline bg-white p-5 shadow-sm">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-faint">
             {t("section_source_mix")}
           </p>
           <div className="mt-3 flex h-3 overflow-hidden rounded-full">
@@ -529,10 +528,10 @@ function PlatformsBreakdown({
             {rows.map((r) => (
               <span
                 key={r.platform}
-                className={`inline-flex items-center gap-1.5 ${r.posts === 0 ? "text-slate-400" : "text-slate-600"}`}
+                className={`inline-flex items-center gap-1.5 ${r.posts === 0 ? "text-ink-faint" : "text-ink-muted"}`}
               >
                 <span className={`inline-block h-2 w-2 rounded-full ${r.visual.barColor}`} />
-                <span className="font-medium text-slate-700">
+                <span className="font-medium text-ink-muted">
                   {t(`platform_${r.visual.key}_name` as Parameters<typeof t>[0])}
                 </span>
                 <span className="tabular-nums">
@@ -558,10 +557,10 @@ function PlatformsBreakdown({
                     <Icon className="h-5 w-5" />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-slate-900">
+                    <p className="truncate text-sm font-semibold text-ink">
                       {t(`platform_${visual.key}_name` as Parameters<typeof t>[0])}
                     </p>
-                    <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-500">
+                    <div className="mt-0.5 flex items-center gap-2 text-xs text-ink-faint">
                       <span className="tabular-nums">
                         {hasData ? (
                           `${posts.toLocaleString()} posts`
@@ -570,27 +569,27 @@ function PlatformsBreakdown({
                         )}
                       </span>
                       {hasData && (
-                        <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-50 px-1.5 py-0.5 font-medium text-emerald-700">
+                        <span className="inline-flex items-center gap-0.5 rounded-full bg-forest-tint px-1.5 py-0.5 font-medium text-forest">
                           {r.sharePct.toFixed(1)}%
                         </span>
                       )}
                     </div>
                   </div>
                   {hasData && (
-                    <ChevronRight className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-slate-700" />
+                    <ChevronRight className="h-4 w-4 shrink-0 text-ink-faint transition group-hover:translate-x-0.5 group-hover:text-ink-muted" />
                   )}
                 </div>
 
                 {hasData && (
-                  <div className="mt-4 rounded-lg border border-slate-100 bg-slate-50/60 p-3">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                  <div className="mt-4 rounded-lg border border-hairline bg-paper-deep/60 p-3">
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-faint">
                       {t("platform_top_topic")}
                     </p>
-                    <p className="mt-1 text-sm font-medium text-slate-800">
+                    <p className="mt-1 text-sm font-medium text-ink">
                       {topTopic?.label ?? t("platform_top_topic_pending")}
                     </p>
                     {(topTopic?.keywords.length || categoryLabel) && (
-                      <p className="mt-0.5 text-xs text-slate-500">
+                      <p className="mt-0.5 text-xs text-ink-faint">
                         {topTopic?.keywords.slice(0, 3).join(" · ") || categoryLabel}
                       </p>
                     )}
@@ -607,8 +606,8 @@ function PlatformsBreakdown({
             );
 
             const cardClass = clsx(
-              "group block rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition",
-              hasData && href && "hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md",
+              "group block rounded-2xl border border-hairline bg-white p-5 shadow-sm transition",
+              hasData && href && "hover:-translate-y-0.5 hover:border-hairline hover:shadow-md",
               !hasData && "opacity-60",
             );
 
@@ -680,8 +679,8 @@ function SentimentRow({
   return (
     <div className="flex items-center gap-2">
       <span className={`inline-block h-2 w-2 rounded-full ${color}`} />
-      <span className="font-semibold tabular-nums text-slate-700">{pct}</span>
-      <span className="text-slate-500">{label}</span>
+      <span className="font-semibold tabular-nums text-ink-muted">{pct}</span>
+      <span className="text-ink-faint">{label}</span>
     </div>
   );
 }

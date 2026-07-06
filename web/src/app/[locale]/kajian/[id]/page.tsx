@@ -1,3 +1,4 @@
+import { ForestWash } from "@/components/ForestWash";
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -65,11 +66,12 @@ export default async function KajianDetailPage({
   const formatLabel = t(`format_${format}` as Parameters<typeof t>[0]);
 
   return (
-    <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16 print:py-0">
+    <article className="relative isolate mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16 print:py-0">
+      <div className="print:hidden"><ForestWash /></div>
       <div className="flex items-center justify-between gap-3 print:hidden">
         <Link
           href={`/briefs/${row.briefId}`}
-          className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900"
+          className="inline-flex items-center gap-1.5 text-sm text-ink-faint hover:text-ink"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           {t("back_to_brief")}
@@ -99,17 +101,17 @@ export default async function KajianDetailPage({
         <p className="text-xs font-medium uppercase tracking-wider text-brand-700">
           {formatLabel}
         </p>
-        <h1 className="text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+        <h1 className="text-balance text-3xl font-bold tracking-tight text-ink sm:text-4xl">
           {row.title}
         </h1>
-        <p className="text-pretty text-sm leading-relaxed text-slate-600">
+        <p className="text-pretty text-sm leading-relaxed text-ink-muted">
           {content.summary}
         </p>
-        <div className="flex flex-wrap items-center gap-2 pt-2 text-xs text-slate-500">
-          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 font-medium">
+        <div className="flex flex-wrap items-center gap-2 pt-2 text-xs text-ink-faint">
+          <span className="inline-flex items-center gap-1 rounded-full bg-paper-deep px-2 py-0.5 font-medium">
             {segmentLabel}
           </span>
-          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 font-medium">
+          <span className="inline-flex items-center gap-1 rounded-full bg-paper-deep px-2 py-0.5 font-medium">
             {toneLabel}
           </span>
           <span className="tabular-nums">
@@ -186,19 +188,19 @@ export default async function KajianDetailPage({
 
         {format === "kultum" &&
           (content as KultumContent).anticipated_objections?.length > 0 && (
-            <section className="rounded-2xl border border-slate-200 bg-slate-50/40 p-6">
-              <h2 className="flex items-center gap-2 text-base font-semibold text-slate-900">
+            <section className="rounded-2xl border border-hairline bg-paper-deep/40 p-6">
+              <h2 className="flex items-center gap-2 text-base font-semibold text-ink">
                 <BookOpenCheck className="h-4 w-4" />
                 {t("section_objections")}
               </h2>
               <ul className="mt-3 space-y-4 text-sm leading-relaxed">
                 {(content as KultumContent).anticipated_objections.map(
                   (o, i) => (
-                    <li key={i} className="border-l-2 border-slate-300 pl-3">
-                      <p className="font-medium text-slate-900">
+                    <li key={i} className="border-l-2 border-hairline pl-3">
+                      <p className="font-medium text-ink">
                         {o.objection}
                       </p>
-                      <p className="mt-1 text-slate-700">{o.response}</p>
+                      <p className="mt-1 text-ink-muted">{o.response}</p>
                     </li>
                   ),
                 )}
@@ -220,13 +222,13 @@ function KhutbahJumatBody({
   return (
     <div className="space-y-10">
       <section>
-        <h2 className="text-lg font-semibold text-slate-900">{labels.pertama}</h2>
+        <h2 className="text-lg font-semibold text-ink">{labels.pertama}</h2>
         <div className="mt-3">
           <MarkdownBody text={content.khutbah_pertama} />
         </div>
       </section>
       <section>
-        <h2 className="text-lg font-semibold text-slate-900">{labels.kedua}</h2>
+        <h2 className="text-lg font-semibold text-ink">{labels.kedua}</h2>
         <div className="mt-3">
           <MarkdownBody text={content.khutbah_kedua} />
         </div>
@@ -244,7 +246,7 @@ function KultumBody({
 }) {
   return (
     <section>
-      <h2 className="text-lg font-semibold text-slate-900">{label}</h2>
+      <h2 className="text-lg font-semibold text-ink">{label}</h2>
       <div className="mt-3">
         <MarkdownBody text={content.body} />
       </div>
@@ -262,13 +264,13 @@ function KajianUmumBody({
   return (
     <div className="space-y-10">
       <section>
-        <h2 className="text-lg font-semibold text-slate-900">
+        <h2 className="text-lg font-semibold text-ink">
           {labels.talkingPoints}
         </h2>
         <ol className="mt-3 space-y-8">
           {content.talking_points.map((p, i) => (
             <li key={i} className="border-l-2 border-brand-300 pl-4">
-              <h3 className="text-base font-semibold text-slate-900">
+              <h3 className="text-base font-semibold text-ink">
                 {i + 1}. {p.heading}
               </h3>
               <div className="mt-2">
@@ -279,11 +281,11 @@ function KajianUmumBody({
         </ol>
       </section>
       <section>
-        <h2 className="text-lg font-semibold text-slate-900">{labels.qna}</h2>
+        <h2 className="text-lg font-semibold text-ink">{labels.qna}</h2>
         <ul className="mt-3 space-y-4">
           {content.qna.map((q, i) => (
-            <li key={i} className="rounded-xl bg-slate-50 p-4">
-              <p className="font-medium text-slate-900">{q.question}</p>
+            <li key={i} className="rounded-xl bg-paper-deep p-4">
+              <p className="font-medium text-ink">{q.question}</p>
               <div className="mt-1 text-sm sm:text-base">
                 <MarkdownBody text={q.answer} />
               </div>

@@ -54,10 +54,10 @@ export function TafsirResult({
         </p>
       )}
 
-      <p className="text-sm leading-relaxed text-slate-700 whitespace-pre-line">
-        {!isFirst && <span className="text-slate-400">… </span>}
+      <p className="text-sm leading-relaxed text-ink-muted whitespace-pre-line">
+        {!isFirst && <span className="text-ink-faint">… </span>}
         {chunk}
-        {!isLast && <span className="text-slate-400"> …</span>}
+        {!isLast && <span className="text-ink-faint"> …</span>}
       </p>
 
       {canExpand && (
@@ -78,7 +78,7 @@ export function TafsirResult({
             <div className="mt-3 space-y-3 rounded-xl border border-violet-100 bg-violet-50/30 p-3 sm:p-4">
               {fullCommentaryAr && (
                 <p
-                  className="text-right font-amiri text-base leading-loose text-slate-900"
+                  className="text-right font-amiri text-base leading-loose text-ink"
                   dir="rtl"
                   lang="ar"
                 >
@@ -86,7 +86,7 @@ export function TafsirResult({
                 </p>
               )}
               {fullCommentaryEn && (
-                <p className="whitespace-pre-line text-sm leading-relaxed text-slate-700">
+                <p className="whitespace-pre-line text-sm leading-relaxed text-ink-muted">
                   {fullCommentaryEn}
                 </p>
               )}

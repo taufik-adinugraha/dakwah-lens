@@ -44,7 +44,7 @@ export function BackToTop({ label }: { label: string }) {
       }
       aria-label={label}
       title={label}
-      className={`fixed bottom-5 right-4 z-40 inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-900 text-white shadow-lg shadow-slate-900/25 transition-all duration-200 hover:bg-slate-700 sm:bottom-6 sm:right-6 ${
+      className={`fixed bottom-5 right-4 z-40 inline-flex h-11 w-11 items-center justify-center rounded-full bg-ink text-white shadow-lg shadow-ink/25 transition-all duration-200 hover:bg-forest sm:bottom-6 sm:right-6 ${
         visible
           ? "translate-y-0 opacity-100"
           : "pointer-events-none translate-y-3 opacity-0"

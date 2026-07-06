@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ForestWash } from "@/components/ForestWash";
 import { setRequestLocale } from "next-intl/server";
 import { getTranslations } from "next-intl/server";
 
@@ -47,21 +48,15 @@ export default async function DiscussionsPage({
   }));
 
   return (
-    <section className="relative isolate min-h-screen pt-12 pb-20 sm:pt-16">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
-      >
-        <div className="absolute inset-0 grid-bg opacity-50" />
-        <div className="absolute -top-20 left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-emerald-200/40 opacity-50 blur-3xl" />
-      </div>
+    <section className="relative isolate min-h-screen bg-paper font-body pt-14 pb-20 sm:pt-20">
+      <ForestWash />
 
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <header className="mx-auto max-w-3xl text-center">
-          <h1 className="text-balance text-3xl font-bold leading-[1.1] tracking-tight text-slate-900 sm:text-5xl">
+          <h1 className="text-balance font-display text-[clamp(2rem,4.5vw,3.25rem)] font-medium leading-[1.1] tracking-[-0.02em] text-ink">
             {t("discussions_index_title")}
           </h1>
-          <p className="mx-auto mt-3 max-w-2xl text-pretty text-base leading-relaxed text-slate-600 sm:text-lg">
+          <p className="mx-auto mt-4 max-w-2xl text-pretty text-base leading-[1.7] text-ink-muted sm:text-lg">
             {t("discussions_index_subtitle")}
           </p>
         </header>

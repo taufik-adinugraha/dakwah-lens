@@ -105,8 +105,8 @@ export function LoginForm({
     <div className="space-y-6">
       {/* Banner — visible only on the standard signin tab after a successful verify click. */}
       {justVerified && mode === "signin" && (
-        <div className="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50/70 px-4 py-3 text-sm text-emerald-800">
-          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+        <div className="flex items-start gap-3 rounded-xl border border-hairline bg-forest-tint/70 px-4 py-3 text-sm text-forest">
+          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-forest" />
           <p>{t("verify_success_banner")}</p>
         </div>
       )}
@@ -131,7 +131,7 @@ export function LoginForm({
         />
       )}
 
-      <p className="text-pretty text-sm leading-relaxed text-slate-600">
+      <p className="text-pretty text-sm leading-relaxed text-ink-muted">
         {mode === "signin"
           ? t("intro_signin")
           : mode === "signup"
@@ -145,7 +145,7 @@ export function LoginForm({
             <input type="hidden" name="callbackUrl" value={callbackUrl} />
             <button
               type="submit"
-              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-hairline bg-white px-4 text-sm font-medium text-ink-muted shadow-sm transition hover:border-hairline hover:bg-paper-deep"
             >
               <GoogleIcon />
               {t("google_button")}
@@ -154,10 +154,10 @@ export function LoginForm({
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200" />
+              <div className="w-full border-t border-hairline" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-white px-3 uppercase tracking-wider text-slate-500">
+              <span className="bg-white px-3 uppercase tracking-wider text-ink-faint">
                 {t("divider")}
               </span>
             </div>
@@ -233,7 +233,7 @@ export function LoginForm({
         <button
           type="submit"
           disabled={isPending}
-          className="group inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-slate-900 px-4 text-sm font-semibold text-white shadow transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+          className="group inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-forest px-4 text-sm font-semibold text-white shadow transition hover:bg-forest-hover disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isPending && <Spinner size="md" />}
           {isPending
@@ -249,13 +249,13 @@ export function LoginForm({
         </button>
 
         {mode === "signup" && (
-          <p className="text-pretty text-center text-xs leading-relaxed text-slate-500">
+          <p className="text-pretty text-center text-xs leading-relaxed text-ink-faint">
             {t.rich("signup_terms_notice", {
               terms: (chunks) => (
                 <Link
                   href="/terms"
                   target="_blank"
-                  className="font-medium text-slate-700 underline-offset-2 hover:underline"
+                  className="font-medium text-ink-muted underline-offset-2 hover:underline"
                 >
                   {chunks}
                 </Link>
@@ -264,7 +264,7 @@ export function LoginForm({
                 <Link
                   href="/privacy"
                   target="_blank"
-                  className="font-medium text-slate-700 underline-offset-2 hover:underline"
+                  className="font-medium text-ink-muted underline-offset-2 hover:underline"
                 >
                   {chunks}
                 </Link>
@@ -275,7 +275,7 @@ export function LoginForm({
       </form>
 
       {mode === "forgot" ? (
-        <p className="text-center text-sm text-slate-600">
+        <p className="text-center text-sm text-ink-muted">
           <button
             type="button"
             onClick={() => {
@@ -288,7 +288,7 @@ export function LoginForm({
           </button>
         </p>
       ) : (
-        <p className="text-center text-sm text-slate-600">
+        <p className="text-center text-sm text-ink-muted">
           {mode === "signup" ? (
             <>
               {t("footer_signup_prompt")}{" "}
@@ -334,7 +334,7 @@ function Tabs({
   t: ReturnType<typeof useTranslations<"Auth">>;
 }) {
   return (
-    <div className="inline-flex w-full rounded-full bg-slate-100 p-1 text-sm font-medium">
+    <div className="inline-flex w-full rounded-full bg-paper-deep p-1 text-sm font-medium">
       {(["signin", "signup"] as const).map((m) => (
         <button
           key={m}
@@ -343,8 +343,8 @@ function Tabs({
           className={clsx(
             "flex-1 rounded-full px-3 py-1.5 transition",
             mode === m
-              ? "bg-white text-slate-900 shadow-sm"
-              : "text-slate-500 hover:text-slate-800",
+              ? "bg-white text-ink shadow-sm"
+              : "text-ink-faint hover:text-ink",
           )}
           aria-pressed={mode === m}
         >
@@ -380,7 +380,7 @@ function Field({
 }) {
   return (
     <label className="block text-left">
-      <span className="text-xs font-medium text-slate-700">{label}</span>
+      <span className="text-xs font-medium text-ink-muted">{label}</span>
       <input
         name={name}
         type={type}
@@ -391,7 +391,7 @@ function Field({
         maxLength={maxLength}
         inputMode={inputMode}
         autoFocus={autoFocus}
-        className="mt-1.5 block h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
+        className="mt-1.5 block h-11 w-full rounded-lg border border-hairline bg-white px-3 text-sm text-ink shadow-sm transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
       />
     </label>
   );
@@ -434,13 +434,13 @@ function CheckEmailState({
       <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 ring-1 ring-brand-200">
         <Mail className="h-6 w-6 text-brand-700" />
       </div>
-      <h2 className="text-balance text-xl font-semibold text-slate-900 sm:text-2xl">
+      <h2 className="text-balance text-xl font-semibold text-ink sm:text-2xl">
         {t("verify_sent_title")}
       </h2>
-      <p className="text-pretty text-sm leading-relaxed text-slate-600">
+      <p className="text-pretty text-sm leading-relaxed text-ink-muted">
         {t("verify_sent_body", { email })}
       </p>
-      <p className="text-pretty text-xs leading-relaxed text-slate-500">
+      <p className="text-pretty text-xs leading-relaxed text-ink-faint">
         {t("verify_sent_hint")}
       </p>
       <div className="flex flex-wrap items-center justify-center gap-2">
@@ -448,7 +448,7 @@ function CheckEmailState({
           type="button"
           onClick={onResend}
           disabled={resent || pending}
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-hairline bg-white px-4 text-xs font-semibold text-ink-muted shadow-sm transition hover:border-hairline hover:bg-paper-deep disabled:cursor-not-allowed disabled:opacity-60"
         >
           {pending && <Spinner size="sm" />}
           {pending
@@ -460,7 +460,7 @@ function CheckEmailState({
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex h-10 items-center justify-center rounded-full bg-slate-900 px-4 text-xs font-semibold text-white hover:bg-slate-800"
+          className="inline-flex h-10 items-center justify-center rounded-full bg-forest px-4 text-xs font-semibold text-white hover:bg-forest-hover"
         >
           {t("verify_back_to_login")}
         </button>
@@ -490,19 +490,19 @@ function ResetSentState({
       <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 ring-1 ring-brand-200">
         <Mail className="h-6 w-6 text-brand-700" />
       </div>
-      <h2 className="text-balance text-xl font-semibold text-slate-900 sm:text-2xl">
+      <h2 className="text-balance text-xl font-semibold text-ink sm:text-2xl">
         {t("forgot_sent_title")}
       </h2>
-      <p className="text-pretty text-sm leading-relaxed text-slate-600">
+      <p className="text-pretty text-sm leading-relaxed text-ink-muted">
         {t("forgot_sent_body", { email })}
       </p>
-      <p className="text-pretty text-xs leading-relaxed text-slate-500">
+      <p className="text-pretty text-xs leading-relaxed text-ink-faint">
         {t("forgot_sent_hint")}
       </p>
       <button
         type="button"
         onClick={onBack}
-        className="inline-flex h-10 items-center justify-center rounded-full bg-slate-900 px-4 text-xs font-semibold text-white hover:bg-slate-800"
+        className="inline-flex h-10 items-center justify-center rounded-full bg-forest px-4 text-xs font-semibold text-white hover:bg-forest-hover"
       >
         {t("verify_back_to_login")}
       </button>

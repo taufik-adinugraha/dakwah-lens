@@ -26,8 +26,14 @@ export default async function ContactPage({
           aria-hidden
           className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
         >
-          <div className="absolute inset-0 grid-bg opacity-40" />
-          <div className="absolute -top-24 left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-brand-200 opacity-40 blur-3xl" />
+          <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(90rem 42rem at 50% -12rem, rgba(14, 90, 60, 0.42), transparent 68%)," +
+              "radial-gradient(64rem 36rem at 88% 108%, rgba(14, 90, 60, 0.26), transparent 68%)",
+          }}
+        />
         </div>
 
         <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
@@ -35,10 +41,10 @@ export default async function ContactPage({
             <MessageSquare className="h-3.5 w-3.5" />
             {t("badge")}
           </span>
-          <h1 className="mt-4 text-balance text-3xl font-bold leading-[1.1] tracking-tight text-slate-900 sm:text-5xl">
+          <h1 className="mt-4 text-balance text-3xl font-bold leading-[1.1] tracking-tight text-ink sm:text-5xl">
             {t("hero_title")}
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-pretty text-base leading-relaxed text-slate-600 sm:text-lg">
+          <p className="mx-auto mt-4 max-w-2xl text-pretty text-base leading-relaxed text-ink-muted sm:text-lg">
             {t("hero_subtitle")}
           </p>
         </div>
@@ -50,20 +56,20 @@ export default async function ContactPage({
               here via "Hubungi tim untuk akses beta", so call out the
               expected flow up front instead of leaving people to guess
               what to write in the message body. */}
-          <div className="mb-5 flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/70 px-4 py-3 text-sm leading-relaxed text-emerald-900 shadow-sm">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" />
+          <div className="mb-5 flex items-start gap-3 rounded-2xl border border-hairline bg-forest-tint/70 px-4 py-3 text-sm leading-relaxed text-ink shadow-sm">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-forest" />
             <div>
               <p className="font-semibold">{t("beta_access_title")}</p>
-              <p className="mt-0.5 text-emerald-800">
+              <p className="mt-0.5 text-forest">
                 {t("beta_access_body")}
               </p>
             </div>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <div className="rounded-2xl border border-hairline bg-white p-6 shadow-sm sm:p-8">
             <ContactForm />
           </div>
-          <p className="mx-auto mt-6 flex max-w-xl items-start justify-center gap-2 text-pretty text-center text-xs leading-relaxed text-slate-500">
-            <Mail className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-400" />
+          <p className="mx-auto mt-6 flex max-w-xl items-start justify-center gap-2 text-pretty text-center text-xs leading-relaxed text-ink-faint">
+            <Mail className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink-faint" />
             {t("footer_note")}
           </p>
         </div>

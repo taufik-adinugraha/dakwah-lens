@@ -110,7 +110,7 @@ export default async function RootLayout({
       lang={locale}
       className={`${geistSans.variable} ${geistMono.variable} ${amiri.variable} ${fraunces.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="relative min-h-full bg-white text-slate-900">
+      <body className="relative min-h-full bg-white text-ink">
         <NextIntlClientProvider>
           <PendingApprovalBanner />
           <Header />

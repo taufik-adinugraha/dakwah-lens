@@ -1,3 +1,4 @@
+import { ForestWash } from "@/components/ForestWash";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -9,7 +10,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 export const revalidate = 300;
 
 import { and, desc, inArray, sql } from "drizzle-orm";
-import { ArrowRight, Compass, Layers, X } from "lucide-react";
+import { ArrowRight, X } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
@@ -233,22 +234,19 @@ export default async function GroupLandingPage({
   }));
 
   return (
-    <section className="pt-10 pb-16 sm:pt-14 sm:pb-20">
+    <section className="relative isolate overflow-hidden bg-paper pt-10 pb-16 font-body text-ink sm:pt-14 sm:pb-20">
+      <ForestWash />
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
-        <header className="border-b border-slate-200 pb-6">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-700">
-              <Compass className="h-3 w-3" />
-              {t("group_eyebrow")}
-            </span>
-            <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-700">
-              {group}
-            </span>
-          </div>
-          <h1 className="mt-3 text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+        <header className="border-b border-hairline pb-6">
+          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ink-faint">
+            {t("group_eyebrow")}
+            <span aria-hidden> · </span>
+            {group}
+          </p>
+          <h1 className="mt-4 text-balance font-display text-[clamp(1.75rem,3.5vw,2.5rem)] font-medium leading-[1.15] tracking-[-0.015em] text-ink">
             {group}
           </h1>
-          <p className="mt-2 max-w-2xl text-pretty text-sm leading-relaxed text-slate-600">
+          <p className="mt-3 max-w-2xl text-pretty text-sm leading-[1.7] text-ink-muted">
             <I18nText
               text={t("group_page_intro", {
                 group,
@@ -261,62 +259,63 @@ export default async function GroupLandingPage({
         {briefingHref && (
           <Link
             href={briefingHref}
-            className="mt-6 flex items-start gap-3 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/70 to-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-500 hover:shadow-md"
+            className="group mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 border border-hairline bg-forest-tint p-5 transition hover:border-forest"
           >
-            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
-              <Layers className="h-5 w-5" />
-            </span>
             <div className="min-w-0 flex-1">
-              <h2 className="text-base font-bold text-slate-900 sm:text-lg">
+              <h2 className="font-display text-base font-medium tracking-[-0.015em] text-ink sm:text-lg">
                 {t("group_briefing_available_title")}
               </h2>
-              <p className="mt-0.5 text-sm leading-relaxed text-slate-600">
+              <p className="mt-1 text-sm leading-[1.7] text-ink-muted">
                 {t("group_briefing_available_body")}
               </p>
             </div>
-            <span className="inline-flex items-center gap-1.5 self-center rounded-full bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white">
+            <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-forest transition group-hover:text-forest-hover">
               {t("hub_card_cta")}
-              <ArrowRight className="h-3.5 w-3.5" />
+              <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
             </span>
           </Link>
         )}
 
         {/* Topics in this group. */}
-        <section className="mt-8">
-          <h2 className="text-balance text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
+        <section className="mt-10">
+          <h2 className="text-balance font-display text-lg font-medium tracking-[-0.015em] text-ink sm:text-xl">
             {t("group_topics_title")}
           </h2>
           {sortedTopics.length === 0 ? (
-            <p className="mt-3 rounded-lg border border-dashed border-slate-200 bg-slate-50/60 p-4 text-center text-xs text-slate-500">
+            <p className="mt-3 border border-dashed border-hairline bg-paper-deep p-4 text-center text-xs text-ink-faint">
               {t("group_topics_empty")}
             </p>
           ) : (
-            <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+            <ul className="mt-5 border-t border-hairline">
               {sortedTopics.map((topic) => {
                 const isActive = topicFilter === topic.id;
                 return (
-                  <li key={topic.id}>
+                  <li key={topic.id} className="border-b border-hairline">
                     <Link
                       href={`/groups/${slug}?topic=${topic.id}`}
-                      className={`block rounded-2xl border bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
-                        isActive
-                          ? "border-emerald-500 ring-2 ring-emerald-100"
-                          : "border-slate-200 hover:border-slate-900"
+                      className={`flex items-baseline justify-between gap-6 py-4 transition ${
+                        isActive ? "bg-forest-tint px-3" : "hover:bg-paper-deep"
                       }`}
                     >
-                      <p className="text-sm font-semibold text-slate-900">
-                        {topic.label}
-                      </p>
-                      <p className="mt-1 text-[11px] text-slate-500">
+                      <div className="min-w-0">
+                        <p
+                          className={`text-sm font-semibold ${
+                            isActive ? "text-forest" : "text-ink"
+                          }`}
+                        >
+                          {topic.label}
+                        </p>
+                        {topic.keywords && topic.keywords.length > 0 && (
+                          <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-ink-faint">
+                            {topic.keywords.slice(0, 5).join(" · ")}
+                          </p>
+                        )}
+                      </div>
+                      <p className="shrink-0 text-[11px] text-ink-faint tabular-nums">
                         {t("group_topic_count", {
                           count: topic.postCount7d,
                         })}
                       </p>
-                      {topic.keywords && topic.keywords.length > 0 && (
-                        <p className="mt-2 line-clamp-2 text-[11px] leading-relaxed text-slate-500">
-                          {topic.keywords.slice(0, 5).join(" · ")}
-                        </p>
-                      )}
                     </Link>
                   </li>
                 );
@@ -329,10 +328,10 @@ export default async function GroupLandingPage({
             if one is selected). Stacked horizontal bar + count
             legend. Hidden when the group has zero labelled posts. */}
         <section className="mt-10">
-          <h2 className="text-balance text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
+          <h2 className="text-balance font-display text-lg font-medium tracking-[-0.015em] text-ink sm:text-xl">
             {t("group_sentiment_title")}
           </h2>
-          <p className="mt-1 text-sm leading-relaxed text-slate-600">
+          <p className="mt-1 text-sm leading-[1.7] text-ink-muted">
             {activeTopic
               ? t("group_sentiment_subtitle_topic_tpl", {
                   count: sentimentTotal,
@@ -341,19 +340,19 @@ export default async function GroupLandingPage({
               : t("group_sentiment_subtitle_tpl", { count: sentimentTotal })}
           </p>
           {sentimentTotal === 0 ? (
-            <p className="mt-3 rounded-lg border border-dashed border-slate-200 bg-slate-50/60 p-4 text-center text-xs text-slate-500">
+            <p className="mt-3 border border-dashed border-hairline bg-paper-deep p-4 text-center text-xs text-ink-faint">
               {t("group_sentiment_empty")}
             </p>
           ) : (
             <>
               <div
-                className="mt-4 flex h-3 overflow-hidden rounded-full bg-slate-100"
+                className="mt-4 flex h-3 overflow-hidden rounded-full bg-paper-deep"
                 role="img"
                 aria-label={t("group_sentiment_title")}
               >
                 {sentimentCounts.positive > 0 && (
                   <div
-                    className="bg-emerald-500"
+                    className="bg-forest"
                     style={{
                       width: `${(sentimentCounts.positive / sentimentTotal) * 100}%`,
                     }}
@@ -361,7 +360,7 @@ export default async function GroupLandingPage({
                 )}
                 {sentimentCounts.neutral > 0 && (
                   <div
-                    className="bg-slate-400"
+                    className="bg-ink-faint"
                     style={{
                       width: `${(sentimentCounts.neutral / sentimentTotal) * 100}%`,
                     }}
@@ -369,7 +368,7 @@ export default async function GroupLandingPage({
                 )}
                 {sentimentCounts.negative > 0 && (
                   <div
-                    className="bg-amber-500"
+                    className="bg-ink"
                     style={{
                       width: `${(sentimentCounts.negative / sentimentTotal) * 100}%`,
                     }}
@@ -378,19 +377,19 @@ export default async function GroupLandingPage({
               </div>
               <div className="mt-3 flex flex-wrap gap-3 text-xs">
                 <SentimentLegend
-                  swatch="bg-emerald-500"
+                  swatch="bg-forest"
                   label={t("coverage_sentiment_positive")}
                   count={sentimentCounts.positive}
                   total={sentimentTotal}
                 />
                 <SentimentLegend
-                  swatch="bg-slate-400"
+                  swatch="bg-ink-faint"
                   label={t("coverage_sentiment_neutral")}
                   count={sentimentCounts.neutral}
                   total={sentimentTotal}
                 />
                 <SentimentLegend
-                  swatch="bg-amber-500"
+                  swatch="bg-ink"
                   label={t("coverage_sentiment_negative")}
                   count={sentimentCounts.negative}
                   total={sentimentTotal}
@@ -405,13 +404,13 @@ export default async function GroupLandingPage({
             clear-filter button. */}
         <section className="mt-10">
           <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-2">
-            <h2 className="text-balance text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
+            <h2 className="text-balance font-display text-lg font-medium tracking-[-0.015em] text-ink sm:text-xl">
               {t("group_posts_title")}
             </h2>
             {activeTopic && (
               <Link
                 href={`/groups/${slug}`}
-                className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 transition hover:border-slate-900"
+                className="inline-flex items-center gap-1.5 rounded-full border border-hairline bg-paper px-3 py-1 text-xs font-semibold text-ink-muted transition hover:border-ink hover:text-ink"
               >
                 <X className="h-3.5 w-3.5" />
                 {t("group_topic_filter_clear")}
@@ -419,7 +418,7 @@ export default async function GroupLandingPage({
             )}
           </div>
           {activeTopic && (
-            <p className="mt-2 rounded-lg border border-emerald-200 bg-emerald-50/60 px-3 py-2 text-xs text-emerald-800">
+            <p className="mt-2 border border-hairline bg-forest-tint px-3 py-2 text-xs text-forest">
               {t("group_topic_filter_active_tpl", { topic: activeTopic.label })}
             </p>
           )}
@@ -452,22 +451,20 @@ export default async function GroupLandingPage({
         </section>
 
         {/* Encourage on-demand briefing via the topic-pick brief flow. */}
-        <section className="mt-12">
-          <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50/70 to-white p-6 shadow-sm">
-            <h2 className="text-base font-bold text-slate-900 sm:text-lg">
-              {t("group_brief_cta_title")}
-            </h2>
-            <p className="mt-1 text-sm leading-relaxed text-slate-600">
-              {t("group_brief_cta_body")}
-            </p>
-            <Link
-              href="/briefs/new"
-              className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700"
-            >
-              {t("group_brief_cta_button")}
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
+        <section className="mt-12 border-t border-hairline pt-8">
+          <h2 className="font-display text-base font-medium tracking-[-0.015em] text-ink sm:text-lg">
+            {t("group_brief_cta_title")}
+          </h2>
+          <p className="mt-1 max-w-xl text-sm leading-[1.7] text-ink-muted">
+            {t("group_brief_cta_body")}
+          </p>
+          <Link
+            href="/briefs/new"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-forest px-4 py-2 text-xs font-semibold text-paper transition hover:bg-forest-hover"
+          >
+            {t("group_brief_cta_button")}
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </section>
       </div>
     </section>
@@ -487,10 +484,10 @@ function SentimentLegend({
 }) {
   const pct = total > 0 ? Math.round((count / total) * 100) : 0;
   return (
-    <span className="inline-flex items-center gap-1.5 text-slate-600">
+    <span className="inline-flex items-center gap-1.5 text-ink-muted">
       <span className={`inline-block h-2.5 w-2.5 rounded-sm ${swatch}`} />
       <span className="font-medium">{label}</span>
-      <span className="tabular-nums text-slate-500">
+      <span className="tabular-nums text-ink-faint">
         {count.toLocaleString()} · {pct}%
       </span>
     </span>

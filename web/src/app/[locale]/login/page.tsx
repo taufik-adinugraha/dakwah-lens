@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ArrowLeft } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
-import { Logo } from "@/components/Logo";
+import Image from "next/image";
 import { LoginForm } from "@/components/LoginForm";
 
 export async function generateMetadata({
@@ -32,24 +32,36 @@ export default async function LoginPage({
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
       >
-        <div className="absolute inset-0 grid-bg opacity-50" />
-        <div className="absolute top-1/3 left-1/2 h-[460px] w-[460px] -translate-x-1/2 rounded-full bg-gradient-to-br from-brand-200 via-cyan-200 to-emerald-200 opacity-40 blur-3xl" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(90rem 42rem at 50% -12rem, rgba(14, 90, 60, 0.42), transparent 68%)," +
+              "radial-gradient(64rem 36rem at 88% 108%, rgba(14, 90, 60, 0.26), transparent 68%)",
+          }}
+        />
       </div>
 
       <div className="mx-auto w-full max-w-md px-4 sm:px-6">
         <div className="flex items-center justify-between">
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900"
+            className="inline-flex items-center gap-1.5 text-sm text-ink-faint hover:text-ink"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             {t("back_home")}
           </Link>
-          <Logo showWordmark={false} />
+          <Image
+            src="/dakwah-lens-logo-short-removebg.png"
+            alt="Dakwah-Lens"
+            width={36}
+            height={36}
+            className="h-9 w-auto"
+          />
         </div>
 
-        <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <Suspense fallback={<div className="h-72 animate-pulse rounded-lg bg-slate-100" />}>
+        <div className="mt-8 rounded-2xl border border-hairline bg-white p-6 shadow-sm sm:p-8">
+          <Suspense fallback={<div className="h-72 animate-pulse rounded-lg bg-paper-deep" />}>
             <LoginForm
               initialMode={initialMode}
               googleEnabled={

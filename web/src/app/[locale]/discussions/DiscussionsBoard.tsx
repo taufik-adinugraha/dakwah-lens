@@ -162,7 +162,7 @@ export function DiscussionsBoard({
     <div>
       {/* Filter strip — sticky-ish on scroll so the controls stay
           reachable without jumping back to the top. */}
-      <div className="rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm backdrop-blur sm:p-5">
+      <div className="rounded-2xl border border-hairline bg-white/80 p-4 shadow-sm backdrop-blur sm:p-5">
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
@@ -171,8 +171,8 @@ export function DiscussionsBoard({
             className={
               "inline-flex h-8 items-center gap-1.5 rounded-full px-3.5 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 " +
               (onlyMine
-                ? "bg-slate-900 text-white shadow-sm hover:bg-slate-800"
-                : "border border-slate-200 bg-white text-slate-700 hover:border-slate-300")
+                ? "bg-forest text-paper shadow-sm hover:bg-forest-hover"
+                : "border border-hairline bg-white text-ink-muted hover:border-hairline")
             }
           >
             <UserCheck className="h-3.5 w-3.5" />
@@ -183,7 +183,7 @@ export function DiscussionsBoard({
                   "rounded-full px-1.5 text-[10px] font-bold " +
                   (onlyMine
                     ? "bg-white/20 text-white"
-                    : "bg-slate-100 text-slate-600")
+                    : "bg-paper-deep text-ink-muted")
                 }
               >
                 {mineCount}
@@ -191,7 +191,7 @@ export function DiscussionsBoard({
             )}
           </button>
 
-          <div className="mx-1 h-5 w-px bg-slate-200" aria-hidden />
+          <div className="mx-1 h-5 w-px bg-hairline" aria-hidden />
 
           {/* Status: All / Active / Dormant */}
           <FilterChip
@@ -212,7 +212,7 @@ export function DiscussionsBoard({
             tone="slate"
           />
 
-          <div className="mx-1 h-5 w-px bg-slate-200" aria-hidden />
+          <div className="mx-1 h-5 w-px bg-hairline" aria-hidden />
 
           {/* Theme-group dropdown — 14 canonical groups (was 4-chip
               legacy: Spiritual / Keluarga / Pemuda / Keadilan).
@@ -227,12 +227,12 @@ export function DiscussionsBoard({
               id="discussion-segment-filter"
               value={segment}
               onChange={(e) => setSegment(e.target.value)}
-              className="h-8 rounded-full border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+              className="h-8 rounded-full border border-hairline bg-white px-3 text-xs font-semibold text-ink-muted hover:border-hairline focus:outline-none focus:ring-2 focus:ring-forest/30"
             >
               <option value="all">{labels.segmentAll}</option>
               {Object.entries(THEME_GROUP_PALETTE)
                 .filter(([key]) => key !== "all")
-                .map(([groupName, tone]) => (
+                .map(([groupName]) => (
                   <option key={groupName} value={groupName}>
                     {/* Title-case from upper-case label for the dropdown */}
                     {groupName}
@@ -241,12 +241,12 @@ export function DiscussionsBoard({
             </select>
           </div>
 
-          <div className="mx-1 h-5 w-px bg-slate-200" aria-hidden />
+          <div className="mx-1 h-5 w-px bg-hairline" aria-hidden />
 
           {/* Week dropdown */}
           <div className="inline-flex items-center gap-1.5">
             <Calendar
-              className="h-3.5 w-3.5 text-slate-400"
+              className="h-3.5 w-3.5 text-ink-faint"
               aria-hidden
             />
             <label className="sr-only" htmlFor="discussion-week-filter">
@@ -256,7 +256,7 @@ export function DiscussionsBoard({
               id="discussion-week-filter"
               value={week}
               onChange={(e) => setWeek(e.target.value)}
-              className="h-8 rounded-full border border-slate-200 bg-white px-3 pr-7 text-xs font-semibold text-slate-700 transition hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-300"
+              className="h-8 rounded-full border border-hairline bg-white px-3 pr-7 text-xs font-semibold text-ink-muted transition hover:border-hairline focus:outline-none focus:ring-2 focus:ring-forest/30"
             >
               <option value="all">{labels.filterWeek}</option>
               {weeks.map((w) => (
@@ -281,7 +281,7 @@ export function DiscussionsBoard({
                 setWeek("all");
                 setOnlyMine(false);
               }}
-              className="ml-auto text-xs font-medium text-slate-500 underline-offset-2 transition hover:text-slate-900 hover:underline"
+              className="ml-auto text-xs font-medium text-ink-faint underline-offset-2 transition hover:text-ink hover:underline"
             >
               {labels.clearFilters}
             </button>
@@ -289,13 +289,13 @@ export function DiscussionsBoard({
         </div>
 
         {mineCount > 0 && (
-          <p className="mt-3 text-[12px] text-slate-500">{mineCountLabel}</p>
+          <p className="mt-3 text-[12px] text-ink-faint">{mineCountLabel}</p>
         )}
       </div>
 
       {/* Cards */}
       {paged.length === 0 ? (
-        <div className="mt-8 rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-12 text-center text-sm text-slate-500">
+        <div className="mt-8 rounded-2xl border border-dashed border-hairline bg-white/60 px-6 py-12 text-center text-sm text-ink-faint">
           {onlyMine && mineCount === 0 ? labels.emptyMine : labels.empty}
         </div>
       ) : (
@@ -394,7 +394,7 @@ function FilterChip({
         <button
           type="button"
           onClick={onClick}
-          className={`inline-flex items-center rounded-full font-semibold transition bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 ${base}`}
+          className={`inline-flex items-center rounded-full font-semibold transition bg-forest text-paper hover:bg-forest-hover ${base}`}
         >
           {label}
         </button>
@@ -404,7 +404,7 @@ function FilterChip({
       <button
         type="button"
         onClick={onClick}
-        className={`inline-flex items-center rounded-full font-semibold transition bg-slate-900 text-white shadow-sm hover:bg-slate-800 ${base}`}
+        className={`inline-flex items-center rounded-full font-semibold transition bg-forest text-paper shadow-sm hover:bg-forest-hover ${base}`}
       >
         {label}
       </button>
@@ -414,7 +414,7 @@ function FilterChip({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex items-center rounded-full font-semibold transition border border-slate-200 bg-white text-slate-700 hover:border-slate-300 ${base}`}
+      className={`inline-flex items-center rounded-full font-semibold transition border border-hairline bg-white text-ink-muted hover:border-hairline ${base}`}
     >
       {label}
     </button>
@@ -472,24 +472,24 @@ function RoomCard({
           >
             {segLabel}
           </span>
-          <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-slate-400">
+          <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-ink-faint">
             {dateLabel}
           </span>
         </div>
 
-        <h3 className="mt-3 text-balance text-[15px] font-bold leading-snug text-slate-900">
+        <h3 className="mt-3 text-balance text-[15px] font-bold leading-snug text-ink">
           {room.title ?? room.slug}
         </h3>
         {room.title && (
-          <p className="mt-1 font-mono text-[10.5px] text-slate-400">
+          <p className="mt-1 font-mono text-[10.5px] text-ink-faint">
             {room.slug}
           </p>
         )}
 
-        <div className="mt-3 flex items-center gap-2 text-[12px] text-slate-500">
+        <div className="mt-3 flex items-center gap-2 text-[12px] text-ink-faint">
           <MessageSquare className="h-3.5 w-3.5" />
           <span>{commentLabel}</span>
-          <span className="text-slate-300">·</span>
+          <span className="text-ink-faint/50">·</span>
           <span>
             {lastWhen
               ? labels.lastActivity.replace("{when}", lastWhen)
@@ -504,8 +504,8 @@ function RoomCard({
               (room.muted
                 ? "bg-amber-50 text-amber-700 ring-1 ring-amber-200"
                 : isActive
-                  ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
-                  : "bg-slate-50 text-slate-500 ring-1 ring-slate-200")
+                  ? "bg-forest-tint text-forest ring-1 ring-forest/20"
+                  : "bg-paper-deep text-ink-faint ring-1 ring-hairline")
             }
           >
             {room.muted ? (
@@ -521,7 +521,7 @@ function RoomCard({
                 ? labels.statusActive
                 : labels.statusDormant}
           </span>
-          <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 transition group-hover:text-slate-900">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-ink-faint transition group-hover:text-ink">
             {labels.open}
             <ArrowUpRight className="h-3 w-3" />
           </span>
@@ -546,18 +546,18 @@ function Pagination({
         type="button"
         disabled={page <= 1}
         onClick={() => onChange(Math.max(1, page - 1))}
-        className="inline-flex h-8 items-center rounded-full border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+        className="inline-flex h-8 items-center rounded-full border border-hairline bg-white px-3 text-xs font-semibold text-ink-muted transition hover:border-hairline hover:bg-paper-deep disabled:cursor-not-allowed disabled:opacity-50"
       >
         ‹
       </button>
-      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+      <span className="rounded-full bg-paper-deep px-3 py-1 text-xs font-semibold text-ink-muted">
         {page} / {pageCount}
       </span>
       <button
         type="button"
         disabled={page >= pageCount}
         onClick={() => onChange(Math.min(pageCount, page + 1))}
-        className="inline-flex h-8 items-center rounded-full border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+        className="inline-flex h-8 items-center rounded-full border border-hairline bg-white px-3 text-xs font-semibold text-ink-muted transition hover:border-hairline hover:bg-paper-deep disabled:cursor-not-allowed disabled:opacity-50"
       >
         ›
       </button>

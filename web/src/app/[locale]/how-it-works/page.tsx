@@ -1,22 +1,7 @@
+import { ForestWash } from "@/components/ForestWash";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import {
-  ArrowRight,
-  BookOpenCheck,
-  Code2,
-  Database,
-  ExternalLink,
-  GitBranch,
-  Globe2,
-  Hash,
-  Layers,
-  MessageSquare,
-  Newspaper,
-  ShieldCheck,
-  Sparkles,
-  Video,
-  Workflow,
-} from "lucide-react";
+import { ArrowRight, ArrowUpRight, ExternalLink, GitBranch, ShieldCheck } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 
@@ -38,7 +23,8 @@ export default async function HowItWorksPage({
   const t = await getTranslations("HowItWorks");
 
   return (
-    <>
+    <div className="relative isolate overflow-hidden bg-paper font-body text-ink">
+      <ForestWash />
       <Hero t={t} />
       <TLDR t={t} />
       <StackGrid t={t} />
@@ -54,7 +40,7 @@ export default async function HowItWorksPage({
       <Observability t={t} />
       <Tradeoffs t={t} />
       <Repo t={t} />
-    </>
+    </div>
   );
 }
 
@@ -62,32 +48,23 @@ type T = Awaited<ReturnType<typeof getTranslations<"HowItWorks">>>;
 
 function Hero({ t }: { t: T }) {
   return (
-    <section className="relative isolate overflow-hidden pt-12 pb-10 sm:pt-16 sm:pb-14">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
-      >
-        <div className="absolute inset-0 grid-bg opacity-40" />
-        <div className="absolute -top-24 left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-brand-200 opacity-40 blur-3xl" />
-      </div>
-
-      <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-brand-200 bg-brand-50/80 px-3 py-1 text-xs font-medium text-brand-700 shadow-sm backdrop-blur">
-          <Code2 className="h-3.5 w-3.5" />
+    <section className="pt-16 pb-12 sm:pt-24 sm:pb-16">
+      <div className="mx-auto max-w-3xl px-6 text-center">
+        <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ink-faint">
           {t("badge")}
-        </span>
-        <h1 className="mt-4 text-balance text-3xl font-bold leading-[1.1] tracking-tight text-slate-900 sm:text-5xl">
+        </p>
+        <h1 className="mt-6 text-balance font-display text-[clamp(2.25rem,5vw,3.5rem)] font-medium leading-[1.1] tracking-[-0.02em] text-ink">
           {t("hero_title")}
         </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-pretty text-base leading-relaxed text-slate-600 sm:text-lg">
+        <p className="mx-auto mt-6 max-w-2xl text-pretty text-base leading-[1.7] text-ink-muted sm:text-lg">
           {t("hero_subtitle")}
         </p>
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+        <div className="mt-9 flex flex-wrap items-center justify-center gap-x-7 gap-y-4">
           <a
             href={GITHUB_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex h-11 items-center gap-2 rounded-full bg-slate-900 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
+            className="inline-flex h-11 items-center gap-2 rounded-full bg-forest px-6 text-sm font-semibold text-paper transition hover:bg-forest-hover"
           >
             <GithubIcon className="h-4 w-4" />
             {t("hero_cta_github")}
@@ -95,7 +72,7 @@ function Hero({ t }: { t: T }) {
           </a>
           <Link
             href="/"
-            className="inline-flex h-11 items-center gap-2 rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            className="inline-flex h-11 items-center text-sm font-semibold text-ink-muted transition hover:text-ink"
           >
             {t("hero_cta_back")}
           </Link>
@@ -107,88 +84,50 @@ function Hero({ t }: { t: T }) {
 
 function TLDR({ t }: { t: T }) {
   return (
-    <section className="py-8 sm:py-12">
-      <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-6 shadow-sm sm:p-8">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">
-            {t("tldr_label")}
-          </p>
+    <section className="border-t border-hairline py-12 sm:py-16">
+      <div className="mx-auto max-w-3xl px-6">
+        <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ink-faint">
+          {t("tldr_label")}
+        </p>
 
-          {/* Two facet cards: architecture + AI stack. Equal weight,
-           * stacked on mobile, side-by-side on tablet+. */}
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            <TldrFacet
-              icon={Layers}
-              label={t("tldr_arch_label")}
-              body={t("tldr_arch_body")}
-              tone="brand"
-            />
-            <TldrFacet
-              icon={Sparkles}
-              label={t("tldr_ai_label")}
-              body={t("tldr_ai_body")}
-              tone="violet"
-            />
-          </div>
-
-          {/* The credibility-anchor callout — visually distinct from the
-           * facets above so the reader's eye locks on the daleel-retrieval
-           * guarantee. Matches the emerald/ShieldCheck idiom used on the
-           * /kitab and onboarding "we don't hallucinate" surfaces. */}
-          <div className="mt-4 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50/70 p-4">
-            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
-                {t("tldr_trust_label")}
-              </p>
-              <p className="mt-1 text-pretty text-sm leading-relaxed text-emerald-900">
-                {t("tldr_trust_body")}
-              </p>
-            </div>
-          </div>
-
-          <p className="mt-4 text-center text-xs text-slate-500">
-            {t("tldr_license")}
-          </p>
+        {/* Two facets: architecture + AI stack. Equal weight,
+         * stacked on mobile, side-by-side on tablet+. */}
+        <div className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-2">
+          <TldrFacet label={t("tldr_arch_label")} body={t("tldr_arch_body")} />
+          <TldrFacet label={t("tldr_ai_label")} body={t("tldr_ai_body")} />
         </div>
+
+        {/* The credibility-anchor callout — visually distinct from the
+         * facets above so the reader's eye locks on the daleel-retrieval
+         * guarantee. Matches the green/ShieldCheck idiom used on the
+         * /kitab and onboarding "we don't hallucinate" surfaces. */}
+        <div className="mt-8 flex items-start gap-3 rounded-xl bg-forest-tint p-4 sm:p-5">
+          <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-forest" />
+          <div>
+            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-forest">
+              {t("tldr_trust_label")}
+            </p>
+            <p className="mt-1.5 text-pretty text-sm leading-[1.7] text-ink">
+              {t("tldr_trust_body")}
+            </p>
+          </div>
+        </div>
+
+        <p className="mt-6 text-xs text-ink-faint">
+          {t("tldr_license")}
+        </p>
       </div>
     </section>
   );
 }
 
-function TldrFacet({
-  icon: Icon,
-  label,
-  body,
-  tone,
-}: {
-  icon: typeof Layers;
-  label: string;
-  body: string;
-  tone: "brand" | "violet";
-}) {
-  const tones: Record<typeof tone, { border: string; bg: string; text: string }> = {
-    brand: {
-      border: "border-brand-200",
-      bg: "bg-brand-50/60",
-      text: "text-brand-700",
-    },
-    violet: {
-      border: "border-violet-200",
-      bg: "bg-violet-50/60",
-      text: "text-violet-700",
-    },
-  };
-  const s = tones[tone];
+function TldrFacet({ label, body }: { label: string; body: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
-      <div
-        className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${s.border} ${s.bg} ${s.text}`}
-      >
-        <Icon className="h-3 w-3" />
+    <div className="border-t border-hairline pt-4">
+      <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ink-faint">
         {label}
-      </div>
-      <p className="mt-2 text-pretty text-sm leading-relaxed text-slate-700">
+      </p>
+      <p className="mt-2 text-pretty text-sm leading-[1.7] text-ink-muted">
         {body}
       </p>
     </div>
@@ -199,8 +138,6 @@ function StackGrid({ t }: { t: T }) {
   const groups = [
     {
       id: "frontend",
-      icon: Layers,
-      tone: "brand" as const,
       title: t("stack_frontend_title"),
       items: [
         { name: "Next.js 16", role: t("stack_frontend_nextjs") },
@@ -214,8 +151,6 @@ function StackGrid({ t }: { t: T }) {
     },
     {
       id: "backend",
-      icon: Workflow,
-      tone: "emerald" as const,
       title: t("stack_backend_title"),
       items: [
         { name: "FastAPI", role: t("stack_backend_fastapi") },
@@ -229,8 +164,6 @@ function StackGrid({ t }: { t: T }) {
     },
     {
       id: "data",
-      icon: Database,
-      tone: "amber" as const,
       title: t("stack_data_title"),
       items: [
         { name: "PostgreSQL 16", role: t("stack_data_pg") },
@@ -240,8 +173,6 @@ function StackGrid({ t }: { t: T }) {
     },
     {
       id: "ai",
-      icon: Sparkles,
-      tone: "violet" as const,
       title: t("stack_ai_title"),
       items: [
         { name: "OpenAI Embeddings", role: t("stack_ai_openai") },
@@ -252,8 +183,6 @@ function StackGrid({ t }: { t: T }) {
     },
     {
       id: "infra",
-      icon: ShieldCheck,
-      tone: "slate" as const,
       title: t("stack_infra_title"),
       items: [
         { name: "Docker Compose", role: t("stack_infra_docker") },
@@ -266,12 +195,36 @@ function StackGrid({ t }: { t: T }) {
   ];
 
   return (
-    <section className="py-10 sm:py-14">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <section className="border-t border-hairline py-14 sm:py-20">
+      <div className="mx-auto max-w-5xl px-6">
         <SectionHeader title={t("stack_title")} subtitle={t("stack_subtitle")} />
-        <div className="mt-8 grid gap-4 lg:grid-cols-2">
+        <div className="mt-12">
           {groups.map((g) => (
-            <StackCard key={g.id} {...g} />
+            <div
+              key={g.id}
+              className="grid gap-3 border-t border-hairline py-7 sm:grid-cols-[200px_1fr] sm:gap-8"
+            >
+              <h3 className="text-[11px] font-medium uppercase tracking-[0.2em] text-ink-faint">
+                {g.title}
+              </h3>
+              {/* Grid (not flex) so wrapped names — e.g. "Anthropic Claude Sonnet
+               * 4.5" — keep the role column starting at the top of the row instead
+               * of jumping to the first-line baseline. Column widths are explicit
+               * so role text in every row starts at the same x-offset. */}
+              <ul className="space-y-2.5 text-sm">
+                {g.items.map((it) => (
+                  <li
+                    key={it.name}
+                    className="grid gap-x-3 gap-y-0.5 sm:grid-cols-[12rem_1fr]"
+                  >
+                    <span className="font-mono text-xs font-semibold leading-snug text-ink">
+                      {it.name}
+                    </span>
+                    <span className="leading-snug text-ink-muted">{it.role}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
         </div>
       </div>
@@ -279,105 +232,52 @@ function StackGrid({ t }: { t: T }) {
   );
 }
 
-function StackCard({
-  icon: Icon,
-  tone,
-  title,
-  items,
-}: {
-  icon: typeof Layers;
-  tone: "brand" | "emerald" | "amber" | "violet" | "slate";
-  title: string;
-  items: Array<{ name: string; role: string }>;
-}) {
-  const styles = TONE_STYLES[tone];
-  return (
-    <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="flex items-center gap-3">
-        <span
-          className={`inline-flex h-9 w-9 items-center justify-center rounded-xl ${styles.bg}`}
-        >
-          <Icon className={`h-4 w-4 ${styles.icon}`} />
-        </span>
-        <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700">
-          {title}
-        </h3>
-      </div>
-      {/* Grid (not flex) so wrapped names — e.g. "Anthropic Claude Sonnet
-       * 4.5" — keep the role column starting at the top of the row instead
-       * of jumping to the first-line baseline. Column widths are explicit
-       * so role text in every row starts at the same x-offset. */}
-      <ul className="mt-4 space-y-2 text-sm">
-        {items.map((it) => (
-          <li
-            key={it.name}
-            className="grid gap-x-3 gap-y-0.5 sm:grid-cols-[12rem_1fr]"
-          >
-            <span className="font-mono text-xs font-semibold leading-snug text-slate-900">
-              {it.name}
-            </span>
-            <span className="leading-snug text-slate-600">{it.role}</span>
-          </li>
-        ))}
-      </ul>
-    </article>
-  );
-}
-
-const TONE_STYLES = {
-  brand: { bg: "bg-brand-50", icon: "text-brand-700" },
-  emerald: { bg: "bg-emerald-50", icon: "text-emerald-700" },
-  amber: { bg: "bg-amber-50", icon: "text-amber-700" },
-  violet: { bg: "bg-violet-50", icon: "text-violet-700" },
-  slate: { bg: "bg-slate-100", icon: "text-slate-700" },
-} as const;
-
 /**
  * System-level diagram — three tiers (client / app / data) connected by
- * thin slate arrows. Built as nested grids + flexbox so it stays sharp at
+ * thin hairline arrows. Built as nested grids + flexbox so it stays sharp at
  * any screen width (no SVG hand-positioning).
  */
 function SystemDiagram({ t }: { t: T }) {
   return (
-    <section className="border-y border-slate-100 bg-slate-50/40 py-12 sm:py-16">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+    <section className="border-t border-hairline py-14 sm:py-20">
+      <div className="mx-auto max-w-5xl px-6">
         <SectionHeader
           title={t("system_title")}
           subtitle={t("system_subtitle")}
         />
 
-        <div className="mt-10 space-y-4">
+        <div className="mt-12 space-y-4">
           {/* Tier 1: clients */}
           <DiagramTier label={t("system_tier_client")}>
-            <DiagramBox tone="brand" title={t("system_browser")} sub="Next.js SSR + RSC" />
-            <DiagramBox tone="brand" title={t("system_celery_workers")} sub="Celery beat + worker" />
-            <DiagramBox tone="brand" title={t("system_cli")} sub="uv run python -m api.scripts.*" />
+            <DiagramBox title={t("system_browser")} sub="Next.js SSR + RSC" />
+            <DiagramBox title={t("system_celery_workers")} sub="Celery beat + worker" />
+            <DiagramBox title={t("system_cli")} sub="uv run python -m api.scripts.*" />
           </DiagramTier>
 
           <Arrow />
 
           {/* Tier 2: app */}
           <DiagramTier label={t("system_tier_app")}>
-            <DiagramBox tone="emerald" title="Next.js Server Actions" sub={t("system_next_actions")} />
-            <DiagramBox tone="emerald" title="FastAPI" sub={t("system_fastapi")} />
+            <DiagramBox title="Next.js Server Actions" sub={t("system_next_actions")} />
+            <DiagramBox title="FastAPI" sub={t("system_fastapi")} />
           </DiagramTier>
 
           <Arrow />
 
           {/* Tier 3: data */}
           <DiagramTier label={t("system_tier_data")}>
-            <DiagramBox tone="amber" title="PostgreSQL" sub={t("system_pg_role")} />
-            <DiagramBox tone="amber" title="Qdrant" sub={t("system_qdrant_role")} />
-            <DiagramBox tone="amber" title="Redis" sub={t("system_redis_role")} />
+            <DiagramBox title="PostgreSQL" sub={t("system_pg_role")} />
+            <DiagramBox title="Qdrant" sub={t("system_qdrant_role")} />
+            <DiagramBox title="Redis" sub={t("system_redis_role")} />
           </DiagramTier>
 
           <Arrow />
 
           {/* Tier 4: third-party */}
           <DiagramTier label={t("system_tier_external")}>
-            <DiagramBox tone="violet" title="LLM providers" sub="OpenAI · Gemini · Anthropic" />
-            <DiagramBox tone="violet" title={t("system_scrapers")} sub="Apify · YouTube API · RSS" />
-            <DiagramBox tone="violet" title="Resend" sub={t("system_resend_role")} />
+            <DiagramBox title="LLM providers" sub="OpenAI · Gemini · Anthropic" />
+            <DiagramBox title={t("system_scrapers")} sub="Apify · YouTube API · RSS" />
+            <DiagramBox title="Resend" sub={t("system_resend_role")} />
           </DiagramTier>
         </div>
       </div>
@@ -394,7 +294,7 @@ function DiagramTier({
 }) {
   return (
     <div className="flex items-center gap-4">
-      <span className="hidden w-32 shrink-0 text-right text-[10px] font-semibold uppercase tracking-wider text-slate-500 sm:block">
+      <span className="hidden w-32 shrink-0 text-right text-[10px] font-medium uppercase tracking-[0.2em] text-ink-faint sm:block">
         {label}
       </span>
       <div className="grid w-full gap-3 sm:grid-cols-3">{children}</div>
@@ -402,22 +302,11 @@ function DiagramTier({
   );
 }
 
-function DiagramBox({
-  tone,
-  title,
-  sub,
-}: {
-  tone: "brand" | "emerald" | "amber" | "violet";
-  title: string;
-  sub: string;
-}) {
-  const styles = TONE_STYLES[tone];
+function DiagramBox({ title, sub }: { title: string; sub: string }) {
   return (
-    <div
-      className={`rounded-xl border ${styles.bg} ${tone === "brand" ? "border-brand-200" : tone === "emerald" ? "border-emerald-200" : tone === "amber" ? "border-amber-200" : "border-violet-200"} px-3 py-3 text-center shadow-sm`}
-    >
-      <p className={`text-sm font-bold ${styles.icon}`}>{title}</p>
-      <p className="mt-0.5 text-xs font-mono text-slate-600">{sub}</p>
+    <div className="rounded-lg border border-hairline bg-white px-3 py-3 text-center">
+      <p className="text-sm font-medium text-ink">{title}</p>
+      <p className="mt-0.5 font-mono text-xs text-ink-muted">{sub}</p>
     </div>
   );
 }
@@ -425,7 +314,7 @@ function DiagramBox({
 function Arrow() {
   return (
     <div className="flex items-center justify-center" aria-hidden>
-      <div className="h-5 w-px bg-slate-300" />
+      <div className="h-5 w-px bg-hairline" />
     </div>
   );
 }
@@ -438,11 +327,11 @@ function SectionHeader({
   subtitle: string;
 }) {
   return (
-    <div className="mx-auto max-w-2xl text-center">
-      <h2 className="text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+    <div className="max-w-2xl">
+      <h2 className="text-balance font-display text-[clamp(1.6rem,3vw,2.25rem)] font-medium leading-[1.15] tracking-[-0.015em] text-ink">
         {title}
       </h2>
-      <p className="mt-2 text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
+      <p className="mt-3 max-w-xl text-pretty text-sm leading-[1.7] text-ink-muted sm:text-base">
         {subtitle}
       </p>
     </div>
@@ -450,7 +339,44 @@ function SectionHeader({
 }
 
 /**
- * Ingestion pipeline — horizontal flow of 5 stages. Each stage has the
+ * Numbered editorial stage list — shared by the three pipeline sections
+ * (ingestion, insights briefing, on-demand brief). Fraunces tabular
+ * indices + hairline dividers instead of the old step-badge card grid.
+ */
+function StageList({
+  stages,
+}: {
+  stages: Array<{ title: string; module: string; body: string }>;
+}) {
+  return (
+    <ol className="mt-10">
+      {stages.map((s, i) => (
+        <li
+          key={i}
+          className="grid gap-2 border-t border-hairline py-6 sm:grid-cols-[56px_1fr] sm:gap-8"
+        >
+          <span className="font-display text-xl font-medium tabular-nums text-forest">
+            {String(i + 1).padStart(2, "0")}
+          </span>
+          <div>
+            <p className="font-display text-lg font-medium text-ink">
+              {s.title}
+            </p>
+            <p className="mt-1 font-mono text-xs text-forest">
+              {s.module}
+            </p>
+            <p className="mt-2 max-w-2xl text-pretty text-sm leading-[1.7] text-ink-muted">
+              {s.body}
+            </p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+/**
+ * Ingestion pipeline — flow of 5 stages. Each stage has the
  * specific code module noted in monospace so a reader can immediately go
  * read it.
  */
@@ -484,35 +410,15 @@ function IngestionPipeline({ t }: { t: T }) {
   ];
 
   return (
-    <section className="py-12 sm:py-16">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <section className="border-t border-hairline py-14 sm:py-20">
+      <div className="mx-auto max-w-4xl px-6">
         <SectionHeader
           title={t("ingest_title")}
           subtitle={t("ingest_subtitle")}
         />
-        <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          {stages.map((s, i) => (
-            <li
-              key={i}
-              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-            >
-              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">
-                {i + 1}
-              </span>
-              <p className="mt-3 text-sm font-bold text-slate-900">
-                {s.title}
-              </p>
-              <p className="mt-1 font-mono text-[10px] text-brand-700">
-                {s.module}
-              </p>
-              <p className="mt-3 text-xs leading-relaxed text-slate-600">
-                {s.body}
-              </p>
-            </li>
-          ))}
-        </ol>
+        <StageList stages={stages} />
 
-        <p className="mx-auto mt-6 max-w-3xl text-pretty text-center text-xs text-slate-500">
+        <p className="mt-6 max-w-2xl text-pretty text-xs leading-relaxed text-ink-faint">
           {t("ingest_schedule_note")}
         </p>
       </div>
@@ -522,47 +428,41 @@ function IngestionPipeline({ t }: { t: T }) {
 
 /* Discovery strategy: how keywords are picked. Sits between the
  * IngestionPipeline (which assumes you have a query) and BriefPipeline.
- * Two-card layout because there are exactly two complementary layers —
+ * Two-entry layout because there are exactly two complementary layers —
  * curated rotation and the daily trending overlay. */
 function DiscoveryStrategy({ t }: { t: T }) {
   return (
-    <section className="py-12 sm:py-16">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <section className="border-t border-hairline py-14 sm:py-20">
+      <div className="mx-auto max-w-4xl px-6">
         <SectionHeader
           title={t("discovery_title")}
           subtitle={t("discovery_subtitle")}
         />
-        <div className="mt-8 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="flex items-center gap-2">
-              <GitBranch className="h-5 w-5 text-brand-600" />
-              <h3 className="text-base font-bold text-slate-900">
-                {t("discovery_curated_title")}
-              </h3>
-            </div>
-            <p className="mt-1 font-mono text-[10px] text-brand-700">
+        <div className="mt-10 grid gap-x-10 sm:grid-cols-2">
+          <div className="border-t border-hairline py-6">
+            <h3 className="font-display text-lg font-medium text-ink">
+              {t("discovery_curated_title")}
+            </h3>
+            <p className="mt-1 font-mono text-xs text-forest">
               {t("discovery_curated_module")}
             </p>
-            <p className="mt-3 text-sm leading-relaxed text-slate-700">
+            <p className="mt-3 text-pretty text-sm leading-[1.7] text-ink-muted">
               {t("discovery_curated_body")}
             </p>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-amber-500" />
-              <h3 className="text-base font-bold text-slate-900">
-                {t("discovery_trending_title")}
-              </h3>
-            </div>
-            <p className="mt-1 font-mono text-[10px] text-brand-700">
+          <div className="border-t border-hairline py-6">
+            <h3 className="font-display text-lg font-medium text-ink">
+              {t("discovery_trending_title")}
+            </h3>
+            <p className="mt-1 font-mono text-xs text-forest">
               {t("discovery_trending_module")}
             </p>
-            <p className="mt-3 text-sm leading-relaxed text-slate-700">
+            <p className="mt-3 text-pretty text-sm leading-[1.7] text-ink-muted">
               {t("discovery_trending_body")}
             </p>
           </div>
         </div>
-        <p className="mx-auto mt-6 max-w-3xl text-pretty text-center text-xs text-slate-500">
+        <p className="mt-4 max-w-2xl text-pretty text-xs leading-relaxed text-ink-faint">
           {t("discovery_why_note")}
         </p>
       </div>
@@ -580,75 +480,51 @@ function DiscoveryStrategy({ t }: { t: T }) {
  */
 function PlatformStrategy({ t }: { t: T }) {
   const cards: Array<{
-    icon: typeof Layers;
-    tone: keyof typeof TONE_STYLES;
     title: string;
     body: string;
   }> = [
     {
-      icon: Newspaper,
-      tone: "amber",
       title: t("platforms_rss_title"),
       body: t("platforms_rss_body"),
     },
     {
-      icon: MessageSquare,
-      tone: "slate",
       title: t("platforms_x_title"),
       body: t("platforms_x_body"),
     },
     {
-      icon: Video,
-      tone: "slate",
       title: t("platforms_tiktok_title"),
       body: t("platforms_tiktok_body"),
     },
     {
-      icon: Hash,
-      tone: "violet",
       title: t("platforms_ig_title"),
       body: t("platforms_ig_body"),
     },
     {
-      icon: Globe2,
-      tone: "emerald",
       title: t("platforms_yt_title"),
       body: t("platforms_yt_body"),
     },
   ];
 
   return (
-    <section className="border-y border-slate-100 bg-slate-50/40 py-12 sm:py-16">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <section className="border-t border-hairline py-14 sm:py-20">
+      <div className="mx-auto max-w-5xl px-6">
         <SectionHeader
           title={t("platforms_title")}
           subtitle={t("platforms_subtitle")}
         />
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {cards.map((c) => {
-            const Icon = c.icon;
-            const s = TONE_STYLES[c.tone];
-            return (
-              <article
-                key={c.title}
-                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
-              >
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${s.bg}`}
-                  >
-                    <Icon className={`h-4 w-4 ${s.icon}`} />
-                  </span>
-                  <h3 className="text-sm font-bold text-slate-900">{c.title}</h3>
-                </div>
-                <p className="mt-3 text-pretty text-sm leading-relaxed text-slate-600">
-                  {c.body}
-                </p>
-              </article>
-            );
-          })}
+        <div className="mt-10 grid gap-x-10 sm:grid-cols-2">
+          {cards.map((c) => (
+            <article key={c.title} className="border-t border-hairline py-6">
+              <h3 className="font-display text-lg font-medium text-ink">
+                {c.title}
+              </h3>
+              <p className="mt-2 text-pretty text-sm leading-[1.7] text-ink-muted">
+                {c.body}
+              </p>
+            </article>
+          ))}
         </div>
-        <p className="mx-auto mt-6 max-w-3xl text-pretty text-center text-xs text-slate-500">
+        <p className="mt-4 max-w-2xl text-pretty text-xs leading-relaxed text-ink-faint">
           {t("platforms_note")}
         </p>
 
@@ -656,11 +532,11 @@ function PlatformStrategy({ t }: { t: T }) {
             that operators ask when they see the dashboard. Two paragraphs:
             (1) cost is the binding constraint, (2) signal value justifies
             keeping them on despite the low volume. */}
-        <div className="mx-auto mt-8 max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h3 className="text-balance text-base font-bold text-slate-900 sm:text-lg">
+        <div className="mt-12 max-w-3xl border-t border-hairline pt-8">
+          <h3 className="text-balance font-display text-lg font-medium text-ink sm:text-xl">
             {t("platforms_faq_q_low_count")}
           </h3>
-          <div className="mt-3 space-y-3 text-pretty text-sm leading-relaxed text-slate-700">
+          <div className="mt-3 space-y-3 text-pretty text-sm leading-[1.7] text-ink-muted">
             <p>{t("platforms_faq_a_low_count_cost")}</p>
             <p>{t("platforms_faq_a_low_count_signal")}</p>
           </div>
@@ -700,35 +576,15 @@ function BriefPipeline({ t }: { t: T }) {
   ];
 
   return (
-    <section className="border-y border-slate-100 bg-emerald-50/30 py-12 sm:py-16">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <section className="border-t border-hairline py-14 sm:py-20">
+      <div className="mx-auto max-w-4xl px-6">
         <SectionHeader
           title={t("brief_title")}
           subtitle={t("brief_subtitle")}
         />
-        <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          {stages.map((s, i) => (
-            <li
-              key={i}
-              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-            >
-              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-700 text-xs font-bold text-white">
-                {i + 1}
-              </span>
-              <p className="mt-3 text-sm font-bold text-slate-900">
-                {s.title}
-              </p>
-              <p className="mt-1 font-mono text-[10px] text-emerald-700">
-                {s.module}
-              </p>
-              <p className="mt-3 text-xs leading-relaxed text-slate-600">
-                {s.body}
-              </p>
-            </li>
-          ))}
-        </ol>
-        <div className="mx-auto mt-6 max-w-3xl rounded-xl border border-amber-200 bg-amber-50/60 p-4 text-center text-xs text-amber-900">
-          <strong>{t("brief_callout_strong")}</strong>{" "}
+        <StageList stages={stages} />
+        <div className="mt-8 max-w-3xl rounded-xl border border-hairline bg-paper-deep p-4 text-xs leading-relaxed text-ink-muted">
+          <strong className="text-ink">{t("brief_callout_strong")}</strong>{" "}
           {t("brief_callout_body")}
         </div>
       </div>
@@ -781,37 +637,17 @@ function InsightsBriefingPipeline({ t }: { t: T }) {
   ];
 
   return (
-    <section className="border-y border-slate-100 bg-brand-50/30 py-12 sm:py-16">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <section className="border-t border-hairline py-14 sm:py-20">
+      <div className="mx-auto max-w-5xl px-6">
         <SectionHeader
           title={t("insights_brief_title")}
           subtitle={t("insights_brief_subtitle")}
         />
-        <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          {stages.map((s, i) => (
-            <li
-              key={i}
-              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-            >
-              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-brand-700 text-xs font-bold text-white">
-                {i + 1}
-              </span>
-              <p className="mt-3 text-sm font-bold text-slate-900">
-                {s.title}
-              </p>
-              <p className="mt-1 font-mono text-[10px] text-brand-700">
-                {s.module}
-              </p>
-              <p className="mt-3 text-xs leading-relaxed text-slate-600">
-                {s.body}
-              </p>
-            </li>
-          ))}
-        </ol>
+        <StageList stages={stages} />
 
         <BriefingAnatomy t={t} />
 
-        <div className="mx-auto mt-6 max-w-3xl rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 text-center text-xs text-emerald-900">
+        <div className="mt-8 max-w-3xl rounded-xl bg-forest-tint p-4 text-xs leading-relaxed text-ink">
           <strong>{t("insights_brief_callout_strong")}</strong>{" "}
           {t("insights_brief_callout_body")}
         </div>
@@ -897,37 +733,34 @@ function BriefingAnatomy({ t }: { t: T }) {
   ];
 
   return (
-    <div className="mt-12 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
-      <h3 className="text-balance text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
+    <div className="mt-14 border-t border-hairline pt-10">
+      <h3 className="text-balance font-display text-xl font-medium tracking-[-0.015em] text-ink sm:text-2xl">
         {t("anatomy_title")}
       </h3>
-      <p className="mt-1.5 max-w-2xl text-pretty text-sm leading-relaxed text-slate-600">
+      <p className="mt-2 max-w-2xl text-pretty text-sm leading-[1.7] text-ink-muted">
         {t("anatomy_subtitle")}
       </p>
 
       {/* Top row: 5-section structure (Section 4 expanded below) */}
-      <div className="mt-6">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+      <div className="mt-8">
+        <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ink-faint">
           {t("anatomy_sections_label")}
         </p>
-        <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="mt-4 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
           {sections.map((s) => (
-            <li
-              key={s.n}
-              className="rounded-xl border border-slate-200 bg-slate-50/60 p-3"
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white">
+            <li key={s.n} className="border-t border-hairline pt-4">
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="font-display text-lg font-medium tabular-nums text-forest">
                   {s.n}
                 </span>
-                <span className="text-[10px] font-mono text-slate-400 tabular-nums">
+                <span className="font-mono text-[10px] tabular-nums text-ink-faint">
                   ~{s.words} kata
                 </span>
               </div>
-              <p className="mt-2 text-[13px] font-bold text-slate-900">
+              <p className="mt-2 text-[13px] font-semibold text-ink">
                 {s.title}
               </p>
-              <p className="mt-1 text-xs leading-relaxed text-slate-600">
+              <p className="mt-1 text-xs leading-relaxed text-ink-muted">
                 {s.body}
               </p>
             </li>
@@ -936,35 +769,32 @@ function BriefingAnatomy({ t }: { t: T }) {
       </div>
 
       {/* Section 4 deep-dive: 6 ready-to-use deliverables */}
-      <div className="mt-7 rounded-xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50/50 to-white p-4">
+      <div className="mt-10 rounded-2xl bg-forest-tint p-5 sm:p-7">
         <div className="flex items-baseline justify-between gap-3">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-forest">
               {t("anatomy_section4_eyebrow")}
             </p>
-            <p className="mt-1 text-balance text-sm font-bold text-slate-900 sm:text-base">
+            <p className="mt-1.5 text-balance font-display text-lg font-medium text-ink sm:text-xl">
               {t("anatomy_section4_title")}
             </p>
           </div>
-          <span className="text-[10px] font-mono text-emerald-700 tabular-nums">
+          <span className="shrink-0 font-mono text-[10px] tabular-nums text-forest">
             5,400-7,800 kata
           </span>
         </div>
-        <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="mt-6 grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
           {deliverables.map((d) => (
-            <li
-              key={d.key}
-              className="rounded-xl border border-slate-200 bg-white p-3"
-            >
+            <li key={d.key}>
               <div className="flex items-baseline justify-between gap-2">
-                <p className="text-[13px] font-bold text-slate-900">
+                <p className="text-[13px] font-semibold text-ink">
                   {d.title}
                 </p>
-                <span className="text-[10px] font-mono text-slate-400 tabular-nums">
+                <span className="font-mono text-[10px] tabular-nums text-ink-faint">
                   ~{d.words}
                 </span>
               </div>
-              <p className="mt-1 text-xs leading-relaxed text-slate-600">
+              <p className="mt-1 text-xs leading-relaxed text-ink-muted">
                 {d.body}
               </p>
             </li>
@@ -973,35 +803,35 @@ function BriefingAnatomy({ t }: { t: T }) {
       </div>
 
       {/* Flyer companions row */}
-      <div className="mt-7 rounded-xl border-2 border-fuchsia-200 bg-gradient-to-br from-fuchsia-50/40 to-white p-4">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-fuchsia-700">
+      <div className="mt-6 rounded-2xl border border-hairline p-5 sm:p-7">
+        <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ink-faint">
           {t("anatomy_flyer_eyebrow")}
         </p>
-        <p className="mt-1 text-balance text-sm font-bold text-slate-900 sm:text-base">
+        <p className="mt-1.5 text-balance font-display text-lg font-medium text-ink sm:text-xl">
           {t("anatomy_flyer_title")}
         </p>
-        <p className="mt-1 max-w-2xl text-[12px] leading-relaxed text-slate-600">
+        <p className="mt-1.5 max-w-2xl text-pretty text-xs leading-relaxed text-ink-muted">
           {t("anatomy_flyer_body")}
         </p>
-        <ul className="mt-3 grid gap-3 sm:grid-cols-2">
-          <li className="rounded-xl border border-slate-200 bg-white p-3">
-            <p className="text-[13px] font-bold text-slate-900">
+        <ul className="mt-5 grid gap-x-8 gap-y-5 sm:grid-cols-2">
+          <li className="border-t border-hairline pt-4">
+            <p className="text-[13px] font-semibold text-ink">
               {t("anatomy_flyer_general_title")}
             </p>
-            <p className="mt-1 text-xs leading-relaxed text-slate-600">
+            <p className="mt-1 text-xs leading-relaxed text-ink-muted">
               {t("anatomy_flyer_general_body")}
             </p>
           </li>
-          <li className="rounded-xl border border-slate-200 bg-white p-3">
-            <p className="text-[13px] font-bold text-slate-900">
+          <li className="border-t border-hairline pt-4">
+            <p className="text-[13px] font-semibold text-ink">
               {t("anatomy_flyer_genz_title")}
             </p>
-            <p className="mt-1 text-xs leading-relaxed text-slate-600">
+            <p className="mt-1 text-xs leading-relaxed text-ink-muted">
               {t("anatomy_flyer_genz_body")}
             </p>
           </li>
         </ul>
-        <p className="mt-3 text-xs text-slate-500">
+        <p className="mt-4 text-xs text-ink-faint">
           {t("anatomy_flyer_footnote")}
         </p>
       </div>
@@ -1042,38 +872,38 @@ function ModelsTable({ t }: { t: T }) {
   ];
 
   return (
-    <section className="py-12 sm:py-16">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <section className="border-t border-hairline py-14 sm:py-20">
+      <div className="mx-auto max-w-5xl px-6">
         <SectionHeader
           title={t("models_title")}
           subtitle={t("models_subtitle")}
         />
-        <div className="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <table className="w-full min-w-[720px] text-sm">
+        <div className="mt-10 overflow-x-auto">
+          <table className="w-full min-w-[720px] border-t border-hairline text-sm">
             <thead>
-              <tr className="border-b border-slate-100 bg-slate-50 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                <th className="px-4 py-3">{t("models_th_model")}</th>
-                <th className="px-4 py-3">{t("models_th_role")}</th>
-                <th className="px-4 py-3">{t("models_th_why")}</th>
-                <th className="px-4 py-3">{t("models_th_where")}</th>
+              <tr className="border-b border-hairline text-left text-[10px] font-medium uppercase tracking-[0.16em] text-ink-faint">
+                <th className="py-3 pr-4">{t("models_th_model")}</th>
+                <th className="py-3 pr-4">{t("models_th_role")}</th>
+                <th className="py-3 pr-4">{t("models_th_why")}</th>
+                <th className="py-3">{t("models_th_where")}</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((r) => (
-                <tr key={r.name} className="border-b border-slate-50 last:border-0">
-                  <td className="px-4 py-3 align-top">
-                    <p className="font-bold text-slate-900">{r.name}</p>
-                    <p className="mt-0.5 font-mono text-[10px] text-slate-500">
+                <tr key={r.name} className="border-b border-hairline">
+                  <td className="py-4 pr-4 align-top">
+                    <p className="font-medium text-ink">{r.name}</p>
+                    <p className="mt-0.5 font-mono text-[10px] text-ink-faint">
                       {r.id}
                     </p>
                   </td>
-                  <td className="px-4 py-3 align-top text-slate-700">
+                  <td className="py-4 pr-4 align-top text-ink-muted">
                     {r.role}
                   </td>
-                  <td className="px-4 py-3 align-top text-slate-600">
+                  <td className="py-4 pr-4 align-top text-ink-muted">
                     {r.why}
                   </td>
-                  <td className="px-4 py-3 align-top text-slate-500">
+                  <td className="py-4 align-top text-ink-faint">
                     {r.where}
                   </td>
                 </tr>
@@ -1219,48 +1049,48 @@ function MonthlyCost({ t }: { t: T }) {
   const usedPct = Math.min(100, (total / cap) * 100);
 
   return (
-    <section className="border-y border-slate-100 bg-gradient-to-b from-amber-50/30 to-white py-12 sm:py-16">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+    <section className="border-t border-hairline py-14 sm:py-20">
+      <div className="mx-auto max-w-5xl px-6">
         <SectionHeader
           title={t("cost_title")}
           subtitle={t("cost_subtitle")}
         />
 
-        <div className="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <table className="w-full min-w-[640px] text-sm">
+        <div className="mt-10 overflow-x-auto">
+          <table className="w-full min-w-[640px] border-t border-hairline text-sm">
             <thead>
-              <tr className="border-b border-slate-100 bg-slate-50 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                <th className="px-4 py-3">{t("cost_th_provider")}</th>
-                <th className="px-4 py-3">{t("cost_th_use")}</th>
-                <th className="px-4 py-3 text-right">{t("cost_th_monthly")}</th>
-                <th className="px-4 py-3">{t("cost_th_note")}</th>
+              <tr className="border-b border-hairline text-left text-[10px] font-medium uppercase tracking-[0.16em] text-ink-faint">
+                <th className="py-3 pr-4">{t("cost_th_provider")}</th>
+                <th className="py-3 pr-4">{t("cost_th_use")}</th>
+                <th className="py-3 pr-4 text-right">{t("cost_th_monthly")}</th>
+                <th className="py-3">{t("cost_th_note")}</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((r) => (
-                <tr key={r.provider} className="border-b border-slate-50 last:border-0">
-                  <td className="px-4 py-3 align-top">
-                    <p className="font-semibold text-slate-900">{r.provider}</p>
+                <tr key={r.provider} className="border-b border-hairline">
+                  <td className="py-4 pr-4 align-top">
+                    <p className="font-medium text-ink">{r.provider}</p>
                   </td>
-                  <td className="px-4 py-3 align-top text-slate-700">{r.use}</td>
-                  <td className="px-4 py-3 align-top text-right tabular-nums text-slate-900">
+                  <td className="py-4 pr-4 align-top text-ink-muted">{r.use}</td>
+                  <td className="py-4 pr-4 align-top text-right tabular-nums text-ink">
                     {r.monthly === 0
                       ? "—"
                       : `$${r.monthly.toFixed(2)}`}
                   </td>
-                  <td className="px-4 py-3 align-top text-xs text-slate-500">
+                  <td className="py-4 align-top text-xs text-ink-faint">
                     {r.note}
                   </td>
                 </tr>
               ))}
-              <tr className="border-t-2 border-slate-200 bg-slate-50/60 font-semibold">
-                <td className="px-4 py-3 text-slate-900" colSpan={2}>
+              <tr className="border-b border-hairline bg-paper-deep font-semibold">
+                <td className="px-2 py-4 text-ink" colSpan={2}>
                   {t("cost_total_row")}
                 </td>
-                <td className="px-4 py-3 text-right tabular-nums text-slate-900">
+                <td className="py-4 pr-4 text-right tabular-nums text-ink">
                   ~${total.toFixed(2)}
                 </td>
-                <td className="px-4 py-3 text-xs text-slate-600">
+                <td className="py-4 pr-2 text-xs text-ink-muted">
                   ≈ Rp {Math.round(totalIDR / 1000).toLocaleString("id-ID")}K/bulan
                 </td>
               </tr>
@@ -1269,22 +1099,22 @@ function MonthlyCost({ t }: { t: T }) {
         </div>
 
         {/* Budget cap bar */}
-        <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50/60 p-4 sm:p-5">
+        <div className="mt-8 max-w-3xl rounded-2xl border border-hairline p-4 sm:p-5">
           <div className="flex flex-wrap items-baseline justify-between gap-2 text-sm">
-            <p className="font-semibold text-slate-900">
+            <p className="font-medium text-ink">
               {t("cost_budget_title")}
             </p>
-            <p className="font-mono text-xs text-slate-700">
+            <p className="font-mono text-xs text-ink-muted">
               ${total.toFixed(2)} / ${cap} · Rp {Math.round(capIDR / 1000).toLocaleString("id-ID")}K
             </p>
           </div>
-          <div className="mt-3 h-2 overflow-hidden rounded-full bg-amber-100">
+          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-paper-deep">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-amber-500"
+              className="h-full rounded-full bg-forest"
               style={{ width: `${usedPct}%` }}
             />
           </div>
-          <p className="mt-2 text-xs text-slate-600">
+          <p className="mt-2 text-xs text-ink-faint">
             {t("cost_budget_caveat")}
           </p>
         </div>
@@ -1345,19 +1175,19 @@ function KitabCorpus({ t }: { t: T }) {
   ];
 
   return (
-    <section className="border-y border-slate-100 bg-gradient-to-b from-emerald-50/30 to-white py-12 sm:py-16">
-      <div className="mx-auto max-w-4xl px-4 sm:px-6">
+    <section className="border-t border-hairline py-14 sm:py-20">
+      <div className="mx-auto max-w-4xl px-6">
         <SectionHeader
           title={t("kitab_title")}
           subtitle={t("kitab_subtitle")}
         />
-        <div className="mt-8 space-y-8">
+        <div className="mt-10 space-y-10">
           {categories.map((cat) => (
             <div key={cat.heading}>
-              <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700">
+              <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-forest">
                 {cat.heading}
               </p>
-              <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+              <ul className="mt-4 grid gap-x-10 sm:grid-cols-2">
                 {cat.items.map((item) => (
                   <KitabItem key={item.title} title={item.title} detail={item.detail} />
                 ))}
@@ -1365,16 +1195,16 @@ function KitabCorpus({ t }: { t: T }) {
             </div>
           ))}
         </div>
-        <p className="mx-auto mt-8 max-w-2xl text-pretty text-center text-xs leading-relaxed text-slate-600">
+        <p className="mt-10 max-w-2xl text-pretty text-xs leading-relaxed text-ink-faint">
           {t("kitab_note")}
         </p>
-        <p className="mt-4 text-center text-xs">
+        <p className="mt-4 text-xs">
           <Link
             href="/kitab"
-            className="inline-flex items-center gap-1 font-semibold text-emerald-700 hover:text-emerald-800"
+            className="group inline-flex items-center gap-1 font-semibold text-forest transition hover:text-forest-hover"
           >
             {t("kitab_browse_library")}
-            <ArrowRight className="h-3 w-3" />
+            <ArrowUpRight className="h-3 w-3 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </Link>
         </p>
       </div>
@@ -1390,12 +1220,9 @@ function KitabItem({
   detail: string;
 }) {
   return (
-    <li className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <p className="flex items-baseline gap-2">
-        <BookOpenCheck className="h-4 w-4 shrink-0 text-emerald-700" />
-        <span className="text-sm font-bold text-slate-900">{title}</span>
-      </p>
-      <p className="mt-2 text-xs leading-relaxed text-slate-600">{detail}</p>
+    <li className="border-t border-hairline py-4">
+      <p className="font-display text-[15px] font-medium text-ink">{title}</p>
+      <p className="mt-1.5 text-xs leading-relaxed text-ink-muted">{detail}</p>
     </li>
   );
 }
@@ -1415,19 +1242,19 @@ function Observability({ t }: { t: T }) {
   ];
 
   return (
-    <section className="py-12 sm:py-16">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+    <section className="border-t border-hairline py-14 sm:py-20">
+      <div className="mx-auto max-w-4xl px-6">
         <SectionHeader title={t("obs_title")} subtitle={t("obs_subtitle")} />
-        <div className="mt-8 grid gap-3 sm:grid-cols-2">
+        <div className="mt-10 grid gap-x-10 sm:grid-cols-2">
           {tables.map((tbl) => (
             <div
               key={tbl.name}
-              className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+              className="border-t border-hairline py-4"
             >
-              <p className="font-mono text-xs font-bold text-brand-700">
+              <p className="font-mono text-xs font-semibold text-forest">
                 {tbl.name}
               </p>
-              <p className="mt-1 text-xs leading-relaxed text-slate-600">
+              <p className="mt-1 text-xs leading-relaxed text-ink-muted">
                 {tbl.role}
               </p>
             </div>
@@ -1448,20 +1275,20 @@ function Tradeoffs({ t }: { t: T }) {
     { q: t("tradeoff_6_q"), a: t("tradeoff_6_a") },
   ];
   return (
-    <section className="border-t border-slate-100 bg-slate-50/50 py-12 sm:py-16">
-      <div className="mx-auto max-w-3xl px-4 sm:px-6">
+    <section className="border-t border-hairline py-14 sm:py-20">
+      <div className="mx-auto max-w-3xl px-6">
         <SectionHeader
           title={t("tradeoffs_title")}
           subtitle={t("tradeoffs_subtitle")}
         />
-        <dl className="mt-8 space-y-5">
+        <dl className="mt-10">
           {items.map((it, i) => (
             <div
               key={i}
-              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+              className="border-t border-hairline py-6"
             >
-              <dt className="text-sm font-bold text-slate-900">{it.q}</dt>
-              <dd className="mt-2 text-[15px] leading-relaxed text-slate-600">
+              <dt className="font-display text-lg font-medium text-ink">{it.q}</dt>
+              <dd className="mt-2 text-pretty text-[15px] leading-[1.7] text-ink-muted">
                 {it.a}
               </dd>
             </div>
@@ -1474,34 +1301,27 @@ function Tradeoffs({ t }: { t: T }) {
 
 function Repo({ t }: { t: T }) {
   return (
-    <section className="py-16 sm:py-20">
-      <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <div className="relative isolate overflow-hidden rounded-3xl bg-slate-950 px-6 py-12 text-center text-white shadow-2xl sm:px-12">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 -z-10"
-          >
-            <div className="absolute -top-24 left-1/3 h-72 w-72 rounded-full bg-brand-500 opacity-20 blur-3xl" />
-            <div className="absolute -bottom-24 right-0 h-72 w-72 rounded-full bg-emerald-500 opacity-15 blur-3xl" />
-          </div>
-          <GithubIcon className="mx-auto h-10 w-10 text-white" />
-          <h2 className="mt-4 text-balance text-2xl font-bold tracking-tight sm:text-3xl">
+    <section className="border-t border-hairline py-16 sm:py-20">
+      <div className="mx-auto max-w-3xl px-6">
+        <div className="rounded-3xl bg-ink px-6 py-12 text-center text-paper sm:px-12">
+          <GithubIcon className="mx-auto h-10 w-10 text-paper" />
+          <h2 className="mt-5 text-balance font-display text-2xl font-medium tracking-[-0.015em] sm:text-3xl">
             {t("repo_title")}
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-white/75 sm:text-base">
+          <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-[1.7] text-paper/70 sm:text-base">
             {t("repo_body")}
           </p>
           <a
             href={GITHUB_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-7 inline-flex h-12 items-center gap-2 rounded-full bg-white px-6 text-sm font-semibold text-slate-900 shadow-lg transition hover:bg-slate-100"
+            className="mt-8 inline-flex h-12 items-center gap-2 rounded-full bg-paper px-6 text-sm font-semibold text-ink transition hover:bg-paper-deep"
           >
             <GitBranch className="h-4 w-4" />
             {t("repo_cta")}
             <ArrowRight className="h-4 w-4" />
           </a>
-          <p className="mt-4 font-mono text-xs text-white/50">
+          <p className="mt-5 font-mono text-xs text-paper/45">
             {GITHUB_URL.replace("https://", "")}
           </p>
         </div>

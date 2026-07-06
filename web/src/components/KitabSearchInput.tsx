@@ -28,8 +28,8 @@ export function KitabSearchInput({
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   return (
-    <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 focus-within:border-emerald-400 focus-within:bg-white">
-      <Search className="h-4 w-4 shrink-0 text-slate-400" />
+    <label className="flex items-center gap-2 rounded-xl border border-hairline bg-paper-deep px-4 py-2.5 focus-within:border-forest/50 focus-within:bg-white">
+      <Search className="h-4 w-4 shrink-0 text-ink-faint" />
       <input
         ref={inputRef}
         type="text"
@@ -37,7 +37,7 @@ export function KitabSearchInput({
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
-        className="flex-1 bg-transparent text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none"
+        className="flex-1 bg-transparent text-sm text-ink placeholder:text-ink-faint focus:outline-none"
         maxLength={200}
       />
       {value.length > 0 && (
@@ -62,14 +62,14 @@ export function KitabSearchInput({
               }
             }
           }}
-          className="shrink-0 rounded-full p-1 text-slate-400 transition hover:bg-slate-200 hover:text-slate-700"
+          className="shrink-0 rounded-full p-1 text-ink-faint transition hover:bg-paper-deep hover:text-ink"
         >
           <X className="h-3.5 w-3.5" />
         </button>
       )}
       <button
         type="submit"
-        className="rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-800"
+        className="rounded-lg bg-forest px-3 py-1.5 text-xs font-semibold text-paper transition hover:bg-forest-hover"
       >
         {submitLabel}
       </button>

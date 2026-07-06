@@ -110,23 +110,23 @@ export function WatchedRoomsNudge() {
   };
 
   return (
-    <div className="mx-auto mb-2 max-w-6xl px-4 sm:px-6">
-      <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 px-4 py-3 shadow-sm sm:px-5">
-        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+    <div className="mx-auto mb-2 max-w-6xl px-4 font-body sm:px-6">
+      <div className="flex flex-wrap items-center gap-3 border border-hairline bg-forest-tint px-4 py-3 sm:px-5">
+        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-forest text-paper">
           <Flame className="h-4 w-4" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-[12.5px] font-bold text-slate-900">
+          <p className="text-[12.5px] font-semibold text-ink">
             Diskusi kamu masih hangat
           </p>
-          <p className="mt-0.5 truncate text-[11.5px] text-slate-600">
+          <p className="mt-0.5 truncate text-[11.5px] text-ink-muted">
             <MessageCircle className="-mt-0.5 mr-1 inline h-3 w-3" />
             {hot.total} komen di ruang yang kamu ikuti
           </p>
         </div>
         <Link
           href={`/m/${hot.slug}`}
-          className="inline-flex h-8 items-center gap-1 rounded-full bg-slate-900 px-3 text-[11.5px] font-semibold text-white shadow-sm hover:bg-slate-700"
+          className="inline-flex h-8 items-center gap-1 rounded-full bg-forest px-3 text-[11.5px] font-semibold text-paper transition hover:bg-forest-hover"
         >
           Buka
           <ArrowUpRight className="h-3 w-3" />
@@ -134,7 +134,7 @@ export function WatchedRoomsNudge() {
         <button
           type="button"
           onClick={dismiss}
-          className="text-xs font-semibold text-slate-500 hover:text-slate-900"
+          className="text-xs font-semibold text-ink-faint hover:text-ink"
           aria-label="Dismiss"
         >
           Tutup

@@ -1,3 +1,4 @@
+import { ForestWash } from "@/components/ForestWash";
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { CheckCircle2, MailX } from "lucide-react";
@@ -48,24 +49,25 @@ function FailureCard({
   t: Awaited<ReturnType<typeof getTranslations<"Auth">>>;
 }) {
   return (
-    <section className="mx-auto flex max-w-md flex-col items-center justify-center px-4 py-24 text-center">
+    <section className="relative isolate mx-auto flex max-w-md flex-col items-center justify-center px-4 py-24 text-center">
+      <ForestWash />
       <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-rose-50 text-rose-600 ring-1 ring-rose-100">
         <MailX className="h-6 w-6" />
       </span>
-      <h1 className="mt-4 text-balance text-xl font-bold text-slate-900">
+      <h1 className="mt-4 text-balance text-xl font-bold text-ink">
         {t("verify_failed_title")}
       </h1>
-      <p className="mt-2 text-pretty text-sm text-slate-600">{message}</p>
+      <p className="mt-2 text-pretty text-sm text-ink-muted">{message}</p>
       <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
         <Link
           href="/login?resend=1"
-          className="inline-flex h-9 items-center rounded-full bg-slate-900 px-4 text-sm font-semibold text-white hover:bg-slate-800"
+          className="inline-flex h-9 items-center rounded-full bg-forest px-4 text-sm font-semibold text-paper hover:bg-forest-hover"
         >
           {t("verify_resend_cta")}
         </Link>
         <Link
           href="/login"
-          className="inline-flex h-9 items-center rounded-full border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          className="inline-flex h-9 items-center rounded-full border border-hairline bg-white px-4 text-sm font-medium text-ink-muted hover:bg-paper-deep"
         >
           {t("verify_back_to_login")}
         </Link>

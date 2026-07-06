@@ -37,9 +37,9 @@ export async function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-30 w-full">
+    <header className="sticky top-0 z-30 w-full border-b border-hairline bg-paper/85 font-body backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
-        <div className="flex h-12 w-full items-center justify-between gap-3 rounded-full border border-slate-200 bg-white px-3 pr-2 shadow-sm shadow-slate-200/60 sm:px-5">
+        <div className="flex h-full w-full items-center justify-between gap-3">
           {/* Mobile-only: hamburger + home icon on the left. The
               MobileNav component auto-hides on md+, and the desktop
               logo below auto-hides on mobile — so the two never
@@ -53,7 +53,7 @@ export async function Header() {
             <Link
               href="/"
               aria-label={t("home")}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-ink-muted transition hover:bg-paper-deep"
             >
               <Home className="h-5 w-5" />
             </Link>
@@ -74,30 +74,30 @@ export async function Header() {
             />
           </Link>
 
-          <nav className="hidden items-center gap-7 text-sm font-medium text-slate-600 md:flex">
+          <nav className="hidden items-center gap-7 text-sm font-medium text-ink-muted md:flex">
             {user && (
               <Link
                 href="/dashboard"
-                className="hover:text-slate-900 transition"
+                className="hover:text-ink transition"
               >
                 {t("dashboard")}
               </Link>
             )}
-            <Link href="/briefings" className="hover:text-slate-900 transition">
+            <Link href="/briefings" className="hover:text-ink transition">
               {t("insights")}
             </Link>
             <Link
               href="/discussions"
-              className="hover:text-slate-900 transition"
+              className="hover:text-ink transition"
             >
               {t("discussions")}
             </Link>
-            <Link href="/kitab" className="hover:text-slate-900 transition">
+            <Link href="/kitab" className="hover:text-ink transition">
               {t("kitab")}
             </Link>
             <Link
               href="/flyers/public"
-              className="hover:text-slate-900 transition"
+              className="hover:text-ink transition"
             >
               {t("flyers_library")}
             </Link>

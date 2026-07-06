@@ -37,7 +37,7 @@ export function TrendingTopicsList({
 
   return (
     <>
-      <div className="mt-4 overflow-hidden rounded-lg border border-slate-200">
+      <div className="mt-4 overflow-hidden rounded-lg border border-hairline">
         {topics.map((t, i) => {
           const pct = (t.volume / maxCount) * 100;
           return (
@@ -46,7 +46,7 @@ export function TrendingTopicsList({
               type="button"
               onClick={() => setActiveId(t.id)}
               title={`${t.volume} ${label} · ${t.reach} ${t.reach === 1 ? "source" : "sources"} · click for detail`}
-              className={`group relative grid w-full grid-cols-[1fr_auto_20px] items-center gap-3 px-3 py-2.5 text-left transition hover:bg-slate-50 ${i > 0 ? "border-t border-slate-100" : ""}`}
+              className={`group relative grid w-full grid-cols-[1fr_auto_20px] items-center gap-3 px-3 py-2.5 text-left transition hover:bg-paper-deep ${i > 0 ? "border-t border-hairline" : ""}`}
             >
               {/* Background bar — sits behind the row contents, width
                   proportional to post_count vs max. Slightly darker on
@@ -57,21 +57,21 @@ export function TrendingTopicsList({
                 style={{ width: `${pct}%` }}
               />
               <div className="relative min-w-0">
-                <p className="truncate text-sm font-medium text-slate-800">
-                  <span className="mr-1.5 tabular-nums text-slate-400">
+                <p className="truncate text-sm font-medium text-ink">
+                  <span className="mr-1.5 tabular-nums text-ink-faint">
                     {i + 1}.
                   </span>
                   {t.title}
                 </p>
-                <p className="truncate text-xs text-slate-500">
+                <p className="truncate text-xs text-ink-faint">
                   {t.keywords.slice(0, 4).join(" · ") || t.platform}
                 </p>
               </div>
-              <span className="relative whitespace-nowrap text-xs font-semibold tabular-nums text-slate-700">
+              <span className="relative whitespace-nowrap text-xs font-semibold tabular-nums text-ink-muted">
                 {t.volume.toLocaleString()}{" "}
-                <span className="font-normal text-slate-500">{label}</span>
+                <span className="font-normal text-ink-faint">{label}</span>
               </span>
-              <ChevronRight className="relative h-4 w-4 shrink-0 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-slate-500" />
+              <ChevronRight className="relative h-4 w-4 shrink-0 text-ink-faint/60 transition group-hover:translate-x-0.5 group-hover:text-ink-faint" />
             </button>
           );
         })}

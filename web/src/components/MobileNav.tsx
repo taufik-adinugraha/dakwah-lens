@@ -67,7 +67,7 @@ export function MobileNav({
         type="button"
         onClick={() => setOpen(true)}
         aria-label={openLabel}
-        className="inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 md:hidden"
+        className="inline-flex h-9 w-9 items-center justify-center rounded-full text-ink-muted transition hover:bg-paper-deep md:hidden"
       >
         <Menu className="h-5 w-5" />
       </button>
@@ -84,7 +84,7 @@ export function MobileNav({
               type="button"
               aria-label={closeLabel}
               onClick={() => setOpen(false)}
-              className="absolute inset-0 bg-slate-900/50"
+              className="absolute inset-0 bg-forest/50"
             />
             <div className="absolute right-0 top-0 flex h-full w-72 max-w-[85vw] flex-col bg-white shadow-2xl">
               <div className="flex items-center justify-end p-4">
@@ -92,7 +92,7 @@ export function MobileNav({
                   type="button"
                   onClick={() => setOpen(false)}
                   aria-label={closeLabel}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full text-ink-muted transition hover:bg-paper-deep"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -103,7 +103,7 @@ export function MobileNav({
                     key={item.href}
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="rounded-lg px-3 py-3 text-base font-medium text-slate-700 transition hover:bg-slate-100"
+                    className="rounded-lg px-3 py-3 text-base font-medium text-ink-muted transition hover:bg-paper-deep"
                   >
                     {item.label}
                   </a>

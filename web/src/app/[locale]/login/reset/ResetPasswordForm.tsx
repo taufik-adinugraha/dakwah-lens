@@ -26,13 +26,13 @@ export function ResetPasswordForm({
   if (!email || !token) {
     return (
       <div className="space-y-4 text-center">
-        <h2 className="text-xl font-semibold text-slate-900">
+        <h2 className="text-xl font-semibold text-ink">
           {t("reset_invalid_link_title")}
         </h2>
-        <p className="text-sm text-slate-600">{t("reset_invalid_link_body")}</p>
+        <p className="text-sm text-ink-muted">{t("reset_invalid_link_body")}</p>
         <Link
           href="/login?mode=signin"
-          className="inline-flex h-10 items-center justify-center rounded-full bg-slate-900 px-4 text-xs font-semibold text-white"
+          className="inline-flex h-10 items-center justify-center rounded-full bg-forest px-4 text-xs font-semibold text-white"
         >
           {t("verify_back_to_login")}
         </Link>
@@ -43,18 +43,18 @@ export function ResetPasswordForm({
   if (done) {
     return (
       <div className="space-y-5 text-center">
-        <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 ring-1 ring-emerald-200">
-          <CheckCircle2 className="h-6 w-6 text-emerald-600" />
+        <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-forest-tint ring-1 ring-forest/20">
+          <CheckCircle2 className="h-6 w-6 text-forest" />
         </div>
-        <h2 className="text-balance text-xl font-semibold text-slate-900 sm:text-2xl">
+        <h2 className="text-balance text-xl font-semibold text-ink sm:text-2xl">
           {t("reset_done_title")}
         </h2>
-        <p className="text-pretty text-sm leading-relaxed text-slate-600">
+        <p className="text-pretty text-sm leading-relaxed text-ink-muted">
           {t("reset_done_body")}
         </p>
         <Link
           href="/login"
-          className="inline-flex h-10 items-center justify-center rounded-full bg-slate-900 px-4 text-xs font-semibold text-white"
+          className="inline-flex h-10 items-center justify-center rounded-full bg-forest px-4 text-xs font-semibold text-white"
         >
           {t("verify_back_to_login")}
         </Link>
@@ -82,10 +82,10 @@ export function ResetPasswordForm({
         <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 ring-1 ring-brand-200">
           <KeyRound className="h-6 w-6 text-brand-700" />
         </div>
-        <h2 className="text-balance text-xl font-semibold text-slate-900 sm:text-2xl">
+        <h2 className="text-balance text-xl font-semibold text-ink sm:text-2xl">
           {t("reset_title")}
         </h2>
-        <p className="text-pretty text-sm leading-relaxed text-slate-600">
+        <p className="text-pretty text-sm leading-relaxed text-ink-muted">
           {t("reset_body", { email })}
         </p>
       </div>
@@ -95,7 +95,7 @@ export function ResetPasswordForm({
         <input type="hidden" name="token" value={token} />
 
         <label className="block text-left">
-          <span className="text-xs font-medium text-slate-700">
+          <span className="text-xs font-medium text-ink-muted">
             {t("reset_field_password")}
           </span>
           <input
@@ -106,7 +106,7 @@ export function ResetPasswordForm({
             maxLength={256}
             autoComplete="new-password"
             placeholder={t("reset_field_password_placeholder")}
-            className="mt-1.5 block h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
+            className="mt-1.5 block h-11 w-full rounded-lg border border-hairline bg-white px-3 text-sm text-ink shadow-sm transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
           />
         </label>
 
@@ -122,7 +122,7 @@ export function ResetPasswordForm({
         <button
           type="submit"
           disabled={pending}
-          className="group inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-slate-900 px-4 text-sm font-semibold text-white shadow transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+          className="group inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-forest px-4 text-sm font-semibold text-white shadow transition hover:bg-forest-hover disabled:cursor-not-allowed disabled:opacity-60"
         >
           {pending && <Spinner size="md" />}
           {pending ? t("submit_loading") : t("reset_submit")}

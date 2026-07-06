@@ -54,22 +54,28 @@ function Hero({ t, lastUpdated }: { t: T; lastUpdated: string }) {
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
       >
-        <div className="absolute inset-0 grid-bg opacity-40" />
-        <div className="absolute -top-24 left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-emerald-200 opacity-40 blur-3xl" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(90rem 42rem at 50% -12rem, rgba(14, 90, 60, 0.42), transparent 68%)," +
+              "radial-gradient(64rem 36rem at 88% 108%, rgba(14, 90, 60, 0.26), transparent 68%)",
+          }}
+        />
       </div>
 
       <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50/80 px-3 py-1 text-xs font-medium text-emerald-700 shadow-sm backdrop-blur">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-hairline bg-forest-tint/80 px-3 py-1 text-xs font-medium text-forest shadow-sm backdrop-blur">
           <Scale className="h-3.5 w-3.5" />
           {t("badge")}
         </span>
-        <h1 className="mt-4 text-balance text-3xl font-bold leading-[1.1] tracking-tight text-slate-900 sm:text-5xl">
+        <h1 className="mt-4 text-balance text-3xl font-bold leading-[1.1] tracking-tight text-ink sm:text-5xl">
           {t("hero_title")}
         </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-pretty text-base leading-relaxed text-slate-600 sm:text-lg">
+        <p className="mx-auto mt-4 max-w-2xl text-pretty text-base leading-relaxed text-ink-muted sm:text-lg">
           {t("hero_subtitle")}
         </p>
-        <p className="mt-4 text-xs uppercase tracking-wider text-slate-400">
+        <p className="mt-4 text-xs uppercase tracking-wider text-ink-faint">
           {t("hero_last_updated", { date: lastUpdated })}
         </p>
       </div>
@@ -81,11 +87,11 @@ function Preamble({ t }: { t: T }) {
   return (
     <section className="py-10 sm:py-14">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <div className="rounded-2xl border border-emerald-100 bg-emerald-50/40 p-6 sm:p-8">
+        <div className="rounded-2xl border border-hairline bg-forest-tint/40 p-6 sm:p-8">
           <div className="flex items-start gap-3">
-            <HeartHandshake className="mt-0.5 h-5 w-5 shrink-0 text-emerald-700" />
-            <div className="space-y-3 text-pretty text-[15px] leading-relaxed text-slate-700">
-              <p className="font-semibold text-slate-900">
+            <HeartHandshake className="mt-0.5 h-5 w-5 shrink-0 text-forest" />
+            <div className="space-y-3 text-pretty text-[15px] leading-relaxed text-ink-muted">
+              <p className="font-semibold text-ink">
                 {t("preamble_lede")}
               </p>
               <p>{t("preamble_p1")}</p>
@@ -123,7 +129,7 @@ function SectionList({ t }: { t: T }) {
       tone: "emerald" as const,
       title: t("s2_title"),
       body: (
-        <ul className="ml-4 list-disc space-y-1.5 marker:text-emerald-500">
+        <ul className="ml-4 list-disc space-y-1.5 marker:text-forest/60">
           <li>{t("s2_item_1")}</li>
           <li>{t("s2_item_2")}</li>
           <li>{t("s2_item_3")}</li>
@@ -245,22 +251,22 @@ function SectionCard({
 }) {
   const palette = TONE_STYLES[tone];
   return (
-    <article className="grid gap-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:grid-cols-[auto_1fr] sm:gap-7 sm:p-8">
+    <article className="grid gap-5 rounded-2xl border border-hairline bg-white p-6 shadow-sm sm:grid-cols-[auto_1fr] sm:gap-7 sm:p-8">
       <div className="flex sm:flex-col sm:items-center sm:gap-2">
         <span
           className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${palette.bg}`}
         >
           <Icon className={`h-5 w-5 ${palette.icon}`} />
         </span>
-        <span className="ml-3 text-xs font-semibold uppercase tracking-wider text-slate-400 sm:ml-0">
+        <span className="ml-3 text-xs font-semibold uppercase tracking-wider text-ink-faint sm:ml-0">
           §{index}
         </span>
       </div>
       <div className="min-w-0">
-        <h2 className="text-balance text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
+        <h2 className="text-balance text-lg font-bold tracking-tight text-ink sm:text-xl">
           {title}
         </h2>
-        <div className="mt-3 space-y-3 text-pretty text-[15px] leading-relaxed text-slate-700">
+        <div className="mt-3 space-y-3 text-pretty text-[15px] leading-relaxed text-ink-muted">
           {body}
         </div>
       </div>
@@ -269,37 +275,37 @@ function SectionCard({
 }
 
 const TONE_STYLES = {
-  emerald: { bg: "bg-emerald-50", icon: "text-emerald-700" },
+  emerald: { bg: "bg-forest-tint", icon: "text-forest" },
   rose: { bg: "bg-rose-50", icon: "text-rose-700" },
   brand: { bg: "bg-brand-50", icon: "text-brand-700" },
   amber: { bg: "bg-amber-50", icon: "text-amber-700" },
-  slate: { bg: "bg-slate-100", icon: "text-slate-700" },
+  slate: { bg: "bg-paper-deep", icon: "text-ink-muted" },
 } as const;
 
 function Closing({ t }: { t: T }) {
   return (
     <section className="py-12 sm:py-16">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-emerald-50/30 p-8 text-center shadow-sm">
-          <p className="font-amiri text-2xl text-slate-900">
+        <div className="rounded-2xl border border-hairline bg-white p-8 text-center shadow-sm">
+          <p className="font-amiri text-2xl text-ink">
             {t("closing_arabic")}
           </p>
-          <p className="mt-2 text-sm italic text-slate-600">
+          <p className="mt-2 text-sm italic text-ink-muted">
             {t("closing_translation")}
           </p>
-          <p className="mx-auto mt-6 max-w-xl text-pretty text-sm leading-relaxed text-slate-600">
+          <p className="mx-auto mt-6 max-w-xl text-pretty text-sm leading-relaxed text-ink-muted">
             {t("closing_body")}
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
             <Link
               href="/about"
-              className="inline-flex h-10 items-center gap-2 rounded-full bg-slate-900 px-5 text-xs font-semibold text-white hover:bg-slate-800"
+              className="inline-flex h-10 items-center gap-2 rounded-full bg-forest px-5 text-xs font-semibold text-paper hover:bg-forest-hover"
             >
               {t("closing_cta_about")}
             </Link>
             <Link
               href="/"
-              className="inline-flex h-10 items-center gap-2 rounded-full border border-slate-200 bg-white px-5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+              className="inline-flex h-10 items-center gap-2 rounded-full border border-hairline bg-white px-5 text-xs font-semibold text-ink-muted hover:bg-paper-deep"
             >
               {t("closing_cta_home")}
             </Link>
