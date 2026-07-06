@@ -24,6 +24,25 @@
   --font-mono: var(--font-geist-mono);
   --font-arabic: var(--font-amiri);
 
+  /* Landing redesign (2026-07): serif display + sans body. Used ONLY on
+     the landing (via `font-display` / `font-body`), leaving Geist as the
+     app-wide default everywhere else. */
+  --font-display: var(--font-fraunces);
+  --font-body: var(--font-inter);
+
+  /* Landing palette — serene "one deep green on warm paper". Deliberately
+     namespaced (paper/ink/forest) so it can't collide with the existing
+     brand/accent scales the rest of the app depends on. */
+  --color-paper: #fbfaf6;
+  --color-paper-deep: #f5f3ec;
+  --color-ink: #1b1a17;
+  --color-ink-muted: #5c5a52;
+  --color-ink-faint: #8a887e;
+  --color-hairline: #e7e4da;
+  --color-forest: #0e5a3c;
+  --color-forest-hover: #0a4a31;
+  --color-forest-tint: #eef3ef;
+
   --animate-blob: blob 14s ease-in-out infinite;
   --animate-blob-slow: blob 20s ease-in-out infinite;
   --animate-fade-up: fade-up 0.7s ease-out both;
@@ -135,6 +154,27 @@ body {
   a[role="button"]:active,
   a.btn-link:active {
     transform: scale(0.98);
+  }
+}
+
+/* ────────────────────────────────────────────────────────────────
+ * Landing "reveal" — subtle, purposeful entrance used by the redesign.
+ * The <Reveal> client component adds `.is-in` when the element scrolls
+ * into view. Under prefers-reduced-motion we skip the transform/opacity
+ * entirely so content is visible immediately (no fade, no shift).
+ * ──────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+  }
+  .reveal.is-in {
+    opacity: 1;
+    transform: none;
   }
 }
 

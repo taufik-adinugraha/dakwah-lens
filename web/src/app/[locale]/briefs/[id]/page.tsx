@@ -205,7 +205,10 @@ function Section({
 /** Same visual structure as `Section` but rendered as `<details>` so
  *  the body is collapsed by default and toggleable without any JS.
  *  Native browser disclosure triangle replaced by a Tailwind-styled
- *  chevron that rotates via `[&[open]>summary>...]:rotate-90`. */
+ *  chevron that rotates via an open-state arbitrary variant. (Do NOT
+ *  spell that class out here even abbreviated — Tailwind v4's scanner
+ *  reads comments, and an abbreviated selector with "..." generates
+ *  invalid CSS that hard-fails the Lightning CSS parse.) */
 function CollapsibleSection({
   icon: Icon,
   title,
