@@ -40,7 +40,7 @@ export async function ActiveNotice({ locale }: { locale: string }) {
     notice.severity === "warning"
       ? "border-amber-200 bg-amber-50 text-amber-900"
       : notice.severity === "success"
-        ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+        ? "border-hairline bg-forest-tint text-ink"
         : "border-brand-200 bg-brand-50 text-brand-900";
 
   return (

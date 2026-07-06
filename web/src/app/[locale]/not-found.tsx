@@ -24,32 +24,38 @@ export default async function NotFound() {
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
       >
-        <div className="absolute inset-0 grid-bg opacity-40" />
-        <div className="absolute top-1/3 left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-amber-200 opacity-40 blur-3xl" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(90rem 42rem at 50% -12rem, rgba(14, 90, 60, 0.42), transparent 68%)," +
+              "radial-gradient(64rem 36rem at 88% 108%, rgba(14, 90, 60, 0.26), transparent 68%)",
+          }}
+        />
       </div>
 
       <div className="mx-auto w-full max-w-md px-4 text-center sm:px-6">
         <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-700">
           404
         </p>
-        <h1 className="mt-2 text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+        <h1 className="mt-2 text-balance text-3xl font-bold tracking-tight text-ink sm:text-4xl">
           {t("notfound_title")}
         </h1>
-        <p className="mx-auto mt-3 max-w-sm text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
+        <p className="mx-auto mt-3 max-w-sm text-pretty text-sm leading-relaxed text-ink-muted sm:text-base">
           {t("notfound_body")}
         </p>
 
         <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
           <Link
             href="/briefings"
-            className="inline-flex h-11 items-center gap-2 rounded-full bg-slate-900 px-5 text-sm font-semibold text-white shadow transition hover:bg-slate-800"
+            className="inline-flex h-11 items-center gap-2 rounded-full bg-forest px-5 text-sm font-semibold text-white shadow transition hover:bg-forest-hover"
           >
             <Compass className="h-4 w-4" />
             {t("notfound_cta_insights")}
           </Link>
           <Link
             href="/"
-            className="inline-flex h-11 items-center gap-2 rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300"
+            className="inline-flex h-11 items-center gap-2 rounded-full border border-hairline bg-white px-5 text-sm font-semibold text-ink-muted shadow-sm transition hover:border-forest/40"
           >
             <Home className="h-4 w-4" />
             {t("notfound_cta_home")}

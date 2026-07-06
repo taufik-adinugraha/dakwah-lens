@@ -30,13 +30,13 @@ export function ContactForm() {
   if (sent) {
     return (
       <div className="space-y-5 text-center">
-        <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 ring-1 ring-emerald-200">
-          <CheckCircle2 className="h-6 w-6 text-emerald-600" />
+        <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-forest-tint ring-1 ring-forest/20">
+          <CheckCircle2 className="h-6 w-6 text-forest" />
         </div>
-        <h2 className="text-balance text-xl font-semibold text-slate-900 sm:text-2xl">
+        <h2 className="text-balance text-xl font-semibold text-ink sm:text-2xl">
           {t("sent_title")}
         </h2>
-        <p className="text-pretty text-sm leading-relaxed text-slate-600">
+        <p className="text-pretty text-sm leading-relaxed text-ink-muted">
           {t("sent_body")}
         </p>
       </div>
@@ -83,9 +83,9 @@ export function ContactForm() {
       />
 
       <label className="block text-left">
-        <span className="text-xs font-semibold text-slate-700">
+        <span className="text-xs font-semibold text-ink-muted">
           {t("field_message")}
-          <span className="ml-2 text-[10px] font-normal text-slate-400">
+          <span className="ml-2 text-[10px] font-normal text-ink-faint">
             {t("field_message_hint")}
           </span>
         </span>
@@ -96,7 +96,7 @@ export function ContactForm() {
           maxLength={5000}
           rows={6}
           placeholder={t("field_message_placeholder")}
-          className="mt-1.5 block w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
+          className="mt-1.5 block w-full resize-y rounded-lg border border-hairline bg-white px-3 py-2 text-sm text-ink shadow-sm transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
         />
       </label>
 
@@ -112,7 +112,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={pending}
-        className="group inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-slate-900 px-4 text-sm font-semibold text-white shadow transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+        className="group inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-forest px-4 text-sm font-semibold text-white shadow transition hover:bg-forest-hover disabled:cursor-not-allowed disabled:opacity-60"
       >
         {pending ? (
           <>
@@ -150,10 +150,10 @@ function Field({
 }) {
   return (
     <label className="block text-left">
-      <span className="text-xs font-semibold text-slate-700">
+      <span className="text-xs font-semibold text-ink-muted">
         {label}
         {optional && (
-          <span className="ml-1 text-[10px] font-normal text-slate-400">
+          <span className="ml-1 text-[10px] font-normal text-ink-faint">
             (optional)
           </span>
         )}
@@ -164,7 +164,7 @@ function Field({
         required={required}
         maxLength={maxLength}
         autoComplete={autoComplete}
-        className="mt-1.5 block h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
+        className="mt-1.5 block h-11 w-full rounded-lg border border-hairline bg-white px-3 text-sm text-ink shadow-sm transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
       />
     </label>
   );

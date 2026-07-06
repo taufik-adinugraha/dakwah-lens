@@ -1,7 +1,7 @@
+import { ForestWash } from "@/components/ForestWash";
 import type { Metadata } from "next";
 import { and, desc, eq, gte, lt, sql } from "drizzle-orm";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Sparkles } from "lucide-react";
 
 import { auth } from "@/auth";
 import { MonthPickerPager } from "@/components/MonthPickerPager";
@@ -271,22 +271,23 @@ export default async function PublicFlyersPage({
   );
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-12">
+    <div className="relative isolate overflow-hidden bg-paper font-body">
+    <ForestWash />
+    <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
       <header className="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-balance text-2xl font-bold text-slate-900 sm:text-3xl">
+          <h1 className="text-balance font-display text-2xl font-medium tracking-[-0.015em] text-ink sm:text-3xl">
             {t("page_title_public")}
           </h1>
-          <p className="mt-2 text-pretty text-sm leading-relaxed text-slate-600">
+          <p className="mt-2 text-pretty text-sm leading-[1.7] text-ink-muted">
             {t("subtitle_public")}
           </p>
         </div>
         {session?.user?.id && (
           <Link
             href="/flyers/new"
-            className="inline-flex items-center gap-1.5 rounded-full bg-emerald-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-800"
+            className="inline-flex items-center gap-1.5 rounded-full bg-forest px-4 py-2 text-sm font-semibold text-paper transition hover:bg-forest-hover"
           >
-            <Sparkles className="h-4 w-4" />
             {t("cta_new_flyer")}
           </Link>
         )}
@@ -322,11 +323,11 @@ export default async function PublicFlyersPage({
       )}
 
       {pageFlyers.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center">
-          <p className="text-sm font-semibold text-slate-700">
+        <div className="rounded-xl border border-dashed border-hairline bg-white px-6 py-10 text-center">
+          <p className="text-sm font-semibold text-ink">
             {t("empty_public_title")}
           </p>
-          <p className="mt-1 text-xs leading-relaxed text-slate-500">
+          <p className="mt-1 text-xs leading-relaxed text-ink-faint">
             {t("empty_public_body")}
           </p>
         </div>
@@ -363,6 +364,7 @@ export default async function PublicFlyersPage({
           }}
         />
       )}
+    </div>
     </div>
   );
 }

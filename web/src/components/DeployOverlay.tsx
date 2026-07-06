@@ -107,9 +107,9 @@ export function DeployOverlay({
       // pointer-events-auto on the overlay swallows clicks underneath.
       // z-50 keeps it above page chrome including the share/download
       // popovers (which use z-20-ish).
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/70 px-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/70 px-4 backdrop-blur-sm"
     >
-      <div className="relative w-full max-w-md overflow-hidden rounded-3xl bg-white p-8 shadow-2xl ring-1 ring-slate-200">
+      <div className="relative w-full max-w-md overflow-hidden rounded-3xl bg-white p-8 shadow-2xl ring-1 ring-hairline">
         {/* Top accent bar */}
         <div
           aria-hidden
@@ -119,7 +119,7 @@ export function DeployOverlay({
         {/* Icon */}
         <div className="flex justify-center">
           <span
-            className={`inline-flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br ${accent} text-white shadow-md`}
+            className={`inline-flex h-14 w-14 items-center justify-center rounded-full bg-white ${accent} text-white shadow-md`}
           >
             {isFailed ? (
               <AlertCircle className="h-7 w-7" aria-hidden />
@@ -130,10 +130,10 @@ export function DeployOverlay({
         </div>
 
         {/* Title + body */}
-        <h2 className="mt-5 text-balance text-center text-xl font-bold tracking-tight text-slate-900">
+        <h2 className="mt-5 text-balance text-center text-xl font-bold tracking-tight text-ink">
           {isFailed ? t("failed_title") : t("deploying_title")}
         </h2>
-        <p className="mt-2 text-pretty text-center text-sm leading-relaxed text-slate-600">
+        <p className="mt-2 text-pretty text-center text-sm leading-relaxed text-ink-muted">
           {isFailed ? t("failed_body") : t("deploying_body")}
         </p>
 
@@ -143,7 +143,7 @@ export function DeployOverlay({
         {!isFailed && elapsedLabel !== null && (
           <div className="mt-4 flex justify-center">
             <span
-              className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold tabular-nums text-emerald-800"
+              className="inline-flex items-center gap-1.5 rounded-full border border-hairline bg-forest-tint px-3 py-1 text-xs font-semibold tabular-nums text-forest"
               aria-label={t("elapsed_label", { time: elapsedLabel })}
             >
               <Clock className="h-3.5 w-3.5" aria-hidden />
@@ -155,14 +155,14 @@ export function DeployOverlay({
         {/* Commit metadata (if provided) — small, muted; only render
             during in-flight deploy so the failure case stays terse. */}
         {!isFailed && (status.commitMessage || status.commitSha) && (
-          <div className="mt-5 rounded-xl border border-slate-100 bg-slate-50/60 p-3 text-center">
+          <div className="mt-5 rounded-xl border border-hairline bg-paper-deep/60 p-3 text-center">
             {status.commitMessage && (
-              <p className="line-clamp-2 text-xs font-medium text-slate-800">
+              <p className="line-clamp-2 text-xs font-medium text-ink">
                 {status.commitMessage}
               </p>
             )}
             {status.commitSha && (
-              <p className="mt-0.5 font-mono text-[10px] text-slate-500">
+              <p className="mt-0.5 font-mono text-[10px] text-ink-faint">
                 {status.commitSha.slice(0, 8)}
               </p>
             )}
@@ -170,7 +170,7 @@ export function DeployOverlay({
         )}
 
         {/* Footnote — sets expectations: typically 2-3 min. */}
-        <p className="mt-4 text-center text-xs text-slate-400">
+        <p className="mt-4 text-center text-xs text-ink-faint">
           {t("auto_refresh_note")}
         </p>
       </div>

@@ -78,10 +78,10 @@ export function CoverageBreakdown({
 
   return (
     <section>
-      <h2 className="text-balance text-lg font-semibold text-slate-900 sm:text-xl">
+      <h2 className="text-balance text-lg font-semibold text-ink sm:text-xl">
         {labels.sectionTitle}
       </h2>
-      <p className="mt-1 text-pretty text-xs leading-relaxed text-slate-500 sm:text-sm">
+      <p className="mt-1 text-pretty text-xs leading-relaxed text-ink-faint sm:text-sm">
         {labels.sectionSubtitle}
       </p>
       <div className="mt-3 grid gap-3 md:grid-cols-3">
@@ -110,18 +110,18 @@ function PlatformCard({
 }) {
   const total = data.reduce((s, b) => s + b.count, 0);
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+    <div className="rounded-2xl border border-hairline bg-white p-4 shadow-sm sm:p-5">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-faint">
         {labels.platformsTitle}
       </p>
-      <p className="mt-0.5 text-2xl font-bold tabular-nums text-slate-900">
+      <p className="mt-0.5 text-2xl font-bold tabular-nums text-ink">
         {total.toLocaleString()}
-        <span className="ml-1 text-xs font-medium text-slate-400">
+        <span className="ml-1 text-xs font-medium text-ink-faint">
           {labels.postsSuffix}
         </span>
       </p>
       {data.length === 0 ? (
-        <p className="mt-3 rounded-lg border border-dashed border-slate-200 bg-slate-50/60 px-3 py-2.5 text-center text-xs leading-relaxed text-slate-500">
+        <p className="mt-3 rounded-lg border border-dashed border-hairline bg-paper-deep/60 px-3 py-2.5 text-center text-xs leading-relaxed text-ink-faint">
           {labels.noDataYet}
         </p>
       ) : (
@@ -129,18 +129,18 @@ function PlatformCard({
           {data.map((p) => (
             <li key={p.platform}>
               <div className="flex items-center justify-between text-xs">
-                <span className="font-medium capitalize text-slate-700">
+                <span className="font-medium capitalize text-ink-muted">
                   {p.platform === "mainstream"
                     ? labels.platformMainstream
                     : p.platform}
                 </span>
-                <span className="tabular-nums text-slate-500">
+                <span className="tabular-nums text-ink-faint">
                   {p.count.toLocaleString()} · {p.pct.toFixed(0)}%
                 </span>
               </div>
-              <div className="mt-0.5 h-1 overflow-hidden rounded-full bg-slate-100">
+              <div className="mt-0.5 h-1 overflow-hidden rounded-full bg-paper-deep">
                 <div
-                  className="h-full rounded-full bg-emerald-500"
+                  className="h-full rounded-full bg-forest-tint0"
                   style={{ width: `${Math.max(p.pct, 2)}%` }}
                 />
               </div>
@@ -162,23 +162,23 @@ function SentimentCard({
   labels: CoverageLabels;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+    <div className="rounded-2xl border border-hairline bg-white p-4 shadow-sm sm:p-5">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-faint">
         {labels.sentimentTitle}
       </p>
-      <p className="mt-0.5 text-2xl font-bold tabular-nums text-slate-900">
+      <p className="mt-0.5 text-2xl font-bold tabular-nums text-ink">
         {data.total.toLocaleString()}
-        <span className="ml-1 text-xs font-medium text-slate-400">
+        <span className="ml-1 text-xs font-medium text-ink-faint">
           {labels.classifiedSuffix}
         </span>
       </p>
       {data.total === 0 ? (
-        <p className="mt-3 rounded-lg border border-dashed border-slate-200 bg-slate-50/60 px-3 py-2.5 text-center text-xs leading-relaxed text-slate-500">
+        <p className="mt-3 rounded-lg border border-dashed border-hairline bg-paper-deep/60 px-3 py-2.5 text-center text-xs leading-relaxed text-ink-faint">
           {labels.noDataYet}
         </p>
       ) : (
         <>
-          <div className="mt-3 flex h-2.5 overflow-hidden rounded-full bg-slate-100">
+          <div className="mt-3 flex h-2.5 overflow-hidden rounded-full bg-paper-deep">
             <div
               className="h-full bg-rose-500"
               style={{ width: `${data.negative.pct}%` }}
@@ -190,14 +190,14 @@ function SentimentCard({
               title={`${labels.sentimentNeutral} ${data.neutral.pct.toFixed(0)}%`}
             />
             <div
-              className="h-full bg-emerald-500"
+              className="h-full bg-forest-tint0"
               style={{ width: `${data.positive.pct}%` }}
               title={`${labels.sentimentPositive} ${data.positive.pct.toFixed(0)}%`}
             />
           </div>
           <ul className="mt-3 space-y-1 text-xs">
             <SentimentRow
-              dot="bg-emerald-500"
+              dot="bg-forest-tint0"
               label={labels.sentimentPositive}
               count={data.positive.count}
               pct={data.positive.pct}
@@ -216,7 +216,7 @@ function SentimentCard({
             />
           </ul>
           {data.unlabelled > 0 && (
-            <p className="mt-2 text-[10px] text-slate-400">
+            <p className="mt-2 text-[10px] text-ink-faint">
               {labels.unlabelledTpl.replace(
                 "{n}",
                 data.unlabelled.toLocaleString(),
@@ -246,11 +246,11 @@ function SentimentRow({
 }) {
   return (
     <li className="flex items-center justify-between">
-      <span className="inline-flex items-center gap-1.5 text-slate-700">
+      <span className="inline-flex items-center gap-1.5 text-ink-muted">
         <span className={`inline-block h-2 w-2 rounded-full ${dot}`} />
         {label}
       </span>
-      <span className="tabular-nums text-slate-500">
+      <span className="tabular-nums text-ink-faint">
         {count.toLocaleString()} · {pct.toFixed(0)}%
       </span>
     </li>
@@ -267,14 +267,14 @@ function TopicsCard({
   labels: CoverageLabels;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+    <div className="rounded-2xl border border-hairline bg-white p-4 shadow-sm sm:p-5">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-faint">
         {labels.topicsTitle}
       </p>
       <div className="mt-0.5 flex items-center justify-between gap-2">
-        <p className="text-2xl font-bold tabular-nums text-slate-900">
+        <p className="text-2xl font-bold tabular-nums text-ink">
           {data.length}
-          <span className="ml-1 text-xs font-medium text-slate-400">
+          <span className="ml-1 text-xs font-medium text-ink-faint">
             {labels.topicsCountSuffix}
           </span>
         </p>
@@ -284,7 +284,7 @@ function TopicsCard({
         />
       </div>
       {data.length === 0 ? (
-        <p className="mt-3 rounded-lg border border-dashed border-slate-200 bg-slate-50/60 px-3 py-2.5 text-center text-xs leading-relaxed text-slate-500">
+        <p className="mt-3 rounded-lg border border-dashed border-hairline bg-paper-deep/60 px-3 py-2.5 text-center text-xs leading-relaxed text-ink-faint">
           {labels.noDataYet}
         </p>
       ) : (
@@ -292,19 +292,19 @@ function TopicsCard({
           {data.slice(0, 10).map((topic) => (
             <li key={topic.id}>
               <div className="flex items-center justify-between gap-2 text-xs">
-                <span className="truncate font-medium text-slate-700">
+                <span className="truncate font-medium text-ink-muted">
                   {topic.label}
                 </span>
-                <span className="shrink-0 tabular-nums text-slate-500">
+                <span className="shrink-0 tabular-nums text-ink-faint">
                   {topic.count}
-                  <span className="ml-1 text-slate-400">
+                  <span className="ml-1 text-ink-faint">
                     · {topic.pct.toFixed(0)}%
                   </span>
                 </span>
               </div>
-              <div className="mt-0.5 h-1 overflow-hidden rounded-full bg-slate-100">
+              <div className="mt-0.5 h-1 overflow-hidden rounded-full bg-paper-deep">
                 <div
-                  className="h-full rounded-full bg-emerald-500"
+                  className="h-full rounded-full bg-forest-tint0"
                   style={{ width: `${Math.max(topic.pct, 2)}%` }}
                 />
               </div>

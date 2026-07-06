@@ -10,7 +10,6 @@ import {
   Mic,
   Scroll,
   Smartphone,
-  Sparkles,
   Users,
 } from "lucide-react";
 
@@ -131,7 +130,7 @@ export default async function DeliverablePage({ params }: Props) {
   const heroTitle = mahasiswa?.question || section.heading;
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-paper-deep">
       <section
         className="relative overflow-hidden"
         style={{
@@ -204,12 +203,12 @@ export default async function DeliverablePage({ params }: Props) {
         <DeliverableBody markdown={section.body} palette={palette} />
       )}
 
-      <footer className="border-t border-slate-200 bg-white">
+      <footer className="border-t border-hairline bg-white">
         <div className="mx-auto max-w-3xl px-5 py-10 text-center sm:px-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-ink-faint">
             Dakwah-Lens — Briefing Mingguan untuk Dakwah Indonesia
           </p>
-          <p className="mt-3 text-pretty text-xs leading-relaxed text-slate-500">
+          <p className="mt-3 text-pretty text-xs leading-relaxed text-ink-faint">
             Konten ini AI-assisted, BUKAN fatwa otoritatif. Tanggung
             jawab keagamaan tetap pada penyusun konten dakwah.
           </p>
@@ -218,7 +217,6 @@ export default async function DeliverablePage({ params }: Props) {
             className="mt-6 inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition"
             style={{ background: palette.accentDeep, color: "#ffffff" }}
           >
-            <Sparkles className="h-3.5 w-3.5" />
             Lihat Briefing Mingguan
           </Link>
         </div>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ArrowLeft, MessageSquareQuote, Sparkles } from "lucide-react";
+import { ArrowLeft, MessageSquareQuote } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import { getBriefingBySlug } from "@/lib/briefing-data";
@@ -85,7 +85,7 @@ export default async function MahasiswaArticlePage({ params }: Props) {
   const segmentLabel = brief.themeGroup ?? t("brief_scope_all");
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-paper-deep">
       {/* HERO BAND — Poster Question is the visual focal point. The
           colored gradient identifies the briefing's segment without
           needing the rest of the site chrome. */}
@@ -120,7 +120,6 @@ export default async function MahasiswaArticlePage({ params }: Props) {
               className="inline-flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em]"
               style={{ color: palette.accentDeep }}
             >
-              <Sparkles className="h-3 w-3" />
               Mahasiswa Pack
             </span>
             <span
@@ -176,12 +175,12 @@ export default async function MahasiswaArticlePage({ params }: Props) {
       <OtherRoomsSection currentSlug={id} locale={locale} />
 
       {/* FOOTER */}
-      <footer className="border-t border-slate-200 bg-white">
+      <footer className="border-t border-hairline bg-white">
         <div className="mx-auto max-w-3xl px-5 py-10 text-center sm:px-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-ink-faint">
             Dakwah-Lens — Briefing Mingguan untuk Dakwah Indonesia
           </p>
-          <p className="mt-3 text-pretty text-xs leading-relaxed text-slate-500">
+          <p className="mt-3 text-pretty text-xs leading-relaxed text-ink-faint">
             Konten ini AI-assisted, BUKAN fatwa otoritatif. Tanggung
             jawab keagamaan tetap pada penyusun konten dakwah.
           </p>

@@ -17,7 +17,6 @@ import {
   Minus,
   Scale,
   Smartphone,
-  Sparkles,
   TrendingDown,
   TrendingUp,
   Users2,
@@ -50,99 +49,93 @@ const GROUP_THEME: Record<
   { tone: string; iconBg: string; iconText: string; Icon: typeof Scale }
 > = {
   "Hukum & Keadilan": {
-    tone: "from-rose-50/80 to-white border-rose-200 hover:border-rose-500",
-    iconBg: "bg-rose-100",
-    iconText: "text-rose-700",
+    tone: "border-hairline hover:border-forest/50",
+    iconBg: "bg-forest-tint",
+    iconText: "text-forest",
     Icon: Scale,
   },
   "Sosial & Keluarga": {
-    tone: "from-pink-50/80 to-white border-pink-200 hover:border-pink-500",
-    iconBg: "bg-pink-100",
-    iconText: "text-pink-700",
+    tone: "border-hairline hover:border-forest/50",
+    iconBg: "bg-forest-tint",
+    iconText: "text-forest",
     Icon: Users2,
   },
   "Ekonomi & Bisnis": {
-    tone: "from-amber-50/80 to-white border-amber-200 hover:border-amber-500",
-    iconBg: "bg-amber-100",
-    iconText: "text-amber-700",
+    tone: "border-hairline hover:border-forest/50",
+    iconBg: "bg-forest-tint",
+    iconText: "text-forest",
     Icon: Banknote,
   },
   "Aqidah & Ibadah": {
-    tone:
-      "from-emerald-50/80 to-white border-emerald-200 hover:border-emerald-500",
-    iconBg: "bg-emerald-100",
-    iconText: "text-emerald-700",
+    tone: "border-hairline hover:border-forest/50",
+    iconBg: "bg-forest-tint",
+    iconText: "text-forest",
     Icon: Landmark, // mosque-ish silhouette; lucide doesn't ship a mosque glyph
   },
   "Kesehatan & Kehidupan": {
-    tone: "from-teal-50/80 to-white border-teal-200 hover:border-teal-500",
-    iconBg: "bg-teal-100",
-    iconText: "text-teal-700",
+    tone: "border-hairline hover:border-forest/50",
+    iconBg: "bg-forest-tint",
+    iconText: "text-forest",
     Icon: HeartPulse,
   },
   "Pendidikan & SDM": {
-    tone: "from-sky-50/80 to-white border-sky-200 hover:border-sky-500",
-    iconBg: "bg-sky-100",
-    iconText: "text-sky-700",
+    tone: "border-hairline hover:border-forest/50",
+    iconBg: "bg-forest-tint",
+    iconText: "text-forest",
     Icon: GraduationCap,
   },
   "Lingkungan & Bencana": {
-    tone: "from-lime-50/80 to-white border-lime-200 hover:border-lime-500",
-    iconBg: "bg-lime-100",
-    iconText: "text-lime-700",
+    tone: "border-hairline hover:border-forest/50",
+    iconBg: "bg-forest-tint",
+    iconText: "text-forest",
     Icon: Leaf,
   },
   "Pemerintahan & Kebijakan": {
-    tone:
-      "from-indigo-50/80 to-white border-indigo-200 hover:border-indigo-500",
-    iconBg: "bg-indigo-100",
-    iconText: "text-indigo-700",
+    tone: "border-hairline hover:border-forest/50",
+    iconBg: "bg-forest-tint",
+    iconText: "text-forest",
     Icon: LandPlot,
   },
   "Patologi Sosial Digital": {
-    tone:
-      "from-orange-50/80 to-white border-orange-200 hover:border-orange-500",
-    iconBg: "bg-orange-100",
-    iconText: "text-orange-700",
+    tone: "border-hairline hover:border-forest/50",
+    iconBg: "bg-forest-tint",
+    iconText: "text-forest",
     Icon: Smartphone,
   },
   "Teknologi & AI": {
-    tone:
-      "from-violet-50/80 to-white border-violet-200 hover:border-violet-500",
-    iconBg: "bg-violet-100",
-    iconText: "text-violet-700",
+    tone: "border-hairline hover:border-forest/50",
+    iconBg: "bg-forest-tint",
+    iconText: "text-forest",
     Icon: Cpu,
   },
   "Pekerja & Pertanian Rakyat": {
-    tone:
-      "from-yellow-50/80 to-white border-yellow-200 hover:border-yellow-500",
-    iconBg: "bg-yellow-100",
-    iconText: "text-yellow-700",
+    tone: "border-hairline hover:border-forest/50",
+    iconBg: "bg-forest-tint",
+    iconText: "text-forest",
     Icon: Wheat,
   },
   "Konflik & Geopolitik": {
-    tone: "from-red-50/80 to-white border-red-200 hover:border-red-500",
-    iconBg: "bg-red-100",
-    iconText: "text-red-700",
+    tone: "border-hairline hover:border-forest/50",
+    iconBg: "bg-forest-tint",
+    iconText: "text-forest",
     Icon: Globe2,
   },
   "Inspirasi & Kisah Pribadi": {
-    tone:
-      "from-fuchsia-50/80 to-white border-fuchsia-200 hover:border-fuchsia-500",
-    iconBg: "bg-fuchsia-100",
-    iconText: "text-fuchsia-700",
+    tone: "border-hairline hover:border-forest/50",
+    iconBg: "bg-forest-tint",
+    iconText: "text-forest",
     Icon: Heart,
   },
   "Toleransi & Lintas-Iman": {
-    tone: "from-cyan-50/80 to-white border-cyan-200 hover:border-cyan-500",
-    iconBg: "bg-cyan-100",
-    iconText: "text-cyan-700",
+    tone: "border-hairline hover:border-forest/50",
+    iconBg: "bg-forest-tint",
+    iconText: "text-forest",
     Icon: HandHeart,
   },
   Lainnya: {
-    tone: "from-slate-50/80 to-white border-slate-200 hover:border-slate-500",
-    iconBg: "bg-slate-100",
-    iconText: "text-slate-600",
+    tone: "border-hairline hover:border-forest/50",
+    iconBg: "bg-forest-tint",
+    iconText: "text-forest",
     Icon: Boxes,
   },
 };
@@ -213,20 +206,19 @@ export async function BriefingsGrid({
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
-              <Sparkles className="h-3 w-3" />
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-hairline bg-forest-tint px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-forest">
               {t("hub_briefings_eyebrow")}
             </span>
-            <h2 className="mt-2 text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+            <h2 className="mt-2 text-balance text-2xl font-bold tracking-tight text-ink sm:text-3xl">
               {t("hub_briefings_title")}
             </h2>
-            <p className="mt-2 max-w-2xl text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
+            <p className="mt-2 max-w-2xl text-pretty text-sm leading-relaxed text-ink-muted sm:text-base">
               {t("hub_briefings_body")}
             </p>
           </div>
         </div>
 
-        <p className="mb-5 max-w-3xl rounded-2xl border border-slate-200 bg-slate-50/60 px-4 py-2.5 text-xs leading-relaxed text-slate-600">
+        <p className="mb-5 max-w-3xl rounded-2xl border border-hairline bg-paper-deep/60 px-4 py-2.5 text-xs leading-relaxed text-ink-muted">
           {t("hub_top_n_note")}
         </p>
 
@@ -267,22 +259,21 @@ export async function BriefingsGrid({
               <li key={`__occasion-${occasion.occasionSlug ?? "latest"}`}>
                 <Link
                   href={occasionHref}
-                  className="group relative flex h-full flex-col rounded-2xl border bg-gradient-to-br p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md from-yellow-50/90 to-white border-yellow-300 hover:border-yellow-500"
+                  className="group relative flex h-full flex-col rounded-xl border bg-white p-3 transition hover:-translate-y-0.5 hover:shadow-sm border-hairline hover:border-forest/50"
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-yellow-100 text-yellow-700">
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-forest-tint text-forest">
                       <CalendarHeart className="h-4 w-4" />
                     </span>
                     <div className="flex flex-wrap items-center justify-end gap-1">
                       <span
-                        className="inline-flex items-center gap-0.5 rounded-full bg-yellow-100 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-yellow-800"
+                        className="inline-flex items-center gap-0.5 rounded-full bg-forest-tint px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-forest"
                         title="Acara kalender Hijriah"
                       >
-                        <Sparkles className="h-2.5 w-2.5" />
                         Acara
                       </span>
                       <span
-                        className="inline-flex items-center gap-0.5 rounded-full bg-slate-100 px-1.5 py-0.5 text-[9px] font-semibold tabular-nums text-slate-700"
+                        className="inline-flex items-center gap-0.5 rounded-full bg-paper-deep px-1.5 py-0.5 text-[9px] font-semibold tabular-nums text-ink-muted"
                         title={t("hub_card_age_tooltip", { n: ageDays })}
                       >
                         <Clock className="h-2.5 w-2.5" />
@@ -290,19 +281,19 @@ export async function BriefingsGrid({
                       </span>
                     </div>
                   </div>
-                  <h3 className="mt-3 line-clamp-2 text-sm font-bold leading-snug text-slate-900">
+                  <h3 className="mt-3 line-clamp-2 text-sm font-bold leading-snug text-ink">
                     {occasionName}
                   </h3>
                   {(hijriDate || gregorianDate) && (
-                    <div className="mt-2 line-clamp-2 text-[11px] leading-snug text-slate-600">
+                    <div className="mt-2 line-clamp-2 text-[11px] leading-snug text-ink-muted">
                       {hijriDate}
                       {hijriDate && gregorianDate && (
-                        <span className="text-slate-400"> · </span>
+                        <span className="text-ink-faint"> · </span>
                       )}
                       {gregorianDate}
                     </div>
                   )}
-                  <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-yellow-800 transition group-hover:gap-1.5">
+                  <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-forest transition group-hover:gap-1.5">
                     Baca briefing acara
                     <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
                   </div>
@@ -342,7 +333,7 @@ export async function BriefingsGrid({
               <li key={group}>
                 <Link
                   href={href}
-                  className={`group relative flex h-full flex-col rounded-2xl border bg-gradient-to-br p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${theme.tone}`}
+                  className={`group relative flex h-full flex-col rounded-xl border bg-white p-3 transition hover:-translate-y-0.5 hover:shadow-sm ${theme.tone}`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <span
@@ -359,7 +350,7 @@ export async function BriefingsGrid({
                           className={`inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-semibold tabular-nums ${
                             isStale
                               ? "bg-amber-100 text-amber-800"
-                              : "bg-slate-100 text-slate-700"
+                              : "bg-paper-deep text-ink-muted"
                           }`}
                           title={t("hub_card_age_tooltip", { n: ageDays })}
                         >
@@ -376,18 +367,17 @@ export async function BriefingsGrid({
                       <span
                         className={`inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${
                           deltaPct === null
-                            ? "bg-emerald-100 text-emerald-800"
+                            ? "bg-forest-tint text-forest"
                             : deltaPct > 0
-                              ? "bg-emerald-100 text-emerald-800"
+                              ? "bg-forest-tint text-forest"
                               : deltaPct < 0
                                 ? "bg-rose-100 text-rose-800"
-                                : "bg-slate-100 text-slate-700"
+                                : "bg-paper-deep text-ink-muted"
                         }`}
                         title={t("hub_card_delta_tooltip")}
                       >
                         {deltaPct === null ? (
                           <>
-                            <Sparkles className="h-2.5 w-2.5" />
                             {t("hub_card_delta_new")}
                           </>
                         ) : deltaPct > 0 ? (
@@ -409,14 +399,14 @@ export async function BriefingsGrid({
                     )}
                     </div>
                   </div>
-                  <h3 className="mt-3 line-clamp-2 text-sm font-bold leading-snug text-slate-900">
+                  <h3 className="mt-3 line-clamp-2 text-sm font-bold leading-snug text-ink">
                     {group}
                   </h3>
                   <div className="mt-3 flex items-baseline gap-1.5">
-                    <span className="text-base font-bold tabular-nums text-slate-900">
+                    <span className="text-base font-bold tabular-nums text-ink">
                       {nf.format(current)}
                     </span>
-                    <span className="text-[10px] text-slate-500">
+                    <span className="text-[10px] text-ink-faint">
                       {t("hub_card_volume_unit")}
                     </span>
                   </div>

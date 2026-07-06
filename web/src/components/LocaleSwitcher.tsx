@@ -30,7 +30,7 @@ export function LocaleSwitcher() {
     <div
       role="group"
       aria-label="Language"
-      className="inline-flex items-center rounded-full border border-slate-200 bg-white/70 p-0.5 text-xs font-semibold shadow-sm backdrop-blur"
+      className="inline-flex items-center rounded-full border border-hairline bg-white/70 p-0.5 text-xs font-semibold shadow-sm backdrop-blur"
     >
       {routing.locales.map((locale) => {
         const { flag, code, name } = LABELS[locale];
@@ -50,8 +50,8 @@ export function LocaleSwitcher() {
             className={clsx(
               "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 transition",
               active
-                ? "bg-slate-900 text-white shadow"
-                : "text-slate-600 hover:text-slate-900",
+                ? "bg-forest text-paper shadow"
+                : "text-ink-muted hover:text-ink",
             )}
             aria-pressed={active}
           >

@@ -64,12 +64,12 @@ export function KitabCorpusSelector({
       <button
         type="button"
         onClick={allSelected ? deselectAll : selectAll}
-        className="inline-flex items-center gap-1 rounded-full border border-slate-300 bg-white px-3 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-50"
+        className="inline-flex items-center gap-1 rounded-full border border-hairline bg-white px-3 py-1 text-[11px] font-semibold text-ink-muted hover:bg-paper-deep"
         aria-label={allSelected ? deselectAllLabel : selectAllLabel}
       >
         {allSelected ? deselectAllLabel : selectAllLabel}
       </button>
-      <span className="text-[11px] text-slate-400 tabular-nums">
+      <span className="text-[11px] text-ink-faint tabular-nums">
         {countLabel.replace("{n}", String(selected.size)).replace(
           "{total}",
           String(corpora.length),
@@ -84,8 +84,8 @@ export function KitabCorpusSelector({
             key={c}
             className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 transition ${
               isOn
-                ? "border-emerald-300 bg-emerald-50 text-emerald-800"
-                : "border-slate-200 bg-white text-slate-500"
+                ? "border-forest/30 bg-forest-tint text-forest"
+                : "border-hairline bg-white text-ink-faint"
             }`}
           >
             <input
@@ -100,7 +100,7 @@ export function KitabCorpusSelector({
             {count > 0 && (
               <span
                 className={`text-[10px] tabular-nums ${
-                  isOn ? "text-emerald-700/70" : "text-slate-500"
+                  isOn ? "text-forest/70" : "text-ink-faint"
                 }`}
               >
                 {count.toLocaleString()}

@@ -5,10 +5,8 @@ import {
   ArrowRight,
   ArrowUpRight,
   Flame,
-  Info,
   Newspaper,
   Radio,
-  Sparkles,
   TrendingUp,
 } from "lucide-react";
 import clsx from "clsx";
@@ -208,14 +206,14 @@ function ScopePicker({
   const _ = locale; // accepted for symmetry with other section components
   const pill = (selected: boolean) =>
     selected
-      ? "border-slate-900 bg-slate-900 text-white"
-      : "border-slate-200 bg-white text-slate-700 hover:border-slate-300";
+      ? "border-forest bg-forest text-paper"
+      : "border-hairline bg-white text-ink-muted hover:border-hairline";
 
   return (
-    <section className="border-b border-slate-100 bg-slate-50/50 py-6">
+    <section className="border-b border-hairline bg-paper-deep/50 py-6">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+          <span className="text-xs font-semibold uppercase tracking-wider text-ink-faint">
             {tInsights("scope_picker_label")}
           </span>
           <Link
@@ -236,7 +234,7 @@ function ScopePicker({
           >
             {tInsights("scope_regional_all")}
           </Link>
-          <span className="mx-1 hidden h-4 w-px bg-slate-200 sm:inline-block" />
+          <span className="mx-1 hidden h-4 w-px bg-hairline sm:inline-block" />
           {REGIONS.map((r) => (
             <Link
               key={r}
@@ -251,19 +249,6 @@ function ScopePicker({
     </section>
   );
 }
-
-/** Display tones cycled across the 9 PRD da'wah categories. */
-const CATEGORY_TONES: Record<string, keyof typeof CLUSTER_TONES> = {
-  aqidah: "emerald",
-  akhlaq: "brand",
-  muamalah: "amber",
-  social_justice: "rose",
-  family: "violet",
-  youth: "cyan",
-  education: "brand",
-  economic_ethics: "amber",
-  health: "emerald",
-};
 
 // DAWAH_CATEGORIES is imported from @/lib/briefing-data (single source).
 
@@ -317,17 +302,16 @@ async function CategoryTopicCharts({
         <div className="grid gap-6">
           {/* ── Discovered topics ── */}
           {hasTopics && (
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+            <div className="rounded-2xl border border-hairline bg-white p-5 shadow-sm sm:p-6">
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
+                <h2 className="text-lg font-bold tracking-tight text-ink sm:text-xl">
                   {tInsights("section_topics_discovered_title")}
                 </h2>
-                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
-                  <Sparkles className="h-3 w-3" />
+                <span className="inline-flex items-center rounded-full bg-forest-tint px-2 py-0.5 text-[10px] font-semibold text-forest">
                   {tInsights("section_topics_discovered_badge")}
                 </span>
               </div>
-              <p className="mt-1 text-sm leading-relaxed text-slate-600">
+              <p className="mt-1 text-sm leading-relaxed text-ink-muted">
                 {tInsights("section_topics_discovered_subtitle")}
               </p>
 
@@ -345,15 +329,15 @@ async function CategoryTopicCharts({
                   return (
                     <div key={topic.id} className="block rounded-lg px-2 py-1.5">
                       <div className="flex min-w-0 items-baseline justify-between gap-3">
-                        <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-800">
+                        <span className="min-w-0 flex-1 truncate text-sm font-medium text-ink">
                           {topic.label}
                         </span>
-                        <span className="shrink-0 text-xs tabular-nums text-slate-500">
+                        <span className="shrink-0 text-xs tabular-nums text-ink-faint">
                           {topic.postCount.toLocaleString()}
-                          <span className="text-slate-400"> · {sharePct}%</span>
+                          <span className="text-ink-faint"> · {sharePct}%</span>
                         </span>
                       </div>
-                      <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-slate-100">
+                      <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-paper-deep">
                         <div
                           className={`h-full rounded-full ${tone.bar}`}
                           style={{ width: `${(topic.postCount / topMax) * 100}%` }}
@@ -393,32 +377,38 @@ function Hero({
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
       >
-        <div className="absolute inset-0 grid-bg opacity-40" />
-        <div className="absolute -top-20 left-1/2 h-[380px] w-[380px] -translate-x-1/2 rounded-full bg-brand-200 opacity-40 blur-3xl" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(90rem 42rem at 50% -12rem, rgba(14, 90, 60, 0.42), transparent 68%)," +
+              "radial-gradient(64rem 36rem at 88% 108%, rgba(14, 90, 60, 0.26), transparent 68%)",
+          }}
+        />
       </div>
 
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 shadow-sm">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-hairline bg-white px-3 py-1 text-xs font-medium text-ink-muted shadow-sm">
                 <Newspaper className="h-3.5 w-3.5" />
                 {t("badge")}
               </span>
               {live && live.totalPosts > 0 && (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 shadow-sm">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-forest-tint px-3 py-1 text-xs font-semibold text-forest">
                   <span className="relative inline-flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-forest/40 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-forest" />
                   </span>
                   Live · {live.totalPosts.toLocaleString()} posts ingested
                 </span>
               )}
             </div>
-            <h1 className="mt-4 text-balance text-3xl font-bold leading-[1.1] tracking-tight text-slate-900 sm:text-4xl">
+            <h1 className="mt-4 text-balance text-3xl font-bold leading-[1.1] tracking-tight text-ink sm:text-4xl">
               {t("title")}
             </h1>
-            <p className="mt-3 text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
+            <p className="mt-3 text-pretty text-sm leading-relaxed text-ink-muted sm:text-base">
               {t("subtitle", {
                 count: totalArticles.toLocaleString(),
                 outlets: String(totalOutlets),
@@ -449,11 +439,11 @@ function Hero({
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-center shadow-sm">
-      <p className="text-xl font-bold tabular-nums text-slate-900 sm:text-2xl">
+    <div className="rounded-xl border border-hairline bg-white px-3 py-2.5 text-center shadow-sm">
+      <p className="text-xl font-bold tabular-nums text-ink sm:text-2xl">
         {value}
       </p>
-      <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-slate-500">
+      <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-ink-faint">
         {label}
       </p>
     </div>
@@ -466,10 +456,10 @@ function ClusterCards({ config, t }: { config: DrilldownConfig; t: T }) {
     <section className="py-12 sm:py-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          <h2 className="text-balance text-2xl font-bold tracking-tight text-ink sm:text-3xl">
             {t("section_clusters_title")}
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
+          <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-ink-muted sm:text-base">
             {t("section_clusters_subtitle")}
           </p>
         </div>
@@ -481,14 +471,14 @@ function ClusterCards({ config, t }: { config: DrilldownConfig; t: T }) {
             return (
               <article
                 key={c.key}
-                className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+                className="relative overflow-hidden rounded-2xl border border-hairline bg-white p-5 shadow-sm"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-base font-semibold text-slate-900 sm:text-lg">
+                    <p className="text-base font-semibold text-ink sm:text-lg">
                       {t(`cluster_${c.key}_name`)}
                     </p>
-                    <p className="mt-1 text-xs text-slate-500">
+                    <p className="mt-1 text-xs text-ink-faint">
                       {c.outlets.length} {t("stat_outlets").toLowerCase()} ·{" "}
                       {c.articles.toLocaleString()} {t("stat_articles").toLowerCase()}
                     </p>
@@ -505,11 +495,11 @@ function ClusterCards({ config, t }: { config: DrilldownConfig; t: T }) {
                   </span>
                 </div>
 
-                <p className="mt-3 text-pretty text-xs leading-relaxed text-slate-600">
+                <p className="mt-3 text-pretty text-xs leading-relaxed text-ink-muted">
                   {t(`cluster_${c.key}_desc`)}
                 </p>
 
-                <div className="mt-4 h-1 overflow-hidden rounded-full bg-slate-100">
+                <div className="mt-4 h-1 overflow-hidden rounded-full bg-paper-deep">
                   <div
                     className={`h-full ${tone.bar}`}
                     style={{ width: `${sharePct}%` }}
@@ -520,7 +510,7 @@ function ClusterCards({ config, t }: { config: DrilldownConfig; t: T }) {
                   {c.outlets.map((o) => (
                     <span
                       key={o}
-                      className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-700"
+                      className="inline-flex items-center rounded-full border border-hairline bg-paper-deep px-2 py-0.5 text-xs font-medium text-ink-muted"
                     >
                       {o}
                     </span>
@@ -558,36 +548,36 @@ function TopOutlets({
     <section className="py-12 sm:py-16">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          <h2 className="text-balance text-2xl font-bold tracking-tight text-ink sm:text-3xl">
             {t("section_outlets_title")}
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
+          <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-ink-muted sm:text-base">
             {t("section_outlets_subtitle")}
           </p>
           {useLive && (
-            <p className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
+            <p className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-forest">
               <Radio className="h-3 w-3" />
               Real-time · from {live!.totalPosts.toLocaleString()} ingested posts
             </p>
           )}
         </div>
 
-        <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="mt-8 rounded-2xl border border-hairline bg-white p-5 shadow-sm">
           <div className="space-y-1">
             {outlets.map((o) => {
               const pct = (o.articles / max) * 100;
               const rowInner = (
                 <>
-                  <span className="truncate text-sm font-medium text-slate-800">
+                  <span className="truncate text-sm font-medium text-ink">
                     {o.name}
                   </span>
-                  <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                  <div className="h-2 overflow-hidden rounded-full bg-paper-deep">
                     <div
-                      className="h-full rounded-full bg-gradient-to-r from-brand-500 to-emerald-500"
+                      className="h-full rounded-full bg-forest"
                       style={{ width: `${pct}%` }}
                     />
                   </div>
-                  <span className="text-xs tabular-nums text-slate-500">
+                  <span className="text-xs tabular-nums text-ink-faint">
                     {o.articles.toLocaleString()}
                   </span>
                 </>
@@ -631,22 +621,22 @@ function LiveStream({
   const negPct = 100 - posPct - neuPct;
 
   return (
-    <section className="border-t border-slate-100 bg-gradient-to-b from-white to-slate-50/40 py-12 sm:py-16">
+    <section className="border-t border-hairline bg-paper-deep/40 py-12 sm:py-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-forest-tint px-3 py-1 text-xs font-semibold text-forest">
               <Radio className="h-3 w-3" />
               {tInsights("live_sentiment_concerned_badge")}
             </span>
-            <h2 className="mt-3 text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+            <h2 className="mt-3 text-balance text-2xl font-bold tracking-tight text-ink sm:text-3xl">
               {tInsights("live_section_title")}
             </h2>
             <I18nText
               text={tInsights("live_section_subtitle", {
                 count: live.totalPosts.toLocaleString(),
               })}
-              className="mt-1.5 block text-pretty text-sm text-slate-600"
+              className="mt-1.5 block text-pretty text-sm text-ink-muted"
             />
             {/* The "chart vs chip count" disclaimer was only needed while
                 the post list was capped at 50 (and later 1000) — chip
@@ -656,22 +646,22 @@ function LiveStream({
           </div>
 
           {/* Sentiment mix mini-chart */}
-          <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+          <div className="w-full max-w-sm rounded-2xl border border-hairline bg-white p-4 shadow-sm">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-faint">
               {tInsights("live_sentiment_mix")}
             </p>
             <div className="mt-2 flex h-2 overflow-hidden rounded-full">
               <span className="bg-emerald-500" style={{ width: `${posPct}%` }} />
-              <span className="bg-slate-300" style={{ width: `${neuPct}%` }} />
+              <span className="bg-ink-faint/40" style={{ width: `${neuPct}%` }} />
               <span className="bg-amber-500" style={{ width: `${negPct}%` }} />
             </div>
-            <div className="mt-2 flex justify-between text-xs tabular-nums text-slate-600">
+            <div className="mt-2 flex justify-between text-xs tabular-nums text-ink-muted">
               <span>
-                <span className="font-semibold text-emerald-700">{posPct}%</span>{" "}
+                <span className="font-semibold text-forest">{posPct}%</span>{" "}
                 {tInsights("live_sentiment_positive")}
               </span>
               <span>
-                <span className="font-semibold text-slate-700">{neuPct}%</span>{" "}
+                <span className="font-semibold text-ink-muted">{neuPct}%</span>{" "}
                 {tInsights("live_sentiment_neutral")}
               </span>
               <span>
@@ -721,17 +711,17 @@ function TopStories({
   const stories = useLive ? live!.topStories.slice(0, config.storyCount) : [];
 
   return (
-    <section className="bg-slate-50/60 py-12 sm:py-16">
+    <section className="bg-paper-deep/60 py-12 sm:py-16">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          <h2 className="text-balance text-2xl font-bold tracking-tight text-ink sm:text-3xl">
             {t("section_stories_title")}
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
+          <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-ink-muted sm:text-base">
             {t("section_stories_subtitle")}
           </p>
           {useLive && (
-            <p className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
+            <p className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-forest">
               <Radio className="h-3 w-3" />
               Real-time · top posts by da&apos;wah relevance
             </p>
@@ -748,15 +738,15 @@ function TopStories({
                 (post.text ?? "").split("\n").find((s) => s.trim()) ?? "";
               const inner = (
                 <>
-                  <Newspaper className="h-5 w-5 shrink-0 text-slate-400" />
+                  <Newspaper className="h-5 w-5 shrink-0 text-ink-faint" />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-slate-800">
+                    <p className="truncate text-sm font-medium text-ink">
                       {title.slice(0, 130) || "(no headline)"}
                     </p>
-                    <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-500">
+                    <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-ink-faint">
                       {post.author && (
                         <>
-                          <span className="font-medium text-slate-700">
+                          <span className="font-medium text-ink-muted">
                             {post.author}
                           </span>
                           {post.themeGroup && <span>·</span>}
@@ -775,7 +765,7 @@ function TopStories({
                       )}
                     </p>
                   </div>
-                  <ArrowUpRight className="h-4 w-4 shrink-0 text-slate-300" />
+                  <ArrowUpRight className="h-4 w-4 shrink-0 text-ink-faint/60" />
                 </>
               );
               return post.url ? (
@@ -784,14 +774,14 @@ function TopStories({
                   href={post.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300 hover:shadow-md"
+                  className="flex items-center gap-3 rounded-xl border border-hairline bg-white p-4 shadow-sm transition hover:border-hairline hover:shadow-md"
                 >
                   {inner}
                 </a>
               ) : (
                 <div
                   key={post.id}
-                  className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+                  className="flex items-center gap-3 rounded-xl border border-hairline bg-white p-4 shadow-sm"
                 >
                   {inner}
                 </div>
@@ -799,7 +789,7 @@ function TopStories({
             })}
           </div>
         ) : (
-          <div className="mt-8 rounded-2xl border border-dashed border-slate-200 bg-white/60 p-8 text-center text-sm text-slate-500">
+          <div className="mt-8 rounded-2xl border border-dashed border-hairline bg-white/60 p-8 text-center text-sm text-ink-faint">
             {t("data_note")}
           </div>
         )}
@@ -812,27 +802,16 @@ function CTA({ t }: { t: T }) {
   return (
     <section className="py-16 sm:py-24">
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
-        <div className="relative isolate overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 via-emerald-700 to-brand-700 px-6 py-12 text-center text-white shadow-2xl sm:px-12">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 -z-10"
-          >
-            <div className="absolute -top-24 left-1/3 h-72 w-72 rounded-full bg-amber-300 opacity-25 blur-3xl" />
-            <div className="absolute -bottom-24 right-0 h-72 w-72 rounded-full bg-emerald-300 opacity-30 blur-3xl" />
-          </div>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur">
-            <Sparkles className="h-3.5 w-3.5" />
-            Free forever
-          </span>
-          <h2 className="mt-6 text-balance text-2xl font-bold tracking-tight sm:text-3xl">
+        <div className="relative isolate overflow-hidden rounded-2xl bg-forest px-6 py-12 text-center text-paper sm:px-12">
+          <h2 className="text-balance font-display text-2xl font-medium tracking-[-0.015em] sm:text-3xl">
             {t("cta_title")}
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-white/85 sm:text-base">
+          <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-[1.7] text-paper/80 sm:text-base">
             {t("cta_body")}
           </p>
           <Link
             href="/login"
-            className="mt-7 inline-flex h-12 items-center gap-2 rounded-full bg-white px-6 text-sm font-semibold text-emerald-800 shadow-lg transition hover:bg-emerald-50"
+            className="mt-7 inline-flex h-12 items-center gap-2 rounded-full bg-paper px-6 text-sm font-semibold text-forest transition hover:bg-paper-deep"
           >
             {t("cta_button")}
             <ArrowRight className="h-4 w-4" />
@@ -866,15 +845,15 @@ function RisingVideosPanel({
             <Flame className="h-3 w-3" />
             {tInsights("section_rising_videos_badge")}
           </span>
-          <h2 className="mt-3 text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          <h2 className="mt-3 text-balance text-2xl font-bold tracking-tight text-ink sm:text-3xl">
             {tInsights("section_rising_videos_title")}
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
+          <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-ink-muted sm:text-base">
             {tInsights("section_rising_videos_subtitle_platform")}
           </p>
         </div>
 
-        <ul className="mt-8 divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <ul className="mt-8 divide-y divide-hairline overflow-hidden rounded-2xl border border-hairline bg-white shadow-sm">
           {videos.map((v) => (
             <li key={v.postId} className="flex items-start gap-3 p-4 sm:p-5">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-50 text-xs font-bold text-rose-700 tabular-nums">
@@ -886,22 +865,22 @@ function RisingVideosPanel({
                     href={v.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block truncate text-sm font-semibold text-slate-900 hover:text-rose-700"
+                    className="block truncate text-sm font-semibold text-ink hover:text-rose-700"
                   >
                     {v.title}
                   </a>
                 ) : (
-                  <p className="truncate text-sm font-semibold text-slate-900">
+                  <p className="truncate text-sm font-semibold text-ink">
                     {v.title}
                   </p>
                 )}
-                <p className="mt-0.5 text-xs text-slate-500">
-                  <span className="font-medium text-slate-700">
+                <p className="mt-0.5 text-xs text-ink-faint">
+                  <span className="font-medium text-ink-muted">
                     {v.channel}
                   </span>
                   {" · "}
                   {formatCompactInt(v.viewsNow)} views ·{" "}
-                  <span className="text-emerald-700">
+                  <span className="text-forest">
                     +{formatCompactInt(v.delta)}
                   </span>{" "}
                   {tInsights("rising_videos_vs_24h_ago")}
@@ -944,10 +923,10 @@ function TopEngagedPanel({
             <TrendingUp className="h-3 w-3" />
             {tInsights("section_top_engaged_badge")}
           </span>
-          <h2 className="mt-3 text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          <h2 className="mt-3 text-balance text-2xl font-bold tracking-tight text-ink sm:text-3xl">
             {tInsights("section_top_engaged_title", { platform })}
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
+          <p className="mx-auto mt-3 max-w-xl text-pretty text-sm leading-relaxed text-ink-muted sm:text-base">
             {tInsights("section_top_engaged_subtitle")}
           </p>
         </div>
@@ -959,16 +938,16 @@ function TopEngagedPanel({
               "";
             const inner = (
               <>
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-700 tabular-nums">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-paper-deep text-xs font-bold text-ink-muted tabular-nums">
                   {idx + 1}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-slate-900 group-hover:text-amber-700">
+                  <p className="truncate text-sm font-semibold text-ink group-hover:text-amber-700">
                     {title || "(no title)"}
                   </p>
-                  <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-500">
+                  <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-ink-faint">
                     {p.author && (
-                      <span className="font-medium text-slate-700">
+                      <span className="font-medium text-ink-muted">
                         @{p.author}
                       </span>
                     )}
@@ -991,7 +970,7 @@ function TopEngagedPanel({
                       </span>
                     )}
                     {p.postedAt && (
-                      <span className="text-slate-400">
+                      <span className="text-ink-faint">
                         {new Date(p.postedAt).toLocaleDateString(locale, {
                           timeZone: "Asia/Jakarta",
                         })}
@@ -999,7 +978,7 @@ function TopEngagedPanel({
                     )}
                   </p>
                 </div>
-                <ArrowUpRight className="h-4 w-4 shrink-0 text-slate-300" />
+                <ArrowUpRight className="h-4 w-4 shrink-0 text-ink-faint/60" />
               </>
             );
             return (
@@ -1009,12 +988,12 @@ function TopEngagedPanel({
                     href={p.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-amber-300 hover:shadow-md"
+                    className="group flex items-center gap-3 rounded-xl border border-hairline bg-white p-4 shadow-sm transition hover:border-amber-300 hover:shadow-md"
                   >
                     {inner}
                   </a>
                 ) : (
-                  <div className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                  <div className="group flex items-center gap-3 rounded-xl border border-hairline bg-white p-4 shadow-sm">
                     {inner}
                   </div>
                 )}
@@ -1053,9 +1032,9 @@ function ThemeGroupReachPanel({
   tInsights: Awaited<ReturnType<typeof getTranslations>>;
 }) {
   return (
-    <section className="border-y border-slate-100 bg-slate-50/40 py-10 sm:py-12">
+    <section className="border-y border-hairline bg-paper-deep/40 py-10 sm:py-12">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <h2 className="text-base font-semibold tracking-tight text-slate-900 sm:text-lg">
+        <h2 className="text-base font-semibold tracking-tight text-ink sm:text-lg">
           {tInsights("section_bucket_reach_title")}
         </h2>
 
@@ -1071,10 +1050,10 @@ function ThemeGroupReachPanel({
                     : "flat";
             const deltaClass =
               dir === "up"
-                ? "text-emerald-700"
+                ? "text-forest"
                 : dir === "down"
                   ? "text-rose-700"
-                  : "text-slate-500";
+                  : "text-ink-faint";
             const unitLabel =
               r.unit === "articles"
                 ? tInsights("bucket_reach_unit_articles")
@@ -1084,12 +1063,12 @@ function ThemeGroupReachPanel({
             return (
               <div
                 key={r.group}
-                className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm"
+                className="rounded-xl border border-hairline bg-white p-3 shadow-sm"
               >
-                <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-ink-faint">
                   {r.group}
                 </div>
-                <div className="mt-0.5 text-sm font-semibold tabular-nums text-slate-900">
+                <div className="mt-0.5 text-sm font-semibold tabular-nums text-ink">
                   {formatCompactInt(r.valueThisWeek)} {unitLabel}
                 </div>
                 <div className={`text-[11px] tabular-nums ${deltaClass}`}>

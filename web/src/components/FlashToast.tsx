@@ -82,17 +82,17 @@ export function FlashToast({ initial }: { initial: Flash | null }) {
 
   const toneClass =
     flash.kind === "success"
-      ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+      ? "border-hairline bg-forest-tint text-forest"
       : flash.kind === "error"
         ? "border-rose-200 bg-rose-50 text-rose-900"
-        : "border-slate-200 bg-white text-slate-900";
+        : "border-hairline bg-white text-ink";
 
   const iconClass =
     flash.kind === "success"
-      ? "text-emerald-600"
+      ? "text-forest"
       : flash.kind === "error"
         ? "text-rose-600"
-        : "text-slate-500";
+        : "text-ink-faint";
 
   return (
     <div
@@ -121,7 +121,7 @@ export function FlashToast({ initial }: { initial: Flash | null }) {
           type="button"
           onClick={() => setVisible(false)}
           aria-label="Dismiss"
-          className="-mr-1 -mt-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-slate-500 transition hover:bg-slate-900/5"
+          className="-mr-1 -mt-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-ink-faint transition hover:bg-ink/5"
         >
           <X className="h-3.5 w-3.5" />
         </button>

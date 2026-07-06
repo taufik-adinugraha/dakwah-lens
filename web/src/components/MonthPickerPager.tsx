@@ -67,8 +67,8 @@ export function MonthPickerPager({
   return (
     <div className="my-4 flex flex-wrap items-center justify-between gap-3">
       <details className="relative">
-        <summary className="inline-flex cursor-pointer list-none items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 [&::-webkit-details-marker]:hidden">
-          <span className="text-slate-500">{labels.monthLabel}:</span>
+        <summary className="inline-flex cursor-pointer list-none items-center gap-1.5 rounded-full border border-hairline bg-white px-3 py-1.5 text-xs font-semibold text-ink-muted transition hover:border-hairline hover:bg-paper-deep [&::-webkit-details-marker]:hidden">
+          <span className="text-ink-faint">{labels.monthLabel}:</span>
           <span>
             {selectedMonth
               ? formatMonthLabel(
@@ -78,15 +78,15 @@ export function MonthPickerPager({
                 )
               : labels.allTime}
           </span>
-          <ChevronRight className="h-3 w-3 rotate-90 text-slate-400" />
+          <ChevronRight className="h-3 w-3 rotate-90 text-ink-faint" />
         </summary>
-        <div className="absolute left-0 top-full z-10 mt-1 max-h-72 w-56 overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-lg">
+        <div className="absolute left-0 top-full z-10 mt-1 max-h-72 w-56 overflow-y-auto rounded-xl border border-hairline bg-white shadow-lg">
           <Link
             href={allTimeHref}
             className={`block px-3 py-1.5 text-xs font-medium transition ${
               monthParam === "all"
-                ? "bg-emerald-50 text-emerald-700"
-                : "text-slate-700 hover:bg-slate-50"
+                ? "bg-forest-tint text-forest"
+                : "text-ink-muted hover:bg-paper-deep"
             }`}
           >
             {labels.allTime}
@@ -99,8 +99,8 @@ export function MonthPickerPager({
                 href={linkFor(year, month)}
                 className={`block px-3 py-1.5 text-xs transition ${
                   monthParam === key
-                    ? "bg-emerald-50 font-semibold text-emerald-700"
-                    : "text-slate-700 hover:bg-slate-50"
+                    ? "bg-forest-tint font-semibold text-forest"
+                    : "text-ink-muted hover:bg-paper-deep"
                 }`}
               >
                 {formatMonthLabel(year, month, locale)}
@@ -111,14 +111,14 @@ export function MonthPickerPager({
       </details>
 
       {totalPages > 1 && (
-        <div className="inline-flex items-center gap-1 text-xs text-slate-600">
+        <div className="inline-flex items-center gap-1 text-xs text-ink-muted">
           <Link
             href={`${baseHref}?month=${monthParam}&page=${prevPage}${extra}`}
             aria-label={labels.prev}
-            className={`inline-flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white transition ${
+            className={`inline-flex h-7 w-7 items-center justify-center rounded-full border border-hairline bg-white transition ${
               page <= 1
                 ? "pointer-events-none opacity-40"
-                : "hover:border-slate-300 hover:bg-slate-50"
+                : "hover:border-hairline hover:bg-paper-deep"
             }`}
           >
             <ChevronLeft className="h-3.5 w-3.5" />
@@ -127,10 +127,10 @@ export function MonthPickerPager({
           <Link
             href={`${baseHref}?month=${monthParam}&page=${nextPage}${extra}`}
             aria-label={labels.next}
-            className={`inline-flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white transition ${
+            className={`inline-flex h-7 w-7 items-center justify-center rounded-full border border-hairline bg-white transition ${
               page >= totalPages
                 ? "pointer-events-none opacity-40"
-                : "hover:border-slate-300 hover:bg-slate-50"
+                : "hover:border-hairline hover:bg-paper-deep"
             }`}
           >
             <ChevronRight className="h-3.5 w-3.5" />

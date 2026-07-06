@@ -249,7 +249,7 @@ export function FlyerGrid({
       )}
 
       {filtered.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center text-sm text-slate-500">
+        <p className="rounded-2xl border border-dashed border-hairline bg-white px-6 py-10 text-center text-sm text-ink-faint">
           {f?.empty ?? ""}
         </p>
       ) : (
@@ -294,7 +294,7 @@ function FilterSelect({
         aria-label={label}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="appearance-none rounded-full border border-slate-200 bg-white py-1.5 pl-3.5 pr-8 text-xs font-semibold text-slate-700 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+        className="appearance-none rounded-full border border-hairline bg-white py-1.5 pl-3.5 pr-8 text-xs font-semibold text-ink-muted shadow-sm focus:border-forest/50 focus:outline-none focus:ring-2 focus:ring-hairline"
       >
         <option value="all">
           {label}: {allLabel}
@@ -305,7 +305,7 @@ function FilterSelect({
           </option>
         ))}
       </select>
-      <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+      <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-faint" />
     </div>
   );
 }
@@ -340,12 +340,12 @@ function FlyerTile({
   }
 
   return (
-    <li className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <li className="overflow-hidden rounded-2xl border border-hairline bg-white shadow-sm">
       <button
         type="button"
         onClick={() => setZoomed(true)}
         aria-label={labels.openLarge}
-        className="block aspect-square w-full overflow-hidden bg-slate-100"
+        className="block aspect-square w-full overflow-hidden bg-paper-deep"
       >
         <img
           src={png}
@@ -356,11 +356,11 @@ function FlyerTile({
       </button>
       <div className="space-y-2 p-3">
         <div className="flex items-start justify-between gap-2">
-          <p className="line-clamp-2 text-sm font-semibold text-slate-900">
+          <p className="line-clamp-2 text-sm font-semibold text-ink">
             {flyer.headline}
           </p>
           {kind === "system" ? (
-            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700">
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-forest-tint px-1.5 py-0.5 text-[10px] font-semibold text-forest">
               <Sparkles className="h-2.5 w-2.5" />
               {labels.badgeSystem ?? "Weekly"}
             </span>
@@ -369,7 +369,7 @@ function FlyerTile({
               className={`inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
                 flyer.visibility === "public"
                   ? "bg-sky-50 text-sky-700"
-                  : "bg-slate-100 text-slate-600"
+                  : "bg-paper-deep text-ink-muted"
               }`}
             >
               {flyer.visibility === "public" ? (
@@ -383,7 +383,7 @@ function FlyerTile({
             </span>
           )}
         </div>
-        <p className="text-[11px] text-slate-500">
+        <p className="text-[11px] text-ink-faint">
           {new Date(flyer.createdAt).toLocaleDateString(undefined, {
             day: "numeric",
             month: "short",
@@ -394,7 +394,7 @@ function FlyerTile({
           <button
             type="button"
             onClick={() => setZoomed(true)}
-            className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-50"
+            className="inline-flex items-center gap-1 rounded-full border border-hairline bg-white px-2.5 py-1 text-[11px] font-semibold text-ink-muted hover:bg-paper-deep"
           >
             <Eye className="h-3 w-3" />
             {labels.openLarge}
@@ -402,7 +402,7 @@ function FlyerTile({
           <a
             href={png}
             download={`dakwah-lens-flyer-${flyer.id}.png`}
-            className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-50"
+            className="inline-flex items-center gap-1 rounded-full border border-hairline bg-white px-2.5 py-1 text-[11px] font-semibold text-ink-muted hover:bg-paper-deep"
           >
             <Download className="h-3 w-3" />
             {labels.download}
@@ -467,13 +467,13 @@ function ZoomOverlay({
       role="dialog"
       aria-modal="true"
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-forest/80 p-4 backdrop-blur-sm"
     >
       <button
         type="button"
         onClick={onClose}
         aria-label={closeLabel}
-        className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-slate-900 shadow-md transition hover:bg-white"
+        className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-ink shadow-md transition hover:bg-white"
       >
         <X className="h-5 w-5" />
       </button>
@@ -489,7 +489,7 @@ function ZoomOverlay({
         <a
           href={src}
           download={downloadName}
-          className="inline-flex items-center gap-1.5 rounded-full bg-white/95 px-4 py-2 text-xs font-semibold text-slate-900 shadow-md transition hover:bg-white"
+          className="inline-flex items-center gap-1.5 rounded-full bg-white/95 px-4 py-2 text-xs font-semibold text-ink shadow-md transition hover:bg-white"
         >
           <Download className="h-3.5 w-3.5" />
           {downloadLabel}

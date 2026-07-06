@@ -79,7 +79,7 @@ export function BookmarkButton({
         className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition disabled:opacity-60 ${
           saved
             ? "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
-            : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+            : "border-hairline bg-white text-ink-muted hover:bg-paper-deep"
         }`}
       >
         {saved ? (

@@ -2,6 +2,7 @@ import { ArrowRight } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { Link } from "@/i18n/navigation";
+import { ForestWash } from "@/components/ForestWash";
 import { Reveal } from "./Reveal";
 
 type LandingT = Awaited<ReturnType<typeof getTranslations<"Landing">>>;
@@ -37,20 +38,7 @@ export function Hero({
 
   return (
     <section className="relative isolate overflow-hidden bg-paper font-body">
-      {/* Soft green wash — two large radial gradients breathing up from
-          the paper. Deliberately quiet (low alpha, huge blur radii) so
-          it reads as light, not as a "gradient hero" — the serene take
-          on the operator's ask for green in the background. */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(90rem 42rem at 50% -12rem, rgba(14, 90, 60, 0.42), transparent 68%)," +
-              "radial-gradient(64rem 36rem at 88% 108%, rgba(14, 90, 60, 0.26), transparent 68%)",
-          }}
-        />
-      </div>
+      <ForestWash />
 
       <div className="mx-auto max-w-3xl px-6 pt-24 pb-28 text-center sm:pt-32 sm:pb-36">
         <Reveal>

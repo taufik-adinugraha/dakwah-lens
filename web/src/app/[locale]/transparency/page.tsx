@@ -178,19 +178,25 @@ function Hero({ t }: { t: T }) {
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
       >
-        <div className="absolute inset-0 grid-bg opacity-40" />
-        <div className="absolute -top-24 left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-emerald-200 opacity-40 blur-3xl" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(90rem 42rem at 50% -12rem, rgba(14, 90, 60, 0.42), transparent 68%)," +
+              "radial-gradient(64rem 36rem at 88% 108%, rgba(14, 90, 60, 0.26), transparent 68%)",
+          }}
+        />
       </div>
 
       <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50/80 px-3 py-1 text-xs font-medium text-emerald-700 shadow-sm backdrop-blur">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-hairline bg-forest-tint/80 px-3 py-1 text-xs font-medium text-forest shadow-sm backdrop-blur">
           <Heart className="h-3.5 w-3.5" />
           {t("badge")}
         </span>
-        <h1 className="mt-4 text-balance text-3xl font-bold leading-[1.1] tracking-tight text-slate-900 sm:text-5xl">
+        <h1 className="mt-4 text-balance text-3xl font-bold leading-[1.1] tracking-tight text-ink sm:text-5xl">
           {t("hero_title")}
         </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-pretty text-base leading-relaxed text-slate-600 sm:text-lg">
+        <p className="mx-auto mt-4 max-w-2xl text-pretty text-base leading-relaxed text-ink-muted sm:text-lg">
           {t("hero_subtitle")}
         </p>
       </div>
@@ -217,9 +223,9 @@ function StatTile({
 }) {
   const styles = TILE_STYLES[tone];
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="rounded-2xl border border-hairline bg-white p-5 shadow-sm">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-faint">
           {label}
         </p>
         <span
@@ -238,32 +244,32 @@ function StatTile({
             : "—"}
       </p>
       {valueIdrFromUsd != null && (
-        <p className="text-xs tabular-nums text-slate-500">
+        <p className="text-xs tabular-nums text-ink-faint">
           ≈ Rp {Math.round(valueIdrFromUsd).toLocaleString("id-ID")}
         </p>
       )}
-      <p className="mt-1 text-xs leading-relaxed text-slate-500">{hint}</p>
+      <p className="mt-1 text-xs leading-relaxed text-ink-faint">{hint}</p>
     </div>
   );
 }
 
 const TILE_STYLES = {
   emerald: {
-    bg: "bg-emerald-50",
-    icon: "text-emerald-700",
-    value: "text-emerald-800",
+    bg: "bg-forest-tint",
+    icon: "text-forest",
+    value: "text-forest",
   },
   rose: { bg: "bg-rose-50", icon: "text-rose-700", value: "text-rose-800" },
-  brand: { bg: "bg-brand-50", icon: "text-brand-700", value: "text-slate-900" },
-  slate: { bg: "bg-slate-100", icon: "text-slate-700", value: "text-slate-900" },
+  brand: { bg: "bg-brand-50", icon: "text-brand-700", value: "text-ink" },
+  slate: { bg: "bg-paper-deep", icon: "text-ink-muted", value: "text-ink" },
 } as const;
 
 function PrepaidDisclaimer({ t }: { t: T }) {
   return (
-    <aside className="mt-3 flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 text-sm text-slate-700">
-      <Info className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
+    <aside className="mt-3 flex items-start gap-3 rounded-2xl border border-hairline bg-paper-deep/60 p-4 text-sm text-ink-muted">
+      <Info className="mt-0.5 h-4 w-4 shrink-0 text-ink-faint" />
       <div className="space-y-1 leading-relaxed">
-        <p className="font-semibold text-slate-900">{t("prepaid_title")}</p>
+        <p className="font-semibold text-ink">{t("prepaid_title")}</p>
         <p>{t("prepaid_body")}</p>
       </div>
     </aside>
@@ -283,17 +289,17 @@ function MonthlyTable({
   return (
     <section className="py-10 sm:py-14">
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
-        <h2 className="text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+        <h2 className="text-balance text-2xl font-bold tracking-tight text-ink sm:text-3xl">
           {t("monthly_title")}
         </h2>
-        <p className="mt-2 text-pretty text-sm leading-relaxed text-slate-600">
+        <p className="mt-2 text-pretty text-sm leading-relaxed text-ink-muted">
           {t("monthly_subtitle")}
         </p>
 
-        <div className="mt-6 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="mt-6 overflow-x-auto rounded-2xl border border-hairline bg-white shadow-sm">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-100 bg-slate-50 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+              <tr className="border-b border-hairline bg-paper-deep text-left text-[10px] font-semibold uppercase tracking-wider text-ink-faint">
                 <th className="px-4 py-3">{t("th_month")}</th>
                 <th className="px-4 py-3 text-right">{t("th_donations")}</th>
                 <th className="px-4 py-3 text-right">{t("th_spend")}</th>
@@ -306,24 +312,24 @@ function MonthlyTable({
                 return (
                   <tr
                     key={r.month}
-                    className="border-b border-slate-50 last:border-0"
+                    className="border-b border-hairline/60 last:border-0"
                   >
-                    <td className="px-4 py-3 text-slate-800">
+                    <td className="px-4 py-3 text-ink">
                       {new Date(r.month).toLocaleDateString(idLocale, {
                         year: "numeric",
                         month: "long",
                         timeZone: "Asia/Jakarta",
                       })}
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-emerald-700">
+                    <td className="px-4 py-3 text-right tabular-nums text-forest">
                       Rp {Math.round(r.incomeIdr).toLocaleString("id-ID")}
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-slate-700">
+                    <td className="px-4 py-3 text-right tabular-nums text-ink-muted">
                       Rp {Math.round(r.outIdr).toLocaleString("id-ID")}
                     </td>
                     <td
                       className={`px-4 py-3 text-right tabular-nums font-semibold ${
-                        net >= 0 ? "text-emerald-800" : "text-rose-700"
+                        net >= 0 ? "text-forest" : "text-rose-700"
                       }`}
                     >
                       Rp {Math.round(net).toLocaleString("id-ID")}
@@ -357,33 +363,33 @@ function DonationsList({
   idLocale: string;
 }) {
   return (
-    <section className="border-t border-slate-100 bg-emerald-50/30 py-10 sm:py-14">
+    <section className="border-t border-hairline bg-forest-tint/30 py-10 sm:py-14">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <h2 className="text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+        <h2 className="text-balance text-2xl font-bold tracking-tight text-ink sm:text-3xl">
           {t("recent_donations_title")}
         </h2>
-        <p className="mt-2 text-pretty text-sm leading-relaxed text-slate-600">
+        <p className="mt-2 text-pretty text-sm leading-relaxed text-ink-muted">
           {t("recent_donations_subtitle")}
         </p>
 
         <div className="mt-6 space-y-2">
           {donations.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-10 text-center">
-              <p className="text-sm text-slate-600">{t("no_donations_yet")}</p>
+            <div className="rounded-2xl border border-dashed border-hairline bg-white px-6 py-10 text-center">
+              <p className="text-sm text-ink-muted">{t("no_donations_yet")}</p>
             </div>
           ) : (
             donations.map((d) => (
               <article
                 key={d.id}
-                className="grid grid-cols-[1fr_auto] items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm"
+                className="grid grid-cols-[1fr_auto] items-center gap-3 rounded-xl border border-hairline bg-white px-4 py-3 shadow-sm"
               >
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-slate-900">
+                  <p className="truncate text-sm font-semibold text-ink">
                     {d.isAnonymous || !d.donor
                       ? t("anonymous_donor")
                       : d.donor}
                   </p>
-                  <p className="mt-0.5 text-xs text-slate-500">
+                  <p className="mt-0.5 text-xs text-ink-faint">
                     {new Date(d.receivedAt).toLocaleDateString(idLocale, {
                       year: "numeric",
                       month: "short",
@@ -392,7 +398,7 @@ function DonationsList({
                     })}
                     {d.channel ? (
                       <>
-                        <span className="text-slate-300"> · </span>
+                        <span className="text-ink-faint/60"> · </span>
                         <span className="capitalize">
                           {d.channel.replace(/_/g, " ")}
                         </span>
@@ -400,7 +406,7 @@ function DonationsList({
                     ) : null}
                   </p>
                 </div>
-                <p className="shrink-0 text-sm font-semibold tabular-nums text-emerald-800">
+                <p className="shrink-0 text-sm font-semibold tabular-nums text-forest">
                   Rp {d.amountIdr.toLocaleString("id-ID")}
                 </p>
               </article>
@@ -416,14 +422,7 @@ function ClosingCTA({ t, donateHref }: { t: T; donateHref: string }) {
   return (
     <section className="py-12 sm:py-16">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <div className="relative isolate overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 via-emerald-700 to-brand-700 px-6 py-12 text-center text-white shadow-2xl sm:px-12">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 -z-10"
-          >
-            <div className="absolute -top-24 left-1/3 h-72 w-72 rounded-full bg-amber-300 opacity-25 blur-3xl" />
-            <div className="absolute -bottom-24 right-0 h-72 w-72 rounded-full bg-emerald-300 opacity-30 blur-3xl" />
-          </div>
+        <div className="relative isolate overflow-hidden rounded-2xl bg-forest px-6 py-12 text-center text-paper sm:px-12">
           <h2 className="text-balance text-2xl font-bold tracking-tight sm:text-3xl">
             {t("closing_title")}
           </h2>
@@ -433,7 +432,7 @@ function ClosingCTA({ t, donateHref }: { t: T; donateHref: string }) {
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
             <a
               href={donateHref}
-              className="inline-flex h-12 items-center gap-2 rounded-full bg-white px-6 text-sm font-semibold text-emerald-800 shadow-lg transition hover:bg-emerald-50"
+              className="inline-flex h-12 items-center gap-2 rounded-full bg-white px-6 text-sm font-semibold text-forest shadow-lg transition hover:bg-forest-tint"
             >
               {t("closing_cta_donate")}
             </a>
