@@ -305,6 +305,14 @@ ERR ON THE SIDE OF MORE THEMES (audit failure 2026-06-06): a 17-theme run had ~3
   · "Bencana Alam & Lingkungan" (33% noise) absorbed "burnout" slang posts. CURE: tight exclude_keywords ["burnout", "burnout syndrome"].
 The pattern: ANY theme whose label starts with a broad category noun ("Korupsi", "Kekerasan", "Ekonomi") will absorb adjacent stories unless either (a) split into specific stories or (b) given a tight exclude_keywords list. Default to (a) — splitting is cheaper than maintaining excludes.
 
+DOMAIN-MAGNET COVERAGE (added 2026-07-06 after a manual recluster hit this) — the COMPLEMENT to split-don't-lump, and just as important. The second-pass rescue floors (0.20 / 0.22) force EVERY leftover orphan onto its nearest centroid, whether or not it truly belongs. So if a DOMAIN has lots of low-signal chatter but NO broad home theme, all that chatter rescue-dumps onto whatever concrete theme is semantically closest — and tanks its purity. Empirically: a tight "Evaluasi Haji 2026" theme absorbed ALL general-Islam posts (sholat/doa/dzikir/mualaf) because it was the only religious centroid; a "Sekolah Rakyat" theme absorbed ALL of education; a "Pajak JHT" theme absorbed ALL generic finance (solar, saham, Tapera, daya beli). This is why the line-above cure for "Ibadah Haji absorbed non-haji content" (just split Haji from Qurban) is INCOMPLETE — splitting doesn't help if the sholat/doa posts still have nowhere else to land.
+FIX: alongside your concrete event-themes, ALWAYS emit a broad DOMAIN-MAGNET theme for each recurring high-volume domain present in the pool, so orphans have a correct reservoir instead of polluting a concrete theme:
+  · "Panduan Ibadah & Spiritualitas Islam" (keywords: sholat, shalat, dzikir, mualaf, sunnah, ibadah) — the reservoir for general-Islam chatter, so Haji/Qurban/Zakat event-themes stay clean.
+  · "Ekonomi, Harga & Daya Beli" (keywords: ekonomi, harga, inflasi, daya beli, subsidi) — the reservoir for generic finance, so JHT/UMKM/specific-policy themes stay clean.
+  · "Dunia Pendidikan & Sekolah" (keywords: sekolah, siswa, guru, dosen, beasiswa, SPMB) — the reservoir for generic education, so Sekolah-Rakyat / specific-program themes stay clean.
+  · plus the governance / crime / personal-social magnets you already tend to emit.
+Give each domain magnet min_similarity ~0.34-0.38 (deliberately LOW so it out-competes concrete themes for weak-signal orphans). These magnets carry moderate purity themselves (~0.45-0.80) — that is CORRECT and expected; their job is to keep the DENOMINATOR clean on the concrete themes. Target ~3-5 domain magnets sitting under your concrete event-themes.
+
 For each theme:
 - label: short human-readable name in Bahasa Indonesia (3-6 words). Be CONCRETE about what the theme is — name the actual subject matter, not a generic newsroom department.
 
