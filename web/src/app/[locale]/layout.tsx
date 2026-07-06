@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Amiri } from "next/font/google";
+import { Geist, Geist_Mono, Amiri, Fraunces, Inter } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -32,6 +32,24 @@ const amiri = Amiri({
   variable: "--font-amiri",
   weight: ["400", "700"],
   subsets: ["arabic"],
+  display: "swap",
+});
+
+// Landing redesign (2026-07) — serene "serif display + sans body" pair.
+// Fraunces is a variable serif with real optical character; Inter is the
+// calm workhorse body. Both are self-hosted by next/font (CSP-safe) and
+// exposed as CSS variables, but only APPLIED on the landing (via the
+// `font-display` / `font-body` theme tokens) so the rest of the app keeps
+// its Geist default untouched.
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
   display: "swap",
 });
 
@@ -90,7 +108,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${geistSans.variable} ${geistMono.variable} ${amiri.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${amiri.variable} ${fraunces.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="relative min-h-full bg-white text-slate-900">
         <NextIntlClientProvider>
