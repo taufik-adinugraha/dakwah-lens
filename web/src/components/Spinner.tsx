@@ -49,10 +49,10 @@ const SIZE = {
 
 const TONE = {
   current: "",
-  slate: "text-slate-500",
+  slate: "text-ink-faint",
   brand: "text-brand-600",
   white: "text-white",
-  emerald: "text-emerald-600",
+  emerald: "text-forest",
 } as const;
 
 /**
@@ -65,7 +65,7 @@ export function PageLoading({ caption }: { caption?: string }) {
     <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3 px-6 text-center">
       <Spinner size="xl" tone="brand" label="Loading" />
       {caption && (
-        <p className="text-sm text-slate-500" aria-live="polite">
+        <p className="text-sm text-ink-faint" aria-live="polite">
           {caption}
         </p>
       )}

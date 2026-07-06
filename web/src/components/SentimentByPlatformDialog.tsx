@@ -44,7 +44,7 @@ export function SentimentByPlatformDialog({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="mt-3 inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+        className="mt-3 inline-flex items-center gap-1 rounded-full border border-hairline bg-white px-2.5 py-1 text-xs font-medium text-ink-muted transition hover:border-hairline hover:bg-paper-deep"
       >
         {labels.cta}
         <ArrowUpRight className="h-3 w-3" />
@@ -55,22 +55,22 @@ export function SentimentByPlatformDialog({
           role="dialog"
           aria-modal="true"
           aria-labelledby="sentiment-by-platform-title"
-          className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-0 backdrop-blur-sm sm:items-center sm:p-4"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-0 backdrop-blur-sm sm:items-center sm:p-4"
           onClick={() => setOpen(false)}
         >
           <div
             className="relative max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-t-3xl bg-white shadow-2xl sm:rounded-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="sticky top-0 z-10 flex items-start justify-between gap-3 border-b border-slate-100 bg-white/95 px-6 py-4 backdrop-blur">
+            <div className="sticky top-0 z-10 flex items-start justify-between gap-3 border-b border-hairline bg-white/95 px-6 py-4 backdrop-blur">
               <div className="min-w-0 flex-1">
                 <h3
                   id="sentiment-by-platform-title"
-                  className="text-balance text-lg font-bold text-slate-900 sm:text-xl"
+                  className="text-balance text-lg font-bold text-ink sm:text-xl"
                 >
                   {labels.dialogTitle}
                 </h3>
-                <p className="mt-1 text-xs leading-relaxed text-slate-500">
+                <p className="mt-1 text-xs leading-relaxed text-ink-faint">
                   {labels.dialogSubtitle}
                 </p>
               </div>
@@ -78,7 +78,7 @@ export function SentimentByPlatformDialog({
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label={labels.closeLabel}
-                className="rounded-full p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+                className="rounded-full p-1.5 text-ink-faint transition hover:bg-paper-deep hover:text-ink"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -107,21 +107,21 @@ function PlatformRow({
     row.platform === "mainstream" ? labels.platformMainstream : row.platform;
 
   return (
-    <li className="rounded-2xl border border-slate-200 bg-white p-4">
+    <li className="rounded-2xl border border-hairline bg-white p-4">
       <div className="flex items-baseline justify-between gap-3">
-        <p className="text-sm font-semibold capitalize text-slate-900">
+        <p className="text-sm font-semibold capitalize text-ink">
           {displayName}
         </p>
-        <p className="text-xs tabular-nums text-slate-500">
+        <p className="text-xs tabular-nums text-ink-faint">
           {row.total.toLocaleString()}
         </p>
       </div>
 
       {row.total === 0 ? (
-        <p className="mt-3 text-xs text-slate-400">{labels.noData}</p>
+        <p className="mt-3 text-xs text-ink-faint">{labels.noData}</p>
       ) : (
         <>
-          <div className="mt-3 flex h-2.5 overflow-hidden rounded-full bg-slate-100">
+          <div className="mt-3 flex h-2.5 overflow-hidden rounded-full bg-paper-deep">
             <div
               className="h-full bg-rose-500"
               style={{ width: `${row.negative.pct}%` }}
@@ -133,14 +133,14 @@ function PlatformRow({
               title={`${labels.neutral} ${row.neutral.pct.toFixed(0)}%`}
             />
             <div
-              className="h-full bg-emerald-500"
+              className="h-full bg-forest-tint0"
               style={{ width: `${row.positive.pct}%` }}
               title={`${labels.positive} ${row.positive.pct.toFixed(0)}%`}
             />
           </div>
           <ul className="mt-2.5 grid grid-cols-3 gap-2 text-xs">
             <PlatformStat
-              dot="bg-emerald-500"
+              dot="bg-forest-tint0"
               label={labels.positive}
               count={row.positive.count}
               pct={row.positive.pct}
@@ -176,16 +176,16 @@ function PlatformStat({
   pct: number;
 }) {
   return (
-    <li className="rounded-lg bg-slate-50 px-2.5 py-1.5">
-      <div className="flex items-center gap-1.5 text-slate-600">
+    <li className="rounded-lg bg-paper-deep px-2.5 py-1.5">
+      <div className="flex items-center gap-1.5 text-ink-muted">
         <span className={`inline-block h-1.5 w-1.5 rounded-full ${dot}`} />
         <span className="text-[10px] font-medium uppercase tracking-wider">
           {label}
         </span>
       </div>
-      <p className="mt-0.5 tabular-nums text-slate-800">
+      <p className="mt-0.5 tabular-nums text-ink">
         {count.toLocaleString()}
-        <span className="ml-1 text-slate-500">· {pct.toFixed(0)}%</span>
+        <span className="ml-1 text-ink-faint">· {pct.toFixed(0)}%</span>
       </p>
     </li>
   );
