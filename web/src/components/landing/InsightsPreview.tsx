@@ -2,6 +2,7 @@ import { ArrowRight } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { Link } from "@/i18n/navigation";
+import { briefingSlug } from "@/lib/briefing-data";
 import type { LandingInsights } from "@/lib/landing-data";
 import { Eyebrow, Lede, Section, Title } from "./primitives";
 import { Reveal } from "./Reveal";
@@ -51,8 +52,11 @@ export function InsightsPreview({
             <ol className="mt-4 divide-y divide-hairline border-y border-hairline">
               {briefings.map((b, i) => (
                 <li key={b.id}>
+                  {/* Route resolves date+group SLUGS (briefingSlug), not
+                      raw row UUIDs — linking the id 404s (operator hit
+                      this live 2026-07-06). */}
                   <Link
-                    href={`/briefings/${b.id}`}
+                    href={`/briefings/${briefingSlug(b.generatedAt, b.themeGroup)}`}
                     className="group flex items-baseline gap-5 py-4 transition"
                   >
                     <span className="font-display text-sm tabular-nums text-ink-faint">

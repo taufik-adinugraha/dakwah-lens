@@ -70,7 +70,7 @@ export async function BriefPagination({
         </div>
         <Link
           href="/briefings"
-          className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-900 hover:bg-slate-900 hover:text-white"
+          className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:border-ink hover:bg-slate-900 hover:text-white"
         >
           {t("brief_nav_view_all")}
           <ArrowUpRight className="h-3.5 w-3.5" />
@@ -91,7 +91,7 @@ export async function BriefPagination({
             <li>
               <div
                 aria-current="page"
-                className={`group relative flex h-full flex-col rounded-2xl border-2 border-slate-900 px-4 py-3.5 shadow-sm ${p.cardBg}`}
+                className={`group relative flex h-full flex-col rounded-2xl border-2 border-ink px-4 py-3.5 shadow-sm ${p.cardBg}`}
               >
                 <span
                   className={`inline-flex h-7 w-7 items-center justify-center rounded-full ${p.chipBg} ${p.chipText}`}
@@ -115,7 +115,7 @@ export async function BriefPagination({
             <li key={group}>
               <Link
                 href={`/briefings/${peer.slug}`}
-                className={`group relative flex h-full flex-col rounded-2xl border px-4 py-3.5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${p.cardBorder} ${p.cardBg} hover:border-slate-900`}
+                className={`group relative flex h-full flex-col rounded-2xl border px-4 py-3.5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${p.cardBorder} ${p.cardBg} hover:border-ink`}
               >
                 <span
                   className={`inline-flex h-7 w-7 items-center justify-center rounded-full ${p.chipBg} ${p.chipText}`}
@@ -143,7 +143,7 @@ export async function BriefPagination({
           {navigation.previous ? (
             <Link
               href={`/briefings/${navigation.previous.slug}`}
-              className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-900 hover:shadow-md"
+              className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm transition hover:-translate-y-0.5 hover:border-ink hover:shadow-md"
             >
               <span className="flex items-center gap-3">
                 <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition group-hover:bg-slate-900 group-hover:text-white">
@@ -166,7 +166,7 @@ export async function BriefPagination({
           {navigation.next ? (
             <Link
               href={`/briefings/${navigation.next.slug}`}
-              className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-900 hover:shadow-md sm:flex-row-reverse sm:text-right"
+              className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm transition hover:-translate-y-0.5 hover:border-ink hover:shadow-md sm:flex-row-reverse sm:text-right"
             >
               <span className="flex items-center gap-3 sm:flex-row-reverse">
                 <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition group-hover:bg-slate-900 group-hover:text-white">

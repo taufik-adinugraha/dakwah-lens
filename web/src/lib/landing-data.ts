@@ -27,17 +27,28 @@ export type LandingInsights = {
 
 export async function getLandingInsights(): Promise<LandingInsights> {
   const [briefingRows, themeRows] = await Promise.all([
-    // Latest briefing per theme_group, newest 4 groups. DISTINCT ON
-    // keeps one row per group; the outer sort surfaces the freshest.
+    // Latest briefing per theme_group, ranked by that group's 7d post
+    // volume (NOT recency — the weekly batch publishes low-volume
+    // groups last, so "newest 4" would surface exactly the least-busy
+    // themes; operator caught this on 2026-07-06). DISTINCT ON keeps
+    // one row per group; the volume join picks the 4 biggest.
     db.execute(sql`
-      SELECT id, theme_group, generated_at FROM (
+      SELECT latest.id, latest.theme_group, latest.generated_at
+      FROM (
         SELECT DISTINCT ON (theme_group)
           id, theme_group, generated_at
         FROM briefings
         WHERE theme_group IS NOT NULL AND occasion_slug IS NULL
         ORDER BY theme_group, generated_at DESC
       ) latest
-      ORDER BY generated_at DESC
+      LEFT JOIN (
+        SELECT theme_group, COUNT(*) AS vol
+        FROM social_posts
+        WHERE posted_at >= now() - interval '7 days'
+          AND theme_group IS NOT NULL
+        GROUP BY theme_group
+      ) v ON v.theme_group = latest.theme_group
+      ORDER BY COALESCE(v.vol, 0) DESC
       LIMIT 4
     `) as unknown as Promise<
       Array<{ id: string; theme_group: string; generated_at: string }>

@@ -49,93 +49,99 @@ const GROUP_THEME: Record<
   { tone: string; iconBg: string; iconText: string; Icon: typeof Scale }
 > = {
   "Hukum & Keadilan": {
-    tone: "border-hairline hover:border-forest/50",
-    iconBg: "bg-forest-tint",
-    iconText: "text-forest",
+    tone: "from-rose-50/80 to-white border-rose-200 hover:border-rose-500",
+    iconBg: "bg-rose-100",
+    iconText: "text-rose-700",
     Icon: Scale,
   },
   "Sosial & Keluarga": {
-    tone: "border-hairline hover:border-forest/50",
-    iconBg: "bg-forest-tint",
-    iconText: "text-forest",
+    tone: "from-pink-50/80 to-white border-pink-200 hover:border-pink-500",
+    iconBg: "bg-pink-100",
+    iconText: "text-pink-700",
     Icon: Users2,
   },
   "Ekonomi & Bisnis": {
-    tone: "border-hairline hover:border-forest/50",
-    iconBg: "bg-forest-tint",
-    iconText: "text-forest",
+    tone: "from-amber-50/80 to-white border-amber-200 hover:border-amber-500",
+    iconBg: "bg-amber-100",
+    iconText: "text-amber-700",
     Icon: Banknote,
   },
   "Aqidah & Ibadah": {
-    tone: "border-hairline hover:border-forest/50",
-    iconBg: "bg-forest-tint",
-    iconText: "text-forest",
+    tone:
+      "from-emerald-50/80 to-white border-emerald-200 hover:border-emerald-500",
+    iconBg: "bg-emerald-100",
+    iconText: "text-emerald-700",
     Icon: Landmark, // mosque-ish silhouette; lucide doesn't ship a mosque glyph
   },
   "Kesehatan & Kehidupan": {
-    tone: "border-hairline hover:border-forest/50",
-    iconBg: "bg-forest-tint",
-    iconText: "text-forest",
+    tone: "from-teal-50/80 to-white border-teal-200 hover:border-teal-500",
+    iconBg: "bg-teal-100",
+    iconText: "text-teal-700",
     Icon: HeartPulse,
   },
   "Pendidikan & SDM": {
-    tone: "border-hairline hover:border-forest/50",
-    iconBg: "bg-forest-tint",
-    iconText: "text-forest",
+    tone: "from-sky-50/80 to-white border-sky-200 hover:border-sky-500",
+    iconBg: "bg-sky-100",
+    iconText: "text-sky-700",
     Icon: GraduationCap,
   },
   "Lingkungan & Bencana": {
-    tone: "border-hairline hover:border-forest/50",
-    iconBg: "bg-forest-tint",
-    iconText: "text-forest",
+    tone: "from-lime-50/80 to-white border-lime-200 hover:border-lime-500",
+    iconBg: "bg-lime-100",
+    iconText: "text-lime-700",
     Icon: Leaf,
   },
   "Pemerintahan & Kebijakan": {
-    tone: "border-hairline hover:border-forest/50",
-    iconBg: "bg-forest-tint",
-    iconText: "text-forest",
+    tone:
+      "from-indigo-50/80 to-white border-indigo-200 hover:border-indigo-500",
+    iconBg: "bg-indigo-100",
+    iconText: "text-indigo-700",
     Icon: LandPlot,
   },
   "Patologi Sosial Digital": {
-    tone: "border-hairline hover:border-forest/50",
-    iconBg: "bg-forest-tint",
-    iconText: "text-forest",
+    tone:
+      "from-orange-50/80 to-white border-orange-200 hover:border-orange-500",
+    iconBg: "bg-orange-100",
+    iconText: "text-orange-700",
     Icon: Smartphone,
   },
   "Teknologi & AI": {
-    tone: "border-hairline hover:border-forest/50",
-    iconBg: "bg-forest-tint",
-    iconText: "text-forest",
+    tone:
+      "from-violet-50/80 to-white border-violet-200 hover:border-violet-500",
+    iconBg: "bg-violet-100",
+    iconText: "text-violet-700",
     Icon: Cpu,
   },
   "Pekerja & Pertanian Rakyat": {
-    tone: "border-hairline hover:border-forest/50",
-    iconBg: "bg-forest-tint",
-    iconText: "text-forest",
+    tone:
+      "from-yellow-50/80 to-white border-yellow-200 hover:border-yellow-500",
+    iconBg: "bg-yellow-100",
+    iconText: "text-yellow-700",
     Icon: Wheat,
   },
   "Konflik & Geopolitik": {
-    tone: "border-hairline hover:border-forest/50",
-    iconBg: "bg-forest-tint",
-    iconText: "text-forest",
+    tone: "from-red-50/80 to-white border-red-200 hover:border-red-500",
+    iconBg: "bg-red-100",
+    iconText: "text-red-700",
     Icon: Globe2,
   },
   "Inspirasi & Kisah Pribadi": {
-    tone: "border-hairline hover:border-forest/50",
-    iconBg: "bg-forest-tint",
-    iconText: "text-forest",
+    tone:
+      "from-fuchsia-50/80 to-white border-fuchsia-200 hover:border-fuchsia-500",
+    iconBg: "bg-fuchsia-100",
+    iconText: "text-fuchsia-700",
     Icon: Heart,
   },
   "Toleransi & Lintas-Iman": {
-    tone: "border-hairline hover:border-forest/50",
-    iconBg: "bg-forest-tint",
-    iconText: "text-forest",
+    tone: "from-cyan-50/80 to-white border-cyan-200 hover:border-cyan-500",
+    iconBg: "bg-cyan-100",
+    iconText: "text-cyan-700",
     Icon: HandHeart,
   },
   Lainnya: {
-    tone: "border-hairline hover:border-forest/50",
-    iconBg: "bg-forest-tint",
-    iconText: "text-forest",
+    tone: "from-slate-50/80 to-white border-slate-200 hover:border-slate-500",
+    iconBg: "bg-slate-100",
+    iconText: "text-slate-600",
     Icon: Boxes,
   },
 };
@@ -259,15 +265,15 @@ export async function BriefingsGrid({
               <li key={`__occasion-${occasion.occasionSlug ?? "latest"}`}>
                 <Link
                   href={occasionHref}
-                  className="group relative flex h-full flex-col rounded-xl border bg-white p-3 transition hover:-translate-y-0.5 hover:shadow-sm border-hairline hover:border-forest/50"
+                  className="group relative flex h-full flex-col rounded-xl border bg-gradient-to-br p-3 transition hover:-translate-y-0.5 hover:shadow-sm from-yellow-50/90 to-white border-yellow-300 hover:border-yellow-500"
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-forest-tint text-forest">
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-yellow-100 text-yellow-700">
                       <CalendarHeart className="h-4 w-4" />
                     </span>
                     <div className="flex flex-wrap items-center justify-end gap-1">
                       <span
-                        className="inline-flex items-center gap-0.5 rounded-full bg-forest-tint px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-forest"
+                        className="inline-flex items-center gap-0.5 rounded-full bg-yellow-100 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-yellow-800"
                         title="Acara kalender Hijriah"
                       >
                         Acara
@@ -293,7 +299,7 @@ export async function BriefingsGrid({
                       {gregorianDate}
                     </div>
                   )}
-                  <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-forest transition group-hover:gap-1.5">
+                  <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-yellow-800 transition group-hover:gap-1.5">
                     Baca briefing acara
                     <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
                   </div>
@@ -333,7 +339,7 @@ export async function BriefingsGrid({
               <li key={group}>
                 <Link
                   href={href}
-                  className={`group relative flex h-full flex-col rounded-xl border bg-white p-3 transition hover:-translate-y-0.5 hover:shadow-sm ${theme.tone}`}
+                  className={`group relative flex h-full flex-col rounded-xl border bg-gradient-to-br p-3 transition hover:-translate-y-0.5 hover:shadow-sm ${theme.tone}`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <span
