@@ -5,7 +5,8 @@ import { auth } from "@/auth";
 import { db, schema } from "@/db";
 import { Link } from "@/i18n/navigation";
 import { getUsdToIdr } from "@/lib/settings";
-import { addManualCost, deleteManualCost, updateManualCost } from "../actions";
+import { deleteManualCost } from "../actions";
+import { ManualCostForm } from "./ManualCostForm";
 import {
   Card,
   EmptyState,
@@ -271,163 +272,33 @@ export default async function CostsPage({
         title={editRow ? `Edit cost entry — ${editRow.vendor}` : "Add a manual cost entry"}
         hint={
           editRow
-            ? "Editing an existing row. Attachment isn't editable here — delete and re-add if the invoice file needs changing."
+            ? "Editing an existing row. Upload a new invoice file to replace the current one; leave it empty to keep the existing file."
             : undefined
         }
       >
-        <form
-          // `key` forces React to remount the form (and re-apply every
-          // `defaultValue`) when switching between add mode and edit
-          // mode, or between editing one row and editing another.
-          // Without this, the `<select name="kind">` keeps whatever
-          // option it last rendered with — which is why the kind
-          // appeared to "flip to Infra" when clicking pencil on a row
-          // with a different kind. `defaultValue` is uncontrolled and
-          // only honored on the FIRST mount of an element; subsequent
-          // navigations to ?edit=<id> would reuse the same DOM node.
+        {/* `key` remounts the client form when switching between add
+            mode and editing different rows, so `useActionState` resets
+            and every `defaultValue` re-applies (uncontrolled inputs
+            only honor defaultValue on first mount). */}
+        <ManualCostForm
           key={editRow?.id ?? "add"}
-          id="manual-cost-form"
-          action={editRow ? updateManualCost : addManualCost}
-          className="space-y-4"
-          encType="multipart/form-data"
-        >
-          {editRow && (
-            <input type="hidden" name="id" value={editRow.id} />
-          )}
-          {/* Row 1 — what */}
-          <div className="grid gap-3 sm:grid-cols-[200px_1fr_1fr]">
-            <FormField label="Kind">
-              <select
-                name="kind"
-                required
-                defaultValue={editRow?.kind ?? "infra"}
-                className="h-9 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm"
-              >
-                <option value="infra">Infra (monthly VPS)</option>
-                <option value="infra_topup">Infra (Top Up)</option>
-                <option value="domain">Domain (yearly)</option>
-                <option value="api_topup">API (Top Up)</option>
-                <option value="api_usage">API Usage</option>
-                <option value="other">Other</option>
-              </select>
-            </FormField>
-            <FormField label="Vendor">
-              <input
-                name="vendor"
-                placeholder="IDCloudHost, Niagahoster…"
-                required
-                maxLength={64}
-                defaultValue={editRow?.vendor ?? ""}
-                className="h-9 w-full rounded-lg border border-slate-200 px-3 text-sm placeholder:text-slate-400"
-              />
-            </FormField>
-            <FormField label="Amount (IDR)">
-              <input
-                name="amount_idr"
-                type="number"
-                min="0"
-                step="1"
-                placeholder="e.g. 150000"
-                required
-                defaultValue={editRow ? Math.round(editRow.amountIdr) : ""}
-                className="h-9 w-full rounded-lg border border-slate-200 px-3 text-sm placeholder:text-slate-400"
-              />
-            </FormField>
-          </div>
-
-          {/* Row 2 — when */}
-          <div className="grid gap-3 sm:grid-cols-2">
-            <FormField label="Period start">
-              <input
-                name="period_start"
-                type="date"
-                required
-                defaultValue={
-                  editRow ? toDateInput(editRow.periodStart) : ""
+          editRow={
+            editRow
+              ? {
+                  id: editRow.id,
+                  kind: editRow.kind,
+                  vendor: editRow.vendor,
+                  amountIdr: editRow.amountIdr,
+                  periodStart: toDateInput(editRow.periodStart),
+                  periodEnd: toDateInput(editRow.periodEnd),
+                  note: editRow.note,
+                  coversProvider: editRow.coversProvider,
+                  attachmentPath: editRow.attachmentPath,
+                  attachmentFilename: editRow.attachmentFilename,
                 }
-                className="h-9 w-full rounded-lg border border-slate-200 px-3 text-sm"
-              />
-            </FormField>
-            <FormField label="Period end">
-              <input
-                name="period_end"
-                type="date"
-                required
-                defaultValue={
-                  editRow ? toDateInput(editRow.periodEnd) : ""
-                }
-                className="h-9 w-full rounded-lg border border-slate-200 px-3 text-sm"
-              />
-            </FormField>
-          </div>
-
-          {/* Note — full width */}
-          <FormField label="Note" hint="Optional · invoice number, plan tier, etc.">
-            <input
-              name="note"
-              placeholder="Invoice #INV-2026-0042"
-              maxLength={2000}
-              defaultValue={editRow?.note ?? ""}
-              className="h-9 w-full rounded-lg border border-slate-200 px-3 text-sm placeholder:text-slate-400"
-            />
-          </FormField>
-
-          {/* Subscription mapping — when this entry covers an API
-              provider on a flat-rate plan, pick it here so the cost
-              totals don't double-count the per-call usage. */}
-          <FormField
-            label="Covers API provider"
-            hint="Optional · only when this is a flat-rate subscription (e.g. Apify Starter $29/mo). Per-call usage for the selected provider will be excluded from the monthly API-cost sum to avoid double-counting."
-          >
-            <select
-              name="covers_provider"
-              defaultValue={editRow?.coversProvider ?? ""}
-              className="h-9 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm"
-            >
-              <option value="">— (none, pure infra / domain)</option>
-              {KNOWN_PROVIDERS.map((p) => (
-                <option key={p} value={p}>
-                  {providerLabel(p)}
-                </option>
-              ))}
-            </select>
-          </FormField>
-
-          {/* Optional invoice attachment — only on ADD; editing an
-              attachment requires delete + re-add (rare enough). */}
-          {!editRow && (
-            <FormField
-              label="Invoice file"
-              hint="Optional · PDF / JPG / PNG / WebP · max 5 MB"
-            >
-              <input
-                name="attachment"
-                type="file"
-                accept="application/pdf,image/jpeg,image/png,image/webp"
-                className="block w-full text-sm text-slate-700 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-slate-700 hover:file:bg-slate-200"
-              />
-            </FormField>
-          )}
-
-          {/* Submit — right-aligned. In edit mode we also surface a
-              Cancel link so the operator can back out without saving. */}
-          <div className="flex items-center justify-end gap-3 pt-1">
-            {editRow && (
-              <Link
-                href="/admin/system/costs"
-                className="text-sm font-medium text-slate-500 hover:text-slate-700"
-              >
-                Cancel
-              </Link>
-            )}
-            <button
-              type="submit"
-              className="inline-flex h-9 items-center justify-center rounded-lg bg-slate-900 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
-            >
-              {editRow ? "Save changes" : "Save entry"}
-            </button>
-          </div>
-        </form>
+              : null
+          }
+        />
       </Card>
       )}
 
@@ -712,29 +583,5 @@ function toDateInput(d: Date | string): string {
 function kindLabel(kind: string): string {
   return (
     KIND_LABELS[kind] ?? kind.charAt(0).toUpperCase() + kind.slice(1).replace(/_/g, " ")
-  );
-}
-
-function FormField({
-  label,
-  hint,
-  children,
-}: {
-  label: string;
-  hint?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <label className="block">
-      <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-600">
-        {label}
-        {hint && (
-          <span className="ml-2 text-[10px] font-normal normal-case tracking-normal text-slate-400">
-            {hint}
-          </span>
-        )}
-      </span>
-      <div className="mt-1">{children}</div>
-    </label>
   );
 }

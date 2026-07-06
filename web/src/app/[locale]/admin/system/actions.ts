@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { and, eq, inArray, ne } from "drizzle-orm";
+import { and, eq, gte, inArray, lte, ne } from "drizzle-orm";
 
 import { db, schema } from "@/db";
 import { logAdminAction } from "@/lib/admin-log";
@@ -12,7 +12,7 @@ import {
   writeAttachment,
   type AttachmentKind,
 } from "@/lib/attachments";
-import { KNOWN_PROVIDERS } from "@/lib/cost-providers";
+import { KNOWN_PROVIDERS, providerLabel } from "@/lib/cost-providers";
 import {
   getUsdToIdr,
   setPipelineEnabled,
@@ -728,7 +728,91 @@ export async function verifyAllYoutubeChannels(): Promise<VerifyAllYoutubeChanne
  * Manual cost CRUD (VPS, domain, etc.)
  * ──────────────────────────────────────────────────────────── */
 
-export async function addManualCost(formData: FormData) {
+/** Result state for the add/edit form's `useActionState`. `null` is
+ *  the idle state; `{ error, duplicate }` surfaces a validation or
+ *  soft-duplicate warning without writing. Success paths redirect
+ *  (they never return a state). */
+export type ManualCostFormState = {
+  error?: string;
+  duplicate?: boolean;
+} | null;
+
+/**
+ * Soft duplicate / double-input guard. Returns a human-readable
+ * warning string when the proposed entry looks like an accidental
+ * re-input, else null. Two independent checks:
+ *
+ *  1. EXACT double-entry — same vendor + amount + IDENTICAL period.
+ *     An identical amount in a DIFFERENT period is legitimate (a
+ *     monthly subscription bills the same fee every month), so the
+ *     period equality is the real duplicate signal — not the amount.
+ *  2. SUBSCRIPTION overlap — another row already "covers" the same
+ *     metered provider for an overlapping period. Two overlapping
+ *     covers-rows double-book the usage-dedup logic and understate
+ *     API cost, so this is the higher-value catch.
+ *
+ * `excludeId` skips the row being edited so re-saving it unchanged
+ * doesn't flag itself.
+ */
+async function findManualCostConflict(opts: {
+  vendor: string;
+  amount: number;
+  start: Date;
+  end: Date;
+  coversProvider: string | null;
+  excludeId?: string;
+}): Promise<string | null> {
+  const { vendor, amount, start, end, coversProvider, excludeId } = opts;
+
+  const [exact] = await db
+    .select({ id: schema.manualCosts.id })
+    .from(schema.manualCosts)
+    .where(
+      and(
+        eq(schema.manualCosts.vendor, vendor),
+        eq(schema.manualCosts.amountIdr, amount),
+        eq(schema.manualCosts.periodStart, start),
+        eq(schema.manualCosts.periodEnd, end),
+        excludeId ? ne(schema.manualCosts.id, excludeId) : undefined,
+      ),
+    )
+    .limit(1);
+  if (exact) {
+    return `An identical entry already exists — ${vendor} · Rp ${amount.toLocaleString(
+      "id-ID",
+    )} · for this exact period. Tick "Save anyway" only if this is a separate, legitimate charge.`;
+  }
+
+  if (coversProvider) {
+    const [overlap] = await db
+      .select({
+        id: schema.manualCosts.id,
+        vendor: schema.manualCosts.vendor,
+      })
+      .from(schema.manualCosts)
+      .where(
+        and(
+          eq(schema.manualCosts.coversProvider, coversProvider),
+          lte(schema.manualCosts.periodStart, end),
+          gte(schema.manualCosts.periodEnd, start),
+          excludeId ? ne(schema.manualCosts.id, excludeId) : undefined,
+        ),
+      )
+      .limit(1);
+    if (overlap) {
+      return `Another subscription (${overlap.vendor}) already covers ${providerLabel(
+        coversProvider,
+      )} for an overlapping period. Two overlapping "covers" rows double-count the usage de-dup. Tick "Save anyway" only if you're sure.`;
+    }
+  }
+
+  return null;
+}
+
+export async function addManualCost(
+  _prevState: ManualCostFormState,
+  formData: FormData,
+): Promise<ManualCostFormState> {
   const session = await requireSuperadmin();
   const kind = String(formData.get("kind") ?? "").trim().slice(0, 32);
   const vendor = String(formData.get("vendor") ?? "").trim().slice(0, 64);
@@ -737,7 +821,9 @@ export async function addManualCost(formData: FormData) {
   const end = String(formData.get("period_end") ?? "");
   const rawNote = (formData.get("note") ?? "").toString().trim();
   const note = rawNote ? rawNote.slice(0, 2000) : null;
-  if (!kind || !vendor || !amount || !start || !end) return;
+  if (!kind || !vendor || !amount || !start || !end) {
+    return { error: "Fill in kind, vendor, amount, and both period dates." };
+  }
 
   // Validate covers_provider against the KNOWN_PROVIDERS allow-list.
   // Empty string / "none" → null (pure infra cost, no usage offset).
@@ -750,6 +836,23 @@ export async function addManualCost(formData: FormData) {
     ? rawCoversProvider
     : null;
 
+  const periodStart = new Date(start);
+  const periodEnd = new Date(end);
+
+  // Soft duplicate guard — skipped when the operator ticked the
+  // "Save anyway" confirm checkbox on the re-submit.
+  const confirmDuplicate = formData.get("confirm_duplicate") === "1";
+  if (!confirmDuplicate) {
+    const conflict = await findManualCostConflict({
+      vendor,
+      amount,
+      start: periodStart,
+      end: periodEnd,
+      coversProvider,
+    });
+    if (conflict) return { error: conflict, duplicate: true };
+  }
+
   // Optional invoice attachment. Persist to disk first so the DB row
   // doesn't reference a missing file if the upload fails mid-way.
   const attachment = await consumeAttachment(formData, "manual-cost");
@@ -760,8 +863,8 @@ export async function addManualCost(formData: FormData) {
       kind,
       vendor,
       amountIdr: amount,
-      periodStart: new Date(start),
-      periodEnd: new Date(end),
+      periodStart,
+      periodEnd,
       note,
       coversProvider,
       attachmentPath: attachment?.path,
@@ -788,22 +891,29 @@ export async function addManualCost(formData: FormData) {
   await setFlash("success", `Saved · ${vendor} Rp ${amount.toLocaleString("id-ID")}`);
   revalidatePath("/admin/system/costs");
   revalidatePath("/admin/system");
+  // Redirect resets the client form (fresh mount) and surfaces the
+  // flash. `useActionState` treats the thrown NEXT_REDIRECT as a
+  // navigation, so no state is returned on the success path.
+  redirect("/admin/system/costs");
 }
 
 /**
  * Edit an existing manual_costs row in place. Fields that mirror the
  * add form: kind, vendor, amount_idr, period_start/end, note,
- * covers_provider. Attachment isn't edited here — invoice mistakes are
- * rare enough that re-upload-by-delete-and-re-add is fine; keeping the
- * edit path attachment-free avoids extra disk lifecycle work.
+ * covers_provider. Attachment IS editable here: uploading a new file
+ * replaces the current one (the superseded file is deleted from disk),
+ * while an empty file input leaves the existing attachment untouched.
  *
  * Re-uses the same KNOWN_PROVIDERS allow-list + length caps as
  * addManualCost so the two paths can't drift.
  */
-export async function updateManualCost(formData: FormData) {
+export async function updateManualCost(
+  _prevState: ManualCostFormState,
+  formData: FormData,
+): Promise<ManualCostFormState> {
   const session = await requireSuperadmin();
   const id = String(formData.get("id") ?? "");
-  if (!id) return;
+  if (!id) return { error: "Missing entry id." };
 
   const kind = String(formData.get("kind") ?? "").trim().slice(0, 32);
   const vendor = String(formData.get("vendor") ?? "").trim().slice(0, 64);
@@ -812,7 +922,9 @@ export async function updateManualCost(formData: FormData) {
   const end = String(formData.get("period_end") ?? "");
   const rawNote = (formData.get("note") ?? "").toString().trim();
   const note = rawNote ? rawNote.slice(0, 2000) : null;
-  if (!kind || !vendor || !amount || !start || !end) return;
+  if (!kind || !vendor || !amount || !start || !end) {
+    return { error: "Fill in kind, vendor, amount, and both period dates." };
+  }
 
   const rawCoversProvider = (
     formData.get("covers_provider") ?? ""
@@ -822,6 +934,9 @@ export async function updateManualCost(formData: FormData) {
   )
     ? rawCoversProvider
     : null;
+
+  const periodStart = new Date(start);
+  const periodEnd = new Date(end);
 
   // Capture the prior row so the audit payload includes the diff,
   // not just the new state. Manual costs touch real money; an audit
@@ -835,11 +950,35 @@ export async function updateManualCost(formData: FormData) {
       periodEnd: schema.manualCosts.periodEnd,
       note: schema.manualCosts.note,
       coversProvider: schema.manualCosts.coversProvider,
+      attachmentPath: schema.manualCosts.attachmentPath,
     })
     .from(schema.manualCosts)
     .where(eq(schema.manualCosts.id, id))
     .limit(1);
-  if (!before) return;
+  if (!before) return { error: "Entry not found — it may have been deleted." };
+
+  // Soft duplicate guard (excludes this row so an unchanged re-save
+  // doesn't flag itself). Skipped when the operator ticked "Save
+  // anyway". Checked before touching the attachment so a blocked
+  // duplicate never writes an orphan file to disk.
+  const confirmDuplicate = formData.get("confirm_duplicate") === "1";
+  if (!confirmDuplicate) {
+    const conflict = await findManualCostConflict({
+      vendor,
+      amount,
+      start: periodStart,
+      end: periodEnd,
+      coversProvider,
+      excludeId: id,
+    });
+    if (conflict) return { error: conflict, duplicate: true };
+  }
+
+  // Optional replacement invoice. Persist the new file BEFORE the DB
+  // update so a failed upload never leaves the row pointing at a
+  // missing file. Null → operator left the field empty → keep the
+  // existing attachment (don't touch the attachment columns).
+  const attachment = await consumeAttachment(formData, "manual-cost");
 
   await db
     .update(schema.manualCosts)
@@ -847,13 +986,28 @@ export async function updateManualCost(formData: FormData) {
       kind,
       vendor,
       amountIdr: amount,
-      periodStart: new Date(start),
-      periodEnd: new Date(end),
+      periodStart,
+      periodEnd,
       note,
       coversProvider,
       updatedAt: new Date(),
+      ...(attachment
+        ? {
+            attachmentPath: attachment.path,
+            attachmentFilename: attachment.filename,
+            attachmentSizeBytes: attachment.sizeBytes,
+            attachmentMimeType: attachment.mimeType,
+          }
+        : {}),
     })
     .where(eq(schema.manualCosts.id, id));
+
+  // The DB row now points at the new file (if any) — safe to unlink
+  // the superseded one from disk. Done after the update so a crash
+  // can't orphan the row from its only attachment.
+  if (attachment && before.attachmentPath) {
+    await deleteAttachment(before.attachmentPath);
+  }
 
   await logAdminAction({
     actorId: session.user.id,
@@ -875,12 +1029,16 @@ export async function updateManualCost(formData: FormData) {
         covers_provider: coversProvider,
         note,
       },
+      attachment_replaced: Boolean(attachment),
     },
   });
   await setFlash("success", `Updated · ${vendor} Rp ${amount.toLocaleString("id-ID")}`);
   revalidatePath("/admin/system/costs");
   revalidatePath("/admin/system/api-costs");
   revalidatePath("/admin/system");
+  // Redirect drops `?edit=<id>` (back to add mode) + surfaces the
+  // flash; `useActionState` treats NEXT_REDIRECT as a navigation.
+  redirect("/admin/system/costs");
 }
 
 

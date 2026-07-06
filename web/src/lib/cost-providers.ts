@@ -8,6 +8,7 @@
  */
 export const KNOWN_PROVIDERS = [
   "apify",
+  "elevenlabs",
   "openai",
   "anthropic",
   "gemini",
@@ -27,7 +28,8 @@ export function isKnownProvider(value: string): value is KnownProvider {
  *  provider for a manual-cost entry — so the dropdown is unambiguous
  *  about what monthly fee they're recording. */
 const PROVIDER_LABELS: Record<KnownProvider, string> = {
-  apify: "Apify Starter ($29/mo)",
+  apify: "Apify Starter ($15/mo)",
+  elevenlabs: "ElevenLabs (pay-as-you-go)",
   openai: "OpenAI (pay-as-you-go)",
   anthropic: "Anthropic / Claude (pay-as-you-go)",
   gemini: "Gemini (pay-as-you-go)",

@@ -562,7 +562,7 @@ export const manualCosts = pgTable(
     amountIdr: doublePrecision("amount_idr").notNull(),
     note: text("note"),
     // When this manual cost is a flat-rate subscription that covers a
-    // metered provider (e.g. Apify Starter $29/mo), set this to the
+    // metered provider (e.g. Apify Starter $15/mo), set this to the
     // provider name so the cost totals on /admin/system + costs page
     // exclude that provider's usage_events for the period — avoids
     // double-counting subscription + per-call usage. Null when the

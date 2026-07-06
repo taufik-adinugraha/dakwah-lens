@@ -64,7 +64,7 @@ export default async function ScrapersPage() {
             <KeyRow
               name="APIFY_TOKEN"
               configured={status.apifyToken}
-              src="console.apify.com → Settings → Integrations → Personal API tokens. We run on Starter ($29/mo, $29 platform credit included — overages bill on top). Free tier ($5 credit) is enough only for a one-off dev run."
+              src="console.apify.com → Settings → Integrations → Personal API tokens. We run on Starter ($15/mo, $15 platform credit included — overages bill on top). Free tier ($5 credit) is enough only for a one-off dev run."
             />
             <KeyRow
               name="YOUTUBE_API_KEY"

@@ -1177,7 +1177,7 @@ function MonthlyCost({ t }: { t: T }) {
       note: "≈ Rp 300K/bulan · 2 vCPU · 4 GB RAM · 30 GB disk",
     },
     // ── Apify scrapers ── per-row projections at documented Starter
-    // rates. Combined target ≤ $29/mo (Apify Starter included credit).
+    // rates. Combined target ≤ $15/mo (Apify Starter included credit).
     {
       provider: "Apify · X (apidojo, incl. late-bill)",
       use: t("cost_x_use"),
