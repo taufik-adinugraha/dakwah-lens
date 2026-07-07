@@ -17,6 +17,7 @@ import { DigestOptInPrompt } from "@/components/DigestOptInPrompt";
 import {
   getAllLatestBriefings,
   getGroupVolumes7d,
+  getLatestFiqhBriefing,
   getLatestOccasionBriefing,
 } from "@/lib/briefing-data";
 import { WatchedRoomsNudge } from "./WatchedRoomsNudge";
@@ -57,10 +58,11 @@ export default async function InsightsPage({
   // why they got bounced (was previously silent, see audit 2026-05-26).
   const showBriefsAdminNotice = sp.notice === "briefs-admin-only";
 
-  const [briefings, volumes, occasion, session] = await Promise.all([
+  const [briefings, volumes, occasion, fiqh, session] = await Promise.all([
     getAllLatestBriefings(),
     getGroupVolumes7d(),
     getLatestOccasionBriefing(),
+    getLatestFiqhBriefing(),
     auth(),
   ]);
 
@@ -122,6 +124,7 @@ export default async function InsightsPage({
            query (getLatestOccasionBriefing) + `occasion` var are kept so
            un-hiding is a one-line swap back to `occasion={occasion}`. */
         occasion={null}
+        fiqh={fiqh}
         locale={locale}
       />
 

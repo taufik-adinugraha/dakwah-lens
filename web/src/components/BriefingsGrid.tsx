@@ -3,6 +3,7 @@ import {
   ArrowRight,
   Banknote,
   Boxes,
+  BookOpenCheck,
   CalendarHeart,
   Clock,
   Cpu,
@@ -177,17 +178,22 @@ export async function BriefingsGrid({
   briefings,
   volumes,
   occasion,
+  fiqh,
   locale,
 }: {
   briefings: Map<string, LatestBriefing>;
   volumes: Map<string, GroupVolume>;
   /** Latest 15th-track Islamic-calendar occasion briefing
    *  (theme_group = 'Acara Kalender Islam'). When non-null, rendered
-   *  as a FEATURED first card with the yellow gold-tone palette,
-   *  visually distinct from the 14 weekly theme cards below. NULL
-   *  when no occasion briefing has been saved yet — grid falls back
-   *  to the standard 14-card layout. */
+   *  in the "Edisi Khusus" row above the 14-theme grid with the
+   *  yellow gold-tone palette. NULL when no (fresh) occasion briefing
+   *  exists — the card simply doesn't render. */
   occasion: LatestBriefing | null;
+  /** Latest 16th-track fiqh briefing (theme_group = 'Fiqh Pekan Ini'
+   *  — top-4 fiqh issues of the week as 4 articles). Rendered next to
+   *  the occasion card in the "Edisi Khusus" row, emerald-toned. NULL
+   *  until the first edition is saved. */
+  fiqh: LatestBriefing | null;
   locale: string;
 }) {
   const t = await getTranslations("Briefing");
@@ -228,85 +234,162 @@ export async function BriefingsGrid({
           {t("hub_top_n_note")}
         </p>
 
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {occasion && (() => {
-            // 15th-track Islamic-calendar occasion card — featured first.
-            // Yellow / amber gold tone signals "event-driven, not weekly
-            // news theme". The headline pulled from headlineStats
-            // (manual save writes occasion_name there); falls back to
-            // theme_group label.
-            const stats = occasion.headlineStats as Record<string, unknown>;
-            const occasionName =
-              (typeof stats.occasion_name === "string"
-                ? stats.occasion_name
-                : null) ||
-              occasion.themeGroup ||
-              "Acara Kalender Islam";
-            const hijriDate =
-              typeof stats.hijri_date === "string"
-                ? stats.hijri_date
-                : null;
-            const gregorianDate =
-              typeof stats.gregorian_date === "string"
-                ? stats.gregorian_date
-                : null;
-            const occasionHref = `/briefings/${briefingSlug(
-              occasion.generatedAt,
-              occasion.themeGroup,
-              occasion.occasionSlug,
-            )}`;
-            const ageDays = Math.max(
-              0,
-              Math.floor(
-                (nowMs - occasion.generatedAt.getTime()) / 86_400_000,
-              ),
-            );
-            return (
-              <li key={`__occasion-${occasion.occasionSlug ?? "latest"}`}>
-                <Link
-                  href={occasionHref}
-                  className="group relative flex h-full flex-col rounded-xl border bg-gradient-to-br p-3 transition hover:-translate-y-0.5 hover:shadow-sm from-yellow-50/90 to-white border-yellow-300 hover:border-yellow-500"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-yellow-100 text-yellow-700">
-                      <CalendarHeart className="h-4 w-4" />
-                    </span>
-                    <div className="flex flex-wrap items-center justify-end gap-1">
-                      <span
-                        className="inline-flex items-center gap-0.5 rounded-full bg-yellow-100 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-yellow-800"
-                        title="Acara kalender Hijriah"
-                      >
-                        Acara
-                      </span>
-                      <span
-                        className="inline-flex items-center gap-0.5 rounded-full bg-paper-deep px-1.5 py-0.5 text-[9px] font-semibold tabular-nums text-ink-muted"
-                        title={t("hub_card_age_tooltip", { n: ageDays })}
-                      >
-                        <Clock className="h-2.5 w-2.5" />
-                        {ageDays}d
-                      </span>
-                    </div>
-                  </div>
-                  <h3 className="mt-3 line-clamp-2 text-sm font-bold leading-snug text-ink">
-                    {occasionName}
-                  </h3>
-                  {(hijriDate || gregorianDate) && (
-                    <div className="mt-2 line-clamp-2 text-[11px] leading-snug text-ink-muted">
-                      {hijriDate}
-                      {hijriDate && gregorianDate && (
-                        <span className="text-ink-faint"> · </span>
+        {/* ── Edisi Khusus — the two non-weekly tracks (Acara Kalender
+            Islam + Fiqh Pekan Ini), lightly separated from the 14 news
+            themes below. The whole row disappears when neither card
+            exists, so the 14-grid layout is untouched in that state. */}
+        {(occasion || fiqh) && (
+          <div className="mb-8">
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-faint">
+              Edisi Khusus
+            </p>
+            <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {occasion && (() => {
+                // 15th-track Islamic-calendar occasion card. Yellow /
+                // gold tone signals "event-driven, not weekly news
+                // theme". Headline pulled from headlineStats (manual
+                // save writes occasion_name there); falls back to
+                // theme_group label.
+                const stats = occasion.headlineStats as Record<string, unknown>;
+                const occasionName =
+                  (typeof stats.occasion_name === "string"
+                    ? stats.occasion_name
+                    : null) ||
+                  occasion.themeGroup ||
+                  "Acara Kalender Islam";
+                const hijriDate =
+                  typeof stats.hijri_date === "string"
+                    ? stats.hijri_date
+                    : null;
+                const gregorianDate =
+                  typeof stats.gregorian_date === "string"
+                    ? stats.gregorian_date
+                    : null;
+                const occasionHref = `/briefings/${briefingSlug(
+                  occasion.generatedAt,
+                  occasion.themeGroup,
+                  occasion.occasionSlug,
+                )}`;
+                const ageDays = Math.max(
+                  0,
+                  Math.floor(
+                    (nowMs - occasion.generatedAt.getTime()) / 86_400_000,
+                  ),
+                );
+                return (
+                  <li key={`__occasion-${occasion.occasionSlug ?? "latest"}`}>
+                    <Link
+                      href={occasionHref}
+                      className="group relative flex h-full flex-col rounded-xl border bg-gradient-to-br p-4 transition hover:-translate-y-0.5 hover:shadow-sm from-yellow-50/90 to-white border-yellow-300 hover:border-yellow-500"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-yellow-100 text-yellow-700">
+                          <CalendarHeart className="h-4 w-4" />
+                        </span>
+                        <div className="flex flex-wrap items-center justify-end gap-1">
+                          <span
+                            className="inline-flex items-center gap-0.5 rounded-full bg-yellow-100 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-yellow-800"
+                            title="Acara kalender Hijriah"
+                          >
+                            Acara
+                          </span>
+                          <span
+                            className="inline-flex items-center gap-0.5 rounded-full bg-paper-deep px-1.5 py-0.5 text-[9px] font-semibold tabular-nums text-ink-muted"
+                            title={t("hub_card_age_tooltip", { n: ageDays })}
+                          >
+                            <Clock className="h-2.5 w-2.5" />
+                            {ageDays}d
+                          </span>
+                        </div>
+                      </div>
+                      <h3 className="mt-3 line-clamp-2 text-sm font-bold leading-snug text-ink">
+                        {occasionName}
+                      </h3>
+                      {(hijriDate || gregorianDate) && (
+                        <div className="mt-2 line-clamp-2 text-[11px] leading-snug text-ink-muted">
+                          {hijriDate}
+                          {hijriDate && gregorianDate && (
+                            <span className="text-ink-faint"> · </span>
+                          )}
+                          {gregorianDate}
+                        </div>
                       )}
-                      {gregorianDate}
-                    </div>
-                  )}
-                  <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-yellow-800 transition group-hover:gap-1.5">
-                    Baca briefing acara
-                    <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
-                  </div>
-                </Link>
-              </li>
-            );
-          })()}
+                      <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-yellow-800 transition group-hover:gap-1.5">
+                        Baca briefing acara
+                        <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })()}
+              {fiqh && (() => {
+                // 16th-track fiqh card — emerald tone (scholarly green,
+                // distinct from the occasion yellow). Subtitle lists the
+                // week's 4 issues from headlineStats.fiqh_issues (the
+                // manual save writes the issue titles there).
+                const stats = fiqh.headlineStats as Record<string, unknown>;
+                const issues = Array.isArray(stats.fiqh_issues)
+                  ? (stats.fiqh_issues as unknown[]).filter(
+                      (x): x is string => typeof x === "string",
+                    )
+                  : [];
+                const fiqhHref = `/briefings/${briefingSlug(
+                  fiqh.generatedAt,
+                  fiqh.themeGroup,
+                )}`;
+                const ageDays = Math.max(
+                  0,
+                  Math.floor(
+                    (nowMs - fiqh.generatedAt.getTime()) / 86_400_000,
+                  ),
+                );
+                return (
+                  <li key="__fiqh-latest">
+                    <Link
+                      href={fiqhHref}
+                      className="group relative flex h-full flex-col rounded-xl border bg-gradient-to-br p-4 transition hover:-translate-y-0.5 hover:shadow-sm from-emerald-50/90 to-white border-emerald-300 hover:border-emerald-500"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+                          <BookOpenCheck className="h-4 w-4" />
+                        </span>
+                        <div className="flex flex-wrap items-center justify-end gap-1">
+                          <span
+                            className="inline-flex items-center gap-0.5 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-emerald-800"
+                            title="4 isu fiqh terhangat pekan ini"
+                          >
+                            Fiqh
+                          </span>
+                          <span
+                            className="inline-flex items-center gap-0.5 rounded-full bg-paper-deep px-1.5 py-0.5 text-[9px] font-semibold tabular-nums text-ink-muted"
+                            title={t("hub_card_age_tooltip", { n: ageDays })}
+                          >
+                            <Clock className="h-2.5 w-2.5" />
+                            {ageDays}d
+                          </span>
+                        </div>
+                      </div>
+                      <h3 className="mt-3 line-clamp-2 text-sm font-bold leading-snug text-ink">
+                        Fiqh Pekan Ini
+                      </h3>
+                      {issues.length > 0 && (
+                        <div className="mt-2 line-clamp-2 text-[11px] leading-snug text-ink-muted">
+                          {issues.join(" · ")}
+                        </div>
+                      )}
+                      <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 transition group-hover:gap-1.5">
+                        Baca 4 artikel fiqh
+                        <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })()}
+            </ul>
+          </div>
+        )}
+
+        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {sortedGroups.map((group) => {
             const brief = briefings.get(group);
             const vol = volumes.get(group);

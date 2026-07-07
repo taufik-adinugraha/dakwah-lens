@@ -1842,6 +1842,433 @@ async def cmd_list_occasions(lookahead_days: int = 14) -> None:
 # ──────────────────────────────────────────────────────────────────
 
 
+
+# ──────────────────────────────────────────────────────────────────
+# Fiqh Pekan Ini (16th track): dump-fiqh / save-fiqh
+#
+# Weekly fiqh briefing = top-4 fiqh issues of the last 7d, each as a
+# news-anchored article (~900-1,300 words) that REPORTS the ruling
+# landscape (positions attributed to retrieved kitab dalil or to
+# authorities as reported in the news) and NEVER issues its own tarjih.
+# Replaces "Strategi & Aksi Dakwah"; NO Pesan Flyer, NO poster.
+#
+# Flow (pure-Claude, zero Gemini — same discipline as the weekly +
+# occasion paths):
+#   1. Operator's Claude session picks 4 issues from the 7d corpus and
+#      writes issues.json: {"issues": [{"title", "query", "context"}x4]}
+#   2. dump-fiqh issues.json → per-issue Qdrant retrieval builds the
+#      daleel pool, caches it, emits the composition prompt.
+#   3. Claude composes in chat → save-fiqh reply.md validates
+#      (fiqh-specific structural hard-fails + generic heuristics) and
+#      upserts the Briefing row (theme_group='Fiqh Pekan Ini').
+# ──────────────────────────────────────────────────────────────────
+
+FIQH_GROUP = "Fiqh Pekan Ini"
+FIQH_CACHE_SLUG = "fiqh-pekan-ini"
+
+FIQH_SYSTEM_PROMPT = """Kamu menyusun BRIEFING FIQH PEKAN INI untuk platform Dakwah-Lens: 4 isu fiqh terhangat dari percakapan publik Indonesia 7 hari terakhir, masing-masing dibahas dalam satu artikel yang berpijak pada berita nyata.
+
+STRUKTUR WAJIB (H2 persis seperti ini, berurutan):
+## Ringkasan Eksekutif
+## Poin Kunci
+## Artikel Fiqh Pekan Ini
+## Dalil & Sumber
+
+Di bawah "## Artikel Fiqh Pekan Ini" tulis paragraf pengantar singkat, lalu TEPAT 4 sub-bagian H3 dengan pola persis:
+### Artikel 1 — "<judul punchy 4-7 kata>"
+### Artikel 2 — "<judul punchy 4-7 kata>"
+### Artikel 3 — "<judul punchy 4-7 kata>"
+### Artikel 4 — "<judul punchy 4-7 kata>"
+
+SETIAP ARTIKEL (900-1.300 kata) mengikuti alur:
+1. Peristiwa — apa yang terjadi pekan ini dan apa yang sedang ditanyakan umat (anchor ke berita di prompt; JANGAN mengarang detail; ikuti disiplin parafrase-berita: setiap atribusi nama/peran harus bisa ditelusuri ke headline).
+2. Pertanyaan fiqh — rumuskan pertanyaannya secara presisi.
+3. Peta pandangan — LAPORKAN posisi-posisi yang ada, JANGAN memutuskan tarjih sendiri. Setiap dalil WAJIB diambil verbatim dari DALEEL POOL di prompt (kutip teks Arab pada barisnya sendiri + terjemahan + sitasi persis seperti di pool). Posisi lembaga (MUI/NU/Muhammadiyah dll.) hanya boleh dikutip bila termuat di berita pada prompt — kutip sebagai BERITA, bukan sebagai dalil.
+4. Panduan praktis — langkah bijak yang bisa diambil pembaca hari ini, nada rahmah dan hikmah.
+5. Penutup wajib — ajakan eksplisit merujuk ke ulama/ustadz setempat untuk keputusan pribadi (frasa mengandung kata "ulama").
+
+ATURAN KERAS:
+- Setiap referensi Islam HARUS berasal dari DALEEL POOL (retrieved, bukan digenerate). Jangan sekali-kali menulis dalil dari ingatan.
+- Jangan menghukumi tanpa atribusi: kalimat seperti "hukumnya haram" hanya boleh muncul sebagai laporan posisi yang di-atribusi ("Dalam Fathul Qarib disebutkan…", "MUI dalam pemberitaan pekan ini menyatakan…").
+- Bagian "## Ringkasan Eksekutif" dan "## Poin Kunci": naratif; angka statistik internal (jumlah posting dll.) TIDAK boleh masuk ke badan artikel.
+- Tanpa emphasis ALL-CAPS; gunakan **bold**/*italic*.
+- Fokus pada pola/praktik, bukan menyerang individu; tanpa framing sektarian atau merendahkan madzhab mana pun.
+- "## Dalil & Sumber": daftar SEMUA dalil yang dikutip artikel, satu baris per dalil dengan pola persis: `- **<sitasi persis dari pool>** — <catatan 1 kalimat>`.
+- Tutup dokumen dengan satu baris disclaimer yang memuat frasa "bukan fatwa" (konten berbantuan AI, bukan fatwa; keputusan akhir kembali kepada ulama).
+- JANGAN menulis bagian "Pesan Flyer", "Strategi & Aksi Dakwah", khutbah, kultum, atau deliverable mingguan lain."""
+
+
+def _fiqh_stats(issues: list[dict[str, Any]]) -> dict[str, Any]:
+    """headline_stats payload for the fiqh row. period = trailing 7d
+    (the corpus window the issues were picked from)."""
+    now = datetime.now(UTC)
+    return {
+        "mode": "fiqh",
+        "fiqh_issues": [i["title"] for i in issues],
+        "issues_meta": [
+            {"title": i["title"], "query": i["query"]} for i in issues
+        ],
+        "period_start": (now - timedelta(days=7)).isoformat(),
+        "period_end": now.isoformat(),
+    }
+
+
+def _load_fiqh_issues(issues_path: str) -> list[dict[str, Any]]:
+    p = Path(issues_path)
+    if not p.exists():
+        raise SystemExit(f"Issues file not found: {issues_path}")
+    raw = json.loads(p.read_text(encoding="utf-8"))
+    issues = raw.get("issues") if isinstance(raw, dict) else raw
+    if not isinstance(issues, list) or len(issues) != 4:
+        raise SystemExit(
+            "Expected exactly 4 issues: "
+            '{"issues": [{"title", "query", "context"} x4]}.'
+        )
+    for i, it in enumerate(issues, 1):
+        for key in ("title", "query", "context"):
+            if not str(it.get(key, "")).strip():
+                raise SystemExit(f"Issue {i} missing '{key}'.")
+    return issues
+
+
+async def cmd_dump_fiqh(issues_path: str, output_path: str | None) -> None:
+    """STAGE 1 (fiqh): per-issue Qdrant retrieval → daleel pool + prompt.
+
+    Deterministic re-dump is NOT safe once composition started (a fresh
+    retrieval can shift the pool and orphan citations) — same discipline
+    as the weekly two-stage flow.
+    """
+    issues = _load_fiqh_issues(issues_path)
+
+    # Per-issue retrieval, tagged so the composer knows which hits
+    # anchor which article. Dedupe by citation across issues (first
+    # issue wins the tag; the composer may cite any pool entry in any
+    # article — the tag is a hint, not a fence).
+    pool: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for idx, issue in enumerate(issues, 1):
+        hits = retrieve_daleel(
+            f"{issue['title']}. {issue['query']}", limit=8, per_corpus=2
+        )
+        for h in hits:
+            cit = (h.get("citation") or "").strip()
+            if not cit or cit in seen:
+                continue
+            seen.add(cit)
+            entry = dict(h)
+            entry["fiqh_issue"] = idx
+            pool.append(entry)
+
+    if len(pool) < 8:
+        raise SystemExit(
+            f"Only {len(pool)} pool entries retrieved across 4 issues — "
+            "too thin to compose 4 dalil-grounded articles. Refine the "
+            "issue queries."
+        )
+
+    async with SessionLocal() as session:
+        pool, misses = await lookup_cached_translations(session, pool)
+        headlines = await fetch_trending_headlines(
+            session, limit=12, period_days=7
+        )
+
+    stats = _fiqh_stats(issues)
+    cache = {
+        "mode": "fiqh",
+        "dumped_at_utc": datetime.now(UTC).isoformat(),
+        "issues": issues,
+        "stats": stats,
+        "daleel": pool,
+        "adhkar": [],
+    }
+    cache_file = _cache_path(FIQH_CACHE_SLUG)
+    cache_file.write_text(
+        json.dumps(cache, ensure_ascii=False, indent=1), encoding="utf-8"
+    )
+
+    lines = [
+        "<!-- DAKWAH-LENS MANUAL BRIEFING — FIQH PEKAN INI -->",
+        f"<!-- dumped: {datetime.now(UTC).isoformat()} -->",
+        "<!-- After composing, save with: -->",
+        "<!--   uv run python -m api.scripts.manual_briefing save-fiqh <reply.md> -->",
+        "",
+        "SYSTEM INSTRUCTION (fiqh-mode persona + structure)",
+        "─" * 60,
+        FIQH_SYSTEM_PROMPT,
+        "─" * 60,
+        "",
+        "# ISU FIQH PEKAN INI (4)",
+        "",
+    ]
+    for i, issue in enumerate(issues, 1):
+        lines.append(f"## Isu {i}: {issue['title']}")
+        lines.append(f"Konteks berita: {issue['context']}")
+        lines.append("")
+
+    lines.append("# BERITA PENDUKUNG (7 hari terakhir — anchor faktual)")
+    lines.append("")
+    for h in headlines:
+        text = (h.get("text") or "").replace(chr(10), " ")[:220]
+        lines.append(f"- [{h.get('theme_group') or '?'}] {text}")
+    lines.append("")
+
+    lines.append(f"# DALEEL POOL ({len(pool)} — kutip HANYA dari sini)")
+    lines.append("")
+    for i, d in enumerate(pool, 1):
+        cit = d.get("citation", "?")
+        corpus = d.get("corpus", "?")
+        ar = (d.get("arabic") or "").replace(chr(10), " ")
+        trn = (
+            d.get("translation_id") or d.get("translation_en") or ""
+        ).replace(chr(10), " ")
+        lines.append(f"## {i}. {cit}  [{corpus} · isu {d.get('fiqh_issue')}]")
+        lines.append(f"AR: {ar}")
+        lines.append(f"ID/EN: {trn}")
+        lines.append("")
+
+    if misses:
+        lines.append(
+            f"# TRANSLATION MISSES ({len(misses)}) — terjemahkan di chat "
+            "lalu cache-translation bila dipakai"
+        )
+        for m in misses:
+            lines.append(f"- {m.get('citation')}")
+        lines.append("")
+
+    out = chr(10).join(lines)
+    if output_path:
+        Path(output_path).write_text(out, encoding="utf-8")
+        sys.stderr.write(
+            f"✓ Fiqh prompt written to {output_path} "
+            f"({len(out):,} chars, pool={len(pool)}, "
+            f"headlines={len(headlines)}, misses={len(misses)})" + chr(10)
+        )
+    else:
+        print(out)
+
+
+_FIQH_REQUIRED_H2S = [
+    "## Ringkasan Eksekutif",
+    "## Poin Kunci",
+    "## Artikel Fiqh Pekan Ini",
+    "## Dalil & Sumber",
+]
+
+_FIQH_FORBIDDEN_H2S = ["## Pesan Flyer", "## Strategi & Aksi Dakwah"]
+
+
+def _validate_fiqh_briefing(md: str, daleel_pool: list[dict[str, Any]]) -> None:
+    """Fiqh-specific structural hard-fails. Raises SystemExit on any
+    violation — nothing is persisted."""
+    import re as _re
+
+    problems: list[str] = []
+    md_stripped = md.strip()
+    if len(md_stripped) < 8000:
+        problems.append(
+            f"Body suspiciously short ({len(md_stripped):,} chars) — "
+            "expected 4 articles x 900-1,300 words."
+        )
+
+    # Required H2s, in order; forbidden weekly/flyer H2s absent.
+    pos = -1
+    for h2 in _FIQH_REQUIRED_H2S:
+        p = md.find(chr(10) + h2)
+        if p == -1 and not md.startswith(h2):
+            problems.append(f"Missing required H2 '{h2}'.")
+        elif p != -1:
+            if p < pos:
+                problems.append(f"H2 '{h2}' out of order.")
+            pos = p
+    for h2 in _FIQH_FORBIDDEN_H2S:
+        if h2 in md:
+            problems.append(
+                f"Forbidden section '{h2}' present — fiqh briefing must "
+                "not carry weekly deliverables/flyers (composer drift)."
+            )
+
+    # Exactly 4 article H3s with quote-titles: ### Artikel N — "…"
+    h3s = _re.findall(
+        r'^###\s+Artikel\s+([1-4])\s+—\s+"([^"]{8,90})"\s*$',
+        md,
+        _re.MULTILINE,
+    )
+    nums = [int(n) for n, _t in h3s]
+    if nums != [1, 2, 3, 4]:
+        problems.append(
+            f"Expected exactly H3s 'Artikel 1..4 — \"judul\"' in order; "
+            f"found {nums or 'none'}."
+        )
+
+    # Per-article: consult-ulama close present.
+    if len(nums) == 4:
+        bodies = _re.split(r'^###\s+Artikel\s+[1-4][^\n]*$', md, flags=_re.MULTILINE)
+        # bodies[1..4] are the article bodies (tail of 4 includes next H2 —
+        # trim at the next H2 boundary).
+        for i, body in enumerate(bodies[1:5], 1):
+            body = body.split(chr(10) + "## ")[0]
+            if "ulama" not in body.lower():
+                problems.append(
+                    f"Artikel {i} missing the consult-ulama close "
+                    "(no 'ulama' mention)."
+                )
+
+    # Disclaimer with the exact anchor phrase.
+    if "bukan fatwa" not in md.lower():
+        problems.append("Missing 'bukan fatwa' AI-disclaimer line.")
+
+    # Dalil & Sumber entries must cite the pool verbatim.
+    dalil_section = md.split("## Dalil & Sumber", 1)
+    cited: list[str] = []
+    if len(dalil_section) == 2:
+        cited = _re.findall(
+            r"^-\s+\*\*(.+?)\*\*", dalil_section[1], _re.MULTILINE
+        )
+    if len(cited) < 4:
+        problems.append(
+            f"Dalil & Sumber lists only {len(cited)} entries (expect >=4, "
+            "one line per cited dalil: `- **<sitasi>** — catatan`)."
+        )
+    def _norm(s: str) -> str:
+        return _re.sub(r"\s+", " ", s).strip().casefold()
+    pool_cits = {_norm(d.get("citation") or "") for d in daleel_pool}
+    out_of_pool = [c for c in cited if _norm(c) not in pool_cits]
+    if out_of_pool:
+        problems.append(
+            "Dalil & Sumber citations NOT in the retrieved pool: "
+            + "; ".join(out_of_pool[:6])
+        )
+
+    if problems:
+        sys.stderr.write("✗ Fiqh validation failed:" + chr(10))
+        for p in problems:
+            sys.stderr.write(f"  - {p}" + chr(10))
+        raise SystemExit(1)
+
+
+async def cmd_save_fiqh(markdown_path: str) -> None:
+    """STAGE 2 (fiqh): validate Claude's reply + upsert the Briefing row."""
+    cache_file = _cache_path(FIQH_CACHE_SLUG)
+    if not cache_file.exists():
+        raise SystemExit(
+            f"Fiqh cache missing at {cache_file}." + chr(10) +
+            "  → Re-run: manual_briefing dump-fiqh <issues.json> "
+            "(NO auto-redump: it would shift the pool and orphan "
+            "citations)."
+        )
+    md_path = Path(markdown_path)
+    if not md_path.exists():
+        raise SystemExit(f"Markdown file not found: {markdown_path}")
+    summary_md = md_path.read_text(encoding="utf-8").strip()
+
+    cached = json.loads(cache_file.read_text(encoding="utf-8"))
+    if cached.get("mode") != "fiqh":
+        raise SystemExit("Cache at fiqh slot is not a fiqh dump. Re-dump.")
+    daleel: list[dict[str, Any]] = cached["daleel"]
+    issues: list[dict[str, Any]] = cached["issues"]
+    stats: dict[str, Any] = cached["stats"]
+
+    dumped_at = datetime.fromisoformat(cached["dumped_at_utc"])
+    age_hours = (datetime.now(UTC) - dumped_at).total_seconds() / 3600.0
+    if age_hours > 48:
+        sys.stderr.write(
+            f"⚠ Fiqh cache is {age_hours:.1f}h old — pool may be stale."
+            + chr(10)
+        )
+
+    # Fiqh structural hard-fails first (cheap, most specific).
+    _validate_fiqh_briefing(summary_md, daleel)
+
+    # Generic heuristic pass — surfaced for operator review. Flyer /
+    # occasion structure kinds hard-fail (they can only fire if the
+    # composer drifted into another template).
+    from api.services.validate_briefing import (
+        format_warnings_for_stderr,
+        validate_briefing,
+    )
+
+    warnings: list[dict] = []
+    try:
+        warnings = validate_briefing(
+            summary_md,
+            daleel_pool=daleel,
+            adhkar_pool=[],
+            llm_judgments=False,
+        )
+    except Exception as exc:  # pragma: no cover — never block on scanner bug
+        sys.stderr.write(f"⚠ Validation pass failed (non-fatal): {exc}" + chr(10))
+
+    drift = [
+        w
+        for w in warnings
+        if str(w.get("kind", "")).startswith("flyer_")
+        or w.get("kind") == "occasion_section_malformed"
+    ]
+    if drift:
+        sys.stderr.write(
+            "✗ Template-drift warnings (flyer/occasion structures in a "
+            "fiqh briefing):" + chr(10)
+        )
+        sys.stderr.write(format_warnings_for_stderr(drift) + chr(10))
+        raise SystemExit(1)
+    if warnings:
+        sys.stderr.write(
+            f"⚠ {len(warnings)} heuristic warning(s) — review:" + chr(10)
+        )
+        sys.stderr.write(format_warnings_for_stderr(warnings) + chr(10))
+
+    async with SessionLocal() as session:
+        now = datetime.now(UTC)
+        # Same-day upsert, mirroring cmd_save: one row per (FIQH_GROUP,
+        # Jakarta calendar day) so the slug stays stable across re-saves.
+        jakarta_today = (now + timedelta(hours=7)).date()
+        existing = (
+            await session.execute(
+                select(Briefing.id, Briefing.generated_at).where(
+                    Briefing.theme_group == FIQH_GROUP
+                )
+            )
+        ).all()
+        stale = [
+            bid
+            for bid, gen in existing
+            if (gen + timedelta(hours=7)).date() == jakarta_today
+        ]
+        if stale:
+            await session.execute(
+                delete(Briefing).where(Briefing.id.in_(stale))
+            )
+            sys.stderr.write(
+                f"  ↻ replaced {len(stale)} same-day fiqh row(s) "
+                f"({jakarta_today})." + chr(10)
+            )
+
+        row = Briefing(
+            generated_at=now,
+            period_start=datetime.fromisoformat(stats["period_start"]),
+            period_end=datetime.fromisoformat(stats["period_end"]),
+            summary_md=summary_md,
+            summary_md_en=None,
+            headline_stats=stats,
+            model=MODEL_TAG,
+            tokens_in=0,
+            tokens_out=0,
+            cost_usd=0.0,
+            theme_group=FIQH_GROUP,
+            daleel_refs=daleel,
+            adhkar_refs=[],
+        )
+        session.add(row)
+        await session.commit()
+
+    sys.stderr.write(
+        "✓ Fiqh briefing saved." + chr(10) +
+        f"  theme_group={FIQH_GROUP}" + chr(10) +
+        f"  issues={[i['title'] for i in issues]}" + chr(10) +
+        f"  daleel_refs={len(daleel)} · body={len(summary_md):,} chars" + chr(10)
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog="manual_briefing",
@@ -1972,6 +2399,27 @@ def main() -> None:
     p_save_occ.add_argument("slug", help=occasion_help)
     p_save_occ.add_argument("markdown_file", help="Path to Claude's reply (.md)")
 
+    p_dump_fiqh = sub.add_parser(
+        "dump-fiqh",
+        help=(
+            "Fiqh mode STAGE 1: per-issue retrieval for the 4 picked fiqh "
+            "issues → daleel pool + composition prompt."
+        ),
+    )
+    p_dump_fiqh.add_argument(
+        "issues_file",
+        help='JSON: {"issues": [{"title","query","context"} x4]}',
+    )
+    p_dump_fiqh.add_argument(
+        "--output", "-o", default=None, help="Write prompt to file."
+    )
+
+    p_save_fiqh = sub.add_parser(
+        "save-fiqh",
+        help="Fiqh mode STAGE 2: validate Claude's reply + upsert the row.",
+    )
+    p_save_fiqh.add_argument("markdown_file", help="Path to Claude's reply (.md)")
+
     p_list_occ = sub.add_parser(
         "list-occasions",
         help=(
@@ -2028,6 +2476,10 @@ def main() -> None:
         asyncio.run(cmd_dump_occasion(args.slug, args.output))
     elif args.cmd == "save-occasion":
         asyncio.run(cmd_save_occasion(args.slug, args.markdown_file))
+    elif args.cmd == "dump-fiqh":
+        asyncio.run(cmd_dump_fiqh(args.issues_file, args.output))
+    elif args.cmd == "save-fiqh":
+        asyncio.run(cmd_save_fiqh(args.markdown_file))
     elif args.cmd == "list-occasions":
         asyncio.run(cmd_list_occasions(args.days))
 

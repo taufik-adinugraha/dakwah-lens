@@ -531,6 +531,29 @@ export const DELIVERABLE_HEADING_PATTERNS: Record<
       /aksi|khidmah|ummah|social action|service to/i.test(h),
     title: "Aksi Sosial",
   },
+  // ── Fiqh Pekan Ini (16th track) ──────────────────────────────
+  // The weekly fiqh briefing replaces Strategi & Aksi Dakwah with 4
+  // news-anchored fiqh articles, each its own shareable page. H3s are
+  // `### Artikel N — "Judul"`; sectionNamePrefix strips the quote-title
+  // so the matcher only sees "Artikel N". Registry-driven consumers
+  // (/d/, /briefings/[id]/[deliverable], PDF route) pick these up
+  // automatically.
+  "artikel-1": {
+    matcher: (h) => /^artikel\s*1\b/i.test(h),
+    title: "Artikel Fiqh 1",
+  },
+  "artikel-2": {
+    matcher: (h) => /^artikel\s*2\b/i.test(h),
+    title: "Artikel Fiqh 2",
+  },
+  "artikel-3": {
+    matcher: (h) => /^artikel\s*3\b/i.test(h),
+    title: "Artikel Fiqh 3",
+  },
+  "artikel-4": {
+    matcher: (h) => /^artikel\s*4\b/i.test(h),
+    title: "Artikel Fiqh 4",
+  },
 };
 
 /** Strip the trailing "— ..." quote-title from an H3 heading so the
@@ -623,7 +646,9 @@ export async function getBriefingBySlug(
   // separately; this lookup-side fallback covers stale bookmarks +
   // copy-paste links from earlier sessions.
   const resolveGroup = (raw: string): string | undefined =>
-    GROUP_BY_SLUG[raw] ?? GROUP_BY_SLUG[slugifyGroup(raw)];
+    raw === FIQH_SLUG
+      ? FIQH_GROUP
+      : GROUP_BY_SLUG[raw] ?? GROUP_BY_SLUG[slugifyGroup(raw)];
 
   let group: string | undefined;
   let occasionSlug: string | undefined;
@@ -898,6 +923,26 @@ export async function getLatestOccasionBriefing(): Promise<
  *  cross-platform "all" briefing was removed 2026-06-03; navigation
  *  is now group-keyed. */
 export const BRIEFING_GROUPS: readonly string[] = ALL_GROUP_LABELS;
+
+/** Reserved 16th-track theme_group for the weekly fiqh briefing
+ *  (top-4 fiqh issues of the last 7d, 4 news-anchored articles
+ *  replacing Strategi & Aksi Dakwah — no flyers/poster). Same
+ *  reserved-label pattern as the 15th track's 'Acara Kalender Islam':
+ *  not in BRIEFING_GROUPS, so the 14-grid + volume queries never see
+ *  it, and no /groups page exists for it. */
+export const FIQH_GROUP = "Fiqh Pekan Ini";
+/** URL slug for the fiqh track: /briefings/YYYY-MM-DD-fiqh-pekan-ini.
+ *  Matches slugifyGroup(FIQH_GROUP) — asserted by the resolver in
+ *  getBriefingBySlug, which maps it back to FIQH_GROUP (it is NOT in
+ *  GROUP_BY_SLUG, and unlike occasions the fiqh row has no
+ *  occasion_slug to fall back on). */
+export const FIQH_SLUG = "fiqh-pekan-ini";
+
+/** Latest fiqh briefing for the hub's "Edisi Khusus" card. Null until
+ *  the first edition is saved — the card renders only when non-null. */
+export async function getLatestFiqhBriefing(): Promise<LatestBriefing | null> {
+  return getLatestBriefing(FIQH_GROUP);
+}
 
 /**
  * Fetch the latest briefing per group in one batch. Returns a Map
