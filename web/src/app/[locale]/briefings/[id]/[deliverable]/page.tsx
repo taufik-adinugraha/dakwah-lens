@@ -39,6 +39,10 @@ const VALID_SLUGS: ReadonlySet<DeliverableSlug> = new Set([
   "content",
   "genz",
   "action",
+  "artikel-1",
+  "artikel-2",
+  "artikel-3",
+  "artikel-4",
 ]);
 
 function asDeliverable(raw: string): DeliverableSlug | null {

@@ -1880,12 +1880,13 @@ Di bawah "## Artikel Fiqh Pekan Ini" tulis paragraf pengantar singkat, lalu TEPA
 ### Artikel 3 — "<judul punchy 4-7 kata>"
 ### Artikel 4 — "<judul punchy 4-7 kata>"
 
-SETIAP ARTIKEL (900-1.300 kata) mengikuti alur:
+SETIAP ARTIKEL (900-1.300 kata prosa + blok Tanya-Jawab; total per artikel maks ±1.700 kata) mengikuti alur:
 1. Peristiwa — apa yang terjadi pekan ini dan apa yang sedang ditanyakan umat (anchor ke berita di prompt; JANGAN mengarang detail; ikuti disiplin parafrase-berita: setiap atribusi nama/peran harus bisa ditelusuri ke headline).
 2. Pertanyaan fiqh — rumuskan pertanyaannya secara presisi.
 3. Peta pandangan — LAPORKAN posisi-posisi yang ada, JANGAN memutuskan tarjih sendiri. Setiap dalil WAJIB diambil verbatim dari DALEEL POOL di prompt (kutip teks Arab pada barisnya sendiri + terjemahan + sitasi persis seperti di pool). Posisi lembaga (MUI/NU/Muhammadiyah dll.) hanya boleh dikutip bila termuat di berita pada prompt — kutip sebagai BERITA, bukan sebagai dalil.
 4. Panduan praktis — langkah bijak yang bisa diambil pembaca hari ini, nada rahmah dan hikmah.
-5. Penutup wajib — ajakan eksplisit merujuk ke ulama/ustadz setempat untuk keputusan pribadi (frasa mengandung kata "ulama").
+5. Tanya-Jawab — sub-bagian dengan heading persis `#### Tanya-Jawab` berisi 3-4 pasang pertanyaan-jawaban. Pertanyaan = suara akar rumput yang NYATA (gaya bertanya jamaah/warganet, first-person, diambil dari pola keresahan di konteks berita — mis. "Saya sudah terlanjur…", "Kalau cuma ikut-ikutan…", "Bagaimana dengan…"). Format tiap pasang: baris `**T:** <pertanyaan>` lalu `**J:** <jawaban 2-4 kalimat>`. Jawaban mengikuti aturan yang sama: atribusi posisi, dalil hanya dari pool (boleh merujuk dalil yang sudah dikutip artikel), akhiri dengan arahan ke ulama bila menyangkut keputusan pribadi.
+6. Penutup wajib — ajakan eksplisit merujuk ke ulama/ustadz setempat untuk keputusan pribadi (frasa mengandung kata "ulama").
 
 ATURAN KERAS:
 - Setiap referensi Islam HARUS berasal dari DALEEL POOL (retrieved, bukan digenerate). Jangan sekali-kali menulis dalil dari ingatan.
@@ -2115,6 +2116,19 @@ def _validate_fiqh_briefing(md: str, daleel_pool: list[dict[str, Any]]) -> None:
                     f"Artikel {i} missing the consult-ulama close "
                     "(no 'ulama' mention)."
                 )
+            # Grassroots Q&A block: `#### Tanya-Jawab` with >=3 T/J pairs.
+            if "#### Tanya-Jawab" not in body:
+                problems.append(
+                    f"Artikel {i} missing the `#### Tanya-Jawab` block."
+                )
+            else:
+                qa = body.split("#### Tanya-Jawab", 1)[1]
+                n_q = len(_re.findall(r"\*\*T:\*\*", qa))
+                if n_q < 3:
+                    problems.append(
+                        f"Artikel {i} Tanya-Jawab has only {n_q} questions "
+                        "(expect >=3 `**T:**` pairs)."
+                    )
 
     # Disclaimer with the exact anchor phrase.
     if "bukan fatwa" not in md.lower():

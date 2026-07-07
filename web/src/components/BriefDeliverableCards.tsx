@@ -20,6 +20,7 @@ import {
   Smartphone,
   Users,
   X,
+  Scale,
 } from "lucide-react";
 import ReactMarkdown, { type Components } from "react-markdown";
 
@@ -48,7 +49,14 @@ type CardKind =
   | "home"
   | "content"
   | "genz"
-  | "action";
+  | "action"
+  // Fiqh Pekan Ini (16th track): the 4 per-issue articles. Slug-shaped
+  // kinds so routing (/briefings/{slug}/artikel-N), share (/d/…) and
+  // PDF URLs fall out of the existing kind-keyed plumbing unchanged.
+  | "artikel-1"
+  | "artikel-2"
+  | "artikel-3"
+  | "artikel-4";
 
 type DeliverableCard = {
   kind: CardKind | null;
@@ -88,6 +96,10 @@ const KIND_ORDER: CardKind[] = [
   "content",
   "genz",
   "action",
+  "artikel-1",
+  "artikel-2",
+  "artikel-3",
+  "artikel-4",
 ];
 
 const KIND_ICON: Record<CardKind, typeof BookOpen> = {
@@ -99,6 +111,10 @@ const KIND_ICON: Record<CardKind, typeof BookOpen> = {
   content: Smartphone,
   genz: Mic,
   action: HandHeart,
+  "artikel-1": Scale,
+  "artikel-2": Scale,
+  "artikel-3": Scale,
+  "artikel-4": Scale,
 };
 
 /** Light accent tint per card so the grid scans quickly. */
@@ -111,6 +127,10 @@ const KIND_TONE: Record<CardKind, string> = {
   content: "from-sky-50 to-white ring-sky-200/60",
   genz: "from-violet-50 to-white ring-violet-200/60",
   action: "from-teal-50 to-white ring-teal-200/60",
+  "artikel-1": "from-emerald-50 to-white ring-emerald-200/60",
+  "artikel-2": "from-emerald-50 to-white ring-emerald-200/60",
+  "artikel-3": "from-emerald-50 to-white ring-emerald-200/60",
+  "artikel-4": "from-emerald-50 to-white ring-emerald-200/60",
 };
 
 const KIND_ICON_TONE: Record<CardKind, string> = {
@@ -122,6 +142,10 @@ const KIND_ICON_TONE: Record<CardKind, string> = {
   content: "bg-sky-100 text-sky-700",
   genz: "bg-violet-100 text-violet-700",
   action: "bg-teal-100 text-teal-700",
+  "artikel-1": "bg-emerald-100 text-emerald-700",
+  "artikel-2": "bg-emerald-100 text-emerald-700",
+  "artikel-3": "bg-emerald-100 text-emerald-700",
+  "artikel-4": "bg-emerald-100 text-emerald-700",
 };
 
 /** Modal header bar tint per card kind — the colored strip across the
@@ -136,6 +160,10 @@ const KIND_HEADER_BG: Record<CardKind, string> = {
   content: "bg-gradient-to-r from-sky-50 via-white to-sky-50",
   genz: "bg-gradient-to-r from-violet-50 via-white to-violet-50",
   action: "bg-gradient-to-r from-teal-50 via-white to-teal-50",
+  "artikel-1": "bg-gradient-to-r from-emerald-50 via-white to-emerald-50",
+  "artikel-2": "bg-gradient-to-r from-emerald-50 via-white to-emerald-50",
+  "artikel-3": "bg-gradient-to-r from-emerald-50 via-white to-emerald-50",
+  "artikel-4": "bg-gradient-to-r from-emerald-50 via-white to-emerald-50",
 };
 
 /** Modal scrollable-body backdrop per card kind — a soft tinted
@@ -151,6 +179,10 @@ const KIND_BODY_BG: Record<CardKind, string> = {
   content: "bg-gradient-to-br from-sky-50/70 via-white to-blue-50/50",
   genz: "bg-gradient-to-br from-violet-50/70 via-white to-fuchsia-50/50",
   action: "bg-gradient-to-br from-teal-50/70 via-white to-cyan-50/50",
+  "artikel-1": "bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/50",
+  "artikel-2": "bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/50",
+  "artikel-3": "bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/50",
+  "artikel-4": "bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/50",
 };
 
 /** Accent border-bottom for the header, drives the section h3 underline
@@ -164,6 +196,10 @@ const KIND_ACCENT_BORDER: Record<CardKind, string> = {
   content: "border-sky-200",
   genz: "border-violet-200",
   action: "border-teal-200",
+  "artikel-1": "border-emerald-200",
+  "artikel-2": "border-emerald-200",
+  "artikel-3": "border-emerald-200",
+  "artikel-4": "border-emerald-200",
 };
 
 /** Blockquote palette per card kind — matches the section accent so a
@@ -178,6 +214,10 @@ const KIND_QUOTE: Record<CardKind, { bg: string; border: string; icon: string }>
   content: { bg: "bg-sky-50/70", border: "border-sky-400", icon: "text-sky-500" },
   genz: { bg: "bg-violet-50/70", border: "border-violet-400", icon: "text-violet-500" },
   action: { bg: "bg-teal-50/70", border: "border-teal-400", icon: "text-teal-500" },
+  "artikel-1": { bg: "bg-emerald-50/70", border: "border-emerald-400", icon: "text-emerald-500" },
+  "artikel-2": { bg: "bg-emerald-50/70", border: "border-emerald-400", icon: "text-emerald-500" },
+  "artikel-3": { bg: "bg-emerald-50/70", border: "border-emerald-400", icon: "text-emerald-500" },
+  "artikel-4": { bg: "bg-emerald-50/70", border: "border-emerald-400", icon: "text-emerald-500" },
 };
 
 /**
@@ -203,7 +243,15 @@ function cardLabelFor(heading: string): string {
   // through untouched).
   const idx = heading.search(/\s+[—–]\s+/);
   if (idx === -1) return heading.trim();
-  return heading.slice(0, idx).trim();
+  const prefix = heading.slice(0, idx).trim();
+  // Fiqh articles: "Artikel 2" alone says nothing — surface the punchy
+  // per-issue title on the card instead (quotes stripped); the "Artikel
+  // N" category still shows via the numbered icon + modal header.
+  if (/^artikel\s*[1-4]$/i.test(prefix)) {
+    const title = heading.slice(idx).replace(/^\s+[—–]\s+/, "").trim();
+    return title.replace(/^["\u201C]|["\u201D]$/g, "").trim() || prefix;
+  }
+  return prefix;
 }
 
 /**
@@ -228,6 +276,10 @@ function classifyHeading(heading: string): CardKind | null {
     return (m ? m[1] : heading).trim();
   })();
   const lower = sectionName.toLowerCase();
+  // Fiqh articles first: "Artikel N — \"…\"" → slug-shaped kind so the
+  // deep-link/share/PDF URLs carry the article number.
+  const artikelMatch = lower.match(/^artikel\s*([1-4])\b/);
+  if (artikelMatch) return `artikel-${artikelMatch[1]}` as CardKind;
   // Kultum BEFORE khutbah: a heading like "Kultum Jumat" would otherwise
   // match /khutbah/... wait, it wouldn't share that root. But ordering
   // before khutbah is still defensive against future "Khutbah Singkat /

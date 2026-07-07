@@ -20,8 +20,8 @@ import { MahasiswaPosterCard } from "./MahasiswaPosterCard";
  *  instead of inline. Match is case-insensitive and tolerant of trailing
  *  punctuation but requires the exact phrase since the LLM is steered
  *  toward these exact section names by the prompt. */
-const SECTION_4_HEADINGS_ID = ["strategi & aksi dakwah", "strategi dan aksi dakwah"];
-const SECTION_4_HEADINGS_EN = ["da'wah strategies & actions", "dawah strategies & actions"];
+const SECTION_4_HEADINGS_ID = ["strategi & aksi dakwah", "strategi dan aksi dakwah", "artikel fiqh pekan ini"];
+const SECTION_4_HEADINGS_EN = ["da'wah strategies & actions", "dawah strategies & actions", "artikel fiqh pekan ini"];
 
 /** The `## Pesan Flyer` / `## Flyer Messages` section is INPUT for the
  *  PNG flyer renderer (see `extractDedicatedFlyerMessage` in
@@ -123,6 +123,10 @@ export function BriefingNarrative({
     | "kultum"
     | "kajian"
     | "kisah"
+    | "artikel-1"
+    | "artikel-2"
+    | "artikel-3"
+    | "artikel-4"
     | "home"
     | "content"
     | "genz"
@@ -338,6 +342,14 @@ const SECTION_THEMES: Array<{
     ruleClass: "border-amber-300",
     quoteBg: "bg-amber-50/60",
     quoteBorder: "border-amber-300",
+  },
+  {
+    match: /artikel fiqh/i,
+    icon: BookOpen,
+    iconClass: "bg-emerald-100 text-emerald-700",
+    ruleClass: "border-emerald-300",
+    quoteBg: "bg-emerald-50/60",
+    quoteBorder: "border-emerald-300",
   },
   {
     match: /strategi & aksi|strategies & actions/i,

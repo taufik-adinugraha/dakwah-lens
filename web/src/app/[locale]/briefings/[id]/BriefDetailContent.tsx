@@ -33,7 +33,11 @@ export type DeliverableSlug =
   | "home"
   | "content"
   | "genz"
-  | "action";
+  | "action"
+  | "artikel-1"
+  | "artikel-2"
+  | "artikel-3"
+  | "artikel-4";
 
 export async function BriefDetailContent({
   locale,
