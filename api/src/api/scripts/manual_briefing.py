@@ -1966,6 +1966,9 @@ async def cmd_dump_fiqh(issues_path: str, output_path: str | None) -> None:
             "issue queries."
         )
 
+    from api.services.hadith_translation import lookup_cached_translations
+    from api.services.trending_headlines import fetch_trending_headlines
+
     async with SessionLocal() as session:
         pool, misses = await lookup_cached_translations(session, pool)
         headlines = await fetch_trending_headlines(
@@ -2216,6 +2219,8 @@ async def cmd_save_fiqh(markdown_path: str) -> None:
             f"⚠ {len(warnings)} heuristic warning(s) — review:" + chr(10)
         )
         sys.stderr.write(format_warnings_for_stderr(warnings) + chr(10))
+
+    from sqlalchemy import delete, select
 
     async with SessionLocal() as session:
         now = datetime.now(UTC)
