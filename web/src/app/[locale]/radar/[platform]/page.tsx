@@ -652,8 +652,8 @@ function LiveStream({
             </p>
             <div className="mt-2 flex h-2 overflow-hidden rounded-full">
               <span className="bg-emerald-500" style={{ width: `${posPct}%` }} />
-              <span className="bg-ink-faint/40" style={{ width: `${neuPct}%` }} />
-              <span className="bg-amber-500" style={{ width: `${negPct}%` }} />
+              <span className="bg-slate-300" style={{ width: `${neuPct}%` }} />
+              <span className="bg-rose-500" style={{ width: `${negPct}%` }} />
             </div>
             <div className="mt-2 flex justify-between text-xs tabular-nums text-ink-muted">
               <span>
@@ -665,7 +665,7 @@ function LiveStream({
                 {tInsights("live_sentiment_neutral")}
               </span>
               <span>
-                <span className="font-semibold text-amber-700">{negPct}%</span>{" "}
+                <span className="font-semibold text-rose-600">{negPct}%</span>{" "}
                 {tInsights("live_sentiment_concerned")}
               </span>
             </div>

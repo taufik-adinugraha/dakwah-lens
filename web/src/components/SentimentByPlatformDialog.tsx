@@ -133,14 +133,14 @@ function PlatformRow({
               title={`${labels.neutral} ${row.neutral.pct.toFixed(0)}%`}
             />
             <div
-              className="h-full bg-forest-tint0"
+              className="h-full bg-emerald-500"
               style={{ width: `${row.positive.pct}%` }}
               title={`${labels.positive} ${row.positive.pct.toFixed(0)}%`}
             />
           </div>
           <ul className="mt-2.5 grid grid-cols-3 gap-2 text-xs">
             <PlatformStat
-              dot="bg-forest-tint0"
+              dot="bg-emerald-500"
               label={labels.positive}
               count={row.positive.count}
               pct={row.positive.pct}

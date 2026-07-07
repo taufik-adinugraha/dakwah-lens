@@ -140,7 +140,7 @@ function PlatformCard({
               </div>
               <div className="mt-0.5 h-1 overflow-hidden rounded-full bg-paper-deep">
                 <div
-                  className="h-full rounded-full bg-forest-tint0"
+                  className="h-full rounded-full bg-emerald-500"
                   style={{ width: `${Math.max(p.pct, 2)}%` }}
                 />
               </div>
@@ -190,14 +190,14 @@ function SentimentCard({
               title={`${labels.sentimentNeutral} ${data.neutral.pct.toFixed(0)}%`}
             />
             <div
-              className="h-full bg-forest-tint0"
+              className="h-full bg-emerald-500"
               style={{ width: `${data.positive.pct}%` }}
               title={`${labels.sentimentPositive} ${data.positive.pct.toFixed(0)}%`}
             />
           </div>
           <ul className="mt-3 space-y-1 text-xs">
             <SentimentRow
-              dot="bg-forest-tint0"
+              dot="bg-emerald-500"
               label={labels.sentimentPositive}
               count={data.positive.count}
               pct={data.positive.pct}
@@ -304,7 +304,7 @@ function TopicsCard({
               </div>
               <div className="mt-0.5 h-1 overflow-hidden rounded-full bg-paper-deep">
                 <div
-                  className="h-full rounded-full bg-forest-tint0"
+                  className="h-full rounded-full bg-emerald-500"
                   style={{ width: `${Math.max(topic.pct, 2)}%` }}
                 />
               </div>

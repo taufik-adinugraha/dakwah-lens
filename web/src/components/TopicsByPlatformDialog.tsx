@@ -138,7 +138,7 @@ function PlatformGroup({
               </div>
               <div className="mt-0.5 h-1 overflow-hidden rounded-full bg-paper-deep">
                 <div
-                  className="h-full rounded-full bg-forest-tint0"
+                  className="h-full rounded-full bg-emerald-500"
                   style={{ width: `${Math.max(t.pct, 2)}%` }}
                 />
               </div>

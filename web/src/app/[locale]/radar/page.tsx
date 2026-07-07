@@ -262,7 +262,7 @@ export default async function InsightsExplorePage({
                     style={{ width: `${sentimentPct.neutral}%` }}
                   />
                   <span
-                    className="bg-amber-500"
+                    className="bg-rose-500"
                     style={{ width: `${sentimentPct.negative}%` }}
                   />
                 </div>
@@ -278,7 +278,7 @@ export default async function InsightsExplorePage({
                     label={t("live_sentiment_neutral")}
                   />
                   <SentimentRow
-                    color="bg-amber-500"
+                    color="bg-rose-500"
                     pct={`${Math.round(sentimentPct.negative)}%`}
                     label={t("live_sentiment_concerned")}
                   />
@@ -402,7 +402,7 @@ const PLATFORM_VISUALS: Record<
     key: "news",
     Icon: Newspaper,
     iconBg: "bg-slate-900",
-    barColor: "bg-paper-deep0",
+    barColor: "bg-slate-500",
     href: "/radar/mainstream",
   },
   youtube: {
