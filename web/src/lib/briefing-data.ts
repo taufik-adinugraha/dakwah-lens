@@ -485,10 +485,12 @@ export async function getLatestBriefing(
  *  The matcher pattern is the same one used by
  *  BriefDeliverableCards.classifyHeading — kept here so both server
  *  pages (/d/{brief}/{deliverable}) and the modal card grid agree. */
-export const DELIVERABLE_HEADING_PATTERNS: Record<
-  string,
-  { matcher: (heading: string) => boolean; title: string }
-> = {
+/** NOTE: literal-keyed (`satisfies`, not `Record<string,…>`) so that
+ *  `keyof typeof DELIVERABLE_HEADING_PATTERNS` is the exact slug union —
+ *  any `Record<DeliverableSlug, …>` map elsewhere then FAILS TO COMPILE
+ *  when a new deliverable slug is added but the map isn't extended
+ *  (the /d/ KIND_ICON gap crashed every fiqh article page, 2026-07-07). */
+export const DELIVERABLE_HEADING_PATTERNS = {
   khutbah: {
     matcher: (h) => /khutbah|friday/i.test(h),
     title: "Khutbah Jumat",
@@ -554,7 +556,10 @@ export const DELIVERABLE_HEADING_PATTERNS: Record<
     matcher: (h) => /^artikel\s*4\b/i.test(h),
     title: "Artikel Fiqh 4",
   },
-};
+} satisfies Record<
+  string,
+  { matcher: (heading: string) => boolean; title: string }
+>;
 
 /** Strip the trailing "— ..." quote-title from an H3 heading so the
  *  thematic title of one section can't false-match another section's

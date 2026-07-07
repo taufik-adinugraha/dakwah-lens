@@ -11,6 +11,7 @@ import {
   Scroll,
   Smartphone,
   Users,
+  Scale,
 } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
@@ -57,6 +58,14 @@ const KIND_ICON: Record<DeliverableSlug, typeof BookOpen> = {
   content: Smartphone,
   genz: Mic,
   action: HandHeart,
+  // Fiqh Pekan Ini articles. A missing key here is NOT a cosmetic gap:
+  // <Icon/> with undefined hard-crashes hydration (React #130) and the
+  // error boundary eats the whole page — exactly the 2026-07-07
+  // "Kunjungi halaman doesn't load" incident.
+  "artikel-1": Scale,
+  "artikel-2": Scale,
+  "artikel-3": Scale,
+  "artikel-4": Scale,
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -100,11 +109,13 @@ export default async function DeliverablePage({ params }: Props) {
   const section = extractDeliverableSection(body, deliverable);
   if (!section) notFound();
 
-  // Mahasiswa deliverable has its own (richer) shape — Poster Question +
-  // Article + Q&A. Render via the same Article component the /m/{slug}
-  // route uses so the reading experience is consistent.
+  // Mahasiswa (genz) redirects to /m/{slug} above, so this is always
+  // null in practice — the literal-keyed DeliverableSlug union
+  // (2026-07-07) even flags the comparison as dead. Kept (with a
+  // widening cast) so the Mahasiswa JSX branch below stays intact if
+  // the redirect is ever removed.
   const mahasiswa =
-    deliverable === "genz" ? extractMahasiswaContent(body) : null;
+    (deliverable as string) === "genz" ? extractMahasiswaContent(body) : null;
 
   // Palette keys are legacy 4-segment slugs (all/spiritual/family/youth/
   // justice); briefings now use 14-group labels ("Hukum & Keadilan",
