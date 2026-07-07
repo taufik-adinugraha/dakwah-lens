@@ -117,7 +117,11 @@ export default async function InsightsPage({
       <BriefingsGrid
         briefings={briefings}
         volumes={volumes}
-        occasion={occasion}
+        /* "Acara Kalender Islam" occasion card temporarily hidden
+           (2026-07-07) — the latest occasion briefing is outdated. The
+           query (getLatestOccasionBriefing) + `occasion` var are kept so
+           un-hiding is a one-line swap back to `occasion={occasion}`. */
+        occasion={null}
         locale={locale}
       />
 
