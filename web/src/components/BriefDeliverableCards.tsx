@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "@/i18n/navigation";
+import { useLocale } from "next-intl";
 import {
   BookOpen,
   Check,
@@ -418,6 +419,13 @@ export function BriefDeliverableCards({
   routeOnOpen?: boolean;
 }) {
   const router = useRouter();
+  // Locale-prefix the raw /d/ + /m/ anchors (they're plain <a
+  // target="_blank">, outside the i18n <Link> layer). Without the
+  // prefix every click costs a 307 redirect from the locale proxy —
+  // and redirect + target="_blank" is mishandled by some in-app
+  // browsers/popup blockers (reported as "Kunjungi halaman doesn't
+  // load", 2026-07-07). Direct URLs remove the hop entirely.
+  const locale = useLocale();
   const { intro, cards } = parseSection4(section4Markdown);
 
   // Order cards by KIND_ORDER so the grid is predictable even if the LLM
@@ -485,8 +493,8 @@ export function BriefDeliverableCards({
           const shareUrl = !card.kind
             ? null
             : card.kind === "genz"
-              ? `/m/${briefSlug}`
-              : `/d/${briefSlug}/${card.kind}`;
+              ? `/${locale}/m/${briefSlug}`
+              : `/${locale}/d/${briefSlug}/${card.kind}`;
           const pdfUrl = !card.kind
             ? null
             : card.kind === "genz"
@@ -513,8 +521,8 @@ export function BriefDeliverableCards({
         const modalPageUrl = !openCard.kind
           ? null
           : openCard.kind === "genz"
-            ? `/m/${briefSlug}`
-            : `/d/${briefSlug}/${openCard.kind}`;
+            ? `/${locale}/m/${briefSlug}`
+            : `/${locale}/d/${briefSlug}/${openCard.kind}`;
         const modalPdfUrl = !openCard.kind
           ? null
           : openCard.kind === "genz"
