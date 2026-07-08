@@ -322,10 +322,24 @@ GROUP_INTENT_HINTS: dict[str, str] = {
     ),
     "Teknologi & AI": "kecerdasan buatan, teknologi baru, etika digital",
     "Pekerja & Pertanian Rakyat": (
-        "buruh, tenaga kerja, petani, nelayan, ketahanan pangan"
+        "buruh, tenaga kerja, petani, nelayan, ketahanan pangan, "
+        "PHK/pemutusan hubungan kerja massal, sengketa & hak "
+        "ketenagakerjaan, upah, BPJS Ketenagakerjaan — isu yang berpusat "
+        "pada nasib pekerja. PHK massal korporasi (mis. karyawan Tokopedia/"
+        "TikTok) masuk sini, BUKAN Lainnya / Ekonomi & Bisnis, karena "
+        "dampak intinya pada pekerja"
     ),
     "Konflik & Geopolitik": (
-        "Palestina, konflik internasional, geopolitik, hubungan luar negeri"
+        "Palestina, konflik bersenjata internasional, geopolitik, perang, "
+        "solidaritas umat lintas negara, hubungan luar negeri. HANYA untuk "
+        "peristiwa yang intinya konflik/diplomasi/geopolitik — BUKAN semata "
+        "karena kejadiannya di luar negeri. Peristiwa asing yang intinya "
+        "kriminal/korupsi/penegakan hukum (razia/penggerebekan narkoba, "
+        "operasi antikorupsi, kasus penipuan atau gugatan di pengadilan "
+        "asing) → Hukum & Keadilan. Penghargaan/kunjungan diplomatik "
+        "seremonial dan gerakan politik domestik (mis. gerakan menjatuhkan "
+        "pemerintah) → Pemerintahan & Kebijakan. Sejarah/perdagangan kuno "
+        "tanpa dimensi geopolitik terkini → Lainnya"
     ),
     "Inspirasi & Kisah Pribadi": (
         "kisah hidup orang BIASA (bukan selebritas/atlet), pengalaman "
