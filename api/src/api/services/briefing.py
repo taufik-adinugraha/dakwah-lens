@@ -405,8 +405,8 @@ KHUTBAH KEDUA (750-1050 kata):
 
 - Penutup standar (~120 kata Arab): aksara Arab berharakat penuh untuk sequence "إِنَّ اللهَ وَمَلَائِكَتَهُ يُصَلُّوْنَ عَلَى النَّبِيّ…" → sholawat lengkap "اَللّٰهُمَّ صَلِّ عَلٰى سَيِّدِنَا مُحَمَّدٍ وَعَلٰى آلِ سَيِّدِنَا مُحَمَّدٍ…" → "عِبَادَ اللهِ، إِنَّ اللهَ يَأْمُرُ بِالْعَدْلِ وَالْإِحْسَانِ وَإِيْتَاءِ ذِي الْقُرْبٰى…" → tahmid akhir "وَاذْكُرُوا اللهَ الْعَظِيْمَ يَذْكُرْكُمْ، وَاشْكُرُوْهُ عَلٰى نِعَمِهِ يَزِدْكُمْ، وَلَذِكْرُ اللهِ أَكْبَرُ." Semua dalam aksara Arab, harakat lengkap.
 
-### Kultum (1650-2250 kata) — WAJIB H3 dengan judul: `### Kultum — "<judul kultum 4-7 kata>"`
-Tulis KULTUM 10-15 menit siap-baca, format ringkas tapi LENGKAP dari pembuka sampai penutup. Audience: jamaah ba'da sholat (Subuh / Maghrib / Isya), Ramadhan tarawih, atau acara komunitas singkat — orang yang sudah sholat dan tidak ingin terlalu lama berdiri, tapi mau pulang dengan satu pesan yang menempel. Bahasa Indonesia mengalir-konversasional (bukan setegang khutbah Jumat), satu argumen tajam yang tidak melebar.
+### Kultum (900-1050 kata) — WAJIB H3 dengan judul: `### Kultum — "<judul kultum 4-7 kata>"`
+Tulis KULTUM ~7 menit siap-baca, format ringkas tapi LENGKAP dari pembuka sampai penutup. Audience: jamaah ba'da sholat (Subuh / Maghrib / Isya), Ramadhan tarawih, atau acara komunitas singkat — orang yang sudah sholat dan tidak ingin terlalu lama berdiri, tapi mau pulang dengan satu pesan yang menempel. Bahasa Indonesia mengalir-konversasional (bukan setegang khutbah Jumat), satu argumen tajam yang tidak melebar.
 
 VOICE — KULTUM (audiens duduk ba'da sholat, penyampai berdiri / duduk di depan, suasana lebih dekat dari khutbah Jumat):
 - Sapaan WAJIB lebih hangat dari khutbah Jumat: "jamaah yang saya hormati", "para jamaah", "saudara-saudara sekalian". JANGAN pakai sapaan formal mimbar Jumat ("ma'asyiral muslimin").
@@ -1225,8 +1225,8 @@ KHUTBAH KEDUA (750-1050 words):
 
 - Standard closing (~120 Arabic words) in ARABIC SCRIPT WITH FULL HARAKAT: the sequence "إِنَّ اللهَ وَمَلَائِكَتَهُ يُصَلُّوْنَ عَلَى النَّبِيّ…" → full sholawat "اَللّٰهُمَّ صَلِّ عَلٰى سَيِّدِنَا مُحَمَّدٍ وَعَلٰى آلِ سَيِّدِنَا مُحَمَّدٍ…" → "عِبَادَ اللهِ، إِنَّ اللهَ يَأْمُرُ بِالْعَدْلِ وَالْإِحْسَانِ وَإِيْتَاءِ ذِي الْقُرْبٰى…" → final tahmid "وَاذْكُرُوا اللهَ الْعَظِيْمَ يَذْكُرْكُمْ، وَاشْكُرُوْهُ عَلٰى نِعَمِهِ يَزِدْكُمْ، وَلَذِكْرُ اللهِ أَكْبَرُ." All in Arabic letters with harakat.
 
-### Kultum / Short Talk (1650-2250 words)
-Write a READY-TO-DELIVER 10-15 minute kultum — concise but COMPLETE from opening to closing. Audience: congregants right after sholat (Subuh / Maghrib / Isya), tarawih, or short community gatherings — people who've just prayed, don't want to stand long, but want to leave with one message that sticks. Flowing conversational English (NOT the formal cadence of a Friday khutbah), one sharp argument that does not wander.
+### Kultum / Short Talk (900-1050 words)
+Write a READY-TO-DELIVER ~7 minute kultum — concise but COMPLETE from opening to closing. Audience: congregants right after sholat (Subuh / Maghrib / Isya), tarawih, or short community gatherings — people who've just prayed, don't want to stand long, but want to leave with one message that sticks. Flowing conversational English (NOT the formal cadence of a Friday khutbah), one sharp argument that does not wander.
 
 REQUIRED STRUCTURE (in this order):
 

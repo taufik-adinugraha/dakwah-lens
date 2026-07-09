@@ -332,11 +332,14 @@ def _starts_with_arabic(para: str) -> bool:
 # matching the H3 heading (case-insensitive, language-tolerant) plus
 # `(min, max)` words. We only flag at 70% of `min` so authors with a
 # tight-but-on-target draft don't get nagged — the real failure mode
-# we're guarding against is the v5 Kultum that landed at 400 words on
-# a 1650-word target (24% of min, clearly under-delivered).
+# we're guarding against is the v5 Kultum that landed at 400 words —
+# well under its target — clearly under-delivered.
 _DELIVERABLE_WORD_TARGETS: list[tuple[str, tuple[int, int]]] = [
     (r"^###\s+Khutbah(?:\s+Jumat)?(?:\s+/\s+Friday\s+Khutbah)?\b", (3450, 4800)),
-    (r"^###\s+Kultum(?:\s+/\s+Short\s+Talk)?\b", (1650, 2250)),
+    # Kultum is a ~7-minute talk (operator-confirmed 2026-07-09): ~130 wpm
+    # measured Indonesian delivery minus ~1 min of Arabic daleel recitation
+    # → ~900-1,050 word manuscript. Band (800, 1150) allows for pace + Arabic.
+    (r"^###\s+Kultum(?:\s+/\s+Short\s+Talk)?\b", (800, 1150)),
     (r"^###\s+Kajian(?:\s+Ibu-ibu)?(?:\s+(?:&|and)\s+Majelis\s+Taklim)?\b", (1400, 1800)),
     (r"^###\s+Kisah(?:\s+Pendek)?(?:\s+(?:—|-)\s+Short\s+Story)?\b", (700, 1100)),
     (r"^###\s+Pengajaran(?:\s+di\s+Rumah)?(?:\s+/\s+Home\s+Teaching)?\b", (500, 700)),
@@ -362,7 +365,7 @@ def scan_deliverable_word_counts(markdown: str) -> list[BriefingWarning]:
     """Flag any Section-4 deliverable or Pesan Flyer slot whose word
     count falls below 70% of its prompt-specified minimum. Catches
     under-delivered sub-sections at save time so they don't reach
-    readers — the v5 Kultum (400 words on a 1650-word target) was the
+    readers — the v5 Kultum (400 words, far under target) was the
     motivating regression."""
     warnings: list[BriefingWarning] = []
 
