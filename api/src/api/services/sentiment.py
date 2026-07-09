@@ -611,7 +611,7 @@ def _classify_chunk(texts: list[str]) -> list[SentimentResult | None]:
         meta={"batch_size": len(texts)},
     )
 
-    from api.services.theme_groups import ALL_GROUP_NAMES
+    from api.services.theme_groups import resolve_group_name
 
     results: list[SentimentResult] = []
     for scores in parsed:
@@ -635,15 +635,13 @@ def _classify_chunk(texts: list[str]) -> list[SentimentResult | None]:
             top_label = "neutral"
             top_score = max(0.7, clean.get("neutral", 0.0))
             clean = {"positive": 0.0, "neutral": top_score, "negative": 0.0}
-        # Validate theme_group — must be one of 14 + Lainnya. Anything
-        # else (typo, hallucinated name, missing field) → None; ingest
-        # writes NULL and read paths fall back to the topic.label regex.
-        tg_raw = scores.get("theme_group")
-        theme_group = (
-            tg_raw
-            if isinstance(tg_raw, str) and tg_raw in ALL_GROUP_NAMES
-            else None
-        )
+        # Resolve theme_group to one of 14 + Lainnya via tolerant matching
+        # (case/whitespace/`&`↔`dan`/stray quotes) — salvages the ~1-3%
+        # of near-miss names the model drifts on (worst on noisy X text)
+        # that strict equality used to drop to NULL. Genuinely unknown or
+        # missing → None; ingest writes NULL and read paths fall back to
+        # the topic.label regex.
+        theme_group = resolve_group_name(scores.get("theme_group"))
         results.append(
             SentimentResult(
                 label=top_label,  # type: ignore[arg-type]

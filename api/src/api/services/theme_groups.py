@@ -396,3 +396,42 @@ def llm_group_options_prompt() -> str:
 ALL_GROUP_NAMES: frozenset[str] = frozenset(
     [tg.group for tg in THEME_GROUPS] + [LAINNYA_GROUP]
 )
+
+
+def _normalize_group(s: str) -> str:
+    """Canonical-key form of a group name for tolerant matching.
+
+    Folds the harmless ways the LLM drifts from the exact stored name:
+    surrounding whitespace/quotes/periods, internal whitespace runs,
+    case, and `&` vs the spelled-out `dan`. Purely lexical — it never
+    maps one distinct group onto another (verified: the 15 canonical
+    names all normalize to distinct keys).
+    """
+    s = s.strip().strip("\"'.").strip().casefold()
+    s = s.replace("&", " dan ")
+    return re.sub(r"\s+", " ", s).strip()
+
+
+# Normalized lookup → canonical name. Built once; used by resolve_group_name.
+_NORM_TO_CANONICAL: dict[str, str] = {
+    _normalize_group(g): g for g in ALL_GROUP_NAMES
+}
+# Guard against a future group whose normalized form collides with another's
+# (that would silently swallow one). Cheap import-time invariant.
+assert len(_NORM_TO_CANONICAL) == len(ALL_GROUP_NAMES), (
+    "theme-group normalization collision — two groups share a normalized key"
+)
+
+
+def resolve_group_name(raw: object) -> str | None:
+    """Map an LLM-returned theme_group to its exact canonical name.
+
+    Returns the canonical group string if `raw` matches one of the 15
+    names after tolerant normalization (case/whitespace/`&`↔`dan`/stray
+    quotes), else None. A valid exact name resolves to itself, so this
+    only ever *rescues* near-misses that strict equality would have
+    dropped to NULL — it cannot cause a misassignment.
+    """
+    if not isinstance(raw, str):
+        return None
+    return _NORM_TO_CANONICAL.get(_normalize_group(raw))
