@@ -77,6 +77,18 @@ _DUA_SUPPLICATION_MARKERS = (
     "رب إني",
     "رَبِّ إِنِّي",
     "رب اجعلني",
+    # Vocative "Rabbi + imperative" Qur'anic du'a openings (recitable) —
+    # e.g. QS Ash-Shu'araa 169 "rabbi najjinī". Specific to request-verbs
+    # so statements ("rabb al-'ālamīn", "rabbukum") don't match.
+    "رب نجني",
+    "رب هب",
+    "رب زدني",
+    "رب اشرح",
+    "رب اوزعني",
+    "رب انصرني",
+    "رب ارحم",
+    "رب ادخلني",
+    "رب اخرجني",
     "أعوذ",
     "أَعُوذُ",
     "اعوذ",
@@ -98,6 +110,7 @@ def _strip_tashkil(s: str) -> str:
     s = _TASHKIL_RE.sub("", s or "")
     for a in ("أ", "إ", "آ", "ٱ", "ٲ", "ٳ"):
         s = s.replace(a, "ا")
+    s = s.replace("ى", "ي")  # fold alef-maqsura → ya (Uthmani vs plain)
     return s
 
 

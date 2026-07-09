@@ -468,7 +468,10 @@ _KISAH_PREACHER_PATTERNS: list[tuple[str, str]] = [
     (r"\bhadirin\s+yang\s+(?:dimuliakan|dirahmati|saya\s+hormati)\b", "preacher salutation"),
     (r"\bjamaah\s+yang\s+(?:dimuliakan|dirahmati|saya\s+hormati)\b", "preacher salutation"),
     (r"\bpara\s+jamaah\b", "preacher salutation"),
-    (r"\bsaudara-?saudara(?:\s+sekalian)?\b", "preacher 2nd-person address"),
+    # Vocative address only — exclude the possessive 3rd-person noun
+    # ("saudara-saudara mereka/kita/…" = *their* brothers) which is
+    # legitimate cerpen narration, not the narrator addressing jamaah.
+    (r"\bsaudara-?saudara(?:\s+sekalian)?\b(?!\s+(?:mereka|kalian|kami|kita|nya|itu))", "preacher 2nd-person address"),
     (r"\bwahai\s+sekalian\s+(?:manusia|muslim|hadirin)\b", "preacher 2nd-person address"),
     (r"\bizinkan\s+saya\s+(?:menceritakan|berbagi|mengisahkan|menyampaikan)\b", "preacher framing"),
     (r"\bsaya\s+akan\s+(?:bercerita|menceritakan|mengisahkan)\b", "1st-person narrator"),
@@ -516,6 +519,15 @@ def scan_kisah_voice(markdown: str) -> list[BriefingWarning]:
         maxsplit=1,
         flags=re.MULTILINE | re.IGNORECASE,
     )[0]
+    # Quoted scripture (a verse/hadith translation carrying a "(QS. …)"
+    # or "(HR. …)" citation) is not the narrator's voice — strip such
+    # spans before the scan so e.g. QS Al-Mujadalah 22's enumeration
+    # ("…saudara-saudara…") isn't misread as a preacher addressing jamaah.
+    narrative_only = re.sub(
+        r"[\"“][^\"”]{0,700}[\"”]\s*\(\s*(?:QS|HR)\.[^)]*\)",
+        " ",
+        narrative_only,
+    )
     for pattern, label in _KISAH_PREACHER_PATTERNS:
         for m in re.finditer(pattern, narrative_only, flags=re.IGNORECASE):
             start = max(0, m.start() - 30)
@@ -2236,6 +2248,18 @@ _DUA_SUPPLICATION_MARKERS = (
     "رب إني",
     "رَبِّ إِنِّي",
     "رب اجعلني",
+    # Vocative "Rabbi + imperative" Qur'anic du'a openings (recitable) —
+    # e.g. QS Ash-Shu'araa 169 "rabbi najjinī wa ahlī". Kept specific to
+    # request-verbs so statements ("rabb al-'ālamīn", "rabbukum") don't match.
+    "رب نجني",
+    "رب هب",
+    "رب زدني",
+    "رب اشرح",
+    "رب اوزعني",
+    "رب انصرني",
+    "رب ارحم",
+    "رب ادخلني",
+    "رب اخرجني",
     "أعوذ",
     "أَعُوذُ",
     "اعوذ",
@@ -2255,6 +2279,7 @@ def _strip_tashkil(s: str) -> str:
     s = _TASHKIL_RE.sub("", s or "")
     for a in ("أ", "إ", "آ", "ٱ", "ٲ", "ٳ"):
         s = s.replace(a, "ا")
+    s = s.replace("ى", "ي")  # fold alef-maqsura → ya (Uthmani vs plain)
     return s
 
 
