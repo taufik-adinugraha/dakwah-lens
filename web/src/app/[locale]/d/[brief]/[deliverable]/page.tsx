@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import {
   ArrowLeft,
   BookOpen,
+  BookOpenText,
   HandHeart,
   Home as HomeIcon,
   MessageSquareText,
@@ -66,6 +67,11 @@ const KIND_ICON: Record<DeliverableSlug, typeof BookOpen> = {
   "artikel-2": Scale,
   "artikel-3": Scale,
   "artikel-4": Scale,
+  // Tafsir Pekan Ini articles — same hydration-crash guard as above.
+  "tafsir-1": BookOpenText,
+  "tafsir-2": BookOpenText,
+  "tafsir-3": BookOpenText,
+  "tafsir-4": BookOpenText,
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

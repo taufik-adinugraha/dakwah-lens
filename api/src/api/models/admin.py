@@ -949,3 +949,30 @@ class HadithTranslationId(Base):
         nullable=False,
         server_default=text("now()"),
     )
+
+
+class TafsirTranslationId(Base):
+    """Claude-supplied Indonesian rendering of an ayah's Ibn Kathir tafsir.
+
+    The `tafsir_ibn_kathir` Qdrant corpus stores exegesis in ENGLISH only
+    (`chunk_text_en`), so the "Tafsir Pekan Ini" track renders it to Bahasa
+    at compose-time and caches the result here for free future SELECTs —
+    the direct analogue of `HadithTranslationId` for the tafsir track.
+
+    Keyed by (surah, ayah). `text_en` is the concatenated Ibn Kathir English
+    (provenance) so a cached ID rendering is invalidated if the upstream
+    source text ever changes.
+    """
+
+    __tablename__ = "tafsir_translations_id"
+
+    surah: Mapped[int] = mapped_column(Integer, primary_key=True)
+    ayah: Mapped[int] = mapped_column(Integer, primary_key=True)
+    text_en: Mapped[str] = mapped_column(Text, nullable=False)
+    text_id: Mapped[str] = mapped_column(Text, nullable=False)
+    model: Mapped[str] = mapped_column(String(64), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("now()"),
+    )

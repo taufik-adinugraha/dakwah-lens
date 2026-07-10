@@ -2288,6 +2288,623 @@ async def cmd_save_fiqh(markdown_path: str) -> None:
     )
 
 
+# ──────────────────────────────────────────────────────────────────
+# TAFSIR PEKAN INI — 17th reserved track (manual-weekly, zero-Gemini)
+#
+# Qur'anic-exegesis analogue of the Fiqh track. Claude picks 4 dominant
+# weekly themes + 1 anchor ayat each; each article is a news-anchored
+# tadabbur (reflection) grounded in the RETRIEVED Ibn Kathir tafsir —
+# never free-generated. The Ibn Kathir corpus is English-only, so the
+# composer renders EN→ID faithfully in chat and the result is cached
+# (M2 `tafsir_translations_id`).
+#
+# Flow (mirrors dump-fiqh / save-fiqh):
+#   1. Claude picks 4 themes → themes.json:
+#      {"themes": [{"title","surah","ayah","citation","why"} x4]}
+#   2. dump-tafsir themes.json → per-theme retrieval (anchor ayat AR+ID
+#      from `quran` + full Ibn Kathir tafsir from `tafsir_ibn_kathir`),
+#      caches the pools, emits the composition prompt. Any ayah with no
+#      Ibn Kathir chunk is a HARD MISS (re-pick, never fabricate).
+#   3. Claude composes in chat → save-tafsir reply.md validates
+#      (tafsir-specific structural hard-fails) and upserts the Briefing
+#      row (theme_group='Tafsir Pekan Ini'). NO flyers.
+# ──────────────────────────────────────────────────────────────────
+
+TAFSIR_GROUP = "Tafsir Pekan Ini"
+TAFSIR_CACHE_SLUG = "tafsir-pekan-ini"
+
+TAFSIR_SYSTEM_PROMPT = """Kamu menyusun BRIEFING TAFSIR PEKAN INI untuk platform Dakwah-Lens: 4 renungan tadabbur atas ayat pilihan yang menyinari peristiwa 7 hari terakhir. Reflektif, menyentuh hati, SATU ibrah utama per ayat. Bukan ceramah menggurui, bukan penetapan hukum.
+
+STRUKTUR WAJIB (H2 persis seperti ini, berurutan):
+## Ringkasan Eksekutif
+## Poin Kunci
+## Artikel Tafsir Pekan Ini
+## Dalil & Sumber
+
+Di bawah "## Artikel Tafsir Pekan Ini" tulis paragraf pengantar singkat, lalu TEPAT 4 sub-bagian H3 dengan pola persis:
+### Tafsir 1 — "<judul punchy 4-7 kata>"
+### Tafsir 2 — "<judul punchy 4-7 kata>"
+### Tafsir 3 — "<judul punchy 4-7 kata>"
+### Tafsir 4 — "<judul punchy 4-7 kata>"
+
+SETIAP ARTIKEL (900-1.300 kata) mengikuti alur:
+1. Peristiwa — konteks berita 7 hari terakhir (fakta HANYA dari BERITA PENDUKUNG; disiplin parafrase: tiap atribusi nama/peran bisa ditelusuri ke headline; anchor pada pola/institusi, JANGAN sebut nama individu).
+2. Ayat — cetak AYAT PILIHAN dalam aksara Arab pada barisnya sendiri, lalu terjemahan Indonesia verbatim dari AYAT POOL. Sertakan sitasi "QS. <Surah>: <ayah>".
+3. Tafsir — sampaikan makna dari TAFSIR POOL (Ibn Katsir). Terjemahkan/rangkum SETIA dari tafsir_en yang diberikan; JANGAN menambah makna di luar pool. Sitasi persis: "Tafsir Ibn Kathir on <surah>:<ayah>".
+4. Tadabbur & Ibrah — renungan yang menautkan makna ayat ke peristiwa pekan ini; SATU ibrah utama, nada rahmah dan hikmah.
+5. Tanya-Jawab — sub-bagian dengan heading persis `#### Tanya-Jawab` berisi 3-4 pasang. Pertanyaan = suara akar rumput yang NYATA tentang MAKNA/penerapan ayat (first-person, mis. "Kalau saya membaca ayat ini…", "Bagaimana memahami…"). Format tiap pasang: baris `**T:** <pertanyaan>` lalu `**J:** <jawaban 2-4 kalimat>`. Jawaban hanya dari pool; untuk keputusan pribadi tunjuk ke ahli tafsir/ulama.
+6. Penutup — satu baris yang menegaskan ini "renungan tadabbur, berbantuan AI, bukan tafsir muktamad" + ajakan merujuk ahli tafsir. (WAJIB memuat frasa "bukan tafsir muktamad".)
+
+ATURAN KERAS (guardrails — tak bisa ditawar):
+- GROUNDING: setiap makna ayat DARI TAFSIR POOL (Ibn Katsir), retrieved — tak boleh tafsir bebas dari ingatan.
+- BUKAN FIQH: jangan menetapkan hukum halal/haram/wajib/makruh dari ayat sebagai keputusanmu sendiri. Ini renungan makna, bukan tarjih hukum; rujukkan pertanyaan hukum ke ulama atau kanal Fiqh. (Bila ayat/tafsir Ibn Katsir sendiri menyebut sifat halal/haram — mis. riba — laporkan sebagai makna ayat yang di-atribusi ke Ibn Katsir, bukan sebagai fatwamu.)
+- AQIDAH SELAMAT (salaf): hindari takwil ayat mutasyabihat & perselisihan aqidah sektarian; ambil makna yang disepakati mayoritas mufassir.
+- TANPA RIWAYAT LEMAH/ISRAILIYYAT: hanya yang ditegaskan Ibn Katsir; jangan bawa kisah israiliyyat da'if.
+- Bagian "## Ringkasan Eksekutif" dan "## Poin Kunci": naratif; TANPA angka statistik internal (jumlah posting, persentase).
+- Tanpa emphasis ALL-CAPS; gunakan **bold**/*italic*. Fokus pola bukan individu; tanpa framing sektarian.
+- "## Dalil & Sumber": daftar SEMUA rujukan yang dikutip artikel, satu baris per entri dengan pola persis: `- **<sitasi persis dari pool>** — <catatan 1 kalimat>` (minimal 8 entri: 4 ayat "QS. …" + 4 "Tafsir Ibn Kathir on <s>:<a>").
+- JANGAN menulis bagian "Pesan Flyer", "Strategi & Aksi Dakwah", khutbah, kultum, atau deliverable mingguan lain."""
+
+
+def _tafsir_stats(themes: list[dict[str, Any]]) -> dict[str, Any]:
+    """headline_stats payload for the tafsir row. `tafsir_topics` powers
+    the hub-card subtitle (see web M7). period = trailing 7d window the
+    themes were picked from."""
+    now = datetime.now(UTC)
+    return {
+        "mode": "tafsir",
+        "tafsir_topics": [t["title"] for t in themes],
+        "themes_meta": [
+            {
+                "title": t["title"],
+                "citation": t["citation"],
+                "surah": int(t["surah"]),
+                "ayah": int(t["ayah"]),
+            }
+            for t in themes
+        ],
+        "period_start": (now - timedelta(days=7)).isoformat(),
+        "period_end": now.isoformat(),
+    }
+
+
+def _load_tafsir_themes(themes_path: str) -> list[dict[str, Any]]:
+    p = Path(themes_path)
+    if not p.exists():
+        raise SystemExit(f"Themes file not found: {themes_path}")
+    raw = json.loads(p.read_text(encoding="utf-8"))
+    themes = raw.get("themes") if isinstance(raw, dict) else raw
+    if not isinstance(themes, list) or len(themes) != 4:
+        raise SystemExit(
+            "Expected exactly 4 themes: "
+            '{"themes": [{"title","surah","ayah","citation","why"} x4]}.'
+        )
+    for i, t in enumerate(themes, 1):
+        for key in ("title", "citation", "why"):
+            if not str(t.get(key, "")).strip():
+                raise SystemExit(f"Theme {i} missing '{key}'.")
+        for key in ("surah", "ayah"):
+            try:
+                int(t[key])
+            except (KeyError, TypeError, ValueError) as exc:
+                raise SystemExit(
+                    f"Theme {i} '{key}' must be an integer (got {t.get(key)!r})."
+                ) from exc
+    return themes
+
+
+async def cmd_dump_tafsir(themes_path: str, output_path: str | None) -> None:
+    """STAGE 1 (tafsir): per-theme Qdrant retrieval → ayat + Ibn Kathir
+    tafsir pools + composition prompt.
+
+    Any theme whose anchor ayat has no Ibn Kathir coverage (or whose
+    verse text is empty) is a BLOCKING miss — the operator must re-pick
+    that ayat. We never fabricate exegesis. Deterministic re-dump is not
+    safe once composition started (a fresh retrieval can shift the pool).
+    """
+    from api.services.kitab_retrieval import (
+        retrieve_by_citation,
+        retrieve_tafsir_for_ayah,
+    )
+
+    themes = _load_tafsir_themes(themes_path)
+
+    verses_pool: list[dict[str, Any]] = []
+    tafsir_pool: list[dict[str, Any]] = []
+    missing: list[str] = []
+    for idx, theme in enumerate(themes, 1):
+        surah = int(theme["surah"])
+        ayah = int(theme["ayah"])
+        citation = str(theme["citation"]).strip()
+
+        verse = retrieve_by_citation(citation)
+        verse_ar = ((verse or {}).get("arabic") or "").strip()
+        verse_id = (
+            (verse or {}).get("translation_id")
+            or (verse or {}).get("translation_en")
+            or ""
+        ).strip()
+        taf = retrieve_tafsir_for_ayah(surah, ayah)
+
+        if not verse or not verse_ar:
+            missing.append(
+                f"Tema {idx} — ayat {citation} tidak ditemukan / teks Arab "
+                "kosong di koleksi Qur'an. Perbaiki sitasi atau pilih ayat lain."
+            )
+        if not taf:
+            missing.append(
+                f"Tema {idx} — Tafsir Ibn Kathir untuk {surah}:{ayah} tidak "
+                "ada di korpus. Pilih ayat lain yang tercakup Ibn Katsir."
+            )
+        if not verse or not verse_ar or not taf:
+            continue
+
+        verses_pool.append(
+            {
+                "tafsir_theme": idx,
+                "citation": citation,
+                "surah": surah,
+                "ayah": ayah,
+                "arabic": verse_ar,
+                "translation_id": verse_id,
+            }
+        )
+        taf_entry = dict(taf)
+        taf_entry["tafsir_theme"] = idx
+        tafsir_pool.append(taf_entry)
+
+    if missing:
+        sys.stderr.write(
+            "✗ TAFSIR MISSES — re-pick ayat (jangan mengarang tafsir):"
+            + chr(10)
+        )
+        for m in missing:
+            sys.stderr.write(f"  - {m}" + chr(10))
+        raise SystemExit(1)
+
+    from api.services.tafsir_translation import lookup_cached_tafsir
+    from api.services.trending_headlines import fetch_trending_headlines
+
+    async with SessionLocal() as session:
+        tafsir_pool, misses = await lookup_cached_tafsir(session, tafsir_pool)
+        headlines = await fetch_trending_headlines(
+            session, limit=12, period_days=7
+        )
+
+    stats = _tafsir_stats(themes)
+    cache = {
+        "mode": "tafsir",
+        "dumped_at_utc": datetime.now(UTC).isoformat(),
+        "themes": themes,
+        "stats": stats,
+        "verses": verses_pool,
+        "tafsir": tafsir_pool,
+        "headlines": [
+            {
+                "theme_group": h.get("theme_group"),
+                "text": (h.get("text") or ""),
+            }
+            for h in headlines
+        ],
+    }
+    cache_file = _cache_path(TAFSIR_CACHE_SLUG)
+    cache_file.write_text(
+        json.dumps(cache, ensure_ascii=False, indent=1), encoding="utf-8"
+    )
+
+    lines = [
+        "<!-- DAKWAH-LENS MANUAL BRIEFING — TAFSIR PEKAN INI -->",
+        f"<!-- dumped: {datetime.now(UTC).isoformat()} -->",
+        "<!-- After composing, save with: -->",
+        "<!--   uv run python -m api.scripts.manual_briefing save-tafsir <reply.md> -->",
+        "",
+        "SYSTEM INSTRUCTION (tafsir-mode persona + structure)",
+        "─" * 60,
+        TAFSIR_SYSTEM_PROMPT,
+        "─" * 60,
+        "",
+        "# TEMA & AYAT PEKAN INI (4)",
+        "",
+    ]
+    for i, theme in enumerate(themes, 1):
+        lines.append(f"## Tema {i}: {theme['title']}")
+        lines.append(f"Ayat pilihan: {theme['citation']}")
+        lines.append(f"Kenapa ayat ini: {theme['why']}")
+        lines.append("")
+
+    lines.append("# BERITA PENDUKUNG (7 hari terakhir — anchor faktual)")
+    lines.append("")
+    for h in headlines:
+        text = (h.get("text") or "").replace(chr(10), " ")[:220]
+        lines.append(f"- [{h.get('theme_group') or '?'}] {text}")
+    lines.append("")
+
+    lines.append("# AYAT POOL (cetak verbatim di artikel — jangan direkonstruksi)")
+    lines.append("")
+    for v in verses_pool:
+        lines.append(
+            f"## Tema {v['tafsir_theme']} — {v['citation']}"
+        )
+        lines.append(f"AR: {v['arabic']}")
+        lines.append(f"ID: {v['translation_id']}")
+        lines.append("")
+
+    lines.append(
+        "# TAFSIR POOL (Ibn Katsir — makna HANYA dari sini; terjemahkan setia)"
+    )
+    lines.append("")
+    for t in tafsir_pool:
+        lines.append(
+            f"## Tema {t['tafsir_theme']} — {t['citation']} "
+            f"({t.get('n_chunks', '?')} chunk)"
+        )
+        if t.get("tafsir_id"):
+            lines.append("[ID tersedia dari cache — pakai/haluskan]")
+            lines.append(f"ID: {t['tafsir_id']}")
+        lines.append(f"EN: {t.get('tafsir_en', '')}")
+        lines.append("")
+
+    if misses:
+        lines.append(
+            f"# TAFSIR TRANSLATION MISSES ({len(misses)}) — render EN→ID "
+            "setia di chat, lalu cache-tafsir <surah> <ayah> <text_id>"
+        )
+        for m in misses:
+            lines.append(f"- {m.get('citation')} ({m['surah']}:{m['ayah']})")
+        lines.append("")
+
+    out = chr(10).join(lines)
+    if output_path:
+        Path(output_path).write_text(out, encoding="utf-8")
+        sys.stderr.write(
+            f"✓ Tafsir prompt written to {output_path} "
+            f"({len(out):,} chars, verses={len(verses_pool)}, "
+            f"tafsir={len(tafsir_pool)}, headlines={len(headlines)}, "
+            f"misses={len(misses)})" + chr(10)
+        )
+    else:
+        print(out)
+
+
+async def cmd_cache_tafsir(surah: int, ayah: int, text_id: str) -> None:
+    """Persist a Claude-supplied Ibn Kathir EN→ID rendering to the cache.
+
+    `text_en` is read from the current tafsir dump pool (so the staleness
+    guard in `lookup_cached_tafsir` matches). Parallels the hadith
+    `cache-translation` subcommand.
+    """
+    from api.services.tafsir_translation import cache_tafsir as _cache
+
+    cache_file = _cache_path(TAFSIR_CACHE_SLUG)
+    if not cache_file.exists():
+        raise SystemExit(
+            f"Tafsir cache missing at {cache_file}. Run dump-tafsir first."
+        )
+    cached = json.loads(cache_file.read_text(encoding="utf-8"))
+    if cached.get("mode") != "tafsir":
+        raise SystemExit("Cache at tafsir slot is not a tafsir dump. Re-dump.")
+    text_en = None
+    for t in cached.get("tafsir", []):
+        if int(t.get("surah")) == int(surah) and int(t.get("ayah")) == int(ayah):
+            text_en = t.get("tafsir_en")
+            break
+    if not text_en:
+        raise SystemExit(
+            f"No tafsir pool entry for {surah}:{ayah} in the current dump."
+        )
+
+    async with SessionLocal() as session:
+        await _cache(session, int(surah), int(ayah), text_en, text_id)
+    sys.stderr.write(
+        f"✓ Cached tafsir ID rendering for {surah}:{ayah}" + chr(10)
+    )
+
+
+_TAFSIR_REQUIRED_H2S = [
+    "## Ringkasan Eksekutif",
+    "## Poin Kunci",
+    "## Artikel Tafsir Pekan Ini",
+    "## Dalil & Sumber",
+]
+
+_TAFSIR_FORBIDDEN_H2S = ["## Pesan Flyer", "## Strategi & Aksi Dakwah"]
+
+
+def _validate_tafsir_briefing(
+    md: str,
+    tafsir_pool: list[dict[str, Any]],
+    ayat_pool: list[dict[str, Any]],
+) -> None:
+    """Tafsir-specific structural hard-fails. Raises SystemExit on any
+    violation — nothing is persisted. (The fiqh-ruling check is a SOFT
+    warning here, not a hard-fail: an anchor ayat's own text may name
+    halal/haram — e.g. riba in QS 2:275 — and that legitimate reporting
+    is indistinguishable from a composer-introduced ruling by regex. The
+    M5 adversarial Verify pass, Gate B, is the layer that distinguishes
+    the two.)"""
+    import re as _re
+
+    problems: list[str] = []
+    warnings: list[str] = []
+    md_stripped = md.strip()
+    if len(md_stripped) < 8000:
+        problems.append(
+            f"Body suspiciously short ({len(md_stripped):,} chars) — "
+            "expected 4 articles x 900-1,300 words."
+        )
+
+    # Required H2s, in order; forbidden weekly/flyer H2s absent.
+    pos = -1
+    for h2 in _TAFSIR_REQUIRED_H2S:
+        p = md.find(chr(10) + h2)
+        if p == -1 and not md.startswith(h2):
+            problems.append(f"Missing required H2 '{h2}'.")
+        elif p != -1:
+            if p < pos:
+                problems.append(f"H2 '{h2}' out of order.")
+            pos = p
+    for h2 in _TAFSIR_FORBIDDEN_H2S:
+        if h2 in md:
+            problems.append(
+                f"Forbidden section '{h2}' present — tafsir briefing must "
+                "not carry weekly deliverables/flyers (composer drift)."
+            )
+
+    # Exactly 4 article H3s with quote-titles: ### Tafsir N — "…"
+    h3s = _re.findall(
+        r'^###\s+Tafsir\s+([1-4])\s+—\s+"([^"]{8,90})"\s*$',
+        md,
+        _re.MULTILINE,
+    )
+    nums = [int(n) for n, _t in h3s]
+    if nums != [1, 2, 3, 4]:
+        problems.append(
+            f"Expected exactly H3s 'Tafsir 1..4 — \"judul\"' in order; "
+            f"found {nums or 'none'}."
+        )
+
+    taf_sa = {
+        (int(t["surah"]), int(t["ayah"]))
+        for t in tafsir_pool
+        if t.get("surah") is not None and t.get("ayah") is not None
+    }
+
+    def _norm(s: str) -> str:
+        return _re.sub(r"\s+", " ", s or "").strip().casefold()
+
+    ayat_cits = [_norm(v.get("citation") or "") for v in ayat_pool]
+
+    if len(nums) == 4:
+        bodies = _re.split(
+            r'^###\s+Tafsir\s+[1-4][^\n]*$', md, flags=_re.MULTILINE
+        )
+        for i, body in enumerate(bodies[1:5], 1):
+            body = body.split(chr(10) + "## ")[0]
+            body_norm = _norm(body)
+
+            # (5) Arabic ayat printed (a vocalized run on its own line).
+            has_arabic = any(
+                _re.search(r"[؀-ۿ]{8,}", ln)
+                for ln in body.splitlines()
+            )
+            if not has_arabic:
+                problems.append(
+                    f"Tafsir {i} tidak mencetak ayat dalam aksara Arab."
+                )
+
+            # (6) In-pool Ibn Kathir tafsir citation.
+            found_taf = _re.findall(
+                r"Tafsir Ibn Kathir on\s+(\d+)\s*:\s*(\d+)", body
+            )
+            if not any((int(s), int(a)) in taf_sa for s, a in found_taf):
+                problems.append(
+                    f"Tafsir {i} tidak mengutip 'Tafsir Ibn Kathir on <s>:<a>' "
+                    "yang ada di pool."
+                )
+
+            # (7) In-pool QS anchor citation.
+            if not any(c and c in body_norm for c in ayat_cits):
+                problems.append(
+                    f"Tafsir {i} tidak mengutip sitasi ayat 'QS. …' dari pool."
+                )
+
+            # (8) Grassroots Q&A block: `#### Tanya-Jawab` with >=3 pairs.
+            if "#### Tanya-Jawab" not in body:
+                problems.append(
+                    f"Tafsir {i} tidak punya blok `#### Tanya-Jawab`."
+                )
+            else:
+                qa = body.split("#### Tanya-Jawab", 1)[1]
+                n_q = len(_re.findall(r"\*\*T:\*\*", qa))
+                if n_q < 3:
+                    problems.append(
+                        f"Tafsir {i} Tanya-Jawab hanya {n_q} pertanyaan "
+                        "(butuh >=3 pasang `**T:**`)."
+                    )
+
+            # (9) SOFT: fiqh-ruling verbs used as an assertion (no
+            # attribution / redirect marker in the same sentence).
+            _SAFE = _re.compile(
+                r"\b(bukan|rujuk|ulama|ustadz|fatwa|fiqh|kanal|serahkan|"
+                r"ibn\s*kath|katsir|ayat ini)\b",
+                _re.IGNORECASE,
+            )
+            for sent in _re.split(r"[.\n]", body):
+                if _re.search(r"\b(haram|halal|wajib)\b", sent, _re.IGNORECASE) \
+                        and not _SAFE.search(sent):
+                    warnings.append(
+                        f"Tafsir {i}: kemungkinan penetapan hukum tanpa "
+                        f"atribusi → \"{sent.strip()[:90]}…\" (cek Verify Gate B)."
+                    )
+
+    # (10) Disclaimer with the exact anchor phrase.
+    if "bukan tafsir muktamad" not in md.lower():
+        problems.append("Missing 'bukan tafsir muktamad' AI-disclaimer line.")
+
+    # (11) Dalil & Sumber entries must cite the pool verbatim (>=8).
+    dalil_section = md.split("## Dalil & Sumber", 1)
+    cited: list[str] = []
+    if len(dalil_section) == 2:
+        cited = _re.findall(
+            r"^-\s+\*\*(.+?)\*\*", dalil_section[1], _re.MULTILINE
+        )
+    if len(cited) < 8:
+        problems.append(
+            f"Dalil & Sumber lists only {len(cited)} entries (expect >=8: "
+            "4 ayat + 4 tafsir, one line per entry)."
+        )
+    pool_cits = {_norm(v.get("citation") or "") for v in ayat_pool} | {
+        _norm(t.get("citation") or "") for t in tafsir_pool
+    }
+    out_of_pool = [c for c in cited if _norm(c) not in pool_cits]
+    if out_of_pool:
+        problems.append(
+            "Dalil & Sumber citations NOT in the retrieved pool: "
+            + "; ".join(out_of_pool[:6])
+        )
+
+    if warnings:
+        sys.stderr.write(
+            f"⚠ {len(warnings)} soft ruling-verb warning(s) — review "
+            "against Verify Gate B (may be legitimate ayat text):" + chr(10)
+        )
+        for w in warnings:
+            sys.stderr.write(f"  - {w}" + chr(10))
+
+    if problems:
+        sys.stderr.write("✗ Tafsir validation failed:" + chr(10))
+        for p in problems:
+            sys.stderr.write(f"  - {p}" + chr(10))
+        raise SystemExit(1)
+
+
+async def cmd_save_tafsir(markdown_path: str) -> None:
+    """STAGE 2 (tafsir): validate Claude's reply + upsert the Briefing row."""
+    cache_file = _cache_path(TAFSIR_CACHE_SLUG)
+    if not cache_file.exists():
+        raise SystemExit(
+            f"Tafsir cache missing at {cache_file}." + chr(10) +
+            "  → Re-run: manual_briefing dump-tafsir <themes.json> "
+            "(NO auto-redump: it would shift the pool and orphan citations)."
+        )
+    md_path = Path(markdown_path)
+    if not md_path.exists():
+        raise SystemExit(f"Markdown file not found: {markdown_path}")
+    summary_md = md_path.read_text(encoding="utf-8").strip()
+
+    cached = json.loads(cache_file.read_text(encoding="utf-8"))
+    if cached.get("mode") != "tafsir":
+        raise SystemExit("Cache at tafsir slot is not a tafsir dump. Re-dump.")
+    verses: list[dict[str, Any]] = cached["verses"]
+    tafsir: list[dict[str, Any]] = cached["tafsir"]
+    themes: list[dict[str, Any]] = cached["themes"]
+    stats: dict[str, Any] = cached["stats"]
+
+    dumped_at = datetime.fromisoformat(cached["dumped_at_utc"])
+    age_hours = (datetime.now(UTC) - dumped_at).total_seconds() / 3600.0
+    if age_hours > 48:
+        sys.stderr.write(
+            f"⚠ Tafsir cache is {age_hours:.1f}h old — pool may be stale."
+            + chr(10)
+        )
+
+    # Combined pool: anchor ayat + Ibn Kathir tafsir entries. Used for
+    # the generic drift scanner and stored as daleel_refs.
+    combined_pool = list(verses) + list(tafsir)
+
+    # Tafsir structural hard-fails first (cheap, most specific).
+    _validate_tafsir_briefing(summary_md, tafsir, verses)
+
+    # Generic heuristic pass — flyer/occasion structure kinds hard-fail
+    # (they can only fire if the composer drifted into another template).
+    from api.services.validate_briefing import (
+        format_warnings_for_stderr,
+        validate_briefing,
+    )
+
+    warnings: list[dict] = []
+    try:
+        warnings = validate_briefing(
+            summary_md,
+            daleel_pool=combined_pool,
+            adhkar_pool=[],
+            llm_judgments=False,
+        )
+    except Exception as exc:  # pragma: no cover — never block on scanner bug
+        sys.stderr.write(f"⚠ Validation pass failed (non-fatal): {exc}" + chr(10))
+
+    drift = [
+        w
+        for w in warnings
+        if str(w.get("kind", "")).startswith("flyer_")
+        or w.get("kind") == "occasion_section_malformed"
+    ]
+    if drift:
+        sys.stderr.write(
+            "✗ Template-drift warnings (flyer/occasion structures in a "
+            "tafsir briefing):" + chr(10)
+        )
+        sys.stderr.write(format_warnings_for_stderr(drift) + chr(10))
+        raise SystemExit(1)
+    if warnings:
+        sys.stderr.write(
+            f"⚠ {len(warnings)} heuristic warning(s) — review:" + chr(10)
+        )
+        sys.stderr.write(format_warnings_for_stderr(warnings) + chr(10))
+
+    from sqlalchemy import delete, select
+
+    async with SessionLocal() as session:
+        now = datetime.now(UTC)
+        jakarta_today = (now + timedelta(hours=7)).date()
+        existing = (
+            await session.execute(
+                select(Briefing.id, Briefing.generated_at).where(
+                    Briefing.theme_group == TAFSIR_GROUP
+                )
+            )
+        ).all()
+        stale = [
+            bid
+            for bid, gen in existing
+            if (gen + timedelta(hours=7)).date() == jakarta_today
+        ]
+        if stale:
+            await session.execute(
+                delete(Briefing).where(Briefing.id.in_(stale))
+            )
+            sys.stderr.write(
+                f"  ↻ replaced {len(stale)} same-day tafsir row(s) "
+                f"({jakarta_today})." + chr(10)
+            )
+
+        row = Briefing(
+            generated_at=now,
+            period_start=datetime.fromisoformat(stats["period_start"]),
+            period_end=datetime.fromisoformat(stats["period_end"]),
+            summary_md=summary_md,
+            summary_md_en=None,
+            headline_stats=stats,
+            model=MODEL_TAG,
+            tokens_in=0,
+            tokens_out=0,
+            cost_usd=0.0,
+            theme_group=TAFSIR_GROUP,
+            daleel_refs=combined_pool,
+            adhkar_refs=[],
+        )
+        session.add(row)
+        await session.commit()
+
+    sys.stderr.write(
+        "✓ Tafsir briefing saved." + chr(10) +
+        f"  theme_group={TAFSIR_GROUP}" + chr(10) +
+        f"  themes={[t['title'] for t in themes]}" + chr(10) +
+        f"  ayat={len(verses)} · tafsir={len(tafsir)} · "
+        f"body={len(summary_md):,} chars" + chr(10)
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog="manual_briefing",
@@ -2439,6 +3056,41 @@ def main() -> None:
     )
     p_save_fiqh.add_argument("markdown_file", help="Path to Claude's reply (.md)")
 
+    p_dump_tafsir = sub.add_parser(
+        "dump-tafsir",
+        help=(
+            "Tafsir mode STAGE 1: per-theme retrieval (anchor ayat AR+ID + "
+            "full Ibn Kathir tafsir) for the 4 picked themes → pools + "
+            "composition prompt."
+        ),
+    )
+    p_dump_tafsir.add_argument(
+        "themes_file",
+        help='JSON: {"themes": [{"title","surah","ayah","citation","why"} x4]}',
+    )
+    p_dump_tafsir.add_argument(
+        "--output", "-o", default=None, help="Write prompt to file."
+    )
+
+    p_save_tafsir = sub.add_parser(
+        "save-tafsir",
+        help="Tafsir mode STAGE 2: validate Claude's reply + upsert the row.",
+    )
+    p_save_tafsir.add_argument(
+        "markdown_file", help="Path to Claude's reply (.md)"
+    )
+
+    p_cache_tafsir = sub.add_parser(
+        "cache-tafsir",
+        help=(
+            "Persist a Claude-supplied Ibn Kathir EN→ID rendering "
+            "(text_en read from the current dump pool)."
+        ),
+    )
+    p_cache_tafsir.add_argument("surah", type=int)
+    p_cache_tafsir.add_argument("ayah", type=int)
+    p_cache_tafsir.add_argument("text_id", help="Indonesian rendering.")
+
     p_list_occ = sub.add_parser(
         "list-occasions",
         help=(
@@ -2499,6 +3151,12 @@ def main() -> None:
         asyncio.run(cmd_dump_fiqh(args.issues_file, args.output))
     elif args.cmd == "save-fiqh":
         asyncio.run(cmd_save_fiqh(args.markdown_file))
+    elif args.cmd == "dump-tafsir":
+        asyncio.run(cmd_dump_tafsir(args.themes_file, args.output))
+    elif args.cmd == "save-tafsir":
+        asyncio.run(cmd_save_tafsir(args.markdown_file))
+    elif args.cmd == "cache-tafsir":
+        asyncio.run(cmd_cache_tafsir(args.surah, args.ayah, args.text_id))
     elif args.cmd == "list-occasions":
         asyncio.run(cmd_list_occasions(args.days))
 

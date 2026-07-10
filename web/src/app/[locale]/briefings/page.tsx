@@ -19,6 +19,7 @@ import {
   getGroupVolumes7d,
   getLatestFiqhBriefing,
   getLatestOccasionBriefing,
+  getLatestTafsirBriefing,
 } from "@/lib/briefing-data";
 import { WatchedRoomsNudge } from "./WatchedRoomsNudge";
 
@@ -58,13 +59,15 @@ export default async function InsightsPage({
   // why they got bounced (was previously silent, see audit 2026-05-26).
   const showBriefsAdminNotice = sp.notice === "briefs-admin-only";
 
-  const [briefings, volumes, occasion, fiqh, session] = await Promise.all([
-    getAllLatestBriefings(),
-    getGroupVolumes7d(),
-    getLatestOccasionBriefing(),
-    getLatestFiqhBriefing(),
-    auth(),
-  ]);
+  const [briefings, volumes, occasion, fiqh, tafsir, session] =
+    await Promise.all([
+      getAllLatestBriefings(),
+      getGroupVolumes7d(),
+      getLatestOccasionBriefing(),
+      getLatestFiqhBriefing(),
+      getLatestTafsirBriefing(),
+      auth(),
+    ]);
 
   let showDigestPrompt = false;
   if (session?.user?.id) {
@@ -125,6 +128,7 @@ export default async function InsightsPage({
            un-hiding is a one-line swap back to `occasion={occasion}`. */
         occasion={null}
         fiqh={fiqh}
+        tafsir={tafsir}
         locale={locale}
       />
 

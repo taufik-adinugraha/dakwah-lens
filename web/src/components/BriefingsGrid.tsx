@@ -4,6 +4,7 @@ import {
   Banknote,
   Boxes,
   BookOpenCheck,
+  BookOpenText,
   CalendarHeart,
   Clock,
   Cpu,
@@ -179,6 +180,7 @@ export async function BriefingsGrid({
   volumes,
   occasion,
   fiqh,
+  tafsir,
   locale,
 }: {
   briefings: Map<string, LatestBriefing>;
@@ -194,6 +196,11 @@ export async function BriefingsGrid({
    *  the occasion card in the "Edisi Khusus" row, emerald-toned. NULL
    *  until the first edition is saved. */
   fiqh: LatestBriefing | null;
+  /** Latest 17th-track tafsir briefing (theme_group = 'Tafsir Pekan
+   *  Ini' — 4 news-anchored tadabbur articles over a picked anchor
+   *  ayat each). Rendered next to the fiqh card in the "Edisi Khusus"
+   *  row, sky-toned. NULL until the first edition is saved. */
+  tafsir: LatestBriefing | null;
   locale: string;
 }) {
   const t = await getTranslations("Briefing");
@@ -234,11 +241,12 @@ export async function BriefingsGrid({
           {t("hub_top_n_note")}
         </p>
 
-        {/* ── Edisi Khusus — the two non-weekly tracks (Acara Kalender
-            Islam + Fiqh Pekan Ini), lightly separated from the 14 news
-            themes below. The whole row disappears when neither card
-            exists, so the 14-grid layout is untouched in that state. */}
-        {(occasion || fiqh) && (
+        {/* ── Edisi Khusus — the three non-weekly tracks (Acara
+            Kalender Islam + Fiqh Pekan Ini + Tafsir Pekan Ini), lightly
+            separated from the 14 news themes below. The whole row
+            disappears when no card exists, so the 14-grid layout is
+            untouched in that state. */}
+        {(occasion || fiqh || tafsir) && (
           <div className="mb-8">
             <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-faint">
               Edisi Khusus
@@ -379,6 +387,69 @@ export async function BriefingsGrid({
                       )}
                       <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 transition group-hover:gap-1.5">
                         Baca 4 artikel fiqh
+                        <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })()}
+              {tafsir && (() => {
+                // 17th-track tafsir card — sky tone (distinct from the
+                // occasion yellow + fiqh emerald). Subtitle lists the
+                // week's 4 themes from headlineStats.tafsir_topics (the
+                // manual save writes the theme titles there).
+                const stats = tafsir.headlineStats as Record<string, unknown>;
+                const topics = Array.isArray(stats.tafsir_topics)
+                  ? (stats.tafsir_topics as unknown[]).filter(
+                      (x): x is string => typeof x === "string",
+                    )
+                  : [];
+                const tafsirHref = `/briefings/${briefingSlug(
+                  tafsir.generatedAt,
+                  tafsir.themeGroup,
+                )}`;
+                const ageDays = Math.max(
+                  0,
+                  Math.floor(
+                    (nowMs - tafsir.generatedAt.getTime()) / 86_400_000,
+                  ),
+                );
+                return (
+                  <li key="__tafsir-latest">
+                    <Link
+                      href={tafsirHref}
+                      className="group relative flex h-full flex-col rounded-xl border bg-gradient-to-br p-4 transition hover:-translate-y-0.5 hover:shadow-sm from-sky-50/90 to-white border-sky-300 hover:border-sky-500"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-sky-100 text-sky-700">
+                          <BookOpenText className="h-4 w-4" />
+                        </span>
+                        <div className="flex flex-wrap items-center justify-end gap-1">
+                          <span
+                            className="inline-flex items-center gap-0.5 rounded-full bg-sky-100 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-sky-800"
+                            title="4 tadabbur ayat pilihan pekan ini"
+                          >
+                            Tafsir
+                          </span>
+                          <span
+                            className="inline-flex items-center gap-0.5 rounded-full bg-paper-deep px-1.5 py-0.5 text-[9px] font-semibold tabular-nums text-ink-muted"
+                            title={t("hub_card_age_tooltip", { n: ageDays })}
+                          >
+                            <Clock className="h-2.5 w-2.5" />
+                            {ageDays}d
+                          </span>
+                        </div>
+                      </div>
+                      <h3 className="mt-3 line-clamp-2 text-sm font-bold leading-snug text-ink">
+                        Tafsir Pekan Ini
+                      </h3>
+                      {topics.length > 0 && (
+                        <div className="mt-2 line-clamp-2 text-[11px] leading-snug text-ink-muted">
+                          {topics.join(" · ")}
+                        </div>
+                      )}
+                      <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-sky-800 transition group-hover:gap-1.5">
+                        Baca 4 tadabbur ayat
                         <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
                       </div>
                     </Link>

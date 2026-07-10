@@ -876,6 +876,76 @@ def retrieve_by_citation(citation: str) -> dict[str, Any] | None:
     return None
 
 
+def retrieve_tafsir_for_ayah(surah: int, ayah: int) -> dict[str, Any] | None:
+    """Gather the FULL Ibn Kathir tafsir for one ayah from Qdrant.
+
+    `tafsir_ibn_kathir` stores each verse's exegesis split across several
+    `chunk_index` chunks (ENGLISH only — payload key `chunk_text_en`; there
+    is no Indonesian field). `retrieve_by_citation` returns just the top-1
+    chunk, so this dedicated helper scrolls EVERY chunk for (surah, ayah),
+    orders them by `chunk_index`, and concatenates into one `tafsir_en`.
+
+    Returns None when the ayah has no tafsir chunk (or text is empty) — the
+    caller MUST surface that as a miss and re-pick the ayat, never fabricate
+    tafsir. The anchor ayat text (AR + Kemenag ID) is fetched separately via
+    `retrieve_by_citation("QS. <Surah>: <ayah>")`.
+    """
+    from qdrant_client import models
+
+    qdrant = _get_qdrant()
+    try:
+        points, _ = qdrant.scroll(
+            collection_name=COLLECTION_NAMES["tafsir_ibn_kathir"],
+            scroll_filter=models.Filter(
+                must=[
+                    models.FieldCondition(
+                        key="surah", match=models.MatchValue(value=int(surah))
+                    ),
+                    models.FieldCondition(
+                        key="ayah", match=models.MatchValue(value=int(ayah))
+                    ),
+                ]
+            ),
+            limit=64,  # one ayah's tafsir is a handful of chunks; 64 is ample
+            with_payload=True,
+            with_vectors=False,
+        )
+    except Exception as exc:
+        log.warning(
+            "kitab_retrieval.tafsir_scroll_failed",
+            surah=surah,
+            ayah=ayah,
+            error=str(exc),
+        )
+        return None
+    if not points:
+        log.info("kitab_retrieval.tafsir_not_found", surah=surah, ayah=ayah)
+        return None
+
+    chunks = sorted(
+        (p.payload or {} for p in points),
+        key=lambda pl: int(pl.get("chunk_index", 0)),
+    )
+    tafsir_en = "\n\n".join(
+        (pl.get("chunk_text_en") or "").strip()
+        for pl in chunks
+        if (pl.get("chunk_text_en") or "").strip()
+    )
+    if not tafsir_en:
+        log.info("kitab_retrieval.tafsir_empty", surah=surah, ayah=ayah)
+        return None
+    first = chunks[0]
+    return {
+        "surah": int(surah),
+        "ayah": int(ayah),
+        "citation": f"Tafsir Ibn Kathir on {int(surah)}:{int(ayah)}",
+        "ayah_ar": (first.get("ayah_text_ar") or "").strip(),
+        "tafsir_en": tafsir_en,
+        "n_chunks": len(chunks),
+        "source": "Tafsir Ibn Kathir",
+    }
+
+
 # ── Kisah Pendek (10-min storytelling slot) ───────────────────────────
 #
 # Source: one of FOUR narrative kitabs. Each has different content shape

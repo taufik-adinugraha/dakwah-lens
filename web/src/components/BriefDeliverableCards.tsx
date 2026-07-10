@@ -6,6 +6,7 @@ import { useRouter } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
 import {
   BookOpen,
+  BookOpenText,
   Check,
   Copy,
   Download,
@@ -57,7 +58,15 @@ type CardKind =
   | "artikel-1"
   | "artikel-2"
   | "artikel-3"
-  | "artikel-4";
+  | "artikel-4"
+  // Tafsir Pekan Ini (17th track): the 4 per-ayat tadabbur articles.
+  // Same slug-shaped kinds so routing (/briefings/{slug}/tafsir-N),
+  // share (/d/…) and PDF URLs fall out of the existing kind-keyed
+  // plumbing unchanged.
+  | "tafsir-1"
+  | "tafsir-2"
+  | "tafsir-3"
+  | "tafsir-4";
 
 type DeliverableCard = {
   kind: CardKind | null;
@@ -101,6 +110,10 @@ const KIND_ORDER: CardKind[] = [
   "artikel-2",
   "artikel-3",
   "artikel-4",
+  "tafsir-1",
+  "tafsir-2",
+  "tafsir-3",
+  "tafsir-4",
 ];
 
 const KIND_ICON: Record<CardKind, typeof BookOpen> = {
@@ -116,6 +129,10 @@ const KIND_ICON: Record<CardKind, typeof BookOpen> = {
   "artikel-2": Scale,
   "artikel-3": Scale,
   "artikel-4": Scale,
+  "tafsir-1": BookOpenText,
+  "tafsir-2": BookOpenText,
+  "tafsir-3": BookOpenText,
+  "tafsir-4": BookOpenText,
 };
 
 /** Light accent tint per card so the grid scans quickly. */
@@ -132,6 +149,10 @@ const KIND_TONE: Record<CardKind, string> = {
   "artikel-2": "from-emerald-50 to-white ring-emerald-200/60",
   "artikel-3": "from-emerald-50 to-white ring-emerald-200/60",
   "artikel-4": "from-emerald-50 to-white ring-emerald-200/60",
+  "tafsir-1": "from-sky-50 to-white ring-sky-200/60",
+  "tafsir-2": "from-sky-50 to-white ring-sky-200/60",
+  "tafsir-3": "from-sky-50 to-white ring-sky-200/60",
+  "tafsir-4": "from-sky-50 to-white ring-sky-200/60",
 };
 
 const KIND_ICON_TONE: Record<CardKind, string> = {
@@ -147,6 +168,10 @@ const KIND_ICON_TONE: Record<CardKind, string> = {
   "artikel-2": "bg-emerald-100 text-emerald-700",
   "artikel-3": "bg-emerald-100 text-emerald-700",
   "artikel-4": "bg-emerald-100 text-emerald-700",
+  "tafsir-1": "bg-sky-100 text-sky-700",
+  "tafsir-2": "bg-sky-100 text-sky-700",
+  "tafsir-3": "bg-sky-100 text-sky-700",
+  "tafsir-4": "bg-sky-100 text-sky-700",
 };
 
 /** Modal header bar tint per card kind — the colored strip across the
@@ -165,6 +190,10 @@ const KIND_HEADER_BG: Record<CardKind, string> = {
   "artikel-2": "bg-gradient-to-r from-emerald-50 via-white to-emerald-50",
   "artikel-3": "bg-gradient-to-r from-emerald-50 via-white to-emerald-50",
   "artikel-4": "bg-gradient-to-r from-emerald-50 via-white to-emerald-50",
+  "tafsir-1": "bg-gradient-to-r from-sky-50 via-white to-sky-50",
+  "tafsir-2": "bg-gradient-to-r from-sky-50 via-white to-sky-50",
+  "tafsir-3": "bg-gradient-to-r from-sky-50 via-white to-sky-50",
+  "tafsir-4": "bg-gradient-to-r from-sky-50 via-white to-sky-50",
 };
 
 /** Modal scrollable-body backdrop per card kind — a soft tinted
@@ -184,6 +213,10 @@ const KIND_BODY_BG: Record<CardKind, string> = {
   "artikel-2": "bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/50",
   "artikel-3": "bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/50",
   "artikel-4": "bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/50",
+  "tafsir-1": "bg-gradient-to-br from-sky-50/70 via-white to-blue-50/50",
+  "tafsir-2": "bg-gradient-to-br from-sky-50/70 via-white to-blue-50/50",
+  "tafsir-3": "bg-gradient-to-br from-sky-50/70 via-white to-blue-50/50",
+  "tafsir-4": "bg-gradient-to-br from-sky-50/70 via-white to-blue-50/50",
 };
 
 /** Accent border-bottom for the header, drives the section h3 underline
@@ -201,6 +234,10 @@ const KIND_ACCENT_BORDER: Record<CardKind, string> = {
   "artikel-2": "border-emerald-200",
   "artikel-3": "border-emerald-200",
   "artikel-4": "border-emerald-200",
+  "tafsir-1": "border-sky-200",
+  "tafsir-2": "border-sky-200",
+  "tafsir-3": "border-sky-200",
+  "tafsir-4": "border-sky-200",
 };
 
 /** Blockquote palette per card kind — matches the section accent so a
@@ -219,6 +256,10 @@ const KIND_QUOTE: Record<CardKind, { bg: string; border: string; icon: string }>
   "artikel-2": { bg: "bg-emerald-50/70", border: "border-emerald-400", icon: "text-emerald-500" },
   "artikel-3": { bg: "bg-emerald-50/70", border: "border-emerald-400", icon: "text-emerald-500" },
   "artikel-4": { bg: "bg-emerald-50/70", border: "border-emerald-400", icon: "text-emerald-500" },
+  "tafsir-1": { bg: "bg-sky-50/70", border: "border-sky-400", icon: "text-sky-500" },
+  "tafsir-2": { bg: "bg-sky-50/70", border: "border-sky-400", icon: "text-sky-500" },
+  "tafsir-3": { bg: "bg-sky-50/70", border: "border-sky-400", icon: "text-sky-500" },
+  "tafsir-4": { bg: "bg-sky-50/70", border: "border-sky-400", icon: "text-sky-500" },
 };
 
 /**
@@ -245,10 +286,11 @@ function cardLabelFor(heading: string): string {
   const idx = heading.search(/\s+[—–]\s+/);
   if (idx === -1) return heading.trim();
   const prefix = heading.slice(0, idx).trim();
-  // Fiqh articles: "Artikel 2" alone says nothing — surface the punchy
-  // per-issue title on the card instead (quotes stripped); the "Artikel
-  // N" category still shows via the numbered icon + modal header.
-  if (/^artikel\s*[1-4]$/i.test(prefix)) {
+  // Fiqh / Tafsir articles: "Artikel 2" / "Tafsir 2" alone says nothing
+  // — surface the punchy per-issue title on the card instead (quotes
+  // stripped); the "Artikel N" / "Tafsir N" category still shows via
+  // the numbered icon + modal header.
+  if (/^(?:artikel|tafsir)\s*[1-4]$/i.test(prefix)) {
     const title = heading.slice(idx).replace(/^\s+[—–]\s+/, "").trim();
     return title.replace(/^["\u201C]|["\u201D]$/g, "").trim() || prefix;
   }
@@ -281,6 +323,10 @@ function classifyHeading(heading: string): CardKind | null {
   // deep-link/share/PDF URLs carry the article number.
   const artikelMatch = lower.match(/^artikel\s*([1-4])\b/);
   if (artikelMatch) return `artikel-${artikelMatch[1]}` as CardKind;
+  // Tafsir articles: "Tafsir N — \"…\"" → slug-shaped kind so the
+  // deep-link/share/PDF URLs carry the article number.
+  const tafsirMatch = lower.match(/^tafsir\s*([1-4])\b/);
+  if (tafsirMatch) return `tafsir-${tafsirMatch[1]}` as CardKind;
   // Kultum BEFORE khutbah: a heading like "Kultum Jumat" would otherwise
   // match /khutbah/... wait, it wouldn't share that root. But ordering
   // before khutbah is still defensive against future "Khutbah Singkat /

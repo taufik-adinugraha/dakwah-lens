@@ -556,6 +556,29 @@ export const DELIVERABLE_HEADING_PATTERNS = {
     matcher: (h) => /^artikel\s*4\b/i.test(h),
     title: "Artikel Fiqh 4",
   },
+  // ── Tafsir Pekan Ini (17th track) ────────────────────────────
+  // The weekly tafsir briefing carries 4 news-anchored tadabbur
+  // articles over a picked anchor ayat each, mirroring the Fiqh
+  // track's per-article page split. H3s are `### Tafsir N — "Judul"`;
+  // sectionNamePrefix strips the quote-title so the matcher only sees
+  // "Tafsir N". Registry-driven consumers (/d/, /briefings/[id]/
+  // [deliverable], PDF route) pick these up automatically.
+  "tafsir-1": {
+    matcher: (h) => /^tafsir\s*1\b/i.test(h),
+    title: "Tafsir 1",
+  },
+  "tafsir-2": {
+    matcher: (h) => /^tafsir\s*2\b/i.test(h),
+    title: "Tafsir 2",
+  },
+  "tafsir-3": {
+    matcher: (h) => /^tafsir\s*3\b/i.test(h),
+    title: "Tafsir 3",
+  },
+  "tafsir-4": {
+    matcher: (h) => /^tafsir\s*4\b/i.test(h),
+    title: "Tafsir 4",
+  },
 } satisfies Record<
   string,
   { matcher: (heading: string) => boolean; title: string }
@@ -653,7 +676,9 @@ export async function getBriefingBySlug(
   const resolveGroup = (raw: string): string | undefined =>
     raw === FIQH_SLUG
       ? FIQH_GROUP
-      : GROUP_BY_SLUG[raw] ?? GROUP_BY_SLUG[slugifyGroup(raw)];
+      : raw === TAFSIR_SLUG
+        ? TAFSIR_GROUP
+        : GROUP_BY_SLUG[raw] ?? GROUP_BY_SLUG[slugifyGroup(raw)];
 
   let group: string | undefined;
   let occasionSlug: string | undefined;
@@ -947,6 +972,26 @@ export const FIQH_SLUG = "fiqh-pekan-ini";
  *  the first edition is saved — the card renders only when non-null. */
 export async function getLatestFiqhBriefing(): Promise<LatestBriefing | null> {
   return getLatestBriefing(FIQH_GROUP);
+}
+
+/** Reserved 17th-track theme_group for the weekly tafsir briefing
+ *  (4 news-anchored tadabbur articles over a picked anchor ayat each,
+ *  Ibn Kathir single-source — no flyers/poster). Same reserved-label
+ *  pattern as the 16th track's 'Fiqh Pekan Ini': not in BRIEFING_GROUPS,
+ *  so the 14-grid + volume queries never see it, and no /groups page
+ *  exists for it. */
+export const TAFSIR_GROUP = "Tafsir Pekan Ini";
+/** URL slug for the tafsir track: /briefings/YYYY-MM-DD-tafsir-pekan-ini.
+ *  Matches slugifyGroup(TAFSIR_GROUP) — asserted by the resolver in
+ *  getBriefingBySlug, which maps it back to TAFSIR_GROUP (it is NOT in
+ *  GROUP_BY_SLUG, and unlike occasions the tafsir row has no
+ *  occasion_slug to fall back on). */
+export const TAFSIR_SLUG = "tafsir-pekan-ini";
+
+/** Latest tafsir briefing for the hub's "Edisi Khusus" card. Null until
+ *  the first edition is saved — the card renders only when non-null. */
+export async function getLatestTafsirBriefing(): Promise<LatestBriefing | null> {
+  return getLatestBriefing(TAFSIR_GROUP);
 }
 
 /**
