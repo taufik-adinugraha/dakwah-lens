@@ -2012,7 +2012,7 @@ async def cmd_dump_fiqh(issues_path: str, output_path: str | None) -> None:
     lines.append("# BERITA PENDUKUNG (7 hari terakhir — anchor faktual)")
     lines.append("")
     for h in headlines:
-        text = (h.get("text") or "").replace(chr(10), " ")[:220]
+        text = (h.get("title") or "").replace(chr(10), " ")[:220]
         lines.append(f"- [{h.get('theme_group') or '?'}] {text}")
     lines.append("")
 
@@ -2403,7 +2403,7 @@ async def cmd_dump_tafsir(themes_path: str, output_path: str | None) -> None:
     safe once composition started (a fresh retrieval can shift the pool).
     """
     from api.services.kitab_retrieval import (
-        retrieve_by_citation,
+        retrieve_quran_ayah,
         retrieve_tafsir_for_ayah,
     )
 
@@ -2417,7 +2417,7 @@ async def cmd_dump_tafsir(themes_path: str, output_path: str | None) -> None:
         ayah = int(theme["ayah"])
         citation = str(theme["citation"]).strip()
 
-        verse = retrieve_by_citation(citation)
+        verse = retrieve_quran_ayah(surah, ayah)
         verse_ar = ((verse or {}).get("arabic") or "").strip()
         verse_id = (
             (verse or {}).get("translation_id")
@@ -2482,7 +2482,7 @@ async def cmd_dump_tafsir(themes_path: str, output_path: str | None) -> None:
         "headlines": [
             {
                 "theme_group": h.get("theme_group"),
-                "text": (h.get("text") or ""),
+                "title": (h.get("title") or ""),
             }
             for h in headlines
         ],
@@ -2515,7 +2515,7 @@ async def cmd_dump_tafsir(themes_path: str, output_path: str | None) -> None:
     lines.append("# BERITA PENDUKUNG (7 hari terakhir — anchor faktual)")
     lines.append("")
     for h in headlines:
-        text = (h.get("text") or "").replace(chr(10), " ")[:220]
+        text = (h.get("title") or "").replace(chr(10), " ")[:220]
         lines.append(f"- [{h.get('theme_group') or '?'}] {text}")
     lines.append("")
 

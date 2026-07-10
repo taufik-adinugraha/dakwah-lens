@@ -909,6 +909,11 @@ def retrieve_tafsir_for_ayah(surah: int, ayah: int) -> dict[str, Any] | None:
             limit=64,  # one ayah's tafsir is a handful of chunks; 64 is ample
             with_payload=True,
             with_vectors=False,
+            # `tafsir_ibn_kathir` has no payload index on (surah, ayah), so
+            # this filter is a full scan over ~12k points. The client default
+            # (~5s) intermittently times out and would be misread as a
+            # coverage miss (→ spurious "re-pick ayat"). 30s is ample.
+            timeout=30,
         )
     except Exception as exc:
         log.warning(
@@ -943,6 +948,66 @@ def retrieve_tafsir_for_ayah(surah: int, ayah: int) -> dict[str, Any] | None:
         "tafsir_en": tafsir_en,
         "n_chunks": len(chunks),
         "source": "Tafsir Ibn Kathir",
+    }
+
+
+def retrieve_quran_ayah(surah: int, ayah: int) -> dict[str, Any] | None:
+    """Fetch one Qur'an ayah (AR + Kemenag ID) by surah+ayah NUMBER.
+
+    Preferred over `retrieve_by_citation("QS. <name>: <n>")` for the Tafsir
+    track: the name path post-filters on `surah_name_translit` (canonical
+    forms like 'An-Nisaa' / 'Al-Maaida'), which breaks on the natural
+    Indonesian spellings an operator writes ('An-Nisa' / "Al-Ma'idah").
+    Matching by the numeric (surah, ayah) is unambiguous and lets the
+    displayed citation stay whatever the caller wants. Returns None if the
+    ayah isn't found (caller surfaces a miss, never fabricates).
+    """
+    from qdrant_client import models
+
+    qdrant = _get_qdrant()
+    try:
+        points, _ = qdrant.scroll(
+            collection_name=COLLECTION_NAMES["quran"],
+            scroll_filter=models.Filter(
+                must=[
+                    models.FieldCondition(
+                        key="surah", match=models.MatchValue(value=int(surah))
+                    ),
+                    models.FieldCondition(
+                        key="ayah", match=models.MatchValue(value=int(ayah))
+                    ),
+                ]
+            ),
+            limit=1,
+            with_payload=True,
+            with_vectors=False,
+            timeout=30,
+        )
+    except Exception as exc:
+        log.warning(
+            "kitab_retrieval.quran_ayah_scroll_failed",
+            surah=surah,
+            ayah=ayah,
+            error=str(exc),
+        )
+        return None
+    if not points:
+        log.info("kitab_retrieval.quran_ayah_not_found", surah=surah, ayah=ayah)
+        return None
+    pl = points[0].payload or {}
+    arabic = (pl.get("arabic") or "").strip()
+    translation_id = (pl.get("id") or "").strip()
+    if not arabic:
+        log.info("kitab_retrieval.quran_ayah_empty", surah=surah, ayah=ayah)
+        return None
+    return {
+        "surah": int(surah),
+        "ayah": int(ayah),
+        "arabic": arabic,
+        "translation_id": translation_id,
+        "translation_en": (pl.get("en") or "").strip(),
+        "citation_id": (pl.get("citation_id") or "").strip(),
+        "surah_name_translit": (pl.get("surah_name_translit") or "").strip(),
     }
 
 
