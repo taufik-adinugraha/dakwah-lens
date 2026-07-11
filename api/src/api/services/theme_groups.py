@@ -269,7 +269,11 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "(itu Lainnya). Cerita politik tentang ibadah / kartel haji / "
         "reformasi Kemenhaj → Pemerintahan & Kebijakan. Konten "
         "SINGLE-FAITH non-Islam (devosional Kristen, doa Katolik, "
-        "kalender Hindu) → Lainnya kecuali ada framing lain"
+        "kalender Hindu) → Lainnya kecuali ada framing lain. BUKAN daftar "
+        "hasil lomba MTQ/STQ, CSR khitanan massal / santunan anak yatim, "
+        "atau logistik & politik kepemimpinan muktamar/munas ormas Islam "
+        "(NU/Muhammadiyah) — hasil lomba & CSR itu Lainnya, sedangkan "
+        "kepemimpinan/politik ormas itu Pemerintahan & Kebijakan (audit#89)"
     ),
     "Kesehatan & Kehidupan": "kesehatan fisik & mental, kesejahteraan jiwa",
     "Pendidikan & SDM": (
@@ -306,7 +310,11 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "BUKAN vlog perjalanan/wisata via transportasi umum / sunrise "
         "tour / stream-of-consciousness lifestyle musing — itu Lainnya. "
         "BUKAN cuitan fandom politik singkat tanpa diskusi kebijakan "
-        "('Anak Abah ganteng') — itu Lainnya"
+        "('Anak Abah ganteng') — itu Lainnya. BUKAN kegiatan rutin/"
+        "seremonial/human-interest TNI-Polri (latihan/lari fisik, bakti "
+        "sosial bangun jembatan, silat/bela diri, upacara kenaikan "
+        "pangkat, rekrutmen, yel/slogan, klip alutsista) atau Latsar/"
+        "diklat ASN tanpa substansi kebijakan — itu Lainnya (audit#89)"
     ),
     "Patologi Sosial Digital": (
         "judi online, pinjol, narkoba (konteks distribusi/peredaran digital), "
