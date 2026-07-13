@@ -20,8 +20,8 @@ import { MahasiswaPosterCard } from "./MahasiswaPosterCard";
  *  instead of inline. Match is case-insensitive and tolerant of trailing
  *  punctuation but requires the exact phrase since the LLM is steered
  *  toward these exact section names by the prompt. */
-const SECTION_4_HEADINGS_ID = ["strategi & aksi dakwah", "strategi dan aksi dakwah", "artikel fiqh pekan ini"];
-const SECTION_4_HEADINGS_EN = ["da'wah strategies & actions", "dawah strategies & actions", "artikel fiqh pekan ini"];
+const SECTION_4_HEADINGS_ID = ["strategi & aksi dakwah", "strategi dan aksi dakwah", "artikel fiqh pekan ini", "artikel tafsir pekan ini"];
+const SECTION_4_HEADINGS_EN = ["da'wah strategies & actions", "dawah strategies & actions", "artikel fiqh pekan ini", "artikel tafsir pekan ini"];
 
 /** The `## Pesan Flyer` / `## Flyer Messages` section is INPUT for the
  *  PNG flyer renderer (see `extractDedicatedFlyerMessage` in
