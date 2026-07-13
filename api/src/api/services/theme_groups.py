@@ -244,7 +244,11 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "negeri tanpa kaitan Indonesia (itu Lainnya)"
     ),
     "Ekonomi & Bisnis": (
-        "ekonomi rakyat, bisnis halal, investasi, UMKM, daya beli"
+        "ekonomi rakyat, bisnis halal, investasi, UMKM, daya beli, harga "
+        "pangan, kebijakan ekonomi yang berdampak pada rakyat. BUKAN iklan/"
+        "peluncuran produk komersial (otomotif spt Toyota/Honda, gadget, "
+        "properti) maupun event bazar/karnaval/UMKM seremonial tanpa "
+        "substansi isu ekonomi — itu Lainnya (audit#90)"
     ),
     "Aqidah & Ibadah": (
         "ibadah ISLAM pilar (haji/kurban/idul adha), hijrah, fatwa, polemik "
