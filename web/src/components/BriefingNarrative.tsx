@@ -182,6 +182,15 @@ export function BriefingNarrative({
       ? splitSection4(bodyForDisplay, contentIsEnglish)
       : null;
 
+  // Article-only reserved tracks (Fiqh / Tafsir Pekan Ini) have a
+  // "## Artikel … Pekan Ini" Section 4 and carry NO Mahasiswa poster or
+  // share-flyer PNGs. The weekly track's Section 4 is "Strategi & Aksi
+  // Dakwah". Gate the poster/flyer extras on this so article-only pages
+  // don't show empty visual slots.
+  const isArticleOnlyTrack =
+    !!split?.section4HeadingLine &&
+    /^\s*##\s+artikel\s+(fiqh|tafsir)\b/i.test(split.section4HeadingLine);
+
   return (
     <div className="mt-5">
       <article className="text-pretty text-slate-800">
@@ -201,27 +210,33 @@ export function BriefingNarrative({
                   briefBasePath={briefBasePath!}
                   initialDeliverable={initialDeliverable ?? null}
                 />
-                {/* Separator between the core deliverable cards and the
-                    visual extras (Mahasiswa poster, share-ready flyers).
-                    Both downstream blocks have their own eyebrow + title,
-                    but without the dashed rule + spacing they bled into
-                    the deliverable grid above and looked like more cards.
-                    Audit 2026-05-26 P0 — visitors expecting a unified
-                    "content kit" couldn't tell where it ended. */}
-                {briefId && (posterLabels || true) && (
-                  <hr
-                    aria-hidden
-                    className="my-10 border-t border-dashed border-slate-200"
-                  />
+                {/* The Mahasiswa poster + share-ready flyer PNGs are
+                    weekly-briefing deliverables. The article-only reserved
+                    tracks (Fiqh / Tafsir Pekan Ini) carry neither — their
+                    Section 4 is "## Artikel … Pekan Ini", not the weekly
+                    "Strategi & Aksi Dakwah". Suppress both there so those
+                    pages don't show an empty poster slot + flyer grid. */}
+                {briefId && !isArticleOnlyTrack && (
+                  <>
+                    {/* Separator between the core deliverable cards and the
+                        visual extras (Mahasiswa poster, share-ready flyers).
+                        Audit 2026-05-26 P0 — without the dashed rule they
+                        bled into the deliverable grid and looked like more
+                        cards. */}
+                    <hr
+                      aria-hidden
+                      className="my-10 border-t border-dashed border-slate-200"
+                    />
+                    {posterLabels && (
+                      <MahasiswaPosterCard
+                        briefId={briefId}
+                        locale={locale ?? "id"}
+                        labels={posterLabels}
+                      />
+                    )}
+                    <BriefFlyerSection briefId={briefId} />
+                  </>
                 )}
-                {briefId && posterLabels && (
-                  <MahasiswaPosterCard
-                    briefId={briefId}
-                    locale={locale ?? "id"}
-                    labels={posterLabels}
-                  />
-                )}
-                {briefId && <BriefFlyerSection briefId={briefId} />}
               </>
             )}
             <ReactMarkdown components={makeMarkdownComponents()}>
