@@ -43,6 +43,10 @@ const VALID_SLUGS: ReadonlySet<DeliverableSlug> = new Set([
   "artikel-2",
   "artikel-3",
   "artikel-4",
+  "tafsir-1",
+  "tafsir-2",
+  "tafsir-3",
+  "tafsir-4",
 ]);
 
 function asDeliverable(raw: string): DeliverableSlug | null {
