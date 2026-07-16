@@ -68,9 +68,10 @@ export async function generateMetadata({
   const brief = await getBriefingBySlug(id);
   if (!brief) return { title: t("brief_not_found_title") };
 
-  const scopeLabel = brief.themeGroup
-    ? t(`segment_${brief.themeGroup}_title` as Parameters<typeof t>[0])
-    : t("brief_scope_all");
+  // 14-group labels (e.g. "Teknologi & AI") are human-readable Indonesian —
+  // use verbatim instead of routing through legacy segment_${slug}_title
+  // i18n keys that no longer exist (they only covered the old 5 segments).
+  const scopeLabel = brief.themeGroup ?? t("brief_scope_all");
   const dateStr = localeAwareFormat(brief.generatedAt, locale, {
     weekday: "long",
     month: "long",
