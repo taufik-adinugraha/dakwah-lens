@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
 # Fetch posts in a recent window from prod for a theme-classification audit.
 #
-# Usage: fetch.sh <run_dir> [window_days=2] [ssh_host=dakwah]
+# Usage: fetch.sh <run_dir> [window_days=7] [ssh_host=dakwah]
 #
 # Writes <run_dir>/posts.jsonl  (one {"id","tg","text"} object per line)
-# Default window is 2 days — matches the "run every 1-2 days" cadence and keeps
-# the target small/cheap. Widen only when catching up after a gap.
+# Use whatever window the operator asks for (default 7 days). The window is NOT
+# an efficiency lever — the ledger de-dup keeps a 7d target small when audits are
+# regular; cost is controlled by the terse subagent contract + batching, not by
+# shrinking the window.
 set -euo pipefail
 
 RUN="${1:?run_dir required}"
-DAYS="${2:-2}"
+DAYS="${2:-7}"
 HOST="${3:-dakwah}"
 mkdir -p "$RUN"
 
