@@ -7,9 +7,10 @@ Reads   <run_dir>/posts.jsonl
 Writes  <run_dir>/target.jsonl, <run_dir>/target_uuids.txt, <run_dir>/in/part_XX.jsonl
 Prints  a manifest + a drift/size guard.
 
-Batch size defaults to 175: small enough that even a 100%-correction batch's JSON
-output stays far under the 64k subagent output-token cap (the failure that wrecked
-the previous run), and the per-batch text read stays modest.
+Batch size defaults to 350 (in line with prior working Opus runs, ~350-440/batch).
+What actually keeps a subagent under the 64k output-token cap is the no-narration
+OUTPUT BUDGET contract in AUDIT_INSTRUCTION.md, NOT a small batch — the previous run
+failed because subagents narrated per post, not because batches were large.
 """
 import argparse
 import json
@@ -23,8 +24,8 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("run_dir")
     ap.add_argument("--ledger", default=DEF_LEDGER)
-    ap.add_argument("--batch-size", type=int, default=175)
-    ap.add_argument("--window-days", type=int, default=2)  # informational, for the guard
+    ap.add_argument("--batch-size", type=int, default=350)  # matches prior working Opus runs (~350-440); the no-narration contract, not batch size, is what keeps output under the 64k cap
+    ap.add_argument("--window-days", type=int, default=7)  # informational; use whatever the operator asks for
     a = ap.parse_args()
 
     audited = set()
@@ -77,11 +78,9 @@ def main() -> None:
     print(f"  batches: {nb} x ~{per} posts (cap {a.batch_size})")
     if posts and len(posts) > 500 and pct < 20:
         print(f"  ⚠️  DRIFT: only {pct:.0f}% of this {a.window_days}d window is audited. "
-              f"If you run every 1-2 days most should already be audited — verify the ledger "
-              f"is the canonical file and that the last run actually persisted.")
-    if target and len(target) > a.batch_size * 20:
-        print(f"  ⚠️  LARGE TARGET ({len(target)}): this is a big/costly run — "
-              f"consider a shorter --window-days.")
+              f"If you audit regularly most should already be in the ledger — verify the ledger "
+              f"is the canonical file and that the last run actually persisted (the window itself "
+              f"is fine; this flags a possibly-stale ledger, not a too-wide window).")
 
 
 if __name__ == "__main__":

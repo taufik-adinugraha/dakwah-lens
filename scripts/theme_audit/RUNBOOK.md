@@ -8,9 +8,9 @@ This runbook + `scripts/theme_audit/` replace the old ad-hoc, per-run scratchpad
 It is designed to be **cheap, resumable, and drift-proof**. Run it every 1–2 days.
 
 ## Why the previous run was slow/expensive (what this hardens)
-1. **64k output-token blowups** — subagents narrated per-post → single response exceeded the cap → the agent died producing *nothing* → wasted ~250k tokens/batch + manual re-runs. → Fixed by the **OUTPUT BUDGET** rule in `AUDIT_INSTRUCTION.md` (JSON file + one line, no narration) and small batches.
-2. **Oversized batches (484)** → 220–330k tokens each. → Fixed by **batch-size 175** (auto in `prepare.py`).
-3. **Too-wide window** (7d after a 3-day gap = 7,729 posts). → Default window **2 days**.
+1. **64k output-token blowups — the actual root cause.** Subagents narrated per-post → a single response exceeded the output cap → the agent died producing *nothing* → wasted ~250k tokens/batch + manual re-runs. → Fixed by the **OUTPUT BUDGET** rule in `AUDIT_INSTRUCTION.md` (write the JSON file, reply one line, NO narration). Model-independent — narration blows the cap on any model.
+2. **Oversized batches (484)** amplified the narration. → `prepare.py` batches ~**350** (prior working runs' size). The contract in (1), not the batch size, is the real guard.
+3. **Large target came from a STALE LEDGER, not a too-wide window** — the 7,729 was a ~3-day gap since the ledger's last write. → The durable ledger + regular runs keep any window's target small. **Model and window are NOT efficiency levers — use Opus and whatever window you ask for.**
 4. **Ephemeral ledger in `/tmp`** (drift/loss risk). → Durable ledger at `~/.dakwah/theme_audit/` + prod `~/theme_audit/`, with backup on every write.
 5. **Rulebook drift** — a hand-copied rulebook could diverge from the live prompt. → `gen_rulebook.py` derives it from `theme_groups.llm_group_options_prompt()`.
 6. **Manual whack-a-mole on failures.** → `aggregate.py` reports missing batches and withholds `apply.sql` until every batch is covered.
@@ -24,18 +24,18 @@ RUN=/tmp/theme_audit_$(date +%Y%m%d)          # a scratch run dir (ephemeral is 
 # 1. Derive rulebook + valid groups from the LIVE classifier prompt
 PYTHONPATH=../../api/src python3 gen_rulebook.py "$RUN"
 
-# 2. Fetch the window from prod (default 2 days)
-bash fetch.sh "$RUN" 2
+# 2. Fetch the window from prod (default 7 days; pass whatever window you want, e.g. 7)
+bash fetch.sh "$RUN" 7
 
-# 3. Filter to unaudited + split into ~175-post batches; read the manifest + guards
-python3 prepare.py "$RUN" --window-days 2
+# 3. Filter to unaudited + split into ~350-post batches; read the manifest + guards
+python3 prepare.py "$RUN" --window-days 7
 #   -> note the batch count (part_00 .. part_NN) and heed any ⚠️ DRIFT / LARGE-TARGET warning.
 ```
 
 **4. Launch one Claude subagent per `in/part_NN.jsonl`** (this is done by me, the orchestrator — the Agent tool, NOT a shell loop):
 - Each subagent prompt points at `AUDIT_INSTRUCTION.md`, `rulebook.txt`, `valid_groups.json`, its `in/part_NN.jsonl`, and its `out/flags_NN.json` target. Nothing more.
-- **Model:** `haiku` is the default — the classification is mechanical rulebook-matching and Haiku is far cheaper; it is still Claude, not Gemini. Escalate a specific batch to `sonnet`/`opus` only if its posts are unusually ambiguous. (The old run used implicit Opus everywhere — unnecessary.)
-- Run them in parallel. The **OUTPUT BUDGET** rule keeps each one small; batches of 175 will not approach the 64k cap.
+- **Model: Opus** (default — what prior runs used, and it was fine). The model was never the cost problem; the terse OUTPUT-BUDGET contract + batching are what matter. Sonnet is an acceptable floor if ever needed; do NOT drop to Haiku for audit judgment. Always Claude, never Gemini (`feedback_no_gemini_for_audit`).
+- Run them in parallel. The **OUTPUT BUDGET** rule (no narration) is what keeps each response small — a ~350-post batch's JSON flags stay far under the 64k cap regardless of model.
 - If a batch ever does fail (cap/stall), just re-run that one batch; do NOT re-run the whole set.
 
 ```bash
