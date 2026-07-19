@@ -1,0 +1,62 @@
+# Theme-classification audit — runbook
+
+Pure-Claude audit of recent `theme_group` classifications: sweep the last N days of
+posts, reclassify the mis-labelled ones, feed systematic misses back into the live
+classifier prompt. **Never uses Gemini/any external API** (per `feedback_no_gemini_for_audit`).
+
+This runbook + `scripts/theme_audit/` replace the old ad-hoc, per-run scratchpad process.
+It is designed to be **cheap, resumable, and drift-proof**. Run it every 1–2 days.
+
+## Why the previous run was slow/expensive (what this hardens)
+1. **64k output-token blowups** — subagents narrated per-post → single response exceeded the cap → the agent died producing *nothing* → wasted ~250k tokens/batch + manual re-runs. → Fixed by the **OUTPUT BUDGET** rule in `AUDIT_INSTRUCTION.md` (JSON file + one line, no narration) and small batches.
+2. **Oversized batches (484)** → 220–330k tokens each. → Fixed by **batch-size 175** (auto in `prepare.py`).
+3. **Too-wide window** (7d after a 3-day gap = 7,729 posts). → Default window **2 days**.
+4. **Ephemeral ledger in `/tmp`** (drift/loss risk). → Durable ledger at `~/.dakwah/theme_audit/` + prod `~/theme_audit/`, with backup on every write.
+5. **Rulebook drift** — a hand-copied rulebook could diverge from the live prompt. → `gen_rulebook.py` derives it from `theme_groups.llm_group_options_prompt()`.
+6. **Manual whack-a-mole on failures.** → `aggregate.py` reports missing batches and withholds `apply.sql` until every batch is covered.
+
+## Procedure
+
+```bash
+cd scripts/theme_audit
+RUN=/tmp/theme_audit_$(date +%Y%m%d)          # a scratch run dir (ephemeral is fine)
+
+# 1. Derive rulebook + valid groups from the LIVE classifier prompt
+PYTHONPATH=../../api/src python3 gen_rulebook.py "$RUN"
+
+# 2. Fetch the window from prod (default 2 days)
+bash fetch.sh "$RUN" 2
+
+# 3. Filter to unaudited + split into ~175-post batches; read the manifest + guards
+python3 prepare.py "$RUN" --window-days 2
+#   -> note the batch count (part_00 .. part_NN) and heed any ⚠️ DRIFT / LARGE-TARGET warning.
+```
+
+**4. Launch one Claude subagent per `in/part_NN.jsonl`** (this is done by me, the orchestrator — the Agent tool, NOT a shell loop):
+- Each subagent prompt points at `AUDIT_INSTRUCTION.md`, `rulebook.txt`, `valid_groups.json`, its `in/part_NN.jsonl`, and its `out/flags_NN.json` target. Nothing more.
+- **Model:** `haiku` is the default — the classification is mechanical rulebook-matching and Haiku is far cheaper; it is still Claude, not Gemini. Escalate a specific batch to `sonnet`/`opus` only if its posts are unusually ambiguous. (The old run used implicit Opus everywhere — unnecessary.)
+- Run them in parallel. The **OUTPUT BUDGET** rule keeps each one small; batches of 175 will not approach the 64k cap.
+- If a batch ever does fail (cap/stall), just re-run that one batch; do NOT re-run the whole set.
+
+```bash
+# 5. Aggregate -> validated corrections.json + apply.sql (refuses apply.sql if any batch missing)
+python3 aggregate.py "$RUN"
+#   -> review the transition matrix + the _notes (candidate new rules) before applying.
+
+# 6. Apply to prod (single transaction, rolls back on any error)
+bash apply.sh "$RUN"
+
+# 7. Mark the whole reviewed target audited (durable ledger, backed up, synced to prod)
+bash mark_audited.sh "$RUN"
+```
+
+**8. Feed systematic misses back into the pipeline (the "adjust prompt" step).**
+If `aggregate.py`'s `_notes`/transition matrix show a *recurring* new pattern (e.g. this run: MagangHub/Kemnaker magang posts → `Lainnya`), add it to the matching group in
+`api/src/api/services/theme_groups.py` → `GROUP_INTENT_HINTS`, tagged `(audit#NN)`.
+That is the single source of truth — `gen_rulebook.py` re-derives the rulebook from it next run, so audit and pipeline never diverge. Committing/deploying that change is a normal code change (ask first, per repo rules).
+
+## Notes / conventions
+- `theme_group` values: 14 groups + `Lainnya`. Write the literal `Lainnya` (not "Lainnya — Tidak Terklasifikasi").
+- The `social_posts` table has no slug/audited column — "audited" state is the external ledger. **Recommended next hardening:** a small `theme_audit_ledger(post_id uuid pk, audited_at timestamptz)` table so the unaudited filter becomes a SQL `NOT EXISTS` and the file ledger (and its drift risk) goes away entirely. Not done yet — needs a prod migration + sign-off.
+- Prod DB: `docker exec dakwah-lens-postgres-1 psql -U dakwah -d dakwah_lens`.
+- Idempotent: re-applying the same corrections is harmless; re-marking audited uuids de-dupes.
