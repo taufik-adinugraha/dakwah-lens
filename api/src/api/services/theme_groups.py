@@ -337,7 +337,14 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "seremonial/human-interest TNI-Polri (latihan/lari fisik, bakti "
         "sosial bangun jembatan, silat/bela diri, upacara kenaikan "
         "pangkat, rekrutmen, yel/slogan, klip alutsista) atau Latsar/"
-        "diklat ASN tanpa substansi kebijakan — itu Lainnya (audit#89)"
+        "diklat ASN tanpa substansi kebijakan — itu Lainnya (audit#89). "
+        "TETAP Lainnya untuk varian seremonial yang sering lolos: TMMD/"
+        "Manunggal Membangun Desa, PR seremonial Lapas/Kemenimipas "
+        "(senam/dekorasi warga binaan), apel Hari Kesadaran Nasional "
+        "dengan imbauan ASN generik, pejabat sipil memberi pembekalan/"
+        "motivasi seremonial ke taruna, acara budaya instansi (pameran "
+        "museum, penghargaan layanan publik), dan nobar/CSR yang digelar "
+        "instansi pemerintah (audit#96)"
     ),
     "Patologi Sosial Digital": (
         "judi online, pinjol, narkoba (konteks distribusi/peredaran digital), "
@@ -373,7 +380,10 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "operasi antikorupsi, kasus penipuan atau gugatan di pengadilan "
         "asing) → Hukum & Keadilan. Penghargaan/kunjungan diplomatik "
         "seremonial dan gerakan politik domestik (mis. gerakan menjatuhkan "
-        "pemerintah) → Pemerintahan & Kebijakan. Sejarah/perdagangan kuno "
+        "pemerintah) → Pemerintahan & Kebijakan. BUKAN sepak bola / "
+        "kompetisi olahraga internasional (Piala Dunia, taktik "
+        "pertandingan, biografi pelatih, rivalitas klub/negara) — itu "
+        "Lainnya (audit#96). Sejarah/perdagangan kuno "
         "tanpa dimensi geopolitik terkini → Lainnya"
     ),
     "Inspirasi & Kisah Pribadi": (
