@@ -35,8 +35,9 @@ python3 prepare.py "$RUN" --window-days 7
 **4. Launch one Claude subagent per `in/part_NN.jsonl`** (this is done by me, the orchestrator — the Agent tool, NOT a shell loop):
 - Each subagent prompt points at `AUDIT_INSTRUCTION.md`, `rulebook.txt`, `valid_groups.json`, its `in/part_NN.jsonl`, and its `out/flags_NN.json` target. Nothing more.
 - **Model: Opus** (default — what prior runs used, and it was fine). The model was never the cost problem; the terse OUTPUT-BUDGET contract + batching are what matter. Sonnet is an acceptable floor if ever needed; do NOT drop to Haiku for audit judgment. Always Claude, never Gemini (`feedback_no_gemini_for_audit`).
-- Run them in parallel. The **OUTPUT BUDGET** rule (no narration) is what keeps each response small — a ~350-post batch's JSON flags stay far under the 64k cap regardless of model.
-- If a batch ever does fail (cap/stall), just re-run that one batch; do NOT re-run the whole set.
+- Run them in parallel BUT in **waves of ~4-6, not all at once**. Aggregate concurrent Opus load is the real limiter: a full 7d/~10k-post run is ~3–4M tokens and **will exceed one account session-limit window** — launching all ~20 at once burns the window and most fail together (audit#96 lesson). After each wave, apply+mark it (`aggregate.py --force` → `apply.sh` → mark; idempotent re-apply of earlier waves is harmless), so progress banks incrementally. When you hit a session limit, wait for the reset (a background timer works) then continue the next wave — a big run legitimately spans 1–3 resets.
+- The **OUTPUT BUDGET** rule (no narration) keeps each response small — a ~350–500-post batch's JSON flags stay far under the 64k cap regardless of model.
+- If a batch **fails on the 64k output cap** (some batches make a subagent over-produce despite the contract — seen repeatedly on specific batches), split just that batch into halves (`part_NN` → `part_NNa`/`part_NNb`, delete the original) and re-run the two with a hard no-narration reminder. If a batch fails on the **session limit**, just re-run that one after reset. Either way, never re-run the whole set.
 
 ```bash
 # 5. Aggregate -> validated corrections.json + apply.sql (refuses apply.sql if any batch missing)
