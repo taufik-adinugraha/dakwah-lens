@@ -263,7 +263,11 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "pangan, kebijakan ekonomi yang berdampak pada rakyat. BUKAN iklan/"
         "peluncuran produk komersial (otomotif spt Toyota/Honda, gadget, "
         "properti) maupun event bazar/karnaval/UMKM seremonial tanpa "
-        "substansi isu ekonomi — itu Lainnya (audit#90)"
+        "substansi isu ekonomi — itu Lainnya (audit#90). BUKAN promo/"
+        "referral trading-crypto-forex (mis. Bybit/exchange, sinyal "
+        "trading), klip influencer trading, atau iklan jasa tukar valuta "
+        "personal (PayPal/Venmo/Zelle) tanpa analisis/berita ekonomi nyata "
+        "— itu Lainnya (audit#99)"
     ),
     "Aqidah & Ibadah": (
         "ibadah ISLAM pilar (haji/kurban/idul adha), hijrah, fatwa, polemik "
