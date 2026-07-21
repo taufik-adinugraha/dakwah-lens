@@ -224,7 +224,11 @@ LAINNYA_SLUG: str = slugify_group(LAINNYA_GROUP)
 GROUP_INTENT_HINTS: dict[str, str] = {
     "Hukum & Keadilan": (
         "korupsi, kriminalitas, penipuan, pembunuhan, keadilan publik "
-        "(BUKAN polemik kebijakan/pejabat — itu Pemerintahan & Kebijakan). "
+        "(BUKAN polemik kebijakan/pejabat — itu Pemerintahan & Kebijakan; "
+        "TERMASUK pernyataan pejabat/parpol/istana yang membantah, "
+        "mengklarifikasi, menegur, atau membela diri soal sebuah kasus yang "
+        "sedang berjalan → itu polemik pejabat → Pemerintahan & Kebijakan, "
+        "BUKAN kasus pidananya sendiri, audit#98). "
         "BUKAN acara komunitas/baksos/lomba mancing/CFD/nobar/SIM gratis "
         "dari kepolisian (Hari Bhayangkara, Polres/Polsek event) — itu "
         "Lainnya. BUKAN kegiatan rutin/seremonial kepolisian-TNI-BNN: "
