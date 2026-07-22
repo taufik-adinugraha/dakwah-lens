@@ -323,7 +323,9 @@ GROUP_INTENT_HINTS: dict[str, str] = {
     ),
     "Lingkungan & Bencana": (
         "bencana alam, kebakaran, kecelakaan, lingkungan, fenomena alam "
-        "misterius"
+        "misterius. TERMASUK info/peringatan dini cuaca & gempa BMKG "
+        "(peringatan dini, prakiraan cuaca, magnitudo/lokasi gempa) — tetap "
+        "Lingkungan & Bencana walau berupa buletin rutin/template (audit#100)"
     ),
     "Pemerintahan & Kebijakan": (
         "pemerintahan, kebijakan publik, otonomi daerah, program negara, "
@@ -352,7 +354,10 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "dengan imbauan ASN generik, pejabat sipil memberi pembekalan/"
         "motivasi seremonial ke taruna, acara budaya instansi (pameran "
         "museum, penghargaan layanan publik), dan nobar/CSR yang digelar "
-        "instansi pemerintah (audit#96)"
+        "instansi pemerintah; TETAP Lainnya walau upacara dipimpin/dihadiri "
+        "Presiden (mis. Praspa/pelantikan perwira TNI-Polri) atau berupa "
+        "upacara HUT/Hari Jadi daerah dengan pidato prestasi kepala daerah "
+        "(audit#96, diperluas audit#100)"
     ),
     "Patologi Sosial Digital": (
         "judi online, pinjol, narkoba (konteks distribusi/peredaran digital), "
