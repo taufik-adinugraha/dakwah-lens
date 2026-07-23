@@ -14,7 +14,11 @@ filtering, etc.), promote and extend.
 
 from __future__ import annotations
 
+import json as _json
+import random as _random
 import re
+from datetime import date as _date
+from pathlib import Path as _Path
 from typing import Any
 
 import structlog
@@ -151,11 +155,6 @@ _MIN_DUA_SUPPLICATIONS = 4
 # (operator ask 2026-07-23: "the du'a content are just the same from week
 # to week … rotate every week"). All citations are real kitab entries, so
 # the save-time citation refetch/validation still holds.
-import json as _json
-import random as _random
-from datetime import date as _date
-from pathlib import Path as _Path
-
 _DUA_LIBRARY: list[dict[str, Any]] | None = None
 _WEEKLY_DUA_LEAD = 8  # rotated library du'a to lead the pool with each week
 
