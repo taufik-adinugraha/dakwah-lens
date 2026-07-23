@@ -50,3 +50,7 @@ coverage/
 
 # Local-only experiment artifacts (kept outside git history)
 experiments/
+# …except the versioned du'a library shipped inside the api image
+# (retrieve_dua.weekly_dua_pool reads it at runtime; deploy builds from git).
+!api/src/api/data/
+!api/src/api/data/dua_library.json
