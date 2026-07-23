@@ -141,6 +141,67 @@ _CANONICAL_DUA_CITATIONS = (
 _MIN_DUA_SUPPLICATIONS = 4
 
 
+# ── Weekly-rotating du'a library ──────────────────────────────────────
+# Curated recitable du'a extracted from the du'a-books of the kitab corpus
+# (Bukhari Kitab ad-Da'awat, Muslim Kitab adh-Dhikr, Riyad as-Salihin
+# dzikir/du'a chapters, Bulugh al-Maram adhkar) → api/src/api/data/
+# dua_library.json (~320 entries). The weekly rotation leads the du'a
+# candidate pool so Pesan Flyer 6 ("Doa Pekan Ini") varies week to week
+# instead of repeating the same _CANONICAL_DUA_CITATIONS every time
+# (operator ask 2026-07-23: "the du'a content are just the same from week
+# to week … rotate every week"). All citations are real kitab entries, so
+# the save-time citation refetch/validation still holds.
+import json as _json
+import random as _random
+from datetime import date as _date
+from pathlib import Path as _Path
+
+_DUA_LIBRARY: list[dict[str, Any]] | None = None
+_WEEKLY_DUA_LEAD = 8  # rotated library du'a to lead the pool with each week
+
+
+def _load_dua_library() -> list[dict[str, Any]]:
+    global _DUA_LIBRARY
+    if _DUA_LIBRARY is None:
+        p = _Path(__file__).resolve().parent.parent / "data" / "dua_library.json"
+        try:
+            _DUA_LIBRARY = _json.loads(p.read_text(encoding="utf-8"))
+        except Exception as exc:  # pragma: no cover
+            log.warning("dua_library.load_failed", error=str(exc))
+            _DUA_LIBRARY = []
+    return _DUA_LIBRARY
+
+
+def _lib_entry_to_ref(d: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "corpus": d.get("corpus", ""),
+        "citation": str(d.get("citation", "")),
+        "score": 0.99,  # lead the candidate pool
+        "arabic": d.get("arabic", ""),
+        "translation_id": d.get("translation_id", ""),
+        "translation_en": "",
+        "ref_id": f"{d.get('corpus', '')}::dua-lib",
+    }
+
+
+def weekly_dua_pool(n: int = _WEEKLY_DUA_LEAD) -> list[dict[str, Any]]:
+    """Return `n` recitable du'a from the library in a deterministic
+    per-ISO-week rotation, so the flyer du'a differs every week and cycles
+    through the whole library over time."""
+    lib = _load_dua_library()
+    if not lib:
+        return []
+    iso = _date.today().isocalendar()
+    seed = iso[0] * 53 + iso[1]  # (year, week) → stable weekly seed
+    order = list(range(len(lib)))
+    _random.Random(seed).shuffle(order)
+    # contiguous week-offset window over the shuffled order → consecutive
+    # weeks surface disjoint slices, cycling the whole library over time.
+    start = (seed * n) % len(lib)
+    picks = [lib[order[(start + i) % len(lib)]] for i in range(min(n, len(lib)))]
+    return [_lib_entry_to_ref(d) for d in picks]
+
+
 # Collection names match the embed scripts in api/src/api/scripts/embed_*.py
 COLLECTION_NAMES: dict[str, str] = {
     "quran": "quran",
@@ -1698,12 +1759,23 @@ def retrieve_dua(
                 added=added,
             )
 
+    # Weekly-rotated recitable du'a from the curated library LEADS the
+    # candidate pool (score 0.99) so slot-6 "Doa Pekan Ini" varies week to
+    # week and cycles the library, instead of the theme-retrieval + fixed
+    # canonical floor surfacing the same few supplications every time.
+    rotated = weekly_dua_pool()
+    if rotated:
+        present = {h.get("citation", "") for h in result}
+        lead = [r for r in rotated if r["citation"] not in present]
+        result = lead + result
+
     log.info(
         "adhkar_retrieval.scored",
         theme=theme[:80],
         kept=len(all_hits),
         top_score=all_hits[0]["score"] if all_hits else None,
         dua_supplications=n_supp,
+        weekly_lead=len(rotated),
     )
     return result
 
