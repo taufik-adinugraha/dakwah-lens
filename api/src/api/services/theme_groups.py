@@ -232,8 +232,10 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "pelantikan/pengangkatan pejabat internal lembaga penegak hukum "
         "(Kejaksaan/Kepolisian: Jampidsus, Kajati, Kapolda) maupun berita "
         "administratif pejabat tanpa kasus pidana aktif (LHKPN, "
-        "kewarganegaraan, kerja sama antar-lembaga) — itu tata kelola → "
-        "Pemerintahan & Kebijakan (audit#101). "
+        "kewarganegaraan, kerja sama antar-lembaga, penindakan imigrasi "
+        "administratif spt cekal/deportasi WNA tanpa dakwaan pidana) — itu "
+        "tata kelola → Pemerintahan & Kebijakan (audit#101; imigrasi "
+        "audit#102). "
         "BUKAN acara komunitas/baksos/lomba mancing/CFD/nobar/SIM gratis "
         "dari kepolisian (Hari Bhayangkara, Polres/Polsek event) — itu "
         "Lainnya. BUKAN kegiatan rutin/seremonial kepolisian-TNI-BNN: "
@@ -304,9 +306,16 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "hasil lomba MTQ/STQ, CSR khitanan massal / santunan anak yatim, "
         "atau logistik & politik kepemimpinan muktamar/munas ormas Islam "
         "(NU/Muhammadiyah) — hasil lomba & CSR itu Lainnya, sedangkan "
-        "kepemimpinan/politik ormas itu Pemerintahan & Kebijakan (audit#89)"
+        "kepemimpinan/politik ormas itu Pemerintahan & Kebijakan (audit#89). "
+        "BUKAN program operasional/CSR lembaga zakat (BAZNAS/LAZ: program "
+        "panen, sinergi/penyaluran zakat) tanpa pengajaran agama → Lainnya "
+        "(audit#102)"
     ),
-    "Kesehatan & Kehidupan": "kesehatan fisik & mental, kesejahteraan jiwa",
+    "Kesehatan & Kehidupan": (
+        "kesehatan fisik & mental, kesejahteraan jiwa. TERMASUK keracunan "
+        "pangan massal (mis. Makan Bergizi Gratis/MBG) tanpa unsur pidana → "
+        "di sini, BUKAN Hukum & Keadilan (audit#102)"
+    ),
     "Pendidikan & SDM": (
         "sekolah, kampus, literasi, pembangunan SDM kelembagaan — BUKAN "
         "akademi sepak bola/sport (itu Lainnya), BUKAN wisata yang "
@@ -335,7 +344,10 @@ GROUP_INTENT_HINTS: dict[str, str] = {
     "Pemerintahan & Kebijakan": (
         "pemerintahan, kebijakan publik, otonomi daerah, program negara, "
         "ideologi negara (Pancasila), polemik kebijakan/pejabat, hari "
-        "nasional. BUKAN notifikasi lalu lintas/maintenance jalan tol/"
+        "nasional (HANYA bila ada substansi kebijakan/program; ucapan "
+        "seremonial 'Selamat Hari X Nasional/Internasional' — Hari Kebaya, "
+        "Hari Anak, dsb. — tanpa isi kebijakan → Lainnya, audit#102). "
+        "BUKAN notifikasi lalu lintas/maintenance jalan tol/"
         "penutupan ruas (Jasa Marga, plustrafik, llminfotrafik, NKVE, "
         "BKE, LDP) serta notifikasi pemadaman terjadwal PDAM/PLN & "
         "penutupan layanan rutin (mis. TransJakarta halte closure) — itu "
@@ -378,7 +390,10 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "penetapan tersangka, atau Sosial & Keluarga bila demo "
         "warga/moralitas komunitas. BUKAN kesehatan publik (vape, rokok "
         "elektrik) tanpa dimensi distribusi digital → itu Kesehatan & "
-        "Kehidupan"
+        "Kehidupan. BUKAN regulasi/pengawasan digital pemerintah "
+        "(registrasi SIM biometrik, e-ID, aturan platform) → itu "
+        "Pemerintahan & Kebijakan; Patologi butuh unsur judi/pinjol/narkoba/"
+        "KBGO/hoax eksplisit, bukan sekadar 'digital' (audit#102)"
     ),
     "Teknologi & AI": "kecerdasan buatan, teknologi baru, etika digital",
     "Pekerja & Pertanian Rakyat": (
