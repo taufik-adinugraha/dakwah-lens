@@ -17,7 +17,13 @@ import {
 
 import { Link } from "@/i18n/navigation";
 import { localeAwareFormat } from "@/lib/date-id";
-import { localeAlternates } from "@/lib/seo";
+import { localeAlternates, SITE_URL } from "@/lib/seo";
+import { JsonLd } from "@/components/JsonLd";
+import {
+  articleSchema,
+  breadcrumbSchema,
+  faqSchemaFromSection,
+} from "@/lib/seo-schema";
 import {
   DELIVERABLE_HEADING_PATTERNS,
   extractDeliverableSection,
@@ -152,8 +158,31 @@ export default async function DeliverablePage({ params }: Props) {
 
   const heroTitle = mahasiswa?.question || section.heading;
 
+  const canonicalUrl = `${SITE_URL}/${locale}/d/${brief}/${deliverable}`;
+  const jsonLd = [
+    articleSchema({
+      url: canonicalUrl,
+      headline: section.heading,
+      bodyMarkdown: section.body,
+      datePublished: row.generatedAt,
+      locale,
+      section: row.themeGroup,
+    }),
+    breadcrumbSchema([
+      { name: "Beranda", url: `${SITE_URL}/${locale}` },
+      { name: "Briefing", url: `${SITE_URL}/${locale}/briefings` },
+      {
+        name: row.themeGroup ?? "Briefing",
+        url: `${SITE_URL}/${locale}/d/${brief}`,
+      },
+      { name: section.heading, url: canonicalUrl },
+    ]),
+    faqSchemaFromSection(section.body),
+  ].filter(Boolean) as Array<Record<string, unknown>>;
+
   return (
     <main className="min-h-screen bg-paper-deep">
+      <JsonLd data={jsonLd} />
       <section
         className="relative overflow-hidden"
         style={{

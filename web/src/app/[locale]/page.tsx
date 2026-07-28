@@ -6,6 +6,8 @@ import { and, count, eq, sql } from "drizzle-orm";
 import { auth } from "@/auth";
 import { db, schema } from "@/db";
 import { localeAlternates } from "@/lib/seo";
+import { JsonLd } from "@/components/JsonLd";
+import { organizationSchema, websiteSchema } from "@/lib/seo-schema";
 import { Hero } from "@/components/landing/Hero";
 import { InsightsPreview } from "@/components/landing/InsightsPreview";
 import { WhyNotLlm } from "@/components/landing/WhyNotLlm";
@@ -131,6 +133,7 @@ export default async function LandingPage({
 
   return (
     <div className="bg-paper font-body">
+      <JsonLd data={[organizationSchema(), websiteSchema()]} />
       <Hero t={tLanding} locale={locale} viewer={viewer} coverage={coverage} />
       <InsightsPreview t={tLanding} locale={locale} insights={insights} />
       <WhyNotLlm t={tLanding} />
