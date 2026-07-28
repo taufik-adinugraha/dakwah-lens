@@ -17,6 +17,7 @@ import {
 
 import { Link } from "@/i18n/navigation";
 import { localeAwareFormat } from "@/lib/date-id";
+import { localeAlternates } from "@/lib/seo";
 import {
   DELIVERABLE_HEADING_PATTERNS,
   extractDeliverableSection,
@@ -86,6 +87,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     : "Dakwah-Lens";
   return {
     title,
+    alternates: localeAlternates({
+      locale,
+      canonicalPath: `/d/${brief}/${deliverable}`,
+      hasEn: Boolean(row.summaryMdEn),
+    }),
     openGraph: { title, type: "article" },
   };
 }

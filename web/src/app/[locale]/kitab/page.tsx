@@ -19,6 +19,7 @@ import { TafsirResult } from "./TafsirResult";
 import { KitabCorpusSelector } from "./KitabCorpusSelector";
 import { KitabTranslationBody } from "./KitabTranslationBody";
 import { KitabSearchInput } from "@/components/KitabSearchInput";
+import { localeAlternates } from "@/lib/seo";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -275,7 +276,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Kitab" });
-  return { title: t("page_title") };
+  return {
+    title: t("page_title"),
+    alternates: localeAlternates({ locale, canonicalPath: "/kitab" }),
+  };
 }
 
 function parseCorpusSelection(

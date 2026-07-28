@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 
 import { getBriefingBySlug } from "@/lib/briefing-data";
 import { localeAwareFormat } from "@/lib/date-id";
+import { localeAlternates } from "@/lib/seo";
 import {
   BriefDetailContent,
   type DeliverableSlug,
@@ -84,6 +85,12 @@ export async function generateMetadata({
   // unfurls should treat them as one.
   return {
     title: t("brief_page_title", { scope: scopeLabel, date: dateStr }),
+    // Duplicate of the public /d/{slug}/{deliverable} page — canonicalise onto it.
+    alternates: localeAlternates({
+      locale,
+      canonicalPath: `/d/${id}/${deliverable}`,
+      hasEn: Boolean(brief.summaryMdEn),
+    }),
   };
 }
 

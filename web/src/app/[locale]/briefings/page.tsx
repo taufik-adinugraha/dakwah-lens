@@ -13,6 +13,7 @@ import { auth } from "@/auth";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { BriefingsGrid } from "@/components/BriefingsGrid";
+import { localeAlternates } from "@/lib/seo";
 import { DigestOptInPrompt } from "@/components/DigestOptInPrompt";
 import {
   getAllLatestBriefings,
@@ -42,7 +43,10 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/briefings">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Briefing" });
-  return { title: t("page_title") };
+  return {
+    title: t("page_title"),
+    alternates: localeAlternates({ locale, canonicalPath: "/briefings" }),
+  };
 }
 
 export default async function InsightsPage({

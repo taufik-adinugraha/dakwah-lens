@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 
 import { getBriefingBySlug } from "@/lib/briefing-data";
 import { localeAwareFormat } from "@/lib/date-id";
+import { localeAlternates } from "@/lib/seo";
 import { BriefDetailContent } from "./BriefDetailContent";
 
 /**
@@ -64,6 +65,12 @@ export async function generateMetadata({
   return {
     title,
     description,
+    // Duplicate of the public /d/{slug} hub — canonicalise onto it.
+    alternates: localeAlternates({
+      locale,
+      canonicalPath: `/d/${id}`,
+      hasEn: Boolean(brief.summaryMdEn),
+    }),
     openGraph: {
       title,
       description,

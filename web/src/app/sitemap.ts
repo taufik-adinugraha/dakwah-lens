@@ -5,8 +5,10 @@ import { db, schema } from "@/db";
 import { briefingSlug } from "@/lib/briefing-data";
 import { SITE_URL } from "@/lib/seo";
 
-// Briefings change weekly; regenerate hourly (cheap DB read, cached).
-export const revalidate = 3600;
+// Render at request time against the live DB. (As a build-time static
+// route the briefing query ran in the Docker build container, which has
+// no DB reachability, so only the static routes were emitted.)
+export const dynamic = "force-dynamic";
 
 // Public, translated UI routes (localePrefix "always" -> both /id and /en).
 const STATIC_PATHS = [

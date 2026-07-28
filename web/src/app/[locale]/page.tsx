@@ -1,9 +1,11 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { and, count, eq, sql } from "drizzle-orm";
 
 import { auth } from "@/auth";
 import { db, schema } from "@/db";
+import { localeAlternates } from "@/lib/seo";
 import { Hero } from "@/components/landing/Hero";
 import { InsightsPreview } from "@/components/landing/InsightsPreview";
 import { WhyNotLlm } from "@/components/landing/WhyNotLlm";
@@ -62,6 +64,13 @@ async function getCoverage(): Promise<Coverage> {
  * one job is to move visitors into the public Insights with zero
  * friction — every section either shows live value or removes a doubt.
  */
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]">): Promise<Metadata> {
+  const { locale } = await params;
+  return { alternates: localeAlternates({ locale, canonicalPath: "" }) };
+}
+
 export default async function LandingPage({
   params,
   searchParams,
