@@ -131,6 +131,8 @@ export function organizationSchema(): Json {
     alternateName: "Sukses & Berkah Group",
     url: SITE_URL,
     logo: `${SITE_URL}/dakwah-lens-logo-long-removebg.png`,
+    // Verified brand profiles — connects the entity for brand SERP / panel.
+    sameAs: ["https://www.facebook.com/p/Dakwah-Lens-61590429377695/"],
   };
 }
 
