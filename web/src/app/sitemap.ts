@@ -1,0 +1,110 @@
+import type { MetadataRoute } from "next";
+import { sql } from "drizzle-orm";
+
+import { db, schema } from "@/db";
+import { briefingSlug } from "@/lib/briefing-data";
+import { SITE_URL } from "@/lib/seo";
+
+// Briefings change weekly; regenerate hourly (cheap DB read, cached).
+export const revalidate = 3600;
+
+// Public, translated UI routes (localePrefix "always" -> both /id and /en).
+const STATIC_PATHS = [
+  "",
+  "/briefings",
+  "/kitab",
+  "/about",
+  "/how-it-works",
+  "/transparency",
+  "/privacy",
+  "/terms",
+  "/contact",
+] as const;
+
+// Deliverable sub-page slugs by briefing type (keys of
+// DELIVERABLE_HEADING_PATTERNS). Weekly + occasion briefings carry all 8
+// sections (enforced by the save validators); Fiqh carries 4 articles.
+const WEEKLY_DELIVERABLES = [
+  "khutbah",
+  "kultum",
+  "kajian",
+  "kisah",
+  "home",
+  "content",
+  "genz",
+  "action",
+];
+const FIQH_DELIVERABLES = ["artikel-1", "artikel-2", "artikel-3", "artikel-4"];
+const TAFSIR_DELIVERABLES = ["tafsir-1", "tafsir-2", "tafsir-3", "tafsir-4"];
+
+/** hreflang alternates. `en` is only asserted when an English body exists. */
+function alternates(path: string, hasEn: boolean) {
+  const languages: Record<string, string> = {
+    id: `${SITE_URL}/id${path}`,
+    "x-default": `${SITE_URL}/id${path}`,
+  };
+  if (hasEn) languages.en = `${SITE_URL}/en${path}`;
+  return { languages };
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const now = new Date();
+  const entries: MetadataRoute.Sitemap = [];
+
+  // 1) Static UI routes — bilingual.
+  for (const path of STATIC_PATHS) {
+    entries.push({
+      url: `${SITE_URL}/id${path}`,
+      lastModified: now,
+      changeFrequency: path === "" || path === "/briefings" ? "daily" : "monthly",
+      priority: path === "" ? 1 : 0.6,
+      alternates: alternates(path, true),
+    });
+  }
+
+  // 2) Every briefing hub + its deliverable pages.
+  try {
+    const rows = await db
+      .select({
+        generatedAt: schema.briefings.generatedAt,
+        themeGroup: schema.briefings.themeGroup,
+        occasionSlug: schema.briefings.occasionSlug,
+        hasEn: sql<boolean>`${schema.briefings.summaryMdEn} is not null`,
+      })
+      .from(schema.briefings);
+
+    for (const r of rows) {
+      const slug = briefingSlug(r.generatedAt, r.themeGroup, r.occasionSlug);
+      const hub = `/d/${slug}`;
+      entries.push({
+        url: `${SITE_URL}/id${hub}`,
+        lastModified: r.generatedAt,
+        changeFrequency: "weekly",
+        priority: 0.8,
+        alternates: alternates(hub, r.hasEn),
+      });
+
+      const deliverables =
+        r.themeGroup === "Fiqh Pekan Ini"
+          ? FIQH_DELIVERABLES
+          : r.themeGroup === "Tafsir Pekan Ini"
+            ? TAFSIR_DELIVERABLES
+            : WEEKLY_DELIVERABLES;
+
+      for (const d of deliverables) {
+        const path = `${hub}/${d}`;
+        entries.push({
+          url: `${SITE_URL}/id${path}`,
+          lastModified: r.generatedAt,
+          changeFrequency: "monthly",
+          priority: 0.7,
+          alternates: alternates(path, r.hasEn),
+        });
+      }
+    }
+  } catch {
+    // Never let a DB hiccup 500 the whole sitemap — serve static routes.
+  }
+
+  return entries;
+}

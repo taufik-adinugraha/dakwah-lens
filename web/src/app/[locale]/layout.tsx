@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import { routing } from "@/i18n/routing";
+import { SITE_URL } from "@/lib/seo";
 import { ActiveNotice } from "@/components/ActiveNotice";
 import { BackButton } from "@/components/BackButton";
 import { BackToTop } from "@/components/BackToTop";
@@ -71,6 +72,7 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "App" });
   return {
+    metadataBase: new URL(SITE_URL),
     title: { default: t("name"), template: `%s · ${t("name")}` },
     description: t("description"),
     // favicon.ico + apple-icon.png are auto-emitted from src/app/ (Next
