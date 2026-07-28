@@ -235,7 +235,10 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "kewarganegaraan, kerja sama antar-lembaga, penindakan imigrasi "
         "administratif spt cekal/deportasi WNA tanpa dakwaan pidana) — itu "
         "tata kelola → Pemerintahan & Kebijakan (audit#101; imigrasi "
-        "audit#102). "
+        "audit#102). BUKAN tindakan administratif/regulasi lembaga tanpa "
+        "penetapan tersangka (mis. penutupan dapur / larangan subsidi oleh "
+        "Badan Gizi Nasional/program MBG) — itu Pemerintahan & Kebijakan "
+        "(audit#105). "
         "BUKAN acara komunitas/baksos/lomba mancing/CFD/nobar/SIM gratis "
         "dari kepolisian (Hari Bhayangkara, Polres/Polsek event) — itu "
         "Lainnya. BUKAN kegiatan rutin/seremonial kepolisian-TNI-BNN: "
@@ -263,7 +266,10 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "('bunuh diri', 'broken home', 'cere') tanpa narasi substansi "
         "/ shitpost meme / fiksi anime-light-novel / cuitan fandom politik "
         "(itu Lainnya). BUKAN protes kesejahteraan hewan/isu sosial di luar "
-        "negeri tanpa kaitan Indonesia (itu Lainnya)"
+        "negeri tanpa kaitan Indonesia (itu Lainnya). BUKAN obituari/berita "
+        "wafat tokoh tanpa isu keluarga/sosial substantif, maupun ucapan "
+        "seremonial Hari X Nasional (mis. Hari Anak Nasional) tanpa substansi "
+        "kebijakan — itu Lainnya (audit#105)"
     ),
     "Ekonomi & Bisnis": (
         "ekonomi rakyat, bisnis halal, investasi, UMKM, daya beli, harga "
@@ -312,7 +318,8 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "sikap-kebijakan diperluas audit#103). "
         "BUKAN program operasional/CSR lembaga zakat (BAZNAS/LAZ: program "
         "panen, sinergi/penyaluran zakat) tanpa pengajaran agama → Lainnya "
-        "(audit#102)"
+        "(audit#102). BUKAN obituari/berita wafat kiai/ulama/tokoh tanpa "
+        "refleksi atau pengajaran ibadah → Lainnya (audit#105)"
     ),
     "Kesehatan & Kehidupan": (
         "kesehatan fisik & mental, kesejahteraan jiwa. TERMASUK keracunan "
