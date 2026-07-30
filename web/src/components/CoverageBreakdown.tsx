@@ -110,7 +110,7 @@ function PlatformCard({
 }) {
   const total = data.reduce((s, b) => s + b.count, 0);
   return (
-    <div className="rounded-2xl border border-hairline bg-white p-4 shadow-sm sm:p-5">
+    <div className="min-w-0 rounded-2xl border border-hairline bg-white p-4 shadow-sm sm:p-5">
       <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-faint">
         {labels.platformsTitle}
       </p>
@@ -162,7 +162,7 @@ function SentimentCard({
   labels: CoverageLabels;
 }) {
   return (
-    <div className="rounded-2xl border border-hairline bg-white p-4 shadow-sm sm:p-5">
+    <div className="min-w-0 rounded-2xl border border-hairline bg-white p-4 shadow-sm sm:p-5">
       <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-faint">
         {labels.sentimentTitle}
       </p>
@@ -267,7 +267,7 @@ function TopicsCard({
   labels: CoverageLabels;
 }) {
   return (
-    <div className="rounded-2xl border border-hairline bg-white p-4 shadow-sm sm:p-5">
+    <div className="min-w-0 rounded-2xl border border-hairline bg-white p-4 shadow-sm sm:p-5">
       <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-faint">
         {labels.topicsTitle}
       </p>
@@ -292,7 +292,7 @@ function TopicsCard({
           {data.slice(0, 10).map((topic) => (
             <li key={topic.id}>
               <div className="flex items-center justify-between gap-2 text-xs">
-                <span className="truncate font-medium text-ink-muted">
+                <span className="min-w-0 truncate font-medium text-ink-muted">
                   {topic.label}
                 </span>
                 <span className="shrink-0 tabular-nums text-ink-faint">
