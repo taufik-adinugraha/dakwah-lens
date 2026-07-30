@@ -386,7 +386,9 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "motivasi seremonial ke taruna, acara budaya instansi (pameran "
         "museum, penghargaan layanan publik), dan nobar/CSR yang digelar "
         "instansi pemerintah; TETAP Lainnya walau upacara dipimpin/dihadiri "
-        "Presiden (mis. Praspa/pelantikan perwira TNI-Polri) atau berupa "
+        "Presiden (mis. Praspa/pelantikan perwira TNI-Polri, maupun "
+        "pelantikan Praja IPDN / lulusan sekolah kedinasan sipil, audit#108) "
+        "atau berupa "
         "upacara HUT/Hari Jadi daerah dengan pidato prestasi kepala daerah "
         "(audit#96, diperluas audit#100)"
     ),
