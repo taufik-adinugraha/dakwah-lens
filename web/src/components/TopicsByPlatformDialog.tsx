@@ -126,7 +126,7 @@ function PlatformGroup({
           {group.topics.map((t) => (
             <li key={t.id}>
               <div className="flex items-center justify-between gap-2 text-xs">
-                <span className="truncate font-medium text-ink-muted">
+                <span className="min-w-0 truncate font-medium text-ink-muted">
                   {t.label}
                 </span>
                 <span className="shrink-0 tabular-nums text-ink-faint">
