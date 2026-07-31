@@ -6,27 +6,32 @@ import { db } from "@/db";
 
 /** Lightweight rows for the landing "live Insights preview" — the
  *  redesign's proof that the product is real: latest briefing per
- *  theme (newest few) + the busiest live discussion themes. Kept
+ *  theme_group (newest few) + the busiest live discussion topics. Kept
  *  deliberately skinny (no summary markdown) so the landing stays
- *  fast; the heavy lifting lives on /briefings. */
+ *  fast; the heavy lifting lives on /briefings.
+ *
+ *  Note the vocabulary split this project keeps strict: a "theme" (aka
+ *  theme_group) is one of the 14 fixed briefing categories; a "topic" is
+ *  a reclustered discussion cluster from the `topics` table (e.g. "TPPU
+ *  Febrie Adriansyah"). The busiest-list below is TOPICS, not themes. */
 export type LandingBriefing = {
   id: string;
   themeGroup: string;
   generatedAt: Date;
 };
 
-export type LandingTheme = {
+export type LandingTopic = {
   label: string;
   postCount: number;
 };
 
 export type LandingInsights = {
   briefings: LandingBriefing[];
-  themes: LandingTheme[];
+  topics: LandingTopic[];
 };
 
 export async function getLandingInsights(): Promise<LandingInsights> {
-  const [briefingRows, themeRows] = await Promise.all([
+  const [briefingRows, topicRows] = await Promise.all([
     // Latest briefing per theme_group, ranked by that group's 7d post
     // volume (NOT recency — the weekly batch publishes low-volume
     // groups last, so "newest 4" would surface exactly the least-busy
@@ -53,8 +58,11 @@ export async function getLandingInsights(): Promise<LandingInsights> {
     `) as unknown as Promise<
       Array<{ id: string; theme_group: string; generated_at: string }>
     >,
-    // Busiest live themes from the topics table, skipping the synthetic
+    // Busiest live topics from the topics table, skipping the synthetic
     // catch-all bucket — it's real but reads as noise on a landing page.
+    // No date filter: the topics table is a single current set rebuilt on
+    // each manual recluster, so this always shows the latest available
+    // reclustering — the previous set carries over until a new one lands.
     db.execute(sql`
       SELECT label, post_count
       FROM topics
@@ -70,7 +78,7 @@ export async function getLandingInsights(): Promise<LandingInsights> {
       themeGroup: r.theme_group,
       generatedAt: new Date(r.generated_at),
     })),
-    themes: (Array.isArray(themeRows) ? themeRows : []).map((r) => ({
+    topics: (Array.isArray(topicRows) ? topicRows : []).map((r) => ({
       label: r.label,
       postCount: Number(r.post_count),
     })),

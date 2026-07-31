@@ -37,6 +37,41 @@ export function stripMarkdown(md: string): string {
     .trim();
 }
 
+// Arabic-script Unicode ranges (core + supplement + extended-A + presentation
+// forms A/B). The core ؀-ۿ block already covers Arabic punctuation
+// and harakat, so a run may span internal whitespace between words.
+const ARABIC_RUN =
+  /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]+(?:\s+[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]+)*/g;
+
+/**
+ * Meta-description text for a briefing deliverable section. On top of
+ * stripMarkdown it (a) removes the internal script cue-labels the
+ * content/kreator deliverables carry ("HOOK (5 detik):", "BODY (40-60
+ * detik):", "CTA (5-10 detik):") and (b) drops Arabic-script runs so a
+ * khutbah/kajian page — whose body opens with the retrieved daleel — does
+ * not emit an all-Arabic snippet; Google then shows the Latin prose that
+ * actually describes the page. Trimmed to ~155 chars at a word boundary;
+ * returns undefined when nothing meaningful survives.
+ */
+export function deliverableMetaDescription(
+  bodyMarkdown: string,
+): string | undefined {
+  let s = stripMarkdown(bodyMarkdown);
+  // Duration cue-labels: an all-caps tag + "(… detik …)" + optional colon.
+  s = s.replace(/\b[A-Z][A-Za-z]*\s*\([^)]*\bdetik\b[^)]*\)\s*:?\s*/g, " ");
+  // The retrieved daleel prints Arabic first — drop the Arabic-script runs.
+  s = s.replace(ARABIC_RUN, " ");
+  // Clean the punctuation debris left between removed Arabic clauses
+  // (". . ." between two ex-Arabic sentences) and any leading orphans.
+  s = s
+    .replace(/(?:[.,;:!?]\s*){2,}/g, " ")
+    .replace(/^[\s.,;:!?]+/, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!s) return undefined;
+  return s.length > 155 ? s.slice(0, 152).replace(/\s+\S*$/, "") + "…" : s;
+}
+
 export function articleSchema(opts: {
   url: string;
   headline: string;

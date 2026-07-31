@@ -11,8 +11,8 @@ type LandingT = Awaited<ReturnType<typeof getTranslations<"Landing">>>;
 
 /**
  * Live Insights preview — the "show value instantly" section. Real rows
- * from the database (latest briefing per theme + busiest live themes),
- * set as a quiet editorial list rather than product-y cards. When the
+ * from the database (latest briefing per theme_group + busiest live
+ * topics), a quiet editorial list rather than product-y cards. When the
  * corpus is empty (fresh install, dev DB) the section renders nothing:
  * an empty shell would undermine the exact proof it exists to give.
  */
@@ -25,8 +25,8 @@ export function InsightsPreview({
   locale: string;
   insights: LandingInsights;
 }) {
-  const { briefings, themes } = insights;
-  if (briefings.length === 0 && themes.length === 0) return null;
+  const { briefings, topics } = insights;
+  if (briefings.length === 0 && topics.length === 0) return null;
 
   const df = new Intl.DateTimeFormat(locale, {
     day: "numeric",
@@ -78,24 +78,24 @@ export function InsightsPreview({
           </Reveal>
         )}
 
-        {/* Busiest live themes — quiet tally list */}
-        {themes.length > 0 && (
+        {/* Busiest live topics — quiet tally list */}
+        {topics.length > 0 && (
           <Reveal delay={160}>
             <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ink-faint">
-              {t("insights_themes_label")}
+              {t("insights_topics_label")}
             </p>
             <ul className="mt-4 space-y-3">
-              {themes.map((theme) => (
+              {topics.map((topic) => (
                 <li
-                  key={theme.label}
+                  key={topic.label}
                   className="flex items-baseline justify-between gap-4 text-sm"
                 >
                   <span className="min-w-0 flex-1 truncate text-ink">
-                    {theme.label}
+                    {topic.label}
                   </span>
                   <span className="shrink-0 text-xs tabular-nums text-ink-faint">
-                    {t("insights_theme_posts", {
-                      count: nf.format(theme.postCount),
+                    {t("insights_topic_posts", {
+                      count: nf.format(topic.postCount),
                     })}
                   </span>
                 </li>
