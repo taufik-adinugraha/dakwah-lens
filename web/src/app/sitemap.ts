@@ -78,13 +78,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     for (const r of rows) {
       const slug = briefingSlug(r.generatedAt, r.themeGroup, r.occasionSlug);
       const hub = `/d/${slug}`;
-      entries.push({
-        url: `${SITE_URL}/id${hub}`,
-        lastModified: r.generatedAt,
-        changeFrequency: "weekly",
-        priority: 0.8,
-        alternates: alternates(hub, r.hasEn),
-      });
+      // The bare hub URL (`/d/<slug>`) is intentionally NOT emitted: it
+      // renders a thin, noindexed card-grid, so submitting it in the sitemap
+      // triggers a Google Search Console "Submitted URL marked noindex"
+      // exclusion. Only the indexable deliverable pages below belong here.
 
       const deliverables =
         r.themeGroup === "Fiqh Pekan Ini"
