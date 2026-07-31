@@ -22,8 +22,8 @@ import { JsonLd } from "@/components/JsonLd";
 import {
   articleSchema,
   breadcrumbSchema,
+  deliverableMetaDescription,
   faqSchemaFromSection,
-  stripMarkdown,
 } from "@/lib/seo-schema";
 import {
   DELIVERABLE_HEADING_PATTERNS,
@@ -93,15 +93,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // " · Dakwah-Lens". Previously we ALSO suffixed "— Dakwah-Lens" here,
   // producing a duplicated brand ("… — Dakwah-Lens · Dakwah-Lens").
   const title = section ? section.heading : "Dakwah-Lens";
-  // Unique per-page meta description from the section body (markdown
-  // stripped, trimmed to ~155 chars at a word boundary). Previously every
-  // deliverable page inherited the generic site tagline — a long-tail SEO
-  // + click-through miss.
-  const summary = section ? stripMarkdown(section.body) : "";
-  const description =
-    summary.length > 155
-      ? summary.slice(0, 152).replace(/\s+\S*$/, "") + "…"
-      : summary || undefined;
+  // Unique per-page meta description from the section body: markdown
+  // stripped, internal script cue-labels ("HOOK (5 detik):"…) and the
+  // Arabic-script daleel runs removed, trimmed to ~155 chars at a word
+  // boundary. Previously every deliverable page inherited the generic site
+  // tagline — a long-tail SEO + click-through miss.
+  const description = section
+    ? deliverableMetaDescription(section.body)
+    : undefined;
   return {
     title,
     description,
