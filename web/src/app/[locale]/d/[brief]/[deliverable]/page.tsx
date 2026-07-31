@@ -23,6 +23,7 @@ import {
   articleSchema,
   breadcrumbSchema,
   faqSchemaFromSection,
+  stripMarkdown,
 } from "@/lib/seo-schema";
 import {
   DELIVERABLE_HEADING_PATTERNS,
@@ -88,17 +89,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!row) return { title: "Dakwah-Lens" };
   const body = locale === "en" && row.summaryMdEn ? row.summaryMdEn : row.summaryMd;
   const section = extractDeliverableSection(body, deliverable);
-  const title = section
-    ? `${section.heading} — Dakwah-Lens`
-    : "Dakwah-Lens";
+  // Bare heading — the [locale] layout's title template appends
+  // " · Dakwah-Lens". Previously we ALSO suffixed "— Dakwah-Lens" here,
+  // producing a duplicated brand ("… — Dakwah-Lens · Dakwah-Lens").
+  const title = section ? section.heading : "Dakwah-Lens";
+  // Unique per-page meta description from the section body (markdown
+  // stripped, trimmed to ~155 chars at a word boundary). Previously every
+  // deliverable page inherited the generic site tagline — a long-tail SEO
+  // + click-through miss.
+  const summary = section ? stripMarkdown(section.body) : "";
+  const description =
+    summary.length > 155
+      ? summary.slice(0, 152).replace(/\s+\S*$/, "") + "…"
+      : summary || undefined;
   return {
     title,
+    description,
     alternates: localeAlternates({
       locale,
       canonicalPath: `/d/${brief}/${deliverable}`,
       hasEn: Boolean(row.summaryMdEn),
     }),
-    openGraph: { title, type: "article" },
+    openGraph: { title, description, type: "article" },
   };
 }
 
