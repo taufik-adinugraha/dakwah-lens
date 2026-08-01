@@ -7,7 +7,7 @@ import { auth } from "@/auth";
 import { MonthPickerPager } from "@/components/MonthPickerPager";
 import { db, schema } from "@/db";
 import { Link } from "@/i18n/navigation";
-import { briefingSlug } from "@/lib/briefing-data";
+import { briefingSlug, FIQH_GROUP } from "@/lib/briefing-data";
 import {
   monthRangeUtc,
   parseMonthParam,
@@ -161,7 +161,13 @@ export default async function PublicFlyersPage({
     }>;
   }
 
-  const systemFlyers = briefingRows.flatMap((b) => {
+  const systemFlyers = briefingRows
+    // Fiqh Pekan Ini (report-never-rule track) has NO flyers — its flyer
+    // render endpoint 404s, so skip it or its 6 variant cards sort to the
+    // top (newest) and fill page 1 with broken images (operator-reported
+    // 2026-08-01).
+    .filter((b) => b.segment !== FIQH_GROUP)
+    .flatMap((b) => {
     const generatedAt = new Date(b.generated_at);
     // Occasion briefings (15th-track: asyura-1448, ramadan-1448-w2, ...)
     // resolve via occasion_slug; weekly briefings via slugified theme
