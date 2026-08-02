@@ -224,6 +224,14 @@ COLLECTION_NAMES: dict[str, str] = {
     "hayat_as_sahabah": "hayat_as_sahabah",
 }
 
+# Tafsir al-Tabari (Jāmiʿ al-Bayān) — Arabic-only, used ONLY via the keyed
+# `retrieve_tafsir_for_ayah` lookup (scroll by surah/ayah). Deliberately kept
+# OUT of COLLECTION_NAMES: `retrieve_daleel` iterates that dict for semantic
+# search, and al-Tabari's classical-Arabic vectors would only add weak-cosine
+# noise to the daleel pool. The Tafsir track reads it by verse key, where
+# vector quality is irrelevant.
+TAFSIR_TABARI_COLLECTION = "tafsir_al_tabari"
+
 # Per-corpus minimum cosine similarity for a hit to count as a usable
 # daleel. Recalibrated 2026-06-09 against 27 real recent topic labels
 # pulled from `topics.label` (the actual queries the briefing pipeline
@@ -937,77 +945,96 @@ def retrieve_by_citation(citation: str) -> dict[str, Any] | None:
 
 
 def retrieve_tafsir_for_ayah(surah: int, ayah: int) -> dict[str, Any] | None:
-    """Gather the FULL Ibn Kathir tafsir for one ayah from Qdrant.
+    """Gather one ayah's tafsir from Qdrant — Ibn Kathir (EN) AND al-Tabari (AR).
 
-    `tafsir_ibn_kathir` stores each verse's exegesis split across several
-    `chunk_index` chunks (ENGLISH only — payload key `chunk_text_en`; there
-    is no Indonesian field). `retrieve_by_citation` returns just the top-1
-    chunk, so this dedicated helper scrolls EVERY chunk for (surah, ayah),
-    orders them by `chunk_index`, and concatenates into one `tafsir_en`.
+    Each corpus stores a verse's exegesis across `chunk_index` chunks:
+    `tafsir_ibn_kathir` in ENGLISH (`chunk_text_en`), `tafsir_al_tabari` in
+    ARABIC (`chunk_text_ar`). This scrolls EVERY chunk for (surah, ayah) in
+    both, orders by `chunk_index`, and concatenates into `tafsir_en` +
+    `tafsir_ar`. Both are KEYED lookups (surah/ayah payload filter), so
+    al-Tabari's weak-for-semantic Arabic vectors don't matter here.
 
-    Returns None when the ayah has no tafsir chunk (or text is empty) — the
-    caller MUST surface that as a miss and re-pick the ayat, never fabricate
-    tafsir. The anchor ayat text (AR + Kemenag ID) is fetched separately via
-    `retrieve_by_citation("QS. <Surah>: <ayah>")`.
+    Returns None only when NEITHER corpus has the ayah — the caller surfaces
+    that as a miss and re-picks the ayat, never fabricates. (al-Tabari covers
+    all 6,236 verses; Ibn Kathir groups some verses and returns empty for
+    them, so al-Tabari now fills that gap and a None is rare.) The composer
+    renders EN→ID / AR→ID at compose time. Anchor ayat text (AR + Kemenag ID)
+    is fetched separately via `retrieve_quran_ayah`.
     """
     from qdrant_client import models
 
     qdrant = _get_qdrant()
-    try:
-        points, _ = qdrant.scroll(
-            collection_name=COLLECTION_NAMES["tafsir_ibn_kathir"],
-            scroll_filter=models.Filter(
-                must=[
-                    models.FieldCondition(
-                        key="surah", match=models.MatchValue(value=int(surah))
-                    ),
-                    models.FieldCondition(
-                        key="ayah", match=models.MatchValue(value=int(ayah))
-                    ),
-                ]
-            ),
-            limit=64,  # one ayah's tafsir is a handful of chunks; 64 is ample
-            with_payload=True,
-            with_vectors=False,
-            # `tafsir_ibn_kathir` has no payload index on (surah, ayah), so
-            # this filter is a full scan over ~12k points. The client default
-            # (~5s) intermittently times out and would be misread as a
-            # coverage miss (→ spurious "re-pick ayat"). 30s is ample.
-            timeout=30,
+
+    def _scroll(collection: str, text_key: str) -> tuple[str, str, int]:
+        """(text ordered by chunk_index, ayah_text_ar, n_chunks). Returns
+        empty ("", "", 0) on a per-corpus miss/error — one corpus failing
+        must not sink the other."""
+        try:
+            points, _ = qdrant.scroll(
+                collection_name=collection,
+                scroll_filter=models.Filter(
+                    must=[
+                        models.FieldCondition(
+                            key="surah", match=models.MatchValue(value=int(surah))
+                        ),
+                        models.FieldCondition(
+                            key="ayah", match=models.MatchValue(value=int(ayah))
+                        ),
+                    ]
+                ),
+                limit=64,  # one ayah's tafsir is a handful of chunks
+                with_payload=True,
+                with_vectors=False,
+                # No payload index on (surah, ayah) → full scan over ~12k
+                # points; the ~5s client default intermittently times out and
+                # would be misread as a coverage miss. 30s is ample.
+                timeout=30,
+            )
+        except Exception as exc:
+            log.warning(
+                "kitab_retrieval.tafsir_scroll_failed",
+                collection=collection,
+                surah=surah,
+                ayah=ayah,
+                error=str(exc),
+            )
+            return ("", "", 0)
+        if not points:
+            return ("", "", 0)
+        chunks = sorted(
+            (p.payload or {} for p in points),
+            key=lambda pl: int(pl.get("chunk_index", 0)),
         )
-    except Exception as exc:
-        log.warning(
-            "kitab_retrieval.tafsir_scroll_failed",
-            surah=surah,
-            ayah=ayah,
-            error=str(exc),
+        text = "\n\n".join(
+            (pl.get(text_key) or "").strip()
+            for pl in chunks
+            if (pl.get(text_key) or "").strip()
         )
-        return None
-    if not points:
+        ayah_ar = (chunks[0].get("ayah_text_ar") or "").strip()
+        return (text.strip(), ayah_ar, len(chunks))
+
+    tafsir_en, ik_ayah_ar, ik_n = _scroll(
+        COLLECTION_NAMES["tafsir_ibn_kathir"], "chunk_text_en"
+    )
+    tafsir_ar, tb_ayah_ar, tb_n = _scroll(
+        TAFSIR_TABARI_COLLECTION, "chunk_text_ar"
+    )
+
+    if not tafsir_en and not tafsir_ar:
         log.info("kitab_retrieval.tafsir_not_found", surah=surah, ayah=ayah)
         return None
 
-    chunks = sorted(
-        (p.payload or {} for p in points),
-        key=lambda pl: int(pl.get("chunk_index", 0)),
-    )
-    tafsir_en = "\n\n".join(
-        (pl.get("chunk_text_en") or "").strip()
-        for pl in chunks
-        if (pl.get("chunk_text_en") or "").strip()
-    )
-    if not tafsir_en:
-        log.info("kitab_retrieval.tafsir_empty", surah=surah, ayah=ayah)
-        return None
-    first = chunks[0]
     return {
         "surah": int(surah),
         "ayah": int(ayah),
         "citation": f"Tafsir Ibn Kathir on {int(surah)}:{int(ayah)}",
-        "ayah_ar": (first.get("ayah_text_ar") or "").strip(),
+        "ayah_ar": ik_ayah_ar or tb_ayah_ar,
         "tafsir_en": tafsir_en,
-        "n_chunks": len(chunks),
-        "source": "Tafsir Ibn Kathir",
+        "n_chunks": ik_n,
+        "tabari_citation": f"Tafsir al-Tabari on {int(surah)}:{int(ayah)}",
+        "tafsir_ar": tafsir_ar,
+        "tabari_n_chunks": tb_n,
+        "source": "Tafsir Ibn Kathir + al-Tabari",
     }
 
 
