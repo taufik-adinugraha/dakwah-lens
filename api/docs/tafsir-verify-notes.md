@@ -3,14 +3,14 @@
 ADVERSARIAL VERIFY — Briefing Tafsir Pekan Ini. Kamu skeptis; tugasmu MENOLAK/memperbaiki, bukan menyetujui. Baca prompt file (AYAT POOL + TAFSIR POOL + BERITA PENDUKUNG) lalu reply.md. Periksa & PERBAIKI LANGSUNG di file reply (edit in place), catat setiap perubahan.
 
 GATE A — Tafsir integrity (hard):
-A1. Setiap klaim makna ayat tertelusur ke `tafsir_en` (Ibn Katsir) di TAFSIR POOL. Rendering ID TIDAK menambah makna, kisah, atau kesimpulan yang tak ada di sumber (no drift). Kalimat yang menambah makna → potong / kembalikan ke makna pool.
+A1. Setiap klaim makna ayat tertelusur ke `tafsir_en` (Ibn Katsir) ATAU `tafsir_ar` (Ath-Thabari) di TAFSIR POOL. Rendering ID/AR→ID TIDAK menambah makna, kisah, atau kesimpulan yang tak ada di sumber (no drift). Kalimat yang menambah makna → potong / kembalikan ke makna pool.
 A2. Ayat Arab di tiap artikel VERBATIM dari AYAT POOL (cocokkan potongan Arab). Terjemahan Indonesia verbatim Kemenag dari pool.
-A3. Setiap sitasi "Tafsir Ibn Kathir on <s>:<a>" dan "QS. <Surah>: <ayah>" ADA di pool (cocokkan (surah,ayah)). Sitasi di luar pool → ganti dengan entri pool yang pas atau hapus. Semua entri "## Dalil & Sumber" (>=8) harus sitasi pool persis.
+A3. Setiap sitasi "Tafsir Ibn Kathir on <s>:<a>" ATAU "Tafsir al-Tabari on <s>:<a>" dan "QS. <Surah>: <ayah>" ADA di pool (cocokkan (surah,ayah)). Sitasi di luar pool → ganti dengan entri pool yang pas atau hapus. Semua entri "## Dalil & Sumber" (>=8) harus sitasi pool persis.
 
 GATE B — Guardrails (hard):
 B1. NO FIQH RULING: scan kalimat "hukumnya haram/wajib/halal", "ini jelas riba", "wajib atasmu…" sebagai keputusan penyusun. Bila sifat halal/haram berasal dari ayat/tafsir Ibn Katsir → pastikan di-atribusi ("Ibn Katsir menjelaskan…") dan bukan disodorkan sebagai fatwa. Bila itu vonis penyusun → lunakkan jadi laporan makna + rujuk ulama/kanal Fiqh.
 B2. AQIDAH SELAMAT: tidak ada takwil mutasyabihat atau perselisihan aqidah sektarian; makna yang diambil disepakati mayoritas mufassir.
-B3. NO WEAK/ISRAILIYYAT: tidak ada kisah israiliyyat / riwayat da'if yang tidak ditegaskan Ibn Katsir. Hapus bila ada.
+B3. NO WEAK/ISRAILIYYAT: tidak ada kisah israiliyyat / riwayat da'if. ⚠️ Awasi khusus makna yang diambil dari Ath-Thabari (AR) — ia memuat israiliyyat & isnad panjang tanpa penilaian; pastikan artikel TIDAK mengutip israiliyyat darinya dan isnad sudah diringkas. Hapus bila ada.
 B4. DISCLAIMER: baris memuat "bukan tafsir muktamad" ada tepat 1× + ajakan merujuk ahli tafsir.
 
 GATE C — Fact-check hook (hard):
