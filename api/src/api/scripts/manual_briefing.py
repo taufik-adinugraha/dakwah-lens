@@ -2330,19 +2330,19 @@ Di bawah "## Artikel Tafsir Pekan Ini" tulis paragraf pengantar singkat, lalu TE
 SETIAP ARTIKEL (900-1.300 kata) mengikuti alur:
 1. Peristiwa — konteks berita 7 hari terakhir (fakta HANYA dari BERITA PENDUKUNG; disiplin parafrase: tiap atribusi nama/peran bisa ditelusuri ke headline; anchor pada pola/institusi, JANGAN sebut nama individu).
 2. Ayat — cetak AYAT PILIHAN dalam aksara Arab pada barisnya sendiri, lalu terjemahan Indonesia verbatim dari AYAT POOL. Sertakan sitasi "QS. <Surah>: <ayah>".
-3. Tafsir — sampaikan makna dari TAFSIR POOL (Ibn Katsir). Terjemahkan/rangkum SETIA dari tafsir_en yang diberikan; JANGAN menambah makna di luar pool. Sitasi persis: "Tafsir Ibn Kathir on <surah>:<ayah>".
+3. Tafsir — sampaikan makna dari TAFSIR POOL (Ibn Katsir [EN] dan/atau Ath-Thabari [AR]). Terjemahkan/rangkum SETIA dari tafsir_en/tafsir_ar yang diberikan; JANGAN menambah makna di luar pool. Untuk Ath-Thabari: terjemahkan AR→ID setia, RINGKAS rantai isnad (cukup pandangan/perawi akhir), LEWATI riwayat israiliyyat. Sitasi persis: "Tafsir Ibn Kathir on <surah>:<ayah>" ATAU "Tafsir al-Tabari on <surah>:<ayah>" (sesuai sumber makna yang dipakai).
 4. Tadabbur & Ibrah — renungan yang menautkan makna ayat ke peristiwa pekan ini; SATU ibrah utama, nada rahmah dan hikmah.
 5. Tanya-Jawab — sub-bagian dengan heading persis `#### Tanya-Jawab` berisi 3-4 pasang. Pertanyaan = suara akar rumput yang NYATA tentang MAKNA/penerapan ayat (first-person, mis. "Kalau saya membaca ayat ini…", "Bagaimana memahami…"). Format tiap pasang: baris `**T:** <pertanyaan>` lalu `**J:** <jawaban 2-4 kalimat>`. Jawaban hanya dari pool; untuk keputusan pribadi tunjuk ke ahli tafsir/ulama.
 6. Penutup — satu baris yang menegaskan ini "renungan tadabbur, berbantuan AI, bukan tafsir muktamad" + ajakan merujuk ahli tafsir. (WAJIB memuat frasa "bukan tafsir muktamad".)
 
 ATURAN KERAS (guardrails — tak bisa ditawar):
-- GROUNDING: setiap makna ayat DARI TAFSIR POOL (Ibn Katsir), retrieved — tak boleh tafsir bebas dari ingatan.
-- BUKAN FIQH: jangan menetapkan hukum halal/haram/wajib/makruh dari ayat sebagai keputusanmu sendiri. Ini renungan makna, bukan tarjih hukum; rujukkan pertanyaan hukum ke ulama atau kanal Fiqh. (Bila ayat/tafsir Ibn Katsir sendiri menyebut sifat halal/haram — mis. riba — laporkan sebagai makna ayat yang di-atribusi ke Ibn Katsir, bukan sebagai fatwamu.)
+- GROUNDING: setiap makna ayat DARI TAFSIR POOL (Ibn Katsir dan/atau Ath-Thabari), retrieved — tak boleh tafsir bebas dari ingatan.
+- BUKAN FIQH: jangan menetapkan hukum halal/haram/wajib/makruh dari ayat sebagai keputusanmu sendiri. Ini renungan makna, bukan tarjih hukum; rujukkan pertanyaan hukum ke ulama atau kanal Fiqh. (Bila ayat/tafsir sendiri menyebut sifat halal/haram — mis. riba — laporkan sebagai makna ayat yang di-atribusi ke mufassir [Ibn Katsir/Ath-Thabari], bukan sebagai fatwamu.)
 - AQIDAH SELAMAT (salaf): hindari takwil ayat mutasyabihat & perselisihan aqidah sektarian; ambil makna yang disepakati mayoritas mufassir.
-- TANPA RIWAYAT LEMAH/ISRAILIYYAT: hanya yang ditegaskan Ibn Katsir; jangan bawa kisah israiliyyat da'if.
+- TANPA RIWAYAT LEMAH/ISRAILIYYAT: jangan bawa kisah israiliyyat da'if. ⚠️ Ath-Thabari kerap memuat banyak riwayat berantai (isnad) TANPA penilaian, termasuk israiliyyat — JANGAN kutip riwayat israiliyyat darinya; ambil hanya makna tafsir yang jelas & disepakati; bila ragu, jadikan Ibn Katsir (yang menyaring israiliyyat) sebagai penimbang.
 - Bagian "## Ringkasan Eksekutif" dan "## Poin Kunci": naratif; TANPA angka statistik internal (jumlah posting, persentase).
 - Tanpa emphasis ALL-CAPS; gunakan **bold**/*italic*. Fokus pola bukan individu; tanpa framing sektarian.
-- "## Dalil & Sumber": daftar SEMUA rujukan yang dikutip artikel, satu baris per entri dengan pola persis: `- **<sitasi persis dari pool>** — <catatan 1 kalimat>` (minimal 8 entri: 4 ayat "QS. …" + 4 "Tafsir Ibn Kathir on <s>:<a>").
+- "## Dalil & Sumber": daftar SEMUA rujukan yang dikutip artikel, satu baris per entri dengan pola persis: `- **<sitasi persis dari pool>** — <catatan 1 kalimat>` (minimal 8 entri: 4 ayat "QS. …" + 4 sitasi tafsir "Tafsir Ibn Kathir on <s>:<a>" dan/atau "Tafsir al-Tabari on <s>:<a>").
 - JANGAN menulis bagian "Pesan Flyer", "Strategi & Aksi Dakwah", khutbah, kultum, atau deliverable mingguan lain."""
 
 
@@ -2433,8 +2433,8 @@ async def cmd_dump_tafsir(themes_path: str, output_path: str | None) -> None:
             )
         if not taf:
             missing.append(
-                f"Tema {idx} — Tafsir Ibn Kathir untuk {surah}:{ayah} tidak "
-                "ada di korpus. Pilih ayat lain yang tercakup Ibn Katsir."
+                f"Tema {idx} — tafsir untuk {surah}:{ayah} tidak ada di korpus "
+                "(Ibn Katsir maupun Ath-Thabari). Pilih ayat lain."
             )
         if not verse or not verse_ar or not taf:
             continue
@@ -2530,18 +2530,29 @@ async def cmd_dump_tafsir(themes_path: str, output_path: str | None) -> None:
         lines.append("")
 
     lines.append(
-        "# TAFSIR POOL (Ibn Katsir — makna HANYA dari sini; terjemahkan setia)"
+        "# TAFSIR POOL (Ibn Katsir [EN] & Ath-Thabari [AR] — makna HANYA dari "
+        "sini; terjemahkan setia, ringkas isnad, LEWATI israiliyyat)"
     )
     lines.append("")
     for t in tafsir_pool:
-        lines.append(
-            f"## Tema {t['tafsir_theme']} — {t['citation']} "
-            f"({t.get('n_chunks', '?')} chunk)"
-        )
+        lines.append(f"## Tema {t['tafsir_theme']} — {t['citation']}")
         if t.get("tafsir_id"):
-            lines.append("[ID tersedia dari cache — pakai/haluskan]")
+            lines.append("[ID Ibn Katsir tersedia dari cache — pakai/haluskan]")
             lines.append(f"ID: {t['tafsir_id']}")
-        lines.append(f"EN: {t.get('tafsir_en', '')}")
+        if (t.get("tafsir_en") or "").strip():
+            lines.append(
+                f'EN (Ibn Katsir, {t.get("n_chunks", "?")} chunk) — '
+                f'sitasi "{t["citation"]}":'
+            )
+            lines.append(t["tafsir_en"])
+        if (t.get("tafsir_ar") or "").strip():
+            lines.append("")
+            lines.append(
+                f'AR (Ath-Thabari, {t.get("tabari_n_chunks", "?")} chunk) — '
+                f'sitasi "{t.get("tabari_citation", "")}"; terjemahkan AR→ID '
+                "setia, ringkas isnad, LEWATI israiliyyat:"
+            )
+            lines.append(t["tafsir_ar"])
         lines.append("")
 
     if misses:
@@ -2692,14 +2703,14 @@ def _validate_tafsir_briefing(
                     f"Tafsir {i} tidak mencetak ayat dalam aksara Arab."
                 )
 
-            # (6) In-pool Ibn Kathir tafsir citation.
+            # (6) In-pool tafsir citation — Ibn Kathir OR al-Tabari.
             found_taf = _re.findall(
-                r"Tafsir Ibn Kathir on\s+(\d+)\s*:\s*(\d+)", body
+                r"Tafsir (?:Ibn Kathir|al-Tabari) on\s+(\d+)\s*:\s*(\d+)", body
             )
             if not any((int(s), int(a)) in taf_sa for s, a in found_taf):
                 problems.append(
                     f"Tafsir {i} tidak mengutip 'Tafsir Ibn Kathir on <s>:<a>' "
-                    "yang ada di pool."
+                    "atau 'Tafsir al-Tabari on <s>:<a>' yang ada di pool."
                 )
 
             # (7) In-pool QS anchor citation.
@@ -2753,9 +2764,15 @@ def _validate_tafsir_briefing(
             f"Dalil & Sumber lists only {len(cited)} entries (expect >=8: "
             "4 ayat + 4 tafsir, one line per entry)."
         )
-    pool_cits = {_norm(v.get("citation") or "") for v in ayat_pool} | {
-        _norm(t.get("citation") or "") for t in tafsir_pool
-    }
+    pool_cits = (
+        {_norm(v.get("citation") or "") for v in ayat_pool}
+        | {_norm(t.get("citation") or "") for t in tafsir_pool}
+        | {
+            _norm(t.get("tabari_citation") or "")
+            for t in tafsir_pool
+            if t.get("tabari_citation")
+        }
+    )
     out_of_pool = [c for c in cited if _norm(c) not in pool_cits]
     if out_of_pool:
         problems.append(
