@@ -751,6 +751,51 @@ def retrieve_occasion_daleel(
     return retrieve_daleel(query, limit=limit, per_corpus=per_corpus)
 
 
+def retrieve_national_daleel(
+    national_slug: str,
+    *,
+    limit: int = 12,
+    per_corpus: int = 4,
+) -> list[dict[str, Any]]:
+    """Retrieve daleel for an Indonesian national occasion ("Acara
+    Nasional" track). Gregorian-calendar sibling of
+    ``retrieve_occasion_daleel`` — wraps ``retrieve_daleel`` with the
+    entry's ``query_template`` from ``api/catalogs/national_occasions.yaml``.
+
+    Identical hit shape + generous defaults (12 vs 5) so the rest of the
+    briefing pipeline consumes it without changes. The query_template is
+    deliberately Islamic-anchored (syukur / persatuan / ilmu / amanah) so
+    the pool lands on ayat + hadith that carry the da'wah frame, not
+    civic slogans.
+
+    Args:
+      national_slug: stable slug from the national catalog YAML
+        (e.g. ``"kemerdekaan-2026"``, ``"hari-santri-2026"``).
+      limit: max hits returned across all corpora after merge.
+      per_corpus: how many hits to fetch from each corpus before merging.
+
+    Returns: list of normalized hit dicts. Empty list if the slug is
+    unknown, the query template is empty, or nothing clears MIN_SCORE.
+    """
+    from api.services.national_catalog import get_national_by_slug
+
+    entry = get_national_by_slug(national_slug)
+    if entry is None:
+        log.warning(
+            "kitab_retrieval.national_unknown_slug",
+            slug=national_slug,
+        )
+        return []
+    query = (entry.query_template or "").strip()
+    if not query:
+        log.warning(
+            "kitab_retrieval.national_empty_query",
+            slug=national_slug,
+        )
+        return []
+    return retrieve_daleel(query, limit=limit, per_corpus=per_corpus)
+
+
 def retrieve_by_citation(citation: str) -> dict[str, Any] | None:
     """Fetch a specific Qdrant chunk by its human-readable citation.
 

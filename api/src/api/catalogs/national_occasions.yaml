@@ -1,0 +1,71 @@
+# Indonesian national occasions for the "Acara Nasional" briefing track.
+#
+# Gregorian-calendar sibling of hijri_occasions.yaml. Every entry is a
+# fixed CIVIL date (no rukyat), so `confirmed` is true by default and
+# there are no hijri fields.
+#
+# EDITORIAL FRAME (read before adding entries):
+#   This is a DA'WAH product. A national occasion is always framed through
+#   an Islamic lens — syukur atas nikmat, persatuan/ukhuwah, amanah menjaga
+#   negeri, peran ulama & santri — grounded in RETRIEVED daleel (§12), and
+#   it must steer clear of ghuluw / over-nationalism (hubbul wathan yes,
+#   nationalism-over-aqidah no). The query_template exists to pull the
+#   right ayat/hadith for that frame from the kitab corpus.
+#
+# OPERATOR PLAYBOOK:
+#   - Refresh annually: append next year's entry (e.g. `kemerdekaan-2027`)
+#     with the new gregorian_date. Keep old entries — the slug is the
+#     dedupe key + URL path component; NEVER rename a shipped slug.
+#   - Compose manually: `dump-national <slug>` → paste to Claude →
+#     `save-national <slug> <reply.md>`. There is no cron (manual-only,
+#     same as the Islamic occasion track).
+#
+# Schema per occasion (all required unless marked optional):
+#   slug                     — stable lowercase-dash id (e.g. kemerdekaan-2026),
+#                              used as occasion_slug column + URL path component
+#   name                     — human-readable Indonesian label
+#   gregorian_date           — ISO 8601 civil date the occasion lands on
+#   query_template           — semantic query passed to retrieve_daleel
+#                              (mix occasion theme + Islamic/daleel terms)
+#   include_trending_headlines  optional, default true — attach top last-7d
+#                              headlines as BERITA PENDUKUNG (qualitative
+#                              supporting evidence only, never the lead)
+#   confirmed                optional, default true (civil dates are fixed)
+#   notes                    optional — operator scratch field; the prompt
+#                              surfaces this as "Catatan operator", so the
+#                              historical anchor date goes here
+
+occasions:
+  # ────────────── 2026 — core da'wah-relevant national days ──────────────
+
+  - slug: kemerdekaan-2026
+    name: "HUT Kemerdekaan RI ke-81"
+    gregorian_date: 2026-08-17
+    query_template: "syukur nikmat kemerdekaan keamanan negeri aman sentosa persatuan ukhuwah menjaga amanah tanah air merdeka dari penjajahan mensyukuri nikmat Allah bertambah nikmat"
+    include_trending_headlines: true
+    confirmed: true
+    notes: "Memperingati Proklamasi Kemerdekaan 17 Agustus 1945. Frame: syukur atas nikmat kemerdekaan & keamanan (ni'mat al-amn), persatuan, amanah menjaga negeri. Hindari nasionalisme yang berlebihan; hubbul wathan dalam batas syar'i."
+
+  - slug: hari-santri-2026
+    name: "Hari Santri Nasional 2026"
+    gregorian_date: 2026-10-22
+    query_template: "peran santri ulama membela negeri keutamaan menuntut ilmu adab penuntut ilmu keberkahan ilmu khidmah umat jihad dengan ilmu ketaatan pada ulil amri hubbul wathan"
+    include_trending_headlines: true
+    confirmed: true
+    notes: "Memperingati Resolusi Jihad 22 Oktober 1945 (KH Hasyim Asy'ari). Frame: peran ulama & santri, kemuliaan ilmu & adab, khidmah untuk umat & bangsa. Paling kuat sebagai konten dakwah dari keempat hari nasional ini."
+
+  - slug: sumpah-pemuda-2026
+    name: "Hari Sumpah Pemuda 2026"
+    gregorian_date: 2026-10-28
+    query_template: "persatuan ukhuwah semangat pemuda kekuatan iman pemuda ashabul kahfi bersatu tidak berpecah belah menyatukan hati persaudaraan seiman dan sebangsa amanah generasi muda"
+    include_trending_headlines: true
+    confirmed: true
+    notes: "Memperingati Sumpah Pemuda 28 Oktober 1928. Frame: persatuan/ukhuwah, keteladanan pemuda beriman (mis. Ashabul Kahfi), tanggung jawab generasi muda."
+
+  - slug: hari-pahlawan-2026
+    name: "Hari Pahlawan 2026"
+    gregorian_date: 2026-11-10
+    query_template: "pengorbanan membela kebenaran keberanian mempertahankan negeri mengenang jasa syuhada syukur amanah meneruskan perjuangan berbuat baik pada sesama tanggung jawab generasi penerus"
+    include_trending_headlines: true
+    confirmed: true
+    notes: "Memperingati Pertempuran Surabaya 10 November 1945. Frame: menghargai pengorbanan, keberanian menegakkan kebenaran, amanah generasi penerus mengisi kemerdekaan dengan kebaikan. Kenang jasa tanpa mengkultuskan."

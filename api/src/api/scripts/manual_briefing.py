@@ -1838,6 +1838,498 @@ async def cmd_list_occasions(lookahead_days: int = 14) -> None:
 
 
 # ──────────────────────────────────────────────────────────────────
+# National occasions ("Acara Nasional" track): dump-national /
+# save-national / list-national.
+#
+# Gregorian-calendar sibling of the Islamic occasion pipeline above.
+# Same 7-section shape + full weekly deliverable set (khutbah + 8 sub-
+# sections + 6 flyers), but Sections 2+3 are Gregorian-framed and the
+# briefing is composed through an Islamic da'wah lens (syukur, persatuan,
+# peran ulama-santri, amanah) with a hard anti-ghuluw guard. Manual-only
+# (no cron), same discipline as the occasion + weekly + fiqh paths.
+# Catalog: api/src/api/catalogs/national_occasions.yaml.
+# ──────────────────────────────────────────────────────────────────
+
+NATIONAL_GROUP = "Acara Nasional"
+
+
+async def _prepare_national_context(
+    slug: str,
+) -> tuple[
+    Any,  # NationalOccasionEntry
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    str,
+    str,
+]:
+    """Data-prep half of the national-mode pipeline (everything BEFORE
+    Claude composes). Pure-Claude, no Gemini.
+
+    Returns: (entry, daleel, adhkar, flyer_daleel_pool,
+              flyer_adhkar_pool, trending_headlines, translation_misses,
+              system_prompt, user_prompt). All Indonesian.
+    """
+    from datetime import date as _date
+
+    from api.services.briefing import (
+        NATIONAL_SYSTEM_PROMPT_ID,
+        _build_national_user_prompt,
+    )
+    from api.services.kitab_retrieval import (
+        FLYER_ALLOWED_CORPORA,
+        retrieve_dua,
+        retrieve_national_daleel,
+    )
+    from api.services.national_catalog import get_national_by_slug
+    from api.services.trending_headlines import fetch_trending_headlines
+
+    entry = get_national_by_slug(slug)
+    if entry is None:
+        raise SystemExit(
+            f"Unknown national slug '{slug}'. "
+            "Run `list-national` to see upcoming entries from "
+            "api/src/api/catalogs/national_occasions.yaml."
+        )
+
+    candidates = retrieve_national_daleel(slug, limit=24, per_corpus=4)
+    async with SessionLocal() as session:
+        from api.services.hadith_translation import lookup_cached_translations
+
+        daleel, daleel_misses = await lookup_cached_translations(
+            session, candidates
+        )
+
+        # Adhkar pool for Flyer 5+6. No hijri_context — national days are
+        # Gregorian; the query_template already carries the theme.
+        dua_candidates = retrieve_dua(
+            entry.query_template,
+            limit=15,
+            per_corpus=4,
+        )
+        adhkar, dua_misses = await lookup_cached_translations(
+            session, dua_candidates
+        )
+        translation_misses = daleel_misses + dua_misses
+
+        if entry.include_trending_headlines:
+            trending = await fetch_trending_headlines(
+                session, limit=8, period_days=7
+            )
+        else:
+            trending = []
+
+    flyer_allowed = set(FLYER_ALLOWED_CORPORA)
+    flyer_daleel_pool = [d for d in (daleel or []) if d.get("corpus") in flyer_allowed]
+    flyer_adhkar_pool = [a for a in (adhkar or []) if a.get("corpus") in flyer_allowed]
+
+    log.info(
+        "manual_briefing.national_context_ready",
+        slug=slug,
+        daleel_count=len(daleel),
+        adhkar_count=len(adhkar),
+        flyer_daleel=len(flyer_daleel_pool),
+        flyer_adhkar=len(flyer_adhkar_pool),
+        trending=len(trending),
+        translation_misses=len(translation_misses),
+        gregorian=entry.gregorian_date.isoformat(),
+    )
+
+    user_prompt = _build_national_user_prompt(
+        entry,
+        today_gregorian=_date.today(),
+        daleel=daleel,
+        adhkar=adhkar,
+        flyer_daleel_pool=flyer_daleel_pool,
+        flyer_adhkar_pool=flyer_adhkar_pool,
+        trending_headlines=trending,
+        language="id",
+    )
+    return (
+        entry,
+        daleel,
+        adhkar,
+        flyer_daleel_pool,
+        flyer_adhkar_pool,
+        trending,
+        translation_misses,
+        NATIONAL_SYSTEM_PROMPT_ID,
+        user_prompt,
+    )
+
+
+async def cmd_dump_national(slug: str, output_path: str | None) -> None:
+    """Compute national-mode pool + prompt, write cache, emit prompt.
+
+    Pure-Claude: no Gemini. Translation cache misses are appended as a
+    TRANSLATION MISSES block for Claude to translate inline; persist
+    later via `cache-translation`."""
+    (
+        entry,
+        daleel,
+        adhkar,
+        flyer_daleel_pool,
+        flyer_adhkar_pool,
+        trending,
+        translation_misses,
+        system_prompt,
+        user_prompt,
+    ) = await _prepare_national_context(slug)
+
+    cache_path = _cache_path(slug)
+    cache_path.write_text(
+        json.dumps(
+            {
+                "mode": "national",
+                "occasion_slug": slug,
+                "entry": {
+                    "slug": entry.slug,
+                    "name": entry.name,
+                    "gregorian_date": entry.gregorian_date.isoformat(),
+                    "query_template": entry.query_template,
+                    "include_trending_headlines": entry.include_trending_headlines,
+                    "confirmed": entry.confirmed,
+                    "notes": entry.notes,
+                },
+                "daleel": daleel,
+                "adhkar": adhkar,
+                "flyer_daleel_pool": flyer_daleel_pool,
+                "flyer_adhkar_pool": flyer_adhkar_pool,
+                "trending_headlines": trending,
+                "translation_misses": translation_misses,
+                "dumped_at_utc": datetime.now(UTC).isoformat(),
+            },
+            indent=2,
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    if translation_misses:
+        miss_block_lines = [
+            "================================================================",
+            "TRANSLATION CACHE MISSES (translate these in chat)",
+            "================================================================",
+            "",
+            f"The hadith_translations_id cache has no Indonesian translation for "
+            f"the {len(translation_misses)} hadith below. Provide ID translations "
+            f"inline in your briefing where you cite them, then persist them after "
+            f"save with:",
+            "  manual_briefing cache-translation \"<citation>\" \"<text_en>\" \"<text_id>\"",
+            "",
+        ]
+        for m in translation_misses:
+            miss_block_lines.append(f"## {m['citation']}  [{m['corpus']} #{m['hadithnumber']}]")
+            miss_block_lines.append(f"EN: {m['text_en']}")
+            miss_block_lines.append("")
+        miss_block = "\n".join(miss_block_lines) + "\n"
+    else:
+        miss_block = ""
+
+    composed = (
+        f"<!-- DAKWAH-LENS MANUAL NATIONAL BRIEFING PROMPT (pure-Claude) -->\n"
+        f"<!-- national: {entry.name} ({entry.slug})  "
+        f"gregorian: {entry.gregorian_date}  "
+        f"dumped: {datetime.now(UTC).isoformat()} -->\n"
+        f"<!-- daleel pool: {len(daleel)} entries · adhkar pool: "
+        f"{len(adhkar)} entries · trending headlines: {len(trending)} · "
+        f"translation misses: {len(translation_misses)} -->\n"
+        f"<!-- After Claude responds, save the reply as a .md file and run: -->\n"
+        f"<!--   uv run python -m api.scripts.manual_briefing save-national "
+        f"{slug} <reply.md> -->\n\n"
+        "================================================================\n"
+        "SYSTEM INSTRUCTION (national-mode persona + 7-section structure)\n"
+        "================================================================\n\n"
+        f"{system_prompt}\n\n"
+        "================================================================\n"
+        "USER PROMPT (national context + daleel pool + supporting headlines)\n"
+        "================================================================\n\n"
+        f"{user_prompt}\n\n"
+        f"{miss_block}"
+    )
+
+    if output_path:
+        Path(output_path).write_text(composed, encoding="utf-8")
+        sys.stderr.write(
+            f"✓ National prompt written to {output_path} "
+            f"({len(composed):,} chars).\n"
+            f"  Cache: {cache_path}\n"
+            f"  Translation misses: {len(translation_misses)} "
+            f"(surfaced in prompt for Claude to translate)\n"
+            f"  Next: paste {output_path} into Claude → save reply → "
+            f"`save-national {slug} <reply.md>`.\n",
+        )
+    else:
+        sys.stdout.write(composed)
+        sys.stderr.write(
+            f"\n[stderr] National cache: {cache_path}\n"
+            f"[stderr] Translation misses: {len(translation_misses)}\n"
+            f"[stderr] Next: pipe Claude's reply into "
+            f"`save-national {slug} <file.md>`\n",
+        )
+
+
+async def cmd_save_national(slug: str, markdown_path: str) -> None:
+    """Persist Claude's reply for a national briefing.
+
+    Same validator chain as the weekly/occasion save path. Hard-fails on
+    any `high` severity `national_section_malformed` warning (composer
+    drifted to the weekly template). Flyer pool refetch + independence
+    checks apply unchanged."""
+    from api.models.admin import Briefing
+    from api.services.national_catalog import get_national_by_slug
+    from api.services.validate_briefing import (
+        format_warnings_for_stderr,
+        validate_briefing,
+    )
+
+    entry = get_national_by_slug(slug)
+    if entry is None:
+        raise SystemExit(
+            f"Unknown national slug '{slug}'. "
+            "Add it to api/src/api/catalogs/national_occasions.yaml first."
+        )
+
+    cache_path = _cache_path(slug)
+    if not cache_path.exists():
+        sys.stderr.write(
+            f"⚠ National cache for '{slug}' missing at {cache_path}\n"
+            f"  → Auto-redumping (likely a container restart wiped the cache).\n"
+        )
+        await cmd_dump_national(slug, None)
+        if not cache_path.exists():
+            raise SystemExit(
+                f"Auto-redump failed to create cache at {cache_path}. "
+                f"Run `dump-national {slug}` manually and check logs."
+            )
+
+    md_path = Path(markdown_path)
+    if not md_path.exists():
+        raise SystemExit(f"Markdown file not found: {markdown_path}")
+    summary_md = md_path.read_text(encoding="utf-8").strip()
+    if not summary_md or len(summary_md) < 1500:
+        raise SystemExit(
+            f"National briefing markdown looks empty or truncated "
+            f"({len(summary_md):,} chars). Aborting save."
+        )
+
+    cached = json.loads(cache_path.read_text(encoding="utf-8"))
+    daleel: list[dict[str, Any]] = cached["daleel"]
+    adhkar: list[dict[str, Any]] = cached.get("adhkar", [])
+    flyer_daleel = cached.get("flyer_daleel_pool") or []
+    flyer_adhkar = cached.get("flyer_adhkar_pool") or []
+
+    try:
+        heuristic_warnings = validate_briefing(
+            summary_md,
+            daleel_pool=daleel,
+            adhkar_pool=adhkar,
+            flyer_daleel_pool=flyer_daleel,
+            flyer_adhkar_pool=flyer_adhkar,
+            llm_judgments=False,
+        )
+    except Exception as exc:
+        sys.stderr.write(f"⚠ Validation pass failed (non-fatal): {exc}\n")
+        heuristic_warnings = []
+
+    # HARD-FAIL on national structural drift.
+    nat_struct_high = [
+        w
+        for w in heuristic_warnings
+        if w.get("kind") == "national_section_malformed"
+        and w.get("severity") == "high"
+    ]
+    if nat_struct_high:
+        sys.stderr.write(
+            "\n✗ SAVE BLOCKED — national briefing has structural drift "
+            "between weekly + national templates:\n\n"
+        )
+        for w in nat_struct_high:
+            sys.stderr.write(f"  · {w['where']}: {w['message']}\n")
+        sys.stderr.write(
+            "\n  Fix the markdown (rename H2s to national-mode names + "
+            "remove any '## Numerik & Tren' / '## Tema Utama' sections "
+            "the composer left behind), then re-run save-national.\n"
+            "  Save aborted. No row written.\n"
+        )
+        raise SystemExit(1)
+
+    # Reuse the same flyer pool + independence hard-fails.
+    pool_warnings = [
+        w for w in heuristic_warnings if w.get("kind") == "flyer_dalil_not_in_pool"
+    ]
+    if pool_warnings:
+        from api.services.kitab_retrieval import retrieve_by_citation
+
+        refetched_d: list[dict[str, Any]] = []
+        refetched_a: list[dict[str, Any]] = []
+        unresolved: list[dict[str, Any]] = []
+        for w in pool_warnings:
+            citation = (w.get("current_citation") or "").strip()
+            flyer_idx = w.get("flyer_index")
+            if not citation:
+                unresolved.append(w)
+                continue
+            hit = retrieve_by_citation(citation)
+            if hit is None:
+                unresolved.append(w)
+                continue
+            if isinstance(flyer_idx, int) and flyer_idx in (4, 5):
+                refetched_a.append(hit)
+            else:
+                refetched_d.append(hit)
+        if refetched_d or refetched_a:
+            existing_d = {d.get("citation", "") for d in daleel}
+            existing_a = {d.get("citation", "") for d in adhkar}
+            added_d = [h for h in refetched_d if h["citation"] not in existing_d]
+            added_a = [h for h in refetched_a if h["citation"] not in existing_a]
+            daleel = daleel + added_d
+            adhkar = adhkar + added_a
+            sys.stderr.write(
+                f"\n↻ Refetched {len(added_d)} daleel + {len(added_a)} "
+                f"adhkar by exact citation. Re-running pool validation.\n"
+            )
+            heuristic_warnings = validate_briefing(
+                summary_md,
+                daleel_pool=daleel,
+                adhkar_pool=adhkar,
+                flyer_daleel_pool=flyer_daleel,
+                flyer_adhkar_pool=flyer_adhkar,
+                llm_judgments=False,
+            )
+            pool_warnings = [
+                w
+                for w in heuristic_warnings
+                if w.get("kind") == "flyer_dalil_not_in_pool"
+            ]
+            unresolved = pool_warnings
+        if unresolved:
+            sys.stderr.write(
+                "\n✗ SAVE BLOCKED — flyer Dalil markers don't resolve in "
+                "pool AND couldn't be refetched.\n\n"
+            )
+            for w in unresolved:
+                sys.stderr.write(f"  · {w['where']}: {w['message']}\n")
+            raise SystemExit(1)
+
+    independence_warnings = [
+        w for w in heuristic_warnings if w.get("kind") == "flyer_independence_violation"
+    ]
+    if independence_warnings:
+        sys.stderr.write(
+            "\n✗ SAVE BLOCKED — Pesan Flyer body references another "
+            "deliverable / uses staged-narrator framing:\n\n"
+        )
+        for w in independence_warnings:
+            sys.stderr.write(f"  · {w['where']}: {w['message']}\n")
+        raise SystemExit(1)
+
+    # Persist. theme_group = 'Acara Nasional'. period_start/end frame the
+    # 14-day-before → 7-day-after window (matches the occasion track).
+    period_start = datetime.combine(
+        entry.gregorian_date - timedelta(days=14),
+        datetime.min.time(),
+    ).replace(tzinfo=UTC)
+    period_end = datetime.combine(
+        entry.gregorian_date + timedelta(days=7),
+        datetime.min.time(),
+    ).replace(tzinfo=UTC)
+
+    async with SessionLocal() as session:
+        from sqlalchemy import delete, select
+
+        # One row per national occasion (keyed by occasion_slug). Re-save
+        # REPLACES the prior row. Filter by BOTH occasion_slug AND
+        # theme_group so a national re-save never touches an Islamic
+        # occasion row that happened to share a slug.
+        existing = (
+            await session.execute(
+                select(Briefing.id).where(
+                    Briefing.occasion_slug == slug,
+                    Briefing.theme_group == NATIONAL_GROUP,
+                )
+            )
+        ).scalars().all()
+        if existing:
+            await session.execute(delete(Briefing).where(Briefing.id.in_(existing)))
+            sys.stderr.write(
+                f"  ↻ replaced {len(existing)} prior row(s) for national "
+                f"'{slug}' — re-save, not duplicate.\n"
+            )
+
+        row = Briefing(
+            generated_at=datetime.now(UTC),
+            period_start=period_start,
+            period_end=period_end,
+            summary_md=summary_md,
+            summary_md_en=None,
+            headline_stats={
+                "mode": "national",
+                "occasion_slug": slug,
+                "occasion_name": entry.name,
+                "gregorian_date": entry.gregorian_date.isoformat(),
+                "trending_headlines_used": len(cached.get("trending_headlines", [])),
+            },
+            model=MODEL_TAG,
+            tokens_in=0,
+            tokens_out=0,
+            cost_usd=0.0,
+            theme_group=NATIONAL_GROUP,
+            occasion_slug=slug,
+            daleel_refs=daleel,
+            adhkar_refs=adhkar,
+        )
+        session.add(row)
+        await session.commit()
+
+    sys.stderr.write(
+        f"✓ National briefing saved: {entry.name} ({slug}).\n"
+        f"  model={MODEL_TAG} (manual)\n"
+        f"  daleel_refs={len(daleel)} · adhkar_refs={len(adhkar)}\n"
+        f"  body={len(summary_md):,} chars\n"
+        f"  period={period_start.date()} → {period_end.date()}\n"
+    )
+
+    warning_report = format_warnings_for_stderr(heuristic_warnings)
+    if warning_report:
+        sys.stderr.write("\n" + warning_report + "\n")
+
+
+async def cmd_list_national(lookahead_days: int = 14) -> None:
+    """Print national catalog entries whose Gregorian date falls within
+    the next `lookahead_days`. Operator uses this to decide which to dump."""
+    from datetime import date as _date
+
+    from api.services.national_catalog import national_upcoming
+
+    upcoming_entries = national_upcoming(now=_date.today(), lookahead_days=lookahead_days)
+    if not upcoming_entries:
+        sys.stdout.write(
+            f"No national occasions in the next {lookahead_days} days. "
+            "Catalog: api/src/api/catalogs/national_occasions.yaml\n"
+        )
+        return
+    sys.stdout.write(
+        f"Upcoming national occasions in the next {lookahead_days} days:\n\n"
+    )
+    for o in upcoming_entries:
+        days = (o.gregorian_date - _date.today()).days
+        confirmed = "✓" if o.confirmed else "⚠ approx"
+        sys.stdout.write(
+            f"  {o.slug:<24} {o.gregorian_date.isoformat()} "
+            f"(in {days}d) [{confirmed}]\n"
+            f"  {'':<24} {o.name}\n\n"
+        )
+    sys.stdout.write(
+        "Run: uv run python -m api.scripts.manual_briefing "
+        "dump-national <slug>\n"
+    )
+
+
+# ──────────────────────────────────────────────────────────────────
 # Argparse + entry
 # ──────────────────────────────────────────────────────────────────
 
@@ -3123,6 +3615,54 @@ def main() -> None:
         help="Lookahead window in days (default 14).",
     )
 
+    # ── National occasions ("Acara Nasional" track) ────────────────
+    national_help = (
+        "National occasion slug from api/src/api/catalogs/"
+        "national_occasions.yaml (e.g. 'kemerdekaan-2026', "
+        "'hari-santri-2026'). Run `list-national` to see upcoming entries."
+    )
+
+    p_dump_nat = sub.add_parser(
+        "dump-national",
+        help=(
+            "Compute national daleel + supporting headlines, emit "
+            "national-mode prompt to feed Claude. 7-section format "
+            "(Sections 2+3 are Kalender Nasional + Konteks & Hikmah Bangsa)."
+        ),
+    )
+    p_dump_nat.add_argument("slug", help=national_help)
+    p_dump_nat.add_argument(
+        "--output",
+        "-o",
+        help="Write prompt to this file. Default: stdout.",
+        default=None,
+    )
+
+    p_save_nat = sub.add_parser(
+        "save-national",
+        help=(
+            "Persist Claude's reply as a national briefing ('Acara "
+            "Nasional'). Hard-fails on structural drift (Sections 2+3 must "
+            "be national-mode H2s, no '## Numerik & Tren' / '## Tema Utama')."
+        ),
+    )
+    p_save_nat.add_argument("slug", help=national_help)
+    p_save_nat.add_argument("markdown_file", help="Path to Claude's reply (.md)")
+
+    p_list_nat = sub.add_parser(
+        "list-national",
+        help=(
+            "Show national occasion catalog entries within the next 14 "
+            "days (default). Operator uses this to decide which to dump next."
+        ),
+    )
+    p_list_nat.add_argument(
+        "--days",
+        type=int,
+        default=14,
+        help="Lookahead window in days (default 14).",
+    )
+
     p_apply = sub.add_parser(
         "apply-swaps",
         help=(
@@ -3176,6 +3716,12 @@ def main() -> None:
         asyncio.run(cmd_cache_tafsir(args.surah, args.ayah, args.text_id))
     elif args.cmd == "list-occasions":
         asyncio.run(cmd_list_occasions(args.days))
+    elif args.cmd == "dump-national":
+        asyncio.run(cmd_dump_national(args.slug, args.output))
+    elif args.cmd == "save-national":
+        asyncio.run(cmd_save_national(args.slug, args.markdown_file))
+    elif args.cmd == "list-national":
+        asyncio.run(cmd_list_national(args.days))
 
 
 if __name__ == "__main__":

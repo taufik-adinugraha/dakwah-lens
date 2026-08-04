@@ -907,9 +907,15 @@ export function briefingSlug(
 
 /**
  * Latest Islamic-calendar occasion briefing (15th-track) — the one
- * whose `generated_at` is most recent across all rows where
- * `occasion_slug IS NOT NULL`. Returns null when no occasion
- * briefing has been saved yet.
+ * whose `generated_at` is most recent across rows where
+ * `occasion_slug IS NOT NULL AND theme_group = 'Acara Kalender
+ * Islam'`. Returns null when no occasion briefing has been saved yet.
+ *
+ * The theme_group filter was added alongside the 18th-track "Acara
+ * Nasional" briefings (national/civic occasions) — both tracks set
+ * `occasion_slug`, so filtering on `occasion_slug IS NOT NULL` alone
+ * would let a fresher national row leak into this Islamic-calendar
+ * query (and vice versa in getLatestNationalBriefing below).
  *
  * The /briefings hub renders this row as a FEATURED first card
  * (yellow tone, distinct from the 14 weekly themes) so operators
@@ -934,7 +940,56 @@ export async function getLatestOccasionBriefing(): Promise<
       occasionSlug: schema.briefings.occasionSlug,
     })
     .from(schema.briefings)
-    .where(sql`occasion_slug IS NOT NULL`)
+    .where(sql`occasion_slug IS NOT NULL AND theme_group = 'Acara Kalender Islam'`)
+    .orderBy(desc(schema.briefings.generatedAt))
+    .limit(1);
+  if (!row) return null;
+  return {
+    ...row,
+    summaryMd: stripWordCountAnnotations(row.summaryMd) as string,
+    summaryMdEn: stripWordCountAnnotations(row.summaryMdEn),
+    headlineStats: row.headlineStats as LatestBriefing["headlineStats"],
+    daleelRefs: (row.daleelRefs as schema.DaleelRef[] | null) ?? null,
+    adhkarRefs: (row.adhkarRefs as schema.DaleelRef[] | null) ?? null,
+    occasionSlug: row.occasionSlug ?? null,
+  };
+}
+
+/**
+ * Latest national/civic-occasion briefing (18th-track: Kemerdekaan RI,
+ * Hari Pahlawan, Hari Kesaktian Pancasila, etc.) — the one whose
+ * `generated_at` is most recent across rows where `theme_group =
+ * 'Acara Nasional' AND occasion_slug IS NOT NULL`. Returns null when
+ * no national briefing has been saved yet.
+ *
+ * Mirrors getLatestOccasionBriefing's shape/structure exactly; the
+ * two are kept as separate queries (rather than one shared helper)
+ * so each can filter its own theme_group explicitly and neither can
+ * accidentally surface the other track's row.
+ *
+ * The /briefings hub renders this row alongside the occasion/fiqh/
+ * tafsir cards in the "Edisi Khusus" row (red/rose "merah-putih"
+ * tone, distinct from the Islamic-calendar occasion's gold).
+ */
+export async function getLatestNationalBriefing(): Promise<
+  LatestBriefing | null
+> {
+  const [row] = await db
+    .select({
+      generatedAt: schema.briefings.generatedAt,
+      periodStart: schema.briefings.periodStart,
+      periodEnd: schema.briefings.periodEnd,
+      summaryMd: schema.briefings.summaryMd,
+      summaryMdEn: schema.briefings.summaryMdEn,
+      headlineStats: schema.briefings.headlineStats,
+      model: schema.briefings.model,
+      themeGroup: schema.briefings.themeGroup,
+      daleelRefs: schema.briefings.daleelRefs,
+      adhkarRefs: schema.briefings.adhkarRefs,
+      occasionSlug: schema.briefings.occasionSlug,
+    })
+    .from(schema.briefings)
+    .where(sql`theme_group = ${NATIONAL_GROUP} AND occasion_slug IS NOT NULL`)
     .orderBy(desc(schema.briefings.generatedAt))
     .limit(1);
   if (!row) return null;
@@ -993,6 +1048,18 @@ export const TAFSIR_SLUG = "tafsir-pekan-ini";
 export async function getLatestTafsirBriefing(): Promise<LatestBriefing | null> {
   return getLatestBriefing(TAFSIR_GROUP);
 }
+
+/** Reserved 18th-track theme_group for national/civic-occasion
+ *  briefings (Kemerdekaan RI, Hari Pahlawan, Hari Kesaktian Pancasila,
+ *  etc.) — the full weekly deliverable set (khutbah + 8 sub-sections +
+ *  6 flyers), same as Islamic-calendar occasions, generated per
+ *  national-calendar event rather than per weekly theme. Same
+ *  reserved-label pattern as the 15th track's 'Acara Kalender Islam':
+ *  not in BRIEFING_GROUPS, so the 14-grid + volume queries never see
+ *  it, and no /groups page exists for it. Rows carry a non-null
+ *  `occasion_slug` (e.g. 'kemerdekaan-2026') just like Islamic
+ *  occasions — see getLatestNationalBriefing above. */
+export const NATIONAL_GROUP = "Acara Nasional";
 
 /**
  * Fetch the latest briefing per group in one batch. Returns a Map

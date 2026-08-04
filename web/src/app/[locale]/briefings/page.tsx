@@ -19,6 +19,7 @@ import {
   getAllLatestBriefings,
   getGroupVolumes7d,
   getLatestFiqhBriefing,
+  getLatestNationalBriefing,
   getLatestOccasionBriefing,
   getLatestTafsirBriefing,
 } from "@/lib/briefing-data";
@@ -63,13 +64,14 @@ export default async function InsightsPage({
   // why they got bounced (was previously silent, see audit 2026-05-26).
   const showBriefsAdminNotice = sp.notice === "briefs-admin-only";
 
-  const [briefings, volumes, occasion, fiqh, tafsir, session] =
+  const [briefings, volumes, occasion, fiqh, tafsir, national, session] =
     await Promise.all([
       getAllLatestBriefings(),
       getGroupVolumes7d(),
       getLatestOccasionBriefing(),
       getLatestFiqhBriefing(),
       getLatestTafsirBriefing(),
+      getLatestNationalBriefing(),
       auth(),
     ]);
 
@@ -133,6 +135,7 @@ export default async function InsightsPage({
         occasion={null}
         fiqh={fiqh}
         tafsir={tafsir}
+        national={national}
         locale={locale}
       />
 

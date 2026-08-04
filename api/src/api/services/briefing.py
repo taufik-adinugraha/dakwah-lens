@@ -2483,6 +2483,220 @@ the `Citation` field is what goes in your heading):
 {write_now}"""
 
 
+# ──────────────────────────────────────────────────────────────────────
+# National-occasion track ("Acara Nasional") — Gregorian-calendar sibling
+# of the Islamic occasion track. Same 7-section shape + full weekly
+# deliverable set, but Sections 2+3 are Gregorian-framed and Section 3
+# carries a hard da'wah-frame / anti-ghuluw guard. Manual-only; composed
+# by Claude via manual_briefing dump-national / save-national.
+# ──────────────────────────────────────────────────────────────────────
+
+_NATIONAL_SECTIONS_1_TO_3_ID = """## Ringkasan Eksekutif (100-130 kata, satu paragraf)
+- Sebut nama lengkap peringatan + tanggal Gregorian + nama hari + hitung mundur (jumlah hari menuju hari peringatan)
+- Inti hikmah / pelajaran dakwah dari hari nasional ini dalam satu kalimat (mis. syukur nikmat kemerdekaan, persatuan/ukhuwah, peran ulama-santri, amanah menjaga negeri)
+- Satu aksi praktis yang akan dipersiapkan audiens dakwah dalam 14 hari ke depan
+- Bisa di-skim dalam 30 detik
+- JANGAN sebut statistik post / persentase sentimen — angka tersebut tidak diperlukan untuk briefing peringatan
+
+## Kalender Nasional Pekan Ini (120-180 kata)
+- Buka dengan POSISI HARI INI (mis. "Hari ini Rabu 5 Agustus 2026 M").
+- HITUNG MUNDUR ke hari peringatan utama dengan tanggal Gregorian + nama hari (mis. "HUT Kemerdekaan RI jatuh Senin 17 Agustus — 12 hari lagi").
+- Sebut TANGGAL BERSEJARAH yang diperingati sebagai jangkar historis (mis. "memperingati Proklamasi 17 Agustus 1945", "Resolusi Jihad 22 Oktober 1945").
+- Bila ada hari besar Islam / tanggal sunnah yang berdekatan pekan ini, BOLEH disebut singkat sebagai penghubung (mis. puasa Senin-Kamis, Ayyamul Bidh) — opsional, jangan dipaksakan.
+- DILARANG: angka statistik post / persentase sentimen / data dari sample_headlines — section ini MURNI kalender, bukan numerik news data.
+
+## Konteks & Hikmah Bangsa (450-650 kata)
+- PROSA NARATIF — beri pembaca konteks lengkap: latar historis hari peringatan, LALU lensa Islam atasnya (mengapa peristiwa ini relevan bagi umat), hikmah yang bisa dipetik.
+- Sebut 2-4 SUMBER dari DALIL POOL yang berbicara tentang tema hari ini (syukur nikmat, persatuan/ukhuwah, kemuliaan ilmu & adab, amanah, pengorbanan di jalan kebenaran), lalu jabarkan maknanya. Citations BOLEH inline di section ini (mis. "QS. Ibrahim: 7 mengingatkan bahwa syukur mengundang tambahan nikmat…", "Dalam Sahih Muslim …, Rasulullah ﷺ bersabda…"). Dalil-naratif INTEGRAL di sini — bukan ditahan untuk section Dalil & Sumber.
+- Bila ada `BERITA PENDUKUNG` yang relevan, BOLEH jadi bahan refleksi — TAPI berita pekan ini AMUNISI PENDUKUNG, bukan headline. Sebutkan SECARA KUALITATIF ("kabar yang ramai pekan ini tentang…"), JANGAN angka/persentase, JANGAN nama outlet/akun.
+- STRUKTUR yang disarankan: (1) Latar historis hari peringatan (~100 kata), (2) Lensa Islam & relevansi bagi umat/bangsa (~150 kata), (3) Hikmah ulama dengan kutipan dalil (~200 kata), (4) Jembatan ke kondisi pekan ini bagi audiens dakwah (~100 kata).
+- **BINGKAI DAKWAH — INVIOLABLE**: bingkai peringatan ini sebagai syukur atas nikmat, persatuan, amanah, dan peran umat/ulama; JANGAN mengangkat nasionalisme yang berlebihan (ghuluw) atau menempatkan cinta tanah air di atas aqidah. Hubbul wathan (cinta tanah air) diterima dalam batas syar'i; pengkultusan tokoh atau slogan kebangsaan yang mengesampingkan tauhid TIDAK. Promosikan rahma + hikmah; hindari nada memecah-belah atau partisan politik.
+- Verba observasional + reflektif. Hindari "wajib" / "harus" sebagai perintah keras — gunakan "diajarkan", "diteladani", "diingatkan", "mengundang refleksi" — KECUALI saat menyebut kewajiban yang memang wajib syar'i.
+- DILARANG: (a) angka statistik post / persentase / view-count; (b) atribusi outlet atau akun media sosial ("Liputan6 melaporkan…", "user X menulis…") — abstraksikan polanya; (c) narasi partisan / dukungan pada tokoh atau partai politik tertentu."""
+
+
+def _splice_national_system_prompt() -> str:
+    """Build NATIONAL_SYSTEM_PROMPT_ID by splicing the national-mode
+    Sections 1-3 into SYSTEM_PROMPT_ID — same splice mechanism +
+    anchors as _splice_occasion_system_prompt (Sections 4-7 — Poin
+    Kunci, Strategi & Aksi Dakwah 8 sub-sections, Dalil & Sumber, Pesan
+    Flyer — inherited UNCHANGED, incl. all validator/flyer/citation
+    rules). Assertion-fails at import if the weekly anchors drift."""
+    section_1_anchor = "## Ringkasan Eksekutif (100-130 kata,"
+    section_4_anchor = "## Poin Kunci (180-260 kata)"
+
+    i = SYSTEM_PROMPT_ID.find(section_1_anchor)
+    j = SYSTEM_PROMPT_ID.find(section_4_anchor)
+    assert i >= 0, (
+        f"NATIONAL_SYSTEM_PROMPT_ID: anchor {section_1_anchor!r} not found "
+        f"in SYSTEM_PROMPT_ID — section names may have drifted."
+    )
+    assert j > i, (
+        f"NATIONAL_SYSTEM_PROMPT_ID: anchor {section_4_anchor!r} not found "
+        f"after {section_1_anchor!r} — section ordering may have drifted."
+    )
+    return SYSTEM_PROMPT_ID[:i] + _NATIONAL_SECTIONS_1_TO_3_ID + "\n\n" + SYSTEM_PROMPT_ID[j:]
+
+
+NATIONAL_SYSTEM_PROMPT_ID: str = _splice_national_system_prompt()
+
+
+# Indonesian weekday names, indexed by date.weekday() (Mon=0 … Sun=6).
+_ID_WEEKDAYS = ("Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu")
+
+
+def _build_national_user_prompt(
+    entry: Any,  # api.services.national_catalog.NationalOccasionEntry
+    *,
+    today_gregorian: date,
+    daleel: list[dict[str, Any]],
+    adhkar: list[dict[str, Any]] | None = None,
+    flyer_daleel_pool: list[dict[str, Any]] | None = None,
+    flyer_adhkar_pool: list[dict[str, Any]] | None = None,
+    trending_headlines: list[dict[str, Any]] | None = None,
+    language: str = "id",
+) -> str:
+    """Assemble the user prompt for an "Acara Nasional" briefing. Same
+    shape as _build_occasion_user_prompt but with a Gregorian NATIONAL
+    CONTEXT block (no Hijri fields, no Kemenag SKB caveat) and the
+    national section names. Sections 4-7 (deliverables + flyers) carry
+    over identically."""
+    if language == "en":
+        empty_marker = "(no daleel found for this occasion)"
+        translation_label = "Translation (EN)"
+    else:
+        empty_marker = "(tidak ada daleel yang ditemukan untuk peringatan ini)"
+        translation_label = "Terjemahan ID"
+
+    def _translation_for(d: dict[str, Any]) -> str:
+        if language == "en":
+            return d.get("translation_en") or d.get("translation_id") or ""
+        return d.get("translation_id") or d.get("translation_en") or ""
+
+    # ── NATIONAL CONTEXT ──────────────────────────────────────────
+    days_until = (entry.gregorian_date - today_gregorian).days
+    if days_until > 0:
+        countdown = f"{days_until} hari menuju hari peringatan"
+    elif days_until == 0:
+        countdown = "HARI PERINGATAN JATUH HARI INI"
+    else:
+        countdown = (
+            f"hari peringatan sudah berlangsung {-days_until} hari yang lalu "
+            f"(masih dalam periode pasca-peringatan / refleksi)"
+        )
+    occasion_day = _ID_WEEKDAYS[entry.gregorian_date.weekday()]
+    today_day = _ID_WEEKDAYS[today_gregorian.weekday()]
+    national_context = (
+        f"NATIONAL CONTEXT (Section 2 'Kalender Nasional Pekan Ini' dan "
+        f"Section 3 'Konteks & Hikmah Bangsa' WAJIB merujuk pada data ini, "
+        f"BUKAN pada angka post / sample_headlines):\n\n"
+        f"- Slug: {entry.slug}\n"
+        f"- Nama peringatan: {entry.name}\n"
+        f"- Tanggal peringatan (Gregorian): {occasion_day} {entry.gregorian_date.isoformat()}\n"
+        f"- Hari ini (Gregorian): {today_day} {today_gregorian.isoformat()}\n"
+        f"- Hitung mundur: {countdown}\n"
+        f"- Query template (semantic search yang digunakan untuk DALEEL POOL): {entry.query_template!r}\n"
+    )
+    if entry.notes:
+        national_context += f"- Catatan operator (termasuk jangkar historis): {entry.notes}\n"
+    national_context += (
+        "- ⚠ BINGKAI DAKWAH: peringatan ini WAJIB dibingkai lewat lensa Islam "
+        "(syukur nikmat, persatuan, amanah, peran umat/ulama), grounded pada "
+        "DALEEL POOL. Hindari ghuluw/nasionalisme berlebihan dan narasi partisan.\n"
+    )
+
+    # ── BERITA PENDUKUNG ──────────────────────────────────────────
+    if trending_headlines:
+        headline_lines = []
+        for h in trending_headlines:
+            theme = h.get("theme_group") or "?"
+            platform = h.get("platform") or "?"
+            headline_lines.append(
+                f"- [{theme} · {platform}] {h.get('title','')[:200]}"
+            )
+        berita_pendukung_block = (
+            "BERITA PENDUKUNG (top last-7d headlines untuk AMUNISI Section 3 — "
+            "WAJIB rujuk hanya sebagai bahan refleksi kualitatif, BUKAN headline. "
+            "Peringatannya yang utama; berita pekan ini hanya cermin keseharian. "
+            "DILARANG memasukkan angka post / persentase / view-count / nama "
+            "outlet / handle akun ke dalam briefing — abstraksikan polanya):\n\n"
+            + "\n".join(headline_lines)
+        )
+    else:
+        berita_pendukung_block = (
+            "BERITA PENDUKUNG: (kosong — operator memilih fokus murni pada "
+            "konteks peringatan tanpa rujukan berita pekan ini, atau tidak ada "
+            "headline last-7d yang melewati threshold relevansi)."
+        )
+
+    # ── POOLS (same shape as occasion / weekly) ───────────────────
+    def _render_pool(pool: list[dict[str, Any]]) -> str:
+        if not pool:
+            return empty_marker
+        return "\n\n".join(
+            f"Citation: {d['citation']}\n"
+            f"Arabic: {d['arabic'][:300]}\n"
+            f"{translation_label}: {_translation_for(d)[:500]}"
+            for d in pool
+        )
+
+    daleel_block = _render_pool(daleel)
+
+    adhkar_section = (
+        "\n\nADHKAR POOL (recitable du'a / dzikir, untuk sub-section "
+        "Kultum/Kajian + Pesan Flyer 5+6 jika temanya menyangkut wirid):\n\n"
+        + _render_pool(adhkar)
+        if adhkar
+        else ""
+    )
+
+    flyer_pool_section = (
+        "\n\nFLYER DALEEL POOL (untuk `### Pesan Flyer 1-4`; cite verbatim "
+        "dari pool ini, BUKAN dari DALEEL POOL atas — dibatasi 11-kitab "
+        "flyer whitelist):\n\n" + _render_pool(flyer_daleel_pool)
+        if flyer_daleel_pool
+        else (
+            "\n\nFLYER DALEEL POOL: (kosong — tidak ada entri whitelist-"
+            "eligible yang cocok dengan tema peringatan). JANGAN synthesize 6 "
+            "slot `### Pesan Flyer 1..6`. Emit `## Pesan Flyer` H2 saja + "
+            "satu baris `_Pool flyer kosong untuk peringatan ini, slot dilewati._`"
+        )
+    )
+    flyer_pool_section += (
+        "\n\nFLYER ADHKAR POOL (untuk `### Pesan Flyer 5+6`; same whitelist):\n\n"
+        + _render_pool(flyer_adhkar_pool)
+        if flyer_adhkar_pool
+        else (
+            "\n\nFLYER ADHKAR POOL: (kosong — LEWATI Pesan Flyer 5 + 6 dan "
+            "tambahkan note `_Pool adhkar kosong, slot 5+6 dilewati._`)"
+        )
+    )
+
+    # ── FINAL ASSEMBLY ────────────────────────────────────────────
+    write_now = (
+        "Tulis briefing peringatan nasional sekarang dalam format markdown "
+        "7 bagian (Ringkasan Eksekutif / Kalender Nasional Pekan Ini / "
+        "Konteks & Hikmah Bangsa / Poin Kunci / Strategi & Aksi Dakwah / "
+        "Dalil & Sumber / Pesan Flyer). Strategi & Aksi Dakwah adalah CONTENT "
+        "KIT 8 sub-section siap-pakai (khutbah lengkap, kultum, kajian, kisah "
+        "pendek, pengajaran rumah, kreator konten, mahasiswa pack, aksi "
+        "sosial) dengan daleel pool yang ditenun inline ke setiap sub-section "
+        "— sama persis dengan format mingguan, hanya frame peringatan nasional "
+        "(dibingkai secara dakwah) menggantikan frame trending news."
+    )
+
+    return f"""{national_context}
+
+{berita_pendukung_block}
+
+DALEEL POOL (use for Section 6 Dalil & Sumber, cite 4-6 dari sini; "
+the `Citation` field is what goes in your heading):
+
+{daleel_block}{adhkar_section}{flyer_pool_section}
+
+{write_now}"""
+
+
 def _build_user_prompt(
     stats: dict[str, Any],
     daleel: list[dict[str, Any]],

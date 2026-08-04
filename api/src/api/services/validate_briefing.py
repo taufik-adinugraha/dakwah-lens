@@ -70,6 +70,7 @@ class BriefingWarning(TypedDict, total=False):
         "flyer_independence_violation",
         "news_paraphrase_fabrication",
         "occasion_section_malformed",
+        "national_section_malformed",
     ]
     severity: Literal["low", "medium", "high"]
     where: str  # human-readable locator, e.g. "Pesan Flyer 2"
@@ -1372,6 +1373,17 @@ _WEEKLY_TEMA_H2_RE = re.compile(
     re.MULTILINE | re.IGNORECASE,
 )
 
+# National-occasion ("Acara Nasional") Section 2+3 markers — Gregorian
+# sibling of the occasion H2s above.
+_NATIONAL_KALENDER_H2_RE = re.compile(
+    r"^##\s+Kalender\s+Nasional\s+Pekan\s+Ini\b",
+    re.MULTILINE | re.IGNORECASE,
+)
+_NATIONAL_KONTEKS_H2_RE = re.compile(
+    r"^##\s+Konteks\s+&\s+Hikmah\s+Bangsa\b",
+    re.MULTILINE | re.IGNORECASE,
+)
+
 
 def scan_occasion_section_structure(markdown: str) -> list[BriefingWarning]:
     """Structural validator for the 15th-track Islamic-calendar
@@ -1475,6 +1487,97 @@ def scan_occasion_section_structure(markdown: str) -> list[BriefingWarning]:
                     "occasion's sirah/fiqh/hikmah narrative is the right "
                     "Section 3 (with daleel inline + supporting news "
                     "tucked in as qualitative ammunition only)."
+                ),
+            }
+        )
+
+    return warnings
+
+
+def scan_national_section_structure(markdown: str) -> list[BriefingWarning]:
+    """Structural validator for the "Acara Nasional" track. Gregorian
+    sibling of scan_occasion_section_structure — confirms a national
+    briefing has Sections 2+3 renamed to the national-mode H2 markers
+    (`## Kalender Nasional Pekan Ini`, `## Konteks & Hikmah Bangsa`) and
+    has NOT drifted to the weekly template.
+
+    AUTODETECTION: returns [] when neither national H2 is present (this
+    is a weekly, occasion, or non-national briefing — skip). Runs
+    independently from scan_occasion_section_structure; the two never
+    both fire because their anchor H2 names are disjoint.
+
+    Failure modes caught (all severity=high, kind
+    `national_section_malformed`):
+      (a) only ONE of the two national H2s present (partial drift)
+      (b) national briefing also carries `## Numerik & Tren ...` or
+          `## Tema Utama ...` (composer reverted to the weekly template)
+    """
+    warnings: list[BriefingWarning] = []
+    kalender = _NATIONAL_KALENDER_H2_RE.search(markdown)
+    konteks = _NATIONAL_KONTEKS_H2_RE.search(markdown)
+
+    if not kalender and not konteks:
+        return warnings
+
+    if kalender and not konteks:
+        warnings.append(
+            {
+                "kind": "national_section_malformed",
+                "severity": "high",
+                "where": "## Konteks & Hikmah Bangsa",
+                "message": (
+                    "National briefing has `## Kalender Nasional Pekan Ini` "
+                    "but is MISSING `## Konteks & Hikmah Bangsa`. Section 3 "
+                    "is mandatory — without it the briefing lacks the "
+                    "historical + Islamic-lens narrative the deliverables in "
+                    "Section 5 draw from."
+                ),
+            }
+        )
+    if konteks and not kalender:
+        warnings.append(
+            {
+                "kind": "national_section_malformed",
+                "severity": "high",
+                "where": "## Kalender Nasional Pekan Ini",
+                "message": (
+                    "National briefing has `## Konteks & Hikmah Bangsa` "
+                    "but is MISSING `## Kalender Nasional Pekan Ini`. "
+                    "Section 2 is mandatory — readers need the Gregorian "
+                    "countdown + historical anchor date before the "
+                    "contextual narrative."
+                ),
+            }
+        )
+
+    numerik = _WEEKLY_NUMERIK_H2_RE.search(markdown)
+    if numerik:
+        warnings.append(
+            {
+                "kind": "national_section_malformed",
+                "severity": "high",
+                "where": "## Numerik & Tren",
+                "message": (
+                    "National briefing contains a `## Numerik & Tren ...` "
+                    "H2 — composer drifted to the WEEKLY template. National "
+                    "mode replaces Section 2 with `## Kalender Nasional Pekan "
+                    "Ini`. Remove the Numerik H2 + content."
+                ),
+            }
+        )
+
+    tema = _WEEKLY_TEMA_H2_RE.search(markdown)
+    if tema:
+        warnings.append(
+            {
+                "kind": "national_section_malformed",
+                "severity": "high",
+                "where": "## Tema Utama",
+                "message": (
+                    "National briefing contains a `## Tema Utama ...` H2 — "
+                    "composer drifted to the WEEKLY template. National mode "
+                    "replaces Section 3 with `## Konteks & Hikmah Bangsa`. "
+                    "Remove the Tema Utama H2 + content."
                 ),
             }
         )
@@ -2501,6 +2604,7 @@ def validate_briefing(
         (scan_flyer_independence, "flyer_independence_check_failed"),
         (scan_flyer_specificity, "flyer_specificity_check_failed"),
         (scan_occasion_section_structure, "occasion_section_structure_check_failed"),
+        (scan_national_section_structure, "national_section_structure_check_failed"),
     ):
         try:
             warnings.extend(fn(markdown))

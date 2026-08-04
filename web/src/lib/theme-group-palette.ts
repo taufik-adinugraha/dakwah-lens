@@ -180,6 +180,21 @@ export const THEME_GROUP_PALETTE: Readonly<Record<string, ThemeGroupTone>> = Obj
     openText: "text-yellow-800 group-hover:text-yellow-900",
     label: "ACARA KALENDER ISLAM",
   },
+
+  // 18th track — national/civic occasions (Kemerdekaan RI, Hari
+  // Pahlawan, Hari Kesaktian Pancasila, etc.). Distinct red tone
+  // (merah-putih) signals "this isn't a weekly news theme — it's a
+  // civic/national-calendar event," mirroring how gold marks the
+  // Islamic-calendar occasion track above. See:
+  //   - api/... (national occasion catalog + generator, built separately)
+  "Acara Nasional": {
+    cardBorder: "border-red-300",
+    cardBg: "bg-gradient-to-br from-red-50/70 via-white to-white",
+    chipBg: "bg-red-100 ring-1 ring-red-300",
+    chipText: "text-red-900",
+    openText: "text-red-800 group-hover:text-red-900",
+    label: "ACARA NASIONAL",
+  },
 });
 
 /** Lookup with neutral fallback. Pass a raw `theme_group` value

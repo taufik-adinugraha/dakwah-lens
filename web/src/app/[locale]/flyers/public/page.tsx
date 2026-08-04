@@ -62,6 +62,7 @@ const SEGMENT_LABEL_ID: Record<string, string> = {
   youth: "Pemuda",
   justice: "Keadilan",
   "Acara Kalender Islam": "Acara",
+  "Acara Nasional": "Nasional",
 };
 
 export async function generateMetadata({
