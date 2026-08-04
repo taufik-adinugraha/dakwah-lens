@@ -27,6 +27,7 @@ Cost: ~$0.009/mo for the Gemini filter call (~3K tokens/day).
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from typing import Literal
 
@@ -198,14 +199,101 @@ debate", "K-pop fandom", "stadium tragedy", "athlete transfer", etc.).
 """
 
 
+# ── LLM-free heuristic fallback ──────────────────────────────────
+# When Gemini is unavailable (no key / rate-limit / prepay outage), the
+# pipeline must NOT go dark: fetching is separable from the relevance
+# judgment, exactly like RSS ingests unclassified and the daily theme-audit
+# backfills theme_group later. This rule-based selector approximates the
+# Gemini filter — clean each candidate to a short search keyword, drop the
+# obvious pure-entertainment, prefer da'wah/society-relevant + editorial
+# (news) signals, and cap at the same TOTAL_KEEP_LIMIT budget so cost stays
+# bounded. Intentionally PERMISSIVE ("when in doubt keep", per SYSTEM_PROMPT)
+# — the per-post classifier + audits sort true relevance downstream; the
+# cost of a wrong-keep is one cheap scrape.
+
+# Society/da'wah relevance signals (substring, lowercase) — a da'i's broad
+# lens across the theme groups. Not exhaustive; just enough to prioritise.
+_RELEVANCE_TERMS = (
+    "islam", "muslim", "ustad", "ulama", "kiai", "kyai", "masjid", "quran",
+    "alquran", "hadits", "dakwah", "syariah", "halal", "haram", "zakat",
+    "sholat", "salat", "puasa", "haji", "umrah", "santri", "pesantren",
+    "hijrah", "khutbah", "maulid", "kajian", "korupsi", "suap", "kpk",
+    "hukum", "sidang", "vonis", "pengadilan", "narkoba", "judi", "judol",
+    "pinjol", "riba", "pelecehan", "cabul", "kekerasan", "bunuh", "pembunuhan",
+    "begal", "tawuran", "demo", "unjuk rasa", "phk", "buruh", "petani", "upah",
+    "gempa", "banjir", "kebakaran", "bencana", "kecelakaan", "longsor",
+    "erupsi", "pendidikan", "sekolah", "guru", "siswa", "mahasiswa", "keluarga",
+    "anak", "nikah", "cerai", "perempuan", "kesehatan", "stunting", "wabah",
+    "gaza", "palestina", "israel", "rohingya", "perang", "pejabat", "menteri",
+    "presiden", "gubernur", "bupati", "walikota", "dprd", "pemerintah",
+    "kebijakan", "subsidi", "pajak", "ekonomi", "umkm", "toleransi", "gereja",
+)
+
+# Obvious pure-entertainment / fandom / sports-score markers to drop when a
+# candidate carries NO relevance signal. Fandom is a moving target, so this
+# only catches the clearest cases; the rest fall through (keep).
+_EXCLUDE_TERMS = (
+    "comeback", "teaser", "trailer", " mv", "m/v", "album", "konser",
+    "concert", "fandom", " stan", "anime", "manga", "episode", "spoiler",
+    "esports", "e-sports", "mobile legend", "free fire", "genshin", "valorant",
+    "mlbb", "gacha", "highlight", "full match", " vs ", "line up", "giveaway",
+    "unboxing", "bts", "blackpink", "nct", "seventeen", "twice", "aespa",
+    "stray kids", "enhypen", "le sserafim", "itzy", "treasure",
+)
+
+_HASHTAG_RE = re.compile(r"#(\w+)", re.UNICODE)
+_NONWORD_RE = re.compile(r"[^\w\s]", re.UNICODE)
+
+
+def _clean_keyword(text: str) -> str:
+    """Best-effort keyword extraction without an LLM: drop a trailing
+    ' - Outlet' news suffix, unwrap hashtags, strip punctuation/emoji, keep
+    the first few significant words as a search query."""
+    t = text.split(" - ")[0]        # 'Headline - Outlet' → 'Headline'
+    t = _HASHTAG_RE.sub(r"\1", t)   # '#WajibHalal' → 'WajibHalal'
+    t = _NONWORD_RE.sub(" ", t)     # strip punctuation + emoji
+    words = [w for w in t.lower().split() if len(w) > 1]
+    return " ".join(words[:4]).strip()
+
+
+def _heuristic_keywords(candidates: list[Candidate]) -> list[str]:
+    """LLM-free keep-list used when Gemini is unavailable. Prefer
+    relevance-matched, then editorial (news), then trends, then youtube;
+    drop obvious pure-entertainment; dedupe; cap at TOTAL_KEEP_LIMIT."""
+    src_rank = {"google_news": 1, "google_trends": 2, "youtube": 3}
+    scored: list[tuple[int, str]] = []
+    seen: set[str] = set()
+    for c in candidates:
+        kw = _clean_keyword(c.text)
+        if not kw or kw in seen:
+            continue
+        low = c.text.lower()
+        relevant = any(t in low for t in _RELEVANCE_TERMS)
+        if not relevant and any(t in low for t in _EXCLUDE_TERMS):
+            continue
+        seen.add(kw)
+        scored.append((0 if relevant else src_rank[c.source], kw))
+    scored.sort(key=lambda x: x[0])  # stable → first-seen order within tier
+    kept = [kw for _, kw in scored[:TOTAL_KEEP_LIMIT]]
+    log.warning(
+        "trending.fallback.heuristic",
+        candidates=len(candidates),
+        kept=len(kept),
+        keep_keywords=kept,
+    )
+    return kept
+
+
 def filter_with_gemini(candidates: list[Candidate]) -> list[str]:
     """Send merged candidates to Gemini Flash-Lite for keyword extraction
-    and da'wah-relevance filtering. Returns deduplicated keep-list."""
+    and da'wah-relevance filtering. Returns the deduplicated keep-list — or,
+    if Gemini is unavailable (no key / rate-limit / outage), falls back to
+    `_heuristic_keywords` so the fetch keeps flowing instead of going dark."""
     if not candidates:
         return []
     if not settings.gemini_api_key:
         log.warning("trending.gemini.no_api_key")
-        return []
+        return _heuristic_keywords(candidates)
 
     client = genai.Client(api_key=settings.gemini_api_key)
     numbered = "\n".join(
@@ -283,7 +371,7 @@ def filter_with_gemini(candidates: list[Candidate]) -> list[str]:
         return kept
     except Exception as e:  # noqa: BLE001
         log.error("trending.gemini.failed", error=str(e))
-        return []
+        return _heuristic_keywords(candidates)
 
 
 # ── High-level API ──────────────────────────────────────────────
@@ -293,8 +381,11 @@ def get_trending_keywords() -> list[str]:
     """End-to-end: fetch all three sources, merge, filter, return the
     surviving da'wah-relevant keyword list. Caller dispatches scrapes.
 
-    Returns an empty list if all three sources fail OR if Gemini filtering
-    fails — the caller treats this as "no trending today, skip".
+    Returns [] only if all three gather sources fail (nothing to fetch). If
+    Gemini filtering is unavailable (no key / rate-limit / prepay outage), it
+    falls back to a rule-based keep-list (`_heuristic_keywords`) so the
+    trending fetch keeps flowing unclassified — the daily theme-audit
+    backfills classification later, exactly like the RSS pipeline.
     """
     candidates: list[Candidate] = []
     candidates.extend(fetch_google_trends())
