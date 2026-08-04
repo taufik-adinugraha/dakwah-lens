@@ -1124,15 +1124,18 @@ function MonthlyCost({ t }: { t: T }) {
 }
 
 function KitabCorpus({ t }: { t: T }) {
-  // 19 kitabs grouped into 5 thematic categories. Order within each
+  // 20 kitabs grouped into 5 thematic categories. Order within each
   // group mirrors the /kitab library page so a reader who's been there
-  // sees the same mental model. Update both places together.
+  // sees the same mental model — EXCEPT Tafsir Ath-Thabari, which is
+  // Arabic-only and retrieved verse-keyed for the Tafsir Pekan Ini track
+  // (not part of the /kitab semantic search). Update both places together.
   const categories: Array<{ heading: string; note?: string; items: Array<{ title: string; detail: string }> }> = [
     {
       heading: t("kitab_cat_quran_tafsir"),
       items: [
         { title: "Al-Qur'an al-Karim", detail: t("kitab_quran") },
         { title: "Tafsir Ibn Katsir", detail: t("kitab_tafsir") },
+        { title: "Tafsir Ath-Thabari", detail: t("kitab_tafsir_tabari") },
       ],
     },
     {

@@ -1,8 +1,10 @@
 # Tafsir Pekan Ini — Per-Module Spec Sheets (v0.1, design-only)
 
-- **Status:** Build spec, no code written. Mirrors the Fiqh Pekan Ini track.
+- **Status:** ✅ BUILT + SHIPPED (2026-07-10, commit `414229f`) — this is the design-of-record. Mirrors the Fiqh Pekan Ini track.
 - **Date:** 2026-07-10 · Owner: Sukses & Berkah / Taufik Adi
 - **Baseline (locked):** Path A (Qur'an + Ibn Kathir, EN→ID at compose, expand corpus for v2) · Claude picks 4 themes + 1 anchor ayat each · news-anchored · tadabbur-reflective · single anchor verse/article · 4 guardrails · NO flyers · overlap-with-Fiqh OK.
+
+> **⚠️ UPDATE 2026-08-02 — the v2 corpus-expansion SHIPPED (PR #17/#18).** The "single-source (Ibn Kathir)" baseline is **superseded**: **Tafsir al-Ṭabarī** (*Jāmiʿ al-Bayān*, Arabic, all 6,236 ayat) is now indexed (`tafsir_al_tabari` Qdrant collection) and wired as a **second mufassir**. `retrieve_tafsir_for_ayah` is now **dual-source** — it returns Ibn Kathir `tafsir_en` (EN→ID) **and** al-Ṭabarī `tafsir_ar` (AR→ID at compose, isnād condensed, isrāʾīlīyyāt skipped), and the compose prompt + `_validate_tafsir_briefing` accept `Tafsir al-Tabari on S:A` citations too. So the **"⚠️ THE corpus finding (why Path A)"** note further below — that only `tafsir_ibn_kathir` is indexed and Ṭabarī is not — is **no longer true**. al-Ṭabarī is kept OUT of the semantic `retrieve_daleel` / `/kitab` search (AR-only, verse-keyed lookup only). Everything else here — track structure, `tafsir-1..4` slugs, guardrails, validators — still holds. First dual-source edition shipped 2026-08-02.
 
 ## Design invariants (read first)
 1. **Distinct deliverable slugs `tafsir-1..4`** with H3 heading `### Tafsir N — "<judul>"` and matcher `/^tafsir\s*N\b/`. Do NOT reuse Fiqh's `artikel-N` — it would collide in `DELIVERABLE_HEADING_PATTERNS` / `classifyHeading` / the KIND_* maps.
