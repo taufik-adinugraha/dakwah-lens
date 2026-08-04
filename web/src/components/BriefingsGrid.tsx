@@ -8,6 +8,7 @@ import {
   CalendarHeart,
   Clock,
   Cpu,
+  Flag,
   Globe2,
   GraduationCap,
   HandHeart,
@@ -26,6 +27,7 @@ import {
 } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
+import { localeAwareFormat } from "@/lib/date-id";
 import { slugifyGroup } from "@/lib/dashboard-metrics";
 import {
   BRIEFING_GROUPS,
@@ -181,6 +183,7 @@ export async function BriefingsGrid({
   occasion,
   fiqh,
   tafsir,
+  national,
   locale,
 }: {
   briefings: Map<string, LatestBriefing>;
@@ -201,6 +204,13 @@ export async function BriefingsGrid({
    *  ayat each). Rendered next to the fiqh card in the "Edisi Khusus"
    *  row, sky-toned. NULL until the first edition is saved. */
   tafsir: LatestBriefing | null;
+  /** Latest 18th-track national/civic-occasion briefing (theme_group
+   *  = 'Acara Nasional' — Kemerdekaan RI, Hari Pahlawan, Hari
+   *  Kesaktian Pancasila, etc. Produces the full weekly deliverable
+   *  set, same as Islamic-calendar occasions). Rendered next to the
+   *  tafsir card in the "Edisi Khusus" row, red/rose "merah-putih"
+   *  toned. NULL until the first edition is saved. */
+  national: LatestBriefing | null;
   locale: string;
 }) {
   const t = await getTranslations("Briefing");
@@ -241,12 +251,12 @@ export async function BriefingsGrid({
           {t("hub_top_n_note")}
         </p>
 
-        {/* ── Edisi Khusus — the three non-weekly tracks (Acara
-            Kalender Islam + Fiqh Pekan Ini + Tafsir Pekan Ini), lightly
-            separated from the 14 news themes below. The whole row
-            disappears when no card exists, so the 14-grid layout is
-            untouched in that state. */}
-        {(occasion || fiqh || tafsir) && (
+        {/* ── Edisi Khusus — the four non-weekly tracks (Acara
+            Kalender Islam + Fiqh Pekan Ini + Tafsir Pekan Ini + Acara
+            Nasional), lightly separated from the 14 news themes below.
+            The whole row disappears when no card exists, so the
+            14-grid layout is untouched in that state. */}
+        {(occasion || fiqh || tafsir || national) && (
           <div className="mb-8">
             <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-faint">
               Edisi Khusus
@@ -450,6 +460,89 @@ export async function BriefingsGrid({
                       )}
                       <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-sky-800 transition group-hover:gap-1.5">
                         Baca 4 tadabbur ayat
+                        <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })()}
+              {national && (() => {
+                // 18th-track national/civic-occasion card — red/rose
+                // "merah-putih" tone (distinct from the occasion gold,
+                // fiqh emerald, tafsir sky). Headline pulled from
+                // headlineStats.occasion_name; falls back to
+                // theme_group label. Only gregorian_date exists on
+                // this track (no hijri_date), formatted readable.
+                const stats = national.headlineStats as Record<string, unknown>;
+                const occasionName =
+                  (typeof stats.occasion_name === "string"
+                    ? stats.occasion_name
+                    : null) ||
+                  national.themeGroup ||
+                  "Acara Nasional";
+                const gregorianDateRaw =
+                  typeof stats.gregorian_date === "string"
+                    ? stats.gregorian_date
+                    : null;
+                const gregorianDate = gregorianDateRaw
+                  ? (() => {
+                      const d = new Date(gregorianDateRaw);
+                      return Number.isNaN(d.getTime())
+                        ? gregorianDateRaw
+                        : localeAwareFormat(d, locale, {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          });
+                    })()
+                  : null;
+                const nationalHref = `/briefings/${briefingSlug(
+                  national.generatedAt,
+                  national.themeGroup,
+                  national.occasionSlug,
+                )}`;
+                const ageDays = Math.max(
+                  0,
+                  Math.floor(
+                    (nowMs - national.generatedAt.getTime()) / 86_400_000,
+                  ),
+                );
+                return (
+                  <li key={`__national-${national.occasionSlug ?? "latest"}`}>
+                    <Link
+                      href={nationalHref}
+                      className="group relative flex h-full flex-col rounded-xl border bg-gradient-to-br p-4 transition hover:-translate-y-0.5 hover:shadow-sm from-red-50/90 to-white border-red-300 hover:border-red-500"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-red-100 text-red-700">
+                          <Flag className="h-4 w-4" />
+                        </span>
+                        <div className="flex flex-wrap items-center justify-end gap-1">
+                          <span
+                            className="inline-flex items-center gap-0.5 rounded-full bg-red-100 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-red-800"
+                            title="Acara kalender nasional"
+                          >
+                            Nasional
+                          </span>
+                          <span
+                            className="inline-flex items-center gap-0.5 rounded-full bg-paper-deep px-1.5 py-0.5 text-[9px] font-semibold tabular-nums text-ink-muted"
+                            title={t("hub_card_age_tooltip", { n: ageDays })}
+                          >
+                            <Clock className="h-2.5 w-2.5" />
+                            {ageDays}d
+                          </span>
+                        </div>
+                      </div>
+                      <h3 className="mt-3 line-clamp-2 text-sm font-bold leading-snug text-ink">
+                        {occasionName}
+                      </h3>
+                      {gregorianDate && (
+                        <div className="mt-2 line-clamp-2 text-[11px] leading-snug text-ink-muted">
+                          {gregorianDate}
+                        </div>
+                      )}
+                      <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-red-800 transition group-hover:gap-1.5">
+                        Baca briefing nasional
                         <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
                       </div>
                     </Link>
