@@ -343,7 +343,10 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "Lainnya. BUKAN cuitan keluhan/pertanyaan portal MagangHub / "
         "Pemagangan Nasional Kemnaker (verifikasi, status pendaftaran, "
         "eligibilitas) maupun listing/iklan program magang — itu "
-        "Lainnya (audit#96)"
+        "Lainnya (audit#96). BUKAN konten SEO farm 'kunci jawaban soal "
+        "ujian' (listicle 'kunci jawaban halaman N'/LKS yang dihasilkan "
+        "otomatis untuk trafik pencarian, tanpa muatan pedagogi/kebijakan/"
+        "berita) — itu Lainnya (audit#112)"
     ),
     "Lingkungan & Bencana": (
         "bencana alam, kebakaran, kecelakaan, lingkungan, fenomena alam "
