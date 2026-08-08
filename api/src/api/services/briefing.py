@@ -2381,6 +2381,21 @@ def _build_occasion_user_prompt(
             "Gunakan sebagai panduan; bila sudah ada SKB resmi yang menggeser tanggal "
             "±1-2 hari, tetap relevan karena hitung mundur 14 hari ke depan masih akurat.\n"
         )
+    occasion_context += (
+        f"\n⭐ FLYER EDISI KHUSUS — {entry.name}: keenam Pesan Flyer WAJIB "
+        f"mengangkat momen ini secara eksplisit (ini Edisi Khusus, bukan briefing "
+        f"mingguan biasa):\n"
+        f"- H3 subtitle SETIAP flyer sebut momennya — `### Pesan Flyer N — Suara "
+        f"{entry.name} (boleh bentuk pendek, mis. 'HUT ke-81 RI'): <tema pendek>` — "
+        f"bukan 'Suara <kategori>' generik.\n"
+        "- Body SETIAP flyer (bukan hanya satu) sebut momen ini secara spesifik "
+        "sebagai pengikat waktu, biasanya di kalimat pembuka.\n"
+        "- Headline TETAP mengangkat pesan DALIL yang dikutip (daleel-first "
+        "INVIOLABLE), BUKAN nama momen — momen hidup di subtitle+body, pesan dalil "
+        "di headline. Ini hanya menimpa 'OCCASION ≠ HEADLINE' untuk subtitle+body.\n"
+        "- ANTI-GHULUW tetap: bingkai sebagai syukur/refleksi berbasis dalil; jangan "
+        "agungkan simbol/seremoni/nasionalisme di atas pesan dalil.\n"
+    )
 
     # ── BERITA PENDUKUNG ──────────────────────────────────────────
     # Top-N last-7d headlines as supporting evidence. Composer is
@@ -2603,6 +2618,21 @@ def _build_national_user_prompt(
         "- ⚠ BINGKAI DAKWAH: peringatan ini WAJIB dibingkai lewat lensa Islam "
         "(syukur nikmat, persatuan, amanah, peran umat/ulama), grounded pada "
         "DALEEL POOL. Hindari ghuluw/nasionalisme berlebihan dan narasi partisan.\n"
+    )
+    national_context += (
+        f"\n⭐ FLYER EDISI KHUSUS — {entry.name}: keenam Pesan Flyer WAJIB "
+        f"mengangkat peringatan ini secara eksplisit (ini Edisi Khusus, bukan "
+        f"briefing mingguan biasa):\n"
+        f"- H3 subtitle SETIAP flyer sebut peringatannya — `### Pesan Flyer N — Suara "
+        f"{entry.name} (boleh bentuk pendek, mis. 'HUT ke-81 RI'): <tema pendek>` — "
+        f"bukan 'Suara <kategori>' generik.\n"
+        "- Body SETIAP flyer (bukan hanya satu) sebut peringatan ini secara spesifik "
+        "sebagai pengikat waktu, biasanya di kalimat pembuka.\n"
+        "- Headline TETAP mengangkat pesan DALIL yang dikutip (daleel-first "
+        "INVIOLABLE), BUKAN nama peringatan — peringatan hidup di subtitle+body, pesan "
+        "dalil di headline. Ini hanya menimpa 'OCCASION ≠ HEADLINE' untuk subtitle+body.\n"
+        "- ANTI-GHULUW tetap: bingkai sebagai syukur/refleksi berbasis dalil; jangan "
+        "agungkan simbol/seremoni/nasionalisme di atas pesan dalil.\n"
     )
 
     # ── BERITA PENDUKUNG ──────────────────────────────────────────
