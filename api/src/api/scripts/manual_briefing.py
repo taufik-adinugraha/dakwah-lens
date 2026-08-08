@@ -352,10 +352,16 @@ def _build_picks_context(
 
     flyer_allowed = set(FLYER_ALLOWED_CORPORA)
     flyer_daleel_pool = [
-        d for d in daleel if d.get("corpus") in flyer_allowed
+        d
+        for d in daleel
+        if d.get("corpus") in flyer_allowed
+        and (d.get("translation_id") or "").strip()
     ]
     flyer_adhkar_pool = [
-        a for a in adhkar if a.get("corpus") in flyer_allowed
+        a
+        for a in adhkar
+        if a.get("corpus") in flyer_allowed
+        and (a.get("translation_id") or "").strip()
     ]
 
     log.info(
@@ -1404,8 +1410,8 @@ async def _prepare_occasion_context(
 
     # Flyer-pool filter: 11-kitab whitelist subset of daleel + adhkar.
     flyer_allowed = set(FLYER_ALLOWED_CORPORA)
-    flyer_daleel_pool = [d for d in (daleel or []) if d.get("corpus") in flyer_allowed]
-    flyer_adhkar_pool = [a for a in (adhkar or []) if a.get("corpus") in flyer_allowed]
+    flyer_daleel_pool = [d for d in (daleel or []) if d.get("corpus") in flyer_allowed and (d.get("translation_id") or "").strip()]
+    flyer_adhkar_pool = [a for a in (adhkar or []) if a.get("corpus") in flyer_allowed and (a.get("translation_id") or "").strip()]
 
     log.info(
         "manual_briefing.occasion_context_ready",
@@ -1923,8 +1929,8 @@ async def _prepare_national_context(
             trending = []
 
     flyer_allowed = set(FLYER_ALLOWED_CORPORA)
-    flyer_daleel_pool = [d for d in (daleel or []) if d.get("corpus") in flyer_allowed]
-    flyer_adhkar_pool = [a for a in (adhkar or []) if a.get("corpus") in flyer_allowed]
+    flyer_daleel_pool = [d for d in (daleel or []) if d.get("corpus") in flyer_allowed and (d.get("translation_id") or "").strip()]
+    flyer_adhkar_pool = [a for a in (adhkar or []) if a.get("corpus") in flyer_allowed and (a.get("translation_id") or "").strip()]
 
     log.info(
         "manual_briefing.national_context_ready",
