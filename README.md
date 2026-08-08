@@ -33,7 +33,7 @@ See `Dakwah-Lens_PRD_v0.4.pdf` for the full product spec.
 - Languages: Indonesian (primary) + English via next-intl
 - Embedding model: OpenAI `text-embedding-3-large`
 - VPS: IDCloudHost (Indonesia residency per UU PDP §27/2022)
-- Kitab corpus v0: Qur'an (AR + ID Kemenag + EN Sahih International), Sahih al-Bukhari, Sahih Muslim, Riyad as-Salihin
+- Kitab corpus (20 works; live list on `/how-it-works`): **Qur'an & tafsir** — Al-Qur'an (AR + ID Kemenag + EN Sahih International), Tafsir Ibn Katsir (AR + EN), Tafsir Ath-Thabari (AR — verse-keyed for the Tafsir Pekan Ini track, *not* in `/kitab` free-text search); **hadith** — Sahih al-Bukhari, Sahih Muslim, Riyad as-Salihin, Bulugh al-Maram; **sirah & sahabat** — Sirah Ibn Hisham, Ash-Shama'il al-Muhammadiyyah, Hayat as-Sahabah, Al-Bidayah wan-Nihayah; **fiqh** — Al-Umm, Fiqh as-Sunnah, Fath al-Mu'in, Fath al-Qarib; **aqidah & adab** — Bidayatul Hidayah, Nashaihul Ibad, Adab al-'Alim wa al-Muta'allim, 'Aqidat al-'Awam, Thalathat al-Ushul
 - Multi-tenant: `organizations` + `org_members` (owner/admin/member), app-level scoping
 - Tiered LLM: Gemini Flash-Lite for classify/topic/rerank → Gemini 2.5 Pro for brief synthesis → Claude Sonnet 4.6 only as a Pro fallback
 

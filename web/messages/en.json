@@ -407,6 +407,7 @@
     "search_deselect_all": "Deselect all",
     "search_selected_count": "{n}/{total} selected",
     "search_hint": "Tip: phrase your search in natural language. Semantic search, not keyword.",
+    "kitab_tabari_note": "Tafsir Ath-Thabari (Arabic) is also in the kitab library, but it's used verse-keyed for the Tafsir Pekan Ini reflections — not part of the free-text search above.",
     "results_count": "{count} result(s) for \"{query}\"",
     "results_empty": "No matching passages. Try broader wording or different kitab selection.",
     "low_confidence_title": "Limited matches:",

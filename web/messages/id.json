@@ -407,6 +407,7 @@
     "search_deselect_all": "Batalkan semua",
     "search_selected_count": "{n}/{total} dipilih",
     "search_hint": "Tips: gunakan bahasa alami. Pencariannya semantik, bukan kata kunci.",
+    "kitab_tabari_note": "Tafsir Ath-Thabari (Arab) juga ada di perpustakaan kitab, tetapi dipakai per-ayat untuk renungan Tafsir Pekan Ini — tidak termasuk dalam pencarian teks bebas di atas.",
     "results_count": "{count} hasil untuk \"{query}\"",
     "results_empty": "Tidak ada passage yang cocok. Coba kata kunci yang lebih luas atau pilihan kitab yang berbeda.",
     "low_confidence_title": "Hasil terbatas:",

@@ -505,6 +505,7 @@ function SearchForm({
               {t("search_hint")}
             </span>
           </div>
+          <p className="mt-2 text-xs text-ink-faint">{t("kitab_tabari_note")}</p>
         </form>
       </div>
     </section>
