@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Info, Mail, MessageSquare } from "lucide-react";
 
+import { localeAlternates } from "@/lib/seo";
 import { ContactForm } from "./ContactForm";
 
 export async function generateMetadata({
@@ -9,7 +10,10 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/contact">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Contact" });
-  return { title: t("page_title") };
+  return {
+    title: t("page_title"),
+    alternates: localeAlternates({ locale, canonicalPath: "/contact" }),
+  };
 }
 
 export default async function ContactPage({

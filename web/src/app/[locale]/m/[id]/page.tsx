@@ -6,6 +6,7 @@ import { ArrowLeft, MessageSquareQuote } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { getBriefingBySlug } from "@/lib/briefing-data";
 import { localeAwareFormat } from "@/lib/date-id";
+import { localeAlternates } from "@/lib/seo";
 import { extractMahasiswaContent } from "@/lib/flyer/content";
 import { ShareButton } from "../../d/[brief]/[deliverable]/ShareButton";
 import { Article } from "./Article";
@@ -47,6 +48,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description: m.question || undefined,
+    alternates: localeAlternates({
+      locale,
+      canonicalPath: `/m/${id}`,
+      hasEn: Boolean(brief.summaryMdEn),
+    }),
     openGraph: {
       title,
       description: m.question || undefined,

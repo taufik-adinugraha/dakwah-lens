@@ -16,6 +16,7 @@ import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
 import { classifyThemeGroup, GROUP_BY_SLUG } from "@/lib/dashboard-metrics";
 import { briefingSlug, getLatestBriefing } from "@/lib/briefing-data";
+import { localeAlternates } from "@/lib/seo";
 import { I18nText } from "@/components/I18nText";
 import { GroupPostsFilter, type GroupPost } from "./GroupPostsFilter";
 import { buildGroupScopeClause } from "./scope";
@@ -51,7 +52,10 @@ export async function generateMetadata({
   const group = GROUP_BY_SLUG[slug];
   if (!group) return { title: "Group not found" };
   const t = await getTranslations({ locale, namespace: "Briefing" });
-  return { title: t("group_page_title", { group }) };
+  return {
+    title: t("group_page_title", { group }),
+    alternates: localeAlternates({ locale, canonicalPath: `/groups/${slug}` }),
+  };
 }
 
 export default async function GroupLandingPage({

@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ArrowRight, ArrowUpRight, ExternalLink, GitBranch, ShieldCheck } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
+import { localeAlternates } from "@/lib/seo";
 
 const GITHUB_URL = "https://github.com/taufik-adinugraha/dakwah-lens";
 
@@ -12,7 +13,10 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/how-it-works">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "HowItWorks" });
-  return { title: t("page_title") };
+  return {
+    title: t("page_title"),
+    alternates: localeAlternates({ locale, canonicalPath: "/how-it-works" }),
+  };
 }
 
 export default async function HowItWorksPage({

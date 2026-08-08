@@ -21,6 +21,9 @@ const STATIC_PATHS = [
   "/privacy",
   "/terms",
   "/contact",
+  "/pustaka-kajian",
+  "/discussions",
+  "/flyers/public",
 ] as const;
 
 // Deliverable sub-page slugs by briefing type (keys of
@@ -33,7 +36,6 @@ const WEEKLY_DELIVERABLES = [
   "kisah",
   "home",
   "content",
-  "genz",
   "action",
 ];
 const FIQH_DELIVERABLES = ["artikel-1", "artikel-2", "artikel-3", "artikel-4"];
@@ -83,12 +85,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       // triggers a Google Search Console "Submitted URL marked noindex"
       // exclusion. Only the indexable deliverable pages below belong here.
 
-      const deliverables =
-        r.themeGroup === "Fiqh Pekan Ini"
+      const isWeekly =
+        r.themeGroup !== "Fiqh Pekan Ini" && r.themeGroup !== "Tafsir Pekan Ini";
+      const deliverables = isWeekly
+        ? WEEKLY_DELIVERABLES
+        : r.themeGroup === "Fiqh Pekan Ini"
           ? FIQH_DELIVERABLES
-          : r.themeGroup === "Tafsir Pekan Ini"
-            ? TAFSIR_DELIVERABLES
-            : WEEKLY_DELIVERABLES;
+          : TAFSIR_DELIVERABLES;
 
       for (const d of deliverables) {
         const path = `${hub}/${d}`;
@@ -98,6 +101,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           changeFrequency: "monthly",
           priority: 0.7,
           alternates: alternates(path, r.hasEn),
+        });
+      }
+
+      // Mahasiswa pack's canonical home is `/m/{slug}`, not the
+      // `/d/{slug}/genz` share URL (which now redirects there) —
+      // submit the canonical page directly so it gets indexed.
+      if (isWeekly) {
+        entries.push({
+          url: `${SITE_URL}/id/m/${slug}`,
+          lastModified: r.generatedAt,
+          changeFrequency: "monthly",
+          priority: 0.7,
+          alternates: alternates(`/m/${slug}`, r.hasEn),
         });
       }
     }

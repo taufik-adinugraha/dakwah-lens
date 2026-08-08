@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
+import { localeAlternates } from "@/lib/seo";
 import { TERMS_UPDATED_AT } from "@/lib/terms-version";
 
 export async function generateMetadata({
@@ -21,7 +22,10 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/terms">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Terms" });
-  return { title: t("page_title") };
+  return {
+    title: t("page_title"),
+    alternates: localeAlternates({ locale, canonicalPath: "/terms" }),
+  };
 }
 
 export default async function TermsPage({
