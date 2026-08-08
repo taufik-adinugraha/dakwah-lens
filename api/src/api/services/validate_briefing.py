@@ -68,6 +68,7 @@ class BriefingWarning(TypedDict, total=False):
         "flyer_outlet_or_handle",
         "flyer_headline_missing_or_generic",
         "flyer_independence_violation",
+        "flyer_dua_unvoweled",
         "news_paraphrase_fabrication",
         "occasion_section_malformed",
         "national_section_malformed",
@@ -250,6 +251,77 @@ def scan_pesan_flyer_inline_arabic(markdown: str) -> list[BriefingWarning]:
                     ),
                 }
             )
+    return warnings
+
+
+# Base Arabic letters (hamza..ya) vs the tashkil/harakat marks + dagger-alif.
+# Kept separate from _ARABIC_CHAR_RE (which spans the whole block incl. marks)
+# so we can measure a harakat-to-letter ratio.
+_ARABIC_LETTER_RE = re.compile(r"[ء-ي]")
+_HARAKAT_RE = re.compile(r"[ً-ْٰٓ-ٕ]")
+
+
+def scan_pesan_flyer_dua_unvoweled(markdown: str) -> list[BriefingWarning]:
+    """Recitable Arabic in Pesan Flyer slots (du'a in 5+6, ayat lead-ins)
+    MUST be fully voweled (syakl) or the reader can't recite it correctly.
+    dua_library.json historically held ~123 unvoweled entries (voweled
+    2026-08-06); the composer copies du'a verbatim, so a bare library row
+    ships a bare du'a in the flyer. This guard catches that per-briefing.
+
+    Soft, non-blocking (severity "medium"): flags any substantial Arabic
+    line (>= 12 letters) in the flyer section whose harakat-to-letter ratio
+    is below 0.20. Well-voweled du'a run 0.70-0.95; unvoweled run ~0.00, so
+    0.20 separates cleanly without false-flagging lightly-marked text."""
+    warnings: list[BriefingWarning] = []
+    slc = _section_slice(markdown, r"Pesan\s+Flyer")
+    if not slc:
+        return warnings
+    section = markdown[slc[0] : slc[1]]
+    h3_iter = list(
+        re.finditer(
+            r"^###\s+Pesan\s+Flyer\s+(\d)[^\n]*$",
+            section,
+            flags=re.MULTILINE | re.IGNORECASE,
+        )
+    )
+    for i, h3 in enumerate(h3_iter):
+        slot = int(h3.group(1))
+        body_start = h3.end()
+        body_end = h3_iter[i + 1].start() if i + 1 < len(h3_iter) else len(section)
+        body = section[body_start:body_end]
+        # Strip the **Headline:** / **Dalil:** marker lines first — a Dalil
+        # citation for an AR-only kitab carries an unvoweled Arabic section
+        # descriptor (e.g. "الباب الثاني في أدب العالم…") that is NOT
+        # recitable du'a and must not be flagged.
+        body = re.sub(
+            r"^\s*\*\*\s*(?:Headline|Judul|Tema|Dalil|Daleel)\s*:\*\*[^\n]*$",
+            "",
+            body,
+            flags=re.MULTILINE | re.IGNORECASE,
+        )
+        # Per-line so a fully-voweled ayat can't mask a bare du'a in the
+        # same slot.
+        for line in body.splitlines():
+            letters = _ARABIC_LETTER_RE.findall(line)
+            if len(letters) < 12:
+                continue
+            ratio = len(_HARAKAT_RE.findall(line)) / len(letters)
+            if ratio < 0.20:
+                warnings.append(
+                    {
+                        "kind": "flyer_dua_unvoweled",
+                        "severity": "medium",
+                        "where": f"Pesan Flyer {slot}",
+                        "message": (
+                            f"Arabic block has {len(letters)} letters but only "
+                            f"{ratio:.0%} carry harakat — recitable du'a/ayat in a "
+                            f"flyer must be fully voweled (syakl). Fix the "
+                            f"dua_library.json entry for the cited daleel (add "
+                            f"harakat) so future weekly rotations ship voweled."
+                        ),
+                    }
+                )
+                break  # one flag per slot is enough
     return warnings
 
 
@@ -2589,6 +2661,7 @@ def validate_briefing(
     for fn, key in (
         (scan_poin_kunci_missing_dalil, "poin_kunci_check_failed"),
         (scan_pesan_flyer_inline_arabic, "flyer_arabic_check_failed"),
+        (scan_pesan_flyer_dua_unvoweled, "flyer_dua_unvoweled_check_failed"),
         (scan_mixed_script_paragraphs, "mixed_script_check_failed"),
         (scan_dangling_citations, "dangling_citation_check_failed"),
         (scan_deliverable_word_counts, "word_count_check_failed"),
