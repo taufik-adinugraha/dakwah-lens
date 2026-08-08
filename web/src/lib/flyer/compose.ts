@@ -723,7 +723,18 @@ async function buildContent(ctx: FlyerContext): Promise<FlyerContent> {
   const dedicatedDaleel =
     findDaleelByCitation(ctx.daleelRefs, dedicatedBlock?.daleelCitation) ??
     findDaleelByCitation(ctx.adhkarRefs ?? null, dedicatedBlock?.daleelCitation);
-  const daleel = dedicatedDaleel ?? pickFlyerDaleel(ctx.daleelRefs, lang, rank);
+  // Skip, don't fall back to English: if the pinned daleel has no
+  // translation for this locale (some hadith corpora are EN-only), use a
+  // pool daleel that does — never render a non-Indonesian daleel on an
+  // Indonesian flyer.
+  const dedicatedUsable =
+    dedicatedDaleel &&
+    (lang === "en"
+      ? dedicatedDaleel.translation_en
+      : dedicatedDaleel.translation_id);
+  const daleel = dedicatedUsable
+    ? dedicatedDaleel
+    : pickFlyerDaleel(ctx.daleelRefs, lang, rank);
 
   if (ctx.slot.kind === "general") {
     const fallbackHeadline =

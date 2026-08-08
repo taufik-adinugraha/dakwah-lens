@@ -461,9 +461,10 @@ def _normalize_hit(corpus: str, hit: Any) -> dict[str, Any]:
         # All four hadith corpora share the same payload shape.
         citation = payload.get("citation_en") or ""
         arabic = payload.get("ar") or ""
-        # Hadith corpora aren't translated to Bahasa yet — leave id
-        # blank so the UI knows to render the English text instead.
-        translation_id = ""
+        # Muslim (and any hadith corpus with a manual Bahasa translation)
+        # carries it in payload["id"]; EN-only corpora return "" and the
+        # flyer pool + renderer skip them (never English on an ID surface).
+        translation_id = payload.get("id") or ""
         translation_en = payload.get("en") or ""
         ref_id = f"{corpus}::{payload.get('hadithnumber','')}"
 
