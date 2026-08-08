@@ -14,6 +14,7 @@ import type {
   KultumContent,
   KajianUmumContent,
 } from "@/db/schema";
+import { localeAlternates } from "@/lib/seo";
 import { DaleelList } from "../../kajian/DaleelList";
 import { DuaBlock } from "../../kajian/DuaBlock";
 import { MarkdownBody } from "../../kajian/MarkdownBody";
@@ -33,7 +34,13 @@ export async function generateMetadata({
       ),
     )
     .limit(1);
-  return { title: row?.title ?? "Kajian" };
+  return {
+    title: row?.title ?? "Kajian",
+    alternates: localeAlternates({
+      locale,
+      canonicalPath: `/pustaka-kajian/${id}`,
+    }),
+  };
 }
 
 export default async function PustakaKajianDetailPage({

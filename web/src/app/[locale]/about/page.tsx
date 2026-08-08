@@ -7,13 +7,17 @@ import { ArrowUpRight } from "lucide-react";
 import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { marketingSectionLink } from "@/lib/marketing-href";
+import { localeAlternates } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/about">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "About" });
-  return { title: t("page_title") };
+  return {
+    title: t("page_title"),
+    alternates: localeAlternates({ locale, canonicalPath: "/about" }),
+  };
 }
 
 export default async function AboutPage({

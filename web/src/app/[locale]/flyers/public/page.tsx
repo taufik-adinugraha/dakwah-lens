@@ -13,6 +13,7 @@ import {
   parseMonthParam,
   parsePageParam,
 } from "@/lib/month-filter";
+import { localeAlternates } from "@/lib/seo";
 
 import { FlyerGrid } from "../FlyerGrid";
 
@@ -70,7 +71,10 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/flyers/public">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "UserFlyers" });
-  return { title: t("page_title_public") };
+  return {
+    title: t("page_title_public"),
+    alternates: localeAlternates({ locale, canonicalPath: "/flyers/public" }),
+  };
 }
 
 export default async function PublicFlyersPage({

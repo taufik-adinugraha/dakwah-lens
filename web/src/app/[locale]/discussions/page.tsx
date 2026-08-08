@@ -7,6 +7,7 @@ import {
   listPublicRoomOverviews,
   wibDateString,
 } from "@/lib/discussions-data";
+import { localeAlternates } from "@/lib/seo";
 import { DiscussionsBoard } from "./DiscussionsBoard";
 
 export async function generateMetadata({
@@ -18,6 +19,7 @@ export async function generateMetadata({
   return {
     title: t("discussions_index_title"),
     description: t("discussions_index_subtitle"),
+    alternates: localeAlternates({ locale, canonicalPath: "/discussions" }),
   };
 }
 

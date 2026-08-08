@@ -13,13 +13,17 @@ import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
 import { marketingSectionLink } from "@/lib/marketing-href";
+import { localeAlternates } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/transparency">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Transparency" });
-  return { title: t("page_title") };
+  return {
+    title: t("page_title"),
+    alternates: localeAlternates({ locale, canonicalPath: "/transparency" }),
+  };
 }
 
 const RECENT_LIMIT = 12;

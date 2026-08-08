@@ -14,13 +14,17 @@ import {
 } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
+import { localeAlternates } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/privacy">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Privacy" });
-  return { title: t("page_title") };
+  return {
+    title: t("page_title"),
+    alternates: localeAlternates({ locale, canonicalPath: "/privacy" }),
+  };
 }
 
 export default async function PrivacyPage({

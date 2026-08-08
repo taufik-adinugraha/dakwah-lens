@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { Link } from "@/i18n/navigation";
 import { db, schema } from "@/db";
+import { localeAlternates } from "@/lib/seo";
 
 const PAGE_LIMIT = 50;
 
@@ -13,7 +14,10 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/pustaka-kajian">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "PustakaKajian" });
-  return { title: t("page_title") };
+  return {
+    title: t("page_title"),
+    alternates: localeAlternates({ locale, canonicalPath: "/pustaka-kajian" }),
+  };
 }
 
 export default async function PustakaKajianPage({
