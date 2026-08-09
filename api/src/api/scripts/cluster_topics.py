@@ -107,6 +107,15 @@ async def _fetch_recent_posts() -> list[dict[str, Any]]:
     each day. Returns up to SAMPLE_HARD_CEILING rows ordered overall
     newest-first. Pooling every platform means the whole week's corpus
     (mainstream + X + YouTube + …) feeds one discovery pass.
+
+    Outage fallback: the opportunity floor is a noise FILTER, not a hard
+    gate. When the sentiment/opportunity classifier is degraded (e.g. the
+    Gemini prepay outage) it writes low — or no — `dawah_opportunity`
+    across the board, so the floor rejects the ENTIRE window and the
+    floored query returns ~0 rows. In that case retry WITHOUT the floor,
+    keeping the same per-WIB-day composite-ranked stratification. An
+    unfiltered stratified sample is strictly better than an empty one; the
+    downstream keyword/embedding assignment still discriminates the noise.
     """
     async with SessionLocal() as session:
         window_start = datetime.now(UTC) - timedelta(
@@ -130,8 +139,9 @@ async def _fetch_recent_posts() -> list[dict[str, Any]]:
             func.coalesce(SocialPost.dawah_opportunity, 0.0)
             * func.coalesce(SocialPost.engagement_score, 1.0)
         )
-        ranked = (
-            select(
+
+        async def _sample(apply_opportunity_floor: bool) -> list[dict[str, Any]]:
+            ranked_q = select(
                 SocialPost.id,
                 SocialPost.text,
                 SocialPost.posted_at,
@@ -142,41 +152,53 @@ async def _fetch_recent_posts() -> list[dict[str, Any]]:
                     order_by=(composite_score.desc(), SocialPost.posted_at.desc()),
                 )
                 .label("rn"),
-            )
-            .where(SocialPost.posted_at >= window_start)
-            .where(
-                sql_or(
-                    SocialPost.dawah_opportunity.is_(None),
-                    SocialPost.dawah_opportunity >= MIN_OPPORTUNITY_FOR_DISCOVERY,
+            ).where(SocialPost.posted_at >= window_start)
+            if apply_opportunity_floor:
+                ranked_q = ranked_q.where(
+                    sql_or(
+                        SocialPost.dawah_opportunity.is_(None),
+                        SocialPost.dawah_opportunity
+                        >= MIN_OPPORTUNITY_FOR_DISCOVERY,
+                    )
                 )
-            )
-            .subquery()
-        )
+            ranked = ranked_q.subquery()
 
-        res = await session.execute(
-            select(
-                ranked.c.id,
-                ranked.c.text,
-                ranked.c.posted_at,
-                ranked.c.theme_group,
+            res = await session.execute(
+                select(
+                    ranked.c.id,
+                    ranked.c.text,
+                    ranked.c.posted_at,
+                    ranked.c.theme_group,
+                )
+                .where(ranked.c.rn <= PER_DAY_CAP)
+                .order_by(ranked.c.posted_at.desc())
             )
-            .where(ranked.c.rn <= PER_DAY_CAP)
-            .order_by(ranked.c.posted_at.desc())
-        )
-        # `theme_group` is the coarse 14-bucket label set at ingest by
-        # the sentiment/theme-group classifier. The orphan-rescue pass
-        # inside discover_topics() uses it to constrain the in-group
-        # cosine retry — see RESCUE_FLOOR in services/topic_discovery.py.
-        rows = [
-            {
-                "id": row.id,
-                "text": row.text,
-                "posted_at": row.posted_at,
-                "theme_group": row.theme_group,
-            }
-            for row in res.all()
-            if row.text
-        ]
+            # `theme_group` is the coarse 14-bucket label set at ingest by
+            # the sentiment/theme-group classifier. The orphan-rescue pass
+            # inside discover_topics() uses it to constrain the in-group
+            # cosine retry — see RESCUE_FLOOR in services/topic_discovery.py.
+            return [
+                {
+                    "id": row.id,
+                    "text": row.text,
+                    "posted_at": row.posted_at,
+                    "theme_group": row.theme_group,
+                }
+                for row in res.all()
+                if row.text
+            ]
+
+        rows = await _sample(apply_opportunity_floor=True)
+        if len(rows) < MIN_POSTS_FOR_DISCOVERY:
+            # The floor starved discovery — treat it as a classifier-outage
+            # signal and re-sample the same stratified window unfiltered.
+            log.warning(
+                "topic_discovery.opportunity_floor_starved",
+                floored=len(rows),
+                min_required=MIN_POSTS_FOR_DISCOVERY,
+                action="refetch_without_opportunity_floor",
+            )
+            rows = await _sample(apply_opportunity_floor=False)
 
         # Belt-and-suspenders against a runaway scrape: enforce the
         # absolute ceiling even though the partition cap should already
