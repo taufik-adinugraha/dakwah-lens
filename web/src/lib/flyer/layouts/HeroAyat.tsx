@@ -19,7 +19,7 @@ export const HeroAyat: FlyerLayoutComponent = ({
   assets,
   layoutVariant,
 }) => {
-  const { daleel, headline, message, dateLabel, brand } = content;
+  const { daleel, headline, message, brand } = content;
   const translation = pickDaleelTranslation(daleel, locale, {
     keywords: [headline, message].filter(Boolean) as string[],
   });
@@ -107,9 +107,6 @@ export const HeroAyat: FlyerLayoutComponent = ({
             }}
           >
             {brand}
-          </div>
-          <div className="text-[20px] font-bold tracking-wide" style={{ color: "#ffffffe0" }}>
-            {dateLabel}
           </div>
         </div>
 
