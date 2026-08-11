@@ -78,9 +78,22 @@ function headFor({ width, height }: CanvasSize): string {
 export async function buildHtmlDocument(
   tree: React.ReactNode,
   canvas: CanvasSize = DEFAULT_CANVAS,
+  footer?: React.ReactNode,
 ): Promise<string> {
   const { renderToStaticMarkup } = await import("react-dom/server");
-  const body = renderToStaticMarkup(<>{tree}</>);
+  // When a footer overlay is supplied (social strip on the square
+  // share-cards) wrap the tree + footer in a full-canvas relative box so
+  // the footer's `position:absolute; bottom:0` anchors to the canvas
+  // edge. No footer (e.g. A4 PDF poster) → render the tree bare, as before.
+  const inner = footer ? (
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+      {tree}
+      {footer}
+    </div>
+  ) : (
+    <>{tree}</>
+  );
+  const body = renderToStaticMarkup(inner);
   return `<!doctype html>
 <html lang="id">
 <head>${headFor(canvas)}</head>
