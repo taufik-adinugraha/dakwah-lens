@@ -109,7 +109,7 @@ export const QuoteCard: FlyerLayoutComponent = ({
       </div>
 
       <div
-        className={`relative z-10 flex h-full flex-col ${contentJustify} gap-[32px] px-[80px] pb-[80px] pt-[170px]`}
+        className={`relative z-10 flex h-full flex-col ${contentJustify} gap-[32px] px-[80px] pb-[150px] pt-[170px]`}
       >
         {/* Headline + message (white over dark overlay) */}
         <div className="flex max-w-[940px] flex-col gap-[26px]">

@@ -95,7 +95,7 @@ export const HeroAyat: FlyerLayoutComponent = ({
         </svg>
       )}
 
-      <div className="relative z-10 flex h-full flex-col justify-between px-[80px] pt-[80px] pb-[60px]">
+      <div className="relative z-10 flex h-full flex-col justify-between px-[80px] pt-[80px] pb-[150px]">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div
