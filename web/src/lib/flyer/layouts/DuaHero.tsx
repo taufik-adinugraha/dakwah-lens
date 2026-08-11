@@ -28,7 +28,7 @@ export const DuaHero: FlyerLayoutComponent = ({
   locale,
   assets,
 }) => {
-  const { daleel, dateLabel, brand } = content;
+  const { daleel, brand } = content;
   const isEnglish = locale === "en";
   const arabic = daleel?.arabic ?? "";
   const translation = daleel
@@ -70,7 +70,6 @@ export const DuaHero: FlyerLayoutComponent = ({
     translation,
     citation,
     brand,
-    dateLabel,
     kicker: isEnglish ? "Du'a of the Week" : "Doa Pekan Ini",
     palette,
     bgSrc,
@@ -87,7 +86,6 @@ type DuaProps = {
   translation: string;
   citation: string;
   brand: string;
-  dateLabel: string;
   kicker: string;
   palette: FlyerPalette;
   bgSrc: string;
@@ -156,7 +154,6 @@ function CardComposition({
   translation,
   citation,
   brand,
-  dateLabel,
   kicker,
   palette,
   bgSrc,
@@ -182,12 +179,6 @@ function CardComposition({
           style={{ color: palette.accentDeep }}
         >
           {brand}
-        </span>
-        <span
-          className="rounded-full bg-white/85 px-3 py-1 text-[15px] font-bold shadow-sm"
-          style={{ color: palette.accentDeep }}
-        >
-          {dateLabel}
         </span>
       </div>
 

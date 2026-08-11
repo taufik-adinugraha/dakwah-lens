@@ -28,7 +28,7 @@ export const QuoteCard: FlyerLayoutComponent = ({
   assets,
   layoutVariant,
 }) => {
-  const { daleel, headline, message, dateLabel, brand } = content;
+  const { daleel, headline, message, brand } = content;
   const translation = pickDaleelTranslation(daleel, locale, {
     keywords: [headline, message].filter(Boolean) as string[],
   });
@@ -102,9 +102,6 @@ export const QuoteCard: FlyerLayoutComponent = ({
           }}
         >
           {brand}
-        </div>
-        <div className="rounded-full bg-white/90 px-4 py-1.5 text-[18px] font-bold" style={{ color: palette.accentDeep }}>
-          {dateLabel}
         </div>
       </div>
 
