@@ -133,6 +133,82 @@ export function DaleelSourceChip({
 }
 
 /**
+ * Social-media footer strip (experiment 2026-08-11) — a uniform bottom
+ * bar carrying the Dakwah-Lens social handles, overlaid on every square
+ * Pesan-Flyer share-card. Full-width dark-gradient backing (fades up to
+ * transparent) so the white text reads on ANY background — photo, pattern
+ * or solid — without needing the per-flyer palette. Rendered at the
+ * document level by renderFlyerPng (NOT the A4 poster / Mahasiswa poster,
+ * whose own footer + QR own the bottom edge).
+ *
+ * Handles are display text (the flyer is a rendered PNG, not clickable),
+ * so they're centralised here as the single source of truth.
+ */
+export const SOCIAL_HANDLES: { label: string; handle: string }[] = [
+  { label: "Instagram", handle: "dakwahlens" },
+  { label: "TikTok", handle: "dakwahlens" },
+  { label: "Facebook", handle: "Dakwah Lens" },
+  { label: "YouTube", handle: "dakwah lens" },
+];
+
+export function SocialFooter() {
+  return (
+    <div
+      aria-hidden
+      style={{
+        position: "absolute",
+        left: 0,
+        right: 0,
+        bottom: 0,
+        height: "88px",
+        display: "flex",
+        alignItems: "flex-end",
+        justifyContent: "center",
+        gap: "34px",
+        paddingBottom: "18px",
+        background:
+          "linear-gradient(to top, rgba(15,23,42,0.86) 0%, rgba(15,23,42,0.66) 55%, rgba(15,23,42,0) 100%)",
+        zIndex: 40,
+      }}
+    >
+      {SOCIAL_HANDLES.map(({ label, handle }) => (
+        <div
+          key={label}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            lineHeight: 1.15,
+          }}
+        >
+          <span
+            style={{
+              fontSize: "13px",
+              fontWeight: 800,
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+              color: "rgba(255,255,255,0.72)",
+            }}
+          >
+            {label}
+          </span>
+          <span
+            style={{
+              fontSize: "21px",
+              fontWeight: 800,
+              color: "#ffffff",
+              textShadow: "0 1px 3px rgba(0,0,0,0.45)",
+            }}
+          >
+            {handle}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
  * Short rounded accent bar placed under a headline — a small visual
  * anchor lifted from the reference posters' bold-title treatment.
  */

@@ -4,6 +4,7 @@ import { createElement } from "react";
 import { composeFlyer, type FlyerContext } from "./compose";
 import { resolveAssets } from "./images/resolve";
 import { LAYOUTS } from "./layouts";
+import { SocialFooter } from "./layouts/decor";
 import { buildHtmlDocument } from "./render/document";
 import { snapHtmlToPdf, snapHtmlToPng } from "./render/snap";
 
@@ -30,7 +31,13 @@ export async function renderFlyerPng(ctx: FlyerContext): Promise<Buffer> {
     layoutVariant,
   });
 
-  const html = await buildHtmlDocument(tree);
+  // Social-media footer overlay on the square Pesan-Flyer share-cards
+  // (experiment 2026-08-11). Skipped for the poster layouts — the
+  // Mahasiswa poster owns its bottom edge with a QR + article URL.
+  const footer = layoutId.startsWith("poster")
+    ? undefined
+    : createElement(SocialFooter);
+  const html = await buildHtmlDocument(tree, undefined, footer);
   return await snapHtmlToPng(html);
 }
 
