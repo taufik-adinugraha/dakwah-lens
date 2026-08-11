@@ -159,8 +159,21 @@ export function pickDaleelTranslation(
   // BEFORE deciding whether to truncate. The teaching now starts the
   // text, so accumulate-from-start preserves it (v2 book-end was
   // dropping the teaching as the elided middle).
+  // v4 (2026-08-11): strip markdown FIRST — classic-kitab translations
+  // (Adab al-'Alim, Nashaihul Ibad, …) are authored with markdown
+  // structure (### headings, **bold**, ---) and were leaking those
+  // markers verbatim into the flyer quote card (operator-reported).
   const text = stripNarratorIntro(
-    rawText.replace(_TRAILING_ATTRIBUTION_RE, "").trim(),
+    stripMd(rawText)
+      // Belt-and-suspenders after stripMd: kill residual INLINE heading
+      // markers + ORPHAN emphasis asterisks that stripMd's line-start /
+      // paired rules miss when a classic-kitab section is split mid-way.
+      .replace(/#{1,6}\s+/g, "")
+      .replace(/\*+/g, "")
+      .replace(/\s*-{3,}\s*/g, " ")
+      .replace(_TRAILING_ATTRIBUTION_RE, "")
+      .replace(/\s{2,}/g, " ")
+      .trim(),
   );
   if (text.length <= cutThreshold) return text;
 
