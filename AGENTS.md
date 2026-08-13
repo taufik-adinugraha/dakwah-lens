@@ -153,6 +153,8 @@ Memory: `feedback_fact_check_news_paraphrase`. Live enforcement: briefing.py SYS
 
 **[DON'T BLOCK ON DEPLOYS]** Never sit on `gh run watch` as a serial blocking step. Always have parallel downstream prep in flight while a deploy runs (re-dumps, workflow scripts, file ops). Verify deploy completion only at the moment the downstream step needs the new code. Memory: `feedback_dont_block_on_deploys`.
 
+**[COMPOSE — NEVER EMIT THE WHOLE BRIEFING]** A compose subagent MUST build the briefing file INCREMENTALLY — one `Write` for the opening sections + Khutbah Jumat, then one `Edit`-append per remaining section (Kultum → Kajian → Kisah → Pengajaran → Kreator → Mahasiswa → Aksi Sosial → `## Dalil & Sumber` → `## Pesan Flyer`). NEVER emit the whole ~12–15k-word briefing in one response, and never paste it into a chat reply. Why: a single response caps at 64,000 output tokens; a full briefing + reasoning exceeds it, the agent dies with "response exceeded the 64000 output token maximum" and writes NOTHING to disk (total loss). 2026-08-13 incident: lingkungan-bencana + pemerintahan-kebijakan composers both died this way in one wave; chunked composers finished clean. Make chunked-write a CRITICAL directive in every compose-subagent prompt. Memory: `feedback_compose_never_emit_whole_briefing`.
+
 ---
 
 ## How to use this section
