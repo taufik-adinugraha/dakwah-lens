@@ -96,6 +96,7 @@ from api.services.briefing import (
 )
 from api.services.kitab_retrieval import (
     build_kisah_for_corpus,
+    merge_theme_daleel_seeds,
     retrieve_daleel,
     retrieve_dua,
     retrieve_kisah_pendek_unranked,
@@ -207,6 +208,10 @@ async def _prepare_unranked_candidates(
         daleel_candidates = retrieve_daleel(
             retrieval_query, limit=28, per_corpus=6
         )
+        # Prepend curated per-theme anchor daleel (deduped) so thin/generic
+        # news weeks still surface a theme's defining verses/hadith even when
+        # the (Gemini) query builder is degraded. No-op for themes w/o seeds.
+        daleel_candidates = merge_theme_daleel_seeds(daleel_candidates, group)
 
         # Calendar context — local engine, no LLM.
         from datetime import date as _date
@@ -431,9 +436,10 @@ def _format_candidates_markdown(
         corpus = d.get("corpus", "?")
         score = d.get("score") or d.get("similarity", 0)
         score_s = f"{score:.3f}" if isinstance(score, (int, float)) else "?"
+        tag = "curated seed" if d.get("_seed") else f"sim={score_s}"
         ar = (d.get("arabic") or "")[:200].replace("\n", " ")
         trn = (d.get("translation_id") or d.get("translation_en") or "")[:200].replace("\n", " ")
-        lines.append(f"## {i}. {cit}  [{corpus} · sim={score_s}]")
+        lines.append(f"## {i}. {cit}  [{corpus} · {tag}]")
         lines.append(f"AR: {ar}")
         lines.append(f"ID/EN: {trn}")
         lines.append("")

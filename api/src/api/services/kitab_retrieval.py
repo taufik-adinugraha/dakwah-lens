@@ -990,6 +990,77 @@ def retrieve_by_citation(citation: str) -> dict[str, Any] | None:
     return None
 
 
+# ── Curated per-theme daleel seeds ───────────────────────────────────────
+# Thin / generic news weeks (compounded by a degraded Gemini retrieval-query
+# builder) can leave a theme's DEFINING verses/hadith out of the embedding
+# similarity pool entirely — e.g. Toleransi surfaced no QS 2:256 (laa ikraha)
+# or QS 60:8 (kindness+justice to peaceful non-Muslims), Sosial no spousal-
+# mercy ayat, Inspirasi no husnuzhan hadith (2026-08-13 batch finding). These
+# anchors ALWAYS exist in the corpus; they just don't rank for a weak query.
+# The citations below are the EXACT romanizations that resolve via
+# `retrieve_by_citation` against the prod Qdrant collections (verified
+# 2026-08-13). `merge_theme_daleel_seeds` prepends them into the candidate
+# pool so the picker always has them, independent of the week's posts.
+THEME_DALEEL_SEEDS: dict[str, list[str]] = {
+    "Toleransi & Lintas-Iman": [
+        "QS. Al-Mumtahana: 8",    # berbuat baik & adil pd non-Muslim yg tak memerangi
+        "QS. Al-Baqara: 256",     # laa ikraha fid-din — tidak ada paksaan dalam agama
+        "QS. Al-Maaida: 8",       # tegakkan keadilan walau pd kaum yg dibenci
+        "Sahih al-Bukhari 3166",  # ancaman bagi yg membunuh mu'ahid (lindungi dzimmi)
+    ],
+    "Sosial & Keluarga": [
+        "QS. Ar-Room: 21",        # mawaddah wa rahmah antar pasangan
+        "QS. An-Nisaa: 19",       # wa 'aasyiruuhunna bil-ma'ruf — gauli dgn baik
+        "QS. At-Tahrim: 6",       # jaga diri & keluarga dari api neraka
+        "Riyad as-Salihin 278",   # sebaik-baik kalian yg terbaik pd istrinya
+    ],
+    "Inspirasi & Kisah Pribadi": [
+        "Sahih Muslim 2675a",     # husnuzhan qudsi: "Aku sesuai persangkaan hamba-Ku"
+        "Sahih al-Bukhari 7405",  # husnuzhan qudsi (matn Arab kanonik)
+    ],
+    "Konflik & Geopolitik": [
+        "QS. Al-Hujuraat: 9",     # damaikan (ishlah) dua golongan mukmin yg bertikai
+        "QS. Al-Hujuraat: 10",    # innamal-mu'minuna ikhwah → damaikan saudaramu
+    ],
+}
+
+
+def merge_theme_daleel_seeds(
+    candidates: list[dict[str, Any]], group: str, *, cap: int = 32
+) -> list[dict[str, Any]]:
+    """Prepend curated anchor daleel for `group` ahead of the embedding-
+    retrieved `candidates`, deduped by citation.
+
+    Each seed is fetched by exact citation (so it is available regardless of
+    the week's similarity scores) and tagged ``_seed=True`` so the candidate
+    dump can label it ``curated seed`` instead of a misleading ``sim=0.000``.
+    Unresolved seeds are logged and skipped (never crash retrieval).
+    """
+    cites = THEME_DALEEL_SEEDS.get(group) or []
+    if not cites:
+        return candidates
+    seen = {c.get("citation") for c in candidates}
+    seeds: list[dict[str, Any]] = []
+    for cit in cites:
+        if cit in seen:
+            continue
+        hit = retrieve_by_citation(cit)
+        if not hit:
+            log.warning(
+                "kitab_retrieval.theme_seed_unresolved",
+                group=group,
+                citation=cit,
+            )
+            continue
+        hit["_seed"] = True
+        seeds.append(hit)
+        seen.add(hit.get("citation") or cit)
+    if not seeds:
+        return candidates
+    merged = seeds + candidates
+    return merged[:cap] if cap else merged
+
+
 def retrieve_tafsir_for_ayah(surah: int, ayah: int) -> dict[str, Any] | None:
     """Gather one ayah's tafsir from Qdrant — Ibn Kathir (EN) AND al-Tabari (AR).
 

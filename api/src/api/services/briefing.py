@@ -46,6 +46,7 @@ from api.config import settings
 from api.db import SessionLocal
 from api.models.admin import Briefing
 from api.services.kitab_retrieval import (
+    merge_theme_daleel_seeds,
     rerank_daleel,
     retrieve_daleel,
 )
@@ -3315,6 +3316,10 @@ async def generate_briefing(
         candidates = retrieve_daleel(
             retrieval_query, limit=28, per_corpus=6
         )
+        # Curated per-theme anchor daleel prepended before the rerank so a
+        # thin/generic news week can't drop a theme's defining verses/hadith
+        # (parity with the manual dump-candidates path). No-op w/o seeds.
+        candidates = merge_theme_daleel_seeds(candidates, group)
         # top_n=18 (was 10, 2026-05-24) — widened so the brief LLM has
         # genuinely-fitting daleel to pick from per flyer / per
         # sub-section without forcing a mis-citation. The rerank is
