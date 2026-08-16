@@ -905,6 +905,48 @@ export function briefingSlug(
 }
 
 
+/** Days an occasion card keeps showing AFTER its event date has passed. */
+const OCCASION_VISIBLE_DAYS_AFTER = 5;
+
+/**
+ * True while an occasion briefing is still worth FEATURING on the hub:
+ * its event date is upcoming, today, or at most
+ * `OCCASION_VISIBLE_DAYS_AFTER` days past.
+ *
+ * Both occasion tracks (Islamic-calendar "Acara Kalender Islam" and
+ * national "Acara Nasional") store the event day as
+ * `headline_stats.gregorian_date` ("YYYY-MM-DD").
+ *
+ * Why this exists: the hub used to be un-staled BY HAND — /briefings
+ * hardcoded `occasion={null}` from 2026-07-07 to 2026-08-16 purely
+ * because the newest occasion briefing had aged out. That needs no
+ * human toggle; the event date already says when the card stops being
+ * useful. Expiry is compared on the WIB calendar day (the audience is
+ * Indonesian), so a card lapses at local midnight, not at 07:00 WIB.
+ *
+ * NOTE: this only controls the FEATURED card. Expired occasion
+ * briefings stay fully reachable at their own URLs — the detail pages
+ * read `getBriefingBySlug`, not these getters.
+ *
+ * Fails OPEN: a missing/unparseable date returns true, so malformed
+ * `headline_stats` can never silently hide a fresh briefing.
+ */
+function isOccasionStillFeatured(headlineStats: unknown): boolean {
+  const raw = (headlineStats as { gregorian_date?: unknown } | null)
+    ?.gregorian_date;
+  if (typeof raw !== "string") return true;
+  const eventDay = Date.parse(`${raw}T00:00:00Z`);
+  if (Number.isNaN(eventDay)) return true;
+  // "today" as the WIB calendar date, compared UTC-midnight to UTC-midnight.
+  const todayWib = new Date().toLocaleDateString("en-CA", {
+    timeZone: "Asia/Jakarta",
+  });
+  const today = Date.parse(`${todayWib}T00:00:00Z`);
+  if (Number.isNaN(today)) return true;
+  return today <= eventDay + OCCASION_VISIBLE_DAYS_AFTER * 86_400_000;
+}
+
+
 /**
  * Latest Islamic-calendar occasion briefing (15th-track) — the one
  * whose `generated_at` is most recent across rows where
@@ -944,6 +986,9 @@ export async function getLatestOccasionBriefing(): Promise<
     .orderBy(desc(schema.briefings.generatedAt))
     .limit(1);
   if (!row) return null;
+  // Stop featuring the card once the event is >5 days past (see
+  // isOccasionStillFeatured) — the briefing itself stays reachable.
+  if (!isOccasionStillFeatured(row.headlineStats)) return null;
   return {
     ...row,
     summaryMd: stripWordCountAnnotations(row.summaryMd) as string,
@@ -993,6 +1038,9 @@ export async function getLatestNationalBriefing(): Promise<
     .orderBy(desc(schema.briefings.generatedAt))
     .limit(1);
   if (!row) return null;
+  // Stop featuring the card once the event is >5 days past (see
+  // isOccasionStillFeatured) — the briefing itself stays reachable.
+  if (!isOccasionStillFeatured(row.headlineStats)) return null;
   return {
     ...row,
     summaryMd: stripWordCountAnnotations(row.summaryMd) as string,
