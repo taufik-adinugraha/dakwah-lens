@@ -53,7 +53,12 @@ export async function generateMetadata({
   const config = DRILLDOWN_CONFIGS[platform as PlatformKey];
   if (!config) return {};
   const t = await getTranslations({ locale, namespace: config.namespace });
-  return { title: t("page_title") };
+  return {
+    title: t("page_title"),
+    // Same reasoning as /radar: keep the drill-down out of the index but
+    // crawlable, so the `noindex` is actually visible to Google.
+    robots: { index: false, follow: true },
+  };
 }
 
 // Region picker presets — mirror the onboarding `loc_*` codes so we use the
