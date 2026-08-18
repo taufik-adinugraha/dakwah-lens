@@ -50,7 +50,15 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/radar">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Briefing" });
-  return { title: t("explore_page_title") };
+  return {
+    // Keep the raw-data dashboard OUT of the index while staying crawlable:
+    // it is a constantly-changing widget page with no standalone search value.
+    // `noindex` (not a robots.txt block) is the correct lever — a blocked page
+    // can never be seen to carry this tag, which is how it previously ended up
+    // in GSC as "Indexed, though blocked by robots.txt".
+    robots: { index: false, follow: true },
+    title: t("explore_page_title"),
+  };
 }
 
 export default async function InsightsExplorePage({
