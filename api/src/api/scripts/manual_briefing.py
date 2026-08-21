@@ -405,6 +405,30 @@ def _candidates_cache_path(group_slug: str) -> Path:
     return _CACHE_DIR / f"{group_slug}_candidates.json"
 
 
+CAND_FIELD_CHARS = 400
+
+
+def _cand_field(label: str, text: str | None) -> str:
+    """Render one candidate field, always showing its TRUE length.
+
+    The candidate dump is what the picker actually reads to choose daleel,
+    so a silent clip here is a picking hazard, not just cosmetic. It used
+    to clip at 200 chars with no length shown: `Riyad as-Salihin 1587`'s
+    first 200 chars are pure isnad, so the entry looked like a bare stub
+    with no matn — and on 2026-08-20 two pick agents were told to avoid it
+    as unusable. It is in fact the hadits qudsi on withholding a worker's
+    wage: the single best anchor the labour theme had.
+
+    Showing `(612 ch)` makes "there is more past the cut" unmissable even
+    when the visible text happens to end at a plausible-looking place.
+    """
+    s = (text or "").replace("\n", " ").strip()
+    if not s:
+        return f"{label} (empty): —"
+    body = s if len(s) <= CAND_FIELD_CHARS else s[:CAND_FIELD_CHARS].rstrip() + " …[CLIPPED]"
+    return f"{label} ({len(s)} ch): {body}"
+
+
 def _format_candidates_markdown(
     group: str, slug: str, candidates: dict[str, Any]
 ) -> str:
@@ -437,11 +461,11 @@ def _format_candidates_markdown(
         score = d.get("score") or d.get("similarity", 0)
         score_s = f"{score:.3f}" if isinstance(score, (int, float)) else "?"
         tag = "curated seed" if d.get("_seed") else f"sim={score_s}"
-        ar = (d.get("arabic") or "")[:200].replace("\n", " ")
-        trn = (d.get("translation_id") or d.get("translation_en") or "")[:200].replace("\n", " ")
         lines.append(f"## {i}. {cit}  [{corpus} · {tag}]")
-        lines.append(f"AR: {ar}")
-        lines.append(f"ID/EN: {trn}")
+        lines.append(_cand_field("AR", d.get("arabic")))
+        lines.append(
+            _cand_field("ID/EN", d.get("translation_id") or d.get("translation_en"))
+        )
         lines.append("")
 
     lines.append(f"# Du'a candidates ({len(dua)} — pick 6)")
@@ -451,11 +475,11 @@ def _format_candidates_markdown(
         corpus = d.get("corpus", "?")
         score = d.get("score") or d.get("similarity", 0)
         score_s = f"{score:.3f}" if isinstance(score, (int, float)) else "?"
-        ar = (d.get("arabic") or "")[:200].replace("\n", " ")
-        trn = (d.get("translation_id") or d.get("translation_en") or "")[:200].replace("\n", " ")
         lines.append(f"## {i}. {cit}  [{corpus} · sim={score_s}]")
-        lines.append(f"AR: {ar}")
-        lines.append(f"ID/EN: {trn}")
+        lines.append(_cand_field("AR", d.get("arabic")))
+        lines.append(
+            _cand_field("ID/EN", d.get("translation_id") or d.get("translation_en"))
+        )
         lines.append("")
 
     lines.append(f"# Kisah Pendek seeds ({len(kisah)} — pick 1 kitab)")

@@ -63,6 +63,41 @@ MODEL = "gemini-2.5-pro"
 # `briefing.skip_thin_group`.
 MIN_POSTS_PER_GROUP_FOR_BRIEFING = 30
 
+# ── pool entry clipping ──────────────────────────────────────────────
+# Pool entries are clipped to keep the synthesis prompt affordable. The
+# clip itself is fine; doing it SILENTLY is not.
+#
+# A composer that sees a hadith stop mid-word has no way to know the text
+# was cut, so it completes the well-known ending from training memory —
+# producing scripture that was never retrieved. That is the exact failure
+# the Sharia rule in AGENTS.md forbids ("every Islamic reference must be
+# RETRIEVED from Qdrant, never freely generated").
+#
+# Measured on the 2026-08-20 batch: 427 of 645 pool Arabic fields (66%)
+# were cut mid-sentence, and that single mechanism produced the batch's
+# dominant defect class — from-memory matn in Hukum (Muslim 1827, whose
+# Arabic stopped inside the isnad so the matn was never supplied at all),
+# Inspirasi (×3), Patologi (Muslim 2121c, cut after item 1 of 5), and
+# Kesehatan. Six of seven briefings verified carried at least one.
+#
+# So: clip wider, and always mark the cut in a way the composer cannot
+# read as complete text.
+POOL_ARABIC_CHARS = 900  # was 300 — a hadith's isnad alone often exceeds it
+POOL_TRANSLATION_CHARS = 1200  # was 500
+_CLIP_MARKER = " …[TERPOTONG — kutip hanya sampai sini, jangan lanjutkan dari hafalan]"
+
+
+def _clip_pool_text(text: str | None, limit: int) -> str:
+    """Clip to `limit` chars, appending a visible marker when text was cut.
+
+    Never clip silently: an unmarked cut invites the composer to complete
+    the passage from memory. See POOL_ARABIC_CHARS above.
+    """
+    s = (text or "").strip()
+    if len(s) <= limit:
+        return s
+    return s[:limit].rstrip() + _CLIP_MARKER
+
 # Short intent line per theme group — gives the LLM 1-sentence
 # framing for what the group typically covers from a da'wah lens.
 # Used in the synthesis prompt so the briefing voice tracks the
@@ -2437,8 +2472,9 @@ def _build_occasion_user_prompt(
             return empty_marker
         return "\n\n".join(
             f"Citation: {d['citation']}\n"
-            f"Arabic: {d['arabic'][:300]}\n"
-            f"{translation_label}: {_translation_for(d)[:500]}"
+            f"Arabic: {_clip_pool_text(d['arabic'], POOL_ARABIC_CHARS)}\n"
+            f"{translation_label}: "
+            f"{_clip_pool_text(_translation_for(d), POOL_TRANSLATION_CHARS)}"
             for d in pool
         )
 
@@ -2666,8 +2702,9 @@ def _build_national_user_prompt(
             return empty_marker
         return "\n\n".join(
             f"Citation: {d['citation']}\n"
-            f"Arabic: {d['arabic'][:300]}\n"
-            f"{translation_label}: {_translation_for(d)[:500]}"
+            f"Arabic: {_clip_pool_text(d['arabic'], POOL_ARABIC_CHARS)}\n"
+            f"{translation_label}: "
+            f"{_clip_pool_text(_translation_for(d), POOL_TRANSLATION_CHARS)}"
             for d in pool
         )
 
@@ -2786,8 +2823,9 @@ def _build_user_prompt(
     daleel_block = (
         "\n\n".join(
             f"Citation: {d['citation']}\n"
-            f"Arabic: {d['arabic'][:300]}\n"
-            f"{translation_label}: {_translation_for(d)[:500]}"
+            f"Arabic: {_clip_pool_text(d['arabic'], POOL_ARABIC_CHARS)}\n"
+            f"{translation_label}: "
+            f"{_clip_pool_text(_translation_for(d), POOL_TRANSLATION_CHARS)}"
             for d in daleel
         )
         if daleel
@@ -2880,8 +2918,9 @@ def _build_user_prompt(
     if adhkar:
         adhkar_block = "\n\n".join(
             f"Citation: {a['citation']}\n"
-            f"Arabic: {a['arabic'][:300]}\n"
-            f"{translation_label}: {_translation_for(a)[:500]}"
+            f"Arabic: {_clip_pool_text(a['arabic'], POOL_ARABIC_CHARS)}\n"
+            f"{translation_label}: "
+            f"{_clip_pool_text(_translation_for(a), POOL_TRANSLATION_CHARS)}"
             for a in adhkar
         )
         adhkar_section = (
@@ -2952,8 +2991,9 @@ def _build_user_prompt(
     if flyer_daleel_pool:
         flyer_daleel_block = "\n\n".join(
             f"Citation: {d['citation']}\n"
-            f"Arabic: {d['arabic'][:300]}\n"
-            f"{translation_label}: {_translation_for(d)[:500]}"
+            f"Arabic: {_clip_pool_text(d['arabic'], POOL_ARABIC_CHARS)}\n"
+            f"{translation_label}: "
+            f"{_clip_pool_text(_translation_for(d), POOL_TRANSLATION_CHARS)}"
             for d in flyer_daleel_pool
         )
         flyer_pool_section += (
@@ -2979,8 +3019,9 @@ def _build_user_prompt(
     if flyer_adhkar_pool:
         flyer_adhkar_block = "\n\n".join(
             f"Citation: {a['citation']}\n"
-            f"Arabic: {a['arabic'][:300]}\n"
-            f"{translation_label}: {_translation_for(a)[:500]}"
+            f"Arabic: {_clip_pool_text(a['arabic'], POOL_ARABIC_CHARS)}\n"
+            f"{translation_label}: "
+            f"{_clip_pool_text(_translation_for(a), POOL_TRANSLATION_CHARS)}"
             for a in flyer_adhkar_pool
         )
         flyer_pool_section += (
