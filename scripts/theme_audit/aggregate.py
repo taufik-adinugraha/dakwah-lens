@@ -83,6 +83,49 @@ def main() -> None:
             corrections[i] = {"id": i, "from": cur.get(i, fl.get("from", "")), "to": to, "reason": reason}
 
     corr = list(corrections.values())
+
+    # ── null-coverage guard ──────────────────────────────────────────────
+    # A null post that no subagent flagged stays null forever: mark_audited.sh
+    # writes every reviewed post to the ledger, so future runs filter it out
+    # as "already audited" and never look at it again. Batch-level coverage
+    # above cannot see this — the batch is present and parseable, it just
+    # declined to label some rows.
+    #
+    # Measured 2026-08-21: 1,445 posts across runs #128-#132 were marked
+    # audited while still null, because AUDIT_INSTRUCTION.md's "be
+    # conservative, leave borderline alone" rule was applied to nulls too.
+    # For a null there is nothing to be conservative about; `Lainnya` is the
+    # answer. Report the gap loudly and hold apply.sql unless forced.
+    covered = set(corrections)
+    null_uncovered = sorted(
+        i for i, g in cur.items()
+        if (g is None or str(g).strip() in ("", "(null)", "None")) and i not in covered
+    )
+    if null_uncovered:
+        print(f"\n⚠️  NULL COVERAGE GAP: {len(null_uncovered)} null post(s) were "
+              f"reviewed but left unlabelled.")
+        print(f"    Marking these audited would strand them permanently null.")
+        print(f"    ids -> {sp}/null_uncovered.txt   (label them, or exclude "
+              f"them from mark_audited)")
+        with open(f"{sp}/null_uncovered.txt", "w") as f:
+            f.write("\n".join(null_uncovered) + "\n")
+    else:
+        # Clear any stale gap file from an earlier partial aggregate of this
+        # same run. mark_audited.sh reads this file to decide what to hold
+        # back, so leaving it behind after the gap closes would wrongly
+        # withhold now-covered posts from the ledger — they'd be re-audited
+        # from scratch next run. (Hit exactly this on audit#133: a mid-run
+        # aggregate wrote 641 ids, all of which were covered by the end.)
+        stale = f"{sp}/null_uncovered.txt"
+        if os.path.exists(stale):
+            os.remove(stale)
+            print(f"  (cleared stale null_uncovered.txt — gap has since closed)")
+        nulls_total = sum(
+            1 for g in cur.values()
+            if g is None or str(g).strip() in ("", "(null)", "None")
+        )
+        if nulls_total:
+            print(f"\n✓ null coverage complete: all {nulls_total} null post(s) labelled")
     print(f"reviewed={reviewed} corrections={len(corr)} skipped={dict(skipped)}")
     print("--- transitions (from -> to : n) ---")
     for (frm, to), n in Counter((c["from"], c["to"]) for c in corr).most_common():
