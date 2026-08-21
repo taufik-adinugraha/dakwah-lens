@@ -538,18 +538,96 @@ def generate_occasion_briefings() -> dict[str, object]:
         return {"error": "generate_failed"}
 
 
+# Rows repaired per run. Was 200, which at the 2h schedule (12 runs/day)
+# drains 2,400/day — at or BELOW the 2,000-3,500/day ingest rate, so a
+# backlog inside the 14-day window could never actually drain: rows aged
+# out of the window faster than the task reached them. 600 gives ~7,200/day,
+# comfortably above inflow, so a backlog shrinks instead of rotting.
+# This does NOT raise the monthly LLM bill: these are classifications the
+# ingest path already owed (one Gemini call per post, deferred by an
+# outage), so total spend is bounded by post volume, not by this cap.
+RETRY_SENTIMENT_ROW_CAP = 600
+
+# How far back to repair. Rows older than this are never revisited, so
+# anything still NULL past the cutoff is permanently unclassified.
+RETRY_SENTIMENT_WINDOW_DAYS = 14
+
+
+# The predicate and the write are extracted as pure functions (no DB, no
+# IO) so the two properties that actually caused the 2026-08-20 stranding
+# bug are unit-testable — see tests/test_retry_repair_semantics.py:
+#   1. the filter must reach rows whose theme_group alone is NULL, and
+#   2. the write must COALESCE, never blind-set, or it would silently undo
+#      hand-verified manual theme audits.
+# Imports stay function-local to match this module's existing lazy-import
+# style (keeps worker import time down / avoids model-import cycles).
+def retry_repair_filter(cutoff: datetime):
+    """Rows inside `cutoff` that are missing sentiment OR theme_group."""
+    from sqlalchemy import and_, or_
+
+    from api.models.social import SocialPost
+
+    return and_(
+        SocialPost.text.is_not(None),
+        SocialPost.posted_at >= cutoff,
+        or_(
+            SocialPost.sentiment_label.is_(None),
+            SocialPost.theme_group.is_(None),
+        ),
+    )
+
+
+def retry_repair_values(label: str, score: float, theme_group: str | None) -> dict:
+    """Fill-in write: `coalesce(existing, new)` for every column.
+
+    Never overwrites a value that is already present — see the task
+    docstring for why that is load-bearing for `theme_group`.
+    """
+    from sqlalchemy import func
+
+    from api.models.social import SocialPost
+
+    return {
+        "sentiment_label": func.coalesce(SocialPost.sentiment_label, label),
+        "sentiment_score": func.coalesce(SocialPost.sentiment_score, score),
+        "theme_group": func.coalesce(SocialPost.theme_group, theme_group),
+    }
+
+
 @celery_app.task(name="api.workers.ingest.retry_failed_sentiment")
 def retry_failed_sentiment() -> dict[str, int]:
-    """Re-classify posts whose sentiment label is NULL.
+    """Repair posts missing `sentiment_label` OR `theme_group`.
 
-    These rows result from sustained Gemini 5xx outages that exhausted
-    the in-line retry budget inside `sentiment._classify_chunk`. Covers
-    every platform (mainstream + X + YT + IG + TT) since the 2026-05-25
-    cutover to a single Gemini classifier.
+    These rows result from sustained Gemini outages that exhausted the
+    in-line retry budget inside `sentiment._classify_chunk` (5xx) or that
+    never got a response at all (429 RESOURCE_EXHAUSTED when the prepay
+    balance is depleted — the 4/8/16s backoff only covers ServerError, so
+    quota failures land straight here). Covers every platform (mainstream
+    + X + YT + IG + TT) since the 2026-05-25 single-classifier cutover.
 
-    Scoped to the last 14 days so a backlog from an old outage doesn't
-    grow unbounded. Caps at 200 rows per run so a worst-case batch
-    can't blow our Gemini-per-minute quota.
+    FILL-IN SEMANTICS — this task repairs missing fields and NEVER
+    overwrites data that is already present. Every write goes through
+    `coalesce(existing, new)`. That matters for two reasons:
+      * `theme_group` is also written directly by the manual theme audits
+        (232k+ rows as of 2026-08-20). A blind write here would silently
+        undo that hand-verified work.
+      * Re-running the classifier over a row whose sentiment was already
+        good shouldn't churn its label.
+
+    WHY IT ALSO REPAIRS theme_group (fix 2026-08-20): `classify_batch`
+    returns sentiment AND theme_group from a single Gemini call, and the
+    normal ingest path persists both (`scripts/ingest.py`). This task used
+    to write only the two sentiment columns and DISCARD `s.theme_group`.
+    Because its own predicate was `sentiment_label IS NULL`, every row it
+    repaired became permanently unreachable with `theme_group` still NULL
+    — silently stranding it. That produced 848 orphans, with a further
+    9,327 rows queued to be stranded the moment credits were topped up.
+    Selecting on `sentiment_label IS NULL OR theme_group IS NULL` and
+    coalescing the theme in closes both halves of that hole.
+
+    Scoped to the last `RETRY_SENTIMENT_WINDOW_DAYS` so an old backlog
+    doesn't grow unbounded, and capped at `RETRY_SENTIMENT_ROW_CAP` rows
+    per run so a worst-case batch can't blow the Gemini per-minute quota.
 
     Schedule: every 2h offset 1h from the RSS ingest (so 01:00, 03:00
     … WIB). The offset means an RSS-induced 503 has a full hour to
@@ -557,76 +635,111 @@ def retry_failed_sentiment() -> dict[str, int]:
     """
     if not is_task_enabled("retry_failed_sentiment", "all"):
         log.info("pipeline.disabled", task="retry_failed_sentiment")
-        return {"checked": 0, "relabeled": 0, "still_failed": 0, "disabled": True}
+        return {
+            "checked": 0,
+            "relabeled": 0,
+            "themed": 0,
+            "still_failed": 0,
+            "disabled": True,
+        }
 
-    from sqlalchemy import and_, select, update
+    from sqlalchemy import select, update
 
     from api.db import SessionLocal
     from api.models.social import SocialPost
     from api.services.sentiment import classify_batch as classify_sentiment
 
-    cutoff = datetime.now(UTC) - timedelta(days=14)
+    cutoff = datetime.now(UTC) - timedelta(days=RETRY_SENTIMENT_WINDOW_DAYS)
 
     async def _runner() -> dict[str, int]:
         async with SessionLocal() as session:
             rows = (
                 await session.execute(
-                    select(SocialPost.id, SocialPost.text)
-                    .where(
-                        and_(
-                            SocialPost.sentiment_label.is_(None),
-                            SocialPost.text.is_not(None),
-                            SocialPost.posted_at >= cutoff,
-                        )
+                    select(
+                        SocialPost.id,
+                        SocialPost.text,
+                        SocialPost.sentiment_label,
+                        SocialPost.theme_group,
                     )
+                    .where(retry_repair_filter(cutoff))
                     .order_by(SocialPost.posted_at.desc().nulls_last())
-                    .limit(200)
+                    .limit(RETRY_SENTIMENT_ROW_CAP)
                 )
             ).all()
 
             if not rows:
                 log.info("retry_failed_sentiment.nothing_to_do")
-                return {"checked": 0, "relabeled": 0, "still_failed": 0}
+                return {
+                    "checked": 0,
+                    "relabeled": 0,
+                    "themed": 0,
+                    "still_failed": 0,
+                }
 
             ids = [r.id for r in rows]
             texts = [r.text or "" for r in rows]
+            needed_label = {r.id for r in rows if r.sentiment_label is None}
+            needed_theme = {r.id for r in rows if r.theme_group is None}
             scored = classify_sentiment(texts)
 
             relabeled = 0
+            themed = 0
             still_failed = 0
             for post_id, s in zip(ids, scored, strict=False):
                 if s is None:
                     still_failed += 1
-                    # Leave label NULL — next cron tick retries.
+                    # Leave the NULLs — next cron tick retries.
                     continue
                 await session.execute(
                     update(SocialPost)
                     .where(SocialPost.id == post_id)
-                    .values(
-                        sentiment_label=s.label,
-                        sentiment_score=s.score,
-                    )
+                    .values(**retry_repair_values(s.label, s.score, s.theme_group))
                 )
-                relabeled += 1
+                if post_id in needed_label:
+                    relabeled += 1
+                # s.theme_group is None when the model omitted it or emitted
+                # an invalid name — that row stays NULL and is retried.
+                if post_id in needed_theme and s.theme_group is not None:
+                    themed += 1
             await session.commit()
 
             log.info(
                 "retry_failed_sentiment.done",
                 checked=len(rows),
                 relabeled=relabeled,
+                themed=themed,
                 still_failed=still_failed,
             )
             return {
                 "checked": len(rows),
                 "relabeled": relabeled,
+                "themed": themed,
                 "still_failed": still_failed,
             }
 
     try:
         return asyncio.run(_runner())
-    except Exception:
-        log.exception("retry_failed_sentiment.failed")
-        return {"checked": 0, "relabeled": 0, "still_failed": 0}
+    except Exception as exc:
+        # Surface a depleted prepay balance as its own high-signal event.
+        # It is NOT a transient error: no amount of retrying fixes it, only
+        # an operator top-up does, and until then EVERY post ingested lands
+        # unclassified. It arrives as a google.genai ClientError (429), which
+        # the in-line ServerError backoff does not catch, so this is where it
+        # surfaces. Matched on message text to avoid importing genai types.
+        msg = str(exc)
+        if "RESOURCE_EXHAUSTED" in msg or "prepayment credits" in msg:
+            log.error(
+                "retry_failed_sentiment.quota_exhausted",
+                hint=(
+                    "Gemini prepay balance depleted — classification is DOWN "
+                    "pipeline-wide (sentiment + theme_group + topic + rerank). "
+                    "Top up at https://ai.studio/projects; retrying cannot fix it."
+                ),
+                error=msg[:300],
+            )
+        else:
+            log.exception("retry_failed_sentiment.failed")
+        return {"checked": 0, "relabeled": 0, "themed": 0, "still_failed": 0}
 
 
 @celery_app.task(name="api.workers.ingest.reconcile_apify_costs")
