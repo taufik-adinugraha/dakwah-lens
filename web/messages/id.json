@@ -1143,7 +1143,9 @@
     "group_sentiment_empty": "Belum ada postingan ber-label sentimen untuk dirangkum.",
     "group_topic_filter_active_tpl": "Memfilter postingan untuk topik: {topic}",
     "group_topic_filter_clear": "Hapus filter topik",
-    "group_posts_filter_label": "Filter sentimen:"
+    "group_posts_filter_label": "Filter sentimen:",
+    "m_seo_title": "Artikel Dakwah Tema {theme}: {hook}",
+    "m_seo_description": "{hook} — artikel dakwah mingguan bertema {theme}, dengan rujukan Al-Qur'an dan hadits serta tanya-jawab. Edisi {date}."
   },
   "Youtube": {
     "page_title": "YouTube",
