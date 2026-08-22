@@ -6,7 +6,7 @@ import { ArrowLeft, MessageSquareQuote } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { getBriefingBySlug } from "@/lib/briefing-data";
 import { localeAwareFormat } from "@/lib/date-id";
-import { localeAlternates } from "@/lib/seo";
+import { localeAlternates, SITE_URL } from "@/lib/seo";
 import { extractMahasiswaContent } from "@/lib/flyer/content";
 import { ShareButton } from "../../d/[brief]/[deliverable]/ShareButton";
 import { Article } from "./Article";
@@ -36,18 +36,67 @@ type Props = {
 // approved comments — both need a fresh server render every time.
 export const dynamic = "force-dynamic";
 
+/** Trim at a word boundary with an ellipsis; never mid-word. */
+function trimAtWord(s: string, max: number): string {
+  if (s.length <= max) return s;
+  const cut = s.slice(0, max + 1);
+  const at = cut.lastIndexOf(" ");
+  return `${cut.slice(0, at > 40 ? at : max).trimEnd()}…`;
+}
+
+/**
+ * SEO strings for a briefing's /m page, shared by generateMetadata and
+ * the page's JSON-LD so the two can never drift apart.
+ *
+ * Why the title is NOT the bare poster question any more: the question
+ * is a rhetorical hook ("Kalau Umar mencatat penggembala di Aden…") —
+ * strong on the page, but nobody types it into Google. People search
+ * "artikel dakwah tema pekerja" / "materi dakwah teknologi". So the
+ * title leads with the searchable phrase and keeps a trimmed hook for
+ * uniqueness; the H1 on the page still carries the full hook. This
+ * measured 44 impressions/week across ~2,350 indexed pages before the
+ * change (GSC, 2026-08-22).
+ *
+ * Also fixes a doubled suffix: the old title appended "— Dakwah-Lens"
+ * while the root layout template appends "· Dakwah-Lens", so every
+ * briefing rendered "… — Dakwah-Lens · Dakwah-Lens" in the SERP.
+ */
+function buildSeo(
+  t: Awaited<ReturnType<typeof getTranslations>>,
+  brief: { themeGroup: string | null; generatedAt: Date },
+  question: string,
+  locale: string,
+) {
+  const theme = brief.themeGroup ?? "Dakwah";
+  const date = localeAwareFormat(brief.generatedAt, locale, {
+    month: "long",
+    year: "numeric",
+    timeZone: "Asia/Jakarta",
+  });
+  return {
+    title: t("m_seo_title", { theme, hook: trimAtWord(question, 60) }),
+    description: t("m_seo_description", {
+      hook: trimAtWord(question, 110),
+      theme,
+      date,
+    }),
+  };
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id, locale } = await params;
   const brief = await getBriefingBySlug(id);
-  if (!brief) return { title: "Dakwah-Lens" };
+  // `absolute` keeps the fallback from becoming "Dakwah-Lens · Dakwah-Lens"
+  // via the layout's `%s · Dakwah-Lens` template.
+  if (!brief) return { title: { absolute: "Dakwah-Lens" } };
   const body = locale === "en" && brief.summaryMdEn ? brief.summaryMdEn : brief.summaryMd;
   const m = extractMahasiswaContent(body);
-  const title = m.question
-    ? `${m.question} — Dakwah-Lens`
-    : "Dakwah-Lens";
+  if (!m.question) return { title: { absolute: "Dakwah-Lens" } };
+  const t = await getTranslations({ locale, namespace: "Briefing" });
+  const { title, description } = buildSeo(t, brief, m.question, locale);
   return {
     title,
-    description: m.question || undefined,
+    description,
     alternates: localeAlternates({
       locale,
       canonicalPath: `/m/${id}`,
@@ -55,8 +104,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }),
     openGraph: {
       title,
-      description: m.question || undefined,
+      description,
       type: "article",
+      publishedTime: brief.generatedAt.toISOString(),
     },
   };
 }
@@ -90,8 +140,44 @@ export default async function MahasiswaArticlePage({ params }: Props) {
   // segment_${slug}_title i18n keys that no longer exist.
   const segmentLabel = brief.themeGroup ?? t("brief_scope_all");
 
+  // Article structured data — briefing pages carried zero ld+json
+  // before 2026-08-22, so nothing was eligible for rich results.
+  // Organization author/publisher (not Person): the briefing is
+  // AI-assisted editorial output of the org, per the transparency page.
+  const pageUrl = `${SITE_URL}/${locale}/m/${id}`;
+  const seo = m.question ? buildSeo(t, brief, m.question, locale) : null;
+  const jsonLd = seo && {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: trimAtWord(m.question, 110),
+    description: seo.description,
+    datePublished: brief.generatedAt.toISOString(),
+    dateModified: brief.generatedAt.toISOString(),
+    inLanguage: locale,
+    ...(brief.themeGroup ? { articleSection: brief.themeGroup } : {}),
+    isAccessibleForFree: true,
+    mainEntityOfPage: { "@type": "WebPage", "@id": pageUrl },
+    author: { "@type": "Organization", name: "Dakwah-Lens", url: SITE_URL },
+    publisher: {
+      "@type": "Organization",
+      name: "Dakwah-Lens",
+      url: SITE_URL,
+      logo: { "@type": "ImageObject", url: `${SITE_URL}/apple-icon.png` },
+    },
+  };
+
   return (
     <main className="min-h-screen bg-paper-deep">
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          // `<` escaped so markdown content can never close the script
+          // tag early (standard JSON-LD XSS hygiene).
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+          }}
+        />
+      )}
       {/* HERO BAND — Poster Question is the visual focal point. The
           colored gradient identifies the briefing's segment without
           needing the rest of the site chrome. */}

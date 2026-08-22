@@ -1143,7 +1143,9 @@
     "group_sentiment_empty": "No sentiment-labelled posts to summarise yet.",
     "group_topic_filter_active_tpl": "Filtering posts for topic: {topic}",
     "group_topic_filter_clear": "Clear topic filter",
-    "group_posts_filter_label": "Sentiment filter:"
+    "group_posts_filter_label": "Sentiment filter:",
+    "m_seo_title": "Da'wah Article on {theme}: {hook}",
+    "m_seo_description": "{hook} — a weekly da'wah article on {theme}, grounded in Qur'an and hadith references, with Q&A. {date} edition."
   },
   "Youtube": {
     "page_title": "YouTube",
