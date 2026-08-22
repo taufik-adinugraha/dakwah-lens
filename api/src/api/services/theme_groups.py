@@ -256,7 +256,11 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "(mengantuk, gorong-gorong terbuka, tabrakan beruntun) — itu "
         "Lingkungan & Bencana. BUKAN iklan/promo jasa (jasa balikin akun, "
         "hapus akun) — itu Lainnya. BUKAN insiden teknis/keselamatan "
-        "(eskalator mall overload) tanpa unsur kriminal — itu Lainnya"
+        "(eskalator mall overload) tanpa unsur kriminal — itu Lainnya. "
+        "TERMASUK kekerasan kelompok bersenjata domestik (KKB/OPM/TPNPB di "
+        "Papua: penembakan, penyanderaan, kontak senjata) — itu pidana "
+        "bersenjata dalam negeri, BUKAN konflik internasional dan BUKAN "
+        "Lainnya (audit#133)"
     ),
     "Sosial & Keluarga": (
         "KS, KDRT, perlindungan anak, kebijakan keluarga, dinamika sosial "
@@ -440,7 +444,11 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "pemerintah) → Pemerintahan & Kebijakan. BUKAN sepak bola / "
         "kompetisi olahraga internasional (Piala Dunia, taktik "
         "pertandingan, biografi pelatih, rivalitas klub/negara) — itu "
-        "Lainnya (audit#96). Sejarah/perdagangan kuno "
+        "Lainnya (audit#96). BUKAN kekerasan kelompok bersenjata domestik "
+        "(KKB/OPM/TPNPB di Papua: penembakan, penyanderaan, kontak "
+        "senjata) — itu bukan konflik internasional; kasus pidana "
+        "bersenjata di dalam negeri → Hukum & Keadilan (audit#133). "
+        "Sejarah/perdagangan kuno "
         "tanpa dimensi geopolitik terkini → Lainnya"
     ),
     "Inspirasi & Kisah Pribadi": (
