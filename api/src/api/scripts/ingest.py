@@ -25,7 +25,7 @@ import asyncio
 import sys
 
 import structlog
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert
 
 from api.db import SessionLocal
@@ -315,14 +315,44 @@ async def _run(
                 set_={
                     "text": insert(SocialPost).excluded.text,
                     "language": insert(SocialPost).excluded.language,
-                    "sentiment_label": insert(SocialPost).excluded.sentiment_label,
-                    "sentiment_score": insert(SocialPost).excluded.sentiment_score,
+                    # COALESCE, not a blind overwrite. A failed Gemini call
+                    # leaves these NULL on the incoming row (see the
+                    # `getattr(s, ..., None)` block above), and a blind
+                    # overwrite then ERASES a good existing classification
+                    # every time an already-seen post is re-ingested.
+                    #
+                    # Measured 2026-08-21: 66 posts in a 10-day window had
+                    # been correctly labelled, then re-nulled by a later
+                    # re-ingest — including labels a manual theme audit had
+                    # just written. Their `updated_at` all predated the
+                    # audit's own UPDATE, which is how the direction of the
+                    # damage was established. While the Gemini prepay
+                    # balance is depleted, `s` is None on EVERY call, so
+                    # this silently eats audit corrections wholesale.
+                    #
+                    # New value wins when present (the upsert is meant to
+                    # refresh); the old value survives only when the new one
+                    # is NULL. Note this is the OPPOSITE order from
+                    # `retry_repair_values` in workers/ingest.py, which is a
+                    # gap-filler and must never overwrite — different intent,
+                    # deliberately different coalesce order.
+                    "sentiment_label": func.coalesce(
+                        insert(SocialPost).excluded.sentiment_label,
+                        SocialPost.sentiment_label,
+                    ),
+                    "sentiment_score": func.coalesce(
+                        insert(SocialPost).excluded.sentiment_score,
+                        SocialPost.sentiment_score,
+                    ),
                     # dawah_relevance + categories deliberately omitted from
                     # the upsert SET since 2026-06-05 — those columns are
                     # retired but kept in the schema. Existing values are
                     # preserved; new rows just get NULL by column default.
                     "dawah_opportunity": insert(SocialPost).excluded.dawah_opportunity,
-                    "theme_group": insert(SocialPost).excluded.theme_group,
+                    "theme_group": func.coalesce(
+                        insert(SocialPost).excluded.theme_group,
+                        SocialPost.theme_group,
+                    ),
                     "region": insert(SocialPost).excluded.region,
                     "raw_payload": insert(SocialPost).excluded.raw_payload,
                     # Engagement REFRESHED on every upsert (view counts
