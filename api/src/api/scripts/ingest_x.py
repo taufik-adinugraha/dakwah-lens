@@ -23,7 +23,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 import structlog
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert
 
 from api.db import SessionLocal
@@ -165,13 +165,30 @@ async def _run(query: str, limit: int) -> int:
                 index_elements=["platform", "external_id"],
                 set_={
                     "text": insert(SocialPost).excluded.text,
-                    "sentiment_label": insert(SocialPost).excluded.sentiment_label,
-                    "sentiment_score": insert(SocialPost).excluded.sentiment_score,
+                    # COALESCE, not a blind overwrite — see the long note in
+                    # scripts/ingest.py. `s` is None whenever a Gemini chunk
+                    # exhausts its retry budget, which sets these NULL on the
+                    # incoming row; a blind overwrite then erases a good
+                    # existing classification on every re-ingest of an
+                    # already-seen post, including labels a manual theme
+                    # audit just wrote. New value wins when present; the old
+                    # one survives only when the new one is NULL.
+                    "sentiment_label": func.coalesce(
+                        insert(SocialPost).excluded.sentiment_label,
+                        SocialPost.sentiment_label,
+                    ),
+                    "sentiment_score": func.coalesce(
+                        insert(SocialPost).excluded.sentiment_score,
+                        SocialPost.sentiment_score,
+                    ),
                     # dawah_relevance + categories retired 2026-06-05;
                     # omitted from SET so existing values stay intact
                     # for historical rows. New rows just have them NULL.
                     "dawah_opportunity": insert(SocialPost).excluded.dawah_opportunity,
-                    "theme_group": insert(SocialPost).excluded.theme_group,
+                    "theme_group": func.coalesce(
+                        insert(SocialPost).excluded.theme_group,
+                        SocialPost.theme_group,
+                    ),
                     "raw_payload": insert(SocialPost).excluded.raw_payload,
                 },
             )
