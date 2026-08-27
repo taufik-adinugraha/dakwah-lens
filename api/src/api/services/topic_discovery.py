@@ -148,7 +148,7 @@ MIN_SIMILARITY = 0.24
 # because the candidate pool is gated by theme_group agreement, so this
 # loosening doesn't reintroduce the noise the strict floor exists to
 # block.
-RESCUE_FLOOR = 0.20
+RESCUE_FLOOR = 0.28
 
 # Third-pass any-target rescue floor (added 2026-06-18 after Pro recluster
 # audit found Lainnya leaking ~40% of sampled posts to named-sibling
@@ -175,7 +175,21 @@ RESCUE_FLOOR = 0.20
 # get a clean home. Bleed risk is bounded by the still-strict 0.22 cap
 # — a post that doesn't even cosine 0.22 to ANY named centroid is
 # genuinely off-taxonomy.
-ANY_TARGET_RESCUE_FLOOR = 0.22
+ANY_TARGET_RESCUE_FLOOR = 0.32
+
+# Raised from 0.22 on 2026-08-27 after a purity audit with EVIDENCE, not
+# inference. At 0.22 a topic centroid pulls in its broad CATEGORY rather
+# than its specific event: "Kasus Narkoba dan Penindakan BNN" had
+# collected a phone snatcher, hajj-quota corruption, DPRD bribery and a
+# water-tank thief (generic crime, zero narcotics); "Alih Status Guru
+# PPPK" had collected students grading ministers and a viral
+# teacher-salary post (education-adjacent, zero PPPK). 19 of 24 topics
+# sat below 0.50 purity, measured as the share of a topic's assigned
+# posts containing any of that topic's own keywords.
+#
+# RESCUE_FLOOR moved 0.20 -> 0.28 for the same reason; it is the
+# theme_group-gated pass, so it can stay slightly looser than the
+# ungated one.
 
 # Floor to use when theme_group coverage is ~zero, i.e. the in-group gate
 # is entirely unavailable and cosine is the ONLY thing deciding. The
