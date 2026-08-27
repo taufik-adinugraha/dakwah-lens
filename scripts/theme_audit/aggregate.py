@@ -41,8 +41,15 @@ def main() -> None:
             o = json.loads(line)
             cur[o["id"]] = o["tg"]
 
-    parts = {stem(p, "part_") for p in glob.glob(f"{sp}/in/part_*.jsonl")}
-    done = {stem(p, "flags_") for p in glob.glob(f"{sp}/out/flags_*.json")}
+    # STRICT two-digit glob. `prepare.py` writes exactly `part_NN.jsonl`, but
+    # subagents told to work in chunks sometimes split their input into
+    # sibling files in the same dir (`part_04_chunk_0.jsonl`, …). A loose
+    # `part_*.jsonl` counted those as extra batches — audit#135 reported
+    # "batches: 31" for a 23-batch run and listed the chunk names as MISSING
+    # forever, so a final non-force aggregate could never come back clean.
+    # Same reasoning for flags: only `flags_NN.json` is a batch result.
+    parts = {stem(p, "part_") for p in glob.glob(f"{sp}/in/part_[0-9][0-9].jsonl")}
+    done = {stem(p, "flags_") for p in glob.glob(f"{sp}/out/flags_[0-9][0-9].json")}
     missing = sorted(parts - done)
     print(f"batches: {len(parts)} | completed: {len(done)} | MISSING: {missing or 'none'}")
 
@@ -50,7 +57,7 @@ def main() -> None:
     reviewed = 0
     notes: list[str] = []
     skipped: Counter = Counter()
-    for ff in sorted(glob.glob(f"{sp}/out/flags_*.json")):
+    for ff in sorted(glob.glob(f"{sp}/out/flags_[0-9][0-9].json")):
         try:
             data = json.load(open(ff))
         except Exception as e:

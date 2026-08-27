@@ -89,6 +89,7 @@ import structlog
 from api.db import SessionLocal
 from api.models.admin import Briefing
 from api.services.briefing import (
+    MIN_POSTS_PER_GROUP_FOR_BRIEFING,
     SYSTEM_PROMPT_ID,
     _build_retrieval_query,
     _build_user_prompt,
@@ -176,6 +177,7 @@ def _cache_path(group_slug: str) -> Path:
 
 async def _prepare_unranked_candidates(
     group: str,
+    allow_thin: bool = False,
 ) -> dict[str, Any]:
     """Two-stage flow STEP 1: run retrieval, skip every Gemini call.
 
@@ -195,10 +197,39 @@ async def _prepare_unranked_candidates(
     """
     async with SessionLocal() as session:
         stats = await _compute_stats(session, group)
-        if stats["totals"]["posts_7d"] == 0:
+        posts_7d = stats["totals"]["posts_7d"]
+        if posts_7d == 0:
             raise SystemExit(
                 f"No posts in the 7-day window for group '{group}'. "
                 "Aborting — there's nothing to brief on."
+            )
+        # Volume floor parity with the auto pipeline. `generate_briefings_for_
+        # all_groups` marks a group "skipped:thin" below this floor, but this
+        # manual path only ever guarded ==0 — so every "all 14" batch shipped
+        # low-volume groups the auto pipeline would have skipped. Toleransi &
+        # Lintas-Iman ran 10+ consecutive weeks that way (19 posts on
+        # 2026-08-27, 13 the week before) and nobody was told.
+        #
+        # Not a hard stop: some themes are structurally low-volume without
+        # being low-importance, and a briefing anchored on retrieved daleel
+        # rather than news volume can still be sound. But it must be a
+        # DELIBERATE call, not a silent side effect of which code path ran.
+        if posts_7d < MIN_POSTS_PER_GROUP_FOR_BRIEFING and not allow_thin:
+            raise SystemExit(
+                f"Only {posts_7d} posts in the 7-day window for '{group}' — "
+                f"below the {MIN_POSTS_PER_GROUP_FOR_BRIEFING}-post floor that "
+                f"the auto pipeline enforces (it would mark this "
+                f"'skipped:thin').\n"
+                "  The news basis is thin, so anchor on retrieved daleel and "
+                "do not over-claim from the few headlines there are.\n"
+                "  Pass --allow-thin to generate anyway."
+            )
+        if posts_7d < MIN_POSTS_PER_GROUP_FOR_BRIEFING:
+            log.warning(
+                "manual_briefing.thin_volume_override",
+                theme_group=group,
+                posts_7d=posts_7d,
+                floor=MIN_POSTS_PER_GROUP_FOR_BRIEFING,
             )
 
         retrieval_query = _build_retrieval_query(stats, group)
@@ -513,11 +544,13 @@ def _format_candidates_markdown(
     return "\n".join(lines)
 
 
-async def cmd_dump_candidates(group_arg: str, output_path: str | None) -> None:
+async def cmd_dump_candidates(
+    group_arg: str, output_path: str | None, allow_thin: bool = False
+) -> None:
     group = _resolve_group(group_arg)
     slug = _group_slug(group)
 
-    candidates = await _prepare_unranked_candidates(group)
+    candidates = await _prepare_unranked_candidates(group, allow_thin=allow_thin)
 
     # Cache the unranked candidates so `dump-prompt` can apply Claude's
     # picks without re-running retrieval.
@@ -3484,6 +3517,15 @@ def main() -> None:
         help="Write candidates markdown to this file. Default: stdout.",
         default=None,
     )
+    p_dump_c.add_argument(
+        "--allow-thin",
+        action="store_true",
+        help=(
+            f"Generate even when the group has fewer than "
+            f"{MIN_POSTS_PER_GROUP_FOR_BRIEFING} posts in the 7-day window "
+            "(the floor the auto pipeline enforces). Logged when used."
+        ),
+    )
 
     p_dump_p = sub.add_parser(
         "dump-prompt",
@@ -3721,7 +3763,9 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.cmd == "dump-candidates":
-        asyncio.run(cmd_dump_candidates(args.group, args.output))
+        asyncio.run(
+            cmd_dump_candidates(args.group, args.output, args.allow_thin)
+        )
     elif args.cmd == "dump-prompt":
         asyncio.run(cmd_dump_prompt(args.group, args.picks, args.output))
     elif args.cmd == "cache-translation":
