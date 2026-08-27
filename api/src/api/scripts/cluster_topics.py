@@ -55,6 +55,12 @@ log = structlog.get_logger()
 # handful of unrelated posts.
 MIN_POSTS_FOR_DISCOVERY = 20
 
+# If the opportunity floor keeps less than this fraction of the window, the
+# score column is not discriminating — it is broken — and filtering on it
+# throws away the corpus. See the starvation check in `_fetch_recent_posts`.
+# 5% of a normal week (~20k posts) is ~1,000, still ample for discovery.
+FLOOR_STARVATION_RATIO = 0.05
+
 # Topic discovery is a STRATIFIED sample: up to PER_DAY_CAP posts from
 # each of the last TOPIC_DISCOVERY_WINDOW_DAYS days. Total upper bound is
 # PER_DAY_CAP × DAYS, but most days will yield fewer.
@@ -189,12 +195,40 @@ async def _fetch_recent_posts() -> list[dict[str, Any]]:
             ]
 
         rows = await _sample(apply_opportunity_floor=True)
-        if len(rows) < MIN_POSTS_FOR_DISCOVERY:
-            # The floor starved discovery — treat it as a classifier-outage
-            # signal and re-sample the same stratified window unfiltered.
+
+        # Starvation must be judged RELATIVE to the window, not against a
+        # fixed floor. The old test was `len(rows) < MIN_POSTS_FOR_DISCOVERY`
+        # (20), which only catches a *totally* empty result.
+        #
+        # Measured 2026-08-27: the window held 20,672 posts, of which 20,643
+        # (99.86%) scored `dawah_opportunity = 0` because the opportunity
+        # classifier writes 0.0 — not NULL — when its API call fails. The
+        # floor therefore rejected everything except 29 posts, and 29 >= 20,
+        # so this guard stayed silent and discovery ran on a 29-post sample
+        # of a 20k-post corpus. Nothing errored; the output was just
+        # meaningless.
+        #
+        # Compare against the unfiltered window instead: if the floor keeps
+        # less than FLOOR_STARVATION_RATIO of what is actually there, the
+        # score column is not carrying information and filtering on it is
+        # worse than not filtering at all.
+        total_in_window = await session.scalar(
+            select(func.count())
+            .select_from(SocialPost)
+            .where(
+                SocialPost.posted_at >= window_start,
+                SocialPost.text.is_not(None),
+            )
+        )
+        if total_in_window and (
+            len(rows) < MIN_POSTS_FOR_DISCOVERY
+            or len(rows) < FLOOR_STARVATION_RATIO * total_in_window
+        ):
             log.warning(
                 "topic_discovery.opportunity_floor_starved",
                 floored=len(rows),
+                window_total=total_in_window,
+                kept_pct=round(100.0 * len(rows) / total_in_window, 2),
                 min_required=MIN_POSTS_FOR_DISCOVERY,
                 action="refetch_without_opportunity_floor",
             )

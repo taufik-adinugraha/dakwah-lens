@@ -177,6 +177,16 @@ RESCUE_FLOOR = 0.20
 # genuinely off-taxonomy.
 ANY_TARGET_RESCUE_FLOOR = 0.22
 
+# Floor to use when theme_group coverage is ~zero, i.e. the in-group gate
+# is entirely unavailable and cosine is the ONLY thing deciding. The
+# adaptive blend between the two lives in the any-target rescue pass
+# below; see the comment there for the outage that motivated it.
+# 0.34 is deliberately above the strict MIN_SIMILARITY (0.24): with no
+# correctness check at all, a rescue should be *harder* than a normal
+# assignment, not easier. Leaving a post in Lainnya is recoverable; a
+# confidently mislabelled topic is not.
+ANY_TARGET_RESCUE_FLOOR_UNGATED = 0.34
+
 # A theme needs at least this many assigned posts to survive. Mirrors the
 # old prompt rule ("a theme needs at least 2 posts"); a 1-post theme is
 # usually an embedding fluke, not a trend.
@@ -1463,6 +1473,30 @@ def discover_topics(
     # theme_group cosine matches. See ANY_TARGET_RESCUE_FLOOR comment.
     any_target_rescued: set[int] = set()
     if orphan_ids:
+        # ADAPTIVE FLOOR. The 0.22 constant assumes this pass is the rare
+        # exception — that most posts carry a theme_group, so the gated
+        # in-group pass does the bulk of the rescuing and the correctness
+        # check it provides is usually present.
+        #
+        # That assumption inverts during a classifier outage. Measured
+        # 2026-08-27: ~98% of the window had theme_group NULL, so the
+        # in-group pass could not fire at all and this ungated 0.22 pass
+        # became the DOMINANT assignment path. Purity collapsed — 19 of 24
+        # topics landed below 0.50 (share of assigned posts containing any
+        # of their own topic's keywords), and raising per-theme
+        # `min_similarity` did nothing because this pass ignores it.
+        #
+        # The floor must therefore scale with how much of the correctness
+        # check is actually available: full theme_group coverage keeps the
+        # documented 0.22; near-zero coverage tightens toward
+        # ANY_TARGET_RESCUE_FLOOR_UNGATED, which is what the cosine has to
+        # carry on its own when nothing else is checking the assignment.
+        _with_group = sum(1 for _, _, pg in orphan_metadata if pg)
+        _coverage = _with_group / len(orphan_metadata) if orphan_metadata else 1.0
+        effective_floor = ANY_TARGET_RESCUE_FLOOR + (1.0 - _coverage) * (
+            ANY_TARGET_RESCUE_FLOOR_UNGATED - ANY_TARGET_RESCUE_FLOOR
+        )
+
         # Filter to orphans still remaining after in-group rescue.
         remaining_orphan_positions = [
             i for i in range(len(orphan_metadata))
@@ -1473,7 +1507,7 @@ def discover_topics(
             # sims[row] is the cosine to each theme centroid. Pick the best.
             best_idx = int(np.argmax(sims[row]))
             best_score = float(sims[row, best_idx])
-            if best_score < ANY_TARGET_RESCUE_FLOOR:
+            if best_score < effective_floor:
                 continue
             sample_i, _post_text, _pg = orphan_metadata[pos]
             theme_post_ids[best_idx].append(sample[sample_i]["id"])
@@ -1489,7 +1523,9 @@ def discover_topics(
             "topic_discovery.any_target_rescue",
             rescued=len(any_target_rescued),
             remaining_orphans=len(orphan_ids),
-            floor=ANY_TARGET_RESCUE_FLOOR,
+            floor=round(effective_floor, 3),
+            base_floor=ANY_TARGET_RESCUE_FLOOR,
+            theme_group_coverage=round(_coverage, 3),
         )
 
     results: list[dict[str, Any]] = []
