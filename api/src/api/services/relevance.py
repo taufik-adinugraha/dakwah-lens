@@ -150,7 +150,7 @@ def _should_skip(text: str) -> bool:
 # ─── Opportunity classifier (second pass) ──────────────────────────────────
 
 
-def classify_opportunity_batch(texts: list[str]) -> list[float]:
+def classify_opportunity_batch(texts: list[str]) -> list[float | None]:
     """Score each text for 'would a da'i credibly use this for da'wah'.
 
     Continuous 0-1 score per input. Independent from the 9-category
@@ -158,7 +158,21 @@ def classify_opportunity_batch(texts: list[str]) -> list[float]:
     0.2 / 0.4 / 0.6 / 0.8 to break the bucketing pathology observed
     when the category-level scoring was repurposed as a ranking signal.
 
-    Falls back to 0.0 for skipped items (too short / pure gossip).
+    Returns 0.0 for items skipped by rule (too short / pure gossip) — that
+    is a real classification. Returns **None** when the API call itself
+    fails, which is NOT the same thing and must not be conflated:
+
+      0.0  = scored, and the answer is "no da'wah opportunity"
+      None = not scored; we do not know
+
+    This used to soft-fall-back to 0.0 on any exception. That silently
+    turned an outage into a confident low score, and it broke a downstream
+    guard that keys on emptiness. Measured 2026-08-27: 20,643 of 20,672
+    posts in a 7-day window carried `dawah_opportunity = 0` and ZERO
+    carried NULL, so `cluster_topics`' opportunity floor rejected 99.86%
+    of the corpus while its "floor starved → refetch unfiltered" fallback
+    never fired, because from its point of view the scores looked real.
+    Topic discovery then ran on 29 posts out of 20,672.
 
     Cost: ~$0.0001 per item. ~426 mainstream-RSS posts/week → ~$0.05/mo.
     """
@@ -176,25 +190,32 @@ def classify_opportunity_batch(texts: list[str]) -> list[float]:
             keep_texts.append(t)
 
     if keep_texts:
-        scored: list[float] = []
+        scored: list[float | None] = []
         for start in range(0, len(keep_texts), MAX_BATCH):
             chunk = keep_texts[start : start + MAX_BATCH]
             try:
                 scored.extend(_classify_opportunity_chunk(chunk))
             except Exception:
-                # Soft-fallback to 0.0 on Gemini outage (2026-05-21) —
-                # same rationale as relevance.classify_batch above.
+                # NULL, not 0.0 — see the docstring. A failed call means
+                # "unknown", and writing a confident 0.0 for it poisons
+                # every downstream consumer that reads the score as a
+                # judgement rather than as a missing value.
                 log.exception("opportunity.chunk_failed", batch_size=len(chunk))
-                scored.extend(0.0 for _ in chunk)
+                scored.extend(None for _ in chunk)
         for idx, score in zip(keep_indices, scored, strict=False):
             results[idx] = score
 
+    # A kept index still unset means the model returned fewer scores than we
+    # sent (zip strict=False truncates). That is also "unknown", so it stays
+    # None — but it is worth a log line, since it points at a malformed
+    # response rather than an outage.
+    _kept = set(keep_indices)
     for i, r in enumerate(results):
-        if r is None:
+        if r is None and i in _kept:
             log.warning("opportunity.missing_result", index=i)
-            results[i] = 0.0
 
-    return [r for r in results if r is not None]
+    # Length must equal len(texts): callers zip this against their inputs.
+    return results
 
 
 def _classify_opportunity_chunk(texts: list[str]) -> list[float]:
