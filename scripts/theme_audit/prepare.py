@@ -7,7 +7,8 @@ Reads   <run_dir>/posts.jsonl
 Writes  <run_dir>/target.jsonl, <run_dir>/target_uuids.txt, <run_dir>/in/part_XX.jsonl
 Prints  a manifest + a drift/size guard.
 
-Batch size defaults to 350 (in line with prior working Opus runs, ~350-440/batch).
+Batch size defaults to 175 (halved after audit#139: ~349-post batches died on the
+64k output cap 4 times in 7; ~175-post halves died 0 times in 3).
 What actually keeps a subagent under the 64k output-token cap is the no-narration
 OUTPUT BUDGET contract in AUDIT_INSTRUCTION.md, NOT a small batch — the previous run
 failed because subagents narrated per post, not because batches were large.
@@ -24,7 +25,14 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("run_dir")
     ap.add_argument("--ledger", default=DEF_LEDGER)
-    ap.add_argument("--batch-size", type=int, default=350)  # matches prior working Opus runs (~350-440); the no-narration contract, not batch size, is what keeps output under the 64k cap
+    # 175, halved from 350 after audit#139. Measured there: full ~349-post
+    # batches passed 3 of 7 (4 died on the 64k output cap and had to be split
+    # and re-run); the ~175-post halves passed 3 of 3. The mechanism is the
+    # per-post output budget — 64000/349 ≈ 183 tokens/post vs 64000/175 ≈ 365.
+    # The no-narration contract is still the primary guard, but at 350 a single
+    # lapse loses the whole batch, and a lost batch costs more than two smaller
+    # ones. Raise only if a run shows 175 is wastefully small.
+    ap.add_argument("--batch-size", type=int, default=175)
     ap.add_argument("--window-days", type=int, default=7)  # informational; use whatever the operator asks for
     a = ap.parse_args()
 
