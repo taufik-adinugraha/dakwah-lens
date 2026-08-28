@@ -25,8 +25,9 @@ export function localeAlternates(opts: {
   locale: string;
   canonicalPath: string;
   hasEn?: boolean;
+  canonicalLocale?: (typeof LOCALES)[number];
 }): Metadata["alternates"] {
-  const { locale, canonicalPath } = opts;
+  const { locale, canonicalPath, canonicalLocale } = opts;
   const hasEn = opts.hasEn ?? true;
   const abs = (l: string, p: string) => `${SITE_URL}/${l}${p}`;
 
@@ -40,7 +41,14 @@ export function localeAlternates(opts: {
     ? locale
     : "id";
   return {
-    canonical: abs(self, canonicalPath),
+    // `canonicalLocale` pins the canonical to ONE locale regardless of which
+    // locale is being rendered — for content that exists in Indonesian only.
+    // Without it, `/en/<path>` self-canonicalises while serving the same
+    // Indonesian body as `/id/<path>`, and Google files the pair under
+    // "Duplicate without user-selected canonical" (59 pages in GSC on
+    // 2026-08-28, plus 12 under "Google chose a different canonical").
+    // Pinning makes `/en` an honest alternate of `/id` instead of a rival.
+    canonical: abs(canonicalLocale ?? self, canonicalPath),
     languages,
   };
 }

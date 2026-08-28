@@ -91,8 +91,14 @@ Plus **1 index page** at `/doa`. **17 new URLs.**
 - Indonesian is the real audience; `/en` renders but **must canonical onto
   `/id`** (`hasEn: false`), so we do not repeat the `/en` duplicate-mirror
   problem currently sitting in GSC as 59 + 12 pages.
-- Static: data is a JSON file that changes rarely → `generateStaticParams`,
-  fully prerendered. No runtime DB dependency, ideal crawlability.
+- `generateStaticParams` enumerates all 16 topics.
+  ⚠️ **Corrected at build time:** this plan originally claimed "fully
+  prerendered". It is not — **every `[locale]` route in this app renders
+  dynamic (`ƒ`), including `/about` and `/how-it-works`**, a pre-existing
+  consequence of the proxy + next-intl setup rather than anything about these
+  pages. The du'a pages behave exactly like the rest of the app.
+  What does hold: the data is a **build-time JSON import**, so there is no
+  runtime API or DB dependency and no failure mode when the API is down.
 
 **Data access:** the JSON lives in `api/`. The web app should import a copy at
 `web/src/lib/data/dua-library.json` (build-time import) rather than calling the
@@ -148,7 +154,28 @@ Measured in GSC, `/doa/*` filtered, **10 weeks** after indexing:
   domain's authority level; **abandon the strategy, do not build the hadith /
   term / ayat families**
 
-## 10. If Phase 1 passes
+## 9b. Finding from the build — the corpus, not the architecture, is the ceiling
+
+Folding `keteguhan-iman`, `akhlak` and `dunia-akhirat` leaves **13 du'a on no
+published topic**. Inspecting them showed the fold was not the real problem —
+several are among the *most-searched* Islamic texts in Indonesian, and the
+library simply does not hold enough of them to build a competitive page:
+
+| would-be topic | du'a in library |
+|---|---|
+| bacaan shalawat nabi | 4 |
+| bacaan tahiyat / tasyahud | 2 |
+| doa setelah adzan | 1 |
+
+A 4-item page aimed at "bacaan shalawat" loses to rumaysho/muslim.or.id on
+sight, and is the same thin-content trap that pushed individual du'a pages to
+Phase 2. So these stay unpublished for now.
+
+**Follow-up (not Phase 1 scope):** if Phase 1 passes its §9 criteria, the
+highest-value next move may not be the hadith family at all — it may be
+*deepening the du'a corpus* around shalawat, tasyahud, adzan, and the other
+high-volume daily recitations, where we currently hold 1–4 entries each.
+Cheaper than a new page family and aimed at demand we can already see.
 
 In order: **hadith topic pages** (18,577 chunks), **term/definition pages**
 (`apa itu ghibah`), **ayat + tafsir pages** (6,236 verses + 23,683 tafsir
