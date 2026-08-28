@@ -41,15 +41,27 @@ def main() -> None:
             o = json.loads(line)
             cur[o["id"]] = o["tg"]
 
-    # STRICT two-digit glob. `prepare.py` writes exactly `part_NN.jsonl`, but
-    # subagents told to work in chunks sometimes split their input into
-    # sibling files in the same dir (`part_04_chunk_0.jsonl`, …). A loose
-    # `part_*.jsonl` counted those as extra batches — audit#135 reported
-    # "batches: 31" for a 23-batch run and listed the chunk names as MISSING
-    # forever, so a final non-force aggregate could never come back clean.
-    # Same reasoning for flags: only `flags_NN.json` is a batch result.
-    parts = {stem(p, "part_") for p in glob.glob(f"{sp}/in/part_[0-9][0-9].jsonl")}
-    done = {stem(p, "flags_") for p in glob.glob(f"{sp}/out/flags_[0-9][0-9].json")}
+    # Batch files are `part_NN.jsonl` (prepare.py) OR `part_NNa/b.jsonl` —
+    # the runbook's documented recovery when a batch dies on the 64k output
+    # cap is to split it into lettered halves. Both count as real batches.
+    #
+    # What must NOT count: `part_04_chunk_0.jsonl`, which subagents told to
+    # work in chunks sometimes drop in the same dir. A loose `part_*.jsonl`
+    # counted those as extra batches — audit#135 reported "batches: 31" for a
+    # 23-batch run and listed chunk names as MISSING forever.
+    #
+    # ⚠️ audit#139: the first fix used a bare `[0-9][0-9]` glob, which also
+    # excluded the lettered halves — so a split batch's corrections would have
+    # been silently DROPPED from the aggregate. Same silent-omission class the
+    # fix was meant to prevent. The letter suffix is matched explicitly.
+    def _batches(pattern_dir: str, prefix: str, ext: str) -> set[str]:
+        out = set()
+        for pat in (f"{prefix}[0-9][0-9].{ext}", f"{prefix}[0-9][0-9][a-z].{ext}"):
+            out |= {stem(p, prefix) for p in glob.glob(f"{pattern_dir}/{pat}")}
+        return out
+
+    parts = _batches(f"{sp}/in", "part_", "jsonl")
+    done = _batches(f"{sp}/out", "flags_", "json")
     missing = sorted(parts - done)
     print(f"batches: {len(parts)} | completed: {len(done)} | MISSING: {missing or 'none'}")
 
@@ -57,7 +69,11 @@ def main() -> None:
     reviewed = 0
     notes: list[str] = []
     skipped: Counter = Counter()
-    for ff in sorted(glob.glob(f"{sp}/out/flags_[0-9][0-9].json")):
+    _flag_files = sorted(
+        glob.glob(f"{sp}/out/flags_[0-9][0-9].json")
+        + glob.glob(f"{sp}/out/flags_[0-9][0-9][a-z].json")
+    )
+    for ff in _flag_files:
         try:
             data = json.load(open(ff))
         except Exception as e:
