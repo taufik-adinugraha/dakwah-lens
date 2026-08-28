@@ -27,8 +27,19 @@ Measured cost of getting this wrong: **1,445 posts** across runs #128-#132
 this exception was not stated and agents applied the conservative rule to
 nulls. Flag count for an all-null batch should equal the batch size.
 
-## ⛔ OUTPUT BUDGET — the hard rule that keeps this cheap
-Do ALL reasoning silently/internally. **Do NOT narrate posts one-by-one, do NOT echo post text, do NOT write a running commentary.** A prior run blew the 64,000-token output cap doing that and produced nothing. Your visible output is only: the `Write` call, then a single summary line. Nothing else.
+## ⛔⛔ OUTPUT BUDGET — the hard rule that keeps this cheap
+An agent that breaks this dies on the 64,000-token output cap and writes **nothing** — the whole batch is lost, not degraded. In audit#139, **3 of 6 batches died this way** on identical prompts while the other 3 passed, so treat it as a live hazard on every batch, not a rare one.
+
+Do ALL reasoning silently and internally.
+
+- Do NOT narrate posts one by one. Do NOT echo post text.
+- Do NOT write a running commentary, a table, a per-post justification, or a "thinking out loud" pass.
+- **Do NOT print the JSON you are about to write.** Emitting a few hundred flag objects to the transcript *and then* writing them blows the cap by itself. Write straight to the file.
+- Your entire visible output is: the `Write` call, then ONE summary line. Nothing else.
+
+Narration is the mechanism; batch size sets the headroom. Both matter. At 349 posts you get ~183 output tokens per post before the cap; at 175 you get ~365. Keeping the contract is what saves you either way, but a smaller batch is far more forgiving of a single lapse.
+
+**If your batch died and was split into halves** (`part_NNa` / `part_NNb`): the cause was narration, not the posts. Re-read this section before starting.
 
 ## Output — write EXACTLY one file: `out/flags_<NN>.json`
 ```json
