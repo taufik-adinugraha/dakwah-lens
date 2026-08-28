@@ -2,6 +2,11 @@
 /**
  * Assert the web copy of the du'a library matches the API's.
  *
+ * NOTE the path: `web/src/data/`, not `web/src/lib/data/`. The root .gitignore
+ * has a blanket `data/` rule; `web/src/data/` is explicitly negated, the other
+ * is not — so the first attempt was skipped by `git add -A` with no warning
+ * and only surfaced as a bundler "Module not found" in CI.
+ *
  * `web/src/lib/data/dua-library.json` is a build-time copy of
  * `api/src/api/data/dua_library.json` so the du'a pages prerender static with
  * no runtime API dependency. Two copies of one dataset drifting is a bug this
@@ -21,7 +26,7 @@ const api = JSON.parse(
   readFileSync(join(here, "../../api/src/api/data/dua_library.json"), "utf8"),
 );
 const web = JSON.parse(
-  readFileSync(join(here, "../src/lib/data/dua-library.json"), "utf8"),
+  readFileSync(join(here, "../src/data/dua-library.json"), "utf8"),
 );
 
 const problems = [];

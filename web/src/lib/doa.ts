@@ -8,13 +8,17 @@
  * of that thesis: highest-volume, lowest-competition Indonesian category,
  * data already clean.
  *
- * Data source is `dua-library.json`, a build-time copy of
- * `api/src/api/data/dua_library.json`. It is imported rather than fetched so
+ * Data source is `@/data/dua-library.json`, a build-time copy of
+ * `api/src/api/data/dua_library.json`. It lives under `web/src/data/` because
+ * the root .gitignore has a blanket `data/` rule with an existing negation for
+ * that path — putting it under `web/src/lib/data/` made `git add -A` skip it
+ * SILENTLY, and CI caught it only at the bundler. It is imported rather than
+ * fetched so
  * the pages prerender fully static — no runtime dependency on the API.
  * `scripts/check-doa-parity.mjs` asserts the two copies match; two copies of
  * one dataset drifting is a bug this repo has shipped twice already.
  */
-import raw from "./data/dua-library.json";
+import raw from "@/data/dua-library.json";
 
 export type Dua = {
   citation: string;
