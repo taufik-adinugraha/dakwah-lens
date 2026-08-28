@@ -4,6 +4,7 @@ import { sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { briefingSlug } from "@/lib/briefing-data";
 import { SITE_URL } from "@/lib/seo";
+import { TOPICS } from "@/lib/doa";
 
 // Render at request time against the live DB. (As a build-time static
 // route the briefing query ran in the Docker build container, which has
@@ -63,6 +64,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: path === "" || path === "/briefings" ? "daily" : "monthly",
       priority: path === "" ? 1 : 0.6,
       alternates: alternates(path, true),
+    });
+  }
+
+  // 1b) Du'a topic pages — evergreen, Indonesian-only, fully static.
+  // `hasEn: false` so no English alternate is asserted; the pages also pin
+  // their canonical to /id (see lib/seo `canonicalLocale`).
+  entries.push({
+    url: `${SITE_URL}/id/doa`,
+    lastModified: now,
+    changeFrequency: "monthly",
+    priority: 0.7,
+    alternates: alternates("/doa", false),
+  });
+  for (const t of TOPICS) {
+    entries.push({
+      url: `${SITE_URL}/id/doa/${t.slug}`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+      alternates: alternates(`/doa/${t.slug}`, false),
     });
   }
 
