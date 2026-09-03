@@ -14,6 +14,7 @@ It is designed to be **cheap, resumable, and drift-proof**. Run it every 1–2 d
 4. **Ephemeral ledger in `/tmp`** (drift/loss risk). → Durable ledger at `~/.dakwah/theme_audit/` + prod `~/theme_audit/`, with backup on every write.
 5. **Rulebook drift** — a hand-copied rulebook could diverge from the live prompt. → `gen_rulebook.py` derives it from `theme_groups.llm_group_options_prompt()`.
 6. **Manual whack-a-mole on failures.** → `aggregate.py` reports missing batches and withholds `apply.sql` until every batch is covered.
+7. **`posted_at` windows go blind to backdated arrivals.** Ingest backfills set `posted_at` to the ORIGINAL publication time, so a post published 08-28 can arrive 09-02. A `posted_at`-keyed "past 1d" window cannot see it — and the next day's window has moved on, so it is never audited at all (measured 2026-09-02: **477 nulls** across posted-days 08-28..08-31, every one ingested within the prior 24h; **605** arrival-only posts in a 1d window). Same permanent-invisibility class as the audit#133 null-stranding bug, different door. → `fetch.sh` now defaults to `WINDOW_ON=arrival`, keying on `greatest(posted_at, created_at)`. Verified a strict superset (posted-only = 0). `WINDOW_ON=posted` restores the old slice when you deliberately want a publication-date view.
 
 ## Procedure
 
@@ -27,7 +28,7 @@ PYTHONPATH=../../api/src python3 gen_rulebook.py "$RUN"
 # 2. Fetch the window from prod (default 7 days; pass whatever window you want, e.g. 7)
 bash fetch.sh "$RUN" 7
 
-# 3. Filter to unaudited + split into ~350-post batches; read the manifest + guards
+# 3. Filter to unaudited + split into ~175-post batches; read the manifest + guards
 python3 prepare.py "$RUN" --window-days 7
 #   -> note the batch count (part_00 .. part_NN) and heed any ⚠️ DRIFT / LARGE-TARGET warning.
 ```

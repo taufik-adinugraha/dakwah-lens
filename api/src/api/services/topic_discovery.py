@@ -894,6 +894,13 @@ def _rescue_in_group_orphans(
             continue
         # Pick the in-group theme with highest cosine to this post.
         best_idx = max(in_group_idxs, key=lambda i: sims[row, i])
+        # NOTE: this pass deliberately does NOT enforce the theme's own
+        # `min_similarity` — unlike the ungated any-target pass below. The
+        # theme_group match IS the correctness check here, and the relaxed
+        # RESCUE_FLOOR exists precisely to spend that confidence. Enforcing
+        # the per-theme floor here collapsed in-group rescues 890 -> 30 on a
+        # 7,000-post sample (2026-09-03) and is covered by
+        # test_rescue_picks_best_in_group_above_floor.
         if sims[row, best_idx] < rescue_floor:
             continue
         post_lower = post_text.lower()
@@ -1521,7 +1528,18 @@ def discover_topics(
             # sims[row] is the cosine to each theme centroid. Pick the best.
             best_idx = int(np.argmax(sims[row]))
             best_score = float(sims[row, best_idx])
-            if best_score < effective_floor:
+            # Respect the TARGET theme's own floor. Without this the knob is
+            # not merely ignored here (as the note above says) — it is
+            # actively UNDONE: the primary pass rejects a post for being
+            # below the theme's `min_similarity`, the post becomes an
+            # orphan, and this pass hands it straight back to the very same
+            # theme at 0.32. Measured 2026-09-03 on a 7,000-post sample:
+            # raising 18 themes' floors pushed excluded_by_floor 1,708 ->
+            # 3,260, rescued 684 -> 2,246, and left assigned at 4,576 ->
+            # 4,586 with overall purity flat at 0.343 -> 0.342. Every
+            # additional exclusion was re-admitted to the same theme.
+            theme_floor = themes[best_idx].get("min_similarity") or 0.0
+            if best_score < max(effective_floor, theme_floor):
                 continue
             sample_i, _post_text, _pg = orphan_metadata[pos]
             theme_post_ids[best_idx].append(sample[sample_i]["id"])
