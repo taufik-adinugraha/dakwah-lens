@@ -1938,13 +1938,40 @@ def _build_retrieval_query_fallback(stats: dict[str, Any], group: str) -> str:
     top_topics labels (concrete this-week stories) since the 9-PRD
     `top_categories` was retired 2026-06-05.
     """
+    # Two filters, both learned the hard way on 2026-09-03 while the Gemini
+    # outage forced every briefing down this fallback path:
+    #
+    #  1. Skip the catch-all bucket. `FALLBACK_LABEL` ("Lainnya — Tidak
+    #     Terklasifikasi") is where unclustered posts land; as a search string
+    #     it carries no topical signal at all, and it is frequently the LARGEST
+    #     "topic" in a thin group.
+    #  2. Require a minimum share of the group. Measured that day: the
+    #     retrieval query for `Inspirasi & Kisah Pribadi` (142 posts) was built
+    #     from the fallback bucket plus a topic holding **2 posts**
+    #     ("Kekeringan, Krisis Air, dan Salat Istisqa"). The resulting pool came
+    #     back 40% drought/istisqa daleel for a personal-inspiration theme, and
+    #     the pick agent could only justify 6 of its 18 slots rather than
+    #     stretch wrong daleel over a sharia-sensitive brief.
+    #
+    # A topic that speaks for a handful of posts must not steer what scripture
+    # is retrieved for the whole group.
+    from api.services.topic_discovery import FALLBACK_LABEL
+
+    total = sum(int((t or {}).get("post_count") or 0) for t in stats.get("top_topics", []))
+    floor = max(3, int(total * 0.05)) if total else 3
+
     bits: list[str] = []
-    for t in stats.get("top_topics", [])[:2]:
+    for t in stats.get("top_topics", []):
         label = (t or {}).get("label")
-        if label:
-            bits.append(label)
+        if not label or label == FALLBACK_LABEL:
+            continue
+        if int((t or {}).get("post_count") or 0) < floor:
+            continue
+        bits.append(label)
+        if len(bits) == 2:
+            break
     bits.append(f"dalam konteks {group}")
-    return ". ".join(bits) or "tema dakwah umum minggu ini"
+    return ". ".join(bits) or f"tema dakwah umum minggu ini dalam konteks {group}"
 
 
 def _build_retrieval_query(stats: dict[str, Any], group: str) -> str:
