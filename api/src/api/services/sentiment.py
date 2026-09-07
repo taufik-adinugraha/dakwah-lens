@@ -80,6 +80,31 @@ _ID_ENTITY_RE = re.compile(
     re.IGNORECASE,
 )
 
+# Indonesian derivational morphology. Headline register ("Gunung Sinabung
+# Erupsi, Muntahkan Kolom Abu Setinggi 3,5 KM") systematically omits the
+# function words above, but it still carries these affixes. Each alternative
+# is shaped to avoid colliding with English:
+#   \w{3,}kan       -kan suffix          (English words ending -kan are ~nil)
+#   ke\w{3,}an      ke-…-an circumfix    (kebakaran, kesehatan, keamanan)
+#   pe(r|m|ng|n)…an pe-…-an circumfix    (peraturan, pembayaran, pengumuman)
+#   meng|meny|menj  ID verb prefixes     ('memb' deliberately excluded: "member")
+#   \w{3,}nya       -nya clitic          (3+ prefix excludes Kenya/Tanya/Sonya)
+#   \w{3,}lah/kah   particles            (3+ prefix excludes Allah/blah/Utah)
+_ID_MORPHOLOGY_RE = re.compile(
+    r"\b(?:\w{3,}kan|ke\w{3,}an|pe(?:r|m|ng|n)\w{3,}an|meng\w{2,}|meny\w{2,}"
+    r"|menj\w{2,}|\w{3,}nya|\w{3,}lah|\w{3,}kah)\b",
+    re.IGNORECASE,
+)
+
+# High-frequency English function words. Used as POSITIVE evidence that a
+# Latin-script post is actually foreign — see pathway 2 below.
+_EN_FUNCTION_WORDS = frozenset(
+    "the of and to in is are was were for with that this these those you your "
+    "we our they their it its on at by from have has had be been being will "
+    "would can could should not but or as what when where who how why about "
+    "there here more most some any all just like get got make made".split()
+)
+
 
 def _is_predominantly_non_indonesian(text: str) -> bool:
     """Cheap heuristic — return True if `text` is unlikely to be Indonesian.
@@ -87,12 +112,24 @@ def _is_predominantly_non_indonesian(text: str) -> bool:
     Two pathways:
       1. Substantial non-Latin script content (>30% of non-space chars) →
          True. Catches Hindi/Tamil/Chinese/Korean/Japanese/Russian/Arabic.
-      2. All-Latin but no Indonesian function words AND no Indonesian
-         entity terms in a 50+ char text → True. Catches English-only,
-         Spanish, Tagalog, etc. that happen to share Latin script.
+      2. Latin script with NO Indonesian evidence (function words, entity
+         terms, or derivational morphology) AND positive evidence of English
+         → True. Catches English-only, Spanish, Tagalog, etc.
 
     Short posts (<20 chars after stripping @-handles/URLs) → True (likely
     not meaningful content; usually @-mention spam).
+
+    ⚠️ audit#149 (2026-09-07): pathway 2 used to fire on the mere ABSENCE of
+    Indonesian function words. Absence of evidence is not evidence: Indonesian
+    HEADLINE and COLLOQUIAL register both routinely carry zero function words,
+    so 16/16 sampled volcano-eruption reports ("Erupsi Gunung Sinabung",
+    "buletin resmi BPBD") were force-routed to `Lainnya` with a confident-
+    neutral sentiment. Measured blast radius: 6,697 of 13,813 gated posts
+    (48.5%) carried unmistakable Indonesian morphology. Pathway 2 now requires
+    POSITIVE foreign evidence, and the error is deliberately asymmetric —
+    wrongly rescuing a foreign post only costs one classifier call, while
+    wrongly gating an Indonesian post silently corrupts theme_group AND
+    sentiment for that row.
     """
     if not text:
         return False
@@ -112,12 +149,21 @@ def _is_predominantly_non_indonesian(text: str) -> bool:
     if non_space_chars > 0 and (non_latin / non_space_chars) > 0.30:
         return True
 
-    # Pathway 2: zero Indonesian markers in a long-ish Latin text
+    # Pathway 2: no Indonesian evidence AND positive English evidence.
     words = re.findall(r"[A-Za-z]+", cleaned.lower())
     if len(words) >= 8:
-        id_word_hits = sum(1 for w in words if w in _ID_FUNCTION_WORDS)
-        if id_word_hits == 0 and not _ID_ENTITY_RE.search(cleaned):
-            return True
+        # Any one of these three is enough to call the post Indonesian.
+        if any(w in _ID_FUNCTION_WORDS for w in words):
+            return False
+        if _ID_ENTITY_RE.search(cleaned):
+            return False
+        if _ID_MORPHOLOGY_RE.search(cleaned):
+            return False
+        # No Indonesian marker at all. Only gate if the text positively looks
+        # English — otherwise leave it to the classifier (cheap) rather than
+        # silently bucketing it (destructive).
+        en_hits = sum(1 for w in words if w in _EN_FUNCTION_WORDS)
+        return en_hits >= 3 and (en_hits / len(words)) >= 0.12
 
     return False
 
