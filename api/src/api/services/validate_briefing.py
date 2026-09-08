@@ -72,6 +72,7 @@ class BriefingWarning(TypedDict, total=False):
         "news_paraphrase_fabrication",
         "occasion_section_malformed",
         "national_section_malformed",
+        "missing_web_h2_section",
     ]
     severity: Literal["low", "medium", "high"]
     where: str  # human-readable locator, e.g. "Pesan Flyer 2"
@@ -2613,6 +2614,112 @@ def scan_mahasiswa_qa(markdown: str) -> list[BriefingWarning]:
     return warnings
 
 
+
+# ──────────────────────────────────────────────────────────────────
+# Required H2 sections (the web contract)
+# ──────────────────────────────────────────────────────────────────
+
+# The dashboard resolves each tab by looking up an EXACT H2 heading:
+# `pickSection(md, SEGMENT_HEADINGS.<key>)` in
+# web/src/lib/dashboard-metrics.ts. A missing H2 is not a cosmetic
+# gap — `pickSection` returns "" and KitTabs renders that segment
+# EMPTY while the content sits in the markdown, orphaned and
+# unreachable. Nothing else notices: the H3 deliverables are all
+# present and correctly titled, so every per-deliverable check passes.
+#
+# ⚠️ 2026-09-03 incident: the `Pendidikan & SDM` briefing shipped
+# without `## Strategi & Aksi Dakwah`. Its 8 deliverables sat as bare
+# H3s between `## Poin Kunci` and `## Dalil & Sumber`, and the whole
+# "Strategi & Aksi Dakwah" segment vanished from the page. Undetected
+# in production until the operator noticed the missing tab.
+#
+# Keep this list in sync with SEGMENT_HEADINGS on the web side.
+_WEB_REQUIRED_H2: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("Ringkasan Eksekutif", ("Ringkasan Eksekutif", "Executive Summary")),
+    (
+        "Numerik & Tren Pekan Ini",
+        ("Numerik & Tren Pekan Ini", "Numbers & Trends This Week", "Numerik & Tren"),
+    ),
+    (
+        "Tema Utama & Pola Yang Muncul",
+        ("Tema Utama & Pola Yang Muncul", "Main Themes & Emerging Patterns", "Tema Utama"),
+    ),
+    (
+        "Poin Kunci",
+        ("Poin Kunci untuk Da'i Senior", "Key Points for Senior Da'i", "Poin Kunci"),
+    ),
+    ("Strategi & Aksi Dakwah", ("Strategi & Aksi Dakwah", "Da'wah Strategies & Actions")),
+    ("Dalil & Sumber", ("Dalil & Sumber", "Daleel & Sources", "Daleel & Sumber")),
+)
+
+# A weekly briefing is identified by its deliverable H3s. Fiqh
+# (`### Artikel N`), Tafsir (`### Tafsir N`) and the occasion tracks
+# have their own structure and their own scanners — this check must
+# not fire on them.
+_WEEKLY_DELIVERABLE_H3_RE = re.compile(
+    r"^###\s+(?:Khutbah\s+Jumat|Friday\s+Khutbah|Kultum|Kajian)\b",
+    re.IGNORECASE | re.MULTILINE,
+)
+
+# The occasion (15th) and national (18th) tracks carry the SAME
+# deliverable H3s as a weekly briefing, but deliberately replace
+# Numerik + Tema with their own mode H2s. `scan_occasion_section_structure`
+# treats the weekly H2s appearing there as DRIFT — so requiring them
+# here would make two validators contradict each other. Detect the mode
+# with the same anchors that scanner uses and drop those two rows.
+_OCCASION_MODE_RE = re.compile(
+    r"^##\s+(?:Kalender\s+Hijriah\s+Pekan\s+Ini|Konteks\s+&\s+Hikmah\s+Acara"
+    r"|Kalender\s+Nasional\s+Pekan\s+Ini|Konteks\s+&\s+Hikmah\s+Bangsa)\b",
+    re.IGNORECASE | re.MULTILINE,
+)
+
+# Required for every track that has deliverables; occasion/national
+# swap Numerik + Tema for their own mode headings.
+_OCCASION_EXEMPT = frozenset(
+    {"Numerik & Tren Pekan Ini", "Tema Utama & Pola Yang Muncul"}
+)
+
+
+def scan_required_h2_sections(markdown: str) -> list[BriefingWarning]:
+    """Every H2 the dashboard resolves by name must be present.
+
+    Only runs on weekly briefings (detected via the deliverable H3s).
+    Severity is `high`: a missing H2 silently removes a whole segment
+    from the rendered page.
+    """
+    if not _WEEKLY_DELIVERABLE_H3_RE.search(markdown):
+        return []
+    occasion_mode = bool(_OCCASION_MODE_RE.search(markdown))
+
+    headings = [
+        m.group(1).strip()
+        for m in re.finditer(r"^##\s+(.+?)\s*$", markdown, re.MULTILINE)
+    ]
+    norm = {h.casefold() for h in headings}
+
+    out: list[BriefingWarning] = []
+    for label, candidates in _WEB_REQUIRED_H2:
+        if occasion_mode and label in _OCCASION_EXEMPT:
+            continue
+        if any(c.casefold() in norm for c in candidates):
+            continue
+        out.append(
+            BriefingWarning(
+                kind="missing_web_h2_section",
+                severity="high",
+                where=label,
+                message=(
+                    f"Missing `## {label}` H2. The dashboard looks this "
+                    f"heading up by exact text — without it the whole "
+                    f"segment renders EMPTY even though the content is in "
+                    f"the markdown. Accepted spellings: "
+                    + ", ".join(f"`## {c}`" for c in candidates)
+                ),
+            )
+        )
+    return out
+
+
 def validate_briefing(
     markdown: str,
     *,
@@ -2659,6 +2766,7 @@ def validate_briefing(
     # independent — one regex throwing doesn't block the others. None
     # of these call out to an API LLM; safe on the manual save path.
     for fn, key in (
+        (scan_required_h2_sections, "required_h2_check_failed"),
         (scan_poin_kunci_missing_dalil, "poin_kunci_check_failed"),
         (scan_pesan_flyer_inline_arabic, "flyer_arabic_check_failed"),
         (scan_pesan_flyer_dua_unvoweled, "flyer_dua_unvoweled_check_failed"),
