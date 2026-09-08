@@ -114,6 +114,29 @@ function _isThinLeadIn(s: string): boolean {
  *  stripping would leave too little content (< 60 chars), which usually
  *  means the regex matched a quote that wasn't actually the
  *  intro-to-teaching boundary. */
+/** Leading markdown section headings in a classic-kitab translation.
+ *
+ *  Adab al-'Alim, Fath al-Qarib, Nashaihul Ibad et al. are authored with
+ *  markdown structure, and 151 of the 681 daleel in the last 60 days
+ *  open with a heading LINE like:
+ *
+ *    ## فَصْل — Fasal: Waktu Makruh untuk Shalat
+ *
+ *  ⚠️ 2026-09-08: `stripMd` removes the `##` marker but keeps the text,
+ *  which then flows into the prose and becomes a bogus first "sentence".
+ *  Because the sentence splitter breaks on `—`/`:` + capital, that
+ *  fragment ("فَصْل —") became `sentences[0]`, the next sentence
+ *  overflowed the budget in one go, and the card rendered "فَصْل — …":
+ *  a heading and an ellipsis, no teaching. 4 daleel rendered this way.
+ *
+ *  The heading is pure duplication on a flyer — the citation line under
+ *  the card already names the kitab, bab and fasal — so drop it. Only
+ *  LEADING headings: mid-text sub-headings still flow inline as before,
+ *  since they sit between real prose and removing them would fuse
+ *  unrelated paragraphs.
+ */
+const _LEADING_HEADINGS_RE = /^(?:[ \t]*#{1,6}[^\n]*(?:\n|$))+/;
+
 /** Saying-verbs that introduce the matn (the Prophet's actual words). */
 const _MATN_VERB = "(?:bersabda|berkata|berfirman|menjawab|bertanya|berdoa)";
 
@@ -130,6 +153,34 @@ const _MATN_QUOTE_RE = new RegExp(
  *  end-of-chain marker. */
 const _ISNAD_RE =
   /(?:telah\s+(?:menceritakan|mengabarkan|mengkhabarkan|memberitakan)\s+kepada(?:\s*ku|\s*nya|\s+kami|\s+kamu|\s+mereka)?|\(\s*[Dd]alam\s+riwayat\s+lain\s*\)|\bdengan\s+isnad\s+ini\b)/gi;
+
+/** A chain formula at the very START of the translation — the signature
+ *  of a hadith that prints its isnad before the teaching. Distinct from
+ *  `_ISNAD_RE`, which finds chains anywhere; this one decides whether a
+ *  daleel that already FITS the card still needs its matn extracted. */
+const _ISNAD_PREFIX_RE =
+  /^(?:dan\s+)?telah\s+(?:menceritakan|mengabarkan|mengkhabarkan|memberitakan)\s+kepada/i;
+
+/** A supplementary riwayah tacked onto the END: a full sentence, then a
+ *  short attribution, then a chain formula running to the close —
+ *  Sahih Muslim 1554c's "Abu Ishaq — sahabat Muslim — berkata: telah
+ *  menceritakan kepada kami 'Abdurrahman bin Bisyr dari Sufyan dengan
+ *  ini." It is provenance, not teaching, and it also breaks the
+ *  last-chain anchor: the text after it is too short to be a matn, so
+ *  the strip gave up and printed the opening chain instead. Requiring a
+ *  sentence boundary, ≤80 characters of attribution, and a run to
+ *  end-of-text keeps this off mid-text prose. */
+const _TRAILING_CHAIN_RE =
+  /([.!?])\s+[^.!?]{0,80}?\b(?:telah\s+(?:menceritakan|mengabarkan|mengkhabarkan|memberitakan)\s+kepada|dengan\s+isnad\s+ini)\b[^.!?]*\.?\s*$/i;
+
+/** "(bahwa) (ia mendengar) <up to 3 name words> berkata:" — the last
+ *  narration hop before the report. Capped at 3 words so it cannot run
+ *  past the opening clause and swallow the report's own first sentence. */
+const _RESIDUAL_HOP_RE = new RegExp(
+  `^(?:(?:ia|aku|beliau|dia)\\s+mendengar\\s+)?(?:[^\\s,;:]+\\s+){0,3}?` +
+    `${_MATN_VERB}\\s*[,:]\\s*`,
+  "i",
+);
 
 const _QUOTE_CLOSERS: Record<string, string> = {
   '"': '"',
@@ -181,24 +232,80 @@ function extractMatn(text: string): string {
     if (span.length >= 40) return span;
   }
 
-  _ISNAD_RE.lastIndex = 0;
-  let last: RegExpExecArray | null = null;
-  let hit: RegExpExecArray | null;
-  while ((hit = _ISNAD_RE.exec(text)) !== null) last = hit;
-  if (!last) return "";
+  return stripIsnadChain(text);
+}
 
-  let rest = text.slice(last.index + last[0].length);
-  rest = rest.replace(/^[^,;:]{0,80}[,;:]\s*/, "");
-  rest = rest.replace(
-    /^(?:(?:dan\s+)?dari\s+[^,;:]{1,60}[,;:]\s*){0,8}/i,
-    "",
-  );
-  rest = rest.replace(
-    new RegExp(`^(?:(?:ia|beliau|dia|bahwasanya|bahwa)\\s+)?${_MATN_VERB}\\s*[,:]?\\s*`, "i"),
-    "",
-  );
-  rest = rest.replace(/^["“‘]/, "").trim();
-  return rest.length >= 60 ? rest : "";
+/** Everything after the isnad — rung 2 on its own.
+ *
+ *  Unlike rung 1 this is content-PRESERVING: it drops a prefix and
+ *  keeps every word after it, so a dialogue hadith keeps both halves of
+ *  its exchange. That is what makes it the right tool for a daleel that
+ *  already fits the card and only needs its chain removed.
+ *
+ *  Anchors on the LAST chain formula that still leaves usable text
+ *  after it, walking backwards. Anchoring on the last one outright
+ *  fails when a hadith closes with a supplementary riwayah — Sahih
+ *  Muslim 1554c ends "Abu Ishaq berkata: telah menceritakan kepada kami
+ *  'Abdurrahman bin Bisyr dari Sufyan dengan ini", and anchoring there
+ *  leaves 46 characters of nothing, so the whole strip gave up and the
+ *  card rendered the full opening chain.
+ */
+function stripIsnadChain(text: string): string {
+  const body = text.replace(_TRAILING_CHAIN_RE, "$1").trim() || text;
+
+  _ISNAD_RE.lastIndex = 0;
+  const hits: RegExpExecArray[] = [];
+  let hit: RegExpExecArray | null;
+  while ((hit = _ISNAD_RE.exec(body)) !== null) hits.push(hit);
+
+  for (let i = hits.length - 1; i >= 0; i--) {
+    const rest = shaveNarrationHops(body.slice(hits[i].index + hits[i][0].length));
+    if (rest.length >= 45) return rest;
+  }
+  return "";
+}
+
+/** Shave the "<narrator>, dari X, dari Y, ia berkata:" hops that sit
+ *  between a chain formula and the report it introduces.
+ *
+ *  Iterates, because the hops nest and the forms interleave. Sahih
+ *  Muslim 1584a needs three passes: "Yahya bin Yahya," then "ia
+ *  berkata:" then the 'ard form "aku membacakan kepada Malik," then two
+ *  "dari" hops then a dangling "bahwa". A single pass stopped at the
+ *  'ard form — which is transmission, not teaching — and the card
+ *  opened "aku membacakan kepada Malik, dari Nafi'…".
+ *
+ *  Every pattern is anchored at ^ and bounded (≤3 name words, ≤60-char
+ *  clauses, a required delimiter) so a pass can only ever consume a
+ *  lead-in, never reach into the report. The loop stops as soon as a
+ *  pass changes nothing.
+ */
+function shaveNarrationHops(input: string): string {
+  // The narrator named directly by the formula, up to its delimiter.
+  // Once only — a second pass here could eat the report's first clause.
+  let rest = input.replace(/^[^,;:]{0,80}[,;:]\s*/, "");
+  for (let pass = 0; pass < 4; pass++) {
+    const before = rest;
+    rest = rest.replace(/^(?:(?:dan\s+)?dari\s+[^,;:]{1,60}[,;:]\s*){1,8}/i, "");
+    // 'ard / sama' transmission: "aku membacakan kepada Malik,".
+    rest = rest.replace(
+      /^(?:aku|saya)\s+(?:membacakan|membaca|mendengar)\s+(?:kepada\s+)?[^,;:]{1,60}[,;:]\s*/i,
+      "",
+    );
+    rest = rest.replace(
+      new RegExp(
+        `^(?:(?:ia|beliau|dia|bahwasanya|bahwa)\\s+)?${_MATN_VERB}\\s*[,:]\\s*`,
+        "i",
+      ),
+      "",
+    );
+    // A dangling conjunction: "bahwa" subordinated to a chain clause
+    // that no longer exists. Drop it so the card opens on the report.
+    rest = rest.replace(/^(?:bahwasanya|bahwa)\s+/i, "");
+    rest = rest.replace(_RESIDUAL_HOP_RE, "");
+    if (rest === before) break;
+  }
+  return rest.replace(/^["“‘]/, "").trim();
 }
 
 function stripNarratorIntro(text: string): string {
@@ -251,7 +358,11 @@ export function pickDaleelTranslation(
   // (Adab al-'Alim, Nashaihul Ibad, …) are authored with markdown
   // structure (### headings, **bold**, ---) and were leaking those
   // markers verbatim into the flyer quote card (operator-reported).
-  const cleaned = stripMd(rawText)
+  // v5 (2026-09-08): drop LEADING heading lines before stripMd. See
+  // _LEADING_HEADINGS_RE — the heading text survived stripMd, became a
+  // bogus first sentence, and the card rendered "<heading> — …".
+  const deheaded = rawText.replace(_LEADING_HEADINGS_RE, "").trim();
+  const cleaned = stripMd(deheaded || rawText)
     .replace(/#{1,6}\s+/g, "")
     .replace(/\*+/g, "")
     .replace(/\s*-{3,}\s*/g, " ")
@@ -260,8 +371,28 @@ export function pickDaleelTranslation(
     .trim();
   // Hadith path: when the translation carries an isnad, the matn is the
   // only part a flyer reader needs — the citation line supplies the
-  // chain. Only overrides when the full text would not fit anyway, so
-  // short hadith keep their narrative framing.
+  // chain.
+  //
+  // The length gate alone is not enough. Measured 2026-09-08 across
+  // every daleel used in production: 16 hadith sit BELOW cutThreshold,
+  // so they never entered this path and rendered their chain in full —
+  // Sahih Muslim 46 spends 246 of its 386 characters on narrators
+  // before reaching "Tidak akan masuk surga, orang yang tetangganya
+  // tidak aman dari kejahatannya." Fitting the card is not the test;
+  // the operator rule is that a flyer shows the message, not the isnad.
+  //
+  // So a hadith that FITS also gets its chain removed — but via the
+  // content-preserving strip only. Running the full extractMatn there
+  // would be a downgrade: its rung 1 selects one quoted span, and on a
+  // dialogue hadith that means keeping the question and dropping the
+  // answer (Sahih Muslim 42a: "Islam manakah yang paling utama?" with
+  // "Yang orang-orang Muslim selamat dari lidah dan tangannya" cut).
+  // Selecting a span is a concession to the budget; with no budget
+  // pressure there is nothing to concede.
+  //
+  // Keyed on the OPENING rather than on any occurrence: a chain named
+  // mid-text is a substantive report (Sahih Muslim 1527d closes with
+  // Ibnu Syihab naming his source) and must be left intact.
   if (cleaned.length > cutThreshold) {
     const matn = extractMatn(cleaned);
     if (matn) {
@@ -269,19 +400,17 @@ export function pickDaleelTranslation(
         ? smartTruncateTranslation(matn, targetChars)
         : matn;
     }
+  } else if (_ISNAD_PREFIX_RE.test(cleaned)) {
+    const body = stripIsnadChain(cleaned);
+    if (body) return body;
   }
-  const text = stripNarratorIntro(
-    stripMd(rawText)
-      // Belt-and-suspenders after stripMd: kill residual INLINE heading
-      // markers + ORPHAN emphasis asterisks that stripMd's line-start /
-      // paired rules miss when a classic-kitab section is split mid-way.
-      .replace(/#{1,6}\s+/g, "")
-      .replace(/\*+/g, "")
-      .replace(/\s*-{3,}\s*/g, " ")
-      .replace(_TRAILING_ATTRIBUTION_RE, "")
-      .replace(/\s{2,}/g, " ")
-      .trim(),
-  );
+  // Same `cleaned` text as the hadith path above — it already applies
+  // stripMd plus the belt-and-suspenders pass for residual INLINE
+  // heading markers and ORPHAN emphasis asterisks that stripMd's
+  // line-start / paired rules miss when a classic-kitab section is
+  // split mid-way. Previously duplicated here, which risked the two
+  // paths drifting apart.
+  const text = stripNarratorIntro(cleaned);
   if (text.length <= cutThreshold) return text;
 
   // Split into sentences — period / exclam / question, plus em-dash

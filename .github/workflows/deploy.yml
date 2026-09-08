@@ -40,6 +40,17 @@ jobs:
         working-directory: web
         run: npx eslint .
 
+      # Runs before `next build` because it is ~0.3s against the build's
+      # minutes, and it guards the renderers that shape what a reader
+      # actually sees — a flyer daleel card can be structurally valid,
+      # typecheck clean, build clean, and still print a chain of
+      # narrators instead of the hadith. Only a behavioural assertion
+      # catches that class, and it recurred twice before this step
+      # existed.
+      - name: Web — test
+        working-directory: web
+        run: npm test
+
       # `next build` is the canonical typecheck for App Router projects —
       # `PageProps`/`LayoutProps` globals are only emitted into
       # `.next/types/` during build, so a bare `tsc --noEmit` reports them
@@ -61,6 +72,16 @@ jobs:
       - name: API — lint
         working-directory: api
         run: uv run ruff check src/
+
+      # `api/tests/` had accumulated 8 files and 69 assertions that no
+      # pipeline ever executed — including the two mutation-verified
+      # regression suites written FOR shipped incidents (the
+      # non-Indonesian sentiment gate, and the missing-H2 section that
+      # blanked a briefing's whole deliverable tab on the live page). A
+      # guard nothing runs is documentation, not a guard.
+      - name: API — test
+        working-directory: api
+        run: uv run pytest -q
 
   # ─── Deploy ──────────────────────────────────────────────────
   # SSHes to the VM and runs deploy.sh. All Docker work happens there;
