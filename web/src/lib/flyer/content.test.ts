@@ -107,6 +107,30 @@ const KITAB_ARABIC_HEADING = readFileSync(
   "utf8",
 );
 
+/** The "Mengatakan La Adri" section of Adab al-'Alim. It TEACHES that
+ *  admitting ignorance is part of knowledge, and illustrates it with an
+ *  anecdote: Muhammad bin 'Abdul Hakam asked asy-Syafi'i a fiqh
+ *  question about mut'ah, and asy-Syafi'i answered "Demi Allah, kami
+ *  tidak tahu."
+ *
+ *  Classic kitab, no isnad. Quote-selection anchored on the anecdote's
+ *  saying-verb, took the QUESTION as the "matn", and shipped a flyer
+ *  whose daleel was a fiqh query about nikah mut'ah under a body about
+ *  intellectual humility. 60 daleel rows across two weeks sat on this
+ *  passage. Operator-reported 2026-09-08. */
+const KITAB_LA_ADRI = readFileSync(
+  new URL("./__fixtures__/adab-alim-la-adri.txt", import.meta.url),
+  "utf8",
+);
+
+/** A long dialogue hadith: 'Umar asks who heard the Prophet on fitnah,
+ *  and Hudzaifah's answer is the entire teaching. Quote-selection kept
+ *  only "Siapa di antara kalian yang mendengar...?" */
+const MUSLIM_144A = readFileSync(
+  new URL("./__fixtures__/muslim-144a.txt", import.meta.url),
+  "utf8",
+);
+
 const QURAN_2_188 =
   "Dan janganlah sebahagian kamu memakan harta sebahagian yang lain di antara kamu dengan jalan " +
   "yang bathil dan (janganlah) kamu membawa (urusan) harta itu kepada hakim, supaya kamu dapat " +
@@ -287,5 +311,47 @@ describe("budget and degenerate input", () => {
       {},
     );
     expect(out).toContain("Whoever cheats");
+  });
+});
+
+// ── Matn extraction is a HADITH operation ─────────────────────────
+
+describe("only hadith get reduced to a quoted span", () => {
+  it("a classic-kitab anecdote is not mistaken for a matn", () => {
+    // The regression shipped 2026-09-08: this rendered a fiqh question
+    // about nikah mut'ah as the flyer's daleel.
+    const out = pick(KITAB_LA_ADRI);
+    expect(out).not.toContain("mut'ah");
+    expect(out).not.toContain("asy-Syafi'i");
+    expect(out).not.toMatch(/\?["\u201d\u2019]?\s*$/);
+  });
+
+  it("a kitab passage still renders its own prose", () => {
+    const out = pick(KITAB_LA_ADRI);
+    expect(out.length).toBeGreaterThan(100);
+    expect(out).toContain("inshaf");
+  });
+
+  it("a long dialogue hadith is not reduced to the question", () => {
+    const out = pick(MUSLIM_144A);
+    expect(out).not.toMatch(/\?["\u201d\u2019]?\s*$/);
+    expect(out).not.toMatch(ISNAD);
+  });
+
+  it("a saying-verb plus quote in NON-hadith prose is left alone", () => {
+    // No isnad anywhere -> no reduction, whatever the punctuation.
+    const prose =
+      "Imam al-Ghazali berkata: \"Ketahuilah bahwa hati manusia adalah " +
+      "medan pertempuran antara malaikat dan syaitan.\" Maka barangsiapa " +
+      "membiarkan hatinya kosong, ia menyerahkan medan itu kepada " +
+      "musuhnya. Dan barangsiapa menyibukkannya dengan dzikir, ia " +
+      "menutup pintu bagi bisikan yang merusak niatnya.";
+    const out = pick(prose);
+    // The legacy narrator-intro strip may drop "Imam al-Ghazali berkata:"
+    // — that is long-standing behaviour and not what this pins. What
+    // matters is that the prose AFTER the closing quote survives: span
+    // selection would have thrown it away.
+    expect(out).toContain("Maka barangsiapa membiarkan hatinya kosong");
+    expect(out).toContain("menutup pintu bagi bisikan");
   });
 });
