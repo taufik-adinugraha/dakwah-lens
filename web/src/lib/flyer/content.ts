@@ -219,6 +219,25 @@ const _QUOTE_CLOSERS: Record<string, string> = {
  *  classic kitab — no isnad at all) keep the existing behaviour.
  */
 function extractMatn(text: string): string {
+  // Matn extraction is a HADITH operation: it is only ever correct to
+  // reduce a passage to a quoted span when the rest of that passage is
+  // a chain of narrators. Without this gate rung 1 fires on any
+  // `berkata: "…"`, and classic kitab is built from quoted anecdotes.
+  //
+  // ⚠️ 2026-09-08, shipped and reverted the same day. Adab al-'Alim's
+  // "Mengatakan La Adri" section teaches that admitting ignorance is
+  // part of knowledge, and illustrates it: Muhammad bin 'Abdul Hakam
+  // asked asy-Syafi'i a fiqh question, and asy-Syafi'i answered "Demi
+  // Allah, kami tidak tahu." Rung 1 selected the QUESTION — a query
+  // about nikah mut'ah — and discarded both the answer and the
+  // teaching. The flyer then carried a fiqh question about mut'ah as
+  // its daleel, under a body about intellectual humility. 60 daleel
+  // rows across two weeks of briefings sat on that passage.
+  //
+  // The isnad is what licenses the reduction. No isnad, no reduction.
+  _ISNAD_RE.lastIndex = 0;
+  if (!_ISNAD_RE.test(text)) return "";
+
   const m = _MATN_QUOTE_RE.exec(text);
   if (m && m.index !== undefined) {
     const open = m[1];
@@ -229,7 +248,15 @@ function extractMatn(text: string): string {
     const span = text.slice(start, end).trim();
     // A short span means a dialogue line, not the teaching — fall to
     // rung 2 rather than emit a fragment.
-    if (span.length >= 40) return span;
+    //
+    // So does a span that is a QUESTION. In a dialogue hadith the
+    // teaching is the answer, and rung 1 anchors on the first quote,
+    // which is the question: Sahih Muslim 144a rendered nothing but
+    // "Siapa di antara kalian yang mendengar Rasulullah ﷺ menyebutkan
+    // fitnah-fitnah?" as its daleel. Rung 2 keeps the whole narration
+    // and lets the budget trim the tail, which at worst loses the end
+    // of an answer rather than all of it.
+    if (span.length >= 40 && !/\?["”’]?\s*$/.test(span)) return span;
   }
 
   return stripIsnadChain(text);
