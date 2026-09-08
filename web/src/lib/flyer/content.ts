@@ -1,5 +1,6 @@
 import type { DaleelRef } from "@/db/schema";
 import type { DeliverableSlug } from "./design";
+import { smartTruncateTranslation } from "./translation-fit";
 
 /**
  * Content extraction from the briefing markdown for the 4 shareable
@@ -113,6 +114,93 @@ function _isThinLeadIn(s: string): boolean {
  *  stripping would leave too little content (< 60 chars), which usually
  *  means the regex matched a quote that wasn't actually the
  *  intro-to-teaching boundary. */
+/** Saying-verbs that introduce the matn (the Prophet's actual words). */
+const _MATN_VERB = "(?:bersabda|berkata|berfirman|menjawab|bertanya|berdoa)";
+
+/** A saying-verb followed DIRECTLY by an opening quote. In
+ *  `ia berkata: Rasulullah ﷺ bersabda, "…"` only the `bersabda, "`
+ *  boundary matches — `berkata:` is followed by a name, not a quote. */
+const _MATN_QUOTE_RE = new RegExp(
+  `\\b${_MATN_VERB}\\s*[,:]?\\s*(["“‘„])`,
+  "i",
+);
+
+/** Isnad formulae. These are chain-of-transmission boilerplate and
+ *  never occur inside a matn, which makes the LAST one a reliable
+ *  end-of-chain marker. */
+const _ISNAD_RE =
+  /(?:telah\s+(?:menceritakan|mengabarkan|mengkhabarkan|memberitakan)\s+kepada(?:\s*ku|\s*nya|\s+kami|\s+kamu|\s+mereka)?|\(\s*[Dd]alam\s+riwayat\s+lain\s*\)|\bdengan\s+isnad\s+ini\b)/gi;
+
+const _QUOTE_CLOSERS: Record<string, string> = {
+  '"': '"',
+  "“": "”",
+  "‘": "’",
+  "„": "“",
+};
+
+/** Drop the isnad and return the teaching.
+ *
+ *  ⚠️ 2026-09-08 incident — why this exists. `stripNarratorIntro` only
+ *  inspects the first 280 chars. Sahih Muslim routinely carries THREE
+ *  parallel chains joined by "(dalam riwayat lain)": in Sahih Muslim
+ *  103a the matn's opening quote sits at offset 454, 174 chars past that
+ *  window. The strip found nothing, so `sentences[0]` WAS the isnad and
+ *  the accumulate-from-start truncation rendered a flyer whose entire
+ *  quote card was chain-of-narrators ending "dari 'Abdullah, ia berkata:
+ *  …" — the teaching absent, while the body above paraphrased words that
+ *  never appeared. Measured across 60 days: 57 of 60 long hadith daleel
+ *  had their matn boundary beyond that window.
+ *
+ *  Widening the window is not enough — with a 3-chain isnad the chain
+ *  still outweighs the matn, so a char budget exhausts itself before
+ *  reaching the teaching. For a flyer the isnad is provenance metadata;
+ *  the citation line already carries it.
+ *
+ *  Two rungs, measured over every hadith daleel used in the last 60 days
+ *  (36 unique citations, 36 handled, 0 leaking chain markers):
+ *    1. the quoted matn after a saying-verb — covers 24
+ *    2. otherwise everything after the LAST isnad formula, with the
+ *       residual "dari X, dari Y, ia berkata:" hops shaved — covers the
+ *       remaining 12, which are dialogue/narrative hadith whose first
+ *       quoted span is a one-line fragment ("Mendekatlah.")
+ *
+ *  Returns "" when neither rung applies, so non-hadith corpora (Qur'an,
+ *  classic kitab — no isnad at all) keep the existing behaviour.
+ */
+function extractMatn(text: string): string {
+  const m = _MATN_QUOTE_RE.exec(text);
+  if (m && m.index !== undefined) {
+    const open = m[1];
+    const start = m.index + m[0].length;
+    const closer = _QUOTE_CLOSERS[open] ?? open;
+    let end = text.indexOf(closer, start);
+    if (end === -1) end = text.length;
+    const span = text.slice(start, end).trim();
+    // A short span means a dialogue line, not the teaching — fall to
+    // rung 2 rather than emit a fragment.
+    if (span.length >= 40) return span;
+  }
+
+  _ISNAD_RE.lastIndex = 0;
+  let last: RegExpExecArray | null = null;
+  let hit: RegExpExecArray | null;
+  while ((hit = _ISNAD_RE.exec(text)) !== null) last = hit;
+  if (!last) return "";
+
+  let rest = text.slice(last.index + last[0].length);
+  rest = rest.replace(/^[^,;:]{0,80}[,;:]\s*/, "");
+  rest = rest.replace(
+    /^(?:(?:dan\s+)?dari\s+[^,;:]{1,60}[,;:]\s*){0,8}/i,
+    "",
+  );
+  rest = rest.replace(
+    new RegExp(`^(?:(?:ia|beliau|dia|bahwasanya|bahwa)\\s+)?${_MATN_VERB}\\s*[,:]?\\s*`, "i"),
+    "",
+  );
+  rest = rest.replace(/^["“‘]/, "").trim();
+  return rest.length >= 60 ? rest : "";
+}
+
 function stripNarratorIntro(text: string): string {
   const head = text.slice(0, 280);
   // Match: `:` or `.` then ≤ 40 non-quote chars then ≥1 whitespace
@@ -163,6 +251,25 @@ export function pickDaleelTranslation(
   // (Adab al-'Alim, Nashaihul Ibad, …) are authored with markdown
   // structure (### headings, **bold**, ---) and were leaking those
   // markers verbatim into the flyer quote card (operator-reported).
+  const cleaned = stripMd(rawText)
+    .replace(/#{1,6}\s+/g, "")
+    .replace(/\*+/g, "")
+    .replace(/\s*-{3,}\s*/g, " ")
+    .replace(_TRAILING_ATTRIBUTION_RE, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+  // Hadith path: when the translation carries an isnad, the matn is the
+  // only part a flyer reader needs — the citation line supplies the
+  // chain. Only overrides when the full text would not fit anyway, so
+  // short hadith keep their narrative framing.
+  if (cleaned.length > cutThreshold) {
+    const matn = extractMatn(cleaned);
+    if (matn) {
+      return matn.length > targetChars
+        ? smartTruncateTranslation(matn, targetChars)
+        : matn;
+    }
+  }
   const text = stripNarratorIntro(
     stripMd(rawText)
       // Belt-and-suspenders after stripMd: kill residual INLINE heading
