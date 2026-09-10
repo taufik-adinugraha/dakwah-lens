@@ -417,13 +417,31 @@ def _has_usable_text(normalized: dict[str, Any]) -> bool:
         silently loses its best fiqh muamalah entries. Translating this
         corpus is the follow-up that would pay for itself.
 
-    The bar is Indonesian specifically, not "any text": these pools feed
-    Indonesian briefings, and an entry the composer cannot render on an
-    ID surface is unusable even when its Arabic is present. That mirrors
-    the existing hadith rule — EN-only corpora are skipped rather than
-    shown in English on an Indonesian card.
+    The bar is "some prose a translation path can reach", NOT "Indonesian
+    right now".
+
+    ⚠️ 2026-09-10, same day: the first cut of this guard tested
+    `translation_id` alone and was too aggressive. Bukhari, Riyad
+    as-Salihin and Bulugh al-Maram are Arabic+English in Qdrant; their
+    Indonesian lives in the `hadith_translations_id` cache and is filled
+    AFTER retrieval by `lookup_cached_translations`, with misses surfaced
+    for Claude to translate in chat. Dropping them here ran before that
+    step and deleted hadith that were perfectly usable — measured on the
+    Konflik & Geopolitik and Aqidah & Ibadah dumps, du'a candidates fell
+    22 → 18 and the "Translation cache misses" section vanished
+    entirely. Sahih al-Bukhari 7499 was among the casualties, hours
+    after it had anchored a shipped flyer with good Indonesian.
+
+    So: drop only when there is NEITHER Indonesian NOR English, which is
+    the actual fabrication trap — a citation with no prose behind it.
+    That still catches `al_umm` / `fath_al_muin` / `fiqh_as_sunnah` /
+    `tafsir_al_tabari` (Arabic-only, no translation path today) while
+    leaving every EN-only hadith to the cache/miss workflow that exists
+    precisely to translate it.
     """
-    return bool((normalized.get("translation_id") or "").strip())
+    if (normalized.get("translation_id") or "").strip():
+        return True
+    return bool((normalized.get("translation_en") or "").strip())
 
 
 def _normalize_hit(corpus: str, hit: Any) -> dict[str, Any]:

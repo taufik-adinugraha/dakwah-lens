@@ -59,20 +59,31 @@ def test_none_translation_id_is_not_usable():
     assert _has_usable_text({"translation_id": None}) is False
 
 
-def test_arabic_without_indonesian_is_still_not_usable():
-    """Arabic alone does not make an entry renderable on an ID surface."""
+def test_arabic_without_any_translation_is_not_usable():
+    """Arabic alone has no translation path — al_umm / fath_al_muin /
+    fiqh_as_sunnah / al_tabari all land here."""
     assert (
         _has_usable_text(
-            {"arabic": "الحمد لله رب العالمين", "translation_id": ""}
+            {"arabic": "الحمد لله رب العالمين", "translation_id": "", "translation_en": ""}
         )
         is False
     )
 
 
-def test_english_without_indonesian_is_still_not_usable():
+def test_english_only_hadith_IS_usable():
+    """The regression that made this guard too aggressive.
+
+    Bukhari / Riyad / Bulugh are Arabic+English in Qdrant; their
+    Indonesian is filled after retrieval by `lookup_cached_translations`,
+    with misses handed to Claude. Dropping them here ran before that step
+    and deleted usable hadith — du'a candidates fell 22 → 18 and the
+    translation-misses section disappeared.
+    """
     assert (
-        _has_usable_text({"translation_en": "All praise is due to Allah", "translation_id": ""})
-        is False
+        _has_usable_text(
+            {"translation_en": "All praise is due to Allah", "translation_id": ""}
+        )
+        is True
     )
 
 
@@ -120,12 +131,13 @@ def test_al_tabari_payload_maps_arabic_chunk():
     assert out["citation"] == "Tafsir al-Tabari on 5:33"
 
 
-def test_tafsir_carries_no_indonesian_so_the_guard_drops_it():
-    """Neither tafsir corpus is translated, so both fail the ID bar.
+def test_ibn_kathir_now_carries_prose_so_it_is_no_longer_a_fabrication_trap():
+    """The branch fix — not the guard — is what defused tafsir.
 
-    They stay reachable through `retrieve_tafsir_for_ayah`, the keyed
-    path the Tafsir Pekan Ini track actually uses — this only keeps them
-    out of the similarity-ranked daleel pool.
+    Before the dedicated branch, ibn_kathir arrived with a real citation
+    and every text field empty: a citation with nothing behind it. Now
+    its English chunk survives, so it has prose a reader can check and a
+    translation path like any EN-only entry.
     """
     out = _normalize_hit(
         "tafsir_ibn_kathir",
@@ -136,6 +148,24 @@ def test_tafsir_carries_no_indonesian_so_the_guard_drops_it():
                 "chunk_index": 1,
                 "chunk_text_en": "And We did not send a prophet...",
                 "citation_en": "Tafsir Ibn Kathir on 7:94",
+            }
+        ),
+    )
+    assert out["citation"]
+    assert _has_usable_text(out)
+
+
+def test_al_tabari_without_english_is_dropped():
+    """al-Tabari is Arabic-only, so it has no translation path today."""
+    out = _normalize_hit(
+        "tafsir_al_tabari",
+        _hit(
+            {
+                "surah": 5,
+                "ayah": 33,
+                "chunk_index": 0,
+                "chunk_text_ar": "القول في تأويل قوله تعالى",
+                "citation": "Tafsir al-Tabari on 5:33",
             }
         ),
     )
