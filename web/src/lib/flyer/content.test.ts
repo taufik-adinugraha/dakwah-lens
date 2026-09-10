@@ -18,7 +18,7 @@ import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
 
-import { pickDaleelTranslation } from "./content";
+import { parseInlineDua, pickDaleelTranslation } from "./content";
 
 const pick = (translation_id: string) =>
   pickDaleelTranslation({ translation_id }, "id", {});
@@ -353,5 +353,71 @@ describe("only hadith get reduced to a quoted span", () => {
     // selection would have thrown it away.
     expect(out).toContain("Maka barangsiapa membiarkan hatinya kosong");
     expect(out).toContain("menutup pintu bagi bisikan");
+  });
+});
+
+/**
+ * parseInlineDua — slots 5 and 6 render the du'a the author wrote inline,
+ * NOT the pool entry. `composeFlyer` calls this first and only falls back
+ * to the ADHKAR pool when it returns null. That fallback is silent, so a
+ * parse miss doesn't error — it just swaps a short recitable du'a for the
+ * full isnad-bearing hadith and the flyer still looks plausible.
+ *
+ * 2026-09-10: the Patologi Sosial Digital briefing hit exactly that. Its
+ * slot 6 Indonesian line lacked quotation marks, so the card rendered 466
+ * chars of Sahih al-Bukhari 6368 instead of the intended 110.
+ */
+describe("parseInlineDua", () => {
+  const ARABIC =
+    "اللَّهُمَّ " +
+    "إِنِّي أَعُوذُ " +
+    "بِكَ مِنَ الْكَسَلِ";
+  const ID =
+    "Ya Allah, aku berlindung kepada-Mu dari kemalasan dan usia tua yang pikun.";
+
+  const block = (bodyLines: string) => ({
+    headline: "Berlindung dari Malas dan Utang",
+    daleelCitation: "Sahih al-Bukhari 6368",
+    body: "",
+    rawBody: bodyLines,
+  });
+
+  it("parses the quoted house shape", () => {
+    const out = parseInlineDua(
+      block(`Pembuka.\n\n${ARABIC}\n\n"${ID}"\n\n(HR. Bukhari)\n\nPenutup.`),
+    );
+    expect(out?.translation_id).toBe(ID);
+    expect(out?.arabic).toContain("اللَّهُمَّ");
+  });
+
+  it("parses the same shape when the Indonesian is NOT quoted", () => {
+    // The regression. Before the fallback this returned null.
+    const out = parseInlineDua(
+      block(`Pembuka.\n\n${ARABIC}\n\n${ID}\n\n(HR. Bukhari)\n\nPenutup.`),
+    );
+    expect(out?.translation_id).toBe(ID);
+  });
+
+  it("does NOT treat ordinary body prose as a translation", () => {
+    // Arabic followed by prose with no citation line: the sandwich is
+    // absent, so falling back to the pool is the safer outcome.
+    const out = parseInlineDua(
+      block(
+        `Pembuka.\n\n${ARABIC}\n\nKalimat ini hanyalah penutup paragraf ` +
+          `biasa yang tidak pernah dimaksudkan sebagai terjemahan doa.`,
+      ),
+    );
+    expect(out).toBeNull();
+  });
+
+  it("stops at the next marker instead of reaching past it", () => {
+    const out = parseInlineDua(
+      block(`${ARABIC}\n\n**Headline:** sesuatu\n\n(HR. Bukhari)`),
+    );
+    expect(out).toBeNull();
+  });
+
+  it("still returns null when there is no Arabic at all", () => {
+    expect(parseInlineDua(block(`"${ID}"\n\n(HR. Bukhari)`))).toBeNull();
   });
 });

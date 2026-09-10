@@ -1042,7 +1042,50 @@ export function parseInlineDua(block: FlyerMessageBlock): DaleelRef | null {
     arabic.length > 0 ? md.indexOf(arabic) + arabic.length : -1;
   const afterArabic = arabicEnd > -1 ? md.slice(arabicEnd) : "";
   const transMatch = afterArabic.match(quoteRegex) ?? md.match(quoteRegex);
-  const translation = transMatch?.[1]?.trim() ?? "";
+  let translation = transMatch?.[1]?.trim() ?? "";
+
+  // Fallback: the same translation WITHOUT quotation marks.
+  //
+  // ⚠️ 2026-09-10. The house shape for slots 5-6 is
+  //     <arabic line> / blank / <indonesian line> / blank / (HR. …)
+  // and the Indonesian is conventionally quoted. When a write omits the
+  // quotes, every branch above misses, `parseInlineDua` returns null,
+  // and `composeFlyer` falls back to the ADHKAR pool entry — so the card
+  // renders the full isnad-bearing hadith instead of the short recitable
+  // du'a the author wrote. Nothing surfaces the swap: no error, no
+  // warning, and the flyer still looks plausible. Found on the Patologi
+  // Sosial Digital briefing, where slot 6 rendered 466 chars of Bukhari
+  // 6368 in place of the intended 110.
+  //
+  // Accept a bare line ONLY in that exact sandwich — first non-empty
+  // non-Arabic line after the Arabic, and only if a `(HR. …)`-style
+  // citation follows it within the next few lines. Without the trailing
+  // citation this would happily swallow ordinary body prose, which is
+  // worse than falling back to the pool.
+  if (!translation && afterArabic) {
+    const lines = afterArabic.split("\n").map((l) => l.trim());
+    let candidate = "";
+    let citationFollows = false;
+    let seen = 0;
+    for (const line of lines) {
+      if (!line) continue;
+      if (/[؀-ۿ]/.test(line)) continue; // trailing Arabic fragments
+      if (!candidate) {
+        // A marker or heading means the block ended before any prose.
+        if (/^(\*\*|#{1,6}\s)/.test(line)) break;
+        const bare = line.replace(/^[*_>\s]+/, "").replace(/[*_\s]+$/, "");
+        if (bare.length < 20 || bare.length > 260) break;
+        candidate = bare;
+        continue;
+      }
+      if (/^\(\s*(?:HR\.|QS\.|Hisnul Muslim)/i.test(line)) {
+        citationFollows = true;
+        break;
+      }
+      if (++seen >= 3) break;
+    }
+    if (candidate && citationFollows) translation = candidate;
+  }
 
   // Citation — prefer the explicit `**Daleel:**` marker on the block,
   // fall back to a `(HR. ...)` / `(QS. ...)` / `(Hisnul Muslim ...)`
