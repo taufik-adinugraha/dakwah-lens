@@ -387,6 +387,45 @@ def _get_qdrant() -> QdrantClient:
     return _qdrant_client
 
 
+def _has_usable_text(normalized: dict[str, Any]) -> bool:
+    """True when a normalized hit carries text a composer can actually quote.
+
+    A candidate with a real citation but no Indonesian text is WORSE than
+    no candidate at all: the composer sees an authoritative-looking
+    citation, has nothing to read, and may write prose attributed to a
+    source it never saw. Retrieval-only daleel means the CHUNK is the
+    daleel — never the citation alone.
+
+    ⚠️ 2026-09-10. Two ways a text-less candidate reached the pool, both
+    observed in live briefing runs:
+
+      · `tafsir_ibn_kathir` / `tafsir_al_tabari` — their payloads share
+        no keys with the branch they used to fall into, so every field
+        normalized to "" while `citation_en` survived. Present in 3 of 3
+        themes sampled (44:14, 7:94, 5:33).
+      · `al_umm` / `fath_al_muin` / `fiqh_as_sunnah` — still Arabic-only.
+        The 2026-06-13 bilingual re-embed covered 7 classics but not
+        these three, so they carry `ar` and no `id`.
+
+        `fiqh_as_sunnah` is the costliest of the three, because its
+        chapter titles retrieve *well*: the 2026-09-10 Ekonomi & Bisnis
+        run surfaced البيوع/الإحتكار, متى يحرم الاحتكار and التسعير —
+        the three chapters that speak most directly to a week of mask
+        price-gouging — and every one arrived with an empty body. The
+        drop is still right (a citation with no text invites exactly the
+        fabrication this guard exists to stop), but it means the pool
+        silently loses its best fiqh muamalah entries. Translating this
+        corpus is the follow-up that would pay for itself.
+
+    The bar is Indonesian specifically, not "any text": these pools feed
+    Indonesian briefings, and an entry the composer cannot render on an
+    ID surface is unusable even when its Arabic is present. That mirrors
+    the existing hadith rule — EN-only corpora are skipped rather than
+    shown in English on an Indonesian card.
+    """
+    return bool((normalized.get("translation_id") or "").strip())
+
+
 def _normalize_hit(corpus: str, hit: Any) -> dict[str, Any]:
     """Reshape a Qdrant hit into the schema we persist in
     `insights_summaries.daleel_refs` and feed to the LLM.
@@ -412,6 +451,40 @@ def _normalize_hit(corpus: str, hit: Any) -> dict[str, Any]:
         translation_en = payload.get("en") or ""
         ref_id = (
             f"quran::{payload.get('surah','')}:{payload.get('ayah','')}"
+        )
+    elif corpus in ("tafsir_ibn_kathir", "tafsir_al_tabari"):
+        # Tafsir payloads share NONE of the keys the other branches read.
+        # They store per-ayah exegesis chunked across `chunk_index`:
+        #   ibn_kathir: {surah, ayah, chunk_index, chunk_text_en,
+        #                ayah_text_en, ayah_text_ar, citation_en, source}
+        #   al_tabari:  {surah, ayah, chunk_index, chunk_text_ar,
+        #                ayah_text_ar, citation, source}
+        #
+        # ⚠️ 2026-09-10: before this branch existed they fell through to
+        # the hadith `else`, which reads payload["ar"]/["id"]/["en"] —
+        # none of which a tafsir payload has. Every field came back ""
+        # while `citation_en` survived, so the daleel pool served an
+        # entry with a REAL citation and NO TEXT. That is a fabrication
+        # trap: a composer that trusts the citation without reading the
+        # chunk writes prose attributed to a source it never saw. Found
+        # in 3 of 3 briefing themes sampled (44:14, 7:94, 5:33).
+        #
+        # Neither corpus carries Indonesian, so `translation_id` stays
+        # "" and the ID-surface guard below drops these from the pool.
+        # They remain reachable through `retrieve_tafsir_for_ayah`,
+        # which is the keyed path the Tafsir track actually uses.
+        citation = (
+            payload.get("citation_id")
+            or payload.get("citation")
+            or payload.get("citation_en")
+            or ""
+        )
+        arabic = payload.get("chunk_text_ar") or payload.get("ayah_text_ar") or ""
+        translation_id = ""
+        translation_en = payload.get("chunk_text_en") or payload.get("ayah_text_en") or ""
+        ref_id = (
+            f"{corpus}::{payload.get('surah','')}:{payload.get('ayah','')}"
+            f":{payload.get('chunk_index','')}"
         )
     elif corpus in (
         "bidayat_al_hidayah",
@@ -554,6 +627,15 @@ def retrieve_daleel(
                 below_threshold += 1
                 continue
             normalized = _normalize_hit(corpus, hit)
+            if not _has_usable_text(normalized):
+                log.info(
+                    "kitab_retrieval.dropped_textless",
+                    corpus=corpus,
+                    citation=(normalized.get("citation") or "")[:80],
+                    has_arabic=bool(normalized.get("arabic")),
+                    has_en=bool(normalized.get("translation_en")),
+                )
+                continue
             if normalized["ref_id"] in DALEEL_DENYLIST:
                 log.info(
                     "kitab_retrieval.denylisted",
@@ -1854,6 +1936,15 @@ def retrieve_dua(
             if hit.score is None or hit.score < threshold:
                 continue
             normalized = _normalize_hit(corpus, hit)
+            if not _has_usable_text(normalized):
+                log.info(
+                    "kitab_retrieval.dropped_textless",
+                    corpus=corpus,
+                    citation=(normalized.get("citation") or "")[:80],
+                    has_arabic=bool(normalized.get("arabic")),
+                    has_en=bool(normalized.get("translation_en")),
+                )
+                continue
             if normalized["ref_id"] in DALEEL_DENYLIST:
                 continue
             # Harakat gate — du'a in Pesan Flyer 5 + 6 is meant to be
@@ -2365,6 +2456,15 @@ def pick_flyer_daleel(
             if hit.score is None or hit.score < threshold:
                 continue
             normalized = _normalize_hit(corpus, hit)
+            if not _has_usable_text(normalized):
+                log.info(
+                    "kitab_retrieval.dropped_textless",
+                    corpus=corpus,
+                    citation=(normalized.get("citation") or "")[:80],
+                    has_arabic=bool(normalized.get("arabic")),
+                    has_en=bool(normalized.get("translation_en")),
+                )
+                continue
             if normalized["ref_id"] in DALEEL_DENYLIST:
                 continue
             # Adhkar filter for slots 5+6: only entries with enough
