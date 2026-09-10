@@ -778,7 +778,7 @@ Aksi yang menghormati kapasitas + kebijaksanaan lansia — mereka jadi PELAKU/su
 - Urutkan dari yang PALING RELEVAN dengan tema pekan ini
 
 Di akhir Bagian 5, tutup dengan satu paragraf italic:
-*Briefing ini AI-assisted, BUKAN fatwa otoritatif. Tanggung jawab keagamaan tetap pada penyusun konten dakwah.*
+*Briefing ini AI-assisted, bukan fatwa otoritatif. Tanggung jawab keagamaan tetap pada penyusun konten dakwah.*
 
 ## Pesan Flyer (~520 kata, dirender ke 6 flyer 1080×1080 yang dibagikan ke IG/WA)
 
@@ -1437,7 +1437,7 @@ Action that honors elderly capacity + wisdom — they are ACTORS/sources, NOT ai
 - Order by MOST RELEVANT to this week's themes first.
 
 End Section 5 with one italic paragraph:
-*This briefing is AI-assisted and NOT an authoritative fatwa. The religious responsibility for any published da'wah content remains with you.*
+*This briefing is AI-assisted and not an authoritative fatwa. The religious responsibility for any published da'wah content remains with you.*
 
 ## Flyer Messages (~400 words, rendered to 4 1080×1080 flyers shared to IG/WA)
 
