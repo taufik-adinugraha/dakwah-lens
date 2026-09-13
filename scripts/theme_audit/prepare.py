@@ -34,6 +34,12 @@ def main() -> None:
     # ones. Raise only if a run shows 175 is wastefully small.
     ap.add_argument("--batch-size", type=int, default=175)
     ap.add_argument("--window-days", type=int, default=7)  # informational; use whatever the operator asks for
+    ap.add_argument(
+        "--rescue-nulls",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="re-open rows that are marked audited but are STILL NULL (default on)",
+    )
     a = ap.parse_args()
 
     audited = set()
@@ -56,7 +62,30 @@ def main() -> None:
             seen.add(i)
             posts.append(o)
 
-    target = [o for o in posts if o["id"] not in audited]
+    # ── WHY AN AUDITED ROW CAN STILL BE TARGETED ─────────────────────
+    # The ledger answers "has a reader looked at this?", which is NOT the
+    # same as "does this row have a label". Audits #128-132 marked null
+    # posts audited without labelling them; those rows are now sealed —
+    # the ledger filter drops them from every future run, so they can
+    # never self-heal. Measured 2026-09-13: 3,719 rows are marked audited
+    # AND still NULL, up from the 1,445 first found.
+    #
+    # A NULL is a failure state (see fetch.sh), so "reviewed" is not a
+    # terminal answer for one. Rows that are still null are therefore
+    # re-opened regardless of ledger membership. Non-null rows keep the
+    # normal de-dup: once a labelled post has been read, re-reading it is
+    # the expensive no-op the ledger exists to prevent.
+    # Pass --no-rescue-nulls for the old strict-ledger behaviour.
+    def _is_null(o: dict) -> bool:
+        tg = o.get("tg")
+        return not tg or tg == "(null)"
+
+    if a.rescue_nulls:
+        target = [o for o in posts if o["id"] not in audited or _is_null(o)]
+        rescued = sum(1 for o in posts if o["id"] in audited and _is_null(o))
+    else:
+        target = [o for o in posts if o["id"] not in audited]
+        rescued = 0
     already = len(posts) - len(target)
 
     os.makedirs(os.path.join(a.run_dir, "in"), exist_ok=True)
@@ -82,6 +111,8 @@ def main() -> None:
     print(f"window posts (unique): {len(posts)}")
     print(f"  already audited (in ledger): {already} ({pct:.0f}%)")
     print(f"  UNAUDITED target: {len(target)}")
+    if rescued:
+        print(f"  ↳ incl. {rescued} STRANDED (marked audited but still null) — re-opened")
     print(f"  ledger: {a.ledger} ({len(audited)} uuids)")
     print(f"  batches: {nb} x ~{per} posts (cap {a.batch_size})")
     if posts and len(posts) > 500 and pct < 20:

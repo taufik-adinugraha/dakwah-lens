@@ -18,6 +18,21 @@ It is designed to be **cheap, resumable, and drift-proof**. Run it every 1–2 d
 
 ## Procedure
 
+> ### ⛔ ONE ENTRY POINT — `run.sh`
+> **Every theme-classification audit starts with `bash scripts/theme_audit/run.sh [days]`.**
+> Do not hand-assemble a run from the individual steps, do not invent a run-dir
+> name, and do not retype the per-batch prompt — use `BATCH_PROMPT.md` verbatim.
+>
+> Why this is a rule and not a preference: every miss this pipeline has produced
+> came from a hand-made run. Measured 2026-09-13 — 24,410 posts still NULL, of
+> which 23,699 sat in one 07-27..08-30 block that *no* routine run could see,
+> because each was scoped by an ad-hoc date window. A `theme_group` NULL is a
+> FAILURE state (see `models/social.py`), so it does not age; a date-scoped run
+> silently defines it out of existence. `run.sh` keeps outstanding nulls in
+> scope permanently and re-opens rows the ledger sealed.
+>
+> The steps below document what `run.sh` does. Run them by hand only to debug it.
+
 ```bash
 cd scripts/theme_audit
 RUN=/tmp/theme_audit_$(date +%Y%m%d)          # a scratch run dir (ephemeral is fine)

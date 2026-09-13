@@ -153,6 +153,18 @@ Memory: `feedback_fact_check_news_paraphrase`. Live enforcement: briefing.py SYS
 
 ### Process / operational
 
+**[MANUAL PIPELINES — ONE ENTRY POINT EACH]** The three recurring manual pipelines each have exactly one entry script. Use it; never hand-assemble a run, never invent a run-dir name, never retype a per-batch prompt (the prompt is a checked-in file next to the script).
+
+| ask | run this |
+|---|---|
+| theme classification / audit | `bash scripts/theme_audit/run.sh [days]` |
+| sentiment relabel | `bash scripts/sent_relabel/run.sh [days]` then `ingest.sh <run>` |
+| topic clustering (manual) | `bash scripts/cluster_topics/run.sh` then `inject.sh <run>` |
+
+Why: every miss these pipelines produced came from a hand-made run. The per-run scripts were cloned by sed from the previous run and drifted (`m21_ingest.sh` shipped printing "M14B LEDGER" over m21's numbers); run dirs lived in `/tmp` and were reaped nightly; the batch prompt was retyped each time; and the null-coverage check depended on the operator remembering it. Each is now a default rather than discipline, and each run dir is durable under `~/.dakwah/`. Batch agents must pass `verify_batch.py` before reporting — a subagent's self-report is not evidence, measured repeatedly (batch n017 reported success having written no file; three more in the 4d theme run died with zero bytes). All three are pure-Claude — never Gemini. Memory: `feedback_manual_pipelines_one_entry_point`.
+
+**[THEME AUDIT — ONE ENTRY POINT]** Every theme-classification audit runs through `bash scripts/theme_audit/run.sh [days]`. Never hand-assemble a run from the individual steps, never invent a run-dir name, never retype the per-batch prompt (use `scripts/theme_audit/BATCH_PROMPT.md` verbatim). Why: `theme_group` NULL is a FAILURE state, not a category — a post that fits nothing is written `Lainnya`. Nulls therefore never age, but every hand-made run was scoped by an ad-hoc date window, which silently defines old nulls out of existence. Measured 2026-09-13: 24,410 posts still NULL, 23,699 of them in a single 07-27..08-30 block that no routine run could see, plus 3,719 sealed shut by being marked audited while still null. `run.sh` keeps outstanding nulls in scope permanently and re-opens ledger-sealed ones. Memory: `feedback_theme_audit_one_entry_point`.
+
 **[DON'T PATCH VALIDATOR FIRST]** When a hard-fail validator rejects user content, the FIRST move is to ask "why is the upstream emitting this state?" — NOT to relax the validator. The validator is the canary, not the cause. 2026-06-18 incident: I patched a validator to permit empty-pool skip, masking the actual bug (manual_briefing.py wasn't passing flyer_daleel_pool kwarg). Investigate upstream first; loosen only after confirming the data flow is correct. Memory: `feedback_dont_patch_validator_first`.
 
 **[DON'T BLOCK ON DEPLOYS]** Never sit on `gh run watch` as a serial blocking step. Always have parallel downstream prep in flight while a deploy runs (re-dumps, workflow scripts, file ops). Verify deploy completion only at the moment the downstream step needs the new code. Memory: `feedback_dont_block_on_deploys`.

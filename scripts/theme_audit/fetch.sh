@@ -44,14 +44,37 @@ WINDOW_ON="${WINDOW_ON:-arrival}"
 mkdir -p "$RUN"
 
 case "$WINDOW_ON" in
-  arrival) WHERE="greatest(posted_at, coalesce(created_at, posted_at)) >= now() - interval '${DAYS} days'" ;;
-  posted)  WHERE="posted_at >= now() - interval '${DAYS} days'" ;;
+  arrival) WINDOW="greatest(posted_at, coalesce(created_at, posted_at)) >= now() - interval '${DAYS} days'" ;;
+  posted)  WINDOW="posted_at >= now() - interval '${DAYS} days'" ;;
   *) echo "WINDOW_ON must be 'arrival' or 'posted' (got: ${WINDOW_ON})" >&2; exit 2 ;;
 esac
+
+# ── WHY A NULL IS NEVER ALLOWED TO AGE OUT OF THE WINDOW ──────────────────────
+# theme_group NULL is a FAILURE state, not a classification. The column doc
+# (models/social.py) is explicit: the field is set at ingest by the same Gemini
+# call that produces sentiment, and "rows whose Gemini call failed before this
+# field could be set stay NULL". A post that genuinely fits nothing is written
+# 'Lainnya' — one of the 15 valid values. So every NULL is unfinished work.
+#
+# A date window cannot know how far back unfinished work goes. Measured
+# 2026-09-13: 24,410 nulls spanning 06-03 to 09-13, 23,699 of them in the
+# 07-27..08-30 block left by the Gemini outage. Every routine 1d/4d/7d run since
+# was structurally incapable of seeing them — not because the cadence was too
+# slow, but because the scope was keyed on a date at all.
+#
+# So the window governs only the MISCLASSIFICATION half of the audit (re-reading
+# recently-labelled posts for drift). Outstanding NULLs are always in scope,
+# regardless of age. Set NULLS_ALWAYS=0 for a deliberate date-only slice.
+NULLS_ALWAYS="${NULLS_ALWAYS:-1}"
+if [ "$NULLS_ALWAYS" = "1" ]; then
+  WHERE="(theme_group IS NULL OR (${WINDOW}))"
+else
+  WHERE="${WINDOW}"
+fi
 
 SQL="SELECT json_build_object('id', id::text, 'tg', coalesce(theme_group,'(null)'), 'text', left(regexp_replace(text,'\\s+',' ','g'),600)) FROM social_posts WHERE ${WHERE} AND text IS NOT NULL AND length(text) >= 15;"
 
 ssh "$HOST" "docker exec dakwah-lens-postgres-1 psql -U dakwah -d dakwah_lens -t -A -c \"${SQL}\"" \
   | grep -E '^\{' > "$RUN/posts.jsonl"
 
-echo "fetched $(wc -l < "$RUN/posts.jsonl" | tr -d ' ') posts (window=${DAYS}d on ${WINDOW_ON}) -> $RUN/posts.jsonl"
+echo "fetched $(wc -l < "$RUN/posts.jsonl" | tr -d ' ') posts (window=${DAYS}d on ${WINDOW_ON}, nulls_always=${NULLS_ALWAYS}) -> $RUN/posts.jsonl"
