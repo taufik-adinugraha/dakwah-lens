@@ -380,7 +380,13 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "bencana alam, kebakaran, kecelakaan, lingkungan, fenomena alam "
         "misterius. TERMASUK info/peringatan dini cuaca & gempa BMKG "
         "(peringatan dini, prakiraan cuaca, magnitudo/lokasi gempa) — tetap "
-        "Lingkungan & Bencana walau berupa buletin rutin/template (audit#100)"
+        "Lingkungan & Bencana walau berupa buletin rutin/template (audit#100). "
+        "BUKAN kejadian SIMULASI/FIKSI yang memakai kosakata bencana: klip "
+        "game simulator (BUSSID/BeamNG/Roblox/Sakura School), adegan "
+        "sinetron/film/anime, roleplay, atau caption 'kecelakaan/gempa' tanpa "
+        "detail lokasi-waktu-korban yang nyata — peristiwanya tidak terjadi, "
+        "jadi itu Lainnya. Butuh indikasi kejadian NYATA (lokasi, waktu, "
+        "korban, instansi/SAR/BMKG) untuk masuk sini (audit#151)"
     ),
     "Pemerintahan & Kebijakan": (
         "pemerintahan, kebijakan publik, otonomi daerah, program negara, "
@@ -480,7 +486,10 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "pribadi reflektif, renungan, motivasi — BUKAN K-pop chart, "
         "BUKAN profil aktris/atlet, BUKAN pengajaran hadith (itu Aqidah & "
         "Ibadah), BUKAN ajaran agama non-Islam (itu Toleransi & "
-        "Lintas-Iman)"
+        "Lintas-Iman). HARUS kisah NYATA — BUKAN fiksi/fanfiksi/cerbung/"
+        "novel ringan/AU-thread, narasi roleplay, atau potongan drama-sinetron "
+        "yang dinarasikan seolah pengalaman pribadi; fiksi itu Lainnya "
+        "(audit#151)"
     ),
     "Toleransi & Lintas-Iman": (
         "konten yang SECARA EKSPLISIT mendiskusikan dialog antar-iman, "
