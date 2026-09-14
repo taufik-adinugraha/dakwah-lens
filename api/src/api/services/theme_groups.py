@@ -338,7 +338,15 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "BUKAN Pemerintahan & Kebijakan. Ke Pemerintahan & Kebijakan HANYA "
         "bila pusat gravitasinya pernyataan resmi istana/kementerian soal "
         "kasus berjalan, bukan isi keagamaannya; versi hashtag/banter/"
-        "tautan telanjang tetap Lainnya (audit#150)"
+        "tautan telanjang tetap Lainnya (audit#150). MAULID NABI dipisah "
+        "dengan uji SUBSTANSI yang sama: masuk sini bila ada pengajaran/"
+        "refleksi/polemik nyata (ceramah atau kajian edisi Maulid, perdebatan "
+        "status bid'ah vs sunnah, kutipan ulama soal hukumnya, refleksi "
+        "keteladanan Nabi) — TETAPI pengumuman acara, promo live-stream, "
+        "tumpengan/berkat, lomba & harlah pesantren, klip sholawat, dan "
+        "penggalangan dana berlabel Maulid itu logistik seremonial → Lainnya. "
+        "192 posting Maulid terbelah 102/85 antar-batch di audit#152 karena "
+        "aturannya benar tapi tidak pernah disebut (audit#152)"
     ),
     "Kesehatan & Kehidupan": (
         "kesehatan fisik & mental, kesejahteraan jiwa. TERMASUK keracunan "

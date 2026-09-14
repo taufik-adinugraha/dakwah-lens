@@ -54,9 +54,24 @@ def main() -> None:
     # excluded the lettered halves — so a split batch's corrections would have
     # been silently DROPPED from the aggregate. Same silent-omission class the
     # fix was meant to prevent. The letter suffix is matched explicitly.
+    #
+    # ⚠️ audit#152: the same glob was still two-digit-only, so it went blind
+    # the moment a run exceeded 100 batches. `prepare.py` writes
+    # `part_{b:02d}` — a MINIMUM width, not a maximum — so batch 100 is
+    # `part_100`. Runs only got that big once outstanding NULLs stopped being
+    # date-scoped (fetch.sh NULLS_ALWAYS); the first such run had 152 batches,
+    # and 52 of them would have been dropped with no MISSING warning, because
+    # a file the glob cannot see is not reported absent — it simply is not
+    # counted. Width is matched as 2-or-3 digits.
     def _batches(pattern_dir: str, prefix: str, ext: str) -> set[str]:
         out = set()
-        for pat in (f"{prefix}[0-9][0-9].{ext}", f"{prefix}[0-9][0-9][a-z].{ext}"):
+        pats = (
+            f"{prefix}[0-9][0-9].{ext}",
+            f"{prefix}[0-9][0-9][0-9].{ext}",
+            f"{prefix}[0-9][0-9][a-z].{ext}",
+            f"{prefix}[0-9][0-9][0-9][a-z].{ext}",
+        )
+        for pat in pats:
             out |= {stem(p, prefix) for p in glob.glob(f"{pattern_dir}/{pat}")}
         return out
 
@@ -69,9 +84,14 @@ def main() -> None:
     reviewed = 0
     notes: list[str] = []
     skipped: Counter = Counter()
+    # Must mirror _batches() exactly — see the audit#139/#152 note above. If
+    # these two ever disagree, the MISSING check passes while the corrections
+    # are quietly omitted, which is the worst of both worlds.
     _flag_files = sorted(
         glob.glob(f"{sp}/out/flags_[0-9][0-9].json")
+        + glob.glob(f"{sp}/out/flags_[0-9][0-9][0-9].json")
         + glob.glob(f"{sp}/out/flags_[0-9][0-9][a-z].json")
+        + glob.glob(f"{sp}/out/flags_[0-9][0-9][0-9][a-z].json")
     )
     for ff in _flag_files:
         try:
