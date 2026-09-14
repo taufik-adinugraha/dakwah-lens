@@ -7,6 +7,12 @@ set -euo pipefail
 RUN="${1:?run_dir required}"; RUN="$(cd "$RUN" && pwd)"
 NAME="$(basename "$RUN")"
 [ -f "$RUN/themes.json" ] || { echo "missing $RUN/themes.json — author it first"; exit 1; }
+# Gate on keyword distinctiveness before touching prod. A keyword that matches
+# mostly inside other words produces a topic full of unrelated posts, and the
+# damage is only visible afterwards in the per-theme counts.
+HERE_CK="$(cd "$(dirname "$0")" && pwd)"
+python3 "$HERE_CK/check_keywords.py" "$RUN" || {
+  echo "ABORT: fix the flagged keywords, or re-run with the threshold relaxed deliberately"; exit 1; }
 python3 -c "
 import json,sys
 d=json.load(open('$RUN/themes.json'))

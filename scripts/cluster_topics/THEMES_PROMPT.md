@@ -14,6 +14,22 @@ corpus. Write `<RUN>/themes.json`:
 - `keywords` drive assignment by embedding cosine. The purity metric is a
   literal keyword substring match, so tune with **short single tokens**, not
   phrases (`project_manual_topic_clustering`).
+- **Short is only half the rule — the token must also be DISTINCTIVE.** A short
+  token is easily a substring of common Indonesian morphology, and the matcher
+  cannot tell the difference. Measured on the 2026-09-14 corpus: `iran` matched
+  1,374 posts as a substring but only 85 as a word (the rest were `perairan`,
+  `kehadiran`, `aliran`, `kekhawatiran`); `sar` 3,423 vs 287 (`besar`, `pasar`,
+  `dasar`); `onsu` 408 vs 63 (`konsumsi`); `menteri` 832 vs 508
+  (`kementerian`); `demo` 212 vs 38 (`demokrasi`). A survey agent proposed
+  `iran` for the Middle-East theme — unchecked it would have made that topic
+  ~20% of the corpus, nearly all of it maritime and attendance copy.
+  Prefer `hormuz`, `teheran`, `timur tengah` over `iran`; `krakatau` over `sar`.
+- **Verify before injecting** — do not eyeball it:
+
+      python3 {TOOLKIT}/check_keywords.py <RUN>
+
+  It prints substring-vs-word counts per keyword and exits non-zero if any
+  keyword draws most of its matches from inside other words.
 - `exclude_keywords` carve out a near neighbour that would otherwise absorb
   posts (e.g. excluding `sepakbola` from a geopolitics theme).
 - `min_similarity` is per-theme. Note the historical trap: the rescue passes

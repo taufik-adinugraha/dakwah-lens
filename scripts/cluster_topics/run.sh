@@ -27,6 +27,13 @@ ssh dakwah "cd ~ && docker exec -e PYTHONPATH=/app/src -i dakwah-lens-api-1 \
 # cache (what inject replays). Losing the cache means re-dumping and getting a
 # DIFFERENT corpus, so the themes would be assigned over posts they were not
 # authored from.
+#
+# dump-sample runs INSIDE the api container, so its /tmp is the container's,
+# not the host's. Both files must be docker-cp'd to the host before scp can
+# see them — without this the scp fails with "No such file or directory" while
+# the dump itself reported success.
+ssh dakwah "docker cp dakwah-lens-api-1:/tmp/${NAME}.md /tmp/${NAME}.md >/dev/null && \
+  docker cp dakwah-lens-api-1:/tmp/${NAME}.posts.jsonl /tmp/${NAME}.posts.jsonl >/dev/null"
 scp -q "dakwah:/tmp/${NAME}.md"          "$RUN/sample.md"
 scp -q "dakwah:/tmp/${NAME}.posts.jsonl" "$RUN/posts.jsonl"
 echo "sample:      $RUN/sample.md      ($(wc -c < "$RUN/sample.md" | tr -d ' ') bytes)"
