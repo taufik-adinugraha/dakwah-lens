@@ -589,7 +589,8 @@ CRITICAL — SUMBER KISAH (aturan keras, jangan dilanggar):
 - Ceritakan ulang fasal itu sebagai SATU narasi utuh. JANGAN potong di tengah, JANGAN melompat keluar urutan.
 - JANGAN mengambil dari DALEEL POOL untuk sub-section ini. JANGAN sebut hadits Bukhari / Muslim / Riyad sebagai sumber kisah. Kisah ini MURNI dari «KISAH_LABEL».
 - JANGAN mengarang detail tarikh / dialog / tindakan yang tidak ada di fasal yang diberikan. Boleh tambah setting sensorik (cuaca, suara, bau) yang plausible berdasarkan konteks sejarah, TETAPI dialog dan tindakan inti HARUS persis sesuai teks Arab di KISAH POOL.
-- Jika KISAH POOL bertanda "(sumber kisah belum tersedia...)", LEWATI sub-section ini sepenuhnya — tulis hanya satu baris "*Kisah Pendek tidak tersedia untuk tema ini pekan ini.*" lalu langsung lanjut ke sub-section berikutnya.
+- Jika KISAH POOL bertanda "(sumber kisah belum tersedia...)", JANGAN menulis kisah dari memori — tapi sub-section ini TETAP WAJIB punya heading H3-nya. Tulis persis:
+  `### Kisah Pendek — "Tidak Tersedia Pekan Ini"` lalu satu baris italic yang menyebut "tidak tersedia", mis. *"Kisah Pendek tidak tersedia untuk tema ini pekan ini — tidak ada sumber kisah yang layak diambil dari kitab untuk tema ini, dan kisah tidak ditulis dari ingatan."* JANGAN menulis baris italic itu tanpa heading: validator struktur mencari sub-section ini lewat heading `### Kisah Pendek`, jadi tanpa heading section-nya terbaca HILANG dan gate gagal (dua composer hilang karena ini pada 2026-09-03).
 
 STRUKTUR WAJIB (compact, ~700-1100 kata total):
 
@@ -3147,18 +3148,20 @@ def _build_user_prompt(
         kisah_section = (
             "\n\nKISAH POOL: (sumber kisah belum tersedia atau tidak ada "
             "fasal/bagian yang cocok dengan tema ini di keempat kitab "
-            "naratif yang dijadikan sumber — LEWATI sub-section Kisah "
-            "Pendek seluruhnya, JANGAN ganti dengan kisah dari kitab "
-            "lain atau dari memori; cukup tulis baris singkat di "
-            "posisinya: *\"Kisah Pendek tidak tersedia untuk tema ini "
-            "pekan ini.\"*)"
+            "naratif yang dijadikan sumber — JANGAN ganti dengan kisah dari "
+            "kitab lain atau dari memori; tulis sub-section ini sebagai "
+            "graceful skip yang TETAP berheading: `### Kisah Pendek — \"Tidak Tersedia Pekan Ini\"` diikuti satu baris italic yang "
+            "menyebut \"tidak tersedia\". Heading-nya wajib — tanpa itu "
+            "validator membaca section ini HILANG.)"
             if language == "id"
             else "\n\nKISAH POOL: (kisah source unavailable or no section "
-            "matched this theme across the four narrative kitabs — SKIP "
-            "the Kisah Pendek sub-section entirely, DO NOT substitute a "
-            "story from another kitab or from memory; just write a "
-            "single line in its place: *\"Kisah Pendek not available "
-            "for this theme this week.\"*)"
+            "matched this theme across the four narrative kitabs — DO NOT "
+            "substitute a story from another kitab or from memory; write "
+            "this sub-section as a graceful skip that STILL KEEPS its "
+            "heading: `### Kisah Pendek — \"Tidak Tersedia Pekan Ini\"` "
+            "followed by one italic line saying it is not available. The "
+            "heading is mandatory — without it the validator reads this "
+            "section as MISSING.)"
         )
 
     prior_block = _format_prior_coverage_block(prior_coverage or [], language)
