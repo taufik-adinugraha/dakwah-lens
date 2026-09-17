@@ -24,13 +24,59 @@ right about phrases and incomplete about tokens: short is necessary, and
 DISTINCTIVE is the other half. This script supplies the second half by
 measuring rather than guessing.
 
-Exit 1 if any keyword is inflated past the threshold, so it can gate.
+THE SECOND FAILURE MODE: SEMANTIC POLLUTION
+Substring inflation is morphological — it is visible by comparing a literal
+match to a word-boundary match. There is a second failure this cannot see: a
+token that is a perfectly clean WORD but is generic in context, so most of its
+matches have nothing to do with the theme it was chosen for.
+
+Measured on the 7,000-post corpus of 2026-09-17, against the themes authored
+for 2026-09-14:
+
+    wartawan   305 matches, 305 of them clean words -> only  11% on-story
+    pewarta    138 matches, 138 of them clean words -> only  22% on-story
+
+Both passed the inflation check with a perfect score. `wartawan` was polluted
+by the commonest quotation formula in Indonesian news ("... kepada wartawan",
+88 posts) and `pewarta` by ANTARA's byline footer. They shipped in the
+"Pencarian Lima Jurnalis Hilang" theme, where they were the two highest-volume
+keywords — so the largest theme of that run was built mostly on boilerplate.
+
+COHESION measures this: for each keyword, the fraction of its matches that also
+contain at least one OTHER keyword from the same theme. A keyword describing
+the same story as its theme-mates co-occurs with them; a generic one does not.
+Calibrated on both theme sets over the same corpus:
+
+    09-14 themes   wartawan 11%, pewarta 22%, then a gap to houthi 39%
+    09-17 themes   lowest keyword 51%
+
+The two known-bad keywords sit far below every legitimate one in either set,
+so COHESION_LIMIT is set at 0.30 — under the lowest good value (39%) with
+margin, and well above both defects.
+
+COHESION DOES NOT APPLY TO DOMAIN MAGNETS
+`topic_discovery.py` (DOMAIN-MAGNET COVERAGE, 2026-07-06) requires 3-5 broad
+"magnet" themes alongside the concrete event-themes, because the second-pass
+rescues force every leftover orphan onto its nearest centroid: a domain with
+low-signal chatter and no broad home dumps that chatter onto whatever concrete
+theme is closest and tanks its purity. A magnet's keywords are deliberately
+generic reservoirs, so they are EXPECTED to co-occur weakly with each other —
+`sekolah` scored 12% against `kampus`/`dosen`, which is correct, not broken.
+Cohesion is therefore skipped for any theme marked `"magnet": true`, and the
+skip is printed so it cannot be used quietly to launder a bad concrete theme.
+The inflation check still applies to magnets — breadth is never a licence to
+ship a token that matches inside other words.
+
+Exit 1 if any keyword is inflated or incoherent past its threshold, so it can
+gate.
 """
 import json
 import re
 import sys
 
 INFLATION_LIMIT = 0.15  # >15% of matches coming from inside other words
+COHESION_LIMIT = 0.30   # <30% of matches sharing ANY other keyword of its theme
+COHESION_MIN_N = 40     # below this the fraction is too noisy to judge
 
 
 def main() -> int:
@@ -44,15 +90,15 @@ def main() -> int:
     raw = json.load(open(f"{run}/themes.json", encoding="utf-8"))
     themes = raw.get("themes") if isinstance(raw, dict) else raw
 
+    def word_re(k: str):
+        return re.compile(rf"(?<![a-z]){re.escape(k.lower())}(?![a-z])")
+
     bad = []
     for t in themes:
         for kw in t.get("keywords", []):
             k = kw.lower()
             sub = sum(1 for x in texts if k in x)
-            wb = sum(
-                1 for x in texts
-                if re.search(rf"(?<![a-z]){re.escape(k)}(?![a-z])", x)
-            )
+            wb = sum(1 for x in texts if word_re(k).search(x))
             infl = sub - wb
             flag = ""
             if sub and infl / sub > thresh:
@@ -60,14 +106,52 @@ def main() -> int:
                 bad.append((t["label"], kw, sub, wb))
             print(f"  {t['label'][:28]:30s} {kw:18s} substr={sub:5d} word={wb:5d}{flag}")
 
+    # Second pass: semantic cohesion. A keyword that names the same story as its
+    # theme-mates co-occurs with at least one of them; a generic one does not.
+    # Only meaningful for a theme with something to co-occur WITH, and only
+    # stable once the keyword has enough matches to make the fraction real.
+    incoherent = []
+    print()
+    for t in themes:
+        kws = [k.lower() for k in t.get("keywords", [])]
+        if len(kws) < 3:
+            continue
+        if t.get("magnet"):
+            print(f"  {t['label'][:28]:30s} (domain magnet — cohesion not applicable)")
+            continue
+        pats = {k: word_re(k) for k in kws}
+        for k in kws:
+            hits = [x for x in texts if pats[k].search(x)]
+            if len(hits) < COHESION_MIN_N:
+                continue
+            others = [pats[o] for o in kws if o != k]
+            co = sum(1 for x in hits if any(p.search(x) for p in others))
+            frac = co / len(hits)
+            if frac < COHESION_LIMIT:
+                print(
+                    f"  {t['label'][:28]:30s} {k:18s} cohesion={frac:4.0%} "
+                    f"of {len(hits):4d}  <-- INCOHERENT"
+                )
+                incoherent.append((t["label"], k, len(hits), frac))
+
     print()
     if bad:
         print(f"FAIL: {len(bad)} keyword(s) match mostly inside other words:")
         for lab, kw, sub, wb in bad:
             print(f"  - {kw!r} in {lab!r}: {sub} substring vs {wb} as a word")
         print("Replace them with longer or more distinctive tokens.")
+    if incoherent:
+        print(f"FAIL: {len(incoherent)} keyword(s) rarely co-occur with their theme:")
+        for lab, kw, n, frac in incoherent:
+            print(
+                f"  - {kw!r} in {lab!r}: {n} matches, only {frac:.0%} share any "
+                f"other keyword of the theme"
+            )
+        print("These are clean words but generic in context (boilerplate, bylines,")
+        print("stock phrases). Replace them with tokens specific to the story.")
+    if bad or incoherent:
         return 1
-    print(f"OK: all keywords across {len(themes)} themes are distinctive")
+    print(f"OK: all keywords across {len(themes)} themes are distinctive and coherent")
     return 0
 
 
