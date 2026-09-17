@@ -455,7 +455,18 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "Kehidupan. BUKAN regulasi/pengawasan digital pemerintah "
         "(registrasi SIM biometrik, e-ID, aturan platform) → itu "
         "Pemerintahan & Kebijakan; Patologi butuh unsur judi/pinjol/narkoba/"
-        "KBGO/hoax eksplisit, bukan sekadar 'digital' (audit#102)"
+        "KBGO/hoax eksplisit, bukan sekadar 'digital' (audit#102). "
+        "GESTUN / pencairan limit paylater & kartu kredit ('open gestun', "
+        "'cairin limit', tarik tunai limit Spaylater/Kredivo/GoPayLater/"
+        "Atome/Akulaku/TikTok paylater) masuk sini — baik yang MENAWARKAN "
+        "jasa maupun yang MENCARI-nya: kredit konsumtif berbiaya tinggi di "
+        "luar kanal resmi, satu ekosistem dengan pinjol, dan seluruhnya "
+        "berlangsung digital. TETAPI ini tidak menyapu seluruh tagar "
+        "#zonauang: arisan online, joki tugas/skripsi, jasa edit video, "
+        "jual-beli akun premium dan info freelance tetap Lainnya kecuali "
+        "menyebut judi/pinjol/gestun/penipuan eksplisit. 78 posting gestun "
+        "terbelah 45/33 pada dua run berturut-turut karena istilahnya tidak "
+        "pernah disebut (audit#153)"
     ),
     "Teknologi & AI": "kecerdasan buatan, teknologi baru, etika digital",
     "Pekerja & Pertanian Rakyat": (
