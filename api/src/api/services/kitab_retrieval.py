@@ -101,6 +101,15 @@ _DUA_SUPPLICATION_MARKERS = (
     "أسألك",
     "أَسْأَلُكَ",
     "اللهم إني",
+    # Prophetic du'a that opens with an IMPERATIVE addressed to Allah plus a
+    # vocative, instead of "Allahumma…". The healing du'a of Sahih Muslim 2191
+    # — "adhhibi l-ba'sa rabba n-nas, wa-shfi anta sh-shafi" — is the common
+    # one and was being flagged as a command/statement verse (2026-09-17),
+    # even though it is among the best-known supplications in the corpus.
+    # Both markers are unambiguous: any text carrying them is a supplication
+    # (Surat an-Nas also contains "rabb an-nas", and it too is a du'a).
+    "رب الناس",
+    "أذهب الباس",
 )
 
 

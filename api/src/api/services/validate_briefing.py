@@ -2410,39 +2410,13 @@ def format_autofixes_for_stderr(applied: list[dict[str, str]]) -> str:
     return "\n".join(lines)
 
 
-_DUA_SUPPLICATION_MARKERS = (
-    "اللهم",
-    "اللَّهُمَّ",
-    "اللّٰهُمَّ",
-    "اللّهمّ",
-    "ربنا",
-    "رَبَّنَا",
-    "رَبَّنَآ",
-    "ربّنا",
-    "رب اغفر",
-    "رَبِّ اغْفِرْ",
-    "رب إني",
-    "رَبِّ إِنِّي",
-    "رب اجعلني",
-    # Vocative "Rabbi + imperative" Qur'anic du'a openings (recitable) —
-    # e.g. QS Ash-Shu'araa 169 "rabbi najjinī wa ahlī". Kept specific to
-    # request-verbs so statements ("rabb al-'ālamīn", "rabbukum") don't match.
-    "رب نجني",
-    "رب هب",
-    "رب زدني",
-    "رب اشرح",
-    "رب اوزعني",
-    "رب انصرني",
-    "رب ارحم",
-    "رب ادخلني",
-    "رب اخرجني",
-    "أعوذ",
-    "أَعُوذُ",
-    "اعوذ",
-    "نعوذ",
-    "نَعُوذُ",
-    "أسألك",
-    "أَسْأَلُكَ",
+# Single source of truth. This tuple used to be duplicated here, and the two
+# copies had already drifted (30 markers there, 29 here — "اللهم إني" was
+# missing) before anyone noticed; a du'a shape added to one copy silently
+# did not reach the other. Same failure class as the flyer-pool kwarg and
+# the 30-post volume floor: import the constant, never re-type it.
+from api.services.kitab_retrieval import (  # noqa: E402
+    _DUA_SUPPLICATION_MARKERS,
 )
 
 _TASHKIL_RE = re.compile("[\u0640\u064b-\u0655\u0670]")
