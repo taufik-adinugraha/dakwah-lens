@@ -37,6 +37,34 @@ corpus. Write `<RUN>/themes.json`:
   DOMAIN-MAGNET COVERAGE, 2026-07-06) and was absent here — the recurring
   manual/auto parity failure (`project_manual_auto_parity`). If you change one,
   change the other.
+- ⛔ **NEVER put a private individual's name in a label or in keywords.** A topic label
+  is not internal taxonomy: it is injected into every briefing prompt's stats block,
+  where Section 2 is instructed to name the top topics, and it renders in the product.
+  On 2026-09-17 the label `Kasus Kekerasan Seksual: Betrand Peto dan Pesantren` went
+  live with 241 posts — a named living person against an unproven allegation. All 13
+  composers independently declined to publish it, which is judgment holding, not a
+  safeguard. Name the PATTERN ("Kasus Kekerasan Seksual di Lingkungan Publik dan
+  Pesantren"). The same applies to keywords: a name in `keywords` re-derives the name
+  in the label.
+- ⛔ **Every theme_group that carries real weekly volume needs a topic of its own**, or
+  its briefing inherits other themes' headlines and has no on-theme news to report.
+  Measured 2026-09-17: the run shipped 10 concrete event-topics plus 4 domain magnets
+  (governance / economy / education / health) and NO religious-life or technology
+  magnet. `Aqidah & Ibadah` (358 posts that week) and `Teknologi & AI` (122) therefore
+  had zero on-theme topics, and their composers had to write an honest thin week from
+  other themes' stories. Add a religious-life magnet (masjid, pesantren, santri, haji,
+  umrah, mtq, ibadah) and a technology magnet (teknologi, digital, aplikasi, siber) —
+  measure them like any other, and mark both `"magnet": true`.
+- ⛔ **Measure flyer render-safety, not just pool size.** The flyer card prints
+  `translation_id` from the START to ~560 chars and does not truncate cleanly, and
+  `extractMatn` only reduces entries whose translation carries an isnad formula. An
+  entry whose translation embeds Arabic inside that window, or runs past it, renders
+  a bidi-mixed card cut mid-sentence. Pool SIZE does not predict this: on 2026-09-17
+  `sosial-keluarga` had 9 entries with 7 safe, while `pendidikan-sdm` and
+  `patologi-sosial-digital` had 18 each with only 4, and `konflik-geopolitik` had 15
+  with 2 — too few to fill four daleel-first slots without reuse. Compute the safe
+  list per theme BEFORE composing and hand the composer only that list. See memory
+  [[project-flyer-render-path]].
 - `keywords` drive assignment by embedding cosine. The purity metric is a
   literal keyword substring match, so tune with **short single tokens**, not
   phrases (`project_manual_topic_clustering`).
