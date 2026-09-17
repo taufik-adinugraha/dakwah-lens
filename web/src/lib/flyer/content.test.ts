@@ -421,3 +421,40 @@ describe("parseInlineDua", () => {
     expect(parseInlineDua(block(`"${ID}"\n\n(HR. Bukhari)`))).toBeNull();
   });
 });
+
+describe("stripNarratorIntro — word-initial transliterated ayn (2026-09-17)", () => {
+  // The 2026-06-11 fix required whitespace before the quote so an apostrophe
+  // INSIDE a word (Qur'an) could not be read as an opening quote. Necessary
+  // but NOT sufficient: a transliterated ayn/hamza at the START of a word does
+  // have whitespace before it. Sahih Muslim 2675a shipped that shape and the
+  // card opened "'azza wa jalla berfirman): …" — sliced mid-transliteration on
+  // a public 1080x1080 share image.
+  //
+  // These use the REAL pool translation. Short synthetic strings never reach
+  // the strip path (it only runs once the text approaches targetChars=560), so
+  // a short fixture passes vacuously whatever the regex does.
+  const pick = (t: string) => pickDaleelTranslation({ translation_id: t }, "id", {});
+  const M2675A = "Abu Hurairah berkata: Rasulullah ﷺ bersabda (Allah 'azza wa jalla berfirman): **\"Aku di sisi sangkaan hamba-Ku terhadap-Ku. Aku bersamanya ketika ia mengingat-Ku. Jika ia mengingat-Ku di dalam dirinya, Aku mengingatnya di dalam diri-Ku. Jika ia mengingat-Ku di kerumunan, Aku mengingatnya di kerumunan yang lebih baik darinya. Jika ia mendekat kepada-Ku sejengkal, Aku mendekat kepadanya sehasta. Jika ia mendekat kepada-Ku sehasta, Aku mendekat kepadanya sedepa. Jika ia mendatangi-Ku berjalan, Aku mendatanginya dengan berlari kecil.\"**";
+
+  it("does not slice at the word-initial 'ayn", () => {
+    const out = pick(M2675A);
+    expect(out).not.toBe("");
+    expect(out).not.toMatch(/^'?azza/);
+    expect(out).not.toContain("berfirman)");
+  });
+
+  it("slices at the real opening double quote instead", () => {
+    expect(pick(M2675A)).toMatch(/^Aku di sisi sangkaan hamba-Ku/);
+  });
+
+  it("keeps the 2026-06-11 Qur'an behaviour on a full-length entry", () => {
+    const s =
+      "Beliau membaca Al-Qur'an berikut: \"Sesungguhnya Kami telah menurunkannya pada malam kemuliaan. " +
+      "Dan tahukah kamu apakah malam kemuliaan itu? Malam kemuliaan itu lebih baik daripada seribu bulan. " +
+      "Pada malam itu turun malaikat-malaikat dan Jibril dengan izin Tuhannya untuk mengatur segala urusan. " +
+      "Malam itu penuh kesejahteraan sampai terbit fajar, dan seterusnya sampai cukup panjang untuk diuji.\"";
+    const out = pick(s);
+    expect(out).not.toMatch(/^an berikut/);
+    expect(out).toMatch(/^Sesungguhnya Kami telah menurunkannya/);
+  });
+});

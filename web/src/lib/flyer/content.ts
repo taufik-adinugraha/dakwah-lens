@@ -350,7 +350,26 @@ function stripNarratorIntro(text: string): string {
   // "an berikut: \"Sesungguhnya...\"". Apostrophes inside words have
   // zero whitespace before them, so requiring `\s+` cleanly rejects
   // them while still matching "intro: 'TEACHING'" (space before quote).
-  const match = head.match(/[:.][^'"‘“„]{0,40}\s+(['"‘“„])/);
+  //
+  // ⚠️ 2026-09-17: the `\s+` guard is necessary but NOT sufficient. It only
+  // protects apostrophes INSIDE a word. A transliterated ayn/hamza at the
+  // START of a word — `'azza`, `'alaihi`, `'Abdullah` — does have whitespace
+  // before it and slipped through. Sahih Muslim 2675a's translation reads
+  // "Abu Hurairah berkata: Rasulullah ﷺ bersabda (Allah 'azza wa jalla
+  // berfirman): \"Aku di sisi sangkaan hamba-Ku…\"" and the card sliced at
+  // the apostrophe of `'azza`, rendering "'azza wa jalla berfirman): …" —
+  // a public 1080x1080 share-card opening mid-transliteration.
+  //
+  // Fix: a DOUBLE quote may open the teaching regardless of what follows,
+  // but a SINGLE quote only counts when a capital follows it. A real quoted
+  // sentence starts with a capital ("'Aku diperintahkan…"); a transliterated
+  // ayn is followed by a lowercase stem. Measured over all 193 flyer-pool
+  // entries of the 2026-09-17 batch this changes exactly one outcome —
+  // 2675a, which now correctly skips past `'azza` and slices at the real
+  // double quote. Dropping `'` from the class instead was tried first and
+  // REGRESSED two entries (Muslim 1536t, 1709a) that legitimately open on a
+  // single quote, which is why the guard is a lookahead and not a removal.
+  const match = head.match(/[:.][^'"‘“„]{0,40}\s+(?:(["“„])|(['‘])(?=[A-Z]))/);
   if (!match || match.index === undefined) return text;
   const quoteEnd = match.index + match[0].length;
   const stripped = text
