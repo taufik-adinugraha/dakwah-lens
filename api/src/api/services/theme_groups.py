@@ -291,6 +291,7 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "ekonomi (analisis SEBAB pergerakan harga, kaitan inflasi/rupiah/"
         "pembelian bank sentral, panduan/debat investasi, daya beli) "
         "(audit#150)"
+        "BERITA FISKAL/PERPAJAKAN (restitusi pajak, tarif PPN, penerimaan dan target pajak, tindakan DJP) dibagi dengan uji yang sama seperti audit#98 pada kasus korupsi: LAPORAN bersubstansi ekonomi masuk SINI — angka penerimaan/restitusi, pernyataan resmi soal tarif, dampak ke likuiditas dunia usaha, keluhan pengusaha yang dikutip sebagai berita. TETAPI cuitan warga yang isinya polemik ke aparat atau ke prioritas belanja negara — balasan ke akun pejabat pajak, tuduhan uang negara habis untuk program lain, ketidakpercayaan pada kantor pajak — itu Pemerintahan & Kebijakan, bukan sini. 92 posting fiskal terbelah 40/35 antara dua grup ini di tujuh run berturut-turut karena batasnya tidak pernah ditulis (audit#154)"
     ),
     "Aqidah & Ibadah": (
         "ibadah ISLAM pilar (haji/kurban/idul adha), hijrah, fatwa, polemik "
@@ -441,6 +442,7 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "atau berupa "
         "upacara HUT/Hari Jadi daerah dengan pidato prestasi kepala daerah "
         "(audit#96, diperluas audit#100)"
+        "BERITA FISKAL/PERPAJAKAN masuk sini HANYA bila pusat gravitasinya polemik ke aparat atau ke prioritas belanja negara — balasan warga ke akun pejabat pajak, tuduhan uang negara habis untuk program lain, ketidakpercayaan pada kantor pajak. Laporan bersubstansi ekonomi (angka restitusi/penerimaan, pernyataan resmi soal tarif, dampak ke likuiditas dunia usaha) itu Ekonomi & Bisnis. Uji yang sama seperti audit#98 pada kasus korupsi: fakta/laporan vs polemik pejabat. 92 posting fiskal terbelah 40/35 di tujuh run berturut-turut (audit#154)"
     ),
     "Patologi Sosial Digital": (
         "judi online, pinjol, narkoba (konteks distribusi/peredaran digital), "
