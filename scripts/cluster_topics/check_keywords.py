@@ -54,6 +54,24 @@ The two known-bad keywords sit far below every legitimate one in either set,
 so COHESION_LIMIT is set at 0.30 — under the lowest good value (39%) with
 margin, and well above both defects.
 
+COHESION DOES NOT APPLY TO SYNONYM SETS EITHER
+Cohesion assumes a theme's keywords are complementary FACETS of one story, so a
+post about that story tends to contain more than one of them. A theme built from
+SYNONYMS breaks that assumption: the keywords are alternatives, and a post uses
+one or the other. Measured 2026-09-20 on "Kasus Kekerasan Seksual di Ruang
+Publik" (kekerasan seksual · pelecehan seksual · tpks · pencabulan):
+
+    kekerasan seksual  104 matches, 17% co-occur with a synonym
+    pelecehan seksual   34 matches, 26%
+    tpks                12 matches, 83%
+    pencabulan           6 matches, 50%
+
+Reading the matches showed all of them squarely on-theme — the phrase is
+unambiguous and pulls nothing unrelated. The low number is the metric mis-fitting
+the theme shape, not pollution. Mark such a theme `"synonyms": true` to skip
+cohesion, exactly as magnets are skipped, and the skip prints so it cannot be
+used quietly on a theme that really is polluted.
+
 COHESION DOES NOT APPLY TO DOMAIN MAGNETS
 `topic_discovery.py` (DOMAIN-MAGNET COVERAGE, 2026-07-06) requires 3-5 broad
 "magnet" themes alongside the concrete event-themes, because the second-pass
@@ -118,6 +136,9 @@ def main() -> int:
             continue
         if t.get("magnet"):
             print(f"  {t['label'][:28]:30s} (domain magnet — cohesion not applicable)")
+            continue
+        if t.get("synonyms"):
+            print(f"  {t['label'][:28]:30s} (synonym set — cohesion not applicable)")
             continue
         pats = {k: word_re(k) for k in kws}
         for k in kws:
