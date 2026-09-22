@@ -16,7 +16,6 @@ from api.services.topic_discovery import (
     _rescue_in_group_orphans,
 )
 
-
 # ───────────────────────── _derive_theme_groups ──────────────────────
 
 
