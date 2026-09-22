@@ -16,13 +16,13 @@ import pytest
 
 from api.services.sentiment import _is_predominantly_non_indonesian as gate
 
-
 # Headline register: noun-heavy, zero function words. This is the class that
 # broke — 16/16 sampled eruption reports were gated.
 INDONESIAN_HEADLINES = [
     "Gunung Sinabung Erupsi, Muntahkan Kolom Abu Setinggi 3,5 KM | AKIS",
     "Gunung Anak Krakatau Erupsi, Semburan Abu Capai 15 Kilometer | OneNews Update",
-    "Tiga Bandara InJourney Airports Terdampak Erupsi Gunung Anak Krakatau, 459 Penerbangan Dibatalkan",
+    "Tiga Bandara InJourney Airports Terdampak Erupsi Gunung Anak "
+    "Krakatau, 459 Penerbangan Dibatalkan",
     "Meluas hingga 290 Hektar Karhutla Semeru Hanguskan Vegetasi Jalur Pendakian",
     "Pascaerupsi Gunung Sinabung, PVMBG Imbau Masyarakat Jauhi Kawasan Rawan Bencana",
     "[HEADLINE NEWS, 02/09] Gunung Sinabung Masih Siaga Zona Bahaya Diperluas MetroTV",
