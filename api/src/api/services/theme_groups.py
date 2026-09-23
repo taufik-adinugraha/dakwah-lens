@@ -264,10 +264,21 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "BUKAN buletin/digest redaksi berisi daftar judul bernomor lintas-topik "
         "(format 'Judul | NamaProgram', rangkuman headline TV/portal): tidak ada satu "
         "tema substantif di dalamnya, jadi JANGAN diklasifikasi dari judul pertama "
-        "yang kebetulan pidana — itu Lainnya (audit#155). "
+        "yang kebetulan pidana — itu Lainnya (audit#155). KECUALI rangkuman yang seluruh "
+        "butirnya SATU tema (mis. rangkuman liputan satu bencana atau satu perkara): itu "
+        "bukan lintas-topik, jadi tetap masuk grup temanya (audit#159). "
         "BUKAN penyerahan/hibah aset rampasan atau barang sitaan kepada pemda/instansi "
         "setelah perkara selesai — itu tata kelola aset negara tanpa perkara pidana "
-        "aktif → Pemerintahan & Kebijakan (perluasan audit#101; audit#157)"
+        "aktif → Pemerintahan & Kebijakan (perluasan audit#101; audit#157). "
+        "Kata 'sidang' atau 'gugatan' BUKAN tanda perkara pidana. Sengketa konstitusional, "
+        "pemilu, dan tata usaha negara — sidang PHPU di MK soal syarat pencalonan, gugatan "
+        "PTUN, sengketa KIP, uji materi — tanpa dakwaan pidana itu sengketa legitimasi/"
+        "kebijakan → Pemerintahan & Kebijakan. Masuk sini HANYA bila ada unsur pidana "
+        "aktif: dakwaan, JPU, terdakwa, tersangka, penyidikan polisi/KPK, pasal pidana. "
+        "Satu topik bisa melahirkan dua jalur: sengketa ijazah di MK → Pemerintahan, "
+        "sementara perkara pencemaran nama baik atas klaim yang sama dengan dakwaan/JPU "
+        "→ di sini. Diukur 09-23: 72 posting ijazah masuk sini, 62 memuat 'sidang' dan "
+        "44 menyebut MK, hanya 4 memuat 'pidana' (audit#158)"
     ),
     "Sosial & Keluarga": (
         "KS, KDRT, perlindungan anak, kebijakan keluarga, dinamika sosial "
@@ -310,7 +321,9 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "negara — balasan ke akun pejabat pajak, tuduhan uang negara habis untuk program lain, "
         "ketidakpercayaan pada kantor pajak — itu Pemerintahan & Kebijakan, bukan sini. 92 "
         "posting fiskal terbelah 40/35 antara dua grup ini di tujuh run berturut-turut karena "
-        "batasnya tidak pernah ditulis (audit#154)"
+        "batasnya tidak pernah ditulis (audit#154). "
+        "BUKAN artikel templat produk pinjaman (tabel simulasi cicilan KUR/bank, 'Tabel "
+        "KUR BRI') — itu info produk layanan → Lainnya, sejajar buletin harga (audit#161)"
     ),
     "Aqidah & Ibadah": (
         "ibadah ISLAM pilar (haji/kurban/idul adha), hijrah, fatwa, polemik "
@@ -366,7 +379,11 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "tumpengan/berkat, lomba & harlah pesantren, klip sholawat, dan "
         "penggalangan dana berlabel Maulid itu logistik seremonial → Lainnya. "
         "192 posting Maulid terbelah 102/85 antar-batch di audit#152 karena "
-        "aturannya benar tapi tidak pernah disebut (audit#152)"
+        "aturannya benar tapi tidak pernah disebut (audit#152). "
+        "Prinsip yang sama berlaku DI LUAR Maulid: caption pengumuman kajian/ngaji rutin/"
+        "LIVE streaming masjid yang hanya memuat nama penceramah, lokasi, dan jadwal tanpa "
+        "kutipan atau penjelasan isi ajaran itu logistik acara → Lainnya. Masuk sini bila "
+        "TEKS-nya sendiri memuat ayat/hadits atau penjelasan substantif (audit#162)"
     ),
     "Kesehatan & Kehidupan": (
         "kesehatan fisik & mental, kesejahteraan jiwa. TERMASUK keracunan "
@@ -384,7 +401,13 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "BUKAN konten yang subjeknya PERUNDUNGAN/olok-olok terhadap korban keracunan "
         "(video pegawai mengejek korban, korban dikucilkan lingkungan/sekolah) — yang "
         "dibahas perlakuan terhadap korban, bukan peristiwa keracunannya → Sosial & "
-        "Keluarga (audit#156)"
+        "Keluarga (audit#156). "
+        "TERMASUK dampak kesehatan dari bencana atau program bila yang dibahas KONDISI "
+        "KESEHATANNYA (kasus ISPA akibat kabut asap, lonjakan pasien, data Kemenkes) → di "
+        "sini. Bila yang dibahas PERISTIWANYA sendiri (titik api, evakuasi, kecelakaan — "
+        "termasuk tersedak saat makan program), itu Lingkungan & Bencana (audit#160). "
+        "BUKAN lomba/cerdas cermat literasi JKN/BPJS yang seremonial tanpa isi "
+        "kesehatan — itu Lainnya, perpanjangan audit#150 (audit#161)"
     ),
     "Pendidikan & SDM": (
         "sekolah, kampus, literasi, pembangunan SDM kelembagaan — BUKAN "
@@ -418,7 +441,10 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "sinetron/film/anime, roleplay, atau caption 'kecelakaan/gempa' tanpa "
         "detail lokasi-waktu-korban yang nyata — peristiwanya tidak terjadi, "
         "jadi itu Lainnya. Butuh indikasi kejadian NYATA (lokasi, waktu, "
-        "korban, instansi/SAR/BMKG) untuk masuk sini (audit#151)"
+        "korban, instansi/SAR/BMKG) untuk masuk sini (audit#151). "
+        "BUKAN posting yang pusatnya DAMPAK KESEHATAN (kasus ISPA akibat asap, data pasien, "
+        "pernyataan Kemenkes) — itu Kesehatan & Kehidupan. Yang di sini adalah "
+        "PERISTIWANYA: titik api, evakuasi, kecelakaan (audit#160)"
     ),
     "Pemerintahan & Kebijakan": (
         "pemerintahan, kebijakan publik, otonomi daerah, program negara, "
@@ -475,10 +501,16 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "BUKAN buletin/digest redaksi berisi daftar judul bernomor lintas-topik "
         "(format 'Judul | NamaProgram'): tidak ada satu tema substantif, jadi JANGAN "
         "diklasifikasi dari judul pertama yang kebetulan kebijakan — itu Lainnya "
-        "(audit#155). "
+        "(audit#155). KECUALI rangkuman yang seluruh butirnya SATU tema: itu bukan "
+        "lintas-topik, jadi tetap masuk grup temanya (audit#159). "
         "TERMASUK penyerahan/hibah aset rampasan negara (mis. dari KPK) kepada "
         "pemkot/pemda untuk dipakai layanan publik — itu tata kelola aset, BUKAN "
-        "Hukum & Keadilan, karena tidak ada tersangka atau perkara berjalan (audit#157)"
+        "Hukum & Keadilan, karena tidak ada tersangka atau perkara berjalan (audit#157). "
+        "TERMASUK sengketa konstitusional/pemilu/TUN tanpa dakwaan pidana — sidang PHPU di "
+        "MK soal syarat pencalonan, gugatan PTUN, sengketa KIP — itu sengketa legitimasi "
+        "pejabat, BUKAN Hukum & Keadilan walau berbentuk 'sidang'. Bila topik yang sama "
+        "melahirkan perkara pidana tersendiri (terdakwa, dakwaan, JPU), perkara pidana "
+        "itu → Hukum & Keadilan (audit#158)"
     ),
     "Patologi Sosial Digital": (
         "judi online, pinjol, narkoba (konteks distribusi/peredaran digital), "
