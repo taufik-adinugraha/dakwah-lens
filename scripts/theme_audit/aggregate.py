@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Aggregate subagent flags -> validated corrections.json + apply.sql.
 
-Usage: python aggregate.py <run_dir> [--force]
+Usage: python aggregate.py <run_dir> [--force] [--ignore-alignment]
 
 Reads  <run_dir>/out/flags_*.json, valid_groups.json, target.jsonl, target_uuids.txt
 Writes <run_dir>/corrections.json and <run_dir>/apply.sql
@@ -9,6 +9,15 @@ Writes <run_dir>/corrections.json and <run_dir>/apply.sql
 Resumability guard: every in/part_<stem>.jsonl must have a matching out/flags_<stem>.json.
 If any are missing, corrections.json is still written for inspection but apply.sql is
 withheld (unless --force) — so a half-finished fan-out never gets partially applied.
+
+Alignment guard: every completed batch goes through check_alignment.py. A batch whose
+labels sit on the neighbouring posts (a positional zip that slipped by one) passes
+verify_batch, because counts still match. On a SHIFT, apply.sql is withheld even under
+--force: --force exists to bank a partial wave, and a shifted batch is not partial,
+it is wrong. Override only with --ignore-alignment, after reading the batch.
+
+Whenever apply.sql is withheld, a stale one from an earlier wave is deleted, so
+apply.sh cannot push an old file and look like it applied this one.
 """
 import argparse
 import glob
@@ -16,6 +25,9 @@ import json
 import os
 import re
 from collections import Counter
+
+from check_alignment import check_run
+from check_alignment import report as alignment_report
 
 UUID = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
 
@@ -29,6 +41,8 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("run_dir")
     ap.add_argument("--force", action="store_true")
+    ap.add_argument("--ignore-alignment", action="store_true",
+                    help="apply despite a SHIFT verdict — only after reading the batch")
     a = ap.parse_args()
     sp = a.run_dir
 
@@ -175,9 +189,24 @@ def main() -> None:
         print(f"  {n:4}  {frm} -> {to}")
     json.dump(corr, open(f"{sp}/corrections.json", "w"), ensure_ascii=False, indent=1)
 
-    if missing and not a.force:
-        print(f"\n✗ apply.sql withheld — {len(missing)} batch(es) missing: {missing}. "
-              f"Re-run those batches, or pass --force to apply the partial set.")
+    print()
+    align = check_run(sp.rstrip("/"), sorted(done))
+    alignment_report(align)
+    shifted = [r["batch"] for r in align if r["verdict"] == "SHIFT"]
+
+    withhold = None
+    if shifted and not a.ignore_alignment:
+        withhold = (f"{len(shifted)} batch(es) look SHIFTED: {shifted}. Rebuild those flags by "
+                    f"id and re-run; --force does not override this (--ignore-alignment does).")
+    elif missing and not a.force:
+        withhold = (f"{len(missing)} batch(es) missing: {missing}. "
+                    f"Re-run those batches, or pass --force to apply the partial set.")
+    if withhold:
+        stale = f"{sp}/apply.sql"
+        if os.path.exists(stale):
+            os.remove(stale)
+            print("  (removed stale apply.sql from an earlier aggregate)")
+        print(f"\n✗ apply.sql withheld — {withhold}")
         _print_notes(notes)
         return
 
