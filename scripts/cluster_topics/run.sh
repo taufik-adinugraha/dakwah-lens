@@ -39,6 +39,31 @@ scp -q "dakwah:/tmp/${NAME}.posts.jsonl" "$RUN/posts.jsonl"
 echo "sample:      $RUN/sample.md      ($(wc -c < "$RUN/sample.md" | tr -d ' ') bytes)"
 echo "posts cache: $RUN/posts.jsonl    ($(grep -c '' "$RUN/posts.jsonl") posts)"
 
+# Shard the sample for the parallel survey. The survey prompt is rendered per
+# shard from the checked-in SURVEY_PROMPT.md, never retyped — a retyped prompt
+# is where the other manual pipelines drifted.
+SHARDS="${SHARDS:-5}"
+mkdir -p "$RUN/shards"
+grep '^- ' "$RUN/sample.md" > "$RUN/body.txt"
+NB=$(grep -c '' "$RUN/body.txt")
+NP=$(grep -c '' "$RUN/posts.jsonl")
+PER=$(( (NB + SHARDS - 1) / SHARDS ))
+split -l "$PER" -d -a 2 "$RUN/body.txt" "$RUN/shards/shard_"
+for sh in "$RUN"/shards/shard_[0-9][0-9]; do
+  NN="${sh##*_}"
+  sed -e "s|{RUN}|$RUN|g" -e "s|{NAME}|$NAME|g" -e "s|{NN}|$NN|g" \
+      -e "s|{N_POSTS}|$NP|g" -e "s|{N_LINES}|$(grep -c '' "$sh")|g" \
+      "$HERE/SURVEY_PROMPT.md" > "$RUN/shards/prompt_$NN.md"
+done
+echo "shards:      $(ls "$RUN"/shards/shard_[0-9][0-9] | wc -l | tr -d ' ') x ~$PER lines  (prompts: shards/prompt_NN.md)"
+
 echo
-echo "=== next: read $HERE/THEMES_PROMPT.md, author $RUN/themes.json, then:"
-echo "    bash $HERE/inject.sh $RUN"
+echo "=== next:"
+echo "  1. one Claude subagent per shard, prompt = the text of $RUN/shards/prompt_NN.md verbatim"
+echo "     (Sonnet is fine for the survey; never Gemini). The agent REPLIES with its report;"
+echo "     the orchestrator saves each reply to $RUN/shards/report_NN.md (subagents may not write report files)"
+echo "  2. python3 $HERE/verify_reports.py $RUN     # re-counts every proposed token"
+echo "  3. read $HERE/THEMES_PROMPT.md, author $RUN/themes.json from the reports"
+echo "  4. bash $HERE/inject.sh $RUN"
+echo "  5. for any concrete theme well below ~0.60 purity:  bash $HERE/peek_topic.sh \"<label>\""
+echo "     then re-author and re-inject (idempotent)"

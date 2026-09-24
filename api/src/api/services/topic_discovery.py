@@ -334,8 +334,11 @@ FIX: alongside your concrete event-themes, ALWAYS emit a broad DOMAIN-MAGNET the
   · "Panduan Ibadah & Spiritualitas Islam" (keywords: sholat, shalat, dzikir, mualaf, sunnah, ibadah) — the reservoir for general-Islam chatter, so Haji/Qurban/Zakat event-themes stay clean.
   · "Ekonomi, Harga & Daya Beli" (keywords: ekonomi, harga, inflasi, daya beli, subsidi) — the reservoir for generic finance, so JHT/UMKM/specific-policy themes stay clean.
   · "Dunia Pendidikan & Sekolah" (keywords: sekolah, siswa, guru, dosen, beasiswa, SPMB) — the reservoir for generic education, so Sekolah-Rakyat / specific-program themes stay clean.
+  · "Politik, Partai & Pemilu" (keywords: partai, pemilu, fraksi, capres, ambang batas) — politics is its own domain, separate from governance. Without it (measured 2026-09-24) an MK-dispute theme absorbed every party/election orphan and fell to 0.41 purity; adding it lifted that theme to 0.62.
+  · "Bencana Alam & Lingkungan Hidup" (keywords: banjir, longsor, bencana, cuaca, bpbd) — so specific disaster themes (a sinking, a wildfire) stay clean.
   · plus the governance / crime / personal-social magnets you already tend to emit.
-Give each domain magnet min_similarity ~0.34-0.38 (deliberately LOW so it out-competes concrete themes for weak-signal orphans). These magnets carry moderate purity themselves (~0.45-0.80) — that is CORRECT and expected; their job is to keep the DENOMINATOR clean on the concrete themes. Target ~3-5 domain magnets sitting under your concrete event-themes.
+Give each domain magnet min_similarity ~0.34-0.38 (deliberately LOW so it out-competes concrete themes for weak-signal orphans). These magnets carry moderate purity themselves (~0.45-0.80) — that is CORRECT and expected; their job is to keep the DENOMINATOR clean on the concrete themes. Emit one domain magnet for EVERY recurring high-volume domain in the pool — typically 8-11, not 3-5 (the 2026-09-24 manual run needed 11 to keep its concrete themes clean).
+A CONCRETE label must never contain a generic role noun: "Pergantian Menkeu dan Mutasi Pejabat" became the reservoir for every appointment story in the corpus (0.42 purity) because "mutasi pejabat" describes all of them. Name the event only ("Pergantian Menteri Keuangan").
 
 For each theme:
 - label: short human-readable name in Bahasa Indonesia (3-6 words). Be CONCRETE about what the theme is — name the actual subject matter, not a generic newsroom department.

@@ -1,7 +1,8 @@
 # Authoring the themes JSON (Stage 1 → Stage 2)
 
-Read `<RUN>/sample.md` — it is the exact discovery prompt, with a sample of the
-corpus. Write `<RUN>/themes.json`:
+Read the five survey reports in `<RUN>/shards/report_NN.md` (after
+`verify_reports.py` passes) and `<RUN>/sample.md`, the exact discovery prompt with a
+sample of the corpus. Write `<RUN>/themes.json`:
 
 ```json
 {"themes": [
@@ -12,7 +13,9 @@ corpus. Write `<RUN>/themes.json`:
 
 - **6–10 CONCRETE event-themes**, Indonesian labels, covering what the corpus is
   actually about this week — not evergreen categories.
-- **Plus 3–5 DOMAIN MAGNETS, marked `"magnet": true`.** This is not optional and
+- **Plus one DOMAIN MAGNET per theme_group that carries real volume, marked
+  `"magnet": true`** — in practice 8–11, not the 3–5 this line once said (see the
+  2026-09-24 measurement below). This is not optional and
   it is the one rule this file used to be missing. `topic_discovery.py` runs two
   rescue passes that force every leftover orphan onto its nearest centroid, and
   the in-group pass *deliberately ignores your per-theme `min_similarity`* (the
@@ -55,6 +58,42 @@ corpus. Write `<RUN>/themes.json`:
   other themes' stories. Add a religious-life magnet (masjid, pesantren, santri, haji,
   umrah, mtq, ibadah) and a technology magnet (teknologi, digital, aplikasi, siber) —
   measure them like any other, and mark both `"magnet": true`.
+- ⛔ **Politics is its own domain; it needs its own magnet.** Measured 2026-09-24:
+  with a governance magnet but no party/election one, "Sengketa Syarat Pendidikan
+  Wapres di MK" absorbed every political-chatter orphan (party reshuffles, the
+  threshold debate, a president's remark about "pakar") — 323 posts at **0.41**.
+  Adding `Politik, Partai, dan Pemilu` (partai, pemilu, fraksi, capres, golkar,
+  nasdem, pdip, ambang batas) took it to 247 at **0.62**. Also measured that run:
+  `Lingkungan & Bencana` (656 posts) had no magnet in the previous run; give it one
+  (banjir, longsor, bencana, cuaca, bpbd, erupsi) or its orphans land on whichever
+  disaster story is nearest. Before authoring, count the run's theme_group volume
+  from `posts.jsonl` (key `theme_group`) and give every group above ~80 posts a
+  home.
+- ⛔ **A concrete label must not contain a generic role noun.** "Pergantian Menkeu
+  dan *Mutasi Pejabat* Kemenkeu" became the reservoir for every "a minister/official
+  does X" story in the corpus — 157 posts at 0.42 — because *mutasi pejabat* is
+  semantically every appointment in the country. Name the event only ("Pergantian
+  Menteri Keuangan"), and give the governance magnet the tokens that let it win
+  those posts (`kabinet`, `menlu`, `presiden prabowo`, `pemkot`, `pemprov`,
+  `pemkab`, `apbd`, `wali kota`): 0.42 → 0.55, with the magnet absorbing them at 0.83.
+- **If a concrete theme is collecting a whole beat, rename it to the beat, honestly.**
+  "Penindakan KPK: Suap HGB dan OTT Kepala Daerah" was collecting every corruption
+  case of the week (Kejagung, DPRD assets, BOSP funds) at 0.42. Relabelled
+  "Penindakan Korupsi: Suap HGB, OTT KPK, dan Kasus Daerah" with `korupsi`, `kpk`,
+  `kejagung`, `gratifikasi`, `tipikor`: **0.86**. The label had been the lie, not
+  the assignment.
+- **Diagnose an over-absorbing theme by reading it, not by nudging floors:**
+
+      bash {TOOLKIT}/peek_topic.sh "<label>" 30
+
+  It prints the theme_group mix and samples the posts that contain NONE of the
+  theme's keywords. What they are tells you which of the three fixes above applies.
+  Re-author and re-inject (idempotent); three rounds took that run's concrete-only
+  purity from 0.54 to 0.65 at unchanged coverage.
+- An entertainment/celebrity magnet did NOT earn its place (2026-09-24: 36 posts,
+  0.25 purity) and dropping it left the sports theme's purity unchanged at 0.63.
+  Celebrity gossip is better left in the orphan bucket than given a label, which
+  would also invite celebrity names into keywords.
 - ⛔ **Measure flyer render-safety, not just pool size.** The flyer card prints
   `translation_id` from the START to ~560 chars and does not truncate cleanly, and
   `extractMatn` only reduces entries whose translation carries an isnad formula. An
