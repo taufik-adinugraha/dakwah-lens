@@ -91,7 +91,7 @@ from api.models.admin import Briefing
 from api.services.briefing import (
     MIN_POSTS_PER_GROUP_FOR_BRIEFING,
     SYSTEM_PROMPT_ID,
-    _build_retrieval_query,
+    _build_retrieval_query_fallback,
     _build_user_prompt,
     _compute_stats,
 )
@@ -175,9 +175,30 @@ def _cache_path(group_slug: str) -> Path:
     return _CACHE_DIR / f"{group_slug}.json"
 
 
+def _read_query_file(path: str) -> str:
+    """Load a Claude-authored retrieval query: three lines `ID: …` / `EN: …` / `AR: …`.
+
+    Same trilingual shar'i format `briefing._build_retrieval_query` asks Gemini
+    Flash-Lite for, joined the same way (one embedding input, `\n`-separated).
+    """
+    import re
+
+    parts = []
+    for line in Path(path).read_text(encoding="utf-8").splitlines():
+        m = re.match(r"\s*(ID|EN|AR)\s*:\s*(.+)", line)
+        if m:
+            parts.append(m.group(2).strip())
+    if len(parts) != 3:
+        raise SystemExit(
+            f"{path}: expected three lines 'ID: …', 'EN: …', 'AR: …'; found {len(parts)}"
+        )
+    return "\n".join(parts)
+
+
 async def _prepare_unranked_candidates(
     group: str,
     allow_thin: bool = False,
+    query_file: str | None = None,
 ) -> dict[str, Any]:
     """Two-stage flow STEP 1: run retrieval, skip every Gemini call.
 
@@ -232,7 +253,28 @@ async def _prepare_unranked_candidates(
                 floor=MIN_POSTS_PER_GROUP_FOR_BRIEFING,
             )
 
-        retrieval_query = _build_retrieval_query(stats, group)
+        # The retrieval query is the one LLM judgment this stage used to hand to
+        # Gemini: `briefing._build_retrieval_query` calls Flash-Lite, and the
+        # 2026-06-24 pure-Claude refactor missed it. With the Gemini prepay
+        # depleted (~2026-09-03) every manual batch silently fell back to the
+        # token-concat builder — measured 2026-09-24 on Pemerintahan: Qur'an 0
+        # kept (top 0.344), Bukhari 0 (top 0.178), 74 below threshold, against
+        # a Claude-authored trilingual query that kept 6 in EVERY corpus (tops
+        # 0.51-0.60, 0 below threshold).
+        #
+        # So: Claude writes the query in chat (`--query-file`), and without one
+        # we use the deterministic fallback. This path never calls Gemini.
+        if query_file:
+            retrieval_query = _read_query_file(query_file)
+            log.info("manual_briefing.retrieval_query", source="claude", group=group)
+        else:
+            retrieval_query = _build_retrieval_query_fallback(stats, group)
+            log.warning(
+                "manual_briefing.retrieval_query",
+                source="fallback",
+                group=group,
+                hint="pass --query-file with a Claude-authored ID/EN/AR query",
+            )
 
         # 28 candidates — no rerank. Auto pipeline reranks to 18 with
         # Flash-Lite; here Claude picks 18 in chat from the full pool.
@@ -545,12 +587,17 @@ def _format_candidates_markdown(
 
 
 async def cmd_dump_candidates(
-    group_arg: str, output_path: str | None, allow_thin: bool = False
+    group_arg: str,
+    output_path: str | None,
+    allow_thin: bool = False,
+    query_file: str | None = None,
 ) -> None:
     group = _resolve_group(group_arg)
     slug = _group_slug(group)
 
-    candidates = await _prepare_unranked_candidates(group, allow_thin=allow_thin)
+    candidates = await _prepare_unranked_candidates(
+        group, allow_thin=allow_thin, query_file=query_file
+    )
 
     # Cache the unranked candidates so `dump-prompt` can apply Claude's
     # picks without re-running retrieval.
@@ -3526,6 +3573,16 @@ def main() -> None:
             "(the floor the auto pipeline enforces). Logged when used."
         ),
     )
+    p_dump_c.add_argument(
+        "--query-file",
+        default=None,
+        help=(
+            "Claude-authored retrieval query: three lines 'ID: …' / 'EN: …' / "
+            "'AR: …' in shar'i vocabulary, written from the theme's own "
+            "headlines. Without it the deterministic fallback query is used "
+            "(it retrieves scripture poorly). Never calls Gemini."
+        ),
+    )
 
     p_dump_p = sub.add_parser(
         "dump-prompt",
@@ -3764,7 +3821,9 @@ def main() -> None:
 
     if args.cmd == "dump-candidates":
         asyncio.run(
-            cmd_dump_candidates(args.group, args.output, args.allow_thin)
+            cmd_dump_candidates(
+                args.group, args.output, args.allow_thin, args.query_file
+            )
         )
     elif args.cmd == "dump-prompt":
         asyncio.run(cmd_dump_prompt(args.group, args.picks, args.output))

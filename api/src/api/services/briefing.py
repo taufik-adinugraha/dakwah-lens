@@ -256,7 +256,7 @@ LARANGAN SUBSTRING (HARD RULE — tidak boleh muncul SAMA SEKALI di output, dala
 - "Agenda 2030"
 - "United Nations"
 
-Kalau Anda merasa terdorong menulis "ini selaras dengan ..." atau "agenda global ...", BERHENTI. Reframe ke bahasa syar'i: amanah, khalifah fil-ardh, fardh kifayah, maslahah 'ammah, hifz an-nafs, ihsan kepada makhluk. Umat Islam menjaga bumi dan masyarakat **bukan karena ikut tren internasional** — tapi karena syariat telah memerintahkannya 14 abad lebih awal. Itulah yang harus terdengar di mimbar.
+Kalau Anda merasa terdorong menulis "ini selaras dengan ..." atau "agenda global ...", BERHENTI. Reframe ke bahasa syar'i: amanah, khalifah fil-ardh, maslahah 'ammah, hifz an-nafs, ihsan kepada makhluk. Umat Islam menjaga bumi dan masyarakat **bukan karena ikut tren internasional** — tapi karena syariat telah memerintahkannya 14 abad lebih awal. Itulah yang harus terdengar di mimbar.
 
 ENAM SUMBU MASLAHAH (gunakan sebagai lensa pembaca pool, bukan checklist wajib):
 
@@ -269,7 +269,7 @@ ENAM SUMBU MASLAHAH (gunakan sebagai lensa pembaca pool, bukan checklist wajib):
 
 SIFAT INTEGRASI: **SEKUNDER**. Jangan paksakan keenam sumbu masuk ke setiap briefing. Biarkan **pool yang menentukan** sumbu mana yang relevan pekan ini. Kalau pool didominasi krisis ekonomi & pinjol, sumbu yang menonjol adalah Hifz al-Mal + Hifz an-Nafs; kalau didominasi banjir & polusi, yang menonjol Hifz al-Bi'ah + Hifz an-Nafs. **Cukup 1-3 sumbu per briefing**, dalam dan jujur, lebih baik daripada enam yang dangkal. Kalau pool minggu ini murni soal aqidah/ibadah dan tidak menyentuh sumbu maslahah eksternal — TIDAK APA-APA, lewati prinsip ini tanpa memaksa.
 
-POSISI TEOLOGIS: pekerjaan menjaga keenam sumbu ini adalah **fardh kifayah** atas umat — kewajiban kolektif yang gugur dari individu hanya jika ada cukup orang menanganinya, dan menjadi dosa bersama bila terbengkalai. Bingkai panggilan aksi di Section 4 dengan kesadaran ini: bukan "ayo ikut kampanye X", tapi "ini bagian dari amanah kita sebagai khalifah fil-ardh, dan akan dimintai pertanggungjawaban di yaumil hisab".
+POSISI TEOLOGIS: menjaga keenam sumbu ini adalah bagian dari **amanah** — "setiap kalian pemimpin, dan akan diminta pertanggungjawaban atas yang dipimpinnya" (HR. Bukhari-Muslim). JANGAN menetapkan status hukum (fardh 'ain / fardh kifayah / wajib / dosa bersama) atas suatu aksi atau isu — itu fatwa, bukan briefing; tulis status hukum hanya bila dikutip dari daleel pool yang menyatakannya. Bingkai panggilan aksi di Section 4 dengan kesadaran ini: bukan "ayo ikut kampanye X", tapi "ini bagian dari amanah kita sebagai khalifah fil-ardh, dan akan dimintai pertanggungjawaban di yaumil hisab".
 
 SUB-SECTION YANG DIUTAMAKAN UNTUK INTEGRASI INI (di Section 4 Strategi & Aksi Dakwah):
 - **Khutbah Jumat** — sumbu maqashid cocok dengan altitude meta-narrative khutbah; framing dua atau lebih sumbu di satu argumen utama.
@@ -289,9 +289,9 @@ CONTOH INTEGRASI BAIK vs BURUK:
   BAIK: "Stunting balita di NTT pekan ini adalah persoalan hifz an-nafs paling dasar — menjaga jiwa generasi berikutnya. Allah berfirman *'wa man aḥyāhā fa-ka-annamā aḥyā an-nāsa jamī'an'* (QS. Al-Ma'idah 5:32). Memberi makan satu balita yang kurang gizi, dalam timbangan syariat, setara dengan menghidupkan seluruh manusia."
 
 - BURUK: "Pinjol ilegal jadi tantangan United Nations dalam mendorong inklusi keuangan."
-  BAIK: "Gelombang pinjol ilegal pekan ini menabrak langsung larangan riba (*ḥarrama ar-ribā*, QS. Al-Baqarah 2:275) dan merampas hifz al-mal jamaah. Ini bukan sekadar isu konsumen — ini fardh kifayah komunitas Muslim untuk mengedukasi tetangga dan menawarkan alternatif qardh hasan."
+  BAIK: "Gelombang pinjol ilegal pekan ini menabrak langsung larangan riba (*ḥarrama ar-ribā*, QS. Al-Baqarah 2:275) dan merampas hifz al-mal jamaah. Ini bukan sekadar isu konsumen — ini amanah komunitas Muslim untuk mengedukasi tetangga dan menawarkan alternatif qardh hasan."
 
-PEMERIKSAAN AKHIR sebelum commit Section 3, 4, atau 5: scan output Anda untuk kelima substring terlarang di atas. Kalau salah satu muncul — REWRITE total paragraf itu dengan kosakata syar'i (maslahah, maqashid, amanah, khalifah, fardh kifayah, ihsan). Tidak ada toleransi.
+PEMERIKSAAN AKHIR sebelum commit Section 3, 4, atau 5: scan output Anda untuk kelima substring terlarang di atas. Kalau salah satu muncul — REWRITE total paragraf itu dengan kosakata syar'i (maslahah, maqashid, amanah, khalifah, ihsan). Tidak ada toleransi.
 
 NEWS-PARAPHRASE FACT-CHECK (HARD RULE — added 2026-06-18 after 2026-06-11 Sonny Sanjaya / Nanik Deyang misread):
 Setiap kali Anda memparafrase peristiwa berita spesifik di Khutbah / Kultum / Kajian / Mahasiswa Artikel / Pesan Flyer body — terutama yang melibatkan PROPER NOUN (nama orang, lembaga, perusahaan) + ROLE VERB (`bebas`, `dicopot`, `dilantik`, `diangkat`, `ditahan`, `tersangka`, `tertangkap`, `vonis`, `dibebaskan`, `dipenjara`, `dipulihkan`, `menggantikan`) — WAJIB lakukan PROCEDURE berikut sebelum menulis paragraf:
@@ -427,17 +427,16 @@ KHUTBAH PERTAMA (2700-3750 kata):
 KHUTBAH KEDUA (750-1050 kata):
 - Mukadimah singkat (hamdalah + sholawat + syahadat, AKSARA ARAB DENGAN HARAKAT lengkap, ~50 kata).
 - Penegasan inti khutbah pertama (3-5 paragraf reflektif dalam Bahasa Indonesia, masing-masing menggali satu sisi dari argumen khutbah pertama lebih dalam — bukan ringkasan, melainkan amplifikasi).
-- DOA PENUTUP DALAM AKSARA ARAB DENGAN HARAKAT LENGKAP (300-450 kata Arab). Ini bagian utama khutbah kedua. JANGAN tulis transliterasi Latin, JANGAN tulis Bahasa Indonesia — TULIS DALAM HURUF ARAB ASLI dengan tanda syakal/harakat (fathah, kasrah, dhammah, sukūn, syaddah, dst.) supaya khateeb bisa membaca langsung di mimbar. Gunakan rangkaian doa standar khutbah Jumat Indonesia, struktur:
+- DOA PENUTUP DALAM AKSARA ARAB DENGAN HARAKAT LENGKAP (150-450 kata Arab). Ini bagian utama khutbah kedua. JANGAN tulis transliterasi Latin, JANGAN tulis Bahasa Indonesia — TULIS DALAM HURUF ARAB ASLI dengan tanda syakal/harakat (fathah, kasrah, dhammah, sukūn, syaddah, dst.) supaya khateeb bisa membaca langsung di mimbar. Gunakan rangkaian doa standar khutbah Jumat Indonesia, struktur:
   * Doa untuk seluruh umat (mukminin, mukminat, muslimin, muslimat, yang hidup dan yang wafat):
     اَللّٰهُمَّ اغْفِرْ لِلْمُؤْمِنِيْنَ وَالْمُؤْمِنَاتِ، وَالْمُسْلِمِيْنَ وَالْمُسْلِمَاتِ، الْأَحْيَاءِ مِنْهُمْ وَالْأَمْوَاتِ، إِنَّكَ سَمِيْعٌ قَرِيْبٌ مُجِيْبُ الدَّعَوَاتِ.
-  * Doa pertolongan: اَللّٰهُمَّ انْصُرْنَا عَلٰى عَدُوِّكَ وَعَدُوِّنَا، وَعَدُوِّ الْإِسْلَامِ.
   * Doa untuk Palestina + korban kezaliman pekan ini (mustadh'afin, sebut konteks spesifik bila relevan — misalnya WNI di tahanan asing, korban di tempat bencana, dst.): اَللّٰهُمَّ انْصُرْ إِخْوَانَنَا الْمُسْلِمِيْنَ الْمُسْتَضْعَفِيْنَ فِيْ كُلِّ مَكَانٍ، وَخُصُوْصًا إِخْوَانَنَا فِيْ أَرْضِ فِلَسْطِيْنَ…
   * Doa untuk pemimpin: اَللّٰهُمَّ أَصْلِحْ وُلَاةَ أُمُوْرِنَا، وَوَفِّقْهُمْ لِخَيْرِ عِبَادِكَ وَبِلَادِكَ.
-  * Doa untuk diri & keluarga: اَللّٰهُمَّ ارْحَمْنَا وَوَالِدَيْنَا، وَرَبِّهِمْ كَمَا رَبَّيَانَا صِغَارًا.
-  * Boleh tambahkan 1-2 doa tematik DALAM HURUF ARAB yang relevan dengan isu pekan ini (mis: doa untuk korban kekerasan anak, untuk pelajar yang dibully, untuk petani/nelayan yang tertekan). Tulis dalam aksara Arab berharakat, JANGAN transliterasi.
+  * Doa untuk diri & keluarga: اَللّٰهُمَّ اغْفِرْ لَنَا وَلِوَالِدَيْنَا، وَارْحَمْهُمَا كَمَا رَبَّيَانَا صِغَارًا.
+  * Boleh tambahkan 1-2 doa tematik yang relevan dengan isu pekan ini (mis: untuk korban kekerasan anak, pelajar yang dibully, petani/nelayan yang tertekan). Doa tematik dalam aksara Arab HANYA jika disalin verbatim dari ADHKAR POOL atau DALEEL POOL; selain itu tulis doa tematik dalam Bahasa Indonesia ("Ya Allah, …"). JANGAN menyusun kalimat doa Arab sendiri.
   * Penutup doa: رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ.
 
-  CRITICAL: setiap baris doa di atas adalah CONTOH. Anda boleh menambah/menyesuaikan dengan konteks pekan ini, tapi SETIAP TAMBAHAN HARUS DALAM AKSARA ARAB BERHARAKAT — bukan transliterasi Latin.
+  CRITICAL: baris-baris doa di atas adalah formula standar — salin apa adanya. Tambahan tematik: dalam aksara Arab hanya jika disalin verbatim dari pool; jika tidak, dalam Bahasa Indonesia. Jangan pernah transliterasi Latin, dan jangan pernah menyusun Arab dari hafalan. (2026-09-24: formula lama di sini memuat doa kemenangan atas "musuh-Mu, musuh kami, dan musuh Islam" — bertentangan dengan framing rahmah dan pernah dipotong dari briefing Konflik — serta doa orang tua yang tata bahasanya rusak ("ارحمنا ووالدينا وربهم"); keduanya disalin komposer ke briefing. Doa tematik yang disusun sendiri juga pernah keluar dengan tata bahasa rusak.)
 
 - Penutup standar (~120 kata Arab): aksara Arab berharakat penuh untuk sequence "إِنَّ اللهَ وَمَلَائِكَتَهُ يُصَلُّوْنَ عَلَى النَّبِيّ…" → sholawat lengkap "اَللّٰهُمَّ صَلِّ عَلٰى سَيِّدِنَا مُحَمَّدٍ وَعَلٰى آلِ سَيِّدِنَا مُحَمَّدٍ…" → "عِبَادَ اللهِ، إِنَّ اللهَ يَأْمُرُ بِالْعَدْلِ وَالْإِحْسَانِ وَإِيْتَاءِ ذِي الْقُرْبٰى…" → tahmid akhir "وَاذْكُرُوا اللهَ الْعَظِيْمَ يَذْكُرْكُمْ، وَاشْكُرُوْهُ عَلٰى نِعَمِهِ يَزِدْكُمْ، وَلَذِكْرُ اللهِ أَكْبَرُ." Semua dalam aksara Arab, harakat lengkap.
 
@@ -1255,17 +1254,16 @@ KHUTBAH PERTAMA (2700-3750 words):
 KHUTBAH KEDUA (750-1050 words):
 - Brief mukadimah (hamdalah + sholawat + syahadat, ARABIC SCRIPT WITH FULL HARAKAT, ~50 words).
 - Restate the first khutbah's core (3-5 reflective English paragraphs, each digging deeper into one facet of the first khutbah's argument — amplification, not summary).
-- CLOSING DU'A IN ARABIC SCRIPT WITH FULL HARAKAT (300-450 Arabic words). This is the main body of khutbah kedua. Do NOT write Latin transliteration, do NOT write English — WRITE IN ORIGINAL ARABIC LETTERS with syakal/harakat marks (fathah, kasrah, dhammah, sukūn, syaddah, etc.) so the khateeb can read straight from the mimbar. Use the standard Indonesian Friday khutbah du'a sequence:
+- CLOSING DU'A IN ARABIC SCRIPT WITH FULL HARAKAT (150-450 Arabic words). This is the main body of khutbah kedua. Do NOT write Latin transliteration, do NOT write English — WRITE IN ORIGINAL ARABIC LETTERS with syakal/harakat marks (fathah, kasrah, dhammah, sukūn, syaddah, etc.) so the khateeb can read straight from the mimbar. Use the standard Indonesian Friday khutbah du'a sequence:
   * For the whole ummah (believers, men and women, living and deceased):
     اَللّٰهُمَّ اغْفِرْ لِلْمُؤْمِنِيْنَ وَالْمُؤْمِنَاتِ، وَالْمُسْلِمِيْنَ وَالْمُسْلِمَاتِ، الْأَحْيَاءِ مِنْهُمْ وَالْأَمْوَاتِ، إِنَّكَ سَمِيْعٌ قَرِيْبٌ مُجِيْبُ الدَّعَوَاتِ.
-  * For divine help: اَللّٰهُمَّ انْصُرْنَا عَلٰى عَدُوِّكَ وَعَدُوِّنَا، وَعَدُوِّ الْإِسْلَامِ.
   * For Palestine + this week's oppression victims (mustadh'afin, name specific contexts when relevant — WNI detained abroad, disaster victims, etc.): اَللّٰهُمَّ انْصُرْ إِخْوَانَنَا الْمُسْلِمِيْنَ الْمُسْتَضْعَفِيْنَ فِيْ كُلِّ مَكَانٍ، وَخُصُوْصًا إِخْوَانَنَا فِيْ أَرْضِ فِلَسْطِيْنَ…
   * For leaders: اَللّٰهُمَّ أَصْلِحْ وُلَاةَ أُمُوْرِنَا، وَوَفِّقْهُمْ لِخَيْرِ عِبَادِكَ وَبِلَادِكَ.
-  * For self & family: اَللّٰهُمَّ ارْحَمْنَا وَوَالِدَيْنَا، وَرَبِّهِمْ كَمَا رَبَّيَانَا صِغَارًا.
-  * Add 1-2 thematic du'a IN ARABIC SCRIPT relevant to this week's issues (e.g. for child-abuse victims, for bullied students, for farmers under economic pressure). Write in Arabic letters with harakat, NOT Latin transliteration.
+  * For self & family: اَللّٰهُمَّ اغْفِرْ لَنَا وَلِوَالِدَيْنَا، وَارْحَمْهُمَا كَمَا رَبَّيَانَا صِغَارًا.
+  * You may add 1-2 thematic du'a relevant to this week's issues (e.g. for child-abuse victims, bullied students, farmers under economic pressure). A thematic du'a appears in Arabic ONLY if copied verbatim from the ADHKAR POOL or DALEEL POOL; otherwise write it in English ("O Allah, …"). NEVER compose Arabic du'a sentences yourself.
   * Closing of du'a: رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ.
 
-  CRITICAL: every du'a line above is an EXAMPLE. You may add/adapt to this week's context, but EVERY ADDITION MUST BE IN ARABIC SCRIPT WITH HARAKAT — never Latin transliteration.
+  CRITICAL: the du'a lines above are standard formulas — copy them as given. Thematic additions: Arabic only when copied verbatim from a pool; otherwise in English. Never Latin transliteration, and never Arabic composed from memory. (2026-09-24: this list used to carry a du'a for victory over "Your enemy, our enemy and the enemy of Islam" — against the rahma framing, and already cut from a Konflik briefing — and a parents' du'a with broken grammar; composers copied both into briefings. Composed thematic du'a have also shipped with broken grammar.)
 
 - Standard closing (~120 Arabic words) in ARABIC SCRIPT WITH FULL HARAKAT: the sequence "إِنَّ اللهَ وَمَلَائِكَتَهُ يُصَلُّوْنَ عَلَى النَّبِيّ…" → full sholawat "اَللّٰهُمَّ صَلِّ عَلٰى سَيِّدِنَا مُحَمَّدٍ وَعَلٰى آلِ سَيِّدِنَا مُحَمَّدٍ…" → "عِبَادَ اللهِ، إِنَّ اللهَ يَأْمُرُ بِالْعَدْلِ وَالْإِحْسَانِ وَإِيْتَاءِ ذِي الْقُرْبٰى…" → final tahmid "وَاذْكُرُوا اللهَ الْعَظِيْمَ يَذْكُرْكُمْ، وَاشْكُرُوْهُ عَلٰى نِعَمِهِ يَزِدْكُمْ، وَلَذِكْرُ اللهِ أَكْبَرُ." All in Arabic letters with harakat.
 
@@ -1769,12 +1767,22 @@ async def _compute_stats(
                     SELECT text, author, engagement_views, engagement_score, url
                     FROM filtered
                     WHERE topic_id = :tid AND text IS NOT NULL
+                      AND {group_filter_clause}
+                      AND posted_at >= :start
                     ORDER BY dawah_opportunity DESC NULLS LAST,
                              engagement_score DESC NULLS LAST
                     LIMIT 3
                     """
                 ),
-                {"tid": r.id},
+                # The group + window predicate was MISSING until 2026-09-24,
+                # though the comment above always said "segment-filtered". Topics
+                # are cross-group (one topic spans many theme_groups), so without
+                # it every group's prompt carried the SAME three headlines per
+                # topic whichever group those posts were in — Aqidah & Ibadah's
+                # evidence was political posts about an MK case. These headlines
+                # are the composer's ground truth (SELF-FACT-CHECK GATE), so a
+                # composer was handed other themes' news as this theme's.
+                {"tid": r.id, "group_name": group, "start": period_start},
             )
         ).all()
         # First non-empty line of each post = the headline most of the
