@@ -921,9 +921,13 @@ def scan_firman_hadith_mismatch(markdown: str) -> list[BriefingWarning]:
         quran_match = _QURAN_CITATION_RE.search(window)
         if quran_match and quran_match.start() < hadith_match.start():
             continue
-        # Hadits qudsi exception — the qualifier must appear in the same
-        # window (either before or alongside the citation).
-        if _HADITH_QUDSI_RE.search(window):
+        # Hadits qudsi exception — the qualifier may appear alongside the
+        # citation OR just before the trigger in the same sentence ("Dalam
+        # hadits qudsi … firman Allah Ta'ala …"). The window used to start at
+        # trigger_end only, so a qualifier placed first was never seen and a
+        # correctly-marked qudsi was flagged (2026-09-24, Konflik briefing).
+        lead_in = markdown[max(0, match.start() - 300) : match.start()]
+        if _HADITH_QUDSI_RE.search(window) or _HADITH_QUDSI_RE.search(lead_in):
             continue
         trigger_text = match.group(0)
         citation_text = hadith_match.group(0)

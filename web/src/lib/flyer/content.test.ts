@@ -417,6 +417,19 @@ describe("parseInlineDua", () => {
     expect(out).toBeNull();
   });
 
+  it("keeps a du'a whole when its phrases are joined by LATIN commas", () => {
+    // Bulugh al-Maram's stored shape. Before the fix the run split at each
+    // " , " and only the longest phrase reached the card.
+    const bulugh =
+      "سُبْحَانَ اَللَّهِ , وَالْحَمْدُ لِلَّهِ , وَلَا إِلَهَ إِلَّا اَللَّهُ";
+    const out = parseInlineDua(
+      block(`Pembuka.\n\n${bulugh}\n\n"${ID}"\n\n(Bulugh al-Maram 347)`),
+    );
+    expect(out?.arabic).toContain("سُبْحَانَ");
+    expect(out?.arabic).toContain("وَالْحَمْدُ لِلَّهِ");
+    expect(out?.arabic).toContain("إِلَّا اَللَّهُ");
+  });
+
   it("still returns null when there is no Arabic at all", () => {
     expect(parseInlineDua(block(`"${ID}"\n\n(HR. Bukhari)`))).toBeNull();
   });

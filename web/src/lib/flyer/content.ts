@@ -1029,7 +1029,17 @@ export function parseInlineDua(block: FlyerMessageBlock): DaleelRef | null {
   // `rawBody` preserves Arabic + Markdown that `body` strips. Without
   // it the longest-Arabic-run search lands on an empty string and we
   // return null even for blocks that clearly carry an inline du'a.
-  const md = block.rawBody;
+  // Bulugh al-Maram stores its du'a with a LATIN comma between phrases
+  // ("سُبْحَانَ اَللَّهِ , وَالْحَمْدُ لِلَّهِ , …"). U+002C is not in the Arabic
+  // class below, so the run broke at every comma and the card printed only the
+  // longest phrase — found 2026-09-24 on three flyers citing Bulugh 347 / 387.
+  // Normalise a Latin comma BETWEEN Arabic letters to the Arabic comma (U+060C),
+  // which the class already includes. Punctuation only; letters are untouched,
+  // and the pool match downstream ignores both commas.
+  const md = block.rawBody.replace(
+    /([\u0600-\u06FF])\s*,\s*(?=[\u0600-\u06FF])/g,
+    "$1، ",
+  );
 
   // Longest Arabic run in the block — captures the du'a sentence(s)
   // even if commas / spaces break it into shorter chunks.
