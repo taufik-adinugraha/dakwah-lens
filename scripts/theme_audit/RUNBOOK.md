@@ -15,6 +15,7 @@ It is designed to be **cheap, resumable, and drift-proof**. Run it every 1–2 d
 5. **Rulebook drift** — a hand-copied rulebook could diverge from the live prompt. → `gen_rulebook.py` derives it from `theme_groups.llm_group_options_prompt()`.
 6. **Manual whack-a-mole on failures.** → `aggregate.py` reports missing batches and withholds `apply.sql` until every batch is covered.
 7. **`posted_at` windows go blind to backdated arrivals.** Ingest backfills set `posted_at` to the ORIGINAL publication time, so a post published 08-28 can arrive 09-02. A `posted_at`-keyed "past 1d" window cannot see it — and the next day's window has moved on, so it is never audited at all (measured 2026-09-02: **477 nulls** across posted-days 08-28..08-31, every one ingested within the prior 24h; **605** arrival-only posts in a 1d window). Same permanent-invisibility class as the audit#133 null-stranding bug, different door. → `fetch.sh` now defaults to `WINDOW_ON=arrival`, keying on `greatest(posted_at, created_at)`. Verified a strict superset (posted-only = 0). `WINDOW_ON=posted` restores the old slice when you deliberately want a publication-date view.
+8. **Positional label shift — invisible to `verify_batch.py`.** About half the subagents build flags by zipping an ordered decision list onto the batch's ids by position. One dropped or extra entry moves every later label onto the neighbouring post, and counts still match, so `verify_batch` prints OK (2026-09-24: an agent caught itself at 170 decisions for 171 posts). → `check_alignment.py` runs inside `aggregate.py`: it checks whether labels agree with a keyword guess from the post's OWN text better than from a neighbour's (offset −2..+2), and lists rare-label posts (≤4 uses in the batch) as anchors a human can read. A **SHIFT** withholds `apply.sql` **even under `--force`**, because `--force` banks a partial wave and a shifted batch isn't partial, it's wrong. Rebuild that batch's flags by id; `--ignore-alignment` overrides only after reading it. A **low-signal** batch (under 8 keyword hits) doesn't block. Read its printed anchors: each label should fit its own post. Back-tested over 14 runs / 369 batches (09-13..09-24): 0 false SHIFTs; a synthetic one-post slip was caught at 59% vs 27%.
 
 ## Procedure
 
@@ -57,9 +58,12 @@ python3 prepare.py "$RUN" --window-days 7
 - If a batch **fails on the 64k output cap** (some batches make a subagent over-produce despite the contract — seen repeatedly on specific batches), split just that batch into halves (`part_NN` → `part_NNa`/`part_NNb`, delete the original) and re-run the two with a hard no-narration reminder. If a batch fails on the **session limit**, just re-run that one after reset. Either way, never re-run the whole set.
 
 ```bash
-# 5. Aggregate -> validated corrections.json + apply.sql (refuses apply.sql if any batch missing)
+# 5. Aggregate -> validated corrections.json + apply.sql
+#    (refuses apply.sql if any batch is missing, or any batch's labels look SHIFTED)
 python3 aggregate.py "$RUN"
 #   -> review the transition matrix + the _notes (candidate new rules) before applying.
+#   -> read the anchors printed for any low-signal batch.
+#   Standalone, e.g. on one batch mid-run:  python3 check_alignment.py "$RUN" 04 13
 
 # 6. Apply to prod (single transaction, rolls back on any error)
 bash apply.sh "$RUN"
