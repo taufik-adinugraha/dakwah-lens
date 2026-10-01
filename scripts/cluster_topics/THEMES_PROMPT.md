@@ -90,6 +90,24 @@ sample of the corpus. Write `<RUN>/themes.json`:
   theme's keywords. What they are tells you which of the three fixes above applies.
   Re-author and re-inject (idempotent); three rounds took that run's concrete-only
   purity from 0.54 to 0.65 at unchanged coverage.
+- **A magnet needs the domain's everyday vocabulary, not only its headline words.**
+  Measured 2026-10-01: a Bencana magnet keyed only on banjir/longsor/bencana/cuaca
+  won 116 posts. The domain's commonest posts are house fires, road accidents and
+  weather, and they have no word in that list. So a concrete "Banjir Bangkok dan
+  Banjir Bandang" theme became the reservoir for all of Lingkungan (189 posts at
+  **0.20**). I dropped that theme and added `kebakaran`, `damkar`, `kecelakaan`,
+  `tabrakan`, `hujan deras` and `angin kencang` to the magnet. It took 344 posts at
+  0.87, and the concrete themes in the same group rose: KM Virgo 0.57 → 0.69 and
+  Karhutla 0.58 → 0.63.
+- **Don't give a small same-domain event its own theme when a magnet already
+  covers that domain.** A foreign flood or a single train crash (~40–60 posts)
+  becomes the domain's second centroid and pulls in the domain's orphans: Banjir
+  Bangkok scored 0.20, and a KRL-collision theme scored 0.27 on 41 posts. Put its
+  tokens in the magnet instead.
+- **Put an institution's tokens in the magnet of the theme_group the classifier
+  gives it.** The audit files PBNU / muktamar posts under Pemerintahan
+  (audit#89/103), not Aqidah. With `pbnu` in the religious magnet, the in-group
+  rescue could not place them, and they spilled into the MK-dispute theme.
 - An entertainment/celebrity magnet did NOT earn its place (2026-09-24: 36 posts,
   0.25 purity) and dropping it left the sports theme's purity unchanged at 0.63.
   Celebrity gossip is better left in the orphan bucket than given a label, which
