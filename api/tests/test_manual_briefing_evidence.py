@@ -13,6 +13,9 @@
    carried the same headlines per topic — Aqidah & Ibadah's evidence was
    political posts about an MK case. Those headlines are the composer's ground
    truth; the SELF-FACT-CHECK GATE forbids anything not in them.
+
+3. (2026-10-01) The per-topic engagement roll-up (total_views, yt_video_count)
+   had the same missing group + week predicate as the headlines.
 """
 
 from __future__ import annotations
@@ -70,6 +73,37 @@ def test_sample_headlines_are_filtered_to_the_week() -> None:
 def test_headline_query_binds_the_group_and_window_params() -> None:
     src = inspect.getsource(briefing._compute_stats)
     call = src[src.index("SELECT text, author, engagement_views"):][:1500]
+    assert '"group_name": group' in call
+    assert '"start": period_start' in call
+
+
+# ── per-topic engagement roll-up (2026-10-01) ─────────────────────────────
+# Same missing predicate as the headlines: total_views / yt_video_count summed
+# every post the topic ever had, across all theme_groups, so one topic showed
+# the same total in every group's prompt beside a group+week post_count.
+# Composers wrote "hanya 6 post tetapi 5,23 juta tayangan" — a false contrast.
+
+
+def _engagement_query() -> str:
+    src = inspect.getsource(briefing._compute_stats)
+    start = src.index("COALESCE(SUM(engagement_views), 0)::bigint AS total_views")
+    return src[start : src.index('"""', start)]
+
+
+def test_topic_engagement_is_filtered_to_the_group() -> None:
+    q = _engagement_query()
+    assert "WHERE topic_id = :tid" in q
+    assert "{group_filter_clause}" in q
+
+
+def test_topic_engagement_is_filtered_to_the_week() -> None:
+    assert "posted_at >= :start" in _engagement_query()
+
+
+def test_topic_engagement_binds_the_group_and_window_params() -> None:
+    src = inspect.getsource(briefing._compute_stats)
+    start = src.index("COALESCE(SUM(engagement_views), 0)::bigint AS total_views")
+    call = src[start : src.index("eng_row = topic_engagement.one()", start)]
     assert '"group_name": group' in call
     assert '"start": period_start' in call
 
