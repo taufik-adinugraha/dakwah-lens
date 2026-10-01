@@ -3466,11 +3466,14 @@ async def generate_briefing(
         # general guidance, not always recitable du'a.
         from api.services.kitab_retrieval import rerank_dua, retrieve_dua
 
+        # Same widening as the manual path (parity, 2026-10-01): a per-theme
+        # card-safe library slice via `group`, and a deeper candidate pool.
         dua_candidates = retrieve_dua(
             retrieval_query,
             hijri_context=hijri_short,
-            limit=15,
-            per_corpus=4,
+            limit=20,
+            per_corpus=6,
+            group=group,
         )
         adhkar = rerank_dua(retrieval_query, dua_candidates, top_n=6)
         adhkar = await enrich_daleel_translations(session, adhkar)

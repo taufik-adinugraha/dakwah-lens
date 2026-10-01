@@ -295,13 +295,16 @@ async def _prepare_unranked_candidates(
             _date.today(), lookahead_days=10
         )
 
-        # 15 du'a candidates — no rerank. Same logic as daleel: Claude
-        # picks 6 in chat.
+        # Du'a candidates — no rerank; Claude picks in chat. Widened
+        # 2026-10-01 (15 → 20, per-corpus 4 → 6, plus a per-theme library
+        # slice via `group`): with one shared weekly slice and a pick of 6,
+        # the 14 themes' flyer du'a pools converged on the same few entries.
         dua_candidates = retrieve_dua(
             retrieval_query,
             hijri_context=hijri_short,
-            limit=15,
-            per_corpus=4,
+            limit=20,
+            per_corpus=6,
+            group=group,
         )
 
         # Kisah seeds — 4 candidates (per-corpus top-1, no Flash-Lite

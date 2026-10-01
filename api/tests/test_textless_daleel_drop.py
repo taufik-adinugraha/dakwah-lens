@@ -110,7 +110,10 @@ def test_ibn_kathir_payload_maps_its_own_keys():
         ),
     )
     assert out["translation_en"] == "Then they turned away from him and said..."
-    assert out["arabic"] == "ثُمَّ تَوَلَّوْا عَنْهُ"
+    # 2026-10-01: `ayah_text_ar` is the whole Arabic tafsir of the ayah, not a
+    # translation of this English chunk; a chunk with no quoted Arabic carries
+    # none (see test_dua_pool_and_tafsir_pairing).
+    assert out["arabic"] == ""
     assert out["ref_id"] == "tafsir_ibn_kathir::44:14:2"
 
 

@@ -166,6 +166,22 @@ _MIN_DUA_SUPPLICATIONS = 4
 # the save-time citation refetch/validation still holds.
 _DUA_LIBRARY: list[dict[str, Any]] | None = None
 _WEEKLY_DUA_LEAD = 8  # rotated library du'a to lead the pool with each week
+_THEME_DUA_LEAD = 12  # per-theme slice (see _theme_dua_pool) — wider than the shared one
+
+# A du'a that travels alone on a share-card must be safe for any reader.
+# Death-wish wording («توفني … إذا كانت الوفاة خيرا لي», Riyad as-Salihin 585)
+# reached a 2026-10-01 Flyer 6 draft; curses/war du'a were cut from earlier
+# briefings. Matched on harakat-stripped text.
+_UNSAFE_DUA_MARKERS = (
+    "توفني", "امتني", "أمتني", "اللهم عليك ب", "انصرنا على", "اهزمهم",
+    "اهزم الاحزاب", "زلزلهم", "اللهم العن", "اشدد وطاتك", "اشدد وطأتك",
+)
+_HARAKAT_RE = re.compile(r"[ً-ٰٟـۖ-ۭ]")
+
+
+def _is_unsafe_dua(arabic: str) -> bool:
+    bare = _HARAKAT_RE.sub("", arabic or "")
+    return any(m in bare for m in _UNSAFE_DUA_MARKERS)
 
 
 def _load_dua_library() -> list[dict[str, Any]]:
@@ -192,10 +208,69 @@ def _lib_entry_to_ref(d: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def weekly_dua_pool(n: int = _WEEKLY_DUA_LEAD) -> list[dict[str, Any]]:
+# Per-theme rotation (2026-10-01). The weekly slice above was seeded by the
+# week alone, so all 14 themes received the SAME eight library du'a. Combined
+# with a pick of 6, the flyer du'a pools converged: by the last batch of the
+# 2026-10-01 week, Sahih al-Bukhari 6389, Riyad as-Salihin 1406 and Sahih
+# Muslim 2721a each sat on flyers in three different themes, and one theme
+# was left choosing between a reused du'a and a death-wish du'a. A theme now
+# gets its own slice, led by library entries tagged for that theme, and only
+# entries that fit a 1080x1080 card.
+_THEME_DUA_TAGS: dict[str, tuple[str, ...]] = {
+    "Pemerintahan & Kebijakan": ("hidayah", "keteguhan-iman", "akhlak"),
+    "Hukum & Keadilan": ("ampunan", "tobat", "perlindungan", "akhlak"),
+    "Lingkungan & Bencana": ("waktu-sulit", "sabar", "perlindungan", "safar"),
+    "Ekonomi & Bisnis": ("rezeki", "hutang", "dunia-akhirat", "syukur"),
+    "Konflik & Geopolitik": ("perlindungan", "waktu-sulit", "fitnah", "sabar"),
+    "Pendidikan & SDM": ("ilmu", "hidayah", "akhlak"),
+    "Kesehatan & Kehidupan": ("sakit-syifa", "sabar", "waktu-sulit"),
+    "Pekerja & Pertanian Rakyat": ("rezeki", "hutang", "syukur"),
+    "Sosial & Keluarga": ("keluarga-anak", "akhlak", "sabar"),
+    "Aqidah & Ibadah": ("keteguhan-iman", "hidayah", "pagi-petang", "tobat"),
+    "Patologi Sosial Digital": ("tobat", "fitnah", "hutang", "perlindungan"),
+    "Inspirasi & Kisah Pribadi": ("syukur", "sabar", "keluarga-anak"),
+    "Teknologi & AI": ("ilmu", "hidayah", "fitnah"),
+    "Toleransi & Lintas-Iman": ("akhlak", "hidayah", "perlindungan"),
+}
+_CARD_MAX_ARABIC = 150  # flyer card limits (see the system prompt's slot-6 rule)
+_CARD_TRANSLATION_RANGE = (20, 260)  # the renderer's inline-du'a window
+
+
+def _card_safe(d: dict[str, Any]) -> bool:
+    ar = (d.get("arabic") or "").strip()
+    tr = (d.get("translation_id") or "").strip()
+    lo, hi = _CARD_TRANSLATION_RANGE
+    return 0 < len(ar) <= _CARD_MAX_ARABIC and lo <= len(tr) <= hi and not _is_unsafe_dua(ar)
+
+
+def _theme_dua_pool(theme_group: str, n: int) -> list[dict[str, Any]]:
+    lib = [d for d in _load_dua_library() if _card_safe(d)]
+    if not lib:
+        return []
+    iso = _date.today().isocalendar()
+    rng = _random.Random(f"{iso[0]}-{iso[1]}-{theme_group}")
+    tags = set(_THEME_DUA_TAGS.get(theme_group, ()))
+    tagged = [d for d in lib if tags & set(d.get("tags") or [])]
+    rest = [d for d in lib if d not in tagged]
+    rng.shuffle(tagged)
+    rng.shuffle(rest)
+    n_tagged = min(len(tagged), max(1, (2 * n) // 3)) if tagged else 0
+    picks = tagged[:n_tagged] + rest[: n - n_tagged]
+    return [_lib_entry_to_ref(d) for d in picks]
+
+
+def weekly_dua_pool(
+    n: int = _WEEKLY_DUA_LEAD, theme_group: str | None = None
+) -> list[dict[str, Any]]:
     """Return `n` recitable du'a from the library in a deterministic
     per-ISO-week rotation, so the flyer du'a differs every week and cycles
-    through the whole library over time."""
+    through the whole library over time.
+
+    With `theme_group`, the slice is seeded by (week, theme) and led by
+    entries tagged for that theme, all card-safe — so themes briefed in the
+    same week draw different du'a instead of the same eight."""
+    if theme_group:
+        return _theme_dua_pool(theme_group, n)
     lib = _load_dua_library()
     if not lib:
         return []
@@ -453,6 +528,19 @@ def _has_usable_text(normalized: dict[str, Any]) -> bool:
     return bool((normalized.get("translation_en") or "").strip())
 
 
+_ARABIC_RUN_RE = re.compile(r"[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿][؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿\s،؛«»\-\.\(\)\d]*")
+
+
+def _embedded_arabic(text_en: str, min_len: int = 12) -> str:
+    """Arabic runs quoted inside an English tafsir chunk, joined in order.
+
+    Short runs (a single honorific like ﷺ) are dropped; what is left is the
+    ayat / hadith text the chunk itself quotes and translates beside it.
+    """
+    runs = [m.group(0).strip(" -.()") for m in _ARABIC_RUN_RE.finditer(text_en or "")]
+    return "\n".join(r for r in runs if len(r) >= min_len)
+
+
 def _normalize_hit(corpus: str, hit: Any) -> dict[str, Any]:
     """Reshape a Qdrant hit into the schema we persist in
     `insights_summaries.daleel_refs` and feed to the LLM.
@@ -506,7 +594,19 @@ def _normalize_hit(corpus: str, hit: Any) -> dict[str, Any]:
             or payload.get("citation_en")
             or ""
         )
-        arabic = payload.get("chunk_text_ar") or payload.get("ayah_text_ar") or ""
+        if corpus == "tafsir_ibn_kathir":
+            # ⚠️ 2026-10-01: `ayah_text_ar` is the WHOLE Arabic tafsir of the
+            # ayah, identical on every chunk, while `chunk_text_en` is one
+            # slice of the ENGLISH ABRIDGEMENT. They were never parallel:
+            # for chunk N the "Arabic" was the opening of the Arabic tafsir
+            # and the "translation" a passage from somewhere else. Pickers
+            # rejected these as AR/ID mismatches in 6 of 14 themes that week,
+            # and the ones that slipped through were quoted in khutbahs as if
+            # the Arabic said what the Indonesian said. Only the Arabic that
+            # sits INSIDE this chunk (quoted ayat/hadith) belongs to it.
+            arabic = _embedded_arabic(payload.get("chunk_text_en") or "")
+        else:
+            arabic = payload.get("chunk_text_ar") or payload.get("ayah_text_ar") or ""
         translation_id = ""
         translation_en = payload.get("chunk_text_en") or payload.get("ayah_text_en") or ""
         ref_id = (
@@ -1865,6 +1965,7 @@ def retrieve_dua(
     hijri_context: str | None = None,
     limit: int = 8,
     per_corpus: int = 4,
+    group: str | None = None,
 ) -> list[dict[str, Any]]:
     """Retrieve DU'A / dzikir entries from the existing kitab corpus
     biased toward du'a content.
@@ -1974,6 +2075,12 @@ def retrieve_dua(
                 continue
             if normalized["ref_id"] in DALEEL_DENYLIST:
                 continue
+            if _is_unsafe_dua(normalized.get("arabic", "")):
+                log.info(
+                    "adhkar_retrieval.unsafe_dropped",
+                    citation=normalized.get("citation"),
+                )
+                continue
             # Harakat gate — du'a in Pesan Flyer 5 + 6 is meant to be
             # READ ALOUD by the audience. Without harakat the text
             # can't be pronounced by non-Arabs, defeating the purpose
@@ -2024,7 +2131,13 @@ def retrieve_dua(
     # candidate pool (score 0.99) so slot-6 "Doa Pekan Ini" varies week to
     # week and cycles the library, instead of the theme-retrieval + fixed
     # canonical floor surfacing the same few supplications every time.
-    rotated = weekly_dua_pool()
+    # `group` (2026-10-01): a per-theme, card-safe slice instead of the one
+    # weekly slice every theme shared — see _theme_dua_pool.
+    rotated = (
+        weekly_dua_pool(_THEME_DUA_LEAD, theme_group=group)
+        if group
+        else weekly_dua_pool()
+    )
     if rotated:
         present = {h.get("citation", "") for h in result}
         lead = [r for r in rotated if r["citation"] not in present]
