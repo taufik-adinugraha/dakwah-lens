@@ -1818,9 +1818,18 @@ async def _compute_stats(
                   COUNT(*) FILTER (WHERE engagement_views IS NOT NULL)::int AS yt_count
                 FROM filtered
                 WHERE topic_id = :tid
+                  AND {group_filter_clause}
+                  AND posted_at >= :start
                 """
             ),
-            {"tid": r.id},
+            # Same missing predicate as the headline query above, found
+            # 2026-10-01: this roll-up summed every post the topic EVER had,
+            # across all theme_groups. One topic therefore showed the same
+            # total in every group's prompt (Lapas Cibinong: 148,876 views both
+            # in Pemerintahan, 84 posts, and in Hukum, 11 posts), beside a
+            # post_count that IS group+week filtered. Composers paired the two
+            # into "hanya 6 post tetapi 5,23 juta tayangan" — a false contrast.
+            {"tid": r.id, "group_name": group, "start": period_start},
         )
         eng_row = topic_engagement.one()
         top_topics.append({
