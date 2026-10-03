@@ -46,6 +46,13 @@ Before you reply, verify your own artifact rather than trusting your intent:
 
     python3 {TOOLKIT}/verify_batch.py {RUN} {NN}
 
+Other batches run IN PARALLEL with you. Every scratch file you create must carry your
+batch id in its name (e.g. `{RUN}/scratch_{NN}_flags.txt`) — never a generic name such as
+`labels.txt`, `uuids.txt` or `/tmp/out.txt`: another agent writes the same name and the two
+files silently interleave (2026-10-03: a batch's scratch list grew 350 → 516 lines of
+scrambled rows and its uuid extract came back in another batch's order). Build the final
+file from your own batch file, never from a scratch file you did not just write.
+
 Do not reply until it prints OK. Never call any external API — this is your own
 judgment.
 

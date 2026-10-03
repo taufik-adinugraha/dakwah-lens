@@ -34,6 +34,13 @@ Run this and do not reply until it prints OK:
 A subagent's self-report is not evidence — agents in this pipeline have reported
 success having written no file at all. The artifact on disk is the only signal.
 
+Other batches run IN PARALLEL with you. Every scratch file you create must carry your
+batch id in its name (e.g. `{RUN}/scratch_{ID}_labels.txt`) — never a generic name such as
+`labels.txt`, `uuids.txt` or `/tmp/out.txt`: another agent writes the same name and the two
+files silently interleave (2026-10-03: a batch's scratch list grew 350 → 516 lines of
+scrambled rows and its uuid extract came back in another batch's order). Build the final
+file from your own batch file, never from a scratch file you did not just write.
+
 Never call any external API. This is your own judgment against the rubric.
 
 Reply with exactly one line: `DONE {ID} <lines> <positive>/<neutral>/<negative>`
