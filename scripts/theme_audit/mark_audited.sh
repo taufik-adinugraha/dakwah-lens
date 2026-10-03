@@ -17,6 +17,19 @@ test -s "$RUN/target_uuids.txt" || { echo "no target_uuids.txt in $RUN"; exit 1;
 mkdir -p "$(dirname "$LEDGER")"
 touch "$LEDGER"
 
+# A failed apply.sh must block the mark: the corrections never reached prod, so
+# marking would seal still-NULL posts out of every future run. apply.sh writes
+# applied.ok (the sha of the apply.sql it committed) only on success.
+# Measured 2026-10-04: an scp drop failed the apply, the mark ran anyway, and
+# 442 null posts were sealed until a manual re-apply.
+if [[ -s "$RUN/apply.sql" ]]; then
+    want=$(shasum "$RUN/apply.sql" | cut -d' ' -f1)
+    if [[ "$(cat "$RUN/applied.ok" 2>/dev/null)" != "$want" ]]; then
+        echo "✗ refusing to mark: apply.sh has not succeeded for the current apply.sql — re-run apply.sh first"
+        exit 1
+    fi
+fi
+
 # Posts that were reviewed but left NULL must NOT be marked audited. Marking
 # them is irreversible in practice: the next run's filter skips anything in the
 # ledger, so a null that slips in here is permanently null and never revisited.
