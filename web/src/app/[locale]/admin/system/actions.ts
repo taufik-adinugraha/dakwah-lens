@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { and, eq, gte, inArray, lte, ne } from "drizzle-orm";
 
 import { db, schema } from "@/db";
@@ -730,11 +729,13 @@ export async function verifyAllYoutubeChannels(): Promise<VerifyAllYoutubeChanne
 
 /** Result state for the add/edit form's `useActionState`. `null` is
  *  the idle state; `{ error, duplicate }` surfaces a validation or
- *  soft-duplicate warning without writing. Success paths redirect
+ *  soft-duplicate warning without writing. Success paths return `{ ok }`
  *  (they never return a state). */
 export type ManualCostFormState = {
   error?: string;
   duplicate?: boolean;
+  /** Set on success; the client form navigates + refreshes itself. */
+  ok?: true;
 } | null;
 
 /**
@@ -891,10 +892,13 @@ export async function addManualCost(
   await setFlash("success", `Saved · ${vendor} Rp ${amount.toLocaleString("id-ID")}`);
   revalidatePath("/admin/system/costs");
   revalidatePath("/admin/system");
-  // Redirect resets the client form (fresh mount) and surfaces the
-  // flash. `useActionState` treats the thrown NEXT_REDIRECT as a
-  // navigation, so no state is returned on the success path.
-  redirect("/admin/system/costs");
+  // No server-side redirect (2026-10-07). A server action's redirect()
+  // is rendered by an internal fetch to the container origin (plain
+  // http), where Auth.js does not read the `__Secure-` session cookie;
+  // the proxy then streamed the /login page into the still-unchanged
+  // /id/admin/system/costs URL. The client form resets and refreshes
+  // on `ok` instead, which also surfaces the flash.
+  return { ok: true };
 }
 
 /**
@@ -1036,9 +1040,9 @@ export async function updateManualCost(
   revalidatePath("/admin/system/costs");
   revalidatePath("/admin/system/api-costs");
   revalidatePath("/admin/system");
-  // Redirect drops `?edit=<id>` (back to add mode) + surfaces the
-  // flash; `useActionState` treats NEXT_REDIRECT as a navigation.
-  redirect("/admin/system/costs");
+  // Client form drops `?edit=<id>` (back to add mode) on `ok` — see the
+  // note in addManualCost for why this is not a server redirect.
+  return { ok: true };
 }
 
 

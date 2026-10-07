@@ -1,8 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { KNOWN_PROVIDERS, providerLabel } from "@/lib/cost-providers";
 import {
   addManualCost,
@@ -34,8 +34,9 @@ export type ManualCostEditRow = {
  * duplicate it returns `{ error, duplicate: true }` instead of writing,
  * and this component surfaces the warning + a "Save anyway" checkbox
  * WITHOUT remounting — so the operator's typed values (and any picked
- * invoice file) survive the round-trip. On success the action
- * redirects, which remounts this fresh and clears the form.
+ * invoice file) survive the round-trip. On success the action returns
+ * `{ ok: true }` and this component resets itself and navigates back to
+ * add mode (no server redirect — see addManualCost for why).
  */
 export function ManualCostForm({ editRow }: { editRow: ManualCostEditRow | null }) {
   const action = editRow ? updateManualCost : addManualCost;
@@ -43,9 +44,21 @@ export function ManualCostForm({ editRow }: { editRow: ManualCostEditRow | null 
     ManualCostFormState,
     FormData
   >(action, null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!state?.ok) return;
+    formRef.current?.reset();
+    // Drops `?edit=<id>` after an update (the page's `key` then remounts
+    // this form in add mode) and re-renders the layout so the flash shows.
+    router.replace("/admin/system/costs", { scroll: false });
+    router.refresh();
+  }, [state, router]);
 
   return (
     <form
+      ref={formRef}
       id="manual-cost-form"
       action={formAction}
       className="space-y-4"
