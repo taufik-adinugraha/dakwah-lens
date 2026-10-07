@@ -26,6 +26,9 @@ MANDATORY SELF-CHECK for EVERY token you propose — do not report any that fail
   sub=$(grep -oic "TOKEN" body.txt); word=$(grep -oicw "TOKEN" body.txt); echo "TOKEN sub=$sub word=$word"
 Drop or replace any token where word < 0.85 * sub. Prefer distinctive proper nouns and
 compound terms (hormuz, karhutla, purbaya) over short generic ones.
+Report the FULL body.txt counts from that command, never a count from your own shard,
+and write tokens bare (`ijazah gibran`, not `"ijazah gibran"`). 2026-10-08: one report
+gave shard-only counts and another quoted every phrase; both came back as MISCOUNTs.
 
 ⛔ THE BOILERPLATE TRAP — a clean word can still be off-story.
 A token can pass the substring check perfectly and still match mostly boilerplate.

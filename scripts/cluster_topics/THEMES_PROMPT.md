@@ -76,6 +76,17 @@ sample of the corpus. Write `<RUN>/themes.json`:
   Menteri Keuangan"), and give the governance magnet the tokens that let it win
   those posts (`kabinet`, `menlu`, `presiden prabowo`, `pemkot`, `pemprov`,
   `pemkab`, `apbd`, `wali kota`): 0.42 → 0.55, with the magnet absorbing them at 0.83.
+- **An appointment headline is a role noun too.** Measured 2026-10-08: "Pelantikan
+  Kapolri Baru" became the reservoir for every swearing-in of the week (rektor, Pangdam,
+  DJP rotations, a football coach) — 144 posts at 0.58, though its keywords were clean.
+  "Kapolri Baru Suyudi Ario Seto dan Gelombang Mutasi Polri" (a public official, so the
+  name is allowed), floor 0.38, and `sertijab`/`direksi`/`dilantik`/`pangdam`/`kodam`/`tni`
+  in the governance magnet: 87 posts at **0.86**. The same run lifted a sports theme
+  0.60 → 0.81 by naming the beat ("Olahraga: …") and giving it the beat's words
+  (`piala`, `atlet`, `porprov`, `cabor`, `pertandingan`).
+- **Survey counts are on the SAMPLE; the gate counts the whole cache.** `rutan` was 52/46
+  in body.txt and 90/34 in posts.jsonl (*urutan*); `napi` 16/15 vs 23/13. Run
+  `check_keywords.py` on every new token before `inject.sh`, not after it aborts.
 - **If a concrete theme is collecting a whole beat, rename it to the beat, honestly.**
   "Penindakan KPK: Suap HGB dan OTT Kepala Daerah" was collecting every corruption
   case of the week (Kejagung, DPRD assets, BOSP funds) at 0.42. Relabelled
