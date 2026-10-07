@@ -56,7 +56,7 @@ def main() -> int:
         ntok = 0
         for tl in re.findall(r"^tokens:\s*(.+)$", text, re.M | re.I):
             for tok, rs, rw in TOK.findall(tl):
-                tok = tok.strip().strip("`").lower()
+                tok = tok.strip().strip("`\"'“”").strip().lower()  # agents often quote phrases
                 if not tok:
                     continue
                 ntok += 1
