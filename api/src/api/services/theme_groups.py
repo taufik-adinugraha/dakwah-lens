@@ -294,7 +294,11 @@ GROUP_INTENT_HINTS: dict[str, str] = {
         "pesantren, sekolah, kampus, atau tempat kerja — bila ada laporan polisi, "
         "penyelidikan, penangkapan, tersangka, atau sidang: perkaranya yang dibahas → "
         "di sini, BUKAN Sosial & Keluarga. Diukur 45 hari s.d. 10-02: posting perkara KS "
-        "741 di sini vs 145 di Sosial, sementara hint Sosial masih memuat 'KS' (audit#164)"
+        "741 di sini vs 145 di Sosial, sementara hint Sosial masih memuat 'KS' (audit#164). "
+        "TERMASUK perkara penipuan KONKRET — ada korban, modus, kerugian, atau pelaku/akun yang "
+        "disebut — termasuk laporan korban di media sosial walau belum ada laporan polisi: "
+        "perkaranya yang dibahas → di sini. Diukur 10-08: dari ~90 posting penipuan tanpa kata "
+        "polisi, 32 masuk sini dan 59 ke Lainnya untuk kasus yang sejenis (audit#165)"
     ),
     "Sosial & Keluarga": (
         "KS/KDRT/perlindungan anak sebagai ISU SOSIAL tanpa perkara konkret (advokasi, "
