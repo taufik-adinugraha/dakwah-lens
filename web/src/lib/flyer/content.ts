@@ -552,11 +552,39 @@ function stripMd(s: string): string {
 
 /** Find the lines of a named H3 sub-section. Returns the raw lines
  *  between the matching `### ...` and the next H3 / H2. */
+// Every deliverable H3 carries a theme title after an em-dash —
+// `### Kultum — "Iman yang Diukur di Rumah Sendiri"`. Section matchers
+// must test only the NAME part: tested against the whole line, a Kultum
+// title containing "Rumah" was taken for "Pengajaran di Rumah", and a
+// title containing "aksi"/"kreator" could hijack those slots (2026-10-08).
+const _H3_TITLE_TAIL_RE = /\s+[—–]\s+["“].*$/;
+const _H3_TITLE_RE = /^###\s+[^\n]*?\s[—–]\s+["“]([^"”\n]{3,100})["”]\s*$/;
+
+function h3Name(line: string): string {
+  return line.replace(_H3_TITLE_TAIL_RE, "");
+}
+
+/** The theme title of a deliverable — the quoted text after the em-dash
+ *  in its H3. Required on every sub-section since 2026-06-18, so it is
+ *  the one headline source that is always there and always on-theme. */
+function extractH3Title(markdown: string, matcher: RegExp): string {
+  for (const line of markdown.split("\n")) {
+    if (!line.startsWith("### ") || !matcher.test(h3Name(line))) continue;
+    const m = line.match(_H3_TITLE_RE);
+    if (!m || !m[1]) return "";
+    // Authored titles keep their own punctuation ("'Andai'", "…Mungkinkah?"):
+    // tidyHeadline's quote/punctuation strip would clip them.
+    const words = m[1].replace(/\s+/g, " ").trim().split(" ");
+    return words.slice(0, 9).join(" ");
+  }
+  return "";
+}
+
 function sliceSubSection(markdown: string, matcher: RegExp): string[] {
   const lines = markdown.split("\n");
   let start = -1;
   for (let i = 0; i < lines.length; i++) {
-    if (matcher.test(lines[i])) {
+    if (matcher.test(h3Name(lines[i]))) {
       start = i + 1;
       break;
     }
@@ -1279,12 +1307,26 @@ export function extractKhutbahMessage(markdown: string): string {
   const body = sliceSubSection(markdown, /^###\s+.*khutbah/i).join("\n");
   if (!body) return "";
 
+  // Current khutbah closes the first sermon with "… dalam enam langkah
+  // yang konkret:" + a numbered list whose items open with a bold title.
+  // The titles ARE the call to action. The numeral pivot below did not
+  // know "enam" and latched onto an earlier "tiga hal sekaligus:" inside
+  // a hadith explanation, so the card opened mid-sentence ("surga, iman,
+  // dan cinta di antara sesama…", 2026-10-08).
+  const firstSermon = body.split(/^####\s+khutbah\s+kedua/im)[0];
+  const stepTitles = [...firstSermon.matchAll(/^\s*\d+\.\s+\*\*([^*\n]{6,90})\*\*/gm)]
+    .map((m) => m[1].trim().replace(/[.:;,]+$/, ""))
+    .slice(0, 3);
+  if (stepTitles.length >= 2) {
+    return trimToSentences(stepTitles.map((t) => `${t}.`).join(" "), 3, 320);
+  }
+
   // Locate any phrasing of "(four|three|two|several) concrete/practical
   // (steps|things|actions)". Handles both Claude wording ("empat langkah
   // konkret") and Gemini wording ("beberapa langkah praktis", "tiga hal
   // praktis", "ada beberapa langkah").
   const pivot = body.match(
-    /(?:(?:ada\s+|melakukan\s+|melakukan\s+\w+\s+)?(?:empat|tiga|dua|lima|beberapa)\s+(?:langkah|hal|aksi|tindakan)(?:\s+(?:konkret|praktis))?|berikut\s+langkah|mari\s+kita\s+mulai|langkah[- ]langkah\s+(?:konkret|praktis))[\s\S]{0,1500}/i,
+    /(?:(?:ada\s+|melakukan\s+|melakukan\s+\w+\s+)?(?:empat|tiga|dua|lima|enam|tujuh|beberapa)\s+(?:langkah|hal|aksi|tindakan)(?:\s+(?:konkret|praktis))?|berikut\s+langkah|mari\s+kita\s+mulai|langkah[- ]langkah\s+(?:konkret|praktis))[\s\S]{0,1500}/i,
   );
   if (pivot && pivot[0]) {
     // Drop the leading "Empat langkah konkret..." sentence + colon.
@@ -1360,6 +1402,18 @@ export function extractAksiMessage(markdown: string): string {
 export function extractKreatorMessage(markdown: string): string {
   const body = sliceSubSection(markdown, /^###\s+.*kreator|^###\s+.*content/i).join("\n");
   if (!body) return "";
+
+  // Style 0 (current format): `**Body:** "…"` — the spoken script.
+  // Without this the content card rendered an empty message (2026-10-08).
+  const bodyField = body.match(/\*\*\s*body(?:\s*\([^)\n]*\))?\s*[:：]\s*\*\*\s*([^\n]+)/i);
+  if (bodyField && bodyField[1]) {
+    const text = trimToSentences(
+      stripMd(bodyField[1]).replace(/^["“]\s*|\s*["”]$/g, "").trim(),
+      3,
+      320,
+    );
+    if (text.length > 60) return text;
+  }
 
   // Style 1: explicit `**Kreator:**` speaker marker.
   const krMatches = [...body.matchAll(/\*\*\s*kreator\s*[:：]\s*\*\*\s*([^*]+?)(?=\n\s*\*Visual|\n\s*\*\*|\n###|\n##|$)/gi)];
@@ -1687,6 +1741,14 @@ export function extractDeliverableHeadline(
   markdown: string,
   slug: DeliverableSlug,
 ): string {
+  // The H3 theme title first: the legacy extractors below were written
+  // for Gemini-era markers (`**Tema:**`, `**OUTLINE …**`, `Label aksi:`)
+  // that current briefings don't carry, so they fell through to "first
+  // bold phrase" — which put citations like "Tafsir Ibn Kathir on 33:56"
+  // on the khutbah card and left most other cards headline-less
+  // (2026-10-08: 65 of 78 deliverable cards).
+  const h3 = extractH3Title(markdown, DELIVERABLE_MATCHERS[slug]);
+  if (h3) return h3;
   if (slug === "khutbah") return extractKhutbahTagline(markdown);
   if (slug === "content") return extractKreatorHook(markdown);
   if (slug === "genz") return extractGenZTagline(markdown);
@@ -1725,7 +1787,13 @@ export function extractDeliverableMessage(
   const paragraphs = body
     .split(/\n\s*\n/)
     .map((p) => stripMd(p))
-    .filter((p) => p.length > 80 && !skipPatterns.some((re) => re.test(p)));
+    // Template labels are scaffolding, not message ("Tujuan sesi.",
+    // "Pernyataan intinya begini, ibu-ibu:") — drop them from the card.
+    .map((p) => p.replace(/^(?:tujuan\s+sesi\s*\.|pernyataan\s+intinya[^:\n]{0,40}:)\s*/i, ""))
+    .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+    // An Arabic mukadimah is not the message (Hukum's kajian opened with
+    // one and the card came out empty).
+    .filter((p) => p.length > 80 && !isArabicHeavy(p) && !skipPatterns.some((re) => re.test(p)));
   return trimToSentences(paragraphs[0] ?? "", 3, 320);
 }
 
