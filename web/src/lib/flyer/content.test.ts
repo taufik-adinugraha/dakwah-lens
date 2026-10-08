@@ -460,6 +460,25 @@ describe("stripNarratorIntro — word-initial transliterated ayn (2026-09-17)", 
     expect(pick(M2675A)).toMatch(/^Aku di sisi sangkaan hamba-Ku/);
   });
 
+  it("keeps a Qur'anic 'Katakanlah:' — it is revelation, not a narrator (2026-10-08)", () => {
+    // QS. Aal-i-Imraan 31, the real Kemenag pool translation. Stripping
+    // "Katakanlah:" left "ikutilah aku" with no speaker plus a stray quote.
+    const q331 =
+      'Katakanlah: "Jika kamu (benar-benar) mencintai Allah, ikutilah aku, niscaya Allah mengasihi dan mengampuni dosa-dosamu". Allah Maha Pengampun lagi Maha Penyayang.';
+    expect(pick(q331)).toBe(q331);
+    const ikhlas =
+      'Katakanlah: "Dialah Allah, Yang Maha Esa. Allah adalah Tuhan yang bergantung kepada-Nya segala sesuatu. Dia tiada beranak dan tidak pula diperanakkan, dan tidak ada seorangpun yang setara dengan Dia."';
+    expect(pick(ikhlas)).toMatch(/^Katakanlah: "Dialah Allah/);
+    const waQul = 'Dan katakanlah: "Ya Tuhanku, berilah ampun dan berilah rahmat, dan Engkau adalah Pemberi rahmat Yang Paling baik."';
+    expect(pick(waQul)).toMatch(/^Dan katakanlah:/);
+  });
+
+  it("still strips a hadith narrator intro that is NOT a qul command", () => {
+    const h =
+      'Abu Hurairah meriwayatkan: Rasulullah ﷺ bersabda: "Barangsiapa beriman kepada Allah dan hari akhir, hendaklah ia berkata baik atau diam. Barangsiapa beriman kepada Allah dan hari akhir, hendaklah ia memuliakan tetangganya."';
+    expect(pick(h)).toMatch(/^Barangsiapa beriman/);
+  });
+
   it("keeps the 2026-06-11 Qur'an behaviour on a full-length entry", () => {
     const s =
       "Beliau membaca Al-Qur'an berikut: \"Sesungguhnya Kami telah menurunkannya pada malam kemuliaan. " +
