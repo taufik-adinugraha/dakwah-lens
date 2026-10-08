@@ -335,7 +335,15 @@ function shaveNarrationHops(input: string): string {
   return rest.replace(/^["“‘]/, "").trim();
 }
 
+// A Qur'an translation that opens with the divine command "Katakanlah:"
+// (qul) is not a narrator intro — the command IS revelation, and it names
+// the speaker of the quoted words. Stripping it left QS. Aal-i-Imraan 31
+// on a card as "Jika kamu … ikutilah aku …\"." with no speaker and a
+// stray closing quote, and cut "Katakanlah" off Al-Ikhlas (2026-10-08).
+const _QUL_OPENER_RE = /^\s*(?:dan\s+)?katakan(?:lah)?\b/i;
+
 function stripNarratorIntro(text: string): string {
+  if (_QUL_OPENER_RE.test(text)) return text;
   const head = text.slice(0, 280);
   // Match: `:` or `.` then ≤ 40 non-quote chars then ≥1 whitespace
   // then an opening quote. The intermediate chars allow connectors like

@@ -344,16 +344,17 @@ This gate is single-agent (you do it in your own response, no extra API call). I
 OUTPUT: briefing analisis dalam Bahasa Indonesia, dibagi ke 5 BAGIAN dengan heading H2 (##). Antar bagian dipisahkan satu baris kosong.
 
 ## Ringkasan Eksekutif (100-130 kata, satu paragraf)
-- Sebut top 3 kategori dengan share-pct
+- Sebut top 3 topik (`top_topics`) dengan jumlah post-nya
 - Komposisi sentimen dengan angka verbatim
 - Dua benang merah utama pekan ini
 - Bisa di-skim dalam 30 detik
 
 ## Numerik & Tren Pekan Ini (200-250 kata)
 - Ekspos angka dengan konteks — jangan sekadar daftar, hubungkan ke cerita
-- Cantumkan top 5 kategori, komposisi sentimen, volume
+- Cantumkan top 5 topik (`top_topics`), komposisi sentimen, volume
+- Skor kategori sudah dipensiunkan (2026-06-05) — JANGAN menulis catatan tentang data yang tidak ada ("data kategori belum terisi", "pembacaan memakai topik"); itu catatan pipeline, bukan isi briefing
 - JIKA `delta_pp`/`delta_pp_negative` null: tulis "belum ada baseline mingguan untuk perbandingan". JANGAN memfabrikasi tren naik/turun.
-- Sebut platform mix, lalu BACA `platform_stats`: tiap platform punya karakter sendiri — kontraskan sentimen + kategori dominan antar-platform memakai angka dari `platform_stats` (mis. "media arus utama didominasi berita kebijakan & korupsi dengan sentimen X% negatif, sementara konten YouTube lebih reflektif/ibadah"). Sebutkan MINIMAL satu perbedaan nyata antar-platform bila ada >1 platform berdata; kalau hanya satu platform punya data, lewati tanpa mengarang. JANGAN ratakan semua platform jadi satu angka saja.
+- Sebut platform mix, lalu BACA `platform_stats`: tiap platform punya karakter sendiri — kontraskan sentimen antar-platform memakai angka dari `platform_stats` (mis. "di media arus utama X% negatif, sementara di YouTube Y% positif"). `platform_stats` hanya memuat sentimen + jumlah post per platform — JANGAN menebak topik atau kategori yang mendominasi tiap platform. Sebutkan MINIMAL satu perbedaan nyata antar-platform bila ada >1 platform berdata; kalau hanya satu platform punya data, lewati tanpa mengarang. JANGAN ratakan semua platform jadi satu angka saja.
 
 CRITICAL — TOPIC_GROUP SCOPE: baca TOPIC_GROUP di input. Briefing ini fokus pada SATU kelompok tema (mis. "Hukum & Keadilan", "Aqidah & Ibadah"). Semua angka volume yang Anda ekspos (jumlah postingan, top_topics post_count, platform_stats) adalah HANYA untuk post yang masuk kelompok ini, bukan share dari seluruh percakapan mingguan. Frasa "di antara post yang masuk kelompok Hukum & Keadilan, cerita Korupsi MBG menjadi yang paling ramai dibicarakan" — JANGAN tulis "percakapan publik didominasi X" karena angka dibatasi kelompok ini saja.
 
@@ -2933,13 +2934,22 @@ def _build_user_prompt(
 
     # Strip sample_headlines out of the JSON dump to avoid duplicating
     # them — they're already laid out in TOP TOPICS WITH SAMPLE HEADLINES.
+    # `top_categories` (top-level and per platform) has been an empty list
+    # since the 9-PRD scoring was retired 2026-06-05. Printing the empty
+    # key made every briefing announce "data kategori belum terisi" — a
+    # pipeline note in reader-facing prose (2026-10-08, 12/13 briefings).
     stats_for_json = {
-        **stats,
+        **{k: v for k, v in stats.items() if k != "top_categories"},
         "top_topics": [
             {k: v for k, v in t.items() if k != "sample_headlines"}
             for t in stats.get("top_topics", [])
         ],
     }
+    if "platform_stats" in stats:
+        stats_for_json["platform_stats"] = [
+            {k: v for k, v in ps.items() if k != "top_categories"}
+            for ps in stats["platform_stats"]
+        ]
 
     # Stats dict carries the THEME_GROUPS label in the "theme_group"
     # key. The scope note tells the LLM the briefing covers ONE topic
