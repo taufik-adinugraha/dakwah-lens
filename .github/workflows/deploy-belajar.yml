@@ -192,11 +192,11 @@ jobs:
           # The lesson page carries the streamed recitation + the draft label.
           page="$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/al-fatihah/1)"
           grep -q "Alafasy" <<<"$page"
-          grep -q "menunggu tinjauan ustadz" <<<"$page"
-          # A beta build must say drafts are unreviewed (L10). Assert the beta
-          # sentence is present: the public-build sentence is in the HTML anyway,
-          # inside the next-intl messages payload, so an absence check can't work.
-          grep -q "Selama uji coba, materi bertanda" <<<"$page" || { echo "✗ beta footer missing"; exit 1; }
+          grep -q "Dibantu AI" <<<"$page"
+          # No human review step exists (operator, 2026-10-09): nothing on the
+          # page, including the next-intl messages payload, may promise one.
+          if grep -qiE "tinjauan ustadz|ditinjau ustadz|awaiting ustadz|reviewed by an ustadz" <<<"$page"; then echo "✗ page promises an ustadz review"; exit 1; fi
+          grep -q "bukan fatwa otoritatif" <<<"$page" || { echo "✗ AI-assisted footer missing"; exit 1; }
           grep -q 'href="/belajar/id/quran/al-fatihah/2"' <<<"$page"
           for html in "$hub" "$track" "$page" \
                       "$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/al-fatihah)" \

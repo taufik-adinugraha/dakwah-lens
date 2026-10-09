@@ -24,7 +24,7 @@
     "concepts_available": "{n, plural, one {# nahwu or sharaf concept} other {# nahwu and sharaf concepts}}",
     "concepts_cta": "See all concepts",
     "status_beta": "Beta",
-    "status_beta_draft": "Beta · material still in draft"
+    "status_beta_draft": "Beta · AI-assisted"
   },
   "Quran": {
     "title": "Qur'anic Arabic & Tafsir",
@@ -45,8 +45,8 @@
     "p1_body": "Qur'anic verses are only ever heard from a human reciter. The AI voice only explains, in Indonesian, and never recites an ayah.",
     "p2_title": "Sourced, not invented",
     "p2_body": "Every meaning, i'rab note, tafsir point and hadith is quoted from a named kitab or dataset, with its reference.",
-    "p3_title": "Reviewed by an ustadz",
-    "p3_body": "Lessons go live only after an ustadz reviews them. During the beta some material is still a draft and is clearly marked."
+    "p3_title": "AI-assisted, sourced from kitabs",
+    "p3_body": "Explanations are prepared with AI help from named kitabs. This is learning material, not a fatwa: check the references, and ask a teacher when in doubt."
   },
   "Breadcrumb": {
     "label": "You are here",
@@ -54,9 +54,8 @@
     "quran": "Qur'an"
   },
   "Footer": {
-    "disclaimer": "AI-assisted, not an authoritative fatwa. Explanations are drawn from named kitabs and reviewed by an ustadz before going live.",
-    "credits": "Sources & licences",
-    "disclaimer_beta": "AI-assisted, not an authoritative fatwa. Explanations are drawn from named kitabs. During this trial, material marked “Draft” has not yet been reviewed by an ustadz."
+    "disclaimer": "AI-assisted, not an authoritative fatwa. Explanations are drawn from named kitabs; check the references.",
+    "credits": "Sources & licences"
   },
   "Credits": {
     "title": "Sources & licences",
@@ -77,8 +76,8 @@
   "Surah": {
     "eyebrow": "Surah",
     "meta": "{ayat} ayat · {words} words",
-    "draft_banner": "Trial period: the word meanings, i'rab (how a word's ending changes with its role in the sentence) and notes on this page are drafts awaiting an ustadz's review. The ayah text and the imam's recitation themselves are unchanged.",
-    "draft_chip": "Draft — awaiting ustadz review",
+    "draft_banner": "Trial period: the word meanings, i'rab (how a word's ending changes with its role in the sentence) and notes on this page are prepared with AI help from named kitabs. This is learning material, not a fatwa. The ayah text and the imam's recitation themselves are unchanged.",
+    "draft_chip": "AI-assisted · not a fatwa",
     "learn_ayah": "Learn this ayah",
     "ayah_done": "Practice done",
     "translation_source": "Translation: {source}",
@@ -110,7 +109,7 @@
     "concepts_heading": "New concepts",
     "deeper_heading": "Learn more",
     "deeper_intro": "Tap a title to open or close it.",
-    "draft_short": "Draft"
+    "draft_short": "AI-assisted"
   },
   "Word": {
     "meaning": "Meaning",
@@ -120,7 +119,7 @@
     "other_views": "Other scholars' views",
     "sources": "Sources",
     "no_root": "no root (particle/pronoun)",
-    "draft": "Draft — awaiting ustadz review",
+    "draft": "AI-assisted · not a fatwa",
     "role": "Role in the sentence",
     "concepts": "Grammar concepts",
     "lemma": "See the base word",

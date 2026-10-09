@@ -144,7 +144,7 @@ export default async function LocaleLayout({
               {/* Mandatory label (AGENTS.md): always visible, never collapsed. The waris track
                   has no human review, so it gets its own label (FooterDisclaimer). */}
               <p className="max-w-prose text-pretty text-base text-ink-muted">
-                <FooterDisclaimer module={tf(IS_PUBLIC ? "disclaimer" : "disclaimer_beta")} waris={tw("footer_disclaimer")} />
+                <FooterDisclaimer module={tf("disclaimer")} waris={tw("footer_disclaimer")} />
               </p>
               <div className="flex flex-wrap gap-x-6 gap-y-2 text-base">
                 <Link href={creditsHref()} className="link-text inline-flex min-h-11 items-center">
