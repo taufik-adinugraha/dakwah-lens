@@ -334,7 +334,10 @@ handle                  { reverse_proxy localhost:3000 }
   - its **own concurrency group**;
   - CI runs lint, type-check, tests and the content validators, builds the image, and ships it.
 - **`deploy.yml`** gains `paths-ignore` for the same paths, so module commits do not trigger the main deploy's user-facing "update in progress" overlay.
-- **A VM-level `flock`** (`/srv/dakwah-lens/.deploy.lock`) is shared by both deploy scripts.
+- **A VM-level `flock`** (`/srv/dakwah-lens/.deploy.lock`) is taken by every writer: `deploy.yml`, `deploy-belajar.yml`, `rollback.yml` and the weekly `refresh-base-images.sh` cron. The lock is taken in the workflow YAML, which comes from the pushed commit, so it applies from the first merge. Scripts never re-take it, because a nested `flock` deadlocks.
+- **The module deploy never touches the main checkout** (`/srv/dakwah-lens/repo`). CI ships a self-contained release dir (image + deploy script + compose file) to `/srv/dakwah-lens/belajar/incoming-<sha>/`. Otherwise a module deploy would move the tree the weekly root cron builds from, shipping unverified main code.
+- **Image smoke test on every run, PRs included:** the real image runs against a throwaway Postgres to check migrations, health, pages and the bare-`/belajar` redirect. This catches runtime-only defects that `next build` cannot, such as a dependency Turbopack bundled away from `node_modules`.
+- **DB isolation is enforced, not assumed:** PUBLIC's default CONNECT/TEMP is revoked on every database. The only other login role is the main stack's superuser. The `belajar` role gets CONNECT on `dakwah_belajar` only and a connection limit of 10.
 - **`BELAJAR_PUBLIC=false`:** pages are noindex (crawlable, not robots-blocked) until the first ustadz-approved lesson ships.
 
 ### 7.7 Main-app touchpoints

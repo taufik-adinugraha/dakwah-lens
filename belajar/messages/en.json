@@ -36,5 +36,10 @@
     "status_planned": "Planned",
     "status_in_use": "In use",
     "streaming_note": "When you play a recitation, your browser fetches the audio directly from the recording provider's servers abroad, so your IP address is visible to them."
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "body": "This address doesn't exist in the Learn the Qur'an module.",
+    "cta": "Go to the module home"
   }
 }

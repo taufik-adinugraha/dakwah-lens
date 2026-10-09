@@ -8,7 +8,10 @@ import { routing } from "@/i18n/routing";
 export default createIntlMiddleware(routing);
 
 export const config = {
-  // Paths are matched below the /belajar basePath. Skip API routes, Next
-  // internals and files with an extension (fonts, audio, icons).
-  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
+  // Next prefixes every matcher with the basePath. The catch-all compiles to
+  // a pattern that requires a "/" after "/belajar", so the bare module URL
+  // (/belajar) needs its own "/" entry — without it the proxy never runs
+  // there and the visitor gets a 404 instead of a redirect to /belajar/id.
+  // Skip API routes, Next internals and files with an extension.
+  matcher: ["/", "/((?!api|_next|_vercel|.*\\..*).*)"],
 };

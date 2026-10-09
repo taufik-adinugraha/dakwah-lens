@@ -134,9 +134,15 @@ jobs:
           # on a small VM. Warm rebuilds finish in 1-2 min because layer
           # cache hits. 45 leaves slack for the worst case.
           command_timeout: 45m
+          # The lock lives HERE (this YAML comes from the pushed commit), not
+          # inside deploy.sh (which runs from whatever copy is on the VM
+          # disk when SSH starts). It serialises this deploy with the
+          # /belajar module deploy, rollback.yml and the weekly base-image
+          # refresh, which all take the same lock.
           script: |
             set -euo pipefail
-            bash /srv/dakwah-lens/repo/deploy/deploy.sh
+            flock -w 1800 /srv/dakwah-lens/.deploy.lock \
+              bash /srv/dakwah-lens/repo/deploy/deploy.sh
 
       - name: Notify users — deploy finished
         # `always()` so the overlay clears even if SSH failed — leaving

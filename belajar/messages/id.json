@@ -36,5 +36,10 @@
     "status_planned": "Direncanakan",
     "status_in_use": "Dipakai",
     "streaming_note": "Saat Anda memutar bacaan, peramban Anda mengambil berkas audio langsung dari server penyedia rekaman di luar negeri, sehingga alamat IP Anda terlihat oleh server tersebut."
+  },
+  "NotFound": {
+    "title": "Halaman tidak ditemukan",
+    "body": "Alamat ini tidak ada di modul Belajar Al-Qur'an.",
+    "cta": "Ke beranda modul"
   }
 }

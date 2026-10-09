@@ -35,6 +35,11 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/migrations ./migrations
 COPY --from=builder --chown=nextjs:nodejs /app/scripts/migrate.mjs ./scripts/migrate.mjs
+# migrate.mjs imports `postgres` from /app/node_modules, but Next/Turbopack
+# BUNDLES that package into the server chunks — it is never traced into
+# .next/standalone/node_modules (verified on the prod web image). Ship it
+# explicitly; postgres@3 has zero dependencies, so the directory is enough.
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules/postgres ./node_modules/postgres
 USER nextjs
 EXPOSE 3000
 ENTRYPOINT ["/sbin/tini", "--"]
