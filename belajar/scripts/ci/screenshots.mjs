@@ -14,6 +14,8 @@ const PAGES = [
   ["surah", "/belajar/id/quran/al-fatihah"],
   ["ayah-2", AYAH_2],
   ["ayah-7", "/belajar/id/quran/al-fatihah/7"],
+  ["ikhlas-1", "/belajar/id/quran/al-ikhlas/1"],
+  ["nas-6", "/belajar/id/quran/an-nas/6"],
   ["konsep", "/belajar/id/konsep"],
   ["kredit", "/belajar/id/kredit"],
   // Ilmu Waris (docs/waris-plan.md §9.1): track home, the questionnaire's first screen, and the

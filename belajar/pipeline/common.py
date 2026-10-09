@@ -17,7 +17,47 @@ BELAJAR = PIPELINE.parent
 CACHE = PIPELINE / "cache"
 SOURCES_JSON = PIPELINE / "sources.json"
 CONTENT_DIR = BELAJAR / "content"
+AUTHORED_DIR = PIPELINE / "authored"
 SCHEMA_TS = BELAJAR / "src" / "content" / "schema.ts"
+CONTENT_TS = BELAJAR / "src" / "lib" / "content.ts"
+ROUTES_TS = BELAJAR / "src" / "lib" / "routes.ts"
+
+
+# ---------------------------------------------------------------- surahs with a lesson
+@dataclass(frozen=True)
+class SurahSpec:
+    slug: str
+    surah: int
+    name_id: str
+    # Words per ayah as taught: Tanzil tokens (surah-heading basmalah removed) = QAC 0.4 words.
+    # Checked against both by build_surah.py and validate.py; a change here is a deliberate edit.
+    words: tuple[int, ...]
+
+    @property
+    def n_ayat(self) -> int:
+        return len(self.words)
+
+
+# Mushaf order. src/lib/content.ts loads the same slugs in the same order and src/lib/routes.ts
+# lists them in SURAH_SLUGS (validate.py checks both).
+SURAHS: tuple[SurahSpec, ...] = (
+    SurahSpec("al-fatihah", 1, "Al-Fatihah", (4, 4, 2, 3, 4, 3, 9)),
+    SurahSpec("al-ikhlas", 112, "Al-Ikhlas", (4, 2, 4, 5)),
+    SurahSpec("al-falaq", 113, "Al-Falaq", (4, 4, 5, 5, 5)),
+    SurahSpec("an-nas", 114, "An-Nas", (4, 2, 2, 4, 5, 3)),
+)
+SURAH_BY_SLUG = {s.slug: s for s in SURAHS}
+SURAH_BY_NUM = {s.surah: s for s in SURAHS}
+
+
+def authored_file(slug: str, kind: str) -> Path:
+    """authored/<slug>.<kind>.json (kind: words, structure, concepts-map, facts.generated, hadith)."""
+    return AUTHORED_DIR / f"{slug}.{kind}.json"
+
+
+def authored_surahs() -> list[SurahSpec]:
+    """Registered surahs whose hand-authored word file exists (mushaf order)."""
+    return [s for s in SURAHS if authored_file(s.slug, "words").exists()]
 
 
 # ---------------------------------------------------------------- sources.json
@@ -35,6 +75,32 @@ def sha256_bytes(b: bytes) -> str:
 
 def sha256_file(p: Path) -> str:
     return sha256_bytes(p.read_bytes())
+
+
+QURANENC = "quranenc_indonesian_affairs"
+
+
+def quranenc_sura(src: dict, surah: int) -> tuple[dict, Path]:
+    """QuranEnc indonesian_affairs for one sura: (meta, verified cache path).
+
+    Sura 1 is the input's own entry (pinned first, kept unchanged). Every other sura sits under
+    the input's `suras` map with its own url, cache_path, sha256 and bytes; version, title and
+    last_update come from the one translations list and are shared."""
+    meta = src["inputs"][QURANENC]
+    if surah == 1:
+        return meta, require_pinned(src, QURANENC)
+    sm = (meta.get("suras") or {}).get(str(surah))
+    if not sm:
+        raise SystemExit(f"[{QURANENC}] sura {surah} is not in sources.json `suras`; add it and run fetch.py")
+    p = PIPELINE / sm["cache_path"]
+    if not p.exists():
+        raise SystemExit(f"[{QURANENC}] missing {p}; run fetch.py first")
+    if not sm.get("sha256"):
+        raise SystemExit(f"[{QURANENC}] sura {surah} sha256 not pinned; run fetch.py first")
+    got = sha256_file(p)
+    if got != sm["sha256"]:
+        raise SystemExit(f"[{QURANENC}] sura {surah} sha256 mismatch: pinned {sm['sha256']} but cache has {got}")
+    return {**{k: v for k, v in meta.items() if k != "suras"}, **sm}, p
 
 
 def require_pinned(src: dict, key: str) -> Path:
@@ -72,6 +138,25 @@ def load_tanzil(path: Path) -> Tanzil:
         s, a, t = line.split("|", 2)
         verses[(int(s), int(a))] = t
     return Tanzil(raw=raw, verses=verses, footer="\n".join(footer_lines))
+
+
+def lesson_ayah(T: Tanzil, s: int, a: int) -> tuple[str, int]:
+    """The ayah as taught, and how many leading tokens were removed.
+
+    Tanzil prepends the basmalah to ayah 1 of every surah except 1 and 9 (it is the surah
+    heading, not part of the ayah: QAC 0.4 and quran-align number the words without it). When
+    the first four tokens of such a line equal the tokens of 1:1 under `normalise` (byte-equal
+    in 110 surahs; 95 and 97 carry a shaddah on the ba'), the heading is cut off by slicing the
+    line after its fourth space, so the result is a byte-exact suffix of the Tanzil line."""
+    line = T.verses[(s, a)]
+    if a != 1 or s in (1, 9):
+        return line, 0
+    bas = T.verses[(1, 1)].split(" ")
+    toks = line.split(" ")
+    if len(toks) > len(bas) and [normalise(t) for t in toks[:len(bas)]] == [normalise(t) for t in bas]:
+        cut = len(" ".join(toks[:len(bas)])) + 1
+        return line[cut:], len(bas)
+    return line, 0
 
 
 # ---------------------------------------------------------------- Arabic normalisation (for searching only)

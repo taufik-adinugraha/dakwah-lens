@@ -16,14 +16,15 @@
 const QURAN = "quran";
 
 /**
- * Slug of every surah that has a lesson. When you add a surah's content
- * file, add its slug here too: next.config.ts redirects the pre-hub URLs
- * /{locale}/{slug}[/{ayah}] for these slugs into the track, and
- * src/lib/routes.test.ts fails CI if a loaded surah is missing.
+ * Slug of every surah that has a lesson, in mushaf order. When you add a
+ * surah's content file, add its slug here too: next.config.ts redirects the
+ * pre-hub URLs /{locale}/{slug}[/{ayah}] for these slugs into the track,
+ * src/lib/routes.test.ts fails CI unless this list equals the loaded surahs
+ * (same order), and belajar/pipeline/validate.py checks it against content/.
  * Lowercase letters, digits and hyphens only (the slugs go into a redirect
  * pattern unescaped).
  */
-export const SURAH_SLUGS = ["al-fatihah"] as const;
+export const SURAH_SLUGS = ["al-fatihah", "al-ikhlas", "al-falaq", "an-nas"] as const;
 
 /** The hub: /belajar/{locale} */
 export const hubHref = () => "/";

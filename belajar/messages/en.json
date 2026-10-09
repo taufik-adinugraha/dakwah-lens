@@ -35,7 +35,7 @@
     "start_cta": "Start learning",
     "ayat_nav": "Ayat of {name}",
     "next_heading": "Next",
-    "next_body": "After Al-Fatihah: Al-Ikhlas, An-Nas, Al-Falaq, Al-'Asr, Al-Kawthar and An-Nasr.",
+    "next_body": "After Al-Fatihah and Al-Mu'awwidhat: Al-'Asr, Al-Kawthar and An-Nasr.",
     "how_heading": "How it works",
     "how_1": "Pick an ayah. The imam recites it, then a guided lesson explains each word, step by step. You can pause at any time.",
     "how_2": "Read each word's card: its meaning and why its ending is read the way it is. Tap “See this word's details” for its root.",
@@ -206,7 +206,7 @@
     "related": "Related concepts",
     "index_title": "Grammar concepts (nahwu & sharaf)",
     "index_intro": "Each concept is explained once here, then reused in every ayah and surah where it appears.",
-    "example_loc": "Ayah {ayah}, word {word}"
+    "example_loc": "{surah} · ayah {ayah}, word {word}"
   },
   "Lexeme": {
     "eyebrow": "Vocabulary",

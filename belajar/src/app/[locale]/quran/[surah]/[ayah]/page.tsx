@@ -18,7 +18,7 @@ import { SourceList } from "@/components/library/SourceList";
 import { StructureSection } from "@/components/library/StructureSection";
 import { FactCard } from "@/components/surah/FactCard";
 import { Link } from "@/i18n/navigation";
-import { getAyah, getSurah, SURAHS } from "@/lib/content";
+import { getAyah, getSurah, SURAH_INDEX, SURAHS } from "@/lib/content";
 import { buildLessonSteps } from "@/lib/lessonSteps";
 import { conceptsIntroducedIn, getConcept, getLexeme, LIBRARY } from "@/lib/library";
 import { ayahHref, hubHref, quranHref, surahHref } from "@/lib/routes";
@@ -329,7 +329,7 @@ export default async function AyahPage({
                         key={c.id}
                         concept={c}
                         labels={conceptLabels}
-                        surahSlug={s.slug}
+                        surahs={SURAH_INDEX}
                         wordAr={wordAr}
                         compact
                       />

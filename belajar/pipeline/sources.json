@@ -64,11 +64,11 @@
       "attribution": "Word timings: Collin Fair, quran-align (CC BY 4.0). https://github.com/cpfair/quran-align"
     },
     "quranenc_indonesian_affairs": {
-      "name": "QuranEnc translation indonesian_affairs, sura 1",
+      "name": "QuranEnc translation indonesian_affairs, sura 1 (top-level fields) and the other surahs with a lesson (`suras`)",
       "version": "1.0.1",
       "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1",
       "version_url": "https://quranenc.com/api/v1/translations/list/id?localization=id",
-      "options": "The sura endpoint does not report a version; fetch.py also saves the translations list (Indonesian localisation) and reads the 'version' and 'title' fields for key indonesian_affairs from it.",
+      "options": "The sura endpoint does not report a version; fetch.py also saves the translations list (Indonesian localisation) and reads the 'version' and 'title' fields for key indonesian_affairs from it. Sura 1 keeps the top-level url/cache_path/sha256/bytes; every other surah in common.SURAHS has its own entry under `suras` (same API endpoint, same translation and version), pinned the same way.",
       "cache_path": "cache/quranenc/indonesian_affairs_sura1.json",
       "version_cache_path": "cache/quranenc/translations_list_id.json",
       "title_id": "Terjemahan Berbahasa Indonesia - Kementerian Agama",
@@ -79,7 +79,30 @@
       "bytes": 3039,
       "retrieved": "2026-10-09",
       "licence": "QuranEnc terms of use (https://quranenc.com/en/home/api/): republishing allowed provided the text is not modified, the publisher and QuranEnc are credited, the version is stated, transcript information is kept, the latest version is used, and it is not placed next to inappropriate ads.",
-      "attribution": "Terjemahan Berbahasa Indonesia - Kementerian Agama (indonesian_affairs), via QuranEnc.com (Pusat Terjemah Ruwwād)."
+      "attribution": "Terjemahan Berbahasa Indonesia - Kementerian Agama (indonesian_affairs), via QuranEnc.com (Pusat Terjemah Ruwwād).",
+      "suras": {
+        "112": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/112",
+          "cache_path": "cache/quranenc/indonesian_affairs_sura112.json",
+          "sha256": "2fd5eac590213d9871c53009094487eefbdc8f42a507533d0003ef793a2459a7",
+          "bytes": 1099,
+          "retrieved": "2026-10-09"
+        },
+        "113": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113",
+          "cache_path": "cache/quranenc/indonesian_affairs_sura113.json",
+          "sha256": "f8250fd994df183364e019892b0f8e5a9c4f16c527ec173a54326618b38e5d6a",
+          "bytes": 1589,
+          "retrieved": "2026-10-09"
+        },
+        "114": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/114",
+          "cache_path": "cache/quranenc/indonesian_affairs_sura114.json",
+          "sha256": "c2ad413ccfcc97d833774096a916bf5b4ba2dfad6f107f851ba1129103cacd00",
+          "bytes": 1628,
+          "retrieved": "2026-10-09"
+        }
+      }
     },
     "quranenc_indonesian_affairs_waris": {
       "name": "QuranEnc translation indonesian_affairs, suras 2, 4, 8, 33, 42, 49, 60 (Ilmu Waris dalil)",
@@ -204,9 +227,9 @@
       "attribution": "Hadith numbering map: fawazahmed0/hadith-api. https://github.com/fawazahmed0/hadith-api"
     },
     "everyayah_husary_muallim": {
-      "name": "EveryAyah recitation files, Husary_Muallim_128kbps, sura 1 (validation only; never re-hosted)",
+      "name": "EveryAyah recitation files, Husary_Muallim_128kbps, every surah in common.SURAHS (validation only; never re-hosted)",
       "version": "as served on retrieval date",
-      "url_pattern": "https://everyayah.com/data/Husary_Muallim_128kbps/001{AAA}.mp3",
+      "url_pattern": "https://everyayah.com/data/Husary_Muallim_128kbps/{SSS}{AAA}.mp3",
       "options": "Downloaded only to measure each file's duration so the quran-align timings can be checked against the exact streamed file. The app streams these URLs; the files are not committed or served by us.",
       "cache_dir": "cache/everyayah/Husary_Muallim_128kbps",
       "files": {
@@ -279,15 +302,165 @@
           "sample_rate": 44100,
           "unsynced_bytes": 0,
           "retrieved": "2026-10-09"
+        },
+        "112001.mp3": {
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/112001.mp3",
+          "sha256": "0b16ecd06a0fc6542000fa22943cf71d248ad085606abdae93ff30ae9b887a93",
+          "bytes": 98314,
+          "duration_ms": 6008,
+          "frames": 230,
+          "sample_rate": 44100,
+          "unsynced_bytes": 0,
+          "retrieved": "2026-10-09"
+        },
+        "112002.mp3": {
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/112002.mp3",
+          "sha256": "14e9cfdd371e7aae4f6e259e28a7e66244445fd0552badaaa2ffe9219be746b2",
+          "bytes": 94218,
+          "duration_ms": 5878,
+          "frames": 225,
+          "sample_rate": 44100,
+          "unsynced_bytes": 0,
+          "retrieved": "2026-10-09"
+        },
+        "112003.mp3": {
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/112003.mp3",
+          "sha256": "a6d10a34e788750ab2ca578d0e05b0d4e70c1985fdd45ae8f704dc917fbd7eca",
+          "bytes": 98314,
+          "duration_ms": 6113,
+          "frames": 234,
+          "sample_rate": 44100,
+          "unsynced_bytes": 0,
+          "retrieved": "2026-10-09"
+        },
+        "112004.mp3": {
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/112004.mp3",
+          "sha256": "47f4d7a3e1999ca99588caccd271e788dc5eacd2a311dedc312f33c12ea1941e",
+          "bytes": 137226,
+          "duration_ms": 8464,
+          "frames": 324,
+          "sample_rate": 44100,
+          "unsynced_bytes": 0,
+          "retrieved": "2026-10-09"
+        },
+        "113001.mp3": {
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/113001.mp3",
+          "sha256": "b4b381cd16a87dda3f45f923e6388e6e44787a10bfc6992c19389be147991d81",
+          "bytes": 104458,
+          "duration_ms": 6400,
+          "frames": 245,
+          "sample_rate": 44100,
+          "unsynced_bytes": 0,
+          "retrieved": "2026-10-09"
+        },
+        "113002.mp3": {
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/113002.mp3",
+          "sha256": "1a82d339ba76d91b12ffd582d5586878d451f4c08eb6c899c045ffdb68b70b81",
+          "bytes": 96266,
+          "duration_ms": 5904,
+          "frames": 226,
+          "sample_rate": 44100,
+          "unsynced_bytes": 0,
+          "retrieved": "2026-10-09"
+        },
+        "113003.mp3": {
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/113003.mp3",
+          "sha256": "194d28136f236c5800f4709d78e0bfd145b4ebb7728d54cf78812ce3ff9f3575",
+          "bytes": 124938,
+          "duration_ms": 7784,
+          "frames": 298,
+          "sample_rate": 44100,
+          "unsynced_bytes": 0,
+          "retrieved": "2026-10-09"
+        },
+        "113004.mp3": {
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/113004.mp3",
+          "sha256": "4e570d4c4fed9cf890eb47f090ff083c30d3d987a47b94941b0c5d3a6360205d",
+          "bytes": 139274,
+          "duration_ms": 8620,
+          "frames": 330,
+          "sample_rate": 44100,
+          "unsynced_bytes": 0,
+          "retrieved": "2026-10-09"
+        },
+        "113005.mp3": {
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/113005.mp3",
+          "sha256": "98f6b4afb7e69a3c2051cbbda0e7167a5ab8c4435889dd9fcb7a8d6a880f7b1b",
+          "bytes": 145418,
+          "duration_ms": 8934,
+          "frames": 342,
+          "sample_rate": 44100,
+          "unsynced_bytes": 347,
+          "retrieved": "2026-10-09"
+        },
+        "114001.mp3": {
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/114001.mp3",
+          "sha256": "9dd08d9b862257f7a41b516a9208e34e3456b9e90ca142127555c2dd9620969b",
+          "bytes": 120842,
+          "duration_ms": 7497,
+          "frames": 287,
+          "sample_rate": 44100,
+          "unsynced_bytes": 0,
+          "retrieved": "2026-10-09"
+        },
+        "114002.mp3": {
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/114002.mp3",
+          "sha256": "05c66f80d669635393847b7eebbd1c5263d33dc90d59fe05269c5ddc2c3741ba",
+          "bytes": 79882,
+          "duration_ms": 4937,
+          "frames": 189,
+          "sample_rate": 44100,
+          "unsynced_bytes": 0,
+          "retrieved": "2026-10-09"
+        },
+        "114003.mp3": {
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/114003.mp3",
+          "sha256": "d9bb596223119389fb7fa33d46c75c6f2c309b109ead9fecd48a25aede0b1233",
+          "bytes": 81930,
+          "duration_ms": 4989,
+          "frames": 191,
+          "sample_rate": 44100,
+          "unsynced_bytes": 0,
+          "retrieved": "2026-10-09"
+        },
+        "114004.mp3": {
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/114004.mp3",
+          "sha256": "912105b3dac55d6922ec48a3ad45fe9a12c58759506f0faa4078085f076f1393",
+          "bytes": 139274,
+          "duration_ms": 8568,
+          "frames": 328,
+          "sample_rate": 44100,
+          "unsynced_bytes": 0,
+          "retrieved": "2026-10-09"
+        },
+        "114005.mp3": {
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/114005.mp3",
+          "sha256": "6e1249cc5e48e9c8376b961380e0593875d2b7cf6200b24f5b9709321a0fe2e4",
+          "bytes": 147466,
+          "duration_ms": 9195,
+          "frames": 352,
+          "sample_rate": 44100,
+          "unsynced_bytes": 0,
+          "retrieved": "2026-10-09"
+        },
+        "114006.mp3": {
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/114006.mp3",
+          "sha256": "010db0dcd7fda9f2339e8ae46c361b3d9c0c0cb39e87891f9896cb3cde5c7b54",
+          "bytes": 186378,
+          "duration_ms": 11572,
+          "frames": 443,
+          "sample_rate": 44100,
+          "unsynced_bytes": 0,
+          "retrieved": "2026-10-09"
         }
       },
       "licence": "No licence published by EveryAyah (UNVERIFIED rights). Stream with credit only (plan §6.2).",
       "attribution": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com"
     },
     "everyayah_alafasy": {
-      "name": "EveryAyah recitation files, Alafasy_128kbps, sura 1 (validation only; never re-hosted)",
+      "name": "EveryAyah recitation files, Alafasy_128kbps, every surah in common.SURAHS (validation only; never re-hosted)",
       "version": "as served on retrieval date",
-      "url_pattern": "https://everyayah.com/data/Alafasy_128kbps/001{AAA}.mp3",
+      "url_pattern": "https://everyayah.com/data/Alafasy_128kbps/{SSS}{AAA}.mp3",
       "options": "As above.",
       "cache_dir": "cache/everyayah/Alafasy_128kbps",
       "files": {
@@ -357,6 +530,156 @@
           "bytes": 212450,
           "duration_ms": 13244,
           "frames": 507,
+          "sample_rate": 44100,
+          "unsynced_bytes": 125,
+          "retrieved": "2026-10-09"
+        },
+        "112001.mp3": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/112001.mp3",
+          "sha256": "8166d4ae6fbdae1748e215d5b31dbbf246530da0e849f1488ac35316488f1caf",
+          "bytes": 48192,
+          "duration_ms": 2978,
+          "frames": 114,
+          "sample_rate": 44100,
+          "unsynced_bytes": 125,
+          "retrieved": "2026-10-09"
+        },
+        "112002.mp3": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/112002.mp3",
+          "sha256": "52fd57829c924926152df2175343d115aecbf3b83632f853cb94356697421eee",
+          "bytes": 41087,
+          "duration_ms": 2534,
+          "frames": 97,
+          "sample_rate": 44100,
+          "unsynced_bytes": 125,
+          "retrieved": "2026-10-09"
+        },
+        "112003.mp3": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/112003.mp3",
+          "sha256": "b50ce19c51314817e9a4885de55ad332a19585e0e221dbec86b98405a08400c4",
+          "bytes": 48192,
+          "duration_ms": 2978,
+          "frames": 114,
+          "sample_rate": 44100,
+          "unsynced_bytes": 125,
+          "retrieved": "2026-10-09"
+        },
+        "112004.mp3": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/112004.mp3",
+          "sha256": "67a565d4951ff5956a8299eb84cf57b5e0d44374dba8e24c9f0175cb4309b68e",
+          "bytes": 78285,
+          "duration_ms": 4859,
+          "frames": 186,
+          "sample_rate": 44100,
+          "unsynced_bytes": 125,
+          "retrieved": "2026-10-09"
+        },
+        "113001.mp3": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/113001.mp3",
+          "sha256": "36b36414695bfc69cf038c2060bcd73c4845cd6cce1fb8179de3ce43718b58d0",
+          "bytes": 56133,
+          "duration_ms": 3474,
+          "frames": 133,
+          "sample_rate": 44100,
+          "unsynced_bytes": 125,
+          "retrieved": "2026-10-09"
+        },
+        "113002.mp3": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/113002.mp3",
+          "sha256": "4ca15d21ebe9888142d29c3580bf62a9062513c04f4c7f222a89a00676252943",
+          "bytes": 58641,
+          "duration_ms": 3631,
+          "frames": 139,
+          "sample_rate": 44100,
+          "unsynced_bytes": 125,
+          "retrieved": "2026-10-09"
+        },
+        "113003.mp3": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/113003.mp3",
+          "sha256": "e0ee7929798463fdf1c41c93204bb1917f1304819d76cd6911c6d3df773de1a4",
+          "bytes": 81211,
+          "duration_ms": 5042,
+          "frames": 193,
+          "sample_rate": 44100,
+          "unsynced_bytes": 125,
+          "retrieved": "2026-10-09"
+        },
+        "113004.mp3": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/113004.mp3",
+          "sha256": "aa34657feaf7ea666ec62f253d2458b98c3cb01835f8c915da0b58ef4c87ed2c",
+          "bytes": 96675,
+          "duration_ms": 6008,
+          "frames": 230,
+          "sample_rate": 44100,
+          "unsynced_bytes": 125,
+          "retrieved": "2026-10-09"
+        },
+        "113005.mp3": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/113005.mp3",
+          "sha256": "c83d3988ef8809ea0bfd107f62732d1e9b8697bb26ee8004ea514b9301389fe8",
+          "bytes": 91242,
+          "duration_ms": 5669,
+          "frames": 217,
+          "sample_rate": 44100,
+          "unsynced_bytes": 125,
+          "retrieved": "2026-10-09"
+        },
+        "114001.mp3": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/114001.mp3",
+          "sha256": "85f84b7f45d8249a94265f5453997a3e55fc027763114b8df91b15fa39c0e484",
+          "bytes": 98347,
+          "duration_ms": 6113,
+          "frames": 234,
+          "sample_rate": 44100,
+          "unsynced_bytes": 125,
+          "retrieved": "2026-10-09"
+        },
+        "114002.mp3": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/114002.mp3",
+          "sha256": "522638668af16887a5a514d92903c1172d8afa28622eeb90f7d8550b56c6eae2",
+          "bytes": 84972,
+          "duration_ms": 5277,
+          "frames": 202,
+          "sample_rate": 44100,
+          "unsynced_bytes": 125,
+          "retrieved": "2026-10-09"
+        },
+        "114003.mp3": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/114003.mp3",
+          "sha256": "b07db0b577e3f14304b7279cea34c9b261fe55d6a31c58e33657279d19ec1309",
+          "bytes": 86226,
+          "duration_ms": 5355,
+          "frames": 205,
+          "sample_rate": 44100,
+          "unsynced_bytes": 125,
+          "retrieved": "2026-10-09"
+        },
+        "114004.mp3": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/114004.mp3",
+          "sha256": "3a3ae4ed53b7cf5123c5bf01842be316657c509e4306ae3f7270e8fb612fb8e9",
+          "bytes": 128440,
+          "duration_ms": 7993,
+          "frames": 306,
+          "sample_rate": 44100,
+          "unsynced_bytes": 125,
+          "retrieved": "2026-10-09"
+        },
+        "114005.mp3": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/114005.mp3",
+          "sha256": "bbc6d4bdabc7350738bba1309eaed60389de12c9e8284de316878318b8f32ec1",
+          "bytes": 127186,
+          "duration_ms": 7915,
+          "frames": 303,
+          "sample_rate": 44100,
+          "unsynced_bytes": 125,
+          "retrieved": "2026-10-09"
+        },
+        "114006.mp3": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/114006.mp3",
+          "sha256": "99047f038edf3db4ce4914f0d935d46693f8b95ca00316ecf2457002e457c2f9",
+          "bytes": 132620,
+          "duration_ms": 8255,
+          "frames": 316,
           "sample_rate": 44100,
           "unsynced_bytes": 125,
           "retrieved": "2026-10-09"

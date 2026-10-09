@@ -1,0 +1,300 @@
+{
+  "_comment": "Hadits surah Al-Ikhlas (schema.ts Hadith), dicari di korpus platform api/data dan disalin byte-per-byte oleh belajar/pipeline/facts_muawwidzat.py. 'hadith' = rekaman yang lengkap menurut schema.ts (punya terjemahan Indonesia dari korpus). '_needs_indonesian' = rekaman tanpa terjemahan Indonesia di korpus (al-Bukhari, Riyad as-Salihin); tidak dikirim sampai ada terjemahan bersumber. Tidak ada terjemahan yang ditulis di sini. status 'draft' = status pipeline (plan L11).",
+  "surah": 112,
+  "slug": "al-ikhlas",
+  "_generated_by": "belajar/pipeline/facts_muawwidzat.py (Python stdlib, tanpa LLM)",
+  "_inputs": {
+    "corpus": {
+      "bukhari.json": "sha256:df42f6e5fe98a3571cc44775cbe998fb148e21e650c0ff948a2e03ef009493c7",
+      "muslim.json": "sha256:366ebf71aa8e031eb0ec9c1cb4006f653e4d9300f9f6229f11d4df830fd73351",
+      "riyad-as-salihin.json": "sha256:99d32abd2744456c921a4c069d78b1012b325106cd439accaf137dbd5405c8d0",
+      "tafsir-ibn-kathir.json": "sha256:767270d51e5e8c0b5b946fc27b217f51e98274d3d5523d6fecd7c451300b4858"
+    },
+    "hadith_mapping": {
+      "fawazahmed0/ara-muslim-sections-6.json": "sha256:1814326c0fefd9ed123a5e8ee55e6e4eef8dd303775c2028d95d8fef921666f1",
+      "fawazahmed0/ara-muslim-sections-39.json": "sha256:a0e4d44329e0ae3b4b3b29b67dcc3aff430364ab6f1b6b2940cd7252f563f4a3",
+      "ahmedbaset/riyad_assalihin.json": "sha256:180171247ed9462c05164c80c4f938bd30936bfaf848125595be0b86361d7b75"
+    }
+  },
+  "_search_normalisation": "harakat, tanwin, tatweel, alif kecil (U+0670), tanda Qur'ani dan tanda arah teks (U+200C–U+200F) dibuang; tanda baca diganti spasi; أ إ آ ٱ → ا, ى → ي, ة → ه, ؤ → و, ئ → ي; spasi dirapatkan",
+  "_record_sha256": "sha256 dari json.dumps(rekaman korpus, ensure_ascii=False, sort_keys=True, separators=(',', ':')) dalam UTF-8",
+  "hadith": [
+    {
+      "citation": "Sahih Muslim 811a",
+      "ar": "وَحَدَّثَنِي زُهَيْرُ بْنُ حَرْبٍ، وَمُحَمَّدُ بْنُ بَشَّارٍ، قَالَ زُهَيْرٌ حَدَّثَنَا يَحْيَى بْنُ سَعِيدٍ، عَنْ شُعْبَةَ، عَنْ قَتَادَةَ، عَنْ سَالِمِ بْنِ أَبِي الْجَعْدِ، عَنْ مَعْدَانَ بْنِ أَبِي طَلْحَةَ، عَنْ أَبِي الدَّرْدَاءِ، عَنِ النَّبِيِّ صلى الله عليه وسلم قَالَ ‏\"‏ أَيَعْجِزُ أَحَدُكُمْ أَنْ يَقْرَأَ فِي لَيْلَةٍ ثُلُثَ الْقُرْآنِ ‏\" قَالُوا : وَكَيْفَ يَقْرَأْ ثُلُثَ الْقُرْآنِ ؟ قَالَ : \" قُلْ هُوَ اللَّهُ أَحَدٌ تَعْدِلُ ثُلُثَ الْقُرْآنِ \" ‏.‏",
+      "id": "Dan telah menceritakan kepadaku Zuhair bin Harb dan Muhammad bin Basysyar, Zuhair berkata: telah menceritakan kepada kami Yahya bin Sa'id, dari Syu'bah, dari Qatadah, dari Salim bin Abi al-Ja'd, dari Ma'dan bin Abi Thalhah, dari Abu ad-Darda', dari Nabi ﷺ, beliau bersabda, \"Apakah salah seorang dari kalian merasa berat membaca sepertiga al-Qur'an dalam semalam?\" Mereka bertanya, \"Bagaimana ia membaca sepertiga al-Qur'an?\" Beliau menjawab, \"{Qul huwallahu ahad} setara dengan sepertiga al-Qur'an.\"",
+      "grade": "Shahih (termuat dalam Sahih Muslim; kolom grades di korpus kosong)",
+      "provenance": {
+        "collection": "muslim",
+        "point": "api/data/muslim.json hadithnumber 1886",
+        "sha256": "1d291e1ea64e4bb620a18372064dec7615efdd8226b7b1d07ce19162e9cec8ed"
+      },
+      "status": "draft",
+      "_en": "Abu Darda' reported Allah's Apostle (ﷺ) as saying:Is any one of you incapable of reciting a third of the Qur'an in a night? They (the Companions) asked: How could one recite a third of the Qur'an (in a night)? Upon this he (the Holy Prophet) said: \"'Say: He is Allah, One' (Qur'an. cxii) is equivalent to a third of the Qur'an",
+      "_id_label": "api/data/muslim.json kolom 'id', disalin apa adanya (terjemahan internal platform, bukan edisi terbitan)",
+      "_local_citation": "Sahih Muslim 1886",
+      "_numbering": "Muslim: nomor urut korpus 1886 -> fawazahmed0 arabicnumber 811.01 -> 811a (penomoran Fuad 'Abd al-Baqi, sunnah.com); teks Arab korpus identik byte-per-byte dengan fawazahmed0",
+      "_url": "https://sunnah.com/muslim:811a",
+      "_topic": "Al-Ikhlas setara dengan sepertiga Al-Qur'an",
+      "_slugs": [
+        "al-ikhlas"
+      ],
+      "_used_by_facts": [
+        "setara-sepertiga-al-quran"
+      ]
+    },
+    {
+      "citation": "Sahih Muslim 812a",
+      "ar": "وَحَدَّثَنِي مُحَمَّدُ بْنُ حَاتِمٍ، وَيَعْقُوبُ بْنُ إِبْرَاهِيمَ، جَمِيعًا عَنْ يَحْيَى، - قَالَ ابْنُ حَاتِمٍ حَدَّثَنَا يَحْيَى بْنُ سَعِيدٍ، - حَدَّثَنَا يَزِيدُ بْنُ كَيْسَانَ، حَدَّثَنَا أَبُو حَازِمٍ، عَنْ أَبِي هُرَيْرَةَ، قَالَ قَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏\"‏ احْشِدُوا فَإِنِّي سَأَقْرَأُ عَلَيْكُمْ ثُلُثَ الْقُرْآنِ ‏\"‏ ‏.‏ فَحَشَدَ مَنْ حَشَدَ ثُمَّ خَرَجَ نَبِيُّ اللَّهِ صلى الله عليه وسلم فَقَرَأَ ‏{‏ قُلْ هُوَ اللَّهُ أَحَدٌ‏}‏ ثُمَّ دَخَلَ فَقَالَ بَعْضُنَا لِبَعْضٍ إِنِّي أُرَى هَذَا خَبَرٌ جَاءَهُ مِنَ السَّمَاءِ فَذَاكَ الَّذِي أَدْخَلَهُ ‏.‏ ثُمَّ خَرَجَ نَبِيُّ اللَّهِ صلى الله عليه وسلم فَقَالَ ‏\"‏ إِنِّي قُلْتُ لَكُمْ سَأَقْرَأُ عَلَيْكُمْ ثُلُثَ الْقُرْآنِ أَلاَ إِنَّهَا تَعْدِلُ ثُلُثَ الْقُرْآنِ ‏\"‏ ‏.‏",
+      "id": "Dan telah menceritakan kepadaku Muhammad bin Hatim dan Ya'qub bin Ibrahim, keduanya dari Yahya — Ibnu Hatim berkata: telah menceritakan kepada kami Yahya bin Sa'id — telah menceritakan kepada kami Yazid bin Kaisan, telah menceritakan kepada kami Abu Hazim, dari Abu Hurairah, ia berkata: Rasulullah ﷺ bersabda, \"Berkumpullah! Sungguh aku akan membacakan kepada kalian sepertiga al-Qur'an.\" Maka berkumpullah orang yang berkumpul. Kemudian Nabiyullah ﷺ keluar dan membaca {Qul huwallahu ahad}. Kemudian beliau masuk (ke rumah). Sebagian dari kami berkata kepada yang lain, \"Aku kira ini adalah berita yang datang kepada beliau dari langit, sehingga beliau masuk.\" Kemudian Nabiyullah ﷺ keluar lagi dan bersabda, \"Sungguh aku telah berkata kepada kalian bahwa aku akan membacakan sepertiga al-Qur'an kepada kalian. Ketahuilah, sungguh ia setara dengan sepertiga al-Qur'an.\"",
+      "grade": "Shahih (termuat dalam Sahih Muslim; kolom grades di korpus kosong)",
+      "provenance": {
+        "collection": "muslim",
+        "point": "api/data/muslim.json hadithnumber 1888",
+        "sha256": "29bb8619d5a864fbf86fd3ab74025a7d278a443723a3f638037428c5e6941c57"
+      },
+      "status": "draft",
+      "_en": "It is reported on the authority of Abu Huraira that the Messenger of Allah (ﷺ) said:Get together. for I am going to recite one-third of the Qur'an before you. And those who could get together gathered there. Then the Messenger of Allah (ﷺ) came out and recited:\" Say: He, Allah, is One.\" He then entered (his house). Some of us said to the others: Perhaps there has been some news from the heaven on account of which he has gone Inside (the house). The Apostle of Allah (ﷺ) again came out and said: I told you that I was going to recite one-third of the Qur'in; keep in mind, this (Surah Ikhlas) is equivalent to one-third of the Qur'an",
+      "_id_label": "api/data/muslim.json kolom 'id', disalin apa adanya (terjemahan internal platform, bukan edisi terbitan)",
+      "_local_citation": "Sahih Muslim 1888",
+      "_numbering": "Muslim: nomor urut korpus 1888 -> fawazahmed0 arabicnumber 812.01 -> 812a (penomoran Fuad 'Abd al-Baqi, sunnah.com); teks Arab korpus identik byte-per-byte dengan fawazahmed0",
+      "_url": "https://sunnah.com/muslim:812a",
+      "_topic": "Al-Ikhlas setara dengan sepertiga Al-Qur'an",
+      "_slugs": [
+        "al-ikhlas"
+      ],
+      "_used_by_facts": [
+        "setara-sepertiga-al-quran"
+      ]
+    },
+    {
+      "citation": "Sahih Muslim 813",
+      "ar": "حَدَّثَنَا أَحْمَدُ بْنُ عَبْدِ الرَّحْمَنِ بْنِ وَهْبٍ، حَدَّثَنَا عَمِّي عَبْدُ اللَّهِ بْنُ وَهْبٍ، حَدَّثَنَا عَمْرُو بْنُ الْحَارِثِ، عَنْ سَعِيدِ بْنِ أَبِي هِلاَلٍ، أَنَّ أَبَا الرِّجَالِ، مُحَمَّدَ بْنَ عَبْدِ الرَّحْمَنِ حَدَّثَهُ عَنْ أُمِّهِ، عَمْرَةَ بِنْتِ عَبْدِ الرَّحْمَنِ وَكَانَتْ فِي حَجْرِ عَائِشَةَ زَوْجِ النَّبِيِّ صلى الله عليه وسلم عَنْ عَائِشَةَ أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم بَعَثَ رَجُلاً عَلَى سَرِيَّةٍ وَكَانَ يَقْرَأُ لأَصْحَابِهِ فِي صَلاَتِهِمْ فَيَخْتِمُ بِـ ‏{‏ قُلْ هُوَ اللَّهُ أَحَدٌ‏}‏ فَلَمَّا رَجَعُوا ذُكِرَ ذَلِكَ لِرَسُولِ اللَّهِ صلى الله عليه وسلم فَقَالَ ‏\"‏ سَلُوهُ لأَىِّ شَىْءٍ يَصْنَعُ ذَلِكَ ‏\"‏ ‏.‏ فَسَأَلُوهُ فَقَالَ لأَنَّهَا صِفَةُ الرَّحْمَنِ فَأَنَا أُحِبُّ أَنْ أَقْرَأَ بِهَا ‏.‏ فَقَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏\"‏ أَخْبِرُوهُ أَنَّ اللَّهَ يُحِبُّهُ",
+      "id": "Telah menceritakan kepada kami Ahmad bin 'Abdurrahman bin Wahb, telah menceritakan kepada kami pamanku 'Abdullah bin Wahb, telah menceritakan kepada kami 'Amr bin al-Harits, dari Sa'id bin Abi Hilal, bahwa Abu ar-Rijal Muhammad bin 'Abdurrahman menceritakan kepadanya dari ibunya 'Amrah binti 'Abdurrahman — yang dahulu berada di pangkuan 'Aisyah istri Nabi ﷺ — dari 'Aisyah, bahwa Rasulullah ﷺ mengutus seorang lelaki memimpin sariyyah (pasukan kecil). Ia biasa menjadi imam shalat bagi para sahabatnya dan menutup (bacaannya) dengan {Qul huwallahu ahad}. Ketika mereka pulang, hal itu disebutkan kepada Rasulullah ﷺ. Beliau bersabda, \"Tanyakanlah kepadanya, untuk apa ia melakukan itu.\" Mereka pun bertanya kepadanya, ia menjawab, \"Karena ia adalah sifat ar-Rahman, maka aku senang membacanya.\" Rasulullah ﷺ bersabda, \"Kabarkanlah kepadanya bahwa Allah mencintainya.\"",
+      "grade": "Shahih (termuat dalam Sahih Muslim; kolom grades di korpus kosong)",
+      "provenance": {
+        "collection": "muslim",
+        "point": "api/data/muslim.json hadithnumber 1890",
+        "sha256": "41d8ef486cfb54e34485a220ac219ad213e73d4aeaf8849a3fb4acaecd28224c"
+      },
+      "status": "draft",
+      "_en": "A'isha reported:The Messenger of Allah (ﷺ) sent a man in charge of an expedition and he would recite for his Companions during their prayer, ending (recitation) with:\" Say, He is God, One.\" When they returned mention was made of it to the Messenger of Allah (ﷺ). He (the Holy Prophet) told them to ask him why he had done like that. So they asked him and he said: Verily, it is an attribute of the Compassionate One, and (for this reason) I love to recite it. The Messenger of Allah (ﷺ) thereupon said: Inform him that Allah loves him",
+      "_id_label": "api/data/muslim.json kolom 'id', disalin apa adanya (terjemahan internal platform, bukan edisi terbitan)",
+      "_local_citation": "Sahih Muslim 1890",
+      "_numbering": "Muslim: nomor urut korpus 1890 -> fawazahmed0 arabicnumber 813 -> 813 (penomoran Fuad 'Abd al-Baqi, sunnah.com); teks Arab korpus identik byte-per-byte dengan fawazahmed0",
+      "_url": "https://sunnah.com/muslim:813",
+      "_topic": "sahabat yang mencintai Al-Ikhlas",
+      "_slugs": [
+        "al-ikhlas"
+      ],
+      "_used_by_facts": [
+        "mencintai-surah-ini"
+      ]
+    },
+    {
+      "citation": "Sahih Muslim 726",
+      "ar": "حَدَّثَنِي مُحَمَّدُ بْنُ عَبَّادٍ، وَابْنُ أَبِي عُمَرَ، قَالاَ حَدَّثَنَا مَرْوَانُ بْنُ مُعَاوِيَةَ، عَنْ يَزِيدَ، - هُوَ ابْنُ كَيْسَانَ - عَنْ أَبِي حَازِمٍ، عَنْ أَبِي هُرَيْرَةَ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم قَرَأَ فِي رَكْعَتَىِ الْفَجْرِ ‏{‏ قُلْ يَا أَيُّهَا الْكَافِرُونَ‏}‏ وَ ‏{‏ قُلْ هُوَ اللَّهُ أَحَدٌ‏}‏",
+      "id": "Telah menceritakan kepadaku Muhammad bin 'Abbad dan Ibnu Abi 'Umar, keduanya berkata: telah menceritakan kepada kami Marwan bin Mu'awiyah, dari Yazid — yaitu Ibnu Kaisan —, dari Abu Hazim, dari Abu Hurairah, bahwa Rasulullah ﷺ membaca pada dua rakaat Fajar {Qul ya ayyuhal kafirun} dan {Qul huwallahu ahad}.",
+      "grade": "Shahih (termuat dalam Sahih Muslim; kolom grades di korpus kosong)",
+      "provenance": {
+        "collection": "muslim",
+        "point": "api/data/muslim.json hadithnumber 1690",
+        "sha256": "99b5a1d52e75cc2d2f6fc1c4a24751332d30e45f0ca1534745093ba4bc21c7bf"
+      },
+      "status": "draft",
+      "_en": "Abu Huraira reported that the Messenger of Allah (ﷺ) recited in the two (supererogatory) rak'ahs of the dawn (prayer):\" Say: O unbelievers,\" (Qur'an, cix.) and\" Say: Allah is one\" (cxii)",
+      "_id_label": "api/data/muslim.json kolom 'id', disalin apa adanya (terjemahan internal platform, bukan edisi terbitan)",
+      "_local_citation": "Sahih Muslim 1690",
+      "_numbering": "Muslim: nomor urut korpus 1690 -> fawazahmed0 arabicnumber 726 -> 726 (penomoran Fuad 'Abd al-Baqi, sunnah.com); teks Arab korpus identik byte-per-byte dengan fawazahmed0",
+      "_url": "https://sunnah.com/muslim:726",
+      "_topic": "Al-Kafirun dan Al-Ikhlas di dua rakaat fajar",
+      "_slugs": [
+        "al-ikhlas"
+      ],
+      "_used_by_facts": [
+        "dua-rakaat-fajar"
+      ]
+    }
+  ],
+  "_needs_indonesian": [
+    {
+      "citation": "Sahih al-Bukhari 5013",
+      "ar": "حَدَّثَنَا عَبْدُ اللَّهِ بْنُ يُوسُفَ، أَخْبَرَنَا مَالِكٌ، عَنْ عَبْدِ الرَّحْمَنِ بْنِ عَبْدِ اللَّهِ بْنِ عَبْدِ الرَّحْمَنِ بْنِ أَبِي صَعْصَعَةَ، عَنْ أَبِيهِ، عَنْ أَبِي سَعِيدٍ الْخُدْرِيِّ، أَنَّ رَجُلاً، سَمِعَ رَجُلاً، يَقْرَأُ ‏{‏قُلْ هُوَ اللَّهُ أَحَدٌ‏}‏ يُرَدِّدُهَا فَلَمَّا أَصْبَحَ جَاءَ إِلَى رَسُولِ اللَّهِ صلى الله عليه وسلم فَذَكَرَ ذَلِكَ لَهُ وَكَأَنَّ الرَّجُلَ يَتَقَالُّهَا فَقَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏\"‏ وَالَّذِي نَفْسِي بِيَدِهِ إِنَّهَا لَتَعْدِلُ ثُلُثَ الْقُرْآنِ ‏\"‏‏.‏",
+      "grade": "Shahih (termuat dalam Sahih al-Bukhari; kolom grades di korpus kosong)",
+      "provenance": {
+        "collection": "bukhari",
+        "point": "api/data/bukhari.json hadithnumber 5013",
+        "sha256": "7220669f708446f1543cac476f731dbb506c72da3220b2f13c1fa3666c4ef5cf"
+      },
+      "status": "draft",
+      "_en": "Narrated Abu Said Al-Khudri: A man heard another man reciting (Surat-Al-Ikhlas) 'Say He is Allah, (the) One.' (112. 1) repeatedly. The next morning he came to Allah's Messenger (ﷺ) and informed him about it as if he thought that it was not enough to recite. On that Allah's Messenger (ﷺ) said, \"By Him in Whose Hand my life is, this Surah is equal to one-third of the Qur'an",
+      "_local_citation": "Sahih al-Bukhari 5013",
+      "_numbering": "Bukhari: nomor korpus = nomor sunnah.com (fawazahmed0 hadithnumber)",
+      "_url": "https://sunnah.com/bukhari:5013",
+      "_topic": "Al-Ikhlas setara dengan sepertiga Al-Qur'an",
+      "_slugs": [
+        "al-ikhlas"
+      ],
+      "_variants_in_corpus": [
+        "Sahih al-Bukhari 6643",
+        "Sahih al-Bukhari 7374"
+      ],
+      "_used_by_facts": [
+        "setara-sepertiga-al-quran"
+      ]
+    },
+    {
+      "citation": "Sahih al-Bukhari 7375",
+      "ar": "حَدَّثَنَا أَحْمَدُ بْنُ صَالِحٍ، حَدَّثَنَا ابْنُ وَهْبٍ، حَدَّثَنَا عَمْرٌو، عَنِ ابْنِ أَبِي هِلاَلٍ، أَنَّ أَبَا الرِّجَالِ، مُحَمَّدَ بْنَ عَبْدِ الرَّحْمَنِ حَدَّثَهُ عَنْ أُمِّهِ، عَمْرَةَ بِنْتِ عَبْدِ الرَّحْمَنِ وَكَانَتْ فِي حَجْرِ عَائِشَةَ زَوْجِ النَّبِيِّ صلى الله عليه وسلم عَنْ عَائِشَةَ أَنَّ النَّبِيَّ صلى الله عليه وسلم بَعَثَ رَجُلاً عَلَى سَرِيَّةٍ، وَكَانَ يَقْرَأُ لأَصْحَابِهِ فِي صَلاَتِهِ فَيَخْتِمُ بِ ـ ‏{‏قُلْ هُوَ اللَّهُ أَحَدٌ‏}‏ فَلَمَّا رَجَعُوا ذَكَرُوا ذَلِكَ لِلنَّبِيِّ صلى الله عليه وسلم فَقَالَ ‏\"‏ سَلُوهُ لأَىِّ شَىْءٍ يَصْنَعُ ذَلِكَ ‏\"‏‏.‏ فَسَأَلُوهُ فَقَالَ لأَنَّهَا صِفَةُ الرَّحْمَنِ، وَأَنَا أُحِبُّ أَنْ أَقْرَأَ بِهَا‏.‏ فَقَالَ النَّبِيُّ صلى الله عليه وسلم ‏\"‏ أَخْبِرُوهُ أَنَّ اللَّهَ يُحِبُّهُ ‏\"‏‏.‏",
+      "grade": "Shahih (termuat dalam Sahih al-Bukhari; kolom grades di korpus kosong)",
+      "provenance": {
+        "collection": "bukhari",
+        "point": "api/data/bukhari.json hadithnumber 7375",
+        "sha256": "42722b3bbf15c1ad9b0f096919e83fa5cbf5355d9bc2dc7308882a175e0151d8"
+      },
+      "status": "draft",
+      "_en": "Narrated `Aisha:The Prophet (ﷺ) sent (an army unit) under the command of a man who used to lead his companions in the prayers and would finish his recitation with (the Sura 112): 'Say (O Muhammad): \"He is Allah, the One.\" ' (112.1) When they returned (from the battle), they mentioned that to the Prophet. He said (to them), \"Ask him why he does so.\" They asked him and he said, \"I do so because it mentions the qualities of the Beneficent and I love to recite it (in my prayer).\" The Prophet; said (to them), \"Tell him that Allah loves him",
+      "_local_citation": "Sahih al-Bukhari 7375",
+      "_numbering": "Bukhari: nomor korpus = nomor sunnah.com (fawazahmed0 hadithnumber)",
+      "_url": "https://sunnah.com/bukhari:7375",
+      "_topic": "sahabat yang mencintai Al-Ikhlas",
+      "_slugs": [
+        "al-ikhlas"
+      ],
+      "_used_by_facts": [
+        "mencintai-surah-ini"
+      ]
+    },
+    {
+      "citation": "Riyad as-Salihin 1013",
+      "ar": "وعن أنس رضي الله عنه أن رجلا قال‏:‏ يارسول الله إني أحب هذه السورة ‏\"‏قل هو الله أحد‏\"‏‏:‏‏\"‏إن حبها أدخلك الجنة‏\"‏ ‏(‏‏(‏رواه الترمذي وقال‏:‏ حديث حسن- رواه البخاري في صحيحه تعليقًا‏)‏‏)‏‏.‏",
+      "grade": "Hasan menurut at-Tirmidzi; al-Bukhari meriwayatkannya secara ta'liq (keduanya disebut an-Nawawi di akhir hadits)",
+      "provenance": {
+        "collection": "riyad-as-salihin",
+        "point": "api/data/riyad-as-salihin.json hadithnumber 334",
+        "sha256": "824796d98b341adade0e1ebf5826eab1e2dd8f5c1763515b9ac84cf4d56b29d7"
+      },
+      "status": "draft",
+      "_en": "Anas (May Allah be pleased with him) reported:\nA man said: \"O Messenger of Allah! I love Surat-Al-Ikhlas .",
+      "_local_citation": "Riyad as-Salihin 334",
+      "_numbering": "Riyad: idInBook korpus 334, chapterId 8 -> 1013 (aturan migrate_hadith_citations.py: bab 0 = n - 1217, lainnya n + 679); teks Arab identik dengan AhmedBaset",
+      "_url": "https://sunnah.com/riyadussalihin:1013",
+      "_topic": "sahabat yang mencintai Al-Ikhlas",
+      "_slugs": [
+        "al-ikhlas"
+      ],
+      "_used_by_facts": [
+        "mencintai-surah-ini"
+      ]
+    },
+    {
+      "citation": "Sahih al-Bukhari 4974",
+      "ar": "حَدَّثَنَا أَبُو الْيَمَانِ، حَدَّثَنَا شُعَيْبٌ، حَدَّثَنَا أَبُو الزِّنَادِ، عَنِ الأَعْرَجِ، عَنْ أَبِي هُرَيْرَةَ ـ رضى الله عنه ـ عَنِ النَّبِيِّ صلى الله عليه وسلم قَالَ ‏ \"‏ قَالَ اللَّهُ كَذَّبَنِي ابْنُ آدَمَ وَلَمْ يَكُنْ لَهُ ذَلِكَ، وَشَتَمَنِي وَلَمْ يَكُنْ لَهُ ذَلِكَ، فَأَمَّا تَكْذِيبُهُ إِيَّاىَ فَقَوْلُهُ لَنْ يُعِيدَنِي كَمَا بَدَأَنِي، وَلَيْسَ أَوَّلُ الْخَلْقِ بِأَهْوَنَ عَلَىَّ مِنْ إِعَادَتِهِ، وَأَمَّا شَتْمُهُ إِيَّاىَ فَقَوْلُهُ اتَّخَذَ اللَّهُ وَلَدًا، وَأَنَا الأَحَدُ الصَّمَدُ لَمْ أَلِدْ وَلَمْ أُولَدْ وَلَمْ يَكُنْ لِي كُفْأً أَحَدٌ ‏\"‏‏.‏",
+      "grade": "Shahih (termuat dalam Sahih al-Bukhari; kolom grades di korpus kosong)",
+      "provenance": {
+        "collection": "bukhari",
+        "point": "api/data/bukhari.json hadithnumber 4974",
+        "sha256": "cec96cac3cd6c7e8a2bcbf7f07de6051583f3e5f980bf59cf57087c4b5dbf1eb"
+      },
+      "status": "draft",
+      "_en": "Narrated Abu Huraira:The Prophet (ﷺ) said, \"Allah said: 'The son of Adam tells a lie against Me,, though he hasn't the right to do so. He abuses me though he hasn't the right to do so. As for his telling a lie against Me, it is his saying that I will not recreate him as I created him for the first time. In fact, the first creation was not easier for Me than new creation. As for his abusing Me, it is his saying that Allah has begotten children, while I am the One, the Self-Sufficient Master Whom all creatures need, I beget not, nor was I begotten, and there is none like unto Me",
+      "_local_citation": "Sahih al-Bukhari 4974",
+      "_numbering": "Bukhari: nomor korpus = nomor sunnah.com (fawazahmed0 hadithnumber)",
+      "_url": "https://sunnah.com/bukhari:4974",
+      "_topic": "hadits qudsi yang menggemakan Al-Ikhlas",
+      "_slugs": [
+        "al-ikhlas"
+      ],
+      "_used_by_facts": [
+        "hadits-qudsi-al-ikhlas"
+      ]
+    },
+    {
+      "citation": "Sahih al-Bukhari 5017",
+      "ar": "حَدَّثَنَا قُتَيْبَةُ بْنُ سَعِيدٍ، حَدَّثَنَا الْمُفَضَّلُ، عَنْ عُقَيْلٍ، عَنِ ابْنِ شِهَابٍ، عَنْ عُرْوَةَ، عَنْ عَائِشَةَ، أَنَّ النَّبِيَّ صلى الله عليه وسلم كَانَ إِذَا أَوَى إِلَى فِرَاشِهِ كُلَّ لَيْلَةٍ جَمَعَ كَفَّيْهِ ثُمَّ نَفَثَ فِيهِمَا فَقَرَأَ فِيهِمَا ‏{‏قُلْ هُوَ اللَّهُ أَحَدٌ‏}‏ وَ‏{‏قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ‏}‏ وَ‏{‏قُلْ أَعُوذُ بِرَبِّ النَّاسِ‏}‏ ثُمَّ يَمْسَحُ بِهِمَا مَا اسْتَطَاعَ مِنْ جَسَدِهِ يَبْدَأُ بِهِمَا عَلَى رَأْسِهِ وَوَجْهِهِ وَمَا أَقْبَلَ مِنْ جَسَدِهِ يَفْعَلُ ذَلِكَ ثَلاَثَ مَرَّاتٍ‏.‏",
+      "grade": "Shahih (termuat dalam Sahih al-Bukhari; kolom grades di korpus kosong)",
+      "provenance": {
+        "collection": "bukhari",
+        "point": "api/data/bukhari.json hadithnumber 5017",
+        "sha256": "bff5c0381ff5eb0ea64a932e1964ad4f88e9a02e12183b5eb01a4fe33c25bb8a"
+      },
+      "status": "draft",
+      "_en": "Narrated 'Aisha: Whenever the Prophet (ﷺ) went to bed every night, he used to cup his hands together and blow over it after reciting Surat Al-Ikhlas, Surat Al-Falaq and Surat An-Nas, and then rub his hands over whatever parts of his body he was able to rub, starting with his head, face and front of his body. He used to do that three times",
+      "_local_citation": "Sahih al-Bukhari 5017",
+      "_numbering": "Bukhari: nomor korpus = nomor sunnah.com (fawazahmed0 hadithnumber)",
+      "_url": "https://sunnah.com/bukhari:5017",
+      "_topic": "dibaca sebelum tidur",
+      "_slugs": [
+        "al-ikhlas",
+        "al-falaq",
+        "an-nas"
+      ],
+      "_used_by_facts": [
+        "sebelum-tidur"
+      ]
+    },
+    {
+      "citation": "Sahih al-Bukhari 5748",
+      "ar": "حَدَّثَنَا عَبْدُ الْعَزِيزِ بْنُ عَبْدِ اللَّهِ الأُوَيْسِيُّ، حَدَّثَنَا سُلَيْمَانُ، عَنْ يُونُسَ، عَنِ ابْنِ شِهَابٍ، عَنْ عُرْوَةَ بْنِ الزُّبَيْرِ، عَنْ عَائِشَةَ ـ رضى الله عنها ـ قَالَتْ كَانَ رَسُولُ اللَّهِ صلى الله عليه وسلم إِذَا أَوَى إِلَى فِرَاشِهِ نَفَثَ فِي كَفَّيْهِ بِقُلْ هُوَ اللَّهُ أَحَدٌ وَبِالْمُعَوِّذَتَيْنِ جَمِيعًا، ثُمَّ يَمْسَحُ بِهِمَا وَجْهَهُ، وَمَا بَلَغَتْ يَدَاهُ مِنْ جَسَدِهِ‏.‏ قَالَتْ عَائِشَةُ فَلَمَّا اشْتَكَى كَانَ يَأْمُرُنِي أَنْ أَفْعَلَ ذَلِكَ بِهِ‏.‏ قَالَ يُونُسُ كُنْتُ أَرَى ابْنَ شِهَابٍ يَصْنَعُ ذَلِكَ إِذَا أَتَى إِلَى فِرَاشِهِ‏.‏",
+      "grade": "Shahih (termuat dalam Sahih al-Bukhari; kolom grades di korpus kosong)",
+      "provenance": {
+        "collection": "bukhari",
+        "point": "api/data/bukhari.json hadithnumber 5748",
+        "sha256": "67fc69d263f044577bbc8ebfdf5a78221c3552feb9c2e31e5237bdfc2d43360d"
+      },
+      "status": "draft",
+      "_en": "Narrated `Aisha:Whenever Allah's Messenger (ﷺ) went to bed, he used to recite Surat-al-Ikhlas, Surat-al-Falaq and Surat-an- Nas and then blow on his palms and pass them over his face and those parts of his body that his hands could reach. And when he fell ill, he used to order me to do like that for him",
+      "_local_citation": "Sahih al-Bukhari 5748",
+      "_numbering": "Bukhari: nomor korpus = nomor sunnah.com (fawazahmed0 hadithnumber)",
+      "_url": "https://sunnah.com/bukhari:5748",
+      "_topic": "dibaca sebelum tidur",
+      "_slugs": [
+        "al-ikhlas",
+        "al-falaq",
+        "an-nas"
+      ],
+      "_used_by_facts": [
+        "sebelum-tidur"
+      ]
+    },
+    {
+      "citation": "Riyad as-Salihin 1456",
+      "ar": "وعن عبد الله بن خُبيب -بضم الخاء المعجمة- رضي الله عنه قال‏:‏ قال لي رسول الله صلى الله عليه وسلم‏:‏ ‏\n\"‏اقرأ‏:‏ قل هو الله أحد، والمعوذتين حين تمسي وحين تصبح، ثلاث مرات، تكفيك من كل شيء‏\"‏‏.‏ رواه أبو داود والترمذي وقال حديث حسن صحيح ‏.‏",
+      "grade": "Hasan shahih menurut at-Tirmidzi; diriwayatkan Abu Dawud dan at-Tirmidzi (disebut an-Nawawi di akhir hadits)",
+      "provenance": {
+        "collection": "riyad-as-salihin",
+        "point": "api/data/riyad-as-salihin.json hadithnumber 777",
+        "sha256": "20a1bf82373c5bd7892e6dd2ed51fba88a97821b3884719caaf1e5add133fab2"
+      },
+      "status": "draft",
+      "_en": "'Abdullah bin Khubaib (May Allah be pleased with him) reported:\nThe Messenger of Allah (ﷺ) said to me, \"Recite Surat Al-Ikhlas and Al- Mu'awwidhatain (Surat Al-Falaq and Surat An-Nas) three times at dawn and dusk. It will suffice you in all respects.\".",
+      "_local_citation": "Riyad as-Salihin 777",
+      "_numbering": "Riyad: idInBook korpus 777, chapterId 15 -> 1456 (aturan migrate_hadith_citations.py: bab 0 = n - 1217, lainnya n + 679); teks Arab identik dengan AhmedBaset",
+      "_url": "https://sunnah.com/riyadussalihin:1456",
+      "_topic": "dibaca pagi dan petang",
+      "_slugs": [
+        "al-ikhlas",
+        "al-falaq",
+        "an-nas"
+      ],
+      "_used_by_facts": [
+        "pagi-dan-petang"
+      ]
+    }
+  ],
+  "_not_used": [
+    {
+      "citation": "Sahih al-Bukhari 774",
+      "why": "mu'allaq (dibuka «وقال عبيد الله» tanpa sanad bersambung dari al-Bukhari); kisah yang sama dipakai lewat Riyad as-Salihin 1013, yang menyebut penilaian at-Tirmidzi",
+      "slugs": [
+        "al-ikhlas"
+      ],
+      "variants_in_corpus": []
+    }
+  ],
+  "_en_note": "_en adalah kolom en korpus apa adanya (terjemahan Inggris pihak ketiga, berhak cipta menurut docs/belajar-research/kitabs.md); di beberapa tempat penerjemah menambah keterangan dalam kurung yang tidak ada di teks Arab (mis. Sahih al-Bukhari 5016: '(Surat Al-Falaq and Surat An- Nas)'). Dipakai hanya sebagai pembanding, tidak untuk ditampilkan.",
+  "_anomalies": [
+    "Sahih Muslim 813: corpus Arabic has an odd number of quotation marks; the last quoted saying is never closed (truncated at the end?), kept byte for byte: 'ِ صلى الله عليه وسلم \\u200f\"\\u200f أَخْبِرُوهُ أَنَّ اللَّهَ يُحِبُّهُ'",
+    "Riyad as-Salihin 1013: corpus English stops mid-quotation (truncated): '\\nA man said: \"O Messenger of Allah! I love Surat-Al-Ikhlas .'"
+  ]
+}

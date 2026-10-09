@@ -5,7 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { ConceptCard } from "@/components/library/ConceptCard";
 import { Link } from "@/i18n/navigation";
-import { SURAHS } from "@/lib/content";
+import { SURAH_INDEX, WORD_AR } from "@/lib/content";
 import { getConcept, LIBRARY } from "@/lib/library";
 import { conceptHref, conceptIndexHref } from "@/lib/routes";
 
@@ -29,9 +29,6 @@ export default async function ConceptPage({ params }: PageProps<"/[locale]/konse
   if (!concept) notFound();
   const t = await getTranslations("Concept");
   const tw = await getTranslations("Word");
-  // v1 has one surah; examples are word locs within it.
-  const surah = SURAHS[0];
-  const wordAr = Object.fromEntries(surah.ayat.flatMap((a) => a.words.map((w) => [w.loc, w.ar])));
   const related = concept.related.flatMap((r) => {
     const c = getConcept(r);
     return c ? [c] : [];
@@ -49,8 +46,8 @@ export default async function ConceptPage({ params }: PageProps<"/[locale]/konse
       <div className="mt-4">
         <ConceptCard
           concept={concept}
-          surahSlug={surah.slug}
-          wordAr={wordAr}
+          surahs={SURAH_INDEX}
+          wordAr={WORD_AR}
           labels={{
             nahwu: t("nahwu"),
             sharaf: t("sharaf"),
