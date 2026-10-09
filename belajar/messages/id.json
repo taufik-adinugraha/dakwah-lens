@@ -55,7 +55,8 @@
   },
   "Footer": {
     "disclaimer": "Dibantu AI, bukan fatwa otoritatif. Penjelasan disusun dari kitab yang disebut namanya dan ditinjau ustadz sebelum tayang.",
-    "credits": "Sumber & lisensi"
+    "credits": "Sumber & lisensi",
+    "disclaimer_beta": "Dibantu AI, bukan fatwa otoritatif. Penjelasan disusun dari kitab yang disebut namanya. Selama uji coba, materi bertanda “Draf” belum ditinjau ustadz."
   },
   "Credits": {
     "title": "Sumber & lisensi",

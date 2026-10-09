@@ -158,6 +158,8 @@ jobs:
           page="$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/al-fatihah/1)"
           grep -q "Alafasy" <<<"$page"
           grep -q "menunggu tinjauan ustadz" <<<"$page"
+          # A beta build must not claim ustadz review it hasn't had (L10).
+          if grep -q "ditinjau ustadz sebelum tayang" <<<"$page"; then echo "✗ beta footer claims review"; exit 1; fi
           grep -q 'href="/belajar/id/quran/al-fatihah/2"' <<<"$page"
           for html in "$hub" "$track" "$page" \
                       "$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/al-fatihah)" \

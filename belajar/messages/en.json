@@ -55,7 +55,8 @@
   },
   "Footer": {
     "disclaimer": "AI-assisted, not an authoritative fatwa. Explanations are drawn from named kitabs and reviewed by an ustadz before going live.",
-    "credits": "Sources & licences"
+    "credits": "Sources & licences",
+    "disclaimer_beta": "AI-assisted, not an authoritative fatwa. Explanations are drawn from named kitabs. During this trial, material marked “Draft” has not yet been reviewed by an ustadz."
   },
   "Credits": {
     "title": "Sources & licences",
