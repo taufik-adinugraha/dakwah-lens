@@ -1,0 +1,247 @@
+{
+  "_comment": "Source registry (plan §7.5 stage 0). fetch.py downloads each input into cache/, computes sha256 and pins it here on first run; later runs fail if the bytes change. Update a pin only deliberately: python3 fetch.py --repin <id>.",
+  "inputs": {
+    "tanzil_uthmani": {
+      "name": "Tanzil Quran Text (Uthmani)",
+      "version": "1.1",
+      "url": "https://tanzil.net/pub/download/index.php?quranType=uthmani&outType=txt-2&agree=true",
+      "download_page": "https://tanzil.net/download/",
+      "options": "Form on tanzil.net/download: Quran text type = Uthmani, output = 'Text (with aya numbers)' (txt-2), 'I agree' ticked. The four option checkboxes (pause marks, sajdah signs, rub-el-hizb signs, tatweel below superscript alefs) are NOT sent, so the file has none of them: every space-separated token is one word.",
+      "cache_path": "cache/tanzil/quran-uthmani.txt",
+      "sha256": "bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
+      "bytes": 1370878,
+      "retrieved": "2026-10-09",
+      "licence": "Creative Commons Attribution 3.0, plus Tanzil's terms: verbatim copies only ('CHANGING IT IS NOT ALLOWED'); cite Tanzil Project and link tanzil.net; keep the copyright block. https://tanzil.net/docs/text_license",
+      "attribution": "Tanzil Quran Text (Uthmani, Version 1.1), Copyright (C) 2007-2026 Tanzil Project. https://tanzil.net"
+    },
+    "tanzil_metadata": {
+      "name": "Tanzil Quran metadata (quran-data.xml)",
+      "version": "1.0",
+      "url": "https://tanzil.net/res/text/metadata/quran-data.xml",
+      "docs": "https://tanzil.net/docs/quran_metadata",
+      "options": "Used for the surah's Arabic name (name_ar) and to cross-check ayah counts per surah against the text file.",
+      "cache_path": "cache/tanzil/quran-data.xml",
+      "sha256": "8867c1d88191472adec9db694b3cd9f135b1a2ef580574d32cf888dcb22c5c7a",
+      "bytes": 77234,
+      "retrieved": "2026-10-09",
+      "licence": "Creative Commons Attribution (file header: license=\"cc-by\", copyright (C) 2008-2009 Tanzil.info).",
+      "attribution": "Quran metadata, Tanzil Project. https://tanzil.net"
+    },
+    "qac_morphology": {
+      "name": "Quranic Arabic Corpus morphology",
+      "version": "0.4",
+      "url": "https://raw.githubusercontent.com/bnjasim/quranic-corpus/master/quranic-corpus-morphology-0.4.txt",
+      "official_url": "https://corpus.quran.com/download/",
+      "options": "The official download needs an email address; this is a GitHub mirror of the unmodified 0.4 file. fetch.py checks that the file's own header names 'version 0.4'.",
+      "cache_path": "cache/qac/quranic-corpus-morphology-0.4.txt",
+      "sha256": "a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
+      "bytes": 6309503,
+      "retrieved": "2026-10-09",
+      "licence": "GNU General Public License (file header) with the condition 'verbatim copies only, CHANGING IT IS NOT ALLOWED'; cite the Quranic Arabic Corpus and link corpus.quran.com. Used as authoring input only; the file is never shipped or modified.",
+      "attribution": "Quranic Arabic Corpus (morphology, version 0.4), Copyright (C) 2011 Kais Dukes. http://corpus.quran.com"
+    },
+    "quran_align": {
+      "name": "cpfair/quran-align timing data",
+      "version": "release-2016-11-24",
+      "url": "https://github.com/cpfair/quran-align/releases/download/release-2016-11-24/quran-align-data-2016-11-24.zip",
+      "release_page": "https://github.com/cpfair/quran-align/releases/tag/release-2016-11-24",
+      "options": "Only Husary_Muallim_128kbps.json and Alafasy_128kbps.json are extracted; each is checked against the SHA-1 listed in the release README.",
+      "members": {
+        "Husary_Muallim_128kbps.json": {
+          "readme_sha1": "b03e6c9188934504b6921d22b1f2e2b72ee773eb",
+          "sha256": "3719fb5c482d7db7086b4a81cdb6f114aa71979899917a74e6c8ae5bec684f5f"
+        },
+        "Alafasy_128kbps.json": {
+          "readme_sha1": "167bfc53255152aaf8c9a2e5e79c1160134c77a4",
+          "sha256": "55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7"
+        }
+      },
+      "cache_path": "cache/quran-align/quran-align-data-2016-11-24.zip",
+      "sha256": "5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7",
+      "bytes": 5807871,
+      "retrieved": "2026-10-09",
+      "licence": "Timing data: Creative Commons Attribution 4.0 International (release README + LICENSE); code: MIT.",
+      "attribution": "Word timings: Collin Fair, quran-align (CC BY 4.0). https://github.com/cpfair/quran-align"
+    },
+    "quranenc_indonesian_affairs": {
+      "name": "QuranEnc translation indonesian_affairs, sura 1",
+      "version": "1.0.1",
+      "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1",
+      "version_url": "https://quranenc.com/api/v1/translations/list/id?localization=id",
+      "options": "The sura endpoint does not report a version; fetch.py also saves the translations list (Indonesian localisation) and reads the 'version' and 'title' fields for key indonesian_affairs from it.",
+      "cache_path": "cache/quranenc/indonesian_affairs_sura1.json",
+      "version_cache_path": "cache/quranenc/translations_list_id.json",
+      "title_id": "Terjemahan Berbahasa Indonesia - Kementerian Agama",
+      "title_en": "Indonesian Translation - Ministry of Religious Affairs",
+      "last_update_unix": 1750665512,
+      "sha256": "94d2be603ddb83c6556d609f673d51a9bd8593022a6936a61033324bdaf4ef02",
+      "version_sha256": "2b147ba8af1acc1f416f5b22202a8bdf6b053720609917a18e26f9c8e823d2dc",
+      "bytes": 3039,
+      "retrieved": "2026-10-09",
+      "licence": "QuranEnc terms of use (https://quranenc.com/en/home/api/): republishing allowed provided the text is not modified, the publisher and QuranEnc are credited, the version is stated, transcript information is kept, the latest version is used, and it is not placed next to inappropriate ads.",
+      "attribution": "Terjemahan Berbahasa Indonesia - Kementerian Agama (indonesian_affairs), via QuranEnc.com (Pusat Terjemah Ruwwād)."
+    },
+    "everyayah_husary_muallim": {
+      "name": "EveryAyah recitation files, Husary_Muallim_128kbps, sura 1 (validation only; never re-hosted)",
+      "version": "as served on retrieval date",
+      "url_pattern": "https://everyayah.com/data/Husary_Muallim_128kbps/001{AAA}.mp3",
+      "options": "Downloaded only to measure each file's duration so the quran-align timings can be checked against the exact streamed file. The app streams these URLs; the files are not committed or served by us.",
+      "cache_dir": "cache/everyayah/Husary_Muallim_128kbps",
+      "files": {
+        "001001.mp3": {
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/001001.mp3",
+          "sha256": "f4dff7d7b3624f4ad760f147425d6b63381d12852e258717641f9b605944dcb6",
+          "bytes": 126986,
+          "duration_ms": 7837,
+          "frames": 300,
+          "sample_rate": 44100,
+          "unsynced_bytes": 0,
+          "retrieved": "2026-10-09"
+        },
+        "001002.mp3": {
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/001002.mp3",
+          "sha256": "9717bbf9cf97e0ab38c59890e4e56a5533078073d7bcf34a9a51b7b4f89ef863",
+          "bytes": 133130,
+          "duration_ms": 8255,
+          "frames": 316,
+          "sample_rate": 44100,
+          "unsynced_bytes": 0,
+          "retrieved": "2026-10-09"
+        },
+        "001003.mp3": {
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/001003.mp3",
+          "sha256": "f58ae5ff1f7b056d22d29d17161d84e1e6ec3232d35099e2ec92ded07d49e56b",
+          "bytes": 96266,
+          "duration_ms": 5904,
+          "frames": 226,
+          "sample_rate": 44100,
+          "unsynced_bytes": 0,
+          "retrieved": "2026-10-09"
+        },
+        "001004.mp3": {
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/001004.mp3",
+          "sha256": "4c0c5741098f0599a3133492e6dd8a2cdf3c716ff732a78064c4a3749284cccd",
+          "bytes": 96266,
+          "duration_ms": 5904,
+          "frames": 226,
+          "sample_rate": 44100,
+          "unsynced_bytes": 0,
+          "retrieved": "2026-10-09"
+        },
+        "001005.mp3": {
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/001005.mp3",
+          "sha256": "26ce1573bf520355a77b7cf674b162cb98769558436f87dfb4abeddd11d3db68",
+          "bytes": 149514,
+          "duration_ms": 9221,
+          "frames": 353,
+          "sample_rate": 44100,
+          "unsynced_bytes": 0,
+          "retrieved": "2026-10-09"
+        },
+        "001006.mp3": {
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/001006.mp3",
+          "sha256": "e13a1b33937d53fa3236d00b054ed0ddf8f5ff49b21ecebc2f98dc4f294af839",
+          "bytes": 114698,
+          "duration_ms": 7158,
+          "frames": 274,
+          "sample_rate": 44100,
+          "unsynced_bytes": 0,
+          "retrieved": "2026-10-09"
+        },
+        "001007.mp3": {
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/001007.mp3",
+          "sha256": "b9dd9a11289b55bbdd6c0e8d739a6340c22093fa7366c971710194a55206b77e",
+          "bytes": 329738,
+          "duration_ms": 20506,
+          "frames": 785,
+          "sample_rate": 44100,
+          "unsynced_bytes": 0,
+          "retrieved": "2026-10-09"
+        }
+      },
+      "licence": "No licence published by EveryAyah (UNVERIFIED rights). Stream with credit only (plan §6.2).",
+      "attribution": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com"
+    },
+    "everyayah_alafasy": {
+      "name": "EveryAyah recitation files, Alafasy_128kbps, sura 1 (validation only; never re-hosted)",
+      "version": "as served on retrieval date",
+      "url_pattern": "https://everyayah.com/data/Alafasy_128kbps/001{AAA}.mp3",
+      "options": "As above.",
+      "cache_dir": "cache/everyayah/Alafasy_128kbps",
+      "files": {
+        "001001.mp3": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/001001.mp3",
+          "sha256": "8808f3fc313d9df87b6090ee9efc8c11859da58b0100ad92621c5ee9a93d7280",
+          "bytes": 146830,
+          "duration_ms": 6087,
+          "frames": 233,
+          "sample_rate": 44100,
+          "unsynced_bytes": 125,
+          "retrieved": "2026-10-09"
+        },
+        "001002.mp3": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/001002.mp3",
+          "sha256": "7056ff0c287ee428272e12d16fb8f10b2786487f5d553841a828396750906b6b",
+          "bytes": 89988,
+          "duration_ms": 5590,
+          "frames": 214,
+          "sample_rate": 44100,
+          "unsynced_bytes": 125,
+          "retrieved": "2026-10-09"
+        },
+        "001003.mp3": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/001003.mp3",
+          "sha256": "3bd5bb13dcdf6ab178b6c6cb2810ad2aaac8d4dfb371e553ca78021f56c93abd",
+          "bytes": 74523,
+          "duration_ms": 4624,
+          "frames": 177,
+          "sample_rate": 44100,
+          "unsynced_bytes": 125,
+          "retrieved": "2026-10-09"
+        },
+        "001004.mp3": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/001004.mp3",
+          "sha256": "dca0c09844dd0e9ebf558b25a24352ae8517a9543094d0b1380e962b2bac201a",
+          "bytes": 74941,
+          "duration_ms": 4650,
+          "frames": 178,
+          "sample_rate": 44100,
+          "unsynced_bytes": 125,
+          "retrieved": "2026-10-09"
+        },
+        "001005.mp3": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/001005.mp3",
+          "sha256": "7828eb8f7400b04181d2c08885b9409dbe18037e4e4cfa08153692f25bb252fd",
+          "bytes": 107960,
+          "duration_ms": 6713,
+          "frames": 257,
+          "sample_rate": 44100,
+          "unsynced_bytes": 125,
+          "retrieved": "2026-10-09"
+        },
+        "001006.mp3": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/001006.mp3",
+          "sha256": "44afd93fa73f7fe363c75146a9b28c59a2cbdbf70bfb7ed71d823ed51c5b6327",
+          "bytes": 89988,
+          "duration_ms": 5590,
+          "frames": 214,
+          "sample_rate": 44100,
+          "unsynced_bytes": 125,
+          "retrieved": "2026-10-09"
+        },
+        "001007.mp3": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/001007.mp3",
+          "sha256": "6165fc6954e63686f556a8049c0d5231d6dbe812158da9b63e6d5f7191b1320e",
+          "bytes": 212450,
+          "duration_ms": 13244,
+          "frames": 507,
+          "sample_rate": 44100,
+          "unsynced_bytes": 125,
+          "retrieved": "2026-10-09"
+        }
+      },
+      "licence": "No licence published by EveryAyah (UNVERIFIED rights). Stream with credit only (plan §6.2).",
+      "attribution": "Recitation: Mishary Rashid Alafasy via EveryAyah.com"
+    }
+  }
+}
