@@ -116,10 +116,12 @@ export function WordCard({
 
         <details className="group/word mt-3">
           <summary className="disclosure-row rounded-xl border-[1.5px] border-border-ui bg-white px-4 text-ink hover:border-forest">
-            <span>
+            <span className="flex flex-col py-2">
               <span className="group-open/word:hidden">{t("details_toggle")}</span>
               <span className="hidden group-open/word:inline">{t("details_close")}</span>
-              <span className="font-normal text-ink-muted"> · {sourceCount}</span>
+              {/* Own line: on a phone a trailing " · Rujukan (7)" wrapped with
+                  the dot stranded at the end of the first line. */}
+              <span className="text-sm font-normal text-ink-muted">{sourceCount}</span>
             </span>
             <ChevronDown aria-hidden="true" className="chev h-5 w-5 shrink-0 text-ink-muted" />
           </summary>

@@ -125,7 +125,7 @@
     "lemma": "Lihat kata dasarnya",
     "sharaf_heading": "Lihat asal-usul bentuk kata (sharaf)",
     "sharaf_forms_note": "Bentuk-bentuk kata (tashrif), bukan kutipan ayat.",
-    "ilal": "I'lal (perubahan huruf)",
+    "ilal": "Perubahan bentuk (i'lal, ibdal, idgham)",
     "ilal_from": "asal",
     "ilal_to": "menjadi",
     "why_sign": "Kenapa akhirnya dibaca {sign}?",
@@ -215,7 +215,8 @@
     "occurrences": "Kemunculan dalam Al-Qur'an",
     "occurrences_value": "{count} kali dalam {ayat} ayat",
     "in_lessons": "Muncul dalam pelajaran",
-    "loc_label": "{surah} · ayat {ayah}, kata ke-{word}"
+    "loc_label": "{surah} · ayat {ayah}, kata ke-{word}",
+    "lemma_caption": "Bentuk dasar (lema) menurut Quranic Arabic Corpus"
   },
   "Guided": {
     "title": "Pelajaran dipandu",

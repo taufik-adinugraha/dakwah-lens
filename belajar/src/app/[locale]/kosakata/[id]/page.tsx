@@ -50,9 +50,14 @@ export default async function LexemePage({ params }: PageProps<"/[locale]/kosaka
             <MixedText text={lex.meaning} />
           </p>
         </div>
-        <p lang="ar" dir="rtl" className="arabic-inline text-ar-xl text-ink">
-          {lex.lemma_ar}
-        </p>
+        <div className="text-end">
+          <p lang="ar" dir="rtl" className="arabic-inline text-ar-xl text-ink">
+            {lex.lemma_ar}
+          </p>
+          {/* The headword is QAC's lemma form (e.g. the mudhari' for some
+              verbs), not always the madhi a textbook would list first. */}
+          <p className="mt-1 text-sm text-ink-soft">{t("lemma_caption")}</p>
+        </div>
       </div>
 
       <dl className="mt-6 space-y-4 rounded-2xl border border-hairline bg-white p-5">

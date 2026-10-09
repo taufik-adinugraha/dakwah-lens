@@ -125,7 +125,7 @@
     "lemma": "See the base word",
     "sharaf_heading": "See how the word was formed (sharaf)",
     "sharaf_forms_note": "Word forms (tashrif), not quotations of an ayah.",
-    "ilal": "I'lal (letter changes)",
+    "ilal": "Form changes (i'lal, ibdal, idgham)",
     "ilal_from": "originally",
     "ilal_to": "became",
     "why_sign": "Why does it end in {sign}?",
@@ -215,7 +215,8 @@
     "occurrences": "Occurrences in the Qur'an",
     "occurrences_value": "{count} times in {ayat} ayat",
     "in_lessons": "Appears in the lessons",
-    "loc_label": "{surah} · ayah {ayah}, word {word}"
+    "loc_label": "{surah} · ayah {ayah}, word {word}",
+    "lemma_caption": "Headword (lemma) as listed in the Quranic Arabic Corpus"
   },
   "Guided": {
     "title": "Guided lesson",
