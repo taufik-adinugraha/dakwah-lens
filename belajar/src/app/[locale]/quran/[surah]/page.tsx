@@ -3,11 +3,13 @@ import { ArrowRight } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { DraftChip } from "@/components/lesson/DraftChip";
 import { AyahProgressMark } from "@/components/surah/AyahProgressMark";
 import { FactCard } from "@/components/surah/FactCard";
 import { Link } from "@/i18n/navigation";
 import { getSurah, hasDrafts, SURAHS } from "@/lib/content";
+import { ayahHref, hubHref, quranHref } from "@/lib/routes";
 
 export const dynamicParams = false;
 
@@ -17,23 +19,32 @@ export function generateStaticParams() {
 
 export async function generateMetadata({
   params,
-}: PageProps<"/[locale]/[surah]">): Promise<Metadata> {
+}: PageProps<"/[locale]/quran/[surah]">): Promise<Metadata> {
   const { surah: slug } = await params;
   const s = getSurah(slug);
   return { title: s ? s.name_id : "—" };
 }
 
-export default async function SurahPage({ params }: PageProps<"/[locale]/[surah]">) {
+export default async function SurahPage({ params }: PageProps<"/[locale]/quran/[surah]">) {
   const { locale, surah: slug } = await params;
   setRequestLocale(locale);
   const s = getSurah(slug);
   if (!s) notFound();
   const t = await getTranslations("Surah");
+  const tb = await getTranslations("Breadcrumb");
   const words = s.ayat.reduce((n, a) => n + a.words.length, 0);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-14">
-      <header className="flex flex-wrap items-end justify-between gap-4">
+    <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-10">
+      <Breadcrumb
+        label={tb("label")}
+        items={[
+          { label: tb("hub"), href: hubHref() },
+          { label: tb("quran"), href: quranHref() },
+          { label: s.name_id },
+        ]}
+      />
+      <header className="mt-4 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-sm font-semibold text-forest">{t("eyebrow")}</p>
           <h1 className="mt-1 font-display text-4xl font-medium">{s.name_id}</h1>
@@ -54,7 +65,7 @@ export default async function SurahPage({ params }: PageProps<"/[locale]/[surah]
         {s.ayat.map((a) => (
           <li key={a.loc}>
             <Link
-              href={`/${s.slug}/${a.ayah}`}
+              href={ayahHref(s.slug, a.ayah)}
               className="block rounded-2xl border border-hairline bg-white p-5 transition-colors hover:border-forest"
             >
               <div className="flex items-start gap-3 sm:gap-4">
@@ -68,6 +79,9 @@ export default async function SurahPage({ params }: PageProps<"/[locale]/[surah]
               </div>
               <p className="mt-3 text-pretty text-base text-ink sm:pl-13">{a.translation.text}</p>
               <div className="mt-3 flex flex-wrap items-center justify-between gap-3 sm:pl-13">
+                {/* A progress key in the learner's storage, not a URL: it
+                    stays "{slug}/{ayah}" so saved progress survives the
+                    move under /quran. */}
                 <AyahProgressMark ayahKey={`${s.slug}/${a.ayah}`} label={t("ayah_done")} />
                 <span className="inline-flex items-center gap-1.5 text-base font-semibold text-forest">
                   {t("learn_ayah")}

@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { MixedText } from "@/components/library/MixedText";
 import { Link } from "@/i18n/navigation";
 import { LIBRARY } from "@/lib/library";
+import { conceptHref } from "@/lib/routes";
 
 export async function generateMetadata({
   params,
@@ -39,7 +40,7 @@ export default async function ConceptIndex({ params }: PageProps<"/[locale]/kons
                 {items.map((c) => (
                   <li key={c.id}>
                     <Link
-                      href={`/konsep/${c.id}`}
+                      href={conceptHref(c.id)}
                       className="flex h-full flex-col rounded-2xl border border-hairline bg-white p-5 transition-colors hover:border-forest"
                     >
                       <span className="font-display text-lg font-medium text-ink">

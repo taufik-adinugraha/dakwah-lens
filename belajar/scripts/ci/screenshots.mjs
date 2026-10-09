@@ -6,11 +6,14 @@ import { mkdir } from "node:fs/promises";
 import { chromium } from "playwright";
 
 const BASE = process.env.BASE_URL ?? "http://127.0.0.1:3300";
+// URL shape: plan L9 (hub → /quran track; Konsep/Kosakata at hub level).
+const AYAH_2 = "/belajar/id/quran/al-fatihah/2";
 const PAGES = [
-  ["home", "/belajar/id"],
-  ["surah", "/belajar/id/al-fatihah"],
-  ["ayah-2", "/belajar/id/al-fatihah/2"],
-  ["ayah-7", "/belajar/id/al-fatihah/7"],
+  ["hub", "/belajar/id"],
+  ["track", "/belajar/id/quran"],
+  ["surah", "/belajar/id/quran/al-fatihah"],
+  ["ayah-2", AYAH_2],
+  ["ayah-7", "/belajar/id/quran/al-fatihah/7"],
   ["konsep", "/belajar/id/konsep"],
   ["kredit", "/belajar/id/kredit"],
 ];
@@ -32,8 +35,11 @@ try {
       console.log(`shot ${vp}-${name} (${path})`);
     }
     // First concept and vocabulary pages, discovered from the links.
-    for (const [name, sel] of [["konsep-item", 'a[href*="/konsep/"]'], ["kosakata-item", 'a[href*="/kosakata/"]']]) {
-      await page.goto(BASE + (name === "konsep-item" ? "/belajar/id/konsep" : "/belajar/id/al-fatihah/2"), { waitUntil: "networkidle" });
+    for (const [name, from, sel] of [
+      ["konsep-item", "/belajar/id/konsep", 'a[href*="/konsep/"]'],
+      ["kosakata-item", AYAH_2, 'a[href*="/kosakata/"]'],
+    ]) {
+      await page.goto(BASE + from, { waitUntil: "networkidle" });
       const href = await page.locator(sel).first().getAttribute("href").catch(() => null);
       if (!href) continue;
       await page.goto(new URL(href, BASE).toString(), { waitUntil: "networkidle" });

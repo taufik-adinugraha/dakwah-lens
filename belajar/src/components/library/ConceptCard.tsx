@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import type { Concept } from "@/content/schema";
 import { Link } from "@/i18n/navigation";
 import { parseLoc } from "@/lib/library";
+import { ayahHref, conceptHref } from "@/lib/routes";
 
 import { DraftChip } from "../lesson/DraftChip";
 import { MixedText } from "./MixedText";
@@ -78,7 +79,7 @@ export function ConceptCard({
               return (
                 <li key={ex.loc} className="flex flex-wrap items-center gap-x-3 gap-y-1">
                   <Link
-                    href={`/${surahSlug}/${ayah}#w-${ex.loc.replaceAll(":", "-")}`}
+                    href={ayahHref(surahSlug, ayah, ex.loc)}
                     className="chip-link"
                   >
                     {t("example_loc", { ayah, word })}
@@ -100,7 +101,7 @@ export function ConceptCard({
 
       <div className="mt-auto pt-3">
         {compact ? (
-          <Link href={`/konsep/${concept.id}`} className="chip-link">
+          <Link href={conceptHref(concept.id)} className="chip-link">
             {labels.more}
             <ArrowRight aria-hidden="true" className="h-4 w-4 shrink-0" />
           </Link>

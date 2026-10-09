@@ -10,6 +10,7 @@ import { TextSizeSwitch } from "@/components/TextSizeSwitch";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { IS_PUBLIC } from "@/lib/flags";
+import { conceptIndexHref, creditsHref, hubHref } from "@/lib/routes";
 
 import "../globals.css";
 
@@ -91,7 +92,7 @@ export default async function LocaleLayout({
             <div className="mx-auto flex min-h-14 max-w-5xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-2 sm:px-6">
               <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
                 <Link
-                  href="/"
+                  href={hubHref()}
                   className="inline-flex min-h-11 items-center font-display text-lg font-medium text-ink"
                 >
                   {t("name")}
@@ -102,7 +103,7 @@ export default async function LocaleLayout({
               </div>
               <div className="flex flex-wrap items-center gap-2 text-sm">
                 <Link
-                  href="/konsep"
+                  href={conceptIndexHref()}
                   className="inline-flex min-h-11 items-center rounded-full px-3 font-medium text-ink-muted transition-colors hover:bg-paper-deep hover:text-ink"
                 >
                   {t("nav_concepts")}
@@ -133,7 +134,7 @@ export default async function LocaleLayout({
                 {tf("disclaimer")}
               </p>
               <div className="flex flex-wrap gap-x-6 gap-y-2 text-base">
-                <Link href="/kredit" className="link-text inline-flex min-h-11 items-center">
+                <Link href={creditsHref()} className="link-text inline-flex min-h-11 items-center">
                   {tf("credits")}
                 </Link>
                 <a href={`/${locale}`} className="link-text inline-flex min-h-11 items-center">

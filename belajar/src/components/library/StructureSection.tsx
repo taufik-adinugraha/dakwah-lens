@@ -1,5 +1,6 @@
 import type { Ayah } from "@/content/schema";
 import { Link } from "@/i18n/navigation";
+import { conceptHref } from "@/lib/routes";
 
 import { DraftChip } from "../lesson/DraftChip";
 import { MixedText } from "./MixedText";
@@ -74,7 +75,7 @@ export function StructureSection({
                   — <MixedText text={g.label} />
                 </span>
                 {g.concept && conceptTitle[g.concept] ? (
-                  <Link href={`/konsep/${g.concept}`} className="chip-link">
+                  <Link href={conceptHref(g.concept)} className="chip-link">
                     {conceptTitle[g.concept]}
                   </Link>
                 ) : null}

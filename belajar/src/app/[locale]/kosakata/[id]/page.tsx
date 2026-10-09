@@ -9,6 +9,7 @@ import { SourcesDisclosure } from "@/components/library/SourceList";
 import { Link } from "@/i18n/navigation";
 import { SURAHS } from "@/lib/content";
 import { getLexeme, LIBRARY, parseLoc, rootFor } from "@/lib/library";
+import { ayahHref } from "@/lib/routes";
 
 export const dynamicParams = false;
 
@@ -112,7 +113,7 @@ export default async function LexemePage({ params }: PageProps<"/[locale]/kosaka
               return (
                 <li key={w.loc}>
                   <Link
-                    href={`/${s.slug}/${a.ayah}#w-${w.loc.replaceAll(":", "-")}`}
+                    href={ayahHref(s.slug, a.ayah, w.loc)}
                     className="flex min-h-12 flex-wrap items-center gap-x-4 gap-y-1 rounded-xl border border-hairline bg-white px-4 py-2 transition-colors hover:border-forest"
                   >
                     <span className="text-sm font-semibold text-forest">

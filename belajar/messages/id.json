@@ -1,8 +1,8 @@
 {
   "App": {
-    "name": "Belajar Al-Qur'an",
-    "title_template": "%s · Belajar Al-Qur'an · Dakwah-Lens",
-    "description": "Memahami Al-Qur'an kata demi kata: dengarkan bacaan imam, pahami arti, akar kata, dan alasan harakat setiap kata — dijelaskan sederhana dan bersumber dari kitab.",
+    "name": "Belajar",
+    "title_template": "%s · Belajar · Dakwah-Lens",
+    "description": "Pelajaran agama yang singkat dan bersumber dari kitab. Saat ini: bahasa Arab Al-Qur'an, kata demi kata, dengan bacaan imam sungguhan.",
     "beta": "Uji coba",
     "back_to_main": "Kembali ke Dakwah-Lens",
     "sign_in": "Masuk",
@@ -10,24 +10,48 @@
     "nav_concepts": "Konsep tata bahasa",
     "skip_to_content": "Langsung ke isi halaman"
   },
-  "Home": {
-    "eyebrow": "Belajar Al-Qur'an",
-    "heading": "Memahami Al-Fatihah, kata demi kata",
+  "Hub": {
+    "heading": "Belajar",
+    "intro": "Belajar memahami agama sedikit demi sedikit, dengan penjelasan sederhana yang bersumber dari kitab.",
+    "tracks_heading": "Pilih yang ingin Anda pelajari",
+    "quran_title": "Bahasa Arab Al-Qur'an & Tafsir",
+    "quran_body": "Dengarkan bacaan imam, lalu pahami setiap kata: artinya, akar katanya, dan alasan harakat di akhirnya.",
+    "quran_available": "Tersedia sekarang: {list}",
+    "surah_ayat": "{name} ({ayat} ayat)",
+    "quran_cta": "Lihat pelajaran",
+    "concepts_title": "Konsep tata bahasa",
+    "concepts_body": "Pustaka nahwu dan sharaf: setiap konsep dijelaskan sekali, lalu dipakai ulang di setiap pelajaran yang memuatnya.",
+    "concepts_available": "{n} konsep nahwu dan sharaf",
+    "concepts_cta": "Lihat semua konsep",
+    "status_beta": "Uji coba",
+    "status_beta_draft": "Uji coba · materi masih draf"
+  },
+  "Quran": {
+    "title": "Bahasa Arab Al-Qur'an & Tafsir",
     "intro": "Dengarkan bacaan imam, lalu pahami arti setiap kata, akar katanya, dan alasan sebuah kata dibaca fathah, dhammah, atau kasrah. Dijelaskan sederhana, bersumber dari kitab yang jelas.",
+    "start_heading": "Mulai dari sini",
+    "surah_meta": "{ayat} ayat · {words} kata",
+    "fatihah_pace": "±3 pekan, 10 menit sehari",
+    "start_cta": "Mulai belajar",
+    "ayat_nav": "Ayat {name}",
+    "next_heading": "Berikutnya",
+    "next_body": "Setelah Al-Fatihah: Al-Ikhlas, An-Nas, Al-Falaq, Al-'Asr, Al-Kautsar, dan An-Nasr.",
+    "how_heading": "Cara belajarnya",
+    "how_1": "Pilih satu ayat. Imam membacakannya, lalu pelajaran yang dipandu menjelaskan setiap kata, langkah demi langkah. Anda bisa menjeda kapan saja.",
+    "how_2": "Baca kartu setiap kata: artinya dan alasan harakat di akhirnya. Ketuk “Lihat detail kata ini” untuk akar katanya.",
+    "how_3": "Kerjakan latihan singkat untuk ayat itu, tanpa batas waktu. Lalu lanjut ke ayat berikutnya.",
     "principles_heading": "Cara kami menyusun materi",
     "p1_title": "Suara imam sungguhan",
     "p1_body": "Ayat Al-Qur'an hanya diperdengarkan dari bacaan qari manusia. Suara AI hanya menjelaskan dalam bahasa Indonesia, tidak pernah membacakan ayat.",
     "p2_title": "Bersumber, bukan dikarang",
     "p2_body": "Setiap arti, i'rab, tafsir, dan hadits dikutip dari kitab atau data yang disebut namanya, lengkap dengan rujukannya.",
     "p3_title": "Ditinjau ustadz",
-    "p3_body": "Materi baru tayang setelah ditinjau ustadz. Selama uji coba, sebagian materi masih berstatus draf dan ditandai jelas.",
-    "surah_heading": "Mulai dari sini",
-    "fatihah_name": "Al-Fatihah",
-    "fatihah_meta": "7 ayat · 29 kata · ±3 pekan, 10 menit sehari",
-    "status_preparing": "Uji coba · materi masih draf",
-    "next_heading": "Berikutnya",
-    "next_body": "Setelah Al-Fatihah: Al-Ikhlas, An-Nas, Al-Falaq, Al-'Asr, Al-Kautsar, dan An-Nasr.",
-    "start_cta": "Mulai belajar"
+    "p3_body": "Materi baru tayang setelah ditinjau ustadz. Selama uji coba, sebagian materi masih berstatus draf dan ditandai jelas."
+  },
+  "Breadcrumb": {
+    "label": "Anda berada di",
+    "hub": "Belajar",
+    "quran": "Al-Qur'an"
   },
   "Footer": {
     "disclaimer": "Dibantu AI, bukan fatwa otoritatif. Penjelasan disusun dari kitab yang disebut namanya dan ditinjau ustadz sebelum tayang.",
@@ -46,8 +70,8 @@
   },
   "NotFound": {
     "title": "Halaman tidak ditemukan",
-    "body": "Alamat ini tidak ada di modul Belajar Al-Qur'an.",
-    "cta": "Ke beranda modul"
+    "body": "Alamat ini tidak ada di Belajar. Periksa kembali alamatnya, atau mulai dari halaman utama.",
+    "cta": "Ke halaman utama Belajar"
   },
   "Surah": {
     "eyebrow": "Surah",
@@ -69,7 +93,6 @@
   "Lesson": {
     "ayah": "Ayat {n}",
     "ayah_of": "Ayat {n} dari {total}",
-    "back_list": "Daftar ayat",
     "nav_top": "Navigasi ayat",
     "nav_bottom": "Ayat sebelumnya dan berikutnya",
     "tafsir_heading": "Catatan tafsir",

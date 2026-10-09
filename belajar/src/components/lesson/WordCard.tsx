@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import type { Lexeme, Word } from "@/content/schema";
 import { Link } from "@/i18n/navigation";
 import { parseLoc } from "@/lib/library";
+import { conceptHref, lexemeHref, wordAnchorId } from "@/lib/routes";
 
 import { MixedText } from "../library/MixedText";
 import { SharafPanel, type SharafLabels } from "../library/SharafPanel";
@@ -72,7 +73,7 @@ export function WordCard({
   listen?: ReactNode;
 }) {
   const t = useTranslations("Word");
-  const id = `w-${word.loc.replaceAll(":", "-")}`;
+  const id = wordAnchorId(word.loc);
   const n = parseLoc(word.loc).word;
   const sign = word.case.sign;
   const whyHeading = HARAKAT.has(sign)
@@ -169,14 +170,14 @@ export function WordCard({
                 <ul className="mt-2 flex flex-wrap gap-2">
                   {concepts.map((c) => (
                     <li key={c.id}>
-                      <Link href={`/konsep/${c.id}`} className="chip-link">
+                      <Link href={conceptHref(c.id)} className="chip-link">
                         {c.title}
                       </Link>
                     </li>
                   ))}
                   {lexeme ? (
                     <li>
-                      <Link href={`/kosakata/${lexeme.id}`} className="chip-link">
+                      <Link href={lexemeHref(lexeme.id)} className="chip-link">
                         {labels.lemma}
                         <ArrowRight aria-hidden="true" className="h-4 w-4 shrink-0" />
                       </Link>

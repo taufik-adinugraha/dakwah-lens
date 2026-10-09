@@ -4,6 +4,7 @@ import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { LabelRole } from "@/components/exercises/LabelRole";
 import { SortCase } from "@/components/exercises/SortCase";
 import { TapWord } from "@/components/exercises/TapWord";
@@ -20,13 +21,14 @@ import { Link } from "@/i18n/navigation";
 import { getAyah, getSurah, SURAHS } from "@/lib/content";
 import { buildLessonSteps } from "@/lib/lessonSteps";
 import { conceptsIntroducedIn, getConcept, getLexeme, LIBRARY } from "@/lib/library";
+import { ayahHref, hubHref, quranHref, surahHref } from "@/lib/routes";
 
 export const dynamicParams = false;
 
-// Generates BOTH dynamic segments: [surah] has no layout, so its page's
-// generateStaticParams never reaches this route — relying on a parent
-// `params.surah` here produced zero paths (every ayah page 404'd under
-// dynamicParams=false; caught by the image smoke test).
+// Generates BOTH dynamic segments: neither quran/ nor [surah] has a layout,
+// so the surah page's generateStaticParams never reaches this route —
+// relying on a parent `params.surah` here produced zero paths (every ayah
+// page 404'd under dynamicParams=false; caught by the image smoke test).
 export function generateStaticParams() {
   return SURAHS.flatMap((s) =>
     s.ayat.map((a) => ({ surah: s.slug, ayah: String(a.ayah) })),
@@ -46,7 +48,7 @@ const RECITER_LABEL: Record<string, string> = {
 
 export async function generateMetadata({
   params,
-}: PageProps<"/[locale]/[surah]/[ayah]">): Promise<Metadata> {
+}: PageProps<"/[locale]/quran/[surah]/[ayah]">): Promise<Metadata> {
   const { surah: slug, ayah } = await params;
   const s = getSurah(slug);
   return { title: s ? `${s.name_id} ${ayah}` : "—" };
@@ -85,7 +87,7 @@ function Deeper({ title, draft, children }: { title: string; draft?: string; chi
  */
 export default async function AyahPage({
   params,
-}: PageProps<"/[locale]/[surah]/[ayah]">) {
+}: PageProps<"/[locale]/quran/[surah]/[ayah]">) {
   const { locale, surah: slug, ayah: ayahParam } = await params;
   setRequestLocale(locale);
   const s = getSurah(slug);
@@ -98,6 +100,7 @@ export default async function AyahPage({
   const tc = await getTranslations("Concept");
   const tg = await getTranslations("Guided");
   const tp = await getTranslations("Player");
+  const tb = await getTranslations("Breadcrumb");
 
   const playerWords = a.words.map((w, i) => ({
     index: i + 1,
@@ -121,6 +124,8 @@ export default async function AyahPage({
   const facts = s.facts.filter((f) => f.locations.includes(a.loc));
   const prev = getAyah(s, n - 1);
   const next = getAyah(s, n + 1);
+  // Storage key for lesson/exercise progress, not a URL: unchanged by the
+  // move under /quran so saved progress survives it.
   const key = `${s.slug}/${a.ayah}`;
   const pageTitle = `${s.name_id} · ${t("ayah", { n: a.ayah })}`;
   const introduced = conceptsIntroducedIn(a.loc);
@@ -167,27 +172,36 @@ export default async function AyahPage({
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
-      {/* 1. Where am I */}
-      <nav aria-label={t("nav_top")} className="flex flex-wrap items-center justify-between gap-3">
-        <Link href={`/${s.slug}`} className="chip-link">
-          <ChevronLeft aria-hidden className="h-5 w-5" />
-          {t("back_list")}
-        </Link>
-        <div className="flex flex-wrap gap-2">
-          {prev ? (
-            <Link href={`/${s.slug}/${prev.ayah}`} className="chip-link">
-              <ChevronLeft aria-hidden className="h-5 w-5" />
-              {t("ayah", { n: prev.ayah })}
-            </Link>
-          ) : null}
-          {next ? (
-            <Link href={`/${s.slug}/${next.ayah}`} className="chip-link">
-              {t("ayah", { n: next.ayah })}
-              <ChevronRight aria-hidden className="h-5 w-5" />
-            </Link>
-          ) : null}
-        </div>
-      </nav>
+      {/* 1. Where am I. The breadcrumb's surah crumb is the way back to
+          the list of ayat (it replaced the separate "‹ Daftar ayat" chip,
+          so there is one control per destination). */}
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+        <Breadcrumb
+          label={tb("label")}
+          items={[
+            { label: tb("hub"), href: hubHref() },
+            { label: tb("quran"), href: quranHref() },
+            { label: s.name_id, href: surahHref(s.slug) },
+            { label: t("ayah", { n: a.ayah }) },
+          ]}
+        />
+        {prev || next ? (
+          <nav aria-label={t("nav_top")} className="flex flex-wrap gap-2">
+            {prev ? (
+              <Link href={ayahHref(s.slug, prev.ayah)} className="chip-link">
+                <ChevronLeft aria-hidden className="h-5 w-5" />
+                {t("ayah", { n: prev.ayah })}
+              </Link>
+            ) : null}
+            {next ? (
+              <Link href={ayahHref(s.slug, next.ayah)} className="chip-link">
+                {t("ayah", { n: next.ayah })}
+                <ChevronRight aria-hidden className="h-5 w-5" />
+              </Link>
+            ) : null}
+          </nav>
+        ) : null}
+      </div>
       <h1 className="mt-4 font-display text-3xl font-medium">{pageTitle}</h1>
       <p className="mt-1 text-base text-ink-muted">{t("ayah_of", { n: a.ayah, total: s.ayat.length })}</p>
 
@@ -371,7 +385,7 @@ export default async function AyahPage({
         className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-hairline pt-6"
       >
         {prev ? (
-          <Link href={`/${s.slug}/${prev.ayah}`} className="btn-secondary min-h-14!">
+          <Link href={ayahHref(s.slug, prev.ayah)} className="btn-secondary min-h-14!">
             <ChevronLeft aria-hidden className="h-5 w-5" />
             {t("ayah", { n: prev.ayah })}
           </Link>
@@ -379,12 +393,12 @@ export default async function AyahPage({
           <span />
         )}
         {next ? (
-          <Link href={`/${s.slug}/${next.ayah}`} className="btn-primary">
+          <Link href={ayahHref(s.slug, next.ayah)} className="btn-primary">
             {t("ayah", { n: next.ayah })}
             <ChevronRight aria-hidden className="h-5 w-5" />
           </Link>
         ) : (
-          <Link href={`/${s.slug}`} className="btn-primary">
+          <Link href={surahHref(s.slug)} className="btn-primary">
             {t("back_to_surah")}
           </Link>
         )}

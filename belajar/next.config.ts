@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
+// Relative, import-free module (no "@/" alias, no app code in the config).
+import { SURAH_SLUGS } from "./src/lib/routes";
+
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const isProd = process.env.NODE_ENV === "production";
@@ -46,6 +49,29 @@ const securityHeaders = [
   },
 ];
 
+/**
+ * Lesson URLs moved when /belajar became a hub of tracks (docs/belajar-plan.md
+ * L9): /{locale}/{surah}[/{ayah}] → /{locale}/quran/{surah}[/{ayah}].
+ * Permanent (308), so bookmarks and shared links keep working and search
+ * engines move to the new address.
+ *
+ * - Next prefixes basePath (/belajar) onto both source and destination; do
+ *   not write it here and do not set `basePath: false`.
+ * - Redirects run before the proxy (next-intl middleware), so they see the
+ *   raw URL.
+ * - The locale-less old form (/belajar/al-fatihah[/N]) gets its own rule
+ *   rather than relying on next-intl: the proxy would first add the locale
+ *   with a temporary 307 and only then reach the rules above, i.e. two hops,
+ *   the first one non-permanent. localeDetection is off, so "id" (the
+ *   default locale) is what next-intl would have chosen anyway.
+ * - Only known slugs match: an unknown /{locale}/{x} is left alone and ends
+ *   in the module's 404 instead of being sent into the track.
+ * - The hash (#w-1-2-3 word anchors) never reaches the server; browsers
+ *   carry it across the redirect.
+ */
+const SURAH = `:surah(${SURAH_SLUGS.join("|")})`;
+const LEGACY_LOCALE = ":locale(id|en)";
+
 const nextConfig: NextConfig = {
   // Served at dakwah-lens.id/belajar by the host Caddy; inlined into client
   // bundles at build time, so it cannot change without a rebuild.
@@ -54,6 +80,30 @@ const nextConfig: NextConfig = {
   // runs on a 1.9 GB VM next to the main app (plan §7.2).
   output: "standalone",
   poweredByHeader: false,
+  async redirects() {
+    return [
+      {
+        source: `/${LEGACY_LOCALE}/${SURAH}`,
+        destination: "/:locale/quran/:surah",
+        permanent: true,
+      },
+      {
+        source: `/${LEGACY_LOCALE}/${SURAH}/:ayah`,
+        destination: "/:locale/quran/:surah/:ayah",
+        permanent: true,
+      },
+      {
+        source: `/${SURAH}`,
+        destination: "/id/quran/:surah",
+        permanent: true,
+      },
+      {
+        source: `/${SURAH}/:ayah`,
+        destination: "/id/quran/:surah/:ayah",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

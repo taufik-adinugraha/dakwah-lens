@@ -7,6 +7,7 @@ import { ConceptCard } from "@/components/library/ConceptCard";
 import { Link } from "@/i18n/navigation";
 import { SURAHS } from "@/lib/content";
 import { getConcept, LIBRARY } from "@/lib/library";
+import { conceptHref, conceptIndexHref } from "@/lib/routes";
 
 export const dynamicParams = false;
 
@@ -39,7 +40,7 @@ export default async function ConceptPage({ params }: PageProps<"/[locale]/konse
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
       <nav aria-label={t("index_title")}>
-        <Link href="/konsep" className="chip-link">
+        <Link href={conceptIndexHref()} className="chip-link">
           <ArrowLeft aria-hidden="true" className="h-4 w-4 shrink-0" />
           {t("index_title")}
         </Link>
@@ -69,7 +70,7 @@ export default async function ConceptPage({ params }: PageProps<"/[locale]/konse
           <ul className="mt-3 flex flex-wrap gap-2">
             {related.map((c) => (
               <li key={c.id}>
-                <Link href={`/konsep/${c.id}`} className="chip-link">
+                <Link href={conceptHref(c.id)} className="chip-link">
                   {c.title}
                 </Link>
               </li>

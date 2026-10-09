@@ -94,7 +94,7 @@ jobs:
             -t dakwah-belajar-web:latest \
             belajar
 
-      - name: Smoke-test the image (migrations, health, pages, redirect)
+      - name: Smoke-test the image (migrations, health, pages, redirects)
         run: |
           set -euo pipefail
           docker run -d --name smoke --network host -e PORT=3300 \
@@ -110,21 +110,58 @@ jobs:
           [[ -n "$ok" ]] || { echo "✗ container never became healthy"; exit 1; }
           curl -fsS http://127.0.0.1:3300/belajar/api/health | grep -q '"database":"ok"'
           docker logs smoke 2>&1 | grep -q "applied 0001_init.sql"
-          for path in /belajar/id /belajar/en /belajar/id/kredit \
-                      /belajar/id/al-fatihah /belajar/id/al-fatihah/1 /belajar/id/al-fatihah/7 \
-                      /belajar/en/al-fatihah/5; do
+          # Hub, Qur'an track, shared library, lessons (plan L9 URL shape).
+          for path in /belajar/id /belajar/en /belajar/id/kredit /belajar/id/konsep \
+                      /belajar/id/quran /belajar/en/quran \
+                      /belajar/id/quran/al-fatihah /belajar/id/quran/al-fatihah/1 \
+                      /belajar/id/quran/al-fatihah/7 /belajar/en/quran/al-fatihah/5; do
             code="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:3300${path}")"
             echo "${path} -> ${code}"; [[ "$code" == 200 ]]
           done
-          # Unknown surah / ayah → the module's 404, not a 500.
-          for path in /belajar/id/al-baqarah /belajar/id/al-fatihah/8; do
+          # Unknown surah / ayah / path → the module's 404, not a 500.
+          for path in /belajar/id/quran/al-baqarah /belajar/id/quran/al-fatihah/8 \
+                      /belajar/id/al-baqarah; do
             code="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:3300${path}")"
             echo "${path} -> ${code}"; [[ "$code" == 404 ]]
           done
+          # Pre-hub lesson URLs answer a permanent 308 to the exact new
+          # location (next.config.ts redirects), with and without a locale.
+          # The host is stripped so only the path is compared.
+          while read -r from to; do
+            got="$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' "http://127.0.0.1:3300${from}")"
+            code="${got%% *}"; url="${got#* }"; path="/${url#*://*/}"
+            echo "${from} -> ${code} ${path}"
+            [[ "$code" == 308 && "$path" == "$to" ]]
+          done <<'EOF'
+          /belajar/id/al-fatihah /belajar/id/quran/al-fatihah
+          /belajar/id/al-fatihah/2 /belajar/id/quran/al-fatihah/2
+          /belajar/en/al-fatihah /belajar/en/quran/al-fatihah
+          /belajar/en/al-fatihah/2 /belajar/en/quran/al-fatihah/2
+          /belajar/al-fatihah /belajar/id/quran/al-fatihah
+          /belajar/al-fatihah/2 /belajar/id/quran/al-fatihah/2
+          EOF
+          # The hub links to the track, the track to the surah; no rendered
+          # page still links to the old lesson shape.
+          hub="$(curl -fsS http://127.0.0.1:3300/belajar/id)"
+          grep -q 'href="/belajar/id/quran"' <<<"$hub"
+          # Konsep: the header link on every page + the hub's own card.
+          [[ "$(grep -o 'href="/belajar/id/konsep"' <<<"$hub" | wc -l)" -ge 2 ]]
+          track="$(curl -fsS http://127.0.0.1:3300/belajar/id/quran)"
+          grep -q 'href="/belajar/id/quran/al-fatihah"' <<<"$track"
+          # Ayah chips on the track page: hub → track → ayah N is two taps.
+          grep -q 'href="/belajar/id/quran/al-fatihah/7"' <<<"$track"
           # The lesson page carries the streamed recitation + the draft label.
-          page="$(curl -fsS http://127.0.0.1:3300/belajar/id/al-fatihah/1)"
+          page="$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/al-fatihah/1)"
           grep -q "Alafasy" <<<"$page"
           grep -q "menunggu tinjauan ustadz" <<<"$page"
+          grep -q 'href="/belajar/id/quran/al-fatihah/2"' <<<"$page"
+          for html in "$hub" "$track" "$page" \
+                      "$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/al-fatihah)" \
+                      "$(curl -fsS http://127.0.0.1:3300/belajar/id/konsep)"; do
+            if grep -Eq 'href="/belajar/(id|en)/al-fatihah' <<<"$html"; then
+              echo "✗ a rendered page still links to an old /{locale}/al-fatihah URL"; exit 1
+            fi
+          done
           loc="$(curl -s -o /dev/null -w '%{redirect_url}' http://127.0.0.1:3300/belajar)"
           echo "/belajar -> ${loc}"; [[ "$loc" == */belajar/id ]]
           # Migrations are idempotent across restarts.
