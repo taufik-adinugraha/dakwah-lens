@@ -1,0 +1,4808 @@
+{
+ "META": {
+  "id": "META-PROVENANCE",
+  "generator": "belajar/pipeline/build_waris.py",
+  "about": "For every record of dalil.json and dalil-gaps.json that copies or points at corpus bytes: where each copied field comes from. sha256 = sha256 of the whole source field as UTF-8 (the source record); copied_sha256 = sha256 of the bytes in the dalil record (a span [start, end) of the source field when 'span' is given; with 'omit', the span minus those running-head spans, each shown as an ellipsis; with 'source_truncated', followed by a space and an ellipsis). validate_waris.py recomputes both from the pinned inputs and api/data.",
+  "sources": {
+   "tanzil_uthmani": "belajar/pipeline/cache/tanzil/quran-uthmani.txt (sources.json pin)",
+   "quranenc_indonesian_affairs_waris": "belajar/pipeline/cache/quranenc/ (sources.json pins)",
+   "api/data/*.json": "the platform corpus (git-ignored)"
+  }
+ },
+ "records": {
+  "Q-4-7": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "tanzil_uthmani",
+     "locator": "4|7",
+     "source_field": "verse",
+     "sha256": "dc4a59dc315560c9da82e42f04890a657b96614c4a6e7ea41eceb869ddfd7205",
+     "copied_sha256": "dc4a59dc315560c9da82e42f04890a657b96614c4a6e7ea41eceb869ddfd7205"
+    },
+    {
+     "field": "ar_quran_json",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=7",
+     "source_field": "arabic",
+     "sha256": "5e904a97756c51213bed377e43dfd5bbf123a8ae281563e8e08191ab920c806e",
+     "copied_sha256": "5e904a97756c51213bed377e43dfd5bbf123a8ae281563e8e08191ab920c806e"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.text",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=7",
+     "source_field": "translation",
+     "sha256": "8479399a8f11cab0b058da61c8ee9f17eec42335e150a5ddbe11be0f1772c888",
+     "copied_sha256": "8479399a8f11cab0b058da61c8ee9f17eec42335e150a5ddbe11be0f1772c888"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.footnotes",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=7",
+     "source_field": "footnotes",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "copied_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+     "field": "translations.id_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=7",
+     "source_field": "id",
+     "sha256": "f8c6a03e5a19edc423ef5ae4a0c18eae1c8ea0865435cde953b61b3db131c166",
+     "copied_sha256": "f8c6a03e5a19edc423ef5ae4a0c18eae1c8ea0865435cde953b61b3db131c166"
+    },
+    {
+     "field": "translations.en_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=7",
+     "source_field": "en",
+     "sha256": "a67976bed2f5b6cc980a04789a931e47fac98ec774feb57326c240133f294a5c",
+     "copied_sha256": "a67976bed2f5b6cc980a04789a931e47fac98ec774feb57326c240133f294a5c"
+    }
+   ]
+  },
+  "Q-4-8": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "tanzil_uthmani",
+     "locator": "4|8",
+     "source_field": "verse",
+     "sha256": "b77bab48e0860a9260bb4d5df929fa87b8b899fc5bf24db219eb8594fd628c39",
+     "copied_sha256": "b77bab48e0860a9260bb4d5df929fa87b8b899fc5bf24db219eb8594fd628c39"
+    },
+    {
+     "field": "ar_quran_json",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=8",
+     "source_field": "arabic",
+     "sha256": "e847d8cd296cf74184794fcde25c458f5fd131f73c976b0e7972ed33379a9b62",
+     "copied_sha256": "e847d8cd296cf74184794fcde25c458f5fd131f73c976b0e7972ed33379a9b62"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.text",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=8",
+     "source_field": "translation",
+     "sha256": "e6ebf8069cf9fc58bb55e8248ae5670af98c198c9b9406d7678b700af6e36695",
+     "copied_sha256": "e6ebf8069cf9fc58bb55e8248ae5670af98c198c9b9406d7678b700af6e36695"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.footnotes",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=8",
+     "source_field": "footnotes",
+     "sha256": "d7d1aa557f63757bacb0db855da457bfd77ce341ecabcb8ab0d3110b1a0acea6",
+     "copied_sha256": "d7d1aa557f63757bacb0db855da457bfd77ce341ecabcb8ab0d3110b1a0acea6"
+    },
+    {
+     "field": "translations.id_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=8",
+     "source_field": "id",
+     "sha256": "000db4c4853aab51a390112a2289bdba88dbd06cfa1dd7796f9360a1e940d05a",
+     "copied_sha256": "000db4c4853aab51a390112a2289bdba88dbd06cfa1dd7796f9360a1e940d05a"
+    },
+    {
+     "field": "translations.en_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=8",
+     "source_field": "en",
+     "sha256": "52f2d1f67ba64900fd4d0273dda74300111280b21e10646079b6aeaf9dbf511f",
+     "copied_sha256": "52f2d1f67ba64900fd4d0273dda74300111280b21e10646079b6aeaf9dbf511f"
+    }
+   ]
+  },
+  "Q-4-11": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "tanzil_uthmani",
+     "locator": "4|11",
+     "source_field": "verse",
+     "sha256": "0acafdbbad7bcf46919e804eb30b9b01aa479277baf6b89ac7e6aa055a5ce8a4",
+     "copied_sha256": "0acafdbbad7bcf46919e804eb30b9b01aa479277baf6b89ac7e6aa055a5ce8a4"
+    },
+    {
+     "field": "ar_quran_json",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=11",
+     "source_field": "arabic",
+     "sha256": "94e64bb153473ebb7e51414b0a3859d1565ce6407c2cd2ee565c96c01f6c4c14",
+     "copied_sha256": "94e64bb153473ebb7e51414b0a3859d1565ce6407c2cd2ee565c96c01f6c4c14"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.text",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=11",
+     "source_field": "translation",
+     "sha256": "0f8a6df4d4f6c7ed5c4c951c71915816e841268e1ab8acefc81d642d970b5978",
+     "copied_sha256": "0f8a6df4d4f6c7ed5c4c951c71915816e841268e1ab8acefc81d642d970b5978"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.footnotes",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=11",
+     "source_field": "footnotes",
+     "sha256": "57538f3369a7a1e37203acba0da40d6aa6718c78d5f23a710bca88fd0f32beaa",
+     "copied_sha256": "57538f3369a7a1e37203acba0da40d6aa6718c78d5f23a710bca88fd0f32beaa"
+    },
+    {
+     "field": "translations.id_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=11",
+     "source_field": "id",
+     "sha256": "bfe4b0912fedf866cc352ca2cc8bc5f77ed19369c317a53e5b64ba476d58279d",
+     "copied_sha256": "bfe4b0912fedf866cc352ca2cc8bc5f77ed19369c317a53e5b64ba476d58279d"
+    },
+    {
+     "field": "translations.en_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=11",
+     "source_field": "en",
+     "sha256": "7aec24461c21c560406c63ddfb252025f4154184a0c553fcf6374388165e608f",
+     "copied_sha256": "7aec24461c21c560406c63ddfb252025f4154184a0c553fcf6374388165e608f"
+    }
+   ]
+  },
+  "Q-4-12": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "tanzil_uthmani",
+     "locator": "4|12",
+     "source_field": "verse",
+     "sha256": "987c15ea59aa417de4bf586a399e3806051923bd9322cf560d6ebbed37e9e18e",
+     "copied_sha256": "987c15ea59aa417de4bf586a399e3806051923bd9322cf560d6ebbed37e9e18e"
+    },
+    {
+     "field": "ar_quran_json",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=12",
+     "source_field": "arabic",
+     "sha256": "d3a09d4353132eed28b490cad5fbc89ef32a1452fcd648cc2fbbed9d58f65201",
+     "copied_sha256": "d3a09d4353132eed28b490cad5fbc89ef32a1452fcd648cc2fbbed9d58f65201"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.text",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=12",
+     "source_field": "translation",
+     "sha256": "4bade61e0d599d91489dcd1b793d848002102690e1ed06fdfc11affe3426764b",
+     "copied_sha256": "4bade61e0d599d91489dcd1b793d848002102690e1ed06fdfc11affe3426764b"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.footnotes",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=12",
+     "source_field": "footnotes",
+     "sha256": "8f56e68a0c516b590dc33c693c64341995ed7996702e59b17ccc842c2dd2767b",
+     "copied_sha256": "8f56e68a0c516b590dc33c693c64341995ed7996702e59b17ccc842c2dd2767b"
+    },
+    {
+     "field": "translations.id_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=12",
+     "source_field": "id",
+     "sha256": "9efb3f5b2ad758cdc043d38b8b94ab36cf7e1e59243726d4f6c70fe809f98b1f",
+     "copied_sha256": "9efb3f5b2ad758cdc043d38b8b94ab36cf7e1e59243726d4f6c70fe809f98b1f"
+    },
+    {
+     "field": "translations.en_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=12",
+     "source_field": "en",
+     "sha256": "47ecb531c3789bdede354390f1898a42326ed8961f4c69b1d12b156aa84fc1d2",
+     "copied_sha256": "47ecb531c3789bdede354390f1898a42326ed8961f4c69b1d12b156aa84fc1d2"
+    }
+   ]
+  },
+  "Q-4-13": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "tanzil_uthmani",
+     "locator": "4|13",
+     "source_field": "verse",
+     "sha256": "f073690f534f87f574e6671c7074d53e8f1d9af7328872a2ee73870b2315b23d",
+     "copied_sha256": "f073690f534f87f574e6671c7074d53e8f1d9af7328872a2ee73870b2315b23d"
+    },
+    {
+     "field": "ar_quran_json",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=13",
+     "source_field": "arabic",
+     "sha256": "cb1a9df9ade0be06f752d94d4ae8a2158b431d70069a7fa9295f26e4fd0339e1",
+     "copied_sha256": "cb1a9df9ade0be06f752d94d4ae8a2158b431d70069a7fa9295f26e4fd0339e1"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.text",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=13",
+     "source_field": "translation",
+     "sha256": "a7d6fcb57b724ad1d84c7f87dc4d04de6769181b1c526ac8e2474672cbba016f",
+     "copied_sha256": "a7d6fcb57b724ad1d84c7f87dc4d04de6769181b1c526ac8e2474672cbba016f"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.footnotes",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=13",
+     "source_field": "footnotes",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "copied_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+     "field": "translations.id_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=13",
+     "source_field": "id",
+     "sha256": "661f51ebb20b96e5e5946e722f173b68036f367fff13f5c96dca59a02fae28af",
+     "copied_sha256": "661f51ebb20b96e5e5946e722f173b68036f367fff13f5c96dca59a02fae28af"
+    },
+    {
+     "field": "translations.en_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=13",
+     "source_field": "en",
+     "sha256": "62f4879dfe49c80c2e78bdc297b02729adc3132145f84f969581a94998f01fbd",
+     "copied_sha256": "62f4879dfe49c80c2e78bdc297b02729adc3132145f84f969581a94998f01fbd"
+    }
+   ]
+  },
+  "Q-4-14": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "tanzil_uthmani",
+     "locator": "4|14",
+     "source_field": "verse",
+     "sha256": "88060308d41678ba2ab68c21872b0ba87a33447b35dfeadf6fdac419407df43a",
+     "copied_sha256": "88060308d41678ba2ab68c21872b0ba87a33447b35dfeadf6fdac419407df43a"
+    },
+    {
+     "field": "ar_quran_json",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=14",
+     "source_field": "arabic",
+     "sha256": "cc827e240b77e8afbb9237baa44c1c3d918f594992fb50610a8249567bba76c0",
+     "copied_sha256": "cc827e240b77e8afbb9237baa44c1c3d918f594992fb50610a8249567bba76c0"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.text",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=14",
+     "source_field": "translation",
+     "sha256": "16bce72fcad580541b26140d6ac7bee64b8375f3f914dc91703f9cd29f6f13d2",
+     "copied_sha256": "16bce72fcad580541b26140d6ac7bee64b8375f3f914dc91703f9cd29f6f13d2"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.footnotes",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=14",
+     "source_field": "footnotes",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "copied_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+     "field": "translations.id_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=14",
+     "source_field": "id",
+     "sha256": "43c17c797859a4c9916db1a519ecd6292842f1eefb99a90a377750797fd3d468",
+     "copied_sha256": "43c17c797859a4c9916db1a519ecd6292842f1eefb99a90a377750797fd3d468"
+    },
+    {
+     "field": "translations.en_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=14",
+     "source_field": "en",
+     "sha256": "d24f937cdfca8f7160f58bd27c3b813de03fae68b76d5f298624060c10ad3d2d",
+     "copied_sha256": "d24f937cdfca8f7160f58bd27c3b813de03fae68b76d5f298624060c10ad3d2d"
+    }
+   ]
+  },
+  "Q-4-33": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "tanzil_uthmani",
+     "locator": "4|33",
+     "source_field": "verse",
+     "sha256": "84da2b877966b47fc554103526442b6e1aadc15bae6523988e423918e6fc4739",
+     "copied_sha256": "84da2b877966b47fc554103526442b6e1aadc15bae6523988e423918e6fc4739"
+    },
+    {
+     "field": "ar_quran_json",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=33",
+     "source_field": "arabic",
+     "sha256": "3a530e259b0b014cd3d5eec30b6ebde56dc7f3142f7986f13a2179894df1bc9f",
+     "copied_sha256": "3a530e259b0b014cd3d5eec30b6ebde56dc7f3142f7986f13a2179894df1bc9f"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.text",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=33",
+     "source_field": "translation",
+     "sha256": "5a21bc7f2d51df50942fa338ebe9f26abbc89796825fbc15edce2e2c1227e345",
+     "copied_sha256": "5a21bc7f2d51df50942fa338ebe9f26abbc89796825fbc15edce2e2c1227e345"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.footnotes",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=33",
+     "source_field": "footnotes",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "copied_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+     "field": "translations.id_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=33",
+     "source_field": "id",
+     "sha256": "817c1b68cc57398ef6b5418b9ac4710d61950aeb9f62b93add9372a17fcc5c78",
+     "copied_sha256": "817c1b68cc57398ef6b5418b9ac4710d61950aeb9f62b93add9372a17fcc5c78"
+    },
+    {
+     "field": "translations.en_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=33",
+     "source_field": "en",
+     "sha256": "f580853400776a8170da4f5a56876eab941303285fc7feb94b9b241ee7df20bf",
+     "copied_sha256": "f580853400776a8170da4f5a56876eab941303285fc7feb94b9b241ee7df20bf"
+    }
+   ]
+  },
+  "Q-4-141": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "tanzil_uthmani",
+     "locator": "4|141",
+     "source_field": "verse",
+     "sha256": "d19644ae4794f5f0e3a3f71c0e52347e2384c85ead644615f925347cfa897587",
+     "copied_sha256": "d19644ae4794f5f0e3a3f71c0e52347e2384c85ead644615f925347cfa897587"
+    },
+    {
+     "field": "ar_quran_json",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=141",
+     "source_field": "arabic",
+     "sha256": "a27f8060f54d345acde9a333b7709394dd3e2d276a83e1f4e5e00f0052601b3d",
+     "copied_sha256": "a27f8060f54d345acde9a333b7709394dd3e2d276a83e1f4e5e00f0052601b3d"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.text",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=141",
+     "source_field": "translation",
+     "sha256": "e995c10f278a1de8d29d2aafcd6ce06a0008e0fda82c24b8359cccfc267d9bf5",
+     "copied_sha256": "e995c10f278a1de8d29d2aafcd6ce06a0008e0fda82c24b8359cccfc267d9bf5"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.footnotes",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=141",
+     "source_field": "footnotes",
+     "sha256": "caee80f3383e4bda776f2adf26337f33ec6f26716e8988445d79b9bbb57306cb",
+     "copied_sha256": "caee80f3383e4bda776f2adf26337f33ec6f26716e8988445d79b9bbb57306cb"
+    },
+    {
+     "field": "translations.id_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=141",
+     "source_field": "id",
+     "sha256": "f36b3322830626a850a395b2fb3bdc3d216a2de6dab525aa7b7006bd0c96bef7",
+     "copied_sha256": "f36b3322830626a850a395b2fb3bdc3d216a2de6dab525aa7b7006bd0c96bef7"
+    },
+    {
+     "field": "translations.en_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=141",
+     "source_field": "en",
+     "sha256": "56a8175ae9e2513907ac5c49d89914573e25bda176fd8c79acb7bc729cd4bf08",
+     "copied_sha256": "56a8175ae9e2513907ac5c49d89914573e25bda176fd8c79acb7bc729cd4bf08"
+    }
+   ]
+  },
+  "Q-4-176": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "tanzil_uthmani",
+     "locator": "4|176",
+     "source_field": "verse",
+     "sha256": "2a2ff00022cdd5995853745c38bb36618e4e07f68f042b63ed6487f613ad7986",
+     "copied_sha256": "2a2ff00022cdd5995853745c38bb36618e4e07f68f042b63ed6487f613ad7986"
+    },
+    {
+     "field": "ar_quran_json",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=176",
+     "source_field": "arabic",
+     "sha256": "2521e4dcd048f8c7ce1932975cda64367492953152308455083e383d45a4bd03",
+     "copied_sha256": "2521e4dcd048f8c7ce1932975cda64367492953152308455083e383d45a4bd03"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.text",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=176",
+     "source_field": "translation",
+     "sha256": "7ae550157cb80031c3f3c690e969fdfbf8a6f735cd56c9d09fb9fbfdf1d472eb",
+     "copied_sha256": "7ae550157cb80031c3f3c690e969fdfbf8a6f735cd56c9d09fb9fbfdf1d472eb"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.footnotes",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=176",
+     "source_field": "footnotes",
+     "sha256": "354f84d83e72cdc1d079edb69abc2fee0dd7613277fa308d2e30c6f1802cca08",
+     "copied_sha256": "354f84d83e72cdc1d079edb69abc2fee0dd7613277fa308d2e30c6f1802cca08"
+    },
+    {
+     "field": "translations.id_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=176",
+     "source_field": "id",
+     "sha256": "ce20ae02a4c96daa4c356a62c8f87500443d16d65fbe5eee30529b97f5c8a90c",
+     "copied_sha256": "ce20ae02a4c96daa4c356a62c8f87500443d16d65fbe5eee30529b97f5c8a90c"
+    },
+    {
+     "field": "translations.en_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=176",
+     "source_field": "en",
+     "sha256": "2dafe13feb536a565a519574888fc5c04810b050a24aa47eaac9202d764bbcc0",
+     "copied_sha256": "2dafe13feb536a565a519574888fc5c04810b050a24aa47eaac9202d764bbcc0"
+    }
+   ]
+  },
+  "Q-8-75": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "tanzil_uthmani",
+     "locator": "8|75",
+     "source_field": "verse",
+     "sha256": "52b6d7b09431c1ac54e8d9afdf0a7e500eb9bf7907880f569e4ae8ce87a2e0c4",
+     "copied_sha256": "52b6d7b09431c1ac54e8d9afdf0a7e500eb9bf7907880f569e4ae8ce87a2e0c4"
+    },
+    {
+     "field": "ar_quran_json",
+     "source": "api/data/quran.json",
+     "locator": "surah=8,ayah=75",
+     "source_field": "arabic",
+     "sha256": "8b5a8255a2ef13c4b3308b8603056a96b4ad083df15fc538455fac887178d948",
+     "copied_sha256": "8b5a8255a2ef13c4b3308b8603056a96b4ad083df15fc538455fac887178d948"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.text",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura8.json",
+     "locator": "aya=75",
+     "source_field": "translation",
+     "sha256": "95fc8755350c2effb7d9322a06886442040c3bdcf092cc718fca6912c24b75e9",
+     "copied_sha256": "95fc8755350c2effb7d9322a06886442040c3bdcf092cc718fca6912c24b75e9"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.footnotes",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura8.json",
+     "locator": "aya=75",
+     "source_field": "footnotes",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "copied_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+     "field": "translations.id_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=8,ayah=75",
+     "source_field": "id",
+     "sha256": "3abd75bcc46be9b356e9f00767618f532cb4ad18de2c70f48eab9628620c6bbe",
+     "copied_sha256": "3abd75bcc46be9b356e9f00767618f532cb4ad18de2c70f48eab9628620c6bbe"
+    },
+    {
+     "field": "translations.en_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=8,ayah=75",
+     "source_field": "en",
+     "sha256": "4583170296e40811ca7b374dba0b416942534913725f4904ce4663cb7fc423c4",
+     "copied_sha256": "4583170296e40811ca7b374dba0b416942534913725f4904ce4663cb7fc423c4"
+    }
+   ]
+  },
+  "Q-33-6": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "tanzil_uthmani",
+     "locator": "33|6",
+     "source_field": "verse",
+     "sha256": "e848e38d72a230016ed8b4df8e251008b9a95f49252746cff4f86d771865cc2b",
+     "copied_sha256": "e848e38d72a230016ed8b4df8e251008b9a95f49252746cff4f86d771865cc2b"
+    },
+    {
+     "field": "ar_quran_json",
+     "source": "api/data/quran.json",
+     "locator": "surah=33,ayah=6",
+     "source_field": "arabic",
+     "sha256": "9437c626841ea766337bd6604f8ab51bd2897d34653825f49c889af703a28afd",
+     "copied_sha256": "9437c626841ea766337bd6604f8ab51bd2897d34653825f49c889af703a28afd"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.text",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura33.json",
+     "locator": "aya=6",
+     "source_field": "translation",
+     "sha256": "a22b0a9ca7e2b8d236e251b4cb1d5bcc801e5fb2105ae723b927e2bcf8892ebb",
+     "copied_sha256": "a22b0a9ca7e2b8d236e251b4cb1d5bcc801e5fb2105ae723b927e2bcf8892ebb"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.footnotes",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura33.json",
+     "locator": "aya=6",
+     "source_field": "footnotes",
+     "sha256": "1fd636089a1993b393d7f2c9c39dc011284c7b9dec9130240c0ac1e0b59523ac",
+     "copied_sha256": "1fd636089a1993b393d7f2c9c39dc011284c7b9dec9130240c0ac1e0b59523ac"
+    },
+    {
+     "field": "translations.id_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=33,ayah=6",
+     "source_field": "id",
+     "sha256": "86fce006280a9fa829067f8277ca7d3c797e546fa9f18ed8dee90481b748e830",
+     "copied_sha256": "86fce006280a9fa829067f8277ca7d3c797e546fa9f18ed8dee90481b748e830"
+    },
+    {
+     "field": "translations.en_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=33,ayah=6",
+     "source_field": "en",
+     "sha256": "71780a1bfa563c269dcde29d3e7a853ab1f1c4ce94b0c91087b740653fd6744f",
+     "copied_sha256": "71780a1bfa563c269dcde29d3e7a853ab1f1c4ce94b0c91087b740653fd6744f"
+    }
+   ]
+  },
+  "Q-2-180": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "tanzil_uthmani",
+     "locator": "2|180",
+     "source_field": "verse",
+     "sha256": "335269f34dce51b75b52fb141a300098b9bc75c0d942322f8983ae88fe617396",
+     "copied_sha256": "335269f34dce51b75b52fb141a300098b9bc75c0d942322f8983ae88fe617396"
+    },
+    {
+     "field": "ar_quran_json",
+     "source": "api/data/quran.json",
+     "locator": "surah=2,ayah=180",
+     "source_field": "arabic",
+     "sha256": "fb02fd1588384bef3d7fa3823a3d17d1f66585adb88b296cbd36833e40cd274d",
+     "copied_sha256": "fb02fd1588384bef3d7fa3823a3d17d1f66585adb88b296cbd36833e40cd274d"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.text",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura2.json",
+     "locator": "aya=180",
+     "source_field": "translation",
+     "sha256": "7e510d99edf74eef737f50cdc66c6b8a6aae71f64279671a0cef938db2b57c38",
+     "copied_sha256": "7e510d99edf74eef737f50cdc66c6b8a6aae71f64279671a0cef938db2b57c38"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.footnotes",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura2.json",
+     "locator": "aya=180",
+     "source_field": "footnotes",
+     "sha256": "dda5a6c2f33f5b8af0e7a90641ee6aae3e64ca8a65e7e167650bbebee5797a33",
+     "copied_sha256": "dda5a6c2f33f5b8af0e7a90641ee6aae3e64ca8a65e7e167650bbebee5797a33"
+    },
+    {
+     "field": "translations.id_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=2,ayah=180",
+     "source_field": "id",
+     "sha256": "b47e41a77989869494494cc75411e4529d14a404d552e4555a01005c579a7cfd",
+     "copied_sha256": "b47e41a77989869494494cc75411e4529d14a404d552e4555a01005c579a7cfd"
+    },
+    {
+     "field": "translations.en_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=2,ayah=180",
+     "source_field": "en",
+     "sha256": "12308f27d020a0703c7bb1787ac13952be557674b8acd5b89f37f27facb3e505",
+     "copied_sha256": "12308f27d020a0703c7bb1787ac13952be557674b8acd5b89f37f27facb3e505"
+    }
+   ]
+  },
+  "Q-2-240": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "tanzil_uthmani",
+     "locator": "2|240",
+     "source_field": "verse",
+     "sha256": "a92962cb6acbaad7d5a08e0e09fa05684aad89ff5cf515a065d7af6da78584bd",
+     "copied_sha256": "a92962cb6acbaad7d5a08e0e09fa05684aad89ff5cf515a065d7af6da78584bd"
+    },
+    {
+     "field": "ar_quran_json",
+     "source": "api/data/quran.json",
+     "locator": "surah=2,ayah=240",
+     "source_field": "arabic",
+     "sha256": "973f657f09113d033b9c3bd2f7eee9944faeab109af154a82761dc5c05c2902e",
+     "copied_sha256": "973f657f09113d033b9c3bd2f7eee9944faeab109af154a82761dc5c05c2902e"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.text",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura2.json",
+     "locator": "aya=240",
+     "source_field": "translation",
+     "sha256": "fb6a0c1533786b4099d815a248438a5ba8735e4df09e441297f23d872fcb775b",
+     "copied_sha256": "fb6a0c1533786b4099d815a248438a5ba8735e4df09e441297f23d872fcb775b"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.footnotes",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura2.json",
+     "locator": "aya=240",
+     "source_field": "footnotes",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "copied_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+     "field": "translations.id_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=2,ayah=240",
+     "source_field": "id",
+     "sha256": "65fe388ea45da8d1c67c8fdea5acc94aefdca5d5683637c9ebcae1e5a9f5d952",
+     "copied_sha256": "65fe388ea45da8d1c67c8fdea5acc94aefdca5d5683637c9ebcae1e5a9f5d952"
+    },
+    {
+     "field": "translations.en_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=2,ayah=240",
+     "source_field": "en",
+     "sha256": "72a05e88e51e5021d75df6d610690940ed5d06ca22b76f62c6ead9b4a35905b4",
+     "copied_sha256": "72a05e88e51e5021d75df6d610690940ed5d06ca22b76f62c6ead9b4a35905b4"
+    }
+   ]
+  },
+  "H-BUKHARI-6732": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6732",
+     "source_field": "ar",
+     "sha256": "0ee986595f16a89ca6f936db29f8ce36fd29360c8462be783ef25bc4faeb1156",
+     "copied_sha256": "0ee986595f16a89ca6f936db29f8ce36fd29360c8462be783ef25bc4faeb1156"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6732",
+     "source_field": "en",
+     "sha256": "34d33ecd32d9f1c8a60ee46bd760ebf89a8c50681f1c5f125f396a5a6aac6970",
+     "copied_sha256": "34d33ecd32d9f1c8a60ee46bd760ebf89a8c50681f1c5f125f396a5a6aac6970"
+    }
+   ]
+  },
+  "H-BUKHARI-6736": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6736",
+     "source_field": "ar",
+     "sha256": "5b0f3eb66730e3f369e5cb9de8cedb5649fd5892cf17b93c516a40eedcb3018a",
+     "copied_sha256": "5b0f3eb66730e3f369e5cb9de8cedb5649fd5892cf17b93c516a40eedcb3018a"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6736",
+     "source_field": "en",
+     "sha256": "8025963a160c94b462667b1f87ab0d0dbb79d937c59a861b18875602fa56b229",
+     "copied_sha256": "8025963a160c94b462667b1f87ab0d0dbb79d937c59a861b18875602fa56b229"
+    }
+   ]
+  },
+  "H-BUKHARI-6734": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6734",
+     "source_field": "ar",
+     "sha256": "a15df9169f744fd36e03cbae57db4ca2da64a2656a1aff72cf7cfe7a82556ec8",
+     "copied_sha256": "a15df9169f744fd36e03cbae57db4ca2da64a2656a1aff72cf7cfe7a82556ec8"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6734",
+     "source_field": "en",
+     "sha256": "1d4dfd2f29fb8e13d97973780d03321d6d378788ec9fa3f48e995e0e3991e104",
+     "copied_sha256": "1d4dfd2f29fb8e13d97973780d03321d6d378788ec9fa3f48e995e0e3991e104"
+    }
+   ]
+  },
+  "H-BUKHARI-6739": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6739",
+     "source_field": "ar",
+     "sha256": "2f0e9baae21411569de8b410a34966434d9b7dd545ce0c12ef7acf63862a4ecb",
+     "copied_sha256": "2f0e9baae21411569de8b410a34966434d9b7dd545ce0c12ef7acf63862a4ecb"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6739",
+     "source_field": "en",
+     "sha256": "15a4b2aacc298493344a241270dde702fc3229c2987ef83bf4546bba28a69cf8",
+     "copied_sha256": "15a4b2aacc298493344a241270dde702fc3229c2987ef83bf4546bba28a69cf8"
+    }
+   ]
+  },
+  "H-BUKHARI-6764": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6764",
+     "source_field": "ar",
+     "sha256": "66f5ef25411c5ecd841609934c0bb2f09fd6e0a652701a385a22941b95a47e95",
+     "copied_sha256": "66f5ef25411c5ecd841609934c0bb2f09fd6e0a652701a385a22941b95a47e95"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6764",
+     "source_field": "en",
+     "sha256": "36a4db383968083256e8723c1ee9e480c0f16303ecb8a0d8927d35b71b526ef8",
+     "copied_sha256": "36a4db383968083256e8723c1ee9e480c0f16303ecb8a0d8927d35b71b526ef8"
+    }
+   ]
+  },
+  "H-BUKHARI-2742": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=2742",
+     "source_field": "ar",
+     "sha256": "d2776d98b3defdc2cdcba80d07a76deddeb92d2e85644a4c8a5d2274b6c3e7c7",
+     "copied_sha256": "d2776d98b3defdc2cdcba80d07a76deddeb92d2e85644a4c8a5d2274b6c3e7c7"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=2742",
+     "source_field": "en",
+     "sha256": "db4c82cf3b8061fb6d8e9e92a400315ec15a5b483ff1102b16810a884a69749a",
+     "copied_sha256": "db4c82cf3b8061fb6d8e9e92a400315ec15a5b483ff1102b16810a884a69749a"
+    }
+   ]
+  },
+  "H-BUKHARI-2743": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=2743",
+     "source_field": "ar",
+     "sha256": "6d42e6fedd937b0cffa29c69cdfee841e03ed99bfa78bfeb79b60541be08f348",
+     "copied_sha256": "6d42e6fedd937b0cffa29c69cdfee841e03ed99bfa78bfeb79b60541be08f348"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=2743",
+     "source_field": "en",
+     "sha256": "a4a8f63055efd2304ba12bf45925a8613ddbaea4c325aab114ecbc3ce78239f8",
+     "copied_sha256": "a4a8f63055efd2304ba12bf45925a8613ddbaea4c325aab114ecbc3ce78239f8"
+    }
+   ]
+  },
+  "H-BUKHARI-2738": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=2738",
+     "source_field": "ar",
+     "sha256": "32f37ced3232735983b652b3dae62bd125d0840d8b30484d4c29b786df416fb1",
+     "copied_sha256": "32f37ced3232735983b652b3dae62bd125d0840d8b30484d4c29b786df416fb1"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=2738",
+     "source_field": "en",
+     "sha256": "63b8293a4c8f59f91337bdb0c462bcc51eb4cf6da9fe505d228c927a03a63eea",
+     "copied_sha256": "63b8293a4c8f59f91337bdb0c462bcc51eb4cf6da9fe505d228c927a03a63eea"
+    }
+   ]
+  },
+  "H-BUKHARI-6731": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6731",
+     "source_field": "ar",
+     "sha256": "48d83672897c2d7133d05fab7b0f9afa9c6f5b22cc8ce1d37921f9f7edac41fa",
+     "copied_sha256": "48d83672897c2d7133d05fab7b0f9afa9c6f5b22cc8ce1d37921f9f7edac41fa"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6731",
+     "source_field": "en",
+     "sha256": "1365e19eef081eb5e0cb052bd679745854a8873e2044eb731a7ba18db088f92c",
+     "copied_sha256": "1365e19eef081eb5e0cb052bd679745854a8873e2044eb731a7ba18db088f92c"
+    }
+   ]
+  },
+  "H-BUKHARI-6745": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6745",
+     "source_field": "ar",
+     "sha256": "3309a8da65054982f381ada43a0259317dc620f21a4f4b0eb5eb149ede1e6898",
+     "copied_sha256": "3309a8da65054982f381ada43a0259317dc620f21a4f4b0eb5eb149ede1e6898"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6745",
+     "source_field": "en",
+     "sha256": "6d837baeae162c567978833d614f6f182ad59ac53af49d175eebbeb21bc2cbd6",
+     "copied_sha256": "6d837baeae162c567978833d614f6f182ad59ac53af49d175eebbeb21bc2cbd6"
+    }
+   ]
+  },
+  "H-BUKHARI-6738": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6738",
+     "source_field": "ar",
+     "sha256": "401993987308f4b2b24b96e64fe2c4f8576335165ca3e73ef14bf2d319e30acd",
+     "copied_sha256": "401993987308f4b2b24b96e64fe2c4f8576335165ca3e73ef14bf2d319e30acd"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6738",
+     "source_field": "en",
+     "sha256": "0cfe09a1a1f4819fdcd3aaefbb93def9ee670c761cd4e0470a9cee35e397b51f",
+     "copied_sha256": "0cfe09a1a1f4819fdcd3aaefbb93def9ee670c761cd4e0470a9cee35e397b51f"
+    }
+   ]
+  },
+  "H-BUKHARI-6744": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6744",
+     "source_field": "ar",
+     "sha256": "cf988cecdd2c6ccebd12512b29645179b3efa3f3c2788a66949ffc519bbe84ad",
+     "copied_sha256": "cf988cecdd2c6ccebd12512b29645179b3efa3f3c2788a66949ffc519bbe84ad"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6744",
+     "source_field": "en",
+     "sha256": "d970bf868252bf26e3a4ee5c1bad58f22f658c198a4531e61aff431f1afd8afa",
+     "copied_sha256": "d970bf868252bf26e3a4ee5c1bad58f22f658c198a4531e61aff431f1afd8afa"
+    }
+   ]
+  },
+  "H-BUKHARI-6723": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6723",
+     "source_field": "ar",
+     "sha256": "2c77e57a1baede5c70d73fcb1d6d76e52ace7950c31d5f55433d6686eb75982f",
+     "copied_sha256": "2c77e57a1baede5c70d73fcb1d6d76e52ace7950c31d5f55433d6686eb75982f"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6723",
+     "source_field": "en",
+     "sha256": "b1d4d66e79b479e726d1eeedf1845a053662b6dd87f14c1f1e4674331bcd8966",
+     "copied_sha256": "b1d4d66e79b479e726d1eeedf1845a053662b6dd87f14c1f1e4674331bcd8966"
+    }
+   ]
+  },
+  "H-BUKHARI-4577": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=4577",
+     "source_field": "ar",
+     "sha256": "2ed5699567557872aaf0eb90f367683961e5c788bbd27d10ea01717a19a5e72f",
+     "copied_sha256": "2ed5699567557872aaf0eb90f367683961e5c788bbd27d10ea01717a19a5e72f"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=4577",
+     "source_field": "en",
+     "sha256": "97f8ef17aed22c864eb0825c638c6dd1909b6aff0fb2246c3af86198a564dcfc",
+     "copied_sha256": "97f8ef17aed22c864eb0825c638c6dd1909b6aff0fb2246c3af86198a564dcfc"
+    }
+   ]
+  },
+  "H-BUKHARI-6747": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6747",
+     "source_field": "ar",
+     "sha256": "f09e3195385befabd492d4447cb0e2265f40cc18ca2b80803606798763e025a9",
+     "copied_sha256": "f09e3195385befabd492d4447cb0e2265f40cc18ca2b80803606798763e025a9"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6747",
+     "source_field": "en",
+     "sha256": "459ed62842e7dfb334524e58c5f3c7f86ff68d9b380d50fb5c6a227816d14990",
+     "copied_sha256": "459ed62842e7dfb334524e58c5f3c7f86ff68d9b380d50fb5c6a227816d14990"
+    }
+   ]
+  },
+  "H-BUKHARI-4576": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=4576",
+     "source_field": "ar",
+     "sha256": "b6a171f0d7678d11a6fb009d4a5ca3e940dc6b331722e8e8e8e9fd52ccee3327",
+     "copied_sha256": "b6a171f0d7678d11a6fb009d4a5ca3e940dc6b331722e8e8e8e9fd52ccee3327"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=4576",
+     "source_field": "en",
+     "sha256": "6f9bd48beb56dc8a4d151418166554d435df7483d99c39e2e495ade606878e56",
+     "copied_sha256": "6f9bd48beb56dc8a4d151418166554d435df7483d99c39e2e495ade606878e56"
+    }
+   ]
+  },
+  "H-BUKHARI-2759": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=2759",
+     "source_field": "ar",
+     "sha256": "657e62ce207b893e84542caf2d0767d53ffbe113933b34710757c72575d8b698",
+     "copied_sha256": "657e62ce207b893e84542caf2d0767d53ffbe113933b34710757c72575d8b698"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=2759",
+     "source_field": "en",
+     "sha256": "58288c068eebfa50a93fed4b703701dac09a67f25e9f5e71d1bb04a6a8c2cde8",
+     "copied_sha256": "58288c068eebfa50a93fed4b703701dac09a67f25e9f5e71d1bb04a6a8c2cde8"
+    }
+   ]
+  },
+  "H-BUKHARI-6752": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6752",
+     "source_field": "ar",
+     "sha256": "8abba7e8231a43acb4161411d2e5ed6291669b6a01ac0ecf735db19759e2d8dc",
+     "copied_sha256": "8abba7e8231a43acb4161411d2e5ed6291669b6a01ac0ecf735db19759e2d8dc"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=6752",
+     "source_field": "en",
+     "sha256": "cf9d511a44f30f90ca58c0607a85871a3e0eb7575e799188527a553eaae98714",
+     "copied_sha256": "cf9d511a44f30f90ca58c0607a85871a3e0eb7575e799188527a553eaae98714"
+    }
+   ]
+  },
+  "H-MUSLIM-1614": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4140",
+     "source_field": "ar",
+     "sha256": "64757dea5e23203069a75ce32fe0c04b9ba3a41a4730db6717135cb54ab6e23f",
+     "copied_sha256": "64757dea5e23203069a75ce32fe0c04b9ba3a41a4730db6717135cb54ab6e23f"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4140",
+     "source_field": "en",
+     "sha256": "001dec5129ad296af2c0ec2cffbca5dd7b5df565699bf17baf5e4bb10393ad3d",
+     "copied_sha256": "001dec5129ad296af2c0ec2cffbca5dd7b5df565699bf17baf5e4bb10393ad3d"
+    },
+    {
+     "field": "translations.id.text",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4140",
+     "source_field": "id",
+     "sha256": "4a1f0726bdbe81637e7faf87968c356d5f5610315be5bc60f52e0edfe942be5d",
+     "copied_sha256": "4a1f0726bdbe81637e7faf87968c356d5f5610315be5bc60f52e0edfe942be5d"
+    }
+   ]
+  },
+  "H-MUSLIM-1615a": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4141",
+     "source_field": "ar",
+     "sha256": "291b2754baaaf65272b6eb472e020069b013fb14986211b8ead3b740eba4b0ea",
+     "copied_sha256": "291b2754baaaf65272b6eb472e020069b013fb14986211b8ead3b740eba4b0ea"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4141",
+     "source_field": "en",
+     "sha256": "fa50537e6f3677e4eed13be887011f7a6c7d126e15a43f0d4a4cb66d918449aa",
+     "copied_sha256": "fa50537e6f3677e4eed13be887011f7a6c7d126e15a43f0d4a4cb66d918449aa"
+    },
+    {
+     "field": "translations.id.text",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4141",
+     "source_field": "id",
+     "sha256": "82545eede6bd47abde4afee80de27aa2a6ca8d522591dd5ff69a71be991acfc8",
+     "copied_sha256": "82545eede6bd47abde4afee80de27aa2a6ca8d522591dd5ff69a71be991acfc8"
+    }
+   ]
+  },
+  "H-MUSLIM-1615c": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4143",
+     "source_field": "ar",
+     "sha256": "2ee801bc10c0374dd8a132109cd69f966dce2deae058af1ce433d9712a298e03",
+     "copied_sha256": "2ee801bc10c0374dd8a132109cd69f966dce2deae058af1ce433d9712a298e03"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4143",
+     "source_field": "en",
+     "sha256": "0dfe259924928f353431261b7aac1984aae8361f28171d779732d21e87f66196",
+     "copied_sha256": "0dfe259924928f353431261b7aac1984aae8361f28171d779732d21e87f66196"
+    },
+    {
+     "field": "translations.id.text",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4143",
+     "source_field": "id",
+     "sha256": "db08508820a93f1c47dcd7871c2f3985de3673052adb1a78d93a28d5f787b0a3",
+     "copied_sha256": "db08508820a93f1c47dcd7871c2f3985de3673052adb1a78d93a28d5f787b0a3"
+    }
+   ]
+  },
+  "H-MUSLIM-1616a": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4145",
+     "source_field": "ar",
+     "sha256": "90eb88c152f4d0df682a1248059a266843c51cf3011d978958c867258333a85f",
+     "copied_sha256": "90eb88c152f4d0df682a1248059a266843c51cf3011d978958c867258333a85f"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4145",
+     "source_field": "en",
+     "sha256": "7335415a2e2b0add968956443f8aa29ad4e24108d41dbcff1666b836006e1da1",
+     "copied_sha256": "7335415a2e2b0add968956443f8aa29ad4e24108d41dbcff1666b836006e1da1"
+    },
+    {
+     "field": "translations.id.text",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4145",
+     "source_field": "id",
+     "sha256": "84b4e8eb97163951c5b613e44dd1fd455dbba191bed3ae6f38df15b260545144",
+     "copied_sha256": "84b4e8eb97163951c5b613e44dd1fd455dbba191bed3ae6f38df15b260545144"
+    }
+   ]
+  },
+  "H-MUSLIM-1617a": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4150",
+     "source_field": "ar",
+     "sha256": "f2accf962ea3ae2fac08fcc7961f120a6ceecb665c001379467c626d157f7d47",
+     "copied_sha256": "f2accf962ea3ae2fac08fcc7961f120a6ceecb665c001379467c626d157f7d47"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4150",
+     "source_field": "en",
+     "sha256": "3edf7fa09b835d54347e08d5c913390c8ed1a0cae53db3b11ff9169775a16772",
+     "copied_sha256": "3edf7fa09b835d54347e08d5c913390c8ed1a0cae53db3b11ff9169775a16772"
+    },
+    {
+     "field": "translations.id.text",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4150",
+     "source_field": "id",
+     "sha256": "7f1d37d0802e73320debda0d4427d106c5ea62841fdd60aca611bc7d25abde63",
+     "copied_sha256": "7f1d37d0802e73320debda0d4427d106c5ea62841fdd60aca611bc7d25abde63"
+    }
+   ]
+  },
+  "H-MUSLIM-1618a": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4152",
+     "source_field": "ar",
+     "sha256": "31e3e42a7a019b92574514d1fb5b160e90af6ce08e45078f288eafd30b3c5639",
+     "copied_sha256": "31e3e42a7a019b92574514d1fb5b160e90af6ce08e45078f288eafd30b3c5639"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4152",
+     "source_field": "en",
+     "sha256": "e116c8dfb9b785962e6cec569b902affcdf7840dc39ac69b6c6378d7d5f5b1ab",
+     "copied_sha256": "e116c8dfb9b785962e6cec569b902affcdf7840dc39ac69b6c6378d7d5f5b1ab"
+    },
+    {
+     "field": "translations.id.text",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4152",
+     "source_field": "id",
+     "sha256": "6566ae88dcfd49060a0769dc06fd593d91bff5ed012d3cc030fb065a0e39d1ec",
+     "copied_sha256": "6566ae88dcfd49060a0769dc06fd593d91bff5ed012d3cc030fb065a0e39d1ec"
+    }
+   ]
+  },
+  "H-MUSLIM-1619e": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4161",
+     "source_field": "ar",
+     "sha256": "6ee02381d7ecd75a70c244c42b8702343fe28273defe3a0846014267631a94d1",
+     "copied_sha256": "6ee02381d7ecd75a70c244c42b8702343fe28273defe3a0846014267631a94d1"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4161",
+     "source_field": "en",
+     "sha256": "74e751825b39f02de1ef7fcba033ac088695225fbe026e5b7ec58ca7ff4b1829",
+     "copied_sha256": "74e751825b39f02de1ef7fcba033ac088695225fbe026e5b7ec58ca7ff4b1829"
+    },
+    {
+     "field": "translations.id.text",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4161",
+     "source_field": "id",
+     "sha256": "f925e0191d86750db599037a123351da91db6c274e56554f923814884960ac95",
+     "copied_sha256": "f925e0191d86750db599037a123351da91db6c274e56554f923814884960ac95"
+    }
+   ]
+  },
+  "H-MUSLIM-1627a": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4204",
+     "source_field": "ar",
+     "sha256": "16852c1d3efd0673b5da056df0948f70ca82e3ac0eef2a22a0929de954461854",
+     "copied_sha256": "16852c1d3efd0673b5da056df0948f70ca82e3ac0eef2a22a0929de954461854"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4204",
+     "source_field": "en",
+     "sha256": "796117fcd0f3d48cda41487379c163c5d0835435134b27dc39f800d2026fcc17",
+     "copied_sha256": "796117fcd0f3d48cda41487379c163c5d0835435134b27dc39f800d2026fcc17"
+    },
+    {
+     "field": "translations.id.text",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4204",
+     "source_field": "id",
+     "sha256": "a1ea9d4c59436312c65920e4464f01a4826863d6ada6daa720ca4699441c2b38",
+     "copied_sha256": "a1ea9d4c59436312c65920e4464f01a4826863d6ada6daa720ca4699441c2b38"
+    }
+   ]
+  },
+  "H-MUSLIM-1628a": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4209",
+     "source_field": "ar",
+     "sha256": "6923e4b113f0de9e6f8122bf39c794e58c3d2a551b7b04e887c0753f1c3b02b9",
+     "copied_sha256": "6923e4b113f0de9e6f8122bf39c794e58c3d2a551b7b04e887c0753f1c3b02b9"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4209",
+     "source_field": "en",
+     "sha256": "0421b1c532bcecc9a6186c5777f120d401c159df7aad8788a94bf2676ff25e4a",
+     "copied_sha256": "0421b1c532bcecc9a6186c5777f120d401c159df7aad8788a94bf2676ff25e4a"
+    },
+    {
+     "field": "translations.id.text",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4209",
+     "source_field": "id",
+     "sha256": "da5426c4e160c5e26c99b37aae758a7e03e507a32facd7e7b422b75c7cde3f3a",
+     "copied_sha256": "da5426c4e160c5e26c99b37aae758a7e03e507a32facd7e7b422b75c7cde3f3a"
+    }
+   ]
+  },
+  "H-MUSLIM-1629": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4218",
+     "source_field": "ar",
+     "sha256": "e8aed88aad40175ab1269eb82413fc5a4917756bbc7a225f486c3a9f3b22d226",
+     "copied_sha256": "e8aed88aad40175ab1269eb82413fc5a4917756bbc7a225f486c3a9f3b22d226"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4218",
+     "source_field": "en",
+     "sha256": "ad4ace962416b643061dca9458412f5a170e042d187ce6ecf15d429372060c0e",
+     "copied_sha256": "ad4ace962416b643061dca9458412f5a170e042d187ce6ecf15d429372060c0e"
+    },
+    {
+     "field": "translations.id.text",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4218",
+     "source_field": "id",
+     "sha256": "a16cbe48a8286dc591a29d0877e638c7ee7b918b20dd8ffaef94fca5f81b0eaa",
+     "copied_sha256": "a16cbe48a8286dc591a29d0877e638c7ee7b918b20dd8ffaef94fca5f81b0eaa"
+    }
+   ]
+  },
+  "H-BULUGH-1095": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1095",
+     "source_field": "ar",
+     "sha256": "0a62db85a70883f6967fc7ad62da0203bf233b156ea9e28792f37c153a8fde8a",
+     "copied_sha256": "0a62db85a70883f6967fc7ad62da0203bf233b156ea9e28792f37c153a8fde8a"
+    },
+    {
+     "field": "ar_matn_and_ibn_hajar_attribution",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1095",
+     "source_field": "ar",
+     "sha256": "0a62db85a70883f6967fc7ad62da0203bf233b156ea9e28792f37c153a8fde8a",
+     "copied_sha256": "a4fbe9db03782ca9095e8cb7636e3a007408d2a7126ed6396474afe33a87448d",
+     "span": [
+      0,
+      212
+     ]
+    },
+    {
+     "field": "ar_tahqiq_footnote",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1095",
+     "source_field": "ar",
+     "sha256": "0a62db85a70883f6967fc7ad62da0203bf233b156ea9e28792f37c153a8fde8a",
+     "copied_sha256": "6583f4c7dcac6f8abe4b6e63c413c2deff7b7ab5dc392f624eba90a81c4f9685",
+     "span": [
+      220,
+      275
+     ]
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1095",
+     "source_field": "en",
+     "sha256": "751e49d0baf7780b05e3b6d5d560ad1e0b7b045ee8526f0359b43ead92ba759e",
+     "copied_sha256": "751e49d0baf7780b05e3b6d5d560ad1e0b7b045ee8526f0359b43ead92ba759e"
+    }
+   ]
+  },
+  "H-BULUGH-1096": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1096",
+     "source_field": "ar",
+     "sha256": "d456ac94f7893471776e1acf961c812f9d3eb538678f2d76917569ebac002329",
+     "copied_sha256": "d456ac94f7893471776e1acf961c812f9d3eb538678f2d76917569ebac002329"
+    },
+    {
+     "field": "ar_matn_and_ibn_hajar_attribution",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1096",
+     "source_field": "ar",
+     "sha256": "d456ac94f7893471776e1acf961c812f9d3eb538678f2d76917569ebac002329",
+     "copied_sha256": "b259fab02070607cffd18063255a69e2d27f9f480d7d352433fd2f2912398702",
+     "span": [
+      0,
+      208
+     ]
+    },
+    {
+     "field": "ar_tahqiq_footnote",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1096",
+     "source_field": "ar",
+     "sha256": "d456ac94f7893471776e1acf961c812f9d3eb538678f2d76917569ebac002329",
+     "copied_sha256": "cbbc57f7d272c03d5426a8677c61add6e5b413050e3cf2d6b5a70a5ac2a60763",
+     "span": [
+      213,
+      329
+     ]
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1096",
+     "source_field": "en",
+     "sha256": "dd1466e4bf7b0295112a65e73163c962e6d7b1f36344ccde7f909a1e100fea27",
+     "copied_sha256": "dd1466e4bf7b0295112a65e73163c962e6d7b1f36344ccde7f909a1e100fea27"
+    }
+   ]
+  },
+  "H-BULUGH-1097": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1097",
+     "source_field": "ar",
+     "sha256": "ae9d59da9300bbc21af98262534f2f6a08d9c4b5a738fcb0d596c03456adb00f",
+     "copied_sha256": "ae9d59da9300bbc21af98262534f2f6a08d9c4b5a738fcb0d596c03456adb00f"
+    },
+    {
+     "field": "ar_matn_and_ibn_hajar_attribution",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1097",
+     "source_field": "ar",
+     "sha256": "ae9d59da9300bbc21af98262534f2f6a08d9c4b5a738fcb0d596c03456adb00f",
+     "copied_sha256": "b8be7a8502bdb82d16f3451851eb150e5c66e6537f57af62128ad115b2e012ff",
+     "span": [
+      0,
+      272
+     ]
+    },
+    {
+     "field": "ar_tahqiq_footnote",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1097",
+     "source_field": "ar",
+     "sha256": "ae9d59da9300bbc21af98262534f2f6a08d9c4b5a738fcb0d596c03456adb00f",
+     "copied_sha256": "707583c728eb6240b3b528167456fa2bd5a76b13d5afb0f1ecfa857f1cfc2ebc",
+     "span": [
+      277,
+      684
+     ]
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1097",
+     "source_field": "en",
+     "sha256": "887af86641b08f6200157d5a925fbfc4be32f84c941a5d1d3a8259c65273ce17",
+     "copied_sha256": "887af86641b08f6200157d5a925fbfc4be32f84c941a5d1d3a8259c65273ce17"
+    }
+   ]
+  },
+  "H-BULUGH-1098": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1098",
+     "source_field": "ar",
+     "sha256": "451ce924725fd7c945703061b9b5076869f7fbf647593e49ef62d34a12bc4150",
+     "copied_sha256": "451ce924725fd7c945703061b9b5076869f7fbf647593e49ef62d34a12bc4150"
+    },
+    {
+     "field": "ar_matn_and_ibn_hajar_attribution",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1098",
+     "source_field": "ar",
+     "sha256": "451ce924725fd7c945703061b9b5076869f7fbf647593e49ef62d34a12bc4150",
+     "copied_sha256": "852445b6a841dce44d24927b9ce58d7c8ad182c30fd83000ef620809f483b76d",
+     "span": [
+      0,
+      222
+     ]
+    },
+    {
+     "field": "ar_tahqiq_footnote",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1098",
+     "source_field": "ar",
+     "sha256": "451ce924725fd7c945703061b9b5076869f7fbf647593e49ef62d34a12bc4150",
+     "copied_sha256": "5e63ededca7346425e81c0c1f6a91ccc90dce2aa63c666153c7a89f244f610e7",
+     "span": [
+      230,
+      637
+     ]
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1098",
+     "source_field": "en",
+     "sha256": "78ae5687a296648dbba206c6e17717660fc00f1d32dfa200191f65d876b80334",
+     "copied_sha256": "78ae5687a296648dbba206c6e17717660fc00f1d32dfa200191f65d876b80334"
+    }
+   ]
+  },
+  "H-BULUGH-1101": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1101",
+     "source_field": "ar",
+     "sha256": "3b568936dfb9e49924238530f9374efcd5454ef2eb55658518f9ad9b8f6c9a1b",
+     "copied_sha256": "3b568936dfb9e49924238530f9374efcd5454ef2eb55658518f9ad9b8f6c9a1b"
+    },
+    {
+     "field": "ar_matn_and_ibn_hajar_attribution",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1101",
+     "source_field": "ar",
+     "sha256": "3b568936dfb9e49924238530f9374efcd5454ef2eb55658518f9ad9b8f6c9a1b",
+     "copied_sha256": "223b0ff6e9a409d89252399449ea1ce92893451c141d22f1fe2ec46355b6b0d7",
+     "span": [
+      0,
+      385
+     ]
+    },
+    {
+     "field": "ar_tahqiq_footnote",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1101",
+     "source_field": "ar",
+     "sha256": "3b568936dfb9e49924238530f9374efcd5454ef2eb55658518f9ad9b8f6c9a1b",
+     "copied_sha256": "f3952dec6cad9a43f6205f7b4cf4fc877c49bb3f56168ab670b31de674a77239",
+     "span": [
+      390,
+      715
+     ]
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1101",
+     "source_field": "en",
+     "sha256": "bafe42c8bc0332a2e68995d192fc4eaa716428dba1bc29939049c0d29c3c62de",
+     "copied_sha256": "bafe42c8bc0332a2e68995d192fc4eaa716428dba1bc29939049c0d29c3c62de"
+    }
+   ]
+  },
+  "H-BULUGH-1103": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1103",
+     "source_field": "ar",
+     "sha256": "ad4716889e34063754c91d103bfadd21f0dd7966c4b9f6387aa2c41bdb3a04c6",
+     "copied_sha256": "ad4716889e34063754c91d103bfadd21f0dd7966c4b9f6387aa2c41bdb3a04c6"
+    },
+    {
+     "field": "ar_matn_and_ibn_hajar_attribution",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1103",
+     "source_field": "ar",
+     "sha256": "ad4716889e34063754c91d103bfadd21f0dd7966c4b9f6387aa2c41bdb3a04c6",
+     "copied_sha256": "2cc163df91eacd61372f95c807acda4db8ef971132dbc6dcccf6fa6a9268dd6d",
+     "span": [
+      0,
+      275
+     ]
+    },
+    {
+     "field": "ar_tahqiq_footnote",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1103",
+     "source_field": "ar",
+     "sha256": "ad4716889e34063754c91d103bfadd21f0dd7966c4b9f6387aa2c41bdb3a04c6",
+     "copied_sha256": "2725451c8032b9477f456d4e4a9d8717f2992e32fd6055ca8294708476367cbd",
+     "span": [
+      283,
+      543
+     ]
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1103",
+     "source_field": "en",
+     "sha256": "9d65972783185ad14ed8775704970996f961e80855f5e24f6ed2cfe480ee0f60",
+     "copied_sha256": "9d65972783185ad14ed8775704970996f961e80855f5e24f6ed2cfe480ee0f60"
+    }
+   ]
+  },
+  "H-BULUGH-1104": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1104",
+     "source_field": "ar",
+     "sha256": "c87c816eb0ba9c31ba88587a5615d7419c94c38be57b9e97e1915fc9106f7421",
+     "copied_sha256": "c87c816eb0ba9c31ba88587a5615d7419c94c38be57b9e97e1915fc9106f7421"
+    },
+    {
+     "field": "ar_matn_and_ibn_hajar_attribution",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1104",
+     "source_field": "ar",
+     "sha256": "c87c816eb0ba9c31ba88587a5615d7419c94c38be57b9e97e1915fc9106f7421",
+     "copied_sha256": "c8cae1177a8fa2186712df472817270d0a52b6571d05016da49e4f06a0644b42",
+     "span": [
+      0,
+      306
+     ]
+    },
+    {
+     "field": "ar_tahqiq_footnote",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1104",
+     "source_field": "ar",
+     "sha256": "c87c816eb0ba9c31ba88587a5615d7419c94c38be57b9e97e1915fc9106f7421",
+     "copied_sha256": "073f1337b4dade3bb4530106cc7219a6f401f2f345e3cb6e9b92a8789a15706c",
+     "span": [
+      314,
+      674
+     ]
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1104",
+     "source_field": "en",
+     "sha256": "8d5cdab0129b227daca4c6d583efdc0437e9606aa433ab0da700fac478ab80e5",
+     "copied_sha256": "8d5cdab0129b227daca4c6d583efdc0437e9606aa433ab0da700fac478ab80e5"
+    }
+   ]
+  },
+  "H-BULUGH-1105": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1105",
+     "source_field": "ar",
+     "sha256": "cb25166ff9142d603e8f5071e58da2ecee440f821684ed455723550e16d6a22c",
+     "copied_sha256": "cb25166ff9142d603e8f5071e58da2ecee440f821684ed455723550e16d6a22c"
+    },
+    {
+     "field": "ar_matn_and_ibn_hajar_attribution",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1105",
+     "source_field": "ar",
+     "sha256": "cb25166ff9142d603e8f5071e58da2ecee440f821684ed455723550e16d6a22c",
+     "copied_sha256": "a355d459edc77a9a527025eca1098a219ec3a15ca6afa1a1141ad458a9691581",
+     "span": [
+      0,
+      388
+     ]
+    },
+    {
+     "field": "ar_tahqiq_footnote",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1105",
+     "source_field": "ar",
+     "sha256": "cb25166ff9142d603e8f5071e58da2ecee440f821684ed455723550e16d6a22c",
+     "copied_sha256": "5100ea9fee711212790705ba45492b7634a11bbb81c3d73f798d22cdbb434f74",
+     "span": [
+      396,
+      661
+     ]
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1105",
+     "source_field": "en",
+     "sha256": "5f73e46f6cda990c1edc47eeb9605aaa81cd4d7fbe7d35ddb4b683c0e54d2832",
+     "copied_sha256": "5f73e46f6cda990c1edc47eeb9605aaa81cd4d7fbe7d35ddb4b683c0e54d2832"
+    }
+   ]
+  },
+  "H-BULUGH-1106": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1106",
+     "source_field": "ar",
+     "sha256": "4e76007c78e41ff58e3d96e5d7f566c1759aba87a1fa92c22b48fe4076fc87ca",
+     "copied_sha256": "4e76007c78e41ff58e3d96e5d7f566c1759aba87a1fa92c22b48fe4076fc87ca"
+    },
+    {
+     "field": "ar_matn_and_ibn_hajar_attribution",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1106",
+     "source_field": "ar",
+     "sha256": "4e76007c78e41ff58e3d96e5d7f566c1759aba87a1fa92c22b48fe4076fc87ca",
+     "copied_sha256": "bf757dc5532aabfdd16b76fe1efa6102f96c6f3210a1c6e6c12888251997d4e4",
+     "span": [
+      0,
+      179
+     ]
+    },
+    {
+     "field": "ar_tahqiq_footnote",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1106",
+     "source_field": "ar",
+     "sha256": "4e76007c78e41ff58e3d96e5d7f566c1759aba87a1fa92c22b48fe4076fc87ca",
+     "copied_sha256": "168ff6c124487bc40c061a19fdc399e84e5f45152950dfeb760f9cc2c2cbfef6",
+     "span": [
+      187,
+      627
+     ]
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1106",
+     "source_field": "en",
+     "sha256": "360fb05acd17e44b736ea1d9ef5a4bbd75ebbedba9dead515b616bd33bd04b00",
+     "copied_sha256": "360fb05acd17e44b736ea1d9ef5a4bbd75ebbedba9dead515b616bd33bd04b00"
+    }
+   ]
+  },
+  "H-BULUGH-1107": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1107",
+     "source_field": "ar",
+     "sha256": "ea011e9be0d24fb64808b61eb360a2acd3fe48ee40cbdecf35447a6926aea24e",
+     "copied_sha256": "ea011e9be0d24fb64808b61eb360a2acd3fe48ee40cbdecf35447a6926aea24e"
+    },
+    {
+     "field": "ar_matn_and_ibn_hajar_attribution",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1107",
+     "source_field": "ar",
+     "sha256": "ea011e9be0d24fb64808b61eb360a2acd3fe48ee40cbdecf35447a6926aea24e",
+     "copied_sha256": "cb822f22a7d83068cc15fb2f03d1be3056ee4101405fd1bff870fcda33b986f3",
+     "span": [
+      0,
+      309
+     ]
+    },
+    {
+     "field": "ar_tahqiq_footnote",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1107",
+     "source_field": "ar",
+     "sha256": "ea011e9be0d24fb64808b61eb360a2acd3fe48ee40cbdecf35447a6926aea24e",
+     "copied_sha256": "4b9bdf71e60244f96e8cd761a11dd051e84a901cdc835da2597b8af039ac5add",
+     "span": [
+      317,
+      379
+     ]
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1107",
+     "source_field": "en",
+     "sha256": "467f6d0a5c051e30e0d7909807e24acbee6ebb9d9cd27548bf8b721dc74d596e",
+     "copied_sha256": "467f6d0a5c051e30e0d7909807e24acbee6ebb9d9cd27548bf8b721dc74d596e"
+    }
+   ]
+  },
+  "H-BULUGH-1108": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1108",
+     "source_field": "ar",
+     "sha256": "ecedc11c9d0717ad546acf9841282295df6f2753ac45c5388a55b58c0167a131",
+     "copied_sha256": "ecedc11c9d0717ad546acf9841282295df6f2753ac45c5388a55b58c0167a131"
+    },
+    {
+     "field": "ar_matn_and_ibn_hajar_attribution",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1108",
+     "source_field": "ar",
+     "sha256": "ecedc11c9d0717ad546acf9841282295df6f2753ac45c5388a55b58c0167a131",
+     "copied_sha256": "79578b30d4876dbe9a5a40ebc06861b88761481266a871f5753d33108f67c618",
+     "span": [
+      0,
+      316
+     ]
+    },
+    {
+     "field": "ar_tahqiq_footnote",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1108",
+     "source_field": "ar",
+     "sha256": "ecedc11c9d0717ad546acf9841282295df6f2753ac45c5388a55b58c0167a131",
+     "copied_sha256": "57fbc6be6dec4d1dde87bd34849ae95d2c2c4b9d6f1769c4db59089ac9428e7c",
+     "span": [
+      324,
+      1421
+     ]
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1108",
+     "source_field": "en",
+     "sha256": "7524127f9cfda5fe15440e1a23df4ed0cfc534f7d85bbe693f53db31cb819dda",
+     "copied_sha256": "7524127f9cfda5fe15440e1a23df4ed0cfc534f7d85bbe693f53db31cb819dda"
+    }
+   ]
+  },
+  "H-BULUGH-1109": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1109",
+     "source_field": "ar",
+     "sha256": "d8f9d3d7229b59b2605d38a2114da2fba0bb2d1fb0f60a8270bc7f33fdec573f",
+     "copied_sha256": "d8f9d3d7229b59b2605d38a2114da2fba0bb2d1fb0f60a8270bc7f33fdec573f"
+    },
+    {
+     "field": "ar_matn_and_ibn_hajar_attribution",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1109",
+     "source_field": "ar",
+     "sha256": "d8f9d3d7229b59b2605d38a2114da2fba0bb2d1fb0f60a8270bc7f33fdec573f",
+     "copied_sha256": "48a1032d313853280725ea3ac3dde2f7911355215a9c9fe68daf74439a090d2d",
+     "span": [
+      0,
+      357
+     ]
+    },
+    {
+     "field": "ar_tahqiq_footnote",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1109",
+     "source_field": "ar",
+     "sha256": "d8f9d3d7229b59b2605d38a2114da2fba0bb2d1fb0f60a8270bc7f33fdec573f",
+     "copied_sha256": "a82a2d34ccac16d4f971654f06d88d5fb6c103c7a5cbef7539bdd85480e6de50",
+     "span": [
+      365,
+      560
+     ]
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1109",
+     "source_field": "en",
+     "sha256": "8141d905bdf1de2554ad74a9cf641a2568383af7253dec5729bfd7167d428bd0",
+     "copied_sha256": "8141d905bdf1de2554ad74a9cf641a2568383af7253dec5729bfd7167d428bd0"
+    }
+   ]
+  },
+  "H-BULUGH-1110": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1110",
+     "source_field": "ar",
+     "sha256": "15eae4058e84833c0a35607da7dbfbcc7bdc3eefe88b9b1340ba6ac72c6ee9a7",
+     "copied_sha256": "15eae4058e84833c0a35607da7dbfbcc7bdc3eefe88b9b1340ba6ac72c6ee9a7"
+    },
+    {
+     "field": "ar_matn_and_ibn_hajar_attribution",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1110",
+     "source_field": "ar",
+     "sha256": "15eae4058e84833c0a35607da7dbfbcc7bdc3eefe88b9b1340ba6ac72c6ee9a7",
+     "copied_sha256": "80cd060c01d86a5758c8f8c5db12f2a1e3d17dc55c0486b17b73c618eefeacbd",
+     "span": [
+      0,
+      278
+     ]
+    },
+    {
+     "field": "ar_tahqiq_footnote",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1110",
+     "source_field": "ar",
+     "sha256": "15eae4058e84833c0a35607da7dbfbcc7bdc3eefe88b9b1340ba6ac72c6ee9a7",
+     "copied_sha256": "74b8f241320f37db42b089b1049307d7824801b241729126dcd219b9f36e29a1",
+     "span": [
+      286,
+      322
+     ]
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1110",
+     "source_field": "en",
+     "sha256": "5e7e6242f97aaecaac8cad50f1500c2b88785e9b595121767e2d01b1de190056",
+     "copied_sha256": "5e7e6242f97aaecaac8cad50f1500c2b88785e9b595121767e2d01b1de190056"
+    }
+   ]
+  },
+  "H-BULUGH-1111": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1111",
+     "source_field": "ar",
+     "sha256": "e4f94695c73766a5be1959c1ea9ba3857fb5763651f915ee66b501d092b3ff33",
+     "copied_sha256": "e4f94695c73766a5be1959c1ea9ba3857fb5763651f915ee66b501d092b3ff33"
+    },
+    {
+     "field": "ar_matn_and_ibn_hajar_attribution",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1111",
+     "source_field": "ar",
+     "sha256": "e4f94695c73766a5be1959c1ea9ba3857fb5763651f915ee66b501d092b3ff33",
+     "copied_sha256": "4ac6061c9b32a280952ce92f82b1a4e361c28758afbfa157d96ef0b12bd62117",
+     "span": [
+      0,
+      260
+     ]
+    },
+    {
+     "field": "ar_tahqiq_footnote",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1111",
+     "source_field": "ar",
+     "sha256": "e4f94695c73766a5be1959c1ea9ba3857fb5763651f915ee66b501d092b3ff33",
+     "copied_sha256": "5d9d9dbfc5afc43d62dab4090d14ce5eb25418536c71a8246808eabf04218182",
+     "span": [
+      268,
+      323
+     ]
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1111",
+     "source_field": "en",
+     "sha256": "41c63e3ee94d7a5be538002be4d8c65de810bb9006928a69924b56604d4d4ad3",
+     "copied_sha256": "41c63e3ee94d7a5be538002be4d8c65de810bb9006928a69924b56604d4d4ad3"
+    }
+   ]
+  },
+  "H-BULUGH-1112": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1112",
+     "source_field": "ar",
+     "sha256": "7b4a0c40e666c7fa71029fae6b118f0f145518f4a7a660b5f878cab473508597",
+     "copied_sha256": "7b4a0c40e666c7fa71029fae6b118f0f145518f4a7a660b5f878cab473508597"
+    },
+    {
+     "field": "ar_matn_and_ibn_hajar_attribution",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1112",
+     "source_field": "ar",
+     "sha256": "7b4a0c40e666c7fa71029fae6b118f0f145518f4a7a660b5f878cab473508597",
+     "copied_sha256": "26f3b6ca9e25568bbec20aaa0d880c27acf564f782165eb1fe5eee27359b4d54",
+     "span": [
+      0,
+      474
+     ]
+    },
+    {
+     "field": "ar_tahqiq_footnote",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1112",
+     "source_field": "ar",
+     "sha256": "7b4a0c40e666c7fa71029fae6b118f0f145518f4a7a660b5f878cab473508597",
+     "copied_sha256": "5ac9c9294ef3a9096220523ba760cc71b6d8ee71eb667608cd06540d0e80d374",
+     "span": [
+      482,
+      1052
+     ]
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1112",
+     "source_field": "en",
+     "sha256": "fad84e56f18d68b8105355ed92695ec751c5b6e5b8503ec3b3a678e010160cb2",
+     "copied_sha256": "fad84e56f18d68b8105355ed92695ec751c5b6e5b8503ec3b3a678e010160cb2"
+    }
+   ]
+  },
+  "H-BULUGH-1114": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1114",
+     "source_field": "ar",
+     "sha256": "90b0e3cd9707a68ac611f54a9e67bf1c224eadfca7c1d1734d599901573dcb35",
+     "copied_sha256": "90b0e3cd9707a68ac611f54a9e67bf1c224eadfca7c1d1734d599901573dcb35"
+    },
+    {
+     "field": "ar_matn_and_ibn_hajar_attribution",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1114",
+     "source_field": "ar",
+     "sha256": "90b0e3cd9707a68ac611f54a9e67bf1c224eadfca7c1d1734d599901573dcb35",
+     "copied_sha256": "9b861e093308f85787d4fad4353c878fd9e4e26136a5cae17ab8741326456cea",
+     "span": [
+      0,
+      356
+     ]
+    },
+    {
+     "field": "ar_tahqiq_footnote",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1114",
+     "source_field": "ar",
+     "sha256": "90b0e3cd9707a68ac611f54a9e67bf1c224eadfca7c1d1734d599901573dcb35",
+     "copied_sha256": "d97c5c7dad8a81aea86b64d714bcfbc584a232f4e5878fbd4b9095d942e2a0f3",
+     "span": [
+      364,
+      1501
+     ]
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1114",
+     "source_field": "en",
+     "sha256": "6b95e468bfb45264db4c1e044bf0b014d6ab92865d91b01c11295d0c2f3d4e35",
+     "copied_sha256": "6b95e468bfb45264db4c1e044bf0b014d6ab92865d91b01c11295d0c2f3d4e35"
+    }
+   ]
+  },
+  "H-BULUGH-1115": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1115",
+     "source_field": "ar",
+     "sha256": "29fe28c36158908ee4d38b33e6609fb39e948b86e7c4b34abb55e0ce30774e41",
+     "copied_sha256": "29fe28c36158908ee4d38b33e6609fb39e948b86e7c4b34abb55e0ce30774e41"
+    },
+    {
+     "field": "ar_matn_and_ibn_hajar_attribution",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1115",
+     "source_field": "ar",
+     "sha256": "29fe28c36158908ee4d38b33e6609fb39e948b86e7c4b34abb55e0ce30774e41",
+     "copied_sha256": "fa349018f9adb762334cd796ce9e53fcabe6c7e278da3493d1d0e4878d9d9bee",
+     "span": [
+      0,
+      171
+     ]
+    },
+    {
+     "field": "ar_tahqiq_footnote",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1115",
+     "source_field": "ar",
+     "sha256": "29fe28c36158908ee4d38b33e6609fb39e948b86e7c4b34abb55e0ce30774e41",
+     "copied_sha256": "74d9c41142a90fec5255ff58b87128b5520c642138614082b2e4c53f46d6ec8a",
+     "span": [
+      179,
+      802
+     ]
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1115",
+     "source_field": "en",
+     "sha256": "d9ced7c73977545b816df066e0d6b6a4e523c29cd27e1e95115418a7ce7a9688",
+     "copied_sha256": "d9ced7c73977545b816df066e0d6b6a4e523c29cd27e1e95115418a7ce7a9688"
+    }
+   ]
+  },
+  "H-BULUGH-1116": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1116",
+     "source_field": "ar",
+     "sha256": "242121a1b79d93ee9cc17195c83ad65c5861bec2df2627dc1f55e600d316d5fa",
+     "copied_sha256": "242121a1b79d93ee9cc17195c83ad65c5861bec2df2627dc1f55e600d316d5fa"
+    },
+    {
+     "field": "ar_matn_and_ibn_hajar_attribution",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1116",
+     "source_field": "ar",
+     "sha256": "242121a1b79d93ee9cc17195c83ad65c5861bec2df2627dc1f55e600d316d5fa",
+     "copied_sha256": "45ba071ddcf82511b99730816aedfdb9a6803c92cd84ba3ac2508d67a63551ba",
+     "span": [
+      0,
+      241
+     ]
+    },
+    {
+     "field": "ar_tahqiq_footnote",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1116",
+     "source_field": "ar",
+     "sha256": "242121a1b79d93ee9cc17195c83ad65c5861bec2df2627dc1f55e600d316d5fa",
+     "copied_sha256": "089dd48a24ff290cf829c3e7bae9d673bb702d97622d34fa2ab0366b33de0e85",
+     "span": [
+      249,
+      374
+     ]
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=1116",
+     "source_field": "en",
+     "sha256": "fcaa26296577fafb784c1bbad632f95163334f8f423ea383b69b5a792c81a2ab",
+     "copied_sha256": "fcaa26296577fafb784c1bbad632f95163334f8f423ea383b69b5a792c81a2ab"
+    }
+   ]
+  },
+  "F-FQARIB-116-heirs": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fath-al-qarib.json",
+     "locator": "section_id=116",
+     "source_field": "ar",
+     "sha256": "9fc90e1306031f40ddd762367490c7363025d8536b0f638b35746b5496b8f377",
+     "copied_sha256": "1d1bb0a1da9344440bf823c469ca2e6df111c98454aa99d4b0f1ce5c1ad76020",
+     "span": [
+      306,
+      1055
+     ],
+     "omit": [
+      [
+       710,
+       785
+      ]
+     ]
+    }
+   ]
+  },
+  "F-FQARIB-116-barriers": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fath-al-qarib.json",
+     "locator": "section_id=116",
+     "source_field": "ar",
+     "sha256": "9fc90e1306031f40ddd762367490c7363025d8536b0f638b35746b5496b8f377",
+     "copied_sha256": "59746d85d7bef5f060cbb6ee853e3a2b5943bdb40dff61948330bb0d5a329a28",
+     "span": [
+      1180,
+      1742
+     ],
+     "omit": [
+      [
+       1502,
+       1577
+      ]
+     ]
+    }
+   ]
+  },
+  "F-FQARIB-116-asabah": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fath-al-qarib.json",
+     "locator": "section_id=116",
+     "source_field": "ar",
+     "sha256": "9fc90e1306031f40ddd762367490c7363025d8536b0f638b35746b5496b8f377",
+     "copied_sha256": "8924a4db624a683ede5f19fe30a8015dd618de37833f8df34f01a878a916c7f4",
+     "span": [
+      1745,
+      2355
+     ]
+    }
+   ]
+  },
+  "F-FQARIB-117-furudh": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fath-al-qarib.json",
+     "locator": "section_id=117",
+     "source_field": "ar",
+     "sha256": "ee3980b6a0a23f10cd1466f64603da87403fe12f0bce1a1f8e196b0bb4642a67",
+     "copied_sha256": "d0be25ca4ef8efa81907ae8a66ab765060b53527db22282073fd6a62cf2f33d3",
+     "span": [
+      206,
+      2491
+     ],
+     "omit": [
+      [
+       671,
+       746
+      ],
+      [
+       1334,
+       1409
+      ],
+      [
+       2153,
+       2228
+      ]
+     ]
+    }
+   ]
+  },
+  "F-FQARIB-117-hajb": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fath-al-qarib.json",
+     "locator": "section_id=117",
+     "source_field": "ar",
+     "sha256": "ee3980b6a0a23f10cd1466f64603da87403fe12f0bce1a1f8e196b0bb4642a67",
+     "copied_sha256": "f81275519e328fea4fa5c783830a05cfa8d78899cb2ceb85b04ccf5d17d23d2b",
+     "span": [
+      2494,
+      2867
+     ]
+    }
+   ]
+  },
+  "F-FQARIB-118-asabah-bil-ghayr": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fath-al-qarib.json",
+     "locator": "section_id=118",
+     "source_field": "ar",
+     "sha256": "0edbd237613bc7c5198731b45c87c9374ad9fb1031ac10f0fc8a95a4005efce8",
+     "copied_sha256": "9a4ddefd5219f8773066503f0f78eb27b11874df3dec8a49f9555c75ef4939bc",
+     "span": [
+      77,
+      404
+     ]
+    }
+   ]
+  },
+  "F-FQARIB-118-wasiyya": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fath-al-qarib.json",
+     "locator": "section_id=118",
+     "source_field": "ar",
+     "sha256": "0edbd237613bc7c5198731b45c87c9374ad9fb1031ac10f0fc8a95a4005efce8",
+     "copied_sha256": "1286f11277a271ae9dc0b8d8a0e706833543d74367a0570e3deeebf6cf31d0ac",
+     "span": [
+      726,
+      995
+     ]
+    }
+   ]
+  },
+  "F-FMUIN-34-radd-dzawil-arham": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fath-al-muin.json",
+     "locator": "section_id=34",
+     "source_field": "ar",
+     "sha256": "58e41c30245baf4b3b5d395f9d9c4a16f45240047012ae0e071437deb0c4287d",
+     "copied_sha256": "de8ce819d0db7b60fc2ea308b9bf3b265c9c83e88cc0ea7f31380a0b0fdd8143",
+     "span": [
+      462,
+      753
+     ]
+    }
+   ]
+  },
+  "F-FMUIN-34-umariyyatain": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fath-al-muin.json",
+     "locator": "section_id=34",
+     "source_field": "ar",
+     "sha256": "58e41c30245baf4b3b5d395f9d9c4a16f45240047012ae0e071437deb0c4287d",
+     "copied_sha256": "584e24e05e0714262cdae8f6a80a8fa89d17c2fc854591fd66a85fc20b1bf2b8",
+     "span": [
+      2611,
+      3019
+     ]
+    }
+   ]
+  },
+  "F-FMUIN-34-hajb": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fath-al-muin.json",
+     "locator": "section_id=34",
+     "source_field": "ar",
+     "sha256": "58e41c30245baf4b3b5d395f9d9c4a16f45240047012ae0e071437deb0c4287d",
+     "copied_sha256": "c773ab3cc0cffb20a27184043d09b29f5babad29a6cbdc479f23078251b28465",
+     "span": [
+      3021,
+      3269
+     ]
+    }
+   ]
+  },
+  "F-FMUIN-34-jadd-like-ab": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fath-al-muin.json",
+     "locator": "section_id=34",
+     "source_field": "ar",
+     "sha256": "58e41c30245baf4b3b5d395f9d9c4a16f45240047012ae0e071437deb0c4287d",
+     "copied_sha256": "347a005c33fe9b86b39c7bd846f3b717888233aa6217d075eed17e507955b396",
+     "span": [
+      4020,
+      4296
+     ]
+    }
+   ]
+  },
+  "F-FMUIN-34-asabah-order": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fath-al-muin.json",
+     "locator": "section_id=34",
+     "source_field": "ar",
+     "sha256": "58e41c30245baf4b3b5d395f9d9c4a16f45240047012ae0e071437deb0c4287d",
+     "copied_sha256": "2818a6b8c463a9409220769ceb23d17980a6b78962f8302f436aca20757ef337",
+     "span": [
+      4607,
+      5073
+     ]
+    }
+   ]
+  },
+  "F-FMUIN-35-awl": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fath-al-muin.json",
+     "locator": "section_id=35",
+     "source_field": "ar",
+     "sha256": "eee5b56a5495b9af7eaa2a670e009fe5a485181196476c4981f38efa4e2f8da1",
+     "copied_sha256": "bac2edf99ab0c23642ad50d6c252b2785c18f3484762b0588524e908daa69c27",
+     "span": [
+      1911,
+      2689
+     ],
+     "omit": [
+      [
+       2321,
+       2393
+      ]
+     ]
+    }
+   ]
+  },
+  "F-FMUIN-35-usul": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fath-al-muin.json",
+     "locator": "section_id=35",
+     "source_field": "ar",
+     "sha256": "eee5b56a5495b9af7eaa2a670e009fe5a485181196476c4981f38efa4e2f8da1",
+     "copied_sha256": "b3f30f15ad501c77fdb63eda82e875b85a3b99ad80a7021875509b0e19095965",
+     "span": [
+      134,
+      569
+     ],
+     "omit": [
+      [
+       193,
+       231
+      ]
+     ]
+    }
+   ]
+  },
+  "F-FMUIN-33-heir-consent": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fath-al-muin.json",
+     "locator": "section_id=33",
+     "source_field": "ar",
+     "sha256": "39f05413af893740cf2a1728f2dc41f963f6436fdf570115b660f58efc0c9fd5",
+     "copied_sha256": "7a6bfce67ff62c0dc3cc8f1bf869a12010bce16e5e8c0ed3aa12b2817dbb292f",
+     "span": [
+      2181,
+      2312
+     ]
+    }
+   ]
+  },
+  "F-FMUIN-33-above-third": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fath-al-muin.json",
+     "locator": "section_id=33",
+     "source_field": "ar",
+     "sha256": "39f05413af893740cf2a1728f2dc41f963f6436fdf570115b660f58efc0c9fd5",
+     "copied_sha256": "3f616d3ed74d5dc0d99782552b969d896d47959c7bdb213012945084cf3d265c",
+     "span": [
+      505,
+      561
+     ]
+    }
+   ]
+  },
+  "F-FMUIN-11-tajhiz": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fath-al-muin.json",
+     "locator": "section_id=11",
+     "source_field": "ar",
+     "sha256": "8d933953191e7a0ac711a02d35447fddbf49fe6bedaa0797d93b84ed34e596d6",
+     "copied_sha256": "aa2380f653758bb024afb2a486c04effa1b0d3d9a0eb4f375ec8d3313a98570d",
+     "span": [
+      2041,
+      2191
+     ]
+    }
+   ]
+  },
+  "F-ALUMM-572": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/al-umm.json",
+     "locator": "section_id=572",
+     "source_field": "ar",
+     "sha256": "928191087fac0348c900c6b86c087467c934a2951f3b3feb9a10cd90a9d18152",
+     "copied_sha256": "c1e0084040932551686ebd291e65f4d223e6160f78c9ee4e44156113a7cb4877",
+     "span": [
+      57,
+      950
+     ]
+    }
+   ]
+  },
+  "F-ALUMM-550-killer": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/al-umm.json",
+     "locator": "section_id=550",
+     "source_field": "ar",
+     "sha256": "fbec55a84e31a1360fb913a9af6b46448c08de11a8704eb3b4129a0ffff696db",
+     "copied_sha256": "ef0f4cb7b7fc32c8cc897dec054a23e8a43e5698b77c25ab2773b3bab7e024ac",
+     "span": [
+      1220,
+      1862
+     ]
+    }
+   ]
+  },
+  "F-ALUMM-903-umar": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/al-umm.json",
+     "locator": "section_id=903",
+     "source_field": "ar",
+     "sha256": "a8bace9c39a113f03db66fbf065ad254cc78ca2933f7f6815d075e005fe074ea",
+     "copied_sha256": "0f30e4a638f323d507352cadf1f423316dbb2fc9fe2641b7abf92c414ed3ad4e",
+     "span": [
+      635,
+      802
+     ]
+    }
+   ]
+  },
+  "F-FSUNNAH-840-sad-rabi": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=840",
+     "source_field": "ar",
+     "sha256": "0122e704b026a2e19210cdac5992f9ad6ce0618316f95983e23850e953694fe2",
+     "copied_sha256": "2f6ce23feac7701e5671de96ee4675ea4072d5a724ba7acf5f89c6a0cff96ac8",
+     "span": [
+      129,
+      566
+     ]
+    }
+   ]
+  },
+  "F-FSUNNAH-844-mawani": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=844",
+     "source_field": "ar",
+     "sha256": "3409092fd94f8dab1bf78e9d761ecb779c30d227853cc1bcc9d8ae24269a1775",
+     "copied_sha256": "982fe2f52d74fc75a9f72bd65ad4f661d78833dce099fe0d0da20f155b947f3a",
+     "span": [
+      39,
+      808
+     ]
+    }
+   ]
+  },
+  "F-FSUNNAH-852-awl-umar": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=852",
+     "source_field": "ar",
+     "sha256": "c739de713be6230072fa8e7ff535eb5ea140dc46ac435c09415085f006db967a",
+     "copied_sha256": "17cbd686c3ff465bb8fff872f7d4ac1912857f3392e90f1bfb1a6c19c251a80e",
+     "span": [
+      228,
+      463
+     ]
+    }
+   ]
+  },
+  "F-FSUNNAH-854-radd-no-nass": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=854",
+     "source_field": "ar",
+     "sha256": "9e3fbd257c82d022576dfe4894628898b0ed55dd58ca953a785f370139842023",
+     "copied_sha256": "d0e60e2a7e60b048406aab3f0bb5e557b3b475a2b2aa5a32cf961d9df92c9e52",
+     "span": [
+      344,
+      456
+     ],
+     "source_truncated": true
+    }
+   ]
+  },
+  "F-FSUNNAH-856-dzawil-arham": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=856",
+     "source_field": "ar",
+     "sha256": "258f7fe6558dc143445a245ed4b39314846139229a101e544ea158d34d73a9b0",
+     "copied_sha256": "25ce8c3db5a0543887f88489abfb2ca7302d70ea8a628811b5568636fff66b3e",
+     "span": [
+      18,
+      361
+     ]
+    }
+   ]
+  },
+  "F-FSUNNAH-859-pregnancy": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=859",
+     "source_field": "ar",
+     "sha256": "d77598c9775bdd364c8a12f3a928a8408e760866a6288160993ca63f79958e16",
+     "copied_sha256": "b6f39c2454424e25119c53574c1404ec657484a7705730ddc2d612afa47cd6b8",
+     "span": [
+      79,
+      372
+     ]
+    }
+   ]
+  },
+  "T-IK-2-180-naskh": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=2,ayah=180",
+     "source_field": "ar",
+     "sha256": "0efd6c5712d5e54a680a89119fff7162eead4100b0b3da6dfd606440aba28df4",
+     "copied_sha256": "417ff056340992c0b73d2eeb763986218cab8279eacad1a71eaa81fd363dc175",
+     "span": [
+      0,
+      2432
+     ]
+    }
+   ]
+  },
+  "T-IK-2-240-naskh": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=2,ayah=240",
+     "source_field": "ar",
+     "sha256": "1cc4ffd63136ef549c90081964ec6e6727bbbe124f207bee29dcf5a5efb055c0",
+     "copied_sha256": "3d5a79cac6eab3d5d546be36e4998741ba1cc1f13706d27f6a0db536e3a92f4f",
+     "span": [
+      0,
+      881
+     ]
+    }
+   ]
+  },
+  "T-IK-4-7-muhkam": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=4,ayah=7",
+     "source_field": "ar",
+     "sha256": "a522fcbcea36262bd0c9ec2d328b8dd76685a9b69e64a8add4e37bf88c78c2bd",
+     "copied_sha256": "fad530ee77ccb7146a53ef48b5f364b3232d49428ddafe3ae8d8982c731a4b3c",
+     "span": [
+      640,
+      1134
+     ]
+    }
+   ]
+  },
+  "T-IK-4-8-naskh": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=4,ayah=8",
+     "source_field": "ar",
+     "sha256": "29e87fa5ad6065ad2099397de16e3a1f73e35b84ee0543b747f3bd0d3135e5ab",
+     "copied_sha256": "bdb4a99c528404e085f2d50a7a13941809c237621eecfc93552ca323267cac80",
+     "span": [
+      2,
+      1351
+     ]
+    }
+   ]
+  },
+  "T-IK-4-11-dayn": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=4,ayah=11",
+     "source_field": "ar",
+     "sha256": "b3b73737108af5f15f3e34738ac36168f87de20570393ae15b8a3925ace30be7",
+     "copied_sha256": "b59a94e123ce25262fd177fb67d5403bc148046f492ab2e98a52c915b44892f3",
+     "span": [
+      7921,
+      8455
+     ]
+    }
+   ]
+  },
+  "T-IK-4-12-kalala": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=4,ayah=12",
+     "source_field": "ar",
+     "sha256": "9ffa051fb8b1871b2209c2c31dab180be086d223187b8a43bdd47499f708916d",
+     "copied_sha256": "43e2d09ec13bf122d489d21fc569c3272b736e0445ea2536c9fefff051f9c013",
+     "span": [
+      937,
+      1537
+     ]
+    }
+   ]
+  },
+  "T-IK-4-12-musytaraka": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=4,ayah=12",
+     "source_field": "ar",
+     "sha256": "9ffa051fb8b1871b2209c2c31dab180be086d223187b8a43bdd47499f708916d",
+     "copied_sha256": "3532ad89a6313401d561bbd11469cbeb186ba37edf9bc061cb66d79331edfb57",
+     "span": [
+      2214,
+      2643
+     ]
+    }
+   ]
+  },
+  "T-IK-4-12-no-harm": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=4,ayah=12",
+     "source_field": "ar",
+     "sha256": "9ffa051fb8b1871b2209c2c31dab180be086d223187b8a43bdd47499f708916d",
+     "copied_sha256": "ac5dcb33ad731d577b732dbafd671791d6c1b32d2f1b9ad2451dee10d2da5ea3",
+     "span": [
+      5052,
+      5186
+     ]
+    }
+   ]
+  },
+  "T-IK-4-176-father-blocks": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=4,ayah=176",
+     "source_field": "ar",
+     "sha256": "e402d7f4c4012a52ef24a4bb7721b6bee7f1575a93959f6dc73280414b38dc56",
+     "copied_sha256": "30bc25fc2a88c539cde2d9c71c1ae046e0dbfc4dd027d4bfbb7614fb32fcc13f",
+     "span": [
+      3388,
+      3647
+     ]
+    }
+   ]
+  },
+  "T-IK-4-176-two-daughters": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=4,ayah=176",
+     "source_field": "ar",
+     "sha256": "e402d7f4c4012a52ef24a4bb7721b6bee7f1575a93959f6dc73280414b38dc56",
+     "copied_sha256": "e39159a87af096c1221765ee6361dd0d43110a3c8d808bbf5518ad8ae1d67144",
+     "span": [
+      5292,
+      5469
+     ]
+    }
+   ]
+  },
+  "T-IK-4-176-zayd-husband-sister": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=4,ayah=176",
+     "source_field": "ar",
+     "sha256": "e402d7f4c4012a52ef24a4bb7721b6bee7f1575a93959f6dc73280414b38dc56",
+     "copied_sha256": "2618b7a14505f1bafcaa2a7ca76e1d89151f80e8a29cd98d97ac6c8ab33abb57",
+     "span": [
+      3739,
+      3899
+     ]
+    }
+   ]
+  },
+  "T-IK-4-33-hilf": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=4,ayah=33",
+     "source_field": "ar",
+     "sha256": "2436c0d85b7395e584bc1bbba7c9cbd20bde2d6652ae3fc19e3b1ac5c5cef1d3",
+     "copied_sha256": "d485f85881ed4d39bcacf01852664c124e210d9db3e533d43f849409e2342743",
+     "span": [
+      640,
+      747
+     ]
+    }
+   ]
+  },
+  "T-TB-2-180-view": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/tafsir-al-tabari.json",
+     "locator": "surah=2,ayah=180",
+     "source_field": "ar",
+     "sha256": "167e16ff2c1d3c36ec31db8a245992859b3ff66365f36419337b1d033b62eb90",
+     "copied_sha256": "652919101b562deb5523c78b55ec32a5d4516ff7ca743e427ee0e6d376f8a1b9",
+     "span": [
+      19317,
+      19702
+     ]
+    }
+   ]
+  },
+  "T-TB-2-240-naskh": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/tafsir-al-tabari.json",
+     "locator": "surah=2,ayah=240",
+     "source_field": "ar",
+     "sha256": "2b697435a542863d2560b02a024f52c32a7e4151c0f4c19f298f3b62c7073f83",
+     "copied_sha256": "9b1d17e456cac7cb632aec50947e78dfd16202598d53a1a1a15b0acb9b4631c2",
+     "span": [
+      11589,
+      11894
+     ]
+    }
+   ]
+  },
+  "T-TB-4-8-muhkam": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/tafsir-al-tabari.json",
+     "locator": "surah=4,ayah=8",
+     "source_field": "ar",
+     "sha256": "59b690f76012d2b291510dc4fee60464d830bab65a5de9f625d55a6fb81bd8e0",
+     "copied_sha256": "2e34e93c6e30473ba2ef1e19bde483402e6c3945b7d5b077703af0da93fffab6",
+     "span": [
+      6284,
+      6440
+     ]
+    }
+   ]
+  },
+  "T-TB-4-11-ikhwa-two": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/tafsir-al-tabari.json",
+     "locator": "surah=4,ayah=11",
+     "source_field": "ar",
+     "sha256": "b2e91bdfdecb75c552d9ff2303c6a8e33fbce111cc257db06558d5573fb872ad",
+     "copied_sha256": "960913c044c19dde55923a3d8167ddce1bfd21f771b09532049578ec5b94f6c2",
+     "span": [
+      13467,
+      13713
+     ]
+    }
+   ]
+  },
+  "T-TB-4-11-father-blocks": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/tafsir-al-tabari.json",
+     "locator": "surah=4,ayah=11",
+     "source_field": "ar",
+     "sha256": "b2e91bdfdecb75c552d9ff2303c6a8e33fbce111cc257db06558d5573fb872ad",
+     "copied_sha256": "4ce3a2604b65b932648ee0d4b20d6382306ebb8c0cc1e7a974d336dc5d560d39",
+     "span": [
+      19524,
+      19645
+     ]
+    }
+   ]
+  },
+  "T-TB-4-12-kalala": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/tafsir-al-tabari.json",
+     "locator": "surah=4,ayah=12",
+     "source_field": "ar",
+     "sha256": "1fd2b01708fb1b80cef30a5f74792f45a0dca02b58d515486f19238049ca79f3",
+     "copied_sha256": "ebbf7eec8a5b5064a9f62c3e7cccc0866bb6bdbd2bb9cc7db79d054ba13842df",
+     "span": [
+      11538,
+      11636
+     ]
+    }
+   ]
+  },
+  "T-TB-4-176-daughter-sister": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/tafsir-al-tabari.json",
+     "locator": "surah=4,ayah=176",
+     "source_field": "ar",
+     "sha256": "ca3aac3d615ff95a41d9c30bd96b2e008a7724effe3fe780fab24417d6926a06",
+     "copied_sha256": "dc6caec572b8cae8181d1edc55ac6fec4ccae52a6d068064d8d141656b19594f",
+     "span": [
+      19344,
+      19525
+     ]
+    }
+   ]
+  },
+  "S-FATH-AL-QARIB-116": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fath-al-qarib.json",
+     "locator": "section_id=116",
+     "source_field": "ar",
+     "sha256": "9fc90e1306031f40ddd762367490c7363025d8536b0f638b35746b5496b8f377"
+    }
+   ]
+  },
+  "S-FATH-AL-QARIB-117": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fath-al-qarib.json",
+     "locator": "section_id=117",
+     "source_field": "ar",
+     "sha256": "ee3980b6a0a23f10cd1466f64603da87403fe12f0bce1a1f8e196b0bb4642a67"
+    }
+   ]
+  },
+  "S-FATH-AL-QARIB-118": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fath-al-qarib.json",
+     "locator": "section_id=118",
+     "source_field": "ar",
+     "sha256": "0edbd237613bc7c5198731b45c87c9374ad9fb1031ac10f0fc8a95a4005efce8"
+    }
+   ]
+  },
+  "S-FATH-AL-MUIN-11": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fath-al-muin.json",
+     "locator": "section_id=11",
+     "source_field": "ar",
+     "sha256": "8d933953191e7a0ac711a02d35447fddbf49fe6bedaa0797d93b84ed34e596d6"
+    }
+   ]
+  },
+  "S-FATH-AL-MUIN-33": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fath-al-muin.json",
+     "locator": "section_id=33",
+     "source_field": "ar",
+     "sha256": "39f05413af893740cf2a1728f2dc41f963f6436fdf570115b660f58efc0c9fd5"
+    }
+   ]
+  },
+  "S-FATH-AL-MUIN-34": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fath-al-muin.json",
+     "locator": "section_id=34",
+     "source_field": "ar",
+     "sha256": "58e41c30245baf4b3b5d395f9d9c4a16f45240047012ae0e071437deb0c4287d"
+    }
+   ]
+  },
+  "S-FATH-AL-MUIN-35": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fath-al-muin.json",
+     "locator": "section_id=35",
+     "source_field": "ar",
+     "sha256": "eee5b56a5495b9af7eaa2a670e009fe5a485181196476c4981f38efa4e2f8da1"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-828": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=828",
+     "source_field": "ar",
+     "sha256": "0e85882baddfd8a8a43129619546eeb7b168353465adf92927c4f9e4e5aeebff"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-829": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=829",
+     "source_field": "ar",
+     "sha256": "9137d9b9c9ec64a387c8830038f99617bda3e8c7e4992bb52d1d386d27a78c85"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-830": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=830",
+     "source_field": "ar",
+     "sha256": "f860e0ffb71bb9b43b0345c2617157dfe329ddd4fbcf99c541f40d959161a2f3"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-831": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=831",
+     "source_field": "ar",
+     "sha256": "aabaadd1eaa3a22ce0241c262b66d9830d14a448e14b8fdc1db7f222ef9543c9"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-832": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=832",
+     "source_field": "ar",
+     "sha256": "1b20d71647decb615779f702ee3e939c7457efd7384bdcc01491587c2dda6db8"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-833": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=833",
+     "source_field": "ar",
+     "sha256": "6b01da355ffd720d90c753d437298246f0d941c7efc21f7264f396c92cc99bf1"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-834": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=834",
+     "source_field": "ar",
+     "sha256": "54592113f200701a81028d85486b18c642646a5b52d1f5e3bcef2a7cafe28069"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-835": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=835",
+     "source_field": "ar",
+     "sha256": "8a2a2598950910dc732d0e1b4c0b792873101cc3307198c7f1fc5b5fb504049f"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-836": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=836",
+     "source_field": "ar",
+     "sha256": "bd2280036fe0f8eb12894e3d7aaf3fdca510752ecce15c4766cc32b299b307e0"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-837": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=837",
+     "source_field": "ar",
+     "sha256": "b27d7582a97128b72cd0db65be54f11d97de2dc8f94a836150450a33a902292c"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-838": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=838",
+     "source_field": "ar",
+     "sha256": "d01dae4e88c975d15fe9c8ee3fef61714c754fc5df92800bcb5a70d7ca7abcb6"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-839": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=839",
+     "source_field": "ar",
+     "sha256": "b7c4c61eaa54f11198aafa9c4c8414e1e22e86e3557b6c41b1ec441cd410d24d"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-840": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=840",
+     "source_field": "ar",
+     "sha256": "0122e704b026a2e19210cdac5992f9ad6ce0618316f95983e23850e953694fe2"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-841": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=841",
+     "source_field": "ar",
+     "sha256": "647db4ed9a5af09d0de946a956ae1879bf81d3954f3b2780238d43b1ce0ad8ef"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-842": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=842",
+     "source_field": "ar",
+     "sha256": "954ebc864784c335188637a9d103a9c077b9020303db8c10a1cbb29ca9b0777e"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-843": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=843",
+     "source_field": "ar",
+     "sha256": "aeb1353ce4c1683df6354b6190f22e36713bf33db7e448ce56da7e8eba7c75e7"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-844": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=844",
+     "source_field": "ar",
+     "sha256": "3409092fd94f8dab1bf78e9d761ecb779c30d227853cc1bcc9d8ae24269a1775"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-845": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=845",
+     "source_field": "ar",
+     "sha256": "3cad2d5d7eef0d52fc3c26f656a98fb47c4cf163559b2156d3ef28d8ecff4f74"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-846": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=846",
+     "source_field": "ar",
+     "sha256": "bd609131da73ea7d6e465f04ca085b5996102697006e6767bf25d2fe877f3365"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-847": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=847",
+     "source_field": "ar",
+     "sha256": "6da90dba579614b3d52bafeef2beb35546d4d8a14995382d1b1f853fbe0a809b"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-848": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=848",
+     "source_field": "ar",
+     "sha256": "88a1385be8a066e6d39a623f18310b967394161026424a9763ccc57b8d7c26b3"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-849": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=849",
+     "source_field": "ar",
+     "sha256": "4b1437fbcf4f291bbd91098732b21db507f3f0bd10eeda52619315592e605410"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-850": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=850",
+     "source_field": "ar",
+     "sha256": "e822a0d3041821ee727ffc3cbd901bba458a43aad8a9b80e4889b16f73f87b3f"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-851": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=851",
+     "source_field": "ar",
+     "sha256": "34e5e76506d35bee5d03db1145263f0bec69aa73380f39a369eaae906d5a3236"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-852": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=852",
+     "source_field": "ar",
+     "sha256": "c739de713be6230072fa8e7ff535eb5ea140dc46ac435c09415085f006db967a"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-853": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=853",
+     "source_field": "ar",
+     "sha256": "b55c4eef428a6726a3637283de533266f27f3fd03d1513dc33d8e4c5b1c6d569"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-854": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=854",
+     "source_field": "ar",
+     "sha256": "9e3fbd257c82d022576dfe4894628898b0ed55dd58ca953a785f370139842023"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-855": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=855",
+     "source_field": "ar",
+     "sha256": "7837efb3c88cb52d239bb98c23ae20df992fbe26111775613bd81cbc5240bc0d"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-856": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=856",
+     "source_field": "ar",
+     "sha256": "258f7fe6558dc143445a245ed4b39314846139229a101e544ea158d34d73a9b0"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-857": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=857",
+     "source_field": "ar",
+     "sha256": "a101a4c5457007a219e888a6b434f85915daf86718b777ec6f0ede964b9eebc6"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-858": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=858",
+     "source_field": "ar",
+     "sha256": "1506909137dc485bb3e406fe3ed1140b112d2ccb58fd86bcd01ff395f301d1d9"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-859": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=859",
+     "source_field": "ar",
+     "sha256": "d77598c9775bdd364c8a12f3a928a8408e760866a6288160993ca63f79958e16"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-860": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=860",
+     "source_field": "ar",
+     "sha256": "9dec577a61b19bd8c41baa3d0f3a04146e109b68dd01071419a370addec09721"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-861": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=861",
+     "source_field": "ar",
+     "sha256": "95c70c5427c4ef1bb7ef97ecbf4213b1f2372cf2dd852316fb7bb7f198c3863d"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-862": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=862",
+     "source_field": "ar",
+     "sha256": "6198aeecb0c5135eefb95772348ac48a6d24d0d50dfe9fa63397527d36236ef7"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-863": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=863",
+     "source_field": "ar",
+     "sha256": "fa5fd3e5f826d83f99e020cc4c777ad0cb1aae8b96cfa6c4425eb34b69f0ac99"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-864": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=864",
+     "source_field": "ar",
+     "sha256": "8eccc702ec5f349b9fc996da523b84fb333c271b681ac300f8227cc0c957efe9"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-865": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=865",
+     "source_field": "ar",
+     "sha256": "a29a4a03912d13e38f557085a8ee4c9fd946c4fe56e76a82736cb99060d4f639"
+    }
+   ]
+  },
+  "S-FIQH-AS-SUNNAH-866": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=866",
+     "source_field": "ar",
+     "sha256": "35dbc45dcfd7f5a5971eaf1bf52ed39ae08e816d9c7f33229e4e4a824a14ee51"
+    }
+   ]
+  },
+  "S-AL-UMM-549": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/al-umm.json",
+     "locator": "section_id=549",
+     "source_field": "ar",
+     "sha256": "674f77c6911eaee243748c1813db53a5be6e1da831401e272823a3501dfed687"
+    }
+   ]
+  },
+  "S-AL-UMM-550": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/al-umm.json",
+     "locator": "section_id=550",
+     "source_field": "ar",
+     "sha256": "fbec55a84e31a1360fb913a9af6b46448c08de11a8704eb3b4129a0ffff696db"
+    }
+   ]
+  },
+  "S-AL-UMM-551": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/al-umm.json",
+     "locator": "section_id=551",
+     "source_field": "ar",
+     "sha256": "92c689afc0f4625899a8423123f8421567f4492a6502f34a7361448cdfb8685a"
+    }
+   ]
+  },
+  "S-AL-UMM-552": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/al-umm.json",
+     "locator": "section_id=552",
+     "source_field": "ar",
+     "sha256": "ac7fe53e1072c02bbbcb79a7dfbecf51e1286bbee65998cb99bf735eacfe3bec"
+    }
+   ]
+  },
+  "S-AL-UMM-553": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/al-umm.json",
+     "locator": "section_id=553",
+     "source_field": "ar",
+     "sha256": "8f17316b339f71e2b64cc2549f6918f038c50d55e98ab94d1e7b45bd4095dd9d"
+    }
+   ]
+  },
+  "S-AL-UMM-554": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/al-umm.json",
+     "locator": "section_id=554",
+     "source_field": "ar",
+     "sha256": "d1513e75949b446a5baf62313b9152d68fffa70d99e9fde738be64d9c6b6f077"
+    }
+   ]
+  },
+  "S-AL-UMM-555": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/al-umm.json",
+     "locator": "section_id=555",
+     "source_field": "ar",
+     "sha256": "19d9c5984047c961f2c76453f6585b8c6143d1b1d60b3348340c4aa4a5b6c284"
+    }
+   ]
+  },
+  "S-AL-UMM-556": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/al-umm.json",
+     "locator": "section_id=556",
+     "source_field": "ar",
+     "sha256": "ad87818d07201ac17dddcf47bfdae57d06c9c8cd709ee1cc55dd946a73290d0e"
+    }
+   ]
+  },
+  "S-AL-UMM-557": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/al-umm.json",
+     "locator": "section_id=557",
+     "source_field": "ar",
+     "sha256": "9f98d4a6c066facb731dc5743a594c3620910cbffd8fb65582fe318b1deca276"
+    }
+   ]
+  },
+  "S-AL-UMM-558": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/al-umm.json",
+     "locator": "section_id=558",
+     "source_field": "ar",
+     "sha256": "ff8547dd11dd582991d09afe4a73865a42b0849c5ae9feaeb5ce8dc2f5caa8ad"
+    }
+   ]
+  },
+  "S-AL-UMM-559": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/al-umm.json",
+     "locator": "section_id=559",
+     "source_field": "ar",
+     "sha256": "2bdc2c2c6e494c0382cca55cc3f4777a73eb4389d8448bc682c73d7075aaa32d"
+    }
+   ]
+  },
+  "S-AL-UMM-572": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/al-umm.json",
+     "locator": "section_id=572",
+     "source_field": "ar",
+     "sha256": "928191087fac0348c900c6b86c087467c934a2951f3b3feb9a10cd90a9d18152"
+    }
+   ]
+  },
+  "S-AL-UMM-580": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/al-umm.json",
+     "locator": "section_id=580",
+     "source_field": "ar",
+     "sha256": "d8211d62670390caf9d2fd31973f9bc953423fa9c99d1c012fd4d1d8a0128626"
+    }
+   ]
+  },
+  "S-AL-UMM-581": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/al-umm.json",
+     "locator": "section_id=581",
+     "source_field": "ar",
+     "sha256": "bea8041daf0a1b587ddd2e6003d0226da71bea4df9059c2f2416a1d231e51984"
+    }
+   ]
+  },
+  "S-AL-UMM-584": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/al-umm.json",
+     "locator": "section_id=584",
+     "source_field": "ar",
+     "sha256": "2edc5417d9e3b08b4291b03df1e075f8e3b576f0bad784effb390ffc3695e16b"
+    }
+   ]
+  },
+  "S-AL-UMM-585": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/al-umm.json",
+     "locator": "section_id=585",
+     "source_field": "ar",
+     "sha256": "72d4687c18307c259d324812f30771139ae105202d791e48fe9d638d4babd344"
+    }
+   ]
+  },
+  "S-IK-4-11": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=4,ayah=11",
+     "source_field": "ar",
+     "sha256": "b3b73737108af5f15f3e34738ac36168f87de20570393ae15b8a3925ace30be7"
+    }
+   ]
+  },
+  "S-TB-4-11": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/tafsir-al-tabari.json",
+     "locator": "surah=4,ayah=11",
+     "source_field": "ar",
+     "sha256": "b2e91bdfdecb75c552d9ff2303c6a8e33fbce111cc257db06558d5573fb872ad"
+    }
+   ]
+  },
+  "S-IK-4-12": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=4,ayah=12",
+     "source_field": "ar",
+     "sha256": "9ffa051fb8b1871b2209c2c31dab180be086d223187b8a43bdd47499f708916d"
+    }
+   ]
+  },
+  "S-TB-4-12": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/tafsir-al-tabari.json",
+     "locator": "surah=4,ayah=12",
+     "source_field": "ar",
+     "sha256": "1fd2b01708fb1b80cef30a5f74792f45a0dca02b58d515486f19238049ca79f3"
+    }
+   ]
+  },
+  "S-IK-4-176": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=4,ayah=176",
+     "source_field": "ar",
+     "sha256": "e402d7f4c4012a52ef24a4bb7721b6bee7f1575a93959f6dc73280414b38dc56"
+    }
+   ]
+  },
+  "S-TB-4-176": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/tafsir-al-tabari.json",
+     "locator": "surah=4,ayah=176",
+     "source_field": "ar",
+     "sha256": "ca3aac3d615ff95a41d9c30bd96b2e008a7724effe3fe780fab24417d6926a06"
+    }
+   ]
+  },
+  "S-IK-4-7": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=4,ayah=7",
+     "source_field": "ar",
+     "sha256": "a522fcbcea36262bd0c9ec2d328b8dd76685a9b69e64a8add4e37bf88c78c2bd"
+    }
+   ]
+  },
+  "S-TB-4-7": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/tafsir-al-tabari.json",
+     "locator": "surah=4,ayah=7",
+     "source_field": "ar",
+     "sha256": "67ad80fbb8562a253d08e0c8f0a835cb2961bef2b4c4b6c28f6738fb1da9bd82"
+    }
+   ]
+  },
+  "S-IK-4-8": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=4,ayah=8",
+     "source_field": "ar",
+     "sha256": "29e87fa5ad6065ad2099397de16e3a1f73e35b84ee0543b747f3bd0d3135e5ab"
+    }
+   ]
+  },
+  "S-TB-4-8": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/tafsir-al-tabari.json",
+     "locator": "surah=4,ayah=8",
+     "source_field": "ar",
+     "sha256": "59b690f76012d2b291510dc4fee60464d830bab65a5de9f625d55a6fb81bd8e0"
+    }
+   ]
+  },
+  "S-IK-4-33": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=4,ayah=33",
+     "source_field": "ar",
+     "sha256": "2436c0d85b7395e584bc1bbba7c9cbd20bde2d6652ae3fc19e3b1ac5c5cef1d3"
+    }
+   ]
+  },
+  "S-TB-4-33": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/tafsir-al-tabari.json",
+     "locator": "surah=4,ayah=33",
+     "source_field": "ar",
+     "sha256": "54c15c0465d77be880070832a4e7d37ff97c500afe484d1930f62f5296575221"
+    }
+   ]
+  },
+  "S-IK-2-180": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=2,ayah=180",
+     "source_field": "ar",
+     "sha256": "0efd6c5712d5e54a680a89119fff7162eead4100b0b3da6dfd606440aba28df4"
+    }
+   ]
+  },
+  "S-TB-2-180": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/tafsir-al-tabari.json",
+     "locator": "surah=2,ayah=180",
+     "source_field": "ar",
+     "sha256": "167e16ff2c1d3c36ec31db8a245992859b3ff66365f36419337b1d033b62eb90"
+    }
+   ]
+  },
+  "S-IK-2-240": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=2,ayah=240",
+     "source_field": "ar",
+     "sha256": "1cc4ffd63136ef549c90081964ec6e6727bbbe124f207bee29dcf5a5efb055c0"
+    }
+   ]
+  },
+  "S-TB-2-240": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/tafsir-al-tabari.json",
+     "locator": "surah=2,ayah=240",
+     "source_field": "ar",
+     "sha256": "2b697435a542863d2560b02a024f52c32a7e4151c0f4c19f298f3b62c7073f83"
+    }
+   ]
+  },
+  "S-IK-8-75": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=8,ayah=75",
+     "source_field": "ar",
+     "sha256": "e44f7e3ffd5af52ea8c4f1ef8306bdfdfd09b79110f81ec5be4b3dd0328ea388"
+    }
+   ]
+  },
+  "S-TB-8-75": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/tafsir-al-tabari.json",
+     "locator": "surah=8,ayah=75",
+     "source_field": "ar",
+     "sha256": "8a431dfeab1b3683a2074e4a4df1312c6471a1d9a610fd79d364fcfb3a040fbe"
+    }
+   ]
+  },
+  "S-IK-33-6": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=33,ayah=6",
+     "source_field": "ar",
+     "sha256": "ca8a088f0295d51e47b106a1b4f2872a819e2124645804f705cbc4b8bc90b396"
+    }
+   ]
+  },
+  "S-TB-33-6": {
+   "file": "dalil.json",
+   "copies": [
+    {
+     "field": "(pointer)",
+     "source": "api/data/tafsir-al-tabari.json",
+     "locator": "surah=33,ayah=6",
+     "source_field": "ar",
+     "sha256": "4f1d7d4f9e7d69ae0c1e04e294c7db2200afe14efc6716ca66013947d623d9f5"
+    }
+   ]
+  },
+  "Q-33-4": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "tanzil_uthmani",
+     "locator": "33|4",
+     "source_field": "verse",
+     "sha256": "1ecc8270bb528be424ca9b5531565c9c2a6576e84b6c8931b19b8697c18b70b5",
+     "copied_sha256": "1ecc8270bb528be424ca9b5531565c9c2a6576e84b6c8931b19b8697c18b70b5"
+    },
+    {
+     "field": "ar_quran_json",
+     "source": "api/data/quran.json",
+     "locator": "surah=33,ayah=4",
+     "source_field": "arabic",
+     "sha256": "848e2e121934dcd819c04c3615ff030595a128e0e61f5bd2fd67673ee2f6c23e",
+     "copied_sha256": "848e2e121934dcd819c04c3615ff030595a128e0e61f5bd2fd67673ee2f6c23e"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.text",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura33.json",
+     "locator": "aya=4",
+     "source_field": "translation",
+     "sha256": "5d242133b6e262a3c43011eadef0a793e7d593ce1f98318a683bbe2e927523fa",
+     "copied_sha256": "5d242133b6e262a3c43011eadef0a793e7d593ce1f98318a683bbe2e927523fa"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.footnotes",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura33.json",
+     "locator": "aya=4",
+     "source_field": "footnotes",
+     "sha256": "ee69fc94118f91566df12ea3359ef836e07745306f698c6e009888befeefa98b",
+     "copied_sha256": "ee69fc94118f91566df12ea3359ef836e07745306f698c6e009888befeefa98b"
+    },
+    {
+     "field": "translations.id_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=33,ayah=4",
+     "source_field": "id",
+     "sha256": "c78a03aa6881ec51002d66975ff2ccf0803a66fcd115c255237593d46aa3ef3f",
+     "copied_sha256": "c78a03aa6881ec51002d66975ff2ccf0803a66fcd115c255237593d46aa3ef3f"
+    },
+    {
+     "field": "translations.en_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=33,ayah=4",
+     "source_field": "en",
+     "sha256": "4f4e4b4e9aa75385a1cedeaa8a11082a61dd5d00d9ffaca629863d2eb63cc2d2",
+     "copied_sha256": "4f4e4b4e9aa75385a1cedeaa8a11082a61dd5d00d9ffaca629863d2eb63cc2d2"
+    }
+   ]
+  },
+  "Q-33-5": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "tanzil_uthmani",
+     "locator": "33|5",
+     "source_field": "verse",
+     "sha256": "f7e59ac82b5652fe420dceb657f643a7a8a9207e67f649795d7981906f96ed15",
+     "copied_sha256": "f7e59ac82b5652fe420dceb657f643a7a8a9207e67f649795d7981906f96ed15"
+    },
+    {
+     "field": "ar_quran_json",
+     "source": "api/data/quran.json",
+     "locator": "surah=33,ayah=5",
+     "source_field": "arabic",
+     "sha256": "572475e4e6ce33b34568bcce36d9884be882068ddfc8198cbc7abb5d3fd27913",
+     "copied_sha256": "572475e4e6ce33b34568bcce36d9884be882068ddfc8198cbc7abb5d3fd27913"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.text",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura33.json",
+     "locator": "aya=5",
+     "source_field": "translation",
+     "sha256": "e1ce3b23b083ad39368330e9d1277f4fb46c7cb361b5aafe418e4d0cf0109d2a",
+     "copied_sha256": "e1ce3b23b083ad39368330e9d1277f4fb46c7cb361b5aafe418e4d0cf0109d2a"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.footnotes",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura33.json",
+     "locator": "aya=5",
+     "source_field": "footnotes",
+     "sha256": "77b6f647725844f225230609ff2d6cd5820e5af27edb6e71aa55829d6293923f",
+     "copied_sha256": "77b6f647725844f225230609ff2d6cd5820e5af27edb6e71aa55829d6293923f"
+    },
+    {
+     "field": "translations.id_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=33,ayah=5",
+     "source_field": "id",
+     "sha256": "3abcaa5b786652ab1b1f449562c8cca9778dddf751f3448697db738bf4c1e4bc",
+     "copied_sha256": "3abcaa5b786652ab1b1f449562c8cca9778dddf751f3448697db738bf4c1e4bc"
+    },
+    {
+     "field": "translations.en_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=33,ayah=5",
+     "source_field": "en",
+     "sha256": "8e7265fd67c6981e92c42b3687066be52e90a23c451f8fff5dd921b853856b14",
+     "copied_sha256": "8e7265fd67c6981e92c42b3687066be52e90a23c451f8fff5dd921b853856b14"
+    }
+   ]
+  },
+  "Q-4-34": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "tanzil_uthmani",
+     "locator": "4|34",
+     "source_field": "verse",
+     "sha256": "799610c0989ae509387ea7a77e2c9ba34c23f714224189c27ae4a8a6c1a2498b",
+     "copied_sha256": "799610c0989ae509387ea7a77e2c9ba34c23f714224189c27ae4a8a6c1a2498b"
+    },
+    {
+     "field": "ar_quran_json",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=34",
+     "source_field": "arabic",
+     "sha256": "7dbdb5cb3c95cc957fe2e4c5a0913e409b073cba1a8cf3b99ce2aefdcbebf5f2",
+     "copied_sha256": "7dbdb5cb3c95cc957fe2e4c5a0913e409b073cba1a8cf3b99ce2aefdcbebf5f2"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.text",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=34",
+     "source_field": "translation",
+     "sha256": "bfab3d277ac515908cf4930d37aa567d5e19a77e506d55beaa6b6c47569dac2e",
+     "copied_sha256": "bfab3d277ac515908cf4930d37aa567d5e19a77e506d55beaa6b6c47569dac2e"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.footnotes",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=34",
+     "source_field": "footnotes",
+     "sha256": "38bd51b5f325a74575cdb4cfade750e9848f589a25e0afca395c2e58387cae49",
+     "copied_sha256": "38bd51b5f325a74575cdb4cfade750e9848f589a25e0afca395c2e58387cae49"
+    },
+    {
+     "field": "translations.id_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=34",
+     "source_field": "id",
+     "sha256": "246c408b983200dea45f0a3cdddf13b4d75444de263ea26202820455f3f68778",
+     "copied_sha256": "246c408b983200dea45f0a3cdddf13b4d75444de263ea26202820455f3f68778"
+    },
+    {
+     "field": "translations.en_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=34",
+     "source_field": "en",
+     "sha256": "69c2b16411d520386344d7543441579df50a52ffd7afd687c2822ea9c7458041",
+     "copied_sha256": "69c2b16411d520386344d7543441579df50a52ffd7afd687c2822ea9c7458041"
+    }
+   ]
+  },
+  "Q-4-128": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "tanzil_uthmani",
+     "locator": "4|128",
+     "source_field": "verse",
+     "sha256": "3e6c568ba6cebba6e84c76ac03c8d8f65c609791d002607567d5af4c33aa8251",
+     "copied_sha256": "3e6c568ba6cebba6e84c76ac03c8d8f65c609791d002607567d5af4c33aa8251"
+    },
+    {
+     "field": "ar_quran_json",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=128",
+     "source_field": "arabic",
+     "sha256": "2034d3493465b96a9d24a41d670d3fc3d3540b20b20b3ec7db90c259b7519621",
+     "copied_sha256": "2034d3493465b96a9d24a41d670d3fc3d3540b20b20b3ec7db90c259b7519621"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.text",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=128",
+     "source_field": "translation",
+     "sha256": "8fcd4f7edff532d9c858faeae6eb5878acd53748a7907a9967f5349fc920261f",
+     "copied_sha256": "8fcd4f7edff532d9c858faeae6eb5878acd53748a7907a9967f5349fc920261f"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.footnotes",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=128",
+     "source_field": "footnotes",
+     "sha256": "1af21677da271a3ff26a7c65cee38a57490aa343bc144e888587943ff40124d2",
+     "copied_sha256": "1af21677da271a3ff26a7c65cee38a57490aa343bc144e888587943ff40124d2"
+    },
+    {
+     "field": "translations.id_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=128",
+     "source_field": "id",
+     "sha256": "4eb85a2d4ba8862f1da29e788d85503ca883f1fcaab498098aaf6b44e4fe94cb",
+     "copied_sha256": "4eb85a2d4ba8862f1da29e788d85503ca883f1fcaab498098aaf6b44e4fe94cb"
+    },
+    {
+     "field": "translations.en_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=128",
+     "source_field": "en",
+     "sha256": "55f800508339d5c81dbdd86d55db95b66a75f8be390e812cce71926b227b7325",
+     "copied_sha256": "55f800508339d5c81dbdd86d55db95b66a75f8be390e812cce71926b227b7325"
+    }
+   ]
+  },
+  "Q-49-10": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "tanzil_uthmani",
+     "locator": "49|10",
+     "source_field": "verse",
+     "sha256": "fc8999d03fee799f6627e8be73b0ca61615e7c82ff223cd70bc0418643314187",
+     "copied_sha256": "fc8999d03fee799f6627e8be73b0ca61615e7c82ff223cd70bc0418643314187"
+    },
+    {
+     "field": "ar_quran_json",
+     "source": "api/data/quran.json",
+     "locator": "surah=49,ayah=10",
+     "source_field": "arabic",
+     "sha256": "7be0d2d00c3a6dc9275eea777f7442de0c4b938512d73b4478ee5ecd0135dbbe",
+     "copied_sha256": "7be0d2d00c3a6dc9275eea777f7442de0c4b938512d73b4478ee5ecd0135dbbe"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.text",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura49.json",
+     "locator": "aya=10",
+     "source_field": "translation",
+     "sha256": "3d6d3b4463119207b06c9756369bb59b5b1632cbf5c569acfc9a5c88597dada3",
+     "copied_sha256": "3d6d3b4463119207b06c9756369bb59b5b1632cbf5c569acfc9a5c88597dada3"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.footnotes",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura49.json",
+     "locator": "aya=10",
+     "source_field": "footnotes",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "copied_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+     "field": "translations.id_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=49,ayah=10",
+     "source_field": "id",
+     "sha256": "74bcce2886b319732f48bc96e4b3b1c39a140983ed4d89456cc16ae8e8300f17",
+     "copied_sha256": "74bcce2886b319732f48bc96e4b3b1c39a140983ed4d89456cc16ae8e8300f17"
+    },
+    {
+     "field": "translations.en_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=49,ayah=10",
+     "source_field": "en",
+     "sha256": "67f53d748017c5c87d4c4dda590308fa86b852970cf8605ad5fd02771f5a2097",
+     "copied_sha256": "67f53d748017c5c87d4c4dda590308fa86b852970cf8605ad5fd02771f5a2097"
+    }
+   ]
+  },
+  "Q-42-38": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "tanzil_uthmani",
+     "locator": "42|38",
+     "source_field": "verse",
+     "sha256": "7c631c77b9c691ca4b91a572798221d88168744d96eaac954bcd5213d10ed470",
+     "copied_sha256": "7c631c77b9c691ca4b91a572798221d88168744d96eaac954bcd5213d10ed470"
+    },
+    {
+     "field": "ar_quran_json",
+     "source": "api/data/quran.json",
+     "locator": "surah=42,ayah=38",
+     "source_field": "arabic",
+     "sha256": "7c631c77b9c691ca4b91a572798221d88168744d96eaac954bcd5213d10ed470",
+     "copied_sha256": "7c631c77b9c691ca4b91a572798221d88168744d96eaac954bcd5213d10ed470"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.text",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura42.json",
+     "locator": "aya=38",
+     "source_field": "translation",
+     "sha256": "9aba417376d1ee79511d16be5f318da7366c5310cb1a057fe4d00367af511167",
+     "copied_sha256": "9aba417376d1ee79511d16be5f318da7366c5310cb1a057fe4d00367af511167"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.footnotes",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura42.json",
+     "locator": "aya=38",
+     "source_field": "footnotes",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "copied_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+     "field": "translations.id_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=42,ayah=38",
+     "source_field": "id",
+     "sha256": "181252eeddb6e1e19c8d6e168161568a8e4b9650f962029b635c1b1f1d3918d3",
+     "copied_sha256": "181252eeddb6e1e19c8d6e168161568a8e4b9650f962029b635c1b1f1d3918d3"
+    },
+    {
+     "field": "translations.en_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=42,ayah=38",
+     "source_field": "en",
+     "sha256": "ea841a5ba37c045d673e649842ee560a5e4f30a0bb969621a0a664febc7f6c80",
+     "copied_sha256": "ea841a5ba37c045d673e649842ee560a5e4f30a0bb969621a0a664febc7f6c80"
+    }
+   ]
+  },
+  "Q-2-188": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "tanzil_uthmani",
+     "locator": "2|188",
+     "source_field": "verse",
+     "sha256": "6e13b5129a304adc9464fd16a9b3fb97403fb3b7156a50d44e607aecd48f49dc",
+     "copied_sha256": "6e13b5129a304adc9464fd16a9b3fb97403fb3b7156a50d44e607aecd48f49dc"
+    },
+    {
+     "field": "ar_quran_json",
+     "source": "api/data/quran.json",
+     "locator": "surah=2,ayah=188",
+     "source_field": "arabic",
+     "sha256": "63f23706ba8a23ef519bf41efbb35e3d194fe065c799ee3c6351128844e9b75b",
+     "copied_sha256": "63f23706ba8a23ef519bf41efbb35e3d194fe065c799ee3c6351128844e9b75b"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.text",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura2.json",
+     "locator": "aya=188",
+     "source_field": "translation",
+     "sha256": "554861fed7d8a747910f24fae3ae7242e920e1d7740a1d587f6bc215c51df4f5",
+     "copied_sha256": "554861fed7d8a747910f24fae3ae7242e920e1d7740a1d587f6bc215c51df4f5"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.footnotes",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura2.json",
+     "locator": "aya=188",
+     "source_field": "footnotes",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "copied_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+     "field": "translations.id_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=2,ayah=188",
+     "source_field": "id",
+     "sha256": "9ae02d000748ae27e5510934827c9ab427b1b6a9ff4a389251e024a1463c1fb8",
+     "copied_sha256": "9ae02d000748ae27e5510934827c9ab427b1b6a9ff4a389251e024a1463c1fb8"
+    },
+    {
+     "field": "translations.en_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=2,ayah=188",
+     "source_field": "en",
+     "sha256": "3da00e28265e4fbac813fb05f6cbdd24cddf51701a471d0a41c7b5b7cb9986f8",
+     "copied_sha256": "3da00e28265e4fbac813fb05f6cbdd24cddf51701a471d0a41c7b5b7cb9986f8"
+    }
+   ]
+  },
+  "Q-4-10": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "tanzil_uthmani",
+     "locator": "4|10",
+     "source_field": "verse",
+     "sha256": "1f5b7574e6f7bc6565136233ec7b6d340aafbdc47f1f1ab6325567808f0159b1",
+     "copied_sha256": "1f5b7574e6f7bc6565136233ec7b6d340aafbdc47f1f1ab6325567808f0159b1"
+    },
+    {
+     "field": "ar_quran_json",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=10",
+     "source_field": "arabic",
+     "sha256": "925c0321ad1b945cc922551884afb2693745898ccdb3ce5e806c682bc0974391",
+     "copied_sha256": "925c0321ad1b945cc922551884afb2693745898ccdb3ce5e806c682bc0974391"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.text",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=10",
+     "source_field": "translation",
+     "sha256": "9fbac619f522d841f6e8576c063666359e28f4e4164707909fab6a1c0de6f81f",
+     "copied_sha256": "9fbac619f522d841f6e8576c063666359e28f4e4164707909fab6a1c0de6f81f"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.footnotes",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura4.json",
+     "locator": "aya=10",
+     "source_field": "footnotes",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "copied_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+     "field": "translations.id_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=10",
+     "source_field": "id",
+     "sha256": "616da62d1e154560b414380313bcb4dafe8609553baeba11db95f7a8b312cc98",
+     "copied_sha256": "616da62d1e154560b414380313bcb4dafe8609553baeba11db95f7a8b312cc98"
+    },
+    {
+     "field": "translations.en_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=4,ayah=10",
+     "source_field": "en",
+     "sha256": "bf6c3f09b2e0b8a8bd3057f67d47d0a9fdbe4d858b01f123c2f55e0e8abe0196",
+     "copied_sha256": "bf6c3f09b2e0b8a8bd3057f67d47d0a9fdbe4d858b01f123c2f55e0e8abe0196"
+    }
+   ]
+  },
+  "Q-60-8": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "tanzil_uthmani",
+     "locator": "60|8",
+     "source_field": "verse",
+     "sha256": "d77e69db1c3a44dfd3b6dce1e337dff4887996716fd3835db91c5111f3cec42e",
+     "copied_sha256": "d77e69db1c3a44dfd3b6dce1e337dff4887996716fd3835db91c5111f3cec42e"
+    },
+    {
+     "field": "ar_quran_json",
+     "source": "api/data/quran.json",
+     "locator": "surah=60,ayah=8",
+     "source_field": "arabic",
+     "sha256": "ba76e0f0d129406487a731bb030369e8ea9948242c80be5c9695e200e01d9007",
+     "copied_sha256": "ba76e0f0d129406487a731bb030369e8ea9948242c80be5c9695e200e01d9007"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.text",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura60.json",
+     "locator": "aya=8",
+     "source_field": "translation",
+     "sha256": "de394d8eae36b8f6744a393a7fa5d9ba067d78fce996f771133824aae36eff1e",
+     "copied_sha256": "de394d8eae36b8f6744a393a7fa5d9ba067d78fce996f771133824aae36eff1e"
+    },
+    {
+     "field": "translations.id_quranenc_indonesian_affairs.footnotes",
+     "source": "quranenc_indonesian_affairs_waris:indonesian_affairs_sura60.json",
+     "locator": "aya=8",
+     "source_field": "footnotes",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "copied_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+     "field": "translations.id_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=60,ayah=8",
+     "source_field": "id",
+     "sha256": "7ed030d497e9a6f127e738894c450564bab6208a1779cd24c4b2a1c115272520",
+     "copied_sha256": "7ed030d497e9a6f127e738894c450564bab6208a1779cd24c4b2a1c115272520"
+    },
+    {
+     "field": "translations.en_quran_json.text",
+     "source": "api/data/quran.json",
+     "locator": "surah=60,ayah=8",
+     "source_field": "en",
+     "sha256": "7cdb4bde822e85c14590d5103f12e3540d6ec1628e40072db9553491aba575da",
+     "copied_sha256": "7cdb4bde822e85c14590d5103f12e3540d6ec1628e40072db9553491aba575da"
+    }
+   ]
+  },
+  "H-BUKHARI-2586": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=2586",
+     "source_field": "ar",
+     "sha256": "e0c00a30326a4c8db16737f2fd5c23f340ad0ab0539387dc8df1d9285b06c554",
+     "copied_sha256": "e0c00a30326a4c8db16737f2fd5c23f340ad0ab0539387dc8df1d9285b06c554"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=2586",
+     "source_field": "en",
+     "sha256": "4460a172dcffb0d2858a4925b3c54592b369b46386ba274896dd700b347d827d",
+     "copied_sha256": "4460a172dcffb0d2858a4925b3c54592b369b46386ba274896dd700b347d827d"
+    }
+   ]
+  },
+  "H-BUKHARI-2587": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=2587",
+     "source_field": "ar",
+     "sha256": "3dcde30af8075a24e4280ba6d111312959b0a12b1582409f9563815a73f26c5b",
+     "copied_sha256": "3dcde30af8075a24e4280ba6d111312959b0a12b1582409f9563815a73f26c5b"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=2587",
+     "source_field": "en",
+     "sha256": "962462479defe149e01d554776a2b015b895fb7802bac3949d99edf6632dca85",
+     "copied_sha256": "962462479defe149e01d554776a2b015b895fb7802bac3949d99edf6632dca85"
+    }
+   ]
+  },
+  "H-BUKHARI-5986": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=5986",
+     "source_field": "ar",
+     "sha256": "75941b7a44b68f73fcc761e7cef08fe23310a9354693ff1314ae51692b3f8102",
+     "copied_sha256": "75941b7a44b68f73fcc761e7cef08fe23310a9354693ff1314ae51692b3f8102"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=5986",
+     "source_field": "en",
+     "sha256": "0814002707380726c46f423ba62bf469e8310a0d31a826e63bb75ca87eff2c9e",
+     "copied_sha256": "0814002707380726c46f423ba62bf469e8310a0d31a826e63bb75ca87eff2c9e"
+    }
+   ]
+  },
+  "H-BUKHARI-5987": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=5987",
+     "source_field": "ar",
+     "sha256": "9d0f4f0df36c358f7bfcb9fddcb5e6c2aee193c758c8319d224470e2fa182701",
+     "copied_sha256": "9d0f4f0df36c358f7bfcb9fddcb5e6c2aee193c758c8319d224470e2fa182701"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bukhari.json",
+     "locator": "hadithnumber=5987",
+     "source_field": "en",
+     "sha256": "d8d39b85f8abcf546f0d3596d19ee33f0cfccd0fccb6755f478e794e15d602db",
+     "copied_sha256": "d8d39b85f8abcf546f0d3596d19ee33f0cfccd0fccb6755f478e794e15d602db"
+    }
+   ]
+  },
+  "H-MUSLIM-1623e": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4181",
+     "source_field": "ar",
+     "sha256": "8536660e74f697cc748ee95d69fa2e62d8a388590e26d52393ea147eb4065d61",
+     "copied_sha256": "8536660e74f697cc748ee95d69fa2e62d8a388590e26d52393ea147eb4065d61"
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4181",
+     "source_field": "en",
+     "sha256": "d2f47bbf3cb2e7d17a7b5dd4b8e5d8bba185d22c228686bf37e51e8db9585a73",
+     "copied_sha256": "d2f47bbf3cb2e7d17a7b5dd4b8e5d8bba185d22c228686bf37e51e8db9585a73"
+    },
+    {
+     "field": "translations.id.text",
+     "source": "api/data/muslim.json",
+     "locator": "hadithnumber=4181",
+     "source_field": "id",
+     "sha256": "1a7c4b95f773a0231f6ffefef7173f081c8257a3ac2c2bc7ba7d30ea7180f038",
+     "copied_sha256": "1a7c4b95f773a0231f6ffefef7173f081c8257a3ac2c2bc7ba7d30ea7180f038"
+    }
+   ]
+  },
+  "H-BULUGH-649": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=649",
+     "source_field": "ar",
+     "sha256": "8d0905955d7975d1769eeaa4a6d9127b0df5cef51d1a2239e1b8cc19c13fa2ab",
+     "copied_sha256": "8d0905955d7975d1769eeaa4a6d9127b0df5cef51d1a2239e1b8cc19c13fa2ab"
+    },
+    {
+     "field": "ar_matn_and_ibn_hajar_attribution",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=649",
+     "source_field": "ar",
+     "sha256": "8d0905955d7975d1769eeaa4a6d9127b0df5cef51d1a2239e1b8cc19c13fa2ab",
+     "copied_sha256": "86b554a2f1d6dd739000ee82a81b481cf89d6553b7a1dd7cb55701f96f859737",
+     "span": [
+      0,
+      209
+     ]
+    },
+    {
+     "field": "ar_tahqiq_footnote",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=649",
+     "source_field": "ar",
+     "sha256": "8d0905955d7975d1769eeaa4a6d9127b0df5cef51d1a2239e1b8cc19c13fa2ab",
+     "copied_sha256": "90ecae807d39ddb658bb68f4b600aee780f16ea55f49841da431b1d2a8ef423f",
+     "span": [
+      217,
+      383
+     ]
+    },
+    {
+     "field": "translations.en.text",
+     "source": "api/data/bulugh-al-maram.json",
+     "locator": "hadithnumber=649",
+     "source_field": "en",
+     "sha256": "b3670515fe3dde697af4f414409f31d43660c63020c1833e8a27c78cb544aa89",
+     "copied_sha256": "b3670515fe3dde697af4f414409f31d43660c63020c1833e8a27c78cb544aa89"
+    }
+   ]
+  },
+  "T-IK-4-11-mother-siblings": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=4,ayah=11",
+     "source_field": "ar",
+     "sha256": "b3b73737108af5f15f3e34738ac36168f87de20570393ae15b8a3925ace30be7",
+     "copied_sha256": "fac6d82264137290afb7a388b9b071ecf44041c6a93b69c3687a23dc0329d210",
+     "span": [
+      6334,
+      6579
+     ]
+    }
+   ]
+  },
+  "T-IK-4-11-jahiliyyah": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/tafsir-ibn-kathir.json",
+     "locator": "surah=4,ayah=11",
+     "source_field": "ar",
+     "sha256": "b3b73737108af5f15f3e34738ac36168f87de20570393ae15b8a3925ace30be7",
+     "copied_sha256": "397d256c04541e14ab005e12f158d7615a27f6764c0c1e155ed1a0de11c385ee",
+     "span": [
+      2246,
+      2418
+     ]
+    }
+   ]
+  },
+  "F-ALUMM-556-jadd": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/al-umm.json",
+     "locator": "section_id=556",
+     "source_field": "ar",
+     "sha256": "ad87818d07201ac17dddcf47bfdae57d06c9c8cd709ee1cc55dd946a73290d0e",
+     "copied_sha256": "1291f48a2406293401f92d128104a6f6b9cd8053929cbcafd19c57d74ea7d6c8",
+     "span": [
+      1024,
+      1934
+     ]
+    }
+   ]
+  },
+  "F-ALUMM-559-musyarakah": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/al-umm.json",
+     "locator": "section_id=559",
+     "source_field": "ar",
+     "sha256": "2bdc2c2c6e494c0382cca55cc3f4777a73eb4389d8448bc682c73d7075aaa32d",
+     "copied_sha256": "7cd081259f8da1c51aca84c60b7e0b2cafd00d34ab5d99f137f8c4bf4d7026c7",
+     "span": [
+      4340,
+      4544
+     ]
+    }
+   ]
+  },
+  "F-FSUNNAH-843-syarat": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=843",
+     "source_field": "ar",
+     "sha256": "aeb1353ce4c1683df6354b6190f22e36713bf33db7e448ce56da7e8eba7c75e7",
+     "copied_sha256": "f147825546ab6565d99e115f1dbd56f9c6217ced58fe8a6d2a4bc1487610fb58",
+     "span": [
+      144,
+      662
+     ]
+    }
+   ]
+  },
+  "F-FSUNNAH-847-mutallaqa": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=847",
+     "source_field": "ar",
+     "sha256": "6da90dba579614b3d52bafeef2beb35546d4d8a14995382d1b1f853fbe0a809b",
+     "copied_sha256": "a716526c6cbb18f05ca97586fee363e5d63e30ac245702d4297163c39548a48e",
+     "span": [
+      457,
+      668
+     ]
+    }
+   ]
+  },
+  "F-FSUNNAH-860-mafqud": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=860",
+     "source_field": "ar",
+     "sha256": "9dec577a61b19bd8c41baa3d0f3a04146e109b68dd01071419a370addec09721",
+     "copied_sha256": "44ffbaf835b15fcff299ad35e503d7008f9ca1d6928e491450028d4151677da6",
+     "span": [
+      21,
+      425
+     ]
+    }
+   ]
+  },
+  "F-FSUNNAH-861-mafqud-mirath": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=861",
+     "source_field": "ar",
+     "sha256": "95c70c5427c4ef1bb7ef97ecbf4213b1f2372cf2dd852316fb7bb7f198c3863d",
+     "copied_sha256": "bd1460ba8de5793b758fdb970c1ee30e33ca22f8a76bc63948e7e7c2a7df752f",
+     "span": [
+      566,
+      843
+     ]
+    }
+   ]
+  },
+  "F-FSUNNAH-862-khuntsa": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=862",
+     "source_field": "ar",
+     "sha256": "6198aeecb0c5135eefb95772348ac48a6d24d0d50dfe9fa63397527d36236ef7",
+     "copied_sha256": "792d7a96fb7df84ca7b1e10c9439073e8ab5057cb1e0ecbfb59ef2e75e299a27",
+     "span": [
+      23,
+      570
+     ]
+    }
+   ]
+  },
+  "F-FSUNNAH-863-ibn-zina": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=863",
+     "source_field": "ar",
+     "sha256": "fa5fd3e5f826d83f99e020cc4c777ad0cb1aae8b96cfa6c4425eb34b69f0ac99",
+     "copied_sha256": "7f629a16f43ecfb820f631034155682320346acdf7513e9fa5adc3dcdfdc6f13",
+     "span": [
+      285,
+      725
+     ]
+    }
+   ]
+  },
+  "F-FSUNNAH-864-takharuj": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=864",
+     "source_field": "ar",
+     "sha256": "8eccc702ec5f349b9fc996da523b84fb333c271b681ac300f8227cc0c957efe9",
+     "copied_sha256": "db65186bf91819323b1eb3414b63868fb9305d3a3f56167cec828408d335e3bf",
+     "span": [
+      20,
+      262
+     ]
+    }
+   ]
+  },
+  "F-FSUNNAH-855-radd-zawj": {
+   "file": "dalil-gaps.json",
+   "copies": [
+    {
+     "field": "ar",
+     "source": "api/data/fiqh-as-sunnah.json",
+     "locator": "section_id=855",
+     "source_field": "ar",
+     "sha256": "7837efb3c88cb52d239bb98c23ae20df992fbe26111775613bd81cbc5240bc0d",
+     "copied_sha256": "c4f384765160e9758a497bfe04147057eb12acf25c78b24cd345402f536e0190",
+     "span": [
+      2,
+      494
+     ]
+    }
+   ]
+  }
+ }
+}

@@ -16,6 +16,8 @@ on:
       - ".github/workflows/deploy-belajar.yml"
       - "docs/belajar-plan.md"
       - "docs/belajar-research/**"
+      - "docs/waris-plan.md"
+      - "docs/waris-research/**"
   workflow_dispatch:
 
 # Serialise deploys. New deploys queue behind running ones — mid-deploy

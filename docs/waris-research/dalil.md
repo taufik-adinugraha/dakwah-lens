@@ -96,7 +96,7 @@ Researcher: DALIL · written 2026-10-09 · status: research input, **not reviewe
 
 - **The build:** a script in the session scratchpad (`build_dalil.py`, with helper `ar.py`) builds the JSON, then checks itself.
   - **Qur'an:** each `ar` must equal the Tanzil line.
-  - **Fiqh and tafsir:** each excerpt must equal `source[char_range]`.
+  - **Fiqh and tafsir:** each excerpt must equal `source[char_range]`. *(Amended in review, 2026-10-09.)* Where the span crosses the printed edition's running head (Fath al-Qarib and Fath al-Mu'in carry the book's title line mid-sentence at page breaks, Fath al-Mu'in sometimes with ~33 zero digits), the head is cut out: `omit` lists the source spans removed and `ar` shows each cut as "…". An excerpt that ends where its corpus record itself breaks off mid-sentence (Fiqh as-Sunnah 854) carries `source_truncated` and ends with " …". `belajar/pipeline/validate_waris.py` checks both.
 - **Independent check:** a second script confirmed that all 275 copied strings (Arabic, translations, footnotes, grade words) are verbatim substrings of their source files. 0 failures.
 - **Search:** Arabic search used normalised text (harakat and tatweel stripped; أ/إ/آ/ٱ→ا, ى→ي, ة→ه). The excerpt itself is always cut from the original, vocalised string.
 - **Scratchpad:** the scripts are not in the repo. If the track needs the extraction to be re-runnable, the pipeline owner should move `build_dalil.py` into `belajar/pipeline/` (I was told not to edit there).

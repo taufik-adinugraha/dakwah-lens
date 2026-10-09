@@ -36,7 +36,12 @@ Research files cited below by name and section:
 > - **D13 → No:** `/waris/hitung` and `/waris/laporan` stay unbuilt or flagged off in production until the fara'id reviewer has signed every RuleNote. Lessons and cases may ship as drafts.
 > - **D12 → M1 starts now** on branch `feat/belajar-waris-m1` (engine, 87+ vectors in CI, dalil pipeline, RuleNote drafts). No deploy; any merge to `main` waits for the operator.
 > - **D1, D4–D11, D15–D18:** the recommendations below are adopted as written (the operator raised no objection).
-> - **Still open:** D3 (name the two reviewers) and D14 (honorarium cap in IDR — no spend until set).
+> - **Update (operator, 2026-10-09, later the same day): there is no human review.** "No review by human, we just output recommendation." Therefore:
+>   - **D3, D14 dropped** — no reviewers, no honorarium. Reviewer-hour estimates in §10 no longer apply.
+>   - **D13 superseded** — the calculator and report ship in M2 as a *recommendation* (noindex beta like the rest of the module). There is no sign-off gate.
+>   - **D16 amended** — report title **"Rekomendasi Pembagian Waris"**; subtitle states it is AI-assisted, not a fatwa and not a court decision, names *Penetapan Ahli Waris* at the Pengadilan Agama as the legal route, and notes that heirs may agree another division by musyawarah (KHI Pasal 183).
+>   - **What replaces sign-off:** deterministic engine with exact fractions; sourced vectors + invariants in CI on every push; dalil only byte-copied from the corpus; independent AI fiqh recomputation (Claude, never Gemini) for computed vectors and rule notes. Honest flags stay on the report: the court column where amounts differ, "Perlu konfirmasi" on disputed cases (e.g. grandfather with siblings), and "silakan berkonsultasi" refusals.
+>   - Content `status: "draft"` fields remain as pipeline state; the UI must not promise a future ustadz review that will not happen.
 
 
 Each decision lists the options, a recommendation, and what it changes in numbers. Money examples use

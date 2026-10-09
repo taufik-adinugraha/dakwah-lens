@@ -1,0 +1,2919 @@
+{
+ "meta": {
+  "generator": "belajar/pipeline/build_waris.py (rules step)",
+  "source": "belajar/pipeline/authored/waris.rules.json",
+  "source_sha256": "56fdd4d5ced9220bccd981ef90d692246831a3f83ba53ecb332740ac4eb84fa4",
+  "order": "registry order of belajar/src/lib/waris/registry.ts (RULE_IDS)",
+  "status": "draft",
+  "written": "2026-10-09",
+  "plan": "docs/waris-plan.md §8 (rule -> corpus record), §9.2, §10 M1.6",
+  "registry": "belajar/src/lib/waris/registry.ts",
+  "disclaimer_id": "Dibantu AI, bukan fatwa. Semua catatan ini masih draf dan menunggu tinjauan ustadz ahli faraid.",
+  "disclaimer_en": "AI-assisted, not an authoritative fatwa. Every note is a draft awaiting the fara'id reviewer."
+ },
+ "legal_sources": [
+  {
+   "id": "khi",
+   "kind": "peraturan",
+   "citation": {
+    "kitab": "Kompilasi Hukum Islam (Instruksi Presiden No. 1 Tahun 1991)",
+    "ref": "Buku I Pasal 85-97; Buku II Pasal 171-214",
+    "url": "https://peraturan.bpk.go.id/Details/293351/inpres-no-1-tahun-1991-penyebarluasan-kompilasi-hukum-islam"
+   },
+   "read_via": [
+    {
+     "kitab": "Seri Perundangan KHI (salinan archive.org)",
+     "ref": "Buku II hlm. 40-47",
+     "url": "https://dn790005.ca.archive.org/0/items/khibab-123/KHIbab123.pdf"
+    },
+    {
+     "kitab": "MUI Sumatera Utara, Hukum Kewarisan dalam Kompilasi Hukum Islam (reproduksi)",
+     "url": "https://muisumut.or.id/hukum-kewarisan-dalam-kompilasi-hukum-isla/"
+    }
+   ],
+   "pin": {
+    "status": "belum",
+    "sha256": null
+   },
+   "source_doc": "docs/waris-research/standard.md §2",
+   "note": "The official BPHN PDF returned HTTP 403 on 2026-10-09; wording was read from the archive.org copy and cross-checked against the MUI Sumut reproduction. Pull the BPK or JDIH Kemenag/Badilag copy and pin it before quoting any article (plan M0, rule B9). Pasal 94 is quoted only in Khairuddin pp. 121-122 (engine.md §3.2)."
+  },
+  {
+   "id": "sema-2-1994",
+   "kind": "sema",
+   "citation": {
+    "kitab": "Surat Edaran Mahkamah Agung No. 2 Tahun 1994 (maksud Pasal 177 KHI)",
+    "url": "https://jdih.mahkamahagung.go.id/index.php/legal-product/sema-no-02-tahun-1994/detail"
+   },
+   "read_via": [
+    {
+     "kitab": "Catatan di bawah Pasal 177, reproduksi KHI MUI Sumatera Utara",
+     "url": "https://muisumut.or.id/hukum-kewarisan-dalam-kompilasi-hukum-isla/"
+    }
+   ],
+   "pin": {
+    "status": "belum",
+    "sha256": null
+   },
+   "source_doc": "docs/waris-research/standard.md §3.1",
+   "note": "The JDIH page returned HTTP 403; only the text printed under Pasal 177 was read. The original SEMA is a plan M0 item."
+  },
+  {
+   "id": "sema-7-2012",
+   "kind": "sema",
+   "citation": {
+    "kitab": "SEMA No. 7 Tahun 2012, Rumusan Hukum Rapat Pleno Kamar Agama",
+    "url": "https://pta-bandung.go.id/images/Kepaniteraan/Pengelolaan_Kepaniteraan/2023_Kompilasi_SEMA_Kamar_Agama.pdf"
+   },
+   "read_via": [
+    {
+     "kitab": "A. Cholil, Kompilasi SEMA Kamar Agama 2012-2022 (Jan 2023)",
+     "ref": "Kewarisan hlm. 17-20"
+    }
+   ],
+   "pin": {
+    "status": "belum",
+    "sha256": null
+   },
+   "source_doc": "docs/waris-research/standard.md §3.4, §3.5",
+   "note": "Rumusan numbers as corrected in review 2026-10-09 (stepchild = no. 19; pewaris religion decides the court = no. 10)."
+  },
+  {
+   "id": "sema-3-2015",
+   "kind": "sema",
+   "citation": {
+    "kitab": "SEMA No. 3 Tahun 2015, Rumusan Hukum Rapat Pleno Kamar Agama",
+    "url": "https://kepaniteraan.mahkamahagung.go.id/images/artikel/Buku_Kompilasi_Rapat_Pleno_Ed_10_tanpa_ttd.pdf"
+   },
+   "read_via": [
+    {
+     "kitab": "Kompilasi Rumusan Hasil Rapat Pleno Kamar MA, cetakan ke-10 (2024), salinan identik",
+     "ref": "Kamar Agama sekitar hlm. 148-186",
+     "url": "https://ppotoda.org/wp-content/uploads/2024/03/Buku-Kompilasi-Rumusan-Kamar-MA-2024.pdf"
+    }
+   ],
+   "pin": {
+    "status": "belum",
+    "sha256": null
+   },
+   "source_doc": "docs/waris-research/standard.md §3.3, §3.4"
+  },
+  {
+   "id": "sema-1-2022",
+   "kind": "sema",
+   "citation": {
+    "kitab": "SEMA No. 1 Tahun 2022, Rumusan Hukum Rapat Pleno Kamar Agama",
+    "url": "https://kepaniteraan.mahkamahagung.go.id/images/artikel/Buku_Kompilasi_Rapat_Pleno_Ed_10_tanpa_ttd.pdf"
+   },
+   "pin": {
+    "status": "belum",
+    "sha256": null
+   },
+   "source_doc": "docs/waris-research/standard.md §3.5"
+  },
+  {
+   "id": "yurisprudensi-ma-2018",
+   "kind": "yurisprudensi",
+   "citation": {
+    "kitab": "Mahkamah Agung RI, Himpunan Yurisprudensi Mahkamah Agung s.d. 2018, Edisi Pertama",
+    "ref": "1/Yur/Ag/2018 (wasiat wajibah) hlm. 50-54; 2/Yur/Ag/2018 (ahli waris pengganti) hlm. 55-57",
+    "url": "https://jdih.mahkamahagung.go.id/storage/uploads/produk_hukum/Yurisprudensi%20Tahun%202018/1652410687_Yurisprudensi_2018.pdf"
+   },
+   "pin": {
+    "status": "belum",
+    "sha256": null
+   },
+   "source_doc": "docs/waris-research/engine.md §0.2, §11.1, §11.4",
+   "note": "2/Yur/Ag/2018 prints 86 K/Ag/2001 for grandchild substitution; standard.md §3.3 has 68 (Peradi list). Use the MA's own compilation (plan §7.2)."
+  },
+  {
+   "id": "ma-16-k-ag-2010",
+   "kind": "putusan",
+   "citation": {
+    "kitab": "Putusan Mahkamah Agung No. 16 K/AG/2010 (lembar yurisprudensi JDIH MA)",
+    "ref": "30 April 2010",
+    "url": "https://jdih.mahkamahagung.go.id/storage/uploads/produk_hukum/file/16%20K-AG-2010y.pdf"
+   },
+   "pin": {
+    "status": "belum",
+    "sha256": null
+   },
+   "source_doc": "docs/waris-research/standard.md §3.4; docs/waris-research/engine.md §11.4"
+  },
+  {
+   "id": "ma-86-k-ag-1994",
+   "kind": "yurisprudensi",
+   "citation": {
+    "kitab": "Yurisprudensi MA No. 86 K/AG/1994 (kaidah hukum)",
+    "url": "https://karakterisasi.komisiyudisial.go.id/?view=t5nsyMraxMLmx9%2Fn2uDj18bg0g%3D%3D&id=pmao"
+   },
+   "read_via": [
+    {
+     "kitab": "Komisi Yudisial, Karakterisasi Yurisprudensi 122 K/AG/1995 (mengutip 86 K/AG/1994)"
+    }
+   ],
+   "pin": {
+    "status": "belum",
+    "sha256": null
+   },
+   "source_doc": "docs/waris-research/standard.md §3.2; docs/waris-research/engine.md §12.3",
+   "note": "Three sources give three dates (27 Juli 1994, 20 Juli 1995, 27 Juli 1996). Quote the kaidah, not the date, until the decision itself is read (plan M0)."
+  },
+  {
+   "id": "ma-122-k-ag-1995",
+   "kind": "yurisprudensi",
+   "citation": {
+    "kitab": "Yurisprudensi MA No. 122 K/AG/1995 (Karakterisasi Komisi Yudisial)",
+    "url": "https://karakterisasi.komisiyudisial.go.id/?view=t5nsyMraxMLmx9%2Fn2uDj18bg0g%3D%3D&id=pmao"
+   },
+   "pin": {
+    "status": "belum",
+    "sha256": null
+   },
+   "source_doc": "docs/waris-research/standard.md §3.2"
+  },
+  {
+   "id": "ma-184-k-ag-1995",
+   "kind": "yurisprudensi",
+   "citation": {
+    "kitab": "Yurisprudensi MA No. 184 K/AG/1995 (dikutip Komisi Yudisial)",
+    "url": "https://karakterisasi.komisiyudisial.go.id/?view=t5nsyMraxMLmx9%2Fn2uDj18bg0g%3D%3D&id=pmao"
+   },
+   "pin": {
+    "status": "belum",
+    "sha256": null
+   },
+   "source_doc": "docs/waris-research/standard.md §3.2"
+  },
+  {
+   "id": "ma-32-k-ag-2002",
+   "kind": "yurisprudensi",
+   "citation": {
+    "kitab": "Yurisprudensi MA No. 32 K/AG/2002 (harta bersama dibagi lebih dahulu)",
+    "url": "https://peradi-tasikmalaya.or.id/kaidah-hukum-yurisprudensi-perdata-bagian-2-perdata-agama/"
+   },
+   "pin": {
+    "status": "belum",
+    "sha256": null
+   },
+   "source_doc": "docs/waris-research/standard.md §3.5",
+   "note": "Read only from the Peradi Tasikmalaya list of kaidah hukum."
+  },
+  {
+   "id": "ma-109-k-ag-2016",
+   "kind": "putusan",
+   "citation": {
+    "kitab": "Putusan MA No. 109 K/AG/2016 (batas bagian ahli waris pengganti)",
+    "url": "https://www.pa-bojonegoro.go.id/publikasi-arsip-publikasi/arsip-artikel/358-pembaharuan-hukum-waris-di-indonesia"
+   },
+   "read_via": [
+    {
+     "kitab": "PA Bojonegoro, Pembaharuan Hukum Waris di Indonesia (daftar kaidah MA 2016-2017)"
+    }
+   ],
+   "pin": {
+    "status": "belum",
+    "sha256": null
+   },
+   "source_doc": "docs/waris-research/engine.md §11.1 (EQ4)",
+   "note": "Seen only as listed on PA Bojonegoro's website; the decision itself was not opened (plan M0)."
+  },
+  {
+   "id": "ma-137-k-ag-2016",
+   "kind": "putusan",
+   "citation": {
+    "kitab": "Putusan MA No. 137 K/AG/2016 (anak saudara dan wasiat wajibah)",
+    "url": "https://www.pa-bojonegoro.go.id/publikasi-arsip-publikasi/arsip-artikel/358-pembaharuan-hukum-waris-di-indonesia"
+   },
+   "pin": {
+    "status": "belum",
+    "sha256": null
+   },
+   "source_doc": "docs/waris-research/engine.md §10, §11.4 (c)",
+   "note": "Seen only as listed on PA Bojonegoro's website."
+  },
+  {
+   "id": "fatwa-mui-5-2005",
+   "kind": "fatwa",
+   "citation": {
+    "kitab": "Fatwa MUI No. 5/MUNAS VII/MUI/9/2005 tentang Kewarisan Beda Agama",
+    "ref": "Himpunan Fatwa MUI hlm. 478-480",
+    "url": "https://fatwamui.com/storage/305/39.-Kewarisan-Beda-Agama.pdf"
+   },
+   "pin": {
+    "status": "belum",
+    "sha256": null
+   },
+   "source_doc": "docs/waris-research/standard.md §1.1",
+   "note": "Read in full on 2026-10-09; not yet sha256-pinned."
+  },
+  {
+   "id": "fatwa-mui-11-2012",
+   "kind": "fatwa",
+   "citation": {
+    "kitab": "Fatwa MUI No. 11 Tahun 2012 tentang Kedudukan Anak Hasil Zina dan Perlakuan Terhadapnya",
+    "url": "https://alsofwa.com/fatwa-mui-tentang-kedudukan-anak-hasil-zina-dan-perlakuan-terhadapnya/"
+   },
+   "pin": {
+    "status": "belum",
+    "sha256": null
+   },
+   "source_doc": "docs/waris-research/standard.md §1.2",
+   "note": "Read only from a reproduction; the official PDF was not reached (plan M0)."
+  },
+  {
+   "id": "fatwa-mui-adopsi-1984",
+   "kind": "fatwa",
+   "citation": {
+    "kitab": "Fatwa MUI (Rakernas, 7 Maret 1984) tentang Adopsi (Pengangkatan Anak)",
+    "ref": "Himpunan Fatwa MUI hlm. 305-308",
+    "url": "https://mui-jateng.or.id/wp-content/uploads/2018/03/09.-Adopsi-pengangkatan-anak.pdf"
+   },
+   "pin": {
+    "status": "belum",
+    "sha256": null
+   },
+   "source_doc": "docs/waris-research/standard.md §1.3"
+  },
+  {
+   "id": "buku-ii-2026",
+   "kind": "pedoman",
+   "citation": {
+    "kitab": "Mahkamah Agung RI, Pedoman Teknis Administrasi dan Teknis Peradilan Agama (Lampiran II KMA No. 159/KMA/SK.HK2/VIII/2026)",
+    "ref": "harta bersama poligami hlm. 836-838; kewarisan hlm. 844-848",
+    "url": "https://pa-wangiwangi.go.id/web/images/KEPANITERAAN/pedoman%20kepaniteraan/Buku%20II%20Peradilan%20Agama.pdf"
+   },
+   "pin": {
+    "status": "belum",
+    "sha256": null
+   },
+   "source_doc": "docs/waris-research/engine.md §0.2, §3.2, §6.3",
+   "note": "Supersedes Buku II 2013. Contains no calculation rules on pp. 844-848 (plan D7)."
+  },
+  {
+   "id": "buku-ii-2013",
+   "kind": "pedoman",
+   "citation": {
+    "kitab": "Mahkamah Agung RI, Pedoman Pelaksanaan Tugas dan Administrasi Peradilan Agama, Buku II, Edisi Revisi 2013 (transkripsi PA Rumbia)",
+    "url": "http://pa-rumbia.go.id/images/Pedoman_Organisasi/1-Buku-II-edisi-Rev_2013_Pedoman-Tugas-dan-Adm.pdf"
+   },
+   "pin": {
+    "status": "belum",
+    "sha256": null
+   },
+   "source_doc": "docs/waris-research/engine.md §6.3, §9.4, §11.3",
+   "note": "Superseded in August 2026 by Buku II 2026. Cited only where a court-column default still rests on it (no radd to a spouse, p. 176 §8(h); the wasiat wajibah ceiling, p. 173 §2(i)) and for the readings the engine rejects; never as current MA guidance (plan D7)."
+  },
+  {
+   "id": "kajian-pa-kotabumi",
+   "kind": "kajian",
+   "citation": {
+    "kitab": "PA Kotabumi, Ahli Waris Pengganti dalam Kewarisan Islam Perspektif Madzhab Nasional (artikel situs pengadilan)",
+    "url": "https://pa-kotabumi.go.id/amar-putusan/178-ahli-waris-pengganti-dalam-kewarisan-islam-perspektif-madzhab-nasional.html"
+   },
+   "pin": {
+    "status": "belum",
+    "sha256": null
+   },
+   "source_doc": "docs/waris-research/engine.md §11.1",
+   "note": "A court-website article, not a decision: it records the competing readings of KHI 185(2)."
+  },
+  {
+   "id": "kajian-tarjih-pengganti",
+   "kind": "kajian",
+   "citation": {
+    "kitab": "Majelis Tarjih Muhammadiyah, Ketentuan Ahli Waris Pengganti",
+    "url": "https://fatwatarjih.or.id/ketentuan-ahli-waris-pengganti/"
+   },
+   "read_via": [
+    {
+     "kitab": "Ensiklopedia Tarjih (18 Nov 2019)",
+     "url": "https://tarjih.muhammadiyah.or.id/ketentuan-ahli-waris-pengganti"
+    }
+   ],
+   "pin": {
+    "status": "belum",
+    "sha256": null
+   },
+   "source_doc": "docs/waris-research/engine.md §11.1; docs/waris-research/standard.md §1.6",
+   "note": "Not an MUI position; context for the per-head reading of KHI 185(2)."
+  },
+  {
+   "id": "kajian-pa-banjarmasin-2016",
+   "kind": "kajian",
+   "citation": {
+    "kitab": "Muzibur Rahman, studi lapangan hakim PA Banjarmasin tentang radd kepada suami/istri (UIN Antasari, 2016)",
+    "url": "https://idr.uin-antasari.ac.id/5439/"
+   },
+   "pin": {
+    "status": "belum",
+    "sha256": null
+   },
+   "source_doc": "docs/waris-research/standard.md §3.6",
+   "note": "2 of 3 judges would give radd to the spouse; a field study, not a ruling."
+  },
+  {
+   "id": "kajian-wahyudi-2021",
+   "kind": "kajian",
+   "citation": {
+    "kitab": "M. Isna Wahyudi, Melacak Illat Hukum Larangan Waris Beda Agama, Jurnal Hukum dan Peradilan 10(1) 2021: 155-172",
+    "url": "https://www.jurnalhukumdanperadilan.org/jurnalhukumperadilan/article/download/261/267"
+   },
+   "pin": {
+    "status": "belum",
+    "sha256": null
+   },
+   "source_doc": "docs/waris-research/standard.md §3.4",
+   "note": "Reports three PA decisions giving three different wasiat-wajibah sizes (pp. 171-172)."
+  }
+ ],
+ "rules": [
+  {
+   "rule_id": "estate.harta_bersama",
+   "title_id": "Harta bersama dipisah lebih dulu",
+   "summary_id": "Bila almarhum masih terikat perkawinan, separuh harta bersama adalah milik pasangan yang hidup, bukan warisan. Hanya separuh bagian almarhum yang masuk ke harta peninggalan, dan pasangan tetap mendapat bagian warisnya dari situ.",
+   "dalil": [],
+   "dalil_rule": [],
+   "related_gaps": [
+    "G-E9-indonesian-provisions"
+   ],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 96 ayat (1)"
+    },
+    {
+     "source": "ma-32-k-ag-2002",
+     "locator": "kaidah hukum"
+    }
+   ],
+   "ikhtilaf": {
+    "summary_id": "Bab faraid dalam kitab rujukan kami tidak memuat anggapan bahwa separuh harta bersama milik pasangan; fikih menanyakan siapa pemilik yang sebenarnya. Kolom fikih memakai pemisahan ini sampai peninjau faraid memutuskan.",
+    "source_doc": "docs/waris-plan.md §2.6 D6; docs/waris-research/standard.md §5.4 Q5"
+   },
+   "method": null,
+   "reviewer_notes": [
+    "No corpus record grounds a 50% presumption (engine.md §3.2). Reviewer R1 decides whether the fikih column keeps the split; fallback is plan D6 option B."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "estate.harta_bersama_poligami",
+   "title_id": "Harta bersama bila istri lebih dari satu",
+   "summary_id": "Bila almarhum beristri lebih dari satu, harta bersama dihitung per masa perkawinan, dan setiap istri mengambil bagiannya dari harta yang diperoleh selama ia menjadi istri. Bagian almarhum dari setiap masa menjadi harta peninggalannya.",
+   "dalil": [],
+   "dalil_rule": [],
+   "related_gaps": [
+    "G-E9-indonesian-provisions"
+   ],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 94"
+    },
+    {
+     "source": "khi",
+     "locator": "Pasal 190"
+    },
+    {
+     "source": "buku-ii-2026",
+     "locator": "hlm. 836-838"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "KHI 94 wording is quoted only via Khairuddin pp. 121-122 (engine.md §3.2); standard.md does not quote it. In v1 the questionnaire shows fractions only and refers the rupiah panel to the court for several wives (plan D18)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "estate.biaya",
+   "title_id": "Biaya sakit dan pengurusan jenazah dibayar dulu",
+   "summary_id": "Biaya perawatan menjelang wafat dan biaya pengurusan jenazah diambil dari harta peninggalan sebelum apa pun dibagi. Kitab rujukan kami menyebut biaya jenazah diambil dari harta peninggalan, tetapi belum menyebut urutannya sebelum utang; urutan itu mengikuti KHI.",
+   "dalil": [
+    "F-FMUIN-11-tajhiz"
+   ],
+   "dalil_rule": [
+    "R-tajhiz"
+   ],
+   "related_gaps": [
+    "G-E4-funeral-first"
+   ],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 175 ayat (1) huruf a"
+    },
+    {
+     "source": "khi",
+     "locator": "Pasal 171 huruf e"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "F-FMUIN-11-tajhiz also says a wife's tajhiz is borne by a solvent husband, not by her estate. The engine always deducts biayaJenazah from the estate; reviewer to decide whether the fikih column needs a note or a change when the deceased is a wife.",
+    "Last-illness costs: KHI 171(e) and 175(1)(b); no corpus record names them."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "estate.utang",
+   "title_id": "Utang dilunasi sebelum wasiat dan pembagian",
+   "summary_id": "Utang almarhum dibayar lebih dulu dari harta peninggalan, sebelum wasiat dijalankan dan sebelum harta dibagi kepada ahli waris.",
+   "dalil": [
+    "Q-4-11",
+    "Q-4-12",
+    "F-ALUMM-572",
+    "T-IK-4-11-dayn"
+   ],
+   "dalil_rule": [
+    "R-debt-wasiyya-first"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 175 ayat (1) huruf b"
+    },
+    {
+     "source": "khi",
+     "locator": "Pasal 175 ayat (2)"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "Show the consensus sentences of F-ALUMM-572 and T-IK-4-11-dayn; do not lead with the marfu' report of 'Ali that both records go on to quote (al-Shafi'i: not established by the hadith scholars; at-Tirmidhi: known only via al-Harith).",
+    "H-BUKHARI-6731 and H-MUSLIM-1619e (plan §8 supporting) are not cited: their text says the estate is for the heirs but does not state the order debt before wasiat before division."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "estate.wasiat",
+   "title_id": "Wasiat dijalankan sebelum pembagian",
+   "summary_id": "Wasiat yang sah untuk orang yang bukan ahli waris dijalankan setelah utang dibayar, paling banyak sepertiga harta. Sisanya baru dibagi kepada ahli waris.",
+   "dalil": [
+    "Q-4-11",
+    "H-BUKHARI-2742",
+    "H-MUSLIM-1628a",
+    "F-FQARIB-118-wasiyya"
+   ],
+   "dalil_rule": [
+    "R-wasiyya-third"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 175 ayat (1) huruf c"
+    },
+    {
+     "source": "khi",
+     "locator": "Pasal 195 ayat (2)"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "estate.wasiat_dibatasi_sepertiga",
+   "title_id": "Wasiat lebih dari sepertiga dipotong",
+   "summary_id": "Bila wasiat melebihi sepertiga harta dan tidak semua ahli waris menyetujui kelebihannya, wasiat hanya dijalankan sampai sepertiga.",
+   "dalil": [
+    "H-BUKHARI-2742",
+    "H-MUSLIM-1628a",
+    "F-FQARIB-118-wasiyya"
+   ],
+   "dalil_rule": [
+    "R-wasiyya-third"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 195 ayat (2)"
+    },
+    {
+     "source": "khi",
+     "locator": "Pasal 201"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "With several bequests over one third the engine reduces them pro rata; no opened source states that (engine.md EQ7)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "estate.wasiat_ahli_waris_tanpa_persetujuan",
+   "title_id": "Wasiat untuk ahli waris perlu persetujuan",
+   "summary_id": "Wasiat untuk seorang ahli waris hanya dijalankan bila semua ahli waris lain menyetujuinya. Tanpa persetujuan itu, alat ini tidak menjalankan wasiat tersebut.",
+   "dalil": [
+    "H-BULUGH-1114",
+    "F-FQARIB-118-wasiyya",
+    "F-FMUIN-33-heir-consent"
+   ],
+   "dalil_rule": [
+    "R-no-wasiyya-heir"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 195 ayat (3)"
+    },
+    {
+     "source": "khi",
+     "locator": "Pasal 195 ayat (4)"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "Cite H-BULUGH-1114 by the primaries Bulugh names (Ahmad and the four except an-Nasa'i), never by the Bulugh number (plan D10, G-E5/G-E6). Its shown span still carries an editor footnote marker (pipeline open issue).",
+    "Never show H-BULUGH-1115 (the addition about the heirs' wish, graded munkar in the tahqiq). The consent exception rests on F-FQARIB-118-wasiyya, F-FMUIN-33-heir-consent and KHI 195(3).",
+    "T-IK-2-180-naskh (listed as strongest in R-no-wasiyya-heir) is not cited: its text concerns the abrogation of the 2:180 bequest duty, not the consent rule.",
+    "F-FMUIN-33-heir-consent counts only consent given after the death; the engine has one consent flag and does not ask when it was given."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "estate.wasiat_wajibah",
+   "title_id": "Wasiat wajibah di kolom Pengadilan Agama",
+   "summary_id": "Di kolom KHI dan praktik Pengadilan Agama, anak angkat atau kerabat non-Muslim tertentu dapat diberi wasiat wajibah, yang dihitung sebelum harta dibagi kepada ahli waris. Besarnya ditetapkan hakim; angka di sini hanya perkiraan.",
+   "dalil": [],
+   "dalil_rule": [
+    "R-ext-mui-khi"
+   ],
+   "related_gaps": [
+    "G-E9-indonesian-provisions"
+   ],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 209"
+    },
+    {
+     "source": "yurisprudensi-ma-2018",
+     "locator": "1/Yur/Ag/2018, hlm. 50-54"
+    }
+   ],
+   "ikhtilaf": {
+    "summary_id": "Fatwa MUI tentang kewarisan beda agama hanya membolehkan pemberian sukarela berupa hibah, wasiat, dan hadiah, dan fatwa tentang adopsi hanya menyebut kebolehan berwasiat untuk anak angkat. Keduanya tidak memakai istilah wasiat wajibah, sehingga kolom fikih tidak menghitungnya.",
+    "legal": [
+     {
+      "source": "fatwa-mui-5-2005",
+      "locator": "angka 2"
+     },
+     {
+      "source": "fatwa-mui-adopsi-1984",
+      "locator": "kutipan pendukung, hlm. 307-308"
+     }
+    ],
+    "source_doc": "docs/waris-plan.md §2.8 D8; docs/waris-research/standard.md §1.1, §1.3"
+   },
+   "method": null,
+   "reviewer_notes": [
+    "Fiqh as-Sunnah 865-866 describe Egyptian wasiyya wajiba law (No. 71/1946) and are not used (plan §8)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "mani.beda_agama",
+   "title_id": "Beda agama: tidak saling mewarisi",
+   "summary_id": "Seorang Muslim tidak mewarisi dari orang yang bukan Muslim, dan sebaliknya. Kerabat yang berbeda agama dengan almarhum tidak dihitung sebagai ahli waris.",
+   "dalil": [
+    "H-BUKHARI-6764",
+    "H-MUSLIM-1614",
+    "H-BULUGH-1098",
+    "F-FQARIB-116-barriers"
+   ],
+   "dalil_rule": [
+    "R-barrier-religion"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "fatwa-mui-5-2005",
+     "locator": "angka 1"
+    },
+    {
+     "source": "khi",
+     "locator": "Pasal 171 huruf c"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "Q-4-141 is cited by Fatwa MUI 5/2005 but the ayah itself does not mention inheritance; not listed as grounding (plan §8: show only as the dalil MUI cites). H-BULUGH-1096 repeats H-BUKHARI-6764 and is not listed.",
+    "The engine also lets an ineligible relative neither block nor reduce anyone (engine.md §4, Khairuddin p. 25). No corpus record states that principle; the summary therefore does not claim it. Candidate for a gap record."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "mani.pembunuh",
+   "title_id": "Pembunuh tidak mewarisi",
+   "summary_id": "Ahli waris yang membunuh pewaris tidak mendapat warisan darinya. Menurut KHI, penghalang ini berlaku bila ada putusan hakim yang berkekuatan hukum tetap.",
+   "dalil": [
+    "F-ALUMM-550-killer",
+    "F-FQARIB-116-barriers",
+    "F-FSUNNAH-844-mawani",
+    "F-ALUMM-903-umar",
+    "H-BULUGH-1107"
+   ],
+   "dalil_rule": [
+    "R-barrier-killer"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 173"
+    }
+   ],
+   "ikhtilaf": {
+    "summary_id": "Ulama berbeda pendapat tentang pembunuhan yang tidak disengaja: Imam Syafi'i memandang setiap pembunuhan menghalangi warisan, sedangkan mazhab Maliki hanya pembunuhan sengaja yang zalim. KHI mensyaratkan putusan hakim yang berkekuatan hukum tetap.",
+    "dalil": [
+     "F-ALUMM-550-killer",
+     "F-FSUNNAH-844-mawani"
+    ],
+    "legal": [
+     {
+      "source": "khi",
+      "locator": "Pasal 173"
+     }
+    ],
+    "source_doc": "dalil.json R-barrier-killer caveat; docs/waris-plan.md §2.4 D4"
+   },
+   "method": null,
+   "reviewer_notes": [
+    "Lead with F-ALUMM-550-killer (plan D10). Show H-BULUGH-1107 only with its grading note: Ibn Hajar writes that the correct view is that it stops at 'Umar; the tahqiq footnote reports al-Albani's authentication.",
+    "F-FSUNNAH-844-mawani also quotes Egyptian law (art. 5): never display that part.",
+    "The questionnaire refuses any reported killing in both columns (plan D4); this note is for the refusal page and the lessons."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "mani.anak_luar_nikah",
+   "title_id": "Anak di luar nikah mewarisi dari pihak ibu",
+   "summary_id": "Anak yang lahir di luar pernikahan yang sah tidak saling mewarisi dengan laki-laki yang menjadi ayah biologisnya. Ia mewarisi dari ibunya dan keluarga ibunya.",
+   "dalil": [
+    "F-FSUNNAH-863-ibn-zina"
+   ],
+   "dalil_rule": [],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "fatwa-mui-11-2012",
+     "locator": "angka 1-2"
+    },
+    {
+     "source": "khi",
+     "locator": "Pasal 186"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "Fatwa MUI 11/2012 was read only from a reproduction; the official PDF is a plan M0 item.",
+    "MUI 11/2012 point 5: a wasiat wajibah from the biological father is a ta'zir only the state can impose; report note only, never computed (engine.md §4)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "mani.anak_angkat",
+   "title_id": "Anak angkat bukan ahli waris",
+   "summary_id": "Pengangkatan anak tidak menjadikannya anak kandung, sehingga anak angkat bukan ahli waris orang tua angkatnya, dan sebaliknya. Ia tetap dapat menerima wasiat atau hibah.",
+   "dalil": [
+    "Q-33-4",
+    "Q-33-5"
+   ],
+   "dalil_rule": [],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "fatwa-mui-adopsi-1984",
+     "locator": "angka 1-3 dan kutipan pendukung"
+    },
+    {
+     "source": "khi",
+     "locator": "Pasal 171 huruf h"
+    },
+    {
+     "source": "khi",
+     "locator": "Pasal 209"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "Q-33-4 and Q-33-5 ground that adoption does not create nasab; that the adopted child therefore does not inherit is the fiqh consequence the 1984 fatwa draws (plan §8 notes the fatwa cites these ayat; confirm on the pinned PDF)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "mani.anak_tiri",
+   "title_id": "Anak tiri bukan ahli waris",
+   "summary_id": "Anak tiri, yaitu anak dari pasangan almarhum, tidak termasuk ahli waris. Pengadilan Agama dapat memberinya bagian lewat wasiat wajibah; alat ini tidak menghitungnya.",
+   "dalil": [
+    "F-FQARIB-116-heirs"
+   ],
+   "dalil_rule": [
+    "R-heirs-list"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "sema-7-2012",
+     "locator": "Rumusan Kamar Agama angka 19"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "Grounding by enumeration: the heir list in F-FQARIB-116-heirs does not include a stepchild (plan §8)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "fardh.suami_1_2",
+   "title_id": "Suami: setengah (1/2)",
+   "summary_id": "Suami mendapat setengah harta bila istrinya wafat tanpa meninggalkan anak atau cucu dari anak laki-laki.",
+   "dalil": [
+    "Q-4-12",
+    "F-FQARIB-117-furudh",
+    "H-BUKHARI-6739"
+   ],
+   "dalil_rule": [
+    "R-spouses"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 179"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "fardh.suami_1_4",
+   "title_id": "Suami: seperempat (1/4)",
+   "summary_id": "Suami mendapat seperempat bila istrinya meninggalkan anak atau cucu dari anak laki-laki, baik dari pernikahan dengannya maupun dari pernikahan lain.",
+   "dalil": [
+    "Q-4-12",
+    "F-FQARIB-117-furudh",
+    "H-BUKHARI-6739"
+   ],
+   "dalil_rule": [
+    "R-spouses"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 179"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "fardh.istri_1_4",
+   "title_id": "Istri: seperempat (1/4)",
+   "summary_id": "Istri mendapat seperempat bila suaminya wafat tanpa meninggalkan anak atau cucu dari anak laki-laki. Bila istri lebih dari satu, mereka berbagi seperempat itu sama rata.",
+   "dalil": [
+    "Q-4-12",
+    "F-FQARIB-117-furudh",
+    "H-BUKHARI-6739"
+   ],
+   "dalil_rule": [
+    "R-spouses"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 180"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "fardh.istri_1_8",
+   "title_id": "Istri: seperdelapan (1/8)",
+   "summary_id": "Istri mendapat seperdelapan bila suaminya meninggalkan anak atau cucu dari anak laki-laki. Bila istri lebih dari satu, mereka berbagi seperdelapan itu sama rata.",
+   "dalil": [
+    "Q-4-12",
+    "F-FQARIB-117-furudh",
+    "H-BUKHARI-6739"
+   ],
+   "dalil_rule": [
+    "R-spouses"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 180"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "fardh.anak_pr_1_2",
+   "title_id": "Satu anak perempuan: setengah (1/2)",
+   "summary_id": "Bila almarhum meninggalkan satu anak perempuan dan tidak ada anak laki-laki, anak perempuan itu mendapat setengah harta.",
+   "dalil": [
+    "Q-4-11",
+    "F-FQARIB-117-furudh"
+   ],
+   "dalil_rule": [
+    "R-daughters"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 176"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "fardh.anak_pr_2_3",
+   "title_id": "Dua anak perempuan atau lebih: dua pertiga (2/3)",
+   "summary_id": "Bila almarhum meninggalkan dua anak perempuan atau lebih dan tidak ada anak laki-laki, mereka berbagi dua pertiga harta sama rata.",
+   "dalil": [
+    "Q-4-11",
+    "T-IK-4-176-two-daughters",
+    "F-FQARIB-117-furudh"
+   ],
+   "dalil_rule": [
+    "R-daughters"
+   ],
+   "related_gaps": [
+    "G-E1-sad-ibn-ar-rabi"
+   ],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 176"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "Q-4-11 speaks of more than two daughters; the two-thirds for exactly two is taught through the 4:176 analogy that T-IK-4-176-two-daughters reports from the majority. The Sa'd ibn ar-Rabi' report stays hidden until a named grading is found (G-E1, plan D10)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "fardh.cucu_pr_1_2",
+   "title_id": "Satu cucu perempuan dari anak laki-laki: setengah (1/2)",
+   "summary_id": "Bila almarhum tidak meninggalkan anak sama sekali dan tidak ada cucu laki-laki dari anak laki-laki, satu cucu perempuan dari anak laki-laki mendapat setengah harta, seperti seorang anak perempuan.",
+   "dalil": [
+    "F-FQARIB-117-furudh",
+    "F-FMUIN-34-jadd-like-ab"
+   ],
+   "dalil_rule": [],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "Registry meta names R-sons-daughter-sixth, which concerns the one-sixth only; the half and two-thirds of a son's daughter are grounded by F-FQARIB-117-furudh (the son's daughter listed beside the daughter) and F-FMUIN-34-jadd-like-ab (a son's daughter is like a daughter)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "fardh.cucu_pr_2_3",
+   "title_id": "Dua cucu perempuan atau lebih dari anak laki-laki: dua pertiga (2/3)",
+   "summary_id": "Bila almarhum tidak meninggalkan anak sama sekali dan tidak ada cucu laki-laki dari anak laki-laki, dua cucu perempuan atau lebih dari anak laki-laki berbagi dua pertiga harta sama rata.",
+   "dalil": [
+    "F-FQARIB-117-furudh",
+    "F-FMUIN-34-jadd-like-ab"
+   ],
+   "dalil_rule": [],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "As fardh.cucu_pr_1_2: R-sons-daughter-sixth (registry meta) concerns the one-sixth only, so it is not listed."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "fardh.cucu_pr_1_6_takmilah",
+   "title_id": "Cucu perempuan bersama satu anak perempuan: seperenam (1/6)",
+   "summary_id": "Bila ada satu anak perempuan yang mendapat setengah, cucu perempuan dari anak laki-laki mendapat seperenam untuk menggenapkan dua pertiga, selama tidak ada cucu laki-laki dari anak laki-laki.",
+   "dalil": [
+    "H-BUKHARI-6736",
+    "H-BULUGH-1097",
+    "F-FQARIB-117-furudh"
+   ],
+   "dalil_rule": [
+    "R-sons-daughter-sixth"
+   ],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "H-BULUGH-1097 is the same report of Ibn Mas'ud (Bulugh names al-Bukhari); show H-BUKHARI-6736 first."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "fardh.ayah_1_6",
+   "title_id": "Ayah: seperenam (1/6) bila ada keturunan",
+   "summary_id": "Ayah mendapat seperenam bila almarhum meninggalkan anak atau cucu dari anak laki-laki. Bila keturunannya hanya perempuan, ayah juga mengambil sisa harta.",
+   "dalil": [
+    "Q-4-11",
+    "F-FQARIB-117-furudh",
+    "H-BUKHARI-6739"
+   ],
+   "dalil_rule": [
+    "R-parents"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 177"
+    },
+    {
+     "source": "sema-2-1994",
+     "locator": "maksud Pasal 177"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "fardh.kakek_1_6",
+   "title_id": "Kakek: seperenam (1/6) bila ayah tidak ada",
+   "summary_id": "Bila ayah sudah tidak ada, kakek dari pihak ayah menempati posisi ayah dan mendapat seperenam bila ada anak atau cucu dari anak laki-laki. Bila kakek bersama saudara kandung atau seayah, berlaku cara khusus.",
+   "dalil": [
+    "F-FQARIB-117-furudh",
+    "F-FMUIN-34-jadd-like-ab"
+   ],
+   "dalil_rule": [
+    "R-grandfather"
+   ],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "Never use H-BULUGH-1101 (graded da'if in the tahqiq) for the grandfather's sixth (plan §8)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "fardh.ibu_1_3",
+   "title_id": "Ibu: sepertiga (1/3)",
+   "summary_id": "Ibu mendapat sepertiga bila almarhum tidak meninggalkan anak atau cucu dari anak laki-laki, dan tidak meninggalkan dua saudara atau lebih.",
+   "dalil": [
+    "Q-4-11",
+    "F-FQARIB-117-furudh"
+   ],
+   "dalil_rule": [
+    "R-mother-third-sixth"
+   ],
+   "related_gaps": [
+    "G-UMARIYYATAIN-JADD"
+   ],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 178 ayat (1)"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "With a spouse, the grandfather (no father) and the mother, the engine gives the mother one third of the whole through this rule. That reading rests on al-Hawi al-Kabir 8:121, which is external and not yet pinned (G-UMARIYYATAIN-JADD, reviewer R17)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "fardh.ibu_1_6",
+   "title_id": "Ibu: seperenam (1/6)",
+   "summary_id": "Ibu mendapat seperenam bila almarhum meninggalkan anak atau cucu dari anak laki-laki, atau meninggalkan dua saudara atau lebih dari jalur mana pun, walaupun saudara itu sendiri tidak mendapat warisan.",
+   "dalil": [
+    "Q-4-11",
+    "T-TB-4-11-ikhwa-two",
+    "T-IK-4-11-mother-siblings",
+    "F-FQARIB-117-furudh"
+   ],
+   "dalil_rule": [
+    "R-mother-third-sixth"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 178 ayat (1)"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "T-TB-4-11-ikhwa-two records that 'ikhwa' means two or more against the view of Ibn 'Abbas; the record does not state his view, so no ikhtilaf note is written here."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "fardh.nenek_1_6",
+   "title_id": "Nenek: seperenam (1/6)",
+   "summary_id": "Bila ibu sudah tidak ada, nenek mendapat seperenam. Bila ada dua nenek yang sama-sama berhak, keduanya berbagi seperenam itu.",
+   "dalil": [
+    "H-BULUGH-1103",
+    "F-FQARIB-117-furudh",
+    "F-FMUIN-34-jadd-like-ab"
+   ],
+   "dalil_rule": [
+    "R-grandmother"
+   ],
+   "related_gaps": [
+    "G-E2-grandmother-abu-bakr"
+   ],
+   "legal": [],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "Cite H-BULUGH-1103 by the primaries Bulugh names (Abu Dawud, an-Nasa'i); the tahqiq grades it hasan (plan D10)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "fardh.sdr_pr_1_2",
+   "title_id": "Satu saudara perempuan: setengah (1/2)",
+   "summary_id": "Satu saudara perempuan kandung, atau seayah bila tidak ada yang kandung, mendapat setengah harta bila almarhum tidak meninggalkan anak, cucu dari anak laki-laki, ayah, kakek, maupun saudara laki-laki dari jalurnya.",
+   "dalil": [
+    "Q-4-176",
+    "F-FQARIB-117-furudh"
+   ],
+   "dalil_rule": [
+    "R-siblings-kalala"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 182"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "fardh.sdr_pr_2_3",
+   "title_id": "Dua saudara perempuan atau lebih: dua pertiga (2/3)",
+   "summary_id": "Dua saudara perempuan kandung atau lebih, atau seayah bila tidak ada yang kandung, berbagi dua pertiga harta bila almarhum tidak meninggalkan anak, cucu dari anak laki-laki, ayah, kakek, maupun saudara laki-laki dari jalurnya.",
+   "dalil": [
+    "Q-4-176",
+    "F-FQARIB-117-furudh"
+   ],
+   "dalil_rule": [
+    "R-siblings-kalala"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 182"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "fardh.sdr_pr_seayah_1_6_takmilah",
+   "title_id": "Saudara perempuan seayah bersama satu saudara perempuan kandung: seperenam (1/6)",
+   "summary_id": "Bila ada satu saudara perempuan kandung yang mendapat setengah, saudara perempuan seayah mendapat seperenam untuk menggenapkan dua pertiga, selama tidak ada saudara laki-laki seayah.",
+   "dalil": [
+    "F-FQARIB-117-furudh"
+   ],
+   "dalil_rule": [
+    "R-siblings-kalala"
+   ],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "Q-4-176 does not state this sixth; only F-FQARIB-117-furudh does, so Q-4-176 is not cited here."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "fardh.seibu_1_6",
+   "title_id": "Satu saudara seibu: seperenam (1/6)",
+   "summary_id": "Satu saudara seibu, laki-laki atau perempuan, mendapat seperenam bila almarhum tidak meninggalkan anak, cucu dari anak laki-laki, ayah, maupun kakek.",
+   "dalil": [
+    "Q-4-12",
+    "T-IK-4-12-kalala",
+    "F-FQARIB-117-furudh"
+   ],
+   "dalil_rule": [
+    "R-maternal-siblings"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 181"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "That the sibling of 4:12 is a uterine sibling comes from tafsir (T-IK-4-12-kalala), not from the Tanzil text itself."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "fardh.seibu_1_3",
+   "title_id": "Dua saudara seibu atau lebih: sepertiga (1/3)",
+   "summary_id": "Dua saudara seibu atau lebih berbagi sepertiga harta sama rata; laki-laki dan perempuan mendapat bagian yang sama.",
+   "dalil": [
+    "Q-4-12",
+    "T-IK-4-12-kalala",
+    "F-FQARIB-117-furudh",
+    "F-FQARIB-118-asabah-bil-ghayr"
+   ],
+   "dalil_rule": [
+    "R-maternal-siblings"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 181"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "hajb.hirman",
+   "title_id": "Terhalang oleh kerabat yang lebih dekat",
+   "summary_id": "Sebagian kerabat tidak mendapat warisan karena ada kerabat lain yang lebih dekat, misalnya saudara terhalang oleh anak laki-laki atau ayah, dan kakek terhalang oleh ayah. Alat ini menyebutkan siapa menghalangi siapa.",
+   "dalil": [
+    "F-FQARIB-117-hajb",
+    "F-FMUIN-34-hajb",
+    "Q-4-176",
+    "T-IK-4-176-father-blocks",
+    "T-TB-4-11-father-blocks",
+    "F-FQARIB-116-asabah",
+    "F-FMUIN-34-asabah-order"
+   ],
+   "dalil_rule": [
+    "R-hajb-siblings",
+    "R-hajb-grandparents",
+    "R-asabah-order"
+   ],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "The exclusion of siblings rests on the kalalah ayat plus reported consensus (T-IK-4-176-father-blocks, T-TB-4-11-father-blocks); there is no marfu' hadith in the corpus for it (R-hajb-siblings caveat). H-BULUGH-1108 was removed from this chain in review (it concerns wala')."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "hajb.istighraq",
+   "title_id": "Sisa harta sudah habis",
+   "summary_id": "Ahli waris sisa hanya mengambil apa yang tersisa setelah bagian pasti dibagikan. Bila bagian pasti sudah menghabiskan seluruh harta, mereka tidak mendapat apa-apa.",
+   "dalil": [
+    "H-BUKHARI-6732",
+    "H-MUSLIM-1615a"
+   ],
+   "dalil_rule": [
+    "R-furudh-then-asabah"
+   ],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "The one exception is musytarakah (separate note). The phrase 'tasqutu 'inda al-istighraq' cited by engine.md §6.1 from Fath al-Mu'in §34 is not in an extracted span."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "nuqshan.suami",
+   "title_id": "Bagian suami turun karena ada anak",
+   "summary_id": "Bagian suami turun dari setengah menjadi seperempat karena almarhumah meninggalkan anak atau cucu dari anak laki-laki.",
+   "dalil": [
+    "Q-4-12",
+    "F-FQARIB-117-furudh"
+   ],
+   "dalil_rule": [
+    "R-spouses"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 179"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "nuqshan.istri",
+   "title_id": "Bagian istri turun karena ada anak",
+   "summary_id": "Bagian istri turun dari seperempat menjadi seperdelapan karena almarhum meninggalkan anak atau cucu dari anak laki-laki.",
+   "dalil": [
+    "Q-4-12",
+    "F-FQARIB-117-furudh"
+   ],
+   "dalil_rule": [
+    "R-spouses"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 180"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "nuqshan.ibu",
+   "title_id": "Bagian ibu turun menjadi seperenam",
+   "summary_id": "Bagian ibu turun dari sepertiga menjadi seperenam karena ada anak atau cucu dari anak laki-laki, atau ada dua saudara atau lebih, walaupun saudara itu sendiri terhalang.",
+   "dalil": [
+    "Q-4-11",
+    "T-TB-4-11-ikhwa-two",
+    "T-IK-4-11-mother-siblings",
+    "F-FQARIB-117-furudh"
+   ],
+   "dalil_rule": [
+    "R-mother-third-sixth"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 178 ayat (1)"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "nuqshan.ayah",
+   "title_id": "Ayah mendapat bagian pasti seperenam karena ada keturunan",
+   "summary_id": "Tanpa keturunan, ayah mengambil sisa harta. Karena almarhum meninggalkan anak atau cucu dari anak laki-laki, ayah mendapat seperenam sebagai bagian pasti; ia tetap mengambil sisa hanya bila keturunannya perempuan saja.",
+   "dalil": [
+    "Q-4-11",
+    "F-FQARIB-117-furudh",
+    "H-BUKHARI-6732"
+   ],
+   "dalil_rule": [
+    "R-parents"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 177"
+    },
+    {
+     "source": "sema-2-1994",
+     "locator": "maksud Pasal 177"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "asabah.bin_nafs",
+   "title_id": "Sisa harta untuk kerabat laki-laki terdekat",
+   "summary_id": "Setelah bagian pasti dibagikan, sisanya diberikan kepada kerabat laki-laki terdekat dari jalur ayah, menurut urutan: anak laki-laki, cucu laki-laki, ayah, kakek, saudara laki-laki, keponakan laki-laki, paman, lalu sepupu laki-laki.",
+   "dalil": [
+    "H-BUKHARI-6732",
+    "H-MUSLIM-1615a",
+    "F-FQARIB-116-asabah",
+    "F-FMUIN-34-asabah-order"
+   ],
+   "dalil_rule": [
+    "R-furudh-then-asabah",
+    "R-asabah-order"
+   ],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "The grandfather with brothers is not decided by this order in Syafi'i fiqh; see the jadd.* notes."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "asabah.bil_ghair",
+   "title_id": "Laki-laki mendapat dua kali bagian perempuan",
+   "summary_id": "Bila anak laki-laki dan anak perempuan mewarisi bersama, demikian pula cucu dari anak laki-laki, saudara kandung, atau saudara seayah, mereka berbagi sisa harta dengan bagian laki-laki dua kali bagian perempuan.",
+   "dalil": [
+    "Q-4-11",
+    "Q-4-176",
+    "F-FQARIB-118-asabah-bil-ghayr",
+    "F-FMUIN-34-asabah-order"
+   ],
+   "dalil_rule": [
+    "R-2to1"
+   ],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "Uterine siblings share equally (Q-4-12; F-FQARIB-118-asabah-bil-ghayr): not this rule. The reason F-FMUIN-34-asabah-order gives for 2:1 is the author's explanation, not part of the dalil (R-2to1 caveat)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "asabah.maal_ghair",
+   "title_id": "Saudara perempuan bersama anak perempuan mengambil sisa",
+   "summary_id": "Bila almarhum meninggalkan anak perempuan atau cucu perempuan dari anak laki-laki, saudara perempuan kandung, atau seayah bila tidak ada yang kandung, mengambil sisa harta setelah bagian mereka, selama tidak ada anak laki-laki, cucu laki-laki dari anak laki-laki, ayah, atau saudara laki-laki dari jalurnya.",
+   "dalil": [
+    "H-BUKHARI-6736",
+    "H-BUKHARI-6734",
+    "T-TB-4-176-daughter-sister",
+    "H-BULUGH-1097"
+   ],
+   "dalil_rule": [
+    "R-sister-asabah-maal-ghayr"
+   ],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": {
+    "summary_id": "Ibnu Abbas dan Ibnu az-Zubair tidak sependapat; mayoritas ulama memberikan sisa kepada saudara perempuan. Di kolom KHI dan praktik Pengadilan Agama, anak perempuan menghalangi saudara, sehingga saudara perempuan tidak mendapat apa-apa.",
+    "dalil": [
+     "T-TB-4-176-daughter-sister"
+    ],
+    "legal": [
+     {
+      "source": "ma-86-k-ag-1994",
+      "locator": "kaidah hukum"
+     },
+     {
+      "source": "ma-122-k-ag-1995",
+      "locator": "kaidah hukum"
+     }
+    ],
+    "source_doc": "dalil.json R-sister-asabah-maal-ghayr caveat; docs/waris-plan.md §2.2 D2"
+   },
+   "method": null,
+   "reviewer_notes": [
+    "Label H-BUKHARI-6734 'putusan Mu'adh bin Jabal (atsar)', never a saying of the Prophet; H-BUKHARI-6736 is Ibn Mas'ud reporting the Prophet's ruling (plan D10). engine.md cites Bukhari 6742; the corpus record used here is 6736."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "asabah.ayah_fardh_dan_sisa",
+   "title_id": "Ayah: seperenam ditambah sisa",
+   "summary_id": "Bila keturunan almarhum hanya perempuan, ayah mendapat seperenam sebagai bagian pasti, lalu juga mengambil sisa harta setelah bagian ahli waris lain.",
+   "dalil": [
+    "F-FQARIB-117-furudh",
+    "Q-4-11",
+    "H-BUKHARI-6732"
+   ],
+   "dalil_rule": [
+    "R-parents",
+    "R-furudh-then-asabah"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 177"
+    },
+    {
+     "source": "sema-2-1994",
+     "locator": "maksud Pasal 177"
+    }
+   ],
+   "ikhtilaf": {
+    "summary_id": "Bila Pasal 177 KHI dibaca harfiah, ayah hanya mendapat seperenam dan sisanya dikembalikan kepada ayah, ibu, dan anak perempuan. Belum ditemukan putusan MA yang memakai salah satu cara; kedua kolom memakai cara fikih sampai peninjau memutuskan.",
+    "legal": [
+     {
+      "source": "khi",
+      "locator": "Pasal 177"
+     },
+     {
+      "source": "buku-ii-2013",
+      "locator": "hlm. 176 §9(a)-(b)"
+     }
+    ],
+    "source_doc": "docs/waris-research/engine.md §11.3 (EQ1); docs/waris-plan.md §7.2 (R5)"
+   },
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "umariyyatain",
+   "title_id": "'Umariyyatain: ibu mendapat sepertiga dari sisa",
+   "summary_id": "Bila ahli warisnya hanya suami atau istri, ayah, dan ibu, ibu mendapat sepertiga dari sisa setelah bagian suami atau istri, bukan sepertiga seluruh harta, sehingga ayah mendapat dua kali bagian ibu.",
+   "dalil": [
+    "F-FMUIN-34-umariyyatain",
+    "Q-4-11"
+   ],
+   "dalil_rule": [
+    "R-mother-third-sixth",
+    "R-special-cases"
+   ],
+   "related_gaps": [
+    "G-UMARIYYATAIN-JADD"
+   ],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 178 ayat (2)"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "The engine applies this only with the father. With the grandfather the mother takes one third of the whole (fardh.ibu_1_3), resting on al-Hawi al-Kabir 8:121, external and not yet pinned (G-UMARIYYATAIN-JADD, R17).",
+    "The dissent of Ibn 'Abbas (one third of the whole) is reported only in Khairuddin pp. 68-70, not in the corpus; no ikhtilaf note is written until it is retrieved."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "musytarakah",
+   "title_id": "Musytarakah: saudara kandung ikut berbagi",
+   "summary_id": "Bila ahli warisnya suami, ibu atau nenek, dua saudara seibu atau lebih, dan saudara laki-laki kandung, bagian pasti sudah menghabiskan harta. Dalam kasus ini saudara kandung ikut berbagi sepertiga bersama saudara seibu, sama rata per orang.",
+   "dalil": [
+    "F-ALUMM-559-musyarakah",
+    "T-IK-4-12-musytaraka"
+   ],
+   "dalil_rule": [
+    "R-special-cases"
+   ],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": {
+    "summary_id": "Ulama berbeda pendapat dalam kasus ini. Pendapat jumhur, yang juga dipakai mazhab Syafi'i, mengikutsertakan saudara kandung; pendapat lain tidak memberi mereka apa-apa.",
+    "dalil": [
+     "T-IK-4-12-musytaraka"
+    ],
+    "source_doc": "dalil.json R-special-cases caveat; docs/waris-research/engine.md §8.2"
+   },
+   "method": null,
+   "reviewer_notes": [
+    "F-ALUMM-559-musyarakah ends at the clause on the full brothers joining; the reason that follows in the corpus is not in the span.",
+    "Full sisters without a full brother are not musytarakah: they take their fardh and the case goes to 'aul. The switch value musytarakah=false (Hanafi/Hanbali per Khairuddin p. 75) is a comparison variant only."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "akdariyyah",
+   "title_id": "Akdariyyah: suami, ibu, kakek, dan satu saudara perempuan",
+   "summary_id": "Kasus khusus ketika ahli warisnya tepat suami, ibu, kakek, dan satu saudara perempuan kandung atau seayah. Sumber kitab untuk cara ini belum tersedia di korpus kami, sehingga hasilnya perlu dikonfirmasi ahli faraid.",
+   "dalil": [
+    "G-AKDARIYYAH"
+   ],
+   "dalil_rule": [],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "Method from Khairuddin pp. 89-92 and a blog table (Achmad Yani); the dissents of Abu Bakr and of 'Umar and Ibn Mas'ud are recorded in engine.md §8.3 from Khairuddin, not from the corpus. A Syafi'i kitab page must be extracted or pinned before this note cites anything (plan §7.3 gap 4)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "jadd.muqasamah",
+   "title_id": "Kakek bersama saudara: berbagi sebagai saudara",
+   "summary_id": "Bila kakek mewarisi bersama saudara kandung atau seayah, menurut cara Zaid bin Tsabit kakek dihitung seperti seorang saudara laki-laki dan ikut berbagi, selama cara itu lebih baik baginya daripada pilihan lain.",
+   "dalil": [
+    "F-ALUMM-556-jadd",
+    "F-FQARIB-117-furudh"
+   ],
+   "dalil_rule": [
+    "R-grandfather"
+   ],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": {
+    "summary_id": "Para sahabat berbeda pendapat. Abu Bakar, Aisyah, Ibnu Abbas, dan lainnya memandang kakek seperti ayah sehingga saudara tidak mendapat apa-apa; Imam Syafi'i mengikuti Zaid bin Tsabit, yang juga diriwayatkan dari Umar dan Utsman.",
+    "dalil": [
+     "F-ALUMM-556-jadd",
+     "H-BUKHARI-6738"
+    ],
+    "source_doc": "docs/waris-plan.md §8 (row fardh.kakek_1_6, jadd.*); dalil.json R-grandfather caveat"
+   },
+   "method": null,
+   "reviewer_notes": [
+    "Stamped 'Perlu konfirmasi ahli faraid' (plan D4). Never present H-BUKHARI-6738 as the only view, and never use H-BULUGH-1110 (da'if) as the reason for following Zaid."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "jadd.sepertiga",
+   "title_id": "Kakek bersama saudara: sepertiga (1/3)",
+   "summary_id": "Bila berbagi dengan saudara memberi kakek kurang dari sepertiga, dan tidak ada ahli waris lain yang punya bagian pasti, kakek mendapat sepertiga harta.",
+   "dalil": [
+    "F-ALUMM-556-jadd"
+   ],
+   "dalil_rule": [
+    "R-grandfather"
+   ],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": {
+    "summary_id": "Para sahabat berbeda pendapat. Abu Bakar, Aisyah, Ibnu Abbas, dan lainnya memandang kakek seperti ayah sehingga saudara tidak mendapat apa-apa; Imam Syafi'i mengikuti Zaid bin Tsabit, yang juga diriwayatkan dari Umar dan Utsman.",
+    "dalil": [
+     "F-ALUMM-556-jadd",
+     "H-BUKHARI-6738"
+    ],
+    "source_doc": "docs/waris-plan.md §8 (row fardh.kakek_1_6, jadd.*); dalil.json R-grandfather caveat"
+   },
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "jadd.sepertiga_sisa",
+   "title_id": "Kakek bersama saudara: sepertiga dari sisa",
+   "summary_id": "Bila ada ahli waris lain yang punya bagian pasti, kakek mendapat yang terbaik di antara berbagi dengan saudara, sepertiga dari sisa, atau seperenam harta; di sini yang terbaik adalah sepertiga dari sisa.",
+   "dalil": [
+    "F-FQARIB-117-furudh"
+   ],
+   "dalil_rule": [
+    "R-grandfather"
+   ],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": {
+    "summary_id": "Para sahabat berbeda pendapat. Abu Bakar, Aisyah, Ibnu Abbas, dan lainnya memandang kakek seperti ayah sehingga saudara tidak mendapat apa-apa; Imam Syafi'i mengikuti Zaid bin Tsabit, yang juga diriwayatkan dari Umar dan Utsman.",
+    "dalil": [
+     "F-ALUMM-556-jadd",
+     "H-BUKHARI-6738"
+    ],
+    "source_doc": "docs/waris-plan.md §8 (row fardh.kakek_1_6, jadd.*); dalil.json R-grandfather caveat"
+   },
+   "method": null,
+   "reviewer_notes": [
+    "F-FQARIB-117-furudh names the three options (muqasamah, a third of the remainder, a sixth of the estate) in its worked case of two daughters, a grandfather and three brothers."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "jadd.seperenam",
+   "title_id": "Kakek bersama saudara: seperenam (1/6)",
+   "summary_id": "Bila ada ahli waris lain yang punya bagian pasti dan seperenam harta lebih baik bagi kakek daripada berbagi dengan saudara atau sepertiga dari sisa, kakek mendapat seperenam.",
+   "dalil": [
+    "F-FQARIB-117-furudh"
+   ],
+   "dalil_rule": [
+    "R-grandfather"
+   ],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": {
+    "summary_id": "Para sahabat berbeda pendapat. Abu Bakar, Aisyah, Ibnu Abbas, dan lainnya memandang kakek seperti ayah sehingga saudara tidak mendapat apa-apa; Imam Syafi'i mengikuti Zaid bin Tsabit, yang juga diriwayatkan dari Umar dan Utsman.",
+    "dalil": [
+     "F-ALUMM-556-jadd",
+     "H-BUKHARI-6738"
+    ],
+    "source_doc": "docs/waris-plan.md §8 (row fardh.kakek_1_6, jadd.*); dalil.json R-grandfather caveat"
+   },
+   "method": null,
+   "reviewer_notes": [
+    "The engine also gives the grandfather one sixth, with 'aul and nothing for the siblings, when the remainder is one sixth or less (engine.md §8.4, Khairuddin p. 101). That floor is not in the extracted span of F-FQARIB-117-furudh; no gap record names it yet."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "jadd.muaddah",
+   "title_id": "Saudara seayah ikut dihitung (mu'addah)",
+   "summary_id": "Saat kakek berbagi dengan saudara kandung, saudara seayah ikut dihitung sehingga bagian kakek lebih kecil, lalu bagian mereka diserahkan kepada saudara kandung. Rincian cara ini belum ada di kitab rujukan kami dan perlu dikonfirmasi ahli faraid.",
+   "dalil": [
+    "F-ALUMM-556-jadd"
+   ],
+   "dalil_rule": [
+    "R-grandfather"
+   ],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": {
+    "summary_id": "Para sahabat berbeda pendapat. Abu Bakar, Aisyah, Ibnu Abbas, dan lainnya memandang kakek seperti ayah sehingga saudara tidak mendapat apa-apa; Imam Syafi'i mengikuti Zaid bin Tsabit, yang juga diriwayatkan dari Umar dan Utsman.",
+    "dalil": [
+     "F-ALUMM-556-jadd",
+     "H-BUKHARI-6738"
+    ],
+    "source_doc": "docs/waris-plan.md §8 (row fardh.kakek_1_6, jadd.*); dalil.json R-grandfather caveat"
+   },
+   "method": null,
+   "reviewer_notes": [
+    "F-ALUMM-556-jadd grounds only Zaid's frame (muqasamah or one third). The mu'addah counting itself rests on Khairuddin pp. 98-99, 101-102 and MAIS, not on the corpus, and no gap record names it: ask the pipeline owner for one (suggested id G-JADD-MUADDAH)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "jadd.sdr_pr_kandung_sampai_fardh",
+   "title_id": "Saudara perempuan kandung mengambil sampai bagian pastinya",
+   "summary_id": "Dalam pembagian bersama kakek, saudara perempuan kandung tanpa saudara laki-laki kandung mengambil bagian saudara sampai setengah, atau dua pertiga bila dua orang atau lebih, dan kelebihannya untuk saudara seayah. Rincian cara ini belum ada di kitab rujukan kami dan perlu dikonfirmasi ahli faraid.",
+   "dalil": [
+    "F-ALUMM-556-jadd"
+   ],
+   "dalil_rule": [
+    "R-grandfather"
+   ],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": {
+    "summary_id": "Para sahabat berbeda pendapat. Abu Bakar, Aisyah, Ibnu Abbas, dan lainnya memandang kakek seperti ayah sehingga saudara tidak mendapat apa-apa; Imam Syafi'i mengikuti Zaid bin Tsabit, yang juga diriwayatkan dari Umar dan Utsman.",
+    "dalil": [
+     "F-ALUMM-556-jadd",
+     "H-BUKHARI-6738"
+    ],
+    "source_doc": "docs/waris-plan.md §8 (row fardh.kakek_1_6, jadd.*); dalil.json R-grandfather caveat"
+   },
+   "method": null,
+   "reviewer_notes": [
+    "Like jadd.muaddah: the Zaidiyyat detail (Khairuddin pp. 92-99; MAIS) is not in the corpus and has no gap record (suggested id G-JADD-ZAIDIYYAT)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "aul",
+   "title_id": "'Aul: semua bagian dikurangi seimbang",
+   "summary_id": "Bila jumlah bagian pasti melebihi seluruh harta, angka pembaginya dinaikkan sehingga semua bagian berkurang secara seimbang, seperti para pemberi utang yang berbagi kerugian ketika harta tidak cukup.",
+   "dalil": [
+    "F-FMUIN-35-awl",
+    "F-FSUNNAH-852-awl-umar"
+   ],
+   "dalil_rule": [
+    "R-awl"
+   ],
+   "related_gaps": [
+    "G-E3-first-awl-umar"
+   ],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 192"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "'Aul is the Companions' ijtihad; no Qur'an or hadith text states it (R-awl caveat).",
+    "F-FSUNNAH-852-awl-umar tells the first 'aul under 'Umar only as 'ruwiya' with no chain (G-E3): do not tell it as an established report.",
+    "Ibn 'Abbas's rejection of 'aul (Khairuddin pp. 45-47) is not in the corpus; no ikhtilaf note until it is retrieved."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "radd.tanpa_pasangan",
+   "title_id": "Radd: kelebihan dikembalikan, kecuali kepada suami atau istri",
+   "summary_id": "Bila bagian pasti tidak menghabiskan harta dan tidak ada ahli waris sisa, kelebihannya dikembalikan kepada para pemilik bagian pasti sebanding bagian mereka, kecuali suami atau istri.",
+   "dalil": [
+    "F-FMUIN-34-radd-dzawil-arham",
+    "F-FSUNNAH-854-radd-no-nass"
+   ],
+   "dalil_rule": [
+    "R-radd"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 193"
+    },
+    {
+     "source": "buku-ii-2013",
+     "locator": "hlm. 176 §8(h)"
+    }
+   ],
+   "ikhtilaf": {
+    "summary_id": "Tidak ada nash tentang radd, sehingga ulama berbeda pendapat. Pendapat asal mazhab Syafi'i menyerahkan kelebihan ke Baitul Mal, lalu ulama Syafi'i memakai radd bila Baitul Mal tidak teratur; Pasal 193 KHI tidak mengecualikan suami atau istri, dan sebagian hakim memberikan radd juga kepada mereka.",
+    "dalil": [
+     "F-FSUNNAH-854-radd-no-nass",
+     "F-FMUIN-34-radd-dzawil-arham"
+    ],
+    "legal": [
+     {
+      "source": "khi",
+      "locator": "Pasal 193"
+     },
+     {
+      "source": "kajian-pa-banjarmasin-2016",
+      "locator": "temuan wawancara hakim"
+     }
+    ],
+    "source_doc": "docs/waris-plan.md §2.7 D7; docs/waris-research/standard.md §3.6"
+   },
+   "method": null,
+   "reviewer_notes": [
+    "The court-column default (no radd to a spouse) rests on the superseded Buku II 2013 §8(h) plus Khairuddin, not on current MA guidance; the KHI reviewer confirms current practice (plan D7)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "radd.semua",
+   "title_id": "Radd kepada semua, termasuk suami atau istri (pembanding)",
+   "summary_id": "Cara pembanding, bacaan harfiah Pasal 193 KHI yang tidak dipakai sebagai hasil utama: kelebihan harta dikembalikan kepada semua pemilik bagian pasti, termasuk suami atau istri, sebanding bagian mereka. Sumber fikih untuk radd kepada suami atau istri bersama ahli waris lain belum tersedia; korpus hanya mencatat mazhab Utsman untuk suami atau istri yang menjadi satu-satunya ahli waris, menurut undang-undang waris Mesir.",
+   "dalil": [
+    "F-FSUNNAH-854-radd-no-nass",
+    "F-FSUNNAH-855-radd-zawj"
+   ],
+   "dalil_rule": [],
+   "related_gaps": [
+    "G-RADD-SEMUA-UTSMAN"
+   ],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 193"
+    },
+    {
+     "source": "kajian-pa-banjarmasin-2016",
+     "locator": "temuan wawancara hakim"
+    }
+   ],
+   "ikhtilaf": {
+    "summary_id": "Menurut ulama Syafi'i kemudian, radd tidak diberikan kepada suami atau istri; karena itu kedua kolom utama tidak memakai cara ini.",
+    "dalil": [
+     "F-FMUIN-34-radd-dzawil-arham"
+    ],
+    "source_doc": "docs/waris-plan.md §2.7 D7; docs/waris-research/engine.md §9.4"
+   },
+   "method": null,
+   "reviewer_notes": [
+    "Review 2026-10-09: R-radd is not this note's rule record (it states radd to the heirs other than the spouse, the opposite of this comparison). No corpus text grounds radd to a spouse alongside other heirs (G-RADD-SEMUA-UTSMAN, Khairuddin pp. 54-55 external); F-FSUNNAH-855-radd-zawj covers only a sole surviving spouse under the Egyptian law, and F-FSUNNAH-854-radd-no-nass breaks off mid-sentence in the corpus."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "baitul_mal",
+   "title_id": "Kelebihan harta ke Baitul Mal (pendapat asal, pembanding)",
+   "summary_id": "Menurut pendapat asal mazhab Syafi'i, kelebihan harta setelah bagian pasti, bila tidak ada ahli waris sisa, diserahkan ke Baitul Mal tanpa radd dan tanpa dzawil arham. Alat ini memakainya hanya sebagai pembanding.",
+   "dalil": [
+    "F-FMUIN-34-radd-dzawil-arham",
+    "F-FSUNNAH-856-dzawil-arham"
+   ],
+   "dalil_rule": [
+    "R-radd"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 191"
+    },
+    {
+     "source": "sema-1-2022",
+     "locator": "Rumusan Kamar Agama 2.b"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "KHI 191 sends an estate to the Baitul Mal only when there is no heir at all; it is listed as the Indonesian counterpart, not as support for the comparison profile klasik-syafii-asal."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "dzawil_arham.tanzil",
+   "title_id": "Dzawil arham menempati posisi penghubungnya",
+   "summary_id": "Bila tidak ada pemilik bagian pasti selain suami atau istri dan tidak ada ahli waris sisa, kerabat seperti anak dari anak perempuan atau paman dari pihak ibu dapat mewarisi. Setiap orang menempati posisi ahli waris yang menghubungkannya dengan almarhum.",
+   "dalil": [
+    "F-FMUIN-34-radd-dzawil-arham",
+    "F-FSUNNAH-856-dzawil-arham",
+    "H-BULUGH-1104",
+    "H-BULUGH-1105",
+    "Q-8-75",
+    "Q-33-6"
+   ],
+   "dalil_rule": [
+    "R-dzawil-arham"
+   ],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": {
+    "summary_id": "Ulama berbeda pendapat: Imam Malik dan Imam Syafi'i tidak mewariskan kepada mereka, sedangkan Abu Hanifah dan Ahmad mewariskan. Ulama Syafi'i kemudian menerimanya bila Baitul Mal tidak teratur.",
+    "dalil": [
+     "F-FSUNNAH-856-dzawil-arham",
+     "F-FMUIN-34-radd-dzawil-arham"
+    ],
+    "source_doc": "dalil.json R-dzawil-arham caveat; docs/waris-plan.md §2.4 D4"
+   },
+   "method": null,
+   "reviewer_notes": [
+    "The tanzil method itself (Tuwaijri IV:443; Dakwah.id) is not in the corpus; the spouse-present mechanics are unsettled (engine.md EQ11). The questionnaire refuses dzawil arham in v1 (plan D4).",
+    "Q-8-75 and Q-33-6 are the general kinship ayat cited as the basis; H-BULUGH-1104/1105 (the maternal uncle) are cited by the primaries Bulugh names."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "tashih",
+   "title_id": "Tashih: angka pembagi disesuaikan",
+   "summary_id": "Bila bagian sebuah kelompok tidak bisa dibagi rata kepada anggotanya, angka pembagi dikalikan agar setiap orang mendapat bilangan bulat. Ini cara menghitung, bukan hukum tersendiri.",
+   "dalil": [
+    "F-FMUIN-35-usul"
+   ],
+   "dalil_rule": [
+    "R-calc-method"
+   ],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "F-FMUIN-35-usul states the asal masalah (denominators; heads counted with a male as two females). The correction step itself is method (Khairuddin p. 31), not in the span; plan §8 marks this row as a method, not a dalil."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "ikhtisar",
+   "title_id": "Ikhtisar: angka pembagi disederhanakan",
+   "summary_id": "Bila semua bagian bisa dibagi dengan angka yang sama, angka pembagi diperkecil supaya tabelnya lebih sederhana, tanpa mengubah bagian siapa pun. Ini cara menghitung, bukan hukum tersendiri.",
+   "dalil": [
+    "F-FMUIN-35-usul"
+   ],
+   "dalil_rule": [
+    "R-calc-method"
+   ],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "The reduction step (Zaid's ikhtisar, Khairuddin pp. 97-98) is not in the F-FMUIN-35-usul span; the record grounds only the asal masalah the step simplifies."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "khi.pengganti",
+   "title_id": "Cucu menggantikan orang tuanya yang wafat lebih dulu (KHI)",
+   "summary_id": "Di kolom KHI dan praktik Pengadilan Agama, anak dari anak almarhum yang wafat lebih dulu menempati kedudukan orang tuanya, dan bagian itu dibagi di antara mereka dengan laki-laki dua kali perempuan. Penggantian ini hanya sampai tingkat cucu.",
+   "dalil": [],
+   "dalil_rule": [
+    "R-ext-mui-khi"
+   ],
+   "related_gaps": [
+    "G-E9-indonesian-provisions"
+   ],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 185 ayat (1)"
+    },
+    {
+     "source": "sema-3-2015",
+     "locator": "Rumusan Kamar Agama angka 9"
+    },
+    {
+     "source": "yurisprudensi-ma-2018",
+     "locator": "2/Yur/Ag/2018, hlm. 55-57"
+    }
+   ],
+   "ikhtilaf": {
+    "summary_id": "Dalam fikih mazhab Syafi'i tidak ada ahli waris pengganti: cucu dari anak laki-laki mewarisi atas namanya sendiri dan terhalang bila ada anak laki-laki, sedangkan anak dari anak perempuan termasuk dzawil arham.",
+    "dalil": [
+     "F-FMUIN-34-hajb",
+     "F-FMUIN-34-radd-dzawil-arham"
+    ],
+    "source_doc": "docs/waris-research/standard.md §3.3; docs/waris-plan.md §2.2 D2"
+   },
+   "method": null,
+   "reviewer_notes": [
+    "MUI's public Q&A (Kyai Nurul Irfan, 31 Oktober 2023) answered a family of this shape with substitution; it is one scholar's answer, not a fatwa, and is not cited as a source (plan D2).",
+    "Use 86 K/Ag/2001 as printed in 2/Yur/Ag/2018, not standard.md's 68 K/AG/2001 (plan §7.2)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "khi.pengganti_batas",
+   "title_id": "Batas bagian cucu pengganti (KHI)",
+   "summary_id": "Bagian ahli waris pengganti tidak boleh melebihi bagian ahli waris yang sederajat dengan orang yang digantikan. Alat ini memakai bacaan sederajat: bila yang masih hidup hanya anak perempuan, bagian pengganti anak laki-laki disamakan dengan bagian seorang anak perempuan.",
+   "dalil": [],
+   "dalil_rule": [
+    "R-ext-mui-khi"
+   ],
+   "related_gaps": [
+    "G-E9-indonesian-provisions"
+   ],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 185 ayat (2)"
+    },
+    {
+     "source": "ma-109-k-ag-2016",
+     "locator": "kaidah sebagaimana dikutip PA Bojonegoro"
+    }
+   ],
+   "ikhtilaf": {
+    "summary_id": "Cara membaca batas ini belum seragam: ada yang membatasi bagian kelompok pengganti, ada yang memeriksa setiap orang pengganti, dan ada yang tidak membatasi sama sekali. Hasilnya bisa berbeda; peninjau KHI akan memilih.",
+    "legal": [
+     {
+      "source": "ma-109-k-ag-2016",
+      "locator": "kaidah sebagaimana dikutip PA Bojonegoro"
+     },
+     {
+      "source": "kajian-pa-kotabumi",
+      "locator": "uraian bacaan Pasal 185 ayat (2)"
+     },
+     {
+      "source": "kajian-tarjih-pengganti",
+      "locator": "contoh perhitungan"
+     }
+    ],
+    "source_doc": "docs/waris-research/engine.md §11.1; docs/waris-plan.md §7.2 (R6)"
+   },
+   "method": null,
+   "reviewer_notes": [
+    "109 K/AG/2016 was seen only as listed on PA Bojonegoro's website (engine.md EQ4); open it before this ships."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "khi.anak_menghijab_saudara",
+   "title_id": "Anak perempuan menghalangi saudara (KHI)",
+   "summary_id": "Di kolom KHI dan praktik Pengadilan Agama, adanya anak, laki-laki maupun perempuan, menghalangi saudara, keponakan, paman, dan sepupu almarhum. Kelebihan harta lalu dikembalikan kepada pemilik bagian pasti selain suami atau istri.",
+   "dalil": [],
+   "dalil_rule": [
+    "R-ext-mui-khi"
+   ],
+   "related_gaps": [
+    "G-E9-indonesian-provisions"
+   ],
+   "legal": [
+    {
+     "source": "ma-86-k-ag-1994",
+     "locator": "kaidah hukum (tanggal putusan berbeda antar-sumber)"
+    },
+    {
+     "source": "ma-122-k-ag-1995",
+     "locator": "kaidah hukum"
+    },
+    {
+     "source": "ma-184-k-ag-1995",
+     "locator": "kaidah hukum"
+    }
+   ],
+   "ikhtilaf": {
+    "summary_id": "Dalam fikih mazhab Syafi'i, anak perempuan tidak menghalangi saudara: dalilnya memberikan sisa harta kepada saudara perempuan yang bersama anak perempuan, dan kepada laki-laki terdekat seperti saudara laki-laki. Praktik Pengadilan Agama sendiri belum seragam.",
+    "dalil": [
+     "H-BUKHARI-6736",
+     "H-BUKHARI-6732",
+     "T-TB-4-176-daughter-sister"
+    ],
+    "source_doc": "docs/waris-research/standard.md §3.2; docs/waris-plan.md §2.2 D2"
+   },
+   "method": null,
+   "reviewer_notes": [
+    "Quote the kaidah of 86 K/AG/1994, not its date (three sources give three dates). Practice split: Hakim, SAKINA 4(3) 2020, compares MS Sigli 46/Pdt.P/2013 with PA Banjarbaru 90/Pdt.P/2017 (standard.md §3.2)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "khi.seibu_pasal_181",
+   "title_id": "Saudara seibu menurut bacaan harfiah Pasal 181 KHI (pembanding)",
+   "summary_id": "Cara pembanding: bila Pasal 181 KHI dibaca harfiah, saudara seibu hanya terhalang oleh anak dan ayah, tidak oleh kakek. Kedua kolom utama memakai aturan fikih; bacaan ini hanya untuk perbandingan.",
+   "dalil": [],
+   "dalil_rule": [
+    "R-ext-mui-khi"
+   ],
+   "related_gaps": [
+    "G-E9-indonesian-provisions"
+   ],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 181"
+    }
+   ],
+   "ikhtilaf": {
+    "summary_id": "Dalam fikih, saudara seibu juga terhalang oleh kakek dan oleh cucu dari anak laki-laki. Pasal 182 KHI memakai kata yang sama untuk saudara perempuan kandung dan tidak dibaca harfiah, sehingga Pasal 181 juga tidak dibaca harfiah.",
+    "dalil": [
+     "F-FQARIB-117-hajb"
+    ],
+    "legal": [
+     {
+      "source": "khi",
+      "locator": "Pasal 182"
+     }
+    ],
+    "source_doc": "docs/waris-research/engine.md §6.3, §12.3; docs/waris-plan.md §7.2 (R7)"
+   },
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "khi.ww_anak_angkat",
+   "title_id": "Wasiat wajibah untuk anak angkat (KHI)",
+   "summary_id": "Di kolom KHI dan praktik Pengadilan Agama, anak angkat yang ditetapkan pengadilan dan tidak menerima wasiat dapat diberi wasiat wajibah paling banyak sepertiga harta. Alat ini menampilkan batas tertingginya; besarnya ditetapkan hakim.",
+   "dalil": [],
+   "dalil_rule": [
+    "R-ext-mui-khi"
+   ],
+   "related_gaps": [
+    "G-E9-indonesian-provisions"
+   ],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 209 ayat (2)"
+    },
+    {
+     "source": "khi",
+     "locator": "Pasal 171 huruf h"
+    }
+   ],
+   "ikhtilaf": {
+    "summary_id": "Fatwa MUI tentang adopsi tidak mengatur warisan; kutipan pendukungnya hanya menyebut bahwa ayah angkat boleh berwasiat untuk anak angkatnya. Karena itu kolom fikih tidak menghitung wasiat wajibah.",
+    "legal": [
+     {
+      "source": "fatwa-mui-adopsi-1984",
+      "locator": "kutipan pendukung, hlm. 307-308"
+     }
+    ],
+    "source_doc": "docs/waris-research/standard.md §1.3; docs/waris-plan.md §2.8 D8"
+   },
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "khi.ww_non_muslim",
+   "title_id": "Wasiat wajibah untuk kerabat non-Muslim (contoh putusan MA)",
+   "summary_id": "Di kolom KHI dan praktik Pengadilan Agama, pasangan, anak, atau orang tua yang bukan Muslim dapat diberi wasiat wajibah. Alat ini menampilkan contoh cara putusan MA, yaitu bagian yang akan ia terima seandainya ia ahli waris, sedangkan besarnya tetap ditetapkan hakim.",
+   "dalil": [],
+   "dalil_rule": [
+    "R-ext-mui-khi"
+   ],
+   "related_gaps": [
+    "G-E9-indonesian-provisions"
+   ],
+   "legal": [
+    {
+     "source": "yurisprudensi-ma-2018",
+     "locator": "1/Yur/Ag/2018, hlm. 50-54"
+    },
+    {
+     "source": "ma-16-k-ag-2010",
+     "locator": "amar angka 5"
+    }
+   ],
+   "ikhtilaf": {
+    "summary_id": "Fatwa MUI tentang kewarisan beda agama hanya membolehkan pemberian kepada kerabat beda agama dalam bentuk hibah, wasiat, dan hadiah, dan tidak memakai istilah wasiat wajibah. Karena itu kolom fikih tidak menghitungnya.",
+    "legal": [
+     {
+      "source": "fatwa-mui-5-2005",
+      "locator": "angka 2"
+     }
+    ],
+    "source_doc": "docs/waris-research/standard.md §1.1; docs/waris-plan.md §2.8 D8"
+   },
+   "method": null,
+   "reviewer_notes": [
+    "The court column refuses when the as-if share exceeds one third or would exclude a real heir (rujuk.wasiat_wajibah_besar)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "khi.perdamaian",
+   "title_id": "Perdamaian setelah tahu bagian masing-masing",
+   "summary_id": "Setelah setiap ahli waris mengetahui bagiannya, mereka boleh bersepakat membagi dengan cara lain atas dasar saling rela, misalnya seorang ahli waris melepas bagiannya dengan imbalan. Alat ini tidak menghitung pembagian hasil kesepakatan.",
+   "dalil": [
+    "F-FSUNNAH-864-takharuj"
+   ],
+   "dalil_rule": [],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 183"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "rupiah.pembulatan",
+   "title_id": "Pembulatan rupiah",
+   "summary_id": "Bagian yang sah adalah pecahannya. Saat diubah ke rupiah, setiap bagian dibulatkan ke bawah, lalu sisa beberapa rupiah diberikan satu per satu kepada bagian yang pecahan sisanya terbesar, sehingga jumlahnya tepat sama dengan harta.",
+   "dalil": [],
+   "dalil_rule": [],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": null,
+   "method": {
+    "summary_id": "Ini cara pembulatan angka, bukan hukum waris, sehingga tidak ada dalil atau pasal yang dikutip.",
+    "source_doc": "docs/waris-plan.md §2.5 D5; docs/waris-research/engine.md §14"
+   },
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "rujuk.khuntsa",
+   "title_id": "Perlu konsultasi: jenis kelamin ahli waris belum jelas",
+   "summary_id": "Bagian waris bergantung pada jenis kelamin ahli waris; bila jenis kelaminnya belum jelas, hal itu perlu dipastikan lebih dulu. Alat ini tidak menghitung kasus ini; silakan berkonsultasi ke Pengadilan Agama, KUA, atau ustadz yang memahami faraid.",
+   "dalil": [
+    "F-FSUNNAH-862-khuntsa"
+   ],
+   "dalil_rule": [],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "The extracted span ends with the khuntsa whose signs are clear; the rule for an unresolved case (least share plus suspension, engine.md §13) is beyond the span."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "rujuk.mafqud",
+   "title_id": "Perlu konsultasi: ada ahli waris yang hilang",
+   "summary_id": "Bila ada ahli waris yang hilang dan belum ada putusan hakim tentang wafatnya, padahal ia bisa mengubah pembagian, alat ini tidak menghitung. Wafatnya orang yang hilang ditetapkan oleh hakim.",
+   "dalil": [
+    "F-FSUNNAH-860-mafqud",
+    "F-FSUNNAH-861-mafqud-mirath"
+   ],
+   "dalil_rule": [],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 171 huruf b"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "F-FSUNNAH-861-mafqud-mirath covers the missing person as pewaris; the paragraph on the missing person as heir is not in the span (the corpus record stops mid-sentence). KHI 171(b) is cited for a death declared by a court."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "rujuk.haml",
+   "title_id": "Perlu konsultasi: ada ahli waris dalam kandungan",
+   "summary_id": "Bila ada calon ahli waris yang masih dalam kandungan dan bisa mengubah pembagian, bagian terbesarnya dicadangkan sampai ia lahir. Alat ini tidak menghitung kasus ini.",
+   "dalil": [
+    "F-FSUNNAH-859-pregnancy",
+    "H-BULUGH-1106",
+    "F-FSUNNAH-843-syarat"
+   ],
+   "dalil_rule": [
+    "R-newborn"
+   ],
+   "related_gaps": [
+    "G-E11-newborn-wording"
+   ],
+   "legal": [],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "H-BULUGH-1106: the tahqiq says the wording belongs to Abu Hurayra's hadith, not Jabir's; quote it with that note (G-E11). Its corpus English line is mistranslated: never display it."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "rujuk.gharqa",
+   "title_id": "Perlu konsultasi: wafat bersamaan",
+   "summary_id": "Bila pewaris dan ahli warisnya wafat dalam satu musibah dan tidak diketahui siapa yang lebih dulu, mereka tidak saling mewarisi, dan harta masing-masing dibagi kepada ahli warisnya yang hidup. Alat ini tidak menghitung kasus ini.",
+   "dalil": [
+    "F-FSUNNAH-843-syarat"
+   ],
+   "dalil_rule": [],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "rujuk.wala",
+   "title_id": "Di luar cakupan: hak wala'",
+   "summary_id": "Hak waris karena memerdekakan budak (wala') berada di luar cakupan alat ini.",
+   "dalil": [
+    "H-BUKHARI-6752"
+   ],
+   "dalil_rule": [
+    "R-wala"
+   ],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "The corpus English line of H-BUKHARI-6752 is mistranslated ('for the manumitted'); never display it. Historical topic; leave out of lay lessons."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "rujuk.kerabat_jauh",
+   "title_id": "Perlu konsultasi: kerabat di luar jangkauan alat",
+   "summary_id": "Urutan ahli waris berlanjut sampai kerabat yang lebih jauh, misalnya cicit dari anak laki-laki atau paman ayah dan anak-anaknya. Alat ini hanya menghitung sampai cucu, keponakan laki-laki, paman, dan sepupu, sehingga untuk kerabat yang lebih jauh silakan berkonsultasi.",
+   "dalil": [
+    "F-FQARIB-116-heirs",
+    "F-FQARIB-116-asabah",
+    "F-FMUIN-34-asabah-order"
+   ],
+   "dalil_rule": [
+    "R-asabah-order"
+   ],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "rujuk.dzawil_arham",
+   "title_id": "Perlu konsultasi: kerabat dzawil arham",
+   "summary_id": "Kerabat yang bukan pemilik bagian pasti dan bukan ahli waris sisa, seperti anak dari anak perempuan atau paman dari pihak ibu, hanya mewarisi dalam keadaan tertentu, dan ulama berbeda pendapat tentangnya. Alat ini belum menghitungnya; silakan berkonsultasi.",
+   "dalil": [
+    "F-FSUNNAH-856-dzawil-arham",
+    "F-FMUIN-34-radd-dzawil-arham"
+   ],
+   "dalil_rule": [
+    "R-dzawil-arham"
+   ],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "rujuk.dzawil_arham_campuran",
+   "title_id": "Perlu konsultasi: dzawil arham laki-laki dan perempuan dalam satu jalur",
+   "summary_id": "Bila beberapa kerabat dzawil arham laki-laki dan perempuan terhubung melalui orang yang sama, cara membagi di antara mereka belum dapat kami pastikan dari kitab rujukan. Alat ini tidak menghitung kasus ini.",
+   "dalil": [
+    "F-FSUNNAH-856-dzawil-arham",
+    "F-FMUIN-34-radd-dzawil-arham"
+   ],
+   "dalil_rule": [
+    "R-dzawil-arham"
+   ],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "Whether such relatives split 2:1 or equally is unsettled and no opened Syafi'i source settles it (engine.md §10, EQ11); the dalil cited ground only that dzawil arham inherit in the later Syafi'i school."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "rujuk.dugaan_pembunuhan",
+   "title_id": "Perlu konsultasi: ada dugaan ahli waris menyebabkan kematian",
+   "summary_id": "Bila ada laporan bahwa seorang ahli waris menyebabkan kematian pewaris, haknya bergantung pada fakta dan putusan hakim. Alat ini tidak menghitung kasus ini; silakan berkonsultasi ke Pengadilan Agama.",
+   "dalil": [
+    "F-ALUMM-550-killer",
+    "F-FQARIB-116-barriers"
+   ],
+   "dalil_rule": [
+    "R-barrier-killer"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 173"
+    }
+   ],
+   "ikhtilaf": {
+    "summary_id": "Dalam fikih mazhab Syafi'i setiap pembunuhan menghalangi warisan, sedangkan KHI mensyaratkan putusan hakim yang berkekuatan hukum tetap.",
+    "dalil": [
+     "F-FSUNNAH-844-mawani",
+     "F-FQARIB-116-barriers"
+    ],
+    "legal": [
+     {
+      "source": "khi",
+      "locator": "Pasal 173"
+     }
+    ],
+    "source_doc": "docs/waris-plan.md §2.4 D4"
+   },
+   "method": null,
+   "reviewer_notes": [
+    "The refusal page has no answer printout (plan D4, §9.4); the answer is criminal-record data under UU 27/2022 Pasal 4(2)(d)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "rujuk.beda_agama_pewaris",
+   "title_id": "Di luar cakupan: almarhum bukan Muslim",
+   "summary_id": "Bila almarhum bukan Muslim, ahli waris Muslim tidak mewarisi darinya, dan perkaranya bukan wewenang Pengadilan Agama. Alat ini tidak menghitung kasus ini.",
+   "dalil": [
+    "H-BUKHARI-6764",
+    "H-MUSLIM-1614"
+   ],
+   "dalil_rule": [
+    "R-barrier-religion"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "fatwa-mui-5-2005",
+     "locator": "angka 1"
+    },
+    {
+     "source": "khi",
+     "locator": "Pasal 171 huruf b"
+    },
+    {
+     "source": "sema-7-2012",
+     "locator": "Rumusan Kamar Agama angka 10"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "rujuk.utang_melebihi_harta",
+   "title_id": "Perlu konsultasi: utang sama dengan atau melebihi harta",
+   "summary_id": "Utang dibayar sebelum harta dibagi, sehingga bila utang sama dengan atau melebihi harta peninggalan, tidak ada yang bisa dibagi. Menurut KHI, ahli waris menanggung utang hanya sebatas harta peninggalan.",
+   "dalil": [
+    "Q-4-11",
+    "F-ALUMM-572",
+    "T-IK-4-11-dayn"
+   ],
+   "dalil_rule": [
+    "R-debt-wasiyya-first"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 175 ayat (2)"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "rujuk.wasiat_wajibah_besar",
+   "title_id": "Kolom Pengadilan Agama: wasiat wajibah perlu dikonsultasikan",
+   "summary_id": "Bila bagian seandainya-ahli-waris dari kerabat non-Muslim lebih dari sepertiga harta, atau akan menghalangi ahli waris yang sebenarnya, kolom KHI tidak menampilkan angka dan menyebut bahwa besarnya perlu dikonsultasikan ke Pengadilan Agama. Kolom fikih tetap ditampilkan.",
+   "dalil": [],
+   "dalil_rule": [],
+   "related_gaps": [
+    "G-E9-indonesian-provisions"
+   ],
+   "legal": [
+    {
+     "source": "yurisprudensi-ma-2018",
+     "locator": "1/Yur/Ag/2018, hlm. 50-54"
+    },
+    {
+     "source": "kajian-wahyudi-2021",
+     "locator": "hlm. 171-172"
+    },
+    {
+     "source": "buku-ii-2013",
+     "locator": "hlm. 173 §2(i)"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "Engine choice to confirm: the court column also refuses when a non-Muslim relative's as-if share plus an ordinary wasiat exceed one third without the heirs' consent (engine report). The one-third cap rests on Wahyudi 2021 and the superseded Buku II 2013, not on a current MA text."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "rujuk.pengganti_batas_tak_jelas",
+   "title_id": "Kolom Pengadilan Agama: batas cucu pengganti belum jelas",
+   "summary_id": "Bila batas bagian cucu pengganti menurut KHI berlaku pada keluarga ini dan cara membagi kelebihannya tidak diatur oleh sumber yang kami baca, kolom KHI tidak menampilkan angka. Kolom fikih tetap ditampilkan.",
+   "dalil": [],
+   "dalil_rule": [],
+   "related_gaps": [
+    "G-E9-indonesian-provisions"
+   ],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 185 ayat (2)"
+    },
+    {
+     "source": "ma-109-k-ag-2016",
+     "locator": "kaidah sebagaimana dikutip PA Bojonegoro"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "The engine also uses this refusal when a non-Muslim child in the court column's as-if solve would lift a substitute above the actual daughters (new refusal reported by the engine agent; reviewer to confirm)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "rujuk.tanpa_ahli_waris",
+   "title_id": "Perlu konsultasi: tidak ada ahli waris",
+   "summary_id": "Bila almarhum tidak meninggalkan ahli waris sama sekali, hartanya diserahkan ke Baitul Mal melalui putusan Pengadilan Agama. Alat ini tidak menghitung kasus ini.",
+   "dalil": [
+    "F-FMUIN-34-radd-dzawil-arham"
+   ],
+   "dalil_rule": [],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 191"
+    },
+    {
+     "source": "sema-1-2022",
+     "locator": "Rumusan Kamar Agama 2.b"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "catatan.sisa_pasangan_saja",
+   "title_id": "Hanya ada suami atau istri: sisa perlu dikonsultasikan",
+   "summary_id": "Bila ahli warisnya hanya suami atau istri, ia mendapat bagian pastinya, tetapi sisa harta tidak diberikan kepadanya melalui radd. Alat ini tidak menentukan ke mana sisa itu diberikan; silakan berkonsultasi ke Pengadilan Agama.",
+   "dalil": [
+    "F-FMUIN-34-radd-dzawil-arham"
+   ],
+   "dalil_rule": [
+    "R-radd"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 193"
+    },
+    {
+     "source": "khi",
+     "locator": "Pasal 191"
+    }
+   ],
+   "ikhtilaf": {
+    "summary_id": "Pasal 193 KHI tidak mengecualikan suami atau istri dari radd, dan sebagian hakim memberikan sisa harta juga kepada mereka.",
+    "legal": [
+     {
+      "source": "khi",
+      "locator": "Pasal 193"
+     },
+     {
+      "source": "kajian-pa-banjarmasin-2016",
+      "locator": "temuan wawancara hakim"
+     }
+    ],
+    "source_doc": "docs/waris-plan.md §2.7 D7; docs/waris-research/engine.md §9.4 (EQ3)"
+   },
+   "method": null,
+   "reviewer_notes": [
+    "The 'Utsman view (the spouse takes the rest) is reported in Khairuddin p. 55, not in the corpus. F-FMUIN-34-radd-dzawil-arham adopts radd and dzawil arham only because the Baitul Mal is not orderly and says nothing after that, which is why the residue is left unassigned (plan D7)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "catatan.harta_bersama_rumit",
+   "title_id": "Harta bersama yang rumit: rupiah tidak dihitung",
+   "summary_id": "Bila ada istri yang wafat atau bercerai lebih dulu, atau harta bersama masih disengketakan atau belum dinilai, alat ini tetap menampilkan pecahan bagian waris tetapi tidak menghitung rupiah. Pembagian harta bersama seperti ini perlu diputuskan Pengadilan Agama.",
+   "dalil": [],
+   "dalil_rule": [],
+   "related_gaps": [
+    "G-E9-indonesian-provisions"
+   ],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 190"
+    },
+    {
+     "source": "khi",
+     "locator": "Pasal 96 ayat (1)"
+    },
+    {
+     "source": "buku-ii-2026",
+     "locator": "hlm. 836-838"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "catatan.pewaris_dibawah_umur_wasiat",
+   "title_id": "Wasiat dari orang di bawah 21 tahun",
+   "summary_id": "Menurut KHI, orang yang berwasiat harus berumur sekurang-kurangnya 21 tahun. Wasiat dari orang yang lebih muda perlu dikonsultasikan sebelum dijalankan.",
+   "dalil": [],
+   "dalil_rule": [],
+   "related_gaps": [
+    "G-E9-indonesian-provisions"
+   ],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 194 ayat (1)"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "engine.md §13 says the classical condition is puberty; no corpus record states it, so the note does not claim it. The engine does not emit this note yet."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "catatan.munasakhat",
+   "title_id": "Ahli waris yang wafat setelah almarhum tetap dihitung",
+   "summary_id": "Ahli waris yang masih hidup saat almarhum wafat tetap berhak, walaupun ia kemudian wafat sebelum harta dibagi. Bagiannya menjadi harta peninggalannya sendiri dan dibagi kepada ahli warisnya dalam perhitungan terpisah.",
+   "dalil": [
+    "F-FSUNNAH-843-syarat"
+   ],
+   "dalil_rule": [],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "Stage-by-stage division follows Khairuddin pp. 81-85 and Buku II 2013 p. 178 §10 (engine.md §13); F-FSUNNAH-843-syarat grounds only that the heir must be alive at the death."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "catatan.anak_tiri_wasiat_wajibah",
+   "title_id": "Anak tiri: mungkin wasiat wajibah",
+   "summary_id": "Anak tiri bukan ahli waris, tetapi bila ia dipelihara sejak kecil, Pengadilan Agama dapat memberinya bagian melalui wasiat wajibah. Alat ini tidak menghitung besarnya.",
+   "dalil": [
+    "F-FQARIB-116-heirs"
+   ],
+   "dalil_rule": [
+    "R-heirs-list"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "sema-7-2012",
+     "locator": "Rumusan Kamar Agama angka 19"
+    },
+    {
+     "source": "buku-ii-2026",
+     "locator": "hlm. 846-847 huruf j"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "catatan.anak_angkat_tanpa_penetapan",
+   "title_id": "Anak angkat tanpa putusan pengadilan",
+   "summary_id": "Menurut KHI, anak angkat adalah anak yang pengangkatannya ditetapkan oleh putusan pengadilan. Tanpa putusan itu, alat ini tidak menghitung wasiat wajibah untuknya.",
+   "dalil": [],
+   "dalil_rule": [],
+   "related_gaps": [
+    "G-E9-indonesian-provisions"
+   ],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 171 huruf h"
+    },
+    {
+     "source": "khi",
+     "locator": "Pasal 209"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "catatan.wasiat_wajibah_keponakan",
+   "title_id": "Keponakan yang bukan ahli waris: mungkin wasiat wajibah",
+   "summary_id": "Keponakan yang bukan ahli waris, seperti anak perempuan dari saudara laki-laki atau anak dari saudara perempuan, dapat diberi wasiat wajibah oleh Pengadilan Agama. Alat ini tidak menghitung besarnya.",
+   "dalil": [
+    "F-FQARIB-118-asabah-bil-ghayr",
+    "F-FMUIN-34-radd-dzawil-arham"
+   ],
+   "dalil_rule": [],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "sema-3-2015",
+     "locator": "Rumusan Kamar Agama angka 9"
+    },
+    {
+     "source": "ma-137-k-ag-2016",
+     "locator": "kaidah sebagaimana dikutip PA Bojonegoro"
+    },
+    {
+     "source": "buku-ii-2026",
+     "locator": "hlm. 847 huruf k"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "The dalil ground only that these relatives are dzawil arham, not heirs (F-FQARIB-118: nephews inherit without their sisters; F-FMUIN-34 lists a brother's daughter and a sister's child among dzawil arham). The wasiat wajibah is court practice."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "catatan.jadd_perlu_konfirmasi",
+   "title_id": "Kakek bersama saudara: perlu konfirmasi ahli faraid",
+   "summary_id": "Pembagian kakek bersama saudara mengikuti cara Zaid bin Tsabit yang dipakai mazhab Syafi'i. Karena para sahabat berbeda pendapat dan rinciannya cukup rumit, hasil ini perlu dikonfirmasi ahli faraid.",
+   "dalil": [
+    "F-ALUMM-556-jadd",
+    "H-BUKHARI-6738"
+   ],
+   "dalil_rule": [
+    "R-grandfather"
+   ],
+   "related_gaps": [],
+   "legal": [],
+   "ikhtilaf": {
+    "summary_id": "Para sahabat berbeda pendapat. Abu Bakar, Aisyah, Ibnu Abbas, dan lainnya memandang kakek seperti ayah sehingga saudara tidak mendapat apa-apa; Imam Syafi'i mengikuti Zaid bin Tsabit, yang juga diriwayatkan dari Umar dan Utsman.",
+    "dalil": [
+     "F-ALUMM-556-jadd",
+     "H-BUKHARI-6738"
+    ],
+    "source_doc": "docs/waris-plan.md §8 (row fardh.kakek_1_6, jadd.*); dalil.json R-grandfather caveat"
+   },
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "catatan.kerabat_non_muslim",
+   "title_id": "Kerabat non-Muslim: bukan ahli waris, tetap dapat diberi",
+   "summary_id": "Kerabat yang bukan Muslim tidak menjadi ahli waris, tetapi mereka tetap dapat menerima wasiat atau hibah. Pengadilan Agama juga dapat menetapkan wasiat wajibah untuk mereka.",
+   "dalil": [
+    "H-BUKHARI-6764",
+    "Q-4-8"
+   ],
+   "dalil_rule": [
+    "R-barrier-religion",
+    "R-gift-at-division"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "fatwa-mui-5-2005",
+     "locator": "angka 2"
+    },
+    {
+     "source": "yurisprudensi-ma-2018",
+     "locator": "1/Yur/Ag/2018, hlm. 50-54"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "Q-4-8 (giving to relatives present at the division) is the tone line of plan D8; whether it is abrogated is disputed (R-gift-at-division caveat), so present it as a recommended kindness. Q-60-8 is available in dalil-gaps.json if the reviewer wants it."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "catatan.wasiat_wajibah_ilustrasi",
+   "title_id": "Wasiat wajibah untuk kerabat non-Muslim: hanya contoh",
+   "summary_id": "Angka wasiat wajibah untuk kerabat non-Muslim di kolom KHI hanyalah contoh menurut cara putusan MA. Besarnya ditetapkan hakim, dan pengadilan yang berbeda pernah menetapkan besaran yang berbeda.",
+   "dalil": [],
+   "dalil_rule": [],
+   "related_gaps": [
+    "G-E9-indonesian-provisions"
+   ],
+   "legal": [
+    {
+     "source": "ma-16-k-ag-2010",
+     "locator": "amar angka 5"
+    },
+    {
+     "source": "yurisprudensi-ma-2018",
+     "locator": "1/Yur/Ag/2018, hlm. 50-54"
+    },
+    {
+     "source": "kajian-wahyudi-2021",
+     "locator": "hlm. 171-172"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "catatan.wasiat_wajibah_plafon",
+   "title_id": "Wasiat wajibah anak angkat: batas tertinggi",
+   "summary_id": "Untuk anak angkat, alat ini menampilkan batas tertinggi wasiat wajibah, yaitu paling banyak sepertiga harta dan tidak lebih dari bagian yang akan ia terima seandainya ia anak kandung. Besarnya ditetapkan hakim.",
+   "dalil": [],
+   "dalil_rule": [],
+   "related_gaps": [
+    "G-E9-indonesian-provisions"
+   ],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 209 ayat (2)"
+    },
+    {
+     "source": "buku-ii-2013",
+     "locator": "hlm. 173 §2(i)"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "KHI 209 states only the one-third ceiling; the 'not above the as-if share' part rests on the superseded Buku II 2013 §2(i) and Khairuddin pp. 135-136 (engine.md §11.4 a)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "catatan.ww_anak_angkat_sudah_menerima_wasiat",
+   "title_id": "Anak angkat yang sudah menerima wasiat",
+   "summary_id": "KHI memberi wasiat wajibah kepada anak angkat yang tidak menerima wasiat. Karena anak angkat ini sudah menerima wasiat, alat ini tidak menambahkan wasiat wajibah.",
+   "dalil": [],
+   "dalil_rule": [],
+   "related_gaps": [
+    "G-E9-indonesian-provisions"
+   ],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 209 ayat (2)"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [],
+   "status": "draft"
+  },
+  {
+   "rule_id": "catatan.ww_orang_tua_angkat_tidak_dihitung",
+   "title_id": "Wasiat wajibah orang tua angkat: tidak dihitung",
+   "summary_id": "KHI juga mengenal wasiat wajibah untuk orang tua angkat. Karena kedudukan ayah atau ibu almarhum sudah terisi oleh orang tua kandungnya, alat ini tidak menghitungnya; besarnya ditetapkan hakim.",
+   "dalil": [],
+   "dalil_rule": [],
+   "related_gaps": [
+    "G-E9-indonesian-provisions"
+   ],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 209 ayat (1)"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "Engine choice to confirm: the adoptive parent is not computed when a biological parent of the same sex is alive (engine report)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "catatan.hibah_dapat_diperhitungkan",
+   "title_id": "Hibah orang tua kepada anak",
+   "summary_id": "Menurut KHI, hibah orang tua kepada anaknya dapat diperhitungkan sebagai warisan. Alat ini tidak menguranginya secara otomatis; ahli waris atau hakim yang menentukan.",
+   "dalil": [],
+   "dalil_rule": [],
+   "related_gaps": [
+    "G-E9-indonesian-provisions"
+   ],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 211"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "H-BUKHARI-2586, H-BUKHARI-2587 and H-MUSLIM-1623e (fairness among children in gifts) are lesson material but do not ground counting a hibah as inheritance; not cited (engine.md §3.5, EQ8)."
+   ],
+   "status": "draft"
+  },
+  {
+   "rule_id": "catatan.wasiat_ahli_waris_diabaikan",
+   "title_id": "Wasiat untuk ahli waris tidak dijalankan",
+   "summary_id": "Wasiat untuk ahli waris tidak dijalankan karena tidak semua ahli waris lain menyetujuinya. Ahli waris itu tetap menerima bagian warisnya.",
+   "dalil": [
+    "H-BULUGH-1114",
+    "F-FQARIB-118-wasiyya",
+    "F-FMUIN-33-heir-consent"
+   ],
+   "dalil_rule": [
+    "R-no-wasiyya-heir"
+   ],
+   "related_gaps": [],
+   "legal": [
+    {
+     "source": "khi",
+     "locator": "Pasal 195 ayat (3)"
+    }
+   ],
+   "ikhtilaf": null,
+   "method": null,
+   "reviewer_notes": [
+    "Cite H-BULUGH-1114 by the primaries Bulugh names (plan D10); never show H-BULUGH-1115."
+   ],
+   "status": "draft"
+  }
+ ]
+}

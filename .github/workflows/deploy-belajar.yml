@@ -20,11 +20,17 @@ on:
       - "belajar/**"
       - "deploy/belajar/**"
       - ".github/workflows/deploy-belajar.yml"
+  # The Ilmu Waris research docs are canonical inputs to checks in the verify
+  # job (vector/dalil parity; validate_waris.py reads docs/waris-plan.md §8),
+  # and deploy.yml ignores them: a docs-only PR must still run those checks.
+  # PRs only — a docs-only push to main redeploys nothing.
   pull_request:
     paths:
       - "belajar/**"
       - "deploy/belajar/**"
       - ".github/workflows/deploy-belajar.yml"
+      - "docs/waris-plan.md"
+      - "docs/waris-research/**"
   workflow_dispatch:
 
 concurrency:
@@ -57,6 +63,26 @@ jobs:
 
       - name: Test
         run: npm test
+
+      # Ilmu Waris M1 (docs/waris-plan.md §10). Research-phase parity: the
+      # belajar copies of the test vectors and of dalil.json must equal the
+      # docs/waris-research originals byte for byte (this job checks out the
+      # whole repo, so both pairs are checked).
+      - name: Waris — vector + dalil parity (docs ↔ belajar)
+        run: node scripts/check-waris-vector-parity.mjs
+
+      # api/data and pipeline/cache are git-ignored, so CI runs the
+      # corpus-free checks (parity, references, plan §8 gap list, provenance
+      # record hashes, prose, RuleNotes) and prints what it skipped; the
+      # corpus checks (Qur'an/hadith/kitab bytes, spans, pins) run locally
+      # with plain `python3 pipeline/validate_waris.py`. Stdlib only.
+      - name: Waris — dalil + RuleNote validation (corpus-free)
+        run: python3 pipeline/validate_waris.py --no-corpus
+
+      # Planted-fault tests of that validator; the faults only a corpus
+      # check can catch are listed as skipped, by name.
+      - name: Waris — validator mutation tests (corpus-free)
+        run: python3 pipeline/test_validate_waris.py --no-corpus
 
       # `next build` is the typecheck for App Router (PageProps/LayoutProps
       # globals only exist after build) and prerenders the lesson pages.

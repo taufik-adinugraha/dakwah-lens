@@ -748,9 +748,11 @@ quoting al-Rahabi). Zaid's grandfather method adds bases such as 18 and 36, beca
 may take ⅓ of a remainder. Khairuddin pp. 31–32 teaches lcm by "largest denominator × 1, 2, 3". That
 is a special case of lcm and gives the same numbers.
 
-If there are only 'asabah, the base is the number of **units** (male 2, female 1). Example: 1 son +
-10 daughters gives 12 units, so the daughters take 10/12 (Fath al-Qarib § 117: "فلهن عشرة من اثني
-عشر").
+If there are only 'asabah, the base is the number of **units** (male 2, female 1 when both sexes are
+present; one per head otherwise, as in §9.3). Example: 1 son + 10 daughters gives 12 units, so the
+daughters take 10/12 (Fath al-Qarib § 117: "فلهن عشرة من اثني
+عشر"); three sons give 3, not 6 (Fath al-Mu'in § 35, `F-FMUIN-35-usul`). *(Clarified in review,
+2026-10-09: the engine had used 2 per male even with no female.)*
 
 ### 9.2 'Aul (KHI 192; every opened source)
 
@@ -782,6 +784,15 @@ This lcm form is what the classical four relations (tamatsul, tadakhul, tawafuq,
 p. 31) compute. The final reduction by the common factor is Zaid's *ikhtisar* (Khairuddin pp. 97–98:
 108 → 54 in al-Mukhtasharah). Musytarakah and pooled uterine siblings use weight 1 per head for
 both sexes.
+
+*Trace (review 2026-10-09).* With per-person exact fractions the same steps are: T0 = the table before
+tashih (the asal masalah; the 'aul total; under radd the radd masalah: the heads when the radd heirs are
+one class, else the sum of their siham, fitted into the spouse's table when a spouse takes no radd,
+Fiqh as-Sunnah § 855); T2 = finalBase, the lcm of the per-person denominators; T1 = lcm(T0, T2).
+`tashih {dari: T0, menjadi: T1}` is emitted when T1 > T0 and `ikhtisar {dari: T1, menjadi: T2}` when
+T2 < T1. Example: Akdariyyah 6 → 9 ('aul) → 27 (tashih); a daughter and the father 6 → 2 (ikhtisar).
+Zaid's grandfather cases differ in the intermediate table (al-Mukhtasharah shows tashih 18 → 54, not
+108 → 54); the final table is the same.
 
 ### 9.4 When the furudh fall short and there is no 'asabah: switch `residue`
 
