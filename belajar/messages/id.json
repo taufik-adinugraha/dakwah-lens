@@ -22,9 +22,10 @@
     "surah_heading": "Mulai dari sini",
     "fatihah_name": "Al-Fatihah",
     "fatihah_meta": "7 ayat · 29 kata · ±3 pekan, 10 menit sehari",
-    "status_preparing": "Sedang disiapkan",
+    "status_preparing": "Beta · materi masih draf",
     "next_heading": "Berikutnya",
-    "next_body": "Setelah Al-Fatihah: Al-Ikhlas, An-Nas, Al-Falaq, Al-'Asr, Al-Kautsar, dan An-Nasr."
+    "next_body": "Setelah Al-Fatihah: Al-Ikhlas, An-Nas, Al-Falaq, Al-'Asr, Al-Kautsar, dan An-Nasr.",
+    "start_cta": "Mulai belajar"
   },
   "Footer": {
     "disclaimer": "Dibantu AI, bukan fatwa otoritatif. Penjelasan disusun dari kitab yang disebut namanya dan ditinjau ustadz sebelum tayang.",
@@ -41,5 +42,64 @@
     "title": "Halaman tidak ditemukan",
     "body": "Alamat ini tidak ada di modul Belajar Al-Qur'an.",
     "cta": "Ke beranda modul"
+  },
+  "Surah": {
+    "eyebrow": "Surah",
+    "meta": "{ayat} ayat · {words} kata",
+    "draft_banner": "Masa beta: arti kata, i'rab, dan catatan di halaman ini masih draf yang menunggu tinjauan ustadz. Teks ayat dan bacaan imamnya sendiri tidak berubah.",
+    "draft_chip": "Draf — menunggu tinjauan ustadz",
+    "learn_ayah": "Pelajari ayat ini",
+    "ayah_done": "Latihan selesai",
+    "translation_source": "Terjemahan: {source}",
+    "facts_heading": "Tahukah kamu?",
+    "fact_method": "Cara menghitung",
+    "fact_where": "Letak",
+    "sources": "Rujukan",
+    "data_versions": "Versi data"
+  },
+  "Lesson": {
+    "ayah": "Ayat {n}",
+    "tafsir_heading": "Catatan tafsir",
+    "words_heading": "{n} kata dalam ayat ini",
+    "words_intro": "Ketuk kata pada bacaan di atas untuk mendengarnya lagi. Di bawah: arti, akar kata, dan alasan harakat akhirnya.",
+    "practice_heading": "Latihan",
+    "facts_heading": "Tahukah kamu?",
+    "fact_method": "Cara menghitung",
+    "fact_where": "Letak",
+    "back_to_surah": "Kembali ke daftar ayat"
+  },
+  "Word": {
+    "meaning": "Arti",
+    "root": "Akar kata",
+    "wazn": "Wazan",
+    "why": "Kenapa dibaca begitu?",
+    "other_views": "Pendapat lain",
+    "sources": "Rujukan",
+    "no_root": "tidak berakar (huruf/kata ganti)",
+    "draft": "Draf — menunggu tinjauan ustadz"
+  },
+  "Player": {
+    "play_ayah": "Putar ayat",
+    "pause": "Jeda",
+    "reciter": "Qari",
+    "play_word": "Putar kata {translit} — {gloss}",
+    "hint_tap": "Ketuk sebuah kata untuk mendengarnya sendiri. Ingin menirukan dengan jeda? Pilih bacaan Al-Husary (Mu'allim)."
+  },
+  "Exercise": {
+    "done": "Selesai",
+    "right": "Tepat!",
+    "not_yet": "Belum tepat.",
+    "next": "Lanjut",
+    "finish": "Selesai",
+    "score": "{right} dari {total} tepat pada percobaan pertama. Ulangi kapan saja — mengulang adalah cara terbaik untuk mengingat.",
+    "tap_title": "Dengar & Ketuk",
+    "tap_instruction": "Putar suara imam, lalu ketuk kata yang dibacakan.",
+    "tap_play": "Putar kata",
+    "tap_was": "Yang dibacakan:",
+    "why_title": "Kenapa harakat ini?",
+    "why_instruction": "Pilih alasan yang membuat kata ini berakhir dengan harakat tersebut.",
+    "why_question": "Kenapa",
+    "sort_title": "Sortir akhiran",
+    "sort_instruction": "Ketuk sebuah kata, lalu ketuk kelompok kedudukannya: marfū' (▲), manshūb (◆), majrūr (▼), atau mabnī (■)."
   }
 }

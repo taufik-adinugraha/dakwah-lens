@@ -48,6 +48,7 @@ A short narrated clip explains it with matching visuals. They then practise:
 | L4 | First content | **Surah Al-Fatihah** |
 | L5 | Narration engine | **ElevenLabs** using the house standard: `eleven_v3`, stability 0.5, style 0.35, similarity 0.75, speaker boost on, `apply_text_normalization: "off"`, with all normalisation done in Python |
 | L6 | Recitation | **Real imam voice only.** Never TTS or voice-conversion for Qur'anic text. |
+| L7 | Default reciter | **Mishary Rashid Alafasy** (EveryAyah `Alafasy_128kbps`, the exact files quran-align's timings were made from). Husary Mu'allim remains a selectable second voice for its built-in repeat gaps. |
 
 ## 3. Decisions needed (recommended default in bold)
 

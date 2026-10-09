@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { BookOpenCheck, Library, Mic } from "lucide-react";
+import { ArrowRight, BookOpenCheck, Library, Mic } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+
+import { Link } from "@/i18n/navigation";
 
 export async function generateMetadata({
   params,
@@ -64,9 +66,18 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
               سُورَةُ الْفَاتِحَةِ
             </p>
           </div>
-          <p className="mt-5 inline-flex rounded-full border border-dashed border-hairline px-3 py-1 text-xs font-medium text-ink-muted">
-            {t("status_preparing")}
-          </p>
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <Link
+              href="/al-fatihah"
+              className="inline-flex items-center gap-1.5 rounded-full bg-forest px-4 py-2 text-sm font-semibold text-paper transition hover:bg-forest-hover"
+            >
+              {t("start_cta")}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <span className="inline-flex rounded-full border border-dashed border-hairline px-3 py-1 text-xs font-medium text-ink-muted">
+              {t("status_preparing")}
+            </span>
+          </div>
         </div>
         <p className="mt-4 text-sm text-ink-muted">
           <span className="font-semibold text-ink">{t("next_heading")}:</span>{" "}
