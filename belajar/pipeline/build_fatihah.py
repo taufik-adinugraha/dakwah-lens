@@ -5,6 +5,12 @@ Inputs (all pinned in sources.json and verified by sha256 before use):
   Tanzil Uthmani 1.1 text + metadata, QAC 0.4 morphology, quran-align (Husary Mu'allim,
   Alafasy), QuranEnc indonesian_affairs sura 1, EveryAyah duration probes,
   and the hand-authored inventory authored/al-fatihah.words.json.
+Library links (hand-authored, shared with build_library.py):
+  Word.lemma_id  = the authored/library.lexicon.json id of the word's QAC STEM LEM (same key as
+                   build_library.py --word-map);
+  Word.concepts  = authored/al-fatihah.concepts-map.json (ids must exist in library.concepts.json);
+  Word.role and Ayah.structure = authored/al-fatihah.structure.json (role_src / role_note /
+                   review_notes are reviewer-only and never reach the output).
 
 Qur'anic Arabic is copied byte-for-byte from the Tanzil file. Every record is status "draft".
 The build stops (exit 1) on any structural problem; it prints data anomalies as warnings.
@@ -26,7 +32,13 @@ SLUG = "al-fatihah"
 NAME_ID = "Al-Fatihah"
 EXPECTED_WORDS = [4, 4, 2, 3, 4, 3, 9]
 AUTHORED = PIPELINE / "authored" / "al-fatihah.words.json"
+STRUCTURE = PIPELINE / "authored" / "al-fatihah.structure.json"
+CONCEPTS_MAP = PIPELINE / "authored" / "al-fatihah.concepts-map.json"
+LEXICON = PIPELINE / "authored" / "library.lexicon.json"
+CONCEPTS = PIPELINE / "authored" / "library.concepts.json"
 OUT = CONTENT_DIR / "al-fatihah.json"
+STRUCTURE_KEYS = ["type", "summary", "groups", "sources", "status"]  # schema.ts Ayah.structure
+GROUP_KEYS = {"words", "label", "concept"}
 
 RECITERS = [
     ("Husary_Muallim_128kbps", "everyayah_husary_muallim",
@@ -126,6 +138,66 @@ def verb_form_src(loc: str, a: int, st) -> dict:
             "url": f"https://corpus.quran.com/wordbyword.jsp?chapter={SURAH}&verse={a}"}
 
 
+def load_links(word_locs: list[str], kitab: dict) -> tuple[dict, set, dict, dict]:
+    """Read the hand-authored library links and check them against each other.
+    Returns (lexicon id by QAC LEM, concept ids, concepts by word loc, the structure file)."""
+    lex = json.loads(LEXICON.read_text(encoding="utf-8"))["lexicon"]
+    lex_by_lem = {e["qac_lem"]: e["id"] for e in lex}
+    if len(lex_by_lem) != len(lex) or len({e["id"] for e in lex}) != len(lex):
+        errors.append("library.lexicon.json: duplicate qac_lem or id")
+    raw_c = json.loads(CONCEPTS.read_text(encoding="utf-8"))
+    concept_ids = {c["id"] for c in (raw_c["concepts"] if isinstance(raw_c, dict) else raw_c)}
+    cmap = json.loads(CONCEPTS_MAP.read_text(encoding="utf-8"))["words"]
+    struct = json.loads(STRUCTURE.read_text(encoding="utf-8"))
+    for name, keys in (("concepts-map words", set(cmap)), ("structure words", set(struct["words"]))):
+        if keys != set(word_locs):
+            errors.append(f"{name}: locs differ from the 29 Tanzil words "
+                          f"(missing {sorted(set(word_locs) - keys)}, unknown {sorted(keys - set(word_locs))})")
+    for loc, ids in cmap.items():
+        if not isinstance(ids, list) or len(set(ids)) != len(ids):
+            errors.append(f"concepts-map {loc}: must be a list without repeats, got {ids!r}")
+            continue
+        for cid in ids:
+            if cid not in concept_ids:
+                errors.append(f"concepts-map {loc}: {cid!r} is not a concept id in library.concepts.json")
+    for loc, sw in struct["words"].items():
+        if not isinstance(sw.get("role"), str) or len(sw["role"]) < 2:
+            errors.append(f"structure word {loc}: role must be a string of >= 2 characters")
+        for abbr in sw.get("role_src", []):
+            if abbr not in kitab:
+                errors.append(f"structure word {loc}: role_src {abbr!r} is not a kitab abbreviation")
+    return lex_by_lem, concept_ids, cmap, struct
+
+
+def ayah_structure(a: int, n_words: int, struct: dict, concept_ids: set) -> dict | None:
+    """Ayah.structure from the authored file: schema keys only, groups checked."""
+    sa = (struct["ayat"].get(str(a)) or {}).get("structure")
+    if not sa:
+        errors.append(f"structure.json: no structure for ayah {SURAH}:{a}")
+        return None
+    where = f"structure {SURAH}:{a}"
+    if set(sa) != set(STRUCTURE_KEYS):
+        errors.append(f"{where}: keys {sorted(sa)} != {STRUCTURE_KEYS}")
+    if sa.get("status") != "draft":
+        errors.append(f"{where}: status must be draft")
+    if not sa.get("sources"):
+        errors.append(f"{where}: no sources")
+    groups = []
+    for i, g in enumerate(sa.get("groups", [])):
+        gw = f"{where}.groups[{i}]"
+        if set(g) - GROUP_KEYS:
+            errors.append(f"{gw}: unknown keys {sorted(set(g) - GROUP_KEYS)}")
+        idx = g.get("words", [])
+        if len(idx) < 2 or idx != sorted(set(idx)) or any(not isinstance(x, int) or not 1 <= x <= n_words
+                                                            for x in idx):
+            errors.append(f"{gw}: words {idx} must be >= 2 ascending indices within 1..{n_words}")
+        if "concept" in g and g["concept"] not in concept_ids:
+            errors.append(f"{gw}: concept {g['concept']!r} is not in library.concepts.json")
+        groups.append({k: g[k] for k in ("words", "label", "concept") if k in g})
+    return {"type": sa["type"], "summary": sa["summary"], "groups": groups, "sources": sa["sources"],
+            "status": sa["status"]}
+
+
 def split_footnotes(raw: str) -> list[str]:
     """QuranEnc 'footnotes' field -> one string per footnote, each starting at its [n] marker.
     Only the whitespace between footnotes is dropped; the text is not otherwise touched."""
@@ -183,6 +255,12 @@ def main() -> int:
     if errors:
         return finish(None)
 
+    # ---- library links (lemma_id, concepts, role, structure)
+    word_locs = [f"{SURAH}:{a}:{w}" for a in range(1, 8) for w in range(1, EXPECTED_WORDS[a - 1] + 1)]
+    lex_by_lem, concept_ids, cmap, struct = load_links(word_locs, kitab)
+    if errors:
+        return finish(None)
+
     # ---- ayat
     ayat = []
     for a in range(1, 8):
@@ -216,10 +294,19 @@ def main() -> int:
             pos = au.get("pos") or qac_pos
             if au.get("pos") and not au.get("pos_note"):
                 errors.append(f"{loc}: authored pos override {pos!r} needs a pos_note (QAC says {qac_pos!r})")
+            lemma_id = lex_by_lem.get(st.feat.get("LEM"))
+            if lemma_id is None:
+                errors.append(f"{loc}: no library.lexicon.json entry for QAC LEM {st.feat.get('LEM')!r}")
+            sw = struct["words"][loc]
+            src_abbr = {sp[0] for sp in au["src"]}
+            for abbr in sw.get("role_src", []):
+                if abbr not in src_abbr:
+                    errors.append(f"{loc}: role_src {abbr!r} is not among the word's own src {sorted(src_abbr)}")
             words.append({
                 "loc": loc, "ar": tok, "translit": au["translit"], "gloss": au["gloss"],
                 "root": root, "lemma": lemma, "pos": pos, "wazn": au["wazn"], "case": case,
-                "why": au["why"], "ikhtilaf": au["ikhtilaf"], "sources": sources, "status": "draft",
+                "why": au["why"], "lemma_id": lemma_id, "concepts": list(cmap[loc]), "role": sw["role"],
+                "ikhtilaf": au["ikhtilaf"], "sources": sources, "status": "draft",
             })
 
         # QuranEnc text verbatim (markers kept); its footnotes verbatim, one item per [n].
@@ -249,12 +336,16 @@ def main() -> int:
                                "url": f"https://everyayah.com/data/{reciter}/{SURAH:03d}{a:03d}.mp3",
                                "segments": segs_out, "credit": credit})
 
-        ayat.append({
+        ayah = {
             "loc": f"{SURAH}:{a}", "surah": SURAH, "ayah": a, "ar": verse, "words": words,
             "translation": {"text": tr, "footnotes": footnotes, "source_label": qe["title_id"],
                             "version": qe["version"]},
             "recitation": recitation, "status": "draft",
-        })
+        }
+        structure = ayah_structure(a, len(tokens), struct, concept_ids)
+        if structure:
+            ayah = {**{k: v for k, v in ayah.items() if k != "status"}, "structure": structure, "status": "draft"}
+        ayat.append(ayah)
 
     # ---- facts
     C = Corpus(T, segs, I["tanzil_uthmani"]["sha256"], I["qac_morphology"]["sha256"])
@@ -283,6 +374,8 @@ def main() -> int:
         "quranenc": f"indonesian_affairs {qe['version']} (last_update {qe['last_update_unix']}) "
                     f"sha256:{qe['sha256']}",
         "authored_words": f"authored/al-fatihah.words.json sha256:{sha256_file(AUTHORED)}",
+        "authored_structure": f"authored/al-fatihah.structure.json sha256:{sha256_file(STRUCTURE)}",
+        "authored_concepts_map": f"authored/al-fatihah.concepts-map.json sha256:{sha256_file(CONCEPTS_MAP)}",
         "pipeline": "belajar/pipeline/build_fatihah.py + facts.py (stdlib only, no LLM)",
     }
     out = {"surah": SURAH, "slug": SLUG, "name_ar": name_ar, "name_id": NAME_ID, "ayat": ayat,

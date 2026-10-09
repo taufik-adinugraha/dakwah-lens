@@ -28,6 +28,14 @@
             "sign": "kasrah"
           },
           "why": "Akhirnya kasrah karena kata ism (nama) didahului huruf jar bi- (dengan).",
+          "lemma_id": "ism",
+          "concepts": [
+            "kalimah-isim-fiil-huruf",
+            "tanda-irab",
+            "huruf-jar",
+            "syibhul-jumlah"
+          ],
+          "role": "huruf jar + majrur",
           "ikhtilaf": [
             {
               "point": "Bismi bergantung pada kata yang tersirat; yang mana? (Darwisy menilai kedua pendapat ini baik)",
@@ -89,6 +97,11 @@
             "sign": "kasrah"
           },
           "why": "Akhirnya kasrah karena menjadi mudhaf ilaih dari kata ismi.",
+          "lemma_id": "allah",
+          "concepts": [
+            "idhafah"
+          ],
+          "role": "mudhaf ilaih",
           "ikhtilaf": [],
           "sources": [
             {
@@ -132,6 +145,11 @@
             "sign": "kasrah"
           },
           "why": "Akhirnya kasrah karena menjadi sifat (na't) bagi lafaz Allah, dan sifat mengikuti kata yang disifatinya.",
+          "lemma_id": "rahman",
+          "concepts": [
+            "naat"
+          ],
+          "role": "na't (sifat)",
           "ikhtilaf": [],
           "sources": [
             {
@@ -180,6 +198,11 @@
             "sign": "kasrah"
           },
           "why": "Akhirnya kasrah karena menjadi sifat kedua bagi lafaz Allah, sehingga ikut majrur.",
+          "lemma_id": "rahim",
+          "concepts": [
+            "naat"
+          ],
+          "role": "na't (sifat) kedua",
           "ikhtilaf": [],
           "sources": [
             {
@@ -268,6 +291,77 @@
           "credit": "Recitation: Mishary Rashid Alafasy via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
         }
       ],
+      "structure": {
+        "type": "jumlah ibtida'iyyah (kalimat pembuka) dengan bagian yang tersirat",
+        "summary": "Yang terucap hanya keterangan bismi (“dengan nama”), yaitu huruf jar bi- (“dengan”) beserta kata yang dijarkannya, yang disandarkan (idhafah) kepada Allāhi lalu diikuti dua sifat (na't), ar-raḥmāni dan ar-raḥīmi; kata tempat bergantungnya keterangan ini tidak diucapkan. Ulama memberi dua perkiraan yang oleh Darwisy dinilai sama-sama baik: kata kerja seperti abtadi’u (“aku memulai”; pendapat ulama Kufah), sehingga menjadi kalimat kata kerja (jumlah fi'liyyah), atau ibtidā’ī (“permulaanku”; pendapat ulama Bashrah), sehingga menjadi kalimat nominal (jumlah ismiyyah).",
+        "groups": [
+          {
+            "words": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "label": "seluruh basmalah: satu keterangan jar-majrur yang bergantung pada kata yang tidak diucapkan",
+            "concept": "syibhul-jumlah"
+          },
+          {
+            "words": [
+              1,
+              2
+            ],
+            "label": "ismi → Allāhi: idhafah (“nama Allah”)",
+            "concept": "idhafah"
+          },
+          {
+            "words": [
+              2,
+              3,
+              4
+            ],
+            "label": "Allāhi diikuti dua na't: ar-raḥmāni, ar-raḥīmi (ikut berakhiran kasrah)",
+            "concept": "naat"
+          }
+        ],
+        "sources": [
+          {
+            "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+            "ref": "jil. 1, hlm. 9 (i'rab basmalah: dua perkiraan, abtadi’u atau ibtidā’ī, 'keduanya baik'; jumlah basmalah ibtida'iyyah, tidak punya kedudukan i'rab)",
+            "url": "https://tafsir.app/iraab-aldarweesh/1/1"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+            "ref": "QS 1:1 (bismi terkait khabar yang dibuang, mubtada'-nya ibtidā’ī; Allāhi mudhaf ilaih; ar-raḥmāni na't, ar-raḥīmi na't kedua; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/aljadwal/1/1"
+          },
+          {
+            "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an",
+            "ref": "QS 1:1 (perkiraan ibtidā’ī; jumlah perkiraan itu ibtida'iyyah; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/mujtaba-mushkil-iraab/1/1"
+          },
+          {
+            "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an",
+            "ref": "QS 1:1 (menurut al-Farra' kedudukannya nashab dengan makna 'aku memulai'; menurut ulama Bashrah rafa' dengan makna 'permulaanku'; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/iraab-alnahas/1/1"
+          },
+          {
+            "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun",
+            "ref": "QS 1:1 (ulama Bashrah: kata yang tersirat berupa isim; ulama Kufah: berupa fi'il; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/aldur-almasoon/1/1"
+          },
+          {
+            "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)",
+            "ref": "hlm. 495–496 (al-Bab ats-Tsani, contoh kedelapan: jumlah basmalah ismiyyah bila diperkirakan ibtidā’ī, pendapat Bashrah; fi'liyyah bila diperkirakan 'aku memulai', pendapat Kufah)",
+            "url": "https://shamela.ws/book/6972/483"
+          },
+          {
+            "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+            "ref": "hlm. 22–23 (Bab al-Makhfudhat min al-Asma': majrur karena huruf, karena idhafah, dan karena mengikuti kata yang majrur)",
+            "url": "https://shamela.ws/book/11371/30"
+          }
+        ],
+        "status": "draft"
+      },
       "status": "draft"
     },
     {
@@ -294,6 +388,13 @@
             "sign": "dhammah"
           },
           "why": "Akhirnya dhammah karena menjadi mubtada' (pokok kalimat).",
+          "lemma_id": "hamd",
+          "concepts": [
+            "tanda-irab",
+            "jumlah-ismiyyah",
+            "wazan-dan-tashrif"
+          ],
+          "role": "mubtada'",
           "ikhtilaf": [
             {
               "point": "Apa yang membuat al-ḥamdu marfu'?",
@@ -368,6 +469,13 @@
             "sign": "kasrah"
           },
           "why": "Akhirnya kasrah karena didahului huruf jar li-; jar-majrur ini bergantung pada khabar yang tidak disebut (misalnya 'tetap').",
+          "lemma_id": "allah",
+          "concepts": [
+            "huruf-jar",
+            "jumlah-ismiyyah",
+            "syibhul-jumlah"
+          ],
+          "role": "khabar (jar-majrur)",
           "ikhtilaf": [
             {
               "point": "Makna huruf lam pada lillāhi",
@@ -428,6 +536,12 @@
             "sign": "kasrah"
           },
           "why": "Akhirnya kasrah karena mengikuti lafaz Allah sebagai sifat (na't) atau badal.",
+          "lemma_id": "rabb",
+          "concepts": [
+            "naat",
+            "badal"
+          ],
+          "role": "na't (sifat) atau badal",
           "ikhtilaf": [
             {
               "point": "Kedudukan rabbi",
@@ -487,14 +601,29 @@
             "م"
           ],
           "lemma": "عَٰلَمِين",
-          "pos": "isim (isim jam')",
+          "pos": "isim (jamak)",
           "wazn": "فَاعَل",
           "case": {
             "state": "majrur",
             "sign": "ya'"
           },
           "why": "Majrur dengan tanda ya' karena menjadi mudhaf ilaih dan termasuk kata yang disamakan (mulhaq) dengan jamak mudzakkar salim.",
-          "ikhtilaf": [],
+          "lemma_id": "alamin",
+          "concepts": [
+            "tanda-irab",
+            "idhafah",
+            "jamak-mudzakkar-salim"
+          ],
+          "role": "mudhaf ilaih",
+          "ikhtilaf": [
+            {
+              "point": "Apakah al-‘ālamīna jamak dari ‘ālam?",
+              "options": [
+                "Ya, jamak dari ‘ālam yang disamakan (mulhaq) dengan jamak mudzakkar salim — Darwisy, al-Jadwal, al-Mujtaba",
+                "Bukan; ia isim jam' (bermakna jamak, tetapi tidak punya bentuk tunggal dari lafaznya sendiri) yang berakhiran seperti jamak mudzakkar salim — as-Samin"
+              ]
+            }
+          ],
           "sources": [
             {
               "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
@@ -503,12 +632,12 @@
             },
             {
               "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
-              "ref": "QS 1:2, bagian sharaf: bentuk tunggalnya ‘ālam berwazan fā‘al dengan fathah pada ‘ain, 'begitu pula jamaknya'; al-‘ālamīna disebut isim jam' (halaman cetak belum diverifikasi)",
+              "ref": "QS 1:2, bagian i'rab: mulhaq dengan jamak mudzakkar salim; bagian sharaf: jamak al-‘ālam; ‘ālam berwazan fā‘al dengan fathah pada ‘ain, 'begitu pula jamaknya'; jil. 1, hlm. 29 pada cetakan ke-3 (Shamela 22916)",
               "url": "https://tafsir.app/aljadwal/1/2"
             },
             {
               "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an",
-              "ref": "QS 1:2 (halaman cetak belum diverifikasi)",
+              "ref": "QS 1:2 (mulhaq dengan jamak mudzakkar salim; ‘ālam sebagai bentuk tunggalnya); jil. 1, hlm. 4 (Shamela 9617)",
               "url": "https://tafsir.app/mujtaba-mushkil-iraab/1/2"
             },
             {
@@ -518,7 +647,7 @@
             },
             {
               "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun",
-              "ref": "QS 1:2 (al-‘ālamīna disebut isim jam'; halaman cetak belum diverifikasi)",
+              "ref": "QS 1:2 (al-‘ālamīna isim jam', bukan jamak dari ‘ālam; tanda jar-nya ya' karena berlaku seperti jamak mudzakkar salim); jil. 1, hlm. 46 pada cetakan Dar al-Qalam (Shamela 9057)",
               "url": "https://tafsir.app/aldur-almasoon/1/2"
             },
             {
@@ -597,6 +726,78 @@
           "credit": "Recitation: Mishary Rashid Alafasy via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
         }
       ],
+      "structure": {
+        "type": "jumlah ismiyyah",
+        "summary": "Kalimat nominal: al-ḥamdu adalah pokok kalimat (mubtada'), dan lillāhi menerangkannya (khabar); jar-majrur ini bergantung pada kata yang tidak diucapkan, misalnya “tetap”. Kata rabbi mengikuti lafaz Allah sebagai sifat (na't) atau pengganti (badal), lalu disandarkan kepada al-‘ālamīna, yang menjadi mudhaf ilaih (kata yang disandari).",
+        "groups": [
+          {
+            "words": [
+              1,
+              2
+            ],
+            "label": "al-ḥamdu (mubtada') + lillāhi (khabar): inti kalimat nominal",
+            "concept": "jumlah-ismiyyah"
+          },
+          {
+            "words": [
+              2,
+              3
+            ],
+            "label": "lafaz Allah → rabbi: rabbi mengikutinya sebagai na't (atau badal)",
+            "concept": "naat"
+          },
+          {
+            "words": [
+              3,
+              4
+            ],
+            "label": "rabbi → al-‘ālamīna: idhafah (“Tuhan seluruh alam”)",
+            "concept": "idhafah"
+          }
+        ],
+        "sources": [
+          {
+            "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+            "ref": "jil. 1, hlm. 14 (al-ḥamdu mubtada'; lillāhi jar-majrur terkait khabar yang dibuang; rabbi sifat atau badal; al-‘ālamīna mudhaf ilaih)",
+            "url": "https://tafsir.app/iraab-aldarweesh/1/2"
+          },
+          {
+            "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+            "ref": "jil. 1, hlm. 16 (bagian al-Balaghah: jumlah al-ḥamdu lillāhi adalah jumlah ismiyyah)"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+            "ref": "QS 1:2 (khabar yang dibuang diperkirakan 'tetap' atau 'wajib'; rabbi na't, dalam catatan: atau badal; jumlah ini ibtida'iyyah, tidak punya kedudukan i'rab; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/aljadwal/1/2"
+          },
+          {
+            "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun",
+            "ref": "QS 1:2 (al-ḥamdu marfu' karena ibtida'; khabarnya jar-majrur yang terkait kata yang dibuang; rabbi na't atau badal; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/aldur-almasoon/1/2"
+          },
+          {
+            "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an",
+            "ref": "QS 1:2 (rafa' karena ibtida' menurut ulama Bashrah; rabbi majrur sebagai na't; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/iraab-alnahas/1/2"
+          },
+          {
+            "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an",
+            "ref": "QS 1:2 (rabbi badal; al-‘ālamīna mudhaf ilaih; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/mujtaba-mushkil-iraab/1/2"
+          },
+          {
+            "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+            "ref": "hlm. 12–13 (Bab al-Mubtada' wa al-Khabar: khabar bisa berupa jar-majrur)",
+            "url": "https://shamela.ws/book/11371/11"
+          },
+          {
+            "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)",
+            "ref": "hlm. 492 (al-Bab ats-Tsani: jumlah ismiyyah adalah kalimat yang pangkalnya isim)",
+            "url": "https://shamela.ws/book/6972/480"
+          }
+        ],
+        "status": "draft"
+      },
       "status": "draft"
     },
     {
@@ -623,6 +824,12 @@
             "sign": "kasrah"
           },
           "why": "Akhirnya kasrah karena sekali lagi menjadi sifat bagi lafaz Allah yang majrur.",
+          "lemma_id": "rahman",
+          "concepts": [
+            "naat",
+            "wazan-dan-tashrif"
+          ],
+          "role": "na't (sifat)",
           "ikhtilaf": [
             {
               "point": "Kedudukan ar-raḥmāni ar-raḥīmi di ayat 3",
@@ -674,6 +881,12 @@
             "sign": "kasrah"
           },
           "why": "Akhirnya kasrah karena menjadi sifat berikutnya bagi lafaz Allah yang majrur.",
+          "lemma_id": "rahim",
+          "concepts": [
+            "naat",
+            "wazan-dan-tashrif"
+          ],
+          "role": "na't (sifat)",
           "ikhtilaf": [
             {
               "point": "Kedudukan ar-raḥmāni ar-raḥīmi di ayat 3",
@@ -750,6 +963,43 @@
           "credit": "Recitation: Mishary Rashid Alafasy via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
         }
       ],
+      "structure": {
+        "type": "lanjutan jumlah ayat 2 (na't)",
+        "summary": "Ayat ini bukan kalimat baru: ar-raḥmāni dan ar-raḥīmi adalah dua sifat lagi bagi lafaz Allah di ayat 2, maka keduanya ikut majrur (berakhiran kasrah). Al-Jadwal dan as-Samin juga membolehkan keduanya dibaca sebagai badal.",
+        "groups": [
+          {
+            "words": [
+              1,
+              2
+            ],
+            "label": "ar-raḥmāni, ar-raḥīmi: dua na't bagi lafaz Allah di ayat 2",
+            "concept": "naat"
+          }
+        ],
+        "sources": [
+          {
+            "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+            "ref": "jil. 1, hlm. 14 (ar-raḥmāni ar-raḥīmi: dua sifat bagi Allah, 'juga')",
+            "url": "https://tafsir.app/iraab-aldarweesh/1/3"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+            "ref": "QS 1:3 (na't bagi lafaz Allah; dalam catatan: atau badal, begitu pula ar-raḥīmi; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/aljadwal/1/3"
+          },
+          {
+            "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun",
+            "ref": "QS 1:3 (na't atau badal; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/aldur-almasoon/1/3"
+          },
+          {
+            "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+            "ref": "hlm. 14 (Bab an-Na't: na't mengikuti kata yang disifati dalam rafa', nashab dan jar)",
+            "url": "https://shamela.ws/book/11371/15"
+          }
+        ],
+        "status": "draft"
+      },
       "status": "draft"
     },
     {
@@ -776,6 +1026,13 @@
             "sign": "kasrah"
           },
           "why": "Akhirnya kasrah karena menjadi sifat keempat bagi lafaz Allah.",
+          "lemma_id": "malik",
+          "concepts": [
+            "idhafah",
+            "naat",
+            "isim-fail"
+          ],
+          "role": "na't (sifat)",
           "ikhtilaf": [
             {
               "point": "Kedudukan māliki",
@@ -832,6 +1089,11 @@
             "sign": "kasrah"
           },
           "why": "Akhirnya kasrah karena menjadi mudhaf ilaih bagi māliki.",
+          "lemma_id": "yawm",
+          "concepts": [
+            "idhafah"
+          ],
+          "role": "mudhaf ilaih",
           "ikhtilaf": [],
           "sources": [
             {
@@ -875,6 +1137,12 @@
             "sign": "kasrah"
           },
           "why": "Akhirnya kasrah karena menjadi mudhaf ilaih bagi yaumi.",
+          "lemma_id": "din",
+          "concepts": [
+            "idhafah",
+            "wazan-dan-tashrif"
+          ],
+          "role": "mudhaf ilaih",
           "ikhtilaf": [],
           "sources": [
             {
@@ -955,6 +1223,54 @@
           "credit": "Recitation: Mishary Rashid Alafasy via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
         }
       ],
+      "structure": {
+        "type": "lanjutan jumlah ayat 2 (na't + rangkaian idhafah)",
+        "summary": "Ayat ini masih melanjutkan ayat 2: māliki adalah sifat berikutnya bagi lafaz Allah (Darwisy menyebutnya sifat keempat), lalu ia disandarkan kepada yaumi, dan yaumi disandarkan kepada ad-dīni. Inilah rangkaian idhafah tiga kata: yaumi dan ad-dīni sama-sama mudhaf ilaih, maka keduanya berakhiran kasrah.",
+        "groups": [
+          {
+            "words": [
+              1,
+              2,
+              3
+            ],
+            "label": "rangkaian idhafah: māliki → yaumi → ad-dīni (“Pemilik hari pembalasan”)",
+            "concept": "idhafah"
+          }
+        ],
+        "sources": [
+          {
+            "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+            "ref": "jil. 1, hlm. 14 (māliki sifat keempat bagi Allah; yaumi ad-dīni mudhaf ilaih)",
+            "url": "https://tafsir.app/iraab-aldarweesh/1/4"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+            "ref": "QS 1:4 (māliki na't, dalam catatan: atau badal; yaumi dan ad-dīni mudhaf ilaih; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/aljadwal/1/4"
+          },
+          {
+            "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an",
+            "ref": "QS 1:4 (māliki na't; idhafah-nya murni sehingga ia menjadi ma'rifah; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/mujtaba-mushkil-iraab/1/4"
+          },
+          {
+            "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an",
+            "ref": "QS 1:3–1:4 (yaumi majrur karena māliki disandarkan kepadanya, ad-dīni majrur karena yaumi disandarkan kepadanya; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/iraab-alnahas/1/4"
+          },
+          {
+            "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun",
+            "ref": "QS 1:4 (māliki na't, badal juga boleh walau jarang; ad-dīni mudhaf ilaih; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/aldur-almasoon/1/4"
+          },
+          {
+            "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+            "ref": "hlm. 23 (Bab al-Makhfudhat min al-Asma': majrur karena idhafah)",
+            "url": "https://shamela.ws/book/11371/31"
+          }
+        ],
+        "status": "draft"
+      },
       "status": "draft"
     },
     {
@@ -978,6 +1294,14 @@
             "mahall": "mahall nashb"
           },
           "why": "Kata ganti ini mabni di atas fathah (akhirnya tetap) dan berkedudukan nashab sebagai objek yang didahulukan, sehingga bermakna 'hanya kepada-Mu'.",
+          "lemma_id": "iyya",
+          "concepts": [
+            "murab-mabni",
+            "dhamir",
+            "taqdim-maful",
+            "maful-bih"
+          ],
+          "role": "maf'ul bih (didahulukan)",
           "ikhtilaf": [
             {
               "point": "Bagian mana dari iyyāka yang mabni?",
@@ -1034,6 +1358,14 @@
             "sign": "dhammah"
           },
           "why": "Akhirnya dhammah karena fi'il mudhari' ini tidak didahului huruf penashab atau penjazm; pelakunya tersirat, yaitu 'kami'.",
+          "lemma_id": "abada",
+          "concepts": [
+            "kalimah-isim-fiil-huruf",
+            "murab-mabni",
+            "fiil-mudhari",
+            "jumlah-filiyyah"
+          ],
+          "role": "fi'il mudhari' (fa'il tersimpan: “kami”)",
           "ikhtilaf": [],
           "sources": [
             {
@@ -1079,6 +1411,13 @@
             "mahall": "mahall nashb"
           },
           "why": "Wawu adalah huruf 'athaf, dan iyyāka (mabni di atas fathah, berkedudukan nashab) diulang sebagai objek yang didahulukan bagi nasta‘īnu agar makna 'hanya' melekat pada kedua perbuatan.",
+          "lemma_id": "iyya",
+          "concepts": [
+            "dhamir",
+            "taqdim-maful",
+            "athaf"
+          ],
+          "role": "huruf 'athaf + maf'ul bih (didahulukan)",
           "ikhtilaf": [
             {
               "point": "Bagian mana dari iyyāka yang mabni?",
@@ -1135,6 +1474,13 @@
             "sign": "dhammah"
           },
           "why": "Akhirnya dhammah dengan alasan yang sama seperti na‘budu: fi'il mudhari' tanpa huruf penashab atau penjazm.",
+          "lemma_id": "istaana",
+          "concepts": [
+            "fiil-mudhari",
+            "bab-istifal",
+            "ilal"
+          ],
+          "role": "fi'il mudhari' (fa'il tersimpan: “kami”)",
           "ikhtilaf": [],
           "sources": [
             {
@@ -1233,6 +1579,85 @@
           "credit": "Recitation: Mishary Rashid Alafasy via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
         }
       ],
+      "structure": {
+        "type": "dua jumlah fi'liyyah (yang kedua di-'athaf-kan)",
+        "summary": "Dua kalimat kata kerja yang disambung dengan wa ('athaf, penyambungan): pada masing-masing, objek (maf'ul bih) iyyāka didahulukan sebelum kata kerjanya, na‘budu dan nasta‘īnu, sehingga maknanya “hanya kepada-Mu”. Pelaku (fa'il) kedua kata kerja itu tidak tertulis, yaitu “kami”.",
+        "groups": [
+          {
+            "words": [
+              1,
+              2
+            ],
+            "label": "iyyāka na‘budu: objek didahulukan sebelum kata kerjanya → makna “hanya”",
+            "concept": "taqdim-maful"
+          },
+          {
+            "words": [
+              3,
+              4
+            ],
+            "label": "wa iyyāka nasta‘īnu: pola yang sama diulang",
+            "concept": "taqdim-maful"
+          },
+          {
+            "words": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "label": "kalimat kedua di-'athaf-kan (disambung dengan wa) pada kalimat pertama",
+            "concept": "athaf"
+          }
+        ],
+        "sources": [
+          {
+            "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+            "ref": "jil. 1, hlm. 14 (iyyāka dhamir munfashil, mahall nashb, maf'ul bih yang didahulukan untuk pengkhususan; na‘budu fi'il mudhari', pelakunya tersimpan, 'kami'; wa iyyāka nasta‘īnu di-'athaf-kan pada iyyāka na‘budu)",
+            "url": "https://tafsir.app/iraab-aldarweesh/1/5"
+          },
+          {
+            "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+            "ref": "jil. 1, hlm. 16 (bagian al-Balaghah: dhamir didahulukan untuk membatasi ibadah dan permohonan pertolongan hanya kepada Allah; iyyāka diulang pada kata kerja kedua)"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+            "ref": "QS 1:5 (jumlah pertama isti'nafiyyah, tidak punya kedudukan i'rab; jumlah kedua ma'thufah pada yang pertama; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/aljadwal/1/5"
+          },
+          {
+            "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an",
+            "ref": "QS 1:5 (iyyāka maf'ul bih yang didahulukan untuk pengkhususan; jumlah na‘budu musta'nafah; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/mujtaba-mushkil-iraab/1/5"
+          },
+          {
+            "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an",
+            "ref": "QS 1:5 (iyyāka manshub oleh na‘budu; iyyāka kedua manshub oleh nasta‘īnu, 'athaf jumlah pada jumlah; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/iraab-alnahas/1/5"
+          },
+          {
+            "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun",
+            "ref": "QS 1:5 (iyyāka maf'ul yang didahulukan untuk pengkhususan dan wajib didahulukan; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/aldur-almasoon/1/5"
+          },
+          {
+            "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)",
+            "ref": "hlm. 493 (al-Bab ats-Tsani: yang dihitung adalah pangkal kalimat menurut asalnya, maka kalimat yang objeknya didahulukan tetap jumlah fi'liyyah, karena objek itu berniat di belakang)",
+            "url": "https://shamela.ws/book/6972/481"
+          },
+          {
+            "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+            "ref": "hlm. 17 (Bab al-Maf'ul Bih: dhamir munfashil iyyāka termasuk maf'ul bih)",
+            "url": "https://shamela.ws/book/11371/20"
+          },
+          {
+            "kitab": "Ahmad al-Hasyimi, Jawahir al-Balaghah fi al-Ma'ani wa al-Bayan wa al-Badi' (ed. Yusuf ash-Shumaili, Beirut: al-Maktabah al-'Ashriyyah)",
+            "ref": "hlm. 178 (tathbiq 'amm 'ala al-qashr: iyyāka na‘budu wa iyyāka nasta‘īnu disebut dua jumlah khabariyyah fi'liyyah; objek didahulukan untuk qashr)",
+            "url": "https://shamela.ws/book/9256/155"
+          }
+        ],
+        "status": "draft"
+      },
       "status": "draft"
     },
     {
@@ -1259,6 +1684,13 @@
             "sign": "dibuangnya huruf 'illah (ya')"
           },
           "why": "Fi'il amr yang bermakna doa ini mabni dengan dibuangnya huruf ya' di akhir; pelakunya tersirat ('Engkau'), dan -nā ('kami') adalah objeknya.",
+          "lemma_id": "hada",
+          "concepts": [
+            "dhamir",
+            "fiil-amr",
+            "maful-bih"
+          ],
+          "role": "fi'il amr (doa) + maf'ul bih pertama (-nā); fa'il tersimpan: “Engkau”",
           "ikhtilaf": [],
           "sources": [
             {
@@ -1307,6 +1739,12 @@
             "sign": "fathah"
           },
           "why": "Akhirnya fathah karena menjadi objek kedua (maf'ul bih kedua) dari ihdi.",
+          "lemma_id": "sirat",
+          "concepts": [
+            "tanda-irab",
+            "maful-bih"
+          ],
+          "role": "maf'ul bih kedua",
           "ikhtilaf": [
             {
               "point": "Mengapa aṣ-ṣirāṭa manshub?",
@@ -1363,6 +1801,14 @@
             "sign": "fathah"
           },
           "why": "Akhirnya fathah karena menjadi sifat bagi aṣ-ṣirāṭa yang manshub.",
+          "lemma_id": "mustaqim",
+          "concepts": [
+            "naat",
+            "isim-fail",
+            "bab-istifal",
+            "ilal"
+          ],
+          "role": "na't (sifat)",
           "ikhtilaf": [],
           "sources": [
             {
@@ -1443,6 +1889,66 @@
           "credit": "Recitation: Mishary Rashid Alafasy via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
         }
       ],
+      "structure": {
+        "type": "jumlah fi'liyyah (doa)",
+        "summary": "Kalimat kata kerja berupa kata perintah (fi'il amr) yang di sini bermakna doa: ihdinā memuat pelaku yang tidak tertulis, “Engkau”, dan objek pertama -nā (“kami”), lalu aṣ-ṣirāṭa menjadi objek kedua. Kata al-mustaqīma adalah sifat bagi aṣ-ṣirāṭa, maka ikut manshub (berakhiran fathah).",
+        "groups": [
+          {
+            "words": [
+              1,
+              2
+            ],
+            "label": "ihdinā + aṣ-ṣirāṭa: kata kerja dengan dua objek (-nā objek pertama, aṣ-ṣirāṭa objek kedua)",
+            "concept": "maful-bih"
+          },
+          {
+            "words": [
+              2,
+              3
+            ],
+            "label": "aṣ-ṣirāṭa al-mustaqīma: na't (“jalan yang lurus”), sama-sama manshub",
+            "concept": "naat"
+          }
+        ],
+        "sources": [
+          {
+            "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+            "ref": "jil. 1, hlm. 14 (ihdinā fi'il amr bermakna doa; -nā maf'ul bih; pelakunya tersimpan, 'Engkau'; aṣ-ṣirāṭa maf'ul bih kedua)",
+            "url": "https://tafsir.app/iraab-aldarweesh/1/6"
+          },
+          {
+            "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+            "ref": "jil. 1, hlm. 15 (pendapat lain: aṣ-ṣirāṭa manshub karena huruf jarnya dibuang; al-mustaqīma sifat bagi aṣ-ṣirāṭa)",
+            "url": "https://tafsir.app/iraab-aldarweesh/1/6"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+            "ref": "QS 1:6 (fi'il amr du'a'i; -nā maf'ul bih; aṣ-ṣirāṭa maf'ul bih kedua; al-mustaqīma na't; jumlah isti'nafiyyah; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/aljadwal/1/6"
+          },
+          {
+            "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an",
+            "ref": "QS 1:6 (aṣ-ṣirāṭa maf'ul bih kedua; jumlah ihdinā isti'nafiyyah; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/mujtaba-mushkil-iraab/1/6"
+          },
+          {
+            "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an",
+            "ref": "QS 1:6 (-nā maf'ul pertama, aṣ-ṣirāṭa maf'ul kedua, al-mustaqīma na't; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/iraab-alnahas/1/6"
+          },
+          {
+            "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun",
+            "ref": "QS 1:6 (pelaku tersimpan, 'Engkau'; -nā maf'ul pertama; aṣ-ṣirāṭa maf'ul kedua; al-mustaqīma sifatnya; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/aldur-almasoon/1/6"
+          },
+          {
+            "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)",
+            "ref": "hlm. 492 (al-Bab ats-Tsani: jumlah fi'liyyah adalah kalimat yang pangkalnya fi'il, termasuk fi'il amr)",
+            "url": "https://shamela.ws/book/6972/480"
+          }
+        ],
+        "status": "draft"
+      },
       "status": "draft"
     },
     {
@@ -1469,6 +1975,11 @@
             "sign": "fathah"
           },
           "why": "Akhirnya fathah karena menjadi badal (pengganti) dari aṣ-ṣirāṭa di ayat 6 yang manshub.",
+          "lemma_id": "sirat",
+          "concepts": [
+            "badal"
+          ],
+          "role": "badal",
           "ikhtilaf": [
             {
               "point": "Kedudukan ṣirāṭa di ayat 7",
@@ -1532,6 +2043,13 @@
             "mahall": "mahall jarr"
           },
           "why": "Isim maushul ini mabni (bentuknya tetap) dan berkedudukan jar sebagai mudhaf ilaih dari ṣirāṭa.",
+          "lemma_id": "alladhi",
+          "concepts": [
+            "idhafah",
+            "murab-mabni",
+            "isim-maushul"
+          ],
+          "role": "isim maushul (mudhaf ilaih)",
           "ikhtilaf": [],
           "sources": [
             {
@@ -1575,6 +2093,14 @@
             "sign": "sukun"
           },
           "why": "Fi'il madhi ini mabni di atas sukun karena bersambung dengan dhamir -ta ('Engkau', pelakunya), dan kalimatnya menjadi shilah bagi allażīna.",
+          "lemma_id": "anama",
+          "concepts": [
+            "dhamir",
+            "jumlah-filiyyah",
+            "fiil-madhi",
+            "bab-ifal"
+          ],
+          "role": "fi'il madhi + fa'il (-ta); bersama ‘alaihim menjadi shilah",
           "ikhtilaf": [],
           "sources": [
             {
@@ -1620,6 +2146,13 @@
             "mahall": "mahall nashb"
           },
           "why": "‘Alā adalah huruf jar dan -him ('mereka') kata ganti mabni yang dijarkan olehnya, sedangkan kedudukan nashab (mahall nashb) di kartu ini milik frasa jar-majrur ‘alaihim secara utuh, yang bergantung pada an‘amta (as-Samin: manshub al-mahall).",
+          "lemma_id": "ala",
+          "concepts": [
+            "huruf-jar",
+            "dhamir",
+            "isim-maushul"
+          ],
+          "role": "huruf jar + majrur (terkait an‘amta)",
           "ikhtilaf": [],
           "sources": [
             {
@@ -1668,6 +2201,11 @@
             "sign": "kasrah"
           },
           "why": "Akhirnya kasrah karena menjadi badal dari allażīna yang berkedudukan jar (sebagian ulama menjadikannya sifat).",
+          "lemma_id": "ghayr",
+          "concepts": [
+            "badal"
+          ],
+          "role": "badal",
           "ikhtilaf": [
             {
               "point": "Kedudukan gairi",
@@ -1741,6 +2279,13 @@
             "sign": "kasrah"
           },
           "why": "Akhirnya kasrah karena menjadi mudhaf ilaih dari gairi.",
+          "lemma_id": "maghdub",
+          "concepts": [
+            "idhafah",
+            "isim-maful",
+            "naib-fail"
+          ],
+          "role": "mudhaf ilaih",
           "ikhtilaf": [],
           "sources": [
             {
@@ -1781,6 +2326,12 @@
             "mahall": "mahall raf'"
           },
           "why": "‘Alā adalah huruf jar dan -him kata ganti mabni yang dijarkan olehnya, sedangkan kedudukan rafa' (mahall raf') di kartu ini milik frasa jar-majrur ‘alaihim secara utuh sebagai na'ib fa'il (pengganti pelaku) bagi al-magḍūbi, karena al-magḍūb adalah isim maf'ul.",
+          "lemma_id": "ala",
+          "concepts": [
+            "huruf-jar",
+            "naib-fail"
+          ],
+          "role": "na'ib fa'il (jar-majrur)",
           "ikhtilaf": [],
           "sources": [
             {
@@ -1825,6 +2376,12 @@
             "sign": "—"
           },
           "why": "Wawu adalah huruf 'athaf, dan lā di sini tambahan untuk menegaskan makna 'bukan' yang sudah ada pada gairi.",
+          "lemma_id": "la",
+          "concepts": [
+            "kalimah-isim-fiil-huruf",
+            "athaf"
+          ],
+          "role": "huruf 'athaf + lā penegas (tambahan)",
           "ikhtilaf": [],
           "sources": [
             {
@@ -1873,11 +2430,18 @@
             "sign": "ya'"
           },
           "why": "Majrur dengan tanda ya' karena jamak mudzakkar salim yang di-'athaf-kan pada kata majrur sebelumnya.",
+          "lemma_id": "dall",
+          "concepts": [
+            "jamak-mudzakkar-salim",
+            "isim-fail",
+            "athaf"
+          ],
+          "role": "ma'thuf (kata yang di-'athaf-kan)",
           "ikhtilaf": [
             {
               "point": "Aḍ-ḍāllīna di-'athaf-kan kepada kata apa?",
               "options": [
-                "al-magḍūbi — Darwisy, al-Mujtaba",
+                "al-magḍūbi — Darwisy, al-Mujtaba, an-Nahhas, as-Samin",
                 "gairi — al-Jadwal"
               ]
             }
@@ -1897,6 +2461,16 @@
               "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
               "ref": "QS 1:7 (halaman cetak belum diverifikasi)",
               "url": "https://tafsir.app/aljadwal/1/7"
+            },
+            {
+              "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an",
+              "ref": "QS 1:7 (aḍ-ḍāllīna di-'athaf-kan pada al-magḍūbi ‘alaihim); jil. 1, hlm. 22 (Shamela 23587)",
+              "url": "https://tafsir.app/iraab-alnahas/1/7"
+            },
+            {
+              "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun",
+              "ref": "QS 1:7 (aḍ-ḍāllīna majrur, di-'athaf-kan pada al-magḍūbi); jil. 1, hlm. 74 pada cetakan Dar al-Qalam (Shamela 9057)",
+              "url": "https://tafsir.app/aldur-almasoon/1/7"
             },
             {
               "kitab": "Quranic Arabic Corpus 0.4",
@@ -2026,6 +2600,102 @@
           "credit": "Recitation: Mishary Rashid Alafasy via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
         }
       ],
+      "structure": {
+        "type": "lanjutan jumlah ayat 6 (badal), memuat jumlah shilah",
+        "summary": "Kata ṣirāṭa adalah pengganti (badal) yang menjelaskan aṣ-ṣirāṭa di ayat 6; ia disandarkan kepada allażīna, kata sambung “yang” (isim maushul) yang diterangkan oleh anak kalimat (shilah) an‘amta ‘alaihim. Berikutnya gairi al-magḍūbi ‘alaihim menjadi badal dari allażīna (sebagian ulama menjadikannya sifat), dengan ‘alaihim sebagai pengganti pelaku (na'ib fa'il) bagi al-magḍūbi, lalu aḍ-ḍāllīna disambung dengan wa lā, dan lā di situ menegaskan makna “bukan”.",
+        "groups": [
+          {
+            "words": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "label": "ṣirāṭa allażīna an‘amta ‘alaihim: badal yang menjelaskan aṣ-ṣirāṭa di ayat 6",
+            "concept": "badal"
+          },
+          {
+            "words": [
+              1,
+              2
+            ],
+            "label": "ṣirāṭa → allażīna: idhafah (“jalan orang-orang yang …”)",
+            "concept": "idhafah"
+          },
+          {
+            "words": [
+              2,
+              3,
+              4
+            ],
+            "label": "allażīna + shilah an‘amta ‘alaihim (“yang telah Engkau beri nikmat”)",
+            "concept": "isim-maushul"
+          },
+          {
+            "words": [
+              5,
+              6,
+              7
+            ],
+            "label": "gairi al-magḍūbi ‘alaihim: badal dari allażīna (pendapat lain: na't)",
+            "concept": "badal"
+          },
+          {
+            "words": [
+              6,
+              7
+            ],
+            "label": "al-magḍūbi ‘alaihim: isim maf'ul (kata berarti “yang di-…”) dan na'ib fa'il-nya",
+            "concept": "naib-fail"
+          },
+          {
+            "words": [
+              8,
+              9
+            ],
+            "label": "wa lā aḍ-ḍāllīna: 'athaf, dengan lā sebagai penegas makna “bukan”",
+            "concept": "athaf"
+          }
+        ],
+        "sources": [
+          {
+            "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+            "ref": "jil. 1, hlm. 15 (ṣirāṭa badal yang sepadan; allażīna mudhaf ilaih, mahall jar; jumlah an‘amta adalah shilah, tidak punya kedudukan i'rab; gairi badal dari dhamir pada ‘alaihim, atau dari allażīna, atau na't bagi allażīna; ‘alaihim kedua mahall raf' sebagai na'ib fa'il; lā tambahan untuk menegaskan nafi; aḍ-ḍāllīna di-'athaf-kan pada al-magḍūbi ‘alaihim)",
+            "url": "https://tafsir.app/iraab-aldarweesh/1/7"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+            "ref": "QS 1:7 (ṣirāṭa badal; gairi badal dari allażīna, dalam catatan: atau dari dhamir, atau na't; jumlah an‘amta ‘alaihim shilah; aḍ-ḍāllīna di-'athaf-kan pada gairi; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/aljadwal/1/7"
+          },
+          {
+            "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an",
+            "ref": "QS 1:7 (ṣirāṭa badal kull min kull; gairi badal dari allażīna; ‘alaihim na'ib fa'il bagi isim maf'ul al-magḍūbi; lā tambahan; aḍ-ḍāllīna di-'athaf-kan pada al-magḍūbi; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/mujtaba-mushkil-iraab/1/7"
+          },
+          {
+            "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an",
+            "ref": "QS 1:7 (ṣirāṭa badal; an‘amta ‘alaihim masuk dalam shilah; gairi badal dari allażīna atau na't, Ibnu Kaisan membolehkan badal dari dhamir; ‘alaihim kedua mahall raf'; aḍ-ḍāllīna di-'athaf-kan pada al-magḍūbi ‘alaihim; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/iraab-alnahas/1/7"
+          },
+          {
+            "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun",
+            "ref": "QS 1:7 (ṣirāṭa badal kull min kull; an‘amta shilah; gairi badal dari allażīna, atau na't, atau badal dari dhamir dengan catatan kesulitannya; ‘alaihim pertama mahall nashb, kedua mahall raf'; aḍ-ḍāllīna di-'athaf-kan pada al-magḍūbi; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/aldur-almasoon/1/7"
+          },
+          {
+            "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim",
+            "ref": "tafsir QS 1:7 (ṣirāṭa allażīna … menafsirkan aṣ-ṣirāṭa al-mustaqīma; badal menurut ahli nahwu, boleh juga 'athf bayan; halaman cetak belum diverifikasi)",
+            "url": "https://tafsir.app/ibn-katheer/1/7"
+          },
+          {
+            "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+            "ref": "hlm. 16 (Bab al-Badal: badal mengikuti kata yang digantinya dalam seluruh i'rab-nya)",
+            "url": "https://shamela.ws/book/11371/18"
+          }
+        ],
+        "status": "draft"
+      },
       "status": "draft"
     }
   ],
@@ -4033,7 +4703,9 @@
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
     "quran_align": "release-2016-11-24 sha256:5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7; Husary_Muallim_128kbps.json sha256:3719fb5c482d7db7086b4a81cdb6f114aa71979899917a74e6c8ae5bec684f5f; Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7",
     "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512) sha256:94d2be603ddb83c6556d609f673d51a9bd8593022a6936a61033324bdaf4ef02",
-    "authored_words": "authored/al-fatihah.words.json sha256:4583c977bb3b4c2fba118ae2e383c7c3842448dedfedf6706a052d12482cf53f",
+    "authored_words": "authored/al-fatihah.words.json sha256:96e6be188a14db44f4e9506d31a6895c02ecc7fc1f4332114d55d5b3726b6ec4",
+    "authored_structure": "authored/al-fatihah.structure.json sha256:d3e345b17116cd749884a287eaffc055522ee18a1f296f9f838a40126c02c72d",
+    "authored_concepts_map": "authored/al-fatihah.concepts-map.json sha256:656c8d94d0a68b81de3ab3c32608db99f9481e8e1b382c7c838bae61b636f960",
     "pipeline": "belajar/pipeline/build_fatihah.py + facts.py (stdlib only, no LLM)"
   }
 }

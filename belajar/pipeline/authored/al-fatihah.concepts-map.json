@@ -1,0 +1,136 @@
+{
+  "_comment": "Word loc -> Konsep library ids (belajar/pipeline/authored/library.concepts.json) that the word illustrates; feeds Word.concepts in schema.ts. DRAFT pending ustadz review. Generated from the concepts' `examples`, so every id listed here has this loc among its examples and vice versa. Ids are listed in the order the concepts are introduced (plan §4.2 unit order).",
+  "words": {
+    "1:1:1": [
+      "kalimah-isim-fiil-huruf",
+      "tanda-irab",
+      "huruf-jar",
+      "syibhul-jumlah"
+    ],
+    "1:1:2": [
+      "idhafah"
+    ],
+    "1:1:3": [
+      "naat"
+    ],
+    "1:1:4": [
+      "naat"
+    ],
+    "1:2:1": [
+      "tanda-irab",
+      "jumlah-ismiyyah",
+      "wazan-dan-tashrif"
+    ],
+    "1:2:2": [
+      "huruf-jar",
+      "jumlah-ismiyyah",
+      "syibhul-jumlah"
+    ],
+    "1:2:3": [
+      "naat",
+      "badal"
+    ],
+    "1:2:4": [
+      "tanda-irab",
+      "idhafah",
+      "jamak-mudzakkar-salim"
+    ],
+    "1:3:1": [
+      "naat",
+      "wazan-dan-tashrif"
+    ],
+    "1:3:2": [
+      "naat",
+      "wazan-dan-tashrif"
+    ],
+    "1:4:1": [
+      "idhafah",
+      "naat",
+      "isim-fail"
+    ],
+    "1:4:2": [
+      "idhafah"
+    ],
+    "1:4:3": [
+      "idhafah",
+      "wazan-dan-tashrif"
+    ],
+    "1:5:1": [
+      "murab-mabni",
+      "dhamir",
+      "taqdim-maful",
+      "maful-bih"
+    ],
+    "1:5:2": [
+      "kalimah-isim-fiil-huruf",
+      "murab-mabni",
+      "fiil-mudhari",
+      "jumlah-filiyyah"
+    ],
+    "1:5:3": [
+      "dhamir",
+      "taqdim-maful",
+      "athaf"
+    ],
+    "1:5:4": [
+      "fiil-mudhari",
+      "bab-istifal",
+      "ilal"
+    ],
+    "1:6:1": [
+      "dhamir",
+      "fiil-amr",
+      "maful-bih"
+    ],
+    "1:6:2": [
+      "tanda-irab",
+      "maful-bih"
+    ],
+    "1:6:3": [
+      "naat",
+      "isim-fail",
+      "bab-istifal",
+      "ilal"
+    ],
+    "1:7:1": [
+      "badal"
+    ],
+    "1:7:2": [
+      "idhafah",
+      "murab-mabni",
+      "isim-maushul"
+    ],
+    "1:7:3": [
+      "dhamir",
+      "jumlah-filiyyah",
+      "fiil-madhi",
+      "bab-ifal"
+    ],
+    "1:7:4": [
+      "huruf-jar",
+      "dhamir",
+      "isim-maushul"
+    ],
+    "1:7:5": [
+      "badal"
+    ],
+    "1:7:6": [
+      "idhafah",
+      "isim-maful",
+      "naib-fail"
+    ],
+    "1:7:7": [
+      "huruf-jar",
+      "naib-fail"
+    ],
+    "1:7:8": [
+      "kalimah-isim-fiil-huruf",
+      "athaf"
+    ],
+    "1:7:9": [
+      "jamak-mudzakkar-salim",
+      "isim-fail",
+      "athaf"
+    ]
+  }
+}

@@ -145,14 +145,20 @@
     "1:2:4": {
       "translit": "al-‘ālamīna",
       "gloss": "seluruh alam",
-      "pos": "isim (isim jam')",
-      "pos_note": "QAC 0.4 menandainya N|MP (jamak); al-Jadwal dan as-Samin menyebut al-‘ālamīna isim jam'.",
       "wazn": "فَاعَل",
       "case": { "state": "majrur", "sign": "ya'" },
       "why": "Majrur dengan tanda ya' karena menjadi mudhaf ilaih dan termasuk kata yang disamakan (mulhaq) dengan jamak mudzakkar salim.",
-      "ikhtilaf": [],
-      "src": [["D"], ["J", "QS 1:2, bagian sharaf: bentuk tunggalnya ‘ālam berwazan fā‘al dengan fathah pada ‘ain, 'begitu pula jamaknya'; al-‘ālamīna disebut isim jam' (halaman cetak belum diverifikasi)"], ["M"], ["N"], ["S", "QS 1:2 (al-‘ālamīna disebut isim jam'; halaman cetak belum diverifikasi)"]],
-      "review_notes": ["Wazan fā‘al dari al-Jadwal (QS 1:2, bagian sharaf): wazannya fā‘al dengan fathah pada ‘ain, dan begitu pula jamaknya. Lampiran A mengosongkannya.", "Label kelas kata 'isim (isim jam')' mengikuti al-Jadwal dan as-Samin (keduanya: isim jam'), menggantikan label otomatis QAC 'isim (jamak)'."]
+      "ikhtilaf": [
+        {
+          "point": "Apakah al-‘ālamīna jamak dari ‘ālam?",
+          "options": [
+            "Ya, jamak dari ‘ālam yang disamakan (mulhaq) dengan jamak mudzakkar salim — Darwisy, al-Jadwal, al-Mujtaba",
+            "Bukan; ia isim jam' (bermakna jamak, tetapi tidak punya bentuk tunggal dari lafaznya sendiri) yang berakhiran seperti jamak mudzakkar salim — as-Samin"
+          ]
+        }
+      ],
+      "src": [["D"], ["J", "QS 1:2, bagian i'rab: mulhaq dengan jamak mudzakkar salim; bagian sharaf: jamak al-‘ālam; ‘ālam berwazan fā‘al dengan fathah pada ‘ain, 'begitu pula jamaknya'; jil. 1, hlm. 29 pada cetakan ke-3 (Shamela 22916)"], ["M", "QS 1:2 (mulhaq dengan jamak mudzakkar salim; ‘ālam sebagai bentuk tunggalnya); jil. 1, hlm. 4 (Shamela 9617)"], ["N"], ["S", "QS 1:2 (al-‘ālamīna isim jam', bukan jamak dari ‘ālam; tanda jar-nya ya' karena berlaku seperti jamak mudzakkar salim); jil. 1, hlm. 46 pada cetakan Dar al-Qalam (Shamela 9057)"]],
+      "review_notes": ["Wazan fā‘al dari al-Jadwal (QS 1:2, bagian sharaf): wazannya fā‘al dengan fathah pada ‘ain, dan begitu pula jamaknya. Lampiran A mengosongkannya.", "D2 (verifikator): override kelas kata 'isim (isim jam')' dihapus, sehingga kartu memakai label QAC 'isim (jamak)', sama dengan entri Kosakata alamin. Sebelumnya label itu dinisbatkan kepada al-Jadwal dan as-Samin; hanya as-Samin (1/46) yang berpendapat isim jam' untuk al-‘ālamīna. Kalimat al-Jadwal 'jam' al-'alam, wa huwa ism jam'' dibaca dengan dhamir huwa merujuk ke al-‘ālam (lihat review_notes entri alamin di library.lexicon.json). Perbedaan pendapat kini ada di ikhtilaf."]
     },
     "1:3:1": {
       "translit": "ar-raḥmāni",
@@ -423,12 +429,12 @@
         {
           "point": "Aḍ-ḍāllīna di-'athaf-kan kepada kata apa?",
           "options": [
-            "al-magḍūbi — Darwisy, al-Mujtaba",
+            "al-magḍūbi — Darwisy, al-Mujtaba, an-Nahhas, as-Samin",
             "gairi — al-Jadwal"
           ]
         }
       ],
-      "src": [["D"], ["M"], ["J"]]
+      "src": [["D"], ["M"], ["J"], ["N", "QS 1:7 (aḍ-ḍāllīna di-'athaf-kan pada al-magḍūbi ‘alaihim); jil. 1, hlm. 22 (Shamela 23587)"], ["S", "QS 1:7 (aḍ-ḍāllīna majrur, di-'athaf-kan pada al-magḍūbi); jil. 1, hlm. 74 pada cetakan Dar al-Qalam (Shamela 9057)"]]
     }
   }
 }
