@@ -100,10 +100,8 @@ export function AyahPlayer({
       </div>
 
       <p className="mt-3 text-center text-xs text-ink-muted">{t("hint_tap")}</p>
-      <p className="mt-1 text-center text-[11px] text-ink-faint">{p.source && sources[p.sourceIdx]?.credit}</p>
-
-      {/* Streamed from the reciter's CDN; never re-hosted (plan §6.2). */}
-      <audio ref={p.audioRef} src={p.source.url} preload="none" />
+      {/* Recitation streams from the reciter's CDN; never re-hosted (plan §6.2). */}
+      <p className="mt-1 text-center text-[11px] text-ink-faint">{sources[p.sourceIdx]?.credit}</p>
     </div>
   );
 }

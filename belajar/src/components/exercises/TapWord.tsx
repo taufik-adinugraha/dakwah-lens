@@ -125,7 +125,6 @@ export function TapWord({
           )}
         </>
       )}
-      <audio ref={p.audioRef} src={p.source.url} preload="none" />
     </ExerciseShell>
   );
 }

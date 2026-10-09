@@ -18,11 +18,15 @@ export type RecitationSource = {
  * - The active word is read every animation frame (timeupdate fires only
  *   ~4×/s, too coarse for word highlighting).
  * - Slow playback keeps pitch (A5: user-controlled, pitch preserved).
+ *
+ * The hook owns its Audio element (created after mount, never rendered), so
+ * components never touch a ref during render (React Compiler rule).
  */
 export function useSegmentPlayer(sources: RecitationSource[]) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const stopAtRef = useRef<number | null>(null);
-  const rafRef = useRef<number | null>(null);
+  const segmentsRef = useRef<Segment[]>([]);
+  const rateRef = useRef<1 | 0.75>(1);
   const [sourceIdx, setSourceIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [activeWord, setActiveWord] = useState<number | null>(null);
@@ -30,43 +34,41 @@ export function useSegmentPlayer(sources: RecitationSource[]) {
 
   const source = sources[sourceIdx] ?? sources[0];
 
-  const wordAt = useCallback(
-    (ms: number): number | null => {
-      for (const [w, s, e] of source.segments) if (ms >= s && ms < e) return w;
-      return null;
-    },
-    [source],
-  );
-
-  const tick = useCallback(() => {
-    const a = audioRef.current;
-    if (!a) return;
-    const ms = a.currentTime * 1000;
-    if (stopAtRef.current !== null && ms >= stopAtRef.current) {
-      a.pause();
-      stopAtRef.current = null;
-      setActiveWord(null);
-      return;
-    }
-    setActiveWord(wordAt(ms));
-    rafRef.current = requestAnimationFrame(tick);
-  }, [wordAt]);
-
-  // Wire element events once per source.
+  // Create the element once; the highlight loop lives in this closure.
   useEffect(() => {
-    const a = audioRef.current;
-    if (!a) return;
+    const a = new Audio();
+    a.preload = "none";
+    audioRef.current = a;
+    let raf: number | null = null;
+
+    const wordAt = (ms: number): number | null => {
+      for (const [w, s, e] of segmentsRef.current) if (ms >= s && ms < e) return w;
+      return null;
+    };
+    const loop = () => {
+      const ms = a.currentTime * 1000;
+      const stopAt = stopAtRef.current;
+      if (stopAt !== null && ms >= stopAt) {
+        stopAtRef.current = null;
+        a.pause();
+        setActiveWord(null);
+        return;
+      }
+      setActiveWord(wordAt(ms));
+      raf = requestAnimationFrame(loop);
+    };
     const onPlay = () => {
       setPlaying(true);
-      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(tick);
+      if (raf !== null) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(loop);
     };
     const onStop = () => {
       setPlaying(false);
-      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
+      if (raf !== null) cancelAnimationFrame(raf);
+      raf = null;
       if (a.ended) setActiveWord(null);
     };
+
     a.addEventListener("play", onPlay);
     a.addEventListener("pause", onStop);
     a.addEventListener("ended", onStop);
@@ -74,22 +76,39 @@ export function useSegmentPlayer(sources: RecitationSource[]) {
       a.removeEventListener("play", onPlay);
       a.removeEventListener("pause", onStop);
       a.removeEventListener("ended", onStop);
-      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      if (raf !== null) cancelAnimationFrame(raf);
+      a.pause();
+      a.removeAttribute("src");
+      audioRef.current = null;
     };
-  }, [tick, source.url]);
+  }, []);
+
+  // Point the element at the chosen reciter's file (fetched only on play).
+  useEffect(() => {
+    segmentsRef.current = source.segments;
+    const a = audioRef.current;
+    if (!a) return;
+    a.pause();
+    stopAtRef.current = null;
+    a.src = source.url;
+    // A src swap resets the element's rate; re-apply the learner's choice.
+    a.playbackRate = rateRef.current;
+    a.preservesPitch = true;
+  }, [source]);
 
   useEffect(() => {
+    rateRef.current = rate;
     const a = audioRef.current;
     if (!a) return;
     a.playbackRate = rate;
     a.preservesPitch = true;
-  }, [rate, source.url]);
+  }, [rate]);
 
   const playAll = useCallback(() => {
     const a = audioRef.current;
     if (!a) return;
     stopAtRef.current = null;
-    if (a.ended || a.currentTime > 0) a.currentTime = 0;
+    a.currentTime = 0;
     void a.play().catch(() => {});
   }, []);
 
@@ -114,8 +133,12 @@ export function useSegmentPlayer(sources: RecitationSource[]) {
     setSourceIdx(i);
   }, []);
 
+  const hasWord = useCallback(
+    (w: number) => source.segments.some(([sw]) => sw === w),
+    [source],
+  );
+
   return {
-    audioRef,
     source,
     sourceIdx,
     chooseSource,
@@ -126,6 +149,6 @@ export function useSegmentPlayer(sources: RecitationSource[]) {
     playAll,
     playWord,
     pause,
-    hasWord: (w: number) => source.segments.some(([sw]) => sw === w),
+    hasWord,
   };
 }
