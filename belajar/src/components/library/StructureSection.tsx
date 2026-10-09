@@ -2,39 +2,52 @@ import type { Ayah } from "@/content/schema";
 import { Link } from "@/i18n/navigation";
 
 import { DraftChip } from "../lesson/DraftChip";
+import { MixedText } from "./MixedText";
+import { SourcesDisclosure } from "./SourceList";
 
 /**
- * "Struktur ayat": how the words fit together (nahwu, the tarkib). Words are
- * shown as they are in the mushaf, each with its role beneath; named groups
- * (an idhafah chain, a na't pair, a badal) are listed with their concept.
+ * "Susunan kalimat ayat (tarkib)": how the words fit together (nahwu).
+ * Words are shown as they are in the mushaf, each with its role beneath;
+ * named groups (an idhafah chain, a na't pair, a badal) are listed with
+ * their concept. `hideHeading` drops the section's own H2 when the page
+ * already names it (e.g. inside a "Pelajari lebih dalam" disclosure row).
  */
 export function StructureSection({
   ayah,
   labels,
   conceptTitle,
+  hideHeading = false,
 }: {
   ayah: Ayah;
   labels: { heading: string; groups: string; sources: string; draft: string };
   conceptTitle: Record<string, string>;
+  hideHeading?: boolean;
 }) {
   const st = ayah.structure;
   if (!st) return null;
   return (
-    <section className="mt-10 rounded-2xl border border-hairline bg-white p-5 sm:p-6" aria-labelledby="structure">
-      <h2 id="structure" className="font-display text-2xl font-medium">
-        {labels.heading}
-      </h2>
-      <p className="mt-1 text-sm font-semibold text-forest">{st.type}</p>
-      <p className="mt-2 text-pretty leading-relaxed">{st.summary}</p>
+    <section
+      className={`${hideHeading ? "" : "mt-10 "}rounded-2xl border border-hairline bg-white p-5 sm:p-6`}
+      aria-labelledby={hideHeading ? undefined : "structure"}
+    >
+      {hideHeading ? null : (
+        <h2 id="structure" className="font-display text-2xl font-medium">
+          {labels.heading}
+        </h2>
+      )}
+      <p className={`${hideHeading ? "" : "mt-1 "}text-sm font-semibold text-forest`}>{st.type}</p>
+      <p className="mt-2 max-w-prose text-pretty text-base text-ink">
+        <MixedText text={st.summary} />
+      </p>
 
-      <ol dir="rtl" className="mt-5 flex flex-wrap justify-center gap-x-3 gap-y-4">
+      <ol dir="rtl" className="mt-5 flex flex-wrap justify-center gap-x-4 gap-y-5">
         {ayah.words.map((w) => (
           <li key={w.loc} className="flex flex-col items-center">
-            <span lang="ar" className="quran text-2xl leading-[1.9]">
+            <span lang="ar" className="quran text-ar-md text-ink">
               {w.ar}
             </span>
             {w.role ? (
-              <span dir="ltr" className="mt-0.5 max-w-28 text-center text-[11px] leading-tight text-ink-muted">
+              <span dir="ltr" className="max-w-36 text-center text-sm text-ink-muted">
                 {w.role}
               </span>
             ) : null}
@@ -43,19 +56,25 @@ export function StructureSection({
       </ol>
 
       {st.groups.length > 0 && (
-        <div className="mt-5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-muted">
-            {labels.groups}
-          </p>
-          <ul className="mt-2 space-y-2 text-sm">
+        <div className="mt-6">
+          <h3 className="text-sm font-semibold text-ink">{labels.groups}</h3>
+          <ul className="mt-2 space-y-3">
             {st.groups.map((g) => (
-              <li key={`${g.label}-${g.words.join("-")}`} className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                <span lang="ar" dir="rtl" className="font-arabic text-lg">
-                  {g.words.map((i) => ayah.words[i - 1]?.ar).filter(Boolean).join(" · ")}
+              <li
+                key={`${g.label}-${g.words.join("-")}`}
+                className="flex flex-wrap items-center gap-x-3 gap-y-2 text-base text-ink"
+              >
+                <span lang="ar" dir="rtl" className="quran text-ar-sm text-ink">
+                  {g.words
+                    .map((i) => ayah.words[i - 1]?.ar)
+                    .filter(Boolean)
+                    .join(" · ")}
                 </span>
-                <span>— {g.label}</span>
+                <span>
+                  — <MixedText text={g.label} />
+                </span>
                 {g.concept && conceptTitle[g.concept] ? (
-                  <Link href={`/konsep/${g.concept}`} className="text-forest underline decoration-forest/30 underline-offset-2">
+                  <Link href={`/konsep/${g.concept}`} className="chip-link">
                     {conceptTitle[g.concept]}
                   </Link>
                 ) : null}
@@ -65,9 +84,7 @@ export function StructureSection({
         </div>
       )}
 
-      <p className="mt-4 text-[11px] text-ink-faint">
-        {labels.sources}: {st.sources.map((s) => (s.ref ? `${s.kitab} ${s.ref}` : s.kitab)).join(" · ")}
-      </p>
+      <SourcesDisclosure sources={st.sources} label={labels.sources} className="mt-5" />
       {st.status === "draft" ? <DraftChip label={labels.draft} /> : null}
     </section>
   );

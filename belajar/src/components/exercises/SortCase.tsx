@@ -1,6 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import clsx from "clsx";
+import { Check, Lightbulb } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import type { CaseState, Word } from "@/content/schema";
@@ -8,15 +10,39 @@ import { useProgress } from "@/hooks/useProgress";
 import { CASE_META, SORT_BINS } from "@/lib/cases";
 import { seededShuffle } from "@/lib/shuffle";
 
-import { ExerciseShell, Feedback } from "./ExerciseShell";
+import { CaseBadge, CaseShape } from "../lesson/CaseBadge";
+import {
+  ExerciseShell,
+  Feedback,
+  Finished,
+  OptionMark,
+  useRestart,
+  useStepFocus,
+  type FeedbackKind,
+} from "./ExerciseShell";
+
+type Props = { id: string; words: Word[] };
 
 /**
- * "Sortir Akhiran" — sort the ayah's words into raf' / nasb / jarr / mabni.
- * Tap a word, then tap its bin (no drag-and-drop: works with a thumb and a
- * keyboard). Words are the mushaf words, unaltered; they slide calmly into
- * place — nothing explodes or is thrown away (plan §4.7).
+ * "Kelompokkan menurut akhiran" — sort the ayah's words into raf' / nasb /
+ * jarr / mabni groups. Tap a word, then tap its group (no drag-and-drop:
+ * works with a thumb and a keyboard); the two steps are spelled out on
+ * screen. Words are the mushaf words, unaltered; nothing explodes or is
+ * thrown away (plan §4.7).
  */
-export function SortCase({ id, words }: { id: string; words: Word[] }) {
+export function SortCase(props: Props) {
+  const { round, restart } = useRestart();
+  return <SortCaseRound key={round} {...props} restarted={round > 0} onRestart={restart} />;
+}
+
+type Say = { kind: FeedbackKind; word?: Word; n: number };
+
+function SortCaseRound({
+  id,
+  words,
+  restarted,
+  onRestart,
+}: Props & { restarted: boolean; onRestart: () => void }) {
   const t = useTranslations("Exercise");
   const { progress, markDone } = useProgress();
   const items = useMemo(
@@ -25,29 +51,81 @@ export function SortCase({ id, words }: { id: string; words: Word[] }) {
   );
   const [placed, setPlaced] = useState<Record<string, CaseState>>({});
   const [selected, setSelected] = useState<string | null>(null);
-  const [feedback, setFeedback] = useState<{ ok: boolean; word: Word } | null>(null);
-  const [misses, setMisses] = useState(0);
+  /** Groups already tried, wrongly, for the selected word. */
+  const [wrongBins, setWrongBins] = useState<CaseState[]>([]);
+  /** Wrong drops per word; two unlock "Tunjukkan jawaban". */
+  const [misses, setMisses] = useState<Record<string, number>>({});
+  const [firstTry, setFirstTry] = useState(0);
+  const [say, setSay] = useState<Say | null>(null);
+
+  const remaining = items.filter((w) => !placed[w.loc]);
+  const finished = items.length > 0 && remaining.length === 0;
+  const focusRef = useStepFocus(finished ? 1 : 0);
+  /** The words still to sort: focus lands here after "Tunjukkan jawaban",
+   *  whose button disappears once the word is placed. */
+  const wordsRef = useRef<HTMLDivElement>(null);
 
   if (items.length < 2) return null;
-  const remaining = items.filter((w) => !placed[w.loc]);
-  const finished = remaining.length === 0;
+  const selectedWord = items.find((w) => w.loc === selected) ?? null;
+  const tell = (kind: FeedbackKind, word?: Word) => setSay({ kind, word, n: (say?.n ?? 0) + 1 });
+
+  const place = (word: Word, counts: boolean) => {
+    const next = { ...placed, [word.loc]: word.case.state };
+    const right = firstTry + (counts ? 1 : 0);
+    setPlaced(next);
+    setFirstTry(right);
+    setSelected(null);
+    setWrongBins([]);
+    if (Object.keys(next).length === items.length) markDone(id, right / items.length);
+  };
+
+  const pick = (loc: string) => {
+    if (loc === selected) return;
+    setSelected(loc);
+    setWrongBins([]);
+    // A new word: drop the "try again"/"pick first" notes, but keep the rule
+    // just learned on screen until the next drop.
+    if (say?.kind === "retry" || say?.kind === "hint") setSay(null);
+  };
 
   const drop = (bin: CaseState) => {
-    const word = items.find((w) => w.loc === selected);
-    if (!word) return;
-    if (word.case.state === bin) {
-      const next = { ...placed, [word.loc]: bin };
-      setPlaced(next);
-      setSelected(null);
-      setFeedback({ ok: true, word });
-      if (Object.keys(next).length === items.length) {
-        markDone(id, Math.max(0, items.length - misses) / items.length);
-      }
+    if (finished) return;
+    if (!selectedWord) {
+      tell("hint");
+      return;
+    }
+    if (selectedWord.case.state === bin) {
+      place(selectedWord, !misses[selectedWord.loc]);
+      tell("ok", selectedWord);
     } else {
-      setMisses((m) => m + 1);
-      setFeedback({ ok: false, word });
+      setMisses({ ...misses, [selectedWord.loc]: (misses[selectedWord.loc] ?? 0) + 1 });
+      if (!wrongBins.includes(bin)) setWrongBins([...wrongBins, bin]);
+      tell("retry", selectedWord);
     }
   };
+
+  const reveal = () => {
+    if (!selectedWord) return;
+    const last = remaining.length === 1;
+    place(selectedWord, false);
+    tell("reveal", selectedWord);
+    // The pressed button unmounts with the placed word; keep keyboard focus
+    // on the next step (picking a word). After the last word, useStepFocus
+    // moves focus to the result instead.
+    if (!last) wordsRef.current?.focus();
+  };
+
+  const canReveal = selectedWord !== null && (misses[selectedWord.loc] ?? 0) >= 2;
+  const step = selectedWord ? 2 : 1;
+
+  const title =
+    say?.kind === "ok"
+      ? t("right")
+      : say?.kind === "reveal"
+        ? t("revealed")
+        : say?.kind === "retry"
+          ? t("sort_not_yet")
+          : t("sort_pick_first");
 
   return (
     <ExerciseShell
@@ -55,59 +133,144 @@ export function SortCase({ id, words }: { id: string; words: Word[] }) {
       instruction={t("sort_instruction")}
       done={finished || Boolean(progress[id])}
       doneLabel={t("done")}
+      autoFocus={restarted}
     >
-      <div lang="ar" dir="rtl" className="flex min-h-14 flex-wrap justify-center gap-2">
-        {remaining.map((w) => (
-          <button
-            key={w.loc}
-            type="button"
-            onClick={() => setSelected(w.loc)}
-            aria-pressed={selected === w.loc}
-            className={`quran rounded-xl border px-3 py-1 text-2xl transition ${
-              selected === w.loc ? "border-forest bg-forest-tint" : "border-hairline hover:bg-paper-deep"
-            }`}
-          >
-            {w.ar}
-          </button>
-        ))}
-      </div>
-
-      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {SORT_BINS.map((bin) => {
-          const m = CASE_META[bin];
-          const inBin = items.filter((w) => placed[w.loc] === bin);
-          return (
-            <button
-              key={bin}
-              type="button"
-              onClick={() => drop(bin)}
-              disabled={!selected}
-              className={`flex min-h-24 flex-col items-center rounded-xl p-2 ring-1 ring-inset transition disabled:opacity-70 ${m.className}`}
+      {!finished && (
+        <>
+          {/* The two-step mode, visible; the current step is bold with a
+              forest border (and aria-current), not colour alone. */}
+          <ol aria-label={t("sort_steps_label")} className="flex flex-wrap items-center gap-2">
+            <li
+              aria-current={step === 1 ? "step" : undefined}
+              className={clsx(
+                "rounded-full px-3 py-1 text-base",
+                step === 1 ? "border-2 border-forest bg-forest-tint font-semibold text-ink" : "border-2 border-transparent text-ink-muted",
+              )}
             >
-              <span className="text-sm font-semibold">
-                <span aria-hidden>{m.shape}</span> {m.label}
-              </span>
-              <span lang="ar" dir="rtl" className="quran mt-1 flex flex-wrap justify-center gap-1 text-lg">
-                {inBin.map((w) => (
-                  <span key={w.loc}>{w.ar}</span>
-                ))}
-              </span>
-            </button>
-          );
-        })}
+              {t("sort_step_word")}
+            </li>
+            <li aria-hidden className="text-base text-ink-muted">
+              →
+            </li>
+            <li
+              aria-current={step === 2 ? "step" : undefined}
+              className={clsx(
+                "rounded-full px-3 py-1 text-base",
+                step === 2 ? "border-2 border-forest bg-forest-tint font-semibold text-ink" : "border-2 border-transparent text-ink-muted",
+              )}
+            >
+              {t("sort_step_bin")}
+            </li>
+          </ol>
+
+          {/* The words still to sort, in a shuffled order (RTL flow). A
+              labelled group, so a screen reader announces step 1 when focus
+              is moved here. */}
+          <div
+            ref={wordsRef}
+            tabIndex={-1}
+            role="group"
+            aria-label={t("sort_step_word")}
+            dir="rtl"
+            className="mt-4 flex min-h-14 flex-wrap justify-center gap-3 rounded-xl"
+          >
+            {remaining.map((w) => {
+              const isSel = selected === w.loc;
+              return (
+                <button
+                  key={w.loc}
+                  type="button"
+                  onClick={() => pick(w.loc)}
+                  aria-pressed={isSel}
+                  className={clsx(
+                    "flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl px-4 py-1 text-ink transition-colors",
+                    // 3px when selected; 2px + 1px margin at rest, so the
+                    // row never shifts when the selection moves.
+                    isSel
+                      ? "border-[3px] border-forest bg-forest-tint"
+                      : "m-px border-2 border-border-ui bg-paper-deep hover:border-forest",
+                  )}
+                >
+                  <span lang="ar" className="quran text-ar-md">
+                    {w.ar}
+                  </span>
+                  {isSel && (
+                    <span dir="ltr" className="inline-flex items-center gap-1.5 text-sm font-semibold text-forest">
+                      <Check className="h-5 w-5 shrink-0" strokeWidth={2.5} aria-hidden />
+                      {t("sort_selected")}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {/* The groups: always enabled (a tap with no word chosen explains the
+          first step), a 2px case-colour border, the shape icon and an ink
+          label. Container query: four across only while there is room. */}
+      <div className={clsx("@container", !finished && "mt-5")}>
+        <div className="grid grid-cols-2 gap-3 @3xl:grid-cols-4">
+          {SORT_BINS.map((bin) => {
+            const m = CASE_META[bin];
+            const inBin = items.filter((w) => placed[w.loc] === bin);
+            return (
+              <button
+                key={bin}
+                type="button"
+                onClick={() => drop(bin)}
+                className={clsx(
+                  "flex min-h-24 flex-col items-center gap-2 rounded-xl border-2 p-3 text-ink",
+                  m.className,
+                )}
+              >
+                <span className="inline-flex items-center gap-2 text-base font-semibold text-ink">
+                  <CaseShape state={bin} />
+                  {m.label}
+                </span>
+                {inBin.length > 0 ? (
+                  <span dir="rtl" className="flex flex-wrap justify-center gap-x-3">
+                    {inBin.map((w) => (
+                      <span key={w.loc} lang="ar" className="quran text-ar-sm">
+                        {w.ar}
+                      </span>
+                    ))}
+                  </span>
+                ) : (
+                  <span className="text-sm text-ink-soft">{t("sort_bin_empty")}</span>
+                )}
+                {wrongBins.includes(bin) && <OptionMark state="wrong" />}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {feedback && (
-        <Feedback ok={feedback.ok}>
-          {feedback.ok ? t("right") : t("not_yet")}{" "}
-          <span lang="ar" dir="rtl" className="quran text-lg">{feedback.word.ar}</span> —{" "}
-          {feedback.word.why}
-        </Feedback>
+      <Feedback kind={say?.kind ?? null} title={title} nonce={say?.n}>
+        {(say?.kind === "ok" || say?.kind === "reveal") && say.word && (
+          <>
+            <bdi lang="ar" dir="rtl" className="quran text-ar-sm">
+              {say.word.ar}
+            </bdi>{" "}
+            <CaseBadge state={say.word.case.state} sign={say.word.case.sign} /> {say.word.why}
+          </>
+        )}
+      </Feedback>
+
+      {canReveal && !finished && (
+        <div className="mt-4">
+          <button type="button" onClick={reveal} className="btn-secondary">
+            <Lightbulb className="h-5 w-5" aria-hidden />
+            {t("reveal")}
+          </button>
+        </div>
       )}
+
       {finished && (
-        <Feedback ok>
-          {t("score", { right: Math.max(0, items.length - misses), total: items.length })}
-        </Feedback>
+        <div ref={focusRef} tabIndex={-1} className="mt-4">
+          <Finished right={firstTry} total={items.length} onRestart={onRestart} />
+        </div>
       )}
     </ExerciseShell>
   );

@@ -3,10 +3,12 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { DraftChip } from "@/components/lesson/DraftChip";
+import { MixedText } from "@/components/library/MixedText";
 import { SharafPanel } from "@/components/library/SharafPanel";
+import { SourcesDisclosure } from "@/components/library/SourceList";
 import { Link } from "@/i18n/navigation";
 import { SURAHS } from "@/lib/content";
-import { getLexeme, LIBRARY, rootFor } from "@/lib/library";
+import { getLexeme, LIBRARY, parseLoc, rootFor } from "@/lib/library";
 
 export const dynamicParams = false;
 
@@ -41,42 +43,55 @@ export default async function LexemePage({ params }: PageProps<"/[locale]/kosaka
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-forest">{t("eyebrow")}</p>
+          <p className="text-sm font-semibold text-forest">{t("eyebrow")}</p>
           <h1 className="mt-1 font-display text-3xl font-medium">{lex.translit}</h1>
-          <p className="mt-1 text-ink-muted">{lex.meaning}</p>
+          <p className="mt-1 max-w-prose text-base text-ink-muted">
+            <MixedText text={lex.meaning} />
+          </p>
         </div>
-        <p lang="ar" dir="rtl" className="font-arabic text-4xl">
+        <p lang="ar" dir="rtl" className="arabic-inline text-ar-xl text-ink">
           {lex.lemma_ar}
         </p>
       </div>
 
-      <dl className="mt-6 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 rounded-2xl border border-hairline bg-white p-5 text-sm">
-        <dt className="text-ink-muted">{t("pos")}</dt>
-        <dd>{lex.pos}</dd>
-        <dt className="text-ink-muted">{t("root")}</dt>
-        <dd>
-          {lex.root ? (
-            <span lang="ar" dir="rtl" className="font-arabic text-lg">
-              {lex.root.join(" ")}
-            </span>
-          ) : (
-            "—"
-          )}
-          {root ? <span className="ml-2 text-ink-muted">({root.meaning})</span> : null}
-        </dd>
+      <dl className="mt-6 space-y-4 rounded-2xl border border-hairline bg-white p-5">
+        <div>
+          <dt className="text-sm font-semibold text-ink-muted">{t("pos")}</dt>
+          <dd className="text-base text-ink">{lex.pos}</dd>
+        </div>
+        <div>
+          <dt className="text-sm font-semibold text-ink-muted">{t("root")}</dt>
+          <dd className="flex flex-wrap items-baseline gap-x-3 text-base text-ink">
+            {lex.root ? (
+              <bdi lang="ar" dir="rtl" className="arabic-inline text-ar-sm">
+                {lex.root.join(" ")}
+              </bdi>
+            ) : (
+              <span className="text-ink-muted">{tw("no_root")}</span>
+            )}
+            {root ? (
+              <span className="text-ink-muted">
+                (<MixedText text={root.meaning} />)
+              </span>
+            ) : null}
+          </dd>
+        </div>
         {lex.occurrences && (
-          <>
-            <dt className="text-ink-muted">{t("occurrences")}</dt>
-            <dd>
+          <div>
+            <dt className="text-sm font-semibold text-ink-muted">{t("occurrences")}</dt>
+            <dd className="text-base text-ink">
               {t("occurrences_value", { count: lex.occurrences.count, ayat: lex.occurrences.ayat })}
-              <span className="block text-[11px] text-ink-faint">{lex.occurrences.method}</span>
+              <span className="mt-1 block text-sm text-ink-soft">
+                <MixedText text={lex.occurrences.method} />
+              </span>
             </dd>
-          </>
+          </div>
         )}
       </dl>
 
       <SharafPanel
         lexeme={lex}
+        defaultOpen
         labels={{
           heading: tw("sharaf_heading"),
           forms_note: tw("sharaf_forms_note"),
@@ -87,33 +102,40 @@ export default async function LexemePage({ params }: PageProps<"/[locale]/kosaka
       />
 
       {appearances.length > 0 && (
-        <section className="mt-8">
-          <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-muted">{t("in_lessons")}</h2>
-          <ul className="mt-2 space-y-2">
-            {appearances.map(({ s, a, w }) => (
-              <li key={w.loc}>
-                <Link
-                  href={`/${s.slug}/${a.ayah}#w-${w.loc.replaceAll(":", "-")}`}
-                  className="flex flex-wrap items-baseline gap-x-3 rounded-xl border border-hairline bg-white px-3 py-2 hover:bg-paper-deep"
-                >
-                  <span className="text-xs text-ink-faint">
-                    {s.name_id} {w.loc}
-                  </span>
-                  <span lang="ar" dir="rtl" className="quran text-xl leading-[1.8]">
-                    {w.ar}
-                  </span>
-                  <span className="text-sm text-ink-muted">{w.gloss}</span>
-                </Link>
-              </li>
-            ))}
+        <section className="mt-10" aria-labelledby="in-lessons">
+          <h2 id="in-lessons" className="font-display text-2xl font-medium">
+            {t("in_lessons")}
+          </h2>
+          <ul className="mt-3 flex flex-col gap-2">
+            {appearances.map(({ s, a, w }) => {
+              const { word } = parseLoc(w.loc);
+              return (
+                <li key={w.loc}>
+                  <Link
+                    href={`/${s.slug}/${a.ayah}#w-${w.loc.replaceAll(":", "-")}`}
+                    className="flex min-h-12 flex-wrap items-center gap-x-4 gap-y-1 rounded-xl border border-hairline bg-white px-4 py-2 transition-colors hover:border-forest"
+                  >
+                    <span className="text-sm font-semibold text-forest">
+                      {t("loc_label", { surah: s.name_id, ayah: a.ayah, word })}
+                    </span>
+                    <span lang="ar" dir="rtl" className="quran text-ar-md text-ink">
+                      {w.ar}
+                    </span>
+                    <span className="text-base text-ink-muted">{w.gloss}</span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </section>
       )}
 
-      <p className="mt-6 text-[11px] text-ink-faint">
-        {tw("sources")}: {lex.sources.map((x) => (x.ref ? `${x.kitab} ${x.ref}` : x.kitab)).join(" · ")}
-      </p>
-      {lex.status === "draft" ? <DraftChip label={tw("draft")} /> : null}
+      <SourcesDisclosure sources={lex.sources} label={tw("sources")} className="mt-8" />
+      {lex.status === "draft" ? (
+        <p>
+          <DraftChip label={tw("draft")} />
+        </p>
+      ) : null}
     </div>
   );
 }

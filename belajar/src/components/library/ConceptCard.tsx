@@ -1,8 +1,13 @@
+import { ArrowRight } from "lucide-react";
+import { useTranslations } from "next-intl";
+
 import type { Concept } from "@/content/schema";
 import { Link } from "@/i18n/navigation";
 import { parseLoc } from "@/lib/library";
 
 import { DraftChip } from "../lesson/DraftChip";
+import { MixedText } from "./MixedText";
+import { SourcesDisclosure } from "./SourceList";
 
 export type ConceptLabels = {
   nahwu: string;
@@ -17,7 +22,7 @@ export type ConceptLabels = {
 /**
  * One nahwu/sharaf idea, explained once and reused wherever it appears.
  * `compact` shows the summary + a link (inside lessons); the full card shows
- * the explanation, the Indonesian bridge and every example.
+ * the explanation, the Indonesian bridge, every example and its Rujukan.
  */
 export function ConceptCard({
   concept,
@@ -33,52 +38,59 @@ export function ConceptCard({
   wordAr: Record<string, string>;
   compact?: boolean;
 }) {
+  const t = useTranslations("Concept");
   return (
-    <article className="rounded-2xl border border-hairline bg-white p-5">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded-full bg-forest-tint px-2 py-0.5 text-[11px] font-semibold text-forest">
+    <article className="flex h-full flex-col rounded-2xl border border-hairline bg-white p-5">
+      <p>
+        <span className="inline-flex rounded-full bg-forest-tint px-3 py-1 text-sm font-semibold text-forest">
           {concept.kind === "nahwu" ? labels.nahwu : labels.sharaf}
         </span>
-        <h3 className="font-display text-lg font-medium">{concept.title}</h3>
-      </div>
-      <p className="mt-2 text-pretty leading-relaxed">{concept.summary}</p>
+      </p>
+      <h3 className="mt-2 font-display text-xl font-medium text-ink">
+        <MixedText text={concept.title} />
+      </h3>
+      <p className="mt-2 max-w-prose text-pretty text-base text-ink">
+        <MixedText text={concept.summary} />
+      </p>
 
       {!compact && (
-        <div className="mt-3 space-y-2 text-pretty text-sm leading-relaxed text-ink-muted">
+        <div className="mt-3 max-w-prose space-y-3 text-pretty text-base text-ink-muted">
           {concept.explanation.map((p) => (
-            <p key={p}>{p}</p>
+            <p key={p}>
+              <MixedText text={p} />
+            </p>
           ))}
         </div>
       )}
 
       {concept.bridge && (
-        <p className="mt-3 rounded-xl bg-paper-deep p-3 text-sm leading-relaxed">
-          <span className="font-semibold">{labels.bridge}:</span> {concept.bridge}
+        <p className="mt-4 rounded-xl bg-paper-deep p-4 text-base text-ink">
+          <span className="font-semibold">{labels.bridge}:</span> <MixedText text={concept.bridge} />
         </p>
       )}
 
       {!compact && concept.examples.length > 0 && (
-        <div className="mt-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-muted">
-            {labels.examples}
-          </p>
-          <ul className="mt-1.5 space-y-1.5 text-sm">
+        <div className="mt-5">
+          <p className="text-sm font-semibold text-ink">{labels.examples}</p>
+          <ul className="mt-2 space-y-3">
             {concept.examples.map((ex) => {
-              const { ayah } = parseLoc(ex.loc);
+              const { ayah, word } = parseLoc(ex.loc);
               return (
-                <li key={ex.loc} className="flex flex-wrap items-baseline gap-x-2">
+                <li key={ex.loc} className="flex flex-wrap items-center gap-x-3 gap-y-1">
                   <Link
                     href={`/${surahSlug}/${ayah}#w-${ex.loc.replaceAll(":", "-")}`}
-                    className="text-forest underline decoration-forest/30 underline-offset-2"
+                    className="chip-link"
                   >
-                    {ex.loc}
+                    {t("example_loc", { ayah, word })}
                   </Link>
                   {wordAr[ex.loc] ? (
-                    <span lang="ar" dir="rtl" className="font-arabic text-lg">
+                    <span lang="ar" dir="rtl" className="quran text-ar-sm text-ink">
                       {wordAr[ex.loc]}
                     </span>
                   ) : null}
-                  <span className="text-ink-muted">— {ex.note}</span>
+                  <span className="basis-full text-base text-ink-muted">
+                    <MixedText text={ex.note} />
+                  </span>
                 </li>
               );
             })}
@@ -86,17 +98,20 @@ export function ConceptCard({
         </div>
       )}
 
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+      <div className="mt-auto pt-3">
         {compact ? (
-          <Link href={`/konsep/${concept.id}`} className="text-sm font-semibold text-forest">
-            {labels.more} →
+          <Link href={`/konsep/${concept.id}`} className="chip-link">
+            {labels.more}
+            <ArrowRight aria-hidden="true" className="h-4 w-4 shrink-0" />
           </Link>
         ) : (
-          <p className="text-[11px] text-ink-faint">
-            {labels.sources}: {concept.sources.map((s) => (s.ref ? `${s.kitab} ${s.ref}` : s.kitab)).join(" · ")}
-          </p>
+          <SourcesDisclosure sources={concept.sources} label={labels.sources} className="mt-2" />
         )}
-        {concept.status === "draft" ? <DraftChip label={labels.draft} /> : null}
+        {concept.status === "draft" ? (
+          <p>
+            <DraftChip label={labels.draft} />
+          </p>
+        ) : null}
       </div>
     </article>
   );

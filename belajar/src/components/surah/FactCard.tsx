@@ -1,11 +1,35 @@
+import { ChevronDown } from "lucide-react";
+import { useTranslations } from "next-intl";
+
 import type { Fact } from "@/content/schema";
 
 import { DraftChip } from "../lesson/DraftChip";
+import { MixedText } from "../library/MixedText";
+import { SourcesDisclosure } from "../library/SourceList";
+
+/** Locations shown as chips before the rest fold into "Lihat semua letak". */
+const FIRST_LOCATIONS = 8;
+
+function LocationChips({ locs, label }: { locs: string[]; label: (loc: string) => string }) {
+  return (
+    <ul className="flex flex-wrap gap-2">
+      {locs.map((l) => (
+        <li key={l}>
+          <a href={`https://quran.com/${l.replace(":", "/")}`} rel="noopener" className="chip-link">
+            {label(l)}
+          </a>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 /**
- * "Tahukah kamu?" — every number shows HOW it was counted and WHERE: the
- * full list of locations, each a link to that ayah (plan §4.5: method +
- * clickable locations, no numerology, no overclaiming).
+ * "Tahukah Anda?" — every number shows HOW it was counted and WHERE: the
+ * full list of locations, each a 44px link chip to that ayah (plan §4.5:
+ * method + clickable locations, no numerology, no overclaiming). Long lists
+ * show the first few and keep the rest one tap away; sources sit behind a
+ * "Rujukan (n)" disclosure.
  */
 export function FactCard({
   fact,
@@ -14,34 +38,42 @@ export function FactCard({
   fact: Fact;
   labels: { method: string; where: string; sources: string; draft: string };
 }) {
+  const t = useTranslations("Surah");
+  const label = (loc: string) => t("loc_label", { loc });
+  const first = fact.locations.slice(0, FIRST_LOCATIONS);
+  const rest = fact.locations.slice(FIRST_LOCATIONS);
   return (
     <article className="flex h-full flex-col rounded-2xl border border-hairline bg-white p-5">
-      <p className="font-display text-lg font-medium leading-snug">{fact.title}</p>
-      <p className="mt-2 text-pretty text-sm leading-relaxed text-ink-muted">{fact.body}</p>
+      <h3 className="font-display text-lg font-medium text-ink">
+        <MixedText text={fact.title} />
+      </h3>
+      <p className="mt-2 text-pretty text-base text-ink-muted">
+        <MixedText text={fact.body} />
+      </p>
       {fact.locations.length > 0 && (
-        <p className="mt-3 text-xs text-ink-muted">
-          <span className="font-semibold text-ink">{labels.where}:</span>{" "}
-          {fact.locations.map((l, i) => (
-            <span key={l}>
-              {i > 0 ? ", " : ""}
-              <a
-                href={`https://quran.com/${l.replace(":", "/")}`}
-                className="underline decoration-hairline underline-offset-2 hover:text-ink"
-                rel="noopener"
-              >
-                {l}
-              </a>
-            </span>
-          ))}
-        </p>
+        <div className="mt-4">
+          <p className="text-sm font-semibold text-ink">{labels.where}:</p>
+          <div className="mt-2">
+            <LocationChips locs={first} label={label} />
+          </div>
+          {rest.length > 0 && (
+            <details className="mt-2">
+              <summary className="disclosure-row text-ink">
+                <span>{t("fact_more_where", { n: fact.locations.length })}</span>
+                <ChevronDown aria-hidden="true" className="chev h-5 w-5 shrink-0 text-ink-muted" />
+              </summary>
+              <div className="pb-2">
+                <LocationChips locs={rest} label={label} />
+              </div>
+            </details>
+          )}
+        </div>
       )}
-      <p className="mt-2 text-[11px] text-ink-faint">
-        {labels.method}: {fact.method}
+      <p className="mt-4 text-sm text-ink-muted">
+        <span className="font-semibold">{labels.method}:</span> <MixedText text={fact.method} />
       </p>
       <div className="mt-auto pt-2">
-        <p className="text-[11px] text-ink-faint">
-          {labels.sources}: {fact.sources.map((s) => (s.ref ? `${s.kitab} ${s.ref}` : s.kitab)).join(" · ")}
-        </p>
+        <SourcesDisclosure sources={fact.sources} label={labels.sources} />
         {fact.status === "draft" ? <DraftChip label={labels.draft} /> : null}
       </div>
     </article>

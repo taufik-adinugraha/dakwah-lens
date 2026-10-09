@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import type { ReactNode } from "react";
+import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
@@ -8,11 +9,11 @@ import { SortCase } from "@/components/exercises/SortCase";
 import { TapWord } from "@/components/exercises/TapWord";
 import { WaznFactory } from "@/components/exercises/WaznFactory";
 import { WhyHarakat } from "@/components/exercises/WhyHarakat";
-import { AyahPlayer } from "@/components/lesson/AyahPlayer";
 import { DraftChip } from "@/components/lesson/DraftChip";
-import { GuidedLesson } from "@/components/lesson/GuidedLesson";
+import { LessonStage, WordListenButton } from "@/components/lesson/LessonStage";
 import { WordCard } from "@/components/lesson/WordCard";
 import { ConceptCard } from "@/components/library/ConceptCard";
+import { SourceList } from "@/components/library/SourceList";
 import { StructureSection } from "@/components/library/StructureSection";
 import { FactCard } from "@/components/surah/FactCard";
 import { Link } from "@/i18n/navigation";
@@ -51,6 +52,37 @@ export async function generateMetadata({
   return { title: s ? `${s.name_id} ${ayah}` : "—" };
 }
 
+/**
+ * One row of "Pelajari lebih dalam": a collapsed 48px disclosure. A record
+ * still awaiting review says so on the row itself, so the draft status is
+ * visible before opening; the full marker sits on the record inside.
+ */
+function Deeper({ title, draft, children }: { title: string; draft?: string; children: ReactNode }) {
+  return (
+    <details className="rounded-2xl border border-hairline bg-white">
+      <summary className="disclosure-row px-5 py-2 text-ink">
+        <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span>{title}</span>
+          {draft ? (
+            <span className="rounded-full border border-notice bg-notice-bg px-2.5 py-0.5 text-xs font-medium text-notice">
+              {draft}
+            </span>
+          ) : null}
+        </span>
+        <ChevronDown aria-hidden className="chev h-5 w-5 shrink-0 text-forest" />
+      </summary>
+      <div className="px-5 pt-1 pb-5">{children}</div>
+    </details>
+  );
+}
+
+/**
+ * Lesson page, in the order a learner needs it (senior-ux §3.6): where am I
+ * → the ayah, its translation and the guided lesson (one stage, one player)
+ * → word by word → practice → "learn more" behind collapsed rows → the next
+ * ayah. Nothing gives positional instructions ("di atas"); every citation
+ * stays one tap away.
+ */
 export default async function AyahPage({
   params,
 }: PageProps<"/[locale]/[surah]/[ayah]">) {
@@ -65,6 +97,7 @@ export default async function AyahPage({
   const tw = await getTranslations("Word");
   const tc = await getTranslations("Concept");
   const tg = await getTranslations("Guided");
+  const tp = await getTranslations("Player");
 
   const playerWords = a.words.map((w, i) => ({
     index: i + 1,
@@ -77,23 +110,26 @@ export default async function AyahPage({
   const sources = [...a.recitation]
     .sort((x, y) => reciterRank(x.reciter) - reciterRank(y.reciter))
     .map((r) => ({
-    reciter: r.reciter,
-    url: r.url,
-    segments: r.segments,
-    credit: r.credit,
-    label: RECITER_LABEL[r.reciter] ?? r.reciter,
-  }));
+      reciter: r.reciter,
+      url: r.url,
+      segments: r.segments,
+      credit: r.credit,
+      label: RECITER_LABEL[r.reciter] ?? r.reciter,
+    }));
+  const timed = new Set(sources.flatMap((r) => r.segments.map(([w]) => w)));
   const pool = s.ayat.flatMap((x) => x.words);
   const facts = s.facts.filter((f) => f.locations.includes(a.loc));
   const prev = getAyah(s, n - 1);
   const next = getAyah(s, n + 1);
   const key = `${s.slug}/${a.ayah}`;
+  const pageTitle = `${s.name_id} · ${t("ayah", { n: a.ayah })}`;
   const introduced = conceptsIntroducedIn(a.loc);
   const steps = buildLessonSteps(a, introduced, {
     intro: (n) => tg("intro", { n }),
     wordIntro: (translit) => tg("word_intro", { translit }),
     meaning: (gloss) => tg("meaning", { gloss }),
     concept: (title, summary) => tg("concept", { title, summary }),
+    conceptBrief: (title) => tg("concept_brief", { title }),
     structure: (summary) => tg("structure", { summary }),
     practice: tg("practice"),
     recap: tg("recap"),
@@ -109,133 +145,127 @@ export default async function AyahPage({
     sources: tw("sources"),
     draft: tw("draft"),
   };
+  const draftTag = t("draft_short");
+  const hasDeeper = !!a.structure || introduced.length > 0 || !!a.tafsir || facts.length > 0;
+
+  const translation = (
+    <figure>
+      <blockquote className="text-pretty text-base text-ink">“{a.translation.text}”</blockquote>
+      {a.translation.footnotes.length > 0 && (
+        <ul className="mt-3 space-y-1 text-sm text-ink-muted">
+          {a.translation.footnotes.map((f) => (
+            <li key={f}>{f}</li>
+          ))}
+        </ul>
+      )}
+      <figcaption className="mt-2 text-xs text-ink-soft">
+        {a.translation.source_label}
+        {a.translation.version ? ` · ${a.translation.version}` : ""}
+      </figcaption>
+    </figure>
+  );
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
-      <nav className="text-sm text-ink-muted">
-        <Link href={`/${s.slug}`} className="hover:text-ink">
-          {s.name_id}
-        </Link>{" "}
-        / {t("ayah", { n: a.ayah })}
+    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
+      {/* 1. Where am I */}
+      <nav aria-label={t("nav_top")} className="flex flex-wrap items-center justify-between gap-3">
+        <Link href={`/${s.slug}`} className="chip-link">
+          <ChevronLeft aria-hidden className="h-5 w-5" />
+          {t("back_list")}
+        </Link>
+        <div className="flex flex-wrap gap-2">
+          {prev ? (
+            <Link href={`/${s.slug}/${prev.ayah}`} className="chip-link">
+              <ChevronLeft aria-hidden className="h-5 w-5" />
+              {t("ayah", { n: prev.ayah })}
+            </Link>
+          ) : null}
+          {next ? (
+            <Link href={`/${s.slug}/${next.ayah}`} className="chip-link">
+              {t("ayah", { n: next.ayah })}
+              <ChevronRight aria-hidden className="h-5 w-5" />
+            </Link>
+          ) : null}
+        </div>
       </nav>
-      <h1 className="mt-2 font-display text-3xl font-medium">
-        {s.name_id} · {t("ayah", { n: a.ayah })}
-      </h1>
+      <h1 className="mt-4 font-display text-3xl font-medium">{pageTitle}</h1>
+      <p className="mt-1 text-base text-ink-muted">{t("ayah_of", { n: a.ayah, total: s.ayat.length })}</p>
 
-      <div className="mt-6">
-        <AyahPlayer ayah={a.ayah} words={playerWords} sources={sources} />
-      </div>
-
-      <div className="mt-4">
-        <GuidedLesson
+      {/* 2. The stage: ayah, translation, guided lesson — one player */}
+      <div className="mt-5">
+        <LessonStage
           lessonId={key}
-          title={`${s.name_id} · ${t("ayah", { n: a.ayah })}`}
-          steps={steps}
+          title={pageTitle}
+          ayah={a.ayah}
+          words={playerWords}
           sources={sources}
+          steps={steps}
+          translation={translation}
         />
       </div>
 
-      <figure className="mt-4 rounded-2xl bg-paper-deep p-4">
-        <blockquote className="text-pretty leading-relaxed">“{a.translation.text}”</blockquote>
-        {a.translation.footnotes.length > 0 && (
-          <ul className="mt-2 space-y-1 text-xs leading-relaxed text-ink-muted">
-            {a.translation.footnotes.map((f) => (
-              <li key={f}>{f}</li>
-            ))}
-          </ul>
-        )}
-        <figcaption className="mt-1 text-[11px] text-ink-faint">
-          {a.translation.source_label}
-          {a.translation.version ? ` · ${a.translation.version}` : ""}
-        </figcaption>
-      </figure>
-
-      {a.tafsir && (
-        <section className="mt-6 rounded-2xl border border-hairline bg-white p-5">
-          <h2 className="font-display text-xl font-medium">{t("tafsir_heading")}</h2>
-          <p className="mt-2 text-pretty leading-relaxed">{a.tafsir.text}</p>
-          <p className="mt-2 text-[11px] text-ink-faint">
-            {tw("sources")}: {a.tafsir.sources.map((x) => (x.ref ? `${x.kitab} ${x.ref}` : x.kitab)).join(" · ")}
-          </p>
-          {a.tafsir.status === "draft" ? <DraftChip label={tw("draft")} /> : null}
-        </section>
-      )}
-
-      <StructureSection
-        ayah={a}
-        conceptTitle={conceptTitle}
-        labels={{
-          heading: t("structure_heading"),
-          groups: t("structure_groups"),
-          sources: tw("sources"),
-          draft: tw("draft"),
-        }}
-      />
-
-      {introduced.length > 0 && (
-        <section className="mt-10" aria-labelledby="concepts">
-          <h2 id="concepts" className="font-display text-2xl font-medium">
-            {t("concepts_heading")}
-          </h2>
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
-            {introduced.map((c) => (
-              <ConceptCard
-                key={c.id}
-                concept={c}
-                labels={conceptLabels}
-                surahSlug={s.slug}
-                wordAr={wordAr}
-                compact
+      {/* 3. Word by word */}
+      <section className="mt-12" aria-labelledby="words">
+        <h2 id="words" className="font-display text-2xl font-medium">
+          {t("words_heading")}
+        </h2>
+        <p className="mt-1 max-w-prose text-base text-ink-muted">{t("words_intro", { n: a.words.length })}</p>
+        {/* Container query, not media query: columns collapse as the text
+            size grows (rem in @media ignores the root size). */}
+        <div className="@container mt-4">
+          <div className="grid gap-4 @2xl:grid-cols-2 @5xl:grid-cols-3">
+            {a.words.map((w, i) => (
+              <WordCard
+                key={w.loc}
+                word={w}
+                lexeme={w.lemma_id ? getLexeme(w.lemma_id) : undefined}
+                concepts={w.concepts.flatMap((id) => {
+                  const c = getConcept(id);
+                  return c ? [{ id: c.id, title: c.title }] : [];
+                })}
+                listen={
+                  timed.has(i + 1) ? (
+                    <WordListenButton
+                      index={i + 1}
+                      label={tp("listen")}
+                      detail={tp("listen_detail", { n: i + 1, translit: w.translit })}
+                    />
+                  ) : undefined
+                }
+                labels={{
+                  role: tw("role"),
+                  concepts: tw("concepts"),
+                  lemma: tw("lemma"),
+                  sharaf: {
+                    heading: tw("sharaf_heading"),
+                    forms_note: tw("sharaf_forms_note"),
+                    ilal: tw("ilal"),
+                    ilal_from: tw("ilal_from"),
+                    ilal_to: tw("ilal_to"),
+                  },
+                  meaning: tw("meaning"),
+                  root: tw("root"),
+                  wazn: tw("wazn"),
+                  why: tw("why"),
+                  other_views: tw("other_views"),
+                  sources: tw("sources"),
+                  no_root: tw("no_root"),
+                  draft: tw("draft"),
+                }}
               />
             ))}
           </div>
-        </section>
-      )}
-
-      <section className="mt-10" aria-labelledby="words">
-        <h2 id="words" className="font-display text-2xl font-medium">
-          {t("words_heading", { n: a.words.length })}
-        </h2>
-        <p className="mt-1 text-sm text-ink-muted">{t("words_intro")}</p>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {a.words.map((w) => (
-            <WordCard
-              key={w.loc}
-              word={w}
-              lexeme={w.lemma_id ? getLexeme(w.lemma_id) : undefined}
-              concepts={w.concepts.flatMap((id) => {
-                const c = getConcept(id);
-                return c ? [{ id: c.id, title: c.title }] : [];
-              })}
-              labels={{
-                role: tw("role"),
-                concepts: tw("concepts"),
-                lemma: tw("lemma"),
-                sharaf: {
-                  heading: tw("sharaf_heading"),
-                  forms_note: tw("sharaf_forms_note"),
-                  ilal: tw("ilal"),
-                  ilal_from: tw("ilal_from"),
-                  ilal_to: tw("ilal_to"),
-                },
-                meaning: tw("meaning"),
-                root: tw("root"),
-                wazn: tw("wazn"),
-                why: tw("why"),
-                other_views: tw("other_views"),
-                sources: tw("sources"),
-                no_root: tw("no_root"),
-                draft: tw("draft"),
-              }}
-            />
-          ))}
         </div>
       </section>
 
-      <section id="practice" className="mt-12 scroll-mt-20 space-y-4" aria-labelledby="practice-heading">
-        <h2 id="practice-heading" className="font-display text-2xl font-medium">
-          {t("practice_heading")}
-        </h2>
+      {/* 4. Practice */}
+      <section id="practice" className="mt-12 scroll-mt-24 space-y-4" aria-labelledby="practice-heading">
+        <div>
+          <h2 id="practice-heading" className="font-display text-2xl font-medium">
+            {t("practice_heading")}
+          </h2>
+          <p className="mt-1 max-w-prose text-base text-ink-muted">{t("practice_intro")}</p>
+        </div>
         <TapWord id={`${key}/tap`} words={playerWords} source={sources[0]} />
         <WhyHarakat id={`${key}/why`} words={a.words} pool={pool} />
         <SortCase id={`${key}/sort`} words={a.words} />
@@ -249,45 +279,112 @@ export default async function AyahPage({
         />
       </section>
 
-      {facts.length > 0 && (
-        <section className="mt-12" aria-labelledby="facts">
-          <h2 id="facts" className="font-display text-2xl font-medium">
-            {t("facts_heading")}
+      {/* 5. Learn more, collapsed */}
+      {hasDeeper && (
+        <section className="mt-12" aria-labelledby="deeper">
+          <h2 id="deeper" className="font-display text-2xl font-medium">
+            {t("deeper_heading")}
           </h2>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            {facts.map((f) => (
-              <FactCard
-                key={f.id}
-                fact={f}
-                labels={{
-                  method: t("fact_method"),
-                  where: t("fact_where"),
-                  sources: tw("sources"),
-                  draft: tw("draft"),
-                }}
-              />
-            ))}
+          <p className="mt-1 max-w-prose text-base text-ink-muted">{t("deeper_intro")}</p>
+          <div className="mt-4 space-y-3">
+            {a.structure && (
+              <Deeper title={t("structure_heading")} draft={a.structure.status === "draft" ? draftTag : undefined}>
+                <StructureSection
+                  ayah={a}
+                  conceptTitle={conceptTitle}
+                  hideHeading
+                  labels={{
+                    heading: t("structure_heading"),
+                    groups: t("structure_groups"),
+                    sources: tw("sources"),
+                    draft: tw("draft"),
+                  }}
+                />
+              </Deeper>
+            )}
+
+            {introduced.length > 0 && (
+              <Deeper
+                title={`${t("concepts_heading")} (${introduced.length})`}
+                draft={introduced.some((c) => c.status === "draft") ? draftTag : undefined}
+              >
+                <div className="@container">
+                  <div className="grid gap-4 @2xl:grid-cols-2">
+                    {introduced.map((c) => (
+                      <ConceptCard
+                        key={c.id}
+                        concept={c}
+                        labels={conceptLabels}
+                        surahSlug={s.slug}
+                        wordAr={wordAr}
+                        compact
+                      />
+                    ))}
+                  </div>
+                </div>
+              </Deeper>
+            )}
+
+            {a.tafsir && (
+              <Deeper title={t("tafsir_heading")} draft={a.tafsir.status === "draft" ? draftTag : undefined}>
+                <p className="max-w-prose text-pretty text-base text-ink">{a.tafsir.text}</p>
+                <p className="mt-4 text-sm font-semibold text-ink">
+                  {tw("sources")} ({a.tafsir.sources.length})
+                </p>
+                <div className="mt-1">
+                  <SourceList sources={a.tafsir.sources} />
+                </div>
+                {a.tafsir.status === "draft" ? <DraftChip label={tw("draft")} /> : null}
+              </Deeper>
+            )}
+
+            {facts.length > 0 && (
+              <Deeper
+                title={`${t("facts_heading")} (${facts.length})`}
+                draft={facts.some((f) => f.status === "draft") ? draftTag : undefined}
+              >
+                <div className="@container">
+                  <div className="grid gap-4 @2xl:grid-cols-2">
+                    {facts.map((f) => (
+                      <FactCard
+                        key={f.id}
+                        fact={f}
+                        labels={{
+                          method: t("fact_method"),
+                          where: t("fact_where"),
+                          sources: tw("sources"),
+                          draft: tw("draft"),
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </Deeper>
+            )}
           </div>
         </section>
       )}
 
-      <nav className="mt-12 flex items-center justify-between gap-3 border-t border-hairline pt-6 text-sm">
+      {/* 6. Previous / next ayah */}
+      <nav
+        aria-label={t("nav_bottom")}
+        className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-hairline pt-6"
+      >
         {prev ? (
-          <Link href={`/${s.slug}/${prev.ayah}`} className="inline-flex items-center gap-1 text-ink-muted hover:text-ink">
-            <ArrowLeft className="h-4 w-4" /> {t("ayah", { n: prev.ayah })}
+          <Link href={`/${s.slug}/${prev.ayah}`} className="btn-secondary min-h-14!">
+            <ChevronLeft aria-hidden className="h-5 w-5" />
+            {t("ayah", { n: prev.ayah })}
           </Link>
         ) : (
           <span />
         )}
         {next ? (
-          <Link
-            href={`/${s.slug}/${next.ayah}`}
-            className="inline-flex items-center gap-1 rounded-full bg-forest px-4 py-2 font-semibold text-paper hover:bg-forest-hover"
-          >
-            {t("ayah", { n: next.ayah })} <ArrowRight className="h-4 w-4" />
+          <Link href={`/${s.slug}/${next.ayah}`} className="btn-primary">
+            {t("ayah", { n: next.ayah })}
+            <ChevronRight aria-hidden className="h-5 w-5" />
           </Link>
         ) : (
-          <Link href={`/${s.slug}`} className="font-semibold text-forest">
+          <Link href={`/${s.slug}`} className="btn-primary">
             {t("back_to_surah")}
           </Link>
         )}

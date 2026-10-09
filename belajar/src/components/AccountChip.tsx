@@ -29,12 +29,14 @@ export function AccountChip({ locale }: { locale: string }) {
     };
   }, []);
 
-  if (!me) return <span className="h-8 w-16" aria-hidden />;
+  if (!me) return <span className="inline-block h-11 w-20" aria-hidden />;
 
   if (me.user) {
     return (
-      <span className="max-w-40 truncate rounded-full border border-hairline bg-white px-3 py-1 text-xs text-ink-muted">
-        {t("signed_in_as", { name: me.user.name ?? "—" })}
+      <span className="inline-flex min-h-11 max-w-64 items-center rounded-full border border-hairline bg-white px-4 text-sm text-ink-muted">
+        <span className="min-w-0 truncate">
+          {t("signed_in_as", { name: me.user.name ?? "—" })}
+        </span>
       </span>
     );
   }
@@ -43,10 +45,12 @@ export function AccountChip({ locale }: { locale: string }) {
     typeof window === "undefined"
       ? `/belajar/${locale}`
       : window.location.pathname + window.location.search;
+  // An outlined chip, not a filled button: the page's own main action (e.g.
+  // "Mulai pelajaran") stays the only filled, primary-looking control.
   return (
     <a
       href={`/${locale}/login?callbackUrl=${encodeURIComponent(here)}`}
-      className="rounded-full bg-forest px-3 py-1.5 text-xs font-semibold text-paper transition hover:bg-forest-hover"
+      className="chip-link"
     >
       {t("sign_in")}
     </a>

@@ -1,23 +1,46 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 
 import type { Lexeme } from "@/content/schema";
-import { useProgress } from "@/hooks/useProgress";
 import { seededShuffle } from "@/lib/shuffle";
 
-import { ExerciseShell, Feedback } from "./ExerciseShell";
+import { MixedText } from "../library/MixedText";
+import {
+  Counter,
+  ExerciseShell,
+  Feedback,
+  Finished,
+  OptionButton,
+  QuizActions,
+  optionState,
+  useChoiceQuiz,
+  useRestart,
+  useStepFocus,
+} from "./ExerciseShell";
+
+type Props = { id: string; lexemes: Lexeme[] };
 
 /**
- * "Pabrik Wazan" — from a lemma's root and bab, pick the right form for each
- * tashrif label (fi'il madhi, mudhari', mashdar, …). The forms are Arabic
- * word forms from the Kosakata library, NOT ayat: shown in a plain Arabic
- * face and labelled as such (plan §4.7).
+ * "Bentuk-bentuk kata (wazan)" — from a lemma's root and bab, pick the right
+ * form for each tashrif label (fi'il madhi, mudhari', mashdar, …). The forms
+ * are Arabic word forms from the Kosakata library, NOT ayat: shown in a plain
+ * Arabic face (.arabic-inline, never the mushaf .quran style) and labelled
+ * as such (plan §4.7).
  */
-export function WaznFactory({ id, lexemes }: { id: string; lexemes: Lexeme[] }) {
+export function WaznFactory(props: Props) {
+  const { round, restart } = useRestart();
+  return <WaznFactoryRound key={round} {...props} restarted={round > 0} onRestart={restart} />;
+}
+
+function WaznFactoryRound({
+  id,
+  lexemes,
+  restarted,
+  onRestart,
+}: Props & { restarted: boolean; onRestart: () => void }) {
   const t = useTranslations("Exercise");
-  const { progress, markDone } = useProgress();
   const items = useMemo(
     () =>
       lexemes.flatMap((lx) => {
@@ -28,84 +51,107 @@ export function WaznFactory({ id, lexemes }: { id: string; lexemes: Lexeme[] }) 
           label: f.label,
           answer: f.ar,
           options: seededShuffle(
-            [f.ar, ...seededShuffle(forms.filter((o) => o.ar !== f.ar).map((o) => o.ar), `${lx.id}/${f.label}`).slice(0, 2)],
+            [
+              f.ar,
+              ...seededShuffle(
+                [...new Set(forms.filter((o) => o.ar !== f.ar).map((o) => o.ar))],
+                `${lx.id}/${f.label}`,
+              ).slice(0, 2),
+            ],
             `${lx.id}/${f.label}/o`,
           ),
         }));
       }),
     [lexemes],
   );
-  const [i, setI] = useState(0);
-  const [picked, setPicked] = useState<string | null>(null);
-  const [missed, setMissed] = useState(false);
-  const [firstTry, setFirstTry] = useState(0);
+  const q = useChoiceQuiz(id, items.map((it) => it.answer));
+  const focusRef = useStepFocus(q.i);
 
   if (items.length < 2) return null;
-  const finished = i >= items.length;
-  const item = items[Math.min(i, items.length - 1)];
-  const correct = picked === item.answer;
-
-  const choose = (opt: string) => {
-    if (correct) return;
-    setPicked(opt);
-    if (opt === item.answer) {
-      if (!missed) setFirstTry((n) => n + 1);
-    } else setMissed(true);
-  };
-  const next = () => {
-    const n = i + 1;
-    setI(n);
-    setPicked(null);
-    setMissed(false);
-    if (n >= items.length) markDone(id, firstTry / items.length);
-  };
+  const item = items[Math.min(q.i, items.length - 1)];
+  const root = item.lex.root ?? [];
 
   return (
-    <ExerciseShell title={t("wazn_title")} instruction={t("wazn_instruction")} done={finished || Boolean(progress[id])} doneLabel={t("done")}>
-      {finished ? (
-        <Feedback ok>{t("score", { right: firstTry, total: items.length })}</Feedback>
+    <ExerciseShell
+      title={t("wazn_title")}
+      instruction={t("wazn_instruction")}
+      done={q.finished || q.doneBefore}
+      doneLabel={t("done")}
+      autoFocus={restarted}
+    >
+      {q.finished ? (
+        <div ref={focusRef} tabIndex={-1}>
+          <Finished right={q.firstTry} total={q.total} onRestart={onRestart} />
+        </div>
       ) : (
         <div>
-          <p className="text-xs text-ink-faint">
-            {i + 1} / {items.length} · {item.lex.tashrif?.bab}
-          </p>
-          <p className="mt-1 text-sm">
-            {t("wazn_question")} <span className="font-semibold">{item.label}</span> ·{" "}
-            <span lang="ar" dir="rtl" className="font-arabic text-lg">
-              {(item.lex.root ?? []).join(" ")}
-            </span>
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2" dir="rtl">
-            {item.options.map((opt) => (
-              <button
-                key={opt}
-                type="button"
-                lang="ar"
-                onClick={() => choose(opt)}
-                className={`rounded-xl border px-4 py-1.5 font-arabic text-xl transition ${
-                  picked === opt && opt === item.answer
-                    ? "border-forest bg-forest-tint"
-                    : picked === opt
-                      ? "border-case-nasb/50 bg-paper-deep"
-                      : "border-hairline hover:bg-paper-deep"
-                }`}
-              >
-                {opt}
-              </button>
-            ))}
+          <div ref={focusRef} tabIndex={-1}>
+            <Counter n={q.i + 1} total={q.total} />
+            {root.length > 0 && (
+              <p className="mt-2 flex flex-wrap items-baseline gap-x-2 text-base text-ink">
+                {t("wazn_root")}
+                <bdi lang="ar" dir="rtl" className="arabic-inline text-ar-sm">
+                  {root.join(" ")}
+                </bdi>
+              </p>
+            )}
+            {item.lex.tashrif?.bab && (
+              <p className="mt-1 max-w-prose text-sm text-ink-muted">
+                {t("wazn_bab")} <MixedText text={item.lex.tashrif.bab} />
+              </p>
+            )}
+            <p className="mt-3 text-lg text-ink">
+              {t.rich("wazn_question", {
+                label: item.label,
+                b: (chunks) => <strong className="font-semibold">{chunks}</strong>,
+              })}
+            </p>
           </div>
-          {picked !== null && (
-            <Feedback ok={correct}>
-              {correct ? t("right") : t("not_yet")} {item.label}:{" "}
-              <span lang="ar" dir="rtl" className="font-arabic text-lg">{item.answer}</span>
-            </Feedback>
-          )}
-          {correct && (
-            <button type="button" onClick={next} className="mt-3 rounded-full bg-forest px-4 py-2 text-sm font-semibold text-paper hover:bg-forest-hover">
-              {i + 1 < items.length ? t("next") : t("finish")}
-            </button>
-          )}
-          <p className="mt-3 text-[11px] text-ink-faint">{t("wazn_note")}</p>
+
+          {/* Container query: three columns only while there is room at the
+              learner's chosen text size; full width on phones. */}
+          <div className="@container mt-4">
+            <ul className="grid gap-3 @md:grid-cols-3">
+              {item.options.map((opt) => (
+                <li key={opt}>
+                  <OptionButton
+                    arabic
+                    state={optionState(opt, q.answer, q.tried, q.resolved)}
+                    onClick={() => q.choose(opt)}
+                  >
+                    <span lang="ar" dir="rtl" className="arabic-inline text-ar-md">
+                      {opt}
+                    </span>
+                  </OptionButton>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <Feedback
+            kind={q.resolved === "right" ? "ok" : q.resolved === "revealed" ? "reveal" : q.tried.length ? "retry" : null}
+            title={q.resolved === "right" ? t("right") : q.resolved === "revealed" ? t("revealed") : t("not_yet")}
+            nonce={`${q.i}/${q.tried.length}/${q.resolved ?? ""}`}
+          >
+            {q.resolved !== null && (
+              <>
+                {item.label}:{" "}
+                <bdi lang="ar" dir="rtl" className="arabic-inline text-ar-sm">
+                  {item.answer}
+                </bdi>
+              </>
+            )}
+          </Feedback>
+
+          <QuizActions
+            resolved={q.resolved}
+            canReveal={q.canReveal}
+            last={q.i + 1 >= q.total}
+            onReveal={q.reveal}
+            onNext={q.next}
+          />
+
+          <p className="mt-4 max-w-prose text-sm text-ink-soft">{t("wazn_note")}</p>
         </div>
       )}
     </ExerciseShell>

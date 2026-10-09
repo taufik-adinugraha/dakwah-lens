@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
@@ -37,12 +38,14 @@ export default async function ConceptPage({ params }: PageProps<"/[locale]/konse
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-      <nav className="text-sm text-ink-muted">
-        <Link href="/konsep" className="hover:text-ink">
+      <nav aria-label={t("index_title")}>
+        <Link href="/konsep" className="chip-link">
+          <ArrowLeft aria-hidden="true" className="h-4 w-4 shrink-0" />
           {t("index_title")}
         </Link>
       </nav>
-      <div className="mt-3">
+      <h1 className="sr-only">{concept.title}</h1>
+      <div className="mt-4">
         <ConceptCard
           concept={concept}
           surahSlug={surah.slug}
@@ -59,15 +62,14 @@ export default async function ConceptPage({ params }: PageProps<"/[locale]/konse
         />
       </div>
       {related.length > 0 && (
-        <section className="mt-8">
-          <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-muted">{t("related")}</h2>
-          <ul className="mt-2 flex flex-wrap gap-2">
+        <section className="mt-10" aria-labelledby="related">
+          <h2 id="related" className="font-display text-2xl font-medium">
+            {t("related")}
+          </h2>
+          <ul className="mt-3 flex flex-wrap gap-2">
             {related.map((c) => (
               <li key={c.id}>
-                <Link
-                  href={`/konsep/${c.id}`}
-                  className="inline-flex rounded-full border border-hairline bg-white px-3 py-1 text-sm hover:bg-paper-deep"
-                >
+                <Link href={`/konsep/${c.id}`} className="chip-link">
                   {c.title}
                 </Link>
               </li>

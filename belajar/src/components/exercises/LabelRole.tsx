@@ -1,102 +1,125 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 
 import type { Word } from "@/content/schema";
-import { useProgress } from "@/hooks/useProgress";
 import { seededShuffle } from "@/lib/shuffle";
 
-import { ExerciseShell, Feedback } from "./ExerciseShell";
+import {
+  Counter,
+  ExerciseShell,
+  Feedback,
+  Finished,
+  OptionButton,
+  QuizActions,
+  optionState,
+  useChoiceQuiz,
+  useRestart,
+  useStepFocus,
+} from "./ExerciseShell";
+
+type Props = { id: string; words: Word[]; pool: Word[] };
 
 /**
- * "Label Peran" — choose each word's role in the ayah (tarkib). Options are
- * role labels from the same ayah and the rest of the surah; the explanation
- * after each answer is the word's own "why".
+ * "Tebak peran kata" — choose each word's role in the ayah (tarkib). Options
+ * are role labels from the same ayah and the rest of the surah; the
+ * explanation after each answer is the word's own "why".
  */
-export function LabelRole({ id, words, pool }: { id: string; words: Word[]; pool: Word[] }) {
+export function LabelRole(props: Props) {
+  const { round, restart } = useRestart();
+  return <LabelRoleRound key={round} {...props} restarted={round > 0} onRestart={restart} />;
+}
+
+function LabelRoleRound({
+  id,
+  words,
+  pool,
+  restarted,
+  onRestart,
+}: Props & { restarted: boolean; onRestart: () => void }) {
   const t = useTranslations("Exercise");
-  const { progress, markDone } = useProgress();
   const items = useMemo(
     () =>
       words
-        .filter((w) => w.role)
+        .filter((w): w is Word & { role: string } => !!w.role)
         .map((w) => {
           const others = [...new Set(pool.map((p) => p.role).filter((r): r is string => !!r && r !== w.role))];
-          const options = seededShuffle([w.role as string, ...seededShuffle(others, w.loc).slice(0, 3)], `${w.loc}/r`);
+          const options = seededShuffle([w.role, ...seededShuffle(others, w.loc).slice(0, 3)], `${w.loc}/r`);
           return { word: w, options };
         }),
     [words, pool],
   );
-  const [i, setI] = useState(0);
-  const [picked, setPicked] = useState<string | null>(null);
-  const [missed, setMissed] = useState(false);
-  const [firstTry, setFirstTry] = useState(0);
+  const q = useChoiceQuiz(id, items.map((it) => it.word.role));
+  const focusRef = useStepFocus(q.i);
 
   if (items.length < 2) return null;
-  const finished = i >= items.length;
-  const item = items[Math.min(i, items.length - 1)];
-  const correct = picked === item.word.role;
-
-  const choose = (opt: string) => {
-    if (correct) return;
-    setPicked(opt);
-    if (opt === item.word.role) {
-      if (!missed) setFirstTry((n) => n + 1);
-    } else setMissed(true);
-  };
-  const next = () => {
-    const n = i + 1;
-    setI(n);
-    setPicked(null);
-    setMissed(false);
-    if (n >= items.length) markDone(id, firstTry / items.length);
-  };
+  const item = items[Math.min(q.i, items.length - 1)];
+  const w = item.word;
 
   return (
-    <ExerciseShell title={t("role_title")} instruction={t("role_instruction")} done={finished || Boolean(progress[id])} doneLabel={t("done")}>
-      {finished ? (
-        <Feedback ok>{t("score", { right: firstTry, total: items.length })}</Feedback>
+    <ExerciseShell
+      title={t("role_title")}
+      instruction={t("role_instruction")}
+      done={q.finished || q.doneBefore}
+      doneLabel={t("done")}
+      autoFocus={restarted}
+    >
+      {q.finished ? (
+        <div ref={focusRef} tabIndex={-1}>
+          <Finished right={q.firstTry} total={q.total} onRestart={onRestart} />
+        </div>
       ) : (
         <div>
-          <p className="text-xs text-ink-faint">
-            {i + 1} / {items.length}
-          </p>
-          <p className="mt-1 flex flex-wrap items-center gap-2 text-sm">
-            {t("role_question")}
-            <span lang="ar" dir="rtl" className="quran text-2xl leading-none">
-              {item.word.ar}
-            </span>
-            ?
-          </p>
-          <div className="mt-3 grid gap-2 sm:grid-cols-2">
-            {item.options.map((opt) => (
-              <button
-                key={opt}
-                type="button"
-                onClick={() => choose(opt)}
-                className={`rounded-xl border px-3 py-2 text-left text-sm transition ${
-                  picked === opt && opt === item.word.role
-                    ? "border-forest bg-forest-tint"
-                    : picked === opt
-                      ? "border-case-nasb/50 bg-paper-deep"
-                      : "border-hairline hover:bg-paper-deep"
-                }`}
-              >
-                {opt}
-              </button>
-            ))}
+          <div ref={focusRef} tabIndex={-1}>
+            <Counter n={q.i + 1} total={q.total} />
+            <p className="mt-1 text-lg font-semibold text-ink">{t("role_question")}</p>
+            <div className="mt-3 flex flex-col items-center gap-1 rounded-xl bg-paper-deep px-4 py-3 text-center">
+              <span lang="ar" dir="rtl" className="quran text-ar-md text-ink">
+                {w.ar}
+              </span>
+              <span className="text-sm text-ink-muted">
+                {w.translit} · {w.gloss}
+              </span>
+            </div>
           </div>
-          {picked !== null && (
-            <Feedback ok={correct}>
-              {correct ? t("right") : t("not_yet")} {item.word.why}
-            </Feedback>
-          )}
-          {correct && (
-            <button type="button" onClick={next} className="mt-3 rounded-full bg-forest px-4 py-2 text-sm font-semibold text-paper hover:bg-forest-hover">
-              {i + 1 < items.length ? t("next") : t("finish")}
-            </button>
-          )}
+
+          {/* Container query: two columns only while there is room at the
+              learner's chosen text size. */}
+          <div className="@container mt-4">
+            <ul className="grid gap-3 @xl:grid-cols-2">
+              {item.options.map((opt) => (
+                <li key={opt}>
+                  <OptionButton
+                    state={optionState(opt, q.answer, q.tried, q.resolved)}
+                    onClick={() => q.choose(opt)}
+                  >
+                    <span>{opt}</span>
+                  </OptionButton>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <Feedback
+            kind={q.resolved === "right" ? "ok" : q.resolved === "revealed" ? "reveal" : q.tried.length ? "retry" : null}
+            title={q.resolved === "right" ? t("right") : q.resolved === "revealed" ? t("revealed") : t("not_yet")}
+            nonce={`${q.i}/${q.tried.length}/${q.resolved ?? ""}`}
+          >
+            {q.resolved !== null && (
+              <>
+                <strong className="font-semibold">{w.role}</strong>. {w.why}
+              </>
+            )}
+          </Feedback>
+
+          <QuizActions
+            resolved={q.resolved}
+            canReveal={q.canReveal}
+            last={q.i + 1 >= q.total}
+            onReveal={q.reveal}
+            onNext={q.next}
+          />
         </div>
       )}
     </ExerciseShell>
