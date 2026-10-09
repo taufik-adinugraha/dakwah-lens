@@ -1,0 +1,104 @@
+name: Deploy belajar
+
+# The /belajar module (Belajar Al-Qur'an) deploys on its own, decoupled from
+# the main stack (docs/belajar-plan.md §7.6):
+#   - path-filtered: only module changes trigger it, and deploy.yml ignores
+#     the same paths (no user-facing "update in progress" overlay for them);
+#   - its own concurrency group (a shared group would cancel pending runs of
+#     the other workflow);
+#   - the image is built HERE on the runner, never on the 1.9 GB prod VM or
+#     the operator's laptop, then shipped with `docker save | docker load`;
+#   - on the VM it takes /srv/dakwah-lens/.deploy.lock, the same lock
+#     deploy/deploy.sh holds, so git resets and docker work never overlap.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "belajar/**"
+      - "deploy/belajar/**"
+      - ".github/workflows/deploy-belajar.yml"
+  pull_request:
+    paths:
+      - "belajar/**"
+      - "deploy/belajar/**"
+      - ".github/workflows/deploy-belajar.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-belajar-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: belajar
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: belajar/package-lock.json
+
+      - name: Install
+        run: npm ci --no-audit --no-fund
+
+      - name: Design-token parity with web/
+        run: node scripts/check-token-parity.mjs
+
+      - name: Lint
+        run: npx eslint .
+
+      - name: Test
+        run: npm test
+
+      # `next build` is the typecheck for App Router (PageProps/LayoutProps
+      # globals only exist after build) and prerenders the lesson pages.
+      - name: Build
+        run: npm run build
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: |
+          set -euo pipefail
+          docker build \
+            --build-arg GIT_SHA="${GITHUB_SHA::7}" \
+            -t dakwah-belajar-web:latest \
+            belajar
+          docker save dakwah-belajar-web:latest | gzip -1 > belajar-image.tar.gz
+          ls -la belajar-image.tar.gz
+
+      - name: Ship image to VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: belajar-image.tar.gz
+          target: /tmp
+
+      - name: Deploy on VM
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          command_timeout: 40m
+          script: |
+            set -euo pipefail
+            flock -w 1800 /srv/dakwah-lens/.deploy.lock bash -c '
+              set -euo pipefail
+              cd /srv/dakwah-lens/repo
+              git fetch --quiet origin main
+              git reset --hard origin/main
+              bash deploy/belajar/deploy.sh /tmp/belajar-image.tar.gz
+            '

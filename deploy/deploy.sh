@@ -31,6 +31,16 @@ say() { echo "$LOG_TAG $*"; }
 
 cd "$REPO_DIR"
 
+# 0. Serialise with the /belajar module deploy ─────────────────
+# deploy-belajar.yml takes the same lock around its git reset + docker
+# load. Two deploys interleaving git resets or docker work on this 2-vCPU
+# VM is exactly the failure this prevents. Waits up to 30 min.
+exec 9>/srv/dakwah-lens/.deploy.lock
+if ! flock -w 1800 9; then
+  say "✗ another deploy held /srv/dakwah-lens/.deploy.lock for 30 min — aborting"
+  exit 1
+fi
+
 # 1. Source sync ──────────────────────────────────────────────
 say "▶ git sync"
 # `--ff-only` would refuse a force-push from main — we want to mirror

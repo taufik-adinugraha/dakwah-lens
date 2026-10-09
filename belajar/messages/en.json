@@ -1,0 +1,40 @@
+{
+  "App": {
+    "name": "Learn the Qur'an",
+    "title_template": "%s · Learn the Qur'an · Dakwah-Lens",
+    "description": "Understand the Qur'an word by word: hear a real imam, learn each word's meaning, root, and why it ends in fathah, dammah or kasrah — explained simply, sourced from named kitabs.",
+    "beta": "Beta",
+    "back_to_main": "Back to Dakwah-Lens",
+    "sign_in": "Sign in",
+    "signed_in_as": "Signed in as {name}"
+  },
+  "Home": {
+    "eyebrow": "Learn the Qur'an",
+    "heading": "Understanding Al-Fatihah, word by word",
+    "intro": "Listen to the imam, then learn each word's meaning, its root, and why it ends in fathah, dammah or kasrah. Explained simply, sourced from named kitabs.",
+    "principles_heading": "How we build the lessons",
+    "p1_title": "A real imam's voice",
+    "p1_body": "Qur'anic verses are only ever heard from a human reciter. The AI voice only explains, in Indonesian, and never recites an ayah.",
+    "p2_title": "Sourced, not invented",
+    "p2_body": "Every meaning, i'rab note, tafsir point and hadith is quoted from a named kitab or dataset, with its reference.",
+    "p3_title": "Reviewed by an ustadz",
+    "p3_body": "Lessons go live only after an ustadz reviews them. During the beta some material is still a draft and is clearly marked.",
+    "surah_heading": "Start here",
+    "fatihah_name": "Al-Fatihah",
+    "fatihah_meta": "7 ayat · 29 words · ~3 weeks at 10 minutes a day",
+    "status_preparing": "In preparation",
+    "next_heading": "Next",
+    "next_body": "After Al-Fatihah: Al-Ikhlas, An-Nas, Al-Falaq, Al-'Asr, Al-Kawthar and An-Nasr."
+  },
+  "Footer": {
+    "disclaimer": "AI-assisted, not an authoritative fatwa. Explanations are drawn from named kitabs and reviewed by an ustadz before going live.",
+    "credits": "Sources & licences"
+  },
+  "Credits": {
+    "title": "Sources & licences",
+    "intro": "This module is built on the works and data below. We credit each source as its licence requires, and we do not store reciters' recordings on our servers: recitation streams directly from the provider.",
+    "status_planned": "Planned",
+    "status_in_use": "In use",
+    "streaming_note": "When you play a recitation, your browser fetches the audio directly from the recording provider's servers abroad, so your IP address is visible to them."
+  }
+}

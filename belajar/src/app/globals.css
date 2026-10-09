@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+/* Design tokens copied from web/src/app/globals.css (landing redesign,
+   2026-07: "one deep green on warm paper"). The module is a separate app but
+   must read as the same site. Keep in sync with web/ — see
+   scripts/check-token-parity.mjs. */
+@theme {
+  --font-arabic: var(--font-amiri);
+  --font-display: var(--font-fraunces);
+  --font-body: var(--font-inter);
+
+  --color-paper: #fbfaf6;
+  --color-paper-deep: #f5f3ec;
+  --color-ink: #1b1a17;
+  --color-ink-muted: #5c5a52;
+  --color-ink-faint: #8a887e;
+  --color-hairline: #e7e4da;
+  --color-forest: #0e5a3c;
+  --color-forest-hover: #0a4a31;
+  --color-forest-tint: #eef3ef;
+
+  /* Case colours (plan §4.1): always paired with a SHAPE in the UI so the
+     meaning never rests on colour alone. */
+  --color-case-raf: #0e5a3c;
+  --color-case-nasb: #9a5b13;
+  --color-case-jarr: #1f4e8c;
+  --color-case-mabni: #5c5a52;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Qur'anic text: generous line height for harakat, never synthetic bold. */
+.quran {
+  font-family: var(--font-arabic), "Amiri", serif;
+  font-synthesis: none;
+  line-height: 2.2;
+}

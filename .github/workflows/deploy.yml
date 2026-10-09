@@ -6,6 +6,16 @@ name: Deploy
 on:
   push:
     branches: [main]
+    # Module-only commits deploy through deploy-belajar.yml instead. Without
+    # this, every /belajar commit would also rebuild the main stack and show
+    # every open tab the "update in progress" overlay. A push that touches
+    # ANY other path still runs this workflow.
+    paths-ignore:
+      - "belajar/**"
+      - "deploy/belajar/**"
+      - ".github/workflows/deploy-belajar.yml"
+      - "docs/belajar-plan.md"
+      - "docs/belajar-research/**"
   workflow_dispatch:
 
 # Serialise deploys. New deploys queue behind running ones — mid-deploy
