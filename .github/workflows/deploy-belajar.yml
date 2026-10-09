@@ -112,7 +112,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Node for the CI scripts below (Playwright, the waris smoke/e2e scripts, tsx); the image
+      # brings its own runtime.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
       - name: Build image
+        id: build
         run: |
           set -euo pipefail
           docker build \
@@ -123,6 +130,8 @@ jobs:
       - name: Smoke-test the image (migrations, health, pages, redirects)
         run: |
           set -euo pipefail
+          # A failed check must not leave :3300 taken for the steps below.
+          trap 'docker rm -f smoke >/dev/null 2>&1 || true' EXIT
           docker run -d --name smoke --network host -e PORT=3300 \
             -e DATABASE_URL=postgres://smoke:smoke@127.0.0.1:5432/smoke \
             dakwah-belajar-web:latest
@@ -198,6 +207,13 @@ jobs:
           done
           loc="$(curl -s -o /dev/null -w '%{redirect_url}' http://127.0.0.1:3300/belajar)"
           echo "/belajar -> ${loc}"; [[ "$loc" == */belajar/id ]]
+          # Ilmu Waris (docs/waris-plan.md §10 M2.7, M2.13): every waris route (track, hitung,
+          # laporan; id + en) answers 200, noindex, with the AI chip and "bukan fatwa", and no
+          # visible text promises an ustadz review (there is none); unknown waris paths 404; the
+          # hub card and the track's door link through. Lists every problem, then fails the step
+          # after the restart check below has run.
+          waris_rc=0
+          node belajar/scripts/ci/waris-smoke.mjs || waris_rc=$?
           # Migrations are idempotent across restarts.
           docker restart smoke >/dev/null
           for _ in $(seq 1 30); do
@@ -207,12 +223,15 @@ jobs:
           logs="$(docker logs smoke 2>&1)"
           grep -q "up to date" <<<"$logs"
           docker rm -f smoke >/dev/null
+          [[ "$waris_rc" -eq 0 ]] || { echo "✗ waris smoke checks failed (listed above)"; exit 1; }
 
       # Visual review without a developer laptop: phone + desktop screenshots
       # of the real image, uploaded as a build artifact on every run.
       - name: Screenshots (phone + desktop)
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: |
           set -euo pipefail
+          trap 'docker rm -f shots >/dev/null 2>&1 || true' EXIT
           docker run -d --name shots --network host -e PORT=3300 \
             -e DATABASE_URL=postgres://smoke:smoke@127.0.0.1:5432/smoke \
             dakwah-belajar-web:latest
@@ -228,11 +247,55 @@ jobs:
           node screenshots.mjs
           docker rm -f shots >/dev/null
 
+      # Ilmu Waris end-to-end on the real image (docs/waris-plan.md §10):
+      #   M2.6  a simple, an 'aul and a radd family driven through /waris/hitung screen by screen
+      #         (the plan's screens must be exactly the model's); every fikih data-share equals the
+      #         test vector; FAILS on any POST and on any request other than static assets under
+      #         /belajar/_next/, /belajar/api/me and the module's own pages (GET, "?_rsc=" only);
+      #   M2.9  case 3 printed (A4 PDF + print-media screenshot): fails above 3 pages; every vector
+      #         the questionnaire can express is opened from its #j= share link, checked, and
+      #         measured; the longest is recorded;
+      #   M2.10 reduced motion: no animation running on any screen; screenshots;
+      #   M2.5  no k6 and no rupiah in storage or the address.
+      # The plan comes from the questionnaire model + content/waris/test-vectors.json (pure TS,
+      # run with tsx; no npm install) and is checked against the report model before any browser.
+      - name: Waris end-to-end (questionnaire → report, network, print, reduced motion)
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          set -euo pipefail
+          trap 'docker rm -f e2e >/dev/null 2>&1 || true' EXIT
+          mkdir -p /tmp/shots-run
+          (cd belajar && npx --yes tsx@4.19.2 scripts/ci/waris-e2e-plan.ts --out /tmp/shots-run/waris-plan.json)
+          docker run -d --name e2e --network host -e PORT=3300 \
+            -e DATABASE_URL=postgres://smoke:smoke@127.0.0.1:5432/smoke \
+            dakwah-belajar-web:latest
+          for _ in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:3300/belajar/api/health >/dev/null 2>&1 && break
+            sleep 2
+          done
+          cp belajar/scripts/ci/waris-e2e.mjs /tmp/shots-run/
+          cd /tmp/shots-run
+          # Normally installed by the screenshots step; install here if that step did not get there.
+          if [[ ! -d node_modules/playwright ]]; then
+            [[ -f package.json ]] || npm init -y >/dev/null
+            npm install --no-audit --no-fund --silent playwright@1.49.1
+            npx playwright install --with-deps chromium >/dev/null
+          fi
+          node waris-e2e.mjs waris-plan.json
+
       - name: Upload screenshots
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: belajar-screenshots
-          path: /tmp/shots-run/shots/*.png
+          # shots/: page screenshots, waris e2e shots + print PDFs + waris-e2e-record.json
+          # (page counts, heights, network summary); waris-plan.json: the e2e plan.
+          path: |
+            /tmp/shots-run/shots/*.png
+            /tmp/shots-run/shots/*.pdf
+            /tmp/shots-run/shots/*.json
+            /tmp/shots-run/waris-plan.json
+          if-no-files-found: warn
           retention-days: 14
 
       - name: Ship release + deploy on VM

@@ -2,7 +2,7 @@
  "meta": {
   "generator": "belajar/pipeline/build_waris.py (rules step)",
   "source": "belajar/pipeline/authored/waris.rules.json",
-  "source_sha256": "56fdd4d5ced9220bccd981ef90d692246831a3f83ba53ecb332740ac4eb84fa4",
+  "source_sha256": "d9a26e111842bbafc413c6cd3fc642a8e4d6676547efcad565f4226ca1973fd9",
   "order": "registry order of belajar/src/lib/waris/registry.ts (RULE_IDS)",
   "status": "draft",
   "written": "2026-10-09",
@@ -388,7 +388,7 @@
     }
    ],
    "ikhtilaf": {
-    "summary_id": "Bab faraid dalam kitab rujukan kami tidak memuat anggapan bahwa separuh harta bersama milik pasangan; fikih menanyakan siapa pemilik yang sebenarnya. Kolom fikih memakai pemisahan ini sampai peninjau faraid memutuskan.",
+    "summary_id": "Bab faraid dalam kitab rujukan kami tidak memuat anggapan bahwa separuh harta bersama milik pasangan; fikih menanyakan siapa pemilik yang sebenarnya. Kolom fikih tetap memakai pemisahan ini. Bila keluarga sepakat bahwa seluruh harta itu milik almarhum sendiri, centang pilihan bahwa semua harta milik almarhum sendiri saat mengisi nilai rupiah.",
     "source_doc": "docs/waris-plan.md §2.6 D6; docs/waris-research/standard.md §5.4 Q5"
    },
    "method": null,
@@ -1479,7 +1479,7 @@
     }
    ],
    "ikhtilaf": {
-    "summary_id": "Bila Pasal 177 KHI dibaca harfiah, ayah hanya mendapat seperenam dan sisanya dikembalikan kepada ayah, ibu, dan anak perempuan. Belum ditemukan putusan MA yang memakai salah satu cara; kedua kolom memakai cara fikih sampai peninjau memutuskan.",
+    "summary_id": "Bila Pasal 177 KHI dibaca harfiah, ayah hanya mendapat seperenam dan sisanya dikembalikan kepada ayah, ibu, dan anak perempuan. Belum ditemukan putusan MA yang memakai salah satu cara; kedua kolom memakai cara fikih.",
     "legal": [
      {
       "source": "khi",
@@ -1995,7 +1995,7 @@
     }
    ],
    "ikhtilaf": {
-    "summary_id": "Cara membaca batas ini belum seragam: ada yang membatasi bagian kelompok pengganti, ada yang memeriksa setiap orang pengganti, dan ada yang tidak membatasi sama sekali. Hasilnya bisa berbeda; peninjau KHI akan memilih.",
+    "summary_id": "Cara membaca batas ini belum seragam: ada yang membatasi bagian kelompok pengganti, ada yang memeriksa setiap orang pengganti, dan ada yang tidak membatasi sama sekali. Hasilnya bisa berbeda; alat ini memakai cara pertama, yaitu membatasi bagian kelompok pengganti.",
     "legal": [
      {
       "source": "ma-109-k-ag-2016",

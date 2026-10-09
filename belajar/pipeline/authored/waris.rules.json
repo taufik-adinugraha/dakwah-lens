@@ -198,7 +198,7 @@
       "related_gaps": ["G-E9-indonesian-provisions"],
       "legal": [{"source": "khi", "locator": "Pasal 96 ayat (1)"}, {"source": "ma-32-k-ag-2002", "locator": "kaidah hukum"}],
       "ikhtilaf": {
-        "summary_id": "Bab faraid dalam kitab rujukan kami tidak memuat anggapan bahwa separuh harta bersama milik pasangan; fikih menanyakan siapa pemilik yang sebenarnya. Kolom fikih memakai pemisahan ini sampai peninjau faraid memutuskan.",
+        "summary_id": "Bab faraid dalam kitab rujukan kami tidak memuat anggapan bahwa separuh harta bersama milik pasangan; fikih menanyakan siapa pemilik yang sebenarnya. Kolom fikih tetap memakai pemisahan ini. Bila keluarga sepakat bahwa seluruh harta itu milik almarhum sendiri, centang pilihan bahwa semua harta milik almarhum sendiri saat mengisi nilai rupiah.",
         "source_doc": "docs/waris-plan.md §2.6 D6; docs/waris-research/standard.md §5.4 Q5"
       },
       "reviewer_notes": ["No corpus record grounds a 50% presumption (engine.md §3.2). Reviewer R1 decides whether the fikih column keeps the split; fallback is plan D6 option B."],
@@ -624,7 +624,7 @@
       "dalil_rule": ["R-parents", "R-furudh-then-asabah"],
       "legal": [{"source": "khi", "locator": "Pasal 177"}, {"source": "sema-2-1994", "locator": "maksud Pasal 177"}],
       "ikhtilaf": {
-        "summary_id": "Bila Pasal 177 KHI dibaca harfiah, ayah hanya mendapat seperenam dan sisanya dikembalikan kepada ayah, ibu, dan anak perempuan. Belum ditemukan putusan MA yang memakai salah satu cara; kedua kolom memakai cara fikih sampai peninjau memutuskan.",
+        "summary_id": "Bila Pasal 177 KHI dibaca harfiah, ayah hanya mendapat seperenam dan sisanya dikembalikan kepada ayah, ibu, dan anak perempuan. Belum ditemukan putusan MA yang memakai salah satu cara; kedua kolom memakai cara fikih.",
         "legal": [{"source": "khi", "locator": "Pasal 177"}, {"source": "buku-ii-2013", "locator": "hlm. 176 §9(a)-(b)"}],
         "source_doc": "docs/waris-research/engine.md §11.3 (EQ1); docs/waris-plan.md §7.2 (R5)"
       },
@@ -870,7 +870,7 @@
       "related_gaps": ["G-E9-indonesian-provisions"],
       "legal": [{"source": "khi", "locator": "Pasal 185 ayat (2)"}, {"source": "ma-109-k-ag-2016", "locator": "kaidah sebagaimana dikutip PA Bojonegoro"}],
       "ikhtilaf": {
-        "summary_id": "Cara membaca batas ini belum seragam: ada yang membatasi bagian kelompok pengganti, ada yang memeriksa setiap orang pengganti, dan ada yang tidak membatasi sama sekali. Hasilnya bisa berbeda; peninjau KHI akan memilih.",
+        "summary_id": "Cara membaca batas ini belum seragam: ada yang membatasi bagian kelompok pengganti, ada yang memeriksa setiap orang pengganti, dan ada yang tidak membatasi sama sekali. Hasilnya bisa berbeda; alat ini memakai cara pertama, yaitu membatasi bagian kelompok pengganti.",
         "legal": [{"source": "ma-109-k-ag-2016", "locator": "kaidah sebagaimana dikutip PA Bojonegoro"}, {"source": "kajian-pa-kotabumi", "locator": "uraian bacaan Pasal 185 ayat (2)"}, {"source": "kajian-tarjih-pengganti", "locator": "contoh perhitungan"}],
         "source_doc": "docs/waris-research/engine.md §11.1; docs/waris-plan.md §7.2 (R6)"
       },

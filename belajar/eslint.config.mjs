@@ -3,7 +3,9 @@ import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 
 // ---------------------------------------------------------------------------------------------
-// Waris engine guard (docs/waris-plan.md §10 M1.3, §9.4). Applies ONLY to src/lib/waris/**.
+// Waris engine guard (docs/waris-plan.md §10 M1.3, §9.4). The float rules apply ONLY to
+// src/lib/waris/**; the network ban also covers the waris UI (src/components/waris/**) and its
+// routes (src/app/[locale]/waris/**), which hold the answers and the rupiah amounts.
 // Core ESLint rules only; no new dependency.
 //  - no float arithmetic: shares are exact bigint rationals (frac.ts). Non-integer numeric
 //    literals, Math, parseFloat, Number(), toFixed, ** and the `/` `%` operators are banned
@@ -13,6 +15,8 @@ import nextTs from "eslint-config-next/typescript";
 //    node/http imports are banned in every waris file, format.ts included.
 // ---------------------------------------------------------------------------------------------
 const WARIS = ["src/lib/waris/**/*.ts", "src/lib/waris/**/*.tsx"];
+// "src/app/*/waris" is the [locale] segment (a glob "*" avoids escaping the brackets)
+const WARIS_UI = ["src/components/waris/**/*.ts", "src/components/waris/**/*.tsx", "src/app/*/waris/**/*.ts", "src/app/*/waris/**/*.tsx"];
 const NO_NET = "waris: no network calls — answers never leave the browser (plan §9.4).";
 const NO_FLOAT = "waris: no float arithmetic — use exact bigint rationals from frac.ts (plan §7.1, M1.3).";
 
@@ -68,6 +72,17 @@ const warisGuard = [
   {
     // the named display-formatting module: exempt from the float rules, never from the network ban
     files: FORMAT,
+    rules: {
+      "no-restricted-globals": ["error", ...networkGlobals],
+      "no-restricted-properties": ["error", ...networkProperties],
+      "no-restricted-imports": ["error", networkImports],
+    },
+  },
+  {
+    // the waris UI and routes: the network ban only (the UI formats percentages; plan §9.4).
+    // Unit tests run in node under vitest and read fixtures with node:fs; they never ship.
+    files: WARIS_UI,
+    ignores: ["src/components/waris/**/*.test.ts"],
     rules: {
       "no-restricted-globals": ["error", ...networkGlobals],
       "no-restricted-properties": ["error", ...networkProperties],

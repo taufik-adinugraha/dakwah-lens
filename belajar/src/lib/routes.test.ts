@@ -9,8 +9,10 @@ import {
   quranHref,
   SURAH_SLUGS,
   surahHref,
+  warisHref,
   wordAnchorId,
 } from "./routes";
+import { fragmentFor, tokenFromHash } from "./waris/questionnaire/codec";
 
 describe("route helpers (plan L9: hub + /quran track)", () => {
   it("builds the track's lesson URLs under /quran", () => {
@@ -28,6 +30,21 @@ describe("route helpers (plan L9: hub + /quran track)", () => {
   it("keeps the shared library at hub level", () => {
     expect(conceptHref("idafah")).toBe("/konsep/idafah");
     expect(lexemeHref("rabb")).toBe("/kosakata/rabb");
+  });
+
+  it("builds the Ilmu Waris track's URLs under /waris", () => {
+    expect(warisHref.track()).toBe("/waris");
+    expect(warisHref.hitung()).toBe("/waris/hitung");
+    expect(warisHref.hitung({ baru: true })).toBe("/waris/hitung#baru");
+    expect(warisHref.laporan()).toBe("/waris/laporan");
+  });
+
+  it("puts a report's answers in the fragment the codec reads, never in a query string", () => {
+    const token = "v1.AQIDBA";
+    const href = warisHref.laporan(token);
+    expect(href).toBe(`/waris/laporan#${fragmentFor(token)}`);
+    expect(href).not.toContain("?");
+    expect(tokenFromHash(href.slice(href.indexOf("#")))).toBe(token);
   });
 
   it("lists every surah with a lesson, so its pre-hub URLs redirect", () => {

@@ -1,0 +1,297 @@
+/* Ilmu Waris styles (docs/waris-plan.md §6, §9.3; architecture.md §7.3). Waris-scoped: every
+   rule sits under .waris (track pages) or .waris-report (the report), so nothing here reaches the
+   Qur'an track. globals.css is not touched; its tokens are read through var() with the same hex
+   values as fallbacks, because Tailwind may drop theme variables no utility uses.
+
+   Senior UX (docs/belajar-research/senior-ux.md): layout switches use container queries, so they
+   follow the learner's text size; state is never shown by colour alone (patterns, icons and
+   words); nothing here animates, so reduced motion always shows the final frame. */
+
+.waris {
+  --wr-ink: var(--color-ink, #1b1a17);
+  --wr-ink-muted: var(--color-ink-muted, #4a4840);
+  --wr-ink-soft: var(--color-ink-soft, #5f5d55);
+  --wr-border-ui: var(--color-border-ui, #807e74);
+  --wr-hairline: var(--color-hairline, #e7e4da);
+  --wr-forest: var(--color-forest, #0e5a3c);
+  --wr-forest-tint: var(--color-forest-tint, #eef3ef);
+  --wr-notice: var(--color-notice, #8a4d00);
+  --wr-notice-bg: var(--color-notice-bg, #fbefe3);
+  --wr-paper-deep: var(--color-paper-deep, #f5f3ec);
+}
+
+/* Every waris target is at least 48px (the shared chip-link utility and the shared Breadcrumb
+   stop at 44px). */
+.waris .chip-link,
+.waris nav[aria-label] li > a,
+.waris nav[aria-label] li > [aria-current="page"] {
+  min-height: 3rem;
+}
+
+/* ── Fractions: stacked figure; the words are always printed beside it ─────────────────────── */
+.waris .wr-frac {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.waris .wr-frac-n {
+  padding: 0 0.15em 0.05em;
+  border-bottom: 2px solid currentColor;
+}
+.waris .wr-frac-d {
+  padding: 0.05em 0.15em 0;
+}
+.waris .wr-frac-big {
+  font-size: 1.625rem; /* 26px at Normal: the core number on a phone card */
+}
+.waris .wr-whole-big {
+  font-size: 1.625rem;
+  font-weight: 600;
+}
+
+/* ── Ringkasan: one table, one card per heir when the container is narrow ──────────────────── */
+.waris .wr-table-wrap {
+  container-type: inline-size;
+}
+.waris .wr-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+.waris .wr-table th,
+.waris .wr-table td {
+  padding: 0.75rem 0.75rem;
+  vertical-align: top;
+  border-bottom: 1px solid var(--wr-hairline);
+}
+.waris .wr-table thead th {
+  font-size: var(--text-sm, 1rem);
+  font-weight: 600;
+  color: var(--wr-ink-muted);
+  border-bottom: 2px solid var(--wr-border-ui);
+}
+.waris .wr-cell-label {
+  display: none;
+}
+.waris .wr-court-cell {
+  background: var(--wr-paper-deep);
+}
+
+@container (max-width: 46rem) {
+  .waris .wr-table,
+  .waris .wr-table tbody,
+  .waris .wr-table tr,
+  .waris .wr-table th,
+  .waris .wr-table td {
+    display: block;
+  }
+  .waris .wr-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .waris .wr-table tr {
+    margin-bottom: 0.75rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--wr-hairline);
+    border-radius: 1rem;
+    background: #fff;
+  }
+  .waris .wr-table th,
+  .waris .wr-table td {
+    padding: 0.375rem 0;
+    border-bottom: 0;
+  }
+  .waris .wr-table .wr-court-cell {
+    margin-top: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-left: 4px solid var(--wr-border-ui);
+    border-radius: 0.5rem;
+  }
+  .waris .wr-cell-label {
+    display: block;
+    font-size: var(--text-sm, 1rem);
+    color: var(--wr-ink-soft);
+  }
+}
+
+/* ── Status markers: icon + word, plus a pattern; never colour alone ──────────────────────── */
+.waris .wr-hatch {
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(27, 26, 23, 0.1) 0,
+    rgba(27, 26, 23, 0.1) 2px,
+    transparent 2px,
+    transparent 9px
+  );
+  border-style: dashed !important;
+}
+.waris .wr-dashed {
+  border-style: dashed !important;
+}
+
+/* ── Family tree: nested lists with drawn connectors ──────────────────────────────────────── */
+.waris .wr-tree ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  list-style: none;
+}
+.waris .wr-tree > ul {
+  padding-left: 0;
+}
+.waris .wr-tree li {
+  position: relative;
+  padding-top: 0.5rem;
+}
+.waris .wr-tree ul ul > li::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -1rem;
+  width: 0.875rem;
+  height: 1.75rem;
+  border-left: 2px solid var(--wr-border-ui);
+  border-bottom: 2px solid var(--wr-border-ui);
+}
+.waris .wr-tree ul ul > li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 1.75rem;
+  bottom: 0;
+  left: -1rem;
+  border-left: 2px solid var(--wr-border-ui);
+}
+
+/* ── Dalil cards: Arabic never below text-ar-sm on screen ─────────────────────────────────── */
+.waris .wr-ar {
+  font-size: var(--text-ar-sm, 1.5rem);
+}
+.waris .wr-ar-quran {
+  font-size: var(--text-ar-md, 2rem);
+}
+
+/* ── Checklist boxes (Langkah berikutnya): real 48px targets on screen ────────────────────── */
+.waris .wr-check {
+  width: 1.5rem;
+  height: 1.5rem;
+  accent-color: var(--wr-forest);
+}
+
+/* ── Print and "Simpan sebagai PDF" (plan §6; ux.md §5.3) ─────────────────────────────────── */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 15mm 14mm;
+  }
+  /* Seniors print to read: body ≥ 12pt whatever the on-screen text size. */
+  html,
+  html[data-text-size] {
+    font-size: 12pt !important;
+  }
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  /* The module header (navigation, text size, account) is not part of a printed report; the
+     footer label stays, and the report carries its own label at the top and the end. */
+  body:has(.waris-report) > header {
+    display: none !important;
+  }
+  .waris [data-print="hide"] {
+    display: none !important;
+  }
+  .waris [data-print="only"] {
+    display: block !important;
+  }
+  .waris-report * {
+    box-shadow: none !important;
+  }
+  .waris-report .wr-section {
+    margin-top: 1.25rem !important;
+  }
+  .waris-report h2 {
+    break-after: avoid;
+  }
+  .waris-report .wr-keep,
+  .waris-report figure,
+  .waris-report .wr-table tr,
+  .waris-report .wr-dalil-card {
+    break-inside: avoid;
+  }
+  /* Disclosures print open (also opened by the beforeprint handler). */
+  .waris-report details > summary .chev {
+    display: none;
+  }
+  .waris-report .quran,
+  .waris-report .arabic-inline,
+  .waris-report .wr-ar,
+  .waris-report .wr-ar-quran {
+    font-size: 16pt !important;
+  }
+  /* Always the table layout on paper. */
+  .waris-report .wr-table {
+    display: table !important;
+  }
+  .waris-report .wr-table thead {
+    display: table-header-group !important;
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    clip-path: none !important;
+  }
+  .waris-report .wr-table tbody {
+    display: table-row-group !important;
+  }
+  .waris-report .wr-table tr {
+    display: table-row !important;
+    border: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .waris-report .wr-table th,
+  .waris-report .wr-table td {
+    display: table-cell !important;
+    padding: 4pt 6pt !important;
+    border: 0.75pt solid #000 !important;
+  }
+  .waris-report .wr-cell-label {
+    display: none !important;
+  }
+  /* Patterns are vector SVG and survive black-and-white printing; keep tints exact. */
+  .waris-report .wr-bar,
+  .waris-report .wr-hatch {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  /* Printed links show where they go. */
+  .waris-report a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    word-break: break-all;
+  }
+  /* Empty tick boxes on paper. */
+  .waris-report .wr-check {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 12pt;
+    height: 12pt;
+    border: 1pt solid #000;
+    background: #fff;
+  }
+}
+
+/* Separate rule: a browser that does not know ::details-content drops only this one. */
+@media print {
+  .waris-report details::details-content {
+    content-visibility: visible;
+    display: block;
+  }
+}

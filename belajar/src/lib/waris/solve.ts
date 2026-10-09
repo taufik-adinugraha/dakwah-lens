@@ -12,7 +12,7 @@ import { tanzil } from "./adjust";
 import { solveCore } from "./core";
 import { finalBaseOf, largestRemainder, type LRLine } from "./distribute";
 import { estateStage, voluntaryWasiat } from "./estate";
-import { beyondExcludedBy, deriveFamily, type Derived, type WwCandidate } from "./family";
+import { beyondExcludedBy, deriveFamily, type Beyond, type Derived, type WwCandidate } from "./family";
 import {
   B0,
   ONE,
@@ -195,12 +195,26 @@ export function solveOnce(input: WarisInput, rs: Ruleset): Result {
   // (architecture.md §7.2 item 6; plan §7.1 "every step emits rule ids")
   for (const g of d.ineligible) trace.push({ rule: g.rule, heirs: [g.heir], facts: { alasan: g.reason } });
   const blockedExtra: BlockedGroup[] = [];
+  const unexcluded: string[] = [];
   for (const b of d.beyond) {
-    const by = beyondExcludedBy(b, d);
-    if (!by) return rujuk(rs, ["kerabat_jauh"], notes);
+    const by = beyondExcludedBy(b, d) ?? beyondExcludedByLine(b, d, sw);
+    if (!by) {
+      if (b.kind === "keturunan") return rujuk(rs, ["kerabat_jauh"], notes);
+      unexcluded.push(b.personId);
+      continue;
+    }
     const g = blockedExtra.find((x) => x.by[0] === by);
     if (g) g.personIds.push(b.personId);
     else blockedExtra.push({ heir: KERABAT_JAUH_ROLE, personIds: [b.personId], by: [by], rule: "hajb.hirman" });
+  }
+  // M2 alignment (questionnaire F5): a beyond-depth relative of the siblings' or the uncles' line
+  // is an 'asabah who can only take a residue, reduces no fardh and excludes nobody the tool asks
+  // about. When the furudh exhaust the estate ('aul, or exactly 1, with no 'asabah), he receives
+  // nothing (istighraq, §6.1) and the family is computable; when something is left over he would
+  // take it, and the depth limit refuses as before.
+  if (unexcluded.length > 0) {
+    if (!furudhExhaust(solveCore({ deceasedSex: fam.deceased.sex, sw, roles: d.roles, slots: d.slots }))) return rujuk(rs, ["kerabat_jauh"], notes);
+    blockedExtra.push({ heir: KERABAT_JAUH_ROLE, personIds: unexcluded, by: ["furudh"], rule: "hajb.istighraq" });
   }
   if ((fam.stepChildren ?? []).some((s) => s.alive) && sw.wasiatWajibahAdopsi !== "off") notes.add("anak_tiri_wasiat_wajibah");
   if ((input.estate?.hibahToChildren ?? []).length > 0) notes.add("hibah_dapat_diperhitungkan");
@@ -497,6 +511,45 @@ export function solveOnce(input: WarisInput, rs: Ruleset): Result {
     trace,
     switchesUsed: [],
   };
+}
+
+/**
+ * M2 alignment (questionnaire, plan §5.7 C4b/F5; additive): a beyond-depth relative of the
+ * siblings' or the uncles' line is also excluded by the relatives this engine's own hajb table
+ * lets exclude that whole line, but which beyondExcludedBy() does not list:
+ *  - a full or consanguine sister who takes the residue with a daughter or son's daughter
+ *    ('asabah ma'al ghair ranks as a brother of her line, hajb.ts agnateChainBase, §7.3);
+ *  - in a column with daughtersExcludeSiblings (86 K/AG/1994), any child or KHI-185 substitute
+ *    (that line "excludes siblings, nephews, uncles, cousins", registry.ts).
+ * Without this, a nearer agnate who is himself blocked by such a sister (and so never asked by the
+ * questionnaire, which asks only who could change a number) would decide a refusal the family
+ * cannot see. Descendants (kind "keturunan") are unchanged.
+ */
+function beyondExcludedByLine(b: Beyond, d: Derived, sw: Ruleset["switches"]): string | null {
+  if (b.kind === "keturunan") return null;
+  const has = (h: "anak_lk" | "anak_pr" | "cucu_lk" | "cucu_pr" | "sdr_pr_kandung" | "sdr_pr_seayah") => (d.roles[h]?.length ?? 0) > 0;
+  if (sw.daughtersExcludeSiblings) {
+    if (has("anak_pr")) return "anak_pr";
+    if (has("cucu_pr")) return "cucu_pr";
+    if (d.slots.length > 0) return d.slots[0].key;
+  }
+  if (has("anak_pr") || has("cucu_pr")) {
+    if (has("sdr_pr_kandung")) return "sdr_pr_kandung";
+    if (has("sdr_pr_seayah")) return "sdr_pr_seayah";
+  }
+  return null;
+}
+
+/**
+ * The furudh take the whole estate: no 'asabah share, no radd, no Baitul Mal, no open residue
+ * (an 'aul, or fixed shares that add up to exactly 1). Used for the beyond-depth collateral
+ * 'asabah above: with nothing left over he receives nothing.
+ */
+function furudhExhaust(core: CoreOut): boolean {
+  if (core.rujuk.length > 0 || core.allocs.length === 0) return false;
+  if (core.adjustments.includes("radd") || core.adjustments.includes("baitul_mal")) return false;
+  if (!isZero(core.residueOpen) || !isZero(core.baitulMal) || !isZero(core.sisaDirujuk)) return false;
+  return !core.allocs.some((a) => a.rule.startsWith("asabah.") || a.rule.startsWith("jadd."));
 }
 
 /** KHI 185(2): a slot (sederajat) or a substitute person (per_kepala) above every living child. */
