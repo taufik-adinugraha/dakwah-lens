@@ -6,7 +6,8 @@
     "beta": "Beta",
     "back_to_main": "Back to Dakwah-Lens",
     "sign_in": "Sign in",
-    "signed_in_as": "Signed in as {name}"
+    "signed_in_as": "Signed in as {name}",
+    "nav_concepts": "Concepts"
   },
   "Home": {
     "eyebrow": "Learn the Qur'an",
@@ -66,7 +67,10 @@
     "facts_heading": "Did you know?",
     "fact_method": "How it was counted",
     "fact_where": "Where",
-    "back_to_surah": "Back to the ayat"
+    "back_to_surah": "Back to the ayat",
+    "structure_heading": "Structure of the ayah",
+    "structure_groups": "Parts that belong together",
+    "concepts_heading": "New concepts in this ayah"
   },
   "Word": {
     "meaning": "Meaning",
@@ -76,7 +80,15 @@
     "other_views": "Other views",
     "sources": "Sources",
     "no_root": "no root (particle/pronoun)",
-    "draft": "Draft — awaiting ustadz review"
+    "draft": "Draft — awaiting ustadz review",
+    "role": "Role",
+    "concepts": "Concepts",
+    "lemma": "Vocabulary",
+    "sharaf_heading": "Sharaf: how the word is formed",
+    "sharaf_forms_note": "Word forms (tashrif), not quotations of an ayah.",
+    "ilal": "I'lal (letter changes)",
+    "ilal_from": "originally",
+    "ilal_to": "became"
   },
   "Player": {
     "play_ayah": "Play ayah",
@@ -101,6 +113,52 @@
     "why_instruction": "Choose the reason this word ends with that vowel.",
     "why_question": "Why",
     "sort_title": "Sort the endings",
-    "sort_instruction": "Tap a word, then tap its case: marfū' (▲), manshūb (◆), majrūr (▼) or mabnī (■)."
+    "sort_instruction": "Tap a word, then tap its case: marfū' (▲), manshūb (◆), majrūr (▼) or mabnī (■).",
+    "role_title": "Label the roles",
+    "role_instruction": "Choose each word's role in this ayah.",
+    "role_question": "What is the role of",
+    "wazn_title": "Pattern factory",
+    "wazn_instruction": "From the root and its pattern family, pick the right form for each label.",
+    "wazn_question": "Form",
+    "wazn_note": "These are Arabic word forms (tashrif), not quotations of an ayah."
+  },
+  "Concept": {
+    "nahwu": "Nahwu",
+    "sharaf": "Sharaf",
+    "bridge": "Like Indonesian",
+    "examples": "Examples in the lessons",
+    "more": "Learn this concept",
+    "related": "Related concepts",
+    "index_title": "Nahwu & sharaf concepts",
+    "index_intro": "Each concept is explained once here, then reused in every ayah and surah where it appears."
+  },
+  "Lexeme": {
+    "eyebrow": "Vocabulary",
+    "pos": "Word class",
+    "root": "Root",
+    "occurrences": "Occurrences in the Qur'an",
+    "occurrences_value": "{count} times in {ayat} ayat",
+    "in_lessons": "Appears in the lessons"
+  },
+  "Guided": {
+    "title": "Guided lesson",
+    "step": "Step {n} of {total}",
+    "ready": "Press Start: the imam recites the ayah, then each word is recited and explained. You can pause at any time.",
+    "start": "Start",
+    "pause": "Pause",
+    "resume": "Resume",
+    "continue_after_practice": "Continue after practice",
+    "resume_from": "Resume from step {n}",
+    "prev": "Previous step",
+    "next": "Next step",
+    "go_practice": "Go to practice ↓",
+    "captions_note": "Explanations show as text for now; the spoken narration follows. The ayah is always recited by the imam.",
+    "intro": "Listen to the imam recite ayah {n}.",
+    "word_intro": "Listen to this word: {translit}.",
+    "meaning": "It means: {gloss}.",
+    "concept": "New concept — {title}: {summary}",
+    "structure": "Structure of the ayah: {summary}",
+    "practice": "Your turn: do the practice below, then continue.",
+    "recap": "Listen to the whole ayah once more, and recite along with the imam."
   }
 }

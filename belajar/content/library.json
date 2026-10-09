@@ -1,0 +1,51 @@
+{
+ "concepts": [
+  {
+   "id": "huruf-jar",
+   "kind": "nahwu",
+   "title": "Huruf jar (placeholder CI)",
+   "summary": "Placeholder untuk uji CI; diganti konten sebenarnya sebelum merge.",
+   "explanation": [
+    "Placeholder untuk uji CI; diganti konten sebenarnya sebelum merge."
+   ],
+   "examples": [
+    {
+     "loc": "1:1:1",
+     "note": "placeholder"
+    }
+   ],
+   "related": [],
+   "sources": [
+    {
+     "kitab": "placeholder"
+    }
+   ],
+   "status": "draft"
+  }
+ ],
+ "lexicon": [
+  {
+   "id": "ism",
+   "lemma_ar": "اسم",
+   "translit": "ism",
+   "root": [
+    "س",
+    "م",
+    "و"
+   ],
+   "pos": "isim",
+   "meaning": "nama (placeholder)",
+   "ilal": [],
+   "sources": [
+    {
+     "kitab": "placeholder"
+    }
+   ],
+   "status": "draft"
+  }
+ ],
+ "roots": [],
+ "data_versions": {
+  "stub": "ci"
+ }
+}

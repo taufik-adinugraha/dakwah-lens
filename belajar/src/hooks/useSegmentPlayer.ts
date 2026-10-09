@@ -22,7 +22,18 @@ export type RecitationSource = {
  * The hook owns its Audio element (created after mount, never rendered), so
  * components never touch a ref during render (React Compiler rule).
  */
-export function useSegmentPlayer(sources: RecitationSource[]) {
+export function useSegmentPlayer(
+  sources: RecitationSource[],
+  opts: {
+    /** Called when playback finishes on its own — the ayah ended or a
+     *  single word's segment completed — never on a user pause. */
+    onFinish?: () => void;
+  } = {},
+) {
+  const onFinishRef = useRef(opts.onFinish);
+  useEffect(() => {
+    onFinishRef.current = opts.onFinish;
+  }, [opts.onFinish]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const stopAtRef = useRef<number | null>(null);
   const segmentsRef = useRef<Segment[]>([]);
@@ -54,6 +65,7 @@ export function useSegmentPlayer(sources: RecitationSource[]) {
         stopAtRef.current = null;
         a.pause();
         setActiveWord(null);
+        onFinishRef.current?.();
         return;
       }
       setActiveWord(wordAt(ms));
@@ -73,14 +85,18 @@ export function useSegmentPlayer(sources: RecitationSource[]) {
         setActiveWord(null);
       }
     };
+    const onEnded = () => {
+      onStop();
+      onFinishRef.current?.();
+    };
 
     a.addEventListener("play", onPlay);
     a.addEventListener("pause", onStop);
-    a.addEventListener("ended", onStop);
+    a.addEventListener("ended", onEnded);
     return () => {
       a.removeEventListener("play", onPlay);
       a.removeEventListener("pause", onStop);
-      a.removeEventListener("ended", onStop);
+      a.removeEventListener("ended", onEnded);
       if (raf !== null) cancelAnimationFrame(raf);
       a.pause();
       a.removeAttribute("src");

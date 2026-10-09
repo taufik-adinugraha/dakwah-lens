@@ -6,7 +6,8 @@
     "beta": "Beta",
     "back_to_main": "Kembali ke Dakwah-Lens",
     "sign_in": "Masuk",
-    "signed_in_as": "Masuk sebagai {name}"
+    "signed_in_as": "Masuk sebagai {name}",
+    "nav_concepts": "Konsep"
   },
   "Home": {
     "eyebrow": "Belajar Al-Qur'an",
@@ -66,7 +67,10 @@
     "facts_heading": "Tahukah kamu?",
     "fact_method": "Cara menghitung",
     "fact_where": "Letak",
-    "back_to_surah": "Kembali ke daftar ayat"
+    "back_to_surah": "Kembali ke daftar ayat",
+    "structure_heading": "Struktur ayat",
+    "structure_groups": "Bagian-bagian yang saling terkait",
+    "concepts_heading": "Konsep baru di ayat ini"
   },
   "Word": {
     "meaning": "Arti",
@@ -76,7 +80,15 @@
     "other_views": "Pendapat lain",
     "sources": "Rujukan",
     "no_root": "tidak berakar (huruf/kata ganti)",
-    "draft": "Draf — menunggu tinjauan ustadz"
+    "draft": "Draf — menunggu tinjauan ustadz",
+    "role": "Peran",
+    "concepts": "Konsep",
+    "lemma": "Kosakata",
+    "sharaf_heading": "Sharaf: asal-usul bentuk kata",
+    "sharaf_forms_note": "Bentuk-bentuk kata (tashrif), bukan kutipan ayat.",
+    "ilal": "I'lal (perubahan huruf)",
+    "ilal_from": "asal",
+    "ilal_to": "menjadi"
   },
   "Player": {
     "play_ayah": "Putar ayat",
@@ -101,6 +113,52 @@
     "why_instruction": "Pilih alasan yang membuat kata ini berakhir dengan harakat tersebut.",
     "why_question": "Kenapa",
     "sort_title": "Sortir akhiran",
-    "sort_instruction": "Ketuk sebuah kata, lalu ketuk kelompok kedudukannya: marfū' (▲), manshūb (◆), majrūr (▼), atau mabnī (■)."
+    "sort_instruction": "Ketuk sebuah kata, lalu ketuk kelompok kedudukannya: marfū' (▲), manshūb (◆), majrūr (▼), atau mabnī (■).",
+    "role_title": "Label peran",
+    "role_instruction": "Pilih peran setiap kata dalam ayat ini.",
+    "role_question": "Apa peran",
+    "wazn_title": "Pabrik wazan",
+    "wazn_instruction": "Dari akar kata dan babnya, pilih bentuk kata yang tepat untuk setiap label.",
+    "wazn_question": "Bentuk",
+    "wazn_note": "Bentuk-bentuk ini kata Arab hasil tashrif, bukan kutipan ayat."
+  },
+  "Concept": {
+    "nahwu": "Nahwu",
+    "sharaf": "Sharaf",
+    "bridge": "Mirip bahasa kita",
+    "examples": "Contoh dalam pelajaran",
+    "more": "Pelajari konsep ini",
+    "related": "Konsep terkait",
+    "index_title": "Konsep nahwu & sharaf",
+    "index_intro": "Setiap konsep dijelaskan sekali di sini, lalu dipakai ulang di setiap ayat dan surah yang memuatnya."
+  },
+  "Lexeme": {
+    "eyebrow": "Kosakata",
+    "pos": "Jenis kata",
+    "root": "Akar kata",
+    "occurrences": "Kemunculan dalam Al-Qur'an",
+    "occurrences_value": "{count} kali dalam {ayat} ayat",
+    "in_lessons": "Muncul dalam pelajaran"
+  },
+  "Guided": {
+    "title": "Mode pelajaran",
+    "step": "Langkah {n} dari {total}",
+    "ready": "Tekan Mulai: imam membacakan ayat, lalu setiap kata dibacakan dan dijelaskan. Anda bisa menjeda kapan saja.",
+    "start": "Mulai",
+    "pause": "Jeda",
+    "resume": "Lanjutkan",
+    "continue_after_practice": "Lanjut setelah latihan",
+    "resume_from": "Lanjutkan dari langkah {n}",
+    "prev": "Langkah sebelumnya",
+    "next": "Langkah berikutnya",
+    "go_practice": "Ke latihan ↓",
+    "captions_note": "Penjelasan sementara ditampilkan sebagai teks; suara penjelasan menyusul. Ayat selalu dibacakan oleh imam.",
+    "intro": "Mari dengarkan ayat {n} dibacakan imam.",
+    "word_intro": "Dengarkan kata ini: {translit}.",
+    "meaning": "Artinya: {gloss}.",
+    "concept": "Konsep baru — {title}: {summary}",
+    "structure": "Struktur ayat: {summary}",
+    "practice": "Sekarang giliran Anda: kerjakan latihan di bawah, lalu lanjutkan.",
+    "recap": "Dengarkan sekali lagi seluruh ayatnya, dan ikuti bacaan imam."
   }
 }

@@ -3,15 +3,22 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { LabelRole } from "@/components/exercises/LabelRole";
 import { SortCase } from "@/components/exercises/SortCase";
 import { TapWord } from "@/components/exercises/TapWord";
+import { WaznFactory } from "@/components/exercises/WaznFactory";
 import { WhyHarakat } from "@/components/exercises/WhyHarakat";
 import { AyahPlayer } from "@/components/lesson/AyahPlayer";
 import { DraftChip } from "@/components/lesson/DraftChip";
+import { GuidedLesson } from "@/components/lesson/GuidedLesson";
 import { WordCard } from "@/components/lesson/WordCard";
+import { ConceptCard } from "@/components/library/ConceptCard";
+import { StructureSection } from "@/components/library/StructureSection";
 import { FactCard } from "@/components/surah/FactCard";
 import { Link } from "@/i18n/navigation";
 import { getAyah, getSurah, SURAHS } from "@/lib/content";
+import { buildLessonSteps } from "@/lib/lessonSteps";
+import { conceptsIntroducedIn, getConcept, getLexeme, LIBRARY } from "@/lib/library";
 
 export const dynamicParams = false;
 
@@ -56,6 +63,8 @@ export default async function AyahPage({
 
   const t = await getTranslations("Lesson");
   const tw = await getTranslations("Word");
+  const tc = await getTranslations("Concept");
+  const tg = await getTranslations("Guided");
 
   const playerWords = a.words.map((w, i) => ({
     index: i + 1,
@@ -79,6 +88,27 @@ export default async function AyahPage({
   const prev = getAyah(s, n - 1);
   const next = getAyah(s, n + 1);
   const key = `${s.slug}/${a.ayah}`;
+  const introduced = conceptsIntroducedIn(a.loc);
+  const steps = buildLessonSteps(a, introduced, {
+    intro: (n) => tg("intro", { n }),
+    wordIntro: (translit) => tg("word_intro", { translit }),
+    meaning: (gloss) => tg("meaning", { gloss }),
+    concept: (title, summary) => tg("concept", { title, summary }),
+    structure: (summary) => tg("structure", { summary }),
+    practice: tg("practice"),
+    recap: tg("recap"),
+  });
+  const conceptTitle = Object.fromEntries(LIBRARY.concepts.map((c) => [c.id, c.title]));
+  const wordAr = Object.fromEntries(s.ayat.flatMap((x) => x.words.map((w) => [w.loc, w.ar])));
+  const conceptLabels = {
+    nahwu: tc("nahwu"),
+    sharaf: tc("sharaf"),
+    bridge: tc("bridge"),
+    examples: tc("examples"),
+    more: tc("more"),
+    sources: tw("sources"),
+    draft: tw("draft"),
+  };
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
@@ -94,6 +124,15 @@ export default async function AyahPage({
 
       <div className="mt-6">
         <AyahPlayer ayah={a.ayah} words={playerWords} sources={sources} />
+      </div>
+
+      <div className="mt-4">
+        <GuidedLesson
+          lessonId={key}
+          title={`${s.name_id} · ${t("ayah", { n: a.ayah })}`}
+          steps={steps}
+          sources={sources}
+        />
       </div>
 
       <figure className="mt-4 rounded-2xl bg-paper-deep p-4">
@@ -122,6 +161,37 @@ export default async function AyahPage({
         </section>
       )}
 
+      <StructureSection
+        ayah={a}
+        conceptTitle={conceptTitle}
+        labels={{
+          heading: t("structure_heading"),
+          groups: t("structure_groups"),
+          sources: tw("sources"),
+          draft: tw("draft"),
+        }}
+      />
+
+      {introduced.length > 0 && (
+        <section className="mt-10" aria-labelledby="concepts">
+          <h2 id="concepts" className="font-display text-2xl font-medium">
+            {t("concepts_heading")}
+          </h2>
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            {introduced.map((c) => (
+              <ConceptCard
+                key={c.id}
+                concept={c}
+                labels={conceptLabels}
+                surahSlug={s.slug}
+                wordAr={wordAr}
+                compact
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
       <section className="mt-10" aria-labelledby="words">
         <h2 id="words" className="font-display text-2xl font-medium">
           {t("words_heading", { n: a.words.length })}
@@ -132,7 +202,22 @@ export default async function AyahPage({
             <WordCard
               key={w.loc}
               word={w}
+              lexeme={w.lemma_id ? getLexeme(w.lemma_id) : undefined}
+              concepts={w.concepts.flatMap((id) => {
+                const c = getConcept(id);
+                return c ? [{ id: c.id, title: c.title }] : [];
+              })}
               labels={{
+                role: tw("role"),
+                concepts: tw("concepts"),
+                lemma: tw("lemma"),
+                sharaf: {
+                  heading: tw("sharaf_heading"),
+                  forms_note: tw("sharaf_forms_note"),
+                  ilal: tw("ilal"),
+                  ilal_from: tw("ilal_from"),
+                  ilal_to: tw("ilal_to"),
+                },
                 meaning: tw("meaning"),
                 root: tw("root"),
                 wazn: tw("wazn"),
@@ -147,13 +232,21 @@ export default async function AyahPage({
         </div>
       </section>
 
-      <section className="mt-12 space-y-4" aria-labelledby="practice">
-        <h2 id="practice" className="font-display text-2xl font-medium">
+      <section id="practice" className="mt-12 scroll-mt-20 space-y-4" aria-labelledby="practice-heading">
+        <h2 id="practice-heading" className="font-display text-2xl font-medium">
           {t("practice_heading")}
         </h2>
         <TapWord id={`${key}/tap`} words={playerWords} source={sources[0]} />
         <WhyHarakat id={`${key}/why`} words={a.words} pool={pool} />
         <SortCase id={`${key}/sort`} words={a.words} />
+        <LabelRole id={`${key}/role`} words={a.words} pool={pool} />
+        <WaznFactory
+          id={`${key}/wazn`}
+          lexemes={[...new Set(a.words.map((w) => w.lemma_id).filter((x): x is string => !!x))].flatMap((lid) => {
+            const lx = getLexeme(lid);
+            return lx?.tashrif ? [lx] : [];
+          })}
+        />
       </section>
 
       {facts.length > 0 && (

@@ -76,6 +76,9 @@ export default async function LocaleLayout({
                 </span>
               </div>
               <div className="flex shrink-0 items-center gap-3 text-sm">
+                <Link href="/konsep" className="text-ink-muted transition hover:text-ink">
+                  {t("nav_concepts")}
+                </Link>
                 {/* Cross-app link: plain <a>, never next-intl Link (it would
                     prefix /belajar and soft-navigate across apps). */}
                 <a

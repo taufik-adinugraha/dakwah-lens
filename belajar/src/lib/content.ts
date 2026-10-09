@@ -8,6 +8,7 @@ import alFatihah from "../../content/al-fatihah.json";
 import { SurahContent, type Ayah, type SurahContent as Surah } from "@/content/schema";
 
 import { IS_PUBLIC } from "./flags";
+import { assertReferences } from "./library";
 
 function load(raw: unknown, name: string): Surah {
   const result = SurahContent.safeParse(raw);
@@ -21,6 +22,9 @@ function load(raw: unknown, name: string): Surah {
 }
 
 export const SURAHS: Surah[] = [load(alFatihah, "al-fatihah")];
+
+// Every lemma / concept a lesson points at must exist in the libraries.
+assertReferences(SURAHS);
 
 /** Does any record in this surah still await ustadz review? */
 export function hasDrafts(s: Surah): boolean {
