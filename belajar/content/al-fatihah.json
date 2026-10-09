@@ -1,0 +1,4039 @@
+{
+  "surah": 1,
+  "slug": "al-fatihah",
+  "name_ar": "الفاتحة",
+  "name_id": "Al-Fatihah",
+  "ayat": [
+    {
+      "loc": "1:1",
+      "surah": 1,
+      "ayah": 1,
+      "ar": "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ",
+      "words": [
+        {
+          "loc": "1:1:1",
+          "ar": "بِسْمِ",
+          "translit": "bismi",
+          "gloss": "dengan nama",
+          "root": [
+            "س",
+            "م",
+            "و"
+          ],
+          "lemma": "ٱسْم",
+          "pos": "huruf jar + isim",
+          "wazn": null,
+          "case": {
+            "state": "majrur",
+            "sign": "kasrah"
+          },
+          "why": "Akhirnya kasrah karena kata ism (nama) didahului huruf jar bi- (dengan).",
+          "ikhtilaf": [
+            {
+              "point": "Bismi bergantung pada kata yang tersirat; yang mana? (Darwisy menilai kedua pendapat ini baik)",
+              "options": [
+                "Kata kerja tersirat seperti abtadi’u ('aku memulai'), sehingga jar-majrur ini berkedudukan nashab — Darwisy; an-Nahhas menisbatkan pendapat ini kepada al-Farra' (Kufah)",
+                "Khabar tersirat bagi mubtada' tersirat ibtidā’ī ('permulaanku') — al-Jadwal, al-Mujtaba, Darwisy; an-Nahhas menisbatkannya kepada ulama Bashrah"
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 9",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/1"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:1 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/1"
+            },
+            {
+              "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an",
+              "ref": "QS 1:1 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/mujtaba-mushkil-iraab/1/1"
+            },
+            {
+              "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an",
+              "ref": "QS 1:1 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/iraab-alnahas/1/1"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:1:1:*) — akar, lemma, kelas kata: P|PREFIX|bi+ + N|STEM|POS:N|LEM:{som|ROOT:smw|M|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=1"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:1",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "1:1:2",
+          "ar": "ٱللَّهِ",
+          "translit": "Allāhi",
+          "gloss": "Allah",
+          "root": [
+            "أ",
+            "ل",
+            "ه"
+          ],
+          "lemma": "ٱللَّه",
+          "pos": "isim 'alam (lafaz Allah)",
+          "wazn": null,
+          "case": {
+            "state": "majrur",
+            "sign": "kasrah"
+          },
+          "why": "Akhirnya kasrah karena menjadi mudhaf ilaih dari kata ismi.",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 9",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/1"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:1 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/1"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:1:2:*) — akar, lemma, kelas kata: PN|STEM|POS:PN|LEM:{ll~ah|ROOT:Alh|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=1"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:1",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "1:1:3",
+          "ar": "ٱلرَّحْمَٰنِ",
+          "translit": "ar-raḥmāni",
+          "gloss": "Yang Maha Pengasih",
+          "root": [
+            "ر",
+            "ح",
+            "م"
+          ],
+          "lemma": "رَّحْمَٰن",
+          "pos": "isim sifat",
+          "wazn": "فَعْلان",
+          "case": {
+            "state": "majrur",
+            "sign": "kasrah"
+          },
+          "why": "Akhirnya kasrah karena menjadi sifat (na't) bagi lafaz Allah, dan sifat mengikuti kata yang disifatinya.",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 9",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/1"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:1 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/1"
+            },
+            {
+              "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an",
+              "ref": "QS 1:1 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/mujtaba-mushkil-iraab/1/1"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:1:3:*) — akar, lemma, kelas kata: DET|PREFIX|Al+ + ADJ|STEM|POS:ADJ|LEM:r~aHoma`n|ROOT:rHm|MS|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=1"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:1",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "1:1:4",
+          "ar": "ٱلرَّحِيمِ",
+          "translit": "ar-raḥīmi",
+          "gloss": "Maha Penyayang",
+          "root": [
+            "ر",
+            "ح",
+            "م"
+          ],
+          "lemma": "رَّحِيم",
+          "pos": "isim sifat",
+          "wazn": "فَعِيل",
+          "case": {
+            "state": "majrur",
+            "sign": "kasrah"
+          },
+          "why": "Akhirnya kasrah karena menjadi sifat kedua bagi lafaz Allah, sehingga ikut majrur.",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:1 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/1"
+            },
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 9",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/1"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:1:4:*) — akar, lemma, kelas kata: DET|PREFIX|Al+ + ADJ|STEM|POS:ADJ|LEM:r~aHiym|ROOT:rHm|MS|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=1"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:1",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        }
+      ],
+      "translation": {
+        "text": "Dengan nama Allah Yang Maha Pengasih, Maha Penyayang.",
+        "footnotes": [],
+        "source_label": "Terjemahan Berbahasa Indonesia - Kementerian Agama",
+        "version": "1.0.1"
+      },
+      "recitation": [
+        {
+          "reciter": "Husary_Muallim_128kbps",
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/001001.mp3",
+          "segments": [
+            [
+              1,
+              0,
+              820
+            ],
+            [
+              2,
+              830,
+              1520
+            ],
+            [
+              3,
+              1530,
+              2790
+            ],
+            [
+              4,
+              2800,
+              4240
+            ]
+          ],
+          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        },
+        {
+          "reciter": "Alafasy_128kbps",
+          "url": "https://everyayah.com/data/Alafasy_128kbps/001001.mp3",
+          "segments": [
+            [
+              1,
+              60,
+              610
+            ],
+            [
+              2,
+              620,
+              1310
+            ],
+            [
+              3,
+              1320,
+              2450
+            ],
+            [
+              4,
+              2460,
+              5970
+            ]
+          ],
+          "credit": "Recitation: Mishary Rashid Alafasy via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "loc": "1:2",
+      "surah": 1,
+      "ayah": 2,
+      "ar": "ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ",
+      "words": [
+        {
+          "loc": "1:2:1",
+          "ar": "ٱلْحَمْدُ",
+          "translit": "al-ḥamdu",
+          "gloss": "segala puji",
+          "root": [
+            "ح",
+            "م",
+            "د"
+          ],
+          "lemma": "حَمْد",
+          "pos": "isim",
+          "wazn": "فَعْل (mashdar)",
+          "case": {
+            "state": "marfu",
+            "sign": "dhammah"
+          },
+          "why": "Akhirnya dhammah karena menjadi mubtada' (pokok kalimat).",
+          "ikhtilaf": [
+            {
+              "point": "Apa yang membuat al-ḥamdu marfu'?",
+              "options": [
+                "Ibtida', yaitu kedudukannya sebagai mubtada' — ulama Bashrah, menurut an-Nahhas",
+                "Dhamir yang tersimpan pada huruf lam, karena lam diperlakukan seperti kata kerja — al-Kisa'i, menurut an-Nahhas",
+                "Huruf lam sebagai 'mahall', karena lam diperlakukan seperti isim — al-Farra', menurut an-Nahhas"
+              ]
+            },
+            {
+              "point": "Makna alif-lam pada al-ḥamdu",
+              "options": [
+                "istighraq: mencakup seluruh pujian — disebut as-Samin",
+                "jins: jenis pujian — dipilih az-Zamakhsyari, menurut as-Samin; Darwisy juga menyebut al- pada al-ḥamd untuk jins",
+                "'ahd: pujian yang sudah dikenal — disebut as-Samin"
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 14",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/2"
+            },
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 19 (al- pada al-ḥamd untuk jins)"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:2 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/2"
+            },
+            {
+              "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an",
+              "ref": "QS 1:2 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/iraab-alnahas/1/2"
+            },
+            {
+              "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun",
+              "ref": "QS 1:2 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aldur-almasoon/1/2"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:2:1:*) — akar, lemma, kelas kata: DET|PREFIX|Al+ + N|STEM|POS:N|LEM:Hamod|ROOT:Hmd|M|NOM",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=2"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:2",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "1:2:2",
+          "ar": "لِلَّهِ",
+          "translit": "lillāhi",
+          "gloss": "bagi Allah",
+          "root": [
+            "أ",
+            "ل",
+            "ه"
+          ],
+          "lemma": "ٱللَّه",
+          "pos": "huruf jar + isim 'alam (lafaz Allah)",
+          "wazn": null,
+          "case": {
+            "state": "majrur",
+            "sign": "kasrah"
+          },
+          "why": "Akhirnya kasrah karena didahului huruf jar li-; jar-majrur ini bergantung pada khabar yang tidak disebut (misalnya 'tetap').",
+          "ikhtilaf": [
+            {
+              "point": "Makna huruf lam pada lillāhi",
+              "options": [
+                "istihqaq: Allah-lah yang berhak atas pujian — as-Samin",
+                "ikhtishash: semua pujian khusus milik Allah (tinjauan balaghah) — Darwisy, al-Jadwal"
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 14",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/2"
+            },
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 16 (bagian al-Balaghah: fann al-ikhtishash pada lillāhi)"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:2 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/2"
+            },
+            {
+              "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun",
+              "ref": "QS 1:2 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aldur-almasoon/1/2"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:2:2:*) — akar, lemma, kelas kata: P|PREFIX|l:P+ + PN|STEM|POS:PN|LEM:{ll~ah|ROOT:Alh|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=2"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:2",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "1:2:3",
+          "ar": "رَبِّ",
+          "translit": "rabbi",
+          "gloss": "Tuhan",
+          "root": [
+            "ر",
+            "ب",
+            "ب"
+          ],
+          "lemma": "رَبّ",
+          "pos": "isim",
+          "wazn": "فَعْل",
+          "case": {
+            "state": "majrur",
+            "sign": "kasrah"
+          },
+          "why": "Akhirnya kasrah karena mengikuti lafaz Allah sebagai sifat (na't) atau badal.",
+          "ikhtilaf": [
+            {
+              "point": "Kedudukan rabbi",
+              "options": [
+                "sifat (na't) bagi lafaz Allah — an-Nahhas; juga dibolehkan Darwisy, al-Jadwal, as-Samin",
+                "badal dari lafaz Allah — al-Mujtaba; juga dibolehkan Darwisy, al-Jadwal, as-Samin"
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an",
+              "ref": "QS 1:2 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/iraab-alnahas/1/2"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:2 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/2"
+            },
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 14",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/2"
+            },
+            {
+              "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an",
+              "ref": "QS 1:2 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/mujtaba-mushkil-iraab/1/2"
+            },
+            {
+              "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun",
+              "ref": "QS 1:2 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aldur-almasoon/1/2"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:2:3:*) — akar, lemma, kelas kata: N|STEM|POS:N|LEM:rab~|ROOT:rbb|M|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=2"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:2",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "1:2:4",
+          "ar": "ٱلْعَٰلَمِينَ",
+          "translit": "al-‘ālamīna",
+          "gloss": "seluruh alam",
+          "root": [
+            "ع",
+            "ل",
+            "م"
+          ],
+          "lemma": "عَٰلَمِين",
+          "pos": "isim (isim jam')",
+          "wazn": "فَاعَل",
+          "case": {
+            "state": "majrur",
+            "sign": "ya'"
+          },
+          "why": "Majrur dengan tanda ya' karena menjadi mudhaf ilaih dan termasuk kata yang disamakan (mulhaq) dengan jamak mudzakkar salim.",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 14",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/2"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:2, bagian sharaf: bentuk tunggalnya ‘ālam berwazan fā‘al dengan fathah pada ‘ain, 'begitu pula jamaknya'; al-‘ālamīna disebut isim jam' (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/2"
+            },
+            {
+              "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an",
+              "ref": "QS 1:2 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/mujtaba-mushkil-iraab/1/2"
+            },
+            {
+              "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an",
+              "ref": "QS 1:2 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/iraab-alnahas/1/2"
+            },
+            {
+              "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun",
+              "ref": "QS 1:2 (al-‘ālamīna disebut isim jam'; halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aldur-almasoon/1/2"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:2:4:*) — akar, lemma, kelas kata: DET|PREFIX|Al+ + N|STEM|POS:N|LEM:Ea`lamiyn|ROOT:Elm|MP|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=2"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:2",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        }
+      ],
+      "translation": {
+        "text": "Segala puji bagi Allah, Tuhan seluruh alam,",
+        "footnotes": [],
+        "source_label": "Terjemahan Berbahasa Indonesia - Kementerian Agama",
+        "version": "1.0.1"
+      },
+      "recitation": [
+        {
+          "reciter": "Husary_Muallim_128kbps",
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/001002.mp3",
+          "segments": [
+            [
+              1,
+              250,
+              1060
+            ],
+            [
+              2,
+              1070,
+              1950
+            ],
+            [
+              3,
+              1960,
+              2660
+            ],
+            [
+              4,
+              2670,
+              4360
+            ]
+          ],
+          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        },
+        {
+          "reciter": "Alafasy_128kbps",
+          "url": "https://everyayah.com/data/Alafasy_128kbps/001002.mp3",
+          "segments": [
+            [
+              1,
+              80,
+              960
+            ],
+            [
+              2,
+              970,
+              1800
+            ],
+            [
+              3,
+              1810,
+              2460
+            ],
+            [
+              4,
+              2470,
+              5140
+            ]
+          ],
+          "credit": "Recitation: Mishary Rashid Alafasy via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "loc": "1:3",
+      "surah": 1,
+      "ayah": 3,
+      "ar": "ٱلرَّحْمَٰنِ ٱلرَّحِيمِ",
+      "words": [
+        {
+          "loc": "1:3:1",
+          "ar": "ٱلرَّحْمَٰنِ",
+          "translit": "ar-raḥmāni",
+          "gloss": "Yang Maha Pengasih",
+          "root": [
+            "ر",
+            "ح",
+            "م"
+          ],
+          "lemma": "رَّحْمَٰن",
+          "pos": "isim sifat",
+          "wazn": "فَعْلان",
+          "case": {
+            "state": "majrur",
+            "sign": "kasrah"
+          },
+          "why": "Akhirnya kasrah karena sekali lagi menjadi sifat bagi lafaz Allah yang majrur.",
+          "ikhtilaf": [
+            {
+              "point": "Kedudukan ar-raḥmāni ar-raḥīmi di ayat 3",
+              "options": [
+                "sifat (na't) bagi lafaz Allah — Darwisy, al-Jadwal",
+                "badal dari lafaz Allah — kemungkinan lain dalam al-Jadwal"
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 14",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/3"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:3 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/3"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:3:1:*) — akar, lemma, kelas kata: DET|PREFIX|Al+ + ADJ|STEM|POS:ADJ|LEM:r~aHoma`n|ROOT:rHm|MS|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=3"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:3",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "1:3:2",
+          "ar": "ٱلرَّحِيمِ",
+          "translit": "ar-raḥīmi",
+          "gloss": "Maha Penyayang",
+          "root": [
+            "ر",
+            "ح",
+            "م"
+          ],
+          "lemma": "رَّحِيم",
+          "pos": "isim sifat",
+          "wazn": "فَعِيل",
+          "case": {
+            "state": "majrur",
+            "sign": "kasrah"
+          },
+          "why": "Akhirnya kasrah karena menjadi sifat berikutnya bagi lafaz Allah yang majrur.",
+          "ikhtilaf": [
+            {
+              "point": "Kedudukan ar-raḥmāni ar-raḥīmi di ayat 3",
+              "options": [
+                "sifat (na't) bagi lafaz Allah — Darwisy, al-Jadwal",
+                "badal dari lafaz Allah — kemungkinan lain dalam al-Jadwal"
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 14",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/3"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:3 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/3"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:3:2:*) — akar, lemma, kelas kata: DET|PREFIX|Al+ + ADJ|STEM|POS:ADJ|LEM:r~aHiym|ROOT:rHm|MS|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=3"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:3",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        }
+      ],
+      "translation": {
+        "text": "Yang Maha Pengasih, Maha Penyayang,",
+        "footnotes": [],
+        "source_label": "Terjemahan Berbahasa Indonesia - Kementerian Agama",
+        "version": "1.0.1"
+      },
+      "recitation": [
+        {
+          "reciter": "Husary_Muallim_128kbps",
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/001003.mp3",
+          "segments": [
+            [
+              1,
+              250,
+              1570
+            ],
+            [
+              2,
+              1580,
+              2990
+            ]
+          ],
+          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        },
+        {
+          "reciter": "Alafasy_128kbps",
+          "url": "https://everyayah.com/data/Alafasy_128kbps/001003.mp3",
+          "segments": [
+            [
+              1,
+              40,
+              1230
+            ],
+            [
+              2,
+              1240,
+              4160
+            ]
+          ],
+          "credit": "Recitation: Mishary Rashid Alafasy via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "loc": "1:4",
+      "surah": 1,
+      "ayah": 4,
+      "ar": "مَٰلِكِ يَوْمِ ٱلدِّينِ",
+      "words": [
+        {
+          "loc": "1:4:1",
+          "ar": "مَٰلِكِ",
+          "translit": "māliki",
+          "gloss": "Pemilik",
+          "root": [
+            "م",
+            "ل",
+            "ك"
+          ],
+          "lemma": "مَٰلِك",
+          "pos": "isim fa'il",
+          "wazn": "فَاعِل",
+          "case": {
+            "state": "majrur",
+            "sign": "kasrah"
+          },
+          "why": "Akhirnya kasrah karena menjadi sifat keempat bagi lafaz Allah.",
+          "ikhtilaf": [
+            {
+              "point": "Kedudukan māliki",
+              "options": [
+                "sifat (na't) bagi lafaz Allah — Darwisy, al-Mujtaba, al-Jadwal",
+                "badal dari lafaz Allah — kemungkinan lain dalam al-Jadwal"
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 14",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/4"
+            },
+            {
+              "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an",
+              "ref": "QS 1:4 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/mujtaba-mushkil-iraab/1/4"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:4 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/4"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:4:1:*) — akar, lemma, kelas kata: N|STEM|POS:N|ACT|PCPL|LEM:ma`lik|ROOT:mlk|M|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=4"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:4",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "1:4:2",
+          "ar": "يَوْمِ",
+          "translit": "yaumi",
+          "gloss": "hari",
+          "root": [
+            "ي",
+            "و",
+            "م"
+          ],
+          "lemma": "يَوْم",
+          "pos": "isim",
+          "wazn": null,
+          "case": {
+            "state": "majrur",
+            "sign": "kasrah"
+          },
+          "why": "Akhirnya kasrah karena menjadi mudhaf ilaih bagi māliki.",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 14",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/4"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:4 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/4"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:4:2:*) — akar, lemma, kelas kata: N|STEM|POS:N|LEM:yawom|ROOT:ywm|M|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=4"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:4",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "1:4:3",
+          "ar": "ٱلدِّينِ",
+          "translit": "ad-dīni",
+          "gloss": "pembalasan",
+          "root": [
+            "د",
+            "ي",
+            "ن"
+          ],
+          "lemma": "دِين",
+          "pos": "isim",
+          "wazn": "فِعْل (mashdar)",
+          "case": {
+            "state": "majrur",
+            "sign": "kasrah"
+          },
+          "why": "Akhirnya kasrah karena menjadi mudhaf ilaih bagi yaumi.",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:4 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/4"
+            },
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 14",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/4"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:4:3:*) — akar, lemma, kelas kata: DET|PREFIX|Al+ + N|STEM|POS:N|LEM:diyn|ROOT:dyn|M|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=4"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:4",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        }
+      ],
+      "translation": {
+        "text": "Pemilik hari pembalasan.[1]",
+        "footnotes": [
+          "[1] Yaumiddīn (hari pembalasan), hari waktu manusia menerima pembalasan amalnya, baik atau buruk. Disebut juga yaumul qiyāmah, yaumul hisab dan sebagainya."
+        ],
+        "source_label": "Terjemahan Berbahasa Indonesia - Kementerian Agama",
+        "version": "1.0.1"
+      },
+      "recitation": [
+        {
+          "reciter": "Husary_Muallim_128kbps",
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/001004.mp3",
+          "segments": [
+            [
+              1,
+              250,
+              1160
+            ],
+            [
+              2,
+              1170,
+              1800
+            ],
+            [
+              3,
+              1810,
+              2980
+            ]
+          ],
+          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        },
+        {
+          "reciter": "Alafasy_128kbps",
+          "url": "https://everyayah.com/data/Alafasy_128kbps/001004.mp3",
+          "segments": [
+            [
+              1,
+              60,
+              840
+            ],
+            [
+              2,
+              850,
+              1400
+            ],
+            [
+              3,
+              1410,
+              4280
+            ]
+          ],
+          "credit": "Recitation: Mishary Rashid Alafasy via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "loc": "1:5",
+      "surah": 1,
+      "ayah": 5,
+      "ar": "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",
+      "words": [
+        {
+          "loc": "1:5:1",
+          "ar": "إِيَّاكَ",
+          "translit": "iyyāka",
+          "gloss": "hanya kepada Engkau",
+          "root": null,
+          "lemma": "إِيَّا",
+          "pos": "dhamir munfashil",
+          "wazn": null,
+          "case": {
+            "state": "mabni",
+            "sign": "fathah",
+            "mahall": "mahall nashb"
+          },
+          "why": "Kata ganti ini mabni di atas fathah (akhirnya tetap) dan berkedudukan nashab sebagai objek yang didahulukan, sehingga bermakna 'hanya kepada-Mu'.",
+          "ikhtilaf": [
+            {
+              "point": "Bagian mana dari iyyāka yang mabni?",
+              "options": [
+                "Seluruh iyyāka adalah dhamir yang mabni di atas fathah — al-Jadwal",
+                "Iyyā adalah dhamir yang mabni, sedangkan -ka huruf khithab (penanda lawan bicara) — pendapat kedua dalam al-Jadwal; al-Mujtaba juga berpendapat demikian dan menambahkan bahwa iyyā mabni di atas sukun"
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 14",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/5"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:5 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/5"
+            },
+            {
+              "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an",
+              "ref": "QS 1:5 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/mujtaba-mushkil-iraab/1/5"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:5:1:*) — akar, lemma, kelas kata: PRON|STEM|POS:PRON|LEM:<iy~aA|2MS",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=5"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:5",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "1:5:2",
+          "ar": "نَعْبُدُ",
+          "translit": "na‘budu",
+          "gloss": "kami menyembah",
+          "root": [
+            "ع",
+            "ب",
+            "د"
+          ],
+          "lemma": "عَبَدَ",
+          "pos": "fi'il mudhari'",
+          "wazn": "نَفْعُلُ",
+          "case": {
+            "state": "marfu",
+            "sign": "dhammah"
+          },
+          "why": "Akhirnya dhammah karena fi'il mudhari' ini tidak didahului huruf penashab atau penjazm; pelakunya tersirat, yaitu 'kami'.",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 14",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/5"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:5 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/5"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:5:2:*) — akar, lemma, kelas kata: V|STEM|POS:V|IMPF|LEM:Eabada|ROOT:Ebd|1P",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=5"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:5:2:*) bentuk kata kerja (VF) I (QAC 0.4 menandai bentuk II–XII saja; tanpa tanda = bentuk I), fi'il mudhari' (IMPF), 1P; harakat pola wazan mengikuti token Tanzil 1:5:2",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=5"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:5",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "1:5:3",
+          "ar": "وَإِيَّاكَ",
+          "translit": "wa iyyāka",
+          "gloss": "dan hanya kepada Engkau",
+          "root": null,
+          "lemma": "إِيَّا",
+          "pos": "huruf 'athaf + dhamir munfashil",
+          "wazn": null,
+          "case": {
+            "state": "mabni",
+            "sign": "fathah",
+            "mahall": "mahall nashb"
+          },
+          "why": "Wawu adalah huruf 'athaf, dan iyyāka (mabni di atas fathah, berkedudukan nashab) diulang sebagai objek yang didahulukan bagi nasta‘īnu agar makna 'hanya' melekat pada kedua perbuatan.",
+          "ikhtilaf": [
+            {
+              "point": "Bagian mana dari iyyāka yang mabni?",
+              "options": [
+                "Seluruh iyyāka adalah dhamir yang mabni di atas fathah — al-Jadwal",
+                "Iyyā adalah dhamir yang mabni, sedangkan -ka huruf khithab (penanda lawan bicara) — pendapat kedua dalam al-Jadwal; al-Mujtaba juga berpendapat demikian dan menambahkan bahwa iyyā mabni di atas sukun"
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:5 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/5"
+            },
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 14",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/5"
+            },
+            {
+              "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an",
+              "ref": "QS 1:5 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/mujtaba-mushkil-iraab/1/5"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:5:3:*) — akar, lemma, kelas kata: CONJ|PREFIX|w:CONJ+ + PRON|STEM|POS:PRON|LEM:<iy~aA|2MS",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=5"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:5",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "1:5:4",
+          "ar": "نَسْتَعِينُ",
+          "translit": "nasta‘īnu",
+          "gloss": "kami mohon pertolongan",
+          "root": [
+            "ع",
+            "و",
+            "ن"
+          ],
+          "lemma": "ٱسْتَعِينُ",
+          "pos": "fi'il mudhari'",
+          "wazn": "نَسْتَفْعِلُ",
+          "case": {
+            "state": "marfu",
+            "sign": "dhammah"
+          },
+          "why": "Akhirnya dhammah dengan alasan yang sama seperti na‘budu: fi'il mudhari' tanpa huruf penashab atau penjazm.",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 14",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/5"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:5 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/5"
+            },
+            {
+              "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an",
+              "ref": "catatan tentang nasta‘īnu ada pada pembahasan QS 1:6 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/mujtaba-mushkil-iraab/1/6"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:5:4:*) — akar, lemma, kelas kata: V|STEM|POS:V|IMPF|(X)|LEM:{sotaEiynu|ROOT:Ewn|1P",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=5"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:5:4:*) bentuk kata kerja (VF) X, fi'il mudhari' (IMPF), 1P; harakat pola wazan mengikuti token Tanzil 1:5:4",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=5"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:5",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        }
+      ],
+      "translation": {
+        "text": "Hanya kepada Engkaulah kami menyembah dan hanya kepada Engkaulah kami mohon pertolongan.",
+        "footnotes": [],
+        "source_label": "Terjemahan Berbahasa Indonesia - Kementerian Agama",
+        "version": "1.0.1"
+      },
+      "recitation": [
+        {
+          "reciter": "Husary_Muallim_128kbps",
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/001005.mp3",
+          "segments": [
+            [
+              1,
+              250,
+              1380
+            ],
+            [
+              2,
+              1390,
+              2320
+            ],
+            [
+              3,
+              2330,
+              3820
+            ],
+            [
+              4,
+              3830,
+              5430
+            ]
+          ],
+          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        },
+        {
+          "reciter": "Alafasy_128kbps",
+          "url": "https://everyayah.com/data/Alafasy_128kbps/001005.mp3",
+          "segments": [
+            [
+              1,
+              30,
+              970
+            ],
+            [
+              2,
+              980,
+              1710
+            ],
+            [
+              3,
+              1720,
+              2870
+            ],
+            [
+              4,
+              2880,
+              6290
+            ]
+          ],
+          "credit": "Recitation: Mishary Rashid Alafasy via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "loc": "1:6",
+      "surah": 1,
+      "ayah": 6,
+      "ar": "ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ",
+      "words": [
+        {
+          "loc": "1:6:1",
+          "ar": "ٱهْدِنَا",
+          "translit": "ihdinā",
+          "gloss": "tunjukilah kami",
+          "root": [
+            "ه",
+            "د",
+            "ي"
+          ],
+          "lemma": "هَدَى",
+          "pos": "fi'il amr + dhamir muttashil",
+          "wazn": "افْعِنا",
+          "case": {
+            "state": "mabni",
+            "sign": "dibuangnya huruf 'illah (ya')"
+          },
+          "why": "Fi'il amr yang bermakna doa ini mabni dengan dibuangnya huruf ya' di akhir; pelakunya tersirat ('Engkau'), dan -nā ('kami') adalah objeknya.",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 14",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/6"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:6 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/6"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:6:1:*) — akar, lemma, kelas kata: V|STEM|POS:V|IMPV|LEM:hadaY|ROOT:hdy|2MS + PRON|SUFFIX|PRON:1P",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=6"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:6:1:*) bentuk kata kerja (VF) I (QAC 0.4 menandai bentuk II–XII saja; tanpa tanda = bentuk I), fi'il amr (IMPV), 2MS; harakat pola wazan mengikuti token Tanzil 1:6:1",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=6"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:6",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "1:6:2",
+          "ar": "ٱلصِّرَٰطَ",
+          "translit": "aṣ-ṣirāṭa",
+          "gloss": "jalan",
+          "root": [
+            "ص",
+            "ر",
+            "ط"
+          ],
+          "lemma": "صِرَٰط",
+          "pos": "isim",
+          "wazn": null,
+          "case": {
+            "state": "manshub",
+            "sign": "fathah"
+          },
+          "why": "Akhirnya fathah karena menjadi objek kedua (maf'ul bih kedua) dari ihdi.",
+          "ikhtilaf": [
+            {
+              "point": "Mengapa aṣ-ṣirāṭa manshub?",
+              "options": [
+                "Objek kedua dari ihdi — al-Jadwal, al-Mujtaba, Darwisy",
+                "Manshub karena huruf jarnya dibuang (naz' al-khafidh), sebab hadā biasanya memerlukan li- atau ilā untuk objek kedua — Darwisy"
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:6 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/6"
+            },
+            {
+              "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an",
+              "ref": "QS 1:6 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/mujtaba-mushkil-iraab/1/6"
+            },
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 14–15",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/6"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:6:2:*) — akar, lemma, kelas kata: DET|PREFIX|Al+ + N|STEM|POS:N|LEM:Sira`T|ROOT:SrT|M|ACC",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=6"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:6",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "1:6:3",
+          "ar": "ٱلْمُسْتَقِيمَ",
+          "translit": "al-mustaqīma",
+          "gloss": "yang lurus",
+          "root": [
+            "ق",
+            "و",
+            "م"
+          ],
+          "lemma": "مُّسْتَقِيم",
+          "pos": "isim sifat (isim fa'il)",
+          "wazn": "مُسْتَفْعِل",
+          "case": {
+            "state": "manshub",
+            "sign": "fathah"
+          },
+          "why": "Akhirnya fathah karena menjadi sifat bagi aṣ-ṣirāṭa yang manshub.",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 15",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/6"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:6 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/6"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:6:3:*) — akar, lemma, kelas kata: DET|PREFIX|Al+ + ADJ|STEM|POS:ADJ|ACT|PCPL|(X)|LEM:m~usotaqiym|ROOT:qwm|M|ACC",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=6"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:6",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        }
+      ],
+      "translation": {
+        "text": "Tunjukilah kami jalan yang lurus,[2]",
+        "footnotes": [
+          "[2] Jalan yang lurus, yaitu jalan hidup yang benar, yang dapat membuat bahagia di dunia dan di akhirat."
+        ],
+        "source_label": "Terjemahan Berbahasa Indonesia - Kementerian Agama",
+        "version": "1.0.1"
+      },
+      "recitation": [
+        {
+          "reciter": "Husary_Muallim_128kbps",
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/001006.mp3",
+          "segments": [
+            [
+              1,
+              50,
+              780
+            ],
+            [
+              2,
+              790,
+              1940
+            ],
+            [
+              3,
+              1950,
+              3940
+            ]
+          ],
+          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        },
+        {
+          "reciter": "Alafasy_128kbps",
+          "url": "https://everyayah.com/data/Alafasy_128kbps/001006.mp3",
+          "segments": [
+            [
+              1,
+              30,
+              670
+            ],
+            [
+              2,
+              680,
+              1630
+            ],
+            [
+              3,
+              1640,
+              5120
+            ]
+          ],
+          "credit": "Recitation: Mishary Rashid Alafasy via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "loc": "1:7",
+      "surah": 1,
+      "ayah": 7,
+      "ar": "صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ",
+      "words": [
+        {
+          "loc": "1:7:1",
+          "ar": "صِرَٰطَ",
+          "translit": "ṣirāṭa",
+          "gloss": "jalan",
+          "root": [
+            "ص",
+            "ر",
+            "ط"
+          ],
+          "lemma": "صِرَٰط",
+          "pos": "isim",
+          "wazn": null,
+          "case": {
+            "state": "manshub",
+            "sign": "fathah"
+          },
+          "why": "Akhirnya fathah karena menjadi badal (pengganti) dari aṣ-ṣirāṭa di ayat 6 yang manshub.",
+          "ikhtilaf": [
+            {
+              "point": "Kedudukan ṣirāṭa di ayat 7",
+              "options": [
+                "badal kull min kull (badal yang sepadan) — Darwisy, al-Jadwal, al-Mujtaba, as-Samin; menurut Ibnu Katsir inilah pendapat para ahli nahwu",
+                "'athf bayan — dibolehkan oleh Ibnu Katsir"
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 15",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/7"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:7 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/7"
+            },
+            {
+              "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an",
+              "ref": "QS 1:7 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/mujtaba-mushkil-iraab/1/7"
+            },
+            {
+              "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun",
+              "ref": "QS 1:7 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aldur-almasoon/1/7"
+            },
+            {
+              "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim",
+              "ref": "tafsir QS 1:7 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/ibn-katheer/1/7"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:7:1:*) — akar, lemma, kelas kata: N|STEM|POS:N|LEM:Sira`T|ROOT:SrT|M|ACC",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=7"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:7",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "1:7:2",
+          "ar": "ٱلَّذِينَ",
+          "translit": "allażīna",
+          "gloss": "orang-orang yang",
+          "root": null,
+          "lemma": "ٱلَّذِى",
+          "pos": "isim maushul",
+          "wazn": null,
+          "case": {
+            "state": "mabni",
+            "sign": "fathah",
+            "mahall": "mahall jarr"
+          },
+          "why": "Isim maushul ini mabni (bentuknya tetap) dan berkedudukan jar sebagai mudhaf ilaih dari ṣirāṭa.",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 15",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/7"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:7 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/7"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:7:2:*) — akar, lemma, kelas kata: REL|STEM|POS:REL|LEM:{l~a*iY|MP",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=7"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:7",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "1:7:3",
+          "ar": "أَنْعَمْتَ",
+          "translit": "an‘amta",
+          "gloss": "telah Engkau beri nikmat",
+          "root": [
+            "ن",
+            "ع",
+            "م"
+          ],
+          "lemma": "أَنْعَمَ",
+          "pos": "fi'il madhi + dhamir muttashil",
+          "wazn": "أَفْعَلْتَ",
+          "case": {
+            "state": "mabni",
+            "sign": "sukun"
+          },
+          "why": "Fi'il madhi ini mabni di atas sukun karena bersambung dengan dhamir -ta ('Engkau', pelakunya), dan kalimatnya menjadi shilah bagi allażīna.",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 15",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/7"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:7 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/7"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:7:3:*) — akar, lemma, kelas kata: V|STEM|POS:V|PERF|(IV)|LEM:>anoEama|ROOT:nEm|2MS + PRON|SUFFIX|PRON:2MS",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=7"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:7:3:*) bentuk kata kerja (VF) IV, fi'il madhi (PERF), 2MS; harakat pola wazan mengikuti token Tanzil 1:7:3",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=7"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:7",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "1:7:4",
+          "ar": "عَلَيْهِمْ",
+          "translit": "‘alaihim",
+          "gloss": "kepada mereka",
+          "root": null,
+          "lemma": "عَلَىٰ",
+          "pos": "huruf jar + dhamir muttashil",
+          "wazn": null,
+          "case": {
+            "state": "mabni",
+            "sign": "—",
+            "mahall": "mahall nashb"
+          },
+          "why": "‘Alā adalah huruf jar dan -him ('mereka') kata ganti mabni yang dijarkan olehnya, sedangkan kedudukan nashab (mahall nashb) di kartu ini milik frasa jar-majrur ‘alaihim secara utuh, yang bergantung pada an‘amta (as-Samin: manshub al-mahall).",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 15",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/7"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:7 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/7"
+            },
+            {
+              "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun",
+              "ref": "QS 1:7 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aldur-almasoon/1/7"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:7:4:*) — akar, lemma, kelas kata: P|STEM|POS:P|LEM:EalaY` + PRON|SUFFIX|PRON:3MP",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=7"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:7",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "1:7:5",
+          "ar": "غَيْرِ",
+          "translit": "gairi",
+          "gloss": "bukan",
+          "root": [
+            "غ",
+            "ي",
+            "ر"
+          ],
+          "lemma": "غَيْر",
+          "pos": "isim",
+          "wazn": null,
+          "case": {
+            "state": "majrur",
+            "sign": "kasrah"
+          },
+          "why": "Akhirnya kasrah karena menjadi badal dari allażīna yang berkedudukan jar (sebagian ulama menjadikannya sifat).",
+          "ikhtilaf": [
+            {
+              "point": "Kedudukan gairi",
+              "options": [
+                "badal dari allażīna — al-Jadwal, al-Mujtaba, as-Samin, Darwisy",
+                "sifat (na't) bagi allażīna — Darwisy, al-Jadwal, as-Samin; Ibnu Katsir: bacaan jumhur (jar) sebagai sifat. al-Jadwal mencatat keberatan al-Mubarrad dan dua jawabannya",
+                "badal dari kata ganti -him pada ‘alaihim — Darwisy, al-Jadwal; as-Samin mencatat kesulitannya",
+                "pengecualian terputus (istitsna' munqathi') (hanya pada bacaan nashab gaira, bukan bacaan Hafs) — as-Samin dan an-Nahhas menyebutnya untuk bacaan nashab itu; Ibnu Katsir menukilnya dari sebagian ahli nahwu lalu lebih memilih sifat"
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:7 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/7"
+            },
+            {
+              "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an",
+              "ref": "QS 1:7 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/mujtaba-mushkil-iraab/1/7"
+            },
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 15",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/7"
+            },
+            {
+              "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun",
+              "ref": "QS 1:7 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aldur-almasoon/1/7"
+            },
+            {
+              "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an",
+              "ref": "QS 1:7 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/iraab-alnahas/1/7"
+            },
+            {
+              "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim",
+              "ref": "tafsir QS 1:7 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/ibn-katheer/1/7"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:7:5:*) — akar, lemma, kelas kata: N|STEM|POS:N|LEM:gayor|ROOT:gyr|M|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=7"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:7",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "1:7:6",
+          "ar": "ٱلْمَغْضُوبِ",
+          "translit": "al-magḍūbi",
+          "gloss": "yang dimurkai",
+          "root": [
+            "غ",
+            "ض",
+            "ب"
+          ],
+          "lemma": "مَغْضُوب",
+          "pos": "isim maf'ul",
+          "wazn": "مَفْعُول",
+          "case": {
+            "state": "majrur",
+            "sign": "kasrah"
+          },
+          "why": "Akhirnya kasrah karena menjadi mudhaf ilaih dari gairi.",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 15",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/7"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:7 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/7"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:7:6:*) — akar, lemma, kelas kata: DET|PREFIX|Al+ + N|STEM|POS:N|PASS|PCPL|LEM:magoDuwb|ROOT:gDb|M|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=7"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:7",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "1:7:7",
+          "ar": "عَلَيْهِمْ",
+          "translit": "‘alaihim",
+          "gloss": "atas mereka",
+          "root": null,
+          "lemma": "عَلَىٰ",
+          "pos": "huruf jar + dhamir muttashil",
+          "wazn": null,
+          "case": {
+            "state": "mabni",
+            "sign": "—",
+            "mahall": "mahall raf'"
+          },
+          "why": "‘Alā adalah huruf jar dan -him kata ganti mabni yang dijarkan olehnya, sedangkan kedudukan rafa' (mahall raf') di kartu ini milik frasa jar-majrur ‘alaihim secara utuh sebagai na'ib fa'il (pengganti pelaku) bagi al-magḍūbi, karena al-magḍūb adalah isim maf'ul.",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 15",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/7"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:7 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/7"
+            },
+            {
+              "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an",
+              "ref": "QS 1:7 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/mujtaba-mushkil-iraab/1/7"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:7:7:*) — akar, lemma, kelas kata: P|STEM|POS:P|LEM:EalaY` + PRON|SUFFIX|PRON:3MP",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=7"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:7",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "1:7:8",
+          "ar": "وَلَا",
+          "translit": "wa lā",
+          "gloss": "dan bukan pula",
+          "root": null,
+          "lemma": "لَا",
+          "pos": "huruf 'athaf + huruf nafi",
+          "wazn": null,
+          "case": {
+            "state": "none",
+            "sign": "—"
+          },
+          "why": "Wawu adalah huruf 'athaf, dan lā di sini tambahan untuk menegaskan makna 'bukan' yang sudah ada pada gairi.",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 15",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/7"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:7 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/7"
+            },
+            {
+              "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an",
+              "ref": "QS 1:7 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/mujtaba-mushkil-iraab/1/7"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:7:8:*) — akar, lemma, kelas kata: CONJ|PREFIX|w:CONJ+ + NEG|STEM|POS:NEG|LEM:laA",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=7"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:7",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "1:7:9",
+          "ar": "ٱلضَّآلِّينَ",
+          "translit": "aḍ-ḍāllīna",
+          "gloss": "orang-orang yang sesat",
+          "root": [
+            "ض",
+            "ل",
+            "ل"
+          ],
+          "lemma": "ضَآلّ",
+          "pos": "isim fa'il (jamak)",
+          "wazn": "فَاعِل",
+          "case": {
+            "state": "majrur",
+            "sign": "ya'"
+          },
+          "why": "Majrur dengan tanda ya' karena jamak mudzakkar salim yang di-'athaf-kan pada kata majrur sebelumnya.",
+          "ikhtilaf": [
+            {
+              "point": "Aḍ-ḍāllīna di-'athaf-kan kepada kata apa?",
+              "options": [
+                "al-magḍūbi — Darwisy, al-Mujtaba",
+                "gairi — al-Jadwal"
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 1, hlm. 15",
+              "url": "https://tafsir.app/iraab-aldarweesh/1/7"
+            },
+            {
+              "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an",
+              "ref": "QS 1:7 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/mujtaba-mushkil-iraab/1/7"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi",
+              "ref": "QS 1:7 (halaman cetak belum diverifikasi)",
+              "url": "https://tafsir.app/aljadwal/1/7"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(1:7:9:*) — akar, lemma, kelas kata: DET|PREFIX|Al+ + N|STEM|POS:N|ACT|PCPL|LEM:DaA^l~|ROOT:Dll|MP|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=7"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 1:7",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1"
+            }
+          ],
+          "status": "draft"
+        }
+      ],
+      "translation": {
+        "text": "(yaitu) jalan orang-orang yang telah Engkau beri nikmat kepadanya; bukan (jalan) mereka yang dimurkai, dan bukan (pula jalan) mereka yang sesat.[3]",
+        "footnotes": [
+          "[3] Mereka yang dimurkai, adalah mereka yang sengaja menentang ajaran Islam. Mereka yang sesat adalah mereka yang sengaja mengambil jalan lain selain ajaran Islam."
+        ],
+        "source_label": "Terjemahan Berbahasa Indonesia - Kementerian Agama",
+        "version": "1.0.1"
+      },
+      "recitation": [
+        {
+          "reciter": "Husary_Muallim_128kbps",
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/001007.mp3",
+          "segments": [
+            [
+              1,
+              450,
+              1050
+            ],
+            [
+              2,
+              1060,
+              2070
+            ],
+            [
+              3,
+              2080,
+              3160
+            ],
+            [
+              4,
+              3170,
+              4300
+            ],
+            [
+              5,
+              8400,
+              8700
+            ],
+            [
+              6,
+              8710,
+              10330
+            ],
+            [
+              7,
+              10340,
+              11500
+            ],
+            [
+              8,
+              11510,
+              11870
+            ],
+            [
+              9,
+              11880,
+              16640
+            ]
+          ],
+          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        },
+        {
+          "reciter": "Alafasy_128kbps",
+          "url": "https://everyayah.com/data/Alafasy_128kbps/001007.mp3",
+          "segments": [
+            [
+              1,
+              30,
+              740
+            ],
+            [
+              2,
+              750,
+              1700
+            ],
+            [
+              3,
+              1710,
+              2620
+            ],
+            [
+              4,
+              2630,
+              3590
+            ],
+            [
+              5,
+              3600,
+              4210
+            ],
+            [
+              6,
+              4220,
+              5290
+            ],
+            [
+              7,
+              5300,
+              6320
+            ],
+            [
+              8,
+              6330,
+              6630
+            ],
+            [
+              9,
+              6640,
+              12320
+            ]
+          ],
+          "credit": "Recitation: Mishary Rashid Alafasy via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        }
+      ],
+      "status": "draft"
+    }
+  ],
+  "facts": [
+    {
+      "id": "tujuh-ayat",
+      "title": "Tujuh ayat menurut semua hitungan",
+      "body": "Al-Fatihah terdiri atas 7 ayat. Ibnu Katsir menyebut jumlah ini tanpa perselisihan; yang berbeda hanya letak batas ayatnya. Menurut ad-Dani, hitungan Kufah dan Makkah menjadikan basmalah ayat pertama, sedangkan hitungan lain menjadikan «أَنْعَمْتَ عَلَيْهِمْ» sebagai akhir ayat. Modul ini memakai hitungan Kufah (riwayat Hafs), dengan basmalah sebagai 1:1.",
+      "locations": [
+        "1:1",
+        "1:2",
+        "1:3",
+        "1:4",
+        "1:5",
+        "1:6",
+        "1:7"
+      ],
+      "method": "Jumlah baris surah 1 dalam Tanzil Uthmani 1.1 = 7. Keterangan tentang batas ayat dikutip dari ad-Dani dan Ibnu Katsir, bukan hasil hitungan data.",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; baris 1|1 sampai 1|7",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "Abu 'Amr ad-Dani, al-Bayan fi 'Add Ay al-Qur'an",
+          "ref": "Surat al-Hamd, hlm. 139",
+          "url": "https://shamela.ws/book/5542/121"
+        },
+        {
+          "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim",
+          "ref": "pendahuluan tafsir QS 1:1",
+          "url": "https://tafsir.app/ibn-katheer/1/1"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "jumlah-kata",
+      "title": "29 kata, atau 25 tanpa basmalah",
+      "body": "Teks Al-Fatihah terdiri atas 29 kata (4 + 4 + 2 + 3 + 4 + 3 + 9). Tanpa basmalah jumlahnya 25 kata, sama dengan angka yang dinukil Ibnu Katsir.",
+      "locations": [
+        "1:1",
+        "1:2",
+        "1:3",
+        "1:4",
+        "1:5",
+        "1:6",
+        "1:7"
+      ],
+      "method": "Kata = token yang dipisah spasi dalam teks Tanzil Uthmani 1.1, ayat 1:1–1:7. Penomoran kata QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 1 identik byte-per-byte dengan 1.1 yang dipakai) untuk surah 1 juga berisi 29 kata dan cocok satu per satu.",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token dipisah spasi, 1:1–1:7",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; jumlah lokasi (1:a:w) unik untuk surah 1",
+          "url": "https://corpus.quran.com/"
+        },
+        {
+          "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim",
+          "ref": "pendahuluan tafsir QS 1:1 ('kalimatnya 25')",
+          "url": "https://tafsir.app/ibn-katheer/1/1"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "huruf-tidak-muncul",
+      "title": "7 huruf yang tidak muncul",
+      "body": "Dari 28 huruf hijaiyah, ada 7 huruf yang tidak muncul sama sekali dalam teks Al-Fatihah: ث ج خ ز ش ظ ف.",
+      "locations": [
+        "1:1",
+        "1:2",
+        "1:3",
+        "1:4",
+        "1:5",
+        "1:6",
+        "1:7"
+      ],
+      "method": "Himpunan huruf dasar dalam teks Tanzil 1:1–1:7 dibandingkan dengan 28 huruf hijaiyah. Harakat dan tanda diabaikan; semua bentuk alif dan hamzah dihitung sebagai alif, ta marbuthah sebagai ta, alif maqshurah sebagai ya. Hanya faktanya yang dimuat, tanpa tafsiran populer tentang huruf-huruf ini.",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; karakter 1:1–1:7",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "as-Suyuthi, al-Itqan fi 'Ulum al-Qur'an",
+          "ref": "jil. 1, hlm. 189 (menyebut tujuh huruf ini)",
+          "url": "https://shamela.ws/book/11728/182"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "basmalah-114",
+      "title": "Basmalah tertulis 114 kali",
+      "body": "Dalam mushaf, basmalah tertulis 114 kali: sebagai pembuka 112 surah (semua surah selain Al-Fatihah dan At-Taubah), sebagai ayat pertama Al-Fatihah (1:1), dan di dalam ayat 27:30, pada surat Nabi Sulaiman yang dibacakan Ratu negeri Saba'. Surah At-Taubah dibuka tanpa basmalah.",
+      "locations": [
+        "1:1",
+        "27:30"
+      ],
+      "method": "Tanzil menaruh basmalah di awal ayat 1 pada 112 surah (semua kecuali surah 1 dan 9); itu dihitung sebagai pembuka surah, bukan bagian ayat, lalu dibuang dari teks ayat. Setelah itu empat kata basmalah dicari berurutan di teks ayat: 2 tempat (1:1 dan 27:30). 112 + 2 = 114. Pada pembuka surah 95 dan 97 Tanzil menulis ba' bertasydid; pencocokan tanpa harakat tetap mengenalinya. Pencocokan memakai kunci pencarian: tatweel (U+0640), harakat dan tanda baca Qur'ani (U+064B–U+065F, U+06D6–U+06ED) dibuang; bentuk alif (ٱ أ إ آ dan alif kecil U+0670) disamakan menjadi ا.",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; awal ayat 1 setiap surah; empat token basmalah (dari 1:1) berurutan",
+          "url": "https://tanzil.net/download/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "bismillah-dalam-ayat",
+      "title": "Bismillāh di 3 ayat",
+      "body": "Ungkapan «بِسْمِ ٱللَّهِ» muncul di 3 tempat dalam teks ayat: 1:1, 11:41 (kisah bahtera Nabi Nuh) dan 27:30 (surat Nabi Sulaiman).",
+      "locations": [
+        "1:1",
+        "11:41",
+        "27:30"
+      ],
+      "method": "Dua token berurutan bismi + lafaz Allah (diambil dari 1:1), token pertama boleh berawalan wa- atau fa-, di teks Tanzil setelah basmalah pembuka surah dibuang. Kunci pencarian: tatweel (U+0640), harakat dan tanda baca Qur'ani (U+064B–U+065F, U+06D6–U+06ED) dibuang; bentuk alif (ٱ أ إ آ dan alif kecil U+0670) disamakan menjadi ا.",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token 1:1:1 + 1:1:2 berurutan",
+          "url": "https://tanzil.net/download/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "rahman-rahim-berdampingan",
+      "title": "Ar-raḥmān ar-raḥīm berdampingan",
+      "body": "Pasangan «ٱلرَّحْمَٰنِ ٱلرَّحِيمِ» (dengan harakat akhir apa pun) muncul berdampingan di 6 ayat: 1:1, 1:3, 2:163, 27:30, 41:2 dan 59:22.",
+      "locations": [
+        "1:1",
+        "1:3",
+        "2:163",
+        "27:30",
+        "41:2",
+        "59:22"
+      ],
+      "method": "Dua token berurutan ar-raḥmān + ar-raḥīm (diambil dari 1:1) di teks Tanzil setelah basmalah pembuka surah dibuang; harakat diabaikan sehingga akhiran -u/-a/-i ikut terhitung.",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token 1:1:3 + 1:1:4 berurutan",
+          "url": "https://tanzil.net/download/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "ar-rahman",
+      "title": "Ar-raḥmān: 57 kali",
+      "body": "Kata raḥmān muncul 57 kali dalam 56 ayat Al-Qur'an, tidak termasuk basmalah pembuka surah. 16 di antaranya ada di Surah Maryam.",
+      "locations": [
+        "1:1",
+        "1:3",
+        "2:163",
+        "13:30",
+        "17:110",
+        "19:18",
+        "19:26",
+        "19:44",
+        "19:45",
+        "19:58",
+        "19:61",
+        "19:69",
+        "19:75",
+        "19:78",
+        "19:85",
+        "19:87",
+        "19:88",
+        "19:91",
+        "19:92",
+        "19:93",
+        "19:96",
+        "20:5",
+        "20:90",
+        "20:108",
+        "20:109",
+        "21:26",
+        "21:36",
+        "21:42",
+        "21:112",
+        "25:26",
+        "25:59",
+        "25:60",
+        "25:63",
+        "26:5",
+        "27:30",
+        "36:11",
+        "36:15",
+        "36:23",
+        "36:52",
+        "41:2",
+        "43:17",
+        "43:19",
+        "43:20",
+        "43:33",
+        "43:36",
+        "43:45",
+        "43:81",
+        "50:33",
+        "55:1",
+        "59:22",
+        "67:3",
+        "67:19",
+        "67:20",
+        "67:29",
+        "78:37",
+        "78:38"
+      ],
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 1 identik byte-per-byte dengan 1.1 yang dipakai): jumlah segmen STEM dengan LEM:r~aHoma`n (lemma kata 1:1:3); ayat dihitung sekali walau memuat kata ini lebih dari sekali. QAC tidak memuat basmalah pembuka surah, tetapi memuat 1:1 dan 27:30.",
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; LEM:r~aHoma`n",
+          "url": "https://corpus.quran.com/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "ar-rahim",
+      "title": "Ar-raḥīm: 116 kali",
+      "body": "Kata raḥīm muncul 116 kali dalam Al-Qur'an, tidak termasuk basmalah pembuka surah.",
+      "locations": [
+        "1:1",
+        "1:3",
+        "2:37",
+        "2:54",
+        "2:128",
+        "2:143",
+        "2:160",
+        "2:163",
+        "2:173",
+        "2:182",
+        "2:192",
+        "2:199",
+        "2:218",
+        "2:226",
+        "3:31",
+        "3:89",
+        "3:129",
+        "4:16",
+        "4:23",
+        "4:25",
+        "4:29",
+        "4:64",
+        "4:96",
+        "4:100",
+        "4:106",
+        "4:110",
+        "4:129",
+        "4:152",
+        "5:3",
+        "5:34",
+        "5:39",
+        "5:74",
+        "5:98",
+        "6:54",
+        "6:145",
+        "6:165",
+        "7:153",
+        "7:167",
+        "8:69",
+        "8:70",
+        "9:5",
+        "9:27",
+        "9:91",
+        "9:99",
+        "9:102",
+        "9:104",
+        "9:117",
+        "9:118",
+        "9:128",
+        "10:107",
+        "11:41",
+        "11:90",
+        "12:53",
+        "12:98",
+        "14:36",
+        "15:49",
+        "16:7",
+        "16:18",
+        "16:47",
+        "16:110",
+        "16:115",
+        "16:119",
+        "17:66",
+        "22:65",
+        "24:5",
+        "24:20",
+        "24:22",
+        "24:33",
+        "24:62",
+        "25:6",
+        "25:70",
+        "26:9",
+        "26:68",
+        "26:104",
+        "26:122",
+        "26:140",
+        "26:159",
+        "26:175",
+        "26:191",
+        "26:217",
+        "27:11",
+        "27:30",
+        "28:16",
+        "30:5",
+        "32:6",
+        "33:5",
+        "33:24",
+        "33:43",
+        "33:50",
+        "33:59",
+        "33:73",
+        "34:2",
+        "36:5",
+        "36:58",
+        "39:53",
+        "41:2",
+        "41:32",
+        "42:5",
+        "44:42",
+        "46:8",
+        "48:14",
+        "48:29",
+        "49:5",
+        "49:12",
+        "49:14",
+        "52:28",
+        "57:9",
+        "57:28",
+        "58:12",
+        "59:10",
+        "59:22",
+        "60:7",
+        "60:12",
+        "64:14",
+        "66:1",
+        "73:20"
+      ],
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 1 identik byte-per-byte dengan 1.1 yang dipakai): jumlah segmen STEM dengan LEM:r~aHiym (lemma kata 1:1:4).",
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; LEM:r~aHiym",
+          "url": "https://corpus.quran.com/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "akar-rhm",
+      "title": "Keluarga kata ر ح م: 339 kali",
+      "body": "Kata-kata dari akar ر ح م, misalnya raḥmah, raḥmān, dan raḥīm, muncul 339 kali dalam 313 ayat Al-Qur'an (9 lemma). Ini hitungan satu keluarga kata, bukan satu kata; tidak semuanya berarti 'kasih sayang' secara langsung (mis. arḥām: rahim/kerabat).",
+      "locations": [
+        "1:1",
+        "1:3",
+        "2:37",
+        "2:54",
+        "2:64",
+        "2:105",
+        "2:128",
+        "2:143",
+        "2:157",
+        "2:160",
+        "2:163",
+        "2:173",
+        "2:178",
+        "2:182",
+        "2:192",
+        "2:199",
+        "2:218",
+        "2:226",
+        "2:228",
+        "2:286",
+        "3:6",
+        "3:8",
+        "3:31",
+        "3:74",
+        "3:89",
+        "3:107",
+        "3:129",
+        "3:132",
+        "3:157",
+        "3:159",
+        "4:1",
+        "4:16",
+        "4:23",
+        "4:25",
+        "4:29",
+        "4:64",
+        "4:83",
+        "4:96",
+        "4:100",
+        "4:106",
+        "4:110",
+        "4:113",
+        "4:129",
+        "4:152",
+        "4:175",
+        "5:3",
+        "5:34",
+        "5:39",
+        "5:74",
+        "5:98",
+        "6:12",
+        "6:16",
+        "6:54",
+        "6:133",
+        "6:143",
+        "6:144",
+        "6:145",
+        "6:147",
+        "6:154",
+        "6:155",
+        "6:157",
+        "6:165",
+        "7:23",
+        "7:49",
+        "7:52",
+        "7:56",
+        "7:57",
+        "7:63",
+        "7:72",
+        "7:149",
+        "7:151",
+        "7:153",
+        "7:154",
+        "7:155",
+        "7:156",
+        "7:167",
+        "7:203",
+        "7:204",
+        "8:69",
+        "8:70",
+        "8:75",
+        "9:5",
+        "9:21",
+        "9:27",
+        "9:61",
+        "9:71",
+        "9:91",
+        "9:99",
+        "9:102",
+        "9:104",
+        "9:117",
+        "9:118",
+        "9:128",
+        "10:21",
+        "10:57",
+        "10:58",
+        "10:86",
+        "10:107",
+        "11:9",
+        "11:17",
+        "11:28",
+        "11:41",
+        "11:43",
+        "11:47",
+        "11:58",
+        "11:63",
+        "11:66",
+        "11:73",
+        "11:90",
+        "11:94",
+        "11:119",
+        "12:53",
+        "12:56",
+        "12:64",
+        "12:92",
+        "12:98",
+        "12:111",
+        "13:8",
+        "13:30",
+        "14:36",
+        "15:49",
+        "15:56",
+        "16:7",
+        "16:18",
+        "16:47",
+        "16:64",
+        "16:89",
+        "16:110",
+        "16:115",
+        "16:119",
+        "17:8",
+        "17:24",
+        "17:28",
+        "17:54",
+        "17:57",
+        "17:66",
+        "17:82",
+        "17:87",
+        "17:100",
+        "17:110",
+        "18:10",
+        "18:16",
+        "18:58",
+        "18:65",
+        "18:81",
+        "18:82",
+        "18:98",
+        "19:2",
+        "19:18",
+        "19:21",
+        "19:26",
+        "19:44",
+        "19:45",
+        "19:50",
+        "19:53",
+        "19:58",
+        "19:61",
+        "19:69",
+        "19:75",
+        "19:78",
+        "19:85",
+        "19:87",
+        "19:88",
+        "19:91",
+        "19:92",
+        "19:93",
+        "19:96",
+        "20:5",
+        "20:90",
+        "20:108",
+        "20:109",
+        "21:26",
+        "21:36",
+        "21:42",
+        "21:75",
+        "21:83",
+        "21:84",
+        "21:86",
+        "21:107",
+        "21:112",
+        "22:5",
+        "22:65",
+        "23:75",
+        "23:109",
+        "23:118",
+        "24:5",
+        "24:10",
+        "24:14",
+        "24:20",
+        "24:21",
+        "24:22",
+        "24:33",
+        "24:56",
+        "24:62",
+        "25:6",
+        "25:26",
+        "25:48",
+        "25:59",
+        "25:60",
+        "25:63",
+        "25:70",
+        "26:5",
+        "26:9",
+        "26:68",
+        "26:104",
+        "26:122",
+        "26:140",
+        "26:159",
+        "26:175",
+        "26:191",
+        "26:217",
+        "27:11",
+        "27:19",
+        "27:30",
+        "27:46",
+        "27:63",
+        "27:77",
+        "28:16",
+        "28:43",
+        "28:46",
+        "28:73",
+        "28:86",
+        "29:21",
+        "29:23",
+        "29:51",
+        "30:5",
+        "30:21",
+        "30:33",
+        "30:36",
+        "30:46",
+        "30:50",
+        "31:3",
+        "31:34",
+        "32:6",
+        "33:5",
+        "33:6",
+        "33:17",
+        "33:24",
+        "33:43",
+        "33:50",
+        "33:59",
+        "33:73",
+        "34:2",
+        "35:2",
+        "36:5",
+        "36:11",
+        "36:15",
+        "36:23",
+        "36:44",
+        "36:45",
+        "36:52",
+        "36:58",
+        "38:9",
+        "38:43",
+        "39:9",
+        "39:38",
+        "39:53",
+        "40:7",
+        "40:9",
+        "41:2",
+        "41:32",
+        "41:50",
+        "42:5",
+        "42:8",
+        "42:28",
+        "42:48",
+        "43:17",
+        "43:19",
+        "43:20",
+        "43:32",
+        "43:33",
+        "43:36",
+        "43:45",
+        "43:81",
+        "44:6",
+        "44:42",
+        "45:20",
+        "45:30",
+        "46:8",
+        "46:12",
+        "47:22",
+        "48:14",
+        "48:25",
+        "48:29",
+        "49:5",
+        "49:10",
+        "49:12",
+        "49:14",
+        "50:33",
+        "52:28",
+        "55:1",
+        "57:9",
+        "57:13",
+        "57:27",
+        "57:28",
+        "58:12",
+        "59:10",
+        "59:22",
+        "60:3",
+        "60:7",
+        "60:12",
+        "64:14",
+        "66:1",
+        "67:3",
+        "67:19",
+        "67:20",
+        "67:28",
+        "67:29",
+        "73:20",
+        "76:31",
+        "78:37",
+        "78:38",
+        "90:17"
+      ],
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 1 identik byte-per-byte dengan 1.1 yang dipakai): jumlah segmen STEM dengan ROOT:rHm (akar kata 1:1:3); ayat dihitung sekali walau memuat lebih dari satu kata seakar.",
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; ROOT:rHm",
+          "url": "https://corpus.quran.com/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "alhamdulillah",
+      "title": "Alḥamdulillāh di 23 ayat",
+      "body": "«ٱلْحَمْدُ لِلَّهِ», dengan atau tanpa awalan wa-, muncul di 23 ayat. 5 surah dibuka dengannya: Al-Fatihah (1:2), Al-An'am (6:1), Al-Kahf (18:1), Saba' (34:1) dan Fathir (35:1).",
+      "locations": [
+        "1:2",
+        "6:1",
+        "6:45",
+        "7:43",
+        "10:10",
+        "14:39",
+        "16:75",
+        "17:111",
+        "18:1",
+        "23:28",
+        "27:15",
+        "27:59",
+        "27:93",
+        "29:63",
+        "31:25",
+        "34:1",
+        "35:1",
+        "35:34",
+        "37:182",
+        "39:29",
+        "39:74",
+        "39:75",
+        "40:65"
+      ],
+      "method": "Dua token berurutan al-ḥamdu + lillāhi (diambil dari 1:2); token pertama boleh berawalan wa- atau fa-; dihitung per ayat. 'Dibuka' = ayat pertama setelah basmalah (untuk Al-Fatihah: 1:2).",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token 1:2:1 + 1:2:2 berurutan",
+          "url": "https://tanzil.net/download/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "ayat-2-utuh",
+      "title": "Kalimat ayat 2 utuh di 6 ayat",
+      "body": "Kalimat «ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ», dengan atau tanpa awalan wa-, muncul di 6 ayat: 1:2, 6:45, 10:10, 37:182, 39:75 dan 40:65.",
+      "locations": [
+        "1:2",
+        "6:45",
+        "10:10",
+        "37:182",
+        "39:75",
+        "40:65"
+      ],
+      "method": "Empat token ayat 1:2 berurutan; token pertama boleh berawalan wa- atau fa-; harakat diabaikan.",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token 1:2:1–1:2:4 berurutan",
+          "url": "https://tanzil.net/download/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "rabbil-alamin",
+      "title": "Rabbil-‘ālamīn di 42 ayat",
+      "body": "Ungkapan «رَبِّ ٱلْعَٰلَمِينَ», dengan harakat akhir apa pun dan dengan atau tanpa awalan bi- atau li-, muncul di 42 ayat (42 kali).",
+      "locations": [
+        "1:2",
+        "2:131",
+        "5:28",
+        "6:45",
+        "6:71",
+        "6:162",
+        "7:54",
+        "7:61",
+        "7:67",
+        "7:104",
+        "7:121",
+        "10:10",
+        "10:37",
+        "26:16",
+        "26:23",
+        "26:47",
+        "26:77",
+        "26:98",
+        "26:109",
+        "26:127",
+        "26:145",
+        "26:164",
+        "26:180",
+        "26:192",
+        "27:8",
+        "27:44",
+        "28:30",
+        "32:2",
+        "37:87",
+        "37:182",
+        "39:75",
+        "40:64",
+        "40:65",
+        "40:66",
+        "41:9",
+        "43:46",
+        "45:36",
+        "56:80",
+        "59:16",
+        "69:43",
+        "81:29",
+        "83:6"
+      ],
+      "method": "Dua token berurutan rabb + al-‘ālamīn (diambil dari 1:2); token pertama boleh berawalan wa-, fa-, bi-, atau li-. Tanpa awalan sama sekali: 34 ayat.",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token 1:2:3 + 1:2:4 berurutan",
+          "url": "https://tanzil.net/download/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "rabb",
+      "title": "Rabb: kata benda tersering setelah lafaz Allah",
+      "body": "Kata rabb (Tuhan, Pemelihara) muncul 975 kali dalam 866 ayat Al-Qur'an. Di antara lemma kata benda, hanya lafaz Allah (2.699 kali) yang lebih sering.",
+      "locations": [
+        "1:2",
+        "2:5",
+        "2:21",
+        "2:26",
+        "2:30",
+        "2:37",
+        "2:46",
+        "2:49",
+        "2:61",
+        "2:62",
+        "2:68",
+        "2:69",
+        "2:70",
+        "2:76",
+        "2:105",
+        "2:112",
+        "2:124",
+        "2:126",
+        "2:127",
+        "2:128",
+        "2:129",
+        "2:131",
+        "2:136",
+        "2:139",
+        "2:144",
+        "2:147",
+        "2:149",
+        "2:157",
+        "2:178",
+        "2:198",
+        "2:200",
+        "2:201",
+        "2:248",
+        "2:250",
+        "2:258",
+        "2:260",
+        "2:262",
+        "2:274",
+        "2:275",
+        "2:277",
+        "2:282",
+        "2:283",
+        "2:285",
+        "2:286",
+        "3:7",
+        "3:8",
+        "3:9",
+        "3:15",
+        "3:16",
+        "3:35",
+        "3:36",
+        "3:37",
+        "3:38",
+        "3:40",
+        "3:41",
+        "3:43",
+        "3:47",
+        "3:49",
+        "3:50",
+        "3:51",
+        "3:53",
+        "3:60",
+        "3:64",
+        "3:73",
+        "3:80",
+        "3:84",
+        "3:124",
+        "3:125",
+        "3:133",
+        "3:136",
+        "3:147",
+        "3:169",
+        "3:191",
+        "3:192",
+        "3:193",
+        "3:194",
+        "3:195",
+        "3:198",
+        "3:199",
+        "4:1",
+        "4:65",
+        "4:75",
+        "4:77",
+        "4:170",
+        "4:174",
+        "5:2",
+        "5:24",
+        "5:25",
+        "5:28",
+        "5:64",
+        "5:66",
+        "5:67",
+        "5:68",
+        "5:72",
+        "5:83",
+        "5:84",
+        "5:112",
+        "5:114",
+        "5:117",
+        "6:1",
+        "6:4",
+        "6:15",
+        "6:23",
+        "6:27",
+        "6:30",
+        "6:37",
+        "6:38",
+        "6:45",
+        "6:51",
+        "6:52",
+        "6:54",
+        "6:57",
+        "6:71",
+        "6:76",
+        "6:77",
+        "6:78",
+        "6:80",
+        "6:83",
+        "6:102",
+        "6:104",
+        "6:106",
+        "6:108",
+        "6:112",
+        "6:114",
+        "6:115",
+        "6:117",
+        "6:119",
+        "6:126",
+        "6:127",
+        "6:128",
+        "6:131",
+        "6:132",
+        "6:133",
+        "6:145",
+        "6:147",
+        "6:150",
+        "6:151",
+        "6:154",
+        "6:157",
+        "6:158",
+        "6:161",
+        "6:162",
+        "6:164",
+        "6:165",
+        "7:3",
+        "7:20",
+        "7:22",
+        "7:23",
+        "7:29",
+        "7:33",
+        "7:38",
+        "7:43",
+        "7:44",
+        "7:47",
+        "7:53",
+        "7:54",
+        "7:55",
+        "7:58",
+        "7:61",
+        "7:62",
+        "7:63",
+        "7:67",
+        "7:68",
+        "7:69",
+        "7:71",
+        "7:73",
+        "7:75",
+        "7:77",
+        "7:79",
+        "7:85",
+        "7:89",
+        "7:93",
+        "7:104",
+        "7:105",
+        "7:121",
+        "7:122",
+        "7:125",
+        "7:126",
+        "7:129",
+        "7:134",
+        "7:137",
+        "7:141",
+        "7:142",
+        "7:143",
+        "7:149",
+        "7:150",
+        "7:151",
+        "7:152",
+        "7:153",
+        "7:154",
+        "7:155",
+        "7:164",
+        "7:167",
+        "7:172",
+        "7:187",
+        "7:189",
+        "7:203",
+        "7:205",
+        "7:206",
+        "8:2",
+        "8:4",
+        "8:5",
+        "8:9",
+        "8:12",
+        "8:54",
+        "9:21",
+        "9:31",
+        "9:129",
+        "10:2",
+        "10:3",
+        "10:9",
+        "10:10",
+        "10:15",
+        "10:19",
+        "10:20",
+        "10:32",
+        "10:33",
+        "10:37",
+        "10:40",
+        "10:53",
+        "10:57",
+        "10:61",
+        "10:85",
+        "10:88",
+        "10:93",
+        "10:94",
+        "10:96",
+        "10:99",
+        "10:108",
+        "11:3",
+        "11:17",
+        "11:18",
+        "11:23",
+        "11:28",
+        "11:29",
+        "11:34",
+        "11:41",
+        "11:45",
+        "11:47",
+        "11:52",
+        "11:56",
+        "11:57",
+        "11:59",
+        "11:60",
+        "11:61",
+        "11:63",
+        "11:66",
+        "11:68",
+        "11:76",
+        "11:81",
+        "11:83",
+        "11:88",
+        "11:90",
+        "11:92",
+        "11:101",
+        "11:102",
+        "11:107",
+        "11:108",
+        "11:110",
+        "11:111",
+        "11:117",
+        "11:118",
+        "11:119",
+        "11:123",
+        "12:6",
+        "12:23",
+        "12:24",
+        "12:33",
+        "12:34",
+        "12:37",
+        "12:39",
+        "12:41",
+        "12:42",
+        "12:50",
+        "12:53",
+        "12:98",
+        "12:100",
+        "12:101",
+        "13:1",
+        "13:2",
+        "13:5",
+        "13:6",
+        "13:7",
+        "13:16",
+        "13:18",
+        "13:19",
+        "13:21",
+        "13:22",
+        "13:27",
+        "13:30",
+        "14:1",
+        "14:6",
+        "14:7",
+        "14:13",
+        "14:18",
+        "14:23",
+        "14:25",
+        "14:35",
+        "14:36",
+        "14:37",
+        "14:38",
+        "14:39",
+        "14:40",
+        "14:41",
+        "14:44",
+        "15:25",
+        "15:28",
+        "15:36",
+        "15:39",
+        "15:56",
+        "15:86",
+        "15:92",
+        "15:98",
+        "15:99",
+        "16:7",
+        "16:24",
+        "16:30",
+        "16:33",
+        "16:42",
+        "16:47",
+        "16:50",
+        "16:54",
+        "16:68",
+        "16:69",
+        "16:86",
+        "16:99",
+        "16:102",
+        "16:110",
+        "16:119",
+        "16:124",
+        "16:125",
+        "17:8",
+        "17:12",
+        "17:17",
+        "17:20",
+        "17:23",
+        "17:24",
+        "17:25",
+        "17:27",
+        "17:28",
+        "17:30",
+        "17:38",
+        "17:39",
+        "17:40",
+        "17:46",
+        "17:54",
+        "17:55",
+        "17:57",
+        "17:60",
+        "17:65",
+        "17:66",
+        "17:79",
+        "17:80",
+        "17:84",
+        "17:85",
+        "17:87",
+        "17:93",
+        "17:100",
+        "17:102",
+        "17:108",
+        "18:10",
+        "18:13",
+        "18:14",
+        "18:16",
+        "18:19",
+        "18:21",
+        "18:22",
+        "18:24",
+        "18:27",
+        "18:28",
+        "18:29",
+        "18:36",
+        "18:38",
+        "18:40",
+        "18:42",
+        "18:46",
+        "18:48",
+        "18:49",
+        "18:50",
+        "18:55",
+        "18:57",
+        "18:58",
+        "18:81",
+        "18:82",
+        "18:87",
+        "18:95",
+        "18:98",
+        "18:105",
+        "18:109",
+        "18:110",
+        "19:2",
+        "19:3",
+        "19:4",
+        "19:6",
+        "19:8",
+        "19:9",
+        "19:10",
+        "19:19",
+        "19:21",
+        "19:24",
+        "19:36",
+        "19:47",
+        "19:48",
+        "19:55",
+        "19:64",
+        "19:65",
+        "19:68",
+        "19:71",
+        "19:76",
+        "20:12",
+        "20:25",
+        "20:45",
+        "20:47",
+        "20:49",
+        "20:50",
+        "20:52",
+        "20:70",
+        "20:73",
+        "20:74",
+        "20:84",
+        "20:86",
+        "20:90",
+        "20:105",
+        "20:114",
+        "20:121",
+        "20:122",
+        "20:125",
+        "20:127",
+        "20:129",
+        "20:130",
+        "20:131",
+        "20:133",
+        "20:134",
+        "21:2",
+        "21:4",
+        "21:22",
+        "21:42",
+        "21:46",
+        "21:49",
+        "21:56",
+        "21:83",
+        "21:89",
+        "21:92",
+        "21:112",
+        "22:1",
+        "22:19",
+        "22:30",
+        "22:40",
+        "22:47",
+        "22:54",
+        "22:67",
+        "22:77",
+        "23:26",
+        "23:29",
+        "23:39",
+        "23:52",
+        "23:57",
+        "23:58",
+        "23:59",
+        "23:60",
+        "23:72",
+        "23:76",
+        "23:86",
+        "23:93",
+        "23:94",
+        "23:97",
+        "23:98",
+        "23:99",
+        "23:106",
+        "23:107",
+        "23:109",
+        "23:116",
+        "23:117",
+        "23:118",
+        "25:16",
+        "25:20",
+        "25:21",
+        "25:30",
+        "25:31",
+        "25:45",
+        "25:54",
+        "25:55",
+        "25:57",
+        "25:64",
+        "25:65",
+        "25:73",
+        "25:74",
+        "25:77",
+        "26:9",
+        "26:10",
+        "26:12",
+        "26:16",
+        "26:21",
+        "26:23",
+        "26:24",
+        "26:26",
+        "26:28",
+        "26:47",
+        "26:48",
+        "26:50",
+        "26:51",
+        "26:62",
+        "26:68",
+        "26:77",
+        "26:83",
+        "26:98",
+        "26:104",
+        "26:109",
+        "26:113",
+        "26:117",
+        "26:122",
+        "26:127",
+        "26:140",
+        "26:145",
+        "26:159",
+        "26:164",
+        "26:166",
+        "26:169",
+        "26:175",
+        "26:180",
+        "26:188",
+        "26:191",
+        "26:192",
+        "27:8",
+        "27:19",
+        "27:26",
+        "27:40",
+        "27:44",
+        "27:73",
+        "27:74",
+        "27:78",
+        "27:91",
+        "27:93",
+        "28:16",
+        "28:17",
+        "28:21",
+        "28:22",
+        "28:24",
+        "28:30",
+        "28:32",
+        "28:33",
+        "28:37",
+        "28:46",
+        "28:47",
+        "28:53",
+        "28:59",
+        "28:63",
+        "28:68",
+        "28:69",
+        "28:85",
+        "28:86",
+        "28:87",
+        "29:10",
+        "29:26",
+        "29:30",
+        "29:50",
+        "29:59",
+        "30:8",
+        "30:33",
+        "31:5",
+        "31:33",
+        "32:2",
+        "32:3",
+        "32:10",
+        "32:11",
+        "32:12",
+        "32:15",
+        "32:16",
+        "32:22",
+        "32:25",
+        "33:2",
+        "33:67",
+        "33:68",
+        "34:3",
+        "34:6",
+        "34:12",
+        "34:15",
+        "34:19",
+        "34:21",
+        "34:23",
+        "34:26",
+        "34:31",
+        "34:36",
+        "34:39",
+        "34:48",
+        "34:50",
+        "35:13",
+        "35:18",
+        "35:34",
+        "35:37",
+        "35:39",
+        "36:16",
+        "36:25",
+        "36:27",
+        "36:46",
+        "36:51",
+        "36:58",
+        "37:5",
+        "37:31",
+        "37:57",
+        "37:84",
+        "37:87",
+        "37:99",
+        "37:100",
+        "37:126",
+        "37:149",
+        "37:180",
+        "37:182",
+        "38:9",
+        "38:16",
+        "38:24",
+        "38:32",
+        "38:35",
+        "38:41",
+        "38:61",
+        "38:66",
+        "38:71",
+        "38:79",
+        "39:6",
+        "39:7",
+        "39:8",
+        "39:9",
+        "39:10",
+        "39:13",
+        "39:20",
+        "39:22",
+        "39:23",
+        "39:31",
+        "39:34",
+        "39:54",
+        "39:55",
+        "39:69",
+        "39:71",
+        "39:73",
+        "39:75",
+        "40:6",
+        "40:7",
+        "40:8",
+        "40:11",
+        "40:26",
+        "40:27",
+        "40:28",
+        "40:49",
+        "40:55",
+        "40:60",
+        "40:62",
+        "40:64",
+        "40:65",
+        "40:66",
+        "41:9",
+        "41:14",
+        "41:23",
+        "41:29",
+        "41:30",
+        "41:38",
+        "41:43",
+        "41:45",
+        "41:46",
+        "41:50",
+        "41:53",
+        "41:54",
+        "42:5",
+        "42:10",
+        "42:14",
+        "42:15",
+        "42:16",
+        "42:22",
+        "42:36",
+        "42:38",
+        "42:47",
+        "43:13",
+        "43:14",
+        "43:32",
+        "43:35",
+        "43:46",
+        "43:49",
+        "43:64",
+        "43:77",
+        "43:82",
+        "43:88",
+        "44:6",
+        "44:7",
+        "44:8",
+        "44:12",
+        "44:20",
+        "44:22",
+        "44:57",
+        "45:11",
+        "45:15",
+        "45:17",
+        "45:30",
+        "45:36",
+        "46:13",
+        "46:15",
+        "46:25",
+        "46:34",
+        "47:2",
+        "47:3",
+        "47:14",
+        "47:15",
+        "50:27",
+        "50:39",
+        "51:16",
+        "51:23",
+        "51:30",
+        "51:34",
+        "51:44",
+        "52:7",
+        "52:18",
+        "52:29",
+        "52:37",
+        "52:48",
+        "53:18",
+        "53:23",
+        "53:30",
+        "53:32",
+        "53:42",
+        "53:49",
+        "53:55",
+        "54:10",
+        "55:13",
+        "55:16",
+        "55:17",
+        "55:18",
+        "55:21",
+        "55:23",
+        "55:25",
+        "55:27",
+        "55:28",
+        "55:30",
+        "55:32",
+        "55:34",
+        "55:36",
+        "55:38",
+        "55:40",
+        "55:42",
+        "55:45",
+        "55:46",
+        "55:47",
+        "55:49",
+        "55:51",
+        "55:53",
+        "55:55",
+        "55:57",
+        "55:59",
+        "55:61",
+        "55:63",
+        "55:65",
+        "55:67",
+        "55:69",
+        "55:71",
+        "55:73",
+        "55:75",
+        "55:77",
+        "55:78",
+        "56:74",
+        "56:80",
+        "56:96",
+        "57:8",
+        "57:19",
+        "57:21",
+        "59:10",
+        "59:16",
+        "60:1",
+        "60:4",
+        "60:5",
+        "63:10",
+        "64:7",
+        "65:1",
+        "65:8",
+        "66:5",
+        "66:8",
+        "66:11",
+        "66:12",
+        "67:6",
+        "67:12",
+        "68:2",
+        "68:7",
+        "68:19",
+        "68:29",
+        "68:32",
+        "68:34",
+        "68:48",
+        "68:49",
+        "68:50",
+        "69:10",
+        "69:17",
+        "69:43",
+        "69:52",
+        "70:27",
+        "70:28",
+        "70:40",
+        "71:5",
+        "71:10",
+        "71:21",
+        "71:26",
+        "71:28",
+        "72:2",
+        "72:3",
+        "72:10",
+        "72:13",
+        "72:17",
+        "72:20",
+        "72:25",
+        "72:28",
+        "73:8",
+        "73:9",
+        "73:19",
+        "73:20",
+        "74:3",
+        "74:7",
+        "74:31",
+        "75:12",
+        "75:23",
+        "75:30",
+        "76:10",
+        "76:21",
+        "76:24",
+        "76:25",
+        "76:29",
+        "78:36",
+        "78:37",
+        "78:39",
+        "79:16",
+        "79:19",
+        "79:24",
+        "79:40",
+        "79:44",
+        "81:29",
+        "82:6",
+        "83:6",
+        "83:15",
+        "84:2",
+        "84:5",
+        "84:6",
+        "84:15",
+        "85:12",
+        "87:1",
+        "87:15",
+        "89:6",
+        "89:13",
+        "89:14",
+        "89:15",
+        "89:16",
+        "89:22",
+        "89:28",
+        "91:14",
+        "92:20",
+        "93:3",
+        "93:5",
+        "93:11",
+        "94:8",
+        "96:1",
+        "96:3",
+        "96:8",
+        "97:4",
+        "98:8",
+        "99:5",
+        "100:6",
+        "100:11",
+        "105:1",
+        "106:3",
+        "108:2",
+        "110:3",
+        "113:1",
+        "114:1"
+      ],
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 1 identik byte-per-byte dengan 1.1 yang dipakai): lemma segmen STEM ber-POS N atau PN diurutkan menurut jumlah segmen; LEM:rab~ (lemma 1:2:3) berada di peringkat 2, di bawah LEM:{ll~ah. Ayat dihitung sekali walau memuat kata ini lebih dari sekali.",
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; LEM:rab~; peringkat lemma POS N/PN",
+          "url": "https://corpus.quran.com/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "yaumid-din",
+      "title": "Yaumid-dīn: 13 kali",
+      "body": "Ungkapan «يَوْمِ ٱلدِّينِ» (hari pembalasan) muncul 13 kali, 3 di antaranya di Surah Al-Infithar (82:15, 82:17 dan 82:18). Hitungan ini memasukkan harakat akhir apa pun (yaumu, yauma, yaumi) dan bentuk berawalan, misalnya «بِيَوْمِ ٱلدِّينِ» (70:26); tulisan yang persis sama dengan 1:4 hanya ada di 1:4, 15:35 dan 38:78.",
+      "locations": [
+        "1:4",
+        "15:35",
+        "26:82",
+        "37:20",
+        "38:78",
+        "51:12",
+        "56:56",
+        "70:26",
+        "74:46",
+        "82:15",
+        "82:17",
+        "82:18",
+        "83:11"
+      ],
+      "method": "Dua token berurutan yaum + ad-dīn (diambil dari 1:4); token pertama boleh berawalan wa-, fa-, bi-, atau li-; harakat diabaikan, jadi yaumu, yauma, yaumi dan bentuk berawalan ikut terhitung. Tulisan persis 1:4 (byte sama, tanpa awalan): 1:4, 15:35 dan 38:78.",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token 1:4:2 + 1:4:3 berurutan",
+          "url": "https://tanzil.net/download/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "maliki",
+      "title": "Mālik sebagai isim fa'il: 3 kali",
+      "body": "Kata mālik (isim fa'il, lemma yang sama dengan 1:4) muncul 3 kali: māliki (1:4), mālika (3:26), mālikūna (36:71).",
+      "locations": [
+        "1:4",
+        "3:26",
+        "36:71"
+      ],
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 1 identik byte-per-byte dengan 1.1 yang dipakai): segmen STEM dengan LEM:ma`lik (lemma 1:4:1), hanya POS N; ketiganya bertanda ACT PCPL (isim fa'il). Mālik di 43:77 adalah nama diri dengan lemma lain (LEM:ma`lik2, POS:PN), jadi tidak ikut dihitung. Hitungan ini mengikuti teks Hafs (Tanzil); bacaan maliki tanpa alif adalah qira'at lain.",
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; LEM:ma`lik POS:N; LEM:ma`lik2 POS:PN tidak dihitung",
+          "url": "https://corpus.quran.com/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "iyyaka",
+      "title": "Iyyāka hanya di Al-Fatihah",
+      "body": "Bentuk «إِيَّاكَ» (kata ganti orang kedua tunggal; dalam tata bahasa Arab berbentuk mudzakkar) hanya muncul di 1:5, dan di sana 2 kali. Kata ganti yang sama dengan akhiran lain (untuk 'aku', 'dia', 'kalian', dan seterusnya) muncul 22 kali di tempat lain, sehingga seluruhnya 24 kali dalam 23 ayat.",
+      "locations": [
+        "1:5",
+        "2:40",
+        "2:41",
+        "2:172",
+        "4:131",
+        "6:41",
+        "6:151",
+        "7:155",
+        "9:114",
+        "10:28",
+        "12:40",
+        "16:51",
+        "16:114",
+        "17:23",
+        "17:31",
+        "17:67",
+        "28:63",
+        "29:56",
+        "29:60",
+        "34:24",
+        "34:40",
+        "41:37",
+        "60:1"
+      ],
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 1 identik byte-per-byte dengan 1.1 yang dipakai): semua segmen STEM dengan LEM:<iy~aA (24 kali); yang bertanda 2MS hanya di 1:5. Dicek ulang di Tanzil: token iyyāka (boleh berawalan wa-/fa-) muncul 2 kali.",
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; LEM:<iy~aA, fitur 2MS",
+          "url": "https://corpus.quran.com/"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token 1:5:1, awalan wa-/fa-",
+          "url": "https://tanzil.net/download/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "istaana",
+      "title": "Ista‘āna: memohon pertolongan",
+      "body": "Kata kerja ista‘āna (memohon pertolongan, wazan istaf‘ala) hanya muncul di 1:5, 2:45, 2:153 dan 7:128. Bentuk al-musta‘ān (Yang dimohon pertolongan-Nya) ada di 12:18 dan 21:112. Seluruh keluarga akar ع و ن muncul 11 kali dalam 10 ayat (5 lemma); hitungan akar ini menggabungkan semua kata seakar, termasuk yang maknanya berjauhan.",
+      "locations": [
+        "1:5",
+        "2:45",
+        "2:68",
+        "2:153",
+        "5:2",
+        "7:128",
+        "12:18",
+        "18:95",
+        "21:112",
+        "25:4"
+      ],
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 1 identik byte-per-byte dengan 1.1 yang dipakai): segmen STEM dengan ROOT:Ewn (akar 1:5:4): POS V bertanda (X) = kata kerja wazan istaf‘ala; POS N bertanda (X) = al-musta‘ān; jumlah semua segmen akar = 11, dalam 10 ayat.",
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; ROOT:Ewn, bentuk (X)",
+          "url": "https://corpus.quran.com/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "ihdina",
+      "title": "Ihdinā hanya 2 kali",
+      "body": "Kata «ٱهْدِنَا» (tunjukilah kami) hanya muncul 2 kali dalam Al-Qur'an: 1:6 dan 38:22 (dengan awalan wa-).",
+      "locations": [
+        "1:6",
+        "38:22"
+      ],
+      "method": "Token ihdinā (diambil dari 1:6), boleh berawalan wa- atau fa-; harakat diabaikan.",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token 1:6:1, awalan wa-/fa-",
+          "url": "https://tanzil.net/download/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "ash-shirathal-mustaqim",
+      "title": "Aṣ-ṣirāṭal-mustaqīm yang ber-al",
+      "body": "Bentuk ber-al «ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ» hanya ada di 1:6 dan 37:118. Di 7:16, Iblis menyebut «صِرَٰطَكَ ٱلْمُسْتَقِيمَ» (jalan-Mu yang lurus).",
+      "locations": [
+        "1:6",
+        "7:16",
+        "37:118"
+      ],
+      "method": "Dua token berurutan aṣ-ṣirāṭ + al-mustaqīm (diambil dari 1:6), token pertama boleh berawalan; lalu dicari token ṣirāṭ yang berakhiran kata ganti dan diikuti al-mustaqīm. Harakat diabaikan.",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token 1:6:2 + 1:6:3 berurutan; token berawal 1:7:1 + 1:6:3",
+          "url": "https://tanzil.net/download/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "shirath",
+      "title": "Ṣirāṭ: 45 kali, selalu tunggal",
+      "body": "Kata ṣirāṭ (jalan) muncul 45 kali dalam Al-Qur'an dan selalu dalam bentuk tunggal; bentuk jamaknya tidak pernah dipakai.",
+      "locations": [
+        "1:6",
+        "1:7",
+        "2:142",
+        "2:213",
+        "3:51",
+        "3:101",
+        "4:68",
+        "4:175",
+        "5:16",
+        "6:39",
+        "6:87",
+        "6:126",
+        "6:153",
+        "6:161",
+        "7:16",
+        "7:86",
+        "10:25",
+        "11:56",
+        "14:1",
+        "15:41",
+        "16:76",
+        "16:121",
+        "19:36",
+        "19:43",
+        "20:135",
+        "22:24",
+        "22:54",
+        "23:73",
+        "23:74",
+        "24:46",
+        "34:6",
+        "36:4",
+        "36:61",
+        "36:66",
+        "37:23",
+        "37:118",
+        "38:22",
+        "42:52",
+        "42:53",
+        "43:43",
+        "43:61",
+        "43:64",
+        "48:2",
+        "48:20",
+        "67:22"
+      ],
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 1 identik byte-per-byte dengan 1.1 yang dipakai): LEM:Sira`T (lemma 1:6:2) = 45 segmen, tidak satu pun bertanda dual atau jamak; akar ROOT:SrT juga 45 segmen, jadi tidak ada kata lain dari akar ini. Dicek di Tanzil: 45 token memuat kata ini.",
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; LEM:Sira`T; ROOT:SrT",
+          "url": "https://corpus.quran.com/"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token yang memuat 1:7:1 (tanpa harakat)",
+          "url": "https://tanzil.net/download/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "al-maghdhub",
+      "title": "Al-magḍūb hanya sekali",
+      "body": "Kata «ٱلْمَغْضُوبِ» (yang dimurkai) hanya muncul sekali dalam Al-Qur'an, yaitu di 1:7. Keluarga akar غ ض ب (marah, murka) muncul 24 kali dalam 21 ayat.",
+      "locations": [
+        "1:7",
+        "2:61",
+        "2:90",
+        "3:112",
+        "4:93",
+        "5:60",
+        "7:71",
+        "7:150",
+        "7:152",
+        "7:154",
+        "8:16",
+        "16:106",
+        "20:81",
+        "20:86",
+        "21:87",
+        "24:9",
+        "42:16",
+        "42:37",
+        "48:6",
+        "58:14",
+        "60:13"
+      ],
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 1 identik byte-per-byte dengan 1.1 yang dipakai): LEM:magoDuwb (lemma 1:7:6) = 1; ROOT:gDb = 24 segmen dalam 21 ayat. Dicek di Tanzil: token al-magḍūb (boleh berawalan) muncul 1 kali.",
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; LEM:magoDuwb; ROOT:gDb",
+          "url": "https://corpus.quran.com/"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token 1:7:6",
+          "url": "https://tanzil.net/download/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "yang-diberi-nikmat",
+      "title": "Siapa yang diberi nikmat?",
+      "body": "Ibnu Katsir menghubungkan «ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ» dengan 4:69, yang menyebut para nabi, para shiddiqin, para syuhada, dan orang-orang saleh.",
+      "locations": [
+        "1:7",
+        "4:69"
+      ],
+      "method": "Bukan hitungan. Kaitan kedua ayat dikutip dari Ibnu Katsir (tafsir 1:7). Dicek di QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 1 identik byte-per-byte dengan 1.1 yang dipakai): 4:69 memuat kata kerja dengan LEM:>anoEama, lemma yang sama dengan an‘amta (1:7:3).",
+      "sources": [
+        {
+          "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim",
+          "ref": "tafsir QS 1:7",
+          "url": "https://tafsir.app/ibn-katheer/1/7"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; LEM:>anoEama di 4:69",
+          "url": "https://corpus.quran.com/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "amin-bukan-ayat",
+      "title": "Āmīn bukan bagian Al-Qur'an",
+      "body": "Ucapan āmīn setelah membaca Al-Fatihah bukan bagian dari Al-Fatihah dan bukan ayat Al-Qur'an; artinya 'kabulkanlah'. Darwisy menyebutnya sunnah diucapkan sesudah Al-Fatihah.",
+      "locations": [
+        "1:7"
+      ],
+      "method": "Bukan hitungan; dikutip dari al-Mujtaba dan Darwisy (pembahasan QS 1:7).",
+      "sources": [
+        {
+          "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an",
+          "ref": "QS 1:7 (halaman cetak belum diverifikasi)",
+          "url": "https://tafsir.app/mujtaba-mushkil-iraab/1/7"
+        },
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 1, hlm. 20 (bagian al-Fawa'id, QS 1:7)",
+          "url": "https://tafsir.app/iraab-aldarweesh/1/7"
+        }
+      ],
+      "status": "draft"
+    }
+  ],
+  "hadith": [],
+  "data_versions": {
+    "tanzil": "uthmani-1.1 sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
+    "tanzil_metadata": "1.0 sha256:8867c1d88191472adec9db694b3cd9f135b1a2ef580574d32cf888dcb22c5c7a",
+    "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
+    "quran_align": "release-2016-11-24 sha256:5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7; Husary_Muallim_128kbps.json sha256:3719fb5c482d7db7086b4a81cdb6f114aa71979899917a74e6c8ae5bec684f5f; Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7",
+    "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512) sha256:94d2be603ddb83c6556d609f673d51a9bd8593022a6936a61033324bdaf4ef02",
+    "authored_words": "authored/al-fatihah.words.json sha256:4583c977bb3b4c2fba118ae2e383c7c3842448dedfedf6706a052d12482cf53f",
+    "pipeline": "belajar/pipeline/build_fatihah.py + facts.py (stdlib only, no LLM)"
+  }
+}

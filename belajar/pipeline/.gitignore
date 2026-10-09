@@ -1,0 +1,3 @@
+# Downloaded inputs. Re-create with `python3 fetch.py`; integrity is pinned in sources.json.
+cache/
+__pycache__/

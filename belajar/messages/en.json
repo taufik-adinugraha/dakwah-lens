@@ -22,9 +22,10 @@
     "surah_heading": "Start here",
     "fatihah_name": "Al-Fatihah",
     "fatihah_meta": "7 ayat · 29 words · ~3 weeks at 10 minutes a day",
-    "status_preparing": "In preparation",
+    "status_preparing": "Beta · lessons are drafts",
     "next_heading": "Next",
-    "next_body": "After Al-Fatihah: Al-Ikhlas, An-Nas, Al-Falaq, Al-'Asr, Al-Kawthar and An-Nasr."
+    "next_body": "After Al-Fatihah: Al-Ikhlas, An-Nas, Al-Falaq, Al-'Asr, Al-Kawthar and An-Nasr.",
+    "start_cta": "Start learning"
   },
   "Footer": {
     "disclaimer": "AI-assisted, not an authoritative fatwa. Explanations are drawn from named kitabs and reviewed by an ustadz before going live.",
@@ -41,5 +42,65 @@
     "title": "Page not found",
     "body": "This address doesn't exist in the Learn the Qur'an module.",
     "cta": "Go to the module home"
+  },
+  "Surah": {
+    "eyebrow": "Surah",
+    "meta": "{ayat} ayat · {words} words",
+    "draft_banner": "Beta: the word meanings, i'rab and notes on this page are drafts awaiting an ustadz's review. The ayah text and the imam's recitation themselves are unchanged.",
+    "draft_chip": "Draft — awaiting ustadz review",
+    "learn_ayah": "Learn this ayah",
+    "ayah_done": "Practice done",
+    "translation_source": "Translation: {source}",
+    "facts_heading": "Did you know?",
+    "fact_method": "How it was counted",
+    "fact_where": "Where",
+    "sources": "Sources",
+    "data_versions": "Data versions"
+  },
+  "Lesson": {
+    "ayah": "Ayah {n}",
+    "tafsir_heading": "Tafsir note",
+    "words_heading": "{n} words in this ayah",
+    "words_intro": "Tap a word in the recitation above to hear it again. Below: its meaning, root, and why it ends the way it does.",
+    "practice_heading": "Practice",
+    "facts_heading": "Did you know?",
+    "fact_method": "How it was counted",
+    "fact_where": "Where",
+    "back_to_surah": "Back to the ayat"
+  },
+  "Word": {
+    "meaning": "Meaning",
+    "root": "Root",
+    "wazn": "Pattern",
+    "why": "Why this ending?",
+    "other_views": "Other views",
+    "sources": "Sources",
+    "no_root": "no root (particle/pronoun)",
+    "draft": "Draft — awaiting ustadz review"
+  },
+  "Player": {
+    "play_ayah": "Play ayah",
+    "pause": "Pause",
+    "reciter": "Reciter",
+    "play_word": "Play word {translit} — {gloss}",
+    "hint_tap": "Tap a word to hear it alone. Want gaps to repeat after the imam? Choose Al-Husary's teaching recitation (Mu'allim).",
+    "restart": "Start over"
+  },
+  "Exercise": {
+    "done": "Done",
+    "right": "Correct!",
+    "not_yet": "Not quite.",
+    "next": "Next",
+    "finish": "Finish",
+    "score": "{right} of {total} right on the first try. Repeat any time — repetition is how memory sticks.",
+    "tap_title": "Listen & tap",
+    "tap_instruction": "Play the imam's voice, then tap the word he recites.",
+    "tap_play": "Play word",
+    "tap_was": "The word recited:",
+    "why_title": "Why this ending?",
+    "why_instruction": "Choose the reason this word ends with that vowel.",
+    "why_question": "Why",
+    "sort_title": "Sort the endings",
+    "sort_instruction": "Tap a word, then tap its case: marfū' (▲), manshūb (◆), majrūr (▼) or mabnī (■)."
   }
 }
