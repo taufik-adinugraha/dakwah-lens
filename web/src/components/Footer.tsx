@@ -66,6 +66,9 @@ export async function Footer() {
               >
                 {tNav("how_it_works")}
               </a>
+              <FooterLink href="/khutbah-kultum">
+                {tNav("khutbah_kultum")}
+              </FooterLink>
               <FooterLink href="/kitab">{tNav("kitab")}</FooterLink>
               <a
                 href={sectionLink("#donate")}

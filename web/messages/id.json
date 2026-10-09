@@ -19,6 +19,7 @@
     "features": "Fitur",
     "how_it_works": "Cara Kerja",
     "insights": "Briefing",
+    "khutbah_kultum": "Khutbah & Kultum",
     "discussions": "Diskusi",
     "kitab": "Pustaka Kitab",
     "briefs_library": "Katalog Kajian",
@@ -2615,5 +2616,29 @@
     "error_digest_label": "Kode error",
     "error_cta_retry": "Coba lagi",
     "error_cta_insights": "Buka Briefing"
+  },
+  "KhutbahKultum": {
+    "meta_title": "Naskah Khutbah Jumat & Kultum Pekan Ini",
+    "meta_description": "Naskah khutbah Jumat dan kultum setiap pekan, satu per tema, berangkat dari isu yang ramai dibicarakan umat. Dalil diambil dari kitab rujukan, lengkap dengan teks Arabnya.",
+    "eyebrow": "Naskah siap pakai",
+    "heading": "Khutbah Jumat & Kultum",
+    "intro": "Naskah lengkap untuk mimbar Jumat dan kultum, satu per tema, disusun dari percakapan umat sepekan terakhir. Setiap dalil diambil dari kitab rujukan, bukan dikarang.",
+    "tabs_label": "Jenis naskah",
+    "tab_khutbah": "Khutbah Jumat",
+    "tab_kultum": "Kultum",
+    "week_label": "Pekan",
+    "older_week": "Pekan sebelumnya",
+    "newer_week": "Pekan berikutnya",
+    "special_editions": "Edisi Khusus",
+    "weekly_themes": "Tema Pekanan",
+    "count": "{count} naskah",
+    "steps_label": "Langkah yang diajak",
+    "daleel_label": "Dalil",
+    "read_khutbah": "Baca khutbah",
+    "read_kultum": "Baca kultum",
+    "empty_all": "Belum ada naskah khutbah atau kultum yang terbit.",
+    "empty_week_khutbah": "Belum ada naskah khutbah untuk pekan ini.",
+    "empty_week_kultum": "Belum ada naskah kultum untuk pekan ini.",
+    "disclaimer": "Dibantu AI, bukan fatwa otoritatif. Periksa kembali dalil dan isinya sebelum disampaikan."
   }
 }

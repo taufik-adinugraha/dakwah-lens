@@ -19,6 +19,7 @@
     "features": "Features",
     "how_it_works": "How it Works",
     "insights": "Briefing",
+    "khutbah_kultum": "Khutbah & Kultum",
     "discussions": "Discussions",
     "kitab": "Kitab Library",
     "briefs_library": "Brief catalog",
@@ -2615,5 +2616,29 @@
     "error_digest_label": "Error code",
     "error_cta_retry": "Try again",
     "error_cta_insights": "Open Briefing"
+  },
+  "KhutbahKultum": {
+    "meta_title": "This Week's Friday Khutbah & Kultum Scripts",
+    "meta_description": "A Friday khutbah and a kultum every week, one per theme, drawn from the issues the ummah is talking about. Every daleel is retrieved from a reference kitab, with its Arabic text.",
+    "eyebrow": "Ready-to-use scripts",
+    "heading": "Friday Khutbah & Kultum",
+    "intro": "Complete scripts for the Friday minbar and for kultum, one per theme, built from the past week's conversations. Every daleel is retrieved from a reference kitab, never invented.",
+    "tabs_label": "Script type",
+    "tab_khutbah": "Friday Khutbah",
+    "tab_kultum": "Kultum",
+    "week_label": "Week",
+    "older_week": "Previous week",
+    "newer_week": "Next week",
+    "special_editions": "Special editions",
+    "weekly_themes": "Weekly themes",
+    "count": "{count, plural, one {# script} other {# scripts}}",
+    "steps_label": "Steps it calls for",
+    "daleel_label": "Daleel",
+    "read_khutbah": "Read khutbah",
+    "read_kultum": "Read kultum",
+    "empty_all": "No khutbah or kultum scripts have been published yet.",
+    "empty_week_khutbah": "No khutbah scripts for this week yet.",
+    "empty_week_kultum": "No kultum scripts for this week yet.",
+    "disclaimer": "AI-assisted, not an authoritative fatwa. Review the daleel and content before delivering."
   }
 }
