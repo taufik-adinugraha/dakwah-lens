@@ -15,13 +15,14 @@ import { getAyah, getSurah, SURAHS } from "@/lib/content";
 
 export const dynamicParams = false;
 
-export function generateStaticParams({
-  params,
-}: {
-  params: { locale: string; surah: string };
-}) {
-  const s = SURAHS.find((x) => x.slug === params.surah);
-  return (s?.ayat ?? []).map((a) => ({ ayah: String(a.ayah) }));
+// Generates BOTH dynamic segments: [surah] has no layout, so its page's
+// generateStaticParams never reaches this route — relying on a parent
+// `params.surah` here produced zero paths (every ayah page 404'd under
+// dynamicParams=false; caught by the image smoke test).
+export function generateStaticParams() {
+  return SURAHS.flatMap((s) =>
+    s.ayat.map((a) => ({ surah: s.slug, ayah: String(a.ayah) })),
+  );
 }
 
 const RECITER_ORDER = ["Alafasy_128kbps", "Husary_Muallim_128kbps"];
