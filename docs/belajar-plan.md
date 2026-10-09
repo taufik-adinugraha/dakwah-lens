@@ -50,6 +50,8 @@ A short narrated clip explains it with matching visuals. They then practise:
 | L6 | Recitation | **Real imam voice only.** Never TTS or voice-conversion for Qur'anic text. |
 | L8 | Audience of the narration | **Adults (default).** No parent–child mode for now (operator, 2026-10-09). |
 | L7 | Default reciter | **Mishary Rashid Alafasy** (EveryAyah `Alafasy_128kbps`, the exact files quran-align's timings were made from). Husary Mu'allim remains a selectable second voice for its built-in repeat gaps. |
+| L9 | Information architecture | **`/belajar` is a hub of learning tracks**; Arabic + light tafsir is the first track, under `/belajar/{locale}/quran/{surah}/{ayah}` (old `/belajar/{locale}/{surah}…` URLs redirect). The Konsep / Kosakata / Akar library stays at hub level so later tracks reuse it. Future self-paced tracks live in the same container; paid live cohorts (`docs/kelas-plan.md`, `/kelas`) appear as a card on the hub (operator, 2026-10-09). |
+| L10 | Main-site header link | **"Belajar" goes in the dakwah-lens.id header (after "Khutbah & Kultum") only after the first ustadz sign-off** of the track's content. Until then the module stays noindex and unlinked from the header (operator chose option b, 2026-10-09). |
 
 ## 3. Decisions needed (recommended default in bold)
 

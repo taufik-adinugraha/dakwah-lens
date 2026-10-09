@@ -3,28 +3,85 @@
 /* Design tokens copied from web/src/app/globals.css (landing redesign,
    2026-07: "one deep green on warm paper"). The module is a separate app but
    must read as the same site. Keep in sync with web/ — see
-   scripts/check-token-parity.mjs. */
+   scripts/check-token-parity.mjs.
+
+   Deliberate divergence (senior-readability audit,
+   docs/belajar-research/senior-ux.md §3.2): many learners are 60+, so
+   ink-muted is darker here than on web/ (AAA on every background) and the
+   web/ "faint" grey is not defined at all — it failed WCAG AA everywhere.
+   Secondary text uses ink-soft instead. */
 @theme {
   --font-arabic: var(--font-amiri);
   --font-display: var(--font-fraunces);
   --font-body: var(--font-inter);
 
+  /* Type scale (senior-ux.md §3.1): body is 18px. Overriding the Tailwind
+     scale makes every text-* utility grow at once. text-xs (15px) is the
+     absolute floor and is for citations and metadata only. */
+  --text-xs: 0.9375rem;
+  --text-xs--line-height: 1.5;
+  --text-sm: 1rem;
+  --text-sm--line-height: 1.6;
+  --text-base: 1.125rem;
+  --text-base--line-height: 1.7;
+  --text-lg: 1.25rem;
+  --text-lg--line-height: 1.55;
+  --text-xl: 1.375rem;
+  --text-xl--line-height: 1.5;
+  --text-2xl: 1.625rem;
+  --text-2xl--line-height: 1.35;
+  --text-3xl: 2rem;
+  --text-3xl--line-height: 1.25;
+  --text-4xl: 2.5rem;
+  --text-4xl--line-height: 1.2;
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 1.15;
+
+  /* Arabic sizes (§3.1). 24px is the floor for ANY vocalised Arabic: harakat
+     sit far smaller than the letters. Line height 2 leaves room for stacked
+     marks; .quran (below) still forces 2.2 on Qur'anic lines. */
+  --text-ar-sm: 1.5rem; /* inline, chips, tables, roots, wazn */
+  --text-ar-sm--line-height: 2;
+  --text-ar-md: 2rem; /* exercise words, question words, Sortir chips */
+  --text-ar-md--line-height: 2;
+  --text-ar-lg: 2.25rem; /* word-card headword, ayah on phones */
+  --text-ar-lg--line-height: 2;
+  --text-ar-xl: 2.75rem; /* ayah stage from 640px */
+  --text-ar-xl--line-height: 2;
+
   --color-paper: #fbfaf6;
   --color-paper-deep: #f5f3ec;
   --color-ink: #1b1a17;
-  --color-ink-muted: #5c5a52;
-  --color-ink-faint: #8a887e;
+  --color-ink-muted: #4a4840;
+  /* Secondary/meta text (6.32 on paper, AA). Replaces the old faint grey. */
+  --color-ink-soft: #5f5d55;
+  /* Borders of interactive controls: ≥3:1 on every background (1.4.11). */
+  --color-border-ui: #807e74;
+  /* Decorative card edges and dividers only, never a control's border. */
   --color-hairline: #e7e4da;
   --color-forest: #0e5a3c;
   --color-forest-hover: #0a4a31;
   --color-forest-tint: #eef3ef;
 
-  /* Case colours (plan §4.1): always paired with a SHAPE in the UI so the
-     meaning never rests on colour alone. */
+  /* Notices: draft marker text, "not yet" feedback (calm amber, not red). */
+  --color-notice: #8a4d00;
+  --color-ok-bg: #e6f0ea;
+  --color-notice-bg: #fbefe3;
+
+  /* Case colours (plan §4.1, senior-ux.md §3.2). GRAPHIC colours only: the
+     shape icon and the chip border. A case label's TEXT is always ink, and
+     the shape carries the meaning, never the colour alone. */
   --color-case-raf: #0e5a3c;
-  --color-case-nasb: #9a5b13;
-  --color-case-jarr: #1f4e8c;
-  --color-case-mabni: #5c5a52;
+  --color-case-nasb: #a85f00;
+  --color-case-jarr: #2563b8;
+  --color-case-mabni: #7a2f5c;
+}
+
+@layer base {
+  body {
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+  }
 }
 
 body {
@@ -35,9 +92,223 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Qur'anic text: generous line height for harakat, never synthetic bold. */
+/* Qur'anic text: generous line height for harakat, never synthetic bold.
+   Unlayered on purpose: it beats any leading-* utility, so Arabic line
+   height is set here and never through utilities. */
 .quran {
   font-family: var(--font-arabic), "Amiri", serif;
   font-synthesis: none;
   line-height: 2.2;
+}
+
+/* Any other vocalised Arabic (roots, wazn, examples, chips, feedback). Use
+   this instead of a bare font-arabic, which would inherit a Latin line
+   height and cramp stacked harakat. */
+.arabic-inline {
+  font-family: var(--font-arabic), "Amiri", serif;
+  font-synthesis: none;
+  line-height: 2;
+}
+
+/* ── Shared controls (senior-ux.md §3.3). Use these; don't hand-roll. ── */
+
+/* The one primary action on a screen: 56px tall. */
+@utility btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3.5rem;
+  padding: 0.5rem 1.5rem;
+  border: 1.5px solid var(--color-forest);
+  border-radius: 9999px;
+  background-color: var(--color-forest);
+  color: var(--color-paper);
+  font-size: var(--text-base);
+  line-height: 1.35;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition-property: background-color, border-color, color;
+  transition-duration: 150ms;
+  @media (hover: hover) {
+    &:hover:not(:disabled, [aria-disabled="true"]) {
+      background-color: var(--color-forest-hover);
+      border-color: var(--color-forest-hover);
+    }
+  }
+  /* Disabled is shown by fill, text AND a dashed border, never by opacity. */
+  &:disabled,
+  &[aria-disabled="true"] {
+    background-color: var(--color-paper-deep);
+    border-color: var(--color-border-ui);
+    border-style: dashed;
+    color: var(--color-ink-muted);
+    cursor: not-allowed;
+  }
+}
+
+/* Standard buttons and toggles: 48px tall, visible ≥3:1 border. */
+@utility btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0.375rem 1.25rem;
+  border: 1.5px solid var(--color-border-ui);
+  border-radius: 9999px;
+  background-color: #ffffff;
+  color: var(--color-ink);
+  font-size: var(--text-base);
+  line-height: 1.35;
+  font-weight: 500;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition-property: background-color, border-color, color;
+  transition-duration: 150ms;
+  @media (hover: hover) {
+    &:hover:not(:disabled, [aria-disabled="true"]) {
+      border-color: var(--color-forest);
+    }
+  }
+  &[aria-pressed="true"] {
+    border-color: var(--color-forest);
+    background-color: var(--color-forest-tint);
+  }
+  &:disabled,
+  &[aria-disabled="true"] {
+    background-color: var(--color-paper-deep);
+    border-style: dashed;
+    color: var(--color-ink-muted);
+    cursor: not-allowed;
+  }
+}
+
+/* Chip-shaped links (concepts, locations, related items): 44px minimum. */
+@utility chip-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2.75rem;
+  padding: 0.25rem 1rem;
+  border: 1px solid var(--color-border-ui);
+  border-radius: 9999px;
+  color: var(--color-forest);
+  font-size: var(--text-sm);
+  line-height: 1.35;
+  font-weight: 500;
+  text-decoration: none;
+  transition-property: border-color, background-color;
+  transition-duration: 150ms;
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--color-forest);
+    }
+  }
+  &[aria-current="page"] {
+    border-color: var(--color-forest);
+    background-color: var(--color-forest-tint);
+  }
+}
+
+/* Links inside text: the underline carries the meaning (link vs ink text is
+   only 2.11:1, so colour alone would fail 1.4.1). */
+@utility link-text {
+  color: var(--color-forest);
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  @media (hover: hover) {
+    &:hover {
+      text-decoration-thickness: 2px;
+    }
+  }
+}
+
+/* <summary> of a disclosure: a 48px row with verb-first text and a chevron.
+   Give the chevron svg class="chev"; it turns when the <details> is open. */
+@utility disclosure-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 3rem;
+  font-size: var(--text-base);
+  line-height: 1.4;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+  &::-webkit-details-marker {
+    display: none;
+  }
+  &::marker {
+    content: "";
+  }
+}
+
+details[open] > summary .chev {
+  transform: rotate(180deg);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .chev {
+    transition: transform 150ms ease;
+  }
+}
+
+/* ── Focus, scrolling, motion (§3.8). Unlayered on purpose. ── */
+
+/* 2.4.11: the sticky header never hides a focused element or an anchor. */
+html {
+  scroll-padding-top: 5rem;
+}
+/* At large text sizes the desktop sticky header can wrap to two rows. */
+@media (min-width: 64rem) {
+  html[data-text-size] {
+    scroll-padding-top: 9rem;
+  }
+}
+
+/* 2.4.7 / 2.4.13: one strong focus ring everywhere (forest vs paper 7.90). */
+:where(a, button, summary, select, input, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--color-forest);
+  outline-offset: 3px;
+}
+/* Visually hidden radios/checkboxes: ring the label the learner sees. */
+label:has(> .sr-only:focus-visible) {
+  outline: 3px solid var(--color-forest);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Text size ("Ukuran huruf", §3.4) ──
+   A percentage of the browser default, so the learner's own OS/browser
+   setting is respected. Everything is rem, so type, Arabic, spacing and
+   targets scale together. Set before paint by the inline script in
+   app/[locale]/layout.tsx and by src/hooks/useTextSize.ts. */
+html[data-text-size="besar"] {
+  font-size: 112.5%;
+}
+html[data-text-size="sangat-besar"] {
+  font-size: 133.333%;
+}
+
+/* The one-time Home hint card hides before paint once the learner has
+   chosen a size or dismissed it (data-text-hint is set by the same script). */
+html[data-text-hint="off"] .text-size-hint {
+  display: none;
 }
