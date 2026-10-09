@@ -454,11 +454,11 @@ describe("splitCitation", () => {
       splitCitation("Adab al-'Alim wa al-Muta'allim — الباب الثالث في أدب المتعلم / الثاني"),
     ).toEqual({
       name: "Adab al-'Alim wa al-Muta'allim",
-      locator: { head: "الباب الثالث في أدب المتعلم", tail: "الثاني" },
+      locator: "الباب الثالث في أدب المتعلم / الثاني",
     });
     expect(splitCitation("'Aqidat al-'Awam — بيت 26-30")).toEqual({
       name: "'Aqidat al-'Awam",
-      locator: { head: "بيت 26-30", tail: null },
+      locator: "بيت 26-30",
     });
   });
 

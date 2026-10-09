@@ -301,7 +301,7 @@ function CardSection({
               <h3 className="mt-3 text-balance font-display text-lg font-medium leading-snug text-ink">
                 <Link
                   href={c.href}
-                  className="outline-none after:absolute after:inset-0 after:rounded-2xl after:content-['']"
+                  className="outline-none after:absolute after:-inset-px after:rounded-2xl after:content-['']"
                 >
                   {c.title ?? labels.untitled}
                 </Link>
@@ -336,10 +336,12 @@ function CardSection({
                   <div className="text-xs leading-relaxed text-ink-muted">
                     <p className="font-semibold">{labels.daleel}</p>
                     {/* Citations as retrieved (see splitCitation). An Arabic
-                        locator gets its own right-to-left line, aligned
-                        under its kitab name: a long bab clips at its
-                        logical end, while the sub-section after " / " —
-                        what tells sibling citations apart — never clips. */}
+                        locator gets its own right-to-left block, aligned
+                        under its kitab name and wrapped to two lines, so
+                        the sub-section at its end (" / الثاني" — what
+                        tells sibling citations apart) stays visible; only
+                        a locator longer than two lines clips, at its
+                        logical end. */}
                     <ul className="mt-0.5 space-y-1.5">
                       {c.cites.map((cite) => {
                         const { name, locator } = splitCitation(cite);
@@ -350,14 +352,9 @@ function CardSection({
                               <span
                                 dir="rtl"
                                 lang="ar"
-                                className="flex min-w-0 justify-end gap-1 font-arabic text-[13px] leading-snug"
+                                className="line-clamp-2 text-end font-arabic text-[13px] leading-snug"
                               >
-                                <span className="truncate">{locator.head}</span>
-                                {locator.tail && (
-                                  <span className="shrink-0 whitespace-nowrap">
-                                    / {locator.tail}
-                                  </span>
-                                )}
+                                {locator}
                               </span>
                             )}
                           </li>

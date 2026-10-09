@@ -444,25 +444,17 @@ export function daleelCitations(body: string, max = 3): string[] {
  *   - `name`: the kitab and number. A Latin commentary tail after a
  *     numbered head ("Riyad as-Salihin 1615, dari Abdullah bin Mas'ud …",
  *     "Riyad as-Salihin 1587 — dalam hadits qudsi ini …") is left off.
- *   - `locator`: an Arabic bab/bayt after " — ", split at its first " / "
- *     into `head` and `tail` so the part that tells sibling sections
- *     apart ("/ الثاني" vs "/ الثالث") is never the part clipped. */
+ *   - `locator`: an Arabic bab/bayt after " — ", rendered on its own
+ *     right-to-left line. */
 export function splitCitation(cite: string): {
   name: string;
-  locator: { head: string; tail: string | null } | null;
+  locator: string | null;
 } {
   const dash = cite.indexOf(" — ");
   if (dash >= 0) {
     const rest = cite.slice(dash + 3).trim();
     if (arabicShare(rest) > 0.3) {
-      const slash = rest.indexOf(" / ");
-      return {
-        name: cite.slice(0, dash).trim(),
-        locator:
-          slash >= 0
-            ? { head: rest.slice(0, slash).trim(), tail: rest.slice(slash + 3).trim() }
-            : { head: rest, tail: null },
-      };
+      return { name: cite.slice(0, dash).trim(), locator: rest };
     }
   }
   const commentary = cite.match(/^(.*?\d[\da-z]*)(?:,\s+| — )\D/);
