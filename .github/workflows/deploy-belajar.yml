@@ -136,6 +136,33 @@ jobs:
           docker logs smoke 2>&1 | grep -q "up to date"
           docker rm -f smoke >/dev/null
 
+      # Visual review without a developer laptop: phone + desktop screenshots
+      # of the real image, uploaded as a build artifact on every run.
+      - name: Screenshots (phone + desktop)
+        run: |
+          set -euo pipefail
+          docker run -d --name shots --network host -e PORT=3300 \
+            -e DATABASE_URL=postgres://smoke:smoke@127.0.0.1:5432/smoke \
+            dakwah-belajar-web:latest
+          for _ in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:3300/belajar/api/health >/dev/null 2>&1 && break
+            sleep 2
+          done
+          mkdir -p /tmp/shots-run && cp belajar/scripts/ci/screenshots.mjs /tmp/shots-run/
+          cd /tmp/shots-run
+          npm init -y >/dev/null
+          npm install --no-audit --no-fund --silent playwright@1.49.1
+          npx playwright install --with-deps chromium >/dev/null
+          node screenshots.mjs
+          docker rm -f shots >/dev/null
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: belajar-screenshots
+          path: /tmp/shots-run/shots/*.png
+          retention-days: 14
+
       - name: Ship release + deploy on VM
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         env:
