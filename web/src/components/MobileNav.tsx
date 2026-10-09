@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { Menu, X } from "lucide-react";
 
 /**
- * Mobile-only hamburger menu. Renders nothing on `md+` screens — the
+ * Mobile + tablet hamburger menu. Renders nothing on `lg+` screens — the
  * desktop nav in `Header.tsx` handles those. On smaller screens, the
  * button opens a right-side drawer with the same nav items.
  *
@@ -67,7 +67,7 @@ export function MobileNav({
         type="button"
         onClick={() => setOpen(true)}
         aria-label={openLabel}
-        className="inline-flex h-9 w-9 items-center justify-center rounded-full text-ink-muted transition hover:bg-paper-deep md:hidden"
+        className="inline-flex h-9 w-9 items-center justify-center rounded-full text-ink-muted transition hover:bg-paper-deep lg:hidden"
       >
         <Menu className="h-5 w-5" />
       </button>
@@ -78,7 +78,7 @@ export function MobileNav({
             role="dialog"
             aria-modal="true"
             aria-label={openLabel}
-            className="fixed inset-0 z-[60] md:hidden"
+            className="fixed inset-0 z-[60] lg:hidden"
           >
             <button
               type="button"

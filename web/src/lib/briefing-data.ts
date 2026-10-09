@@ -18,6 +18,7 @@ import {
   slugifyGroup,
 } from "@/lib/dashboard-metrics";
 import { extractMahasiswaContent } from "@/lib/flyer/content";
+import { occasionWeeks, weekRangeUtc, wibWeekOf } from "@/lib/week-filter";
 
 /**
  * Strip word-count annotations the LLM echoes back from the prompt's
@@ -1132,6 +1133,130 @@ export async function getAllLatestBriefings(): Promise<
     if (row) out.set(group, row);
   });
   return out;
+}
+
+/** Occasion tracks that carry a Khutbah Jumat + Kultum (alongside the 14
+ *  weekly themes): Islamic-calendar and national occasions. Fiqh /
+ *  Tafsir publish articles only and are left out of the library. */
+const KHUTBAH_KULTUM_OCCASION_GROUPS: readonly string[] = [
+  "Acara Kalender Islam",
+  NATIONAL_GROUP,
+];
+
+function sqlList(values: readonly string[]) {
+  return sql.join(
+    values.map((v) => sql`${v}`),
+    sql`, `,
+  );
+}
+
+/** WIB weeks (their Monday, "YYYY-MM-DD") that have at least one
+ *  khutbah/kultum-bearing briefing, newest first. Feeds the
+ *  /khutbah-kultum week picker. Weekly themes count in the week they were
+ *  saved; occasion editions in every week `occasionWeeks` files them
+ *  under (the Fridays between save and event), capped at the current week. */
+export async function getKhutbahKultumWeeks(): Promise<string[]> {
+  const [weeklyRows, occasionRows] = await Promise.all([
+    db.execute(sql`
+      SELECT DISTINCT
+        to_char(date_trunc('week', generated_at AT TIME ZONE 'Asia/Jakarta'), 'YYYY-MM-DD') AS wk
+      FROM briefings
+      WHERE theme_group IN (${sqlList(BRIEFING_GROUPS)})
+      ORDER BY wk DESC
+      LIMIT 260
+    `) as unknown as Promise<Array<{ wk: string }>>,
+    db.execute(sql`
+      SELECT generated_at, headline_stats->>'gregorian_date' AS event_date
+      FROM briefings
+      WHERE theme_group IN (${sqlList(KHUTBAH_KULTUM_OCCASION_GROUPS)})
+        AND occasion_slug IS NOT NULL
+    `) as unknown as Promise<
+      Array<{ generated_at: Date | string; event_date: string | null }>
+    >,
+  ]);
+  const thisWeek = wibWeekOf(new Date());
+  const weeks = new Set(weeklyRows.map((r) => r.wk));
+  for (const r of occasionRows) {
+    for (const wk of occasionWeeks(new Date(r.generated_at), r.event_date, thisWeek)) {
+      weeks.add(wk);
+    }
+  }
+  return [...weeks].sort().reverse();
+}
+
+export type KhutbahKultumBriefing = {
+  generatedAt: Date;
+  themeGroup: string;
+  occasionSlug: string | null;
+  summaryMd: string;
+  summaryMdEn: string | null;
+  headlineStats: Record<string, unknown> | null;
+};
+
+type KhutbahKultumRow = {
+  generated_at: Date | string;
+  theme_group: string;
+  occasion_slug: string | null;
+  summary_md: string | null;
+  summary_md_en: string | null;
+  headline_stats: Record<string, unknown> | null;
+};
+
+/** The briefings whose Khutbah/Kultum belong to one WIB week (its
+ *  Monday, "YYYY-MM-DD"):
+ *   - each weekly theme's latest row saved inside the week, and
+ *   - each occasion's row (the save path keeps one per occasion_slug),
+ *     kept when `occasionWeeks` files it under this week — the weeks
+ *     whose Friday falls between its save and its event, so an edition
+ *     saved ahead shows in the week it was written for, and one re-saved
+ *     later stays there. `occasion_slug IS NOT NULL` as in the hub getters: a dated
+ *     slug without one would not resolve.
+ *  Latest-per-track mirrors `getBriefingBySlug`, which resolves a dated
+ *  slug to the LATEST row of that WIB day (per theme group, or per
+ *  occasion_slug), so a card built from these rows links to the same
+ *  body it summarises. */
+export async function getKhutbahKultumBriefings(
+  week: string,
+): Promise<KhutbahKultumBriefing[]> {
+  const { startUtc, endUtc } = weekRangeUtc(week);
+  const [weeklyRows, occasionRows] = await Promise.all([
+    db.execute(sql`
+      SELECT DISTINCT ON (theme_group)
+        generated_at, theme_group, occasion_slug, summary_md, summary_md_en,
+        headline_stats
+      FROM briefings
+      WHERE theme_group IN (${sqlList(BRIEFING_GROUPS)})
+        AND generated_at >= ${startUtc.toISOString()}
+        AND generated_at <  ${endUtc.toISOString()}
+      ORDER BY theme_group, generated_at DESC
+    `) as unknown as Promise<KhutbahKultumRow[]>,
+    db.execute(sql`
+      SELECT DISTINCT ON (theme_group, occasion_slug)
+        generated_at, theme_group, occasion_slug, summary_md, summary_md_en,
+        headline_stats
+      FROM briefings
+      WHERE theme_group IN (${sqlList(KHUTBAH_KULTUM_OCCASION_GROUPS)})
+        AND occasion_slug IS NOT NULL
+      ORDER BY theme_group, occasion_slug, generated_at DESC
+    `) as unknown as Promise<KhutbahKultumRow[]>,
+  ]);
+  const occasionsThisWeek = occasionRows.filter((r) =>
+    occasionWeeks(
+      new Date(r.generated_at),
+      r.headline_stats?.gregorian_date,
+      week,
+    ).includes(week),
+  );
+  return [...weeklyRows, ...occasionsThisWeek]
+    .filter((r) => r.summary_md)
+    .map((r) => ({
+      generatedAt: new Date(r.generated_at),
+      themeGroup: r.theme_group,
+      occasionSlug: r.occasion_slug,
+      summaryMd: stripWordCountAnnotations(r.summary_md) as string,
+      summaryMdEn: stripWordCountAnnotations(r.summary_md_en),
+      headlineStats: r.headline_stats,
+    }));
 }
 
 export type GroupVolume = {

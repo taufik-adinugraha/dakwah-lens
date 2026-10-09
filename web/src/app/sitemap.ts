@@ -25,6 +25,7 @@ const STATIC_PATHS = [
   "/pustaka-kajian",
   "/discussions",
   "/flyers/public",
+  "/khutbah-kultum",
 ] as const;
 
 // Deliverable sub-page slugs by briefing type (keys of
@@ -61,8 +62,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entries.push({
       url: `${SITE_URL}/id${path}`,
       lastModified: now,
-      changeFrequency: path === "" || path === "/briefings" ? "daily" : "monthly",
-      priority: path === "" ? 1 : 0.6,
+      changeFrequency:
+        path === "" || path === "/briefings"
+          ? "daily"
+          : path === "/khutbah-kultum"
+            ? "weekly"
+            : "monthly",
+      priority: path === "" ? 1 : path === "/khutbah-kultum" ? 0.8 : 0.6,
       alternates: alternates(path, true),
     });
   }

@@ -28,6 +28,7 @@ export async function Header() {
       ? [{ href: `/${locale}/dashboard`, label: t("dashboard") }]
       : []),
     { href: `/${locale}/briefings`, label: t("insights") },
+    { href: `/${locale}/khutbah-kultum`, label: t("khutbah_kultum") },
     { href: `/${locale}/discussions`, label: t("discussions") },
     { href: `/${locale}/kitab`, label: t("kitab") },
     { href: `/${locale}/flyers/public`, label: t("flyers_library") },
@@ -40,11 +41,11 @@ export async function Header() {
     <header className="sticky top-0 z-30 w-full border-b border-hairline bg-paper/85 font-body backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
         <div className="flex h-full w-full items-center justify-between gap-3">
-          {/* Mobile-only: hamburger + home icon on the left. The
-              MobileNav component auto-hides on md+, and the desktop
-              logo below auto-hides on mobile — so the two never
+          {/* Below lg: hamburger + home icon on the left. The
+              MobileNav component auto-hides on lg+, and the desktop
+              logo below auto-hides under lg — so the two never
               collide visually. */}
-          <div className="flex items-center gap-1 md:hidden">
+          <div className="flex items-center gap-1 lg:hidden">
             <MobileNav
               items={mobileItems}
               openLabel={t("open_menu")}
@@ -61,7 +62,7 @@ export async function Header() {
 
           <Link
             href="/"
-            className="hidden items-center md:flex"
+            className="hidden shrink-0 items-center lg:flex"
             aria-label="Dakwah-Lens"
           >
             <Image
@@ -74,17 +75,32 @@ export async function Header() {
             />
           </Link>
 
-          <nav className="hidden items-center gap-7 text-sm font-medium text-ink-muted md:flex">
+          {/* Desktop nav from lg (was md until "Khutbah & Kultum" joined):
+              signed in, the row needs ~870px (id) / ~900px (en) at a 16px
+              gap — wider than a 768px tablet, so it overflowed and the
+              page scrolled sideways. Tablets get the hamburger instead;
+              whitespace-nowrap keeps two-word labels on one line, and the
+              logo is shrink-0 so an overflow can never squash it. */}
+          <nav className="hidden items-center gap-5 whitespace-nowrap text-sm font-medium text-ink-muted lg:flex xl:gap-7">
+            {/* Below xl the Dashboard link yields its ~100px (it is also
+                in the UserMenu for approved users): signed in at 1024px,
+                six items squeezed the logo to a sliver. */}
             {user && (
               <Link
                 href="/dashboard"
-                className="hover:text-ink transition"
+                className="hidden hover:text-ink transition xl:inline"
               >
                 {t("dashboard")}
               </Link>
             )}
             <Link href="/briefings" className="hover:text-ink transition">
               {t("insights")}
+            </Link>
+            <Link
+              href="/khutbah-kultum"
+              className="hover:text-ink transition"
+            >
+              {t("khutbah_kultum")}
             </Link>
             <Link
               href="/discussions"

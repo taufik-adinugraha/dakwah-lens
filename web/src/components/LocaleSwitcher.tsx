@@ -42,7 +42,14 @@ export function LocaleSwitcher() {
             disabled={isPending || active}
             onClick={() =>
               startTransition(() => {
-                router.replace(pathname, { locale });
+                // Keep the query string: pages like /khutbah-kultum and
+                // /flyers/public hold their view (?week, ?tab, ?month) in
+                // it, and next-intl's pathname carries none. Read at click
+                // time — no useSearchParams, so no Suspense boundary is
+                // needed on statically rendered pages.
+                router.replace(`${pathname}${window.location.search}`, {
+                  locale,
+                });
               })
             }
             title={name}
