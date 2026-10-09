@@ -387,14 +387,31 @@ export function LessonStage({
   const pct = Math.round(((idx + 1) / steps.length) * 100);
   const source = sources[p.sourceIdx];
 
-  // Middle control: the one thing to do next in this state.
-  const middle = done
-    ? { label: t("restart_lesson"), icon: <RotateCcw aria-hidden className="h-5 w-5" />, onClick: () => begin(0), primary: false }
-    : atPractice
-      ? { label: t("continue_after_practice"), icon: <Play aria-hidden className="h-5 w-5" />, onClick: () => begin(idx + 1), primary: true }
-      : running
-        ? { label: t("pause"), icon: <Pause aria-hidden className="h-5 w-5" />, onClick: pauseLesson, primary: false }
-        : { label: t("resume"), icon: <Play aria-hidden className="h-5 w-5" />, onClick: resume, primary: true };
+  // Middle control: the one thing to do next in this state. Render reads only
+  // this plain mode; the handlers (which touch refs) are chosen at click time,
+  // so the React Compiler never sees a ref-reading value used in render.
+  const middleMode = done ? "restart" : atPractice ? "after_practice" : running ? "pause" : "resume";
+  const middlePrimary = middleMode === "after_practice" || middleMode === "resume";
+  const middleLabel = {
+    restart: t("restart_lesson"),
+    after_practice: t("continue_after_practice"),
+    pause: t("pause"),
+    resume: t("resume"),
+  }[middleMode];
+  const middleIcon =
+    middleMode === "restart" ? (
+      <RotateCcw aria-hidden className="h-5 w-5" />
+    ) : middleMode === "pause" ? (
+      <Pause aria-hidden className="h-5 w-5" />
+    ) : (
+      <Play aria-hidden className="h-5 w-5" />
+    );
+  const onMiddle = () => {
+    if (middleMode === "restart") begin(0);
+    else if (middleMode === "after_practice") begin(idx + 1);
+    else if (middleMode === "pause") pauseLesson();
+    else resume();
+  };
 
   return (
     <div className="rounded-2xl border border-hairline bg-white p-4 shadow-sm sm:p-7">
@@ -527,11 +544,11 @@ export function LessonStage({
                 id={middleId}
                 ref={focusOnMount}
                 type="button"
-                onClick={middle.onClick}
-                className={`${middle.primary ? "btn-primary" : "btn-secondary"} w-full sm:order-2 sm:w-auto sm:grow`}
+                onClick={onMiddle}
+                className={`${middlePrimary ? "btn-primary" : "btn-secondary"} w-full sm:order-2 sm:w-auto sm:grow`}
               >
-                {middle.icon}
-                {middle.label}
+                {middleIcon}
+                {middleLabel}
               </button>
               <button
                 type="button"
