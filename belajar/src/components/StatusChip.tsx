@@ -1,14 +1,14 @@
-import { Hourglass } from "lucide-react";
+import { Info } from "lucide-react";
 
 /**
- * A status, not a control. Material still awaiting ustadz review gets the
- * draft look (icon + words, readable amber on its own tint, 5.91:1, dashed
- * edge); reviewed material in the beta gets a quiet forest pill.
+ * A status, not a control. AI-prepared material gets the notice look
+ * (icon + words, readable amber on its own tint, 5.91:1, dashed edge); there
+ * is no human review step (operator, 2026-10-09).
  */
 export function StatusChip({ label, draft }: { label: string; draft: boolean }) {
   return draft ? (
     <span className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-dashed border-notice bg-notice-bg px-3 py-1 text-sm font-medium text-notice">
-      <Hourglass className="h-4 w-4 shrink-0" aria-hidden />
+      <Info className="h-4 w-4 shrink-0" aria-hidden />
       {label}
     </span>
   ) : (

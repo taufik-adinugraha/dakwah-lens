@@ -24,7 +24,7 @@
     "concepts_available": "{n} konsep nahwu dan sharaf",
     "concepts_cta": "Lihat semua konsep",
     "status_beta": "Uji coba",
-    "status_beta_draft": "Uji coba · materi masih draf"
+    "status_beta_draft": "Uji coba · dibantu AI"
   },
   "Quran": {
     "title": "Bahasa Arab Al-Qur'an & Tafsir",
@@ -45,8 +45,8 @@
     "p1_body": "Ayat Al-Qur'an hanya diperdengarkan dari bacaan qari manusia. Suara AI hanya menjelaskan dalam bahasa Indonesia, tidak pernah membacakan ayat.",
     "p2_title": "Bersumber, bukan dikarang",
     "p2_body": "Setiap arti, i'rab, tafsir, dan hadits dikutip dari kitab atau data yang disebut namanya, lengkap dengan rujukannya.",
-    "p3_title": "Ditinjau ustadz",
-    "p3_body": "Materi baru tayang setelah ditinjau ustadz. Selama uji coba, sebagian materi masih berstatus draf dan ditandai jelas."
+    "p3_title": "Dibantu AI, bersumber kitab",
+    "p3_body": "Penjelasan disusun dengan bantuan AI dari kitab yang disebut namanya. Ini bahan belajar, bukan fatwa: periksa rujukannya, dan tanyakan kepada guru bila ragu."
   },
   "Breadcrumb": {
     "label": "Anda berada di",
@@ -54,9 +54,8 @@
     "quran": "Al-Qur'an"
   },
   "Footer": {
-    "disclaimer": "Dibantu AI, bukan fatwa otoritatif. Penjelasan disusun dari kitab yang disebut namanya dan ditinjau ustadz sebelum tayang.",
-    "credits": "Sumber & lisensi",
-    "disclaimer_beta": "Dibantu AI, bukan fatwa otoritatif. Penjelasan disusun dari kitab yang disebut namanya. Selama uji coba, materi bertanda “Draf” belum ditinjau ustadz."
+    "disclaimer": "Dibantu AI, bukan fatwa otoritatif. Penjelasan disusun dari kitab yang disebut namanya; periksa rujukannya.",
+    "credits": "Sumber & lisensi"
   },
   "Credits": {
     "title": "Sumber & lisensi",
@@ -77,8 +76,8 @@
   "Surah": {
     "eyebrow": "Surah",
     "meta": "{ayat} ayat · {words} kata",
-    "draft_banner": "Masa uji coba: arti kata, i'rab (perubahan akhir kata karena kedudukannya), dan catatan di halaman ini masih draf yang menunggu tinjauan ustadz. Teks ayat dan bacaan imamnya sendiri tidak berubah.",
-    "draft_chip": "Draf — menunggu tinjauan ustadz",
+    "draft_banner": "Masa uji coba: arti kata, i'rab (perubahan akhir kata karena kedudukannya), dan catatan di halaman ini disusun dengan bantuan AI dari kitab yang disebut namanya. Ini bahan belajar, bukan fatwa. Teks ayat dan bacaan imamnya sendiri tidak berubah.",
+    "draft_chip": "Dibantu AI · bukan fatwa",
     "learn_ayah": "Pelajari ayat ini",
     "ayah_done": "Latihan selesai",
     "translation_source": "Terjemahan: {source}",
@@ -110,7 +109,7 @@
     "concepts_heading": "Konsep baru",
     "deeper_heading": "Pelajari lebih dalam",
     "deeper_intro": "Ketuk salah satu judul untuk membuka atau menutup penjelasannya.",
-    "draft_short": "Draf"
+    "draft_short": "Dibantu AI"
   },
   "Word": {
     "meaning": "Arti",
@@ -120,7 +119,7 @@
     "other_views": "Pendapat ulama lain",
     "sources": "Rujukan",
     "no_root": "tidak berakar (huruf/kata ganti)",
-    "draft": "Draf — menunggu tinjauan ustadz",
+    "draft": "Dibantu AI · bukan fatwa",
     "role": "Peran dalam kalimat",
     "concepts": "Konsep tata bahasa",
     "lemma": "Lihat kata dasarnya",

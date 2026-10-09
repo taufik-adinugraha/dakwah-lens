@@ -131,7 +131,7 @@ export default async function LocaleLayout({
             <div className="mx-auto flex max-w-5xl flex-col gap-4 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6">
               {/* Mandatory label (AGENTS.md): always visible, never collapsed. */}
               <p className="max-w-prose text-pretty text-base text-ink-muted">
-                {tf(IS_PUBLIC ? "disclaimer" : "disclaimer_beta")}
+                {tf("disclaimer")}
               </p>
               <div className="flex flex-wrap gap-x-6 gap-y-2 text-base">
                 <Link href={creditsHref()} className="link-text inline-flex min-h-11 items-center">
