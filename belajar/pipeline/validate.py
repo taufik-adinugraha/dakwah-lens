@@ -1,29 +1,44 @@
 #!/usr/bin/env python3
-"""Stage 6 (local half): re-check belajar/content/al-fatihah.json. Exit 1 on any failure.
+"""Stage 6 (local half): re-check every lesson in belajar/content/ (one SurahContent file per
+surah registered in common.SURAHS: al-fatihah, al-ikhlas, al-falaq, an-nas) and the shared
+library.json. Exit 1 on any failure.
 
-Checks
-  1. Qur'anic text: every ayah `ar` equals its Tanzil line byte-for-byte; every word `ar` equals
-     the w-th space token of that line; both are byte-exact substrings of the pinned Tanzil file.
-     Every «…» quotation in any prose field is a byte-exact substring too, and any other Arabic
-     script in prose may only be single letters (letter lists such as roots).
-  2. Words: 29 in total, 4+4+2+3+4+3+9, locs consecutive and matching their ayah.
-  3. Recitation segments: integers, sorted, non-overlapping, endMs > startMs, word indices
-     cover 1..N exactly once, last end not after the measured length of the streamed file.
+Checks (per lesson unless said otherwise)
+  0. Lessons: content/ holds exactly library.json plus one <slug>.json per registered surah that
+     has authored input (al-fatihah always); no unregistered file, no authored surah left unbuilt,
+     no lesson without its authored files; slug, surah number, name_id and name_ar (Tanzil
+     metadata) match the registry.
+  1. Qur'anic text: every ayah `ar` equals its Tanzil line byte-for-byte, except that the
+     surah-heading basmalah Tanzil prepends to ayah 1 (every surah but 1 and 9) is sliced off
+     (common.lesson_ayah); every word `ar` equals the w-th space token of that text; both are
+     byte-exact substrings of the pinned Tanzil file. Every «…» quotation in any prose field is a
+     byte-exact substring too, and any other Arabic script in prose may only be single letters
+     (letter lists such as roots).
+  2. Words: per ayah exactly common.SURAHS' counts (Al-Fatihah 4+4+2+3+4+3+9 = 29, Al-Ikhlas
+     4+2+4+5, Al-Falaq 4+4+5+5+5, An-Nas 4+2+2+4+5+3), equal to the QAC 0.4 word counts, locs
+     consecutive and matching their ayah.
+  3. Recitation segments, per reciter: exactly Husary Mu'allim + Alafasy (L7 default); segments
+     equal the pinned quran-align entry (0-based [start, end) -> 1-based word); integers, sorted,
+     non-overlapping, endMs > startMs, word indices cover 1..N exactly once, last end not after
+     the measured length of the streamed file of that surah and ayah.
   4. Sources: every word and fact has >= 1 SourceRef with a kitab; urls are http(s).
   5. Review: every status is "draft".
   6. Shape: every object's keys match the field names in belajar/src/content/schema.ts
      exactly (no unknown keys, no missing required keys), enums and loc formats hold.
-  7. Pins: data_versions repeat the sha256 values pinned in sources.json; the cached Tanzil
-     file still matches its pin.
-  8. Translation: `text` is byte-identical to the cached QuranEnc `translation` (footnote markers
-     kept); `footnotes` are the cached QuranEnc `footnotes` field, verbatim, one item per [n],
-     in order, with nothing but whitespace left over; markers in the text = footnote markers.
+  7. Pins: data_versions repeat the sha256 values pinned in sources.json (QuranEnc: that
+     surah's own sura file); the cached Tanzil file still matches its pin.
+  8. Translation: `text` is byte-identical to the cached QuranEnc `translation` of that sura and
+     ayah (footnote markers kept); `footnotes` are the cached QuranEnc `footnotes` field,
+     verbatim, one item per [n], in order, with nothing but whitespace left over; markers in the
+     text = footnote markers.
   9. Fact counts, re-derived here from QAC 0.4: for every LEM:/ROOT: query named in a fact's QAC
      source whose ayah set equals the fact's location list, a count that differs from the number
      of ayat must be stated as "N kali dalam M ayat". Every "N kali dalam M ayat" has M = number
      of locations; a title count that differs from it must be restated that way in the body.
-     Fact methods that use QAC carry the QAC 0.4 / Tanzil 1.0.2 basis note, and the QAC header
-     and the surah-1 byte identity behind that note are re-checked.
+     Fact methods (and the library's occurrence methods) that use QAC carry the QAC 0.4 /
+     Tanzil 1.0.2 basis note; every surah the note names is a lesson surah whose QAC words are
+     re-checked here to be byte-identical to the Tanzil 1.1 tokens, and the QAC header is re-read.
+     Hadith: status draft; `ar` is Arabic script only; `id` (Indonesian) carries no Arabic words.
  10. Prose transliteration: no capital after the article hyphen in an SKB word (capital only for
      Allah); no ASCII apostrophe in a word written in SKB (hamzah ’, ‘ain ‘); no
      ASCII-apostrophe spelling of a transliteration that appears elsewhere in SKB form; none of
@@ -36,10 +51,11 @@ Shared library (belajar/content/library.json) and the lesson's links into it
  12. Schema constraints: both files are read against a mirror of the zod declarations in
      schema.ts (types, required/optional/nullable, min/max/length, regex, int/positive, url,
      enums, no unknown keys), so a value the app's zod parse would reject fails here first.
- 13. Links resolve: every Word.lemma_id is a Lexeme id whose lemma_ar and root equal the word's
-     QAC lemma and root, and whose pos agrees with the word's pos (one " + "-part of the word's
-     pos equals it, ignoring a verb's aspect and a "(jamak)"/"(mutsanna)" the lemma lacks); every Word.concepts id, structure.groups[].concept and Concept.related
-     id is a Concept id; every Concept.examples loc is a word of a lesson in content/, and the
+ 13. Links resolve (across all lessons): every Word.lemma_id is a Lexeme id whose lemma_ar and
+     root equal the word's QAC lemma and root, and whose pos agrees with the word's pos (one
+     " + "-part of the word's pos equals it, ignoring a verb's aspect and a "(jamak)"/"(mutsanna)"
+     the lemma lacks); a word whose QAC stem has no lemma has lemma_id null; every Word.concepts
+     id, structure.groups[].concept and Concept.related id is a Concept id; every Concept.examples loc is a word of a lesson in content/, and the
      word lists that concept (and vice versa); every Root.lemmas id is a Lexeme with the same root
      letters, and every rooted Lexeme is listed by exactly one Root. Ids are unique per kind.
  14. Structure: every ayah has one; groups name >= 2 ascending word indices inside the ayah.
@@ -51,30 +67,47 @@ Shared library (belajar/content/library.json) and the lesson's links into it
      an i'lal's before and after differ; Concept.related names no id twice.
  16. Prose of the library, the structures and the roles goes through 1 (quotes byte-exact, no
      unquoted Arabic words) and, together with the lesson prose, through 10.
- 17. Pins: data_versions name the current sha256 of the authored structure, concepts map,
-     lexicon and concepts files.
+ 17. Pins: data_versions name the current sha256 of each lesson's authored words, structure and
+     concepts map (and facts / hadith when the lesson was built from them), and of the lexicon
+     and concepts files.
+ 18. App wiring: src/lib/content.ts loads exactly the lessons in content/, in mushaf order, and
+     src/lib/routes.ts SURAH_SLUGS lists the same slugs in the same order.
 """
 from __future__ import annotations
 
 import json
 import re
 import sys
+from pathlib import Path
 
-from common import (ARABIC_RUN, CONTENT_DIR, PIPELINE, SCHEMA_TS, bw_to_ar, load_qac, load_sources, load_tanzil,
-                    qac_words, require_pinned, root_letters, sha256_file)
+import xml.etree.ElementTree as ET
 
-OUT = CONTENT_DIR / "al-fatihah.json"
+from common import (ARABIC_RUN, CONTENT_DIR, CONTENT_TS, PIPELINE, ROUTES_TS, SCHEMA_TS, SURAH_BY_SLUG, SURAHS,
+                    authored_file, bw_to_ar, lesson_ayah, load_qac, load_sources, load_tanzil, qac_words,
+                    quranenc_sura, require_pinned, root_letters, sha256_file)
+
+# Paths the checks read; test_validate.py points them at temporary copies.
+LESSON_DIR = CONTENT_DIR
 LIBRARY = CONTENT_DIR / "library.json"
+CONTENT_TS_PATH = CONTENT_TS
+ROUTES_TS_PATH = ROUTES_TS
 AUTHORED = PIPELINE / "authored"
+# reciter -> sources.json input holding its duration probes (L7: Alafasy is the default voice)
+RECITERS = {"Husary_Muallim_128kbps": "everyayah_husary_muallim", "Alafasy_128kbps": "everyayah_alafasy"}
 # Typed (non-Qur'anic) Arabic in the library: letters U+0621–U+063A, U+0641–U+064A; harakat and
 # tanwin U+064B–U+0652; spaces. Tatweel (U+0640), alif wasla, superscript alif and Qur'anic marks
 # are Uthmani-only and never appear in a tashrif or i'lal form.
 AR_LETTERS = set(chr(c) for c in range(0x0621, 0x063B)) | set(chr(c) for c in range(0x0641, 0x064B))
 TYPED_AR = AR_LETTERS | set(chr(c) for c in range(0x064B, 0x0653)) | {" "}
-EXPECTED_WORDS = [4, 4, 2, 3, 4, 3, 9]
 QAC_TANZIL_HEADER = "Tanzil Quran Text (Uthmani, version 1.0.2)"
 QAC_BASIS = ("QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 1 identik byte-per-byte "
              "dengan 1.1 yang dipakai)")
+# The same note naming other (or more) surahs: "surah 1, 112, 113 dan 114 identik …".
+QAC_BASIS_RE = re.compile(r"QAC 0\.4 \(disusun di atas teks Tanzil Uthmani 1\.0\.2; surah (\d+(?:(?:, | dan )\d+)*) "
+                          r"identik byte-per-byte dengan 1\.1 yang dipakai\)")
+# Surahs whose QAC words main() byte-checked against Tanzil 1.1; None = not known (the early
+# check run by build_surah.py), and then the surahs a basis note names are not compared.
+CHECKED_SURAHS: set[int] | None = None
 DARWISY = "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)"
 fails: list[str] = []
 
@@ -486,8 +519,19 @@ def check_fact_counts(f: dict, stems: list) -> None:
                 want = f"{fmt(len(hits))} kali dalam {fmt(len(ayat))} ayat"
                 if want not in f["body"]:
                     fail(f"{fp}: {key}:{val} = {len(hits)} segments in {len(ayat)} ayat; body must say '{want}'")
-    if "QAC" in f["method"] and QAC_BASIS not in f["method"]:
-        fail(f"{fp}: method uses QAC but lacks the basis note '{QAC_BASIS}'")
+    if "QAC" in f["method"]:
+        check_basis_note(f["method"], fp)
+
+
+def check_basis_note(method: str, where: str) -> None:
+    m = QAC_BASIS_RE.search(method)
+    if not m:
+        fail(f"{where}: method uses QAC but lacks the basis note '{QAC_BASIS}'")
+        return
+    named = {int(x) for x in re.findall(r"\d+", m.group(1))}
+    if CHECKED_SURAHS is not None and named - CHECKED_SURAHS:
+        fail(f"{where}: basis note names surah {sorted(named - CHECKED_SURAHS)}, whose QAC words are not "
+             f"byte-checked here (no lesson for it in content/)")
 
 
 VOWELS = ("fathah", "kasrah", "dhammah", "sukun")
@@ -545,8 +589,9 @@ def pos_agrees(lexeme_pos: str, word_pos: str) -> bool:
     return False
 
 
-def check_library(data: dict, lib: dict, lessons: list[dict], stems: list, raw: str) -> list[tuple[str, str]]:
-    """Checks 13–15 (and the library half of 16/17). Returns the prose items for check 10."""
+def check_library(lib: dict, lessons: list[dict], stems: list, raw: str) -> list[tuple[str, str]]:
+    """Checks 13–15 (and the library half of 16/17) over every lesson. Returns the prose items for
+    check 10."""
     prose: list[tuple[str, str]] = []
     kinds = {"concepts": lib.get("concepts", []), "lexicon": lib.get("lexicon", []), "roots": lib.get("roots", [])}
     ids = {}
@@ -586,6 +631,8 @@ def check_library(data: dict, lib: dict, lessons: list[dict], stems: list, raw: 
         if roots != {tuple(x["root"]) if x.get("root") else None}:
             fail(f"{where}: root {x.get('root')} != QAC 0.4 root(s) of its lemma {sorted(map(str, roots))}")
         oc = x.get("occurrences")
+        if oc:
+            check_basis_note(oc["method"], f"{where}.occurrences")
         if oc and (oc["count"], oc["ayat"]) != (len(hits), len({(g.s, g.a) for g in hits})):
             fail(f"{where}: occurrences {oc['count']}/{oc['ayat']} != QAC 0.4 {len(hits)} in "
                  f"{len({(g.s, g.a) for g in hits})} ayat")
@@ -607,6 +654,7 @@ def check_library(data: dict, lib: dict, lessons: list[dict], stems: list, raw: 
     for r in kinds["roots"]:
         where = f"library.roots[{r['id']}]"
         hits = by_root.get(tuple(r["letters"]))
+        check_basis_note(r["occurrences"]["method"], f"{where}.occurrences")
         if not hits:
             fail(f"{where}: letters {r['letters']} are not a QAC 0.4 root")
         elif r["occurrences"]["count"] != len(hits):
@@ -644,7 +692,7 @@ def check_library(data: dict, lib: dict, lessons: list[dict], stems: list, raw: 
                                *[e["note"] for e in c.get("examples", [])]]):
             if t:
                 prose.append((f"{where}.text[{i}]", t))
-    for ay in data.get("ayat", []):
+    for ay in (ay for les in lessons for ay in les.get("ayat", [])):
         n = len(ay.get("words", []))
         st = ay.get("structure")
         if not st:
@@ -694,65 +742,94 @@ def check_library(data: dict, lib: dict, lessons: list[dict], stems: list, raw: 
     return prose
 
 
-def main() -> int:
-    if not OUT.exists():
-        print(f"missing {OUT}; run build_fatihah.py", file=sys.stderr)
-        return 1
-    src = load_sources()
+# ---------------------------------------------------------------- inputs (parsed once per process)
+_PARSED: dict = {}
+
+
+def _cached(key: tuple, load):
+    """test_validate.py runs main() dozens of times; the pinned inputs are re-hashed every run
+    (require_pinned) but parsed once."""
+    if key not in _PARSED:
+        _PARSED[key] = load()
+    return _PARSED[key]
+
+
+def load_align(src: dict) -> dict[str, dict]:
+    """reciter -> {(surah, ayah): quran-align entry}, from the pinned release members."""
     I = src["inputs"]
-    tanzil_path = require_pinned(src, "tanzil_uthmani")
-    T = load_tanzil(tanzil_path)
-    raw = T.raw
-    data = json.loads(OUT.read_text(encoding="utf-8"))
-    segs, qac_header = load_qac(require_pinned(src, "qac_morphology"))
-    stems = [g for g in segs if "STEM" in g.flags]
-    if QAC_TANZIL_HEADER not in qac_header:
-        fail(f"QAC header does not name '{QAC_TANZIL_HEADER}' (the basis note in fact methods)")
-    qw = qac_words(segs)
-    for a in range(1, 8):
-        for w, tok in enumerate(T.verses[(1, a)].split(" "), 1):
-            if bw_to_ar("".join(g.form for g in qw.get((1, a, w), []))) != tok:
-                fail(f"QAC word 1:{a}:{w} is not byte-identical to the Tanzil 1.1 token")
-    qe_rows = {int(r["aya"]): r for r in
-               json.loads(require_pinned(src, "quranenc_indonesian_affairs").read_text(encoding="utf-8"))["result"]}
+    qa_dir = (PIPELINE / I["quran_align"]["cache_path"]).parent
+    out = {}
+    for reciter in RECITERS:
+        p = qa_dir / f"{reciter}.json"
+        want = I["quran_align"]["members"][f"{reciter}.json"]["sha256"]
+        if not p.exists() or sha256_file(p) != want:
+            fail(f"quran-align {reciter}.json missing or not matching its pin; run fetch.py")
+            out[reciter] = {}
+            continue
+        out[reciter] = _cached(("align", want), lambda p=p: {(e["surah"], e["ayah"]): e
+                                                              for e in json.loads(p.read_text())})
+    return out
+
+
+def lesson_paths() -> dict[str, Path]:
+    """Check 0: slug -> lesson file, in mushaf order."""
+    found = {f.stem: f for f in sorted(LESSON_DIR.glob("*.json")) if f.name != LIBRARY.name}
+    for slug in sorted(set(found) - set(SURAH_BY_SLUG)):
+        fail(f"content/{slug}.json is not a surah registered in common.SURAHS (the app would not load it)")
+    for spec in SURAHS:
+        has_input = authored_file(spec.slug, "words").exists()
+        if spec.slug == "al-fatihah" and spec.slug not in found:
+            fail(f"missing content/{spec.slug}.json; run build_surah.py {spec.slug}")
+        elif has_input and spec.slug not in found:
+            fail(f"authored/{spec.slug}.words.json exists but content/{spec.slug}.json does not; "
+                 f"run build_surah.py {spec.slug}")
+        elif spec.slug in found and not has_input:
+            fail(f"content/{spec.slug}.json has no authored/{spec.slug}.words.json to be checked against")
+    return {spec.slug: found[spec.slug] for spec in SURAHS if spec.slug in found}
+
+
+def check_lesson(spec, data: dict, ctx: dict) -> tuple[list[tuple[str, str]], set[str]]:
+    """Checks 0–9 and 11 for one lesson. Returns (prose items for check 10, SKB words)."""
+    T, raw, I, src, qw = ctx["T"], ctx["raw"], ctx["I"], ctx["src"], ctx["qw"]
+    S = spec.surah
     prose: list[tuple[str, str]] = []
     skb_words: set[str] = set()
-    if not LIBRARY.exists():
-        print(f"missing {LIBRARY}; run build_library.py", file=sys.stderr)
-        return 1
-    lib = json.loads(LIBRARY.read_text(encoding="utf-8"))
+    lp = f"content/{spec.slug}.json"
 
-    # 6. shape against schema.ts (keys), 12. zod constraints
-    if not SCHEMA_TS.exists():
-        fail(f"schema not found at {SCHEMA_TS}")
-    else:
-        ts = SCHEMA_TS.read_text(encoding="utf-8")
-        schemas, enums = parse_schema(ts)
-        defs = zod_defs(ts)
-        for name, obj in (("SurahContent", data), ("Library", lib)):
-            if name not in schemas or name not in defs:
-                fail(f"schema.ts has no {name} object")
-                continue
-            check_shape(obj, schemas[name], schemas, enums, name)
-            zcheck(obj, defs[name], defs, name)
+    # 0. identity
+    for key, want in (("slug", spec.slug), ("surah", S), ("name_id", spec.name_id),
+                      ("name_ar", ctx["names_ar"].get(S))):
+        if data.get(key) != want:
+            fail(f"{lp}: {key} {data.get(key)!r} != {want!r} (common.SURAHS / Tanzil metadata)")
 
-    # 1/2. text and words
+    # 1/2. text and words; QAC words byte-identical to the Tanzil tokens (basis note, check 9)
     ayat = data.get("ayat", [])
-    if [a.get("ayah") for a in ayat] != list(range(1, 8)):
-        fail(f"ayat are not 1..7: {[a.get('ayah') for a in ayat]}")
+    if [a.get("ayah") for a in ayat] != list(range(1, spec.n_ayat + 1)):
+        fail(f"{lp}: ayat are not 1..{spec.n_ayat}: {[a.get('ayah') for a in ayat]}")
     counts = [len(a.get("words", [])) for a in ayat]
-    if counts != EXPECTED_WORDS or sum(counts) != 29:
-        fail(f"word counts {counts} (total {sum(counts)}) != {EXPECTED_WORDS} (29)")
-    probes = {r: I[k]["files"] for r, k in (("Husary_Muallim_128kbps", "everyayah_husary_muallim"),
-                                            ("Alafasy_128kbps", "everyayah_alafasy"))}
+    if counts != list(spec.words):
+        fail(f"{lp}: word counts {counts} (total {sum(counts)}) != {list(spec.words)} ({sum(spec.words)})")
+    qac_counts = [len([k for k in qw if k[0] == S and k[1] == a]) for a in range(1, spec.n_ayat + 1)]
+    if qac_counts != list(spec.words):
+        fail(f"{lp}: QAC 0.4 word counts {qac_counts} != {list(spec.words)}")
+    for a in range(1, spec.n_ayat + 1):
+        for w, tok in enumerate(lesson_ayah(T, S, a)[0].split(" "), 1):
+            if bw_to_ar("".join(g.form for g in qw.get((S, a, w), []))) != tok:
+                fail(f"QAC word {S}:{a}:{w} is not byte-identical to the Tanzil 1.1 token")
+    qe, qe_path = quranenc_sura(src, S)
+    qe_rows = _cached(("quranenc", qe["sha256"]), lambda: {
+        int(r["aya"]): r for r in json.loads(qe_path.read_text(encoding="utf-8"))["result"]})
+    probes = {r: I[k]["files"] for r, k in RECITERS.items()}
     for ay in ayat:
         s, a = ay["surah"], ay["ayah"]
         p = f"ayah {s}:{a}"
+        if s != S:
+            fail(f"{p}: in {lp}, which is surah {S}")
         if ay["loc"] != f"{s}:{a}":
             fail(f"{p}: loc {ay['loc']!r}")
-        line = T.verses.get((s, a))
+        line = lesson_ayah(T, s, a)[0] if (s, a) in T.verses else None
         if ay["ar"] != line:
-            fail(f"{p}: ar differs from the Tanzil line")
+            fail(f"{p}: ar differs from the Tanzil ayah (Tanzil line, surah-heading basmalah removed)")
         if ay["ar"] not in raw:
             fail(f"{p}: ar is not a substring of the Tanzil file")
         toks = line.split(" ") if line else []
@@ -787,14 +864,14 @@ def main() -> int:
             for sr in wd.get("sources", []):
                 check_source(sr, wp)
             check_word_sources(wd, wp)
-        # translation
+        # 8. translation
         tr = ay["translation"]
-        qe = qe_rows.get(a, {})
-        if tr["text"] != qe.get("translation"):
-            fail(f"{p}: translation.text is not byte-identical to the cached QuranEnc text")
-        fn_raw = qe.get("footnotes") or ""
+        qe_row = qe_rows.get(a, {})
+        if tr["text"] != qe_row.get("translation"):
+            fail(f"{p}: translation.text is not byte-identical to the cached QuranEnc text (sura {S})")
+        fn_raw = qe_row.get("footnotes") or ""
         fns = tr.get("footnotes", [])
-        rest, pos = fn_raw, 0
+        pos = 0
         for i, fn in enumerate(fns):
             j = fn_raw.find(fn, pos)
             if j < 0:
@@ -814,12 +891,17 @@ def main() -> int:
             check_prose(fn, raw, f"{p}.translation.footnotes")
         if "2019" in tr["source_label"] or "kemenag 2019" in tr["source_label"].lower():
             fail(f"{p}: translation source_label must be QuranEnc's own label, not 'Kemenag 2019'")
-        if tr["source_label"] != I["quranenc_indonesian_affairs"]["title_id"]:
+        if tr["source_label"] != qe["title_id"]:
             fail(f"{p}: source_label differs from the QuranEnc title recorded in sources.json")
+        if tr.get("version") != qe["version"]:
+            fail(f"{p}: translation version {tr.get('version')!r} != QuranEnc {qe['version']!r}")
         check_prose(tr["text"], raw, f"{p}.translation")
         # 3. recitation
         if not ay.get("recitation"):
             fail(f"{p}: no recitation")
+        reciters = [rc.get("reciter") for rc in ay.get("recitation", [])]
+        if sorted(reciters) != sorted(RECITERS):
+            fail(f"{p}: reciters {reciters} != {sorted(RECITERS)} (Alafasy is the default, plan L7)")
         for rc in ay.get("recitation", []):
             rp = f"{p} {rc['reciter']}"
             segs = rc["segments"]
@@ -840,12 +922,16 @@ def main() -> int:
                 if st < 0:
                     fail(f"{rp} word {w}: negative start")
                 prev = en
+            qa = ctx["align"].get(rc["reciter"], {}).get((s, a))
+            want = [[ws + 1, int(s_ms), int(e_ms)] for ws, _we, s_ms, e_ms in qa["segments"]] if qa else None
+            if segs != want:
+                fail(f"{rp}: segments differ from the pinned quran-align entry for {s}:{a}")
             probe = probes.get(rc["reciter"], {}).get(f"{s:03d}{a:03d}.mp3")
             if not probe:
                 fail(f"{rp}: no duration probe in sources.json")
             elif segs and segs[-1][2] > probe["duration_ms"]:
                 fail(f"{rp}: last segment ends after the streamed file ({segs[-1][2]} > {probe['duration_ms']} ms)")
-            if not rc["url"].startswith("https://everyayah.com/data/" + rc["reciter"] + "/"):
+            if rc["url"] != f"https://everyayah.com/data/{rc['reciter']}/{s:03d}{a:03d}.mp3":
                 fail(f"{rp}: unexpected url {rc['url']}")
             if "quran-align (CC BY 4.0)" not in rc["credit"]:
                 fail(f"{rp}: credit line lacks the quran-align attribution")
@@ -880,65 +966,160 @@ def main() -> int:
         for fld in ("title", "body", "method"):
             check_prose(f[fld], raw, f"{fp}.{fld}")
             prose.append((f"{fp}.{fld}", f[fld]))
-        check_fact_counts(f, stems)
+        check_fact_counts(f, ctx["stems"])
         for sr in f.get("sources", []):
             check_darwisy(sr, fp)
         if len(f["title"]) < 5 or len(f["body"]) < 10 or len(f["method"]) < 5:
             fail(f"{fp}: title/body/method too short for schema.ts")
     for h in data.get("hadith", []):
+        hp = f"{lp} hadith {h.get('citation')!r}"
         if h.get("status") != "draft":
-            fail("hadith: status must be draft")
+            fail(f"{hp}: status must be draft")
+        # The matn is Arabic copied from the corpus; Latin letters mean a placeholder or a mix-up.
+        if not ARABIC_RUN.search(h.get("ar", "")) or re.search(r"[A-Za-z]", h.get("ar", "")):
+            fail(f"{hp}: ar must be Arabic text only")
+        if ARABIC_RUN.search(h.get("id", "")) and any(len(t) > 1 for r in ARABIC_RUN.findall(h["id"]) for t in r.split()):
+            fail(f"{hp}: id (the Indonesian translation) carries Arabic words")
 
-    # 13–16. library records and the lesson's links into them; prose checked with the lesson's
-    lessons = [data] + [json.loads(f.read_text(encoding="utf-8")) for f in sorted(OUT.parent.glob("*.json"))
-                        if f.name not in (OUT.name, LIBRARY.name)]
-    prose += check_library(data, lib, lessons, stems, raw)
-    skb_words.update(x["translit"] for x in lib.get("lexicon", []))
-    check_translit_prose(prose, skb_words)
-
-    # 7. pins
+    # 7. pins (17: authored files of this lesson)
     dv = data.get("data_versions", {})
     pins = {"tanzil": I["tanzil_uthmani"]["sha256"], "qac": I["qac_morphology"]["sha256"],
-            "quran_align": I["quran_align"]["sha256"], "quranenc": I["quranenc_indonesian_affairs"]["sha256"],
+            "quran_align": I["quran_align"]["sha256"], "quranenc": qe["sha256"],
             "tanzil_metadata": I["tanzil_metadata"]["sha256"]}
     for k, sha in pins.items():
         if k not in dv or sha not in dv[k]:
-            fail(f"data_versions.{k} does not carry the pinned sha256 {sha[:12]}…")
+            fail(f"{lp} data_versions.{k} does not carry the pinned sha256 {sha[:12]}…")
     for n, m in I["quran_align"]["members"].items():
         if m["sha256"] not in dv.get("quran_align", ""):
-            fail(f"data_versions.quran_align lacks {n} sha256")
-    authored = PIPELINE / "authored" / "al-fatihah.words.json"
-    if sha256_file(authored) not in dv.get("authored_words", ""):
-        fail("data_versions.authored_words is stale (authored file changed since the build)")
-    for key, f, owner, versions in (
-            ("authored_structure", "al-fatihah.structure.json", "al-fatihah.json", dv),
-            ("authored_concepts_map", "al-fatihah.concepts-map.json", "al-fatihah.json", dv),
-            ("authored_lexicon", "library.lexicon.json", "library.json", lib.get("data_versions", {})),
-            ("authored_concepts", "library.concepts.json", "library.json", lib.get("data_versions", {}))):
-        if sha256_file(AUTHORED / f) not in versions.get(key, ""):
-            fail(f"{owner} data_versions.{key} is stale or missing (authored/{f} changed since the build)")
+            fail(f"{lp} data_versions.quran_align lacks {n} sha256")
+    for key, kind in (("authored_words", "words"), ("authored_structure", "structure"),
+                      ("authored_concepts_map", "concepts-map"), ("authored_facts", "facts.generated"),
+                      ("authored_hadith", "hadith")):
+        f = authored_file(spec.slug, kind)
+        if key in ("authored_facts", "authored_hadith") and not f.exists() and key not in dv:
+            continue  # optional input, not used
+        if key == "authored_facts" and spec.slug == "al-fatihah":
+            continue  # Al-Fatihah's facts are recomputed by facts.py
+        if not f.exists():
+            fail(f"{lp} data_versions.{key} names authored/{f.name}, which no longer exists")
+        elif sha256_file(f) not in dv.get(key, ""):
+            fail(f"{lp} data_versions.{key} is stale or missing (authored/{f.name} changed since the build)")
+    if not all(isinstance(v, str) for v in dv.values()):
+        fail(f"{lp}: data_versions values must be strings")
+    return prose, skb_words
+
+
+def check_app_wiring(slugs: list[str]) -> None:
+    """Check 18: the app loads exactly the lessons in content/, in mushaf order."""
+    if not CONTENT_TS_PATH.exists() or not ROUTES_TS_PATH.exists():
+        fail(f"cannot read {CONTENT_TS_PATH.name} / {ROUTES_TS_PATH.name} for the wiring check")
+        return
+    ts = CONTENT_TS_PATH.read_text(encoding="utf-8")
+    imported = dict((name, slug) for name, slug in
+                    re.findall(r'^import\s+(\w+)\s+from\s+"\.\./\.\./content/([a-z0-9-]+)\.json";', ts, re.M))
+    m = re.search(r"export const SURAHS: Surah\[\] = \[(.*?)\];", ts, re.S)
+    loaded = re.findall(r'load\(\s*(\w+)\s*,\s*"([a-z0-9-]+)"\s*\)', m.group(1)) if m else []
+    if [slug for _, slug in loaded] != slugs:
+        fail(f"src/lib/content.ts SURAHS loads {[slug for _, slug in loaded]}, content/ has {slugs} (mushaf order)")
+    for name, slug in loaded:
+        if imported.get(name) != slug:
+            fail(f"src/lib/content.ts loads {name} as {slug!r} but imports it from {imported.get(name)!r}.json")
+    m = re.search(r"export const SURAH_SLUGS = \[(.*?)\] as const;", ROUTES_TS_PATH.read_text(encoding="utf-8"), re.S)
+    route_slugs = re.findall(r'"([a-z0-9-]+)"', m.group(1)) if m else []
+    if route_slugs != slugs:
+        fail(f"src/lib/routes.ts SURAH_SLUGS {route_slugs} != the lessons in content/ {slugs} (mushaf order)")
+
+
+def main() -> int:
+    global CHECKED_SURAHS
+    paths = lesson_paths()
+    if not paths:
+        print(f"no lesson in {LESSON_DIR}; run build_surah.py", file=sys.stderr)
+        for m in fails:
+            print("  - " + m, file=sys.stderr)
+        return 1
+    if not LIBRARY.exists():
+        print(f"missing {LIBRARY}; run build_library.py", file=sys.stderr)
+        return 1
+    src = load_sources()
+    I = src["inputs"]
+    tanzil_path = require_pinned(src, "tanzil_uthmani")
+    T = _cached(("tanzil", I["tanzil_uthmani"]["sha256"]), lambda: load_tanzil(tanzil_path))
+    raw = T.raw
+    qac_path = require_pinned(src, "qac_morphology")
+    segs, qac_header = _cached(("qac", I["qac_morphology"]["sha256"]), lambda: load_qac(qac_path))
+    stems = [g for g in segs if "STEM" in g.flags]
+    if QAC_TANZIL_HEADER not in qac_header:
+        fail(f"QAC header does not name '{QAC_TANZIL_HEADER}' (the basis note in fact methods)")
+    qw = _cached(("qac_words", I["qac_morphology"]["sha256"]), lambda: qac_words(segs))
+    meta_path = require_pinned(src, "tanzil_metadata")
+    names_ar = {int(e.get("index")): e.get("name") for e in ET.parse(meta_path).getroot().iter("sura")}
+    lessons = {slug: json.loads(p.read_text(encoding="utf-8")) for slug, p in paths.items()}
+    lib = json.loads(LIBRARY.read_text(encoding="utf-8"))
+    CHECKED_SURAHS = {SURAH_BY_SLUG[slug].surah for slug in lessons}
+    ctx = {"T": T, "raw": raw, "I": I, "src": src, "qw": qw, "stems": stems, "names_ar": names_ar,
+           "align": load_align(src)}
+
+    # 6. shape against schema.ts (keys), 12. zod constraints
+    if not SCHEMA_TS.exists():
+        fail(f"schema not found at {SCHEMA_TS}")
+    else:
+        ts = SCHEMA_TS.read_text(encoding="utf-8")
+        schemas, enums = parse_schema(ts)
+        defs = zod_defs(ts)
+        for name, label, obj in [("SurahContent", f"SurahContent[{slug}]", d) for slug, d in lessons.items()] \
+                + [("Library", "Library", lib)]:
+            if name not in schemas or name not in defs:
+                fail(f"schema.ts has no {name} object")
+                continue
+            check_shape(obj, schemas[name], schemas, enums, label)
+            zcheck(obj, defs[name], defs, label)
+
+    # 0–9, 11. each lesson
+    prose: list[tuple[str, str]] = []
+    skb_words: set[str] = set()
+    for slug, data in lessons.items():
+        p, w = check_lesson(SURAH_BY_SLUG[slug], data, ctx)
+        prose += p
+        skb_words |= w
+
+    # 13–16. library records and every lesson's links into them; prose checked with the lessons'
+    prose += check_library(lib, list(lessons.values()), stems, raw)
+    skb_words.update(x["translit"] for x in lib.get("lexicon", []))
+    check_translit_prose(prose, skb_words)
+
+    # 17. library pins
     ldv = lib.get("data_versions", {})
+    for key, f in (("authored_lexicon", "library.lexicon.json"), ("authored_concepts", "library.concepts.json")):
+        if sha256_file(AUTHORED / f) not in ldv.get(key, ""):
+            fail(f"library.json data_versions.{key} is stale or missing (authored/{f} changed since the build)")
     for k, sha in (("qac", I["qac_morphology"]["sha256"]), ("tanzil", I["tanzil_uthmani"]["sha256"])):
         if sha not in ldv.get(k, ""):
             fail(f"library.json data_versions.{k} does not carry the pinned sha256 {sha[:12]}…")
-    if not all(isinstance(v, str) for v in dv.values()):
-        fail("data_versions values must be strings")
+
+    # 18. app wiring
+    check_app_wiring(list(lessons))
 
     if fails:
         print("VALIDATION FAILED:", file=sys.stderr)
         for m in fails:
             print("  - " + m, file=sys.stderr)
         return 1
-    n_words = sum(len(a["words"]) for a in ayat)
-    n_src = sum(len(w["sources"]) for a in ayat for w in a["words"]) + sum(len(f["sources"]) for f in data["facts"])
-    n_seg = sum(len(r["segments"]) for a in ayat for r in a["recitation"])
+    n_links = 0
+    for slug, data in lessons.items():
+        ayat = data["ayat"]
+        n_words = sum(len(a["words"]) for a in ayat)
+        n_links += n_words
+        n_src = sum(len(w["sources"]) for a in ayat for w in a["words"]) + sum(len(f["sources"]) for f in data["facts"])
+        n_seg = sum(len(r["segments"]) for a in ayat for r in a["recitation"])
+        n_groups = sum(len(a["structure"]["groups"]) for a in ayat)
+        print(f"OK: {slug}: {len(ayat)} ayat, {n_words} words, {len(data['facts'])} facts, "
+              f"{len(data['hadith'])} hadith, {n_seg} timing segments, {n_src} source refs, "
+              f"{len(ayat)} structures ({n_groups} groups); Qur'anic text byte-identical to Tanzil; all draft.")
     n_lib_src = sum(len(x["sources"]) for k in ("concepts", "lexicon", "roots") for x in lib[k])
-    n_groups = sum(len(a["structure"]["groups"]) for a in ayat)
-    print(f"OK: {len(ayat)} ayat, {n_words} words, {len(data['facts'])} facts, {n_seg} timing segments, "
-          f"{n_src} source refs; Qur'anic text byte-identical to Tanzil; keys match schema.ts; all draft.")
     print(f"OK: library {len(lib['concepts'])} concepts, {len(lib['lexicon'])} lexemes, {len(lib['roots'])} roots, "
-          f"{n_lib_src} source refs; {n_words} lemma_id/concepts/role links and {len(ayat)} structures "
-          f"({n_groups} groups) resolve; QAC-derived fields re-derived; zod constraints hold; all draft.")
+          f"{n_lib_src} source refs; {n_links} lemma_id/concepts/role links across {len(lessons)} lessons resolve; "
+          f"QAC-derived fields re-derived; keys and zod constraints match schema.ts; app wiring matches; all draft.")
     return 0
 
 

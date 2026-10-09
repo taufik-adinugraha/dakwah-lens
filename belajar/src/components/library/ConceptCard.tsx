@@ -28,13 +28,14 @@ export type ConceptLabels = {
 export function ConceptCard({
   concept,
   labels,
-  surahSlug,
+  surahs,
   wordAr,
   compact = false,
 }: {
   concept: Concept;
   labels: ConceptLabels;
-  surahSlug: string;
+  /** Surah number → slug + name (examples may come from any lesson surah). */
+  surahs: Record<number, { slug: string; name: string }>;
   /** Arabic of each example word, keyed by loc (resolved by the page). */
   wordAr: Record<string, string>;
   compact?: boolean;
@@ -75,14 +76,17 @@ export function ConceptCard({
           <p className="text-sm font-semibold text-ink">{labels.examples}</p>
           <ul className="mt-2 space-y-3">
             {concept.examples.map((ex) => {
-              const { ayah, word } = parseLoc(ex.loc);
+              const { surah, ayah, word } = parseLoc(ex.loc);
+              const s = surahs[surah];
+              // An example from a surah with no lesson yet has nowhere to link.
+              if (!s) return null;
               return (
                 <li key={ex.loc} className="flex flex-wrap items-center gap-x-3 gap-y-1">
                   <Link
-                    href={ayahHref(surahSlug, ayah, ex.loc)}
+                    href={ayahHref(s.slug, ayah, ex.loc)}
                     className="chip-link"
                   >
-                    {t("example_loc", { ayah, word })}
+                    {t("example_loc", { surah: s.name, ayah, word })}
                   </Link>
                   {wordAr[ex.loc] ? (
                     <span lang="ar" dir="rtl" className="quran text-ar-sm text-ink">

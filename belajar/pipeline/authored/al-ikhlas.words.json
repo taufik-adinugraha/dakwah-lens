@@ -1,0 +1,403 @@
+{
+  "_comment": "Hand-authored per-word values for Al-Ikhlas, QS 112 (stage 3 'Author', plan §7.5), same format as al-fatihah.words.json. Every record is status draft as pipeline state; there is no human review step (plan L11). Read 2026-10-09 against the i'rab texts on tafsir.app and the same editions on Shamela (pagination = print, checked in each page title): Darwisy jil. 10 hlm. 614–621 (Shamela 2163/5772–5779), al-Jadwal jil. 15 hlm. 425–426 (Shamela 22916/5917–5918), al-Mujtaba jil. 4 hlm. 1491 (Shamela 9617/6018–6022), an-Nahhas jil. 5 hlm. 194–196 (Shamela 23587/1411–1413), as-Samin jil. 11 hlm. 149–156 (Shamela 9057/10749–10758; as-Samin has no entry for 112:3), Ibnu Katsir jil. 8 hlm. 527–529 (Shamela 8473/4573–4575), ath-Thabari jil. 24 hlm. 737 (Shamela 7798/16681), plus Syarh Qathr an-Nada (Shamela 6970), al-Ajurrumiyyah (Shamela 11371), Mughni al-Labib (Shamela 6972) and Syarh Ibn 'Aqil (Shamela 9904); the grammar books have one abbreviation per page (AJ8, MG365, ...) so each url is the exact page. Word numbering = QAC 0.4 = Tanzil tokens after the surah-heading basmalah (Tanzil 1.1 prepends the four basmalah tokens to 112:1; QAC 0.4 numbers 112:1 as 4 words without them; the lesson ayah is the line after the fourth space, see common.lesson_ayah). No Qur'anic Arabic is typed here: words are referred to by loc and in SKB transliteration; Arabic in `wazn` is a morphological pattern, not Qur'anic text. root/lemma/pos come from QAC 0.4 in the build. `src` lists kitab refs as [abbr], [abbr, ref] or [abbr, ref, url_ayah] (ref null = the kitab's default ref for the ayah); the build adds the QAC, QAC verb-form (verbs with a wazn) and gloss-anchor refs. `wazn` is filled only where a cited kitab states it (aṣ-ṣamadu, kufuwan) or, for a verb whose root letters all stay in the token (yūlad), from the QAC verb-form tag with the vowels of the Tanzil token, as for na‘budu in Al-Fatihah. `review_notes` never reach the output; they are pipeline notes for the integrator and for independent verification.",
+  "kitab": {
+    "D": {
+      "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+      "default_ref": {
+        "1": "jil. 10, hlm. 616 (al-I'rab QS 112:1; Shamela 2163/5774)",
+        "2": "jil. 10, hlm. 616 (al-I'rab QS 112:2; Shamela 2163/5774)",
+        "3": "jil. 10, hlm. 617 (al-I'rab QS 112:3; Shamela 2163/5775)",
+        "4": "jil. 10, hlm. 617 (al-I'rab QS 112:4; Shamela 2163/5775)",
+        "*": "jil. 10, hlm. 616–617 (al-I'rab QS 112; Shamela 2163/5774–5775)"
+      },
+      "_pages": "Jil. 10 cet. 4 (1415 H) di Shamela 2163 (penomoran sama dengan cetakan): judul surah dan al-Lughah tentang aḥad hlm. 614 (/5772); al-Lughah tentang aṣ-ṣamad dan kufuwan hlm. 615 (/5773); al-I'rab ayat 1–2 dan awal penjelasan fashl hlm. 616 (/5774); lanjutan fashl–washl, i'rab lam yalid sampai aḥadun, kutipan az-Zamakhsyari dan Abu Hayyan hlm. 617 (/5775); lanjutan Abu Hayyan dan Ibnul Munayyir hlm. 618 (/5776); al-Balaghah hlm. 619–621 (/5777–5779). tafsir.app memuat seluruh bagian QS 112 yang sama pada setiap ayat.",
+      "url": "https://tafsir.app/iraab-aldarweesh/{surah}/{ayah}"
+    },
+    "J": {
+      "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+      "default_ref": { "*": "jil. 15, hlm. 425 (QS 112, bagian al-I'rab; Shamela 22916/5917)" },
+      "_pages": "al-I'rab, catatan kaki 1–4 dan awal ash-Sharf (aṣ-ṣamad) hlm. 425 (/5917); akhir ash-Sharf (aṣ-ṣamad, kufuwan), al-Balaghah dan al-Fawa'id hlm. 426 (/5918). Shamela: bagian al-Balaghah dan al-Fawa'id bukan tulisan pengarang, melainkan tambahan penerbit.",
+      "url": "https://tafsir.app/aljadwal/{surah}/{ayah}"
+    },
+    "M": {
+      "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+      "default_ref": {
+        "1": "jil. 4, hlm. 1491 (QS 112:1; Shamela 9617/6019)",
+        "2": "jil. 4, hlm. 1491 (QS 112:2; Shamela 9617/6020)",
+        "3": "jil. 4, hlm. 1491 (QS 112:3; Shamela 9617/6021)",
+        "4": "jil. 4, hlm. 1491 (QS 112:4; Shamela 9617/6022)",
+        "*": "jil. 4, hlm. 1491 (QS 112; Shamela 9617/6018–6022)"
+      },
+      "url": "https://tafsir.app/mujtaba-mushkil-iraab/{surah}/{ayah}"
+    },
+    "N": {
+      "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an (ed. 'Abd al-Mun'im Khalil Ibrahim; Beirut: Dar al-Kutub al-'Ilmiyyah, cet. 1, 1421 H)",
+      "default_ref": {
+        "1": "jil. 5, hlm. 194 (QS 112:1; Shamela 23587/1411)",
+        "2": "jil. 5, hlm. 194–195 (QS 112:2; Shamela 23587/1411–1412)",
+        "3": "jil. 5, hlm. 196 (QS 112:3; Shamela 23587/1413)",
+        "4": "jil. 5, hlm. 196 (QS 112:4; Shamela 23587/1413)",
+        "*": "jil. 5, hlm. 194–196 (QS 112; Shamela 23587/1411–1413)"
+      },
+      "url": "https://tafsir.app/iraab-alnahas/{surah}/{ayah}"
+    },
+    "S": {
+      "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+      "default_ref": {
+        "1": "jil. 11, hlm. 149–150 (QS 112:1; Shamela 9057/10749–10750)",
+        "2": "jil. 11, hlm. 151–152 (QS 112:2; Shamela 9057/10752–10753)",
+        "4": "jil. 11, hlm. 152–155 (QS 112:4; Shamela 9057/10754–10757)",
+        "*": "jil. 11, hlm. 149–156 (QS 112; Shamela 9057/10749–10758)"
+      },
+      "_pages": "as-Samin tidak membahas QS 112:3 (tafsir.app kosong untuk ayat itu; di Shamela pembahasannya langsung dari aṣ-ṣamad ke kufuwan aḥadun), jadi S tidak dikutip untuk kata ayat 3.",
+      "url": "https://tafsir.app/aldur-almasoon/{surah}/{ayah}"
+    },
+    "IK": {
+      "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami bin Muhammad as-Salamah; Riyadh: Dar Thaibah, cet. 2, 1420 H/1999 M)",
+      "default_ref": {
+        "1": "jil. 8, hlm. 527–528 (tafsir QS 112:1; Shamela 8473/4573–4574)",
+        "2": "jil. 8, hlm. 528–529 (tafsir QS 112:2; Shamela 8473/4574–4575)",
+        "3": "jil. 8, hlm. 529 (tafsir QS 112:3–4; Shamela 8473/4575)",
+        "4": "jil. 8, hlm. 529 (tafsir QS 112:3–4; Shamela 8473/4575)",
+        "*": "jil. 8, hlm. 527–529 (tafsir QS 112; Shamela 8473/4573–4575)"
+      },
+      "url": "https://tafsir.app/ibn-katheer/{surah}/{ayah}"
+    },
+    "T": {
+      "kitab": "Ibnu Jarir ath-Thabari, Jami' al-Bayan 'an Ta'wil Ay al-Qur'an (tahqiq 'Abdullah bin 'Abd al-Muhsin at-Turki; Kairo: Dar Hajr, cet. 1, 1422 H/2001 M)",
+      "default_ref": { "*": "jil. 24, hlm. 737 (pilihan ath-Thabari tentang makna aṣ-ṣamad, lalu tafsir lam yalid wa lam yūlad; Shamela 7798/16681)" },
+      "url": "https://shamela.ws/book/7798/16681"
+    },
+    "DA": {
+      "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+      "default_ref": { "*": "jil. 3, hlm. 476 (QS 112:{ayah}; Shamela 23584/1398)" },
+      "_pages": "Seluruh QS 112 ada di jil. 3 hlm. 476 (Shamela 23584/1398; penomoran sama dengan cetakan), halaman yang sama dengan QS 113. Ditambahkan oleh fixer 2026-10-09 (temuan verifikator D4/D5): lam yalid 'mudhari' majzum bi-lam wal-fa'il mustatir'; wa lam yūlad 'mudhari' mabni lil-majhul majzum bi-lam wa na'ib al-fa'il mustatir, wal-jumlah ma'thufah'.",
+      "url": "https://tafsir.app/iraab-daas/{surah}/{ayah}"
+    },
+    "QN": {
+      "kitab": "Ibnu Hisyam al-Anshari, Syarh Qathr an-Nada wa Ball ash-Shada (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, cet. 11, 1383 H/1963 M)",
+      "default_ref": { "*": "hlm. 31, Fi'l al-Amr: hukum asal fi'il amr adalah mabni di atas sukun" },
+      "url": "https://shamela.ws/book/6970/19"
+    },
+    "AJ8": {
+      "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+      "default_ref": { "*": "hlm. 8, Bab Ma'rifat 'Alamat al-I'rab: tanda jazm ada dua, sukun dan hadzf; sukun untuk fi'il mudhari' yang huruf akhirnya sahih" },
+      "url": "https://shamela.ws/book/11371/5"
+    },
+    "AJ10": {
+      "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+      "default_ref": { "*": "hlm. 10, Bab al-Af'al: fi'il mudhari' marfu' sampai didahului huruf penashab atau penjazm; lam termasuk huruf penjazm; fi'il amr 'majzum selamanya'" },
+      "url": "https://shamela.ws/book/11371/7"
+    },
+    "AJ12": {
+      "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+      "default_ref": { "*": "hlm. 12, Bab al-Maf'ul alladzi Lam Yusamma Fa'iluh: fi'il mudhari' yang tidak disebut pelakunya didhammahkan huruf pertamanya dan difathahkan huruf sebelum akhirnya" },
+      "url": "https://shamela.ws/book/11371/10"
+    },
+    "AJ13": {
+      "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+      "default_ref": { "*": "hlm. 13, Bab al-'Awamil ad-Dakhilah 'ala al-Mubtada' wal-Khabar: kāna dan saudaranya merafa'kan isim dan menashabkan khabar, termasuk bentuk mudhari'-nya" },
+      "url": "https://shamela.ws/book/11371/13"
+    },
+    "IA92": {
+      "kitab": "Ibnu 'Aqil, Syarh Ibn 'Aqil 'ala Alfiyyah Ibn Malik (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, Kairo: Dar at-Turats, cet. 20, 1400 H/1980 M)",
+      "default_ref": { "*": "jil. 1, hlm. 92, bab an-Nakirah wal-Ma'rifah: semua dhamir mabni" },
+      "url": "https://shamela.ws/book/9904/91"
+    },
+    "MG365": {
+      "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)",
+      "default_ref": { "*": "hlm. 365, entri lam: huruf jazm untuk menafikan fi'il mudhari', dengan contoh lam yalid wa lam yūlad" },
+      "url": "https://shamela.ws/book/6972/353"
+    },
+    "MG636": {
+      "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)",
+      "default_ref": { "*": "hlm. 635–637 (tempat-tempat kata ganti kembali kepada kata yang disebut sesudahnya; yang keempat ialah dhamir sya'n wal-qishshah, dengan contoh QS 112:1; ulama Kufah menyebutnya dhamir al-majhul; ia hanya dijelaskan oleh sebuah kalimat dan selalu tunggal)" },
+      "url": "https://shamela.ws/book/6972/624"
+    }
+  },
+  "words": {
+    "112:1:1": {
+      "translit": "qul",
+      "gloss": "katakanlah",
+      "wazn": null,
+      "case": { "state": "mabni", "sign": "sukun" },
+      "why": "Fi'il amr (kata perintah) ini mabni di atas sukun, sehingga akhirnya tetap mati; pelakunya tersirat, yaitu “engkau” (Nabi Muhammad).",
+      "ikhtilaf": [],
+      "src": [["D"], ["QN"]],
+      "review_notes": [
+        "Darwisy hlm. 616: qul fi'il amr, fa'il-nya tersimpan, 'engkau, wahai Muhammad'. Tanda sukun dari Ibnu Hisyam, Syarh Qathr an-Nada hlm. 31 (hukum asal fi'il amr adalah mabni di atas sukun); kitab i'rab yang dikutip untuk QS 112 tidak menyebut tanda bina'-nya.",
+        "Ibnu Ajurrum (al-Ajurrumiyyah hlm. 10) menyebut fi'il amr 'majzum selamanya', sedangkan Ibnu Hisyam menyebutnya mabni. Kartu mengikuti Ibnu Hisyam, seragam dengan ihdinā di 1:6:1 (mabni, menurut Darwisy dan al-Jadwal). Perbedaan ini sengaja tidak dimuat sebagai ikhtilaf supaya 1:6:1 dan 112:1:1 tetap sama; integrator dapat menambahkannya pada keduanya sekaligus.",
+        "Wazan dikosongkan: tidak ada kitab yang dikutip yang menyebut wazan qul, dan huruf 'ain-nya (wawu) tidak tertulis, jadi polanya tidak bisa dibaca langsung dari token."
+      ]
+    },
+    "112:1:2": {
+      "translit": "huwa",
+      "gloss": "Dialah",
+      "wazn": null,
+      "case": { "state": "mabni", "sign": "fathah", "mahall": "mahall raf'" },
+      "why": "Kata ganti (dhamir) ini mabni, sehingga bentuknya tidak berubah, dan berkedudukan rafa' (mahall raf') sebagai mubtada', pokok kalimat yang dijelaskan oleh Allāhu aḥadun sesudahnya.",
+      "ikhtilaf": [
+        {
+          "point": "Huwa menunjuk kepada apa?",
+          "options": [
+            "Dhamir sya'n, yaitu kata ganti yang isinya dijelaskan oleh kalimat sesudahnya (“perkaranya ialah: Allah itu Esa”) — al-Mujtaba; pendapat pertama Darwisy; menurut an-Nahhas, pendapat kebanyakan ulama Bashrah dan al-Kisa'i; Ibnu Hisyam (Mughni) menjadikan ayat ini contohnya",
+            "Kata ganti yang kembali kepada Tuhan yang ditanyakan kepada Nabi, sebagaimana dipahami dari riwayat sebab turunnya surah ini — pendapat pertama as-Samin; juga disebut Darwisy dan al-Jadwal; menurut an-Nahhas, al-Farra' tidak membolehkan dhamir sya'n di sini, dan al-Akhfasy menjadikannya kata ganti bagi sesuatu yang tunggal"
+          ]
+        }
+      ],
+      "src": [["M"], ["D"], ["N", "jil. 5, hlm. 194–195 (huwa berkedudukan rafa' sebagai mubtada', kināyah 'an al-ḥadīts menurut kebanyakan ulama Bashrah dan al-Kisa'i; al-Farra' dan al-Akhfasy; Shamela 23587/1411–1412)"], ["S"], ["J", "jil. 15, hlm. 425 (QS 112:1, al-I'rab dan catatan kaki 1: huwa dhamir sya'n, atau kembali kepada Tuhan yang ditanyakan kepada Rasul; Shamela 22916/5917)"], ["MG636"], ["IA92"]],
+      "review_notes": [
+        "Tanda fathah dibaca dari token Tanzil. Kitab yang dikutip menyebut huwa sebagai dhamir yang mabni (al-Jadwal pada QS 2:255 dan 3:2: 'dhamir munfashil mabni dalam kedudukan rafa''; Ibnu 'Aqil jil. 1, hlm. 92: semua dhamir mabni), tetapi tidak menyebut harakat bina'-nya; karena itu `why` tidak menulis 'mabni di atas fathah'.",
+        "QAC 0.4 tidak memberi LEM untuk stem PRON ini; lemma dan lemma_id kosong (build_surah.py memberi peringatan).",
+        "Riwayat sebab turun: an-Nahhas (hlm. 194) menilai jalur Juwaibir dari adh-Dhahhak lemah; Ibnu Katsir (jil. 8, hlm. 518, Shamela 8473/4564) membawakan riwayat Ahmad dari Ubay bin Ka'b bahwa kaum musyrik meminta Nabi menyebutkan nasab Tuhannya. Opsi ikhtilaf hanya menyebut 'riwayat sebab turun' tanpa menilai sanadnya; kalimat tentang 'tembaga atau besi' (Darwisy dan as-Samin, dengan 'qīla') sengaja tidak dimuat.",
+        "Gloss 'Dialah' mengikuti QuranEnc. Menurut pendapat dhamir sya'n, huwa bermakna 'perkaranya'; ikhtilaf menjelaskannya."
+      ]
+    },
+    "112:1:3": {
+      "translit": "Allāhu",
+      "gloss": "Allah",
+      "wazn": null,
+      "case": { "state": "marfu", "sign": "dhammah" },
+      "why": "Akhirnya dhammah karena menjadi mubtada' kedua, yaitu pokok kalimat Allāhu aḥadun yang menjelaskan huwa.",
+      "ikhtilaf": [
+        {
+          "point": "Kedudukan Allāhu di ayat 1",
+          "options": [
+            "Mubtada' kedua, dan Allāhu aḥadun menjadi khabar bagi huwa — al-Mujtaba; al-Jadwal (bila huwa dhamir sya'n); juga disebut Darwisy dan as-Samin",
+            "Khabar bagi huwa (bila huwa kembali kepada Tuhan yang ditanyakan) — al-Jadwal; as-Samin (sebagai khabar pertama); an-Nahhas menukilnya dari al-Akhfasy",
+            "Badal dari huwa, dengan aḥadun sebagai khabar — disebut as-Samin"
+          ]
+        }
+      ],
+      "src": [["M"], ["J", "jil. 15, hlm. 425 (QS 112:1, al-I'rab: Allāhu mubtada' kedua; catatan kaki 1: atau khabar bagi huwa; Shamela 22916/5917)"], ["D"], ["S"], ["N", "jil. 5, hlm. 195 (pendapat al-Akhfasy: Allāhu khabar dan aḥadun badal; Shamela 23587/1412)"]],
+      "review_notes": [
+        "Asal-usul lafaz Allah sengaja tidak dimuat, sesuai kebijakan editorial §8 (sama dengan 1:1:2)."
+      ]
+    },
+    "112:1:4": {
+      "translit": "aḥadun",
+      "gloss": "Yang Maha Esa",
+      "wazn": null,
+      "case": { "state": "marfu", "sign": "dhammatain" },
+      "why": "Akhirnya dhammatain (dhammah bertanwin) karena menjadi khabar bagi Allāhu, sehingga maknanya “Allah itu Esa”.",
+      "ikhtilaf": [
+        {
+          "point": "Kedudukan aḥadun di ayat 1",
+          "options": [
+            "Khabar bagi Allāhu — al-Mujtaba, al-Jadwal, as-Samin, Darwisy",
+            "Khabar kedua bagi huwa — al-Jadwal, as-Samin, Darwisy",
+            "Badal dari Allāhu — Darwisy; an-Nahhas menukilnya dari al-Akhfasy",
+            "Khabar bagi mubtada' yang tidak disebut (“Dia Esa”) — Darwisy, as-Samin"
+          ]
+        },
+        {
+          "point": "Asal huruf hamzah pada aḥad",
+          "options": [
+            "Pengganti huruf wawu, karena kata ini berasal dari al-waḥdah (keesaan) — as-Samin menyebutnya pendapat yang dikenal; Darwisy menukil Ibnu Khalawaih; an-Nahhas juga menyebutnya",
+            "Hamzah asli, bukan pengganti — Abu al-Baqa', menurut nukilan as-Samin"
+          ]
+        }
+      ],
+      "src": [["M"], ["J", "jil. 15, hlm. 425 (QS 112:1, al-I'rab: aḥadun khabar bagi Allāhu; catatan kaki 2: atau khabar kedua bagi huwa; Shamela 22916/5917)"], ["S"], ["D"], ["D", "jil. 10, hlm. 614 (al-Lughah: asal aḥad menurut Ibnu Khalawaih, wawu diganti hamzah; Shamela 2163/5772)"], ["N", "jil. 5, hlm. 195 (tiga pendapat tentang aḥad, dua di antaranya wawu diganti hamzah; pendapat al-Akhfasy: aḥadun badal; Shamela 23587/1412)"], ["IK", "jil. 8, hlm. 527–528 (makna aḥad: Yang Esa, tanpa tandingan, yang serupa atau yang sebanding; lafaz ini dalam kalimat positif hanya dipakai untuk Allah; Shamela 8473/4573–4574)"]],
+      "review_notes": [
+        "Wazan dikosongkan: kitab yang dikutip membahas asal hamzah aḥad tetapi tidak menyebut wazannya.",
+        "QAC 0.4 memberi akar hamzah–ha'–dal (hamzah asli), sejalan dengan nukilan Abu al-Baqa'; pendapat yang dikenal (as-Samin hlm. 149) menjadikan hamzahnya pengganti wawu dari al-waḥdah. Kartu memakai akar QAC apa adanya, dan ikhtilaf menyebut kedua pendapat.",
+        "Sign 'dhammatain' (bukan 'dhammah') dipakai karena WordCard.tsx sudah mengenal dhammatain/fathatain; tanda rafa'-nya tetap dhammah, dan `why` menyebut tanwinnya.",
+        "Ikhtilaf hamzah ini sekaligus dasar pemetaan konsep ilal (ibdal wawu menjadi hamzah) untuk kata ini."
+      ]
+    },
+    "112:2:1": {
+      "translit": "Allāhu",
+      "gloss": "Allah",
+      "wazn": null,
+      "case": { "state": "marfu", "sign": "dhammah" },
+      "why": "Akhirnya dhammah karena menjadi mubtada' (pokok kalimat), dan aṣ-ṣamadu adalah khabarnya.",
+      "ikhtilaf": [
+        {
+          "point": "Kedudukan Allāhu di ayat 2",
+          "options": [
+            "Mubtada' — Darwisy, al-Mujtaba, as-Samin; perkiraan yang dinilai terbaik oleh an-Nahhas juga menjadikannya mubtada'",
+            "Badal dari aḥadun, atau dari Allāhu di ayat 1 — dua dari enam perkiraan yang disebut an-Nahhas",
+            "Khabar bagi mubtada' yang tidak disebut, atau khabar sesudah khabar — dua perkiraan lain yang disebut an-Nahhas"
+          ]
+        }
+      ],
+      "src": [["D"], ["M"], ["S"], ["N"]],
+      "review_notes": [
+        "an-Nahhas hlm. 194 menyebut enam perkiraan untuk Allāhu aṣ-ṣamadu, menunjuk al-Bahr al-Muhith 8/529. Pengulangan lafaz Allah (bukan kata ganti) menurutnya untuk mengagungkan; dimuat di ringkasan struktur ayat 2."
+      ]
+    },
+    "112:2:2": {
+      "translit": "aṣ-ṣamadu",
+      "gloss": "tempat meminta segala sesuatu",
+      "wazn": "فَعَل",
+      "case": { "state": "marfu", "sign": "dhammah" },
+      "why": "Akhirnya dhammah karena menjadi khabar (keterangan) bagi Allāhu.",
+      "ikhtilaf": [
+        {
+          "point": "Kedudukan aṣ-ṣamadu",
+          "options": [
+            "Khabar bagi Allāhu — Darwisy, al-Mujtaba; as-Samin menilainya paling baik, karena setiap kalimat dalam surah ini berdiri sendiri dengan beritanya",
+            "Na't (sifat) bagi Allāhu, sedangkan khabarnya kalimat lam yalid sesudahnya — perkiraan yang dinilai terbaik oleh an-Nahhas; as-Samin menilainya lemah"
+          ]
+        },
+        {
+          "point": "Makna aṣ-ṣamad (sebagian pendapat yang dinukil Ibnu Katsir)",
+          "options": [
+            "Tempat seluruh makhluk menuju dalam kebutuhan dan permintaan mereka — Ibnu 'Abbas (riwayat 'Ikrimah) menurut Ibnu Katsir; makna ini juga dipakai Darwisy, al-Jadwal dan as-Samin",
+            "Penguasa (as-sayyid) yang telah sempurna kemuliaan dan kepemimpinan-Nya — Ibnu 'Abbas (riwayat 'Ali bin Abi Thalhah) dan Abu Wa'il menurut Ibnu Katsir; ath-Thabari memilih makna ini: penguasa yang dituju, yang tidak ada seorang pun di atas-Nya",
+            "Yang tetap kekal sesudah makhluk-Nya — al-Hasan dan Qatadah, menurut Ibnu Katsir",
+            "Yang tidak beranak dan tidak diperanakkan, sebagaimana dijelaskan ayat sesudahnya — ar-Rabi' bin Anas, menurut Ibnu Katsir, yang menilainya tafsir yang baik",
+            "Yang tidak makan dan tidak minum — asy-Sya'bi, menurut Ibnu Katsir"
+          ]
+        }
+      ],
+      "src": [["D"], ["M"], ["S"], ["N"], ["D", "jil. 10, hlm. 615 (al-Lughah: aṣ-ṣamad berwazan fa‘al bermakna maf‘ūl, yaitu yang dituju dalam segala kebutuhan; Shamela 2163/5773)"], ["J", "jil. 15, hlm. 425–426 (ash-Sharf: aṣ-ṣamad sifat musyabbahah berwazan fa‘al dengan dua fathah, bermakna maf‘ūl, yaitu yang dituju dalam segala kebutuhan; Shamela 22916/5917–5918)"], ["IK"], ["T"]],
+      "review_notes": [
+        "Pendapat 'yang tidak berongga' (lā jawfa lahū; Ibnu Mas'ud, Ibnu 'Abbas, Mujahid dan lain-lain menurut Ibnu Katsir hlm. 528; ath-Thabari jil. 24, hlm. 731 dst.; Darwisy hlm. 615 dan as-Samin hlm. 151 dengan 'qīla'), 'yang tidak keluar sesuatu pun dari-Nya' ('Ikrimah) dan 'cahaya yang berkilau' ('Abdullah bin Buraidah) sengaja tidak dimuat di kartu: dalam bahasa Indonesia sehari-hari ungkapan itu mudah terbaca sebagai gambaran fisik, padahal maksudnya penyucian (tanzih) Allah dari sifat makhluk. Riwayat marfu' 'yang tidak berongga' dinilai Ibnu Katsir 'gharib jiddan'; yang sahih mauquf pada 'Abdullah bin Buraidah. ath-Thabarani (dinukil Ibnu Katsir hlm. 529) menyatakan semua pendapat itu benar dan menyebut lā jawfa lahū di antaranya; karena kartu hanya memuat sebagian pendapat, pernyataan itu tidak dipakai sebagai judul ikhtilaf (fixer 2026-10-09, temuan verifikator D1: judul lama menaruh pernyataan 'semua benar' di atas daftar yang membuang salah satu makna yang ia sebut). Judul sekarang: 'sebagian pendapat yang dinukil Ibnu Katsir'.",
+        "Wazan fa‘al dari Darwisy hlm. 615, al-Jadwal hlm. 425–426 dan as-Samin hlm. 151 (ketiganya: fa‘al bermakna maf‘ūl). al-Jadwal menyebutnya sifat musyabbahah; QAC memberi kelas N, dan kartu memakai label QAC (isim).",
+        "Lemma QAC 0.4 untuk kata ini ditulis dengan syaddah pada huruf pertama (sisa asimilasi alif-lam), seperti raḥmān di Al-Fatihah.",
+        "Darwisy (al-Balaghah hlm. 619) dan al-Jadwal (al-Balaghah hlm. 426, tambahan penerbit): aṣ-ṣamad menunjukkan seluruh sifat kesempurnaan, karena kepada-Nya semua permintaan dituju. Bisa dipakai untuk catatan tafsir."
+      ]
+    },
+    "112:3:1": {
+      "translit": "lam",
+      "gloss": "tidak",
+      "wazn": null,
+      "case": { "state": "none", "sign": "—" },
+      "why": "Lam adalah huruf nafi (peniada) sekaligus huruf jazm: ia meniadakan kata kerja sesudahnya dan membuatnya majzum.",
+      "ikhtilaf": [],
+      "src": [["D"], ["MG365"], ["AJ10"]],
+      "review_notes": [
+        "Darwisy hlm. 617: lam 'huruf nafi, qalb dan jazm'. Mughni hlm. 365: huruf jazm untuk menafikan mudhari' dan membaliknya ke makna lampau, dengan lam yalid wa lam yūlad sebagai contohnya. Makna qalb (lampau) tidak dimuat di kartu supaya penafian ini tidak terbaca seolah terbatas pada masa lalu. ath-Thabari (jil. 24, hlm. 737) menafsirkan lam yalid: Dia tidak binasa, karena segala yang beranak pasti binasa; lam yūlad: Dia tidak diadakan sesudah sebelumnya tiada; Dia senantiasa ada (lam yazal) dan kekal. ath-Thabari tidak berbicara tentang kala (tense) lam; ungkapan 'penafian yang mutlak' adalah bacaan penulis, bukan kata ath-Thabari, jadi tidak boleh dinisbatkan kepadanya (temuan verifikator D2, diperbaiki di konsep jazm-lam dan Kosakata lam).",
+        "State 'none' dan sign '—' seperti wa lā di 1:7:8 (huruf yang tidak ditampilkan peran i'rab-nya)."
+      ]
+    },
+    "112:3:2": {
+      "translit": "yalid",
+      "gloss": "beranak",
+      "wazn": null,
+      "case": { "state": "majzum", "sign": "sukun" },
+      "why": "Fi'il mudhari' ini majzum karena didahului lam, dengan tanda sukun di akhir, karena huruf terakhirnya bukan huruf 'illah; pelakunya kata ganti yang tersimpan.",
+      "ikhtilaf": [],
+      "src": [["D"], ["DA"], ["AJ8"], ["N"]],
+      "review_notes": [
+        "Wazan dikosongkan: tidak ada kitab yang dikutip yang menyebut wazan yalid, dan huruf fa'-nya (wawu) gugur, jadi polanya tidak bisa dibaca langsung dari token. an-Nahhas hlm. 196 menjelaskan gugurnya wawu itu: pada yalid wawu terletak di antara ya' dan kasrah sehingga dibuang, sedangkan pada yūlad ia terletak di antara ya' dan fathah sehingga tetap. Ini dasar pemetaan konsep ilal untuk kata ini.",
+        "Fa'il yalid: ad-Da'as jil. 3 hlm. 476 menulis 'wal-fa'il mustatir' (pelakunya tersimpan), tanpa menyebut taqdirnya; `why` hanya menulis itu (QAC menandai orang ketiga tunggal maskulin, 3MS). Ditambahkan oleh fixer bersama temuan D5."
+      ]
+    },
+    "112:3:3": {
+      "translit": "wa lam",
+      "gloss": "dan tidak pula",
+      "wazn": null,
+      "case": { "state": "none", "sign": "—" },
+      "why": "Wawu adalah huruf 'athaf yang menyambungkan kalimat ini dengan lam yalid, dan lam kembali menjazmkan kata kerja sesudahnya.",
+      "ikhtilaf": [],
+      "src": [["D"], ["J"], ["DA"], ["MG365"]],
+      "review_notes": [
+        "Darwisy hlm. 617: lam yūlad di-'athaf-kan pada lam yalid. al-Jadwal hlm. 425: jumlah lam yūlad ma'thufah pada jumlah lam yalid."
+      ]
+    },
+    "112:3:4": {
+      "translit": "yūlad",
+      "gloss": "diperanakkan",
+      "wazn": "يُفْعَلْ",
+      "case": { "state": "majzum", "sign": "sukun" },
+      "why": "Fi'il mudhari' bentuk majhul (pasif: “diperanakkan”) ini majzum oleh lam-nya sendiri, dengan tanda sukun di akhir; na'ib fa'il-nya (pengganti pelaku) adalah kata ganti yang tersimpan.",
+      "ikhtilaf": [],
+      "src": [["D"], ["DA"], ["J"], ["AJ8"], ["AJ12"], ["N"]],
+      "review_notes": [
+        "Wazan dibaca dari bentuk kata kerja QAC (bentuk I, IMPF, PASS) dengan harakat token Tanzil, seperti na‘budu di Al-Fatihah; semua huruf akarnya tetap ada (an-Nahhas hlm. 196: wawu-nya tetap), jadi polanya bisa dipetakan langsung. Tidak ada kitab yang dikutip yang menulis wazan ini secara tertulis.",
+        "Darwisy hlm. 617 menulis 'lam yūlad di-'athaf-kan padanya' sesudah 'yalid fi'il mudhari' majzum oleh lam'; status majzum dan bentuk majhul juga tercatat pada tag QAC (MOOD:JUS, PASS). Ciri majhul (huruf pertama berharakat dhammah, huruf sebelum akhir berharakat fathah) dari al-Ajurrumiyyah hlm. 12.",
+        "Na'ib fa'il yūlad: ad-Da'as jil. 3 hlm. 476 menulis 'mudhari' mabni lil-majhul majzum bi-lam wa na'ib al-fa'il mustatir', dan 'wal-jumlah ma'thufah 'ala ma qablaha'. Jadi yūlad majzum oleh lam-nya sendiri, dan yang di-'athaf-kan adalah kalimatnya (al-Jadwal: jumlah lam yūlad ma'thufah, berkedudukan rafa'). Catatan lama 'kitab yang dikutip tidak menyebut na'ib fa'il' keliru karena ad-Da'as belum dibuka untuk QS 112 (temuan verifikator D5); kata ini kini dipetakan ke konsep naib-fail."
+      ]
+    },
+    "112:4:1": {
+      "translit": "wa lam",
+      "gloss": "dan tidak",
+      "wazn": null,
+      "case": { "state": "none", "sign": "—" },
+      "why": "Wawu adalah huruf 'athaf yang menyambungkan kalimat ini dengan lam yalid, dan lam sekali lagi menjazmkan kata kerja sesudahnya.",
+      "ikhtilaf": [],
+      "src": [["D"], ["J"], ["MG365"]],
+      "review_notes": [
+        "Darwisy hlm. 617: 'wa lam, 'athaf'. al-Jadwal hlm. 425: jumlah lam yakun lahū kufuwan aḥadun ma'thufah pada jumlah lam yalid."
+      ]
+    },
+    "112:4:2": {
+      "translit": "yakun",
+      "gloss": "ada",
+      "wazn": null,
+      "case": { "state": "majzum", "sign": "sukun" },
+      "why": "Fi'il mudhari' dari kāna ini majzum oleh lam, dengan tanda sukun pada nun di akhirnya; seperti kāna, ia merafa'kan isimnya (aḥadun) dan menashabkan khabarnya (kufuwan).",
+      "ikhtilaf": [],
+      "src": [["D"], ["M"], ["N"], ["S"], ["AJ8"], ["AJ13"]],
+      "review_notes": [
+        "Wazan dikosongkan: tidak ada kitab yang dikutip yang menyebut wazan yakun, dan huruf 'ain-nya (wawu) tidak tertulis dalam bentuk majzum ini.",
+        "QAC 0.4 menandai kata ini SP:kaAn (kelompok kāna dan saudaranya) dan MOOD:JUS."
+      ]
+    },
+    "112:4:3": {
+      "translit": "lahū",
+      "gloss": "bagi-Nya",
+      "wazn": null,
+      "case": { "state": "mabni", "sign": "—" },
+      "why": "Li- (bagi) adalah huruf jar dan -hū (Dia) kata ganti mabni yang dijarkan olehnya; frasa jar-majrur lahū ini bergantung pada kufuwan, sehingga bermakna “setara bagi-Nya”.",
+      "ikhtilaf": [
+        {
+          "point": "Kedudukan lahū",
+          "options": [
+            "Bergantung pada kufuwan, khabar yakun — al-Jadwal, al-Mujtaba, as-Samin (pendapat pertama), Darwisy; menurut Abu Hayyan (dinukil Darwisy dan as-Samin) maksudnya “tidak ada seorang pun yang setara bagi-Nya”, dan lahū didahulukan karena memuat kata ganti bagi Allah",
+            "Khabar yakun, sehingga kufuwan menjadi hal — Makki dan Abu al-Baqa', menurut as-Samin; Abu Hayyan menolaknya, dan as-Samin membantah penolakan itu",
+            "Hal — kemungkinan lain yang disebut Darwisy"
+          ]
+        }
+      ],
+      "src": [["J"], ["M"], ["S"], ["D"], ["D", "jil. 10, hlm. 617–618 (kutipan az-Zamakhsyari dan Abu Hayyan tentang didahulukannya lahū; Shamela 2163/5775–5776)"], ["IA92"]],
+      "gloss_exception": "QuranEnc menerjemahkan kufuwan lahū sebagai 'yang setara dengan Dia'; gloss harfiah 'bagi-Nya' (li- = bagi, -hū = Dia) dipakai untuk kartu kata.",
+      "review_notes": [
+        "QAC 0.4 menandai li- sebagai PREFIX P dan -hū sebagai STEM PRON tanpa LEM; build_surah.py melabelinya 'huruf jar + dhamir muttashil' dan memberi lemma_id null, jadi tidak perlu pos override di sini.",
+        "Tidak ada mahall pada case: menurut pendapat utama frasa ini bergantung pada kufuwan, dan tidak ada kitab yang dikutip yang menyebut kedudukan i'rab frasanya; sign '—' karena unitnya frasa, seperti ‘alaihim di 1:7:4. -hū mabni dalam kedudukan jar, tetapi validate.py meminta mahall pada kata berawalan huruf jar menjadi milik frasa, jadi mahall itu tidak ditulis.",
+        "Darwisy hlm. 617: 'wa lahū hal, atau keduanya (jar dan majrur) terkait dengan kufuwan'. as-Samin hlm. 153 juga membolehkan kufuwan menjadi hal dari dhamir yang tersimpan dalam lahū (bila lahū khabar); tidak dimuat agar opsi tetap sederhana."
+      ]
+    },
+    "112:4:4": {
+      "translit": "kufuwan",
+      "gloss": "setara",
+      "wazn": "فُعُل",
+      "case": { "state": "manshub", "sign": "fathatain" },
+      "why": "Akhirnya fathatain (fathah bertanwin) karena menjadi khabar yakun yang didahulukan sebelum isimnya, aḥadun.",
+      "ikhtilaf": [
+        {
+          "point": "Mengapa kufuwan manshub?",
+          "options": [
+            "Khabar yakun yang didahulukan, sedangkan aḥadun isimnya yang diakhirkan — Darwisy, al-Mujtaba, al-Jadwal, as-Samin (pendapat pertama); menurut an-Nahhas, ini pendapat kebanyakan ahli nahwu",
+            "Hal, karena asalnya sifat bagi aḥadun lalu didahulukan, dengan lahū sebagai khabar — Makki dan Abu al-Baqa', menurut as-Samin; an-Nahhas juga menyebut kemungkinan ini; Abu Hayyan (dinukil Darwisy dan as-Samin) menolaknya"
+          ]
+        }
+      ],
+      "src": [["D"], ["M"], ["J", "jil. 15, hlm. 425 (al-I'rab: lahū terkait dengan khabar yakun, yaitu kufuwan; Shamela 22916/5917)"], ["S"], ["N"], ["J", "jil. 15, hlm. 426 (ash-Sharf: kufuwan isim bermakna 'yang sepadan', wazannya fu‘ul dengan dua dhammah, dan wawu-nya keringanan dari hamzah; Shamela 22916/5918)"], ["AJ13"]],
+      "review_notes": [
+        "Wazan fu‘ul dari al-Jadwal hlm. 426. Darwisy hlm. 615 menyebut bentuk lain yang semakna (kafī’ berwazan fa‘īl, kifā’ berwazan fi‘āl) dan, menukil Abu Hayyan, bahwa Hafs mengganti hamzahnya dengan wawu; as-Samin hlm. 155 juga: Hafs mengganti hamzah dengan wawu dalam semua keadaan. Bacaan qira'at lain tidak dimuat (kebijakan editorial §8).",
+        "Makna kufuw: yang serupa dan sebanding (Darwisy hlm. 615: al-mitsl wan-nazhir; as-Samin hlm. 156: an-nazhir).",
+        "Sign 'fathatain': tanda nashab-nya fathah, ditulis bertanwin; lihat catatan 112:1:4.",
+        "Perdebatan al-Mubarrad dengan Sibawaih tentang zharaf yang didahulukan (an-Nahhas hlm. 196; as-Samin hlm. 152) tidak dimuat; opsi kedua sudah mewakili pendapat yang menjadikan lahū khabar."
+      ]
+    },
+    "112:4:5": {
+      "translit": "aḥadun",
+      "gloss": "sesuatu",
+      "wazn": null,
+      "case": { "state": "marfu", "sign": "dhammatain" },
+      "why": "Akhirnya dhammatain (dhammah bertanwin) karena menjadi isim yakun, yang diletakkan di akhir kalimat.",
+      "ikhtilaf": [],
+      "src": [["D"], ["M"], ["S"], ["N"], ["AJ13"]],
+      "review_notes": [
+        "Abu Hayyan (dinukil Darwisy hlm. 617 dan as-Samin hlm. 153) menyebut isim yakun diakhirkan karena ia fashilah, akhir ayat yang serima dengan ayat-ayat sebelumnya.",
+        "Di sini aḥad berada dalam kalimat yang dinafikan dan bermakna 'seorang pun'. an-Nahhas hlm. 195: aḥad dengan makna umum hanya dipakai dalam penafian, sedangkan aḥad bermakna 'satu' dipakai dalam kalimat positif seperti ayat 1; as-Samin hlm. 149–150: hamzah aḥad yang bermakna umum adalah hamzah asli. Karena itu ilal tidak dipetakan untuk kata ini. Gloss mengikuti QuranEnc ('sesuatu').",
+        "Lemma QAC sama dengan 112:1:4 (>aHad); integrator Kosakata perlu memutuskan bagaimana dua makna ini dijelaskan dalam satu entri.",
+        "al-Jadwal hlm. 425 tidak menyebut aḥadun di ayat 4 secara tersendiri, jadi tidak dikutip untuk kata ini."
+      ]
+    }
+  }
+}

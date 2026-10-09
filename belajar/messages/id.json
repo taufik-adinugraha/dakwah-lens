@@ -35,7 +35,7 @@
     "start_cta": "Mulai belajar",
     "ayat_nav": "Ayat {name}",
     "next_heading": "Berikutnya",
-    "next_body": "Setelah Al-Fatihah: Al-Ikhlas, An-Nas, Al-Falaq, Al-'Asr, Al-Kautsar, dan An-Nasr.",
+    "next_body": "Setelah Al-Fatihah dan Al-Mu'awwidzat: Al-'Asr, Al-Kautsar, dan An-Nasr.",
     "how_heading": "Cara belajarnya",
     "how_1": "Pilih satu ayat. Imam membacakannya, lalu pelajaran yang dipandu menjelaskan setiap kata, langkah demi langkah. Anda bisa menjeda kapan saja.",
     "how_2": "Baca kartu setiap kata: artinya dan alasan harakat di akhirnya. Ketuk “Lihat detail kata ini” untuk akar katanya.",
@@ -206,7 +206,7 @@
     "related": "Konsep terkait",
     "index_title": "Konsep tata bahasa (nahwu & sharaf)",
     "index_intro": "Setiap konsep dijelaskan sekali di sini, lalu dipakai ulang di setiap ayat dan surah yang memuatnya.",
-    "example_loc": "Ayat {ayah}, kata ke-{word}"
+    "example_loc": "{surah} · ayat {ayah}, kata ke-{word}"
   },
   "Lexeme": {
     "eyebrow": "Kosakata",

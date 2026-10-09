@@ -1,9 +1,22 @@
-# Belajar content pipeline (Al-Fatihah)
+# Belajar content pipeline (Al-Fatihah and Al-Mu'awwidzat)
 
-Offline, review-gated pipeline that produces `belajar/content/al-fatihah.json`, a `SurahContent`
-record, and `belajar/content/library.json`, the shared `Library` (Konsep, Kosakata, Akar), as
-defined in `belajar/src/content/schema.ts`. It implements the "source registry",
-"assemble" and local "validate" stages of plan §7.5 (`docs/belajar-plan.md`).
+Offline pipeline that produces one `SurahContent` record per surah with a lesson —
+`belajar/content/al-fatihah.json`, `al-ikhlas.json`, `al-falaq.json`, `an-nas.json` — and
+`belajar/content/library.json`, the shared `Library` (Konsep, Kosakata, Akar), as defined in
+`belajar/src/content/schema.ts`. It implements the "source registry", "assemble" and local
+"validate" stages of plan §7.5 (`docs/belajar-plan.md`).
+
+The surahs are registered once, in mushaf order, in `common.SURAHS` (slug, surah number,
+Indonesian name, words per ayah). `fetch.py`, `build_library.py`, `build_surah.py` and
+`validate.py` all read that table; `src/lib/content.ts` and `SURAH_SLUGS` in `src/lib/routes.ts`
+list the same slugs in the same order (`validate.py` checks both).
+
+| Slug | Surah | Ayat | Words per ayah (QAC 0.4 = Tanzil tokens) | Total |
+|---|---|---|---|---|
+| `al-fatihah` | 1 | 7 | 4+4+2+3+4+3+9 | 29 |
+| `al-ikhlas` | 112 | 4 | 4+2+4+5 | 15 |
+| `al-falaq` | 113 | 5 | 4+4+5+5+5 | 23 |
+| `an-nas` | 114 | 6 | 4+2+2+4+5+3 | 20 |
 
 Ground rules, enforced in code:
 
@@ -13,22 +26,34 @@ Ground rules, enforced in code:
 - **Nothing is invented.** Counts and location lists are recomputed from data; i'rab text comes from
   the sourced inventory (plan Appendix A, research `fatihah-content.md` §2–§3). Gaps and doubts are
   recorded as `review_notes` in the authored file, never filled by guesswork.
-- **Every record is `status: "draft"`** until an ustadz signs it off (plan §8).
+- **Every record is `status: "draft"`.** That is pipeline state: there is no human review step
+  (plan L11), and nothing here or in the app may promise one.
 - Python 3 standard library only. No LLM, no paid API, no npm, no docker.
 
 ## Run
 
 ```bash
 cd belajar/pipeline
-python3 fetch.py            # download into cache/ and verify (or, first time, pin) sha256
-python3 build_library.py    # write ../content/library.json (Kosakata, Akar, + Konsep if authored)
-python3 build_fatihah.py    # write ../content/al-fatihah.json; prints data warnings
-python3 validate.py         # re-check both outputs and the links between them; exits 1 on any failure
-python3 test_validate.py    # mutation tests: plants 50 faults in copies of the outputs, each must fail validate
+python3 fetch.py                   # download into cache/ and verify (or, first time, pin) sha256
+python3 facts_muawwidzat.py --corpus /path/to/api/data  # Al-Mu'awwidzat facts + hadith files (api/data is git-ignored; --check compares only)
+python3 build_library.py           # write ../content/library.json (Kosakata, Akar, + Konsep if authored)
+python3 build_surah.py al-fatihah  # write ../content/al-fatihah.json; prints data warnings
+python3 build_surah.py al-ikhlas   # … and the same for al-falaq, an-nas
+python3 validate.py                # re-check every lesson, the library and the links between them; exit 1 on any failure
+python3 test_validate.py           # mutation tests: plants 66 faults in copies of the outputs, each must fail validate
 ```
 
 Run them in this order after editing any authored file: the lesson build reads the lexicon and
-concept ids, and `validate.py` fails when an output is older than an authored file it was built from.
+concept ids, and `validate.py` fails when an output is older than an authored file it was built from,
+when a surah has authored input but no built lesson, and when the app does not load every lesson.
+`python3 build_fatihah.py` is kept as a wrapper for `build_surah.py al-fatihah`: it is the entry
+point named in `al-fatihah.json`'s `data_versions.pipeline`, and the generalised build reproduces
+that file byte for byte (checked with `cmp` when the build was generalised).
+
+`build_library.py` covers every registered surah whose `authored/<slug>.words.json` exists;
+`build_library.py --only al-fatihah` narrows it (that run reproduces the Al-Fatihah-only
+`library.json` byte for byte). `build_library.py --word-map <slug>` prints word loc -> lexicon id
+for one surah (`null` = no lexicon entry yet, or a QAC stem with no lemma).
 
 `fetch.py --refresh` re-downloads everything and compares with the pins (upstream drift check);
 `fetch.py --repin <id>` deliberately accepts new bytes for one input. `cache/` is git-ignored.
@@ -38,14 +63,18 @@ concept ids, and `validate.py` fails when an output is older than an authored fi
 | File | Stage | Role |
 |---|---|---|
 | `sources.json` | 0 | Every input: URL, version, sha256 (pinned after download), bytes, retrieval date, licence, attribution |
-| `fetch.py` | 1 | Downloads into `cache/`, checks headers/licence footers, pins or verifies sha256 |
-| `common.py` | — | Paths, sha256, Tanzil and QAC loaders, QAC Buckwalter table, search normalisation, MP3 duration probe |
-| `authored/al-fatihah.words.json` | 3 | Hand-authored per-word values: translit, gloss, wazn, case, why, ikhtilaf, kitab sources, review notes |
-| `authored/al-fatihah.structure.json` | 3 | Hand-authored `Ayah.structure` (type, summary, word groups, sources) and `Word.role`, with `role_src` / review notes for the reviewer |
-| `authored/al-fatihah.concepts-map.json` | 3 | Word loc -> Konsep ids (`Word.concepts`); generated from the concepts' `examples`, re-checked both ways by `validate.py` |
-| `facts.py` | 2 | Recomputes the plan's Appendix B "Tahukah kamu?" facts from Tanzil + QAC |
-| `build_fatihah.py` | 2 | Joins everything into `belajar/content/al-fatihah.json` |
-| `validate.py` | 6 | Independent re-check of both outputs against Tanzil, QAC, the pins and `schema.ts` (a Python mirror of its zod rules), and of every link between them |
+| `fetch.py` | 1 | Downloads into `cache/`, checks headers/licence footers, pins or verifies sha256; per-surah inputs follow `common.SURAHS` |
+| `common.py` | — | Paths, the surah registry (`SURAHS`), sha256, Tanzil and QAC loaders, `lesson_ayah` (surah-heading basmalah), QuranEnc per-sura lookup, QAC Buckwalter table, search normalisation, MP3 duration probe |
+| `authored/<slug>.words.json` | 3 | Hand-authored per-word values: translit, gloss, wazn, case, why, ikhtilaf, kitab sources, review notes |
+| `authored/<slug>.structure.json` | 3 | Hand-authored `Ayah.structure` (type, summary, word groups, sources) and `Word.role`, with `role_src` / pipeline review notes (never shipped) |
+| `authored/<slug>.concepts-map.json` | 3 | Word loc -> Konsep ids (`Word.concepts`); generated from the concepts' `examples`, re-checked both ways by `validate.py` |
+| `authored/<slug>.facts.generated.json` | 2/3 | Facts for a surah other than Al-Fatihah: `{"facts": [Fact, …]}` in `schema.ts` shape, passed through after the `validate.py` fact checks (optional) |
+| `authored/<slug>.hadith.json` | 1/3 | Hadith for the lesson: `{"hadith": [Hadith, …]}`, retrieved from the platform corpus (optional; `hadith: []` without it) |
+| `facts.py` | 2 | Recomputes the plan's Appendix B "Tahukah kamu?" facts for Al-Fatihah from Tanzil + QAC |
+| `facts_muawwidzat.py` | 1/2 | Writes the Al-Mu'awwidzat facts and hadith files from Tanzil + QAC + the platform corpus (`--corpus api/data`); every figure is re-derived a second way, and `--check` fails if a written file differs from a fresh run |
+| `build_surah.py` | 2 | `build_surah.py <slug>` joins everything into `belajar/content/<slug>.json` |
+| `build_fatihah.py` | 2 | Wrapper: `build_surah.py al-fatihah` |
+| `validate.py` | 6 | Independent re-check of every lesson and the library against Tanzil, QAC, quran-align, QuranEnc, the pins and `schema.ts` (a Python mirror of its zod rules), of every link between them, and of the app wiring |
 | `test_validate.py` | 6 | Mutation tests for `validate.py` (stdlib `unittest`; `python3 test_validate.py` prints the table) |
 | `authored/library.lexicon.json` | 3 | Hand-authored Kosakata + Akar values: translit, meaning, tashrif rows, i'lal, root meanings, kitab refs, review notes |
 | `authored/library.concepts.json` | 3 | Hand-authored Konsep records (separate author); passed through by `build_library.py`, minus each record's reviewer-only `review_notes` |
@@ -59,8 +88,8 @@ concept ids, and `validate.py` fails when an output is older than an authored fi
 | `tanzil_metadata` | Tanzil `quran-data.xml` (surah Arabic name; ayah counts cross-check) | 1.0 |
 | `qac_morphology` | Quranic Arabic Corpus morphology, GitHub mirror of the unmodified file (official download needs an email) | 0.4 (header checked) |
 | `quran_align` | cpfair/quran-align release zip; `Husary_Muallim_128kbps.json` and `Alafasy_128kbps.json` checked against the SHA-1s in the release README | release-2016-11-24 |
-| `quranenc_indonesian_affairs` | QuranEnc API, sura 1, plus the translations list for the version and title | 1.0.1 as reported by `translations/list` |
-| `everyayah_*` | The 14 streamed MP3s, downloaded only to measure their length (never committed or served) | per-file sha256 + duration |
+| `quranenc_indonesian_affairs` | QuranEnc API: sura 1 (top-level fields, unchanged) and suras 112, 113, 114 (`suras` map, one pinned file each, same endpoint), plus the translations list for the version and title | 1.0.1 as reported by `translations/list` |
+| `everyayah_*` | The 44 streamed MP3s (2 reciters × 22 ayat), downloaded only to measure their length (never committed or served); url pattern `{SSS}{AAA}.mp3` | per-file sha256 + duration |
 
 **Tanzil download options.** On tanzil.net/download the four checkboxes (pause marks, sajdah
 signs, rub-el-hizb signs, tatweel before superscript alef) are left unticked, so every
@@ -72,11 +101,20 @@ small yeh; that is part of the text, not the option. `fetch.py` asserts the opti
 97 the first token carries a shaddah on the ba'. `facts.py` removes these headings by comparing
 normalised tokens, so both spellings are handled. 1:1 is the basmalah itself (Kufan count).
 
+The heading is not part of the ayah: QAC 0.4 numbers 112:1 as four words (qul huwa Allāhu
+aḥad) and quran-align's word indices and the EveryAyah ayah-1 files (speech starts 30–250 ms in)
+have no basmalah either. So a lesson ayah is `common.lesson_ayah`: the Tanzil line with the
+four heading tokens sliced off after the fourth space (a byte-exact suffix of the line, never
+retyped). For 112:1, 113:1 and 114:1 the heading is byte-identical to the 1:1 tokens. The app
+plays and shows no basmalah before ayah 1; adding one later would need its own recitation
+entry (EveryAyah 001001), not a change to the ayah.
+
 ## Word data
 
-**Alignment.** For every word of surah 1 the QAC segments, joined and converted from Buckwalter,
-are byte-identical to the Tanzil token (29/29), and QAC's word numbering equals the Tanzil token
-index. The build stops if this ever fails.
+**Alignment.** For every lesson word the QAC segments, joined and converted from Buckwalter,
+are byte-identical to the Tanzil token (Al-Fatihah 29/29, Al-Ikhlas 15/15, Al-Falaq 23/23, An-Nas
+20/20), and QAC's word numbering equals the token index of the lesson ayah. The build stops if
+this ever fails; `validate.py` re-checks it for every lesson surah.
 
 **Root and lemma** come from the QAC `STEM` segment, converted with QAC's own extended Buckwalter
 table (`common.BUCKWALTER`). Root letter `A` is shown as `أ`, as corpus.quran.com displays it
@@ -92,10 +130,16 @@ with ` + ` (e.g. `huruf jar + isim`). The alif-lam prefix (`DET`) is not shown a
 | `ADJ` | isim sifat; with `ACT PCPL` → isim sifat (isim fa'il); with `PASS PCPL` → isim sifat (isim maf'ul) |
 | `PRON` stem / suffix | dhamir munfashil / dhamir muttashil |
 | `REL`, `DEM` | isim maushul, isim isyarah |
-| `V` | `PERF` fi'il madhi, `IMPF` fi'il mudhari', `IMPV` fi'il amr |
+| `V` | `PERF` fi'il madhi, `IMPF` fi'il mudhari', `IMPV` fi'il amr; with `PASS` + " (majhul)" (yūlad 112:3:4) |
 | `P` (prefix or stem) | huruf jar |
 | `CONJ` | huruf 'athaf |
 | `NEG` | huruf nafi |
+| `T`, `LOC` | zharaf zaman, zharaf makan (idzā 113:3:4, 113:5:4) |
+| `PRON` stem after a `P` prefix | dhamir muttashil (the -hu of lahu 112:4:3, which QAC tags STEM because the word has no other stem) |
+
+QAC 0.4 gives two pronoun stems no lemma: huwa (112:1:2) and the -hu of lahu (112:4:3). They have
+`lemma: null`, `lemma_id: null` and no Kosakata entry (a lexeme's `lemma_ar` must be a QAC
+lemma); both builds print a warning for them.
 
 Other QAC prefix tags (`REM`, `EMPH`, `INTG`, `VOC`, `FUT`, `RSLT`, `CAUS`, `SUP`, `IMPV`, `PRP`)
 already have labels for later surahs; an unmapped tag stops the build.
@@ -114,7 +158,14 @@ page that holds the passage (`url_ayah`, when the kitab discusses the word under
 - **Wazn** is shown only when a cited kitab states it (al-Jadwal for most nouns, e.g. fā‘al for
   al-‘ālamīna) or, for verbs, from the QAC 0.4 verb-form tag (QAC marks forms II–XII; no tag =
   form I) with the vowels read from the Tanzil token; that ref is added automatically. yaumi,
-  aṣ-ṣirāṭa and ṣirāṭa have `wazn: null` because no cited kitab states their wazn.
+  aṣ-ṣirāṭa and ṣirāṭa have `wazn: null` because no cited kitab states their wazn. When the
+  pattern's vowels are not the token's, the authored entry gives `wazn_basis`, which replaces the
+  ref's closing clause "harakat pola wazan mengikuti token Tanzil …" (`{loc}` is filled in; the
+  build stops if `wazn_basis` is given for a word that is not a verb with a wazn). a‘ūżu (113:1:2,
+  114:1:2, af‘ulu) uses it: the vowels follow the verb's bab, fa‘ala–yaf‘ulu (Mukhtar ash-Shihah
+  hlm. 221, al-Amtsilah bab 1, both cited on the card), and the ref says how the token differs.
+  Al-Fatihah's nasta‘īnu (1:5:4, nastaf‘ilu) has the same mismatch but keeps the default clause,
+  because `al-fatihah.json` is kept byte-identical.
 - **pos** may be overridden in the authored file (`pos` + a required `pos_note`) when the kitab
   label differs from the QAC mapping. No word uses an override now: 1:2:4 had "isim (isim jam')",
   but only as-Samin calls al-‘ālamīna an isim jam' (Darwisy, al-Jadwal and al-Mujtaba: plural of
@@ -124,6 +175,14 @@ page that holds the passage (`url_ayah`, when the kitab discusses the word under
   fathah, al-Jadwal; allażīna: fathah; an‘amta: sukun). For ‘alaihim (1:7:4, 1:7:7) the `mahall`
   is the jar-majrur phrase's (1:7:4 nashb per as-Samin; 1:7:7 raf' as na'ib fa'il) and `why`
   says so; `sign` is "—" because the unit is a phrase.
+- **Standalone huruf** (a particle with no noun or verb in the same word: wa lā 1:7:8, lam,
+  min, fī, mina) have `case: {state: "none", sign: "—"}` in every lesson, following Al-Fatihah;
+  where a source states it, `why` may still say the particle is mabni di atas sukun (An-Nas,
+  Ibnu 'Aqil jil. 1 hlm. 40). Tanwin endings use `dhammatain` / `fathatain` / `kasratain`.
+- **The three qul cards** (112:1:1, 113:1:1, 114:1:1) match ihdinā (1:6:1): `mabni`, no
+  mabni/majzum ikhtilaf, and al-Ajurrumiyyah (which calls fi'il amr "majzum") is not cited for
+  the mabni claim. The Konsep `fiil-amr` explains Ibnu Ajurrum's term (Ahmad Zaini Dahlan's
+  syarh) and the Bashrah/Kufah difference (as-Samin).
 
 **Page numbers.** Darwisy, *I'rab al-Qur'an wa Bayanuh* jil. 1 (cet. 4, 1415 H) was checked on
 Shamela, whose pagination follows the print: i'rab 1:1 hlm. 9; 1:2–1:6 hlm. 14 except the end of 1:6 (the naz' al-khafiḍ option for aṣ-ṣirāṭa and the i'rab of al-mustaqīma), which is on hlm. 15; 1:7 hlm. 15; the balaghah note on lillāhi (ikhtishash) hlm. 16;
@@ -132,7 +191,7 @@ as-Suyuthi, *al-Itqan* 1/189 are confirmed. Pages for al-Jadwal, al-Mujtaba, an-
 and Ibn Kathir still say "halaman cetak belum diverifikasi".
 
 **Library links.** `lemma_id` is the authored-lexicon id of the word's QAC STEM `LEM` (the build
-stops if a word's lemma has no lexicon entry). `concepts` is copied from
+stops if a word's lemma has no lexicon entry; a stem without a QAC lemma gets `null`). `concepts` is copied from
 `authored/al-fatihah.concepts-map.json` (every id must be a Konsep id). `role` and each ayah's
 `structure` come from `authored/al-fatihah.structure.json`; group `words` are 1-based indices
 inside the ayah, ascending, at least two; a group `concept` must be a Konsep id; every `role_src`
@@ -140,7 +199,7 @@ abbreviation must already be in that word's `src`. `role_src`, `role_note` and `
 never reach the output. All 29 words have a role and all 7 ayat a structure; the build stops otherwise.
 
 **Gloss** is a short in-house Indonesian draft for the word in this ayah, anchored to the QuranEnc
-ayah translation (`build_fatihah.py` warns when a gloss word does not occur in the translation,
+ayah translation (`build_surah.py` warns when a gloss word does not occur in the translation,
 unless the authored entry gives a `gloss_exception`). Quran.com's word-by-word layer is not used.
 
 ## Transliteration (SKB Menag–Mendikbud 158/1987 and 0543b/U/1987)
@@ -179,8 +238,10 @@ unless the authored entry gives a `gloss_exception`). Quran.com's word-by-word l
 
 ## Translation
 
-`translation.text` is the QuranEnc `indonesian_affairs` text byte for byte, footnote markers
-(`[1]` in 1:4, `[2]` in 1:6, `[3]` in 1:7) included, because QuranEnc's terms forbid modifying it.
+`translation.text` is the QuranEnc `indonesian_affairs` text of that sura and ayah byte for byte
+(sura 1 and suras 112–114 are pinned separately, same translation and version), footnote markers
+(`[1]` in 1:4, `[2]` in 1:6, `[3]` in 1:7; none in 112–114) included, because QuranEnc's terms
+forbid modifying it.
 `translation.footnotes` holds that ayah's QuranEnc `footnotes` field verbatim, split into one item
 per `[n]` marker (only whitespace between footnotes is dropped). `validate.py` checks both against
 the pinned cache. `source_label` is QuranEnc's own title in its Indonesian
@@ -190,7 +251,9 @@ Translation - Ministry of Religious Affairs"); it is **not** labelled "Kemenag 2
 
 ## Recitation
 
-Two entries per ayah, streamed from EveryAyah (`Husary_Muallim_128kbps`, `Alafasy_128kbps`).
+Two entries per ayah, streamed from EveryAyah (`Husary_Muallim_128kbps`, `Alafasy_128kbps`;
+Alafasy is the default voice, plan L7). `validate.py` also re-derives every segment list from the
+pinned quran-align file and fails on any difference.
 quran-align segments `[wordStart0, wordEndExclusive0, startMs, endMs]` become
 `[wordIndex1, startMs, endMs]`; a segment spanning more than one word stops the build. Checked:
 integers, sorted, non-overlapping, endMs > startMs, word indices cover 1..N exactly once, and the
@@ -211,17 +274,31 @@ holds the word more than once), the body says "N kali dalam M ayat" (e.g. raḥm
 QAC state its basis: QAC 0.4 was built on Tanzil Uthmani 1.0.2 (its header says so), and its
 surah-1 words are byte-identical to the Tanzil 1.1 tokens used here (checked by the build and the
 validator). The mālik card counts LEM:ma`lik with POS N (3 forms: māliki 1:4, mālika 3:26,
-mālikūna 36:71); Mālik in 43:77 is a different QAC lemma (ma`lik2, PN) and is not counted. `build_fatihah.py` prints every recomputed figure that differs from the plan.
+mālikūna 36:71); Mālik in 43:77 is a different QAC lemma (ma`lik2, PN) and is not counted. `build_surah.py al-fatihah` prints every recomputed figure that differs from the plan.
 Facts that are citations rather than counts (seven ayat per ad-Dani/Ibn Kathir; 4:69 per Ibn
 Kathir; āmīn per al-Mujtaba and Darwisy) say so in `method`.
+
+Al-Mu'awwidzat facts and hadith come from `facts_muawwidzat.py` (its docstring gives the rules).
+The lesson's `data_versions.pipeline` names `build_surah.py` plus the script in the
+`_generated_by` line of those files. Hadith records without a corpus Indonesian translation
+(Bukhari, Riyad as-Salihin) are kept out of `hadith` (under `_needs_indonesian`), but nine of them
+are paraphrased in Indonesian in fact bodies (Bukhari 4974, 5013, 5016, 5017, 5748, 7375; Riyad
+1013, 1015, 1456); whether that is allowed is an open operator decision (Al-Fatihah has no
+hadith facts). Corpus defects are listed in each hadith file's `_anomalies` and kept byte for
+byte: Riyad 1013's English stops mid-quotation, and Muslim 813's Arabic (as in the fawazahmed0
+section file it came from) opens the Prophet's quoted saying and never closes it.
 
 ## Shared library: Kosakata (lexicon) and Akar (roots)
 
 `build_library.py` writes `belajar/content/library.json`, a `Library` record (`schema.ts`): one
-`Lexeme` per QAC lemma and one `Root` per QAC root used by the covered surahs (`SURAHS = [1]`:
-23 lemmas, 18 roots for Al-Fatihah), plus the Konsep records from `authored/library.concepts.json`
-when that file exists (otherwise `concepts: []`). Run it after `fetch.py`; it needs no network.
-`python3 build_library.py --word-map` prints word loc -> lexicon id; `build_fatihah.py` sets
+`Lexeme` per QAC lemma and one `Root` per QAC root used by the covered surahs (every registered
+surah with an authored words file; Al-Fatihah alone: 23 lemmas, 18 roots; Al-Mu'awwidzat add 29
+lemmas and 20 roots that are not in Al-Fatihah), plus the Konsep records from
+`authored/library.concepts.json` when that file exists (otherwise `concepts: []`). Lemmas and roots
+are listed in reading order of first occurrence (surah order), so a later surah appends records
+and a root's `lemmas` list grows (Allāh then ilāh under أ ل ه; malik of 1:4 and malik of 114:2 are
+different QAC lemmas under م ل ك). Run it after `fetch.py`; it needs no network.
+`python3 build_library.py --word-map [slug]` prints word loc -> lexicon id; `build_surah.py` sets
 `Word.lemma_id` from the same key (the QAC LEM of the word's STEM looked up in the authored
 lexicon), and `validate.py` checks that the lexeme's `lemma_ar` and `root` equal the word's.
 
@@ -243,12 +320,13 @@ fails if a needed lemma or root has no entry or an entry matches nothing in QAC.
 | `` Ea`lamiyn `` | alamin | `` Sira`T `` | sirat | `laA` | la |
 | `` ma`lik `` | malik | | | `DaA^l~` | dall |
 
-- **pos**: `build_fatihah.pos_label` on the lemma's first covered STEM; verbs get the lemma-level
+- **pos**: `build_surah.pos_label` on the lemma's first covered STEM; verbs get the lemma-level
   label `fi'il` (aspect belongs to a word); "(jamak)"/"(mutsanna)" is dropped unless every QAC
   occurrence of the lemma has that number (so ‘ālamīn, plural in all 73, is "isim (jamak)"). An
   authored `pos` needs a `pos_note`.
 - **occurrences**: STEM segments with that `LEM`, ayat counted once; the `method` carries the
-  `facts.QAC_BASIS` note, lists the QAC POS tags when a lemma has more than one (yaum: N/T;
+  `facts.QAC_BASIS` note (for more than Al-Fatihah it names every covered surah: "surah 1, 112,
+  113 dan 114 identik byte-per-byte …"; `validate.py` fails if it names a surah without a lesson), lists the QAC POS tags when a lemma has more than one (yaum: N/T;
   lā: NEG/PRO; allażī: REL/COND), and says QAC has no surah-heading basmalah (only 1:1 and 27:30).
   Root counts are STEM segments with that `ROOT`; the method says the count merges every lemma
   of the root, including distant meanings, and names the lemmas already in Kosakata.
@@ -281,7 +359,9 @@ are prefixed "(tashrif)" / "(i'lal)" (the schema has one `sources` list per lexe
   isim maf'ul, fi'il amr (then fi'il nahi, isim zaman/makan, isim alat, unused so far); a row may
   skip forms, never reorder them. Only forms the cited kitab support are given. Checked by the
   build: the QAC verb form of `verb_lem` matches the wazan named in `bab` (form I = tsulatsi
-  mujarrad, IV = أَفْعَلَ, X = اِسْتَفْعَلَ); `verb_lem` and every `attest` lemma share the
+  mujarrad, IV = أَفْعَلَ, X = اِسْتَفْعَلَ; QAC also leaves the basic form of a four-letter root
+  unmarked, so an unmarked verb on such a root must name "Ruba'i mujarrad", as waswasa does,
+  and `build_surah.verb_form_src` says so in the word card's VF ref); `verb_lem` and every `attest` lemma share the
   lexeme's root; a fi'il amr appears only if QAC tags that verb IMPV somewhere (so ‘abada,
   ista‘āna, hadā, istaqāma, raḥima have one; ḥamida, malaka, an‘ama, gaḍiba, ḍalla, dāna do not).
   Typed Arabic (forms, i'lal before/after, wazan in `bab`) must be imla'i letters + harakat only;
@@ -293,13 +373,28 @@ are prefixed "(tashrif)" / "(i'lal)" (the schema has one `sources` list per lexe
   (bab 2, mudha'af). Bab per al-Jadwal's ash-Sharf notes (jil. 1, hlm. 27–36) and dictionary
   entries; row patterns per al-Amtsilah (bab 1/2 hlm. 2–3, bab 4 hlm. 4–5, af‘ala hlm. 16–17,
   istaf‘ala hlm. 27–29).
-- **i'lal** (7): ism ← simw (ibdal; J 27, MB 290, D 8), nasta‘īnu ← nasta‘winu (J 32, D 14,
+  Al-Mu'awwidzat add 8 rows: qāla, kāna and ‘āża (bab 1, ajwaf wawi, row ṣāna–yaṣūnu, hlm. 2–3;
+  bab from MQ 5/42 and MB 2/519, MQ 5/148 and MS 275, MS 221 "min bāb qāla"), khalaqa and ḥasada
+  (bab 1; MS 95 "bābuhu naṣara", MS 72 "bābuhu dakhala"), walada and waqaba (bab 2, mitsal wawi,
+  row wa‘ada–ya‘idu; MB 2/671 "min bāb wa‘ada", MS 343 "bābuhu wa‘ada"; waqaba gives only madhi
+  and mudhari'), and waswasa (ruba'i mujarrad, al-Amtsilah hlm. 8–9 = PDF 11–12, its own example
+  row; isim maf'ul muwaswas ilaihi per MB 2/658). The scan's rows were read on the page images.
+- **i'lal** (10): ism ← simw (ibdal; J 27, MB 290, D 8), nasta‘īnu ← nasta‘winu (J 32, D 14,
   al-Mujtaba 1/5 on 1:6), ihdinā ← tahdīnā (ta- dropped, hamzah washal, i'lal bil-hadzf; J 34, D 14,
   al-Hamalawi 36–37, an-Nahhas 1/20, as-Samin 1/62), ṣirāṭ ← sirāṭ (ibdal;
   J 34, MQ 3/349 and 3/152, MB 274), mustaqīm ← mustaqwim (J 34, D 15), ‘alaihi ← ‘alāhu
-  (MB 2/428), ḍāll ← ḍālil (idgham; J 35). The Kosakata card shows ibdal and idgham under the
+  (MB 2/428), ḍāll ← ḍālil (idgham; J 35), and for Al-Mu'awwidzat: aḥad ← waḥad (ibdal, the
+  known view per S 11/149–150, with Abu al-Baqa's dissent; D 10/614, MQ 1/67, R 67), yalidu ←
+  yawlidu (wawu dropped between ya' and kasrah; N 5/196), lam yakun ← lam yakūn (two sakin letters;
+  MS 275). The Kosakata card shows ibdal and idgham under the
   i'lal heading; the Konsep `ilal` record says so (al-Hamalawi 121–122: every i'lal is an ibdal,
   not the reverse).
+- **Al-Mu'awwidzat sources.** Meanings come from ar-Raghib (R), Maqayis (MQ), al-Mishbah (MB),
+  Mukhtar ash-Shihah (MS) and the al-Lughah / ash-Sharf parts of Darwisy jil. 10 and al-Jadwal
+  jil. 15; particles from Ibnu Hisyam's Mughni (MG: lam 365, min 419, mā 390/402, iżā 120/127,
+  fī 223), al-Ajurrumiyyah (AJ) and Ibnu 'Aqil (IA). New abbreviations MG, AJ, IA, IK (Ibnu
+  Katsir) and T (ath-Thabari, whose "qadim" is not used, per the muhaqqiq's footnote). Ids:
+  `malik-raja` is malik (king, 114:2), distinct from `malik` (mālik, 1:4); `adha` is QAC `Eu*o`.
 
 **Spelling convention shared with the lesson and Konsep text.** Letter names and grammar terms are
 written in pesantren spelling (ya', 'ain, tha', shad, sin, lam, qaf; fa'il, maf'ul), and wazan
@@ -307,7 +402,7 @@ names in prose carry their ending (fa‘īlun, fā‘ilun, maf‘ūlun), so they
 spelling of an SKB word. `build_library.py` and `validate.py` check the lexicon, root and concept
 prose together with the lesson prose, as the app shows them side by side.
 
-**Left out on purpose, or open for the reviewer** (details in each entry's `review_notes`):
+**Left out on purpose** (details in each entry's `review_notes`):
 no tashrif for ism, rabb (its origin is disputed: D 13 gives three views, J 29 one), Allah
 (origin not decided, plan §8), ‘ālamīn, yaum, ṣirāṭ, gair or the particles; no isim fa'il for
 gaḍiba (the dictionaries cited give gaḍbān/gaḍūb, the Qur'an uses gaḍbān); no isim maf'ul for
@@ -317,14 +412,22 @@ mean debtor/creditor). al-Jadwal (hlm. 29) puts ḥamida in bab naṣara; Mukhta
 tafsir.app ayah page; printed pages, checked on Shamela 9617's page markers: QS 1:1–1:5 hlm. 4, 1:6–1:7 hlm. 5. The `review_notes` of word 1:5:4 in
 `authored/al-fatihah.words.json` write the origin of nasta‘īnu as "nasta‘wanu"; D, J and
 al-Mujtaba all say nasta‘winu (kasrah on the wawu).
+Al-Mu'awwidzat, left out: the i'lal of qul and of a‘ūżu (no cited kitab states it; al-Jadwal on
+QS 2:67 does not either); a fi'il amr for ‘āża, walada, khalaqa, ḥasada and waswasa (QAC has no
+IMPV for them); the mashdar and participles of waqaba (not in the dictionaries cited); the
+"not hollow" and similar readings of aṣ-ṣamad (aqidah wording, as on the word card); the origin of
+lafaz Allah under ilāh (plan §8); a wazan for al-khannās.
 
 ## Not built here
 
-- `tafsir` (per ayah) and `hadith` come from the platform-corpus retrieval stage (plan §7.5 stage 1);
-  this build leaves them out (`hadith: []`), and `validate.py` fails if a tafsir appears.
-- Narration, quizzes and review sign-off records are later stages.
+- `tafsir` (per ayah) comes from the platform-corpus retrieval stage (plan §7.5 stage 1); this
+  build leaves it out, and `validate.py` fails if a tafsir appears. `hadith` is passed through from
+  `authored/<slug>.hadith.json` when that file exists (retrieved from the corpus by its author;
+  `validate.py` checks status, that `ar` is Arabic only and that `id` carries no Arabic words),
+  otherwise `hadith: []`.
+- Narration and quizzes are later stages. There are no review sign-off records (plan L11).
 
-## Known data issues (for the reviewer)
+## Known data issues
 
 - QAC 0.4 lemma spellings carry context marks: `r~aHoma`n`, `r~aHiym`, `m~usotaqiym` start with a
   shaddah (from assimilation), and the Form X verb lemma is `{sotaEiynu` (shown as ٱسْتَعِينُ).
@@ -333,5 +436,17 @@ al-Mujtaba all say nasta‘winu (kasrah on the wawu).
   root-family cards say so instead of implying one meaning.
 - quran-align Husary Mu'allim 1:7 has a 4.1 s gap before word 5 (gairi, 0.3 s long) and non-zero
   matcher stats; 1:1 has one deletion. Check by ear before shipping.
+- quran-align covers every word of 112–114 for both reciters, one word per segment, no gap over
+  1.5 s and no word under 0.2 s. Husary Mu'allim has non-zero matcher stats on 112:2 (1 deletion),
+  113:2 (1 deletion) and 114:6 (3 insertions); check by ear. Alafasy holds the last word of every
+  An-Nas ayah for 3.8–4.5 s (madd at the pause plus the breath) — expected, but it inflates a
+  word-length "madd" display. The Husary 113:5 file has 347 bytes outside MPEG frames (the
+  duration probe skips them).
+- QAC 0.4 spells the lemma of a‘ūżu (113:1:2, 114:1:2) `Eu*o` (عُذْ, an imperative form) and gives
+  ṣamad, nās and naffāṡāt their assimilation shaddah (`S~amad`, `n~aAs`, `n~af~a`va`t`); shown
+  verbatim, like the Al-Fatihah lemma oddities above.
+- QuranEnc's Al-Mu'awwidzat translations open the quotation after "Katakanlah" in ayah 1 and close
+  it at the end of the last ayah (112:4, 113:5, 114:6); shipped verbatim, so a single ayah shows an
+  unbalanced quotation mark. None of the three suras has footnotes.
 - QuranEnc footnotes are shipped verbatim with their markers; the app must render them under the
   ayah (schema `translation.footnotes`).

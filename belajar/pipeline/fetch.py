@@ -6,7 +6,9 @@
     python3 fetch.py --repin ID    # accept new bytes for input ID (deliberate pin update)
 
 First run: pins are empty, so the downloaded bytes are pinned. Later runs fail loudly
-(exit 1) if a cached or re-downloaded file differs from its pin. Stdlib only.
+(exit 1) if a cached or re-downloaded file differs from its pin. Per-surah inputs (the QuranEnc
+sura files and the EveryAyah duration probes) follow common.SURAHS, so a newly registered surah
+is downloaded and pinned on the next run while the existing pins are only verified. Stdlib only.
 """
 from __future__ import annotations
 
@@ -21,7 +23,7 @@ import urllib.request
 import zipfile
 from pathlib import Path
 
-from common import PIPELINE, load_sources, mp3_duration_ms, save_sources, sha256_bytes
+from common import PIPELINE, SURAHS, load_sources, mp3_duration_ms, save_sources, sha256_bytes
 
 UA = "dakwah-lens-belajar-pipeline/0.1 (+https://dakwah-lens.id)"
 TODAY = dt.date.today().isoformat()
@@ -135,6 +137,17 @@ def fetch_quran_align(meta: dict, refresh: bool, repin: set[str]) -> None:
         problems.append("[quran_align] LICENSE is not CC BY 4.0")
 
 
+QURANENC_SURA_URL = "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/{n}"
+
+
+def check_quranenc_rows(b: bytes, n: int, n_ayat: int) -> None:
+    rows = json.loads(b)["result"]
+    if [int(r["aya"]) for r in rows] != list(range(1, n_ayat + 1)):
+        problems.append(f"[quranenc] sura {n} does not have ayat 1..{n_ayat}")
+    if any(int(r["sura"]) != n for r in rows):
+        problems.append(f"[quranenc] sura {n}: a row names another sura")
+
+
 def fetch_quranenc(meta: dict, refresh: bool, repin: set[str]) -> None:
     p = PIPELINE / meta["cache_path"]
     b = obtain(p, meta["url"], refresh)
@@ -143,6 +156,20 @@ def fetch_quranenc(meta: dict, refresh: bool, repin: set[str]) -> None:
     rows = json.loads(b)["result"]
     if [int(r["aya"]) for r in rows] != list(range(1, 8)):
         problems.append("[quranenc] sura 1 does not have ayat 1..7")
+    # Every other surah with a lesson: same endpoint and recording, one pinned file per sura.
+    suras = meta.setdefault("suras", {})
+    for spec in SURAHS:
+        if spec.surah == 1:
+            continue
+        n = spec.surah
+        sm = suras.setdefault(str(n), {"url": QURANENC_SURA_URL.format(n=n),
+                                       "cache_path": f"cache/quranenc/indonesian_affairs_sura{n}.json",
+                                       "sha256": None})
+        sb = obtain(PIPELINE / sm["cache_path"], sm["url"], refresh)
+        pin(sm, f"sura {n}", sb, "quranenc_indonesian_affairs", repin)
+        sm["bytes"] = len(sb)
+        sm["retrieved"] = sm.get("retrieved") or TODAY
+        check_quranenc_rows(sb, n, spec.n_ayat)
     pv = PIPELINE / meta["version_cache_path"]
     vb = obtain(pv, meta["version_url"], refresh)
     pin(meta, "translations list", vb, "quranenc_indonesian_affairs", repin, "version_sha256")
@@ -161,15 +188,23 @@ def fetch_quranenc(meta: dict, refresh: bool, repin: set[str]) -> None:
 
 def fetch_everyayah(input_id: str, meta: dict, refresh: bool, repin: set[str]) -> None:
     d = PIPELINE / meta["cache_dir"]
-    for ayah in range(1, 8):
-        name = f"001{ayah:03d}.mp3"
-        url = meta["url_pattern"].replace("{AAA}", f"{ayah:03d}")
-        b = obtain(d / name, url, refresh)
-        f = meta["files"].setdefault(name, {"url": url, "sha256": None})
-        pin(f, name, b, input_id, repin)
-        f["bytes"] = len(b)
-        f.update(mp3_duration_ms(b))
-        f["retrieved"] = f.get("retrieved") or TODAY
+    for spec in SURAHS:
+        for ayah in range(1, spec.n_ayat + 1):
+            fetch_everyayah_file(input_id, meta, d, spec.surah, ayah, refresh, repin)
+
+
+def fetch_everyayah_file(input_id: str, meta: dict, d: Path, surah: int, ayah: int, refresh: bool,
+                         repin: set[str]) -> None:
+    name = f"{surah:03d}{ayah:03d}.mp3"
+    url = meta["url_pattern"].replace("{SSS}", f"{surah:03d}").replace("{AAA}", f"{ayah:03d}")
+    b = obtain(d / name, url, refresh)
+    f = meta["files"].setdefault(name, {"url": url, "sha256": None})
+    if f["url"] != url:
+        problems.append(f"[{input_id}] {name}: pinned url {f['url']} != {url}")
+    pin(f, name, b, input_id, repin)
+    f["bytes"] = len(b)
+    f.update(mp3_duration_ms(b))
+    f["retrieved"] = f.get("retrieved") or TODAY
 
 
 def main() -> int:

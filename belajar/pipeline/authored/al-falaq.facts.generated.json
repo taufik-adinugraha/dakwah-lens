@@ -1,0 +1,1248 @@
+{
+  "_comment": "Kartu 'Tahukah kamu?' surah Al-Falaq (schema.ts Fact), dihasilkan oleh belajar/pipeline/facts_muawwidzat.py dari Tanzil Uthmani 1.1 + QAC 0.4 (dipin sha256), kutipan kitab dengan jilid/halaman, dan hadits dari korpus platform. Jangan diedit tangan: jalankan ulang skripnya. status 'draft' adalah status pipeline (plan L11). Kunci berawalan '_' hanya untuk pipeline dan tidak dikirim ke aplikasi.",
+  "surah": 113,
+  "slug": "al-falaq",
+  "_generated_by": "belajar/pipeline/facts_muawwidzat.py (Python stdlib, tanpa LLM)",
+  "_inputs": {
+    "tanzil": "uthmani-1.1 sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
+    "tanzil_metadata": "1.0 sha256:8867c1d88191472adec9db694b3cd9f135b1a2ef580574d32cf888dcb22c5c7a",
+    "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
+    "corpus": {
+      "bukhari.json": "sha256:df42f6e5fe98a3571cc44775cbe998fb148e21e650c0ff948a2e03ef009493c7",
+      "muslim.json": "sha256:366ebf71aa8e031eb0ec9c1cb4006f653e4d9300f9f6229f11d4df830fd73351",
+      "riyad-as-salihin.json": "sha256:99d32abd2744456c921a4c069d78b1012b325106cd439accaf137dbd5405c8d0",
+      "tafsir-ibn-kathir.json": "sha256:767270d51e5e8c0b5b946fc27b217f51e98274d3d5523d6fecd7c451300b4858"
+    },
+    "hadith_mapping": {
+      "fawazahmed0/ara-muslim-sections-6.json": "sha256:1814326c0fefd9ed123a5e8ee55e6e4eef8dd303775c2028d95d8fef921666f1",
+      "fawazahmed0/ara-muslim-sections-39.json": "sha256:a0e4d44329e0ae3b4b3b29b67dcc3aff430364ab6f1b6b2940cd7252f563f4a3",
+      "ahmedbaset/riyad_assalihin.json": "sha256:180171247ed9462c05164c80c4f938bd30936bfaf848125595be0b86361d7b75"
+    },
+    "kitab_pages": "ad-Dani al-Bayan (Shamela 5542), Ibnu Katsir ed. as-Salamah (Shamela 8473), Darwisy (Shamela 2163): halaman cetak dari judul halaman Shamela, dicek 2026-10-09"
+  },
+  "_self_check": {
+    "figures": 40,
+    "failed": 0,
+    "rows": [
+      {
+        "fact": "lima-ayat",
+        "what": "ayat (baris Tanzil)",
+        "value": 5,
+        "recheck": 5,
+        "how": "quran-data.xml atribut ayas",
+        "ok": true
+      },
+      {
+        "fact": "lima-ayat",
+        "what": "ayat vs ad-Dani (hitungan Kufah)",
+        "value": 5,
+        "recheck": 5,
+        "how": "angka ad-Dani hlm. 297",
+        "ok": true
+      },
+      {
+        "fact": "lima-ayat",
+        "what": "kata (token Tanzil)",
+        "value": 23,
+        "recheck": 23,
+        "how": "jumlah lokasi kata QAC 0.4",
+        "ok": true
+      },
+      {
+        "fact": "lima-ayat",
+        "what": "kata vs ad-Dani",
+        "value": 23,
+        "recheck": 23,
+        "how": "angka ad-Dani hlm. 297",
+        "ok": true
+      },
+      {
+        "fact": "makkiyah-madaniyah-al-falaq",
+        "what": "type quran-data.xml",
+        "value": "Meccan",
+        "recheck": "Meccan",
+        "how": "atribut type dibaca ulang",
+        "ok": true
+      },
+      {
+        "fact": "kata-tunggal-al-falaq",
+        "what": "LEM:falaq",
+        "value": [
+          [
+            113,
+            1,
+            4
+          ]
+        ],
+        "recheck": [
+          [
+            113,
+            1,
+            4
+          ]
+        ],
+        "how": "baris QAC mentah",
+        "ok": true
+      },
+      {
+        "fact": "kata-tunggal-al-falaq",
+        "what": "token Tanzil LEM:falaq",
+        "value": true,
+        "recheck": true,
+        "how": "pencarian token + lemma QAC",
+        "ok": true
+      },
+      {
+        "fact": "kata-tunggal-al-falaq",
+        "what": "LEM:gaAsiq",
+        "value": [
+          [
+            113,
+            3,
+            3
+          ]
+        ],
+        "recheck": [
+          [
+            113,
+            3,
+            3
+          ]
+        ],
+        "how": "baris QAC mentah",
+        "ok": true
+      },
+      {
+        "fact": "kata-tunggal-al-falaq",
+        "what": "token Tanzil LEM:gaAsiq",
+        "value": true,
+        "recheck": true,
+        "how": "pencarian token + lemma QAC",
+        "ok": true
+      },
+      {
+        "fact": "kata-tunggal-al-falaq",
+        "what": "LEM:waqaba",
+        "value": [
+          [
+            113,
+            3,
+            5
+          ]
+        ],
+        "recheck": [
+          [
+            113,
+            3,
+            5
+          ]
+        ],
+        "how": "baris QAC mentah",
+        "ok": true
+      },
+      {
+        "fact": "kata-tunggal-al-falaq",
+        "what": "token Tanzil LEM:waqaba",
+        "value": true,
+        "recheck": true,
+        "how": "pencarian token + lemma QAC",
+        "ok": true
+      },
+      {
+        "fact": "kata-tunggal-al-falaq",
+        "what": "LEM:n~af~a`va`t",
+        "value": [
+          [
+            113,
+            4,
+            3
+          ]
+        ],
+        "recheck": [
+          [
+            113,
+            4,
+            3
+          ]
+        ],
+        "how": "baris QAC mentah",
+        "ok": true
+      },
+      {
+        "fact": "kata-tunggal-al-falaq",
+        "what": "token Tanzil LEM:n~af~a`va`t",
+        "value": true,
+        "recheck": true,
+        "how": "pencarian token + lemma QAC",
+        "ok": true
+      },
+      {
+        "fact": "kata-tunggal-al-falaq",
+        "what": "LEM:HaAsid",
+        "value": [
+          [
+            113,
+            5,
+            3
+          ]
+        ],
+        "recheck": [
+          [
+            113,
+            5,
+            3
+          ]
+        ],
+        "how": "baris QAC mentah",
+        "ok": true
+      },
+      {
+        "fact": "kata-tunggal-al-falaq",
+        "what": "token Tanzil LEM:HaAsid",
+        "value": true,
+        "recheck": true,
+        "how": "pencarian token + lemma QAC",
+        "ok": true
+      },
+      {
+        "fact": "kata-tunggal-al-falaq",
+        "what": "ROOT:wqb hanya di surah 113",
+        "value": [
+          [
+            113,
+            3,
+            5
+          ]
+        ],
+        "recheck": [
+          [
+            113,
+            3,
+            5
+          ]
+        ],
+        "how": "baris QAC mentah",
+        "ok": true
+      },
+      {
+        "fact": "kata-tunggal-al-falaq",
+        "what": "ROOT:nfv hanya di surah 113",
+        "value": [
+          [
+            113,
+            4,
+            3
+          ]
+        ],
+        "recheck": [
+          [
+            113,
+            4,
+            3
+          ]
+        ],
+        "how": "baris QAC mentah",
+        "ok": true
+      },
+      {
+        "fact": "lima-surah-qul",
+        "what": "surah dibuka qul (Tanzil vs QAC kata 1 ayat 1)",
+        "value": [
+          [
+            72,
+            1
+          ],
+          [
+            109,
+            1
+          ],
+          [
+            112,
+            1
+          ],
+          [
+            113,
+            1
+          ],
+          [
+            114,
+            1
+          ]
+        ],
+        "recheck": [
+          [
+            72,
+            1
+          ],
+          [
+            109,
+            1
+          ],
+          [
+            112,
+            1
+          ],
+          [
+            113,
+            1
+          ],
+          [
+            114,
+            1
+          ]
+        ],
+        "how": "baris QAC mentah",
+        "ok": true
+      },
+      {
+        "fact": "qul-a-udzu-bi-rabbi",
+        "what": "qul a‘ūżu bi-rabbi (find_seq vs regex)",
+        "value": [
+          [
+            113,
+            1
+          ],
+          [
+            114,
+            1
+          ]
+        ],
+        "recheck": [
+          [
+            113,
+            1
+          ],
+          [
+            114,
+            1
+          ]
+        ],
+        "how": "regex",
+        "ok": true
+      },
+      {
+        "fact": "qul-a-udzu-bi-rabbi",
+        "what": "hanya 113:1 dan 114:1",
+        "value": true,
+        "recheck": true,
+        "how": "syarat kalimat",
+        "ok": true
+      },
+      {
+        "fact": "akar-falaq",
+        "what": "ROOT:flq",
+        "value": [
+          [
+            6,
+            95,
+            3
+          ],
+          [
+            6,
+            96,
+            1
+          ],
+          [
+            26,
+            63,
+            8
+          ],
+          [
+            113,
+            1,
+            4
+          ]
+        ],
+        "recheck": [
+          [
+            6,
+            95,
+            3
+          ],
+          [
+            6,
+            96,
+            1
+          ],
+          [
+            26,
+            63,
+            8
+          ],
+          [
+            113,
+            1,
+            4
+          ]
+        ],
+        "how": "baris QAC mentah",
+        "ok": true
+      },
+      {
+        "fact": "akar-falaq",
+        "what": "LEM falaq hanya di 113:1",
+        "value": true,
+        "recheck": true,
+        "how": "syarat kalimat",
+        "ok": true
+      },
+      {
+        "fact": "akar-falaq",
+        "what": "kalimat Ibnu Katsir (falaq) ada di rekaman tafsir korpus",
+        "value": true,
+        "recheck": true,
+        "how": "syarat kalimat",
+        "ok": true
+      },
+      {
+        "fact": "akar-falaq",
+        "what": "kalimat Ibnu Katsir (falaq-6-96) ada di rekaman tafsir korpus",
+        "value": true,
+        "recheck": true,
+        "how": "syarat kalimat",
+        "ok": true
+      },
+      {
+        "fact": "akar-falaq",
+        "what": "kalimat Ibnu Katsir (falaq-sawab) ada di rekaman tafsir korpus",
+        "value": true,
+        "recheck": true,
+        "how": "syarat kalimat",
+        "ok": true
+      },
+      {
+        "fact": "akar-falaq",
+        "what": "6:96 termasuk keluarga akar ini",
+        "value": true,
+        "recheck": true,
+        "how": "syarat kalimat",
+        "ok": true
+      },
+      {
+        "fact": "akar-ghasiq",
+        "what": "ROOT:gsq",
+        "value": [
+          [
+            17,
+            78,
+            6
+          ],
+          [
+            38,
+            57,
+            4
+          ],
+          [
+            78,
+            25,
+            3
+          ],
+          [
+            113,
+            3,
+            3
+          ]
+        ],
+        "recheck": [
+          [
+            17,
+            78,
+            6
+          ],
+          [
+            38,
+            57,
+            4
+          ],
+          [
+            78,
+            25,
+            3
+          ],
+          [
+            113,
+            3,
+            3
+          ]
+        ],
+        "how": "baris QAC mentah",
+        "ok": true
+      },
+      {
+        "fact": "akar-ghasiq",
+        "what": "kalimat Ibnu Katsir (ghasiq) ada di rekaman tafsir korpus",
+        "value": true,
+        "recheck": true,
+        "how": "syarat kalimat",
+        "ok": true
+      },
+      {
+        "fact": "akar-ghasiq",
+        "what": "kalimat Ibnu Katsir (ghasiq-lain) ada di rekaman tafsir korpus",
+        "value": true,
+        "recheck": true,
+        "how": "syarat kalimat",
+        "ok": true
+      },
+      {
+        "fact": "akar-hasad",
+        "what": "ROOT:Hsd",
+        "value": [
+          [
+            2,
+            109,
+            12
+          ],
+          [
+            4,
+            54,
+            2
+          ],
+          [
+            48,
+            15,
+            25
+          ],
+          [
+            113,
+            5,
+            3
+          ],
+          [
+            113,
+            5,
+            5
+          ]
+        ],
+        "recheck": [
+          [
+            2,
+            109,
+            12
+          ],
+          [
+            4,
+            54,
+            2
+          ],
+          [
+            48,
+            15,
+            25
+          ],
+          [
+            113,
+            5,
+            3
+          ],
+          [
+            113,
+            5,
+            5
+          ]
+        ],
+        "how": "baris QAC mentah",
+        "ok": true
+      },
+      {
+        "fact": "akar-hasad",
+        "what": "ḥāsid hanya di 113:5",
+        "value": true,
+        "recheck": true,
+        "how": "syarat kalimat",
+        "ok": true
+      },
+      {
+        "fact": "min-syarri",
+        "what": "min syarri (find_seq vs regex)",
+        "value": [
+          [
+            113,
+            2
+          ],
+          [
+            113,
+            3
+          ],
+          [
+            113,
+            4
+          ],
+          [
+            113,
+            5
+          ],
+          [
+            114,
+            4
+          ]
+        ],
+        "recheck": [
+          [
+            113,
+            2
+          ],
+          [
+            113,
+            3
+          ],
+          [
+            113,
+            4
+          ],
+          [
+            113,
+            5
+          ],
+          [
+            114,
+            4
+          ]
+        ],
+        "how": "regex",
+        "ok": true
+      },
+      {
+        "fact": "min-syarri",
+        "what": "lemma QAC min + syarr di setiap tempat",
+        "value": true,
+        "recheck": true,
+        "how": "syarat kalimat",
+        "ok": true
+      },
+      {
+        "fact": "min-syarri",
+        "what": "semua di 113 dan 114",
+        "value": true,
+        "recheck": true,
+        "how": "syarat kalimat",
+        "ok": true
+      },
+      {
+        "fact": "keluarga-kata-a-udzu",
+        "what": "ROOT:Ew*",
+        "value": {
+          "n": 17,
+          "sha256": "e52a8c688be3302d"
+        },
+        "recheck": {
+          "n": 17,
+          "sha256": "e52a8c688be3302d"
+        },
+        "how": "baris QAC mentah",
+        "ok": true
+      },
+      {
+        "fact": "keluarga-kata-a-udzu",
+        "what": "a‘ūżu IMPF 1S",
+        "value": [
+          [
+            2,
+            67,
+            15
+          ],
+          [
+            11,
+            47,
+            4
+          ],
+          [
+            19,
+            18,
+            3
+          ],
+          [
+            23,
+            97,
+            3
+          ],
+          [
+            23,
+            98,
+            1
+          ],
+          [
+            113,
+            1,
+            2
+          ],
+          [
+            114,
+            1,
+            2
+          ]
+        ],
+        "recheck": [
+          [
+            2,
+            67,
+            15
+          ],
+          [
+            11,
+            47,
+            4
+          ],
+          [
+            19,
+            18,
+            3
+          ],
+          [
+            23,
+            97,
+            3
+          ],
+          [
+            23,
+            98,
+            1
+          ],
+          [
+            113,
+            1,
+            2
+          ],
+          [
+            114,
+            1,
+            2
+          ]
+        ],
+        "how": "baris QAC mentah",
+        "ok": true
+      },
+      {
+        "fact": "keluarga-kata-a-udzu",
+        "what": "token Tanzil a‘ūżu vs QAC",
+        "value": true,
+        "recheck": true,
+        "how": "pencarian token + lemma QAC",
+        "ok": true
+      },
+      {
+        "fact": "keluarga-kata-a-udzu",
+        "what": "perintah = satu lemma bentuk X",
+        "value": true,
+        "recheck": true,
+        "how": "syarat kalimat",
+        "ok": true
+      },
+      {
+        "fact": "keluarga-kata-a-udzu",
+        "what": "16:98 memuat perintah itu",
+        "value": true,
+        "recheck": true,
+        "how": "syarat kalimat",
+        "ok": true
+      },
+      {
+        "fact": "setelah-al-muawwidzatain-turun",
+        "what": "riwayat ini ada di rekaman tafsir korpus 113:1",
+        "value": true,
+        "recheck": true,
+        "how": "syarat kalimat",
+        "ok": true
+      }
+    ]
+  },
+  "_not_sourced": [
+    "Sebab turun Al-Falaq dan An-Nas terkait sihir Labid bin al-A'sham: hadits sihir di korpus (Sahih al-Bukhari 3268, 5763, 5766, 6391; Sahih Muslim 2189a) tidak menyebut turunnya kedua surah; kaitan itu ada dalam riwayat ats-Tsa'labi tanpa sanad yang dinukil Ibnu Katsir. Tidak dimuat; perlu sumber takhrij luar.",
+    "Membaca al-mu‘awwiżāt setiap selesai shalat (Abu Dawud, at-Tirmidzi, an-Nasa'i): tidak ada di korpus.",
+    "Hadits 'Uqbah bin 'Amir bahwa tidak ada bacaan perlindungan yang menyamai keduanya (an-Nasa'i, Abu Dawud): tidak ada di koleksi korpus (hanya dinukil Ibnu Katsir).",
+    "Penafsiran gāsiq sebagai bulan (hadits Aisyah dari Ahmad dan at-Tirmidzi, dinukil Ibnu Katsir): tidak dimuat sebagai hadits karena tidak ada di koleksi korpus.",
+    "Arti dasar akar kata (Maqayis, al-Mishbah) untuk akar di surah ini: tidak ditulis di kartu; tempatnya di perpustakaan Akar.",
+    "Jumlah huruf (ad-Dani: 79): tidak dimuat (plan §4.5)."
+  ],
+  "facts": [
+    {
+      "id": "lima-ayat",
+      "title": "5 ayat, 23 kata",
+      "body": "Dalam hitungan Kufah (riwayat Hafs) yang dipakai modul ini, Al-Falaq terdiri atas 5 ayat dan 23 kata (4 + 4 + 5 + 5 + 5). Basmalah di atas surah tidak diberi nomor ayat dalam hitungan ini. Ad-Dani mencatat jumlah kata yang sama. Menurut ad-Dani, surah ini 5 ayat dalam semua hitungan, tanpa perbedaan.",
+      "locations": [
+        "113:1",
+        "113:2",
+        "113:3",
+        "113:4",
+        "113:5"
+      ],
+      "method": "Ayat = baris surah 113 dalam Tanzil Uthmani 1.1 (sama dengan atribut ayas di quran-data.xml); kata = token yang dipisah spasi setelah basmalah pembuka surah (yang ditaruh Tanzil di awal ayat 1) dibuang. Penomoran kata QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 112, 113 dan 114 identik byte-per-byte dengan 1.1 yang dipakai) untuk surah 113 juga berisi 23 kata dan cocok satu per satu. Kesepakatan semua hitungan ayat dikutip dari ad-Dani, bukan hasil hitungan data.",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; baris 113|1 sampai 113|5; basmalah pembuka dibuang",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; jumlah lokasi (113:a:w)",
+          "url": "https://corpus.quran.com/"
+        },
+        {
+          "kitab": "Abu 'Amr ad-Dani, al-Bayan fi 'Add Ay al-Qur'an",
+          "ref": "Surat al-Falaq, hlm. 297",
+          "url": "https://shamela.ws/book/5542/279"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "makkiyah-madaniyah-al-falaq",
+      "title": "Makkiyah atau Madaniyah?",
+      "body": "Ad-Dani mencatat perbedaan pendapat: Al-Falaq Madaniyah menurut Ibnu 'Abbas, Mujahid dan 'Atha', sedangkan menurut Qatadah Makkiyah. Data surah Tanzil yang dipakai modul ini menandainya Makkiyah.",
+      "locations": [
+        "113:1",
+        "113:2",
+        "113:3",
+        "113:4",
+        "113:5"
+      ],
+      "method": "Bukan hitungan. Pendapat ulama dikutip dari ad-Dani; penanda Tanzil dari atribut type di quran-data.xml.",
+      "sources": [
+        {
+          "kitab": "Abu 'Amr ad-Dani, al-Bayan fi 'Add Ay al-Qur'an",
+          "ref": "Surat al-Falaq, hlm. 297",
+          "url": "https://shamela.ws/book/5542/279"
+        },
+        {
+          "kitab": "Tanzil Quran metadata (quran-data.xml) 1.0",
+          "ref": "sha256:8867c1d88191472a; sura index=113, type=Meccan",
+          "url": "https://tanzil.net/docs/quran_metadata"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "qul-a-udzu-bi-rabbi",
+      "title": "Dua surah dengan pembuka yang sama",
+      "body": "Kalimat «قُلْ أَعُوذُ بِرَبِّ» (katakanlah: aku berlindung kepada Tuhan) hanya ada di dua tempat dalam Al-Qur'an: awal Al-Falaq (113:1) dan awal An-Nas (114:1). Lanjutannya berbeda: «ٱلْفَلَقِ» di Al-Falaq dan «ٱلنَّاسِ» di An-Nas.",
+      "locations": [
+        "113:1",
+        "114:1"
+      ],
+      "method": "Tiga token berurutan qul + a‘ūżu + bi-rabbi (diambil dari 113:1), token pertama boleh berawalan wa- atau fa-; kunci pencarian: tatweel (U+0640), harakat dan tanda baca Qur'ani (U+064B–U+065F, U+06D6–U+06ED) dibuang; bentuk alif (ٱ أ إ آ dan alif kecil U+0670) disamakan menjadi ا.",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token 113:1:1–3 berurutan",
+          "url": "https://tanzil.net/download/"
+        }
+      ],
+      "status": "draft",
+      "_shared": [
+        "al-falaq",
+        "an-nas"
+      ]
+    },
+    {
+      "id": "kata-tunggal-al-falaq",
+      "title": "5 kata yang hanya ada di Al-Falaq",
+      "body": "Lima kata dalam surah ini tidak dipakai di tempat lain dalam Al-Qur'an: «ٱلْفَلَقِ» (113:1), «غَاسِقٍ» dan «وَقَبَ» (113:3), «ٱلنَّفَّٰثَٰتِ» (113:4) dan «حَاسِدٍ» (113:5). Untuk «وَقَبَ» dan «ٱلنَّفَّٰثَٰتِ», akarnya pun (و ق ب dan ن ف ث) hanya ada di sini.",
+      "locations": [
+        "113:1",
+        "113:3",
+        "113:4",
+        "113:5"
+      ],
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 112, 113 dan 114 identik byte-per-byte dengan 1.1 yang dipakai): lemma (LEM) segmen STEM surah 113 yang semua kemunculannya di seluruh Al-Qur'an ada di surah ini (LEM:falaq; LEM:gaAsiq; LEM:waqaba; LEM:n~af~a`va`t; LEM:HaAsid); akar yang juga hanya ada di sini: ROOT:wqb; ROOT:nfv. Dicek di Tanzil: token dengan tulisan sama tanpa harakat (boleh dengan al- dan awalan wa-, fa-, bi-, ka-, li-) hanya ada di tempat itu.",
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; LEM:falaq; LEM:gaAsiq; LEM:waqaba; LEM:n~af~a`va`t; LEM:HaAsid; ROOT:wqb; ROOT:nfv",
+          "url": "https://corpus.quran.com/"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token yang sama tanpa harakat",
+          "url": "https://tanzil.net/download/"
+        }
+      ],
+      "status": "draft",
+      "_homographs": []
+    },
+    {
+      "id": "akar-falaq",
+      "title": "Al-falaq dan keluarga katanya",
+      "body": "Kata «ٱلْفَلَقِ» hanya ada di 113:1, tetapi keluarga akar ف ل ق muncul 4 kali: «فَالِقُ ٱلْحَبِّ» (6:95), «فَالِقُ ٱلْإِصْبَاحِ» (6:96), «فَٱنفَلَقَ» (26:63) dan 113:1. Ibnu Katsir menukil dari Jabir dan Ibnu 'Abbas (riwayat al-'Aufi), juga dari banyak ulama salaf, bahwa al-falaq adalah subuh; al-Qurazhi, Ibnu Zaid, dan Ibnu Jarir menyamakannya dengan «فَالِقُ ٱلْإِصْبَاحِ» (6:96). Ada pendapat lain, tetapi Ibnu Jarir memilih makna ini, dan Ibnu Katsir menyebutnya pendapat yang benar serta pilihan al-Bukhari.",
+      "locations": [
+        "6:95",
+        "6:96",
+        "26:63",
+        "113:1"
+      ],
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 112, 113 dan 114 identik byte-per-byte dengan 1.1 yang dipakai): segmen STEM dengan ROOT:flq = 4 dalam 4 ayat; LEM:falaq = 1. Kutipan diambil dari token Tanzil di lokasi QAC itu (isim beserta kata sesudahnya). Penafsiran dikutip dari Ibnu Katsir.",
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; ROOT:flq; LEM:falaq",
+          "url": "https://corpus.quran.com/"
+        },
+        {
+          "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami as-Salamah, Dar Thayyibah)",
+          "ref": "jil. 8, hlm. 535 (tafsir QS 113:1: makna al-falaq)",
+          "url": "https://shamela.ws/book/8473/4581"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "akar-ghasiq",
+      "title": "Gāsiq dan keluarga katanya",
+      "body": "Kata «غَاسِقٍ» hanya ada di 113:3, tetapi keluarga akar غ س ق muncul 4 kali, misalnya «غَسَقِ ٱلَّيْلِ» (17:78). Ibnu Katsir menukil Mujahid: gāsiq adalah malam, dan «إِذَا وَقَبَ» adalah saat matahari terbenam; Ibnu 'Abbas dan sejumlah ulama lain menyebutnya malam ketika datang dengan kegelapannya. Ibnu Katsir juga mencatat pendapat lain.",
+      "locations": [
+        "17:78",
+        "38:57",
+        "78:25",
+        "113:3"
+      ],
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 112, 113 dan 114 identik byte-per-byte dengan 1.1 yang dipakai): segmen STEM dengan ROOT:gsq = 4 dalam 4 ayat; LEM:gaAsiq = 1. Penafsiran dikutip dari Ibnu Katsir.",
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; ROOT:gsq; LEM:gaAsiq",
+          "url": "https://corpus.quran.com/"
+        },
+        {
+          "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami as-Salamah, Dar Thayyibah)",
+          "ref": "jil. 8, hlm. 535 (tafsir QS 113:3: makna gāsiq)",
+          "url": "https://shamela.ws/book/8473/4581"
+        },
+        {
+          "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami as-Salamah, Dar Thayyibah)",
+          "ref": "jil. 8, hlm. 536 (tafsir QS 113:3: pendapat lain tentang gāsiq: matahari terbenam, bintang, bulan)",
+          "url": "https://shamela.ws/book/8473/4582"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "akar-hasad",
+      "title": "Keluarga kata ḥasad: 5 kali",
+      "body": "Kata-kata dari akar ح س د (dengki), seperti «حَاسِدٍ» dan «حَسَدَ» di 113:5, muncul 5 kali dalam 4 ayat: 2:109, 4:54, 48:15 dan 113:5. Bentuk ḥāsid (orang yang dengki) hanya ada di 113:5.",
+      "locations": [
+        "2:109",
+        "4:54",
+        "48:15",
+        "113:5"
+      ],
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 112, 113 dan 114 identik byte-per-byte dengan 1.1 yang dipakai): segmen STEM dengan ROOT:Hsd = 5 dalam 4 ayat (LEM:HaAsid 1, LEM:Hasad 1, LEM:Hasada 3); LEM:HaAsid hanya di 113:5.",
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; ROOT:Hsd; LEM:HaAsid",
+          "url": "https://corpus.quran.com/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "min-syarri",
+      "title": "Min syarri: 5 kali",
+      "body": "Ungkapan «مِن شَرِّ» (dari kejahatan), dengan atau tanpa awalan wa-, muncul 5 kali dalam Al-Qur'an, dan semuanya ada di dua surah ini: empat di Al-Falaq (113:2–5) dan satu di An-Nas (114:4).",
+      "locations": [
+        "113:2",
+        "113:3",
+        "113:4",
+        "113:5",
+        "114:4"
+      ],
+      "method": "Dua token berurutan min + syarri (diambil dari 113:2), token pertama boleh berawalan wa- atau fa-; kunci pencarian: tatweel (U+0640), harakat dan tanda baca Qur'ani (U+064B–U+065F, U+06D6–U+06ED) dibuang; bentuk alif (ٱ أ إ آ dan alif kecil U+0670) disamakan menjadi ا. Dicek di QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 112, 113 dan 114 identik byte-per-byte dengan 1.1 yang dipakai): di setiap tempat kata pertama berlemma min dan kata kedua berlemma syarr.",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token 113:2:1 + 113:2:2 berurutan",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; LEM:min lalu LEM:$ar~",
+          "url": "https://corpus.quran.com/"
+        }
+      ],
+      "status": "draft",
+      "_shared": [
+        "al-falaq",
+        "an-nas"
+      ]
+    },
+    {
+      "id": "keluarga-kata-a-udzu",
+      "title": "Keluarga kata a‘ūżu: 17 kali",
+      "body": "Keluarga kata ع و ذ (berlindung) muncul 17 kali dalam Al-Qur'an, dalam 4 lemma. Bentuk «أَعُوذُ» (aku berlindung), dengan atau tanpa awalan wa-, ada di 7 ayat: 2:67, 11:47, 19:18, 23:97, 23:98, 113:1 dan 114:1. Perintah «فَٱسْتَعِذْ» (maka berlindunglah) muncul 4 kali (7:200, 16:98, 40:56 dan 41:36); salah satunya «فَإِذَا قَرَأْتَ ٱلْقُرْءَانَ فَٱسْتَعِذْ بِٱللَّهِ» (16:98), yaitu perintah berlindung kepada Allah ketika membaca Al-Qur'an.",
+      "locations": [
+        "2:67",
+        "3:36",
+        "7:200",
+        "11:47",
+        "12:23",
+        "12:79",
+        "16:98",
+        "19:18",
+        "23:97",
+        "23:98",
+        "40:27",
+        "40:56",
+        "41:36",
+        "44:20",
+        "72:6",
+        "113:1",
+        "114:1"
+      ],
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 112, 113 dan 114 identik byte-per-byte dengan 1.1 yang dipakai): segmen STEM dengan ROOT:Ew* = 17 dalam 17 ayat (LEM:>uEiy*u 1, LEM:Eu*o 10, LEM:maEaA* 2, LEM:{sotaEi*o 4); a‘ūżu = LEM:Eu*o bertanda IMPF 1S; perintah = LEM:{sotaEi*o bertanda IMPV (bentuk X). Dicek di Tanzil: token a‘ūżu (boleh berawalan wa- atau fa-) ada 7, sama dengan QAC.",
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; ROOT:Ew*; LEM:Eu*o IMPF 1S; LEM:{sotaEi*o IMPV",
+          "url": "https://corpus.quran.com/"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token 113:1:2, awalan wa-/fa-; 16:98 token 1–5",
+          "url": "https://tanzil.net/download/"
+        }
+      ],
+      "status": "draft",
+      "_shared": [
+        "al-falaq",
+        "an-nas"
+      ]
+    },
+    {
+      "id": "lima-surah-qul",
+      "title": "Lima surah dibuka dengan qul",
+      "body": "Ada 5 surah yang ayat pertamanya dibuka dengan «قُلْ» (katakanlah): Al-Jinn (72:1), Al-Kafirun (109:1), Al-Ikhlas (112:1), Al-Falaq (113:1) dan An-Nas (114:1).",
+      "locations": [
+        "72:1",
+        "109:1",
+        "112:1",
+        "113:1",
+        "114:1"
+      ],
+      "method": "Token pertama ayat 1 setiap surah di Tanzil Uthmani 1.1, setelah basmalah pembuka surah dibuang, dibandingkan dengan token 112:1:1 (tanpa awalan); kunci pencarian: tatweel (U+0640), harakat dan tanda baca Qur'ani (U+064B–U+065F, U+06D6–U+06ED) dibuang; bentuk alif (ٱ أ إ آ dan alif kecil U+0670) disamakan menjadi ا. Dicek di QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 112, 113 dan 114 identik byte-per-byte dengan 1.1 yang dipakai): kata pertama kelima ayat itu berlemma qāla dengan tanda IMPV 2MS.",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token pertama ayat 1 setiap surah",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; LEM:qaAla IMPV 2MS pada kata 1 ayat 1",
+          "url": "https://corpus.quran.com/"
+        }
+      ],
+      "status": "draft",
+      "_shared": [
+        "al-ikhlas",
+        "al-falaq",
+        "an-nas"
+      ]
+    },
+    {
+      "id": "belum-pernah-terlihat-semisalnya",
+      "title": "Belum pernah terlihat semisalnya",
+      "body": "'Uqbah bin 'Amir meriwayatkan sabda Rasulullah ﷺ: malam ini telah diturunkan ayat-ayat yang belum pernah terlihat yang serupa dengannya, yaitu Al-Falaq dan An-Nas (Shahih Muslim no. 814a). Dalam riwayat berikutnya keduanya disebut al-mu‘awwiżatain (Shahih Muslim no. 814b).",
+      "locations": [
+        "113:1",
+        "113:2",
+        "113:3",
+        "113:4",
+        "113:5",
+        "114:1",
+        "114:2",
+        "114:3",
+        "114:4",
+        "114:5",
+        "114:6"
+      ],
+      "method": "Makna ringkas hadits, dibantu AI — bukan terjemahan resmi. Isinya dirangkum dari teks Arab hadits di korpus kitab platform, tanpa menambah makna. nomor Muslim dipetakan dari nomor urut korpus ke penomoran Fuad 'Abdul Baqi (sunnah.com) lewat fawazahmed0, setelah teks Arabnya dicek identik.",
+      "sources": [
+        {
+          "kitab": "Sahih Muslim",
+          "ref": "no. 814a (penomoran sunnah.com); korpus platform muslim.json hadithnumber 1891, rekaman sha256:1cbc0fa0e7c19328",
+          "url": "https://sunnah.com/muslim:814a"
+        },
+        {
+          "kitab": "Sahih Muslim",
+          "ref": "no. 814b (penomoran sunnah.com); korpus platform muslim.json hadithnumber 1892, rekaman sha256:6e6c5d0f26985253",
+          "url": "https://sunnah.com/muslim:814b"
+        }
+      ],
+      "status": "draft",
+      "_hadith": [
+        "Sahih Muslim 814a",
+        "Sahih Muslim 814b"
+      ],
+      "_shared": [
+        "al-falaq",
+        "an-nas"
+      ]
+    },
+    {
+      "id": "setelah-al-muawwidzatain-turun",
+      "title": "Setelah al-mu‘awwiżatain turun",
+      "body": "Abu Sa'id al-Khudri meriwayatkan: Rasulullah ﷺ dahulu memohon perlindungan dari jin dan dari mata manusia, sampai turun al-mu‘awwiżatain. Setelah keduanya turun, beliau memakai keduanya dan meninggalkan yang lain. An-Nawawi mencantumkannya (Riyadhush Shalihin no. 1015) dan menyebut at-Tirmidzi menilainya hasan.",
+      "locations": [
+        "113:1",
+        "113:2",
+        "113:3",
+        "113:4",
+        "113:5",
+        "114:1",
+        "114:2",
+        "114:3",
+        "114:4",
+        "114:5",
+        "114:6"
+      ],
+      "method": "Makna ringkas hadits, dibantu AI — bukan terjemahan resmi. Isinya dirangkum dari teks Arab hadits di korpus kitab platform, tanpa menambah makna. nomor Riyadhush Shalihin dipetakan dari nomor korpus ke penomoran sunnah.com; penilaian dikutip apa adanya dari akhir teks an-Nawawi.",
+      "sources": [
+        {
+          "kitab": "an-Nawawi, Riyad as-Salihin",
+          "ref": "no. 1015 (penomoran sunnah.com); korpus platform riyad-as-salihin.json hadithnumber 336, rekaman sha256:04b28f750f53a3d1; penilaian: Hasan menurut at-Tirmidzi (disebut an-Nawawi di akhir hadits)",
+          "url": "https://sunnah.com/riyadussalihin:1015"
+        },
+        {
+          "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami as-Salamah, Dar Thayyibah)",
+          "ref": "jil. 8, hlm. 534 (tafsir QS 113:1: riwayat Abu Sa'id, penilaian at-Tirmidzi: hasan)",
+          "url": "https://shamela.ws/book/8473/4580"
+        }
+      ],
+      "status": "draft",
+      "_hadith": [
+        "Riyad as-Salihin 1015"
+      ],
+      "_shared": [
+        "al-falaq",
+        "an-nas"
+      ],
+      "_notes": [
+        "Rekaman tafsir Ibnu Katsir di korpus platform (113:1) menulis penilaian at-Tirmidzi 'hasan shahih'; cetakan as-Salamah jil. 8 hlm. 534 dan Riyad as-Salihin menulis 'hasan'. Kartu memakai 'hasan'."
+      ]
+    },
+    {
+      "id": "dibaca-saat-sakit",
+      "title": "Dibaca saat sakit",
+      "body": "Aisyah menuturkan bahwa apabila sakit, Rasulullah ﷺ membaca al-mu‘awwiżāt untuk dirinya sendiri lalu meniupkannya. Ketika sakitnya bertambah berat, Aisyah yang membacakannya dan mengusap tubuh beliau dengan tangan beliau sendiri, karena mengharap keberkahannya (Shahih al-Bukhari no. 5016). Aisyah juga menuturkan bahwa apabila ada anggota keluarga yang sakit, beliau meniupnya dengan al-mu‘awwiżāt (Shahih Muslim no. 2192a). Teks kedua hadits ini tidak merinci surah mana saja yang dimaksud dengan al-mu‘awwiżāt.",
+      "locations": [
+        "113:1",
+        "113:2",
+        "113:3",
+        "113:4",
+        "113:5",
+        "114:1",
+        "114:2",
+        "114:3",
+        "114:4",
+        "114:5",
+        "114:6"
+      ],
+      "method": "Makna ringkas hadits, dibantu AI — bukan terjemahan resmi. Isinya dirangkum dari teks Arab hadits di korpus kitab platform, tanpa menambah makna. nomor al-Bukhari = nomor korpus (sama dengan sunnah.com); nomor Muslim dipetakan dari nomor urut korpus ke penomoran Fuad 'Abdul Baqi (sunnah.com) lewat fawazahmed0, setelah teks Arabnya dicek identik.",
+      "sources": [
+        {
+          "kitab": "Sahih al-Bukhari",
+          "ref": "no. 5016 (penomoran sunnah.com); korpus platform bukhari.json hadithnumber 5016, rekaman sha256:e0aa52f4b7f95bca",
+          "url": "https://sunnah.com/bukhari:5016"
+        },
+        {
+          "kitab": "Sahih Muslim",
+          "ref": "no. 2192a (penomoran sunnah.com); korpus platform muslim.json hadithnumber 5714, rekaman sha256:2ea6260c64820aba",
+          "url": "https://sunnah.com/muslim:2192a"
+        }
+      ],
+      "status": "draft",
+      "_hadith": [
+        "Sahih al-Bukhari 5016",
+        "Sahih Muslim 2192a"
+      ],
+      "_shared": [
+        "al-falaq",
+        "an-nas"
+      ]
+    },
+    {
+      "id": "sebelum-tidur",
+      "title": "Dibaca sebelum tidur",
+      "body": "Aisyah menuturkan: setiap malam, ketika beranjak ke tempat tidurnya, Rasulullah ﷺ menyatukan kedua telapak tangannya, meniupnya, dan membaca ke dalamnya Al-Ikhlas, Al-Falaq, dan An-Nas. Kemudian beliau mengusapkan kedua tangannya ke tubuh sejauh yang terjangkau, dimulai dari kepala, wajah, dan bagian depan tubuh. Beliau melakukannya tiga kali (Shahih al-Bukhari no. 5017). Dalam riwayat lain, Aisyah menyebut bahwa ketika beliau sakit, beliau menyuruh Aisyah melakukannya untuk beliau (Shahih al-Bukhari no. 5748).",
+      "locations": [
+        "112:1",
+        "112:2",
+        "112:3",
+        "112:4",
+        "113:1",
+        "113:2",
+        "113:3",
+        "113:4",
+        "113:5",
+        "114:1",
+        "114:2",
+        "114:3",
+        "114:4",
+        "114:5",
+        "114:6"
+      ],
+      "method": "Makna ringkas hadits, dibantu AI — bukan terjemahan resmi. Isinya dirangkum dari teks Arab hadits di korpus kitab platform, tanpa menambah makna. nomor al-Bukhari = nomor korpus (sama dengan sunnah.com).",
+      "sources": [
+        {
+          "kitab": "Sahih al-Bukhari",
+          "ref": "no. 5017 (penomoran sunnah.com); korpus platform bukhari.json hadithnumber 5017, rekaman sha256:bff5c0381ff5eb0e",
+          "url": "https://sunnah.com/bukhari:5017"
+        },
+        {
+          "kitab": "Sahih al-Bukhari",
+          "ref": "no. 5748 (penomoran sunnah.com); korpus platform bukhari.json hadithnumber 5748, rekaman sha256:67fc69d263f04457",
+          "url": "https://sunnah.com/bukhari:5748"
+        }
+      ],
+      "status": "draft",
+      "_hadith": [
+        "Sahih al-Bukhari 5017",
+        "Sahih al-Bukhari 5748"
+      ],
+      "_shared": [
+        "al-ikhlas",
+        "al-falaq",
+        "an-nas"
+      ]
+    },
+    {
+      "id": "pagi-dan-petang",
+      "title": "Pagi dan petang, tiga kali",
+      "body": "'Abdullah bin Khubaib meriwayatkan bahwa Rasulullah ﷺ menyuruhnya membaca Al-Ikhlas dan al-mu‘awwiżatain pada petang dan pagi hari, tiga kali, dan bersabda bahwa bacaan itu mencukupinya dari segala sesuatu. An-Nawawi mencantumkannya (Riyadhush Shalihin no. 1456) dari riwayat Abu Dawud dan at-Tirmidzi, dan menyebut at-Tirmidzi menilainya hasan shahih.",
+      "locations": [
+        "112:1",
+        "112:2",
+        "112:3",
+        "112:4",
+        "113:1",
+        "113:2",
+        "113:3",
+        "113:4",
+        "113:5",
+        "114:1",
+        "114:2",
+        "114:3",
+        "114:4",
+        "114:5",
+        "114:6"
+      ],
+      "method": "Makna ringkas hadits, dibantu AI — bukan terjemahan resmi. Isinya dirangkum dari teks Arab hadits di korpus kitab platform, tanpa menambah makna. nomor Riyadhush Shalihin dipetakan dari nomor korpus ke penomoran sunnah.com; penilaian dikutip apa adanya dari akhir teks an-Nawawi.",
+      "sources": [
+        {
+          "kitab": "an-Nawawi, Riyad as-Salihin",
+          "ref": "no. 1456 (penomoran sunnah.com); korpus platform riyad-as-salihin.json hadithnumber 777, rekaman sha256:20a1bf82373c5bd7; penilaian: Hasan shahih menurut at-Tirmidzi; diriwayatkan Abu Dawud dan at-Tirmidzi (disebut an-Nawawi di akhir hadits)",
+          "url": "https://sunnah.com/riyadussalihin:1456"
+        }
+      ],
+      "status": "draft",
+      "_hadith": [
+        "Riyad as-Salihin 1456"
+      ],
+      "_shared": [
+        "al-ikhlas",
+        "al-falaq",
+        "an-nas"
+      ]
+    }
+  ]
+}

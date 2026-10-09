@@ -1,0 +1,620 @@
+{
+  "_comment": "Hand-authored sentence structure (tarkib) for An-Nas, QS 114: one `structure` per ayah (schema.ts Ayah.structure) and one `role` per word (schema.ts Word.role), same format as al-fatihah.structure.json. Every record is status draft as pipeline state; there is no human review step (plan L11). Read 2026-10-09 against the i'rab texts on tafsir.app and the same editions on Shamela (pagination = print, checked in each page title): Darwisy jil. 10 hlm. 624–626 (Shamela 2163/5782–5784), al-Jadwal jil. 15 hlm. 429–430 (22916/5921–5922), al-Mujtaba jil. 4 hlm. 1493 (9617/6028–6033), an-Nahhas jil. 5 hlm. 199–200 (23587/1416–1417), as-Samin jil. 11 hlm. 161–164 (9057/10765–10771), ad-Da'as jil. 3 hlm. 477 (23584/1399), Ibnu Katsir jil. 8 hlm. 539–540 (8473/4585–4586); for definitions and sentence types al-Ajurrumiyyah (Shamela 11371), Mughni al-Labib (Shamela 6972), Syarh Qathr an-Nada (Shamela 6970) and Syarh Ibn 'Aqil (Shamela 9904). `structure.sources` are complete SourceRef objects whose url is the Shamela page of the printed page cited. No Qur'anic Arabic is typed here: words are referred to in SKB transliteration exactly as in an-nas.words.json. `structure.groups[].words` are 1-based indices within the ayah as taught (Tanzil tokens after the surah-heading basmalah = QAC 0.4 word numbers). `role_src` lists the kitab abbreviations of an-nas.words.json that state the role; every abbreviation listed is in that word's `src`. Group concepts 'maqul-al-qaul' (same id as the Al-Ikhlas and Al-Falaq authors) and 'hal' are new ids described in an-nas.new-concepts.md. `role_note` and `review_notes` never reach the output; they are pipeline notes for the integrator and for independent verification. Grammar terms use pesantren spelling with ASCII apostrophes and no macrons.",
+  "ayat": {
+    "1": {
+      "structure": {
+        "type": "jumlah fi'liyyah ibtida'iyyah (perintah) yang memuat maqul al-qaul",
+        "summary": "Kalimat perintah: qul (“katakanlah”) adalah fi'il amr dengan pelaku tersirat “engkau”, dan kalimat yang diawali a‘ūżu adalah isi perkataan itu (maqul al-qaul), yang berkedudukan nashab. Isi itu sendiri kalimat kata kerja: a‘ūżu (“aku berlindung”) dengan pelaku tersirat “aku”, lalu birabbi an-nāsi (“kepada Tuhan manusia”) menerangkan kepada siapa ia berlindung: jar-majrur yang bergantung pada a‘ūżu, dengan rabbi disandarkan kepada an-nāsi. Az-Zamakhsyari (dinukil as-Samin) menjelaskan mengapa disebut Tuhan manusia secara khusus: yang dimohonkan perlindungan adalah dari pembisik di dada manusia, maka manusia berlindung kepada Tuhan mereka yang menguasai urusan mereka.",
+        "groups": [
+          {
+            "words": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "label": "qul + isi perkataannya: a‘ūżu birabbi an-nāsi menjadi maqul al-qaul (berkedudukan nashab)",
+            "concept": "maqul-al-qaul"
+          },
+          {
+            "words": [
+              2,
+              3
+            ],
+            "label": "a‘ūżu + birabbi: frasa jar-majrur birabbi bergantung pada a‘ūżu",
+            "concept": "huruf-jar"
+          },
+          {
+            "words": [
+              3,
+              4
+            ],
+            "label": "rabbi → an-nāsi: idhafah (“Tuhan manusia”)",
+            "concept": "idhafah"
+          }
+        ],
+        "sources": [
+          {
+            "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+            "ref": "jil. 10, hlm. 625 (al-I'rab: qul fi'il amr, pelakunya tersimpan, anta; jumlah a‘ūżu maqul al-qaul; a‘ūżu fi'il mudhari' marfu', pelakunya tersimpan, anā; birabbi an-nāsi muta'alliq bi-a‘ūżu)",
+            "url": "https://shamela.ws/book/2163/5783"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+            "ref": "jil. 15, hlm. 429 (QS 114, al-I'rab: birabbi muta'alliq bi-a‘ūżu; jumlah qul ibtida'iyyah, tidak berkedudukan i'rab; jumlah a‘ūżu berkedudukan nashab sebagai maqul al-qaul)",
+            "url": "https://shamela.ws/book/22916/5921"
+          },
+          {
+            "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+            "ref": "jil. 3, hlm. 477 (qul fi'il amr, pelakunya tersimpan, jumlahnya ibtida'iyyah; birabbi muta'alliq dengan fi'il; an-nāsi mudhaf ilaih; jumlah a‘ūżu maqul al-qaul)",
+            "url": "https://shamela.ws/book/23584/1399"
+          },
+          {
+            "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+            "ref": "jil. 11, hlm. 161–162 (az-Zamakhsyari, dinukil: rabb disandarkan khusus kepada an-nās karena perlindungan dimohon dari pembisik di dada manusia, kepada Tuhan mereka yang menguasai urusan mereka)",
+            "url": "https://shamela.ws/book/9057/10765"
+          },
+          {
+            "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)",
+            "ref": "hlm. 500 (al-Bab ats-Tsani, kalimat yang tidak berkedudukan i'rab: yang pertama ibtida'iyyah atau musta'nafah, termasuk kalimat pembuka surah)",
+            "url": "https://shamela.ws/book/6972/488"
+          },
+          {
+            "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)",
+            "ref": "hlm. 538 (al-Bab ats-Tsani, kalimat yang berkedudukan i'rab: yang ketiga berkedudukan nashab sebagai maf'ul, antara lain dalam bab al-hikayah bil-qaul)",
+            "url": "https://shamela.ws/book/6972/526"
+          },
+          {
+            "kitab": "Ibnu Hisyam al-Anshari, Syarh Qathr an-Nada wa Ball ash-Shada (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, cet. 11, 1383 H/1963 M)",
+            "ref": "hlm. 31 (Fi'l al-Amr: hukum asalnya mabni di atas sukun)",
+            "url": "https://shamela.ws/book/6970/19"
+          },
+          {
+            "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+            "ref": "hlm. 23 (Bab al-Makhfudhat min al-Asma': makhfudh karena huruf dan karena idhafah)",
+            "url": "https://shamela.ws/book/11371/31"
+          }
+        ],
+        "status": "draft"
+      },
+      "review_notes": [
+        "Batas maqul al-qaul: al-Jadwal dan Darwisy menyebut 'jumlah a‘ūżu …' sebagai maqul al-qaul; kalimat itu berlanjut sampai akhir surah (min syarri di ayat 4 juga bergantung pada a‘ūżu). Kelompok [1–4] hanya menandai bagian yang ada di ayat 1.",
+        "Catatan az-Zamakhsyari dikutip lewat as-Samin (dan Abu Hayyan menukil hal yang sama). Al-Kasysyaf tidak dikutip langsung."
+      ]
+    },
+    "2": {
+      "structure": {
+        "type": "lanjutan jumlah ayat 1 (badal + idhafah)",
+        "summary": "Ayat ini bukan kalimat baru: maliki (“Raja”) mengikuti rabbi di ayat 1 sebagai badal (pengganti yang menjelaskan) menurut al-Jadwal, al-Mujtaba dan ad-Da'as, maka ikut majrur; Darwisy, al-Jadwal dan as-Samin juga membolehkannya dibaca sebagai na't (sifat) atau 'athf bayan. Maliki disandarkan kepada an-nāsi; menurut Darwisy, idhafah kepada an-nāsi diulang untuk menambah kejelasan.",
+        "groups": [
+          {
+            "words": [
+              1,
+              2
+            ],
+            "label": "maliki → an-nāsi: idhafah (“Raja manusia”)",
+            "concept": "idhafah"
+          }
+        ],
+        "sources": [
+          {
+            "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+            "ref": "jil. 10, hlm. 625 (al-I'rab: maliki an-nāsi dan ilāhi an-nāsi badal, atau sifat, atau 'athf bayan; idhafah diulang untuk menambah kejelasan)",
+            "url": "https://shamela.ws/book/2163/5783"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+            "ref": "jil. 15, hlm. 429 (maliki badal dari rabbi, atau na't, atau 'athf bayan, majrur)",
+            "url": "https://shamela.ws/book/22916/5921"
+          },
+          {
+            "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+            "ref": "jil. 4, hlm. 1493 (maliki badal dari rabbi)",
+            "url": "https://shamela.ws/book/9617/6029"
+          },
+          {
+            "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an (ed. 'Abd al-Mun'im Khalil Ibrahim; Beirut: Dar al-Kutub al-'Ilmiyyah, cet. 1, 1421 H)",
+            "ref": "jil. 5, hlm. 199 (maliki na't)",
+            "url": "https://shamela.ws/book/23587/1416"
+          },
+          {
+            "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+            "ref": "jil. 11, hlm. 161 (maliki dan ilāhi boleh dua sifat, dua badal, atau 'athf bayan; keberatan bahwa 'athf bayan berupa kata jamid dan jawabannya)",
+            "url": "https://shamela.ws/book/9057/10765"
+          },
+          {
+            "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+            "ref": "jil. 3, hlm. 477 (maliki badal dari rabbi; an-nāsi mudhaf ilaih)",
+            "url": "https://shamela.ws/book/23584/1399"
+          },
+          {
+            "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+            "ref": "hlm. 16 (Bab al-Badal: badal mengikuti kata yang digantinya dalam seluruh i'rab-nya)",
+            "url": "https://shamela.ws/book/11371/18"
+          },
+          {
+            "kitab": "Ibnu 'Aqil, Syarh Ibn 'Aqil 'ala Alfiyyah Ibn Malik (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, Kairo: Dar at-Turats, cet. 20, 1400 H/1980 M)",
+            "ref": "jil. 3, hlm. 218–219 (bab al-'Athf: 'athf bayan adalah pengikut jamid yang menyerupai sifat dalam menjelaskan kata yang diikutinya)",
+            "url": "https://shamela.ws/book/9904/893"
+          }
+        ],
+        "status": "draft"
+      }
+    },
+    "3": {
+      "structure": {
+        "type": "lanjutan jumlah ayat 1 (badal + idhafah)",
+        "summary": "Ilāhi (“Sembahan”) juga mengikuti kata sebelumnya dan ikut majrur: badal dari maliki menurut al-Jadwal dan al-Mujtaba (ad-Da'as: dari rabbi), dan sebagian ulama menjadikannya sifat atau 'athf bayan; ia disandarkan kepada an-nāsi. Az-Zamakhsyari (dinukil as-Samin) menjelaskan urutannya: “tuhan manusia” dan “raja manusia” kadang diucapkan untuk selain Allah, sedangkan “sembahan manusia” khusus bagi-Nya tanpa sekutu, maka sebutan ini menjadi puncak penjelasan. Ibnu Katsir menyebut ketiga ayat ini tiga sifat Allah: Dialah Tuhan, Raja, dan Sembahan segala sesuatu.",
+        "groups": [
+          {
+            "words": [
+              1,
+              2
+            ],
+            "label": "ilāhi → an-nāsi: idhafah (“Sembahan manusia”)",
+            "concept": "idhafah"
+          }
+        ],
+        "sources": [
+          {
+            "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+            "ref": "jil. 10, hlm. 625 (al-I'rab: ilāhi an-nāsi badal, atau sifat, atau 'athf bayan; nukilan al-Kasysyaf: 'athf bayan untuk penjelasan, maka an-nāsi ditampakkan, bukan diganti kata ganti)",
+            "url": "https://shamela.ws/book/2163/5783"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+            "ref": "jil. 15, hlm. 429 (ilāhi badal dari maliki, majrur)",
+            "url": "https://shamela.ws/book/22916/5921"
+          },
+          {
+            "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+            "ref": "jil. 4, hlm. 1493 (ilāhi badal dari maliki)",
+            "url": "https://shamela.ws/book/9617/6030"
+          },
+          {
+            "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an (ed. 'Abd al-Mun'im Khalil Ibrahim; Beirut: Dar al-Kutub al-'Ilmiyyah, cet. 1, 1421 H)",
+            "ref": "jil. 5, hlm. 199 (ilāhi na't atau badal)",
+            "url": "https://shamela.ws/book/23587/1416"
+          },
+          {
+            "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+            "ref": "jil. 11, hlm. 161 (az-Zamakhsyari, dinukil: rabb an-nās dan malik an-nās kadang dikatakan untuk selain-Nya, QS 9:31, sedangkan ilāh an-nās khusus tanpa sekutu, maka dijadikan puncak penjelasan)",
+            "url": "https://shamela.ws/book/9057/10765"
+          },
+          {
+            "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+            "ref": "jil. 3, hlm. 477 (ilāhi badal dari rabbi; an-nāsi mudhaf ilaih)",
+            "url": "https://shamela.ws/book/23584/1399"
+          },
+          {
+            "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami bin Muhammad as-Salamah; Riyadh: Dar Thaibah, cet. 2, 1420 H/1999 M)",
+            "ref": "jil. 8, hlm. 539 (tafsir QS 114:1–3: tiga sifat Allah, ar-rububiyyah, al-mulk dan al-ilahiyyah; Dia Tuhan, Raja dan Sembahan segala sesuatu)",
+            "url": "https://shamela.ws/book/8473/4585"
+          },
+          {
+            "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+            "ref": "hlm. 16 (Bab al-Badal: badal mengikuti kata yang digantinya dalam seluruh i'rab-nya)",
+            "url": "https://shamela.ws/book/11371/18"
+          }
+        ],
+        "status": "draft"
+      },
+      "review_notes": [
+        "'Tiga sifat' adalah ungkapan Ibnu Katsir tentang ayat 1–3 (rububiyyah, mulk, ilahiyyah), bukan pembagian tiga jenis tauhid yang diminta plan §8 untuk dihindari; ringkasan sengaja tidak memakai istilah 'tauhid rububiyyah/uluhiyyah'.",
+        "Rangkaian rabbi → maliki → ilāhi melintasi tiga ayat, jadi tidak bisa menjadi satu kelompok (groups hanya dalam satu ayat); ringkasan ayat 2 dan 3 yang menjelaskannya."
+      ]
+    },
+    "4": {
+      "structure": {
+        "type": "lanjutan jumlah ayat 1 (jar-majrur kedua bagi a‘ūżu)",
+        "summary": "Min syarri (“dari kejahatan”) adalah jar-majrur kedua yang bergantung pada a‘ūżu di ayat 1: berlindung kepada Tuhan manusia, dari kejahatan. Syarri disandarkan kepada al-waswāsi (“pembisik”), dan al-khannāsi (“yang bersembunyi”) adalah sifatnya, maka keduanya berakhir kasrah. Menurut riwayat dari Ibnu 'Abbas (dinukil Ibnu Katsir dan an-Nahhas), setan membisik ketika manusia lalai, lalu mundur bersembunyi ketika manusia mengingat Allah.",
+        "groups": [
+          {
+            "words": [
+              1,
+              2
+            ],
+            "label": "min syarri: jar-majrur kedua yang bergantung pada a‘ūżu di ayat 1",
+            "concept": "huruf-jar"
+          },
+          {
+            "words": [
+              2,
+              3
+            ],
+            "label": "syarri → al-waswāsi: idhafah (“kejahatan pembisik”)",
+            "concept": "idhafah"
+          },
+          {
+            "words": [
+              3,
+              4
+            ],
+            "label": "al-waswāsi al-khannāsi: na't (“pembisik yang bersembunyi”)",
+            "concept": "naat"
+          }
+        ],
+        "sources": [
+          {
+            "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+            "ref": "jil. 10, hlm. 625 (al-I'rab: min syarri jar-majrur muta'alliq bi-a‘ūżu; al-waswāsi mudhaf ilaih; al-khannāsi sifat)",
+            "url": "https://shamela.ws/book/2163/5783"
+          },
+          {
+            "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+            "ref": "jil. 10, hlm. 624–625 (al-Lughah: al-waswās bermakna al-waswasah, yang dimaksud setan; al-khannās setan karena ia mundur bila Allah disebut)",
+            "url": "https://shamela.ws/book/2163/5782"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+            "ref": "jil. 15, hlm. 429 (min syarri muta'alliq bi-a‘ūżu)",
+            "url": "https://shamela.ws/book/22916/5921"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+            "ref": "jil. 15, hlm. 430 (ash-Sharf: al-waswās nama bagi yang membisikkan, wazannya fa‘lāl; al-khannās mubalaghah isim fa'il dari khanasa)",
+            "url": "https://shamela.ws/book/22916/5922"
+          },
+          {
+            "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+            "ref": "jil. 4, hlm. 1493 (min syarri muta'alliq bi-a‘ūżu)",
+            "url": "https://shamela.ws/book/9617/6031"
+          },
+          {
+            "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an (ed. 'Abd al-Mun'im Khalil Ibrahim; Beirut: Dar al-Kutub al-'Ilmiyyah, cet. 1, 1421 H)",
+            "ref": "jil. 5, hlm. 199 (dua riwayat Ibnu 'Abbas tentang al-khannās: ia mundur bila Allah disebut; ia mundur bila ditaati; keduanya sejalan)",
+            "url": "https://shamela.ws/book/23587/1416"
+          },
+          {
+            "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+            "ref": "jil. 11, hlm. 162 (al-waswās; al-khannās artinya ar-rajjā‘, bentuk mubalaghah dari al-khunūs)",
+            "url": "https://shamela.ws/book/9057/10767"
+          },
+          {
+            "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+            "ref": "jil. 3, hlm. 477 (min syarri muta'alliq bi-a‘ūżu; al-waswāsi mudhaf ilaih; al-khannāsi badal dari al-waswāsi)",
+            "url": "https://shamela.ws/book/23584/1399"
+          },
+          {
+            "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami bin Muhammad as-Salamah; Riyadh: Dar Thaibah, cet. 2, 1420 H/1999 M)",
+            "ref": "jil. 8, hlm. 539–540 (al-waswās al-khannās adalah setan yang menyertai manusia; Ibnu 'Abbas: setan bercokol di hati anak Adam, bila ia lalai setan membisik, bila ia mengingat Allah setan mundur)",
+            "url": "https://shamela.ws/book/8473/4585"
+          },
+          {
+            "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+            "ref": "hlm. 14 (Bab an-Na't: na't mengikuti kata yang disifatinya)",
+            "url": "https://shamela.ws/book/11371/15"
+          }
+        ],
+        "status": "draft"
+      },
+      "review_notes": [
+        "Kelompok [3,4] mengikuti Darwisy (al-khannāsi sifat); ad-Da'as menjadikannya badal (lihat ikhtilaf 114:4:4).",
+        "Riwayat yang dipakai hanya atsar Ibnu 'Abbas yang dinukil Ibnu Katsir dan an-Nahhas. Hadits Abu Ya'la tentang setan yang menaruh moncongnya di hati (Ibnu Katsir hlm. 539) tidak dipakai karena pentahqiq menukil penilaian Ibnu Hajar: sanadnya lemah. Hadits di Asas al-Balaghah yang dinukil Darwisy hlm. 625 juga tidak dipakai (tanpa takhrij).",
+        "Nada: ringkasan menekankan bahwa mengingat Allah membuat pembisik mundur (sesuai riwayat), tanpa menakut-nakuti."
+      ]
+    },
+    "5": {
+      "structure": {
+        "type": "lanjutan (na't berupa isim maushul) dengan jumlah shilah",
+        "summary": "Allażī (“yang”) adalah sifat (na't) bagi al-waswāsi di ayat 4: ia mabni, tetapi berkedudukan jar. Kalimat sesudahnya, yuwaswisu fī ṣudūri an-nāsi (“membisikkan ke dalam dada manusia”), adalah shilah-nya: yuwaswisu fi'il mudhari' dengan pelaku tersirat “ia” yang kembali kepada allażī, fī ṣudūri bergantung pada yuwaswisu, dan ṣudūri disandarkan kepada an-nāsi.",
+        "groups": [
+          {
+            "words": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "label": "allażī + shilah yuwaswisu fī ṣudūri an-nāsi (“yang membisikkan ke dalam dada manusia”)",
+            "concept": "isim-maushul"
+          },
+          {
+            "words": [
+              2,
+              3,
+              4
+            ],
+            "label": "yuwaswisu + fī ṣudūri: frasa jar-majrur bergantung pada yuwaswisu",
+            "concept": "huruf-jar"
+          },
+          {
+            "words": [
+              4,
+              5
+            ],
+            "label": "ṣudūri → an-nāsi: idhafah (“dada manusia”)",
+            "concept": "idhafah"
+          }
+        ],
+        "sources": [
+          {
+            "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+            "ref": "jil. 10, hlm. 625 (al-I'rab: allażī na't bagi al-waswās; nukilan al-Kasysyaf: kedudukannya boleh jar sebagai sifat, atau rafa' dan nashab sebagai celaan; yuwaswisu fi'il mudhari'; fī ṣudūri an-nāsi muta'alliq bi-yuwaswisu)",
+            "url": "https://shamela.ws/book/2163/5783"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+            "ref": "jil. 15, hlm. 429 (allażī maushul dalam kedudukan jar, na't bagi al-waswās; fī ṣudūri muta'alliq bi-yuwaswisu; jumlah yuwaswisu shilah, tidak berkedudukan i'rab)",
+            "url": "https://shamela.ws/book/22916/5921"
+          },
+          {
+            "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+            "ref": "jil. 4, hlm. 1493 (allażī na't bagi al-waswās)",
+            "url": "https://shamela.ws/book/9617/6032"
+          },
+          {
+            "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an (ed. 'Abd al-Mun'im Khalil Ibrahim; Beirut: Dar al-Kutub al-'Ilmiyyah, cet. 1, 1421 H)",
+            "ref": "jil. 5, hlm. 199 (allażī berkedudukan khafdh sebagai na't; boleh rafa' dengan mubtada' tersirat)",
+            "url": "https://shamela.ws/book/23587/1416"
+          },
+          {
+            "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+            "ref": "jil. 11, hlm. 162 (allażī boleh jar sebagai na't, badal atau bayan; nashab dan rafa' karena qath')",
+            "url": "https://shamela.ws/book/9057/10768"
+          },
+          {
+            "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+            "ref": "jil. 3, hlm. 477 (allażī isim maushul, sifat bagi al-waswās; yuwaswisu mudhari', pelakunya tersimpan, jumlahnya shilah; fī ṣudūri muta'alliq dengan fi'il; an-nāsi mudhaf ilaih)",
+            "url": "https://shamela.ws/book/23584/1399"
+          },
+          {
+            "kitab": "Ibnu 'Aqil, Syarh Ibn 'Aqil 'ala Alfiyyah Ibn Malik (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, Kairo: Dar at-Turats, cet. 20, 1400 H/1980 M)",
+            "ref": "jil. 1, hlm. 153 (bab al-Maushul: shilah isim maushul harus memuat kata ganti yang sesuai dengan maushul-nya)",
+            "url": "https://shamela.ws/book/9904/152"
+          },
+          {
+            "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)",
+            "ref": "hlm. 534 (al-Bab ats-Tsani: kalimat yang menjadi shilah bagi isim atau huruf tidak berkedudukan i'rab)",
+            "url": "https://shamela.ws/book/6972/522"
+          }
+        ],
+        "status": "draft"
+      }
+    },
+    "6": {
+      "structure": {
+        "type": "lanjutan (frasa penjelas tentang pembisik)",
+        "summary": "Mina al-jinnati (“dari golongan jin”) adalah jar-majrur, dan wa an-nāsi (“dan manusia”) di-'athaf-kan kepada al-jinnati sehingga ikut majrur. Al-Jadwal, al-Mujtaba dan ad-Da'as menjadikan frasa ini keterangan keadaan (hal) bagi pelaku yuwaswisu, sedangkan Darwisy membacanya sebagai penjelas (bayan) bagi “yang membisikkan”; menurut keduanya, pembisik itu ada dari golongan jin dan dari golongan manusia. Ibnu Katsir menyebut makna ini dengan merujuk QS 6:112 tentang setan dari jenis manusia dan jin.",
+        "groups": [
+          {
+            "words": [
+              1,
+              2
+            ],
+            "label": "mina al-jinnati: jar-majrur sebagai hal bagi pelaku yuwaswisu (atau penjelas bagi pembisik)",
+            "concept": "hal"
+          },
+          {
+            "words": [
+              2,
+              3
+            ],
+            "label": "al-jinnati wa an-nāsi: 'athaf (“jin dan manusia”)",
+            "concept": "athaf"
+          }
+        ],
+        "sources": [
+          {
+            "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+            "ref": "jil. 10, hlm. 625 (al-I'rab: mina al-jinnati wa an-nāsi bayan bagi yang membisikkan, min bayaniyyah; boleh juga min ibtida'iyyah yang bergantung pada yuwaswisu, atau tab'idhiyyah; al-Khatib: bayan bagi an-nās di ayat 5)",
+            "url": "https://shamela.ws/book/2163/5783"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+            "ref": "jil. 15, hlm. 429 (mina al-jinnati muta'alliq dengan hal dari pelaku yuwaswisu)",
+            "url": "https://shamela.ws/book/22916/5921"
+          },
+          {
+            "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+            "ref": "jil. 4, hlm. 1493 (jar-majrur muta'alliq dengan hal dari pelaku yuwaswisu)",
+            "url": "https://shamela.ws/book/9617/6033"
+          },
+          {
+            "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an (ed. 'Abd al-Mun'im Khalil Ibrahim; Beirut: Dar al-Kutub al-'Ilmiyyah, cet. 1, 1421 H)",
+            "ref": "jil. 5, hlm. 200 (jinnī, jinn, jinnah: ha' pada al-jinnah untuk muannats jama'ah; 'Ali bin Salman, demikian tertulis di cetakan (pengantar penerbit, jil. 1 hlm. 3, menyebut guru an-Nahhas al-Akhfasy 'Ali bin Sulaiman): wa an-nāsi di-'athaf-kan pada al-waswās, dinilai baik oleh an-Nahhas)",
+            "url": "https://shamela.ws/book/23587/1417"
+          },
+          {
+            "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+            "ref": "jil. 11, hlm. 162–164 (delapan pendapat: badal dari syarri; badal dari pembisik; hal dari kata ganti dalam yuwaswisu; penjelas bagi an-nās; bayan bagi yang membisikkan; min ibtida'iyyah; 'athaf an-nās pada al-waswās menurut Makki, dinilai sangat jauh; hal dari an-nās)",
+            "url": "https://shamela.ws/book/9057/10769"
+          },
+          {
+            "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan, Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+            "ref": "jil. 3, hlm. 477 (mina al-jinnati muta'alliq dengan hal yang dibuang dari pelaku yuwaswisu; wa an-nāsi ma'thuf pada al-jinnah)",
+            "url": "https://shamela.ws/book/23584/1399"
+          },
+          {
+            "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami bin Muhammad as-Salamah; Riyadh: Dar Thaibah, cet. 2, 1420 H/1999 M)",
+            "ref": "jil. 8, hlm. 540 (mina al-jinnati wa an-nāsi: perincian bagi yang membisikkan, atau tafsir baginya, yaitu setan dari jenis manusia dan jin, dengan merujuk QS 6:112)",
+            "url": "https://shamela.ws/book/8473/4586"
+          },
+          {
+            "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+            "ref": "hlm. 19 (Bab al-Hal: hal menjelaskan keadaan yang samar)",
+            "url": "https://shamela.ws/book/11371/23"
+          },
+          {
+            "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+            "ref": "hlm. 15 (Bab al-'Athf: yang di-'athaf-kan pada kata makhfudh ikut makhfudh)",
+            "url": "https://shamela.ws/book/11371/16"
+          }
+        ],
+        "status": "draft"
+      },
+      "review_notes": [
+        "Ringkasan sengaja menyebut dua pembacaan utama (hal: al-Jadwal, al-Mujtaba, ad-Da'as; bayan: Darwisy) tanpa memilih. Pendapat lain (badal, min ibtida'iyyah, penjelas bagi an-nās, 'athaf pada al-waswās) ada di ikhtilaf 114:6:1 dan 114:6:3.",
+        "Kelompok [1,2] memakai konsep baru 'hal' (lihat an-nas.new-concepts.md). Menurut ad-Da'as dan al-Jadwal yang menjadi hal adalah kata tersirat tempat jar-majrur bergantung, bukan mina sendiri."
+      ]
+    }
+  },
+  "words": {
+    "114:1:1": {
+      "role": "fi'il amr (fa'il tersimpan: “engkau”)",
+      "role_src": [
+        "D",
+        "DS"
+      ]
+    },
+    "114:1:2": {
+      "role": "fi'il mudhari' (fa'il tersimpan: “aku”); kalimatnya maqul al-qaul",
+      "role_src": [
+        "D",
+        "J",
+        "DS"
+      ],
+      "role_note": "al-Jadwal menyebut jumlah a‘ūżu sebagai maqul al-qaul tanpa mengurai kata a‘ūżu; Darwisy dan ad-Da'as mengurai keduanya."
+    },
+    "114:1:3": {
+      "role": "huruf jar + majrur (terkait a‘ūżu)",
+      "role_src": [
+        "D",
+        "J",
+        "DS"
+      ]
+    },
+    "114:1:4": {
+      "role": "mudhaf ilaih",
+      "role_src": [
+        "DS",
+        "D"
+      ],
+      "role_note": "ad-Da'as tegas; Darwisy lewat nukilan al-Kasysyaf ('al-mudhaf ilaih alladzi huwa an-nās')."
+    },
+    "114:2:1": {
+      "role": "badal (atau na't, atau 'athf bayan)",
+      "role_src": [
+        "J",
+        "M",
+        "DS",
+        "D",
+        "N",
+        "S"
+      ],
+      "role_note": "Pendapat utama badal: al-Jadwal (disebut pertama), al-Mujtaba, ad-Da'as, dan urutan pertama Darwisy. Na't: an-Nahhas. 'Athf bayan: az-Zamakhsyari lewat Darwisy dan as-Samin."
+    },
+    "114:2:2": {
+      "role": "mudhaf ilaih",
+      "role_src": [
+        "DS",
+        "D"
+      ]
+    },
+    "114:3:1": {
+      "role": "badal (atau na't, atau 'athf bayan)",
+      "role_src": [
+        "J",
+        "M",
+        "DS",
+        "D",
+        "N",
+        "S"
+      ],
+      "role_note": "Badal dari maliki (al-Jadwal, al-Mujtaba) atau dari rabbi (ad-Da'as); label tidak menyebut kata asalnya."
+    },
+    "114:3:2": {
+      "role": "mudhaf ilaih",
+      "role_src": [
+        "DS",
+        "D"
+      ]
+    },
+    "114:4:1": {
+      "role": "huruf jar (min syarri terkait a‘ūżu)",
+      "role_src": [
+        "D",
+        "J",
+        "M",
+        "DS"
+      ]
+    },
+    "114:4:2": {
+      "role": "majrur (oleh min) dan mudhaf",
+      "role_src": [
+        "D",
+        "DS"
+      ]
+    },
+    "114:4:3": {
+      "role": "mudhaf ilaih",
+      "role_src": [
+        "D",
+        "DS"
+      ]
+    },
+    "114:4:4": {
+      "role": "na't (sifat)",
+      "role_src": [
+        "D"
+      ],
+      "role_note": "Hanya Darwisy (di antara kitab yang dikutip) yang menyebut sifat; ad-Da'as: badal. al-Jadwal, al-Mujtaba, an-Nahhas dan as-Samin tidak menyebut kedudukannya."
+    },
+    "114:5:1": {
+      "role": "isim maushul (na't bagi al-waswāsi)",
+      "role_src": [
+        "J",
+        "D",
+        "M",
+        "N",
+        "DS"
+      ]
+    },
+    "114:5:2": {
+      "role": "fi'il mudhari' (fa'il tersimpan: “ia”); bersama sesudahnya menjadi shilah",
+      "role_src": [
+        "D",
+        "DS",
+        "J"
+      ]
+    },
+    "114:5:3": {
+      "role": "huruf jar (fī ṣudūri terkait yuwaswisu)",
+      "role_src": [
+        "D",
+        "J",
+        "DS"
+      ]
+    },
+    "114:5:4": {
+      "role": "majrur (oleh fī) dan mudhaf",
+      "role_src": [
+        "D",
+        "J",
+        "DS"
+      ]
+    },
+    "114:5:5": {
+      "role": "mudhaf ilaih",
+      "role_src": [
+        "DS"
+      ],
+      "role_note": "Hanya ad-Da'as yang menulisnya tegas untuk kata ini; kaidahnya di al-Ajurrumiyyah hlm. 23 (AJ23 ada di src kata)."
+    },
+    "114:6:1": {
+      "role": "huruf jar (frasa penjelas pembisik: hal atau bayan)",
+      "role_src": [
+        "J",
+        "M",
+        "DS",
+        "D"
+      ]
+    },
+    "114:6:2": {
+      "role": "majrur (oleh min)",
+      "role_src": [
+        "D",
+        "J",
+        "DS"
+      ]
+    },
+    "114:6:3": {
+      "role": "huruf 'athaf + ma'thuf (pada al-jinnati)",
+      "role_src": [
+        "DS"
+      ],
+      "role_note": "Hanya ad-Da'as yang menulis 'ma'thuf 'ala al-jinnah'; pendapat 'athaf pada al-waswās ('Ali bin Salman, ejaan cetakan an-Nahhas, dan Makki lewat as-Samin) ada di ikhtilaf."
+    }
+  }
+}
