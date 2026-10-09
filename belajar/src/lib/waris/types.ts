@@ -19,7 +19,7 @@ import type {
   Switches,
 } from "./registry";
 
-export type { Sex } from "./registry";
+export type { OutOfScopeFact, Sex } from "./registry";
 
 export type Religion = "islam" | "non_islam";
 

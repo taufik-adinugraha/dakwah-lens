@@ -84,6 +84,13 @@ jobs:
       - name: Waris — validator mutation tests (corpus-free)
         run: python3 pipeline/test_validate_waris.py --no-corpus
 
+      # Full type check first: `next build` stops at the FIRST type error,
+      # which costs a CI round per error. `next typegen` writes the route
+      # types (PageProps/LayoutProps) without building, then tsc lists every
+      # error at once.
+      - name: Typecheck (all errors at once)
+        run: npx next typegen && npx tsc --noEmit -p .
+
       # `next build` is the typecheck for App Router (PageProps/LayoutProps
       # globals only exist after build) and prerenders the lesson pages.
       - name: Build
