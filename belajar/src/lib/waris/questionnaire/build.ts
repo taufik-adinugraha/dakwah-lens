@@ -609,6 +609,15 @@ export function applyPolicy(r: Result, rs: Ruleset): { result: Result; policy?: 
     const out: Rujuk = { kind: "rujuk", ruleset: r.ruleset, reasons: ["dzawil_arham"], notes: r.notes, trace: [{ rule: "rujuk.dzawil_arham", heirs: [] }] };
     return { result: out, policy: "dzawil_v1" };
   }
+  // v1 refuses every dzawil-arham family the same way, so the engine's finer "mixed sexes through
+  // one link" refusal (a tanzil detail for v2) is reported as the plain dzawil refusal too. The
+  // questionnaire never asks what would distinguish them (F4 is not asked when no residue is
+  // open), so without this the same family showed two different refusal texts (q-check #7928).
+  if (r.kind === "rujuk" && rs.switches.dzawilArham === "tanzil" && r.reasons.includes("dzawil_arham_campuran")) {
+    const reasons = [...new Set(r.reasons.map((x) => (x === "dzawil_arham_campuran" ? "dzawil_arham" : x)))];
+    const trace = r.trace.map((t) => (t.rule === "rujuk.dzawil_arham_campuran" ? { ...t, rule: "rujuk.dzawil_arham" } : t));
+    return { result: { ...r, reasons, trace }, policy: "dzawil_v1" };
+  }
   return { result: r };
 }
 

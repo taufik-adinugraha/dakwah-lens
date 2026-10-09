@@ -5,7 +5,7 @@
     "written": "2026-10-09",
     "plan": "docs/waris-plan.md §8 (rule -> corpus record), §9.2, §10 M1.6",
     "registry": "belajar/src/lib/waris/registry.ts",
-    "disclaimer_id": "Dibantu AI, bukan fatwa. Semua catatan ini masih draf dan menunggu tinjauan ustadz ahli faraid.",
+    "disclaimer_id": "Dibantu AI, bukan fatwa. Catatan ini disusun dengan bantuan AI dari dalil dan sumber hukum yang disebut namanya.",
     "disclaimer_en": "AI-assisted, not an authoritative fatwa. Every note is a draft awaiting the fara'id reviewer."
   },
   "legal_sources": [

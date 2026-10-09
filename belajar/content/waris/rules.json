@@ -2,13 +2,13 @@
  "meta": {
   "generator": "belajar/pipeline/build_waris.py (rules step)",
   "source": "belajar/pipeline/authored/waris.rules.json",
-  "source_sha256": "d9a26e111842bbafc413c6cd3fc642a8e4d6676547efcad565f4226ca1973fd9",
+  "source_sha256": "aec32050fd813eafce5ee6a202f4c940534971f42e774107d174b5d71f0d56e8",
   "order": "registry order of belajar/src/lib/waris/registry.ts (RULE_IDS)",
   "status": "draft",
   "written": "2026-10-09",
   "plan": "docs/waris-plan.md §8 (rule -> corpus record), §9.2, §10 M1.6",
   "registry": "belajar/src/lib/waris/registry.ts",
-  "disclaimer_id": "Dibantu AI, bukan fatwa. Semua catatan ini masih draf dan menunggu tinjauan ustadz ahli faraid.",
+  "disclaimer_id": "Dibantu AI, bukan fatwa. Catatan ini disusun dengan bantuan AI dari dalil dan sumber hukum yang disebut namanya.",
   "disclaimer_en": "AI-assisted, not an authoritative fatwa. Every note is a draft awaiting the fara'id reviewer."
  },
  "legal_sources": [
