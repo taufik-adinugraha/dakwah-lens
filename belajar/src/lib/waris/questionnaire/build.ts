@@ -615,7 +615,7 @@ export function applyPolicy(r: Result, rs: Ruleset): { result: Result; policy?: 
   // open), so without this the same family showed two different refusal texts (q-check #7928).
   if (r.kind === "rujuk" && rs.switches.dzawilArham === "tanzil" && r.reasons.includes("dzawil_arham_campuran")) {
     const reasons = [...new Set(r.reasons.map((x) => (x === "dzawil_arham_campuran" ? "dzawil_arham" : x)))];
-    const trace = r.trace.map((t) => (t.rule === "rujuk.dzawil_arham_campuran" ? { ...t, rule: "rujuk.dzawil_arham" } : t));
+    const trace = r.trace.map((t): typeof t => (t.rule === "rujuk.dzawil_arham_campuran" ? { ...t, rule: "rujuk.dzawil_arham" } : t));
     return { result: { ...r, reasons, trace }, policy: "dzawil_v1" };
   }
   return { result: r };
