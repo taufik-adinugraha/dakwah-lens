@@ -118,12 +118,15 @@ jobs:
           for path in /belajar/id /belajar/en /belajar/id/kredit /belajar/id/konsep \
                       /belajar/id/quran /belajar/en/quran \
                       /belajar/id/quran/al-fatihah /belajar/id/quran/al-fatihah/1 \
-                      /belajar/id/quran/al-fatihah/7 /belajar/en/quran/al-fatihah/5; do
+                      /belajar/id/quran/al-fatihah/7 /belajar/en/quran/al-fatihah/5 \
+                      /belajar/id/quran/al-ikhlas /belajar/id/quran/al-ikhlas/1 \
+                      /belajar/id/quran/al-falaq/5 /belajar/id/quran/an-nas/6 \
+                      /belajar/en/quran/an-nas/1; do
             code="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:3300${path}")"
             echo "${path} -> ${code}"; [[ "$code" == 200 ]]
           done
           # Unknown surah / ayah / path → the module's 404, not a 500.
-          for path in /belajar/id/quran/al-baqarah /belajar/id/quran/al-fatihah/8 \
+          for path in /belajar/id/quran/al-baqarah /belajar/id/quran/al-fatihah/8 /belajar/id/quran/an-nas/7 \
                       /belajar/id/al-baqarah; do
             code="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:3300${path}")"
             echo "${path} -> ${code}"; [[ "$code" == 404 ]]

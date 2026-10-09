@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
-"""Mutation tests for validate.py: each case plants one deliberate fault in a copy of
-content/al-fatihah.json or content/library.json and asserts that validate.py fails with the
-expected message. The unmutated copies must pass. Standard library only; run from belajar/pipeline:
+"""Mutation tests for validate.py: each case plants one deliberate fault in a copy of the lessons
+in content/ (al-fatihah.json and every other built surah), content/library.json or the app's
+src/lib/content.ts / routes.ts, and asserts that validate.py fails with the expected message. The
+unmutated copies must pass. Standard library only; run from belajar/pipeline:
 
     python3 test_validate.py          # table of faults and the message that caught each
     python3 -m unittest test_validate # the same as a unittest run
 
-Run build_library.py and build_fatihah.py first (the copies are taken from content/).
+Run build_library.py and build_surah.py <slug> for every authored surah first (the copies are
+taken from content/). The multi-surah cases plant their faults in the first and the last lesson
+after Al-Fatihah ("second", "last"); they are reported as skipped only while no such lesson
+exists (validate.py itself fails when a surah has authored input but no built lesson).
 """
 from __future__ import annotations
 
@@ -20,10 +24,16 @@ import unittest
 from pathlib import Path
 
 import validate as V
-from common import CONTENT_DIR
+from common import CONTENT_DIR, CONTENT_TS, ROUTES_TS, SURAHS, load_sources, load_tanzil, require_pinned
 
-SURAH = json.loads((CONTENT_DIR / "al-fatihah.json").read_text(encoding="utf-8"))
+LESSONS = {sp.slug: json.loads((CONTENT_DIR / f"{sp.slug}.json").read_text(encoding="utf-8"))
+           for sp in SURAHS if (CONTENT_DIR / f"{sp.slug}.json").exists()}
+SURAH = LESSONS["al-fatihah"]
 LIB = json.loads((CONTENT_DIR / "library.json").read_text(encoding="utf-8"))
+OTHER = [slug for slug in LESSONS if slug != "al-fatihah"]
+SECOND = OTHER[0] if OTHER else None  # first lesson after Al-Fatihah (mushaf order)
+LAST = OTHER[-1] if OTHER else None
+TANZIL = load_tanzil(require_pinned(load_sources(), "tanzil_uthmani"))
 
 
 def word(d, loc):
@@ -40,6 +50,25 @@ def rec(lib, kind, rid):
 
 def set_(obj, key, val):
     obj[key] = val
+
+
+def rc_of(ay, reciter):
+    return next(r for r in ay["recitation"] if r["reciter"] == reciter)
+
+
+def foreign_concept(loc):
+    """A Konsep id that does not give `loc` as an example (and the word does not list)."""
+    return next(c["id"] for c in LIB["concepts"] if loc not in {e["loc"] for e in c["examples"]})
+
+
+def drop_load(ts: str, slug: str) -> str:
+    return "\n".join(ln for ln in ts.split("\n") if f'"{slug}")' not in ln)
+
+
+def swap_slugs(ts: str) -> str:
+    """routes.ts with the last two SURAH_SLUGS entries swapped."""
+    a, b = OTHER[-2:] if len(OTHER) >= 2 else ("al-fatihah", SECOND)
+    return ts.replace(f'"{a}"', "@@").replace(f'"{b}"', f'"{a}"').replace("@@", f'"{b}"')
 
 
 # (name, file the fault goes into, mutation, substring the failure message must contain)
@@ -167,56 +196,139 @@ MUTATIONS = [
      lambda d: set_(word(d, "1:2:1"), "ar", word(d, "1:2:1")["ar"][:-1]), "is not Tanzil token"),
 ]
 
+# Multi-surah faults: planted in the first ("second") or last ("last") lesson after Al-Fatihah,
+# across lesson files ("lessons": the dict of all lesson copies), or in the app's wiring.
+MULTI = [
+    ("ayah 1 keeps the surah-heading basmalah Tanzil prepends", "second",
+     lambda d: set_(ayah(d, 1), "ar", TANZIL.verses[(d["surah"], 1)]), "ar differs from the Tanzil ayah"),
+    ("a word dropped from an ayah (count vs registry/QAC)", "last",
+     lambda d: ayah(d, 2)["words"].pop(), "word counts"),
+    ("an ayah missing from a later surah", "last",
+     lambda d: d["ayat"].pop(), "ayat are not 1.."),
+    ("translation copied from Al-Fatihah 1:1", "second",
+     lambda d: set_(ayah(d, 1)["translation"], "text", ayah(SURAH, 1)["translation"]["text"]),
+     "not byte-identical to the cached QuranEnc text"),
+    ("data_versions.quranenc pins sura 1 in another sura's lesson", "lessons",
+     lambda ls: set_(ls[SECOND]["data_versions"], "quranenc", SURAH["data_versions"]["quranenc"]),
+     "data_versions.quranenc does not carry the pinned sha256"),
+    ("Alafasy timings replaced by Husary's", "last",
+     lambda d: set_(rc_of(ayah(d, 1), "Alafasy_128kbps"), "segments",
+                    copy.deepcopy(rc_of(ayah(d, 1), "Husary_Muallim_128kbps")["segments"])),
+     "segments differ from the pinned quran-align entry"),
+    ("recitation streams the Al-Fatihah file of the same ayah", "second",
+     lambda d: set_(ayah(d, 1)["recitation"][0], "url",
+                    ayah(d, 1)["recitation"][0]["url"][:-10] + "001001.mp3"), "unexpected url"),
+    ("lesson file under an unregistered slug", "lessons",
+     lambda ls: ls.__setitem__(SECOND + "x", ls.pop(SECOND)), "is not a surah registered in common.SURAHS"),
+    ("lesson slug field names another surah", "second",
+     lambda d: set_(d, "slug", "al-fatihah"), "slug 'al-fatihah' !="),
+    ("authored words of a later surah changed after the build", "second",
+     lambda d: set_(d["data_versions"], "authored_words", f"authored/{d['slug']}.words.json sha256:0"),
+     "authored_words is stale"),
+    ("word of a later surah lists a concept that does not cite it", "second",
+     lambda d: word(d, f"{d['surah']}:1:1")["concepts"].append(foreign_concept(f"{d['surah']}:1:1")),
+     "which does not give"),
+    ("hadith with a Latin placeholder as its Arabic", "second",
+     lambda d: d["hadith"].append({"citation": "Sahih al-Bukhari 5013", "ar": "TODO matn", "id": "terjemah",
+                                   "grade": "sahih", "status": "draft"}), "ar must be Arabic text only"),
+    ("fact basis note names a surah that has no lesson", "surah",
+     lambda d: set_(next(f for f in d["facts"] if "QAC" in f["method"]), "method",
+                    next(f for f in d["facts"] if "QAC" in f["method"])["method"]
+                    .replace("surah 1 identik", "surah 1 dan 2 identik")), "basis note names surah [2]"),
+    ("library occurrence method without the QAC basis note", "library",
+     lambda l: rec(l, "lexicon", "hamd")["occurrences"].__setitem__("method", "jumlah segmen STEM di QAC"),
+     "lacks the basis note"),
+    ("content.ts stops loading a built lesson", "content.ts",
+     lambda ts: drop_load(ts, SECOND), "src/lib/content.ts SURAHS loads"),
+    ("routes.ts SURAH_SLUGS out of mushaf order", "routes.ts",
+     swap_slugs, "src/lib/routes.ts SURAH_SLUGS"),
+]
+ALL = MUTATIONS + MULTI
+NEEDS_OTHER = {"second", "last", "lessons", "content.ts", "routes.ts"}
 
-def run_validate(surah: dict, lib: dict) -> tuple[int, list[str]]:
+
+def run_validate(lessons: dict, lib: dict, content_ts: str | None = None,
+                 routes_ts: str | None = None) -> tuple[int, list[str]]:
     with tempfile.TemporaryDirectory() as tmp:
-        out, libp = Path(tmp) / "al-fatihah.json", Path(tmp) / "library.json"
-        out.write_text(json.dumps(surah, ensure_ascii=False), encoding="utf-8")
+        t = Path(tmp)
+        for slug, d in lessons.items():
+            (t / f"{slug}.json").write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")
+        libp, cts, rts = t / "library.json", t / "content.ts", t / "routes.ts"
         libp.write_text(json.dumps(lib, ensure_ascii=False), encoding="utf-8")
-        saved = V.OUT, V.LIBRARY
-        V.OUT, V.LIBRARY = out, libp
+        cts.write_text(content_ts if content_ts is not None else CONTENT_TS.read_text(encoding="utf-8"),
+                       encoding="utf-8")
+        rts.write_text(routes_ts if routes_ts is not None else ROUTES_TS.read_text(encoding="utf-8"),
+                       encoding="utf-8")
+        saved = V.LESSON_DIR, V.LIBRARY, V.CONTENT_TS_PATH, V.ROUTES_TS_PATH
+        V.LESSON_DIR, V.LIBRARY, V.CONTENT_TS_PATH, V.ROUTES_TS_PATH = t, libp, cts, rts
         V.fails.clear()
         try:
             with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
                 rc = V.main()
         finally:
-            V.OUT, V.LIBRARY = saved
+            V.LESSON_DIR, V.LIBRARY, V.CONTENT_TS_PATH, V.ROUTES_TS_PATH = saved
         return rc, list(V.fails)
 
 
+def runnable(target: str) -> bool:
+    return target not in NEEDS_OTHER or bool(OTHER)
+
+
 def apply(name: str):
-    _, target, fn, expect = next(m for m in MUTATIONS if m[0] == name)
-    surah, lib = copy.deepcopy(SURAH), copy.deepcopy(LIB)
-    fn(surah if target == "surah" else lib)
-    rc, fails = run_validate(surah, lib)
+    _, target, fn, expect = next(m for m in ALL if m[0] == name)
+    lessons, lib = copy.deepcopy(LESSONS), copy.deepcopy(LIB)
+    content_ts = routes_ts = None
+    if target == "surah":
+        fn(lessons["al-fatihah"])
+    elif target == "library":
+        fn(lib)
+    elif target in ("second", "last"):
+        fn(lessons[SECOND if target == "second" else LAST])
+    elif target == "lessons":
+        fn(lessons)
+    elif target == "content.ts":
+        content_ts = fn(CONTENT_TS.read_text(encoding="utf-8"))
+    elif target == "routes.ts":
+        routes_ts = fn(ROUTES_TS.read_text(encoding="utf-8"))
+    else:
+        raise ValueError(target)
+    rc, fails = run_validate(lessons, lib, content_ts, routes_ts)
     hit = next((f for f in fails if expect in f), None)
     return rc, fails, hit
 
 
 class TestValidateMutations(unittest.TestCase):
     def test_clean_copies_pass(self):
-        rc, fails = run_validate(copy.deepcopy(SURAH), copy.deepcopy(LIB))
+        rc, fails = run_validate(copy.deepcopy(LESSONS), copy.deepcopy(LIB))
         self.assertEqual((rc, fails), (0, []))
 
     def test_each_fault_is_caught(self):
-        for name, *_ in MUTATIONS:
+        for name, target, *_ in ALL:
             with self.subTest(fault=name):
+                if not runnable(target):
+                    self.skipTest("no lesson after Al-Fatihah in content/")
                 rc, fails, hit = apply(name)
                 self.assertEqual(rc, 1, f"{name}: validate passed")
                 self.assertIsNotNone(hit, f"{name}: failed, but not with the expected message: {fails[:3]}")
 
 
 if __name__ == "__main__" and sys.argv[1:] == []:
-    rc0, f0 = run_validate(copy.deepcopy(SURAH), copy.deepcopy(LIB))
-    print(f"clean copies: exit {rc0}, {len(f0)} failures")
-    missed = 0
-    for i, (name, target, _, _) in enumerate(MUTATIONS, 1):
+    rc0, f0 = run_validate(copy.deepcopy(LESSONS), copy.deepcopy(LIB))
+    print(f"lessons: {', '.join(LESSONS)}; multi-surah faults go into {SECOND} (second) and {LAST} (last)")
+    print(f"clean copies: exit {rc0}, {len(f0)} failures" + "".join(f"\n  - {f}" for f in f0[:10]))
+    missed = skipped = 0
+    for i, (name, target, _, _) in enumerate(ALL, 1):
+        if not runnable(target):
+            skipped += 1
+            print(f"{i:2d}. SKIPPED [{target}] {name} (no lesson after Al-Fatihah in content/)")
+            continue
         rc, fails, hit = apply(name)
         ok = rc == 1 and hit
         missed += not ok
         print(f"{i:2d}. {'CAUGHT' if ok else 'MISSED'} [{target}] {name}\n      -> {hit or fails[:2]}")
-    print(f"\n{len(MUTATIONS) - missed}/{len(MUTATIONS)} faults caught; clean copies "
-          f"{'pass' if rc0 == 0 and not f0 else 'FAIL'}")
+    ran = len(ALL) - skipped
+    print(f"\n{ran - missed}/{ran} faults caught ({len(MUTATIONS)} single-lesson/library + {len(MULTI)} multi-surah"
+          f"{f', {skipped} skipped' if skipped else ''}); clean copies {'pass' if rc0 == 0 and not f0 else 'FAIL'}")
     sys.exit(1 if missed or rc0 or f0 else 0)
 elif __name__ == "__main__":
     unittest.main()

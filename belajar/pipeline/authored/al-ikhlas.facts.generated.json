@@ -1,0 +1,1286 @@
+{
+  "_comment": "Kartu 'Tahukah kamu?' surah Al-Ikhlas (schema.ts Fact), dihasilkan oleh belajar/pipeline/facts_muawwidzat.py dari Tanzil Uthmani 1.1 + QAC 0.4 (dipin sha256), kutipan kitab dengan jilid/halaman, dan hadits dari korpus platform. Jangan diedit tangan: jalankan ulang skripnya. status 'draft' adalah status pipeline (plan L11). Kunci berawalan '_' hanya untuk pipeline dan tidak dikirim ke aplikasi.",
+  "surah": 112,
+  "slug": "al-ikhlas",
+  "_generated_by": "belajar/pipeline/facts_muawwidzat.py (Python stdlib, tanpa LLM)",
+  "_inputs": {
+    "tanzil": "uthmani-1.1 sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
+    "tanzil_metadata": "1.0 sha256:8867c1d88191472adec9db694b3cd9f135b1a2ef580574d32cf888dcb22c5c7a",
+    "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
+    "corpus": {
+      "bukhari.json": "sha256:df42f6e5fe98a3571cc44775cbe998fb148e21e650c0ff948a2e03ef009493c7",
+      "muslim.json": "sha256:366ebf71aa8e031eb0ec9c1cb4006f653e4d9300f9f6229f11d4df830fd73351",
+      "riyad-as-salihin.json": "sha256:99d32abd2744456c921a4c069d78b1012b325106cd439accaf137dbd5405c8d0",
+      "tafsir-ibn-kathir.json": "sha256:767270d51e5e8c0b5b946fc27b217f51e98274d3d5523d6fecd7c451300b4858"
+    },
+    "hadith_mapping": {
+      "fawazahmed0/ara-muslim-sections-6.json": "sha256:1814326c0fefd9ed123a5e8ee55e6e4eef8dd303775c2028d95d8fef921666f1",
+      "fawazahmed0/ara-muslim-sections-39.json": "sha256:a0e4d44329e0ae3b4b3b29b67dcc3aff430364ab6f1b6b2940cd7252f563f4a3",
+      "ahmedbaset/riyad_assalihin.json": "sha256:180171247ed9462c05164c80c4f938bd30936bfaf848125595be0b86361d7b75"
+    },
+    "kitab_pages": "ad-Dani al-Bayan (Shamela 5542), Ibnu Katsir ed. as-Salamah (Shamela 8473), Darwisy (Shamela 2163): halaman cetak dari judul halaman Shamela, dicek 2026-10-09"
+  },
+  "_self_check": {
+    "figures": 26,
+    "failed": 0,
+    "rows": [
+      {
+        "fact": "empat-ayat",
+        "what": "ayat (baris Tanzil)",
+        "value": 4,
+        "recheck": 4,
+        "how": "quran-data.xml atribut ayas",
+        "ok": true
+      },
+      {
+        "fact": "empat-ayat",
+        "what": "ayat vs ad-Dani (hitungan Kufah)",
+        "value": 4,
+        "recheck": 4,
+        "how": "angka ad-Dani hlm. 296",
+        "ok": true
+      },
+      {
+        "fact": "empat-ayat",
+        "what": "kata (token Tanzil)",
+        "value": 15,
+        "recheck": 15,
+        "how": "jumlah lokasi kata QAC 0.4",
+        "ok": true
+      },
+      {
+        "fact": "empat-ayat",
+        "what": "kata vs ad-Dani",
+        "value": 15,
+        "recheck": 15,
+        "how": "angka ad-Dani hlm. 296",
+        "ok": true
+      },
+      {
+        "fact": "makkiyah-madaniyah-al-ikhlas",
+        "what": "type quran-data.xml",
+        "value": "Meccan",
+        "recheck": "Meccan",
+        "how": "atribut type dibaca ulang",
+        "ok": true
+      },
+      {
+        "fact": "kata-tunggal-al-ikhlas",
+        "what": "LEM:S~amad",
+        "value": [
+          [
+            112,
+            2,
+            2
+          ]
+        ],
+        "recheck": [
+          [
+            112,
+            2,
+            2
+          ]
+        ],
+        "how": "baris QAC mentah",
+        "ok": true
+      },
+      {
+        "fact": "kata-tunggal-al-ikhlas",
+        "what": "token Tanzil LEM:S~amad",
+        "value": true,
+        "recheck": true,
+        "how": "pencarian token + lemma QAC",
+        "ok": true
+      },
+      {
+        "fact": "kata-tunggal-al-ikhlas",
+        "what": "LEM:kufuw",
+        "value": [
+          [
+            112,
+            4,
+            4
+          ]
+        ],
+        "recheck": [
+          [
+            112,
+            4,
+            4
+          ]
+        ],
+        "how": "baris QAC mentah",
+        "ok": true
+      },
+      {
+        "fact": "kata-tunggal-al-ikhlas",
+        "what": "token Tanzil LEM:kufuw",
+        "value": true,
+        "recheck": true,
+        "how": "pencarian token + lemma QAC",
+        "ok": true
+      },
+      {
+        "fact": "kata-tunggal-al-ikhlas",
+        "what": "ROOT:Smd hanya di surah 112",
+        "value": [
+          [
+            112,
+            2,
+            2
+          ]
+        ],
+        "recheck": [
+          [
+            112,
+            2,
+            2
+          ]
+        ],
+        "how": "baris QAC mentah",
+        "ok": true
+      },
+      {
+        "fact": "kata-tunggal-al-ikhlas",
+        "what": "ROOT:kfA hanya di surah 112",
+        "value": [
+          [
+            112,
+            4,
+            4
+          ]
+        ],
+        "recheck": [
+          [
+            112,
+            4,
+            4
+          ]
+        ],
+        "how": "baris QAC mentah",
+        "ok": true
+      },
+      {
+        "fact": "ash-shamad-menurut-ibnu-abbas",
+        "what": "kalimat Ibnu Katsir ada di rekaman tafsir korpus 112:2",
+        "value": true,
+        "recheck": true,
+        "how": "syarat kalimat",
+        "ok": true
+      },
+      {
+        "fact": "ahad",
+        "what": "LEM:>aHad",
+        "value": {
+          "n": 74,
+          "sha256": "f87981b9e42cf0b9"
+        },
+        "recheck": {
+          "n": 74,
+          "sha256": "f87981b9e42cf0b9"
+        },
+        "how": "baris QAC mentah",
+        "ok": true
+      },
+      {
+        "fact": "ahad",
+        "what": "di Al-Ikhlas tepat di ayat pertama dan terakhir",
+        "value": true,
+        "recheck": true,
+        "how": "syarat kalimat",
+        "ok": true
+      },
+      {
+        "fact": "huwa-allahu",
+        "what": "huwa Allāhu (find_seq vs regex)",
+        "value": [
+          [
+            6,
+            3
+          ],
+          [
+            18,
+            38
+          ],
+          [
+            28,
+            70
+          ],
+          [
+            34,
+            27
+          ],
+          [
+            39,
+            4
+          ],
+          [
+            59,
+            22
+          ],
+          [
+            59,
+            23
+          ],
+          [
+            59,
+            24
+          ],
+          [
+            112,
+            1
+          ]
+        ],
+        "recheck": [
+          [
+            6,
+            3
+          ],
+          [
+            18,
+            38
+          ],
+          [
+            28,
+            70
+          ],
+          [
+            34,
+            27
+          ],
+          [
+            39,
+            4
+          ],
+          [
+            59,
+            22
+          ],
+          [
+            59,
+            23
+          ],
+          [
+            59,
+            24
+          ],
+          [
+            112,
+            1
+          ]
+        ],
+        "how": "regex",
+        "ok": true
+      },
+      {
+        "fact": "huwa-allahu",
+        "what": "kata kedua berlemma Allah (QAC)",
+        "value": true,
+        "recheck": true,
+        "how": "syarat kalimat",
+        "ok": true
+      },
+      {
+        "fact": "huwa-allahu",
+        "what": "qul huwa Allāhu",
+        "value": [
+          [
+            112,
+            1
+          ]
+        ],
+        "recheck": [
+          [
+            112,
+            1
+          ]
+        ],
+        "how": "regex",
+        "ok": true
+      },
+      {
+        "fact": "wa-lam-yakun-lahu",
+        "what": "wa lam yakun lahu (find_seq vs regex)",
+        "value": [
+          [
+            17,
+            111
+          ],
+          [
+            17,
+            111
+          ],
+          [
+            25,
+            2
+          ],
+          [
+            112,
+            4
+          ]
+        ],
+        "recheck": [
+          [
+            17,
+            111
+          ],
+          [
+            17,
+            111
+          ],
+          [
+            25,
+            2
+          ],
+          [
+            112,
+            4
+          ]
+        ],
+        "how": "regex",
+        "ok": true
+      },
+      {
+        "fact": "wa-lam-yakun-lahu",
+        "what": "17:111: tiga token sebelum = 17:111",
+        "value": true,
+        "recheck": true,
+        "how": "syarat kalimat",
+        "ok": true
+      },
+      {
+        "fact": "wa-lam-yakun-lahu",
+        "what": "17:111: tiga token sesudah = 17:111",
+        "value": true,
+        "recheck": true,
+        "how": "syarat kalimat",
+        "ok": true
+      },
+      {
+        "fact": "wa-lam-yakun-lahu",
+        "what": "25:2: tiga token sebelum = 17:111",
+        "value": true,
+        "recheck": true,
+        "how": "syarat kalimat",
+        "ok": true
+      },
+      {
+        "fact": "wa-lam-yakun-lahu",
+        "what": "25:2: tiga token sesudah = 17:111",
+        "value": true,
+        "recheck": true,
+        "how": "syarat kalimat",
+        "ok": true
+      },
+      {
+        "fact": "qul",
+        "what": "qul 2MS segmen",
+        "value": {
+          "n": 332,
+          "sha256": "a495144b32092eda"
+        },
+        "recheck": {
+          "n": 332,
+          "sha256": "a495144b32092eda"
+        },
+        "how": "baris QAC mentah",
+        "ok": true
+      },
+      {
+        "fact": "qul",
+        "what": "qul 2MP segmen",
+        "value": 12,
+        "recheck": 12,
+        "how": "baris QAC mentah",
+        "ok": true
+      },
+      {
+        "fact": "qul",
+        "what": "token Tanzil qul vs QAC",
+        "value": true,
+        "recheck": true,
+        "how": "pencarian token + lemma QAC",
+        "ok": true
+      },
+      {
+        "fact": "lima-surah-qul",
+        "what": "surah dibuka qul (Tanzil vs QAC kata 1 ayat 1)",
+        "value": [
+          [
+            72,
+            1
+          ],
+          [
+            109,
+            1
+          ],
+          [
+            112,
+            1
+          ],
+          [
+            113,
+            1
+          ],
+          [
+            114,
+            1
+          ]
+        ],
+        "recheck": [
+          [
+            72,
+            1
+          ],
+          [
+            109,
+            1
+          ],
+          [
+            112,
+            1
+          ],
+          [
+            113,
+            1
+          ],
+          [
+            114,
+            1
+          ]
+        ],
+        "how": "baris QAC mentah",
+        "ok": true
+      }
+    ]
+  },
+  "_not_sourced": [
+    "Sebab turun (kaum musyrik meminta Nabi menyebut nasab Tuhannya): riwayat Ubay bin Ka'b lewat Ahmad dan at-Tirmidzi tidak ada di koleksi hadits korpus; Ibnu Katsir (jil. 8, hlm. 518) menukilnya bersama catatan at-Tirmidzi bahwa jalur mursal lebih sahih. Tidak dimuat; perlu sumber takhrij luar.",
+    "Nama-nama lain surah selain Surah Ash-Shamad (ad-Dani): perlu sumber seperti al-Itqan dengan halaman; tidak dimuat.",
+    "Pernyataan Ibnu Katsir (jil. 8, hlm. 528) bahwa lafaz aḥad dalam kalimat positif hanya dipakai untuk Allah: tidak dimuat, karena daftar 74 kemunculan memuat bentuk positif seperti aḥadakum (18:19) sehingga mudah disalahpahami tanpa penjelasan ulama.",
+    "Makna 'setara dengan sepertiga Al-Qur'an' (pahala atau kandungan): tidak dimuat; perlu syarah hadits (mis. Fath al-Bari) dengan halaman.",
+    "Qira'at kufuwan (kufu’an, kuf’an): perlu an-Nasyr dengan halaman; tidak dimuat.",
+    "Jumlah huruf (ad-Dani: 47): tidak dimuat, karena plan §4.5 melarang klaim hitungan huruf."
+  ],
+  "facts": [
+    {
+      "id": "empat-ayat",
+      "title": "4 ayat, 15 kata",
+      "body": "Dalam hitungan Kufah (riwayat Hafs) yang dipakai modul ini, Al-Ikhlas terdiri atas 4 ayat dan 15 kata (4 + 2 + 4 + 5). Basmalah di atas surah tidak diberi nomor ayat dalam hitungan ini. Ad-Dani, yang menamainya Surah Ash-Shamad, mencatat jumlah kata yang sama. Menurut ad-Dani, hitungan Makkah dan Syam menjadikannya 5 ayat, karena «لَمْ يَلِدْ» dihitung sebagai akhir ayat.",
+      "locations": [
+        "112:1",
+        "112:2",
+        "112:3",
+        "112:4"
+      ],
+      "method": "Ayat = baris surah 112 dalam Tanzil Uthmani 1.1 (sama dengan atribut ayas di quran-data.xml); kata = token yang dipisah spasi setelah basmalah pembuka surah (yang ditaruh Tanzil di awal ayat 1) dibuang. Penomoran kata QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 112, 113 dan 114 identik byte-per-byte dengan 1.1 yang dipakai) untuk surah 112 juga berisi 15 kata dan cocok satu per satu. Hitungan ayat negeri lain dan nama surah dikutip dari ad-Dani, bukan hasil hitungan data.",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; baris 112|1 sampai 112|4; basmalah pembuka dibuang",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; jumlah lokasi (112:a:w)",
+          "url": "https://corpus.quran.com/"
+        },
+        {
+          "kitab": "Abu 'Amr ad-Dani, al-Bayan fi 'Add Ay al-Qur'an",
+          "ref": "Surat ash-Shamad, hlm. 296",
+          "url": "https://shamela.ws/book/5542/278"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "makkiyah-madaniyah-al-ikhlas",
+      "title": "Makkiyah atau Madaniyah?",
+      "body": "Ad-Dani mencatat perbedaan pendapat: Al-Ikhlas Makkiyah menurut Mujahid, 'Atha' dan Qatadah, sedangkan menurut Ibnu 'Abbas Madaniyah. Data surah Tanzil yang dipakai modul ini menandainya Makkiyah.",
+      "locations": [
+        "112:1",
+        "112:2",
+        "112:3",
+        "112:4"
+      ],
+      "method": "Bukan hitungan. Pendapat ulama dikutip dari ad-Dani; penanda Tanzil dari atribut type di quran-data.xml.",
+      "sources": [
+        {
+          "kitab": "Abu 'Amr ad-Dani, al-Bayan fi 'Add Ay al-Qur'an",
+          "ref": "Surat ash-Shamad, hlm. 296",
+          "url": "https://shamela.ws/book/5542/278"
+        },
+        {
+          "kitab": "Tanzil Quran metadata (quran-data.xml) 1.0",
+          "ref": "sha256:8867c1d88191472a; sura index=112, type=Meccan",
+          "url": "https://tanzil.net/docs/quran_metadata"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "kata-tunggal-al-ikhlas",
+      "title": "2 kata yang hanya ada di Al-Ikhlas",
+      "body": "Dua kata dalam surah ini tidak dipakai di tempat lain dalam Al-Qur'an: «ٱلصَّمَدُ» (112:2) dan «كُفُوًا» (112:4). Akar kedua kata itu pun (ص م د dan ك ف أ) tidak muncul di ayat lain. Tanpa harakat, «كُفُوًا» tertulis sama dengan «كُفُّوٓا۟» di 4:77, kata lain dari akar ك ف ف.",
+      "locations": [
+        "4:77",
+        "112:2",
+        "112:4"
+      ],
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 112, 113 dan 114 identik byte-per-byte dengan 1.1 yang dipakai): lemma (LEM) segmen STEM surah 112 yang semua kemunculannya di seluruh Al-Qur'an ada di surah ini (LEM:S~amad; LEM:kufuw); akar yang juga hanya ada di sini: ROOT:Smd; ROOT:kfA. Dicek di Tanzil: token dengan tulisan sama tanpa harakat (boleh dengan al- dan awalan wa-, fa-, bi-, ka-, li-) hanya ada di tempat itu, kecuali homograf yang disebut, yang lemma QAC-nya lain.",
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; LEM:S~amad; LEM:kufuw; ROOT:Smd; ROOT:kfA",
+          "url": "https://corpus.quran.com/"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token yang sama tanpa harakat",
+          "url": "https://tanzil.net/download/"
+        }
+      ],
+      "status": "draft",
+      "_homographs": [
+        {
+          "loc": "4:77:7",
+          "token": "كُفُّوٓا۟",
+          "qac_lem": "kaf~a",
+          "qac_root": "kff",
+          "of": "kufuw"
+        }
+      ]
+    },
+    {
+      "id": "ash-shamad-menurut-ibnu-abbas",
+      "title": "Aṣ-ṣamad menurut Ibnu 'Abbas",
+      "body": "Ibnu Katsir menukil beberapa penafsiran ulama salaf tentang «ٱلصَّمَدُ». Salah satunya dari Ibnu 'Abbas (riwayat 'Ikrimah): Dialah yang menjadi tujuan seluruh makhluk dalam kebutuhan dan permohonan mereka.",
+      "locations": [
+        "112:2"
+      ],
+      "method": "Bukan hitungan; dikutip dari Ibnu Katsir (tafsir 112:2). Kalimatnya juga dicek ada di rekaman tafsir Ibnu Katsir korpus platform (api/data/tafsir-ibn-kathir.json, 112:2).",
+      "sources": [
+        {
+          "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami as-Salamah, Dar Thayyibah)",
+          "ref": "jil. 8, hlm. 528 (tafsir QS 112:2: makna aṣ-ṣamad)",
+          "url": "https://shamela.ws/book/8473/4574"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "ahad",
+      "title": "Aḥad: 74 kali",
+      "body": "Kata aḥad muncul 74 kali dalam 72 ayat Al-Qur'an. Di surah ini ia muncul dua kali, di ayat pertama dan ayat terakhir (112:1 dan 112:4). Ibnu Katsir menjelaskan aḥad di 112:1: Dialah Yang Esa, yang tidak ada tandingan-Nya, tidak ada pembantu-Nya, tidak ada saingan-Nya, tidak ada yang menyerupai-Nya, dan tidak ada yang sebanding dengan-Nya.",
+      "locations": [
+        "2:96",
+        "2:102",
+        "2:136",
+        "2:180",
+        "2:266",
+        "2:285",
+        "3:73",
+        "3:84",
+        "3:91",
+        "3:153",
+        "4:18",
+        "4:43",
+        "4:152",
+        "5:6",
+        "5:20",
+        "5:27",
+        "5:106",
+        "5:115",
+        "6:61",
+        "7:80",
+        "9:4",
+        "9:6",
+        "9:84",
+        "9:127",
+        "11:81",
+        "12:4",
+        "12:36",
+        "12:41",
+        "12:78",
+        "15:65",
+        "16:58",
+        "16:76",
+        "17:23",
+        "18:19",
+        "18:22",
+        "18:26",
+        "18:32",
+        "18:38",
+        "18:42",
+        "18:47",
+        "18:49",
+        "18:110",
+        "19:26",
+        "19:98",
+        "23:99",
+        "24:6",
+        "24:21",
+        "24:28",
+        "29:28",
+        "33:32",
+        "33:39",
+        "33:40",
+        "35:41",
+        "38:35",
+        "43:17",
+        "49:12",
+        "59:11",
+        "63:10",
+        "69:47",
+        "72:2",
+        "72:7",
+        "72:18",
+        "72:20",
+        "72:22",
+        "72:26",
+        "89:25",
+        "89:26",
+        "90:5",
+        "90:7",
+        "92:19",
+        "112:1",
+        "112:4"
+      ],
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 112, 113 dan 114 identik byte-per-byte dengan 1.1 yang dipakai): segmen STEM dengan LEM:>aHad (lemma 112:1:4) = 74 dalam 72 ayat. Akar ROOT:AHd juga memuat 11 segmen lemma lain (LEM:<iHodaY, bentuk perempuan iḥdā), yang tidak dihitung. Penjelasan makna dikutip dari Ibnu Katsir.",
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; LEM:>aHad",
+          "url": "https://corpus.quran.com/"
+        },
+        {
+          "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami as-Salamah, Dar Thayyibah)",
+          "ref": "jil. 8, hlm. 527–528 (tafsir QS 112:1: makna aḥad)",
+          "url": "https://shamela.ws/book/8473/4573"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "huwa-allahu",
+      "title": "Huwa Allāhu di 9 ayat",
+      "body": "Ungkapan «هُوَ ٱللَّهُ» (Dialah Allah), dengan atau tanpa awalan wa-, muncul di 9 ayat: 6:3, 18:38, 28:70, 34:27, 39:4, 59:22, 59:23, 59:24 dan 112:1. Tiga di antaranya berurutan di akhir Surah Al-Hasyr (59:22–24). Kalimat «قُلْ هُوَ ٱللَّهُ» hanya ada di 112:1.",
+      "locations": [
+        "6:3",
+        "18:38",
+        "28:70",
+        "34:27",
+        "39:4",
+        "59:22",
+        "59:23",
+        "59:24",
+        "112:1"
+      ],
+      "method": "Dua token berurutan huwa + Allāh (diambil dari 112:1), token pertama boleh berawalan wa- atau fa-; dihitung per ayat; kunci pencarian: tatweel (U+0640), harakat dan tanda baca Qur'ani (U+064B–U+065F, U+06D6–U+06ED) dibuang; bentuk alif (ٱ أ إ آ dan alif kecil U+0670) disamakan menjadi ا. Kalimat qul + huwa + Allāh (tiga token 112:1) dicari dengan cara yang sama. Dicek di QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 112, 113 dan 114 identik byte-per-byte dengan 1.1 yang dipakai): di setiap tempat kata kedua berlemma Allāh.",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token 112:1:2 + 112:1:3 berurutan; 112:1:1–3",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; LEM:{ll~ah pada kata kedua",
+          "url": "https://corpus.quran.com/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "wa-lam-yakun-lahu",
+      "title": "Wa lam yakun lahu di 3 ayat",
+      "body": "Rangkaian «وَلَمْ يَكُن لَّهُۥ» (dan tidak ada bagi-Nya) muncul 4 kali dalam 3 ayat: dua kali di 17:111, sekali di 25:2 dan sekali di 112:4. Di 17:111 dan 25:2, kemunculan pertamanya didahului «لَمْ يَتَّخِذْ وَلَدًا» (tidak mengambil anak) dan diikuti «شَرِيكٌ فِى ٱلْمُلْكِ» (sekutu dalam kerajaan).",
+      "locations": [
+        "17:111",
+        "25:2",
+        "112:4"
+      ],
+      "method": "Tiga token berurutan wa-lam + yakun + lahu (diambil dari 112:4) di teks Tanzil setelah basmalah pembuka surah dibuang; kunci pencarian: tatweel (U+0640), harakat dan tanda baca Qur'ani (U+064B–U+065F, U+06D6–U+06ED) dibuang; bentuk alif (ٱ أ إ آ dan alif kecil U+0670) disamakan menjadi ا. Tiga token sebelum dan sesudah kemunculan pertamanya di 17:111 dan 25:2 dibandingkan dengan cara yang sama (token pertama boleh berawalan wa-).",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token 112:4:1–3 berurutan; tiga token sebelum/sesudah di ayat lain",
+          "url": "https://tanzil.net/download/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "qul",
+      "title": "Qul: 332 kali",
+      "body": "Perintah qul (katakanlah), bentuk perintah kata kerja qāla untuk satu orang (dalam tata bahasa Arab berbentuk mudzakkar), muncul 332 kali dalam 306 ayat Al-Qur'an, termasuk yang berawalan wa- atau fa-. Bentuk untuk orang banyak, qūlū, muncul 12 kali.",
+      "locations": [
+        "2:80",
+        "2:91",
+        "2:93",
+        "2:94",
+        "2:97",
+        "2:111",
+        "2:120",
+        "2:135",
+        "2:139",
+        "2:140",
+        "2:142",
+        "2:189",
+        "2:215",
+        "2:217",
+        "2:219",
+        "2:220",
+        "2:222",
+        "3:12",
+        "3:15",
+        "3:20",
+        "3:26",
+        "3:29",
+        "3:31",
+        "3:32",
+        "3:61",
+        "3:64",
+        "3:73",
+        "3:84",
+        "3:93",
+        "3:95",
+        "3:98",
+        "3:99",
+        "3:119",
+        "3:154",
+        "3:165",
+        "3:168",
+        "3:183",
+        "4:63",
+        "4:77",
+        "4:78",
+        "4:127",
+        "4:176",
+        "5:4",
+        "5:17",
+        "5:18",
+        "5:59",
+        "5:60",
+        "5:68",
+        "5:76",
+        "5:77",
+        "5:100",
+        "6:11",
+        "6:12",
+        "6:14",
+        "6:15",
+        "6:19",
+        "6:37",
+        "6:40",
+        "6:46",
+        "6:47",
+        "6:50",
+        "6:54",
+        "6:56",
+        "6:57",
+        "6:58",
+        "6:63",
+        "6:64",
+        "6:65",
+        "6:66",
+        "6:71",
+        "6:90",
+        "6:91",
+        "6:109",
+        "6:135",
+        "6:143",
+        "6:144",
+        "6:145",
+        "6:147",
+        "6:148",
+        "6:149",
+        "6:150",
+        "6:151",
+        "6:158",
+        "6:161",
+        "6:162",
+        "6:164",
+        "7:28",
+        "7:29",
+        "7:32",
+        "7:33",
+        "7:158",
+        "7:187",
+        "7:188",
+        "7:195",
+        "7:203",
+        "8:1",
+        "8:38",
+        "8:70",
+        "9:24",
+        "9:51",
+        "9:52",
+        "9:53",
+        "9:61",
+        "9:64",
+        "9:65",
+        "9:81",
+        "9:83",
+        "9:94",
+        "9:105",
+        "9:129",
+        "10:15",
+        "10:16",
+        "10:18",
+        "10:20",
+        "10:21",
+        "10:31",
+        "10:34",
+        "10:35",
+        "10:38",
+        "10:41",
+        "10:49",
+        "10:50",
+        "10:53",
+        "10:58",
+        "10:59",
+        "10:69",
+        "10:101",
+        "10:102",
+        "10:104",
+        "10:108",
+        "11:13",
+        "11:35",
+        "11:121",
+        "12:108",
+        "13:16",
+        "13:27",
+        "13:30",
+        "13:33",
+        "13:36",
+        "13:43",
+        "14:30",
+        "14:31",
+        "15:89",
+        "16:102",
+        "17:23",
+        "17:24",
+        "17:28",
+        "17:42",
+        "17:50",
+        "17:51",
+        "17:53",
+        "17:56",
+        "17:80",
+        "17:81",
+        "17:84",
+        "17:85",
+        "17:88",
+        "17:93",
+        "17:95",
+        "17:96",
+        "17:100",
+        "17:107",
+        "17:110",
+        "17:111",
+        "18:22",
+        "18:24",
+        "18:26",
+        "18:29",
+        "18:83",
+        "18:103",
+        "18:109",
+        "18:110",
+        "19:75",
+        "20:105",
+        "20:114",
+        "20:135",
+        "21:24",
+        "21:42",
+        "21:45",
+        "21:108",
+        "21:109",
+        "22:49",
+        "22:68",
+        "22:72",
+        "23:28",
+        "23:29",
+        "23:84",
+        "23:85",
+        "23:86",
+        "23:87",
+        "23:88",
+        "23:89",
+        "23:93",
+        "23:97",
+        "23:118",
+        "24:30",
+        "24:31",
+        "24:53",
+        "24:54",
+        "25:6",
+        "25:15",
+        "25:57",
+        "25:77",
+        "26:216",
+        "27:59",
+        "27:64",
+        "27:65",
+        "27:69",
+        "27:72",
+        "27:92",
+        "27:93",
+        "28:49",
+        "28:71",
+        "28:72",
+        "28:85",
+        "29:20",
+        "29:50",
+        "29:52",
+        "29:63",
+        "30:42",
+        "31:25",
+        "32:11",
+        "32:29",
+        "33:16",
+        "33:17",
+        "33:28",
+        "33:59",
+        "33:63",
+        "34:3",
+        "34:22",
+        "34:24",
+        "34:25",
+        "34:26",
+        "34:27",
+        "34:30",
+        "34:36",
+        "34:39",
+        "34:46",
+        "34:47",
+        "34:48",
+        "34:49",
+        "34:50",
+        "35:40",
+        "36:79",
+        "37:18",
+        "38:65",
+        "38:67",
+        "38:86",
+        "39:8",
+        "39:9",
+        "39:10",
+        "39:11",
+        "39:13",
+        "39:14",
+        "39:15",
+        "39:38",
+        "39:39",
+        "39:43",
+        "39:44",
+        "39:46",
+        "39:53",
+        "39:64",
+        "40:66",
+        "41:6",
+        "41:9",
+        "41:13",
+        "41:44",
+        "41:52",
+        "42:15",
+        "42:23",
+        "43:81",
+        "43:89",
+        "45:14",
+        "45:26",
+        "46:4",
+        "46:8",
+        "46:9",
+        "46:10",
+        "48:11",
+        "48:15",
+        "48:16",
+        "49:14",
+        "49:16",
+        "49:17",
+        "52:31",
+        "56:49",
+        "62:6",
+        "62:8",
+        "62:11",
+        "64:7",
+        "67:23",
+        "67:24",
+        "67:26",
+        "67:28",
+        "67:29",
+        "67:30",
+        "72:1",
+        "72:20",
+        "72:21",
+        "72:22",
+        "72:25",
+        "79:18",
+        "109:1",
+        "112:1",
+        "113:1",
+        "114:1"
+      ],
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 112, 113 dan 114 identik byte-per-byte dengan 1.1 yang dipakai): segmen STEM dengan LEM:qaAla, POS V, bertanda IMPV dan 2MS = 332 dalam 306 ayat (ayat dihitung sekali walau memuat qul lebih dari sekali); IMPV 2MP = 12. Dicek di Tanzil: 333 token qul (boleh berawalan wa- atau fa-); 1 di antaranya kata lain yang tulisannya sama tanpa harakat (lemma QAC: qal~a 1).",
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; LEM:qaAla, IMPV 2MS dan 2MP",
+          "url": "https://corpus.quran.com/"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token 112:1:1, awalan wa-/fa-",
+          "url": "https://tanzil.net/download/"
+        }
+      ],
+      "status": "draft",
+      "_homographs": [
+        {
+          "loc": "4:7:14",
+          "token": "قَلَّ",
+          "qac_lem": "qal~a",
+          "qac_root": "qll"
+        }
+      ]
+    },
+    {
+      "id": "lima-surah-qul",
+      "title": "Lima surah dibuka dengan qul",
+      "body": "Ada 5 surah yang ayat pertamanya dibuka dengan «قُلْ» (katakanlah): Al-Jinn (72:1), Al-Kafirun (109:1), Al-Ikhlas (112:1), Al-Falaq (113:1) dan An-Nas (114:1).",
+      "locations": [
+        "72:1",
+        "109:1",
+        "112:1",
+        "113:1",
+        "114:1"
+      ],
+      "method": "Token pertama ayat 1 setiap surah di Tanzil Uthmani 1.1, setelah basmalah pembuka surah dibuang, dibandingkan dengan token 112:1:1 (tanpa awalan); kunci pencarian: tatweel (U+0640), harakat dan tanda baca Qur'ani (U+064B–U+065F, U+06D6–U+06ED) dibuang; bentuk alif (ٱ أ إ آ dan alif kecil U+0670) disamakan menjadi ا. Dicek di QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 112, 113 dan 114 identik byte-per-byte dengan 1.1 yang dipakai): kata pertama kelima ayat itu berlemma qāla dengan tanda IMPV 2MS.",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token pertama ayat 1 setiap surah",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; LEM:qaAla IMPV 2MS pada kata 1 ayat 1",
+          "url": "https://corpus.quran.com/"
+        }
+      ],
+      "status": "draft",
+      "_shared": [
+        "al-ikhlas",
+        "al-falaq",
+        "an-nas"
+      ]
+    },
+    {
+      "id": "setara-sepertiga-al-quran",
+      "title": "Setara dengan sepertiga Al-Qur'an",
+      "body": "Abu Sa'id al-Khudri meriwayatkan: seseorang mendengar orang lain membaca surah ini berulang-ulang, lalu menceritakannya kepada Rasulullah ﷺ seolah menganggapnya sedikit. Rasulullah ﷺ bersumpah bahwa surah ini setara dengan sepertiga Al-Qur'an (Shahih al-Bukhari no. 5013). Makna yang sama ada dalam riwayat Abu ad-Darda' dan Abu Hurairah (Shahih Muslim no. 811a dan 812a).",
+      "locations": [
+        "112:1",
+        "112:2",
+        "112:3",
+        "112:4"
+      ],
+      "method": "Bukan hitungan. Isi hadits dirangkum dari teks Arab rekamannya di korpus platform (api/data), tanpa menambah makna; teks Arab, terjemahan korpus, dan sha256 rekaman dicatat di authored/*.hadith.json. nomor al-Bukhari = nomor korpus (sama dengan sunnah.com); nomor Muslim dipetakan dari nomor urut korpus ke penomoran Fuad 'Abdul Baqi (sunnah.com) lewat fawazahmed0, setelah teks Arabnya dicek identik.",
+      "sources": [
+        {
+          "kitab": "Sahih al-Bukhari",
+          "ref": "no. 5013 (penomoran sunnah.com); korpus platform bukhari.json hadithnumber 5013, rekaman sha256:7220669f708446f1",
+          "url": "https://sunnah.com/bukhari:5013"
+        },
+        {
+          "kitab": "Sahih Muslim",
+          "ref": "no. 811a (penomoran sunnah.com); korpus platform muslim.json hadithnumber 1886, rekaman sha256:1d291e1ea64e4bb6",
+          "url": "https://sunnah.com/muslim:811a"
+        },
+        {
+          "kitab": "Sahih Muslim",
+          "ref": "no. 812a (penomoran sunnah.com); korpus platform muslim.json hadithnumber 1888, rekaman sha256:29bb8619d5a864fb",
+          "url": "https://sunnah.com/muslim:812a"
+        }
+      ],
+      "status": "draft",
+      "_hadith": [
+        "Sahih al-Bukhari 5013",
+        "Sahih Muslim 811a",
+        "Sahih Muslim 812a"
+      ]
+    },
+    {
+      "id": "mencintai-surah-ini",
+      "title": "Mencintai surah ini",
+      "body": "Aisyah meriwayatkan bahwa seorang sahabat yang memimpin pasukan kecil selalu menutup bacaan shalatnya dengan surah ini. Ketika ditanya, ia menjawab bahwa surah ini adalah sifat ar-raḥmān dan ia senang membacanya. Rasulullah ﷺ lalu menyuruh agar orang itu diberi kabar bahwa Allah mencintainya (Shahih al-Bukhari no. 7375; Shahih Muslim no. 813). Dalam riwayat Anas yang dicantumkan an-Nawawi (Riyadhush Shalihin no. 1013), seseorang berkata kepada Rasulullah ﷺ bahwa ia mencintai surah ini, dan beliau bersabda bahwa kecintaannya kepada surah ini memasukkannya ke surga. An-Nawawi menyebut at-Tirmidzi menilainya hasan, dan al-Bukhari meriwayatkannya secara ta'liq.",
+      "locations": [
+        "112:1",
+        "112:2",
+        "112:3",
+        "112:4"
+      ],
+      "method": "Bukan hitungan. Isi hadits dirangkum dari teks Arab rekamannya di korpus platform (api/data), tanpa menambah makna; teks Arab, terjemahan korpus, dan sha256 rekaman dicatat di authored/*.hadith.json. nomor al-Bukhari = nomor korpus (sama dengan sunnah.com); nomor Muslim dipetakan dari nomor urut korpus ke penomoran Fuad 'Abdul Baqi (sunnah.com) lewat fawazahmed0, setelah teks Arabnya dicek identik; nomor Riyadhush Shalihin dipetakan dari nomor korpus ke penomoran sunnah.com; penilaian dikutip apa adanya dari akhir teks an-Nawawi.",
+      "sources": [
+        {
+          "kitab": "Sahih al-Bukhari",
+          "ref": "no. 7375 (penomoran sunnah.com); korpus platform bukhari.json hadithnumber 7375, rekaman sha256:42722b3bbf15c1ad",
+          "url": "https://sunnah.com/bukhari:7375"
+        },
+        {
+          "kitab": "Sahih Muslim",
+          "ref": "no. 813 (penomoran sunnah.com); korpus platform muslim.json hadithnumber 1890, rekaman sha256:41d8ef486cfb54e3",
+          "url": "https://sunnah.com/muslim:813"
+        },
+        {
+          "kitab": "an-Nawawi, Riyad as-Salihin",
+          "ref": "no. 1013 (penomoran sunnah.com); korpus platform riyad-as-salihin.json hadithnumber 334, rekaman sha256:824796d98b341ada; penilaian: Hasan menurut at-Tirmidzi; al-Bukhari meriwayatkannya secara ta'liq (keduanya disebut an-Nawawi di akhir hadits)",
+          "url": "https://sunnah.com/riyadussalihin:1013"
+        }
+      ],
+      "status": "draft",
+      "_hadith": [
+        "Sahih al-Bukhari 7375",
+        "Sahih Muslim 813",
+        "Riyad as-Salihin 1013"
+      ]
+    },
+    {
+      "id": "hadits-qudsi-al-ikhlas",
+      "title": "Al-Ikhlas dalam hadits qudsi",
+      "body": "Abu Hurairah meriwayatkan sebuah hadits qudsi: Allah menyebut ucapan anak Adam (manusia) bahwa Allah mengambil anak sebagai celaan kepada-Nya, lalu menyebut diri-Nya dengan sifat-sifat yang juga ada dalam surah ini: al-aḥad, aṣ-ṣamad, tidak beranak dan tidak diperanakkan, serta tidak ada seorang pun yang setara dengan-Nya (Shahih al-Bukhari no. 4974).",
+      "locations": [
+        "112:1",
+        "112:2",
+        "112:3",
+        "112:4"
+      ],
+      "method": "Bukan hitungan. Isi hadits dirangkum dari teks Arab rekamannya di korpus platform (api/data), tanpa menambah makna; teks Arab, terjemahan korpus, dan sha256 rekaman dicatat di authored/*.hadith.json. nomor al-Bukhari = nomor korpus (sama dengan sunnah.com).",
+      "sources": [
+        {
+          "kitab": "Sahih al-Bukhari",
+          "ref": "no. 4974 (penomoran sunnah.com); korpus platform bukhari.json hadithnumber 4974, rekaman sha256:cec96cac3cd6c7e8",
+          "url": "https://sunnah.com/bukhari:4974"
+        }
+      ],
+      "status": "draft",
+      "_hadith": [
+        "Sahih al-Bukhari 4974"
+      ]
+    },
+    {
+      "id": "dua-rakaat-fajar",
+      "title": "Dibaca di dua rakaat fajar",
+      "body": "Abu Hurairah meriwayatkan bahwa Rasulullah ﷺ membaca surah Al-Kafirun dan Al-Ikhlas dalam dua rakaat fajar (Shahih Muslim no. 726).",
+      "locations": [
+        "109:1",
+        "109:2",
+        "109:3",
+        "109:4",
+        "109:5",
+        "109:6",
+        "112:1",
+        "112:2",
+        "112:3",
+        "112:4"
+      ],
+      "method": "Bukan hitungan. Isi hadits dirangkum dari teks Arab rekamannya di korpus platform (api/data), tanpa menambah makna; teks Arab, terjemahan korpus, dan sha256 rekaman dicatat di authored/*.hadith.json. nomor Muslim dipetakan dari nomor urut korpus ke penomoran Fuad 'Abdul Baqi (sunnah.com) lewat fawazahmed0, setelah teks Arabnya dicek identik.",
+      "sources": [
+        {
+          "kitab": "Sahih Muslim",
+          "ref": "no. 726 (penomoran sunnah.com); korpus platform muslim.json hadithnumber 1690, rekaman sha256:99b5a1d52e75cc2d",
+          "url": "https://sunnah.com/muslim:726"
+        }
+      ],
+      "status": "draft",
+      "_hadith": [
+        "Sahih Muslim 726"
+      ]
+    },
+    {
+      "id": "sebelum-tidur",
+      "title": "Dibaca sebelum tidur",
+      "body": "Aisyah menuturkan: setiap malam, ketika beranjak ke tempat tidurnya, Rasulullah ﷺ menyatukan kedua telapak tangannya, meniupnya, dan membaca ke dalamnya Al-Ikhlas, Al-Falaq, dan An-Nas. Kemudian beliau mengusapkan kedua tangannya ke tubuh sejauh yang terjangkau, dimulai dari kepala, wajah, dan bagian depan tubuh. Beliau melakukannya tiga kali (Shahih al-Bukhari no. 5017). Dalam riwayat lain, Aisyah menyebut bahwa ketika beliau sakit, beliau menyuruh Aisyah melakukannya untuk beliau (Shahih al-Bukhari no. 5748).",
+      "locations": [
+        "112:1",
+        "112:2",
+        "112:3",
+        "112:4",
+        "113:1",
+        "113:2",
+        "113:3",
+        "113:4",
+        "113:5",
+        "114:1",
+        "114:2",
+        "114:3",
+        "114:4",
+        "114:5",
+        "114:6"
+      ],
+      "method": "Bukan hitungan. Isi hadits dirangkum dari teks Arab rekamannya di korpus platform (api/data), tanpa menambah makna; teks Arab, terjemahan korpus, dan sha256 rekaman dicatat di authored/*.hadith.json. nomor al-Bukhari = nomor korpus (sama dengan sunnah.com).",
+      "sources": [
+        {
+          "kitab": "Sahih al-Bukhari",
+          "ref": "no. 5017 (penomoran sunnah.com); korpus platform bukhari.json hadithnumber 5017, rekaman sha256:bff5c0381ff5eb0e",
+          "url": "https://sunnah.com/bukhari:5017"
+        },
+        {
+          "kitab": "Sahih al-Bukhari",
+          "ref": "no. 5748 (penomoran sunnah.com); korpus platform bukhari.json hadithnumber 5748, rekaman sha256:67fc69d263f04457",
+          "url": "https://sunnah.com/bukhari:5748"
+        }
+      ],
+      "status": "draft",
+      "_hadith": [
+        "Sahih al-Bukhari 5017",
+        "Sahih al-Bukhari 5748"
+      ],
+      "_shared": [
+        "al-ikhlas",
+        "al-falaq",
+        "an-nas"
+      ]
+    },
+    {
+      "id": "pagi-dan-petang",
+      "title": "Pagi dan petang, tiga kali",
+      "body": "'Abdullah bin Khubaib meriwayatkan bahwa Rasulullah ﷺ menyuruhnya membaca Al-Ikhlas dan al-mu‘awwiżatain pada petang dan pagi hari, tiga kali, dan bersabda bahwa bacaan itu mencukupinya dari segala sesuatu. An-Nawawi mencantumkannya (Riyadhush Shalihin no. 1456) dari riwayat Abu Dawud dan at-Tirmidzi, dan menyebut at-Tirmidzi menilainya hasan shahih.",
+      "locations": [
+        "112:1",
+        "112:2",
+        "112:3",
+        "112:4",
+        "113:1",
+        "113:2",
+        "113:3",
+        "113:4",
+        "113:5",
+        "114:1",
+        "114:2",
+        "114:3",
+        "114:4",
+        "114:5",
+        "114:6"
+      ],
+      "method": "Bukan hitungan. Isi hadits dirangkum dari teks Arab rekamannya di korpus platform (api/data), tanpa menambah makna; teks Arab, terjemahan korpus, dan sha256 rekaman dicatat di authored/*.hadith.json. nomor Riyadhush Shalihin dipetakan dari nomor korpus ke penomoran sunnah.com; penilaian dikutip apa adanya dari akhir teks an-Nawawi.",
+      "sources": [
+        {
+          "kitab": "an-Nawawi, Riyad as-Salihin",
+          "ref": "no. 1456 (penomoran sunnah.com); korpus platform riyad-as-salihin.json hadithnumber 777, rekaman sha256:20a1bf82373c5bd7; penilaian: Hasan shahih menurut at-Tirmidzi; diriwayatkan Abu Dawud dan at-Tirmidzi (disebut an-Nawawi di akhir hadits)",
+          "url": "https://sunnah.com/riyadussalihin:1456"
+        }
+      ],
+      "status": "draft",
+      "_hadith": [
+        "Riyad as-Salihin 1456"
+      ],
+      "_shared": [
+        "al-ikhlas",
+        "al-falaq",
+        "an-nas"
+      ]
+    }
+  ]
+}

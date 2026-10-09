@@ -7,8 +7,13 @@ Inputs (pinned in sources.json and verified by sha256 before use):
   authored/library.concepts.json (Konsep, author B; passed through after a shape check, minus
   each record's reviewer-only `review_notes`).
 
+Covered surahs: every surah registered in common.SURAHS whose authored/<slug>.words.json exists,
+in mushaf order (`--only <slug> ...` narrows the set, e.g. to rebuild the Al-Fatihah-only file).
+Lemmas and roots are listed in reading order of first occurrence across the covered surahs, so
+adding a later surah appends records and never reorders the earlier ones.
+
 Data-derived here, never typed: the list of lemmas and roots the covered surahs need, lemma_ar
-(QAC LEM, Buckwalter -> Arabic), root letters, pos (build_fatihah.pos_label), lemma and root
+(QAC LEM, Buckwalter -> Arabic), root letters, pos (build_surah.pos_label), lemma and root
 counts, root ids, root lemma lists, QAC source refs. Typed in the authored file: translit,
 meaning, tashrif rows, i'lal, root meaning, kitab refs. Every record is status "draft".
 The build stops (exit 1) on any structural or sourcing problem. No network, no LLM.
@@ -21,17 +26,28 @@ import sys
 import urllib.parse
 from collections import Counter
 
-import build_fatihah
+import build_surah
 import validate as V
-from common import (ARABIC_RUN, CONTENT_DIR, PIPELINE, SCHEMA_TS, bw_to_ar, load_qac, load_sources, load_tanzil,
-                    qac_words, require_pinned, root_letters, sha256_file, stem_of)
-from facts import QAC_BASIS, QAC_TANZIL_HEADER, fmt
+from common import (ARABIC_RUN, CONTENT_DIR, PIPELINE, SCHEMA_TS, SURAH_BY_SLUG, authored_file, authored_surahs,
+                    bw_to_ar, load_qac, load_sources, load_tanzil, qac_words, require_pinned, root_letters,
+                    sha256_file, stem_of)
+from facts import QAC_BASIS, QAC_TANZIL_HEADER, fmt, refs_text
 
 LEXICON = PIPELINE / "authored" / "library.lexicon.json"
 CONCEPTS = PIPELINE / "authored" / "library.concepts.json"
-WORDS = {1: PIPELINE / "authored" / "al-fatihah.words.json"}
 OUT = CONTENT_DIR / "library.json"
-SURAHS = [1]  # surahs whose every stem lemma and root must have a library entry
+SURAHS = [1]  # surahs whose every stem lemma and root must have a library entry (set in main)
+WORDS = {1: authored_file("al-fatihah", "words")}  # surah -> authored word file (set in main)
+
+
+def qac_basis(surahs: list[int]) -> str:
+    """facts.QAC_BASIS for Al-Fatihah alone (unchanged), naming every covered surah otherwise;
+    validate.py byte-checks the QAC words of every lesson surah against Tanzil 1.1."""
+    if surahs == [1]:
+        return QAC_BASIS
+    return QAC_BASIS.replace("surah 1 identik", f"surah {refs_text([str(s) for s in surahs])} identik")
+
+
 QAC_KITAB = "Quranic Arabic Corpus 0.4 (morfologi)"
 ID_RE = re.compile(r"^[a-z0-9-]+$")
 LOC_RE = re.compile(r"^\d{1,3}:\d{1,3}:\d{1,3}$")
@@ -62,7 +78,10 @@ assert len(set(ROOT_ID_TOKEN.values())) == len(ROOT_ID_TOKEN)
 # QAC POS tags named in an occurrence method when one lemma carries more than one of them.
 POS_NAME = {"N": "isim", "ADJ": "isim sifat", "PN": "isim 'alam", "T": "keterangan waktu", "V": "fi'il",
             "NEG": "huruf nafi", "PRO": "larangan", "REL": "isim maushul", "COND": "makna syarat",
-            "P": "huruf jar", "PRON": "dhamir", "DEM": "isim isyarah"}
+            "P": "huruf jar", "PRON": "dhamir", "DEM": "isim isyarah",
+            # QAC tagset names (corpus.quran.com/documentation/tagset.jsp), for mā and idzā:
+            "PREV": "pencegah (kaffah)", "INTG": "kata tanya (istifham)", "SUB": "huruf mashdariyyah",
+            "SUP": "tambahan (zaidah)", "SUR": "kejutan (fuja'iyyah)"}
 ASPECT = [("PERF", "madhi"), ("IMPF", "mudhari'"), ("IMPV", "amr")]
 
 errors: list[str] = []
@@ -141,12 +160,12 @@ def number_of(st) -> str | None:
 
 
 def lemma_pos(st, hits) -> str:
-    """Lemma-level learner label: the word-card label of the stem (build_fatihah.pos_label), with
+    """Lemma-level learner label: the word-card label of the stem (build_surah.pos_label), with
     verbs as plain "fi'il" (aspect belongs to a word, not a lemma) and the number mark dropped
     unless every QAC occurrence of the lemma has it (e.g. ‘ālamīn, always plural)."""
     if st.tag == "V":
         return "fi'il"
-    label = build_fatihah.pos_label([st])
+    label = build_surah.pos_label([st])
     nums = {number_of(g) for g in hits}
     if nums != {"P"}:
         label = label.replace(" (jamak)", "")
@@ -204,7 +223,16 @@ def check_sources(srcs: list, where: str) -> None:
 
 
 # ---------------------------------------------------------------- main
-def main() -> int:
+def main(only: list[str] | None = None) -> int:
+    global SURAHS, WORDS
+    specs = [SURAH_BY_SLUG[x] for x in only] if only else authored_surahs()
+    specs = sorted(specs, key=lambda sp: sp.surah)
+    if not specs:
+        err("no covered surah: no authored/<slug>.words.json for any slug in common.SURAHS")
+        return finish(None)
+    SURAHS = [sp.surah for sp in specs]
+    WORDS = {sp.surah: authored_file(sp.slug, "words") for sp in specs}
+    basis = qac_basis(SURAHS)
     src = load_sources()
     I = src["inputs"]
     segs, qac_header = load_qac(require_pinned(src, "qac_morphology"))
@@ -230,7 +258,10 @@ def main() -> int:
             continue
         st = stem_of(W[key])
         if "LEM" not in st.feat:
-            err(f"QAC word {':'.join(map(str, key))} has no LEM")
+            if st.tag == "PRON":  # QAC 0.4 leaves some pronoun stems without a lemma (112:1:2, 112:4:3)
+                warnings.append(f"QAC word {':'.join(map(str, key))} ({st.tag}) has no LEM: no lexeme for it")
+            else:
+                err(f"QAC word {':'.join(map(str, key))} has no LEM")
             continue
         need_lem.setdefault(st.feat["LEM"], st)
         if "ROOT" in st.feat:
@@ -309,13 +340,18 @@ def main() -> int:
             if "fi'il amr" in labels and not aspects.get("amr"):
                 err(f"{tw}: a fi'il amr form needs QAC to tag {vl} IMPV somewhere (it does not)")
             vfs = {vf_of(g) for g in vh}
+            # QAC marks only forms II-XII; an unmarked verb on a four-letter root (w-s-w-s,
+            # yuwaswisu 114:5:2) is the basic ruba'i form, not tsulatsi form I.
+            quad = bool(bw_root) and len(bw_root) == 4
             if len(vfs) > 1:
                 err(f"{tw}: QAC verb forms of {vl} are mixed: {vfs}")
             elif vfs:
                 vf = next(iter(vfs))
-                if BAB_FOR_VF.get(vf, "\0") not in t["bab"]:
-                    err(f"{tw}: QAC verb form {vf} for {vl} but bab {t['bab']!r} does not name "
-                        f"{BAB_FOR_VF.get(vf)!r}")
+                want = "Ruba'i mujarrad" if quad and vf == "I" else BAB_FOR_VF.get(vf, "\0")
+                if quad and vf != "I":
+                    err(f"{tw}: four-letter root {bw_root} with QAC verb form {vf}: no ruba'i mazid bab mapped yet")
+                elif want not in t["bab"]:
+                    err(f"{tw}: QAC verb form {vf} for {vl} but bab {t['bab']!r} does not name {want!r}")
             for run in ARABIC_RUN.findall(t["bab"]):
                 check_typed_arabic(run, f"{tw}.bab")
             for i, f in enumerate(t["forms"]):
@@ -335,7 +371,8 @@ def main() -> int:
             sources.append({
                 "kitab": QAC_KITAB,
                 "ref": f"(tashrif) sha256:{qsha[:16]}; fi'il LEM:{vl}, bentuk kata kerja (VF) "
-                       f"{'/'.join(sorted(vfs)) or '?'} (QAC menandai II–XII; tanpa tanda = I), "
+                       f"{'/'.join(sorted(vfs)) or '?'} (QAC menandai II–XII; tanpa tanda = I"
+                       + ("; akar empat huruf, jadi bentuk dasarnya ruba'i mujarrad" if quad else "") + "), "
                        f"dipakai {fmt(len(vh))} kali: {asp}"
                        + (f"; bentuk lain dari baris ini yang dipakai Al-Qur'an: {', '.join(attest)}" if attest else ""),
                 "url": qac_url(bw_root, first)})
@@ -355,7 +392,7 @@ def main() -> int:
         out["ilal"] = ilal
 
         ayat = {(g.s, g.a) for g in hits}
-        method = (f"{QAC_BASIS}: jumlah segmen STEM dengan LEM:{lem} (lemma kata {loc}), dalam {fmt(len(ayat))} "
+        method = (f"{basis}: jumlah segmen STEM dengan LEM:{lem} (lemma kata {loc}), dalam {fmt(len(ayat))} "
                   f"ayat; ayat dihitung sekali walau memuat kata ini lebih dari sekali.{pos_breakdown(hits)}")
         if any(g.s == 1 and g.a == 1 for g in hits):
             method += " QAC tidak memuat basmalah pembuka surah, tetapi memuat 1:1 dan 27:30."
@@ -423,7 +460,7 @@ def main() -> int:
             "id": root_id(r), "letters": root_letters(r), "meaning": e["meaning"], "lemmas": lemmas,
             "occurrences": {
                 "count": len(hits),
-                "method": f"{QAC_BASIS}: jumlah segmen STEM dengan ROOT:{r} (akar kata {loc}), dalam "
+                "method": f"{basis}: jumlah segmen STEM dengan ROOT:{r} (akar kata {loc}), dalam "
                           f"{fmt(len(ayat))} ayat. Hitungan ini menggabungkan semua {nlem} lemma seakar di QAC, "
                           f"termasuk yang maknanya berjauhan. Lemma akar ini yang sudah ada di Kosakata: "
                           f"{', '.join(translits)}."},
@@ -448,7 +485,7 @@ def main() -> int:
                 err(f"concepts[{c.get('id')}]: review_notes must be a list of sentences")
         concepts = [{k: v for k, v in c.items() if k != "review_notes"} for c in concepts]
         concepts_ver = f"authored/library.concepts.json sha256:{sha256_file(CONCEPTS)}"
-        fatihah_locs = {":".join(map(str, k)) for k in W if k[0] in SURAHS}
+        covered_locs = {":".join(map(str, k)) for k in W if k[0] in SURAHS}
         cids = [c.get("id") for c in concepts]
         for c in concepts:
             cw = f"concepts[{c.get('id')}]"
@@ -463,7 +500,7 @@ def main() -> int:
             for x in c.get("examples") or []:
                 if not LOC_RE.match(x.get("loc", "")) or len(x.get("note", "")) < 5:
                     err(f"{cw}: bad example {x!r}")
-                elif x["loc"] not in fatihah_locs:
+                elif x["loc"] not in covered_locs:
                     warnings.append(f"{cw}: example {x['loc']} is not a word of the covered surahs")
             if not c.get("examples"):
                 err(f"{cw}: needs ≥1 example")
@@ -507,9 +544,9 @@ def main() -> int:
     for kind, recs in (("concept", concepts), ("lexeme", lexicon), ("root", roots)):
         for x in recs:
             if x.get("status") != "draft":
-                err(f"{kind} {x.get('id')}: status must be 'draft' until an ustadz signs it off")
+                err(f"{kind} {x.get('id')}: status must be 'draft' (pipeline state; plan L11)")
     errors.extend(V.fails)
-    errors.extend(build_fatihah.errors)
+    errors.extend(build_surah.errors)
     return finish(out)
 
 
@@ -547,7 +584,16 @@ def finish(out) -> int:
 
 
 if __name__ == "__main__":
-    if sys.argv[1:] == ["--word-map"]:
-        print(json.dumps(word_lemma_ids(), ensure_ascii=False, indent=2))
+    args = sys.argv[1:]
+    if args[:1] == ["--word-map"]:
+        # python3 build_library.py --word-map [slug]   (default al-fatihah)
+        slug = args[1] if len(args) > 1 else "al-fatihah"
+        print(json.dumps(word_lemma_ids(SURAH_BY_SLUG[slug].surah), ensure_ascii=False, indent=2))
         sys.exit(0)
+    if args[:1] == ["--only"] and len(args) > 1 and all(a in SURAH_BY_SLUG for a in args[1:]):
+        sys.exit(main(args[1:]))
+    if args:
+        print(f"usage: python3 build_library.py [--only <slug> ...] | --word-map [slug]   "
+              f"(slugs: {', '.join(SURAH_BY_SLUG)})", file=sys.stderr)
+        sys.exit(2)
     sys.exit(main())

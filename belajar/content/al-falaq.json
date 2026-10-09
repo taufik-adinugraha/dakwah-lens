@@ -1,0 +1,2809 @@
+{
+  "surah": 113,
+  "slug": "al-falaq",
+  "name_ar": "الفلق",
+  "name_id": "Al-Falaq",
+  "ayat": [
+    {
+      "loc": "113:1",
+      "surah": 113,
+      "ayah": 1,
+      "ar": "قُلْ أَعُوذُ بِرَبِّ ٱلْفَلَقِ",
+      "words": [
+        {
+          "loc": "113:1:1",
+          "ar": "قُلْ",
+          "translit": "qul",
+          "gloss": "katakanlah",
+          "root": [
+            "ق",
+            "و",
+            "ل"
+          ],
+          "lemma": "قَالَ",
+          "pos": "fi'il amr",
+          "wazn": null,
+          "case": {
+            "state": "mabni",
+            "sign": "sukun"
+          },
+          "why": "Kata perintah (fi'il amr) ini mabni di atas sukun, jadi akhirnya tetap; pelakunya tersirat, yaitu “engkau”.",
+          "lemma_id": "qala",
+          "concepts": [
+            "fiil-amr",
+            "maqul-al-qaul"
+          ],
+          "role": "fi'il amr (fa'il tersimpan: “engkau”)",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 623 (al-I'rab QS 113:1–5; Shamela 2163/5781)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/1"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 15, hlm. 427 (QS 113, bagian al-I'rab; Shamela 22916/5919)",
+              "url": "https://tafsir.app/aljadwal/113/1"
+            },
+            {
+              "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+              "ref": "jil. 3, hlm. 476 (QS 113:1; Shamela 23584/1398)",
+              "url": "https://tafsir.app/iraab-daas/113/1"
+            },
+            {
+              "kitab": "Ibnu Hisyam al-Anshari, Syarh Qathr an-Nada wa Ball ash-Shada (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, cet. 11, 1383 H/1963 M)",
+              "ref": "hlm. 31, Fi'l al-Amr: hukum asalnya mabni di atas sukun",
+              "url": "https://shamela.ws/book/6970/19"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:1:1:*) — akar, lemma, kelas kata: V|STEM|POS:V|IMPV|LEM:qaAla|ROOT:qwl|2MS",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=1"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 113:1",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "113:1:2",
+          "ar": "أَعُوذُ",
+          "translit": "a‘ūżu",
+          "gloss": "aku berlindung",
+          "root": [
+            "ع",
+            "و",
+            "ذ"
+          ],
+          "lemma": "عُذْ",
+          "pos": "fi'il mudhari'",
+          "wazn": "أَفْعُلُ",
+          "case": {
+            "state": "marfu",
+            "sign": "dhammah"
+          },
+          "why": "Akhirnya dhammah karena fi'il mudhari' ini tidak didahului huruf penashab atau penjazm; pelakunya tersirat, yaitu “aku”.",
+          "lemma_id": "adha",
+          "concepts": [
+            "fiil-mudhari",
+            "jumlah-filiyyah",
+            "maqul-al-qaul"
+          ],
+          "role": "fi'il mudhari' (fa'il tersimpan: “aku”); kalimatnya maqul al-qaul",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 623 (al-I'rab QS 113:1–5; Shamela 2163/5781)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/1"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 15, hlm. 427 (QS 113, bagian al-I'rab; Shamela 22916/5919)",
+              "url": "https://tafsir.app/aljadwal/113/1"
+            },
+            {
+              "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+              "ref": "jil. 3, hlm. 476 (QS 113:1; Shamela 23584/1398)",
+              "url": "https://tafsir.app/iraab-daas/113/1"
+            },
+            {
+              "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+              "ref": "hlm. 10, Bab al-Af'al: fi'il madhi selalu berakhir fathah; fi'il amr 'majzum selamanya'; fi'il mudhari' marfu' sampai didahului huruf penashab atau penjazm",
+              "url": "https://shamela.ws/book/11371/7"
+            },
+            {
+              "kitab": "Zainuddin ar-Razi, Mukhtar ash-Shihah, tahqiq Yusuf asy-Syaikh Muhammad (cet. 5, 1420 H)",
+              "ref": "hlm. 221, entri ‘-w-ż: ‘āża bihi termasuk bab qāla (fa‘ala–yaf‘ulu)",
+              "url": "https://shamela.ws/book/23193/2308"
+            },
+            {
+              "kitab": "KH Muhammad Ma'shum bin 'Ali, al-Amtsilah at-Tashrifiyyah (Surabaya: Maktabah Syaikh Salim bin Sa'd Nabhan)",
+              "ref": "hlm. 2–3 (PDF hlm. 5–6), bab 1 tsulatsi mujarrad fa‘ala–yaf‘ulu, dengan baris ajwaf wawi ṣāna–yaṣūnu",
+              "url": "https://archive.org/details/amthilahtasrifiah"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:1:2:*) — akar, lemma, kelas kata: V|STEM|POS:V|IMPF|LEM:Eu*o|ROOT:Ew*|1S",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=1"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:1:2:*) bentuk kata kerja (VF) I (QAC 0.4 menandai bentuk II–XII saja; tanpa tanda = bentuk I), fi'il mudhari' (IMPF), 1S; harakat pola wazan mengikuti bab fi'il ini, fa‘ala–yaf‘ulu (Mukhtar ash-Shihah hlm. 221; al-Amtsilah hlm. 2–3), dalam bentuk orang pertama tunggal; harakat token Tanzil 113:1:2 berbeda: huruf pertama akar ('ain) berharakat dhammah dan huruf kedua akar (wawu) menjadi huruf mad",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=1"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 113:1",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "113:1:3",
+          "ar": "بِرَبِّ",
+          "translit": "birabbi",
+          "gloss": "kepada Tuhan",
+          "root": [
+            "ر",
+            "ب",
+            "ب"
+          ],
+          "lemma": "رَبّ",
+          "pos": "huruf jar + isim",
+          "wazn": "فَعْل",
+          "case": {
+            "state": "majrur",
+            "sign": "kasrah"
+          },
+          "why": "Akhirnya kasrah karena kata rabb (Tuhan) didahului huruf jar bi-; frasa birabbi bergantung pada a‘ūżu, dan rabbi disandarkan kepada al-falaqi.",
+          "lemma_id": "rabb",
+          "concepts": [
+            "huruf-jar"
+          ],
+          "role": "huruf jar + majrur (terkait a‘ūżu); mudhaf",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 623 (al-I'rab QS 113:1–5; Shamela 2163/5781)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/1"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 15, hlm. 427 (QS 113, bagian al-I'rab; Shamela 22916/5919)",
+              "url": "https://tafsir.app/aljadwal/113/1"
+            },
+            {
+              "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+              "ref": "jil. 3, hlm. 476 (QS 113:1; Shamela 23584/1398)",
+              "url": "https://tafsir.app/iraab-daas/113/1"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 1, hlm. 29 (ash-Sharf QS 1:2: rabb mashdar yang kemudian dipakai sebagai sifat, wazan fa‘lun dengan fathah lalu sukun)",
+              "url": "https://shamela.ws/book/22916/14"
+            },
+            {
+              "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+              "ref": "hlm. 23, Bab al-Makhfudhat min al-Asma': majrur karena huruf (antara lain min, fī, bi-) dan karena idhafah",
+              "url": "https://shamela.ws/book/11371/31"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:1:3:*) — akar, lemma, kelas kata: P|PREFIX|bi+ + N|STEM|POS:N|LEM:rab~|ROOT:rbb|M|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=1"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 113:1",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "113:1:4",
+          "ar": "ٱلْفَلَقِ",
+          "translit": "al-falaqi",
+          "gloss": "subuh",
+          "root": [
+            "ف",
+            "ل",
+            "ق"
+          ],
+          "lemma": "فَلَق",
+          "pos": "isim",
+          "wazn": "فَعَل",
+          "case": {
+            "state": "majrur",
+            "sign": "kasrah"
+          },
+          "why": "Akhirnya kasrah karena menjadi mudhaf ilaih dari rabbi (“Tuhan yang menguasai subuh”).",
+          "lemma_id": "falaq",
+          "concepts": [
+            "idhafah",
+            "wazan-dan-tashrif"
+          ],
+          "role": "mudhaf ilaih",
+          "ikhtilaf": [
+            {
+              "point": "Apa makna al-falaq?",
+              "options": [
+                "Subuh (fajar): makna yang dipilih Darwisy dan al-Jadwal. As-Samin menjelaskan polanya fa‘alun bermakna maf‘ūlun, “yang dibelah”, dan Darwisy menukil bahwa malam terbelah darinya. Ibnu Katsir menukilnya dari Jabir, Ibnu Abbas, Mujahid dan lainnya, lalu menyebutnya pendapat yang benar, pilihan Ibnu Jarir dan al-Bukhari; an-Nahhas menguatkannya dengan pemakaian bahasa Arab",
+                "Seluruh makhluk (al-khalq): riwayat Ali bin Abi Thalhah dari Ibnu Abbas, juga pendapat adh-Dhahhak, dinukil Ibnu Katsir; an-Nahhas juga menyebutnya"
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 622 (al-Lughah: al-falaq = subuh, karena malam terbelah darinya; ada pendapat lain, tetapi 'yang pertama lebih utama'; Shamela 2163/5780)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/1"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 15, hlm. 428 (ash-Sharf: al-falaq isim bermakna subuh, wazan fa‘alun dengan dua fathah; catatan kaki menyebut makna-makna lain dalam tafsir; Shamela 22916/5920)",
+              "url": "https://tafsir.app/aljadwal/113/1"
+            },
+            {
+              "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+              "ref": "jil. 11, hlm. 157 (QS 113:1; Shamela 9057/10759)",
+              "url": "https://tafsir.app/aldur-almasoon/113/1"
+            },
+            {
+              "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an (ed. 'Abd al-Mun'im Khalil Ibrahim; Beirut: Dar al-Kutub al-'Ilmiyyah, cet. 1, 1421 H)",
+              "ref": "jil. 5, hlm. 197 (QS 113:1; Shamela 23587/1414)",
+              "url": "https://tafsir.app/iraab-alnahas/113/1"
+            },
+            {
+              "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami bin Muhammad as-Salamah; Riyadh: Dar Thaibah, cet. 2, 1420 H/1999 M)",
+              "ref": "jil. 8, hlm. 535 (tafsir QS 113:1; Shamela 8473/4581)",
+              "url": "https://tafsir.app/ibn-katheer/113/1"
+            },
+            {
+              "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+              "ref": "jil. 3, hlm. 476 (QS 113:1; Shamela 23584/1398)",
+              "url": "https://tafsir.app/iraab-daas/113/1"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:1:4:*) — akar, lemma, kelas kata: DET|PREFIX|Al+ + N|STEM|POS:N|LEM:falaq|ROOT:flq|M|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=1"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 113:1",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113"
+            }
+          ],
+          "status": "draft"
+        }
+      ],
+      "translation": {
+        "text": "Katakanlah, \"Aku berlindung kepada Tuhan yang menguasai subuh (fajar),",
+        "footnotes": [],
+        "source_label": "Terjemahan Berbahasa Indonesia - Kementerian Agama",
+        "version": "1.0.1"
+      },
+      "recitation": [
+        {
+          "reciter": "Husary_Muallim_128kbps",
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/113001.mp3",
+          "segments": [
+            [
+              1,
+              200,
+              650
+            ],
+            [
+              2,
+              660,
+              1880
+            ],
+            [
+              3,
+              1890,
+              3140
+            ],
+            [
+              4,
+              3150,
+              4130
+            ]
+          ],
+          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        },
+        {
+          "reciter": "Alafasy_128kbps",
+          "url": "https://everyayah.com/data/Alafasy_128kbps/113001.mp3",
+          "segments": [
+            [
+              1,
+              30,
+              340
+            ],
+            [
+              2,
+              350,
+              1200
+            ],
+            [
+              3,
+              1210,
+              2080
+            ],
+            [
+              4,
+              2090,
+              2870
+            ]
+          ],
+          "credit": "Recitation: Mishary Rashid Alafasy via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        }
+      ],
+      "structure": {
+        "type": "jumlah fi'liyyah (perintah) dengan maqul al-qaul",
+        "summary": "Qul (“katakanlah”) adalah kata perintah dengan pelaku tersirat, “engkau”. Yang diperintahkan untuk diucapkan, a‘ūżu birabbi al-falaqi (“aku berlindung kepada Tuhan yang menguasai subuh”), adalah kalimat kata kerja dengan pelaku tersirat “aku”; seluruhnya menjadi isi ucapan (maqul al-qaul) dan berkedudukan nashab. Birabbi bergantung pada a‘ūżu, dan rabbi disandarkan (idhafah) kepada al-falaqi.",
+        "groups": [
+          {
+            "words": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "label": "qul → a‘ūżu birabbi al-falaqi: perintah dan isi ucapannya (maqul al-qaul), berkedudukan nashab",
+            "concept": "maqul-al-qaul"
+          },
+          {
+            "words": [
+              2,
+              3
+            ],
+            "label": "a‘ūżu + birabbi: frasa jar-majrur yang bergantung pada kata kerja (“berlindung kepada”)",
+            "concept": "huruf-jar"
+          },
+          {
+            "words": [
+              3,
+              4
+            ],
+            "label": "rabbi → al-falaqi: idhafah (“Tuhan subuh”)",
+            "concept": "idhafah"
+          }
+        ],
+        "sources": [
+          {
+            "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+            "ref": "jil. 10, hlm. 623 (al-I'rab: qul fi'il amr, pelakunya tersimpan, anta; jumlah a‘ūżu maqul al-qaul; a‘ūżu fi'il mudhari' marfu', pelakunya tersimpan, anā; birabbi al-falaqi terkait a‘ūżu)",
+            "url": "https://shamela.ws/book/2163/5781"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+            "ref": "jil. 15, hlm. 427 (birabbi terkait a‘ūżu; jumlah qul ibtida'iyyah, tidak punya kedudukan i'rab; jumlah a‘ūżu berkedudukan nashab sebagai maqul al-qaul)",
+            "url": "https://shamela.ws/book/22916/5919"
+          },
+          {
+            "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+            "ref": "jil. 3, hlm. 476 (qul fi'il amr, pelakunya tersimpan, jumlahnya ibtida'iyyah; a‘ūżu fi'il mudhari', pelakunya tersimpan; birabbi terkait fi'il itu; al-falaqi mudhaf ilaih; jumlah a‘ūżu maqul al-qaul)",
+            "url": "https://shamela.ws/book/23584/1398"
+          },
+          {
+            "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)",
+            "ref": "hlm. 538 (al-Bab ats-Tsani: jumlah ketiga yang punya kedudukan i'rab ialah jumlah yang menjadi maf'ul, kedudukannya nashab; antara lain dalam bab hikayah dengan qaul)",
+            "url": "https://shamela.ws/book/6972/526"
+          },
+          {
+            "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)",
+            "ref": "hlm. 492 (al-Bab ats-Tsani: jumlah fi'liyyah adalah kalimat yang pangkalnya fi'il, termasuk fi'il amr)",
+            "url": "https://shamela.ws/book/6972/480"
+          },
+          {
+            "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+            "ref": "hlm. 23 (Bab al-Makhfudhat min al-Asma': majrur karena huruf, antara lain bi-, dan karena idhafah)",
+            "url": "https://shamela.ws/book/11371/31"
+          }
+        ],
+        "status": "draft"
+      },
+      "status": "draft"
+    },
+    {
+      "loc": "113:2",
+      "surah": 113,
+      "ayah": 2,
+      "ar": "مِن شَرِّ مَا خَلَقَ",
+      "words": [
+        {
+          "loc": "113:2:1",
+          "ar": "مِن",
+          "translit": "min",
+          "gloss": "dari",
+          "root": null,
+          "lemma": "مِن",
+          "pos": "huruf jar",
+          "wazn": null,
+          "case": {
+            "state": "none",
+            "sign": "—"
+          },
+          "why": "Min adalah huruf jar (kata depan) “dari”; kata sesudahnya, syarri, menjadi majrur karenanya, dan frasa min syarri bergantung pada a‘ūżu di ayat 1.",
+          "lemma_id": "min",
+          "concepts": [
+            "huruf-jar"
+          ],
+          "role": "huruf jar (min syarri terkait a‘ūżu)",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 623 (al-I'rab QS 113:1–5; Shamela 2163/5781)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/2"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 15, hlm. 427 (QS 113, bagian al-I'rab; Shamela 22916/5919)",
+              "url": "https://tafsir.app/aljadwal/113/2"
+            },
+            {
+              "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+              "ref": "jil. 11, hlm. 158 (QS 113:2; Shamela 9057/10760)",
+              "url": "https://tafsir.app/aldur-almasoon/113/2"
+            },
+            {
+              "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+              "ref": "jil. 3, hlm. 476 (QS 113:2; Shamela 23584/1398)",
+              "url": "https://tafsir.app/iraab-daas/113/2"
+            },
+            {
+              "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+              "ref": "hlm. 23, Bab al-Makhfudhat min al-Asma': majrur karena huruf (antara lain min, fī, bi-) dan karena idhafah",
+              "url": "https://shamela.ws/book/11371/31"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:2:1:*) — akar, lemma, kelas kata: P|STEM|POS:P|LEM:min",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=2"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 113:2",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "113:2:2",
+          "ar": "شَرِّ",
+          "translit": "syarri",
+          "gloss": "kejahatan",
+          "root": [
+            "ش",
+            "ر",
+            "ر"
+          ],
+          "lemma": "شَرّ",
+          "pos": "isim",
+          "wazn": null,
+          "case": {
+            "state": "majrur",
+            "sign": "kasrah"
+          },
+          "why": "Akhirnya kasrah karena didahului huruf jar min; syarri juga disandarkan (mudhaf) kepada kata sesudahnya, mā.",
+          "lemma_id": "sharr",
+          "concepts": [
+            "huruf-jar",
+            "idhafah"
+          ],
+          "role": "majrur oleh min; mudhaf",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 623 (al-I'rab QS 113:1–5; Shamela 2163/5781)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/2"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 15, hlm. 427 (QS 113, bagian al-I'rab; Shamela 22916/5919)",
+              "url": "https://tafsir.app/aljadwal/113/2"
+            },
+            {
+              "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+              "ref": "jil. 3, hlm. 476 (QS 113:2; Shamela 23584/1398)",
+              "url": "https://tafsir.app/iraab-daas/113/2"
+            },
+            {
+              "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+              "ref": "hlm. 23, Bab al-Makhfudhat min al-Asma': majrur karena huruf (antara lain min, fī, bi-) dan karena idhafah",
+              "url": "https://shamela.ws/book/11371/31"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:2:2:*) — akar, lemma, kelas kata: N|STEM|POS:N|LEM:$ar~|ROOT:$rr|MS|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=2"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 113:2",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "113:2:3",
+          "ar": "مَا",
+          "translit": "mā",
+          "gloss": "(makhluk) yang",
+          "root": null,
+          "lemma": "مَا",
+          "pos": "isim maushul",
+          "wazn": null,
+          "case": {
+            "state": "mabni",
+            "sign": "sukun",
+            "mahall": "mahall jarr"
+          },
+          "why": "Isim maushul (kata penghubung “yang”) ini mabni di atas sukun dan berkedudukan jar sebagai mudhaf ilaih dari syarri; shilah-nya adalah khalaqa, dan kata ganti yang kembali kepada mā dibuang, maksudnya “yang Dia ciptakan”.",
+          "lemma_id": "ma",
+          "concepts": [
+            "murab-mabni",
+            "isim-maushul"
+          ],
+          "role": "isim maushul (mudhaf ilaih)",
+          "ikhtilaf": [
+            {
+              "point": "Mā di sini isim maushul atau mā mashdariyyah?",
+              "options": [
+                "Isim maushul (“yang”): “kejahatan (makhluk) yang Dia ciptakan”, dengan kata ganti penghubung yang dibuang — Darwisy, al-Jadwal, al-Mujtaba, ad-Da'as; an-Nahhas dan as-Samin juga membolehkannya",
+                "Mā mashdariyyah (pembentuk mashdar): mā khalaqa sama dengan “ciptaan-Nya”, sehingga tidak memerlukan kata ganti penghubung — an-Nahhas menyebutnya lebih dulu, Darwisy dan as-Samin membolehkannya, dan al-Jadwal menukilnya dari al-'Ukbari dengan al-khalq bermakna makhluk"
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 623 (al-I'rab QS 113:1–5; Shamela 2163/5781)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/2"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 15, hlm. 427 (QS 113, bagian al-I'rab; Shamela 22916/5919)",
+              "url": "https://tafsir.app/aljadwal/113/2"
+            },
+            {
+              "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+              "ref": "jil. 4, hlm. 1492 (QS 113:2; Shamela 9617/6024)",
+              "url": "https://tafsir.app/mujtaba-mushkil-iraab/113/2"
+            },
+            {
+              "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an (ed. 'Abd al-Mun'im Khalil Ibrahim; Beirut: Dar al-Kutub al-'Ilmiyyah, cet. 1, 1421 H)",
+              "ref": "jil. 5, hlm. 197 (QS 113:2; Shamela 23587/1414)",
+              "url": "https://tafsir.app/iraab-alnahas/113/2"
+            },
+            {
+              "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+              "ref": "jil. 11, hlm. 158 (QS 113:2; Shamela 9057/10760)",
+              "url": "https://tafsir.app/aldur-almasoon/113/2"
+            },
+            {
+              "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+              "ref": "jil. 3, hlm. 476 (QS 113:2; Shamela 23584/1398)",
+              "url": "https://tafsir.app/iraab-daas/113/2"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 1, hlm. 41 (al-I'rab QS 2:3: mā isim maushul mabni di atas sukun dalam kedudukan jar)",
+              "url": "https://shamela.ws/book/22916/26"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:2:3:*) — akar, lemma, kelas kata: REL|STEM|POS:REL|LEM:maA",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=2"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 113:2",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "113:2:4",
+          "ar": "خَلَقَ",
+          "translit": "khalaqa",
+          "gloss": "Dia ciptakan",
+          "root": [
+            "خ",
+            "ل",
+            "ق"
+          ],
+          "lemma": "خَلَقَ",
+          "pos": "fi'il madhi",
+          "wazn": "فَعَلَ",
+          "case": {
+            "state": "mabni",
+            "sign": "fathah"
+          },
+          "why": "Fi'il madhi ini mabni di atas fathah; pelakunya tersirat, yaitu “Dia” (Allah), dan kalimat khalaqa menjadi shilah bagi mā.",
+          "lemma_id": "khalaqa",
+          "concepts": [
+            "jumlah-filiyyah",
+            "isim-maushul",
+            "fiil-madhi"
+          ],
+          "role": "fi'il madhi (fa'il tersimpan: “Dia”); kalimatnya shilah bagi mā",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 623 (al-I'rab QS 113:1–5; Shamela 2163/5781)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/2"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 15, hlm. 427 (QS 113, bagian al-I'rab; Shamela 22916/5919)",
+              "url": "https://tafsir.app/aljadwal/113/2"
+            },
+            {
+              "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+              "ref": "jil. 3, hlm. 476 (QS 113:2; Shamela 23584/1398)",
+              "url": "https://tafsir.app/iraab-daas/113/2"
+            },
+            {
+              "kitab": "Ibnu Hisyam al-Anshari, Syarh Qathr an-Nada wa Ball ash-Shada (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, cet. 11, 1383 H/1963 M)",
+              "ref": "hlm. 27, al-Fi'l al-Madhi: hukum asalnya mabni di atas fathah",
+              "url": "https://shamela.ws/book/6970/15"
+            },
+            {
+              "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+              "ref": "hlm. 10, Bab al-Af'al: fi'il madhi selalu berakhir fathah; fi'il amr 'majzum selamanya'; fi'il mudhari' marfu' sampai didahului huruf penashab atau penjazm",
+              "url": "https://shamela.ws/book/11371/7"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:2:4:*) — akar, lemma, kelas kata: V|STEM|POS:V|PERF|LEM:xalaqa|ROOT:xlq|3MS",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=2"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:2:4:*) bentuk kata kerja (VF) I (QAC 0.4 menandai bentuk II–XII saja; tanpa tanda = bentuk I), fi'il madhi (PERF), 3MS; harakat pola wazan mengikuti token Tanzil 113:2:4",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=2"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 113:2",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113"
+            }
+          ],
+          "status": "draft"
+        }
+      ],
+      "translation": {
+        "text": "dari kejahatan (makhluk yang) Dia ciptakan,",
+        "footnotes": [],
+        "source_label": "Terjemahan Berbahasa Indonesia - Kementerian Agama",
+        "version": "1.0.1"
+      },
+      "recitation": [
+        {
+          "reciter": "Husary_Muallim_128kbps",
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/113002.mp3",
+          "segments": [
+            [
+              1,
+              0,
+              1180
+            ],
+            [
+              2,
+              1190,
+              2250
+            ],
+            [
+              3,
+              2260,
+              2850
+            ],
+            [
+              4,
+              2860,
+              3790
+            ]
+          ],
+          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        },
+        {
+          "reciter": "Alafasy_128kbps",
+          "url": "https://everyayah.com/data/Alafasy_128kbps/113002.mp3",
+          "segments": [
+            [
+              1,
+              30,
+              1300
+            ],
+            [
+              2,
+              1310,
+              2020
+            ],
+            [
+              3,
+              2030,
+              2370
+            ],
+            [
+              4,
+              2380,
+              3060
+            ]
+          ],
+          "credit": "Recitation: Mishary Rashid Alafasy via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        }
+      ],
+      "structure": {
+        "type": "lanjutan jumlah ayat 1 (jar-majrur terkait a‘ūżu), memuat jumlah shilah",
+        "summary": "Ayat ini melanjutkan ayat 1: min syarri (“dari kejahatan”) bergantung pada a‘ūżu, begitu pula min syarri di ayat 3, 4 dan 5. Syarri disandarkan kepada mā (“yang”), isim maushul yang dijelaskan oleh shilah khalaqa (“Dia ciptakan”); kata ganti yang kembali kepada mā dibuang. Sebagian ulama membaca mā sebagai mā mashdariyyah, sehingga maknanya “ciptaan-Nya”.",
+        "groups": [
+          {
+            "words": [
+              1,
+              2
+            ],
+            "label": "min syarri: jar-majrur yang bergantung pada a‘ūżu di ayat 1",
+            "concept": "huruf-jar"
+          },
+          {
+            "words": [
+              2,
+              3
+            ],
+            "label": "syarri → mā: idhafah (“kejahatan (makhluk) yang …”)",
+            "concept": "idhafah"
+          },
+          {
+            "words": [
+              3,
+              4
+            ],
+            "label": "mā + shilah khalaqa (“yang Dia ciptakan”)",
+            "concept": "isim-maushul"
+          }
+        ],
+        "sources": [
+          {
+            "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+            "ref": "jil. 10, hlm. 623 (al-I'rab: min syarri terkait a‘ūżu; mā isim maushul, mudhaf ilaih; jumlah khalaqa shilah, kata ganti penghubungnya dibuang, 'khalaqahu'; boleh juga mā mashdariyyah)",
+            "url": "https://shamela.ws/book/2163/5781"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+            "ref": "jil. 15, hlm. 427 (min syarri terkait a‘ūżu di keempat tempat; mā isim maushul dalam kedudukan jar sebagai mudhaf ilaih, kata ganti penghubungnya dibuang; catatan kaki: atau huruf mashdari, menurut al-'Ukbari; jumlah khalaqa shilah, tidak punya kedudukan i'rab)",
+            "url": "https://shamela.ws/book/22916/5919"
+          },
+          {
+            "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+            "ref": "jil. 4, hlm. 1492 (QS 113:2: mā maushul ismi, mudhaf ilaih)",
+            "url": "https://shamela.ws/book/9617/6024"
+          },
+          {
+            "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an (ed. 'Abd al-Mun'im Khalil Ibrahim; Beirut: Dar al-Kutub al-'Ilmiyyah, cet. 1, 1421 H)",
+            "ref": "jil. 5, hlm. 197 (QS 113:2: mā bisa mashdar sehingga tidak perlu kata ganti penghubung, atau bermakna 'yang' dengan kata ganti -hu yang dibuang)",
+            "url": "https://shamela.ws/book/23587/1414"
+          },
+          {
+            "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+            "ref": "jil. 11, hlm. 158 (QS 113:2: min syarri terkait a‘ūżu; mā mashdariyyah atau bermakna 'yang')",
+            "url": "https://shamela.ws/book/9057/10760"
+          },
+          {
+            "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+            "ref": "jil. 3, hlm. 476 (min syarri terkait a‘ūżu; mā isim maushul, mudhaf ilaih; khalaqa fi'il madhi, pelakunya tersimpan, jumlahnya shilah)",
+            "url": "https://shamela.ws/book/23584/1398"
+          },
+          {
+            "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami bin Muhammad as-Salamah; Riyadh: Dar Thaibah, cet. 2, 1420 H/1999 M)",
+            "ref": "jil. 8, hlm. 535 (tafsir QS 113:2: “dari kejahatan seluruh makhluk”)",
+            "url": "https://shamela.ws/book/8473/4581"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+            "ref": "jil. 1, hlm. 41 (al-I'rab QS 2:3: mā isim maushul mabni di atas sukun dalam kedudukan jar)",
+            "url": "https://shamela.ws/book/22916/26"
+          }
+        ],
+        "status": "draft"
+      },
+      "status": "draft"
+    },
+    {
+      "loc": "113:3",
+      "surah": 113,
+      "ayah": 3,
+      "ar": "وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ",
+      "words": [
+        {
+          "loc": "113:3:1",
+          "ar": "وَمِن",
+          "translit": "wa min",
+          "gloss": "dan dari",
+          "root": null,
+          "lemma": "مِن",
+          "pos": "huruf 'athaf + huruf jar",
+          "wazn": null,
+          "case": {
+            "state": "none",
+            "sign": "—"
+          },
+          "why": "Wa adalah huruf 'athaf (penyambung) dan min huruf jar “dari”; frasa ini disambungkan pada min syarri di ayat 2, sehingga juga bergantung pada a‘ūżu.",
+          "lemma_id": "min",
+          "concepts": [
+            "athaf"
+          ],
+          "role": "huruf 'athaf + huruf jar",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 623 (al-I'rab QS 113:1–5; Shamela 2163/5781)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/3"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 15, hlm. 427 (QS 113, bagian al-I'rab; Shamela 22916/5919)",
+              "url": "https://tafsir.app/aljadwal/113/3"
+            },
+            {
+              "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+              "ref": "jil. 3, hlm. 476 (QS 113:3; Shamela 23584/1398)",
+              "url": "https://tafsir.app/iraab-daas/113/3"
+            },
+            {
+              "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+              "ref": "hlm. 23, Bab al-Makhfudhat min al-Asma': majrur karena huruf (antara lain min, fī, bi-) dan karena idhafah",
+              "url": "https://shamela.ws/book/11371/31"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:3:1:*) — akar, lemma, kelas kata: CONJ|PREFIX|w:CONJ+ + P|STEM|POS:P|LEM:min",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=3"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 113:3",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "113:3:2",
+          "ar": "شَرِّ",
+          "translit": "syarri",
+          "gloss": "kejahatan",
+          "root": [
+            "ش",
+            "ر",
+            "ر"
+          ],
+          "lemma": "شَرّ",
+          "pos": "isim",
+          "wazn": null,
+          "case": {
+            "state": "majrur",
+            "sign": "kasrah"
+          },
+          "why": "Akhirnya kasrah karena didahului huruf jar min; syarri juga disandarkan (mudhaf) kepada gāsiqin.",
+          "lemma_id": "sharr",
+          "concepts": [],
+          "role": "majrur oleh min; mudhaf",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 623 (al-I'rab QS 113:1–5; Shamela 2163/5781)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/3"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 15, hlm. 427 (QS 113, bagian al-I'rab; Shamela 22916/5919)",
+              "url": "https://tafsir.app/aljadwal/113/3"
+            },
+            {
+              "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+              "ref": "jil. 3, hlm. 476 (QS 113:3; Shamela 23584/1398)",
+              "url": "https://tafsir.app/iraab-daas/113/3"
+            },
+            {
+              "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+              "ref": "hlm. 23, Bab al-Makhfudhat min al-Asma': majrur karena huruf (antara lain min, fī, bi-) dan karena idhafah",
+              "url": "https://shamela.ws/book/11371/31"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:3:2:*) — akar, lemma, kelas kata: N|STEM|POS:N|LEM:$ar~|ROOT:$rr|MS|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=3"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 113:3",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "113:3:3",
+          "ar": "غَاسِقٍ",
+          "translit": "gāsiqin",
+          "gloss": "malam",
+          "root": [
+            "غ",
+            "س",
+            "ق"
+          ],
+          "lemma": "غَاسِق",
+          "pos": "isim fa'il",
+          "wazn": "فَاعِل",
+          "case": {
+            "state": "majrur",
+            "sign": "kasratain"
+          },
+          "why": "Akhirnya kasrah bertanwin karena menjadi mudhaf ilaih dari syarri; kata ini nakirah (tak tentu), tanpa al-.",
+          "lemma_id": "ghasiq",
+          "concepts": [
+            "idhafah",
+            "isim-fail"
+          ],
+          "role": "mudhaf ilaih",
+          "ikhtilaf": [
+            {
+              "point": "Apa yang dimaksud gāsiq?",
+              "options": [
+                "Malam ketika gelapnya datang: pendapat kebanyakan ahli tafsir menurut an-Nahhas; Ibnu Katsir menukilnya dari Ibnu Abbas, Mujahid, al-Hasan, Qatadah dan lainnya; juga Darwisy; al-Jadwal menyebut gāsiq isim fa'il dari gasaqa, “menjadi gelap”",
+                "Bulan: berdasarkan hadits Aisyah yang dinilai hasan sahih oleh at-Tirmidzi, dinukil Ibnu Katsir; an-Nahhas dan as-Samin juga menyebutnya. Menurut Ibnu Katsir, pendukung pendapat pertama menilai keduanya tidak bertentangan, karena bulan adalah tanda malam dan hanya berkuasa pada malam hari; an-Nahhas juga menyimpulkan bahwa semua pendapat kembali ke makna malam yang gelap"
+              ]
+            },
+            {
+              "point": "Mengapa gāsiqin dan ḥāsidin berbentuk nakirah (tanpa al-), sedangkan an-naffāṡāti memakai al-?",
+              "options": [
+                "Nakirah memberi makna “sebagian”, karena bahaya tidak selalu datang darinya; al- pada an-naffāṡāti menunjuk yang sudah dikenal, sebagaimana diriwayatkan dalam tafsir, atau untuk menegaskan beratnya kejahatan — as-Samin",
+                "Sebagian yang dimintakan perlindungan dibuat ma'rifah untuk makna umum dan sebagian nakirah untuk makna khusus: setiap peniup buhul itu jahat, sedangkan hasad (dengki) ada yang terpuji dan ada yang tercela — Darwisy; catatan al-Fawa'id dalam al-Jadwal menjelaskan bahwa yang tercela ialah menginginkan hilangnya nikmat dari orang lain, sedangkan berlomba dalam kebaikan itu terpuji"
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 622 (al-Lughah: gāsiq = malam ketika kegelapannya pekat; Shamela 2163/5780)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/3"
+            },
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 623 (al-Fawa'id: sebagian yang dimintakan perlindungan dibuat ma'rifah dan sebagian nakirah, untuk makna umum dan khusus; Shamela 2163/5781)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/3"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 15, hlm. 428 (ash-Sharf: gāsiq isim fa'il dari fi'il tsulatsi gasaqa, “menjadi gelap”, wazan fā‘ilun, yaitu malam; catatan kaki: atau bulan, dan makna lain; al-Fawa'id tentang hasad; Shamela 22916/5920)",
+              "url": "https://tafsir.app/aljadwal/113/3"
+            },
+            {
+              "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an (ed. 'Abd al-Mun'im Khalil Ibrahim; Beirut: Dar al-Kutub al-'Ilmiyyah, cet. 1, 1421 H)",
+              "ref": "jil. 5, hlm. 197 (QS 113:3; Shamela 23587/1414)",
+              "url": "https://tafsir.app/iraab-alnahas/113/3"
+            },
+            {
+              "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+              "ref": "jil. 11, hlm. 158–159 (QS 113:3; Shamela 9057/10761–10762)",
+              "url": "https://tafsir.app/aldur-almasoon/113/3"
+            },
+            {
+              "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+              "ref": "jil. 11, hlm. 160 (gāsiq dan ḥāsid dibuat nakirah karena bahayanya bisa tidak terjadi, jadi nakirah bermakna sebagian; an-naffāṡāt ma'rifah untuk 'ahd atau untuk menegaskan kejahatan; Shamela 9057/10764)",
+              "url": "https://tafsir.app/aldur-almasoon/113/4"
+            },
+            {
+              "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami bin Muhammad as-Salamah; Riyadh: Dar Thaibah, cet. 2, 1420 H/1999 M)",
+              "ref": "jil. 8, hlm. 535–536 (tafsir QS 113:3; Shamela 8473/4581–4582)",
+              "url": "https://tafsir.app/ibn-katheer/113/3"
+            },
+            {
+              "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+              "ref": "jil. 3, hlm. 476 (QS 113:3; Shamela 23584/1398)",
+              "url": "https://tafsir.app/iraab-daas/113/3"
+            },
+            {
+              "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+              "ref": "hlm. 7, Bab Ma'rifat 'Alamat al-I'rab: kasrah tanda khafdh pada isim mufrad munsharif, jamak taksir munsharif dan jamak mu'annats salim",
+              "url": "https://shamela.ws/book/11371/4"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:3:3:*) — akar, lemma, kelas kata: N|STEM|POS:N|ACT|PCPL|LEM:gaAsiq|ROOT:gsq|M|INDEF|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=3"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 113:3",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "113:3:4",
+          "ar": "إِذَا",
+          "translit": "iżā",
+          "gloss": "apabila",
+          "root": null,
+          "lemma": "إِذَا",
+          "pos": "zharaf zaman",
+          "wazn": null,
+          "case": {
+            "state": "mabni",
+            "sign": "sukun",
+            "mahall": "mahall nashb"
+          },
+          "why": "Iżā mabni di atas sukun dan berkedudukan nashab sebagai keterangan waktu (zharaf) murni, tanpa makna syarat; kalimat sesudahnya, waqaba, menjadi mudhaf ilaih baginya.",
+          "lemma_id": "idha",
+          "concepts": [
+            "murab-mabni",
+            "zharaf-idza"
+          ],
+          "role": "zharaf zaman (keterangan waktu); disandarkan kepada kalimat sesudahnya",
+          "ikhtilaf": [
+            {
+              "point": "Iżā dikaitkan (muta'alliq) dengan kata apa?",
+              "options": [
+                "Dengan a‘ūżu: “aku berlindung … pada waktu itu” — al-Mujtaba; as-Samin (iżā manshub oleh a‘ūżu)",
+                "Dengan kata syarri, yang oleh al-Jadwal disebut mashdar (syarri gāsiqin) — al-Jadwal"
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 623 (al-I'rab QS 113:1–5; Shamela 2163/5781)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/3"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 15, hlm. 427 (QS 113, bagian al-I'rab; Shamela 22916/5919)",
+              "url": "https://tafsir.app/aljadwal/113/3"
+            },
+            {
+              "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+              "ref": "jil. 4, hlm. 1492 (QS 113:3; Shamela 9617/6025)",
+              "url": "https://tafsir.app/mujtaba-mushkil-iraab/113/3"
+            },
+            {
+              "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+              "ref": "jil. 11, hlm. 158–159 (QS 113:3; Shamela 9057/10761–10762)",
+              "url": "https://tafsir.app/aldur-almasoon/113/3"
+            },
+            {
+              "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+              "ref": "jil. 3, hlm. 476 (QS 113:3; Shamela 23584/1398)",
+              "url": "https://tafsir.app/iraab-daas/113/3"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 1, hlm. 57–58 (QS 2:11: iżā zharaf untuk masa yang akan datang, mabni di atas sukun; ash-Sharf: iżā bisa lepas dari makna syarat, seperti pada QS 92:1; Shamela 22916/42–43)",
+              "url": "https://shamela.ws/book/22916/42"
+            },
+            {
+              "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)",
+              "ref": "hlm. 547 (al-Bab ats-Tsani: jumlah keempat yang punya kedudukan i'rab ialah jumlah yang menjadi mudhaf ilaih, kedudukannya jar; iżā wajib disandarkan kepada jumlah menurut jumhur)",
+              "url": "https://shamela.ws/book/6972/535"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:3:4:*) — akar, lemma, kelas kata: T|STEM|POS:T|LEM:<i*aA",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=3"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 113:3",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "113:3:5",
+          "ar": "وَقَبَ",
+          "translit": "waqaba",
+          "gloss": "telah gelap gulita",
+          "root": [
+            "و",
+            "ق",
+            "ب"
+          ],
+          "lemma": "وَقَبَ",
+          "pos": "fi'il madhi",
+          "wazn": "فَعَلَ",
+          "case": {
+            "state": "mabni",
+            "sign": "fathah"
+          },
+          "why": "Fi'il madhi ini mabni di atas fathah; pelakunya tersirat (“ia”, yaitu malam itu), dan kalimat waqaba berkedudukan jar sebagai mudhaf ilaih dari iżā.",
+          "lemma_id": "waqaba",
+          "concepts": [
+            "fiil-madhi",
+            "zharaf-idza"
+          ],
+          "role": "fi'il madhi (fa'il tersimpan: “ia”); kalimatnya mudhaf ilaih bagi iżā",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 623 (al-I'rab QS 113:1–5; Shamela 2163/5781)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/3"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 15, hlm. 428 (jumlah waqaba berkedudukan jar sebagai mudhaf ilaih; Shamela 22916/5920)",
+              "url": "https://tafsir.app/aljadwal/113/3"
+            },
+            {
+              "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+              "ref": "jil. 11, hlm. 158–159 (QS 113:3; Shamela 9057/10761–10762)",
+              "url": "https://tafsir.app/aldur-almasoon/113/3"
+            },
+            {
+              "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+              "ref": "jil. 3, hlm. 476 (QS 113:3; Shamela 23584/1398)",
+              "url": "https://tafsir.app/iraab-daas/113/3"
+            },
+            {
+              "kitab": "Ibnu Hisyam al-Anshari, Syarh Qathr an-Nada wa Ball ash-Shada (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, cet. 11, 1383 H/1963 M)",
+              "ref": "hlm. 27, al-Fi'l al-Madhi: hukum asalnya mabni di atas fathah",
+              "url": "https://shamela.ws/book/6970/15"
+            },
+            {
+              "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+              "ref": "hlm. 10, Bab al-Af'al: fi'il madhi selalu berakhir fathah; fi'il amr 'majzum selamanya'; fi'il mudhari' marfu' sampai didahului huruf penashab atau penjazm",
+              "url": "https://shamela.ws/book/11371/7"
+            },
+            {
+              "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)",
+              "ref": "hlm. 547 (al-Bab ats-Tsani: jumlah keempat yang punya kedudukan i'rab ialah jumlah yang menjadi mudhaf ilaih, kedudukannya jar; iżā wajib disandarkan kepada jumlah menurut jumhur)",
+              "url": "https://shamela.ws/book/6972/535"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:3:5:*) — akar, lemma, kelas kata: V|STEM|POS:V|PERF|LEM:waqaba|ROOT:wqb|3MS",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=3"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:3:5:*) bentuk kata kerja (VF) I (QAC 0.4 menandai bentuk II–XII saja; tanpa tanda = bentuk I), fi'il madhi (PERF), 3MS; harakat pola wazan mengikuti token Tanzil 113:3:5",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=3"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 113:3",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113"
+            }
+          ],
+          "status": "draft"
+        }
+      ],
+      "translation": {
+        "text": "dan dari kejahatan malam apabila telah gelap gulita,",
+        "footnotes": [],
+        "source_label": "Terjemahan Berbahasa Indonesia - Kementerian Agama",
+        "version": "1.0.1"
+      },
+      "recitation": [
+        {
+          "reciter": "Husary_Muallim_128kbps",
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/113003.mp3",
+          "segments": [
+            [
+              1,
+              300,
+              1310
+            ],
+            [
+              2,
+              1320,
+              2210
+            ],
+            [
+              3,
+              2220,
+              3840
+            ],
+            [
+              4,
+              3850,
+              4870
+            ],
+            [
+              5,
+              4880,
+              5730
+            ]
+          ],
+          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        },
+        {
+          "reciter": "Alafasy_128kbps",
+          "url": "https://everyayah.com/data/Alafasy_128kbps/113003.mp3",
+          "segments": [
+            [
+              1,
+              30,
+              1410
+            ],
+            [
+              2,
+              1420,
+              2100
+            ],
+            [
+              3,
+              2110,
+              3190
+            ],
+            [
+              4,
+              3200,
+              3820
+            ],
+            [
+              5,
+              3830,
+              4470
+            ]
+          ],
+          "credit": "Recitation: Mishary Rashid Alafasy via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        }
+      ],
+      "structure": {
+        "type": "lanjutan jumlah ayat 1 ('athaf), memuat zharaf iżā dan jumlah mudhaf ilaih",
+        "summary": "Wa (“dan”) menyambungkan ('athaf) frasa ini dengan min syarri di ayat 2, jadi ia juga bergantung pada a‘ūżu. Syarri disandarkan kepada gāsiqin (“malam”). Iżā (“apabila”) di sini keterangan waktu (zharaf) murni tanpa makna syarat, dan kalimat waqaba (“telah gelap gulita”) menjadi mudhaf ilaih baginya; iżā dikaitkan dengan a‘ūżu menurut al-Mujtaba dan as-Samin, atau dengan syarri menurut al-Jadwal.",
+        "groups": [
+          {
+            "words": [
+              1,
+              2,
+              3
+            ],
+            "label": "wa min syarri gāsiqin: di-'athaf-kan pada min syarri di ayat 2",
+            "concept": "athaf"
+          },
+          {
+            "words": [
+              2,
+              3
+            ],
+            "label": "syarri → gāsiqin: idhafah (“kejahatan malam”)",
+            "concept": "idhafah"
+          },
+          {
+            "words": [
+              4,
+              5
+            ],
+            "label": "iżā + waqaba: keterangan waktu yang disandarkan kepada sebuah kalimat",
+            "concept": "zharaf-idza"
+          }
+        ],
+        "sources": [
+          {
+            "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+            "ref": "jil. 10, hlm. 623 (al-I'rab: di-'athaf-kan pada yang sebelumnya; iżā zharaf untuk sekadar keterangan waktu; jumlah waqaba berkedudukan jar karena zharaf disandarkan kepadanya)",
+            "url": "https://shamela.ws/book/2163/5781"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+            "ref": "jil. 15, hlm. 427 (iżā zharaf dalam kedudukan nashab, lepas dari makna syarat, terkait mashdar syarri gāsiqin)",
+            "url": "https://shamela.ws/book/22916/5919"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+            "ref": "jil. 15, hlm. 428 (jumlah waqaba berkedudukan jar sebagai mudhaf ilaih; ash-Sharf: gāsiq isim fa'il, yaitu malam)",
+            "url": "https://shamela.ws/book/22916/5920"
+          },
+          {
+            "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+            "ref": "jil. 4, hlm. 1492 (QS 113:3: iżā zharaf murni terkait a‘ūżu, “aku berlindung kepada Allah dari ini pada waktu itu”)",
+            "url": "https://shamela.ws/book/9617/6025"
+          },
+          {
+            "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+            "ref": "jil. 11, hlm. 159 (QS 113:3: iżā manshub oleh a‘ūżu)",
+            "url": "https://shamela.ws/book/9057/10762"
+          },
+          {
+            "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+            "ref": "jil. 3, hlm. 476 (wa min syarri di-'athaf-kan; gāsiqin mudhaf ilaih; iżā zharaf zaman; waqaba fi'il madhi, pelakunya tersimpan, jumlahnya berkedudukan jar karena idhafah)",
+            "url": "https://shamela.ws/book/23584/1398"
+          },
+          {
+            "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)",
+            "ref": "hlm. 547 (al-Bab ats-Tsani: jumlah yang menjadi mudhaf ilaih berkedudukan jar; iżā wajib disandarkan kepada jumlah menurut jumhur)",
+            "url": "https://shamela.ws/book/6972/535"
+          },
+          {
+            "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)",
+            "ref": "hlm. 135–136 (al-Fashl ats-Tsalits: iżā bisa keluar dari makna syarat)",
+            "url": "https://shamela.ws/book/6972/124"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+            "ref": "jil. 1, hlm. 57–58 (QS 2:11: iżā mabni di atas sukun; ash-Sharf: iżā bisa lepas dari makna syarat)",
+            "url": "https://shamela.ws/book/22916/42"
+          }
+        ],
+        "status": "draft"
+      },
+      "status": "draft"
+    },
+    {
+      "loc": "113:4",
+      "surah": 113,
+      "ayah": 4,
+      "ar": "وَمِن شَرِّ ٱلنَّفَّٰثَٰتِ فِى ٱلْعُقَدِ",
+      "words": [
+        {
+          "loc": "113:4:1",
+          "ar": "وَمِن",
+          "translit": "wa min",
+          "gloss": "dan dari",
+          "root": null,
+          "lemma": "مِن",
+          "pos": "huruf 'athaf + huruf jar",
+          "wazn": null,
+          "case": {
+            "state": "none",
+            "sign": "—"
+          },
+          "why": "Wa adalah huruf 'athaf dan min huruf jar “dari”; frasa ini juga disambungkan pada min syarri sebelumnya, jadi tetap bergantung pada a‘ūżu.",
+          "lemma_id": "min",
+          "concepts": [
+            "athaf"
+          ],
+          "role": "huruf 'athaf + huruf jar",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 623 (al-I'rab QS 113:1–5; Shamela 2163/5781)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/4"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 15, hlm. 427 (QS 113, bagian al-I'rab; Shamela 22916/5919)",
+              "url": "https://tafsir.app/aljadwal/113/4"
+            },
+            {
+              "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+              "ref": "jil. 3, hlm. 476 (QS 113:4; Shamela 23584/1398)",
+              "url": "https://tafsir.app/iraab-daas/113/4"
+            },
+            {
+              "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+              "ref": "hlm. 23, Bab al-Makhfudhat min al-Asma': majrur karena huruf (antara lain min, fī, bi-) dan karena idhafah",
+              "url": "https://shamela.ws/book/11371/31"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:4:1:*) — akar, lemma, kelas kata: CONJ|PREFIX|w:CONJ+ + P|STEM|POS:P|LEM:min",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=4"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 113:4",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "113:4:2",
+          "ar": "شَرِّ",
+          "translit": "syarri",
+          "gloss": "kejahatan",
+          "root": [
+            "ش",
+            "ر",
+            "ر"
+          ],
+          "lemma": "شَرّ",
+          "pos": "isim",
+          "wazn": null,
+          "case": {
+            "state": "majrur",
+            "sign": "kasrah"
+          },
+          "why": "Akhirnya kasrah karena didahului huruf jar min; syarri juga disandarkan (mudhaf) kepada an-naffāṡāti.",
+          "lemma_id": "sharr",
+          "concepts": [],
+          "role": "majrur oleh min; mudhaf",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 623 (al-I'rab QS 113:1–5; Shamela 2163/5781)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/4"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 15, hlm. 427 (QS 113, bagian al-I'rab; Shamela 22916/5919)",
+              "url": "https://tafsir.app/aljadwal/113/4"
+            },
+            {
+              "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+              "ref": "jil. 3, hlm. 476 (QS 113:4; Shamela 23584/1398)",
+              "url": "https://tafsir.app/iraab-daas/113/4"
+            },
+            {
+              "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+              "ref": "hlm. 23, Bab al-Makhfudhat min al-Asma': majrur karena huruf (antara lain min, fī, bi-) dan karena idhafah",
+              "url": "https://shamela.ws/book/11371/31"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:4:2:*) — akar, lemma, kelas kata: N|STEM|POS:N|LEM:$ar~|ROOT:$rr|MS|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=4"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 113:4",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "113:4:3",
+          "ar": "ٱلنَّفَّٰثَٰتِ",
+          "translit": "an-naffāṡāti",
+          "gloss": "penyihir (perempuan) yang meniup",
+          "root": [
+            "ن",
+            "ف",
+            "ث"
+          ],
+          "lemma": "نَّفَّٰثَٰت",
+          "pos": "isim (jamak)",
+          "wazn": "فَعَّال",
+          "case": {
+            "state": "majrur",
+            "sign": "kasrah"
+          },
+          "why": "Akhirnya kasrah karena menjadi mudhaf ilaih dari syarri; kata ini jamak dari naffāṡah, bentuk mubalaghah (“yang banyak meniup”) dari isim fa'il.",
+          "lemma_id": "naffathat",
+          "concepts": [
+            "idhafah",
+            "sighat-mubalaghah"
+          ],
+          "role": "mudhaf ilaih",
+          "ikhtilaf": [
+            {
+              "point": "Seperti apa tiupan (nafṡ) itu?",
+              "options": [
+                "Tiupan dari mulut tanpa ludah; bila disertai ludah disebut tafl — Abu al-Fadhl, dinukil as-Samin; Darwisy menukil kamus al-Mukhtar: mirip meniup, lebih ringan daripada tafl",
+                "Tiupan yang disertai ludah — az-Zamakhsyari, dinukil as-Samin"
+              ]
+            },
+            {
+              "point": "Mengapa gāsiqin dan ḥāsidin berbentuk nakirah (tanpa al-), sedangkan an-naffāṡāti memakai al-?",
+              "options": [
+                "Nakirah memberi makna “sebagian”, karena bahaya tidak selalu datang darinya; al- pada an-naffāṡāti menunjuk yang sudah dikenal, sebagaimana diriwayatkan dalam tafsir, atau untuk menegaskan beratnya kejahatan — as-Samin",
+                "Sebagian yang dimintakan perlindungan dibuat ma'rifah untuk makna umum dan sebagian nakirah untuk makna khusus: setiap peniup buhul itu jahat, sedangkan hasad (dengki) ada yang terpuji dan ada yang tercela — Darwisy; catatan al-Fawa'id dalam al-Jadwal menjelaskan bahwa yang tercela ialah menginginkan hilangnya nikmat dari orang lain, sedangkan berlomba dalam kebaikan itu terpuji"
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 623 (al-I'rab QS 113:1–5; Shamela 2163/5781)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/4"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 15, hlm. 428 (ash-Sharf: an-naffāṡāt jamak dari an-naffāṡah, bentuk perempuan dari an-naffāṡ, mubalaghah isim fa'il, yaitu yang meniup pada buhul untuk sihir; dari nafaṡa bab naṣara dan ḍaraba; wazan fa‘‘ālun; Shamela 22916/5920)",
+              "url": "https://tafsir.app/aljadwal/113/4"
+            },
+            {
+              "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an (ed. 'Abd al-Mun'im Khalil Ibrahim; Beirut: Dar al-Kutub al-'Ilmiyyah, cet. 1, 1421 H)",
+              "ref": "jil. 5, hlm. 197 (QS 113:4; Shamela 23587/1414)",
+              "url": "https://tafsir.app/iraab-alnahas/113/4"
+            },
+            {
+              "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+              "ref": "jil. 11, hlm. 159–160 (QS 113:4; Shamela 9057/10763–10764)",
+              "url": "https://tafsir.app/aldur-almasoon/113/4"
+            },
+            {
+              "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami bin Muhammad as-Salamah; Riyadh: Dar Thaibah, cet. 2, 1420 H/1999 M)",
+              "ref": "jil. 8, hlm. 536 (tafsir QS 113:4; Shamela 8473/4582)",
+              "url": "https://tafsir.app/ibn-katheer/113/4"
+            },
+            {
+              "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+              "ref": "jil. 3, hlm. 476 (QS 113:4; Shamela 23584/1398)",
+              "url": "https://tafsir.app/iraab-daas/113/4"
+            },
+            {
+              "kitab": "Ibnu 'Aqil, Syarh Ibn 'Aqil 'ala Alfiyyah Ibn Malik (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, Kairo: Dar at-Turats, cet. 20, 1400 H/1980 M)",
+              "ref": "jil. 3, hlm. 111, bab I'mal Ism al-Fa'il: lima wazan (fa‘‘ālun, mif‘ālun, fa‘ūlun, fa‘īlun, fa‘ilun) dibentuk dari fā‘ilun untuk makna banyak dan bekerja seperti fi'il",
+              "url": "https://shamela.ws/book/9904/789"
+            },
+            {
+              "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+              "ref": "hlm. 7, Bab Ma'rifat 'Alamat al-I'rab: kasrah tanda khafdh pada isim mufrad munsharif, jamak taksir munsharif dan jamak mu'annats salim",
+              "url": "https://shamela.ws/book/11371/4"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:4:3:*) — akar, lemma, kelas kata: DET|PREFIX|Al+ + N|STEM|POS:N|LEM:n~af~a`va`t|ROOT:nfv|FP|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=4"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 113:4",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "113:4:4",
+          "ar": "فِى",
+          "translit": "fī",
+          "gloss": "pada",
+          "root": null,
+          "lemma": "فِى",
+          "pos": "huruf jar",
+          "wazn": null,
+          "case": {
+            "state": "none",
+            "sign": "—"
+          },
+          "why": "Fī adalah huruf jar “pada”; al-‘uqadi sesudahnya menjadi majrur karenanya, dan frasa fī al-‘uqadi bergantung pada an-naffāṡāti.",
+          "lemma_id": "fi",
+          "concepts": [
+            "huruf-jar",
+            "sighat-mubalaghah"
+          ],
+          "role": "huruf jar (fī al-‘uqadi terkait an-naffāṡāti)",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 623 (al-I'rab QS 113:1–5; Shamela 2163/5781)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/4"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 15, hlm. 427 (QS 113, bagian al-I'rab; Shamela 22916/5919)",
+              "url": "https://tafsir.app/aljadwal/113/4"
+            },
+            {
+              "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+              "ref": "jil. 4, hlm. 1492 (QS 113:4; Shamela 9617/6026)",
+              "url": "https://tafsir.app/mujtaba-mushkil-iraab/113/4"
+            },
+            {
+              "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+              "ref": "jil. 3, hlm. 476 (QS 113:4; Shamela 23584/1398)",
+              "url": "https://tafsir.app/iraab-daas/113/4"
+            },
+            {
+              "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+              "ref": "hlm. 23, Bab al-Makhfudhat min al-Asma': majrur karena huruf (antara lain min, fī, bi-) dan karena idhafah",
+              "url": "https://shamela.ws/book/11371/31"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:4:4:*) — akar, lemma, kelas kata: P|STEM|POS:P|LEM:fiY",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=4"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 113:4",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "113:4:5",
+          "ar": "ٱلْعُقَدِ",
+          "translit": "al-‘uqadi",
+          "gloss": "buhul-buhul",
+          "root": [
+            "ع",
+            "ق",
+            "د"
+          ],
+          "lemma": "عُقْدَة",
+          "pos": "isim (jamak)",
+          "wazn": null,
+          "case": {
+            "state": "majrur",
+            "sign": "kasrah"
+          },
+          "why": "Akhirnya kasrah karena didahului huruf jar fī; kata ini jamak dari ‘uqdah (buhul, simpul).",
+          "lemma_id": "uqdah",
+          "concepts": [
+            "huruf-jar"
+          ],
+          "role": "majrur oleh fī",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 623 (al-I'rab QS 113:1–5; Shamela 2163/5781)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/4"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 15, hlm. 427 (QS 113, bagian al-I'rab; Shamela 22916/5919)",
+              "url": "https://tafsir.app/aljadwal/113/4"
+            },
+            {
+              "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+              "ref": "jil. 4, hlm. 1492 (QS 113:4; Shamela 9617/6026)",
+              "url": "https://tafsir.app/mujtaba-mushkil-iraab/113/4"
+            },
+            {
+              "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+              "ref": "jil. 3, hlm. 476 (QS 113:4; Shamela 23584/1398)",
+              "url": "https://tafsir.app/iraab-daas/113/4"
+            },
+            {
+              "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+              "ref": "hlm. 7, Bab Ma'rifat 'Alamat al-I'rab: kasrah tanda khafdh pada isim mufrad munsharif, jamak taksir munsharif dan jamak mu'annats salim",
+              "url": "https://shamela.ws/book/11371/4"
+            },
+            {
+              "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+              "ref": "hlm. 23, Bab al-Makhfudhat min al-Asma': majrur karena huruf (antara lain min, fī, bi-) dan karena idhafah",
+              "url": "https://shamela.ws/book/11371/31"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:4:5:*) — akar, lemma, kelas kata: DET|PREFIX|Al+ + N|STEM|POS:N|LEM:Euqodap|ROOT:Eqd|MP|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=4"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 113:4",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113"
+            }
+          ],
+          "status": "draft"
+        }
+      ],
+      "translation": {
+        "text": "dan dari kejahatan (perempuan-perempuan) penyihir yang meniup pada buhul-buhul (talinya),",
+        "footnotes": [],
+        "source_label": "Terjemahan Berbahasa Indonesia - Kementerian Agama",
+        "version": "1.0.1"
+      },
+      "recitation": [
+        {
+          "reciter": "Husary_Muallim_128kbps",
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/113004.mp3",
+          "segments": [
+            [
+              1,
+              250,
+              1210
+            ],
+            [
+              2,
+              1220,
+              2320
+            ],
+            [
+              3,
+              2330,
+              5030
+            ],
+            [
+              4,
+              5040,
+              5370
+            ],
+            [
+              5,
+              5380,
+              6420
+            ]
+          ],
+          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        },
+        {
+          "reciter": "Alafasy_128kbps",
+          "url": "https://everyayah.com/data/Alafasy_128kbps/113004.mp3",
+          "segments": [
+            [
+              1,
+              30,
+              1400
+            ],
+            [
+              2,
+              1410,
+              2140
+            ],
+            [
+              3,
+              2150,
+              4360
+            ],
+            [
+              4,
+              4370,
+              4590
+            ],
+            [
+              5,
+              4600,
+              5460
+            ]
+          ],
+          "credit": "Recitation: Mishary Rashid Alafasy via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        }
+      ],
+      "structure": {
+        "type": "lanjutan jumlah ayat 1 ('athaf)",
+        "summary": "Frasa ini juga di-'athaf-kan pada min syarri sebelumnya, jadi tetap bergantung pada a‘ūżu. Syarri disandarkan kepada an-naffāṡāti (“para peniup”), bentuk jamak dari naffāṡah, yaitu bentuk mubalaghah (“yang banyak …”) dari isim fa'il. Frasa fī al-‘uqadi (“pada buhul-buhul”) bergantung pada an-naffāṡāti (Darwisy, al-Jadwal, al-Mujtaba, ad-Da'as).",
+        "groups": [
+          {
+            "words": [
+              1,
+              2,
+              3
+            ],
+            "label": "wa min syarri an-naffāṡāti: di-'athaf-kan pada min syarri sebelumnya",
+            "concept": "athaf"
+          },
+          {
+            "words": [
+              2,
+              3
+            ],
+            "label": "syarri → an-naffāṡāti: idhafah (“kejahatan para peniup”)",
+            "concept": "idhafah"
+          },
+          {
+            "words": [
+              3,
+              4,
+              5
+            ],
+            "label": "an-naffāṡāti ← fī al-‘uqadi: jar-majrur yang bergantung pada bentuk mubalaghah",
+            "concept": "sighat-mubalaghah"
+          }
+        ],
+        "sources": [
+          {
+            "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+            "ref": "jil. 10, hlm. 623 (al-I'rab: di-'athaf-kan pada yang sebelumnya; fī al-‘uqadi terkait an-naffāṡāti; al-Lughah: an-naffāṡāt para penyihir perempuan yang meniup pada buhul yang mereka ikat)",
+            "url": "https://shamela.ws/book/2163/5781"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+            "ref": "jil. 15, hlm. 427 (fī al-‘uqadi terkait an-naffāṡāti)",
+            "url": "https://shamela.ws/book/22916/5919"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+            "ref": "jil. 15, hlm. 428 (ash-Sharf: an-naffāṡāt jamak dari an-naffāṡah, bentuk perempuan dari an-naffāṡ, mubalaghah isim fa'il, wazan fa‘‘ālun)",
+            "url": "https://shamela.ws/book/22916/5920"
+          },
+          {
+            "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+            "ref": "jil. 4, hlm. 1492 (QS 113:4: jar-majrur fī al-‘uqadi terkait an-naffāṡāti)",
+            "url": "https://shamela.ws/book/9617/6026"
+          },
+          {
+            "kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an (ed. 'Abd al-Mun'im Khalil Ibrahim; Beirut: Dar al-Kutub al-'Ilmiyyah, cet. 1, 1421 H)",
+            "ref": "jil. 5, hlm. 197 (QS 113:4: jamak dari naffāṡah; bentuk jamak taksirnya nawāfiṡ)",
+            "url": "https://shamela.ws/book/23587/1414"
+          },
+          {
+            "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+            "ref": "jil. 11, hlm. 159–160 (QS 113:4: an-naffāṡāt jamak dari naffāṡah, bentuk mubalaghah dari nafaṡa, “meniup”)",
+            "url": "https://shamela.ws/book/9057/10763"
+          },
+          {
+            "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+            "ref": "jil. 3, hlm. 476 (wa min syarri an-naffāṡāti di-'athaf-kan; fī al-‘uqadi terkait kata sebelumnya)",
+            "url": "https://shamela.ws/book/23584/1398"
+          },
+          {
+            "kitab": "Ibnu 'Aqil, Syarh Ibn 'Aqil 'ala Alfiyyah Ibn Malik (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, Kairo: Dar at-Turats, cet. 20, 1400 H/1980 M)",
+            "ref": "jil. 3, hlm. 111 (bab I'mal Ism al-Fa'il: bentuk mubalaghah seperti fa‘‘ālun dibentuk dari fā‘ilun untuk makna banyak dan bekerja seperti fi'il)",
+            "url": "https://shamela.ws/book/9904/789"
+          },
+          {
+            "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami bin Muhammad as-Salamah; Riyadh: Dar Thaibah, cet. 2, 1420 H/1999 M)",
+            "ref": "jil. 8, hlm. 536 (tafsir QS 113:4: an-naffāṡāt ialah para penyihir perempuan, menurut Mujahid, 'Ikrimah, al-Hasan, Qatadah dan adh-Dhahhak)",
+            "url": "https://shamela.ws/book/8473/4582"
+          }
+        ],
+        "status": "draft"
+      },
+      "status": "draft"
+    },
+    {
+      "loc": "113:5",
+      "surah": 113,
+      "ayah": 5,
+      "ar": "وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ",
+      "words": [
+        {
+          "loc": "113:5:1",
+          "ar": "وَمِن",
+          "translit": "wa min",
+          "gloss": "dan dari",
+          "root": null,
+          "lemma": "مِن",
+          "pos": "huruf 'athaf + huruf jar",
+          "wazn": null,
+          "case": {
+            "state": "none",
+            "sign": "—"
+          },
+          "why": "Wa adalah huruf 'athaf dan min huruf jar “dari”; frasa terakhir ini pun disambungkan pada min syarri sebelumnya dan bergantung pada a‘ūżu.",
+          "lemma_id": "min",
+          "concepts": [
+            "athaf"
+          ],
+          "role": "huruf 'athaf + huruf jar",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 623 (al-I'rab QS 113:1–5; Shamela 2163/5781)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/5"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 15, hlm. 427 (QS 113, bagian al-I'rab; Shamela 22916/5919)",
+              "url": "https://tafsir.app/aljadwal/113/5"
+            },
+            {
+              "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+              "ref": "jil. 3, hlm. 476 (QS 113:5; Shamela 23584/1398)",
+              "url": "https://tafsir.app/iraab-daas/113/5"
+            },
+            {
+              "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+              "ref": "hlm. 23, Bab al-Makhfudhat min al-Asma': majrur karena huruf (antara lain min, fī, bi-) dan karena idhafah",
+              "url": "https://shamela.ws/book/11371/31"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:5:1:*) — akar, lemma, kelas kata: CONJ|PREFIX|w:CONJ+ + P|STEM|POS:P|LEM:min",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=5"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 113:5",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "113:5:2",
+          "ar": "شَرِّ",
+          "translit": "syarri",
+          "gloss": "kejahatan",
+          "root": [
+            "ش",
+            "ر",
+            "ر"
+          ],
+          "lemma": "شَرّ",
+          "pos": "isim",
+          "wazn": null,
+          "case": {
+            "state": "majrur",
+            "sign": "kasrah"
+          },
+          "why": "Akhirnya kasrah karena didahului huruf jar min; syarri juga disandarkan (mudhaf) kepada ḥāsidin.",
+          "lemma_id": "sharr",
+          "concepts": [],
+          "role": "majrur oleh min; mudhaf",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 623 (al-I'rab QS 113:1–5; Shamela 2163/5781)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/5"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 15, hlm. 427 (QS 113, bagian al-I'rab; Shamela 22916/5919)",
+              "url": "https://tafsir.app/aljadwal/113/5"
+            },
+            {
+              "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+              "ref": "jil. 3, hlm. 476 (QS 113:5; Shamela 23584/1398)",
+              "url": "https://tafsir.app/iraab-daas/113/5"
+            },
+            {
+              "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+              "ref": "hlm. 23, Bab al-Makhfudhat min al-Asma': majrur karena huruf (antara lain min, fī, bi-) dan karena idhafah",
+              "url": "https://shamela.ws/book/11371/31"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:5:2:*) — akar, lemma, kelas kata: N|STEM|POS:N|LEM:$ar~|ROOT:$rr|MS|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=5"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 113:5",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "113:5:3",
+          "ar": "حَاسِدٍ",
+          "translit": "ḥāsidin",
+          "gloss": "orang yang dengki",
+          "root": [
+            "ح",
+            "س",
+            "د"
+          ],
+          "lemma": "حَاسِد",
+          "pos": "isim fa'il",
+          "wazn": "فَاعِل",
+          "case": {
+            "state": "majrur",
+            "sign": "kasratain"
+          },
+          "why": "Akhirnya kasrah bertanwin karena menjadi mudhaf ilaih dari syarri; ḥāsid adalah isim fa'il dari ḥasada (“yang dengki”), dan di sini nakirah, tanpa al-.",
+          "lemma_id": "hasid",
+          "concepts": [
+            "idhafah",
+            "isim-fail"
+          ],
+          "role": "mudhaf ilaih",
+          "ikhtilaf": [
+            {
+              "point": "Mengapa gāsiqin dan ḥāsidin berbentuk nakirah (tanpa al-), sedangkan an-naffāṡāti memakai al-?",
+              "options": [
+                "Nakirah memberi makna “sebagian”, karena bahaya tidak selalu datang darinya; al- pada an-naffāṡāti menunjuk yang sudah dikenal, sebagaimana diriwayatkan dalam tafsir, atau untuk menegaskan beratnya kejahatan — as-Samin",
+                "Sebagian yang dimintakan perlindungan dibuat ma'rifah untuk makna umum dan sebagian nakirah untuk makna khusus: setiap peniup buhul itu jahat, sedangkan hasad (dengki) ada yang terpuji dan ada yang tercela — Darwisy; catatan al-Fawa'id dalam al-Jadwal menjelaskan bahwa yang tercela ialah menginginkan hilangnya nikmat dari orang lain, sedangkan berlomba dalam kebaikan itu terpuji"
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 15, hlm. 428 (ash-Sharf: ḥāsid isim fa'il dari fi'il tsulatsi ḥasada, wazan fā‘ilun; al-Fawa'id: hasad ialah menginginkan hilangnya nikmat dari orang lain dan itu tercela, sedangkan berlomba dalam kebaikan itu terpuji; Shamela 22916/5920)",
+              "url": "https://tafsir.app/aljadwal/113/5"
+            },
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 623 (QS 113:5 di-'athaf-kan, 'i'rab-nya jelas'; al-Fawa'id: sebagian dibuat ma'rifah dan sebagian nakirah untuk makna umum dan khusus, dan hasad ada yang terpuji dan ada yang tercela; Shamela 2163/5781)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/5"
+            },
+            {
+              "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+              "ref": "jil. 11, hlm. 160 (gāsiq dan ḥāsid dibuat nakirah karena bahayanya bisa tidak terjadi, jadi nakirah bermakna sebagian; Shamela 9057/10764)",
+              "url": "https://tafsir.app/aldur-almasoon/113/4"
+            },
+            {
+              "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+              "ref": "jil. 3, hlm. 476 (QS 113:5; Shamela 23584/1398)",
+              "url": "https://tafsir.app/iraab-daas/113/5"
+            },
+            {
+              "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+              "ref": "hlm. 7, Bab Ma'rifat 'Alamat al-I'rab: kasrah tanda khafdh pada isim mufrad munsharif, jamak taksir munsharif dan jamak mu'annats salim",
+              "url": "https://shamela.ws/book/11371/4"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:5:3:*) — akar, lemma, kelas kata: N|STEM|POS:N|ACT|PCPL|LEM:HaAsid|ROOT:Hsd|M|INDEF|GEN",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=5"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 113:5",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "113:5:4",
+          "ar": "إِذَا",
+          "translit": "iżā",
+          "gloss": "apabila",
+          "root": null,
+          "lemma": "إِذَا",
+          "pos": "zharaf zaman",
+          "wazn": null,
+          "case": {
+            "state": "mabni",
+            "sign": "sukun",
+            "mahall": "mahall nashb"
+          },
+          "why": "Iżā mabni di atas sukun dan berkedudukan nashab sebagai keterangan waktu (zharaf) murni; kalimat sesudahnya, ḥasada, menjadi mudhaf ilaih baginya.",
+          "lemma_id": "idha",
+          "concepts": [
+            "zharaf-idza"
+          ],
+          "role": "zharaf zaman (keterangan waktu); disandarkan kepada kalimat sesudahnya",
+          "ikhtilaf": [
+            {
+              "point": "Iżā dikaitkan (muta'alliq) dengan kata apa?",
+              "options": [
+                "Dengan a‘ūżu: “aku berlindung … pada waktu itu” — al-Mujtaba; as-Samin menyatakan hal yang sama untuk iżā di ayat 3",
+                "Dengan kata syarri, yang oleh al-Jadwal disebut mashdar (syarri ḥāsidin) — al-Jadwal"
+              ]
+            }
+          ],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 623 (al-I'rab QS 113:1–5; Shamela 2163/5781)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/5"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 15, hlm. 427 (QS 113, bagian al-I'rab; Shamela 22916/5919)",
+              "url": "https://tafsir.app/aljadwal/113/5"
+            },
+            {
+              "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+              "ref": "jil. 4, hlm. 1492 (QS 113:5; Shamela 9617/6027)",
+              "url": "https://tafsir.app/mujtaba-mushkil-iraab/113/5"
+            },
+            {
+              "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath; Damaskus: Dar al-Qalam)",
+              "ref": "jil. 11, hlm. 159 (untuk iżā di ayat 3: manshub oleh a‘ūżu; Shamela 9057/10762)",
+              "url": "https://tafsir.app/aldur-almasoon/113/3"
+            },
+            {
+              "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+              "ref": "jil. 3, hlm. 476 (QS 113:5; Shamela 23584/1398)",
+              "url": "https://tafsir.app/iraab-daas/113/5"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 1, hlm. 57–58 (QS 2:11: iżā zharaf untuk masa yang akan datang, mabni di atas sukun; ash-Sharf: iżā bisa lepas dari makna syarat, seperti pada QS 92:1; Shamela 22916/42–43)",
+              "url": "https://shamela.ws/book/22916/42"
+            },
+            {
+              "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)",
+              "ref": "hlm. 547 (al-Bab ats-Tsani: jumlah keempat yang punya kedudukan i'rab ialah jumlah yang menjadi mudhaf ilaih, kedudukannya jar; iżā wajib disandarkan kepada jumlah menurut jumhur)",
+              "url": "https://shamela.ws/book/6972/535"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:5:4:*) — akar, lemma, kelas kata: T|STEM|POS:T|LEM:<i*aA",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=5"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 113:5",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113"
+            }
+          ],
+          "status": "draft"
+        },
+        {
+          "loc": "113:5:5",
+          "ar": "حَسَدَ",
+          "translit": "ḥasada",
+          "gloss": "dia dengki",
+          "root": [
+            "ح",
+            "س",
+            "د"
+          ],
+          "lemma": "حَسَدَ",
+          "pos": "fi'il madhi",
+          "wazn": "فَعَلَ",
+          "case": {
+            "state": "mabni",
+            "sign": "fathah"
+          },
+          "why": "Fi'il madhi ini mabni di atas fathah; pelakunya tersirat (“dia”, yaitu orang yang dengki itu), dan kalimat ḥasada berkedudukan jar sebagai mudhaf ilaih dari iżā.",
+          "lemma_id": "hasada",
+          "concepts": [
+            "fiil-madhi",
+            "zharaf-idza"
+          ],
+          "role": "fi'il madhi (fa'il tersimpan: “dia”); kalimatnya mudhaf ilaih bagi iżā",
+          "ikhtilaf": [],
+          "sources": [
+            {
+              "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+              "ref": "jil. 10, hlm. 623 (QS 113:5 di-'athaf-kan, 'i'rab-nya jelas', yaitu seperti ayat 3; Shamela 2163/5781)",
+              "url": "https://tafsir.app/iraab-aldarweesh/113/5"
+            },
+            {
+              "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+              "ref": "jil. 15, hlm. 428 (jumlah ḥasada berkedudukan jar sebagai mudhaf ilaih; Shamela 22916/5920)",
+              "url": "https://tafsir.app/aljadwal/113/5"
+            },
+            {
+              "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+              "ref": "jil. 3, hlm. 476 (QS 113:5; Shamela 23584/1398)",
+              "url": "https://tafsir.app/iraab-daas/113/5"
+            },
+            {
+              "kitab": "Ibnu Hisyam al-Anshari, Syarh Qathr an-Nada wa Ball ash-Shada (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, cet. 11, 1383 H/1963 M)",
+              "ref": "hlm. 27, al-Fi'l al-Madhi: hukum asalnya mabni di atas fathah",
+              "url": "https://shamela.ws/book/6970/15"
+            },
+            {
+              "kitab": "Ibnu Ajurrum, al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998)",
+              "ref": "hlm. 10, Bab al-Af'al: fi'il madhi selalu berakhir fathah; fi'il amr 'majzum selamanya'; fi'il mudhari' marfu' sampai didahului huruf penashab atau penjazm",
+              "url": "https://shamela.ws/book/11371/7"
+            },
+            {
+              "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)",
+              "ref": "hlm. 547 (al-Bab ats-Tsani: jumlah keempat yang punya kedudukan i'rab ialah jumlah yang menjadi mudhaf ilaih, kedudukannya jar; iżā wajib disandarkan kepada jumlah menurut jumhur)",
+              "url": "https://shamela.ws/book/6972/535"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:5:5:*) — akar, lemma, kelas kata: V|STEM|POS:V|PERF|LEM:Hasada|ROOT:Hsd|3MS",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=5"
+            },
+            {
+              "kitab": "Quranic Arabic Corpus 0.4",
+              "ref": "(113:5:5:*) bentuk kata kerja (VF) I (QAC 0.4 menandai bentuk II–XII saja; tanpa tanda = bentuk I), fi'il madhi (PERF), 3MS; harakat pola wazan mengikuti token Tanzil 113:5:5",
+              "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=5"
+            },
+            {
+              "kitab": "Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc 'Terjemahan Berbahasa Indonesia - Kementerian Agama' v1.0.1",
+              "ref": "QS 113:5",
+              "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113"
+            }
+          ],
+          "status": "draft"
+        }
+      ],
+      "translation": {
+        "text": "dan dari kejahatan orang yang dengki apabila dia dengki.\"",
+        "footnotes": [],
+        "source_label": "Terjemahan Berbahasa Indonesia - Kementerian Agama",
+        "version": "1.0.1"
+      },
+      "recitation": [
+        {
+          "reciter": "Husary_Muallim_128kbps",
+          "url": "https://everyayah.com/data/Husary_Muallim_128kbps/113005.mp3",
+          "segments": [
+            [
+              1,
+              250,
+              1230
+            ],
+            [
+              2,
+              1240,
+              2190
+            ],
+            [
+              3,
+              2200,
+              3670
+            ],
+            [
+              4,
+              3680,
+              4610
+            ],
+            [
+              5,
+              4620,
+              5550
+            ]
+          ],
+          "credit": "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        },
+        {
+          "reciter": "Alafasy_128kbps",
+          "url": "https://everyayah.com/data/Alafasy_128kbps/113005.mp3",
+          "segments": [
+            [
+              1,
+              30,
+              1270
+            ],
+            [
+              2,
+              1280,
+              1920
+            ],
+            [
+              3,
+              1930,
+              3070
+            ],
+            [
+              4,
+              3080,
+              3640
+            ],
+            [
+              5,
+              3650,
+              4330
+            ]
+          ],
+          "credit": "Recitation: Mishary Rashid Alafasy via EveryAyah.com · Word timings: Collin Fair, quran-align (CC BY 4.0)"
+        }
+      ],
+      "structure": {
+        "type": "lanjutan jumlah ayat 1 ('athaf), memuat zharaf iżā dan jumlah mudhaf ilaih",
+        "summary": "Polanya sama dengan ayat 3, dan Darwisy menyebut i'rab-nya “jelas”: frasa ini di-'athaf-kan pada min syarri sebelumnya, syarri disandarkan kepada ḥāsidin (“orang yang dengki”), lalu iżā (“apabila”) menjadi keterangan waktu dengan kalimat ḥasada (“dia dengki”) sebagai mudhaf ilaih-nya. Al-Mujtaba mengaitkan iżā dengan a‘ūżu, sedangkan al-Jadwal dengan syarri.",
+        "groups": [
+          {
+            "words": [
+              1,
+              2,
+              3
+            ],
+            "label": "wa min syarri ḥāsidin: di-'athaf-kan pada min syarri sebelumnya",
+            "concept": "athaf"
+          },
+          {
+            "words": [
+              2,
+              3
+            ],
+            "label": "syarri → ḥāsidin: idhafah (“kejahatan orang yang dengki”)",
+            "concept": "idhafah"
+          },
+          {
+            "words": [
+              4,
+              5
+            ],
+            "label": "iżā + ḥasada: keterangan waktu yang disandarkan kepada sebuah kalimat",
+            "concept": "zharaf-idza"
+          }
+        ],
+        "sources": [
+          {
+            "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+            "ref": "jil. 10, hlm. 623 (al-I'rab: QS 113:5 di-'athaf-kan pada yang sebelumnya, 'i'rab-nya jelas')",
+            "url": "https://shamela.ws/book/2163/5781"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+            "ref": "jil. 15, hlm. 427 (iżā seperti yang pertama, terkait mashdar syarri ḥāsidin)",
+            "url": "https://shamela.ws/book/22916/5919"
+          },
+          {
+            "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+            "ref": "jil. 15, hlm. 428 (jumlah ḥasada berkedudukan jar sebagai mudhaf ilaih; ash-Sharf: ḥāsid isim fa'il dari ḥasada, wazan fā‘ilun)",
+            "url": "https://shamela.ws/book/22916/5920"
+          },
+          {
+            "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+            "ref": "jil. 4, hlm. 1492 (QS 113:5: iżā zharaf murni terkait a‘ūżu)",
+            "url": "https://shamela.ws/book/9617/6027"
+          },
+          {
+            "kitab": "Ahmad 'Ubaid ad-Da'as, Ahmad Muhammad Humaidan dan Isma'il Mahmud al-Qasim, I'rab al-Qur'an al-Karim (Damaskus: Dar al-Munir dan Dar al-Farabi, cet. 1, 1425 H)",
+            "ref": "jil. 3, hlm. 476 (wa min syarri ḥāsidin di-'athaf-kan; iżā zharaf zaman; ḥasada fi'il madhi, pelakunya tersimpan, jumlahnya berkedudukan jar karena idhafah)",
+            "url": "https://shamela.ws/book/23584/1398"
+          },
+          {
+            "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)",
+            "ref": "hlm. 547 (al-Bab ats-Tsani: jumlah yang menjadi mudhaf ilaih berkedudukan jar; iżā wajib disandarkan kepada jumlah menurut jumhur)",
+            "url": "https://shamela.ws/book/6972/535"
+          }
+        ],
+        "status": "draft"
+      },
+      "status": "draft"
+    }
+  ],
+  "facts": [
+    {
+      "id": "lima-ayat",
+      "title": "5 ayat, 23 kata",
+      "body": "Dalam hitungan Kufah (riwayat Hafs) yang dipakai modul ini, Al-Falaq terdiri atas 5 ayat dan 23 kata (4 + 4 + 5 + 5 + 5). Basmalah di atas surah tidak diberi nomor ayat dalam hitungan ini. Ad-Dani mencatat jumlah kata yang sama. Menurut ad-Dani, surah ini 5 ayat dalam semua hitungan, tanpa perbedaan.",
+      "locations": [
+        "113:1",
+        "113:2",
+        "113:3",
+        "113:4",
+        "113:5"
+      ],
+      "method": "Ayat = baris surah 113 dalam Tanzil Uthmani 1.1 (sama dengan atribut ayas di quran-data.xml); kata = token yang dipisah spasi setelah basmalah pembuka surah (yang ditaruh Tanzil di awal ayat 1) dibuang. Penomoran kata QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 112, 113 dan 114 identik byte-per-byte dengan 1.1 yang dipakai) untuk surah 113 juga berisi 23 kata dan cocok satu per satu. Kesepakatan semua hitungan ayat dikutip dari ad-Dani, bukan hasil hitungan data.",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; baris 113|1 sampai 113|5; basmalah pembuka dibuang",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; jumlah lokasi (113:a:w)",
+          "url": "https://corpus.quran.com/"
+        },
+        {
+          "kitab": "Abu 'Amr ad-Dani, al-Bayan fi 'Add Ay al-Qur'an",
+          "ref": "Surat al-Falaq, hlm. 297",
+          "url": "https://shamela.ws/book/5542/279"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "makkiyah-madaniyah-al-falaq",
+      "title": "Makkiyah atau Madaniyah?",
+      "body": "Ad-Dani mencatat perbedaan pendapat: Al-Falaq Madaniyah menurut Ibnu 'Abbas, Mujahid dan 'Atha', sedangkan menurut Qatadah Makkiyah. Data surah Tanzil yang dipakai modul ini menandainya Makkiyah.",
+      "locations": [
+        "113:1",
+        "113:2",
+        "113:3",
+        "113:4",
+        "113:5"
+      ],
+      "method": "Bukan hitungan. Pendapat ulama dikutip dari ad-Dani; penanda Tanzil dari atribut type di quran-data.xml.",
+      "sources": [
+        {
+          "kitab": "Abu 'Amr ad-Dani, al-Bayan fi 'Add Ay al-Qur'an",
+          "ref": "Surat al-Falaq, hlm. 297",
+          "url": "https://shamela.ws/book/5542/279"
+        },
+        {
+          "kitab": "Tanzil Quran metadata (quran-data.xml) 1.0",
+          "ref": "sha256:8867c1d88191472a; sura index=113, type=Meccan",
+          "url": "https://tanzil.net/docs/quran_metadata"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "qul-a-udzu-bi-rabbi",
+      "title": "Dua surah dengan pembuka yang sama",
+      "body": "Kalimat «قُلْ أَعُوذُ بِرَبِّ» (katakanlah: aku berlindung kepada Tuhan) hanya ada di dua tempat dalam Al-Qur'an: awal Al-Falaq (113:1) dan awal An-Nas (114:1). Lanjutannya berbeda: «ٱلْفَلَقِ» di Al-Falaq dan «ٱلنَّاسِ» di An-Nas.",
+      "locations": [
+        "113:1",
+        "114:1"
+      ],
+      "method": "Tiga token berurutan qul + a‘ūżu + bi-rabbi (diambil dari 113:1), token pertama boleh berawalan wa- atau fa-; kunci pencarian: tatweel (U+0640), harakat dan tanda baca Qur'ani (U+064B–U+065F, U+06D6–U+06ED) dibuang; bentuk alif (ٱ أ إ آ dan alif kecil U+0670) disamakan menjadi ا.",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token 113:1:1–3 berurutan",
+          "url": "https://tanzil.net/download/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "kata-tunggal-al-falaq",
+      "title": "5 kata yang hanya ada di Al-Falaq",
+      "body": "Lima kata dalam surah ini tidak dipakai di tempat lain dalam Al-Qur'an: «ٱلْفَلَقِ» (113:1), «غَاسِقٍ» dan «وَقَبَ» (113:3), «ٱلنَّفَّٰثَٰتِ» (113:4) dan «حَاسِدٍ» (113:5). Untuk «وَقَبَ» dan «ٱلنَّفَّٰثَٰتِ», akarnya pun (و ق ب dan ن ف ث) hanya ada di sini.",
+      "locations": [
+        "113:1",
+        "113:3",
+        "113:4",
+        "113:5"
+      ],
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 112, 113 dan 114 identik byte-per-byte dengan 1.1 yang dipakai): lemma (LEM) segmen STEM surah 113 yang semua kemunculannya di seluruh Al-Qur'an ada di surah ini (LEM:falaq; LEM:gaAsiq; LEM:waqaba; LEM:n~af~a`va`t; LEM:HaAsid); akar yang juga hanya ada di sini: ROOT:wqb; ROOT:nfv. Dicek di Tanzil: token dengan tulisan sama tanpa harakat (boleh dengan al- dan awalan wa-, fa-, bi-, ka-, li-) hanya ada di tempat itu.",
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; LEM:falaq; LEM:gaAsiq; LEM:waqaba; LEM:n~af~a`va`t; LEM:HaAsid; ROOT:wqb; ROOT:nfv",
+          "url": "https://corpus.quran.com/"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token yang sama tanpa harakat",
+          "url": "https://tanzil.net/download/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "akar-falaq",
+      "title": "Al-falaq dan keluarga katanya",
+      "body": "Kata «ٱلْفَلَقِ» hanya ada di 113:1, tetapi keluarga akar ف ل ق muncul 4 kali: «فَالِقُ ٱلْحَبِّ» (6:95), «فَالِقُ ٱلْإِصْبَاحِ» (6:96), «فَٱنفَلَقَ» (26:63) dan 113:1. Ibnu Katsir menukil dari Jabir dan Ibnu 'Abbas (riwayat al-'Aufi), juga dari banyak ulama salaf, bahwa al-falaq adalah subuh; al-Qurazhi, Ibnu Zaid, dan Ibnu Jarir menyamakannya dengan «فَالِقُ ٱلْإِصْبَاحِ» (6:96). Ada pendapat lain, tetapi Ibnu Jarir memilih makna ini, dan Ibnu Katsir menyebutnya pendapat yang benar serta pilihan al-Bukhari.",
+      "locations": [
+        "6:95",
+        "6:96",
+        "26:63",
+        "113:1"
+      ],
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 112, 113 dan 114 identik byte-per-byte dengan 1.1 yang dipakai): segmen STEM dengan ROOT:flq = 4 dalam 4 ayat; LEM:falaq = 1. Kutipan diambil dari token Tanzil di lokasi QAC itu (isim beserta kata sesudahnya). Penafsiran dikutip dari Ibnu Katsir.",
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; ROOT:flq; LEM:falaq",
+          "url": "https://corpus.quran.com/"
+        },
+        {
+          "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami as-Salamah, Dar Thayyibah)",
+          "ref": "jil. 8, hlm. 535 (tafsir QS 113:1: makna al-falaq)",
+          "url": "https://shamela.ws/book/8473/4581"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "akar-ghasiq",
+      "title": "Gāsiq dan keluarga katanya",
+      "body": "Kata «غَاسِقٍ» hanya ada di 113:3, tetapi keluarga akar غ س ق muncul 4 kali, misalnya «غَسَقِ ٱلَّيْلِ» (17:78). Ibnu Katsir menukil Mujahid: gāsiq adalah malam, dan «إِذَا وَقَبَ» adalah saat matahari terbenam; Ibnu 'Abbas dan sejumlah ulama lain menyebutnya malam ketika datang dengan kegelapannya. Ibnu Katsir juga mencatat pendapat lain.",
+      "locations": [
+        "17:78",
+        "38:57",
+        "78:25",
+        "113:3"
+      ],
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 112, 113 dan 114 identik byte-per-byte dengan 1.1 yang dipakai): segmen STEM dengan ROOT:gsq = 4 dalam 4 ayat; LEM:gaAsiq = 1. Penafsiran dikutip dari Ibnu Katsir.",
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; ROOT:gsq; LEM:gaAsiq",
+          "url": "https://corpus.quran.com/"
+        },
+        {
+          "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami as-Salamah, Dar Thayyibah)",
+          "ref": "jil. 8, hlm. 535 (tafsir QS 113:3: makna gāsiq)",
+          "url": "https://shamela.ws/book/8473/4581"
+        },
+        {
+          "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami as-Salamah, Dar Thayyibah)",
+          "ref": "jil. 8, hlm. 536 (tafsir QS 113:3: pendapat lain tentang gāsiq: matahari terbenam, bintang, bulan)",
+          "url": "https://shamela.ws/book/8473/4582"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "akar-hasad",
+      "title": "Keluarga kata ḥasad: 5 kali",
+      "body": "Kata-kata dari akar ح س د (dengki), seperti «حَاسِدٍ» dan «حَسَدَ» di 113:5, muncul 5 kali dalam 4 ayat: 2:109, 4:54, 48:15 dan 113:5. Bentuk ḥāsid (orang yang dengki) hanya ada di 113:5.",
+      "locations": [
+        "2:109",
+        "4:54",
+        "48:15",
+        "113:5"
+      ],
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 112, 113 dan 114 identik byte-per-byte dengan 1.1 yang dipakai): segmen STEM dengan ROOT:Hsd = 5 dalam 4 ayat (LEM:HaAsid 1, LEM:Hasad 1, LEM:Hasada 3); LEM:HaAsid hanya di 113:5.",
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; ROOT:Hsd; LEM:HaAsid",
+          "url": "https://corpus.quran.com/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "min-syarri",
+      "title": "Min syarri: 5 kali",
+      "body": "Ungkapan «مِن شَرِّ» (dari kejahatan), dengan atau tanpa awalan wa-, muncul 5 kali dalam Al-Qur'an, dan semuanya ada di dua surah ini: empat di Al-Falaq (113:2–5) dan satu di An-Nas (114:4).",
+      "locations": [
+        "113:2",
+        "113:3",
+        "113:4",
+        "113:5",
+        "114:4"
+      ],
+      "method": "Dua token berurutan min + syarri (diambil dari 113:2), token pertama boleh berawalan wa- atau fa-; kunci pencarian: tatweel (U+0640), harakat dan tanda baca Qur'ani (U+064B–U+065F, U+06D6–U+06ED) dibuang; bentuk alif (ٱ أ إ آ dan alif kecil U+0670) disamakan menjadi ا. Dicek di QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 112, 113 dan 114 identik byte-per-byte dengan 1.1 yang dipakai): di setiap tempat kata pertama berlemma min dan kata kedua berlemma syarr.",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token 113:2:1 + 113:2:2 berurutan",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; LEM:min lalu LEM:$ar~",
+          "url": "https://corpus.quran.com/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "keluarga-kata-a-udzu",
+      "title": "Keluarga kata a‘ūżu: 17 kali",
+      "body": "Keluarga kata ع و ذ (berlindung) muncul 17 kali dalam Al-Qur'an, dalam 4 lemma. Bentuk «أَعُوذُ» (aku berlindung), dengan atau tanpa awalan wa-, ada di 7 ayat: 2:67, 11:47, 19:18, 23:97, 23:98, 113:1 dan 114:1. Perintah «فَٱسْتَعِذْ» (maka berlindunglah) muncul 4 kali (7:200, 16:98, 40:56 dan 41:36); salah satunya «فَإِذَا قَرَأْتَ ٱلْقُرْءَانَ فَٱسْتَعِذْ بِٱللَّهِ» (16:98), yaitu perintah berlindung kepada Allah ketika membaca Al-Qur'an.",
+      "locations": [
+        "2:67",
+        "3:36",
+        "7:200",
+        "11:47",
+        "12:23",
+        "12:79",
+        "16:98",
+        "19:18",
+        "23:97",
+        "23:98",
+        "40:27",
+        "40:56",
+        "41:36",
+        "44:20",
+        "72:6",
+        "113:1",
+        "114:1"
+      ],
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 112, 113 dan 114 identik byte-per-byte dengan 1.1 yang dipakai): segmen STEM dengan ROOT:Ew* = 17 dalam 17 ayat (LEM:>uEiy*u 1, LEM:Eu*o 10, LEM:maEaA* 2, LEM:{sotaEi*o 4); a‘ūżu = LEM:Eu*o bertanda IMPF 1S; perintah = LEM:{sotaEi*o bertanda IMPV (bentuk X). Dicek di Tanzil: token a‘ūżu (boleh berawalan wa- atau fa-) ada 7, sama dengan QAC.",
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; ROOT:Ew*; LEM:Eu*o IMPF 1S; LEM:{sotaEi*o IMPV",
+          "url": "https://corpus.quran.com/"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token 113:1:2, awalan wa-/fa-; 16:98 token 1–5",
+          "url": "https://tanzil.net/download/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "lima-surah-qul",
+      "title": "Lima surah dibuka dengan qul",
+      "body": "Ada 5 surah yang ayat pertamanya dibuka dengan «قُلْ» (katakanlah): Al-Jinn (72:1), Al-Kafirun (109:1), Al-Ikhlas (112:1), Al-Falaq (113:1) dan An-Nas (114:1).",
+      "locations": [
+        "72:1",
+        "109:1",
+        "112:1",
+        "113:1",
+        "114:1"
+      ],
+      "method": "Token pertama ayat 1 setiap surah di Tanzil Uthmani 1.1, setelah basmalah pembuka surah dibuang, dibandingkan dengan token 112:1:1 (tanpa awalan); kunci pencarian: tatweel (U+0640), harakat dan tanda baca Qur'ani (U+064B–U+065F, U+06D6–U+06ED) dibuang; bentuk alif (ٱ أ إ آ dan alif kecil U+0670) disamakan menjadi ا. Dicek di QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 112, 113 dan 114 identik byte-per-byte dengan 1.1 yang dipakai): kata pertama kelima ayat itu berlemma qāla dengan tanda IMPV 2MS.",
+      "sources": [
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "sha256:bf4f57b968d03f41; token pertama ayat 1 setiap surah",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "Quranic Arabic Corpus 0.4 (morfologi)",
+          "ref": "sha256:a1d12923815341fa; LEM:qaAla IMPV 2MS pada kata 1 ayat 1",
+          "url": "https://corpus.quran.com/"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "belum-pernah-terlihat-semisalnya",
+      "title": "Belum pernah terlihat semisalnya",
+      "body": "'Uqbah bin 'Amir meriwayatkan sabda Rasulullah ﷺ: malam ini telah diturunkan ayat-ayat yang belum pernah terlihat yang serupa dengannya, yaitu Al-Falaq dan An-Nas (Shahih Muslim no. 814a). Dalam riwayat berikutnya keduanya disebut al-mu‘awwiżatain (Shahih Muslim no. 814b).",
+      "locations": [
+        "113:1",
+        "113:2",
+        "113:3",
+        "113:4",
+        "113:5",
+        "114:1",
+        "114:2",
+        "114:3",
+        "114:4",
+        "114:5",
+        "114:6"
+      ],
+      "method": "Bukan hitungan. Isi hadits dirangkum dari teks Arab rekamannya di korpus platform (api/data), tanpa menambah makna; teks Arab, terjemahan korpus, dan sha256 rekaman dicatat di authored/*.hadith.json. nomor Muslim dipetakan dari nomor urut korpus ke penomoran Fuad 'Abdul Baqi (sunnah.com) lewat fawazahmed0, setelah teks Arabnya dicek identik.",
+      "sources": [
+        {
+          "kitab": "Sahih Muslim",
+          "ref": "no. 814a (penomoran sunnah.com); korpus platform muslim.json hadithnumber 1891, rekaman sha256:1cbc0fa0e7c19328",
+          "url": "https://sunnah.com/muslim:814a"
+        },
+        {
+          "kitab": "Sahih Muslim",
+          "ref": "no. 814b (penomoran sunnah.com); korpus platform muslim.json hadithnumber 1892, rekaman sha256:6e6c5d0f26985253",
+          "url": "https://sunnah.com/muslim:814b"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "setelah-al-muawwidzatain-turun",
+      "title": "Setelah al-mu‘awwiżatain turun",
+      "body": "Abu Sa'id al-Khudri meriwayatkan: Rasulullah ﷺ dahulu memohon perlindungan dari jin dan dari mata manusia, sampai turun al-mu‘awwiżatain. Setelah keduanya turun, beliau memakai keduanya dan meninggalkan yang lain. An-Nawawi mencantumkannya (Riyadhush Shalihin no. 1015) dan menyebut at-Tirmidzi menilainya hasan.",
+      "locations": [
+        "113:1",
+        "113:2",
+        "113:3",
+        "113:4",
+        "113:5",
+        "114:1",
+        "114:2",
+        "114:3",
+        "114:4",
+        "114:5",
+        "114:6"
+      ],
+      "method": "Bukan hitungan. Isi hadits dirangkum dari teks Arab rekamannya di korpus platform (api/data), tanpa menambah makna; teks Arab, terjemahan korpus, dan sha256 rekaman dicatat di authored/*.hadith.json. nomor Riyadhush Shalihin dipetakan dari nomor korpus ke penomoran sunnah.com; penilaian dikutip apa adanya dari akhir teks an-Nawawi.",
+      "sources": [
+        {
+          "kitab": "an-Nawawi, Riyad as-Salihin",
+          "ref": "no. 1015 (penomoran sunnah.com); korpus platform riyad-as-salihin.json hadithnumber 336, rekaman sha256:04b28f750f53a3d1; penilaian: Hasan menurut at-Tirmidzi (disebut an-Nawawi di akhir hadits)",
+          "url": "https://sunnah.com/riyadussalihin:1015"
+        },
+        {
+          "kitab": "Ibnu Katsir, Tafsir al-Qur'an al-'Azhim (tahqiq Sami as-Salamah, Dar Thayyibah)",
+          "ref": "jil. 8, hlm. 534 (tafsir QS 113:1: riwayat Abu Sa'id, penilaian at-Tirmidzi: hasan)",
+          "url": "https://shamela.ws/book/8473/4580"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "dibaca-saat-sakit",
+      "title": "Dibaca saat sakit",
+      "body": "Aisyah menuturkan bahwa apabila sakit, Rasulullah ﷺ membaca al-mu‘awwiżāt untuk dirinya sendiri lalu meniupkannya. Ketika sakitnya bertambah berat, Aisyah yang membacakannya dan mengusap tubuh beliau dengan tangan beliau sendiri, karena mengharap keberkahannya (Shahih al-Bukhari no. 5016). Aisyah juga menuturkan bahwa apabila ada anggota keluarga yang sakit, beliau meniupnya dengan al-mu‘awwiżāt (Shahih Muslim no. 2192a). Teks kedua hadits ini tidak merinci surah mana saja yang dimaksud dengan al-mu‘awwiżāt.",
+      "locations": [
+        "113:1",
+        "113:2",
+        "113:3",
+        "113:4",
+        "113:5",
+        "114:1",
+        "114:2",
+        "114:3",
+        "114:4",
+        "114:5",
+        "114:6"
+      ],
+      "method": "Bukan hitungan. Isi hadits dirangkum dari teks Arab rekamannya di korpus platform (api/data), tanpa menambah makna; teks Arab, terjemahan korpus, dan sha256 rekaman dicatat di authored/*.hadith.json. nomor al-Bukhari = nomor korpus (sama dengan sunnah.com); nomor Muslim dipetakan dari nomor urut korpus ke penomoran Fuad 'Abdul Baqi (sunnah.com) lewat fawazahmed0, setelah teks Arabnya dicek identik.",
+      "sources": [
+        {
+          "kitab": "Sahih al-Bukhari",
+          "ref": "no. 5016 (penomoran sunnah.com); korpus platform bukhari.json hadithnumber 5016, rekaman sha256:e0aa52f4b7f95bca",
+          "url": "https://sunnah.com/bukhari:5016"
+        },
+        {
+          "kitab": "Sahih Muslim",
+          "ref": "no. 2192a (penomoran sunnah.com); korpus platform muslim.json hadithnumber 5714, rekaman sha256:2ea6260c64820aba",
+          "url": "https://sunnah.com/muslim:2192a"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "sebelum-tidur",
+      "title": "Dibaca sebelum tidur",
+      "body": "Aisyah menuturkan: setiap malam, ketika beranjak ke tempat tidurnya, Rasulullah ﷺ menyatukan kedua telapak tangannya, meniupnya, dan membaca ke dalamnya Al-Ikhlas, Al-Falaq, dan An-Nas. Kemudian beliau mengusapkan kedua tangannya ke tubuh sejauh yang terjangkau, dimulai dari kepala, wajah, dan bagian depan tubuh. Beliau melakukannya tiga kali (Shahih al-Bukhari no. 5017). Dalam riwayat lain, Aisyah menyebut bahwa ketika beliau sakit, beliau menyuruh Aisyah melakukannya untuk beliau (Shahih al-Bukhari no. 5748).",
+      "locations": [
+        "112:1",
+        "112:2",
+        "112:3",
+        "112:4",
+        "113:1",
+        "113:2",
+        "113:3",
+        "113:4",
+        "113:5",
+        "114:1",
+        "114:2",
+        "114:3",
+        "114:4",
+        "114:5",
+        "114:6"
+      ],
+      "method": "Bukan hitungan. Isi hadits dirangkum dari teks Arab rekamannya di korpus platform (api/data), tanpa menambah makna; teks Arab, terjemahan korpus, dan sha256 rekaman dicatat di authored/*.hadith.json. nomor al-Bukhari = nomor korpus (sama dengan sunnah.com).",
+      "sources": [
+        {
+          "kitab": "Sahih al-Bukhari",
+          "ref": "no. 5017 (penomoran sunnah.com); korpus platform bukhari.json hadithnumber 5017, rekaman sha256:bff5c0381ff5eb0e",
+          "url": "https://sunnah.com/bukhari:5017"
+        },
+        {
+          "kitab": "Sahih al-Bukhari",
+          "ref": "no. 5748 (penomoran sunnah.com); korpus platform bukhari.json hadithnumber 5748, rekaman sha256:67fc69d263f04457",
+          "url": "https://sunnah.com/bukhari:5748"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "pagi-dan-petang",
+      "title": "Pagi dan petang, tiga kali",
+      "body": "'Abdullah bin Khubaib meriwayatkan bahwa Rasulullah ﷺ menyuruhnya membaca Al-Ikhlas dan al-mu‘awwiżatain pada petang dan pagi hari, tiga kali, dan bersabda bahwa bacaan itu mencukupinya dari segala sesuatu. An-Nawawi mencantumkannya (Riyadhush Shalihin no. 1456) dari riwayat Abu Dawud dan at-Tirmidzi, dan menyebut at-Tirmidzi menilainya hasan shahih.",
+      "locations": [
+        "112:1",
+        "112:2",
+        "112:3",
+        "112:4",
+        "113:1",
+        "113:2",
+        "113:3",
+        "113:4",
+        "113:5",
+        "114:1",
+        "114:2",
+        "114:3",
+        "114:4",
+        "114:5",
+        "114:6"
+      ],
+      "method": "Bukan hitungan. Isi hadits dirangkum dari teks Arab rekamannya di korpus platform (api/data), tanpa menambah makna; teks Arab, terjemahan korpus, dan sha256 rekaman dicatat di authored/*.hadith.json. nomor Riyadhush Shalihin dipetakan dari nomor korpus ke penomoran sunnah.com; penilaian dikutip apa adanya dari akhir teks an-Nawawi.",
+      "sources": [
+        {
+          "kitab": "an-Nawawi, Riyad as-Salihin",
+          "ref": "no. 1456 (penomoran sunnah.com); korpus platform riyad-as-salihin.json hadithnumber 777, rekaman sha256:20a1bf82373c5bd7; penilaian: Hasan shahih menurut at-Tirmidzi; diriwayatkan Abu Dawud dan at-Tirmidzi (disebut an-Nawawi di akhir hadits)",
+          "url": "https://sunnah.com/riyadussalihin:1456"
+        }
+      ],
+      "status": "draft"
+    }
+  ],
+  "hadith": [
+    {
+      "citation": "Sahih Muslim 814a",
+      "ar": "وَحَدَّثَنَا قُتَيْبَةُ بْنُ سَعِيدٍ، حَدَّثَنَا جَرِيرٌ، عَنْ بَيَانٍ، عَنْ قَيْسِ بْنِ أَبِي حَازِمٍ، عَنْ عُقْبَةَ بْنِ عَامِرٍ، قَالَ قَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏\"‏ أَلَمْ تَرَ آيَاتٍ أُنْزِلَتِ اللَّيْلَةَ لَمْ يُرَ مِثْلُهُنَّ قَطُّ ‏{‏ قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ‏}‏ وَ ‏{‏ قُلْ أَعُوذُ بِرَبِّ النَّاسِ‏}‏ ‏\"‏ ‏.‏",
+      "id": "Dan telah menceritakan kepada kami Qutaibah bin Sa'id, telah menceritakan kepada kami Jarir, dari Bayan, dari Qais bin Abi Hazim, dari 'Uqbah bin 'Amir, ia berkata: Rasulullah ﷺ bersabda, \"Tidakkah engkau melihat ayat-ayat yang diturunkan pada malam ini, yang belum pernah terlihat yang serupa dengannya? {Qul a'udzu birabbil falaq} dan {Qul a'udzu birabbin-nas}.\"",
+      "grade": "Shahih (termuat dalam Sahih Muslim; kolom grades di korpus kosong)",
+      "provenance": {
+        "collection": "muslim",
+        "point": "api/data/muslim.json hadithnumber 1891",
+        "sha256": "1cbc0fa0e7c1932870f087bcfe9a6ed060a94e1fc90381d8c183c9add164571a"
+      },
+      "status": "draft"
+    },
+    {
+      "citation": "Sahih Muslim 814b",
+      "ar": "وَحَدَّثَنِي مُحَمَّدُ بْنُ عَبْدِ اللَّهِ بْنِ نُمَيْرٍ، حَدَّثَنَا أَبِي، حَدَّثَنَا إِسْمَاعِيلُ، عَنْ قَيْسٍ، عَنْ عُقْبَةَ بْنِ عَامِرٍ، قَالَ قَالَ لِي رَسُولُ اللَّهِ صلى الله عليه وسلم ‏ \"‏ أُنْزِلَ - أَوْ أُنْزِلَتْ - عَلَىَّ آيَاتٌ لَمْ يُرَ مِثْلُهُنَّ قَطُّ الْمُعَوِّذَتَيْنِ ‏\"‏ ‏.‏",
+      "id": "Dan telah menceritakan kepadaku Muhammad bin 'Abdullah bin Numair, telah menceritakan kepada kami ayahku, telah menceritakan kepada kami Isma'il, dari Qais, dari 'Uqbah bin 'Amir, ia berkata: Rasulullah ﷺ bersabda kepadaku, \"Telah diturunkan — atau telah turun — kepadaku ayat-ayat yang belum pernah terlihat yang serupa dengannya, yaitu al-Mu'awwidzatain.\"",
+      "grade": "Shahih (termuat dalam Sahih Muslim; kolom grades di korpus kosong)",
+      "provenance": {
+        "collection": "muslim",
+        "point": "api/data/muslim.json hadithnumber 1892",
+        "sha256": "6e6c5d0f26985253b452bd83e82267aff2c766d165a9e93abe3fc841a8d464e8"
+      },
+      "status": "draft"
+    },
+    {
+      "citation": "Sahih Muslim 2192a",
+      "ar": "حَدَّثَنِي سُرَيْجُ بْنُ يُونُسَ، وَيَحْيَى بْنُ أَيُّوبَ، قَالاَ حَدَّثَنَا عَبَّادُ بْنُ عَبَّادٍ، عَنْ هِشَامِ، بْنِ عُرْوَةَ عَنْ أَبِيهِ، عَنْ عَائِشَةَ، قَالَتْ كَانَ رَسُولُ اللَّهِ صلى الله عليه وسلم إِذَا مَرِضَ أَحَدٌ مِنْ أَهْلِهِ نَفَثَ عَلَيْهِ بِالْمُعَوِّذَاتِ فَلَمَّا مَرِضَ مَرَضَهُ الَّذِي مَاتَ فِيهِ جَعَلْتُ أَنْفُثُ عَلَيْهِ وَأَمْسَحُهُ بِيَدِ نَفْسِهِ لأَنَّهَا كَانَتْ أَعْظَمَ بَرَكَةً مِنْ يَدِي ‏.‏ وَفِي رِوَايَةِ يَحْيَى بْنِ أَيُّوبَ بِمُعَوِّذَاتٍ ‏.‏",
+      "id": "Telah menceritakan kepadaku Suraij bin Yunus dan Yahya bin Ayyub, keduanya berkata: telah menceritakan kepada kami 'Abbad bin 'Abbad, dari Hisyam bin 'Urwah, dari ayahnya, dari 'Aisyah, ia berkata: Rasulullah ﷺ apabila ada salah seorang anggota keluarganya yang sakit, beliau meniupinya dengan al-mu'awwidzat. Ketika beliau sakit yang menyebabkan wafatnya, aku mulai meniupinya dan mengusapnya dengan tangannya sendiri — karena tangan beliau lebih besar barakahnya daripada tanganku. Dalam riwayat Yahya bin Ayyub: \"dengan beberapa mu'awwidzah\".",
+      "grade": "Shahih (termuat dalam Sahih Muslim; kolom grades di korpus kosong)",
+      "provenance": {
+        "collection": "muslim",
+        "point": "api/data/muslim.json hadithnumber 5714",
+        "sha256": "2ea6260c64820abad68acdd5585f949cd7dc988601c3a8649cf01b7e2f15824a"
+      },
+      "status": "draft"
+    }
+  ],
+  "data_versions": {
+    "tanzil": "uthmani-1.1 sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
+    "tanzil_metadata": "1.0 sha256:8867c1d88191472adec9db694b3cd9f135b1a2ef580574d32cf888dcb22c5c7a",
+    "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
+    "quran_align": "release-2016-11-24 sha256:5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7; Husary_Muallim_128kbps.json sha256:3719fb5c482d7db7086b4a81cdb6f114aa71979899917a74e6c8ae5bec684f5f; Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7",
+    "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512) sha256:f8250fd994df183364e019892b0f8e5a9c4f16c527ec173a54326618b38e5d6a",
+    "authored_words": "authored/al-falaq.words.json sha256:f15a21310244b21c869aeee61c14ac8e3d34f905317b71fe821893077c6d5d4e",
+    "authored_structure": "authored/al-falaq.structure.json sha256:2a9811bbc7e5d374152ac7089be6d2b946a5bbbb5a569856532d0e336cd3d6af",
+    "authored_concepts_map": "authored/al-falaq.concepts-map.json sha256:aed1fd50942fa30fa657a55a384d2fe284d957714238d05a9499b0065e82aaf4",
+    "authored_facts": "authored/al-falaq.facts.generated.json sha256:7340b0445ac2668b639c53c01006f936b4ecd1ef79c6eb9a02f176454003e7f9",
+    "authored_hadith": "authored/al-falaq.hadith.json sha256:b21ea1e52401b20e98c0b96dac242a626180ec8bc779405b3bb099f7b429ba62",
+    "pipeline": "belajar/pipeline/build_surah.py + facts_muawwidzat.py (stdlib only, no LLM)"
+  }
+}

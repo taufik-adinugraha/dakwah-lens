@@ -1,0 +1,244 @@
+{
+  "_comment": "Hadits surah An-Nas (schema.ts Hadith), dicari di korpus platform api/data dan disalin byte-per-byte oleh belajar/pipeline/facts_muawwidzat.py. 'hadith' = rekaman yang lengkap menurut schema.ts (punya terjemahan Indonesia dari korpus). '_needs_indonesian' = rekaman tanpa terjemahan Indonesia di korpus (al-Bukhari, Riyad as-Salihin); tidak dikirim sampai ada terjemahan bersumber. Tidak ada terjemahan yang ditulis di sini. status 'draft' = status pipeline (plan L11).",
+  "surah": 114,
+  "slug": "an-nas",
+  "_generated_by": "belajar/pipeline/facts_muawwidzat.py (Python stdlib, tanpa LLM)",
+  "_inputs": {
+    "corpus": {
+      "bukhari.json": "sha256:df42f6e5fe98a3571cc44775cbe998fb148e21e650c0ff948a2e03ef009493c7",
+      "muslim.json": "sha256:366ebf71aa8e031eb0ec9c1cb4006f653e4d9300f9f6229f11d4df830fd73351",
+      "riyad-as-salihin.json": "sha256:99d32abd2744456c921a4c069d78b1012b325106cd439accaf137dbd5405c8d0",
+      "tafsir-ibn-kathir.json": "sha256:767270d51e5e8c0b5b946fc27b217f51e98274d3d5523d6fecd7c451300b4858"
+    },
+    "hadith_mapping": {
+      "fawazahmed0/ara-muslim-sections-6.json": "sha256:1814326c0fefd9ed123a5e8ee55e6e4eef8dd303775c2028d95d8fef921666f1",
+      "fawazahmed0/ara-muslim-sections-39.json": "sha256:a0e4d44329e0ae3b4b3b29b67dcc3aff430364ab6f1b6b2940cd7252f563f4a3",
+      "ahmedbaset/riyad_assalihin.json": "sha256:180171247ed9462c05164c80c4f938bd30936bfaf848125595be0b86361d7b75"
+    }
+  },
+  "_search_normalisation": "harakat, tanwin, tatweel, alif kecil (U+0670), tanda Qur'ani dan tanda arah teks (U+200C–U+200F) dibuang; tanda baca diganti spasi; أ إ آ ٱ → ا, ى → ي, ة → ه, ؤ → و, ئ → ي; spasi dirapatkan",
+  "_record_sha256": "sha256 dari json.dumps(rekaman korpus, ensure_ascii=False, sort_keys=True, separators=(',', ':')) dalam UTF-8",
+  "hadith": [
+    {
+      "citation": "Sahih Muslim 814a",
+      "ar": "وَحَدَّثَنَا قُتَيْبَةُ بْنُ سَعِيدٍ، حَدَّثَنَا جَرِيرٌ، عَنْ بَيَانٍ، عَنْ قَيْسِ بْنِ أَبِي حَازِمٍ، عَنْ عُقْبَةَ بْنِ عَامِرٍ، قَالَ قَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏\"‏ أَلَمْ تَرَ آيَاتٍ أُنْزِلَتِ اللَّيْلَةَ لَمْ يُرَ مِثْلُهُنَّ قَطُّ ‏{‏ قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ‏}‏ وَ ‏{‏ قُلْ أَعُوذُ بِرَبِّ النَّاسِ‏}‏ ‏\"‏ ‏.‏",
+      "id": "Dan telah menceritakan kepada kami Qutaibah bin Sa'id, telah menceritakan kepada kami Jarir, dari Bayan, dari Qais bin Abi Hazim, dari 'Uqbah bin 'Amir, ia berkata: Rasulullah ﷺ bersabda, \"Tidakkah engkau melihat ayat-ayat yang diturunkan pada malam ini, yang belum pernah terlihat yang serupa dengannya? {Qul a'udzu birabbil falaq} dan {Qul a'udzu birabbin-nas}.\"",
+      "grade": "Shahih (termuat dalam Sahih Muslim; kolom grades di korpus kosong)",
+      "provenance": {
+        "collection": "muslim",
+        "point": "api/data/muslim.json hadithnumber 1891",
+        "sha256": "1cbc0fa0e7c1932870f087bcfe9a6ed060a94e1fc90381d8c183c9add164571a"
+      },
+      "status": "draft",
+      "_en": "Uqba b. 'Amir reported Allah's Messenger (ﷺ) as saying:What wonderful verses have been sent down today. the like of which has never been seen! They are:\" Say: I seek refuge with the Lord of the dawn,\" and\" Say: I seek refuge with the Lord of men",
+      "_id_label": "api/data/muslim.json kolom 'id', disalin apa adanya (terjemahan internal platform, bukan edisi terbitan)",
+      "_local_citation": "Sahih Muslim 1891",
+      "_numbering": "Muslim: nomor urut korpus 1891 -> fawazahmed0 arabicnumber 814.01 -> 814a (penomoran Fuad 'Abd al-Baqi, sunnah.com); teks Arab korpus identik byte-per-byte dengan fawazahmed0",
+      "_url": "https://sunnah.com/muslim:814a",
+      "_topic": "ayat yang belum pernah terlihat semisalnya",
+      "_slugs": [
+        "al-falaq",
+        "an-nas"
+      ],
+      "_used_by_facts": [
+        "belum-pernah-terlihat-semisalnya"
+      ]
+    },
+    {
+      "citation": "Sahih Muslim 814b",
+      "ar": "وَحَدَّثَنِي مُحَمَّدُ بْنُ عَبْدِ اللَّهِ بْنِ نُمَيْرٍ، حَدَّثَنَا أَبِي، حَدَّثَنَا إِسْمَاعِيلُ، عَنْ قَيْسٍ، عَنْ عُقْبَةَ بْنِ عَامِرٍ، قَالَ قَالَ لِي رَسُولُ اللَّهِ صلى الله عليه وسلم ‏ \"‏ أُنْزِلَ - أَوْ أُنْزِلَتْ - عَلَىَّ آيَاتٌ لَمْ يُرَ مِثْلُهُنَّ قَطُّ الْمُعَوِّذَتَيْنِ ‏\"‏ ‏.‏",
+      "id": "Dan telah menceritakan kepadaku Muhammad bin 'Abdullah bin Numair, telah menceritakan kepada kami ayahku, telah menceritakan kepada kami Isma'il, dari Qais, dari 'Uqbah bin 'Amir, ia berkata: Rasulullah ﷺ bersabda kepadaku, \"Telah diturunkan — atau telah turun — kepadaku ayat-ayat yang belum pernah terlihat yang serupa dengannya, yaitu al-Mu'awwidzatain.\"",
+      "grade": "Shahih (termuat dalam Sahih Muslim; kolom grades di korpus kosong)",
+      "provenance": {
+        "collection": "muslim",
+        "point": "api/data/muslim.json hadithnumber 1892",
+        "sha256": "6e6c5d0f26985253b452bd83e82267aff2c766d165a9e93abe3fc841a8d464e8"
+      },
+      "status": "draft",
+      "_en": "Uqba b. 'Amir reported:The Messenger of Allah (ﷺ) said to me: There have been sent down to me verses the like of which had never been seen before. They are the Mu'awwadhatain",
+      "_id_label": "api/data/muslim.json kolom 'id', disalin apa adanya (terjemahan internal platform, bukan edisi terbitan)",
+      "_local_citation": "Sahih Muslim 1892",
+      "_numbering": "Muslim: nomor urut korpus 1892 -> fawazahmed0 arabicnumber 814.02 -> 814b (penomoran Fuad 'Abd al-Baqi, sunnah.com); teks Arab korpus identik byte-per-byte dengan fawazahmed0",
+      "_url": "https://sunnah.com/muslim:814b",
+      "_topic": "ayat yang belum pernah terlihat semisalnya",
+      "_slugs": [
+        "al-falaq",
+        "an-nas"
+      ],
+      "_used_by_facts": [
+        "belum-pernah-terlihat-semisalnya"
+      ]
+    },
+    {
+      "citation": "Sahih Muslim 2192a",
+      "ar": "حَدَّثَنِي سُرَيْجُ بْنُ يُونُسَ، وَيَحْيَى بْنُ أَيُّوبَ، قَالاَ حَدَّثَنَا عَبَّادُ بْنُ عَبَّادٍ، عَنْ هِشَامِ، بْنِ عُرْوَةَ عَنْ أَبِيهِ، عَنْ عَائِشَةَ، قَالَتْ كَانَ رَسُولُ اللَّهِ صلى الله عليه وسلم إِذَا مَرِضَ أَحَدٌ مِنْ أَهْلِهِ نَفَثَ عَلَيْهِ بِالْمُعَوِّذَاتِ فَلَمَّا مَرِضَ مَرَضَهُ الَّذِي مَاتَ فِيهِ جَعَلْتُ أَنْفُثُ عَلَيْهِ وَأَمْسَحُهُ بِيَدِ نَفْسِهِ لأَنَّهَا كَانَتْ أَعْظَمَ بَرَكَةً مِنْ يَدِي ‏.‏ وَفِي رِوَايَةِ يَحْيَى بْنِ أَيُّوبَ بِمُعَوِّذَاتٍ ‏.‏",
+      "id": "Telah menceritakan kepadaku Suraij bin Yunus dan Yahya bin Ayyub, keduanya berkata: telah menceritakan kepada kami 'Abbad bin 'Abbad, dari Hisyam bin 'Urwah, dari ayahnya, dari 'Aisyah, ia berkata: Rasulullah ﷺ apabila ada salah seorang anggota keluarganya yang sakit, beliau meniupinya dengan al-mu'awwidzat. Ketika beliau sakit yang menyebabkan wafatnya, aku mulai meniupinya dan mengusapnya dengan tangannya sendiri — karena tangan beliau lebih besar barakahnya daripada tanganku. Dalam riwayat Yahya bin Ayyub: \"dengan beberapa mu'awwidzah\".",
+      "grade": "Shahih (termuat dalam Sahih Muslim; kolom grades di korpus kosong)",
+      "provenance": {
+        "collection": "muslim",
+        "point": "api/data/muslim.json hadithnumber 5714",
+        "sha256": "2ea6260c64820abad68acdd5585f949cd7dc988601c3a8649cf01b7e2f15824a"
+      },
+      "status": "draft",
+      "_en": "A'isha reported that when any of the members of the household fell ill Allah's Messenger (ﷺ) used to blow over him by reciting Mu'awwidhatan, and when he suffered from illness of which he died I used to blow over him and rubbed his body with his hand for his hand had greater healing power than my hand",
+      "_id_label": "api/data/muslim.json kolom 'id', disalin apa adanya (terjemahan internal platform, bukan edisi terbitan)",
+      "_local_citation": "Sahih Muslim 5714",
+      "_numbering": "Muslim: nomor urut korpus 5714 -> fawazahmed0 arabicnumber 2192.01 -> 2192a (penomoran Fuad 'Abd al-Baqi, sunnah.com); teks Arab korpus identik byte-per-byte dengan fawazahmed0",
+      "_url": "https://sunnah.com/muslim:2192a",
+      "_topic": "dibaca saat sakit",
+      "_slugs": [
+        "al-falaq",
+        "an-nas"
+      ],
+      "_used_by_facts": [
+        "dibaca-saat-sakit"
+      ]
+    }
+  ],
+  "_needs_indonesian": [
+    {
+      "citation": "Sahih al-Bukhari 5017",
+      "ar": "حَدَّثَنَا قُتَيْبَةُ بْنُ سَعِيدٍ، حَدَّثَنَا الْمُفَضَّلُ، عَنْ عُقَيْلٍ، عَنِ ابْنِ شِهَابٍ، عَنْ عُرْوَةَ، عَنْ عَائِشَةَ، أَنَّ النَّبِيَّ صلى الله عليه وسلم كَانَ إِذَا أَوَى إِلَى فِرَاشِهِ كُلَّ لَيْلَةٍ جَمَعَ كَفَّيْهِ ثُمَّ نَفَثَ فِيهِمَا فَقَرَأَ فِيهِمَا ‏{‏قُلْ هُوَ اللَّهُ أَحَدٌ‏}‏ وَ‏{‏قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ‏}‏ وَ‏{‏قُلْ أَعُوذُ بِرَبِّ النَّاسِ‏}‏ ثُمَّ يَمْسَحُ بِهِمَا مَا اسْتَطَاعَ مِنْ جَسَدِهِ يَبْدَأُ بِهِمَا عَلَى رَأْسِهِ وَوَجْهِهِ وَمَا أَقْبَلَ مِنْ جَسَدِهِ يَفْعَلُ ذَلِكَ ثَلاَثَ مَرَّاتٍ‏.‏",
+      "grade": "Shahih (termuat dalam Sahih al-Bukhari; kolom grades di korpus kosong)",
+      "provenance": {
+        "collection": "bukhari",
+        "point": "api/data/bukhari.json hadithnumber 5017",
+        "sha256": "bff5c0381ff5eb0ea64a932e1964ad4f88e9a02e12183b5eb01a4fe33c25bb8a"
+      },
+      "status": "draft",
+      "_en": "Narrated 'Aisha: Whenever the Prophet (ﷺ) went to bed every night, he used to cup his hands together and blow over it after reciting Surat Al-Ikhlas, Surat Al-Falaq and Surat An-Nas, and then rub his hands over whatever parts of his body he was able to rub, starting with his head, face and front of his body. He used to do that three times",
+      "_local_citation": "Sahih al-Bukhari 5017",
+      "_numbering": "Bukhari: nomor korpus = nomor sunnah.com (fawazahmed0 hadithnumber)",
+      "_url": "https://sunnah.com/bukhari:5017",
+      "_topic": "dibaca sebelum tidur",
+      "_slugs": [
+        "al-ikhlas",
+        "al-falaq",
+        "an-nas"
+      ],
+      "_used_by_facts": [
+        "sebelum-tidur"
+      ]
+    },
+    {
+      "citation": "Sahih al-Bukhari 5748",
+      "ar": "حَدَّثَنَا عَبْدُ الْعَزِيزِ بْنُ عَبْدِ اللَّهِ الأُوَيْسِيُّ، حَدَّثَنَا سُلَيْمَانُ، عَنْ يُونُسَ، عَنِ ابْنِ شِهَابٍ، عَنْ عُرْوَةَ بْنِ الزُّبَيْرِ، عَنْ عَائِشَةَ ـ رضى الله عنها ـ قَالَتْ كَانَ رَسُولُ اللَّهِ صلى الله عليه وسلم إِذَا أَوَى إِلَى فِرَاشِهِ نَفَثَ فِي كَفَّيْهِ بِقُلْ هُوَ اللَّهُ أَحَدٌ وَبِالْمُعَوِّذَتَيْنِ جَمِيعًا، ثُمَّ يَمْسَحُ بِهِمَا وَجْهَهُ، وَمَا بَلَغَتْ يَدَاهُ مِنْ جَسَدِهِ‏.‏ قَالَتْ عَائِشَةُ فَلَمَّا اشْتَكَى كَانَ يَأْمُرُنِي أَنْ أَفْعَلَ ذَلِكَ بِهِ‏.‏ قَالَ يُونُسُ كُنْتُ أَرَى ابْنَ شِهَابٍ يَصْنَعُ ذَلِكَ إِذَا أَتَى إِلَى فِرَاشِهِ‏.‏",
+      "grade": "Shahih (termuat dalam Sahih al-Bukhari; kolom grades di korpus kosong)",
+      "provenance": {
+        "collection": "bukhari",
+        "point": "api/data/bukhari.json hadithnumber 5748",
+        "sha256": "67fc69d263f044577bbc8ebfdf5a78221c3552feb9c2e31e5237bdfc2d43360d"
+      },
+      "status": "draft",
+      "_en": "Narrated `Aisha:Whenever Allah's Messenger (ﷺ) went to bed, he used to recite Surat-al-Ikhlas, Surat-al-Falaq and Surat-an- Nas and then blow on his palms and pass them over his face and those parts of his body that his hands could reach. And when he fell ill, he used to order me to do like that for him",
+      "_local_citation": "Sahih al-Bukhari 5748",
+      "_numbering": "Bukhari: nomor korpus = nomor sunnah.com (fawazahmed0 hadithnumber)",
+      "_url": "https://sunnah.com/bukhari:5748",
+      "_topic": "dibaca sebelum tidur",
+      "_slugs": [
+        "al-ikhlas",
+        "al-falaq",
+        "an-nas"
+      ],
+      "_used_by_facts": [
+        "sebelum-tidur"
+      ]
+    },
+    {
+      "citation": "Riyad as-Salihin 1456",
+      "ar": "وعن عبد الله بن خُبيب -بضم الخاء المعجمة- رضي الله عنه قال‏:‏ قال لي رسول الله صلى الله عليه وسلم‏:‏ ‏\n\"‏اقرأ‏:‏ قل هو الله أحد، والمعوذتين حين تمسي وحين تصبح، ثلاث مرات، تكفيك من كل شيء‏\"‏‏.‏ رواه أبو داود والترمذي وقال حديث حسن صحيح ‏.‏",
+      "grade": "Hasan shahih menurut at-Tirmidzi; diriwayatkan Abu Dawud dan at-Tirmidzi (disebut an-Nawawi di akhir hadits)",
+      "provenance": {
+        "collection": "riyad-as-salihin",
+        "point": "api/data/riyad-as-salihin.json hadithnumber 777",
+        "sha256": "20a1bf82373c5bd7892e6dd2ed51fba88a97821b3884719caaf1e5add133fab2"
+      },
+      "status": "draft",
+      "_en": "'Abdullah bin Khubaib (May Allah be pleased with him) reported:\nThe Messenger of Allah (ﷺ) said to me, \"Recite Surat Al-Ikhlas and Al- Mu'awwidhatain (Surat Al-Falaq and Surat An-Nas) three times at dawn and dusk. It will suffice you in all respects.\".",
+      "_local_citation": "Riyad as-Salihin 777",
+      "_numbering": "Riyad: idInBook korpus 777, chapterId 15 -> 1456 (aturan migrate_hadith_citations.py: bab 0 = n - 1217, lainnya n + 679); teks Arab identik dengan AhmedBaset",
+      "_url": "https://sunnah.com/riyadussalihin:1456",
+      "_topic": "dibaca pagi dan petang",
+      "_slugs": [
+        "al-ikhlas",
+        "al-falaq",
+        "an-nas"
+      ],
+      "_used_by_facts": [
+        "pagi-dan-petang"
+      ]
+    },
+    {
+      "citation": "Sahih al-Bukhari 5016",
+      "ar": "حَدَّثَنَا عَبْدُ اللَّهِ بْنُ يُوسُفَ، أَخْبَرَنَا مَالِكٌ، عَنِ ابْنِ شِهَابٍ، عَنْ عُرْوَةَ، عَنْ عَائِشَةَ، رضى الله عنها أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم كَانَ إِذَا اشْتَكَى يَقْرَأُ عَلَى نَفْسِهِ بِالْمُعَوِّذَاتِ وَيَنْفُثُ، فَلَمَّا اشْتَدَّ وَجَعُهُ كُنْتُ أَقْرَأُ عَلَيْهِ وَأَمْسَحُ بِيَدِهِ رَجَاءَ بَرَكَتِهَا‏.‏",
+      "grade": "Shahih (termuat dalam Sahih al-Bukhari; kolom grades di korpus kosong)",
+      "provenance": {
+        "collection": "bukhari",
+        "point": "api/data/bukhari.json hadithnumber 5016",
+        "sha256": "e0aa52f4b7f95bca92dd302b27b8063fb846a84daa43f685129c23eb634bdb26"
+      },
+      "status": "draft",
+      "_en": "Narrated `Aisha:Whenever Allah's Messenger (ﷺ) became sick, he would recite Mu'awwidhat (Surat Al-Falaq and Surat An- Nas) and then blow his breath over his body. When he became seriously ill, I used to recite (these two Suras) and rub his hands over his body hoping for its blessings",
+      "_local_citation": "Sahih al-Bukhari 5016",
+      "_numbering": "Bukhari: nomor korpus = nomor sunnah.com (fawazahmed0 hadithnumber)",
+      "_url": "https://sunnah.com/bukhari:5016",
+      "_topic": "dibaca saat sakit",
+      "_slugs": [
+        "al-falaq",
+        "an-nas"
+      ],
+      "_used_by_facts": [
+        "dibaca-saat-sakit"
+      ]
+    },
+    {
+      "citation": "Riyad as-Salihin 1015",
+      "ar": "وعن أبي سعيد الخدري رضي الله عنه قال ‏:‏ كان رسول الله صلى الله عليه وسلم يتعوذ من الجان، وعين الإنسان، حتى نزلت المعوذتان، فلما نزلتا، أخذ بهما وترك ما سواهما ‏.‏ \n(‏‏(‏رواه الترمذي وقال ‏:‏حديث حسن ‏)‏‏)‏‏.‏",
+      "grade": "Hasan menurut at-Tirmidzi (disebut an-Nawawi di akhir hadits)",
+      "provenance": {
+        "collection": "riyad-as-salihin",
+        "point": "api/data/riyad-as-salihin.json hadithnumber 336",
+        "sha256": "04b28f750f53a3d106bc4e66bacf75733e0e9c4845567d789d36bc514359fb97"
+      },
+      "status": "draft",
+      "_en": "Abu Sa'id Al-Khudri (May Allah be pleased with him) reported:\nThe Messenger of Allah (ﷺ) used to seek protection against the evil of jinn and the evil eyes till Surat Al-Falaq and Surat An-Nas were revealed. After they were revealed, he took to them for seeking Allah's protection and left everything besides them..",
+      "_local_citation": "Riyad as-Salihin 336",
+      "_numbering": "Riyad: idInBook korpus 336, chapterId 8 -> 1015 (aturan migrate_hadith_citations.py: bab 0 = n - 1217, lainnya n + 679); teks Arab identik dengan AhmedBaset",
+      "_url": "https://sunnah.com/riyadussalihin:1015",
+      "_topic": "setelah al-mu‘awwiżatain turun",
+      "_slugs": [
+        "al-falaq",
+        "an-nas"
+      ],
+      "_used_by_facts": [
+        "setelah-al-muawwidzatain-turun"
+      ]
+    }
+  ],
+  "_not_used": [
+    {
+      "citation": "Sahih al-Bukhari 4977",
+      "why": "pertanyaan tentang pendapat Ibnu Mas'ud mengenai al-mu‘awwiżatain; matannya tidak menyebut pendapat itu ('kadza wa kadza') dan butuh penjelasan ulama; tidak cocok untuk kartu singkat",
+      "slugs": [
+        "al-falaq",
+        "an-nas"
+      ],
+      "variants_in_corpus": []
+    },
+    {
+      "citation": "Sahih al-Bukhari 5763",
+      "why": "kisah sihir Labid bin al-A'sham: matan di korpus tidak menyebut turunnya Al-Falaq/An-Nas, jadi tidak dipakai sebagai sebab turun",
+      "slugs": [
+        "al-falaq",
+        "an-nas"
+      ],
+      "variants_in_corpus": [
+        "Sahih al-Bukhari 3268",
+        "Sahih al-Bukhari 5766",
+        "Sahih al-Bukhari 6391"
+      ]
+    }
+  ],
+  "_en_note": "_en adalah kolom en korpus apa adanya (terjemahan Inggris pihak ketiga, berhak cipta menurut docs/belajar-research/kitabs.md); di beberapa tempat penerjemah menambah keterangan dalam kurung yang tidak ada di teks Arab (mis. Sahih al-Bukhari 5016: '(Surat Al-Falaq and Surat An- Nas)'). Dipakai hanya sebagai pembanding, tidak untuk ditampilkan.",
+  "_anomalies": []
+}

@@ -1,0 +1,83 @@
+{
+  "_comment": "Word loc -> Konsep library ids (belajar/pipeline/authored/library.concepts.json) that the word illustrates; feeds Word.concepts in schema.ts. Draft as pipeline state (no human review step, plan L11). validate.py checks the map both ways against each concept's `examples`, so every loc listed here must be added as an example of that concept (suggested example notes: al-falaq.new-concepts.md). Ids are listed in library order; the three ids not yet in the library (maqul-al-qaul, zharaf-idza, sighat-mubalaghah) are proposed in al-falaq.new-concepts.md and come last. Syarri in 113:3:2, 113:4:2 and 113:5:2 deliberately has no concept (113:2:2 already illustrates huruf jar + idhafah), so the Konsep pages do not list the same pattern four times.",
+  "words": {
+    "113:1:1": [
+      "fiil-amr",
+      "maqul-al-qaul"
+    ],
+    "113:1:2": [
+      "fiil-mudhari",
+      "jumlah-filiyyah",
+      "maqul-al-qaul"
+    ],
+    "113:1:3": [
+      "huruf-jar"
+    ],
+    "113:1:4": [
+      "idhafah",
+      "wazan-dan-tashrif"
+    ],
+    "113:2:1": [
+      "huruf-jar"
+    ],
+    "113:2:2": [
+      "huruf-jar",
+      "idhafah"
+    ],
+    "113:2:3": [
+      "murab-mabni",
+      "isim-maushul"
+    ],
+    "113:2:4": [
+      "jumlah-filiyyah",
+      "isim-maushul",
+      "fiil-madhi"
+    ],
+    "113:3:1": [
+      "athaf"
+    ],
+    "113:3:2": [],
+    "113:3:3": [
+      "idhafah",
+      "isim-fail"
+    ],
+    "113:3:4": [
+      "murab-mabni",
+      "zharaf-idza"
+    ],
+    "113:3:5": [
+      "fiil-madhi",
+      "zharaf-idza"
+    ],
+    "113:4:1": [
+      "athaf"
+    ],
+    "113:4:2": [],
+    "113:4:3": [
+      "idhafah",
+      "sighat-mubalaghah"
+    ],
+    "113:4:4": [
+      "huruf-jar",
+      "sighat-mubalaghah"
+    ],
+    "113:4:5": [
+      "huruf-jar"
+    ],
+    "113:5:1": [
+      "athaf"
+    ],
+    "113:5:2": [],
+    "113:5:3": [
+      "idhafah",
+      "isim-fail"
+    ],
+    "113:5:4": [
+      "zharaf-idza"
+    ],
+    "113:5:5": [
+      "fiil-madhi",
+      "zharaf-idza"
+    ]
+  }
+}

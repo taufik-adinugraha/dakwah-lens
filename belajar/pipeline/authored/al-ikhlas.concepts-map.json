@@ -1,0 +1,79 @@
+{
+  "_comment": "Word loc -> Konsep library ids that the word illustrates; feeds Word.concepts in schema.ts. Same format as al-fatihah.concepts-map.json. Every record is status draft as pipeline state; there is no human review step (plan L11). Existing ids are from belajar/content/library.json; NEW ids (maqul-al-qaul, dhamir-syan, khabar-jumlah, jazm-lam, fiil-majhul, kana-wa-akhawatuha) are proposed in al-ikhlas.new-concepts.md with their sources. validate.py requires every loc listed here to appear in that concept's `examples` and vice versa, so the integrator must add each pair below to library.concepts.json (al-ikhlas.new-concepts.md gives a sourced example note for every pair). Ids are listed in the order the concepts appear in library.concepts.json, new ids last.",
+  "words": {
+    "112:1:1": [
+      "murab-mabni",
+      "jumlah-filiyyah",
+      "fiil-amr",
+      "maqul-al-qaul"
+    ],
+    "112:1:2": [
+      "jumlah-ismiyyah",
+      "murab-mabni",
+      "dhamir",
+      "dhamir-syan",
+      "khabar-jumlah"
+    ],
+    "112:1:3": [
+      "tanda-irab",
+      "jumlah-ismiyyah",
+      "khabar-jumlah"
+    ],
+    "112:1:4": [
+      "tanda-irab",
+      "jumlah-ismiyyah",
+      "ilal"
+    ],
+    "112:2:1": [
+      "jumlah-ismiyyah",
+      "khabar-jumlah"
+    ],
+    "112:2:2": [
+      "naat",
+      "jumlah-ismiyyah",
+      "wazan-dan-tashrif"
+    ],
+    "112:3:1": [
+      "kalimah-isim-fiil-huruf",
+      "jazm-lam"
+    ],
+    "112:3:2": [
+      "tanda-irab",
+      "fiil-mudhari",
+      "ilal",
+      "jazm-lam"
+    ],
+    "112:3:3": [
+      "athaf",
+      "jazm-lam"
+    ],
+    "112:3:4": [
+      "fiil-mudhari",
+      "naib-fail",
+      "jazm-lam",
+      "fiil-majhul"
+    ],
+    "112:4:1": [
+      "athaf",
+      "jazm-lam"
+    ],
+    "112:4:2": [
+      "fiil-mudhari",
+      "jazm-lam",
+      "kana-wa-akhawatuha"
+    ],
+    "112:4:3": [
+      "huruf-jar",
+      "dhamir"
+    ],
+    "112:4:4": [
+      "tanda-irab",
+      "wazan-dan-tashrif",
+      "kana-wa-akhawatuha"
+    ],
+    "112:4:5": [
+      "tanda-irab",
+      "kana-wa-akhawatuha"
+    ]
+  }
+}

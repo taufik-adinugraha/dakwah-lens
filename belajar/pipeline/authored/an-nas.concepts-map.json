@@ -1,0 +1,93 @@
+{
+  "_comment": "Word loc -> Konsep library ids (belajar/pipeline/authored/library.concepts.json) that the word illustrates; feeds Word.concepts in schema.ts. Same format as al-fatihah.concepts-map.json. Records are status draft as pipeline state; there is no human review step (plan L11). Existing ids are from belajar/content/library.json; NEW ids (maqul-al-qaul and sighat-mubalaghah, shared with the Al-Ikhlas/Al-Falaq maps; athaf-bayan, rubai-mujarrad, hal) are described with their sources in an-nas.new-concepts.md. validate.py checks the map both ways against each concept's `examples`, so the integrator must add every loc below to the `examples` of each listed concept (suggested notes in an-nas.new-concepts.md). Ids are listed in library order, new ids last.",
+  "words": {
+    "114:1:1": [
+      "murab-mabni",
+      "dhamir",
+      "jumlah-filiyyah",
+      "fiil-amr",
+      "maqul-al-qaul"
+    ],
+    "114:1:2": [
+      "dhamir",
+      "fiil-mudhari",
+      "jumlah-filiyyah",
+      "maqul-al-qaul"
+    ],
+    "114:1:3": [
+      "huruf-jar",
+      "idhafah"
+    ],
+    "114:1:4": [
+      "idhafah"
+    ],
+    "114:2:1": [
+      "idhafah",
+      "naat",
+      "badal",
+      "athaf-bayan"
+    ],
+    "114:2:2": [
+      "idhafah"
+    ],
+    "114:3:1": [
+      "idhafah",
+      "naat",
+      "badal",
+      "athaf-bayan"
+    ],
+    "114:3:2": [
+      "idhafah"
+    ],
+    "114:4:1": [
+      "huruf-jar",
+      "murab-mabni"
+    ],
+    "114:4:2": [
+      "huruf-jar",
+      "idhafah"
+    ],
+    "114:4:3": [
+      "idhafah",
+      "wazan-dan-tashrif",
+      "rubai-mujarrad"
+    ],
+    "114:4:4": [
+      "naat",
+      "sighat-mubalaghah"
+    ],
+    "114:5:1": [
+      "naat",
+      "murab-mabni",
+      "isim-maushul"
+    ],
+    "114:5:2": [
+      "dhamir",
+      "fiil-mudhari",
+      "isim-maushul",
+      "rubai-mujarrad"
+    ],
+    "114:5:3": [
+      "huruf-jar",
+      "murab-mabni"
+    ],
+    "114:5:4": [
+      "huruf-jar",
+      "idhafah"
+    ],
+    "114:5:5": [
+      "idhafah"
+    ],
+    "114:6:1": [
+      "huruf-jar",
+      "murab-mabni",
+      "hal"
+    ],
+    "114:6:2": [
+      "huruf-jar"
+    ],
+    "114:6:3": [
+      "athaf"
+    ]
+  }
+}
