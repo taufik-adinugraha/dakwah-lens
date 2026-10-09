@@ -22,6 +22,15 @@
 
 set -euo pipefail
 
+# Serialise with deploy.yml, rollback.yml and the /belajar module deploy
+# (all take /srv/dakwah-lens/.deploy.lock): this script rebuilds and rolls
+# containers from the shared checkout. Re-exec under the lock once. The
+# `flock FILE cmd` form opens the file read-only, so it works whoever
+# (root here, `deploy` elsewhere) created it first.
+if [[ -z "${DAKWAH_DEPLOY_LOCKED:-}" ]]; then
+  exec env DAKWAH_DEPLOY_LOCKED=1 flock -w 1800 /srv/dakwah-lens/.deploy.lock "$0" "$@"
+fi
+
 REPO_DIR=/srv/dakwah-lens/repo
 COMPOSE="docker compose --env-file ${REPO_DIR}/.env -f ${REPO_DIR}/docker-compose.prod.yml"
 LOG_TAG="[refresh $(date -u +%Y-%m-%dT%H:%M:%SZ)]"

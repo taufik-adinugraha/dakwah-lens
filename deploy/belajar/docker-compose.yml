@@ -1,0 +1,41 @@
+# Belajar Al-Qur'an module — its OWN compose project.
+#
+# `name: dakwah-belajar` is load-bearing: the main stack (project
+# `dakwah-lens`) deploys with `up -d --remove-orphans`, which would delete any
+# container it considers part of ITS project. A separate project name keeps
+# the two deploys from ever touching each other's containers.
+#
+# The image is built in CI and `docker load`-ed by deploy/belajar/deploy.sh;
+# nothing is built on the VM.
+name: dakwah-belajar
+
+services:
+  belajar-web:
+    image: dakwah-belajar-web:latest
+    restart: unless-stopped
+    # Created once by deploy.sh (mode 600): DATABASE_URL for the module's own
+    # `dakwah_belajar` database, MAIN_APP_INTERNAL_URL for session lookups.
+    env_file: /srv/dakwah-lens/belajar.env
+    environment:
+      TZ: Asia/Jakarta
+      NODE_OPTIONS: --max-old-space-size=192
+    ports:
+      # Host Caddy proxies dakwah-lens.id/belajar* here. Loopback only.
+      - "127.0.0.1:3200:3000"
+    # The VM has 1.9 GB RAM and the main web container already uses ~615 MB;
+    # cap the module so it can never starve prod (plan §7.2).
+    mem_limit: 256m
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/belajar/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    networks: [dakwah]
+
+networks:
+  # Joins the main stack's network to reach `postgres` (own DB + role) and
+  # `web` (session lookup). Created by the main compose project.
+  dakwah:
+    external: true
+    name: dakwah-lens_dakwah

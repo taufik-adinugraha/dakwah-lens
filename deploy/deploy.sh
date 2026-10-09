@@ -31,6 +31,13 @@ say() { echo "$LOG_TAG $*"; }
 
 cd "$REPO_DIR"
 
+# Serialisation: callers run this script under
+#   flock -w 1800 /srv/dakwah-lens/.deploy.lock …
+# (deploy.yml; the /belajar module deploy, rollback.yml and the weekly
+# base-image refresh take the same lock). Do NOT take the lock in here as
+# well: flock locks belong to the open file description, so a second
+# `flock` on a new fd would wait on the caller's lock — a 30-min deadlock.
+
 # 1. Source sync ──────────────────────────────────────────────
 say "▶ git sync"
 # `--ff-only` would refuse a force-push from main — we want to mirror

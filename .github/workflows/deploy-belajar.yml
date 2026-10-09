@@ -1,0 +1,153 @@
+name: Deploy belajar
+
+# The /belajar module (Belajar Al-Qur'an) deploys on its own, decoupled from
+# the main stack (docs/belajar-plan.md §7.6):
+#   - path-filtered: only module changes trigger it, and deploy.yml ignores
+#     the same paths (no user-facing "update in progress" overlay for them);
+#   - its own concurrency group (a shared group would cancel pending runs of
+#     the other workflow);
+#   - the image is built HERE on the runner, never on the 1.9 GB prod VM or
+#     the operator's laptop, smoke-tested against a throwaway Postgres on
+#     every run (PRs too), then shipped with `docker save | docker load`;
+#   - it ships a self-contained release dir to /srv/dakwah-lens/belajar/ and
+#     NEVER touches the main checkout /srv/dakwah-lens/repo;
+#   - on the VM it runs under /srv/dakwah-lens/.deploy.lock, the lock
+#     deploy.yml, rollback.yml and the weekly base-image refresh also take.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "belajar/**"
+      - "deploy/belajar/**"
+      - ".github/workflows/deploy-belajar.yml"
+  pull_request:
+    paths:
+      - "belajar/**"
+      - "deploy/belajar/**"
+      - ".github/workflows/deploy-belajar.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-belajar-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: belajar
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: belajar/package-lock.json
+
+      - name: Install
+        run: npm ci --no-audit --no-fund
+
+      - name: Design-token parity with web/
+        run: node scripts/check-token-parity.mjs
+
+      - name: Lint
+        run: npx eslint .
+
+      - name: Test
+        run: npm test
+
+      # `next build` is the typecheck for App Router (PageProps/LayoutProps
+      # globals only exist after build) and prerenders the lesson pages.
+      - name: Build
+        run: npm run build
+
+  # Build the real runtime image and smoke-test it on EVERY run (PRs too):
+  # `next build` passing does not prove the container starts — e.g. a
+  # package bundled away from node_modules only fails at `docker run`.
+  # On main, the same image is then shipped and deployed.
+  image:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: smoke
+          POSTGRES_PASSWORD: smoke
+          POSTGRES_DB: smoke
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U smoke"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: |
+          set -euo pipefail
+          docker build \
+            --build-arg GIT_SHA="${GITHUB_SHA::7}" \
+            -t dakwah-belajar-web:latest \
+            belajar
+
+      - name: Smoke-test the image (migrations, health, pages, redirect)
+        run: |
+          set -euo pipefail
+          docker run -d --name smoke --network host -e PORT=3300 \
+            -e DATABASE_URL=postgres://smoke:smoke@127.0.0.1:5432/smoke \
+            dakwah-belajar-web:latest
+          ok=""
+          for _ in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:3300/belajar/api/health; then ok=1; break; fi
+            sleep 2
+          done
+          echo
+          docker logs smoke 2>&1 | tail -20
+          [[ -n "$ok" ]] || { echo "✗ container never became healthy"; exit 1; }
+          curl -fsS http://127.0.0.1:3300/belajar/api/health | grep -q '"database":"ok"'
+          docker logs smoke 2>&1 | grep -q "applied 0001_init.sql"
+          for path in /belajar/id /belajar/en /belajar/id/kredit; do
+            code="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:3300${path}")"
+            echo "${path} -> ${code}"; [[ "$code" == 200 ]]
+          done
+          loc="$(curl -s -o /dev/null -w '%{redirect_url}' http://127.0.0.1:3300/belajar)"
+          echo "/belajar -> ${loc}"; [[ "$loc" == */belajar/id ]]
+          # Migrations are idempotent across restarts.
+          docker restart smoke >/dev/null
+          for _ in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:3300/belajar/api/health >/dev/null 2>&1 && break
+            sleep 2
+          done
+          docker logs smoke 2>&1 | grep -q "up to date"
+          docker rm -f smoke >/dev/null
+
+      - name: Ship release + deploy on VM
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$HOME/.ssh/deploy_key"
+          chmod 600 "$HOME/.ssh/deploy_key"
+          SSH_OPTS=(-i "$HOME/.ssh/deploy_key" -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=30)
+          TARGET="${DEPLOY_USER}@${DEPLOY_HOST}"
+          REL="/srv/dakwah-lens/belajar/incoming-${GITHUB_SHA::7}"
+
+          # Release dir: image + this commit's deploy script + compose file.
+          # Shipped OUTSIDE the main checkout (/srv/dakwah-lens/repo), which
+          # only the main deploy, rollback and the weekly refresh may move.
+          ssh "${SSH_OPTS[@]}" "$TARGET" "mkdir -p '$REL'"
+          docker save dakwah-belajar-web:latest | gzip -1 \
+            | ssh "${SSH_OPTS[@]}" "$TARGET" "cat > '$REL/belajar-image.tar.gz'"
+          scp "${SSH_OPTS[@]}" deploy/belajar/deploy.sh deploy/belajar/docker-compose.yml "$TARGET:$REL/"
+
+          # Same VM lock as deploy.yml / rollback.yml / the weekly refresh.
+          ssh "${SSH_OPTS[@]}" "$TARGET" \
+            "flock -w 1800 /srv/dakwah-lens/.deploy.lock bash '$REL/deploy.sh' '$REL'"

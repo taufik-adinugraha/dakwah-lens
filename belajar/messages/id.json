@@ -1,0 +1,45 @@
+{
+  "App": {
+    "name": "Belajar Al-Qur'an",
+    "title_template": "%s · Belajar Al-Qur'an · Dakwah-Lens",
+    "description": "Memahami Al-Qur'an kata demi kata: dengarkan bacaan imam, pahami arti, akar kata, dan alasan harakat setiap kata — dijelaskan sederhana dan bersumber dari kitab.",
+    "beta": "Beta",
+    "back_to_main": "Kembali ke Dakwah-Lens",
+    "sign_in": "Masuk",
+    "signed_in_as": "Masuk sebagai {name}"
+  },
+  "Home": {
+    "eyebrow": "Belajar Al-Qur'an",
+    "heading": "Memahami Al-Fatihah, kata demi kata",
+    "intro": "Dengarkan bacaan imam, lalu pahami arti setiap kata, akar katanya, dan alasan sebuah kata dibaca fathah, dhammah, atau kasrah. Dijelaskan sederhana, bersumber dari kitab yang jelas.",
+    "principles_heading": "Cara kami menyusun materi",
+    "p1_title": "Suara imam sungguhan",
+    "p1_body": "Ayat Al-Qur'an hanya diperdengarkan dari bacaan qari manusia. Suara AI hanya menjelaskan dalam bahasa Indonesia, tidak pernah membacakan ayat.",
+    "p2_title": "Bersumber, bukan dikarang",
+    "p2_body": "Setiap arti, i'rab, tafsir, dan hadits dikutip dari kitab atau data yang disebut namanya, lengkap dengan rujukannya.",
+    "p3_title": "Ditinjau ustadz",
+    "p3_body": "Materi baru tayang setelah ditinjau ustadz. Selama beta, sebagian materi masih berstatus draf dan ditandai jelas.",
+    "surah_heading": "Mulai dari sini",
+    "fatihah_name": "Al-Fatihah",
+    "fatihah_meta": "7 ayat · 29 kata · ±3 pekan, 10 menit sehari",
+    "status_preparing": "Sedang disiapkan",
+    "next_heading": "Berikutnya",
+    "next_body": "Setelah Al-Fatihah: Al-Ikhlas, An-Nas, Al-Falaq, Al-'Asr, Al-Kautsar, dan An-Nasr."
+  },
+  "Footer": {
+    "disclaimer": "Dibantu AI, bukan fatwa otoritatif. Penjelasan disusun dari kitab yang disebut namanya dan ditinjau ustadz sebelum tayang.",
+    "credits": "Sumber & lisensi"
+  },
+  "Credits": {
+    "title": "Sumber & lisensi",
+    "intro": "Modul ini dibangun di atas karya dan data berikut. Kami menyebut setiap sumber sesuai ketentuan lisensinya, dan tidak menyimpan rekaman qari di server kami: bacaan diputar langsung dari server penyedianya.",
+    "status_planned": "Direncanakan",
+    "status_in_use": "Dipakai",
+    "streaming_note": "Saat Anda memutar bacaan, peramban Anda mengambil berkas audio langsung dari server penyedia rekaman di luar negeri, sehingga alamat IP Anda terlihat oleh server tersebut."
+  },
+  "NotFound": {
+    "title": "Halaman tidak ditemukan",
+    "body": "Alamat ini tidak ada di modul Belajar Al-Qur'an.",
+    "cta": "Ke beranda modul"
+  }
+}

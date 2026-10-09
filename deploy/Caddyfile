@@ -16,11 +16,32 @@
 dakwah-lens.id, www.dakwah-lens.id {
     encode gzip zstd
 
-    # Single upstream — Next.js owns every public route, including
+    # /belajar — the Belajar Al-Qur'an module, its own container
+    # (deploy/belajar/, docs/belajar-plan.md §7.1). Routed HERE rather than
+    # through a Next rewrite in the main app, so the module stays up when
+    # `web` is down. Caddy sorts `handle` blocks by path specificity: media
+    # first, then the module, then everything else.
+    #
+    # Module media (narration, our own recordings): immutable, content-
+    # hashed files on disk. file_server answers byte-range requests, which
+    # audio seeking needs.
+    handle /belajar/media/* {
+        uri strip_prefix /belajar/media
+        root * /srv/dakwah-lens/data/belajar-media
+        file_server
+    }
+
+    handle /belajar* {
+        reverse_proxy localhost:3200
+    }
+
+    # Everything else — Next.js owns every public route, including
     # /api/auth/* (NextAuth) and /api/admin/attachments/* (uploads).
     # FastAPI is reachable only inside the dakwah docker network at
     # http://api:8000 (the web service calls it directly).
-    reverse_proxy localhost:3000
+    handle {
+        reverse_proxy localhost:3000
+    }
 
     header {
         Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"

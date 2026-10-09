@@ -1,0 +1,40 @@
+{
+  "name": "belajar",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Belajar Al-Qur'an — Qur'anic Arabic + light tafsir module served at dakwah-lens.id/belajar (own container). See docs/belajar-plan.md.",
+  "scripts": {
+    "dev": "next dev -p 3200",
+    "build": "next build",
+    "start": "next start -p 3200",
+    "lint": "eslint",
+    "test": "vitest run",
+    "migrate": "node scripts/migrate.mjs"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.16.0",
+    "next": "16.2.6",
+    "next-intl": "^4.12.0",
+    "postgres": "^3.4.9",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "server-only": "^0.0.1",
+    "ts-fsrs": "^5.4.2",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.6",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vitest": "^3.2.7"
+  },
+  "overrides": {
+    "postcss": "^8.5.10"
+  }
+}
