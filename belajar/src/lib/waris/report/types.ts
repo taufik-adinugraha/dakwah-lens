@@ -463,6 +463,33 @@ export interface DalilRowRef {
   first: boolean;
 }
 
+/**
+ * The printout's one dalil for a row (plan §6 "Print and PDF", M2.9; report/primary.ts): a short
+ * clause of the row's first Qur'an / hadith source, the matn only for a hadith. Every other source
+ * of the report is printed as a citation. The screen still shows every card whole.
+ */
+export interface PrimaryDalilView {
+  /** The dalil card the clause is cut from (one of the row's dalil ids). */
+  id: string;
+  /** One contiguous slice of the card's Arabic field (verified like every ArabicView). */
+  arabic: ArabicView;
+  /**
+   * The matching words of the corpus translation the card shows (QuranEnc; Muslim's internal one),
+   * as `recordString(record, slice.path).slice(slice.start, slice.end)`; null when the corpus has none.
+   */
+  meaning: {
+    text: string;
+    label: Msg;
+    slice: { recordId: string; path: string; start: number; end: number };
+    /** The words start / end mid-sentence (the page marks it with an ellipsis). */
+    cut: { start: boolean; end: boolean };
+  } | null;
+  /** The slice starts after / ends before the record text (the page marks it with an ellipsis). */
+  cut: { start: boolean; end: boolean };
+  /** false → the same clause was printed for an earlier row ("Dalil ini sudah ditampilkan di atas"). */
+  first: boolean;
+}
+
 export interface DalilRow {
   anchor: string;
   title: Msg;
@@ -476,6 +503,8 @@ export interface DalilRow {
   /** Rules that only the court column used for this row. */
   courtRules: RuleRefView[];
   courtLine: Msg | null;
+  /** Print only: the row's primary dalil (null: the row prints its citations only). */
+  primary: PrimaryDalilView | null;
 }
 
 export interface DalilSectionView {

@@ -15,6 +15,7 @@ import { legalRef } from "./content";
 import { dateText } from "./code";
 import { msg, type Msg } from "./messages";
 import { ENGINE_VERSION_DEFAULT } from "./options";
+import { descendantInherits, primaryOf } from "./primary";
 import { iddahText, lineLabel, setCol, type UnknownResult } from "./ringkasan";
 import type {
   CatatanView,
@@ -50,10 +51,30 @@ export function dalilSectionView(ctx: Ctx, a: Analysis, rows: readonly HeirRow[]
       if (first) seen.push(id);
       return { id, first };
     });
+  // estate steps first: the page shows this row ABOVE the heir rows, so its dalil must be the
+  // ones marked "first" (otherwise it said "sudah ditampilkan di atas" before the card appeared).
+  // harta bersama, biaya, utang, wasiat, wasiat wajibah (both shown columns)
+  const estate: RuleId[] = [];
+  for (const c of [lead, ...(a.other && a.otherShown ? [a.other] : [])]) for (const r of estateRules(c)) if (!estate.includes(r)) estate.push(r);
+  let sebelum: DalilRow | null = null;
+  if (estate.length > 0) {
+    const rules = estate.map((r) => ctx.rule(r));
+    const ids = dalilIdsOf(rules);
+    sebelum = {
+      anchor: "dasar-sebelum",
+      title: msg("laporan.dalil.sebelum"),
+      countLine: msg("laporan.dalil.rujukan", { jumlah: ids.length }),
+      rules,
+      dalil: refs(ids),
+      courtRules: [],
+      courtLine: null,
+      primary: null,
+    };
+  }
   const out: DalilRow[] = [];
+  const otherId: ColumnId = lead.id === "fikih" ? "court" : "fikih";
   for (const row of rows) {
     const leadCell = row[lead.id];
-    const otherId: ColumnId = lead.id === "fikih" ? "court" : "fikih";
     const otherCell = row[otherId];
     const rules = leadCell?.rules ?? [];
     const courtRules = (otherCell?.rules ?? []).filter((r) => !rules.some((x) => x.ruleId === r.ruleId));
@@ -66,19 +87,11 @@ export function dalilSectionView(ctx: Ctx, a: Analysis, rows: readonly HeirRow[]
       dalil: refs(ids),
       courtRules,
       courtLine: courtRules.length > 0 ? msg("laporan.dalil.kolom_court") : null,
+      primary: null,
     };
     if (leadCell?.total) setCol(d, lead.id, leadCell.total);
     if (otherCell?.total) setCol(d, otherId, otherCell.total);
     out.push(d);
-  }
-  // estate steps: harta bersama, biaya, utang, wasiat, wasiat wajibah (both shown columns)
-  const estate: RuleId[] = [];
-  for (const c of [lead, ...(a.other && a.otherShown ? [a.other] : [])]) for (const r of estateRules(c)) if (!estate.includes(r)) estate.push(r);
-  let sebelum: DalilRow | null = null;
-  if (estate.length > 0) {
-    const rules = estate.map((r) => ctx.rule(r));
-    const ids = dalilIdsOf(rules);
-    sebelum = { anchor: "dasar-sebelum", title: msg("laporan.dalil.sebelum"), countLine: msg("laporan.dalil.rujukan", { jumlah: ids.length }), rules, dalil: refs(ids), courtRules: [], courtLine: null };
   }
   // exclusions and non-heirs
   const tRules: RuleRefView[] = [];
@@ -103,8 +116,31 @@ export function dalilSectionView(ctx: Ctx, a: Analysis, rows: readonly HeirRow[]
       dalil: refs(ids),
       courtRules: [],
       courtLine: null,
+      // exclusions print their sources as citations: one clause cannot stand for every exclusion
+      primary: null,
     };
   }
+  // print: each row's primary clause, deduped in the order the rows are shown (estate steps first)
+  const printed = new Set<string>();
+  const primaryFor = (groups: Parameters<typeof primaryOf>[1], role: string | null): DalilRow["primary"] => {
+    const hit = primaryOf(ctx, groups, role);
+    if (!hit) return null;
+    const first = !printed.has(hit.key);
+    printed.add(hit.key);
+    return { ...hit.view, first };
+  };
+  if (sebelum) sebelum.primary = primaryFor([{ rules: sebelum.rules, descendant: false }], null);
+  const descendant = { lead: descendantInherits(rows, lead.id), other: descendantInherits(rows, otherId) };
+  rows.forEach((row, i) => {
+    const d = out[i];
+    d.primary = primaryFor(
+      [
+        { rules: d.rules, descendant: descendant.lead },
+        { rules: d.courtRules, descendant: descendant.other },
+      ],
+      row.role,
+    );
+  });
   return { view: { title: msg("laporan.dalil.judul"), rows: out, sebelum, tidakMendapat: tidakRow, seeAbove: msg("laporan.dalil.lihat_atas") }, order: seen };
 }
 

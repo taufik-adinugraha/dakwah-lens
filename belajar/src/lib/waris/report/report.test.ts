@@ -13,8 +13,10 @@ import vectorsJson from "../../../../content/waris/test-vectors.json";
 import { PLAN_CASES } from "../checks/cases";
 import { messageTableProblems, runPlantedFaults, runReportChecks } from "../checks/report";
 import { buildReport } from "./build";
-import type { ReportDalilRecord, ReportRules } from "./content";
+import { NEVER_SHOWN, type ReportDalilRecord, type ReportRules } from "./content";
+import { recordString, translationOf } from "./dalil";
 import { renderMsg } from "./messages";
+import { PRIMARY, SPANS, fnv1a } from "./primary";
 import { buildTextSummary } from "./summary";
 import { fractionWords, parseFractionWords } from "./words";
 import { frac } from "../frac";
@@ -122,5 +124,52 @@ describe("plan-anchored numbers", () => {
     expect(m.printAllowed).toBe(false);
     expect(buildTextSummary(m)).toBeNull();
     expect(JSON.stringify(m)).not.toMatch(/"t":"(frac|rp|tabel)"/);
+  });
+});
+
+describe("print: the primary dalil clause of each row (report/primary.ts, plan §6 Print and PDF)", () => {
+  const records = new Map(dalil.map((r) => [r.id, r] as const));
+  const ARABIC = /[\u0600-\u06ff\u0750-\u077f\u08a0-\u08ff\ufb50-\ufdff\ufe70-\ufeff]/;
+
+  it("every span still cuts the exact words it was chosen for (checksums), from a shown record", () => {
+    for (const [key, s] of Object.entries(SPANS)) {
+      const r = records.get(s.recordId);
+      expect(r, key).toBeDefined();
+      if (!r) continue;
+      expect(NEVER_SHOWN[s.recordId], key).toBeUndefined();
+      const field = r[s.field];
+      expect(typeof field, `${key} ${s.field}`).toBe("string");
+      const ar = typeof field === "string" ? field.slice(s.ar.start, s.ar.end) : "";
+      expect(fnv1a(ar), `${key}: Arabic slice`).toBe(s.ar.check);
+      expect(/\s[0-9]+\u200f/.test(ar), `${key}: a Bulugh editor marker in the slice`).toBe(false);
+      if ("tr" in s) {
+        const tr = translationOf(r);
+        const full = tr ? recordString(r, tr.path) : null;
+        expect(full, `${key}: translation`).not.toBeNull();
+        const words = (full ?? "").slice(s.tr.start, s.tr.end);
+        expect(fnv1a(words), `${key}: translation slice`).toBe(s.tr.check);
+        expect(ARABIC.test(words), `${key}: Arabic script in the translation slice`).toBe(false);
+      }
+    }
+  });
+
+  it("a clause is offered only for a rule whose RuleNote cites its record", () => {
+    for (const [ruleId, specs] of Object.entries(PRIMARY)) {
+      const note = rules.rules.find((n) => n.rule_id === ruleId);
+      expect(note, ruleId).toBeDefined();
+      for (const s of specs ?? []) expect(note?.dalil ?? [], `${ruleId} → ${s.span.recordId}`).toContain(s.span.recordId);
+    }
+  });
+
+  it("case 3: the estate steps and each heir print one clause (QS 4:11 debts, 4:12 wife, Muslim 1615a son, 4:11 daughter, 4:11 mother)", () => {
+    const m = buildReport(caseInput("kasus-3"), rules, dalil, { date: "2026-10-09" });
+    const rows = [m.dalil?.sebelum ?? null, ...(m.dalil?.rows ?? [])];
+    expect(rows.map((r) => r?.primary?.id ?? null)).toEqual(["Q-4-11", "Q-4-12", "H-MUSLIM-1615a", "Q-4-11", "Q-4-11"]);
+    expect(rows.map((r) => r?.primary?.first)).toEqual([true, true, true, true, true]);
+    // the son's hadith prints its matn only: the slice starts after the isnad
+    const son = rows[2]?.primary;
+    expect(son?.cut.start).toBe(true);
+    expect(son?.meaning?.label.key).toBe("laporan.dalil.label_muslim");
+    expect(m.dalil?.tidakMendapat?.primary ?? null).toBeNull();
   });
 });

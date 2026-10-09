@@ -288,6 +288,300 @@
   }
 }
 
+/* ── Compact printout (Cetak.tsx; plan §6 "Print and PDF", §10 M2.9: case 3 on ≤ 3 A4 pages) ──
+   A computed report prints this instead of the screen sections (which carry data-print="hide"):
+   the same model in less space. Body 10pt, notes 9pt, citations 8.5pt, Arabic 14pt; every block
+   that holds one dalil or one table row stays on one page; patterns and borders, never colour. */
+.waris [data-print="only"] {
+  display: none;
+}
+
+@media print {
+  body:has(.wr-cetak) .waris {
+    padding: 0 !important;
+    max-width: none !important;
+  }
+  body:has(.wr-cetak) .waris > div {
+    margin-top: 0 !important;
+  }
+  /* The module footer keeps its mandatory label, in one small line. */
+  body:has(.wr-cetak) > footer {
+    margin-top: 6pt !important;
+    border-top: 0.5pt solid #000 !important;
+    break-inside: avoid;
+  }
+  body:has(.wr-cetak) > footer > div {
+    display: block !important;
+    max-width: none !important;
+    padding: 2pt 0 0 !important;
+  }
+  body:has(.wr-cetak) > footer p {
+    max-width: none !important;
+    font-size: 7.5pt !important;
+    line-height: 1.3 !important;
+    color: #000 !important;
+  }
+  body:has(.wr-cetak) > footer > div > div {
+    display: none !important;
+  }
+
+  .waris-report .wr-cetak {
+    font-size: 10pt;
+    line-height: 1.35;
+    color: #000;
+  }
+  .waris-report .wr-cetak p,
+  .waris-report .wr-cetak ul,
+  .waris-report .wr-cetak ol,
+  .waris-report .wr-cetak figure {
+    margin: 0;
+    padding: 0;
+  }
+  .waris-report .wr-cetak ul,
+  .waris-report .wr-cetak ol {
+    list-style: none;
+  }
+  .waris-report .wr-cetak b {
+    font-weight: 600;
+  }
+  .waris-report .wr-cetak sup {
+    font-size: 6.5pt;
+    line-height: 0;
+    vertical-align: super;
+  }
+  .waris-report .wr-cetak .wr-c-s {
+    font-size: 9pt;
+    line-height: 1.35;
+  }
+  .waris-report .wr-cetak .wr-c-xs {
+    font-size: 8.5pt;
+    line-height: 1.3;
+  }
+  .waris-report .wr-cetak .wr-c-line {
+    display: block;
+  }
+  .waris-report .wr-cetak .wr-c-gap {
+    margin-top: 3pt;
+  }
+
+  /* 0 Kepala */
+  .waris-report .wr-cetak .wr-c-h1 {
+    font-family: var(--font-fraunces), Georgia, serif;
+    font-size: 17pt;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+  .waris-report .wr-cetak .wr-c-subjudul {
+    font-family: var(--font-inter), Arial, sans-serif;
+    font-size: 10pt;
+    font-weight: 400;
+  }
+  .waris-report .wr-cetak .wr-c-label {
+    display: inline-block;
+    margin-top: 3pt;
+    padding: 1.5pt 5pt;
+    border: 1.25pt solid #000;
+    font-weight: 600;
+  }
+  .waris-report .wr-cetak .wr-c-meta {
+    margin-top: 3pt;
+  }
+  .waris-report .wr-cetak .wr-c-meta > span + span::before {
+    content: " · ";
+  }
+
+  /* Sections */
+  .waris-report .wr-cetak .wr-c-section {
+    margin-top: 8pt;
+  }
+  .waris-report .wr-cetak .wr-c-h2 {
+    margin: 0 0 3pt;
+    padding-bottom: 1pt;
+    border-bottom: 0.75pt solid #000;
+    font-family: var(--font-fraunces), Georgia, serif;
+    font-size: 12.5pt;
+    font-weight: 600;
+    line-height: 1.25;
+    break-after: avoid;
+  }
+  .waris-report .wr-cetak .wr-c-h3 {
+    margin-top: 4pt;
+    font-weight: 600;
+    break-after: avoid;
+  }
+  .waris-report .wr-cetak .wr-c-box,
+  .waris-report .wr-cetak .wr-c-stamp {
+    margin-top: 3pt;
+    padding: 2pt 5pt;
+    border: 0.75pt solid #000;
+    break-inside: avoid;
+  }
+  /* "Perlu dipastikan": a dashed double-weight edge, not a colour */
+  .waris-report .wr-cetak .wr-c-stamp {
+    border: 1.25pt dashed #000;
+  }
+  .waris-report .wr-cetak .wr-c-grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3pt 10pt;
+    margin-top: 2pt;
+  }
+  .waris-report .wr-cetak .wr-c-list > li {
+    margin-top: 1.5pt;
+    padding-left: 8pt;
+    text-indent: -8pt;
+    break-inside: avoid;
+  }
+  .waris-report .wr-cetak .wr-c-list > li::before {
+    content: "– ";
+  }
+  .waris-report .wr-cetak .wr-c-cols2 {
+    columns: 2;
+    column-gap: 12pt;
+  }
+
+  /* 1 Ringkasan table */
+  .waris-report .wr-cetak .wr-c-table {
+    width: 100%;
+    margin-top: 4pt;
+    border-collapse: collapse;
+  }
+  .waris-report .wr-cetak .wr-c-table caption {
+    caption-side: top;
+    padding-bottom: 2pt;
+    text-align: left;
+    font-size: 9pt;
+  }
+  .waris-report .wr-cetak .wr-c-table thead {
+    display: table-header-group;
+  }
+  .waris-report .wr-cetak .wr-c-table th,
+  .waris-report .wr-cetak .wr-c-table td {
+    padding: 2pt 4pt;
+    border: 0.75pt solid #000;
+    vertical-align: top;
+    text-align: left;
+    font-weight: 400;
+  }
+  .waris-report .wr-cetak .wr-c-table thead th {
+    font-size: 8.5pt;
+    font-weight: 600;
+  }
+  .waris-report .wr-cetak .wr-c-table tbody th {
+    font-weight: 600;
+  }
+  .waris-report .wr-cetak .wr-c-table tr {
+    break-inside: avoid;
+  }
+  .waris-report .wr-cetak .wr-c-table .wr-c-num {
+    white-space: nowrap;
+  }
+
+  /* 1 the estate bar: SVG patterns + borders survive black-and-white printing */
+  .waris-report .wr-cetak .wr-c-figure {
+    margin-top: 5pt;
+    break-inside: avoid;
+  }
+  .waris-report .wr-cetak .wr-c-bar {
+    display: flex;
+    height: 8mm;
+    margin-top: 2pt;
+    overflow: hidden;
+    border: 1pt solid #000;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .waris-report .wr-cetak .wr-c-seg {
+    position: relative;
+    display: flex;
+    min-width: 3pt;
+    align-items: center;
+    justify-content: center;
+  }
+  .waris-report .wr-cetak .wr-c-seg + .wr-c-seg {
+    border-left: 1pt solid #000;
+  }
+  .waris-report .wr-cetak .wr-c-seg > span {
+    position: relative;
+    padding: 0 2pt;
+    background: #fff;
+    font-size: 8.5pt;
+    font-weight: 600;
+  }
+  .waris-report .wr-cetak .wr-c-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1pt 10pt;
+    margin-top: 2pt;
+  }
+  .waris-report .wr-cetak .wr-c-legend > li {
+    display: inline-flex;
+    align-items: center;
+    gap: 3pt;
+  }
+  .waris-report .wr-cetak .wr-c-swatch {
+    position: relative;
+    display: inline-block;
+    width: 14pt;
+    height: 8pt;
+    overflow: hidden;
+    border: 0.75pt solid #000;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .waris-report .wr-cetak .wr-c-sisa {
+    border-style: dashed;
+  }
+
+  /* 4 Dalil: one block per row, never split; Arabic 14pt in the module's Arabic face */
+  .waris-report .wr-cetak .wr-c-dalil {
+    margin-top: 4pt;
+    break-inside: avoid;
+  }
+  .waris-report .wr-cetak .wr-c-ar {
+    margin-top: 1pt;
+    font-family: var(--font-amiri), "Amiri", serif;
+    font-synthesis: none;
+    font-size: 14pt;
+    line-height: 1.75;
+    text-align: right;
+  }
+  .waris-report .wr-cetak .wr-c-sources {
+    margin-top: 5pt;
+  }
+  .waris-report .wr-cetak .wr-c-sources > p + p,
+  .waris-report .wr-cetak .wr-c-notes {
+    margin-top: 2pt;
+  }
+
+  /* 6 Langkah: empty tick boxes */
+  .waris-report .wr-cetak .wr-c-check > li {
+    position: relative;
+    margin-top: 2pt;
+    padding-left: 14pt;
+    break-inside: avoid;
+  }
+  .waris-report .wr-cetak .wr-c-check > li.wr-c-indent {
+    margin-left: 14pt;
+  }
+  .waris-report .wr-cetak .wr-c-tick {
+    position: absolute;
+    top: 2pt;
+    left: 0;
+    width: 8pt;
+    height: 8pt;
+    border: 0.75pt solid #000;
+  }
+
+  /* 7 Penutup */
+  .waris-report .wr-cetak .wr-c-penutup {
+    margin-top: 8pt;
+    padding: 3pt 6pt;
+    border: 1.25pt solid #000;
+    break-inside: avoid;
+  }
+}
+
 /* Separate rule: a browser that does not know ::details-content drops only this one. */
 @media print {
   .waris-report details::details-content {

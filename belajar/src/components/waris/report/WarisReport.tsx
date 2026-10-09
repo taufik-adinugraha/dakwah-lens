@@ -13,6 +13,7 @@ import { warisHref } from "@/lib/routes";
 import { hitungHref, ReportActions, ShareActions } from "./Actions";
 import { AiChip } from "./AiChip";
 import { Catatan } from "./Catatan";
+import { Cetak } from "./Cetak";
 import { computeReport, exitRefs, rupiahFields } from "./compute";
 import { CardsContext } from "./context";
 import { DalilCardsOnly, DalilSection } from "./Dalil";
@@ -120,7 +121,8 @@ function ReportForAnswers({ src, rules, dalil }: { src: Ada; rules: ReportRules;
   }, [computed, exitInfo]);
 
   // Print: every disclosure opens for the printout and closes again afterwards (plan §6: collapsed
-  // on screen, expanded in print). The rupiah panel is not printed, so it is left alone.
+  // on screen, expanded in print). The rupiah panel is not printed, so it is left alone; nor is the
+  // screen report of a computed family, which prints as the compact Cetak.tsx instead.
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
@@ -254,8 +256,11 @@ function ModelView({
 }) {
   const dasarAnchors = useMemo(() => new Set((model.dalil?.rows ?? []).map((r) => r.anchor)), [model]);
   const g = model.ringkasan;
-  return (
-    <CardsContext.Provider value={cards}>
+  // A computed report prints the compact printout (Cetak.tsx, plan §6 / M2.9) instead of the
+  // screen sections; a refusal prints as it is shown.
+  const compact = model.kind === "laporan" && !!g;
+  const screen = (
+    <>
       <Kepala k={model.kepala} />
       {fromLink}
       <ReportActions printAllowed={model.printAllowed} token={token} />
@@ -283,6 +288,18 @@ function ModelView({
       )}
       <Penutup v={model.penutup} />
       <ShareActions model={model} answers={answers} amounts={amounts} lookup={lookup} />
+    </>
+  );
+  return (
+    <CardsContext.Provider value={cards}>
+      {compact ? (
+        <>
+          <div data-print="hide">{screen}</div>
+          <Cetak model={model} qNotes={qNotes} />
+        </>
+      ) : (
+        screen
+      )}
     </CardsContext.Provider>
   );
 }

@@ -36,7 +36,7 @@ import { useReportText } from "./text";
 const otherOf = (c: ColumnId): ColumnId => (c === "fikih" ? "court" : "fikih");
 
 /** The figure the column leads with (ColumnHead.basis): the share of the harta waris, or of the estate after debts. */
-function mainOf(head: ColumnHead, c: CellView): { value: FracView | null; per: FracView | null } {
+export function mainOf(head: ColumnHead, c: CellView): { value: FracView | null; per: FracView | null } {
   if (head.basis === "setelah_utang") return { value: c.lineTotal ?? c.total, per: c.linePerHead ?? c.perHead };
   return { value: c.total, per: c.perHead };
 }

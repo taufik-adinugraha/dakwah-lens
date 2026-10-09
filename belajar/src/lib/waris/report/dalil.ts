@@ -101,27 +101,33 @@ function citationOf(r: ReportDalilRecord): CitationView {
   }
 }
 
+/**
+ * Where a record's displayable Indonesian lives, with its exact source label (plan D10): QuranEnc
+ * for the Qur'an, the internal translation for Sahih Muslim, nothing else. Shared by the card and
+ * the printed primary span (primary.ts), so both quote the same text under the same label.
+ */
+export function translationOf(r: ReportDalilRecord): { path: string; label: Msg } | null {
+  if (r.kind === "quran") return { path: "translations.id_quranenc_indonesian_affairs.text", label: msg("laporan.dalil.label_quranenc") };
+  if (r.kind === "hadith" && (str(r, "collection") ?? "").startsWith("Sahih Muslim")) return { path: "translations.id.text", label: msg("laporan.dalil.label_muslim") };
+  return null;
+}
+
 function meaningOf(r: ReportDalilRecord): MeaningView | null {
+  const tr = translationOf(r);
+  if (!tr) return null;
+  const text = recordString(r, tr.path);
+  if (!text) return null;
   if (r.kind === "quran") {
-    const path = "translations.id_quranenc_indonesian_affairs.text";
-    const text = recordString(r, path);
-    if (!text) return null;
     const fpath = "translations.id_quranenc_indonesian_affairs.footnotes";
     const foot = recordString(r, fpath);
     return {
       text,
-      source: { recordId: r.id, path },
-      label: msg("laporan.dalil.label_quranenc"),
+      source: { recordId: r.id, path: tr.path },
+      label: tr.label,
       footnotes: foot ? { text: foot, source: { recordId: r.id, path: fpath } } : null,
     };
   }
-  if (r.kind === "hadith" && (str(r, "collection") ?? "").startsWith("Sahih Muslim")) {
-    const path = "translations.id.text";
-    const text = recordString(r, path);
-    if (!text) return null;
-    return { text, source: { recordId: r.id, path }, label: msg("laporan.dalil.label_muslim"), footnotes: null };
-  }
-  return null;
+  return { text, source: { recordId: r.id, path: tr.path }, label: tr.label, footnotes: null };
 }
 
 /** The card for one record; null when the record is not a displayable kind. */

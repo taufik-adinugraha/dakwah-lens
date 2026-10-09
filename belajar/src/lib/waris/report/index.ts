@@ -10,7 +10,7 @@ export { answerCode, dateText } from "./code";
 export { REPORT_MESSAGES, renderMsg, renderValue, msg, isMsg, type Msg, type MsgList, type MsgValue, type ReportMsgKey, type LabelId } from "./messages";
 export { fractionWords, numberWords, parseFractionWords, parseNumberWords } from "./words";
 export { NEVER_SHOWN, REPORT_LEGAL_SOURCES, type ReportRules, type ReportDalilRecord, type RuleNoteIn, type LegalSourceIn } from "./content";
-export { dalilCard, rebuildArabic, recordString } from "./dalil";
+export { dalilCard, rebuildArabic, recordString, translationOf } from "./dalil";
 export { SWITCH_RULES, SOFT_STOP_NOTES } from "./analysis";
 export {
   ENGINE_VERSION_DEFAULT,
@@ -64,6 +64,7 @@ export type {
   TidakMendapatView,
   DalilRowRef,
   DalilRow,
+  PrimaryDalilView,
   DalilSectionView,
   DiffRow,
   PerluItem,

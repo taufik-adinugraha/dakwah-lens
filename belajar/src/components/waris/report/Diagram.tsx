@@ -88,8 +88,8 @@ function PatternDef({ id, index }: { id: string; index: number }) {
   }
 }
 
-/** A pattern fill for a box; "sisa" (unassigned residue) is blank with a dashed edge instead. */
-function PatternFill({ id, seg }: { id: string; seg: BarSegment }) {
+/** A pattern fill for a box; "sisa" (unassigned residue) is blank with a dashed edge instead. Also used by the printout (Cetak.tsx). */
+export function PatternFill({ id, seg }: { id: string; seg: BarSegment }) {
   if (seg.kind === "sisa") return null;
   return (
     <svg className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
@@ -102,7 +102,7 @@ function PatternFill({ id, seg }: { id: string; seg: BarSegment }) {
   );
 }
 
-function pctOf(n: string, d: string): number {
+export function pctOf(n: string, d: string): number {
   const nn = Number(n);
   const dd = Number(d);
   return dd > 0 ? (nn * 100) / dd : 0;
