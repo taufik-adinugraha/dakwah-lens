@@ -27,6 +27,8 @@ export function useSegmentPlayer(sources: RecitationSource[]) {
   const stopAtRef = useRef<number | null>(null);
   const segmentsRef = useRef<Segment[]>([]);
   const rateRef = useRef<1 | 0.75>(1);
+  /** Where a paused whole-ayah playback stopped; null = start from 0. */
+  const resumeAtRef = useRef<number | null>(null);
   const [sourceIdx, setSourceIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [activeWord, setActiveWord] = useState<number | null>(null);
@@ -66,7 +68,10 @@ export function useSegmentPlayer(sources: RecitationSource[]) {
       setPlaying(false);
       if (raf !== null) cancelAnimationFrame(raf);
       raf = null;
-      if (a.ended) setActiveWord(null);
+      if (a.ended) {
+        resumeAtRef.current = null;
+        setActiveWord(null);
+      }
     };
 
     a.addEventListener("play", onPlay);
@@ -90,6 +95,7 @@ export function useSegmentPlayer(sources: RecitationSource[]) {
     if (!a) return;
     a.pause();
     stopAtRef.current = null;
+    resumeAtRef.current = null;
     a.src = source.url;
     // A src swap resets the element's rate; re-apply the learner's choice.
     a.playbackRate = rateRef.current;
@@ -104,10 +110,25 @@ export function useSegmentPlayer(sources: RecitationSource[]) {
     a.preservesPitch = true;
   }, [rate]);
 
+  /** Play the whole ayah — RESUMING where a pause left off; from the start
+   *  only when nothing is mid-way (fresh, ended, or after a single-word
+   *  replay, which is a detour rather than a position to resume from). */
   const playAll = useCallback(() => {
     const a = audioRef.current;
     if (!a) return;
+    const midWord = stopAtRef.current !== null;
     stopAtRef.current = null;
+    if (a.ended || midWord || resumeAtRef.current === null) a.currentTime = 0;
+    else a.currentTime = resumeAtRef.current;
+    void a.play().catch(() => {});
+  }, []);
+
+  /** Start the ayah over from the beginning. */
+  const restart = useCallback(() => {
+    const a = audioRef.current;
+    if (!a) return;
+    stopAtRef.current = null;
+    resumeAtRef.current = null;
     a.currentTime = 0;
     void a.play().catch(() => {});
   }, []);
@@ -118,13 +139,20 @@ export function useSegmentPlayer(sources: RecitationSource[]) {
       const seg = source.segments.find(([w]) => w === word);
       if (!a || !seg) return;
       stopAtRef.current = seg[2];
+      resumeAtRef.current = null;
       a.currentTime = seg[1] / 1000;
       void a.play().catch(() => {});
     },
     [source],
   );
 
-  const pause = useCallback(() => audioRef.current?.pause(), []);
+  /** Pause and remember the spot, so the next play resumes there. */
+  const pause = useCallback(() => {
+    const a = audioRef.current;
+    if (!a) return;
+    resumeAtRef.current = stopAtRef.current === null ? a.currentTime : null;
+    a.pause();
+  }, []);
 
   const chooseSource = useCallback((i: number) => {
     audioRef.current?.pause();
@@ -147,6 +175,7 @@ export function useSegmentPlayer(sources: RecitationSource[]) {
     rate,
     setRate,
     playAll,
+    restart,
     playWord,
     pause,
     hasWord,

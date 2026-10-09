@@ -110,10 +110,21 @@ jobs:
           [[ -n "$ok" ]] || { echo "✗ container never became healthy"; exit 1; }
           curl -fsS http://127.0.0.1:3300/belajar/api/health | grep -q '"database":"ok"'
           docker logs smoke 2>&1 | grep -q "applied 0001_init.sql"
-          for path in /belajar/id /belajar/en /belajar/id/kredit; do
+          for path in /belajar/id /belajar/en /belajar/id/kredit \
+                      /belajar/id/al-fatihah /belajar/id/al-fatihah/1 /belajar/id/al-fatihah/7 \
+                      /belajar/en/al-fatihah/5; do
             code="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:3300${path}")"
             echo "${path} -> ${code}"; [[ "$code" == 200 ]]
           done
+          # Unknown surah / ayah → the module's 404, not a 500.
+          for path in /belajar/id/al-baqarah /belajar/id/al-fatihah/8; do
+            code="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:3300${path}")"
+            echo "${path} -> ${code}"; [[ "$code" == 404 ]]
+          done
+          # The lesson page carries the streamed recitation + the draft label.
+          page="$(curl -fsS http://127.0.0.1:3300/belajar/id/al-fatihah/1)"
+          grep -q "Alafasy" <<<"$page"
+          grep -q "menunggu tinjauan ustadz" <<<"$page"
           loc="$(curl -s -o /dev/null -w '%{redirect_url}' http://127.0.0.1:3300/belajar)"
           echo "/belajar -> ${loc}"; [[ "$loc" == */belajar/id ]]
           # Migrations are idempotent across restarts.

@@ -83,7 +83,8 @@
     "pause": "Jeda",
     "reciter": "Qari",
     "play_word": "Putar kata {translit} — {gloss}",
-    "hint_tap": "Ketuk sebuah kata untuk mendengarnya sendiri. Ingin menirukan dengan jeda? Pilih bacaan Al-Husary (Mu'allim)."
+    "hint_tap": "Ketuk sebuah kata untuk mendengarnya sendiri. Ingin menirukan dengan jeda? Pilih bacaan Al-Husary (Mu'allim).",
+    "restart": "Ulang dari awal"
   },
   "Exercise": {
     "done": "Selesai",

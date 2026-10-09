@@ -83,7 +83,8 @@
     "pause": "Pause",
     "reciter": "Reciter",
     "play_word": "Play word {translit} — {gloss}",
-    "hint_tap": "Tap a word to hear it alone. Want gaps to repeat after the imam? Choose Al-Husary's teaching recitation (Mu'allim)."
+    "hint_tap": "Tap a word to hear it alone. Want gaps to repeat after the imam? Choose Al-Husary's teaching recitation (Mu'allim).",
+    "restart": "Start over"
   },
   "Exercise": {
     "done": "Done",

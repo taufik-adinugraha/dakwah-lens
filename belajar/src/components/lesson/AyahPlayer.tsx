@@ -1,6 +1,6 @@
 "use client";
 
-import { Gauge, Pause, Play } from "lucide-react";
+import { Gauge, Pause, Play, RotateCcw } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { useSegmentPlayer, type RecitationSource } from "@/hooks/useSegmentPlayer";
@@ -67,6 +67,15 @@ export function AyahPlayer({
         >
           {p.playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
           {p.playing ? t("pause") : t("play_ayah")}
+        </button>
+        <button
+          type="button"
+          onClick={p.restart}
+          aria-label={t("restart")}
+          className="inline-flex items-center gap-1.5 rounded-full border border-hairline px-3 py-2 text-sm text-ink-muted transition hover:bg-paper-deep"
+        >
+          <RotateCcw className="h-4 w-4" />
+          <span className="hidden sm:inline">{t("restart")}</span>
         </button>
         <button
           type="button"
