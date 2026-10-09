@@ -2608,7 +2608,7 @@
         "114:5",
         "114:6"
       ],
-      "method": "Bukan hitungan. Isi hadits dirangkum dari teks Arab rekamannya di korpus platform (api/data), tanpa menambah makna; teks Arab, terjemahan korpus, dan sha256 rekaman dicatat di authored/*.hadith.json. nomor Muslim dipetakan dari nomor urut korpus ke penomoran Fuad 'Abdul Baqi (sunnah.com) lewat fawazahmed0, setelah teks Arabnya dicek identik.",
+      "method": "Makna ringkas hadits, dibantu AI — bukan terjemahan resmi. Isinya dirangkum dari teks Arab hadits di korpus kitab platform, tanpa menambah makna. nomor Muslim dipetakan dari nomor urut korpus ke penomoran Fuad 'Abdul Baqi (sunnah.com) lewat fawazahmed0, setelah teks Arabnya dicek identik.",
       "sources": [
         {
           "kitab": "Sahih Muslim",
@@ -2640,7 +2640,7 @@
         "114:5",
         "114:6"
       ],
-      "method": "Bukan hitungan. Isi hadits dirangkum dari teks Arab rekamannya di korpus platform (api/data), tanpa menambah makna; teks Arab, terjemahan korpus, dan sha256 rekaman dicatat di authored/*.hadith.json. nomor Riyadhush Shalihin dipetakan dari nomor korpus ke penomoran sunnah.com; penilaian dikutip apa adanya dari akhir teks an-Nawawi.",
+      "method": "Makna ringkas hadits, dibantu AI — bukan terjemahan resmi. Isinya dirangkum dari teks Arab hadits di korpus kitab platform, tanpa menambah makna. nomor Riyadhush Shalihin dipetakan dari nomor korpus ke penomoran sunnah.com; penilaian dikutip apa adanya dari akhir teks an-Nawawi.",
       "sources": [
         {
           "kitab": "an-Nawawi, Riyad as-Salihin",
@@ -2672,7 +2672,7 @@
         "114:5",
         "114:6"
       ],
-      "method": "Bukan hitungan. Isi hadits dirangkum dari teks Arab rekamannya di korpus platform (api/data), tanpa menambah makna; teks Arab, terjemahan korpus, dan sha256 rekaman dicatat di authored/*.hadith.json. nomor al-Bukhari = nomor korpus (sama dengan sunnah.com); nomor Muslim dipetakan dari nomor urut korpus ke penomoran Fuad 'Abdul Baqi (sunnah.com) lewat fawazahmed0, setelah teks Arabnya dicek identik.",
+      "method": "Makna ringkas hadits, dibantu AI — bukan terjemahan resmi. Isinya dirangkum dari teks Arab hadits di korpus kitab platform, tanpa menambah makna. nomor al-Bukhari = nomor korpus (sama dengan sunnah.com); nomor Muslim dipetakan dari nomor urut korpus ke penomoran Fuad 'Abdul Baqi (sunnah.com) lewat fawazahmed0, setelah teks Arabnya dicek identik.",
       "sources": [
         {
           "kitab": "Sahih al-Bukhari",
@@ -2708,7 +2708,7 @@
         "114:5",
         "114:6"
       ],
-      "method": "Bukan hitungan. Isi hadits dirangkum dari teks Arab rekamannya di korpus platform (api/data), tanpa menambah makna; teks Arab, terjemahan korpus, dan sha256 rekaman dicatat di authored/*.hadith.json. nomor al-Bukhari = nomor korpus (sama dengan sunnah.com).",
+      "method": "Makna ringkas hadits, dibantu AI — bukan terjemahan resmi. Isinya dirangkum dari teks Arab hadits di korpus kitab platform, tanpa menambah makna. nomor al-Bukhari = nomor korpus (sama dengan sunnah.com).",
       "sources": [
         {
           "kitab": "Sahih al-Bukhari",
@@ -2744,7 +2744,7 @@
         "114:5",
         "114:6"
       ],
-      "method": "Bukan hitungan. Isi hadits dirangkum dari teks Arab rekamannya di korpus platform (api/data), tanpa menambah makna; teks Arab, terjemahan korpus, dan sha256 rekaman dicatat di authored/*.hadith.json. nomor Riyadhush Shalihin dipetakan dari nomor korpus ke penomoran sunnah.com; penilaian dikutip apa adanya dari akhir teks an-Nawawi.",
+      "method": "Makna ringkas hadits, dibantu AI — bukan terjemahan resmi. Isinya dirangkum dari teks Arab hadits di korpus kitab platform, tanpa menambah makna. nomor Riyadhush Shalihin dipetakan dari nomor korpus ke penomoran sunnah.com; penilaian dikutip apa adanya dari akhir teks an-Nawawi.",
       "sources": [
         {
           "kitab": "an-Nawawi, Riyad as-Salihin",
@@ -2802,7 +2802,7 @@
     "authored_words": "authored/al-falaq.words.json sha256:f15a21310244b21c869aeee61c14ac8e3d34f905317b71fe821893077c6d5d4e",
     "authored_structure": "authored/al-falaq.structure.json sha256:2a9811bbc7e5d374152ac7089be6d2b946a5bbbb5a569856532d0e336cd3d6af",
     "authored_concepts_map": "authored/al-falaq.concepts-map.json sha256:aed1fd50942fa30fa657a55a384d2fe284d957714238d05a9499b0065e82aaf4",
-    "authored_facts": "authored/al-falaq.facts.generated.json sha256:7340b0445ac2668b639c53c01006f936b4ecd1ef79c6eb9a02f176454003e7f9",
+    "authored_facts": "authored/al-falaq.facts.generated.json sha256:75ebf95f8fe6d95dbad2bd5b19df7a8e6cb49e44b945adf96abde2b533e1ebd3",
     "authored_hadith": "authored/al-falaq.hadith.json sha256:b21ea1e52401b20e98c0b96dac242a626180ec8bc779405b3bb099f7b429ba62",
     "pipeline": "belajar/pipeline/build_surah.py + facts_muawwidzat.py (stdlib only, no LLM)"
   }

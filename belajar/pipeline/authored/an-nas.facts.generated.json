@@ -1289,7 +1289,7 @@
         "114:5",
         "114:6"
       ],
-      "method": "Bukan hitungan. Isi hadits dirangkum dari teks Arab rekamannya di korpus platform (api/data), tanpa menambah makna; teks Arab, terjemahan korpus, dan sha256 rekaman dicatat di authored/*.hadith.json. nomor Muslim dipetakan dari nomor urut korpus ke penomoran Fuad 'Abdul Baqi (sunnah.com) lewat fawazahmed0, setelah teks Arabnya dicek identik.",
+      "method": "Makna ringkas hadits, dibantu AI — bukan terjemahan resmi. Isinya dirangkum dari teks Arab hadits di korpus kitab platform, tanpa menambah makna. nomor Muslim dipetakan dari nomor urut korpus ke penomoran Fuad 'Abdul Baqi (sunnah.com) lewat fawazahmed0, setelah teks Arabnya dicek identik.",
       "sources": [
         {
           "kitab": "Sahih Muslim",
@@ -1329,7 +1329,7 @@
         "114:5",
         "114:6"
       ],
-      "method": "Bukan hitungan. Isi hadits dirangkum dari teks Arab rekamannya di korpus platform (api/data), tanpa menambah makna; teks Arab, terjemahan korpus, dan sha256 rekaman dicatat di authored/*.hadith.json. nomor Riyadhush Shalihin dipetakan dari nomor korpus ke penomoran sunnah.com; penilaian dikutip apa adanya dari akhir teks an-Nawawi.",
+      "method": "Makna ringkas hadits, dibantu AI — bukan terjemahan resmi. Isinya dirangkum dari teks Arab hadits di korpus kitab platform, tanpa menambah makna. nomor Riyadhush Shalihin dipetakan dari nomor korpus ke penomoran sunnah.com; penilaian dikutip apa adanya dari akhir teks an-Nawawi.",
       "sources": [
         {
           "kitab": "an-Nawawi, Riyad as-Salihin",
@@ -1371,7 +1371,7 @@
         "114:5",
         "114:6"
       ],
-      "method": "Bukan hitungan. Isi hadits dirangkum dari teks Arab rekamannya di korpus platform (api/data), tanpa menambah makna; teks Arab, terjemahan korpus, dan sha256 rekaman dicatat di authored/*.hadith.json. nomor al-Bukhari = nomor korpus (sama dengan sunnah.com); nomor Muslim dipetakan dari nomor urut korpus ke penomoran Fuad 'Abdul Baqi (sunnah.com) lewat fawazahmed0, setelah teks Arabnya dicek identik.",
+      "method": "Makna ringkas hadits, dibantu AI — bukan terjemahan resmi. Isinya dirangkum dari teks Arab hadits di korpus kitab platform, tanpa menambah makna. nomor al-Bukhari = nomor korpus (sama dengan sunnah.com); nomor Muslim dipetakan dari nomor urut korpus ke penomoran Fuad 'Abdul Baqi (sunnah.com) lewat fawazahmed0, setelah teks Arabnya dicek identik.",
       "sources": [
         {
           "kitab": "Sahih al-Bukhari",
@@ -1415,7 +1415,7 @@
         "114:5",
         "114:6"
       ],
-      "method": "Bukan hitungan. Isi hadits dirangkum dari teks Arab rekamannya di korpus platform (api/data), tanpa menambah makna; teks Arab, terjemahan korpus, dan sha256 rekaman dicatat di authored/*.hadith.json. nomor al-Bukhari = nomor korpus (sama dengan sunnah.com).",
+      "method": "Makna ringkas hadits, dibantu AI — bukan terjemahan resmi. Isinya dirangkum dari teks Arab hadits di korpus kitab platform, tanpa menambah makna. nomor al-Bukhari = nomor korpus (sama dengan sunnah.com).",
       "sources": [
         {
           "kitab": "Sahih al-Bukhari",
@@ -1460,7 +1460,7 @@
         "114:5",
         "114:6"
       ],
-      "method": "Bukan hitungan. Isi hadits dirangkum dari teks Arab rekamannya di korpus platform (api/data), tanpa menambah makna; teks Arab, terjemahan korpus, dan sha256 rekaman dicatat di authored/*.hadith.json. nomor Riyadhush Shalihin dipetakan dari nomor korpus ke penomoran sunnah.com; penilaian dikutip apa adanya dari akhir teks an-Nawawi.",
+      "method": "Makna ringkas hadits, dibantu AI — bukan terjemahan resmi. Isinya dirangkum dari teks Arab hadits di korpus kitab platform, tanpa menambah makna. nomor Riyadhush Shalihin dipetakan dari nomor korpus ke penomoran sunnah.com; penilaian dikutip apa adanya dari akhir teks an-Nawawi.",
       "sources": [
         {
           "kitab": "an-Nawawi, Riyad as-Salihin",

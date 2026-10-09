@@ -609,8 +609,12 @@ def hadith_method(H: Hadiths, keys: list[str]) -> str:
         c = H.records[k]["provenance"]["collection"]
         if c not in colls:
             colls.append(c)
-    return ("Bukan hitungan. Isi hadits dirangkum dari teks Arab rekamannya di korpus platform (api/data), tanpa "
-            "menambah makna; teks Arab, terjemahan korpus, dan sha256 rekaman dicatat di authored/*.hadith.json. "
+    # Operator decision 2026-10-10: hadith-based facts keep an Indonesian
+    # summary, labelled as AI-assisted (the corpus has no Indonesian for
+    # Bukhari/Riyad). Provenance (Arabic bytes, corpus translation, sha256)
+    # stays in authored/*.hadith.json; the card shows learner-facing words.
+    return ("Makna ringkas hadits, dibantu AI — bukan terjemahan resmi. Isinya dirangkum dari teks Arab hadits "
+            "di korpus kitab platform, tanpa menambah makna. "
             + "; ".join(HADITH_METHOD[c] for c in colls) + ".")
 
 
