@@ -3,7 +3,6 @@ import { useTranslations } from "next-intl";
 
 import type { Fact } from "@/content/schema";
 
-import { DraftChip } from "../lesson/DraftChip";
 import { MixedText } from "../library/MixedText";
 import { SourcesDisclosure } from "../library/SourceList";
 
@@ -74,7 +73,6 @@ export function FactCard({
       </p>
       <div className="mt-auto pt-2">
         <SourcesDisclosure sources={fact.sources} label={labels.sources} />
-        {fact.status === "draft" ? <DraftChip label={labels.draft} /> : null}
       </div>
     </article>
   );
