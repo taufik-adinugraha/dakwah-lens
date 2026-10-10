@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { ArrowRight, BookOpenCheck, ChevronDown, Library, Mic } from "lucide-react";
+import { ArrowRight, BookOpenCheck, ChevronDown, Clock, Library, Mic } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { ForestGlow } from "@/components/ForestGlow";
 import { StatusChip } from "@/components/StatusChip";
 import { Link } from "@/i18n/navigation";
 import { hasDrafts, SURAHS } from "@/lib/content";
+import { visibleSurahs } from "@/lib/features";
 import { ayahHref, surahHref } from "@/lib/routes";
 
 export async function generateMetadata({
@@ -34,6 +35,11 @@ export async function generateMetadata({
  * whole-card link to its list of ayat; the straight-to-ayah chips (a
  * returning learner's shortcut) fold into one collapsed row under the
  * cards; no breadcrumb (the header's "Belajar" is the way back to the hub).
+ * Al-Fatihah first (operator, 2026-10-10: "show cards for other surah as
+ * 'segera hadir', but not clickable"; plan L14): a surah BELAJAR_SURAHS does
+ * not publish (lib/features.ts) keeps its card, the same size, but as a
+ * plain element labelled "Segera hadir", and has no ayah chips. The switch
+ * is read per request, so this page renders at request time.
  */
 export default async function QuranTrackPage({ params }: PageProps<"/[locale]/quran">) {
   const { locale } = await params;
@@ -43,6 +49,8 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
   // same words for the same state.
   const th = await getTranslations("Hub");
   const tl = await getTranslations("Lesson");
+  const published = new Set(await visibleSurahs());
+  const available = SURAHS.filter((s) => published.has(s.slug));
 
   // Authored per surah; a surah without an estimate shows only its counts.
   const pace: Record<string, string> = { "al-fatihah": t("fatihah_pace") };
@@ -75,6 +83,38 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
               const meta = [t("surah_meta", { ayat: s.ayat.length, words }), pace[s.slug]]
                 .filter(Boolean)
                 .join(" · ");
+              if (!published.has(s.slug)) {
+                return (
+                  <li key={s.slug}>
+                    {/* Not published yet: no link (nothing to focus or
+                        click), the same card on the paper ground with a
+                        dashed edge, the way a disabled control looks here
+                        (globals.css), and the words "Segera hadir" where an
+                        open card has its status and arrow, so the state is
+                        said, not only coloured. */}
+                    <div
+                      data-coming-soon={s.slug}
+                      className="block rounded-2xl border-[1.5px] border-dashed border-border-ui bg-paper-deep p-5 sm:p-7"
+                    >
+                      <span className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+                        <span className="block">
+                          <span className="block font-display text-2xl font-medium text-ink">{s.name_id}</span>
+                          <span className="mt-1 block text-base text-ink-muted">{meta}</span>
+                        </span>
+                        <span lang="ar" dir="rtl" className="quran text-ar-lg text-ink-muted">
+                          {s.name_ar}
+                        </span>
+                      </span>
+                      <span className="mt-4 flex flex-wrap items-center gap-3">
+                        <span className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-border-ui bg-white px-3 py-1 text-sm font-semibold text-ink">
+                          <Clock aria-hidden className="h-4 w-4 shrink-0 text-ink-muted" />
+                          {t("coming_soon")}
+                        </span>
+                      </span>
+                    </div>
+                  </li>
+                );
+              }
               const draft = hasDrafts(s);
               return (
                 <li key={s.slug}>
@@ -108,7 +148,7 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
               <ChevronDown aria-hidden className="chev h-5 w-5 shrink-0 text-forest" />
             </summary>
             <div className="space-y-4 pt-1 pb-5">
-              {SURAHS.map((s) => (
+              {available.map((s) => (
                 <nav key={s.slug} aria-label={t("ayat_nav", { name: s.name_id })}>
                   <p className="text-base font-semibold text-ink">{s.name_id}</p>
                   <ul className="mt-2 flex flex-wrap gap-2">

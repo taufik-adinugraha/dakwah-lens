@@ -131,9 +131,14 @@ export default async function AyahPage({
     const lx = getLexeme(lid);
     return lx?.tashrif ? [lx] : [];
   });
+  // For the end card of a surah's last ayah: the surahs after it. Which of
+  // them are published (BELAJAR_SURAHS) is read per request, and this page is
+  // prerendered, so the stage asks /belajar/api/surahs in the browser and
+  // offers only a published one; at the end of Al-Fatihah, while it is the
+  // only one, the card says the next surah is coming soon (operator,
+  // 2026-10-10).
   const surahIdx = SURAHS.findIndex((x) => x.slug === s.slug);
-  const after = surahIdx >= 0 ? SURAHS[surahIdx + 1] : undefined;
-  const nextSurah = after ? { slug: after.slug, name: after.name_id } : null;
+  const following = next ? [] : SURAHS.slice(surahIdx + 1).map((x) => ({ slug: x.slug, name: x.name_id }));
   const conceptTitle = Object.fromEntries(LIBRARY.concepts.map((c) => [c.id, c.title]));
   const wordAr = Object.fromEntries(s.ayat.flatMap((x) => x.words.map((w) => [w.loc, w.ar])));
   const conceptLabels = {
@@ -183,7 +188,7 @@ export default async function AyahPage({
             title={pageTitle}
             ayah={a.ayah}
             surahName={s.name_id}
-            nextSurah={nextSurah}
+            following={following}
             words={playerWords}
             sources={sources}
             translation={translation}

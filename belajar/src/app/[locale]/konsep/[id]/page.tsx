@@ -6,6 +6,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ConceptCard } from "@/components/library/ConceptCard";
 import { Link } from "@/i18n/navigation";
 import { SURAH_INDEX, WORD_AR } from "@/lib/content";
+import { visibleSurahs } from "@/lib/features";
 import { getConcept, LIBRARY } from "@/lib/library";
 import { conceptHref, conceptIndexHref } from "@/lib/routes";
 
@@ -22,11 +23,18 @@ export async function generateMetadata({
   return { title: getConcept(id)?.title ?? "—" };
 }
 
+/**
+ * One concept, in full. Its examples link to the lesson words, except those of
+ * a surah BELAJAR_SURAHS does not publish (operator, 2026-10-10: Al-Fatihah
+ * first), which ConceptCard shows as plain text. The switch is read per
+ * request, so this page waits for it and renders at request time.
+ */
 export default async function ConceptPage({ params }: PageProps<"/[locale]/konsep/[id]">) {
   const { locale, id } = await params;
   setRequestLocale(locale);
   const concept = getConcept(id);
   if (!concept) notFound();
+  await visibleSurahs();
   const t = await getTranslations("Concept");
   const tw = await getTranslations("Word");
   const related = concept.related.flatMap((r) => {

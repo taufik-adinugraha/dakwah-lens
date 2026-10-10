@@ -23,6 +23,7 @@ import { EXERCISE_TITLE_KEY, GuidedExercise, type StageExerciseData } from "@/co
 import { type Offscreen, Spotlight } from "@/components/autoplay/Spotlight";
 import { SurahEndCard } from "@/components/autoplay/SurahEndCard";
 import { continueToAyah, PLAY_WORD_EVENT, useAutoplay } from "@/components/autoplay/useAutoplay";
+import { type SurahRef, useUpNext } from "@/components/autoplay/useUpNext";
 import { guideSelector } from "@/components/exercises/guide";
 import { TextSizeOptions } from "@/components/TextSizeSwitch";
 import type { RecitationSource } from "@/hooks/useSegmentPlayer";
@@ -154,7 +155,7 @@ export function LessonStage({
   title,
   ayah,
   surahName,
-  nextSurah,
+  following,
   words,
   sources,
   translation,
@@ -165,8 +166,9 @@ export function LessonStage({
   title: string;
   ayah: number;
   surahName: string;
-  /** The surah after this one, for the end card (null after the last). */
-  nextSurah: { slug: string; name: string } | null;
+  /** The surahs after this one, in mushaf order, on a surah's last ayah only (else empty): the
+   *  end card offers the first published one (useUpNext.ts). */
+  following: SurahRef[];
   words: PlayerWord[];
   sources: StageSource[];
   /** The ayah's translation with footnotes and source, rendered by the page. */
@@ -180,6 +182,7 @@ export function LessonStage({
   const uid = useId();
   const ap = useAutoplay(seq, sources, title);
   const { state, view, actions, player: p } = ap;
+  const upNext = useUpNext(following);
 
   const [offscreen, setOffscreen] = useState<Offscreen>(null);
   const [barHeight, setBarHeight] = useState(0);
@@ -607,9 +610,10 @@ export function LessonStage({
           state.intent?.kind === "surah_end" ? (
             <SurahEndCard
               surahName={surahName}
-              nextSurah={nextSurah}
+              nextSurah={upNext.next}
+              comingSoon={upNext.soon?.name ?? null}
               onRepeat={() => continueToAyah(ap.router, seq.slug, 1)}
-              onNextSurah={() => nextSurah && continueToAyah(ap.router, nextSurah.slug, 1)}
+              onNextSurah={() => upNext.next && continueToAyah(ap.router, upNext.next.slug, 1)}
             />
           ) : state.intent?.kind === "ayah" ? (
             <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-3" role="status">

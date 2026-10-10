@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 
 import type { Concept } from "@/content/schema";
 import { Link } from "@/i18n/navigation";
+import { surahPublished } from "@/lib/features";
 import { parseLoc } from "@/lib/library";
 import { ayahHref, conceptHref } from "@/lib/routes";
 
@@ -80,12 +81,21 @@ export function ConceptCard({
               if (!s) return null;
               return (
                 <li key={ex.loc} className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <Link
-                    href={ayahHref(s.slug, ayah, ex.loc)}
-                    className="chip-link"
-                  >
-                    {t("example_loc", { surah: s.name, ayah, word })}
-                  </Link>
+                  {/* A surah not published yet (BELAJAR_SURAHS, operator
+                      2026-10-10) has no lesson to open: its place is plain
+                      text. The page awaits visibleSurahs() first. */}
+                  {surahPublished(s.slug) ? (
+                    <Link
+                      href={ayahHref(s.slug, ayah, ex.loc)}
+                      className="chip-link"
+                    >
+                      {t("example_loc", { surah: s.name, ayah, word })}
+                    </Link>
+                  ) : (
+                    <span className="text-sm font-medium text-ink-muted">
+                      {t("example_loc", { surah: s.name, ayah, word })}
+                    </span>
+                  )}
                   {wordAr[ex.loc] ? (
                     <span lang="ar" dir="rtl" className="quran text-ar-sm text-ink">
                       {wordAr[ex.loc]}
