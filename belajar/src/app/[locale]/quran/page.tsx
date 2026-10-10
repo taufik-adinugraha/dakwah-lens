@@ -27,7 +27,7 @@ export async function generateMetadata({
 }
 
 /**
- * Landing page of the Qur'anic Arabic + light tafsir track (plan L9): what
+ * Landing page of the Qur'anic Arabic track (plan L9, L13): what
  * the track is, the surahs available now, how a lesson works and how the
  * material is built. Design pass (operator, 2026-10-10: fewer links, more
  * colour): the forest glow behind the page; each surah card is ONE
