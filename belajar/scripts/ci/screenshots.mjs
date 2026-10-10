@@ -1,6 +1,12 @@
 // CI-only: screenshot key module pages from the real image (started by the
 // workflow on :3300) at phone and desktop widths, for visual review of each
 // PR without running anything on a developer laptop. Output: ./shots/*.png
+//
+// Two runs, one container each. By default: the module as production shows
+// it, from a container with the Ilmu Waris switch off (hidden since
+// 2026-10-10, src/lib/features.ts), including the 404 a hidden waris URL
+// answers. `--waris`: only the Ilmu Waris pages, from a container started
+// with BELAJAR_WARIS=on.
 import { mkdir, readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -29,13 +35,18 @@ const PAGES = [
   ["nas-6", "/belajar/id/quran/an-nas/6"],
   ["konsep", "/belajar/id/konsep"],
   ["kredit", "/belajar/id/kredit"],
-  // Ilmu Waris (docs/waris-plan.md §9.1): track home, the questionnaire's first screen, and the
-  // report page with no answers (its "start" notice). Filled reports, print and reduced-motion
-  // shots come from waris-e2e.mjs (waris-*.png).
+  // What a visitor gets at the hidden track's address: the module's own 404.
+  ["waris-tersembunyi-404", "/belajar/id/waris"],
+];
+// Ilmu Waris (docs/waris-plan.md §9.1), `--waris` only: track home, the questionnaire's first
+// screen, and the report page with no answers (its "start" notice). Filled reports, print and
+// reduced-motion shots come from waris-e2e.mjs (waris-*.png).
+const WARIS_PAGES = [
   ["waris", "/belajar/id/waris"],
   ["waris-hitung", "/belajar/id/waris/hitung"],
   ["waris-laporan-kosong", "/belajar/id/waris/laporan"],
 ];
+const WARIS_ONLY = process.argv.includes("--waris");
 const VIEWPORTS = [
   ["phone", { width: 390, height: 844 }, 2],
   ["desktop", { width: 1280, height: 900 }, 1],
@@ -339,18 +350,22 @@ async function karaokeShots(page, vp, index) {
 }
 
 await mkdir("shots", { recursive: true });
-const narration = await narrationIndex();
-console.log(`narration index: ${narration.size} file(s) named by the manifests in ${BELAJAR_DIR}`);
+const narration = WARIS_ONLY ? new Map() : await narrationIndex();
+if (!WARIS_ONLY) console.log(`narration index: ${narration.size} file(s) named by the manifests in ${BELAJAR_DIR}`);
 const browser = await chromium.launch();
 try {
   for (const [vp, viewport, scale] of VIEWPORTS) {
     const ctx = await browser.newContext({ viewport, deviceScaleFactor: scale, locale: "id-ID" });
     const page = await ctx.newPage();
-    for (const [name, path] of PAGES) {
+    for (const [name, path] of WARIS_ONLY ? WARIS_PAGES : PAGES) {
       await page.goto(BASE + path, { waitUntil: "networkidle" });
       await page.evaluate(() => document.fonts.ready);
       await page.screenshot({ path: `shots/${vp}-${name}.png`, fullPage: true });
       console.log(`shot ${vp}-${name} (${path})`);
+    }
+    if (WARIS_ONLY) {
+      await ctx.close();
+      continue;
     }
     // First concept and vocabulary pages, discovered from the links.
     for (const [name, from, sel] of [

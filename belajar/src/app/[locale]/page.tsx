@@ -8,6 +8,7 @@ import { TextSizeHint } from "@/components/TextSizeSwitch";
 import { AiChip } from "@/components/waris/report/AiChip";
 import { Link } from "@/i18n/navigation";
 import { hasDrafts, SURAHS } from "@/lib/content";
+import { warisVisible } from "@/lib/features";
 import { LIBRARY } from "@/lib/library";
 import { conceptIndexHref, quranHref, warisHref } from "@/lib/routes";
 
@@ -29,6 +30,19 @@ export async function generateMetadata({
   };
 }
 
+/** One hub card. */
+type TrackCard = {
+  href: string;
+  Icon: typeof BookOpen;
+  title: string;
+  body: string;
+  available: string;
+  status: string;
+  draft: boolean;
+  /** The card's label is the AI chip instead of the status chip (no human review, plan L11). */
+  ai?: boolean;
+};
+
 /**
  * The Belajar hub (plan L9): one card per learning track that exists today,
  * plus the shared grammar library later tracks reuse. No cards for tracks
@@ -36,12 +50,14 @@ export async function generateMetadata({
  * Design pass (operator, 2026-10-10): the forest glow behind the page, and
  * each card is ONE whole-card link with no "Lihat …" line inside it (the
  * arrow is the only cue); the "Uji coba" chip lives on the cards only.
+ * Ilmu Waris is hidden for now (operator, 2026-10-10; lib/features.ts): its
+ * card is listed only while BELAJAR_WARIS=on. The switch is read per request,
+ * so this page renders at request time instead of being prerendered.
  */
 export default async function HubPage({ params }: PageProps<"/[locale]">) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("Hub");
-  const tw = await getTranslations("Track");
 
   const quranDraft = SURAHS.some(hasDrafts);
   const surahList = SURAHS.map((s) =>
@@ -49,7 +65,7 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
   ).join(", ");
   const conceptsDraft = LIBRARY.concepts.some((c) => c.status === "draft");
 
-  const tracks = [
+  const tracks: TrackCard[] = [
     {
       href: quranHref(),
       Icon: BookOpen,
@@ -68,7 +84,10 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
       status: conceptsDraft ? t("status_beta_draft") : t("status_beta"),
       draft: conceptsDraft,
     },
-    {
+  ];
+  if (await warisVisible()) {
+    const tw = await getTranslations("Track");
+    tracks.push({
       // Ilmu Waris (Faraidh): what exists today is the calculator (docs/waris-plan.md §9.1, M2.13).
       // No human review (operator, 2026-10-09), so the chip states what it is, not a review status.
       href: warisHref.track(),
@@ -79,8 +98,8 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
       status: tw("chip"),
       draft: false,
       ai: true,
-    },
-  ];
+    });
+  }
 
   return (
     <div className="relative isolate">

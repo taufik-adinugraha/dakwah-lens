@@ -42,6 +42,7 @@ Research files cited below by name and section:
 >   - **D16 amended** — report title **"Rekomendasi Pembagian Waris"**; subtitle states it is AI-assisted, not a fatwa and not a court decision, names *Penetapan Ahli Waris* at the Pengadilan Agama as the legal route, and notes that heirs may agree another division by musyawarah (KHI Pasal 183).
 >   - **What replaces sign-off:** deterministic engine with exact fractions; sourced vectors + invariants in CI on every push; dalil only byte-copied from the corpus; independent AI fiqh recomputation (Claude, never Gemini) for computed vectors and rule notes. Honest flags stay on the report: the court column where amounts differ, "Perlu konfirmasi" on disputed cases (e.g. grandfather with siblings), and "silakan berkonsultasi" refusals.
 >   - Content `status: "draft"` fields remain as pipeline state; the UI must not promise a future ustadz review that will not happen.
+> - **Hidden for now (operator, 2026-10-10):** "let's hide warisan at the moment". The track stays built and tested, but the live site shows no hub card and every `/waris` URL answers 404 until the operator says to show it (switch `BELAJAR_WARIS=on`; `docs/belajar-plan.md` L12).
 
 
 Each decision lists the options, a recommendation, and what it changes in numbers. Money examples use
