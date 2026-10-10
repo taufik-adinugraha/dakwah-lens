@@ -48,7 +48,7 @@ export function GuidedExercise({
   exercise: ExerciseKey;
   progressId: string;
   data: StageExerciseData;
-  /** The mushaf words of the ayah (Dengar dan ketuk). */
+  /** The mushaf words of the ayah (Dengar dan klik). */
   tapWords: { index: number; ar: string; translit: string; gloss: string }[];
   /** The page's first (default) recitation — the one the standalone copy uses. */
   tapSource: RecitationSource;

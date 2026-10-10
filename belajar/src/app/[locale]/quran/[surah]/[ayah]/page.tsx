@@ -5,13 +5,15 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { stageSequence } from "@/components/autoplay/build";
-import { Breadcrumb } from "@/components/Breadcrumb";
+import { BackLink } from "@/components/BackLink";
 import { LabelRole } from "@/components/exercises/LabelRole";
 import { SortCase } from "@/components/exercises/SortCase";
 import { TapWord } from "@/components/exercises/TapWord";
 import { WaznFactory } from "@/components/exercises/WaznFactory";
 import { WhyHarakat } from "@/components/exercises/WhyHarakat";
+import { ForestGlow } from "@/components/ForestGlow";
 import { LessonStage, WordListenButton } from "@/components/lesson/LessonStage";
+import { MaterialsDisclosure } from "@/components/lesson/MaterialsDisclosure";
 import { WordCard } from "@/components/lesson/WordCard";
 import { ConceptCard } from "@/components/library/ConceptCard";
 import { SourceList } from "@/components/library/SourceList";
@@ -21,7 +23,7 @@ import { Link } from "@/i18n/navigation";
 import { getAyah, getSurah, SURAH_INDEX, SURAHS } from "@/lib/content";
 import { orderRecitations } from "@/lib/autoplay";
 import { conceptsIntroducedIn, getConcept, getLexeme, LIBRARY } from "@/lib/library";
-import { ayahHref, hubHref, quranHref, surahHref } from "@/lib/routes";
+import { ayahHref, surahHref } from "@/lib/routes";
 
 export const dynamicParams = false;
 
@@ -53,18 +55,11 @@ export async function generateMetadata({
  * "Dibantu AI" tag: the operator removed those chips (2026-10-10) because each
  * record shows its Rujukan; the page footer carries the AI-assisted label.
  */
-function Deeper({ title, draft, children }: { title: string; draft?: string; children: ReactNode }) {
+function Deeper({ title, children }: { title: string; children: ReactNode }) {
   return (
     <details className="rounded-2xl border border-hairline bg-white">
       <summary className="disclosure-row px-5 py-2 text-ink">
-        <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <span>{title}</span>
-          {draft ? (
-            <span className="rounded-full border border-notice bg-notice-bg px-2.5 py-0.5 text-xs font-medium text-notice">
-              {draft}
-            </span>
-          ) : null}
-        </span>
+        <span>{title}</span>
         <ChevronDown aria-hidden className="chev h-5 w-5 shrink-0 text-forest" />
       </summary>
       <div className="px-5 pt-1 pb-5">{children}</div>
@@ -73,13 +68,18 @@ function Deeper({ title, draft, children }: { title: string; draft?: string; chi
 }
 
 /**
- * Lesson page, in the order a learner needs it (senior-ux §3.6): where am I
- * → the stage: the ayah, its translation and the autoplay lesson (one tap on
- * "Mulai", then it runs to the end of the surah by itself; exercises inside
- * the stage, guided by voice and a spotlight) → word by word → practice (the
- * same exercises, standalone, for manual practice) → "learn more" behind
- * collapsed rows → the next ayah. Nothing gives positional instructions
- * ("di atas"); every citation stays one tap away.
+ * Lesson page = ONE focused stage (operator, 2026-10-10: "too crowded … focus
+ * on the main feature with less distraction"): a short title "Al-Fatihah ·
+ * Ayat 1 dari 7" with one small "‹ Al-Fatihah" link back to the list of
+ * ayat → the stage: the numbered ayah, its translation and ONE "▶ Mulai
+ * pelajaran" (one click, then it runs to the end of the surah by itself;
+ * exercises inside the stage, guided by voice and a spotlight; every
+ * secondary control behind "⚙ Pengaturan") → everything else folded into
+ * ONE collapsed row, "Materi lengkap ayat ini": word by word, the
+ * standalone practice, "learn more" (structure, concepts, tafsir, facts),
+ * content unchanged → the ayah navigation, once, at the bottom. The forest
+ * glow sits behind the page. Nothing gives positional instructions ("di
+ * atas"); every citation (Rujukan) stays reachable inside the row.
  */
 export default async function AyahPage({
   params,
@@ -95,7 +95,6 @@ export default async function AyahPage({
   const tw = await getTranslations("Word");
   const tc = await getTranslations("Concept");
   const tp = await getTranslations("Player");
-  const tb = await getTranslations("Breadcrumb");
 
   const playerWords = a.words.map((w, i) => ({
     index: i + 1,
@@ -104,14 +103,14 @@ export default async function AyahPage({
     gloss: w.gloss,
   }));
   // Default reciter: Mishary Alafasy (operator's choice, 2026-10-09); Husary
-  // Mu'allim stays available for its built-in "repeat after me" gaps. One
+  // Mu'allim stays available for its built-in "repeat after me" gaps. Their
+  // credit lines are listed on the Kredit page (kredit/page.tsx). One
   // order for the page and the autoplay engine (RECITER_ORDER there), so
   // the exercises the lesson waits at are exactly the ones rendered.
   const sources = orderRecitations(a.recitation).map((r) => ({
     reciter: r.reciter,
     url: r.url,
     segments: r.segments,
-    credit: r.credit,
     label: RECITER_LABEL[r.reciter] ?? r.reciter,
   }));
   const timed = new Set(sources.flatMap((r) => r.segments.map(([w]) => w)));
@@ -144,7 +143,6 @@ export default async function AyahPage({
     examples: tc("examples"),
     more: tc("more"),
     sources: tw("sources"),
-    draft: tw("draft"),
   };
   const hasDeeper = !!a.structure || introduced.length > 0 || !!a.tafsir || facts.length > 0;
 
@@ -166,30 +164,204 @@ export default async function AyahPage({
   );
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
-      {/* 1. Where am I. The breadcrumb's surah crumb is the way back to
-          the list of ayat (it replaced the separate "‹ Daftar ayat" chip,
-          so there is one control per destination). */}
-      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-        <Breadcrumb
-          label={tb("label")}
-          items={[
-            { label: tb("hub"), href: hubHref() },
-            { label: tb("quran"), href: quranHref() },
-            { label: s.name_id, href: surahHref(s.slug) },
-            { label: t("ayah", { n: a.ayah }) },
-          ]}
-        />
+    <div className="relative isolate">
+      <ForestGlow />
+      <div className="mx-auto max-w-5xl px-4 py-5 sm:px-6 sm:py-8">
+        {/* 1. Where am I: one way back, one short title. */}
+        <BackLink href={surahHref(s.slug)} label={s.name_id} hint={t("back_to_surah")} />
+        <h1 className="mt-2 text-balance font-display text-3xl font-medium">
+          {s.name_id} · {t("ayah_of", { n: a.ayah, total: s.ayat.length })}
+        </h1>
+
+        {/* 2. The stage: ayah, translation and the autoplay lesson — one
+            player. Keyed by ayah: the next ayah (reached by the lesson's own
+            hand-off) starts with a fresh runner. */}
+        <div className="mt-5">
+          <LessonStage
+            key={key}
+            seq={seq}
+            title={pageTitle}
+            ayah={a.ayah}
+            surahName={s.name_id}
+            nextSurah={nextSurah}
+            words={playerWords}
+            sources={sources}
+            translation={translation}
+            exercise={{ words: a.words, pool, lexemes }}
+          />
+        </div>
+
+        {/* 3. Everything else, in one collapsed row. */}
+        <div className="mt-10">
+          <MaterialsDisclosure title={t("materials")} hint={t("materials_hint")}>
+            {/* Word by word */}
+            <section aria-labelledby="words">
+              <h2 id="words" className="font-display text-2xl font-medium">
+                {t("words_heading")}
+              </h2>
+              <p className="mt-1 max-w-prose text-base text-ink-muted">{t("words_intro", { n: a.words.length })}</p>
+              {/* Container query, not media query: columns collapse as the text
+                  size grows (rem in @media ignores the root size). */}
+              <div className="@container mt-4">
+                <div className="grid gap-4 @2xl:grid-cols-2 @5xl:grid-cols-3">
+                  {a.words.map((w, i) => (
+                    <WordCard
+                      key={w.loc}
+                      word={w}
+                      lexeme={w.lemma_id ? getLexeme(w.lemma_id) : undefined}
+                      concepts={w.concepts.flatMap((id) => {
+                        const c = getConcept(id);
+                        return c ? [{ id: c.id, title: c.title }] : [];
+                      })}
+                      listen={
+                        timed.has(i + 1) ? (
+                          <WordListenButton
+                            index={i + 1}
+                            label={tp("listen")}
+                            detail={tp("listen_detail", { n: i + 1, translit: w.translit })}
+                          />
+                        ) : undefined
+                      }
+                      labels={{
+                        role: tw("role"),
+                        concepts: tw("concepts"),
+                        lemma: tw("lemma"),
+                        sharaf: {
+                          heading: tw("sharaf_heading"),
+                          forms_note: tw("sharaf_forms_note"),
+                          ilal: tw("ilal"),
+                          ilal_from: tw("ilal_from"),
+                          ilal_to: tw("ilal_to"),
+                        },
+                        meaning: tw("meaning"),
+                        root: tw("root"),
+                        wazn: tw("wazn"),
+                        why: tw("why"),
+                        other_views: tw("other_views"),
+                        sources: tw("sources"),
+                        no_root: tw("no_root"),
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* Practice: the same exercises as the stage's, standalone */}
+            <section id="practice" className="mt-12 scroll-mt-24 space-y-4" aria-labelledby="practice-heading">
+              <div>
+                <h2 id="practice-heading" className="font-display text-2xl font-medium">
+                  {t("practice_heading")}
+                </h2>
+                <p className="mt-1 max-w-prose text-base text-ink-muted">{t("practice_intro")}</p>
+              </div>
+              <TapWord id={`${key}/tap`} words={playerWords} source={sources[0]} />
+              <WhyHarakat id={`${key}/why`} words={a.words} pool={pool} />
+              <SortCase id={`${key}/sort`} words={a.words} />
+              <LabelRole id={`${key}/role`} words={a.words} pool={pool} />
+              <WaznFactory id={`${key}/wazn`} lexemes={lexemes} />
+            </section>
+
+            {/* Learn more, each part collapsed again */}
+            {hasDeeper && (
+              <section className="mt-12" aria-labelledby="deeper">
+                <h2 id="deeper" className="font-display text-2xl font-medium">
+                  {t("deeper_heading")}
+                </h2>
+                <p className="mt-1 max-w-prose text-base text-ink-muted">{t("deeper_intro")}</p>
+                <div className="mt-4 space-y-3">
+                  {a.structure && (
+                    <Deeper title={t("structure_heading")}>
+                      <StructureSection
+                        ayah={a}
+                        conceptTitle={conceptTitle}
+                        hideHeading
+                        labels={{
+                          heading: t("structure_heading"),
+                          groups: t("structure_groups"),
+                          sources: tw("sources"),
+                        }}
+                      />
+                    </Deeper>
+                  )}
+
+                  {introduced.length > 0 && (
+                    <Deeper
+                      title={`${t("concepts_heading")} (${introduced.length})`}
+                    >
+                      <div className="@container">
+                        <div className="grid gap-4 @2xl:grid-cols-2">
+                          {introduced.map((c) => (
+                            <ConceptCard
+                              key={c.id}
+                              concept={c}
+                              labels={conceptLabels}
+                              surahs={SURAH_INDEX}
+                              wordAr={wordAr}
+                              compact
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </Deeper>
+                  )}
+
+                  {a.tafsir && (
+                    <Deeper title={t("tafsir_heading")}>
+                      <p className="max-w-prose text-pretty text-base text-ink">{a.tafsir.text}</p>
+                      <p className="mt-4 text-sm font-semibold text-ink">
+                        {tw("sources")} ({a.tafsir.sources.length})
+                      </p>
+                      <div className="mt-1">
+                        <SourceList sources={a.tafsir.sources} />
+                      </div>
+                    </Deeper>
+                  )}
+
+                  {facts.length > 0 && (
+                    <Deeper
+                      title={`${t("facts_heading")} (${facts.length})`}
+                    >
+                      <div className="@container">
+                        <div className="grid gap-4 @2xl:grid-cols-2">
+                          {facts.map((f) => (
+                            <FactCard
+                              key={f.id}
+                              fact={f}
+                              labels={{
+                                method: t("fact_method"),
+                                where: t("fact_where"),
+                                sources: tw("sources"),
+                              }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </Deeper>
+                  )}
+                </div>
+              </section>
+            )}
+          </MaterialsDisclosure>
+        </div>
+
+        {/* 4. Previous / next ayah: once, here. The stage's "Mulai" stays
+            the one primary action on the page. */}
         {prev || next ? (
-          <nav aria-label={t("nav_top")} className="flex flex-wrap gap-2">
+          <nav
+            aria-label={t("nav_bottom")}
+            className="mt-10 flex flex-wrap items-center justify-between gap-4"
+          >
             {prev ? (
-              <Link href={ayahHref(s.slug, prev.ayah)} className="chip-link">
+              <Link href={ayahHref(s.slug, prev.ayah)} className="btn-secondary min-h-14!">
                 <ChevronLeft aria-hidden className="h-5 w-5" />
                 {t("ayah", { n: prev.ayah })}
               </Link>
-            ) : null}
+            ) : (
+              <span />
+            )}
             {next ? (
-              <Link href={ayahHref(s.slug, next.ayah)} className="chip-link">
+              <Link href={ayahHref(s.slug, next.ayah)} className="btn-secondary min-h-14!">
                 {t("ayah", { n: next.ayah })}
                 <ChevronRight aria-hidden className="h-5 w-5" />
               </Link>
@@ -197,203 +369,6 @@ export default async function AyahPage({
           </nav>
         ) : null}
       </div>
-      <h1 className="mt-4 font-display text-3xl font-medium">{pageTitle}</h1>
-      <p className="mt-1 text-base text-ink-muted">{t("ayah_of", { n: a.ayah, total: s.ayat.length })}</p>
-
-      {/* 2. The stage: ayah, translation and the autoplay lesson — one
-          player. Keyed by ayah: the next ayah (reached by the lesson's own
-          hand-off) starts with a fresh runner. */}
-      <div className="mt-5">
-        <LessonStage
-          key={key}
-          seq={seq}
-          title={pageTitle}
-          ayah={a.ayah}
-          surahName={s.name_id}
-          nextSurah={nextSurah}
-          words={playerWords}
-          sources={sources}
-          translation={translation}
-          exercise={{ words: a.words, pool, lexemes }}
-        />
-      </div>
-
-      {/* 3. Word by word */}
-      <section className="mt-12" aria-labelledby="words">
-        <h2 id="words" className="font-display text-2xl font-medium">
-          {t("words_heading")}
-        </h2>
-        <p className="mt-1 max-w-prose text-base text-ink-muted">{t("words_intro", { n: a.words.length })}</p>
-        {/* Container query, not media query: columns collapse as the text
-            size grows (rem in @media ignores the root size). */}
-        <div className="@container mt-4">
-          <div className="grid gap-4 @2xl:grid-cols-2 @5xl:grid-cols-3">
-            {a.words.map((w, i) => (
-              <WordCard
-                key={w.loc}
-                word={w}
-                lexeme={w.lemma_id ? getLexeme(w.lemma_id) : undefined}
-                concepts={w.concepts.flatMap((id) => {
-                  const c = getConcept(id);
-                  return c ? [{ id: c.id, title: c.title }] : [];
-                })}
-                listen={
-                  timed.has(i + 1) ? (
-                    <WordListenButton
-                      index={i + 1}
-                      label={tp("listen")}
-                      detail={tp("listen_detail", { n: i + 1, translit: w.translit })}
-                    />
-                  ) : undefined
-                }
-                labels={{
-                  role: tw("role"),
-                  concepts: tw("concepts"),
-                  lemma: tw("lemma"),
-                  sharaf: {
-                    heading: tw("sharaf_heading"),
-                    forms_note: tw("sharaf_forms_note"),
-                    ilal: tw("ilal"),
-                    ilal_from: tw("ilal_from"),
-                    ilal_to: tw("ilal_to"),
-                  },
-                  meaning: tw("meaning"),
-                  root: tw("root"),
-                  wazn: tw("wazn"),
-                  why: tw("why"),
-                  other_views: tw("other_views"),
-                  sources: tw("sources"),
-                  no_root: tw("no_root"),
-                  draft: tw("draft"),
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 4. Practice */}
-      <section id="practice" className="mt-12 scroll-mt-24 space-y-4" aria-labelledby="practice-heading">
-        <div>
-          <h2 id="practice-heading" className="font-display text-2xl font-medium">
-            {t("practice_heading")}
-          </h2>
-          <p className="mt-1 max-w-prose text-base text-ink-muted">{t("practice_intro")}</p>
-        </div>
-        <TapWord id={`${key}/tap`} words={playerWords} source={sources[0]} />
-        <WhyHarakat id={`${key}/why`} words={a.words} pool={pool} />
-        <SortCase id={`${key}/sort`} words={a.words} />
-        <LabelRole id={`${key}/role`} words={a.words} pool={pool} />
-        <WaznFactory id={`${key}/wazn`} lexemes={lexemes} />
-      </section>
-
-      {/* 5. Learn more, collapsed */}
-      {hasDeeper && (
-        <section className="mt-12" aria-labelledby="deeper">
-          <h2 id="deeper" className="font-display text-2xl font-medium">
-            {t("deeper_heading")}
-          </h2>
-          <p className="mt-1 max-w-prose text-base text-ink-muted">{t("deeper_intro")}</p>
-          <div className="mt-4 space-y-3">
-            {a.structure && (
-              <Deeper title={t("structure_heading")}>
-                <StructureSection
-                  ayah={a}
-                  conceptTitle={conceptTitle}
-                  hideHeading
-                  labels={{
-                    heading: t("structure_heading"),
-                    groups: t("structure_groups"),
-                    sources: tw("sources"),
-                    draft: tw("draft"),
-                  }}
-                />
-              </Deeper>
-            )}
-
-            {introduced.length > 0 && (
-              <Deeper
-                title={`${t("concepts_heading")} (${introduced.length})`}
-              >
-                <div className="@container">
-                  <div className="grid gap-4 @2xl:grid-cols-2">
-                    {introduced.map((c) => (
-                      <ConceptCard
-                        key={c.id}
-                        concept={c}
-                        labels={conceptLabels}
-                        surahs={SURAH_INDEX}
-                        wordAr={wordAr}
-                        compact
-                      />
-                    ))}
-                  </div>
-                </div>
-              </Deeper>
-            )}
-
-            {a.tafsir && (
-              <Deeper title={t("tafsir_heading")}>
-                <p className="max-w-prose text-pretty text-base text-ink">{a.tafsir.text}</p>
-                <p className="mt-4 text-sm font-semibold text-ink">
-                  {tw("sources")} ({a.tafsir.sources.length})
-                </p>
-                <div className="mt-1">
-                  <SourceList sources={a.tafsir.sources} />
-                </div>
-              </Deeper>
-            )}
-
-            {facts.length > 0 && (
-              <Deeper
-                title={`${t("facts_heading")} (${facts.length})`}
-              >
-                <div className="@container">
-                  <div className="grid gap-4 @2xl:grid-cols-2">
-                    {facts.map((f) => (
-                      <FactCard
-                        key={f.id}
-                        fact={f}
-                        labels={{
-                          method: t("fact_method"),
-                          where: t("fact_where"),
-                          sources: tw("sources"),
-                          draft: tw("draft"),
-                        }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </Deeper>
-            )}
-          </div>
-        </section>
-      )}
-
-      {/* 6. Previous / next ayah */}
-      <nav
-        aria-label={t("nav_bottom")}
-        className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-hairline pt-6"
-      >
-        {prev ? (
-          <Link href={ayahHref(s.slug, prev.ayah)} className="btn-secondary min-h-14!">
-            <ChevronLeft aria-hidden className="h-5 w-5" />
-            {t("ayah", { n: prev.ayah })}
-          </Link>
-        ) : (
-          <span />
-        )}
-        {next ? (
-          <Link href={ayahHref(s.slug, next.ayah)} className="btn-primary">
-            {t("ayah", { n: next.ayah })}
-            <ChevronRight aria-hidden className="h-5 w-5" />
-          </Link>
-        ) : (
-          <Link href={surahHref(s.slug)} className="btn-primary">
-            {t("back_to_surah")}
-          </Link>
-        )}
-      </nav>
     </div>
   );
 }

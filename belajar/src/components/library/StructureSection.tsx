@@ -19,7 +19,7 @@ export function StructureSection({
   hideHeading = false,
 }: {
   ayah: Ayah;
-  labels: { heading: string; groups: string; sources: string; draft: string };
+  labels: { heading: string; groups: string; sources: string };
   conceptTitle: Record<string, string>;
   hideHeading?: boolean;
 }) {

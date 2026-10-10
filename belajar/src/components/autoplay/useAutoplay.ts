@@ -32,7 +32,16 @@ import {
 } from "@/lib/autoplay";
 import { ayahHref } from "@/lib/routes";
 
-import { type CaptionClock, srAnnouncement, stageCaption } from "./caption";
+import {
+  type CaptionClock,
+  karaokeAt,
+  lineVoiced,
+  playingWords,
+  srAnnouncement,
+  stageCaption,
+  stageMarks,
+  type VoicePos,
+} from "./caption";
 
 /** Query flag of the hand-off to the next ayah (".../quran/al-ikhlas/2?lanjut=1"). */
 export const CONTINUE_PARAM = "lanjut";
@@ -71,14 +80,19 @@ export function continueToAyah(router: ReturnType<typeof useRouter>, slug: strin
  *   and recitation therefore never overlap.
  * - Exercises: forwards the guided exercise's answers, done and control
  *   reports; sends idle_tick once a second while one waits in silence.
- *   Dengar dan ketuk's word is recited here, on the stage's player (the one
+ *   Dengar dan klik's word is recited here, on the stage's player (the one
  *   "Mulai" unlocked); the learner's own replay of it ends that recitation
  *   instead of pausing the lesson.
- * - The learner's own sound (a mushaf word, "Dengar ayat", a word card's
+ * - The learner's own sound (a mushaf word, a word card's
  *   Dengar) pauses the lesson; a "Dengarkan kata" inside an exercise only
  *   ends the narration it cut short.
  * - Browser blocked the sound (autoplay policy, e.g. after a reload): the
- *   lesson pauses and asks for one tap on "Lanjutkan".
+ *   lesson pauses and asks for one click on "Lanjutkan".
+ * - The karaoke caption: while a narration file with word timings plays,
+ *   the narrator's position is read once a frame (requestAnimationFrame)
+ *   and stored only when the word changes.
+ * - "↺ Ulangi langkah ini" replays the current step from its start (also
+ *   from a pause); an exercise is remounted fresh (`replays`).
  * - Remembers the step per ayah; hands off to the next ayah; Media Session
  *   (lock screen, earphones) play/pause/next/previous.
  * - Never scrolls the page.
@@ -95,13 +109,23 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
   /** The browser refused to play sound until the next tap. */
   const [blocked, setBlocked] = useState(false);
   const [clock, setClock] = useState<CaptionClock | null>(null);
+  /** The narrator's place in the words of the file on screen. */
+  const [voice, setVoice] = useState<VoicePos | null>(null);
+  /** How often the learner replayed a step (keys the stage's exercise, so a
+   *  replayed exercise starts over). */
+  const [replays, setReplays] = useState(0);
+  /** The learner played a word on the stage's player themselves (a mushaf
+   *  word or a word card's "Dengar"), and nothing has taken the player back
+   *  since: only then is a failed stream THEIR word ("klik kata itu sekali
+   *  lagi"); the lesson's own recitation failing has its own notice. */
+  const [learnerWord, setLearnerWord] = useState(false);
   const savedIdx = useSyncExternalStore(
     noopSubscribe,
     () => readSavedIndex(browserStorage("local"), seq),
     () => null,
   );
 
-  const { play: playNarration, preload, owns: ownsNarration } = useNarrationPlayer();
+  const { play: playNarration, preload, owns: ownsNarration, positionMs } = useNarrationPlayer();
 
   // The recite activity's completion, error and interruption handlers (set
   // by the executor below, read by the player's callbacks).
@@ -126,7 +150,7 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
     onFinish: () => finishRef.current?.(),
     onError: (reason) => errorRef.current?.(reason),
     // Another recording on the page paused the imam mid-activity (e.g. the
-    // standalone Dengar dan ketuk below the stage): pause the lesson like
+    // standalone Dengar dan klik below the stage): pause the lesson like
     // "Jeda", so it neither moves on nor waits for audio that won't end —
     // except an exercise's word, which the learner's own replay just said.
     onInterrupt: () => interruptRef.current?.(),
@@ -150,12 +174,14 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
       return () => window.clearTimeout(id);
     }
     if (activity.kind === "narrate") {
-      const { line, url, ms: fileMs, offsetMs, totalMs } = activity;
+      const { line, file, url, ms: fileMs, offsetMs, totalMs } = activity;
       let stop: (() => void) | null = null;
       const begin = () => {
         stop = playNarration(url, {
           onEnd: () => {
             setClock({ token, line, ms: offsetMs + fileMs, totalMs });
+            // Every word of the file is said: none lit, none muted.
+            setVoice({ token, line, file, now: -1, said: Number.MAX_SAFE_INTEGER });
             dispatch({ type: "narration_end", token });
           },
           onError: () => dispatch({ type: "narration_error", token }),
@@ -287,6 +313,31 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
     };
   }, [activity, playNarration]);
 
+  // ── The karaoke caption: the narrator's word, once a frame ──
+  // Only while a file with word timings plays; the state changes only when
+  // the word does (a few times a second), never every frame.
+  const words = playingWords(seq, state);
+  useEffect(() => {
+    if (activity?.kind !== "narrate" || !words) return;
+    const { token, line, file } = activity;
+    let raf = 0;
+    let last = "";
+    const tick = () => {
+      const ms = positionMs();
+      if (ms !== null) {
+        const pos = karaokeAt(words, ms);
+        const key = `${pos.now}:${pos.said}`;
+        if (key !== last) {
+          last = key;
+          setVoice({ token, line, file, ...pos });
+        }
+      }
+      raf = window.requestAnimationFrame(tick);
+    };
+    raf = window.requestAnimationFrame(tick);
+    return () => window.cancelAnimationFrame(raf);
+  }, [activity, words, positionMs]);
+
   // Warm the next narration file (same-origin only).
   const upcoming = upcomingAudio(seq, state);
   const nextUrl =
@@ -399,6 +450,7 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
       const n = (e as CustomEvent<number>).detail;
       if (typeof n !== "number") return;
       ownerRef.current = null;
+      setLearnerWord(true);
       dispatch({ type: "pause" });
       playerRef.current.playWord(n);
     };
@@ -406,16 +458,22 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
     return () => window.removeEventListener(PLAY_WORD_EVENT, onPlayWord);
   }, []);
 
-  // ── The caption on screen ── (caption.ts: the spoken text with audio,
-  // the engine's caption part without), and what a screen reader is told
-  const { text: caption, voiced } = stageCaption(seq, state, clock);
+  // ── The caption on screen ── (caption.ts: the karaoke words or the
+  // display text with audio, the engine's caption part without), what the
+  // mushaf line marks, and what a screen reader is told
+  const caption = stageCaption(seq, state, clock, voice);
+  const voiced = caption.voiced;
+  const marks = stageMarks(seq, state);
   const announcement = srAnnouncement(seq, state, voiced);
+  /** The line on screen has the narration voice (null: no line on screen). */
+  const lineHasVoice = lineVoiced(seq, state);
 
   // ── Actions (event handlers) ──
-  /** Every tap that (re)starts the lesson: sound may now play without
-   *  another tap, and a "browser blocked the sound" notice is answered. */
+  /** Every click that (re)starts the lesson: sound may now play without
+   *  another click, and a "browser blocked the sound" notice is answered. */
   const tapped = () => {
     setBlocked(false);
+    setLearnerWord(false);
     playerRef.current.unlock();
   };
   const actions = {
@@ -436,6 +494,7 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
     },
     /** "Lanjut" in the "Tunggu saya" mode. */
     lanjut() {
+      setLearnerWord(false);
       dispatch({ type: "next" });
     },
     prev() {
@@ -450,6 +509,13 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
     skip() {
       dispatch({ type: "skip" });
     },
+    /** "↺ Ulangi langkah ini": the current step from its start, playing
+     *  (also from a pause). */
+    replay() {
+      tapped();
+      setReplays((n) => n + 1);
+      dispatch({ type: "replay" });
+    },
     setPace(p: Pace) {
       storePace(p);
       dispatch({ type: "set_pace", pace: p });
@@ -457,6 +523,7 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
     /** The learner plays something on the stage's player themselves. */
     takeOverPlayer() {
       ownerRef.current = null;
+      setLearnerWord(true);
       dispatch({ type: "pause" });
     },
     answered(key: ExerciseKey, correct: boolean) {
@@ -478,9 +545,17 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
     setImamRate,
     savedIdx,
     blocked,
+    /** The caption model (caption.ts StageCaption): karaoke words or text. */
     caption,
     /** The caption is spoken by the narration (no aria-live needed). */
     voiced,
+    /** The words the mushaf line marks, and the word card's word. */
+    marks,
+    lineHasVoice,
+    /** Replays so far (the stage keys its exercise with it). */
+    replays,
+    /** The learner's own word is on the stage's player (see learnerWord). */
+    learnerWord,
     /** For the stage's polite live region: the line's sanitised spoken
      *  text, "" while the imam or the narration speaks. */
     announcement,

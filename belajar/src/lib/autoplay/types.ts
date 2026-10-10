@@ -25,10 +25,16 @@
  * Manifests: content/narration/${slug}.json and content/narration/shared.json
  * (NarrationManifest below).
  *
- * Hard rules this module encodes (plan §6.1 A1, L11):
- *  - the narrator NEVER voices Qur'anic words (no Arabic script, no
- *    transliteration in NARRATION text); captions may carry transliteration
- *    but never Arabic script;
+ * Hard rules this module encodes (plan §6.1 A1, L11; operator review of the
+ * Al-Fatihah 1 preview, 2026-10-10):
+ *  - the narrator NEVER voices Qur'anic words: no transliteration of a
+ *    lesson word in NARRATION text, and Arabic script there only as a
+ *    pronunciation-dictionary term (pipeline/authored/pronunciation.json
+ *    "speak": grammar terms such as نَعْت, said from Arabic script so the
+ *    voice says them right);
+ *  - captions show what is spoken: the manifest's `display` (dictionary
+ *    terms as "na’t (نَعْت)", a letter as in the ayah, بِ) or, without a
+ *    manifest, the engine's own caption, which carries no Arabic script;
  *  - narration audio is same-origin only, under /belajar/media/narration/;
  *  - nothing here promises a human review.
  *
@@ -116,31 +122,82 @@ export type NarrationAudio = {
   sha256: string;
 };
 
+/** One spoken word of a narration file, as the manifest stores it (from
+ *  ElevenLabs /with-timestamps, whose alignment is 1:1 with the characters
+ *  sent): `t` its on-screen text (a dictionary term in its display form,
+ *  "na’t (نَعْت)"), `s` / `e` when the narrator starts / ends it, in seconds
+ *  from the start of that file. */
+export type CaptionToken = { t: string; s: number; e: number };
+
+/** A caption word as the sequence ships it to the page (compact): text,
+ *  start and end in milliseconds from the start of its file. */
+export type KaraokeWord = readonly [text: string, startMs: number, endMs: number];
+
 /** One file of a line as played: the manifest id it came from ("<id>", or
- *  "<id>:a", "<id>:b" … for a split line). */
-export type NarrationSegment = NarrationAudio & { id: string };
+ *  "<id>:a", "<id>:b" … for a split line), and its words with their times
+ *  when the manifest has them (the karaoke caption). */
+export type NarrationSegment = NarrationAudio & { id: string; words?: KaraokeWord[] };
+
+/** One manifest line (the contract between the narration pipeline and the
+ *  stage; pipeline/README.md "Narasi"). */
+export type NarrationLine = {
+  /** The SPOKEN text, exactly as sent to the voice (dictionary applied). */
+  text: string;
+  /** The full caption: what is spoken, with dictionary terms in their
+   *  display form and letters as in the ayah. Shown when there are no
+   *  `tokens` (and as the caption-only text). */
+  display?: string;
+  /** Word numbers of this ayah the screen highlights while the line is on
+   *  screen; [] none, [0] the whole ayah. */
+  highlight?: number[];
+  /** The word ("1:1:3") the large word card shows while the line plays. */
+  focus?: string | null;
+  audio?: NarrationAudio;
+  /** Word timings of `audio` (only with audio). */
+  tokens?: CaptionToken[];
+};
 
 /** content/narration/${slug}.json and content/narration/shared.json. */
 export type NarrationManifest = {
   version: number | string;
   voice: null | { id: string; name: string; model: string };
-  lines: Record<string, { text: string; audio?: NarrationAudio }>;
+  lines: Record<string, NarrationLine>;
 };
+
+/** One entry of the pronunciation dictionary (kamus pelafalan,
+ *  pipeline/authored/pronunciation.json): the term, the exact form the
+ *  narrator is sent (`speak`: Arabic script, or a fixed Latin respelling
+ *  for a heavy letter, "idhofah"), and its caption form (`display`). */
+export type PronunciationTerm = { term: string; speak: string; display: string };
+export type Pronunciation = { terms: PronunciationTerm[] };
 
 // ───────────────────────────── Sequence ─────────────────────────────
 
 /**
  * One narration line inside a step: its id (contract above), the caption
- * shown while it plays and where the spotlight points. The caption is
- * written from the content (it may carry Latin transliteration, never
- * Arabic script); the SPOKEN text lives in the narration manifest and is
- * written separately (it may carry neither).
+ * shown while it plays and where the spotlight points. The caption is the
+ * manifest's `display` when the line has one (what is spoken, dictionary
+ * terms as "na’t (نَعْت)"), else written from the content by the engine's
+ * texts (Latin transliteration at most, never Arabic script). The SPOKEN
+ * text lives in the manifest (`spoken`).
  */
 export type Cue = {
   /** Contract id (never a ":a"/":b" split part). */
   line: string;
   /** Full caption, whitespace-normalised. */
   caption: string;
+  /** The manifest's display text (split parts joined), or null: then the
+   *  caption is the engine's own and carries no Arabic script. */
+  display: string | null;
+  /** Words (1-based) the mushaf line highlights while this line is on
+   *  screen — the whole ayah, the word explained, a concept's words. From
+   *  the manifest's `highlight` ([0] = every word), else by the line's
+   *  kind. Empty for shared lines. */
+  highlight: number[];
+  /** The word (1-based) the large word card shows while this line is on
+   *  screen (the manifest's `focus`, else the word a w${n} line explains);
+   *  null: no card. */
+  focus: number | null;
   /** The caption cut into ≤180-character parts (senior-ux §3.5): shown one
    *  at a time — by reading time without audio, by audio position with. */
   parts: string[];
@@ -149,13 +206,12 @@ export type Cue = {
   /** The line's audio files in play order (one, or the split parts); empty
    *  → caption-only (reading-time pace). All parts or none. */
   audio: NarrationSegment[];
-  /** What the narrator says (the manifest's text, split parts joined), for
-   *  subtitles that match the voice word for word; null without a manifest
-   *  entry. Never Arabic script or transliteration (checked). */
+  /** What the narrator says (the manifest's text, split parts joined);
+   *  null without a manifest entry. Never a Qur'anic word, in any spelling;
+   *  Arabic script only as a pronunciation-dictionary term (checked). */
   spoken: string | null;
   /** Word places (1-based) the spoken line names in its own ayah ("kata
-   *  kedua", "kata ketiga dan keempat"): the stage rings them on the
-   *  numbered mushaf line while the line plays. Empty without `spoken`. */
+   *  kedua", "kata ketiga dan keempat"). Empty without `spoken`. */
   refs: number[];
 };
 
@@ -198,7 +254,8 @@ export type AutoplayStep = {
   /** = cues.map((c) => c.line). */
   lines: string[];
   /** What the stage shows when no cue is playing (recite_word), and the
-   *  step's caption in lists; never empty, never Arabic script. */
+   *  step's caption in lists; never empty (Arabic script only from a
+   *  manifest display, see Cue.caption). */
   caption: string;
   /** Default spotlight of the step. */
   guides: Guide[];

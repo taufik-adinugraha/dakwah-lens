@@ -70,8 +70,9 @@ describe("autoplay stage: what the lesson page ships", () => {
               else expect(c.spoken, c.line).toBeNull();
             }
           }
-          // Serialisable for the client component, and not huge.
-          expect(JSON.stringify(seq).length).toBeLessThan(80_000);
+          // Serialisable for the client component, and not huge (word
+          // timings for the karaoke caption add ~40 KB to the longest ayah).
+          expect(JSON.stringify(seq).length).toBeLessThan(120_000);
         }
       }
     }
@@ -99,12 +100,34 @@ describe("autoplay stage: messages and markers", () => {
     }
   });
 
-  it("explains the one tap on the start button, and the caption-only stage honestly", () => {
-    expect(id.Guided.start).toBe("Mulai");
-    expect(id.Guided.start_hint).toBe("Ketuk sekali untuk mulai — selanjutnya pelajaran berjalan sendiri.");
-    expect(id.Guided.note_captions).toBe(
-      "Suara penjelasan sedang disiapkan; untuk sementara penjelasan tampil sebagai tulisan.",
-    );
+  it("explains the one click under the one start button, and nothing else (operator, 2026-10-10)", () => {
+    expect(id.Guided.start).toBe("Mulai pelajaran");
+    expect(id.Guided.start_hint).toBe("Klik sekali; pelajaran berjalan sendiri.");
+    // The stage's long notes, mode line and duplicate imam buttons are gone,
+    // and so are their messages (they would still ship in the page payload).
+    for (const msgs of [id, en]) {
+      for (const k of ["note_captions", "note_voice", "note_imam", "text_size", "paused", "mode_auto", "mode_wait", "mode_exercise"]) {
+        expect(msgs.Guided[k], `Guided.${k}`).toBeUndefined();
+      }
+      for (const k of ["play_ayah", "restart", "hint_tap", "pause"]) expect(msgs.Player[k], `Player.${k}`).toBeUndefined();
+      expect(msgs.Guided.settings_button).toBeTruthy();
+      expect(msgs.Lesson.materials).toBeTruthy();
+      expect(msgs.App.menu).toBeTruthy();
+    }
+    expect(id.Guided.settings_button).toBe("Pengaturan");
+    expect(id.Lesson.materials).toBe("Materi lengkap ayat ini");
+  });
+
+  it("the image smoke test greps the start label and the hint the page renders", () => {
+    // The workflow checks the server-rendered copy with literal greps; keep
+    // them and these messages in step (checked where the repo is complete).
+    const wf = join(BELAJAR, "..", ".github", "workflows", "deploy-belajar.yml");
+    if (!existsSync(wf)) return;
+    const yaml = readFileSync(wf, "utf8");
+    const label = /grep -q '<span>([^<']+)<\/span>'/.exec(yaml)?.[1];
+    const hint = /grep -q '([^']+)'[^\n]*one-click hint/.exec(yaml)?.[1];
+    if (label !== undefined) expect(label, "deploy-belajar.yml: start label grep").toBe(id.Guided.start);
+    if (hint !== undefined) expect(id.Guided.start_hint, "deploy-belajar.yml: one-click hint grep").toContain(hint);
   });
 
   it("never promises a human review, never shouts", () => {
@@ -118,14 +141,49 @@ describe("autoplay stage: messages and markers", () => {
     }
   });
 
+  it("says klik, never ketuk, in every Indonesian string of the module (operator, 2026-10-10)", () => {
+    const strings = (v: unknown): string[] =>
+      typeof v === "string" ? [v] : v && typeof v === "object" ? Object.values(v).flatMap(strings) : [];
+    const waris = JSON.parse(read("messages/waris/id.json")) as unknown;
+    for (const v of [...strings(id), ...strings(waris)]) expect(v).not.toMatch(/ketuk/i);
+    for (const v of strings(AUTOPLAY_TEXT_SETS.id.exercise)) expect(v).not.toMatch(/ketuk/i);
+    for (const v of [...Object.values(AUTOPLAY_TEXT_SETS.id.shared), ...Object.values(AUTOPLAY_TEXT_SETS.id.guide.part)]) {
+      expect(v).not.toMatch(/ketuk/i);
+    }
+    // And the narration the Indonesian page plays and shows.
+    for (const m of [SHARED_NARRATION, ...NARRATED_SLUGS.map((slug) => narrationFor(slug))]) {
+      for (const [lid, l] of Object.entries(m?.lines ?? {})) expect(`${l.text} ${l.display ?? ""}`, lid).not.toMatch(/ketuk/i);
+    }
+  });
+
+  it("ships no per-card AI chip or trial banner text, and the spoken start says no 'bukan fatwa' (the footer does)", () => {
+    for (const msgs of [id, en]) {
+      expect(msgs.Word.draft).toBeUndefined();
+      expect(msgs.Surah.draft_chip).toBeUndefined();
+      expect(msgs.Surah.draft_banner).toBeUndefined();
+      expect(msgs.Lesson.draft_short).toBeUndefined();
+    }
+    expect(id.Footer.disclaimer).toMatch(/Dibantu AI, bukan fatwa otoritatif/);
+    expect(SHARED_NARRATION.lines["shared:start"]?.text ?? "").not.toMatch(/bukan fatwa/i);
+  });
+
+  it("labels the replay control and the word card in both locales", () => {
+    expect(id.Guided.replay).toBe("Ulangi langkah ini");
+    expect(id.Guided.card_meaning).toBe("yang artinya “{gloss}”");
+    expect(en.Guided.replay).toBeTruthy();
+  });
+
   it("marks the controls the CI screenshots and smoke test drive", () => {
     const stage = read("src/components/lesson/LessonStage.tsx");
-    for (const marker of ['data-autoplay="stage"', 'data-autoplay="start"', 'data-autoplay="middle"', 'data-autoplay="next"', 'data-autoplay="exercise"', 'data-autoplay="caption"']) {
+    for (const marker of ['data-autoplay="stage"', 'data-autoplay="start"', 'data-autoplay="middle"', 'data-autoplay="replay"', 'data-autoplay="next"', 'data-autoplay="exercise"', 'data-autoplay="caption"', 'data-autoplay="word-card"', 'data-autoplay="settings-toggle"', 'data-autoplay="settings"']) {
       expect(stage).toContain(marker);
     }
     expect(read("src/components/autoplay/Spotlight.tsx")).toContain("data-spotlight-ring");
+    const header = read("src/components/HeaderControls.tsx");
+    for (const marker of ["data-header-menu-toggle", "data-header-menu=", "data-text-size-toggle"]) expect(header).toContain(marker);
     const shots = read("scripts/ci/screenshots.mjs");
-    expect(shots).toContain('[data-autoplay="start"]');
-    expect(shots).toContain("[data-spotlight-ring]");
+    for (const sel of ['[data-autoplay="start"]', "[data-spotlight-ring]", '[data-autoplay="settings-toggle"]', '[data-autoplay="settings"]', "[data-header-menu-toggle]", "[data-header-menu]"]) {
+      expect(shots).toContain(sel);
+    }
   });
 });

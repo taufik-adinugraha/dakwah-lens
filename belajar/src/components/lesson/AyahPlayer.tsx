@@ -10,18 +10,19 @@ const toArabicDigits = (n: number) =>
 
 /**
  * The ayah as a mushaf line: every word is a light chip, so it looks
- * tappable; tapping replays just that word (the stage seeks within the
+ * clickable; clicking replays just that word (the stage seeks within the
  * streamed recording). The word the imam is reciting is filled forest with
  * paper text (7.9:1). Arabic is rendered from content data only, never
  * retyped.
  *
- * While the autoplay lesson runs (`numbered`), every chip carries its place
- * under the word — "1", "2", … in Latin digits, 16px — because the
- * narration names words by their place ("kata kedua"), never by the word
- * itself. The words the line on screen is about (`marked`: the word being
- * explained, and the places the narration names) get a thick ring with a
- * white gap and a filled number: an outline and a shape change, never
- * colour alone.
+ * On the lesson stage (`numbered`: before "Mulai" and while the lesson
+ * runs), every chip carries its place under the word in a badge — "1", "2", … in Latin digits, right to left
+ * (word 1 rightmost), 16px — because the narration names words by their
+ * place ("kata kedua"), never by the word itself. The words the line on
+ * screen is about (`marked`: the whole ayah, the word explained, a concept's
+ * words) get a thick ring with a white gap and a filled badge: an outline
+ * and a shape change, never colour alone. On the imam's forest fill the
+ * badge turns paper with forest digits, so it stays readable.
  *
  * Presentational: the one player lives in LessonStage, shared with the
  * guided lesson so the line highlights during the lesson too.
@@ -41,7 +42,7 @@ export function MushafLine({
   activeWord: number | null;
   /** Words the lesson is talking about (thick ring + filled number). */
   marked?: readonly number[];
-  /** Show each word's place under it (the lesson runs). */
+  /** Show each word's place under it (the lesson stage). */
   numbered?: boolean;
   canPlay: (index: number) => boolean;
   onTap: (index: number) => void;
@@ -57,13 +58,14 @@ export function MushafLine({
     >
       {words.map((w) => {
         const isMarked = marked.includes(w.index);
-        // The place under the word: LTR digits in the body face, 16px.
+        // The place under the word: LTR digits in the body face, 16px, in a
+        // badge (filled when the word is marked).
         const place = numbered ? (
           <span
             aria-hidden
             dir="ltr"
-            className={`mx-auto mt-0.5 mb-1 inline-flex min-w-7 items-center justify-center rounded-full px-1.5 font-body text-sm font-semibold tabular-nums ${
-              isMarked ? "bg-forest text-paper" : "text-ink-muted"
+            className={`mx-auto mt-0.5 mb-1 inline-flex min-w-7 items-center justify-center rounded-full border-[1.5px] px-1.5 font-body text-sm leading-6 font-semibold tabular-nums ${
+              isMarked ? "border-forest bg-forest text-paper" : "border-border-ui bg-white text-ink"
             }`}
           >
             {w.index}
@@ -78,6 +80,9 @@ export function MushafLine({
                 isMarked ? "ring-4 ring-forest ring-offset-2 ring-offset-white" : ""
               }`}
             >
+              {/* The narration names words by place ("kata kedua"); the
+                  badge is aria-hidden, so its place is said here. */}
+              {numbered ? <span className="sr-only">{t("word_place", { n: w.index })}</span> : null}
               <span lang="ar">{w.ar}</span>
               {place}
             </span>
@@ -89,7 +94,9 @@ export function MushafLine({
             key={w.index}
             type="button"
             onClick={() => onTap(w.index)}
-            aria-label={t("play_word", { translit: w.translit, gloss: w.gloss })}
+            // The place first ("Kata ke-2: dengar …"): the narration names
+            // words by place, and the number badge itself is aria-hidden.
+            aria-label={t("play_word", { n: w.index, translit: w.translit, gloss: w.gloss })}
             aria-current={active ? "true" : undefined}
             className={`inline-flex flex-col rounded-xl border-[1.5px] px-2.5 motion-safe:transition-colors ${
               active
@@ -99,11 +106,11 @@ export function MushafLine({
           >
             <span lang="ar">{w.ar}</span>
             {active && place ? (
-              // On the forest fill the number is paper, so it stays readable.
+              // On the forest fill the badge is paper with forest digits.
               <span
                 aria-hidden
                 dir="ltr"
-                className="mx-auto mt-0.5 mb-1 inline-flex min-w-7 items-center justify-center rounded-full px-1.5 font-body text-sm font-semibold tabular-nums text-paper"
+                className="mx-auto mt-0.5 mb-1 inline-flex min-w-7 items-center justify-center rounded-full border-[1.5px] border-paper bg-paper px-1.5 font-body text-sm leading-6 font-semibold tabular-nums text-forest"
               >
                 {w.index}
               </span>

@@ -33,7 +33,7 @@
  *    shared:reminder + the current prompt; the third also offers "Lewati
  *    latihan" (shared:skip_offer, spotlight "skip").
  *  - Inside an exercise the learner only ANSWERS (operator, 2026-10-10):
- *    · Dengar dan ketuk reports the word its question asks about with
+ *    · Dengar dan klik reports the word its question asks about with
  *      "play"; the lesson's imam recites it (a recite activity on the
  *      stage's one, already unlocked player), then `exercise.heard` says
  *      so and the exercise offers its words;
@@ -52,6 +52,10 @@
  *  - prev/next jump steps (keeping play/pause); after the last step the
  *    state is "finished" and `intent` says where to go (next ayah | end of
  *    the surah).
+ *  - replay ("↺ Ulangi langkah ini", operator 2026-10-10) plays the current
+ *    step again from its start — also from a pause, and from "Tunggu saya"'s
+ *    Lanjut — and plays on from there. An exercise starts over at its first
+ *    control (the stage remounts the exercise itself).
  * No clocks, no randomness: the same events give the same states.
  */
 import type { Pace } from "../lessonSteps";
@@ -117,7 +121,7 @@ export type Activity =
       target: "word";
       word: number;
       minMs: number;
-      /** The question of an exercise (Dengar dan ketuk): another recording
+      /** The question of an exercise (Dengar dan klik): another recording
        *  starting (the learner's own replay) ends it, rather than pausing
        *  the lesson. */
       inExercise?: boolean;
@@ -165,7 +169,7 @@ export type ExerciseState = {
   closed: null | "done";
   /** The last reminder offered "Lewati latihan" (spotlight on it). */
   skipOffered: boolean;
-  /** Dengar dan ketuk: the word (1-based) the current question asks about,
+  /** Dengar dan klik: the word (1-based) the current question asks about,
    *  as the exercise reported it with "play". */
   word: number | null;
   /** The word the lesson's imam last recited to its end in this step (the
@@ -238,6 +242,8 @@ export type AutoplayEvent =
   | { type: "prev" }
   /** "Berikutnya", and "Lanjut" in the "Tunggu saya" mode. */
   | { type: "next" }
+  /** "↺ Ulangi langkah ini": the current step again, from its start. */
+  | { type: "replay" }
   | { type: "set_pace"; pace: Pace };
 
 // ───────────────────────────── helpers ─────────────────────────────
@@ -805,6 +811,22 @@ export function reduceAutoplay(seq: AutoplaySequence, s: AutoplayState, e: Autop
       return enter(seq, s, to, { run: s.phase !== "paused", skipDone: false });
     }
 
+    case "replay": {
+      if (s.phase === "idle" || s.phase === "finished") return s;
+      // An exercise starts over at its first control: forget the one it last
+      // reported (the remounted exercise reports its first control again).
+      const key = stepOf(seq, s).exercise?.key;
+      let lastPart = s.lastPart;
+      if (key && lastPart[key] !== undefined) {
+        lastPart = {};
+        for (const k of EXERCISE_KEYS) {
+          const part = s.lastPart[k];
+          if (k !== key && part !== undefined) lastPart[k] = part;
+        }
+      }
+      return enter(seq, { ...s, lastPart }, s.idx, { run: true, skipDone: false });
+    }
+
     case "next": {
       if (s.phase === "idle" || s.phase === "finished") return s;
       const step = stepOf(seq, s);
@@ -884,8 +906,9 @@ export type AutoplayView = {
   guides: Guide[];
   /** Word the stage shows and marks on the mushaf line (1-based). */
   focusWord: number | null;
-  /** Other words the line on screen names by their place ("kata kedua"):
-   *  the stage rings them on the numbered mushaf line. */
+  /** Other words the line on screen names by their place ("kata kedua").
+   *  The stage marks the line's Cue.highlight instead (which defaults to
+   *  these for lines without a kind of their own). */
   refWords: number[];
   activity: Activity | null;
   canPrev: boolean;

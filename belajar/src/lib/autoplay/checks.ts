@@ -4,12 +4,18 @@
  * node_modules needed) and in CI by autoplay.test.ts and stage.test.ts:
  *
  *  1. sequences: non-empty, in lesson order, unique step ids, every caption
- *     non-empty with no Arabic script and ≤ 180 characters per part, line
- *     ids on the contract, the right exercises, the last ayah ends "done";
+ *     non-empty and ≤ 180 characters per part, Arabic script in a caption
+ *     only from a manifest's display, line ids on the contract, the right
+ *     exercises, the last ayah ends "done";
  *  2. narration manifests, IF they exist: every line the sequences play is
- *     there, ids are well-formed, spoken text never carries Arabic script or
- *     a transliterated Qur'anic word (nor digits, ALL CAPS, "kamu"), audio
- *     is same-origin; missing manifests are skipped and reported as notes;
+ *     there, ids are well-formed, spoken text never carries a transliterated
+ *     Qur'anic word (nor digits, ALL CAPS, "kamu") and Arabic script only as
+ *     a term of the pronunciation dictionary (pipeline/authored/
+ *     pronunciation.json); captions (display, karaoke words) show Arabic only
+ *     as a dictionary display form or the lesson's own words; highlight and
+ *     focus name words of the line's own ayah; audio is same-origin; word
+ *     timings stay inside their audio; missing manifests are skipped and
+ *     reported as notes;
  *  3. the machine, driven to the end in every pace, caption-only and with
  *     (synthetic) audio: every step is entered once in order, exercises
  *     wait for the learner, the navigation intent is right;
@@ -34,7 +40,15 @@ import {
   type AutoplayEvent,
   type AutoplayState,
 } from "./machine";
-import { hasArabicScript, parseNarrationManifest, quranTokenSet, spokenTextProblems } from "./narration";
+import {
+  captionArabicProblems,
+  hasArabicScript,
+  parseNarrationManifest,
+  parsePronunciation,
+  quranTokenSet,
+  spokenTextProblems,
+  usableTokens,
+} from "./narration";
 import { buildAutoplaySequence, introducedConcepts, sequenceLineIds, type SequenceInput } from "./sequence";
 import { ID_TEXTS } from "./texts";
 import { IDLE_TICK_MS, MAX_REMINDERS } from "./timing";
@@ -59,6 +73,10 @@ export type CheckInput = {
   manifests: Readonly<Record<string, unknown>>;
   /** Parsed content/narration/shared.json; null = no file. */
   sharedManifest: unknown;
+  /** Parsed pipeline/authored/pronunciation.json (the dictionary of terms
+   *  the narrator may say in Arabic script); null/absent = no file, and
+   *  then any Arabic in spoken text or a caption is an error. */
+  pronunciation?: unknown;
   texts?: AutoplayTexts;
   property?: { streams?: number; length?: number; seed?: number };
 };
@@ -81,9 +99,13 @@ export type CheckReport = {
 
 // ───────────────────────────── loading ─────────────────────────────
 
+/** The pronunciation dictionary, relative to content/. */
+export const PRONUNCIATION_PATH = "../pipeline/authored/pronunciation.json";
+
 /**
  * Builds the check input from files, `read(relativePath)` returning the
- * text or null when the file does not exist (paths relative to content/).
+ * text or null when the file does not exist (paths relative to content/;
+ * the pronunciation dictionary is PRONUNCIATION_PATH).
  */
 export function loadCheckInput(read: (rel: string) => string | null): { input: CheckInput; errors: string[] } {
   const errors: string[] = [];
@@ -118,6 +140,7 @@ export function loadCheckInput(read: (rel: string) => string | null): { input: C
       lexicon: library.lexicon,
       manifests,
       sharedManifest: json("narration/shared.json", false),
+      pronunciation: json(PRONUNCIATION_PATH, false),
     },
     errors,
   };
@@ -199,9 +222,15 @@ export function sequenceProblems(
   // Captions, lines, guides.
   const own = `${seq.slug}:${seq.ayah}:`;
   const lineSeen = new Set<string>();
+  // Arabic script on screen only from a manifest's display (checked against
+  // the pronunciation dictionary with the manifest); the engine's own
+  // captions carry none.
+  const ownArabic = (c: { caption: string; display: string | null }) => hasArabicScript(c.caption) && c.display === null;
   for (const s of steps) {
     if (!s.caption.trim()) out.push(`${s.id}: empty caption`);
-    if (hasArabicScript(s.caption)) out.push(`${s.id}: Arabic script in the caption`);
+    if (hasArabicScript(s.caption) && !(s.cues[0] && s.cues[0].caption === s.caption && s.cues[0].display !== null)) {
+      out.push(`${s.id}: Arabic script in the caption`);
+    }
     if (JSON.stringify(s.lines) !== JSON.stringify(s.cues.map((c) => c.line))) out.push(`${s.id}: lines differ from cues`);
     if (s.kind !== "recite_word" && s.cues.length === 0) out.push(`${s.id}: no narration line`);
     for (const g of s.guides) if (!g.label.trim()) out.push(`${s.id}: a spotlight without a label`);
@@ -217,9 +246,13 @@ export function sequenceProblems(
       for (const part of c.parts) {
         if (!part.trim()) out.push(`${s.id}: ${c.line} has an empty caption part`);
         if (part.length > MAX_CAPTION && part.includes(" ")) out.push(`${s.id}: ${c.line} has a caption part over ${MAX_CAPTION} characters`);
-        if (hasArabicScript(part)) out.push(`${s.id}: ${c.line} has Arabic script in its caption`);
       }
+      if (ownArabic(c)) out.push(`${s.id}: ${c.line} has Arabic script in its caption`);
+      if (c.display !== null && c.display !== c.caption) out.push(`${s.id}: ${c.line} caption is not its display text`);
       if (c.parts.join(" ") !== c.caption) out.push(`${s.id}: ${c.line} caption parts do not rejoin to the caption`);
+      for (const w of [...c.highlight, ...(c.focus === null ? [] : [c.focus])]) {
+        if (!Number.isInteger(w) || w < 1 || w > ctx.ayah.words.length) out.push(`${s.id}: ${c.line} highlights word ${w} of ${ctx.ayah.words.length}`);
+      }
       for (const g of c.guides) if (!g.label.trim()) out.push(`${s.id}: ${c.line} spotlight without a label`);
       for (const r of c.refs) {
         if (!Number.isInteger(r) || r < 1 || r > ctx.ayah.words.length) out.push(`${s.id}: ${c.line} names word ${r} of ${ctx.ayah.words.length}`);
@@ -247,7 +280,8 @@ export function sequenceProblems(
   }
   for (const k of SHARED_KEYS) {
     const c = seq.shared[k];
-    if (c.line !== `shared:${k}` || !c.caption.trim() || hasArabicScript(c.caption)) out.push(`shared:${k}: bad shared cue`);
+    if (c.line !== `shared:${k}` || !c.caption.trim() || ownArabic(c)) out.push(`shared:${k}: bad shared cue`);
+    if (c.highlight.length > 0 || c.focus !== null) out.push(`shared:${k}: a shared line highlights words`);
   }
   if (!seq.shared.skip_offer.guides.some((g) => g.target === "skip")) out.push("the skip offer does not point at Lewati latihan");
   return out;
@@ -371,7 +405,10 @@ export function driveToEnd(
         if (!s.guides.some((g) => g.target === "skip")) problems.push(`${seq.steps[before].id}: the last reminder does not point at Lewati latihan`);
         ms += idle;
         send({ type: "skip" });
-        if (s.idx !== before + 1 && s.phase !== "finished") problems.push(`${seq.steps[before].id}: skip did not move on`);
+        // send() reassigns s inside a closure, so TS keeps the earlier "waiting" narrowing here;
+        // read the phase without it (CI tsc TS2367).
+        const phaseAfterSkip: string = s.phase;
+        if (s.idx !== before + 1 && phaseAfterSkip !== "finished") problems.push(`${seq.steps[before].id}: skip did not move on`);
         continue;
       }
       if (learner === "lazy" && n === 0) {
@@ -384,7 +421,7 @@ export function driveToEnd(
       }
       // The learner: the exercise reports its controls, one miss, then right.
       const parts = PARTS_OF[ex.key];
-      // Dengar dan ketuk reports the word its question asks about: the lesson's imam recites it.
+      // Dengar dan klik reports the word its question asks about: the lesson's imam recites it.
       const script: AutoplayEvent[] = [
         { type: "exercise_guide", target: `exercise:${ex.key}:${parts[0]}`, word: ex.key === "tap-word" ? 1 : undefined },
         { type: "answered", key: ex.key, correct: false },
@@ -451,7 +488,8 @@ function randomEvent(rng: () => number, seq: AutoplaySequence, s: AutoplayState)
   if (r < 0.79) return { type: "pause" };
   if (r < 0.85) return { type: "resume" };
   if (r < 0.88) return { type: "prev" };
-  if (r < 0.94) return { type: "next" };
+  if (r < 0.92) return { type: "next" };
+  if (r < 0.94) return { type: "replay" };
   if (r < 0.97) {
     return { type: "start", from: Math.floor(rng() * seq.steps.length), reason: pick(["fresh", "restore", "continue"] as const) };
   }
@@ -550,9 +588,26 @@ export function runAutoplayChecks(input: CheckInput): CheckReport {
     input.surahs.flatMap((s) => s.ayat.map((a) => a.words.map((w) => w.translit))),
   );
 
-  // Manifests: parse + spoken-text guard.
+  // The pronunciation dictionary: the only Arabic the narrator may say.
+  let dict: ReturnType<typeof parsePronunciation>["dict"] = null;
+  if (input.pronunciation === null || input.pronunciation === undefined) {
+    notes.push("pipeline/authored/pronunciation.json not present: any Arabic script in narration is an error");
+  } else {
+    const r = parsePronunciation(input.pronunciation);
+    for (const p of r.problems) errors.push(`pipeline/authored/pronunciation.json: ${p}`);
+    dict = r.dict;
+  }
+  // Arabic a caption may show: the dictionary's display forms and the lesson
+  // words' own Arabic (content bytes).
+  const allowedArabic = [
+    ...(dict?.terms.map((t) => t.display) ?? []),
+    ...input.surahs.flatMap((s) => s.ayat.flatMap((a) => a.words.map((w) => w.ar))),
+  ].join(" | ");
+
+  // Manifests: parse + spoken-text guard + captions + marks.
   const parsed = new Map<string, NarrationManifest | null>();
-  const checkManifest = (file: string, raw: unknown, owns: (id: string) => string | null) => {
+  type Owner = { why: string | null; words?: readonly { loc: string }[] };
+  const checkManifest = (file: string, raw: unknown, owns: (id: string) => Owner) => {
     if (raw === null || raw === undefined) return null;
     const { manifest, problems } = parseNarrationManifest(raw);
     for (const p of problems) errors.push(`${file}: ${p}`);
@@ -563,23 +618,49 @@ export function runAutoplayChecks(input: CheckInput): CheckReport {
       errors.push(`${file}: voice.model "${manifest.voice.model}" is not the house standard eleven_v3 (plan L5)`);
     }
     for (const [id, l] of Object.entries(manifest.lines)) {
-      const why = owns(id);
+      const { why, words } = owns(id);
       if (why) errors.push(`${file}: ${id}: ${why}`);
-      for (const p of spokenTextProblems(l.text, quranTokens)) errors.push(`${file}: ${id}: ${p}`);
+      for (const p of spokenTextProblems(l.text, quranTokens, dict)) errors.push(`${file}: ${id}: ${p}`);
+      if (l.display !== undefined) {
+        for (const p of captionArabicProblems(l.display, dict, allowedArabic)) errors.push(`${file}: ${id}: display: ${p}`);
+      }
+      const tokens = usableTokens(l.tokens);
+      if (tokens && l.audio) {
+        const bad = new Set(tokens.flatMap((k) => captionArabicProblems(k.t, dict, allowedArabic)));
+        for (const p of bad) errors.push(`${file}: ${id}: tokens: ${p}`);
+        // Timings come from the render of this very file (1 s of slack for
+        // the duration probe).
+        const end = tokens[tokens.length - 1].e;
+        if (end * 1000 > l.audio.ms + 1000) errors.push(`${file}: ${id}: tokens end at ${end} s, past the audio (${l.audio.ms} ms)`);
+      }
+      if (words) {
+        for (const w of l.highlight ?? []) {
+          if (w > words.length) errors.push(`${file}: ${id}: highlight names word ${w} of ${words.length}`);
+        }
+        if (l.highlight && l.highlight.includes(0) && l.highlight.length > 1) {
+          errors.push(`${file}: ${id}: highlight [0] (the whole ayah) mixed with word numbers`);
+        }
+        if (typeof l.focus === "string" && !words.some((w) => w.loc === l.focus)) {
+          errors.push(`${file}: ${id}: focus ${l.focus} is not a word of this ayah`);
+        }
+      } else if ((l.highlight?.length ?? 0) > 0 || (l.focus ?? null) !== null) {
+        notes.push(`${file}: ${id}: a shared line names words to highlight (ignored: shared lines play on every ayah)`);
+      }
     }
     return manifest;
   };
-  const shared = checkManifest("content/narration/shared.json", input.sharedManifest, (id) =>
-    parseLineId(id)?.kind === "shared" ? null : "not a shared:* line id on the contract",
-  );
+  const shared = checkManifest("content/narration/shared.json", input.sharedManifest, (id) => ({
+    why: parseLineId(id)?.kind === "shared" ? null : "not a shared:* line id on the contract",
+  }));
   if (!shared) notes.push("content/narration/shared.json not present: shared:* lines not checked (caption-only)");
   for (const s of input.surahs) {
     const m = checkManifest(`content/narration/${s.slug}.json`, input.manifests[s.slug], (id) => {
       const p = parseLineId(id);
-      if (!p || p.kind !== "ayah") return "not a line id on the contract";
-      if (p.slug !== s.slug) return `belongs to "${p.slug}"`;
-      if (!s.ayat.some((a) => a.ayah === p.ayah)) return `ayah ${p.ayah} is not in ${s.slug}`;
-      return null;
+      if (!p || p.kind !== "ayah") return { why: "not a line id on the contract" };
+      if (p.slug !== s.slug) return { why: `belongs to "${p.slug}"` };
+      const a = s.ayat.find((x) => x.ayah === p.ayah);
+      if (!a) return { why: `ayah ${p.ayah} is not in ${s.slug}` };
+      return { why: null, words: a.words };
     });
     parsed.set(s.slug, m);
     if (!m) notes.push(`content/narration/${s.slug}.json not present: ${s.slug} line ids not checked (caption-only)`);

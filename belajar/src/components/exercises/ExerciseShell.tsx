@@ -31,7 +31,7 @@ export type { ExerciseGuide, ExerciseKey, GuideInfo, GuidePart, GuideTarget } fr
  *     onDone?:   () => void;
  *     onGuide?:  (target: GuideTarget, info?: { word?: number }) => void;
  *     advance?:  number;          // the lesson moves a settled question on
- *     heard?:    number | null;   // Dengar dan ketuk: the word the lesson's imam recited
+ *     heard?:    number | null;   // Dengar dan klik: the word the lesson's imam recited
  *   }
  *   compact?: boolean
  *
@@ -165,7 +165,7 @@ export function useGuide(
   guided: ExerciseGuide | undefined,
   target: GuideTarget | null,
   empty = false,
-  /** Dengar dan ketuk, with "play": the question's word. */
+  /** Dengar dan klik, with "play": the question's word. */
   word?: number,
 ) {
   const onGuide = guided?.onGuide;
@@ -223,7 +223,7 @@ export function useStepFocus(step: number, preventScroll = false) {
 export type Resolution = "right" | "revealed" | null;
 
 /**
- * One-answer-per-question flow shared by Dengar dan ketuk, Kenapa harakat,
+ * One-answer-per-question flow shared by Dengar dan klik, Kenapa harakat,
  * Tebak peran and Bentuk kata. `answers[i]` is question i's right option.
  * Score = questions answered right on the first try; a revealed answer
  * never counts.

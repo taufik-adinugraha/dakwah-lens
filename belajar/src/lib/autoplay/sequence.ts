@@ -11,16 +11,18 @@
  *   → recap (imam again) → next (to ayah + 1) | done (end of the surah)
  *
  * Every step carries its narration line ids (contract in types.ts), the
- * captions to show and the spotlight. Narration audio is attached from the
- * manifests when present; without it the sequence is caption-only and the
- * machine paces it by reading time. Pure and deterministic.
+ * captions to show, what the mushaf line highlights and the word card shows,
+ * and the spotlight. Narration audio (with its word timings, for the karaoke
+ * caption) is attached from the manifests when present; without it the
+ * sequence is caption-only and the machine paces it by reading time. Pure
+ * and deterministic.
  */
 import type { Ayah, Concept } from "@/content/schema";
 
 import { latinSentences, splitCaption, stripArabic } from "../lessonSteps";
 import { canonicalExercises, exerciseProgressId } from "./exercises";
 import { lineId, manifestParts, parseLineId, promptLineId, sharedLineId, type LinePart } from "./ids";
-import { lineSegments, lineText, wordRefs } from "./narration";
+import { lineDisplay, lineMarks, lineSegments, lineText, wordRefs } from "./narration";
 import {
   PARTS_OF,
   SHARED_KEYS,
@@ -72,13 +74,71 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
 
   const manifestOf = (line: string) => (line.startsWith("shared:") ? input.shared : input.narration);
   const words = ayah.words.length;
+  const every = ayah.words.map((_, i) => i + 1);
+  const placeOf = new Map(ayah.words.map((w, i) => [w.loc, i + 1]));
+  /** The word a "w${n}" line explains, else null. */
+  const explained = (part: string): number | null => {
+    const m = /^w([1-9][0-9]*)$/.exec(part);
+    return m && Number(m[1]) <= words ? Number(m[1]) : null;
+  };
+  /** What a line highlights when its manifest does not say (operator,
+   *  2026-10-10): the whole ayah for the intro, the recitation, the
+   *  structure and the recap; the word a w${n} line explains; for a concept,
+   *  the words tagged with it (Word.concepts) and the words of the ayah's
+   *  structure groups of that concept (the idhafah of bismi + Allāhi is
+   *  [1, 2] although only Allāhi is tagged; validate_narration.concept_words);
+   *  else the places the line names. */
+  const kindHighlight = (part: string, refs: number[]): number[] => {
+    if (part === "intro" || part === "recite" || part === "structure" || part === "recap") return every;
+    const w = explained(part);
+    if (w !== null) return [w];
+    if (part.startsWith("concept:")) {
+      const id = part.slice("concept:".length);
+      const tagged = new Set(ayah.words.flatMap((x, i) => ((x.concepts ?? []).includes(id) ? [i + 1] : [])));
+      for (const g of ayah.structure?.groups ?? []) {
+        if (g.concept === id) for (const x of g.words) if (Number.isInteger(x) && x >= 1 && x <= words) tagged.add(x);
+      }
+      if (tagged.size) return [...tagged].sort((a, b) => a - b);
+    }
+    return refs;
+  };
   const cue = (line: string, caption: string, guides: Guide[] = []): Cue => {
-    const text = clean(stripArabic(caption));
     const m = manifestOf(line);
+    // The manifest's display (what is spoken, dictionary terms as "na’t
+    // (نَعْت)") is the caption; without one, the engine's own (no Arabic).
+    const display = lineDisplay(m, line);
+    const text = display !== null ? clean(display) : clean(stripArabic(caption));
     const spoken = lineText(m, line);
-    // Only this ayah's own lines name its word places.
-    const refs = spoken && !line.startsWith("shared:") ? wordRefs(spoken).filter((w) => w <= words) : [];
-    return { line, caption: text, parts: splitCaption(text), guides, audio: lineSegments(m, line), spoken, refs };
+    const id = parseLineId(line);
+    // Only this ayah's own lines name its word places, highlight its words
+    // or show a word card; shared lines never do.
+    const part = id?.kind === "ayah" ? id.part : null;
+    const refs = spoken && part !== null ? wordRefs(spoken).filter((w) => w <= words) : [];
+    const marks = lineMarks(m, line);
+    let highlight: number[] = [];
+    let focus: number | null = null;
+    if (part !== null) {
+      const h = marks.highlight;
+      highlight =
+        h === undefined
+          ? kindHighlight(part, refs)
+          : h.includes(0)
+            ? every
+            : [...new Set(h)].filter((w) => w >= 1 && w <= words).sort((a, b) => a - b);
+      focus = marks.focus === undefined ? explained(part) : marks.focus === null ? null : (placeOf.get(marks.focus) ?? null);
+    }
+    return {
+      line,
+      caption: text,
+      display: display !== null ? text : null,
+      highlight,
+      focus,
+      parts: splitCaption(text),
+      guides,
+      audio: lineSegments(m, line),
+      spoken,
+      refs,
+    };
   };
   const line: Guide = { target: "mushaf-line", label: texts.guide.mushafLine };
   const partGuide = (key: ExerciseKey, part: GuidePart): Guide => ({

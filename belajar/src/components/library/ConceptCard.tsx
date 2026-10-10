@@ -16,7 +16,6 @@ export type ConceptLabels = {
   examples: string;
   more: string;
   sources: string;
-  draft: string;
 };
 
 /**

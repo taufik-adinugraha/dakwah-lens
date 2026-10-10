@@ -1,16 +1,28 @@
 /**
  * Narration manifests (content/narration/*.json): parsing, the same-origin
- * audio rule, and the guard on SPOKEN text.
+ * audio rule, and the guards on SPOKEN text and on captions.
  *
  * The narrator never voices Qur'anic words (plan §6.1 A1; operator): no
- * Arabic script and no transliteration of any lesson word may appear in a
- * line's text — the imam's recording carries every Qur'anic word and the
- * script says "kata ini", "kata pertama", etc. Also plain Indonesian for
- * adults: no digits (numbers spelled out), no ALL CAPS, "Anda" not "kamu".
+ * transliteration of any lesson word may appear in a line's text — the
+ * imam's recording carries every Qur'anic word and the script says "kata
+ * ini", "kata pertama", etc. Arabic script appears in spoken text only as a
+ * term of the pronunciation dictionary (pipeline/authored/pronunciation.json:
+ * grammar terms such as نَعْت, said from Arabic script so the voice says them
+ * right — operator, 2026-10-10). Also plain Indonesian for adults: no digits
+ * (numbers spelled out), no ALL CAPS, "Anda" not "kamu".
  * Pure: no file access here (scripts/autoplay-check.ts reads the files).
  */
 import { manifestParts } from "./ids";
-import type { NarrationAudio, NarrationManifest, NarrationSegment } from "./types";
+import type {
+  CaptionToken,
+  KaraokeWord,
+  NarrationAudio,
+  NarrationLine,
+  NarrationManifest,
+  NarrationSegment,
+  Pronunciation,
+  PronunciationTerm,
+} from "./types";
 
 /** Narration audio is served same-origin by Caddy (plan §7.1), never from
  *  another host: the page makes no other network call besides the
@@ -35,9 +47,36 @@ export function usableAudio(a: unknown): NarrationAudio | null {
 }
 
 /**
+ * Word timings of a narration file, if they are usable: a non-empty list of
+ * { t: non-empty text, s ≥ 0, e ≥ s } in order of start (seconds); null
+ * otherwise. The karaoke caption shows them; without them the caption is the
+ * line's display text.
+ */
+export function usableTokens(raw: unknown): CaptionToken[] | null {
+  if (!Array.isArray(raw) || raw.length === 0) return null;
+  const out: CaptionToken[] = [];
+  let last = 0;
+  for (const x of raw) {
+    if (!x || typeof x !== "object") return null;
+    const { t, s, e } = x as Record<string, unknown>;
+    if (typeof t !== "string" || !t.trim()) return null;
+    if (typeof s !== "number" || typeof e !== "number" || !Number.isFinite(s) || !Number.isFinite(e)) return null;
+    if (s < 0 || e < s || s < last) return null;
+    last = s;
+    out.push({ t, s, e });
+  }
+  return out;
+}
+
+/** Manifest tokens → the compact caption words the page receives (ms). */
+const karaokeWords = (tokens: readonly CaptionToken[]): KaraokeWord[] =>
+  tokens.map((k) => [k.t.trim(), Math.round(k.s * 1000), Math.round(k.e * 1000)] as const);
+
+/**
  * The audio files of line `id` in play order (the whole line, or its split
- * parts "<id>:a", "<id>:b", …). All or nothing: a line with any part
- * missing usable audio plays caption-only.
+ * parts "<id>:a", "<id>:b", …), each with its caption words when the
+ * manifest has their timings. All or nothing: a line with any part missing
+ * usable audio plays caption-only.
  */
 export function lineSegments(manifest: NarrationManifest | null | undefined, id: string): NarrationSegment[] {
   if (!manifest) return [];
@@ -45,9 +84,11 @@ export function lineSegments(manifest: NarrationManifest | null | undefined, id:
   if (!ids) return [];
   const out: NarrationSegment[] = [];
   for (const k of ids) {
-    const audio = usableAudio(manifest.lines[k]?.audio);
+    const l = manifest.lines[k];
+    const audio = usableAudio(l?.audio);
     if (!audio) return [];
-    out.push({ ...audio, id: k });
+    const tokens = usableTokens(l.tokens);
+    out.push(tokens ? { ...audio, id: k, words: karaokeWords(tokens) } : { ...audio, id: k });
   }
   return out;
 }
@@ -57,6 +98,32 @@ export function lineText(manifest: NarrationManifest | null | undefined, id: str
   if (!manifest) return null;
   const ids = manifestParts(manifest, id);
   return ids ? ids.map((k) => manifest.lines[k].text.trim()).join(" ") : null;
+}
+
+/** The display text of line `id` (split parts joined), or null when the
+ *  line, or any of its parts, has none. */
+export function lineDisplay(manifest: NarrationManifest | null | undefined, id: string): string | null {
+  if (!manifest) return null;
+  const ids = manifestParts(manifest, id);
+  if (!ids) return null;
+  const parts = ids.map((k) => manifest.lines[k].display?.trim() ?? "");
+  return parts.every(Boolean) ? parts.join(" ") : null;
+}
+
+/** The manifest's own fields of line `id` (the first part's, for a split
+ *  line, where every part names the same words): `highlight` and `focus`
+ *  as written, `undefined` when the manifest does not say. */
+export function lineMarks(
+  manifest: NarrationManifest | null | undefined,
+  id: string,
+): { highlight: number[] | undefined; focus: string | null | undefined } {
+  if (!manifest) return { highlight: undefined, focus: undefined };
+  const ids = manifestParts(manifest, id);
+  if (!ids) return { highlight: undefined, focus: undefined };
+  const all = ids.map((k) => manifest.lines[k]);
+  const highlight = all.find((l) => l.highlight !== undefined)?.highlight;
+  const focused = all.find((l) => l.focus !== undefined);
+  return { highlight, focus: focused ? (focused.focus ?? null) : undefined };
 }
 
 /**
@@ -89,11 +156,32 @@ export function parseNarrationManifest(raw: unknown): { manifest: NarrationManif
       problems.push(`${id}: text missing`);
       continue;
     }
-    const entry: NarrationManifest["lines"][string] = { text: l.text };
+    const entry: NarrationLine = { text: l.text };
+    const { display, highlight, focus } = l;
+    if (display !== undefined) {
+      if (typeof display === "string" && display.trim()) entry.display = display;
+      else problems.push(`${id}: display must be a non-empty string`);
+    }
+    if (highlight !== undefined) {
+      if (Array.isArray(highlight) && highlight.every((n) => typeof n === "number" && Number.isInteger(n) && n >= 0)) {
+        entry.highlight = highlight.map(Number);
+      } else problems.push(`${id}: highlight must be a list of word numbers ([0] = the whole ayah)`);
+    }
+    if (focus !== undefined) {
+      if (focus === null) entry.focus = null;
+      else if (typeof focus === "string" && /^[1-9][0-9]{0,2}:[1-9][0-9]{0,2}:[1-9][0-9]{0,2}$/.test(focus)) entry.focus = focus;
+      else problems.push(`${id}: focus must be null or a word loc "surah:ayah:word"`);
+    }
     if (l.audio !== undefined) {
       const audio = usableAudio(l.audio);
       if (audio) entry.audio = audio;
       else problems.push(`${id}: audio must be { url under ${NARRATION_MEDIA_PREFIX}, ms > 0, sha256 }`);
+    }
+    if (l.tokens !== undefined) {
+      const tokens = usableTokens(l.tokens);
+      if (!tokens) problems.push(`${id}: tokens must be a non-empty list of { t, s, e } (seconds, in order)`);
+      else if (l.audio === undefined) problems.push(`${id}: tokens without audio`);
+      else entry.tokens = tokens;
     }
     lines[id] = entry;
   }
@@ -144,9 +232,94 @@ export function wordRefs(text: string): number[] {
   return out;
 }
 
-// ───────────────────────────── Spoken-text guard ─────────────────────────────
+// ───────────────────────────── Pronunciation dictionary ─────────────────────────────
 
 const ARABIC_SCRIPT = /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/;
+/** One Arabic word (letters and harakat, no spaces). */
+const ARABIC_WORD = /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]+/g;
+/** A heavy letter (ص ض ط ظ ق خ غ), optionally doubled, before fathah or
+ *  alif: the voice reads it light, so such a term is spoken from a fixed
+ *  Latin respelling ("idhofah"), never from Arabic script (operator,
+ *  2026-10-10). As the narration pipeline's rule. */
+const HEAVY_BEFORE_A = /[صضطظقخغ]ّ?[َا]/;
+
+/**
+ * Reads pipeline/authored/pronunciation.json (the kamus pelafalan): every
+ * term the narrator may say in Arabic script, or by a fixed respelling.
+ * Problems: a malformed entry, two entries with one `speak`, and a term with
+ * a heavy letter + fathah/alif still spoken from Arabic script.
+ */
+export function parsePronunciation(raw: unknown): { dict: Pronunciation | null; problems: string[] } {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return { dict: null, problems: ["not a JSON object"] };
+  const terms = (raw as Record<string, unknown>).terms;
+  if (!Array.isArray(terms)) return { dict: null, problems: ["terms must be a list"] };
+  const problems: string[] = [];
+  const out: PronunciationTerm[] = [];
+  const speaks = new Set<string>();
+  terms.forEach((x, i) => {
+    const { term, speak, display } = (x ?? {}) as Record<string, unknown>;
+    if (typeof term !== "string" || typeof speak !== "string" || typeof display !== "string" || !term || !speak || !display) {
+      problems.push(`terms[${i}]: term, speak and display must be non-empty strings`);
+      return;
+    }
+    if (speaks.has(speak)) problems.push(`terms[${i}] (${term}): "${speak}" is spoken by two entries`);
+    speaks.add(speak);
+    if (HEAVY_BEFORE_A.test(term) && ARABIC_SCRIPT.test(speak)) {
+      problems.push(`terms[${i}] (${term}): a heavy letter before fathah/alif needs a fixed Latin respelling in "speak"`);
+    }
+    out.push({ term, speak, display });
+  });
+  return { dict: { terms: out }, problems };
+}
+
+/** The dictionary's Arabic-script `speak` forms, longest first (so "حَرْف
+ *  جَرّ" is taken before "حَرْف"). */
+function arabicSpeakForms(dict: Pronunciation): string[] {
+  return dict.terms
+    .map((t) => t.speak)
+    .filter((sp) => ARABIC_SCRIPT.test(sp))
+    .sort((a, b) => b.length - a.length);
+}
+
+/**
+ * Arabic in a CAPTION (a line's display text or one karaoke word) that is
+ * not allowed (empty when fine). A caption shows what is spoken, so its
+ * Arabic is a dictionary term's display form ("na’t (نَعْت)", a letter as in
+ * the ayah: "ba’ (بِ)") or the lesson's own Arabic (content bytes). Never a
+ * letter's spelled-out name next to the verse (بَاء), i.e. a spoken-only
+ * form. `allowed`: the dictionary displays and the lesson words' Arabic,
+ * joined; every Arabic word of the caption must occur in it.
+ */
+export function captionArabicProblems(text: string, dict: Pronunciation | null, allowed: string): string[] {
+  if (!ARABIC_SCRIPT.test(text)) return [];
+  const out: string[] = [];
+  if (!dict) return ["Arabic script in a caption, and no pronunciation dictionary to check it against"];
+  const spokenOnly = dict.terms.filter((t) => ARABIC_SCRIPT.test(t.speak) && !t.display.includes(t.speak));
+  const shown = spokenOnly.filter((t) => text.includes(t.speak)).map((t) => `${t.speak} (shown as "${t.display}")`);
+  if (shown.length) out.push(`a spoken-only form on screen: ${shown.join(", ")}`);
+  const stray = [...new Set([...text.matchAll(ARABIC_WORD)].map((m) => m[0]))].filter((w) => !allowed.includes(w));
+  if (stray.length) out.push(`Arabic from neither the dictionary nor the lesson: ${stray.join(" ")}`);
+  return out;
+}
+
+/**
+ * A caption without its Arabic, for a screen reader's Indonesian voice (and
+ * never a Qur'anic word in Arabic): "kasrah (كَسْرَة), karena" → "kasrah,
+ * karena"; "huruf jar (حَرْف جَرّ) ba’ (بِ)" → "huruf jar ba’".
+ */
+export function withoutArabic(text: string): string {
+  if (!ARABIC_SCRIPT.test(text)) return text;
+  return text
+    .replace(/\s*\(\s*[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿][؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿\s،,–-]*\)/g, "")
+    .replace(ARABIC_WORD, "")
+    .replace(/\(\s*\)/g, "")
+    .replace(/\s+([,.;:!?)”’])/g, "$1")
+    .replace(/([(“‘])\s+/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// ───────────────────────────── Spoken-text guard ─────────────────────────────
 
 /** Lowercase ASCII-ish form for comparing transliterations: diacritics,
  *  ‘ayn/hamza marks, apostrophes and hyphens dropped ("al-‘ālamīna" →
@@ -298,7 +471,8 @@ function quranHit(raw: string, guard: QuranGuard): boolean {
 
 /**
  * Problems in one line of SPOKEN text (empty when it is fine):
- *  - Arabic script;
+ *  - Arabic script — with the pronunciation dictionary, Arabic script that
+ *    is not one of its terms (each term's exact `speak` form);
  *  - a lesson word in transliteration, in any spelling or ending
  *    ("al-ḥamdu", "rabbi", "rabbu", "a'udzu", "ash-shirath", "huwallahu") —
  *    the imam's recording says those, the narrator says "kata ini"; allowed:
@@ -310,10 +484,17 @@ function quranHit(raw: string, guard: QuranGuard): boolean {
  *  - "kamu"/"kalian" (the module addresses adults as "Anda").
  * A lighter mirror of pipeline/validate_narration.py, which CI also runs.
  */
-export function spokenTextProblems(text: string, guard: QuranGuard): string[] {
+export function spokenTextProblems(text: string, guard: QuranGuard, dict: Pronunciation | null = null): string[] {
   const out: string[] = [];
   if (!text.trim()) out.push("empty text");
-  if (ARABIC_SCRIPT.test(text)) out.push("Arabic script");
+  if (dict) {
+    // Only a dictionary term may be Arabic script; anything left over is not.
+    let rest = text;
+    for (const sp of arabicSpeakForms(dict)) rest = rest.split(sp).join(" ");
+    if (ARABIC_SCRIPT.test(rest)) out.push("Arabic script outside the pronunciation dictionary");
+  } else if (ARABIC_SCRIPT.test(text)) {
+    out.push("Arabic script");
+  }
   const honor = [...text.matchAll(HONORIFICS)].map((m) => [m.index ?? 0, (m.index ?? 0) + m[0].length] as const);
   const raws: { raw: string; at: number }[] = [];
   const re = /[\p{L}\p{M}‘’'ʼʻʿʾ`´-]+/gu;

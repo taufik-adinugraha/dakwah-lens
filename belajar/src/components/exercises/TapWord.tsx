@@ -37,7 +37,7 @@ type Props = {
 };
 
 /**
- * "Dengar dan ketuk" — the imam says one word (seeked inside the streamed
+ * "Dengar dan klik" — the imam says one word (seeked inside the streamed
  * ayah recording); the learner taps it. Trains listening-to-text mapping.
  * The mushaf words are shown unaltered, as chips that look tappable; no
  * sound effects. The player lives outside the round so "Ulangi latihan"

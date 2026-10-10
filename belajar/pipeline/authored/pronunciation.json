@@ -1,5 +1,5 @@
 {
-  "_comment": "Pronunciation dictionary for narration (kamus pelafalan). ElevenLabs eleven_v3, mode A (language_code \"id\"). Every Arabic term in spoken narration is written exactly as `speak`; captions show `display`. Approved by the operator by ear on the Al-Fatihah 1 preview (2026-10-10). Rules: (1) grammar terms are spoken from Arabic script unless listed with a Latin respelling; (2) a term with a heavy letter (ص ض ط ظ ق خ غ) + fathah/alif MUST have a fixed respelling (v3 reads them light and inconsistently); (3) the narrator never speaks Qur'anic words. New terms are added only after the operator approves their sound.",
+  "_comment": "Pronunciation dictionary for narration (kamus pelafalan). ElevenLabs eleven_v3, mode A (language_code \"id\"). Every Arabic term in spoken narration is written exactly as `speak`; captions show `display`. Approved by the operator by ear on the Al-Fatihah 1 preview (2026-10-10). Rules: (1) grammar terms are spoken from Arabic script unless listed with a Latin respelling; (2) a term with a heavy letter (ص ض ط ظ ق خ غ) + fathah/alif MUST have a fixed respelling (v3 reads them light and inconsistently); (3) the narrator never speaks Qur'anic words, so no term may be (the front of) a word of any lesson surah: عَلَى was removed on 2026-10-10 because it is the front of عَلَيْهِمْ (1:7:4, 1:7:7). New terms are added only after the operator approves their sound.",
   "mode": { "model_id": "eleven_v3", "language_code": "id", "voice": "Kang Nandar (aK834gEOxQEtviMPgurT)" },
   "terms": [
     { "term": "كَسْرَة", "speak": "كَسْرَة", "display": "kasrah (كَسْرَة)", "rule": "ra + fathah; operator kept the Arabic-script reading", "approved": "2026-10-10" },
@@ -17,7 +17,6 @@
     { "term": "نَعْت", "speak": "نَعْت", "display": "na’t (نَعْت)", "rule": "Arabic script (Latin na't was mispronounced)", "approved": "2026-10-10" },
     { "term": "بَاء", "speak": "بَاء", "display": "ba’ (بِ)", "rule": "letter NAME spoken; caption shows the letter as in the ayah", "approved": "2026-10-10" },
     { "term": "لَام", "speak": "لَام", "display": "lam (لِ)", "rule": "letter NAME spoken; caption shows the letter as in the ayah", "approved": "2026-10-10" },
-    { "term": "عَلَى", "speak": "عَلَى", "display": "‘ala (عَلَى)", "rule": "preposition example (grammar), Arabic script", "approved": "2026-10-10" },
     { "term": "فَتْحَة", "speak": "فَتْحَة", "display": "fathah (فَتْحَة)", "rule": "Arabic script", "approved": "2026-10-10" },
     { "term": "كَلِمَة", "speak": "كَلِمَة", "display": "kalimah (كَلِمَة)", "rule": "Arabic script", "approved": "2026-10-10" },
     { "term": "اِسْم", "speak": "اِسْم", "display": "isim (اِسْم)", "rule": "Arabic script", "approved": "2026-10-10" },

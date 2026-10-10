@@ -61,7 +61,7 @@ const sameBoxes = (a: Box[], b: Box[]) =>
  * `data-guide` target, found with guideSelector) INSIDE the stage area it is
  * rendered in — never over the whole page:
  * - a thick forest ring with a white halo around the target, plus a label
- *   ("Ketuk di sini") with an arrow: never colour alone (senior-ux §3.2).
+ *   ("Klik di sini") with an arrow: never colour alone (senior-ux §3.2).
  *   The label never leaves the stage area: it is anchored on the target's
  *   side and wraps within the room left (a phone at the largest text size
  *   included), so the page never scrolls sideways;

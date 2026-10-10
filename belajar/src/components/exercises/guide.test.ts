@@ -74,7 +74,7 @@ describe("what the learner does next", () => {
     expect(choiceGuidePart({ ...idle, finished: true })).toBeNull();
   });
 
-  it("Dengar dan ketuk: play until the word is heard, then the words", () => {
+  it("Dengar dan klik: play until the word is heard, then the words", () => {
     expect(tapWordGuidePart({ ...idle, heard: false })).toBe("play");
     expect(tapWordGuidePart({ ...idle, heard: true })).toBe("options");
     // Two misses before ever listening: listening comes first.

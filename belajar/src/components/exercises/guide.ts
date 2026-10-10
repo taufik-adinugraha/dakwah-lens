@@ -20,8 +20,8 @@ export type ExerciseKey = (typeof EXERCISE_KEYS)[number];
 
 /**
  * What a target points at:
- * - play    : "Dengarkan kata" (Dengar dan ketuk, before the word is heard)
- * - options : the answer options (the words, for Dengar dan ketuk)
+ * - play    : "Dengarkan kata" (Dengar dan klik, before the word is heard)
+ * - options : the answer options (the words, for Dengar dan klik)
  * - words   : the words still to sort (Kelompokkan, step 1)
  * - bins    : the four groups (Kelompokkan, step 2)
  * - reveal  : "Tunjukkan jawaban" (after two misses; the options stay usable)
@@ -44,7 +44,7 @@ export type GuideTarget = `exercise:${ExerciseKey}:${GuidePart}`;
 
 /** What a guide report says besides its target. */
 export type GuideInfo = {
-  /** Dengar dan ketuk, with "play": the word (1-based) the question asks
+  /** Dengar dan klik, with "play": the word (1-based) the question asks
    *  about — the lesson's imam recites it, so the learner needs no tap. */
   word?: number;
 };
@@ -63,7 +63,7 @@ export type ExerciseGuide = {
    *  settled question moves to the next one (or finishes) as if "Lanjut" /
    *  "Selesai" were tapped — the learner only answers. */
   advance?: number;
-  /** Dengar dan ketuk: the word the lesson's imam has just recited to its
+  /** Dengar dan klik: the word the lesson's imam has just recited to its
    *  end; the question whose word it is offers its words. */
   heard?: number | null;
 };
@@ -114,7 +114,7 @@ export function choiceGuidePart(s: ChoiceState): GuidePart | null {
 }
 
 /**
- * Dengar dan ketuk: play → options → (reveal) → next. The spotlight leaves
+ * Dengar dan klik: play → options → (reveal) → next. The spotlight leaves
  * "Dengarkan kata" only once the imam's word has played to its end, so a
  * voiced prompt never starts over the recitation.
  */

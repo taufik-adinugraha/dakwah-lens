@@ -25,7 +25,7 @@ export type PlayError = "blocked" | "failed";
 /** Window event every player sends when its recording starts (detail: its
  *  Audio element). Every other player on the page pauses, so two
  *  recordings never play over each other (senior-ux §3.5), whichever
- *  component owns them (the lesson stage, the Dengar dan ketuk exercise,
+ *  component owns them (the lesson stage, the Dengar dan klik exercise,
  *  the autoplay narration — useNarrationPlayer sends and honours it too). */
 export const AUDIO_START_EVENT = "belajar:audio-start";
 

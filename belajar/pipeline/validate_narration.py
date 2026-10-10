@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
 """Validator for the guided-lesson narration manifests (belajar/content/narration/*.json).
 
-Checks every line the AI narrator may speak, the coverage of the step-id contract and any
-rendered audio. Exit 1 on any failure. Standard library only; run from belajar/pipeline:
+Checks every line the AI narrator may speak, what the caption shows for it, the coverage of the
+step-id contract and any rendered audio. Exit 1 on any failure. Standard library only; run from
+belajar/pipeline:
 
     python3 validate_narration.py
 
 What it enforces (README "Narasi" has the reasons):
 
-- Manifest shape: {version: 1, voice: null | {id, name, model: "eleven_v3"}, lines: {id: {text, audio?}}}.
+- Manifest shape (version 2): {version, voice: null | {id, name, model: "eleven_v3"}, lines: {id:
+  {text, display, highlight, focus, audio?, tokens?}}}. `text` is the SPOKEN text, exactly what is
+  sent to the voice; `display` the caption (dictionary terms in their display form, letters as in
+  the ayah); `highlight` the word numbers of the ayah the stage highlights ([0] the whole ayah, []
+  none); `focus` the word ("1:1:3") of the large word card, or null.
 - Ids follow the contract: "${slug}:${ayah}:${part}" with part in intro | recite | w${n} |
   structure | concept:${conceptId} | ex:${exerciseKey}:${lineKey} | recap | next | done, and
   "shared:${key}" in shared.json. A line longer than MAX_LINE is split into "<id>:a", "<id>:b", …
@@ -17,52 +22,106 @@ What it enforces (README "Narasi" has the reasons):
   Konsep whose first example is in that ayah, ex:${key}:intro for each exercise the ayah shows,
   recap, and next (or done on the last ayah). Nothing else. shared.json holds SHARED_KEYS plus
   ex:${key}:${part} for every guide part of every exercise (mirrors src/components/exercises/guide.ts).
-- Text: non-empty, trimmed, at most MAX_LINE characters; no Arabic script; no digits (numbers are
-  spelled out); no transliteration diacritics (ā ḥ ṣ ‘ …); ASCII plus “ ” — – … only; no ALL-CAPS
-  word except ACRONYMS.
-- No Qur'anic word, in any spelling the narrator could voice: the normalised `translit` of every
+- The pronunciation dictionary (authored/pronunciation.json, the kamus pelafalan the operator
+  approved by ear): every term spoken from Arabic script is spoken as the term itself; a term with a
+  heavy letter (ص ض ط ظ ق خ غ) + fathah or alif has a fixed Latin respelling (idhofah, dhommah);
+  no term (Arabic, or its Latin caption head) is a word of any lesson surah, nor the front of one.
+- Spoken text: non-empty, trimmed, at most MAX_LINE characters; Arabic script only as a dictionary
+  `speak` value (any other Arabic is an error, a Qur'anic word in Arabic says so); a dictionary
+  term's Latin spelling never stays in the spoken text (it is said from the dictionary); "Allah" is
+  said "Alloh"; no digits; ASCII letters and . , ; : ! ? ' - only (no brackets, quotes, ellipsis,
+  dashes or open prefix: render-ready); no ellipsis ("yang....") and no phrase ending on a bare
+  "di" ("kata yang di."): an open fragment cannot be read aloud; no ALL-CAPS word except ACRONYMS;
+  "klik", never "ketuk"; meanings with "yang artinya", never "yang berarti"; no "fatwa" and no
+  promise of a human review.
+- Heavy letters in Latin (heavy_latin): a spoken word with dh zh kh gh sh th q + a (khabar,
+  mudhaf, 'athaf, nashab) that the dictionary does not respell may not have audio, and
+  render_narration.py refuses to render it: eleven_v3 reads it light (pronunciation rule 2). The
+  operator approves a respelling (pronunciation.json) first; main() lists what is waiting.
+- No Qur'anic word in any spelling the narrator could voice: the normalised `translit` of every
   word of every lesson surah, plus its i'rab-stripped form (al-ḥamdu → al-ḥamd), its form without
   the article (ṣirāṭ), its space-separated parts (the wa of wa lā) and ALIASES (ism inside bismi).
   Matching is on whole tokens after folding (diacritics and apostrophes dropped, lower case), and a
   token that merely starts with such a form (alhamdulillah, bismillah) fails too. Spelling- and
   ending-blind as well (`sound`, `stem`): Indonesian digraphs (a'udzu, ash-shirath, ghairi,
   adh-dhollin), other case endings (rabbu, rabbil), pausal forms of mabni words (khalaq, hasad), a
-  ta marbuta spelled -ah (al-jinnah) and two words run together as recited (huwallahu). Exceptions,
-  and only these:
-    * "Allah" (no case ending) inside “…” (the spoken translation and quoted glosses are
-      Indonesian, not Qur'an) or followed by the honorific "subhanahu wa ta'ala";
+  ta marbuta spelled -ah (al-jinnah) and two words run together as recited (huwallahu). Run on the
+  spoken text and on the caption, with dictionary terms masked. Exceptions, and only these:
+    * in the caption, "Allah" (no case ending) inside “…” (the translation and quoted glosses are
+      Indonesian, not Qur'an) or followed by the honorific "subhanahu wa ta'ala"; in the spoken
+      text the Name is the dictionary's "Alloh", which the caption must show as one of those;
     * the honorifics HONORIFICS themselves;
     * a surah name right after "Surah" (Surah An-Nas, Surah Al-Falaq);
     * "lam" as the name of the letter, i.e. with "huruf" (or "alif": "alif lam", the article)
       among the four tokens before it.
+- Caption (`display`): says what is spoken — replacing its dictionary display forms by their
+  `speak` values and normalising for speech gives `text` exactly; Arabic only inside those display
+  forms; a letter shown as in the ayah (بِ, or the focus word's own first letter, لَ of lahu), never
+  by its spelled-out name (بَاء); the same Qur'anic-word guard and word-place rules.
 - Word places: a line names a word of its own ayah by its place ("kata kedua"), never more places
   than the ayah has words, never a place in another ayah (it is named by its meaning there), never a
   place inside a place, and never "di kartu ini" (the stage shows no card); a concept's title is
   never turned into a place.
+- What the stage shows (operator review, 2026-10-10): intro, recite, structure and recap highlight
+  the whole ayah ([0]); w${n} highlights word n and puts it on the word card (focus); a concept
+  line highlights the words whose `concepts` list that concept and the words of the ayah's
+  structure groups of that concept; the Dengar dan klik intro the whole ayah; every other line
+  nothing. Shared lines: [] and null.
 - Audio (when present): url = /belajar/media/narration/<voice-slug>/<slug>/<file>.mp3 with <file>
-  the id with every ":" written "__" (media_file), ms > 0, 64-hex sha256, and the manifest names
-  its voice.
-- The manifests equal a fresh build_narration.py run (no hand edits, no stale lines), and the
-  speech text render_narration.py would send (build_narration.tts_text) carries no digits, Arabic,
-  brackets or quotes.
+  the content address of the request (audio_name: sha256 of the spoken text, voice and settings),
+  so a line whose text changed can never keep old audio; ms > 0; 64-hex sha256; the manifest names
+  its voice. `tokens` (with audio only): [{t, s, e}] in time order within the clip, whose texts
+  joined by spaces equal the display rendering of the spoken text (render_display).
+- The manifests equal a fresh build_narration.py run (no hand edits, no stale lines).
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import sys
 import unicodedata
+from dataclasses import dataclass
 from pathlib import Path
 
-from common import BELAJAR, CONTENT_DIR, SURAHS
+from common import AUTHORED_DIR, BELAJAR, CONTENT_DIR, SURAHS, normalise
 
 NARRATION_DIR = CONTENT_DIR / "narration"
+PRONUNCIATION_JSON = AUTHORED_DIR / "pronunciation.json"
 GUIDE_TS = BELAJAR / "src" / "components" / "exercises" / "guide.ts"
 MEDIA_PREFIX = "/belajar/media/narration/"
-MANIFEST_VERSION = 1
+MANIFEST_VERSION = 2
 MAX_LINE = 400
 TTS_MAX = 5000  # eleven_v3 characters per request
+
+# ------------------------------------------------------------------ the voice request (house standard)
+# Fixed here, not flags (feedback_voice_render_settings; operator chose mode A, 2026-10-10). The
+# content address of every audio file hashes these with the spoken text and the voice id.
 MODEL = "eleven_v3"
+TTS_LANGUAGE = "id"  # mode A: language_code "id"
+VOICE_SETTINGS = {"stability": 0.5, "style": 0.35, "similarity_boost": 0.75, "use_speaker_boost": True}
+TEXT_NORMALIZATION = "off"
+OUTPUT_FORMAT = "mp3_44100_128"
+
+
+def request_body(text: str) -> dict:
+    """Exactly what is POSTed for one line (no previous_text / next_text: eleven_v3 rejects them)."""
+    return {
+        "text": text,
+        "model_id": MODEL,
+        "language_code": TTS_LANGUAGE,
+        "voice_settings": dict(VOICE_SETTINGS),
+        "apply_text_normalization": TEXT_NORMALIZATION,
+    }
+
+
+def audio_name(text: str, voice_id: str) -> str:
+    """The file name (without .mp3) of a line's audio: the first 16 hex of the sha256 of the request
+    (text, voice, model, language, settings, output format). Unchanged text → same file, never
+    rendered twice; changed text → a new file, never a stale cached one."""
+    key = {**request_body(text), "voice_id": voice_id, "output_format": OUTPUT_FORMAT}
+    return hashlib.sha256(json.dumps(key, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()[:16]
+
 
 # ------------------------------------------------------------------ the exercises (mirrors the app)
 EXERCISE_KEYS = ("tap-word", "why-harakat", "sort-case", "label-role", "wazn-factory")
@@ -142,12 +201,48 @@ def expected_shared() -> list[str]:
     return list(SHARED_KEYS) + [f"ex:{k}:{p}" for k in EXERCISE_KEYS for p in EXERCISE_GUIDE_PARTS[k]]
 
 
+WHOLE_AYAH = [0]
+
+
+def line_view(ayah: dict | None, part: str) -> tuple[list[int], str | None]:
+    """(highlight, focus) of a line (operator review of the Al-Fatihah 1 preview, 2026-10-10): the
+    whole ayah ([0]) while it is introduced, recited, analysed or recited again; word n, on the word
+    card too, while it is explained; the words tagged with a concept while that concept is
+    introduced (concept_words: tagged, or in a structure group of that concept); the whole ayah
+    while Dengar dan klik is announced; nothing otherwise."""
+    if ayah is None:
+        return [], None
+    if part in ("intro", "recite", "structure", "recap", "ex:tap-word:intro"):
+        return list(WHOLE_AYAH), None
+    m = re.fullmatch(r"w([1-9]\d*)", part)
+    if m:
+        n = int(m.group(1))
+        return [n], ayah["words"][n - 1]["loc"] if n <= len(ayah["words"]) else None
+    if part.startswith("concept:"):
+        return concept_words(ayah, part.split(":", 1)[1]), None
+    return [], None
+
+
+def concept_words(ayah: dict, cid: str) -> list[int]:
+    """The words a concept line highlights: those whose `concepts` list it, and every word of the
+    ayah's structure groups named after it (the idhafah of bismi + Allāhi is [1, 2] although only
+    Allāhi is tagged). Mirrors kindHighlight in src/lib/autoplay/sequence.ts."""
+    n = len(ayah["words"])
+    out = {i for i, w in enumerate(ayah["words"], 1) if cid in (w.get("concepts") or [])}
+    for g in (ayah.get("structure") or {}).get("groups") or []:
+        if g.get("concept") == cid:
+            out |= {x for x in g.get("words") or [] if isinstance(x, int) and 1 <= x <= n}
+    return sorted(out)
+
+
 # ------------------------------------------------------------------ text folding and tokens
 APOS = "'‘’ʼʿʾ`´"
 _APOS = re.compile(f"[{APOS}]")
 TOKEN = re.compile(f"[{APOS}]?[^\\W\\d_]+(?:[{APOS}][^\\W\\d_]+)*[{APOS}]?")
 ARABIC = re.compile("[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]")
+AR_MARKS = "ً-ٰٟۖ-ۭ"
 EXTRA_CHARS = set("“”—–…")  # “ ” — – …
+SPOKEN_CHARS = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ .,;:!?'-")
 
 
 def fold(s: str) -> str:
@@ -170,15 +265,22 @@ def keys_of(s: str) -> tuple[str, ...]:
     return tuple(t[0] for t in tokens(s))
 
 
-def media_file(lid: str) -> str:
-    """File name of a line's audio: the id with ':' written '__' ("al-fatihah__1__w1.mp3"), so every
-    path segment is [A-Za-z0-9_-] (colons break scp host parsing and the app's same-origin path rule)."""
-    return lid.replace(":", "__") + ".mp3"
-
-
 def slugify(name: str) -> str:
     s = re.sub(r"[^a-z0-9]+", "-", fold(name).lower()).strip("-")
     return s or "voice"
+
+
+def ar_skeleton(s: str) -> str:
+    """Arabic letters only, for comparing a term with the lesson words: harakat, Qur'anic marks and
+    tatweel dropped, alif forms (and the dagger alif) → ا, alif maqsura → ي, ta marbuta → ه."""
+    return normalise(s).replace("ى", "ي").replace("ة", "ه").replace(" ", "")
+
+
+def first_letter(ar: str) -> str | None:
+    """The first letter of an Arabic word with its own harakat, as the ayah shows it (بِ of bismi,
+    لَ of lahu)."""
+    m = re.match("([ء-يٱ])([ً-ْ]*)", ar)
+    return m.group(1) + m.group(2) if m else None
 
 
 # ------------------------------------------------------------------ Qur'anic word forms
@@ -233,15 +335,22 @@ def stem(k: str, min_len: int = 3) -> str | None:
     return None
 
 
+_PROCLITICS = "وفبلك"
+
+
 class Forms:
     """Every spelling of a lesson word the narrator must not voice, mapped to the words it names.
 
     forms[key tuple] = [((surah, ayah, word), kind), …], kind "full" (the word itself, with or
-    without its i'rab ending or article) or "part" (a piece of a multi-word token or an alias)."""
+    without its i'rab ending or article) or "part" (a piece of a multi-word token or an alias).
+    `arabic`: every lesson word's Arabic skeleton, also without a one-letter proclitic and the
+    article, for the Arabic check (`quranic_arabic`). `word_ar`: each word's Arabic by its loc."""
 
     def __init__(self, lessons: dict[str, dict]):
         self.forms: dict[tuple[str, ...], list[tuple[tuple[int, int, int], str]]] = {}
         self.translit: dict[tuple[int, int, int], str] = {}
+        self.word_ar: dict[str, str] = {}
+        self.arabic: set[str] = set()
         self.surah_names = {key(sp.name_id) for sp in SURAHS}
         self.surah_name_keys = {keys_of(sp.name_id) for sp in SURAHS}
         self.stems: set[str] = set()
@@ -255,6 +364,16 @@ class Forms:
                     s, ay, wi = (int(x) for x in w["loc"].split(":"))
                     loc = (s, ay, wi)
                     self.translit[loc] = w["translit"]
+                    self.word_ar[w["loc"]] = w["ar"]
+                    for piece in w["ar"].split():
+                        sk = ar_skeleton(piece)
+                        variants = {sk}
+                        if len(sk) > 2 and sk[0] in _PROCLITICS:
+                            variants.add(sk[1:])
+                        for v in list(variants):
+                            if v.startswith("ال") and len(v) > 3:
+                                variants.add(v[2:])
+                        self.arabic |= {v for v in variants if len(v) >= 2}
                     graded = w["case"]["state"] in I_RAB_STATES
                     sign = w["case"]["sign"]
                     full = keys_of(w["translit"])
@@ -312,6 +431,14 @@ class Forms:
         if (loc, kind) not in lst:
             lst.append((loc, kind))
 
+    def quranic_arabic(self, word: str) -> bool:
+        """An Arabic word (or run) that is a lesson word, one without its proclitic or article, or
+        the front (3+ letters) of one: على is the front of عليهم (1:7:4)."""
+        sk = ar_skeleton(word)
+        if len(sk) < 2:
+            return False
+        return sk in self.arabic or (len(sk) >= 3 and any(a.startswith(sk) for a in self.arabic))
+
     def mentions(self, text: str):
         """Longest-first matches of a form, left to right: (start, end, key, candidates, i, n)."""
         toks = tokens(text)
@@ -347,6 +474,292 @@ def spoken_translation(text: str) -> str:
     return t
 
 
+def tts_text(text: str) -> str:
+    """The caption made render-ready (house rule: all normalisation in Python, the voice's own
+    normaliser stays "off"): quotes dropped, brackets and dashes become commas, an ellipsis (an open
+    phrase, "yang banyak …") is dropped, not read as a full stop, "/" reads "atau", "+" reads "dan",
+    an open prefix loses its hyphen ("berawalan di-" → "berawalan di"). Pronunciation (the
+    dictionary, Allah → Alloh) is applied before this, by build_narration.speech."""
+    t = text.replace("“", "").replace("”", "").replace('"', "")
+    t = t.replace("—", ", ").replace("–", ", ").replace("…", "").replace("/", " atau ").replace(" + ", " dan ")
+    t = re.sub(r"(?<=\w)-(?=[\s,.;:!?)]|$)", "", t)  # "berawalan di-" → "berawalan di"
+    t = t.replace("(", ", ").replace(")", ", ")
+    t = re.sub(r"\s+", " ", t)
+    t = re.sub(r"\s+([,.;:!?])", r"\1", t)
+    t = re.sub(r",(?:\s*,)+", ",", t)
+    t = re.sub(r",\s*([.;:!?])", r"\1", t)
+    t = re.sub(r"([.;:!?])\s*,", r"\1", t)
+    t = re.sub(r"^\s*,\s*", "", t)
+    t = re.sub(r",(?=\S)", ", ", t)
+    return re.sub(r"\s+", " ", t).strip()
+
+
+# ------------------------------------------------------------------ pronunciation dictionary
+# authored/pronunciation.json (kamus pelafalan): each grammar term the narrator says, `speak` the
+# exact form sent to the voice (Arabic script, or a fixed Latin respelling where eleven_v3 reads a
+# heavy letter light), `display` its caption form, "na’t (نَعْت)". A letter term (بَاء) is spoken by
+# its name and shown as the letter in the ayah (بِ). Terms are added only after the operator has
+# approved their sound (README "Narasi").
+_DISPLAY = re.compile(r"^(?P<head>[^()؀-ۿ]+?)(?: \((?P<ar>[^()]+)\))?$")
+_CONT = f"\\w{AR_MARKS}'‘’ʼ`´\\-"  # characters that continue a word on either side of a term
+# A heavy letter (tafkhim) with fathah (or fathatan, either order with a shadda) or followed by alif.
+HEAVY_A = re.compile("[صضطظقخغ](?:\u0651?[\u064E\u064B]|[\u064E\u064B]\u0651|\u0627)")
+ARABIC_WORD = re.compile("[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]+")
+MASK = "istilah"  # what a dictionary term becomes for the word guard (a plain Indonesian word)
+
+# Where the lesson prose (Latin) carries a dictionary term, by the term's caption head ("kasrah",
+# "na't", "huruf jar"; build_narration.mark speaks it from the dictionary there). Most heads count
+# anywhere as a whole word; these only in the contexts given ({h} is the head):
+_COMPOUND_NEXT = r"(?! (?:maushul|fa'il|maf'ul|manshub|marfu'|mudhari'|amr|madhi|majhul)(?![\w']))"
+LATIN_CONTEXT: dict[str, str] = {
+    # "huruf" is also plain Indonesian ("huruf ba'", "empat huruf", "huruf 'athaf"): the word
+    # class is said from the dictionary only where the Kalimah concept lists the three classes.
+    "حَرْف": r"(?:(?<=fi'il, dan ){h}|(?<=atau ){h}(?= \(kata tugas\)))",
+    # The letter of a prefixed preposition (bi-, li-), never "alif lam" or a root letter (fa', 'ain, lam).
+    "بَاء": r"(?:(?<=[Hh]uruf )|(?<=jar )){h}",
+    "لَام": r"(?:(?<=[Hh]uruf )|(?<=jar )){h}",
+    # The head of a longer term the dictionary does not have (isim fa'il, fi'il mudhari') stays as
+    # written until the operator approves that term's sound.
+    "اِسْم": "{h}" + _COMPOUND_NEXT,
+    "فِعْل": "{h}" + _COMPOUND_NEXT,
+}
+
+
+def _ci(s: str) -> str:
+    """`s` as a regex whose first letter matches either case."""
+    if s[:1].isalpha() and s[:1].lower() != s[:1].upper():
+        return f"[{s[0].upper()}{s[0].lower()}]" + re.escape(s[1:])
+    return re.escape(s)
+
+
+def _cap(s: str) -> str:
+    return s[:1].upper() + s[1:]
+
+
+# A concept line opens "Konsep baru: <title>" (build_narration.surah_lines); the title starts with
+# a capital in the caption, so a term spoken from Arabic script right there is shown capitalised.
+TITLE_LEAD = "Konsep baru:"
+
+
+def _sentence_start(text: str, i: int) -> bool:
+    before = text[:i].rstrip()
+    return not before or before[-1] in ".!?" or before == TITLE_LEAD
+
+
+@dataclass(frozen=True)
+class Term:
+    term: str
+    speak: str
+    display: str
+    head: str            # the caption's Latin head ("na’t", "ba’", "Allah")
+    shown: str | None    # the Arabic the caption shows in brackets, or None
+
+    @property
+    def latin(self) -> str:
+        """The head as the lesson prose writes it (folded: "na't")."""
+        return fold(self.head)
+
+    @property
+    def arabic_speak(self) -> bool:
+        return bool(ARABIC.search(self.speak))
+
+    @property
+    def letter(self) -> bool:
+        """A letter: its NAME is spoken (bā’), the letter as in the ayah is shown (بِ)."""
+        return bool(self.shown) and ar_skeleton(self.shown) != ar_skeleton(self.term)
+
+
+class Lexicon:
+    def __init__(self, data, source: str = "pronunciation.json"):
+        self.source = source
+        self.shape: list[str] = []
+        self.terms: list[Term] = []
+        raw_terms = data.get("terms") if isinstance(data, dict) else None
+        if not isinstance(raw_terms, list):
+            self.shape.append(f"{source}: needs a list of terms")
+            raw_terms = []
+        for i, raw in enumerate(raw_terms):
+            if not isinstance(raw, dict) or not all(
+                isinstance(raw.get(k), str) and raw[k] and raw[k] == raw[k].strip() for k in ("term", "speak", "display")
+            ):
+                self.shape.append(f"{source}: term {i} needs non-empty, trimmed term, speak and display")
+                continue
+            m = _DISPLAY.match(raw["display"])
+            if not m:
+                self.shape.append(f"{source}: {raw['term']}: display must be “latin” or “latin (arabic)”, got {raw['display']!r}")
+                continue
+            self.terms.append(Term(raw["term"], raw["speak"], raw["display"], m.group("head"), m.group("ar")))
+        self.by_term = {t.term: t for t in self.terms}
+        self._groups: dict[str, Term] = {}
+        speak_alts, display_alts = [], []
+        for i, t in enumerate(sorted(self.terms, key=lambda t: -len(t.speak))):
+            self._groups[f"s{i}"] = t
+            speak_alts.append(f"(?P<s{i}>{re.escape(t.speak) if t.arabic_speak else _ci(t.speak)})")
+        for i, t in enumerate(sorted(self.terms, key=lambda t: -len(t.display))):
+            self._groups[f"d{i}"] = t
+            if t.letter:
+                body = f"{_ci(t.head)} \\({re.escape(ar_skeleton(t.shown))}[\u064B-\u0652]*\\)"
+            else:
+                body = _ci(t.display)
+            display_alts.append(f"(?P<d{i}>{body})")
+        never = "(?!x)x"
+        self.speak_rx = re.compile(f"(?<![{_CONT}])(?:{'|'.join(speak_alts) or never})(?![{_CONT}])")
+        self.display_rx = re.compile(f"(?<![{_CONT}])(?:{'|'.join(display_alts) or never})(?![{_CONT}])")
+        rules = []
+        for t in sorted(self.terms, key=lambda t: -len(t.latin)):
+            if t.latin == t.speak:
+                continue  # said as written (Bashrah): nothing to convert
+            pat = LATIN_CONTEXT.get(t.term, "{h}").replace("{h}", _ci(t.latin))
+            rules.append((t, re.compile(f"(?<![\\w'‘’\\-]){pat}(?![\\w'‘’\\-])")))
+        self.latin_rules = rules
+
+    # -- finding terms
+    def latin_matches(self, text: str) -> list[tuple[int, int, Term, bool]]:
+        """Non-overlapping (start, end, term, capitalised) of the dictionary terms the lesson
+        prose writes in Latin (the longest at each place)."""
+        found = [(m.start(), m.end(), t, m.group()[:1].isupper()) for t, rx in self.latin_rules for m in rx.finditer(text)]
+        found.sort(key=lambda x: (x[0], -(x[1] - x[0])))
+        out, end = [], -1
+        for f in found:
+            if f[0] >= end:
+                out.append(f)
+                end = f[1]
+        return out
+
+    def spoken_spans(self, text: str) -> list[tuple[int, int, Term]]:
+        return [(m.start(), m.end(), self._groups[m.lastgroup]) for m in self.speak_rx.finditer(text)]
+
+    # -- forms
+    def shown_letter(self, t: Term, focus_ar: str | None) -> str:
+        """The letter a letter term shows: the focus word's own first letter when it is that letter
+        (لَ of lahu), else the dictionary's (بِ, لِ)."""
+        fl = first_letter(focus_ar) if focus_ar else None
+        return fl if fl and ar_skeleton(fl) == ar_skeleton(t.shown or "") else (t.shown or "")
+
+    def display_of(self, t: Term, cap: bool, focus_ar: str | None = None) -> str:
+        s = f"{t.head} ({self.shown_letter(t, focus_ar)})" if t.letter else t.display
+        return _cap(s) if cap else s
+
+    def speak_of(self, t: Term, cap: bool) -> str:
+        return _cap(t.speak) if cap and not t.arabic_speak else t.speak
+
+    def runs(self, text: str) -> list[tuple[int, int]]:
+        """The spoken words of a line: runs of non-space characters, a multi-word term (حَرْف جَرّ,
+        mudhof ilaih) being one word. These are the karaoke tokens."""
+        runs = [[m.start(), m.end()] for m in re.finditer(r"\S+", text)]
+        for a, b, _t in self.spoken_spans(text):
+            inside = [r for r in runs if r[1] > a and r[0] < b]
+            if len(inside) > 1:
+                first = inside[0]
+                first[1] = inside[-1][1]
+                runs = [r for r in runs if r is first or r not in inside]
+        return [(a, b) for a, b in runs]
+
+    def _render(self, text: str, a: int, b: int, spans, focus_ar) -> str:
+        out, cur = "", a
+        for s, e, t in spans:
+            if s < a or e > b:
+                continue
+            cap = text[s].isupper() if not t.arabic_speak else _sentence_start(text, s)
+            out += text[cur:s] + self.display_of(t, cap, focus_ar)
+            cur = e
+        return out + text[cur:b]
+
+    def render_display(self, text: str, focus_ar: str | None = None) -> str:
+        """The caption of a spoken line, word by word: each dictionary `speak` value in its display
+        form (a capital at a sentence start), "Alloh" as "Allah"; what the karaoke tokens join to."""
+        spans = self.spoken_spans(text)
+        return " ".join(self._render(text, a, b, spans, focus_ar) for a, b in self.runs(text))
+
+    def tokens(self, text: str, starts: list[float], ends: list[float], focus_ar: str | None = None) -> list[dict]:
+        """Karaoke tokens from a character alignment of `text` (ElevenLabs /with-timestamps:
+        one start and end per input character): {t: display text, s: start, e: end} seconds."""
+        if len(starts) != len(text) or len(ends) != len(text):
+            raise ValueError("alignment does not match the text character for character")
+        spans = self.spoken_spans(text)
+        return [{"t": self._render(text, a, b, spans, focus_ar), "s": round(starts[a], 3), "e": round(ends[b - 1], 3)}
+                for a, b in self.runs(text)]
+
+    def speech_of_display(self, display: str) -> str:
+        """What a caption says: each display form back to its `speak` value, then tts_text."""
+        def rep(m: re.Match) -> str:
+            t = self._groups[m.lastgroup]
+            return self.speak_of(t, m.group()[:1].isupper())
+        return tts_text(self.display_rx.sub(rep, display))
+
+    def mask_spoken(self, text: str) -> str:
+        return self.speak_rx.sub(MASK, text)
+
+    def mask_display(self, display: str) -> str:
+        """Display forms with Arabic masked; a plain Latin one ("Allah") stays, for the guard's own
+        rule on the Name (inside “…” or with its honorific)."""
+        return self.display_rx.sub(lambda m: MASK if self._groups[m.lastgroup].shown else m.group(), display)
+
+    # -- the dictionary's own rules
+    def problems(self, forms: Forms) -> list[str]:
+        errs = list(self.shape)
+        src = self.source
+        for what in ("term", "speak", "display"):
+            seen: set[str] = set()
+            for t in self.terms:
+                v = getattr(t, what).lower()
+                if v in seen:
+                    errs.append(f"{src}: {what} {getattr(t, what)!r} appears twice")
+                seen.add(v)
+        for t in self.terms:
+            if ARABIC.search(t.head):
+                errs.append(f"{src}: {t.term}: the display's head must be Latin, Arabic goes in brackets")
+            if t.arabic_speak and t.speak != t.term:
+                errs.append(f"{src}: {t.term}: speak must be the term itself (Arabic script) or a Latin respelling")
+            if HEAVY_A.search(t.term) and t.arabic_speak:
+                errs.append(f"{src}: {t.term}: heavy letter with fathah/alif needs a fixed Latin respelling in speak "
+                            "(eleven_v3 reads it light and inconsistently)")
+            if ARABIC.search(t.term) and not t.shown:
+                errs.append(f"{src}: {t.term}: display must show the Arabic in brackets")
+            if t.shown and not t.letter and t.shown != t.term:
+                errs.append(f"{src}: {t.term}: display shows {t.shown!r}, not the term")
+            arabic = {w for s in (t.term, t.speak, "" if t.letter else (t.shown or "")) for w in ARABIC_WORD.findall(s)}
+            hit = sorted(w for w in arabic if forms.quranic_arabic(w))
+            if hit:
+                errs.append(f"{src}: {t.term}: Qur'anic word {hit[0]!r} (a lesson word or its front) cannot be a term")
+            if t.term != "Allah":
+                for latin in {t.head, t.speak} - {t.term} if t.arabic_speak else {t.head, t.speak}:
+                    if ARABIC.search(latin):
+                        continue
+                    # A letter's name is said after "huruf" ("huruf lam"), where the guard allows it.
+                    found = _guard(t.term, ("huruf " if t.letter else "") + fold(latin), forms, captions=False)
+                    if found:
+                        errs.append(f"{src}: {t.term}: {found[0].split(': ', 1)[1]} (in its Latin form {latin!r})")
+        return errs
+
+
+def load_lexicon(path: Path = PRONUNCIATION_JSON) -> Lexicon:
+    return Lexicon(json.loads(path.read_text(encoding="utf-8")), path.name)
+
+
+# A heavy letter (tafkhim) in the lesson's Latin spelling, followed by a (fathah or alif): dh ض,
+# zh ظ, kh خ, gh غ, sh ص, th ط, q ق. eleven_v3 reads these light and inconsistently (operator
+# 2026-10-10, pronunciation rule 2), so a spoken Latin word with one may be RENDERED only from an
+# operator-approved respelling, i.e. as a pronunciation.json `speak` value ("mudhof ilaih",
+# "idhofah"; added only after the operator approves its sound). Until then the line stays
+# caption-only: render_narration.py refuses it, and a line with audio may not contain one.
+HEAVY_LATIN = re.compile(r"(?:dh|zh|kh|gh|sh|th|q)a")
+# Spoken words whose letters only look heavy (decided here, with the reason).
+NOT_HEAVY = {
+    "fathatain": "fat-hatain: ta then ha (فَتْحَتَيْن), not tha'",
+}
+
+
+def heavy_latin(text: str, lex: Lexicon) -> list[str]:
+    """The spoken Latin words of `text` with a heavy letter + a that the dictionary does not
+    respell, in order of first use (dictionary `speak` values are masked first)."""
+    out: list[str] = []
+    for k, _a, _b, orig in tokens(lex.mask_spoken(text)):
+        if k not in NOT_HEAVY and HEAVY_LATIN.search(k) and orig not in out:
+            out.append(orig)
+    return out
+
+
 # ------------------------------------------------------------------ checks
 SLUG_ID = re.compile(
     r"^(?P<slug>[a-z-]+):(?P<ayah>[1-9]\d*):(?P<part>intro|recite|w[1-9]\d*|structure|concept:[a-z0-9-]+"
@@ -356,6 +769,11 @@ SHARED_ID = re.compile(r"^shared:(?P<part>[a-z_]+(?::[a-z-]+:[a-z_]+)?)(?::(?P<s
 HONORIFIC_RE = re.compile("|".join(re.escape(h) for h in HONORIFICS))
 QUOTED = re.compile("“[^”]*”")
 SHA = re.compile(r"^[0-9a-f]{64}$")
+KETUK = re.compile(r"\b(?:ketuk|ketuklah|mengetuk|diketuk|ketukan)\b", re.I)
+REVIEW = re.compile(r"\b(?:ditinjau|direview|ditelaah|ditashih|tinjauan|review|diperiksa ulang)\b", re.I)
+ORDINAL = r"(?:pertama|ke(?:dua|tiga|empat|lima|enam|tujuh|delapan|sembilan|sepuluh|sebelas)(?: belas)?)"
+_ORD = {"pertama": 1, "kedua": 2, "ketiga": 3, "keempat": 4, "kelima": 5, "keenam": 6, "ketujuh": 7,
+        "kedelapan": 8, "kesembilan": 9, "kesepuluh": 10, "kesebelas": 11}
 
 
 def _letter_context(toks, i: int, text: str) -> bool:
@@ -367,27 +785,10 @@ def _letter_context(toks, i: int, text: str) -> bool:
     return False
 
 
-def check_text(lid: str, text, forms: Forms) -> list[str]:
+def _guard(lid: str, text: str, forms: Forms, *, captions: bool) -> list[str]:
+    """No Qur'anic word in any spelling. `captions`: the text keeps its quotes (a caption or the
+    build's prose), so "Allah" inside “…” is the Indonesian translation; spoken text has none."""
     errs: list[str] = []
-    if not isinstance(text, str) or not text.strip():
-        return [f"{lid}: empty text"]
-    if text != text.strip() or "  " in text:
-        errs.append(f"{lid}: stray whitespace")
-    if len(text) > MAX_LINE:
-        errs.append(f"{lid}: {len(text)} characters, more than {MAX_LINE} (split it into :a/:b)")
-    if ARABIC.search(text):
-        errs.append(f"{lid}: Arabic script in narration")
-    if re.search(r"\d", text):
-        errs.append(f"{lid}: digit in narration (spell numbers out)")
-    odd = sorted({c for c in text if not (" " <= c <= "~") and c not in EXTRA_CHARS})
-    if odd:
-        if any(unicodedata.category(c) == "Ll" or unicodedata.category(c) == "Lu" for c in odd) or any(c in APOS for c in odd):
-            errs.append(f"{lid}: transliteration diacritic {''.join(odd)!r} (fold to plain letters)")
-        else:
-            errs.append(f"{lid}: character not allowed {''.join(odd)!r}")
-    for m in re.finditer(r"\b[A-Z]{2,}\b", text):
-        if m.group() not in ACRONYMS:
-            errs.append(f"{lid}: ALL-CAPS word {m.group()!r}")
     honor = [(m.start(), m.end()) for m in HONORIFIC_RE.finditer(text)]
     quoted = [(m.start(), m.end()) for m in QUOTED.finditer(text)]
     inside = lambda spans, a, b: any(s <= a and b <= e for s, e in spans)  # noqa: E731
@@ -397,7 +798,7 @@ def check_text(lid: str, text, forms: Forms) -> list[str]:
         covered.update(range(i, i + n))
         if inside(honor, start, end):
             continue
-        if k == ("allah",) and (inside(quoted, start, end) or text[end:].startswith(" subhanahu wa ta'ala")):
+        if k == ("allah",) and captions and (inside(quoted, start, end) or text[end:].startswith(" subhanahu wa ta'ala")):
             continue
         if k in forms.surah_name_keys and i > 0 and toks[i - 1][0] == "surah":
             continue
@@ -422,9 +823,14 @@ def check_text(lid: str, text, forms: Forms) -> list[str]:
         hit = hit or next((x for x in forms.wasl if len(x) >= 7 and sk.startswith(x[:7])), None)
         if hit:
             errs.append(f"{lid}: Qur'anic phrase {orig!r} (starts with {hit!r}) in narration")
-    # How the narration names words: by their place in THIS ayah, which the screen numbers. A
-    # place in another ayah cannot be found on screen (name it by its meaning instead), a place
-    # inside a place cannot be followed by ear, and the stage shows no word card to point at.
+    return errs
+
+
+def _places(lid: str, text: str) -> list[str]:
+    """How the narration names words: by their place in THIS ayah, which the screen numbers. A
+    place in another ayah cannot be found on screen (name it by its meaning instead), a place
+    inside a place cannot be followed by ear, and the stage shows no word card to point at."""
+    errs = []
     if re.search(rf"\b[Kk]ata {ORDINAL}(?: (?:dan|sampai) {ORDINAL})? (?:di|pada) ayat\b", text):
         errs.append(f"{lid}: names a word of another ayah by its place (say its meaning)")
     if re.search(rf"\b[Kk]ata {ORDINAL} dalam (?:frasa )?kata\b", text):
@@ -436,9 +842,111 @@ def check_text(lid: str, text, forms: Forms) -> list[str]:
     return errs
 
 
-ORDINAL = r"(?:pertama|ke(?:dua|tiga|empat|lima|enam|tujuh|delapan|sembilan|sepuluh|sebelas)(?: belas)?)"
-_ORD = {"pertama": 1, "kedua": 2, "ketiga": 3, "keempat": 4, "kelima": 5, "keenam": 6, "ketujuh": 7,
-        "kedelapan": 8, "kesembilan": 9, "kesepuluh": 10, "kesebelas": 11}
+def _basic(lid: str, text, max_len: int | None, what: str = "text") -> list[str]:
+    if not isinstance(text, str) or not text.strip():
+        return [f"{lid}: empty {what}"]
+    errs = []
+    if text != text.strip() or "  " in text:
+        errs.append(f"{lid}: stray whitespace in {what}")
+    if max_len is not None and len(text) > max_len:
+        errs.append(f"{lid}: {len(text)} characters, more than {max_len} (split it into :a/:b)")
+    return errs
+
+
+def _caps(lid: str, text: str) -> list[str]:
+    return [f"{lid}: ALL-CAPS word {m.group()!r}" for m in re.finditer(r"\b[A-Z]{2,}\b", text) if m.group() not in ACRONYMS]
+
+
+def check_text(lid: str, text, forms: Forms, *, max_len: int | None = MAX_LINE) -> list[str]:
+    """Latin narration prose with its quotes (the build's input to `speech`, or a caption with its
+    dictionary terms masked): no Arabic, digits, diacritics or Qur'anic words; word places."""
+    errs = _basic(lid, text, max_len)
+    if errs and errs[0].endswith("empty text"):
+        return errs
+    if ARABIC.search(text):
+        errs.append(f"{lid}: Arabic script in narration")
+    if re.search(r"\d", text):
+        errs.append(f"{lid}: digit in narration (spell numbers out)")
+    odd = sorted({c for c in text if not (" " <= c <= "~") and c not in EXTRA_CHARS and not ARABIC.match(c)})
+    if odd:
+        if any(unicodedata.category(c) in ("Ll", "Lu") for c in odd) or any(c in APOS for c in odd):
+            errs.append(f"{lid}: transliteration diacritic {''.join(odd)!r} (fold to plain letters)")
+        else:
+            errs.append(f"{lid}: character not allowed {''.join(odd)!r}")
+    errs += _caps(lid, text)
+    errs += _guard(lid, text, forms, captions=True)
+    errs += _places(lid, text)
+    return errs
+
+
+def check_spoken(lid: str, text, forms: Forms, lex: Lexicon) -> list[str]:
+    """The spoken text, exactly as sent to the voice."""
+    errs = _basic(lid, text, MAX_LINE)
+    if errs and errs[0].endswith("empty text"):
+        return errs
+    masked = lex.mask_spoken(text)
+    for w in ARABIC_WORD.findall(masked):
+        if forms.quranic_arabic(w):
+            errs.append(f"{lid}: Qur'anic word {w!r} (Arabic script) in spoken text")
+        else:
+            errs.append(f"{lid}: Arabic script in spoken text that is not a pronunciation-dictionary term: {w!r}")
+    for a, b, t, _cap_ in lex.latin_matches(text):
+        errs.append(f"{lid}: {text[a:b]!r} must be spoken from the pronunciation dictionary ({t.speak})")
+    if re.search(r"\d", text):
+        errs.append(f"{lid}: digit in narration (spell numbers out)")
+    odd = sorted({c for c in ARABIC_WORD.sub(MASK, masked) if c not in SPOKEN_CHARS})
+    if odd:
+        if any(unicodedata.category(c) in ("Ll", "Lu") for c in odd) or any(c in APOS and c != "'" for c in odd):
+            errs.append(f"{lid}: transliteration diacritic {''.join(odd)!r} in spoken text (fold to plain letters)")
+        else:
+            errs.append(f"{lid}: character not allowed in spoken text {''.join(odd)!r} (brackets, quotes, ellipses "
+                        "and dashes are normalised away before the render)")
+    if re.search(r"\w-(?=[\s,.;:!?]|$)", text):
+        errs.append(f"{lid}: spoken text keeps an open prefix")
+    if ".." in text:
+        errs.append(f"{lid}: spoken text keeps an ellipsis (an open phrase cannot be read aloud)")
+    if re.search(r"\b[Dd]i(?=[.;:!?]|$)", text):
+        errs.append(f"{lid}: spoken text ends a phrase on a bare “di” (an open prefix cannot be read aloud)")
+    errs += _caps(lid, text)
+    if KETUK.search(text):
+        errs.append(f"{lid}: say “klik” (klik / mengklik / diklik), not “ketuk”")
+    if re.search(r"\byang berarti\b", text):
+        errs.append(f"{lid}: a meaning is introduced with “yang artinya”, not “yang berarti”")
+    if re.search(r"\bfatwa\b", text, re.I):
+        errs.append(f"{lid}: the narration does not speak of fatwa (the page footer carries the label)")
+    if REVIEW.search(text):
+        errs.append(f"{lid}: promises a human review")
+    errs += _guard(lid, masked, forms, captions=False)
+    errs += _places(lid, masked)
+    return errs
+
+
+def check_display(lid: str, display, text, forms: Forms, lex: Lexicon, focus_ar: str | None) -> list[str]:
+    """The caption: what is spoken, dictionary terms in display form, letters as in the ayah."""
+    errs = _basic(lid, display, None, "display")
+    if errs and errs[0].endswith("empty display"):
+        return errs
+    for t in lex.terms:
+        if t.letter and t.term in display:
+            errs.append(f"{lid}: caption shows the letter {t.head} by its name ({t.term}); show it as in the ayah "
+                        f"({lex.shown_letter(t, focus_ar)})")
+    for m in lex.display_rx.finditer(display):
+        t = lex._groups[m.lastgroup]
+        if t.letter:
+            want = lex.shown_letter(t, focus_ar)
+            got = m.group()[m.group().index("(") + 1:-1]
+            if got != want:
+                errs.append(f"{lid}: caption shows {m.group()!r}; the letter as in the ayah is {want}")
+    masked = lex.mask_display(display)
+    if ARABIC.search(masked):
+        errs.append(f"{lid}: Arabic script in the caption that is not a dictionary display form")
+    errs += [e.replace(" in narration", " in caption") for e in check_text(lid, masked, forms, max_len=None)
+             if not e.endswith("Arabic script in narration")]
+    if isinstance(text, str):
+        said = lex.speech_of_display(display)
+        if said != text:
+            errs.append(f"{lid}: display does not say what is spoken (spoken form of the display: {said!r})")
+    return errs
 
 
 def ordinal_value(word: str) -> int:
@@ -450,8 +958,8 @@ def ordinal_value(word: str) -> int:
 
 def word_places(text: str) -> list[int]:
     """Word places a line names in its own ayah ("kata kedua", "kata ketiga dan keempat", "kata
-    kedua sampai keempat"), in order of first mention; the stage rings them while the line plays.
-    Mirrors wordRefs() in src/lib/autoplay/narration.ts."""
+    kedua sampai keempat"), in order of first mention. Mirrors wordRefs() in
+    src/lib/autoplay/narration.ts."""
     out: list[int] = []
     for m in re.finditer(rf"\b[Kk]ata ({ORDINAL})(?: (dan|sampai) ({ORDINAL}))?\b", text):
         if re.match(r" (?:di|pada) ayat\b", text[m.end():]):
@@ -463,21 +971,47 @@ def word_places(text: str) -> list[int]:
     return out
 
 
-def check_audio(lid: str, audio, manifest_slug: str, voice) -> list[str]:
+def check_audio(lid: str, audio, manifest_slug: str, voice, text) -> list[str]:
     if not isinstance(audio, dict) or set(audio) != {"url", "ms", "sha256"}:
         return [f"{lid}: audio must be exactly {{url, ms, sha256}}"]
     errs = []
     url = audio["url"]
     if not isinstance(url, str) or not url.startswith(MEDIA_PREFIX) or ".." in url or not url.endswith(".mp3"):
         errs.append(f"{lid}: audio url must be an .mp3 under {MEDIA_PREFIX}")
-    elif isinstance(voice, dict) and isinstance(voice.get("name"), str):
-        want = f"{MEDIA_PREFIX}{slugify(voice['name'])}/{manifest_slug}/{media_file(lid)}"
+    elif isinstance(voice, dict) and isinstance(voice.get("name"), str) and isinstance(voice.get("id"), str) \
+            and isinstance(text, str):
+        want = f"{MEDIA_PREFIX}{slugify(voice['name'])}/{manifest_slug}/{audio_name(text, voice['id'])}.mp3"
         if url != want:
-            errs.append(f"{lid}: audio url {url!r} is not {want!r}")
+            errs.append(f"{lid}: audio url {url!r} is not {want!r} (the file is named by the spoken text, voice and "
+                        "settings: a changed line needs a new render)")
     if not isinstance(audio["ms"], int) or isinstance(audio["ms"], bool) or audio["ms"] <= 0:
         errs.append(f"{lid}: audio ms must be a positive integer")
     if not isinstance(audio["sha256"], str) or not SHA.match(audio["sha256"]):
         errs.append(f"{lid}: audio sha256 must be 64 lower-case hex characters")
+    return errs
+
+
+def check_tokens(lid: str, toks, audio, text, lex: Lexicon, focus_ar: str | None) -> list[str]:
+    if not isinstance(toks, list) or not toks:
+        return [f"{lid}: tokens must be a non-empty list of {{t, s, e}}"]
+    errs = []
+    num = lambda x: isinstance(x, (int, float)) and not isinstance(x, bool)  # noqa: E731
+    prev = 0.0
+    for i, tk in enumerate(toks):
+        if not isinstance(tk, dict) or set(tk) != {"t", "s", "e"} or not isinstance(tk["t"], str) or not tk["t"].strip() \
+                or tk["t"] != tk["t"].strip() or not num(tk["s"]) or not num(tk["e"]):
+            return errs + [f"{lid}: token {i} must be {{t: text, s: start, e: end}}"]
+        if tk["s"] < 0 or tk["e"] < tk["s"]:
+            errs.append(f"{lid}: token {i} ({tk['t']!r}) ends before it starts")
+        if tk["s"] < prev:
+            errs.append(f"{lid}: token {i} ({tk['t']!r}) starts before the token before it")
+        prev = tk["s"]
+    if isinstance(audio, dict) and isinstance(audio.get("ms"), int) and toks[-1]["e"] > audio["ms"] / 1000 + 0.5:
+        errs.append(f"{lid}: tokens run past the end of the audio")
+    if isinstance(text, str):
+        joined, want = " ".join(tk["t"] for tk in toks), lex.render_display(text, focus_ar)
+        if joined != want:
+            errs.append(f"{lid}: tokens do not join to the display rendering of the spoken text ({joined!r} ≠ {want!r})")
     return errs
 
 
@@ -504,7 +1038,28 @@ def _split_groups(ids: list[str], rx: re.Pattern, name: str) -> tuple[dict[str, 
     return groups, errs
 
 
-def check_manifest(name: str, man, forms: Forms, lesson: dict | None, library: dict) -> list[str]:
+LINE_KEYS = {"text", "display", "highlight", "focus"}
+LINE_OPTIONAL = {"audio", "tokens"}
+
+
+def check_view(lid: str, line: dict, ayah: dict | None, part: str) -> list[str]:
+    errs = []
+    hl, focus = line.get("highlight"), line.get("focus")
+    n = len(ayah["words"]) if ayah else 0
+    if not isinstance(hl, list) or not all(isinstance(x, int) and not isinstance(x, bool) for x in hl):
+        return [f"{lid}: highlight must be a list of word numbers"]
+    if hl != sorted(set(hl)) or (0 in hl and hl != [0]) or any(x < 0 or x > n for x in hl):
+        errs.append(f"{lid}: highlight {hl} must be [0] (the whole ayah), [] or word numbers 1–{n} in order")
+    if focus is not None and (not isinstance(focus, str) or not ayah or focus not in {w["loc"] for w in ayah["words"]}):
+        errs.append(f"{lid}: focus {focus!r} is not a word of this ayah")
+    want_hl, want_focus = line_view(ayah, part)
+    if not errs and (hl != want_hl or focus != want_focus):
+        errs.append(f"{lid}: highlight/focus {hl}/{focus!r} is not what the stage shows for this step "
+                    f"({want_hl}/{want_focus!r})")
+    return errs
+
+
+def check_manifest(name: str, man, forms: Forms, lesson: dict | None, library: dict, lex: Lexicon) -> list[str]:
     errs: list[str] = []
     if not isinstance(man, dict) or set(man) != {"version", "voice", "lines"}:
         return [f"{name}: manifest must be exactly {{version, voice, lines}}"]
@@ -524,19 +1079,36 @@ def check_manifest(name: str, man, forms: Forms, lesson: dict | None, library: d
     rx = SHARED_ID if name == "shared" else SLUG_ID
     groups, gerrs = _split_groups(list(lines), rx, name)
     errs += gerrs
+    ayat = {a["ayah"]: a for a in lesson["ayat"]} if lesson else {}
     for lid, line in lines.items():
-        if not isinstance(line, dict) or "text" not in line or set(line) - {"text", "audio"}:
-            errs.append(f"{lid}: a line is {{text, audio?}}")
+        if not isinstance(line, dict) or not LINE_KEYS <= set(line) or set(line) - LINE_KEYS - LINE_OPTIONAL:
+            errs.append(f"{lid}: a line is {{text, display, highlight, focus, audio?, tokens?}}")
             continue
-        if name != "shared":
-            m = SLUG_ID.match(lid)
-            if m and m.group("slug") != slug:
+        m = rx.match(lid)
+        ayah, part = None, (m.group("part") if m else "")
+        if name != "shared" and m:
+            if m.group("slug") != slug:
                 errs.append(f"{lid}: id belongs to {m.group('slug')!r}, not {slug!r}")
-        errs += check_text(lid, line["text"], forms)
+            ayah = ayat.get(int(m.group("ayah")))
+        focus_ar = forms.word_ar.get(line["focus"]) if isinstance(line.get("focus"), str) else None
+        errs += check_spoken(lid, line["text"], forms, lex)
+        errs += check_display(lid, line["display"], line["text"], forms, lex, focus_ar)
+        if m and (name == "shared" or ayah is not None):
+            errs += check_view(lid, line, ayah, part)
         if "audio" in line:
             if voice is None:
                 errs.append(f"{lid}: audio present but the manifest names no voice")
-            errs += check_audio(lid, line["audio"], slug, voice)
+            if isinstance(line["text"], str):
+                for w in heavy_latin(line["text"], lex):
+                    errs.append(f"{lid}: rendered with {w!r}, a heavy letter + a with no approved respelling in "
+                                "pronunciation.json")
+            errs += check_audio(lid, line["audio"], slug, voice, line["text"])
+            if "tokens" not in line:
+                errs.append(f"{lid}: audio without tokens (render with /with-timestamps)")
+        if "tokens" in line:
+            if "audio" not in line:
+                errs.append(f"{lid}: tokens without audio")
+            errs += check_tokens(lid, line["tokens"], line.get("audio"), line["text"], lex, focus_ar)
     # coverage
     if name == "shared":
         want = {f"shared:{k}" for k in expected_shared()}
@@ -552,31 +1124,39 @@ def check_manifest(name: str, man, forms: Forms, lesson: dict | None, library: d
             errs.append(f"{name}: missing line {lid}")
         for lid in sorted(have - want):
             errs.append(f"{name}: unexpected line {lid}")
-        errs += check_content(name, lines, lesson)
+        errs += check_content(name, lines, lesson, lex)
     return errs
 
 
-def _text_of(lines: dict, base: str) -> str:
+def _field_of(lines: dict, base: str, field: str) -> str:
+    """A line's field, its split parts joined."""
     if base in lines:
-        return lines[base].get("text", "") if isinstance(lines[base], dict) else ""
-    parts = [lines[k].get("text", "") for k in sorted(lines) if k.startswith(base + ":") and len(k) == len(base) + 2
+        return str(lines[base].get(field, "")) if isinstance(lines[base], dict) else ""
+    parts = [str(lines[k].get(field, "")) for k in sorted(lines) if k.startswith(base + ":") and len(k) == len(base) + 2
              and isinstance(lines[k], dict)]
     return " ".join(parts)
 
 
-def check_content(name: str, lines: dict, lesson: dict) -> list[str]:
-    """The intro reads the ayah's translation and each w${n} line gives the word's gloss."""
+def _says(text: str, phrase: str) -> bool:
+    """`phrase`'s words, in order and contiguous, among the words of `text`."""
+    t, p = keys_of(text), keys_of(phrase)
+    return bool(p) and any(t[i:i + len(p)] == p for i in range(len(t) - len(p) + 1))
+
+
+def check_content(name: str, lines: dict, lesson: dict, lex: Lexicon) -> list[str]:
+    """The intro reads the ayah's translation and each w${n} line gives the word's gloss (in the
+    caption in quotes, in the spoken text as said); no line names a place past the ayah's words."""
     errs = []
     for a in lesson["ayat"]:
         base = f"{lesson['slug']}:{a['ayah']}"
-        intro = _text_of(lines, f"{base}:intro")
         tr = fold(spoken_translation(a["translation"]["text"]))
-        if intro and f"“{tr}”" not in intro:
+        shown, said = _field_of(lines, f"{base}:intro", "display"), _field_of(lines, f"{base}:intro", "text")
+        if (shown and f"“{tr}”" not in shown) or (said and not _says(said, lex.speech_of_display(tr))):
             errs.append(f"{base}:intro: does not read the translation “{tr}”")
         for i, w in enumerate(a["words"], 1):
-            txt = _text_of(lines, f"{base}:w{i}")
             g = fold(w["gloss"])
-            if txt and f"“{g}”" not in txt:
+            shown, said = _field_of(lines, f"{base}:w{i}", "display"), _field_of(lines, f"{base}:w{i}", "text")
+            if (shown and f"“{g}”" not in shown) or (said and not _says(said, lex.speech_of_display(g))):
                 errs.append(f"{base}:w{i}: does not give the gloss “{g}”")
         n = len(a["words"])
         for lid in lines:
@@ -604,40 +1184,45 @@ def check_guide_ts() -> list[str]:
     return errs
 
 
-def check_build(manifests: dict[str, dict], lessons: dict[str, dict], library: dict) -> list[str]:
-    """Manifest text == a fresh build, and the speech text is clean."""
+_BUILDS: dict[str, dict | str] = {}
+
+
+def check_build(manifests: dict[str, dict], lessons: dict[str, dict], library: dict, lex: Lexicon) -> list[str]:
+    """Every line equals a fresh build (text, display, highlight, focus), and nothing else is there."""
     import build_narration as B  # local import: build_narration imports this module
 
     errs = []
-    want = B.build_texts(lessons, library)
+    # The build depends only on the lessons, the library and the dictionary (not on the manifests):
+    # one build per distinct input (the mutation tests check many manifest copies against one).
+    key = hashlib.sha256(json.dumps([lessons, library, [(t.term, t.speak, t.display) for t in lex.terms]],
+                                    sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()
+    if key not in _BUILDS:
+        try:
+            _BUILDS[key] = B.build_lines(lessons, library, lex)
+        except SystemExit as e:
+            _BUILDS[key] = f"build_narration.py fails: {e}"
+    want = _BUILDS[key]
+    if isinstance(want, str):
+        return [want]
     for name, lines in want.items():
         man = manifests.get(name)
         got = man.get("lines", {}) if isinstance(man, dict) else {}
         if not isinstance(got, dict):
             continue
-        for lid, text in lines.items():
-            line = got.get(lid)
-            if isinstance(line, dict) and line.get("text") != text:
-                errs.append(f"{lid}: text is out of date with build_narration.py (rebuild, do not hand-edit)")
+        for lid, line in lines.items():
+            have = got.get(lid)
+            if isinstance(have, dict) and any(have.get(k) != line[k] for k in LINE_KEYS):
+                errs.append(f"{lid}: line is out of date with build_narration.py (rebuild, do not hand-edit)")
         for lid in set(got) - set(lines):
             errs.append(f"{lid}: not produced by build_narration.py")
-    for name, man in manifests.items():
-        for lid, line in (man.get("lines") or {}).items() if isinstance(man, dict) else ():
-            if not isinstance(line, dict) or not isinstance(line.get("text"), str):
-                continue
-            tts = B.tts_text(line["text"])
-            if re.search(r"\d", tts) or ARABIC.search(tts) or re.search("[()\"“”\\[\\]]", tts):
-                errs.append(f"{lid}: speech text keeps a digit, Arabic, bracket or quote: {tts!r}")
-            if "…" in tts or re.search(r"\w-(?=[\s,.;:!?]|$)", tts):
-                errs.append(f"{lid}: speech text keeps an ellipsis or an open prefix: {tts!r}")
-            if len(tts) > TTS_MAX:
-                errs.append(f"{lid}: speech text longer than {TTS_MAX} characters")
     return errs
 
 
-def check(manifests: dict[str, dict], lessons: dict[str, dict], library: dict, *, build: bool = True) -> list[str]:
+def check(manifests: dict[str, dict], lessons: dict[str, dict], library: dict, *, build: bool = True,
+          lex: Lexicon | None = None) -> list[str]:
     forms = Forms(lessons)
-    errs: list[str] = []
+    lex = lex or load_lexicon()
+    errs: list[str] = lex.problems(forms)
     for sp in SURAHS:
         if sp.slug in lessons and sp.slug not in manifests:
             errs.append(f"{sp.slug}: narration manifest missing")
@@ -647,10 +1232,10 @@ def check(manifests: dict[str, dict], lessons: dict[str, dict], library: dict, *
         if name != "shared" and name not in lessons:
             errs.append(f"{name}: narration manifest for a surah without a lesson")
             continue
-        errs += check_manifest(name, man, forms, lessons.get(name), library)
+        errs += check_manifest(name, man, forms, lessons.get(name), library, lex)
     errs += check_guide_ts()
     if build:
-        errs += check_build(manifests, lessons, library)
+        errs += check_build(manifests, lessons, library, lex)
     return errs
 
 
@@ -664,6 +1249,18 @@ def load_all() -> tuple[dict[str, dict], dict[str, dict], dict]:
     return manifests, lessons, library
 
 
+def pending_respellings(manifests: dict[str, dict], lex: Lexicon) -> dict[str, list[str]]:
+    """Heavy-letter words (heavy_latin) → the lines without audio that speak them: what the
+    operator has to approve a respelling for before those lines can be rendered."""
+    out: dict[str, list[str]] = {}
+    for man in manifests.values():
+        for lid, line in (man.get("lines") or {}).items() if isinstance(man, dict) else ():
+            if isinstance(line, dict) and "audio" not in line and isinstance(line.get("text"), str):
+                for w in heavy_latin(line["text"], lex):
+                    out.setdefault(key(w), []).append(lid)
+    return out
+
+
 def main() -> int:
     manifests, lessons, library = load_all()
     errs = check(manifests, lessons, library)
@@ -671,7 +1268,13 @@ def main() -> int:
         lines = man.get("lines", {}) if isinstance(man, dict) else {}
         n_audio = sum(1 for x in lines.values() if isinstance(x, dict) and "audio" in x)
         chars = sum(len(x.get("text", "")) for x in lines.values() if isinstance(x, dict))
-        print(f"{name:12s} {len(lines):4d} lines  {chars:6d} chars  {n_audio:4d} with audio")
+        print(f"{name:12s} {len(lines):4d} lines  {chars:6d} spoken chars  {n_audio:4d} with audio")
+    pending = pending_respellings(manifests, load_lexicon())
+    if pending:
+        n = len({lid for ids in pending.values() for lid in ids})
+        print(f"\nnot renderable yet: {n} lines speak a heavy letter + a with no approved respelling "
+              "(render_narration.py refuses them until pronunciation.json has one):")
+        print("  " + ", ".join(f"{w} ×{len(ids)}" for w, ids in sorted(pending.items(), key=lambda x: -len(x[1]))))
     if errs:
         print(f"\nFAIL: {len(errs)} problem(s)")
         for e in errs:

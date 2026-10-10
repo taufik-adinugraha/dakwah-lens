@@ -1,3 +1,5 @@
 # Downloaded inputs. Re-create with `python3 fetch.py`; integrity is pinned in sources.json.
 cache/
 __pycache__/
+# Rendered narration audio for upload (render_narration.py); the manifests carry url/ms/sha256.
+out/

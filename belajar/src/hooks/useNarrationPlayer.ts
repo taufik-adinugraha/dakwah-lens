@@ -49,6 +49,8 @@ function narrationAudio(): HTMLAudioElement {
  *   never played.
  * - `owns(el)` tells whether an audio element is this narration's, for
  *   telling the lesson's own sound from the learner's.
+ * - `positionMs()` is the playing file's position (for the karaoke caption,
+ *   polled once a frame while a line plays).
  * - One narration at a time on a page (the lesson stage's).
  *
  * Narration audio exists only once the operator approved a voice and the
@@ -139,5 +141,12 @@ export function useNarrationPlayer() {
 
   const owns = useCallback((el: unknown) => el !== null && el === audioRef.current, []);
 
-  return { play, preload, owns };
+  /** Where the file playing now is, in ms (null when none plays): read
+   *  from requestAnimationFrame by the karaoke caption, never in render. */
+  const positionMs = useCallback((): number | null => {
+    const a = audioRef.current;
+    return a && handlersRef.current && !a.paused ? a.currentTime * 1000 : null;
+  }, []);
+
+  return { play, preload, owns, positionMs };
 }

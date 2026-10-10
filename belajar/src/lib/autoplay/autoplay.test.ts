@@ -18,7 +18,17 @@ import {
   type AutoplayEvent,
   type AutoplayState,
 } from "./machine";
-import { lineSegments, quranTokenSet, spokenTextProblems, wordRefs } from "./narration";
+import {
+  captionArabicProblems,
+  lineDisplay,
+  lineSegments,
+  parseNarrationManifest,
+  parsePronunciation,
+  quranTokenSet,
+  spokenTextProblems,
+  withoutArabic,
+  wordRefs,
+} from "./narration";
 import {
   autoplayStorageKey,
   markContinue,
@@ -457,7 +467,7 @@ describe("autoplay exercises: the learner only answers", () => {
     return r;
   };
 
-  it("Dengar dan ketuk: the lesson's imam recites the question's word, then reports it heard", () => {
+  it("Dengar dan klik: the lesson's imam recites the question's word, then reports it heard", () => {
     const seq = seqFor("al-fatihah", 2);
     const r = waitingAt(seq);
     expect(seq.steps[r.s.idx].exercise?.key).toBe("tap-word");
@@ -677,7 +687,7 @@ describe("narration ids and the spoken-text guard", () => {
     expect(spokenTextProblems("Kata الحمد ini.", tokens)).toContain("Arabic script");
     expect(spokenTextProblems("Ada 4 kata.", tokens)).toContain("digits (spell numbers out)");
     expect(spokenTextProblems("Allah SWT berfirman.", tokens).join(" ")).toMatch(/ALL CAPS: SWT/);
-    expect(spokenTextProblems("Coba kamu ketuk.", tokens).join(" ")).toMatch(/kamu/);
+    expect(spokenTextProblems("Coba kamu klik.", tokens).join(" ")).toMatch(/kamu/);
     // Other spellings and endings of the lesson words, and words run together.
     for (const t of [
       "Qul huwallahu ahad.",
@@ -706,6 +716,189 @@ describe("narration ids and the spoken-text guard", () => {
     ]) {
       expect(spokenTextProblems(t, tokens), t).toEqual([]);
     }
+  });
+});
+
+describe("replay (↺ Ulangi langkah ini)", () => {
+  it("plays the current step again from its start, also from a pause, and plays on", () => {
+    const seq = seqFor("al-fatihah", 2);
+    const r = runner(seq);
+    const at = firstIdx(seq, "structure");
+    r.send({ type: "start", from: at, reason: "continue" });
+    const first = r.s.activity;
+    expect(first?.kind).toBe("read");
+    // Read on a little (a long structure line has several parts), then replay.
+    r.send(end(r.s.activity!));
+    r.send({ type: "replay" });
+    expect(r.s.idx).toBe(at);
+    expect(r.s.phase).toBe("running");
+    expect(r.s.part).toBe(0);
+    expect(r.s.activity).toMatchObject({ kind: "read", ms: first?.kind === "read" ? first.ms : -1 });
+    expect(r.s.activity!.token).toBeGreaterThan(first!.token);
+    // From a pause: it plays (no "Kita lanjutkan" first), from the start.
+    r.send({ type: "pause" });
+    expect(r.s.phase).toBe("paused");
+    r.send({ type: "replay" });
+    expect(r.s.phase).toBe("running");
+    expect(r.s.caption).toEqual({ c: 0 });
+    expect(r.s.part).toBe(0);
+  });
+
+  it("replays a recitation step with the imam from the start, and does nothing before the start or after the end", () => {
+    const seq = seqFor("al-fatihah", 2);
+    const r = runner(seq);
+    r.send({ type: "start", from: 1, reason: "continue" });
+    expect(r.s.activity).toMatchObject({ kind: "recite", target: "ayah", resume: false });
+    r.send({ type: "pause" });
+    r.send({ type: "replay" });
+    expect(r.s.activity).toMatchObject({ kind: "recite", target: "ayah", resume: false });
+    const idle = createAutoplayState(seq);
+    expect(reduceAutoplay(seq, idle, { type: "replay" })).toBe(idle);
+    const finished = { ...createAutoplayState(seq), started: true, phase: "finished" as const, intent: seq.nav };
+    expect(reduceAutoplay(seq, finished, { type: "replay" })).toBe(finished);
+  });
+
+  it("starts an exercise over at its first control", () => {
+    const seq = seqFor("al-fatihah", 2);
+    const r = runner(seq);
+    const at = firstIdx(seq, "exercise");
+    const key = seq.steps[at].exercise!.key;
+    const parts = seq.steps[at].exercise!.parts;
+    r.send({ type: "start", from: at, reason: "continue" });
+    r.send({ type: "exercise_guide", target: `exercise:${key}:${parts[1]}` });
+    expect(r.s.exercise?.part).toBe(parts[1]);
+    r.send({ type: "replay" });
+    expect(r.s.idx).toBe(at);
+    expect(r.s.exercise?.part).toBe(parts[0]);
+    expect(r.s.exercise?.reminders).toBe(0);
+    expect(r.s.lastPart[key]).toBeUndefined();
+    // It opens with the exercise's introduction again.
+    expect(r.s.caption).toEqual({ c: 0 });
+  });
+});
+
+describe("the manifest contract (display, highlight, focus, tokens)", () => {
+  const audio = { url: "/belajar/media/narration/kang-nandar/al-fatihah/al-fatihah__1__w1.mp3", ms: 4000, sha256: "c".repeat(64) };
+
+  it("reads display, highlight, focus and tokens, and refuses malformed ones", () => {
+    const ok = parseNarrationManifest({
+      version: 1,
+      voice: { id: "aK834gEOxQEtviMPgurT", name: "Kang Nandar", model: "eleven_v3" },
+      lines: {
+        "al-fatihah:1:w1": {
+          text: "Akhirnya dibaca كَسْرَة.",
+          display: "Akhirnya dibaca kasrah (كَسْرَة).",
+          highlight: [1],
+          focus: "1:1:1",
+          audio,
+          tokens: [
+            { t: "Akhirnya", s: 0, e: 0.4 },
+            { t: "dibaca", s: 0.5, e: 0.9 },
+            { t: "kasrah (كَسْرَة).", s: 1, e: 1.6 },
+          ],
+        },
+      },
+    });
+    expect(ok.problems).toEqual([]);
+    expect(ok.manifest?.lines["al-fatihah:1:w1"].focus).toBe("1:1:1");
+    expect(lineDisplay(ok.manifest, "al-fatihah:1:w1")).toBe("Akhirnya dibaca kasrah (كَسْرَة).");
+    expect(lineSegments(ok.manifest, "al-fatihah:1:w1")[0].words).toEqual([
+      ["Akhirnya", 0, 400],
+      ["dibaca", 500, 900],
+      ["kasrah (كَسْرَة).", 1000, 1600],
+    ]);
+    const bad = parseNarrationManifest({
+      version: 1,
+      voice: null,
+      lines: {
+        "a:1:intro": { text: "x", display: "" },
+        "a:1:recite": { text: "x", highlight: [1.5] },
+        "a:1:w1": { text: "x", focus: "kata pertama" },
+        "a:1:w2": { text: "x", tokens: [{ t: "x", s: 0, e: 1 }] },
+        "a:1:w3": { text: "x", audio, tokens: [{ t: "x", s: 1, e: 0.5 }] },
+      },
+    });
+    expect(bad.problems.join("\n")).toMatch(/a:1:intro: display/);
+    expect(bad.problems.join("\n")).toMatch(/a:1:recite: highlight/);
+    expect(bad.problems.join("\n")).toMatch(/a:1:w1: focus/);
+    expect(bad.problems.join("\n")).toMatch(/a:1:w2: tokens without audio/);
+    expect(bad.problems.join("\n")).toMatch(/a:1:w3: tokens must be/);
+  });
+
+  it("takes the caption from the display, the marks from highlight / focus", () => {
+    const narration: NarrationManifest = {
+      version: 1,
+      voice: null,
+      lines: {
+        "al-fatihah:2:intro": { text: "Ayat kedua.", display: "Ayat kedua.", highlight: [0] },
+        "al-fatihah:2:w1": { text: "Kata pertama.", display: "Kata pertama, idhafah (إِضَافَة).", highlight: [1, 2], focus: "1:2:1" },
+      },
+    };
+    const seq = seqFor("al-fatihah", 2, { narration });
+    const intro = seq.steps[0].cues[0];
+    expect(intro.highlight).toEqual([1, 2, 3, 4]);
+    const w1 = seq.steps.find((x) => x.id === "w1")!.cues[0];
+    expect(w1.caption).toBe("Kata pertama, idhafah (إِضَافَة).");
+    expect(w1.highlight).toEqual([1, 2]);
+    expect(w1.focus).toBe(1);
+    // A line the manifest lacks keeps the engine's caption (no Arabic).
+    const w2 = seq.steps.find((x) => x.id === "w2")!.cues[0];
+    expect(w2.display).toBeNull();
+    expect(w2.caption).not.toMatch(/[\u0600-\u06FF]/);
+  });
+});
+
+describe("the pronunciation dictionary", () => {
+  const dictFile = join(CONTENT, "../pipeline/authored/pronunciation.json");
+  const real = existsSync(dictFile) ? parsePronunciation(JSON.parse(readFileSync(dictFile, "utf8"))) : null;
+  const term = (t: string, speak: string, display: string) => ({ term: t, speak, display });
+  const dict = {
+    terms: [
+      term("كَسْرَة", "كَسْرَة", "kasrah (كَسْرَة)"),
+      term("حَرْف جَرّ", "حَرْف جَرّ", "huruf jar (حَرْف جَرّ)"),
+      term("حَرْف", "حَرْف", "huruf (حَرْف)"),
+      term("بَاء", "بَاء", "ba’ (بِ)"),
+      term("إِضَافَة", "idhofah", "idhafah (إِضَافَة)"),
+      term("Allah", "Alloh", "Allah"),
+    ],
+  };
+  const guard = quranTokenSet(input.surahs.flatMap((s) => s.ayat.flatMap((a) => a.words.map((w) => w.translit))));
+
+  it("the operator's dictionary reads without problems, and has no term that is a word of the lessons", () => {
+    expect(real?.problems ?? []).toEqual([]);
+    expect(real?.dict?.terms.some((t) => t.speak === "عَلَى")).not.toBe(true);
+  });
+
+  it("refuses a heavy letter before fathah/alif spoken from Arabic script", () => {
+    const r = parsePronunciation({ terms: [term("ضَمَّة", "ضَمَّة", "dhammah (ضَمَّة)"), term("ضَمِير", "dhomir", "dhamir (ضَمِير)")] });
+    expect(r.problems.join(" ")).toMatch(/ضَمَّة.*respelling/);
+    expect(r.problems.join(" ")).not.toMatch(/ضَمِير/);
+  });
+
+  it("allows Arabic in spoken text only as a dictionary term", () => {
+    expect(spokenTextProblems("Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu huruf بَاء.", guard, dict)).toEqual([]);
+    expect(spokenTextProblems("Sandaran ini disebut idhofah, seperti nama Alloh.", guard, dict)).toEqual([]);
+    expect(spokenTextProblems("Kata الحمد ini.", guard, dict)).toContain("Arabic script outside the pronunciation dictionary");
+    // A term glued into a longer Arabic word is not the term.
+    expect(spokenTextProblems("Ini حَرْفِيّ.", guard, dict)).toContain("Arabic script outside the pronunciation dictionary");
+    // Without the dictionary any Arabic is refused.
+    expect(spokenTextProblems("Akhirnya dibaca كَسْرَة.", guard)).toContain("Arabic script");
+  });
+
+  it("captions show a dictionary display form or the lesson's own Arabic, never a spoken-only form", () => {
+    const allowed = [...dict.terms.map((t) => t.display), "بِسْمِ", "ٱللَّهِ"].join(" | ");
+    expect(captionArabicProblems("Akhirnya kasrah (كَسْرَة), huruf jar (حَرْف جَرّ) ba’ (بِ).", dict, allowed)).toEqual([]);
+    expect(captionArabicProblems("Kata pertama: بِسْمِ.", dict, allowed)).toEqual([]);
+    expect(captionArabicProblems("huruf بَاء", dict, allowed).join(" ")).toMatch(/spoken-only/);
+    expect(captionArabicProblems("kata الرحمن", dict, allowed).join(" ")).toMatch(/neither the dictionary nor the lesson/);
+    expect(captionArabicProblems("tanpa huruf Arab", null, allowed)).toEqual([]);
+  });
+
+  it("drops the Arabic for a screen reader", () => {
+    expect(withoutArabic("Akhirnya kasrah (كَسْرَة), karena didahului huruf jar (حَرْف جَرّ) ba’ (بِ).")).toBe(
+      "Akhirnya kasrah, karena didahului huruf jar ba’.",
+    );
+    expect(withoutArabic("Tanpa Arab.")).toBe("Tanpa Arab.");
   });
 });
 
