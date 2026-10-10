@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useId, useRef, useState } from "react";
 
 import { AccountChip } from "@/components/AccountChip";
+import { MixedText } from "@/components/library/MixedText";
 import { TextSizeOptions } from "@/components/TextSizeSwitch";
 import { Link, usePathname } from "@/i18n/navigation";
 import { conceptIndexHref, creditsHref } from "@/lib/routes";
@@ -160,7 +161,10 @@ export function HeaderControls({ locale }: { locale: string }) {
                     prefix /belajar and soft-navigate across apps). */}
                 <a href={`/${locale}`} className="menu-row">
                   <ArrowLeft aria-hidden className="h-5 w-5 shrink-0 text-forest" />
-                  {t("back_to_main")}
+                  {/* "Dakwah-Lens" is never cut at its hyphen (line breaks, 2026-10-10). */}
+                  <span>
+                    <MixedText text={t("back_to_main")} />
+                  </span>
                 </a>
               </li>
               <li>

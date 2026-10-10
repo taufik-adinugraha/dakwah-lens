@@ -16,6 +16,7 @@ import { LessonStage, WordListenButton } from "@/components/lesson/LessonStage";
 import { MaterialsDisclosure } from "@/components/lesson/MaterialsDisclosure";
 import { WordCard } from "@/components/lesson/WordCard";
 import { ConceptCard } from "@/components/library/ConceptCard";
+import { MixedText } from "@/components/library/MixedText";
 import { SourceList } from "@/components/library/SourceList";
 import { StructureSection } from "@/components/library/StructureSection";
 import { FactCard } from "@/components/surah/FactCard";
@@ -160,19 +161,27 @@ export default async function AyahPage({
   };
   const hasDeeper = !!a.structure || introduced.length > 0 || !!a.tafsir || facts.length > 0;
 
+  // Through MixedText (line breaks, operator 2026-10-10): the quotes and a
+  // footnote mark stay on their word ("pembalasan.[1]”"), "orang-orang" and
+  // "Al-Qur'an" are never cut, and neither " - " nor " · " starts a line.
   const translation = (
     <figure>
-      <blockquote className="text-pretty text-base text-ink">“{a.translation.text}”</blockquote>
+      <blockquote className="text-pretty text-base text-ink">
+        <MixedText text={`“${a.translation.text}”`} />
+      </blockquote>
       {a.translation.footnotes.length > 0 && (
         <ul className="mt-3 space-y-1 text-sm text-ink-muted">
           {a.translation.footnotes.map((f) => (
-            <li key={f}>{f}</li>
+            <li key={f}>
+              <MixedText text={f} />
+            </li>
           ))}
         </ul>
       )}
       <figcaption className="mt-2 text-xs text-ink-soft">
-        {a.translation.source_label}
-        {a.translation.version ? ` · ${a.translation.version}` : ""}
+        <MixedText
+          text={`${a.translation.source_label}${a.translation.version ? ` · ${a.translation.version}` : ""}`}
+        />
       </figcaption>
     </figure>
   );
@@ -184,7 +193,7 @@ export default async function AyahPage({
         {/* 1. Where am I: one way back, one short title. */}
         <BackLink href={surahHref(s.slug)} label={s.name_id} hint={t("back_to_surah")} />
         <h1 className="mt-2 text-balance font-display text-3xl font-medium">
-          {s.name_id} · {t("ayah_of", { n: a.ayah, total: s.ayat.length })}
+          <MixedText text={`${s.name_id} · ${t("ayah_of", { n: a.ayah, total: s.ayat.length })}`} />
         </h1>
 
         {/* 2. The stage: ayah, translation and the autoplay lesson — one
@@ -323,7 +332,9 @@ export default async function AyahPage({
 
                   {a.tafsir && (
                     <Deeper title={t("tafsir_heading")}>
-                      <p className="max-w-prose text-pretty text-base text-ink">{a.tafsir.text}</p>
+                      <p className="max-w-prose text-pretty text-base text-ink">
+                        <MixedText text={a.tafsir.text} />
+                      </p>
                       <p className="mt-4 text-sm font-semibold text-ink">
                         {tw("sources")} ({a.tafsir.sources.length})
                       </p>

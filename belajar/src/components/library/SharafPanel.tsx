@@ -33,7 +33,9 @@ export function SharafPanel({
   return (
     <details open={defaultOpen} className="mt-3 rounded-xl border border-hairline bg-white">
       <summary className="disclosure-row px-4 text-ink">
-        <span>{labels.heading}</span>
+        <span>
+          <MixedText text={labels.heading} />
+        </span>
         <ChevronDown aria-hidden="true" className="chev h-5 w-5 shrink-0 text-ink-muted" />
       </summary>
       <div className="space-y-5 px-4 pb-4">
@@ -47,7 +49,7 @@ export function SharafPanel({
                 {lexeme.tashrif.forms.map((f) => (
                   <tr key={f.label} className="border-t border-hairline first:border-t-0">
                     <th scope="row" className="py-2 pr-3 text-left text-sm font-normal text-ink-muted">
-                      {f.label}
+                      <MixedText text={f.label} />
                     </th>
                     <td lang="ar" dir="rtl" className="arabic-inline py-1 text-right text-ar-sm text-ink">
                       {f.ar}
@@ -56,7 +58,9 @@ export function SharafPanel({
                 ))}
               </tbody>
             </table>
-            <p className="mt-2 text-sm text-ink-muted">{labels.forms_note}</p>
+            <p className="mt-2 text-sm text-ink-muted">
+              <MixedText text={labels.forms_note} />
+            </p>
           </div>
         )}
         {lexeme.ilal.length > 0 && (
@@ -65,16 +69,23 @@ export function SharafPanel({
             <ul className="mt-2 space-y-4">
               {lexeme.ilal.map((x) => (
                 <li key={`${x.from}-${x.to}`}>
+                  {/* Two groups that wrap as wholes: "asal <form> →" and "menjadi
+                      <form>", so the arrow never starts a row and a label never
+                      sits a row away from its form (line breaks, 2026-10-10). */}
                   <p className="flex flex-wrap items-baseline gap-x-2 text-sm text-ink-muted">
-                    <span>{labels.ilal_from}</span>
-                    <bdi lang="ar" dir="rtl" className="arabic-inline text-ar-sm text-ink">
-                      {x.from}
-                    </bdi>
-                    <span aria-hidden="true">→</span>
-                    <span>{labels.ilal_to}</span>
-                    <bdi lang="ar" dir="rtl" className="arabic-inline text-ar-sm text-ink">
-                      {x.to}
-                    </bdi>
+                    <span className="inline-flex items-baseline gap-x-2">
+                      <span>{labels.ilal_from}</span>
+                      <bdi lang="ar" dir="rtl" className="arabic-inline text-ar-sm text-ink">
+                        {x.from}
+                      </bdi>
+                      <span aria-hidden="true">→</span>
+                    </span>
+                    <span className="inline-flex items-baseline gap-x-2">
+                      <span>{labels.ilal_to}</span>
+                      <bdi lang="ar" dir="rtl" className="arabic-inline text-ar-sm text-ink">
+                        {x.to}
+                      </bdi>
+                    </span>
                   </p>
                   <p className="mt-1 text-pretty text-base text-ink-muted">
                     <MixedText text={x.rule} />

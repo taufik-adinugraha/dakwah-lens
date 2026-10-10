@@ -88,6 +88,42 @@
     font-size: var(--text-base);
     line-height: var(--text-base--line-height);
   }
+  /* No word left alone on a paragraph's last line, no heading with one long
+     and one short line (line breaks, operator 2026-10-10). Base layer: a
+     text-* or whitespace-* utility on the element still wins. */
+  p,
+  li,
+  dd,
+  dt,
+  blockquote,
+  figcaption,
+  summary,
+  label,
+  td,
+  th {
+    text-wrap: pretty;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+  /* Arabic is never cut inside a word (a cut would also break its letter
+     joining) and never hyphenated; inline Arabic a component sets on its own
+     (a root "ر ح م", a wazan, a feedback word) stays on one line. Base layer,
+     like the rules above: they still beat whatever an ancestor's utility
+     passes down, and a utility on the element itself wins — the Konsep
+     library lets a long Qur'anic run wrap with whitespace-normal (review,
+     2026-10-10). Checked in a real browser: scripts/ci/linebreaks.mjs. */
+  [lang|="ar"] {
+    word-break: normal;
+    overflow-wrap: normal;
+    hyphens: none;
+  }
+  bdi[lang|="ar"] {
+    white-space: nowrap;
+  }
 }
 
 body {
@@ -114,6 +150,67 @@ body {
   font-family: var(--font-arabic), "Amiri", serif;
   font-synthesis: none;
   line-height: 2;
+}
+
+/* ── Line breaks (operator, 2026-10-10: "make sure the line break is clean
+   and easy to read, sometime i see wrong line break especially for arabic
+   words"). The Arabic defaults are in the base layer above. Checked in a
+   real browser at every text size: scripts/ci/linebreaks.mjs. ── */
+
+/* Utilities layer, each selector in :where() (no specificity): they beat the
+   base layer, and a utility on the element itself still wins. */
+@layer utilities {
+  /* MixedText's pieces (src/lib/textUnits.ts): a unit (a term with its
+     Arabic, "huruf jar (حَرْف جَرّ),", and inside it its seam, "jar (حَرْف
+     جَرّ),"), its parts, a glued word ("Al-Fatihah", "nashab —"). Each is an
+     inline box that moves to the next line whole. An inline-block does not
+     take a link's underline from its parent, hence the inherit. */
+  :where(.lb-unit, .lb-part, .lb-glue) {
+    display: inline-block;
+    max-width: 100%;
+    text-decoration: inherit;
+  }
+  /* A glued word is one word also where a box takes its size from its
+     content (a table column, the stage's word card): never cut there. */
+  :where(.lb-glue) {
+    white-space: nowrap;
+  }
+  /* A box wider than its line would be exactly as wide as the line, leaving
+     the words before and after it on lines of their own (review,
+     2026-10-10). src/lib/lineFit.ts marks such a box data-lb-flow and it is
+     laid out in the paragraph's flow: it breaks only between its pieces (its
+     parts stay boxes; a glued word at its hyphen or space), never inside an
+     Arabic word or before its punctuation. */
+  :where(.lb-unit[data-lb-flow], .lb-glue[data-lb-flow]) {
+    display: inline;
+  }
+  :where(.lb-glue[data-lb-flow]) {
+    white-space: inherit;
+  }
+  /* An Arabic part wider than its line wraps at its own spaces, right to
+     left: lines right-aligned, its brackets with it (MixedText). */
+  :where(.lb-ar) {
+    text-align: right;
+  }
+  :where(.lb-ar bdi[lang|="ar"]) {
+    white-space: normal;
+  }
+  /* Karaoke (CaptionView): Amiri's harakat reach above and below the Inter
+     line that a spoken word's fill covers, so the Arabic inside the word
+     carries the fill itself (--karaoke-fill, set on the word being said):
+     paper-coloured marks never fall on the paper ground. It fades with the
+     word's own fill. */
+  :where([data-karaoke] bdi[lang|="ar"]) {
+    border-radius: 0.25rem;
+    background-color: var(--karaoke-fill, transparent);
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    :where([data-karaoke] bdi[lang|="ar"]) {
+      transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  }
 }
 
 /* ── Shared controls (senior-ux.md §3.3). Use these; don't hand-roll. ── */

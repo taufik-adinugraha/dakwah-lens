@@ -346,13 +346,55 @@ jobs:
             curl -fsS http://127.0.0.1:3300/belajar/api/health >/dev/null 2>&1 && break
             sleep 2
           done
-          mkdir -p /tmp/shots-run && cp belajar/scripts/ci/screenshots.mjs /tmp/shots-run/
+          mkdir -p /tmp/shots-run && cp belajar/scripts/ci/screenshots.mjs belajar/scripts/ci/narration-route.mjs /tmp/shots-run/
           cd /tmp/shots-run
           npm init -y >/dev/null
           npm install --no-audit --no-fund --silent playwright@1.49.1
           npx playwright install --with-deps chromium >/dev/null
           BELAJAR_DIR="$GITHUB_WORKSPACE/belajar" node screenshots.mjs
           docker rm -f shots >/dev/null
+
+      # Line breaks (operator, 2026-10-10: "make sure the line break is clean and easy to read,
+      # sometime i see wrong line break especially for arabic words"). linebreaks.mjs measures
+      # where Chromium REALLY breaks the lines of the real image: every page a learner reaches by
+      # its links (hub, track, each linked surah, every linked ayah closed and with every
+      # disclosure open, Konsep and every concept, every Kosakata entry linked from those) and the
+      # autoplay lesson step by step (Al-Fatihah 1 with the routed narration, so the karaoke
+      # caption; 2 and 7 caption-only; each kind of exercise answered once, so its feedback is
+      # measured too), on a phone (390) and a desktop (1280), each at the three text sizes. A
+      # self-test first lays out linebreaks-fixture.html in a real page: a bad case of every kind
+      # must be caught, the markup as it ships must pass, and a unit wider than its line must
+      # break in the paragraph's flow. Any offender (a term split from its Arabic, a hyphenated
+      # word cut, a line starting with "," or "·", a box as wide as its line, text sticking out of
+      # its column, the ayah marker alone on a row, …) fails the step; each is printed, and all
+      # are in shots/linebreaks.json with lb-*.png shots at each size (uploaded below). Its own
+      # container, started like production; removed on every exit so :3300 is free again.
+      - name: Line breaks (phone + desktop, three text sizes)
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          set -euo pipefail
+          trap 'docker rm -f linebreaks >/dev/null 2>&1 || true' EXIT
+          docker run -d --name linebreaks --network host -e PORT=3300 \
+            -e DATABASE_URL=postgres://smoke:smoke@127.0.0.1:5432/smoke \
+            dakwah-belajar-web:latest
+          ok=""
+          for _ in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:3300/belajar/api/health >/dev/null 2>&1; then ok=1; break; fi
+            sleep 2
+          done
+          [[ -n "$ok" ]] || { docker logs linebreaks 2>&1 | tail -20; echo "✗ container never became healthy"; exit 1; }
+          mkdir -p /tmp/shots-run
+          cp belajar/scripts/ci/linebreaks.mjs belajar/scripts/ci/linebreaks-measure.mjs \
+             belajar/scripts/ci/linebreaks-fixture.mjs belajar/scripts/ci/linebreaks-fixture.html \
+             belajar/scripts/ci/narration-route.mjs /tmp/shots-run/
+          cd /tmp/shots-run
+          # Normally installed by the screenshots step; install here if that step did not get there.
+          if [[ ! -d node_modules/playwright ]]; then
+            [[ -f package.json ]] || npm init -y >/dev/null
+            npm install --no-audit --no-fund --silent playwright@1.49.1
+            npx playwright install --with-deps chromium >/dev/null
+          fi
+          BELAJAR_DIR="$GITHUB_WORKSPACE/belajar" node linebreaks.mjs
 
       # Ilmu Waris on the real image, on a container started with the switch on
       # (BELAJAR_WARIS=on): the track is hidden on the live site (operator, 2026-10-10;
@@ -395,7 +437,7 @@ jobs:
           [[ -n "$ok" ]] || { docker logs waris 2>&1 | tail -20; echo "✗ container never became healthy"; exit 1; }
           smoke_rc=0
           node belajar/scripts/ci/waris-smoke.mjs || smoke_rc=$?
-          cp belajar/scripts/ci/screenshots.mjs belajar/scripts/ci/waris-e2e.mjs /tmp/shots-run/
+          cp belajar/scripts/ci/screenshots.mjs belajar/scripts/ci/narration-route.mjs belajar/scripts/ci/waris-e2e.mjs /tmp/shots-run/
           cd /tmp/shots-run
           # Normally installed by the screenshots step; install here if that step did not get there.
           if [[ ! -d node_modules/playwright ]]; then
@@ -416,8 +458,9 @@ jobs:
         with:
           name: belajar-screenshots
           # shots/: page screenshots (the waris pages from the switch-on container), waris e2e
-          # shots + print PDFs + waris-e2e-record.json (page counts, heights, network summary);
-          # waris-plan.json: the e2e plan.
+          # shots + print PDFs + waris-e2e-record.json (page counts, heights, network summary),
+          # linebreaks.json + lb-*.png (the line-break check: every offender, shots at each text
+          # size); waris-plan.json: the e2e plan.
           path: |
             /tmp/shots-run/shots/*.png
             /tmp/shots-run/shots/*.pdf

@@ -3,6 +3,7 @@ import { ArrowRight, BookOpenCheck, ChevronDown, Library, Mic } from "lucide-rea
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { ForestGlow } from "@/components/ForestGlow";
+import { MixedText } from "@/components/library/MixedText";
 import { StatusChip } from "@/components/StatusChip";
 import { Link } from "@/i18n/navigation";
 import { hasDrafts, SURAHS } from "@/lib/content";
@@ -59,10 +60,15 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
       <ForestGlow />
       <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
         <section className="max-w-2xl">
+          {/* Copy naming surahs goes through MixedText: "Al-Qur'an", "Al-Fatihah"
+              are never cut at the hyphen, "·" never starts a line (line breaks,
+              operator 2026-10-10). */}
           <h1 className="text-balance font-display text-3xl font-medium tracking-[-0.015em] sm:text-5xl">
-            {t("title")}
+            <MixedText text={t("title")} />
           </h1>
-          <p className="mt-4 max-w-prose text-pretty text-lg text-ink-muted">{t("intro")}</p>
+          <p className="mt-4 max-w-prose text-pretty text-lg text-ink-muted">
+            <MixedText text={t("intro")} />
+          </p>
         </section>
 
         <section className="mt-10" aria-labelledby="start">
@@ -84,7 +90,9 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
                     <span className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
                       <span className="block">
                         <span className="block font-display text-2xl font-medium text-ink">{s.name_id}</span>
-                        <span className="mt-1 block text-base text-ink-muted">{meta}</span>
+                        <span className="mt-1 block text-base text-ink-muted">
+                          <MixedText text={meta} />
+                        </span>
                       </span>
                       <span lang="ar" dir="rtl" className="quran text-ar-lg text-ink">
                         {s.name_ar}
@@ -127,7 +135,7 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
 
           <p className="mt-4 max-w-prose text-base text-ink-muted">
             <span className="font-semibold text-ink">{t("next_heading")}:</span>{" "}
-            {t("next_body")}
+            <MixedText text={t("next_body")} />
           </p>
         </section>
 
@@ -144,7 +152,9 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
                 >
                   {i + 1}
                 </span>
-                <span className="pt-1">{step}</span>
+                <span className="pt-1">
+                  <MixedText text={step} />
+                </span>
               </li>
             ))}
           </ol>
@@ -161,8 +171,12 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
               {principles.map(({ Icon, title, body }) => (
                 <li key={title} className="rounded-2xl border border-hairline bg-white p-5">
                   <Icon className="h-6 w-6 text-forest" aria-hidden />
-                  <p className="mt-3 font-display text-xl font-medium">{title}</p>
-                  <p className="mt-1.5 text-base text-ink-muted">{body}</p>
+                  <p className="mt-3 font-display text-xl font-medium">
+                    <MixedText text={title} />
+                  </p>
+                  <p className="mt-1.5 text-base text-ink-muted">
+                    <MixedText text={body} />
+                  </p>
                 </li>
               ))}
             </ul>

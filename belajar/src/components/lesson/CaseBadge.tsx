@@ -37,7 +37,8 @@ export function CaseBadge({ state, sign }: { state: CaseState; sign?: string }) 
     >
       <CaseShape state={state} />
       {m.label}
-      {sign && sign !== "—" ? <span className="font-normal">· {sign}</span> : null}
+      {/* nowrap: the dot never sits alone at the end of a row (line breaks, 2026-10-10). */}
+      {sign && sign !== "—" ? <span className="whitespace-nowrap font-normal">· {sign}</span> : null}
     </span>
   );
 }

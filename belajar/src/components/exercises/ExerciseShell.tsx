@@ -7,6 +7,8 @@ import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 
 
 import { useProgress } from "@/hooks/useProgress";
 
+import { MixedText } from "../library/MixedText";
+
 import type { ExerciseGuide, GuideInfo, GuideTarget } from "./guide";
 
 export type { ExerciseGuide, ExerciseKey, GuideInfo, GuidePart, GuideTarget } from "./guide";
@@ -138,9 +140,11 @@ export function ExerciseShell({
             tabIndex={-1}
             className="font-display text-xl font-medium text-ink"
           >
-            {title}
+            <MixedText text={title} />
           </h3>
-          <p className="mt-1 max-w-prose text-base text-ink-muted">{instruction}</p>
+          <p className="mt-1 max-w-prose text-base text-ink-muted">
+            <MixedText text={instruction} />
+          </p>
         </div>
         {done && (
           <span className="inline-flex shrink-0 items-center gap-2 rounded-full bg-ok-bg px-3 py-1 text-sm font-semibold text-forest">
@@ -407,7 +411,10 @@ function FeedbackBox({ kind, title, children }: { kind: FeedbackKind; title: str
       {kind === "reveal" && <Lightbulb className={icon} aria-hidden />}
       {kind === "hint" && <Info className={icon} aria-hidden />}
       <div className="min-w-0">
-        <p className="font-semibold">{title}</p>
+        {/* "Belum tepat — coba …": the dash never starts a line (line breaks, 2026-10-10). */}
+        <p className="font-semibold">
+          <MixedText text={title} />
+        </p>
         {children ? <div className="mt-1">{children}</div> : null}
       </div>
     </div>

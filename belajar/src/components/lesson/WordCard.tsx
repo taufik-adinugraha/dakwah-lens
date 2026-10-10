@@ -94,7 +94,7 @@ export function WordCard({
       <p className="text-sm text-ink-muted">{word.translit}</p>
       <p className="mt-2 font-display text-lg font-medium text-ink">
         <span className="sr-only">{labels.meaning}: </span>
-        {word.gloss}
+        <MixedText text={word.gloss} />
       </p>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -128,7 +128,9 @@ export function WordCard({
               {word.role ? (
                 <div>
                   <dt className="text-sm font-semibold text-ink-muted">{labels.role}</dt>
-                  <dd className="text-base text-ink">{word.role}</dd>
+                  <dd className="text-base text-ink">
+                    <MixedText text={word.role} />
+                  </dd>
                 </div>
               ) : null}
               <div>
@@ -170,7 +172,9 @@ export function WordCard({
                   {concepts.map((c) => (
                     <li key={c.id}>
                       <Link href={conceptHref(c.id)} className="chip-link">
-                        {c.title}
+                        <span>
+                          <MixedText text={c.title} />
+                        </span>
                       </Link>
                     </li>
                   ))}
@@ -197,8 +201,10 @@ export function WordCard({
                 <ul className="space-y-3 px-4 pb-4 text-base text-ink-muted">
                   {word.ikhtilaf.map((x) => (
                     <li key={x.point}>
+                      {/* The colon inside the text, so no line starts with it; the
+                          " · " between the options stays with the option before it. */}
                       <span className="font-semibold text-ink">
-                        <MixedText text={x.point} />:
+                        <MixedText text={`${x.point}:`} />
                       </span>{" "}
                       <MixedText text={x.options.join(" · ")} />
                     </li>

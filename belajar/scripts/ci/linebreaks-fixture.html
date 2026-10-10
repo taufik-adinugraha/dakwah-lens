@@ -1,0 +1,115 @@
+<!doctype html>
+<!--
+  The line-break check's self-test (linebreaks.mjs; line breaks, operator 2026-10-10: "make sure
+  the line break is clean and easy to read, sometime i see wrong line break especially for arabic
+  words"). linebreaks.mjs puts this body into a real page, with its real fonts, CSS and the
+  in-flow fallback (src/lib/lineFit.ts), before the real run, and measures every section on its
+  own:
+  - data-expect="kind …": the case must report each of those kinds — the check can fail;
+  - data-expect="": the markup as it ships must report nothing — the fixed markup passes.
+  Bad breaks are forced with <br>, or made by markup the fallback cannot reach (a display set on
+  the box itself), so nothing rests on a width guess. data-fit="unit | glue | arabic": the
+  paragraph is sized by linebreaks.mjs from its own measured pieces, so the box is wider than its
+  line while every piece fits. A span with data-mixed (closed by the comment /mixed) holds exactly
+  what MixedText renders for that text: linebreaks-fixture.test.mjs renders it and compares.
+  {{…}}: filled by linebreaks-fixture.mjs from the pronunciation dictionary and the lesson
+  content, never typed here.
+-->
+<html lang="id">
+  <body>
+    <section data-case="term-split" data-expect="term-split">
+      <p style="width:20rem">didahului {{TERM.lead}} {{TERM.last}}<br>(<bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{TERM.ar}}</bdi>), yaitu</p>
+    </section>
+    <section data-case="gloss-split" data-expect="term-split">
+      <p style="width:20rem">kata <bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{ONE.ar}}</bdi><br>({{ONE.latin}}) lagi</p>
+    </section>
+    <section data-case="arabic-phrase-split" data-expect="arabic-phrase-split">
+      <p style="width:20rem">kata <bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{TERM.w1}} <br>{{TERM.w2}}</bdi> lagi</p>
+    </section>
+    <section data-case="arabic-word-split" data-expect="arabic-word-split">
+      <p style="width:20rem">kata <bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{HALF1}}<br>{{HALF2}}</bdi></p>
+    </section>
+    <section data-case="word-split" data-expect="word-split">
+      <p style="width:20rem">kata<span>ber</span><br><span>hasil</span></p>
+    </section>
+    <section data-case="hyphen-split" data-expect="hyphen-split">
+      <p style="width:20rem">surah Al-<br>Fatihah</p>
+    </section>
+    <section data-case="footnote-orphan" data-expect="footnote-orphan">
+      <p style="width:20rem">pembalasan.<br>[1]</p>
+    </section>
+    <section data-case="line-start-dot" data-expect="line-start-punct">
+      <p style="width:20rem">kata<br>· lagi</p>
+    </section>
+    <section data-case="line-start-hyphen" data-expect="line-start-punct">
+      <p style="width:20rem">Indonesia<br>- Kementerian</p>
+    </section>
+    <section data-case="line-start-bullet" data-expect="line-start-punct">
+      <p style="width:20rem">satu<br>• dua</p>
+    </section>
+    <section data-case="line-start-ellipsis" data-expect="line-start-punct">
+      <p style="width:20rem">hamidtuhu<br>… hamdan</p>
+    </section>
+    <section data-case="line-end-opener" data-expect="line-end-opener">
+      <p style="width:20rem">kata (<br>lagi)</p>
+    </section>
+    <section data-case="arabic-not-isolated" data-expect="arabic-not-isolated">
+      <p style="width:20rem">kata {{ONE.ar}} lagi</p>
+    </section>
+    <section data-case="arabic-box-ltr" data-expect="arabic-box-ltr">
+      <p data-fit="arabic"><span data-lb="unit" class="lb-unit"><span data-lb="part" class="lb-part lb-ar" style="text-align:left"><span dir="rtl">«<bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{QUOTE}}</bdi>»</span></span></span></p>
+    </section>
+    <section data-case="unit-not-a-box" data-expect="unit-broken">
+      <p style="width:30rem">a <span data-lb="unit" class="lb-unit" style="display:inline"><span data-lb="part" class="lb-part">{{TERM.last}}</span> <span data-lb="part" class="lb-part lb-ar"><span dir="rtl">(<bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{TERM.ar}}</bdi>)</span></span></span> b</p>
+    </section>
+    <section data-case="unit-broken" data-expect="unit-broken term-split">
+      <p style="width:30rem"><span data-lb="unit" class="lb-unit"><span data-lb="part" class="lb-part">{{TERM.last}}</span><br><span data-lb="part" class="lb-part lb-ar"><span dir="rtl">(<bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{TERM.ar}}</bdi>)</span></span></span></p>
+    </section>
+    <section data-case="unit-boxed" data-expect="unit-boxed">
+      <p data-fit="unit">kata <span data-lb="unit" class="lb-unit" style="display:inline-block">{{WIDE.lead}} <span data-lb="unit" class="lb-unit"><span data-lb="part" class="lb-part">{{WIDE.last}}</span> <span data-lb="part" class="lb-part lb-ar"><span dir="rtl">(<bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{WIDE.ar}}</bdi>)</span></span></span></span> lagi</p>
+    </section>
+    <section data-case="glue-boxed" data-expect="overflow">
+      <p data-fit="glue"><span data-lb="glue" class="lb-glue" style="display:inline-block">Al-Fatihah</span></p>
+    </section>
+    <section data-case="glue-unbreakable" data-expect="overflow">
+      <p style="width:3rem"><span data-lb="glue" class="lb-glue">Kementerian</span></p>
+    </section>
+    <section data-case="part-unbreakable" data-expect="overflow">
+      <p style="width:3rem"><span data-lb="unit" class="lb-unit"><span data-lb="part" class="lb-part">Kementerian</span></span></p>
+    </section>
+    <section data-case="text-unbreakable" data-expect="overflow">
+      <p style="width:3rem">Penyayang”</p>
+    </section>
+    <section data-case="ayah-marker-alone" data-expect="ayah-marker-alone">
+      <div dir="rtl" class="quran flex flex-wrap" style="width:20rem"><span class="inline-flex rounded-xl border px-2.5" style="flex-basis:100%"><span lang="ar">{{ONE.ar}}</span></span><span aria-hidden="true" lang="ar" data-lb="ayah-marker">﴿١﴾</span></div>
+    </section>
+    <section data-case="karaoke-word-broken" data-expect="karaoke-word-broken hyphen-split">
+      <p style="width:20rem"><span data-karaoke="later" class="whitespace-nowrap">Al-<br>Fatihah</span></p>
+    </section>
+    <section data-case="karaoke-fill-wide" data-expect="karaoke-fill-wide">
+      <p style="width:20rem"><span data-karaoke="now" class="rounded-md bg-forest px-0.5 text-paper" style="display:inline-block">kata <br>berikutnya lagi</span></p>
+    </section>
+    <section data-case="page-overflow" data-expect="page-overflow">
+      <div style="width:300vw;height:1px"></div>
+    </section>
+
+    <section data-case="unit-with-room" data-expect="">
+      <p style="width:20rem"><span data-mixed="didahului {{TERM.display}}, yaitu {{ONE.ar}} ({{ONE.latin}}) dan Al-Fatihah." style="display:contents">didahului <span data-lb="unit" class="lb-unit">{{TERM.lead}} <span data-lb="unit" class="lb-unit"><span data-lb="part" class="lb-part">{{TERM.last}}</span> <span data-lb="part" class="lb-part lb-ar"><span dir="rtl">(<bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{TERM.ar}}</bdi>)</span>,</span></span></span> yaitu <span data-lb="unit" class="lb-unit"><span data-lb="part" class="lb-part lb-ar"><bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{ONE.ar}}</bdi></span> <span data-lb="part" class="lb-part">({{ONE.latin}})</span></span> dan <span data-lb="glue" class="lb-glue">Al-Fatihah.</span></span><!--/mixed--></p>
+    </section>
+    <section data-case="unit-in-flow" data-expect="">
+      <p data-fit="unit"><span data-mixed="kata {{WIDE.display}} lagi" style="display:contents">kata <span data-lb="unit" class="lb-unit">{{WIDE.lead}} <span data-lb="unit" class="lb-unit"><span data-lb="part" class="lb-part">{{WIDE.last}}</span> <span data-lb="part" class="lb-part lb-ar"><span dir="rtl">(<bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{WIDE.ar}}</bdi>)</span></span></span></span> lagi</span><!--/mixed--></p>
+    </section>
+    <section data-case="glue-in-flow" data-expect="">
+      <p data-fit="glue"><span data-mixed="Al-Fatihah" style="display:contents"><span data-lb="glue" class="lb-glue">Al-Fatihah</span></span><!--/mixed--></p>
+    </section>
+    <section data-case="arabic-box-rtl" data-expect="">
+      <p data-fit="arabic"><span data-mixed="«{{QUOTE}}»" style="display:contents"><span data-lb="unit" class="lb-unit"><span data-lb="part" class="lb-part lb-ar"><span dir="rtl">«<bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{QUOTE}}</bdi>»</span></span></span></span><!--/mixed--></p>
+    </section>
+    <section data-case="ayah-end" data-expect="">
+      <div dir="rtl" class="quran flex flex-wrap" style="width:20rem"><span class="inline-flex rounded-xl border px-2.5" style="flex-basis:60%"><span lang="ar">{{ONE.ar}}</span></span><span data-lb="ayah-end" class="flex items-start gap-x-2"><span class="inline-flex rounded-xl border px-2.5"><span lang="ar">{{ONE.ar}}</span></span><span aria-hidden="true" lang="ar" data-lb="ayah-marker" class="self-center">﴿١﴾</span></span></div>
+    </section>
+    <section data-case="karaoke" data-expect="">
+      <p style="width:20rem"><span data-karaoke="said" class="-mx-0.5 box-decoration-clone rounded-md px-0.5 whitespace-nowrap"><span data-mixed="Al-Fatihah." style="display:contents"><span data-lb="glue" class="lb-glue">Al-Fatihah.</span></span><!--/mixed--></span> <span data-karaoke="now" class="-mx-0.5 box-decoration-clone rounded-md bg-forest px-0.5 text-paper [--karaoke-fill:var(--color-forest)]"><span data-mixed="{{TERM.display}}," style="display:contents"><span data-lb="unit" class="lb-unit">{{TERM.lead}} <span data-lb="unit" class="lb-unit"><span data-lb="part" class="lb-part">{{TERM.last}}</span> <span data-lb="part" class="lb-part lb-ar"><span dir="rtl">(<bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{TERM.ar}}</bdi>)</span>,</span></span></span></span><!--/mixed--></span></p>
+    </section>
+  </body>
+</html>

@@ -11,6 +11,7 @@ import { CASE_META, SORT_BINS } from "@/lib/cases";
 import { seededShuffle } from "@/lib/shuffle";
 
 import { CaseBadge, CaseShape } from "../lesson/CaseBadge";
+import { MixedText } from "../library/MixedText";
 import {
   ExerciseShell,
   Feedback,
@@ -278,7 +279,7 @@ function SortCaseRound({
             <bdi lang="ar" dir="rtl" className="quran text-ar-sm">
               {say.word.ar}
             </bdi>{" "}
-            <CaseBadge state={say.word.case.state} sign={say.word.case.sign} /> {say.word.why}
+            <CaseBadge state={say.word.case.state} sign={say.word.case.sign} /> <MixedText text={say.word.why} />
           </>
         )}
       </Feedback>

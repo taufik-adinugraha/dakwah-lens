@@ -62,28 +62,36 @@ export default async function LexemePage({ params }: PageProps<"/[locale]/kosaka
       <dl className="mt-6 space-y-4 rounded-2xl border border-hairline bg-white p-5">
         <div>
           <dt className="text-sm font-semibold text-ink-muted">{t("pos")}</dt>
-          <dd className="text-base text-ink">{lex.pos}</dd>
+          <dd className="text-base text-ink">
+            <MixedText text={lex.pos} />
+          </dd>
         </div>
         <div>
           <dt className="text-sm font-semibold text-ink-muted">{t("root")}</dt>
-          <dd className="flex flex-wrap items-baseline gap-x-3 text-base text-ink">
+          {/* One line of text, not a wrapping flex row: the meaning follows
+              the root and wraps under it, instead of its "(" dropping to a row
+              of its own; the parentheses inside the text (line breaks,
+              operator 2026-10-10). */}
+          <dd className="text-base text-ink">
             {lex.root ? (
-              <bdi lang="ar" dir="rtl" className="arabic-inline text-ar-sm">
+              <bdi lang="ar" dir="rtl" className="arabic-inline mr-2 text-ar-sm">
                 {lex.root.join(" ")}
               </bdi>
             ) : (
-              <span className="text-ink-muted">{tw("no_root")}</span>
-            )}
+              <span className="mr-2 text-ink-muted">{tw("no_root")}</span>
+            )}{" "}
             {root ? (
               <span className="text-ink-muted">
-                (<MixedText text={root.meaning} />)
+                <MixedText text={`(${root.meaning})`} />
               </span>
             ) : null}
           </dd>
         </div>
         {lex.occurrences && (
           <div>
-            <dt className="text-sm font-semibold text-ink-muted">{t("occurrences")}</dt>
+            <dt className="text-sm font-semibold text-ink-muted">
+            <MixedText text={t("occurrences")} />
+          </dt>
             <dd className="text-base text-ink">
               {t("occurrences_value", { count: lex.occurrences.count, ayat: lex.occurrences.ayat })}
               <span className="mt-1 block text-sm text-ink-soft">
@@ -121,12 +129,14 @@ export default async function LexemePage({ params }: PageProps<"/[locale]/kosaka
                     className="flex min-h-12 flex-wrap items-center gap-x-4 gap-y-1 rounded-xl border border-hairline bg-white px-4 py-2 transition-colors hover:border-forest"
                   >
                     <span className="text-sm font-semibold text-forest">
-                      {t("loc_label", { surah: s.name_id, ayah: a.ayah, word })}
+                      <MixedText text={t("loc_label", { surah: s.name_id, ayah: a.ayah, word })} />
                     </span>
                     <span lang="ar" dir="rtl" className="quran text-ar-md text-ink">
                       {w.ar}
                     </span>
-                    <span className="text-base text-ink-muted">{w.gloss}</span>
+                    <span className="text-base text-ink-muted">
+                      <MixedText text={w.gloss} />
+                    </span>
                   </Link>
                 </li>
               );
