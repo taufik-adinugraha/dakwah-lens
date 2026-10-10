@@ -2,7 +2,7 @@
  * Every in-module URL is built here, so the URL shape lives in one place.
  *
  * /belajar is a hub of learning tracks (docs/belajar-plan.md L9): the
- * Qur'anic Arabic + light tafsir track sits under /quran, while the shared
+ * Qur'anic Arabic track sits under /quran, while the shared
  * Konsep / Kosakata library stays at hub level because later tracks reuse
  * it. Paths here are locale-less and basePath-less: hand them to the
  * next-intl <Link> from "@/i18n/navigation", which adds both.
