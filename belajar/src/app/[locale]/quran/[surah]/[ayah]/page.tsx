@@ -11,7 +11,6 @@ import { SortCase } from "@/components/exercises/SortCase";
 import { TapWord } from "@/components/exercises/TapWord";
 import { WaznFactory } from "@/components/exercises/WaznFactory";
 import { WhyHarakat } from "@/components/exercises/WhyHarakat";
-import { DraftChip } from "@/components/lesson/DraftChip";
 import { LessonStage, WordListenButton } from "@/components/lesson/LessonStage";
 import { WordCard } from "@/components/lesson/WordCard";
 import { ConceptCard } from "@/components/library/ConceptCard";
@@ -50,9 +49,9 @@ export async function generateMetadata({
 }
 
 /**
- * One row of "Pelajari lebih dalam": a collapsed 48px disclosure. A record
- * still awaiting review says so on the row itself, so the draft status is
- * visible before opening; the full marker sits on the record inside.
+ * One row of "Pelajari lebih dalam": a collapsed 48px disclosure. No per-row
+ * "Dibantu AI" tag: the operator removed those chips (2026-10-10) because each
+ * record shows its Rujukan; the page footer carries the AI-assisted label.
  */
 function Deeper({ title, draft, children }: { title: string; draft?: string; children: ReactNode }) {
   return (
@@ -147,7 +146,6 @@ export default async function AyahPage({
     sources: tw("sources"),
     draft: tw("draft"),
   };
-  const draftTag = t("draft_short");
   const hasDeeper = !!a.structure || introduced.length > 0 || !!a.tafsir || facts.length > 0;
 
   const translation = (
@@ -298,7 +296,7 @@ export default async function AyahPage({
           <p className="mt-1 max-w-prose text-base text-ink-muted">{t("deeper_intro")}</p>
           <div className="mt-4 space-y-3">
             {a.structure && (
-              <Deeper title={t("structure_heading")} draft={a.structure.status === "draft" ? draftTag : undefined}>
+              <Deeper title={t("structure_heading")}>
                 <StructureSection
                   ayah={a}
                   conceptTitle={conceptTitle}
@@ -316,7 +314,6 @@ export default async function AyahPage({
             {introduced.length > 0 && (
               <Deeper
                 title={`${t("concepts_heading")} (${introduced.length})`}
-                draft={introduced.some((c) => c.status === "draft") ? draftTag : undefined}
               >
                 <div className="@container">
                   <div className="grid gap-4 @2xl:grid-cols-2">
@@ -336,7 +333,7 @@ export default async function AyahPage({
             )}
 
             {a.tafsir && (
-              <Deeper title={t("tafsir_heading")} draft={a.tafsir.status === "draft" ? draftTag : undefined}>
+              <Deeper title={t("tafsir_heading")}>
                 <p className="max-w-prose text-pretty text-base text-ink">{a.tafsir.text}</p>
                 <p className="mt-4 text-sm font-semibold text-ink">
                   {tw("sources")} ({a.tafsir.sources.length})
@@ -344,14 +341,12 @@ export default async function AyahPage({
                 <div className="mt-1">
                   <SourceList sources={a.tafsir.sources} />
                 </div>
-                {a.tafsir.status === "draft" ? <DraftChip label={tw("draft")} /> : null}
               </Deeper>
             )}
 
             {facts.length > 0 && (
               <Deeper
                 title={`${t("facts_heading")} (${facts.length})`}
-                draft={facts.some((f) => f.status === "draft") ? draftTag : undefined}
               >
                 <div className="@container">
                   <div className="grid gap-4 @2xl:grid-cols-2">

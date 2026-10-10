@@ -1,0 +1,1119 @@
+[
+ {
+  "id": "META-GAPS",
+  "kind": "meta",
+  "generator": "belajar/pipeline/build_waris.py (byte copy from api/data + pinned Tanzil + pinned QuranEnc; no Arabic retyped)",
+  "about": "The plan §8 gap list (docs/waris-plan.md §8). Records of kind quran/hadith/fiqh/tafsir close a 'Gaps to extract in M1' item and use the dalil.json shapes and byte rules; kind 'gap' records name what the corpus cannot ground and what is needed. They extend belajar/content/waris/dalil.json, which stays byte-identical to docs/waris-research/dalil.json during the research phase; ids do not collide, so readers take the union. 'would_ground' names the dalil.json rule a record supports; the rule records themselves are unchanged until the docs copy stops being canonical.",
+  "status": "Every record is draft: not reviewed by an ustadz. AI-assisted, not an authoritative fatwa.",
+  "sources": {
+   "tanzil_uthmani": {
+    "file": "belajar/pipeline/cache/tanzil/quran-uthmani.txt",
+    "sha256": "bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8"
+   },
+   "quranenc_indonesian_affairs_waris": {
+    "version": "1.0.1",
+    "sha256": {
+     "2": "7c7fdff5bdbc29b330e7bdd563c7950bc34501485123d2913c74068005774f28",
+     "4": "5312415a824f459641fbfe5fb7a4fda2f1ce4c32dffd827517911e17254c6a4c",
+     "33": "9401aa54b8ebeb7dc15aca60674a1ec9ba7a8998ebb22e16c9d89fc8b6362d17",
+     "42": "3bf7f083ec20ceda3b216e307287180e374a3bb4074a4259bb400c74da329c2d",
+     "49": "c61cc582b75fba8cf64445e5588d7f99dd501fff1213390a376f0322dd4cf0b1",
+     "60": "991c08c42350253291dd5f287fea2c120e24989053cd3888e7207146d3f536c7"
+    }
+   },
+   "fawazahmed0_muslim_sections": {
+    "sha256": {
+     "24": "83c107753b79eb1315589688d9a35b4b08b72aae7c906e39df9a37443c749d8f"
+    }
+   },
+   "quran.json": {
+    "file": "api/data/quran.json",
+    "sha256": "bf71fc98003e0cad6e9ea145d8cd2dbc4a3a4d9336f97dc19801476f9cd2c3de"
+   },
+   "bukhari.json": {
+    "file": "api/data/bukhari.json",
+    "sha256": "df42f6e5fe98a3571cc44775cbe998fb148e21e650c0ff948a2e03ef009493c7"
+   },
+   "muslim.json": {
+    "file": "api/data/muslim.json",
+    "sha256": "366ebf71aa8e031eb0ec9c1cb4006f653e4d9300f9f6229f11d4df830fd73351"
+   },
+   "bulugh-al-maram.json": {
+    "file": "api/data/bulugh-al-maram.json",
+    "sha256": "94346b6374135a60ea5950a6a0f1bb28e44b0d1de27ffe00ae11c875eac011c2"
+   },
+   "fiqh-as-sunnah.json": {
+    "file": "api/data/fiqh-as-sunnah.json",
+    "sha256": "5d2267f0f033bf6ab8d6644885b6a5f3b8bacf4a9388bfb9918deb5297f21c14"
+   },
+   "al-umm.json": {
+    "file": "api/data/al-umm.json",
+    "sha256": "6880d15da4d949a02648ae5368f69b6409f1e56f923c33ff7e70493e464b65a7"
+   },
+   "tafsir-ibn-kathir.json": {
+    "file": "api/data/tafsir-ibn-kathir.json",
+    "sha256": "767270d51e5e8c0b5b946fc27b217f51e98274d3d5523d6fecd7c451300b4858"
+   }
+  },
+  "counts": {
+   "quran": 9,
+   "hadith": 6,
+   "fiqh": 10,
+   "tafsir": 2,
+   "gap": 14
+  }
+ },
+ {
+  "id": "Q-33-4",
+  "kind": "quran",
+  "citation": "QS Al-Ahzab [33]: 4",
+  "ref": {
+   "surah": 33,
+   "ayah": 4
+  },
+  "ar": "مَّا جَعَلَ ٱللَّهُ لِرَجُلٍ مِّن قَلْبَيْنِ فِى جَوْفِهِۦ وَمَا جَعَلَ أَزْوَٰجَكُمُ ٱلَّٰٓـِٔى تُظَٰهِرُونَ مِنْهُنَّ أُمَّهَٰتِكُمْ وَمَا جَعَلَ أَدْعِيَآءَكُمْ أَبْنَآءَكُمْ ذَٰلِكُمْ قَوْلُكُم بِأَفْوَٰهِكُمْ وَٱللَّهُ يَقُولُ ٱلْحَقَّ وَهُوَ يَهْدِى ٱلسَّبِيلَ",
+  "ar_source": "tanzil",
+  "ar_quran_json": "مَّا جَعَلَ ٱللَّهُ لِرَجُلٍۢ مِّن قَلْبَيْنِ فِى جَوْفِهِۦ ۚ وَمَا جَعَلَ أَزْوَٰجَكُمُ ٱلَّٰٓـِٔى تُظَٰهِرُونَ مِنْهُنَّ أُمَّهَٰتِكُمْ ۚ وَمَا جَعَلَ أَدْعِيَآءَكُمْ أَبْنَآءَكُمْ ۚ ذَٰلِكُمْ قَوْلُكُم بِأَفْوَٰهِكُمْ ۖ وَٱللَّهُ يَقُولُ ٱلْحَقَّ وَهُوَ يَهْدِى ٱلسَّبِيلَ",
+  "ar_quran_json_byte_identical_to_tanzil": false,
+  "translations": {
+   "id_quranenc_indonesian_affairs": {
+    "text": "Allah tidak menjadikan bagi seseorang dua hati dalam rongganya; dan Dia tidak menjadikan istri-istrimu yang kamu zihar[664] itu sebagai ibumu, dan Dia tidak menjadikan anak angkatmu sebagai anak kandungmu (sendiri). Yang demikian itu hanyalah perkataan di mulutmu saja. Allah mengatakan yang sebenarnya dan Dia menujukkan jalan (yang benar).",
+    "footnotes": "[664] Zihar ialah perkataan seorang suami kepada istrinya, \"Punggungmu haram bagiku seperti punggung ibuku,\" atau perkataan lain yang sama maksudnya. Adalah menjadi adat kebiasaan orang Arab Jahiliah bahwa apabila dia berkata demikian kepada istrinya maka istrinya itu haram baginya untuk selama-lamanya. Tetapi setelah Islam datang, maka yang haram untuk selama-lamanya itu dihapuskan dan istri-istri itu kembali halal baginya dengan membayar kafarat (denda).",
+    "label": "QuranEnc indonesian_affairs v1.0.1 (\"Terjemahan Berbahasa Indonesia - Kementerian Agama\" as QuranEnc names it; not the official Kemenag 2019 v1122 text)"
+   },
+   "id_quran_json": {
+    "text": "Allah sekali-kali tidak menjadikan bagi seseorang dua buah hati dalam rongganya; dan Dia tidak menjadikan istri-istrimu yang kamu zhihar itu sebagai ibumu, dan Dia tidak menjadikan anak-anak angkatmu sebagai anak kandungmu (sendiri). Yang demikian itu hanyalah perkataanmu di mulutmu saja. Dan Allah mengatakan yang sebenarnya dan Dia menunjukkan jalan (yang benar).",
+    "label": "api/data/quran.json \"id\" = Tanzil/AlQuran.cloud id.indonesian (older edition; non-commercial licence)"
+   },
+   "en_quran_json": {
+    "text": "Allah has not made for a man two hearts in his interior. And He has not made your wives whom you declare unlawful your mothers. And he has not made your adopted sons your [true] sons. That is [merely] your saying by your mouths, but Allah says the truth, and He guides to the [right] way.",
+    "label": "api/data/quran.json \"en\" = Tanzil/AlQuran.cloud en.sahih (Sahih International; non-commercial)"
+   }
+  },
+  "url": "https://tanzil.net/#33:4",
+  "grounds": [],
+  "gist_id": "Allah tidak menjadikan anak angkat sebagai anak kandung; sebutan itu hanya ucapan di mulut.",
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": ayat QS 33:4-5 (row mani.anak_angkat; cited by Fatwa MUI Adopsi 1984); lessons L3, L8",
+  "would_ground": [],
+  "status": "draft",
+  "notes": []
+ },
+ {
+  "id": "Q-33-5",
+  "kind": "quran",
+  "citation": "QS Al-Ahzab [33]: 5",
+  "ref": {
+   "surah": 33,
+   "ayah": 5
+  },
+  "ar": "ٱدْعُوهُمْ لِـَٔابَآئِهِمْ هُوَ أَقْسَطُ عِندَ ٱللَّهِ فَإِن لَّمْ تَعْلَمُوٓا۟ ءَابَآءَهُمْ فَإِخْوَٰنُكُمْ فِى ٱلدِّينِ وَمَوَٰلِيكُمْ وَلَيْسَ عَلَيْكُمْ جُنَاحٌ فِيمَآ أَخْطَأْتُم بِهِۦ وَلَٰكِن مَّا تَعَمَّدَتْ قُلُوبُكُمْ وَكَانَ ٱللَّهُ غَفُورًا رَّحِيمًا",
+  "ar_source": "tanzil",
+  "ar_quran_json": "ٱدْعُوهُمْ لِءَابَآئِهِمْ هُوَ أَقْسَطُ عِندَ ٱللَّهِ ۚ فَإِن لَّمْ تَعْلَمُوٓا۟ ءَابَآءَهُمْ فَإِخْوَٰنُكُمْ فِى ٱلدِّينِ وَمَوَٰلِيكُمْ ۚ وَلَيْسَ عَلَيْكُمْ جُنَاحٌۭ فِيمَآ أَخْطَأْتُم بِهِۦ وَلَٰكِن مَّا تَعَمَّدَتْ قُلُوبُكُمْ ۚ وَكَانَ ٱللَّهُ غَفُورًۭا رَّحِيمًا",
+  "ar_quran_json_byte_identical_to_tanzil": false,
+  "translations": {
+   "id_quranenc_indonesian_affairs": {
+    "text": "Panggillah mereka (anak angkat itu) dengan (memakai) nama bapak-bapak mereka; itulah yang adil di sisi Allah. Dan jika kamu tidak mengetahui bapak mereka, maka (panggillah mereka sebagai) saudara-saudaramu seagama dan maula-maulamu.[665] Dan tidak ada dosa atasmu jika kamu khilaf tentang itu, tetapi (yang ada dosanya) apa yang disengaja oleh hatimu. Allah Maha Pengampun, Maha Penyayang.",
+    "footnotes": "[665] Maula-maula ialah hamba sahaya yang sudah dimerdekakan atau seseorang yang telah dijadikan anak angkat, seperti Salim anak angkat Hużaifah, dipanggil Maula Hużaifah.",
+    "label": "QuranEnc indonesian_affairs v1.0.1 (\"Terjemahan Berbahasa Indonesia - Kementerian Agama\" as QuranEnc names it; not the official Kemenag 2019 v1122 text)"
+   },
+   "id_quran_json": {
+    "text": "Panggilah mereka (anak-anak angkat itu) dengan (memakai) nama bapak-bapak mereka; itulah yang lebih adil pada sisi Allah, dan jika kamu tidak mengetahui bapak-bapak mereka, maka (panggilah mereka sebagai) saudara-saudaramu seagama dan maula-maulamu. Dan tidak ada dosa atasmu terhadap apa yang kamu khilaf padanya, tetapi (yang ada dosanya) apa yang disengaja oleh hatimu. Dan adalah Allah Maha Pengampun lagi Maha Penyayang.",
+    "label": "api/data/quran.json \"id\" = Tanzil/AlQuran.cloud id.indonesian (older edition; non-commercial licence)"
+   },
+   "en_quran_json": {
+    "text": "Call them by [the names of] their fathers; it is more just in the sight of Allah. But if you do not know their fathers - then they are [still] your brothers in religion and those entrusted to you. And there is no blame upon you for that in which you have erred but [only for] what your hearts intended. And ever is Allah Forgiving and Merciful.",
+    "label": "api/data/quran.json \"en\" = Tanzil/AlQuran.cloud en.sahih (Sahih International; non-commercial)"
+   }
+  },
+  "url": "https://tanzil.net/#33:5",
+  "grounds": [],
+  "gist_id": "Anak angkat dipanggil dengan nama ayah kandungnya; bila ayahnya tidak diketahui, mereka saudara seagama dan maula.",
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": ayat QS 33:4-5 (row mani.anak_angkat; cited by Fatwa MUI Adopsi 1984); lessons L3, L8",
+  "would_ground": [],
+  "status": "draft",
+  "notes": []
+ },
+ {
+  "id": "Q-4-34",
+  "kind": "quran",
+  "citation": "QS An-Nisa' [4]: 34",
+  "ref": {
+   "surah": 4,
+   "ayah": 34
+  },
+  "ar": "ٱلرِّجَالُ قَوَّٰمُونَ عَلَى ٱلنِّسَآءِ بِمَا فَضَّلَ ٱللَّهُ بَعْضَهُمْ عَلَىٰ بَعْضٍ وَبِمَآ أَنفَقُوا۟ مِنْ أَمْوَٰلِهِمْ فَٱلصَّٰلِحَٰتُ قَٰنِتَٰتٌ حَٰفِظَٰتٌ لِّلْغَيْبِ بِمَا حَفِظَ ٱللَّهُ وَٱلَّٰتِى تَخَافُونَ نُشُوزَهُنَّ فَعِظُوهُنَّ وَٱهْجُرُوهُنَّ فِى ٱلْمَضَاجِعِ وَٱضْرِبُوهُنَّ فَإِنْ أَطَعْنَكُمْ فَلَا تَبْغُوا۟ عَلَيْهِنَّ سَبِيلًا إِنَّ ٱللَّهَ كَانَ عَلِيًّا كَبِيرًا",
+  "ar_source": "tanzil",
+  "ar_quran_json": "ٱلرِّجَالُ قَوَّٰمُونَ عَلَى ٱلنِّسَآءِ بِمَا فَضَّلَ ٱللَّهُ بَعْضَهُمْ عَلَىٰ بَعْضٍۢ وَبِمَآ أَنفَقُوا۟ مِنْ أَمْوَٰلِهِمْ ۚ فَٱلصَّٰلِحَٰتُ قَٰنِتَٰتٌ حَٰفِظَٰتٌۭ لِّلْغَيْبِ بِمَا حَفِظَ ٱللَّهُ ۚ وَٱلَّٰتِى تَخَافُونَ نُشُوزَهُنَّ فَعِظُوهُنَّ وَٱهْجُرُوهُنَّ فِى ٱلْمَضَاجِعِ وَٱضْرِبُوهُنَّ ۖ فَإِنْ أَطَعْنَكُمْ فَلَا تَبْغُوا۟ عَلَيْهِنَّ سَبِيلًا ۗ إِنَّ ٱللَّهَ كَانَ عَلِيًّۭا كَبِيرًۭا",
+  "ar_quran_json_byte_identical_to_tanzil": false,
+  "translations": {
+   "id_quranenc_indonesian_affairs": {
+    "text": "Laki-laki (suami) itu pelindung bagi perempuan (istri), karena Allah telah melebihkan sebagian mereka (laki-laki) atas sebagian yang lain (perempuan), dan karena mereka (laki-laki) telah memberikan nafkah dari hartanya. Maka perempuan-perempuan yang saleh, adalah mereka yang taat (kepada Allah) dan menjaga diri ketika (suaminya) tidak ada, karena Allah telah menjaga (mereka).[191] Perempuan-perempuan yang kamu khawatirkan akan nusyuz,[192] hendaklah kamu beri nasihat kepada mereka, tinggalkanlah mereka di tempat tidur (pisah ranjang), dan (kalau perlu) pukullah mereka. Tetapi jika mereka menaatimu, maka janganlah kamu mencari-cari alasan untuk menyusahkannya. Sungguh, Allah Mahatinggi, Mahabesar.",
+    "footnotes": "[191] Allah telah mewajibkan kepada suami untuk menggauli istrinya dengan baik. \n[192] Nusyuz yaitu meninggalkan kewajiban selaku istri, seperti meninggalkan rumah tanpa izin suaminya.",
+    "label": "QuranEnc indonesian_affairs v1.0.1 (\"Terjemahan Berbahasa Indonesia - Kementerian Agama\" as QuranEnc names it; not the official Kemenag 2019 v1122 text)"
+   },
+   "id_quran_json": {
+    "text": "Kaum laki-laki itu adalah pemimpin bagi kaum wanita, oleh karena Allah telah melebihkan sebahagian mereka (laki-laki) atas sebahagian yang lain (wanita), dan karena mereka (laki-laki) telah menafkahkan sebagian dari harta mereka. Sebab itu maka wanita yang saleh, ialah yang taat kepada Allah lagi memelihara diri ketika suaminya tidak ada, oleh karena Allah telah memelihara (mereka). Wanita-wanita yang kamu khawatirkan nusyuznya, maka nasehatilah mereka dan pisahkanlah mereka di tempat tidur mereka, dan pukullah mereka. Kemudian jika mereka mentaatimu, maka janganlah kamu mencari-cari jalan untuk menyusahkannya. Sesungguhnya Allah Maha Tinggi lagi Maha Besar.",
+    "label": "api/data/quran.json \"id\" = Tanzil/AlQuran.cloud id.indonesian (older edition; non-commercial licence)"
+   },
+   "en_quran_json": {
+    "text": "Men are in charge of women by [right of] what Allah has given one over the other and what they spend [for maintenance] from their wealth. So righteous women are devoutly obedient, guarding in [the husband's] absence what Allah would have them guard. But those [wives] from whom you fear arrogance - [first] advise them; [then if they persist], forsake them in bed; and [finally], strike them. But if they obey you [once more], seek no means against them. Indeed, Allah is ever Exalted and Grand.",
+    "label": "api/data/quran.json \"en\" = Tanzil/AlQuran.cloud en.sahih (Sahih International; non-commercial)"
+   }
+  },
+  "url": "https://tanzil.net/#4:34",
+  "grounds": [],
+  "gist_id": "Laki-laki (suami) pelindung bagi perempuan (istri), antara lain karena memberi nafkah dari hartanya.",
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": ayat QS 4:34 (lesson L5, the nafkah hikmah of 2:1)",
+  "would_ground": [],
+  "status": "draft",
+  "notes": [
+   "Plan L5: the nafkah explanation of 2:1 is a hikmah, never 'the reason' of the share. Only the first clause concerns the track; the rest of the ayah is about nusyuz. The reviewer decides whether a span of the first clause is shown."
+  ]
+ },
+ {
+  "id": "Q-4-128",
+  "kind": "quran",
+  "citation": "QS An-Nisa' [4]: 128",
+  "ref": {
+   "surah": 4,
+   "ayah": 128
+  },
+  "ar": "وَإِنِ ٱمْرَأَةٌ خَافَتْ مِنۢ بَعْلِهَا نُشُوزًا أَوْ إِعْرَاضًا فَلَا جُنَاحَ عَلَيْهِمَآ أَن يُصْلِحَا بَيْنَهُمَا صُلْحًا وَٱلصُّلْحُ خَيْرٌ وَأُحْضِرَتِ ٱلْأَنفُسُ ٱلشُّحَّ وَإِن تُحْسِنُوا۟ وَتَتَّقُوا۟ فَإِنَّ ٱللَّهَ كَانَ بِمَا تَعْمَلُونَ خَبِيرًا",
+  "ar_source": "tanzil",
+  "ar_quran_json": "وَإِنِ ٱمْرَأَةٌ خَافَتْ مِنۢ بَعْلِهَا نُشُوزًا أَوْ إِعْرَاضًۭا فَلَا جُنَاحَ عَلَيْهِمَآ أَن يُصْلِحَا بَيْنَهُمَا صُلْحًۭا ۚ وَٱلصُّلْحُ خَيْرٌۭ ۗ وَأُحْضِرَتِ ٱلْأَنفُسُ ٱلشُّحَّ ۚ وَإِن تُحْسِنُوا۟ وَتَتَّقُوا۟ فَإِنَّ ٱللَّهَ كَانَ بِمَا تَعْمَلُونَ خَبِيرًۭا",
+  "ar_quran_json_byte_identical_to_tanzil": false,
+  "translations": {
+   "id_quranenc_indonesian_affairs": {
+    "text": "Dan jika seorang perempuan khawatir suaminya akan nusyuz[230] atau bersikap tidak acuh, maka keduanya dapat mengadakan perdamaian yang sebenarnya,[231] dan perdamaian itu lebih baik (bagi mereka) walaupun manusia itu menurut tabiatnya kikir.[232] Dan jika kamu memperbaiki (pergaulan dengan istrimu) dan memelihara dirimu (dari nusyuz dan sikap acuh tak acuh), maka sungguh, Allah Mahateliti terhadap apa yang kamu kerjakan.",
+    "footnotes": "[230] Lihat arti nusyuz bagi pihak istri dalam catatan kaki An-Nisā` (4): 34. Nusyuz dari pihak suami ialah bersikap keras terhadap istrinya; tidak mau menggaulinya dan tidak mau memberikan haknya. \n[231] Seperti istri bersedia beberapa haknya dikurangi asal suaminya mau baik kembali. \n[232] Tabiat manusia itu tidak mau melepaskan sebagian haknya kepada orang lain dengan seikhlas hatinya, kendati pun demikian jika istri melepaskan sebagian haknya, maka boleh suami menerimanya.",
+    "label": "QuranEnc indonesian_affairs v1.0.1 (\"Terjemahan Berbahasa Indonesia - Kementerian Agama\" as QuranEnc names it; not the official Kemenag 2019 v1122 text)"
+   },
+   "id_quran_json": {
+    "text": "Dan jika seorang wanita khawatir akan nusyuz atau sikap tidak acuh dari suaminya, maka tidak mengapa bagi keduanya mengadakan perdamaian yang sebenar-benarnya, dan perdamaian itu lebih baik (bagi mereka) walaupun manusia itu menurut tabiatnya kikir. Dan jika kamu bergaul dengan isterimu secara baik dan memelihara dirimu (dari nusyuz dan sikap tak acuh), maka sesungguhnya Allah adalah Maha Mengetahui apa yang kamu kerjakan.",
+    "label": "api/data/quran.json \"id\" = Tanzil/AlQuran.cloud id.indonesian (older edition; non-commercial licence)"
+   },
+   "en_quran_json": {
+    "text": "And if a woman fears from her husband contempt or evasion, there is no sin upon them if they make terms of settlement between them - and settlement is best. And present in [human] souls is stinginess. But if you do good and fear Allah - then indeed Allah is ever, with what you do, Acquainted.",
+    "label": "api/data/quran.json \"en\" = Tanzil/AlQuran.cloud en.sahih (Sahih International; non-commercial)"
+   }
+  },
+  "url": "https://tanzil.net/#4:128",
+  "grounds": [],
+  "gist_id": "Bila istri khawatir suaminya nusyuz atau acuh, keduanya boleh berdamai; perdamaian itu lebih baik.",
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": ayat QS 4:128 (lesson L9, perdamaian)",
+  "would_ground": [],
+  "status": "draft",
+  "notes": [
+   "The ayah is about reconciliation between spouses; using it for a settlement among heirs is an analogy the lesson must present as such (reviewer)."
+  ]
+ },
+ {
+  "id": "Q-49-10",
+  "kind": "quran",
+  "citation": "QS Al-Hujurat [49]: 10",
+  "ref": {
+   "surah": 49,
+   "ayah": 10
+  },
+  "ar": "إِنَّمَا ٱلْمُؤْمِنُونَ إِخْوَةٌ فَأَصْلِحُوا۟ بَيْنَ أَخَوَيْكُمْ وَٱتَّقُوا۟ ٱللَّهَ لَعَلَّكُمْ تُرْحَمُونَ",
+  "ar_source": "tanzil",
+  "ar_quran_json": "إِنَّمَا ٱلْمُؤْمِنُونَ إِخْوَةٌۭ فَأَصْلِحُوا۟ بَيْنَ أَخَوَيْكُمْ ۚ وَٱتَّقُوا۟ ٱللَّهَ لَعَلَّكُمْ تُرْحَمُونَ",
+  "ar_quran_json_byte_identical_to_tanzil": false,
+  "translations": {
+   "id_quranenc_indonesian_affairs": {
+    "text": "Sesungguhnya orang-orang mukmin itu bersaudara, karena itu damaikanlah antara kedua saudaramu (yang berselisih) dan bertakwalah kepada Allah agar kamu mendapat rahmat.",
+    "footnotes": "",
+    "label": "QuranEnc indonesian_affairs v1.0.1 (\"Terjemahan Berbahasa Indonesia - Kementerian Agama\" as QuranEnc names it; not the official Kemenag 2019 v1122 text)"
+   },
+   "id_quran_json": {
+    "text": "Orang-orang beriman itu sesungguhnya bersaudara. Sebab itu damaikanlah (perbaikilah hubungan) antara kedua saudaramu itu dan takutlah terhadap Allah, supaya kamu mendapat rahmat.",
+    "label": "api/data/quran.json \"id\" = Tanzil/AlQuran.cloud id.indonesian (older edition; non-commercial licence)"
+   },
+   "en_quran_json": {
+    "text": "The believers are but brothers, so make settlement between your brothers. And fear Allah that you may receive mercy.",
+    "label": "api/data/quran.json \"en\" = Tanzil/AlQuran.cloud en.sahih (Sahih International; non-commercial)"
+   }
+  },
+  "url": "https://tanzil.net/#49:10",
+  "grounds": [],
+  "gist_id": "Orang-orang mukmin bersaudara; damaikanlah saudara yang berselisih dan bertakwalah agar mendapat rahmat.",
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": ayat QS 49:10 (lesson L9)",
+  "would_ground": [],
+  "status": "draft",
+  "notes": []
+ },
+ {
+  "id": "Q-42-38",
+  "kind": "quran",
+  "citation": "QS Asy-Syura [42]: 38",
+  "ref": {
+   "surah": 42,
+   "ayah": 38
+  },
+  "ar": "وَٱلَّذِينَ ٱسْتَجَابُوا۟ لِرَبِّهِمْ وَأَقَامُوا۟ ٱلصَّلَوٰةَ وَأَمْرُهُمْ شُورَىٰ بَيْنَهُمْ وَمِمَّا رَزَقْنَٰهُمْ يُنفِقُونَ",
+  "ar_source": "tanzil",
+  "ar_quran_json": "وَٱلَّذِينَ ٱسْتَجَابُوا۟ لِرَبِّهِمْ وَأَقَامُوا۟ ٱلصَّلَوٰةَ وَأَمْرُهُمْ شُورَىٰ بَيْنَهُمْ وَمِمَّا رَزَقْنَٰهُمْ يُنفِقُونَ",
+  "ar_quran_json_byte_identical_to_tanzil": true,
+  "translations": {
+   "id_quranenc_indonesian_affairs": {
+    "text": "dan (bagi) orang-orang yang menerima (mematuhi) seruan Tuhan dan melaksanakan salat, sedang urusan mereka (diputuskan) dengan musyawarah antara mereka; dan mereka menginfakkan sebagian dari rezeki yang Kami berikan kepada mereka,",
+    "footnotes": "",
+    "label": "QuranEnc indonesian_affairs v1.0.1 (\"Terjemahan Berbahasa Indonesia - Kementerian Agama\" as QuranEnc names it; not the official Kemenag 2019 v1122 text)"
+   },
+   "id_quran_json": {
+    "text": "Dan (bagi) orang-orang yang menerima (mematuhi) seruan Tuhannya dan mendirikan shalat, sedang urusan mereka (diputuskan) dengan musyawarat antara mereka; dan mereka menafkahkan sebagian dari rezeki yang Kami berikan kepada mereka.",
+    "label": "api/data/quran.json \"id\" = Tanzil/AlQuran.cloud id.indonesian (older edition; non-commercial licence)"
+   },
+   "en_quran_json": {
+    "text": "And those who have responded to their lord and established prayer and whose affair is [determined by] consultation among themselves, and from what We have provided them, they spend.",
+    "label": "api/data/quran.json \"en\" = Tanzil/AlQuran.cloud en.sahih (Sahih International; non-commercial)"
+   }
+  },
+  "url": "https://tanzil.net/#42:38",
+  "grounds": [],
+  "gist_id": "Urusan orang-orang beriman diputuskan dengan musyawarah di antara mereka.",
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": ayat QS 42:38 (lesson L9, musyawarah)",
+  "would_ground": [],
+  "status": "draft",
+  "notes": []
+ },
+ {
+  "id": "Q-2-188",
+  "kind": "quran",
+  "citation": "QS Al-Baqarah [2]: 188",
+  "ref": {
+   "surah": 2,
+   "ayah": 188
+  },
+  "ar": "وَلَا تَأْكُلُوٓا۟ أَمْوَٰلَكُم بَيْنَكُم بِٱلْبَٰطِلِ وَتُدْلُوا۟ بِهَآ إِلَى ٱلْحُكَّامِ لِتَأْكُلُوا۟ فَرِيقًا مِّنْ أَمْوَٰلِ ٱلنَّاسِ بِٱلْإِثْمِ وَأَنتُمْ تَعْلَمُونَ",
+  "ar_source": "tanzil",
+  "ar_quran_json": "وَلَا تَأْكُلُوٓا۟ أَمْوَٰلَكُم بَيْنَكُم بِٱلْبَٰطِلِ وَتُدْلُوا۟ بِهَآ إِلَى ٱلْحُكَّامِ لِتَأْكُلُوا۟ فَرِيقًۭا مِّنْ أَمْوَٰلِ ٱلنَّاسِ بِٱلْإِثْمِ وَأَنتُمْ تَعْلَمُونَ",
+  "ar_quran_json_byte_identical_to_tanzil": false,
+  "translations": {
+   "id_quranenc_indonesian_affairs": {
+    "text": "Dan janganlah kamu makan harta di antara kamu dengan jalan yang batil, dan (janganlah) kamu menyuap dengan harta itu kepada para hakim, dengan maksud agar kamu dapat memakan sebagian harta orang lain itu dengan jalan dosa, padahal kamu mengetahui.",
+    "footnotes": "",
+    "label": "QuranEnc indonesian_affairs v1.0.1 (\"Terjemahan Berbahasa Indonesia - Kementerian Agama\" as QuranEnc names it; not the official Kemenag 2019 v1122 text)"
+   },
+   "id_quran_json": {
+    "text": "Dan janganlah sebahagian kamu memakan harta sebahagian yang lain di antara kamu dengan jalan yang bathil dan (janganlah) kamu membawa (urusan) harta itu kepada hakim, supaya kamu dapat memakan sebahagian daripada harta benda orang lain itu dengan (jalan berbuat) dosa, padahal kamu mengetahui.",
+    "label": "api/data/quran.json \"id\" = Tanzil/AlQuran.cloud id.indonesian (older edition; non-commercial licence)"
+   },
+   "en_quran_json": {
+    "text": "And do not consume one another's wealth unjustly or send it [in bribery] to the rulers in order that [they might aid] you [to] consume a portion of the wealth of the people in sin, while you know [it is unlawful].",
+    "label": "api/data/quran.json \"en\" = Tanzil/AlQuran.cloud en.sahih (Sahih International; non-commercial)"
+   }
+  },
+  "url": "https://tanzil.net/#2:188",
+  "grounds": [],
+  "gist_id": "Jangan memakan harta sesama dengan cara batil, termasuk membawanya kepada hakim untuk mengambil sebagian harta orang lain.",
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": ayat QS 2:188 (lesson L9)",
+  "would_ground": [],
+  "status": "draft",
+  "notes": []
+ },
+ {
+  "id": "Q-4-10",
+  "kind": "quran",
+  "citation": "QS An-Nisa' [4]: 10",
+  "ref": {
+   "surah": 4,
+   "ayah": 10
+  },
+  "ar": "إِنَّ ٱلَّذِينَ يَأْكُلُونَ أَمْوَٰلَ ٱلْيَتَٰمَىٰ ظُلْمًا إِنَّمَا يَأْكُلُونَ فِى بُطُونِهِمْ نَارًا وَسَيَصْلَوْنَ سَعِيرًا",
+  "ar_source": "tanzil",
+  "ar_quran_json": "إِنَّ ٱلَّذِينَ يَأْكُلُونَ أَمْوَٰلَ ٱلْيَتَٰمَىٰ ظُلْمًا إِنَّمَا يَأْكُلُونَ فِى بُطُونِهِمْ نَارًۭا ۖ وَسَيَصْلَوْنَ سَعِيرًۭا",
+  "ar_quran_json_byte_identical_to_tanzil": false,
+  "translations": {
+   "id_quranenc_indonesian_affairs": {
+    "text": "Sesungguhnya orang-orang yang memakan harta anak yatim secara zalim, sebenarnya mereka itu menelan api dalam perutnya dan mereka akan masuk ke dalam api yang menyala-nyala (neraka).",
+    "footnotes": "",
+    "label": "QuranEnc indonesian_affairs v1.0.1 (\"Terjemahan Berbahasa Indonesia - Kementerian Agama\" as QuranEnc names it; not the official Kemenag 2019 v1122 text)"
+   },
+   "id_quran_json": {
+    "text": "Sesungguhnya orang-orang yang memakan harta anak yatim secara zalim, sebenarnya mereka itu menelan api sepenuh perutnya dan mereka akan masuk ke dalam api yang menyala-nyala (neraka).",
+    "label": "api/data/quran.json \"id\" = Tanzil/AlQuran.cloud id.indonesian (older edition; non-commercial licence)"
+   },
+   "en_quran_json": {
+    "text": "Indeed, those who devour the property of orphans unjustly are only consuming into their bellies fire. And they will be burned in a Blaze.",
+    "label": "api/data/quran.json \"en\" = Tanzil/AlQuran.cloud en.sahih (Sahih International; non-commercial)"
+   }
+  },
+  "url": "https://tanzil.net/#4:10",
+  "grounds": [],
+  "gist_id": "Orang yang memakan harta anak yatim secara zalim sebenarnya menelan api ke dalam perutnya.",
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": ayat QS 4:10 (lesson L9, the orphan card)",
+  "would_ground": [],
+  "status": "draft",
+  "notes": []
+ },
+ {
+  "id": "Q-60-8",
+  "kind": "quran",
+  "citation": "QS Al-Mumtahanah [60]: 8",
+  "ref": {
+   "surah": 60,
+   "ayah": 8
+  },
+  "ar": "لَّا يَنْهَىٰكُمُ ٱللَّهُ عَنِ ٱلَّذِينَ لَمْ يُقَٰتِلُوكُمْ فِى ٱلدِّينِ وَلَمْ يُخْرِجُوكُم مِّن دِيَٰرِكُمْ أَن تَبَرُّوهُمْ وَتُقْسِطُوٓا۟ إِلَيْهِمْ إِنَّ ٱللَّهَ يُحِبُّ ٱلْمُقْسِطِينَ",
+  "ar_source": "tanzil",
+  "ar_quran_json": "لَّا يَنْهَىٰكُمُ ٱللَّهُ عَنِ ٱلَّذِينَ لَمْ يُقَٰتِلُوكُمْ فِى ٱلدِّينِ وَلَمْ يُخْرِجُوكُم مِّن دِيَٰرِكُمْ أَن تَبَرُّوهُمْ وَتُقْسِطُوٓا۟ إِلَيْهِمْ ۚ إِنَّ ٱللَّهَ يُحِبُّ ٱلْمُقْسِطِينَ",
+  "ar_quran_json_byte_identical_to_tanzil": false,
+  "translations": {
+   "id_quranenc_indonesian_affairs": {
+    "text": "Allah tidak melarang kamu berbuat baik dan berlaku adil terhadap orang-orang yang tidak memerangimu dalam urusan agama dan tidak mengusir kamu dari kampung halamanmu. Sesungguhnya Allah mencintai orang-orang yang berlaku adil.",
+    "footnotes": "",
+    "label": "QuranEnc indonesian_affairs v1.0.1 (\"Terjemahan Berbahasa Indonesia - Kementerian Agama\" as QuranEnc names it; not the official Kemenag 2019 v1122 text)"
+   },
+   "id_quran_json": {
+    "text": "Allah tidak melarang kamu untuk berbuat baik dan berlaku adil terhadap orang-orang yang tiada memerangimu karena agama dan tidak (pula) mengusir kamu dari negerimu. Sesungguhnya Allah menyukai orang-orang yang berlaku adil.",
+    "label": "api/data/quran.json \"id\" = Tanzil/AlQuran.cloud id.indonesian (older edition; non-commercial licence)"
+   },
+   "en_quran_json": {
+    "text": "Allah does not forbid you from those who do not fight you because of religion and do not expel you from your homes - from being righteous toward them and acting justly toward them. Indeed, Allah loves those who act justly.",
+    "label": "api/data/quran.json \"en\" = Tanzil/AlQuran.cloud en.sahih (Sahih International; non-commercial)"
+   }
+  },
+  "url": "https://tanzil.net/#60:8",
+  "grounds": [],
+  "gist_id": "Allah tidak melarang berbuat baik dan berlaku adil kepada orang yang tidak memerangi kaum muslimin karena agama dan tidak mengusir mereka.",
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": ayat QS 60:8 (only if the reviewer wants it for case 11's tone line)",
+  "would_ground": [],
+  "status": "draft",
+  "notes": [
+   "Plan §8: extract only if the reviewer wants it for case 11's tone line (a non-Muslim relative)."
+  ]
+ },
+ {
+  "id": "H-BUKHARI-2586",
+  "kind": "hadith",
+  "collection": "Sahih al-Bukhari",
+  "citation": "Sahih al-Bukhari 2586",
+  "numbering": "sunnah.com (fawazahmed0 hadithnumber = sunnah.com for Bukhari)",
+  "book": 51,
+  "in_book_number": 20,
+  "ar": "حَدَّثَنَا عَبْدُ اللَّهِ بْنُ يُوسُفَ، أَخْبَرَنَا مَالِكٌ، عَنِ ابْنِ شِهَابٍ، عَنْ حُمَيْدِ بْنِ عَبْدِ الرَّحْمَنِ، وَمُحَمَّدِ بْنِ النُّعْمَانِ بْنِ بَشِيرٍ، أَنَّهُمَا حَدَّثَاهُ عَنِ النُّعْمَانِ بْنِ بَشِيرٍ، أَنَّ أَبَاهُ، أَتَى بِهِ إِلَى رَسُولِ اللَّهِ صلى الله عليه وسلم فَقَالَ إِنِّي نَحَلْتُ ابْنِي هَذَا غُلاَمًا‏.‏ فَقَالَ ‏\"‏ أَكُلَّ وَلَدِكَ نَحَلْتَ مِثْلَهُ ‏\"‏‏.‏ قَالَ لاَ‏.‏ قَالَ ‏\"‏ فَارْجِعْهُ ‏\"‏‏.‏",
+  "translations": {
+   "en": {
+    "text": "Narrated An-Nu`man bin Bashir:that his father took him to Allah's Messenger (ﷺ) and said, \"I have given this son of mine a slave.\" The Prophet asked, \"Have you given all your sons the like?\" He replied in the negative. The Prophet (ﷺ) said, \"Take back your gift then",
+    "label": "api/data/bukhari.json \"en\" (no Indonesian in corpus)"
+   }
+  },
+  "grade_field": [],
+  "grade_note": "Record grade field is empty; the collection is Sahih al-Bukhari.",
+  "url": "https://sunnah.com/bukhari:2586",
+  "grounds": [],
+  "gist_id": "An-Nu'man bin Basyir: ayahnya memberinya seorang budak; Nabi bertanya apakah semua anaknya diberi yang sama, lalu menyuruh pemberian itu ditarik kembali.",
+  "variants_in_corpus": [],
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": Bukhari 2586 (row E-HIDUP: be fair among children; lesson L8)",
+  "would_ground": [],
+  "status": "draft",
+  "notes": []
+ },
+ {
+  "id": "H-BUKHARI-2587",
+  "kind": "hadith",
+  "collection": "Sahih al-Bukhari",
+  "citation": "Sahih al-Bukhari 2587",
+  "numbering": "sunnah.com (fawazahmed0 hadithnumber = sunnah.com for Bukhari)",
+  "book": 51,
+  "in_book_number": 21,
+  "ar": "حَدَّثَنَا حَامِدُ بْنُ عُمَرَ، حَدَّثَنَا أَبُو عَوَانَةَ، عَنْ حُصَيْنٍ، عَنْ عَامِرٍ، قَالَ سَمِعْتُ النُّعْمَانَ بْنَ بَشِيرٍ ـ رضى الله عنهما ـ وَهُوَ عَلَى الْمِنْبَرِ يَقُولُ أَعْطَانِي أَبِي عَطِيَّةً، فَقَالَتْ عَمْرَةُ بِنْتُ رَوَاحَةَ لاَ أَرْضَى حَتَّى تُشْهِدَ رَسُولَ اللَّهِ صلى الله عليه وسلم‏.‏ فَأَتَى رَسُولَ اللَّهِ صلى الله عليه وسلم فَقَالَ إِنِّي أَعْطَيْتُ ابْنِي مِنْ عَمْرَةَ بِنْتِ رَوَاحَةَ عَطِيَّةً، فَأَمَرَتْنِي أَنْ أُشْهِدَكَ يَا رَسُولَ اللَّهِ‏.‏ قَالَ ‏\"‏ أَعْطَيْتَ سَائِرَ وَلَدِكَ مِثْلَ هَذَا ‏\"‏‏.‏ قَالَ لاَ‏.‏ قَالَ ‏\"‏ فَاتَّقُوا اللَّهَ، وَاعْدِلُوا بَيْنَ أَوْلاَدِكُمْ ‏\"‏‏.‏ قَالَ فَرَجَعَ فَرَدَّ عَطِيَّتَهُ‏.‏",
+  "translations": {
+   "en": {
+    "text": "Narrated 'Amir:I heard An-Nu`man bin Bashir on the pulpit saying, \"My father gave me a gift but `Amra bint Rawaha (my mother) said that she would not agree to it unless he made Allah's Messenger (ﷺ) as a witness to it. So, my father went to Allah's Messenger (ﷺ) and said, 'I have given a gift to my son from `Amra bint Rawaha, but she ordered me to make you as a witness to it, O Allah's Messenger (ﷺ)!' Allah's Messenger (ﷺ) asked, 'Have you given (the like of it) to everyone of your sons?' He replied in the negative. Allah's Messenger (ﷺ) said, 'Be afraid of Allah, and be just to your children.' My father then returned and took back his gift",
+    "label": "api/data/bukhari.json \"en\" (no Indonesian in corpus)"
+   }
+  },
+  "grade_field": [],
+  "grade_note": "Record grade field is empty; the collection is Sahih al-Bukhari.",
+  "url": "https://sunnah.com/bukhari:2587",
+  "grounds": [],
+  "gist_id": "An-Nu'man bin Basyir: Nabi memerintahkan bertakwa kepada Allah dan berlaku adil di antara anak-anak; ayahnya lalu menarik kembali pemberiannya.",
+  "variants_in_corpus": [],
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": Bukhari 2587 (row E-HIDUP: be fair among children; lesson L8)",
+  "would_ground": [],
+  "status": "draft",
+  "notes": []
+ },
+ {
+  "id": "H-BUKHARI-5986",
+  "kind": "hadith",
+  "collection": "Sahih al-Bukhari",
+  "citation": "Sahih al-Bukhari 5986",
+  "numbering": "sunnah.com (fawazahmed0 hadithnumber = sunnah.com for Bukhari)",
+  "book": 78,
+  "in_book_number": 17,
+  "ar": "حَدَّثَنَا يَحْيَى بْنُ بُكَيْرٍ، حَدَّثَنَا اللَّيْثُ، عَنْ عُقَيْلٍ، عَنِ ابْنِ شِهَابٍ، قَالَ أَخْبَرَنِي أَنَسُ بْنُ مَالِكٍ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم قَالَ ‏ \"‏ مَنْ أَحَبَّ أَنْ يُبْسَطَ لَهُ فِي رِزْقِهِ، وَيُنْسَأَ لَهُ فِي أَثَرِهِ، فَلْيَصِلْ رَحِمَهُ ‏\"‏‏.‏",
+  "translations": {
+   "en": {
+    "text": "Narrated Anas bin Malik:Allah's Apostle said, \"Whoever loves that he be granted more wealth and that his lease of life be prolonged then he should keep good relations with his Kith and kin",
+    "label": "api/data/bukhari.json \"en\" (no Indonesian in corpus)"
+   }
+  },
+  "grade_field": [],
+  "grade_note": "Record grade field is empty; the collection is Sahih al-Bukhari.",
+  "url": "https://sunnah.com/bukhari:5986",
+  "grounds": [],
+  "gist_id": "Siapa ingin dilapangkan rezekinya dan dipanjangkan umurnya, hendaklah menyambung silaturahim.",
+  "variants_in_corpus": [],
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": Bukhari 5986 (lesson L9, silaturahim)",
+  "would_ground": [],
+  "status": "draft",
+  "notes": []
+ },
+ {
+  "id": "H-BUKHARI-5987",
+  "kind": "hadith",
+  "collection": "Sahih al-Bukhari",
+  "citation": "Sahih al-Bukhari 5987",
+  "numbering": "sunnah.com (fawazahmed0 hadithnumber = sunnah.com for Bukhari)",
+  "book": 78,
+  "in_book_number": 18,
+  "ar": "حَدَّثَنِي بِشْرُ بْنُ مُحَمَّدٍ، أَخْبَرَنَا عَبْدُ اللَّهِ، أَخْبَرَنَا مُعَاوِيَةُ بْنُ أَبِي مُزَرِّدٍ، قَالَ سَمِعْتُ عَمِّي، سَعِيدَ بْنَ يَسَارٍ يُحَدِّثُ عَنْ أَبِي هُرَيْرَةَ، عَنِ النَّبِيِّ صلى الله عليه وسلم قَالَ ‏\"‏ إِنَّ اللَّهَ خَلَقَ الْخَلْقَ حَتَّى إِذَا فَرَغَ مِنْ خَلْقِهِ، قَالَتِ الرَّحِمُ هَذَا مَقَامُ الْعَائِذِ بِكَ مِنَ الْقَطِيعَةِ‏.‏ قَالَ نَعَمْ أَمَا تَرْضَيْنَ أَنْ أَصِلَ مَنْ وَصَلَكِ‏.‏ وَأَقْطَعَ مَنْ قَطَعَكِ‏.‏ قَالَتْ بَلَى يَا رَبِّ‏.‏ قَالَ فَهْوَ لَكِ ‏\"‏‏.‏ قَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏\"‏ فَاقْرَءُوا إِنْ شِئْتُمْ ‏{‏فَهَلْ عَسَيْتُمْ إِنْ تَوَلَّيْتُمْ أَنْ تُفْسِدُوا فِي الأَرْضِ وَتُقَطِّعُوا أَرْحَامَكُمْ‏}‏‏\"‏‏.‏",
+  "translations": {
+   "en": {
+    "text": "Narrated Abu Huraira:The Prophet (ﷺ) said, \"Allah created the creations, and when He finished from His creations, Ar-Rahm i.e., womb said, \"(O Allah) at this place I seek refuge with You from all those who sever me (i.e. sever the ties of Kith and kin). Allah said, 'Yes, won't you be pleased that I will keep good relations with the one who will keep good relations with you, and I will sever the relation with the one who will sever the relations with you.' It said, 'Yes, O my Lord.' Allah said, 'Then that is for you ' \" Allah's Messenger (ﷺ) added. \"Read (in the Qur'an) if you wish, the Statement of Allah: 'Would you then, if you were given the authority, do mischief in the land and sever your ties of kinship?",
+    "label": "api/data/bukhari.json \"en\" (no Indonesian in corpus)"
+   }
+  },
+  "grade_field": [],
+  "grade_note": "Record grade field is empty; the collection is Sahih al-Bukhari.",
+  "url": "https://sunnah.com/bukhari:5987",
+  "grounds": [],
+  "gist_id": "Rahim (kekerabatan) berlindung kepada Allah dari pemutusan; Allah menyambung orang yang menyambungnya dan memutus orang yang memutusnya.",
+  "variants_in_corpus": [],
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": Bukhari 5987 (lesson L9, silaturahim)",
+  "would_ground": [],
+  "status": "draft",
+  "notes": [
+   "The matn ends with the Prophet saying 'read, if you wish' and QS 47:22; that ayah is not extracted here."
+  ]
+ },
+ {
+  "id": "H-MUSLIM-1623e",
+  "kind": "hadith",
+  "collection": "Sahih Muslim",
+  "citation": "Sahih Muslim 1623e",
+  "numbering": "Fuad Abd al-Baqi via fawazahmed0 arabicnumber (.01->a); local file key hadithnumber=4181 is NOT canonical",
+  "local_hadithnumber": 4181,
+  "local_citation_en": "Sahih Muslim 4181",
+  "ar": "حَدَّثَنَا أَبُو بَكْرِ بْنُ أَبِي شَيْبَةَ، حَدَّثَنَا عَبَّادُ بْنُ الْعَوَّامِ، عَنْ حُصَيْنٍ، عَنِ الشَّعْبِيِّ، قَالَ سَمِعْتُ النُّعْمَانَ بْنَ بَشِيرٍ، ح وَحَدَّثَنَا يَحْيَى بْنُ يَحْيَى، - وَاللَّفْظُ لَهُ - أَخْبَرَنَا أَبُو الأَحْوَصِ، عَنْ حُصَيْنٍ، عَنِ الشَّعْبِيِّ، عَنِ النُّعْمَانِ بْنِ بَشِيرٍ، قَالَ تَصَدَّقَ عَلَىَّ أَبِي بِبَعْضِ مَالِهِ فَقَالَتْ أُمِّي عَمْرَةُ بِنْتُ رَوَاحَةَ لاَ أَرْضَى حَتَّى تُشْهِدَ رَسُولَ اللَّهِ صلى الله عليه وسلم ‏.‏ فَانْطَلَقَ أَبِي إِلَى النَّبِيِّ صلى الله عليه وسلم لِيُشْهِدَهُ عَلَى صَدَقَتِي فَقَالَ لَهُ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏\"‏ أَفَعَلْتَ هَذَا بِوَلَدِكَ كُلِّهِمْ ‏\"‏ ‏.‏ قَالَ لاَ ‏.‏ قَالَ ‏\"‏ اتَّقُوا اللَّهَ وَاعْدِلُوا فِي أَوْلاَدِكُمْ ‏\"‏ ‏.‏ فَرَجَعَ أَبِي فَرَدَّ تِلْكَ الصَّدَقَةَ ‏.‏",
+  "translations": {
+   "en": {
+    "text": "Nu'man b. Bashir reported:My father donated to me some of his property. My mother Amra bint Rawaha said: I shall not be pleased (with this act) until you make Allah's Messenger (ﷺ) a witness to it. My father went to Allah's Apostle (ﷺ) in order to make him the witness of the donation given to me. Allah's Messenger (ﷺ) said to him: Have you done the same with every son of yours? He said: No. Thereupon he (the Holy Prophet) said: Fear Allah, and observe equity in case of your children. My father returned and got back the gift",
+    "label": "api/data/muslim.json \"en\""
+   },
+   "id": {
+    "text": "Telah menceritakan kepada kami Abu Bakar bin Abi Syaibah, telah menceritakan kepada kami 'Abbad bin al-'Awwam, dari Hushain, dari asy-Sya'bi, ia berkata: aku mendengar an-Nu'man bin Basyir, (dalam riwayat lain) dan telah menceritakan kepada kami Yahya bin Yahya — dan lafazh ini miliknya — telah mengabarkan kepada kami Abu al-Ahwash, dari Hushain, dari asy-Sya'bi, dari an-Nu'man bin Basyir, ia berkata: Ayahku bersedekah kepadaku dengan sebagian hartanya. Ibuku 'Amrah binti Rawahah berkata: \"Aku tidak ridha sampai engkau persaksikan kepada Rasulullah ﷺ.\" Maka ayahku berangkat kepada Nabi ﷺ untuk menjadikan beliau saksi atas sedekahnya kepadaku. Rasulullah ﷺ bertanya kepadanya: \"Apakah engkau berbuat ini untuk seluruh anakmu?\" Ia menjawab: \"Tidak.\" Beliau bersabda: \"Bertakwalah kepada Allah dan berlakulah adil di antara anak-anak kalian.\" Maka ayahku pulang dan mengembalikan sedekah itu.",
+    "label": "api/data/muslim.json \"id\" (in-house operator translation per project memory; not a published translation; needs ustadz review)"
+   }
+  },
+  "grade_field": [],
+  "grade_note": "Record grade field is empty; the collection is Sahih Muslim.",
+  "url": "https://sunnah.com/muslim:1623e",
+  "grounds": [],
+  "gist_id": "An-Nu'man bin Basyir: ayahnya bersedekah sebagian hartanya kepadanya; Nabi memerintahkan bertakwa dan berlaku adil di antara anak-anak, lalu sedekah itu dikembalikan.",
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": Muslim 1623e (row E-HIDUP: be fair among children; lesson L8)",
+  "would_ground": [],
+  "status": "draft",
+  "notes": []
+ },
+ {
+  "id": "H-BULUGH-649",
+  "kind": "hadith",
+  "collection": "Bulugh al-Maram (Ibn Hajar)",
+  "citation": "Bulugh al-Maram 649 (local AhmedBaset numbering)",
+  "numbering": "AhmedBaset idInBook - NOT sunnah.com canonical (see project memory hadith-canonical-numbering); canonical number unresolved",
+  "cross_numbering": null,
+  "book": 3,
+  "ar": "وَعَنْ أَبِي هُرَيْرَةَ ‏- رضى الله عنه ‏- عَنِ اَلنَّبِيِّ ‏- صلى الله عليه وسلم ‏-قَالَ: { نَفْسُ اَلْمُؤْمِنِ مُعَلَّقَةٌ بِدَيْنِهِ, حَتَّى يُقْضَى عَنْهُ }  رَوَاهُ أَحْمَدُ, وَاَلتِّرْمِذِيُّ وَحَسَّنَهُ  1‏ .‏‏1 ‏- صحيح.‏ رواه أحمد (2/440 و 475 و 508)‏، والترمذي (1078)‏ و (1079)‏، وقال الترمذي: \"هذا حديث حسن\".‏ قلت: هو صحيح؛ إذ له شواهد عن أربعة من الصحابة ذكرتها \"بالأصل\".‏",
+  "ar_matn_and_ibn_hajar_attribution": "وَعَنْ أَبِي هُرَيْرَةَ ‏- رضى الله عنه ‏- عَنِ اَلنَّبِيِّ ‏- صلى الله عليه وسلم ‏-قَالَ: { نَفْسُ اَلْمُؤْمِنِ مُعَلَّقَةٌ بِدَيْنِهِ, حَتَّى يُقْضَى عَنْهُ }  رَوَاهُ أَحْمَدُ, وَاَلتِّرْمِذِيُّ وَحَسَّنَهُ",
+  "ar_tahqiq_footnote": "1 ‏- صحيح.‏ رواه أحمد (2/440 و 475 و 508)‏، والترمذي (1078)‏ و (1079)‏، وقال الترمذي: \"هذا حديث حسن\".‏ قلت: هو صحيح؛ إذ له شواهد عن أربعة من الصحابة ذكرتها \"بالأصل\".‏",
+  "grade_field": [],
+  "grades_from_tahqiq_footnotes": [
+   {
+    "footnote": "1",
+    "text": "صحيح"
+   }
+  ],
+  "tahqiq_note": "Footnotes come from the corpus edition's muhaqqiq; the edition/editor is not named in the corpus file - verify before citing him by name.",
+  "translations": {
+   "en": {
+    "text": "Abu Hurairah (RAA) narrated that the Messenger of Allah said, \"A believer‘s soul remains suspended according to his debt until it is settled or paid off on his behalf\". Related by Ahmad and At-Tirmidhi.",
+    "label": "api/data/bulugh-al-maram.json \"en\""
+   }
+  },
+  "url": null,
+  "grounds": [],
+  "gist_id": "Jiwa orang mukmin tergantung pada utangnya sampai utang itu dilunasi.",
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": Bulugh local 649 (lesson L2, debt)",
+  "would_ground": [],
+  "status": "draft",
+  "notes": [
+   "Supports the seriousness of debt; it does not state the order debt-before-wasiyya (that rests on 4:11-12 + reported ijma', F-ALUMM-572, T-IK-4-11-dayn).",
+   "Ibn Hajar's attribution: Ahmad and at-Tirmidhi, who called it hasan; the tahqiq footnote grades it sahih by witnesses and names Ahmad 2/440, 475, 508 and at-Tirmidhi 1078, 1079 (primaries not in the corpus, see G-E6).",
+   "Corpus 'book' field = 3; the chapter name is not in the record (not verified here)."
+  ]
+ },
+ {
+  "id": "T-IK-4-11-mother-siblings",
+  "kind": "tafsir",
+  "book": "Tafsir Ibn Kathir (AR)",
+  "ref": {
+   "surah": 4,
+   "ayah": 11
+  },
+  "record_key": "4:11",
+  "char_range": [
+   6334,
+   6579
+  ],
+  "ar": "والحال الثالث من أحوال الأبوين وهو اجتماعهما مع الأخوة سواء كانوا من الأبوين أو من الأب أو من الأم فإنهم لا يرثون مع الأب شيئا ولكنهم مع ذلك يحجبون الأم عن الثلث إلى السدس فيفرض لها مع وجودهم السدس فإن لم يكن وارث سواها وسوى الأب أخذ الأب الباقي",
+  "grounds": [],
+  "gist_id": "Ibnu Katsir: bila ayah dan ibu bersama saudara-saudara (kandung, seayah, atau seibu), saudara tidak mewarisi bersama ayah, tetapi tetap menurunkan bagian ibu dari 1/3 ke 1/6; sisanya untuk ayah.",
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": Ibn Kathir 4:11, the sentence that blocked siblings still reduce the mother (row fardh.ibu_*; engine.md §0.1, EQ14; lesson L6)",
+  "would_ground": [
+   "R-mother-third-sixth",
+   "R-hajb-siblings"
+  ],
+  "status": "draft",
+  "notes": [
+   "The next sentence (two brothers count as 'ikhwah' for the jumhur) is left out; T-TB-4-11-ikhwa-two covers it."
+  ]
+ },
+ {
+  "id": "T-IK-4-11-jahiliyyah",
+  "kind": "tafsir",
+  "book": "Tafsir Ibn Kathir (AR)",
+  "ref": {
+   "surah": 4,
+   "ayah": 11
+  },
+  "record_key": "4:11",
+  "char_range": [
+   2246,
+   2418
+  ],
+  "ar": "أي يأمركم بالعدل فيهم فإن أهل الجاهلية كانوا يجعلون جميع الميراث للذكور دون الإناث فأمر الله تعالى بالتسوية بينهم في أصل الميراث وفاوت بين الصنفين فجعل للذكر مثل حظ الأنثين",
+  "grounds": [],
+  "gist_id": "Ibnu Katsir: ayat ini memerintahkan adil di antara anak; orang Jahiliah memberikan seluruh warisan kepada laki-laki, lalu Allah menyamakan keduanya dalam hak dasar waris dan membedakan kadarnya (2:1).",
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": Ibn Kathir 4:11, the jahiliyyah practice (lesson L1, from the Arabic, not the English edition)",
+  "would_ground": [
+   "R-women-inherit",
+   "R-2to1"
+  ],
+  "status": "draft",
+  "notes": [
+   "Ends before Ibn Kathir's nafkah explanation of 2:1 (a hikmah, never 'the reason', plan L5). The source spells 'al-untsayayn' without the second ya' here; the bytes are kept as they are."
+  ]
+ },
+ {
+  "id": "F-ALUMM-556-jadd",
+  "kind": "fiqh",
+  "book": "al-Umm (al-Shafi'i)",
+  "section_id": "556",
+  "anchor": "C805",
+  "qism": "كتاب الفرائض",
+  "title": "باب ميراث الجد",
+  "char_range": [
+   1024,
+   1934
+  ],
+  "ar": "وَقُلْنَا إذَا وَرِثَ الْجَدُّ مَعَ الْإِخْوَةِ قَاسَمَهُمْ مَا كَانَتْ الْمُقَاسَمَةُ خَيْرًا لَهُ مِنْ الثُّلُثِ، فَإِذَا كَانَ الثُّلُثُ خَيْرًا لَهُ مِنْهَا أُعْطِيهِ، وَهَذَا قَوْلُ زَيْدِ بْنِ ثَابِتٍ وَعَنْهُ قَبِلْنَا أَكْثَرُ الْفَرَائِضِ، وَقَدْ رُوِيَ هَذَا الْقَوْلُ عَنْ عُمَرَ وَعُثْمَانَ أَنَّهُمَا قَالَا فِيهِ مِثْلَ قَوْلِ زَيْدِ بْنِ ثَابِتٍ، وَقَدْ رُوِيَ هَذَا أَيْضًا عَنْ غَيْرِ وَاحِدٍ مِنْ أَصْحَابِ النَّبِيِّ - صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ - وَهُوَ قَوْلُ الْأَكْثَرِ مِنْ فُقَهَاءِ الْبُلْدَانِ، وَقَدْ خَالَفْنَا بَعْضَ النَّاسِ فِي ذَلِكَ فَقَالَ: الْجَدُّ أَبٌ، وَقَدْ اخْتَلَفَ فِيهِ أَصْحَابُ النَّبِيِّ - صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ - فَقَالَ: أَبُو بَكْرٍ وَعَائِشَةُ وَابْنُ عَبَّاسٍ وَعَبْدُ اللَّهِ بْنُ عُتْبَةَ وَعَبْدُ اللَّهِ بْنُ الزُّبَيْرِ - رَضِيَ اللَّهُ عَنْهُ -. إنَّهُ أَبٌ إذَا كَانَ مَعَهُ الْإِخْوَةُ طُرِحُوا وَكَانَ الْمَالُ لِلْجَدِّ دُونَهُمْ",
+  "grounds": [],
+  "gist_id": "Asy-Syafi'i: kakek bersama saudara mendapat yang lebih baik antara muqasamah (berbagi bersama saudara) dan 1/3; ini pendapat Zaid bin Tsabit, juga diriwayatkan dari Umar dan Utsman. Pendapat lain (Abu Bakar, Aisyah, Ibnu Abbas, dan lainnya): kakek seperti ayah, sehingga saudara gugur.",
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": al-Umm §556 (C805), Zayd's muqasamah (row fardh.kakek_1_6, jadd.*)",
+  "would_ground": [
+   "R-grandfather"
+  ],
+  "status": "draft",
+  "notes": [
+   "'Ruwiya' (reported) for Umar and Uthman: no chain in the excerpt. Plan §8: never use H-BULUGH-1101 or H-BULUGH-1110 (both da'if) as the reason for following Zayd."
+  ]
+ },
+ {
+  "id": "F-ALUMM-559-musyarakah",
+  "kind": "fiqh",
+  "book": "al-Umm (al-Shafi'i)",
+  "section_id": "559",
+  "anchor": "C809",
+  "qism": "كتاب الفرائض",
+  "title": "ميراث المشركة",
+  "char_range": [
+   4340,
+   4544
+  ],
+  "ar": "قُلْنَا: إنَّ الْمُشْرِكَةَ زَوْجٌ وَأُمٌّ وَأَخَوَانِ لِأَبٍ وَأُمٌّ وَأَخَوَانِ لِأُمٍّ فَلِلزَّوْجِ النِّصْفُ وَلِلْأُمِّ السُّدُسُ وَلِلْأَخَوَيْنِ مِنْ الْأُمِّ الثُّلُثُ وَيُشْرِكُهُمْ بَنُو الْأَبِ",
+  "grounds": [],
+  "gist_id": "Asy-Syafi'i: masalah musyarakah (suami, ibu, dua saudara laki-laki kandung, dua saudara seibu): suami 1/2, ibu 1/6, saudara seibu 1/3, dan saudara kandung ikut berbagi bersama mereka.",
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": al-Umm §559 (C809), the Syafi'i tasyrik (row musytarakah)",
+  "would_ground": [
+   "R-special-cases"
+  ],
+  "status": "draft",
+  "notes": [
+   "The corpus record ends mid-sentence right after this clause; the reasoning continues in al-Umm §560 (not extracted). T-IK-4-12-musytaraka records that the case is a khilaf."
+  ]
+ },
+ {
+  "id": "F-FSUNNAH-843-syarat",
+  "kind": "fiqh",
+  "book": "Fiqh as-Sunnah (Sayyid Sabiq)",
+  "section_id": "843",
+  "anchor": "C1086",
+  "qism": "الفرائض",
+  "title": "شروط الميراث",
+  "char_range": [
+   144,
+   662
+  ],
+  "ar": "يشترط للارث شروط ثلاثة: 1 - موت المورث حقيقة أموته حكما كأن يحكم القاضي بموت المفقود فهذا الحكم يجعله كمن مات حقيقة، أو موته تقديرا، كأن يعتدي شخص على امرأة حامل بالضرب فتسقط جنينا ميتا فتقدر حياة هذا السقط وان لم تتحقق بعد. 2 - حياة الوارث بعد موت المورث ولو حكما، كالحمل، فإنه حي في الحكم ليس إلا لجواز أن يكون الروح لم ينفخ فيه بعد. فإذا لم تعلم حياة الوارث بعد موت المورث كالغرقى والحرقى والهدمي فإنه لا توارث بينهم إذا كانوا ممن يرث بعضهم بعضا ويقسم مال كل منهم على ورثته الاحياء. 3 - ألا يوجد مانع من موانع الارث",
+  "grounds": [],
+  "gist_id": "Tiga syarat waris: pewaris wafat (nyata atau menurut putusan hakim), ahli waris hidup saat pewaris wafat, dan tidak ada penghalang. Korban tenggelam, terbakar, atau tertimpa reruntuhan yang tidak diketahui siapa wafat lebih dulu tidak saling mewarisi.",
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": Fiqh as-Sunnah §843 (refusal pages: gharqa; the heir must outlive the deceased)",
+  "would_ground": [],
+  "status": "draft",
+  "notes": []
+ },
+ {
+  "id": "F-FSUNNAH-847-mutallaqa",
+  "kind": "fiqh",
+  "book": "Fiqh as-Sunnah (Sayyid Sabiq)",
+  "section_id": "847",
+  "anchor": "C1090",
+  "qism": "الفرائض",
+  "title": "الزوجة المطلقة",
+  "char_range": [
+   457,
+   668
+  ],
+  "ar": "الزوجة المطلقة طلاقا رجعيا ترث من زوجها إذا مات قبل انتهاء عدتها، ويرى الحنابلة توريث المطلقة قبل الدخول والخلوة من مطلقها في مرض الموت إذا مات في مرضه ما لم تتزوج، وكذلك بعد الخلوة ما لم تتزوج وعليها عدة الوفاة",
+  "grounds": [],
+  "gist_id": "Istri yang ditalak raj'i mewarisi suaminya bila suami wafat sebelum iddahnya habis; mazhab Hanbali juga mewariskan istri yang ditalak saat suami sakit menjelang wafat, selama ia belum menikah lagi.",
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": Fiqh as-Sunnah §847 (C1090), divorce in 'iddah (+ reviewer R14)",
+  "would_ground": [
+   "R-spouses"
+  ],
+  "status": "draft",
+  "notes": [
+   "The Syafi'i position on a final divorce in the husband's last illness is not stated in this span. The next sentence quotes Egyptian law and is left out."
+  ]
+ },
+ {
+  "id": "F-FSUNNAH-860-mafqud",
+  "kind": "fiqh",
+  "book": "Fiqh as-Sunnah (Sayyid Sabiq)",
+  "section_id": "860",
+  "anchor": "C1104",
+  "qism": "الفرائض",
+  "title": "المفقود",
+  "char_range": [
+   21,
+   425
+  ],
+  "ar": "إذا غاب الشخص وانقطع خبره ولم يدر مكانه ولم يعرف أحي هو أم ميت؟ وحكم القضاء بموته قيل إنه مفقود. وحكم القاضي: إما أن يكون مبينا على الدليل، كشهادة العدول، أو يكون مبينا على أمارات لا تصلح أن تكون دليلا وذلك بمضي المدة. ففي الحالة الاولى يكون موته محققا ثابتا من الوقت الذي قام فيه الدليل على الموت، وفي الحالة الثانية التي يحكم فيها القاضي بموت المفقود بمقتضى مضي الدة يكون موته حكميا لاحتمال أن يكون حيا",
+  "grounds": [],
+  "gist_id": "Mafqud: orang hilang yang tidak diketahui hidup atau matinya; kematiannya ditetapkan hakim, berdasarkan bukti (pasti) atau lewatnya waktu (secara hukum).",
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": Fiqh as-Sunnah §860 (refusal page: mafqud)",
+  "would_ground": [],
+  "status": "draft",
+  "notes": [
+   "The corpus record ends mid-sentence in the scholars' views on the waiting period; that part is left out."
+  ]
+ },
+ {
+  "id": "F-FSUNNAH-861-mafqud-mirath",
+  "kind": "fiqh",
+  "book": "Fiqh as-Sunnah (Sayyid Sabiq)",
+  "section_id": "861",
+  "anchor": "C1105",
+  "qism": "الفرائض",
+  "title": "ميراثه",
+  "char_range": [
+   566,
+   843
+  ],
+  "ar": "ميراث المفقود يتعلق به أمران: لانه إما أن يكون مورثا أو وارثا، ففي حالة ما إذا كان مورثا فإن ماله يبقى على مكله ولا يقسم بين ورثته إلى أن يتحقق موته أو يحكم القاضي بالموت. فإن ظهر حيا أخذ ماله وإن تحقق موته أو حكم القاضي بموته ورثه من كان وارثا له وقت الموت أو وقت الحكم بالموت",
+  "grounds": [],
+  "gist_id": "Bila orang hilang itu pewaris: hartanya tetap miliknya dan tidak dibagi sampai kematiannya pasti atau diputus hakim; lalu diwarisi ahli waris yang ada pada saat itu.",
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": Fiqh as-Sunnah §861 (refusal page: mafqud)",
+  "would_ground": [],
+  "status": "draft",
+  "notes": [
+   "The Egyptian law article quoted earlier in the record is left out; the record ends mid-sentence after this span, and the case of the missing person as an heir is not in the corpus record."
+  ]
+ },
+ {
+  "id": "F-FSUNNAH-862-khuntsa",
+  "kind": "fiqh",
+  "book": "Fiqh as-Sunnah (Sayyid Sabiq)",
+  "section_id": "862",
+  "anchor": "C1107",
+  "qism": "الفرائض",
+  "title": "الخنثى / كيف يرث",
+  "char_range": [
+   23,
+   570
+  ],
+  "ar": "الخنثى شخص اشتبه في أمره ولم يدر أذكر هو أم أنثى؟ إما لان له ذكره وفرجا معا أو لانه ليس له شئ منهما أصلا. كيف يرث : إن تبينأنه ذكر ورث ميراث الذكر وإن تبين أنه أنثى ورث ميراثها. وتتبين الذكورة والانوثة بظهور علامات كل منهما. وهي قبل البلوغ تعرف بالبول فإن بال بالعضو المخصوص بالذكر فهو ذكر وان بال بالعضو المخصوص بالانثى فهو أنثى، وإن بال منهما كان الحكم للاسبق. وبعد البلوغ إن نبتت له لحية أو أتى النساء أو احتلم كما يحتلم الرجال فهو ذكر، وإن ظهر له ثدي كثدي المرأة أو در له لبن أو حاض أو حبل فهو أنثى، وهو في هاتين الحالتين يقال له خنثى غير مشكل",
+  "grounds": [],
+  "gist_id": "Khuntsa: orang yang tidak jelas laki-laki atau perempuan; bila tanda-tandanya jelas, ia mewarisi sesuai jenis itu (khuntsa ghairu musykil).",
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": Fiqh as-Sunnah §862 (refusal page: khuntsa)",
+  "would_ground": [],
+  "status": "draft",
+  "notes": []
+ },
+ {
+  "id": "F-FSUNNAH-863-ibn-zina",
+  "kind": "fiqh",
+  "book": "Fiqh as-Sunnah (Sayyid Sabiq)",
+  "section_id": "863",
+  "anchor": "C1108",
+  "qism": "الفرائض",
+  "title": "ميراث المرتد",
+  "char_range": [
+   285,
+   725
+  ],
+  "ar": "ابن الزنا هو المولود من غير زواج شرعي وابن الملاعنة هو الذي نفى الزوج الشرعي نسبه منه. وابن الزنا وابن الملاعنة لا توارث بينهما وبين أبويهما باجماع المسلمين لانتفاء النسب الشرعي. وإنما التوارث بينهما وبين أميهما. فعن ابن عمر أن رجلا لاعن امرأته في زمن النبي صلى الله عليه وسلم وانتفى من ولدها ففرق النبي بينهما وألحق الولد بالمرأة. رواه البخاري وأبو داود. ولفظه \" جعل رسول الله صلى الله عليه وسلم ميراث ابن الملاعنة لامه ولورثتها من بعدها \"",
+  "grounds": [],
+  "gist_id": "Anak zina dan anak li'an tidak saling mewarisi dengan ayahnya (dinukil sebagai ijma'), hanya dengan ibunya; lafaz riwayat yang dikutip menyebut juga ahli waris ibu sesudahnya.",
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": Fiqh as-Sunnah §863 (row mani.anak_luar_nikah, note only; + Legal Fatwa MUI 11/2012, KHI 186)",
+  "would_ground": [],
+  "status": "draft",
+  "notes": [
+   "Secondary citation: Sayyid Sabiq gives the li'an report as 'rawahu al-Bukhari wa Abu Dawud'; the primary is not extracted here. The Egyptian law article (47) that follows is left out."
+  ]
+ },
+ {
+  "id": "F-FSUNNAH-864-takharuj",
+  "kind": "fiqh",
+  "book": "Fiqh as-Sunnah (Sayyid Sabiq)",
+  "section_id": "864",
+  "anchor": "C1109",
+  "qism": "الفرائض",
+  "title": "التخارج",
+  "char_range": [
+   20,
+   262
+  ],
+  "ar": "التخارج هو أن يتصالح الورثة على إخراج بعضهم عن نصيبه في الميراث نظير شئ معين من التركة أو من غيرها. وقد يكون التخارج بين اثنين من الورثة على أن يحل أحدهم محل الاخر في نصيبيه في مقابل مبلغ من المال يقدمه له. حكمه: والتخارج جائز متى كان عن تراض",
+  "grounds": [],
+  "gist_id": "Takharuj: ahli waris berdamai untuk mengeluarkan salah seorang dari bagiannya dengan imbalan tertentu; hukumnya boleh bila atas dasar saling rela.",
+  "closes_gap": "docs/waris-plan.md §8 \"Gaps to extract in M1\": Fiqh as-Sunnah §864 (row khi.perdamaian, takharuj; + Legal KHI 183)",
+  "would_ground": [],
+  "status": "draft",
+  "notes": [
+   "The report that follows (the widow of 'Abd al-Rahman ibn 'Awf and 'Uthman) is given without a chain and is left out, as is the Egyptian law article (48)."
+  ]
+ },
+ {
+  "id": "F-FSUNNAH-855-radd-zawj",
+  "kind": "fiqh",
+  "book": "Fiqh as-Sunnah (Sayyid Sabiq)",
+  "section_id": "855",
+  "anchor": "C1098",
+  "qism": "الفرائض",
+  "title": "طريقة حل مسائل الرد",
+  "char_range": [
+   2,
+   494
+  ],
+  "ar": "وقد أخذ القانون بهذا الرأي إلا في مسألة واحدة أخذ فيها بمذهب عثمان، فحكم بالرد على أحد الزوجين وهي ما إذا مات أحد الزوجين ولم يترك وارثا سواه، فإن الزوج الحي يأخذ التركة كلها بطريق الفرض والرد، فالرد على احد الزوجين في القانون مؤخر عن ذوي الارحام فجاء نص المادة 30 من القانون هكذا: \" إذا لم تستغرق الفروض التركة ولم توجد عصبة من النسب رد الباقي على غير الزوجين من أصحاب الفروض بنسبة فروضهم، ويرد باقي التركة إلى أحد الزوجين إذا لم يوجد عصبة من النسب أو أحد الفروض النسبية أو أحد ذوي الارحام \"",
+  "grounds": [],
+  "gist_id": "Sayyid Sabiq: undang-undang waris Mesir mengembalikan sisa harta kepada ashabul furudh selain suami atau istri, kecuali satu keadaan yang mengikuti mazhab Utsman: bila suami atau istri tidak meninggalkan ahli waris lain, ia mengambil seluruh harta dengan fardh dan radd. Radd kepada suami atau istri itu baru berlaku bila tidak ada ashabah nasab, ashabul furudh nasabiyah, maupun dzawil arham (pasal 30).",
+  "closes_gap": "review 2026-10-09: Fiqh as-Sunnah §855 (C1098), radd to a spouse as Sayyid Sabiq reports the Egyptian law (row radd.semua, comparison only; not a plan §8 item)",
+  "would_ground": [
+   "R-radd"
+  ],
+  "status": "draft",
+  "notes": [
+   "Describes the Egyptian inheritance law (art. 30) as quoted by Sayyid Sabiq: not Indonesian law and not the Syafi'i school. It records 'Uthman's view only for a sole surviving spouse; 'Uthman's wider view (radd to every fardh heir, the spouse included) is G-RADD-SEMUA-UTSMAN.",
+   "The span opens with 'this view', which points back to the end of section 854, missing from the corpus (F-FSUNNAH-854-radd-no-nass breaks off there)."
+  ]
+ },
+ {
+  "id": "G-E1-sad-ibn-ar-rabi",
+  "kind": "gap",
+  "status": "external",
+  "source_doc": "docs/waris-research/dalil.md §7 E1",
+  "plan_ref": "docs/waris-plan.md §8 \"Still external\"",
+  "item": "Sa'd ibn ar-Rabi''s two daughters: two-thirds to the daughters, one-eighth to the widow, the rest to the uncle (the classic sabab al-nuzul of 4:11).",
+  "corpus_has": "Second-hand only: Fiqh as-Sunnah 840 ('rawahu al-khamsah illa an-Nasa'i'); Ibn Kathir and al-Tabari on 4:11.",
+  "needed": "The primary source (Abu Dawud, at-Tirmidhi, Ibn Majah), its number, and a grade from a named muhaddith.",
+  "related": [
+   "F-FSUNNAH-840-sad-rabi",
+   "S-IK-4-11",
+   "S-TB-4-11"
+  ],
+  "rules": [
+   "R-daughters",
+   "R-asbab-nuzul"
+  ],
+  "plan_rows": [
+   "fardh.anak_pr_*"
+  ],
+  "display": "Never shown until a named grading is found (plan D10); the two daughters' 2/3 is taught through the 4:176 analogy (T-IK-4-176-two-daughters)."
+ },
+ {
+  "id": "G-E2-grandmother-abu-bakr",
+  "kind": "gap",
+  "status": "external",
+  "source_doc": "docs/waris-research/dalil.md §7 E2",
+  "plan_ref": "docs/waris-plan.md §8 \"Still external\"",
+  "item": "Abu Bakr gave the grandmother one-sixth on the testimony of al-Mughira and Muhammad ibn Maslama.",
+  "corpus_has": "Not found (normalised search for the phrases of the report in fara'id contexts).",
+  "needed": "The primary source (Muwatta', Abu Dawud, at-Tirmidhi) and a grade.",
+  "related": [
+   "H-BULUGH-1103",
+   "F-FQARIB-117-furudh"
+  ],
+  "rules": [
+   "R-grandmother"
+  ],
+  "plan_rows": [
+   "fardh.nenek_1_6"
+  ],
+  "display": "Meanwhile the grandmother's sixth rests on H-BULUGH-1103 (hasan in the tahqiq) and on fiqh."
+ },
+ {
+  "id": "G-E3-first-awl-umar",
+  "kind": "gap",
+  "status": "external",
+  "source_doc": "docs/waris-research/dalil.md §7 E3",
+  "plan_ref": "docs/waris-plan.md §8 \"Still external\"",
+  "item": "'Umar's first 'aul case (husband and two sisters), with al-'Abbas, 'Ali or Zayd advising.",
+  "corpus_has": "Fiqh as-Sunnah 852 says only 'ruwiya' (it was reported), with no chain.",
+  "needed": "The primary report and a grade, if a lesson tells the story.",
+  "related": [
+   "F-FSUNNAH-852-awl-umar",
+   "F-FMUIN-35-awl"
+  ],
+  "rules": [
+   "R-awl"
+  ],
+  "plan_rows": [
+   "aul"
+  ],
+  "display": "The rule itself is taught as the Companions' ijtihad (F-FMUIN-35-awl) plus Legal KHI 192."
+ },
+ {
+  "id": "G-E4-funeral-first",
+  "kind": "gap",
+  "status": "external",
+  "source_doc": "docs/waris-research/dalil.md §7 E4",
+  "plan_ref": "docs/waris-plan.md §8 \"Still external\"",
+  "item": "The order of claims: funeral costs, then debts, then bequests, then shares.",
+  "corpus_has": "Debts before bequests: found (F-ALUMM-572, T-IK-4-11-dayn). Funeral costs from the estate: found (F-FMUIN-11-tajhiz). That funeral costs come first: not found.",
+  "needed": "A Syafi'i source for the order of claims on the estate.",
+  "related": [
+   "F-FMUIN-11-tajhiz",
+   "F-ALUMM-572",
+   "T-IK-4-11-dayn"
+  ],
+  "rules": [
+   "R-tajhiz",
+   "R-debt-wasiyya-first"
+  ],
+  "plan_rows": [
+   "estate.biaya"
+  ],
+  "display": "Cite Legal KHI 175(1) for the order until a kitab source is extracted."
+ },
+ {
+  "id": "G-E5-bulugh-canonical-numbers",
+  "kind": "gap",
+  "status": "external",
+  "source_doc": "docs/waris-research/dalil.md §7 E5",
+  "plan_ref": "docs/waris-plan.md §8 \"Still external\"",
+  "item": "Canonical sunnah.com numbers for the Bulugh fara'id and wasaya hadith.",
+  "corpus_has": "Local AhmedBaset numbers (1095-1119, and 649); tohed.com shows a third numbering (805-817).",
+  "needed": "A sunnah.com API key, or a manual read of sunnah.com/bulugh, then a mapping.",
+  "related": [
+   "H-BULUGH-1095",
+   "H-BULUGH-1107",
+   "H-BULUGH-1114",
+   "H-BULUGH-649"
+  ],
+  "rules": [],
+  "plan_rows": [],
+  "display": "Show the primary source a Bulugh entry names, never a Bulugh number (plan D10)."
+ },
+ {
+  "id": "G-E6-bulugh-primary-collections",
+  "kind": "gap",
+  "status": "external",
+  "source_doc": "docs/waris-research/dalil.md §7 E6",
+  "plan_ref": "docs/waris-plan.md §8 \"Still external\"",
+  "item": "The primary sources behind Bulugh entries that are not Bukhari or Muslim (Abu Dawud 2895, 2899, 3565; at-Tirmidhi 2103, 2120; Ibn Majah 2713, 2737; ad-Daraqutni 4/98; an-Nasa'i al-Kubra; for local 649: Ahmad 2/440, 475, 508 and at-Tirmidhi 1078, 1079).",
+  "corpus_has": "Only as numbers inside the Bulugh editor's footnotes.",
+  "needed": "Those collections in the corpus, checked against the cited numbers.",
+  "related": [
+   "H-BULUGH-1103",
+   "H-BULUGH-1114",
+   "H-BULUGH-649"
+  ],
+  "rules": [
+   "R-no-wasiyya-heir",
+   "R-grandmother"
+  ],
+  "plan_rows": [],
+  "display": "Show them as 'dikutip dalam Bulugh al-Maram' until they are added and checked."
+ },
+ {
+  "id": "G-E7-learn-faraid",
+  "kind": "gap",
+  "status": "external",
+  "source_doc": "docs/waris-research/dalil.md §7 E7",
+  "plan_ref": "docs/waris-plan.md §8 \"Still external\"",
+  "item": "Hadith on the virtue of learning the fara'id ('learn the fara'id', 'half of knowledge').",
+  "corpus_has": "Fiqh as-Sunnah 840-841 without grades; Bulugh 1110 (a related report) graded da'if.",
+  "needed": "An external grading. Until then these are not used in a lesson.",
+  "related": [
+   "H-BULUGH-1110",
+   "S-FIQH-AS-SUNNAH-840",
+   "S-FIQH-AS-SUNNAH-841"
+  ],
+  "rules": [
+   "R-learn-faraid"
+  ],
+  "plan_rows": [],
+  "display": "Never shown (plan D10)."
+ },
+ {
+  "id": "G-E8-id-translation-bukhari-bulugh",
+  "kind": "gap",
+  "status": "external",
+  "source_doc": "docs/waris-research/dalil.md §7 E8",
+  "plan_ref": "docs/waris-plan.md §8 \"Still external\"",
+  "item": "Indonesian translations of the Bukhari and Bulugh texts (and of the kitab and tafsir spans).",
+  "corpus_has": "None.",
+  "needed": "In-house translations reviewed and signed by an ustadz.",
+  "related": [],
+  "rules": [],
+  "plan_rows": [],
+  "display": "Until signed, the card shows the Arabic, the citation and 'terjemahan menunggu tinjauan ustadz' (plan D10)."
+ },
+ {
+  "id": "G-E9-indonesian-provisions",
+  "kind": "gap",
+  "status": "external",
+  "source_doc": "docs/waris-research/dalil.md §7 E9",
+  "plan_ref": "docs/waris-plan.md §8 rows marked Legal",
+  "item": "Indonesia-specific provisions: KHI substitute heirs, wasiat wajibah, joint marital property, radd to a spouse.",
+  "corpus_has": "Not in the corpus. Fiqh as-Sunnah 865-866 is Egyptian law (No. 71/1946) and is not used.",
+  "needed": "Pinned official legal texts (KHI, SEMA, MA decisions, MUI fatwas): URL, sha256, page (plan M0).",
+  "related": [
+   "S-FIQH-AS-SUNNAH-865",
+   "S-FIQH-AS-SUNNAH-866"
+  ],
+  "rules": [
+   "R-ext-mui-khi"
+  ],
+  "plan_rows": [],
+  "display": "Legal sources, not dalil; quoted only from pinned PDFs."
+ },
+ {
+  "id": "G-E10-zayd-husband-sister",
+  "kind": "gap",
+  "status": "external",
+  "source_doc": "docs/waris-research/dalil.md §7 E10",
+  "plan_ref": "docs/waris-plan.md §8 \"Still external\"",
+  "item": "Zayd ibn Thabit's report of the Prophet's ruling: husband one-half, full sister one-half.",
+  "corpus_has": "Second-hand only (Ibn Kathir 4:176, who notes that Ahmad alone narrates it by this route).",
+  "needed": "A grade, if it is used. The rule itself follows from the Qur'an text.",
+  "related": [
+   "T-IK-4-176-zayd-husband-sister"
+  ],
+  "rules": [
+   "R-siblings-kalala",
+   "R-spouses"
+  ],
+  "plan_rows": [],
+  "display": "Not needed for the rule; do not show without a grade."
+ },
+ {
+  "id": "G-E11-newborn-wording",
+  "kind": "gap",
+  "status": "external",
+  "source_doc": "docs/waris-research/dalil.md §7 E11",
+  "plan_ref": "docs/waris-plan.md §8 \"Still external\"",
+  "item": "The newborn's sign of life (istihlal): which narration and which wording.",
+  "corpus_has": "Bulugh 1106's footnote cites at-Tirmidhi 1032, Ibn Majah 2750-2751 and Ibn Hibban 1223, and says the wording belongs to Abu Hurayra's hadith, not Jabir's.",
+  "needed": "The primary texts, to settle which wording to quote (see G-E6).",
+  "related": [
+   "H-BULUGH-1106",
+   "S-FIQH-AS-SUNNAH-857"
+  ],
+  "rules": [
+   "R-newborn"
+  ],
+  "plan_rows": [],
+  "display": "Refusal page only; quote with the tahqiq note."
+ },
+ {
+  "id": "G-AKDARIYYAH",
+  "kind": "gap",
+  "status": "external",
+  "source_doc": "docs/waris-research/engine.md §8.3",
+  "plan_ref": "docs/waris-plan.md §8 \"Still external\"",
+  "item": "Akdariyyah: husband, mother, grandfather and one full or paternal sister (and no other sibling).",
+  "corpus_has": "No corpus record. engine.md §8.3 rests on Khairuddin pp. 89-92 and Achmad Yani, which are not in the corpus.",
+  "needed": "A kitab page (Syafi'i), extracted or pinned, before the rule note cites anything.",
+  "related": [],
+  "rules": [
+   "R-special-cases",
+   "R-grandfather"
+  ],
+  "plan_rows": [
+   "akdariyyah"
+  ],
+  "display": "No dalil to show; the rule note says the source is pending."
+ },
+ {
+  "id": "G-UMARIYYATAIN-JADD",
+  "kind": "gap",
+  "status": "external",
+  "source_doc": "docs/waris-plan.md §8 (row fardh.kakek_1_6, jadd.*; External (review))",
+  "plan_ref": "docs/waris-plan.md §8 External (review)",
+  "item": "'Umariyyatain with the grandfather instead of the father: the mother takes one-third of the whole.",
+  "corpus_has": "F-FMUIN-34-jadd-like-ab is a summary sentence and is not read as an exhaustive list; the corpus has no explicit statement of this case.",
+  "needed": "al-Mawardi, al-Hawi al-Kabir, vol. 8 p. 121, Bab mirath al-jadd (the review's source; engine.md source list, islamweb library edition), pinned with URL, sha256 and page.",
+  "related": [
+   "F-FMUIN-34-jadd-like-ab",
+   "F-FMUIN-34-umariyyatain"
+  ],
+  "rules": [
+   "R-grandfather",
+   "R-mother-third-sixth"
+  ],
+  "plan_rows": [
+   "fardh.kakek_1_6",
+   "jadd.*",
+   "umariyyatain"
+  ],
+  "display": "No dalil to show for the grandfather variant until the page is pinned."
+ },
+ {
+  "id": "G-RADD-SEMUA-UTSMAN",
+  "kind": "gap",
+  "status": "external",
+  "source_doc": "docs/waris-research/engine.md §9.4 (residue = radd_all)",
+  "plan_ref": "review 2026-10-09 of the radd.semua RuleNote (not a docs/waris-plan.md §8 item)",
+  "item": "'Uthman's view that the residue returns to every fardh heir in proportion, the spouse included (the comparison profile residue = radd_all; the literal reading of KHI 193).",
+  "corpus_has": "Fiqh as-Sunnah §854 says only that no text settles radd and that the scholars differ, and the corpus record breaks off there; §855 records that the Egyptian law follows 'Uthman only for a sole surviving spouse (F-FSUNNAH-855-radd-zawj).",
+  "needed": "A text stating 'Uthman's radd to the spouse alongside other fardh heirs (engine.md §9.4 and plan D7 cite Khairuddin, Fikih Faraidh, pp. 54-55, which is not in the corpus), retrieved and pinned with URL, sha256 and page before the radd.semua note cites it.",
+  "related": [
+   "F-FSUNNAH-854-radd-no-nass",
+   "F-FSUNNAH-855-radd-zawj"
+  ],
+  "rules": [
+   "R-radd"
+  ],
+  "plan_rows": [
+   "radd.semua"
+  ],
+  "display": "No dalil to show for radd to a spouse alongside other heirs; the rule note says the source is pending."
+ }
+]

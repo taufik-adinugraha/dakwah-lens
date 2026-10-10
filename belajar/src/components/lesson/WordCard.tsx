@@ -11,7 +11,6 @@ import { MixedText } from "../library/MixedText";
 import { SharafPanel, type SharafLabels } from "../library/SharafPanel";
 import { SourceList } from "../library/SourceList";
 import { CaseBadge } from "./CaseBadge";
-import { DraftChip } from "./DraftChip";
 
 export type WordCardLabels = {
   role: string;
@@ -112,7 +111,6 @@ export function WordCard({
       </div>
 
       <div className="mt-auto pt-3">
-        {word.status === "draft" ? <DraftChip label={labels.draft} /> : null}
 
         <details className="group/word mt-3">
           <summary className="disclosure-row rounded-xl border-[1.5px] border-border-ui bg-white px-4 text-ink hover:border-forest">

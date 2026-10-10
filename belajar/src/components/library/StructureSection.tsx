@@ -2,7 +2,6 @@ import type { Ayah } from "@/content/schema";
 import { Link } from "@/i18n/navigation";
 import { conceptHref } from "@/lib/routes";
 
-import { DraftChip } from "../lesson/DraftChip";
 import { MixedText } from "./MixedText";
 import { SourcesDisclosure } from "./SourceList";
 
@@ -86,7 +85,6 @@ export function StructureSection({
       )}
 
       <SourcesDisclosure sources={st.sources} label={labels.sources} className="mt-5" />
-      {st.status === "draft" ? <DraftChip label={labels.draft} /> : null}
     </section>
   );
 }

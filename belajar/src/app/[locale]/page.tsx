@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
-import { ArrowRight, BookOpen, Library } from "lucide-react";
+import { ArrowRight, BookOpen, Library, Scale } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { StatusChip } from "@/components/StatusChip";
 import { TextSizeHint } from "@/components/TextSizeSwitch";
+import { AiChip } from "@/components/waris/report/AiChip";
 import { Link } from "@/i18n/navigation";
 import { hasDrafts, SURAHS } from "@/lib/content";
 import { LIBRARY } from "@/lib/library";
-import { conceptIndexHref, quranHref } from "@/lib/routes";
+import { conceptIndexHref, quranHref, warisHref } from "@/lib/routes";
 
 export async function generateMetadata({
   params,
@@ -36,6 +37,7 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("Hub");
+  const tw = await getTranslations("Track");
 
   const quranDraft = SURAHS.some(hasDrafts);
   const surahList = SURAHS.map((s) =>
@@ -64,6 +66,19 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
       draft: conceptsDraft,
       cta: t("concepts_cta"),
     },
+    {
+      // Ilmu Waris (Faraidh): what exists today is the calculator (docs/waris-plan.md §9.1, M2.13).
+      // No human review (operator, 2026-10-09), so the chip states what it is, not a review status.
+      href: warisHref.track(),
+      Icon: Scale,
+      title: tw("hub_title"),
+      body: tw("hub_body"),
+      available: tw("hub_available"),
+      status: tw("chip"),
+      draft: false,
+      ai: true,
+      cta: tw("hub_cta"),
+    },
   ];
 
   return (
@@ -87,7 +102,7 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
             learner's text size grows (senior-ux.md §3.4). */}
         <div className="@container mt-3">
           <ul className="grid gap-4 @2xl:grid-cols-2">
-            {tracks.map(({ href, Icon, title, body, available, status, draft, cta }) => (
+            {tracks.map(({ href, Icon, title, body, available, status, draft, ai, cta }) => (
               <li key={href}>
                 {/* The whole card is the link; nothing inside it is
                     interactive (the status is a label, not a control). */}
@@ -100,7 +115,7 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
                   <p className="mt-1.5 text-pretty text-base text-ink-muted">{body}</p>
                   <p className="mt-3 text-base text-ink">{available}</p>
                   <span className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-5">
-                    <StatusChip label={status} draft={draft} />
+                    {ai ? <AiChip label={status} /> : <StatusChip label={status} draft={draft} />}
                     <span className="inline-flex items-center gap-1.5 text-base font-semibold text-forest">
                       {cta}
                       <ArrowRight aria-hidden className="h-5 w-5 shrink-0" />

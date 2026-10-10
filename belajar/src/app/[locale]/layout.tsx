@@ -3,9 +3,10 @@ import { Amiri, Fraunces, Inter } from "next/font/google";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 
 import { AccountChip } from "@/components/AccountChip";
+import { FooterDisclaimer } from "@/components/FooterDisclaimer";
 import { TextSizeSwitch } from "@/components/TextSizeSwitch";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
@@ -38,6 +39,14 @@ const inter = Inter({
  */
 const PRE_PAINT = `(function(){try{var d=document.documentElement,s=localStorage.getItem("belajar:v1:text-size");if(s==="besar"||s==="sangat-besar")d.dataset.textSize=s;if(s||localStorage.getItem("belajar:v1:text-size-hint"))d.dataset.textHint="off"}catch(e){}})();`;
 
+/**
+ * Ilmu Waris namespaces (messages/waris/*.json, merged in i18n/request.ts). Kept out of the
+ * module-wide client provider: about 60 KB that no other page reads. The calculator and the
+ * report pages wrap their client trees in their own provider with exactly what those trees read;
+ * "Track" is read on the server only.
+ */
+const WARIS_NAMESPACES: ReadonlySet<string> = new Set(["Q", "Exit", "Report", "Track"]);
+
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
@@ -64,6 +73,9 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
   const t = await getTranslations("App");
   const tf = await getTranslations("Footer");
+  const tw = await getTranslations("Track");
+  const all = await getMessages();
+  const clientMessages = Object.fromEntries(Object.entries(all).filter(([ns]) => !WARIS_NAMESPACES.has(ns)));
 
   // suppressHydrationWarning: the pre-paint script sets data-text-size /
   // data-text-hint on <html> before React hydrates.
@@ -77,7 +89,7 @@ export default async function LocaleLayout({
         <script dangerouslySetInnerHTML={{ __html: PRE_PAINT }} />
       </head>
       <body className="min-h-dvh bg-paper font-body text-ink">
-        <NextIntlClientProvider>
+        <NextIntlClientProvider messages={clientMessages}>
           <a
             href="#isi"
             className="sr-only rounded-full bg-forest px-5 py-3 text-base font-semibold text-paper focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50"
@@ -129,9 +141,10 @@ export default async function LocaleLayout({
 
           <footer className="mt-16 border-t border-hairline">
             <div className="mx-auto flex max-w-5xl flex-col gap-4 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-              {/* Mandatory label (AGENTS.md): always visible, never collapsed. */}
+              {/* Mandatory label (AGENTS.md): always visible, never collapsed. The waris track
+                  has no human review, so it gets its own label (FooterDisclaimer). */}
               <p className="max-w-prose text-pretty text-base text-ink-muted">
-                {tf("disclaimer")}
+                <FooterDisclaimer module={tf("disclaimer")} waris={tw("footer_disclaimer")} />
               </p>
               <div className="flex flex-wrap gap-x-6 gap-y-2 text-base">
                 <Link href={creditsHref()} className="link-text inline-flex min-h-11 items-center">
