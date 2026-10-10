@@ -450,3 +450,71 @@ lafaz Allah under ilāh (plan §8); a wazan for al-khannās.
   unbalanced quotation mark. None of the three suras has footnotes.
 - QuranEnc footnotes are shipped verbatim with their markers; the app must render them under the
   ayah (schema `translation.footnotes`).
+
+## Ilmu Waris (dalil pipeline)
+
+The dalil half of the Ilmu Waris track's M1 (`docs/waris-plan.md` §8–§10; research in
+`docs/waris-research/dalil.md`, `dalil.json` and `architecture.md` §4). Same ground rules as above:
+no Arabic is typed, every string is a whole source field or an offset slice of one, stdlib only,
+no LLM or paid API, every record draft until the fara'id reviewer signs.
+
+```bash
+cd belajar/pipeline
+python3 fetch.py --skip-audio   # also pins QuranEnc suras 2, 4, 8, 33, 42, 49, 60 and fawazahmed0 Muslim sections 23-25
+python3 build_waris.py          # writes ../content/waris/{dalil,dalil-gaps,dalil-provenance,rules}.json; exit 1 if dalil.json != the docs copy
+python3 build_waris.py --rules-only   # rules.json only (from authored/waris.rules.json)
+python3 validate_waris.py       # independent re-check against Tanzil, QuranEnc, api/data and the pins; exit 1 on any failure
+python3 validate_waris.py --no-corpus  # what CI runs: every check that needs neither api/data nor cache/; prints what it skipped
+python3 validate_waris.py --rules-only # RuleNotes only
+python3 test_validate_waris.py  # mutation tests: plants 52 faults in copies of the outputs, each must fail validate_waris.py
+python3 test_validate_waris.py --no-corpus  # what CI runs: the 33 corpus-free faults; the 19 corpus-only ones skipped by name
+node ../scripts/check-waris-vector-parity.mjs   # research-phase parity (docs copy vs belajar copy), skipped where docs/ is absent
+```
+
+| File | Role |
+|---|---|
+| `ar.py` | Arabic search key and harakat-insensitive regex for the corpus (moved from the DALIL researcher's scratchpad; same patterns, written with escapes); the printed editions' running heads that excerpts are cut around (`running_head_spans`, `elide`) |
+| `build_dalil.py` | The research stage, moved from the scratchpad: rebuilds `docs/waris-research/dalil.json` byte for byte from the pinned inputs, including the 2026-10-09 review edits (`apply_review_2026_10_09`, each edit asserts the value it replaces) |
+| `build_waris.py` | Writes the three files below; extracts the plan §8 gap list; fails unless `dalil.json` equals the docs copy while that exists |
+| `validate_waris.py` | Independent re-check (its docstring lists the 10 checks); warns about two known research-file defects (below). `--no-corpus` runs the corpus-free subset; without it a missing `api/data` file is a failure, never a skip |
+| `test_validate_waris.py` | Mutation tests for `validate_waris.py` (stdlib `unittest`; `python3 test_validate_waris.py` prints the table). A full run also proves `NEEDS_CORPUS` exact: every other fault is caught by `--no-corpus` too |
+| `authored/waris.rules.json` | The RuleNote drafts (one per engine rule id in `src/lib/waris/registry.ts`), written by hand; `build_waris.py` copies them to `../content/waris/rules.json` in registry order |
+| `../content/waris/dalil.json` | 228 research records (13 ayat, 46 hadith, 26 fiqh, 19 tafsir excerpts, 82 section pointers, 41 rules); byte-identical to `docs/waris-research/dalil.json`, which is canonical during the research phase |
+| `../content/waris/dalil-gaps.json` | The plan §8 gap list: 26 extracted records (9 ayat, 6 hadith, 11 kitab/tafsir excerpts) in the `dalil.json` shapes, plus 13 `kind: "gap"` records for what the corpus cannot ground (E1–E11, Akdariyyah, 'Umariyyatain with the grandfather). The 2026-10-09 review added one excerpt (`F-FSUNNAH-855-radd-zawj`) and one gap (`G-RADD-SEMUA-UTSMAN`) for the `radd.semua` note. Ids never collide with `dalil.json`: readers take the union. `would_ground` names the rule an extracted record supports; the rule records stay unchanged until the docs copy stops being canonical |
+| `../content/waris/dalil-provenance.json` | For every record that copies or points at corpus bytes: source, locator, sha256 of the whole source field, sha256 of the copied bytes, and the span when it is a slice (with `omit` / `source_truncated` when the excerpt carries the marks below) |
+| `../content/waris/rules.json` | Generated RuleNotes (95) plus the 22 legal sources; all draft |
+| `../content/waris/test-vectors.json` | Byte copy of `docs/waris-research/test-vectors.json` (the engine's vectors, 99 since the 12 plan §4 case-study vectors were merged in on 2026-10-09; parity-checked). The engine runs them with `npx --yes tsx@4.19.2 scripts/waris-check.ts` from `belajar/` |
+
+**Inputs.** `tanzil_uthmani` is the whole Qur'an (6236 verse lines), so the Arabic needs no new
+download. `quranenc_indonesian_affairs_waris` pins the seven QuranEnc sura files; the sura-1 entry is
+untouched, and the version (1.0.1) is the one read from its pinned translations list.
+`fawazahmed0_muslim_sections` maps `api/data/muslim.json`'s sequential numbers to the Fuad Abd al-Baqi
+numbers (1615a style); the Arabic is checked byte-identical before a number is used. The hadith,
+kitab and tafsir bytes come from `api/data/*.json`, the platform corpus, which is git-ignored: each
+file's sha256 is in META.sources and each copied field's sha256 in `dalil-provenance.json`, so a
+changed corpus fails `validate_waris.py`. For the same reason the corpus checks run locally (like
+`validate.py`); CI (`.github/workflows/deploy-belajar.yml`, verify job) runs the parity script,
+`validate_waris.py --no-corpus` and `test_validate_waris.py --no-corpus`. Run the full
+`validate_waris.py` before committing any change to the dalil files.
+
+**Known data issues (for the reviewer and the research owner).**
+- `dalil.json` META still names the scratchpad (`generator`, `sources.quranenc.files`). The strings are
+  kept so the rebuild is byte-identical; the bytes now come from the pinned cache and have the same
+  sha256, which `validate_waris.py` checks.
+- `H-BULUGH-1114` and `H-BULUGH-1116`: the shown matn span (`ar_matn_and_ibn_hajar_attribution`)
+  carries the editor's in-text footnote marker ("1" + RLM) mid-matn. The display must strip it, or the
+  span must be split; `validate_waris.py` warns for these two and fails for any other record.
+- Five Arabic quotations in four review notes of `dalil.json` (H-BUKHARI-6734, T-IK-4-7-muhkam,
+  R-hajb-siblings, R-asabah-order) are in a cleaned form that is not a byte-exact substring of the corpus
+  (brackets and spacing removed). They are reviewer notes, never dalil; do not display them.
+- Several corpus records are chunked mid-sentence (Fiqh as-Sunnah 860, 861; al-Umm 559): the
+  extracted spans stop at the last complete clause and say so in `notes`. Fiqh as-Sunnah 854 breaks off
+  inside the sentence the excerpt needs: `F-FSUNNAH-854-radd-no-nass` carries `source_truncated` and
+  its `ar` ends with " …" (review 2026-10-09).
+- **Running heads (review 2026-10-09).** The Fath al-Qarib and Fath al-Mu'in corpus texts carry the
+  printed edition's title line at every page break, mid-sentence (Fath al-Mu'in sometimes followed by
+  ~33 zero digits). Five excerpts crossed one (`F-FQARIB-116-heirs`, `-116-barriers`, `-117-furudh`,
+  `F-FMUIN-35-awl`, `-35-usul`). An excerpt is now cut around each head: `omit` lists the source spans
+  removed, `ar` shows each cut as "…", and `validate_waris.py` checks that every omitted span is exactly a
+  running head (corpus) and that no shown Arabic field carries a head or a 6+ digit run (corpus-free).
+  `docs/waris-research/dalil.json` was regenerated from `build_dalil.py` for this (META.excerpt_marks).

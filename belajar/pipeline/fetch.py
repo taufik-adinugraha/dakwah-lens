@@ -23,7 +23,7 @@ import urllib.request
 import zipfile
 from pathlib import Path
 
-from common import PIPELINE, SURAHS, load_sources, mp3_duration_ms, save_sources, sha256_bytes
+from common import PIPELINE, SURAHS, load_sources, load_tanzil, mp3_duration_ms, save_sources, sha256_bytes
 
 UA = "dakwah-lens-belajar-pipeline/0.1 (+https://dakwah-lens.id)"
 TODAY = dt.date.today().isoformat()
@@ -186,6 +186,64 @@ def fetch_quranenc(meta: dict, refresh: bool, repin: set[str]) -> None:
     meta["retrieved"] = meta.get("retrieved") or TODAY
 
 
+def fetch_quranenc_waris(meta: dict, sura1: dict, tanzil: dict, refresh: bool, repin: set[str]) -> None:
+    """Ilmu Waris dalil (plan §9.2): the same QuranEnc endpoint and translation as sura 1 above, for
+    the suras that hold the inheritance ayat and the plan §8 gap ayat. The sura endpoint reports no
+    version, so the version is the one fetch_quranenc() read from the pinned translations list."""
+    key = "quranenc_indonesian_affairs_waris"
+    counts: dict[int, int] = {}
+    for (s, _a) in load_tanzil(PIPELINE / tanzil["cache_path"]).verses:
+        counts[s] = counts.get(s, 0) + 1
+    d = PIPELINE / meta["cache_dir"]
+    for sura in meta["suras"]:
+        name = f"indonesian_affairs_sura{sura}.json"
+        url = meta["url_pattern"].replace("{SURA}", str(sura))
+        b = obtain(d / name, url, refresh)
+        f = meta["files"].setdefault(name, {"url": url, "sha256": None})
+        if f["url"] != url:
+            problems.append(f"[{key}] {name}: pinned url {f['url']} != {url}")
+        pin(f, name, b, key, repin)
+        f["bytes"] = len(b)
+        rows = json.loads(b)["result"]
+        if {int(r["sura"]) for r in rows} != {sura}:
+            problems.append(f"[{key}] {name}: rows are not all sura {sura}")
+        if [int(r["aya"]) for r in rows] != list(range(1, counts[sura] + 1)):
+            problems.append(f"[{key}] {name}: ayat are not 1..{counts[sura]} (the Tanzil count)")
+        f["ayat"] = len(rows)
+        f["retrieved"] = f.get("retrieved") or TODAY
+    if meta.get("version") != sura1.get("version") or meta.get("title_id") != sura1.get("title_id"):
+        problems.append(f"[{key}] version/title {meta.get('version')!r}/{meta.get('title_id')!r} differ from the "
+                        f"translations list as read for sura 1: {sura1.get('version')!r}/{sura1.get('title_id')!r}")
+
+
+def fetch_fawaz_muslim(meta: dict, refresh: bool, repin: set[str]) -> None:
+    """Ilmu Waris dalil: fawazahmed0 Sahih Muslim sections, used only to map api/data/muslim.json's
+    sequential numbers to Fuad Abd al-Baqi numbers (build_dalil.muslim_canon)."""
+    key = "fawazahmed0_muslim_sections"
+    d = PIPELINE / meta["cache_dir"]
+    for n in meta["sections"]:
+        name = f"ara-muslim-sections-{n}.json"
+        url = meta["url_pattern"].replace("{N}", str(n))
+        b = obtain(d / name, url, refresh)
+        f = meta["files"].setdefault(name, {"url": url, "sha256": None})
+        if f["url"] != url:
+            problems.append(f"[{key}] {name}: pinned url {f['url']} != {url}")
+        pin(f, name, b, key, repin)
+        f["bytes"] = len(b)
+        data = json.loads(b)
+        md = data["metadata"]
+        if md.get("name") != "Sahih Muslim" or list(md.get("section", {})) != [str(n)]:
+            problems.append(f"[{key}] {name}: metadata is not Sahih Muslim section {n}")
+            continue
+        det = md["section_detail"][str(n)]
+        nums = [h["hadithnumber"] for h in data["hadiths"]]
+        if nums != list(range(det["hadithnumber_first"], det["hadithnumber_last"] + 1)):
+            problems.append(f"[{key}] {name}: hadithnumber is not the contiguous range the metadata states")
+        f["section_title_en"] = md["section"][str(n)]
+        f["hadithnumber_range"] = [det["hadithnumber_first"], det["hadithnumber_last"]]
+        f["retrieved"] = f.get("retrieved") or TODAY
+
+
 def fetch_everyayah(input_id: str, meta: dict, refresh: bool, repin: set[str]) -> None:
     d = PIPELINE / meta["cache_dir"]
     for spec in SURAHS:
@@ -212,6 +270,7 @@ def main() -> int:
     ap.add_argument("--refresh", action="store_true", help="re-download and compare against the pins")
     ap.add_argument("--repin", action="append", default=[], help="accept new bytes for this input id")
     ap.add_argument("--skip-audio", action="store_true", help="skip the EveryAyah duration probes")
+    ap.add_argument("--skip-waris", action="store_true", help="skip the Ilmu Waris inputs (QuranEnc suras > 1, Muslim map)")
     args = ap.parse_args()
     repin = set(args.repin)
     src = load_sources()
@@ -221,6 +280,11 @@ def main() -> int:
     print("qac_morphology"); fetch_qac(I["qac_morphology"], args.refresh, repin)
     print("quran_align"); fetch_quran_align(I["quran_align"], args.refresh, repin)
     print("quranenc_indonesian_affairs"); fetch_quranenc(I["quranenc_indonesian_affairs"], args.refresh, repin)
+    if not args.skip_waris:
+        print("quranenc_indonesian_affairs_waris")
+        fetch_quranenc_waris(I["quranenc_indonesian_affairs_waris"], I["quranenc_indonesian_affairs"],
+                             I["tanzil_uthmani"], args.refresh, repin)
+        print("fawazahmed0_muslim_sections"); fetch_fawaz_muslim(I["fawazahmed0_muslim_sections"], args.refresh, repin)
     if not args.skip_audio:
         for k in ("everyayah_husary_muallim", "everyayah_alafasy"):
             print(k); fetch_everyayah(k, I[k], args.refresh, repin)

@@ -47,6 +47,24 @@ export function ayahHref(slug: string, ayah: number, wordLoc?: string) {
 /** DOM id of a word card, from its loc: "1:2:3" → "w-1-2-3". */
 export const wordAnchorId = (loc: string) => `w-${loc.replaceAll(":", "-")}`;
 
+/** The Ilmu Waris track's segment: /belajar/{locale}/waris/… (docs/waris-plan.md §9.1). */
+const WARIS = "waris";
+
+/**
+ * Ilmu Waris (Faraidh) links. The report's answers travel only in the URL
+ * FRAGMENT ("#j=v1.…", plan D9): never a query string, which would reach the
+ * server through the /belajar/api/me referrer. `hitung({ baru: true })` asks
+ * the questionnaire for a fresh start ("#baru"), for "Hitung untuk beliau".
+ */
+export const warisHref = {
+  /** Track home: /waris */
+  track: () => `/${WARIS}`,
+  /** The questionnaire "Hitung waris keluarga saya". */
+  hitung: (opts?: { baru?: boolean }) => (opts?.baru ? `/${WARIS}/hitung#baru` : `/${WARIS}/hitung`),
+  /** The report "Rekomendasi Pembagian Waris"; with a share token, its fragment link. */
+  laporan: (token?: string) => (token ? `/${WARIS}/laporan#j=${token}` : `/${WARIS}/laporan`),
+} as const;
+
 /** Shared library, hub level. */
 export const conceptIndexHref = () => "/konsep";
 export const conceptHref = (id: string) => `/konsep/${id}`;

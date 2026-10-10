@@ -104,6 +104,128 @@
         }
       }
     },
+    "quranenc_indonesian_affairs_waris": {
+      "name": "QuranEnc translation indonesian_affairs, suras 2, 4, 8, 33, 42, 49, 60 (Ilmu Waris dalil)",
+      "version": "1.0.1",
+      "url_pattern": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/{SURA}",
+      "version_url": "https://quranenc.com/api/v1/translations/list/id?localization=id",
+      "options": "Same endpoint and translation as quranenc_indonesian_affairs (sura 1). The sura endpoint reports no version, so the version and title are the ones fetch.py reads for sura 1 from the pinned translations list (version_sha256 of that entry); fetch.py fails if they differ. Suras 2, 4, 8 and 33 hold the inheritance ayat of docs/waris-research/dalil.json; 4, 33, 2, 42, 49 and 60 hold the plan §8 gap ayat. fetch.py also checks that each file has ayat 1..N, N = the Tanzil ayah count of that sura.",
+      "suras": [
+        2,
+        4,
+        8,
+        33,
+        42,
+        49,
+        60
+      ],
+      "cache_dir": "cache/quranenc",
+      "title_id": "Terjemahan Berbahasa Indonesia - Kementerian Agama",
+      "title_en": "Indonesian Translation - Ministry of Religious Affairs",
+      "files": {
+        "indonesian_affairs_sura2.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/2",
+          "sha256": "7c7fdff5bdbc29b330e7bdd563c7950bc34501485123d2913c74068005774f28",
+          "bytes": 423062,
+          "ayat": 286,
+          "retrieved": "2026-10-09"
+        },
+        "indonesian_affairs_sura4.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/4",
+          "sha256": "5312415a824f459641fbfe5fb7a4fda2f1ce4c32dffd827517911e17254c6a4c",
+          "bytes": 268970,
+          "ayat": 176,
+          "retrieved": "2026-10-09"
+        },
+        "indonesian_affairs_sura8.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/8",
+          "sha256": "6fb5464a5944592919a122b5cc8f54e995c89cb921d3280134d2583c2bc41540",
+          "bytes": 89350,
+          "ayat": 75,
+          "retrieved": "2026-10-09"
+        },
+        "indonesian_affairs_sura33.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/33",
+          "sha256": "9401aa54b8ebeb7dc15aca60674a1ec9ba7a8998ebb22e16c9d89fc8b6362d17",
+          "bytes": 94323,
+          "ayat": 73,
+          "retrieved": "2026-10-09"
+        },
+        "indonesian_affairs_sura42.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/42",
+          "sha256": "3bf7f083ec20ceda3b216e307287180e374a3bb4074a4259bb400c74da329c2d",
+          "bytes": 57367,
+          "ayat": 53,
+          "retrieved": "2026-10-09"
+        },
+        "indonesian_affairs_sura49.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/49",
+          "sha256": "c61cc582b75fba8cf64445e5588d7f99dd501fff1213390a376f0322dd4cf0b1",
+          "bytes": 24217,
+          "ayat": 18,
+          "retrieved": "2026-10-09"
+        },
+        "indonesian_affairs_sura60.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/60",
+          "sha256": "991c08c42350253291dd5f287fea2c120e24989053cd3888e7207146d3f536c7",
+          "bytes": 24949,
+          "ayat": 13,
+          "retrieved": "2026-10-09"
+        }
+      },
+      "licence": "QuranEnc terms of use (https://quranenc.com/en/home/api/): republishing allowed provided the text is not modified, the publisher and QuranEnc are credited, the version is stated, transcript information is kept, the latest version is used, and it is not placed next to inappropriate ads.",
+      "attribution": "Terjemahan Berbahasa Indonesia - Kementerian Agama (indonesian_affairs), via QuranEnc.com (Pusat Terjemah Ruwwād)."
+    },
+    "fawazahmed0_muslim_sections": {
+      "name": "fawazahmed0 hadith-api, Sahih Muslim (Arabic) sections 23, 24, 25 (number map only; never shipped)",
+      "version": "hadith-api@1 as served on retrieval date (jsDelivr; the @1 tag moves, so the sha256 pins are the version)",
+      "url_pattern": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-muslim/sections/{N}.json",
+      "repository": "https://github.com/fawazahmed0/hadith-api",
+      "options": "Authoring input only. build_dalil.py maps api/data/muslim.json's sequential hadithnumber to the Fuad Abd al-Baqi number with each hadith's arabicnumber ('.01' -> 'a', the rule of download_hadith.py) and asserts the Arabic is byte-identical to api/data/muslim.json before using the number. Section 23 = The Book of the Rules of Inheritance, 24 = The Book of Gifts, 25 = The Book of Wills (titles as the files' own metadata states them).",
+      "sections": [
+        23,
+        24,
+        25
+      ],
+      "cache_dir": "cache/fawazahmed0",
+      "files": {
+        "ara-muslim-sections-23.json": {
+          "url": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-muslim/sections/23.json",
+          "sha256": "cd1a2faac337ff28e22253cf25312126135a3cdd880fa9fb65868385ada44105",
+          "bytes": 21550,
+          "section_title_en": "The Book of the Rules of Inheritance",
+          "hadithnumber_range": [
+            4140,
+            4162
+          ],
+          "retrieved": "2026-10-09"
+        },
+        "ara-muslim-sections-24.json": {
+          "url": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-muslim/sections/24.json",
+          "sha256": "83c107753b79eb1315589688d9a35b4b08b72aae7c906e39df9a37443c749d8f",
+          "bytes": 39915,
+          "section_title_en": "The Book of Gifts",
+          "hadithnumber_range": [
+            4163,
+            4203
+          ],
+          "retrieved": "2026-10-09"
+        },
+        "ara-muslim-sections-25.json": {
+          "url": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-muslim/sections/25.json",
+          "sha256": "e1ba1130fc1cbc43b89ace4d90b9b86c4b60adce3127a0ae31c00796c2d070c4",
+          "bytes": 37029,
+          "section_title_en": "The Book of Wills",
+          "hadithnumber_range": [
+            4204,
+            4234
+          ],
+          "retrieved": "2026-10-09"
+        }
+      },
+      "licence": "Repository LICENSE: The Unlicense (public-domain dedication), https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/LICENSE. Rights in the underlying hadith edition are not stated there. Nothing from these files is shipped; only the canonical numbers derived from them.",
+      "attribution": "Hadith numbering map: fawazahmed0/hadith-api. https://github.com/fawazahmed0/hadith-api"
+    },
     "everyayah_husary_muallim": {
       "name": "EveryAyah recitation files, Husary_Muallim_128kbps, every surah in common.SURAHS (validation only; never re-hosted)",
       "version": "as served on retrieval date",

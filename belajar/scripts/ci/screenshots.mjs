@@ -18,6 +18,12 @@ const PAGES = [
   ["nas-6", "/belajar/id/quran/an-nas/6"],
   ["konsep", "/belajar/id/konsep"],
   ["kredit", "/belajar/id/kredit"],
+  // Ilmu Waris (docs/waris-plan.md §9.1): track home, the questionnaire's first screen, and the
+  // report page with no answers (its "start" notice). Filled reports, print and reduced-motion
+  // shots come from waris-e2e.mjs (waris-*.png).
+  ["waris", "/belajar/id/waris"],
+  ["waris-hitung", "/belajar/id/waris/hitung"],
+  ["waris-laporan-kosong", "/belajar/id/waris/laporan"],
 ];
 const VIEWPORTS = [
   ["phone", { width: 390, height: 844 }, 2],
