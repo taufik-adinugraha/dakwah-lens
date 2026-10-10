@@ -24,7 +24,6 @@ export type WordCardLabels = {
   other_views: string;
   sources: string;
   no_root: string;
-  draft: string;
 };
 
 /** Signs that are harakat ("dibaca kasrah") vs letters ("memakai huruf

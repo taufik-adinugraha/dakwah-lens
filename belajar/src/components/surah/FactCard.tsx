@@ -35,7 +35,7 @@ export function FactCard({
   labels,
 }: {
   fact: Fact;
-  labels: { method: string; where: string; sources: string; draft: string };
+  labels: { method: string; where: string; sources: string };
 }) {
   const t = useTranslations("Surah");
   const label = (loc: string) => t("loc_label", { loc });

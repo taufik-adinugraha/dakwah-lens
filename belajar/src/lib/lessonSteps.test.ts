@@ -3,7 +3,15 @@ import { describe, expect, it } from "vitest";
 import type { Ayah } from "@/content/schema";
 
 import { getAyah, getSurah } from "./content";
-import { buildLessonSteps, captionMs, latinSentences, MAX_CAPTION, splitCaption, type StepTexts } from "./lessonSteps";
+import {
+  buildLessonSteps,
+  captionMs,
+  latinSentences,
+  MAX_CAPTION,
+  splitCaption,
+  stripArabic,
+  type StepTexts,
+} from "./lessonSteps";
 import { conceptsIntroducedIn } from "./library";
 
 const T: StepTexts = {
@@ -160,6 +168,14 @@ describe("splitCaption", () => {
     const parts = splitCaption(run);
     for (const p of parts) expect(p.length).toBeLessThanOrEqual(MAX_CAPTION);
     expect(parts.join(" ")).toBe(norm(run));
+  });
+});
+
+describe("stripArabic", () => {
+  it("drops Arabic runs from a template part and tidies the spaces (the autoplay captions use it too)", () => {
+    const ar = String.fromCharCode(0x0631, 0x064e, 0x0628, 0x0651, 0x0650); // a vocalised word
+    expect(stripArabic(`Kata ${ar} , artinya Tuhan`)).toBe("Kata, artinya Tuhan");
+    expect(stripArabic("Tanpa huruf Arab.")).toBe("Tanpa huruf Arab.");
   });
 });
 

@@ -16,12 +16,21 @@ import {
   Feedback,
   Finished,
   OptionMark,
+  useGuide,
   useRestart,
   useStepFocus,
   type FeedbackKind,
 } from "./ExerciseShell";
+import { guideMarker, guideTarget, sortCaseGuidePart, type ExerciseGuide } from "./guide";
 
-type Props = { id: string; words: Word[] };
+type Props = {
+  id: string;
+  words: Word[];
+  /** Guided mode (see ExerciseShell.tsx). */
+  guided?: ExerciseGuide;
+  /** Hide the heading and instruction (the stage shows its own). */
+  compact?: boolean;
+};
 
 /**
  * "Kelompokkan menurut akhiran" — sort the ayah's words into raf' / nasb /
@@ -40,6 +49,8 @@ type Say = { kind: FeedbackKind; word?: Word; n: number };
 function SortCaseRound({
   id,
   words,
+  guided,
+  compact,
   restarted,
   onRestart,
 }: Props & { restarted: boolean; onRestart: () => void }) {
@@ -60,13 +71,18 @@ function SortCaseRound({
 
   const remaining = items.filter((w) => !placed[w.loc]);
   const finished = items.length > 0 && remaining.length === 0;
-  const focusRef = useStepFocus(finished ? 1 : 0);
+  const focusRef = useStepFocus(finished ? 1 : 0, !!guided);
   /** The words still to sort: focus lands here after "Tunjukkan jawaban",
    *  whose button disappears once the word is placed. */
   const wordsRef = useRef<HTMLDivElement>(null);
-
-  if (items.length < 2) return null;
   const selectedWord = items.find((w) => w.loc === selected) ?? null;
+  const canReveal = selectedWord !== null && (misses[selectedWord.loc] ?? 0) >= 2;
+  const empty = items.length < 2;
+  const part = empty ? null : sortCaseGuidePart({ finished, selected: selectedWord !== null, canReveal });
+  useGuide(guided, part && guideTarget("sort-case", part), empty);
+  const mark = guideMarker(guided, "sort-case");
+
+  if (empty) return null;
   const tell = (kind: FeedbackKind, word?: Word) => setSay({ kind, word, n: (say?.n ?? 0) + 1 });
 
   const place = (word: Word, counts: boolean) => {
@@ -76,7 +92,10 @@ function SortCaseRound({
     setFirstTry(right);
     setSelected(null);
     setWrongBins([]);
-    if (Object.keys(next).length === items.length) markDone(id, right / items.length);
+    if (Object.keys(next).length === items.length) {
+      markDone(id, right / items.length);
+      guided?.onDone?.();
+    }
   };
 
   const pick = (loc: string) => {
@@ -95,12 +114,16 @@ function SortCaseRound({
       return;
     }
     if (selectedWord.case.state === bin) {
+      // The answer is reported before place(), which reports onDone with
+      // the last word.
+      guided?.onAnswer?.(true);
       place(selectedWord, !misses[selectedWord.loc]);
       tell("ok", selectedWord);
     } else {
       setMisses({ ...misses, [selectedWord.loc]: (misses[selectedWord.loc] ?? 0) + 1 });
       if (!wrongBins.includes(bin)) setWrongBins([...wrongBins, bin]);
       tell("retry", selectedWord);
+      guided?.onAnswer?.(false);
     }
   };
 
@@ -111,11 +134,11 @@ function SortCaseRound({
     tell("reveal", selectedWord);
     // The pressed button unmounts with the placed word; keep keyboard focus
     // on the next step (picking a word). After the last word, useStepFocus
-    // moves focus to the result instead.
-    if (!last) wordsRef.current?.focus();
+    // moves focus to the result instead. Inside the lesson stage the page
+    // never scrolls by itself.
+    if (!last) wordsRef.current?.focus({ preventScroll: !!guided });
   };
 
-  const canReveal = selectedWord !== null && (misses[selectedWord.loc] ?? 0) >= 2;
   const step = selectedWord ? 2 : 1;
 
   const title =
@@ -134,6 +157,7 @@ function SortCaseRound({
       done={finished || Boolean(progress[id])}
       doneLabel={t("done")}
       autoFocus={restarted}
+      compact={compact}
     >
       {!finished && (
         <>
@@ -171,6 +195,7 @@ function SortCaseRound({
             tabIndex={-1}
             role="group"
             aria-label={t("sort_step_word")}
+            data-guide={mark("words")}
             dir="rtl"
             className="mt-4 flex min-h-14 flex-wrap justify-center gap-3 rounded-xl"
           >
@@ -211,7 +236,7 @@ function SortCaseRound({
           first step), a 2px case-colour border, the shape icon and an ink
           label. Container query: four across only while there is room. */}
       <div className={clsx("@container", !finished && "mt-5")}>
-        <div className="grid grid-cols-2 gap-3 @3xl:grid-cols-4">
+        <div data-guide={mark("bins")} className="grid grid-cols-2 gap-3 @3xl:grid-cols-4">
           {SORT_BINS.map((bin) => {
             const m = CASE_META[bin];
             const inBin = items.filter((w) => placed[w.loc] === bin);
@@ -260,7 +285,7 @@ function SortCaseRound({
 
       {canReveal && !finished && (
         <div className="mt-4">
-          <button type="button" onClick={reveal} className="btn-secondary">
+          <button type="button" onClick={reveal} data-guide={mark("reveal")} className="btn-secondary">
             <Lightbulb className="h-5 w-5" aria-hidden />
             {t("reveal")}
           </button>
@@ -269,7 +294,7 @@ function SortCaseRound({
 
       {finished && (
         <div ref={focusRef} tabIndex={-1} className="mt-4">
-          <Finished right={firstTry} total={items.length} onRestart={onRestart} />
+          <Finished right={firstTry} total={items.length} onRestart={guided ? undefined : onRestart} />
         </div>
       )}
     </ExerciseShell>

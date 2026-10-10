@@ -1,36 +1,46 @@
 "use client";
 
+import clsx from "clsx";
 import {
+  ArrowDown,
+  ArrowUp,
   Check,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Gauge,
   Pause,
   Play,
   RotateCcw,
-  SlidersHorizontal,
-  Volume2,
+  Settings,
+  SkipForward,
+  X,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { type ReactNode, useCallback, useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
+import { type ReactNode, useEffect, useId, useRef, useState } from "react";
 
+import { CaptionView } from "@/components/autoplay/CaptionView";
+import { EXERCISE_TITLE_KEY, GuidedExercise, type StageExerciseData } from "@/components/autoplay/GuidedExercise";
+import { type Offscreen, Spotlight } from "@/components/autoplay/Spotlight";
+import { SurahEndCard } from "@/components/autoplay/SurahEndCard";
+import { continueToAyah, PLAY_WORD_EVENT, useAutoplay } from "@/components/autoplay/useAutoplay";
+import { guideSelector } from "@/components/exercises/guide";
 import { TextSizeOptions } from "@/components/TextSizeSwitch";
-import { useImamRate, usePace } from "@/hooks/usePace";
-import { type RecitationSource, useSegmentPlayer } from "@/hooks/useSegmentPlayer";
-import { captionMs, type LessonStep, type Pace, PACES } from "@/lib/lessonSteps";
+import type { RecitationSource } from "@/hooks/useSegmentPlayer";
+import { Link } from "@/i18n/navigation";
+import type { AutoplaySequence } from "@/lib/autoplay";
+import { PACES } from "@/lib/lessonSteps";
+import { ayahHref } from "@/lib/routes";
 
 import { MushafLine, type PlayerWord } from "./AyahPlayer";
 
-export type StageSource = RecitationSource & { label: string; credit: string };
-
-/** Window event a word card's "Dengar" button sends; the stage plays the
- *  word on its one player (so word cards never start a second recording). */
-const PLAY_WORD_EVENT = "belajar:play-word";
+/** A recording the stage can play, with its reciter's name for the select.
+ *  Its credit line is on the Kredit page, not on the stage. */
+export type StageSource = RecitationSource & { label: string };
 
 /**
  * "▶ Dengar" for a word card (WordCard's optional `listen` slot). It asks
- * the lesson stage to play the word; the stage pauses a running lesson first.
+ * the lesson stage to play the word on its one player; a running lesson
+ * pauses first.
  */
 export function WordListenButton({ index, label, detail }: { index: number; label: string; detail: string }) {
   return (
@@ -46,18 +56,6 @@ export function WordListenButton({ index, label, detail }: { index: number; labe
   );
 }
 
-const KEY = (id: string) => `belajar:v1:lesson:${id}`;
-
-function readSaved(id: string): number | null {
-  try {
-    const v = window.localStorage.getItem(KEY(id));
-    return v === null ? null : Number(v);
-  } catch {
-    return null;
-  }
-}
-const noopSubscribe = () => () => {};
-
 /** Moves keyboard focus to a control when it appears in place of the one
  *  just pressed (stable function: React calls it on mount only). Never
  *  scrolls: the page does not move under the learner. */
@@ -65,630 +63,384 @@ const focusOnMount = (el: HTMLElement | null) => {
   el?.focus({ preventScroll: true });
 };
 
-/** Steps that wait for the imam's recording before they are complete. */
-const audible = (s: LessonStep, hasWord: (w: number) => boolean) =>
-  s.kind === "recite_ayah" || (s.kind === "recite_word" && hasWord(s.word));
+/** Moves focus into the stage's new exercise (its heading, never
+ *  scrolling) — only when focus was in the lesson area or nowhere, never
+ *  away from the settings the learner is using. Stable: React calls it on
+ *  mount (the heading is keyed per exercise). */
+const focusIntoExercise = (el: HTMLElement | null) => {
+  if (!el) return;
+  const a = document.activeElement;
+  const stage = el.closest('[data-autoplay="stage"]');
+  const inLesson = !!a && !!stage?.contains(a) && !a.closest('[data-autoplay="settings"]');
+  if (!a || a === document.body || inLesson) el.focus({ preventScroll: true });
+};
 
-/** The word a step is about, if any (1-based index in the ayah). */
-const wordOf = (s: LessonStep) => (s.kind === "recite_word" || s.kind === "explain" ? s.word : undefined);
+/** The spotlight label of a control in the controls bar ("Klik di sini"
+ *  + an arrow), drawn above it; the ring is on the button itself. `end`:
+ *  anchored at the button's right edge (a button on the right of the bar),
+ *  so it never runs past the screen; it wraps rather than overflow. */
+function BarSpotLabel({ label, align = "center" }: { label: string; align?: "center" | "end" }) {
+  return (
+    <span
+      aria-hidden
+      className={clsx(
+        "pointer-events-none absolute bottom-full z-10 mb-3 inline-flex w-max max-w-[min(20rem,calc(100vw-2rem))] items-center gap-1.5 rounded-2xl border-2 border-white bg-forest px-3 py-1 text-base font-semibold text-paper shadow-md",
+        align === "end" ? "right-0" : "left-1/2 -translate-x-1/2",
+      )}
+    >
+      <ArrowDown aria-hidden className="h-5 w-5 shrink-0" strokeWidth={2.5} />
+      <span className="min-w-0 text-balance">{label}</span>
+    </span>
+  );
+}
+
+/** Ring of a spotlit control in the controls bar (thick, with a white gap;
+ *  never colour alone — the label above names it). */
+const BAR_RING = "ring-4 ring-forest ring-offset-4 ring-offset-white";
 
 /**
- * The lesson stage: the ayah, its translation and the guided lesson around
- * ONE recitation player (senior-ux §3.5–3.6). Sharing the player means the
- * mushaf line highlights the word being recited during the guided lesson,
- * two recordings never play over each other, and the imam's speed applies
- * everywhere.
+ * The lesson stage, now an AUTOPLAY player (operator, 2026-10-10): one click
+ * on "Mulai" and the whole ayah plays from start to finish — narration
+ * (caption-only until the narration audio is rendered), the imam's
+ * recitation with the mushaf word lit as he recites it, every word
+ * explained, the new concepts, then each exercise inside the stage with
+ * voice + spotlight guidance, the recap, and on to the next ayah by itself.
+ * Engine: src/lib/autoplay (pure state machine); runner: useAutoplay.
  *
- * Guided lesson ("Pelajaran dipandu"): the imam recites the ayah, each word
- * is recited and explained, new concepts and the sentence structure follow,
- * then it stops for practice and closes with the imam again.
- * - Pace (asked once, kept in Pengaturan belajar): "biasa" / "pelan" move on
- *   by themselves at a reading pace with no upper cap; "tunggu" never moves
- *   on by itself — a Lanjut button appears once the step is heard (WCAG
- *   2.2.1). A word step waits for BOTH the recitation and the reading time.
- * - Position remembered per ayah ("Lanjutkan dari langkah N").
- * - Explanations are captions until narration audio exists; the narrator
- *   will never voice Qur'anic words (plan §6.1 A1). Nothing scrolls the page.
- * - Lock-screen / earphone controls via the Media Session API.
+ * Layout — ONE focused stage (operator, 2026-10-10: "too crowded … focus on
+ * the main feature"), senior-friendly, nothing scrolls by itself:
+ * - Before "Mulai": the ayah with its words numbered (1 rightmost, as "kata
+ *   pertama"), the translation, ONE primary "▶ Mulai pelajaran" (56px) and
+ *   one short line under it. A remembered place makes "Lanjutkan dari
+ *   langkah N" the primary button, with "Mulai dari awal" beside it.
+ * - While it plays: the mushaf line (highlights + number badges) and the
+ *   word card (in a slot that keeps its height, empty between words; one
+ *   compact row on phones), then the bottom panel — no other buttons, and
+ *   no translation (it is shown before "Mulai"). The step's content swaps
+ *   in place (the prompt + the exercise while practising), so the page
+ *   never moves under the learner. If the "Mulai" click leaves the card
+ *   under the panel (a phone), that click brings the stage up once.
+ * - The bottom panel is sticky at the bottom of the viewport while the
+ *   stage is on screen (a familiar media player with subtitles): the
+ *   karaoke caption (an exercise's prompt stays above the exercise
+ *   instead), then ‹ Sebelumnya · Jeda / Lanjutkan · "↺ Ulangi langkah
+ *   ini" (the current step again, from its start, also while paused) ·
+ *   Berikutnya › (which becomes "Lewati latihan" during an exercise), at
+ *   48–56px whatever the text size.
+ * - A spotlit control that is out of view is never scrolled to
+ *   automatically: the bar offers "Lihat bagian yang ditandai", which
+ *   scrolls only on the learner's click.
+ * - Every secondary control (pace Biasa / Pelan / Tunggu saya, the imam's
+ *   speed, the reciter, text size) sits behind ONE labelled "⚙ Pengaturan"
+ *   button at the top of the stage: an inline panel, closed by "Tutup
+ *   pengaturan", Escape or the button again. The reciters' credit lines are
+ *   on the Kredit page.
+ *
+ * The narrator never voices Qur'anic words (plan §6.1 A1): the caption
+ * shows what is spoken — word by word as a karaoke caption once the
+ * narration has word timings — with grammar terms as "na’t (نَعْت)" and a
+ * letter as in the ayah (بِ). While the lesson runs, the mushaf line numbers
+ * its words (1 rightmost, as "kata pertama") and highlights what the line on
+ * screen is about: the whole ayah, the word explained, a concept's words,
+ * the imam's current word as he recites. A large word card (Arabic ·
+ * transliteration · "yang artinya …") sits above the caption while a word is
+ * explained or recited. A screen reader hears the line without its Arabic
+ * from a polite live region — never over the imam. The rest of the page
+ * (word cards, Latihan, Pelajari lebih dalam) waits, collapsed, under the
+ * stage in "Materi lengkap ayat ini".
  */
 export function LessonStage({
-  lessonId,
+  seq,
   title,
   ayah,
+  surahName,
+  nextSurah,
   words,
   sources,
-  steps,
   translation,
+  exercise,
 }: {
-  lessonId: string;
+  seq: AutoplaySequence;
+  /** Page title, also the lock-screen title (Media Session). */
   title: string;
   ayah: number;
+  surahName: string;
+  /** The surah after this one, for the end card (null after the last). */
+  nextSurah: { slug: string; name: string } | null;
   words: PlayerWord[];
   sources: StageSource[];
-  steps: LessonStep[];
   /** The ayah's translation with footnotes and source, rendered by the page. */
   translation: ReactNode;
+  /** What the exercises need inside the stage. */
+  exercise: StageExerciseData;
 }) {
   const t = useTranslations("Guided");
   const tp = useTranslations("Player");
+  const tx = useTranslations("Exercise");
   const uid = useId();
-  const { pace, chosen: paceChosen, setPace } = usePace();
-  const [imamRate, setImamRate] = useImamRate();
+  const ap = useAutoplay(seq, sources, title);
+  const { state, view, actions, player: p } = ap;
 
-  const [idx, setIdx] = useState(0);
-  const [running, setRunning] = useState(false);
-  const [started, setStarted] = useState(false);
-  const [done, setDone] = useState(false);
-  /** Step that is complete and waits for the learner's "Lanjut". */
-  const [readyIdx, setReadyIdx] = useState<number | null>(null);
-  /** Step to start from once the one-time pace question is answered. */
-  const [asking, setAsking] = useState<number | null>(null);
+  const [offscreen, setOffscreen] = useState<Offscreen>(null);
+  const [barHeight, setBarHeight] = useState(0);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const barRef = useRef<HTMLDivElement>(null);
+  const settingsButtonRef = useRef<HTMLButtonElement>(null);
+  const areaRef = useRef<HTMLElement>(null);
+  const captionRef = useRef<HTMLParagraphElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const cardSlotRef = useRef<HTMLDivElement>(null);
+  /** The previous step was an exercise (to catch focus it leaves behind). */
+  const wasExerciseRef = useRef(false);
+  /** The learner just clicked "Mulai" / "Lanjutkan dari langkah N". */
+  const startClickRef = useRef(false);
 
-  const runningRef = useRef(false);
-  const idxRef = useRef(0);
-  const paceRef = useRef<Pace>(pace);
-  /** A recite_ayah step paused mid-recitation resumes there instead of
-   *  starting over. */
-  const resumeIdxRef = useRef<number | null>(null);
-  /** Completion handler of the step being driven (set by the driver). */
-  const finishRef = useRef<(() => void) | null>(null);
-  const settingsRef = useRef<HTMLDetailsElement>(null);
-  const saved = useSyncExternalStore(noopSubscribe, () => readSaved(lessonId), () => null);
+  const started = state.started;
+  const finished = state.phase === "finished";
+  const live = started && !finished;
+  const showBar = live;
 
+  // The sticky bar's height: the spotlight's "out of view" line.
   useEffect(() => {
-    paceRef.current = pace;
-  }, [pace]);
+    const el = barRef.current;
+    if (!showBar || !el) return;
+    const ro = new ResizeObserver(() => setBarHeight(el.getBoundingClientRect().height));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [showBar]);
 
-  const halt = useCallback(() => {
-    runningRef.current = false;
-    setRunning(false);
-  }, []);
+  const step = view.step;
+  const spec = live ? step.exercise : undefined;
+  const exerciseKey = spec?.key;
+  // What the line on screen is about (caption.ts stageMarks): the words the
+  // numbered mushaf line marks, and the word of the large word card.
+  const focusWord = ap.marks.focus === null ? undefined : words.find((w) => w.index === ap.marks.focus);
+  const marked = ap.marks.marked;
+  const showMushaf = !started || (live && !spec);
+  const spotGuides = spec ? state.guides.filter((g) => g.target.startsWith("exercise:")) : [];
+  const skipGuide = view.showSkip ? state.guides.find((g) => g.target === "skip") : undefined;
+  const lanjutGuide = view.showLanjut ? state.guides.find((g) => g.target === "lanjut") : undefined;
+  const exerciseSteps = seq.steps.filter((s) => s.kind === "exercise");
+  const exerciseN = exerciseSteps.findIndex((s) => s.id === step.id) + 1;
+  const pace = started ? state.pace : ap.pace;
+  const lessonAudio = state.activity?.kind === "recite";
+  const pct = Math.round(((view.index + 1) / view.total) * 100);
+  const settingsId = `${uid}-settings`;
 
-  const p = useSegmentPlayer(sources, {
-    rate: imamRate,
-    onFinish: () => finishRef.current?.(),
-    // The recording failed (offline, blocked): stop instead of waiting forever.
-    onError: () => {
-      if (runningRef.current) halt();
-    },
-    // Another recording on the page started (e.g. the Dengar dan ketuk
-    // exercise) and paused ours: pause the lesson like "Jeda" would, so it
-    // neither moves on nor waits for audio that will not finish.
-    onInterrupt: () => {
-      if (!runningRef.current) return;
-      halt();
-      resumeIdxRef.current = steps[idxRef.current]?.kind === "recite_ayah" ? idxRef.current : null;
-    },
-  });
-  const { restart, playAll, playWord, hasWord, pause: pauseAudio, chooseSource } = p;
-
-  const goTo = useCallback(
-    (n: number) => {
-      const i = Math.max(0, Math.min(steps.length - 1, n));
-      idxRef.current = i;
-      resumeIdxRef.current = null;
-      setIdx(i);
-      setReadyIdx(null);
-      setDone(false);
-      // Practice is the learner's turn: the lesson waits there.
-      if (steps[i].kind === "practice") halt();
-    },
-    [steps, halt],
-  );
-
-  const advance = useCallback(() => {
-    const i = idxRef.current;
-    if (i >= steps.length - 1) {
-      halt();
-      setReadyIdx(null);
-      setDone(true);
-      try {
-        window.localStorage.removeItem(KEY(lessonId));
-      } catch {
-        /* storage blocked: nothing was remembered */
-      }
-      return;
-    }
-    goTo(i + 1);
-  }, [steps.length, halt, goTo, lessonId]);
-
-  const autoAdvance = pace !== "tunggu";
-
-  // Drive the current step while running. State changes only happen in the
-  // timer / audio callbacks, never synchronously here.
-  useEffect(() => {
-    if (!running) return;
-    const s = steps[idx];
-    if (!s || s.kind === "practice") return;
-    const withAudio = audible(s, hasWord);
-    // "Tunggu saya" + a caption with no recitation: Lanjut shows at once.
-    if (!withAudio && !autoAdvance) return;
-    let heard = !withAudio;
-    let read = !autoAdvance;
-    let plays = 0;
-    let live = true;
-    const timers: number[] = [];
-    const settle = () => {
-      if (!live || !heard || !read) return;
-      live = false;
-      finishRef.current = null;
-      if (autoAdvance) advance();
-      else setReadyIdx(idx);
-    };
-    if (withAudio) {
-      finishRef.current = () => {
-        plays += 1;
-        // Pelan: the imam says the word once more after a short gap.
-        if (s.kind === "recite_word" && plays === 1 && paceRef.current === "pelan") {
-          timers.push(
-            window.setTimeout(() => {
-              if (live) playWord(s.word);
-            }, 1500),
-          );
-          return;
-        }
-        heard = true;
-        settle();
-      };
-      if (s.kind === "recite_word") playWord(s.word);
-      else if (resumeIdxRef.current === idx) playAll();
-      else restart();
-    }
-    resumeIdxRef.current = null;
-    if (autoAdvance) {
-      const ms = captionMs(s.caption, paceRef.current === "pelan" ? "pelan" : "biasa");
-      timers.push(
-        window.setTimeout(() => {
-          read = true;
-          settle();
-        }, ms),
-      );
-    }
-    return () => {
-      live = false;
-      finishRef.current = null;
-      timers.forEach((id) => window.clearTimeout(id));
-    };
-  }, [running, idx, steps, autoAdvance, hasWord, playWord, playAll, restart, advance]);
-
-  // "Dengar" on a word card: the same player, so audio never overlaps.
-  useEffect(() => {
-    const onPlayWord = (e: Event) => {
-      const n = (e as CustomEvent<number>).detail;
-      if (typeof n !== "number") return;
-      if (runningRef.current) halt();
-      resumeIdxRef.current = null;
-      playWord(n);
-    };
-    window.addEventListener(PLAY_WORD_EVENT, onPlayWord);
-    return () => window.removeEventListener(PLAY_WORD_EVENT, onPlayWord);
-  }, [halt, playWord]);
-
-  // Remember the position.
-  useEffect(() => {
-    if (!started) return;
-    try {
-      window.localStorage.setItem(KEY(lessonId), String(idx));
-    } catch {
-      /* storage blocked: position just isn't remembered */
-    }
-  }, [idx, started, lessonId]);
-
-  const begin = useCallback(
-    (from: number) => {
-      goTo(from);
-      setStarted(true);
-      const i = Math.max(0, Math.min(steps.length - 1, from));
-      if (steps[i].kind === "practice") return;
-      runningRef.current = true;
-      setRunning(true);
-    },
-    [goTo, steps],
-  );
-
-  const resume = useCallback(() => {
-    if (done) {
-      begin(0);
-      return;
-    }
-    if (steps[idxRef.current].kind === "practice") return;
-    setStarted(true);
-    runningRef.current = true;
-    setRunning(true);
-  }, [done, begin, steps]);
-
-  const pauseLesson = useCallback(() => {
-    halt();
-    resumeIdxRef.current = steps[idxRef.current].kind === "recite_ayah" ? idxRef.current : null;
-    pauseAudio();
-  }, [halt, steps, pauseAudio]);
-
-  const jump = useCallback(
-    (delta: number) => {
-      const to = idxRef.current + delta;
-      // Already at the first/last step: the button is aria-disabled, and a
-      // press (or an earphone skip) changes nothing.
-      if (to < 0 || to > steps.length - 1) return;
-      pauseAudio();
-      goTo(to);
-      setStarted(true);
-    },
-    [steps.length, pauseAudio, goTo],
-  );
-
-  /** A tap on the mushaf line or an imam control takes over the player:
-   *  the lesson pauses and resumes its step later from the start. */
-  const interrupt = () => {
-    if (runningRef.current) halt();
-    resumeIdxRef.current = null;
-  };
-
-  const requestStart = (from: number) => {
-    if (paceChosen) begin(from);
-    else setAsking(from);
-  };
-
-  const choosePace = (v: Pace) => {
-    setPace(v);
-    paceRef.current = v;
-    const from = asking ?? 0;
-    setAsking(null);
-    begin(from);
-  };
-
-  const openSettings = () => {
-    const d = settingsRef.current;
-    if (!d) return;
-    d.open = true;
-    d.querySelector("summary")?.focus();
-  };
-
-  // Lock-screen / earphone controls.
-  useEffect(() => {
-    if (!("mediaSession" in navigator) || !started) return;
-    const ms = navigator.mediaSession;
-    ms.metadata = new MediaMetadata({ title, artist: "Belajar Al-Qur'an · Dakwah-Lens" });
-    ms.setActionHandler("play", () => resume());
-    ms.setActionHandler("pause", () => pauseLesson());
-    ms.setActionHandler("nexttrack", () => jump(1));
-    ms.setActionHandler("previoustrack", () => jump(-1));
-    return () => {
-      for (const a of ["play", "pause", "nexttrack", "previoustrack"] as const) ms.setActionHandler(a, null);
-    };
-  }, [started, title, resume, pauseLesson, jump]);
-
-  const step = steps[Math.min(idx, steps.length - 1)];
-  const last = steps.length - 1;
-  const atPractice = started && step.kind === "practice";
-  const focusIndex = started && !done ? wordOf(step) : undefined;
-  const focusWord = focusIndex === undefined ? undefined : words.find((w) => w.index === focusIndex);
-  /** "Tunggu saya": ONE Lanjut button stays mounted for the whole run, so
-   *  keyboard focus never drops when a step starts waiting for the imam. */
-  const lanjutShown = running && pace === "tunggu" && !atPractice;
-  /** …and it works once the step is heard (a caption-only step at once). */
-  const lanjutReady = lanjutShown && (readyIdx === idx || !audible(step, hasWord));
-  const middleId = `${uid}-middle`;
-  const waitId = `${uid}-wait`;
-  /** A no-op while the imam is still reciting (aria-disabled then). When the
-   *  next step is the practice or the end, the button goes away: focus moves
-   *  to the middle control, which stays mounted and now offers the next
-   *  thing to do. */
-  const onLanjut = () => {
-    if (!lanjutReady) return;
-    const i = idxRef.current;
-    const leaving = i >= steps.length - 1 || steps[i + 1].kind === "practice";
-    advance();
-    if (leaving) document.getElementById(middleId)?.focus({ preventScroll: true });
-  };
-  const resumeAt = !started && saved !== null && saved > 0 && saved < steps.length ? saved : null;
-  const idlePlaying = p.playing && !running;
-  const paceLabel = t(`pace_${pace}`);
-  const modeLabel = pace === "tunggu" ? t("mode_wait") : t("mode_auto", { pace: paceLabel });
-  const pct = Math.round(((idx + 1) / steps.length) * 100);
-  const source = sources[p.sourceIdx];
-
-  // Middle control: the one thing to do next in this state. Render reads only
-  // this plain mode; the handlers (which touch refs) are chosen at click time,
-  // so the React Compiler never sees a ref-reading value used in render.
-  const middleMode = done ? "restart" : atPractice ? "after_practice" : running ? "pause" : "resume";
-  const middlePrimary = middleMode === "after_practice" || middleMode === "resume";
-  const middleLabel = {
-    restart: t("restart_lesson"),
-    after_practice: t("continue_after_practice"),
-    pause: t("pause"),
-    resume: t("resume"),
-  }[middleMode];
-  const middleIcon =
-    middleMode === "restart" ? (
-      <RotateCcw aria-hidden className="h-5 w-5" />
-    ) : middleMode === "pause" ? (
-      <Pause aria-hidden className="h-5 w-5" />
-    ) : (
-      <Play aria-hidden className="h-5 w-5" />
-    );
+  // The middle control: the one thing to do next in this state. Render
+  // reads only this plain mode; the handler is chosen at click time.
+  const middle = state.phase === "ready" ? "lanjut" : state.phase === "paused" ? "resume" : "pause";
+  const middleLabel = { lanjut: t("next_wait"), resume: t("resume"), pause: t("pause") }[middle];
   const onMiddle = () => {
-    if (middleMode === "restart") begin(0);
-    else if (middleMode === "after_practice") begin(idx + 1);
-    else if (middleMode === "pause") pauseLesson();
-    else resume();
+    if (middle === "lanjut") actions.lanjut();
+    else if (middle === "resume") actions.resume();
+    else actions.pause();
   };
+
+  const guided = exerciseKey
+    ? {
+        onAnswer: (correct: boolean) => actions.answered(exerciseKey, correct),
+        onDone: () => actions.exerciseDone(exerciseKey),
+        onGuide: (target: string, info?: { word?: number }) => actions.exerciseGuide(target, info?.word),
+        // The lesson moves a settled question on, and recites Dengar dan
+        // klik's word itself: the learner only answers.
+        advance: state.exercise?.advance ?? 0,
+        heard: state.exercise?.heard ?? null,
+      }
+    : null;
+
+  // An exercise just ended and took the focus with it (its last control
+  // unmounted): put focus on the caption, so keyboard and screen-reader
+  // users keep their place. Never scrolls.
+  const isExerciseStep = !!spec;
+  useEffect(() => {
+    const was = wasExerciseRef.current;
+    wasExerciseRef.current = isExerciseStep;
+    if (!was || isExerciseStep) return;
+    const a = document.activeElement;
+    if (a && a !== document.body) return;
+    captionRef.current?.focus({ preventScroll: true });
+  }, [step.id, isExerciseStep]);
+
+  /** "Mulai pelajaran" / "Lanjutkan dari langkah N" (the learner's click). */
+  const begin = (from?: number) => {
+    startClickRef.current = true;
+    actions.start(from);
+  };
+
+  // Right after that click (and only then), bring the stage up when the
+  // learner could not see the words and the word card above the bottom
+  // panel: on a phone the "Mulai" button sits low on the stage, and the
+  // panel (caption + controls) would cover the card. The one scroll the
+  // lesson makes on its own, and only on the learner's click — like "Lihat
+  // bagian yang ditandai".
+  useEffect(() => {
+    if (!started || !startClickRef.current) return;
+    startClickRef.current = false;
+    const stage = stageRef.current;
+    const slot = cardSlotRef.current;
+    const bar = barRef.current;
+    if (!stage || !slot || !bar) return;
+    const covered = slot.getBoundingClientRect().bottom > bar.getBoundingClientRect().top + 1;
+    if (stage.getBoundingClientRect().top >= 0 && !covered) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    stage.scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" });
+  }, [started]);
+
+  /** "Tutup pengaturan" / Escape: close the panel, focus back on its button. */
+  const closeSettings = () => {
+    setSettingsOpen(false);
+    settingsButtonRef.current?.focus({ preventScroll: true });
+  };
+
+  /** "Lihat bagian yang ditandai": the only scroll, and only on a click. */
+  const showTarget = () => {
+    const g = spotGuides[0];
+    const el = g ? areaRef.current?.querySelector(guideSelector(g.target)) : null;
+    if (!el) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" });
+  };
+
+  // The caption shows what is spoken: karaoke words following the narrator
+  // once the narration has word timings, else the line's text. A screen
+  // reader is told the line without its Arabic instead, in its own live
+  // region: nothing while the imam recites or the narration speaks, nor
+  // "Benar." (the exercise's status box says that). In the bottom panel it
+  // keeps three lines' height, so the panel's edge does not jump per line.
+  const caption = (
+    <p
+      ref={captionRef}
+      tabIndex={-1}
+      data-autoplay="caption"
+      className={clsx(
+        "mx-auto max-w-prose text-pretty text-xl text-ink",
+        spec ? "mt-2 min-h-[3em]" : "min-h-[4.2em]",
+      )}
+    >
+      <CaptionView caption={ap.caption} />
+    </p>
+  );
+
+  // Notices: in the bottom panel while it shows (where the learner's eyes
+  // and the controls that answer them are), else under the stage.
+  const notice = clsx(
+    "mx-auto max-w-prose rounded-xl bg-notice-bg px-4 py-3 text-base text-ink",
+    showBar ? "mb-3" : "mt-4",
+  );
+  const notices = (
+    <>
+      {ap.blocked && (
+        <p role="status" className={notice}>
+          {t("blocked")}
+        </p>
+      )}
+      {view.error === "recite" && (
+        <p role="status" className={notice}>
+          {t("recite_failed")}
+        </p>
+      )}
+      {/* A word the learner clicked to hear could not stream (only theirs:
+          the lesson's own recitation failing says so above, and a step
+          change or replay hands the player back to the lesson). */}
+      {p.failed && ap.learnerWord && view.error !== "recite" && (
+        <p role="status" className={notice}>
+          {tp("failed")}
+        </p>
+      )}
+    </>
+  );
 
   return (
-    <div className="rounded-2xl border border-hairline bg-white p-4 shadow-sm sm:p-7">
-      <p className="flex items-center justify-center gap-2 text-center text-sm text-ink-muted">
-        <Volume2 aria-hidden className="h-5 w-5 shrink-0 text-forest" />
-        {tp("hint_tap")}
-      </p>
-      <div className="mt-3">
-        <MushafLine
-          ayah={ayah}
-          words={words}
-          activeWord={p.activeWord}
-          focusWord={focusIndex}
-          canPlay={hasWord}
-          onTap={(i) => {
-            interrupt();
-            playWord(i);
-          }}
-        />
-      </div>
-      <div className="mx-auto mt-5 max-w-prose">{translation}</div>
+    // overflow-x-clip: a backstop so nothing drawn over the stage (a
+    // spotlight label at the largest text size) can make the page scroll
+    // sideways; `clip` keeps the controls bar sticky.
+    <div ref={stageRef} data-autoplay="stage" className="stage-card scroll-mt-2 overflow-x-clip">
+      <h2 id={`${uid}-guided`} className="sr-only">
+        {t("title")}
+      </h2>
 
-      {/* Guided lesson */}
-      <section aria-labelledby={`${uid}-guided`} className="mt-6 border-t border-hairline pt-5">
-        <h2 id={`${uid}-guided`} className="font-display text-2xl font-medium">
-          {t("title")}
-        </h2>
-
-        {!started && asking !== null ? (
-          <fieldset ref={focusOnMount} tabIndex={-1} className="mt-3">
-            <legend className="text-lg font-semibold text-ink">{t("ask_title")}</legend>
-            <div className="mt-3 grid gap-3">
-              {PACES.map((v) => (
-                <button key={v} type="button" onClick={() => choosePace(v)} className="btn-secondary w-full">
-                  {t(`ask_${v}`)}
-                </button>
-              ))}
-            </div>
-            <p className="mt-3 text-sm text-ink-muted">{t("ask_note")}</p>
-          </fieldset>
-        ) : !started ? (
-          <>
-            <p className="mt-2 max-w-prose text-pretty text-base text-ink">{t("ready")}</p>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <button type="button" onClick={() => requestStart(0)} className="btn-primary w-full sm:w-auto">
-                <Play aria-hidden className="h-5 w-5" />
-                {t("start")}
-              </button>
-              {resumeAt !== null && (
-                <button type="button" onClick={() => requestStart(resumeAt)} className="btn-secondary w-full sm:w-auto">
-                  {t("resume_from", { n: resumeAt + 1 })}
-                </button>
-              )}
-            </div>
-            {paceChosen && (
-              <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-ink-muted">
-                {modeLabel}
-                <button type="button" onClick={openSettings} className="chip-link">
-                  {t("change")}
-                </button>
-              </p>
-            )}
-          </>
-        ) : (
-          <>
-            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-ink-muted">
-              <span className="tabular-nums">{t("step", { n: idx + 1, total: steps.length })}</span>
-              <span aria-hidden>·</span>
-              <span>{running ? modeLabel : done ? t("finished") : t("paused")}</span>
-              <button type="button" onClick={openSettings} className="chip-link">
-                {t("change")}
-              </button>
-            </div>
-            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-paper-deep" aria-hidden>
-              <div className="h-full bg-forest motion-safe:transition-[width]" style={{ width: `${pct}%` }} />
-            </div>
-
-            {focusWord && (
-              <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1 rounded-xl bg-paper-deep px-4 py-2">
-                <p lang="ar" dir="rtl" className="quran text-ar-lg text-ink">
-                  {focusWord.ar}
-                </p>
-                <div>
-                  <p className="text-sm text-ink-muted">
-                    {t("word_n", { n: focusWord.index })} · {focusWord.translit}
-                  </p>
-                  <p className="text-lg font-medium text-ink">{focusWord.gloss}</p>
-                </div>
-              </div>
-            )}
-
-            <p aria-live="polite" className="mt-4 min-h-[6em] max-w-prose text-pretty text-xl text-ink">
-              {done ? t("done") : step.caption}
-            </p>
-
-            {lanjutShown && (
-              <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2">
-                <button
-                  type="button"
-                  onClick={onLanjut}
-                  aria-disabled={!lanjutReady}
-                  aria-describedby={lanjutReady ? undefined : waitId}
-                  className="btn-primary w-full sm:w-auto"
-                >
-                  {t("next_wait")}
-                  <ChevronRight aria-hidden className="h-5 w-5" />
-                </button>
-                {!lanjutReady && (
-                  <p id={waitId} className="text-base text-ink-muted">
-                    {t("waiting_audio")}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {atPractice && (
-              <p className="mt-2">
-                <a href="#practice" className="chip-link">
-                  {t("go_practice")}
-                </a>
-              </p>
-            )}
-
-            {/* DOM order = phone order (the main control on its own row,
-                then ‹ Sebelumnya · Berikutnya ›); from sm the order utilities
-                place it between them. At the first/last step prev/next stay
-                in place, aria-disabled, so focus is never lost. */}
-            <div role="group" aria-label={t("controls_label")} className="mt-5 flex flex-wrap items-center gap-4">
-              <button
-                id={middleId}
-                ref={focusOnMount}
-                type="button"
-                onClick={onMiddle}
-                className={`${middlePrimary ? "btn-primary" : "btn-secondary"} w-full sm:order-2 sm:w-auto sm:grow`}
-              >
-                {middleIcon}
-                {middleLabel}
-              </button>
-              <button
-                type="button"
-                onClick={() => jump(-1)}
-                aria-disabled={idx === 0}
-                className="btn-secondary grow sm:order-1"
-              >
-                <ChevronLeft aria-hidden className="h-5 w-5" />
-                {t("prev")}
-              </button>
-              <button
-                type="button"
-                onClick={() => jump(1)}
-                aria-disabled={idx === last}
-                className="btn-secondary grow sm:order-3"
-              >
-                {t("next")}
-                <ChevronRight aria-hidden className="h-5 w-5" />
-              </button>
-            </div>
-          </>
-        )}
-      </section>
-
-      {/* The imam's recitation */}
-      <div role="group" aria-labelledby={`${uid}-imam`} className="mt-6 border-t border-hairline pt-5">
-        <p id={`${uid}-imam`} className="text-base font-semibold text-ink">
-          {tp("heading")}
-        </p>
-        <div className="mt-3 flex flex-wrap gap-3">
+      {/* Head: where the lesson is, and the ONE door to every secondary
+          control. Outside the spotlight's area, so it is never dimmed. */}
+      {/* Escape closes the settings from anywhere in the head, the toggle
+          included (focus stays on it when the panel opens). */}
+      <div
+        className="px-4 pt-4 sm:px-7 sm:pt-5"
+        onKeyDown={(e) => {
+          if (e.key !== "Escape" || !settingsOpen) return;
+          e.stopPropagation();
+          closeSettings();
+        }}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+          {live && (
+            <p data-autoplay="step" className="text-sm text-ink-muted tabular-nums">{t("step", { n: view.index + 1, total: view.total })}</p>
+          )}
           <button
+            ref={settingsButtonRef}
             type="button"
-            onClick={() => {
-              if (idlePlaying) {
-                pauseAudio();
-                return;
-              }
-              interrupt();
-              playAll();
-            }}
-            className="btn-secondary"
+            data-autoplay="settings-toggle"
+            aria-expanded={settingsOpen}
+            aria-controls={settingsId}
+            onClick={() => setSettingsOpen((o) => !o)}
+            className="btn-secondary ml-auto px-4! sm:px-5!"
           >
-            {idlePlaying ? <Pause aria-hidden className="h-5 w-5" /> : <Play aria-hidden className="h-5 w-5" />}
-            {idlePlaying ? tp("pause") : tp("play_ayah")}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              interrupt();
-              restart();
-            }}
-            className="btn-secondary"
-          >
-            <RotateCcw aria-hidden className="h-5 w-5" />
-            {tp("restart")}
-          </button>
-          <button
-            type="button"
-            onClick={() => setImamRate(imamRate === 1 ? 0.75 : 1)}
-            className="btn-secondary"
-          >
-            <Gauge aria-hidden className="h-5 w-5" />
-            {tp("speed", { speed: imamRate === 1 ? tp("speed_normal") : tp("speed_slow") })}
+            <Settings aria-hidden className="h-5 w-5" />
+            {t("settings_button")}
           </button>
         </div>
-
-        {sources.length > 1 && (
-          <div className="mt-4">
-            <label htmlFor={`${uid}-reciter`} className="block text-base font-semibold text-ink">
-              {tp("reciter")}
-            </label>
-            <select
-              id={`${uid}-reciter`}
-              value={p.sourceIdx}
-              onChange={(e) => {
-                interrupt();
-                chooseSource(Number(e.target.value));
-              }}
-              className="mt-2 min-h-12 w-full max-w-sm cursor-pointer rounded-xl border-[1.5px] border-border-ui bg-white px-3 text-base text-ink hover:border-forest"
-            >
-              {sources.map((s, i) => (
-                <option key={s.reciter} value={i}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
-            <p className="mt-2 max-w-prose text-sm text-ink-muted">{tp("husary_note")}</p>
+        {live && (
+          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-paper-deep" aria-hidden>
+            <div className="h-full bg-forest motion-safe:transition-[width]" style={{ width: `${pct}%` }} />
           </div>
         )}
 
-        {p.failed && (
-          <p role="status" className="mt-4 max-w-prose rounded-xl bg-notice-bg px-4 py-3 text-base text-ink">
-            {tp("failed")}
-          </p>
-        )}
-        {/* Recitation streams from the reciter's CDN; never re-hosted (plan §6.2). */}
-        <p className="mt-3 text-xs text-ink-soft">{source?.credit}</p>
-      </div>
-
-      {/* Learning settings: pace + text size */}
-      <details ref={settingsRef} className="mt-6 rounded-xl border border-hairline bg-paper">
-        <summary className="disclosure-row px-4 py-2">
-          <span className="inline-flex items-center gap-2">
-            <SlidersHorizontal aria-hidden className="h-5 w-5 shrink-0 text-forest" />
+        {/* Settings: pace, the imam, text size — labelled, behind the one
+            button. Always in the page (hidden when closed), so the button's
+            aria-controls names a real element. */}
+        <div
+          id={settingsId}
+          data-autoplay="settings"
+          role="region"
+          aria-label={t("settings")}
+          hidden={!settingsOpen}
+          className="mt-4 rounded-2xl border border-hairline bg-paper px-4 py-5 sm:px-6"
+        >
+          <p className="flex items-center gap-2 text-lg font-semibold text-ink">
+            <Settings aria-hidden className="h-5 w-5 shrink-0 text-forest" />
             {t("settings")}
-          </span>
-          <ChevronDown aria-hidden className="chev h-5 w-5 shrink-0 text-forest" />
-        </summary>
-        <div className="space-y-6 px-4 pt-2 pb-5">
-          <fieldset>
+          </p>
+
+          <fieldset className="mt-4">
             <legend className="text-base font-semibold text-ink">{t("pace_heading")}</legend>
-            {/* Same pattern as TextSizeOptions: a drawn radio with a tick and
-                the word "Dipilih", never colour alone. */}
+            {/* A drawn radio with a tick and the word "Dipilih", never colour
+                alone (same pattern as TextSizeOptions). */}
             <div className="@container mt-2">
               <div className="grid gap-3 @xl:grid-cols-3">
                 {PACES.map((v) => {
-                  // Nothing is checked until the learner has chosen: a
-                  // pre-checked default could not be "chosen" (tapping it
-                  // fires no change), and the start would ask again.
-                  const on = paceChosen && pace === v;
+                  const on = pace === v;
                   return (
                     <label
                       key={v}
-                      className={`flex min-h-14 cursor-pointer items-center gap-3 rounded-2xl px-4 py-2 ${
-                        on ? "border-2 border-forest bg-forest-tint" : "border-[1.5px] border-border-ui bg-white hover:border-forest"
-                      }`}
+                      className={clsx(
+                        "flex min-h-14 cursor-pointer items-center gap-3 rounded-2xl px-4 py-2",
+                        on ? "border-2 border-forest bg-forest-tint" : "border-[1.5px] border-border-ui bg-white hover:border-forest",
+                      )}
                     >
                       <input
                         type="radio"
                         name={`${uid}-pace`}
                         value={v}
                         checked={on}
-                        onChange={() => setPace(v)}
+                        onChange={() => actions.setPace(v)}
                         className="sr-only"
                       />
                       <span
                         aria-hidden
-                        className={`grid h-6 w-6 shrink-0 place-items-center rounded-full border-2 ${
-                          on ? "border-forest bg-forest text-paper" : "border-border-ui bg-white"
-                        }`}
+                        className={clsx(
+                          "grid h-6 w-6 shrink-0 place-items-center rounded-full border-2",
+                          on ? "border-forest bg-forest text-paper" : "border-border-ui bg-white",
+                        )}
                       >
                         {on ? <Check className="h-4 w-4" strokeWidth={3} /> : null}
                       </span>
@@ -707,16 +459,346 @@ export function LessonStage({
             </div>
             <p className="mt-2 max-w-prose text-sm text-ink-muted">{t(`pace_hint_${pace}`)}</p>
           </fieldset>
-          <div>
-            <p className="text-base font-semibold text-ink">{t("text_size")}</p>
-            <div className="mt-2">
-              <TextSizeOptions />
+
+          {/* The imam's recitation: speed and reciter. */}
+          <div role="group" aria-labelledby={`${uid}-imam`} className="mt-6">
+            <p id={`${uid}-imam`} className="text-base font-semibold text-ink">
+              {tp("heading")}
+            </p>
+            <button
+              type="button"
+              onClick={() => ap.setImamRate(ap.imamRate === 1 ? 0.75 : 1)}
+              className="btn-secondary mt-2"
+            >
+              <Gauge aria-hidden className="h-5 w-5" />
+              {tp("speed", { speed: ap.imamRate === 1 ? tp("speed_normal") : tp("speed_slow") })}
+            </button>
+
+            {sources.length > 1 && (
+              <div className="mt-4">
+                <label htmlFor={`${uid}-reciter`} className="block text-base font-semibold text-ink">
+                  {tp("reciter")}
+                </label>
+                <select
+                  id={`${uid}-reciter`}
+                  value={p.sourceIdx}
+                  onChange={(e) => {
+                    // Switching reciters stops the recording in play: pause
+                    // the lesson rather than wait for audio that won't end.
+                    if (lessonAudio) actions.pause();
+                    p.chooseSource(Number(e.target.value));
+                  }}
+                  className="mt-2 min-h-12 w-full max-w-sm cursor-pointer rounded-xl border-[1.5px] border-border-ui bg-white px-3 text-base text-ink hover:border-forest"
+                >
+                  {sources.map((s, i) => (
+                    <option key={s.reciter} value={i}>
+                      {s.label}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-2 max-w-prose text-sm text-ink-muted">{tp("husary_note")}</p>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-6">
+            <TextSizeOptions showLegend />
+          </div>
+
+          <button type="button" onClick={closeSettings} className="btn-secondary mt-6">
+            <X aria-hidden className="h-5 w-5" />
+            {t("settings_close")}
+          </button>
+        </div>
+      </div>
+
+      <section ref={areaRef} aria-labelledby={`${uid}-guided`} className="relative isolate px-4 pt-3 pb-6 sm:px-7">
+        {showMushaf && (
+          <div className="mt-2">
+            <MushafLine
+              ayah={ayah}
+              words={words}
+              activeWord={p.activeWord}
+              marked={marked}
+              numbered
+              canPlay={p.hasWord}
+              onTap={(i) => {
+                actions.takeOverPlayer();
+                p.playWord(i);
+              }}
+            />
+          </div>
+        )}
+
+        {/* Before "Mulai": the translation. While the lesson plays: the
+            WORD CARD while a word is explained or recited — its Arabic
+            (content bytes, never retyped), transliteration and "yang artinya
+            …" — and otherwise nothing, in a slot that keeps the card's
+            height, so nothing below jumps from step to step (the playing
+            stage is the words, the card, then the caption and the controls
+            in the bottom panel). Phones: one compact row, the Arabic on the
+            right of its number, transliteration and meaning, so the words,
+            the card and the panel fit one screen; from sm: stacked, centred. */}
+        {!started ? (
+          <div className="mx-auto mt-5 max-w-prose">{translation}</div>
+        ) : live && !spec ? (
+          <div ref={cardSlotRef} className="mt-4 min-h-32 sm:min-h-56">
+            {focusWord ? (
+              <div
+                data-guide="word-card"
+                data-autoplay="word-card"
+                className="mx-auto grid max-w-xl grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 rounded-2xl border-[1.5px] border-forest bg-forest-tint px-4 py-2 sm:grid-cols-1 sm:justify-items-center sm:gap-y-1 sm:py-3 sm:text-center"
+              >
+                <p className="row-start-1 text-base font-semibold text-forest">{t("word_n", { n: focusWord.index })}</p>
+                <p
+                  lang="ar"
+                  dir="rtl"
+                  className="quran col-start-2 row-span-3 row-start-1 text-ar-lg text-ink sm:col-start-1 sm:row-span-1 sm:row-start-2 sm:text-ar-xl"
+                >
+                  {focusWord.ar}
+                </p>
+                <p className="row-start-2 text-lg text-ink-muted sm:row-start-3">{focusWord.translit}</p>
+                <p className="row-start-3 text-xl font-semibold text-pretty text-ink sm:row-start-4">
+                  {t("card_meaning", { gloss: focusWord.gloss })}
+                </p>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        {!started ? (
+          <div className="mt-6 flex flex-col items-center border-t border-hairline pt-6 text-center">
+            {/* A remembered place makes "Lanjutkan dari langkah N" the big
+                button: a habitual click on the primary one keeps the place. */}
+            <div className="flex w-full flex-wrap justify-center gap-3">
+              {ap.savedIdx !== null && (
+                <button
+                  type="button"
+                  data-autoplay="resume"
+                  onClick={() => begin(ap.savedIdx ?? 0)}
+                  className="btn-primary w-full sm:w-auto sm:min-w-64"
+                >
+                  <Play aria-hidden className="h-5 w-5" />
+                  <span>{t("resume_from", { n: ap.savedIdx + 1 })}</span>
+                </button>
+              )}
+              <button
+                type="button"
+                data-autoplay="start"
+                onClick={() => begin()}
+                className={clsx(ap.savedIdx === null ? "btn-primary" : "btn-secondary", "w-full sm:w-auto sm:min-w-64")}
+              >
+                {ap.savedIdx === null ? (
+                  <>
+                    <Play aria-hidden className="h-5 w-5" />
+                    <span>{t("start")}</span>
+                  </>
+                ) : (
+                  <>
+                    <RotateCcw aria-hidden className="h-5 w-5" />
+                    <span>{t("start_over")}</span>
+                  </>
+                )}
+              </button>
+            </div>
+            <p className="mt-3 max-w-prose text-pretty text-base text-ink-muted">{t("start_hint")}</p>
+          </div>
+        ) : finished ? (
+          state.intent?.kind === "surah_end" ? (
+            <SurahEndCard
+              surahName={surahName}
+              nextSurah={nextSurah}
+              onRepeat={() => continueToAyah(ap.router, seq.slug, 1)}
+              onNextSurah={() => nextSurah && continueToAyah(ap.router, nextSurah.slug, 1)}
+            />
+          ) : state.intent?.kind === "ayah" ? (
+            <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-3" role="status">
+              <p className="text-xl text-ink">{t("going_next", { n: state.intent.ayah })}</p>
+              <Link href={ayahHref(state.intent.slug, state.intent.ayah)} className="btn-secondary">
+                {t("open_next", { n: state.intent.ayah })}
+                <ChevronRight aria-hidden className="h-5 w-5" />
+              </Link>
+            </div>
+          ) : null
+        ) : (
+          <>
+            {spec && (
+              <p
+                key={step.id}
+                ref={focusIntoExercise}
+                tabIndex={-1}
+                className="mt-4 text-base font-semibold text-ink"
+              >
+                {t("exercise_heading", {
+                  n: exerciseN,
+                  total: exerciseSteps.length,
+                  title: tx(EXERCISE_TITLE_KEY[spec.key]),
+                })}
+              </p>
+            )}
+            {/* An exercise's prompt stays above the exercise it explains;
+                every other line's caption is in the bottom panel. */}
+            {spec && caption}
+            {spec && guided && (
+              <div data-autoplay="exercise" className="mt-4 pt-3">
+                <GuidedExercise
+                  // A replayed exercise starts over (fresh, at its first question).
+                  key={`${step.id}:${ap.replays}`}
+                  exercise={spec.key}
+                  progressId={spec.progressId}
+                  data={exercise}
+                  tapWords={words}
+                  tapSource={sources[0]}
+                  guided={guided}
+                />
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Always in the page, so a screen reader is listening before the
+            first line: the sanitised spoken text of each line as it starts. */}
+        <p className="sr-only" aria-live="polite" aria-atomic="true">
+          {live ? ap.announcement : ""}
+        </p>
+
+        {!showBar && notices}
+
+        {spotGuides.length > 0 && (
+          <Spotlight
+            guides={spotGuides}
+            pulse={state.exercise?.reminders ?? 0}
+            bottomInset={barHeight}
+            onOffscreen={setOffscreen}
+          />
+        )}
+      </section>
+
+      {/* The bottom panel: sticky at the bottom of the viewport while the
+          stage is on screen, so what the narrator says and the controls
+          never scroll away — on a phone the words and the card above are
+          taller than the screen, and a caption in the page sat below the
+          fold, behind the controls (CI shot, 2026-10-10). In order: a
+          notice (sound blocked, a recording failed), the caption (not
+          during an exercise: its prompt stays above it), then the controls.
+          Phones: two rows — the main control with "↺ Ulangi" beside it,
+          then ‹ Sebelumnya · Berikutnya ›. From sm the two row wrappers
+          dissolve (display: contents) and the order utilities line all four
+          up: ‹ Sebelumnya · main · ↺ Ulangi langkah ini · Berikutnya ›. */}
+      {showBar && (
+        <div
+          ref={barRef}
+          data-autoplay="panel"
+          className="sticky bottom-0 z-20 rounded-b-2xl border-t border-hairline bg-white/95 px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-12px_28px_-14px_rgb(14_90_60/0.35)] backdrop-blur-sm sm:px-7"
+        >
+          {notices}
+          {!spec && <div className="mb-4">{caption}</div>}
+          {offscreen && spotGuides.length > 0 && (
+            <button type="button" onClick={showTarget} className="btn-secondary mb-3 w-full">
+              {offscreen === "below" ? (
+                <ArrowDown aria-hidden className="h-5 w-5" />
+              ) : (
+                <ArrowUp aria-hidden className="h-5 w-5" />
+              )}
+              {t("show_target")}
+            </button>
+          )}
+          <div
+            role="group"
+            aria-label={t("controls_label")}
+            className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center"
+          >
+            <div className="flex flex-wrap items-center gap-3 sm:contents">
+              <div className="relative min-w-0 grow basis-40 sm:order-2 sm:basis-auto">
+                {lanjutGuide && <BarSpotLabel label={lanjutGuide.label} />}
+                <button
+                  ref={focusOnMount}
+                  type="button"
+                  data-autoplay="middle"
+                  data-guide={middle === "lanjut" ? "lanjut" : undefined}
+                  onClick={onMiddle}
+                  className={clsx(
+                    middle === "pause" ? "btn-secondary" : "btn-primary",
+                    "w-full min-h-14!",
+                    lanjutGuide && BAR_RING,
+                  )}
+                >
+                  {middle === "pause" ? (
+                    <Pause aria-hidden className="h-5 w-5" />
+                  ) : middle === "lanjut" ? (
+                    <ChevronRight aria-hidden className="h-5 w-5" />
+                  ) : (
+                    <Play aria-hidden className="h-5 w-5" />
+                  )}
+                  {middleLabel}
+                </button>
+              </div>
+              {/* The current step again, from its start — also while
+                  paused (it plays on from there). Phones show the short
+                  word; the name is always the full "Ulangi langkah ini". */}
+              <button
+                type="button"
+                data-autoplay="replay"
+                onClick={actions.replay}
+                aria-label={t("replay")}
+                className="btn-secondary min-h-14! shrink-0 px-3! sm:order-3 sm:grow sm:px-5!"
+              >
+                <RotateCcw aria-hidden className="h-5 w-5" />
+                <span aria-hidden className="sm:hidden">
+                  {t("replay_short")}
+                </span>
+                <span aria-hidden className="hidden sm:inline">
+                  {t("replay")}
+                </span>
+              </button>
+            </div>
+            <div className="flex flex-wrap items-center gap-3 sm:contents">
+              <button
+                type="button"
+                data-autoplay="prev"
+                onClick={() => {
+                  if (view.index > 0) actions.prev();
+                }}
+                aria-disabled={view.index === 0}
+                className="btn-secondary grow px-2.5! sm:order-1 sm:px-5!"
+              >
+                <ChevronLeft aria-hidden className="h-5 w-5" />
+                {t("prev")}
+              </button>
+              <div className="relative grow sm:order-4">
+                {skipGuide && <BarSpotLabel label={skipGuide.label} align="end" />}
+                <button
+                  type="button"
+                  data-autoplay="next"
+                  data-guide={view.showSkip ? "skip" : undefined}
+                  onClick={actions.forward}
+                  className={clsx(
+                    // Narrower side padding on phones (and no skip icon)
+                    // keeps ‹ Sebelumnya and this button — "Lewati latihan"
+                    // too, a label the voice says in full — on one row at
+                    // the normal text size.
+                    "btn-secondary w-full px-2.5! sm:px-5!",
+                    view.showSkip && "min-h-14! font-semibold",
+                    skipGuide && BAR_RING,
+                  )}
+                >
+                  {view.showSkip ? (
+                    <>
+                      <SkipForward aria-hidden className="hidden h-5 w-5 sm:block" />
+                      {t("skip")}
+                    </>
+                  ) : (
+                    <>
+                      {t("next")}
+                      <ChevronRight aria-hidden className="h-5 w-5" />
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </details>
-
-      <p className="mt-4 max-w-prose text-sm text-ink-muted">{t("captions_note")}</p>
+      )}
     </div>
   );
 }

@@ -55,7 +55,6 @@ export default async function ConceptPage({ params }: PageProps<"/[locale]/konse
             examples: t("examples"),
             more: t("more"),
             sources: tw("sources"),
-            draft: tw("draft"),
           }}
         />
       </div>

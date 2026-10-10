@@ -1,0 +1,1447 @@
+{
+  "version": 2,
+  "voice": {
+    "id": "aK834gEOxQEtviMPgurT",
+    "name": "Kang Nandar",
+    "model": "eleven_v3"
+  },
+  "lines": {
+    "shared:start": {
+      "text": "Mari kita mulai. Anda cukup mendengarkan dan memperhatikan layar; pelajaran berjalan sendiri, dan hanya latihan yang meminta Anda mengklik. Ayat Al-Qur'an selalu dibacakan oleh imam. Penjelasan ini dibacakan dengan suara kecerdasan buatan, disusun dengan bantuan kecerdasan buatan dari kitab-kitab yang disebutkan sumbernya.",
+      "display": "Mari kita mulai. Anda cukup mendengarkan dan memperhatikan layar; pelajaran berjalan sendiri, dan hanya latihan yang meminta Anda mengklik. Ayat Al-Qur'an selalu dibacakan oleh imam. Penjelasan ini dibacakan dengan suara kecerdasan buatan, disusun dengan bantuan kecerdasan buatan dari kitab-kitab yang disebutkan sumbernya.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/b55eec562c42ecb7.mp3",
+        "ms": 23249,
+        "sha256": "776feb45965ae2a68ba4aea120c05c52bc9c4881fb1b9848e2129b707f94ce89"
+      },
+      "tokens": [
+        {
+          "t": "Mari",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "kita",
+          "s": 0.288,
+          "e": 0.48
+        },
+        {
+          "t": "mulai.",
+          "s": 0.54,
+          "e": 1.48
+        },
+        {
+          "t": "Anda",
+          "s": 1.6,
+          "e": 2.08
+        },
+        {
+          "t": "cukup",
+          "s": 2.12,
+          "e": 2.32
+        },
+        {
+          "t": "mendengarkan",
+          "s": 2.368,
+          "e": 3.04
+        },
+        {
+          "t": "dan",
+          "s": 3.1,
+          "e": 3.28
+        },
+        {
+          "t": "memperhatikan",
+          "s": 3.32,
+          "e": 3.92
+        },
+        {
+          "t": "layar;",
+          "s": 3.98,
+          "e": 4.4
+        },
+        {
+          "t": "pelajaran",
+          "s": 4.6,
+          "e": 5.6
+        },
+        {
+          "t": "berjalan",
+          "s": 5.64,
+          "e": 6.0
+        },
+        {
+          "t": "sendiri,",
+          "s": 6.064,
+          "e": 6.64
+        },
+        {
+          "t": "dan",
+          "s": 6.8,
+          "e": 7.28
+        },
+        {
+          "t": "hanya",
+          "s": 7.347,
+          "e": 7.68
+        },
+        {
+          "t": "latihan",
+          "s": 7.74,
+          "e": 8.24
+        },
+        {
+          "t": "yang",
+          "s": 8.288,
+          "e": 8.48
+        },
+        {
+          "t": "meminta",
+          "s": 8.52,
+          "e": 8.96
+        },
+        {
+          "t": "Anda",
+          "s": 9.024,
+          "e": 9.28
+        },
+        {
+          "t": "mengklik.",
+          "s": 9.328,
+          "e": 10.44
+        },
+        {
+          "t": "Ayat",
+          "s": 10.667,
+          "e": 11.28
+        },
+        {
+          "t": "Al-Qur'an",
+          "s": 11.333,
+          "e": 11.92
+        },
+        {
+          "t": "selalu",
+          "s": 12.0,
+          "e": 12.48
+        },
+        {
+          "t": "dibacakan",
+          "s": 12.54,
+          "e": 13.12
+        },
+        {
+          "t": "oleh",
+          "s": 13.168,
+          "e": 13.36
+        },
+        {
+          "t": "imam.",
+          "s": 13.413,
+          "e": 13.76
+        },
+        {
+          "t": "Penjelasan",
+          "s": 14.0,
+          "e": 15.12
+        },
+        {
+          "t": "ini",
+          "s": 15.2,
+          "e": 15.44
+        },
+        {
+          "t": "dibacakan",
+          "s": 15.5,
+          "e": 16.16
+        },
+        {
+          "t": "dengan",
+          "s": 16.194,
+          "e": 16.4
+        },
+        {
+          "t": "suara",
+          "s": 16.48,
+          "e": 16.8
+        },
+        {
+          "t": "kecerdasan",
+          "s": 16.827,
+          "e": 17.28
+        },
+        {
+          "t": "buatan,",
+          "s": 17.36,
+          "e": 18.48
+        },
+        {
+          "t": "disusun",
+          "s": 18.52,
+          "e": 18.96
+        },
+        {
+          "t": "dengan",
+          "s": 19.006,
+          "e": 19.28
+        },
+        {
+          "t": "bantuan",
+          "s": 19.32,
+          "e": 19.76
+        },
+        {
+          "t": "kecerdasan",
+          "s": 19.813,
+          "e": 20.24
+        },
+        {
+          "t": "buatan",
+          "s": 20.32,
+          "e": 20.8
+        },
+        {
+          "t": "dari",
+          "s": 20.848,
+          "e": 21.04
+        },
+        {
+          "t": "kitab-kitab",
+          "s": 21.093,
+          "e": 21.68
+        },
+        {
+          "t": "yang",
+          "s": 21.728,
+          "e": 21.92
+        },
+        {
+          "t": "disebutkan",
+          "s": 21.98,
+          "e": 22.56
+        },
+        {
+          "t": "sumbernya.",
+          "s": 22.6,
+          "e": 23.2
+        }
+      ]
+    },
+    "shared:resume": {
+      "text": "Kita lanjutkan pelajaran dari langkah terakhir.",
+      "display": "Kita lanjutkan pelajaran dari langkah terakhir.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/b225c5793eb85038.mp3",
+        "ms": 3004,
+        "sha256": "70d8ef1a8dfbd832e34906fdd5f8969e454f5c0f8d7ea9392693893c714f803b"
+      },
+      "tokens": [
+        {
+          "t": "Kita",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "lanjutkan",
+          "s": 0.28,
+          "e": 0.72
+        },
+        {
+          "t": "pelajaran",
+          "s": 0.78,
+          "e": 1.44
+        },
+        {
+          "t": "dari",
+          "s": 1.504,
+          "e": 1.76
+        },
+        {
+          "t": "langkah",
+          "s": 1.856,
+          "e": 2.32
+        },
+        {
+          "t": "terakhir.",
+          "s": 2.38,
+          "e": 2.96
+        }
+      ]
+    },
+    "shared:correct": {
+      "text": "Benar.",
+      "display": "Benar.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/bb746a5ce73eda11.mp3",
+        "ms": 679,
+        "sha256": "b3a02a8d31e8119957a6c5639e6a10c28be3e4c3a657b40620e23c377d18515a"
+      },
+      "tokens": [
+        {
+          "t": "Benar.",
+          "s": 0.0,
+          "e": 0.64
+        }
+      ]
+    },
+    "shared:try_again": {
+      "text": "Belum tepat. Coba pilih yang lain.",
+      "display": "Belum tepat. Coba pilih yang lain.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/ab3bf5fdcbd85cf5.mp3",
+        "ms": 2116,
+        "sha256": "1ab8354b53b0a943ca9476346eeff7b09f6182f988cd984c3f0fc0e6815ec374"
+      },
+      "tokens": [
+        {
+          "t": "Belum",
+          "s": 0.0,
+          "e": 0.16
+        },
+        {
+          "t": "tepat.",
+          "s": 0.22,
+          "e": 0.64
+        },
+        {
+          "t": "Coba",
+          "s": 0.76,
+          "e": 1.2
+        },
+        {
+          "t": "pilih",
+          "s": 1.24,
+          "e": 1.44
+        },
+        {
+          "t": "yang",
+          "s": 1.472,
+          "e": 1.6
+        },
+        {
+          "t": "lain.",
+          "s": 1.664,
+          "e": 2.08
+        }
+      ]
+    },
+    "shared:revealed": {
+      "text": "Ini jawabannya. Perhatikan sebentar.",
+      "display": "Ini jawabannya. Perhatikan sebentar.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/f46b63613b9bbad4.mp3",
+        "ms": 2691,
+        "sha256": "9090a80f3a7e132e5f1fc44446c38c1ac1e13200476fa8b07ff839d214b32774"
+      },
+      "tokens": [
+        {
+          "t": "Ini",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "jawabannya.",
+          "s": 0.28,
+          "e": 1.28
+        },
+        {
+          "t": "Perhatikan",
+          "s": 1.38,
+          "e": 2.0
+        },
+        {
+          "t": "sebentar.",
+          "s": 2.04,
+          "e": 2.64
+        }
+      ]
+    },
+    "shared:reminder": {
+      "text": "Silakan lanjutkan latihannya. Bagian yang perlu diklik sedang diberi tanda di layar.",
+      "display": "Silakan lanjutkan latihannya. Bagian yang perlu diklik sedang diberi tanda di layar.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/f98325fbc76f9470.mp3",
+        "ms": 5068,
+        "sha256": "29bd22ab13b61e87c6d402090b5d2446f7da057ce211298cc26c6f1247ad99ae"
+      },
+      "tokens": [
+        {
+          "t": "Silakan",
+          "s": 0.0,
+          "e": 0.48
+        },
+        {
+          "t": "lanjutkan",
+          "s": 0.52,
+          "e": 0.96
+        },
+        {
+          "t": "latihannya.",
+          "s": 1.02,
+          "e": 2.04
+        },
+        {
+          "t": "Bagian",
+          "s": 2.15,
+          "e": 2.64
+        },
+        {
+          "t": "yang",
+          "s": 2.672,
+          "e": 2.8
+        },
+        {
+          "t": "perlu",
+          "s": 2.84,
+          "e": 3.04
+        },
+        {
+          "t": "diklik",
+          "s": 3.1,
+          "e": 3.44
+        },
+        {
+          "t": "sedang",
+          "s": 3.52,
+          "e": 3.84
+        },
+        {
+          "t": "diberi",
+          "s": 3.88,
+          "e": 4.16
+        },
+        {
+          "t": "tanda",
+          "s": 4.2,
+          "e": 4.48
+        },
+        {
+          "t": "di",
+          "s": 4.507,
+          "e": 4.56
+        },
+        {
+          "t": "layar.",
+          "s": 4.62,
+          "e": 5.04
+        }
+      ]
+    },
+    "shared:skip_offer": {
+      "text": "Jika ingin melewati latihan ini, klik tombol Lewati latihan.",
+      "display": "Jika ingin melewati latihan ini, klik tombol Lewati latihan.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/f3ef4da64b9ea5e6.mp3",
+        "ms": 4598,
+        "sha256": "9709c07834913848758565142a0f328e098f720413c6f1a569c4bb0fd4dff637"
+      },
+      "tokens": [
+        {
+          "t": "Jika",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "ingin",
+          "s": 0.293,
+          "e": 0.56
+        },
+        {
+          "t": "melewati",
+          "s": 0.613,
+          "e": 1.12
+        },
+        {
+          "t": "latihan",
+          "s": 1.18,
+          "e": 1.52
+        },
+        {
+          "t": "ini,",
+          "s": 1.62,
+          "e": 2.4
+        },
+        {
+          "t": "klik",
+          "s": 2.464,
+          "e": 2.72
+        },
+        {
+          "t": "tombol",
+          "s": 2.768,
+          "e": 3.12
+        },
+        {
+          "t": "Lewati",
+          "s": 3.22,
+          "e": 3.76
+        },
+        {
+          "t": "latihan.",
+          "s": 3.82,
+          "e": 4.56
+        }
+      ]
+    },
+    "shared:surah_done": {
+      "text": "Pilihan berikutnya ada di layar.",
+      "display": "Pilihan berikutnya ada di layar.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/097b10cd0125bcf5.mp3",
+        "ms": 2273,
+        "sha256": "04df735b6e54a1abb2c7b6b0e3ccde1760490dfa369c9834b0f72ed414ce6010"
+      },
+      "tokens": [
+        {
+          "t": "Pilihan",
+          "s": 0.0,
+          "e": 0.4
+        },
+        {
+          "t": "berikutnya",
+          "s": 0.44,
+          "e": 1.12
+        },
+        {
+          "t": "ada",
+          "s": 1.22,
+          "e": 1.52
+        },
+        {
+          "t": "di",
+          "s": 1.573,
+          "e": 1.68
+        },
+        {
+          "t": "layar.",
+          "s": 1.74,
+          "e": 2.24
+        }
+      ]
+    },
+    "shared:ex:tap-word:play": {
+      "text": "Dengarkan imam membacakan satu kata dari ayat ini.",
+      "display": "Dengarkan imam membacakan satu kata dari ayat ini.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/11482ffa93f86e88.mp3",
+        "ms": 3631,
+        "sha256": "efa2d74aedbe82941cf69e88fc56ed1d6ee841e731f20307e3915803ceeaad8f"
+      },
+      "tokens": [
+        {
+          "t": "Dengarkan",
+          "s": 0.0,
+          "e": 0.64
+        },
+        {
+          "t": "imam",
+          "s": 0.693,
+          "e": 0.88
+        },
+        {
+          "t": "membacakan",
+          "s": 0.928,
+          "e": 1.6
+        },
+        {
+          "t": "satu",
+          "s": 1.664,
+          "e": 1.92
+        },
+        {
+          "t": "kata",
+          "s": 2.016,
+          "e": 2.4
+        },
+        {
+          "t": "dari",
+          "s": 2.496,
+          "e": 2.88
+        },
+        {
+          "t": "ayat",
+          "s": 2.96,
+          "e": 3.28
+        },
+        {
+          "t": "ini.",
+          "s": 3.34,
+          "e": 3.6
+        }
+      ]
+    },
+    "shared:ex:tap-word:options": {
+      "text": "Sekarang klik kata yang tadi dibacakan imam.",
+      "display": "Sekarang klik kata yang tadi dibacakan imam.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/42a6d602f4991a97.mp3",
+        "ms": 2847,
+        "sha256": "405c9a0e241f4ccbbbcfe994c8ee2867c0730468cba00a90818e7d03f57ddbc2"
+      },
+      "tokens": [
+        {
+          "t": "Sekarang",
+          "s": 0.0,
+          "e": 0.48
+        },
+        {
+          "t": "klik",
+          "s": 0.544,
+          "e": 0.8
+        },
+        {
+          "t": "kata",
+          "s": 0.864,
+          "e": 1.12
+        },
+        {
+          "t": "yang",
+          "s": 1.152,
+          "e": 1.28
+        },
+        {
+          "t": "tadi",
+          "s": 1.36,
+          "e": 1.6
+        },
+        {
+          "t": "dibacakan",
+          "s": 1.64,
+          "e": 2.16
+        },
+        {
+          "t": "imam.",
+          "s": 2.213,
+          "e": 2.8
+        }
+      ]
+    },
+    "shared:ex:tap-word:reveal": {
+      "text": "Jika masih ragu, klik Tunjukkan jawaban. Anda juga boleh mencoba lagi.",
+      "display": "Jika masih ragu, klik Tunjukkan jawaban. Anda juga boleh mencoba lagi.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/982732c15af5b7a1.mp3",
+        "ms": 4989,
+        "sha256": "c4a0323e19d12ed51df76f4c8d0e3c46e4eb4f2ce426c441afa0721184f13266"
+      },
+      "tokens": [
+        {
+          "t": "Jika",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "masih",
+          "s": 0.28,
+          "e": 0.48
+        },
+        {
+          "t": "ragu,",
+          "s": 0.56,
+          "e": 1.2
+        },
+        {
+          "t": "klik",
+          "s": 1.248,
+          "e": 1.44
+        },
+        {
+          "t": "Tunjukkan",
+          "s": 1.5,
+          "e": 2.0
+        },
+        {
+          "t": "jawaban.",
+          "s": 2.04,
+          "e": 2.8
+        },
+        {
+          "t": "Anda",
+          "s": 2.912,
+          "e": 3.36
+        },
+        {
+          "t": "juga",
+          "s": 3.408,
+          "e": 3.6
+        },
+        {
+          "t": "boleh",
+          "s": 3.653,
+          "e": 3.92
+        },
+        {
+          "t": "mencoba",
+          "s": 3.968,
+          "e": 4.32
+        },
+        {
+          "t": "lagi.",
+          "s": 4.384,
+          "e": 4.96
+        }
+      ]
+    },
+    "shared:ex:tap-word:next": {
+      "text": "Klik tombol yang diberi tanda untuk melanjutkan.",
+      "display": "Klik tombol yang diberi tanda untuk melanjutkan.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/74c1f05857371a94.mp3",
+        "ms": 2691,
+        "sha256": "01a57a195a99303989fcaccedb6d115e54e280d896e4934d3a92240cf90b62c0"
+      },
+      "tokens": [
+        {
+          "t": "Klik",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "tombol",
+          "s": 0.288,
+          "e": 0.56
+        },
+        {
+          "t": "yang",
+          "s": 0.592,
+          "e": 0.72
+        },
+        {
+          "t": "diberi",
+          "s": 0.76,
+          "e": 1.12
+        },
+        {
+          "t": "tanda",
+          "s": 1.2,
+          "e": 1.44
+        },
+        {
+          "t": "untuk",
+          "s": 1.507,
+          "e": 1.84
+        },
+        {
+          "t": "melanjutkan.",
+          "s": 1.86,
+          "e": 2.64
+        }
+      ]
+    },
+    "shared:ex:why-harakat:options": {
+      "text": "Pilih alasan yang membuat akhir kata ini dibaca seperti itu.",
+      "display": "Pilih alasan yang membuat akhir kata ini dibaca seperti itu.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/4fa5126ebf0f2c1d.mp3",
+        "ms": 3553,
+        "sha256": "1f7335ae0f171a99544dadf6fad02638e75f3507184fa73ef19d2e0cdc7f5b95"
+      },
+      "tokens": [
+        {
+          "t": "Pilih",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "alasan",
+          "s": 0.293,
+          "e": 0.72
+        },
+        {
+          "t": "yang",
+          "s": 0.736,
+          "e": 0.8
+        },
+        {
+          "t": "membuat",
+          "s": 0.86,
+          "e": 1.28
+        },
+        {
+          "t": "akhir",
+          "s": 1.333,
+          "e": 1.52
+        },
+        {
+          "t": "kata",
+          "s": 1.6,
+          "e": 1.92
+        },
+        {
+          "t": "ini",
+          "s": 1.98,
+          "e": 2.16
+        },
+        {
+          "t": "dibaca",
+          "s": 2.22,
+          "e": 2.72
+        },
+        {
+          "t": "seperti",
+          "s": 2.77,
+          "e": 3.12
+        },
+        {
+          "t": "itu.",
+          "s": 3.2,
+          "e": 3.52
+        }
+      ]
+    },
+    "shared:ex:why-harakat:reveal": {
+      "text": "Jika masih ragu, klik Tunjukkan jawaban. Anda juga boleh mencoba lagi.",
+      "display": "Jika masih ragu, klik Tunjukkan jawaban. Anda juga boleh mencoba lagi.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/982732c15af5b7a1.mp3",
+        "ms": 4989,
+        "sha256": "c4a0323e19d12ed51df76f4c8d0e3c46e4eb4f2ce426c441afa0721184f13266"
+      },
+      "tokens": [
+        {
+          "t": "Jika",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "masih",
+          "s": 0.28,
+          "e": 0.48
+        },
+        {
+          "t": "ragu,",
+          "s": 0.56,
+          "e": 1.2
+        },
+        {
+          "t": "klik",
+          "s": 1.248,
+          "e": 1.44
+        },
+        {
+          "t": "Tunjukkan",
+          "s": 1.5,
+          "e": 2.0
+        },
+        {
+          "t": "jawaban.",
+          "s": 2.04,
+          "e": 2.8
+        },
+        {
+          "t": "Anda",
+          "s": 2.912,
+          "e": 3.36
+        },
+        {
+          "t": "juga",
+          "s": 3.408,
+          "e": 3.6
+        },
+        {
+          "t": "boleh",
+          "s": 3.653,
+          "e": 3.92
+        },
+        {
+          "t": "mencoba",
+          "s": 3.968,
+          "e": 4.32
+        },
+        {
+          "t": "lagi.",
+          "s": 4.384,
+          "e": 4.96
+        }
+      ]
+    },
+    "shared:ex:why-harakat:next": {
+      "text": "Klik tombol yang diberi tanda untuk melanjutkan.",
+      "display": "Klik tombol yang diberi tanda untuk melanjutkan.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/74c1f05857371a94.mp3",
+        "ms": 2691,
+        "sha256": "01a57a195a99303989fcaccedb6d115e54e280d896e4934d3a92240cf90b62c0"
+      },
+      "tokens": [
+        {
+          "t": "Klik",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "tombol",
+          "s": 0.288,
+          "e": 0.56
+        },
+        {
+          "t": "yang",
+          "s": 0.592,
+          "e": 0.72
+        },
+        {
+          "t": "diberi",
+          "s": 0.76,
+          "e": 1.12
+        },
+        {
+          "t": "tanda",
+          "s": 1.2,
+          "e": 1.44
+        },
+        {
+          "t": "untuk",
+          "s": 1.507,
+          "e": 1.84
+        },
+        {
+          "t": "melanjutkan.",
+          "s": 1.86,
+          "e": 2.64
+        }
+      ]
+    },
+    "shared:ex:sort-case:words": {
+      "text": "Klik satu kata yang ingin Anda kelompokkan.",
+      "display": "Klik satu kata yang ingin Anda kelompokkan.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/f64e88bdcc44f8ea.mp3",
+        "ms": 2847,
+        "sha256": "9758840a3e63a1a8cb292bf8b5b0fb39bb7a412b11d4d74f21719f730d836c80"
+      },
+      "tokens": [
+        {
+          "t": "Klik",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "satu",
+          "s": 0.304,
+          "e": 0.56
+        },
+        {
+          "t": "kata",
+          "s": 0.64,
+          "e": 0.96
+        },
+        {
+          "t": "yang",
+          "s": 1.008,
+          "e": 1.2
+        },
+        {
+          "t": "ingin",
+          "s": 1.253,
+          "e": 1.52
+        },
+        {
+          "t": "Anda",
+          "s": 1.616,
+          "e": 2.0
+        },
+        {
+          "t": "kelompokkan.",
+          "s": 2.04,
+          "e": 2.8
+        }
+      ]
+    },
+    "shared:ex:sort-case:bins": {
+      "text": "Sekarang klik kelompok akhiran yang cocok untuk kata itu.",
+      "display": "Sekarang klik kelompok akhiran yang cocok untuk kata itu.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/0de6c80d60c42be6.mp3",
+        "ms": 3709,
+        "sha256": "7a36cc6acc6c6b3e049840b40ffbb25b8f3bf5cf46a70856b7401474876e4b3b"
+      },
+      "tokens": [
+        {
+          "t": "Sekarang",
+          "s": 0.0,
+          "e": 0.56
+        },
+        {
+          "t": "klik",
+          "s": 0.656,
+          "e": 1.04
+        },
+        {
+          "t": "kelompok",
+          "s": 1.08,
+          "e": 1.44
+        },
+        {
+          "t": "akhiran",
+          "s": 1.493,
+          "e": 1.92
+        },
+        {
+          "t": "yang",
+          "s": 1.952,
+          "e": 2.08
+        },
+        {
+          "t": "cocok",
+          "s": 2.16,
+          "e": 2.56
+        },
+        {
+          "t": "untuk",
+          "s": 2.613,
+          "e": 2.88
+        },
+        {
+          "t": "kata",
+          "s": 2.928,
+          "e": 3.12
+        },
+        {
+          "t": "itu.",
+          "s": 3.2,
+          "e": 3.68
+        }
+      ]
+    },
+    "shared:ex:sort-case:reveal": {
+      "text": "Jika masih ragu, klik Tunjukkan jawaban. Anda juga boleh mencoba lagi.",
+      "display": "Jika masih ragu, klik Tunjukkan jawaban. Anda juga boleh mencoba lagi.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/982732c15af5b7a1.mp3",
+        "ms": 4989,
+        "sha256": "c4a0323e19d12ed51df76f4c8d0e3c46e4eb4f2ce426c441afa0721184f13266"
+      },
+      "tokens": [
+        {
+          "t": "Jika",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "masih",
+          "s": 0.28,
+          "e": 0.48
+        },
+        {
+          "t": "ragu,",
+          "s": 0.56,
+          "e": 1.2
+        },
+        {
+          "t": "klik",
+          "s": 1.248,
+          "e": 1.44
+        },
+        {
+          "t": "Tunjukkan",
+          "s": 1.5,
+          "e": 2.0
+        },
+        {
+          "t": "jawaban.",
+          "s": 2.04,
+          "e": 2.8
+        },
+        {
+          "t": "Anda",
+          "s": 2.912,
+          "e": 3.36
+        },
+        {
+          "t": "juga",
+          "s": 3.408,
+          "e": 3.6
+        },
+        {
+          "t": "boleh",
+          "s": 3.653,
+          "e": 3.92
+        },
+        {
+          "t": "mencoba",
+          "s": 3.968,
+          "e": 4.32
+        },
+        {
+          "t": "lagi.",
+          "s": 4.384,
+          "e": 4.96
+        }
+      ]
+    },
+    "shared:ex:label-role:options": {
+      "text": "Pilih peran kata ini dalam kalimat ayatnya.",
+      "display": "Pilih peran kata ini dalam kalimat ayatnya.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/9f3795803810a981.mp3",
+        "ms": 2926,
+        "sha256": "c86103df9c5621491bc0c8684d1da9a71f690e99696f4cfc78260bb00423c2cf"
+      },
+      "tokens": [
+        {
+          "t": "Pilih",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "peran",
+          "s": 0.3,
+          "e": 0.56
+        },
+        {
+          "t": "kata",
+          "s": 0.624,
+          "e": 0.88
+        },
+        {
+          "t": "ini",
+          "s": 0.98,
+          "e": 1.28
+        },
+        {
+          "t": "dalam",
+          "s": 1.347,
+          "e": 1.68
+        },
+        {
+          "t": "kalimat",
+          "s": 1.74,
+          "e": 2.16
+        },
+        {
+          "t": "ayatnya.",
+          "s": 2.24,
+          "e": 2.88
+        }
+      ]
+    },
+    "shared:ex:label-role:reveal": {
+      "text": "Jika masih ragu, klik Tunjukkan jawaban. Anda juga boleh mencoba lagi.",
+      "display": "Jika masih ragu, klik Tunjukkan jawaban. Anda juga boleh mencoba lagi.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/982732c15af5b7a1.mp3",
+        "ms": 4989,
+        "sha256": "c4a0323e19d12ed51df76f4c8d0e3c46e4eb4f2ce426c441afa0721184f13266"
+      },
+      "tokens": [
+        {
+          "t": "Jika",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "masih",
+          "s": 0.28,
+          "e": 0.48
+        },
+        {
+          "t": "ragu,",
+          "s": 0.56,
+          "e": 1.2
+        },
+        {
+          "t": "klik",
+          "s": 1.248,
+          "e": 1.44
+        },
+        {
+          "t": "Tunjukkan",
+          "s": 1.5,
+          "e": 2.0
+        },
+        {
+          "t": "jawaban.",
+          "s": 2.04,
+          "e": 2.8
+        },
+        {
+          "t": "Anda",
+          "s": 2.912,
+          "e": 3.36
+        },
+        {
+          "t": "juga",
+          "s": 3.408,
+          "e": 3.6
+        },
+        {
+          "t": "boleh",
+          "s": 3.653,
+          "e": 3.92
+        },
+        {
+          "t": "mencoba",
+          "s": 3.968,
+          "e": 4.32
+        },
+        {
+          "t": "lagi.",
+          "s": 4.384,
+          "e": 4.96
+        }
+      ]
+    },
+    "shared:ex:label-role:next": {
+      "text": "Klik tombol yang diberi tanda untuk melanjutkan.",
+      "display": "Klik tombol yang diberi tanda untuk melanjutkan.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/74c1f05857371a94.mp3",
+        "ms": 2691,
+        "sha256": "01a57a195a99303989fcaccedb6d115e54e280d896e4934d3a92240cf90b62c0"
+      },
+      "tokens": [
+        {
+          "t": "Klik",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "tombol",
+          "s": 0.288,
+          "e": 0.56
+        },
+        {
+          "t": "yang",
+          "s": 0.592,
+          "e": 0.72
+        },
+        {
+          "t": "diberi",
+          "s": 0.76,
+          "e": 1.12
+        },
+        {
+          "t": "tanda",
+          "s": 1.2,
+          "e": 1.44
+        },
+        {
+          "t": "untuk",
+          "s": 1.507,
+          "e": 1.84
+        },
+        {
+          "t": "melanjutkan.",
+          "s": 1.86,
+          "e": 2.64
+        }
+      ]
+    },
+    "shared:ex:wazn-factory:options": {
+      "text": "Pilih bentuk kata yang sesuai dengan nama yang ditanyakan.",
+      "display": "Pilih bentuk kata yang sesuai dengan nama yang ditanyakan.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/77343eee7ccc453d.mp3",
+        "ms": 2926,
+        "sha256": "3aad130ab11e750c52aff2712c549dc0c40e71040a7d9dd52edb93bcd13e9e0d"
+      },
+      "tokens": [
+        {
+          "t": "Pilih",
+          "s": 0.0,
+          "e": 0.32
+        },
+        {
+          "t": "bentuk",
+          "s": 0.352,
+          "e": 0.56
+        },
+        {
+          "t": "kata",
+          "s": 0.624,
+          "e": 0.88
+        },
+        {
+          "t": "yang",
+          "s": 0.912,
+          "e": 1.04
+        },
+        {
+          "t": "sesuai",
+          "s": 1.1,
+          "e": 1.44
+        },
+        {
+          "t": "dengan",
+          "s": 1.474,
+          "e": 1.68
+        },
+        {
+          "t": "nama",
+          "s": 1.744,
+          "e": 2.0
+        },
+        {
+          "t": "yang",
+          "s": 2.032,
+          "e": 2.16
+        },
+        {
+          "t": "ditanyakan.",
+          "s": 2.2,
+          "e": 2.88
+        }
+      ]
+    },
+    "shared:ex:wazn-factory:reveal": {
+      "text": "Jika masih ragu, klik Tunjukkan jawaban. Anda juga boleh mencoba lagi.",
+      "display": "Jika masih ragu, klik Tunjukkan jawaban. Anda juga boleh mencoba lagi.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/982732c15af5b7a1.mp3",
+        "ms": 4989,
+        "sha256": "c4a0323e19d12ed51df76f4c8d0e3c46e4eb4f2ce426c441afa0721184f13266"
+      },
+      "tokens": [
+        {
+          "t": "Jika",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "masih",
+          "s": 0.28,
+          "e": 0.48
+        },
+        {
+          "t": "ragu,",
+          "s": 0.56,
+          "e": 1.2
+        },
+        {
+          "t": "klik",
+          "s": 1.248,
+          "e": 1.44
+        },
+        {
+          "t": "Tunjukkan",
+          "s": 1.5,
+          "e": 2.0
+        },
+        {
+          "t": "jawaban.",
+          "s": 2.04,
+          "e": 2.8
+        },
+        {
+          "t": "Anda",
+          "s": 2.912,
+          "e": 3.36
+        },
+        {
+          "t": "juga",
+          "s": 3.408,
+          "e": 3.6
+        },
+        {
+          "t": "boleh",
+          "s": 3.653,
+          "e": 3.92
+        },
+        {
+          "t": "mencoba",
+          "s": 3.968,
+          "e": 4.32
+        },
+        {
+          "t": "lagi.",
+          "s": 4.384,
+          "e": 4.96
+        }
+      ]
+    },
+    "shared:ex:wazn-factory:next": {
+      "text": "Klik tombol yang diberi tanda untuk melanjutkan.",
+      "display": "Klik tombol yang diberi tanda untuk melanjutkan.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/74c1f05857371a94.mp3",
+        "ms": 2691,
+        "sha256": "01a57a195a99303989fcaccedb6d115e54e280d896e4934d3a92240cf90b62c0"
+      },
+      "tokens": [
+        {
+          "t": "Klik",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "tombol",
+          "s": 0.288,
+          "e": 0.56
+        },
+        {
+          "t": "yang",
+          "s": 0.592,
+          "e": 0.72
+        },
+        {
+          "t": "diberi",
+          "s": 0.76,
+          "e": 1.12
+        },
+        {
+          "t": "tanda",
+          "s": 1.2,
+          "e": 1.44
+        },
+        {
+          "t": "untuk",
+          "s": 1.507,
+          "e": 1.84
+        },
+        {
+          "t": "melanjutkan.",
+          "s": 1.86,
+          "e": 2.64
+        }
+      ]
+    }
+  }
+}

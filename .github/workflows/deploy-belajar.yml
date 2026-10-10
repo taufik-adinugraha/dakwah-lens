@@ -64,6 +64,17 @@ jobs:
       - name: Test
         run: npm test
 
+      # The narration guard that matters: no Qur'anic word in any spelling or
+      # ending the AI narrator could voice (plan §6.1 A1; no human review,
+      # L11), word places on screen, manifests equal to a fresh build. Stdlib
+      # only, no network; render_narration.py is never run here.
+      - name: Narration — manifests up to date
+        run: python3 pipeline/build_narration.py --check
+      - name: Narration — validate manifests
+        run: python3 pipeline/validate_narration.py
+      - name: Narration — validator mutation tests
+        run: python3 pipeline/test_validate_narration.py
+
       # Ilmu Waris M1 (docs/waris-plan.md §10). Research-phase parity: the
       # belajar copies of the test vectors and of dalil.json must equal the
       # docs/waris-research originals byte for byte (this job checks out the
@@ -199,7 +210,7 @@ jobs:
           grep -q 'href="/belajar/id/quran/al-fatihah"' <<<"$track"
           # Ayah chips on the track page: hub → track → ayah N is two taps.
           grep -q 'href="/belajar/id/quran/al-fatihah/7"' <<<"$track"
-          # The lesson page carries the streamed recitation + the draft label.
+          # The lesson page carries the streamed recitation + the AI-assisted footer.
           page="$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/al-fatihah/1)"
           grep -q "Alafasy" <<<"$page"
           grep -q "Dibantu AI" <<<"$page"
@@ -207,7 +218,36 @@ jobs:
           # page, including the next-intl messages payload, may promise one.
           if grep -qiE "tinjauan ustadz|ditinjau ustadz|awaiting ustadz|reviewed by an ustadz" <<<"$page"; then echo "✗ page promises an ustadz review"; exit 1; fi
           grep -q "bukan fatwa otoritatif" <<<"$page" || { echo "✗ AI-assisted footer missing"; exit 1; }
+          # The footer is the one AI label on the Qur'an track (operator, 2026-10-10): the per-card
+          # "Dibantu AI · bukan fatwa" chips and the "Masa uji coba" banner are gone, their message
+          # keys too (so not even the messages payload carries them), and the spoken start line no
+          # longer says "dan bukan fatwa".
+          for path in /belajar/id/quran/al-fatihah /belajar/id/quran/al-fatihah/1; do
+            html="$(curl -fsS "http://127.0.0.1:3300${path}")"
+            if grep -qF -e "Dibantu AI · bukan fatwa" -e "Masa uji coba" -e "dan bukan fatwa" <<<"$html"; then
+              echo "✗ ${path}: a removed AI chip / trial banner / spoken 'bukan fatwa' is back"; exit 1
+            fi
+          done
+          # Al-Fatihah ayah 1 is narrated (Kang Nandar): its page ships the same-origin narration
+          # files and their word timings for the karaoke caption. The MP3s themselves are uploaded
+          # to the VM media dir (Caddy, /belajar/media/), not baked into the image.
+          grep -q '/belajar/media/narration/kang-nandar/al-fatihah/' <<<"$page" || { echo "✗ ayah 1 page carries no narration audio"; exit 1; }
           grep -q 'href="/belajar/id/quran/al-fatihah/2"' <<<"$page"
+          # The autoplay lesson: one ayah page of every surah carries the
+          # single "Mulai pelajaran" button and the one-line hint that one click starts
+          # everything (server-rendered, before any script runs). "Klik", never
+          # "ketuk" (operator, 2026-10-10).
+          for path in /belajar/id/quran/al-fatihah/2 /belajar/id/quran/al-ikhlas/1 \
+                      /belajar/id/quran/al-falaq/3 /belajar/id/quran/an-nas/6; do
+            html="$(curl -fsS "http://127.0.0.1:3300${path}")"
+            grep -q 'data-autoplay="start"' <<<"$html" || { echo "✗ ${path}: no autoplay start button"; exit 1; }
+            grep -q '<span>Mulai pelajaran</span>' <<<"$html" || { echo "✗ ${path}: Mulai pelajaran label missing"; exit 1; }
+            grep -q 'Klik sekali; pelajaran berjalan sendiri' <<<"$html" || { echo "✗ ${path}: one-click hint missing"; exit 1; }
+            if grep -qiE '\b(ketuk|mengetuk|diketuk)\b' <<<"$html"; then echo "✗ ${path}: says ketuk (use klik)"; exit 1; fi
+            echo "${path}: autoplay start ok"
+          done
+          en_page="$(curl -fsS http://127.0.0.1:3300/belajar/en/quran/an-nas/1)"
+          grep -q 'data-autoplay="start"' <<<"$en_page" || { echo "✗ /belajar/en/quran/an-nas/1: no autoplay start button"; exit 1; }
           for html in "$hub" "$track" "$page" \
                       "$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/al-fatihah)" \
                       "$(curl -fsS http://127.0.0.1:3300/belajar/id/konsep)"; do
@@ -236,7 +276,13 @@ jobs:
           [[ "$waris_rc" -eq 0 ]] || { echo "✗ waris smoke checks failed (listed above)"; exit 1; }
 
       # Visual review without a developer laptop: phone + desktop screenshots
-      # of the real image, uploaded as a build artifact on every run.
+      # of the real image, uploaded as a build artifact on every run. The
+      # narration MP3s are not in the repo or the image (they live in the VM
+      # media dir), so for the Al-Fatihah ayah 1 karaoke shots the script
+      # answers the narration URLs ITSELF, in the browser only (Playwright
+      # route): the git-ignored pipeline/out file when present, else a silent
+      # stand-in as long as the manifest's `ms`. BELAJAR_DIR points it at the
+      # manifests. Production routing is untouched.
       - name: Screenshots (phone + desktop)
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: |
@@ -254,7 +300,7 @@ jobs:
           npm init -y >/dev/null
           npm install --no-audit --no-fund --silent playwright@1.49.1
           npx playwright install --with-deps chromium >/dev/null
-          node screenshots.mjs
+          BELAJAR_DIR="$GITHUB_WORKSPACE/belajar" node screenshots.mjs
           docker rm -f shots >/dev/null
 
       # Ilmu Waris end-to-end on the real image (docs/waris-plan.md §10):

@@ -62,6 +62,12 @@
   --color-forest: #0e5a3c;
   --color-forest-hover: #0a4a31;
   --color-forest-tint: #eef3ef;
+  /* Module-only (design pass, operator 2026-10-10: "more colourful, green
+     teal shadow like the home page"). Edges only, never text:
+     forest-teal is the lesson stage's 1.5px edge (5.95:1 on white);
+     teal-line is the softer edge of hub / track cards. */
+  --color-forest-teal: #0e715a;
+  --color-teal-line: #cde3d8;
 
   /* Notices: draft marker text, "not yet" feedback (calm amber, not red). */
   --color-notice: #8a4d00;
@@ -214,6 +220,36 @@ body {
   }
 }
 
+/* A row of the header's Menu panel: a 48px link (or the signed-in name),
+   icon + words, with a visible ≥3:1 edge. */
+@utility menu-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.5rem 1rem;
+  border: 1.5px solid var(--color-border-ui);
+  border-radius: 0.75rem;
+  background-color: #ffffff;
+  color: var(--color-ink);
+  font-size: var(--text-base);
+  line-height: 1.35;
+  font-weight: 500;
+  text-decoration: none;
+  transition-property: border-color, background-color;
+  transition-duration: 150ms;
+  @media (hover: hover) {
+    &:is(a):hover {
+      border-color: var(--color-forest);
+    }
+  }
+  &[aria-current="page"] {
+    border-color: var(--color-forest);
+    background-color: var(--color-forest-tint);
+  }
+}
+
 /* Links inside text: the underline carries the meaning (link vs ink text is
    only 2.11:1, so colour alone would fail 1.4.1). */
 @utility link-text {
@@ -248,6 +284,57 @@ body {
   }
   &::marker {
     content: "";
+  }
+}
+
+/* ── Colour (design pass, operator 2026-10-10) ──
+   The main site's forest glow and a soft green-teal shadow. Cards stay
+   white, so their text keeps its contrast; text that sits straight on the
+   glow is ink, ink-muted or forest (≥ 5.2:1 at the glow's strongest, the
+   band under the header), never ink-soft (4.2:1 there). */
+
+/* The lesson stage: the one focused card on the lesson page. */
+@utility stage-card {
+  border: 1.5px solid var(--color-forest-teal);
+  border-radius: 1rem;
+  background-color: #ffffff;
+  box-shadow:
+    0 24px 60px -24px rgb(14 90 60 / 0.45),
+    0 2px 0 rgb(13 148 136 / 0.1);
+}
+
+/* Hub and track cards (each one whole-card link): the same shadow, softer. */
+@utility glow-card {
+  border: 1.5px solid var(--color-teal-line);
+  border-radius: 1rem;
+  background-color: #ffffff;
+  box-shadow:
+    0 18px 44px -26px rgb(14 90 60 / 0.4),
+    0 1px 0 rgb(13 148 136 / 0.08);
+  transition-property: border-color, box-shadow;
+  transition-duration: 150ms;
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--color-forest);
+      box-shadow:
+        0 22px 52px -24px rgb(14 90 60 / 0.5),
+        0 1px 0 rgb(13 148 136 / 0.12);
+    }
+  }
+}
+
+/* Background of the hub, the Qur'an track and its lesson pages: exactly the
+   glow of web/src/app/[locale]/login/page.tsx, drawn by <ForestGlow />. The
+   module has no dark palette; a browser that asks for dark gets the glow
+   toned down. */
+.forest-glow {
+  background:
+    radial-gradient(90rem 42rem at 50% -12rem, rgba(14, 90, 60, 0.42), transparent 68%),
+    radial-gradient(64rem 36rem at 88% 108%, rgba(14, 90, 60, 0.26), transparent 68%);
+}
+@media (prefers-color-scheme: dark) {
+  .forest-glow {
+    opacity: 0.5;
   }
 }
 

@@ -15,6 +15,15 @@
  *
  * Audience: adults, many of them 60+ (operator decisions, 2026-10-09). Reading
  * pace and caption length follow docs/belajar-research/senior-ux.md §3.5.
+ *
+ * The full start-to-finish autoplay lesson (narration line ids, exercises
+ * that wait for the learner, spotlight targets, a pure state machine, the
+ * hand-off to the next ayah) is built on these pieces in ./autoplay/ — the
+ * pacing (Pace, captionMs) and the caption tools (splitCaption,
+ * latinSentences, stripArabic) defined here are shared by both, so the two
+ * lessons can never pace or caption differently. This module stays pure (type
+ * imports only): scripts/autoplay-check.ts runs it under tsx without
+ * node_modules.
  */
 import type { Ayah, Concept } from "@/content/schema";
 
@@ -107,7 +116,7 @@ export function latinSentences(text: string): string {
 }
 
 /** Last resort for template parts (a title, a gloss): drop Arabic runs. */
-const stripArabic = (text: string) =>
+export const stripArabic = (text: string) =>
   ARABIC.test(text) ? text.replace(ARABIC_RUN, "").replace(/\s+([,.;:)])/g, "$1").replace(/\s+/g, " ").trim() : text;
 
 /** Greedily joins pieces with a space while the result stays ≤ max. */

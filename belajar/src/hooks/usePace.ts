@@ -66,6 +66,12 @@ export function usePace(): { pace: Pace; chosen: boolean; setPace: (p: Pace) => 
   return { pace: stored ?? DEFAULT_PACE, chosen: stored !== null, setPace: pacePref.write };
 }
 
+/** The pace in storage right now, read outside render (a timer, an event
+ *  handler) — e.g. when the next ayah starts by itself after an autoplay
+ *  hand-off, before the hydration re-render has delivered usePace's value.
+ *  The default when none was chosen or storage is blocked. */
+export const readPace = (): Pace => pacePref.read() ?? DEFAULT_PACE;
+
 /** The imam's playback speed: normal or slow (0.75×, pitch preserved). */
 export type ImamRate = 1 | 0.75;
 const ratePref = createPref<"1" | "0.75">("belajar:v1:imam-rate", ["1", "0.75"]);

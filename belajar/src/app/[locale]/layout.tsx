@@ -1,17 +1,15 @@
 import type { Metadata } from "next";
 import { Amiri, Fraunces, Inter } from "next/font/google";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 
-import { AccountChip } from "@/components/AccountChip";
 import { FooterDisclaimer } from "@/components/FooterDisclaimer";
-import { TextSizeSwitch } from "@/components/TextSizeSwitch";
+import { HeaderControls } from "@/components/HeaderControls";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { IS_PUBLIC } from "@/lib/flags";
-import { conceptIndexHref, creditsHref, hubHref } from "@/lib/routes";
+import { creditsHref, hubHref } from "@/lib/routes";
 
 import "../globals.css";
 
@@ -96,44 +94,22 @@ export default async function LocaleLayout({
           >
             {t("skip_to_content")}
           </a>
-          {/* Sticky only on wide screens: on phones and tablets the header
-              wraps to several rows at large text sizes, and a sticky header
-              would then cover a large part of the reading area. Positioned at
-              every width because the text-size panel hangs under it. */}
+          {/* One quiet row (operator, 2026-10-10: "too many links and
+              buttons on screen"): the brand, back to the hub; the "Aa" text
+              size; ONE "Menu" holding the rest (HeaderControls). Sticky only
+              on wide screens: on phones and tablets the row can wrap at
+              large text sizes, and a sticky header would then cover a large
+              part of the reading area. Positioned at every width because
+              both panels hang under it. */}
           <header className="relative z-30 border-b border-hairline bg-paper/95 backdrop-blur-md lg:sticky lg:top-0">
-            <div className="mx-auto flex min-h-14 max-w-5xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-2 sm:px-6">
-              <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
-                <Link
-                  href={hubHref()}
-                  className="inline-flex min-h-11 items-center font-display text-lg font-medium text-ink"
-                >
-                  {t("name")}
-                </Link>
-                <span className="rounded-full bg-forest-tint px-3 py-0.5 text-sm font-semibold text-forest">
-                  {t("beta")}
-                </span>
-              </div>
-              <div className="flex flex-wrap items-center gap-2 text-sm">
-                <Link
-                  href={conceptIndexHref()}
-                  className="inline-flex min-h-11 items-center rounded-full px-3 font-medium text-ink-muted transition-colors hover:bg-paper-deep hover:text-ink"
-                >
-                  {t("nav_concepts")}
-                </Link>
-                {/* Cross-app link: plain <a>, never next-intl Link (it would
-                    prefix /belajar and soft-navigate across apps). Visible
-                    at every width; the long label only where it fits. */}
-                <a
-                  href={`/${locale}`}
-                  className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 font-medium text-ink-muted transition-colors hover:bg-paper-deep hover:text-ink"
-                >
-                  <ArrowLeft className="h-5 w-5" aria-hidden />
-                  <span className="hidden xl:inline">{t("back_to_main")}</span>
-                  <span className="xl:hidden">Dakwah-Lens</span>
-                </a>
-                <TextSizeSwitch />
-                <AccountChip locale={locale} />
-              </div>
+            <div className="mx-auto flex min-h-16 max-w-5xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-2 sm:px-6">
+              <Link
+                href={hubHref()}
+                className="inline-flex min-h-12 items-center font-display text-xl font-medium text-ink"
+              >
+                {t("name")}
+              </Link>
+              <HeaderControls locale={locale} />
             </div>
           </header>
 
@@ -146,14 +122,13 @@ export default async function LocaleLayout({
               <p className="max-w-prose text-pretty text-base text-ink-muted">
                 <FooterDisclaimer module={tf("disclaimer")} waris={tw("footer_disclaimer")} />
               </p>
-              <div className="flex flex-wrap gap-x-6 gap-y-2 text-base">
-                <Link href={creditsHref()} className="link-text inline-flex min-h-11 items-center">
-                  {tf("credits")}
-                </Link>
-                <a href={`/${locale}`} className="link-text inline-flex min-h-11 items-center">
-                  Dakwah-Lens
-                </a>
-              </div>
+              {/* One link only (operator, 2026-10-10: "too many links"): the
+                  way back to Dakwah-Lens lives in the header's Menu. Sumber &
+                  lisensi stays here as well, where licence credits are looked
+                  for, reachable without opening a menu. 48px target. */}
+              <Link href={creditsHref()} className="link-text inline-flex min-h-12 shrink-0 items-center text-base">
+                {tf("credits")}
+              </Link>
             </div>
           </footer>
         </NextIntlClientProvider>

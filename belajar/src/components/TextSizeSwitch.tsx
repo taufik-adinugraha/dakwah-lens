@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useId } from "react";
 import clsx from "clsx";
 import { Check, X } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -13,10 +13,9 @@ import {
 
 /**
  * "Ukuran huruf" controls (docs/belajar-research/senior-ux.md §3.4):
- * - TextSizeSwitch: the header button "Aa Ukuran huruf" and the inline panel
- *   it opens under the header (no hover, no modal).
- * - TextSizeOptions: the bare three-option radio group, reused in the
- *   lesson's settings panel and the Home hint card.
+ * - TextSizeOptions: the bare three-option radio group, used by the header's
+ *   "Aa" panel (HeaderControls), the lesson's Pengaturan panel and the Home
+ *   hint card.
  * - TextSizeHint: the one-time Home card "Tulisan kurang jelas? …".
  */
 
@@ -32,16 +31,18 @@ const OPTIONS: {
   { value: "sangat-besar", label: "size_sangat_besar", sample: "text-[1.5rem]" },
 ];
 
-export function TextSizeOptions() {
+/** `showLegend`: print the group's name ("Ukuran huruf") above the options,
+ *  where nothing else on screen names them (the lesson's Pengaturan panel). */
+export function TextSizeOptions({ showLegend = false }: { showLegend?: boolean }) {
   const t = useTranslations("Settings");
   const [size, setSize] = useTextSize();
   const name = useId();
 
   return (
     <fieldset>
-      <legend className="sr-only">{t("group_label")}</legend>
+      <legend className={showLegend ? "text-base font-semibold text-ink" : "sr-only"}>{t("group_label")}</legend>
       {/* Container query: options stack as the text grows. */}
-      <div className="@container">
+      <div className={clsx("@container", showLegend && "mt-2")}>
         <div className="grid gap-3 @xl:grid-cols-3">
           {OPTIONS.map((o) => {
             const checked = size === o.value;
@@ -92,84 +93,6 @@ export function TextSizeOptions() {
         </div>
       </div>
     </fieldset>
-  );
-}
-
-export function TextSizeSwitch() {
-  const t = useTranslations("Settings");
-  const [open, setOpen] = useState(false);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
-  const panelId = useId();
-
-  useEffect(() => {
-    if (!open) return;
-    // Put keyboard and screen-reader users on the current choice.
-    panelRef.current?.querySelector<HTMLInputElement>("input:checked")?.focus();
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
-      setOpen(false);
-      buttonRef.current?.focus();
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open]);
-
-  const close = () => {
-    setOpen(false);
-    buttonRef.current?.focus();
-  };
-
-  return (
-    <>
-      <button
-        ref={buttonRef}
-        type="button"
-        data-text-size-toggle=""
-        aria-expanded={open}
-        aria-controls={panelId}
-        onClick={() => setOpen((o) => !o)}
-        className={clsx(
-          "inline-flex min-h-11 items-center gap-2 rounded-full border-[1.5px] px-3 text-sm font-medium text-ink transition-colors hover:border-forest",
-          open ? "border-forest bg-forest-tint" : "border-border-ui bg-white",
-        )}
-      >
-        <span aria-hidden className="font-display text-base font-semibold">
-          Aa
-        </span>
-        <span className="hidden min-[380px]:inline">{t("button")}</span>
-        <span className="min-[380px]:hidden">{t("button_short")}</span>
-      </button>
-
-      {/* Inline panel under the header (the header is the positioned
-          ancestor). Rendered always so aria-controls points at a real id. */}
-      <div
-        id={panelId}
-        ref={panelRef}
-        role="region"
-        aria-label={t("panel_title")}
-        hidden={!open}
-        className="absolute inset-x-0 top-full z-40 border-b border-hairline bg-paper shadow-lg"
-      >
-        <div className="mx-auto max-w-5xl px-4 py-5 sm:px-6">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-lg font-semibold text-ink">{t("panel_title")}</p>
-              <p className="mt-1 max-w-prose text-base text-ink-muted">
-                {t("panel_body")}
-              </p>
-            </div>
-            <button type="button" onClick={close} className="btn-secondary">
-              <X className="h-5 w-5" aria-hidden />
-              {t("close")}
-            </button>
-          </div>
-          <div className="mt-4">
-            <TextSizeOptions />
-          </div>
-        </div>
-      </div>
-    </>
   );
 }
 

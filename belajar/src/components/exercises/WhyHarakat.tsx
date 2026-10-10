@@ -16,13 +16,23 @@ import {
   QuizActions,
   optionState,
   useChoiceQuiz,
+  useGuide,
   useRestart,
   useStepFocus,
 } from "./ExerciseShell";
+import { choiceGuidePart, guideMarker, guideTarget, type ExerciseGuide } from "./guide";
 
 const GRADED = new Set(["marfu", "manshub", "majrur", "mabni"]);
 
-type Props = { id: string; words: Word[]; pool: Word[] };
+type Props = {
+  id: string;
+  words: Word[];
+  pool: Word[];
+  /** Guided mode (see ExerciseShell.tsx). */
+  guided?: ExerciseGuide;
+  /** Hide the heading and instruction (the stage shows its own). */
+  compact?: boolean;
+};
 
 /**
  * "Kenapa harakat ini?" — choose the reason a word ends the way it does.
@@ -39,6 +49,8 @@ function WhyHarakatRound({
   id,
   words,
   pool,
+  guided,
+  compact,
   restarted,
   onRestart,
 }: Props & { restarted: boolean; onRestart: () => void }) {
@@ -60,10 +72,16 @@ function WhyHarakatRound({
         }),
     [words, pool],
   );
-  const q = useChoiceQuiz(id, items.map((it) => it.word.why));
-  const focusRef = useStepFocus(q.i);
+  const q = useChoiceQuiz(id, items.map((it) => it.word.why), guided);
+  const focusRef = useStepFocus(q.i, !!guided);
+  const empty = items.length === 0;
+  const part = empty
+    ? null
+    : choiceGuidePart({ finished: q.finished, settled: q.resolved !== null, canReveal: q.canReveal });
+  useGuide(guided, part && guideTarget("why-harakat", part), empty);
+  const mark = guideMarker(guided, "why-harakat");
 
-  if (items.length === 0) return null;
+  if (empty) return null;
   const item = items[Math.min(q.i, items.length - 1)];
   const w = item.word;
 
@@ -74,10 +92,11 @@ function WhyHarakatRound({
       done={q.finished || q.doneBefore}
       doneLabel={t("done")}
       autoFocus={restarted}
+      compact={compact}
     >
       {q.finished ? (
         <div ref={focusRef} tabIndex={-1}>
-          <Finished right={q.firstTry} total={q.total} onRestart={onRestart} />
+          <Finished right={q.firstTry} total={q.total} onRestart={guided ? undefined : onRestart} />
         </div>
       ) : (
         <div>
@@ -97,7 +116,7 @@ function WhyHarakatRound({
             </div>
           </div>
 
-          <ul className="mt-4 grid gap-3">
+          <ul data-guide={mark("options")} className="mt-4 grid gap-3">
             {item.options.map((opt) => (
               <li key={opt}>
                 <OptionButton
@@ -128,6 +147,8 @@ function WhyHarakatRound({
             last={q.i + 1 >= q.total}
             onReveal={q.reveal}
             onNext={q.next}
+            revealGuide={mark("reveal")}
+            nextGuide={mark("next")}
           />
         </div>
       )}

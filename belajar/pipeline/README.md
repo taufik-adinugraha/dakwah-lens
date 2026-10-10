@@ -41,6 +41,10 @@ python3 build_surah.py al-fatihah  # write ../content/al-fatihah.json; prints da
 python3 build_surah.py al-ikhlas   # … and the same for al-falaq, an-nas
 python3 validate.py                # re-check every lesson, the library and the links between them; exit 1 on any failure
 python3 test_validate.py           # mutation tests: plants 66 faults in copies of the outputs, each must fail validate
+python3 build_narration.py         # narration manifests ../content/narration/*.json (see "Narasi")
+python3 validate_narration.py      # narration checks; exit 1 on any failure
+python3 test_validate_narration.py # plants 70 faults in copies of the manifests and the dictionary, each must fail
+python3 render_narration.py        # DRY RUN: characters and cost; never calls the API without --render --i-approve-spend
 ```
 
 Run them in this order after editing any authored file: the lesson build reads the lexicon and
@@ -79,6 +83,10 @@ for one surah (`null` = no lexicon entry yet, or a QAC stem with no lemma).
 | `authored/library.lexicon.json` | 3 | Hand-authored Kosakata + Akar values: translit, meaning, tashrif rows, i'lal, root meanings, kitab refs, review notes |
 | `authored/library.concepts.json` | 3 | Hand-authored Konsep records (separate author); passed through by `build_library.py`, minus each record's reviewer-only `review_notes` |
 | `build_library.py` | 2 | Joins QAC 0.4 + the authored library files into `belajar/content/library.json` (`Library`) |
+| `build_narration.py` | 3 | Writes the guided-lesson narration manifests `belajar/content/narration/<slug>.json` + `shared.json` (spoken text, caption, highlight, word card) from the lessons, the library and `authored/pronunciation.json` (templates + content fields; see "Narasi") |
+| `validate_narration.py` | 6 | Narration checks: step-id coverage, the pronunciation dictionary, no Qur'anic word in any spelling or script, Arabic only from the dictionary, caption = speech, highlight/focus, audio entries and karaoke tokens, manifests equal a fresh build |
+| `test_validate_narration.py` | 6 | Mutation tests for `validate_narration.py` + unit tests of the speech text, dictionary rendering, tokens, numbers and render request |
+| `render_narration.py` | 4 | ElevenLabs renderer with word timings (`/with-timestamps`; dry run by default; spends only with `--render --i-approve-spend`) |
 
 ## Inputs (see `sources.json` for the pinned sha256 values)
 
@@ -418,6 +426,251 @@ IMPV for them); the mashdar and participles of waqaba (not in the dictionaries c
 "not hollow" and similar readings of aṣ-ṣamad (aqidah wording, as on the word card); the origin of
 lafaz Allah under ilāh (plan §8); a wazan for al-khannās.
 
+## Narasi (guided-lesson narration)
+
+The autoplay lesson ("Mulai" once, then no clicks except exercise answers) speaks an Indonesian
+narration line for every step. `build_narration.py` writes the scripts; `render_narration.py` turns
+them into audio, with word timings for the karaoke caption, once the operator has approved the
+spend. The voice is Kang Nandar (ElevenLabs `aK834gEOxQEtviMPgurT`, `eleven_v3`, mode A). A line
+without `audio` plays caption-only: the runner shows `display` at reading pace.
+
+**Manifest** (`belajar/content/narration/<slug>.json` per lesson surah, `shared.json` for generic
+lines; `version` is the format version, 2):
+
+```json
+{ "version": 2,
+  "voice": { "id": "aK834gEOxQEtviMPgurT", "name": "Kang Nandar", "model": "eleven_v3" },
+  "lines": { "al-fatihah:1:w3": {
+      "text": "Kata ketiga artinya: Yang Maha Pengasih. Akhirnya dibaca كَسْرَة, karena menjadi sifat, atau نَعْت, bagi kata kedua, …",
+      "display": "Kata ketiga artinya: “Yang Maha Pengasih”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi sifat, atau na’t (نَعْت), bagi kata kedua, …",
+      "highlight": [3], "focus": "1:1:3",
+      "audio": { "url": "/belajar/media/narration/kang-nandar/al-fatihah/<16 hex>.mp3", "ms": 9120, "sha256": "…" },
+      "tokens": [ { "t": "Kata", "s": 0.0, "e": 0.24 }, …, { "t": "kasrah (كَسْرَة),", "s": 4.44, "e": 5.12 }, … ] } } }
+```
+
+| field | what it is |
+|---|---|
+| `text` | the SPOKEN text, exactly what is sent to the voice (dictionary applied, normalised for speech) |
+| `display` | the caption: the same sentence with dictionary terms in their display form ("na’t (نَعْت)", "idhafah (إِضَافَة)", "Allah"), a letter as in the ayah (بِ, لِ; the focus word's own first letter, لَّ of lahu), quotes kept; the fallback when there are no `tokens` |
+| `highlight` | word numbers of this ayah the stage highlights while the line plays; `[0]` the whole ayah, `[]` none |
+| `focus` | the word (`"1:1:3"`) of the large word card (its Arabic from the content bytes, transliteration, "yang artinya “gloss”"), or `null` |
+| `audio` | after a render: `{url, ms, sha256}`; `voice` is then `{id, name, model: "eleven_v3"}` |
+| `tokens` | after a render: the karaoke caption, `[{t, s, e}]`, one per spoken word (a multi-word term such as حَرْف جَرّ is one word), `t` its display text, `s`/`e` seconds from the start of that file |
+
+**Ids** (the step-id contract shared with the runner and the exercises): `${slug}:${ayah}:${part}`,
+in lesson order:
+
+| part | when | says | highlight / focus |
+|---|---|---|---|
+| `intro` | every ayah | which ayah, its translation (QuranEnc, in quotes on the caption), how many words | `[0]` |
+| `recite` | every ayah | one line before the imam recites the ayah | `[0]` |
+| `w${n}` | every word | "Kata ke-n artinya: “gloss”." + the word's `why`, sanitised | `[n]`, focus = that word |
+| `concept:${id}` | each Konsep whose first example is in this ayah (`library.ts conceptsIntroducedIn`) | "Konsep baru: title. summary" (a term spoken from Arabic script right after "Konsep baru:" is shown capitalised, as the caption shows it) | the words whose `concepts` list it and the words of the ayah's `structure.groups` of that concept (idhafah of 1:1: [1, 2]) |
+| `structure` | every ayah with `structure` | the structure summary, sanitised | `[0]` |
+| `ex:${key}:intro` | each exercise the page shows on this ayah (same thresholds as the components) | what the exercise is and how many questions | `[0]` for `tap-word`, else `[]` |
+| `recap` | every ayah | before the imam recites the ayah again | `[0]` |
+| `next` / `done` | `next` on every ayah but the last, `done` on the last | | `[]` |
+
+Exercise keys: `tap-word`, `why-harakat`, `sort-case`, `label-role`, `wazn-factory`.
+`shared.json` holds `shared:start`, `resume`, `correct`, `try_again`, `revealed` (a settled
+question whose answer was shown), `reminder`, `skip_offer`, `surah_done` (true however the learner
+got there: no claim that every ayah was studied), and one prompt per guide part,
+`shared:ex:${key}:${part}`, with the parts of `src/components/exercises/guide.ts`
+`EXERCISE_GUIDE_PARTS` (play, options, words, bins, reveal, next; `validate_narration.py`
+compares its mirror with that file); all with `highlight: []`, `focus: null`. A runner looks for
+`${slug}:${ayah}:ex:${key}:${part}` first and falls back to `shared:ex:${key}:${part}`; only
+`intro` is per ayah today. The learner only answers: the lesson's imam recites Dengar dan klik's
+word by itself (the `play` prompt asks for listening, not a click), and a settled question moves
+on by itself; the `next` prompt ("Klik tombol yang diberi tanda…") is spoken only in the "Tunggu
+saya" pace. The start line says what the narration is (an AI voice, composed with AI help from the
+cited kitab) and nothing about fatwa: the page footer keeps "Dibantu AI, bukan fatwa otoritatif".
+Nothing anywhere promises a human review.
+
+**Split lines.** A line whose spoken text would be longer than 400 characters is cut at sentence
+ends (then `; `, then `, `) into the fewest even parts, stored as `<id>:a`, `<id>:b`, … (never next
+to the unsplit `<id>`), each with the line's `highlight` and `focus`. A player that does not find
+`<id>` plays `<id>:a`, `<id>:b`, … in order. Today 17 lines are split (into 39 parts; mostly
+`structure`).
+
+**One sentence, three forms.** Each line starts as PROSE (Latin, quotes and brackets kept) and is
+written out twice from it, so caption and voice always say the same thing:
+
+1. *Prose* (house rule: all normalisation in Python, ElevenLabs `apply_text_normalization` stays
+   "off"): numbers spelled out (`ayat 6` → "ayat enam", `ke-3` → "ketiga"), `QS 6:112` → "Surah
+   Al-An'am ayat seratus dua belas" (`CITED_SURAH` lists the cited surahs; any other fails the
+   build), honorifics in full ("Allah subhanahu wa ta'ala", "Nabi Muhammad shallallahu 'alaihi wa
+   sallam"), "Anda", no Arabic script, no ALL CAPS, no transliteration diacritics (folded: ā → a,
+   ‘ → '), every Qur'anic word replaced by its place (below), and the house phrasing
+   (`build_narration.PHRASING`, operator review 2026-10-10): a meaning is introduced with "yang
+   artinya" ("huruf lam yang artinya “bagi”", "kata pertama, yang artinya “katakanlah”, …"), never
+   bare quotes or "yang berarti" — also after a grammar term ("bentuk mubalaghah, yang artinya
+   “yang banyak meniup”,", "keterangan waktu yang artinya “apabila”", "kata depan yang artinya
+   “dari”"), while an example stays an example ("misalnya “tetap”", "sandaran kata: “nama
+   Allah”"); "huruf jar ba'" reads "huruf jar, yaitu huruf ba'"; "Akhirnya dibaca kasrah, karena
+   …"; "klik / mengklik / diklik", never "ketuk"; no open fragment ("yang....", "kata yang di."):
+   the spoken text may carry no ellipsis and no phrase that ends on a bare "di".
+2. `text`, *spoken*: each grammar term of the **pronunciation dictionary**
+   (`authored/pronunciation.json`, the kamus pelafalan the operator approved by ear on the
+   Al-Fatihah 1 preview) is written as its `speak` value — Arabic script for most (كَسْرَة,
+   إِعْرَاب, مَجْرُور, حَرْف جَرّ, نَعْت, كَلِمَة, اِسْم, فِعْل, تَصْرِيف, جُمْلَة فِعْلِيَّة …; eleven_v3 mispronounced
+   the Latin na't, idhafah, mudhaf ilaih), a fixed Latin respelling for a heavy letter (ص ض ط ظ ق خ غ)
+   with fathah or alif, which v3 reads light and inconsistently (إِضَافَة → idhofah, مُضَاف إِلَيْه →
+   mudhof ilaih, ضَمَّة → dhommah, ضَمِير → dhomir), and the Name as "Alloh" (tafkhim, house rule);
+   a letter of a preposition is said by its name (بَاء, لَام). Then `tts_text`: quotes dropped,
+   brackets and dashes become commas, an ellipsis is dropped (not read as a full stop), "/" reads
+   "atau", "+" reads "dan", an open prefix loses its hyphen ("di-" → "di").
+3. `display`, *caption*: the prose with each term in its `display` form and the letter as in the
+   ayah — never its spelled-out name (the operator caught "ba’ (بَاء)" beside بِسْمِ). A term whose
+   caption has brackets is not left inside or right before brackets: "sifat (na't)" becomes
+   "sifat, atau na’t (نَعْت)," (spoken "sifat, atau نَعْت,"), "huruf jar (kata depan)" becomes "huruf
+   jar (حَرْف جَرّ), yaitu kata depan,", which is also how the line is best said.
+
+Where a term counts (`validate_narration.LATIN_CONTEXT`): its caption head ("kasrah", "na't",
+"huruf jar", "mudhaf ilaih", "isim majrur") as a whole word anywhere, except "huruf" (plain
+Indonesian: "huruf ba'", "empat huruf", "huruf 'athaf"; the word class only in the Kalimah
+concept's list), ba'/lam (only after "huruf" or "jar": "alif lam" and root letters stay), and
+isim/fi'il as the head of a longer term the dictionary does not have (isim fa'il, isim maushul,
+fi'il mudhari', fi'il amr, fi'il madhi, fi'il majhul stay Latin). Grammar vocabulary the dictionary
+does not have stays Latin, folded (mubtada', khabar, mabni, sukun, badal, mudhaf, mudhari', manshub
+…): **new terms are added only after the operator approves their sound** on the preview page, and
+are then spoken from the dictionary wherever their caption head appears. A Latin word with a heavy
+letter + a (dh zh kh gh sh th q + a: khabar, mudhaf, mudhari', 'athaf, nashab, zharaf, qaul,
+shallallahu …; `validate_narration.heavy_latin`) is the same problem as إِضَافَة: v3 reads it light.
+Such a line stays caption-only until the dictionary has an approved respelling for the word:
+`render_narration.py --render` refuses it before anything is sent, a line with audio may not carry
+one, and `validate_narration.py` lists the words waiting for the operator (`NOT_HEAVY` holds the
+spellings that only look heavy: fathatain is ta + ha). عَلَى was removed (2026-10-10): it is the
+front of عَلَيْهِمْ (1:7), a Qur'anic word, so the narrator never says ‘ala in any script ("Bagian
+depan kata ini adalah huruf jar yang artinya “atas”"; the Huruf jar concept names only its bi- and
+li- examples, never "huruf jar yang artinya atas", which would define the term by itself).
+
+**The narrator never voices a Qur'anic word** (plan §6.1 A1; the imam's recording carries every
+Qur'anic word). The lesson prose names words in SKB transliteration, so `build_narration.Sanitiser`
+replaces each mention with the word's place, which the stage numbers under each mushaf word
+(1, 2, 3… right to left, word 1 rightmost):
+
+- the word the line is about → "kata ini"; another word of the ayah → "kata kedua"; a run →
+  "kata pertama dan kedua", "kata kedua sampai keempat". A word of ANOTHER ayah is not on screen,
+  so it is named by its meaning: "kata yang artinya “jalan” di ayat enam" (an existing "di ayat 6"
+  is reused), "frasa yang artinya “dari kejahatan” di ayat dua", and in another surah just "kata
+  yang artinya “Dia ciptakan”"; a gloss the prose already gives right after the mention is that
+  meaning; "lafaz Allah" in another ayah reads "lafaz “Allah” di ayat dua". A preceding
+  "kata"/"lafaz" is absorbed, "kata perintah qul" reads "kata perintah, yaitu kata pertama", and a
+  particle name followed by its gloss ("huruf jar min (“dari”)") keeps only the gloss.
+- `PRE_REWRITES` (in `build_narration.py`) fix the phrasings no place can: the ‘alā of ‘alaihim
+  ("Bagian depan kata ini adalah huruf jar yang artinya “atas”"), the lesson card's "di kartu
+  ini", a place inside a place (dhamir sya'n), a concept title that is only the particle ("Lam: …"
+  → "Huruf yang menafikan…"), the concept titles that end in an open fragment ("Isim fa'il, yaitu
+  kata pelaku", "Isim maf'ul, yaitu kata bagi yang dikenai perbuatan", "Fi'il majhul, yaitu kata
+  kerja pasif"; the summary that follows explains them), the Huruf jar concept's examples (bi- and
+  li- only), an open gloss ("yang banyak …" → "yang banyak meniup", as 113:4's word card says), the
+  Kalimah title ("Tiga jenis kalimah, atau kata: isim, fi'il, dan huruf").
+- Which occurrence a repeated form means (‘alaihim in 1:7, lam in 112:3): the line's own word,
+  then the one the line mentioned last, then the nearest in the same clause; outside the ayah, an
+  explicit "di ayat N", then the nearest preceding ayah.
+- Prefixes and suffixes are named, not voiced: bi- → "huruf ba'", li- → "huruf lam", wa →
+  "wawu", the lā of wa lā → "huruf nafi", -nā/-ta/-him/-hū → "akhiran", al- → "alif lam",
+  -ūna/-īna → "akhiran una/ina"; an Arabic letter list (ف ع ل) → "fa', 'ain, dan lam".
+- `ALIASES` (in `validate_narration.py`) lists the pieces prose uses for a word: ism/ismi (bismi),
+  Allāh (lillāhi), ihdi (ihdinā), rabb (birabbi), waswasa (yuwaswisu), min (mina), ‘alā
+  (‘alaihim).
+
+**What counts as a Qur'anic word** (the validator's forbidden set): every word's `translit` in
+every lesson surah, folded (diacritics and apostrophes dropped, lower case) and matched on whole
+tokens; plus its form without the i'rab ending (al-ḥamd, rabb, aḥad), without the article
+(ṣirāṭ, falaq; only stems of 4+ letters), its space-separated parts (wa, lā) and the aliases; and
+any token that starts with one of these (bismillah, alhamdulillah). The validator is also
+spelling- and ending-blind (never used to rewrite prose): Indonesian digraphs map to the folded
+letter (a'udzu, ash-shirath, ghairi, adh-dhollin), other case endings and joined article vowels
+match the stem (rabbu, rabba, rabbil), mabni words match without their last vowel as recited at a
+pause (khalaq, hasad, waqab), a ta marbuta matches in its -ah spelling (al-jinnah), and two words
+run together as recited are prefixes (huwallahu, bismillahi). In Arabic script: any Arabic in the
+spoken text that is not a dictionary `speak` value fails, and says so when it is a lesson word, one
+without its proclitic or article, or the front of one (`Forms.quranic_arabic`); no dictionary term
+may be one either. The guard runs on the spoken text and on the caption, dictionary terms masked.
+Allowed exceptions, decided here: **in the caption, "Allah" (no case ending) only inside “…” — the
+translation and the quoted glosses are Indonesian — or followed by "subhanahu wa ta'ala"**; the
+spoken text says the dictionary's "Alloh", and saying the caption must give the spoken text, so
+every "Alloh" is one of those. Also allowed: the honorific phrases, a surah name right after
+"Surah", and "lam" as the letter name ("huruf … lam", "alif lam").
+
+**Arabic that stays Latin (operator decision pending).** Non-Qur'anic Arabic in the prose that the
+dictionary does not have is kept, folded: wazan names (fa'lala–yufa'lilu, istaf'ala, af'ala,
+if'al, istif'al), the i'lal origin nasta'winu, the plural markers una/ina, the pattern examples
+naffas/naffasah, and four dictionary forms that are also Qur'anic words elsewhere in the mushaf but
+not in these lessons: hada (lemma of ihdinā), kana (yakun; "kāna dan saudaranya"), 'uqdah
+(singular of al-‘uqadi). The scholars' supplied verbs for 1:1 (abtadi'u, ibtida'i) are dictionary
+terms (أَبْتَدِئُ, اِبْتِدَائِي). The i'lal origin nasta'winu is close in sound to nasta‘īnu (1:5:4):
+still waiting on the operator. If those count as Qur'anic words, add them to `ALIASES` (or the
+form set) and the build stops until each mention has a rule.
+
+**Checks.** `build_narration.py` refuses to write a line that fails `validate_narration.check_text`
+(prose), `check_spoken` or `check_display`, or when the dictionary breaks its own rules.
+`validate_narration.py` re-checks everything independently of the files' history: shape (v2),
+id contract and coverage (every ayah/word/introduced concept/shown exercise, no extras), split
+parts; the dictionary (an Arabic `speak` is the term itself; a heavy letter + fathah/alif has a
+Latin respelling; no term, in Arabic or in its Latin caption head, is a lesson word or its front);
+the spoken text (≤ 400 characters, Arabic only from the dictionary, no dictionary term left in its
+Latin spelling, "Alloh" not "Allah", ASCII letters and `. , ; : ! ? ' -` only, no digits, ALL
+CAPS, open prefix, "ketuk", "yang berarti", "fatwa" or review promise, the forbidden set, word
+places); the caption (says what is spoken, Arabic only in display forms, a letter as in the ayah
+and never by its name, the forbidden set with the Allah rule, word places); that the intro reads
+the translation and each `w${n}` gives the gloss (in quotes on the caption, as said in the spoken
+text); `highlight`/`focus` as the table above; audio entries (`url` =
+`/belajar/media/narration/<voice-slug>/<slug>/<audio_name>.mp3`, so audio of an older text cannot
+survive, `ms` > 0, sha256) and tokens (with audio only, in time order, within the clip, joined by
+spaces equal to `Lexicon.render_display(text)`); and that the manifests equal a fresh build (no
+hand edits; edit the templates, the dictionary or the lesson content instead).
+`test_validate_narration.py` plants 70 faults (one per rule; 28 of them came with format 2: the
+dictionary, captions, tokens, content-addressed audio, copy rules and the stage view) and unit-tests numbers, `tts_text`, the
+dictionary rendering (spoken text, caption, tokens), the sanitiser, the word places, the content
+address and the request body. CI (`.github/workflows/deploy-belajar.yml`, verify job) runs
+`build_narration.py --check`, `validate_narration.py` and `test_validate_narration.py`; the
+TypeScript guard in `src/lib/autoplay/narration.ts` (`spokenTextProblems`, run by `npm test`) is a
+lighter mirror of the same rules. The image job's screenshots (`scripts/ci/screenshots.mjs`) drive
+Al-Fatihah ayah 1 in a real browser to mid-explanation of word 1 and fail unless the word card and
+the karaoke caption show; the MP3s are not on the runner, so that script answers the narration URLs
+in the browser itself (a Playwright route, test-only) with the `pipeline/out` file when present,
+else a silent WAV as long as the line's `ms`, so the word timings play out against a real audio
+clock.
+
+**Render (`render_narration.py`; costs money, asks first).** Default is a dry run: characters and
+cost per manifest at USD 0.08/1K (eleven_v3 list price), plus the distinct texts it would actually
+send (identical lines, e.g. the same exercise intro on several ayat, are rendered once and copied).
+A render needs `--render --i-approve-spend --voice-id <id> --voice-name "<name>"` and reads
+`ELEVENLABS_API_KEY` only then, from the repo `.env` or `--env-file` (a worktree has none). The
+request is fixed in `validate_narration.request_body`: `eleven_v3`, `language_code: "id"` (mode A,
+operator 2026-10-10), stability 0.5, style 0.35, similarity_boost 0.75, use_speaker_boost true,
+`apply_text_normalization: "off"`; no `previous_text`/`next_text` (v3 rejects them). One request
+per line (v3 limit 5,000 characters; lines are ≤ 400) to `POST /v1/text-to-speech/{voice}/with-timestamps`,
+whose character alignment is 1:1 with the text sent; `Lexicon.tokens` turns it into the line's
+`tokens`. MP3s go to `pipeline/out/narration/<voice-slug>/<slug>/<file>.mp3` (git-ignored) with
+the alignment beside them as `<file>.json`, where `<file>` is `audio_name` (16 hex of the sha256 of
+the text, voice and settings): an unchanged line is never paid for twice (skipped when the
+manifest already points at that file, re-used from disk otherwise, copied between manifests), and
+a changed line gets a new name, never a stale cached file. The manifest line gets
+`audio {url, ms, sha256}` (duration from `common.mp3_duration_ms`) and `tokens` after each line;
+`build_narration.py` keeps both while the spoken text is unchanged (re-deriving token texts if a
+display form changes). `--surah` and `--only <id-prefix>` (repeatable) narrow a run, e.g.
+`--only al-fatihah:1: --only shared:`; a manifest already voiced by another voice needs
+`--switch-voice`. The run prints the characters sent and the `character-cost` header total. The
+upload is printed, never run:
+`scp -r …/out/narration/<voice-slug> <vm-host>:/srv/dakwah-lens/data/belajar-media/narration/`.
+
+Dry run on 2026-10-10 (spoken characters, first take): Al-Fatihah 19,814 (USD 1.59), Al-Ikhlas
+10,475 (0.84), Al-Falaq 12,247 (0.98), An-Nas 12,660 (1.01), shared 1,520 (0.12); total 56,716
+characters in 381 lines (USD 4.54), of which 43,971 characters in 253 distinct texts are sent
+(USD 3.52). Retakes come on top.
+
+Rendered on 2026-10-10 (operator-approved sample, Kang Nandar, mode A): Al-Fatihah ayah 1 (20
+lines) and every shared line (24 lines, 17 distinct texts) — 37 requests, 4,334 characters sent,
+`character-cost` header total 952; 37 MP3s in `pipeline/out/narration/kang-nandar/`, waiting for
+the upload. Every other ayah stays caption-only until the operator approves its render. Since the
+review fix of 2026-10-10 the Huruf jar concept line (`al-fatihah:1:concept:huruf-jar`) no longer
+gives "huruf jar yang artinya atas" as its third example (the term defined by itself); its new text (226 characters, about USD 0.02)
+is caption-only until the operator approves that one render (`--only
+al-fatihah:1:concept:huruf-jar`), and its old file `08d5205d14fcad8e.mp3` is no longer used.
+
 ## Not built here
 
 - `tafsir` (per ayah) comes from the platform-corpus retrieval stage (plan §7.5 stage 1); this
@@ -425,7 +678,9 @@ lafaz Allah under ilāh (plan §8); a wazan for al-khannās.
   `authored/<slug>.hadith.json` when that file exists (retrieved from the corpus by its author;
   `validate.py` checks status, that `ar` is Arabic only and that `id` carries no Arabic words),
   otherwise `hadith: []`.
-- Narration and quizzes are later stages. There are no review sign-off records (plan L11).
+- Narration audio beyond the approved sample: only Al-Fatihah ayah 1 and the shared lines are
+  rendered ("Narasi"); every other line runs caption-only until the operator approves its render.
+  There are no review sign-off records (plan L11).
 
 ## Known data issues
 

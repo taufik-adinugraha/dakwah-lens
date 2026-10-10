@@ -37,6 +37,12 @@ export default async function CreditsPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("Credits");
+  // The exact credit line of every recording the lesson pages stream (moved
+  // here from the lesson stage, operator 2026-10-10), once each, in the
+  // order the content lists them.
+  const recitationCredits = [
+    ...new Set(SURAHS.flatMap((s) => s.ayat.flatMap((a) => a.recitation.map((r) => r.credit)))),
+  ];
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
@@ -68,6 +74,21 @@ export default async function CreditsPage({
           </li>
         ))}
       </ul>
+      {recitationCredits.length > 0 && (
+        <section className="mt-8" aria-labelledby="recitations">
+          <h2 id="recitations" className="text-lg font-semibold text-ink">
+            {t("recitation_heading")}
+          </h2>
+          <p className="mt-1 max-w-prose text-base text-ink-muted">{t("recitation_body")}</p>
+          <ul className="mt-3 space-y-2">
+            {recitationCredits.map((c) => (
+              <li key={c} className="rounded-xl border border-hairline bg-white px-4 py-3 text-sm text-ink">
+                {c}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       <p className="mt-8 rounded-2xl bg-paper-deep p-5 text-base text-ink-muted">
         {t("streaming_note")}
       </p>
