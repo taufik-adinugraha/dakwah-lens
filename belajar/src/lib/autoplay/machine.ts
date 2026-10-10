@@ -294,7 +294,12 @@ function sayPlan(s: AutoplayState, step: AutoplayStep, seq: AutoplaySequence, re
 }
 
 function captionParts(seq: AutoplaySequence, step: AutoplayStep, ref: CaptionRef): { parts: string[]; line: string | null } {
-  if (ref === "step") return step.cues.length ? { parts: step.cues[0].parts, line: null } : { parts: [step.caption], line: null };
+  // A compose step's own caption is the imam's word ("Kata ke-1: bismi.
+  // Dengarkan imam membacanya."), shown while he recites the joined word after
+  // the frames' lines — not its first line again.
+  if (ref === "step") {
+    return step.cues.length && step.kind !== "compose" ? { parts: step.cues[0].parts, line: null } : { parts: [step.caption], line: null };
+  }
   const cue = cueOf(seq, step, ref);
   return { parts: cue.parts, line: cue.line };
 }

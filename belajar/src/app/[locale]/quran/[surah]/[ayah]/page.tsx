@@ -20,6 +20,7 @@ import { SourceList } from "@/components/library/SourceList";
 import { StructureSection } from "@/components/library/StructureSection";
 import { FactCard } from "@/components/surah/FactCard";
 import { Link } from "@/i18n/navigation";
+import { composeFor } from "@/lib/compose-content";
 import { getAyah, getSurah, SURAH_INDEX, SURAHS } from "@/lib/content";
 import { orderRecitations } from "@/lib/autoplay";
 import { conceptsIntroducedIn, getConcept, getLexeme, LIBRARY } from "@/lib/library";
@@ -127,6 +128,19 @@ export default async function AyahPage({
   // time: captions in the page's locale, narration audio from
   // content/narration/ when it has been rendered.
   const seq = stageSequence(s, a, locale);
+  // The word compositions and the harakat primer of this ayah (content/compose,
+  // operator 2026-10-10, narration rule 14): the bytes the stage's animation
+  // shows, by word number; the sequence above carries only their lines.
+  const composeFile = composeFor(s.slug);
+  const compose = composeFile
+    ? {
+        marks: composeFile.marks,
+        primer: composeFile.primer && composeFile.primer.ayah === a.ayah ? composeFile.primer : null,
+        words: Object.fromEntries(
+          a.words.flatMap((w, i) => (composeFile.words[w.loc] ? [[i + 1, composeFile.words[w.loc]]] : [])),
+        ),
+      }
+    : null;
   const lexemes = [...new Set(a.words.map((w) => w.lemma_id).filter((x): x is string => !!x))].flatMap((lid) => {
     const lx = getLexeme(lid);
     return lx?.tashrif ? [lx] : [];
@@ -188,6 +202,7 @@ export default async function AyahPage({
             sources={sources}
             translation={translation}
             exercise={{ words: a.words, pool, lexemes }}
+            compose={compose && (compose.primer || Object.keys(compose.words).length) ? compose : null}
           />
         </div>
 

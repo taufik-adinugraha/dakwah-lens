@@ -22,6 +22,11 @@
  * only his current word is lit (the player's activeWord), plus the word of
  * a word step.
  *
+ * The animation in the word card's slot (stageFrame, operator 2026-10-10,
+ * narration rule 14): on a primer or compose step, the frame the line on
+ * screen is said over; while the imam recites the joined word after the
+ * lines (and in his settle pause), the last frame, "recited".
+ *
  * And what a screen reader is told (srAnnouncement): a polite live region
  * never reads the caption's Arabic or transliteration out — the device's
  * voice would say it, and over the imam. It announces the line's text
@@ -156,16 +161,67 @@ export function stageMarks(seq: AutoplaySequence, state: AutoplayState): { marke
   // A word step is about its word, the imam reciting it or not.
   if (step.kind === "recite_word" && step.word) return { marked: [step.word], focus: step.word };
   // The imam recites the ayah (and its settle pause): his current word only.
+  // A compose step's recitation is its own word, the composition on screen.
   const here = state.plan[state.at];
-  if (state.activity?.kind === "recite" || (here?.t === "settle" && here.after === "recite")) return none;
+  if (state.activity?.kind === "recite" || (here?.t === "settle" && here.after === "recite")) {
+    return step.kind === "compose" && step.word ? { marked: [step.word], focus: step.word } : none;
+  }
   // A step shown paused (‹ Sebelumnya / Berikutnya › while paused) points
   // at no line yet: it is about what its first line is about.
   const cue = captionCue(seq, state) ?? step.cues[0] ?? null;
   if (!cue) return none;
-  // A shared line ("Kita lanjutkan.") keeps the explained word's card, and
-  // highlights nothing.
-  if (cue.line.startsWith("shared:")) return { marked: [], focus: step.kind === "explain" ? (step.cues[0]?.focus ?? null) : null };
+  // A shared line ("Kita lanjutkan.") keeps the explained word's card (or its
+  // composition), and highlights nothing.
+  if (cue.line.startsWith("shared:")) {
+    return { marked: [], focus: step.kind === "explain" || step.kind === "compose" ? (step.cues[0]?.focus ?? null) : null };
+  }
   return { marked: cue.highlight, focus: cue.focus };
+}
+
+/** The animation on screen: which step's frames, which frame (1-based), and
+ *  whether the imam is reciting the result. */
+export type StageFrame = { step: "primer" | "compose"; word: number | null; frame: number; recited: boolean };
+
+/**
+ * The frame of a primer / compose step to show (null on any other step,
+ * before the start and after the end). It follows the plan: the line being
+ * said (or the one a shared line like "Kita lanjutkan." comes before), the
+ * line that just ended while its settle pause runs, the last frame
+ * ("recited") while the imam recites the joined word and after. A step shown
+ * paused before its first line shows its first frame.
+ */
+export function stageFrame(seq: AutoplaySequence, state: AutoplayState): StageFrame | null {
+  if (!state.started || state.phase === "idle" || state.phase === "finished") return null;
+  const step = seq.steps[state.idx];
+  if (!step || (step.kind !== "primer" && step.kind !== "compose") || !step.frames) return null;
+  const last = step.frames;
+  const frameOf = (c: number) => step.cues[c]?.frame ?? 1;
+  const plan = state.plan;
+  const sayOf = (i: number) => {
+    const a = plan[i];
+    return a?.t === "say" && "c" in a.ref ? a.ref.c : null;
+  };
+  const word = step.word ?? null;
+  const reciting = (i: number) => {
+    const a = plan[i];
+    return a?.t === "recite" || a?.t === "gap" || (a?.t === "settle" && a.after === "recite");
+  };
+  if (state.at >= plan.length) return { step: step.kind, word, frame: last, recited: step.kind === "compose" };
+  if (reciting(state.at)) return { step: step.kind, word, frame: last, recited: true };
+  const here = sayOf(state.at);
+  if (here !== null) return { step: step.kind, word, frame: frameOf(here), recited: false };
+  // A settle pause after a line, or a shared line: the frame of the step's
+  // line before it, else the one after it.
+  for (let i = state.at - 1; i >= 0; i--) {
+    const c = sayOf(i);
+    if (c !== null) return { step: step.kind, word, frame: frameOf(c), recited: false };
+    if (reciting(i)) return { step: step.kind, word, frame: last, recited: true };
+  }
+  for (let i = state.at + 1; i < plan.length; i++) {
+    const c = sayOf(i);
+    if (c !== null) return { step: step.kind, word, frame: frameOf(c), recited: false };
+  }
+  return { step: step.kind, word, frame: 1, recited: false };
 }
 
 /** The text a polite live region announces for the stage right now ("" =

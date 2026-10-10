@@ -552,7 +552,7 @@
     },
     "an-nas:6:w1": {
       "text": "Kata pertama artinya: dari. Kata ini adalah حَرْف جَرّ yang artinya dari, yang mabni di atas sukun; nunnya berharakat فَتْحَة di sini hanya karena bertemu huruf mati pada alif lam sesudahnya, sebab kata mabni boleh bergerak untuk menghindari dua huruf mati bertemu.",
-      "display": "Kata pertama artinya: “dari”. Kata ini adalah huruf jar (حَرْف جَرّ) yang artinya “dari”, yang mabni di atas sukun; nunnya berharakat fathah (فَتْحَة) di sini hanya karena bertemu huruf mati pada alif lam sesudahnya, sebab kata mabni boleh bergerak untuk menghindari dua huruf mati bertemu.",
+      "display": "Kata pertama artinya: “dari”. Kata ini adalah huruf jar (حَرْف جَرّ) yang artinya “dari”, yang mabni di atas sukun; nunnya berharakat fathah (فَتْحَة) di sini hanya karena bertemu huruf mati pada alif lam (ال) sesudahnya, sebab kata mabni boleh bergerak untuk menghindari dua huruf mati bertemu.",
       "highlight": [
         1
       ],
@@ -567,8 +567,8 @@
       "focus": "114:6:2"
     },
     "an-nas:6:w3": {
-      "text": "Kata ketiga artinya: dan manusia. Wawu adalah huruf 'athaf, dan kata ini di-'athaf-kan kepada kata kedua yang مَجْرُور, maka ikut berakhir كَسْرَة.",
-      "display": "Kata ketiga artinya: “dan manusia”. Wawu adalah huruf 'athaf, dan kata ini di-'athaf-kan kepada kata kedua yang majrur (مَجْرُور), maka ikut berakhir kasrah (كَسْرَة).",
+      "text": "Kata ketiga artinya: dan manusia. وَاو adalah huruf 'athaf, dan kata ini di-'athaf-kan kepada kata kedua yang مَجْرُور, maka ikut berakhir كَسْرَة.",
+      "display": "Kata ketiga artinya: “dan manusia”. Wawu (وَ) adalah huruf 'athaf, dan kata ini di-'athaf-kan kepada kata kedua yang majrur (مَجْرُور), maka ikut berakhir kasrah (كَسْرَة).",
       "highlight": [
         3
       ],

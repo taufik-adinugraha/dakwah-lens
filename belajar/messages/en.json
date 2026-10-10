@@ -253,6 +253,26 @@
     "replay_short": "Replay",
     "card_meaning": "meaning “{gloss}”"
   },
+  "Compose": {
+    "word_n": "Word {n}",
+    "base_tag": "base form",
+    "cause_tag": "cause",
+    "sound": "sound {v}",
+    "silent": "not read",
+    "dropped": "not written",
+    "doubled": "read doubled",
+    "no_vowel": "no vowel",
+    "recited": "The imam recites this word.",
+    "stage_parts": "its parts",
+    "stage_base": "base form",
+    "stage_change": "its harakah changes",
+    "stage_join": "written together",
+    "stage_drop": "a letter is not written",
+    "stage_whole": "as written in the ayah",
+    "stage_overview": "harakat",
+    "stage_mark": "harakat",
+    "aria_primer": "Harakat: {marks}. Examples: {examples}."
+  },
   "Settings": {
     "button": "Text size",
     "button_short": "Text",

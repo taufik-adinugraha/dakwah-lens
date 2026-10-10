@@ -196,430 +196,301 @@
         }
       ]
     },
+    "al-fatihah:1:primer:1": {
+      "text": "Sebelum membahas kata demi kata, kita kenali dulu harakat, yaitu tanda bunyi pada huruf Arab.",
+      "display": "Sebelum membahas kata demi kata, kita kenali dulu harakat, yaitu tanda bunyi pada huruf Arab.",
+      "highlight": [],
+      "focus": null,
+      "frame": 1
+    },
+    "al-fatihah:1:primer:2": {
+      "text": "Tiga harakat utama adalah فَتْحَة, كَسْرَة, dan dhommah. Bunyinya a, i, dan u.",
+      "display": "Tiga harakat utama adalah fathah (فَتْحَة), kasrah (كَسْرَة), dan dhammah (ضَمَّة). Bunyinya a, i, dan u.",
+      "highlight": [],
+      "focus": null,
+      "frame": 1
+    },
+    "al-fatihah:1:primer:3": {
+      "text": "فَتْحَة adalah garis kecil miring di atas huruf. Huruf yang diberi فَتْحَة dibaca dengan bunyi a.",
+      "display": "Fathah (فَتْحَة) adalah garis kecil miring di atas huruf. Huruf yang diberi fathah (فَتْحَة) dibaca dengan bunyi a.",
+      "highlight": [],
+      "focus": null,
+      "frame": 2
+    },
+    "al-fatihah:1:primer:4": {
+      "text": "كَسْرَة adalah garis yang sama, tetapi di bawah huruf; bunyinya i. Huruf pertama ayat ini, huruf بَاء, memakai كَسْرَة.",
+      "display": "Kasrah (كَسْرَة) adalah garis yang sama, tetapi di bawah huruf; bunyinya i. Huruf pertama ayat ini, huruf ba’ (بِ), memakai kasrah (كَسْرَة).",
+      "highlight": [
+        1
+      ],
+      "focus": null,
+      "frame": 3
+    },
+    "al-fatihah:1:primer:5": {
+      "text": "Dhommah bentuknya seperti huruf وَاو kecil di atas huruf; bunyinya u.",
+      "display": "Dhammah (ضَمَّة) bentuknya seperti huruf wawu (و) kecil di atas huruf; bunyinya u.",
+      "highlight": [],
+      "focus": null,
+      "frame": 4
+    },
+    "al-fatihah:1:primer:6": {
+      "text": "Ada tanda lain di ayat ini. Tanda kecil di atas huruf سِين menandakan huruf mati, dibaca tanpa vokal.",
+      "display": "Ada tanda lain di ayat ini. Tanda kecil di atas huruf sin (سْ) menandakan huruf mati, dibaca tanpa vokal.",
+      "highlight": [
+        1,
+        3
+      ],
+      "focus": null,
+      "frame": 5
+    },
+    "al-fatihah:1:primer:7": {
+      "text": "Tanda seperti huruf w kecil di atas huruf رَاء menandakan huruf itu dibaca dobel.",
+      "display": "Tanda seperti huruf w kecil di atas huruf ra’ (رَّ) menandakan huruf itu dibaca dobel.",
+      "highlight": [
+        1,
+        3
+      ],
+      "focus": null,
+      "frame": 5
+    },
+    "al-fatihah:1:primer:8": {
+      "text": "Satu tanda lagi: alif kecil yang tegak di atas huruf مِيم pada kata ketiga.",
+      "display": "Satu tanda lagi: alif (ا) kecil yang tegak di atas huruf mim (مَٰ) pada kata ketiga.",
+      "highlight": [
+        3
+      ],
+      "focus": null,
+      "frame": 6
+    },
+    "al-fatihah:1:primer:9": {
+      "text": "Huruf kecil seperti ini menandai huruf yang tidak tertulis dalam tulisan asli Al-Qur'an, tetapi wajib dibaca; karena itu bunyi a pada huruf مِيم itu dibaca panjang.",
+      "display": "Huruf kecil seperti ini menandai huruf yang tidak tertulis dalam tulisan asli Al-Qur'an, tetapi wajib dibaca; karena itu bunyi a pada huruf mim (مَٰ) itu dibaca panjang.",
+      "highlight": [
+        3
+      ],
+      "focus": null,
+      "frame": 6
+    },
     "al-fatihah:1:w1": {
-      "text": "Kata pertama artinya: dengan nama. Akhirnya dibaca كَسْرَة, karena kata ini didahului حَرْف جَرّ, yaitu huruf بَاء, yang artinya dengan.",
-      "display": "Kata pertama artinya: “dengan nama”. Akhirnya dibaca kasrah (كَسْرَة), karena kata ini didahului huruf jar (حَرْف جَرّ), yaitu huruf ba’ (بِ), yang artinya “dengan”.",
+      "text": "Kata pertama artinya: dengan nama. Kata ini terdiri dari dua bagian.",
+      "display": "Kata pertama artinya: “dengan nama”. Kata ini terdiri dari dua bagian.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:1:1"
+    },
+    "al-fatihah:1:w1:compose:1": {
+      "text": "Bagian pertama adalah حَرْف جَرّ, yaitu huruf بَاء, yang artinya dengan.",
+      "display": "Bagian pertama adalah huruf jar (حَرْف جَرّ), yaitu huruf ba’ (بِ), yang artinya “dengan”.",
       "highlight": [
         1
       ],
       "focus": "1:1:1",
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/b47ebba7a92c09b4.mp3",
-        "ms": 12669,
-        "sha256": "88efbb45817c9ef9bfe8c44adea350222c432c485080c165b89d2e5a562d5804"
-      },
-      "tokens": [
-        {
-          "t": "Kata",
-          "s": 0.0,
-          "e": 0.16
-        },
-        {
-          "t": "pertama",
-          "s": 0.208,
-          "e": 0.72
-        },
-        {
-          "t": "artinya:",
-          "s": 0.78,
-          "e": 1.36
-        },
-        {
-          "t": "dengan",
-          "s": 1.474,
-          "e": 2.16
-        },
-        {
-          "t": "nama.",
-          "s": 2.24,
-          "e": 2.64
-        },
-        {
-          "t": "Akhirnya",
-          "s": 2.96,
-          "e": 3.92
-        },
-        {
-          "t": "dibaca",
-          "s": 3.96,
-          "e": 4.4
-        },
-        {
-          "t": "kasrah (كَسْرَة),",
-          "s": 4.56,
-          "e": 5.28
-        },
-        {
-          "t": "karena",
-          "s": 5.44,
-          "e": 6.4
-        },
-        {
-          "t": "kata",
-          "s": 6.464,
-          "e": 6.72
-        },
-        {
-          "t": "ini",
-          "s": 6.82,
-          "e": 7.12
-        },
-        {
-          "t": "didahului",
-          "s": 7.18,
-          "e": 7.92
-        },
-        {
-          "t": "huruf jar (حَرْف جَرّ),",
-          "s": 8.04,
-          "e": 9.04
-        },
-        {
-          "t": "yaitu",
-          "s": 9.36,
-          "e": 10.0
-        },
-        {
-          "t": "huruf",
-          "s": 10.04,
-          "e": 10.32
-        },
-        {
-          "t": "ba’ (بِ),",
-          "s": 10.4,
-          "e": 10.72
-        },
-        {
-          "t": "yang",
-          "s": 10.848,
-          "e": 11.36
-        },
-        {
-          "t": "artinya",
-          "s": 11.42,
-          "e": 11.92
-        },
-        {
-          "t": "dengan.",
-          "s": 12.011,
-          "e": 12.64
-        }
-      ]
+      "frame": 1
+    },
+    "al-fatihah:1:w1:compose:2": {
+      "text": "Bagian kedua adalah sebuah اِسْم, atau kata benda, yang artinya nama.",
+      "display": "Bagian kedua adalah sebuah isim (اِسْم), atau kata benda, yang artinya “nama”.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:1:1",
+      "frame": 1
+    },
+    "al-fatihah:1:w1:compose:3": {
+      "text": "Dalam bentuk dasarnya, kata benda ini berakhir dengan dhommah, tanda bunyi u di atas huruf مِيم.",
+      "display": "Dalam bentuk dasarnya, kata benda ini berakhir dengan dhammah (ضَمَّة), tanda bunyi u di atas huruf mim (مُ).",
+      "highlight": [
+        1
+      ],
+      "focus": "1:1:1",
+      "frame": 2
+    },
+    "al-fatihah:1:w1:compose:4": {
+      "text": "Karena didahului حَرْف جَرّ, akhirnya berubah: dhommah menjadi كَسْرَة, tanda bunyi i di bawah huruf.",
+      "display": "Karena didahului huruf jar (حَرْف جَرّ), akhirnya berubah: dhammah (ضَمَّة) menjadi kasrah (كَسْرَة), tanda bunyi i di bawah huruf.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:1:1",
+      "frame": 3
+    },
+    "al-fatihah:1:w1:compose:5": {
+      "text": "Kata benda yang berubah seperti ini disebut مَجْرُور.",
+      "display": "Kata benda yang berubah seperti ini disebut majrur (مَجْرُور).",
+      "highlight": [
+        1
+      ],
+      "focus": "1:1:1",
+      "frame": 3
+    },
+    "al-fatihah:1:w1:compose:6": {
+      "text": "Lalu kedua bagian ditulis bersambung.",
+      "display": "Lalu kedua bagian ditulis bersambung.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:1:1",
+      "frame": 4
+    },
+    "al-fatihah:1:w1:compose:7": {
+      "text": "Alif di awal kata benda itu hanya dibaca bila bacaan dimulai darinya; setelah huruf بَاء, alif itu tidak dibaca.",
+      "display": "Alif (ٱ) di awal kata benda itu hanya dibaca bila bacaan dimulai darinya; setelah huruf ba’ (بِ), alif (ٱ) itu tidak dibaca.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:1:1",
+      "frame": 4
+    },
+    "al-fatihah:1:w1:compose:8": {
+      "text": "Menurut as-Samin al-Halabi, pada kata ini, sebelum nama Alloh subhanahu wa ta'ala, alif itu juga tidak ditulis, karena sangat sering dipakai.",
+      "display": "Menurut as-Samin al-Halabi, pada kata ini, sebelum nama Allah subhanahu wa ta'ala, alif (ٱ) itu juga tidak ditulis, karena sangat sering dipakai.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:1:1",
+      "frame": 5
+    },
+    "al-fatihah:1:w1:compose:9": {
+      "text": "Di ayat lain alif itu tetap ditulis, misalnya sebelum kata yang artinya Tuhanmu.",
+      "display": "Di ayat lain alif (ٱ) itu tetap ditulis, misalnya sebelum kata yang artinya “Tuhanmu”.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:1:1",
+      "frame": 5
     },
     "al-fatihah:1:w2": {
-      "text": "Kata kedua artinya: Alloh. Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih dari kata pertama.",
-      "display": "Kata kedua artinya: “Allah”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata pertama.",
+      "text": "Kata kedua artinya: Alloh.",
+      "display": "Kata kedua artinya: “Allah”.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:1:2"
+    },
+    "al-fatihah:1:w2:compose:1": {
+      "text": "Dalam bentuk dasarnya, kata ini berakhir dengan dhommah, bunyi u, seperti di awal ayat kedua Surah Al-Ikhlas.",
+      "display": "Dalam bentuk dasarnya, kata ini berakhir dengan dhammah (ضَمَّة), bunyi u, seperti di awal ayat kedua Surah Al-Ikhlas.",
       "highlight": [
         2
       ],
       "focus": "1:1:2",
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/66341b09f867bd76.mp3",
-        "ms": 7471,
-        "sha256": "cebe291bbdf3fbcff0ebd9cc8b0b6fa93f1a14bb5e453f5bb1683b4aac8072e2"
-      },
-      "tokens": [
-        {
-          "t": "Kata",
-          "s": 0.0,
-          "e": 0.24
-        },
-        {
-          "t": "kedua",
-          "s": 0.3,
-          "e": 0.64
-        },
-        {
-          "t": "artinya:",
-          "s": 0.72,
-          "e": 1.28
-        },
-        {
-          "t": "Allah.",
-          "s": 1.493,
-          "e": 2.16
-        },
-        {
-          "t": "Akhirnya",
-          "s": 2.347,
-          "e": 3.12
-        },
-        {
-          "t": "dibaca",
-          "s": 3.18,
-          "e": 3.68
-        },
-        {
-          "t": "kasrah (كَسْرَة),",
-          "s": 3.8,
-          "e": 4.8
-        },
-        {
-          "t": "karena",
-          "s": 4.846,
-          "e": 5.12
-        },
-        {
-          "t": "menjadi",
-          "s": 5.17,
-          "e": 5.52
-        },
-        {
-          "t": "mudhaf ilaih (مُضَاف إِلَيْه)",
-          "s": 5.58,
-          "e": 6.32
-        },
-        {
-          "t": "dari",
-          "s": 6.384,
-          "e": 6.64
-        },
-        {
-          "t": "kata",
-          "s": 6.688,
-          "e": 6.88
-        },
-        {
-          "t": "pertama.",
-          "s": 6.944,
-          "e": 7.44
-        }
-      ]
+      "frame": 1
+    },
+    "al-fatihah:1:w2:compose:2": {
+      "text": "Di ayat ini akhirnya menjadi كَسْرَة, bunyi i, karena kata ini menjadi mudhof ilaih: kata yang artinya nama disandarkan kepadanya.",
+      "display": "Di ayat ini akhirnya menjadi kasrah (كَسْرَة), bunyi i, karena kata ini menjadi mudhaf ilaih (مُضَاف إِلَيْه): kata yang artinya “nama” disandarkan kepadanya.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:1:2",
+      "frame": 2
     },
     "al-fatihah:1:w3": {
-      "text": "Kata ketiga artinya: Yang Maha Pengasih. Akhirnya dibaca كَسْرَة, karena menjadi sifat, atau نَعْت, bagi kata kedua, dan sifat mengikuti kata yang disifatinya.",
-      "display": "Kata ketiga artinya: “Yang Maha Pengasih”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi sifat, atau na’t (نَعْت), bagi kata kedua, dan sifat mengikuti kata yang disifatinya.",
+      "text": "Kata ketiga artinya: Yang Maha Pengasih. Kata ini juga terdiri dari dua bagian.",
+      "display": "Kata ketiga artinya: “Yang Maha Pengasih”. Kata ini juga terdiri dari dua bagian.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:1:3"
+    },
+    "al-fatihah:1:w3:compose:1": {
+      "text": "Bagian pertama adalah alif lam, penanda bahwa kata itu sudah tertentu.",
+      "display": "Bagian pertama adalah alif lam (ٱلْ), penanda bahwa kata itu sudah tertentu.",
       "highlight": [
         3
       ],
       "focus": "1:1:3",
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/522d0e7a97593483.mp3",
-        "ms": 13714,
-        "sha256": "fab22d891d83fc54790f57e5dbe64fd99b6d53764a8344c7c92f100f81be1880"
-      },
-      "tokens": [
-        {
-          "t": "Kata",
-          "s": 0.0,
-          "e": 0.24
-        },
-        {
-          "t": "ketiga",
-          "s": 0.28,
-          "e": 0.64
-        },
-        {
-          "t": "artinya:",
-          "s": 0.72,
-          "e": 1.64
-        },
-        {
-          "t": "Yang",
-          "s": 1.712,
-          "e": 2.0
-        },
-        {
-          "t": "Maha",
-          "s": 2.04,
-          "e": 2.4
-        },
-        {
-          "t": "Pengasih.",
-          "s": 2.448,
-          "e": 3.04
-        },
-        {
-          "t": "Akhirnya",
-          "s": 3.36,
-          "e": 4.32
-        },
-        {
-          "t": "dibaca",
-          "s": 4.38,
-          "e": 4.88
-        },
-        {
-          "t": "kasrah (كَسْرَة),",
-          "s": 5.0,
-          "e": 5.68
-        },
-        {
-          "t": "karena",
-          "s": 5.84,
-          "e": 6.8
-        },
-        {
-          "t": "menjadi",
-          "s": 6.84,
-          "e": 7.12
-        },
-        {
-          "t": "sifat,",
-          "s": 7.2,
-          "e": 7.84
-        },
-        {
-          "t": "atau",
-          "s": 7.904,
-          "e": 8.16
-        },
-        {
-          "t": "na’t (نَعْت),",
-          "s": 8.32,
-          "e": 8.88
-        },
-        {
-          "t": "bagi",
-          "s": 8.992,
-          "e": 9.44
-        },
-        {
-          "t": "kata",
-          "s": 9.488,
-          "e": 9.68
-        },
-        {
-          "t": "kedua,",
-          "s": 9.74,
-          "e": 10.24
-        },
-        {
-          "t": "dan",
-          "s": 10.44,
-          "e": 11.04
-        },
-        {
-          "t": "sifat",
-          "s": 11.08,
-          "e": 11.52
-        },
-        {
-          "t": "mengikuti",
-          "s": 11.584,
-          "e": 12.16
-        },
-        {
-          "t": "kata",
-          "s": 12.256,
-          "e": 12.64
-        },
-        {
-          "t": "yang",
-          "s": 12.672,
-          "e": 12.8
-        },
-        {
-          "t": "disifatinya.",
-          "s": 12.86,
-          "e": 13.68
-        }
-      ]
+      "frame": 1
+    },
+    "al-fatihah:1:w3:compose:2": {
+      "text": "Bagian kedua adalah اِسْم yang artinya Maha Pengasih.",
+      "display": "Bagian kedua adalah isim (اِسْم) yang artinya “Maha Pengasih”.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:1:3",
+      "frame": 1
+    },
+    "al-fatihah:1:w3:compose:3": {
+      "text": "Ketika keduanya bersambung, huruf لَام tidak dibaca; bunyinya melebur ke huruf رَاء, sehingga رَاء dibaca dobel.",
+      "display": "Ketika keduanya bersambung, huruf lam (ل) tidak dibaca; bunyinya melebur ke huruf ra’ (رَّ), sehingga ra’ (رَّ) dibaca dobel.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:1:3",
+      "frame": 2
+    },
+    "al-fatihah:1:w3:compose:4": {
+      "text": "Alif di awalnya juga tidak dibaca, karena bacaan bersambung dari kata sebelumnya, seperti alif pada kata pertama.",
+      "display": "Alif (ٱ) di awalnya juga tidak dibaca, karena bacaan bersambung dari kata sebelumnya, seperti alif (ٱ) pada kata pertama.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:1:3",
+      "frame": 2
+    },
+    "al-fatihah:1:w3:compose:5": {
+      "text": "Bentuk dasarnya berakhir dengan dhommah, bunyi u.",
+      "display": "Bentuk dasarnya berakhir dengan dhammah (ضَمَّة), bunyi u.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:1:3",
+      "frame": 3
+    },
+    "al-fatihah:1:w3:compose:6": {
+      "text": "Di sini akhirnya menjadi كَسْرَة, bunyi i, karena kata ini sifat, atau نَعْت, bagi kata kedua; sifat mengikuti akhiran kata yang disifatinya.",
+      "display": "Di sini akhirnya menjadi kasrah (كَسْرَة), bunyi i, karena kata ini sifat, atau na’t (نَعْت), bagi kata kedua; sifat mengikuti akhiran kata yang disifatinya.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:1:3",
+      "frame": 4
     },
     "al-fatihah:1:w4": {
-      "text": "Kata keempat artinya: Maha Penyayang. Akhirnya dibaca كَسْرَة, karena menjadi sifat kedua bagi kata kedua, sehingga ikut مَجْرُور.",
-      "display": "Kata keempat artinya: “Maha Penyayang”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi sifat kedua bagi kata kedua, sehingga ikut majrur (مَجْرُور).",
+      "text": "Kata keempat artinya: Maha Penyayang. Susunannya sama seperti kata ketiga.",
+      "display": "Kata keempat artinya: “Maha Penyayang”. Susunannya sama seperti kata ketiga.",
+      "highlight": [
+        4
+      ],
+      "focus": "1:1:4"
+    },
+    "al-fatihah:1:w4:compose:1": {
+      "text": "Alif lam bersambung dengan اِسْم yang artinya Maha Penyayang.",
+      "display": "Alif lam (ٱل) bersambung dengan isim (اِسْم) yang artinya “Maha Penyayang”.",
       "highlight": [
         4
       ],
       "focus": "1:1:4",
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/381e0c41890d0976.mp3",
-        "ms": 10449,
-        "sha256": "82357aa89eeb5021ded74acc29e13b3e5919104949cffd75b9e7d42d1a86772a"
-      },
-      "tokens": [
-        {
-          "t": "Kata",
-          "s": 0.0,
-          "e": 0.24
-        },
-        {
-          "t": "keempat",
-          "s": 0.293,
-          "e": 0.8
-        },
-        {
-          "t": "artinya:",
-          "s": 0.86,
-          "e": 1.56
-        },
-        {
-          "t": "Maha",
-          "s": 1.66,
-          "e": 2.0
-        },
-        {
-          "t": "Penyayang.",
-          "s": 2.06,
-          "e": 2.72
-        },
-        {
-          "t": "Akhirnya",
-          "s": 2.907,
-          "e": 3.6
-        },
-        {
-          "t": "dibaca",
-          "s": 3.66,
-          "e": 4.16
-        },
-        {
-          "t": "kasrah (كَسْرَة),",
-          "s": 4.32,
-          "e": 5.04
-        },
-        {
-          "t": "karena",
-          "s": 5.166,
-          "e": 5.92
-        },
-        {
-          "t": "menjadi",
-          "s": 5.97,
-          "e": 6.32
-        },
-        {
-          "t": "sifat",
-          "s": 6.36,
-          "e": 6.72
-        },
-        {
-          "t": "kedua",
-          "s": 6.76,
-          "e": 7.12
-        },
-        {
-          "t": "bagi",
-          "s": 7.2,
-          "e": 7.52
-        },
-        {
-          "t": "kata",
-          "s": 7.584,
-          "e": 7.84
-        },
-        {
-          "t": "kedua,",
-          "s": 7.9,
-          "e": 8.72
-        },
-        {
-          "t": "sehingga",
-          "s": 8.78,
-          "e": 9.28
-        },
-        {
-          "t": "ikut",
-          "s": 9.36,
-          "e": 9.68
-        },
-        {
-          "t": "majrur (مَجْرُور).",
-          "s": 9.76,
-          "e": 10.4
-        }
-      ]
+      "frame": 1
+    },
+    "al-fatihah:1:w4:compose:2": {
+      "text": "Alif dan huruf لَام tidak dibaca, dan huruf رَاء sesudahnya dibaca dobel.",
+      "display": "Alif (ٱ) dan huruf lam (ل) tidak dibaca, dan huruf ra’ (رَّ) sesudahnya dibaca dobel.",
+      "highlight": [
+        4
+      ],
+      "focus": "1:1:4",
+      "frame": 1
+    },
+    "al-fatihah:1:w4:compose:3": {
+      "text": "Bentuk dasarnya berakhir dengan dhommah, bunyi u; di sini menjadi كَسْرَة, bunyi i, karena kata ini sifat kedua bagi kata kedua.",
+      "display": "Bentuk dasarnya berakhir dengan dhammah (ضَمَّة), bunyi u; di sini menjadi kasrah (كَسْرَة), bunyi i, karena kata ini sifat kedua bagi kata kedua.",
+      "highlight": [
+        4
+      ],
+      "focus": "1:1:4",
+      "frame": 2
+    },
+    "al-fatihah:1:w4:compose:4": {
+      "text": "Ini kata terakhir ayat, dan imam berhenti padanya, jadi كَسْرَة ini hanya terlihat dalam tulisan, tidak terdengar.",
+      "display": "Ini kata terakhir ayat, dan imam berhenti padanya, jadi kasrah (كَسْرَة) ini hanya terlihat dalam tulisan, tidak terdengar.",
+      "highlight": [
+        4
+      ],
+      "focus": "1:1:4",
+      "frame": 3
     },
     "al-fatihah:1:concept:kalimah-isim-fiil-huruf": {
       "text": "Konsep baru: Tiga jenis كَلِمَة, atau kata: اِسْم, فِعْل, dan حَرْف. Setiap kata Arab termasuk salah satu dari tiga jenis: اِسْم, yaitu nama benda, orang, atau sifat, فِعْل, yaitu kata kerja, atau حَرْف, yaitu kata tugas.",
@@ -2586,36 +2457,243 @@
       "focus": null
     },
     "al-fatihah:2:w1": {
-      "text": "Kata pertama artinya: segala puji. Akhirnya dibaca dhommah, karena menjadi mubtada', pokok kalimat.",
-      "display": "Kata pertama artinya: “segala puji”. Akhirnya dibaca dhammah (ضَمَّة), karena menjadi mubtada' (pokok kalimat).",
+      "text": "Kata pertama artinya: segala puji. Kata ini juga terdiri dari dua bagian.",
+      "display": "Kata pertama artinya: “segala puji”. Kata ini juga terdiri dari dua bagian.",
       "highlight": [
         1
       ],
       "focus": "1:2:1"
     },
+    "al-fatihah:2:w1:compose:1": {
+      "text": "Bagian pertama adalah alif lam, seperti di ayat pertama.",
+      "display": "Bagian pertama adalah alif lam (ٱلْ), seperti di ayat pertama.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:2:1",
+      "frame": 1
+    },
+    "al-fatihah:2:w1:compose:2": {
+      "text": "Bagian kedua adalah اِسْم yang artinya pujian.",
+      "display": "Bagian kedua adalah isim (اِسْم) yang artinya “pujian”.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:2:1",
+      "frame": 1
+    },
+    "al-fatihah:2:w1:compose:3": {
+      "text": "Kali ini huruf لَام dibaca, sebagai huruf mati: perhatikan tanda kecil di atasnya, seperti di atas huruf سِين pada ayat pertama.",
+      "display": "Kali ini huruf lam (لْ) dibaca, sebagai huruf mati: perhatikan tanda kecil di atasnya, seperti di atas huruf sin (س) pada ayat pertama.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:2:1",
+      "frame": 2
+    },
+    "al-fatihah:2:w1:compose:4": {
+      "text": "Huruf sesudahnya pun tidak dibaca dobel, berbeda dengan huruf رَاء pada kata yang artinya Yang Maha Pengasih di ayat pertama.",
+      "display": "Huruf sesudahnya pun tidak dibaca dobel, berbeda dengan huruf ra’ (ر) pada kata yang artinya “Yang Maha Pengasih” di ayat pertama.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:2:1",
+      "frame": 2
+    },
+    "al-fatihah:2:w1:compose:5": {
+      "text": "Ayat ini dimulai dari kata ini, jadi alif di awalnya dibaca: seperti di ayat pertama, alif seperti ini hanya dibaca bila bacaan dimulai darinya.",
+      "display": "Ayat ini dimulai dari kata ini, jadi alif (ٱ) di awalnya dibaca: seperti di ayat pertama, alif (ٱ) seperti ini hanya dibaca bila bacaan dimulai darinya.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:2:1",
+      "frame": 2
+    },
+    "al-fatihah:2:w1:compose:6": {
+      "text": "Akhir kata ini dhommah, tanda bunyi u di atas huruf دَال; inilah bentuk dasarnya.",
+      "display": "Akhir kata ini dhammah (ضَمَّة), tanda bunyi u di atas huruf dal (دُ); inilah bentuk dasarnya.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:2:1",
+      "frame": 3
+    },
+    "al-fatihah:2:w1:compose:7": {
+      "text": "Di ayat ini akhiran itu tidak berubah, karena kata ini menjadi pokok kalimat, dan tidak didahului kata lain yang mengubah akhirnya.",
+      "display": "Di ayat ini akhiran itu tidak berubah, karena kata ini menjadi pokok kalimat, dan tidak didahului kata lain yang mengubah akhirnya.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:2:1",
+      "frame": 3
+    },
     "al-fatihah:2:w2": {
-      "text": "Kata kedua artinya: bagi Alloh. Akhirnya dibaca كَسْرَة, karena didahului حَرْف جَرّ, yaitu huruf لَام; jar-majrur ini bergantung pada khabar yang tidak disebut, misalnya tetap.",
-      "display": "Kata kedua artinya: “bagi Allah”. Akhirnya dibaca kasrah (كَسْرَة), karena didahului huruf jar (حَرْف جَرّ), yaitu huruf lam (لِ); jar-majrur ini bergantung pada khabar yang tidak disebut (misalnya “tetap”).",
+      "text": "Kata kedua artinya: bagi Alloh. Kata ini juga terdiri dari dua bagian.",
+      "display": "Kata kedua artinya: “bagi Allah”. Kata ini juga terdiri dari dua bagian.",
       "highlight": [
         2
       ],
       "focus": "1:2:2"
     },
+    "al-fatihah:2:w2:compose:1": {
+      "text": "Bagian pertama adalah حَرْف جَرّ, yaitu huruf لَام, yang artinya bagi.",
+      "display": "Bagian pertama adalah huruf jar (حَرْف جَرّ), yaitu huruf lam (لِ), yang artinya “bagi”.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:2:2",
+      "frame": 1
+    },
+    "al-fatihah:2:w2:compose:2": {
+      "text": "Bagian kedua adalah nama Alloh subhanahu wa ta'ala; bentuk dasarnya berakhir dengan dhommah, bunyi u, seperti yang kita lihat di ayat pertama.",
+      "display": "Bagian kedua adalah nama Allah subhanahu wa ta'ala; bentuk dasarnya berakhir dengan dhammah (ضَمَّة), bunyi u, seperti yang kita lihat di ayat pertama.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:2:2",
+      "frame": 1
+    },
+    "al-fatihah:2:w2:compose:3": {
+      "text": "Karena didahului حَرْف جَرّ, akhirnya berubah menjadi كَسْرَة, bunyi i, sama seperti kata yang artinya dengan nama di ayat pertama.",
+      "display": "Karena didahului huruf jar (حَرْف جَرّ), akhirnya berubah menjadi kasrah (كَسْرَة), bunyi i, sama seperti kata yang artinya “dengan nama” di ayat pertama.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:2:2",
+      "frame": 2
+    },
+    "al-fatihah:2:w2:compose:4": {
+      "text": "Kedua bagian lalu ditulis bersambung, dan tulisannya menjadi lebih ringkas.",
+      "display": "Kedua bagian lalu ditulis bersambung, dan tulisannya menjadi lebih ringkas.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:2:2",
+      "frame": 3
+    },
     "al-fatihah:2:w3": {
-      "text": "Kata ketiga artinya: Tuhan. Akhirnya dibaca كَسْرَة, karena mengikuti kata kedua sebagai sifat, yaitu نَعْت, atau badal.",
-      "display": "Kata ketiga artinya: “Tuhan”. Akhirnya dibaca kasrah (كَسْرَة), karena mengikuti kata kedua sebagai sifat, yaitu na’t (نَعْت), atau badal.",
+      "text": "Kata ketiga artinya: Tuhan.",
+      "display": "Kata ketiga artinya: “Tuhan”.",
       "highlight": [
         3
       ],
       "focus": "1:2:3"
     },
+    "al-fatihah:2:w3:compose:1": {
+      "text": "Dalam bentuk dasarnya, kata ini berakhir dengan dhommah, bunyi u; misalnya di ayat lain, dalam ungkapan yang artinya Tuhan seluruh alam.",
+      "display": "Dalam bentuk dasarnya, kata ini berakhir dengan dhammah (ضَمَّة), bunyi u; misalnya di ayat lain, dalam ungkapan yang artinya “Tuhan seluruh alam”.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:2:3",
+      "frame": 1
+    },
+    "al-fatihah:2:w3:compose:2": {
+      "text": "Di ayat ini akhirnya menjadi كَسْرَة, bunyi i, karena kata ini mengikuti nama Alloh subhanahu wa ta'ala pada kata kedua, yang berakhir كَسْرَة.",
+      "display": "Di ayat ini akhirnya menjadi kasrah (كَسْرَة), bunyi i, karena kata ini mengikuti nama Allah subhanahu wa ta'ala pada kata kedua, yang berakhir kasrah (كَسْرَة).",
+      "highlight": [
+        3
+      ],
+      "focus": "1:2:3",
+      "frame": 2
+    },
+    "al-fatihah:2:w3:compose:3": {
+      "text": "Kata ini sifat, atau نَعْت, bagi nama itu, seperti sifat-sifat di ayat pertama; sebagian ulama menyebutnya pengganti, dengan akhiran yang sama.",
+      "display": "Kata ini sifat, atau na’t (نَعْت), bagi nama itu, seperti sifat-sifat di ayat pertama; sebagian ulama menyebutnya pengganti, dengan akhiran yang sama.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:2:3",
+      "frame": 2
+    },
     "al-fatihah:2:w4": {
-      "text": "Kata keempat artinya: seluruh alam. مَجْرُور dengan tanda ya' karena menjadi mudhof ilaih dan termasuk kata yang disamakan, mulhaq, dengan jamak mudzakkar salim.",
-      "display": "Kata keempat artinya: “seluruh alam”. Majrur (مَجْرُور) dengan tanda ya' karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dan termasuk kata yang disamakan (mulhaq) dengan jamak mudzakkar salim.",
+      "text": "Kata keempat artinya: seluruh alam. Kata ini juga terdiri dari dua bagian.",
+      "display": "Kata keempat artinya: “seluruh alam”. Kata ini juga terdiri dari dua bagian.",
       "highlight": [
         4
       ],
       "focus": "1:2:4"
+    },
+    "al-fatihah:2:w4:compose:1": {
+      "text": "Bagian pertama adalah alif lam, seperti pada kata pertama.",
+      "display": "Bagian pertama adalah alif lam (ٱلْ), seperti pada kata pertama.",
+      "highlight": [
+        4
+      ],
+      "focus": "1:2:4",
+      "frame": 1
+    },
+    "al-fatihah:2:w4:compose:2": {
+      "text": "Bagian kedua adalah اِسْم yang artinya seluruh alam.",
+      "display": "Bagian kedua adalah isim (اِسْم) yang artinya “seluruh alam”.",
+      "highlight": [
+        4
+      ],
+      "focus": "1:2:4",
+      "frame": 1
+    },
+    "al-fatihah:2:w4:compose:3": {
+      "text": "Huruf لَام di sini juga dibaca sebagai huruf mati, dan huruf sesudahnya tidak dibaca dobel.",
+      "display": "Huruf lam (لْ) di sini juga dibaca sebagai huruf mati, dan huruf sesudahnya tidak dibaca dobel.",
+      "highlight": [
+        4
+      ],
+      "focus": "1:2:4",
+      "frame": 2
+    },
+    "al-fatihah:2:w4:compose:4": {
+      "text": "Alif di awalnya tidak dibaca, karena di tengah ayat bacaan bersambung dari kata sebelumnya.",
+      "display": "Alif (ٱ) di awalnya tidak dibaca, karena di tengah ayat bacaan bersambung dari kata sebelumnya.",
+      "highlight": [
+        4
+      ],
+      "focus": "1:2:4",
+      "frame": 2
+    },
+    "al-fatihah:2:w4:compose:5": {
+      "text": "Kata ini menjadi mudhof ilaih: kata ketiga, yang artinya Tuhan, disandarkan kepadanya, seperti di ayat pertama.",
+      "display": "Kata ini menjadi mudhaf ilaih (مُضَاف إِلَيْه): kata ketiga, yang artinya “Tuhan”, disandarkan kepadanya, seperti di ayat pertama.",
+      "highlight": [
+        4
+      ],
+      "focus": "1:2:4",
+      "frame": 3
+    },
+    "al-fatihah:2:w4:compose:6": {
+      "text": "Kata ini مَجْرُور, tetapi tandanya bukan كَسْرَة, bunyi i, melainkan huruf يَاء sebelum huruf نُون.",
+      "display": "Kata ini majrur (مَجْرُور), tetapi tandanya bukan kasrah (كَسْرَة), bunyi i, melainkan huruf ya’ (ي) sebelum huruf nun (نَ).",
+      "highlight": [
+        4
+      ],
+      "focus": "1:2:4",
+      "frame": 3
+    },
+    "al-fatihah:2:w4:compose:7": {
+      "text": "Sebabnya, kata ini diperlakukan seperti jamak laki-laki beraturan, yang memakai huruf يَاء sebagai pengganti كَسْرَة ketika مَجْرُور.",
+      "display": "Sebabnya, kata ini diperlakukan seperti jamak laki-laki beraturan, yang memakai huruf ya’ (ي) sebagai pengganti kasrah (كَسْرَة) ketika majrur (مَجْرُور).",
+      "highlight": [
+        4
+      ],
+      "focus": "1:2:4",
+      "frame": 3
+    },
+    "al-fatihah:2:w4:compose:8": {
+      "text": "Dalam bentuk dasarnya, jamak seperti ini memakai huruf وَاو, bunyi u panjang, di tempat huruf يَاء itu.",
+      "display": "Dalam bentuk dasarnya, jamak seperti ini memakai huruf wawu (و), bunyi u panjang, di tempat huruf ya’ (ي) itu.",
+      "highlight": [
+        4
+      ],
+      "focus": "1:2:4",
+      "frame": 3
+    },
+    "al-fatihah:2:w4:compose:9": {
+      "text": "Ini kata terakhir ayat, dan imam berhenti padanya: فَتْحَة, bunyi a, pada huruf نُون terakhir tidak terdengar, tetapi huruf يَاء sebelumnya terdengar.",
+      "display": "Ini kata terakhir ayat, dan imam berhenti padanya: fathah (فَتْحَة), bunyi a, pada huruf nun (نَ) terakhir tidak terdengar, tetapi huruf ya’ (ي) sebelumnya terdengar.",
+      "highlight": [
+        4
+      ],
+      "focus": "1:2:4",
+      "frame": 4
     },
     "al-fatihah:2:concept:jumlah-ismiyyah": {
       "text": "Konsep baru: جُمْلَة اِسْمِيَّة, yaitu kalimat nominal: mubtada' dan khabar. Kalimat yang diawali اِسْم terdiri dari mubtada', pokok kalimat, dan khabar, berita tentangnya, tanpa perlu kata adalah.",
@@ -2713,24 +2791,114 @@
       "focus": null
     },
     "al-fatihah:3:w1": {
-      "text": "Kata pertama artinya: Yang Maha Pengasih. Akhirnya dibaca كَسْرَة, karena sekali lagi menjadi sifat bagi lafaz Alloh di ayat dua yang مَجْرُور.",
-      "display": "Kata pertama artinya: “Yang Maha Pengasih”. Akhirnya dibaca kasrah (كَسْرَة), karena sekali lagi menjadi sifat bagi lafaz “Allah” di ayat dua yang majrur (مَجْرُور).",
+      "text": "Kata pertama artinya: Yang Maha Pengasih. Kata yang sama sudah kita pelajari di ayat pertama.",
+      "display": "Kata pertama artinya: “Yang Maha Pengasih”. Kata yang sama sudah kita pelajari di ayat pertama.",
       "highlight": [
         1
       ],
       "focus": "1:3:1"
     },
+    "al-fatihah:3:w1:compose:1": {
+      "text": "Susunannya pun sama: alif lam bersambung dengan اِسْم yang artinya Maha Pengasih.",
+      "display": "Susunannya pun sama: alif lam (ٱل) bersambung dengan isim (اِسْم) yang artinya “Maha Pengasih”.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:3:1",
+      "frame": 1
+    },
+    "al-fatihah:3:w1:compose:2": {
+      "text": "Huruf لَام tidak dibaca, dan huruf رَاء sesudahnya dibaca dobel.",
+      "display": "Huruf lam (ل) tidak dibaca, dan huruf ra’ (رَّ) sesudahnya dibaca dobel.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:3:1",
+      "frame": 1
+    },
+    "al-fatihah:3:w1:compose:3": {
+      "text": "Bentuk dasarnya berakhir dengan dhommah, bunyi u; di sini akhirnya كَسْرَة, bunyi i.",
+      "display": "Bentuk dasarnya berakhir dengan dhammah (ضَمَّة), bunyi u; di sini akhirnya kasrah (كَسْرَة), bunyi i.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:3:1",
+      "frame": 2
+    },
+    "al-fatihah:3:w1:compose:4": {
+      "text": "Sebabnya, kata ini sekali lagi menjadi sifat bagi nama Alloh subhanahu wa ta'ala di ayat kedua, yang berakhir كَسْرَة.",
+      "display": "Sebabnya, kata ini sekali lagi menjadi sifat bagi nama Allah subhanahu wa ta'ala di ayat kedua, yang berakhir kasrah (كَسْرَة).",
+      "highlight": [
+        1
+      ],
+      "focus": "1:3:1",
+      "frame": 2
+    },
+    "al-fatihah:3:w1:compose:5": {
+      "text": "Karena ayat ini dimulai dari kata ini, alif di awalnya dibaca, sama seperti di awal ayat kedua.",
+      "display": "Karena ayat ini dimulai dari kata ini, alif (ٱ) di awalnya dibaca, sama seperti di awal ayat kedua.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:3:1",
+      "frame": 3
+    },
     "al-fatihah:3:w2": {
-      "text": "Kata kedua artinya: Maha Penyayang. Akhirnya dibaca كَسْرَة, karena menjadi sifat berikutnya bagi lafaz Alloh di ayat dua yang مَجْرُور.",
-      "display": "Kata kedua artinya: “Maha Penyayang”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi sifat berikutnya bagi lafaz “Allah” di ayat dua yang majrur (مَجْرُور).",
+      "text": "Kata kedua artinya: Maha Penyayang. Kata ini pun sudah kita pelajari di ayat pertama.",
+      "display": "Kata kedua artinya: “Maha Penyayang”. Kata ini pun sudah kita pelajari di ayat pertama.",
       "highlight": [
         2
       ],
       "focus": "1:3:2"
     },
+    "al-fatihah:3:w2:compose:1": {
+      "text": "Alif lam bersambung dengan اِسْم yang artinya Maha Penyayang.",
+      "display": "Alif lam (ٱل) bersambung dengan isim (اِسْم) yang artinya “Maha Penyayang”.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:3:2",
+      "frame": 1
+    },
+    "al-fatihah:3:w2:compose:2": {
+      "text": "Alif dan huruf لَام tidak dibaca, dan huruf رَاء sesudahnya dibaca dobel.",
+      "display": "Alif (ٱ) dan huruf lam (ل) tidak dibaca, dan huruf ra’ (رَّ) sesudahnya dibaca dobel.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:3:2",
+      "frame": 1
+    },
+    "al-fatihah:3:w2:compose:3": {
+      "text": "Bentuk dasarnya berakhir dengan dhommah, bunyi u; di sini akhirnya كَسْرَة, bunyi i.",
+      "display": "Bentuk dasarnya berakhir dengan dhammah (ضَمَّة), bunyi u; di sini akhirnya kasrah (كَسْرَة), bunyi i.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:3:2",
+      "frame": 2
+    },
+    "al-fatihah:3:w2:compose:4": {
+      "text": "Sebabnya, kata ini sifat berikutnya bagi nama Alloh subhanahu wa ta'ala di ayat kedua.",
+      "display": "Sebabnya, kata ini sifat berikutnya bagi nama Allah subhanahu wa ta'ala di ayat kedua.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:3:2",
+      "frame": 2
+    },
+    "al-fatihah:3:w2:compose:5": {
+      "text": "Ini kata terakhir ayat, dan imam berhenti padanya, jadi كَسْرَة ini hanya terlihat dalam tulisan, tidak terdengar.",
+      "display": "Ini kata terakhir ayat, dan imam berhenti padanya, jadi kasrah (كَسْرَة) ini hanya terlihat dalam tulisan, tidak terdengar.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:3:2",
+      "frame": 3
+    },
     "al-fatihah:3:concept:wazan-dan-tashrif": {
-      "text": "Konsep baru: Wazan dan تَصْرِيف, yaitu cetakan kata. Wazan adalah cetakan kata yang ditulis dengan tiga huruf fa', 'ain, dan lam, dan تَصْرِيف adalah mengubah satu akar ke berbagai cetakan.",
-      "display": "Konsep baru: Wazan dan tashrif (تَصْرِيف), yaitu cetakan kata. Wazan adalah cetakan kata yang ditulis dengan tiga huruf fa', 'ain, dan lam, dan tashrif (تَصْرِيف) adalah mengubah satu akar ke berbagai cetakan.",
+      "text": "Konsep baru: Wazan dan تَصْرِيف, yaitu cetakan kata. Wazan adalah cetakan kata yang ditulis dengan tiga huruf فَاء, عَيْن, dan lam, dan تَصْرِيف adalah mengubah satu akar ke berbagai cetakan.",
+      "display": "Konsep baru: Wazan dan tashrif (تَصْرِيف), yaitu cetakan kata. Wazan adalah cetakan kata yang ditulis dengan tiga huruf fa’ (ف), ‘ain (ع), dan lam, dan tashrif (تَصْرِيف) adalah mengubah satu akar ke berbagai cetakan.",
       "highlight": [
         1,
         2
@@ -2808,28 +2976,127 @@
       "focus": null
     },
     "al-fatihah:4:w1": {
-      "text": "Kata pertama artinya: Pemilik. Akhirnya dibaca كَسْرَة, karena menjadi sifat keempat bagi lafaz Alloh di ayat dua.",
-      "display": "Kata pertama artinya: “Pemilik”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi sifat keempat bagi lafaz “Allah” di ayat dua.",
+      "text": "Kata pertama artinya: Pemilik.",
+      "display": "Kata pertama artinya: “Pemilik”.",
       "highlight": [
         1
       ],
       "focus": "1:4:1"
     },
+    "al-fatihah:4:w1:compose:1": {
+      "text": "Dalam bentuk dasarnya, kata ini berakhir dengan dhommah, bunyi u, di atas huruf كَاف.",
+      "display": "Dalam bentuk dasarnya, kata ini berakhir dengan dhammah (ضَمَّة), bunyi u, di atas huruf kaf (كُ).",
+      "highlight": [
+        1
+      ],
+      "focus": "1:4:1",
+      "frame": 1
+    },
+    "al-fatihah:4:w1:compose:2": {
+      "text": "Di sini akhirnya menjadi كَسْرَة, bunyi i, karena kata ini sifat, atau نَعْت, bagi nama Alloh subhanahu wa ta'ala di ayat kedua.",
+      "display": "Di sini akhirnya menjadi kasrah (كَسْرَة), bunyi i, karena kata ini sifat, atau na’t (نَعْت), bagi nama Allah subhanahu wa ta'ala di ayat kedua.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:4:1",
+      "frame": 2
+    },
+    "al-fatihah:4:w1:compose:3": {
+      "text": "Nama itu juga berakhir كَسْرَة, dan seperti di ayat pertama, sifat mengikuti akhiran kata yang disifatinya.",
+      "display": "Nama itu juga berakhir kasrah (كَسْرَة), dan seperti di ayat pertama, sifat mengikuti akhiran kata yang disifatinya.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:4:1",
+      "frame": 2
+    },
+    "al-fatihah:4:w1:compose:4": {
+      "text": "Darwisy menyebut kata ini sifat keempat, sesudah tiga sifat di ayat kedua dan ketiga.",
+      "display": "Darwisy menyebut kata ini sifat keempat, sesudah tiga sifat di ayat kedua dan ketiga.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:4:1",
+      "frame": 2
+    },
     "al-fatihah:4:w2": {
-      "text": "Kata kedua artinya: hari. Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih bagi kata pertama.",
-      "display": "Kata kedua artinya: “hari”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) bagi kata pertama.",
+      "text": "Kata kedua artinya: hari.",
+      "display": "Kata kedua artinya: “hari”.",
       "highlight": [
         2
       ],
       "focus": "1:4:2"
     },
+    "al-fatihah:4:w2:compose:1": {
+      "text": "Dalam bentuk dasarnya, kata ini berakhir dengan dhommah, bunyi u, di atas huruf مِيم.",
+      "display": "Dalam bentuk dasarnya, kata ini berakhir dengan dhammah (ضَمَّة), bunyi u, di atas huruf mim (مُ).",
+      "highlight": [
+        2
+      ],
+      "focus": "1:4:2",
+      "frame": 1
+    },
+    "al-fatihah:4:w2:compose:2": {
+      "text": "Di sini akhirnya menjadi كَسْرَة, bunyi i, karena kata pertama disandarkan kepadanya; kata ini menjadi mudhof ilaih.",
+      "display": "Di sini akhirnya menjadi kasrah (كَسْرَة), bunyi i, karena kata pertama disandarkan kepadanya; kata ini menjadi mudhaf ilaih (مُضَاف إِلَيْه).",
+      "highlight": [
+        2
+      ],
+      "focus": "1:4:2",
+      "frame": 2
+    },
+    "al-fatihah:4:w2:compose:3": {
+      "text": "Aturannya sama seperti nama Alloh subhanahu wa ta'ala di ayat pertama.",
+      "display": "Aturannya sama seperti nama Allah subhanahu wa ta'ala di ayat pertama.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:4:2",
+      "frame": 2
+    },
     "al-fatihah:4:w3": {
-      "text": "Kata ketiga artinya: pembalasan. Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih bagi kata kedua.",
-      "display": "Kata ketiga artinya: “pembalasan”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) bagi kata kedua.",
+      "text": "Kata ketiga artinya: pembalasan. Kata ini juga terdiri dari dua bagian.",
+      "display": "Kata ketiga artinya: “pembalasan”. Kata ini juga terdiri dari dua bagian.",
       "highlight": [
         3
       ],
       "focus": "1:4:3"
+    },
+    "al-fatihah:4:w3:compose:1": {
+      "text": "Alif lam bersambung dengan اِسْم yang artinya pembalasan.",
+      "display": "Alif lam (ٱل) bersambung dengan isim (اِسْم) yang artinya “pembalasan”.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:4:3",
+      "frame": 1
+    },
+    "al-fatihah:4:w3:compose:2": {
+      "text": "Seperti di ayat pertama, alif dan huruf لَام tidak dibaca; kali ini bunyi huruf لَام melebur ke huruf دَال, sehingga دَال dibaca dobel.",
+      "display": "Seperti di ayat pertama, alif (ٱ) dan huruf lam (ل) tidak dibaca; kali ini bunyi huruf lam (ل) melebur ke huruf dal (دِّ), sehingga dal (دِّ) dibaca dobel.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:4:3",
+      "frame": 1
+    },
+    "al-fatihah:4:w3:compose:3": {
+      "text": "Bentuk dasarnya berakhir dengan dhommah, bunyi u; di sini كَسْرَة, bunyi i, karena kata ini juga mudhof ilaih bagi kata kedua.",
+      "display": "Bentuk dasarnya berakhir dengan dhammah (ضَمَّة), bunyi u; di sini kasrah (كَسْرَة), bunyi i, karena kata ini juga mudhaf ilaih (مُضَاف إِلَيْه) bagi kata kedua.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:4:3",
+      "frame": 2
+    },
+    "al-fatihah:4:w3:compose:4": {
+      "text": "Ini kata terakhir ayat, dan imam berhenti padanya, jadi كَسْرَة ini hanya terlihat dalam tulisan, tidak terdengar.",
+      "display": "Ini kata terakhir ayat, dan imam berhenti padanya, jadi kasrah (كَسْرَة) ini hanya terlihat dalam tulisan, tidak terdengar.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:4:3",
+      "frame": 3
     },
     "al-fatihah:4:concept:isim-fail": {
       "text": "Konsep baru: Isim fa'il, yaitu kata pelaku. Isim fa'il adalah اِسْم turunan dari mashdar, kata benda perbuatan, yang menyebut pelakunya, seperti kata pertama Pemilik.",
@@ -2910,36 +3177,180 @@
       "focus": null
     },
     "al-fatihah:5:w1": {
-      "text": "Kata pertama artinya: hanya kepada Engkau. Kata ganti ini mabni di atas فَتْحَة, yaitu akhirnya tetap, dan berkedudukan nashab sebagai objek yang didahulukan, sehingga bermakna hanya kepada-Mu.",
-      "display": "Kata pertama artinya: “hanya kepada Engkau”. Kata ganti ini mabni di atas fathah (فَتْحَة), yaitu akhirnya tetap, dan berkedudukan nashab sebagai objek yang didahulukan, sehingga bermakna “hanya kepada-Mu”.",
+      "text": "Kata pertama artinya: hanya kepada Engkau.",
+      "display": "Kata pertama artinya: “hanya kepada Engkau”.",
       "highlight": [
         1
       ],
       "focus": "1:5:1"
     },
+    "al-fatihah:5:w1:compose:1": {
+      "text": "Kata ini adalah dhomir, atau kata ganti, yang berdiri sendiri, tidak menempel pada kata lain.",
+      "display": "Kata ini adalah dhamir (ضَمِير), atau kata ganti, yang berdiri sendiri, tidak menempel pada kata lain.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:5:1",
+      "frame": 1
+    },
+    "al-fatihah:5:w1:compose:2": {
+      "text": "Akhirnya فَتْحَة, bunyi a. Berbeda dengan kata-kata sebelumnya, akhir kata ganti tidak berubah oleh kata lain dalam kalimat.",
+      "display": "Akhirnya fathah (فَتْحَة), bunyi a. Berbeda dengan kata-kata sebelumnya, akhir kata ganti tidak berubah oleh kata lain dalam kalimat.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:5:1",
+      "frame": 1
+    },
+    "al-fatihah:5:w1:compose:3": {
+      "text": "Kata ganti ini menjadi objek, yaitu yang dikenai perbuatan, dan diletakkan sebelum kata kerjanya.",
+      "display": "Kata ganti ini menjadi objek, yaitu yang dikenai perbuatan, dan diletakkan sebelum kata kerjanya.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:5:1",
+      "frame": 2
+    },
+    "al-fatihah:5:w1:compose:4": {
+      "text": "Objek yang didahulukan seperti ini memberi makna pengkhususan; karena itu terjemahannya memakai kata hanya.",
+      "display": "Objek yang didahulukan seperti ini memberi makna pengkhususan; karena itu terjemahannya memakai kata “hanya”.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:5:1",
+      "frame": 2
+    },
     "al-fatihah:5:w2": {
-      "text": "Kata kedua artinya: kami menyembah. Akhirnya dibaca dhommah, karena fi'il mudhari' ini tidak didahului huruf penashab atau penjazm; pelakunya tersirat, yaitu kami.",
-      "display": "Kata kedua artinya: “kami menyembah”. Akhirnya dibaca dhammah (ضَمَّة), karena fi'il mudhari' ini tidak didahului huruf penashab atau penjazm; pelakunya tersirat, yaitu “kami”.",
+      "text": "Kata kedua artinya: kami menyembah. Inilah فِعْل, atau kata kerja, pertama yang tertulis dalam surah ini.",
+      "display": "Kata kedua artinya: “kami menyembah”. Inilah fi’il (فِعْل), atau kata kerja, pertama yang tertulis dalam surah ini.",
       "highlight": [
         2
       ],
       "focus": "1:5:2"
     },
+    "al-fatihah:5:w2:compose:1": {
+      "text": "فِعْل ini menyebut perbuatan yang sedang atau akan dilakukan.",
+      "display": "Fi’il (فِعْل) ini menyebut perbuatan yang sedang atau akan dilakukan.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:5:2",
+      "frame": 1
+    },
+    "al-fatihah:5:w2:compose:2": {
+      "text": "Huruf نُون di awalnya menunjukkan pelakunya, yaitu kami; pelaku itu tidak ditulis sebagai kata tersendiri.",
+      "display": "Huruf nun (نَ) di awalnya menunjukkan pelakunya, yaitu “kami”; pelaku itu tidak ditulis sebagai kata tersendiri.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:5:2",
+      "frame": 1
+    },
+    "al-fatihah:5:w2:compose:3": {
+      "text": "Akhirnya dhommah, bunyi u, di atas huruf دَال, dan di sini ia tetap dalam bentuk dasarnya.",
+      "display": "Akhirnya dhammah (ضَمَّة), bunyi u, di atas huruf dal (دُ), dan di sini ia tetap dalam bentuk dasarnya.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:5:2",
+      "frame": 2
+    },
+    "al-fatihah:5:w2:compose:4": {
+      "text": "Kata kerja seperti ini baru berubah akhirnya bila didahului kata tertentu; di sini tidak ada kata seperti itu.",
+      "display": "Kata kerja seperti ini baru berubah akhirnya bila didahului kata tertentu; di sini tidak ada kata seperti itu.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:5:2",
+      "frame": 2
+    },
     "al-fatihah:5:w3": {
-      "text": "Kata ketiga artinya: dan hanya kepada Engkau. Wawu adalah huruf 'athaf, dan kata ini, yaitu mabni di atas فَتْحَة, berkedudukan nashab, diulang sebagai objek yang didahulukan bagi kata keempat agar makna hanya melekat pada kedua perbuatan.",
-      "display": "Kata ketiga artinya: “dan hanya kepada Engkau”. Wawu adalah huruf 'athaf, dan kata ini, yaitu mabni di atas fathah (فَتْحَة), berkedudukan nashab, diulang sebagai objek yang didahulukan bagi kata keempat agar makna “hanya” melekat pada kedua perbuatan.",
+      "text": "Kata ketiga artinya: dan hanya kepada Engkau. Kata ini juga terdiri dari dua bagian.",
+      "display": "Kata ketiga artinya: “dan hanya kepada Engkau”. Kata ini juga terdiri dari dua bagian.",
       "highlight": [
         3
       ],
       "focus": "1:5:3"
     },
+    "al-fatihah:5:w3:compose:1": {
+      "text": "Bagian pertama adalah huruf وَاو, yang artinya dan.",
+      "display": "Bagian pertama adalah huruf wawu (وَ), yang artinya “dan”.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:5:3",
+      "frame": 1
+    },
+    "al-fatihah:5:w3:compose:2": {
+      "text": "Bagian kedua adalah kata ganti yang sama dengan kata pertama; kali ini ia objek bagi kata keempat.",
+      "display": "Bagian kedua adalah kata ganti yang sama dengan kata pertama; kali ini ia objek bagi kata keempat.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:5:3",
+      "frame": 1
+    },
+    "al-fatihah:5:w3:compose:3": {
+      "text": "Keduanya ditulis bersambung, dan akhirnya tetap فَتْحَة, bunyi a, karena akhir kata ganti tidak berubah.",
+      "display": "Keduanya ditulis bersambung, dan akhirnya tetap fathah (فَتْحَة), bunyi a, karena akhir kata ganti tidak berubah.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:5:3",
+      "frame": 2
+    },
+    "al-fatihah:5:w3:compose:4": {
+      "text": "Huruf وَاو ini menyambungkan kalimat kedua, tentang memohon pertolongan, dengan kalimat pertama, tentang menyembah.",
+      "display": "Huruf wawu (وَ) ini menyambungkan kalimat kedua, tentang memohon pertolongan, dengan kalimat pertama, tentang menyembah.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:5:3",
+      "frame": 2
+    },
+    "al-fatihah:5:w3:compose:5": {
+      "text": "Menurut Darwisy, kata ganti ini diulang di depan kata keempat agar menyembah dan memohon pertolongan masing-masing dituju secara tersendiri.",
+      "display": "Menurut Darwisy, kata ganti ini diulang di depan kata keempat agar menyembah dan memohon pertolongan masing-masing dituju secara tersendiri.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:5:3",
+      "frame": 2
+    },
     "al-fatihah:5:w4": {
-      "text": "Kata keempat artinya: kami mohon pertolongan. Akhirnya dhommah dengan alasan yang sama seperti kata kedua: fi'il mudhari' tanpa huruf penashab atau penjazm.",
-      "display": "Kata keempat artinya: “kami mohon pertolongan”. Akhirnya dhammah (ضَمَّة) dengan alasan yang sama seperti kata kedua: fi'il mudhari' tanpa huruf penashab atau penjazm.",
+      "text": "Kata keempat artinya: kami mohon pertolongan. Ini juga sebuah فِعْل, seperti kata kedua.",
+      "display": "Kata keempat artinya: “kami mohon pertolongan”. Ini juga sebuah fi’il (فِعْل), seperti kata kedua.",
       "highlight": [
         4
       ],
       "focus": "1:5:4"
+    },
+    "al-fatihah:5:w4:compose:1": {
+      "text": "Huruf نُون di awalnya juga menunjukkan pelakunya: kami.",
+      "display": "Huruf nun (نَ) di awalnya juga menunjukkan pelakunya: “kami”.",
+      "highlight": [
+        4
+      ],
+      "focus": "1:5:4",
+      "frame": 1
+    },
+    "al-fatihah:5:w4:compose:2": {
+      "text": "Akhirnya dhommah, bunyi u, tetap dalam bentuk dasarnya, dengan alasan yang sama: tidak didahului kata yang mengubahnya.",
+      "display": "Akhirnya dhammah (ضَمَّة), bunyi u, tetap dalam bentuk dasarnya, dengan alasan yang sama: tidak didahului kata yang mengubahnya.",
+      "highlight": [
+        4
+      ],
+      "focus": "1:5:4",
+      "frame": 2
+    },
+    "al-fatihah:5:w4:compose:3": {
+      "text": "Ini kata terakhir ayat, dan imam berhenti padanya, jadi dhommah ini hanya terlihat dalam tulisan, tidak terdengar.",
+      "display": "Ini kata terakhir ayat, dan imam berhenti padanya, jadi dhammah (ضَمَّة) ini hanya terlihat dalam tulisan, tidak terdengar.",
+      "highlight": [
+        4
+      ],
+      "focus": "1:5:4",
+      "frame": 3
     },
     "al-fatihah:5:concept:murab-mabni": {
       "text": "Konsep baru: Mu'rab dan mabni, akhiran berubah atau tetap. Kata mu'rab akhirnya berubah mengikuti perannya dalam kalimat, sedangkan kata mabni akhirnya tetap di posisi mana pun.",
@@ -2971,8 +3382,8 @@
       "focus": null
     },
     "al-fatihah:5:concept:fiil-mudhari": {
-      "text": "Konsep baru: Fi'il mudhari', kata kerja sekarang dan akan datang. Fi'il mudhari' adalah kata kerja untuk sekarang atau yang akan datang; ia diawali salah satu dari empat huruf, hamzah, nun, ya', ta', dan marfu' selama tidak didahului huruf penashab atau penjazm.",
-      "display": "Konsep baru: Fi'il mudhari' (kata kerja sekarang dan akan datang). Fi'il mudhari' adalah kata kerja untuk sekarang atau yang akan datang; ia diawali salah satu dari empat huruf (hamzah, nun, ya', ta') dan marfu' selama tidak didahului huruf penashab atau penjazm.",
+      "text": "Konsep baru: Fi'il mudhari', kata kerja sekarang dan akan datang. Fi'il mudhari' adalah kata kerja untuk sekarang atau yang akan datang; ia diawali salah satu dari empat huruf, yaitu هَمْزَة, نُون, يَاء, تَاء, dan marfu' selama tidak didahului huruf penashab atau penjazm.",
+      "display": "Konsep baru: Fi'il mudhari' (kata kerja sekarang dan akan datang). Fi'il mudhari' adalah kata kerja untuk sekarang atau yang akan datang; ia diawali salah satu dari empat huruf, yaitu hamzah (ء), nun (ن), ya’ (ي), ta’ (ت), dan marfu' selama tidak didahului huruf penashab atau penjazm.",
       "highlight": [
         2,
         4
@@ -2988,8 +3399,8 @@
       "focus": null
     },
     "al-fatihah:5:concept:athaf": {
-      "text": "Konsep baru: 'Athaf, kata sambung: wawu yang artinya dan. 'Athaf adalah menyambungkan kata atau kalimat dengan huruf seperti wawu yang artinya dan; kata yang disambungkan mengikuti إِعْرَاب kata sebelumnya.",
-      "display": "Konsep baru: 'Athaf (kata sambung: wawu yang artinya “dan”). 'Athaf adalah menyambungkan kata atau kalimat dengan huruf seperti wawu yang artinya “dan”; kata yang disambungkan mengikuti i’rab (إِعْرَاب) kata sebelumnya.",
+      "text": "Konsep baru: 'Athaf, yaitu kata sambung: وَاو yang artinya dan. 'Athaf adalah menyambungkan kata atau kalimat dengan huruf seperti وَاو yang artinya dan; kata yang disambungkan mengikuti إِعْرَاب kata sebelumnya.",
+      "display": "Konsep baru: 'Athaf, yaitu kata sambung: wawu (و) yang artinya “dan”. 'Athaf adalah menyambungkan kata atau kalimat dengan huruf seperti wawu (و) yang artinya “dan”; kata yang disambungkan mengikuti i’rab (إِعْرَاب) kata sebelumnya.",
       "highlight": [
         1,
         2,
@@ -2999,24 +3410,24 @@
       "focus": null
     },
     "al-fatihah:5:concept:bab-istifal": {
-      "text": "Konsep baru: Bab istif'al, wazan istaf'ala: meminta. Wazan istaf'ala dibentuk dengan menambah hamzah, sin, dan ta' di depan akar; makna yang paling dikenal adalah meminta, seperti kata keempat kami memohon pertolongan.",
-      "display": "Konsep baru: Bab istif'al (wazan istaf'ala: meminta). Wazan istaf'ala dibentuk dengan menambah hamzah, sin, dan ta' di depan akar; makna yang paling dikenal adalah meminta, seperti kata keempat “kami memohon pertolongan”.",
+      "text": "Konsep baru: Bab istif'al, wazan istaf'ala: meminta. Wazan istaf'ala dibentuk dengan menambah هَمْزَة, سِين, dan تَاء di depan akar; makna yang paling dikenal adalah meminta, seperti kata keempat kami memohon pertolongan.",
+      "display": "Konsep baru: Bab istif'al (wazan istaf'ala: meminta). Wazan istaf'ala dibentuk dengan menambah hamzah (ء), sin (س), dan ta’ (ت) di depan akar; makna yang paling dikenal adalah meminta, seperti kata keempat “kami memohon pertolongan”.",
       "highlight": [
         4
       ],
       "focus": null
     },
     "al-fatihah:5:concept:ilal": {
-      "text": "Konsep baru: I'lal, perubahan huruf wawu dan ya'. I'lal adalah perubahan pada huruf 'illah, alif, wawu, ya', agar kata lebih ringan diucapkan, misalnya nasta'winu menjadi kata keempat.",
-      "display": "Konsep baru: I'lal (perubahan huruf wawu dan ya'). I'lal adalah perubahan pada huruf 'illah (alif, wawu, ya') agar kata lebih ringan diucapkan, misalnya nasta'winu menjadi kata keempat.",
+      "text": "Konsep baru: I'lal, yaitu perubahan huruf وَاو dan يَاء. I'lal adalah perubahan pada huruf 'illah, yaitu alif, وَاو, يَاء, agar kata lebih ringan diucapkan, misalnya nasta'winu menjadi kata keempat.",
+      "display": "Konsep baru: I'lal, yaitu perubahan huruf wawu (و) dan ya’ (ي). I'lal adalah perubahan pada huruf 'illah, yaitu alif (ا), wawu (و), ya’ (ي), agar kata lebih ringan diucapkan, misalnya nasta'winu menjadi kata keempat.",
       "highlight": [
         4
       ],
       "focus": null
     },
     "al-fatihah:5:structure": {
-      "text": "Sekarang susunan kalimatnya. Dua kalimat kata kerja yang disambung dengan wawu, 'athaf, penyambungan: pada masing-masing, objek, maf'ul bih, kata pertama didahulukan sebelum kata kerjanya, kata kedua dan kata keempat, sehingga maknanya hanya kepada-Mu. Pelaku, fa'il, kedua kata kerja itu tidak tertulis, yaitu kami.",
-      "display": "Sekarang susunan kalimatnya. Dua kalimat kata kerja yang disambung dengan wawu ('athaf, penyambungan): pada masing-masing, objek (maf'ul bih) kata pertama didahulukan sebelum kata kerjanya, kata kedua dan kata keempat, sehingga maknanya “hanya kepada-Mu”. Pelaku (fa'il) kedua kata kerja itu tidak tertulis, yaitu “kami”.",
+      "text": "Sekarang susunan kalimatnya. Dua kalimat kata kerja yang disambung dengan وَاو, yaitu 'athaf, penyambungan: pada masing-masing, objek, maf'ul bih, kata pertama didahulukan sebelum kata kerjanya, kata kedua dan kata keempat, sehingga maknanya hanya kepada-Mu. Pelaku, fa'il, kedua kata kerja itu tidak tertulis, yaitu kami.",
+      "display": "Sekarang susunan kalimatnya. Dua kalimat kata kerja yang disambung dengan wawu (و), yaitu 'athaf, penyambungan: pada masing-masing, objek (maf'ul bih) kata pertama didahulukan sebelum kata kerjanya, kata kedua dan kata keempat, sehingga maknanya “hanya kepada-Mu”. Pelaku (fa'il) kedua kata kerja itu tidak tertulis, yaitu “kami”.",
       "highlight": [
         0
       ],
@@ -3085,28 +3496,208 @@
       "focus": null
     },
     "al-fatihah:6:w1": {
-      "text": "Kata pertama artinya: tunjukilah kami. Fi'il amr yang bermakna doa ini mabni dengan dibuangnya huruf ya' di akhir; pelakunya tersirat, Engkau, dan akhiran, yang artinya kami, adalah objeknya.",
-      "display": "Kata pertama artinya: “tunjukilah kami”. Fi'il amr yang bermakna doa ini mabni dengan dibuangnya huruf ya' di akhir; pelakunya tersirat (“Engkau”), dan akhiran, yang artinya “kami”, adalah objeknya.",
+      "text": "Kata pertama artinya: tunjukilah kami. Kata ini juga terdiri dari dua bagian.",
+      "display": "Kata pertama artinya: “tunjukilah kami”. Kata ini juga terdiri dari dua bagian.",
       "highlight": [
         1
       ],
       "focus": "1:6:1"
     },
+    "al-fatihah:6:w1:compose:1": {
+      "text": "Bagian pertama adalah فِعْل, atau kata kerja, dalam bentuk perintah, yang artinya tunjukilah.",
+      "display": "Bagian pertama adalah fi’il (فِعْل), atau kata kerja, dalam bentuk perintah, yang artinya “tunjukilah”.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:6:1",
+      "frame": 1
+    },
+    "al-fatihah:6:w1:compose:2": {
+      "text": "Bagian kedua adalah dhomir, yaitu kata ganti yang menempel, yang artinya kami.",
+      "display": "Bagian kedua adalah dhamir (ضَمِير), yaitu kata ganti yang menempel, yang artinya “kami”.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:6:1",
+      "frame": 1
+    },
+    "al-fatihah:6:w1:compose:3": {
+      "text": "Keduanya ditulis bersambung, dan dhomir itu menjadi objeknya: kamilah yang ditunjuki.",
+      "display": "Keduanya ditulis bersambung, dan dhamir (ضَمِير) itu menjadi objeknya: kamilah yang ditunjuki.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:6:1",
+      "frame": 2
+    },
+    "al-fatihah:6:w1:compose:4": {
+      "text": "Pelakunya tidak tertulis, yaitu Engkau.",
+      "display": "Pelakunya tidak tertulis, yaitu “Engkau”.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:6:1",
+      "frame": 2
+    },
+    "al-fatihah:6:w1:compose:5": {
+      "text": "Kata kerja perintah akhirnya tetap, tidak berubah karena kata lain.",
+      "display": "Kata kerja perintah akhirnya tetap, tidak berubah karena kata lain.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:6:1",
+      "frame": 3
+    },
+    "al-fatihah:6:w1:compose:6": {
+      "text": "Pada kata kerja ini, bentuk tetap itu ditandai dengan dibuangnya huruf terakhirnya, yaitu huruf يَاء.",
+      "display": "Pada kata kerja ini, bentuk tetap itu ditandai dengan dibuangnya huruf terakhirnya, yaitu huruf ya’ (ي).",
+      "highlight": [
+        1
+      ],
+      "focus": "1:6:1",
+      "frame": 3
+    },
+    "al-fatihah:6:w1:compose:7": {
+      "text": "Karena diucapkan hamba kepada Alloh subhanahu wa ta'ala, perintah ini bermakna doa, yaitu permohonan.",
+      "display": "Karena diucapkan hamba kepada Allah subhanahu wa ta'ala, perintah ini bermakna doa, yaitu permohonan.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:6:1",
+      "frame": 3
+    },
+    "al-fatihah:6:w1:compose:8": {
+      "text": "Karena ayat ini dimulai dari kata ini, alif di awalnya dibaca, kali ini dengan bunyi i.",
+      "display": "Karena ayat ini dimulai dari kata ini, alif (ٱ) di awalnya dibaca, kali ini dengan bunyi i.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:6:1",
+      "frame": 3
+    },
     "al-fatihah:6:w2": {
-      "text": "Kata kedua artinya: jalan. Akhirnya dibaca فَتْحَة, karena menjadi objek kedua, maf'ul bih kedua, dari kata pertama.",
-      "display": "Kata kedua artinya: “jalan”. Akhirnya dibaca fathah (فَتْحَة), karena menjadi objek kedua (maf'ul bih kedua) dari kata pertama.",
+      "text": "Kata kedua artinya: jalan. Kata ini juga terdiri dari dua bagian.",
+      "display": "Kata kedua artinya: “jalan”. Kata ini juga terdiri dari dua bagian.",
       "highlight": [
         2
       ],
       "focus": "1:6:2"
     },
+    "al-fatihah:6:w2:compose:1": {
+      "text": "Alif lam bersambung dengan اِسْم yang artinya jalan.",
+      "display": "Alif lam (ٱل) bersambung dengan isim (اِسْم) yang artinya “jalan”.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:6:2",
+      "frame": 1
+    },
+    "al-fatihah:6:w2:compose:2": {
+      "text": "Seperti di ayat pertama, alif dan huruf لَام tidak dibaca; bunyi huruf لَام melebur ke huruf sesudahnya, sehingga huruf itu dibaca dobel.",
+      "display": "Seperti di ayat pertama, alif (ٱ) dan huruf lam (ل) tidak dibaca; bunyi huruf lam (ل) melebur ke huruf sesudahnya, sehingga huruf itu dibaca dobel.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:6:2",
+      "frame": 1
+    },
+    "al-fatihah:6:w2:compose:3": {
+      "text": "Bentuk dasarnya berakhir dengan dhommah, bunyi u.",
+      "display": "Bentuk dasarnya berakhir dengan dhammah (ضَمَّة), bunyi u.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:6:2",
+      "frame": 2
+    },
+    "al-fatihah:6:w2:compose:4": {
+      "text": "Di sini akhirnya menjadi فَتْحَة, tanda bunyi a di atas huruf.",
+      "display": "Di sini akhirnya menjadi fathah (فَتْحَة), tanda bunyi a di atas huruf.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:6:2",
+      "frame": 3
+    },
+    "al-fatihah:6:w2:compose:5": {
+      "text": "Sebabnya, kata ini menjadi objek kedua dari kata pertama; objek pertamanya adalah dhomir yang artinya kami.",
+      "display": "Sebabnya, kata ini menjadi objek kedua dari kata pertama; objek pertamanya adalah dhamir (ضَمِير) yang artinya “kami”.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:6:2",
+      "frame": 3
+    },
     "al-fatihah:6:w3": {
-      "text": "Kata ketiga artinya: yang lurus. Akhirnya dibaca فَتْحَة, karena menjadi sifat bagi kata kedua yang manshub.",
-      "display": "Kata ketiga artinya: “yang lurus”. Akhirnya dibaca fathah (فَتْحَة), karena menjadi sifat bagi kata kedua yang manshub.",
+      "text": "Kata ketiga artinya: yang lurus. Kata ini juga terdiri dari dua bagian.",
+      "display": "Kata ketiga artinya: “yang lurus”. Kata ini juga terdiri dari dua bagian.",
       "highlight": [
         3
       ],
       "focus": "1:6:3"
+    },
+    "al-fatihah:6:w3:compose:1": {
+      "text": "Alif lam bersambung dengan اِسْم yang artinya yang lurus.",
+      "display": "Alif lam (ٱلْ) bersambung dengan isim (اِسْم) yang artinya “yang lurus”.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:6:3",
+      "frame": 1
+    },
+    "al-fatihah:6:w3:compose:2": {
+      "text": "Alif di awalnya tidak dibaca, tetapi huruf لَام dibaca sebagai huruf mati, dan huruf مِيم sesudahnya tidak dibaca dobel.",
+      "display": "Alif (ٱ) di awalnya tidak dibaca, tetapi huruf lam (لْ) dibaca sebagai huruf mati, dan huruf mim (مُ) sesudahnya tidak dibaca dobel.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:6:3",
+      "frame": 1
+    },
+    "al-fatihah:6:w3:compose:3": {
+      "text": "Hal ini sama seperti pada kata yang artinya seluruh alam di ayat kedua.",
+      "display": "Hal ini sama seperti pada kata yang artinya “seluruh alam” di ayat kedua.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:6:3",
+      "frame": 1
+    },
+    "al-fatihah:6:w3:compose:4": {
+      "text": "Bentuk dasarnya berakhir dengan dhommah, bunyi u.",
+      "display": "Bentuk dasarnya berakhir dengan dhammah (ضَمَّة), bunyi u.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:6:3",
+      "frame": 2
+    },
+    "al-fatihah:6:w3:compose:5": {
+      "text": "Di sini akhirnya menjadi فَتْحَة, bunyi a, karena kata ini sifat, atau نَعْت, bagi kata kedua.",
+      "display": "Di sini akhirnya menjadi fathah (فَتْحَة), bunyi a, karena kata ini sifat, atau na’t (نَعْت), bagi kata kedua.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:6:3",
+      "frame": 3
+    },
+    "al-fatihah:6:w3:compose:6": {
+      "text": "Sifat mengikuti kata yang disifatinya, seperti di ayat pertama: kata kedua berakhir فَتْحَة dan memakai alif lam, maka kata ini juga.",
+      "display": "Sifat mengikuti kata yang disifatinya, seperti di ayat pertama: kata kedua berakhir fathah (فَتْحَة) dan memakai alif lam (ٱلْ), maka kata ini juga.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:6:3",
+      "frame": 3
+    },
+    "al-fatihah:6:w3:compose:7": {
+      "text": "Ini kata terakhir ayat, dan imam berhenti padanya, jadi فَتْحَة ini hanya terlihat dalam tulisan, tidak terdengar.",
+      "display": "Ini kata terakhir ayat, dan imam berhenti padanya, jadi fathah (فَتْحَة) ini hanya terlihat dalam tulisan, tidak terdengar.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:6:3",
+      "frame": 4
     },
     "al-fatihah:6:concept:fiil-amr": {
       "text": "Konsep baru: Fi'il amr, bentuk perintah, juga untuk doa. Fi'il amr adalah bentuk perintah, seperti kata yang artinya katakanlah; bila diucapkan hamba kepada Alloh subhanahu wa ta'ala maknanya permohonan, doa, seperti kata pertama tunjukilah kami.",
@@ -3196,76 +3787,553 @@
       "focus": null
     },
     "al-fatihah:7:w1": {
-      "text": "Kata pertama artinya: jalan. Akhirnya dibaca فَتْحَة, karena menjadi badal, pengganti, dari kata yang artinya jalan di ayat enam yang manshub.",
-      "display": "Kata pertama artinya: “jalan”. Akhirnya dibaca fathah (فَتْحَة), karena menjadi badal (pengganti) dari kata yang artinya “jalan” di ayat enam yang manshub.",
+      "text": "Kata pertama artinya: jalan. Kata ini sama dengan kata yang artinya jalan di ayat keenam, tetapi tanpa alif lam.",
+      "display": "Kata pertama artinya: “jalan”. Kata ini sama dengan kata yang artinya “jalan” di ayat keenam, tetapi tanpa alif lam (ال).",
       "highlight": [
         1
       ],
       "focus": "1:7:1"
     },
+    "al-fatihah:7:w1:compose:1": {
+      "text": "Bentuk dasarnya berakhir dengan dhommah, bunyi u.",
+      "display": "Bentuk dasarnya berakhir dengan dhammah (ضَمَّة), bunyi u.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:7:1",
+      "frame": 1
+    },
+    "al-fatihah:7:w1:compose:2": {
+      "text": "Di sini akhirnya menjadi فَتْحَة, bunyi a, sama seperti di ayat keenam.",
+      "display": "Di sini akhirnya menjadi fathah (فَتْحَة), bunyi a, sama seperti di ayat keenam.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:7:1",
+      "frame": 2
+    },
+    "al-fatihah:7:w1:compose:3": {
+      "text": "Sebabnya, kata ini pengganti bagi kata yang artinya jalan di ayat keenam, dan pengganti mengikuti akhiran kata yang digantikannya.",
+      "display": "Sebabnya, kata ini pengganti bagi kata yang artinya “jalan” di ayat keenam, dan pengganti mengikuti akhiran kata yang digantikannya.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:7:1",
+      "frame": 2
+    },
+    "al-fatihah:7:w1:compose:4": {
+      "text": "Dengan pengganti ini, jalan yang lurus itu dijelaskan: jalan orang-orang yang telah Engkau beri nikmat.",
+      "display": "Dengan pengganti ini, jalan yang lurus itu dijelaskan: jalan orang-orang yang telah Engkau beri nikmat.",
+      "highlight": [
+        1
+      ],
+      "focus": "1:7:1",
+      "frame": 2
+    },
     "al-fatihah:7:w2": {
-      "text": "Kata kedua artinya: orang-orang yang. Isim maushul ini mabni, bentuknya tetap, dan berkedudukan jar sebagai mudhof ilaih dari kata pertama.",
-      "display": "Kata kedua artinya: “orang-orang yang”. Isim maushul ini mabni (bentuknya tetap) dan berkedudukan jar sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari kata pertama.",
+      "text": "Kata kedua artinya: orang-orang yang.",
+      "display": "Kata kedua artinya: “orang-orang yang”.",
       "highlight": [
         2
       ],
       "focus": "1:7:2"
     },
+    "al-fatihah:7:w2:compose:1": {
+      "text": "Kata ini adalah kata penghubung yang artinya orang-orang yang; maknanya baru lengkap dengan kalimat sesudahnya.",
+      "display": "Kata ini adalah kata penghubung yang artinya “orang-orang yang”; maknanya baru lengkap dengan kalimat sesudahnya.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:7:2",
+      "frame": 1
+    },
+    "al-fatihah:7:w2:compose:2": {
+      "text": "Kata penghubung seperti ini akhirnya tetap: bentuknya sama di posisi mana pun.",
+      "display": "Kata penghubung seperti ini akhirnya tetap: bentuknya sama di posisi mana pun.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:7:2",
+      "frame": 1
+    },
+    "al-fatihah:7:w2:compose:3": {
+      "text": "Alif di awalnya tidak dibaca, karena bacaan bersambung dari kata pertama.",
+      "display": "Alif (ٱ) di awalnya tidak dibaca, karena bacaan bersambung dari kata pertama.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:7:2",
+      "frame": 1
+    },
+    "al-fatihah:7:w2:compose:4": {
+      "text": "Kata pertama disandarkan kepadanya, jadi kata ini menjadi mudhof ilaih, seperti kata yang artinya Alloh di ayat pertama.",
+      "display": "Kata pertama disandarkan kepadanya, jadi kata ini menjadi mudhaf ilaih (مُضَاف إِلَيْه), seperti kata yang artinya “Allah” di ayat pertama.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:7:2",
+      "frame": 2
+    },
+    "al-fatihah:7:w2:compose:5": {
+      "text": "Namun akhirnya tidak berubah menjadi كَسْرَة, bunyi i; hanya kedudukannya yang مَجْرُور.",
+      "display": "Namun akhirnya tidak berubah menjadi kasrah (كَسْرَة), bunyi i; hanya kedudukannya yang majrur (مَجْرُور).",
+      "highlight": [
+        2
+      ],
+      "focus": "1:7:2",
+      "frame": 2
+    },
+    "al-fatihah:7:w2:compose:6": {
+      "text": "Akhir kata ini mirip akhiran jamak pada kata yang artinya seluruh alam di ayat kedua, tetapi di sini ia bagian dari bentuk yang tetap.",
+      "display": "Akhir kata ini mirip akhiran jamak pada kata yang artinya “seluruh alam” di ayat kedua, tetapi di sini ia bagian dari bentuk yang tetap.",
+      "highlight": [
+        2
+      ],
+      "focus": "1:7:2",
+      "frame": 2
+    },
     "al-fatihah:7:w3": {
-      "text": "Kata ketiga artinya: telah Engkau beri nikmat. Fi'il madhi ini mabni di atas sukun karena bersambung dengan dhomir akhiran, Engkau, pelakunya, dan kalimatnya menjadi shilah bagi kata kedua.",
-      "display": "Kata ketiga artinya: “telah Engkau beri nikmat”. Fi'il madhi ini mabni di atas sukun karena bersambung dengan dhamir (ضَمِير) akhiran (“Engkau”, pelakunya), dan kalimatnya menjadi shilah bagi kata kedua.",
+      "text": "Kata ketiga artinya: telah Engkau beri nikmat. Kata ini juga terdiri dari dua bagian.",
+      "display": "Kata ketiga artinya: “telah Engkau beri nikmat”. Kata ini juga terdiri dari dua bagian.",
       "highlight": [
         3
       ],
       "focus": "1:7:3"
     },
+    "al-fatihah:7:w3:compose:1": {
+      "text": "Bagian pertama adalah فِعْل, kata kerja bentuk lampau, yang artinya telah memberi nikmat.",
+      "display": "Bagian pertama adalah fi’il (فِعْل), kata kerja bentuk lampau, yang artinya “telah memberi nikmat”.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:7:3",
+      "frame": 1
+    },
+    "al-fatihah:7:w3:compose:2": {
+      "text": "Bagian kedua adalah dhomir yang artinya Engkau, yaitu pelakunya.",
+      "display": "Bagian kedua adalah dhamir (ضَمِير) yang artinya “Engkau”, yaitu pelakunya.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:7:3",
+      "frame": 1
+    },
+    "al-fatihah:7:w3:compose:3": {
+      "text": "Berbeda dengan ayat keenam, di sini dhomir yang menempel adalah pelaku, bukan objek.",
+      "display": "Berbeda dengan ayat keenam, di sini dhamir (ضَمِير) yang menempel adalah pelaku, bukan objek.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:7:3",
+      "frame": 1
+    },
+    "al-fatihah:7:w3:compose:4": {
+      "text": "Kata kerja lampau akhirnya tetap; bentuk dasarnya berakhir dengan فَتْحَة, bunyi a, seperti tertulis di ayat lain.",
+      "display": "Kata kerja lampau akhirnya tetap; bentuk dasarnya berakhir dengan fathah (فَتْحَة), bunyi a, seperti tertulis di ayat lain.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:7:3",
+      "frame": 2
+    },
+    "al-fatihah:7:w3:compose:5": {
+      "text": "Ketika bersambung dengan dhomir pelaku yang berharakat, huruf terakhirnya menjadi huruf mati; karena itu huruf مِيم di sini mati.",
+      "display": "Ketika bersambung dengan dhamir (ضَمِير) pelaku yang berharakat, huruf terakhirnya menjadi huruf mati; karena itu huruf mim (مْ) di sini mati.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:7:3",
+      "frame": 3
+    },
+    "al-fatihah:7:w3:compose:6": {
+      "text": "Kata ini bersama kata sesudahnya menjadi kalimat penjelas bagi kata kedua.",
+      "display": "Kata ini bersama kata sesudahnya menjadi kalimat penjelas bagi kata kedua.",
+      "highlight": [
+        3
+      ],
+      "focus": "1:7:3",
+      "frame": 3
+    },
     "al-fatihah:7:w4": {
-      "text": "Kata keempat artinya: kepada mereka. Bagian depan kata ini adalah حَرْف جَرّ yang artinya atas, dan akhiran, yang artinya mereka, kata ganti mabni yang dijarkan olehnya, sedangkan kedudukan nashab, mahall nashb, milik frasa jar-majrur kata ini secara utuh, yang bergantung pada kata ketiga, as-Samin: manshub al-mahall.",
-      "display": "Kata keempat artinya: “kepada mereka”. Bagian depan kata ini adalah huruf jar (حَرْف جَرّ) yang artinya “atas”, dan akhiran, yang artinya “mereka”, kata ganti mabni yang dijarkan olehnya, sedangkan kedudukan nashab (mahall nashb) milik frasa jar-majrur kata ini secara utuh, yang bergantung pada kata ketiga (as-Samin: manshub al-mahall).",
+      "text": "Kata keempat artinya: kepada mereka. Kata ini juga terdiri dari dua bagian.",
+      "display": "Kata keempat artinya: “kepada mereka”. Kata ini juga terdiri dari dua bagian.",
       "highlight": [
         4
       ],
       "focus": "1:7:4"
     },
+    "al-fatihah:7:w4:compose:1": {
+      "text": "Bagian pertama adalah حَرْف جَرّ yang artinya kepada.",
+      "display": "Bagian pertama adalah huruf jar (حَرْف جَرّ) yang artinya “kepada”.",
+      "highlight": [
+        4
+      ],
+      "focus": "1:7:4",
+      "frame": 1
+    },
+    "al-fatihah:7:w4:compose:2": {
+      "text": "Bagian kedua adalah dhomir yang artinya mereka; asal bunyi huruf هَاء di awalnya adalah u.",
+      "display": "Bagian kedua adalah dhamir (ضَمِير) yang artinya “mereka”; asal bunyi huruf ha’ (هُ) di awalnya adalah u.",
+      "highlight": [
+        4
+      ],
+      "focus": "1:7:4",
+      "frame": 1
+    },
+    "al-fatihah:7:w4:compose:3": {
+      "text": "Ketika keduanya bersambung, akhir حَرْف جَرّ itu ditulis dengan huruf يَاء mati.",
+      "display": "Ketika keduanya bersambung, akhir huruf jar (حَرْف جَرّ) itu ditulis dengan huruf ya’ (يْ) mati.",
+      "highlight": [
+        4
+      ],
+      "focus": "1:7:4",
+      "frame": 2
+    },
+    "al-fatihah:7:w4:compose:4": {
+      "text": "Menurut as-Samin, bila huruf هَاء ini didahului huruf يَاء mati, orang Arab selain penduduk Hijaz membacanya dengan كَسْرَة, bunyi i.",
+      "display": "Menurut as-Samin, bila huruf ha’ (هِ) ini didahului huruf ya’ (يْ) mati, orang Arab selain penduduk Hijaz membacanya dengan kasrah (كَسْرَة), bunyi i.",
+      "highlight": [
+        4
+      ],
+      "focus": "1:7:4",
+      "frame": 3
+    },
+    "al-fatihah:7:w4:compose:5": {
+      "text": "Jadi كَسْرَة ini bukan karena حَرْف جَرّ, seperti di ayat pertama, melainkan karena huruf يَاء mati sebelumnya.",
+      "display": "Jadi kasrah (كَسْرَة) ini bukan karena huruf jar (حَرْف جَرّ), seperti di ayat pertama, melainkan karena huruf ya’ (يْ) mati sebelumnya.",
+      "highlight": [
+        4
+      ],
+      "focus": "1:7:4",
+      "frame": 3
+    },
+    "al-fatihah:7:w4:compose:6": {
+      "text": "Dhomir ini dikenai حَرْف جَرّ, tetapi tidak berubah karenanya; seperti kata kedua, hanya kedudukannya yang مَجْرُور.",
+      "display": "Dhamir (ضَمِير) ini dikenai huruf jar (حَرْف جَرّ), tetapi tidak berubah karenanya; seperti kata kedua, hanya kedudukannya yang majrur (مَجْرُور).",
+      "highlight": [
+        4
+      ],
+      "focus": "1:7:4",
+      "frame": 4
+    },
+    "al-fatihah:7:w4:compose:7": {
+      "text": "Dhomir yang artinya mereka ini merujuk kepada kata kedua: merekalah yang diberi nikmat.",
+      "display": "Dhamir (ضَمِير) yang artinya “mereka” ini merujuk kepada kata kedua: merekalah yang diberi nikmat.",
+      "highlight": [
+        4
+      ],
+      "focus": "1:7:4",
+      "frame": 4
+    },
     "al-fatihah:7:w5": {
-      "text": "Kata kelima artinya: bukan. Akhirnya dibaca كَسْرَة, karena menjadi badal dari kata kedua yang berkedudukan jar, sebagian ulama menjadikannya sifat.",
-      "display": "Kata kelima artinya: “bukan”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi badal dari kata kedua yang berkedudukan jar (sebagian ulama menjadikannya sifat).",
+      "text": "Kata kelima artinya: bukan. Meskipun artinya bukan, kata ini sebuah اِسْم, bukan huruf.",
+      "display": "Kata kelima artinya: “bukan”. Meskipun artinya “bukan”, kata ini sebuah isim (اِسْم), bukan huruf.",
       "highlight": [
         5
       ],
       "focus": "1:7:5"
     },
+    "al-fatihah:7:w5:compose:1": {
+      "text": "Bentuk dasarnya berakhir dengan dhommah, bunyi u.",
+      "display": "Bentuk dasarnya berakhir dengan dhammah (ضَمَّة), bunyi u.",
+      "highlight": [
+        5
+      ],
+      "focus": "1:7:5",
+      "frame": 1
+    },
+    "al-fatihah:7:w5:compose:2": {
+      "text": "Di sini akhirnya menjadi كَسْرَة, bunyi i, karena kata ini pengganti bagi kata kedua.",
+      "display": "Di sini akhirnya menjadi kasrah (كَسْرَة), bunyi i, karena kata ini pengganti bagi kata kedua.",
+      "highlight": [
+        5
+      ],
+      "focus": "1:7:5",
+      "frame": 2
+    },
+    "al-fatihah:7:w5:compose:3": {
+      "text": "Kata kedua bentuknya tetap, tetapi kedudukannya مَجْرُور; kata ini mengikutinya, dan pada kata inilah كَسْرَة itu tampak.",
+      "display": "Kata kedua bentuknya tetap, tetapi kedudukannya majrur (مَجْرُور); kata ini mengikutinya, dan pada kata inilah kasrah (كَسْرَة) itu tampak.",
+      "highlight": [
+        5
+      ],
+      "focus": "1:7:5",
+      "frame": 2
+    },
+    "al-fatihah:7:w5:compose:4": {
+      "text": "Sebagian ulama menjadikannya sifat bagi kata kedua; akhirnya tetap كَسْرَة.",
+      "display": "Sebagian ulama menjadikannya sifat bagi kata kedua; akhirnya tetap kasrah (كَسْرَة).",
+      "highlight": [
+        5
+      ],
+      "focus": "1:7:5",
+      "frame": 2
+    },
+    "al-fatihah:7:w5:compose:5": {
+      "text": "Kata ini selalu disandarkan kepada kata lain; di sini kepada kata keenam.",
+      "display": "Kata ini selalu disandarkan kepada kata lain; di sini kepada kata keenam.",
+      "highlight": [
+        5
+      ],
+      "focus": "1:7:5",
+      "frame": 3
+    },
+    "al-fatihah:7:w5:compose:6": {
+      "text": "Karena itu, menurut Darwisy, memberinya alif lam adalah kesalahan.",
+      "display": "Karena itu, menurut Darwisy, memberinya alif lam (ال) adalah kesalahan.",
+      "highlight": [
+        5
+      ],
+      "focus": "1:7:5",
+      "frame": 3
+    },
     "al-fatihah:7:w6": {
-      "text": "Kata keenam artinya: yang dimurkai. Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih dari kata kelima.",
-      "display": "Kata keenam artinya: “yang dimurkai”. Akhirnya dibaca kasrah (كَسْرَة), karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata kelima.",
+      "text": "Kata keenam artinya: yang dimurkai. Kata ini juga terdiri dari dua bagian.",
+      "display": "Kata keenam artinya: “yang dimurkai”. Kata ini juga terdiri dari dua bagian.",
       "highlight": [
         6
       ],
       "focus": "1:7:6"
     },
+    "al-fatihah:7:w6:compose:1": {
+      "text": "Alif lam bersambung dengan اِسْم yang artinya yang dimurkai.",
+      "display": "Alif lam (ٱلْ) bersambung dengan isim (اِسْم) yang artinya “yang dimurkai”.",
+      "highlight": [
+        6
+      ],
+      "focus": "1:7:6",
+      "frame": 1
+    },
+    "al-fatihah:7:w6:compose:2": {
+      "text": "Alif di awalnya tidak dibaca, tetapi huruf لَام dibaca, sama seperti pada kata yang artinya yang lurus di ayat keenam.",
+      "display": "Alif (ٱ) di awalnya tidak dibaca, tetapi huruf lam (لْ) dibaca, sama seperti pada kata yang artinya “yang lurus” di ayat keenam.",
+      "highlight": [
+        6
+      ],
+      "focus": "1:7:6",
+      "frame": 1
+    },
+    "al-fatihah:7:w6:compose:3": {
+      "text": "اِسْم ini menunjuk pihak yang dikenai perbuatan, yaitu pihak yang dikenai murka.",
+      "display": "Isim (اِسْم) ini menunjuk pihak yang dikenai perbuatan, yaitu pihak yang dikenai murka.",
+      "highlight": [
+        6
+      ],
+      "focus": "1:7:6",
+      "frame": 1
+    },
+    "al-fatihah:7:w6:compose:4": {
+      "text": "Bentuk dasarnya berakhir dengan dhommah, bunyi u.",
+      "display": "Bentuk dasarnya berakhir dengan dhammah (ضَمَّة), bunyi u.",
+      "highlight": [
+        6
+      ],
+      "focus": "1:7:6",
+      "frame": 2
+    },
+    "al-fatihah:7:w6:compose:5": {
+      "text": "Di sini akhirnya menjadi كَسْرَة, bunyi i, karena kata kelima disandarkan kepadanya: kata ini mudhof ilaih, seperti di ayat pertama.",
+      "display": "Di sini akhirnya menjadi kasrah (كَسْرَة), bunyi i, karena kata kelima disandarkan kepadanya: kata ini mudhaf ilaih (مُضَاف إِلَيْه), seperti di ayat pertama.",
+      "highlight": [
+        6
+      ],
+      "focus": "1:7:6",
+      "frame": 3
+    },
     "al-fatihah:7:w7": {
-      "text": "Kata ketujuh artinya: atas mereka. Bagian depan kata ini adalah حَرْف جَرّ yang artinya atas, dan akhiran kata ganti mabni yang dijarkan olehnya, sedangkan kedudukan rafa', mahall raf', milik frasa jar-majrur kata ini secara utuh sebagai na'ib fa'il, pengganti pelaku, bagi kata keenam, karena kata keenam adalah isim maf'ul.",
-      "display": "Kata ketujuh artinya: “atas mereka”. Bagian depan kata ini adalah huruf jar (حَرْف جَرّ) yang artinya “atas”, dan akhiran kata ganti mabni yang dijarkan olehnya, sedangkan kedudukan rafa' (mahall raf') milik frasa jar-majrur kata ini secara utuh sebagai na'ib fa'il (pengganti pelaku) bagi kata keenam, karena kata keenam adalah isim maf'ul.",
+      "text": "Kata ketujuh artinya: atas mereka. Susunannya sama seperti kata keempat.",
+      "display": "Kata ketujuh artinya: “atas mereka”. Susunannya sama seperti kata keempat.",
       "highlight": [
         7
       ],
       "focus": "1:7:7"
     },
+    "al-fatihah:7:w7:compose:1": {
+      "text": "حَرْف جَرّ yang artinya atas, bersambung dengan dhomir yang artinya mereka.",
+      "display": "Huruf jar (حَرْف جَرّ) yang artinya “atas”, bersambung dengan dhamir (ضَمِير) yang artinya “mereka”.",
+      "highlight": [
+        7
+      ],
+      "focus": "1:7:7",
+      "frame": 1
+    },
+    "al-fatihah:7:w7:compose:2": {
+      "text": "Bunyi i pada dhomir ini juga datang dari huruf يَاء mati sebelumnya, bukan dari حَرْف جَرّ.",
+      "display": "Bunyi i pada dhamir (ضَمِير) ini juga datang dari huruf ya’ (يْ) mati sebelumnya, bukan dari huruf jar (حَرْف جَرّ).",
+      "highlight": [
+        7
+      ],
+      "focus": "1:7:7",
+      "frame": 1
+    },
+    "al-fatihah:7:w7:compose:3": {
+      "text": "Di sini kata ini menempati posisi pelaku bagi kata keenam, karena kata keenam bermakna dikenai perbuatan.",
+      "display": "Di sini kata ini menempati posisi pelaku bagi kata keenam, karena kata keenam bermakna dikenai perbuatan.",
+      "highlight": [
+        7
+      ],
+      "focus": "1:7:7",
+      "frame": 2
+    },
+    "al-fatihah:7:w7:compose:4": {
+      "text": "Maknanya: mereka yang dimurkai; para ahli bahasa Arab menyebut posisi ini pengganti pelaku.",
+      "display": "Maknanya: mereka yang dimurkai; para ahli bahasa Arab menyebut posisi ini pengganti pelaku.",
+      "highlight": [
+        7
+      ],
+      "focus": "1:7:7",
+      "frame": 2
+    },
+    "al-fatihah:7:w7:compose:5": {
+      "text": "Menurut Darwisy, di sini ada adab: nikmat disandarkan langsung kepada Alloh subhanahu wa ta'ala, tetapi murka disebut tanpa menyebut siapa yang murka.",
+      "display": "Menurut Darwisy, di sini ada adab: nikmat disandarkan langsung kepada Allah subhanahu wa ta'ala, tetapi murka disebut tanpa menyebut siapa yang murka.",
+      "highlight": [
+        7
+      ],
+      "focus": "1:7:7",
+      "frame": 2
+    },
     "al-fatihah:7:w8": {
-      "text": "Kata kedelapan artinya: dan bukan pula. Wawu adalah huruf 'athaf, dan huruf nafi di sini tambahan untuk menegaskan makna bukan yang sudah ada pada kata kelima.",
-      "display": "Kata kedelapan artinya: “dan bukan pula”. Wawu adalah huruf 'athaf, dan huruf nafi di sini tambahan untuk menegaskan makna “bukan” yang sudah ada pada kata kelima.",
+      "text": "Kata kedelapan artinya: dan bukan pula. Kata ini juga terdiri dari dua bagian.",
+      "display": "Kata kedelapan artinya: “dan bukan pula”. Kata ini juga terdiri dari dua bagian.",
       "highlight": [
         8
       ],
       "focus": "1:7:8"
     },
+    "al-fatihah:7:w8:compose:1": {
+      "text": "Bagian pertama adalah huruf وَاو, yang artinya dan, sama seperti di ayat kelima.",
+      "display": "Bagian pertama adalah huruf wawu (وَ), yang artinya “dan”, sama seperti di ayat kelima.",
+      "highlight": [
+        8
+      ],
+      "focus": "1:7:8",
+      "frame": 1
+    },
+    "al-fatihah:7:w8:compose:2": {
+      "text": "Bagian kedua adalah huruf yang artinya bukan.",
+      "display": "Bagian kedua adalah huruf yang artinya “bukan”.",
+      "highlight": [
+        8
+      ],
+      "focus": "1:7:8",
+      "frame": 1
+    },
+    "al-fatihah:7:w8:compose:3": {
+      "text": "Keduanya ditulis bersambung.",
+      "display": "Keduanya ditulis bersambung.",
+      "highlight": [
+        8
+      ],
+      "focus": "1:7:8",
+      "frame": 2
+    },
+    "al-fatihah:7:w8:compose:4": {
+      "text": "Keduanya termasuk huruf, jenis kata yang akhirnya selalu tetap.",
+      "display": "Keduanya termasuk huruf, jenis kata yang akhirnya selalu tetap.",
+      "highlight": [
+        8
+      ],
+      "focus": "1:7:8",
+      "frame": 2
+    },
+    "al-fatihah:7:w8:compose:5": {
+      "text": "Huruf yang artinya bukan ini berfungsi menegaskan: maknanya sudah ada pada kata kelima, dan di sini ia menguatkannya.",
+      "display": "Huruf yang artinya “bukan” ini berfungsi menegaskan: maknanya sudah ada pada kata kelima, dan di sini ia menguatkannya.",
+      "highlight": [
+        8
+      ],
+      "focus": "1:7:8",
+      "frame": 3
+    },
+    "al-fatihah:7:w8:compose:6": {
+      "text": "Menurut as-Samin, penegasan ini menjaga agar kata terakhir tidak dikira disambung kepada orang-orang yang diberi nikmat.",
+      "display": "Menurut as-Samin, penegasan ini menjaga agar kata terakhir tidak dikira disambung kepada orang-orang yang diberi nikmat.",
+      "highlight": [
+        8
+      ],
+      "focus": "1:7:8",
+      "frame": 3
+    },
     "al-fatihah:7:w9": {
-      "text": "Kata kesembilan artinya: orang-orang yang sesat. مَجْرُور dengan tanda ya' karena jamak mudzakkar salim yang di-'athaf-kan pada kata مَجْرُور sebelumnya.",
-      "display": "Kata kesembilan artinya: “orang-orang yang sesat”. Majrur (مَجْرُور) dengan tanda ya' karena jamak mudzakkar salim yang di-'athaf-kan pada kata majrur (مَجْرُور) sebelumnya.",
+      "text": "Kata kesembilan artinya: orang-orang yang sesat. Kata ini juga terdiri dari dua bagian.",
+      "display": "Kata kesembilan artinya: “orang-orang yang sesat”. Kata ini juga terdiri dari dua bagian.",
       "highlight": [
         9
       ],
       "focus": "1:7:9"
+    },
+    "al-fatihah:7:w9:compose:1": {
+      "text": "Alif lam bersambung dengan اِسْم yang artinya orang-orang yang sesat.",
+      "display": "Alif lam (ٱل) bersambung dengan isim (اِسْم) yang artinya “orang-orang yang sesat”.",
+      "highlight": [
+        9
+      ],
+      "focus": "1:7:9",
+      "frame": 1
+    },
+    "al-fatihah:7:w9:compose:2": {
+      "text": "Sama seperti pada kata yang artinya jalan di ayat keenam, alif dan huruf لَام tidak dibaca, dan huruf sesudahnya dibaca dobel.",
+      "display": "Sama seperti pada kata yang artinya “jalan” di ayat keenam, alif (ٱ) dan huruf lam (ل) tidak dibaca, dan huruf sesudahnya dibaca dobel.",
+      "highlight": [
+        9
+      ],
+      "focus": "1:7:9",
+      "frame": 1
+    },
+    "al-fatihah:7:w9:compose:3": {
+      "text": "Tanda dobel pada huruf لَام di tengahnya muncul karena dua huruf لَام dilebur menjadi satu.",
+      "display": "Tanda dobel pada huruf lam (لِّ) di tengahnya muncul karena dua huruf lam (لِّ) dilebur menjadi satu.",
+      "highlight": [
+        9
+      ],
+      "focus": "1:7:9",
+      "frame": 2
+    },
+    "al-fatihah:7:w9:compose:4": {
+      "text": "Kata ini jamak laki-laki beraturan; bentuk dasarnya memakai huruf وَاو, bunyi u panjang, sebelum huruf نُون.",
+      "display": "Kata ini jamak laki-laki beraturan; bentuk dasarnya memakai huruf wawu (و), bunyi u panjang, sebelum huruf nun (نَ).",
+      "highlight": [
+        9
+      ],
+      "focus": "1:7:9",
+      "frame": 2
+    },
+    "al-fatihah:7:w9:compose:5": {
+      "text": "Di sini وَاو itu diganti huruf يَاء, bunyi i panjang: inilah tanda مَجْرُور, sama seperti pada kata yang artinya seluruh alam di ayat kedua.",
+      "display": "Di sini wawu (و) itu diganti huruf ya’ (ي), bunyi i panjang: inilah tanda majrur (مَجْرُور), sama seperti pada kata yang artinya “seluruh alam” di ayat kedua.",
+      "highlight": [
+        9
+      ],
+      "focus": "1:7:9",
+      "frame": 2
+    },
+    "al-fatihah:7:w9:compose:6": {
+      "text": "Kata ini مَجْرُور karena disambungkan dengan huruf وَاو kepada kata keenam, dan kata yang disambungkan mengikuti akhiran kata itu.",
+      "display": "Kata ini majrur (مَجْرُور) karena disambungkan dengan huruf wawu (و) kepada kata keenam, dan kata yang disambungkan mengikuti akhiran kata itu.",
+      "highlight": [
+        9
+      ],
+      "focus": "1:7:9",
+      "frame": 3
+    },
+    "al-fatihah:7:w9:compose:7": {
+      "text": "Sebagian ulama menyambungkannya kepada kata kelima; hasilnya sama, مَجْرُور.",
+      "display": "Sebagian ulama menyambungkannya kepada kata kelima; hasilnya sama, majrur (مَجْرُور).",
+      "highlight": [
+        9
+      ],
+      "focus": "1:7:9",
+      "frame": 3
+    },
+    "al-fatihah:7:w9:compose:8": {
+      "text": "Ini kata terakhir surah, dan imam berhenti padanya: فَتْحَة, bunyi a, pada huruf نُون terakhir tidak terdengar, tetapi huruf يَاء sebelumnya terdengar.",
+      "display": "Ini kata terakhir surah, dan imam berhenti padanya: fathah (فَتْحَة), bunyi a, pada huruf nun (نَ) terakhir tidak terdengar, tetapi huruf ya’ (ي) sebelumnya terdengar.",
+      "highlight": [
+        9
+      ],
+      "focus": "1:7:9",
+      "frame": 4
     },
     "al-fatihah:7:concept:badal": {
       "text": "Konsep baru: Badal, pengganti yang menjelaskan. Badal adalah اِسْم yang mengulang atau menggantikan اِسْم sebelumnya untuk menjelaskannya, dan ia mengikuti seluruh إِعْرَاب اِسْم itu.",
@@ -3300,8 +4368,8 @@
       "focus": null
     },
     "al-fatihah:7:concept:bab-ifal": {
-      "text": "Konsep baru: Bab if'al, wazan af'ala. Wazan af'ala dibentuk dengan menambah hamzah di depan akar tiga huruf; kata ketiga, yang artinya Engkau telah memberi nikmat, memakai pola ini.",
-      "display": "Konsep baru: Bab if'al (wazan af'ala). Wazan af'ala dibentuk dengan menambah hamzah di depan akar tiga huruf; kata ketiga, yang artinya “Engkau telah memberi nikmat”, memakai pola ini.",
+      "text": "Konsep baru: Bab if'al, wazan af'ala. Wazan af'ala dibentuk dengan menambah هَمْزَة di depan akar tiga huruf; kata ketiga, yang artinya Engkau telah memberi nikmat, memakai pola ini.",
+      "display": "Konsep baru: Bab if'al (wazan af'ala). Wazan af'ala dibentuk dengan menambah hamzah (ء) di depan akar tiga huruf; kata ketiga, yang artinya “Engkau telah memberi nikmat”, memakai pola ini.",
       "highlight": [
         3
       ],

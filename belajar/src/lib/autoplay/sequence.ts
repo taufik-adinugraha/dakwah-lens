@@ -3,7 +3,14 @@
  * written per ayah), in the order a learner meets it:
  *
  *   intro → recite_ayah (imam, whole ayah; mushaf words follow the imam)
- *   → for every word: recite_word (imam, that word) + explain (w${n})
+ *   → primer (the harakat primer, when content/compose opens this ayah with
+ *     it: each mark on a dotted circle, its sound, an example from the ayah)
+ *   → for every word: recite_word (imam, that word) + explain (w${n}: the
+ *     gloss and the word's why — or, when the word has a composition, the
+ *     gloss and the composition's lead) + compose (w${n}:compose, only for a
+ *     word with a composition: one line per sentence of its frames, the
+ *     animation in the word card's slot, then the imam recites the word
+ *     again; operator 2026-10-10, narration rule 14)
  *   → concept (each concept FIRST introduced in this ayah) → structure
  *     (the lesson page's order, and the narration's: the structure line
  *     uses the terms the concept lines introduce)
@@ -19,6 +26,7 @@
  */
 import type { Ayah, Concept } from "@/content/schema";
 
+import type { ComposeInput } from "../composition";
 import { latinSentences, splitCaption, stripArabic } from "../lessonSteps";
 import { canonicalExercises, exerciseProgressId } from "./exercises";
 import { lineId, manifestParts, parseLineId, promptLineId, sharedLineId, type LinePart } from "./ids";
@@ -53,6 +61,9 @@ export type SequenceInput = {
   narration?: NarrationManifest | null;
   /** content/narration/shared.json, when it exists. */
   shared?: NarrationManifest | null;
+  /** This ayah's word compositions and harakat primer (content/compose/,
+   *  without their Arabic: lines and frames only), when it has any. */
+  compose?: ComposeInput | null;
 };
 
 /** Concepts whose FIRST example lies in `ayahLoc` ("1:2"). Same rule as
@@ -76,10 +87,19 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
   const words = ayah.words.length;
   const every = ayah.words.map((_, i) => i + 1);
   const placeOf = new Map(ayah.words.map((w, i) => [w.loc, i + 1]));
-  /** The word a "w${n}" line explains, else null. */
+  /** The word a "w${n}" (or "w${n}:compose:${k}") line explains, else null. */
   const explained = (part: string): number | null => {
-    const m = /^w([1-9][0-9]*)$/.exec(part);
+    const m = /^w([1-9][0-9]*)(?::compose:[1-9][0-9]*)?$/.exec(part);
     return m && Number(m[1]) <= words ? Number(m[1]) : null;
+  };
+  const composition = (wn: number) => input.compose?.words[ayah.words[wn - 1]?.loc ?? ""] ?? null;
+  /** The animation frame a primer / compose line plays over (the content's
+   *  own line plan; the manifest's `frame` says the same, validated). */
+  const frameOf = (part: string): number | null => {
+    const c = /^w([1-9][0-9]*):compose:([1-9][0-9]*)$/.exec(part);
+    if (c) return composition(Number(c[1]))?.lines[Number(c[2]) - 1]?.frame ?? null;
+    const p = /^primer:([1-9][0-9]*)$/.exec(part);
+    return p ? (input.compose?.primer?.lines[Number(p[1]) - 1]?.frame ?? null) : null;
   };
   /** What a line highlights when its manifest does not say (operator,
    *  2026-10-10): the whole ayah for the intro, the recitation, the
@@ -127,12 +147,14 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
             : [...new Set(h)].filter((w) => w >= 1 && w <= words).sort((a, b) => a - b);
       focus = marks.focus === undefined ? explained(part) : marks.focus === null ? null : (placeOf.get(marks.focus) ?? null);
     }
+    const frame = part === null ? null : (marks.frame ?? frameOf(part));
     return {
       line,
       caption: text,
       display: display !== null ? text : null,
       highlight,
       focus,
+      frame,
       parts: splitCaption(text),
       guides,
       audio: lineSegments(m, line),
@@ -170,6 +192,19 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
     }),
   );
 
+  const primer = input.compose?.primer;
+  if (primer && primer.lines.length) {
+    steps.push(
+      step({
+        id: "primer",
+        kind: "primer",
+        cues: primer.lines.map((l, k) => cue(p(`primer:${k + 1}`), l.say)),
+        guides: [],
+        frames: primer.frames,
+      }),
+    );
+  }
+
   ayah.words.forEach((w, i) => {
     const wn = i + 1;
     const wordGuide: Guide = { target: `mushaf-word:${wn}`, label: texts.guide.mushafWord(wn) };
@@ -186,17 +221,37 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
         recite: { target: "word", word: wn },
       }),
     );
-    const why = latinSentences(w.why);
+    const comp = composition(wn);
+    // A word with a composition: its line is the gloss and the lead; the
+    // frames say the why part by part.
+    const why = comp ? (comp.lead ?? "") : latinSentences(w.why);
+    const card: Guide = { target: "word-card", label: texts.guide.wordCard };
     steps.push(
       step({
         id: `w${wn}`,
         kind: "explain",
-        cues: [cue(p(`w${wn}`), `${texts.meaning(a)} ${why}`, [{ target: "word-card", label: texts.guide.wordCard }])],
-        guides: [{ target: "word-card", label: texts.guide.wordCard }, wordGuide],
+        cues: [cue(p(`w${wn}`), `${texts.meaning(a)} ${why}`.trim(), [card])],
+        guides: [card, wordGuide],
         word: wn,
         loc: w.loc,
       }),
     );
+    if (comp && comp.lines.length) {
+      steps.push(
+        step({
+          id: `w${wn}:compose`,
+          kind: "compose",
+          cues: comp.lines.map((l, k) => cue(p(`w${wn}:compose:${k + 1}`), l.say, [card])),
+          // While the imam recites the joined word (after the frames).
+          caption: clean(stripArabic(texts.wordIntro(a))),
+          guides: [card, wordGuide],
+          word: wn,
+          loc: w.loc,
+          recite: { target: "word", word: wn },
+          frames: comp.frames,
+        }),
+      );
+    }
   });
 
   for (const c of input.introduced) {

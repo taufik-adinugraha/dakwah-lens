@@ -21,6 +21,7 @@ import render_narration as R
 import validate_narration as V
 
 MANIFESTS, LESSONS, LIBRARY = V.load_all()
+COMPOSE = V.load_compose()
 LEXDATA = json.loads(V.PRONUNCIATION_JSON.read_text(encoding="utf-8"))
 LEX = V.Lexicon(LEXDATA)
 FORMS = V.Forms(LESSONS)
@@ -28,8 +29,8 @@ SHA = "a" * 64
 VOICE = {"id": "v123", "name": "Suara Uji", "model": "eleven_v3"}
 
 
-def run_check(m, ls, lx):
-    return V.check(m, ls, LIBRARY, lex=V.Lexicon(lx))
+def run_check(m, ls, lx, cp=None):
+    return V.check(m, ls, LIBRARY, lex=V.Lexicon(lx), compose=COMPOSE if cp is None else cp)
 
 
 def name_of(lid):
@@ -127,14 +128,14 @@ def gloss_changed(_m, lessons, *_):
 
 
 def lex_term(term, **changes):
-    def f(_m, _l, lx):
+    def f(_m, _l, lx, *_):
         t = next(x for x in lx["terms"] if x["term"] == term)
         t.update(changes)
     return f
 
 
 def lex_add(**entry):
-    def f(_m, _l, lx):
+    def f(_m, _l, lx, *_):
         lx["terms"].append(entry)
     return f
 
@@ -155,8 +156,34 @@ def concept_line():
 
 LAHU_L = V.first_letter(FORMS.word_ar["112:4:3"])  # لَّ of lahu (112:4:3), with the shadda of the ayah
 W = "al-fatihah:2:w1"
-W11 = "al-fatihah:1:w1"
-AUD = "al-ikhlas:4:w3"  # audio faults go on a manifest that has no voice yet
+# Al-Fatihah 1's word lines are now the gloss + the composition's lead; the terms and the letter
+# they used to carry are said in the composition lines (narration rule 14, 2026-10-10).
+W11 = "al-fatihah:1:w1:compose:4"   # "… dhommah menjadi كَسْرَة …"
+WBA = "al-fatihah:1:w1:compose:1"   # "… huruf بَاء, yang artinya dengan."
+C1 = "al-fatihah:1:w1:compose:3"
+LAM3 = "al-fatihah:1:w3:compose:3"  # "huruf lam (ل)": the bare lam of the frame's ٱلرَّحْمَٰن
+
+
+def compose_say(loc, k, text):
+    """A composition's k-th `say` changed in the content (the narration then lags behind it)."""
+    def f(_m, _l, _x, cp):
+        cp["al-fatihah"]["words"][loc]["lines"][k - 1]["say"] = text
+    return f
+
+
+def drop_frame(lid):
+    def f(m, *_):
+        line(m, lid).pop("frame")
+    return f
+
+
+def split_compose(m, *_):
+    lines = m["al-fatihah"]["lines"]
+    old = lines.pop(C1)
+    lines[C1 + ":a"] = dict(old)
+    lines[C1 + ":b"] = dict(old)
+# Audio faults go on a manifest that has no voice yet, on a line that is renderable (no Latin term).
+AUD = next(lid for lid, ln in MANIFESTS["al-ikhlas"]["lines"].items() if ":w" in lid and not V.held(ln["text"], LEX))
 NA_EX = non_applicable_exercise()
 
 
@@ -167,6 +194,24 @@ def heavy_line():
 
 
 HEAVY = heavy_line()
+
+
+def latin_line():
+    """A line without audio that says an Arabic term in Latin (mubtada', fa'il…) and no heavy letter."""
+    return next(lid for man in MANIFESTS.values() for lid, ln in man["lines"].items()
+                if "audio" not in ln and V.latin_terms(ln["text"], LEX) and not V.heavy_latin(ln["text"], LEX))
+
+
+LATIN = latin_line()
+W79 = "al-fatihah:7:w9:compose:3"   # the doubled lam of ٱلضَّآلِّينَ, pinned by its frame (`letters`)
+LAM79 = V.COMPOSE.pieces(FORMS.word_ar["1:7:9"])[-3]  # that lam with its shadda and kasrah, from the bytes
+LAM79_BARE = V.COMPOSE.pieces(FORMS.word_ar["1:7:9"])[1]  # the article's bare lam of the same word
+
+
+def lex_drop(term, field):
+    def f(_m, _l, lx, *_):
+        next(x for x in lx["terms"] if x["term"] == term).pop(field)
+    return f
 
 
 def swap_first_tokens(ln):
@@ -236,7 +281,7 @@ MUTATIONS = [
     ("Arabic that is not a dictionary term", append_text(W, " Ini مُبْتَدَأ."),
      "not a pronunciation-dictionary term"),
     ("Qur'anic word in Arabic script", append_text(W, " Lalu بِسْمِ."), "Qur'anic word 'بِسْمِ' (Arabic script)"),
-    ("heavy-letter term spoken from Arabic", replace_in("al-fatihah:1:w2", "text", "mudhof ilaih", "مُضَاف إِلَيْه"),
+    ("heavy-letter term spoken from Arabic", replace_in("al-fatihah:1:w2:compose:2", "text", "mudhof ilaih", "مُضَاف إِلَيْه"),
      "not a pronunciation-dictionary term"),
     ("grammar term left in Latin", replace_in(W11, "text", "كَسْرَة", "kasrah"),
      "'kasrah' must be spoken from the pronunciation dictionary"),
@@ -250,11 +295,11 @@ MUTATIONS = [
      "speak must be the term itself"),
     ("caption differs from the speech", replace_in(W11, "display", "kasrah (كَسْرَة)", "fathah (فَتْحَة)"),
      "display does not say what is spoken"),
-    ("caption names the letter", replace_in(W11, "display", "ba’ (بِ)", "ba’ (بَاء)"),
+    ("caption names the letter", replace_in(WBA, "display", "ba’ (بِ)", "ba’ (بَاء)"),
      "caption shows the letter ba’ by its name"),
     ("caption letter not as in the ayah", replace_in("al-ikhlas:4:w3", "display", f"lam ({LAHU_L})", "lam (لِ)"),
      f"the letter as in the ayah is {LAHU_L}"),
-    ("quotes left in the spoken text", replace_in(W11, "text", "dengan nama.", "“dengan nama”."),
+    ("quotes left in the spoken text", replace_in(WBA, "text", "artinya dengan.", "artinya “dengan”."),
      "character not allowed in spoken text"),
     ("tokens that do not join to the caption", with_audio(AUD, tweak=bad_token_text), "tokens do not join"),
     ("tokens out of time order", with_audio(AUD, tweak=swap_first_tokens), "starts before the token before it"),
@@ -280,6 +325,52 @@ MUTATIONS = [
     ("highlight past the ayah's words", set_field("al-fatihah:2:intro", "highlight", [9]), "must be [0] (the whole ayah)"),
     ("focus outside the ayah", set_field("al-fatihah:2:w2", "focus", "1:3:1"), "is not a word of this ayah"),
     ("shared line with a highlight", set_field("shared:correct", "highlight", [0]), "not what the stage shows"),
+    # --- word composition and the harakat primer (narration rule 14, 2026-10-10)
+    ("compose line missing", drop(C1), f"missing line {C1}"),
+    ("compose line past the frames' says", add("al-fatihah:1:w2:compose:3", "Lagi."),
+     "unexpected line al-fatihah:1:w2:compose:3"),
+    ("primer line missing", drop("al-fatihah:1:primer:2"), "missing line al-fatihah:1:primer:2"),
+    ("primer on an ayah the primer does not open", add("al-fatihah:2:primer:1", "Harakat."),
+     "unexpected line al-fatihah:2:primer:1"),
+    ("compose line without its frame", drop_frame(C1), "is not the animation frame this line plays over"),
+    ("compose line on the wrong frame", set_field(C1, "frame", 1), "is not the animation frame this line plays over"),
+    ("a frame on a line without animation", set_field("al-fatihah:1:w1", "frame", 1), "only primer / compose lines have one"),
+    ("compose line on another word's card", set_field(C1, "focus", "1:1:2"), "not what the stage shows"),
+    ("compose caption too long beside the animation", set_display(C1, "Kata pertama. " * 14),
+     "beside the animation"),
+    ("a syllable the tiles show, spoken", append_text(WBA, " Dibaca bi."), "a syllable the tiles show in transliteration"),
+    ("a compose line split", split_compose, "is never split"),
+    ("letter not as the frame writes it", replace_in(LAM3, "display", "lam (ل)", "lam (لِ)"),
+     "the letter as in the ayah is ل"),
+    ("composition changed, narration stale",
+     compose_say("1:1:1", 1, "Bagian pertama adalah huruf jar yang artinya “dengan”."), "out of date"),
+    ("Qur'anic word in a composition's say",
+     compose_say("1:1:1", 1, "Bagian pertama adalah bi- dan ismi."), "names the Qur'anic word(s)"),
+    # --- Arabic terms said in Latin (rule 1) and the dictionary's approvals (review 2026-10-10)
+    ("a compose line with a Latin grammar term (mubtada')", append_text(C1, " Kata ini mubtada'."),
+     "says \"mubtada'\" in Latin"),
+    ("a compose line with Latin sukun", append_text(C1, " Huruf itu dengan sukun di atasnya."), "says 'sukun' in Latin"),
+    ("a compose line with a letter name the dictionary lacks", append_text(WBA, " Lalu huruf jim."), "says 'jim' in Latin"),
+    ("a composed word's lead with a Latin term", append_text("al-fatihah:1:w1", " Ia mabni."), "says 'mabni' in Latin"),
+    ("a primer line with a heavy letter + a (mushaf)", append_text("al-fatihah:1:primer:1", " Lihat mushaf."),
+     "a heavy letter + a with no approved respelling (rule 9), in a line written to be rendered"),
+    ("a rendered line with a Latin grammar term", with_audio(LATIN), "in Latin, an Arabic term"),
+    ("a letter name spoken in Latin where the dictionary has it", replace_in(C1, "text", "مِيم", "mim"),
+     "'mim' must be spoken from the pronunciation dictionary"),
+    ("dictionary: a term without its approval", lex_drop("نَعْت", "approved"), "needs `approved`"),
+    ("dictionary: an approval that is not a date", lex_term("نَعْت", approved="soon"), "approved must be a date"),
+    ("a syllable of another word's tiles in the same ayah (hum)",
+     append_text("al-fatihah:7:w7:compose:2", " Bunyi asalnya hum."), "a syllable the tiles show"),
+    ("a letter's name read as a sound", append_text("al-fatihah:1:primer:3", " Huruf بَاء dibaca بَاء."),
+     "reads a letter's name as a sound"),
+    ("Indonesian spelling, long vowel doubled (maaliki)", append_text(W, " Seperti maaliki."),
+     "Qur'anic word 'maaliki' (another spelling"),
+    ("Indonesian spelling, ‘ain as k (nakbudu)", append_text(W, " Fi'il ini, nakbudu."),
+     "Qur'anic word 'nakbudu' (another spelling"),
+    ("Indonesian spelling, ‘ain as ng (nastangin)", append_text(W, " Lalu nastangin."),
+     "Qur'anic word 'nastangin' (another spelling"),
+    ("the doubled lam not as the frame pins it", replace_in(W79, "display", f"lam ({LAM79})", f"lam ({LAM79_BARE})"),
+     f"the letter as in the ayah is {LAM79}"),
 ]
 
 
@@ -290,12 +381,31 @@ class NarrationValidation(unittest.TestCase):
     def test_build_is_deterministic(self):
         self.assertEqual(B.build_lines(LESSONS, LIBRARY, LEX), B.build_lines(LESSONS, LIBRARY, LEX))
 
+    def test_compose_lines_follow_the_frames(self):
+        lines = B.build_lines(LESSONS, LIBRARY, LEX, COMPOSE)["al-fatihah"]
+        ids = [lid for lid in lines if lid.startswith("al-fatihah:1:")]
+        # recite → the primer → each word: its gloss line, then its frames' lines (rule 14)
+        self.assertEqual(ids[1:3], ["al-fatihah:1:recite", "al-fatihah:1:primer:1"])
+        w1 = ids.index("al-fatihah:1:w1")
+        self.assertEqual(ids[w1 + 1], "al-fatihah:1:w1:compose:1")
+        comp = COMPOSE["al-fatihah"]["words"]["1:1:1"]
+        for k, ln in enumerate(comp["lines"], 1):
+            self.assertEqual(lines[f"al-fatihah:1:w1:compose:{k}"]["frame"], ln["frame"])
+        self.assertNotIn("frame", lines["al-fatihah:1:w1"])
+        # The word line is the gloss and the lead; the why is said part by part in the frames.
+        self.assertEqual(lines["al-fatihah:1:w1"]["display"], "Kata pertama artinya: “dengan nama”. Kata ini terdiri dari dua bagian.")
+        # The narrator never says the tiles' syllables; the vowel sounds it may say.
+        for lid, ln in lines.items():
+            if ":compose:" in lid or ":primer:" in lid:
+                self.assertNotRegex(ln["text"], r"\b(?:bi|ismu|ismi|bismi|ar-rahmanu|ar-rahmani)\b", lid)
+        self.assertIn("bunyi a", lines["al-fatihah:1:primer:3"]["text"])
+
     def test_mutations_fail(self):
         for name, mutate, expect in MUTATIONS:
             with self.subTest(name):
-                m, ls, lx = copy.deepcopy(MANIFESTS), copy.deepcopy(LESSONS), copy.deepcopy(LEXDATA)
-                mutate(m, ls, lx)
-                errs = run_check(m, ls, lx)
+                m, ls, lx, cp = copy.deepcopy(MANIFESTS), copy.deepcopy(LESSONS), copy.deepcopy(LEXDATA), copy.deepcopy(COMPOSE)
+                mutate(m, ls, lx, cp)
+                errs = run_check(m, ls, lx, cp)
                 self.assertTrue(any(expect in e for e in errs), f"{name}: expected {expect!r} in {errs[:5]}")
 
     def test_good_audio_passes(self):
@@ -391,6 +501,25 @@ class Dictionary(unittest.TestCase):
         rows = [("x", "x:1:w1", "Kata pertama adalah khabar."), ("x", "x:1:w2", "Akhirnya dibaca كَسْرَة.")]
         self.assertEqual(R.blocked(rows, LEX), [("x:1:w1", ["khabar"])])
 
+    def test_latin_terms_and_pending(self):
+        # Arabic terms said in Latin are held back (render refuses them); the honorifics, Indonesian
+        # words of Arabic origin and the pesantren verbs are not terms; "ya" is the letter only as ya'.
+        text = "Kata ini mubtada' dan khabarnya; huruf ya' itu, ya, harakat dan lafaz Alloh subhanahu wa ta'ala dijarkan."
+        self.assertEqual(V.latin_terms(text, LEX), ["mubtada'", "khabarnya", "ya'"])
+        rows = [("x", "x:1:w1", "Kata pertama adalah mubtada'."), ("x", "x:1:w2", "Akhirnya dibaca كَسْرَة.")]
+        self.assertEqual(R.blocked(rows, LEX), [("x:1:w1", ["mubtada'"])])
+        # a pending term (operator waived the pre-render review) renders and is reported
+        mim = LEX.by_term["مِيم"]
+        self.assertTrue(mim.pending)
+        self.assertFalse(LEX.by_term["كَسْرَة"].pending)
+        self.assertEqual(V.check_spoken("t", "Di atas huruf مِيم.", FORMS, LEX), [])
+        self.assertIn("مِيم", V.pending_terms(MANIFESTS, LEX))
+        # alif is said as written (its Arabic name is refused, rule 3) and shown as on screen
+        sp = B.Speech(LEX)
+        marked = sp.mark("Alif lam dan alif.")
+        self.assertEqual(sp.spoken(marked), "Alif lam dan alif.")
+        self.assertEqual(sp.shown(marked, None), "Alif lam (ال) dan alif (ا).")
+
     def test_retext_keeps_timing(self):
         line = {"text": "Akhirnya dibaca كَسْرَة.", "focus": None}
         old = [{"t": "a", "s": 0.0, "e": 0.4}, {"t": "b", "s": 0.5, "e": 0.9}, {"t": "c", "s": 1.0, "e": 1.5}]
@@ -407,6 +536,16 @@ class WordPlaces(unittest.TestCase):
 
     def test_line_view(self):
         a = LESSONS["al-fatihah"]["ayat"][0]
+        cp = COMPOSE["al-fatihah"]
+        self.assertEqual(V.line_view(a, "w1:compose:3", cp), ([1], "1:1:1"))
+        self.assertEqual(V.line_frame(a, "w1:compose:3", cp), cp["words"]["1:1:1"]["lines"][2]["frame"])
+        self.assertIsNone(V.line_frame(a, "w1", cp))
+        # The primer marks the words whose letters its frame shows as they are (بِ of word 1).
+        self.assertEqual(V.line_view(a, "primer:4", cp), ([1], None))
+        self.assertEqual(V.line_view(a, "primer:3", cp), ([], None))  # بَ: an edit, not the ayah's letter
+        # A letter term takes the frame's shape: the bare lam of ٱلرَّحْمَٰن (join frame).
+        src = V.line_letters(a, "w3:compose:3", "1:1:3", FORMS, cp)
+        self.assertEqual(LEX.shown_letter(LEX.by_term["لَام"], src), "ل")
         self.assertEqual(V.line_view(a, "intro"), ([0], None))
         self.assertEqual(V.line_view(a, "w3"), ([3], "1:1:3"))
         # A concept: the words tagged with it and the words of its structure groups (bismi +
@@ -505,9 +644,9 @@ def main() -> int:
     print(f"{'unmutated copies':{width}s}  {'PASS' if not base else 'FAIL'}" + (f"  {base[:3]}" if base else ""))
     failed += bool(base)
     for name, mutate, expect in MUTATIONS:
-        m, ls, lx = copy.deepcopy(MANIFESTS), copy.deepcopy(LESSONS), copy.deepcopy(LEXDATA)
-        mutate(m, ls, lx)
-        errs = run_check(m, ls, lx)
+        m, ls, lx, cp = copy.deepcopy(MANIFESTS), copy.deepcopy(LESSONS), copy.deepcopy(LEXDATA), copy.deepcopy(COMPOSE)
+        mutate(m, ls, lx, cp)
+        errs = run_check(m, ls, lx, cp)
         hit = next((e for e in errs if expect in e), None)
         failed += hit is None
         print(f"{name:{width}s}  {'caught' if hit else 'MISSED'}  {hit or errs[:2]}")
