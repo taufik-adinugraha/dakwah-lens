@@ -323,6 +323,21 @@ body {
   }
 }
 
+/* A harakah mark shown on its own (the Harakat page, a word's changing ending): a dotted circle
+   drawn here, because the served Amiri subset has no U+25CC (◌) and a fallback font's circle
+   would not carry the mark. The mark sits on a tatweel, as Arabic primers write ـَ ـِ ـُ. */
+@utility mark-circle {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border: 2px dotted var(--color-forest-teal);
+  border-radius: 9999px;
+  background-color: #ffffff;
+}
+
 /* Background of the hub, the Qur'an track and its lesson pages: exactly the
    glow of web/src/app/[locale]/login/page.tsx, drawn by <ForestGlow />. The
    module has no dark palette; a browser that asks for dark gets the glow

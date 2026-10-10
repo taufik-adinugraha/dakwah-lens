@@ -200,7 +200,22 @@
     "related": "Konsep terkait",
     "index_title": "Konsep tata bahasa (nahwu & sharaf)",
     "index_intro": "Setiap konsep dijelaskan sekali di sini, lalu dipakai ulang di setiap ayat dan surah yang memuatnya.",
-    "example_loc": "{surah} · ayat {ayah}, kata ke-{word}"
+    "example_loc": "{surah} · ayat {ayah}, kata ke-{word}",
+    "dasar": "Dasar membaca",
+    "start_here": "Mulai di sini",
+    "meaning": "yang artinya",
+    "parts_heading": "Kata dari bagian-bagiannya",
+    "parts_change_end": "Akhir {part} berubah",
+    "parts_change_first": "Huruf pertama {part} berubah",
+    "parts_change_only": "{part} berubah",
+    "parts_change_nth": "Huruf ke-{n} {part} berubah",
+    "parts_more": "Lihat {n} kata lainnya",
+    "parts_not_written": "tidak ditulis",
+    "more_examples": "Lihat {n} contoh lainnya",
+    "signs_heading": "Tanda-tanda harakat",
+    "sign_sound": "Bunyi",
+    "sign_example": "Contoh",
+    "sign_from": "dari"
   },
   "Lexeme": {
     "eyebrow": "Kosakata",

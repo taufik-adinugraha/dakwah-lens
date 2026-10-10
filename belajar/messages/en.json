@@ -200,7 +200,22 @@
     "related": "Related concepts",
     "index_title": "Grammar concepts (nahwu & sharaf)",
     "index_intro": "Each concept is explained once here, then reused in every ayah and surah where it appears.",
-    "example_loc": "{surah} · ayah {ayah}, word {word}"
+    "example_loc": "{surah} · ayah {ayah}, word {word}",
+    "dasar": "Reading basics",
+    "start_here": "Start here",
+    "meaning": "meaning",
+    "parts_heading": "A word from its parts",
+    "parts_change_end": "The end of {part} changes",
+    "parts_change_first": "The first letter of {part} changes",
+    "parts_change_only": "{part} changes",
+    "parts_change_nth": "Letter {n} of {part} changes",
+    "parts_more": "Show {n} more words",
+    "parts_not_written": "not written",
+    "more_examples": "Show {n} more examples",
+    "signs_heading": "The harakat signs",
+    "sign_sound": "Sound",
+    "sign_example": "Example",
+    "sign_from": "from"
   },
   "Lexeme": {
     "eyebrow": "Vocabulary",

@@ -2627,8 +2627,8 @@
       "focus": null
     },
     "al-fatihah:2:concept:syibhul-jumlah": {
-      "text": "Konsep baru: Syibhul jumlah, frasa jar-majrur sebagai khabar. Frasa حَرْف جَرّ dan اِسْم bisa mengisi posisi khabar; ulama menyebutnya syibhul jumlah, yang menyerupai kalimat.",
-      "display": "Konsep baru: Syibhul jumlah (frasa jar-majrur sebagai khabar). Frasa huruf jar (حَرْف جَرّ) + isim (اِسْم) bisa mengisi posisi khabar; ulama menyebutnya syibhul jumlah, “yang menyerupai kalimat”.",
+      "text": "Konsep baru: Syibhul jumlah, frasa jar-majrur sebagai khabar. Frasa حَرْف جَرّ dan اِسْم bisa mengisi posisi khabar; ulama menyebutnya syibhul jumlah, yang artinya yang menyerupai kalimat.",
+      "display": "Konsep baru: Syibhul jumlah (frasa jar-majrur sebagai khabar). Frasa huruf jar (حَرْف جَرّ) + isim (اِسْم) bisa mengisi posisi khabar; ulama menyebutnya syibhul jumlah, yang artinya “yang menyerupai kalimat”.",
       "highlight": [
         2
       ],
@@ -2832,8 +2832,8 @@
       "focus": "1:4:3"
     },
     "al-fatihah:4:concept:isim-fail": {
-      "text": "Konsep baru: Isim fa'il, yaitu kata pelaku. Isim fa'il adalah اِسْم turunan dari mashdar, kata benda perbuatan, yang menyebut pelakunya, seperti kata pertama Pemilik.",
-      "display": "Konsep baru: Isim fa'il, yaitu kata pelaku. Isim fa'il adalah isim (اِسْم) turunan dari mashdar (kata benda perbuatan) yang menyebut pelakunya, seperti kata pertama “Pemilik”.",
+      "text": "Konsep baru: Isim fa'il, yaitu kata pelaku. Isim fa'il adalah اِسْم turunan dari mashdar, kata benda perbuatan, yang menyebut pelakunya, seperti kata pertama yang artinya Pemilik.",
+      "display": "Konsep baru: Isim fa'il, yaitu kata pelaku. Isim fa'il adalah isim (اِسْم) turunan dari mashdar (kata benda perbuatan) yang menyebut pelakunya, seperti kata pertama yang artinya “Pemilik”.",
       "highlight": [
         1
       ],
@@ -2999,8 +2999,8 @@
       "focus": null
     },
     "al-fatihah:5:concept:bab-istifal": {
-      "text": "Konsep baru: Bab istif'al, wazan istaf'ala: meminta. Wazan istaf'ala dibentuk dengan menambah hamzah, sin, dan ta' di depan akar; makna yang paling dikenal adalah meminta, seperti kata keempat kami memohon pertolongan.",
-      "display": "Konsep baru: Bab istif'al (wazan istaf'ala: meminta). Wazan istaf'ala dibentuk dengan menambah hamzah, sin, dan ta' di depan akar; makna yang paling dikenal adalah meminta, seperti kata keempat “kami memohon pertolongan”.",
+      "text": "Konsep baru: Bab istif'al, wazan istaf'ala: meminta. Wazan istaf'ala dibentuk dengan menambah hamzah, sin, dan ta' di depan akar; makna yang paling dikenal adalah meminta, seperti kata keempat yang artinya kami memohon pertolongan.",
+      "display": "Konsep baru: Bab istif'al (wazan istaf'ala: meminta). Wazan istaf'ala dibentuk dengan menambah hamzah, sin, dan ta' di depan akar; makna yang paling dikenal adalah meminta, seperti kata keempat yang artinya “kami memohon pertolongan”.",
       "highlight": [
         4
       ],
@@ -3117,8 +3117,8 @@
       "focus": null
     },
     "al-fatihah:6:concept:maful-bih": {
-      "text": "Konsep baru: Maf'ul bih, objek. Maf'ul bih adalah اِسْم yang dikenai perbuatan; ia manshub, dan kata kerja hada yang artinya menunjuki, dalam kata pertama mengambil dua objek sekaligus.",
-      "display": "Konsep baru: Maf'ul bih (objek). Maf'ul bih adalah isim (اِسْم) yang dikenai perbuatan; ia manshub, dan kata kerja hada yang artinya “menunjuki”, dalam kata pertama mengambil dua objek sekaligus.",
+      "text": "Konsep baru: Maf'ul bih, objek. Maf'ul bih adalah اِسْم yang dikenai perbuatan; ia manshub, dan kata kerja hada, yang artinya menunjuki, dalam kata pertama mengambil dua objek sekaligus.",
+      "display": "Konsep baru: Maf'ul bih (objek). Maf'ul bih adalah isim (اِسْم) yang dikenai perbuatan; ia manshub, dan kata kerja hada, yang artinya “menunjuki”, dalam kata pertama mengambil dua objek sekaligus.",
       "highlight": [
         1,
         2
@@ -3292,8 +3292,8 @@
       "focus": null
     },
     "al-fatihah:7:concept:fiil-madhi": {
-      "text": "Konsep baru: Fi'il madhi, kata kerja lampau. Fi'il madhi menunjuk perbuatan yang sudah terjadi; ia mabni, pada asalnya di atas فَتْحَة seperti kata yang artinya Dia ciptakan, dan huruf akhirnya sukun bila bersambung dengan kata ganti pelaku seperti akhiran Engkau.",
-      "display": "Konsep baru: Fi'il madhi (kata kerja lampau). Fi'il madhi menunjuk perbuatan yang sudah terjadi; ia mabni, pada asalnya di atas fathah (فَتْحَة) seperti kata yang artinya “Dia ciptakan”, dan huruf akhirnya sukun bila bersambung dengan kata ganti pelaku seperti akhiran “Engkau”.",
+      "text": "Konsep baru: Fi'il madhi, kata kerja lampau. Fi'il madhi menunjuk perbuatan yang sudah terjadi; ia mabni, pada asalnya di atas فَتْحَة seperti kata yang artinya Dia ciptakan, dan huruf akhirnya sukun bila bersambung dengan kata ganti pelaku seperti akhiran yang artinya Engkau.",
+      "display": "Konsep baru: Fi'il madhi (kata kerja lampau). Fi'il madhi menunjuk perbuatan yang sudah terjadi; ia mabni, pada asalnya di atas fathah (فَتْحَة) seperti kata yang artinya “Dia ciptakan”, dan huruf akhirnya sukun bila bersambung dengan kata ganti pelaku seperti akhiran yang artinya “Engkau”.",
       "highlight": [
         3
       ],
@@ -3308,8 +3308,8 @@
       "focus": null
     },
     "al-fatihah:7:concept:isim-maful": {
-      "text": "Konsep baru: Isim maf'ul, yaitu kata bagi yang dikenai perbuatan. Isim maf'ul adalah اِسْم turunan dari mashdar, kata benda perbuatan, yang menyebut pihak yang dikenai perbuatan, seperti kata keenam yang dimurkai.",
-      "display": "Konsep baru: Isim maf'ul, yaitu kata bagi yang dikenai perbuatan. Isim maf'ul adalah isim (اِسْم) turunan dari mashdar (kata benda perbuatan) yang menyebut pihak yang dikenai perbuatan, seperti kata keenam “yang dimurkai”.",
+      "text": "Konsep baru: Isim maf'ul, yaitu kata bagi yang dikenai perbuatan. Isim maf'ul adalah اِسْم turunan dari mashdar, kata benda perbuatan, yang menyebut pihak yang dikenai perbuatan, seperti kata keenam yang artinya yang dimurkai.",
+      "display": "Konsep baru: Isim maf'ul, yaitu kata bagi yang dikenai perbuatan. Isim maf'ul adalah isim (اِسْم) turunan dari mashdar (kata benda perbuatan) yang menyebut pihak yang dikenai perbuatan, seperti kata keenam yang artinya “yang dimurkai”.",
       "highlight": [
         6
       ],
