@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-import { DraftChip } from "@/components/lesson/DraftChip";
 import { MixedText } from "@/components/library/MixedText";
 import { SharafPanel } from "@/components/library/SharafPanel";
 import { SourcesDisclosure } from "@/components/library/SourceList";
@@ -137,11 +136,6 @@ export default async function LexemePage({ params }: PageProps<"/[locale]/kosaka
       )}
 
       <SourcesDisclosure sources={lex.sources} label={tw("sources")} className="mt-8" />
-      {lex.status === "draft" ? (
-        <p>
-          <DraftChip label={tw("draft")} />
-        </p>
-      ) : null}
     </div>
   );
 }

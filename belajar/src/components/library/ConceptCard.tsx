@@ -6,7 +6,6 @@ import { Link } from "@/i18n/navigation";
 import { parseLoc } from "@/lib/library";
 import { ayahHref, conceptHref } from "@/lib/routes";
 
-import { DraftChip } from "../lesson/DraftChip";
 import { MixedText } from "./MixedText";
 import { SourcesDisclosure } from "./SourceList";
 
@@ -112,11 +111,6 @@ export function ConceptCard({
         ) : (
           <SourcesDisclosure sources={concept.sources} label={labels.sources} className="mt-2" />
         )}
-        {concept.status === "draft" ? (
-          <p>
-            <DraftChip label={labels.draft} />
-          </p>
-        ) : null}
       </div>
     </article>
   );

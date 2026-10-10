@@ -4,11 +4,10 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { Breadcrumb } from "@/components/Breadcrumb";
-import { DraftChip } from "@/components/lesson/DraftChip";
 import { AyahProgressMark } from "@/components/surah/AyahProgressMark";
 import { FactCard } from "@/components/surah/FactCard";
 import { Link } from "@/i18n/navigation";
-import { getSurah, hasDrafts, SURAHS } from "@/lib/content";
+import { getSurah, SURAHS } from "@/lib/content";
 import { ayahHref, hubHref, quranHref } from "@/lib/routes";
 
 export const dynamicParams = false;
@@ -54,12 +53,6 @@ export default async function SurahPage({ params }: PageProps<"/[locale]/quran/[
           {s.name_ar}
         </p>
       </header>
-
-      {hasDrafts(s) && (
-        <p className="mt-6 rounded-2xl border border-notice bg-notice-bg p-4 text-pretty text-base text-ink">
-          {t("draft_banner")}
-        </p>
-      )}
 
       <ol className="mt-8 space-y-4">
         {s.ayat.map((a) => (
@@ -121,11 +114,6 @@ export default async function SurahPage({ params }: PageProps<"/[locale]/quran/[
         </section>
       )}
 
-      {hasDrafts(s) ? (
-        <p className="mt-10">
-          <DraftChip label={t("draft_chip")} />
-        </p>
-      ) : null}
     </div>
   );
 }
