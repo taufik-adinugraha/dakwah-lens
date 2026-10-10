@@ -50,10 +50,11 @@ A short narrated clip explains it with matching visuals. They then practise:
 | L6 | Recitation | **Real imam voice only.** Never TTS or voice-conversion for Qur'anic text. |
 | L8 | Audience of the narration | **Adults (default).** No parent–child mode for now (operator, 2026-10-09). |
 | L7 | Default reciter | **Mishary Rashid Alafasy** (EveryAyah `Alafasy_128kbps`, the exact files quran-align's timings were made from). Husary Mu'allim remains a selectable second voice for its built-in repeat gaps. |
-| L9 | Information architecture | **`/belajar` is a hub of learning tracks**; Arabic + light tafsir is the first track, under `/belajar/{locale}/quran/{surah}/{ayah}` (old `/belajar/{locale}/{surah}…` URLs redirect). The Konsep / Kosakata / Akar library stays at hub level so later tracks reuse it. Future self-paced tracks live in the same container; paid live cohorts (`docs/kelas-plan.md`, `/kelas`) appear as a card on the hub (operator, 2026-10-09). |
+| L9 | Information architecture | **`/belajar` is a hub of learning tracks**; Qur'anic Arabic (L13) is the first track, under `/belajar/{locale}/quran/{surah}/{ayah}` (old `/belajar/{locale}/{surah}…` URLs redirect). The Konsep / Kosakata / Akar library stays at hub level so later tracks reuse it. Future self-paced tracks live in the same container; paid live cohorts (`docs/kelas-plan.md`, `/kelas`) appear as a card on the hub (operator, 2026-10-09). |
 | L10 | Main-site header link | **"Belajar" goes in the dakwah-lens.id header (after "Khutbah & Kultum") when the operator says so.** First decided (option b, 2026-10-09) as "after the first ustadz sign-off"; **superseded the same day: there is no human review** — content is AI-assisted and labelled "Dibantu AI · bukan fatwa", never "menunggu tinjauan ustadz". The module stays noindex and unlinked until the operator asks. |
 | L11 | Review model | **No human (ustadz) review.** Outputs are AI-assisted learning material and recommendations, sourced from named kitabs and checked by deterministic tests and independent AI verification; the UI must not promise a review (operator, 2026-10-09). The `status: "draft"` field stays as pipeline state; the BELAJAR_PUBLIC draft gate must be revisited before any indexed build. |
 | L12 | Ilmu Waris visibility | **Hidden on the live site until the operator says to show it** (operator, 2026-10-10: "let's hide warisan at the moment"). The code, content and checks stay. While hidden, the hub lists no Ilmu Waris card and every `/belajar/{locale}/waris…` URL answers the module's 404 (`belajar/src/proxy.ts`). To show it: add `BELAJAR_WARIS=on` to `/srv/dakwah-lens/belajar.env` on the VM and recreate the container (`up -d --force-recreate`; no rebuild, the switch is read per request — `belajar/src/lib/features.ts`). CI keeps testing the track (smoke, screenshots, end-to-end) on a container started with the switch on, and checks that the default container hides it. |
+| L13 | Track name | **"Bahasa Arab Al-Qur'an" (en "Qur'anic Arabic"), not "… & Tafsir"** (operator, 2026-10-10: "if tafsir is not deep better to rephrase as learning arabic only, not plus tafsir"). Checked that day: no ayah of Al-Fatihah or the Mu'awwidzat carries a tafsir note; the lessons teach word meanings, roots, i'rab and sentence structure, with the Kemenag translation and some hadith-based facts. Ibn Kathir and the i'rab books are cited as sources for meanings, not as a tafsir layer. The "Catatan tafsir" slot stays in the code, empty. A tafsir layer may come later; the name changes back only if it is deep enough to earn it. |
 
 ## 3. Decisions needed (recommended default in bold)
 
@@ -94,7 +95,7 @@ Each of the 29 words of Al-Fatihah gets a **word card**:
 | Tahukah kamu | "(Wa/fa) al-ḥamdu lillāh appears in 23 ayat, and 5 surahs open with it." | Tanzil query, method shown |
 
 **Ayah layer:**
-- one light tafsir note (Ibn Kathir AR / al-Tabari from the corpus, rendered into reviewed Indonesian);
+- one light tafsir note (Ibn Kathir AR / al-Tabari from the corpus, rendered into reviewed Indonesian) — not built; deferred, and the track is named for Arabic only (L13);
 - the official Indonesian translation, labelled exactly by its source;
 - the ayah's place in the *qasamtu* dialogue (Muslim 395).
 

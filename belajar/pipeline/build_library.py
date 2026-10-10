@@ -5,7 +5,14 @@ Inputs (pinned in sources.json and verified by sha256 before use):
   QAC 0.4 morphology, Tanzil Uthmani 1.1 (only to byte-check «…» quotations in prose),
   authored/library.lexicon.json (Kosakata + Akar, author A) and, when present,
   authored/library.concepts.json (Konsep, author B; passed through after a shape check, minus
-  each record's reviewer-only `review_notes`).
+  each record's reviewer-only `review_notes`), authored/library.terms.json (grammar terms in
+  Arabic script, each spelling attested by the pronunciation dictionary or a Shamela page pinned
+  by its text sha256, sources.json `shamela_istilah`), authored/library.basics.json (the Harakat
+  page) and authored/library.parts.json (words explained by their parts). The Konsep prose
+  carries inline markup (terms.py: [[majrur]], [[bismi|q:1:1:1]], …): every field is checked,
+  stripped into the plain field (narration and metadata read those) and shipped marked beside it,
+  and every Qur'anic ref's bytes go to `quran` from Tanzil and QAC (operator 2026-10-10: terms
+  and words in Arabic, never retyped).
 
 Covered surahs: every surah registered in common.SURAHS whose authored/<slug>.words.json exists,
 in mushaf order (`--only <slug> ...` narrows the set, e.g. to rebuild the Al-Fatihah-only file).
@@ -27,14 +34,19 @@ import urllib.parse
 from collections import Counter
 
 import build_surah
+import terms as TM
 import validate as V
 from common import (ARABIC_RUN, CONTENT_DIR, PIPELINE, SCHEMA_TS, SURAH_BY_SLUG, authored_file, authored_surahs,
-                    bw_to_ar, load_qac, load_sources, load_tanzil, qac_words, require_pinned, root_letters,
-                    sha256_file, stem_of)
+                    bw_to_ar, lesson_ayah, load_qac, load_sources, load_tanzil, qac_words, require_pinned,
+                    root_letters, sha256_file, stem_of)
 from facts import QAC_BASIS, QAC_TANZIL_HEADER, fmt, refs_text
 
 LEXICON = PIPELINE / "authored" / "library.lexicon.json"
 CONCEPTS = PIPELINE / "authored" / "library.concepts.json"
+TERMS_FILE = TM.TERMS_JSON  # grammar terms in Arabic script (operator 2026-10-10)
+PRONUNCIATION = TM.PRONUNCIATION_JSON
+BASICS = PIPELINE / "authored" / "library.basics.json"  # Dasar membaca: the Harakat page
+PARTS = PIPELINE / "authored" / "library.parts.json"  # words explained by their parts (rule 14)
 OUT = CONTENT_DIR / "library.json"
 SURAHS = [1]  # surahs whose every stem lemma and root must have a library entry (set in main)
 WORDS = {1: authored_file("al-fatihah", "words")}  # surah -> authored word file (set in main)
@@ -510,6 +522,9 @@ def main(only: list[str] | None = None) -> int:
             check_sources(c.get("sources") or [], cw)
         for dup in sorted({i for i in cids if cids.count(i) > 1}):
             err(f"concept id {dup!r} used twice")
+    # ---- terms in Arabic script + the inline markup; plain fields from here on (terms.py)
+    extra = markup_section(concepts, T, W, src)
+    if CONCEPTS.exists():
         for c in concepts:
             cw = f"concepts[{c.get('id')}]"
             prose += [(f"{cw}.title", c.get("title", "")), (f"{cw}.summary", c.get("summary", ""))]
@@ -518,6 +533,7 @@ def main(only: list[str] | None = None) -> int:
                 prose.append((f"{cw}.bridge", c["bridge"]))
             prose += [(f"{cw}.examples[{i}].note", x.get("note", "")) for i, x in enumerate(c.get("examples") or [])]
 
+    prose += extra["prose"]
     # ---- prose (lexicon, roots and concepts together, as the app shows them side by side): no
     # unquoted Arabic words, «…» quotes byte-exact in Tanzil, SKB transliteration
     for path, text in prose:
@@ -534,20 +550,288 @@ def main(only: list[str] | None = None) -> int:
                   f"(only to byte-check «…» quotations in prose)",
         "authored_lexicon": f"authored/library.lexicon.json sha256:{sha256_file(LEXICON)}",
         "authored_concepts": concepts_ver,
+        **extra["versions"],
         "pipeline": "belajar/pipeline/build_library.py (stdlib only, no LLM)",
     }
-    out = {"concepts": concepts, "lexicon": lexicon, "roots": roots, "data_versions": data_versions}
+    out = {"concepts": concepts, "lexicon": lexicon, "roots": roots, "basics": extra["basics"],
+           "terms": extra["terms"], "parts": extra["parts"], "quran": extra["quran"],
+           "segments": extra["segments"], "data_versions": data_versions}
 
     # ---- shape against schema.ts (keys, nesting, enums) + status
     schemas, enums = V.parse_schema(SCHEMA_TS.read_text(encoding="utf-8"))
     V.check_shape(out, schemas["Library"], schemas, enums, "library")
-    for kind, recs in (("concept", concepts), ("lexeme", lexicon), ("root", roots)):
+    for kind, recs in (("concept", concepts), ("lexeme", lexicon), ("root", roots), ("basic", extra["basics"]),
+                       ("parts", extra["parts"])):
         for x in recs:
             if x.get("status") != "draft":
                 err(f"{kind} {x.get('id')}: status must be 'draft' (pipeline state; plan L11)")
     errors.extend(V.fails)
     errors.extend(build_surah.errors)
     return finish(out)
+
+
+# ---------------------------------------------------------------- terms in Arabic script, markup
+# Operator 2026-10-10 on /konsep: "mention the arabic word like majrur in arabic letter etc, not
+# only the transliteration" (and the earlier rules: Qur'anic words in Arabic from content bytes,
+# the harakat for beginners, words explained by their parts). terms.py has the markup and the term
+# checks; here every marked prose field is checked, stripped into the plain field the app,
+# narration and metadata read, and kept marked beside it; every q-ref is resolved from the pinned
+# Tanzil text and QAC 0.4 into library.json `quran`.
+LETTER_NAMES = {  # a letter q-ref's surface must name its letter (rule 7: the letter as in the ayah)
+    "ا": {"alif"}, "ب": {"ba’", "ba'"}, "ت": {"ta’", "ta'"}, "ث": {"tsa’"}, "ج": {"jim"}, "ح": {"ha’"},
+    "خ": {"kha’"}, "د": {"dal"}, "ذ": {"dzal"}, "ر": {"ra’", "ra"}, "ز": {"zai"}, "س": {"sin"}, "ش": {"syin"},
+    "ص": {"shad"}, "ض": {"dhad"}, "ط": {"tha’"}, "ظ": {"zha’"}, "ع": {"‘ain"}, "غ": {"ghain"}, "ف": {"fa’"},
+    "ق": {"qaf"}, "ك": {"kaf"}, "ل": {"lam"}, "م": {"mim"}, "ن": {"nun"}, "و": {"wawu"}, "ه": {"ha’"},
+    "ي": {"ya’", "ya'"}, "ى": {"ya’", "alif"}, "ء": {"hamzah"}, "أ": {"hamzah", "alif"}, "إ": {"hamzah", "alif"},
+}
+PAUSAL = re.compile(r"(un|in|an|u|i|a)$")
+
+
+def markup_section(concepts: list[dict], T, W, src: dict) -> dict:
+    table = TM.load_terms(TERMS_FILE)
+    pron = TM.load_pronunciation(PRONUNCIATION)
+    meta = src["inputs"]["shamela_istilah"]
+    page_text = {}
+    for pk, pm in meta["pages"].items():
+        book, page = pk.split("/")
+        f = PIPELINE / meta["cache_dir"] / book / f"{page}.txt"
+        if not f.exists():
+            err(f"shamela_istilah {pk}: not in the cache; run fetch.py")
+        elif sha256_file(f) != pm.get("text_sha256"):
+            err(f"shamela_istilah {pk}: cached text does not match its pin; run fetch.py")
+        else:
+            page_text[pk] = f.read_text(encoding="utf-8")
+    e, report = TM.check_table(table, pron, meta["pages"], meta["books"], page_text)
+    for x in e:
+        err(x)
+    warnings.extend(report)
+    by_id, by_form = TM.term_index(table)
+    translit = {}
+    for p in WORDS.values():
+        if p.exists():
+            translit.update({loc: w["translit"] for loc, w in json.loads(p.read_text(encoding="utf-8"))["words"].items()})
+
+    def tanzil_token(s, a, w):
+        if (s, a) not in T.verses:
+            return None
+        toks = lesson_ayah(T, s, a)[0].split(" ")
+        return toks[w - 1] if 1 <= w <= len(toks) else None
+
+    def qac_segments(s, a, w):
+        return [bw_to_ar(g.form) for g in W.get((s, a, w), [])]
+
+    refs: set[str] = set()
+
+    def same_surface(surface: str, want: str, last: bool) -> bool:
+        s = surface if surface.startswith("All") else surface[:1].lower() + surface[1:]
+        return s == want or (last and PAUSAL.search(want) is not None and s == PAUSAL.sub("", want))
+
+    def check_q(surface: str, ref: str, where: str) -> None:
+        m = TM.QREF.match(ref)
+        s, a, w = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        if m.group(4):  # a run: each word's transliteration, the last may be pausal (aḥad)
+            locs = [f"{s}:{a}:{k}" for k in range(w, int(m.group(4)) + 1)]
+            if all(l in translit for l in locs):
+                words = surface.split(" ")
+                want = [translit[l] for l in locs]
+                # multi-word transliterations (wa lā) count as their words
+                flat = " ".join(want).split(" ")
+                if len(words) != len(flat) or not all(same_surface(x, y, i == len(flat) - 1)
+                                                      for i, (x, y) in enumerate(zip(words, flat))):
+                    err(f"{where}: [[{surface}|{ref}]]: the words are {' '.join(want)!r}")
+        elif m.group(6):  # a letter: the surface names that letter
+            try:
+                letter = TM.letter_of(tanzil_token(s, a, w) or "", int(m.group(6)))
+            except ValueError as x:
+                err(f"{where}: {x}")
+                return
+            if surface.lower() not in LETTER_NAMES.get(letter[0], set()):
+                err(f"{where}: [[{surface}|{ref}]] names the letter {letter[0]}, whose name is "
+                    f"{sorted(LETTER_NAMES.get(letter[0], {'?'}))}")
+        elif not m.group(5) and f"{s}:{a}:{w}" in translit:
+            if not same_surface(surface, translit[f"{s}:{a}:{w}"], False):
+                err(f"{where}: [[{surface}|{ref}]]: the word's transliteration is {translit[f'{s}:{a}:{w}']!r}")
+        if not m.group(6):  # every word, run and segment: the Latin names the bytes (terms.surface_matches)
+            try:
+                ar = TM.resolve_q(ref, tanzil_token, qac_segments)
+            except ValueError as x:
+                err(f"{where}: {x}")
+                return
+            if not TM.surface_matches(surface, ar):
+                err(f"{where}: [[{surface}|{ref}]]: {surface!r} does not name {ar} "
+                    f"(consonants {TM.skeleton_latin(surface)!r} vs {TM.skeleton_ar(ar)!r})")
+
+    def field(text: str, where: str) -> str:
+        for x in (TM.check_markup(text, where, by_id, by_form, table) + TM.wording(TM.strip(text), where)
+                  + TM.meaning_problems(text, where)):
+            err(x)
+        for surface, ref in TM.spans(text):
+            if ref and ref.startswith("q:") and TM.QREF.match(ref):
+                refs.add(ref)
+                check_q(surface, ref, where)
+        return TM.strip(text)
+
+    def explicit(text: str) -> str:
+        return TM.explicit(text, by_id, by_form)
+
+    def marked_record(rec: dict, where: str, notes: list[str]) -> dict:
+        mk = {"title": explicit(rec["title"]), "summary": explicit(rec["summary"]),
+              "explanation": [explicit(p) for p in rec["explanation"]]}
+        if rec.get("bridge"):
+            mk["bridge"] = explicit(rec["bridge"])
+        mk["notes"] = [explicit(n) for n in notes]
+        rec["title"] = field(rec["title"], f"{where}.title")
+        rec["summary"] = field(rec["summary"], f"{where}.summary")
+        rec["explanation"] = [field(p, f"{where}.explanation[{i}]") for i, p in enumerate(rec["explanation"])]
+        if rec.get("bridge"):
+            rec["bridge"] = field(rec["bridge"], f"{where}.bridge")
+        return mk
+
+    for c in concepts:
+        cw = f"concepts[{c.get('id')}]"
+        notes = [x.get("note", "") for x in c.get("examples") or []]
+        mk = marked_record(c, cw, notes)
+        for i, x in enumerate(c.get("examples") or []):
+            x["note"] = field(x["note"], f"{cw}.examples[{i}].note")
+        c["marked"] = mk
+
+    # ---- Dasar membaca (the Harakat page)
+    basics = []
+    if BASICS.exists():
+        for b in json.loads(BASICS.read_text(encoding="utf-8"))["basics"]:
+            bw = f"basics[{b.get('id')}]"
+            b = {k: v for k, v in b.items() if k != "review_notes"}
+            b["marked"] = marked_record(b, bw, [])
+            for i, sg in enumerate(b.get("signs", [])):
+                sw = f"{bw}.signs[{i}]"
+                t = by_id.get(sg.get("term"))
+                if not t or t.get("group") != "harakah":
+                    err(f"{sw}: term {sg.get('term')!r} is not a harakah term of library.terms.json")
+                m = TM.QREF.match(sg.get("example", ""))
+                if not m or not m.group(6):
+                    err(f"{sw}: example must be a letter q-ref (q:S:A:W#n), got {sg.get('example')!r}")
+                    continue
+                refs.add(sg["example"])
+                try:
+                    letter = TM.letter_of(tanzil_token(*map(int, m.groups()[:3])) or "", int(m.group(6)))
+                except ValueError as x:
+                    err(f"{sw}: {x}")
+                    continue
+                have = {TM.MARKS[ch] for ch in letter if ch in TM.MARKS}
+                if not set(sg["marks"]) <= have:
+                    err(f"{sw}: the example letter {letter} carries {sorted(have)}, not {sg['marks']}")
+                for x in TM.sign_problems(sg, letter, sw):
+                    err(x)
+                for fld in ("sound", "place", "shape", "reading"):
+                    for x in TM.wording(sg.get(fld, ""), f"{sw}.{fld}"):
+                        err(x)
+            for rel in b.get("related", []):
+                if rel not in {c.get("id") for c in concepts}:
+                    err(f"{bw}: related {rel!r} is not a concept id")
+            check_sources(b.get("sources") or [], bw)
+            if b.get("status") != "draft":
+                err(f"{bw}: status must be 'draft' (plan L11)")
+            basics.append(b)
+
+    # ---- words explained by their parts (rule 14), static diagrams
+    parts = []
+    cids = {c.get("id") for c in concepts}
+    if PARTS.exists():
+        for pt in json.loads(PARTS.read_text(encoding="utf-8"))["parts"]:
+            pw = f"parts[{pt.get('loc')}]"
+            loc = pt.get("loc", "")
+            s, a, w = map(int, loc.split(":"))
+            word = tanzil_token(s, a, w)
+            if loc not in translit or word is None:
+                err(f"{pw}: {loc} is not a word of a lesson surah")
+                continue
+            refs.add(f"q:{loc}")
+            for cid in pt.get("concepts", []):
+                if cid not in cids:
+                    err(f"{pw}: concept {cid!r} does not exist")
+            tiles = []
+            for i, tl in enumerate(pt.get("tiles", [])):
+                tw = f"{pw}.tiles[{i}]"
+                m = TM.QREF.match(tl.get("q", ""))
+                if not m or m.group(4) or m.group(6):
+                    err(f"{tw}: q must be a word or a QAC segment q-ref, got {tl.get('q')!r}")
+                    continue
+                # A tile is a part as this word writes it (its own QAC segment) or the part's bentuk
+                # dasar elsewhere in the Qur'an: a Tanzil token (ٱسْمُ, QS 55:78) or, for an attached
+                # pronoun, the QAC segment of another word (the هُمْ of رَزَقْنَٰهُمْ, QS 2:3).
+                try:
+                    tiles.append(TM.resolve_q(tl["q"], tanzil_token, qac_segments))
+                except ValueError as x:
+                    err(f"{tw}: {x}")
+                    continue
+                if not TM.surface_matches(tl.get("translit", ""), tiles[-1]):
+                    err(f"{tw}: translit {tl.get('translit')!r} does not name the tile's bytes {tiles[-1]}")
+                refs.add(tl["q"])
+                field(tl["label"], f"{tw}.label")  # checked; shipped marked
+                if TM.AKAR.search(TM.strip(tl["label"])):
+                    err(f"{tw}.label: says 'akar'; a part's base form is its 'bentuk dasar' (rule 14)")
+                tl["label"] = explicit(tl["label"])
+            if len(tiles) == len(pt.get("tiles", [])):
+                for x in TM.parts_problems(tiles, pt.get("changes", []), pt.get("drops", []), word):
+                    err(f"{pw}: {x}")
+            for i, t in enumerate(pt.get("steps", [])):
+                field(t, f"{pw}.steps[{i}]")  # checked; shipped marked (WordParts renders the markup)
+                if TM.AKAR.search(TM.strip(t)):
+                    err(f"{pw}.steps[{i}]: says 'akar'; a part's base form is its 'bentuk dasar' (rule 14: "
+                        f"akar = the root letters)")
+            pt["steps"] = [explicit(t) for t in pt.get("steps", [])]
+            check_sources(pt.get("sources") or [], pw)
+            if pt.get("status") != "draft":
+                err(f"{pw}: status must be 'draft' (plan L11)")
+            parts.append(pt)
+    # ---- the bytes of every q-ref, and the segments of each lesson word a part names
+    quran, segments = {}, {}
+    # mushaf order, then the ref itself, so ties ("114:6:1-2" and "114:6:1#2") sort the same every run
+    for ref in sorted(refs, key=lambda r: ([int(x) for x in re.findall(r"\d+", r)], r)):
+        try:
+            quran[ref[2:]] = TM.resolve_q(ref, tanzil_token, qac_segments)
+        except ValueError as x:
+            err(f"q-ref {ref}: {x}")
+        m = TM.QREF.match(ref)
+        loc = ":".join(m.groups()[:3])
+        if m.group(5) and loc in translit:
+            segments[loc] = qac_segments(*map(int, m.groups()[:3]))
+
+    terms_out = []
+    for t in table.get("terms", []):
+        o = {"id": t["id"], "latin": t["latin"], "ar": t.get("ar"), "group": t["group"]}
+        if t.get("hint"):
+            o["hint"] = t["hint"]
+        srcs = []
+        if t.get("ar"):
+            for at in t.get("attest", []):
+                pm = meta["pages"].get(at.get("page"))
+                if not pm:
+                    continue
+                vol = re.search(r"ج(\d+)", pm.get("title") or "")
+                ref = (f"jil. {vol.group(1)}, " if vol else "") + f"hlm. {pm.get('print_page')}" \
+                    + (", catatan kaki penyunting" if at.get("part") == "hamesh" else "") + ": ejaan istilah"
+                srcs.append({"kitab": meta["books"][pm["book"]], "ref": ref, "url": pm["url"]})
+        o["sources"] = srcs
+        terms_out.append(o)
+
+    prose_items = []
+    for b in basics:
+        bw = f"basics[{b['id']}]"
+        prose_items += [(f"{bw}.title", b["title"]), (f"{bw}.summary", b["summary"])]
+        prose_items += [(f"{bw}.explanation[{i}]", t) for i, t in enumerate(b["explanation"])]
+    for pt in parts:
+        prose_items += [(f"parts[{pt['loc']}].steps[{i}]", TM.strip(t)) for i, t in enumerate(pt["steps"])]
+    versions = {
+        "authored_terms": f"authored/library.terms.json sha256:{sha256_file(TERMS_FILE)}",
+        "shamela_istilah": f"{len(page_text)} Shamela pages pinned by text sha256 (sources.json shamela_istilah)",
+    }
+    if BASICS.exists():
+        versions["authored_basics"] = f"authored/library.basics.json sha256:{sha256_file(BASICS)}"
+    if PARTS.exists():
+        versions["authored_parts"] = f"authored/library.parts.json sha256:{sha256_file(PARTS)}"
+    return {"terms": terms_out, "basics": basics, "parts": parts, "quran": quran, "segments": segments,
+            "prose": prose_items, "versions": versions}
 
 
 def word_lemma_ids(surah: int = 1) -> dict[str, str]:

@@ -44,6 +44,8 @@ python3 test_validate.py           # mutation tests: plants 66 faults in copies 
 python3 build_compose.py           # word compositions + harakat primer ../content/compose/*.json (see "Komposisi kata")
 python3 validate_compose.py        # composition checks against the corpus (CI: --no-corpus); exit 1 on any failure
 python3 test_validate_compose.py   # plants 34 faults in copies of the compositions, each must fail (CI: --no-corpus)
+python3 validate_terms.py          # Konsep terms in Arabic script + inline markup (CI: --no-corpus); see "Konsep"
+python3 test_validate_terms.py     # plants 32 faults (retyped term, unmarked term, wrong word bytes, a ref whose Latin names other bytes, ketuk, …)
 python3 build_narration.py         # narration manifests ../content/narration/*.json (see "Narasi")
 python3 validate_narration.py      # narration checks; exit 1 on any failure
 python3 test_validate_narration.py # plants 102 faults in copies of the manifests, the dictionary and the compositions, each must fail
@@ -91,6 +93,12 @@ for one surah (`null` = no lexicon entry yet, or a QAC stem with no lemma).
 | `build_compose.py` | 2 | Writes `belajar/content/compose/<slug>.json`; `--show <loc>` prints a word's pieces and QAC segments, `--find <loc>` where that token stands in the Qur'an |
 | `validate_compose.py` | 6 | Composition checks (local: Tanzil/QAC bytes, attestations, parts = QAC segments, equality with a fresh build; `--no-corpus` in CI: replays, stages, last frame = the word, authored hash) |
 | `test_validate_compose.py` | 6 | Mutation tests for `validate_compose.py` (`--no-corpus` skips the corpus-only faults by name) |
+| `authored/library.terms.json` | 3 | The ONE table of grammar terms in Arabic script (latin, forms, ar, group, harakah reminder), each spelling attested by the pronunciation dictionary or a pinned Shamela excerpt; unverified terms have `ar: null` + a reason |
+| `authored/library.basics.json` | 3 | Dasar membaca: the Harakat page (signs with an example letter as a q-ref into Tanzil) |
+| `authored/library.parts.json` | 3 | Words explained by their parts (rule 14): tiles as q-refs (each part's bentuk dasar), the letters that change and the letters not written, sourced steps |
+| `terms.py` | — | Term table checks (folded attestation, vowel compatibility, confirmed harakat), Shamela page-text extraction, the `[[…]]` markup (parse, strip, unmarked forms, a term ref's surface, a q-ref's Latin against its bytes), meanings ("yang artinya"), q-ref resolution, letters, parts arithmetic, the Harakat signs |
+| `validate_terms.py` | 6 | Konsep terms + markup + Qur'anic bytes; `--no-corpus` in CI, full with the cache locally |
+| `test_validate_terms.py` | 6 | Mutation tests for `validate_terms.py` (`--no-corpus` skips the 2 faults only the cache can catch) |
 | `build_narration.py` | 3 | Writes the guided-lesson narration manifests `belajar/content/narration/<slug>.json` + `shared.json` (spoken text, caption, highlight, word card) from the lessons, the library and `authored/pronunciation.json` (templates + content fields; see "Narasi") |
 | `validate_narration.py` | 6 | Narration checks: step-id coverage, the pronunciation dictionary, no Qur'anic word in any spelling or script, Arabic only from the dictionary, caption = speech, highlight/focus, audio entries and karaoke tokens, manifests equal a fresh build |
 | `test_validate_narration.py` | 6 | Mutation tests for `validate_narration.py` + unit tests of the speech text, dictionary rendering, tokens, numbers and render request |
@@ -533,6 +541,70 @@ the pause line "Ini kata terakhir ayat, dan imam berhenti padanya, jadi … ini 
 tulisan, tidak terdengar.", "Karena ayat ini dimulai dari kata ini, alif di awalnya dibaca, …". The
 article's alif in the middle of an ayah is tagged on screen (`silent: [0]` on the join frame) at
 every such word. The first harakah of each word's explanation carries its sound ("kasrah, bunyi i").
+
+## Konsep: istilah dalam huruf Arab, kata Qur'an dari byte konten
+
+Operator, 2026-10-10, on /belajar/id/konsep: "mention the arabic word like majrur in arabic letter
+etc, not only the transliteration" — and the narration review's rules the same day (Arabic with
+transliteration, meanings with "yang artinya", "klik", letters as in the ayah, harakat for
+beginners, words explained by their parts).
+
+- **One term table.** `authored/library.terms.json` holds every grammar term the Konsep prose
+  uses: its Latin surface forms, its Arabic, its group (`harakah` terms carry a short reminder,
+  "tanda bunyi i di bawah huruf", shown at their first use on a page and linked to the Harakat
+  page). No page types a term's Arabic. Each spelling is attested: `{"pron": …}` = byte-equal to
+  the operator-approved pronunciation dictionary (a term the dictionary has must equal it, so
+  captions and Konsep agree), or `{"page": "book/id", "text": …}` = a verbatim excerpt (≤ 12
+  words) of a Shamela page of a kitab the library cites. Shamela HTML carries per-request
+  tokens, so `fetch.py` pins the EXTRACTED page text (`sources.json` `shamela_istilah`, cache
+  `cache/shamela/<book>/<id>.txt`). The check (`terms.attest_match`) folds harakat and alif
+  forms, matches whole tokens (a clitic or the article may stand before the first token, only
+  the article before a later one), and rejects a vowel the excerpt writes that differs from the
+  term's, except on a declining token's case ending (its last letter; the لًا of an -an wazan,
+  which the kitab may cite without its alif). It proves the letters, not the sense: the
+  excerpts were chosen by hand to use the word in its grammatical sense. A mark counts as
+  CONFIRMED only where the dictionary or a vocalised excerpt writes it; `validate_terms.py`
+  counts both and lists every unconfirmed mark ("HARAKAT UNCONFIRMED"), so a spelling whose
+  vowels no source writes is never called verified. The table also holds the sharaf wazan
+  (fā‘ilun, maf‘ūlun, istaf‘ala, …, from Syadza al-'Arf), the bab names, kāna and its sisters,
+  and the particles and pronouns of Ibnu Ajurrum's lists. 6 terms have no attestation and are
+  shown in Latin only: dhamir al-majhul and lam doa (only in un-pinned sources), and the wazan
+  yastaf‘ilu, nastaf‘ilu, yuf‘ilu and yufa‘lilu (no pinned page writes them; al-Amtsilah is an
+  image scan). fi'il majhul and shighat mubalaghah are marked as their verified parts.
+- **Inline markup** in the authored concepts, the Harakat page and the parts diagrams:
+  `[[majrur]]` (a term by form), `[[bertanwin|tanwin]]` (by id), `[[bismi|q:1:1:1]]` (a
+  Qur'anic word), `[[huwa Allāhu aḥad|q:112:1:2-4]]` (a run; the last word may be pausal),
+  `[[bi-|q:1:1:1/1]]` (a QAC 0.4 segment), `[[ya'|q:1:2:4#6]]` (a letter as in the ayah; its
+  surface must name that letter). `build_library.py` checks every field (unknown refs, a term
+  form left unmarked — except a term's `ambiguous_forms`: huruf, hal, sifat, bab, jumlah, syarat
+  are ordinary Indonesian words too, and the particles min, ilā, fī … are Qur'anic words too —,
+  an explicit term ref whose surface names another term, "ketuk", "yang berarti", a Qur'anic
+  word's meaning in bare quotes instead of "yang artinya" (`terms.BARE_QUOTE_OK` lists the
+  recorded-narration exceptions), a q-ref whose Latin does not name its bytes
+  (`terms.surface_matches`, a consonant-skeleton comparison: `[[bi-|q:1:1:1/2]]` fails because
+  the segment is سْمِ), writes the stripped text to the plain fields (narration, metadata and the
+  older prose checks read those) and ships the marked text, with every term named by id, in
+  `marked`; `validate_terms.py` rebuilds that explicit form from the authored text and compares
+  it byte for byte, so a hand-edited `library.json` fails in CI. Every q-ref's bytes go to
+  `library.json` `quran` from the pinned Tanzil text and QAC.
+- **Parts diagrams** (`authored/library.parts.json`, six words: bismi, lillāhi, ‘alaihim, lahū,
+  birabbi, an‘amta): each tile is a part's bentuk dasar, and the tiles, with `changes` (a letter
+  replaced by the word's letter: the same consonant with another vowel, or the alif maqsurah of
+  عَلَىٰ written ya') and `drops` (letters the word does not write: an alif, and after it the lam
+  of al-, as in لِلَّهِ) applied, must spell the word's Tanzil bytes exactly
+  (`terms.parts_problems`; `src/lib/terms.ts partsProblems` repeats it in vitest). A base form
+  is a Tanzil token elsewhere in the Qur'an chosen by its QAC lemma and case (ٱسْمُ marfu'), or,
+  for an attached pronoun, an attached QAC segment of another word (the هُمْ of رَزَقْنَٰهُمْ, never
+  the standalone هُمْ). Each tile's `translit` must name its bytes; the steps say "bentuk dasar",
+  never "akar" (refused). WordParts names each change by where it is ("Akhir ismu berubah",
+  "Huruf pertama -hum berubah"). The al- and wa- words are not diagrammed: joining them changes
+  no letter of the part (the article's assimilation is tajwid, which the Harakat page leaves to
+  the ilmu tajwid).
+- **Kept on purpose:** titles, and the summaries of the five concepts whose narration is rendered
+  (al-fatihah:1: kalimah, tanda-irab, huruf-jar, idhafah, naat), are byte-identical, so no
+  rendered MP3 went stale. Two other summaries (fi'il amr, isim maushul) keep their bare quotes:
+  the narration already says "kata yang artinya …" for a word of another ayah, and a written
+  "yang artinya" would be spoken twice.
 
 ## Narasi (guided-lesson narration)
 

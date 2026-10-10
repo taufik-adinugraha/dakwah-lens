@@ -94,3 +94,12 @@ export const SURAH_INDEX: Record<number, { slug: string; name: string }> = Objec
 export const WORD_AR: Record<string, string> = Object.fromEntries(
   SURAHS.flatMap((s) => s.ayat.flatMap((a) => a.words.map((w) => [w.loc, w.ar]))),
 );
+
+/** Arabic, transliteration and meaning of every lesson word, keyed by loc: a Konsep example row
+ *  shows the word as "بِسْمِ bismi, yang artinya “dengan nama”" from these content bytes
+ *  (operator 2026-10-10: Arabic with transliteration, meanings with "yang artinya"). */
+export const WORD_INFO: Record<string, { ar: string; translit: string; gloss: string }> = Object.fromEntries(
+  SURAHS.flatMap((s) =>
+    s.ayat.flatMap((a) => a.words.map((w) => [w.loc, { ar: w.ar, translit: w.translit, gloss: w.gloss }])),
+  ),
+);

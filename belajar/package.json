@@ -2,7 +2,7 @@
   "name": "belajar",
   "version": "0.1.0",
   "private": true,
-  "description": "Belajar Al-Qur'an — Qur'anic Arabic + light tafsir module served at dakwah-lens.id/belajar (own container). See docs/belajar-plan.md.",
+  "description": "Belajar Al-Qur'an — Qur'anic Arabic module served at dakwah-lens.id/belajar (own container). See docs/belajar-plan.md.",
   "scripts": {
     "dev": "next dev -p 3200",
     "build": "next build",
