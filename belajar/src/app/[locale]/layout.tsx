@@ -6,6 +6,7 @@ import { getMessages, getTranslations, setRequestLocale } from "next-intl/server
 
 import { FooterDisclaimer } from "@/components/FooterDisclaimer";
 import { HeaderControls } from "@/components/HeaderControls";
+import { LineFit } from "@/components/LineFit";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { IS_PUBLIC } from "@/lib/flags";
@@ -114,6 +115,9 @@ export default async function LocaleLayout({
           </header>
 
           <main id="isi">{children}</main>
+          {/* Kept-together text wider than its line breaks in the paragraph's flow
+              (line breaks, operator 2026-10-10; src/lib/lineFit.ts). */}
+          <LineFit />
 
           <footer className="mt-16 border-t border-hairline">
             <div className="mx-auto flex max-w-5xl flex-col gap-4 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6">

@@ -3,6 +3,7 @@ import { ArrowRight, BookOpen, Library, Scale } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { ForestGlow } from "@/components/ForestGlow";
+import { MixedText } from "@/components/library/MixedText";
 import { StatusChip } from "@/components/StatusChip";
 import { TextSizeHint } from "@/components/TextSizeSwitch";
 import { AiChip } from "@/components/waris/report/AiChip";
@@ -106,10 +107,14 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
       <ForestGlow />
       <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
         <section className="max-w-2xl">
+          {/* Copy naming surahs goes through MixedText: "Al-Qur'an", "Al-Fatihah"
+              are never cut at the hyphen (line breaks, operator 2026-10-10). */}
           <h1 className="text-balance font-display text-4xl font-medium tracking-[-0.015em] sm:text-5xl">
-            {t("heading")}
+            <MixedText text={t("heading")} />
           </h1>
-          <p className="mt-3 max-w-prose text-pretty text-lg text-ink-muted">{t("intro")}</p>
+          <p className="mt-3 max-w-prose text-pretty text-lg text-ink-muted">
+            <MixedText text={t("intro")} />
+          </p>
         </section>
 
         {/* One-time card: hidden before paint once the learner has chosen a
@@ -133,9 +138,15 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
                       <Icon className="h-7 w-7 text-forest" aria-hidden />
                       <ArrowRight aria-hidden className="h-6 w-6 shrink-0 text-forest" />
                     </span>
-                    <h3 className="mt-3 font-display text-2xl font-medium text-ink">{title}</h3>
-                    <p className="mt-1.5 text-pretty text-base text-ink-muted">{body}</p>
-                    <p className="mt-3 text-base text-ink">{available}</p>
+                    <h3 className="mt-3 font-display text-2xl font-medium text-ink">
+                      <MixedText text={title} />
+                    </h3>
+                    <p className="mt-1.5 text-pretty text-base text-ink-muted">
+                      <MixedText text={body} />
+                    </p>
+                    <p className="mt-3 text-base text-ink">
+                      <MixedText text={available} />
+                    </p>
                     <span className="mt-auto flex flex-wrap items-center gap-3 pt-5">
                       {ai ? <AiChip label={status} /> : <StatusChip label={status} draft={draft} />}
                     </span>

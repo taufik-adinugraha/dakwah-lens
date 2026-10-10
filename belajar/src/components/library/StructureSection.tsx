@@ -1,3 +1,5 @@
+import { Fragment } from "react";
+
 import type { Ayah } from "@/content/schema";
 import { Link } from "@/i18n/navigation";
 import { conceptHref } from "@/lib/routes";
@@ -35,7 +37,9 @@ export function StructureSection({
           {labels.heading}
         </h2>
       )}
-      <p className={`${hideHeading ? "" : "mt-1 "}text-sm font-semibold text-forest`}>{st.type}</p>
+      <p className={`${hideHeading ? "" : "mt-1 "}text-sm font-semibold text-forest`}>
+        <MixedText text={st.type} />
+      </p>
       <p className="mt-2 max-w-prose text-pretty text-base text-ink">
         <MixedText text={st.summary} />
       </p>
@@ -48,7 +52,7 @@ export function StructureSection({
             </span>
             {w.role ? (
               <span dir="ltr" className="max-w-36 text-center text-sm text-ink-muted">
-                {w.role}
+                <MixedText text={w.role} />
               </span>
             ) : null}
           </li>
@@ -57,25 +61,40 @@ export function StructureSection({
 
       {st.groups.length > 0 && (
         <div className="mt-6">
-          <h3 className="text-sm font-semibold text-ink">{labels.groups}</h3>
+          <h3 className="text-sm font-semibold text-ink">
+            <MixedText text={labels.groups} />
+          </h3>
           <ul className="mt-2 space-y-3">
             {st.groups.map((g) => (
               <li
                 key={`${g.label}-${g.words.join("-")}`}
                 className="flex flex-wrap items-center gap-x-3 gap-y-2 text-base text-ink"
               >
+                {/* The words joined " · ", each kept with its dot so no line
+                    starts with one; the dash inside the text, glued to the
+                    label's first word (line breaks, operator 2026-10-10). */}
                 <span lang="ar" dir="rtl" className="quran text-ar-sm text-ink">
                   {g.words
                     .map((i) => ayah.words[i - 1]?.ar)
                     .filter(Boolean)
-                    .join(" · ")}
+                    .map((ar, k, all) => (
+                      <Fragment key={k}>
+                        {k > 0 ? " " : null}
+                        <span className="whitespace-nowrap">
+                          {ar}
+                          {k < all.length - 1 ? " ·" : null}
+                        </span>
+                      </Fragment>
+                    ))}
                 </span>
                 <span>
-                  — <MixedText text={g.label} />
+                  <MixedText text={`— ${g.label}`} />
                 </span>
                 {g.concept && conceptTitle[g.concept] ? (
                   <Link href={conceptHref(g.concept)} className="chip-link">
-                    {conceptTitle[g.concept]}
+                    <span>
+                      <MixedText text={conceptTitle[g.concept]} />
+                    </span>
                   </Link>
                 ) : null}
               </li>

@@ -28,7 +28,9 @@ export default async function ConceptIndex({ params }: PageProps<"/[locale]/kons
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
       <h1 className="font-display text-3xl font-medium">{t("index_title")}</h1>
-      <p className="mt-2 max-w-prose text-pretty text-base text-ink-muted">{t("index_intro")}</p>
+      <p className="mt-2 max-w-prose text-pretty text-base text-ink-muted">
+        <MixedText text={t("index_intro")} />
+      </p>
       {groups.map(({ kind, items }) =>
         items.length ? (
           <section key={kind} className="mt-10" aria-labelledby={`kind-${kind}`}>

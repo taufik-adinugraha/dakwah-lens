@@ -21,10 +21,17 @@ export function SourceList({ sources }: { sources: SourceRef[] }) {
         const d = displaySource(s);
         const body = (
           <>
+            {/* MixedText throughout: kitab names are full of hyphenated words
+                ("ad-Dani", "al-Qur'an") a line must not cut (line breaks,
+                operator 2026-10-10). */}
             <span className={s.url ? "link-text text-sm font-medium" : "text-sm font-medium text-ink-muted"}>
-              {d.name}
+              <MixedText text={d.name} />
             </span>
-            {d.edition ? <span className="text-xs text-ink-soft">{d.edition}</span> : null}
+            {d.edition ? (
+              <span className="text-xs text-ink-soft">
+                <MixedText text={d.edition} />
+              </span>
+            ) : null}
             {d.detail ? (
               <span className="text-xs text-ink-soft">
                 <MixedText text={d.detail} />

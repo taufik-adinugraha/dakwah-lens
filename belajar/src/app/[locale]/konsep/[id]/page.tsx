@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { ConceptCard } from "@/components/library/ConceptCard";
+import { MixedText } from "@/components/library/MixedText";
 import { Link } from "@/i18n/navigation";
 import { SURAH_INDEX, WORD_AR } from "@/lib/content";
 import { getConcept, LIBRARY } from "@/lib/library";
@@ -67,7 +68,9 @@ export default async function ConceptPage({ params }: PageProps<"/[locale]/konse
             {related.map((c) => (
               <li key={c.id}>
                 <Link href={conceptHref(c.id)} className="chip-link">
-                  {c.title}
+                  <span>
+                    <MixedText text={c.title} />
+                  </span>
                 </Link>
               </li>
             ))}

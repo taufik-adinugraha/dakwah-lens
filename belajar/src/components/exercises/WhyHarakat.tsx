@@ -7,6 +7,7 @@ import type { Word } from "@/content/schema";
 import { seededShuffle } from "@/lib/shuffle";
 
 import { CaseBadge } from "../lesson/CaseBadge";
+import { MixedText } from "../library/MixedText";
 import {
   Counter,
   ExerciseShell,
@@ -108,7 +109,7 @@ function WhyHarakatRound({
                 {w.ar}
               </span>
               <span className="text-sm text-ink-muted">
-                {w.translit} · {w.gloss}
+                <MixedText text={`${w.translit} · ${w.gloss}`} />
               </span>
               {w.case.sign !== "—" && (
                 <span className="text-sm text-ink-muted">{t("why_sign", { sign: w.case.sign })}</span>
@@ -123,7 +124,9 @@ function WhyHarakatRound({
                   state={optionState(opt, q.answer, q.tried, q.resolved)}
                   onClick={() => q.choose(opt)}
                 >
-                  <span>{opt}</span>
+                  <span>
+                    <MixedText text={opt} />
+                  </span>
                 </OptionButton>
               </li>
             ))}
@@ -136,7 +139,7 @@ function WhyHarakatRound({
           >
             {q.resolved !== null && (
               <>
-                <CaseBadge state={w.case.state} sign={w.case.sign} /> {w.why}
+                <CaseBadge state={w.case.state} sign={w.case.sign} /> <MixedText text={w.why} />
               </>
             )}
           </Feedback>
