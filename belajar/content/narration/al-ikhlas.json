@@ -1,0 +1,201 @@
+{
+  "version": 1,
+  "voice": null,
+  "lines": {
+    "al-ikhlas:1:intro": {
+      "text": "Ayat pertama Surah Al-Ikhlas. Terjemahannya: “Katakanlah (Muhammad), Dialah Allah, Yang Maha Esa.” Ayat ini terdiri dari empat kata, dan kita akan mempelajarinya satu per satu."
+    },
+    "al-ikhlas:1:recite": {
+      "text": "Sekarang dengarkan imam membacakan ayat pertama."
+    },
+    "al-ikhlas:1:w1": {
+      "text": "Kata pertama artinya “katakanlah”. Fi'il amr (kata perintah) ini mabni di atas sukun, sehingga akhirnya tetap mati; pelakunya tersirat, yaitu “engkau” (Nabi Muhammad shallallahu 'alaihi wa sallam)."
+    },
+    "al-ikhlas:1:w2": {
+      "text": "Kata kedua artinya “Dialah”. Kata ganti (dhamir) ini mabni, sehingga bentuknya tidak berubah, dan berkedudukan rafa' (mahall raf') sebagai mubtada', pokok kalimat yang dijelaskan oleh kata ketiga dan keempat sesudahnya."
+    },
+    "al-ikhlas:1:w3": {
+      "text": "Kata ketiga artinya “Allah”. Akhirnya dhammah karena menjadi mubtada' kedua, yaitu pokok kalimat kata ketiga dan keempat yang menjelaskan kata kedua."
+    },
+    "al-ikhlas:1:w4": {
+      "text": "Kata keempat artinya “Yang Maha Esa”. Akhirnya dhammatain (dhammah bertanwin) karena menjadi khabar bagi kata ketiga, sehingga maknanya “Allah itu Esa”."
+    },
+    "al-ikhlas:1:concept:maqul-al-qaul": {
+      "text": "Konsep baru: Maqul al-qaul (isi perkataan sesudah kata pertama). Sesudah kata kerja “berkata”, seperti kata pertama (“katakanlah”), kalimat yang diucapkan disebut maqul al-qaul; seluruh kalimat itu berkedudukan nashab, seperti objek."
+    },
+    "al-ikhlas:1:concept:dhamir-syan": {
+      "text": "Konsep baru: Dhamir sya'n (kata ganti “perkara”). Dhamir sya'n ialah kata ganti di awal kalimat yang tidak menunjuk kata sebelumnya; isinya dijelaskan oleh kalimat sesudahnya, seperti kata kedua menurut banyak ulama, yang isinya ialah kata ketiga dan keempat."
+    },
+    "al-ikhlas:1:concept:khabar-jumlah": {
+      "text": "Konsep baru: Khabar jumlah (khabar berupa kalimat). Khabar tidak selalu satu kata; ia bisa berupa kalimat lengkap, misalnya mubtada' bersama khabarnya sendiri."
+    },
+    "al-ikhlas:1:structure:a": {
+      "text": "Sekarang susunan kalimatnya. Ayat dibuka dengan kata perintah, yaitu kata pertama (“katakanlah”), yang pelakunya tersirat, “engkau” (Nabi Muhammad shallallahu 'alaihi wa sallam); kalimat sesudahnya, kata kedua sampai keempat, adalah isi yang diperintahkan untuk diucapkan (maqul al-qaul) dan berkedudukan nashab."
+    },
+    "al-ikhlas:1:structure:b": {
+      "text": "Di dalamnya kata kedua menjadi mubtada': menurut al-Mujtaba dan pendapat pertama Darwisy, kata kedua adalah dhamir sya'n (“perkaranya ialah …”) yang dijelaskan oleh kalimat kata ketiga dan keempat, dengan kata ketiga sebagai mubtada' kedua dan kata keempat sebagai khabarnya;"
+    },
+    "al-ikhlas:1:structure:c": {
+      "text": "menurut pendapat lain, kata kedua kembali kepada Tuhan yang ditanyakan kepada Nabi shallallahu 'alaihi wa sallam, lalu kata ketiga menjadi khabarnya."
+    },
+    "al-ikhlas:1:ex:tap-word:intro": {
+      "text": "Latihan dengar dan ketuk. Imam akan membacakan empat kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, ketuk kata yang Anda dengar."
+    },
+    "al-ikhlas:1:ex:why-harakat:intro": {
+      "text": "Latihan kenapa harakat ini, empat soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu."
+    },
+    "al-ikhlas:1:ex:sort-case:intro": {
+      "text": "Latihan kelompokkan menurut akhiran, empat kata. Ketuk satu kata, lalu ketuk kelompok akhirannya."
+    },
+    "al-ikhlas:1:ex:label-role:intro": {
+      "text": "Latihan tebak peran kata, empat soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini."
+    },
+    "al-ikhlas:1:ex:wazn-factory:intro": {
+      "text": "Latihan bentuk-bentuk kata, enam soal. Dari satu akar lahir beberapa bentuk kata; pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif, bukan kutipan ayat."
+    },
+    "al-ikhlas:1:recap": {
+      "text": "Dengarkan sekali lagi seluruh ayat pertama dibacakan imam."
+    },
+    "al-ikhlas:1:next": {
+      "text": "Pelajaran ayat pertama selesai. Berikutnya ayat kedua; pelajaran berlanjut sendiri."
+    },
+    "al-ikhlas:2:intro": {
+      "text": "Ayat kedua Surah Al-Ikhlas. Terjemahannya: “Allah tempat meminta segala sesuatu.” Ayat ini terdiri dari dua kata, dan kita akan mempelajarinya satu per satu."
+    },
+    "al-ikhlas:2:recite": {
+      "text": "Sekarang dengarkan imam membacakan ayat kedua."
+    },
+    "al-ikhlas:2:w1": {
+      "text": "Kata pertama artinya “Allah”. Akhirnya dhammah karena menjadi mubtada' (pokok kalimat), dan kata kedua adalah khabarnya."
+    },
+    "al-ikhlas:2:w2": {
+      "text": "Kata kedua artinya “tempat meminta segala sesuatu”. Akhirnya dhammah karena menjadi khabar (keterangan) bagi kata pertama."
+    },
+    "al-ikhlas:2:structure:a": {
+      "text": "Sekarang susunan kalimatnya. Kalimat nominal: kata pertama menjadi mubtada' dan kata kedua khabarnya (Darwisy, al-Mujtaba); al-Mujtaba dan al-Jadwal menjadikan seluruh kalimat ini khabar kedua bagi kata yang berarti “Dialah” di ayat satu, dan al-Jadwal juga membolehkannya sebagai kalimat baru di dalam isi perkataan itu."
+    },
+    "al-ikhlas:2:structure:b": {
+      "text": "Kata pertama diulang, bukan diganti dengan kata ganti, dan menurut an-Nahhas pengulangan itu untuk mengagungkan; menurut Darwisy, ayat ini tidak disambung dengan wawu karena ia menegaskan dan memantapkan isi ayat sebelumnya."
+    },
+    "al-ikhlas:2:ex:tap-word:intro": {
+      "text": "Latihan dengar dan ketuk. Imam akan membacakan dua kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, ketuk kata yang Anda dengar."
+    },
+    "al-ikhlas:2:ex:why-harakat:intro": {
+      "text": "Latihan kenapa harakat ini, dua soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu."
+    },
+    "al-ikhlas:2:ex:sort-case:intro": {
+      "text": "Latihan kelompokkan menurut akhiran, dua kata. Ketuk satu kata, lalu ketuk kelompok akhirannya."
+    },
+    "al-ikhlas:2:ex:label-role:intro": {
+      "text": "Latihan tebak peran kata, dua soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini."
+    },
+    "al-ikhlas:2:recap": {
+      "text": "Dengarkan sekali lagi seluruh ayat kedua dibacakan imam."
+    },
+    "al-ikhlas:2:next": {
+      "text": "Pelajaran ayat kedua selesai. Berikutnya ayat ketiga; pelajaran berlanjut sendiri."
+    },
+    "al-ikhlas:3:intro": {
+      "text": "Ayat ketiga Surah Al-Ikhlas. Terjemahannya: “(Allah) tidak beranak dan tidak pula diperanakkan.” Ayat ini terdiri dari empat kata, dan kita akan mempelajarinya satu per satu."
+    },
+    "al-ikhlas:3:recite": {
+      "text": "Sekarang dengarkan imam membacakan ayat ketiga."
+    },
+    "al-ikhlas:3:w1": {
+      "text": "Kata pertama artinya “tidak”. Kata ini adalah huruf nafi (peniada) sekaligus huruf jazm: ia meniadakan kata kerja sesudahnya dan membuatnya majzum."
+    },
+    "al-ikhlas:3:w2": {
+      "text": "Kata kedua artinya “beranak”. Fi'il mudhari' ini majzum karena didahului kata pertama, dengan tanda sukun di akhir, karena huruf terakhirnya bukan huruf 'illah; pelakunya kata ganti yang tersimpan."
+    },
+    "al-ikhlas:3:w3": {
+      "text": "Kata ketiga artinya “dan tidak pula”. Wawu adalah huruf 'athaf yang menyambungkan kalimat ini dengan kata pertama dan kedua, dan kata ini kembali menjazmkan kata kerja sesudahnya."
+    },
+    "al-ikhlas:3:w4": {
+      "text": "Kata keempat artinya “diperanakkan”. Fi'il mudhari' bentuk majhul (pasif: “diperanakkan”) ini majzum oleh kata pertama sendiri, dengan tanda sukun di akhir; na'ib fa'il-nya (pengganti pelaku) adalah kata ganti yang tersimpan."
+    },
+    "al-ikhlas:3:concept:jazm-lam": {
+      "text": "Konsep baru: Huruf yang menafikan dan menjazmkan fi'il mudhari'. Kata pertama meniadakan fi'il mudhari' sesudahnya dan membuatnya majzum; bila huruf akhirnya sahih, tanda jazm-nya sukun."
+    },
+    "al-ikhlas:3:concept:fiil-majhul": {
+      "text": "Konsep baru: Fi'il majhul (kata kerja pasif: berawalan “di-”). Fi'il majhul ialah kata kerja yang pelakunya tidak disebut; pada fi'il mudhari', huruf pertamanya berharakat dhammah dan huruf sebelum akhirnya berharakat fathah."
+    },
+    "al-ikhlas:3:structure:a": {
+      "text": "Sekarang susunan kalimatnya. Kata pertama meniadakan fi'il mudhari' sesudahnya dan menjazmkannya, maka kata kedua dan kata keempat sama-sama berakhiran sukun; Ibnu Hisyam (Mughni) menjadikan ayat ini contoh kata pertama yang menjazmkan."
+    },
+    "al-ikhlas:3:structure:b": {
+      "text": "Menurut al-Mujtaba dan al-Jadwal, kata pertama dan kedua adalah khabar ketiga bagi kata yang berarti “Dialah” di ayat satu (al-Jadwal juga membolehkannya sebagai kalimat baru, dan ad-Da'as membacanya sebagai kalimat baru), dan kalimat kata ketiga dan keempat di-'athaf-kan padanya, sedangkan kata keempat majzum oleh kata ketiga sendiri;"
+    },
+    "al-ikhlas:3:structure:c": {
+      "text": "menurut Darwisy, kata pertama dan kedua sendiri tidak disambung dengan wawu karena ia menguatkan makna kata yang berarti “tempat meminta segala sesuatu” di ayat dua: Yang tidak membutuhkan apa pun, sedangkan segala sesuatu membutuhkan-Nya, tidak beranak dan tidak diperanakkan."
+    },
+    "al-ikhlas:3:ex:tap-word:intro": {
+      "text": "Latihan dengar dan ketuk. Imam akan membacakan empat kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, ketuk kata yang Anda dengar."
+    },
+    "al-ikhlas:3:ex:label-role:intro": {
+      "text": "Latihan tebak peran kata, empat soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini."
+    },
+    "al-ikhlas:3:ex:wazn-factory:intro": {
+      "text": "Latihan bentuk-bentuk kata, lima soal. Dari satu akar lahir beberapa bentuk kata; pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif, bukan kutipan ayat."
+    },
+    "al-ikhlas:3:recap": {
+      "text": "Dengarkan sekali lagi seluruh ayat ketiga dibacakan imam."
+    },
+    "al-ikhlas:3:next": {
+      "text": "Pelajaran ayat ketiga selesai. Berikutnya ayat keempat; pelajaran berlanjut sendiri."
+    },
+    "al-ikhlas:4:intro": {
+      "text": "Ayat keempat Surah Al-Ikhlas. Terjemahannya: “Dan tidak ada sesuatu yang setara dengan Dia.” Ayat ini terdiri dari lima kata, dan kita akan mempelajarinya satu per satu."
+    },
+    "al-ikhlas:4:recite": {
+      "text": "Sekarang dengarkan imam membacakan ayat keempat."
+    },
+    "al-ikhlas:4:w1": {
+      "text": "Kata pertama artinya “dan tidak”. Wawu adalah huruf 'athaf yang menyambungkan kalimat ini dengan frasa yang berarti “tidak beranak” di ayat tiga, dan kata ini sekali lagi menjazmkan kata kerja sesudahnya."
+    },
+    "al-ikhlas:4:w2": {
+      "text": "Kata kedua artinya “ada”. Fi'il mudhari' dari kana ini majzum oleh kata pertama, dengan tanda sukun pada nun di akhirnya; seperti kana, ia merafa'kan isimnya (kata kelima) dan menashabkan khabarnya (kata keempat)."
+    },
+    "al-ikhlas:4:w3": {
+      "text": "Kata ketiga artinya “bagi-Nya”. Huruf lam (bagi) adalah huruf jar dan akhiran (Dia) kata ganti mabni yang dijarkan olehnya; frasa jar-majrur kata ini bergantung pada kata keempat, sehingga bermakna “setara bagi-Nya”."
+    },
+    "al-ikhlas:4:w4": {
+      "text": "Kata keempat artinya “setara”. Akhirnya fathatain (fathah bertanwin) karena menjadi khabar kata kedua yang didahulukan sebelum isimnya, kata kelima."
+    },
+    "al-ikhlas:4:w5": {
+      "text": "Kata kelima artinya “sesuatu”. Akhirnya dhammatain (dhammah bertanwin) karena menjadi isim kata kedua, yang diletakkan di akhir kalimat."
+    },
+    "al-ikhlas:4:concept:kana-wa-akhawatuha": {
+      "text": "Konsep baru: Kana dan saudaranya (isimnya marfu', khabarnya manshub). Kana dan saudara-saudaranya masuk pada mubtada' dan khabar: isimnya menjadi marfu' dan khabarnya manshub, dan khabar itu boleh diletakkan sebelum isimnya."
+    },
+    "al-ikhlas:4:structure:a": {
+      "text": "Sekarang susunan kalimatnya. Wawu menyambungkan kalimat ini pada frasa yang berarti “tidak beranak” di ayat tiga, dan kata pertama menjazmkan kata kedua, bentuk mudhari' dari kana yang merafa'kan isimnya dan menashabkan khabarnya: kata kelima adalah isimnya yang diletakkan di akhir,"
+    },
+    "al-ikhlas:4:structure:b": {
+      "text": "kata keempat khabarnya yang didahulukan, dan kata ketiga bergantung pada kata keempat, sehingga maksudnya “tidak ada seorang pun yang setara bagi-Nya” (Abu Hayyan, dinukil Darwisy dan as-Samin)."
+    },
+    "al-ikhlas:4:structure:c": {
+      "text": "Kata ketiga disebut lebih dulu karena inti ayat ini adalah meniadakan kesetaraan dari Allah subhanahu wa ta'ala (az-Zamakhsyari, dinukil Darwisy dan as-Samin), dan menurut Darwisy tiga kalimat terakhir disambung dengan wawu karena tujuannya satu: meniadakan dari Allah subhanahu wa ta'ala segala keserupaan dan keterkaitan dalam bentuk apa pun."
+    },
+    "al-ikhlas:4:ex:tap-word:intro": {
+      "text": "Latihan dengar dan ketuk. Imam akan membacakan lima kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, ketuk kata yang Anda dengar."
+    },
+    "al-ikhlas:4:ex:why-harakat:intro": {
+      "text": "Latihan kenapa harakat ini, tiga soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu."
+    },
+    "al-ikhlas:4:ex:sort-case:intro": {
+      "text": "Latihan kelompokkan menurut akhiran, tiga kata. Ketuk satu kata, lalu ketuk kelompok akhirannya."
+    },
+    "al-ikhlas:4:ex:label-role:intro": {
+      "text": "Latihan tebak peran kata, lima soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini."
+    },
+    "al-ikhlas:4:ex:wazn-factory:intro": {
+      "text": "Latihan bentuk-bentuk kata, lima soal. Dari satu akar lahir beberapa bentuk kata; pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif, bukan kutipan ayat."
+    },
+    "al-ikhlas:4:recap": {
+      "text": "Dengarkan sekali lagi seluruh ayat keempat dibacakan imam."
+    },
+    "al-ikhlas:4:done": {
+      "text": "Pelajaran ayat keempat selesai. Ini ayat terakhir Surah Al-Ikhlas."
+    }
+  }
+}

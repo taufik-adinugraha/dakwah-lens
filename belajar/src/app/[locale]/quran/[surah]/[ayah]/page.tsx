@@ -4,6 +4,7 @@ import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { stageSequence } from "@/components/autoplay/build";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { LabelRole } from "@/components/exercises/LabelRole";
 import { SortCase } from "@/components/exercises/SortCase";
@@ -19,7 +20,7 @@ import { StructureSection } from "@/components/library/StructureSection";
 import { FactCard } from "@/components/surah/FactCard";
 import { Link } from "@/i18n/navigation";
 import { getAyah, getSurah, SURAH_INDEX, SURAHS } from "@/lib/content";
-import { buildLessonSteps } from "@/lib/lessonSteps";
+import { orderRecitations } from "@/lib/autoplay";
 import { conceptsIntroducedIn, getConcept, getLexeme, LIBRARY } from "@/lib/library";
 import { ayahHref, hubHref, quranHref, surahHref } from "@/lib/routes";
 
@@ -34,12 +35,6 @@ export function generateStaticParams() {
     s.ayat.map((a) => ({ surah: s.slug, ayah: String(a.ayah) })),
   );
 }
-
-const RECITER_ORDER = ["Alafasy_128kbps", "Husary_Muallim_128kbps"];
-const reciterRank = (id: string) => {
-  const i = RECITER_ORDER.indexOf(id);
-  return i === -1 ? RECITER_ORDER.length : i;
-};
 
 const RECITER_LABEL: Record<string, string> = {
   Husary_Muallim_128kbps: "Al-Husary (Mu'allim)",
@@ -80,10 +75,12 @@ function Deeper({ title, draft, children }: { title: string; draft?: string; chi
 
 /**
  * Lesson page, in the order a learner needs it (senior-ux §3.6): where am I
- * → the ayah, its translation and the guided lesson (one stage, one player)
- * → word by word → practice → "learn more" behind collapsed rows → the next
- * ayah. Nothing gives positional instructions ("di atas"); every citation
- * stays one tap away.
+ * → the stage: the ayah, its translation and the autoplay lesson (one tap on
+ * "Mulai", then it runs to the end of the surah by itself; exercises inside
+ * the stage, guided by voice and a spotlight) → word by word → practice (the
+ * same exercises, standalone, for manual practice) → "learn more" behind
+ * collapsed rows → the next ayah. Nothing gives positional instructions
+ * ("di atas"); every citation stays one tap away.
  */
 export default async function AyahPage({
   params,
@@ -98,7 +95,6 @@ export default async function AyahPage({
   const t = await getTranslations("Lesson");
   const tw = await getTranslations("Word");
   const tc = await getTranslations("Concept");
-  const tg = await getTranslations("Guided");
   const tp = await getTranslations("Player");
   const tb = await getTranslations("Breadcrumb");
 
@@ -109,16 +105,16 @@ export default async function AyahPage({
     gloss: w.gloss,
   }));
   // Default reciter: Mishary Alafasy (operator's choice, 2026-10-09); Husary
-  // Mu'allim stays available for its built-in "repeat after me" gaps.
-  const sources = [...a.recitation]
-    .sort((x, y) => reciterRank(x.reciter) - reciterRank(y.reciter))
-    .map((r) => ({
-      reciter: r.reciter,
-      url: r.url,
-      segments: r.segments,
-      credit: r.credit,
-      label: RECITER_LABEL[r.reciter] ?? r.reciter,
-    }));
+  // Mu'allim stays available for its built-in "repeat after me" gaps. One
+  // order for the page and the autoplay engine (RECITER_ORDER there), so
+  // the exercises the lesson waits at are exactly the ones rendered.
+  const sources = orderRecitations(a.recitation).map((r) => ({
+    reciter: r.reciter,
+    url: r.url,
+    segments: r.segments,
+    credit: r.credit,
+    label: RECITER_LABEL[r.reciter] ?? r.reciter,
+  }));
   const timed = new Set(sources.flatMap((r) => r.segments.map(([w]) => w)));
   const pool = s.ayat.flatMap((x) => x.words);
   const facts = s.facts.filter((f) => f.locations.includes(a.loc));
@@ -129,16 +125,17 @@ export default async function AyahPage({
   const key = `${s.slug}/${a.ayah}`;
   const pageTitle = `${s.name_id} · ${t("ayah", { n: a.ayah })}`;
   const introduced = conceptsIntroducedIn(a.loc);
-  const steps = buildLessonSteps(a, introduced, {
-    intro: (n) => tg("intro", { n }),
-    wordIntro: (translit) => tg("word_intro", { translit }),
-    meaning: (gloss) => tg("meaning", { gloss }),
-    concept: (title, summary) => tg("concept", { title, summary }),
-    conceptBrief: (title) => tg("concept_brief", { title }),
-    structure: (summary) => tg("structure", { summary }),
-    practice: tg("practice"),
-    recap: tg("recap"),
+  // The autoplay lesson of this ayah (src/lib/autoplay), built here at build
+  // time: captions in the page's locale, narration audio from
+  // content/narration/ when it has been rendered.
+  const seq = stageSequence(s, a, locale);
+  const lexemes = [...new Set(a.words.map((w) => w.lemma_id).filter((x): x is string => !!x))].flatMap((lid) => {
+    const lx = getLexeme(lid);
+    return lx?.tashrif ? [lx] : [];
   });
+  const surahIdx = SURAHS.findIndex((x) => x.slug === s.slug);
+  const after = surahIdx >= 0 ? SURAHS[surahIdx + 1] : undefined;
+  const nextSurah = after ? { slug: after.slug, name: after.name_id } : null;
   const conceptTitle = Object.fromEntries(LIBRARY.concepts.map((c) => [c.id, c.title]));
   const wordAr = Object.fromEntries(s.ayat.flatMap((x) => x.words.map((w) => [w.loc, w.ar])));
   const conceptLabels = {
@@ -205,16 +202,21 @@ export default async function AyahPage({
       <h1 className="mt-4 font-display text-3xl font-medium">{pageTitle}</h1>
       <p className="mt-1 text-base text-ink-muted">{t("ayah_of", { n: a.ayah, total: s.ayat.length })}</p>
 
-      {/* 2. The stage: ayah, translation, guided lesson — one player */}
+      {/* 2. The stage: ayah, translation and the autoplay lesson — one
+          player. Keyed by ayah: the next ayah (reached by the lesson's own
+          hand-off) starts with a fresh runner. */}
       <div className="mt-5">
         <LessonStage
-          lessonId={key}
+          key={key}
+          seq={seq}
           title={pageTitle}
           ayah={a.ayah}
+          surahName={s.name_id}
+          nextSurah={nextSurah}
           words={playerWords}
           sources={sources}
-          steps={steps}
           translation={translation}
+          exercise={{ words: a.words, pool, lexemes }}
         />
       </div>
 
@@ -284,13 +286,7 @@ export default async function AyahPage({
         <WhyHarakat id={`${key}/why`} words={a.words} pool={pool} />
         <SortCase id={`${key}/sort`} words={a.words} />
         <LabelRole id={`${key}/role`} words={a.words} pool={pool} />
-        <WaznFactory
-          id={`${key}/wazn`}
-          lexemes={[...new Set(a.words.map((w) => w.lemma_id).filter((x): x is string => !!x))].flatMap((lid) => {
-            const lx = getLexeme(lid);
-            return lx?.tashrif ? [lx] : [];
-          })}
-        />
+        <WaznFactory id={`${key}/wazn`} lexemes={lexemes} />
       </section>
 
       {/* 5. Learn more, collapsed */}

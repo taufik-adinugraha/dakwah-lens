@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "voice": null,
+  "lines": {
+    "shared:start": {
+      "text": "Mari kita mulai. Anda cukup mendengarkan dan memperhatikan layar; pelajaran berjalan sendiri, dan hanya latihan yang meminta Anda mengetuk. Ayat Al-Qur'an selalu dibacakan oleh imam. Penjelasan ini dibacakan dengan suara kecerdasan buatan, disusun dengan bantuan kecerdasan buatan dari kitab-kitab yang disebutkan sumbernya, dan bukan fatwa."
+    },
+    "shared:resume": {
+      "text": "Kita lanjutkan pelajaran dari langkah terakhir."
+    },
+    "shared:correct": {
+      "text": "Benar."
+    },
+    "shared:try_again": {
+      "text": "Belum tepat. Coba pilih yang lain."
+    },
+    "shared:revealed": {
+      "text": "Ini jawabannya. Perhatikan sebentar."
+    },
+    "shared:reminder": {
+      "text": "Silakan lanjutkan latihannya. Bagian yang perlu diketuk sedang diberi tanda di layar."
+    },
+    "shared:skip_offer": {
+      "text": "Jika ingin melewati latihan ini, ketuk tombol Lewati latihan."
+    },
+    "shared:surah_done": {
+      "text": "Pilihan berikutnya ada di layar."
+    },
+    "shared:ex:tap-word:play": {
+      "text": "Dengarkan imam membacakan satu kata dari ayat ini."
+    },
+    "shared:ex:tap-word:options": {
+      "text": "Sekarang ketuk kata yang tadi dibacakan imam."
+    },
+    "shared:ex:tap-word:reveal": {
+      "text": "Jika masih ragu, ketuk Tunjukkan jawaban. Anda juga boleh mencoba lagi."
+    },
+    "shared:ex:tap-word:next": {
+      "text": "Ketuk tombol yang diberi tanda untuk melanjutkan."
+    },
+    "shared:ex:why-harakat:options": {
+      "text": "Pilih alasan yang membuat akhir kata ini dibaca seperti itu."
+    },
+    "shared:ex:why-harakat:reveal": {
+      "text": "Jika masih ragu, ketuk Tunjukkan jawaban. Anda juga boleh mencoba lagi."
+    },
+    "shared:ex:why-harakat:next": {
+      "text": "Ketuk tombol yang diberi tanda untuk melanjutkan."
+    },
+    "shared:ex:sort-case:words": {
+      "text": "Ketuk satu kata yang ingin Anda kelompokkan."
+    },
+    "shared:ex:sort-case:bins": {
+      "text": "Sekarang ketuk kelompok akhiran yang cocok untuk kata itu."
+    },
+    "shared:ex:sort-case:reveal": {
+      "text": "Jika masih ragu, ketuk Tunjukkan jawaban. Anda juga boleh mencoba lagi."
+    },
+    "shared:ex:label-role:options": {
+      "text": "Pilih peran kata ini dalam kalimat ayatnya."
+    },
+    "shared:ex:label-role:reveal": {
+      "text": "Jika masih ragu, ketuk Tunjukkan jawaban. Anda juga boleh mencoba lagi."
+    },
+    "shared:ex:label-role:next": {
+      "text": "Ketuk tombol yang diberi tanda untuk melanjutkan."
+    },
+    "shared:ex:wazn-factory:options": {
+      "text": "Pilih bentuk kata yang sesuai dengan nama yang ditanyakan."
+    },
+    "shared:ex:wazn-factory:reveal": {
+      "text": "Jika masih ragu, ketuk Tunjukkan jawaban. Anda juga boleh mencoba lagi."
+    },
+    "shared:ex:wazn-factory:next": {
+      "text": "Ketuk tombol yang diberi tanda untuk melanjutkan."
+    }
+  }
+}

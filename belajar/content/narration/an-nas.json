@@ -1,0 +1,267 @@
+{
+  "version": 1,
+  "voice": null,
+  "lines": {
+    "an-nas:1:intro": {
+      "text": "Ayat pertama Surah An-Nas. Terjemahannya: “Katakanlah, Aku berlindung kepada Tuhannya manusia.” Ayat ini terdiri dari empat kata, dan kita akan mempelajarinya satu per satu."
+    },
+    "an-nas:1:recite": {
+      "text": "Sekarang dengarkan imam membacakan ayat pertama."
+    },
+    "an-nas:1:w1": {
+      "text": "Kata pertama artinya “katakanlah”. Fi'il amr ini mabni di atas sukun, sesuai hukum asal fi'il amr; pelakunya kata ganti tersirat, yaitu “engkau”."
+    },
+    "an-nas:1:w2": {
+      "text": "Kata kedua artinya “aku berlindung”. Akhirnya dhammah karena fi'il mudhari' ini tidak didahului huruf penashab atau penjazm; pelakunya kata ganti tersirat, yaitu “aku”."
+    },
+    "an-nas:1:w3": {
+      "text": "Kata ketiga artinya “kepada Tuhan”. Akhirnya kasrah karena kata ini didahului huruf jar ba' (“kepada”); frasa kata ini bergantung pada kata kedua."
+    },
+    "an-nas:1:w4": {
+      "text": "Kata keempat artinya “manusia”. Akhirnya kasrah karena menjadi mudhaf ilaih (kata yang disandari) bagi kata ketiga."
+    },
+    "an-nas:1:structure:a": {
+      "text": "Sekarang susunan kalimatnya. Kalimat perintah: kata pertama (“katakanlah”) adalah fi'il amr dengan pelaku tersirat “engkau”, dan kalimat yang diawali kata kedua adalah isi perkataan itu (maqul al-qaul), yang berkedudukan nashab."
+    },
+    "an-nas:1:structure:b": {
+      "text": "Isi itu sendiri kalimat kata kerja: kata kedua (“aku berlindung”) dengan pelaku tersirat “aku”, lalu kata ketiga dan keempat (“kepada Tuhan manusia”) menerangkan kepada siapa ia berlindung: jar-majrur yang bergantung pada kata kedua, dengan kata ketiga disandarkan kepada kata keempat."
+    },
+    "an-nas:1:structure:c": {
+      "text": "Az-Zamakhsyari (dinukil as-Samin) menjelaskan mengapa disebut Tuhan manusia secara khusus: yang dimohonkan perlindungan adalah dari pembisik di dada manusia, maka manusia berlindung kepada Tuhan mereka yang menguasai urusan mereka."
+    },
+    "an-nas:1:ex:tap-word:intro": {
+      "text": "Latihan dengar dan ketuk. Imam akan membacakan empat kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, ketuk kata yang Anda dengar."
+    },
+    "an-nas:1:ex:why-harakat:intro": {
+      "text": "Latihan kenapa harakat ini, empat soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu."
+    },
+    "an-nas:1:ex:sort-case:intro": {
+      "text": "Latihan kelompokkan menurut akhiran, empat kata. Ketuk satu kata, lalu ketuk kelompok akhirannya."
+    },
+    "an-nas:1:ex:label-role:intro": {
+      "text": "Latihan tebak peran kata, empat soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini."
+    },
+    "an-nas:1:ex:wazn-factory:intro": {
+      "text": "Latihan bentuk-bentuk kata, sepuluh soal. Dari satu akar lahir beberapa bentuk kata; pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif, bukan kutipan ayat."
+    },
+    "an-nas:1:recap": {
+      "text": "Dengarkan sekali lagi seluruh ayat pertama dibacakan imam."
+    },
+    "an-nas:1:next": {
+      "text": "Pelajaran ayat pertama selesai. Berikutnya ayat kedua; pelajaran berlanjut sendiri."
+    },
+    "an-nas:2:intro": {
+      "text": "Ayat kedua Surah An-Nas. Terjemahannya: “Raja manusia.” Ayat ini terdiri dari dua kata, dan kita akan mempelajarinya satu per satu."
+    },
+    "an-nas:2:recite": {
+      "text": "Sekarang dengarkan imam membacakan ayat kedua."
+    },
+    "an-nas:2:w1": {
+      "text": "Kata pertama artinya “Raja”. Akhirnya kasrah karena menjadi badal (pengganti yang menjelaskan) dari kata yang berarti “kepada Tuhan” di ayat satu yang majrur; sebagian ulama menjadikannya sifat atau 'athf bayan."
+    },
+    "an-nas:2:w2": {
+      "text": "Kata kedua artinya “manusia”. Akhirnya kasrah karena menjadi mudhaf ilaih bagi kata pertama."
+    },
+    "an-nas:2:concept:athaf-bayan": {
+      "text": "Konsep baru: 'Athaf bayan (penjelas yang mengikuti). 'Athaf bayan ialah kata yang mengikuti kata sebelumnya untuk menjelaskannya, mirip sifat tetapi berupa kata jamid (bukan kata turunan), dan ikut dalam seluruh i'rab-nya."
+    },
+    "an-nas:2:structure:a": {
+      "text": "Sekarang susunan kalimatnya. Ayat ini bukan kalimat baru: kata pertama (“Raja”) mengikuti kata yang berarti “kepada Tuhan” di ayat satu sebagai badal (pengganti yang menjelaskan) menurut al-Jadwal, al-Mujtaba dan ad-Da'as, maka ikut majrur; Darwisy, al-Jadwal dan as-Samin juga membolehkannya dibaca sebagai na't (sifat) atau 'athf bayan."
+    },
+    "an-nas:2:structure:b": {
+      "text": "Kata pertama disandarkan kepada kata kedua; menurut Darwisy, idhafah kepada kata kedua diulang untuk menambah kejelasan."
+    },
+    "an-nas:2:ex:tap-word:intro": {
+      "text": "Latihan dengar dan ketuk. Imam akan membacakan dua kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, ketuk kata yang Anda dengar."
+    },
+    "an-nas:2:ex:why-harakat:intro": {
+      "text": "Latihan kenapa harakat ini, dua soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu."
+    },
+    "an-nas:2:ex:sort-case:intro": {
+      "text": "Latihan kelompokkan menurut akhiran, dua kata. Ketuk satu kata, lalu ketuk kelompok akhirannya."
+    },
+    "an-nas:2:ex:label-role:intro": {
+      "text": "Latihan tebak peran kata, dua soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini."
+    },
+    "an-nas:2:recap": {
+      "text": "Dengarkan sekali lagi seluruh ayat kedua dibacakan imam."
+    },
+    "an-nas:2:next": {
+      "text": "Pelajaran ayat kedua selesai. Berikutnya ayat ketiga; pelajaran berlanjut sendiri."
+    },
+    "an-nas:3:intro": {
+      "text": "Ayat ketiga Surah An-Nas. Terjemahannya: “sembahan manusia.” Ayat ini terdiri dari dua kata, dan kita akan mempelajarinya satu per satu."
+    },
+    "an-nas:3:recite": {
+      "text": "Sekarang dengarkan imam membacakan ayat ketiga."
+    },
+    "an-nas:3:w1": {
+      "text": "Kata pertama artinya “sembahan”. Akhirnya kasrah karena menjadi badal (pengganti yang menjelaskan) dari kata yang berarti “Raja” di ayat dua, sehingga ikut majrur; sebagian ulama menjadikannya sifat atau 'athf bayan."
+    },
+    "an-nas:3:w2": {
+      "text": "Kata kedua artinya “manusia”. Akhirnya kasrah karena menjadi mudhaf ilaih bagi kata pertama."
+    },
+    "an-nas:3:structure:a": {
+      "text": "Sekarang susunan kalimatnya. Kata pertama (“Sembahan”) juga mengikuti kata sebelumnya dan ikut majrur: badal dari kata yang berarti “Raja” di ayat dua menurut al-Jadwal dan al-Mujtaba (ad-Da'as: dari kata yang berarti “kepada Tuhan” di ayat satu), dan sebagian ulama menjadikannya sifat atau 'athf bayan; ia disandarkan kepada kata kedua."
+    },
+    "an-nas:3:structure:b": {
+      "text": "Az-Zamakhsyari (dinukil as-Samin) menjelaskan urutannya: “tuhan manusia” dan “raja manusia” kadang diucapkan untuk selain Allah subhanahu wa ta'ala, sedangkan “sembahan manusia” khusus bagi-Nya tanpa sekutu, maka sebutan ini menjadi puncak penjelasan. Ibnu Katsir menyebut ketiga ayat ini tiga sifat Allah subhanahu wa ta'ala: Dialah Tuhan, Raja, dan Sembahan segala sesuatu."
+    },
+    "an-nas:3:ex:tap-word:intro": {
+      "text": "Latihan dengar dan ketuk. Imam akan membacakan dua kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, ketuk kata yang Anda dengar."
+    },
+    "an-nas:3:ex:why-harakat:intro": {
+      "text": "Latihan kenapa harakat ini, dua soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu."
+    },
+    "an-nas:3:ex:sort-case:intro": {
+      "text": "Latihan kelompokkan menurut akhiran, dua kata. Ketuk satu kata, lalu ketuk kelompok akhirannya."
+    },
+    "an-nas:3:ex:label-role:intro": {
+      "text": "Latihan tebak peran kata, dua soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini."
+    },
+    "an-nas:3:recap": {
+      "text": "Dengarkan sekali lagi seluruh ayat ketiga dibacakan imam."
+    },
+    "an-nas:3:next": {
+      "text": "Pelajaran ayat ketiga selesai. Berikutnya ayat keempat; pelajaran berlanjut sendiri."
+    },
+    "an-nas:4:intro": {
+      "text": "Ayat keempat Surah An-Nas. Terjemahannya: “dari kejahatan (bisikan) setan yang bersembunyi.” Ayat ini terdiri dari empat kata, dan kita akan mempelajarinya satu per satu."
+    },
+    "an-nas:4:recite": {
+      "text": "Sekarang dengarkan imam membacakan ayat keempat."
+    },
+    "an-nas:4:w1": {
+      "text": "Kata pertama artinya “dari”. Kata ini (“dari”) adalah huruf jar yang mabni di atas sukun, karena semua huruf mabni; frasa kata pertama dan kedua bergantung pada kata yang berarti “aku berlindung” di ayat satu."
+    },
+    "an-nas:4:w2": {
+      "text": "Kata kedua artinya “kejahatan”. Akhirnya kasrah karena didahului huruf jar, yaitu kata pertama; kata ini lalu disandarkan kepada kata ketiga."
+    },
+    "an-nas:4:w3": {
+      "text": "Kata ketiga artinya “pembisik (setan)”. Akhirnya kasrah karena menjadi mudhaf ilaih bagi kata kedua."
+    },
+    "an-nas:4:w4": {
+      "text": "Kata keempat artinya “yang bersembunyi”. Akhirnya kasrah karena menjadi sifat (na't) bagi kata ketiga yang majrur."
+    },
+    "an-nas:4:structure:a": {
+      "text": "Sekarang susunan kalimatnya. Kata pertama dan kedua (“dari kejahatan”) adalah jar-majrur kedua yang bergantung pada kata yang berarti “aku berlindung” di ayat satu: berlindung kepada Tuhan manusia, dari kejahatan."
+    },
+    "an-nas:4:structure:b": {
+      "text": "Kata kedua disandarkan kepada kata ketiga (“pembisik”), dan kata keempat (“yang bersembunyi”) adalah sifatnya, maka keduanya berakhir kasrah. Menurut riwayat dari Ibnu 'Abbas (dinukil Ibnu Katsir dan an-Nahhas), setan membisik ketika manusia lalai, lalu mundur bersembunyi ketika manusia mengingat Allah subhanahu wa ta'ala."
+    },
+    "an-nas:4:ex:tap-word:intro": {
+      "text": "Latihan dengar dan ketuk. Imam akan membacakan empat kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, ketuk kata yang Anda dengar."
+    },
+    "an-nas:4:ex:why-harakat:intro": {
+      "text": "Latihan kenapa harakat ini, tiga soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu."
+    },
+    "an-nas:4:ex:sort-case:intro": {
+      "text": "Latihan kelompokkan menurut akhiran, tiga kata. Ketuk satu kata, lalu ketuk kelompok akhirannya."
+    },
+    "an-nas:4:ex:label-role:intro": {
+      "text": "Latihan tebak peran kata, empat soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini."
+    },
+    "an-nas:4:recap": {
+      "text": "Dengarkan sekali lagi seluruh ayat keempat dibacakan imam."
+    },
+    "an-nas:4:next": {
+      "text": "Pelajaran ayat keempat selesai. Berikutnya ayat kelima; pelajaran berlanjut sendiri."
+    },
+    "an-nas:5:intro": {
+      "text": "Ayat kelima Surah An-Nas. Terjemahannya: “yang membisikkan (kejahatan) ke dalam dada manusia.” Ayat ini terdiri dari lima kata, dan kita akan mempelajarinya satu per satu."
+    },
+    "an-nas:5:recite": {
+      "text": "Sekarang dengarkan imam membacakan ayat kelima."
+    },
+    "an-nas:5:w1": {
+      "text": "Kata pertama artinya “yang”. Isim maushul ini mabni di atas sukun dan berkedudukan jar sebagai sifat (na't) bagi kata yang berarti “pembisik (setan)” di ayat empat; kalimat sesudahnya menjadi shilah-nya."
+    },
+    "an-nas:5:w2": {
+      "text": "Kata kedua artinya “membisikkan”. Akhirnya dhammah karena fi'il mudhari' ini tidak didahului huruf penashab atau penjazm; pelakunya kata ganti tersirat “ia”, yang kembali kepada kata pertama."
+    },
+    "an-nas:5:w3": {
+      "text": "Kata ketiga artinya “ke dalam”. Kata ini (“di dalam”) adalah huruf jar yang mabni di atas sukun, karena semua huruf mabni; frasa kata ketiga dan keempat bergantung pada kata kedua."
+    },
+    "an-nas:5:w4": {
+      "text": "Kata keempat artinya “dada”. Akhirnya kasrah karena didahului huruf jar, yaitu kata ketiga; kata ini lalu disandarkan kepada kata kelima."
+    },
+    "an-nas:5:w5": {
+      "text": "Kata kelima artinya “manusia”. Akhirnya kasrah karena menjadi mudhaf ilaih bagi kata keempat."
+    },
+    "an-nas:5:concept:rubai-mujarrad": {
+      "text": "Konsep baru: Ruba'i mujarrad (kata kerja empat huruf asli). Sebagian kata kerja tersusun dari empat huruf akar tanpa huruf tambahan; polanya hanya satu, fa'lala–yufa'lilu, seperti kata kedua (“membisikkan”)."
+    },
+    "an-nas:5:structure:a": {
+      "text": "Sekarang susunan kalimatnya. Kata pertama (“yang”) adalah sifat (na't) bagi kata yang berarti “pembisik (setan)” di ayat empat: ia mabni, tetapi berkedudukan jar."
+    },
+    "an-nas:5:structure:b": {
+      "text": "Kalimat sesudahnya, kata kedua sampai kelima (“membisikkan ke dalam dada manusia”), adalah shilah-nya: kata kedua fi'il mudhari' dengan pelaku tersirat “ia” yang kembali kepada kata pertama, kata ketiga dan keempat bergantung pada kata kedua, dan kata keempat disandarkan kepada kata kelima."
+    },
+    "an-nas:5:ex:tap-word:intro": {
+      "text": "Latihan dengar dan ketuk. Imam akan membacakan lima kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, ketuk kata yang Anda dengar."
+    },
+    "an-nas:5:ex:why-harakat:intro": {
+      "text": "Latihan kenapa harakat ini, empat soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu."
+    },
+    "an-nas:5:ex:sort-case:intro": {
+      "text": "Latihan kelompokkan menurut akhiran, empat kata. Ketuk satu kata, lalu ketuk kelompok akhirannya."
+    },
+    "an-nas:5:ex:label-role:intro": {
+      "text": "Latihan tebak peran kata, lima soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini."
+    },
+    "an-nas:5:ex:wazn-factory:intro": {
+      "text": "Latihan bentuk-bentuk kata, lima soal. Dari satu akar lahir beberapa bentuk kata; pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif, bukan kutipan ayat."
+    },
+    "an-nas:5:recap": {
+      "text": "Dengarkan sekali lagi seluruh ayat kelima dibacakan imam."
+    },
+    "an-nas:5:next": {
+      "text": "Pelajaran ayat kelima selesai. Berikutnya ayat keenam; pelajaran berlanjut sendiri."
+    },
+    "an-nas:6:intro": {
+      "text": "Ayat keenam Surah An-Nas. Terjemahannya: “dari (golongan) jin dan manusia.” Ayat ini terdiri dari tiga kata, dan kita akan mempelajarinya satu per satu."
+    },
+    "an-nas:6:recite": {
+      "text": "Sekarang dengarkan imam membacakan ayat keenam."
+    },
+    "an-nas:6:w1": {
+      "text": "Kata pertama artinya “dari”. Kata ini adalah huruf jar (“dari”) yang mabni di atas sukun; nunnya berharakat fathah di sini hanya karena bertemu huruf mati pada alif lam sesudahnya, sebab kata mabni boleh bergerak untuk menghindari dua huruf mati bertemu."
+    },
+    "an-nas:6:w2": {
+      "text": "Kata kedua artinya “(golongan) jin”. Akhirnya kasrah karena didahului huruf jar, yaitu kata pertama."
+    },
+    "an-nas:6:w3": {
+      "text": "Kata ketiga artinya “dan manusia”. Wawu adalah huruf 'athaf, dan kata ini di-'athaf-kan kepada kata kedua yang majrur, maka ikut berakhir kasrah."
+    },
+    "an-nas:6:concept:hal": {
+      "text": "Konsep baru: Hal (keterangan keadaan). Hal menjelaskan keadaan pelaku atau objek ketika perbuatan terjadi; biasanya berupa isim manshub, dan bisa juga tersirat, dengan frasa jar-majrur yang bergantung padanya."
+    },
+    "an-nas:6:structure:a": {
+      "text": "Sekarang susunan kalimatnya. Kata pertama dan kedua (“dari golongan jin”) adalah jar-majrur, dan kata ketiga (“dan manusia”) di-'athaf-kan kepada kata kedua sehingga ikut majrur."
+    },
+    "an-nas:6:structure:b": {
+      "text": "Al-Jadwal, al-Mujtaba dan ad-Da'as menjadikan frasa ini keterangan keadaan (hal) bagi pelaku kata yang berarti “membisikkan” di ayat lima, sedangkan Darwisy membacanya sebagai penjelas (bayan) bagi “yang membisikkan”; menurut keduanya, pembisik itu ada dari golongan jin dan dari golongan manusia."
+    },
+    "an-nas:6:structure:c": {
+      "text": "Ibnu Katsir menyebut makna ini dengan merujuk Surah Al-An'am ayat seratus dua belas tentang setan dari jenis manusia dan jin."
+    },
+    "an-nas:6:ex:tap-word:intro": {
+      "text": "Latihan dengar dan ketuk. Imam akan membacakan tiga kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, ketuk kata yang Anda dengar."
+    },
+    "an-nas:6:ex:why-harakat:intro": {
+      "text": "Latihan kenapa harakat ini, dua soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu."
+    },
+    "an-nas:6:ex:sort-case:intro": {
+      "text": "Latihan kelompokkan menurut akhiran, dua kata. Ketuk satu kata, lalu ketuk kelompok akhirannya."
+    },
+    "an-nas:6:ex:label-role:intro": {
+      "text": "Latihan tebak peran kata, tiga soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini."
+    },
+    "an-nas:6:recap": {
+      "text": "Dengarkan sekali lagi seluruh ayat keenam dibacakan imam."
+    },
+    "an-nas:6:done": {
+      "text": "Pelajaran ayat keenam selesai. Ini ayat terakhir Surah An-Nas."
+    }
+  }
+}

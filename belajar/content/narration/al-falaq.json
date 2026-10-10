@@ -1,0 +1,240 @@
+{
+  "version": 1,
+  "voice": null,
+  "lines": {
+    "al-falaq:1:intro": {
+      "text": "Ayat pertama Surah Al-Falaq. Terjemahannya: “Katakanlah, Aku berlindung kepada Tuhan yang menguasai subuh (fajar).” Ayat ini terdiri dari empat kata, dan kita akan mempelajarinya satu per satu."
+    },
+    "al-falaq:1:recite": {
+      "text": "Sekarang dengarkan imam membacakan ayat pertama."
+    },
+    "al-falaq:1:w1": {
+      "text": "Kata pertama artinya “katakanlah”. Kata perintah (fi'il amr) ini mabni di atas sukun, jadi akhirnya tetap; pelakunya tersirat, yaitu “engkau”."
+    },
+    "al-falaq:1:w2": {
+      "text": "Kata kedua artinya “aku berlindung”. Akhirnya dhammah karena fi'il mudhari' ini tidak didahului huruf penashab atau penjazm; pelakunya tersirat, yaitu “aku”."
+    },
+    "al-falaq:1:w3": {
+      "text": "Kata ketiga artinya “kepada Tuhan”. Akhirnya kasrah karena kata ini (Tuhan) didahului huruf jar ba'; frasa kata ini bergantung pada kata kedua, dan kata ini disandarkan kepada kata keempat."
+    },
+    "al-falaq:1:w4": {
+      "text": "Kata keempat artinya “subuh”. Akhirnya kasrah karena menjadi mudhaf ilaih dari kata ketiga (“Tuhan yang menguasai subuh”)."
+    },
+    "al-falaq:1:structure:a": {
+      "text": "Sekarang susunan kalimatnya. Kata pertama (“katakanlah”) adalah kata perintah dengan pelaku tersirat, “engkau”."
+    },
+    "al-falaq:1:structure:b": {
+      "text": "Yang diperintahkan untuk diucapkan, kata kedua sampai keempat (“aku berlindung kepada Tuhan yang menguasai subuh”), adalah kalimat kata kerja dengan pelaku tersirat “aku”; seluruhnya menjadi isi ucapan (maqul al-qaul) dan berkedudukan nashab. Kata ketiga bergantung pada kata kedua, dan kata ketiga disandarkan (idhafah) kepada kata keempat."
+    },
+    "al-falaq:1:ex:tap-word:intro": {
+      "text": "Latihan dengar dan ketuk. Imam akan membacakan empat kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, ketuk kata yang Anda dengar."
+    },
+    "al-falaq:1:ex:why-harakat:intro": {
+      "text": "Latihan kenapa harakat ini, empat soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu."
+    },
+    "al-falaq:1:ex:sort-case:intro": {
+      "text": "Latihan kelompokkan menurut akhiran, empat kata. Ketuk satu kata, lalu ketuk kelompok akhirannya."
+    },
+    "al-falaq:1:ex:label-role:intro": {
+      "text": "Latihan tebak peran kata, empat soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini."
+    },
+    "al-falaq:1:ex:wazn-factory:intro": {
+      "text": "Latihan bentuk-bentuk kata, sepuluh soal. Dari satu akar lahir beberapa bentuk kata; pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif, bukan kutipan ayat."
+    },
+    "al-falaq:1:recap": {
+      "text": "Dengarkan sekali lagi seluruh ayat pertama dibacakan imam."
+    },
+    "al-falaq:1:next": {
+      "text": "Pelajaran ayat pertama selesai. Berikutnya ayat kedua; pelajaran berlanjut sendiri."
+    },
+    "al-falaq:2:intro": {
+      "text": "Ayat kedua Surah Al-Falaq. Terjemahannya: “dari kejahatan (makhluk yang) Dia ciptakan.” Ayat ini terdiri dari empat kata, dan kita akan mempelajarinya satu per satu."
+    },
+    "al-falaq:2:recite": {
+      "text": "Sekarang dengarkan imam membacakan ayat kedua."
+    },
+    "al-falaq:2:w1": {
+      "text": "Kata pertama artinya “dari”. Kata ini adalah huruf jar (kata depan) “dari”; kata sesudahnya, kata kedua, menjadi majrur karenanya, dan frasa kata pertama dan kedua bergantung pada kata yang berarti “aku berlindung” di ayat satu."
+    },
+    "al-falaq:2:w2": {
+      "text": "Kata kedua artinya “kejahatan”. Akhirnya kasrah karena didahului huruf jar, yaitu kata pertama; kata ini juga disandarkan (mudhaf) kepada kata sesudahnya, kata ketiga."
+    },
+    "al-falaq:2:w3": {
+      "text": "Kata ketiga artinya “(makhluk) yang”. Isim maushul (kata penghubung “yang”) ini mabni di atas sukun dan berkedudukan jar sebagai mudhaf ilaih dari kata kedua; shilah-nya adalah kata keempat, dan kata ganti yang kembali kepada kata ini dibuang, maksudnya “yang Dia ciptakan”."
+    },
+    "al-falaq:2:w4": {
+      "text": "Kata keempat artinya “Dia ciptakan”. Fi'il madhi ini mabni di atas fathah; pelakunya tersirat, yaitu “Dia” (Allah subhanahu wa ta'ala), dan kalimat kata ini menjadi shilah bagi kata ketiga."
+    },
+    "al-falaq:2:structure:a": {
+      "text": "Sekarang susunan kalimatnya. Ayat ini melanjutkan ayat satu: kata pertama dan kedua (“dari kejahatan”) bergantung pada kata yang berarti “aku berlindung” di ayat satu, begitu pula frasa yang berarti “dan dari kejahatan” di ayat tiga, empat dan lima."
+    },
+    "al-falaq:2:structure:b": {
+      "text": "Kata kedua disandarkan kepada kata ketiga (“yang”), isim maushul yang dijelaskan oleh shilah kata keempat (“Dia ciptakan”); kata ganti yang kembali kepada kata ketiga dibuang. Sebagian ulama membaca kata ketiga sebagai huruf mashdariyyah, sehingga maknanya “ciptaan-Nya”."
+    },
+    "al-falaq:2:ex:tap-word:intro": {
+      "text": "Latihan dengar dan ketuk. Imam akan membacakan empat kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, ketuk kata yang Anda dengar."
+    },
+    "al-falaq:2:ex:why-harakat:intro": {
+      "text": "Latihan kenapa harakat ini, tiga soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu."
+    },
+    "al-falaq:2:ex:sort-case:intro": {
+      "text": "Latihan kelompokkan menurut akhiran, tiga kata. Ketuk satu kata, lalu ketuk kelompok akhirannya."
+    },
+    "al-falaq:2:ex:label-role:intro": {
+      "text": "Latihan tebak peran kata, empat soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini."
+    },
+    "al-falaq:2:ex:wazn-factory:intro": {
+      "text": "Latihan bentuk-bentuk kata, lima soal. Dari satu akar lahir beberapa bentuk kata; pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif, bukan kutipan ayat."
+    },
+    "al-falaq:2:recap": {
+      "text": "Dengarkan sekali lagi seluruh ayat kedua dibacakan imam."
+    },
+    "al-falaq:2:next": {
+      "text": "Pelajaran ayat kedua selesai. Berikutnya ayat ketiga; pelajaran berlanjut sendiri."
+    },
+    "al-falaq:3:intro": {
+      "text": "Ayat ketiga Surah Al-Falaq. Terjemahannya: “dan dari kejahatan malam apabila telah gelap gulita.” Ayat ini terdiri dari lima kata, dan kita akan mempelajarinya satu per satu."
+    },
+    "al-falaq:3:recite": {
+      "text": "Sekarang dengarkan imam membacakan ayat ketiga."
+    },
+    "al-falaq:3:w1": {
+      "text": "Kata pertama artinya “dan dari”. Wawu adalah huruf 'athaf (penyambung) dan kata ini huruf jar “dari”; frasa ini disambungkan pada frasa yang berarti “dari kejahatan” di ayat dua, sehingga juga bergantung pada kata yang berarti “aku berlindung” di ayat satu."
+    },
+    "al-falaq:3:w2": {
+      "text": "Kata kedua artinya “kejahatan”. Akhirnya kasrah karena didahului huruf jar, yaitu kata pertama; kata ini juga disandarkan (mudhaf) kepada kata ketiga."
+    },
+    "al-falaq:3:w3": {
+      "text": "Kata ketiga artinya “malam”. Akhirnya kasrah bertanwin karena menjadi mudhaf ilaih dari kata kedua; kata ini nakirah (tak tentu), tanpa alif lam."
+    },
+    "al-falaq:3:w4": {
+      "text": "Kata keempat artinya “apabila”. Kata ini mabni di atas sukun dan berkedudukan nashab sebagai keterangan waktu (zharaf) murni, tanpa makna syarat; kalimat sesudahnya, kata kelima, menjadi mudhaf ilaih baginya."
+    },
+    "al-falaq:3:w5": {
+      "text": "Kata kelima artinya “telah gelap gulita”. Fi'il madhi ini mabni di atas fathah; pelakunya tersirat (“ia”, yaitu malam itu), dan kalimat kata ini berkedudukan jar sebagai mudhaf ilaih dari kata keempat."
+    },
+    "al-falaq:3:concept:zharaf-idza": {
+      "text": "Konsep baru: Zharaf kata keempat (keterangan waktu “apabila”). Kata keempat ialah keterangan waktu (zharaf) untuk masa yang akan datang, mabni di atas sukun, yang selalu disandarkan kepada kalimat sesudahnya; di Surah Al-Falaq ia keterangan waktu murni, tanpa makna syarat."
+    },
+    "al-falaq:3:structure:a": {
+      "text": "Sekarang susunan kalimatnya. Wawu (“dan”) menyambungkan ('athaf) frasa ini dengan frasa yang berarti “dari kejahatan” di ayat dua, jadi ia juga bergantung pada kata yang berarti “aku berlindung” di ayat satu. Kata kedua disandarkan kepada kata ketiga (“malam”)."
+    },
+    "al-falaq:3:structure:b": {
+      "text": "Kata keempat (“apabila”) di sini keterangan waktu (zharaf) murni tanpa makna syarat, dan kalimat kata kelima (“telah gelap gulita”) menjadi mudhaf ilaih baginya; kata keempat dikaitkan dengan kata yang berarti “aku berlindung” di ayat satu menurut al-Mujtaba dan as-Samin, atau dengan kata kedua menurut al-Jadwal."
+    },
+    "al-falaq:3:ex:tap-word:intro": {
+      "text": "Latihan dengar dan ketuk. Imam akan membacakan lima kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, ketuk kata yang Anda dengar."
+    },
+    "al-falaq:3:ex:why-harakat:intro": {
+      "text": "Latihan kenapa harakat ini, empat soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu."
+    },
+    "al-falaq:3:ex:sort-case:intro": {
+      "text": "Latihan kelompokkan menurut akhiran, empat kata. Ketuk satu kata, lalu ketuk kelompok akhirannya."
+    },
+    "al-falaq:3:ex:label-role:intro": {
+      "text": "Latihan tebak peran kata, lima soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini."
+    },
+    "al-falaq:3:recap": {
+      "text": "Dengarkan sekali lagi seluruh ayat ketiga dibacakan imam."
+    },
+    "al-falaq:3:next": {
+      "text": "Pelajaran ayat ketiga selesai. Berikutnya ayat keempat; pelajaran berlanjut sendiri."
+    },
+    "al-falaq:4:intro": {
+      "text": "Ayat keempat Surah Al-Falaq. Terjemahannya: “dan dari kejahatan (perempuan-perempuan) penyihir yang meniup pada buhul-buhul (talinya).” Ayat ini terdiri dari lima kata, dan kita akan mempelajarinya satu per satu."
+    },
+    "al-falaq:4:recite": {
+      "text": "Sekarang dengarkan imam membacakan ayat keempat."
+    },
+    "al-falaq:4:w1": {
+      "text": "Kata pertama artinya “dan dari”. Wawu adalah huruf 'athaf dan kata ini huruf jar “dari”; frasa ini juga disambungkan pada kata pertama dan kedua sebelumnya, jadi tetap bergantung pada kata yang berarti “aku berlindung” di ayat satu."
+    },
+    "al-falaq:4:w2": {
+      "text": "Kata kedua artinya “kejahatan”. Akhirnya kasrah karena didahului huruf jar, yaitu kata pertama; kata ini juga disandarkan (mudhaf) kepada kata ketiga."
+    },
+    "al-falaq:4:w3": {
+      "text": "Kata ketiga artinya “penyihir (perempuan) yang meniup”. Akhirnya kasrah karena menjadi mudhaf ilaih dari kata kedua; kata ini jamak dari naffasah, bentuk mubalaghah (“yang banyak meniup”) dari isim fa'il."
+    },
+    "al-falaq:4:w4": {
+      "text": "Kata keempat artinya “pada”. Kata ini adalah huruf jar “pada”; kata kelima sesudahnya menjadi majrur karenanya, dan frasa kata keempat dan kelima bergantung pada kata ketiga."
+    },
+    "al-falaq:4:w5": {
+      "text": "Kata kelima artinya “buhul-buhul”. Akhirnya kasrah karena didahului huruf jar, yaitu kata keempat; kata ini jamak dari 'uqdah (buhul, simpul)."
+    },
+    "al-falaq:4:concept:sighat-mubalaghah": {
+      "text": "Konsep baru: Shighat mubalaghah (bentuk “sangat, sering”). Shighat mubalaghah ialah bentuk isim fa'il yang bermakna “sangat” atau “sering melakukan”, seperti naffas (“yang banyak meniup”); bentuk ini bekerja seperti kata kerja."
+    },
+    "al-falaq:4:structure:a": {
+      "text": "Sekarang susunan kalimatnya. Frasa ini juga di-'athaf-kan pada kata pertama dan kedua sebelumnya, jadi tetap bergantung pada kata yang berarti “aku berlindung” di ayat satu."
+    },
+    "al-falaq:4:structure:b": {
+      "text": "Kata kedua disandarkan kepada kata ketiga (“para peniup”), bentuk jamak dari naffasah, yaitu bentuk mubalaghah (“yang banyak …”) dari isim fa'il. Frasa kata keempat dan kelima (“pada buhul-buhul”) bergantung pada kata ketiga (Darwisy, al-Jadwal, al-Mujtaba, ad-Da'as)."
+    },
+    "al-falaq:4:ex:tap-word:intro": {
+      "text": "Latihan dengar dan ketuk. Imam akan membacakan lima kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, ketuk kata yang Anda dengar."
+    },
+    "al-falaq:4:ex:why-harakat:intro": {
+      "text": "Latihan kenapa harakat ini, tiga soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu."
+    },
+    "al-falaq:4:ex:sort-case:intro": {
+      "text": "Latihan kelompokkan menurut akhiran, tiga kata. Ketuk satu kata, lalu ketuk kelompok akhirannya."
+    },
+    "al-falaq:4:ex:label-role:intro": {
+      "text": "Latihan tebak peran kata, lima soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini."
+    },
+    "al-falaq:4:recap": {
+      "text": "Dengarkan sekali lagi seluruh ayat keempat dibacakan imam."
+    },
+    "al-falaq:4:next": {
+      "text": "Pelajaran ayat keempat selesai. Berikutnya ayat kelima; pelajaran berlanjut sendiri."
+    },
+    "al-falaq:5:intro": {
+      "text": "Ayat kelima Surah Al-Falaq. Terjemahannya: “dan dari kejahatan orang yang dengki apabila dia dengki.” Ayat ini terdiri dari lima kata, dan kita akan mempelajarinya satu per satu."
+    },
+    "al-falaq:5:recite": {
+      "text": "Sekarang dengarkan imam membacakan ayat kelima."
+    },
+    "al-falaq:5:w1": {
+      "text": "Kata pertama artinya “dan dari”. Wawu adalah huruf 'athaf dan kata ini huruf jar “dari”; frasa terakhir ini pun disambungkan pada kata pertama dan kedua sebelumnya dan bergantung pada kata yang berarti “aku berlindung” di ayat satu."
+    },
+    "al-falaq:5:w2": {
+      "text": "Kata kedua artinya “kejahatan”. Akhirnya kasrah karena didahului huruf jar, yaitu kata pertama; kata ini juga disandarkan (mudhaf) kepada kata ketiga."
+    },
+    "al-falaq:5:w3": {
+      "text": "Kata ketiga artinya “orang yang dengki”. Akhirnya kasrah bertanwin karena menjadi mudhaf ilaih dari kata kedua; kata ini adalah isim fa'il dari kata kelima (“yang dengki”), dan di sini nakirah, tanpa alif lam."
+    },
+    "al-falaq:5:w4": {
+      "text": "Kata keempat artinya “apabila”. Kata ini mabni di atas sukun dan berkedudukan nashab sebagai keterangan waktu (zharaf) murni; kalimat sesudahnya, kata kelima, menjadi mudhaf ilaih baginya."
+    },
+    "al-falaq:5:w5": {
+      "text": "Kata kelima artinya “dia dengki”. Fi'il madhi ini mabni di atas fathah; pelakunya tersirat (“dia”, yaitu orang yang dengki itu), dan kalimat kata ini berkedudukan jar sebagai mudhaf ilaih dari kata keempat."
+    },
+    "al-falaq:5:structure:a": {
+      "text": "Sekarang susunan kalimatnya. Polanya sama dengan ayat tiga, dan Darwisy menyebut i'rab-nya “jelas”: frasa ini di-'athaf-kan pada kata pertama dan kedua sebelumnya, kata kedua disandarkan kepada kata ketiga (“orang yang dengki”), lalu kata keempat (“apabila”) menjadi keterangan waktu dengan kalimat kata kelima (“dia dengki”) sebagai mudhaf ilaih-nya."
+    },
+    "al-falaq:5:structure:b": {
+      "text": "Al-Mujtaba mengaitkan kata keempat dengan kata yang berarti “aku berlindung” di ayat satu, sedangkan al-Jadwal dengan kata kedua."
+    },
+    "al-falaq:5:ex:tap-word:intro": {
+      "text": "Latihan dengar dan ketuk. Imam akan membacakan lima kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, ketuk kata yang Anda dengar."
+    },
+    "al-falaq:5:ex:why-harakat:intro": {
+      "text": "Latihan kenapa harakat ini, empat soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu."
+    },
+    "al-falaq:5:ex:sort-case:intro": {
+      "text": "Latihan kelompokkan menurut akhiran, empat kata. Ketuk satu kata, lalu ketuk kelompok akhirannya."
+    },
+    "al-falaq:5:ex:label-role:intro": {
+      "text": "Latihan tebak peran kata, lima soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini."
+    },
+    "al-falaq:5:ex:wazn-factory:intro": {
+      "text": "Latihan bentuk-bentuk kata, lima soal. Dari satu akar lahir beberapa bentuk kata; pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif, bukan kutipan ayat."
+    },
+    "al-falaq:5:recap": {
+      "text": "Dengarkan sekali lagi seluruh ayat kelima dibacakan imam."
+    },
+    "al-falaq:5:done": {
+      "text": "Pelajaran ayat kelima selesai. Ini ayat terakhir Surah Al-Falaq."
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "_comment": "Pronunciation dictionary for narration (kamus pelafalan). ElevenLabs eleven_v3, mode A (language_code \"id\"). Every Arabic term in spoken narration is written exactly as `speak`; captions show `display`. Approved by the operator by ear on the Al-Fatihah 1 preview (2026-10-10). Rules: (1) grammar terms are spoken from Arabic script unless listed with a Latin respelling; (2) a term with a heavy letter (ص ض ط ظ ق خ غ) + fathah/alif MUST have a fixed respelling (v3 reads them light and inconsistently); (3) the narrator never speaks Qur'anic words. New terms are added only after the operator approves their sound.",
+  "mode": { "model_id": "eleven_v3", "language_code": "id", "voice": "Kang Nandar (aK834gEOxQEtviMPgurT)" },
+  "terms": [
+    { "term": "كَسْرَة", "speak": "كَسْرَة", "display": "kasrah (كَسْرَة)", "rule": "ra + fathah; operator kept the Arabic-script reading", "approved": "2026-10-10" },
+    { "term": "إِعْرَاب", "speak": "إِعْرَاب", "display": "i’rab (إِعْرَاب)", "rule": "ra + fathah; operator kept the Arabic-script reading", "approved": "2026-10-10" },
+    { "term": "مَجْرُور", "speak": "مَجْرُور", "display": "majrur (مَجْرُور)", "rule": "ra + dhammah; operator kept the Arabic-script reading", "approved": "2026-10-10" },
+    { "term": "حَرْف جَرّ", "speak": "حَرْف جَرّ", "display": "huruf jar (حَرْف جَرّ)", "rule": "ra sukun after fathah; operator kept the Arabic-script reading", "approved": "2026-10-10" },
+    { "term": "حَرْف", "speak": "حَرْف", "display": "huruf (حَرْف)", "rule": "ra sukun after fathah; operator kept the Arabic-script reading", "approved": "2026-10-10" },
+    { "term": "تَصْرِيف", "speak": "تَصْرِيف", "display": "tashrif (تَصْرِيف)", "rule": "ra + kasrah (light)", "approved": "2026-10-10" },
+    { "term": "Bashrah", "speak": "Bashrah", "display": "Bashrah", "rule": "place name; operator kept the current spelling", "approved": "2026-10-10" },
+    { "term": "إِضَافَة", "speak": "idhofah", "display": "idhafah (إِضَافَة)", "rule": "dhad + fathah/alif → heavy (o); fixed respelling", "approved": "2026-10-10" },
+    { "term": "مُضَاف إِلَيْه", "speak": "mudhof ilaih", "display": "mudhaf ilaih (مُضَاف إِلَيْه)", "rule": "dhad + fathah/alif → heavy (o); fixed respelling", "approved": "2026-10-10" },
+    { "term": "ضَمَّة", "speak": "dhommah", "display": "dhammah (ضَمَّة)", "rule": "dhad + fathah → heavy (o); fixed respelling", "approved": "2026-10-10" },
+    { "term": "ضَمِير", "speak": "dhomir", "display": "dhamir (ضَمِير)", "rule": "dhad + fathah → heavy (o); fixed respelling (operator heard it inconsistent)", "approved": "2026-10-10" },
+    { "term": "Allah", "speak": "Alloh", "display": "Allah", "rule": "lafzh al-jalalah, tafkhim; house normalisation rule", "approved": "2026-10-10" },
+    { "term": "نَعْت", "speak": "نَعْت", "display": "na’t (نَعْت)", "rule": "Arabic script (Latin na't was mispronounced)", "approved": "2026-10-10" },
+    { "term": "بَاء", "speak": "بَاء", "display": "ba’ (بِ)", "rule": "letter NAME spoken; caption shows the letter as in the ayah", "approved": "2026-10-10" },
+    { "term": "لَام", "speak": "لَام", "display": "lam (لِ)", "rule": "letter NAME spoken; caption shows the letter as in the ayah", "approved": "2026-10-10" },
+    { "term": "عَلَى", "speak": "عَلَى", "display": "‘ala (عَلَى)", "rule": "preposition example (grammar), Arabic script", "approved": "2026-10-10" },
+    { "term": "فَتْحَة", "speak": "فَتْحَة", "display": "fathah (فَتْحَة)", "rule": "Arabic script", "approved": "2026-10-10" },
+    { "term": "كَلِمَة", "speak": "كَلِمَة", "display": "kalimah (كَلِمَة)", "rule": "Arabic script", "approved": "2026-10-10" },
+    { "term": "اِسْم", "speak": "اِسْم", "display": "isim (اِسْم)", "rule": "Arabic script", "approved": "2026-10-10" },
+    { "term": "اِسْم مَجْرُور", "speak": "اِسْم مَجْرُور", "display": "isim majrur (اِسْم مَجْرُور)", "rule": "Arabic script", "approved": "2026-10-10" },
+    { "term": "فِعْل", "speak": "فِعْل", "display": "fi’il (فِعْل)", "rule": "Arabic script", "approved": "2026-10-10" },
+    { "term": "جُمْلَة فِعْلِيَّة", "speak": "جُمْلَة فِعْلِيَّة", "display": "jumlah fi’liyyah (جُمْلَة فِعْلِيَّة)", "rule": "Arabic script", "approved": "2026-10-10" },
+    { "term": "جُمْلَة اِسْمِيَّة", "speak": "جُمْلَة اِسْمِيَّة", "display": "jumlah ismiyyah (جُمْلَة اِسْمِيَّة)", "rule": "Arabic script", "approved": "2026-10-10" },
+    { "term": "أَبْتَدِئُ", "speak": "أَبْتَدِئُ", "display": "abtadi’u (أَبْتَدِئُ)", "rule": "scholars' implied word (not Qur'an), Arabic script", "approved": "2026-10-10" },
+    { "term": "اِبْتِدَائِي", "speak": "اِبْتِدَائِي", "display": "ibtida’i (اِبْتِدَائِي)", "rule": "scholars' implied word (not Qur'an), Arabic script", "approved": "2026-10-10" }
+  ]
+}

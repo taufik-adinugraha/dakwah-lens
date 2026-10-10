@@ -15,11 +15,21 @@ import {
   QuizActions,
   optionState,
   useChoiceQuiz,
+  useGuide,
   useRestart,
   useStepFocus,
 } from "./ExerciseShell";
+import { choiceGuidePart, guideMarker, guideTarget, type ExerciseGuide } from "./guide";
 
-type Props = { id: string; words: Word[]; pool: Word[] };
+type Props = {
+  id: string;
+  words: Word[];
+  pool: Word[];
+  /** Guided mode (see ExerciseShell.tsx). */
+  guided?: ExerciseGuide;
+  /** Hide the heading and instruction (the stage shows its own). */
+  compact?: boolean;
+};
 
 /**
  * "Tebak peran kata" — choose each word's role in the ayah (tarkib). Options
@@ -35,6 +45,8 @@ function LabelRoleRound({
   id,
   words,
   pool,
+  guided,
+  compact,
   restarted,
   onRestart,
 }: Props & { restarted: boolean; onRestart: () => void }) {
@@ -50,10 +62,16 @@ function LabelRoleRound({
         }),
     [words, pool],
   );
-  const q = useChoiceQuiz(id, items.map((it) => it.word.role));
-  const focusRef = useStepFocus(q.i);
+  const q = useChoiceQuiz(id, items.map((it) => it.word.role), guided);
+  const focusRef = useStepFocus(q.i, !!guided);
+  const empty = items.length < 2;
+  const part = empty
+    ? null
+    : choiceGuidePart({ finished: q.finished, settled: q.resolved !== null, canReveal: q.canReveal });
+  useGuide(guided, part && guideTarget("label-role", part), empty);
+  const mark = guideMarker(guided, "label-role");
 
-  if (items.length < 2) return null;
+  if (empty) return null;
   const item = items[Math.min(q.i, items.length - 1)];
   const w = item.word;
 
@@ -64,10 +82,11 @@ function LabelRoleRound({
       done={q.finished || q.doneBefore}
       doneLabel={t("done")}
       autoFocus={restarted}
+      compact={compact}
     >
       {q.finished ? (
         <div ref={focusRef} tabIndex={-1}>
-          <Finished right={q.firstTry} total={q.total} onRestart={onRestart} />
+          <Finished right={q.firstTry} total={q.total} onRestart={guided ? undefined : onRestart} />
         </div>
       ) : (
         <div>
@@ -87,7 +106,7 @@ function LabelRoleRound({
           {/* Container query: two columns only while there is room at the
               learner's chosen text size. */}
           <div className="@container mt-4">
-            <ul className="grid gap-3 @xl:grid-cols-2">
+            <ul data-guide={mark("options")} className="grid gap-3 @xl:grid-cols-2">
               {item.options.map((opt) => (
                 <li key={opt}>
                   <OptionButton
@@ -119,6 +138,8 @@ function LabelRoleRound({
             last={q.i + 1 >= q.total}
             onReveal={q.reveal}
             onNext={q.next}
+            revealGuide={mark("reveal")}
+            nextGuide={mark("next")}
           />
         </div>
       )}

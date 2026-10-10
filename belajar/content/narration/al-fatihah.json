@@ -1,0 +1,387 @@
+{
+  "version": 1,
+  "voice": null,
+  "lines": {
+    "al-fatihah:1:intro": {
+      "text": "Ayat pertama Surah Al-Fatihah. Terjemahannya: “Dengan nama Allah Yang Maha Pengasih, Maha Penyayang.” Ayat ini terdiri dari empat kata, dan kita akan mempelajarinya satu per satu."
+    },
+    "al-fatihah:1:recite": {
+      "text": "Sekarang dengarkan imam membacakan ayat pertama."
+    },
+    "al-fatihah:1:w1": {
+      "text": "Kata pertama artinya “dengan nama”. Akhirnya kasrah karena kata ini (nama) didahului huruf jar ba' (dengan)."
+    },
+    "al-fatihah:1:w2": {
+      "text": "Kata kedua artinya “Allah”. Akhirnya kasrah karena menjadi mudhaf ilaih dari kata pertama."
+    },
+    "al-fatihah:1:w3": {
+      "text": "Kata ketiga artinya “Yang Maha Pengasih”. Akhirnya kasrah karena menjadi sifat (na't) bagi kata kedua, dan sifat mengikuti kata yang disifatinya."
+    },
+    "al-fatihah:1:w4": {
+      "text": "Kata keempat artinya “Maha Penyayang”. Akhirnya kasrah karena menjadi sifat kedua bagi kata kedua, sehingga ikut majrur."
+    },
+    "al-fatihah:1:concept:kalimah-isim-fiil-huruf": {
+      "text": "Konsep baru: Kalimah: isim, fi'il, huruf (tiga jenis kata). Setiap kata Arab termasuk salah satu dari tiga jenis: isim (nama benda, orang, atau sifat), fi'il (kata kerja), atau huruf (kata tugas)."
+    },
+    "al-fatihah:1:concept:tanda-irab": {
+      "text": "Konsep baru: I'rab dan tandanya (dhammah, fathah, kasrah). Bunyi akhir banyak kata Arab berubah mengikuti perannya dalam kalimat; perubahan itu disebut i'rab, dan bunyi akhirnya menjadi tanda."
+    },
+    "al-fatihah:1:concept:huruf-jar": {
+      "text": "Konsep baru: Huruf jar (kata depan) dan isim majrur. Huruf jar adalah kata depan seperti huruf ba' “dengan”, huruf lam “bagi”, dan huruf jar yang berarti “atas”; isim sesudahnya menjadi majrur, umumnya berakhir kasrah."
+    },
+    "al-fatihah:1:concept:idhafah": {
+      "text": "Konsep baru: Idhafah (sandaran kata: “nama Allah”). Idhafah adalah gabungan dua isim seperti “nama Allah”, dan kata keduanya (mudhaf ilaih) selalu majrur."
+    },
+    "al-fatihah:1:concept:naat": {
+      "text": "Konsep baru: Na't (sifat yang mengikuti). Na't adalah isim yang menyifati isim sebelumnya dan mengikutinya dalam akhiran serta dalam tertentu atau tidaknya."
+    },
+    "al-fatihah:1:structure:a": {
+      "text": "Sekarang susunan kalimatnya. Yang terucap hanya keterangan kata pertama (“dengan nama”), yaitu huruf jar ba' (“dengan”) beserta kata yang dijarkannya, yang disandarkan (idhafah) kepada kata kedua lalu diikuti dua sifat (na't), kata ketiga dan kata keempat; kata tempat bergantungnya keterangan ini tidak diucapkan."
+    },
+    "al-fatihah:1:structure:b": {
+      "text": "Ulama memberi dua perkiraan yang oleh Darwisy dinilai sama-sama baik: kata kerja seperti abtadi'u (“aku memulai”; pendapat ulama Kufah), sehingga menjadi kalimat kata kerja (jumlah fi'liyyah), atau ibtida'i (“permulaanku”; pendapat ulama Bashrah), sehingga menjadi kalimat nominal (jumlah ismiyyah)."
+    },
+    "al-fatihah:1:ex:tap-word:intro": {
+      "text": "Latihan dengar dan ketuk. Imam akan membacakan empat kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, ketuk kata yang Anda dengar."
+    },
+    "al-fatihah:1:ex:why-harakat:intro": {
+      "text": "Latihan kenapa harakat ini, empat soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu."
+    },
+    "al-fatihah:1:ex:sort-case:intro": {
+      "text": "Latihan kelompokkan menurut akhiran, empat kata. Ketuk satu kata, lalu ketuk kelompok akhirannya."
+    },
+    "al-fatihah:1:ex:label-role:intro": {
+      "text": "Latihan tebak peran kata, empat soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini."
+    },
+    "al-fatihah:1:ex:wazn-factory:intro": {
+      "text": "Latihan bentuk-bentuk kata, dua belas soal. Dari satu akar lahir beberapa bentuk kata; pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif, bukan kutipan ayat."
+    },
+    "al-fatihah:1:recap": {
+      "text": "Dengarkan sekali lagi seluruh ayat pertama dibacakan imam."
+    },
+    "al-fatihah:1:next": {
+      "text": "Pelajaran ayat pertama selesai. Berikutnya ayat kedua; pelajaran berlanjut sendiri."
+    },
+    "al-fatihah:2:intro": {
+      "text": "Ayat kedua Surah Al-Fatihah. Terjemahannya: “Segala puji bagi Allah, Tuhan seluruh alam.” Ayat ini terdiri dari empat kata, dan kita akan mempelajarinya satu per satu."
+    },
+    "al-fatihah:2:recite": {
+      "text": "Sekarang dengarkan imam membacakan ayat kedua."
+    },
+    "al-fatihah:2:w1": {
+      "text": "Kata pertama artinya “segala puji”. Akhirnya dhammah karena menjadi mubtada' (pokok kalimat)."
+    },
+    "al-fatihah:2:w2": {
+      "text": "Kata kedua artinya “bagi Allah”. Akhirnya kasrah karena didahului huruf jar lam; jar-majrur ini bergantung pada khabar yang tidak disebut (misalnya “tetap”)."
+    },
+    "al-fatihah:2:w3": {
+      "text": "Kata ketiga artinya “Tuhan”. Akhirnya kasrah karena mengikuti kata kedua sebagai sifat (na't) atau badal."
+    },
+    "al-fatihah:2:w4": {
+      "text": "Kata keempat artinya “seluruh alam”. Majrur dengan tanda ya' karena menjadi mudhaf ilaih dan termasuk kata yang disamakan (mulhaq) dengan jamak mudzakkar salim."
+    },
+    "al-fatihah:2:concept:jumlah-ismiyyah": {
+      "text": "Konsep baru: Jumlah ismiyyah (kalimat nominal: mubtada' dan khabar). Kalimat yang diawali isim terdiri dari mubtada' (pokok kalimat) dan khabar (berita tentangnya), tanpa perlu kata “adalah”."
+    },
+    "al-fatihah:2:concept:syibhul-jumlah": {
+      "text": "Konsep baru: Syibhul jumlah (frasa jar-majrur sebagai khabar). Frasa huruf jar + isim bisa mengisi posisi khabar; ulama menyebutnya syibhul jumlah, “yang menyerupai kalimat”."
+    },
+    "al-fatihah:2:concept:jamak-mudzakkar-salim": {
+      "text": "Konsep baru: Jamak mudzakkar salim (jamak akhiran una dan ina). Jamak laki-laki beraturan dibentuk dengan menambah akhiran una ketika rafa' atau akhiran ina ketika nashab dan jar pada bentuk tunggalnya."
+    },
+    "al-fatihah:2:structure": {
+      "text": "Sekarang susunan kalimatnya. Kalimat nominal: kata pertama adalah pokok kalimat (mubtada'), dan kata kedua menerangkannya (khabar); jar-majrur ini bergantung pada kata yang tidak diucapkan, misalnya “tetap”. Kata ketiga mengikuti kata kedua sebagai sifat (na't) atau pengganti (badal), lalu disandarkan kepada kata keempat, yang menjadi mudhaf ilaih (kata yang disandari)."
+    },
+    "al-fatihah:2:ex:tap-word:intro": {
+      "text": "Latihan dengar dan ketuk. Imam akan membacakan empat kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, ketuk kata yang Anda dengar."
+    },
+    "al-fatihah:2:ex:why-harakat:intro": {
+      "text": "Latihan kenapa harakat ini, empat soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu."
+    },
+    "al-fatihah:2:ex:sort-case:intro": {
+      "text": "Latihan kelompokkan menurut akhiran, empat kata. Ketuk satu kata, lalu ketuk kelompok akhirannya."
+    },
+    "al-fatihah:2:ex:label-role:intro": {
+      "text": "Latihan tebak peran kata, empat soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini."
+    },
+    "al-fatihah:2:ex:wazn-factory:intro": {
+      "text": "Latihan bentuk-bentuk kata, lima soal. Dari satu akar lahir beberapa bentuk kata; pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif, bukan kutipan ayat."
+    },
+    "al-fatihah:2:recap": {
+      "text": "Dengarkan sekali lagi seluruh ayat kedua dibacakan imam."
+    },
+    "al-fatihah:2:next": {
+      "text": "Pelajaran ayat kedua selesai. Berikutnya ayat ketiga; pelajaran berlanjut sendiri."
+    },
+    "al-fatihah:3:intro": {
+      "text": "Ayat ketiga Surah Al-Fatihah. Terjemahannya: “Yang Maha Pengasih, Maha Penyayang.” Ayat ini terdiri dari dua kata, dan kita akan mempelajarinya satu per satu."
+    },
+    "al-fatihah:3:recite": {
+      "text": "Sekarang dengarkan imam membacakan ayat ketiga."
+    },
+    "al-fatihah:3:w1": {
+      "text": "Kata pertama artinya “Yang Maha Pengasih”. Akhirnya kasrah karena sekali lagi menjadi sifat bagi lafaz “Allah” di ayat dua yang majrur."
+    },
+    "al-fatihah:3:w2": {
+      "text": "Kata kedua artinya “Maha Penyayang”. Akhirnya kasrah karena menjadi sifat berikutnya bagi lafaz “Allah” di ayat dua yang majrur."
+    },
+    "al-fatihah:3:concept:wazan-dan-tashrif": {
+      "text": "Konsep baru: Wazan dan tashrif (cetakan kata). Wazan adalah cetakan kata yang ditulis dengan tiga huruf fa', 'ain, dan lam, dan tashrif adalah mengubah satu akar ke berbagai cetakan."
+    },
+    "al-fatihah:3:structure": {
+      "text": "Sekarang susunan kalimatnya. Ayat ini bukan kalimat baru: kata pertama dan kata kedua adalah dua sifat lagi bagi lafaz “Allah” di ayat dua, maka keduanya ikut majrur (berakhiran kasrah). Al-Jadwal dan as-Samin juga membolehkan keduanya dibaca sebagai badal."
+    },
+    "al-fatihah:3:ex:tap-word:intro": {
+      "text": "Latihan dengar dan ketuk. Imam akan membacakan dua kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, ketuk kata yang Anda dengar."
+    },
+    "al-fatihah:3:ex:why-harakat:intro": {
+      "text": "Latihan kenapa harakat ini, dua soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu."
+    },
+    "al-fatihah:3:ex:sort-case:intro": {
+      "text": "Latihan kelompokkan menurut akhiran, dua kata. Ketuk satu kata, lalu ketuk kelompok akhirannya."
+    },
+    "al-fatihah:3:ex:label-role:intro": {
+      "text": "Latihan tebak peran kata, dua soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini."
+    },
+    "al-fatihah:3:ex:wazn-factory:intro": {
+      "text": "Latihan bentuk-bentuk kata, dua belas soal. Dari satu akar lahir beberapa bentuk kata; pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif, bukan kutipan ayat."
+    },
+    "al-fatihah:3:recap": {
+      "text": "Dengarkan sekali lagi seluruh ayat ketiga dibacakan imam."
+    },
+    "al-fatihah:3:next": {
+      "text": "Pelajaran ayat ketiga selesai. Berikutnya ayat keempat; pelajaran berlanjut sendiri."
+    },
+    "al-fatihah:4:intro": {
+      "text": "Ayat keempat Surah Al-Fatihah. Terjemahannya: “Pemilik hari pembalasan.” Ayat ini terdiri dari tiga kata, dan kita akan mempelajarinya satu per satu."
+    },
+    "al-fatihah:4:recite": {
+      "text": "Sekarang dengarkan imam membacakan ayat keempat."
+    },
+    "al-fatihah:4:w1": {
+      "text": "Kata pertama artinya “Pemilik”. Akhirnya kasrah karena menjadi sifat keempat bagi lafaz “Allah” di ayat dua."
+    },
+    "al-fatihah:4:w2": {
+      "text": "Kata kedua artinya “hari”. Akhirnya kasrah karena menjadi mudhaf ilaih bagi kata pertama."
+    },
+    "al-fatihah:4:w3": {
+      "text": "Kata ketiga artinya “pembalasan”. Akhirnya kasrah karena menjadi mudhaf ilaih bagi kata kedua."
+    },
+    "al-fatihah:4:concept:isim-fail": {
+      "text": "Konsep baru: Isim fa'il (kata pelaku: “yang...”). Isim fa'il adalah isim turunan dari mashdar (kata benda perbuatan) yang menyebut pelakunya, seperti kata pertama “Pemilik”."
+    },
+    "al-fatihah:4:structure": {
+      "text": "Sekarang susunan kalimatnya. Ayat ini masih melanjutkan ayat dua: kata pertama adalah sifat berikutnya bagi lafaz “Allah” di ayat dua (Darwisy menyebutnya sifat keempat), lalu ia disandarkan kepada kata kedua, dan kata kedua disandarkan kepada kata ketiga. Inilah rangkaian idhafah tiga kata: kata kedua dan kata ketiga sama-sama mudhaf ilaih, maka keduanya berakhiran kasrah."
+    },
+    "al-fatihah:4:ex:tap-word:intro": {
+      "text": "Latihan dengar dan ketuk. Imam akan membacakan tiga kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, ketuk kata yang Anda dengar."
+    },
+    "al-fatihah:4:ex:why-harakat:intro": {
+      "text": "Latihan kenapa harakat ini, tiga soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu."
+    },
+    "al-fatihah:4:ex:sort-case:intro": {
+      "text": "Latihan kelompokkan menurut akhiran, tiga kata. Ketuk satu kata, lalu ketuk kelompok akhirannya."
+    },
+    "al-fatihah:4:ex:label-role:intro": {
+      "text": "Latihan tebak peran kata, tiga soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini."
+    },
+    "al-fatihah:4:ex:wazn-factory:intro": {
+      "text": "Latihan bentuk-bentuk kata, delapan soal. Dari satu akar lahir beberapa bentuk kata; pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif, bukan kutipan ayat."
+    },
+    "al-fatihah:4:recap": {
+      "text": "Dengarkan sekali lagi seluruh ayat keempat dibacakan imam."
+    },
+    "al-fatihah:4:next": {
+      "text": "Pelajaran ayat keempat selesai. Berikutnya ayat kelima; pelajaran berlanjut sendiri."
+    },
+    "al-fatihah:5:intro": {
+      "text": "Ayat kelima Surah Al-Fatihah. Terjemahannya: “Hanya kepada Engkaulah kami menyembah dan hanya kepada Engkaulah kami mohon pertolongan.” Ayat ini terdiri dari empat kata, dan kita akan mempelajarinya satu per satu."
+    },
+    "al-fatihah:5:recite": {
+      "text": "Sekarang dengarkan imam membacakan ayat kelima."
+    },
+    "al-fatihah:5:w1": {
+      "text": "Kata pertama artinya “hanya kepada Engkau”. Kata ganti ini mabni di atas fathah (akhirnya tetap) dan berkedudukan nashab sebagai objek yang didahulukan, sehingga bermakna “hanya kepada-Mu”."
+    },
+    "al-fatihah:5:w2": {
+      "text": "Kata kedua artinya “kami menyembah”. Akhirnya dhammah karena fi'il mudhari' ini tidak didahului huruf penashab atau penjazm; pelakunya tersirat, yaitu “kami”."
+    },
+    "al-fatihah:5:w3": {
+      "text": "Kata ketiga artinya “dan hanya kepada Engkau”. Wawu adalah huruf 'athaf, dan kata ini (mabni di atas fathah, berkedudukan nashab) diulang sebagai objek yang didahulukan bagi kata keempat agar makna “hanya” melekat pada kedua perbuatan."
+    },
+    "al-fatihah:5:w4": {
+      "text": "Kata keempat artinya “kami mohon pertolongan”. Akhirnya dhammah dengan alasan yang sama seperti kata kedua: fi'il mudhari' tanpa huruf penashab atau penjazm."
+    },
+    "al-fatihah:5:concept:murab-mabni": {
+      "text": "Konsep baru: Mu'rab dan mabni (akhiran berubah atau tetap). Kata mu'rab akhirnya berubah mengikuti perannya dalam kalimat, sedangkan kata mabni akhirnya tetap di posisi mana pun."
+    },
+    "al-fatihah:5:concept:dhamir": {
+      "text": "Konsep baru: Dhamir (kata ganti): muttashil dan munfashil. Dhamir adalah kata ganti seperti “kami”, “Engkau”, dan “mereka”; ada yang menempel pada kata lain (muttashil) dan ada yang berdiri sendiri (munfashil)."
+    },
+    "al-fatihah:5:concept:taqdim-maful": {
+      "text": "Konsep baru: Taqdim maf'ul (objek di depan: makna “hanya”). Mendahulukan objek sebelum kata kerjanya memberi makna pengkhususan; karena itu kata pertama dan kedua diterjemahkan “hanya kepada Engkaulah kami menyembah”."
+    },
+    "al-fatihah:5:concept:fiil-mudhari": {
+      "text": "Konsep baru: Fi'il mudhari' (kata kerja sekarang dan akan datang). Fi'il mudhari' adalah kata kerja untuk sekarang atau yang akan datang; ia diawali salah satu dari empat huruf (hamzah, nun, ya', ta') dan marfu' selama tidak didahului huruf penashab atau penjazm."
+    },
+    "al-fatihah:5:concept:jumlah-filiyyah": {
+      "text": "Konsep baru: Jumlah fi'liyyah (kalimat verbal: fi'il dan fa'il). Jumlah fi'liyyah adalah kalimat yang intinya fi'il (kata kerja) beserta fa'il (pelakunya); pelaku itu bisa tertulis atau tersirat."
+    },
+    "al-fatihah:5:concept:athaf": {
+      "text": "Konsep baru: 'Athaf (kata sambung: wawu “dan”). 'Athaf adalah menyambungkan kata atau kalimat dengan huruf seperti wawu (“dan”); kata yang disambungkan mengikuti i'rab kata sebelumnya."
+    },
+    "al-fatihah:5:concept:bab-istifal": {
+      "text": "Konsep baru: Bab istif'al (wazan istaf'ala: meminta). Wazan istaf'ala dibentuk dengan menambah hamzah, sin, dan ta' di depan akar; makna yang paling dikenal adalah meminta, seperti kata keempat “kami memohon pertolongan”."
+    },
+    "al-fatihah:5:concept:ilal": {
+      "text": "Konsep baru: I'lal (perubahan huruf wawu dan ya'). I'lal adalah perubahan pada huruf 'illah (alif, wawu, ya') agar kata lebih ringan diucapkan, misalnya nasta'winu menjadi kata keempat."
+    },
+    "al-fatihah:5:structure": {
+      "text": "Sekarang susunan kalimatnya. Dua kalimat kata kerja yang disambung dengan wawu ('athaf, penyambungan): pada masing-masing, objek (maf'ul bih) kata pertama didahulukan sebelum kata kerjanya, kata kedua dan kata keempat, sehingga maknanya “hanya kepada-Mu”. Pelaku (fa'il) kedua kata kerja itu tidak tertulis, yaitu “kami”."
+    },
+    "al-fatihah:5:ex:tap-word:intro": {
+      "text": "Latihan dengar dan ketuk. Imam akan membacakan empat kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, ketuk kata yang Anda dengar."
+    },
+    "al-fatihah:5:ex:why-harakat:intro": {
+      "text": "Latihan kenapa harakat ini, empat soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu."
+    },
+    "al-fatihah:5:ex:sort-case:intro": {
+      "text": "Latihan kelompokkan menurut akhiran, empat kata. Ketuk satu kata, lalu ketuk kelompok akhirannya."
+    },
+    "al-fatihah:5:ex:label-role:intro": {
+      "text": "Latihan tebak peran kata, empat soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini."
+    },
+    "al-fatihah:5:ex:wazn-factory:intro": {
+      "text": "Latihan bentuk-bentuk kata, dua belas soal. Dari satu akar lahir beberapa bentuk kata; pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif, bukan kutipan ayat."
+    },
+    "al-fatihah:5:recap": {
+      "text": "Dengarkan sekali lagi seluruh ayat kelima dibacakan imam."
+    },
+    "al-fatihah:5:next": {
+      "text": "Pelajaran ayat kelima selesai. Berikutnya ayat keenam; pelajaran berlanjut sendiri."
+    },
+    "al-fatihah:6:intro": {
+      "text": "Ayat keenam Surah Al-Fatihah. Terjemahannya: “Tunjukilah kami jalan yang lurus.” Ayat ini terdiri dari tiga kata, dan kita akan mempelajarinya satu per satu."
+    },
+    "al-fatihah:6:recite": {
+      "text": "Sekarang dengarkan imam membacakan ayat keenam."
+    },
+    "al-fatihah:6:w1": {
+      "text": "Kata pertama artinya “tunjukilah kami”. Fi'il amr yang bermakna doa ini mabni dengan dibuangnya huruf ya' di akhir; pelakunya tersirat (“Engkau”), dan akhiran (“kami”) adalah objeknya."
+    },
+    "al-fatihah:6:w2": {
+      "text": "Kata kedua artinya “jalan”. Akhirnya fathah karena menjadi objek kedua (maf'ul bih kedua) dari kata pertama."
+    },
+    "al-fatihah:6:w3": {
+      "text": "Kata ketiga artinya “yang lurus”. Akhirnya fathah karena menjadi sifat bagi kata kedua yang manshub."
+    },
+    "al-fatihah:6:concept:fiil-amr": {
+      "text": "Konsep baru: Fi'il amr (bentuk perintah, juga untuk doa). Fi'il amr adalah bentuk perintah, seperti kata yang berarti “katakanlah”; bila diucapkan hamba kepada Allah subhanahu wa ta'ala maknanya permohonan (doa), seperti kata pertama “tunjukilah kami”."
+    },
+    "al-fatihah:6:concept:maful-bih": {
+      "text": "Konsep baru: Maf'ul bih (objek). Maf'ul bih adalah isim yang dikenai perbuatan; ia manshub, dan kata kerja hada (“menunjuki”) dalam kata pertama mengambil dua objek sekaligus."
+    },
+    "al-fatihah:6:structure": {
+      "text": "Sekarang susunan kalimatnya. Kalimat kata kerja berupa kata perintah (fi'il amr) yang di sini bermakna doa: kata pertama memuat pelaku yang tidak tertulis, “Engkau”, dan objek pertama akhiran (“kami”), lalu kata kedua menjadi objek kedua. Kata ketiga adalah sifat bagi kata kedua, maka ikut manshub (berakhiran fathah)."
+    },
+    "al-fatihah:6:ex:tap-word:intro": {
+      "text": "Latihan dengar dan ketuk. Imam akan membacakan tiga kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, ketuk kata yang Anda dengar."
+    },
+    "al-fatihah:6:ex:why-harakat:intro": {
+      "text": "Latihan kenapa harakat ini, tiga soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu."
+    },
+    "al-fatihah:6:ex:sort-case:intro": {
+      "text": "Latihan kelompokkan menurut akhiran, tiga kata. Ketuk satu kata, lalu ketuk kelompok akhirannya."
+    },
+    "al-fatihah:6:ex:label-role:intro": {
+      "text": "Latihan tebak peran kata, tiga soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini."
+    },
+    "al-fatihah:6:ex:wazn-factory:intro": {
+      "text": "Latihan bentuk-bentuk kata, sebelas soal. Dari satu akar lahir beberapa bentuk kata; pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif, bukan kutipan ayat."
+    },
+    "al-fatihah:6:recap": {
+      "text": "Dengarkan sekali lagi seluruh ayat keenam dibacakan imam."
+    },
+    "al-fatihah:6:next": {
+      "text": "Pelajaran ayat keenam selesai. Berikutnya ayat ketujuh; pelajaran berlanjut sendiri."
+    },
+    "al-fatihah:7:intro": {
+      "text": "Ayat ketujuh Surah Al-Fatihah. Terjemahannya: “(yaitu) jalan orang-orang yang telah Engkau beri nikmat kepadanya; bukan (jalan) mereka yang dimurkai, dan bukan (pula jalan) mereka yang sesat.” Ayat ini terdiri dari sembilan kata, dan kita akan mempelajarinya satu per satu."
+    },
+    "al-fatihah:7:recite": {
+      "text": "Sekarang dengarkan imam membacakan ayat ketujuh."
+    },
+    "al-fatihah:7:w1": {
+      "text": "Kata pertama artinya “jalan”. Akhirnya fathah karena menjadi badal (pengganti) dari kata yang berarti “jalan” di ayat enam yang manshub."
+    },
+    "al-fatihah:7:w2": {
+      "text": "Kata kedua artinya “orang-orang yang”. Isim maushul ini mabni (bentuknya tetap) dan berkedudukan jar sebagai mudhaf ilaih dari kata pertama."
+    },
+    "al-fatihah:7:w3": {
+      "text": "Kata ketiga artinya “telah Engkau beri nikmat”. Fi'il madhi ini mabni di atas sukun karena bersambung dengan dhamir akhiran (“Engkau”, pelakunya), dan kalimatnya menjadi shilah bagi kata kedua."
+    },
+    "al-fatihah:7:w4": {
+      "text": "Kata keempat artinya “kepada mereka”. Bagian depan kata ini adalah huruf jar yang berarti “atas” dan akhiran (“mereka”) kata ganti mabni yang dijarkan olehnya, sedangkan kedudukan nashab (mahall nashb) milik frasa jar-majrur kata ini secara utuh, yang bergantung pada kata ketiga (as-Samin: manshub al-mahall)."
+    },
+    "al-fatihah:7:w5": {
+      "text": "Kata kelima artinya “bukan”. Akhirnya kasrah karena menjadi badal dari kata kedua yang berkedudukan jar (sebagian ulama menjadikannya sifat)."
+    },
+    "al-fatihah:7:w6": {
+      "text": "Kata keenam artinya “yang dimurkai”. Akhirnya kasrah karena menjadi mudhaf ilaih dari kata kelima."
+    },
+    "al-fatihah:7:w7": {
+      "text": "Kata ketujuh artinya “atas mereka”. Bagian depan kata ini adalah huruf jar yang berarti “atas” dan akhiran kata ganti mabni yang dijarkan olehnya, sedangkan kedudukan rafa' (mahall raf') milik frasa jar-majrur kata ini secara utuh sebagai na'ib fa'il (pengganti pelaku) bagi kata keenam, karena kata keenam adalah isim maf'ul."
+    },
+    "al-fatihah:7:w8": {
+      "text": "Kata kedelapan artinya “dan bukan pula”. Wawu adalah huruf 'athaf, dan huruf nafi di sini tambahan untuk menegaskan makna “bukan” yang sudah ada pada kata kelima."
+    },
+    "al-fatihah:7:w9": {
+      "text": "Kata kesembilan artinya “orang-orang yang sesat”. Majrur dengan tanda ya' karena jamak mudzakkar salim yang di-'athaf-kan pada kata majrur sebelumnya."
+    },
+    "al-fatihah:7:concept:badal": {
+      "text": "Konsep baru: Badal (pengganti yang menjelaskan). Badal adalah isim yang mengulang atau menggantikan isim sebelumnya untuk menjelaskannya, dan ia mengikuti seluruh i'rab isim itu."
+    },
+    "al-fatihah:7:concept:isim-maushul": {
+      "text": "Konsep baru: Isim maushul (kata penghubung “yang”). Isim maushul seperti kata kedua (“orang-orang yang”), kata yang berarti “yang”, dan kata yang berarti “apa yang” baru lengkap maknanya dengan kalimat penjelas sesudahnya, yang disebut shilah."
+    },
+    "al-fatihah:7:concept:fiil-madhi": {
+      "text": "Konsep baru: Fi'il madhi (kata kerja lampau). Fi'il madhi menunjuk perbuatan yang sudah terjadi; ia mabni, pada asalnya di atas fathah seperti kata yang berarti “Dia ciptakan”, dan huruf akhirnya sukun bila bersambung dengan kata ganti pelaku seperti akhiran “Engkau”."
+    },
+    "al-fatihah:7:concept:bab-ifal": {
+      "text": "Konsep baru: Bab if'al (wazan af'ala). Wazan af'ala dibentuk dengan menambah hamzah di depan akar tiga huruf; kata ketiga (“Engkau telah memberi nikmat”) memakai pola ini."
+    },
+    "al-fatihah:7:concept:isim-maful": {
+      "text": "Konsep baru: Isim maf'ul (kata “yang di-”). Isim maf'ul adalah isim turunan dari mashdar (kata benda perbuatan) yang menyebut pihak yang dikenai perbuatan, seperti kata keenam “yang dimurkai”."
+    },
+    "al-fatihah:7:concept:naib-fail": {
+      "text": "Konsep baru: Na'ib fa'il (pengganti pelaku). Na'ib fa'il adalah kata yang menempati posisi pelaku ketika pelakunya tidak disebut; kedudukannya rafa'."
+    },
+    "al-fatihah:7:structure:a": {
+      "text": "Sekarang susunan kalimatnya. Kata pertama adalah pengganti (badal) yang menjelaskan kata yang berarti “jalan” di ayat enam; ia disandarkan kepada kata kedua, kata sambung “yang” (isim maushul) yang diterangkan oleh anak kalimat (shilah) kata ketiga dan keempat."
+    },
+    "al-fatihah:7:structure:b": {
+      "text": "Berikutnya kata kelima sampai ketujuh menjadi badal dari kata kedua (sebagian ulama menjadikannya sifat), dengan kata ketujuh sebagai pengganti pelaku (na'ib fa'il) bagi kata keenam, lalu kata kesembilan disambung dengan kata kedelapan, dan huruf nafi di situ menegaskan makna “bukan”."
+    },
+    "al-fatihah:7:ex:tap-word:intro": {
+      "text": "Latihan dengar dan ketuk. Imam akan membacakan sembilan kata dari ayat ini satu per satu, dalam urutan acak. Setiap kali, ketuk kata yang Anda dengar."
+    },
+    "al-fatihah:7:ex:why-harakat:intro": {
+      "text": "Latihan kenapa harakat ini, delapan soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu."
+    },
+    "al-fatihah:7:ex:sort-case:intro": {
+      "text": "Latihan kelompokkan menurut akhiran, delapan kata. Ketuk satu kata, lalu ketuk kelompok akhirannya."
+    },
+    "al-fatihah:7:ex:label-role:intro": {
+      "text": "Latihan tebak peran kata, sembilan soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini."
+    },
+    "al-fatihah:7:ex:wazn-factory:intro": {
+      "text": "Latihan bentuk-bentuk kata, tiga belas soal. Dari satu akar lahir beberapa bentuk kata; pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif, bukan kutipan ayat."
+    },
+    "al-fatihah:7:recap": {
+      "text": "Dengarkan sekali lagi seluruh ayat ketujuh dibacakan imam."
+    },
+    "al-fatihah:7:done": {
+      "text": "Pelajaran ayat ketujuh selesai. Ini ayat terakhir Surah Al-Fatihah."
+    }
+  }
+}

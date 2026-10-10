@@ -24,6 +24,52 @@ const VIEWPORTS = [
   ["desktop", { width: 1280, height: 900 }, 1],
 ];
 
+/**
+ * The autoplay lesson on Al-Fatihah 2 (a real browser, the real image):
+ *   1. the stage before "Mulai";
+ *   2. after the one tap, jumped to the first word's explanation;
+ *   3. the first exercise inside the stage, with the spotlight ring + label
+ *      (stage, and what a phone shows in the viewport with the sticky bar).
+ * "Berikutnya ›" jumps whole steps, so this neither waits for the reading
+ * timers nor depends on the imam's stream (a failed recording only pauses
+ * the lesson; the jumps still work). It fails the job if the stage never
+ * reaches an exercise or the spotlight never appears: that is the check
+ * that the autoplay really runs in a browser.
+ */
+async function autoplayShots(page, vp) {
+  await page.goto(BASE + AYAH_2, { waitUntil: "networkidle" });
+  await page.evaluate(() => document.fonts.ready);
+  const stage = page.locator('[data-autoplay="stage"]');
+  await stage.screenshot({ path: `shots/${vp}-autoplay-1-ready.png` });
+  console.log(`shot ${vp}-autoplay-1-ready`);
+
+  await page.locator('[data-autoplay="start"]').click();
+  const next = page.locator('[data-autoplay="next"]');
+  // Step 1 intro → 2 the ayah → 3 the imam says word 1 → 4 its explanation.
+  for (let i = 0; i < 3; i++) {
+    await next.click();
+    await page.waitForTimeout(250);
+  }
+  await page.waitForTimeout(600);
+  await stage.screenshot({ path: `shots/${vp}-autoplay-2-explain.png` });
+  console.log(`shot ${vp}-autoplay-2-explain`);
+
+  const exercise = page.locator('[data-autoplay="exercise"]');
+  for (let i = 0; i < 40 && (await exercise.count()) === 0; i++) {
+    await next.click();
+    await page.waitForTimeout(200);
+  }
+  await exercise.waitFor({ state: "visible", timeout: 10_000 });
+  await page.locator("[data-spotlight-ring]").first().waitFor({ state: "visible", timeout: 10_000 });
+  await page.waitForTimeout(1200);
+  await stage.screenshot({ path: `shots/${vp}-autoplay-3-exercise.png` });
+  console.log(`shot ${vp}-autoplay-3-exercise`);
+  await page.screenshot({ path: `shots/${vp}-autoplay-3-exercise-viewport.png` });
+  console.log(`shot ${vp}-autoplay-3-exercise-viewport`);
+  // Leave the page quiet for whatever comes next.
+  await page.goto("about:blank");
+}
+
 await mkdir("shots", { recursive: true });
 const browser = await chromium.launch();
 try {
@@ -48,6 +94,7 @@ try {
       await page.screenshot({ path: `shots/${vp}-${name}.png`, fullPage: true });
       console.log(`shot ${vp}-${name} (${href})`);
     }
+    await autoplayShots(page, vp);
     await ctx.close();
   }
 } finally {
