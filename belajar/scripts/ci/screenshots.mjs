@@ -2,11 +2,17 @@
 // workflow on :3300) at phone and desktop widths, for visual review of each
 // PR without running anything on a developer laptop. Output: ./shots/*.png
 //
-// Two runs, one container each. By default: the module as production shows
-// it, from a container with the Ilmu Waris switch off (hidden since
-// 2026-10-10, src/lib/features.ts), including the 404 a hidden waris URL
-// answers. `--waris`: only the Ilmu Waris pages, from a container started
-// with BELAJAR_WARIS=on.
+// Three runs, one container each. By default: the module as production shows
+// it, from a container with neither switch set (src/lib/features.ts): Ilmu
+// Waris hidden (since 2026-10-10) and the Qur'an track on Al-Fatihah only
+// (operator, 2026-10-10: the Mu'awwidzat "segera hadir", not clickable),
+// including the 404 a hidden waris or surah URL answers, the "Segera hadir"
+// cards (checked: no link, nothing to focus) and the end of Al-Fatihah
+// (checked: the next surah is coming soon, nothing to click, no move).
+// `--waris`: only the Ilmu Waris pages, from a container started with
+// BELAJAR_WARIS=on. `--surahs`: the Mu'awwidzat lessons, from a container
+// started with every surah in BELAJAR_SURAHS (the end of Al-Fatihah then
+// offers Al-Ikhlas).
 import { mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
@@ -26,17 +32,26 @@ const PAGES = [
   ["surah", "/belajar/id/quran/al-fatihah"],
   ["ayah-2", AYAH_2],
   ["ayah-7", "/belajar/id/quran/al-fatihah/7"],
-  ["ikhlas-1", "/belajar/id/quran/al-ikhlas/1"],
-  ["nas-6", "/belajar/id/quran/an-nas/6"],
   ["konsep", "/belajar/id/konsep"],
   // Konsep with every term in Arabic (operator 2026-10-10): the Harakat page (Dasar membaca) and
   // the operator's model page, huruf jar, with its parts diagram.
   ["konsep-harakat", "/belajar/id/konsep/harakat"],
   ["konsep-huruf-jar", "/belajar/id/konsep/huruf-jar"],
   ["kredit", "/belajar/id/kredit"],
-  // What a visitor gets at the hidden track's address: the module's own 404.
+  // What a visitor gets at a hidden address: the module's own 404.
   ["waris-tersembunyi-404", "/belajar/id/waris"],
+  ["ikhlas-tersembunyi-404", "/belajar/id/quran/al-ikhlas/1"],
 ];
+// The Mu'awwidzat (hidden on the live site), `--surahs` only: the track with every surah a link,
+// and a lesson of two of them.
+const SURAH_PAGES = [
+  ["track-semua-surah", "/belajar/id/quran"],
+  ["ikhlas-1", "/belajar/id/quran/al-ikhlas/1"],
+  ["nas-6", "/belajar/id/quran/an-nas/6"],
+];
+/** The surahs the default (production-like) container does not publish (lib/features.ts). */
+const HIDDEN_SURAHS = ["al-ikhlas", "al-falaq", "an-nas"];
+const AYAH_7 = "/belajar/id/quran/al-fatihah/7";
 // Ilmu Waris (docs/waris-plan.md §9.1), `--waris` only: track home, the questionnaire's first
 // screen, and the report page with no answers (its "start" notice). Filled reports, print and
 // reduced-motion shots come from waris-e2e.mjs (waris-*.png).
@@ -46,6 +61,7 @@ const WARIS_PAGES = [
   ["waris-laporan-kosong", "/belajar/id/waris/laporan"],
 ];
 const WARIS_ONLY = process.argv.includes("--waris");
+const SURAHS_ON = process.argv.includes("--surahs");
 const VIEWPORTS = [
   ["phone", { width: 390, height: 844 }, 2],
   ["desktop", { width: 1280, height: 900 }, 1],
@@ -162,6 +178,88 @@ async function materialsShot(page, vp) {
   await page.waitForTimeout(300);
   await page.screenshot({ path: `shots/${vp}-ayah-2-materials-open.png`, fullPage: true });
   console.log(`shot ${vp}-ayah-2-materials-open`);
+  await page.goto("about:blank");
+}
+
+/**
+ * The track page as production shows it (operator, 2026-10-10: "show cards for other surah as
+ * 'segera hadir', but not clickable"): Al-Fatihah's card is a link; each hidden surah has a card
+ * that is a plain element, not inside a link, with nothing focusable in it, and that says
+ * "Segera hadir" in its own text. Checked on the rendered elements (the next-intl messages in the
+ * page's scripts carry the same words). Fails the job otherwise.
+ */
+async function comingSoonCheck(page, vp) {
+  await page.goto(BASE + "/belajar/id/quran", { waitUntil: "networkidle" });
+  const cards = await page.locator("[data-coming-soon]").evaluateAll((els) =>
+    els.map((e) => ({
+      slug: e.getAttribute("data-coming-soon"),
+      tag: e.tagName,
+      inLink: !!e.closest("a"),
+      focusable: e.querySelectorAll("a, button, input, select, textarea, summary, [tabindex]").length,
+      text: e.textContent ?? "",
+    })),
+  );
+  const problems = [];
+  const slugs = cards.map((c) => c.slug);
+  if (JSON.stringify(slugs) !== JSON.stringify(HIDDEN_SURAHS)) problems.push(`cards for ${JSON.stringify(slugs)}, expected ${JSON.stringify(HIDDEN_SURAHS)}`);
+  for (const c of cards) {
+    if (c.tag === "A" || c.inLink) problems.push(`${c.slug}: the "Segera hadir" card is a link`);
+    if (c.focusable > 0) problems.push(`${c.slug}: ${c.focusable} focusable element(s) inside`);
+    if (!c.text.includes("Segera hadir")) problems.push(`${c.slug}: the card does not say "Segera hadir"`);
+  }
+  if ((await page.locator('a[href="/belajar/id/quran/al-fatihah"]').count()) === 0) problems.push("Al-Fatihah's card is no link");
+  for (const slug of HIDDEN_SURAHS) {
+    const n = await page.locator(`a[href^="/belajar/id/quran/${slug}"]`).count();
+    if (n > 0) problems.push(`${n} link(s) into the hidden ${slug}`);
+  }
+  if (problems.length) throw new Error(`${vp}: track page — ${problems.join("; ")}`);
+  console.log(`  ${vp}: "Segera hadir" cards ok (${slugs.join(", ")}: plain elements, nothing to focus)`);
+  await page.goto("about:blank");
+}
+
+/**
+ * The end of Al-Fatihah's autoplay lesson (ayah 7), reached with "Berikutnya ›" / "Lewati
+ * latihan", step by step. As production shows it (`surahsOn` false): the card says the next surah
+ * is coming soon, offers no "Surah berikutnya" and "Ulangi Al-Fatihah" instead, and the page does
+ * not move on by itself. With every surah listed (`--surahs`): it offers "Surah berikutnya:
+ * Al-Ikhlas". Fails the job otherwise.
+ */
+async function endCardShots(page, vp, surahsOn) {
+  // networkidle: the stage's /belajar/api/surahs answer has arrived.
+  await page.goto(BASE + AYAH_7, { waitUntil: "networkidle" });
+  await page.evaluate(() => document.fonts.ready);
+  await page.locator('[data-autoplay="start"]').click();
+  const end = page.locator('[data-autoplay="end"]');
+  const next = page.locator('[data-autoplay="next"]');
+  let clicks = 0;
+  for (; clicks < 300 && (await end.count()) === 0; clicks++) {
+    if ((await next.count()) > 0) await next.click({ timeout: 5_000 }).catch(() => {});
+    await page.waitForTimeout(150);
+  }
+  await end.waitFor({ state: "visible", timeout: 10_000 });
+  const at = page.url();
+  await page.waitForTimeout(1500);
+  const problems = [];
+  if (page.url() !== at) problems.push(`the page moved on by itself (${at} → ${page.url()})`);
+  const soon = page.locator('[data-autoplay="end-soon"]');
+  const nextSurah = page.locator('[data-autoplay="end-next"]');
+  const repeat = (await page.locator('[data-autoplay="end-repeat"]').innerText()).trim();
+  if (repeat !== "Ulangi Al-Fatihah") problems.push(`the repeat button says "${repeat}", expected "Ulangi Al-Fatihah"`);
+  if (surahsOn) {
+    if ((await soon.count()) > 0) problems.push('says "segera hadir" with every surah published');
+    const label = (await nextSurah.count()) > 0 ? (await nextSurah.innerText()).trim() : "";
+    if (!label.includes("Al-Ikhlas")) problems.push(`no "Surah berikutnya: Al-Ikhlas" (got "${label}")`);
+  } else {
+    const text = (await soon.count()) > 0 ? (await soon.innerText()).trim() : "";
+    if (!text.includes("Al-Ikhlas") || !text.includes("segera hadir")) problems.push(`no coming-soon line (got "${text}")`);
+    if ((await nextSurah.count()) > 0) problems.push('offers "Surah berikutnya" into a hidden surah');
+    const links = await end.locator('a[href*="/quran/al-ikhlas"], a[href*="/quran/al-falaq"], a[href*="/quran/an-nas"]').count();
+    if (links > 0) problems.push(`${links} link(s) into a hidden surah`);
+  }
+  const name = surahsOn ? "autoplay-fatihah-end-semua-surah" : "autoplay-fatihah-end";
+  await page.locator('[data-autoplay="stage"]').screenshot({ path: `shots/${vp}-${name}.png` });
+  console.log(`shot ${vp}-${name} (${clicks} step click(s) to the end)`);
+  if (problems.length) throw new Error(`${vp}: end of Al-Fatihah — ${problems.join("; ")}`);
   await page.goto("about:blank");
 }
 
@@ -599,21 +697,27 @@ async function composeShots(page, vp, index) {
 }
 
 await mkdir("shots", { recursive: true });
-const narration = WARIS_ONLY ? new Map() : await narrationIndex();
-const units = WARIS_ONLY ? new Map() : await composedUnits();
-if (!WARIS_ONLY) console.log(`narration index: ${narration.size} file(s) named by the manifests in ${BELAJAR_DIR}`);
+const DEFAULT_RUN = !WARIS_ONLY && !SURAHS_ON;
+const narration = DEFAULT_RUN ? await narrationIndex() : new Map();
+const units = DEFAULT_RUN ? await composedUnits() : new Map();
+if (DEFAULT_RUN) console.log(`narration index: ${narration.size} file(s) named by the manifests in ${BELAJAR_DIR}`);
 const browser = await chromium.launch();
 try {
   for (const [vp, viewport, scale] of VIEWPORTS) {
     const ctx = await browser.newContext({ viewport, deviceScaleFactor: scale, locale: "id-ID" });
     const page = await ctx.newPage();
-    for (const [name, path] of WARIS_ONLY ? WARIS_PAGES : PAGES) {
+    for (const [name, path] of WARIS_ONLY ? WARIS_PAGES : SURAHS_ON ? SURAH_PAGES : PAGES) {
       await page.goto(BASE + path, { waitUntil: "networkidle" });
       await page.evaluate(() => document.fonts.ready);
       await page.screenshot({ path: `shots/${vp}-${name}.png`, fullPage: true });
       console.log(`shot ${vp}-${name} (${path})`);
     }
     if (WARIS_ONLY) {
+      await ctx.close();
+      continue;
+    }
+    if (SURAHS_ON) {
+      await endCardShots(page, vp, true);
       await ctx.close();
       continue;
     }
@@ -639,6 +743,8 @@ try {
     await composeFitSweep(page, vp, "normal", [1], units);
     await composeFitSweep(page, vp, "besar", [1], units);
     await composeFitSweep(page, vp, "sangat-besar", [1, 2, 3, 4, 5, 6, 7], units);
+    await comingSoonCheck(page, vp);
+    await endCardShots(page, vp, false);
     await ctx.close();
   }
 } finally {

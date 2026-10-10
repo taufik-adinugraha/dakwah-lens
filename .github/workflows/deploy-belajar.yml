@@ -188,15 +188,15 @@ jobs:
           # SIGPIPE (exit 141) when grep -q exits on an early match.
           logs="$(docker logs smoke 2>&1)"
           grep -q "applied 0001_init.sql" <<<"$logs"
-          # Hub, Qur'an track, shared library, lessons (plan L9 URL shape).
+          # Hub, Qur'an track, shared library, lessons (plan L9 URL shape). This container starts
+          # like production, without BELAJAR_SURAHS: only Al-Fatihah is published (operator,
+          # 2026-10-10; src/lib/features.ts). The Mu'awwidzat lessons answer 200 in the "every
+          # surah listed" step below; here surahs-smoke.mjs --hidden checks they are hidden.
           for path in /belajar/id /belajar/en /belajar/id/kredit /belajar/id/konsep \
                       /belajar/id/konsep/harakat /belajar/en/konsep/harakat /belajar/id/konsep/huruf-jar \
                       /belajar/id/quran /belajar/en/quran \
                       /belajar/id/quran/al-fatihah /belajar/id/quran/al-fatihah/1 \
-                      /belajar/id/quran/al-fatihah/7 /belajar/en/quran/al-fatihah/5 \
-                      /belajar/id/quran/al-ikhlas /belajar/id/quran/al-ikhlas/1 \
-                      /belajar/id/quran/al-falaq/5 /belajar/id/quran/an-nas/6 \
-                      /belajar/en/quran/an-nas/1; do
+                      /belajar/id/quran/al-fatihah/7 /belajar/en/quran/al-fatihah/5; do
             code="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:3300${path}")"
             echo "${path} -> ${code}"; [[ "$code" == 200 ]]
           done
@@ -255,12 +255,11 @@ jobs:
           # to the VM media dir (Caddy, /belajar/media/), not baked into the image.
           grep -q '/belajar/media/narration/kang-nandar/al-fatihah/' <<<"$page" || { echo "✗ ayah 1 page carries no narration audio"; exit 1; }
           grep -q 'href="/belajar/id/quran/al-fatihah/2"' <<<"$page"
-          # The autoplay lesson: one ayah page of every surah carries the
-          # single "Mulai pelajaran" button and the one-line hint that one click starts
-          # everything (server-rendered, before any script runs). "Klik", never
-          # "ketuk" (operator, 2026-10-10).
-          for path in /belajar/id/quran/al-fatihah/2 /belajar/id/quran/al-ikhlas/1 \
-                      /belajar/id/quran/al-falaq/3 /belajar/id/quran/an-nas/6; do
+          # The autoplay lesson: an ayah page carries the single "Mulai pelajaran" button and
+          # the one-line hint that one click starts everything (server-rendered, before any
+          # script runs). "Klik", never "ketuk" (operator, 2026-10-10). Every ayah of the
+          # Mu'awwidzat gets the same check in the "every surah listed" step below.
+          for path in /belajar/id/quran/al-fatihah/2 /belajar/id/quran/al-fatihah/7; do
             html="$(curl -fsS "http://127.0.0.1:3300${path}")"
             grep -q 'data-autoplay="start"' <<<"$html" || { echo "✗ ${path}: no autoplay start button"; exit 1; }
             grep -q '<span>Mulai pelajaran</span>' <<<"$html" || { echo "✗ ${path}: Mulai pelajaran label missing"; exit 1; }
@@ -268,8 +267,8 @@ jobs:
             if grep -qiE '\b(ketuk|mengetuk|diketuk)\b' <<<"$html"; then echo "✗ ${path}: says ketuk (use klik)"; exit 1; fi
             echo "${path}: autoplay start ok"
           done
-          en_page="$(curl -fsS http://127.0.0.1:3300/belajar/en/quran/an-nas/1)"
-          grep -q 'data-autoplay="start"' <<<"$en_page" || { echo "✗ /belajar/en/quran/an-nas/1: no autoplay start button"; exit 1; }
+          en_page="$(curl -fsS http://127.0.0.1:3300/belajar/en/quran/al-fatihah/1)"
+          grep -q 'data-autoplay="start"' <<<"$en_page" || { echo "✗ /belajar/en/quran/al-fatihah/1: no autoplay start button"; exit 1; }
           for html in "$hub" "$track" "$page" \
                       "$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/al-fatihah)" \
                       "$(curl -fsS http://127.0.0.1:3300/belajar/id/konsep)"; do
@@ -312,6 +311,17 @@ jobs:
           # after the restart check below has run.
           waris_rc=0
           node belajar/scripts/ci/waris-smoke.mjs --hidden || waris_rc=$?
+          # Al-Fatihah first (operator, 2026-10-10: the other surahs "segera hadir", not
+          # clickable; src/lib/features.ts BELAJAR_SURAHS, unset here as in production):
+          # /belajar/api/surahs lists Al-Fatihah only; every page of Al-Ikhlas, Al-Falaq and An-Nas
+          # (id + en, every ayah; also as an RSC request, percent-encoded, TAB/LF/CR-mangled, and
+          # through the pre-hub 308) answers the module's 404 with none of its ayat in the body;
+          # the track page (id, en) shows each of them as a "Segera hadir" card that is no <a>
+          # and links nowhere into them; the hub's "Tersedia sekarang" names Al-Fatihah only; the
+          # concept and word pages show their places as plain text, never a link. Lists every
+          # problem, then fails the step after the restart check below.
+          surahs_rc=0
+          node belajar/scripts/ci/surahs-smoke.mjs --hidden || surahs_rc=$?
           # Migrations are idempotent across restarts.
           docker restart smoke >/dev/null
           for _ in $(seq 1 30); do
@@ -322,12 +332,17 @@ jobs:
           grep -q "up to date" <<<"$logs"
           docker rm -f smoke >/dev/null
           [[ "$waris_rc" -eq 0 ]] || { echo "✗ Ilmu Waris is not hidden (listed above)"; exit 1; }
+          [[ "$surahs_rc" -eq 0 ]] || { echo "✗ the unpublished surahs are not hidden (listed above)"; exit 1; }
 
       # Visual review without a developer laptop: phone + desktop screenshots
       # of the real image, uploaded as a build artifact on every run. The
-      # container starts like production (no BELAJAR_WARIS), so the shots show
-      # what production shows, the hidden waris address's 404 included; the
-      # Ilmu Waris pages are shot in the switch-on step below. The
+      # container starts like production (no BELAJAR_WARIS, no BELAJAR_SURAHS),
+      # so the shots show what production shows: the hidden waris and Al-Ikhlas
+      # addresses' 404, the Mu'awwidzat as "Segera hadir" cards (checked in the
+      # browser: no link, nothing to focus) and the end of Al-Fatihah's lesson
+      # (checked: "Al-Ikhlas segera hadir", no "Surah berikutnya", no move on).
+      # The Ilmu Waris pages and the Mu'awwidzat lessons are shot in their
+      # switch-on steps below. The
       # narration MP3s are not in the repo or the image (they live in the VM
       # media dir), so for the Al-Fatihah ayah 1 karaoke shots the script
       # answers the narration URLs ITSELF, in the browser only (Playwright
@@ -360,15 +375,19 @@ jobs:
       # its links (hub, track, each linked surah, every linked ayah closed and with every
       # disclosure open, Konsep and every concept, every Kosakata entry linked from those) and the
       # autoplay lesson step by step (Al-Fatihah 1 with the routed narration, so the karaoke
-      # caption; 2 and 7 caption-only; each kind of exercise answered once, so its feedback is
-      # measured too), on a phone (390) and a desktop (1280), each at the three text sizes. A
-      # self-test first lays out linebreaks-fixture.html in a real page: a bad case of every kind
-      # must be caught, the markup as it ships must pass, and a unit wider than its line must
-      # break in the paragraph's flow. Any offender (a term split from its Arabic, a hyphenated
-      # word cut, a line starting with "," or "·", a box as wide as its line, text sticking out of
-      # its column, the ayah marker alone on a row, …) fails the step; each is printed, and all
-      # are in shots/linebreaks.json with lb-*.png shots at each size (uploaded below). Its own
-      # container, started like production; removed on every exit so :3300 is free again.
+      # caption; 2 and 7 caption-only, 7 up to its end card; each kind of exercise answered once,
+      # so its feedback is measured too), on a phone (390) and a desktop (1280), each at the three
+      # text sizes. A self-test first lays out linebreaks-fixture.html in a real page: a bad case
+      # of every kind must be caught, the markup as it ships must pass, and a unit wider than its
+      # line must break in the paragraph's flow. Any offender (a term split from its Arabic, a
+      # hyphenated word cut, a line starting with "," or "·", a box as wide as its line, text
+      # sticking out of its column, the ayah marker alone on a row, …) fails the step; each is
+      # printed, and all are in shots/linebreaks.json with lb-*.png shots at each size (uploaded
+      # below). Its own container, started like production (no BELAJAR_SURAHS), so it measures
+      # what production shows: the Al-Fatihah pages, the Mu'awwidzat as "Segera hadir" cards and
+      # the end of Al-Fatihah saying the next surah is coming soon. The Mu'awwidzat pages are
+      # measured on the every-surah container in the next step (linebreaks.mjs --surahs).
+      # Removed on every exit so :3300 is free again.
       - name: Line breaks (phone + desktop, three text sizes)
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: |
@@ -395,6 +414,63 @@ jobs:
             npx playwright install --with-deps chromium >/dev/null
           fi
           BELAJAR_DIR="$GITHUB_WORKSPACE/belajar" node linebreaks.mjs
+
+      # The Mu'awwidzat on the real image, on a container started with every surah listed
+      # (BELAJAR_SURAHS): only Al-Fatihah is published on the live site (operator, 2026-10-10;
+      # src/lib/features.ts), but Al-Ikhlas, Al-Falaq and An-Nas stay built and tested, so showing
+      # them is an env change.
+      #   smoke (surahs-smoke.mjs): /belajar/api/surahs lists all four; every surah and ayah page
+      #         answers 200, each ayah with the single "Mulai pelajaran" button and the one-click
+      #         hint, "klik" never "ketuk"; the pre-hub URLs 308 into them; the track page has no
+      #         "Segera hadir" card and links every surah; the hub lists all four; the concept and
+      #         word pages link into each of them again;
+      #   screenshots (screenshots.mjs --surahs): the track, Al-Ikhlas 1, An-Nas 6, and the end of
+      #         Al-Fatihah offering "Surah berikutnya: Al-Ikhlas" (checked in the browser);
+      #   line breaks (linebreaks.mjs --surahs): the check of the step above on this container,
+      #         where the pages a learner reaches by links include every Mu'awwidzat surah and ayah
+      #         page and the concept and word pages link into them (the end of Al-Fatihah offers
+      #         "Surah berikutnya: Al-Ikhlas"); its results in shots/linebreaks-semua-surah.json and
+      #         lb-semua-surah-*.png.
+      # Each lists its problems; the step fails after all three have run.
+      - name: Al-Mu'awwidzat with every surah listed (smoke, screenshots, line breaks)
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          set -euo pipefail
+          # A failed check must not leave :3300 taken.
+          trap 'docker rm -f surahs >/dev/null 2>&1 || true' EXIT
+          docker run -d --name surahs --network host -e PORT=3300 \
+            -e BELAJAR_SURAHS=al-fatihah,al-ikhlas,al-falaq,an-nas \
+            -e DATABASE_URL=postgres://smoke:smoke@127.0.0.1:5432/smoke \
+            dakwah-belajar-web:latest
+          ok=""
+          for _ in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:3300/belajar/api/health >/dev/null 2>&1; then ok=1; break; fi
+            sleep 2
+          done
+          [[ -n "$ok" ]] || { docker logs surahs 2>&1 | tail -20; echo "✗ container never became healthy"; exit 1; }
+          smoke_rc=0
+          node belajar/scripts/ci/surahs-smoke.mjs || smoke_rc=$?
+          mkdir -p /tmp/shots-run
+          cp belajar/scripts/ci/screenshots.mjs belajar/scripts/ci/narration-route.mjs \
+             belajar/scripts/ci/linebreaks.mjs belajar/scripts/ci/linebreaks-measure.mjs \
+             belajar/scripts/ci/linebreaks-fixture.mjs belajar/scripts/ci/linebreaks-fixture.html /tmp/shots-run/
+          cd /tmp/shots-run
+          # Normally installed by the screenshots step; install here if that step did not get there.
+          if [[ ! -d node_modules/playwright ]]; then
+            [[ -f package.json ]] || npm init -y >/dev/null
+            npm install --no-audit --no-fund --silent playwright@1.49.1
+            npx playwright install --with-deps chromium >/dev/null
+          fi
+          shots_rc=0
+          BELAJAR_DIR="$GITHUB_WORKSPACE/belajar" node screenshots.mjs --surahs || shots_rc=$?
+          lb_rc=0
+          BELAJAR_DIR="$GITHUB_WORKSPACE/belajar" node linebreaks.mjs --surahs || lb_rc=$?
+          docker rm -f surahs >/dev/null
+          rc=0
+          [[ "$smoke_rc" -eq 0 ]] || { echo "✗ Mu'awwidzat smoke checks failed (listed above)"; rc=1; }
+          [[ "$shots_rc" -eq 0 ]] || { echo "✗ Mu'awwidzat screenshots failed (above)"; rc=1; }
+          [[ "$lb_rc" -eq 0 ]] || { echo "✗ line breaks with every surah listed failed (listed above)"; rc=1; }
+          exit "$rc"
 
       # Ilmu Waris on the real image, on a container started with the switch on
       # (BELAJAR_WARIS=on): the track is hidden on the live site (operator, 2026-10-10;
@@ -457,10 +533,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: belajar-screenshots
-          # shots/: page screenshots (the waris pages from the switch-on container), waris e2e
-          # shots + print PDFs + waris-e2e-record.json (page counts, heights, network summary),
-          # linebreaks.json + lb-*.png (the line-break check: every offender, shots at each text
-          # size); waris-plan.json: the e2e plan.
+          # shots/: page screenshots (the waris pages and the Mu'awwidzat lessons from their
+          # switch-on containers), waris e2e shots + print PDFs + waris-e2e-record.json (page
+          # counts, heights, network summary), linebreaks.json + lb-*.png (the line-break check:
+          # every offender, shots at each text size; linebreaks-semua-surah.json +
+          # lb-semua-surah-*.png from the every-surah container); waris-plan.json: the e2e plan.
           path: |
             /tmp/shots-run/shots/*.png
             /tmp/shots-run/shots/*.pdf

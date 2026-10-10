@@ -71,6 +71,10 @@ export type Seg =
 const ARABIC_WORD = new RegExp(`[${AR}]+`, "g");
 const letters = (w: string) => w.replace(MARKS, "").length;
 const longWords = (s: string) => (s.match(ARABIC_WORD) ?? []).filter((w) => letters(w) >= 2).length;
+/** Latin words naming one Arabic word in a term's bracket: one, except bare letters — a word of
+ *  2–3 letters with no harakat, named letter by letter ("alif lam (ال)", the article) — one per
+ *  letter. */
+const namesFor = (w: string) => (w.replace(MARKS, "") === w && letters(w) <= 3 ? letters(w) : 1);
 /** From this many words, an Arabic run is a quotation: nothing glued to it. */
 export const QUOTE_WORDS = 4;
 /** A gloss stays with an Arabic run of at most this many words (root letters count as none): a
@@ -137,14 +141,15 @@ export function textUnits(text: string): Seg[] {
     const runs = [...core.matchAll(ARABIC_RUN)].map((m) => m[0]);
 
     // Before: a term in front of a bracket that opens on Arabic and holds ≤ 3 Arabic words — as
-    // many Latin words as the bracket has Arabic words (root letters count as one), at most 3:
+    // many Latin words as the bracket has Arabic words (root letters count as one; bare letters,
+    // the article, one per letter: "alif lam (ال)", namesFor), at most 3:
     // "huruf jar (حَرْف جَرّ)", "kasrah (كَسْرَة)", "entri (و س و س)", "alif (ٱ أ إ آ dan alif
     // kecil …)" (the bracket may close after Latin words). The last of them is the seam's.
     let b = i;
     const bracket = BRACKET.exec(join(i, toks.length - 1));
     if (bracket && hasArabic(bracket[1].trim()[0] ?? "") && longWords(bracket[1]) < QUOTE_WORDS) {
       const inside = bracket[1].match(ARABIC_WORD) ?? [];
-      const n = Math.min(TERM_WORDS, inside.every((w) => letters(w) <= 1) ? 1 : inside.length);
+      const n = Math.min(TERM_WORDS, inside.every((w) => letters(w) <= 1) ? 1 : inside.reduce((k, w) => k + namesFor(w), 0));
       const latin = (k: number) => k >= 0 && free(k) && !ar[k] && LATIN_WORD.test(toks[k].w);
       if (latin(i - 1) && ENDS_LATIN.test(toks[i - 1].w)) {
         b = i - 1;

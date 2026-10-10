@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import type { Concept } from "@/content/schema";
 import { Link } from "@/i18n/navigation";
 import { WORD_INFO } from "@/lib/content";
+import { surahPublished } from "@/lib/features";
 import { getBasic, parseLoc, partsFor, TERMS } from "@/lib/library";
 import { ayahHref, conceptHref } from "@/lib/routes";
 import { annotate, noteWithoutWord, type PartsChange, prepareParts, Scope, soundsOf, titleParts, type Token } from "@/lib/terms";
@@ -224,6 +225,7 @@ function ExampleRow({
   meaning: string;
   locLabel: string;
 }) {
+  const { s } = row;
   return (
     <li className="border-t border-hairline py-4 first:border-t-0">
       <p className="flex flex-wrap items-baseline gap-x-3">
@@ -241,9 +243,15 @@ function ExampleRow({
       <p className="mt-1 max-w-prose text-pretty text-base text-ink">
         <TermText tokens={row.note} />
       </p>
-      <Link href={ayahHref(row.s.slug, row.ayah, row.ex.loc)} className="chip-link mt-2">
-        {locLabel}
-      </Link>
+      {/* A surah not published yet (BELAJAR_SURAHS, operator 2026-10-10) has no lesson to open:
+          its place is plain text. The page awaits visibleSurahs() first. */}
+      {surahPublished(s.slug) ? (
+        <Link href={ayahHref(s.slug, row.ayah, row.ex.loc)} className="chip-link mt-2">
+          {locLabel}
+        </Link>
+      ) : (
+        <span className="mt-2 block text-sm font-medium text-ink-muted">{locLabel}</span>
+      )}
     </li>
   );
 }

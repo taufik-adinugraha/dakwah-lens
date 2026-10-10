@@ -11,6 +11,7 @@ import { Headword, TermText } from "@/components/library/TermText";
 import type { Basic, Concept } from "@/content/schema";
 import { Link } from "@/i18n/navigation";
 import { SURAH_INDEX, WORD_AR, WORD_INFO } from "@/lib/content";
+import { visibleSurahs } from "@/lib/features";
 import { getBasic, getConcept, LIBRARY, TERMS } from "@/lib/library";
 import { conceptHref, conceptIndexHref } from "@/lib/routes";
 import { annotate, prepareSigns, Scope, soundsOf, titleParts } from "@/lib/terms";
@@ -35,6 +36,10 @@ export async function generateMetadata({
  * behind ONE focused reading column, the concept on the lesson stage's card, related concepts
  * as chips with their Arabic headword. /konsep/harakat is the foundation page (Dasar membaca).
  * One first-use scope for the whole page: a term shows its Arabic once.
+ *
+ * A concept's examples link to the lesson words, except those of a surah BELAJAR_SURAHS does not
+ * publish (operator, 2026-10-10: Al-Fatihah first), which ConceptCard shows as plain text. The
+ * switch is read per request, so this page waits for it and renders at request time.
  */
 export default async function ConceptPage({ params }: PageProps<"/[locale]/konsep/[id]">) {
   const { locale, id } = await params;
@@ -42,6 +47,7 @@ export default async function ConceptPage({ params }: PageProps<"/[locale]/konse
   const basic = getBasic(id);
   const concept = basic ? undefined : getConcept(id);
   if (!basic && !concept) notFound();
+  await visibleSurahs();
   const t = await getTranslations("Concept");
   const tw = await getTranslations("Word");
   const relatedIds = (basic ?? concept)!.related;

@@ -40,6 +40,11 @@
 // (a new component, a merged branch) is checked too: every [lang="ar"] run and every marked box
 // on the pages it visits.
 //
+// `--surahs`: the same check on the container started with every surah listed (BELAJAR_SURAHS,
+// src/lib/features.ts), where the track links the Mu'awwidzat too: the production-like run reaches
+// Al-Fatihah only (operator, 2026-10-10: the others "segera hadir", not linked). Its results go to
+// shots/linebreaks-semua-surah.json and lb-semua-surah-*.png, beside the production-like run's.
+//
 // Before the real run, a self-test lays out linebreaks-fixture.html in a real page: one known-bad
 // case of every kind must be caught, the markup as it ships must not be, and a unit wider than its
 // line must break in the paragraph's flow, the words around it sharing its lines.
@@ -59,6 +64,9 @@ import { KINDS, measure } from "./linebreaks-measure.mjs";
 import { BELAJAR_DIR, isNarration, narrationIndex, narrationRoute } from "./narration-route.mjs";
 
 const BASE = process.env.BASE_URL ?? "http://127.0.0.1:3300";
+const SURAHS_ON = process.argv.includes("--surahs");
+const TAG = SURAHS_ON ? "-semua-surah" : "";
+const REPORT = `shots/linebreaks${TAG}.json`;
 const SIZES = ["normal", "besar", "sangat-besar"];
 const VIEWPORTS = [
   ["phone", { width: 390, height: 844 }],
@@ -113,7 +121,7 @@ async function setSize(page, size) {
 }
 
 /** One measure per text size; the size is back to Normal afterwards. `shot`: also a screenshot
- *  at each size (shots/lb-<shot>-<size>.png), for reviewing the breaks by eye — every other CI
+ *  at each size (shots/lb[-semua-surah]-<vp>-<shot>-<size>.png), for reviewing the breaks by eye — every other CI
  *  shot is at the Normal size only. */
 async function measureAllSizes(page, vp, label, scope = null, shot = null) {
   for (const size of SIZES) {
@@ -124,7 +132,7 @@ async function measureAllSizes(page, vp, label, scope = null, shot = null) {
     if (counts.containers === 0) offenders.push({ kind: "nothing-measured", where: scope ?? "body", detail: "no text found", text: "" });
     for (const o of offenders) record({ page: label, viewport: vp, size, ...o });
     if (shot) {
-      const file = `shots/lb-${vp}-${shot}-${size}.png`;
+      const file = `shots/lb${TAG}-${vp}-${shot}-${size}.png`;
       if (scope) await page.locator(scope).first().screenshot({ path: file });
       else await page.screenshot({ path: file, fullPage: true });
     }
@@ -187,6 +195,9 @@ async function staticPages(page, vp) {
   if (await open(page, vp, "/belajar/id/konsep"))
     for (const p of await paths(page, 'main a[href*="/konsep/"]')) pages.push([`konsep ${p.split("/").pop()}`, p]);
   if (!ayat.size) record({ page: "/belajar/id/quran", viewport: vp, size: "-", kind: "nothing-measured", where: "track", detail: "the track links no ayah page", text: "" });
+  // With every surah listed, the point of the run: the Mu'awwidzat are reached and measured.
+  if (SURAHS_ON && !surahs.some((s) => !s.endsWith("/al-fatihah")))
+    record({ page: "/belajar/id/quran", viewport: vp, size: "-", kind: "nothing-measured", where: "track", detail: "--surahs: the track links no surah besides Al-Fatihah", text: "" });
   const kosakata = new Set();
   for (const [label, urlPath] of pages) {
     try {
@@ -555,18 +566,18 @@ try {
   await browser.close();
 }
 
-await writeFile("shots/linebreaks.json", JSON.stringify({ tally, offenders: all }, null, 2));
+await writeFile(REPORT, JSON.stringify({ tally, offenders: all }, null, 2));
 console.log(
-  `line breaks: ${tally.measures} measures (${SIZES.length} text sizes × ${VIEWPORTS.length} viewports), ${tally.containers} text blocks, ` +
+  `line breaks${SURAHS_ON ? " (every surah listed)" : ""}: ${tally.measures} measures (${SIZES.length} text sizes × ${VIEWPORTS.length} viewports), ${tally.containers} text blocks, ` +
     `${tally.lines} lines, ${tally.units} units, ${tally.glued} kept words, ${tally.flowed} laid out in the flow, ${tally.arabic} inline Arabic runs, ` +
     `${tally.karaoke} karaoke words, ${tally.markers} ayah markers, ${tally.exercises} exercises answered — ${Math.round((Date.now() - t0) / 1000)}s`,
 );
 if (all.length) {
   for (const o of all.slice(0, MAX_PRINTED))
     console.error(`✗ ${o.kind} · ${o.page} · ${o.viewport} · ${o.size} · ${o.where} · ${o.detail}${o.text ? ` · "${o.text}"` : ""}`);
-  if (all.length > MAX_PRINTED) console.error(`  … and ${all.length - MAX_PRINTED} more (shots/linebreaks.json)`);
+  if (all.length > MAX_PRINTED) console.error(`  … and ${all.length - MAX_PRINTED} more (${REPORT})`);
   const byKind = Object.entries(all.reduce((m, o) => ((m[o.kind] = (m[o.kind] ?? 0) + 1), m), {}));
-  console.error(`✗ ${all.length} line-break offender(s): ${byKind.map(([k, n]) => `${k} ${n}`).join(", ")} — full list in shots/linebreaks.json`);
+  console.error(`✗ ${all.length} line-break offender(s): ${byKind.map(([k, n]) => `${k} ${n}`).join(", ")} — full list in ${REPORT}`);
   process.exit(1);
 }
 console.log("✓ no line-break offenders");
