@@ -372,9 +372,9 @@ export function LessonStage({
           closeSettings();
         }}
       >
-        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
           {live && (
-            <p className="text-sm text-ink-muted tabular-nums">{t("step", { n: view.index + 1, total: view.total })}</p>
+            <p data-autoplay="step" className="text-sm text-ink-muted tabular-nums">{t("step", { n: view.index + 1, total: view.total })}</p>
           )}
           <button
             ref={settingsButtonRef}
@@ -383,7 +383,7 @@ export function LessonStage({
             aria-expanded={settingsOpen}
             aria-controls={settingsId}
             onClick={() => setSettingsOpen((o) => !o)}
-            className="btn-secondary ml-auto"
+            className="btn-secondary ml-auto px-4! sm:px-5!"
           >
             <Settings aria-hidden className="h-5 w-5" />
             {t("settings_button")}
@@ -760,7 +760,7 @@ export function LessonStage({
                   if (view.index > 0) actions.prev();
                 }}
                 aria-disabled={view.index === 0}
-                className="btn-secondary grow px-3! sm:order-1 sm:px-5!"
+                className="btn-secondary grow px-2.5! sm:order-1 sm:px-5!"
               >
                 <ChevronLeft aria-hidden className="h-5 w-5" />
                 {t("prev")}
@@ -773,16 +773,18 @@ export function LessonStage({
                   data-guide={view.showSkip ? "skip" : undefined}
                   onClick={actions.forward}
                   className={clsx(
-                    // Narrower side padding on phones keeps ‹ Sebelumnya and
-                    // this button on one row at the normal text size.
-                    "btn-secondary w-full px-3! sm:px-5!",
+                    // Narrower side padding on phones (and no skip icon)
+                    // keeps ‹ Sebelumnya and this button — "Lewati latihan"
+                    // too, a label the voice says in full — on one row at
+                    // the normal text size.
+                    "btn-secondary w-full px-2.5! sm:px-5!",
                     view.showSkip && "min-h-14! font-semibold",
                     skipGuide && BAR_RING,
                   )}
                 >
                   {view.showSkip ? (
                     <>
-                      <SkipForward aria-hidden className="h-5 w-5" />
+                      <SkipForward aria-hidden className="hidden h-5 w-5 sm:block" />
                       {t("skip")}
                     </>
                   ) : (

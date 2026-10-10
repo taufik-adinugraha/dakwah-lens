@@ -57,6 +57,20 @@ const VIEWPORTS = [
  * close, the stage never reaches an exercise or the spotlight never appears: that is the check
  * that the autoplay really runs in a browser.
  */
+/**
+ * Two controls share one row (their vertical centres within 4px) at the normal text size. On a
+ * phone at an exercise, ‹ Sebelumnya and "Lewati latihan" wrapping made the panel three rows tall
+ * over the exercise, and "Langkah 15 dari 21" pushed ⚙ Pengaturan onto a row of its own
+ * (2026-10-10 shots). A larger text size may wrap them: that is the graceful fallback, not tested.
+ */
+async function assertSameRow(page, vp, a, b, what) {
+  const [ba, bb] = [await page.locator(a).first().boundingBox(), await page.locator(b).first().boundingBox()];
+  if (!ba || !bb) throw new Error(`${vp}: ${what} — not rendered`);
+  const [ca, cb] = [ba.y + ba.height / 2, bb.y + bb.height / 2];
+  if (Math.abs(ca - cb) > 4) throw new Error(`${vp}: ${what} wrapped onto two rows (centres ${Math.round(ca)} / ${Math.round(cb)})`);
+  console.log(`  one row: ${what}`);
+}
+
 async function autoplayShots(page, vp) {
   await page.goto(BASE + AYAH_2, { waitUntil: "networkidle" });
   await page.evaluate(() => document.fonts.ready);
@@ -96,6 +110,8 @@ async function autoplayShots(page, vp) {
   await exercise.waitFor({ state: "visible", timeout: 10_000 });
   await page.locator("[data-spotlight-ring]").first().waitFor({ state: "visible", timeout: 10_000 });
   await page.waitForTimeout(1200);
+  await assertSameRow(page, vp, '[data-autoplay="prev"]', '[data-autoplay="next"]', "‹ Sebelumnya and Lewati latihan");
+  await assertSameRow(page, vp, '[data-autoplay="step"]', '[data-autoplay="settings-toggle"]', "Langkah N dari M and Pengaturan");
   await stage.screenshot({ path: `shots/${vp}-autoplay-3-exercise.png` });
   console.log(`shot ${vp}-autoplay-3-exercise`);
   await page.screenshot({ path: `shots/${vp}-autoplay-3-exercise-viewport.png` });
