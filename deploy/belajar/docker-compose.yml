@@ -15,6 +15,11 @@ services:
     restart: unless-stopped
     # Created once by deploy.sh (mode 600): DATABASE_URL for the module's own
     # `dakwah_belajar` database, MAIN_APP_INTERNAL_URL for session lookups.
+    # Optional, added by hand: BELAJAR_WARIS=on shows the Ilmu Waris track,
+    # hidden while the line is absent (operator, 2026-10-10;
+    # belajar/src/lib/features.ts). The file is read when the container is
+    # created: after editing it, `up -d --force-recreate` (a restart keeps
+    # the old values).
     env_file: /srv/dakwah-lens/belajar.env
     environment:
       TZ: Asia/Jakarta

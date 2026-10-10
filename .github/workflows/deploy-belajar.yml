@@ -257,13 +257,16 @@ jobs:
           done
           loc="$(curl -s -o /dev/null -w '%{redirect_url}' http://127.0.0.1:3300/belajar)"
           echo "/belajar -> ${loc}"; [[ "$loc" == */belajar/id ]]
-          # Ilmu Waris (docs/waris-plan.md §10 M2.7, M2.13): every waris route (track, hitung,
-          # laporan; id + en) answers 200, noindex, with the AI chip and "bukan fatwa", and no
-          # visible text promises an ustadz review (there is none); unknown waris paths 404; the
-          # hub card and the track's door link through. Lists every problem, then fails the step
+          # Ilmu Waris is hidden on the live site (operator, 2026-10-10; src/lib/features.ts), and
+          # this container starts like production, without BELAJAR_WARIS: every waris route (track,
+          # hitung, laporan; id + en; also fetched as the App Router does, percent-encoded, and
+          # with the TAB/LF/CR or trailing space next-intl strips on its way to the page) answers
+          # 404 with nothing of the track in the body, and the hub (id, en) has no waris
+          # card and no link into the track. The track itself is tested with the switch on in the
+          # "Ilmu Waris with the switch on" step below. Lists every problem, then fails the step
           # after the restart check below has run.
           waris_rc=0
-          node belajar/scripts/ci/waris-smoke.mjs || waris_rc=$?
+          node belajar/scripts/ci/waris-smoke.mjs --hidden || waris_rc=$?
           # Migrations are idempotent across restarts.
           docker restart smoke >/dev/null
           for _ in $(seq 1 30); do
@@ -273,10 +276,13 @@ jobs:
           logs="$(docker logs smoke 2>&1)"
           grep -q "up to date" <<<"$logs"
           docker rm -f smoke >/dev/null
-          [[ "$waris_rc" -eq 0 ]] || { echo "✗ waris smoke checks failed (listed above)"; exit 1; }
+          [[ "$waris_rc" -eq 0 ]] || { echo "✗ Ilmu Waris is not hidden (listed above)"; exit 1; }
 
       # Visual review without a developer laptop: phone + desktop screenshots
       # of the real image, uploaded as a build artifact on every run. The
+      # container starts like production (no BELAJAR_WARIS), so the shots show
+      # what production shows, the hidden waris address's 404 included; the
+      # Ilmu Waris pages are shot in the switch-on step below. The
       # narration MP3s are not in the repo or the image (they live in the VM
       # media dir), so for the Al-Fatihah ayah 1 karaoke shots the script
       # answers the narration URLs ITSELF, in the browser only (Playwright
@@ -303,7 +309,15 @@ jobs:
           BELAJAR_DIR="$GITHUB_WORKSPACE/belajar" node screenshots.mjs
           docker rm -f shots >/dev/null
 
-      # Ilmu Waris end-to-end on the real image (docs/waris-plan.md §10):
+      # Ilmu Waris on the real image, on a container started with the switch on
+      # (BELAJAR_WARIS=on): the track is hidden on the live site (operator, 2026-10-10;
+      # src/lib/features.ts) but stays built and tested, so showing it again is an env change.
+      #   smoke (docs/waris-plan.md §10 M2.7, M2.13): every waris route (track, hitung, laporan;
+      #         id + en) answers 200, noindex, with the AI chip and "bukan fatwa", and no visible
+      #         text promises an ustadz review (there is none); unknown waris paths 404; the hub
+      #         card and the track's door link through;
+      #   screenshots of the three waris pages (screenshots.mjs --waris, phone + desktop);
+      # and end to end (docs/waris-plan.md §10):
       #   M2.6  a simple, an 'aul and a radd family driven through /waris/hitung screen by screen
       #         (the plan's screens must be exactly the model's); every fikih data-share equals the
       #         test vector; FAILS on any POST and on any request other than static assets under
@@ -315,21 +329,28 @@ jobs:
       #   M2.5  no k6 and no rupiah in storage or the address.
       # The plan comes from the questionnaire model + content/waris/test-vectors.json (pure TS,
       # run with tsx; no npm install) and is checked against the report model before any browser.
-      - name: Waris end-to-end (questionnaire → report, network, print, reduced motion)
+      # The smoke and the screenshots list their problems and fail the step after the end-to-end
+      # run, so one run reports all three.
+      - name: Ilmu Waris with the switch on (smoke, screenshots, end-to-end)
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: |
           set -euo pipefail
-          trap 'docker rm -f e2e >/dev/null 2>&1 || true' EXIT
+          # A failed check must not leave :3300 taken.
+          trap 'docker rm -f waris >/dev/null 2>&1 || true' EXIT
           mkdir -p /tmp/shots-run
           (cd belajar && npx --yes tsx@4.19.2 scripts/ci/waris-e2e-plan.ts --out /tmp/shots-run/waris-plan.json)
-          docker run -d --name e2e --network host -e PORT=3300 \
+          docker run -d --name waris --network host -e PORT=3300 -e BELAJAR_WARIS=on \
             -e DATABASE_URL=postgres://smoke:smoke@127.0.0.1:5432/smoke \
             dakwah-belajar-web:latest
+          ok=""
           for _ in $(seq 1 30); do
-            curl -fsS http://127.0.0.1:3300/belajar/api/health >/dev/null 2>&1 && break
+            if curl -fsS http://127.0.0.1:3300/belajar/api/health >/dev/null 2>&1; then ok=1; break; fi
             sleep 2
           done
-          cp belajar/scripts/ci/waris-e2e.mjs /tmp/shots-run/
+          [[ -n "$ok" ]] || { docker logs waris 2>&1 | tail -20; echo "✗ container never became healthy"; exit 1; }
+          smoke_rc=0
+          node belajar/scripts/ci/waris-smoke.mjs || smoke_rc=$?
+          cp belajar/scripts/ci/screenshots.mjs belajar/scripts/ci/waris-e2e.mjs /tmp/shots-run/
           cd /tmp/shots-run
           # Normally installed by the screenshots step; install here if that step did not get there.
           if [[ ! -d node_modules/playwright ]]; then
@@ -337,15 +358,21 @@ jobs:
             npm install --no-audit --no-fund --silent playwright@1.49.1
             npx playwright install --with-deps chromium >/dev/null
           fi
+          shots_rc=0
+          node screenshots.mjs --waris || shots_rc=$?
           node waris-e2e.mjs waris-plan.json
+          docker rm -f waris >/dev/null
+          [[ "$smoke_rc" -eq 0 ]] || { echo "✗ waris smoke checks failed (listed above)"; exit 1; }
+          [[ "$shots_rc" -eq 0 ]] || { echo "✗ waris screenshots failed (above)"; exit 1; }
 
       - name: Upload screenshots
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: belajar-screenshots
-          # shots/: page screenshots, waris e2e shots + print PDFs + waris-e2e-record.json
-          # (page counts, heights, network summary); waris-plan.json: the e2e plan.
+          # shots/: page screenshots (the waris pages from the switch-on container), waris e2e
+          # shots + print PDFs + waris-e2e-record.json (page counts, heights, network summary);
+          # waris-plan.json: the e2e plan.
           path: |
             /tmp/shots-run/shots/*.png
             /tmp/shots-run/shots/*.pdf
