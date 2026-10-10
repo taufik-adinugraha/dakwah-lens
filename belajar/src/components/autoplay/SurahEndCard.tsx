@@ -3,6 +3,7 @@
 import { CheckCircle2, ChevronRight, List, RotateCcw } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+import { MixedText } from "@/components/library/MixedText";
 import { Link } from "@/i18n/navigation";
 import { quranHref } from "@/lib/routes";
 
@@ -33,13 +34,18 @@ export function SurahEndCard({
     <div ref={focusOnMount} tabIndex={-1} data-autoplay="end" className="mt-5 rounded-2xl bg-ok-bg px-5 py-5 sm:px-6">
       <p className="flex items-center gap-3 font-display text-2xl font-medium text-ink">
         <CheckCircle2 aria-hidden className="h-7 w-7 shrink-0 text-forest" />
-        {t("end_title", { surah: surahName })}
+        {/* Surah names ("Al-Ikhlas") are never cut at the hyphen (line breaks, 2026-10-10). */}
+        <span>
+          <MixedText text={t("end_title", { surah: surahName })} />
+        </span>
       </p>
       <p className="mt-2 max-w-prose text-pretty text-lg text-ink">{t("end_text")}</p>
       <div className="mt-5 flex flex-wrap gap-3">
         {nextSurah && (
           <button type="button" onClick={onNextSurah} className="btn-primary w-full sm:w-auto">
-            {t("end_next", { surah: nextSurah.name })}
+            <span>
+              <MixedText text={t("end_next", { surah: nextSurah.name })} />
+            </span>
             <ChevronRight aria-hidden className="h-5 w-5" />
           </button>
         )}

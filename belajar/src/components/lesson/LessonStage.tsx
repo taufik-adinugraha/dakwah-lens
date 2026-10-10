@@ -24,6 +24,7 @@ import { type Offscreen, Spotlight } from "@/components/autoplay/Spotlight";
 import { SurahEndCard } from "@/components/autoplay/SurahEndCard";
 import { continueToAyah, PLAY_WORD_EVENT, useAutoplay } from "@/components/autoplay/useAutoplay";
 import { guideSelector } from "@/components/exercises/guide";
+import { MixedText } from "@/components/library/MixedText";
 import { TextSizeOptions } from "@/components/TextSizeSwitch";
 import type { RecitationSource } from "@/hooks/useSegmentPlayer";
 import { Link } from "@/i18n/navigation";
@@ -538,7 +539,11 @@ export function LessonStage({
             stage is the words, the card, then the caption and the controls
             in the bottom panel). Phones: one compact row, the Arabic on the
             right of its number, transliteration and meaning, so the words,
-            the card and the panel fit one screen; from sm: stacked, centred. */}
+            the card and the panel fit one screen — while the longest of
+            those words fits beside the Arabic; when it does not (large text
+            sizes), the Arabic takes a row of its own above them instead of
+            the words running into it (flex-wrap on their min-content; line
+            breaks, 2026-10-10). From sm: stacked, centred. */}
         {!started ? (
           <div className="mx-auto mt-5 max-w-prose">{translation}</div>
         ) : live && !spec ? (
@@ -547,19 +552,21 @@ export function LessonStage({
               <div
                 data-guide="word-card"
                 data-autoplay="word-card"
-                className="mx-auto grid max-w-xl grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 rounded-2xl border-[1.5px] border-forest bg-forest-tint px-4 py-2 sm:grid-cols-1 sm:justify-items-center sm:gap-y-1 sm:py-3 sm:text-center"
+                className="mx-auto flex max-w-xl flex-wrap-reverse items-center gap-x-4 gap-y-1 rounded-2xl border-[1.5px] border-forest bg-forest-tint px-4 py-2 sm:flex-col sm:flex-nowrap sm:py-3 sm:text-center"
               >
-                <p className="row-start-1 text-base font-semibold text-forest">{t("word_n", { n: focusWord.index })}</p>
-                <p
-                  lang="ar"
-                  dir="rtl"
-                  className="quran col-start-2 row-span-3 row-start-1 text-ar-lg text-ink sm:col-start-1 sm:row-span-1 sm:row-start-2 sm:text-ar-xl"
-                >
+                <div className="flex-[1_1_min-content] sm:contents">
+                  <p className="text-base font-semibold text-forest sm:order-1">{t("word_n", { n: focusWord.index })}</p>
+                  {/* MixedText: "al-ḥamdu", "orang-orang" are never cut at the hyphen while
+                      they fit the column (line breaks, operator 2026-10-10). */}
+                  <p className="text-lg text-ink-muted sm:order-3">
+                    <MixedText text={focusWord.translit} />
+                  </p>
+                  <p className="text-xl font-semibold text-pretty text-ink sm:order-4">
+                    <MixedText text={t("card_meaning", { gloss: focusWord.gloss })} />
+                  </p>
+                </div>
+                <p lang="ar" dir="rtl" className="quran ml-auto text-ar-lg text-ink sm:order-2 sm:ml-0 sm:text-ar-xl">
                   {focusWord.ar}
-                </p>
-                <p className="row-start-2 text-lg text-ink-muted sm:row-start-3">{focusWord.translit}</p>
-                <p className="row-start-3 text-xl font-semibold text-pretty text-ink sm:row-start-4">
-                  {t("card_meaning", { gloss: focusWord.gloss })}
                 </p>
               </div>
             ) : null}
@@ -629,11 +636,14 @@ export function LessonStage({
                 tabIndex={-1}
                 className="mt-4 text-base font-semibold text-ink"
               >
-                {t("exercise_heading", {
-                  n: exerciseN,
-                  total: exerciseSteps.length,
-                  title: tx(EXERCISE_TITLE_KEY[spec.key]),
-                })}
+                {/* "Latihan 2 dari 5 · …": the dot never starts a line (line breaks, 2026-10-10). */}
+                <MixedText
+                  text={t("exercise_heading", {
+                    n: exerciseN,
+                    total: exerciseSteps.length,
+                    title: tx(EXERCISE_TITLE_KEY[spec.key]),
+                  })}
+                />
               </p>
             )}
             {/* An exercise's prompt stays above the exercise it explains;

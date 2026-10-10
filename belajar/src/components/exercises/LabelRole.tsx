@@ -6,6 +6,8 @@ import { useTranslations } from "next-intl";
 import type { Word } from "@/content/schema";
 import { seededShuffle } from "@/lib/shuffle";
 
+import { MixedText } from "../library/MixedText";
+
 import {
   Counter,
   ExerciseShell,
@@ -98,7 +100,7 @@ function LabelRoleRound({
                 {w.ar}
               </span>
               <span className="text-sm text-ink-muted">
-                {w.translit} · {w.gloss}
+                <MixedText text={`${w.translit} · ${w.gloss}`} />
               </span>
             </div>
           </div>
@@ -113,7 +115,9 @@ function LabelRoleRound({
                     state={optionState(opt, q.answer, q.tried, q.resolved)}
                     onClick={() => q.choose(opt)}
                   >
-                    <span>{opt}</span>
+                    <span>
+                      <MixedText text={opt} />
+                    </span>
                   </OptionButton>
                 </li>
               ))}
@@ -127,7 +131,13 @@ function LabelRoleRound({
           >
             {q.resolved !== null && (
               <>
-                <strong className="font-semibold">{w.role}</strong>. {w.why}
+                {/* The full stop inside the role's text: a line may break right
+                    after a kept-together word, so "(jar-majrur)" ⏎ "." could
+                    happen with the stop outside (line breaks, 2026-10-10). */}
+                <strong className="font-semibold">
+                  <MixedText text={`${w.role}.`} />
+                </strong>{" "}
+                <MixedText text={w.why} />
               </>
             )}
           </Feedback>

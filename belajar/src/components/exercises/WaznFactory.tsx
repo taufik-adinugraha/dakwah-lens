@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import type { Lexeme } from "@/content/schema";
 import { seededShuffle } from "@/lib/shuffle";
 
-import { MixedText } from "../library/MixedText";
+import { KeepTogether, MixedText } from "../library/MixedText";
 import {
   Counter,
   ExerciseShell,
@@ -152,12 +152,13 @@ function WaznFactoryRound({
             nonce={`${q.i}/${q.tried.length}/${q.resolved ?? ""}`}
           >
             {q.resolved !== null && (
-              <>
+              // The label and its form on one line: never "label:" ⏎ form.
+              <KeepTogether>
                 {item.label}:{" "}
                 <bdi lang="ar" dir="rtl" className="arabic-inline text-ar-sm">
                   {item.answer}
                 </bdi>
-              </>
+              </KeepTogether>
             )}
           </Feedback>
 
@@ -171,7 +172,9 @@ function WaznFactoryRound({
             nextGuide={mark("next")}
           />
 
-          <p className="mt-4 max-w-prose text-sm text-ink-soft">{t("wazn_note")}</p>
+          <p className="mt-4 max-w-prose text-sm text-ink-soft">
+            <MixedText text={t("wazn_note")} />
+          </p>
         </div>
       )}
     </ExerciseShell>

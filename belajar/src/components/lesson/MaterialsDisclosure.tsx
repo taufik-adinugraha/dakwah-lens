@@ -3,6 +3,8 @@
 import { ChevronDown } from "lucide-react";
 import { type ReactNode, useEffect, useRef } from "react";
 
+import { MixedText } from "../library/MixedText";
+
 /**
  * "Materi lengkap ayat ini" (operator, 2026-10-10: focus on the lesson, less
  * distraction): everything below the stage — the word cards, the standalone
@@ -47,7 +49,9 @@ export function MaterialsDisclosure({ title, hint, children }: { title: string; 
       <summary className="disclosure-row px-5 py-3 text-ink">
         <span className="flex min-w-0 flex-col">
           <span className="text-lg font-semibold">{title}</span>
-          <span className="text-sm font-normal text-ink-muted">{hint}</span>
+          <span className="text-sm font-normal text-ink-muted">
+            <MixedText text={hint} />
+          </span>
         </span>
         <ChevronDown aria-hidden className="chev h-6 w-6 shrink-0 text-forest" />
       </summary>

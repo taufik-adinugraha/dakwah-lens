@@ -9,6 +9,8 @@ import { useImamRate } from "@/hooks/usePace";
 import { useSegmentPlayer, type RecitationSource } from "@/hooks/useSegmentPlayer";
 import { seededShuffle } from "@/lib/shuffle";
 
+import { KeepTogether, MixedText } from "../library/MixedText";
+
 import {
   Counter,
   ExerciseShell,
@@ -197,10 +199,15 @@ function TapWordRound({
           >
             {q.resolved !== null && targetWord && (
               <>
-                <bdi lang="ar" dir="rtl" className="quran text-ar-sm">
-                  {targetWord.ar}
-                </bdi>{" "}
-                ({targetWord.translit} — {targetWord.gloss})
+                {/* The word, its transliteration and the dash on one line; the
+                    gloss wraps after them (line breaks, 2026-10-10). */}
+                <KeepTogether>
+                  <bdi lang="ar" dir="rtl" className="quran text-ar-sm">
+                    {targetWord.ar}
+                  </bdi>{" "}
+                  ({targetWord.translit} —
+                </KeepTogether>{" "}
+                <MixedText text={`${targetWord.gloss})`} />
               </>
             )}
           </Feedback>
