@@ -262,14 +262,11 @@ async function karaokeShots(page, vp, index) {
     await page.locator('[data-autoplay="replay"]').click();
     await page.locator('[data-autoplay="word-card"]').waitFor({ state: "visible", timeout: 10_000 });
     // Mid-line: the first sentence said, the narrator on the term "kasrah (كَسْرَة)," (8th word).
-    await page.waitForFunction(
-      () => {
-        const c = document.querySelector('[data-autoplay="caption"]');
-        return !!c?.querySelector('[data-karaoke="now"]') && c.querySelectorAll('[data-karaoke="said"]').length >= 7;
-      },
-      null,
-      { timeout: 25_000 },
-    );
+    // Locator waits, not page.waitForFunction: Playwright evaluates waitForFunction predicates
+    // with eval in the page, which the module's CSP (no 'unsafe-eval') rightly refuses.
+    const caption = page.locator('[data-autoplay="caption"]');
+    await caption.locator('[data-karaoke="said"]').nth(6).waitFor({ state: "attached", timeout: 25_000 });
+    await caption.locator('[data-karaoke="now"]').first().waitFor({ state: "attached", timeout: 25_000 });
     await stage.screenshot({ path: `shots/${vp}-autoplay-ayah1-karaoke.png` });
     console.log(`shot ${vp}-autoplay-ayah1-karaoke`);
     await page.screenshot({ path: `shots/${vp}-autoplay-ayah1-karaoke-viewport.png` });
