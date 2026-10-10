@@ -17,7 +17,9 @@ import {
 export type LinePart =
   | "intro"
   | "recite"
+  | `primer:${number}`
   | `w${number}`
+  | `w${number}:compose:${number}`
   | "structure"
   | `concept:${string}`
   | `ex:${ExerciseKey}:intro`
@@ -38,7 +40,7 @@ export const promptLineId = (key: ExerciseKey, part: GuidePart): string => `shar
 const SLUG = "[a-z0-9]+(?:-[a-z0-9]+)*";
 const ID = "[a-z0-9]+(?:-[a-z0-9]+)*";
 const EX = EXERCISE_KEYS.join("|");
-const PART = `intro|recite|w[1-9][0-9]{0,2}|structure|concept:${ID}|ex:(?:${EX}):[a-z]+(?:_[a-z]+)*|recap|next|done`;
+const PART = `intro|recite|primer:[1-9][0-9]{0,2}|w[1-9][0-9]{0,2}(?::compose:[1-9][0-9]{0,2})?|structure|concept:${ID}|ex:(?:${EX}):[a-z]+(?:_[a-z]+)*|recap|next|done`;
 const SHARED = `${SHARED_KEYS.join("|")}|ex:(?:${EX}):(?:${GUIDE_PARTS.join("|")})`;
 /** A split part of a long line: ":a", ":b", … */
 const SPLIT = "(?::[a-z])?";

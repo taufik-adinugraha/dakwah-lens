@@ -68,6 +68,16 @@ jobs:
       # ending the AI narrator could voice (plan §6.1 A1; no human review,
       # L11), word places on screen, manifests equal to a fresh build. Stdlib
       # only, no network; render_narration.py is never run here.
+      # Word compositions + the harakat primer (content/compose, narration
+      # rule 14): every Arabic form re-derived from the lesson words' bytes
+      # and its declared edits, the stages, the last frame = the word, the
+      # authored file's hash. The Tanzil / QAC checks need pipeline/cache
+      # (git-ignored) and run locally: `python3 pipeline/validate_compose.py`.
+      - name: Compositions — validate (corpus-free)
+        run: python3 pipeline/validate_compose.py --no-corpus
+      - name: Compositions — validator mutation tests (corpus-free)
+        run: python3 pipeline/test_validate_compose.py --no-corpus
+
       - name: Narration — manifests up to date
         run: python3 pipeline/build_narration.py --check
       - name: Narration — validate manifests

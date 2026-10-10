@@ -32,6 +32,7 @@ import { PACES } from "@/lib/lessonSteps";
 import { ayahHref } from "@/lib/routes";
 
 import { MushafLine, type PlayerWord } from "./AyahPlayer";
+import { type StageCompose, WordComposition } from "./WordComposition";
 
 /** A recording the stage can play, with its reciter's name for the select.
  *  Its credit line is on the Kredit page, not on the stage. */
@@ -144,7 +145,12 @@ const BAR_RING = "ring-4 ring-forest ring-offset-4 ring-offset-white";
  * screen is about: the whole ayah, the word explained, a concept's words,
  * the imam's current word as he recites. A large word card (Arabic ·
  * transliteration · "yang artinya …") sits above the caption while a word is
- * explained or recited. A screen reader hears the line without its Arabic
+ * explained or recited; in its place, the harakat primer and a word's
+ * COMPOSITION animation (operator 2026-10-10, narration rule 14: [بِ] +
+ * [ٱسْمُ] → kasrah → joined → [بِسْمِ]) play frame by frame with their lines
+ * (WordComposition; same slot, as tall as the word's tallest frame, so nothing
+ * jumps between frames and nothing is clipped). A screen reader hears the line
+ * without its Arabic
  * from a polite live region — never over the imam. The rest of the page
  * (word cards, Latihan, Pelajari lebih dalam) waits, collapsed, under the
  * stage in "Materi lengkap ayat ini".
@@ -159,6 +165,7 @@ export function LessonStage({
   sources,
   translation,
   exercise,
+  compose = null,
 }: {
   seq: AutoplaySequence;
   /** Page title, also the lock-screen title (Media Session). */
@@ -173,6 +180,8 @@ export function LessonStage({
   translation: ReactNode;
   /** What the exercises need inside the stage. */
   exercise: StageExerciseData;
+  /** This ayah's word compositions and harakat primer (content bytes), if any. */
+  compose?: StageCompose | null;
 }) {
   const t = useTranslations("Guided");
   const tp = useTranslations("Player");
@@ -216,6 +225,8 @@ export function LessonStage({
   // numbered mushaf line marks, and the word of the large word card.
   const focusWord = ap.marks.focus === null ? undefined : words.find((w) => w.index === ap.marks.focus);
   const marked = ap.marks.marked;
+  // The animation in the card's slot: the primer, or the word's composition.
+  const anim = ap.frame && compose ? (ap.frame.step === "primer" ? compose.primer : ap.frame.word ? compose.words[ap.frame.word] : null) : null;
   const showMushaf = !started || (live && !spec);
   const spotGuides = spec ? state.guides.filter((g) => g.target.startsWith("exercise:")) : [];
   const skipGuide = view.showSkip ? state.guides.find((g) => g.target === "skip") : undefined;
@@ -542,8 +553,18 @@ export function LessonStage({
         {!started ? (
           <div className="mx-auto mt-5 max-w-prose">{translation}</div>
         ) : live && !spec ? (
-          <div ref={cardSlotRef} className="mt-4 min-h-32 sm:min-h-56">
-            {focusWord ? (
+          <div ref={cardSlotRef} className="mt-4 min-h-36 sm:min-h-56">
+            {anim && ap.frame && compose ? (
+              <WordComposition
+                unit={anim}
+                kind={ap.frame.step}
+                frame={ap.frame.frame}
+                recited={ap.frame.recited}
+                marks={compose.marks}
+                word={ap.frame.word}
+                stepKey={step.id}
+              />
+            ) : focusWord ? (
               <div
                 data-guide="word-card"
                 data-autoplay="word-card"

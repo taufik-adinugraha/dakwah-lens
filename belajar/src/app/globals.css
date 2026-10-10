@@ -382,6 +382,99 @@ label:has(> .sr-only:focus-visible) {
   }
 }
 
+/* ── Word composition / harakat primer (operator 2026-10-10, narration rule 14) ──
+   WordComposition stacks the BEFORE and AFTER state of a change in one grid
+   cell (nothing reflows) and fades one whole form into the next — never a
+   mark inside a word (styled spans break Arabic joining). Without motion
+   (reduced motion, or before the transition starts) only the after state
+   shows; every transition and delay lives inside no-preference, because the
+   global reduce block above shortens durations but not delays. Each frame
+   plays its transition once, when it appears (its layer is keyed by frame):
+   ≤ 1.5 s, gentle easing, no loops, nothing moves while the line is read. */
+[data-compose-before] {
+  visibility: hidden;
+}
+/* The word's other frames, laid out under the one on screen so the figure
+   keeps its tallest frame's height (WordComposition): never shown, never
+   animated (an animation's keyframes set visibility, which !important
+   outranks; a ghost must not flash). */
+[data-compose-ghost],
+[data-compose-ghost] * {
+  visibility: hidden !important;
+  animation: none !important;
+  transition: none !important;
+}
+/* The strip's Arabic at a tighter line height than .arabic-inline / .quran
+   (2 / 2.2, which make a chip row 48px and a tile twice its letters' height
+   on a phone): 1.6 for the pieces and the terms of the chips ("kasrah
+   (كَسْرَة)"), 1.8 for a tile's whole form, which still clears its stacked
+   marks (shaddah + fathah, the small alif). Unlayered and more specific
+   than those rules, so they win wherever the composition draws. */
+[data-autoplay="composition"] :is(.arabic-inline, .quran) {
+  line-height: 1.6;
+}
+[data-autoplay="composition"] .compose-ar {
+  line-height: 1.8;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-compose-layer] {
+    animation: compose-in 450ms ease-out both;
+  }
+  [data-compose-before] {
+    animation: compose-out 550ms ease-in 750ms both;
+  }
+  [data-compose-after] {
+    animation: compose-in 550ms ease-out 900ms both;
+  }
+  /* join: the parts slide together, the "+" fades, then the joined tile appears */
+  [data-compose-row] {
+    animation:
+      compose-squeeze 650ms ease-in-out 250ms both,
+      compose-out 400ms ease-in 800ms both;
+  }
+  [data-compose-row] [data-compose-plus] {
+    animation: compose-plus 450ms ease-in 250ms both;
+  }
+}
+@keyframes compose-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes compose-out {
+  from {
+    opacity: 1;
+    visibility: visible;
+  }
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@keyframes compose-squeeze {
+  from {
+    column-gap: 0.5rem;
+    visibility: visible;
+  }
+  to {
+    column-gap: 0;
+    visibility: visible;
+  }
+}
+@keyframes compose-plus {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    width: 0;
+    padding: 0;
+  }
+}
+
 /* ── Text size ("Ukuran huruf", §3.4) ──
    A percentage of the browser default, so the learner's own OS/browser
    setting is respected. Everything is rem, so type, Arabic, spacing and

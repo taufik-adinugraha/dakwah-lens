@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 
 import { loadCheckInput, runAutoplayChecks } from "@/lib/autoplay/checks";
 import { availableExercises, buildAutoplaySequence, hasArabicScript, timedWords } from "@/lib/autoplay";
+import { composeInput } from "@/lib/compose-content";
 import { SURAHS } from "@/lib/content";
 import { conceptsIntroducedIn, getLexeme } from "@/lib/library";
 import { SURAH_SLUGS } from "@/lib/routes";
@@ -21,14 +22,22 @@ const { input, errors: loadErrors } = loadCheckInput((rel) => {
   return existsSync(path) ? readFileSync(path, "utf8") : null;
 });
 
+// Two full engine runs over every surah: ~1.5 s alone since every Al-Fatihah word has a
+// composition (2026-10-10), 12 s beside the waris suite's workers, past vitest's 5 s.
+const FULL_RUN_TIMEOUT_MS = 60_000;
+
 describe("autoplay stage: what the lesson page ships", () => {
-  it("passes the engine's checks with every caption set the page uses (id, en)", () => {
-    expect(loadErrors).toEqual([]);
-    for (const [locale, texts] of Object.entries(AUTOPLAY_TEXT_SETS)) {
-      const report = runAutoplayChecks({ ...input, texts, property: { streams: 1, length: 120 } });
-      expect({ locale, errors: report.errors }).toEqual({ locale, errors: [] });
-    }
-  });
+  it(
+    "passes the engine's checks with every caption set the page uses (id, en)",
+    () => {
+      expect(loadErrors).toEqual([]);
+      for (const [locale, texts] of Object.entries(AUTOPLAY_TEXT_SETS)) {
+        const report = runAutoplayChecks({ ...input, texts, property: { streams: 1, length: 120 } });
+        expect({ locale, errors: report.errors }).toEqual({ locale, errors: [] });
+      }
+    },
+    FULL_RUN_TIMEOUT_MS,
+  );
 
   it("spotlight labels are plain words: no Arabic script, no ALL CAPS", () => {
     for (const texts of Object.values(AUTOPLAY_TEXT_SETS)) {
@@ -60,6 +69,8 @@ describe("autoplay stage: what the lesson page ships", () => {
             // The narration is Indonesian: an English page stays caption-only.
             narration: locale === "id" ? narrationFor(s.slug) : null,
             shared: locale === "id" ? SHARED_NARRATION : null,
+            // Word compositions + the harakat primer go to every locale (rule 14).
+            compose: composeInput(s.slug, a),
           });
           expect(JSON.stringify(seq)).toBe(JSON.stringify(direct));
           // Every line the Indonesian stage can speak has its manifest text
@@ -94,8 +105,8 @@ describe("autoplay stage: messages and markers", () => {
   const id = JSON.parse(read("messages/id.json")) as Record<string, Record<string, string>>;
   const en = JSON.parse(read("messages/en.json")) as Record<string, Record<string, string>>;
 
-  it("has the same Guided / Lesson / Player keys in both locales", () => {
-    for (const ns of ["Guided", "Lesson", "Player"]) {
+  it("has the same Guided / Lesson / Player / Compose keys in both locales", () => {
+    for (const ns of ["Guided", "Lesson", "Player", "Compose"]) {
       expect(Object.keys(en[ns]).sort()).toEqual(Object.keys(id[ns]).sort());
     }
   });
@@ -179,6 +190,10 @@ describe("autoplay stage: messages and markers", () => {
       expect(stage).toContain(marker);
     }
     expect(read("src/components/autoplay/Spotlight.tsx")).toContain("data-spotlight-ring");
+    // The composition animation in the card's slot, and the frame CI waits for.
+    const comp = read("src/components/lesson/WordComposition.tsx");
+    for (const marker of ['data-autoplay="composition"', 'data-guide="word-card"', "data-compose-frame", "data-compose-stage"]) expect(comp).toContain(marker);
+    expect(read("scripts/ci/screenshots.mjs")).toContain('[data-autoplay="composition"]');
     const header = read("src/components/HeaderControls.tsx");
     for (const marker of ["data-header-menu-toggle", "data-header-menu=", "data-text-size-toggle"]) expect(header).toContain(marker);
     const shots = read("scripts/ci/screenshots.mjs");

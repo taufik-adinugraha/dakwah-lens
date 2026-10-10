@@ -111,19 +111,21 @@ export function lineDisplay(manifest: NarrationManifest | null | undefined, id: 
 }
 
 /** The manifest's own fields of line `id` (the first part's, for a split
- *  line, where every part names the same words): `highlight` and `focus`
- *  as written, `undefined` when the manifest does not say. */
+ *  line, where every part names the same words): `highlight`, `focus` and
+ *  (primer / compose lines) `frame` as written, `undefined` when the
+ *  manifest does not say. */
 export function lineMarks(
   manifest: NarrationManifest | null | undefined,
   id: string,
-): { highlight: number[] | undefined; focus: string | null | undefined } {
-  if (!manifest) return { highlight: undefined, focus: undefined };
+): { highlight: number[] | undefined; focus: string | null | undefined; frame: number | undefined } {
+  if (!manifest) return { highlight: undefined, focus: undefined, frame: undefined };
   const ids = manifestParts(manifest, id);
-  if (!ids) return { highlight: undefined, focus: undefined };
+  if (!ids) return { highlight: undefined, focus: undefined, frame: undefined };
   const all = ids.map((k) => manifest.lines[k]);
   const highlight = all.find((l) => l.highlight !== undefined)?.highlight;
   const focused = all.find((l) => l.focus !== undefined);
-  return { highlight, focus: focused ? (focused.focus ?? null) : undefined };
+  const frame = all.find((l) => l.frame !== undefined)?.frame;
+  return { highlight, focus: focused ? (focused.focus ?? null) : undefined, frame };
 }
 
 /**
@@ -157,7 +159,7 @@ export function parseNarrationManifest(raw: unknown): { manifest: NarrationManif
       continue;
     }
     const entry: NarrationLine = { text: l.text };
-    const { display, highlight, focus } = l;
+    const { display, highlight, focus, frame } = l;
     if (display !== undefined) {
       if (typeof display === "string" && display.trim()) entry.display = display;
       else problems.push(`${id}: display must be a non-empty string`);
@@ -171,6 +173,10 @@ export function parseNarrationManifest(raw: unknown): { manifest: NarrationManif
       if (focus === null) entry.focus = null;
       else if (typeof focus === "string" && /^[1-9][0-9]{0,2}:[1-9][0-9]{0,2}:[1-9][0-9]{0,2}$/.test(focus)) entry.focus = focus;
       else problems.push(`${id}: focus must be null or a word loc "surah:ayah:word"`);
+    }
+    if (frame !== undefined) {
+      if (typeof frame === "number" && Number.isInteger(frame) && frame >= 1) entry.frame = frame;
+      else problems.push(`${id}: frame must be a positive integer (the animation frame of a primer / compose line)`);
     }
     if (l.audio !== undefined) {
       const audio = usableAudio(l.audio);

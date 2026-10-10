@@ -253,6 +253,26 @@
     "replay_short": "Ulangi",
     "card_meaning": "yang artinya “{gloss}”"
   },
+  "Compose": {
+    "word_n": "Kata ke-{n}",
+    "base_tag": "bentuk dasar",
+    "cause_tag": "penyebab",
+    "sound": "bunyi {v}",
+    "silent": "tidak dibaca",
+    "dropped": "tidak ditulis",
+    "doubled": "dibaca dobel",
+    "no_vowel": "huruf mati",
+    "recited": "Imam membacakan kata ini.",
+    "stage_parts": "bagian-bagiannya",
+    "stage_base": "bentuk dasar",
+    "stage_change": "harakatnya berubah",
+    "stage_join": "ditulis bersambung",
+    "stage_drop": "ada huruf yang tidak ditulis",
+    "stage_whole": "seperti tertulis di ayat",
+    "stage_overview": "harakat",
+    "stage_mark": "harakat",
+    "aria_primer": "Harakat: {marks}. Contoh: {examples}."
+  },
   "Settings": {
     "button": "Ukuran huruf",
     "button_short": "Huruf",

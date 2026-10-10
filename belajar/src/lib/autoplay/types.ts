@@ -9,10 +9,15 @@
  *
  * Narration lines are keyed by the step-id contract shared by every part of
  * the autoplay build (and by pipeline/build_narration.py + validate_narration.py):
- *   "${slug}:${ayah}:${part}"   part ∈ intro | recite | w${n} | structure |
+ *   "${slug}:${ayah}:${part}"   part ∈ intro | recite | primer:${k} | w${n} |
+ *                                      w${n}:compose:${k} | structure |
  *                                      concept:${conceptId} |
  *                                      ex:${exerciseKey}:intro |
  *                                      recap | next | done
+ *   (primer:${k}: the k-th line of the harakat primer that opens an ayah;
+ *    w${n}:compose:${k}: the k-th line of word n's composition — both play
+ *    over an animation frame, the manifest's `frame`; operator 2026-10-10,
+ *    narration rule 14, content/compose/${slug}.json)
  *   "shared:${key}"             start | resume | correct | try_again |
  *                               revealed | reminder | skip_offer | surah_done
  *   "shared:ex:${exerciseKey}:${part}"   the prompt for one control of an
@@ -152,6 +157,9 @@ export type NarrationLine = {
   highlight?: number[];
   /** The word ("1:1:3") the large word card shows while the line plays. */
   focus?: string | null;
+  /** A primer / compose line: the animation frame (1-based) on screen while
+   *  it plays. */
+  frame?: number;
   audio?: NarrationAudio;
   /** Word timings of `audio` (only with audio). */
   tokens?: CaptionToken[];
@@ -198,6 +206,10 @@ export type Cue = {
    *  screen (the manifest's `focus`, else the word a w${n} line explains);
    *  null: no card. */
   focus: number | null;
+  /** A primer / compose line: the frame (1-based) of the step's animation
+   *  shown while it plays (the manifest's `frame`, else the composition's
+   *  own line plan); null otherwise. */
+  frame: number | null;
   /** The caption cut into ≤180-character parts (senior-ux §3.5): shown one
    *  at a time — by reading time without audio, by audio position with. */
   parts: string[];
@@ -218,8 +230,13 @@ export type Cue = {
 export type StepKind =
   | "intro"
   | "recite_ayah"
+  /** The harakat primer (fathah a, kasrah i, dhammah u, …) opening an ayah. */
+  | "primer"
   | "recite_word"
   | "explain"
+  /** A word explained by its parts, over its animation; ends with the imam
+   *  reciting the joined word. */
+  | "compose"
   | "structure"
   | "concept"
   | "exercise"
@@ -259,8 +276,10 @@ export type AutoplayStep = {
   caption: string;
   /** Default spotlight of the step. */
   guides: Guide[];
-  /** 1-based word index the step is about (recite_word, explain). */
+  /** 1-based word index the step is about (recite_word, explain, compose). */
   word?: number;
+  /** primer / compose: how many animation frames the step has. */
+  frames?: number;
   /** That word's loc ("1:2:3"). */
   loc?: string;
   /** The imam's recitation, played after the cues (never during them). */

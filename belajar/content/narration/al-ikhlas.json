@@ -191,8 +191,8 @@
       "focus": null
     },
     "al-ikhlas:2:structure:b": {
-      "text": "Kata pertama diulang, bukan diganti dengan kata ganti, dan menurut an-Nahhas pengulangan itu untuk mengagungkan; menurut Darwisy, ayat ini tidak disambung dengan wawu karena ia menegaskan dan memantapkan isi ayat sebelumnya.",
-      "display": "Kata pertama diulang, bukan diganti dengan kata ganti, dan menurut an-Nahhas pengulangan itu untuk mengagungkan; menurut Darwisy, ayat ini tidak disambung dengan wawu karena ia menegaskan dan memantapkan isi ayat sebelumnya.",
+      "text": "Kata pertama diulang, bukan diganti dengan kata ganti, dan menurut an-Nahhas pengulangan itu untuk mengagungkan; menurut Darwisy, ayat ini tidak disambung dengan وَاو karena ia menegaskan dan memantapkan isi ayat sebelumnya.",
+      "display": "Kata pertama diulang, bukan diganti dengan kata ganti, dan menurut an-Nahhas pengulangan itu untuk mengagungkan; menurut Darwisy, ayat ini tidak disambung dengan wawu (و) karena ia menegaskan dan memantapkan isi ayat sebelumnya.",
       "highlight": [
         0
       ],
@@ -271,8 +271,8 @@
       "focus": "112:3:2"
     },
     "al-ikhlas:3:w3": {
-      "text": "Kata ketiga artinya: dan tidak pula. Wawu adalah huruf 'athaf yang menyambungkan kalimat ini dengan kata pertama dan kedua, dan kata ini kembali menjazmkan kata kerja sesudahnya.",
-      "display": "Kata ketiga artinya: “dan tidak pula”. Wawu adalah huruf 'athaf yang menyambungkan kalimat ini dengan kata pertama dan kedua, dan kata ini kembali menjazmkan kata kerja sesudahnya.",
+      "text": "Kata ketiga artinya: dan tidak pula. وَاو adalah huruf 'athaf yang menyambungkan kalimat ini dengan kata pertama dan kedua, dan kata ini kembali menjazmkan kata kerja sesudahnya.",
+      "display": "Kata ketiga artinya: “dan tidak pula”. Wawu (وَ) adalah huruf 'athaf yang menyambungkan kalimat ini dengan kata pertama dan kedua, dan kata ini kembali menjazmkan kata kerja sesudahnya.",
       "highlight": [
         3
       ],
@@ -323,8 +323,8 @@
       "focus": null
     },
     "al-ikhlas:3:structure:c": {
-      "text": "menurut Darwisy, kata pertama dan kedua sendiri tidak disambung dengan wawu karena ia menguatkan makna kata yang artinya tempat meminta segala sesuatu di ayat dua: Yang tidak membutuhkan apa pun, sedangkan segala sesuatu membutuhkan-Nya, tidak beranak dan tidak diperanakkan.",
-      "display": "menurut Darwisy, kata pertama dan kedua sendiri tidak disambung dengan wawu karena ia menguatkan makna kata yang artinya “tempat meminta segala sesuatu” di ayat dua: Yang tidak membutuhkan apa pun, sedangkan segala sesuatu membutuhkan-Nya, tidak beranak dan tidak diperanakkan.",
+      "text": "menurut Darwisy, kata pertama dan kedua sendiri tidak disambung dengan وَاو karena ia menguatkan makna kata yang artinya tempat meminta segala sesuatu di ayat dua: Yang tidak membutuhkan apa pun, sedangkan segala sesuatu membutuhkan-Nya, tidak beranak dan tidak diperanakkan.",
+      "display": "menurut Darwisy, kata pertama dan kedua sendiri tidak disambung dengan wawu (و) karena ia menguatkan makna kata yang artinya “tempat meminta segala sesuatu” di ayat dua: Yang tidak membutuhkan apa pun, sedangkan segala sesuatu membutuhkan-Nya, tidak beranak dan tidak diperanakkan.",
       "highlight": [
         0
       ],
@@ -381,16 +381,16 @@
       "focus": null
     },
     "al-ikhlas:4:w1": {
-      "text": "Kata pertama artinya: dan tidak. Wawu adalah huruf 'athaf yang menyambungkan kalimat ini dengan frasa yang artinya tidak beranak di ayat tiga, dan kata ini sekali lagi menjazmkan kata kerja sesudahnya.",
-      "display": "Kata pertama artinya: “dan tidak”. Wawu adalah huruf 'athaf yang menyambungkan kalimat ini dengan frasa yang artinya “tidak beranak” di ayat tiga, dan kata ini sekali lagi menjazmkan kata kerja sesudahnya.",
+      "text": "Kata pertama artinya: dan tidak. وَاو adalah huruf 'athaf yang menyambungkan kalimat ini dengan frasa yang artinya tidak beranak di ayat tiga, dan kata ini sekali lagi menjazmkan kata kerja sesudahnya.",
+      "display": "Kata pertama artinya: “dan tidak”. Wawu (وَ) adalah huruf 'athaf yang menyambungkan kalimat ini dengan frasa yang artinya “tidak beranak” di ayat tiga, dan kata ini sekali lagi menjazmkan kata kerja sesudahnya.",
       "highlight": [
         1
       ],
       "focus": "112:4:1"
     },
     "al-ikhlas:4:w2": {
-      "text": "Kata kedua artinya: ada. Fi'il mudhari' dari kana ini majzum oleh kata pertama, dengan tanda sukun pada nun di akhirnya; seperti kana, ia merafa'kan isimnya, kata kelima, dan menashabkan khabarnya, kata keempat.",
-      "display": "Kata kedua artinya: “ada”. Fi'il mudhari' dari kana ini majzum oleh kata pertama, dengan tanda sukun pada nun di akhirnya; seperti kana, ia merafa'kan isimnya (kata kelima) dan menashabkan khabarnya (kata keempat).",
+      "text": "Kata kedua artinya: ada. Fi'il mudhari' dari kana ini majzum oleh kata pertama, dengan tanda sukun pada نُون di akhirnya; seperti kana, ia merafa'kan isimnya, kata kelima, dan menashabkan khabarnya, kata keempat.",
+      "display": "Kata kedua artinya: “ada”. Fi'il mudhari' dari kana ini majzum oleh kata pertama, dengan tanda sukun pada nun (ن) di akhirnya; seperti kana, ia merafa'kan isimnya (kata kelima) dan menashabkan khabarnya (kata keempat).",
       "highlight": [
         2
       ],
@@ -432,8 +432,8 @@
       "focus": null
     },
     "al-ikhlas:4:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Wawu menyambungkan kalimat ini pada frasa yang artinya tidak beranak di ayat tiga, dan kata pertama menjazmkan kata kedua, bentuk mudhari' dari kana yang merafa'kan isimnya dan menashabkan khabarnya: kata kelima adalah isimnya yang diletakkan di akhir,",
-      "display": "Sekarang susunan kalimatnya. Wawu menyambungkan kalimat ini pada frasa yang artinya “tidak beranak” di ayat tiga, dan kata pertama menjazmkan kata kedua, bentuk mudhari' dari kana yang merafa'kan isimnya dan menashabkan khabarnya: kata kelima adalah isimnya yang diletakkan di akhir,",
+      "text": "Sekarang susunan kalimatnya. وَاو menyambungkan kalimat ini pada frasa yang artinya tidak beranak di ayat tiga, dan kata pertama menjazmkan kata kedua, bentuk mudhari' dari kana yang merafa'kan isimnya dan menashabkan khabarnya: kata kelima adalah isimnya yang diletakkan di akhir,",
+      "display": "Sekarang susunan kalimatnya. Wawu (و) menyambungkan kalimat ini pada frasa yang artinya “tidak beranak” di ayat tiga, dan kata pertama menjazmkan kata kedua, bentuk mudhari' dari kana yang merafa'kan isimnya dan menashabkan khabarnya: kata kelima adalah isimnya yang diletakkan di akhir,",
       "highlight": [
         0
       ],
@@ -448,8 +448,8 @@
       "focus": null
     },
     "al-ikhlas:4:structure:c": {
-      "text": "Kata ketiga disebut lebih dulu karena inti ayat ini adalah meniadakan kesetaraan dari Alloh subhanahu wa ta'ala, az-Zamakhsyari, dinukil Darwisy dan as-Samin, dan menurut Darwisy tiga kalimat terakhir disambung dengan wawu karena tujuannya satu: meniadakan dari Alloh subhanahu wa ta'ala segala keserupaan dan keterkaitan dalam bentuk apa pun.",
-      "display": "Kata ketiga disebut lebih dulu karena inti ayat ini adalah meniadakan kesetaraan dari Allah subhanahu wa ta'ala (az-Zamakhsyari, dinukil Darwisy dan as-Samin), dan menurut Darwisy tiga kalimat terakhir disambung dengan wawu karena tujuannya satu: meniadakan dari Allah subhanahu wa ta'ala segala keserupaan dan keterkaitan dalam bentuk apa pun.",
+      "text": "Kata ketiga disebut lebih dulu karena inti ayat ini adalah meniadakan kesetaraan dari Alloh subhanahu wa ta'ala, az-Zamakhsyari, dinukil Darwisy dan as-Samin, dan menurut Darwisy tiga kalimat terakhir disambung dengan وَاو karena tujuannya satu: meniadakan dari Alloh subhanahu wa ta'ala segala keserupaan dan keterkaitan dalam bentuk apa pun.",
+      "display": "Kata ketiga disebut lebih dulu karena inti ayat ini adalah meniadakan kesetaraan dari Allah subhanahu wa ta'ala (az-Zamakhsyari, dinukil Darwisy dan as-Samin), dan menurut Darwisy tiga kalimat terakhir disambung dengan wawu (و) karena tujuannya satu: meniadakan dari Allah subhanahu wa ta'ala segala keserupaan dan keterkaitan dalam bentuk apa pun.",
       "highlight": [
         0
       ],

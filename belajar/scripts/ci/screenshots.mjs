@@ -287,9 +287,12 @@ const fmt = (b) => `${Math.round(b.top)}–${Math.round(b.bottom)}`;
  * word 1 — the KARAOKE caption (the narrator's current word filled forest, words said in ink,
  * words to come muted; a dictionary term shown "kasrah (كَسْرَة)") under the large WORD CARD
  * (the word's Arabic · transliteration · "yang artinya …"), the mushaf words numbered with word 1
- * marked. "Berikutnya ›" jumps whole steps (intro → the ayah → the imam says word 1 → its
- * explanation), then "↺ Ulangi langkah ini" plays the explanation from its start — the replay
- * control, and a start that holds even when the imam's stream paused the lesson on the way.
+ * marked. "Berikutnya ›" jumps whole steps (intro → the ayah → the harakat primer → the imam says
+ * word 1 → its explanation), then "↺ Ulangi langkah ini" plays the explanation from its start —
+ * the replay control, and a start that holds even when the imam's stream paused the lesson on the
+ * way. Needs al-fatihah:1:w1 rendered (its audio in content/narration/al-fatihah.json): the word
+ * line became "gloss + lead" with the composition (2026-10-10), so a rebuilt manifest without a
+ * new render has no karaoke there and this check says so.
  * Fails the job if the word card or the karaoke caption never shows (what a learner would see
  * without them is the caption-only fallback, already covered by the ayah 2 shots above).
  */
@@ -308,7 +311,7 @@ async function karaokeShots(page, vp, index) {
     await page.evaluate(() => document.fonts.ready);
     await page.locator('[data-autoplay="start"]').click();
     const next = page.locator('[data-autoplay="next"]');
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 4; i++) {
       await next.click();
       await page.waitForTimeout(250);
     }
@@ -334,6 +337,8 @@ async function karaokeShots(page, vp, index) {
       .innerHTML()
       .catch(() => "(no caption element)");
     console.error(`✗ ${vp}: the Al-Fatihah ayah 1 karaoke caption / word card never showed`);
+    if (![...index.keys()].length) console.error("  (no narration audio in the manifests at all)");
+    console.error("  al-fatihah:1:w1 must have audio + tokens in content/narration/al-fatihah.json (render it after a text change)");
     console.error(`  caption HTML: ${caption.slice(0, 600)}`);
     console.error(`  narration requests answered (${served.length}):\n    ${served.join("\n    ") || "(none)"}`);
     console.error(`  console errors (${consoleErrors.length}):\n    ${consoleErrors.join("\n    ") || "(none)"}`);
@@ -349,8 +354,267 @@ async function karaokeShots(page, vp, index) {
   await page.goto("about:blank");
 }
 
+/**
+ * The composition animation on the stage's word-card slot (operator 2026-10-10, narration rule 14),
+ * on the real page: the harakat primer (frame 2: fathah on its dotted circle, بَ "b + a"), then
+ * word 1 of Al-Fatihah 1 explained by its parts — its first frame [بِ] + [ٱسْمُ], MID-WAY through
+ * the change frame (the dhammah fading into kasrah, مُ → مِ, u → i), the change settled, and the
+ * join (بِٱسْمِ, "bi + ismi → bismi"), the recited tile (forest fill, checked by computed style);
+ * plus the change frame with reduced motion (static). Each is checked unclipped (composeFit). In the
+ * "Tunggu saya" pace each caption-only line waits for Lanjut, so the frames are stepped through by
+ * clicking it (rendered lines play on by themselves); "↺ Ulangi" starts each step even if the
+ * imam's stream paused the lesson on the way. Fails the job if the animation never shows or sits
+ * under the bottom panel.
+ */
+async function assertComposeLayout(page, vp) {
+  const box = async (sel) => {
+    const b = await page.locator(sel).first().boundingBox();
+    if (!b) throw new Error(`${vp}: ${sel} has no box (not rendered)`);
+    return { top: b.y, bottom: b.y + b.height };
+  };
+  const { height } = page.viewportSize();
+  const comp = await box('[data-autoplay="composition"]');
+  const panel = await box('[data-autoplay="panel"]');
+  const caption = await box('[data-autoplay="caption"]');
+  const controls = await box('[data-autoplay="panel"] [role="group"]');
+  const problems = [];
+  if (comp.top < 0 || comp.bottom > panel.top + 1) problems.push(`composition ${fmt(comp)} off screen or under the panel ${fmt(panel)}`);
+  if (caption.top < 0 || caption.bottom > height || caption.bottom > controls.top + 1) problems.push(`caption ${fmt(caption)} not on screen above the controls ${fmt(controls)}`);
+  if (problems.length) throw new Error(`${vp}: composition layout — ${problems.join("; ")}`);
+  console.log(`  layout ok: composition ${fmt(comp)} · panel ${fmt(panel)} · caption ${fmt(caption)}`);
+}
+
+/**
+ * Nothing in the composition figure is clipped or spills out of it (review 2026-10-10: a fixed
+ * 9rem figure with overflow-hidden cut 83 of 87 frames on a phone): every element of the frame on
+ * screen AND of the word's other frames (laid out invisibly to hold the height, data-compose-ghost)
+ * lies inside the figure's box, the figure scrolls in neither direction, and it is no wider than
+ * the screen. Run in the page (page.evaluate: the CSP forbids waitForFunction's eval, not this).
+ * Returns null when no composition is on screen.
+ */
+async function composeFit(page) {
+  return page.evaluate(() => {
+    const fig = document.querySelector('[data-autoplay="composition"]');
+    if (!fig) return null;
+    const f = fig.getBoundingClientRect();
+    const box = (r) => `${Math.round(r.left)},${Math.round(r.top)}–${Math.round(r.right)},${Math.round(r.bottom)}`;
+    const out = [];
+    if (fig.scrollWidth > fig.clientWidth + 1) out.push(`scrolls sideways (${fig.scrollWidth} > ${fig.clientWidth})`);
+    if (fig.scrollHeight > fig.clientHeight + 1) out.push(`scrolls (${fig.scrollHeight} > ${fig.clientHeight})`);
+    if (f.left < -1 || f.right > window.innerWidth + 1) out.push(`figure ${box(f)} wider than the screen (${window.innerWidth})`);
+    for (const el of fig.querySelectorAll("*")) {
+      if (el.closest(".sr-only")) continue;
+      const r = el.getBoundingClientRect();
+      if (!r.width && !r.height) continue;
+      if (r.left < f.left - 1 || r.right > f.right + 1 || r.top < f.top - 1 || r.bottom > f.bottom + 1) {
+        const where = el.closest("[data-compose-ghost]") ? "another frame" : "the frame on screen";
+        out.push(`${where}: <${el.tagName.toLowerCase()}> “${(el.textContent || "").trim().slice(0, 40)}” at ${box(r)}, outside the figure ${box(f)}`);
+        if (out.length >= 6) break;
+      }
+    }
+    const d = fig.dataset;
+    return { unit: d.composeKind === "primer" ? "primer" : `word ${d.composeWord}`, frame: d.composeFrame, problems: out };
+  });
+}
+
+async function assertComposeFits(page, where) {
+  const fit = await composeFit(page);
+  if (!fit) throw new Error(`${where}: no composition on screen`);
+  if (fit.problems.length) throw new Error(`${where}: composition ${fit.unit} frame ${fit.frame} clipped — ${fit.problems.join("; ")}`);
+  return fit;
+}
+
+/** "Ukuran huruf": the stored size (pre-paint script, app/[locale]/layout.tsx), then a reload. */
+async function setTextSize(page, size) {
+  await page.evaluate((v) => {
+    if (v === "normal") localStorage.removeItem("belajar:v1:text-size");
+    else localStorage.setItem("belajar:v1:text-size", v);
+  }, size);
+  await page.reload({ waitUntil: "networkidle" });
+  await page.evaluate(() => document.fonts.ready);
+}
+
+/** Al-Fatihah's composed units per ayah (the primer and each composed word), from the content. */
+async function composedUnits() {
+  const c = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "compose", "al-fatihah.json"), "utf8"));
+  const by = new Map();
+  for (const loc of Object.keys(c.words)) {
+    const ayah = Number(loc.split(":")[1]);
+    by.set(ayah, [...(by.get(ayah) ?? []), `word ${loc.split(":")[2]}`]);
+  }
+  if (c.primer) by.set(c.primer.ayah, ["primer", ...(by.get(c.primer.ayah) ?? [])]);
+  return by;
+}
+
+/**
+ * Every composition of the given Al-Fatihah ayat at one text size: "Berikutnya ›" step by step
+ * through each lesson until every composed unit has shown, each checked with composeFit — which
+ * covers all of a unit's frames at once, since they are all laid out in its figure. At the largest
+ * size on a phone it also shoots word 1 of ayah 1 on its change frame (caption-only lines advance
+ * by reading time). Fails the job on any clipped frame or a unit that never showed.
+ */
+async function composeFitSweep(page, vp, size, ayat, units) {
+  let checked = 0;
+  await page.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
+  await setTextSize(page, size);
+  try {
+    for (const ayah of ayat) {
+      const want = new Set(units.get(ayah) ?? []);
+      if (!want.size) continue;
+      await page.goto(BASE + `/belajar/id/quran/al-fatihah/${ayah}`, { waitUntil: "networkidle" });
+      await page.evaluate(() => document.fonts.ready);
+      await page.locator('[data-autoplay="start"]').click();
+      const next = page.locator('[data-autoplay="next"]');
+      const seen = new Set();
+      for (let i = 0; i < 120 && seen.size < want.size; i++) {
+        const fit = await composeFit(page);
+        if (fit) {
+          if (fit.problems.length) {
+            await page.screenshot({ path: `shots/${vp}-compose-fit-${size}-FAILED.png`, fullPage: true }).catch(() => {});
+            throw new Error(`${vp}, text size ${size}, ayah ${ayah}: composition ${fit.unit} clipped — ${fit.problems.join("; ")}`);
+          }
+          if (!seen.has(fit.unit)) {
+            seen.add(fit.unit);
+            checked++;
+            if (vp === "phone" && size === "sangat-besar" && ayah === 1 && fit.unit === "word 1") {
+              // ↺ plays the step from its start even if the imam's stream paused the lesson.
+              await page.locator('[data-autoplay="replay"]').click();
+              const change = page.locator('[data-autoplay="composition"][data-compose-stage="change"]');
+              for (let w = 0; w < 120 && (await change.count()) === 0; w++) await page.waitForTimeout(500);
+              if ((await change.count()) === 0) throw new Error(`${vp} ${size}: word 1 never reached its change frame`);
+              await page.waitForTimeout(1600);
+              await assertComposeFits(page, `${vp} ${size}: word 1 change frame`);
+              await page.locator('[data-autoplay="stage"]').screenshot({ path: `shots/${vp}-autoplay-ayah1-compose-3-change-${size}.png` });
+              console.log(`shot ${vp}-autoplay-ayah1-compose-3-change-${size}`);
+            }
+          }
+        }
+        if (!(await next.isEnabled().catch(() => false))) break;
+        await next.click();
+        await page.waitForTimeout(300);
+      }
+      const missing = [...want].filter((u) => !seen.has(u));
+      if (missing.length) throw new Error(`${vp}, text size ${size}, ayah ${ayah}: never showed ${missing.join(", ")}`);
+    }
+  } finally {
+    await setTextSize(page, "normal").catch(() => {});
+  }
+  console.log(`  composition fits: ${checked} unit(s), every frame, ${vp}, text size ${size}, ayat ${ayat.join(",")}`);
+  await page.goto("about:blank");
+}
+
+async function composeShots(page, vp, index) {
+  const served = [];
+  const handler = narrationRoute(index, served);
+  await page.route(isNarration, handler);
+  const stage = page.locator('[data-autoplay="stage"]');
+  const comp = page.locator('[data-autoplay="composition"]');
+  const frame = (sel) => page.locator(`[data-autoplay="composition"]${sel}`);
+  const middle = page.locator('[data-autoplay="middle"]');
+  const settingsToggle = page.locator('[data-autoplay="settings-toggle"]');
+  const shot = async (name) => {
+    await stage.screenshot({ path: `shots/${vp}-${name}.png` });
+    console.log(`shot ${vp}-${name}`);
+  };
+  // "Tunggu saya" holds each caption-only line until Lanjut: the frames are stepped through
+  // deterministically (with rendered narration the lines play on by themselves instead).
+  const setPace = async (label) => {
+    await settingsToggle.click();
+    await page.locator('[data-autoplay="settings"] label', { hasText: label }).click();
+    await settingsToggle.click();
+    await page.waitForTimeout(200);
+  };
+  const advanceTo = async (sel) => {
+    const deadline = Date.now() + 60_000;
+    while (Date.now() < deadline) {
+      if ((await frame(sel).count()) > 0 && (await frame(sel).first().isVisible())) return;
+      if ((await middle.getAttribute("data-guide")) === "lanjut") await middle.click();
+      await page.waitForTimeout(300);
+    }
+    throw new Error(`${vp}: the composition never reached ${sel}`);
+  };
+  try {
+    await page.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    await page.locator('[data-autoplay="start"]').click();
+    const next = page.locator('[data-autoplay="next"]');
+    const replay = page.locator('[data-autoplay="replay"]');
+    // intro → the ayah → the harakat primer (Biasa: "Berikutnya ›" jumps whole steps)
+    for (let i = 0; i < 2; i++) {
+      await next.click();
+      await page.waitForTimeout(250);
+    }
+    await setPace("Tunggu saya");
+    await replay.click();
+    await comp.waitFor({ state: "visible", timeout: 10_000 });
+    await advanceTo('[data-compose-kind="primer"][data-compose-frame="2"]');
+    await page.waitForTimeout(1600);
+    await assertComposeLayout(page, vp);
+    await assertComposeFits(page, `${vp}: primer`);
+    await shot("autoplay-ayah1-primer");
+    // → the imam says word 1 → its gloss line → its composition
+    await setPace("Biasa");
+    for (let i = 0; i < 3; i++) {
+      await next.click();
+      await page.waitForTimeout(250);
+    }
+    await setPace("Tunggu saya");
+    await replay.click();
+    await advanceTo('[data-compose-stage="parts"]');
+    await page.waitForTimeout(1600);
+    await assertComposeLayout(page, vp);
+    await assertComposeFits(page, `${vp}: word 1 parts`);
+    await shot("autoplay-ayah1-compose-1-parts");
+    await advanceTo('[data-compose-stage="change"]');
+    await page.waitForTimeout(1100); // mid-way: the before form fading out, the after form fading in
+    await shot("autoplay-ayah1-compose-3-change-midway");
+    await page.waitForTimeout(1000);
+    await assertComposeLayout(page, vp);
+    await assertComposeFits(page, `${vp}: word 1 change`);
+    await shot("autoplay-ayah1-compose-3-change");
+    await advanceTo('[data-compose-stage="join"]');
+    await page.waitForTimeout(1800);
+    await assertComposeFits(page, `${vp}: word 1 join`);
+    await shot("autoplay-ayah1-compose-4-join");
+    // While the imam recites the joined word (and, in "Tunggu saya", until Lanjut), the last
+    // tile is filled forest with paper text — the review found it white on white (2026-10-10).
+    await advanceTo('[data-recited="true"]');
+    await page.waitForTimeout(700);
+    const fill = await page
+      .locator('[data-autoplay="composition"][data-recited="true"] [data-compose-layer] [data-compose-tile]')
+      .last()
+      .evaluate((el) => {
+        const ar = el.querySelector('[lang="ar"]');
+        return { bg: getComputedStyle(el).backgroundColor, fg: getComputedStyle(ar ?? el).color };
+      });
+    if (fill.bg === "rgb(255, 255, 255)" || fill.bg === fill.fg) throw new Error(`${vp}: recited tile is ${fill.fg} on ${fill.bg}`);
+    console.log(`  recited tile: ${fill.fg} on ${fill.bg}`);
+    await assertComposeFits(page, `${vp}: word 1 recited`);
+    await shot("autoplay-ayah1-compose-5-recited");
+    // The change frame again with reduced motion: static frames, no transition.
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await replay.click();
+    await advanceTo('[data-compose-stage="change"]');
+    await page.waitForTimeout(300);
+    await shot("autoplay-ayah1-compose-3-change-reduced-motion");
+    await page.emulateMedia({ reducedMotion: null });
+    const text = (await comp.innerText()).replace(/\s+/g, " ").trim();
+    console.log(`  composition: ${text}`);
+    await setPace("Biasa");
+  } catch (err) {
+    await page.screenshot({ path: `shots/${vp}-autoplay-ayah1-compose-FAILED.png`, fullPage: true }).catch(() => {});
+    console.error(`✗ ${vp}: the Al-Fatihah ayah 1 composition animation never showed (or sat under the panel)`);
+    console.error(`  narration requests answered (${served.length}):\n    ${served.join("\n    ") || "(none)"}`);
+    throw err;
+  } finally {
+    await page.unroute(isNarration, handler);
+  }
+  await page.goto("about:blank");
+}
+
 await mkdir("shots", { recursive: true });
 const narration = WARIS_ONLY ? new Map() : await narrationIndex();
+const units = WARIS_ONLY ? new Map() : await composedUnits();
 if (!WARIS_ONLY) console.log(`narration index: ${narration.size} file(s) named by the manifests in ${BELAJAR_DIR}`);
 const browser = await chromium.launch();
 try {
@@ -383,6 +647,11 @@ try {
     await materialsShot(page, vp);
     await autoplayShots(page, vp);
     await karaokeShots(page, vp, narration);
+    await composeShots(page, vp, narration);
+    // Every composition frame fits at every text size (largest: all seven ayat; the others: ayah 1).
+    await composeFitSweep(page, vp, "normal", [1], units);
+    await composeFitSweep(page, vp, "besar", [1], units);
+    await composeFitSweep(page, vp, "sangat-besar", [1, 2, 3, 4, 5, 6, 7], units);
     await ctx.close();
   }
 } finally {

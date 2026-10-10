@@ -919,12 +919,20 @@ describe("autoplay timing", () => {
   });
 });
 
+// Every Al-Fatihah word has a composition since 2026-10-10 (29 words, 162 compose/primer lines):
+// the full runs take ~1.1 s alone but 8–13 s beside the waris suite's workers, past vitest's 5 s.
+const FULL_RUN_TIMEOUT_MS = 60_000;
+
 describe("autoplay checks (every ayah of every surah)", () => {
-  it("pass: sequences, narration manifests, full runs and property runs", () => {
-    const report = runAutoplayChecks(input);
-    for (const n of report.notes) console.info(`autoplay-check note: ${n}`);
-    expect(report.errors).toEqual([]);
-    expect(report.stats.ayat).toBe(22);
-    expect(report.stats.simulatedEvents).toBeGreaterThan(10_000);
-  });
+  it(
+    "pass: sequences, narration manifests, full runs and property runs",
+    () => {
+      const report = runAutoplayChecks(input);
+      for (const n of report.notes) console.info(`autoplay-check note: ${n}`);
+      expect(report.errors).toEqual([]);
+      expect(report.stats.ayat).toBe(22);
+      expect(report.stats.simulatedEvents).toBeGreaterThan(10_000);
+    },
+    FULL_RUN_TIMEOUT_MS,
+  );
 });
