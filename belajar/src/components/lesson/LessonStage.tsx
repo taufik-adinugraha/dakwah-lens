@@ -113,17 +113,20 @@ const BAR_RING = "ring-4 ring-forest ring-offset-4 ring-offset-white";
  *   pertama"), the translation, ONE primary "▶ Mulai pelajaran" (56px) and
  *   one short line under it. A remembered place makes "Lanjutkan dari
  *   langkah N" the primary button, with "Mulai dari awal" beside it.
- * - While it plays: the mushaf line (highlights + number badges), the word
- *   card (in a slot that keeps its height, empty between words), the
- *   karaoke caption, and the controls — no other buttons, and no
- *   translation (it is shown before "Mulai"). The step's content swaps in
- *   place (the prompt + the exercise while practising), so the page never
- *   moves under the learner.
- * - The controls bar is sticky at the bottom of the viewport while the
- *   stage is on screen (a familiar media-player bar): ‹ Sebelumnya ·
- *   Jeda / Lanjutkan · "↺ Ulangi langkah ini" (the current step again, from
- *   its start, also while paused) · Berikutnya › (which becomes "Lewati
- *   latihan" during an exercise), at 48–56px whatever the text size.
+ * - While it plays: the mushaf line (highlights + number badges) and the
+ *   word card (in a slot that keeps its height, empty between words; one
+ *   compact row on phones), then the bottom panel — no other buttons, and
+ *   no translation (it is shown before "Mulai"). The step's content swaps
+ *   in place (the prompt + the exercise while practising), so the page
+ *   never moves under the learner. If the "Mulai" click leaves the card
+ *   under the panel (a phone), that click brings the stage up once.
+ * - The bottom panel is sticky at the bottom of the viewport while the
+ *   stage is on screen (a familiar media player with subtitles): the
+ *   karaoke caption (an exercise's prompt stays above the exercise
+ *   instead), then ‹ Sebelumnya · Jeda / Lanjutkan · "↺ Ulangi langkah
+ *   ini" (the current step again, from its start, also while paused) ·
+ *   Berikutnya › (which becomes "Lewati latihan" during an exercise), at
+ *   48–56px whatever the text size.
  * - A spotlit control that is out of view is never scrolled to
  *   automatically: the bar offers "Lihat bagian yang ditandai", which
  *   scrolls only on the learner's click.
@@ -185,8 +188,12 @@ export function LessonStage({
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   const areaRef = useRef<HTMLElement>(null);
   const captionRef = useRef<HTMLParagraphElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const cardSlotRef = useRef<HTMLDivElement>(null);
   /** The previous step was an exercise (to catch focus it leaves behind). */
   const wasExerciseRef = useRef(false);
+  /** The learner just clicked "Mulai" / "Lanjutkan dari langkah N". */
+  const startClickRef = useRef(false);
 
   const started = state.started;
   const finished = state.phase === "finished";
@@ -255,6 +262,31 @@ export function LessonStage({
     captionRef.current?.focus({ preventScroll: true });
   }, [step.id, isExerciseStep]);
 
+  /** "Mulai pelajaran" / "Lanjutkan dari langkah N" (the learner's click). */
+  const begin = (from?: number) => {
+    startClickRef.current = true;
+    actions.start(from);
+  };
+
+  // Right after that click (and only then), bring the stage up when the
+  // learner could not see the words and the word card above the bottom
+  // panel: on a phone the "Mulai" button sits low on the stage, and the
+  // panel (caption + controls) would cover the card. The one scroll the
+  // lesson makes on its own, and only on the learner's click — like "Lihat
+  // bagian yang ditandai".
+  useEffect(() => {
+    if (!started || !startClickRef.current) return;
+    startClickRef.current = false;
+    const stage = stageRef.current;
+    const slot = cardSlotRef.current;
+    const bar = barRef.current;
+    if (!stage || !slot || !bar) return;
+    const covered = slot.getBoundingClientRect().bottom > bar.getBoundingClientRect().top + 1;
+    if (stage.getBoundingClientRect().top >= 0 && !covered) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    stage.scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" });
+  }, [started]);
+
   /** "Tutup pengaturan" / Escape: close the panel, focus back on its button. */
   const closeSettings = () => {
     setSettingsOpen(false);
@@ -270,11 +302,60 @@ export function LessonStage({
     el.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" });
   };
 
+  // The caption shows what is spoken: karaoke words following the narrator
+  // once the narration has word timings, else the line's text. A screen
+  // reader is told the line without its Arabic instead, in its own live
+  // region: nothing while the imam recites or the narration speaks, nor
+  // "Benar." (the exercise's status box says that). In the bottom panel it
+  // keeps three lines' height, so the panel's edge does not jump per line.
+  const caption = (
+    <p
+      ref={captionRef}
+      tabIndex={-1}
+      data-autoplay="caption"
+      className={clsx(
+        "mx-auto max-w-prose text-pretty text-xl text-ink",
+        spec ? "mt-2 min-h-[3em]" : "min-h-[4.2em]",
+      )}
+    >
+      <CaptionView caption={ap.caption} />
+    </p>
+  );
+
+  // Notices: in the bottom panel while it shows (where the learner's eyes
+  // and the controls that answer them are), else under the stage.
+  const notice = clsx(
+    "mx-auto max-w-prose rounded-xl bg-notice-bg px-4 py-3 text-base text-ink",
+    showBar ? "mb-3" : "mt-4",
+  );
+  const notices = (
+    <>
+      {ap.blocked && (
+        <p role="status" className={notice}>
+          {t("blocked")}
+        </p>
+      )}
+      {view.error === "recite" && (
+        <p role="status" className={notice}>
+          {t("recite_failed")}
+        </p>
+      )}
+      {/* A word the learner clicked to hear could not stream (only theirs:
+          the lesson's own recitation failing says so above, and a step
+          change or replay hands the player back to the lesson). */}
+      {p.failed && ap.learnerWord && view.error !== "recite" && (
+        <p role="status" className={notice}>
+          {tp("failed")}
+        </p>
+      )}
+    </>
+  );
+
   return (
     // overflow-x-clip: a backstop so nothing drawn over the stage (a
     // spotlight label at the largest text size) can make the page scroll
     // sideways; `clip` keeps the controls bar sticky.
-    <div data-autoplay="stage" className="stage-card overflow-x-clip">
+    <div ref={stageRef} data-autoplay="stage" className="stage-card scroll-mt-2 overflow-x-clip">
       <h2 id={`${uid}-guided`} className="sr-only">
         {t("title")}
       </h2>
@@ -452,26 +533,34 @@ export function LessonStage({
         {/* Before "Mulai": the translation. While the lesson plays: the
             WORD CARD while a word is explained or recited — its Arabic
             (content bytes, never retyped), transliteration and "yang artinya
-            …", large, above the caption — and otherwise nothing, in a slot
-            that keeps the card's height, so the caption never jumps from
-            step to step (the playing stage is the words, the card, the
-            caption and the controls only). */}
+            …" — and otherwise nothing, in a slot that keeps the card's
+            height, so nothing below jumps from step to step (the playing
+            stage is the words, the card, then the caption and the controls
+            in the bottom panel). Phones: one compact row, the Arabic on the
+            right of its number, transliteration and meaning, so the words,
+            the card and the panel fit one screen; from sm: stacked, centred. */}
         {!started ? (
           <div className="mx-auto mt-5 max-w-prose">{translation}</div>
         ) : live && !spec ? (
-          <div className="mt-4 min-h-52 sm:min-h-56">
+          <div ref={cardSlotRef} className="mt-4 min-h-32 sm:min-h-56">
             {focusWord ? (
               <div
                 data-guide="word-card"
                 data-autoplay="word-card"
-                className="mx-auto grid max-w-xl justify-items-center gap-1 rounded-2xl border-[1.5px] border-forest bg-forest-tint px-4 py-3 text-center"
+                className="mx-auto grid max-w-xl grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 rounded-2xl border-[1.5px] border-forest bg-forest-tint px-4 py-2 sm:grid-cols-1 sm:justify-items-center sm:gap-y-1 sm:py-3 sm:text-center"
               >
-                <p className="text-base font-semibold text-forest">{t("word_n", { n: focusWord.index })}</p>
-                <p lang="ar" dir="rtl" className="quran text-ar-lg text-ink sm:text-ar-xl">
+                <p className="row-start-1 text-base font-semibold text-forest">{t("word_n", { n: focusWord.index })}</p>
+                <p
+                  lang="ar"
+                  dir="rtl"
+                  className="quran col-start-2 row-span-3 row-start-1 text-ar-lg text-ink sm:col-start-1 sm:row-span-1 sm:row-start-2 sm:text-ar-xl"
+                >
                   {focusWord.ar}
                 </p>
-                <p className="text-lg text-ink-muted">{focusWord.translit}</p>
-                <p className="text-xl font-semibold text-pretty text-ink">{t("card_meaning", { gloss: focusWord.gloss })}</p>
+                <p className="row-start-2 text-lg text-ink-muted sm:row-start-3">{focusWord.translit}</p>
+                <p className="row-start-3 text-xl font-semibold text-pretty text-ink sm:row-start-4">
+                  {t("card_meaning", { gloss: focusWord.gloss })}
+                </p>
               </div>
             ) : null}
           </div>
@@ -486,7 +575,7 @@ export function LessonStage({
                 <button
                   type="button"
                   data-autoplay="resume"
-                  onClick={() => actions.start(ap.savedIdx ?? 0)}
+                  onClick={() => begin(ap.savedIdx ?? 0)}
                   className="btn-primary w-full sm:w-auto sm:min-w-64"
                 >
                   <Play aria-hidden className="h-5 w-5" />
@@ -496,7 +585,7 @@ export function LessonStage({
               <button
                 type="button"
                 data-autoplay="start"
-                onClick={() => actions.start()}
+                onClick={() => begin()}
                 className={clsx(ap.savedIdx === null ? "btn-primary" : "btn-secondary", "w-full sm:w-auto sm:min-w-64")}
               >
                 {ap.savedIdx === null ? (
@@ -547,23 +636,9 @@ export function LessonStage({
                 })}
               </p>
             )}
-            {/* The caption shows what is spoken: karaoke words following
-                the narrator once the narration has word timings, else the
-                line's text. A screen reader is told the line without its
-                Arabic instead, in its own live region: nothing while the
-                imam recites or the narration speaks, nor "Benar." (the
-                exercise's status box says that). */}
-            <p
-              ref={captionRef}
-              tabIndex={-1}
-              data-autoplay="caption"
-              className={clsx(
-                "mx-auto max-w-prose text-pretty text-xl text-ink",
-                spec ? "mt-2 min-h-[3em]" : "mt-4 min-h-[5.5em]",
-              )}
-            >
-              <CaptionView caption={ap.caption} />
-            </p>
+            {/* An exercise's prompt stays above the exercise it explains;
+                every other line's caption is in the bottom panel. */}
+            {spec && caption}
             {spec && guided && (
               <div data-autoplay="exercise" className="mt-4 pt-3">
                 <GuidedExercise
@@ -587,24 +662,7 @@ export function LessonStage({
           {live ? ap.announcement : ""}
         </p>
 
-        {ap.blocked && (
-          <p role="status" className="mx-auto mt-4 max-w-prose rounded-xl bg-notice-bg px-4 py-3 text-base text-ink">
-            {t("blocked")}
-          </p>
-        )}
-        {view.error === "recite" && (
-          <p role="status" className="mx-auto mt-4 max-w-prose rounded-xl bg-notice-bg px-4 py-3 text-base text-ink">
-            {t("recite_failed")}
-          </p>
-        )}
-        {/* A word the learner clicked to hear could not stream (only theirs:
-            the lesson's own recitation failing says so above, and a step
-            change or replay hands the player back to the lesson). */}
-        {p.failed && ap.learnerWord && view.error !== "recite" && (
-          <p role="status" className="mx-auto mt-4 max-w-prose rounded-xl bg-notice-bg px-4 py-3 text-base text-ink">
-            {tp("failed")}
-          </p>
-        )}
+        {!showBar && notices}
 
         {spotGuides.length > 0 && (
           <Spotlight
@@ -616,17 +674,25 @@ export function LessonStage({
         )}
       </section>
 
-      {/* Controls: sticky at the bottom of the viewport while the stage is
-          on screen. Phones: two rows — the main control with "↺ Ulangi"
-          beside it, then ‹ Sebelumnya · Berikutnya ›. From sm the two row
-          wrappers dissolve (display: contents) and the order utilities line
-          all four up: ‹ Sebelumnya · main · ↺ Ulangi langkah ini ·
-          Berikutnya ›. */}
+      {/* The bottom panel: sticky at the bottom of the viewport while the
+          stage is on screen, so what the narrator says and the controls
+          never scroll away — on a phone the words and the card above are
+          taller than the screen, and a caption in the page sat below the
+          fold, behind the controls (CI shot, 2026-10-10). In order: a
+          notice (sound blocked, a recording failed), the caption (not
+          during an exercise: its prompt stays above it), then the controls.
+          Phones: two rows — the main control with "↺ Ulangi" beside it,
+          then ‹ Sebelumnya · Berikutnya ›. From sm the two row wrappers
+          dissolve (display: contents) and the order utilities line all four
+          up: ‹ Sebelumnya · main · ↺ Ulangi langkah ini · Berikutnya ›. */}
       {showBar && (
         <div
           ref={barRef}
+          data-autoplay="panel"
           className="sticky bottom-0 z-20 rounded-b-2xl border-t border-hairline bg-white/95 px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-12px_28px_-14px_rgb(14_90_60/0.35)] backdrop-blur-sm sm:px-7"
         >
+          {notices}
+          {!spec && <div className="mb-4">{caption}</div>}
           {offscreen && spotGuides.length > 0 && (
             <button type="button" onClick={showTarget} className="btn-secondary mb-3 w-full">
               {offscreen === "below" ? (

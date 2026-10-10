@@ -230,6 +230,32 @@ function narrationRoute(index, served) {
 }
 
 /**
+ * What a learner must see while the narrator explains a word, checked on the real page in the
+ * viewport (not the screenshot's stage crop): the whole caption on screen and above the controls,
+ * and the word card fully on screen, not under the bottom panel. The 2026-10-10 phone shot had the
+ * caption below the fold behind the sticky controls, showing only its last fragment.
+ */
+async function assertKaraokeLayout(page, vp) {
+  const { height } = page.viewportSize();
+  const box = async (sel) => {
+    const b = await page.locator(sel).first().boundingBox();
+    if (!b) throw new Error(`${vp}: ${sel} has no box (not rendered)`);
+    return { top: b.y, bottom: b.y + b.height };
+  };
+  const caption = await box('[data-autoplay="caption"]');
+  const controls = await box('[data-autoplay="panel"] [role="group"]');
+  const panel = await box('[data-autoplay="panel"]');
+  const card = await box('[data-autoplay="word-card"]');
+  const problems = [];
+  if (caption.top < 0 || caption.bottom > height) problems.push(`caption ${fmt(caption)} not inside the viewport (0–${height})`);
+  if (caption.bottom > controls.top + 1) problems.push(`caption ${fmt(caption)} not above the controls ${fmt(controls)}`);
+  if (card.top < 0 || card.bottom > panel.top + 1) problems.push(`word card ${fmt(card)} off screen or under the panel ${fmt(panel)}`);
+  if (problems.length) throw new Error(`${vp}: karaoke layout — ${problems.join("; ")}`);
+  console.log(`  layout ok: card ${fmt(card)} · panel ${fmt(panel)} · caption ${fmt(caption)} · controls ${fmt(controls)}`);
+}
+const fmt = (b) => `${Math.round(b.top)}–${Math.round(b.bottom)}`;
+
+/**
  * Al-Fatihah ayah 1, the narrated ayah, after the one "Mulai" click: the stage mid-explanation of
  * word 1 — the KARAOKE caption (the narrator's current word filled forest, words said in ink,
  * words to come muted; a dictionary term shown "kasrah (كَسْرَة)") under the large WORD CARD
@@ -267,6 +293,7 @@ async function karaokeShots(page, vp, index) {
     const caption = page.locator('[data-autoplay="caption"]');
     await caption.locator('[data-karaoke="said"]').nth(6).waitFor({ state: "attached", timeout: 25_000 });
     await caption.locator('[data-karaoke="now"]').first().waitFor({ state: "attached", timeout: 25_000 });
+    await assertKaraokeLayout(page, vp);
     await stage.screenshot({ path: `shots/${vp}-autoplay-ayah1-karaoke.png` });
     console.log(`shot ${vp}-autoplay-ayah1-karaoke`);
     await page.screenshot({ path: `shots/${vp}-autoplay-ayah1-karaoke-viewport.png` });
