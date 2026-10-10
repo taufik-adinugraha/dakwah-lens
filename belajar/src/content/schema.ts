@@ -173,6 +173,24 @@ export type Hadith = z.infer<typeof Hadith>;
 // (plan: "re-use materials across verses/surah"). Spaced review is keyed by
 // these ids, so revising رَبّ in An-Nas counts for Al-Fatihah too.
 
+/**
+ * Library prose with its inline markup kept (pipeline/terms.py; operator 2026-10-10 on /konsep:
+ * "mention the arabic word like majrur in arabic letter, not only the transliteration"):
+ * [[majrur]] a grammar term (Term), [[bismi|q:1:1:1]] a Qur'anic word, [[huwa Allāhu aḥad|q:112:1:2-4]]
+ * a run of words, [[bi-|q:1:1:1/1]] a part of a word (QAC segment), [[ya’|q:1:2:4#6]] a letter as
+ * the ayah writes it. The record's plain fields are this text with the markup stripped
+ * (src/lib/terms.test.ts): narration, page titles and search read those, byte-identical.
+ */
+export const MarkedProse = z.object({
+  title: z.string().min(3),
+  summary: z.string().min(15),
+  explanation: z.array(z.string().min(20)).min(1),
+  bridge: z.string().optional(),
+  /** Concept: one per example, in order. */
+  notes: z.array(z.string().min(5)).default([]),
+});
+export type MarkedProse = z.infer<typeof MarkedProse>;
+
 /** A nahwu/sharaf idea explained once ("Apa itu idhafah?"). */
 export const Concept = z.object({
   id: z.string().regex(/^[a-z0-9-]+$/),
@@ -190,8 +208,100 @@ export const Concept = z.object({
   related: z.array(z.string()).default([]),
   sources: z.array(SourceRef).min(1),
   status: ReviewStatus,
+  /** The same prose with its terms and Qur'anic words marked (Konsep pages, the lessons' cards). */
+  marked: MarkedProse.optional(),
 });
 export type Concept = z.infer<typeof Concept>;
+
+/**
+ * A grammar term in Arabic script, from ONE table (pipeline/authored/library.terms.json): each
+ * spelling is checked against a pinned source the module cites (a Shamela page of a cited kitab,
+ * or the operator-approved pronunciation dictionary), never typed per page. `ar` null = no source
+ * verified it: the term is shown in Latin only.
+ */
+export const Term = z.object({
+  id: z.string().regex(/^[a-z0-9-]+$/),
+  latin: z.string().min(2),
+  ar: z.string().min(1).nullable(),
+  /** harakah: a vowel sign beginners may not know yet (operator 2026-10-10: "expect also people
+   *  dont understand what is kasrah, dhommah, and fathah"); its first use on a page links to the
+   *  Harakat page and carries `hint`. */
+  group: z.enum(["istilah", "harakah"]),
+  hint: z.string().min(5).optional(),
+  /** Where the spelling is attested. */
+  sources: z.array(SourceRef).default([]),
+});
+export type Term = z.infer<typeof Term>;
+
+/** One sign on the Harakat page: its name (Term), sound and place, and the example letter as an
+ *  ayah writes it (a letter q-ref into the Tanzil text: "q:1:1:1#1" = بِ). */
+export const HarakahSign = z.object({
+  term: z.string().regex(/^[a-z0-9-]+$/),
+  example: z.string().min(5),
+  /** The marks of that letter this sign is about (رَبِّ's second letter carries shaddah + kasrah). */
+  marks: z.array(z.enum(["fathah", "kasrah", "dhammah", "sukun", "fathatain", "kasratain", "dhammatain", "shaddah"])).min(1),
+  sound: z.string().min(1),
+  place: z.string().min(3),
+  shape: z.string().min(3),
+  /** How the example letter reads, in Latin letters: "b + i". */
+  reading: z.string().min(1),
+});
+export type HarakahSign = z.infer<typeof HarakahSign>;
+
+/** A foundation page before the grammar (Dasar membaca): the harakat. */
+export const Basic = z.object({
+  id: z.string().regex(/^[a-z0-9-]+$/),
+  title: z.string().min(3),
+  summary: z.string().min(15),
+  explanation: z.array(z.string().min(20)).min(1).max(6),
+  signs: z.array(HarakahSign).min(1),
+  related: z.array(z.string()).default([]),
+  sources: z.array(SourceRef).min(1),
+  status: ReviewStatus,
+  marked: MarkedProse.optional(),
+});
+export type Basic = z.infer<typeof Basic>;
+
+/**
+ * A word explained by its parts (operator 2026-10-10, narration rule 14: "bismi has 2 components,
+ * harf jar and ismi; ismi in its root is read dhommah, but because of harf jar it's read kasrah"):
+ * [بِ] + [ٱسْمُ] → [بِسْمِ]. Shown as static tiles on the Konsep pages (the lesson stage's animation
+ * is a separate component). The tiles, with `changes` and `drops` applied, spell the word's Tanzil
+ * bytes exactly (src/lib/terms.test.ts).
+ */
+export const WordParts = z.object({
+  loc: WordLoc,
+  concepts: z.array(z.string().regex(/^[a-z0-9-]+$/)).min(1),
+  tiles: z
+    .array(
+      z.object({
+        /** q-ref of the tile's bytes: a QAC segment of this word ("q:1:1:1/1") or the part's bentuk
+         *  dasar elsewhere: a Tanzil token ("q:55:78:2", ٱسْمُ marfu') or, for an attached pronoun,
+         *  another word's QAC segment ("q:2:3:7/3", the هُمْ of رَزَقْنَٰهُمْ). */
+        q: z.string().min(5),
+        translit: z.string().min(1),
+        /** Marked: "[[huruf jar]]", "[[isim]], bentuk dasar". */
+        label: z.string().min(3),
+        gloss: z.string().min(1),
+      }),
+    )
+    .min(2),
+  /** Letters that change as the parts join: letter `letter` of tile `tile` (1-based; -1 = its
+   *  last letter) becomes letter `to` of the word — another vowel on the same letter (ٱسْمُ's مُ →
+   *  بِسْمِ's مِ; هُمْ's هُ → عَلَيْهِمْ's هِ) or the alif maqsurah written ya' (عَلَىٰ's ىٰ → يْ). */
+  changes: z
+    .array(z.object({ tile: z.number().int().positive(), letter: z.number().int(), to: z.number().int().positive() }))
+    .default([]),
+  /** Letters of a tile that the word does not write: an alif (the hamzah washal of ٱسْمُ in بِسْمِ)
+   *  and, after it, the lam of al- (ٱللَّهُ in لِلَّهِ). */
+  drops: z.array(z.object({ tile: z.number().int().positive(), letter: z.number().int().positive() })).default([]),
+  /** Marked sentences: the parts and their meanings, the bentuk dasar, the change and its cause,
+   *  how the parts join. */
+  steps: z.array(z.string().min(10)).min(1),
+  sources: z.array(SourceRef).min(1),
+  status: ReviewStatus,
+});
+export type WordParts = z.infer<typeof WordParts>;
 
 /** One lemma's shared entry: meaning, derivation (tashrif), i'lal, counts. */
 export const Lexeme = z.object({
@@ -243,6 +353,16 @@ export const Library = z.object({
   concepts: z.array(Concept),
   lexicon: z.array(Lexeme),
   roots: z.array(Root),
+  /** Dasar membaca: the Harakat page, first in the Konsep index. */
+  basics: z.array(Basic).default([]),
+  terms: z.array(Term).default([]),
+  parts: z.array(WordParts).default([]),
+  /** Bytes of every Qur'anic word, run, part or letter the marked prose names, keyed by its q-ref
+   *  without "q:" ("1:1:1", "112:1:2-4", "1:1:1/1", "1:2:4#6"): pinned Tanzil 1.1 tokens and QAC
+   *  0.4 segments, resolved by build_library.py, never typed. */
+  quran: z.record(z.string(), z.string()).default({}),
+  /** QAC 0.4 segments of each lesson word a part names; joined they are the word. */
+  segments: z.record(z.string(), z.array(z.string().min(1))).default({}),
   data_versions: z.record(z.string(), z.string()),
 });
 export type Library = z.infer<typeof Library>;

@@ -68,8 +68,9 @@ Shared library (belajar/content/library.json) and the lesson's links into it
  16. Prose of the library, the structures and the roles goes through 1 (quotes byte-exact, no
      unquoted Arabic words) and, together with the lesson prose, through 10.
  17. Pins: data_versions name the current sha256 of each lesson's authored words, structure and
-     concepts map (and facts / hadith when the lesson was built from them), and of the lexicon
-     and concepts files.
+     concepts map (and facts / hadith when the lesson was built from them), and of the lexicon,
+     concepts, terms, basics and parts files. The Konsep terms in Arabic script and the inline
+     markup (operator 2026-10-10) have their own validator, validate_terms.py (CI: --no-corpus).
  18. App wiring: src/lib/content.ts loads exactly the lessons in content/, in mushaf order, and
      src/lib/routes.ts SURAH_SLUGS lists the same slugs in the same order.
 """
@@ -1090,8 +1091,12 @@ def main() -> int:
 
     # 17. library pins
     ldv = lib.get("data_versions", {})
-    for key, f in (("authored_lexicon", "library.lexicon.json"), ("authored_concepts", "library.concepts.json")):
-        if sha256_file(AUTHORED / f) not in ldv.get(key, ""):
+    for key, f in (("authored_lexicon", "library.lexicon.json"), ("authored_concepts", "library.concepts.json"),
+                   ("authored_terms", "library.terms.json"), ("authored_basics", "library.basics.json"),
+                   ("authored_parts", "library.parts.json")):
+        if not (AUTHORED / f).exists() and key not in ldv:
+            continue  # optional input (basics, parts), not used
+        if not (AUTHORED / f).exists() or sha256_file(AUTHORED / f) not in ldv.get(key, ""):
             fail(f"library.json data_versions.{key} is stale or missing (authored/{f} changed since the build)")
     for k, sha in (("qac", I["qac_morphology"]["sha256"]), ("tanzil", I["tanzil_uthmani"]["sha256"])):
         if sha not in ldv.get(k, ""):

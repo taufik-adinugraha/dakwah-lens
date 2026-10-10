@@ -75,6 +75,17 @@ jobs:
       - name: Narration — validator mutation tests
         run: python3 pipeline/test_validate_narration.py
 
+      # Konsep (operator 2026-10-10: "mention the arabic word like majrur in arabic letter"):
+      # every grammar term's Arabic from ONE verified table, the inline markup (no term left
+      # unmarked, no "ketuk"), Qur'anic words from the lesson content's bytes, the Harakat page and
+      # the parts diagrams. pipeline/cache is git-ignored, so CI runs the corpus-free half; the
+      # validator names what it skipped (Shamela page pins, bytes outside the lesson words), which
+      # runs locally with plain `python3 pipeline/validate_terms.py`.
+      - name: Konsep — terms + markup (corpus-free)
+        run: python3 pipeline/validate_terms.py --no-corpus
+      - name: Konsep — validator mutation tests (corpus-free)
+        run: python3 pipeline/test_validate_terms.py --no-corpus
+
       # Ilmu Waris M1 (docs/waris-plan.md §10). Research-phase parity: the
       # belajar copies of the test vectors and of dalil.json must equal the
       # docs/waris-research originals byte for byte (this job checks out the
@@ -169,6 +180,7 @@ jobs:
           grep -q "applied 0001_init.sql" <<<"$logs"
           # Hub, Qur'an track, shared library, lessons (plan L9 URL shape).
           for path in /belajar/id /belajar/en /belajar/id/kredit /belajar/id/konsep \
+                      /belajar/id/konsep/harakat /belajar/en/konsep/harakat /belajar/id/konsep/huruf-jar \
                       /belajar/id/quran /belajar/en/quran \
                       /belajar/id/quran/al-fatihah /belajar/id/quran/al-fatihah/1 \
                       /belajar/id/quran/al-fatihah/7 /belajar/en/quran/al-fatihah/5 \
@@ -255,6 +267,29 @@ jobs:
               echo "✗ a rendered page still links to an old /{locale}/al-fatihah URL"; exit 1
             fi
           done
+          # Konsep (operator 2026-10-10): grammar terms in Arabic script RENDERED in the HTML. The
+          # <script> payload (RSC + the next-intl messages) is cut away first, so a string that
+          # only travels in the payload cannot pass; the Arabic is read from content/library.json,
+          # never typed here. The index lists the Harakat page first (the konsep-item shot opens it).
+          strip_scripts() { perl -0pe 's/<script\b.*?<\/script>//gs'; }
+          majrur_ar="$(python3 -c 'import json; print(next(t["ar"] for t in json.load(open("belajar/content/library.json"))["terms"] if t["id"] == "majrur"))')"
+          for path in /belajar/id/konsep /belajar/id/konsep/huruf-jar; do
+            html="$(curl -fsS "http://127.0.0.1:3300${path}" | strip_scripts)"
+            grep -qF "$majrur_ar" <<<"$html" || { echo "✗ ${path}: the Arabic of majrur is not rendered"; exit 1; }
+            n="$(grep -o '<bdi lang="ar"' <<<"$html" | wc -l || true)"
+            [[ "$n" -ge 10 ]] || { echo "✗ ${path}: only ${n} Arabic terms rendered"; exit 1; }
+            if grep -qiE '\b(ketuk|mengetuk|diketuk)\b' <<<"$html"; then echo "✗ ${path}: says ketuk (use klik)"; exit 1; fi
+            echo "${path}: ${n} Arabic terms rendered"
+          done
+          html="$(curl -fsS http://127.0.0.1:3300/belajar/id/konsep/huruf-jar | strip_scripts)"
+          grep -q 'href="/belajar/id/konsep/harakat"' <<<"$html" || { echo "✗ huruf-jar: no link to the Harakat page"; exit 1; }
+          grep -q '<figure' <<<"$html" || { echo "✗ huruf-jar: no parts diagram"; exit 1; }
+          html="$(curl -fsS http://127.0.0.1:3300/belajar/id/konsep/harakat | strip_scripts)"
+          grep -q 'mark-circle' <<<"$html" || { echo "✗ /konsep/harakat: no sign on a dotted circle"; exit 1; }
+          idx="$(curl -fsS http://127.0.0.1:3300/belajar/id/konsep | strip_scripts)"
+          # sed reads to the end (head would close the pipe early: SIGPIPE 141 under pipefail)
+          first="$(grep -o 'href="/belajar/id/konsep/[a-z0-9-]*"' <<<"$idx" | sed -n 1p || true)"
+          [[ "$first" == 'href="/belajar/id/konsep/harakat"' ]] || { echo "✗ /konsep: the first concept link is ${first}, not the Harakat page"; exit 1; }
           loc="$(curl -s -o /dev/null -w '%{redirect_url}' http://127.0.0.1:3300/belajar)"
           echo "/belajar -> ${loc}"; [[ "$loc" == */belajar/id ]]
           # Ilmu Waris is hidden on the live site (operator, 2026-10-10; src/lib/features.ts), and

@@ -34,6 +34,10 @@ const PAGES = [
   ["ikhlas-1", "/belajar/id/quran/al-ikhlas/1"],
   ["nas-6", "/belajar/id/quran/an-nas/6"],
   ["konsep", "/belajar/id/konsep"],
+  // Konsep with every term in Arabic (operator 2026-10-10): the Harakat page (Dasar membaca) and
+  // the operator's model page, huruf jar, with its parts diagram.
+  ["konsep-harakat", "/belajar/id/konsep/harakat"],
+  ["konsep-huruf-jar", "/belajar/id/konsep/huruf-jar"],
   ["kredit", "/belajar/id/kredit"],
   // What a visitor gets at the hidden track's address: the module's own 404.
   ["waris-tersembunyi-404", "/belajar/id/waris"],
@@ -163,6 +167,83 @@ async function materialsShot(page, vp) {
   await page.waitForTimeout(300);
   await page.screenshot({ path: `shots/${vp}-ayah-2-materials-open.png`, fullPage: true });
   console.log(`shot ${vp}-ayah-2-materials-open`);
+  await page.goto("about:blank");
+}
+
+/**
+ * The Konsep pages show grammar terms in Arabic script, measured in the real browser (operator
+ * 2026-10-10: "mention the arabic word like majrur in arabic letter"; narration rule 15: a
+ * transliteration and its Arabic never split across lines). On the index and on three concept
+ * pages, at each of the three text sizes (html[data-text-size], as the Aa control sets it): the
+ * term table's Arabic for majrur (read from content/library.json, never typed here) is rendered
+ * and visible inside <main>; every "latin (Arabic)" pair is one line box; every visible Arabic
+ * box lies inside the viewport on BOTH sides (review 2026-10-10: a nowrap RTL headword ran off
+ * the LEFT edge, which scrollWidth cannot see), checked on tanda-irab, whose headword has four
+ * terms; the Harakat page shows its signs on dotted circles and the first letter of 1:1:1
+ * (content bytes); huruf jar shows its parts diagrams and links the first harakah term to the
+ * Harakat page. Fails the job otherwise; the next-intl messages payload is never what is checked.
+ */
+async function konsepChecks(page, vp) {
+  const lib = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "library.json"), "utf8"));
+  const majrur = lib.terms.find((t) => t.id === "majrur")?.ar;
+  const ba = lib.quran["1:1:1#1"];
+  if (!majrur || !ba) throw new Error("content/library.json has no majrur term or no letter 1:1:1#1");
+  const paths = ["/belajar/id/konsep", "/belajar/id/konsep/huruf-jar", "/belajar/id/konsep/tanda-irab", "/belajar/id/konsep/harakat"];
+  for (const size of [null, "besar", "sangat-besar"]) {
+    for (const path_ of paths) {
+      await page.goto(BASE + path_, { waitUntil: "networkidle" });
+      await page.evaluate((s) => {
+        if (s) document.documentElement.dataset.textSize = s;
+        else delete document.documentElement.dataset.textSize;
+      }, size);
+      await page.evaluate(() => document.fonts.ready);
+      const res = await page.evaluate(
+        ({ majrur, ba }) => {
+          const main = document.querySelector("main");
+          const ar = [...main.querySelectorAll('[lang="ar"]')].filter((el) => {
+            const r = el.getBoundingClientRect();
+            return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== "hidden" && !el.closest("details:not([open])");
+          });
+          const texts = ar.map((el) => el.textContent);
+          // a "latin (Arabic)" pair: the nowrap span holding a bdi[lang=ar] must be one line box
+          const split = [...main.querySelectorAll("span.whitespace-nowrap")]
+            .filter((sp) => sp.querySelector('bdi[lang="ar"]'))
+            .filter((sp) => new Set([...sp.getClientRects()].map((r) => Math.round(r.top))).size > 1)
+            .map((sp) => sp.textContent);
+          // every Arabic box inside the viewport, left edge too (an RTL overflow goes left)
+          const outside = ar
+            .filter((el) => {
+              const r = el.getBoundingClientRect();
+              return r.left < -1 || r.right > window.innerWidth + 1;
+            })
+            .map((el) => el.textContent.slice(0, 40));
+          const overflow = document.documentElement.scrollWidth > window.innerWidth + 1;
+          return {
+            visible: ar.length,
+            majrur: texts.includes(majrur),
+            ba: texts.includes(ba),
+            circles: main.querySelectorAll(".mark-circle").length,
+            figure: main.querySelectorAll("figure").length,
+            harakatLink: !!main.querySelector('a[href$="/konsep/harakat"]'),
+            split,
+            outside,
+            overflow,
+          };
+        },
+        { majrur, ba },
+      );
+      const problems = [];
+      if (res.visible < 3) problems.push(`only ${res.visible} visible Arabic elements`);
+      if (!path_.endsWith("/harakat") && !path_.endsWith("/tanda-irab") && !res.majrur) problems.push("majrur's Arabic is not rendered");
+      if (res.split.length) problems.push(`a term and its Arabic split across lines: ${res.split.slice(0, 3).join(" | ")}`);
+      if (res.outside.length) problems.push(`Arabic outside the screen: ${res.outside.slice(0, 3).join(" | ")}`);
+      if (res.overflow) problems.push("the page scrolls sideways");
+      if (path_.endsWith("/harakat") && (res.circles < 6 || !res.ba)) problems.push(`Harakat page: ${res.circles} dotted circles, letter 1:1:1#1 shown: ${res.ba}`);
+      if (path_.endsWith("/huruf-jar") && (!res.figure || !res.harakatLink)) problems.push(`huruf jar: parts diagram ${res.figure}, link to the Harakat page ${res.harakatLink}`);
+      if (problems.length) throw new Error(`${vp} ${size ?? "default"} ${path_}: ${problems.join("; ")}`);
+      console.log(`  konsep ok: ${vp} ${size ?? "default"} ${path_} (${res.visible} Arabic elements${res.circles ? `, ${res.circles} dotted circles` : ""})`);
+    }
+  }
   await page.goto("about:blank");
 }
 
@@ -379,6 +460,7 @@ try {
       await page.screenshot({ path: `shots/${vp}-${name}.png`, fullPage: true });
       console.log(`shot ${vp}-${name} (${href})`);
     }
+    await konsepChecks(page, vp);
     await menuShots(page, vp);
     await materialsShot(page, vp);
     await autoplayShots(page, vp);
