@@ -584,14 +584,15 @@ describe("autoplay exercises: the learner only answers", () => {
     const r = runner(seq);
     r.send({ type: "start", from: at, reason: "continue" });
     r.until((s) => s.phase === "waiting");
-    r.send({ type: "answered", key: "sort-case", correct: true, question: 4 });
+    // Ayah 2 sorts three words (rabbi left out: its reason names badal, taught at ayah 7).
+    r.send({ type: "answered", key: "sort-case", correct: true, question: 3 });
     r.send({ type: "exercise_done", key: "sort-case" });
     const said: string[] = [];
     r.until((s) => {
       if (s.idx === at && s.activity?.kind === "narrate" && said.at(-1) !== s.activity.line) said.push(s.activity.line);
       return s.idx !== at;
     });
-    expect(said).toEqual(["shared:correct", "al-fatihah:2:ex:sort-case:4:why"]);
+    expect(said).toEqual(["shared:correct", "al-fatihah:2:ex:sort-case:3:why"]);
   });
 
   it("Lanjut tapped early: the hold is dropped, the next question's word is recited", () => {

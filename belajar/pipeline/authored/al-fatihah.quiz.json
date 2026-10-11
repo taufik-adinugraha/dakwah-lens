@@ -1,5 +1,5 @@
 {
-  "_comment": "Al-Fatihah quizzes, taught before tested (operator 2026-10-10, narration rule 16: \"make sure all questions in quiz already have lesson beforehand when exploring ayat\"; the quiz audit and the main session's decisions of 2026-10-11: 2–3 exercises per ayah, about four questions each; wrong options only from ayat already studied and differing in cause; no question with two correct options; sort-case bins = the case states taught so far, none while only one is known; the wazan quiz only from ayah 5, with taught form labels only, no mashdar, no 'Akar kata' / 'Pola (bab)' lines; ma'thuf and badal-before-ayah-7 left out). Per ayah, per exercise: tap-word {words}, why-harakat [{word, distractors: the words whose reason is a wrong option}], sort-case {words, bins}, label-role [{word, distractors: the words whose role is a wrong option}], wazn-factory [{lexeme, label, options: the other form labels}]. Words by their number in the ayah; distractors by loc. build_quiz.py resolves it into content/quiz/al-fatihah.json; validate_quiz.py checks it, including that every term a question needs was taught by the narration first.",
+  "_comment": "Al-Fatihah quizzes, taught before tested (operator 2026-10-10, narration rule 16: \"make sure all questions in quiz already have lesson beforehand when exploring ayat\"; the quiz audit and the main session's decisions of 2026-10-11: 2–3 exercises per ayah, about four questions each; wrong options only from ayat already studied and differing in cause; no question with two correct options; sort-case bins = the case states taught so far, none while only one is known; the wazan quiz only from ayah 5, with taught form labels only, no mashdar, no 'Akar kata' / 'Pola (bab)' lines; ma'thuf and badal-before-ayah-7 left out; so rabbi (1:2:3), whose sourced reason says \"atau badal\", is left out of ayah 2's sort-case as of its label-role — main session 2026-10-11). Per ayah, per exercise: tap-word {words}, why-harakat [{word, distractors: the words whose reason is a wrong option}], sort-case {words, bins}, label-role [{word, distractors: the words whose role is a wrong option}], wazn-factory [{lexeme, label, options: the other form labels}]. Words by their number in the ayah; distractors by loc. build_quiz.py resolves it into content/quiz/al-fatihah.json; validate_quiz.py checks it, including that every term a question needs was taught by the narration first.",
   "ayat": {
     "1": {
       "tap-word": { "words": [1, 2, 3, 4] },
@@ -12,7 +12,7 @@
     },
     "2": {
       "tap-word": { "words": [1, 2, 3, 4] },
-      "sort-case": { "words": [1, 2, 3, 4], "bins": ["marfu", "majrur"] },
+      "sort-case": { "words": [1, 2, 4], "bins": ["marfu", "majrur"] },
       "label-role": [
         { "word": 1, "distractors": ["1:2:2", "1:1:2", "1:1:3"] },
         { "word": 2, "distractors": ["1:2:1", "1:1:2", "1:1:3"] },

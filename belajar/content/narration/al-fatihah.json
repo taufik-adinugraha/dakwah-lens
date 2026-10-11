@@ -2507,8 +2507,8 @@
       "focus": null
     },
     "al-fatihah:2:ex:sort-case:intro": {
-      "text": "Latihan kelompokkan menurut akhiran, empat kata, dalam dua kelompok: مَرْفُوع dan مَجْرُور. Klik satu kata, lalu klik kelompok akhirannya.",
-      "display": "Latihan kelompokkan menurut akhiran, empat kata, dalam dua kelompok: marfu’ (مَرْفُوع) dan majrur (مَجْرُور). Klik satu kata, lalu klik kelompok akhirannya.",
+      "text": "Latihan kelompokkan menurut akhiran, tiga kata, dalam dua kelompok: مَرْفُوع dan مَجْرُور. Klik satu kata, lalu klik kelompok akhirannya.",
+      "display": "Latihan kelompokkan menurut akhiran, tiga kata, dalam dua kelompok: marfu’ (مَرْفُوع) dan majrur (مَجْرُور). Klik satu kata, lalu klik kelompok akhirannya.",
       "highlight": [],
       "focus": null
     },
@@ -2525,12 +2525,6 @@
       "focus": null
     },
     "al-fatihah:2:ex:sort-case:3:why": {
-      "text": "Akhirnya dibaca كَسْرَة, karena mengikuti kata kedua sebagai sifat, yaitu نَعْت, atau بَدَل. Jadi, kata ini مَجْرُور.",
-      "display": "Akhirnya dibaca kasrah (كَسْرَة), karena mengikuti kata kedua sebagai sifat, yaitu na’t (نَعْت), atau badal (بَدَل). Jadi, kata ini majrur (مَجْرُور).",
-      "highlight": [],
-      "focus": null
-    },
-    "al-fatihah:2:ex:sort-case:4:why": {
       "text": "مَجْرُور dengan tanda يَاء karena menjadi mudhof ilaih dan termasuk kata yang disamakan, atau مُلْحَق, dengan جَمْع مُذَكَّر سَالِم.",
       "display": "Majrur (مَجْرُور) dengan tanda ya’ (ي) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dan termasuk kata yang disamakan, atau mulhaq (مُلْحَق), dengan jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم).",
       "highlight": [],
