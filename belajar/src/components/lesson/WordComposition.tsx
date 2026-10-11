@@ -191,8 +191,11 @@ function Tile({
   );
 }
 
+/** "+" between two parts. In a join it fades and narrows to nothing as the parts slide together
+ *  (globals.css compose-plus), clipped as it narrows: unclipped, the glyph stood out of its 0px
+ *  box over the tiles while it faded (CI 2026-10-11, al-fatihah/7's joins). */
 const Plus = () => (
-  <span data-compose-plus aria-hidden className="px-0.5 text-2xl font-semibold text-forest sm:px-1 sm:text-3xl">
+  <span data-compose-plus aria-hidden className="overflow-x-clip px-0.5 text-2xl font-semibold text-forest sm:px-1 sm:text-3xl">
     +
   </span>
 );
