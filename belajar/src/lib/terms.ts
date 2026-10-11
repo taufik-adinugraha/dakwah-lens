@@ -288,6 +288,46 @@ export function annotate(text: string, scope: Scope, lookup: Lookup): Token[] {
   return out.filter((t) => t.kind !== "text" || t.text !== "");
 }
 
+/** A stretch of termDisplay's text drawn in a style, [from, to) as offsets: a term's Arabic, a
+ *  Qur'anic word's, and a harakah term's word (at its first use, the link to the Harakat page). */
+export type DisplayMark = { from: number; to: number; kind: "term" | "quran" | "link" };
+
+/**
+ * The text TermText shows for a field's tokens, and its styled stretches. A token with its Arabic
+ * reads "majrur (مَجْرُور)", a harakah term at its first use "kasrah (كَسْرَة, tanda bunyi i di
+ * bawah huruf)", inside the prose's own bracket "(dalam keadaan jar, جَرّ)", joined to the prose's
+ * gloss "nahwu (نَحْو, tata bahasa Arab)" or to a citation "mabni (مَبْنِيّ; Ibnu 'Aqil)"; any
+ * other token is its surface. One string, so MixedText cuts it into line-break pieces exactly as it
+ * cuts any other text (rule 15, review 2026-10-11: drawn token by token, a break was left next to
+ * every term, "keduanya ( ⏎ mudhaf", "waswasa– ⏎ yuwaswisu", and "al- ⏎ qaul" in a plain one).
+ */
+export function termDisplay(tokens: readonly Token[]): { text: string; marks: DisplayMark[] } {
+  let text = "";
+  const marks: DisplayMark[] = [];
+  for (const t of tokens) {
+    if (t.kind === "text") text += t.text;
+    else if (!t.arabic) text += t.surface;
+    else {
+      const words = t.surface.split(" ");
+      const lead = words.slice(0, -1).join(" ");
+      const last = words[words.length - 1];
+      const ar = t.kind === "term" ? t.term.ar! : t.ar;
+      const hint = t.kind === "term" && t.hint && !t.merge ? t.term.hint : null;
+      // What opens before the Arabic and closes right after it, and the reminder after that.
+      const open = t.inBracket ? ", " : " (";
+      const close = hint || t.merge ? "," : t.cite ? ";" : t.inBracket ? t.after : `)${t.after}`;
+      if (lead) text += `${lead} `;
+      if (t.kind === "term" && t.hint) marks.push({ from: text.length, to: text.length + last.length, kind: "link" });
+      text += last + open;
+      marks.push({ from: text.length, to: text.length + ar.length, kind: t.kind });
+      text += ar + close;
+      if (hint) text += ` ${hint}${t.inBracket ? t.after : t.cite ? ";" : `)${t.after}`}`;
+      if (t.merge || t.cite) text += " ";
+    }
+  }
+  return { text, marks };
+}
+
 /** One term of a title's Arabic headword, with its sound when it names a harakah ("ضَمَّة" u):
  *  a beginner meets dhammah in the tanda-irab title before any reminder (review 2026-10-10). */
 export type HeadTerm = { ar: string; sound?: string };

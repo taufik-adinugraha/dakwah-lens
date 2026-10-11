@@ -9,6 +9,7 @@ import { getBasic, parseLoc, partsFor, TERMS } from "@/lib/library";
 import { ayahHref, conceptHref } from "@/lib/routes";
 import { annotate, noteWithoutWord, type PartsChange, prepareParts, Scope, soundsOf, titleParts, type Token } from "@/lib/terms";
 
+import { MixedText } from "./MixedText";
 import { SourcesDisclosure } from "./SourceList";
 import { Headword, HARAKAT_PAGE, TermText } from "./TermText";
 import { WordParts } from "./WordParts";
@@ -109,7 +110,9 @@ export function ConceptCard({
   return (
     <article
       className={
-        page ? "stage-card p-5 sm:p-8" : "flex h-full flex-col rounded-2xl border border-hairline bg-white p-5"
+        // Compact, in a lesson's "Pelajari lebih dalam" row (a @container): narrow padding while
+        // that row is under 16rem (from Besar up on a phone), so its words fit (CI 2026-10-11).
+        page ? "stage-card p-5 sm:p-8" : "flex h-full flex-col rounded-2xl border border-hairline bg-white p-3 @3xs:p-5"
       }
     >
       {page ? <p className="text-sm font-semibold text-forest">{kind}</p> : null}
@@ -140,7 +143,7 @@ export function ConceptCard({
       {parts.length > 0 && (
         <section className="mt-8" aria-labelledby={`parts-${concept.id}`}>
           <h2 id={`parts-${concept.id}`} className="font-display text-2xl font-medium text-ink">
-            {t("parts_heading")}
+            <MixedText text={t("parts_heading")} />
           </h2>
           <div className="mt-3 space-y-5">
             {parts.slice(0, PARTS_SHOWN).map((p) => (
@@ -164,7 +167,7 @@ export function ConceptCard({
       )}
 
       {bridge && (
-        <p className="mt-6 max-w-prose rounded-xl bg-paper-deep p-4 text-base text-ink">
+        <p className={`mt-6 max-w-prose rounded-xl bg-paper-deep text-base text-ink ${page ? "p-4" : "px-2 py-3 @3xs:p-4"}`}>
           <span className="font-semibold">{labels.bridge}:</span> <TermText tokens={bridge} />
         </p>
       )}
@@ -235,8 +238,14 @@ function ExampleRow({
           </span>
         ) : null}
         {row.info ? (
+          // One text through MixedText (rule 15, CI 2026-10-11): "orang-orang" and "aḍ-ḍāllīna"
+          // are never cut, the comma stays on the word and the quote on the gloss; the
+          // transliteration is set bold as an overlay.
           <span className="text-base text-ink">
-            <span className="font-semibold">{row.info.translit}</span>, {meaning} “{row.info.gloss}”
+            <MixedText
+              text={`${row.info.translit}, ${meaning} “${row.info.gloss}”`}
+              overlays={[{ from: 0, to: row.info.translit.length, wrap: (w) => <span className="font-semibold">{w}</span> }]}
+            />
           </span>
         ) : null}
       </p>

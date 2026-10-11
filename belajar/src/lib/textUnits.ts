@@ -14,7 +14,11 @@
  *   while it fits one; wider than its line, it breaks in the paragraph's flow
  *   (src/lib/lineFit.ts), first outside its seam ("huruf" ⏎ "jar (حَرْف جَرّ),"),
  *   and only a seam wider than its line before its bracket ("jar" ⏎ "(…)").
- *   A quotation of 4+ words is a unit with nothing glued to it.
+ *   A quotation of 4+ words is a unit with nothing glued to it. The term may
+ *   be en-dashed ("waswasa–yuwaswisu (يُوَسْوِسُ)"), a prefix ("bi- (بِ)"), open
+ *   the prose's quote (“majzum (مَجْزُوم)”) or carry a case chip's dot ("·
+ *   kasrah (كَسْرَة)"); inside the prose's own bracket it takes its Arabic after a
+ *   comma ("(mudhaf ilaih, مُضَاف إِلَيْه)", TermText's form; 2026-10-11).
  * - glue: a Latin word that a hyphen, dash, slash or footnote mark could split
  *   ("Al-Fatihah", "jar-majrur", "-nya", "pembalasan.[1]"), or a word with the
  *   separator after it ("nashab —", "(Kufah) ·"), so no line starts with
@@ -53,8 +57,17 @@ const SEP_TAIL = new RegExp(`(?:\\s+${SEP})+$`, "u");
  *  or digits ("Al-Fatihah", "ke-1", "waswasa–yuwaswisu", "orang/jenis"), a
  *  leading hyphen ("-nya"), a footnote mark after a word ("pembalasan.[1]"). */
 const GLUE_WORD = /[\p{L}\p{N}][-–—‐‑/][\p{L}\p{N}]|^[-–]\p{L}|\S\[\d+\]/u;
-/** A word of letters (a transliteration: "jar", "ba’", "Al-Fatihah"). */
-const LATIN_WORD = /^[\p{L}\p{M}’‘'ʿʾʼ-]*\p{Script=Latin}[\p{L}\p{M}’‘'ʿʾʼ-]*$/u;
+/** A word of letters (a transliteration: "jar", "ba’", "Al-Fatihah", "waswasa–yuwaswisu"). */
+const LATIN_WORD = /^[\p{L}\p{M}’‘'ʿʾʼ–-]*\p{Script=Latin}[\p{L}\p{M}’‘'ʿʾʼ–-]*$/u;
+/** Inside the prose's own bracket, a term with its Arabic after a comma: its last word with the
+ *  comma ("ilaih,"), and a word before it, maybe the one that opens the bracket ("(mudhaf"). */
+const COMMA_TERM_LAST = /^\(?[\p{L}\p{M}’‘'ʿʾʼ–-]*\p{Script=Latin}[\p{L}\p{M}’‘'ʿʾʼ–-]*,$/u;
+const COMMA_TERM_WORD = /^\(?[\p{L}\p{M}’‘'ʿʾʼ–-]*\p{Script=Latin}[\p{L}\p{M}’‘'ʿʾʼ–-]*$/u;
+/** A quote or bracket the prose opens right before a term: “majzum (مَجْزُوم)”, (lihat: …). Not
+ *  ‘, the ‘ain of a transliteration (‘illah, ‘alā). */
+const OPENS = /^[“«(]/u;
+/** A separator glued to the first word of the string ("· kasrah"): the word, for the term rules. */
+const SEP_LEAD = new RegExp(`^${SEP}\\s+`, "u");
 
 export type UnitPart = { text: string; arabic: boolean };
 export type Seg =
@@ -83,8 +96,9 @@ export const QUOTE_WORDS = 4;
 export const GLOSS_WORDS = QUOTE_WORDS - 1;
 /** At most this many Latin words of a term stay with its Arabic ("jumlah fi’liyyah (…)"). */
 const TERM_WORDS = 3;
-/** A line that ends in a Latin letter (maybe with ’): the word a term in brackets keeps. */
-const ENDS_LATIN = /\p{Script=Latin}[’'ʼ]?$/u;
+/** A word that ends in a Latin letter (maybe with ’), or a prefix ending in its hyphen ("bi-",
+ *  "li-"): the word a term in brackets keeps ("bi- (بِ)", as TermText drew it before 2026-10-11). */
+const ENDS_LATIN = /\p{Script=Latin}[’'ʼ]?-?$/u;
 /** A bracket opening on Arabic, up to where it closes: "(حَرْف جَرّ)", "(ٱ أ إ آ dan alif kecil U+0670)". */
 const BRACKET = /^\(([^)]*)\)/u;
 /** The end of an Arabic word, maybe closed by » ” ): a gloss after it stays with it. */
@@ -109,6 +123,7 @@ export function textUnits(text: string): Seg[] {
   }
 
   // A separator joins the word before it (at the very start: the word after).
+  let sepLead = false;
   for (let i = 0; i < toks.length; i++) {
     if (!SEPARATOR.test(toks[i].w)) continue;
     if (i > 0) {
@@ -117,8 +132,18 @@ export function textUnits(text: string): Seg[] {
       i--;
     } else if (toks.length > 1) {
       toks.splice(0, 2, { w: toks[0].w + toks[0].ws + toks[1].w, ws: toks[1].ws });
+      sepLead = true;
       i--;
     }
+  }
+  /** The word a token is for the term rules: the first one without the separator glued in front
+   *  of it ("· kasrah (كَسْرَة)", a case chip's sign: the dot, the term and its Arabic one unit). */
+  const wordOf = (k: number) => (k === 0 && sepLead ? toks[0].w.replace(SEP_LEAD, "") : toks[k].w);
+  /** How deep in the prose's own brackets each token starts. */
+  const depth: number[] = [];
+  for (let k = 0, d = 0; k < toks.length; k++) {
+    depth.push(d);
+    for (const ch of toks[k].w) d = ch === "(" ? d + 1 : ch === ")" ? Math.max(0, d - 1) : d;
   }
 
   const ar = toks.map((t) => HAS_AR.test(t.w));
@@ -146,28 +171,42 @@ export function textUnits(text: string): Seg[] {
     // "huruf jar (حَرْف جَرّ)", "kasrah (كَسْرَة)", "entri (و س و س)", "alif (ٱ أ إ آ dan alif
     // kecil …)" (the bracket may close after Latin words). The last of them is the seam's.
     let b = i;
+    // A hyphenated head names one Arabic word per part: "jar-majrur (جَارّ وَمَجْرُور)" is the
+    // whole term, not "frasa jar-majrur" (the quiz narration's dictionary terms, 2026-10-11); so
+    // does an en-dashed pair, "waswasa–yuwaswisu (يُوَسْوِسُ)" (the Konsep summary, 2026-10-11).
+    const named = (k: number) => wordOf(k).split(/[-‐‑–]/u).filter(Boolean).length;
     const bracket = BRACKET.exec(join(i, toks.length - 1));
     if (bracket && hasArabic(bracket[1].trim()[0] ?? "") && longWords(bracket[1]) < QUOTE_WORDS) {
       const inside = bracket[1].match(ARABIC_WORD) ?? [];
       const n = Math.min(TERM_WORDS, inside.every((w) => letters(w) <= 1) ? 1 : inside.reduce((k, w) => k + namesFor(w), 0));
-      const latin = (k: number) => k >= 0 && free(k) && !ar[k] && LATIN_WORD.test(toks[k].w);
-      // A hyphenated head names one Arabic word per part: "jar-majrur (جَارّ وَمَجْرُور)" is the
-      // whole term, not "frasa jar-majrur" (the quiz narration's dictionary terms, 2026-10-11).
-      const named = (k: number) => toks[k].w.split(/[-‐‑]/u).filter(Boolean).length;
+      // The term's first word may open a quote or bracket of the prose's own: “majzum (مَجْزُوم)”.
+      const latin = (k: number) => k >= 0 && free(k) && !ar[k] && LATIN_WORD.test(wordOf(k).replace(OPENS, ""));
       if (latin(i - 1) && ENDS_LATIN.test(toks[i - 1].w)) {
         b = i - 1;
         let have = named(b);
-        while (have < n && latin(b - 1)) have += named(--b);
+        while (have < n && !OPENS.test(toks[b].w) && latin(b - 1)) have += named(--b);
       }
-    } else if (closesOpen(core) && longWords(core) < QUOTE_WORDS) {
-      // A short parenthetical that closes on the Arabic, "(seperti عَلِمَ–يَعْلَمُ)": the Latin
-      // words back to its "(" (at most 2).
-      for (let k = i - 1; k >= 0 && i - k <= 2 && free(k) && !ar[k]; k--) {
-        const w = toks[k].w;
-        if (w.includes(")") || !/^\(?[\p{L}\p{M}’‘'ʿʾʼ-]+$/u.test(w)) break;
-        if (w.startsWith("(")) {
-          b = k;
-          break;
+    } else {
+      // A term inside the prose's own bracket takes its Arabic after a comma, "(mudhaf ilaih,
+      // مُضَاف إِلَيْه)", "(maf'ul bih, مَفْعُول بِه, yaitu …)" (TermText, src/lib/terms.ts
+      // annotate): as many Latin words as the Arabic has, at most 3, back to the bracket's "(";
+      // the last one, its comma and the Arabic are the seam (rule 15, 2026-10-11).
+      const word = (k: number, re: RegExp) => k >= 0 && free(k) && !ar[k] && re.test(toks[k].w);
+      if (depth[i] > 0 && !/^[(«“]/u.test(core) && longWords(core) < QUOTE_WORDS && word(i - 1, COMMA_TERM_LAST)) {
+        const n = Math.min(TERM_WORDS, (core.match(ARABIC_WORD) ?? []).reduce((k, w) => k + namesFor(w), 0));
+        b = i - 1;
+        let have = named(b);
+        while (have < n && !toks[b].w.startsWith("(") && word(b - 1, COMMA_TERM_WORD)) have += named(--b);
+      } else if (closesOpen(core) && longWords(core) < QUOTE_WORDS) {
+        // A short parenthetical that closes on the Arabic, "(seperti عَلِمَ–يَعْلَمُ)": the Latin
+        // words back to its "(" (at most 2).
+        for (let k = i - 1; k >= 0 && i - k <= 2 && free(k) && !ar[k]; k--) {
+          const w = toks[k].w;
+          if (w.includes(")") || !/^\(?[\p{L}\p{M}’‘'ʿʾʼ-]+$/u.test(w)) break;
+          if (w.startsWith("(")) {
+            b = k;
+            break;
+          }
         }
       }
     }

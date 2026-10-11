@@ -38,7 +38,7 @@ export function CaseBadge({ state, sign, label }: { state: CaseState; sign?: str
   const m = CASE_META[state];
   return (
     <span
-      className={`inline-flex items-center gap-2 rounded-full border-[1.5px] px-3 py-1 text-sm font-semibold ${m.className}`}
+      className={`inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-0.5 rounded-full border-[1.5px] px-3 py-1 text-sm font-semibold ${m.className}`}
     >
       <CaseShape state={state} />
       {label ? (
@@ -48,10 +48,14 @@ export function CaseBadge({ state, sign, label }: { state: CaseState; sign?: str
       ) : (
         m.label
       )}
-      {/* nowrap: the dot never sits alone at the end of a row (line breaks, 2026-10-10). */}
+      {/* The dot is glued to the sign's first word (textUnits: a leading separator joins the
+          word after it, and with a term its Arabic), so it never sits alone at the end of a row
+          (line breaks, 2026-10-10). Not nowrap: "dibuangnya huruf 'illah (ya')" on one line made
+          the word card wider than a phone (CI 2026-10-11); a long sign moves under the label
+          (flex-wrap) and wraps there. */}
       {sign && sign !== "—" ? (
-        <span className="whitespace-nowrap font-normal">
-          · <MixedText text={sign} />
+        <span className="min-w-0 font-normal">
+          <MixedText text={`· ${sign}`} />
         </span>
       ) : null}
     </span>

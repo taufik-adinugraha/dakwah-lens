@@ -55,7 +55,9 @@ export function MaterialsDisclosure({ title, hint, children }: { title: string; 
         </span>
         <ChevronDown aria-hidden className="chev h-6 w-6 shrink-0 text-forest" />
       </summary>
-      <div className="border-t border-hairline px-4 pt-6 pb-8 sm:px-6">{children}</div>
+      {/* A container: the cards nested inside ("Pelajari lebih dalam" rows and their cards) size
+          their padding by the room they have, not by the screen (CI 2026-10-11). */}
+      <div className="@container border-t border-hairline px-4 pt-6 pb-8 sm:px-6">{children}</div>
     </details>
   );
 }

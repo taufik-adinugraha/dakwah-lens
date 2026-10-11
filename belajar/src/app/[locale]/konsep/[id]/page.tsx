@@ -6,6 +6,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ForestGlow } from "@/components/ForestGlow";
 import { ConceptCard } from "@/components/library/ConceptCard";
 import { HarakatChart } from "@/components/library/HarakatChart";
+import { MixedText } from "@/components/library/MixedText";
 import { SourcesDisclosure } from "@/components/library/SourceList";
 import { Headword, TermText } from "@/components/library/TermText";
 import type { Basic, Concept } from "@/content/schema";
@@ -164,7 +165,10 @@ function Related({ concepts, heading }: { concepts: Concept[]; heading: string }
           return (
             <li key={c.id}>
               <Link href={conceptHref(c.id)} className="chip-link bg-white">
-                <span>{c.title}</span>
+                {/* MixedText: "jar-majrur" is never cut (rule 15, CI 2026-10-11). */}
+                <span>
+                  <MixedText text={c.title} />
+                </span>
                 {head[0] ? (
                   <bdi lang="ar" dir="rtl" className="arabic-inline text-ar-sm text-forest">
                     {head[0].ar}

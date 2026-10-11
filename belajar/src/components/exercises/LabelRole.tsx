@@ -116,7 +116,7 @@ function LabelRoleRound({
           {/* Container query: two columns only while there is room at the
               learner's chosen text size. */}
           <div className="@container mt-4">
-            <ul data-guide={mark("options")} className="grid gap-3 @xl:grid-cols-2">
+            <ul data-guide={mark("options")} className="grid grid-cols-1 gap-3 @xl:grid-cols-2">
               {item.options.map((opt) => (
                 <li key={opt}>
                   <OptionButton

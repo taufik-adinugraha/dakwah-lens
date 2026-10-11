@@ -2,16 +2,20 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { createElement, Fragment } from "react";
+import { NextIntlClientProvider } from "next-intl";
+import { type ComponentProps, createElement, Fragment } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { stageSequence } from "@/components/autoplay/build";
 import { MixedText } from "@/components/library/MixedText";
+import { TermText } from "@/components/library/TermText";
 
 import { measure } from "../../scripts/ci/linebreaks-measure.mjs";
 
-import { SURAHS } from "./content";
+import { SURAHS, WORD_INFO } from "./content";
+import { LIBRARY, TERMS } from "./library";
+import { annotate, prepareParts, Scope, soundsOf, termDisplay, titleParts, type Token } from "./terms";
 import { ARABIC_RUN, arabicRuns, hasArabic, joinUnits, rtlRuns, textUnits, type Seg } from "./textUnits";
 
 // Line breaks (operator, 2026-10-10: "make sure the line break is clean and easy to read,
@@ -49,6 +53,40 @@ const CORPUS: [string, string][] = [
   ...MANIFESTS.flatMap(([f, m]) => strings(m, `narration/${f}`)),
   ...["id", "en"].flatMap((l) => strings(readJson(`messages/${l}.json`), `messages/${l}`)),
 ];
+
+/**
+ * Every text TermText draws (src/lib/terms.ts termDisplay): the Konsep library's marked prose,
+ * each field as a concept page shows it (one first-use scope for the page: a term's Arabic at its
+ * first use, plain after that) and on its own (a fresh scope: every term with its Arabic, as a card
+ * shows it), with and without the harakah reminders; and the parts diagrams' labels and steps.
+ * None of it is in the content files as shown, so the corpus checks below run on it too (CI
+ * 2026-10-11: "keduanya ( ⏎ mudhaf", "waswasa– ⏎ yuwaswisu", "maqul al- ⏎ qaul").
+ */
+const TERM_TEXTS: [string, string][] = (() => {
+  const out: [string, string][] = [];
+  const add = (where: string, tokens: Token[]) => out.push([`termText ${where}`, termDisplay(tokens).text]);
+  const sounds = soundsOf(LIBRARY.basics.find((b) => b.id === "harakat")?.signs ?? []);
+  for (const rec of [...LIBRARY.concepts, ...LIBRARY.basics]) {
+    const mk = rec.marked;
+    if (!mk) continue;
+    const fields = [mk.summary, ...mk.explanation, ...(mk.bridge ? [mk.bridge] : []), ...mk.notes];
+    for (const hints of [true, false]) {
+      const page = new Scope(hints);
+      add(`${rec.id}.title`, titleParts(mk.title, page, TERMS, sounds).tokens);
+      fields.forEach((f, i) => add(`${rec.id}[${i}] (page)`, annotate(f, page, TERMS)));
+      add(`${rec.id}.title (card)`, titleParts(mk.title, new Scope(hints), TERMS, sounds).tokens);
+      fields.forEach((f, i) => add(`${rec.id}[${i}] (alone)`, annotate(f, new Scope(hints), TERMS)));
+    }
+  }
+  for (const p of LIBRARY.parts) {
+    const w = WORD_INFO[p.loc];
+    if (!w) continue;
+    const d = prepareParts(p, w, new Scope(), TERMS, sounds);
+    d.tiles.forEach((t, i) => add(`parts ${p.loc} tile ${i}`, t.label));
+    d.steps.forEach((st, i) => add(`parts ${p.loc} step ${i}`, st));
+  }
+  return out;
+})();
 
 /** A separator or a hyphen-split word that a text piece (free to wrap) must never hold. */
 const LOOSE_SEPARATOR = /(?:^|\s)(?:[·•—–-]+|…|\.{3}|\[\d+\])[)\]}”’»,.;:!?]*(?=\s|$)/u;
@@ -276,6 +314,37 @@ describe("textUnits: a term stays with its Arabic", () => {
     expect(units("huruf jar (حَرْف جَرّ) — yaitu")[0]).toMatchObject({ parts: [{ text: "huruf" }, { text: "jar" }, { text: "(حَرْف جَرّ) —" }] });
   });
 
+  it("keeps a term inside the prose's bracket with its Arabic after the comma; an en-dashed pair, a prefix, a case sign's dot with theirs", () => {
+    // TermText's "(term, Arabic)" (CI 2026-10-11: "keduanya ( ⏎ mudhaf" when it was drawn token by
+    // token): the bracket's words up to as many as the Arabic has, the last one in the seam.
+    expect(units("dan kata keduanya (mudhaf ilaih, مُضَاف إِلَيْه) selalu")[0]).toEqual({
+      kind: "unit",
+      parts: [
+        { text: "(mudhaf", arabic: false },
+        { text: "ilaih,", arabic: false },
+        { text: "مُضَاف إِلَيْه)", arabic: true },
+      ],
+      gaps: [" ", " "],
+      seam: [1, 2],
+    });
+    expect(units("(dalam keadaan jar, جَرّ)")[0]).toMatchObject({ parts: [{ text: "jar," }, { text: "جَرّ)" }], seam: [0, 1] });
+    expect(units("objeknya (maf'ul bih, مَفْعُول بِه, yaitu kata)")[0]).toMatchObject({
+      parts: [{ text: "(maf'ul" }, { text: "bih," }, { text: "مَفْعُول بِه," }],
+    });
+    // Outside a bracket a comma before Arabic is only a comma.
+    expect(units("Di An-Nas, «مَلِكِ ٱلنَّاسِ» itu")).toEqual([
+      { kind: "glue", text: "An-Nas," },
+      { kind: "unit", parts: [{ text: "«مَلِكِ ٱلنَّاسِ»", arabic: true }], gaps: [], seam: [0, 0] },
+    ]);
+    expect(units("seperti waswasa–yuwaswisu (يُوَسْوِسُ) yang")[0]).toMatchObject({
+      parts: [{ text: "waswasa–yuwaswisu" }, { text: "(يُوَسْوِسُ)" }],
+    });
+    expect(units("seperti bi- (بِ) “dengan”")[0]).toMatchObject({ parts: [{ text: "bi-" }, { text: "(بِ)" }] });
+    expect(units("· kasrah (كَسْرَة)")).toEqual([
+      { kind: "unit", parts: [{ text: "· kasrah", arabic: false }, { text: "(كَسْرَة)", arabic: true }], gaps: [" "], seam: [0, 1] },
+    ]);
+  });
+
   it("gives back the text unchanged, whitespace included", () => {
     for (const s of ["", " ", "  a  b  ", "\tkata\n(كَسْرَة) x", "— ·", "ر ح م"]) expect(joinUnits(textUnits(s))).toBe(s);
   });
@@ -285,6 +354,12 @@ describe("textUnits over every string the module shows", () => {
   it("joins back byte for byte, isolates the same Arabic runs, and leaves no loose separator, hyphen or Arabic", () => {
     expect(CORPUS.length).toBeGreaterThan(5000);
     const bad = CORPUS.flatMap(([where, s]) => problems(s).map((p) => `${where}: ${p}`));
+    expect(bad).toEqual([]);
+  });
+
+  it("does the same for every text TermText draws (the Konsep library, terms with their Arabic)", () => {
+    expect(TERM_TEXTS.length).toBeGreaterThan(1000);
+    const bad = TERM_TEXTS.flatMap(([where, s]) => problems(s).map((p) => `${where}: ${p}`));
     expect(bad).toEqual([]);
   });
 
@@ -322,7 +397,7 @@ describe("textUnits over every string the module shows", () => {
 
   it("leaves open only breaks the browser check accepts (one rule for both: seamKinds)", () => {
     const seen = new Set<string>();
-    const all = CORPUS.filter(([, s]) => !seen.has(s) && !!seen.add(s)).flatMap(([where, s]) =>
+    const all = [...CORPUS, ...TERM_TEXTS].filter(([, s]) => !seen.has(s) && !!seen.add(s)).flatMap(([where, s]) =>
       openBreaks(s).map((b) => [where, b] as const),
     );
     expect(all.length).toBeGreaterThan(50_000);
@@ -395,6 +470,43 @@ describe("MixedText renders the pieces", () => {
     }
     // a few thousand strings: room for a loaded runner
   }, 60_000);
+
+  it("styles stretches with overlays and leaves the pieces as they are", () => {
+    const text = "didahului huruf jar (حَرْف جَرّ), yaitu Al-Fatihah.";
+    const at = (w: string) => text.indexOf(w);
+    const styled = renderToStaticMarkup(
+      createElement(MixedText, {
+        text,
+        overlays: [
+          { from: at("حَرْف"), to: at("),"), arabic: "text-forest" },
+          { from: at("Al-"), to: at("Al-") + "Al-Fatihah".length, wrap: (c) => createElement("b", null, c) },
+        ],
+      }),
+    );
+    expect(textOf(styled)).toBe(text);
+    expect(styled).toContain('<bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm text-forest">حَرْف جَرّ</bdi>');
+    expect(styled).toContain('<span data-lb="glue" class="lb-glue"><b>Al-Fatihah</b>.</span>');
+    // Without the styles, exactly what MixedText draws for the text alone.
+    expect(styled.replace(/<\/?b>/g, "").replace(" text-forest", "")).toBe(renderToStaticMarkup(createElement(MixedText, { text })));
+  });
+
+  it("TermText draws termDisplay's text byte for byte, terms' Arabic in forest, Qur'anic words' in ink, the harakah link", () => {
+    let links = 0;
+    for (const c of LIBRARY.concepts) {
+      const tokens = annotate(c.marked!.summary, new Scope(), TERMS);
+      const { text, marks } = termDisplay(tokens);
+      const html = renderToStaticMarkup(
+        createElement(NextIntlClientProvider, { locale: "id", messages: {} } as ComponentProps<typeof NextIntlClientProvider>, createElement(TermText, { tokens })),
+      );
+      expect(textOf(html), c.id).toBe(text);
+      const tones = [...html.matchAll(/<bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm( text-(forest|ink))?">([^<]*)<\/bdi>/g)].map((m) => [m[3], m[2] ?? ""]);
+      const want = marks.filter((m) => m.kind !== "link").map((m) => [text.slice(m.from, m.to), m.kind === "term" ? "forest" : "ink"]);
+      expect(tones.filter(([, tone]) => tone), c.id).toEqual(want);
+      links += [...html.matchAll(/<a class="link-text" href="\/id\/konsep\/harakat">/g)].length;
+      expect(links >= marks.filter((m) => m.kind === "link").length, c.id).toBe(true);
+    }
+    expect(links).toBeGreaterThan(0);
+  });
 
   it("marks the boxes the CSS and the CI check rely on", () => {
     // The term's unit, its seam a unit inside it; the Arabic part right to left with its brackets,

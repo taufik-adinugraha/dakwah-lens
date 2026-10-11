@@ -42,7 +42,10 @@ export function FactCard({
   const first = fact.locations.slice(0, FIRST_LOCATIONS);
   const rest = fact.locations.slice(FIRST_LOCATIONS);
   return (
-    <article className="flex h-full flex-col rounded-2xl border border-hairline bg-white p-5">
+    // In a @container grid (the surah page, a lesson's "Pelajari lebih dalam" row): narrow padding
+    // while the grid is under 16rem (a lesson's row from Besar up on a phone), so the longest
+    // words ("mencantumkannya") fit without being cut (CI 2026-10-11, rule 15).
+    <article className="flex h-full flex-col rounded-2xl border border-hairline bg-white p-3 @3xs:p-5">
       <h3 className="font-display text-lg font-medium text-ink">
         <MixedText text={fact.title} />
       </h3>

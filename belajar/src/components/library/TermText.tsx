@@ -1,10 +1,8 @@
-import { Fragment, type ReactNode } from "react";
-
 import { Link } from "@/i18n/navigation";
 import { conceptHref } from "@/lib/routes";
-import type { HeadTerm, Token } from "@/lib/terms";
+import { type HeadTerm, termDisplay, type Token } from "@/lib/terms";
 
-import { MixedText } from "./MixedText";
+import { MixedText, type Overlay } from "./MixedText";
 
 /** The Harakat page (Dasar membaca); a harakah term's first use on a page links here. */
 export const HARAKAT_PAGE = "harakat";
@@ -18,89 +16,36 @@ export const HARAKAT_PAGE = "harakat";
  * citation joins it after a semicolon ("mabni (مَبْنِيّ; Ibnu 'Aqil)"), and a term already inside
  * the prose's brackets takes its Arabic after a comma ("(dalam keadaan jar, جَرّ)").
  *
- * Line breaks (rule 15): the transliteration's last word, the opening bracket, the Arabic and the
- * punctuation after it are one unbreakable seam; a term of several words is one inline box, so it
- * moves to the next line whole and only wraps inside (between its Latin words, never at the
- * seam) when it is wider than a whole line at a large text size. Arabic is bidi-isolated (`bdi`)
- * in the Amiri face at the 24px floor. A run of four or more Qur'anic words may take a line of
- * its own rather than overflow a phone. Plain text between spans goes through MixedText, so a
- * «…» Tanzil quotation or a single letter in the prose is isolated as before.
+ * Line breaks (rule 15): the tokens become ONE text (termDisplay) that MixedText draws — the same
+ * pieces and the same rules as every other text in the module, so a term keeps its last word, the
+ * bracket, the Arabic and the punctuation after it in one seam, a hyphenated or en-dashed word is
+ * never cut ("al-qaul", "waswasa–yuwaswisu"), and no line ends on "(" or "“" (CI 2026-10-11:
+ * drawn token by token, the boxes left a break next to every term). The styles are overlays on
+ * that text: a term's Arabic in forest, a Qur'anic word's in ink, the link on the harakah term's
+ * word. Arabic is bidi-isolated (`bdi`) in the Amiri face at the 24px floor; a run of four or more
+ * Qur'anic words is a quotation with nothing glued to it, wrapping right to left in its own box
+ * when it is wider than a phone's line.
  */
 export function TermText({ tokens, links = true }: { tokens: Token[]; links?: boolean }) {
-  return (
-    <>
-      {tokens.map((t, i) => {
-        if (t.kind === "text") return <MixedText key={i} text={t.text} />;
-        if (!t.arabic) return <Fragment key={i}>{t.surface}</Fragment>;
-        const words = t.surface.split(" ");
-        const lead = words.slice(0, -1).join(" ");
-        const lastWord = words[words.length - 1];
-        const ar = t.kind === "term" ? t.term.ar! : t.ar;
-        const long = t.kind === "quran" && ar.split(" ").length >= 4;
-        const hint = t.kind === "term" && t.hint && !t.merge ? t.term.hint : null;
-        const arabic = (
-          <bdi
-            lang="ar"
-            dir="rtl"
-            className={`arabic-inline text-ar-sm ${t.kind === "term" ? "text-forest" : "text-ink"}${long ? " inline-block max-w-full whitespace-normal" : ""}`}
-          >
-            {ar}
-          </bdi>
-        );
-        const word: ReactNode =
-          t.kind === "term" && t.hint && links ? (
-            <Link href={conceptHref(HARAKAT_PAGE)} className="link-text">
-              {lastWord}
-            </Link>
-          ) : (
-            lastWord
-          );
-        // What opens before the Arabic and closes right after it (kept in the seam), and the
-        // wrappable rest (a reminder) after the seam.
-        const open = t.inBracket ? ", " : " (";
-        const close = hint || t.merge ? "," : t.cite ? ";" : t.inBracket ? t.after : `)${t.after}`;
-        const rest = hint ? (
-          <>
-            {" "}
-            {hint}
-            {t.inBracket ? t.after : t.cite ? ";" : `)${t.after}`}
-          </>
-        ) : null;
-        const seam = long ? (
-          <>
-            <span className="whitespace-nowrap">
-              {word}
-              {open}
-            </span>
-            <span className="whitespace-nowrap">
-              {arabic}
-              {close}
-            </span>
-          </>
-        ) : (
-          <span className="whitespace-nowrap">
-            {word}
-            {open}
-            {arabic}
-            {close}
-          </span>
-        );
-        const unit = (
-          <>
-            {lead ? `${lead} ` : null}
-            {seam}
-          </>
-        );
-        return (
-          <Fragment key={i}>
-            {lead && !long ? <span className="inline-block max-w-full">{unit}</span> : unit}
-            {rest}
-            {t.merge || t.cite ? " " : null}
-          </Fragment>
-        );
-      })}
-    </>
+  const { text, marks } = termDisplay(tokens);
+  const overlays = marks.flatMap((m): Overlay[] =>
+    m.kind !== "link"
+      ? [{ from: m.from, to: m.to, arabic: m.kind === "term" ? "text-forest" : "text-ink" }]
+      : links
+        ? [
+            {
+              from: m.from,
+              to: m.to,
+              wrap: (word) => (
+                <Link href={conceptHref(HARAKAT_PAGE)} className="link-text">
+                  {word}
+                </Link>
+              ),
+            },
+          ]
+        : [],
   );
+  return <MixedText text={text} overlays={overlays} />;
 }
 
 /**
