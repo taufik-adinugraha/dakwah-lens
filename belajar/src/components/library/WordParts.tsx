@@ -4,6 +4,7 @@ import { Fragment, type ReactNode } from "react";
 import { letters, type PartsChange, type PreparedParts } from "@/lib/terms";
 
 import { MarkCircle } from "./MarkCircle";
+import { MixedText } from "./MixedText";
 import { TermText } from "./TermText";
 
 export type WordPartsLabels = {
@@ -52,7 +53,9 @@ export function WordParts({ data, labels }: { data: PreparedParts; labels: WordP
 
       {data.changes.map((c, i) => (
         <div key={i} className="mt-5 flex flex-col items-center gap-2 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-x-4">
-          <span className="text-center text-base font-semibold text-ink">{labels.change(c)}:</span>
+          <span className="text-center text-base font-semibold text-ink">
+            <MixedText text={`${labels.change(c)}:`} />
+          </span>
           <span className="flex flex-col items-center gap-1 sm:flex-row sm:gap-3">
             <ChangeMark c={c} side="from" />
             <ArrowDown aria-hidden className="h-6 w-6 shrink-0 text-forest sm:hidden" />
@@ -122,32 +125,32 @@ function Tile({
 }
 
 /** One side of a change: a vowel alone on its dotted circle with its name and sound, or (a
- *  letter change) the whole letter with its Latin name. */
+ *  letter change) the whole letter with its Latin name. The words are one MixedText (the term with
+ *  its Arabic and the "·" after it kept together, the sound free to wrap), beside the circle while
+ *  10rem is left for them there, else under it (flex-wrap, as on the Harakat page): one nowrap
+ *  line, "sukun (سُكُون) · mati, tanpa vokal", was wider than a phone at Sangat besar and made the
+ *  page scroll sideways (CI 2026-10-11, konsep dhamir and fiil-madhi). */
 function ChangeMark({ c, side }: { c: PartsChange; side: "from" | "to" }) {
   const mark = side === "from" ? c.from : c.to;
   const term = side === "from" ? c.fromTerm : c.toTerm;
   const sound = side === "from" ? c.fromSound : c.toSound;
   const name = side === "from" ? c.fromName : c.toName;
+  const head = [c.kind === "letter" && name ? name : "", term ? `${term.latin}${term.ar ? ` (${term.ar})` : ""}` : ""]
+    .filter(Boolean)
+    .join(" ");
+  const text = sound ? `${head}${head ? " " : ""}· ${sound}` : head;
+  const arAt = term?.ar ? head.lastIndexOf(term.ar) : -1;
   return (
-    <span className="inline-flex items-center gap-2">
+    <span className="inline-flex max-w-full flex-wrap items-center justify-center gap-2">
       <MarkCircle mark={mark} size="sm" letter={c.kind === "letter"} />
-      <span className="whitespace-nowrap text-base text-ink">
-        {c.kind === "letter" && name ? `${name}${term ? " " : ""}` : null}
-        {term ? (
-          <>
-            {term.latin}
-            {term.ar ? (
-              <>
-                {" ("}
-                <bdi lang="ar" dir="rtl" className="arabic-inline text-ar-sm text-forest">
-                  {term.ar}
-                </bdi>
-                )
-              </>
-            ) : null}
-          </>
-        ) : null}
-        {sound ? <span className="text-ink-muted"> · {sound}</span> : null}
+      <span className="min-w-[min(10rem,100%)] flex-1 text-base text-ink">
+        <MixedText
+          text={text}
+          overlays={[
+            ...(arAt >= 0 ? [{ from: arAt, to: arAt + term!.ar!.length, arabic: "text-forest" }] : []),
+            ...(sound ? [{ from: text.length - sound.length - 2, to: text.length, wrap: (s: ReactNode) => <span className="text-ink-muted">{s}</span> }] : []),
+          ]}
+        />
       </span>
     </span>
   );

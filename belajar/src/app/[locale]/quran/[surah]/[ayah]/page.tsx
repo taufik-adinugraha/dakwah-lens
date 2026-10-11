@@ -80,15 +80,20 @@ export async function generateMetadata({
  * One row of "Pelajari lebih dalam": a collapsed 48px disclosure. No per-row
  * "Dibantu AI" tag: the operator removed those chips (2026-10-10) because each
  * record shows its Rujukan; the page footer carries the AI-assisted label.
+ * Narrow side padding while "Materi lengkap" (a container) is narrower than
+ * 18rem, i.e. from Besar up on a phone: the row sits in that card and holds
+ * cards of its own, and at Sangat besar the nested paddings left a 192px column,
+ * too narrow for words like "mencantumkannya" or "menerangkannya" (CI
+ * 2026-10-11, rule 15: no word is cut, so the column must hold it).
  */
 function Deeper({ title, children }: { title: string; children: ReactNode }) {
   return (
     <details className="rounded-2xl border border-hairline bg-white">
-      <summary className="disclosure-row px-5 py-2 text-ink">
+      <summary className="disclosure-row px-3 py-2 text-ink @2xs:px-5">
         <span>{title}</span>
         <ChevronDown aria-hidden className="chev h-5 w-5 shrink-0 text-forest" />
       </summary>
-      <div className="px-5 pt-1 pb-5">{children}</div>
+      <div className="px-3 pt-1 pb-5 @2xs:px-5">{children}</div>
     </details>
   );
 }
@@ -266,9 +271,12 @@ export default async function AyahPage({
               </h2>
               <p className="mt-1 max-w-prose text-base text-ink-muted">{t("words_intro", { n: a.words.length })}</p>
               {/* Container query, not media query: columns collapse as the text
-                  size grows (rem in @media ignores the root size). */}
+                  size grows (rem in @media ignores the root size). grid-cols-1, not
+                  the implicit auto column: a card never grows past the page to fit a
+                  long kept-together word, the word breaks in the flow instead
+                  (src/lib/lineFit.ts; CI 2026-10-11: the page scrolled sideways). */}
               <div className="@container mt-4">
-                <div className="grid gap-4 @2xl:grid-cols-2 @5xl:grid-cols-3">
+                <div className="grid grid-cols-1 gap-4 @2xl:grid-cols-2 @5xl:grid-cols-3">
                   {a.words.map((w, i) => (
                     <WordCard
                       key={w.loc}
@@ -357,7 +365,7 @@ export default async function AyahPage({
                       title={`${t("concepts_heading")} (${introduced.length})`}
                     >
                       <div className="@container">
-                        <div className="grid gap-4 @2xl:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-4 @2xl:grid-cols-2">
                           {introduced.map((c) => (
                             <ConceptCard
                               key={c.id}
@@ -392,7 +400,7 @@ export default async function AyahPage({
                       title={`${t("facts_heading")} (${facts.length})`}
                     >
                       <div className="@container">
-                        <div className="grid gap-4 @2xl:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-4 @2xl:grid-cols-2">
                           {facts.map((f) => (
                             <FactCard
                               key={f.id}

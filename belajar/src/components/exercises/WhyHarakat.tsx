@@ -122,7 +122,7 @@ function WhyHarakatRound({
             </div>
           </div>
 
-          <ul data-guide={mark("options")} className="mt-4 grid gap-3">
+          <ul data-guide={mark("options")} className="mt-4 grid grid-cols-1 gap-3">
             {item.options.map((opt) => (
               <li key={opt}>
                 <OptionButton

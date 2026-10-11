@@ -193,12 +193,15 @@ export function WordCard({
             {lexeme ? <SharafPanel lexeme={lexeme} labels={labels.sharaf} /> : null}
 
             {word.ikhtilaf.length > 0 && (
+              // Narrower sides while the word grid (a @container) is narrow: inside the card, inside
+              // "Materi lengkap", the 202px left at Sangat besar on a phone is narrower than
+              // "membolehkannya," (rule 15, 2026-10-11: the column holds the word, nothing cuts it).
               <details className="rounded-xl border border-hairline bg-white">
-                <summary className="disclosure-row px-4 text-ink">
+                <summary className="disclosure-row px-3 text-ink @2xs:px-4">
                   <span>{t("other_views_toggle", { n: word.ikhtilaf.length })}</span>
                   <ChevronDown aria-hidden="true" className="chev h-5 w-5 shrink-0 text-ink-muted" />
                 </summary>
-                <ul className="space-y-3 px-4 pb-4 text-base text-ink-muted">
+                <ul className="space-y-3 px-3 pb-4 text-base text-ink-muted @2xs:px-4">
                   {word.ikhtilaf.map((x) => (
                     <li key={x.point}>
                       {/* The colon inside the text, so no line starts with it; the

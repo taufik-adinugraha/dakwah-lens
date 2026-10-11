@@ -130,7 +130,7 @@ function WaznFactoryRound({
           {/* Container query: three columns only while there is room at the
               learner's chosen text size; full width on phones. */}
           <div className="@container mt-4">
-            <ul data-guide={mark("options")} className="grid gap-3 @md:grid-cols-3">
+            <ul data-guide={mark("options")} className="grid grid-cols-1 gap-3 @md:grid-cols-3">
               {item.options.map((opt) => (
                 <li key={opt}>
                   <OptionButton

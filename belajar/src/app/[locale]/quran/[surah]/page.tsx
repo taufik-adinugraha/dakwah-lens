@@ -102,7 +102,7 @@ export default async function SurahPage({ params }: PageProps<"/[locale]/quran/[
               {t("facts_heading")}
             </h2>
             <div className="@container mt-4">
-              <ul className="grid gap-4 @2xl:grid-cols-2">
+              <ul className="grid grid-cols-1 gap-4 @2xl:grid-cols-2">
                 {s.facts.map((f) => (
                   <li key={f.id}>
                     <FactCard

@@ -12,7 +12,11 @@ import { SourcesDisclosure } from "./SourceList";
  * Words are shown as they are in the mushaf, each with its role beneath;
  * named groups (an idhafah chain, a na't pair, a badal) are listed with
  * their concept. `hideHeading` drops the section's own H2 when the page
- * already names it (e.g. inside a "Pelajari lebih dalam" disclosure row).
+ * already names it (e.g. inside a "Pelajari lebih dalam" disclosure row),
+ * and its card frame with it: that row is already a white bordered card, and
+ * a card inside it inside "Materi lengkap" left a 192px column on a phone at
+ * Sangat besar, where "menerangkannya" or "membolehkannya" is wider than the
+ * line (CI 2026-10-11, rule 15; never cut such a word, give it the room).
  */
 export function StructureSection({
   ayah,
@@ -29,7 +33,7 @@ export function StructureSection({
   if (!st) return null;
   return (
     <section
-      className={`${hideHeading ? "" : "mt-10 "}rounded-2xl border border-hairline bg-white p-5 sm:p-6`}
+      className={hideHeading ? undefined : "mt-10 rounded-2xl border border-hairline bg-white p-5 sm:p-6"}
       aria-labelledby={hideHeading ? undefined : "structure"}
     >
       {hideHeading ? null : (
