@@ -10,7 +10,6 @@ import {
   type PlayError,
   type RecitationSource,
   useSegmentPlayer,
-  warmRecitation,
 } from "@/hooks/useSegmentPlayer";
 import { useRouter } from "@/i18n/navigation";
 import {
@@ -23,7 +22,7 @@ import {
   markContinue,
   positionToSave,
   readSavedIndex,
-  recitationWarmPlan,
+  recitationToWarm,
   reduceAutoplay,
   takeContinue,
   upcomingAudio,
@@ -146,21 +145,14 @@ export function continueToAyah(router: ReturnType<typeof useRouter>, slug: strin
  *   page is idle (never the imam's external recitation).
  * - The imam's recitation is fetched EARLY (operator 2026-10-11; rules in
  *   src/lib/autoplay/warm.ts): this ayah's as soon as the lesson has started,
- *   while the narrator speaks the opening line, on the stage's own player; the
- *   next ayah's (`nextRecitation`) from the recap on, on a spare element.
- *   Never part of `loading`: that is the wait of the activity due to sound.
+ *   while the narrator speaks the opening line, on the stage's own player.
+ *   Never another ayah's (each page fetches its own), and never part of
+ *   `loading`: that is the wait of the activity due to sound.
  * - Remembers the step per ayah; hands off to the next ayah; Media Session
  *   (lock screen, earphones) play/pause/next/previous.
  * - Never scrolls the page.
  */
-export function useAutoplay(
-  seq: AutoplaySequence,
-  sources: RecitationSource[],
-  title: string,
-  /** The recording the next ayah's page plays first (its default reciter's); null on a surah's
-   *  last ayah. Fetched ahead near the end of this ayah (warm.ts). */
-  nextRecitation: string | null = null,
-) {
+export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], title: string) {
   const router = useRouter();
   const { pace, setPace: storePace } = usePace();
   const [imamRate, setImamRate] = useImamRate();
@@ -234,18 +226,13 @@ export function useAutoplay(
   // ── Once the lesson has started: the imam's recitation, fetched early ──
   // (operator 2026-10-11; when and why: src/lib/autoplay/warm.ts). This ayah's recording by the
   // reciter chosen, on the stage's own player, while the narrator speaks the opening line — and
-  // again when another reciter is chosen; from the recap on, the next ayah's, on the spare
-  // element (each file once). Both only ask the browser to fetch: nothing plays, nothing is
-  // reported, and the loading notice stays the waiting activity's alone.
+  // again when another reciter is chosen. It only asks the browser to fetch: nothing plays,
+  // nothing is reported, and the loading notice stays the waiting activity's alone.
   const lessonStarted = state.started;
-  const stepKind = seq.steps[state.idx].kind;
-  const nav = seq.nav;
   useEffect(() => {
-    const conn = (navigator as Navigator & { connection?: ConnectionHints }).connection;
-    const plan = recitationWarmPlan({ started: lessonStarted, currentUrl: reciteUrl, step: stepKind, nav, nextUrl: nextRecitation, conn });
-    if (plan.current) warmPlayer(plan.current);
-    if (plan.next) warmRecitation(plan.next);
-  }, [lessonStarted, reciteUrl, stepKind, nav, nextRecitation, warmPlayer]);
+    const url = recitationToWarm({ started: lessonStarted, currentUrl: reciteUrl });
+    if (url) warmPlayer(url);
+  }, [lessonStarted, reciteUrl, warmPlayer]);
 
   // Latest player functions for the executor, which must not restart its
   // activity when they change identity (e.g. the reciter changed).

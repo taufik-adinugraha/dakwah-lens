@@ -118,6 +118,9 @@ export function MushafLine({
             // words by place, and the number badge itself is aria-hidden.
             aria-label={t("play_word", { n: w.index, translit: w.translit, gloss: w.gloss })}
             aria-current={active ? "true" : undefined}
+            // The word's place, for the CI check that the imam is really sounding: a later word
+            // lights only once the recording has advanced (scripts/ci/screenshots.mjs warmupChecks).
+            data-word={w.index}
             className={`inline-flex flex-col rounded-xl border-[1.5px] px-2.5 motion-safe:transition-colors ${
               active
                 ? "border-forest bg-forest text-paper"

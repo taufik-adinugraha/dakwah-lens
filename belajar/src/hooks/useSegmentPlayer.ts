@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { type AudioLoading, mediaLoading, type MediaEventType } from "@/lib/autoplay/loading";
-import { askOnce } from "@/lib/autoplay/warm";
 
 export type Segment = [word: number, startMs: number, endMs: number];
 export type RecitationSource = {
@@ -51,37 +50,6 @@ const isUnlocked = (a: HTMLAudioElement) => unlockedAudio.has(a);
 const markUnlocked = (a: HTMLAudioElement) => {
   unlockedAudio.add(a);
 };
-
-/** The recordings asked for ahead of their play in this visit, by a player's warm() or by
- *  warmRecitation() (src/lib/autoplay/warm.ts askOnce). */
-const askedAhead = new Set<string>();
-
-/**
- * The NEXT ayah's recording, fetched ahead (operator 2026-10-11; when: src/lib/autoplay/warm.ts)
- * on a spare element that is never played: the stage's own element is still busy with this ayah.
- * The file lands in the browser's caches, where the stage's element finds it once the next page
- * points it at the same address — the media engine's own (Chromium and Firefox keep one buffer
- * for elements with one address, by their design) and the HTTP cache (measured 2026-10-11: the
- * reciter's CDN answers `Range: bytes=0-` with a 206 for the whole file, `Cache-Control:
- * max-age=25600000` and a `Last-Modified`). A browser that keeps media outside those caches
- * (Safari) gains a warm connection at most; there the next page's own warm() does the work.
- * Not measured in a browser here: CI checks that the request is made, and when.
- *
- * A media element, not fetch() or <link rel="preload">: the module's CSP lets only media reach
- * the reciters' hosts (next.config.ts: media-src lists them, connect-src is 'self'), and a
- * preload link does not fetch audio in Chromium. Kept for the visit, like the stage's element,
- * so it holds the file while the page changes. Each file once in a visit (askOnce).
- */
-let keptSpareAudio: HTMLAudioElement | null = null;
-export function warmRecitation(url: string): void {
-  if (!askOnce(askedAhead, url)) return;
-  if (!keptSpareAudio) {
-    keptSpareAudio = new Audio();
-    keptSpareAudio.muted = true;
-    keptSpareAudio.preload = "auto";
-  }
-  keptSpareAudio.src = url;
-}
 
 /**
  * One streamed ayah file + its word timings (quran-align).
@@ -451,6 +419,8 @@ export function useSegmentPlayer(
    * element idle, nothing loaded) is told with load(), which starts it over under "auto" — never
    * while unlock()'s silent play is under way (not paused: load() would abort it), never once
    * anything is loaded. Nothing plays, so none of the events `loading` is made of fires.
+   * The element's own load, not fetch() or <link rel="preload">: the module's CSP lets only media
+   * reach the reciters' hosts (next.config.ts: media-src lists them, connect-src is 'self').
    * A browser may load less than the whole file (Chromium on mobile data loads its start, iOS
    * Safari hardly more than its header): what is there plays at once and the rest follows while
    * it plays. Until the next page, whose mount sets "none" again. `url`: the address the caller
@@ -462,7 +432,6 @@ export function useSegmentPlayer(
     if (!a || a.getAttribute("src") !== url || warmedRef.current === url) return;
     warmedRef.current = url;
     a.preload = "auto";
-    askedAhead.add(url);
     const idle = a.networkState === HTMLMediaElement.NETWORK_IDLE && a.readyState === HTMLMediaElement.HAVE_NOTHING;
     if (!idle || !a.paused || unlockingRef.current || a.error) return;
     a.load();

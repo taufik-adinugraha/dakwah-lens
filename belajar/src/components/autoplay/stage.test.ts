@@ -12,10 +12,9 @@ import {
   firstNarration,
   hasArabicScript,
   idlePreloadUrl,
-  NEXT_AYAH_WARM_STEPS,
   orderRecitations,
   questionNumbers,
-  recitationWarmPlan,
+  recitationToWarm,
   reduceAutoplay,
   viewAutoplay,
 } from "@/lib/autoplay";
@@ -141,38 +140,25 @@ describe("autoplay stage: what the lesson page ships", () => {
 
 describe("autoplay stage: the imam's recitation fetched early (operator 2026-10-11)", () => {
   /** What the ayah page hands the stage (page.tsx): the recordings in the page's order — the
-   *  first is the one chosen until the learner picks another — and the next ayah's first. */
-  const pageRecitations = (s: (typeof SURAHS)[number], n: number) => {
-    const a = s.ayat.find((x) => x.ayah === n);
-    if (!a) throw new Error(`no ${s.slug} ${n}`);
-    const next = s.ayat.find((x) => x.ayah === n + 1);
-    return {
-      sources: orderRecitations(a.recitation).map((r) => r.url),
-      nextRecitation: next ? (orderRecitations(next.recitation)[0]?.url ?? null) : null,
-    };
-  };
+   *  first is the one chosen until the learner picks another. */
+  const pageSources = (a: (typeof SURAHS)[number]["ayat"][number]) => orderRecitations(a.recitation).map((r) => r.url);
 
   it(
-    "every lesson: nothing on a page view; this ayah's recording from the first line; the next ayah's from the recap, never past the surah",
+    "every lesson: nothing on a page view; this ayah's recording from the first line to the last step, and no other ayah's",
     () => {
       let lessons = 0;
-      let handOffs = 0;
       for (const s of SURAHS) {
+        const others = (n: number) => new Set(s.ayat.filter((x) => x.ayah !== n).flatMap((x) => x.recitation.map((r) => r.url)));
         for (const a of s.ayat) {
           for (const locale of ["id", "en"]) {
             const seq = stageSequence(s, a, locale);
-            const { sources, nextRecitation } = pageRecitations(s, a.ayah);
-            const planAt = (st: ReturnType<typeof createAutoplayState>, chosen = 0) =>
-              recitationWarmPlan({
-                started: st.started,
-                currentUrl: sources[chosen] ?? null,
-                step: viewAutoplay(seq, st).step.kind,
-                nav: seq.nav,
-                nextUrl: nextRecitation,
-              });
+            const sources = pageSources(a);
+            const want = (st: ReturnType<typeof createAutoplayState>, chosen = 0) =>
+              recitationToWarm({ started: st.started, currentUrl: sources[chosen] ?? null });
             const where = `${s.slug} ${a.ayah} [${locale}]`;
+            expect(sources.length, where).toBeGreaterThan(0);
             const idle = createAutoplayState(seq);
-            expect(planAt(idle), where).toEqual({ current: null, next: null });
+            expect(want(idle), where).toBeNull();
 
             // "Mulai", "Lanjutkan dari langkah 2" (the imam's own step) and the hand-off from the
             // previous ayah: each starts with a line — the narrator's, or its caption — never
@@ -185,41 +171,29 @@ describe("autoplay stage: the imam's recitation fetched early (operator 2026-10-
               const st = reduceAutoplay(seq, idle, start);
               expect(st.started, where).toBe(true);
               expect(st.activity?.kind, `${where} ${start.reason}`).not.toBe("recite");
-              expect(planAt(st).current, where).toBe(sources[0]);
+              expect(want(st), where).toBe(sources[0]);
               // Another reciter chosen in Pengaturan: his recording of this ayah.
-              if (sources.length > 1) expect(planAt(st, 1).current, where).toBe(sources[1]);
+              if (sources.length > 1) expect(want(st, 1), where).toBe(sources[1]);
             }
 
-            // The whole lesson, step by step ("Berikutnya ›", "Lewati latihan" at an exercise).
+            // The whole lesson, step by step ("Berikutnya ›", "Lewati latihan" at an exercise):
+            // this ayah's recording on every step, the recap and the last line included — never a
+            // recording of another ayah (each page fetches its own; review 2026-10-11).
             let st = reduceAutoplay(seq, idle, { type: "start", reason: "fresh" });
-            const asked: string[] = [];
+            const elsewhere = others(a.ayah);
             for (let i = 0; i < 300 && st.phase !== "finished"; i++) {
               const v = viewAutoplay(seq, st);
-              const p = planAt(st);
-              expect(p.current, where).toBe(sources[0]);
-              const nearEnd = NEXT_AYAH_WARM_STEPS.includes(v.step.kind);
-              expect(p.next, `${where} step ${v.step.id}`).toBe(nearEnd ? nextRecitation : null);
-              if (p.next && !asked.includes(p.next)) asked.push(p.next);
+              const url = want(st);
+              expect(url, `${where} step ${v.step.id}`).toBe(sources[0]);
+              expect(elsewhere.has(url ?? ""), `${where} step ${v.step.id}`).toBe(false);
               st = reduceAutoplay(seq, st, { type: v.showSkip ? "skip" : "next" });
             }
             expect(st.phase, where).toBe("finished");
             lessons++;
-            if (a.ayah < s.ayat.length) {
-              // The lesson goes on to the next ayah by itself: exactly that page's first recording.
-              expect(st.intent, where).toEqual({ kind: "ayah", slug: s.slug, ayah: a.ayah + 1 });
-              expect(asked, where).toEqual([pageRecitations(s, a.ayah + 1).sources[0]]);
-              handOffs++;
-            } else {
-              // The surah's last ayah ends at its end card: nothing of another surah is fetched.
-              expect(st.intent?.kind, where).toBe("surah_end");
-              expect(nextRecitation, where).toBeNull();
-              expect(asked, where).toEqual([]);
-            }
           }
         }
       }
       expect(lessons).toBeGreaterThan(40);
-      expect(handOffs).toBeGreaterThan(30);
     },
     FULL_RUN_TIMEOUT_MS,
   );
@@ -243,25 +217,32 @@ describe("autoplay stage: the imam's recitation fetched early (operator 2026-10-
     expect(n).toBeGreaterThan(40);
   });
 
-  it("is wired from the page to the players, and a page view alone leaves the recording alone", () => {
-    const page = read("src/app/[locale]/quran/[surah]/[ayah]/page.tsx");
-    expect(page).toContain("orderRecitations(next.recitation)[0]");
-    expect(page).toContain("nextRecitation={nextRecitation}");
-    const stage = read("src/components/lesson/LessonStage.tsx");
-    expect(stage).toContain("useAutoplay(seq, sources, title, nextRecitation)");
+  it("is wired from the runner to the stage's one player, and a page view alone leaves the recording alone", () => {
     const runner = read("src/components/autoplay/useAutoplay.ts");
-    expect(runner).toContain("recitationWarmPlan({ started: lessonStarted,");
+    expect(runner).toContain("recitationToWarm({ started: lessonStarted, currentUrl: reciteUrl })");
     expect(runner).toContain("const lessonStarted = state.started;");
-    // The stage's element waits for a play (or the lesson's start): "none" on every page's mount,
-    // "auto" in one place only, warm() (the spare element's own is checked in
-    // src/hooks/useSegmentPlayer.test.ts: made by warmRecitation() alone).
+    expect(runner).toContain("if (url) warmPlayer(url);");
+    // One Audio element fetches a recitation ahead, the stage's own: the element waits for a play
+    // (or the lesson's start) — "none" on every page's mount, "auto" in one place only, warm().
     const player = read("src/hooks/useSegmentPlayer.ts");
-    expect(player.match(/a\.preload = "none";/g)).toHaveLength(1);
-    expect(player.match(/a\.preload = "auto";/g)).toHaveLength(1);
+    expect(player.match(/\.preload = "none";/g)).toHaveLength(1);
+    expect(player.match(/\.preload = "auto";/g)).toHaveLength(1);
     expect(player.indexOf('a.preload = "auto";')).toBeGreaterThan(player.indexOf("const warm = useCallback("));
-    // The CI check finds the chosen recording by the stage's data-reciter.
+    // No second element fetches for another page (review 2026-10-11: the spare element is gone),
+    // and the page hands the stage no recording but this ayah's.
+    expect(player.match(/new Audio\(\)/g)).toHaveLength(2); // stageAudio(), and a standalone player's own
+    const page = read("src/app/[locale]/quran/[surah]/[ayah]/page.tsx");
+    expect(page).not.toContain("next.recitation");
+    expect(page).toContain("sources={sources}");
+    const stage = read("src/components/lesson/LessonStage.tsx");
+    expect(stage).toContain("useAutoplay(seq, sources, title)");
+    // The CI check finds the chosen recording by the stage's data-reciter, and tells that the imam
+    // is really sounding by the place of the word lit (a later word needs the recording to advance).
     expect(stage).toContain("data-reciter={p.source?.reciter}");
-    expect(read("scripts/ci/screenshots.mjs")).toContain('getAttribute("data-reciter")');
+    expect(read("src/components/lesson/AyahPlayer.tsx")).toContain("data-word={w.index}");
+    const ci = read("scripts/ci/screenshots.mjs");
+    expect(ci).toContain('getAttribute("data-reciter")');
+    expect(ci).toContain('getAttribute("data-word")');
   });
 });
 
