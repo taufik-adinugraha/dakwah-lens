@@ -94,7 +94,7 @@
     "status_in_use": "In use",
     "recitation_heading": "The imam's recitation on the lesson pages",
     "recitation_body": "Every ayah is played from these recordings, with a timing for every word:",
-    "streaming_note": "When you play a recitation, your browser fetches the audio directly from the recording provider's servers abroad, so your IP address is visible to them.",
+    "streaming_note": "When you start a lesson or play a recitation, your browser fetches the audio directly from the recording provider's servers abroad, so your IP address is visible to them.",
     "data_versions_heading": "Data versions",
     "data_versions_body": "For technical checks: the version and file fingerprint (sha256) of every dataset the lesson pages use, exactly as recorded when the lessons were built.",
     "data_versions_summary": "Show data versions (for technical checks)",

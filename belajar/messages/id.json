@@ -94,7 +94,7 @@
     "status_in_use": "Dipakai",
     "recitation_heading": "Bacaan imam di halaman pelajaran",
     "recitation_body": "Setiap ayat diperdengarkan dari rekaman berikut, lengkap dengan penanda waktu setiap kata:",
-    "streaming_note": "Saat Anda memutar bacaan, peramban Anda mengambil berkas audio langsung dari server penyedia rekaman di luar negeri, sehingga alamat IP Anda terlihat oleh server tersebut.",
+    "streaming_note": "Saat Anda memulai pelajaran atau memutar bacaan, peramban Anda mengambil berkas audio langsung dari server penyedia rekaman di luar negeri, sehingga alamat IP Anda terlihat oleh server tersebut.",
     "data_versions_heading": "Versi data",
     "data_versions_body": "Untuk pemeriksaan teknis: versi dan sidik berkas (sha256) setiap data yang dipakai halaman pelajaran, persis seperti yang dicatat saat materi disusun.",
     "data_versions_summary": "Lihat versi data (untuk pemeriksaan teknis)",
