@@ -1099,6 +1099,25 @@ async function quizVoiceCheck(page, vp, index) {
   await page.goto("about:blank");
 }
 
+/**
+ * A hidden address shows the module's own 404 in the browser: answered 404, and the page drawn is
+ * src/app/[locale]/not-found.tsx ([data-not-found]) with its title (messages/id.json, never typed
+ * here) visible inside <main>. The server HTML carries that page only in the RSC payload (Next
+ * renders it as the client takes over), so the smoke checks can find its marker but not see it:
+ * this is where it is seen (CI 2026-10-11). Fails the job otherwise.
+ */
+async function assertNotFoundShown(page, vp, urlPath, status) {
+  const msgs = JSON.parse(await readFile(path.join(BELAJAR_DIR, "messages", "id.json"), "utf8"));
+  const title = msgs.NotFound?.title;
+  if (!title) throw new Error("messages/id.json has no NotFound.title");
+  const heading = page.locator("main [data-not-found] h1");
+  const shown = await heading.isVisible().catch(() => false);
+  const text = shown ? (await heading.innerText()).trim() : "";
+  if (status !== 404 || !shown || text !== title)
+    throw new Error(`${vp} ${urlPath}: not the module's 404 on screen (status ${status}, heading ${shown ? `“${text}”` : "not visible"}, expected “${title}”)`);
+  console.log(`  404 ok: ${vp} ${urlPath} shows “${title}”`);
+}
+
 await mkdir("shots", { recursive: true });
 const DEFAULT_RUN = !WARIS_ONLY && !SURAHS_ON;
 const narration = DEFAULT_RUN ? await narrationIndex() : new Map();
@@ -1112,10 +1131,11 @@ try {
     if (!WARIS_ONLY) await ctx.grantPermissions(["clipboard-read", "clipboard-write"], { origin: new URL(BASE).origin });
     const page = await ctx.newPage();
     for (const [name, path] of WARIS_ONLY ? WARIS_PAGES : SURAHS_ON ? SURAH_PAGES : PAGES) {
-      await page.goto(BASE + path, { waitUntil: "networkidle" });
+      const res = await page.goto(BASE + path, { waitUntil: "networkidle" });
       await page.evaluate(() => document.fonts.ready);
       await page.screenshot({ path: `shots/${vp}-${name}.png`, fullPage: true });
       console.log(`shot ${vp}-${name} (${path})`);
+      if (name.endsWith("-tersembunyi-404")) await assertNotFoundShown(page, vp, path, res?.status());
     }
     if (WARIS_ONLY) {
       await ctx.close();

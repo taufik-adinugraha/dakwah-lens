@@ -55,6 +55,17 @@ function visibleText(html) {
     .replace(/\s+/g, " ");
 }
 const mainOf = (html) => /<main\b[^>]*>([\s\S]*)<\/main>/i.exec(html)?.[1] ?? "";
+/**
+ * The module's own 404 page (src/app/[locale]/not-found.tsx) answered: its title in the visible
+ * server HTML, or its `data-not-found` marker anywhere in the response. Next sends this page in
+ * the RSC payload, not as server HTML (CI 2026-10-11: every hidden URL answered 404, yet its title
+ * was in no visible text), and it serialises the locale layout's not-found boundary there; no
+ * message carries the marker, so the next-intl messages payload (which holds the title on every
+ * page) cannot pass this. With the 404 status checked beside it, the marker says the module's
+ * page answered, not Next's bare default 404; that the browser draws its title is checked on the
+ * real page by screenshots.mjs (the hidden surah's 404 shot).
+ */
+const moduleNotFound = (locale, html) => visibleText(html).includes(MSG[locale].NotFound.title) || html.includes("data-not-found");
 const count = (text, s) => text.split(s).length - 1;
 
 /** A link into surah `slug`'s lesson pages, rendered or in the RSC payload (see the top). */
@@ -122,7 +133,7 @@ async function checkHidden() {
         const { status, html } = await get(path);
         console.log(`${path} -> ${status}`);
         if (status !== 404) fail(path, `status ${status}, expected 404 (${slug} is not published)`);
-        if (!visibleText(html).includes(MSG[locale].NotFound.title)) fail(path, "not the module's 404 page");
+        if (!moduleNotFound(locale, html)) fail(path, "not the module's 404 page");
         if (html.includes('data-autoplay="start"')) fail(path, "the 404 carries the lesson stage");
         if (leaks(slug, html)) fail(path, `the 404 carries ${leaks(slug, html)} ayah(s) of ${slug}`);
       }
