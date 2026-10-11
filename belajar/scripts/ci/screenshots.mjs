@@ -1090,6 +1090,11 @@ async function quizVoiceCheck(page, vp, index) {
     // The exercise waits once its introduction and its options prompt are through.
     const prompt = shared["shared:ex:label-role:options"];
     await said(prompt, 0, "the options prompt");
+    // The player preloads a line while the one before it plays, so its request is not its start:
+    // wait until the prompt is the line on screen, then for it to finish.
+    for (let i = 0; i < 200 && (await caption.getAttribute("data-line")) !== "shared:ex:label-role:options"; i++) {
+      await page.waitForTimeout(150);
+    }
     await page.waitForTimeout((prompt.audio?.ms ?? 3000) + 1500);
 
     // 1. Arabic on every label.

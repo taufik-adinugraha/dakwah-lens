@@ -759,10 +759,14 @@ export function LessonStage({
           fold, behind the controls (CI shot, 2026-10-10). In order: a
           notice (sound blocked, a recording failed), the caption (not
           during an exercise: its prompt stays above it), then the controls.
-          Phones: two rows — the main control with "↺ Ulangi" beside it,
-          then ‹ Sebelumnya · Berikutnya ›. From sm the two row wrappers
-          dissolve (display: contents) and the order utilities line all four
-          up: ‹ Sebelumnya · main · ↺ Ulangi langkah ini · Berikutnya ›. */}
+          Three colours by role (operator, 2026-10-11): play / pause / resume
+          forest (btn-primary), the replay amber (btn-replay), Sebelumnya and
+          Berikutnya one warm grey and the same size (btn-nav). Phones: two
+          rows — the main control and "↺ Ulangi" (3 : 2), then ‹ Sebelumnya ·
+          Berikutnya › in equal halves. From sm the row wrappers dissolve
+          (display: contents) into one 4-column grid, the order utilities
+          lining them up: ‹ Sebelumnya · main · ↺ Ulangi langkah ini ·
+          Berikutnya ›, the two ends equal. */}
       {showBar && (
         <div
           ref={barRef}
@@ -784,10 +788,12 @@ export function LessonStage({
           <div
             role="group"
             aria-label={t("controls_label")}
-            className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center"
+            className="flex flex-col gap-3 sm:grid sm:grid-cols-[1fr_1.15fr_1.3fr_1fr] sm:items-center"
           >
-            <div className="flex flex-wrap items-center gap-3 sm:contents">
-              <div className="relative min-w-0 grow basis-40 sm:order-2 sm:basis-auto">
+            {/* Phones, row 1: play / pause 3 : replay 2 (the replay a little wider than its word
+                needs, operator 2026-10-11). From sm the row dissolves into the 4-column grid. */}
+            <div className="grid grid-cols-[3fr_2fr] items-center gap-3 sm:contents">
+              <div className="relative min-w-0 sm:order-2">
                 {lanjutGuide && <BarSpotLabel label={lanjutGuide.label} />}
                 <button
                   ref={focusOnMount}
@@ -796,11 +802,7 @@ export function LessonStage({
                   data-mode={middle}
                   data-guide={middle === "lanjut" ? "lanjut" : undefined}
                   onClick={onMiddle}
-                  className={clsx(
-                    middle === "pause" ? "btn-secondary" : "btn-primary",
-                    "w-full min-h-14!",
-                    lanjutGuide && BAR_RING,
-                  )}
+                  className={clsx("btn-primary w-full min-h-14!", lanjutGuide && BAR_RING)}
                 >
                   {middle === "pause" ? (
                     <Pause aria-hidden className="h-5 w-5" />
@@ -820,7 +822,7 @@ export function LessonStage({
                 data-autoplay="replay"
                 onClick={actions.replay}
                 aria-label={t("replay")}
-                className="btn-secondary min-h-14! shrink-0 px-3! sm:order-3 sm:grow sm:px-5!"
+                className="btn-replay w-full min-h-14! px-3! sm:order-3 sm:px-5!"
               >
                 <RotateCcw aria-hidden className="h-5 w-5" />
                 <span aria-hidden className="sm:hidden">
@@ -831,7 +833,9 @@ export function LessonStage({
                 </span>
               </button>
             </div>
-            <div className="flex flex-wrap items-center gap-3 sm:contents">
+            {/* Row 2: ‹ Sebelumnya and Berikutnya › (or "Lewati latihan"), equal halves, one
+                colour for moving between steps (operator 2026-10-11). */}
+            <div className="grid grid-cols-2 items-center gap-2 sm:contents">
               <button
                 type="button"
                 data-autoplay="prev"
@@ -839,12 +843,12 @@ export function LessonStage({
                   if (view.index > 0) actions.prev();
                 }}
                 aria-disabled={view.index === 0}
-                className="btn-secondary grow px-2.5! sm:order-1 sm:px-5!"
+                className="btn-nav w-full sm:order-1 sm:px-5!"
               >
                 <ChevronLeft aria-hidden className="h-5 w-5" />
                 {t("prev")}
               </button>
-              <div className="relative grow sm:order-4">
+              <div className="relative min-w-0 sm:order-4">
                 {skipGuide && <BarSpotLabel label={skipGuide.label} align="end" />}
                 <button
                   type="button"
@@ -852,11 +856,11 @@ export function LessonStage({
                   data-guide={view.showSkip ? "skip" : undefined}
                   onClick={actions.forward}
                   className={clsx(
-                    // Narrower side padding on phones (and no skip icon)
-                    // keeps ‹ Sebelumnya and this button — "Lewati latihan"
-                    // too, a label the voice says in full — on one row at
-                    // the normal text size.
-                    "btn-secondary w-full px-2.5! sm:px-5!",
+                    // Narrow side padding on phones (and no skip icon) keeps
+                    // ‹ Sebelumnya and this button — "Lewati latihan" too, a
+                    // label the voice says in full — in two equal halves of
+                    // one row at the normal text size.
+                    "btn-nav w-full sm:px-5!",
                     view.showSkip && "min-h-14! font-semibold",
                     skipGuide && BAR_RING,
                   )}

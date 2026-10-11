@@ -86,8 +86,7 @@ export async function cardResponse(card: CardText): Promise<ImageResponse> {
             <div style={{ fontSize: 20, lineHeight: 1.3, marginTop: 10, color: INK_SOFT }}>{card.source}</div>
           ) : null}
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 22, color: INK_SOFT }}>
-          <div>{card.disclaimer}</div>
+        <div style={{ display: "flex", justifyContent: "flex-end", fontSize: 22, color: INK_SOFT }}>
           <div>dakwah-lens.id/belajar</div>
         </div>
       </div>

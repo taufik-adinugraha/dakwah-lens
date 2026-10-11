@@ -21,9 +21,7 @@
     "surah_ayat": "{name} ({ayat} ayat)",
     "concepts_title": "Konsep tata bahasa",
     "concepts_body": "Pustaka nahwu dan sharaf: setiap konsep dijelaskan sekali, lalu dipakai ulang di setiap pelajaran yang memuatnya.",
-    "concepts_available": "{n} konsep nahwu dan sharaf",
-    "status_beta": "Uji coba",
-    "status_beta_draft": "Uji coba · dibantu AI"
+    "concepts_available": "{n} konsep nahwu dan sharaf"
   },
   "Quran": {
     "title": "Bahasa Arab Al-Qur'an",
@@ -87,8 +85,7 @@
     "lesson_title": "{surah} · Ayat {n}",
     "lesson_description": "“{translation}” Pelajari kata demi kata: arti, akar kata, dan alasan harakat di akhirnya.",
     "image_alt": "Belajar Bahasa Arab Al-Qur'an, dari Dakwah-Lens",
-    "lesson_image_alt": "{surah} · Ayat {n}: transliterasi dan terjemahan, Belajar Bahasa Arab Al-Qur'an dari Dakwah-Lens",
-    "disclaimer": "Dibantu AI, bukan fatwa otoritatif"
+    "lesson_image_alt": "{surah} · Ayat {n}: transliterasi dan terjemahan, Belajar Bahasa Arab Al-Qur'an dari Dakwah-Lens"
   },
   "Credits": {
     "title": "Sumber & lisensi",

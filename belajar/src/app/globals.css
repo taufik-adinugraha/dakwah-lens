@@ -253,6 +253,71 @@ body {
 }
 
 /* Standard buttons and toggles: 48px tall, visible ≥3:1 border. */
+/* The lesson's controls bar, three colours by role (operator, 2026-10-11: "let use 3 different
+   colors: 1 color for sebelumnya & berikutnya, also make the size equal; 1 color for
+   play/resume, 1 color for reply, make reply button slightly longer"): play / pause / resume is
+   btn-primary (forest), the replay is amber (btn-replay), moving between steps is a warm grey
+   (btn-nav). Each keeps the 48–56px target, the visible ≥3:1 border and the module's focus ring;
+   colour is never the only cue (each button also has its icon and its word). */
+@utility btn-replay {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0.375rem 1.25rem;
+  border: 1.5px solid var(--color-notice);
+  border-radius: 9999px;
+  background-color: var(--color-notice-bg); /* #8a4d00 on #fbefe3: 5.9:1 */
+  color: var(--color-notice);
+  font-size: var(--text-base);
+  line-height: 1.35;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition-property: background-color, border-color, color;
+  transition-duration: 150ms;
+  @media (hover: hover) {
+    &:hover {
+      background-color: #f6e2cc;
+    }
+  }
+}
+
+@utility btn-nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  min-height: 3rem;
+  padding: 0.375rem 0.75rem;
+  border: 1.5px solid var(--color-border-ui);
+  border-radius: 9999px;
+  background-color: #ebe7dc; /* ink #1b1a17 on it: 14.1:1 */
+  color: var(--color-ink);
+  font-size: var(--text-base);
+  line-height: 1.35;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  transition-property: background-color, border-color, color;
+  transition-duration: 150ms;
+  @media (hover: hover) {
+    &:hover:not(:disabled, [aria-disabled="true"]) {
+      border-color: var(--color-forest);
+      background-color: #e3dfd2;
+    }
+  }
+  /* Not yet possible (the first step): dashed and paler, never only a colour change. */
+  &:disabled,
+  &[aria-disabled="true"] {
+    background-color: var(--color-paper);
+    border-style: dashed;
+    color: var(--color-ink-muted);
+    cursor: not-allowed;
+  }
+}
+
 @utility btn-secondary {
   display: inline-flex;
   align-items: center;

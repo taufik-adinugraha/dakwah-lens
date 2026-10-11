@@ -212,7 +212,9 @@ export function WordCard({
                       <span className="font-semibold text-ink">
                         <MixedText text={`${x.point}:`} />
                       </span>
-                      <ul className="mt-1 list-disc space-y-1 pl-5">
+                      {/* No indent: at Sangat besar on a phone the column is already the width of
+                          its longest word ("membolehkannya,"). */}
+                      <ul className="mt-1 space-y-1">
                         {x.options.map((o) => (
                           <li key={o}>
                             <MixedText text={o} />

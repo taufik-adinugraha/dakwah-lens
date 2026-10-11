@@ -32,7 +32,7 @@ function allCards(): [string, CardText][] {
   }
   return cards;
 }
-const textsOf = (c: CardText) => [c.eyebrow, c.title, c.translit, c.body, c.source, c.disclaimer].filter((x): x is string => !!x);
+const textsOf = (c: CardText) => [c.eyebrow, c.title, c.translit, c.body, c.source].filter((x): x is string => !!x);
 
 /** The code points a TrueType font maps (cmap formats 4 and 12; enough for these files). */
 function cmap(file: string): Set<number> {
@@ -119,8 +119,8 @@ describe("share cards (lib/og)", () => {
     expect(card.body).toBe(`“${s.ayat[0].translation.text}”`);
     expect(card.source).toBe(s.ayat[0].translation.source_label);
     expect(lessonCard(og("en"), s, s.ayat[0]).title).toBe("Al-Fatihah · Ayah 1");
-    // The module's AI label travels with every card (AGENTS.md).
-    for (const [, c] of cards) expect(c.disclaimer).toMatch(/Dibantu AI, bukan fatwa otoritatif|AI-assisted, not an authoritative fatwa/);
+    // No AI label on the cards (operator, 2026-10-11); the pages keep theirs in the footer.
+    for (const [, c] of cards) expect(textsOf(c).join(" ")).not.toMatch(/Dibantu AI|bukan fatwa|AI-assisted|fatwa/i);
   });
 
   it("drops footnote markers and cuts a long translation at a word", () => {
