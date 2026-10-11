@@ -26,8 +26,15 @@
  *    ignored there until then (map the forward control to `skip`). The
  *    exercise reports its controls (exercise_guide): each control's prompt
  *    (shared:ex:${key}:${part}, or the ayah's own) is spoken the first time
- *    it comes up, and shown silently after that; the spotlight follows it;
- *    answers get shared:correct / shared:try_again. While waiting,
+ *    it comes up, and shown silently after that; the spotlight follows it.
+ *    Feedback is voiced for the CORRECT answer only (operator 2026-10-10:
+ *    "give narration/voice only for the correct answer, to give auditory
+ *    explanation"): a right answer says shared:correct and then the
+ *    explanation of that question's answer (the step's
+ *    "${slug}:${ayah}:ex:${key}:${n}:why" cue); "Tunjukkan jawaban"
+ *    (`revealed`) says shared:revealed and the same explanation; a wrong pick
+ *    says nothing and changes nothing that plays (the exercise shows its
+ *    "Belum tepat" note) — it only counts as the learner acting. While waiting,
  *    `idle_tick`s add up silent time and fire a gentle reminder at 20 s,
  *    40 s and 60 s (at most 3 between two actions of the learner):
  *    shared:reminder + the current prompt; the third also offers "Lewati
@@ -37,8 +44,8 @@
  *      "play"; the lesson's imam recites it (a recite activity on the
  *      stage's one, already unlocked player), then `exercise.heard` says
  *      so and the exercise offers its words;
- *    · a settled question ("next": answered right, or its answer shown —
- *      then shared:revealed is said) stays for advanceHoldMs and then
+ *    · a settled question ("next": answered right, or its answer shown) stays,
+ *      after its feedback and explanation, for advanceHoldMs and then
  *      `exercise.advance` counts up: the exercise moves to its next
  *      question (or finishes) by itself. Its own "Lanjut" stays as a way to
  *      go sooner. "Tunggu saya" keeps the old way: the "next" prompt and
@@ -226,8 +233,11 @@ export type AutoplayEvent =
   | { type: "recite_end"; token: number }
   | { type: "recite_error"; token: number }
   | { type: "timer"; token: number }
-  /** guided.onAnswer of the exercise `key`. */
-  | { type: "answered"; key: ExerciseKey; correct: boolean }
+  /** guided.onAnswer of the exercise `key`; `question`: the number of the
+   *  question answered (content/quiz), whose explanation a right answer gets. */
+  | { type: "answered"; key: ExerciseKey; correct: boolean; question?: number }
+  /** guided.onReveal: "Tunjukkan jawaban" on question `question`. */
+  | { type: "revealed"; key: ExerciseKey; question?: number }
   /** guided.onGuide: the control to use next, "exercise:${key}:${part}";
    *  with "play", the word (1-based) the question asks about. */
   | { type: "exercise_guide"; target: string | null; word?: number }
@@ -291,6 +301,13 @@ function sayPlan(s: AutoplayState, step: AutoplayStep, seq: AutoplaySequence, re
   const say: Action = part ? { t: "say", ref, part } : { t: "say", ref };
   if (!audible(s, cueOf(seq, step, ref))) return [say];
   return [say, part ? { t: "settle", after: "narration", part } : { t: "settle", after: "narration" }];
+}
+
+/** The explanation of question `question`'s answer (its cue in an exercise step), as a plan;
+ *  [] when the step has none for it (no narration, or no question number). */
+function explainPlan(s: AutoplayState, step: AutoplayStep, seq: AutoplaySequence, question: number | undefined): Action[] {
+  const c = question === undefined ? undefined : step.exercise?.explain[question];
+  return c === undefined ? [] : sayPlan(s, step, seq, { c });
 }
 
 function captionParts(seq: AutoplaySequence, step: AutoplayStep, ref: CaptionRef): { parts: string[]; line: string | null } {
@@ -657,19 +674,31 @@ export function reduceAutoplay(seq: AutoplaySequence, s: AutoplayState, e: Autop
       return { ...s, phase: "paused", pausedFrom: "running", activity: null, resumeRecite: false, error: "recite" };
     }
 
-    case "answered": {
+    case "answered":
+    case "revealed": {
       const step = stepOf(seq, s);
       const ex = s.exercise;
       if (!isOpen(ex) || step.exercise?.key !== e.key) return s;
-      const ex2: ExerciseState = { ...ex, reminders: 0, idleMs: 0, skipOffered: false, right: ex.right || e.correct };
+      const right = e.type === "answered" && e.correct;
+      const ex2: ExerciseState = { ...ex, reminders: 0, idleMs: 0, skipOffered: false, right: ex.right || right };
+      // A wrong pick: no voice (operator 2026-10-10), nothing that plays is cut — the learner
+      // acted, so the reminders start over and the spotlight drops "Lewati latihan".
+      if (e.type === "answered" && !e.correct) {
+        return { ...s, exercise: ex2, guides: s.phase === "waiting" ? exerciseGuides(seq, step, ex2, s.pace) : s.guides };
+      }
       if (s.phase !== "running" && s.phase !== "waiting") return { ...s, exercise: ex2 };
-      // The imam's word still to come for this control (a pick before he
-      // finished) plays after the feedback line; a right answer moves the
-      // exercise to "next", which drops it.
+      // "Benar." (or "Ini jawabannya.") and the explanation of that question's answer, then the
+      // imam's word still to come for this control (a pick before he finished); a settled
+      // question moves the exercise to "next", which drops that word.
       const rest = s.plan.slice(s.at);
       const from = rest.findIndex((a) => a.t === "recite" && partOf(a) === ex.part);
       const keep = from === -1 ? [] : rest.slice(from).filter((a) => a.t !== "await" && partOf(a) === ex.part);
-      const plan: Action[] = [...sayPlan(s, step, seq, { s: e.correct ? "correct" : "try_again" }), ...keep, { t: "await" }];
+      const plan: Action[] = [
+        ...sayPlan(s, step, seq, { s: right ? "correct" : "revealed" }),
+        ...explainPlan(s, step, seq, e.question),
+        ...keep,
+        { t: "await" },
+      ];
       return run(seq, { ...s, exercise: ex2, plan, at: 0, part: 0, seg: 0, activity: null }, false);
     }
 
@@ -704,11 +733,9 @@ export function reduceAutoplay(seq: AutoplaySequence, s: AutoplayState, e: Autop
         voiced: first ? [...ex.voiced, g.part] : ex.voiced,
       };
       const base: AutoplayState = { ...s, lastPart, exercise: ex2, guides: exerciseGuides(seq, step, ex2, s.pace) };
-      // A settled question whose answer was SHOWN (not answered right) says
-      // so, like "Benar." (untagged feedback: it finishes even if the
-      // learner moves on at once).
-      const revealed: Action[] = g.part === "next" && !samePart && !ex.right ? sayPlan(s, step, seq, { s: "revealed" }) : [];
-      const lines = [...revealed, ...partPlan(seq, base, step, ex2, g.part, samePart ? "none" : first ? "say" : "show")];
+      // (A settled question whose answer was SHOWN said so on `revealed`, with its explanation:
+      // untagged feedback, which finishes even if the learner moves on at once.)
+      const lines = partPlan(seq, base, step, ex2, g.part, samePart ? "none" : first ? "say" : "show");
       const stale = (a: Action | undefined) => {
         const p = partOf(a);
         return p !== undefined && p !== g.part;
@@ -743,9 +770,15 @@ export function reduceAutoplay(seq: AutoplaySequence, s: AutoplayState, e: Autop
       const base: AutoplayState = { ...s, doneKeys, exercise: { ...ex, closed: "done", skipOffered: false }, guides: [] };
       if (s.phase === "paused") return { ...base, plan: [{ t: "hold" }], at: 0, part: 0, seg: 0, resumeRecite: false };
       const current = s.plan[s.at];
-      if (s.phase === "running" && s.activity && current?.t === "say" && partOf(current) === undefined) {
-        // Let the line that is playing (e.g. "Benar.") finish first.
-        return { ...base, plan: [current, { t: "hold" }], at: 0 };
+      if (s.phase === "running" && s.activity && (current?.t === "say" || current?.t === "settle") && partOf(current) === undefined) {
+        // Let the feedback that is playing ("Benar." and the explanation after it, untagged)
+        // finish first: the last answer of a sort ends the exercise as it is said.
+        const chain: Action[] = [current];
+        for (const a of s.plan.slice(s.at + 1)) {
+          if ((a.t !== "say" && a.t !== "settle") || partOf(a) !== undefined) break;
+          chain.push(a);
+        }
+        return { ...base, plan: [...chain, { t: "hold" }], at: 0 };
       }
       return run(seq, { ...base, plan: [{ t: "hold" }], at: 0, part: 0, seg: 0, activity: null }, false);
     }

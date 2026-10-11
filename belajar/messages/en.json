@@ -175,7 +175,7 @@
     "why_question": "Why does this word end the way it does?",
     "why_sign": "Its ending: {sign}",
     "sort_title": "Group by ending",
-    "sort_instruction": "Put each word in the group for its ending. A word's ending changes with its place in the sentence (i'rab); a mabnī word keeps the same ending.",
+    "sort_instruction": "Put each word in the group for its ending. A word's ending changes with its place in the sentence (i'rab).",
     "sort_steps_label": "Steps",
     "sort_step_word": "1. Pick one word",
     "sort_step_bin": "2. Pick its group",
@@ -187,10 +187,8 @@
     "role_instruction": "Choose each word's role in this ayah's sentence.",
     "role_question": "What is this word's role in the sentence?",
     "wazn_title": "Word forms (wazan)",
-    "wazn_instruction": "One root gives several word forms. Pick the form that matches its name.",
+    "wazn_instruction": "Pick the word form that matches its name. These forms come from tashrif.",
     "wazn_question": "Which is the <b>{label}</b> form?",
-    "wazn_root": "Root:",
-    "wazn_bab": "Pattern (bab):",
     "wazn_note": "These are Arabic word forms from tashrif (how a word changes form), not quotations of an ayah."
   },
   "Concept": {

@@ -529,8 +529,12 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
       setLearnerWord(true);
       dispatch({ type: "pause" });
     },
-    answered(key: ExerciseKey, correct: boolean) {
-      dispatch({ type: "answered", key, correct });
+    answered(key: ExerciseKey, correct: boolean, question?: number) {
+      dispatch({ type: "answered", key, correct, question });
+    },
+    /** "Tunjukkan jawaban" on question `question`. */
+    revealed(key: ExerciseKey, question?: number) {
+      dispatch({ type: "revealed", key, question });
     },
     exerciseDone(key: ExerciseKey) {
       dispatch({ type: "exercise_done", key });

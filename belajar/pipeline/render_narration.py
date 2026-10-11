@@ -178,7 +178,7 @@ def dry_run(rows: list[tuple[str, str, str]], manifests: dict[str, dict]) -> Non
     print("dry run: nothing was sent. A render needs --render --i-approve-spend --voice-id --voice-name.")
 
 
-def render(rows, manifests, lessons, args) -> int:
+def render(rows, manifests, lessons, args, library: dict | None = None) -> int:
     voice_slug = V.slugify(args.voice_name)
     voice = {"id": args.voice_id, "name": args.voice_name, "model": MODEL}
     root = Path(args.out).resolve() / "narration" / voice_slug
@@ -208,7 +208,7 @@ def render(rows, manifests, lessons, args) -> int:
         mp3, aligned = root / name / f"{file}.mp3", root / name / f"{file}.json"
         # A letter term's shape on screen: the focus word's, or the animation frame's (primer /
         # compose lines), exactly as build_narration and validate_narration take it.
-        focus_ar = V.letters_for(name, lessons, forms, compose)(lid, line)
+        focus_ar = V.letters_for(name, lessons, forms, compose, library)(lid, line)
         if (line.get("audio") or {}).get("url") == url and "tokens" in line and not mp3.exists():
             print(f"skip   {lid} (the manifest already has this audio)")
             continue
@@ -297,7 +297,7 @@ def main() -> int:
                          "the line, or narrow --only):\n  " + "\n  ".join(f"{lid}: {', '.join(ws)}" for lid, ws in held[:40]))
     for row in unheard(rows, manifests, V.load_lexicon()):
         print(f"pending ear check, rendering anyway (the operator waived the pre-render review): {row}")
-    return render(rows, manifests, lessons, args)
+    return render(rows, manifests, lessons, args, library)
 
 
 if __name__ == "__main__":

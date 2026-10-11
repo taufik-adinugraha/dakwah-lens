@@ -13,13 +13,17 @@
  *                                      w${n}:compose:${k} | structure |
  *                                      concept:${conceptId} |
  *                                      ex:${exerciseKey}:intro |
+ *                                      ex:${exerciseKey}:${n}:why |
  *                                      recap | next | done
  *   (primer:${k}: the k-th line of the harakat primer that opens an ayah;
  *    w${n}:compose:${k}: the k-th line of word n's composition — both play
  *    over an animation frame, the manifest's `frame`; operator 2026-10-10,
- *    narration rule 14, content/compose/${slug}.json)
- *   "shared:${key}"             start | resume | correct | try_again |
- *                               revealed | reminder | skip_offer | surah_done
+ *    narration rule 14, content/compose/${slug}.json; ex:${key}:${n}:why:
+ *    the explanation of question n's correct answer, said after "Benar." or
+ *    "Ini jawabannya." — operator 2026-10-10; the questions are
+ *    content/quiz/${slug}.json's)
+ *   "shared:${key}"             start | resume | correct | revealed |
+ *                               reminder | skip_offer | surah_done
  *   "shared:ex:${exerciseKey}:${part}"   the prompt for one control of an
  *                               exercise, the same on every ayah — unless the
  *                               ayah's manifest has its own
@@ -103,12 +107,14 @@ export type Guide = { target: GuideTarget; label: string };
 // ───────────────────────────── Narration ─────────────────────────────
 
 /** Generic lines in content/narration/shared.json ("shared:${key}"),
- *  besides the exercise prompts "shared:ex:${key}:${part}". */
+ *  besides the exercise prompts "shared:ex:${key}:${part}". No "try_again"
+ *  since 2026-10-11: a wrong pick is not voiced (operator 2026-10-10: "give
+ *  narration/voice only for the correct answer"); the exercise shows its
+ *  "Belum tepat" note on screen. */
 export const SHARED_KEYS = [
   "start",
   "resume",
   "correct",
-  "try_again",
   "revealed",
   "reminder",
   "skip_offer",
@@ -257,6 +263,10 @@ export type ExerciseSpec = {
   promptCue: Partial<Record<GuidePart, number>>;
   /** Spotlight of each part. */
   guides: Partial<Record<GuidePart, Guide>>;
+  /** Cue index of the explanation of question n's correct answer
+   *  ("${slug}:${ayah}:ex:${key}:${n}:why"), by n — only for the lines the
+   *  ayah's manifest has (none on a page without narration). */
+  explain: Partial<Record<number, number>>;
 };
 
 export type ReciteTarget = { target: "ayah" } | { target: "word"; word: number };

@@ -278,7 +278,9 @@ MUTATIONS = [
     ("intro without the translation", set_text("al-fatihah:3:intro", "Ayat ketiga Surah Al-Fatihah."),
      "does not read the translation"),
     # --- the pronunciation dictionary (operator review of the Al-Fatihah 1 preview, 2026-10-10)
-    ("Arabic that is not a dictionary term", append_text(W, " Ini مُبْتَدَأ."),
+    # مُسْتَتِر: a term of the Konsep table the pronunciation dictionary does not have (مُبْتَدَأ, the
+    # earlier example, is in it since 2026-10-11).
+    ("Arabic that is not a dictionary term", append_text(W, " Ini مُسْتَتِر."),
      "not a pronunciation-dictionary term"),
     ("Qur'anic word in Arabic script", append_text(W, " Lalu بِسْمِ."), "Qur'anic word 'بِسْمِ' (Arabic script)"),
     ("heavy-letter term spoken from Arabic", replace_in("al-fatihah:1:w2:compose:2", "text", "mudhof ilaih", "مُضَاف إِلَيْه"),
@@ -464,9 +466,12 @@ class Dictionary(unittest.TestCase):
         self.assertEqual(shown, "Akhirnya kasrah (كَسْرَة) karena menjadi sifat, atau na’t (نَعْت), bagi kata kedua, "
                                 "lalu mudhaf ilaih (مُضَاف إِلَيْه).")
         self.assertEqual(LEX.speech_of_display(shown), sp.spoken(marked))
-        # "huruf" stays Indonesian outside the three word classes; compounds stay as written
+        # "huruf" stays Indonesian outside the three word classes; a compound the dictionary has
+        # (2026-10-11) is said whole, from Arabic script or its respelling (ض + alif: rule 9) …
         self.assertEqual(sp.spoken(sp.mark("empat huruf, isim fa'il, dan fi'il mudhari'")),
-                         "empat huruf, isim fa'il, dan fi'il mudhari'")
+                         "empat huruf, اِسْم فَاعِل, dan fi'il mudhori'")
+        # … and one it lacks keeps its head as written (held until the dictionary has it)
+        self.assertEqual(sp.spoken(sp.mark("fi'il majhul")), "fi'il majhul")
         # the letter of a preposition: its name is said, the letter as in the ayah is shown
         marked = sp.mark("Huruf lam yang artinya “bagi”.")
         self.assertEqual(sp.spoken(marked), "Huruf لَام yang artinya bagi.")

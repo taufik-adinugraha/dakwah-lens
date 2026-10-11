@@ -5,10 +5,11 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 import { loadCheckInput, runAutoplayChecks } from "@/lib/autoplay/checks";
-import { availableExercises, buildAutoplaySequence, hasArabicScript, timedWords } from "@/lib/autoplay";
+import { availableExercises, buildAutoplaySequence, hasArabicScript, questionNumbers } from "@/lib/autoplay";
 import { composeInput } from "@/lib/compose-content";
 import { SURAHS } from "@/lib/content";
-import { conceptsIntroducedIn, getLexeme } from "@/lib/library";
+import { conceptsIntroducedIn } from "@/lib/library";
+import { quizAyah } from "@/lib/quiz-content";
 import { SURAH_SLUGS } from "@/lib/routes";
 
 import { stageSequence } from "./build";
@@ -64,7 +65,8 @@ describe("autoplay stage: what the lesson page ships", () => {
             ayahCount: s.ayat.length,
             ayah: a,
             introduced: conceptsIntroducedIn(a.loc),
-            exercises: availableExercises({ words: a.words, timed: timedWords(a), lexeme: getLexeme }),
+            exercises: availableExercises(quizAyah(s.slug, a.ayah)),
+            questions: questionNumbers(quizAyah(s.slug, a.ayah)),
             texts: autoplayTexts(locale),
             // The narration is Indonesian: an English page stays caption-only.
             narration: locale === "id" ? narrationFor(s.slug) : null,

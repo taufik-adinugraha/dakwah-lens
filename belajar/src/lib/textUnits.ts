@@ -151,9 +151,13 @@ export function textUnits(text: string): Seg[] {
       const inside = bracket[1].match(ARABIC_WORD) ?? [];
       const n = Math.min(TERM_WORDS, inside.every((w) => letters(w) <= 1) ? 1 : inside.reduce((k, w) => k + namesFor(w), 0));
       const latin = (k: number) => k >= 0 && free(k) && !ar[k] && LATIN_WORD.test(toks[k].w);
+      // A hyphenated head names one Arabic word per part: "jar-majrur (جَارّ وَمَجْرُور)" is the
+      // whole term, not "frasa jar-majrur" (the quiz narration's dictionary terms, 2026-10-11).
+      const named = (k: number) => toks[k].w.split(/[-‐‑]/u).filter(Boolean).length;
       if (latin(i - 1) && ENDS_LATIN.test(toks[i - 1].w)) {
         b = i - 1;
-        while (i - b < n && latin(b - 1)) b--;
+        let have = named(b);
+        while (have < n && latin(b - 1)) have += named(--b);
       }
     } else if (closesOpen(core) && longWords(core) < QUOTE_WORDS) {
       // A short parenthetical that closes on the Arabic, "(seperti عَلِمَ–يَعْلَمُ)": the Latin

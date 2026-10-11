@@ -175,7 +175,7 @@
     "why_question": "Kenapa akhir kata ini dibaca seperti itu?",
     "why_sign": "Tanda akhirnya: {sign}",
     "sort_title": "Kelompokkan menurut akhiran",
-    "sort_instruction": "Masukkan setiap kata ke kelompok akhirannya. Akhir kata berubah menurut kedudukannya dalam kalimat (i'rab); kata mabnī akhirnya tetap.",
+    "sort_instruction": "Masukkan setiap kata ke kelompok akhirannya. Akhir kata berubah menurut kedudukannya dalam kalimat (i'rab).",
     "sort_steps_label": "Langkah",
     "sort_step_word": "1. Pilih satu kata",
     "sort_step_bin": "2. Pilih kelompoknya",
@@ -187,10 +187,8 @@
     "role_instruction": "Pilih peran setiap kata dalam kalimat ayat ini.",
     "role_question": "Apa peran kata ini dalam kalimat?",
     "wazn_title": "Bentuk-bentuk kata (wazan)",
-    "wazn_instruction": "Dari satu akar kata lahir beberapa bentuk kata. Pilih bentuk yang sesuai dengan namanya.",
+    "wazn_instruction": "Pilih bentuk kata yang sesuai dengan namanya. Bentuk-bentuk ini lahir dari tashrif.",
     "wazn_question": "Mana bentuk <b>{label}</b>?",
-    "wazn_root": "Akar kata:",
-    "wazn_bab": "Pola (bab):",
     "wazn_note": "Bentuk-bentuk ini kata Arab hasil tashrif (perubahan bentuk kata), bukan kutipan ayat."
   },
   "Concept": {

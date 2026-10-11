@@ -1172,6 +1172,10 @@
         {
           "frame": 3,
           "say": "Di ayat ini akhiran itu tidak berubah, karena kata ini menjadi pokok kalimat, dan tidak didahului kata lain yang mengubah akhirnya."
+        },
+        {
+          "frame": 3,
+          "say": "Kata yang akhirnya dhammah, bunyi u, karena kedudukannya seperti ini disebut marfu'."
         }
       ],
       "sources": [
@@ -1209,6 +1213,11 @@
           "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
           "ref": "hlm. 12, bab al-Mubtada' wal-Khabar: mubtada' adalah isim marfu' yang bebas dari 'amil lafzhi",
           "url": "https://shamela.ws/book/11371/11"
+        },
+        {
+          "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+          "ref": "hlm. 6, bab Ma'rifat 'Alamat al-I'rab: dhammah tanda rafa' (kata yang dibaca rafa' disebut marfu'; quiz audit 2026-10-11, T1)",
+          "url": "https://shamela.ws/book/11371/3"
         },
         {
           "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
@@ -2628,6 +2637,10 @@
           "say": "Akhirnya fathah, bunyi a. Berbeda dengan kata-kata sebelumnya, akhir kata ganti tidak berubah oleh kata lain dalam kalimat."
         },
         {
+          "frame": 1,
+          "say": "Kata yang akhirnya tetap seperti ini disebut mabni."
+        },
+        {
           "frame": 2,
           "say": "Kata ganti ini menjadi objek, yaitu yang dikenai perbuatan, dan diletakkan sebelum kata kerjanya."
         },
@@ -3325,6 +3338,10 @@
         {
           "frame": 3,
           "say": "Sebabnya, kata ini menjadi objek kedua dari kata pertama; objek pertamanya adalah dhamir yang artinya “kami”."
+        },
+        {
+          "frame": 3,
+          "say": "Kata yang akhirnya menjadi fathah, bunyi a, karena kedudukannya seperti ini disebut manshub."
         }
       ],
       "sources": [
@@ -5132,6 +5149,6 @@
   "data_versions": {
     "tanzil": "uthmani sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
-    "authored_compose": "authored/al-fatihah.compose.json sha256:f68321c0bec7a166ec926ca93643df988131dd91e6a797e41e048cfebf740bb7"
+    "authored_compose": "authored/al-fatihah.compose.json sha256:98a0a83790678393d59ae32c569efab261beca71c943941abb50c0ec13226810"
   }
 }

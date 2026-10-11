@@ -29,7 +29,8 @@ export type { ExerciseGuide, ExerciseKey, GuideInfo, GuidePart, GuideTarget } fr
  * takes two optional props. Without them it behaves exactly as before.
  *
  *   guided?: ExerciseGuide = {
- *     onAnswer?: (correct: boolean) => void;
+ *     onAnswer?: (correct: boolean, question?: number) => void;
+ *     onReveal?: (question?: number) => void;
  *     onDone?:   () => void;
  *     onGuide?:  (target: GuideTarget, info?: { word?: number }) => void;
  *     advance?:  number;          // the lesson moves a settled question on
@@ -37,11 +38,19 @@ export type { ExerciseGuide, ExerciseKey, GuideInfo, GuidePart, GuideTarget } fr
  *   }
  *   compact?: boolean
  *
- * onAnswer(correct) — on every answer: an option tapped in the choose-one
- *   exercises (a word chip in TapWord, heard or not), a group tapped with a
- *   word chosen in SortCase. Ignored taps (a settled question, an option
- *   already tried, a group with no word chosen) and "Tunjukkan jawaban" are
- *   not answers. Called from the click handler, before any onDone.
+ * onAnswer(correct, question) — on every answer: an option tapped in the
+ *   choose-one exercises (a word chip in TapWord, heard or not), a group
+ *   tapped with a word chosen in SortCase; `question` is the plan's number of
+ *   the question answered (content/quiz), whose explanation the lesson says
+ *   after "Benar." — a wrong pick is not voiced (operator 2026-10-10). Ignored
+ *   taps (a settled question, an option already tried, a group with no word
+ *   chosen) and "Tunjukkan jawaban" are not answers. Called from the click
+ *   handler, before any onDone.
+ *
+ * onReveal(question) — "Tunjukkan jawaban" pressed (every exercise): the
+ *   lesson says "Ini jawabannya." and the same explanation. Called from the
+ *   click handler, before the exercise reports its next control (and, in
+ *   SortCase, before onDone when it was the last word).
  *
  * onDone() — once, when the exercise is finished: after "Selesai" on the
  *   last question (the choose-one exercises), or with the last word placed
@@ -237,6 +246,9 @@ export function useChoiceQuiz<T extends string | number>(
   answers: readonly T[],
   /** Guided mode: onAnswer on every pick, onDone after the last "Selesai". */
   guided?: ExerciseGuide,
+  /** The plan's number of each question (content/quiz `n`), reported with
+   *  every answer and reveal; default: its position, 1-based. */
+  numbers?: readonly number[],
 ) {
   const { progress, markDone } = useProgress();
   const [i, setI] = useState(0);
@@ -247,21 +259,24 @@ export function useChoiceQuiz<T extends string | number>(
   const total = answers.length;
   const finished = i >= total;
   const answer: T | undefined = answers[Math.min(i, total - 1)];
+  const question = numbers?.[Math.min(i, total - 1)] ?? Math.min(i, total - 1) + 1;
 
   const choose = (opt: T) => {
     if (finished || resolved !== null || tried.includes(opt)) return;
     if (opt === answer) {
       setResolved("right");
       if (tried.length === 0) setFirstTry((n) => n + 1);
-      guided?.onAnswer?.(true);
+      guided?.onAnswer?.(true, question);
     } else {
       setTried((prev) => [...prev, opt]);
-      guided?.onAnswer?.(false);
+      guided?.onAnswer?.(false, question);
     }
   };
 
   const reveal = () => {
-    if (!finished && resolved === null) setResolved("revealed");
+    if (finished || resolved !== null) return;
+    setResolved("revealed");
+    guided?.onReveal?.(question);
   };
 
   const next = () => {
@@ -362,17 +377,22 @@ export function OptionButton({
   state,
   onClick,
   arabic = false,
+  optionKey,
   children,
 }: {
   state: OptionState;
   onClick: () => void;
   arabic?: boolean;
+  /** The option's key in the plan (content/quiz: the word it comes from, or a form label), as
+   *  `data-option`: the CI exercise check picks a right and a wrong option by it. */
+  optionKey?: string;
   children: ReactNode;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      data-option={optionKey}
       className={clsx(
         "flex w-full flex-col justify-center gap-1 rounded-xl border-2 px-4 py-2 text-base text-ink transition-colors",
         arabic ? "min-h-14 items-center text-center" : "min-h-12 items-start text-left",
