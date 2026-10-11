@@ -294,7 +294,24 @@
       "text": "Ini jawabannya.",
       "display": "Ini jawabannya.",
       "highlight": [],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/shared/7a8ee8931abeecf8.mp3",
+        "ms": 1071,
+        "sha256": "24a4228ec11f1bd514b458a87c3adb1c6bf9c2ef76b01fa10996191531fd990d"
+      },
+      "tokens": [
+        {
+          "t": "Ini",
+          "s": 0.0,
+          "e": 0.32
+        },
+        {
+          "t": "jawabannya.",
+          "s": 0.36,
+          "e": 1.04
+        }
+      ]
     },
     "shared:reminder": {
       "text": "Silakan lanjutkan latihannya. Bagian yang perlu diklik sedang diberi tanda di layar.",
