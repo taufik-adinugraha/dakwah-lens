@@ -97,11 +97,17 @@ What it enforces (README "Narasi" has the reasons):
   line highlights the words whose `concepts` list that concept and the words of the ayah's
   structure groups of that concept; the Dengar dan klik intro the whole ayah; every other line
   nothing. Shared lines: [] and null.
-- Audio (when present): url = /belajar/media/narration/<voice-slug>/<slug>/<file>.mp3 with <file>
-  the content address of the request (audio_name: sha256 of the spoken text, voice and settings),
-  so a line whose text changed can never keep old audio; ms > 0; 64-hex sha256; the manifest names
-  its voice. `tokens` (with audio only): [{t, s, e}] in time order within the clip, whose texts
-  joined by spaces equal the display rendering of the spoken text (render_display).
+- Audio (when present): {url, ms, sha256} of the DELIVERED file (operator 2026-10-11: the
+  narration is delivered at 64 kbps mono, DELIVERY_FORMAT; encode_narration.py makes it from the
+  128 kbps master render, which stays in pipeline/out and is never served). url =
+  /belajar/media/narration/<voice-slug>/<slug>/<file>.mp3 with <file> = delivery_name: the content
+  address of the master's request (audio_name: sha256 of the spoken text, voice and settings), the
+  delivery format and the sha256 of the delivered bytes. So a line whose text changed can never
+  keep old audio, a url with the master's own name fails, and so does a sha256 that is not the one
+  the file is named by, or a name made with another format tag: the three are bound together, with
+  no audio file needed to check them (CI has none). ms > 0; 64-hex sha256; the manifest names its
+  voice. `tokens` (with audio only): [{t, s, e}] in time order within the clip, whose texts joined
+  by spaces equal the display rendering of the spoken text (render_display).
 - The manifests equal a fresh build_narration.py run (no hand edits, no stale lines).
 """
 from __future__ import annotations
@@ -133,7 +139,11 @@ MODEL = "eleven_v3"
 TTS_LANGUAGE = "id"  # mode A: language_code "id"
 VOICE_SETTINGS = {"stability": 0.5, "style": 0.35, "similarity_boost": 0.75, "use_speaker_boost": True}
 TEXT_NORMALIZATION = "off"
-OUTPUT_FORMAT = "mp3_44100_128"
+OUTPUT_FORMAT = "mp3_44100_128"  # the MASTER render (mono), kept in pipeline/out/narration
+# What the learner downloads (operator 2026-10-11, "do all three": at 128 kbps the files were twice
+# what speech needs, and each line took that much longer to arrive on mobile data). Every master is
+# re-encoded once, with fixed flags, by encode_narration.py; the masters are never served.
+DELIVERY_FORMAT = "mp3_44100_64_mono"
 
 
 def request_body(text: str) -> dict:
@@ -148,11 +158,34 @@ def request_body(text: str) -> dict:
 
 
 def audio_name(text: str, voice_id: str) -> str:
-    """The file name (without .mp3) of a line's audio: the first 16 hex of the sha256 of the request
-    (text, voice, model, language, settings, output format). Unchanged text → same file, never
-    rendered twice; changed text → a new file, never a stale cached one."""
+    """The file name (without .mp3) of a line's MASTER render: the first 16 hex of the sha256 of the
+    request (text, voice, model, language, settings, output format). Unchanged text → same file,
+    never rendered twice; changed text → a new file, never a stale cached one. The master is not
+    what is served: see delivery_name."""
     key = {**request_body(text), "voice_id": voice_id, "output_format": OUTPUT_FORMAT}
     return hashlib.sha256(json.dumps(key, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()[:16]
+
+
+def delivery_name(text: str, voice_id: str, sha256: str, fmt: str = DELIVERY_FORMAT) -> str:
+    """The file name (without .mp3) of the audio a line is DELIVERED as, the one in the manifest's
+    url: the first 16 hex of the sha256 of the master's name (audio_name: the text, voice and
+    settings), the delivery format and the sha256 of the delivered file's bytes. Never the master's
+    name. A changed text, another format, or other bytes for the same text (a retake, an encoder
+    that writes differently) each give a new name, so no name ever means two files and the server
+    may let browsers keep them for good (Cache-Control immutable; operator 2026-10-11)."""
+    key = {"master": audio_name(text, voice_id), "delivery_format": fmt, "sha256": sha256}
+    return hashlib.sha256(json.dumps(key, sort_keys=True).encode("utf-8")).hexdigest()[:16]
+
+
+def master_url(voice: dict, slug: str, text: str) -> str:
+    """Where a line's master would be served from, were it served (it is not): the url the
+    manifests carried until 2026-10-11, and the master's path under pipeline/out/narration."""
+    return f"{MEDIA_PREFIX}{slugify(voice['name'])}/{slug}/{audio_name(text, voice['id'])}.mp3"
+
+
+def delivery_url(voice: dict, slug: str, text: str, sha256: str) -> str:
+    """The url of a line's delivered file (`sha256` of that file's bytes)."""
+    return f"{MEDIA_PREFIX}{slugify(voice['name'])}/{slug}/{delivery_name(text, voice['id'], sha256)}.mp3"
 
 
 # ------------------------------------------------------------------ the exercises (mirrors the app)
@@ -1023,6 +1056,10 @@ SHARED_ID = re.compile(r"^shared:(?P<part>[a-z_]+(?::[a-z-]+:[a-z_]+)?)(?::(?P<s
 HONORIFIC_RE = re.compile("|".join(re.escape(h) for h in HONORIFICS))
 QUOTED = re.compile("“[^”]*”")
 SHA = re.compile(r"^[0-9a-f]{64}$")
+
+
+def is_sha(x) -> bool:
+    return isinstance(x, str) and SHA.match(x) is not None
 KETUK = re.compile(r"\b(?:ketuk|ketuklah|mengetuk|diketuk|ketukan)\b", re.I)
 REVIEW = re.compile(r"\b(?:ditinjau|direview|ditelaah|ditashih|tinjauan|review|diperiksa ulang)\b", re.I)
 ORDINAL = r"(?:pertama|ke(?:dua|tiga|empat|lima|enam|tujuh|delapan|sembilan|sepuluh|sebelas)(?: belas)?)"
@@ -1240,16 +1277,29 @@ def check_audio(lid: str, audio, manifest_slug: str, voice, text) -> list[str]:
     if not isinstance(url, str) or not url.startswith(MEDIA_PREFIX) or ".." in url or not url.endswith(".mp3"):
         errs.append(f"{lid}: audio url must be an .mp3 under {MEDIA_PREFIX}")
     elif isinstance(voice, dict) and isinstance(voice.get("name"), str) and isinstance(voice.get("id"), str) \
-            and isinstance(text, str):
-        want = f"{MEDIA_PREFIX}{slugify(voice['name'])}/{manifest_slug}/{audio_name(text, voice['id'])}.mp3"
-        if url != want:
+            and isinstance(text, str) and is_sha(audio["sha256"]):
+        # The url, the text and the sha256 are bound together by the name (delivery_name), so this
+        # one comparison needs no audio file: CI has neither the masters nor the delivered files.
+        want = delivery_url(voice, manifest_slug, text, audio["sha256"])
+        if url == master_url(voice, manifest_slug, text):
+            errs.append(f"{lid}: audio url {url!r} is the name of the {OUTPUT_FORMAT} master, not of the delivered file "
+                        f"({DELIVERY_FORMAT}): run encode_narration.py")
+        elif url != want:
             errs.append(f"{lid}: audio url {url!r} is not {want!r} (the file is named by the spoken text, voice and "
-                        "settings: a changed line needs a new render)")
+                        f"settings, the delivery format {DELIVERY_FORMAT} and the sha256 of its bytes: a changed line "
+                        "needs a new render, a changed file a new name)")
     if not isinstance(audio["ms"], int) or isinstance(audio["ms"], bool) or audio["ms"] <= 0:
         errs.append(f"{lid}: audio ms must be a positive integer")
-    if not isinstance(audio["sha256"], str) or not SHA.match(audio["sha256"]):
+    if not is_sha(audio["sha256"]):
         errs.append(f"{lid}: audio sha256 must be 64 lower-case hex characters")
     return errs
+
+
+def is_delivery(audio, voice: dict, manifest_slug: str, text: str) -> bool:
+    """Whether `audio` is the delivered file of this spoken text: its url is the delivery name of the
+    text and of its own sha256 (what check_audio asks of a manifest line)."""
+    return (isinstance(audio, dict) and is_sha(audio.get("sha256"))
+            and audio.get("url") == delivery_url(voice, manifest_slug, text, audio["sha256"]))
 
 
 def check_tokens(lid: str, toks, audio, text, lex: Lexicon, focus_ar: str | None) -> list[str]:

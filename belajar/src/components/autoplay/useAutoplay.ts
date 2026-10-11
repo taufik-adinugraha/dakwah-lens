@@ -22,6 +22,7 @@ import {
   markContinue,
   positionToSave,
   readSavedIndex,
+  recitationToWarm,
   reduceAutoplay,
   takeContinue,
   upcomingAudio,
@@ -142,6 +143,11 @@ export function continueToAyah(router: ReturnType<typeof useRouter>, slug: strin
  *   at "Menyiapkan pelajaran…" until the first line is heard or shown. Before
  *   "Mulai", the first narration file that click plays is warmed once the
  *   page is idle (never the imam's external recitation).
+ * - The imam's recitation is fetched EARLY (operator 2026-10-11; rules in
+ *   src/lib/autoplay/warm.ts): this ayah's as soon as the lesson has started,
+ *   while the narrator speaks the opening line, on the stage's own player.
+ *   Never another ayah's (each page fetches its own), and never part of
+ *   `loading`: that is the wait of the activity due to sound.
  * - Remembers the step per ayah; hands off to the next ayah; Media Session
  *   (lock screen, earphones) play/pause/next/previous.
  * - Never scrolls the page.
@@ -208,13 +214,25 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
     // except an exercise's word, which the learner's own replay just said.
     onInterrupt: () => interruptRef.current?.(),
   });
-  const { playWord, playAll, restart, pause: pauseAudio, unlock } = player;
+  const { playWord, playAll, restart, pause: pauseAudio, unlock, warm: warmPlayer } = player;
   // The imam's recitation streams from the reciter's CDN (next.config.ts RECITATION_HOSTS): a
   // preconnect hint to the chosen reciter's host (the connection set up ahead, operator
   // 2026-10-11) — never a preload of the recording itself before "Mulai": learners on mobile
   // data pay for every byte. React hoists it into <head>, once per origin.
-  const reciteOrigin = originOf(player.source?.url);
+  const reciteUrl = player.source?.url ?? null;
+  const reciteOrigin = originOf(reciteUrl ?? undefined);
   if (reciteOrigin) preconnect(reciteOrigin);
+
+  // ── Once the lesson has started: the imam's recitation, fetched early ──
+  // (operator 2026-10-11; when and why: src/lib/autoplay/warm.ts). This ayah's recording by the
+  // reciter chosen, on the stage's own player, while the narrator speaks the opening line — and
+  // again when another reciter is chosen. It only asks the browser to fetch: nothing plays,
+  // nothing is reported, and the loading notice stays the waiting activity's alone.
+  const lessonStarted = state.started;
+  useEffect(() => {
+    const url = recitationToWarm({ started: lessonStarted, currentUrl: reciteUrl });
+    if (url) warmPlayer(url);
+  }, [lessonStarted, reciteUrl, warmPlayer]);
 
   // Latest player functions for the executor, which must not restart its
   // activity when they change identity (e.g. the reciter changed).

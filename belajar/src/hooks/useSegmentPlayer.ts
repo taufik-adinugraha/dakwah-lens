@@ -73,6 +73,11 @@ const markUnlocked = (a: HTMLAudioElement) => {
  *   ("playing"), and again while the stream stalls ("waiting"); never for
  *   unlock()'s silent play. The lesson stage says "Memuat bacaan imam…"
  *   once it lasts.
+ * - `warm(url)` (operator 2026-10-11: the recitation ready when its step
+ *   comes): fetches the chosen recording ahead of its first play, into this
+ *   very element, once the lesson has started (src/lib/autoplay/warm.ts).
+ *   Never part of `loading`, never reported as `failed`: nothing was asked
+ *   to play.
  *
  * The hook owns its Audio element (created after mount, never rendered), so
  * components never touch a ref during render (React Compiler rule).
@@ -120,6 +125,13 @@ export function useSegmentPlayer(
   const rateRef = useRef<PlaybackRate>(1);
   /** Where a paused whole-ayah playback stopped; null = start from 0. */
   const resumeAtRef = useRef<number | null>(null);
+  /** The file warm() has fetched ahead since the element was pointed at it; null: none yet. */
+  const warmedRef = useRef<string | null>(null);
+  /** A play the learner or the lesson asked for (start()) is under way: set there, cleared
+   *  wherever this hook ends it (a pause, a word's end, the ayah's end, another file, an error).
+   *  While it is clear, the element only fetches ahead (warm()) or sits paused: its errors are
+   *  nobody's failed play. Left set by mistake, an error is reported as before 2026-10-11. */
+  const askedRef = useRef(false);
   const [sourceIdx, setSourceIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [activeWord, setActiveWord] = useState<number | null>(null);
@@ -159,6 +171,7 @@ export function useSegmentPlayer(
       const stopAt = stopAtRef.current;
       if (stopAt !== null && ms >= stopAt) {
         stopAtRef.current = null;
+        askedRef.current = false;
         a.pause();
         setActiveWord(null);
         onFinishRef.current?.();
@@ -189,6 +202,7 @@ export function useSegmentPlayer(
       if ((e as CustomEvent<HTMLAudioElement>).detail === a) return;
       if (!a.paused) {
         resumeAtRef.current = stopAtRef.current === null ? a.currentTime : null;
+        askedRef.current = false;
         a.pause();
         // No word stays lit as "being recited" while another player speaks.
         setActiveWord(null);
@@ -206,6 +220,7 @@ export function useSegmentPlayer(
       }
     };
     const onEnded = () => {
+      askedRef.current = false;
       onStop();
       onFinishRef.current?.();
     };
@@ -222,6 +237,11 @@ export function useSegmentPlayer(
       load("error");
       // A failure during unlock() surfaces at the first real play instead.
       if (unlockingRef.current) return;
+      // So does one while no play asked for is under way (askedRef): the file was only being
+      // fetched ahead (warm()), or the rest of a paused recording was. Nothing to report; the
+      // next play loads the file again (revive()).
+      if (!askedRef.current) return;
+      askedRef.current = false;
       setFailed(true);
       onErrorRef.current?.("failed");
     };
@@ -246,6 +266,7 @@ export function useSegmentPlayer(
       if (raf !== null) cancelAnimationFrame(raf);
       unlockingRef.current = 0;
       beginRef.current = null;
+      askedRef.current = false;
       a.pause();
       a.muted = false;
       a.removeAttribute("src");
@@ -253,14 +274,17 @@ export function useSegmentPlayer(
     };
   }, []);
 
-  // Point the element at the chosen reciter's file (fetched only on play).
+  // Point the element at the chosen reciter's file: fetched on play — or at once, when warm()
+  // has set this page's element to load ahead (a reciter chosen after the lesson started).
   useEffect(() => {
     segmentsRef.current = source.segments;
     const a = audioRef.current;
     if (!a) return;
+    askedRef.current = false;
     a.pause();
     stopAtRef.current = null;
     resumeAtRef.current = null;
+    warmedRef.current = null;
     a.src = source.url;
     // A src swap resets the element's rate; re-apply the learner's choice.
     a.playbackRate = rateRef.current;
@@ -283,13 +307,32 @@ export function useSegmentPlayer(
     const takeover = unlockingRef.current !== 0 && !a.paused;
     unlockingRef.current = 0;
     a.muted = false;
+    askedRef.current = true;
     void a.play().catch((e: unknown) => {
       if (isAbort(e)) return;
+      askedRef.current = false;
       const blocked = isBlocked(e);
       if (!blocked) setFailed(true);
       onErrorRef.current?.(blocked ? "blocked" : "failed");
     });
     if (takeover) beginRef.current?.();
+  }, []);
+
+  /**
+   * Before a play: a recording whose load failed is loaded anew. The element keeps its `error`
+   * until load(), whatever the error was, and never plays while it has one: play() either rejects
+   * at once without asking the network again (the source could not be loaded at all, e.g. a 404:
+   * HTML media element, play() step 2) or never starts playing, with no rejection either (a
+   * network or decode error mid-file). So neither a file that failed while it was only fetched ahead (warm()) nor the
+   * lesson's "Lanjutkan" after "Bacaan imam belum bisa diputar" would ever try again. Every error
+   * is loaded anew, not one kind of it. load() resets the position and the speed: callers set the
+   * position after this, the speed is put back here.
+   */
+  const revive = useCallback((a: HTMLAudioElement) => {
+    if (!a.error) return;
+    a.load();
+    a.playbackRate = rateRef.current;
+    a.preservesPitch = true;
   }, []);
 
   /** Play the whole ayah — RESUMING where a pause left off; from the start
@@ -298,22 +341,24 @@ export function useSegmentPlayer(
   const playAll = useCallback(() => {
     const a = audioRef.current;
     if (!a) return;
+    revive(a);
     const midWord = stopAtRef.current !== null;
     stopAtRef.current = null;
     if (a.ended || midWord || resumeAtRef.current === null) a.currentTime = 0;
     else a.currentTime = resumeAtRef.current;
     start(a);
-  }, [start]);
+  }, [revive, start]);
 
   /** Start the ayah over from the beginning. */
   const restart = useCallback(() => {
     const a = audioRef.current;
     if (!a) return;
+    revive(a);
     stopAtRef.current = null;
     resumeAtRef.current = null;
     a.currentTime = 0;
     start(a);
-  }, [start]);
+  }, [revive, start]);
 
   /** Play one word (seek + stop at its end). Returns false when the word has
    *  no timing in this recording, so nothing will play or finish. */
@@ -322,13 +367,14 @@ export function useSegmentPlayer(
       const a = audioRef.current;
       const seg = source.segments.find(([w]) => w === word);
       if (!a || !seg) return false;
+      revive(a);
       stopAtRef.current = seg[2];
       resumeAtRef.current = null;
       a.currentTime = seg[1] / 1000;
       start(a);
       return true;
     },
-    [source, start],
+    [source, revive, start],
   );
 
   /** Pause and remember the spot, so the next play resumes there. A no-op
@@ -337,6 +383,7 @@ export function useSegmentPlayer(
     const a = audioRef.current;
     if (!a || a.paused) return;
     resumeAtRef.current = stopAtRef.current === null ? a.currentTime : null;
+    askedRef.current = false;
     a.pause();
   }, []);
 
@@ -365,7 +412,38 @@ export function useSegmentPlayer(
     }, done);
   }, []);
 
+  /**
+   * Fetch the recording the element points at NOW, ahead of its first play (operator 2026-10-11;
+   * when: src/lib/autoplay/warm.ts — the lesson has started and will play it). `preload` goes
+   * from "none" to "auto": the browser starts the load it had put off, into this very element, so
+   * the play that follows starts from the element's own buffer; a reciter chosen later loads as
+   * soon as the element points at it. A browser that leaves the put-off load where it was (the
+   * element idle, nothing loaded) is told with load(), which starts it over under "auto" — never
+   * while unlock()'s silent play is under way (not paused: load() would abort it), never once
+   * anything is loaded. Nothing plays, so none of the events `loading` is made of fires.
+   * The element's own load, not fetch() or <link rel="preload">: the module's CSP lets only media
+   * reach the reciters' hosts (next.config.ts: media-src lists them, connect-src is 'self').
+   * A browser may load less than the whole file (Chromium on mobile data loads its start, iOS
+   * Safari hardly more than its header): what is there plays at once and the rest follows while
+   * it plays. Until the next page, whose mount sets "none" again. `url`: the address the caller
+   * decided on; a no-op while the element points elsewhere, and once done for a file (each file
+   * once, until the element is pointed anew).
+   */
+  const warm = useCallback((url: string) => {
+    const a = audioRef.current;
+    if (!a || a.getAttribute("src") !== url || warmedRef.current === url) return;
+    warmedRef.current = url;
+    a.preload = "auto";
+    const idle = a.networkState === HTMLMediaElement.NETWORK_IDLE && a.readyState === HTMLMediaElement.HAVE_NOTHING;
+    if (!idle || !a.paused || unlockingRef.current || a.error) return;
+    a.load();
+    // load() resets the speed, as a src swap does.
+    a.playbackRate = rateRef.current;
+    a.preservesPitch = true;
+  }, []);
+
   const chooseSource = useCallback((i: number) => {
+    askedRef.current = false;
     audioRef.current?.pause();
     stopAtRef.current = null;
     setActiveWord(null);
@@ -396,5 +474,7 @@ export function useSegmentPlayer(
     pause,
     hasWord,
     unlock,
+    /** Fetch the chosen recording ahead of its first play (the lesson has started). */
+    warm,
   };
 }

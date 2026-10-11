@@ -463,7 +463,16 @@ export function LessonStage({
     // overflow-x-clip: a backstop so nothing drawn over the stage (a
     // spotlight label at the largest text size) can make the page scroll
     // sideways; `clip` keeps the controls bar sticky.
-    <div ref={stageRef} data-autoplay="stage" data-step={live ? step.id : undefined} className="stage-card scroll-mt-2 overflow-x-clip">
+    <div
+      ref={stageRef}
+      data-autoplay="stage"
+      data-step={live ? step.id : undefined}
+      // The reciter chosen, by the id the content gives him ("Alafasy_128kbps"): the CI check of
+      // the early fetch finds his recording's address by it (scripts/ci/screenshots.mjs
+      // warmupChecks; operator 2026-10-11).
+      data-reciter={p.source?.reciter}
+      className="stage-card scroll-mt-2 overflow-x-clip"
+    >
       <h2 id={`${uid}-guided`} className="sr-only">
         {t("title")}
       </h2>
