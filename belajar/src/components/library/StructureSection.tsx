@@ -1,3 +1,5 @@
+import { Fragment } from "react";
+
 import type { Ayah } from "@/content/schema";
 import { Link } from "@/i18n/navigation";
 import { conceptHref } from "@/lib/routes";
@@ -10,7 +12,11 @@ import { SourcesDisclosure } from "./SourceList";
  * Words are shown as they are in the mushaf, each with its role beneath;
  * named groups (an idhafah chain, a na't pair, a badal) are listed with
  * their concept. `hideHeading` drops the section's own H2 when the page
- * already names it (e.g. inside a "Pelajari lebih dalam" disclosure row).
+ * already names it (e.g. inside a "Pelajari lebih dalam" disclosure row),
+ * and its card frame with it: that row is already a white bordered card, and
+ * a card inside it inside "Materi lengkap" left a 192px column on a phone at
+ * Sangat besar, where "menerangkannya" or "membolehkannya" is wider than the
+ * line (CI 2026-10-11, rule 15; never cut such a word, give it the room).
  */
 export function StructureSection({
   ayah,
@@ -27,7 +33,7 @@ export function StructureSection({
   if (!st) return null;
   return (
     <section
-      className={`${hideHeading ? "" : "mt-10 "}rounded-2xl border border-hairline bg-white p-5 sm:p-6`}
+      className={hideHeading ? undefined : "mt-10 rounded-2xl border border-hairline bg-white p-5 sm:p-6"}
       aria-labelledby={hideHeading ? undefined : "structure"}
     >
       {hideHeading ? null : (
@@ -35,7 +41,9 @@ export function StructureSection({
           {labels.heading}
         </h2>
       )}
-      <p className={`${hideHeading ? "" : "mt-1 "}text-sm font-semibold text-forest`}>{st.type}</p>
+      <p className={`${hideHeading ? "" : "mt-1 "}text-sm font-semibold text-forest`}>
+        <MixedText text={st.type} />
+      </p>
       <p className="mt-2 max-w-prose text-pretty text-base text-ink">
         <MixedText text={st.summary} />
       </p>
@@ -48,7 +56,7 @@ export function StructureSection({
             </span>
             {w.role ? (
               <span dir="ltr" className="max-w-36 text-center text-sm text-ink-muted">
-                {w.role}
+                <MixedText text={w.role} />
               </span>
             ) : null}
           </li>
@@ -57,25 +65,40 @@ export function StructureSection({
 
       {st.groups.length > 0 && (
         <div className="mt-6">
-          <h3 className="text-sm font-semibold text-ink">{labels.groups}</h3>
+          <h3 className="text-sm font-semibold text-ink">
+            <MixedText text={labels.groups} />
+          </h3>
           <ul className="mt-2 space-y-3">
             {st.groups.map((g) => (
               <li
                 key={`${g.label}-${g.words.join("-")}`}
                 className="flex flex-wrap items-center gap-x-3 gap-y-2 text-base text-ink"
               >
+                {/* The words joined " · ", each kept with its dot so no line
+                    starts with one; the dash inside the text, glued to the
+                    label's first word (line breaks, operator 2026-10-10). */}
                 <span lang="ar" dir="rtl" className="quran text-ar-sm text-ink">
                   {g.words
                     .map((i) => ayah.words[i - 1]?.ar)
                     .filter(Boolean)
-                    .join(" · ")}
+                    .map((ar, k, all) => (
+                      <Fragment key={k}>
+                        {k > 0 ? " " : null}
+                        <span className="whitespace-nowrap">
+                          {ar}
+                          {k < all.length - 1 ? " ·" : null}
+                        </span>
+                      </Fragment>
+                    ))}
                 </span>
                 <span>
-                  — <MixedText text={g.label} />
+                  <MixedText text={`— ${g.label}`} />
                 </span>
                 {g.concept && conceptTitle[g.concept] ? (
                   <Link href={conceptHref(g.concept)} className="chip-link">
-                    {conceptTitle[g.concept]}
+                    <span>
+                      <MixedText text={conceptTitle[g.concept]} />
+                    </span>
                   </Link>
                 ) : null}
               </li>

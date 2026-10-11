@@ -6,7 +6,11 @@
  *  1. sequences: non-empty, in lesson order, unique step ids, every caption
  *     non-empty and ≤ 180 characters per part, Arabic script in a caption
  *     only from a manifest's display, line ids on the contract, the right
- *     exercises, the last ayah ends "done";
+ *     exercises, the last ayah ends "done"; the harakat primer right after
+ *     the imam's ayah, and each word's recite → explain → compose (when it
+ *     has a composition: one cue per line, frames in order, the imam
+ *     reciting that word); the composition files themselves replayed
+ *     (src/lib/composition.ts: every Arabic form from its source);
  *  2. narration manifests, IF they exist: every line the sequences play is
  *     there, ids are well-formed, spoken text never carries a transliterated
  *     Qur'anic word (nor digits, ALL CAPS, "kamu") and Arabic script only as
@@ -26,11 +30,13 @@
  *     same events give the same states.
  * Pure: file access is injected (loadCheckInput).
  */
+import type { ComposeFile } from "@/content/compose-schema";
 import type { Ayah, Concept, Lexeme } from "@/content/schema";
 
+import { composeFileProblems, composeInputFor, type ComposeInput } from "../composition";
 import { MAX_CAPTION, type Pace } from "../lessonSteps";
 import { SURAH_SLUGS } from "../routes";
-import { availableExercises, orderRecitations, timedWords } from "./exercises";
+import { availableExercises, orderRecitations, questionNumbers, type QuizAyahLike } from "./exercises";
 import { LINE_ID_RE, manifestParts, parseLineId, promptLineId } from "./ids";
 import {
   createAutoplayState,
@@ -77,6 +83,12 @@ export type CheckInput = {
    *  the narrator may say in Arabic script); null/absent = no file, and
    *  then any Arabic in spoken text or a caption is an error. */
   pronunciation?: unknown;
+  /** Parsed content/compose/${slug}.json per slug (word compositions and
+   *  the harakat primer); null/absent = none for that surah. */
+  compose?: Readonly<Record<string, unknown>>;
+  /** Parsed content/quiz/${slug}.json per slug (the exercises each ayah
+   *  shows and their questions); null/absent = no exercise in that surah. */
+  quiz?: Readonly<Record<string, unknown>>;
   texts?: AutoplayTexts;
   property?: { streams?: number; length?: number; seed?: number };
 };
@@ -124,10 +136,14 @@ export function loadCheckInput(read: (rel: string) => string | null): { input: C
   };
   const surahs: CheckSurah[] = [];
   const manifests: Record<string, unknown> = {};
+  const compose: Record<string, unknown> = {};
+  const quiz: Record<string, unknown> = {};
   for (const slug of SURAH_SLUGS) {
     const s = json(`${slug}.json`, true) as CheckSurah | null;
     if (s) surahs.push(s);
     manifests[slug] = json(`narration/${slug}.json`, false);
+    compose[slug] = json(`compose/${slug}.json`, false);
+    quiz[slug] = json(`quiz/${slug}.json`, true);
   }
   const library = (json("library.json", true) ?? { concepts: [], lexicon: [] }) as {
     concepts: Concept[];
@@ -141,6 +157,8 @@ export function loadCheckInput(read: (rel: string) => string | null): { input: C
       manifests,
       sharedManifest: json("narration/shared.json", false),
       pronunciation: json(PRONUNCIATION_PATH, false),
+      compose,
+      quiz,
     },
     errors,
   };
@@ -172,7 +190,13 @@ function rngOf(seed: number) {
 /** Structural problems of one ayah's sequence (empty when fine). */
 export function sequenceProblems(
   seq: AutoplaySequence,
-  ctx: { ayah: Pick<Ayah, "words">; last: boolean; exercises: readonly ExerciseKey[]; introduced: readonly { id: string }[] },
+  ctx: {
+    ayah: Pick<Ayah, "words">;
+    last: boolean;
+    exercises: readonly ExerciseKey[];
+    introduced: readonly { id: string }[];
+    compose?: ComposeInput | null;
+  },
 ): string[] {
   const out: string[] = [];
   const steps = seq.steps;
@@ -182,17 +206,37 @@ export function sequenceProblems(
   if (steps[0].kind !== "intro") out.push("does not open with the intro");
   if (steps[1]?.kind !== "recite_ayah") out.push("the imam does not recite the ayah second");
 
-  // Every word: recite_word then explain, in order.
-  const wordSteps = steps.filter((s) => s.kind === "recite_word" || s.kind === "explain");
-  const expected = ctx.ayah.words.flatMap((_, i) => [`w${i + 1}:recite`, `w${i + 1}`]);
-  if (JSON.stringify(wordSteps.map((s) => s.id)) !== JSON.stringify(expected)) out.push("word steps are not recite+explain per word in order");
+  // Every word: recite_word then explain (then compose, for a word with a
+  // composition), in order; the primer, when there is one, right after the
+  // imam's ayah.
+  const composed = (i: number) => !!ctx.compose?.words[ctx.ayah.words[i]?.loc ?? ""]?.lines.length;
+  const wordSteps = steps.filter((s) => s.kind === "recite_word" || s.kind === "explain" || s.kind === "compose");
+  const expected = ctx.ayah.words.flatMap((_, i) => [`w${i + 1}:recite`, `w${i + 1}`, ...(composed(i) ? [`w${i + 1}:compose`] : [])]);
+  if (JSON.stringify(wordSteps.map((s) => s.id)) !== JSON.stringify(expected)) out.push("word steps are not recite + explain (+ compose) per word in order");
+  const primers = steps.filter((s) => s.kind === "primer");
+  if (primers.length !== (ctx.compose?.primer?.lines.length ? 1 : 0) || (primers.length && steps[2] !== primers[0])) {
+    out.push("the harakat primer is not the step right after the imam's ayah");
+  }
   for (const s of steps) {
     if (s.kind === "recite_word" && (s.recite?.target !== "word" || s.recite.word !== s.word)) out.push(`${s.id}: recites the wrong thing`);
     if ((s.kind === "recite_ayah" || s.kind === "recap") && s.recite?.target !== "ayah") out.push(`${s.id}: the imam does not recite the ayah`);
+    if (s.kind === "compose" || s.kind === "primer") {
+      const unit = s.kind === "primer" ? ctx.compose?.primer : ctx.compose?.words[s.loc ?? ""];
+      if (s.kind === "compose" && (s.recite?.target !== "word" || s.recite.word !== s.word)) out.push(`${s.id}: does not end with the imam reciting its word`);
+      if (!unit || s.cues.length !== unit.lines.length || s.frames !== unit.frames) out.push(`${s.id}: cues/frames differ from its composition`);
+      const frames = s.cues.map((c) => c.frame);
+      if (frames.some((f, k) => f === null || f < 1 || f > (s.frames ?? 0) || (k > 0 && f < (frames[k - 1] ?? 0)))) {
+        out.push(`${s.id}: cue frames ${JSON.stringify(frames)} not in order within 1..${s.frames}`);
+      } else if (frames[0] !== 1 || frames[frames.length - 1] !== s.frames) {
+        out.push(`${s.id}: the cues do not cover the frames from the first to the last`);
+      }
+    } else if (s.cues.some((c) => c.frame !== null)) {
+      out.push(`${s.id}: a cue outside a primer / compose step names an animation frame`);
+    }
   }
 
   const order = steps.map((s) => s.kind);
-  const lastWord = order.lastIndexOf("explain");
+  const lastWord = Math.max(order.lastIndexOf("explain"), order.lastIndexOf("compose"));
   const firstAfter = (k: string) => order.indexOf(k as (typeof order)[number]);
   for (const k of ["structure", "concept", "exercise", "recap"]) {
     const i = firstAfter(k);
@@ -275,6 +319,9 @@ export function sequenceProblems(
           out.push(`${s.id}: prompt for "${part}" has the wrong line`);
         }
         if (!e.guides[part]) out.push(`${s.id}: no spotlight for "${part}"`);
+      }
+      for (const [q, ci] of Object.entries(e.explain)) {
+        if (ci === undefined || s.cues[ci]?.line !== `${own}ex:${e.key}:${q}:why`) out.push(`${s.id}: the explanation of question ${q} has the wrong line`);
       }
     }
   }
@@ -422,10 +469,13 @@ export function driveToEnd(
       // The learner: the exercise reports its controls, one miss, then right.
       const parts = PARTS_OF[ex.key];
       // Dengar dan klik reports the word its question asks about: the lesson's imam recites it.
+      // A wrong pick (no voice), a right one (Benar. + the explanation of question 1), then the
+      // answer of question 2 shown ("Tunjukkan jawaban": Ini jawabannya. + its explanation).
       const script: AutoplayEvent[] = [
         { type: "exercise_guide", target: `exercise:${ex.key}:${parts[0]}`, word: ex.key === "tap-word" ? 1 : undefined },
-        { type: "answered", key: ex.key, correct: false },
-        { type: "answered", key: ex.key, correct: true },
+        { type: "answered", key: ex.key, correct: false, question: 1 },
+        { type: "answered", key: ex.key, correct: true, question: 1 },
+        { type: "revealed", key: ex.key, question: 2 },
         { type: "exercise_guide", target: `exercise:${ex.key}:${parts[parts.length - 1]}` },
         { type: "exercise_done", key: ex.key },
       ];
@@ -477,7 +527,8 @@ function randomEvent(rng: () => number, seq: AutoplaySequence, s: AutoplayState)
     return { type: pick(["narration_end", "timer", "recite_end", "narration_error", "recite_error"] as const), token: token() };
   }
   if (r < 0.52) return { type: "idle_tick", ms: 500 + Math.floor(rng() * 25_000) };
-  if (r < 0.6) return { type: "answered", key: key(), correct: rng() < 0.6 };
+  if (r < 0.57) return { type: "answered", key: key(), correct: rng() < 0.6, question: 1 + Math.floor(rng() * 5) };
+  if (r < 0.6) return { type: "revealed", key: key(), question: rng() < 0.9 ? 1 + Math.floor(rng() * 5) : undefined };
   if (r < 0.66) {
     const t = rng();
     const word = rng() < 0.5 ? 1 + Math.floor(rng() * 5) : undefined;
@@ -565,6 +616,15 @@ function syntheticManifests(seq: AutoplaySequence): { narration: NarrationManife
 
 const PACES: readonly Pace[] = ["biasa", "pelan", "tunggu"];
 
+/** One ayah's exercises from a parsed content/quiz/${slug}.json (raw JSON: no zod here; the
+ *  page's loader, src/lib/quiz-content.ts, validates the same file). */
+export function quizAyahOf(raw: unknown, ayah: number): QuizAyahLike {
+  const ayat = (raw as { ayat?: unknown } | null)?.ayat;
+  const a = Array.isArray(ayat) ? ayat.find((x) => (x as { ayah?: unknown })?.ayah === ayah) : undefined;
+  const ex = (a as { exercises?: unknown } | undefined)?.exercises;
+  return { exercises: Array.isArray(ex) ? (ex as QuizAyahLike["exercises"]) : [] };
+}
+
 export function runAutoplayChecks(input: CheckInput): CheckReport {
   const texts = input.texts ?? ID_TEXTS;
   const errors: string[] = [];
@@ -572,7 +632,6 @@ export function runAutoplayChecks(input: CheckInput): CheckReport {
   const streams = input.property?.streams ?? 2;
   const length = input.property?.length ?? 150;
   const seed = input.property?.seed ?? 20261010;
-  const lexeme = new Map(input.lexicon.map((l) => [l.id, l]));
   const stats: CheckReport["stats"] = {
     surahs: input.surahs.length,
     ayat: 0,
@@ -582,6 +641,26 @@ export function runAutoplayChecks(input: CheckInput): CheckReport {
     simulatedEvents: 0,
     minutes: {},
   };
+
+  // Word compositions and the harakat primer: replayed against the lesson
+  // words' bytes (every Arabic form from its source, the last frame = the word).
+  const lessonWords = new Map(input.surahs.flatMap((s) => s.ayat.flatMap((a) => a.words.map((w) => [w.loc, w.ar] as const))));
+  const composeFiles = new Map<string, ComposeFile>();
+  for (const s of input.surahs) {
+    const raw = input.compose?.[s.slug];
+    if (raw === null || raw === undefined) continue;
+    const file = raw as ComposeFile;
+    if (!file || typeof file !== "object" || file.slug !== s.slug || !file.words) {
+      errors.push(`content/compose/${s.slug}.json: not a composition file of ${s.slug}`);
+      continue;
+    }
+    try {
+      for (const p of composeFileProblems(file, lessonWords)) errors.push(p);
+    } catch (e) {
+      errors.push(`content/compose/${s.slug}.json: ${(e as Error).message}`);
+    }
+    composeFiles.set(s.slug, file);
+  }
 
   const quranTokens = quranTokenSet(
     input.surahs.flatMap((s) => s.ayat.flatMap((a) => a.words.map((w) => w.translit))),
@@ -674,9 +753,11 @@ export function runAutoplayChecks(input: CheckInput): CheckReport {
     for (const ayah of surah.ayat) {
       stats.ayat++;
       const where = `${surah.slug} ${ayah.loc}`;
-      const exercises = availableExercises({ words: ayah.words, timed: timedWords(ayah), lexeme: (id) => lexeme.get(id) });
+      const quizAyah = quizAyahOf(input.quiz?.[surah.slug], ayah.ayah);
+      const exercises = availableExercises(quizAyah);
       const introduced = introducedConcepts(input.concepts, ayah.loc);
       const last = ayah.ayah >= surah.ayat.length;
+      const compose = composeInputFor(composeFiles.get(surah.slug), ayah);
       const base: SequenceInput = {
         slug: surah.slug,
         surahName: surah.name_id,
@@ -684,15 +765,17 @@ export function runAutoplayChecks(input: CheckInput): CheckReport {
         ayah,
         introduced,
         exercises,
+        questions: questionNumbers(quizAyah),
         texts,
         narration: manifest,
         shared,
+        compose,
       };
       const seq = buildAutoplaySequence(base);
       if (JSON.stringify(seq) !== JSON.stringify(buildAutoplaySequence(base))) errors.push(`${where}: building the sequence twice differs`);
       stats.steps += seq.steps.length;
       stats.exerciseSteps += seq.steps.filter((x) => x.kind === "exercise").length;
-      for (const p of sequenceProblems(seq, { ayah, last, exercises, introduced })) errors.push(`${where}: ${p}`);
+      for (const p of sequenceProblems(seq, { ayah, last, exercises, introduced, compose })) errors.push(`${where}: ${p}`);
 
       for (const id of sequenceLineIds(seq)) {
         stats.lines++;

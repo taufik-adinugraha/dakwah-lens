@@ -9,6 +9,8 @@ import { useImamRate } from "@/hooks/usePace";
 import { useSegmentPlayer, type RecitationSource } from "@/hooks/useSegmentPlayer";
 import { seededShuffle } from "@/lib/shuffle";
 
+import { KeepTogether, MixedText } from "../library/MixedText";
+
 import {
   Counter,
   ExerciseShell,
@@ -28,7 +30,10 @@ import { guideMarker, guideTarget, tapWordGuidePart, type ExerciseGuide } from "
 type TapWordItem = { index: number; ar: string; translit: string; gloss: string };
 type Props = {
   id: string;
+  /** Every word of the ayah, shown as the chips (mushaf order). */
   words: TapWordItem[];
+  /** The words asked about (content/quiz: `n`, the question's number, and `word`, 1-based). */
+  questions: readonly { n: number; word: number }[];
   source: RecitationSource;
   /** Guided mode (see ExerciseShell.tsx). */
   guided?: ExerciseGuide;
@@ -49,6 +54,9 @@ type Props = {
  * and the LESSON's imam recites it on the stage's player (the one the
  * "Mulai" tap unlocked) — no tap; `guided.heard` says when it has played.
  * "Dengarkan lagi" stays as an optional replay.
+ *
+ * A word written twice in one ayah (عَلَيْهِمْ, Al-Fatihah 7: words 4 and 7) sounds the same: a
+ * click on either is right, and both chips show it (quiz audit 2026-10-11).
  */
 export function TapWord(props: Props) {
   const { round, restart } = useRestart();
@@ -91,6 +99,7 @@ export function TapWord(props: Props) {
 function TapWordRound({
   id,
   words,
+  questions,
   source,
   guided,
   compact,
@@ -108,11 +117,12 @@ function TapWordRound({
   const order = useMemo(() => {
     const timed = new Set(source.segments.map(([w]) => w));
     return seededShuffle(
-      words.filter((w) => timed.has(w.index)).map((w) => w.index),
+      questions.map((x) => x.word).filter((w) => timed.has(w) && words.some((x) => x.index === w)),
       id,
     );
-  }, [words, id, source]);
-  const q = useChoiceQuiz(id, order, guided);
+  }, [words, questions, id, source]);
+  const numbers = useMemo(() => order.map((w) => questions.find((x) => x.word === w)?.n ?? 0), [order, questions]);
+  const q = useChoiceQuiz(id, order, guided, numbers);
   const focusRef = useStepFocus(q.i, !!guided);
   const empty = order.length < 2;
   const target = order[Math.min(q.i, order.length - 1)];
@@ -131,6 +141,8 @@ function TapWordRound({
 
   if (empty) return null;
   const targetWord = words.find((w) => w.index === target);
+  /** The chip stands for the asked word: it is that word, or its twin (the same Arabic). */
+  const asTarget = (w: TapWordItem) => (targetWord && w.ar === targetWord.ar ? target : w.index);
 
   return (
     <ExerciseShell
@@ -167,12 +179,12 @@ function TapWordRound({
               ≥3:1 border so they read as buttons, not plain text. */}
           <div dir="rtl" data-guide={mark("options")} className="mt-5 flex flex-wrap justify-center gap-3">
             {words.map((w) => {
-              const state = optionState(w.index, q.answer, q.tried, q.resolved);
+              const state = optionState(asTarget(w), q.answer, q.tried, q.resolved);
               return (
                 <button
                   key={w.index}
                   type="button"
-                  onClick={() => q.choose(w.index)}
+                  onClick={() => q.choose(asTarget(w))}
                   className={clsx(
                     "flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl border-2 px-4 py-1 transition-colors",
                     state === "right" && "border-forest bg-forest text-paper",
@@ -197,10 +209,15 @@ function TapWordRound({
           >
             {q.resolved !== null && targetWord && (
               <>
-                <bdi lang="ar" dir="rtl" className="quran text-ar-sm">
-                  {targetWord.ar}
-                </bdi>{" "}
-                ({targetWord.translit} — {targetWord.gloss})
+                {/* The word, its transliteration and the dash on one line; the
+                    gloss wraps after them (line breaks, 2026-10-10). */}
+                <KeepTogether>
+                  <bdi lang="ar" dir="rtl" className="quran text-ar-sm">
+                    {targetWord.ar}
+                  </bdi>{" "}
+                  ({targetWord.translit} —
+                </KeepTogether>{" "}
+                <MixedText text={`${targetWord.gloss})`} />
               </>
             )}
           </Feedback>

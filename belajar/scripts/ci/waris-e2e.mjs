@@ -58,6 +58,7 @@ const ok = (msg) => console.log(`  ✓ ${msg}`);
 // ---------------------------------------------------------------------------------------------
 
 const PAGE_PATH = /^\/belajar\/(id|en)(\/[A-Za-z0-9._~\-/]*)?$/;
+const BROWSER_ICONS = new Set(["/favicon.ico", "/belajar/favicon.ico", "/belajar/apple-icon.png"]);
 const secrets = new Set(["j=v1."]);
 for (const c of plan.cases) {
   for (const v of Object.values(c.amounts ?? {})) secrets.add(String(v));
@@ -80,7 +81,9 @@ function classify(req) {
   for (const s of secrets) if (searchable.includes(s)) return { bad: "URL carries a share token or an amount" };
   if (u.pathname.startsWith("/belajar/_next/")) return { cls: "static" };
   if (u.pathname === "/belajar/api/me") return { cls: "api/me" };
-  if (u.pathname === "/favicon.ico") return { cls: "browser" };
+  // The browser's own icon fetches: the site root's guess, and the module's icon links (the main
+  // site's favicon set under the basePath since 2026-10-10, src/app/favicon.ico + apple-icon.png).
+  if (BROWSER_ICONS.has(u.pathname)) return { cls: "browser" };
   if (PAGE_PATH.test(u.pathname) && [...u.searchParams.keys()].every((k) => k === "_rsc")) {
     return { cls: req.isNavigationRequest() && req.resourceType() === "document" ? "document" : "page-fetch" };
   }

@@ -18,12 +18,15 @@ import {
 import { useTranslations } from "next-intl";
 import { type ReactNode, useEffect, useId, useRef, useState } from "react";
 
+import { captionCue } from "@/components/autoplay/caption";
 import { CaptionView } from "@/components/autoplay/CaptionView";
 import { EXERCISE_TITLE_KEY, GuidedExercise, type StageExerciseData } from "@/components/autoplay/GuidedExercise";
 import { type Offscreen, Spotlight } from "@/components/autoplay/Spotlight";
 import { SurahEndCard } from "@/components/autoplay/SurahEndCard";
 import { continueToAyah, PLAY_WORD_EVENT, useAutoplay } from "@/components/autoplay/useAutoplay";
+import { type SurahRef, useUpNext } from "@/components/autoplay/useUpNext";
 import { guideSelector } from "@/components/exercises/guide";
+import { MixedText } from "@/components/library/MixedText";
 import { TextSizeOptions } from "@/components/TextSizeSwitch";
 import type { RecitationSource } from "@/hooks/useSegmentPlayer";
 import { Link } from "@/i18n/navigation";
@@ -32,6 +35,7 @@ import { PACES } from "@/lib/lessonSteps";
 import { ayahHref } from "@/lib/routes";
 
 import { MushafLine, type PlayerWord } from "./AyahPlayer";
+import { type StageCompose, WordComposition } from "./WordComposition";
 
 /** A recording the stage can play, with its reciter's name for the select.
  *  Its credit line is on the Kredit page, not on the stage. */
@@ -119,7 +123,10 @@ const BAR_RING = "ring-4 ring-forest ring-offset-4 ring-offset-white";
  *   no translation (it is shown before "Mulai"). The step's content swaps
  *   in place (the prompt + the exercise while practising), so the page
  *   never moves under the learner. If the "Mulai" click leaves the card
- *   under the panel (a phone), that click brings the stage up once.
+ *   under the panel (a phone), that click brings the stage up once; and
+ *   the card's slot sticks just above the panel, so where the screen is
+ *   too short for the words, the card and the panel, the card covers the
+ *   end of the mushaf line rather than the panel covering the card.
  * - The bottom panel is sticky at the bottom of the viewport while the
  *   stage is on screen (a familiar media player with subtitles): the
  *   karaoke caption (an exercise's prompt stays above the exercise
@@ -144,7 +151,12 @@ const BAR_RING = "ring-4 ring-forest ring-offset-4 ring-offset-white";
  * screen is about: the whole ayah, the word explained, a concept's words,
  * the imam's current word as he recites. A large word card (Arabic ·
  * transliteration · "yang artinya …") sits above the caption while a word is
- * explained or recited. A screen reader hears the line without its Arabic
+ * explained or recited; in its place, the harakat primer and a word's
+ * COMPOSITION animation (operator 2026-10-10, narration rule 14: [بِ] +
+ * [ٱسْمُ] → kasrah → joined → [بِسْمِ]) play frame by frame with their lines
+ * (WordComposition; same slot, as tall as the word's tallest frame, so nothing
+ * jumps between frames and nothing is clipped). A screen reader hears the line
+ * without its Arabic
  * from a polite live region — never over the imam. The rest of the page
  * (word cards, Latihan, Pelajari lebih dalam) waits, collapsed, under the
  * stage in "Materi lengkap ayat ini".
@@ -154,25 +166,29 @@ export function LessonStage({
   title,
   ayah,
   surahName,
-  nextSurah,
+  following,
   words,
   sources,
   translation,
   exercise,
+  compose = null,
 }: {
   seq: AutoplaySequence;
   /** Page title, also the lock-screen title (Media Session). */
   title: string;
   ayah: number;
   surahName: string;
-  /** The surah after this one, for the end card (null after the last). */
-  nextSurah: { slug: string; name: string } | null;
+  /** The surahs after this one, in mushaf order, on a surah's last ayah only (else empty): the
+   *  end card offers the first published one (useUpNext.ts). */
+  following: SurahRef[];
   words: PlayerWord[];
   sources: StageSource[];
   /** The ayah's translation with footnotes and source, rendered by the page. */
   translation: ReactNode;
   /** What the exercises need inside the stage. */
   exercise: StageExerciseData;
+  /** This ayah's word compositions and harakat primer (content bytes), if any. */
+  compose?: StageCompose | null;
 }) {
   const t = useTranslations("Guided");
   const tp = useTranslations("Player");
@@ -180,6 +196,7 @@ export function LessonStage({
   const uid = useId();
   const ap = useAutoplay(seq, sources, title);
   const { state, view, actions, player: p } = ap;
+  const upNext = useUpNext(following);
 
   const [offscreen, setOffscreen] = useState<Offscreen>(null);
   const [barHeight, setBarHeight] = useState(0);
@@ -189,6 +206,7 @@ export function LessonStage({
   const areaRef = useRef<HTMLElement>(null);
   const captionRef = useRef<HTMLParagraphElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  const wordsRef = useRef<HTMLDivElement>(null);
   const cardSlotRef = useRef<HTMLDivElement>(null);
   /** The previous step was an exercise (to catch focus it leaves behind). */
   const wasExerciseRef = useRef(false);
@@ -200,11 +218,18 @@ export function LessonStage({
   const live = started && !finished;
   const showBar = live;
 
-  // The sticky bar's height: the spotlight's "out of view" line.
+  // The sticky bar's height: the spotlight's "out of view" line, and the
+  // card slot's sticky offset (--panel-h, set on the stage before the frame
+  // is painted, so the card never sits under a panel that just grew).
   useEffect(() => {
     const el = barRef.current;
+    const stage = stageRef.current;
     if (!showBar || !el) return;
-    const ro = new ResizeObserver(() => setBarHeight(el.getBoundingClientRect().height));
+    const ro = new ResizeObserver(() => {
+      const h = el.getBoundingClientRect().height;
+      stage?.style.setProperty("--panel-h", `${h}px`);
+      setBarHeight(h);
+    });
     ro.observe(el);
     return () => ro.disconnect();
   }, [showBar]);
@@ -216,6 +241,8 @@ export function LessonStage({
   // numbered mushaf line marks, and the word of the large word card.
   const focusWord = ap.marks.focus === null ? undefined : words.find((w) => w.index === ap.marks.focus);
   const marked = ap.marks.marked;
+  // The animation in the card's slot: the primer, or the word's composition.
+  const anim = ap.frame && compose ? (ap.frame.step === "primer" ? compose.primer : ap.frame.word ? compose.words[ap.frame.word] : null) : null;
   const showMushaf = !started || (live && !spec);
   const spotGuides = spec ? state.guides.filter((g) => g.target.startsWith("exercise:")) : [];
   const skipGuide = view.showSkip ? state.guides.find((g) => g.target === "skip") : undefined;
@@ -226,6 +253,10 @@ export function LessonStage({
   const lessonAudio = state.activity?.kind === "recite";
   const pct = Math.round(((view.index + 1) / view.total) * 100);
   const settingsId = `${uid}-settings`;
+  // The step and the narration line on screen, named on the stage and the
+  // caption (data-step, data-line): the CI checks reach a step by what it
+  // is, never by counting clicks (the primer and compose steps moved them).
+  const lineOnScreen = live ? (captionCue(seq, state)?.line ?? null) : null;
 
   // The middle control: the one thing to do next in this state. Render
   // reads only this plain mode; the handler is chosen at click time.
@@ -239,7 +270,10 @@ export function LessonStage({
 
   const guided = exerciseKey
     ? {
-        onAnswer: (correct: boolean) => actions.answered(exerciseKey, correct),
+        // A right answer and "Tunjukkan jawaban" are voiced with that question's explanation; a
+        // wrong pick is not (operator 2026-10-10).
+        onAnswer: (correct: boolean, question?: number) => actions.answered(exerciseKey, correct, question),
+        onReveal: (question?: number) => actions.revealed(exerciseKey, question),
         onDone: () => actions.exerciseDone(exerciseKey),
         onGuide: (target: string, info?: { word?: number }) => actions.exerciseGuide(target, info?.word),
         // The lesson moves a settled question on, and recites Dengar dan
@@ -273,15 +307,19 @@ export function LessonStage({
   // panel: on a phone the "Mulai" button sits low on the stage, and the
   // panel (caption + controls) would cover the card. The one scroll the
   // lesson makes on its own, and only on the learner's click — like "Lihat
-  // bagian yang ditandai".
+  // bagian yang ditandai". Measured where the card's slot sits in the flow,
+  // under the words: its sticky offset (below) would always place it above
+  // the panel, hiding the words instead.
   useEffect(() => {
     if (!started || !startClickRef.current) return;
     startClickRef.current = false;
     const stage = stageRef.current;
+    const words = wordsRef.current;
     const slot = cardSlotRef.current;
     const bar = barRef.current;
-    if (!stage || !slot || !bar) return;
-    const covered = slot.getBoundingClientRect().bottom > bar.getBoundingClientRect().top + 1;
+    if (!stage || !words || !slot || !bar) return;
+    const slotBottom = words.getBoundingClientRect().bottom + parseFloat(getComputedStyle(slot).marginTop) + slot.offsetHeight;
+    const covered = slotBottom > bar.getBoundingClientRect().top + 1;
     if (stage.getBoundingClientRect().top >= 0 && !covered) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     stage.scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" });
@@ -313,6 +351,7 @@ export function LessonStage({
       ref={captionRef}
       tabIndex={-1}
       data-autoplay="caption"
+      data-line={lineOnScreen ?? undefined}
       className={clsx(
         "mx-auto max-w-prose text-pretty text-xl text-ink",
         spec ? "mt-2 min-h-[3em]" : "min-h-[4.2em]",
@@ -355,7 +394,7 @@ export function LessonStage({
     // overflow-x-clip: a backstop so nothing drawn over the stage (a
     // spotlight label at the largest text size) can make the page scroll
     // sideways; `clip` keeps the controls bar sticky.
-    <div ref={stageRef} data-autoplay="stage" className="stage-card scroll-mt-2 overflow-x-clip">
+    <div ref={stageRef} data-autoplay="stage" data-step={live ? step.id : undefined} className="stage-card scroll-mt-2 overflow-x-clip">
       <h2 id={`${uid}-guided`} className="sr-only">
         {t("title")}
       </h2>
@@ -514,7 +553,7 @@ export function LessonStage({
 
       <section ref={areaRef} aria-labelledby={`${uid}-guided`} className="relative isolate px-4 pt-3 pb-6 sm:px-7">
         {showMushaf && (
-          <div className="mt-2">
+          <div ref={wordsRef} className="mt-2">
             <MushafLine
               ayah={ayah}
               words={words}
@@ -538,28 +577,57 @@ export function LessonStage({
             stage is the words, the card, then the caption and the controls
             in the bottom panel). Phones: one compact row, the Arabic on the
             right of its number, transliteration and meaning, so the words,
-            the card and the panel fit one screen; from sm: stacked, centred. */}
+            the card and the panel fit one screen — while the longest of
+            those words fits beside the Arabic; when it does not (large text
+            sizes), the Arabic takes a row of its own above them instead of
+            the words running into it (flex-wrap on their min-content; line
+            breaks, 2026-10-10). From sm: stacked, centred.
+            The slot is sticky just above the bottom panel (--panel-h): when
+            the words, the card and the panel do not fit one screen — a long
+            line makes the panel taller, a composition is taller than the
+            card, a larger text size, the learner scrolled — the card (or the
+            animation) rides up over the end of the mushaf line instead of
+            sliding under the panel (CI 2026-10-11: word card 445–591 under
+            the panel 436–844 on a 390×844 phone). It never moves while
+            everything fits; when the panel's height changes with the line, it
+            glides to its new place (motion-safe). Clicks pass through its
+            empty part to the words. */}
         {!started ? (
           <div className="mx-auto mt-5 max-w-prose">{translation}</div>
         ) : live && !spec ? (
-          <div ref={cardSlotRef} className="mt-4 min-h-32 sm:min-h-56">
-            {focusWord ? (
+          <div
+            ref={cardSlotRef}
+            className="pointer-events-none sticky bottom-[calc(var(--panel-h,0px)+0.5rem)] z-10 mt-4 min-h-36 *:pointer-events-auto motion-safe:transition-[bottom] motion-safe:duration-200 sm:min-h-56"
+          >
+            {anim && ap.frame && compose ? (
+              <WordComposition
+                unit={anim}
+                kind={ap.frame.step}
+                frame={ap.frame.frame}
+                recited={ap.frame.recited}
+                marks={compose.marks}
+                word={ap.frame.word}
+                stepKey={step.id}
+              />
+            ) : focusWord ? (
               <div
                 data-guide="word-card"
                 data-autoplay="word-card"
-                className="mx-auto grid max-w-xl grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 rounded-2xl border-[1.5px] border-forest bg-forest-tint px-4 py-2 sm:grid-cols-1 sm:justify-items-center sm:gap-y-1 sm:py-3 sm:text-center"
+                className="mx-auto flex max-w-xl flex-wrap-reverse items-center gap-x-4 gap-y-1 rounded-2xl border-[1.5px] border-forest bg-forest-tint px-4 py-2 sm:flex-col sm:flex-nowrap sm:py-3 sm:text-center"
               >
-                <p className="row-start-1 text-base font-semibold text-forest">{t("word_n", { n: focusWord.index })}</p>
-                <p
-                  lang="ar"
-                  dir="rtl"
-                  className="quran col-start-2 row-span-3 row-start-1 text-ar-lg text-ink sm:col-start-1 sm:row-span-1 sm:row-start-2 sm:text-ar-xl"
-                >
+                <div className="flex-[1_1_min-content] sm:contents">
+                  <p className="text-base font-semibold text-forest sm:order-1">{t("word_n", { n: focusWord.index })}</p>
+                  {/* MixedText: "al-ḥamdu", "orang-orang" are never cut at the hyphen while
+                      they fit the column (line breaks, operator 2026-10-10). */}
+                  <p className="text-lg text-ink-muted sm:order-3">
+                    <MixedText text={focusWord.translit} />
+                  </p>
+                  <p className="text-xl font-semibold text-pretty text-ink sm:order-4">
+                    <MixedText text={t("card_meaning", { gloss: focusWord.gloss })} />
+                  </p>
+                </div>
+                <p lang="ar" dir="rtl" className="quran ml-auto text-ar-lg text-ink sm:order-2 sm:ml-0 sm:text-ar-xl">
                   {focusWord.ar}
-                </p>
-                <p className="row-start-2 text-lg text-ink-muted sm:row-start-3">{focusWord.translit}</p>
-                <p className="row-start-3 text-xl font-semibold text-pretty text-ink sm:row-start-4">
-                  {t("card_meaning", { gloss: focusWord.gloss })}
                 </p>
               </div>
             ) : null}
@@ -607,9 +675,10 @@ export function LessonStage({
           state.intent?.kind === "surah_end" ? (
             <SurahEndCard
               surahName={surahName}
-              nextSurah={nextSurah}
+              nextSurah={upNext.next}
+              comingSoon={upNext.soon?.name ?? null}
               onRepeat={() => continueToAyah(ap.router, seq.slug, 1)}
-              onNextSurah={() => nextSurah && continueToAyah(ap.router, nextSurah.slug, 1)}
+              onNextSurah={() => upNext.next && continueToAyah(ap.router, upNext.next.slug, 1)}
             />
           ) : state.intent?.kind === "ayah" ? (
             <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-3" role="status">
@@ -629,11 +698,14 @@ export function LessonStage({
                 tabIndex={-1}
                 className="mt-4 text-base font-semibold text-ink"
               >
-                {t("exercise_heading", {
-                  n: exerciseN,
-                  total: exerciseSteps.length,
-                  title: tx(EXERCISE_TITLE_KEY[spec.key]),
-                })}
+                {/* "Latihan 2 dari 5 · …": the dot never starts a line (line breaks, 2026-10-10). */}
+                <MixedText
+                  text={t("exercise_heading", {
+                    n: exerciseN,
+                    total: exerciseSteps.length,
+                    title: tx(EXERCISE_TITLE_KEY[spec.key]),
+                  })}
+                />
               </p>
             )}
             {/* An exercise's prompt stays above the exercise it explains;
@@ -715,6 +787,7 @@ export function LessonStage({
                   ref={focusOnMount}
                   type="button"
                   data-autoplay="middle"
+                  data-mode={middle}
                   data-guide={middle === "lanjut" ? "lanjut" : undefined}
                   onClick={onMiddle}
                   className={clsx(

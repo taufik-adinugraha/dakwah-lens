@@ -65,7 +65,10 @@ const securityHeaders = [
  *   the first one non-permanent. localeDetection is off, so "id" (the
  *   default locale) is what next-intl would have chosen anyway.
  * - Only known slugs match: an unknown /{locale}/{x} is left alone and ends
- *   in the module's 404 instead of being sent into the track.
+ *   in the module's 404 instead of being sent into the track. A surah that
+ *   BELAJAR_SURAHS does not publish is redirected all the same (these rules
+ *   are fixed at build time, the switch is read per request) and its new
+ *   address answers the 404 (src/proxy.ts; plan L14).
  * - The hash (#w-1-2-3 word anchors) never reaches the server; browsers
  *   carry it across the redirect.
  */

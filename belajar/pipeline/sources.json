@@ -687,6 +687,1119 @@
       },
       "licence": "No licence published by EveryAyah (UNVERIFIED rights). Stream with credit only (plan §6.2).",
       "attribution": "Recitation: Mishary Rashid Alafasy via EveryAyah.com"
+    },
+    "shamela_istilah": {
+      "name": "Shamela page text of kitab the Konsep library cites, for the Arabic spelling of grammar terms (authored/library.terms.json attestations)",
+      "version": "page text as extracted by fetch.py (terms.extract_shamela) on the retrieval date; the extracted text is the pinned version",
+      "url_pattern": "https://shamela.ws/book/{BOOK}/{PAGE}",
+      "options": "A Shamela page's HTML carries per-request tokens, so the EXTRACTED TEXT is pinned (sha256 of the UTF-8 .txt under cache_dir), not the HTML: the matn paragraphs of <div class=\"nass\">, then the editor's footnotes (p.hamesh) after a line '[هامش]'. A page is added by listing its key here (book/page id) and running fetch.py. Authoring and validation input only: nothing from these pages is shipped except the term spellings they attest; the authored term table keeps excerpts of at most 12 words.",
+      "cache_dir": "cache/shamela",
+      "books": {
+        "11371": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+        "6970": "Ibnu Hisyam al-Anshari, Syarh Qathr an-Nada wa Ball ash-Shada (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, cet. 11, 1383 H/1963 M)",
+        "9904": "Ibnu 'Aqil, Syarh Ibn 'Aqil 'ala Alfiyyah Ibn Malik (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, Kairo: Dar at-Turats, cet. 20, 1400 H/1980 M)",
+        "11243": "Ahmad al-Hamalawi, Syadza al-'Arf fi Fann ash-Sharf (tahqiq Nashrullah 'Abd ar-Rahman Nashrullah, Riyadh: Maktabah ar-Rusyd)",
+        "9057": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath, Damaskus: Dar al-Qalam)",
+        "9617": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+        "2163": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+        "22916": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+        "23587": "Abu Ja'far an-Nahhas, I'rab al-Qur'an (catatan 'Abd al-Mun'im Khalil Ibrahim, Beirut: Dar al-Kutub al-'Ilmiyyah, cet. 1, 1421 H)",
+        "9256": "Ahmad al-Hasyimi, Jawahir al-Balaghah fi al-Ma'ani wa al-Bayan wa al-Badi' (ed. Yusuf ash-Shumaili, Beirut: al-Maktabah al-'Ashriyyah)",
+        "13896": "Musa'id ath-Thayyar, al-Muharrar fi 'Ulum al-Qur'an (Markaz ad-Dirasat wa al-Ma'lumat al-Qur'aniyyah, cet. 2, 1429 H/2008 M)"
+      },
+      "pages": {
+        "11243/8": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/8",
+          "print_page": "11",
+          "title": "ص11 - كتاب شذا العرف في فن الصرف - خطبة الكتاب - المكتبة الشاملة",
+          "text_sha256": "391e15235e914f3963065bb5dc29d9ba5c9dd0a0e56222642108ef0ea8d298a9",
+          "chars": 1384,
+          "retrieved": "2026-10-10"
+        },
+        "11243/11": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/11",
+          "print_page": "14",
+          "title": "ص14 - كتاب شذا العرف في فن الصرف - الميزان الصرفي - المكتبة الشاملة",
+          "text_sha256": "6f6657a3c63ba544622ae3e0b2c6b65cf706aa19d8af05360d4ba160136f89df",
+          "chars": 1375,
+          "retrieved": "2026-10-10"
+        },
+        "11243/16": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/16",
+          "print_page": "19",
+          "title": "ص19 - كتاب شذا العرف في فن الصرف - التقسيم الثاني للفعل - المكتبة الشاملة",
+          "text_sha256": "be40dd4df95d5ee33f1fbdab144e68f63e6d582a881e8386c6e9549d64804977",
+          "chars": 1126,
+          "retrieved": "2026-10-11"
+        },
+        "11243/21": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/21",
+          "print_page": "24",
+          "title": "ص24 - كتاب شذا العرف في فن الصرف - التقسيم الثالث للفعل بحسب التجرد والزيادة وتقسيم كل - المكتبة الشاملة",
+          "text_sha256": "bd1c23c4efea92e548b34ec1ef5a11035b86716912ea17797d3ff4f0c391331b",
+          "chars": 1754,
+          "retrieved": "2026-10-10"
+        },
+        "11243/23": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/23",
+          "print_page": "26",
+          "title": "ص26 - كتاب شذا العرف في فن الصرف - التقسيم الثالث للفعل بحسب التجرد والزيادة وتقسيم كل - المكتبة الشاملة",
+          "text_sha256": "880309b2bafc74d8b94056300480a51fc00c4f512bc3708302d7754d69969379",
+          "chars": 1560,
+          "retrieved": "2026-10-10"
+        },
+        "11243/24": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/24",
+          "print_page": "27",
+          "title": "ص27 - كتاب شذا العرف في فن الصرف - التقسيم الثالث للفعل بحسب التجرد والزيادة وتقسيم كل - المكتبة الشاملة",
+          "text_sha256": "f6a5b91d4b421396edf3bc6824e9f122fe7552082c5ba6a20e6a9716faa6e2f0",
+          "chars": 1366,
+          "retrieved": "2026-10-11"
+        },
+        "11243/26": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/26",
+          "print_page": "29",
+          "title": "ص29 - كتاب شذا العرف في فن الصرف - التقسيم الثالث للفعل بحسب التجرد والزيادة وتقسيم كل - المكتبة الشاملة",
+          "text_sha256": "f9e95294844eb806f0549e17d73b1b531607f5ef29ac0572c1cdaf69db1b6c44",
+          "chars": 696,
+          "retrieved": "2026-10-10"
+        },
+        "11243/27": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/27",
+          "print_page": "29",
+          "title": "ص29 - كتاب شذا العرف في فن الصرف - فصل في معاني صيغ الزوائد - المكتبة الشاملة",
+          "text_sha256": "c5ae7773a9e09526f12de4649c0a72c818fb40c9fb44e2bc47d03b3d44d5abb5",
+          "chars": 515,
+          "retrieved": "2026-10-11"
+        },
+        "11243/30": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/30",
+          "print_page": "32",
+          "title": "ص32 - كتاب شذا العرف في فن الصرف - فصل في معاني صيغ الزوائد - المكتبة الشاملة",
+          "text_sha256": "d73b1c680315a5ec46e8889cb2cabb858b6cad37d20538b42e4fc50b5338a9e1",
+          "chars": 1250,
+          "retrieved": "2026-10-10"
+        },
+        "11243/31": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/31",
+          "print_page": "33",
+          "title": "ص33 - كتاب شذا العرف في فن الصرف - فصل في معاني صيغ الزوائد - المكتبة الشاملة",
+          "text_sha256": "526b90f047b9b900756c21b6aeffda526d0e017a5af103d13b073b2c950e5c9a",
+          "chars": 1262,
+          "retrieved": "2026-10-10"
+        },
+        "11243/32": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/32",
+          "print_page": "34",
+          "title": "ص34 - كتاب شذا العرف في فن الصرف - فصل في معاني صيغ الزوائد - المكتبة الشاملة",
+          "text_sha256": "620d1ddf6a13603a57578abf62f6b19754e369570a93e9af9070074209a068ff",
+          "chars": 1178,
+          "retrieved": "2026-10-11"
+        },
+        "11243/35": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/35",
+          "print_page": "36",
+          "title": "ص36 - كتاب شذا العرف في فن الصرف - فصل في تصريف الأفعال بعضها من بعض - المكتبة الشاملة",
+          "text_sha256": "a16cfdb6a0c91accdde5fb01e6ebc7b968f837c34a3a0eb72643616362016dc0",
+          "chars": 672,
+          "retrieved": "2026-10-11"
+        },
+        "11243/41": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/41",
+          "print_page": "42",
+          "title": "ص42 - كتاب شذا العرف في فن الصرف - التقسيم السادس للفعل من حيث بناؤه للفاعل أو المفعول - المكتبة الشاملة",
+          "text_sha256": "0b2774634bc6e9198c8e840e9e224284ba8da177d67a87deef5c7b220694ee75",
+          "chars": 1461,
+          "retrieved": "2026-10-10"
+        },
+        "11243/44": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/44",
+          "print_page": "45",
+          "title": "ص45 - كتاب شذا العرف في فن الصرف - التقسيم السابع للفعل من حيث كونه مؤكدا أو غير مؤكد - المكتبة الشاملة",
+          "text_sha256": "29d501b6fef8b441e0c29ca58c8fd372360f61ba6c58cef2e8e76d472711e336",
+          "chars": 1534,
+          "retrieved": "2026-10-11"
+        },
+        "11243/49": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/49",
+          "print_page": "49",
+          "title": "ص49 - كتاب شذا العرف في فن الصرف - تتمة في حكم الأفعال عند إسنادها إلى الضمائر ونحوها - المكتبة الشاملة",
+          "text_sha256": "24c594f299e2de9cdc37d11447776e015d9d2665d563b297495c6a5299ec0482",
+          "chars": 1130,
+          "retrieved": "2026-10-10"
+        },
+        "11243/53": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/53",
+          "print_page": "53",
+          "title": "ص53 - كتاب شذا العرف في فن الصرف - الباب الثاني في الكلام على الاسم - المكتبة الشاملة",
+          "text_sha256": "87e26eb8137baad25424529313f5a0f4eadb8b9be87def253b086d7726e999d1",
+          "chars": 1441,
+          "retrieved": "2026-10-11"
+        },
+        "11243/54": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/54",
+          "print_page": "54",
+          "title": "ص54 - كتاب شذا العرف في فن الصرف - التقسيم الأول للاسم من حيث التجرد والزيادة - المكتبة الشاملة",
+          "text_sha256": "2414800484c1c627903d5128097c0440a8798495eecb5e2cb73bd20a526ba685",
+          "chars": 1509,
+          "retrieved": "2026-10-11"
+        },
+        "11243/57": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/57",
+          "print_page": "57",
+          "title": "ص57 - كتاب شذا العرف في فن الصرف - المصدر - المكتبة الشاملة",
+          "text_sha256": "1a511ba460c88edf896ea2e9fdeefc755120501214eb4223bae5f53fa9b3be46",
+          "chars": 1590,
+          "retrieved": "2026-10-11"
+        },
+        "11243/58": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/58",
+          "print_page": "58",
+          "title": "ص58 - كتاب شذا العرف في فن الصرف - المصدر - المكتبة الشاملة",
+          "text_sha256": "973dab9e766733509285eb543e8b72a31a6f3f47e71a84c53a3c96c196913c49",
+          "chars": 1580,
+          "retrieved": "2026-10-11"
+        },
+        "11243/59": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/59",
+          "print_page": "59",
+          "title": "ص59 - كتاب شذا العرف في فن الصرف - المصدر - المكتبة الشاملة",
+          "text_sha256": "992a7a6ba5bc09a7242c3d6a7d61243ee046b41f67590a66e73e78e0a936080b",
+          "chars": 1724,
+          "retrieved": "2026-10-11"
+        },
+        "11243/60": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/60",
+          "print_page": "60",
+          "title": "ص60 - كتاب شذا العرف في فن الصرف - المصدر - المكتبة الشاملة",
+          "text_sha256": "329d0eeb943c546a9d7ec78e3f6815992288f7d162190bb7b75ed06e025aa7df",
+          "chars": 1539,
+          "retrieved": "2026-10-11"
+        },
+        "11243/63": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/63",
+          "print_page": "62",
+          "title": "ص62 - كتاب شذا العرف في فن الصرف - اسم الفاعل - المكتبة الشاملة",
+          "text_sha256": "63e658b55d370ab2cea6f41433688060cd59942543feb26ecd9393ccf6c2e6e1",
+          "chars": 1521,
+          "retrieved": "2026-10-11"
+        },
+        "11243/64": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/64",
+          "print_page": "63",
+          "title": "ص63 - كتاب شذا العرف في فن الصرف - اسم الفاعل - المكتبة الشاملة",
+          "text_sha256": "ce823125d3039efd002c4aaa9cd01af7ceb170f7da88f29773839cf060c89168",
+          "chars": 196,
+          "retrieved": "2026-10-11"
+        },
+        "11243/65": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/65",
+          "print_page": "63",
+          "title": "ص63 - كتاب شذا العرف في فن الصرف - اسم المفعول - المكتبة الشاملة",
+          "text_sha256": "88a478545760c0c72bd5c8393ca901de14fa4a300e05ce74489436e712ddfe90",
+          "chars": 703,
+          "retrieved": "2026-10-11"
+        },
+        "11243/67": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/67",
+          "print_page": "64",
+          "title": "ص64 - كتاب شذا العرف في فن الصرف - الصفة المشبهة باسم الفاعل - المكتبة الشاملة",
+          "text_sha256": "bbb07c2db2da78faebd5c00b8c9eed5485fc5633ffb4280b33036d8bf2418312",
+          "chars": 860,
+          "retrieved": "2026-10-11"
+        },
+        "11243/71": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/71",
+          "print_page": "68",
+          "title": "ص68 - كتاب شذا العرف في فن الصرف - اسم التفضيل - المكتبة الشاملة",
+          "text_sha256": "a3b40ffb70da589ab06ad2fee235beef25a9374c547b398f554ae576186e4645",
+          "chars": 1415,
+          "retrieved": "2026-10-11"
+        },
+        "11243/72": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/72",
+          "print_page": "69",
+          "title": "ص69 - كتاب شذا العرف في فن الصرف - اسم التفضيل - المكتبة الشاملة",
+          "text_sha256": "1806b3e0c118323b00c0a394fa7b8124bc72cb7a1f9534ddbe1646122f97d5d1",
+          "chars": 1296,
+          "retrieved": "2026-10-10"
+        },
+        "11243/80": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/80",
+          "print_page": "77",
+          "title": "ص77 - كتاب شذا العرف في فن الصرف - التقسيم الرابع للاسم من حيث كونه منقوصا أو مقصورا أو ممدودا أو صحيحا - المكتبة الشاملة",
+          "text_sha256": "4efd5771a7fc7db0b67f60e19a8c03b00279699c5eabf6287de9da512d16c901",
+          "chars": 1581,
+          "retrieved": "2026-10-11"
+        },
+        "11243/104": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/104",
+          "print_page": "98",
+          "title": "ص98 - كتاب شذا العرف في فن الصرف - خاتمة تشمل على عدة أسئلة - المكتبة الشاملة",
+          "text_sha256": "a549cf0d56e4520fab3b6b1a4ce8b1c04d8a0af2bc686039f7e4ccd1ccdf2f89",
+          "chars": 1339,
+          "retrieved": "2026-10-10"
+        },
+        "11243/113": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/113",
+          "print_page": "107",
+          "title": "ص107 - كتاب شذا العرف في فن الصرف - النسب - المكتبة الشاملة",
+          "text_sha256": "bc84d16db59e2288d7497dcaf3a948634570e7b13674444f146f1585b2ff1f7e",
+          "chars": 1773,
+          "retrieved": "2026-10-11"
+        },
+        "11243/118": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/118",
+          "print_page": "112",
+          "title": "ص112 - كتاب شذا العرف في فن الصرف - النسب - المكتبة الشاملة",
+          "text_sha256": "b97a0f9f5a71f2f5f1049beaff9f4a79711454d0ff92cd8e427931da33de0ddd",
+          "chars": 1708,
+          "retrieved": "2026-10-11"
+        },
+        "11243/121": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/121",
+          "print_page": "114",
+          "title": "ص114 - كتاب شذا العرف في فن الصرف - خاتمة - المكتبة الشاملة",
+          "text_sha256": "3644b7409dd0bcaff85d3490cbd663439b36e829de510ee391429368788f2bb4",
+          "chars": 782,
+          "retrieved": "2026-10-11"
+        },
+        "11243/125": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/125",
+          "print_page": "118",
+          "title": "ص118 - كتاب شذا العرف في فن الصرف - فصل في حروف الزيادة ومواضعها وأدلتها - المكتبة الشاملة",
+          "text_sha256": "8a7f2afe4a8ead033f7735277be5f163f5540451da68e2bfe09d7c755356998d",
+          "chars": 1624,
+          "retrieved": "2026-10-11"
+        },
+        "11243/127": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/127",
+          "print_page": "120",
+          "title": "ص120 - كتاب شذا العرف في فن الصرف - فصل في همزة الوصل - المكتبة الشاملة",
+          "text_sha256": "65b688cea16bd28d8e9032b72c34011fd052498e1c3de35096b4482831143eeb",
+          "chars": 1638,
+          "retrieved": "2026-10-10"
+        },
+        "11243/130": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/130",
+          "print_page": "122",
+          "title": "ص122 - كتاب شذا العرف في فن الصرف - الإعلال والإبدال - المكتبة الشاملة",
+          "text_sha256": "3956db823b8c09726663c9de53cb18e02285b1e4b7a8a2ae40688ff1b5a88acf",
+          "chars": 1533,
+          "retrieved": "2026-10-10"
+        },
+        "11243/140": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/140",
+          "print_page": "129",
+          "title": "ص129 - كتاب شذا العرف في فن الصرف - الإعلال في حروف العلة أ قلب الألف والواو ياء - المكتبة الشاملة",
+          "text_sha256": "5d08a89fdeb2f52265e18896cc7eb48d13116a93020dc3b1b21e214efef79925",
+          "chars": 1644,
+          "retrieved": "2026-10-11"
+        },
+        "11243/141": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/141",
+          "print_page": "130",
+          "title": "ص130 - كتاب شذا العرف في فن الصرف - الإعلال في حروف العلة أ قلب الألف والواو ياء - المكتبة الشاملة",
+          "text_sha256": "9a3d38709c92196f5333b29c3e52c9ffe6f1d3a78c2871d47c928e326cb2d801",
+          "chars": 1690,
+          "retrieved": "2026-10-11"
+        },
+        "11243/146": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/146",
+          "print_page": "133",
+          "title": "ص133 - كتاب شذا العرف في فن الصرف - ج قلب الواو والياء ألفا - المكتبة الشاملة",
+          "text_sha256": "d5dc3ced1acf1547de1af95dd579e2dbdea62391ca8d5c8cf65c47053669b444",
+          "chars": 1293,
+          "retrieved": "2026-10-11"
+        },
+        "11243/147": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/147",
+          "print_page": "134",
+          "title": "ص134 - كتاب شذا العرف في فن الصرف - فصل في فاء الافتعال وتائه - المكتبة الشاملة",
+          "text_sha256": "9859a94e79bfbb6c6750f83e915b8b6b0a9750b69ba030a0b81ee02733a6affe",
+          "chars": 1514,
+          "retrieved": "2026-10-11"
+        },
+        "11243/151": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/151",
+          "print_page": "137",
+          "title": "ص137 - كتاب شذا العرف في فن الصرف - الإعلال بالنقل - المكتبة الشاملة",
+          "text_sha256": "064f0d3947d07322db24d0e3312c6a32259cd0eec3fe7d7b33f25bb5f04d4d6b",
+          "chars": 1779,
+          "retrieved": "2026-10-11"
+        },
+        "11243/153": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/153",
+          "print_page": "138",
+          "title": "ص138 - كتاب شذا العرف في فن الصرف - الإعلال بالحذف - المكتبة الشاملة",
+          "text_sha256": "629096ef34451b76dd2a8cca7fe2193ab28a4580cf800de1bfb057b30ad09436",
+          "chars": 792,
+          "retrieved": "2026-10-11"
+        },
+        "11243/159": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/159",
+          "print_page": "143",
+          "title": "ص143 - كتاب شذا العرف في فن الصرف - الإدغام - المكتبة الشاملة",
+          "text_sha256": "82a2b6ffc3143b123c5b2d0fee1107fb6217f9b8f61d1182f673de85e2155459",
+          "chars": 967,
+          "retrieved": "2026-10-11"
+        },
+        "11243/182": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/182",
+          "print_page": "164",
+          "title": "ص164 - كتاب شذا العرف في فن الصرف - تقاريظ الكتاب - المكتبة الشاملة",
+          "text_sha256": "a28452e3183d7e64970cbba2b0236dc211d7dc3bf635b90eb6f507cc4b4dafa7",
+          "chars": 1171,
+          "retrieved": "2026-10-11"
+        },
+        "11243/185": {
+          "book": "11243",
+          "url": "https://shamela.ws/book/11243/185",
+          "print_page": "168",
+          "title": "ص168 - كتاب شذا العرف في فن الصرف - فهرس الموضوعات - المكتبة الشاملة",
+          "text_sha256": "48a503ceb655b2319b6867da4e76b2623d5de2b4cda1064d52e4f34240c3adde",
+          "chars": 2299,
+          "retrieved": "2026-10-11"
+        },
+        "11371/1": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/1",
+          "print_page": "5",
+          "title": "ص5 - كتاب الآجرومية - مدخل - المكتبة الشاملة",
+          "text_sha256": "a1543cf8dfa4b8d9be343ccbd61950a4ecb5c7b5e40256b0955778e1144f80e4",
+          "chars": 447,
+          "retrieved": "2026-10-10"
+        },
+        "11371/2": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/2",
+          "print_page": "6",
+          "title": "ص6 - كتاب الآجرومية - باب الإعراب - المكتبة الشاملة",
+          "text_sha256": "870935b97942dc099997b554eea6b50980efb56db01b3bdb5044bf22c6086e6d",
+          "chars": 249,
+          "retrieved": "2026-10-10"
+        },
+        "11371/3": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/3",
+          "print_page": "6",
+          "title": "ص6 - كتاب الآجرومية - باب معرفة علامات الإعراب - المكتبة الشاملة",
+          "text_sha256": "355255f4bdf67c6a99afaea90d3f6c0cada6d4d8e8552dc240401360fad7d627",
+          "chars": 509,
+          "retrieved": "2026-10-10"
+        },
+        "11371/4": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/4",
+          "print_page": "7",
+          "title": "ص7 - كتاب الآجرومية - باب معرفة علامات الإعراب - المكتبة الشاملة",
+          "text_sha256": "8109d5c8c1c3998377b07534e5c88384f3bf6b08930aed2951a2ec63433ce65b",
+          "chars": 791,
+          "retrieved": "2026-10-10"
+        },
+        "11371/5": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/5",
+          "print_page": "8",
+          "title": "ص8 - كتاب الآجرومية - باب معرفة علامات الإعراب - المكتبة الشاملة",
+          "text_sha256": "aab31a48f743101d806452ce3e3e8ead48f05112e81577ba679f64226bb1b896",
+          "chars": 455,
+          "retrieved": "2026-10-10"
+        },
+        "11371/6": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/6",
+          "print_page": "9",
+          "title": "ص9 - كتاب الآجرومية - باب معرفة علامات الإعراب - المكتبة الشاملة",
+          "text_sha256": "44f82960bcbd30924f2ad96dfb7015900ece398021cadcad78fc423ee37dd91e",
+          "chars": 649,
+          "retrieved": "2026-10-10"
+        },
+        "11371/7": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/7",
+          "print_page": "10",
+          "title": "ص10 - كتاب الآجرومية - باب الأفعال - المكتبة الشاملة",
+          "text_sha256": "0299ac590d3d32ff9ceb81255b9ee8a4f796e1ccf3cc8894b87004770eea5102",
+          "chars": 598,
+          "retrieved": "2026-10-10"
+        },
+        "11371/8": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/8",
+          "print_page": "11",
+          "title": "ص11 - كتاب الآجرومية - باب مرفوعات الأسماء - المكتبة الشاملة",
+          "text_sha256": "28bde289e7162143d8f10700ce4e69540512f2f429d29d758783fee5eef911cb",
+          "chars": 215,
+          "retrieved": "2026-10-10"
+        },
+        "11371/12": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/12",
+          "print_page": "13",
+          "title": "ص13 - كتاب الآجرومية - باب المبتدأ والخبر - المكتبة الشاملة",
+          "text_sha256": "5b8e06abe28b4de5b052ce470ee5cc4ef2c342409d641688965f8a44788a8d85",
+          "chars": 392,
+          "retrieved": "2026-10-10"
+        },
+        "11371/13": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/13",
+          "print_page": "13",
+          "title": "ص13 - كتاب الآجرومية - باب العوامل الداخلة على المبتدأ والخبر - المكتبة الشاملة",
+          "text_sha256": "47c937de4152cb334e04699eb8ffd7e47c06bae0e395828e396566fc05d57470",
+          "chars": 413,
+          "retrieved": "2026-10-11"
+        },
+        "11371/15": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/15",
+          "print_page": "14",
+          "title": "ص14 - كتاب الآجرومية - باب النعت - المكتبة الشاملة",
+          "text_sha256": "c3f554eed9e58b010e7baed84b5f6017e7a827a139f15bf0a83766eda5da6111",
+          "chars": 522,
+          "retrieved": "2026-10-10"
+        },
+        "11371/16": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/16",
+          "print_page": "15",
+          "title": "ص15 - كتاب الآجرومية - باب العطف - المكتبة الشاملة",
+          "text_sha256": "780814645e83295a58812b59bfcbc60db8c11b3680b8ab42435dcc7db076cbac",
+          "chars": 398,
+          "retrieved": "2026-10-10"
+        },
+        "11371/19": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/19",
+          "print_page": "16",
+          "title": "ص16 - كتاب الآجرومية - باب منصوبات الأسماء - المكتبة الشاملة",
+          "text_sha256": "bef00a27956375cc6b284392f68971df8a5e40f030fd198f213c268744822fdc",
+          "chars": 307,
+          "retrieved": "2026-10-10"
+        },
+        "11371/20": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/20",
+          "print_page": "17",
+          "title": "ص17 - كتاب الآجرومية - باب المفعول به - المكتبة الشاملة",
+          "text_sha256": "d34face9e866a7a808994705eeda4d7aa5c105cfdccad160956e61fe85d22818",
+          "chars": 499,
+          "retrieved": "2026-10-10"
+        },
+        "11371/21": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/21",
+          "print_page": "18",
+          "title": "ص18 - كتاب الآجرومية - باب المصدر - المكتبة الشاملة",
+          "text_sha256": "abe40e472041433383dfb70f637bf32c9273f4294f303f3ec7702cf599a7ee3f",
+          "chars": 299,
+          "retrieved": "2026-10-10"
+        },
+        "11371/23": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/23",
+          "print_page": "19",
+          "title": "ص19 - كتاب الآجرومية - باب الحال - المكتبة الشاملة",
+          "text_sha256": "8958d65239549108e95cb21978292da218ae5347fe322d6e8866b3ed2e5ee028",
+          "chars": 274,
+          "retrieved": "2026-10-10"
+        },
+        "11371/27": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/27",
+          "print_page": "21",
+          "title": "ص21 - كتاب الآجرومية - باب المنادى - المكتبة الشاملة",
+          "text_sha256": "3564ad8fe3147f0cd5a148e95d038c282a58626991fbc7cfc03845fc41a14164",
+          "chars": 277,
+          "retrieved": "2026-10-10"
+        },
+        "11371/30": {
+          "book": "11371",
+          "url": "https://shamela.ws/book/11371/30",
+          "print_page": "22",
+          "title": "ص22 - كتاب الآجرومية - باب المخفوضات من الأسماء - المكتبة الشاملة",
+          "text_sha256": "86d9d699c90829f5706e508479dcb3364aa4cdb3fc5ee42297a4ca43c27bd818",
+          "chars": 165,
+          "retrieved": "2026-10-10"
+        },
+        "13896/280": {
+          "book": "13896",
+          "url": "https://shamela.ws/book/13896/280",
+          "print_page": "295",
+          "title": "ص295 - كتاب المحرر في علوم القرآن - المبحث الثاني اصطلاحات الضبط لمصحف المدينة النبوية - المكتبة الشاملة",
+          "text_sha256": "35ecbbb1353b8189320d929c790f98b6afe805e1b20c39bfa9d5a57789f57bfd",
+          "chars": 1669,
+          "retrieved": "2026-10-11"
+        },
+        "13896/281": {
+          "book": "13896",
+          "url": "https://shamela.ws/book/13896/281",
+          "print_page": "296",
+          "title": "ص296 - كتاب المحرر في علوم القرآن - المبحث الثاني اصطلاحات الضبط لمصحف المدينة النبوية - المكتبة الشاملة",
+          "text_sha256": "2e39b3b7b031b66d84b65511cdc1766ce45b4cb851583e5ad1df4561c36b13e3",
+          "chars": 1392,
+          "retrieved": "2026-10-11"
+        },
+        "2163/12": {
+          "book": "2163",
+          "url": "https://shamela.ws/book/2163/12",
+          "print_page": "15",
+          "title": "ج1 - ص15 - كتاب إعراب القرآن وبيانه - الإعراب - المكتبة الشاملة",
+          "text_sha256": "233904a96b19e0291dac248aa6c7b834845fc9d55e2df24caf88d901bdcedd68",
+          "chars": 1268,
+          "retrieved": "2026-10-10"
+        },
+        "2163/13": {
+          "book": "2163",
+          "url": "https://shamela.ws/book/2163/13",
+          "print_page": "16",
+          "title": "ج1 - ص16 - كتاب إعراب القرآن وبيانه - البلاغة - المكتبة الشاملة",
+          "text_sha256": "260d097a2331a15cb3b4465a2b9836dcb4d3a13d3650ec4042b86783652c0d82",
+          "chars": 1206,
+          "retrieved": "2026-10-10"
+        },
+        "2163/16": {
+          "book": "2163",
+          "url": "https://shamela.ws/book/2163/16",
+          "print_page": "19",
+          "title": "ج1 - ص19 - كتاب إعراب القرآن وبيانه - الفوائد - المكتبة الشاملة",
+          "text_sha256": "fcce77d5992a17ba02ba54da919c7913dd2ee4cbf0f8088ba17c7540b5f2d7ca",
+          "chars": 964,
+          "retrieved": "2026-10-10"
+        },
+        "2163/5774": {
+          "book": "2163",
+          "url": "https://shamela.ws/book/2163/5774",
+          "print_page": "616",
+          "title": "ج10 - ص616 - كتاب إعراب القرآن وبيانه - الإعراب - المكتبة الشاملة",
+          "text_sha256": "86d8b96baba556b48221b90bdfc3080c6c308f8fa413a735910ebcb40ef6e36b",
+          "chars": 1458,
+          "retrieved": "2026-10-10"
+        },
+        "2163/5781": {
+          "book": "2163",
+          "url": "https://shamela.ws/book/2163/5781",
+          "print_page": "623",
+          "title": "ج10 - ص623 - كتاب إعراب القرآن وبيانه - الإعراب - المكتبة الشاملة",
+          "text_sha256": "a05dda9b9c42213a58f3ec3a1e714276b39c89a0cd783a0676dbfefda1974be2",
+          "chars": 1164,
+          "retrieved": "2026-10-10"
+        },
+        "22916/14": {
+          "book": "22916",
+          "url": "https://shamela.ws/book/22916/14",
+          "print_page": "29",
+          "title": "ج1 - ص29 - كتاب الجدول في إعراب القرآن - سورة الفاتحة آية - المكتبة الشاملة",
+          "text_sha256": "289cdd0456b4933124f599975e32d7b10240c06123a3fa4b419006477fb03cef",
+          "chars": 926,
+          "retrieved": "2026-10-10"
+        },
+        "22916/5922": {
+          "book": "22916",
+          "url": "https://shamela.ws/book/22916/5922",
+          "print_page": "430",
+          "title": "ج15 - ص430 - كتاب الجدول في إعراب القرآن - الصرف - المكتبة الشاملة",
+          "text_sha256": "a593ae61b67a484f7af28128400d41638b94e0dcbd430e577956db8a75f2fdd3",
+          "chars": 482,
+          "retrieved": "2026-10-11"
+        },
+        "23587/18": {
+          "book": "23587",
+          "url": "https://shamela.ws/book/23587/18",
+          "print_page": "23",
+          "title": "ج1 - ص23 - كتاب إعراب القرآن للنحاس - شرح إعراب سورة البقرة - المكتبة الشاملة",
+          "text_sha256": "bdd18cf8868afc01807ea88fd8311a4c888e73fa4f0157bdac734b940e186881",
+          "chars": 1527,
+          "retrieved": "2026-10-10"
+        },
+        "6970/2": {
+          "book": "6970",
+          "url": "https://shamela.ws/book/6970/2",
+          "print_page": "11",
+          "title": "ص11 - كتاب شرح قطر الندى وبل الصدى - تعريف الكلمة وأقسامها - المكتبة الشاملة",
+          "text_sha256": "922fc0424491ca6d9e6da35c603f4b975c79f38d5d01ed56a9834143f2615f29",
+          "chars": 1240,
+          "retrieved": "2026-10-10"
+        },
+        "6970/3": {
+          "book": "6970",
+          "url": "https://shamela.ws/book/6970/3",
+          "print_page": "12",
+          "title": "ص12 - كتاب شرح قطر الندى وبل الصدى - علامات الاسم - المكتبة الشاملة",
+          "text_sha256": "23dbe32e1d60c800a0305cdc93a753df9155f1458809c7b2d3ff20ad5090ae19",
+          "chars": 1286,
+          "retrieved": "2026-10-10"
+        },
+        "6970/4": {
+          "book": "6970",
+          "url": "https://shamela.ws/book/6970/4",
+          "print_page": "13",
+          "title": "ص13 - كتاب شرح قطر الندى وبل الصدى - انقسام الاسم إلى معرب ومبني - المكتبة الشاملة",
+          "text_sha256": "7737d6d43fde05a44bf6235e3589d0d537f18e9746da5e42fa4d2cd958939fe5",
+          "chars": 1769,
+          "retrieved": "2026-10-10"
+        },
+        "6970/5": {
+          "book": "6970",
+          "url": "https://shamela.ws/book/6970/5",
+          "print_page": "14",
+          "title": "ص14 - كتاب شرح قطر الندى وبل الصدى - انقسام الاسم إلى معرب ومبني - المكتبة الشاملة",
+          "text_sha256": "291dda646bec27f36e53e5054bcded2c8e02501db2b7832e5796d05ac1134182",
+          "chars": 326,
+          "retrieved": "2026-10-11"
+        },
+        "6970/8": {
+          "book": "6970",
+          "url": "https://shamela.ws/book/6970/8",
+          "print_page": "17",
+          "title": "ص17 - كتاب شرح قطر الندى وبل الصدى - انقسام الاسم إلى معرب ومبني - المكتبة الشاملة",
+          "text_sha256": "45e81db2e218f4e2a6226bcc67f9f6c827618252c4b47516c13d1be6838d0be5",
+          "chars": 355,
+          "retrieved": "2026-10-11"
+        },
+        "6970/9": {
+          "book": "6970",
+          "url": "https://shamela.ws/book/6970/9",
+          "print_page": "19",
+          "title": "ص19 - كتاب شرح قطر الندى وبل الصدى - انقسام الاسم إلى معرب ومبني - المكتبة الشاملة",
+          "text_sha256": "db1b2ca7e90c928b91ae03c7866c50480a9223ab45c364c9a7fabbd0d64b972f",
+          "chars": 1226,
+          "retrieved": "2026-10-10"
+        },
+        "6970/11": {
+          "book": "6970",
+          "url": "https://shamela.ws/book/6970/11",
+          "print_page": "21",
+          "title": "ص21 - كتاب شرح قطر الندى وبل الصدى - انقسام الاسم إلى معرب ومبني - المكتبة الشاملة",
+          "text_sha256": "446ff88dc249ccf6da17043037048613436950761894274324356adadf457739",
+          "chars": 557,
+          "retrieved": "2026-10-11"
+        },
+        "6970/14": {
+          "book": "6970",
+          "url": "https://shamela.ws/book/6970/14",
+          "print_page": "26",
+          "title": "ص26 - كتاب شرح قطر الندى وبل الصدى - أقسام الفعل وعلاماته - المكتبة الشاملة",
+          "text_sha256": "20a7fe1f8d1d50bd66d1f5a9609b4a84b26fd66149a863803b0ae0e70a4e9174",
+          "chars": 1466,
+          "retrieved": "2026-10-10"
+        },
+        "6970/15": {
+          "book": "6970",
+          "url": "https://shamela.ws/book/6970/15",
+          "print_page": "27",
+          "title": "ص27 - كتاب شرح قطر الندى وبل الصدى - الفعل الماضي - المكتبة الشاملة",
+          "text_sha256": "e3c8886d5b36d5b3b800867e5d40210c474f73721de2b08b56310f7151bb8afa",
+          "chars": 1335,
+          "retrieved": "2026-10-10"
+        },
+        "6970/16": {
+          "book": "6970",
+          "url": "https://shamela.ws/book/6970/16",
+          "print_page": "28",
+          "title": "ص28 - كتاب شرح قطر الندى وبل الصدى - الفعل الماضي - المكتبة الشاملة",
+          "text_sha256": "6a7721c73d8644768e59ad9590126a7cae667a09960fdffd9dfa87f061a2e5e9",
+          "chars": 877,
+          "retrieved": "2026-10-10"
+        },
+        "6970/18": {
+          "book": "6970",
+          "url": "https://shamela.ws/book/6970/18",
+          "print_page": "30",
+          "title": "ص30 - كتاب شرح قطر الندى وبل الصدى - فعل الأمر - المكتبة الشاملة",
+          "text_sha256": "37985276e765cf8f49264933014b369635524c8d5967294b14517aabb6b3d9ab",
+          "chars": 645,
+          "retrieved": "2026-10-10"
+        },
+        "6970/21": {
+          "book": "6970",
+          "url": "https://shamela.ws/book/6970/21",
+          "print_page": "33",
+          "title": "ص33 - كتاب شرح قطر الندى وبل الصدى - الفعل المضارع - المكتبة الشاملة",
+          "text_sha256": "f4545228ff7d29acba36e5fe78ef2d26ae37947207c851d76410ab345ee949bb",
+          "chars": 156,
+          "retrieved": "2026-10-11"
+        },
+        "9057/50": {
+          "book": "9057",
+          "url": "https://shamela.ws/book/9057/50",
+          "print_page": "59",
+          "title": "ج1 - ص59 - الدر المصون في علوم الكتاب المكنون - - المكتبة الشاملة",
+          "text_sha256": "03004ae6a5a79a248ab07587d49ddd861e2b18f27a2f30db4388f521c274e3e4",
+          "chars": 1116,
+          "retrieved": "2026-10-11"
+        },
+        "9057/57": {
+          "book": "9057",
+          "url": "https://shamela.ws/book/9057/57",
+          "print_page": "65",
+          "title": "ج1 - ص65 - الدر المصون في علوم الكتاب المكنون - - المكتبة الشاملة",
+          "text_sha256": "72b255a3a4a1f7be246c0b4548d647568df3e453d4bacf9d105f5e434436a0cf",
+          "chars": 620,
+          "retrieved": "2026-10-11"
+        },
+        "9057/58": {
+          "book": "9057",
+          "url": "https://shamela.ws/book/9057/58",
+          "print_page": "65",
+          "title": "ج1 - ص65 - الدر المصون في علوم الكتاب المكنون - - المكتبة الشاملة",
+          "text_sha256": "ed758c5ea4e3e72361e7c9e14b804bfa5d259ed94c5afa512625885399ab69b1",
+          "chars": 414,
+          "retrieved": "2026-10-10"
+        },
+        "9057/60": {
+          "book": "9057",
+          "url": "https://shamela.ws/book/9057/60",
+          "print_page": "67",
+          "title": "ج1 - ص67 - الدر المصون في علوم الكتاب المكنون - - المكتبة الشاملة",
+          "text_sha256": "2c5ef872059ad1eeef891f2369c518d38b717ae0d806ccf4e07fb7a8b37ccba4",
+          "chars": 1043,
+          "retrieved": "2026-10-10"
+        },
+        "9057/61": {
+          "book": "9057",
+          "url": "https://shamela.ws/book/9057/61",
+          "print_page": "68",
+          "title": "ج1 - ص68 - الدر المصون في علوم الكتاب المكنون - - المكتبة الشاملة",
+          "text_sha256": "ea453519a3e687fbdb56ebd0a6d46a09db8caed234aff7401987ae8505681a6f",
+          "chars": 1387,
+          "retrieved": "2026-10-10"
+        },
+        "9057/67": {
+          "book": "9057",
+          "url": "https://shamela.ws/book/9057/67",
+          "print_page": "74",
+          "title": "ج1 - ص74 - الدر المصون في علوم الكتاب المكنون - - المكتبة الشاملة",
+          "text_sha256": "6cb798305c768f6e9b880f0e9b35641a02180cc2f397eb98bb8729670f6d6557",
+          "chars": 1195,
+          "retrieved": "2026-10-11"
+        },
+        "9256/3": {
+          "book": "9256",
+          "url": "https://shamela.ws/book/9256/3",
+          "print_page": "16",
+          "title": "ص16 - كتاب جواهر البلاغة في المعاني والبيان والبديع - علم المعاني - المكتبة الشاملة",
+          "text_sha256": "784adca6ea786ca46ae318cc6903bde94c180abab00484433bb0d0dbb625fa9e",
+          "chars": 1939,
+          "retrieved": "2026-10-10"
+        },
+        "9256/14": {
+          "book": "9256",
+          "url": "https://shamela.ws/book/9256/14",
+          "print_page": "28",
+          "title": "ص28 - كتاب جواهر البلاغة في المعاني والبيان والبديع - علم المعاني - المكتبة الشاملة",
+          "text_sha256": "38fbd9be9fabadc57a89308b6c02fb492d4034f785e4bb6d37915e1e10f9bcc0",
+          "chars": 3233,
+          "retrieved": "2026-10-11"
+        },
+        "9256/34": {
+          "book": "9256",
+          "url": "https://shamela.ws/book/9256/34",
+          "print_page": "48",
+          "title": "ص48 - كتاب جواهر البلاغة في المعاني والبيان والبديع - علم المعاني - المكتبة الشاملة",
+          "text_sha256": "209435cca93d405f9fa009f7813cf737047724bb43cd2d38a647933d00944fd4",
+          "chars": 852,
+          "retrieved": "2026-10-10"
+        },
+        "9256/37": {
+          "book": "9256",
+          "url": "https://shamela.ws/book/9256/37",
+          "print_page": "51",
+          "title": "ص51 - كتاب جواهر البلاغة في المعاني والبيان والبديع - علم المعاني - المكتبة الشاملة",
+          "text_sha256": "2dce01eb41fd270919cab45818ce492c22ce80ed7a0bddf9a2405871821ea5d6",
+          "chars": 1231,
+          "retrieved": "2026-10-11"
+        },
+        "9256/50": {
+          "book": "9256",
+          "url": "https://shamela.ws/book/9256/50",
+          "print_page": "66",
+          "title": "ص66 - كتاب جواهر البلاغة في المعاني والبيان والبديع - المبحث الثالث في تقسيم الخبر إلى جملة فعلية وجملة اسمية - المكتبة الشاملة",
+          "text_sha256": "b8fd65c0334c4ed3346dc2958bfa01f69072cfe36db7335b3f88fd71ce13304f",
+          "chars": 1790,
+          "retrieved": "2026-10-10"
+        },
+        "9256/76": {
+          "book": "9256",
+          "url": "https://shamela.ws/book/9256/76",
+          "print_page": "92",
+          "title": "ص92 - كتاب جواهر البلاغة في المعاني والبيان والبديع - المبحث الخامس في النداء - المكتبة الشاملة",
+          "text_sha256": "b66a4edda01958596fc3dc35325eabbc5ee178da2ac5040a884af400b9e64c59",
+          "chars": 1427,
+          "retrieved": "2026-10-11"
+        },
+        "9256/97": {
+          "book": "9256",
+          "url": "https://shamela.ws/book/9256/97",
+          "print_page": "115",
+          "title": "ص115 - كتاب جواهر البلاغة في المعاني والبيان والبديع - المبحث السابع في تعريف المسند إليه بالموصولية - المكتبة الشاملة",
+          "text_sha256": "b91ab8fd78c3b9b042af40785c30deda70e3f439ff53028633ca28ae08ed82bf",
+          "chars": 541,
+          "retrieved": "2026-10-10"
+        },
+        "9256/105": {
+          "book": "9256",
+          "url": "https://shamela.ws/book/9256/105",
+          "print_page": "123",
+          "title": "ص123 - كتاب جواهر البلاغة في المعاني والبيان والبديع - في تقديم المسند إليه - المكتبة الشاملة",
+          "text_sha256": "26addcdedb2261e5640cace707ad3f67d2f2e32a64922ed632de84e8c985c470",
+          "chars": 1748,
+          "retrieved": "2026-10-10"
+        },
+        "9256/106": {
+          "book": "9256",
+          "url": "https://shamela.ws/book/9256/106",
+          "print_page": "124",
+          "title": "ص124 - كتاب جواهر البلاغة في المعاني والبيان والبديع - في تقديم المسند إليه - المكتبة الشاملة",
+          "text_sha256": "7120d6c35aefb28aa9d11613f3019b861ec0c4556679209d73a4bb1816bfe7b0",
+          "chars": 1605,
+          "retrieved": "2026-10-11"
+        },
+        "9256/107": {
+          "book": "9256",
+          "url": "https://shamela.ws/book/9256/107",
+          "print_page": "125",
+          "title": "ص125 - كتاب جواهر البلاغة في المعاني والبيان والبديع - في تقديم المسند إليه - المكتبة الشاملة",
+          "text_sha256": "248bdad32bb1ce86e2095f0ddb22146740b1a9fbab71f74ce344ad0fba30ac28",
+          "chars": 3702,
+          "retrieved": "2026-10-11"
+        },
+        "9256/116": {
+          "book": "9256",
+          "url": "https://shamela.ws/book/9256/116",
+          "print_page": "136",
+          "title": "ص136 - كتاب جواهر البلاغة في المعاني والبيان والبديع - المبحث الثالث في تقديم المسند أو تأخيره - المكتبة الشاملة",
+          "text_sha256": "da270aefb7d57604013430112e9bddc2a6e4c9078fc698731f0189c45268b7bb",
+          "chars": 1357,
+          "retrieved": "2026-10-10"
+        },
+        "9256/125": {
+          "book": "9256",
+          "url": "https://shamela.ws/book/9256/125",
+          "print_page": "146",
+          "title": "ص146 - كتاب جواهر البلاغة في المعاني والبيان والبديع - المبحث الرابع في التقييد بعطف النسق - المكتبة الشاملة",
+          "text_sha256": "61ff7121b2f4020e66c5bddcd2d3cd0f7d3d1e1c200afbc75b0e9f2b13d76895",
+          "chars": 1205,
+          "retrieved": "2026-10-10"
+        },
+        "9256/129": {
+          "book": "9256",
+          "url": "https://shamela.ws/book/9256/129",
+          "print_page": "150",
+          "title": "ص150 - كتاب جواهر البلاغة في المعاني والبيان والبديع - المبحث السابع في التقييد بالنواسخ - المكتبة الشاملة",
+          "text_sha256": "0c09b1f2f440018062799a02f21eb561d2cc7ab99a2a8dcca65eae8224507b46",
+          "chars": 657,
+          "retrieved": "2026-10-10"
+        },
+        "9256/130": {
+          "book": "9256",
+          "url": "https://shamela.ws/book/9256/130",
+          "print_page": "151",
+          "title": "ص151 - كتاب جواهر البلاغة في المعاني والبيان والبديع - في التقييد بالشرط التقييد به - المكتبة الشاملة",
+          "text_sha256": "1acf89cf52f5409e55f455530255bd7a1c11920c7310021b5b4c31e2b013a87a",
+          "chars": 1467,
+          "retrieved": "2026-10-11"
+        },
+        "9256/282": {
+          "book": "9256",
+          "url": "https://shamela.ws/book/9256/282",
+          "print_page": "315",
+          "title": "ص315 - كتاب جواهر البلاغة في المعاني والبيان والبديع - الباب الأول في المحسنات المعنوية - المكتبة الشاملة",
+          "text_sha256": "e9e0eb9f03d31fa0148298d1f0e36be35957ae2ce57919555d45e143b4050c78",
+          "chars": 2036,
+          "retrieved": "2026-10-11"
+        },
+        "9617/5": {
+          "book": "9617",
+          "url": "https://shamela.ws/book/9617/5",
+          "print_page": "4",
+          "title": "ج1 - ص4 - كتاب المجتبى من مشكل إعراب القرآن - - المكتبة الشاملة",
+          "text_sha256": "031563df3313a48d2c66c14c6bf5e8e4d97f7616e1ddd25adc08125a1d0d9b30",
+          "chars": 237,
+          "retrieved": "2026-10-10"
+        },
+        "9617/7": {
+          "book": "9617",
+          "url": "https://shamela.ws/book/9617/7",
+          "print_page": "4",
+          "title": "ج1 - ص4 - كتاب المجتبى من مشكل إعراب القرآن - - المكتبة الشاملة",
+          "text_sha256": "6dbb8f764df9e0d2cc4bc99525690b3322326d9250cf8b4bc2145865296d7bb4",
+          "chars": 98,
+          "retrieved": "2026-10-10"
+        },
+        "9617/10": {
+          "book": "9617",
+          "url": "https://shamela.ws/book/9617/10",
+          "print_page": "5",
+          "title": "ج1 - ص5 - كتاب المجتبى من مشكل إعراب القرآن - - المكتبة الشاملة",
+          "text_sha256": "4531e0abb25b2db9ee9033f684d3c7263007c94f1ddc5865949ea85473359ca1",
+          "chars": 395,
+          "retrieved": "2026-10-10"
+        },
+        "9904/31": {
+          "book": "9904",
+          "url": "https://shamela.ws/book/9904/31",
+          "print_page": "32",
+          "title": "ج1 - ص32 - كتاب شرح ابن عقيل على ألفية ابن مالك - المعرب والمبني - المكتبة الشاملة",
+          "text_sha256": "69f9692018e142e5060f1ca8a361191cc298399ea9d93c42dbd72e056c6b0c73",
+          "chars": 1593,
+          "retrieved": "2026-10-10"
+        },
+        "9904/34": {
+          "book": "9904",
+          "url": "https://shamela.ws/book/9904/34",
+          "print_page": "35",
+          "title": "ج1 - ص35 - كتاب شرح ابن عقيل على ألفية ابن مالك - المعرب والمبني - المكتبة الشاملة",
+          "text_sha256": "01cc56aedc31064dce279338a642d000f2367f8ada6f697b503927af9954cc68",
+          "chars": 1539,
+          "retrieved": "2026-10-10"
+        },
+        "9904/56": {
+          "book": "9904",
+          "url": "https://shamela.ws/book/9904/56",
+          "print_page": "57",
+          "title": "ج1 - ص57 - كتاب شرح ابن عقيل على ألفية ابن مالك - المعرب والمبني - المكتبة الشاملة",
+          "text_sha256": "7d09235fb0df98e51566b2223d68770860d4fa7c9fd17d8d4d1e8dd513b8d8ec",
+          "chars": 1467,
+          "retrieved": "2026-10-10"
+        },
+        "9904/59": {
+          "book": "9904",
+          "url": "https://shamela.ws/book/9904/59",
+          "print_page": "60",
+          "title": "ج1 - ص60 - كتاب شرح ابن عقيل على ألفية ابن مالك - المعرب والمبني - المكتبة الشاملة",
+          "text_sha256": "a242f83728ab0509137e00a0bdc85d23a4b5631f702d3402234a3223030d7c36",
+          "chars": 1360,
+          "retrieved": "2026-10-10"
+        },
+        "9904/86": {
+          "book": "9904",
+          "url": "https://shamela.ws/book/9904/86",
+          "print_page": "87",
+          "title": "ج1 - ص87 - كتاب شرح ابن عقيل على ألفية ابن مالك - النكرة والمعرفة - المكتبة الشاملة",
+          "text_sha256": "6c27d44aab8e5f1f54a92bf064e2715698df5c8b9380d033f3fdce41fc720c3e",
+          "chars": 1497,
+          "retrieved": "2026-10-10"
+        },
+        "9904/113": {
+          "book": "9904",
+          "url": "https://shamela.ws/book/9904/113",
+          "print_page": "114",
+          "title": "ج1 - ص114 - كتاب شرح ابن عقيل على ألفية ابن مالك - النكرة والمعرفة - المكتبة الشاملة",
+          "text_sha256": "92d1acc4fff4d550b105f2b6d9e292565ebf4f5c6584a9b6e9e6219d3521de7f",
+          "chars": 1288,
+          "retrieved": "2026-10-10"
+        },
+        "9904/123": {
+          "book": "9904",
+          "url": "https://shamela.ws/book/9904/123",
+          "print_page": "124",
+          "title": "ج1 - ص124 - كتاب شرح ابن عقيل على ألفية ابن مالك - العلم - المكتبة الشاملة",
+          "text_sha256": "a2f05abfc6e80b026bc4116f0a3cc668908d65b73fe6afac78de4c20ebead6d8",
+          "chars": 1684,
+          "retrieved": "2026-10-10"
+        },
+        "9904/137": {
+          "book": "9904",
+          "url": "https://shamela.ws/book/9904/137",
+          "print_page": "138",
+          "title": "ج1 - ص138 - كتاب شرح ابن عقيل على ألفية ابن مالك - الموصول - المكتبة الشاملة",
+          "text_sha256": "8dab8d6c88bcfd612bc160dff1be14f5c5273a2d96a26b0052b3ebd20c43d1de",
+          "chars": 1481,
+          "retrieved": "2026-10-10"
+        },
+        "9904/148": {
+          "book": "9904",
+          "url": "https://shamela.ws/book/9904/148",
+          "print_page": "149",
+          "title": "ج1 - ص149 - كتاب شرح ابن عقيل على ألفية ابن مالك - الموصول - المكتبة الشاملة",
+          "text_sha256": "b11cb695fb433fa345018eeed1f3dae46a4f8b54f83fa4cbcb770b8cf4ed01cf",
+          "chars": 1453,
+          "retrieved": "2026-10-10"
+        },
+        "9904/153": {
+          "book": "9904",
+          "url": "https://shamela.ws/book/9904/153",
+          "print_page": "154",
+          "title": "ج1 - ص154 - كتاب شرح ابن عقيل على ألفية ابن مالك - الموصول - المكتبة الشاملة",
+          "text_sha256": "23e9637efd9c1394393c7c0037db5d3c85c17285a40db3aa403e84938c26a95d",
+          "chars": 1597,
+          "retrieved": "2026-10-10"
+        },
+        "9904/155": {
+          "book": "9904",
+          "url": "https://shamela.ws/book/9904/155",
+          "print_page": "156",
+          "title": "ج1 - ص156 - كتاب شرح ابن عقيل على ألفية ابن مالك - الموصول - المكتبة الشاملة",
+          "text_sha256": "4f7ab4caa54ef1255ed6c75011f2a6b424b348b2898270f8d34932bfd96c08fc",
+          "chars": 1777,
+          "retrieved": "2026-10-10"
+        },
+        "9904/157": {
+          "book": "9904",
+          "url": "https://shamela.ws/book/9904/157",
+          "print_page": "158",
+          "title": "ج1 - ص158 - كتاب شرح ابن عقيل على ألفية ابن مالك - الموصول - المكتبة الشاملة",
+          "text_sha256": "11223ae962276b78bf2d9d34b8811738cefa9e037d3064387c383254bb1fef23",
+          "chars": 1438,
+          "retrieved": "2026-10-10"
+        },
+        "9904/167": {
+          "book": "9904",
+          "url": "https://shamela.ws/book/9904/167",
+          "print_page": "168",
+          "title": "ج1 - ص168 - كتاب شرح ابن عقيل على ألفية ابن مالك - الموصول - المكتبة الشاملة",
+          "text_sha256": "ba5119c3cef9f3f37b2992e87dd322a0576fcd0b41c23e7e39e981f3219214eb",
+          "chars": 1342,
+          "retrieved": "2026-10-10"
+        }
+      },
+      "licence": "al-Maktabah asy-Syamilah publishes the texts for reading; the classical matn are public domain, modern works (Darwisy, al-Jadwal, al-Mujtaba, the editors' footnotes) are not, so the pages are cached locally for verification only and never shipped or committed (cache/ is git-ignored).",
+      "attribution": "Texts via al-Maktabah asy-Syamilah, https://shamela.ws"
     }
   }
 }

@@ -3,22 +3,28 @@ import { ArrowRight, BookOpen, Library, Scale } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { ForestGlow } from "@/components/ForestGlow";
+import { MixedText } from "@/components/library/MixedText";
 import { StatusChip } from "@/components/StatusChip";
 import { TextSizeHint } from "@/components/TextSizeSwitch";
 import { AiChip } from "@/components/waris/report/AiChip";
+import { MainSiteBridge } from "@/components/MainSiteBridge";
 import { Link } from "@/i18n/navigation";
 import { hasDrafts, SURAHS } from "@/lib/content";
-import { warisVisible } from "@/lib/features";
+import { visibleSurahs, warisVisible } from "@/lib/features";
 import { LIBRARY } from "@/lib/library";
 import { conceptIndexHref, quranHref, warisHref } from "@/lib/routes";
+import { shareMetadata } from "@/lib/share";
 
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Hub" });
+  const ta = await getTranslations({ locale, namespace: "App" });
+  const to = await getTranslations({ locale, namespace: "Og" });
+  const title = `${t("heading")} · Dakwah-Lens`;
   return {
-    title: { absolute: `${t("heading")} · Dakwah-Lens` },
+    title: { absolute: title },
     alternates: {
       canonical: `https://dakwah-lens.id/belajar/${locale}`,
       languages: {
@@ -27,6 +33,9 @@ export async function generateMetadata({
         "x-default": "https://dakwah-lens.id/belajar/id",
       },
     },
+    // Share preview with the hub's card (app/[locale]/og/route.ts); og:url = the canonical.
+    // "/" is the hub (lib/routes.ts hubHref).
+    ...shareMetadata({ locale, path: "/", title, description: ta("description"), imageAlt: to("image_alt") }),
   };
 }
 
@@ -37,6 +46,8 @@ type TrackCard = {
   title: string;
   body: string;
   available: string;
+  /** What is coming next, under `available` (the Qur'an track's surahs not published yet). */
+  coming?: string;
   status: string;
   draft: boolean;
   /** The card's label is the AI chip instead of the status chip (no human review, plan L11). */
@@ -51,16 +62,22 @@ type TrackCard = {
  * each card is ONE whole-card link with no "Lihat …" line inside it (the
  * arrow is the only cue); the "Uji coba" chip lives on the cards only.
  * Ilmu Waris is hidden for now (operator, 2026-10-10; lib/features.ts): its
- * card is listed only while BELAJAR_WARIS=on. The switch is read per request,
- * so this page renders at request time instead of being prerendered.
+ * card is listed only while BELAJAR_WARIS=on. Al-Fatihah first (operator,
+ * 2026-10-10; plan L14): the Qur'an card's "Tersedia sekarang" names only the
+ * surahs BELAJAR_SURAHS publishes, and one short "Segera hadir" line the
+ * others. Both switches are read per request, so this page renders at request
+ * time instead of being prerendered.
  */
 export default async function HubPage({ params }: PageProps<"/[locale]">) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("Hub");
 
-  const quranDraft = SURAHS.some(hasDrafts);
-  const surahList = SURAHS.map((s) =>
+  const published = new Set(await visibleSurahs());
+  const available = SURAHS.filter((s) => published.has(s.slug));
+  const coming = SURAHS.filter((s) => !published.has(s.slug));
+  const quranDraft = available.some(hasDrafts);
+  const surahList = available.map((s) =>
     t("surah_ayat", { name: s.name_id, ayat: s.ayat.length }),
   ).join(", ");
   const conceptsDraft = LIBRARY.concepts.some((c) => c.status === "draft");
@@ -72,6 +89,7 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
       title: t("quran_title"),
       body: t("quran_body"),
       available: t("quran_available", { list: surahList }),
+      coming: coming.length > 0 ? t("quran_coming", { list: coming.map((s) => s.name_id).join(", ") }) : undefined,
       status: quranDraft ? t("status_beta_draft") : t("status_beta"),
       draft: quranDraft,
     },
@@ -106,10 +124,14 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
       <ForestGlow />
       <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
         <section className="max-w-2xl">
+          {/* Copy naming surahs goes through MixedText: "Al-Qur'an", "Al-Fatihah"
+              are never cut at the hyphen (line breaks, operator 2026-10-10). */}
           <h1 className="text-balance font-display text-4xl font-medium tracking-[-0.015em] sm:text-5xl">
-            {t("heading")}
+            <MixedText text={t("heading")} />
           </h1>
-          <p className="mt-3 max-w-prose text-pretty text-lg text-ink-muted">{t("intro")}</p>
+          <p className="mt-3 max-w-prose text-pretty text-lg text-ink-muted">
+            <MixedText text={t("intro")} />
+          </p>
         </section>
 
         {/* One-time card: hidden before paint once the learner has chosen a
@@ -124,7 +146,7 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
               learner's text size grows (senior-ux.md §3.4). */}
           <div className="@container mt-3">
             <ul className="grid gap-4 @2xl:grid-cols-2">
-              {tracks.map(({ href, Icon, title, body, available, status, draft, ai }) => (
+              {tracks.map(({ href, Icon, title, body, available, coming, status, draft, ai }) => (
                 <li key={href}>
                   {/* The whole card is the link; nothing inside it is
                       interactive (the status is a label, not a control). */}
@@ -133,9 +155,20 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
                       <Icon className="h-7 w-7 text-forest" aria-hidden />
                       <ArrowRight aria-hidden className="h-6 w-6 shrink-0 text-forest" />
                     </span>
-                    <h3 className="mt-3 font-display text-2xl font-medium text-ink">{title}</h3>
-                    <p className="mt-1.5 text-pretty text-base text-ink-muted">{body}</p>
-                    <p className="mt-3 text-base text-ink">{available}</p>
+                    <h3 className="mt-3 font-display text-2xl font-medium text-ink">
+                      <MixedText text={title} />
+                    </h3>
+                    <p className="mt-1.5 text-pretty text-base text-ink-muted">
+                      <MixedText text={body} />
+                    </p>
+                    <p className="mt-3 text-base text-ink">
+                      <MixedText text={available} />
+                    </p>
+                    {coming ? (
+                      <p className="mt-1 text-base text-ink-muted">
+                        <MixedText text={coming} />
+                      </p>
+                    ) : null}
                     <span className="mt-auto flex flex-wrap items-center gap-3 pt-5">
                       {ai ? <AiChip label={status} /> : <StatusChip label={status} draft={draft} />}
                     </span>
@@ -145,6 +178,11 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
             </ul>
           </div>
         </section>
+
+        {/* One line to the main site, under the tracks (operator, 2026-10-10:
+            the module should bring people to dakwah-lens.id): not a card,
+            not a banner. */}
+        <MainSiteBridge id="hub" className="mt-10" />
       </div>
     </div>
   );

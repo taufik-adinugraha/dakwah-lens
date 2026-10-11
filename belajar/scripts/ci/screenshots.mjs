@@ -2,42 +2,56 @@
 // workflow on :3300) at phone and desktop widths, for visual review of each
 // PR without running anything on a developer laptop. Output: ./shots/*.png
 //
-// Two runs, one container each. By default: the module as production shows
-// it, from a container with the Ilmu Waris switch off (hidden since
-// 2026-10-10, src/lib/features.ts), including the 404 a hidden waris URL
-// answers. `--waris`: only the Ilmu Waris pages, from a container started
-// with BELAJAR_WARIS=on.
-import { mkdir, readdir, readFile } from "node:fs/promises";
+// Three runs, one container each. By default: the module as production shows
+// it, from a container with neither switch set (src/lib/features.ts): Ilmu
+// Waris hidden (since 2026-10-10) and the Qur'an track on Al-Fatihah only
+// (operator, 2026-10-10: the Mu'awwidzat "segera hadir", not clickable),
+// including the 404 a hidden waris or surah URL answers, the "Segera hadir"
+// cards (checked: no link, nothing to focus) and the end of Al-Fatihah
+// (checked: the next surah is coming soon, nothing to click, no move).
+// `--waris`: only the Ilmu Waris pages, from a container started with
+// BELAJAR_WARIS=on. `--surahs`: the Mu'awwidzat lessons, from a container
+// started with every surah in BELAJAR_SURAHS (the end of Al-Fatihah then
+// offers Al-Ikhlas).
+import { mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 import { chromium } from "playwright";
+
+// The narration audio for the karaoke shots (browser-side only), shared with linebreaks.mjs.
+// The workflow copies narration-route.mjs next to this script.
+import { BELAJAR_DIR, isNarration, narrationIndex, narrationRoute } from "./narration-route.mjs";
 
 const BASE = process.env.BASE_URL ?? "http://127.0.0.1:3300";
 // URL shape: plan L9 (hub → /quran track; Konsep/Kosakata at hub level).
 const AYAH_1 = "/belajar/id/quran/al-fatihah/1";
 const AYAH_2 = "/belajar/id/quran/al-fatihah/2";
-
-// belajar/: the narration manifests (content/narration/*.json) and, on a
-// machine that rendered them, the git-ignored MP3s (pipeline/out/narration/).
-// The workflow copies this script to /tmp/shots-run and passes BELAJAR_DIR;
-// run in place (belajar/scripts/ci/), it is two levels up.
-const BELAJAR_DIR = process.env.BELAJAR_DIR ?? fileURLToPath(new URL("../..", import.meta.url));
-const NARRATION_PREFIX = "/belajar/media/narration/";
-const isNarration = (url) => url.pathname.startsWith(NARRATION_PREFIX);
 const PAGES = [
   ["hub", "/belajar/id"],
   ["track", "/belajar/id/quran"],
   ["surah", "/belajar/id/quran/al-fatihah"],
   ["ayah-2", AYAH_2],
   ["ayah-7", "/belajar/id/quran/al-fatihah/7"],
+  ["konsep", "/belajar/id/konsep"],
+  // Konsep with every term in Arabic (operator 2026-10-10): the Harakat page (Dasar membaca) and
+  // the operator's model page, huruf jar, with its parts diagram.
+  ["konsep-harakat", "/belajar/id/konsep/harakat"],
+  ["konsep-huruf-jar", "/belajar/id/konsep/huruf-jar"],
+  ["kredit", "/belajar/id/kredit"],
+  // What a visitor gets at a hidden address: the module's own 404.
+  ["waris-tersembunyi-404", "/belajar/id/waris"],
+  ["ikhlas-tersembunyi-404", "/belajar/id/quran/al-ikhlas/1"],
+];
+// The Mu'awwidzat (hidden on the live site), `--surahs` only: the track with every surah a link,
+// and a lesson of two of them.
+const SURAH_PAGES = [
+  ["track-semua-surah", "/belajar/id/quran"],
   ["ikhlas-1", "/belajar/id/quran/al-ikhlas/1"],
   ["nas-6", "/belajar/id/quran/an-nas/6"],
-  ["konsep", "/belajar/id/konsep"],
-  ["kredit", "/belajar/id/kredit"],
-  // What a visitor gets at the hidden track's address: the module's own 404.
-  ["waris-tersembunyi-404", "/belajar/id/waris"],
 ];
+/** The surahs the default (production-like) container does not publish (lib/features.ts). */
+const HIDDEN_SURAHS = ["al-ikhlas", "al-falaq", "an-nas"];
+const AYAH_7 = "/belajar/id/quran/al-fatihah/7";
 // Ilmu Waris (docs/waris-plan.md §9.1), `--waris` only: track home, the questionnaire's first
 // screen, and the report page with no answers (its "start" notice). Filled reports, print and
 // reduced-motion shots come from waris-e2e.mjs (waris-*.png).
@@ -47,19 +61,104 @@ const WARIS_PAGES = [
   ["waris-laporan-kosong", "/belajar/id/waris/laporan"],
 ];
 const WARIS_ONLY = process.argv.includes("--waris");
+const SURAHS_ON = process.argv.includes("--surahs");
 const VIEWPORTS = [
   ["phone", { width: 390, height: 844 }, 2],
   ["desktop", { width: 1280, height: 900 }, 1],
 ];
 
 /**
- * The autoplay lesson on Al-Fatihah 2 (a real browser, the real image). Ayah 2 has no narration
- * audio yet, and on the runner the shared lines' files 404 (the MP3s live in the VM media dir), so
- * this is the CAPTION-ONLY path a learner gets for every unrendered line:
+ * Waits until the page has stopped scrolling. Right after "Mulai" the stage scrolls itself up once,
+ * smoothly (LessonStage), and the next Playwright click would cut that scroll short wherever it
+ * stands: its scroll-into-view is a programmatic scroll, which a learner's tap never makes (CI
+ * 2026-10-11: the stage stood 80px short of the top, the word card under the panel). So the checks
+ * see the page where a learner sees it. Animation frames awaited in the page (page.evaluate), never
+ * waitForFunction (the CSP refuses its eval).
+ */
+async function settleScroll(page) {
+  await page.waitForTimeout(150);
+  return page.evaluate(
+    () =>
+      new Promise((done) => {
+        let last = window.scrollY;
+        let still = 0;
+        let frames = 0;
+        const tick = () => {
+          const y = window.scrollY;
+          still = y === last ? still + 1 : 0;
+          last = y;
+          if (still >= 12 || ++frames > 300) done(y);
+          else requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }),
+  );
+}
+
+/**
+ * "Berikutnya ›" until the lesson is on step `id` — the stage's data-step (LessonStage: "intro",
+ * "primer", "w1:recite", "w1", "w1:compose", …): a step is reached by what it is, never by a count
+ * of clicks (the harakat primer and the composition steps, 2026-10-10, moved every step after them
+ * and the karaoke check landed on a composition line). The lesson is paused first ("Jeda"), so it
+ * cannot move on by itself between a look and a click (a step that ends on its own just then would
+ * be jumped over): each "Berikutnya ›" then enters the next step paused, and the caller starts the
+ * step with "↺ Ulangi" (it plays a step from its start, paused or not). Fails naming the steps it
+ * passed.
+ */
+async function toStep(page, vp, id) {
+  const stage = page.locator('[data-autoplay="stage"]');
+  const next = page.locator('[data-autoplay="next"]');
+  const middle = page.locator('[data-autoplay="middle"]');
+  const pause = async () => {
+    if ((await middle.getAttribute("data-mode").catch(() => null)) !== "pause") return;
+    await middle.click();
+    await page.waitForTimeout(150);
+  };
+  const seen = [];
+  for (let i = 0; i < 80; i++) {
+    await pause();
+    const at = await stage.getAttribute("data-step");
+    if (at === id) return;
+    if (at && seen.at(-1) !== at) seen.push(at);
+    if (!(await next.isVisible().catch(() => false))) break;
+    await next.click();
+    await page.waitForTimeout(250);
+  }
+  throw new Error(`${vp}: the lesson never reached step "${id}" (passed: ${seen.join(" → ") || "no step"})`);
+}
+
+/**
+ * Line `id` of content/narration/<slug>.json as the lesson plays it — the whole line, or its split
+ * parts "<id>:a", "<id>:b", … (src/lib/autoplay/ids.ts manifestParts) — with whether every part has
+ * a rendered file and its word timings (what the karaoke caption follows). A line whose text
+ * changed has neither until the narration is rendered again.
+ */
+async function narratedLine(slug, id) {
+  const file = path.join("content", "narration", `${slug}.json`);
+  const lines = JSON.parse(await readFile(path.join(BELAJAR_DIR, file), "utf8")).lines ?? {};
+  const split = [];
+  for (let c = 97; c <= 122 && Object.hasOwn(lines, `${id}:${String.fromCharCode(c)}`); c++) split.push(lines[`${id}:${String.fromCharCode(c)}`]);
+  const parts = Object.hasOwn(lines, id) ? [lines[id]] : split.length >= 2 ? split : [];
+  // As src/lib/autoplay/narration.ts usableAudio / usableTokens take them (else caption-only).
+  const voiced = (l) =>
+    typeof l?.audio?.url === "string" &&
+    l.audio.url.startsWith("/belajar/media/narration/") &&
+    Number.isInteger(l.audio.ms) &&
+    l.audio.ms > 0 &&
+    /^[0-9a-f]{64}$/.test(l.audio.sha256 ?? "") &&
+    Array.isArray(l.tokens) &&
+    l.tokens.length > 0;
+  return { file, exists: parts.length > 0, voiced: parts.length > 0 && parts.every(voiced), words: parts[0]?.tokens?.length ?? 0 };
+}
+
+/**
+ * The autoplay lesson on Al-Fatihah 2 (a real browser, the real image). Its narration is not routed
+ * here, and on the runner every narration file 404s (the MP3s live in the VM media dir), rendered
+ * or not, so this is the CAPTION-ONLY path a learner gets for every unrendered line:
  *   1. the stage before "Mulai pelajaran" (stage, and the viewport a learner lands on: header,
  *      short title, the one focused stage);
  *   2. the "⚙ Pengaturan" panel open (pace, imam speed, reciter, text size), then closed again;
- *   3. after the one click, jumped to the first word's explanation;
+ *   3. after the one click, jumped to the first word's explanation (step "w1", by name: toStep);
  *   4. the first exercise inside the stage, with the spotlight ring + label
  *      (stage, and what a phone shows in the viewport with the sticky bar).
  * "Berikutnya ›" jumps whole steps, so this neither waits for the reading
@@ -103,12 +202,11 @@ async function autoplayShots(page, vp) {
   await settings.waitFor({ state: "hidden", timeout: 5_000 });
 
   await page.locator('[data-autoplay="start"]').click();
+  await settleScroll(page);
   const next = page.locator('[data-autoplay="next"]');
-  // Step 1 intro → 2 the ayah → 3 the imam says word 1 → 4 its explanation.
-  for (let i = 0; i < 3; i++) {
-    await next.click();
-    await page.waitForTimeout(250);
-  }
+  // intro → the ayah → the imam says word 1 → its explanation, played from its start.
+  await toStep(page, vp, "w1");
+  await page.locator('[data-autoplay="replay"]').click();
   await page.waitForTimeout(600);
   await stage.screenshot({ path: `shots/${vp}-autoplay-2-explain.png` });
   console.log(`shot ${vp}-autoplay-2-explain`);
@@ -150,6 +248,208 @@ async function menuShots(page, vp) {
   await page.goto("about:blank");
 }
 
+// ─────────────── Brand, bridges to the main site, sharing (operator, 2026-10-10) ───────────────
+
+const SIZES = [null, "besar", "sangat-besar"];
+const MAIN = "https://dakwah-lens.id";
+const UTM = (campaign) => `utm_source=belajar&utm_medium=referral&utm_campaign=${campaign}`;
+
+/** Sets the learner's text size the way the "Aa" panel does (the attribute on <html>). */
+async function setTextSizeAttr(page, size) {
+  await page.evaluate((s) => {
+    if (s) document.documentElement.dataset.textSize = s;
+    else delete document.documentElement.dataset.textSize;
+  }, size);
+  await page.waitForTimeout(150);
+}
+
+/**
+ * The header holds ONE brand mark (the Dakwah-Lens logo with "Dakwah-Lens" over "Belajar"), the
+ * "Aa" button and ONE Menu, and stays uncluttered: measured on the hub and a lesson at every text
+ * size. The logo is a rendered <img alt="Dakwah-Lens"> that actually loaded (next/image); each
+ * of the two words stays on one line; nothing overlaps or scrolls sideways; "Aa" and Menu share
+ * a row; the header is one row on the desktop and at most two on a phone (the buttons under the
+ * mark: they do not fit beside it below about 440px). Shots of the header at the normal and the
+ * largest size.
+ */
+async function headerShots(page, vp) {
+  for (const path of ["/belajar/id", AYAH_1]) {
+    await page.goto(BASE + path, { waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    for (const size of SIZES) {
+      await setTextSizeAttr(page, size);
+      const m = await page.locator("header").evaluate((header) => {
+        const brand = header.querySelector("[data-brand]");
+        const img = brand?.querySelector('img[alt="Dakwah-Lens"]');
+        const box = (el) => {
+          const r = el.getBoundingClientRect();
+          return { top: r.top, bottom: r.bottom, left: r.left, right: r.right, mid: r.top + r.height / 2 };
+        };
+        const lines = [...(brand?.querySelectorAll("span > span") ?? [])].map((s) => {
+          const range = document.createRange();
+          range.selectNodeContents(s);
+          return { text: s.textContent, lines: new Set([...range.getClientRects()].map((r) => Math.round(r.top))).size };
+        });
+        const size = header.querySelector("[data-text-size-toggle]");
+        const menu = header.querySelector("[data-header-menu-toggle]");
+        return {
+          img: img ? { loaded: img.complete && img.naturalWidth > 0, src: img.currentSrc, w: img.getBoundingClientRect().width } : null,
+          lines,
+          brand: brand ? box(brand) : null,
+          size: size ? box(size) : null,
+          menu: menu ? box(menu) : null,
+          height: header.getBoundingClientRect().height,
+          overflow: document.documentElement.scrollWidth - window.innerWidth,
+        };
+      });
+      const where = `${vp} ${path} [${size ?? "normal"}]`;
+      const problems = [];
+      if (!m.img) problems.push('no <img alt="Dakwah-Lens"> in the brand mark');
+      else if (!m.img.loaded) problems.push(`the logo did not load (${m.img.src})`);
+      if (m.lines.length !== 2 || m.lines.some((l) => l.lines !== 1)) problems.push(`brand words wrap: ${JSON.stringify(m.lines)}`);
+      if (!m.brand || !m.size || !m.menu) problems.push("brand, Aa or Menu not rendered");
+      else {
+        const overlap = (a, b) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+        if (overlap(m.brand, m.size) || overlap(m.brand, m.menu)) problems.push("the brand mark overlaps a button");
+        if (Math.abs(m.size.mid - m.menu.mid) > 4) problems.push("Aa and Menu are not on one row");
+        const rows = Math.abs(m.brand.mid - m.size.mid) > 4 ? 2 : 1;
+        if (vp === "desktop" && rows !== 1) problems.push("the desktop header is not one row");
+      }
+      if (m.overflow > 0) problems.push(`the page scrolls sideways by ${m.overflow}px`);
+      if (problems.length) throw new Error(`${where}: header — ${problems.join("; ")}`);
+      console.log(`  header ok ${where}: ${Math.round(m.height)}px tall, logo ${Math.round(m.img.w)}px`);
+      if (path === "/belajar/id" && size !== "besar") {
+        await page.locator("header").screenshot({ path: `shots/${vp}-header-${size ?? "normal"}.png` });
+        console.log(`shot ${vp}-header-${size ?? "normal"}`);
+      }
+    }
+    await setTextSizeAttr(page, null);
+  }
+  await page.goto("about:blank");
+}
+
+/**
+ * The footer's "Bagian dari Dakwah-Lens" (en "Part of Dakwah-Lens"): a rendered, visible link to
+ * the main site's home in the page's locale, UTM-tagged; the AI label beside it is untouched.
+ * Checked on the rendered element, not the HTML: next-intl ships every message in the page's
+ * scripts, so the words alone prove nothing.
+ */
+async function footerCheck(page, vp) {
+  for (const [locale, words] of [["id", "Bagian dari Dakwah-Lens"], ["en", "Part of Dakwah-Lens"]]) {
+    await page.goto(`${BASE}/belajar/${locale}`, { waitUntil: "networkidle" });
+    const link = page.locator('footer [data-main-site="footer"]');
+    await link.waitFor({ state: "visible", timeout: 10_000 });
+    const [href, label, height] = [await link.getAttribute("href"), (await link.innerText()).trim(), (await link.boundingBox())?.height ?? 0];
+    const want = `${MAIN}/${locale}?${UTM("footer")}`;
+    if (href !== want || label !== words || height < 47.5) {
+      throw new Error(`${vp} /belajar/${locale}: footer link "${label}" → ${href} (${Math.round(height)}px); expected "${words}" → ${want}, ≥48px`);
+    }
+    if (locale === "id" && !(await page.locator("footer").innerText()).includes("Dibantu AI, bukan fatwa otoritatif")) {
+      throw new Error(`${vp}: the footer's AI label is gone`);
+    }
+    console.log(`  footer ok ${vp} ${locale}: "${label}" → ${href}`);
+  }
+  await page.locator("footer").screenshot({ path: `shots/${vp}-footer-en.png` });
+  console.log(`shot ${vp}-footer-en`);
+  await page.goto("about:blank");
+}
+
+/**
+ * "Bagikan" on Al-Fatihah ayah 1, under the ayah navigation: a 48px labelled button. On the CI
+ * runner Chromium has no share sheet (Linux), so the fallback panel opens: "Kirim lewat WhatsApp"
+ * (wa.me, the address tagged utm_source=share&utm_medium=whatsapp) and "Salin tautan", which
+ * copies the address tagged utm_medium=share and says "Tautan disalin." (the context grants the
+ * clipboard). Shots: phone + desktop, at the normal and the largest text size.
+ */
+async function shareShots(page, vp) {
+  await page.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
+  await page.evaluate(() => document.fonts.ready);
+  const share = page.locator("[data-share]");
+  const toggle = page.locator("[data-share-toggle]");
+  await toggle.scrollIntoViewIfNeeded();
+  const url = `${MAIN}${AYAH_1}`;
+  const hasSheet = await page.evaluate(() => typeof navigator.share === "function");
+  for (const size of [null, "sangat-besar"]) {
+    await setTextSizeAttr(page, size);
+    const h = (await toggle.boundingBox())?.height ?? 0;
+    if (h < 47.5) throw new Error(`${vp}: Bagikan is ${Math.round(h)}px tall (< 48)`);
+  }
+  await setTextSizeAttr(page, null);
+  if (hasSheet) {
+    console.log(`  ${vp}: this browser has a share sheet; the fallback panel is not exercised`);
+  } else {
+    await toggle.click();
+    await page.locator("[data-share-panel]").waitFor({ state: "visible", timeout: 5_000 });
+    const wa = await page.locator("[data-share-whatsapp]").getAttribute("href");
+    const sent = new URL(wa).searchParams.get("text") ?? "";
+    if (!wa.startsWith("https://wa.me/?text=") || !sent.endsWith(`${url}?utm_source=share&utm_medium=whatsapp`)) {
+      throw new Error(`${vp}: WhatsApp link ${wa} does not carry ${url}?utm_source=share&utm_medium=whatsapp`);
+    }
+    await page.locator("[data-share-copy]").click();
+    const status = page.locator("[data-share-status]");
+    await status.filter({ hasText: "Tautan disalin" }).waitFor({ state: "visible", timeout: 5_000 });
+    const copied = await page.evaluate(() => navigator.clipboard.readText());
+    if (copied !== `${url}?utm_source=share&utm_medium=share`) throw new Error(`${vp}: copied "${copied}"`);
+    console.log(`  share ok ${vp}: WhatsApp → …utm_medium=whatsapp, copied ${copied}`);
+    for (const size of [null, "sangat-besar"]) {
+      await setTextSizeAttr(page, size);
+      await share.scrollIntoViewIfNeeded();
+      await page.screenshot({ path: `shots/${vp}-share-${size ?? "normal"}.png` });
+      console.log(`shot ${vp}-share-${size ?? "normal"}`);
+    }
+    await setTextSizeAttr(page, null);
+  }
+  await page.goto("about:blank");
+}
+
+/**
+ * The end of a surah's autoplay lesson (Al-Fatihah 7, the last ayah): "Berikutnya ›" jumps whole
+ * steps, exercises included ("Lewati latihan"), until the calm end card shows, with its one line
+ * to Tafsir Pekan Ini on the main site (src/components/MainSiteBridge.tsx). Fails the job if the
+ * card never shows or its link is not the tagged main-site address.
+ */
+async function surahEndBridgeShots(page, vp) {
+  await page.goto(BASE + "/belajar/id/quran/al-fatihah/7", { waitUntil: "networkidle" });
+  await page.evaluate(() => document.fonts.ready);
+  await page.locator('[data-autoplay="start"]').click();
+  const end = page.locator('[data-autoplay="end"]');
+  const next = page.locator('[data-autoplay="next"]');
+  for (let i = 0; i < 200 && (await end.count()) === 0; i++) {
+    if ((await next.count()) > 0) await next.click({ timeout: 5_000 }).catch(() => {});
+    await page.waitForTimeout(120);
+  }
+  await end.waitFor({ state: "visible", timeout: 10_000 });
+  const link = end.locator('[data-main-site="surah_end"] a');
+  const href = await link.getAttribute("href");
+  const want = `${MAIN}/id/briefings?${UTM("surah-end")}`;
+  if (href !== want || !(await link.isVisible())) throw new Error(`${vp}: end card bridge → ${href}, expected ${want}`);
+  await page.waitForTimeout(300);
+  await page.locator('[data-autoplay="stage"]').screenshot({ path: `shots/${vp}-autoplay-surah-end.png` });
+  console.log(`shot ${vp}-autoplay-surah-end (bridge → ${href})`);
+  await page.goto("about:blank");
+}
+
+/**
+ * The share cards themselves (1200×630 PNG, drawn at build time): the hub's and Al-Fatihah ayah
+ * 1's, saved as they are served. Latin only by design (src/lib/og/text.ts).
+ */
+async function ogShots(request) {
+  const { writeFile } = await import("node:fs/promises");
+  for (const [name, path] of [
+    ["og-hub-id", "/belajar/id/og"],
+    ["og-al-fatihah-1-id", "/belajar/id/quran/al-fatihah/1/og"],
+  ]) {
+    const res = await request.get(BASE + path);
+    const body = await res.body();
+    const size = body.toString("ascii", 12, 16) === "IHDR" ? [body.readUInt32BE(16), body.readUInt32BE(20)] : null;
+    if (res.status() !== 200 || !(res.headers()["content-type"] ?? "").startsWith("image/png") || size?.join("x") !== "1200x630") {
+      throw new Error(`${path}: ${res.status()} ${res.headers()["content-type"]} ${size?.join("x") ?? "not a PNG"}`);
+    }
+    await writeFile(`shots/${name}.png`, body);
+    console.log(`shot ${name} (${path}, ${body.length} bytes)`);
+  }
+}
+
 /**
  * Everything under the lesson stage folds into one row, "Materi lengkap ayat ini" (collapsed in
  * the ayah-2 page shot): here it is opened, full page, so the word cards, the standalone Latihan
@@ -166,94 +466,163 @@ async function materialsShot(page, vp) {
   await page.goto("about:blank");
 }
 
-// ─────────────── Narration audio for the karaoke shots (browser-side only) ───────────────
-
-/** Every narration file the manifests point at → its duration (ms). */
-async function narrationIndex() {
-  const dir = path.join(BELAJAR_DIR, "content", "narration");
-  const index = new Map();
-  for (const name of (await readdir(dir)).filter((n) => n.endsWith(".json")).sort()) {
-    const m = JSON.parse(await readFile(path.join(dir, name), "utf8"));
-    for (const line of Object.values(m.lines ?? {})) {
-      const a = line?.audio;
-      if (a && typeof a.url === "string" && Number.isInteger(a.ms) && a.ms > 0) index.set(a.url, a.ms);
-    }
+/**
+ * The track page as production shows it (operator, 2026-10-10: "show cards for other surah as
+ * 'segera hadir', but not clickable"): Al-Fatihah's card is a link; each hidden surah has a card
+ * that is a plain element, not inside a link, with nothing focusable in it, and that says
+ * "Segera hadir" in its own text. Checked on the rendered elements (the next-intl messages in the
+ * page's scripts carry the same words). Fails the job otherwise.
+ */
+async function comingSoonCheck(page, vp) {
+  await page.goto(BASE + "/belajar/id/quran", { waitUntil: "networkidle" });
+  const cards = await page.locator("[data-coming-soon]").evaluateAll((els) =>
+    els.map((e) => ({
+      slug: e.getAttribute("data-coming-soon"),
+      tag: e.tagName,
+      inLink: !!e.closest("a"),
+      focusable: e.querySelectorAll("a, button, input, select, textarea, summary, [tabindex]").length,
+      text: e.textContent ?? "",
+    })),
+  );
+  const problems = [];
+  const slugs = cards.map((c) => c.slug);
+  if (JSON.stringify(slugs) !== JSON.stringify(HIDDEN_SURAHS)) problems.push(`cards for ${JSON.stringify(slugs)}, expected ${JSON.stringify(HIDDEN_SURAHS)}`);
+  for (const c of cards) {
+    if (c.tag === "A" || c.inLink) problems.push(`${c.slug}: the "Segera hadir" card is a link`);
+    if (c.focusable > 0) problems.push(`${c.slug}: ${c.focusable} focusable element(s) inside`);
+    if (!c.text.includes("Segera hadir")) problems.push(`${c.slug}: the card does not say "Segera hadir"`);
   }
-  return index;
-}
-
-/** A silent WAV (8 kHz, mono, 8-bit PCM: 0x80 is silence) of `ms` milliseconds. */
-function silentWav(ms) {
-  const rate = 8000;
-  const n = Math.max(1, Math.round((rate * ms) / 1000));
-  const b = Buffer.alloc(44 + n, 0x80);
-  b.write("RIFF", 0, "ascii");
-  b.writeUInt32LE(36 + n, 4);
-  b.write("WAVE", 8, "ascii");
-  b.write("fmt ", 12, "ascii");
-  b.writeUInt32LE(16, 16); // fmt chunk size
-  b.writeUInt16LE(1, 20); // PCM
-  b.writeUInt16LE(1, 22); // mono
-  b.writeUInt32LE(rate, 24); // sample rate
-  b.writeUInt32LE(rate, 28); // byte rate
-  b.writeUInt16LE(1, 32); // block align
-  b.writeUInt16LE(8, 34); // bits per sample
-  b.write("data", 36, "ascii");
-  b.writeUInt32LE(n, 40);
-  return b;
-}
-
-/** Answers a media request with `body`, honouring a single byte Range (the media element asks for
- *  "bytes=0-" and may seek). */
-function fulfillBytes(route, body, contentType) {
-  const total = body.length;
-  const m = /^bytes=(\d*)-(\d*)$/.exec(route.request().headers()["range"] ?? "");
-  if (!m || (m[1] === "" && m[2] === "")) {
-    return route.fulfill({ status: 200, contentType, headers: { "accept-ranges": "bytes" }, body });
+  if ((await page.locator('a[href="/belajar/id/quran/al-fatihah"]').count()) === 0) problems.push("Al-Fatihah's card is no link");
+  for (const slug of HIDDEN_SURAHS) {
+    const n = await page.locator(`a[href^="/belajar/id/quran/${slug}"]`).count();
+    if (n > 0) problems.push(`${n} link(s) into the hidden ${slug}`);
   }
-  const start = m[1] === "" ? Math.max(0, total - Number(m[2])) : Number(m[1]);
-  const end = m[1] === "" || m[2] === "" ? total - 1 : Math.min(Number(m[2]), total - 1);
-  if (start >= total || start > end) {
-    return route.fulfill({ status: 416, headers: { "content-range": `bytes */${total}` }, body: "" });
-  }
-  return route.fulfill({
-    status: 206,
-    contentType,
-    headers: { "accept-ranges": "bytes", "content-range": `bytes ${start}-${end}/${total}` },
-    body: body.subarray(start, end + 1),
-  });
+  if (problems.length) throw new Error(`${vp}: track page — ${problems.join("; ")}`);
+  console.log(`  ${vp}: "Segera hadir" cards ok (${slugs.join(", ")}: plain elements, nothing to focus)`);
+  await page.goto("about:blank");
 }
 
 /**
- * The narration URLs, answered in the browser for these shots only (production keeps serving
- * them from the VM media dir through Caddy; nothing here changes routing): the rendered MP3 from
- * pipeline/out/narration/ when this machine has it (git-ignored: never on the CI runner), else a
- * SILENT stand-in exactly as long as the manifest says — the karaoke caption follows the audio
- * clock, so its word timings still play out as they would with the voice. A URL no manifest
- * names answers 404 (the lesson then shows that line caption-only). `served` records each answer.
+ * The end of Al-Fatihah's autoplay lesson (ayah 7), reached with "Berikutnya ›" / "Lewati
+ * latihan", step by step. As production shows it (`surahsOn` false): the card says the next surah
+ * is coming soon, offers no "Surah berikutnya" and "Ulangi Al-Fatihah" instead, and the page does
+ * not move on by itself. With every surah listed (`--surahs`): it offers "Surah berikutnya:
+ * Al-Ikhlas". Fails the job otherwise.
  */
-function narrationRoute(index, served) {
-  return async (route) => {
-    const { pathname } = new URL(route.request().url());
-    const rel = pathname.slice(NARRATION_PREFIX.length);
-    const ms = index.get(pathname);
-    if (ms === undefined || rel.split("/").some((p) => p === ".." || p === "")) {
-      served.push(`${pathname} → 404 (not in a manifest)`);
-      return route.fulfill({ status: 404, body: "" });
+async function endCardShots(page, vp, surahsOn) {
+  // networkidle: the stage's /belajar/api/surahs answer has arrived.
+  await page.goto(BASE + AYAH_7, { waitUntil: "networkidle" });
+  await page.evaluate(() => document.fonts.ready);
+  await page.locator('[data-autoplay="start"]').click();
+  const end = page.locator('[data-autoplay="end"]');
+  const next = page.locator('[data-autoplay="next"]');
+  let clicks = 0;
+  for (; clicks < 300 && (await end.count()) === 0; clicks++) {
+    if ((await next.count()) > 0) await next.click({ timeout: 5_000 }).catch(() => {});
+    await page.waitForTimeout(150);
+  }
+  await end.waitFor({ state: "visible", timeout: 10_000 });
+  const at = page.url();
+  await page.waitForTimeout(1500);
+  const problems = [];
+  if (page.url() !== at) problems.push(`the page moved on by itself (${at} → ${page.url()})`);
+  const soon = page.locator('[data-autoplay="end-soon"]');
+  const nextSurah = page.locator('[data-autoplay="end-next"]');
+  const repeat = (await page.locator('[data-autoplay="end-repeat"]').innerText()).trim();
+  if (repeat !== "Ulangi Al-Fatihah") problems.push(`the repeat button says "${repeat}", expected "Ulangi Al-Fatihah"`);
+  if (surahsOn) {
+    if ((await soon.count()) > 0) problems.push('says "segera hadir" with every surah published');
+    const label = (await nextSurah.count()) > 0 ? (await nextSurah.innerText()).trim() : "";
+    if (!label.includes("Al-Ikhlas")) problems.push(`no "Surah berikutnya: Al-Ikhlas" (got "${label}")`);
+  } else {
+    const text = (await soon.count()) > 0 ? (await soon.innerText()).trim() : "";
+    if (!text.includes("Al-Ikhlas") || !text.includes("segera hadir")) problems.push(`no coming-soon line (got "${text}")`);
+    if ((await nextSurah.count()) > 0) problems.push('offers "Surah berikutnya" into a hidden surah');
+    const links = await end.locator('a[href*="/quran/al-ikhlas"], a[href*="/quran/al-falaq"], a[href*="/quran/an-nas"]').count();
+    if (links > 0) problems.push(`${links} link(s) into a hidden surah`);
+  }
+  const name = surahsOn ? "autoplay-fatihah-end-semua-surah" : "autoplay-fatihah-end";
+  await page.locator('[data-autoplay="stage"]').screenshot({ path: `shots/${vp}-${name}.png` });
+  console.log(`shot ${vp}-${name} (${clicks} step click(s) to the end)`);
+  if (problems.length) throw new Error(`${vp}: end of Al-Fatihah — ${problems.join("; ")}`);
+  await page.goto("about:blank");
+}
+
+/**
+ * The Konsep pages show grammar terms in Arabic script, measured in the real browser (operator
+ * 2026-10-10: "mention the arabic word like majrur in arabic letter"; narration rule 15: a
+ * transliteration and its Arabic never split across lines). On the index and on three concept
+ * pages, at each of the three text sizes (html[data-text-size], as the Aa control sets it): the
+ * term table's Arabic for majrur (read from content/library.json, never typed here) is rendered
+ * and visible inside <main>; every "latin (Arabic)" pair is one line box; every visible Arabic
+ * box lies inside the viewport on BOTH sides (review 2026-10-10: a nowrap RTL headword ran off
+ * the LEFT edge, which scrollWidth cannot see), checked on tanda-irab, whose headword has four
+ * terms; the Harakat page shows its signs on dotted circles and the first letter of 1:1:1
+ * (content bytes); huruf jar shows its parts diagrams and links the first harakah term to the
+ * Harakat page. Fails the job otherwise; the next-intl messages payload is never what is checked.
+ */
+async function konsepChecks(page, vp) {
+  const lib = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "library.json"), "utf8"));
+  const majrur = lib.terms.find((t) => t.id === "majrur")?.ar;
+  const ba = lib.quran["1:1:1#1"];
+  if (!majrur || !ba) throw new Error("content/library.json has no majrur term or no letter 1:1:1#1");
+  const paths = ["/belajar/id/konsep", "/belajar/id/konsep/huruf-jar", "/belajar/id/konsep/tanda-irab", "/belajar/id/konsep/harakat"];
+  for (const size of [null, "besar", "sangat-besar"]) {
+    for (const path_ of paths) {
+      await page.goto(BASE + path_, { waitUntil: "networkidle" });
+      await page.evaluate((s) => {
+        if (s) document.documentElement.dataset.textSize = s;
+        else delete document.documentElement.dataset.textSize;
+      }, size);
+      await page.evaluate(() => document.fonts.ready);
+      const res = await page.evaluate(
+        ({ majrur, ba }) => {
+          const main = document.querySelector("main");
+          const ar = [...main.querySelectorAll('[lang="ar"]')].filter((el) => {
+            const r = el.getBoundingClientRect();
+            return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== "hidden" && !el.closest("details:not([open])");
+          });
+          const texts = ar.map((el) => el.textContent);
+          // a "latin (Arabic)" pair: the nowrap span holding a bdi[lang=ar] must be one line box
+          const split = [...main.querySelectorAll("span.whitespace-nowrap")]
+            .filter((sp) => sp.querySelector('bdi[lang="ar"]'))
+            .filter((sp) => new Set([...sp.getClientRects()].map((r) => Math.round(r.top))).size > 1)
+            .map((sp) => sp.textContent);
+          // every Arabic box inside the viewport, left edge too (an RTL overflow goes left)
+          const outside = ar
+            .filter((el) => {
+              const r = el.getBoundingClientRect();
+              return r.left < -1 || r.right > window.innerWidth + 1;
+            })
+            .map((el) => el.textContent.slice(0, 40));
+          const overflow = document.documentElement.scrollWidth > window.innerWidth + 1;
+          return {
+            visible: ar.length,
+            majrur: texts.includes(majrur),
+            ba: texts.includes(ba),
+            circles: main.querySelectorAll(".mark-circle").length,
+            figure: main.querySelectorAll("figure").length,
+            harakatLink: !!main.querySelector('a[href$="/konsep/harakat"]'),
+            split,
+            outside,
+            overflow,
+          };
+        },
+        { majrur, ba },
+      );
+      const problems = [];
+      if (res.visible < 3) problems.push(`only ${res.visible} visible Arabic elements`);
+      if (!path_.endsWith("/harakat") && !path_.endsWith("/tanda-irab") && !res.majrur) problems.push("majrur's Arabic is not rendered");
+      if (res.split.length) problems.push(`a term and its Arabic split across lines: ${res.split.slice(0, 3).join(" | ")}`);
+      if (res.outside.length) problems.push(`Arabic outside the screen: ${res.outside.slice(0, 3).join(" | ")}`);
+      if (res.overflow) problems.push("the page scrolls sideways");
+      if (path_.endsWith("/harakat") && (res.circles < 6 || !res.ba)) problems.push(`Harakat page: ${res.circles} dotted circles, letter 1:1:1#1 shown: ${res.ba}`);
+      if (path_.endsWith("/huruf-jar") && (!res.figure || !res.harakatLink)) problems.push(`huruf jar: parts diagram ${res.figure}, link to the Harakat page ${res.harakatLink}`);
+      if (problems.length) throw new Error(`${vp} ${size ?? "default"} ${path_}: ${problems.join("; ")}`);
+      console.log(`  konsep ok: ${vp} ${size ?? "default"} ${path_} (${res.visible} Arabic elements${res.circles ? `, ${res.circles} dotted circles` : ""})`);
     }
-    let body = null;
-    try {
-      body = await readFile(path.join(BELAJAR_DIR, "pipeline", "out", "narration", ...rel.split("/")));
-    } catch {
-      body = null;
-    }
-    if (body) {
-      served.push(`${pathname} → pipeline/out MP3`);
-      return fulfillBytes(route, body, "audio/mpeg");
-    }
-    served.push(`${pathname} → silent stand-in, ${ms} ms`);
-    return fulfillBytes(route, silentWav(ms), "audio/wav");
-  };
+  }
+  await page.goto("about:blank");
 }
 
 /**
@@ -282,18 +651,34 @@ async function assertKaraokeLayout(page, vp) {
 }
 const fmt = (b) => `${Math.round(b.top)}–${Math.round(b.bottom)}`;
 
+/** The karaoke check's line: word 1 of Al-Fatihah 1 explained ("w1"; rendered with the rest of
+ *  Al-Fatihah's narration — a line whose text changed has no audio until then). */
+const KARAOKE = { slug: "al-fatihah", step: "w1", line: "al-fatihah:1:w1" };
+
 /**
  * Al-Fatihah ayah 1, the narrated ayah, after the one "Mulai" click: the stage mid-explanation of
  * word 1 — the KARAOKE caption (the narrator's current word filled forest, words said in ink,
- * words to come muted; a dictionary term shown "kasrah (كَسْرَة)") under the large WORD CARD
- * (the word's Arabic · transliteration · "yang artinya …"), the mushaf words numbered with word 1
- * marked. "Berikutnya ›" jumps whole steps (intro → the ayah → the imam says word 1 → its
- * explanation), then "↺ Ulangi langkah ini" plays the explanation from its start — the replay
- * control, and a start that holds even when the imam's stream paused the lesson on the way.
+ * words to come muted) under the large WORD CARD (the word's Arabic · transliteration · "yang
+ * artinya …"), the mushaf words numbered with word 1 marked. "Berikutnya ›" jumps whole steps up to
+ * the step named "w1" on the stage (toStep: intro → the ayah → the harakat primer → the imam says
+ * word 1 → its explanation, whatever steps come between), then "↺ Ulangi langkah ini" plays the
+ * explanation from its start — the replay control, and a start that holds even when the imam's
+ * stream paused the lesson on the way — and the caption must be that line (data-line) with half
+ * its words said. Needs the line rendered (audio + word timings in content/narration/
+ * al-fatihah.json): checked FIRST, so a missing render fails here with that message, not with a
+ * timeout on a caption that can never turn karaoke (CI 2026-10-11: the word line became "gloss +
+ * lead" with the composition, and the stage played on into the composition lines caption-only).
  * Fails the job if the word card or the karaoke caption never shows (what a learner would see
  * without them is the caption-only fallback, already covered by the ayah 2 shots above).
  */
 async function karaokeShots(page, vp, index) {
+  const line = await narratedLine(KARAOKE.slug, KARAOKE.line);
+  if (!line.exists) throw new Error(`${vp}: the karaoke check's line ${KARAOKE.line} is not in ${line.file} (renamed? update KARAOKE in screenshots.mjs)`);
+  if (!line.voiced)
+    throw new Error(
+      `${vp}: ${KARAOKE.line} has no rendered narration in ${line.file} (no audio file or no word timings): its text changed and it was not rendered since. ` +
+        "Render Al-Fatihah's narration (pipeline/render_narration.py), commit the manifest, and run again; the karaoke check plays that line.",
+    );
   const served = [];
   const consoleErrors = [];
   const onConsole = (msg) => {
@@ -307,18 +692,16 @@ async function karaokeShots(page, vp, index) {
     await page.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
     await page.evaluate(() => document.fonts.ready);
     await page.locator('[data-autoplay="start"]').click();
-    const next = page.locator('[data-autoplay="next"]');
-    for (let i = 0; i < 3; i++) {
-      await next.click();
-      await page.waitForTimeout(250);
-    }
+    await settleScroll(page);
+    await toStep(page, vp, KARAOKE.step);
     await page.locator('[data-autoplay="replay"]').click();
     await page.locator('[data-autoplay="word-card"]').waitFor({ state: "visible", timeout: 10_000 });
-    // Mid-line: the first sentence said, the narrator on the term "kasrah (كَسْرَة)," (8th word).
-    // Locator waits, not page.waitForFunction: Playwright evaluates waitForFunction predicates
-    // with eval in the page, which the module's CSP (no 'unsafe-eval') rightly refuses.
-    const caption = page.locator('[data-autoplay="caption"]');
-    await caption.locator('[data-karaoke="said"]').nth(6).waitFor({ state: "attached", timeout: 25_000 });
+    // Mid-line: half its words said, the narrator on the next. Locator waits, not
+    // page.waitForFunction: Playwright evaluates waitForFunction predicates with eval in the page,
+    // which the module's CSP (no 'unsafe-eval') rightly refuses.
+    const caption = page.locator(`[data-autoplay="caption"][data-line="${KARAOKE.line}"]`);
+    const half = Math.max(1, Math.floor(line.words / 2));
+    await caption.locator('[data-karaoke="said"]').nth(half - 1).waitFor({ state: "attached", timeout: 25_000 });
     await caption.locator('[data-karaoke="now"]').first().waitFor({ state: "attached", timeout: 25_000 });
     await assertKaraokeLayout(page, vp);
     await stage.screenshot({ path: `shots/${vp}-autoplay-ayah1-karaoke.png` });
@@ -333,7 +716,11 @@ async function karaokeShots(page, vp, index) {
       .locator('[data-autoplay="caption"]')
       .innerHTML()
       .catch(() => "(no caption element)");
+    const on = await stage.getAttribute("data-step").catch(() => null);
+    const said = await page.locator('[data-autoplay="caption"]').getAttribute("data-line").catch(() => null);
     console.error(`✗ ${vp}: the Al-Fatihah ayah 1 karaoke caption / word card never showed`);
+    if (![...index.keys()].length) console.error("  (no narration audio in the manifests at all)");
+    console.error(`  wanted: step ${KARAOKE.step}, line ${KARAOKE.line} (${line.words} words) · on screen: step ${on ?? "—"}, line ${said ?? "—"}`);
     console.error(`  caption HTML: ${caption.slice(0, 600)}`);
     console.error(`  narration requests answered (${served.length}):\n    ${served.join("\n    ") || "(none)"}`);
     console.error(`  console errors (${consoleErrors.length}):\n    ${consoleErrors.join("\n    ") || "(none)"}`);
@@ -349,21 +736,421 @@ async function karaokeShots(page, vp, index) {
   await page.goto("about:blank");
 }
 
+/**
+ * The composition animation on the stage's word-card slot (operator 2026-10-10, narration rule 14),
+ * on the real page: the harakat primer (frame 2: fathah on its dotted circle, بَ "b + a"), then
+ * word 1 of Al-Fatihah 1 explained by its parts — its first frame [بِ] + [ٱسْمُ], MID-WAY through
+ * the change frame (the dhammah fading into kasrah, مُ → مِ, u → i), the change settled, and the
+ * join (بِٱسْمِ, "bi + ismi → bismi"), the recited tile (forest fill, checked by computed style);
+ * plus the change frame with reduced motion (static). Each is checked unclipped (composeFit). In the
+ * "Tunggu saya" pace each caption-only line waits for Lanjut, so the frames are stepped through by
+ * clicking it (rendered lines play on by themselves); "↺ Ulangi" starts each step even if the
+ * imam's stream paused the lesson on the way. Fails the job if the animation never shows or sits
+ * under the bottom panel.
+ */
+async function assertComposeLayout(page, vp) {
+  const box = async (sel) => {
+    const b = await page.locator(sel).first().boundingBox();
+    if (!b) throw new Error(`${vp}: ${sel} has no box (not rendered)`);
+    return { top: b.y, bottom: b.y + b.height };
+  };
+  const { height } = page.viewportSize();
+  const comp = await box('[data-autoplay="composition"]');
+  const panel = await box('[data-autoplay="panel"]');
+  const caption = await box('[data-autoplay="caption"]');
+  const controls = await box('[data-autoplay="panel"] [role="group"]');
+  const problems = [];
+  if (comp.top < 0 || comp.bottom > panel.top + 1) problems.push(`composition ${fmt(comp)} off screen or under the panel ${fmt(panel)}`);
+  if (caption.top < 0 || caption.bottom > height || caption.bottom > controls.top + 1) problems.push(`caption ${fmt(caption)} not on screen above the controls ${fmt(controls)}`);
+  if (problems.length) throw new Error(`${vp}: composition layout — ${problems.join("; ")}`);
+  console.log(`  layout ok: composition ${fmt(comp)} · panel ${fmt(panel)} · caption ${fmt(caption)}`);
+}
+
+/**
+ * Nothing in the composition figure is clipped or spills out of it (review 2026-10-10: a fixed
+ * 9rem figure with overflow-hidden cut 83 of 87 frames on a phone): every element of the frame on
+ * screen AND of the word's other frames (laid out invisibly to hold the height, data-compose-ghost)
+ * lies inside the figure's box, the figure scrolls in neither direction, and it is no wider than
+ * the screen. Run in the page (page.evaluate: the CSP forbids waitForFunction's eval, not this).
+ * Returns null when no composition is on screen.
+ */
+async function composeFit(page) {
+  return page.evaluate(() => {
+    const fig = document.querySelector('[data-autoplay="composition"]');
+    if (!fig) return null;
+    const f = fig.getBoundingClientRect();
+    const box = (r) => `${Math.round(r.left)},${Math.round(r.top)}–${Math.round(r.right)},${Math.round(r.bottom)}`;
+    const out = [];
+    if (fig.scrollWidth > fig.clientWidth + 1) out.push(`scrolls sideways (${fig.scrollWidth} > ${fig.clientWidth})`);
+    if (fig.scrollHeight > fig.clientHeight + 1) out.push(`scrolls (${fig.scrollHeight} > ${fig.clientHeight})`);
+    if (f.left < -1 || f.right > window.innerWidth + 1) out.push(`figure ${box(f)} wider than the screen (${window.innerWidth})`);
+    for (const el of fig.querySelectorAll("*")) {
+      if (el.closest(".sr-only")) continue;
+      const r = el.getBoundingClientRect();
+      if (!r.width && !r.height) continue;
+      if (r.left < f.left - 1 || r.right > f.right + 1 || r.top < f.top - 1 || r.bottom > f.bottom + 1) {
+        const where = el.closest("[data-compose-ghost]") ? "another frame" : "the frame on screen";
+        out.push(`${where}: <${el.tagName.toLowerCase()}> “${(el.textContent || "").trim().slice(0, 40)}” at ${box(r)}, outside the figure ${box(f)}`);
+        if (out.length >= 6) break;
+      }
+    }
+    const d = fig.dataset;
+    return { unit: d.composeKind === "primer" ? "primer" : `word ${d.composeWord}`, frame: d.composeFrame, problems: out };
+  });
+}
+
+async function assertComposeFits(page, where) {
+  const fit = await composeFit(page);
+  if (!fit) throw new Error(`${where}: no composition on screen`);
+  if (fit.problems.length) throw new Error(`${where}: composition ${fit.unit} frame ${fit.frame} clipped — ${fit.problems.join("; ")}`);
+  return fit;
+}
+
+/** "Ukuran huruf": the stored size (pre-paint script, app/[locale]/layout.tsx), then a reload. */
+async function setTextSize(page, size) {
+  await page.evaluate((v) => {
+    if (v === "normal") localStorage.removeItem("belajar:v1:text-size");
+    else localStorage.setItem("belajar:v1:text-size", v);
+  }, size);
+  await page.reload({ waitUntil: "networkidle" });
+  await page.evaluate(() => document.fonts.ready);
+}
+
+/** Al-Fatihah's composed units per ayah (the primer and each composed word), from the content. */
+async function composedUnits() {
+  const c = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "compose", "al-fatihah.json"), "utf8"));
+  const by = new Map();
+  for (const loc of Object.keys(c.words)) {
+    const ayah = Number(loc.split(":")[1]);
+    by.set(ayah, [...(by.get(ayah) ?? []), `word ${loc.split(":")[2]}`]);
+  }
+  if (c.primer) by.set(c.primer.ayah, ["primer", ...(by.get(c.primer.ayah) ?? [])]);
+  return by;
+}
+
+/**
+ * Every composition of the given Al-Fatihah ayat at one text size: "Berikutnya ›" step by step
+ * through each lesson until every composed unit has shown, each checked with composeFit — which
+ * covers all of a unit's frames at once, since they are all laid out in its figure. At the largest
+ * size on a phone it also shoots word 1 of ayah 1 on its change frame (caption-only lines advance
+ * by reading time). Fails the job on any clipped frame or a unit that never showed.
+ */
+async function composeFitSweep(page, vp, size, ayat, units) {
+  let checked = 0;
+  await page.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
+  await setTextSize(page, size);
+  try {
+    for (const ayah of ayat) {
+      const want = new Set(units.get(ayah) ?? []);
+      if (!want.size) continue;
+      await page.goto(BASE + `/belajar/id/quran/al-fatihah/${ayah}`, { waitUntil: "networkidle" });
+      await page.evaluate(() => document.fonts.ready);
+      await page.locator('[data-autoplay="start"]').click();
+      await settleScroll(page);
+      const next = page.locator('[data-autoplay="next"]');
+      const seen = new Set();
+      for (let i = 0; i < 120 && seen.size < want.size; i++) {
+        const fit = await composeFit(page);
+        if (fit) {
+          if (fit.problems.length) {
+            await page.screenshot({ path: `shots/${vp}-compose-fit-${size}-FAILED.png`, fullPage: true }).catch(() => {});
+            throw new Error(`${vp}, text size ${size}, ayah ${ayah}: composition ${fit.unit} clipped — ${fit.problems.join("; ")}`);
+          }
+          if (!seen.has(fit.unit)) {
+            seen.add(fit.unit);
+            checked++;
+            if (vp === "phone" && size === "sangat-besar" && ayah === 1 && fit.unit === "word 1") {
+              // ↺ plays the step from its start even if the imam's stream paused the lesson.
+              await page.locator('[data-autoplay="replay"]').click();
+              const change = page.locator('[data-autoplay="composition"][data-compose-stage="change"]');
+              for (let w = 0; w < 120 && (await change.count()) === 0; w++) await page.waitForTimeout(500);
+              if ((await change.count()) === 0) throw new Error(`${vp} ${size}: word 1 never reached its change frame`);
+              await page.waitForTimeout(1600);
+              await assertComposeFits(page, `${vp} ${size}: word 1 change frame`);
+              await page.locator('[data-autoplay="stage"]').screenshot({ path: `shots/${vp}-autoplay-ayah1-compose-3-change-${size}.png` });
+              console.log(`shot ${vp}-autoplay-ayah1-compose-3-change-${size}`);
+            }
+          }
+        }
+        if (!(await next.isEnabled().catch(() => false))) break;
+        await next.click();
+        await page.waitForTimeout(300);
+      }
+      const missing = [...want].filter((u) => !seen.has(u));
+      if (missing.length) throw new Error(`${vp}, text size ${size}, ayah ${ayah}: never showed ${missing.join(", ")}`);
+    }
+  } finally {
+    await setTextSize(page, "normal").catch(() => {});
+  }
+  console.log(`  composition fits: ${checked} unit(s), every frame, ${vp}, text size ${size}, ayat ${ayat.join(",")}`);
+  await page.goto("about:blank");
+}
+
+async function composeShots(page, vp, index) {
+  const served = [];
+  const handler = narrationRoute(index, served);
+  await page.route(isNarration, handler);
+  const stage = page.locator('[data-autoplay="stage"]');
+  const comp = page.locator('[data-autoplay="composition"]');
+  const frame = (sel) => page.locator(`[data-autoplay="composition"]${sel}`);
+  const middle = page.locator('[data-autoplay="middle"]');
+  const settingsToggle = page.locator('[data-autoplay="settings-toggle"]');
+  const shot = async (name) => {
+    await stage.screenshot({ path: `shots/${vp}-${name}.png` });
+    console.log(`shot ${vp}-${name}`);
+  };
+  // "Tunggu saya" holds each caption-only line until Lanjut: the frames are stepped through
+  // deterministically (with rendered narration the lines play on by themselves instead).
+  const setPace = async (label) => {
+    await settingsToggle.click();
+    await page.locator('[data-autoplay="settings"] label', { hasText: label }).click();
+    await settingsToggle.click();
+    await page.waitForTimeout(200);
+  };
+  const advanceTo = async (sel) => {
+    const deadline = Date.now() + 60_000;
+    while (Date.now() < deadline) {
+      if ((await frame(sel).count()) > 0 && (await frame(sel).first().isVisible())) return;
+      if ((await middle.getAttribute("data-guide")) === "lanjut") await middle.click();
+      await page.waitForTimeout(300);
+    }
+    throw new Error(`${vp}: the composition never reached ${sel}`);
+  };
+  try {
+    await page.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    await page.locator('[data-autoplay="start"]').click();
+    await settleScroll(page);
+    const replay = page.locator('[data-autoplay="replay"]');
+    // intro → the ayah → the harakat primer (Biasa: "Berikutnya ›" jumps whole steps)
+    await toStep(page, vp, "primer");
+    await setPace("Tunggu saya");
+    await replay.click();
+    await comp.waitFor({ state: "visible", timeout: 10_000 });
+    await advanceTo('[data-compose-kind="primer"][data-compose-frame="2"]');
+    await page.waitForTimeout(1600);
+    await assertComposeLayout(page, vp);
+    await assertComposeFits(page, `${vp}: primer`);
+    await shot("autoplay-ayah1-primer");
+    // → the imam says word 1 → its gloss line → its composition
+    await setPace("Biasa");
+    await toStep(page, vp, "w1:compose");
+    await setPace("Tunggu saya");
+    await replay.click();
+    await advanceTo('[data-compose-stage="parts"]');
+    await page.waitForTimeout(1600);
+    await assertComposeLayout(page, vp);
+    await assertComposeFits(page, `${vp}: word 1 parts`);
+    await shot("autoplay-ayah1-compose-1-parts");
+    await advanceTo('[data-compose-stage="change"]');
+    await page.waitForTimeout(1100); // mid-way: the before form fading out, the after form fading in
+    await shot("autoplay-ayah1-compose-3-change-midway");
+    await page.waitForTimeout(1000);
+    await assertComposeLayout(page, vp);
+    await assertComposeFits(page, `${vp}: word 1 change`);
+    await shot("autoplay-ayah1-compose-3-change");
+    await advanceTo('[data-compose-stage="join"]');
+    await page.waitForTimeout(1800);
+    await assertComposeFits(page, `${vp}: word 1 join`);
+    await shot("autoplay-ayah1-compose-4-join");
+    // While the imam recites the joined word (and, in "Tunggu saya", until Lanjut), the last
+    // tile is filled forest with paper text — the review found it white on white (2026-10-10).
+    await advanceTo('[data-recited="true"]');
+    await page.waitForTimeout(700);
+    const fill = await page
+      .locator('[data-autoplay="composition"][data-recited="true"] [data-compose-layer] [data-compose-tile]')
+      .last()
+      .evaluate((el) => {
+        const ar = el.querySelector('[lang="ar"]');
+        return { bg: getComputedStyle(el).backgroundColor, fg: getComputedStyle(ar ?? el).color };
+      });
+    if (fill.bg === "rgb(255, 255, 255)" || fill.bg === fill.fg) throw new Error(`${vp}: recited tile is ${fill.fg} on ${fill.bg}`);
+    console.log(`  recited tile: ${fill.fg} on ${fill.bg}`);
+    await assertComposeFits(page, `${vp}: word 1 recited`);
+    await shot("autoplay-ayah1-compose-5-recited");
+    // The change frame again with reduced motion: static frames, no transition.
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await replay.click();
+    await advanceTo('[data-compose-stage="change"]');
+    await page.waitForTimeout(300);
+    await shot("autoplay-ayah1-compose-3-change-reduced-motion");
+    await page.emulateMedia({ reducedMotion: null });
+    const text = (await comp.innerText()).replace(/\s+/g, " ").trim();
+    console.log(`  composition: ${text}`);
+    await setPace("Biasa");
+  } catch (err) {
+    await page.screenshot({ path: `shots/${vp}-autoplay-ayah1-compose-FAILED.png`, fullPage: true }).catch(() => {});
+    console.error(`✗ ${vp}: the Al-Fatihah ayah 1 composition animation never showed (or sat under the panel)`);
+    console.error(`  narration requests answered (${served.length}):\n    ${served.join("\n    ") || "(none)"}`);
+    throw err;
+  } finally {
+    await page.unroute(isNarration, handler);
+  }
+  await page.goto("about:blank");
+}
+
+/**
+ * The quiz's voice on Al-Fatihah 2 (operator 2026-10-10: "in quiz, give narration/voice only for
+ * the correct answer, to give auditory explanation"; "better to write the arabic word in quiz as
+ * well like majrur in arabic"). In "Tebak peran kata", reached by STEP IDENTITY (the exercise on
+ * screen, `[data-exercise]`; "Berikutnya ›" / "Lewati latihan" until it is there), with the
+ * narration answered in the browser (narration-route.mjs: silent stand-ins as long as the
+ * manifests say) and every request recorded:
+ *   1. each option of question 1 shows its terms' Arabic (the plan's text, content/quiz);
+ *   2. a WRONG pick: no narration request at all for 2.5 s, and "Belum tepat" on screen;
+ *   3. the RIGHT pick: shared:correct ("Benar."), then question 1's explanation line
+ *      (al-fatihah:2:ex:label-role:1:why) — requested by its URL when the manifest has its audio,
+ *      else shown as the caption (caption-only until it is rendered);
+ *   4. question 2: two wrong picks, then "Tunjukkan jawaban": shared:revealed ("Ini jawabannya.")
+ *      and question 2's explanation, the same way.
+ * Fails the job otherwise.
+ */
+async function quizVoiceCheck(page, vp, index) {
+  const read = async (rel) => JSON.parse(await readFile(path.join(BELAJAR_DIR, rel), "utf8"));
+  const quiz = await read("content/quiz/al-fatihah.json");
+  const lesson = (await read("content/narration/al-fatihah.json")).lines;
+  const shared = (await read("content/narration/shared.json")).lines;
+  const role = quiz.ayat.find((a) => a.ayah === 2).exercises.find((e) => e.key === "label-role");
+  const [q1, q2] = role.questions;
+  const served = [];
+  const handler = narrationRoute(index, served);
+  await page.route(isNarration, handler);
+  const exercise = page.locator('[data-autoplay="exercise"] [data-exercise="label-role"]');
+  const caption = page.locator('[data-autoplay="caption"]');
+  const option = (from) => exercise.locator(`[data-option="${from}"]`);
+  const urls = (from) => served.slice(from).map((s) => s.split(" → ")[0]);
+  /** A line was said after request `from`: its audio requested (the index after that request is
+   *  returned, so the next line is looked for after it), or — caption-only, not rendered yet —
+   *  its caption shown (its Latin start, up to the first Arabic). */
+  const said = async (line, from, what) => {
+    const url = line.audio?.url;
+    const head = line.display.split(/\s*[(\u0600-\u06FF]/u)[0].slice(0, 40);
+    const deadline = Date.now() + 20_000;
+    while (Date.now() < deadline) {
+      if (url) {
+        const k = urls(from).indexOf(url);
+        if (k !== -1) return from + k + 1;
+      } else if ((await caption.innerText()).includes(head)) return served.length;
+      await page.waitForTimeout(150);
+    }
+    throw new Error(`${vp}: ${what} was not said (${url ? `no request for ${url}` : `the caption never showed “${head}”`})`);
+  };
+  try {
+    await page.goto(BASE + AYAH_2, { waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    await page.locator('[data-autoplay="start"]').click();
+    const next = page.locator('[data-autoplay="next"]');
+    for (let i = 0; i < 60 && !(await exercise.isVisible()); i++) {
+      await next.click();
+      await page.waitForTimeout(250);
+    }
+    await exercise.waitFor({ state: "visible", timeout: 10_000 });
+    // The exercise waits once its introduction and its options prompt are through.
+    const prompt = shared["shared:ex:label-role:options"];
+    await said(prompt, 0, "the options prompt");
+    await page.waitForTimeout((prompt.audio?.ms ?? 3000) + 1500);
+
+    // 1. Arabic on every label.
+    for (const o of q1.options) {
+      const text = await option(o.from).innerText();
+      for (const ar of o.text.match(/[\u0600-\u06FF]+(?:\s+[\u0600-\u06FF]+)*/g) ?? []) {
+        if (!text.includes(ar)) throw new Error(`${vp}: option ${o.from} shows “${text}”, without its Arabic ${ar}`);
+      }
+    }
+    console.log(`  quiz labels: ${q1.options.map((o) => o.text).join(" | ")}`);
+
+    // 2. A wrong pick: silence, and the note on screen. A new line said shows as a request for
+    //    another file or a caption on another line; the browser re-fetching part of the prompt it
+    //    is still playing (the same file, logged with its range) is not one.
+    let mark = served.length;
+    const playing = urls(0).at(-1);
+    const lineBefore = await caption.getAttribute("data-line");
+    await option(q1.options[1].from).click();
+    await page.waitForTimeout(2500);
+    const other = urls(mark).filter((u) => u !== playing);
+    const lineAfter = await caption.getAttribute("data-line");
+    if (other.length || (lineAfter && lineAfter !== lineBefore)) {
+      throw new Error(`${vp}: a wrong pick played narration: ${other.join(", ") || `the caption moved to ${lineAfter}`} (requests after the pick: ${served.slice(mark).join(" | ") || "none"})`);
+    }
+    await exercise.getByText("Belum tepat", { exact: false }).first().waitFor({ state: "visible", timeout: 5_000 });
+    console.log("  quiz: a wrong pick plays no narration (Belum tepat on screen)");
+
+    // 3. The right pick: Benar., then the explanation of question 1.
+    mark = served.length;
+    await option(q1.options[0].from).click();
+    const afterCorrect = await said(shared["shared:correct"], mark, "Benar. (shared:correct)");
+    await said(lesson["al-fatihah:2:ex:label-role:1:why"], afterCorrect, "question 1's explanation, after Benar.");
+    await page.locator('[data-autoplay="stage"]').screenshot({ path: `shots/${vp}-quiz-ayah2-role-right.png` });
+    console.log(`shot ${vp}-quiz-ayah2-role-right`);
+
+    // 4. Question 2 (the lesson moves on by itself): two wrong picks, then Tunjukkan jawaban.
+    await exercise.getByText(`Soal 2 dari ${role.questions.length}`).waitFor({ state: "visible", timeout: 30_000 });
+    await page.waitForTimeout(800);
+    await option(q2.options[1].from).click();
+    await page.waitForTimeout(400);
+    await option(q2.options[2].from).click();
+    const reveal = exercise.locator('[data-guide="exercise:label-role:reveal"]');
+    await reveal.waitFor({ state: "visible", timeout: 5_000 });
+    mark = served.length;
+    await reveal.click();
+    const afterRevealed = await said(shared["shared:revealed"], mark, "Ini jawabannya. (shared:revealed)");
+    await said(lesson["al-fatihah:2:ex:label-role:2:why"], afterRevealed, "question 2's explanation, after Ini jawabannya.");
+    console.log("  quiz: right → Benar. + its explanation; Tunjukkan jawaban → Ini jawabannya. + its explanation");
+  } catch (err) {
+    await page.screenshot({ path: `shots/${vp}-quiz-voice-FAILED.png`, fullPage: true }).catch(() => {});
+    console.error(`✗ ${vp}: the quiz voice check on Al-Fatihah 2 failed`);
+    console.error(`  narration requests answered (${served.length}):\n    ${served.join("\n    ") || "(none)"}`);
+    throw err;
+  } finally {
+    await page.unroute(isNarration, handler);
+  }
+  await page.goto("about:blank");
+}
+
+/**
+ * A hidden address shows the module's own 404 in the browser: answered 404, and the page drawn is
+ * src/app/[locale]/not-found.tsx ([data-not-found]) with its title (messages/id.json, never typed
+ * here) visible inside <main>. The server HTML carries that page only in the RSC payload (Next
+ * renders it as the client takes over), so the smoke checks can find its marker but not see it:
+ * this is where it is seen (CI 2026-10-11). Fails the job otherwise.
+ */
+async function assertNotFoundShown(page, vp, urlPath, status) {
+  const msgs = JSON.parse(await readFile(path.join(BELAJAR_DIR, "messages", "id.json"), "utf8"));
+  const title = msgs.NotFound?.title;
+  if (!title) throw new Error("messages/id.json has no NotFound.title");
+  const heading = page.locator("main [data-not-found] h1");
+  const shown = await heading.isVisible().catch(() => false);
+  const text = shown ? (await heading.innerText()).trim() : "";
+  if (status !== 404 || !shown || text !== title)
+    throw new Error(`${vp} ${urlPath}: not the module's 404 on screen (status ${status}, heading ${shown ? `“${text}”` : "not visible"}, expected “${title}”)`);
+  console.log(`  404 ok: ${vp} ${urlPath} shows “${title}”`);
+}
+
 await mkdir("shots", { recursive: true });
-const narration = WARIS_ONLY ? new Map() : await narrationIndex();
-if (!WARIS_ONLY) console.log(`narration index: ${narration.size} file(s) named by the manifests in ${BELAJAR_DIR}`);
+const DEFAULT_RUN = !WARIS_ONLY && !SURAHS_ON;
+const narration = DEFAULT_RUN ? await narrationIndex() : new Map();
+const units = DEFAULT_RUN ? await composedUnits() : new Map();
+if (DEFAULT_RUN) console.log(`narration index: ${narration.size} file(s) named by the manifests in ${BELAJAR_DIR}`);
 const browser = await chromium.launch();
 try {
   for (const [vp, viewport, scale] of VIEWPORTS) {
     const ctx = await browser.newContext({ viewport, deviceScaleFactor: scale, locale: "id-ID" });
+    // "Salin tautan" (shareShots) writes to the clipboard and the check reads it back.
+    if (!WARIS_ONLY) await ctx.grantPermissions(["clipboard-read", "clipboard-write"], { origin: new URL(BASE).origin });
     const page = await ctx.newPage();
-    for (const [name, path] of WARIS_ONLY ? WARIS_PAGES : PAGES) {
-      await page.goto(BASE + path, { waitUntil: "networkidle" });
+    for (const [name, path] of WARIS_ONLY ? WARIS_PAGES : SURAHS_ON ? SURAH_PAGES : PAGES) {
+      const res = await page.goto(BASE + path, { waitUntil: "networkidle" });
       await page.evaluate(() => document.fonts.ready);
       await page.screenshot({ path: `shots/${vp}-${name}.png`, fullPage: true });
       console.log(`shot ${vp}-${name} (${path})`);
+      if (name.endsWith("-tersembunyi-404")) await assertNotFoundShown(page, vp, path, res?.status());
     }
     if (WARIS_ONLY) {
+      await ctx.close();
+      continue;
+    }
+    if (SURAHS_ON) {
+      await endCardShots(page, vp, true);
       await ctx.close();
       continue;
     }
@@ -379,10 +1166,24 @@ try {
       await page.screenshot({ path: `shots/${vp}-${name}.png`, fullPage: true });
       console.log(`shot ${vp}-${name} (${href})`);
     }
+    await konsepChecks(page, vp);
     await menuShots(page, vp);
+    await headerShots(page, vp);
+    await footerCheck(page, vp);
     await materialsShot(page, vp);
+    await shareShots(page, vp);
+    await surahEndBridgeShots(page, vp);
+    if (vp === "desktop") await ogShots(ctx.request);
     await autoplayShots(page, vp);
     await karaokeShots(page, vp, narration);
+    await composeShots(page, vp, narration);
+    await quizVoiceCheck(page, vp, narration);
+    // Every composition frame fits at every text size (largest: all seven ayat; the others: ayah 1).
+    await composeFitSweep(page, vp, "normal", [1], units);
+    await composeFitSweep(page, vp, "besar", [1], units);
+    await composeFitSweep(page, vp, "sangat-besar", [1, 2, 3, 4, 5, 6, 7], units);
+    await comingSoonCheck(page, vp);
+    await endCardShots(page, vp, false);
     await ctx.close();
   }
 } finally {

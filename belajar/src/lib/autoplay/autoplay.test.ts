@@ -5,8 +5,8 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 import { captionMs } from "../lessonSteps";
-import { loadCheckInput, runAutoplayChecks } from "./checks";
-import { availableExercises, timedWords } from "./exercises";
+import { loadCheckInput, quizAyahOf, runAutoplayChecks } from "./checks";
+import { availableExercises, questionNumbers } from "./exercises";
 import { LINE_ID_RE, manifestParts, parseLineId } from "./ids";
 import {
   createAutoplayState,
@@ -48,7 +48,7 @@ const { input, errors: loadErrors } = loadCheckInput((rel) => {
   const path = join(CONTENT, rel);
   return existsSync(path) ? readFileSync(path, "utf8") : null;
 });
-const lexicon = new Map(input.lexicon.map((l) => [l.id, l]));
+const quizOf = (slug: string, n: number) => quizAyahOf(input.quiz?.[slug], n);
 
 /** One ayah's sequence, caption-only unless manifests are given. */
 function seqFor(
@@ -65,7 +65,8 @@ function seqFor(
     ayahCount: surah.ayat.length,
     ayah,
     introduced: introducedConcepts(input.concepts, ayah.loc),
-    exercises: availableExercises({ words: ayah.words, timed: timedWords(ayah), lexeme: (id) => lexicon.get(id) }),
+    exercises: availableExercises(quizOf(slug, n)),
+    questions: questionNumbers(quizOf(slug, n)),
     texts: ID_TEXTS,
     narration: m.narration ?? null,
     shared: m.shared ?? null,
@@ -78,7 +79,11 @@ function withAudio(seq: AutoplaySequence): { narration: NarrationManifest; share
   const narration: NarrationManifest = { version: 1, voice, lines: {} };
   const shared: NarrationManifest = { version: 1, voice, lines: {} };
   let i = 0;
-  for (const id of sequenceLineIds(seq)) {
+  // The explanation lines are in a manifest only (a caption-only sequence has no cue for them).
+  const explain = Object.entries(questionNumbers(quizOf(seq.slug, seq.ayah))).flatMap(([key, ns]) =>
+    (ns ?? []).map((q) => `${seq.slug}:${seq.ayah}:ex:${key}:${q}:why`),
+  );
+  for (const id of [...sequenceLineIds(seq), ...explain]) {
     const audio = { url: `/belajar/media/narration/uji/${i++}.mp3`, ms: 2000, sha256: "a".repeat(64) };
     (id.startsWith("shared:") ? shared : narration).lines[id] = { text: "teks", audio };
   }
@@ -143,12 +148,12 @@ describe("autoplay sequence", () => {
       "concept:syibhul-jumlah",
       "concept:jamak-mudzakkar-salim",
     ]);
+    // The ayah's quiz (content/quiz, taught before tested since 2026-10-11): marfu' is taught at
+    // its first word, so the case sort comes in; wazan only from ayah 5.
     expect(seq.steps.filter((s) => s.kind === "exercise").map((s) => s.exercise?.key)).toEqual([
       "tap-word",
-      "why-harakat",
       "sort-case",
       "label-role",
-      "wazn-factory",
     ]);
     expect(kinds.slice(-2)).toEqual(["recap", "next"]);
     expect(seq.nav).toEqual({ kind: "ayah", slug: "al-fatihah", ayah: 3 });
@@ -343,7 +348,7 @@ describe("autoplay machine", () => {
     expect(wantsIdleTicks(r.s)).toBe(false);
     r.send({ type: "skip" });
     expect(r.s.idx).toBe(ex + 1);
-    expect(seq.steps[r.s.idx].exercise?.key).toBe("why-harakat");
+    expect(seq.steps[r.s.idx].exercise?.key).toBe("sort-case");
   });
 
   it("guides the learner: a prompt the first time a control comes up, feedback on answers, on after done", () => {
@@ -360,9 +365,12 @@ describe("autoplay machine", () => {
     expect(r.s.caption).toEqual({ c: spec.promptCue.options });
     expect(r.s.guides.map((g) => g.target)).toEqual(["exercise:tap-word:options"]);
     r.until((s) => s.phase === "waiting");
-    r.send({ type: "answered", key: "tap-word", correct: false });
-    expect(r.s.caption).toEqual({ s: "try_again" });
-    r.until((s) => s.phase === "waiting");
+    // A wrong pick is not voiced (operator 2026-10-10): nothing plays, the caption stays.
+    const caption = r.s.caption;
+    r.send({ type: "answered", key: "tap-word", correct: false, question: 1 });
+    expect(r.s.activity).toBeNull();
+    expect(r.s.phase).toBe("waiting");
+    expect(r.s.caption).toEqual(caption);
     // Another exercise's answer is not this one's.
     const same = r.s;
     expect(r.send({ type: "answered", key: "sort-case", correct: true })).toBe(same);
@@ -484,13 +492,22 @@ describe("autoplay exercises: the learner only answers", () => {
     expect(r.send({ type: "exercise_guide", target: "exercise:tap-word:play", word: 3 })).toBe(same);
   });
 
-  it("a pick before the imam finished: the feedback, then the word again", () => {
+  it("a wrong pick before the imam finished: no voice, his word goes on", () => {
     const seq = seqFor("al-fatihah", 2);
     const r = waitingAt(seq);
     r.send({ type: "exercise_guide", target: "exercise:tap-word:play", word: 2 });
     expect(r.s.activity?.kind).toBe("recite");
-    r.send({ type: "answered", key: "tap-word", correct: false });
-    expect(r.s.caption).toEqual({ s: "try_again" });
+    const reciting = r.s.activity;
+    r.send({ type: "answered", key: "tap-word", correct: false, question: 2 });
+    expect(r.s.activity).toBe(reciting);
+  });
+
+  it("a right pick before the imam finished: Benar., then the word again", () => {
+    const seq = seqFor("al-fatihah", 2);
+    const r = waitingAt(seq);
+    r.send({ type: "exercise_guide", target: "exercise:tap-word:play", word: 2 });
+    r.send({ type: "answered", key: "tap-word", correct: true, question: 2 });
+    expect(r.s.caption).toEqual({ s: "correct" });
     r.until((s) => s.activity?.kind === "recite");
     expect(r.s.activity).toMatchObject({ kind: "recite", word: 2 });
   });
@@ -519,10 +536,63 @@ describe("autoplay exercises: the learner only answers", () => {
     const r = waitingAt(seq);
     r.send({ type: "exercise_guide", target: "exercise:tap-word:options" });
     r.until((s) => s.phase === "waiting");
+    r.send({ type: "revealed", key: "tap-word", question: 1 });
     r.send({ type: "exercise_guide", target: "exercise:tap-word:next" });
     expect(r.s.caption).toEqual({ s: "revealed" });
     r.send(end(r.s.activity!));
     expect(r.s.activity).toMatchObject({ kind: "wait", ms: advanceHoldMs("biasa", false) });
+  });
+
+  it("a right answer and a shown one are explained by voice: Benar. / Ini jawabannya., then that question's line", () => {
+    const plain = seqFor("al-fatihah", 2);
+    const seq = seqFor("al-fatihah", 2, withAudio(plain));
+    const at = seq.steps.findIndex((x) => x.exercise?.key === "label-role");
+    const spec = seq.steps[at].exercise!;
+    const explain2 = spec.explain[2]!;
+    expect(seq.steps[at].cues[explain2].line).toBe("al-fatihah:2:ex:label-role:2:why");
+    const r = runner(seq);
+    r.send({ type: "start", from: at, reason: "continue" });
+    r.until((s) => s.phase === "waiting");
+    // A wrong pick: silence.
+    r.send({ type: "answered", key: "label-role", correct: false, question: 1 });
+    expect(r.s.activity).toBeNull();
+    // The right one: "Benar.", its settle, then question 1's explanation.
+    r.send({ type: "answered", key: "label-role", correct: true, question: 1 });
+    expect(r.s.activity).toMatchObject({ kind: "narrate", line: "shared:correct" });
+    r.send({ type: "exercise_guide", target: "exercise:label-role:next" });
+    r.send(end(r.s.activity!));
+    r.send(end(r.s.activity!)); // settle
+    expect(r.s.activity).toMatchObject({ kind: "narrate", line: "al-fatihah:2:ex:label-role:1:why" });
+    r.send(end(r.s.activity!));
+    r.send(end(r.s.activity!)); // settle
+    expect(r.s.activity).toMatchObject({ kind: "wait", ms: advanceHoldMs("biasa", true) });
+    r.send(end(r.s.activity!));
+    expect(r.s.exercise?.advance).toBe(1);
+    // "Tunjukkan jawaban" on question 2: "Ini jawabannya.", then question 2's explanation.
+    r.send({ type: "exercise_guide", target: "exercise:label-role:options" });
+    r.until((s) => s.phase === "waiting");
+    r.send({ type: "revealed", key: "label-role", question: 2 });
+    expect(r.s.activity).toMatchObject({ kind: "narrate", line: "shared:revealed" });
+    r.until((s) => s.activity?.kind === "narrate" && s.activity.line !== "shared:revealed");
+    expect(r.s.activity).toMatchObject({ kind: "narrate", line: "al-fatihah:2:ex:label-role:2:why" });
+  });
+
+  it("the last answer of a sort ends the exercise as it is said: the explanation still plays", () => {
+    const plain = seqFor("al-fatihah", 2);
+    const seq = seqFor("al-fatihah", 2, withAudio(plain));
+    const at = seq.steps.findIndex((x) => x.exercise?.key === "sort-case");
+    const r = runner(seq);
+    r.send({ type: "start", from: at, reason: "continue" });
+    r.until((s) => s.phase === "waiting");
+    // Ayah 2 sorts three words (rabbi left out: its reason names badal, taught at ayah 7).
+    r.send({ type: "answered", key: "sort-case", correct: true, question: 3 });
+    r.send({ type: "exercise_done", key: "sort-case" });
+    const said: string[] = [];
+    r.until((s) => {
+      if (s.idx === at && s.activity?.kind === "narrate" && said.at(-1) !== s.activity.line) said.push(s.activity.line);
+      return s.idx !== at;
+    });
+    expect(said).toEqual(["shared:correct", "al-fatihah:2:ex:sort-case:3:why"]);
   });
 
   it("Lanjut tapped early: the hold is dropped, the next question's word is recited", () => {
@@ -919,12 +989,20 @@ describe("autoplay timing", () => {
   });
 });
 
+// Every Al-Fatihah word has a composition since 2026-10-10 (29 words, 162 compose/primer lines):
+// the full runs take ~1.1 s alone but 8–13 s beside the waris suite's workers, past vitest's 5 s.
+const FULL_RUN_TIMEOUT_MS = 60_000;
+
 describe("autoplay checks (every ayah of every surah)", () => {
-  it("pass: sequences, narration manifests, full runs and property runs", () => {
-    const report = runAutoplayChecks(input);
-    for (const n of report.notes) console.info(`autoplay-check note: ${n}`);
-    expect(report.errors).toEqual([]);
-    expect(report.stats.ayat).toBe(22);
-    expect(report.stats.simulatedEvents).toBeGreaterThan(10_000);
-  });
+  it(
+    "pass: sequences, narration manifests, full runs and property runs",
+    () => {
+      const report = runAutoplayChecks(input);
+      for (const n of report.notes) console.info(`autoplay-check note: ${n}`);
+      expect(report.errors).toEqual([]);
+      expect(report.stats.ayat).toBe(22);
+      expect(report.stats.simulatedEvents).toBeGreaterThan(10_000);
+    },
+    FULL_RUN_TIMEOUT_MS,
+  );
 });

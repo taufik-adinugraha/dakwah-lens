@@ -3,6 +3,7 @@ import { ChevronDown } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { SURAHS } from "@/lib/content";
+import { visibleSurahs } from "@/lib/features";
 import { LIBRARY } from "@/lib/library";
 import { SOURCES } from "@/lib/sources";
 
@@ -37,11 +38,16 @@ export default async function CreditsPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("Credits");
+  // Only the surahs BELAJAR_SURAHS publishes (operator, 2026-10-10: Al-Fatihah
+  // first; lib/features.ts), read per request, so this page renders at
+  // request time.
+  const published = new Set(await visibleSurahs());
+  const surahs = SURAHS.filter((s) => published.has(s.slug));
   // The exact credit line of every recording the lesson pages stream (moved
   // here from the lesson stage, operator 2026-10-10), once each, in the
   // order the content lists them.
   const recitationCredits = [
-    ...new Set(SURAHS.flatMap((s) => s.ayat.flatMap((a) => a.recitation.map((r) => r.credit)))),
+    ...new Set(surahs.flatMap((s) => s.ayat.flatMap((a) => a.recitation.map((r) => r.credit)))),
   ];
 
   return (
@@ -108,7 +114,7 @@ export default async function CreditsPage({
             <ChevronDown className="chev h-5 w-5 shrink-0 text-ink-muted" aria-hidden />
           </summary>
           <div className="space-y-6 pb-5 pt-2">
-            {SURAHS.map((s) => (
+            {surahs.map((s) => (
               <VersionList key={s.slug} title={s.name_id} versions={s.data_versions} />
             ))}
             <VersionList title={t("data_versions_library")} versions={LIBRARY.data_versions} />

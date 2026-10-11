@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { BackLink } from "@/components/BackLink";
 import { ForestGlow } from "@/components/ForestGlow";
+import { MixedText } from "@/components/library/MixedText";
 import { AyahProgressMark } from "@/components/surah/AyahProgressMark";
 import { FactCard } from "@/components/surah/FactCard";
 import { Link } from "@/i18n/navigation";
@@ -49,7 +50,9 @@ export default async function SurahPage({ params }: PageProps<"/[locale]/quran/[
           <div>
             <p className="text-sm font-semibold text-forest">{t("eyebrow")}</p>
             <h1 className="mt-1 font-display text-4xl font-medium">{s.name_id}</h1>
-            <p className="mt-1 text-base text-ink-muted">{t("meta", { ayat: s.ayat.length, words })}</p>
+            <p className="mt-1 text-base text-ink-muted">
+              <MixedText text={t("meta", { ayat: s.ayat.length, words })} />
+            </p>
           </div>
           <p lang="ar" dir="rtl" className="quran text-ar-xl text-ink">
             {s.name_ar}
@@ -72,7 +75,9 @@ export default async function SurahPage({ params }: PageProps<"/[locale]/quran/[
                     {a.ar}
                   </p>
                 </div>
-                <p className="mt-3 text-pretty text-base text-ink sm:pl-13">{a.translation.text}</p>
+                <p className="mt-3 text-pretty text-base text-ink sm:pl-13">
+                  <MixedText text={a.translation.text} />
+                </p>
                 <div className="mt-3 flex flex-wrap items-center justify-between gap-3 sm:pl-13">
                   {/* A progress key in the learner's storage, not a URL: it
                       stays "{slug}/{ayah}" so saved progress survives the
@@ -88,7 +93,7 @@ export default async function SurahPage({ params }: PageProps<"/[locale]/quran/[
           ))}
         </ol>
         <p className="mt-3 text-sm text-ink-muted">
-          {t("translation_source", { source: s.ayat[0].translation.source_label })}
+          <MixedText text={t("translation_source", { source: s.ayat[0].translation.source_label })} />
         </p>
 
         {s.facts.length > 0 && (
@@ -97,7 +102,7 @@ export default async function SurahPage({ params }: PageProps<"/[locale]/quran/[
               {t("facts_heading")}
             </h2>
             <div className="@container mt-4">
-              <ul className="grid gap-4 @2xl:grid-cols-2">
+              <ul className="grid grid-cols-1 gap-4 @2xl:grid-cols-2">
                 {s.facts.map((f) => (
                   <li key={f.id}>
                     <FactCard

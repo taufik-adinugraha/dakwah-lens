@@ -45,6 +45,18 @@ has are then spoken from it.
 `highlight` and `focus` say what the stage shows while the line plays (validate_narration.line_view):
 the whole ayah ([0]) for intro/recite/structure/recap, word n (and its word card) for w${n}, the
 words tagged with the concept and the words of its structure groups for concept:${id}.
+
+Word composition and the harakat primer (operator 2026-10-10, narration rule 14; compose.py,
+content/compose/<slug>.json): the ayah that opens with the primer gets "primer:${k}" lines after
+"recite", one per `say` of the primer's frames; a word with a composition gets, after its w${n}
+line, "w${n}:compose:${k}" lines, one per `say` of its frames, and its w${n} line becomes the gloss
+plus the composition's `lead` ("Kata ini terdiri dari dua bagian.") instead of the word's `why`,
+which the frames now say part by part. Each such line carries `frame` (the animation frame shown
+while it plays). Its prose is authored to be spoken as written: the sanitiser runs in STRICT mode
+(a Qur'anic word in it stops the build instead of being replaced by a place), and a letter term
+is shown as the frame pins it or its tiles write it (validate_narration.line_letters). Letter names
+are spoken from the dictionary too (huruf مِيم, the article "alif lam"; operator 2026-10-10: no
+Latin letter names to the voice).
 """
 from __future__ import annotations
 
@@ -53,6 +65,7 @@ import json
 import re
 import sys
 
+import quiz as Q
 import validate_narration as V
 from common import SURAHS
 
@@ -139,6 +152,16 @@ PRE_REWRITES: list[tuple[str, str]] = [
     # The Kalimah title lists the three word classes with the gloss after the list; spoken, the
     # gloss goes with the name, and the classes read as a list ("…, dan huruf").
     (r"^Kalimah: isim, fi'il, huruf \(tiga jenis kata\)$", "Tiga jenis kalimah, atau kata: isim, fi'il, dan huruf"),
+    # The quiz explanations speak the words' `why` (2026-10-11). A Latin term inside an Indonesian
+    # verb ("di-'athaf-kan") cannot be said from the dictionary: the verb is said in Indonesian,
+    # the term on its own.
+    (r"\bdi-'athaf-kan\b", "disambungkan dengan 'athaf"),
+    # The Arabic name of a position in brackets after its Indonesian one ("kedudukan rafa' (mahall
+    # raf')") says the same thing again: the Indonesian is said.
+    (r" \(mahall (?:raf'|nashb|jarr)\)", ""),
+    # An aside in brackets is its own clause, not a gloss of the word before it ("berkedudukan jar
+    # (sebagian ulama …)" would be said "jar, yaitu sebagian ulama …").
+    (r" \((sebagian ulama [^()]+)\)", r"; \1"),
 ]
 
 
@@ -445,13 +468,35 @@ class Sanitiser:
         t = re.sub(r"\(\s+", "(", t)
         return t.strip()
 
-    def prose(self, text: str, S: int, A: int, W: int | None = None) -> str:
+    def strict_check(self, what: str, t: str) -> None:
+        """Authored narration (a composition's `say`, its `lead`) names no Qur'anic word: the
+        build stops rather than rewrite it, since the author wrote it to be said as it stands."""
+        found, toks = self.forms.mentions(t)
+        bad = []
+        for start, end, k, _c, i, _n in found:
+            orig = t[start:end]
+            if orig == "Allah" and not (i > 0 and toks[i - 1][0] == "lafaz"):
+                continue  # the Name in Indonesian (it gets its honorific)
+            if k in self.forms.surah_name_keys and i > 0 and toks[i - 1][0] == "surah":
+                continue  # "Surah Al-Ikhlas"
+            if k == ("lam",) and V._letter_context(toks, i, t):
+                continue  # the letter's name: "huruf lam", "alif lam"
+            bad.append(orig)
+        if bad:
+            raise SystemExit(f"{what}: names the Qur'anic word(s) {bad} — say its place (kata pertama) or its "
+                             "meaning (kata yang artinya …); the screen shows the Arabic and the transliteration")
+
+    def prose(self, text: str, S: int, A: int, W: int | None = None, *, strict: str | None = None) -> str:
         t = re.sub(r"\s+", " ", text).strip()
         for pat, repl in PRE_REWRITES:
             t = re.sub(pat, repl, t)
         t = quotes_to_typographic(t)
         t = self.qs(t)
-        t = self.replace_mentions(t, S, A, W)
+        if strict:
+            # Nothing to map to a place: what is left (the Name, a surah name, "huruf lam") stays.
+            self.strict_check(strict, t)
+        else:
+            t = self.replace_mentions(t, S, A, W)
         t = self.particles(t)
         t = self.suffixes(t)
         t = self.arabic_letters(t)
@@ -590,9 +635,11 @@ SHARED_TEXT = {
               "Penjelasan ini dibacakan dengan suara kecerdasan buatan, disusun dengan bantuan kecerdasan "
               "buatan dari kitab-kitab yang disebutkan sumbernya."),
     "resume": "Kita lanjutkan pelajaran dari langkah terakhir.",
+    # A wrong pick is not voiced (operator 2026-10-10: "give narration/voice only for the correct
+    # answer"); the exercise shows "Belum tepat" on screen. A correct answer says "Benar." and
+    # "Tunjukkan jawaban" says "Ini jawabannya.", each followed by the question's explanation line.
     "correct": "Benar.",
-    "try_again": "Belum tepat. Coba pilih yang lain.",
-    "revealed": "Ini jawabannya. Perhatikan sebentar.",
+    "revealed": "Ini jawabannya.",
     "reminder": "Silakan lanjutkan latihannya. Bagian yang perlu diklik sedang diberi tanda di layar.",
     "skip_offer": "Jika ingin melewati latihan ini, klik tombol Lewati latihan.",
     # True however the learner got here (straight to the last ayah, every exercise skipped):
@@ -614,26 +661,80 @@ SHARED_EX_TEXT = {
 }
 
 
-def ex_intro(key: str, n: int) -> str:
-    c = num_id(n)
+def _list_id(items: list[str], last: str = "dan") -> str:
+    """"a", "a dan b", "a, b, dan c"."""
+    if len(items) <= 2:
+        return f" {last} ".join(items)
+    return ", ".join(items[:-1]) + f", {last} " + items[-1]
+
+
+def ex_intro(ex: dict, terms: Q.Terms) -> str:
+    """An exercise's introduction from its plan (content/quiz): how many questions, and what it
+    asks with — the case bins of a sort, the form names of a wazan quiz (quiz audit 2026-10-11:
+    "Exercise intros rewritten to match the new counts"; no "akar", which the lesson never defines)."""
+    key = ex["key"]
+    c = num_id(len(ex["questions"]))
+    if key == "sort-case":
+        bins = [terms.by_id[Q.STATE_TERM[b]]["latin"] for b in ex.get("bins") or []]
+        return (f"Latihan kelompokkan menurut akhiran, {c} kata, dalam {num_id(len(bins))} kelompok: {_list_id(bins)}. "
+                "Klik satu kata, lalu klik kelompok akhirannya.")
+    if key == "wazn-factory":
+        labels = list(dict.fromkeys(o for q in ex["questions"] for o in q["options"]))
+        which = (f"Pilih bentuk {_list_id(labels, 'atau')} yang ditanyakan." if len(labels) <= 3
+                 else "Pilih bentuk yang sesuai dengan namanya.")
+        return (f"Latihan bentuk-bentuk kata, {c} soal. {which} Bentuk-bentuk ini kata Arab hasil tashrif, bukan "
+                "kutipan ayat.")
     return {
         "tap-word": (f"Latihan dengar dan klik. Imam akan membacakan {c} kata dari ayat ini satu per satu, "
                      "dalam urutan acak. Setiap kali, klik kata yang Anda dengar."),
         "why-harakat": (f"Latihan kenapa harakat ini, {c} soal. Setiap soal menampilkan satu kata; pilih alasan "
                         "yang membuat akhirnya dibaca seperti itu."),
-        "sort-case": (f"Latihan kelompokkan menurut akhiran, {c} kata. Klik satu kata, lalu klik kelompok "
-                      "akhirannya."),
         "label-role": f"Latihan tebak peran kata, {c} soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini.",
-        "wazn-factory": (f"Latihan bentuk-bentuk kata, {c} soal. Dari satu akar lahir beberapa bentuk kata; pilih "
-                         "bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif, bukan "
-                         "kutipan ayat."),
     }[key]
+
+
+def ex_why(ex: dict, q: dict, a: dict, library: dict, san: Sanitiser, terms: Q.Terms, S: int) -> str:
+    """The ONE short line that explains a question's correct answer, said after "Benar." and after
+    "Ini jawabannya." (operator 2026-10-10: "give narration/voice only for the correct answer, to
+    give auditory explanation"; decision 2 of 2026-10-11: new short lines from the word's existing
+    sourced fields only, never a new claim):
+      tap-word      the word's place and gloss;
+      why / sort    the word's `why`, then its case state when the why does not name it ("Jadi,
+                    kata ini marfu'.": the state the sort bin and the badge show);
+      label-role    the word's `role`, then its `why`;
+      wazn-factory  the form's label with its Konsep card's title ("fi'il mudhari', yaitu kata
+                    kerja sekarang dan akan datang"), without the Arabic form (not a dictionary term).
+    """
+    A = a["ayah"]
+    key = ex["key"]
+    if key == "wazn-factory":
+        concept = next((c for tid in sorted(terms.ids(q["label"]))
+                        for c in library["concepts"] if c["id"] == tid), None)
+        if concept is None:
+            return f"Itu bentuk {q['label']}."
+        title = san.prose(concept["title"], S, A)
+        return f"Itu bentuk {title[:1].lower()}{title[1:]}."
+    i = q["word"]
+    w = a["words"][i - 1]
+    if key == "tap-word":
+        return f"Itu kata {ordinal(i)}, yang artinya “{V.fold(w['gloss'])}”."
+    why = san.prose(w["why"], S, A, i)
+    if key == "label-role":
+        # The role's head (before its brackets or its ";"): the why says the rest ("khabar
+        # (jar-majrur)" spoken "khabar, atau jar-majrur" would mean "or").
+        head = re.split(r" \(|;", w["role"], maxsplit=1)[0].strip()
+        return f"Perannya: {san.prose(head, S, A, i)}. {why}"
+    st = Q.STATE_TERM.get(w["case"]["state"])
+    if st and st in terms.by_id and st not in terms.ids(why):
+        why += f" Jadi, kata ini {terms.by_id[st]['latin']}."
+    return why
 
 
 Line = tuple[str, str, dict | None, str]  # id, prose, ayah (None for shared lines), part
 
 
-def surah_lines(lesson: dict, library: dict, san: Sanitiser) -> list[Line]:
+def surah_lines(lesson: dict, library: dict, san: Sanitiser, compose: dict | None = None,
+                quiz: dict | None = None, terms: Q.Terms | None = None) -> list[Line]:
     slug, S, name = lesson["slug"], lesson["surah"], lesson["name_id"]
     last = lesson["ayat"][-1]["ayah"]
     out: list[Line] = []
@@ -647,19 +748,33 @@ def surah_lines(lesson: dict, library: dict, san: Sanitiser) -> list[Line]:
         add("intro", f"Ayat {ordinal(A)} Surah {name}. Terjemahannya: “{V.fold(tr)}” Ayat ini terdiri "
                      f"dari {num_id(n_words)} kata, dan kita akan mempelajarinya satu per satu.")
         add("recite", f"Sekarang dengarkan imam membacakan ayat {ordinal(A)}.")
+        primer = V.primer_of(compose, A)
+        for k, ln in enumerate((primer or {}).get("lines") or [], 1):
+            add(f"primer:{k}", san.prose(ln["say"], S, A, strict=f"{base}:primer:{k}"))
         for i, w in enumerate(a["words"], 1):
             san.plain_check(f"{w['loc']} gloss", w["gloss"])
-            add(f"w{i}", f"Kata {ordinal(i)} artinya: “{V.fold(w['gloss'])}”. {san.prose(w['why'], S, A, i)}")
+            comp = V.composition_of(compose, w["loc"])
+            gloss = f"Kata {ordinal(i)} artinya: “{V.fold(w['gloss'])}”."
+            if comp is None:
+                add(f"w{i}", f"{gloss} {san.prose(w['why'], S, A, i)}")
+                continue
+            # The frames say the why part by part (rule 14): the word line is the gloss and the lead.
+            lead = san.prose(comp["lead"], S, A, i, strict=f"{base}:w{i} lead") if comp.get("lead") else ""
+            add(f"w{i}", f"{gloss} {lead}".strip())
+            for k, ln in enumerate(comp.get("lines") or [], 1):
+                add(f"w{i}:compose:{k}", san.prose(ln["say"], S, A, i, strict=f"{base}:w{i}:compose:{k}"))
         for c in V.introduced_concepts(a["loc"], library):
             # The title starts with a capital: validate_narration._sentence_start shows a term
             # spoken from Arabic script right after TITLE_LEAD capitalised, as the caption does.
             add(f"concept:{c['id']}", f"{V.TITLE_LEAD} {_cap(san.prose(c['title'], S, A))}. {san.prose(c['summary'], S, A)}")
         if a.get("structure"):
             add("structure", f"Sekarang susunan kalimatnya. {san.prose(a['structure']['summary'], S, A)}")
-        counts = V.exercise_counts(a, library)
-        for k in V.EXERCISE_KEYS:
-            if k in counts:
-                add(f"ex:{k}:intro", ex_intro(k, counts[k]))
+        # The exercises of content/quiz/<slug>.json (build_quiz.py): each one's introduction, then
+        # one explanation line per question, "ex:<key>:<n>:why".
+        for ex in Q.ayah_plan(quiz, A):
+            add(f"ex:{ex['key']}:intro", ex_intro(ex, terms))
+            for q in ex["questions"]:
+                add(f"ex:{ex['key']}:{q['n']}:why", ex_why(ex, q, a, library, san, terms, S))
         add("recap", f"Dengarkan sekali lagi seluruh ayat {ordinal(A)} dibacakan imam.")
         if A == last:
             add("done", f"Pelajaran ayat {ordinal(A)} selesai. Ini ayat terakhir Surah {name}.")
@@ -678,11 +793,16 @@ def shared_lines() -> list[Line]:
     return out
 
 
-def build_lines(lessons: dict[str, dict], library: dict, lex: V.Lexicon | None = None) -> dict[str, dict[str, dict]]:
-    """manifest name → {id: {text, display, highlight, focus}}, in lesson order (deterministic).
-    Stops, writing nothing, if a line fails a validate_narration check (a new mention or term the
-    rules above do not cover)."""
+def build_lines(lessons: dict[str, dict], library: dict, lex: V.Lexicon | None = None,
+                compose: dict[str, dict] | None = None, quiz: dict[str, dict] | None = None) -> dict[str, dict[str, dict]]:
+    """manifest name → {id: {text, display, highlight, focus, frame?}}, in lesson order
+    (deterministic). `compose`: content/compose/<slug>.json by slug, `quiz`: content/quiz/<slug>.json
+    by slug (both default: from disk). Stops, writing nothing, if a line fails a validate_narration
+    check (a new mention or term the rules above do not cover)."""
     lex = lex or V.load_lexicon()
+    compose = V.load_compose() if compose is None else compose
+    quiz = V.load_quiz() if quiz is None else quiz
+    terms = Q.Terms(Q.load_terms())
     san = Sanitiser(lessons)
     sp = Speech(lex)
     forms = san.forms
@@ -692,22 +812,28 @@ def build_lines(lessons: dict[str, dict], library: dict, lex: V.Lexicon | None =
     raw: dict[str, list[Line]] = {}
     for spec in SURAHS:
         if spec.slug in lessons:
-            raw[spec.slug] = surah_lines(lessons[spec.slug], library, san)
+            raw[spec.slug] = surah_lines(lessons[spec.slug], library, san, compose.get(spec.slug), quiz.get(spec.slug), terms)
     raw["shared"] = shared_lines()
     out: dict[str, dict[str, dict]] = {}
     for name, rows in raw.items():
         lines: dict[str, dict] = {}
+        comp = compose.get(name)
         for lid, prose, ayah, part in rows:
             errs += V.check_text(lid, prose, forms, max_len=None)
-            highlight, focus = V.line_view(ayah, part)
-            focus_ar = forms.word_ar.get(focus) if focus else None
+            highlight, focus = V.line_view(ayah, part, comp)
+            frame = V.line_frame(ayah, part, comp)
+            focus_ar = V.line_letters(ayah, part, focus, forms, comp, library)
             parts = split_line(sp.mark(prose), measure=lambda x: len(sp.spoken(x)))
             ids = [lid] if len(parts) == 1 else [f"{lid}:{chr(ord('a') + i)}" for i in range(len(parts))]
             for pid, marked in zip(ids, parts):
                 text, display = sp.spoken(marked), sp.shown(marked, focus_ar)
                 errs += V.check_spoken(pid, text, forms, lex)
                 errs += V.check_display(pid, display, text, forms, lex, focus_ar)
-                lines[pid] = {"text": text, "display": display, "highlight": list(highlight), "focus": focus}
+                line = {"text": text, "display": display, "highlight": list(highlight), "focus": focus}
+                if frame is not None:
+                    line["frame"] = frame
+                errs += V.check_animation_line(pid, line, ayah, part, comp, lex, len(parts) > 1)
+                lines[pid] = line
         out[name] = lines
     if errs:
         raise SystemExit("narration lines the narrator must not say:\n  " + "\n  ".join(errs))
@@ -724,8 +850,10 @@ def retext_tokens(tokens: list, line: dict, lex: V.Lexicon, focus_ar: str | None
     return [{**tk, "t": lex._render(line["text"], a, b, spans, focus_ar)} for tk, (a, b) in zip(tokens, runs)]
 
 
-def manifest(lines: dict[str, dict], old: dict | None, lex: V.Lexicon, forms: V.Forms) -> dict:
-    """Keeps the voice, and the audio and tokens of every line whose spoken text did not change."""
+def manifest(lines: dict[str, dict], old: dict | None, lex: V.Lexicon, forms: V.Forms,
+             letters=lambda lid, line: None) -> dict:
+    """Keeps the voice, and the audio and tokens of every line whose spoken text did not change.
+    `letters(lid, line)`: where the line's caption takes a letter's shape (V.line_letters)."""
     old_lines = (old or {}).get("lines") or {}
     out = {}
     for lid, line in lines.items():
@@ -734,8 +862,7 @@ def manifest(lines: dict[str, dict], old: dict | None, lex: V.Lexicon, forms: V.
         if isinstance(prev, dict) and prev.get("text") == line["text"] and "audio" in prev:
             new["audio"] = prev["audio"]
             if "tokens" in prev:
-                focus_ar = forms.word_ar.get(line["focus"]) if line["focus"] else None
-                new["tokens"] = retext_tokens(prev["tokens"], line, lex, focus_ar)
+                new["tokens"] = retext_tokens(prev["tokens"], line, lex, letters(lid, line))
         out[lid] = new
     return {"version": V.MANIFEST_VERSION, "voice": (old or {}).get("voice"), "lines": out}
 
@@ -760,12 +887,13 @@ def main() -> int:
                           f"    said:  {line['text']}\n    shown: {line['display']}\n")
         return 0
     forms = V.Forms(lessons)
+    compose = V.load_compose()
     V.NARRATION_DIR.mkdir(parents=True, exist_ok=True)
     differ = []
     for name, lines in built.items():
         path = V.NARRATION_DIR / f"{name}.json"
         old = json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
-        new = dump(manifest(lines, old, lex, forms))
+        new = dump(manifest(lines, old, lex, forms, V.letters_for(name, lessons, forms, compose, library)))
         chars = sum(len(x["text"]) for x in lines.values())
         if args.check:
             if not path.exists() or path.read_text(encoding="utf-8") != new:
