@@ -301,6 +301,17 @@ jobs:
           [[ "$first" == 'href="/belajar/id/konsep/harakat"' ]] || { echo "✗ /konsep: the first concept link is ${first}, not the Harakat page"; exit 1; }
           loc="$(curl -s -o /dev/null -w '%{redirect_url}' http://127.0.0.1:3300/belajar)"
           echo "/belajar -> ${loc}"; [[ "$loc" == */belajar/id ]]
+          # The Dakwah-Lens brand and the ways to the main site (operator, 2026-10-10: Belajar
+          # should bring people to dakwah-lens.id): the header logo (a rendered <img
+          # alt="Dakwah-Lens">, its next/image rendition fetched), the main site's favicon and
+          # apple-touch icon under /belajar (same bytes), the footer's "Bagian dari Dakwah-Lens"
+          # link to the main home (matched inside <footer>, never in the messages payload), the
+          # bridges' UTM-tagged main-site addresses, og:/twitter: tags on the hub, the track and
+          # every lesson (og:url = canonical, still noindex), and every share card: 200
+          # image/png 1200×630 (hub, track, each lesson in id + en); unknown lessons' cards 404,
+          # the hidden waris 404 carries no card. Lists every problem; fails after the restart check.
+          brand_rc=0
+          node belajar/scripts/ci/brand-smoke.mjs || brand_rc=$?
           # Ilmu Waris is hidden on the live site (operator, 2026-10-10; src/lib/features.ts), and
           # this container starts like production, without BELAJAR_WARIS: every waris route (track,
           # hitung, laporan; id + en; also fetched as the App Router does, percent-encoded, and
@@ -331,6 +342,7 @@ jobs:
           logs="$(docker logs smoke 2>&1)"
           grep -q "up to date" <<<"$logs"
           docker rm -f smoke >/dev/null
+          [[ "$brand_rc" -eq 0 ]] || { echo "✗ brand / bridge / share-card checks failed (listed above)"; exit 1; }
           [[ "$waris_rc" -eq 0 ]] || { echo "✗ Ilmu Waris is not hidden (listed above)"; exit 1; }
           [[ "$surahs_rc" -eq 0 ]] || { echo "✗ the unpublished surahs are not hidden (listed above)"; exit 1; }
 
@@ -348,7 +360,14 @@ jobs:
       # answers the narration URLs ITSELF, in the browser only (Playwright
       # route): the git-ignored pipeline/out file when present, else a silent
       # stand-in as long as the manifest's `ms`. BELAJAR_DIR points it at the
-      # manifests. Production routing is untouched.
+      # manifests. Production routing is untouched. Brand and sharing (operator,
+      # 2026-10-10): the header measured at every text size (logo loaded, one
+      # mark + Aa + Menu, no overlap, one row on the desktop, at most two on a
+      # phone) and shot at the normal and largest size; the footer's rendered
+      # "Bagian dari Dakwah-Lens" link (href checked on the element); the
+      # Bagikan fallback panel (WhatsApp link, Salin tautan → "Tautan
+      # disalin"); the end-of-surah card with its Tafsir Pekan Ini bridge; and
+      # two share cards (hub, Al-Fatihah 1) saved as served.
       - name: Screenshots (phone + desktop)
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: |

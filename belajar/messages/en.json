@@ -55,7 +55,40 @@
   },
   "Footer": {
     "disclaimer": "AI-assisted, not an authoritative fatwa. Explanations are drawn from named kitabs; check the references.",
-    "credits": "Sources & licences"
+    "credits": "Sources & licences",
+    "part_of": "Part of Dakwah-Lens"
+  },
+  "MainSite": {
+    "surah_end_lead": "Want to reflect more deeply?",
+    "surah_end_label": "Read Tafsir Pekan Ini on Dakwah-Lens",
+    "materials_heading": "More on Dakwah-Lens",
+    "ayah_kitab_label": "Search other ayat and hadith in the Dakwah-Lens Kitab Library",
+    "ayah_khutbah_label": "Read this week's Friday khutbah and kultum scripts on Dakwah-Lens",
+    "track_lead": "Want to read more?",
+    "track_label": "Search the Qur'an, hadith and classical kitabs in the Dakwah-Lens Kitab Library",
+    "hub_lead": "Learn is part of Dakwah-Lens.",
+    "hub_label": "See khutbah and kultum scripts and the Kitab Library on Dakwah-Lens"
+  },
+  "Share": {
+    "button": "Share",
+    "panel": "Share this page",
+    "whatsapp": "Send on WhatsApp",
+    "copy": "Copy link",
+    "copied": "Link copied.",
+    "copy_manual": "The link could not be copied automatically. Copy it here:",
+    "lesson_text": "Learn Qur'anic Arabic word by word: {surah} · Ayah {n}",
+    "track_text": "Learn Qur'anic Arabic word by word, with a real imam's recitation"
+  },
+  "Og": {
+    "module": "Learn",
+    "track": "Learn Qur'anic Arabic",
+    "hub_body": "Short lessons on the faith, drawn from named kitabs, starting with Qur'anic Arabic, word by word.",
+    "track_body": "Listen to the imam, then understand each word: its meaning, its root, and why its ending is read the way it is.",
+    "lesson_title": "{surah} · Ayah {n}",
+    "lesson_description": "“{translation}” Learn it word by word: meaning, root, and why each ending is read the way it is.",
+    "image_alt": "Learn Qur'anic Arabic, from Dakwah-Lens",
+    "lesson_image_alt": "{surah} · Ayah {n}: transliteration and translation, Learn Qur'anic Arabic from Dakwah-Lens",
+    "disclaimer": "AI-assisted, not an authoritative fatwa"
   },
   "Credits": {
     "title": "Sources & licences",

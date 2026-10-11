@@ -55,7 +55,40 @@
   },
   "Footer": {
     "disclaimer": "Dibantu AI, bukan fatwa otoritatif. Penjelasan disusun dari kitab yang disebut namanya; periksa rujukannya.",
-    "credits": "Sumber & lisensi"
+    "credits": "Sumber & lisensi",
+    "part_of": "Bagian dari Dakwah-Lens"
+  },
+  "MainSite": {
+    "surah_end_lead": "Ingin tadabbur lebih dalam?",
+    "surah_end_label": "Baca Tafsir Pekan Ini di Dakwah-Lens",
+    "materials_heading": "Lanjut di Dakwah-Lens",
+    "ayah_kitab_label": "Cari ayat dan hadits lain di Pustaka Kitab Dakwah-Lens",
+    "ayah_khutbah_label": "Baca naskah khutbah Jumat dan kultum pekan ini di Dakwah-Lens",
+    "track_lead": "Ingin membaca lebih banyak?",
+    "track_label": "Cari ayat, hadits, dan kitab klasik di Pustaka Kitab Dakwah-Lens",
+    "hub_lead": "Belajar adalah bagian dari Dakwah-Lens.",
+    "hub_label": "Lihat naskah khutbah, kultum, dan Pustaka Kitab di Dakwah-Lens"
+  },
+  "Share": {
+    "button": "Bagikan",
+    "panel": "Bagikan halaman ini",
+    "whatsapp": "Kirim lewat WhatsApp",
+    "copy": "Salin tautan",
+    "copied": "Tautan disalin.",
+    "copy_manual": "Tautan belum bisa disalin otomatis. Salin tautan ini:",
+    "lesson_text": "Belajar bahasa Arab Al-Qur'an kata demi kata: {surah} · Ayat {n}",
+    "track_text": "Belajar bahasa Arab Al-Qur'an kata demi kata, dengan bacaan imam sungguhan"
+  },
+  "Og": {
+    "module": "Belajar",
+    "track": "Belajar Bahasa Arab Al-Qur'an",
+    "hub_body": "Pelajaran agama yang singkat dan bersumber dari kitab, dimulai dari bahasa Arab Al-Qur'an, kata demi kata.",
+    "track_body": "Dengarkan bacaan imam, lalu pahami arti setiap kata, akar katanya, dan alasan harakat di akhirnya.",
+    "lesson_title": "{surah} · Ayat {n}",
+    "lesson_description": "“{translation}” Pelajari kata demi kata: arti, akar kata, dan alasan harakat di akhirnya.",
+    "image_alt": "Belajar Bahasa Arab Al-Qur'an, dari Dakwah-Lens",
+    "lesson_image_alt": "{surah} · Ayat {n}: transliterasi dan terjemahan, Belajar Bahasa Arab Al-Qur'an dari Dakwah-Lens",
+    "disclaimer": "Dibantu AI, bukan fatwa otoritatif"
   },
   "Credits": {
     "title": "Sumber & lisensi",

@@ -78,7 +78,9 @@ export function HeaderControls({ locale }: { locale: string }) {
 
   return (
     <>
-      <div className="flex items-center gap-2">
+      {/* ml-auto: when the header wraps (phones: the Dakwah-Lens brand mark
+          and these two buttons do not fit one row), they keep to the right. */}
+      <div className="ml-auto flex items-center gap-2">
         <button
           ref={sizeButton}
           type="button"

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Amiri, Fraunces, Inter } from "next/font/google";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
@@ -10,6 +11,7 @@ import { LineFit } from "@/components/LineFit";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { IS_PUBLIC } from "@/lib/flags";
+import { mainSiteHref } from "@/lib/mainSite";
 import { creditsHref, hubHref } from "@/lib/routes";
 
 import "../globals.css";
@@ -55,6 +57,12 @@ export async function generateMetadata({
 }: LayoutProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "App" });
+  // Icons: src/app/favicon.ico and src/app/apple-icon.png (Next file convention, so the basePath
+  // is in their links: /belajar/favicon.ico), byte copies of the main site's set
+  // (web/public/favicon_io; web/src/app carries the same two files) — operator, 2026-10-10: the
+  // module wears the Dakwah-Lens brand. Before them a tab showed the main favicon only through the
+  // browser's /favicon.ico guess, and a phone's home screen got no icon. The main site's PWA
+  // manifest is not linked: it describes the main app, not this module.
   return {
     metadataBase: new URL("https://dakwah-lens.id"),
     title: { default: t("name"), template: t("title_template") },
@@ -101,14 +109,36 @@ export default async function LocaleLayout({
               on wide screens: on phones and tablets the row can wrap at
               large text sizes, and a sticky header would then cover a large
               part of the reading area. Positioned at every width because
-              both panels hang under it. */}
+              both panels hang under it.
+              The brand is ONE mark, the Dakwah-Lens logo with the words
+              "Dakwah-Lens" over "Belajar" (operator, 2026-10-10: "at least we
+              should put logo there"), so the brand reads as words, not only
+              as an icon. The logo's alt carries the name and the visible
+              "Dakwah-Lens" is hidden from screen readers, so the link is read
+              once: "Dakwah-Lens Belajar". On a phone (below about 440px) the
+              mark and the two buttons do not fit one row at any text size:
+              the buttons take a second row, at the right (HeaderControls),
+              measured in CI (scripts/ci/screenshots.mjs headerShots). */}
           <header className="relative z-30 border-b border-hairline bg-paper/95 backdrop-blur-md lg:sticky lg:top-0">
             <div className="mx-auto flex min-h-16 max-w-5xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-2 sm:px-6">
-              <Link
-                href={hubHref()}
-                className="inline-flex min-h-12 items-center font-display text-xl font-medium text-ink"
-              >
-                {t("name")}
+              <Link href={hubHref()} data-brand="" className="inline-flex min-h-12 shrink-0 items-center gap-2.5 text-ink">
+                {/* 40px at the normal size, growing with the text size (rem);
+                    next/image serves a 48px and a 96px rendition (crisp at
+                    2x). The basePath is part of src (next.config.ts). */}
+                <Image
+                  src="/belajar/dakwah-lens-logo-short-removebg.png"
+                  alt="Dakwah-Lens"
+                  width={40}
+                  height={40}
+                  loading="eager"
+                  className="h-10 w-10 shrink-0 object-contain"
+                />
+                <span className="flex flex-col">
+                  <span aria-hidden className="whitespace-nowrap text-sm/tight font-semibold text-forest">
+                    Dakwah-Lens
+                  </span>
+                  <span className="whitespace-nowrap font-display text-xl/tight font-medium">{t("name")}</span>
+                </span>
               </Link>
               <HeaderControls locale={locale} />
             </div>
@@ -120,19 +150,33 @@ export default async function LocaleLayout({
           <LineFit />
 
           <footer className="mt-16 border-t border-hairline">
-            <div className="mx-auto flex max-w-5xl flex-col gap-4 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <div className="mx-auto flex max-w-5xl flex-col gap-4 px-4 py-8 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
               {/* Mandatory label (AGENTS.md): always visible, never collapsed. The waris track
                   has no human review, so it gets its own label (FooterDisclaimer). */}
               <p className="max-w-prose text-pretty text-base text-ink-muted">
                 <FooterDisclaimer module={tf("disclaimer")} waris={tw("footer_disclaimer")} />
               </p>
-              {/* One link only (operator, 2026-10-10: "too many links"): the
-                  way back to Dakwah-Lens lives in the header's Menu. Sumber &
-                  lisensi stays here as well, where licence credits are looked
-                  for, reachable without opening a menu. 48px target. */}
-              <Link href={creditsHref()} className="link-text inline-flex min-h-12 shrink-0 items-center text-base">
-                {tf("credits")}
-              </Link>
+              {/* Two links (operator, 2026-10-10: "too many links" — and then:
+                  the module should bring people to dakwah-lens.id): "Bagian dari
+                  Dakwah-Lens", to the main site's home in this locale (a plain
+                  <a>: cross-app; UTM-tagged, lib/mainSite.ts), and Sumber &
+                  lisensi, where licence credits are looked for, reachable
+                  without opening a menu. The header's Menu keeps "Kembali ke
+                  Dakwah-Lens" as well. Under the label until wide screens, so
+                  the label never squeezes into a narrow column at large text
+                  sizes. 48px targets. */}
+              <div className="flex flex-wrap items-center gap-x-6 lg:shrink-0">
+                <a
+                  href={mainSiteHref(locale, "home", "footer")}
+                  data-main-site="footer"
+                  className="link-text inline-flex min-h-12 items-center whitespace-nowrap text-base"
+                >
+                  {tf("part_of")}
+                </a>
+                <Link href={creditsHref()} className="link-text inline-flex min-h-12 items-center text-base">
+                  {tf("credits")}
+                </Link>
+              </div>
             </div>
           </footer>
         </NextIntlClientProvider>

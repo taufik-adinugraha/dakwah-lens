@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 
 import { MixedText } from "@/components/library/MixedText";
 import { Link } from "@/i18n/navigation";
+import { MainSiteBridge } from "@/components/MainSiteBridge";
 import { quranHref } from "@/lib/routes";
 
 import type { SurahRef } from "./useUpNext";
@@ -83,6 +84,8 @@ export function SurahEndCard({
           {t("end_list")}
         </Link>
       </div>
+      {/* After the surah, one calm line to Tafsir Pekan Ini (operator, 2026-10-10). */}
+      <MainSiteBridge id="surah_end" className="mt-5" />
     </div>
   );
 }
