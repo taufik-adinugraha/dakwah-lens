@@ -83,9 +83,11 @@ describe("autoplay stage: what the lesson page ships", () => {
               else expect(c.spoken, c.line).toBeNull();
             }
           }
-          // Serialisable for the client component, and not huge (word
-          // timings for the karaoke caption add ~40 KB to the longest ayah).
-          expect(JSON.stringify(seq).length).toBeLessThan(120_000);
+          // Serialisable for the client component, and not huge. Measured 2026-10-11, with every
+          // Al-Fatihah line voiced (karaoke word timings), the word compositions and the quiz
+          // explanations: the longest, Al-Fatihah 7 (nine words), is 141 KB raw / 28 KB gzipped;
+          // the next, ayah 5, 92 KB. The budget keeps ~13% headroom over the longest.
+          expect(JSON.stringify(seq).length).toBeLessThan(160_000);
         }
       }
     }
