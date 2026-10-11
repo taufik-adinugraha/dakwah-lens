@@ -221,7 +221,7 @@
     "role_question": "Apa peran kata ini dalam kalimat?",
     "wazn_title": "Bentuk-bentuk kata (wazan)",
     "wazn_instruction": "Pilih bentuk kata yang sesuai dengan namanya. Bentuk-bentuk ini lahir dari tashrif.",
-    "wazn_question": "Mana bentuk <b>{label}</b>?",
+    "wazn_question": "Bentuk <b>{label}</b> yang mana?",
     "wazn_note": "Bentuk-bentuk ini kata Arab hasil tashrif (perubahan bentuk kata), bukan kutipan ayat."
   },
   "Concept": {

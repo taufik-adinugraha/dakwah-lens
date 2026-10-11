@@ -1059,11 +1059,19 @@ async function quizVoiceCheck(page, vp, index) {
     }
     console.log(`  quiz labels: ${q1.options.map((o) => o.text).join(" | ")}`);
 
-    // 2. A wrong pick: silence, and the note on screen.
+    // 2. A wrong pick: silence, and the note on screen. A new line said shows as a request for
+    //    another file or a caption on another line; the browser re-fetching part of the prompt it
+    //    is still playing (the same file, logged with its range) is not one.
     let mark = served.length;
+    const playing = urls(0).at(-1);
+    const lineBefore = await caption.getAttribute("data-line");
     await option(q1.options[1].from).click();
     await page.waitForTimeout(2500);
-    if (served.length > mark) throw new Error(`${vp}: a wrong pick played narration: ${urls(mark).join(", ")}`);
+    const other = urls(mark).filter((u) => u !== playing);
+    const lineAfter = await caption.getAttribute("data-line");
+    if (other.length || (lineAfter && lineAfter !== lineBefore)) {
+      throw new Error(`${vp}: a wrong pick played narration: ${other.join(", ") || `the caption moved to ${lineAfter}`} (requests after the pick: ${served.slice(mark).join(" | ") || "none"})`);
+    }
     await exercise.getByText("Belum tepat", { exact: false }).first().waitFor({ state: "visible", timeout: 5_000 });
     console.log("  quiz: a wrong pick plays no narration (Belum tepat on screen)");
 

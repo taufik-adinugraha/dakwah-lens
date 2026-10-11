@@ -97,7 +97,9 @@ export function narrationRoute(index, served) {
       served.push(`${pathname} → pipeline/out MP3`);
       return fulfillBytes(route, body, "audio/mpeg");
     }
-    served.push(`${pathname} → silent stand-in, ${ms} ms`);
+    // The byte range is logged: a media element re-fetches part of a file it is still playing,
+    // which is not a new line being said.
+    served.push(`${pathname} → silent stand-in, ${ms} ms, range ${route.request().headers()["range"] ?? "none"}`);
     return fulfillBytes(route, silentWav(ms), "audio/wav");
   };
 }

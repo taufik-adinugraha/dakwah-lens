@@ -204,12 +204,19 @@ export function WordCard({
                 <ul className="space-y-3 px-3 pb-4 text-base text-ink-muted @2xs:px-4">
                   {word.ikhtilaf.map((x) => (
                     <li key={x.point}>
-                      {/* The colon inside the text, so no line starts with it; the
-                          " · " between the options stays with the option before it. */}
+                      {/* The colon inside the text, so no line starts with it; each option
+                          on its own line (rule 15, 2026-10-11: a " · " join could start a line
+                          at Sangat besar, and a list is easier to read). */}
                       <span className="font-semibold text-ink">
                         <MixedText text={`${x.point}:`} />
-                      </span>{" "}
-                      <MixedText text={x.options.join(" · ")} />
+                      </span>
+                      <ul className="mt-1 list-disc space-y-1 pl-5">
+                        {x.options.map((o) => (
+                          <li key={o}>
+                            <MixedText text={o} />
+                          </li>
+                        ))}
+                      </ul>
                     </li>
                   ))}
                 </ul>

@@ -115,7 +115,8 @@ function WaznFactoryRound({
           <div ref={focusRef} tabIndex={-1}>
             <Counter n={q.i + 1} total={q.total} />
             <p className="mt-3 text-lg text-ink">
-              {/* The label with its Arabic ("fi'il mudhari' (فِعْل مُضَارِع)"), kept together. */}
+              {/* The label with its Arabic ("fi'il mudhari' (فِعْل مُضَارِع)"), kept together; the
+                  question ends on a plain word ("… yang mana?"), so no line starts with "?" (rule 15). */}
               {t.rich("wazn_question", {
                 label: item.label,
                 b: () => (
