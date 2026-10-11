@@ -984,6 +984,28 @@ export function viewAutoplay(seq: AutoplaySequence, s: AutoplayState): AutoplayV
   };
 }
 
+/**
+ * The narration file the lesson plays first when the learner clicks "Mulai" (`from` 0, or
+ * null) or "Lanjutkan dari langkah N" (`from` N − 1): exactly what that click's `start` issues
+ * — "shared:start" or "shared:resume" with their audio — or null when it starts caption-only.
+ * For the UI to warm it while the page is idle (operator 2026-10-11, narration rule 19).
+ */
+export function firstNarration(
+  seq: AutoplaySequence,
+  from: number | null,
+  pace?: Pace,
+): { url: string; ms: number } | null {
+  const at = from ?? 0;
+  const s = reduceAutoplay(seq, createAutoplayState(seq, { pace }), {
+    type: "start",
+    pace,
+    from: at,
+    reason: at > 0 ? "restore" : "fresh",
+  });
+  const a = s.activity;
+  return a?.kind === "narrate" ? { url: a.url, ms: a.ms } : null;
+}
+
 /** URLs of the narration audio this step can still play, in order — for
  *  the UI to preload the next files (same-origin only). */
 export function upcomingAudio(seq: AutoplaySequence, s: AutoplayState): string[] {

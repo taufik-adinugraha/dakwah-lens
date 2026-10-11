@@ -250,6 +250,15 @@ body {
     color: var(--color-ink-muted);
     cursor: not-allowed;
   }
+  /* Busy ("Menyiapkan pelajaran…" with its turning mark, operator 2026-10-11): working, not
+     unavailable, so it keeps its own look; it ignores clicks meanwhile (aria-disabled too). */
+  &[aria-busy="true"] {
+    background-color: var(--color-forest);
+    border-color: var(--color-forest);
+    border-style: solid;
+    color: var(--color-paper);
+    cursor: progress;
+  }
 }
 
 /* Standard buttons and toggles: 48px tall, visible ≥3:1 border. */
@@ -352,6 +361,14 @@ body {
     border-style: dashed;
     color: var(--color-ink-muted);
     cursor: not-allowed;
+  }
+  /* Busy, as btn-primary's: its own look, not the disabled one. */
+  &[aria-busy="true"] {
+    background-color: #ffffff;
+    border-color: var(--color-forest);
+    border-style: solid;
+    color: var(--color-ink);
+    cursor: progress;
   }
 }
 
@@ -556,6 +573,27 @@ label:has(> .sr-only:focus-visible) {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* ── The lesson's loading line (operator 2026-10-11, narration rule 19) ──
+   "Memuat suara narator…" in the bottom panel (LessonStage): it appears only after 0.6 s of
+   loading, and its row opens (0fr → 1fr) and fades in over 200ms, so the panel grows softly
+   instead of jumping; it leaves at once, as the sound starts. With reduced motion it is simply
+   there. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-autoplay="loading"] {
+    animation: loading-in 200ms ease-out both;
+  }
+}
+@keyframes loading-in {
+  from {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+  to {
+    grid-template-rows: 1fr;
+    opacity: 1;
   }
 }
 

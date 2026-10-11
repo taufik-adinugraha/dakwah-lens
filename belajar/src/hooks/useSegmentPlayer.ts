@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { type AudioLoading, mediaLoading, type MediaEventType } from "@/lib/autoplay/loading";
+
 export type Segment = [word: number, startMs: number, endMs: number];
 export type RecitationSource = {
   reciter: string;
@@ -66,6 +68,12 @@ const markUnlocked = (a: HTMLAudioElement) => {
  *   remembers its spot) and calls its `onInterrupt`, so e.g. the guided
  *   lesson stops instead of waiting on audio that was paused under it.
  *
+ * - `loading` (operator 2026-10-11, narration rule 19: never a silent wait):
+ *   from the moment a playback starts ("play") until the imam is heard
+ *   ("playing"), and again while the stream stalls ("waiting"); never for
+ *   unlock()'s silent play. The lesson stage says "Memuat bacaan imam…"
+ *   once it lasts.
+ *
  * The hook owns its Audio element (created after mount, never rendered), so
  * components never touch a ref during render (React Compiler rule).
  */
@@ -119,6 +127,8 @@ export function useSegmentPlayer(
   const rate = opts.rate ?? ownRate;
   /** The last attempt to play failed; cleared once audio actually plays. */
   const [failed, setFailed] = useState(false);
+  /** A playback asked for and not heard yet, or stalled (src/lib/autoplay/loading.ts). */
+  const [loading, setLoading] = useState<AudioLoading | null>(null);
 
   const source = sources[sourceIdx] ?? sources[0];
 
@@ -130,6 +140,11 @@ export function useSegmentPlayer(
     audioRef.current = a;
     let raf: number | null = null;
 
+    /** The element's event `type` for the loading value. */
+    const load = (type: MediaEventType) => {
+      const at = { kind: "recitation" as const, nowMs: Date.now(), ready: a.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA };
+      setLoading((prev) => mediaLoading(prev, type, at));
+    };
     const wordAt = (ms: number): number | null => {
       for (const [w, s, e] of segmentsRef.current) if (ms >= s && ms < e) return w;
       return null;
@@ -156,6 +171,9 @@ export function useSegmentPlayer(
      *  which other players treat the same way. */
     const begin = () => {
       setPlaying(true);
+      // A real playback (the "play" event, or a takeover of unlock()'s silent play, which
+      // fires none): loading until the imam is heard, unless the data is already there.
+      load("play");
       if (raf !== null) cancelAnimationFrame(raf);
       raf = requestAnimationFrame(loop);
       window.dispatchEvent(new CustomEvent<HTMLAudioElement>(AUDIO_START_EVENT, { detail: a }));
@@ -179,6 +197,7 @@ export function useSegmentPlayer(
     };
     const onStop = () => {
       setPlaying(false);
+      load("pause");
       if (raf !== null) cancelAnimationFrame(raf);
       raf = null;
       if (a.ended) {
@@ -191,9 +210,16 @@ export function useSegmentPlayer(
       onFinishRef.current?.();
     };
     const onPlaying = () => {
+      load("playing");
       if (!unlockingRef.current) setFailed(false);
     };
+    // The stream ran dry (a fresh file, a seek to a word, a stall mid-ayah).
+    const onWaiting = () => {
+      if (!unlockingRef.current) load("waiting");
+    };
+    const onEmptied = () => load("emptied");
     const onError = () => {
+      load("error");
       // A failure during unlock() surfaces at the first real play instead.
       if (unlockingRef.current) return;
       setFailed(true);
@@ -204,6 +230,8 @@ export function useSegmentPlayer(
     a.addEventListener("pause", onStop);
     a.addEventListener("ended", onEnded);
     a.addEventListener("playing", onPlaying);
+    a.addEventListener("waiting", onWaiting);
+    a.addEventListener("emptied", onEmptied);
     a.addEventListener("error", onError);
     window.addEventListener(AUDIO_START_EVENT, onOtherStart);
     return () => {
@@ -212,6 +240,8 @@ export function useSegmentPlayer(
       a.removeEventListener("pause", onStop);
       a.removeEventListener("ended", onEnded);
       a.removeEventListener("playing", onPlaying);
+      a.removeEventListener("waiting", onWaiting);
+      a.removeEventListener("emptied", onEmptied);
       a.removeEventListener("error", onError);
       if (raf !== null) cancelAnimationFrame(raf);
       unlockingRef.current = 0;
@@ -358,6 +388,8 @@ export function useSegmentPlayer(
     /** Changes the hook's own speed (ignored while `opts.rate` controls it). */
     setRate,
     failed,
+    /** The imam's recording asked for and not heard yet (or stalled); null while it plays. */
+    loading,
     playAll,
     restart,
     playWord,

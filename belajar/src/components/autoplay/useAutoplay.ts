@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useReducer, useRef, useState, useSyncExternalStore } from "react";
+import { preconnect } from "react-dom";
 
 import { useNarrationPlayer } from "@/hooks/useNarrationPlayer";
 import { readPace, useImamRate, usePace } from "@/hooks/usePace";
@@ -15,7 +16,9 @@ import {
   autoplayStorageKey,
   browserStorage,
   createAutoplayState,
+  firstNarration,
   IDLE_TICK_MS,
+  idlePreloadUrl,
   markContinue,
   positionToSave,
   readSavedIndex,
@@ -24,10 +27,15 @@ import {
   upcomingAudio,
   viewAutoplay,
   wantsIdleTicks,
+  watchLoading,
+  type AudioLoading,
   type AutoplayEvent,
   type AutoplaySequence,
   type AutoplayState,
+  type ConnectionHints,
   type ExerciseKey,
+  type LoadingKind,
+  type LoadingStage,
   type Pace,
 } from "@/lib/autoplay";
 import { ayahHref } from "@/lib/routes";
@@ -57,6 +65,39 @@ export const PLAY_WORD_EVENT = "belajar:play-word";
 const FOREIGN_QUIET_MS = 4000;
 
 const noopSubscribe = () => () => {};
+
+/** What the bottom panel says about a load: whose sound, and whether it is past
+ *  LOADING_SLOW_MS (then it says what to do); null while nothing needs saying. */
+export type LoadingNotice = { kind: LoadingKind; slow: boolean };
+
+/**
+ * The stage's loading notice for `loading` (src/lib/autoplay/loading.ts): null for its first
+ * LOADING_SHOW_MS (a fast load never flickers a message), then "loading", from LOADING_SLOW_MS
+ * "slow"; null again as soon as the sound flows. Timers only (no clock read in render): the
+ * stage a timer reported is kept with the load it belongs to, so a new load starts quiet.
+ */
+function useLoadingNotice(loading: AudioLoading | null): LoadingNotice | null {
+  const [seen, setSeen] = useState<{ of: AudioLoading; stage: LoadingStage } | null>(null);
+  useEffect(() => {
+    if (!loading) return;
+    return watchLoading(loading, Date.now(), (stage) => setSeen({ of: loading, stage }));
+  }, [loading]);
+  if (!loading || seen?.of !== loading || seen.stage === "quiet") return null;
+  return { kind: loading.kind, slow: seen.stage === "slow" };
+}
+
+/** How long after load the page waits for an idle moment before warming the first line. */
+const IDLE_PRELOAD_TIMEOUT_MS = 3000;
+
+/** The origin of a recording's address ("https://everyayah.com"), or null. */
+function originOf(url: string | undefined): string | null {
+  if (!url) return null;
+  try {
+    return new URL(url).origin;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Sends the lesson to another ayah and lets that page start by itself (the
@@ -94,6 +135,13 @@ export function continueToAyah(router: ReturnType<typeof useRouter>, slug: strin
  *   and stored only when the word changes.
  * - "↺ Ulangi langkah ini" replays the current step from its start (also
  *   from a pause); an exercise is remounted fresh (`replays`).
+ * - Never a silent wait (operator 2026-10-11, narration rule 19): `loading`
+ *   is the current activity's sound asked for and not flowing yet (the
+ *   narrator's or the imam's; the players' own value), `loadingNotice` what
+ *   the bottom panel says about it, and `preparing` holds the "Mulai" button
+ *   at "Menyiapkan pelajaran…" until the first line is heard or shown. Before
+ *   "Mulai", the first narration file that click plays is warmed once the
+ *   page is idle (never the imam's external recitation).
  * - Remembers the step per ayah; hands off to the next ayah; Media Session
  *   (lock screen, earphones) play/pause/next/previous.
  * - Never scrolls the page.
@@ -126,7 +174,11 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
     () => null,
   );
 
-  const { play: playNarration, preload, owns: ownsNarration, positionMs } = useNarrationPlayer();
+  const { play: playNarration, preload, owns: ownsNarration, positionMs, loading: narrationLoading } = useNarrationPlayer();
+  /** Token of the first activity a "Mulai" click starts (null: no click yet). */
+  const [prepFor, setPrepFor] = useState<number | null>(null);
+  /** Token of the last narration file heard ("playing"). */
+  const [heardFor, setHeardFor] = useState<number | null>(null);
 
   // The recite activity's completion, error and interruption handlers (set
   // by the executor below, read by the player's callbacks).
@@ -157,6 +209,12 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
     onInterrupt: () => interruptRef.current?.(),
   });
   const { playWord, playAll, restart, pause: pauseAudio, unlock } = player;
+  // The imam's recitation streams from the reciter's CDN (next.config.ts RECITATION_HOSTS): a
+  // preconnect hint to the chosen reciter's host (the connection set up ahead, operator
+  // 2026-10-11) — never a preload of the recording itself before "Mulai": learners on mobile
+  // data pay for every byte. React hoists it into <head>, once per origin.
+  const reciteOrigin = originOf(player.source?.url);
+  if (reciteOrigin) preconnect(reciteOrigin);
 
   // Latest player functions for the executor, which must not restart its
   // activity when they change identity (e.g. the reciter changed).
@@ -194,6 +252,7 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
           // lesson goes on (the engine's rule), it is not a pause.
           onInterrupted: () => dispatch({ type: "narration_end", token }),
           onTime: (ms) => setClock({ token, line, ms: offsetMs + ms, totalMs }),
+          onPlaying: () => setHeardFor(token),
         });
       };
       // The learner's own recording is still playing (e.g. the imam's word
@@ -347,6 +406,38 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
     preload(nextUrl);
   }, [nextUrl, preload]);
 
+  // ── Before "Mulai": warm the first line that click plays ──
+  // (operator 2026-10-11). The primary button's: "Lanjutkan dari langkah N" when a place is
+  // remembered, else "Mulai". Once the page has loaded and is idle, never blocking; skipped when
+  // the browser asks to save data, or the line is long (idlePreloadUrl). The narration player's
+  // own preload element; once the lesson runs, the next-line preload above takes it over.
+  const first = state.started ? null : firstNarration(seq, savedIdx, pace);
+  const firstUrl = first?.url ?? null;
+  const firstMs = first?.ms ?? 0;
+  useEffect(() => {
+    if (!firstUrl) return;
+    // Arrived from the previous ayah (?lanjut=1): the lesson starts by itself, with the ayah's
+    // own first line (no "Mulai", no shared:start) — nothing to warm.
+    if (new URL(window.location.href).searchParams.get(CONTINUE_PARAM) === "1") return;
+    let idle: number | null = null;
+    let timer: number | null = null;
+    const warm = () => {
+      const conn = (navigator as Navigator & { connection?: ConnectionHints }).connection;
+      preload(idlePreloadUrl({ url: firstUrl, ms: firstMs }, conn));
+    };
+    const whenIdle = () => {
+      if (typeof window.requestIdleCallback === "function") idle = window.requestIdleCallback(warm, { timeout: IDLE_PRELOAD_TIMEOUT_MS });
+      else timer = window.setTimeout(warm, 1000);
+    };
+    if (document.readyState === "complete") whenIdle();
+    else window.addEventListener("load", whenIdle, { once: true });
+    return () => {
+      window.removeEventListener("load", whenIdle);
+      if (idle !== null) window.cancelIdleCallback(idle);
+      if (timer !== null) window.clearTimeout(timer);
+    };
+  }, [firstUrl, firstMs, preload]);
+
   // ── Idle reminders: one tick a second while an exercise waits ──
   const ticking = wantsIdleTicks(state);
   useEffect(() => {
@@ -471,6 +562,20 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
   /** The line on screen has the narration voice (null: no line on screen). */
   const lineHasVoice = lineVoiced(seq, state);
 
+  // ── Loading: the current activity's sound, asked for and not flowing yet ──
+  const loading =
+    activity?.kind === "narrate" ? narrationLoading : activity?.kind === "recite" ? player.loading : null;
+  const loadingNotice = useLoadingNotice(loading);
+  // "Menyiapkan pelajaran…": from the click until its first line is heard — or shown at once
+  // (a caption-only line, a failed file, a blocked sound: each is a new activity or none), or
+  // until the load turns slow, when the stage shows with what to do.
+  const preparing =
+    prepFor !== null &&
+    activity?.kind === "narrate" &&
+    activity.token === prepFor &&
+    heardFor !== prepFor &&
+    !loadingNotice?.slow;
+
   // ── Actions (event handlers) ──
   /** Every click that (re)starts the lesson: sound may now play without
    *  another click, and a "browser blocked the sound" notice is answered. */
@@ -482,7 +587,10 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
   const actions = {
     /** "Mulai" (from 0) or "Lanjutkan dari langkah N". */
     start(from?: number) {
+      if (preparing) return; // a second click while the first line loads
       tapped();
+      // The start's first activity is the next token the engine issues.
+      setPrepFor(state.token + 1);
       dispatch({ type: "start", pace, from: from ?? 0, reason: from ? "restore" : "fresh" });
     },
     pause() {
@@ -552,6 +660,12 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
     setImamRate,
     savedIdx,
     blocked,
+    /** The current activity's sound asked for and not flowing yet (loading.ts), else null. */
+    loading,
+    /** What the bottom panel says about `loading` (after LOADING_SHOW_MS), else null. */
+    loadingNotice,
+    /** "Mulai" was clicked and its first line is not heard yet: the button says so. */
+    preparing,
     /** The caption model (caption.ts StageCaption): karaoke words or text. */
     caption,
     /** The caption is spoken by the narration (no aria-live needed). */
