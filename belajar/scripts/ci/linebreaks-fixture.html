@@ -8,7 +8,11 @@
   - data-expect="kind …": the case must report each of those kinds — the check can fail;
   - data-expect="": the markup as it ships must report nothing — the fixed markup passes.
   Bad breaks are forced with <br>, or made by markup the fallback cannot reach (a display set on
-  the box itself), so nothing rests on a width guess. data-fit="unit | glue | arabic": the
+  the box itself; for glue-boxed its white-space too: the fallback's mark lets a glued word wrap,
+  and a box that wraps inside is unit-boxed, CI 2026-10-11 — this case is the word that cannot,
+  sticking out of its line), so nothing rests on a width guess. linebreaks.mjs measures them all
+  inside one box that clips sideways, so no case makes the page scroll sideways — except
+  page-overflow, measured on its own outside it. data-fit="unit | glue | arabic": the
   paragraph is sized by linebreaks.mjs from its own measured pieces, so the box is wider than its
   line while every piece fits. A span with data-mixed (closed by the comment /mixed) holds exactly
   what MixedText renders for that text: linebreaks-fixture.test.mjs renders it and compares.
@@ -69,7 +73,7 @@
       <p data-fit="unit">kata <span data-lb="unit" class="lb-unit" style="display:inline-block">{{WIDE.lead}} <span data-lb="unit" class="lb-unit"><span data-lb="part" class="lb-part">{{WIDE.last}}</span> <span data-lb="part" class="lb-part lb-ar"><span dir="rtl">(<bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{WIDE.ar}}</bdi>)</span></span></span></span> lagi</p>
     </section>
     <section data-case="glue-boxed" data-expect="overflow">
-      <p data-fit="glue"><span data-lb="glue" class="lb-glue" style="display:inline-block">Al-Fatihah</span></p>
+      <p data-fit="glue"><span data-lb="glue" class="lb-glue" style="display:inline-block;white-space:nowrap">Al-Fatihah</span></p>
     </section>
     <section data-case="glue-unbreakable" data-expect="overflow">
       <p style="width:3rem"><span data-lb="glue" class="lb-glue">Kementerian</span></p>

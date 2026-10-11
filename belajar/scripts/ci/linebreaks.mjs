@@ -47,7 +47,9 @@
 //
 // Before the real run, a self-test lays out linebreaks-fixture.html in a real page: one known-bad
 // case of every kind must be caught, the markup as it ships must not be, and a unit wider than its
-// line must break in the paragraph's flow, the words around it sharing its lines.
+// line must break in the paragraph's flow, the words around it sharing its lines. The cases sit in
+// a box that clips sideways, so a bad case sticking out on purpose never makes the page scroll
+// sideways for the others; page-overflow is laid out on its own, outside it, last.
 //
 // Every page call is page.evaluate / locator.evaluateAll with a FUNCTION (CDP callFunctionOn):
 // never page.waitForFunction, whose predicate Playwright runs through eval, which the module's CSP
@@ -373,11 +375,33 @@ async function lessonPages(page, vp, index) {
  */
 async function selfTest(page, fixture) {
   if (!(await open(page, "phone", "/belajar/id/quran/al-fatihah/1"))) throw new Error("self-test: page did not load");
+  /** The page's own width, and its widest elements when it scrolls sideways. */
+  const pageWidth = () =>
+    page.evaluate(() => {
+      const over = document.documentElement.scrollWidth > window.innerWidth + 1;
+      const widest = over
+        ? [...document.body.querySelectorAll("*")]
+            .map((el) => ({ el, right: el.getBoundingClientRect().right }))
+            .filter((x) => x.right > window.innerWidth + 1)
+            .sort((a, b) => b.right - a.right)
+            .slice(0, 3)
+            .map(({ el, right }) => `<${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ""}${el.closest("[data-case]") ? ` in ${el.closest("[data-case]").getAttribute("data-case")}` : ""}> to ${Math.round(right)}px`)
+        : [];
+      return { over, scrollWidth: document.documentElement.scrollWidth, innerWidth: window.innerWidth, widest };
+    });
+  const bare = await pageWidth();
+  if (bare.over) throw new Error(`self-test: the page scrolls sideways before any case is added (${bare.scrollWidth} > ${bare.innerWidth}: ${bare.widest.join(", ")})`);
   await page.evaluate((html) => {
     const box = document.createElement("div");
     box.id = "lb-selftest";
     box.innerHTML = html;
-    // The page scrolls sideways while this one is in: measured on its own, last.
+    // Every case is measured inside this box, which clips sideways: a bad case that sticks out on
+    // purpose (a word wider than its column, a 30rem paragraph on a 390px phone) never makes the
+    // PAGE scroll sideways, which every measure reports as page-overflow — CI 2026-10-11 charged
+    // "scrollWidth 480 > 390" to all six good cases. The text checks look at each case's own
+    // boxes, never at this one, so the box hides nothing from them.
+    box.style.overflowX = "clip";
+    // The one case that must widen the page: measured on its own, last, outside the box.
     const wide = box.querySelector('[data-case="page-overflow"]');
     wide.remove();
     window.__lbWide = wide;
@@ -452,14 +476,17 @@ async function selfTest(page, fixture) {
   for (const s of sized)
     if (!(s.w < s.whole)) throw new Error(`self-test: ${s.case} could not be sized wider than its line (${s.w}px for ${s.whole}px)`);
   await settle(page);
+  const withCases = await pageWidth();
+  if (withCases.over)
+    throw new Error(`self-test: the cases make the page scroll sideways (${withCases.scrollWidth} > ${withCases.innerWidth}: ${withCases.widest.join(", ")}) — each case must stay inside #lb-selftest`);
 
   const cases = await page.locator("#lb-selftest > [data-case]").evaluateAll((els) =>
     els.map((el) => ({ name: el.getAttribute("data-case"), expect: (el.getAttribute("data-expect") ?? "").split(/\s+/).filter(Boolean) })),
   );
   const failures = [];
   const caught = new Set();
-  const run = async (c) => {
-    const { offenders } = await page.evaluate(measure, { scope: `#lb-selftest [data-case="${c.name}"]` });
+  const run = async (c, box = "#lb-selftest") => {
+    const { offenders } = await page.evaluate(measure, { scope: `${box} [data-case="${c.name}"]` });
     const got = new Set(offenders.map((o) => o.kind));
     if (c.expect.length) {
       const missing = c.expect.filter((k) => !got.has(k));
@@ -497,14 +524,18 @@ async function selfTest(page, fixture) {
   });
   if (!flow.flowed || flow.innerFlowed || !flow.before || !flow.after || !flow.glue)
     failures.push(`unit-in-flow: the fallback did not lay the unit out in the flow: ${JSON.stringify(flow)}`);
-  // Last, the page that scrolls sideways.
+  // Last, the page that scrolls sideways: in a box of its own after the clipped one, so it does
+  // widen the page (the check must still see a page that scrolls sideways).
   await page.evaluate(() => {
-    document.getElementById("lb-selftest").append(window.__lbWide);
+    const out = document.createElement("div");
+    out.id = "lb-selftest-wide";
+    out.append(window.__lbWide);
+    document.getElementById("lb-selftest").after(out);
     return true;
   });
-  await run({ name: "page-overflow", expect: ["page-overflow"] });
+  await run({ name: "page-overflow", expect: ["page-overflow"] }, "#lb-selftest-wide");
   await page.evaluate(() => {
-    document.querySelector('#lb-selftest [data-case="page-overflow"]')?.remove();
+    document.getElementById("lb-selftest-wide")?.remove();
     return true;
   });
 

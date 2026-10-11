@@ -68,13 +68,97 @@ const VIEWPORTS = [
 ];
 
 /**
- * The autoplay lesson on Al-Fatihah 2 (a real browser, the real image). Ayah 2 has no narration
- * audio yet, and on the runner the shared lines' files 404 (the MP3s live in the VM media dir), so
- * this is the CAPTION-ONLY path a learner gets for every unrendered line:
+ * Waits until the page has stopped scrolling. Right after "Mulai" the stage scrolls itself up once,
+ * smoothly (LessonStage), and the next Playwright click would cut that scroll short wherever it
+ * stands: its scroll-into-view is a programmatic scroll, which a learner's tap never makes (CI
+ * 2026-10-11: the stage stood 80px short of the top, the word card under the panel). So the checks
+ * see the page where a learner sees it. Animation frames awaited in the page (page.evaluate), never
+ * waitForFunction (the CSP refuses its eval).
+ */
+async function settleScroll(page) {
+  await page.waitForTimeout(150);
+  return page.evaluate(
+    () =>
+      new Promise((done) => {
+        let last = window.scrollY;
+        let still = 0;
+        let frames = 0;
+        const tick = () => {
+          const y = window.scrollY;
+          still = y === last ? still + 1 : 0;
+          last = y;
+          if (still >= 12 || ++frames > 300) done(y);
+          else requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }),
+  );
+}
+
+/**
+ * "Berikutnya ›" until the lesson is on step `id` — the stage's data-step (LessonStage: "intro",
+ * "primer", "w1:recite", "w1", "w1:compose", …): a step is reached by what it is, never by a count
+ * of clicks (the harakat primer and the composition steps, 2026-10-10, moved every step after them
+ * and the karaoke check landed on a composition line). The lesson is paused first ("Jeda"), so it
+ * cannot move on by itself between a look and a click (a step that ends on its own just then would
+ * be jumped over): each "Berikutnya ›" then enters the next step paused, and the caller starts the
+ * step with "↺ Ulangi" (it plays a step from its start, paused or not). Fails naming the steps it
+ * passed.
+ */
+async function toStep(page, vp, id) {
+  const stage = page.locator('[data-autoplay="stage"]');
+  const next = page.locator('[data-autoplay="next"]');
+  const middle = page.locator('[data-autoplay="middle"]');
+  const pause = async () => {
+    if ((await middle.getAttribute("data-mode").catch(() => null)) !== "pause") return;
+    await middle.click();
+    await page.waitForTimeout(150);
+  };
+  const seen = [];
+  for (let i = 0; i < 80; i++) {
+    await pause();
+    const at = await stage.getAttribute("data-step");
+    if (at === id) return;
+    if (at && seen.at(-1) !== at) seen.push(at);
+    if (!(await next.isVisible().catch(() => false))) break;
+    await next.click();
+    await page.waitForTimeout(250);
+  }
+  throw new Error(`${vp}: the lesson never reached step "${id}" (passed: ${seen.join(" → ") || "no step"})`);
+}
+
+/**
+ * Line `id` of content/narration/<slug>.json as the lesson plays it — the whole line, or its split
+ * parts "<id>:a", "<id>:b", … (src/lib/autoplay/ids.ts manifestParts) — with whether every part has
+ * a rendered file and its word timings (what the karaoke caption follows). A line whose text
+ * changed has neither until the narration is rendered again.
+ */
+async function narratedLine(slug, id) {
+  const file = path.join("content", "narration", `${slug}.json`);
+  const lines = JSON.parse(await readFile(path.join(BELAJAR_DIR, file), "utf8")).lines ?? {};
+  const split = [];
+  for (let c = 97; c <= 122 && Object.hasOwn(lines, `${id}:${String.fromCharCode(c)}`); c++) split.push(lines[`${id}:${String.fromCharCode(c)}`]);
+  const parts = Object.hasOwn(lines, id) ? [lines[id]] : split.length >= 2 ? split : [];
+  // As src/lib/autoplay/narration.ts usableAudio / usableTokens take them (else caption-only).
+  const voiced = (l) =>
+    typeof l?.audio?.url === "string" &&
+    l.audio.url.startsWith("/belajar/media/narration/") &&
+    Number.isInteger(l.audio.ms) &&
+    l.audio.ms > 0 &&
+    /^[0-9a-f]{64}$/.test(l.audio.sha256 ?? "") &&
+    Array.isArray(l.tokens) &&
+    l.tokens.length > 0;
+  return { file, exists: parts.length > 0, voiced: parts.length > 0 && parts.every(voiced), words: parts[0]?.tokens?.length ?? 0 };
+}
+
+/**
+ * The autoplay lesson on Al-Fatihah 2 (a real browser, the real image). Its narration is not routed
+ * here, and on the runner every narration file 404s (the MP3s live in the VM media dir), rendered
+ * or not, so this is the CAPTION-ONLY path a learner gets for every unrendered line:
  *   1. the stage before "Mulai pelajaran" (stage, and the viewport a learner lands on: header,
  *      short title, the one focused stage);
  *   2. the "⚙ Pengaturan" panel open (pace, imam speed, reciter, text size), then closed again;
- *   3. after the one click, jumped to the first word's explanation;
+ *   3. after the one click, jumped to the first word's explanation (step "w1", by name: toStep);
  *   4. the first exercise inside the stage, with the spotlight ring + label
  *      (stage, and what a phone shows in the viewport with the sticky bar).
  * "Berikutnya ›" jumps whole steps, so this neither waits for the reading
@@ -118,12 +202,11 @@ async function autoplayShots(page, vp) {
   await settings.waitFor({ state: "hidden", timeout: 5_000 });
 
   await page.locator('[data-autoplay="start"]').click();
+  await settleScroll(page);
   const next = page.locator('[data-autoplay="next"]');
-  // Step 1 intro → 2 the ayah → 3 the imam says word 1 → 4 its explanation.
-  for (let i = 0; i < 3; i++) {
-    await next.click();
-    await page.waitForTimeout(250);
-  }
+  // intro → the ayah → the imam says word 1 → its explanation, played from its start.
+  await toStep(page, vp, "w1");
+  await page.locator('[data-autoplay="replay"]').click();
   await page.waitForTimeout(600);
   await stage.screenshot({ path: `shots/${vp}-autoplay-2-explain.png` });
   console.log(`shot ${vp}-autoplay-2-explain`);
@@ -366,21 +449,34 @@ async function assertKaraokeLayout(page, vp) {
 }
 const fmt = (b) => `${Math.round(b.top)}–${Math.round(b.bottom)}`;
 
+/** The karaoke check's line: word 1 of Al-Fatihah 1 explained ("w1"; rendered with the rest of
+ *  Al-Fatihah's narration — a line whose text changed has no audio until then). */
+const KARAOKE = { slug: "al-fatihah", step: "w1", line: "al-fatihah:1:w1" };
+
 /**
  * Al-Fatihah ayah 1, the narrated ayah, after the one "Mulai" click: the stage mid-explanation of
  * word 1 — the KARAOKE caption (the narrator's current word filled forest, words said in ink,
- * words to come muted; a dictionary term shown "kasrah (كَسْرَة)") under the large WORD CARD
- * (the word's Arabic · transliteration · "yang artinya …"), the mushaf words numbered with word 1
- * marked. "Berikutnya ›" jumps whole steps (intro → the ayah → the harakat primer → the imam says
- * word 1 → its explanation), then "↺ Ulangi langkah ini" plays the explanation from its start —
- * the replay control, and a start that holds even when the imam's stream paused the lesson on the
- * way. Needs al-fatihah:1:w1 rendered (its audio in content/narration/al-fatihah.json): the word
- * line became "gloss + lead" with the composition (2026-10-10), so a rebuilt manifest without a
- * new render has no karaoke there and this check says so.
+ * words to come muted) under the large WORD CARD (the word's Arabic · transliteration · "yang
+ * artinya …"), the mushaf words numbered with word 1 marked. "Berikutnya ›" jumps whole steps up to
+ * the step named "w1" on the stage (toStep: intro → the ayah → the harakat primer → the imam says
+ * word 1 → its explanation, whatever steps come between), then "↺ Ulangi langkah ini" plays the
+ * explanation from its start — the replay control, and a start that holds even when the imam's
+ * stream paused the lesson on the way — and the caption must be that line (data-line) with half
+ * its words said. Needs the line rendered (audio + word timings in content/narration/
+ * al-fatihah.json): checked FIRST, so a missing render fails here with that message, not with a
+ * timeout on a caption that can never turn karaoke (CI 2026-10-11: the word line became "gloss +
+ * lead" with the composition, and the stage played on into the composition lines caption-only).
  * Fails the job if the word card or the karaoke caption never shows (what a learner would see
  * without them is the caption-only fallback, already covered by the ayah 2 shots above).
  */
 async function karaokeShots(page, vp, index) {
+  const line = await narratedLine(KARAOKE.slug, KARAOKE.line);
+  if (!line.exists) throw new Error(`${vp}: the karaoke check's line ${KARAOKE.line} is not in ${line.file} (renamed? update KARAOKE in screenshots.mjs)`);
+  if (!line.voiced)
+    throw new Error(
+      `${vp}: ${KARAOKE.line} has no rendered narration in ${line.file} (no audio file or no word timings): its text changed and it was not rendered since. ` +
+        "Render Al-Fatihah's narration (pipeline/render_narration.py), commit the manifest, and run again; the karaoke check plays that line.",
+    );
   const served = [];
   const consoleErrors = [];
   const onConsole = (msg) => {
@@ -394,18 +490,16 @@ async function karaokeShots(page, vp, index) {
     await page.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
     await page.evaluate(() => document.fonts.ready);
     await page.locator('[data-autoplay="start"]').click();
-    const next = page.locator('[data-autoplay="next"]');
-    for (let i = 0; i < 4; i++) {
-      await next.click();
-      await page.waitForTimeout(250);
-    }
+    await settleScroll(page);
+    await toStep(page, vp, KARAOKE.step);
     await page.locator('[data-autoplay="replay"]').click();
     await page.locator('[data-autoplay="word-card"]').waitFor({ state: "visible", timeout: 10_000 });
-    // Mid-line: the first sentence said, the narrator on the term "kasrah (كَسْرَة)," (8th word).
-    // Locator waits, not page.waitForFunction: Playwright evaluates waitForFunction predicates
-    // with eval in the page, which the module's CSP (no 'unsafe-eval') rightly refuses.
-    const caption = page.locator('[data-autoplay="caption"]');
-    await caption.locator('[data-karaoke="said"]').nth(6).waitFor({ state: "attached", timeout: 25_000 });
+    // Mid-line: half its words said, the narrator on the next. Locator waits, not
+    // page.waitForFunction: Playwright evaluates waitForFunction predicates with eval in the page,
+    // which the module's CSP (no 'unsafe-eval') rightly refuses.
+    const caption = page.locator(`[data-autoplay="caption"][data-line="${KARAOKE.line}"]`);
+    const half = Math.max(1, Math.floor(line.words / 2));
+    await caption.locator('[data-karaoke="said"]').nth(half - 1).waitFor({ state: "attached", timeout: 25_000 });
     await caption.locator('[data-karaoke="now"]').first().waitFor({ state: "attached", timeout: 25_000 });
     await assertKaraokeLayout(page, vp);
     await stage.screenshot({ path: `shots/${vp}-autoplay-ayah1-karaoke.png` });
@@ -420,9 +514,11 @@ async function karaokeShots(page, vp, index) {
       .locator('[data-autoplay="caption"]')
       .innerHTML()
       .catch(() => "(no caption element)");
+    const on = await stage.getAttribute("data-step").catch(() => null);
+    const said = await page.locator('[data-autoplay="caption"]').getAttribute("data-line").catch(() => null);
     console.error(`✗ ${vp}: the Al-Fatihah ayah 1 karaoke caption / word card never showed`);
     if (![...index.keys()].length) console.error("  (no narration audio in the manifests at all)");
-    console.error("  al-fatihah:1:w1 must have audio + tokens in content/narration/al-fatihah.json (render it after a text change)");
+    console.error(`  wanted: step ${KARAOKE.step}, line ${KARAOKE.line} (${line.words} words) · on screen: step ${on ?? "—"}, line ${said ?? "—"}`);
     console.error(`  caption HTML: ${caption.slice(0, 600)}`);
     console.error(`  narration requests answered (${served.length}):\n    ${served.join("\n    ") || "(none)"}`);
     console.error(`  console errors (${consoleErrors.length}):\n    ${consoleErrors.join("\n    ") || "(none)"}`);
@@ -548,6 +644,7 @@ async function composeFitSweep(page, vp, size, ayat, units) {
       await page.goto(BASE + `/belajar/id/quran/al-fatihah/${ayah}`, { waitUntil: "networkidle" });
       await page.evaluate(() => document.fonts.ready);
       await page.locator('[data-autoplay="start"]').click();
+      await settleScroll(page);
       const next = page.locator('[data-autoplay="next"]');
       const seen = new Set();
       for (let i = 0; i < 120 && seen.size < want.size; i++) {
@@ -621,13 +718,10 @@ async function composeShots(page, vp, index) {
     await page.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
     await page.evaluate(() => document.fonts.ready);
     await page.locator('[data-autoplay="start"]').click();
-    const next = page.locator('[data-autoplay="next"]');
+    await settleScroll(page);
     const replay = page.locator('[data-autoplay="replay"]');
     // intro → the ayah → the harakat primer (Biasa: "Berikutnya ›" jumps whole steps)
-    for (let i = 0; i < 2; i++) {
-      await next.click();
-      await page.waitForTimeout(250);
-    }
+    await toStep(page, vp, "primer");
     await setPace("Tunggu saya");
     await replay.click();
     await comp.waitFor({ state: "visible", timeout: 10_000 });
@@ -638,10 +732,7 @@ async function composeShots(page, vp, index) {
     await shot("autoplay-ayah1-primer");
     // → the imam says word 1 → its gloss line → its composition
     await setPace("Biasa");
-    for (let i = 0; i < 3; i++) {
-      await next.click();
-      await page.waitForTimeout(250);
-    }
+    await toStep(page, vp, "w1:compose");
     await setPace("Tunggu saya");
     await replay.click();
     await advanceTo('[data-compose-stage="parts"]');
