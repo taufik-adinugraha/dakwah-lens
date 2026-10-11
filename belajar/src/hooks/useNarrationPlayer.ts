@@ -1,6 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+import { type AudioLoading, mediaLoading, type MediaEventType } from "@/lib/autoplay/loading";
 
 import { AUDIO_START_EVENT, isBlocked } from "./useSegmentPlayer";
 
@@ -17,7 +19,12 @@ export type NarrationHandlers = {
   onInterrupted: () => void;
   /** Playback position in ms (~4×/s, from timeupdate) for the caption clock. */
   onTime?: (ms: number) => void;
+  /** Sound is flowing: the file started, or went on after a stall ("playing"). */
+  onPlaying?: () => void;
 };
+
+/** The element events that start or end a load (src/lib/autoplay/loading.ts mediaLoading). */
+const LOAD_EVENTS: readonly MediaEventType[] = ["play", "waiting", "playing", "pause", "ended", "error", "emptied"];
 
 const isAbort = (e: unknown) => e instanceof DOMException && e.name === "AbortError";
 
@@ -51,6 +58,10 @@ function narrationAudio(): HTMLAudioElement {
  *   telling the lesson's own sound from the learner's.
  * - `positionMs()` is the playing file's position (for the karaoke caption,
  *   polled once a frame while a line plays).
+ * - `loading` (operator 2026-10-11, narration rule 19: never a silent wait):
+ *   from the moment a file this hook plays starts ("play") until sound flows
+ *   ("playing"), and again while it stalls ("waiting"); null while it plays
+ *   or nothing does. The stage says "Memuat suara narator…" once it lasts.
  * - One narration at a time on a page (the lesson stage's).
  *
  * Narration audio exists only once the operator approved a voice and the
@@ -61,6 +72,7 @@ export function useNarrationPlayer() {
   const preloadRef = useRef<HTMLAudioElement | null>(null);
   /** Handlers of the file playing now; null when none. */
   const handlersRef = useRef<NarrationHandlers | null>(null);
+  const [loading, setLoading] = useState<AudioLoading | null>(null);
 
   useEffect(() => {
     const a = narrationAudio();
@@ -86,14 +98,25 @@ export function useNarrationPlayer() {
       a.pause();
       h?.onInterrupted();
     };
+    // Loading: only a file this hook was asked to play starts one (a stopped file's late
+    // "play" does not); every pause, end, error or new file ends it.
+    const onLoad = (e: Event) => {
+      const type = e.type as MediaEventType;
+      if ((type === "play" || type === "waiting") && !handlersRef.current) return;
+      const at = { kind: "narration" as const, nowMs: Date.now(), ready: a.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA };
+      setLoading((prev) => mediaLoading(prev, type, at));
+      if (type === "playing") handlersRef.current?.onPlaying?.();
+    };
 
     a.addEventListener("ended", onEnded);
     a.addEventListener("error", onError);
     a.addEventListener("timeupdate", onTime);
     a.addEventListener("play", onPlay);
+    for (const t of LOAD_EVENTS) a.addEventListener(t, onLoad);
     window.addEventListener(AUDIO_START_EVENT, onOtherStart);
     return () => {
       window.removeEventListener(AUDIO_START_EVENT, onOtherStart);
+      for (const t of LOAD_EVENTS) a.removeEventListener(t, onLoad);
       a.removeEventListener("ended", onEnded);
       a.removeEventListener("error", onError);
       a.removeEventListener("timeupdate", onTime);
@@ -148,5 +171,5 @@ export function useNarrationPlayer() {
     return a && handlersRef.current && !a.paused ? a.currentTime * 1000 : null;
   }, []);
 
-  return { play, preload, owns, positionMs };
+  return { play, preload, owns, positionMs, loading };
 }

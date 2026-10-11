@@ -1,4 +1,5 @@
 import { Link } from "@/i18n/navigation";
+import { termEmphasis } from "@/lib/emphasis";
 import { conceptHref } from "@/lib/routes";
 import { type HeadTerm, termDisplay, type Token } from "@/lib/terms";
 
@@ -25,8 +26,14 @@ export const HARAKAT_PAGE = "harakat";
  * word. Arabic is bidi-isolated (`bdi`) in the Amiri face at the 24px floor; a run of four or more
  * Qur'anic words is a quotation with nothing glued to it, wrapping right to left in its own box
  * when it is wider than a phone's line.
+ *
+ * `emphasis` (prose only, never a title or a label; operator 2026-10-11): the meanings after
+ * "yang artinya" and the harakah sounds of the text termDisplay builds, and the term tokens
+ * named ("disebut marfu’ (مَرْفُوع)", "perubahan itu disebut i'rab" where the title already showed
+ * its Arabic), bold (src/lib/emphasis.ts termEmphasis) — after TermText's own styles, so a term's
+ * or a Qur'anic word's colour stays as it is and a bold harakah term stays inside its link.
  */
-export function TermText({ tokens, links = true }: { tokens: Token[]; links?: boolean }) {
+export function TermText({ tokens, links = true, emphasis = false }: { tokens: Token[]; links?: boolean; emphasis?: boolean }) {
   const { text, marks } = termDisplay(tokens);
   const overlays = marks.flatMap((m): Overlay[] =>
     m.kind !== "link"
@@ -45,7 +52,7 @@ export function TermText({ tokens, links = true }: { tokens: Token[]; links?: bo
           ]
         : [],
   );
-  return <MixedText text={text} overlays={overlays} />;
+  return <MixedText text={text} overlays={overlays} emphasis={emphasis ? termEmphasis(tokens) : undefined} />;
 }
 
 /**

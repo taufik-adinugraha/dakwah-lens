@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 import { loadCheckInput, runAutoplayChecks } from "@/lib/autoplay/checks";
-import { availableExercises, buildAutoplaySequence, hasArabicScript, questionNumbers } from "@/lib/autoplay";
+import { availableExercises, buildAutoplaySequence, firstNarration, hasArabicScript, idlePreloadUrl, questionNumbers } from "@/lib/autoplay";
 import { composeInput } from "@/lib/compose-content";
 import { SURAHS } from "@/lib/content";
 import { conceptsIntroducedIn } from "@/lib/library";
@@ -89,6 +89,27 @@ describe("autoplay stage: what the lesson page ships", () => {
           // the next, ayah 5, 92 KB. The budget keeps ~13% headroom over the longest.
           expect(JSON.stringify(seq).length).toBeLessThan(160_000);
         }
+      }
+    }
+  });
+
+  it("warms the first line Mulai plays — same-origin narration, never the imam's recording (operator 2026-10-11)", () => {
+    const fatihah = SURAHS.find((s) => s.slug === "al-fatihah");
+    const a1 = fatihah?.ayat.find((a) => a.ayah === 1);
+    if (!fatihah || !a1) throw new Error("no Al-Fatihah 1");
+    const start = SHARED_NARRATION.lines["shared:start"]?.audio;
+    const resume = SHARED_NARRATION.lines["shared:resume"]?.audio;
+    const id = stageSequence(fatihah, a1, "id");
+    if (start) expect(firstNarration(id, null)).toEqual({ url: start.url, ms: start.ms });
+    if (resume) expect(firstNarration(id, 2)).toEqual({ url: resume.url, ms: resume.ms });
+    for (const s of SURAHS) {
+      for (const a of s.ayat) {
+        const first = firstNarration(stageSequence(s, a, "id"), null);
+        const url = idlePreloadUrl(first);
+        if (url) expect(url.startsWith("/belajar/media/narration/")).toBe(true);
+        for (const r of a.recitation) expect(url).not.toBe(r.url);
+        // An English page is caption-only: nothing to warm.
+        expect(firstNarration(stageSequence(s, a, "en"), null)).toBeNull();
       }
     }
   });
@@ -182,6 +203,20 @@ describe("autoplay stage: messages and markers", () => {
     expect(SHARED_NARRATION.lines["shared:start"]?.text ?? "").not.toMatch(/bukan fatwa/i);
   });
 
+  it("says what is loading, plainly, and what to do when it is slow (operator 2026-10-11, rule 19)", () => {
+    expect(id.Guided.preparing).toBe("Menyiapkan pelajaran…");
+    expect(id.Guided.loading_narration).toBe("Memuat suara narator…");
+    expect(id.Guided.loading_recitation).toBe("Memuat bacaan imam…");
+    // "↺ Ulangi" names the replay control as a phone shows it, its mark kept with it (no-break
+    // space: never "↺" at a line's end and "Ulangi." on the next — line breaks, rule 15).
+    expect(id.Guided.loading_slow).toBe("Masih memuat. Koneksi mungkin sedang lambat; tunggu sebentar, atau klik ↺\u00a0Ulangi.");
+    expect(id.Guided.loading_slow).toContain(`↺\u00a0${id.Guided.replay_short}`);
+    expect(en.Guided.loading_slow).toContain(`↺\u00a0${en.Guided.replay_short}`);
+    for (const k of ["preparing", "loading_narration", "loading_recitation", "loading_slow"]) {
+      expect(en.Guided[k], `en Guided.${k}`).toBeTruthy();
+    }
+  });
+
   it("labels the replay control and the word card in both locales", () => {
     expect(id.Guided.replay).toBe("Ulangi langkah ini");
     expect(id.Guided.card_meaning).toBe("yang artinya “{gloss}”");
@@ -190,7 +225,7 @@ describe("autoplay stage: messages and markers", () => {
 
   it("marks the controls the CI screenshots and smoke test drive", () => {
     const stage = read("src/components/lesson/LessonStage.tsx");
-    for (const marker of ['data-autoplay="stage"', 'data-autoplay="start"', 'data-autoplay="middle"', 'data-autoplay="replay"', 'data-autoplay="next"', 'data-autoplay="exercise"', 'data-autoplay="caption"', 'data-autoplay="word-card"', 'data-autoplay="settings-toggle"', 'data-autoplay="settings"']) {
+    for (const marker of ['data-autoplay="stage"', 'data-autoplay="start"', 'data-autoplay="middle"', 'data-autoplay="replay"', 'data-autoplay="next"', 'data-autoplay="exercise"', 'data-autoplay="caption"', 'data-autoplay="word-card"', 'data-autoplay="settings-toggle"', 'data-autoplay="settings"', 'data-autoplay="loading"', "aria-busy"]) {
       expect(stage).toContain(marker);
     }
     expect(read("src/components/autoplay/Spotlight.tsx")).toContain("data-spotlight-ring");
@@ -201,7 +236,7 @@ describe("autoplay stage: messages and markers", () => {
     const header = read("src/components/HeaderControls.tsx");
     for (const marker of ["data-header-menu-toggle", "data-header-menu=", "data-text-size-toggle"]) expect(header).toContain(marker);
     const shots = read("scripts/ci/screenshots.mjs");
-    for (const sel of ['[data-autoplay="start"]', "[data-spotlight-ring]", '[data-autoplay="settings-toggle"]', '[data-autoplay="settings"]', "[data-header-menu-toggle]", "[data-header-menu]"]) {
+    for (const sel of ['[data-autoplay="start"]', "[data-spotlight-ring]", '[data-autoplay="settings-toggle"]', '[data-autoplay="settings"]', "[data-header-menu-toggle]", "[data-header-menu]", '[data-autoplay="loading"]']) {
       expect(shots).toContain(sel);
     }
   });

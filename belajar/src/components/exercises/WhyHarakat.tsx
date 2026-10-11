@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 
 import type { QuizExerciseOf } from "@/content/quiz-schema";
 import type { Word } from "@/content/schema";
+import { glossSlot } from "@/lib/emphasis";
 import { seededShuffle } from "@/lib/shuffle";
 
 import { CaseBadge } from "../lesson/CaseBadge";
@@ -111,8 +112,10 @@ function WhyHarakatRound({
               <span lang="ar" dir="rtl" className="quran text-ar-md text-ink">
                 {w.ar}
               </span>
+              {/* The word's meaning bold in forest (operator 2026-10-11): it names the word, it
+                  does not answer the question. */}
               <span className="text-sm text-ink-muted">
-                <MixedText text={`${w.translit} · ${w.gloss}`} />
+                <MixedText {...glossSlot((g) => `${w.translit} · ${g}`, w.gloss)} />
               </span>
               {item.q.sign && (
                 <span className="text-sm text-ink-muted">
@@ -146,7 +149,7 @@ function WhyHarakatRound({
             {q.resolved !== null && (
               <>
                 <CaseBadge state={w.case.state} sign={item.q.sign ?? undefined} label={states[w.case.state]} />{" "}
-                <MixedText text={item.q.why} />
+                <MixedText text={item.q.why} emphasis />
               </>
             )}
           </Feedback>

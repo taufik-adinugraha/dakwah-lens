@@ -31,6 +31,7 @@ import { TextSizeOptions } from "@/components/TextSizeSwitch";
 import type { RecitationSource } from "@/hooks/useSegmentPlayer";
 import { Link } from "@/i18n/navigation";
 import type { AutoplaySequence } from "@/lib/autoplay";
+import { glossSlot } from "@/lib/emphasis";
 import { PACES } from "@/lib/lessonSteps";
 import { ayahHref } from "@/lib/routes";
 
@@ -102,6 +103,17 @@ function BarSpotLabel({ label, align = "center" }: { label: string; align?: "cen
  *  never colour alone — the label above names it). */
 const BAR_RING = "ring-4 ring-forest ring-offset-4 ring-offset-white";
 
+/** The loading mark (operator 2026-10-11, narration rule 19): a turning ring, or with reduced
+ *  motion a still dot (senior-ux §3.8). Never the only cue: the words beside it say what loads. */
+function LoadingMark({ className }: { className?: string }) {
+  return (
+    <span aria-hidden className={clsx("relative inline-block h-5 w-5 shrink-0", className)}>
+      <span className="absolute inset-0 rounded-full border-[2.5px] border-current border-t-transparent motion-safe:animate-spin motion-reduce:hidden" />
+      <span className="absolute inset-[0.3125rem] hidden rounded-full bg-current motion-reduce:block" />
+    </span>
+  );
+}
+
 /**
  * The lesson stage, now an AUTOPLAY player (operator, 2026-10-10): one click
  * on "Mulai" and the whole ayah plays from start to finish — narration
@@ -134,6 +146,17 @@ const BAR_RING = "ring-4 ring-forest ring-offset-4 ring-offset-white";
  *   ini" (the current step again, from its start, also while paused) ·
  *   Berikutnya › (which becomes "Lewati latihan" during an exercise), at
  *   48–56px whatever the text size.
+ * - Never a silent wait (operator 2026-10-11: "sometimes it takes time for
+ *   autoplay to run … there is no info to user, user is confused what
+ *   happen and dont know what to do"; narration rule 19). The "Mulai" click
+ *   answers at once — its button says "Menyiapkan pelajaran…" with a
+ *   turning mark (busy, further clicks ignored) until the first line is
+ *   heard or shown, and only then does the playing stage replace it. While
+ *   the lesson plays, a narration file or the imam's recitation that takes
+ *   longer than 0.6 s to start (or stalls) is named in the bottom panel,
+ *   above the caption ("Memuat suara narator…" / "Memuat bacaan imam…"),
+ *   and from 8 s with what to do ("… tunggu sebentar, atau klik ↺
+ *   Ulangi"); it goes as soon as the sound plays.
  * - A spotlit control that is out of view is never scrolled to
  *   automatically: the bar offers "Lihat bagian yang ditandai", which
  *   scrolls only on the learner's click.
@@ -193,10 +216,17 @@ export function LessonStage({
   const t = useTranslations("Guided");
   const tp = useTranslations("Player");
   const tx = useTranslations("Exercise");
+  /** The word card's "yang artinya “…”", its gloss emphasised (glossSlot). */
+  const cardMeaning = (gloss: string) => glossSlot((g) => t("card_meaning", { gloss: g }), gloss);
   const uid = useId();
   const ap = useAutoplay(seq, sources, title);
   const { state, view, actions, player: p } = ap;
   const upNext = useUpNext(following);
+  // "Mulai" clicked and its first line not heard yet: the stage before "Mulai" stays, its button
+  // saying "Menyiapkan pelajaran…" (useAutoplay `preparing`); then the playing stage shows.
+  const preparing = ap.preparing;
+  /** Which start button was clicked (the one that says "Menyiapkan pelajaran…"). */
+  const [pressed, setPressed] = useState<"start" | "resume" | null>(null);
 
   const [offscreen, setOffscreen] = useState<Offscreen>(null);
   const [barHeight, setBarHeight] = useState(0);
@@ -213,7 +243,7 @@ export function LessonStage({
   /** The learner just clicked "Mulai" / "Lanjutkan dari langkah N". */
   const startClickRef = useRef(false);
 
-  const started = state.started;
+  const started = state.started && !preparing;
   const finished = state.phase === "finished";
   const live = started && !finished;
   const showBar = live;
@@ -296,13 +326,24 @@ export function LessonStage({
     captionRef.current?.focus({ preventScroll: true });
   }, [step.id, isExerciseStep]);
 
-  /** "Mulai pelajaran" / "Lanjutkan dari langkah N" (the learner's click). */
-  const begin = (from?: number) => {
+  /** "Mulai pelajaran" / "Lanjutkan dari langkah N" (the learner's click);
+   *  ignored while the lesson is being prepared (a double click). */
+  const begin = (which: "start" | "resume", from?: number) => {
+    if (preparing) return;
+    setPressed(which);
     startClickRef.current = true;
     actions.start(from);
   };
+  /** The clicked start button's content while the lesson is prepared. */
+  const preparingLabel = (
+    <>
+      <LoadingMark />
+      <span>{t("preparing")}</span>
+    </>
+  );
 
-  // Right after that click (and only then), bring the stage up when the
+  // Right after that click (and only then: when its first line is heard or
+  // shown, the playing stage appears), bring the stage up when the
   // learner could not see the words and the word card above the bottom
   // panel: on a phone the "Mulai" button sits low on the stage, and the
   // panel (caption + controls) would cover the card. The one scroll the
@@ -388,6 +429,34 @@ export function LessonStage({
         </p>
       )}
     </>
+  );
+
+  // The sound is loading (useAutoplay `loadingNotice`: only after 0.6 s, so a fast load never
+  // flickers a line; from 8 s with what to do). In the bottom panel, above the caption. The live
+  // region is always there (an empty box, no height), so a screen reader hears the line as it
+  // appears; the line itself takes room only while shown — it opens and fades in over 200ms
+  // (globals.css; at once with reduced motion) and leaves the moment the sound plays. The panel is
+  // pinned to the bottom of the screen, so it grows upwards: the caption and the controls stay
+  // where they are, and the word card's slot (sticky above the panel, --panel-h) glides up with it.
+  const ln = ap.loadingNotice;
+  const loadingStatus = (
+    <div role="status" aria-live="polite">
+      {ln && (
+        <div data-autoplay="loading" data-kind={ln.kind} data-slow={ln.slow ? "true" : undefined} className="grid grid-rows-[1fr]">
+          <p
+            className={clsx(
+              "mx-auto flex min-h-0 w-full max-w-prose items-start gap-2.5 overflow-hidden pb-3 text-base",
+              ln.slow ? "text-ink" : "text-ink-muted",
+            )}
+          >
+            <LoadingMark className="mt-0.5 text-forest" />
+            <span className="min-w-0 text-pretty">
+              {ln.slow ? t("loading_slow") : ln.kind === "narration" ? t("loading_narration") : t("loading_recitation")}
+            </span>
+          </p>
+        </div>
+      )}
+    </div>
   );
 
   return (
@@ -622,8 +691,11 @@ export function LessonStage({
                   <p className="text-lg text-ink-muted sm:order-3">
                     <MixedText text={focusWord.translit} />
                   </p>
-                  <p className="text-xl font-semibold text-pretty text-ink sm:order-4">
-                    <MixedText text={t("card_meaning", { gloss: focusWord.gloss })} />
+                  {/* The meaning bold in forest, "yang artinya" plain ink (operator 2026-10-11:
+                      "use bold text or different color to highlight the meanings"; 7.3:1 on
+                      forest-tint). The slot is found in the message, so it holds in English too. */}
+                  <p className="text-xl text-pretty text-ink sm:order-4">
+                    <MixedText {...cardMeaning(focusWord.gloss)} />
                   </p>
                 </div>
                 <p lang="ar" dir="rtl" className="quran ml-auto text-ar-lg text-ink sm:order-2 sm:ml-0 sm:text-ar-xl">
@@ -639,24 +711,39 @@ export function LessonStage({
             {/* A remembered place makes "Lanjutkan dari langkah N" the big
                 button: a habitual click on the primary one keeps the place. */}
             <div className="flex w-full flex-wrap justify-center gap-3">
+              {/* After the click, the clicked one says "Menyiapkan pelajaran…" (aria-busy) and
+                  both ignore clicks (aria-disabled, so focus stays on the button) until the
+                  playing stage shows (operator 2026-10-11). */}
               {ap.savedIdx !== null && (
                 <button
                   type="button"
                   data-autoplay="resume"
-                  onClick={() => begin(ap.savedIdx ?? 0)}
+                  onClick={() => begin("resume", ap.savedIdx ?? 0)}
+                  aria-busy={preparing && pressed === "resume" ? true : undefined}
+                  aria-disabled={preparing ? true : undefined}
                   className="btn-primary w-full sm:w-auto sm:min-w-64"
                 >
-                  <Play aria-hidden className="h-5 w-5" />
-                  <span>{t("resume_from", { n: ap.savedIdx + 1 })}</span>
+                  {preparing && pressed === "resume" ? (
+                    preparingLabel
+                  ) : (
+                    <>
+                      <Play aria-hidden className="h-5 w-5" />
+                      <span>{t("resume_from", { n: ap.savedIdx + 1 })}</span>
+                    </>
+                  )}
                 </button>
               )}
               <button
                 type="button"
                 data-autoplay="start"
-                onClick={() => begin()}
+                onClick={() => begin("start")}
+                aria-busy={preparing && pressed === "start" ? true : undefined}
+                aria-disabled={preparing ? true : undefined}
                 className={clsx(ap.savedIdx === null ? "btn-primary" : "btn-secondary", "w-full sm:w-auto sm:min-w-64")}
               >
-                {ap.savedIdx === null ? (
+                {preparing && pressed === "start" ? (
+                  preparingLabel
+                ) : ap.savedIdx === null ? (
                   <>
                     <Play aria-hidden className="h-5 w-5" />
                     <span>{t("start")}</span>
@@ -729,9 +816,11 @@ export function LessonStage({
         )}
 
         {/* Always in the page, so a screen reader is listening before the
-            first line: the sanitised spoken text of each line as it starts. */}
+            first line: the sanitised spoken text of each line as it starts
+            (and, between the "Mulai" click and the first line, "Menyiapkan
+            pelajaran…", which the busy button shows). */}
         <p className="sr-only" aria-live="polite" aria-atomic="true">
-          {live ? ap.announcement : ""}
+          {live ? ap.announcement : preparing ? t("preparing") : ""}
         </p>
 
         {!showBar && notices}
@@ -751,7 +840,8 @@ export function LessonStage({
           never scroll away — on a phone the words and the card above are
           taller than the screen, and a caption in the page sat below the
           fold, behind the controls (CI shot, 2026-10-10). In order: a
-          notice (sound blocked, a recording failed), the caption (not
+          notice (sound blocked, a recording failed), the loading line (the
+          sound takes a while to start, 2026-10-11), the caption (not
           during an exercise: its prompt stays above it), then the controls.
           Three colours by role (operator, 2026-10-11): play / pause / resume
           forest (btn-primary), the replay amber (btn-replay), Sebelumnya and
@@ -768,6 +858,7 @@ export function LessonStage({
           className="sticky bottom-0 z-20 rounded-b-2xl border-t border-hairline bg-white/95 px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-12px_28px_-14px_rgb(14_90_60/0.35)] backdrop-blur-sm sm:px-7"
         >
           {notices}
+          {loadingStatus}
           {!spec && <div className="mb-4">{caption}</div>}
           {offscreen && spotGuides.length > 0 && (
             <button type="button" onClick={showTarget} className="btn-secondary mb-3 w-full">

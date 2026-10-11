@@ -72,7 +72,7 @@ export function WordParts({ data, labels }: { data: PreparedParts; labels: WordP
               {i + 1}
             </span>
             <span>
-              <TermText tokens={s} />
+              <TermText tokens={s} emphasis />
             </span>
           </li>
         ))}

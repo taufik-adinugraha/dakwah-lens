@@ -45,7 +45,7 @@ export function StructureSection({
         <MixedText text={st.type} />
       </p>
       <p className="mt-2 max-w-prose text-pretty text-base text-ink">
-        <MixedText text={st.summary} />
+        <MixedText text={st.summary} emphasis />
       </p>
 
       <ol dir="rtl" className="mt-5 flex flex-wrap justify-center gap-x-4 gap-y-5">

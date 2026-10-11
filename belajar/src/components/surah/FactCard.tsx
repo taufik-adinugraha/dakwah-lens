@@ -50,7 +50,7 @@ export function FactCard({
         <MixedText text={fact.title} />
       </h3>
       <p className="mt-2 text-pretty text-base text-ink-muted">
-        <MixedText text={fact.body} />
+        <MixedText text={fact.body} emphasis />
       </p>
       {fact.locations.length > 0 && (
         <div className="mt-4">

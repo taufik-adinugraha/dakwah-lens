@@ -5,6 +5,7 @@ import type { Concept } from "@/content/schema";
 import { Link } from "@/i18n/navigation";
 import { WORD_INFO } from "@/lib/content";
 import { surahPublished } from "@/lib/features";
+import { glossSlot } from "@/lib/emphasis";
 import { getBasic, parseLoc, partsFor, TERMS } from "@/lib/library";
 import { ayahHref, conceptHref } from "@/lib/routes";
 import { annotate, noteWithoutWord, type PartsChange, prepareParts, Scope, soundsOf, titleParts, type Token } from "@/lib/terms";
@@ -127,14 +128,14 @@ export function ConceptCard({
       </Title>
       <Headword head={title.head} className={page ? "mt-2 text-ar-lg" : "mt-1 text-ar-sm"} />
       <p className={`max-w-prose text-pretty text-ink ${page ? "mt-4 text-lg" : "mt-2 text-base"}`}>
-        <TermText tokens={summary} />
+        <TermText tokens={summary} emphasis />
       </p>
 
       {explanation.length > 0 && (
         <div className="mt-5 max-w-prose space-y-4 text-pretty text-base text-ink">
           {explanation.map((p, i) => (
             <p key={i}>
-              <TermText tokens={p} />
+              <TermText tokens={p} emphasis />
             </p>
           ))}
         </div>
@@ -168,7 +169,7 @@ export function ConceptCard({
 
       {bridge && (
         <p className={`mt-6 max-w-prose rounded-xl bg-paper-deep text-base text-ink ${page ? "p-4" : "px-2 py-3 @3xs:p-4"}`}>
-          <span className="font-semibold">{labels.bridge}:</span> <TermText tokens={bridge} />
+          <span className="font-semibold">{labels.bridge}:</span> <TermText tokens={bridge} emphasis />
         </p>
       )}
 
@@ -228,7 +229,7 @@ function ExampleRow({
   meaning: string;
   locLabel: string;
 }) {
-  const { s } = row;
+  const { s, info } = row;
   return (
     <li className="border-t border-hairline py-4 first:border-t-0">
       <p className="flex flex-wrap items-baseline gap-x-3">
@@ -237,20 +238,21 @@ function ExampleRow({
             {row.ar}
           </span>
         ) : null}
-        {row.info ? (
+        {info ? (
           // One text through MixedText (rule 15, CI 2026-10-11): "orang-orang" and "aḍ-ḍāllīna"
           // are never cut, the comma stays on the word and the quote on the gloss; the
-          // transliteration is set bold as an overlay.
+          // transliteration is set bold as an overlay, the gloss bold in forest (a meaning,
+          // operator 2026-10-11).
           <span className="text-base text-ink">
             <MixedText
-              text={`${row.info.translit}, ${meaning} “${row.info.gloss}”`}
-              overlays={[{ from: 0, to: row.info.translit.length, wrap: (w) => <span className="font-semibold">{w}</span> }]}
+              {...glossSlot((g) => `${info.translit}, ${meaning} “${g}”`, info.gloss)}
+              overlays={[{ from: 0, to: info.translit.length, wrap: (w) => <span className="font-semibold">{w}</span> }]}
             />
           </span>
         ) : null}
       </p>
       <p className="mt-1 max-w-prose text-pretty text-base text-ink">
-        <TermText tokens={row.note} />
+        <TermText tokens={row.note} emphasis />
       </p>
       {/* A surah not published yet (BELAJAR_SURAHS, operator 2026-10-10) has no lesson to open:
           its place is plain text. The page awaits visibleSurahs() first. */}

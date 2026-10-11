@@ -14,6 +14,7 @@ import { TermText } from "@/components/library/TermText";
 import { measure } from "../../scripts/ci/linebreaks-measure.mjs";
 
 import { SURAHS, WORD_INFO } from "./content";
+import { captionSpans, emphasisSpans, partEmphasis, termEmphasis } from "./emphasis";
 import { LIBRARY, TERMS } from "./library";
 import { annotate, prepareParts, Scope, soundsOf, termDisplay, titleParts, type Token } from "./terms";
 import { ARABIC_RUN, arabicRuns, hasArabic, joinUnits, rtlRuns, textUnits, type Seg } from "./textUnits";
@@ -433,6 +434,18 @@ describe("textUnits over every string the module shows", () => {
             const kept = boxes(textUnits(c.caption));
             const inside = cuts.filter((k) => kept.some(([b, e]) => k > b && k < e));
             expect(inside, `${s.slug}:${a.ayah} ${c.line}`).toEqual([]);
+            // Nor inside an emphasis (operator 2026-10-11): each part shows its slice of the whole
+            // caption's (partEmphasis), and no span is cut in two.
+            const whole = captionSpans(c.caption);
+            expect(c.parts.join(" "), `${s.slug}:${a.ayah} ${c.line}`).toBe(c.caption.replace(/\s+/g, " ").trim());
+            expect(cuts.filter((k) => whole.some((e) => k > e.from && k < e.to)), `${s.slug}:${a.ayah} ${c.line}`).toEqual([]);
+            let from = 0;
+            const parts = c.parts.flatMap((p, k) => {
+              const out = partEmphasis(c.parts, k).map((e) => ({ ...e, from: e.from + from, to: e.to + from }));
+              from += p.length + 1;
+              return out;
+            });
+            expect(parts, `${s.slug}:${a.ayah} ${c.line}`).toEqual(whole);
           }
         }
     expect(cues).toBeGreaterThan(20);
@@ -488,6 +501,71 @@ describe("MixedText renders the pieces", () => {
     expect(styled).toContain('<span data-lb="glue" class="lb-glue"><b>Al-Fatihah</b>.</span>');
     // Without the styles, exactly what MixedText draws for the text alone.
     expect(styled.replace(/<\/?b>/g, "").replace(" text-forest", "")).toBe(renderToStaticMarkup(createElement(MixedText, { text })));
+  });
+
+  /** Markup without its emphasis (operator 2026-10-11): the data-emph spans unwrapped, and the
+   *  forest a term's emphasis gives its Arabic taken off (from every bdi, to compare with a render
+   *  whose own forest is taken off the same way). */
+  const plain = (html: string) => {
+    let out = html;
+    for (let prev = ""; prev !== out; ) {
+      prev = out;
+      out = out.replace(/<span data-emph="[a-z]+" class="[^"]*">((?:(?!<\/?span)[\s\S])*?)<\/span>/g, "$1");
+    }
+    return out.replace(/class="arabic-inline text-ar-sm text-forest"/g, 'class="arabic-inline text-ar-sm"');
+  };
+
+  it("emphasises only by overlays: every string drawn with emphasis is the same pieces, text and breaks", () => {
+    const seen = new Set<string>();
+    const sample = [...CORPUS, ...TERM_TEXTS].filter(([, s]) => !seen.has(s) && !!seen.add(s) && emphasisSpans(s).length > 0);
+    expect(sample.length).toBeGreaterThan(400);
+    const render = (emphasis: boolean) =>
+      [
+        ...renderToStaticMarkup(
+          createElement(Fragment, null, ...sample.map(([, s], i) => createElement("p", { key: i }, createElement(MixedText, { text: s, emphasis: emphasis || undefined })))),
+        ).matchAll(/<p>([\s\S]*?)<\/p>/g),
+      ].map((m) => m[1]);
+    const [styled, bare] = [render(true), render(false)];
+    expect(styled).toHaveLength(sample.length);
+    let spans = 0;
+    for (const [k, [where, s]] of sample.entries()) {
+      expect(textOf(styled[k]), where).toBe(s);
+      expect(plain(styled[k]), where).toBe(bare[k]);
+      // Each span drawn: its kind on every piece of its Latin.
+      const marked = [...styled[k].matchAll(/<span data-emph="([a-z]+)"/g)].map((m) => m[1]);
+      for (const e of emphasisSpans(s)) {
+        spans++;
+        if (/\p{Script=Latin}/u.test(s.slice(e.from, e.to))) expect(marked, `${where}: ${e.kind} "${s.slice(e.from, e.to)}"`).toContain(e.kind);
+      }
+    }
+    expect(spans).toBeGreaterThan(500);
+  }, 60_000);
+
+  it("TermText with emphasis: the same pieces and text as without, its own styles kept", () => {
+    let emphasised = 0;
+    const intl = (el: ReturnType<typeof createElement>) =>
+      renderToStaticMarkup(
+        createElement(NextIntlClientProvider, { locale: "id", messages: {} } as ComponentProps<typeof NextIntlClientProvider>, el),
+      );
+    for (const rec of [...LIBRARY.concepts, ...LIBRARY.basics]) {
+      const mk = rec.marked;
+      if (!mk) continue;
+      const page = new Scope(true);
+      for (const f of [mk.summary, ...mk.explanation, ...(mk.bridge ? [mk.bridge] : []), ...mk.notes]) {
+        const tokens = annotate(f, page, TERMS);
+        const { text } = termDisplay(tokens);
+        const styled = intl(createElement(TermText, { tokens, emphasis: true }));
+        const bare = intl(createElement(TermText, { tokens }));
+        expect(textOf(styled), rec.id).toBe(text);
+        expect(plain(styled), rec.id).toBe(plain(bare));
+        // The harakah link is still there, around the bold when both are on the word.
+        expect(styled.match(/<a class="link-text"/g)?.length ?? 0, rec.id).toBe(bare.match(/<a class="link-text"/g)?.length ?? 0);
+        // A Qur'anic word's Arabic stays ink.
+        expect(styled.match(/text-ar-sm text-ink"/g)?.length ?? 0, rec.id).toBe(bare.match(/text-ar-sm text-ink"/g)?.length ?? 0);
+        if (termEmphasis(tokens).length) emphasised++;
+      }
+    }
+    expect(emphasised).toBeGreaterThan(50);
   });
 
   it("TermText draws termDisplay's text byte for byte, terms' Arabic in forest, Qur'anic words' in ink, the harakah link", () => {

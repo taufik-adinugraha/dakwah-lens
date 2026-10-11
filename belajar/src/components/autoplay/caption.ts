@@ -14,6 +14,14 @@
  * - a caption-only line (no audio, or its audio failed this visit): the
  *   engine's caption part — the display text when the manifest has one —
  *   which the machine times by reading pace.
+ * A karaoke caption carries each word's emphasis (operator 2026-10-11,
+ * narration rule 18: the meaning after "yang artinya", the term taught, a
+ * harakah's sound), found in the line's display text and matched to its
+ * words (src/lib/emphasis.ts alignEmphasis) here in the browser: the
+ * manifest, the narration and the audio stay as they are. A text caption
+ * carries its part's slice of the whole line's emphasis (partEmphasis): a
+ * caption emphasises its first meaning, or a quiz answer alone (review
+ * 2026-10-11), and a part shown alone must not pick a "first" of its own.
  *
  * The mushaf line and the word card (stageMarks): the words the line on
  * screen highlights (the whole ayah for the intro, the recitation lead,
@@ -45,6 +53,7 @@ import {
   type Cue,
   type KaraokeWord,
 } from "@/lib/autoplay";
+import { alignEmphasis, partEmphasis, type Emphasis, type EmphasisKind } from "@/lib/emphasis";
 import { splitCaption } from "@/lib/lessonSteps";
 
 /** Where the narration file of a line stands (from the audio element). */
@@ -59,8 +68,10 @@ export type CaptionClock = { token: number; line: string; ms: number; totalMs: n
 export type VoicePos = { token: number; line: string; file: string; now: number; said: number };
 
 export type StageCaption =
-  | { kind: "text"; text: string; voiced: boolean }
-  | { kind: "karaoke"; words: readonly KaraokeWord[]; now: number; said: number; voiced: true };
+  /** `emphasis`: the part's spans (offsets in `text`). */
+  | { kind: "text"; text: string; emphasis: readonly Emphasis[]; voiced: boolean }
+  /** `emph[i]`: what word i emphasises, or null. */
+  | { kind: "karaoke"; words: readonly KaraokeWord[]; emph: readonly (EmphasisKind | null)[]; now: number; said: number; voiced: true };
 
 /** A word stays lit after it ends while no other word has started — until
  *  this long after the last word of the file. */
@@ -111,6 +122,26 @@ export function playingWords(seq: AutoplaySequence, state: AutoplayState): reado
   return words && words.length > 0 ? words : null;
 }
 
+/** The emphasis of each karaoke word of a cue, per audio file: its display text aligned with the
+ *  words of all its files at once (a split line's emphasis may start in one part and end in the
+ *  next), then cut per file. Once per cue: the caption is rebuilt every frame. */
+const KARAOKE_EMPHASIS = new WeakMap<Cue, (EmphasisKind | null)[][]>();
+function karaokeEmphasis(cue: Cue): (EmphasisKind | null)[][] {
+  let per = KARAOKE_EMPHASIS.get(cue);
+  if (!per) {
+    const words = cue.audio.flatMap((f) => (f.words ?? []).map(([t]) => t));
+    const kinds = cue.display !== null ? alignEmphasis(cue.display, words) : words.map(() => null);
+    let at = 0;
+    per = cue.audio.map((f) => {
+      const from = at;
+      at += f.words?.length ?? 0;
+      return kinds.slice(from, at);
+    });
+    KARAOKE_EMPHASIS.set(cue, per);
+  }
+  return per;
+}
+
 export function stageCaption(
   seq: AutoplaySequence,
   state: AutoplayState,
@@ -121,7 +152,7 @@ export function stageCaption(
   const cue = captionCue(seq, state);
   if (!cue || !audible(state, cue)) {
     const { parts, part } = view.caption;
-    return { kind: "text", text: parts[Math.min(part, parts.length - 1)] ?? "", voiced: false };
+    return textCaption(parts, part, false);
   }
   const a: Activity | null = state.activity;
   const playing = a?.kind === "narrate" && a.line === cue.line ? a : null;
@@ -136,7 +167,8 @@ export function stageCaption(
     } else if (voice && voice.line === cue.line && voice.file === seg.id) {
       pos = voice;
     }
-    return { kind: "karaoke", words: seg.words, now: pos.now, said: pos.said, voiced: true };
+    const emph = karaokeEmphasis(cue)[cue.audio.indexOf(seg)] ?? seg.words.map(() => null);
+    return { kind: "karaoke", words: seg.words, emph, now: pos.now, said: pos.said, voiced: true };
   }
   const parts = cue.display !== null ? cue.parts : splitCaption(cue.spoken ?? cue.caption);
   let part = 0;
@@ -145,7 +177,22 @@ export function stageCaption(
   } else if (clock?.line === cue.line) {
     part = partAt(parts, clock.ms, clock.totalMs);
   }
-  return { kind: "text", text: parts[Math.min(part, parts.length - 1)] ?? "", voiced: true };
+  return textCaption(parts, part, true);
+}
+
+/** The text caption of part `part` of `parts`, with its emphasis — cached per line: the caption
+ *  is rebuilt every frame. */
+const TEXT_EMPHASIS = new Map<string, Emphasis[][]>();
+function textCaption(parts: readonly string[], part: number, voiced: boolean): StageCaption {
+  const k = Math.min(part, parts.length - 1);
+  const key = parts.join("\n");
+  let per = TEXT_EMPHASIS.get(key);
+  if (!per) {
+    if (TEXT_EMPHASIS.size > 64) TEXT_EMPHASIS.clear();
+    per = parts.map((_, i) => partEmphasis(parts, i));
+    TEXT_EMPHASIS.set(key, per);
+  }
+  return { kind: "text", text: parts[k] ?? "", emphasis: per[k] ?? [], voiced };
 }
 
 /**

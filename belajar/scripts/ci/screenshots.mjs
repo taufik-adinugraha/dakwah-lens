@@ -72,10 +72,13 @@ const VIEWPORTS = [
  * smoothly (LessonStage), and the next Playwright click would cut that scroll short wherever it
  * stands: its scroll-into-view is a programmatic scroll, which a learner's tap never makes (CI
  * 2026-10-11: the stage stood 80px short of the top, the word card under the panel). So the checks
- * see the page where a learner sees it. Animation frames awaited in the page (page.evaluate), never
+ * see the page where a learner sees it. The playing stage first: after the click the button says
+ * "Menyiapkan pelajaran…" until the first line is heard or shown (2026-10-11), and only then does
+ * the stage appear and scroll. Animation frames awaited in the page (page.evaluate), never
  * waitForFunction (the CSP refuses its eval).
  */
 async function settleScroll(page) {
+  await page.locator('[data-autoplay="panel"]').first().waitFor({ state: "visible", timeout: 15_000 });
   await page.waitForTimeout(150);
   return page.evaluate(
     () =>
@@ -148,7 +151,14 @@ async function narratedLine(slug, id) {
     /^[0-9a-f]{64}$/.test(l.audio.sha256 ?? "") &&
     Array.isArray(l.tokens) &&
     l.tokens.length > 0;
-  return { file, exists: parts.length > 0, voiced: parts.length > 0 && parts.every(voiced), words: parts[0]?.tokens?.length ?? 0 };
+  return {
+    file,
+    exists: parts.length > 0,
+    voiced: parts.length > 0 && parts.every(voiced),
+    words: parts[0]?.tokens?.length ?? 0,
+    // The file the lesson plays first for this line (its first part).
+    url: parts[0]?.audio?.url ?? null,
+  };
 }
 
 /**
@@ -651,6 +661,45 @@ async function assertKaraokeLayout(page, vp) {
 }
 const fmt = (b) => `${Math.round(b.top)}–${Math.round(b.bottom)}`;
 
+/** The module's forest and paper as getComputedStyle reports them (globals.css --color-forest,
+ *  --color-paper). */
+const FOREST = "rgb(14, 90, 60)";
+const PAPER = "rgb(251, 250, 246)";
+
+/**
+ * Emphasis on the karaoke shot (operator 2026-10-11: "we can also use bold text or different color
+ * to highlight the meanings or important things"): the meaning in `scope` — the word card's "yang
+ * artinya “…”", the caption's gloss — is on screen, bold, and forest (paper while it is the word
+ * being said, on the forest fill). So the emphasis cannot quietly disappear (a renamed prop, a
+ * class Tailwind no longer generates) while the shots still look fine at a glance.
+ */
+async function assertEmphasis(page, vp, scope, what) {
+  // A karaoke word's colour fades in 150ms when its state changes ("nama." the moment the narrator
+  // moves on): measured in a moment none of them is fading, never in between two colours.
+  const looks = await page.locator(`${scope} [data-emph="meaning"]`).evaluateAll(async (els) => {
+    for (let k = 0; k < 20; k++) {
+      const fading = els.flatMap((el) => el.getAnimations());
+      if (!fading.length) break;
+      await Promise.all(fading.map((a) => a.finished.catch(() => null)));
+    }
+    return els.map((el) => {
+      const s = getComputedStyle(el);
+      const r = el.getBoundingClientRect();
+      return {
+        text: (el.textContent ?? "").trim(),
+        weight: Number(s.fontWeight),
+        color: s.color,
+        now: !!el.closest('[data-karaoke="now"]'),
+        shown: r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < window.innerHeight && el.checkVisibility({ checkVisibilityCSS: true, visibilityProperty: true }),
+      };
+    });
+  });
+  if (!looks.length) throw new Error(`${vp}: ${what} has no emphasised meaning ([data-emph="meaning"])`);
+  const bad = looks.filter((x) => !x.shown || !(x.weight >= 600) || x.color !== (x.now ? PAPER : FOREST));
+  if (bad.length) throw new Error(`${vp}: ${what}: emphasised meaning not shown bold in ${FOREST} (${PAPER} on the word being said): ${JSON.stringify(bad)}`);
+  console.log(`  emphasis ok: ${what} — ${looks.map((x) => `“${x.text}” ${x.weight}`).join(", ")}`);
+}
+
 /** The karaoke check's line: word 1 of Al-Fatihah 1 explained ("w1"; rendered with the rest of
  *  Al-Fatihah's narration — a line whose text changed has no audio until then). */
 const KARAOKE = { slug: "al-fatihah", step: "w1", line: "al-fatihah:1:w1" };
@@ -669,7 +718,8 @@ const KARAOKE = { slug: "al-fatihah", step: "w1", line: "al-fatihah:1:w1" };
  * timeout on a caption that can never turn karaoke (CI 2026-10-11: the word line became "gloss +
  * lead" with the composition, and the stage played on into the composition lines caption-only).
  * Fails the job if the word card or the karaoke caption never shows (what a learner would see
- * without them is the caption-only fallback, already covered by the ayah 2 shots above).
+ * without them is the caption-only fallback, already covered by the ayah 2 shots above), or if
+ * either shows its meaning without the emphasis (assertEmphasis: "dengan nama" bold in forest).
  */
 async function karaokeShots(page, vp, index) {
   const line = await narratedLine(KARAOKE.slug, KARAOKE.line);
@@ -704,6 +754,8 @@ async function karaokeShots(page, vp, index) {
     await caption.locator('[data-karaoke="said"]').nth(half - 1).waitFor({ state: "attached", timeout: 25_000 });
     await caption.locator('[data-karaoke="now"]').first().waitFor({ state: "attached", timeout: 25_000 });
     await assertKaraokeLayout(page, vp);
+    await assertEmphasis(page, vp, '[data-autoplay="word-card"]', "the word card");
+    await assertEmphasis(page, vp, `[data-autoplay="caption"][data-line="${KARAOKE.line}"]`, "the karaoke caption");
     await stage.screenshot({ path: `shots/${vp}-autoplay-ayah1-karaoke.png` });
     console.log(`shot ${vp}-autoplay-ayah1-karaoke`);
     await page.screenshot({ path: `shots/${vp}-autoplay-ayah1-karaoke-viewport.png` });
@@ -733,6 +785,103 @@ async function karaokeShots(page, vp, index) {
   console.log(
     `  narration: ${served.length} request(s) answered — ${standIns} silent stand-in(s) (the MP3s are not on this machine), ${served.length - standIns} other`,
   );
+  await page.goto("about:blank");
+}
+
+/**
+ * Never a silent wait (operator 2026-10-11: "sometimes it takes time for autoplay to run … there is
+ * no info to user, user is confused what happen and dont know what to do"; narration rule 19), on
+ * Al-Fatihah 1 with the routed narration held back for one file at a time (narration-route.mjs
+ * `delays`: a slow connection for that file only), its remembered place cleared first so the
+ * primary button is "Mulai pelajaran":
+ *   1. "Mulai" with its first line (shared:start) held back START_HOLD_MS: at once the button says
+ *      "Menyiapkan pelajaran…" (aria-busy) and the playing stage is not there; it appears once the
+ *      line plays (not before the hold is over), the button gone;
+ *   2. word 1's explanation (step "w1", started with "↺ Ulangi") with its line held back
+ *      LINE_HOLD_MS: within 1.5 s the bottom panel's status names the narrator ("Memuat suara
+ *      narator…", data-kind="narration"), the word card and the caption still clear of the panel
+ *      (assertKaraokeLayout); it goes once the line plays (not before the hold is over), and the
+ *      karaoke caption then follows the narrator with no status.
+ * The words are read from messages/id.json, never typed here. Shots: the preparing button, and the
+ * status (stage + viewport). Phone only. Fails the job otherwise.
+ */
+const START_HOLD_MS = 3000;
+const LINE_HOLD_MS = 4000;
+async function loadingChecks(page, vp, index) {
+  const msgs = JSON.parse(await readFile(path.join(BELAJAR_DIR, "messages", "id.json"), "utf8")).Guided;
+  const shared = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "narration", "shared.json"), "utf8")).lines ?? {};
+  const startUrl = (shared["shared:start"] ?? shared["shared:start:a"])?.audio?.url;
+  const line = await narratedLine(KARAOKE.slug, KARAOKE.line);
+  if (!startUrl) throw new Error(`${vp}: loading check — shared:start has no rendered narration (content/narration/shared.json)`);
+  if (!line.voiced || !line.url) throw new Error(`${vp}: loading check — ${KARAOKE.line} has no rendered narration in ${line.file}`);
+  const served = [];
+  const delays = new Map();
+  const handler = narrationRoute(index, served, { delays });
+  await page.route(isNarration, handler);
+  const stage = page.locator('[data-autoplay="stage"]');
+  const panel = page.locator('[data-autoplay="panel"]');
+  const status = page.locator('[data-autoplay="loading"]');
+  const start = page.locator('[data-autoplay="start"]');
+  try {
+    await page.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
+    // The earlier checks left a remembered place on this ayah ("Lanjutkan dari langkah N").
+    await page.evaluate(() => localStorage.removeItem("belajar:v1:autoplay:al-fatihah/1"));
+    await page.reload({ waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+
+    // 1. "Mulai" answers at once, and the stage waits for its first line.
+    delays.set(startUrl, START_HOLD_MS);
+    const t0 = Date.now();
+    await start.click();
+    await start.filter({ hasText: msgs.preparing }).waitFor({ state: "visible", timeout: 1_000 });
+    const problems = [];
+    if ((await start.getAttribute("aria-busy")) !== "true") problems.push('the preparing button is not aria-busy="true"');
+    if ((await panel.count()) > 0) problems.push("the playing stage showed before its first line played");
+    if (problems.length) throw new Error(`${vp}: Mulai — ${problems.join("; ")}`);
+    await stage.screenshot({ path: `shots/${vp}-autoplay-preparing.png` });
+    console.log(`shot ${vp}-autoplay-preparing (“${msgs.preparing}” after ${Date.now() - t0} ms)`);
+    await panel.waitFor({ state: "visible", timeout: START_HOLD_MS + 10_000 });
+    const shownAfter = Date.now() - t0;
+    delays.delete(startUrl);
+    if (shownAfter < START_HOLD_MS - 300) throw new Error(`${vp}: the playing stage showed after ${shownAfter} ms, before its first line (held back ${START_HOLD_MS} ms) could play`);
+    if ((await start.count()) > 0) throw new Error(`${vp}: the start button is still there with the playing stage`);
+    console.log(`  Mulai ok: "${msgs.preparing}" at once, the playing stage after ${shownAfter} ms (first line held back ${START_HOLD_MS} ms)`);
+    await settleScroll(page);
+
+    // 2. A narration line that is slow to come is named in the bottom panel.
+    await toStep(page, vp, KARAOKE.step);
+    delays.set(line.url, LINE_HOLD_MS);
+    const t1 = Date.now();
+    await page.locator('[data-autoplay="replay"]').click();
+    await status.waitFor({ state: "visible", timeout: 1_500 });
+    const seenAfter = Date.now() - t1;
+    const [text, kind] = [(await status.innerText()).replace(/\s+/g, " ").trim(), await status.getAttribute("data-kind")];
+    if (text !== msgs.loading_narration || kind !== "narration") {
+      throw new Error(`${vp}: the loading status says “${text}” (data-kind ${kind}), expected “${msgs.loading_narration}” (narration)`);
+    }
+    await page.waitForTimeout(600); // its row opening (200ms), then the word card's glide (200ms) above the taller panel
+    await assertKaraokeLayout(page, vp);
+    await stage.screenshot({ path: `shots/${vp}-autoplay-loading.png` });
+    console.log(`shot ${vp}-autoplay-loading (“${text}” after ${seenAfter} ms)`);
+    await page.screenshot({ path: `shots/${vp}-autoplay-loading-viewport.png` });
+    console.log(`shot ${vp}-autoplay-loading-viewport`);
+    await status.waitFor({ state: "detached", timeout: LINE_HOLD_MS + 10_000 });
+    const goneAfter = Date.now() - t1;
+    delays.delete(line.url);
+    if (goneAfter < LINE_HOLD_MS - 300) throw new Error(`${vp}: the loading status went after ${goneAfter} ms, before the line (held back ${LINE_HOLD_MS} ms) could play`);
+    const caption = page.locator(`[data-autoplay="caption"][data-line="${KARAOKE.line}"]`);
+    await caption.locator('[data-karaoke="now"]').first().waitFor({ state: "attached", timeout: 10_000 });
+    if ((await status.count()) > 0) throw new Error(`${vp}: the loading status is back while the line plays`);
+    console.log(`  loading status ok: “${text}” after ${seenAfter} ms, gone after ${goneAfter} ms (line held back ${LINE_HOLD_MS} ms), then the karaoke caption`);
+  } catch (err) {
+    await page.screenshot({ path: `shots/${vp}-autoplay-loading-FAILED.png`, fullPage: true }).catch(() => {});
+    console.error(`✗ ${vp}: the loading status check on Al-Fatihah 1 failed`);
+    console.error(`  narration requests answered (${served.length}):\n    ${served.join("\n    ") || "(none)"}`);
+    throw err;
+  } finally {
+    delays.clear();
+    await page.unroute(isNarration, handler);
+  }
   await page.goto("about:blank");
 }
 
@@ -1181,6 +1330,7 @@ try {
     if (vp === "desktop") await ogShots(ctx.request);
     await autoplayShots(page, vp);
     await karaokeShots(page, vp, narration);
+    if (vp === "phone") await loadingChecks(page, vp, narration);
     await composeShots(page, vp, narration);
     await quizVoiceCheck(page, vp, narration);
     // Every composition frame fits at every text size (largest: all seven ayat; the others: ayah 1).

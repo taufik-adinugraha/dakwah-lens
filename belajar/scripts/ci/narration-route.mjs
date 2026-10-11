@@ -77,8 +77,14 @@ function fulfillBytes(route, body, contentType) {
  * SILENT stand-in exactly as long as the manifest says — the karaoke caption follows the audio
  * clock, so its word timings still play out as they would with the voice. A URL no manifest
  * names answers 404 (the lesson then shows that line caption-only). `served` records each answer.
+ *
+ * `delays` (optional, a Map of pathname → ms, read at each request): a request for one of those
+ * URLs is answered only after that long — a slow connection for one line, for the loading-status
+ * check (screenshots.mjs loadingChecks; operator 2026-10-11, narration rule 19). The caller adds
+ * an entry just before the click that plays the line and removes it once the line plays, so the
+ * page's own preload of the same file, made earlier, is not what waits.
  */
-export function narrationRoute(index, served) {
+export function narrationRoute(index, served, { delays } = {}) {
   return async (route) => {
     const { pathname } = new URL(route.request().url());
     const rel = pathname.slice(NARRATION_PREFIX.length);
@@ -87,19 +93,29 @@ export function narrationRoute(index, served) {
       served.push(`${pathname} → 404 (not in a manifest)`);
       return route.fulfill({ status: 404, body: "" });
     }
-    let body = null;
-    try {
-      body = await readFile(path.join(BELAJAR_DIR, "pipeline", "out", "narration", ...rel.split("/")));
-    } catch {
-      body = null;
+    const answer = async () => {
+      let body = null;
+      try {
+        body = await readFile(path.join(BELAJAR_DIR, "pipeline", "out", "narration", ...rel.split("/")));
+      } catch {
+        body = null;
+      }
+      if (body) {
+        served.push(`${pathname} → pipeline/out MP3`);
+        return fulfillBytes(route, body, "audio/mpeg");
+      }
+      // The byte range is logged: a media element re-fetches part of a file it is still playing,
+      // which is not a new line being said.
+      served.push(`${pathname} → silent stand-in, ${ms} ms, range ${route.request().headers()["range"] ?? "none"}`);
+      return fulfillBytes(route, silentWav(ms), "audio/wav");
+    };
+    const wait = delays?.get(pathname) ?? 0;
+    if (wait > 0) {
+      served.push(`${pathname} → held back ${wait} ms (a slow connection)`);
+      await new Promise((done) => setTimeout(done, wait));
+      // The page may have moved on meanwhile (a failed check navigates away): nothing to answer.
+      return answer().catch(() => {});
     }
-    if (body) {
-      served.push(`${pathname} → pipeline/out MP3`);
-      return fulfillBytes(route, body, "audio/mpeg");
-    }
-    // The byte range is logged: a media element re-fetches part of a file it is still playing,
-    // which is not a new line being said.
-    served.push(`${pathname} → silent stand-in, ${ms} ms, range ${route.request().headers()["range"] ?? "none"}`);
-    return fulfillBytes(route, silentWav(ms), "audio/wav");
+    return answer();
   };
 }

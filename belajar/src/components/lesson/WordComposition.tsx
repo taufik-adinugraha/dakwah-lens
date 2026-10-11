@@ -184,7 +184,17 @@ function Tile({
         ) : null}
         <span data-compose-after={before ? "" : undefined} className={clsx("col-start-1 row-start-1 text-center font-medium", recited ? "text-paper" : "text-ink")}>
           {f.translit}
-          {f.gloss ? <span className={clsx("hidden font-normal sm:inline", recited ? "text-paper" : "text-ink-muted")}> · “{f.gloss}”</span> : null}
+          {/* The part's meaning bold, in forest (8.3:1 on the tile's white; paper on the recited
+              tile's forest, 7.9:1) — operator 2026-10-11: "use bold text or different color to
+              highlight the meanings". */}
+          {f.gloss ? (
+            <span className={clsx("hidden font-normal sm:inline", recited ? "text-paper" : "text-ink-muted")}>
+              {" · "}
+              <span data-emph="meaning" className={clsx("font-semibold", recited ? "text-paper" : "text-forest")}>
+                “{f.gloss}”
+              </span>
+            </span>
+          ) : null}
         </span>
       </span>
     </div>
@@ -278,9 +288,10 @@ function WordFrame({
   const chips = fr.chips?.length ? <Chips chips={fr.chips} markText={markText} sound={sound} t={t} /> : null;
   // On a phone a join's or drop's note repeats what its chips say ("tidak dibaca", "dibaca
   // dobel"; the narration says it too): it is left out there, so the figure stays above the panel.
+  // Through MixedText, its meaning emphasised: "objek di depan: makna “hanya”" (operator 2026-10-11).
   const note = fr.note ? (
     <p className={clsx("max-w-full text-center text-sm text-pretty text-ink-muted", chips && (fr.stage === "join" || fr.stage === "drop") && "hidden sm:block")}>
-      {fr.note}
+      <MixedText text={fr.note} emphasis />
     </p>
   ) : null;
 

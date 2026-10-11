@@ -22,3 +22,4 @@ export * from "./texts";
 export * from "./sequence";
 export * from "./machine";
 export * from "./persist";
+export * from "./loading";

@@ -129,7 +129,7 @@ function BasicArticle({
       </h1>
       <Headword head={title.head} className="mt-2 text-ar-lg" />
       <p className="mt-4 max-w-prose text-pretty text-lg text-ink">
-        <TermText tokens={summary} links={false} />
+        <TermText tokens={summary} links={false} emphasis />
       </p>
       <section className="mt-6" aria-labelledby="signs">
         <h2 id="signs" className="sr-only">
@@ -144,7 +144,7 @@ function BasicArticle({
       <div className="mt-6 max-w-prose space-y-4 text-pretty text-base text-ink">
         {explanation.map((p, i) => (
           <p key={i}>
-            <TermText tokens={p} links={false} />
+            <TermText tokens={p} links={false} emphasis />
           </p>
         ))}
       </div>

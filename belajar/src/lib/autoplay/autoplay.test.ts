@@ -11,6 +11,7 @@ import { LINE_ID_RE, manifestParts, parseLineId } from "./ids";
 import {
   createAutoplayState,
   EXERCISE_DONE_HOLD_MS,
+  firstNarration,
   reduceAutoplay,
   viewAutoplay,
   wantsIdleTicks,
@@ -969,6 +970,29 @@ describe("the pronunciation dictionary", () => {
       "Akhirnya kasrah, karena didahului huruf jar ba’.",
     );
     expect(withoutArabic("Tanpa Arab.")).toBe("Tanpa Arab.");
+  });
+});
+
+describe("the first line a click plays (warmed before Mulai, operator 2026-10-11)", () => {
+  it("is exactly the narration file the start issues: shared:start from 0, shared:resume from a remembered step", () => {
+    const plain = seqFor("al-fatihah", 2);
+    const m = withAudio(plain);
+    const seq = seqFor("al-fatihah", 2, m);
+    for (const [from, key] of [[null, "start"], [0, "start"], [3, "resume"]] as const) {
+      const first = firstNarration(seq, from, "biasa");
+      const want = m.shared.lines[`shared:${key}`].audio!;
+      expect(first, `from ${from}`).toEqual({ url: want.url, ms: want.ms });
+      // …the same file the click's own start plays first.
+      const s = reduceAutoplay(seq, createAutoplayState(seq), { type: "start", from: from ?? 0, reason: from ? "restore" : "fresh" });
+      expect(s.activity).toMatchObject({ kind: "narrate", url: first!.url });
+    }
+    // "Tunggu saya" holds only the step's own lines, never the shared start: the same file.
+    expect(firstNarration(seq, null, "tunggu")?.url).toBe(m.shared.lines["shared:start"].audio!.url);
+  });
+
+  it("is null when the lesson starts caption-only (no narration audio, e.g. an English page)", () => {
+    expect(firstNarration(seqFor("al-fatihah", 2), null)).toBeNull();
+    expect(firstNarration(seqFor("al-fatihah", 2), 3)).toBeNull();
   });
 });
 
