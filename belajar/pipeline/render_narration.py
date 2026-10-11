@@ -43,7 +43,10 @@ Output, two files per line (operator 2026-10-11, "do all three": the narration i
   flags, no cost), at <out>/delivery/<voice-slug>/<slug>/<name>.mp3, mirroring
   /belajar/media/narration/<voice-slug>/<slug>/<name>.mp3 (Caddy serves /belajar/media/* from
   /srv/dakwah-lens/data/belajar-media), where <name> is validate_narration.delivery_name: a hash of
-  the master's name, the delivery format and the delivered bytes.
+  the master's name, the delivery format and the delivered bytes. A line re-used from disk whose
+  manifest entry already names a delivered file that is here and intact keeps it
+  (encode_narration.standing): the published name stands, whatever this machine's ffmpeg would
+  write today (review 2026-10-11).
 
 After each line the manifest gets audio {url, ms, sha256} of the DELIVERED file (ms measured with
 ffprobe), tokens, and voice {id, name, model}. A render therefore needs ffmpeg and ffprobe, and
@@ -223,6 +226,7 @@ def render(rows, manifests, lessons, args, library: dict | None = None) -> int:
             print(f"skip   {lid} (the manifest already has this audio)")
             continue
         twins = sorted(root.glob(f"*/{file}.mp3"))
+        fresh = False  # a master rendered in this run: delivered anew, whatever the manifest named before
         if mp3.exists() and aligned.exists():
             al = json.loads(aligned.read_text(encoding="utf-8"))
             print(f"reuse  {lid} (unchanged, {mp3.name})")
@@ -234,6 +238,7 @@ def render(rows, manifests, lessons, args, library: dict | None = None) -> int:
             print(f"copy   {lid} (same text as {twins[0].parent.name}/{twins[0].name})")
         else:
             body, al, cost = synthesize(api_key, args.voice_id, text)
+            fresh = True
             mp3.parent.mkdir(parents=True, exist_ok=True)
             mp3.write_bytes(body)
             write_json(aligned, al)
@@ -246,13 +251,21 @@ def render(rows, manifests, lessons, args, library: dict | None = None) -> int:
         tokens = lex.tokens(text, al["character_start_times_seconds"], al["character_end_times_seconds"], focus_ar)
         # The manifest describes what is served: the master encoded for delivery (64 kbps mono), not
         # the master. Refused (SystemExit) if the encode drifts or a token no longer fits; the paid
-        # master stays on disk, so a re-run re-uses it.
-        delivered = E.deliver(mp3, text, voice, name, tokens, out)
-        line["audio"] = delivered.audio
+        # master stays on disk, so a re-run re-uses it. A master that was NOT rendered in this run
+        # keeps the delivered file the manifest already names, when that file is here and intact:
+        # its name is published, and another ffmpeg build would write other bytes under a new one
+        # (encode_narration: a published name stands; review 2026-10-11).
+        kept = None if fresh else E.standing(line, voice, name, out)
+        if kept:
+            audio, path = line["audio"], kept
+        else:
+            delivered = E.deliver(mp3, text, voice, name, tokens, out)
+            audio, path = delivered.audio, delivered.path
+        line["audio"] = audio
         line["tokens"] = tokens
         manifests[name]["voice"] = voice
         write_json(V.NARRATION_DIR / f"{name}.json", manifests[name])
-        done.append((lid, delivered.audio["url"], delivered.path))
+        done.append((lid, audio["url"], path))
     print(f"\nsent {sent} characters (≈ USD {sent / 1000 * PRICE_PER_1K:.2f} at list price); "
           f"character-cost header total {charged}" + (f" ({unknown_cost} responses without the header)" if unknown_cost else ""))
     for lid, url, mp3 in done:

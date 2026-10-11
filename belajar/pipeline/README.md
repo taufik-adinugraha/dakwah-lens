@@ -53,7 +53,7 @@ python3 test_validate_narration.py # plants 105 faults in copies of the manifest
 python3 validate_quiz.py           # the quiz guard: every question TAUGHT before it is asked (Al-Fatihah); exit 1 on any failure
 python3 test_validate_quiz.py      # plants 21 faults (an untaught state, an untaught option, two correct options, …), each must fail
 python3 render_narration.py        # DRY RUN: characters and cost; never calls the API without --render --i-approve-spend
-python3 encode_narration.py --check # the delivered audio (64 kbps mono) re-encoded from the masters and compared; needs ffmpeg and pipeline/out, so not in CI (see "Narasi", Delivery)
+python3 encode_narration.py --check # the delivered audio (64 kbps mono) on disk is what the manifests describe (add --reencode to encode the masters again and compare); needs ffmpeg and pipeline/out, so not in CI (see "Narasi", Delivery)
 ```
 
 Run them in this order after editing any authored file: the lesson build reads the lexicon and
@@ -837,8 +837,13 @@ naming the master, a sha256 of other bytes, another format tag) and unit-tests n
 dictionary rendering (spoken text, caption, tokens), the sanitiser, the word places, the content
 addresses (master and delivery), the request body, the delivery encode's fixed flags, drift limit
 and token fit and — on a machine with ffmpeg, so not on the CI runner — one real encode of a
-generated tone and one `render` of a line whose master is on disk (nothing sent, the manifest gets
-the delivered file, a second run skips it). CI (`.github/workflows/deploy-belajar.yml`, verify job) runs
+generated tone, one `render` of a line whose master is on disk (nothing sent, the manifest gets
+the delivered file, a second run keeps that file without encoding it again, a third with the master
+gone skips the line), the rule that a published name stands (`settle`: kept whatever the master or
+the encoder would give today, encoded again only with `--reencode` or when damaged, a failure when
+damaged with no master, "absent" when neither file is here) and `encode_narration.py --check` on an
+empty output directory (it says nothing was checked, and with `--list` it fails and lists nothing).
+CI (`.github/workflows/deploy-belajar.yml`, verify job) runs
 `build_narration.py --check`, `validate_narration.py` and `test_validate_narration.py`; the
 TypeScript guard in `src/lib/autoplay/narration.ts` (`spokenTextProblems`, run by `npm test`) is a
 lighter mirror of the same rules. The image job's screenshots (`scripts/ci/screenshots.mjs`) drive
@@ -846,11 +851,10 @@ Al-Fatihah ayah 1 in a real browser to mid-explanation of word 1 and fail unless
 the karaoke caption show (al-fatihah:1:w1 needs its render for that), then through the harakat
 primer and word 1's composition (parts, the change mid-way and settled, the join, the change with
 reduced motion), failing if the animation never shows or sits under the bottom panel; the MP3s are not on the runner, so that script answers the narration URLs
-in the browser itself (a Playwright route, test-only) with the `pipeline/out` file when present,
-else a silent WAV as long as the line's `ms`, so the word timings play out against a real audio
-clock. (Since 2026-10-11 the manifests name the delivered files, in `pipeline/out/delivery/`; that
-script still looks in `pipeline/out/narration/`, so on a machine that rendered them it now answers
-with the silent stand-in too, as the runner always did.)
+in the browser itself (a Playwright route, test-only; `scripts/ci/narration-route.mjs`) with the
+delivered file from `pipeline/out/delivery/` when present (the manifests name the delivered files
+since 2026-10-11, no longer the masters in `pipeline/out/narration/`), else a silent WAV as long as
+the line's `ms`, so the word timings play out against a real audio clock.
 
 **Render (`render_narration.py`; costs money, asks first).** Default is a dry run: characters and
 cost per manifest at USD 0.08/1K (eleven_v3 list price), plus the distinct texts it would actually
@@ -892,9 +896,16 @@ served as rendered, mono at 128 kbps, twice what speech needs: the opening line 
   <master> -map 0:a:0 -vn -map_metadata -1 -map_chapters -1 -c:a libmp3lame -b:a 64000 -ac 1 -ar
   44100 -compression_level 2 -flags +bitexact -fflags +bitexact -id3v2_version 0 -write_xing 1 -f
   mp3`: 64 kbps CBR, mono, 44.1 kHz, LAME quality 2, no metadata, no ID3 tag, no encoder version
-  strings. The same master gives the same bytes on this machine (ffmpeg 7.1.1; `--check`
-  re-encodes and compares). The Info frame is kept on purpose: it carries the encoder delay and
-  padding, so a player starts the delivered file at the same instant of sound as the master.
+  strings. The same master gives the same bytes on this machine (ffmpeg 7.1.1; `--check
+  --reencode` encodes every master again and compares). The Info frame is kept on purpose: it
+  carries the encoder delay and padding, so a player starts the delivered file at the same instant
+  of sound as the master.
+- **0.45 dB quieter than the master, on purpose left alone.** LAME scales its input by 0.95 at
+  bitrates like this one (review 2026-10-11, all 335 master/delivered pairs decoded: gain
+  0.944–0.953, mean 0.9495, the same below 4 kHz, zero lag; the same flags on `shared:start` give
+  0.950 at 64, 96 and 128 kbps and 1.000 at 256 kbps). It is uniform and inaudible, not a fault to
+  fix. Do not compensate with `-af volume=…`: the loudest delivered file already peaks at 0.95 of
+  full scale, so ×1/0.95 would clip it, and any change of level gives all 335 files new names.
 - **Its own name, by content.** `<out>/delivery/<voice-slug>/<slug>/<delivery_name>.mp3`, where
   `validate_narration.delivery_name` is 16 hex of the sha256 of `{master: audio_name,
   delivery_format: "mp3_44100_64_mono", sha256: <the delivered bytes>}`. It is never the master's
@@ -902,25 +913,43 @@ served as rendered, mono at 128 kbps, twice what speech needs: the opening line 
   and no name ever means two files: a changed text, another format, a retake of the same text or
   an ffmpeg that writes other bytes each give a new name. That is what lets the server answer
   `/belajar/media/narration/*` with `Cache-Control: public, max-age=31536000, immutable`.
+- **A published name stands** (review 2026-10-11). Because the name carries the bytes, encoding a
+  file again with another ffmpeg or LAME build would rename it: learners would download everything
+  again despite the immutable cache, 22.6 MB would have to be uploaded before the next deploy, and
+  CI could not notice a missed upload (the validators pass on the renamed manifests). So a line
+  whose manifest entry already names a delivered file, with that file on disk and intact (sha256,
+  length, format, decode), is **kept**, master on disk or not, by this script and by
+  `render_narration.py` for a master it re-uses. Only a line without a valid delivered file is
+  encoded: a new or changed text, a fresh render or retake, a file lost or damaged.
+  `--reencode` encodes every line whose master is here and takes what comes out; it is for a
+  deliberate change of `ENCODE` (a new format: give `DELIVERY_FORMAT` a new tag with it) or a
+  master replaced by hand.
 - **The manifest describes what is served.** `audio.url` is the delivered file's, `audio.sha256`
   the sha256 of its bytes, `audio.ms` its length by ffprobe, rounded to the millisecond. `tokens`
   are untouched: they are seconds from the start of the clip, and the clip did not move.
-- **What stops the step** (no manifest is written): a delivered file that is not MP3 / 64 kbps /
+- **What stops the step** (no manifest is written): a freshly encoded file that is not MP3 / 64 kbps /
   mono / 44.1 kHz by ffprobe, whose frames do not add up to ffprobe's length, or that does not
   decode cleanly (`ffmpeg -v error -i f -f null -`); a length more than 80 ms from its master's
   (`MAX_DRIFT_MS`); a karaoke token that no longer fits, i.e. ends later after the end of the
-  delivered file than it did after the end of the master.
+  delivered file than it did after the end of the master. Also a kept file that is damaged while
+  its master is not on the machine to make it again.
 
 ```bash
-python3 encode_narration.py                    # encode what the manifests reference, update their audio entries
+python3 encode_narration.py                    # deliver what the manifests reference (keep what stands, encode the rest), update their audio entries
 python3 encode_narration.py --check            # the same, writing nothing; exit 1 if anything would change
-python3 encode_narration.py --list files.txt   # also list the delivered files, relative to out/delivery, for the upload
+python3 encode_narration.py --list files.txt   # also list the delivered files on this machine, relative to out/delivery, for the upload; exit 1 if a referenced file is not here
+python3 encode_narration.py --check --reencode # every master encoded again and compared with the manifests and the files on disk (this ffmpeg still writes the published bytes)
 ```
 
 `render_narration.py --render` calls the same `deliver` on every line it renders, so a new surah
-is delivered at 64 kbps without this step; run it by hand after changing `ENCODE` (with a new
-`DELIVERY_FORMAT` tag) or to re-check a machine's files. Lines whose master is not on the machine
-are left as the manifest has them (their delivered file is verified when it is there).
+is delivered at 64 kbps without this step; run it by hand to re-check a machine's files, or with
+`--reencode` after changing `ENCODE` (with a new `DELIVERY_FORMAT` tag). A line with neither its
+master nor its delivered file on the machine (another one rendered it) is left as the manifest has
+it and reported as NOT checked: the run still exits 0, and its last line says how many were kept,
+encoded and unchecked. `--list` is the gate before an upload: it writes only files that are on
+this machine, names every referenced file that is not, and then exits 1, because an upload from a
+short list leaves those lines without audio (a 404, caption-only) unless the server already has
+them.
 
 Encoded on 2026-10-11 (everything rendered: Al-Fatihah and the shared lines; 362 lines, 335
 files): 45,282,075 → 22,633,255 bytes (50.0%); the largest, `al-fatihah:4:structure`, 491,146 →

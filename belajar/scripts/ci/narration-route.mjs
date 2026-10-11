@@ -8,7 +8,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 // belajar/: the narration manifests (content/narration/*.json) and, on a
-// machine that rendered them, the git-ignored MP3s (pipeline/out/narration/).
+// machine that rendered them, the git-ignored DELIVERED MP3s the manifests name
+// (pipeline/out/delivery/, 64 kbps mono, pipeline/encode_narration.py; since 2026-10-11 the
+// manifests no longer name the 128 kbps masters in pipeline/out/narration/).
 // The workflow copies the CI scripts to /tmp/shots-run and passes BELAJAR_DIR;
 // run in place (belajar/scripts/ci/), it is two levels up.
 export const BELAJAR_DIR = process.env.BELAJAR_DIR ?? fileURLToPath(new URL("../..", import.meta.url));
@@ -72,8 +74,8 @@ function fulfillBytes(route, body, contentType) {
 }
 
 /**
- * The narration URLs, answered in the browser for these CI runs only: the rendered MP3 from
- * pipeline/out/narration/ when this machine has it (git-ignored: never on the CI runner), else a
+ * The narration URLs, answered in the browser for these CI runs only: the delivered MP3 from
+ * pipeline/out/delivery/ when this machine has it (git-ignored: never on the CI runner), else a
  * SILENT stand-in exactly as long as the manifest says — the karaoke caption follows the audio
  * clock, so its word timings still play out as they would with the voice. A URL no manifest
  * names answers 404 (the lesson then shows that line caption-only). `served` records each answer.
@@ -96,12 +98,12 @@ export function narrationRoute(index, served, { delays } = {}) {
     const answer = async () => {
       let body = null;
       try {
-        body = await readFile(path.join(BELAJAR_DIR, "pipeline", "out", "narration", ...rel.split("/")));
+        body = await readFile(path.join(BELAJAR_DIR, "pipeline", "out", "delivery", ...rel.split("/")));
       } catch {
         body = null;
       }
       if (body) {
-        served.push(`${pathname} → pipeline/out MP3`);
+        served.push(`${pathname} → pipeline/out/delivery MP3`);
         return fulfillBytes(route, body, "audio/mpeg");
       }
       // The byte range is logged: a media element re-fetches part of a file it is still playing,

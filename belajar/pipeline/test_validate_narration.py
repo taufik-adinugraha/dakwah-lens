@@ -738,6 +738,12 @@ class SpeechAndRender(unittest.TestCase):
                 # the upload it prints is the delivery directory, never the masters
                 self.assertIn(f"scp -r {(root / 'out').resolve() / 'delivery' / 'suara-uji'} ", said.getvalue())
                 self.assertIn("reuse  shared:correct", said.getvalue())
+                # Run again with the master still on disk: the delivered file the manifest names is
+                # kept, not encoded again (another ffmpeg build would write other bytes, a new name).
+                with mock.patch.object(E, "_encode_to", side_effect=AssertionError("a published file must not be encoded again")):
+                    self.assertEqual(R.render([(name, lid, text)], manifests, LESSONS, args, LIBRARY), 0)
+                self.assertEqual(ln["audio"], first)
+                self.assertEqual(E.sha256_bytes(delivered.read_bytes()), first["sha256"])
                 master.unlink()
                 self.assertEqual(R.render([(name, lid, text)], manifests, LESSONS, args, LIBRARY), 0)
                 self.assertIn("skip   shared:correct", said.getvalue())
@@ -779,6 +785,90 @@ class SpeechAndRender(unittest.TestCase):
             broken.write_bytes(b"not an mp3" * 50)
             with self.assertRaises(SystemExit):
                 E.deliver(broken, text, voice, "shared", toks, root)
+
+    @unittest.skipUnless(shutil.which("ffmpeg") and shutil.which("ffprobe"), "needs ffmpeg and ffprobe (not on the CI runner)")
+    def test_published_name_stands(self):
+        # encode_narration.settle (review 2026-10-11): a delivered file the manifest names, on disk
+        # and intact, is KEPT, master on disk or not. Its name carries its bytes, and another ffmpeg
+        # build writes other bytes: encoding it again in passing would rename every published file.
+        voice = {"id": "v1", "name": "Suara Uji", "model": "eleven_v3"}
+        text = "Benar."
+        toks = [{"t": "Benar.", "s": 0.1, "e": 1.9}]
+
+        def tone(path: Path, hz: int) -> bool:
+            made = subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-y", "-f", "lavfi", "-i", f"sine=frequency={hz}:duration=2",
+                                   "-c:a", "libmp3lame", "-b:a", "128k", "-ac", "1", "-ar", "44100", str(path)],
+                                  capture_output=True, check=False)
+            return made.returncode == 0
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            master = E.master_path(root, voice, "shared", text)
+            master.parent.mkdir(parents=True)
+            if not tone(master, 440):
+                self.skipTest("this ffmpeg cannot make the test tone")
+            d = E.deliver(master, text, voice, "shared", toks, root)
+            line = {"text": text, "audio": dict(d.audio), "tokens": toks}
+            twin = {"text": text, "audio": dict(d.audio), "tokens": toks}  # the same text on another line
+            settle = lambda lines=None, **kw: E.settle(lines or [line, twin], master, voice, "shared", root, **kw)
+            with mock.patch.object(E, "_encode_to", side_effect=AssertionError("a kept file must not be encoded again")):
+                self.assertEqual(settle(), ("kept", None, []))
+                self.assertEqual(E.standing(line, voice, "shared", root), d.path)
+            # Other bytes from the same master's place (a master replaced by hand here; an upgraded
+            # encoder does the same to every file): the published name stands all the same …
+            self.assertTrue(tone(master, 880))
+            self.assertEqual(settle(), ("kept", None, []))
+            # … and only --reencode takes the new bytes, under a new name (nothing written by --check).
+            how, again, errs = settle(reencode=True, write=False)
+            self.assertEqual((how, errs), ("encoded", []))
+            self.assertNotEqual(again.audio["url"], line["audio"]["url"])
+            self.assertFalse(again.path.exists())
+            self.assertEqual(E.on_disk({d.audio["url"][len(V.MEDIA_PREFIX):], again.audio["url"][len(V.MEDIA_PREFIX):]}, root),
+                             ([d.audio["url"][len(V.MEDIA_PREFIX):]], [again.audio["url"][len(V.MEDIA_PREFIX):]]))
+            # Lines of one text that do not name ONE file (the twin names other bytes, validly):
+            # not kept, delivered again as one.
+            elsewhere = {"url": V.delivery_url(voice, "shared", text, "1" * 64), "ms": d.audio["ms"], "sha256": "1" * 64}
+            self.assertTrue(V.is_delivery(elsewhere, voice, "shared", text))
+            self.assertEqual(settle([line, {**twin, "audio": elsewhere}], write=False)[0], "encoded")
+            # A damaged delivered file: made again while its master is here, a failure once it is not.
+            whole = d.path.read_bytes()
+            for damaged in (whole[: len(whole) // 2], b"", b"not an mp3" * 50):
+                d.path.write_bytes(damaged)
+                self.assertIsNone(E.standing(line, voice, "shared", root))
+                self.assertEqual(settle(write=False)[0], "encoded")
+            master.unlink()
+            how, _d, errs = settle()
+            self.assertEqual(how, "failed")
+            self.assertTrue(errs)
+            # Neither file on this machine (another one rendered the line): nothing to check here.
+            d.path.unlink()
+            self.assertEqual(settle(), ("absent", None, []))
+            self.assertEqual(E.on_disk({d.audio["url"][len(V.MEDIA_PREFIX):]}, root), ([], [d.audio["url"][len(V.MEDIA_PREFIX):]]))
+            # … unless the manifest names no delivered file at all: then there is nothing to serve.
+            unnamed = {**line, "audio": {**line["audio"], "url": V.master_url(voice, "shared", text)}}
+            self.assertEqual(settle([unnamed])[0], "failed")
+
+    @unittest.skipUnless(shutil.which("ffmpeg") and shutil.which("ffprobe"), "needs ffmpeg and ffprobe (not on the CI runner)")
+    def test_delivery_list_wants_every_file(self):
+        # encode_narration.py --check on a machine with none of the files (an empty --out): nothing
+        # was checked and it says so; with --list (the gate before an upload) that is a failure, and
+        # no file that is not here is listed (review 2026-10-11: it used to print OK and list all).
+        if not any("audio" in ln for man in MANIFESTS.values() for ln in man["lines"].values()):
+            self.skipTest("no line has audio")
+        here = Path(E.__file__).resolve().parent
+        with tempfile.TemporaryDirectory() as tmp:
+            listed = Path(tmp) / "files.txt"
+            run = lambda *extra: subprocess.run([sys.executable, str(here / "encode_narration.py"), "--check", "--out", tmp, *extra],
+                                                cwd=here, capture_output=True, text=True, check=False)
+            plain = run()
+            self.assertEqual(plain.returncode, 0, plain.stdout[-400:] + plain.stderr[-400:])
+            self.assertIn("NOT checked", plain.stdout)
+            self.assertNotIn("re-encoded and compared", plain.stdout)
+            gate = run("--list", str(listed))
+            self.assertEqual(gate.returncode, 1, gate.stdout[-400:] + gate.stderr[-400:])
+            self.assertIn("NOT in the list", gate.stdout)
+            self.assertEqual(listed.read_text(encoding="utf-8"), "")
+            self.assertEqual(list(Path(tmp).glob("delivery/**/*.mp3")), [])  # --check wrote nothing
 
     def test_sanitiser_names_places(self):
         san = B.Sanitiser(LESSONS)
