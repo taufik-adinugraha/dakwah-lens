@@ -6,19 +6,24 @@ import { ForestGlow } from "@/components/ForestGlow";
 import { StatusChip } from "@/components/StatusChip";
 import { TextSizeHint } from "@/components/TextSizeSwitch";
 import { AiChip } from "@/components/waris/report/AiChip";
+import { MainSiteBridge } from "@/components/MainSiteBridge";
 import { Link } from "@/i18n/navigation";
 import { hasDrafts, SURAHS } from "@/lib/content";
 import { warisVisible } from "@/lib/features";
 import { LIBRARY } from "@/lib/library";
 import { conceptIndexHref, quranHref, warisHref } from "@/lib/routes";
+import { shareMetadata } from "@/lib/share";
 
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Hub" });
+  const ta = await getTranslations({ locale, namespace: "App" });
+  const to = await getTranslations({ locale, namespace: "Og" });
+  const title = `${t("heading")} · Dakwah-Lens`;
   return {
-    title: { absolute: `${t("heading")} · Dakwah-Lens` },
+    title: { absolute: title },
     alternates: {
       canonical: `https://dakwah-lens.id/belajar/${locale}`,
       languages: {
@@ -27,6 +32,9 @@ export async function generateMetadata({
         "x-default": "https://dakwah-lens.id/belajar/id",
       },
     },
+    // Share preview with the hub's card (app/[locale]/og/route.ts); og:url = the canonical.
+    // "/" is the hub (lib/routes.ts hubHref).
+    ...shareMetadata({ locale, path: "/", title, description: ta("description"), imageAlt: to("image_alt") }),
   };
 }
 
@@ -145,6 +153,11 @@ export default async function HubPage({ params }: PageProps<"/[locale]">) {
             </ul>
           </div>
         </section>
+
+        {/* One line to the main site, under the tracks (operator, 2026-10-10:
+            the module should bring people to dakwah-lens.id): not a card,
+            not a banner. */}
+        <MainSiteBridge id="hub" className="mt-10" />
       </div>
     </div>
   );

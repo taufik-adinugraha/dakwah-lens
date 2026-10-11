@@ -4,6 +4,7 @@ import { CheckCircle2, ChevronRight, List, RotateCcw } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Link } from "@/i18n/navigation";
+import { MainSiteBridge } from "@/components/MainSiteBridge";
 import { quranHref } from "@/lib/routes";
 
 /** Moves keyboard focus to the card when it appears (never scrolls). */
@@ -56,6 +57,8 @@ export function SurahEndCard({
           {t("end_list")}
         </Link>
       </div>
+      {/* After the surah, one calm line to Tafsir Pekan Ini (operator, 2026-10-10). */}
+      <MainSiteBridge id="surah_end" className="mt-5" />
     </div>
   );
 }

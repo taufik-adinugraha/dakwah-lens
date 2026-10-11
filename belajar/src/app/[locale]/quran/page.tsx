@@ -4,15 +4,24 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { ForestGlow } from "@/components/ForestGlow";
 import { StatusChip } from "@/components/StatusChip";
+import { MainSiteBridge } from "@/components/MainSiteBridge";
+import { ShareButton } from "@/components/ShareButton";
 import { Link } from "@/i18n/navigation";
 import { hasDrafts, SURAHS } from "@/lib/content";
 import { ayahHref, surahHref } from "@/lib/routes";
+import { pageUrl, shareMetadata } from "@/lib/share";
+
+/** This page's path, lib/routes.ts quranHref() (src/lib/share.test.ts holds them equal), for
+ *  its share card and its share link. */
+const TRACK_PATH = "/quran";
 
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/quran">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Quran" });
+  const ta = await getTranslations({ locale, namespace: "App" });
+  const to = await getTranslations({ locale, namespace: "Og" });
   return {
     title: t("title"),
     alternates: {
@@ -23,6 +32,14 @@ export async function generateMetadata({
         "x-default": "https://dakwah-lens.id/belajar/id/quran",
       },
     },
+    // Share preview with the track's card (quran/og/route.ts); og:url = the canonical.
+    ...shareMetadata({
+      locale,
+      path: TRACK_PATH,
+      title: ta("title_template").replace("%s", t("title")),
+      description: t("intro"),
+      imageAlt: to("image_alt"),
+    }),
   };
 }
 
@@ -53,6 +70,7 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
     { Icon: Library, title: t("p2_title"), body: t("p2_body") },
     { Icon: BookOpenCheck, title: t("p3_title"), body: t("p3_body") },
   ];
+  const tshare = await getTranslations("Share");
 
   return (
     <div className="relative isolate">
@@ -64,6 +82,11 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
           </h1>
           <p className="mt-4 max-w-prose text-pretty text-lg text-ink-muted">{t("intro")}</p>
         </section>
+
+        {/* One "Bagikan" in the page head, under the intro (operator,
+            2026-10-10): the track is the page worth passing on to someone
+            starting out. */}
+        <ShareButton className="mt-6" url={pageUrl(locale, TRACK_PATH)} text={tshare("track_text")} />
 
         <section className="mt-10" aria-labelledby="start">
           <h2 id="start" className="text-lg font-semibold text-ink">
@@ -167,6 +190,10 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
               ))}
             </ul>
           </div>
+          {/* One line to the main site's kitab search, under the principles
+              (operator, 2026-10-10): the next step for a reader who wants the
+              texts themselves. */}
+          <MainSiteBridge id="track" className="mt-6" />
         </section>
       </div>
     </div>

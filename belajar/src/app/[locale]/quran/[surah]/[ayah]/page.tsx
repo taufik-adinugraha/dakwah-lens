@@ -12,6 +12,8 @@ import { TapWord } from "@/components/exercises/TapWord";
 import { WaznFactory } from "@/components/exercises/WaznFactory";
 import { WhyHarakat } from "@/components/exercises/WhyHarakat";
 import { ForestGlow } from "@/components/ForestGlow";
+import { MainSiteBridge } from "@/components/MainSiteBridge";
+import { ShareButton } from "@/components/ShareButton";
 import { LessonStage, WordListenButton } from "@/components/lesson/LessonStage";
 import { MaterialsDisclosure } from "@/components/lesson/MaterialsDisclosure";
 import { WordCard } from "@/components/lesson/WordCard";
@@ -24,6 +26,8 @@ import { getAyah, getSurah, SURAH_INDEX, SURAHS } from "@/lib/content";
 import { orderRecitations } from "@/lib/autoplay";
 import { conceptsIntroducedIn, getConcept, getLexeme, LIBRARY } from "@/lib/library";
 import { ayahHref, surahHref } from "@/lib/routes";
+import { lessonCard, translationExcerpt } from "@/lib/og/text";
+import { alternatesFor, lessonShareable, pageUrl, shareMetadata } from "@/lib/share";
 
 export const dynamicParams = false;
 
@@ -45,9 +49,27 @@ const RECITER_LABEL: Record<string, string> = {
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/quran/[surah]/[ayah]">): Promise<Metadata> {
-  const { surah: slug, ayah } = await params;
+  const { locale, surah: slug, ayah } = await params;
   const s = getSurah(slug);
-  return { title: s ? `${s.name_id} ${ayah}` : "—" };
+  const a = s ? getAyah(s, Number(ayah)) : undefined;
+  if (!s || !a) return { title: "—" };
+  const path = ayahHref(s.slug, a.ayah);
+  const meta: Metadata = { title: `${s.name_id} ${ayah}`, alternates: alternatesFor(locale, path) };
+  // Share preview (og:*, twitter:*) only for a lesson that may be shared: the one check,
+  // lib/share.ts lessonShareable. Its card is this folder's og/route.ts.
+  if (!lessonShareable(s.slug)) return meta;
+  const to = await getTranslations({ locale, namespace: "Og" });
+  const card = lessonCard(to, s, a);
+  return {
+    ...meta,
+    ...shareMetadata({
+      locale,
+      path,
+      title: `${card.title} · ${card.eyebrow}`,
+      description: to("lesson_description", { translation: translationExcerpt(a.translation.text) }),
+      imageAlt: to("lesson_image_alt", { surah: s.name_id, n: a.ayah }),
+    }),
+  };
 }
 
 /**
@@ -77,7 +99,8 @@ function Deeper({ title, children }: { title: string; children: ReactNode }) {
  * secondary control behind "⚙ Pengaturan") → everything else folded into
  * ONE collapsed row, "Materi lengkap ayat ini": word by word, the
  * standalone practice, "learn more" (structure, concepts, tafsir, facts),
- * content unchanged → the ayah navigation, once, at the bottom. The forest
+ * content unchanged, and last two links to the main site → the ayah
+ * navigation, once, at the bottom → one "Bagikan" under it. The forest
  * glow sits behind the page. Nothing gives positional instructions ("di
  * atas"); every citation (Rujukan) stays reachable inside the row.
  */
@@ -95,6 +118,8 @@ export default async function AyahPage({
   const tw = await getTranslations("Word");
   const tc = await getTranslations("Concept");
   const tp = await getTranslations("Player");
+  const tm = await getTranslations("MainSite");
+  const tshare = await getTranslations("Share");
 
   const playerWords = a.words.map((w, i) => ({
     index: i + 1,
@@ -342,6 +367,19 @@ export default async function AyahPage({
                 </div>
               </section>
             )}
+
+            {/* More on the main site (operator, 2026-10-10): two labelled
+                links, inside this collapsed row, so the stage stays the one
+                focus of the page. */}
+            <section className="mt-12" aria-labelledby="main-site">
+              <h2 id="main-site" className="font-display text-2xl font-medium">
+                {tm("materials_heading")}
+              </h2>
+              <div className="mt-2 space-y-1">
+                <MainSiteBridge id="ayah_kitab" />
+                <MainSiteBridge id="ayah_khutbah" />
+              </div>
+            </section>
           </MaterialsDisclosure>
         </div>
 
@@ -367,6 +405,18 @@ export default async function AyahPage({
               </Link>
             ) : null}
           </nav>
+        ) : null}
+
+        {/* 5. One "Bagikan", under the ayah navigation, outside the stage
+            (operator, 2026-10-10: one focused stage; sharing comes after
+            the lesson). Only for a lesson that may be shared: the one check,
+            lib/share.ts lessonShareable. */}
+        {lessonShareable(s.slug) ? (
+          <ShareButton
+            className="mt-8"
+            url={pageUrl(locale, ayahHref(s.slug, a.ayah))}
+            text={tshare("lesson_text", { surah: s.name_id, n: a.ayah })}
+          />
         ) : null}
       </div>
     </div>
