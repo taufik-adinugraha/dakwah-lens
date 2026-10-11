@@ -21,9 +21,7 @@
     "surah_ayat": "{name} ({ayat} ayat)",
     "concepts_title": "Grammar concepts",
     "concepts_body": "A nahwu and sharaf library: each concept is explained once, then reused in every lesson that contains it.",
-    "concepts_available": "{n, plural, one {# nahwu or sharaf concept} other {# nahwu and sharaf concepts}}",
-    "status_beta": "Beta",
-    "status_beta_draft": "Beta · AI-assisted"
+    "concepts_available": "{n, plural, one {# nahwu or sharaf concept} other {# nahwu and sharaf concepts}}"
   },
   "Quran": {
     "title": "Qur'anic Arabic",
@@ -87,8 +85,7 @@
     "lesson_title": "{surah} · Ayah {n}",
     "lesson_description": "“{translation}” Learn it word by word: meaning, root, and why each ending is read the way it is.",
     "image_alt": "Learn Qur'anic Arabic, from Dakwah-Lens",
-    "lesson_image_alt": "{surah} · Ayah {n}: transliteration and translation, Learn Qur'anic Arabic from Dakwah-Lens",
-    "disclaimer": "AI-assisted, not an authoritative fatwa"
+    "lesson_image_alt": "{surah} · Ayah {n}: transliteration and translation, Learn Qur'anic Arabic from Dakwah-Lens"
   },
   "Credits": {
     "title": "Sources & licences",

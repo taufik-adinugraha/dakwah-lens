@@ -21,8 +21,8 @@ export type CardText = {
   body: string;
   /** Who the translation is by (lesson cards only). */
   source?: string;
-  /** The module's AI label (AGENTS.md), on every card: it travels without the page footer. */
-  disclaimer: string;
+  // No AI label on the card (operator, 2026-10-11: "remove 'dibantu AI, bukan fatwa
+  // otoritatif' in the card"); the page itself carries it in its footer (AGENTS.md).
 };
 
 /** A next-intl translator for the "Og" namespace (or a test stand-in). */
@@ -46,11 +46,11 @@ export function translitLine(a: Ayah): string {
 }
 
 export function hubCard(t: Translate): CardText {
-  return { eyebrow: t("module"), title: t("track"), body: t("hub_body"), disclaimer: t("disclaimer") };
+  return { eyebrow: t("module"), title: t("track"), body: t("hub_body") };
 }
 
 export function trackCard(t: Translate): CardText {
-  return { eyebrow: t("module"), title: t("track"), body: t("track_body"), disclaimer: t("disclaimer") };
+  return { eyebrow: t("module"), title: t("track"), body: t("track_body") };
 }
 
 export function lessonCard(t: Translate, s: SurahContent, a: Ayah): CardText {
@@ -60,6 +60,5 @@ export function lessonCard(t: Translate, s: SurahContent, a: Ayah): CardText {
     translit: translitLine(a),
     body: `“${translationExcerpt(a.translation.text)}”`,
     source: a.translation.source_label,
-    disclaimer: t("disclaimer"),
   };
 }

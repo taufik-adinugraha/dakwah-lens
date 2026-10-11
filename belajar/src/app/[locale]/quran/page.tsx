@@ -4,11 +4,10 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { ForestGlow } from "@/components/ForestGlow";
 import { MixedText } from "@/components/library/MixedText";
-import { StatusChip } from "@/components/StatusChip";
 import { MainSiteBridge } from "@/components/MainSiteBridge";
 import { ShareButton } from "@/components/ShareButton";
 import { Link } from "@/i18n/navigation";
-import { hasDrafts, SURAHS } from "@/lib/content";
+import { SURAHS } from "@/lib/content";
 import { visibleSurahs } from "@/lib/features";
 import { ayahHref, surahHref } from "@/lib/routes";
 import { pageUrl, shareMetadata } from "@/lib/share";
@@ -65,7 +64,6 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
   const t = await getTranslations("Quran");
   // The hub owns the status labels, so the hub card and this page show the
   // same words for the same state.
-  const th = await getTranslations("Hub");
   const tl = await getTranslations("Lesson");
   const published = new Set(await visibleSurahs());
   const available = SURAHS.filter((s) => published.has(s.slug));
@@ -146,7 +144,6 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
                   </li>
                 );
               }
-              const draft = hasDrafts(s);
               return (
                 <li key={s.slug}>
                   {/* The whole card is the link; nothing inside it is
@@ -163,8 +160,8 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
                         {s.name_ar}
                       </span>
                     </span>
-                    <span className="mt-4 flex flex-wrap items-center justify-between gap-3">
-                      <StatusChip label={draft ? th("status_beta_draft") : th("status_beta")} draft={draft} />
+                    {/* No "Uji coba" chip (operator, 2026-10-11); the arrow is the link's cue. */}
+                    <span className="mt-4 flex justify-end">
                       <ArrowRight aria-hidden className="h-6 w-6 shrink-0 text-forest" />
                     </span>
                   </Link>
