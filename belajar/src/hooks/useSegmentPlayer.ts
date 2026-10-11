@@ -320,11 +320,13 @@ export function useSegmentPlayer(
 
   /**
    * Before a play: a recording whose load failed is loaded anew. The element keeps its `error`
-   * until then, and play() on it rejects at once without asking the network again (HTML media
-   * element, play() step 2) — so neither a file that failed while it was only fetched ahead
-   * (warm()) nor the lesson's "Lanjutkan" after "Bacaan imam belum bisa diputar" would ever try
-   * again. load() resets the position and the speed: callers set the position after this, the
-   * speed is put back here.
+   * until load(), whatever the error was, and never plays while it has one: play() either rejects
+   * at once without asking the network again (the source could not be loaded at all, e.g. a 404:
+   * HTML media element, play() step 2) or never starts playing, with no rejection either (a
+   * network or decode error mid-file). So neither a file that failed while it was only fetched ahead (warm()) nor the
+   * lesson's "Lanjutkan" after "Bacaan imam belum bisa diputar" would ever try again. Every error
+   * is loaded anew, not one kind of it. load() resets the position and the speed: callers set the
+   * position after this, the speed is put back here.
    */
   const revive = useCallback((a: HTMLAudioElement) => {
     if (!a.error) return;

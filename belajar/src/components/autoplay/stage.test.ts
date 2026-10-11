@@ -143,12 +143,15 @@ describe("autoplay stage: the imam's recitation fetched early (operator 2026-10-
    *  first is the one chosen until the learner picks another. */
   const pageSources = (a: (typeof SURAHS)[number]["ayat"][number]) => orderRecitations(a.recitation).map((r) => r.url);
 
+  // What this walk can and cannot show (review 2026-10-11): the rule returns the recording it is
+  // handed, so the walk proves WHEN the lesson asks (never on a page view, from the first line to
+  // the last step) and that no lesson opens with the imam. That the stage is handed this ayah's
+  // recording and no other's is the wiring test's below, and the browser check's in CI.
   it(
-    "every lesson: nothing on a page view; this ayah's recording from the first line to the last step, and no other ayah's",
+    "every lesson: nothing asked for on a page view; once started it stays asked for on every step, and no lesson opens with the imam",
     () => {
       let lessons = 0;
       for (const s of SURAHS) {
-        const others = (n: number) => new Set(s.ayat.filter((x) => x.ayah !== n).flatMap((x) => x.recitation.map((r) => r.url)));
         for (const a of s.ayat) {
           for (const locale of ["id", "en"]) {
             const seq = stageSequence(s, a, locale);
@@ -177,15 +180,12 @@ describe("autoplay stage: the imam's recitation fetched early (operator 2026-10-
             }
 
             // The whole lesson, step by step ("Berikutnya ›", "Lewati latihan" at an exercise):
-            // this ayah's recording on every step, the recap and the last line included — never a
-            // recording of another ayah (each page fetches its own; review 2026-10-11).
+            // the lesson stays started, so the recording stays asked for on every step, the recap
+            // and the last line included.
             let st = reduceAutoplay(seq, idle, { type: "start", reason: "fresh" });
-            const elsewhere = others(a.ayah);
             for (let i = 0; i < 300 && st.phase !== "finished"; i++) {
               const v = viewAutoplay(seq, st);
-              const url = want(st);
-              expect(url, `${where} step ${v.step.id}`).toBe(sources[0]);
-              expect(elsewhere.has(url ?? ""), `${where} step ${v.step.id}`).toBe(false);
+              expect(want(st), `${where} step ${v.step.id}`).toBe(sources[0]);
               st = reduceAutoplay(seq, st, { type: v.showSkip ? "skip" : "next" });
             }
             expect(st.phase, where).toBe("finished");
@@ -197,6 +197,20 @@ describe("autoplay stage: the imam's recitation fetched early (operator 2026-10-
     },
     FULL_RUN_TIMEOUT_MS,
   );
+
+  // The content's side of "a recording is fetched by the page that plays it": an address names
+  // one ayah's recording. Were two ayat to share one, a page would fetch another ayah's by name.
+  it("no two ayat of a surah share a recording's address", () => {
+    for (const s of SURAHS) {
+      const owner = new Map<string, number>();
+      for (const a of s.ayat) {
+        for (const url of pageSources(a)) {
+          expect(owner.get(url) ?? a.ayah, `${s.slug}: ${url}`).toBe(a.ayah);
+          owner.set(url, a.ayah);
+        }
+      }
+    }
+  });
 
   it("every recording is on a host the page's CSP lets media reach (next.config.ts), over https", () => {
     // A recording on any other host would neither be fetched ahead nor play: media-src refuses it.

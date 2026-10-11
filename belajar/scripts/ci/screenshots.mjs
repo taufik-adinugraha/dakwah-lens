@@ -979,13 +979,21 @@ async function handOffToAyah2(pg) {
  *      page has loaded, when its idle preload (the first narration line) has run;
  *   2. after "Mulai", this ayah's recording by the reciter chosen (the stage's data-reciter →
  *      content/al-fatihah.json) is requested while the narrator still speaks the opening line:
- *      the stage is on its first step, not yet on the imam's ("recite");
+ *      the stage is on its first step, not yet on the imam's ("recite"). Not proof of the early
+ *      fetch by itself (review 2026-10-11): on a first "Mulai" the click's own unlock() play asks
+ *      for the file too, as it did before the early fetch existed. Steps 3 and 5 are the proof —
+ *      there nothing plays, and without warm() the recording is not requested;
  *   3. another reciter chosen in "Pengaturan" with the lesson paused: his recording is requested
  *      at once (nothing plays it: until 2026-10-11 a recording was fetched only by its play);
  *   4. what the imam's step then plays is what was fetched ahead. First, with the network free,
  *      "↺ Ulangi" on the imam's step must make him SOUND — that this runner can play the
- *      recordings at all (it needs the CDN and the MP3 decoder); where it cannot, 4 is logged as
- *      not checked, never failed for the runner's sake. Then, for the recording of step 3 (fetched
+ *      recordings at all (it needs the CDN and the MP3 decoder). Where the RUNNER cannot (the CDN
+ *      did not answer the recording in full, or the browser has no MP3 decoder), 4 is not checked
+ *      and says so in a warning on the run's summary, never failed for the runner's sake. Where
+ *      the page HAD the recording and the decoder and he still did not sound, or the page itself
+ *      cancelled the fetch (net::ERR_ABORTED), the check fails (review 2026-10-11: a silent imam
+ *      is the app's fault then, and nothing else in this job listens for him).
+ *      Then, for the recording of step 3 (fetched
  *      ahead and by nothing else), with every further request to the reciters' host HELD BACK
  *      RECITE_HOLD_MS (a route that waits, then continues to the CDN): "↺ Ulangi" makes him sound
  *      again, with no "Memuat bacaan imam…" status on the way, and NOT ONE request for the file
@@ -1059,7 +1067,11 @@ async function warmupChecks(page, vp, index) {
     const opening = await stage.getAttribute("data-step");
     const line = await page.locator('[data-autoplay="caption"]').first().getAttribute("data-line").catch(() => null);
     if (opening !== "intro") throw new Error(`${vp}: the lesson is on step "${opening}" right after "Mulai" (expected its first step, "intro")`);
-    console.log(`  early fetch 2/5: ${name(mine)} requested ${askedAfter} ms after "Mulai", the lesson on step "${opening}" (line ${line ?? "—"}), before the imam's step`);
+    // Also asked for by the click's own unlock() play: the early fetch alone is shown by 3 and 5.
+    console.log(
+      `  early fetch 2/5: ${name(mine)} requested ${askedAfter} ms after "Mulai", the lesson on step "${opening}" (line ${line ?? "—"}), before the imam's step ` +
+        `(the click's own silent play asks for it too: steps 3 and 5 show the early fetch alone)`,
+    );
 
     // 4, first half. The imam's step with the network free: can this runner play him at all?
     await toStep(page, vp, "recite");
@@ -1110,11 +1122,30 @@ async function warmupChecks(page, vp, index) {
     const base = await imamTurn(mine, false);
     const codec = await page.evaluate(() => document.createElement("audio").canPlayType("audio/mpeg"));
     const canSound = base.sounded !== null;
-    console.log(
-      canSound
-        ? `  early fetch 4/5, network free: the imam sounded (word ${base.word} lit) ${base.sounded} ms after "↺ Ulangi" (his cue line is ${cueMs} ms)${base.waited ? ", after a loading status" : ""}`
-        : `  early fetch 4/5: the imam does not sound on this runner (no later word lit in ${base.took} ms; ${name(mine)} → ${answered.get(mine) ?? "no answer"}; canPlayType("audio/mpeg") = "${codec}")`,
-    );
+    /** Why the RUNNER, not the page, may be why recording `url` is not there to play; null: the
+     *  page has it (answered in full) or cancelled the fetch itself — nothing to blame the runner
+     *  for. A request the page aborts ends as net::ERR_ABORTED; the CDN's own failures do not. */
+    const runnerFault = (url) => {
+      const how = answered.get(url);
+      if (!codec) return 'this browser plays no MP3 (canPlayType("audio/mpeg") is empty)';
+      if (how === undefined) return `the reciters' host has not answered ${name(url)}`;
+      if (how === "ok" || how.startsWith("failed (net::ERR_ABORTED")) return null;
+      return `the reciters' host did not answer ${name(url)} in full (${how})`;
+    };
+    /** Step 4 left unchecked for the runner's sake: said where it shows, on the run's summary. */
+    const notChecked = (why) => console.log(`::warning title=Belajar early fetch 4/5 not checked::${vp}: ${why}`);
+    if (canSound) {
+      console.log(
+        `  early fetch 4/5, network free: the imam sounded (word ${base.word} lit) ${base.sounded} ms after "↺ Ulangi" (his cue line is ${cueMs} ms)${base.waited ? ", after a loading status" : ""}`,
+      );
+    } else {
+      const state = `no later word lit in ${base.took} ms; ${name(mine)} → ${answered.get(mine) ?? "no answer"}; canPlayType("audio/mpeg") = "${codec}"`;
+      const blame = runnerFault(mine);
+      // The page had what it needs and the imam stayed silent: the lesson is broken, not the runner.
+      if (!blame) throw new Error(`${vp}: with the network free the imam did not sound on his step (${state}) — the page had the recording, or cancelled its own fetch of it`);
+      console.log(`  early fetch 4/5: the imam does not sound on this runner (${state})`);
+      notChecked(`the imam's recitation was not heard at all — ${blame}`);
+    }
 
     // 3. Another reciter, chosen with the lesson paused on the imam's step: fetched when chosen.
     let file = mine;
@@ -1149,9 +1180,14 @@ async function warmupChecks(page, vp, index) {
     // 4, second half. That recording was fetched ahead, by nothing else: with the network held
     // back, the imam's step must play it all the same, and ask the network for nothing.
     await until(page, () => answered.has(file), 20_000);
-    if (!canSound || answered.get(file) !== "ok") {
-      const why = canSound ? `the reciters' host did not answer ${name(file)} in full (${answered.get(file) ?? "no answer in 20 s"})` : "the imam does not sound here (above)";
-      console.log(`  early fetch 4/5 not checked on this runner: ${why}`);
+    if (!canSound) {
+      console.log("  early fetch 4/5 not checked on this runner: the imam does not sound here (above)");
+    } else if (answered.get(file) !== "ok") {
+      const blame = runnerFault(file);
+      // The page cancelled the very fetch it made ahead: what this step is there to catch.
+      if (!blame) throw new Error(`${vp}: the recording fetched ahead (${name(file)}) was cancelled by the page itself before it was played (${answered.get(file)})`);
+      console.log(`  early fetch 4/5 not checked on this runner: ${blame}`);
+      notChecked(`played from what was fetched ahead — ${blame}`);
     } else {
       await page.route(isRecitation, hold);
       try {
