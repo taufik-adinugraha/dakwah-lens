@@ -354,8 +354,10 @@ MUTATIONS = [
     ("a compose line with Latin sukun", append_text(C1, " Huruf itu dengan sukun di atasnya."), "says 'sukun' in Latin"),
     ("a compose line with a letter name the dictionary lacks", append_text(WBA, " Lalu huruf jim."), "says 'jim' in Latin"),
     ("a composed word's lead with a Latin term", append_text("al-fatihah:1:w1", " Ia mabni."), "says 'mabni' in Latin"),
+    # Caught by check_renderable while the line is unrendered, by the rendered-audio check once it
+    # carries audio (Al-Fatihah was rendered 2026-10-11): both messages share this wording.
     ("a primer line with a heavy letter + a (mushaf)", append_text("al-fatihah:1:primer:1", " Lihat mushaf."),
-     "a heavy letter + a with no approved respelling (rule 9), in a line written to be rendered"),
+     "a heavy letter + a with no approved respelling"),
     ("a rendered line with a Latin grammar term", with_audio(LATIN), "in Latin, an Arabic term"),
     ("a letter name spoken in Latin where the dictionary has it", replace_in(C1, "text", "مِيم", "mim"),
      "'mim' must be spoken from the pronunciation dictionary"),
