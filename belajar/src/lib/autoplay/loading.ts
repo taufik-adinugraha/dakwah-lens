@@ -13,7 +13,8 @@
  *   cached file never flickers a message; from LOADING_SLOW_MS it says what to do
  *   (loadingStage, watchLoading).
  * - Before "Mulai", the first narration file that click will play is warmed while the page is
- *   idle (machine.ts firstNarration + idlePreloadUrl): never the imam's external recitation.
+ *   idle (machine.ts firstNarration + idlePreloadUrl): never the imam's external recitation,
+ *   which is fetched ahead only once the lesson has started (warm.ts).
  *
  * Pure (no React, no DOM): unit-tested with fake timers (loading.test.ts).
  */
@@ -87,16 +88,26 @@ export function watchLoading(
 }
 
 /**
- * The longest first narration file warmed while the page is idle, before "Mulai" (~16 KB a
- * second at the narration's 128 kbps: ≈ 480 KB). Measured 2026-10-11: "shared:start", the line a
- * fresh "Mulai" plays first, is 23.2 s (372 KB) — the same file on every ayah, so it is fetched
- * once; "shared:resume" ("Lanjutkan dari langkah N") is 3 s (48 KB). A longer first line is left
- * to load on the click, with its "Menyiapkan pelajaran…".
+ * The longest first narration file warmed while the page is idle, before "Mulai" (~8 KB a second
+ * at the 64 kbps the narration is delivered at since 2026-10-11, docs/belajar-plan.md L15: ≈ 240 KB;
+ * twice that at the 128 kbps of the renders before). Measured 2026-10-11: "shared:start", the line
+ * a fresh "Mulai" plays first, is 23.2 s (186 KB; 372 KB before) — the same file on every ayah, so
+ * it is fetched once; "shared:resume" ("Lanjutkan dari langkah N") is 3 s (24 KB). A longer first
+ * line is left to load on the click, with its "Menyiapkan pelajaran…".
  */
 export const IDLE_PRELOAD_MAX_MS = 30_000;
 
 /** What the browser says about the connection (navigator.connection, where it exists). */
 export type ConnectionHints = { saveData?: boolean; effectiveType?: string };
+
+/**
+ * The learner's browser asks to save data: Data Saver is on, or the connection is 2G-class.
+ * Nothing is fetched ahead of need then — one rule for the idle preload below and for the next
+ * ayah's recitation (warm.ts). Unknown (no navigator.connection: Safari, Firefox) counts as no.
+ */
+export function savesData(conn?: ConnectionHints | null): boolean {
+  return !!conn?.saveData || conn?.effectiveType === "slow-2g" || conn?.effectiveType === "2g";
+}
 
 /**
  * The narration file to warm while the page is idle, or null: the first one "Mulai" plays
@@ -106,6 +117,6 @@ export type ConnectionHints = { saveData?: boolean; effectiveType?: string };
  */
 export function idlePreloadUrl(first: { url: string; ms: number } | null, conn?: ConnectionHints | null): string | null {
   if (!first || first.ms > IDLE_PRELOAD_MAX_MS) return null;
-  if (conn?.saveData || conn?.effectiveType === "slow-2g" || conn?.effectiveType === "2g") return null;
+  if (savesData(conn)) return null;
   return first.url;
 }

@@ -192,6 +192,7 @@ export function LessonStage({
   following,
   words,
   sources,
+  nextRecitation = null,
   translation,
   exercise,
   compose = null,
@@ -206,6 +207,10 @@ export function LessonStage({
   following: SurahRef[];
   words: PlayerWord[];
   sources: StageSource[];
+  /** The recording the next ayah's lesson plays first (its default reciter's), on every ayah but a
+   *  surah's last: fetched ahead from the recap on, because the lesson goes on there by itself
+   *  (operator 2026-10-11; src/lib/autoplay/warm.ts). */
+  nextRecitation?: string | null;
   /** The ayah's translation with footnotes and source, rendered by the page. */
   translation: ReactNode;
   /** What the exercises need inside the stage. */
@@ -219,7 +224,7 @@ export function LessonStage({
   /** The word card's "yang artinya “…”", its gloss emphasised (glossSlot). */
   const cardMeaning = (gloss: string) => glossSlot((g) => t("card_meaning", { gloss: g }), gloss);
   const uid = useId();
-  const ap = useAutoplay(seq, sources, title);
+  const ap = useAutoplay(seq, sources, title, nextRecitation);
   const { state, view, actions, player: p } = ap;
   const upNext = useUpNext(following);
   // "Mulai" clicked and its first line not heard yet: the stage before "Mulai" stays, its button
@@ -463,7 +468,16 @@ export function LessonStage({
     // overflow-x-clip: a backstop so nothing drawn over the stage (a
     // spotlight label at the largest text size) can make the page scroll
     // sideways; `clip` keeps the controls bar sticky.
-    <div ref={stageRef} data-autoplay="stage" data-step={live ? step.id : undefined} className="stage-card scroll-mt-2 overflow-x-clip">
+    <div
+      ref={stageRef}
+      data-autoplay="stage"
+      data-step={live ? step.id : undefined}
+      // The reciter chosen, by the id the content gives him ("Alafasy_128kbps"): the CI check of
+      // the early fetch finds his recording's address by it (scripts/ci/screenshots.mjs
+      // warmupChecks; operator 2026-10-11).
+      data-reciter={p.source?.reciter}
+      className="stage-card scroll-mt-2 overflow-x-clip"
+    >
       <h2 id={`${uid}-guided`} className="sr-only">
         {t("title")}
       </h2>

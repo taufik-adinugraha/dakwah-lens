@@ -161,7 +161,7 @@ describe("watchLoading (fake timers)", () => {
 describe("idle preload of the first line (before Mulai)", () => {
   const first = { url: "/belajar/media/narration/kang-nandar/shared/start.mp3", ms: 23_249 };
 
-  it("warms the first line, also the 23 s shared:start (≈ 372 KB, the same file on every ayah)", () => {
+  it("warms the first line, also the 23 s shared:start (≈ 186 KB at 64 kbps, the same file on every ayah)", () => {
     expect(idlePreloadUrl(first)).toBe(first.url);
     expect(idlePreloadUrl(first, { effectiveType: "4g" })).toBe(first.url);
     expect(idlePreloadUrl({ ...first, ms: IDLE_PRELOAD_MAX_MS })).toBe(first.url);

@@ -161,6 +161,11 @@ export default async function AyahPage({
   const facts = s.facts.filter((f) => f.locations.includes(a.loc));
   const prev = getAyah(s, n - 1);
   const next = getAyah(s, n + 1);
+  // The recording the next ayah's lesson plays first: its default reciter's, as `sources[0]` is
+  // here (the choice of reciter starts over on each ayah). The stage fetches it ahead from the
+  // recap on, because the lesson goes on to that ayah by itself (operator 2026-10-11;
+  // src/lib/autoplay/warm.ts). None on a surah's last ayah: its end card moves nowhere by itself.
+  const nextRecitation = next ? (orderRecitations(next.recitation)[0]?.url ?? null) : null;
   // Storage key for lesson/exercise progress, not a URL: unchanged by the
   // move under /quran so saved progress survives it.
   const key = `${s.slug}/${a.ayah}`;
@@ -255,6 +260,7 @@ export default async function AyahPage({
             following={following}
             words={playerWords}
             sources={sources}
+            nextRecitation={nextRecitation}
             translation={translation}
             exercise={{ words: a.words, lexemes, quiz }}
             compose={compose && (compose.primer || Object.keys(compose.words).length) ? compose : null}

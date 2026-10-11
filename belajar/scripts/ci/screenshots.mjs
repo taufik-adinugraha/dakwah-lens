@@ -106,9 +106,10 @@ async function settleScroll(page) {
  * cannot move on by itself between a look and a click (a step that ends on its own just then would
  * be jumped over): each "Berikutnya ›" then enters the next step paused, and the caller starts the
  * step with "↺ Ulangi" (it plays a step from its start, paused or not). Fails naming the steps it
- * passed.
+ * passed. `onStep` (optional) is called with each step on the way, before it is left: a check of
+ * what must not have happened by then (warmupChecks).
  */
-async function toStep(page, vp, id) {
+async function toStep(page, vp, id, onStep = null) {
   const stage = page.locator('[data-autoplay="stage"]');
   const next = page.locator('[data-autoplay="next"]');
   const middle = page.locator('[data-autoplay="middle"]');
@@ -123,6 +124,7 @@ async function toStep(page, vp, id) {
     const at = await stage.getAttribute("data-step");
     if (at === id) return;
     if (at && seen.at(-1) !== at) seen.push(at);
+    if (onStep) await onStep(at);
     if (!(await next.isVisible().catch(() => false))) break;
     await next.click();
     await page.waitForTimeout(250);
@@ -885,6 +887,376 @@ async function loadingChecks(page, vp, index) {
   await page.goto("about:blank");
 }
 
+/** Al-Fatihah's recordings (content/al-fatihah.json): by ayah, by ayah and reciter, their hosts. */
+async function fatihahRecitations() {
+  const content = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "al-fatihah.json"), "utf8"));
+  const recitations = (ayah) => content.ayat.find((a) => a.ayah === ayah)?.recitation ?? [];
+  return {
+    recitations,
+    urlOf: (ayah, reciter) => recitations(ayah).find((r) => r.reciter === reciter)?.url ?? null,
+    hosts: new Set(content.ayat.flatMap((a) => a.recitation.map((r) => new URL(r.url).host))),
+  };
+}
+
+/** A recording's address, short: "Alafasy_128kbps/001001.mp3". */
+const recordingName = (url) => new URL(url).pathname.split("/").slice(-2).join("/");
+
+/**
+ * Every request `pg` makes to the reciters' hosts from now on, as it is made (`seen`, in order),
+ * and how the CDN answered it (`answered`: "ok" for a 200 / 206 received in full). Observed only:
+ * nothing is intercepted, the real CDN answers. `stop()` ends the watch.
+ */
+function watchRecitations(pg, hosts) {
+  const hostOf = (url) => {
+    try {
+      return new URL(url).host;
+    } catch {
+      return "";
+    }
+  };
+  const seen = [];
+  const answered = new Map();
+  const onRequest = (req) => {
+    if (hosts.has(hostOf(req.url()))) seen.push(req.url());
+  };
+  const onFinished = async (req) => {
+    if (!hosts.has(hostOf(req.url()))) return;
+    const status = (await req.response().catch(() => null))?.status();
+    answered.set(req.url(), status === 200 || status === 206 ? "ok" : `HTTP ${status ?? "?"}`);
+  };
+  const onFailed = (req) => {
+    if (hosts.has(hostOf(req.url()))) answered.set(req.url(), `failed (${req.failure()?.errorText ?? "?"})`);
+  };
+  pg.on("request", onRequest);
+  pg.on("requestfinished", onFinished);
+  pg.on("requestfailed", onFailed);
+  return {
+    seen,
+    answered,
+    requested: (url) => seen.filter((u) => u === url).length,
+    list: () => seen.map((u) => `${recordingName(u)} → ${answered.get(u) ?? "no answer yet"}`).join("\n    ") || "(none)",
+    stop: () => {
+      pg.off("request", onRequest);
+      pg.off("requestfinished", onFinished);
+      pg.off("requestfailed", onFailed);
+    },
+  };
+}
+
+/** Waits (in Node: the CSP refuses waitForFunction's eval) until `fn` is true; false after `ms`. */
+async function until(pg, fn, ms) {
+  for (const end = Date.now() + ms; Date.now() < end; ) {
+    if (await fn()) return true;
+    await pg.waitForTimeout(100);
+  }
+  return false;
+}
+
+/**
+ * From the recap, paused: on to Al-Fatihah 2 as the lesson goes there by itself (the hand-off) —
+ * "Berikutnya ›" to the "next" step, the line that announces the next ayah, and once more to the
+ * end of the ayah. Two clicks and no more: a third could land on ayah 2's own "Berikutnya ›" and
+ * move that lesson off its first step. Returns once the lesson runs there.
+ */
+async function handOffToAyah2(pg) {
+  const stage = pg.locator('[data-autoplay="stage"]');
+  const forward = pg.locator('[data-autoplay="next"]');
+  await forward.click();
+  if (!(await until(pg, async () => (await stage.getAttribute("data-step")) === "next", 5_000))) {
+    throw new Error(`the lesson did not reach its last step ("next") from the recap (on "${await stage.getAttribute("data-step")}")`);
+  }
+  await forward.click();
+  await pg.waitForURL(/\/quran\/al-fatihah\/2(\?.*)?$/, { timeout: 15_000 });
+  await pg.locator('[data-autoplay="panel"]').first().waitFor({ state: "visible", timeout: 15_000 });
+}
+
+/**
+ * The imam's recitation is fetched EARLY, so it is ready when its step comes (operator 2026-10-11:
+ * "how to reduce the loading time? upgrade VM?" … "do all three"; src/lib/autoplay/warm.ts), on
+ * Al-Fatihah 1, phone, its remembered place cleared first. The narration is answered in the
+ * browser, so the opening line lasts as long as the manifest says (23 s); the requests to the
+ * reciters' host are only OBSERVED (watchRecitations) and the real CDN answers them — steps 1–4
+ * need no answer from it, only the asking:
+ *   1. a page view alone asks the reciters' host for no recording: none IDLE_SETTLE_MS after the
+ *      page has loaded, when its idle preload (the first narration line) has run;
+ *   2. after "Mulai", this ayah's recording by the reciter chosen (the stage's data-reciter →
+ *      content/al-fatihah.json) is requested while the narrator still speaks the opening line:
+ *      the stage is on its first step, not yet on the imam's ("recite");
+ *   3. another reciter chosen in "Pengaturan" with the lesson paused: his recording is requested
+ *      at once (nothing plays it: until 2026-10-11 a recording was fetched only by its play);
+ *   4. the NEXT ayah's recording — its default reciter's, what that page plays first — is
+ *      requested on no step before the recap, and is at the recap; and through all of it no other
+ *      recording was requested (no other ayah's, no other reciter's);
+ *   5. what the imam's step then plays is what was fetched ahead. First, with the network free,
+ *      "↺ Ulangi" on the imam's step must light a mushaf word (aria-current: he is sounding) —
+ *      that this runner can play the recordings at all (it needs the CDN and the MP3 decoder);
+ *      where it cannot, 5 is logged as not checked, never failed for the runner's sake. Then,
+ *      for the recording of step 3 (fetched ahead and by nothing else), with every further request
+ *      to the reciters' host HELD BACK RECITE_HOLD_MS (a route that waits, then continues to the
+ *      CDN): "↺ Ulangi" lights a word again, with no "Memuat bacaan imam…" status on the way — a
+ *      play that needed the network would show it after 0.6 s and sound 6 s late;
+ *   6. OBSERVED, never failed: after the hand-off to ayah 2 (the same hold on), whether the new
+ *      page's player asked the network for the recording again, or took what the spare element
+ *      fetched at the recap from the browser's media cache (Playwright switches the HTTP cache off
+ *      while a route is on, so only the media engine's own sharing shows here).
+ * Fails the job on 1–5. (The hand-off's own early fetch, and Save-Data: handOffWarmupCheck.)
+ */
+const IDLE_SETTLE_MS = 4000;
+const RECITE_HOLD_MS = 6000;
+async function warmupChecks(page, vp, index) {
+  const { recitations, urlOf, hosts } = await fatihahRecitations();
+  const isRecitation = (url) => hosts.has(url.host);
+  const name = recordingName;
+  const { seen, answered, requested, list, stop } = watchRecitations(page, hosts);
+  // Steps 5 and 6: later requests to the reciters' hosts wait, then go on to the CDN.
+  const heldBack = [];
+  const hold = async (route) => {
+    heldBack.push(route.request().url());
+    await new Promise((done) => setTimeout(done, RECITE_HOLD_MS));
+    await route.continue().catch(() => {});
+  };
+
+  const served = [];
+  const handler = narrationRoute(index, served);
+  await page.route(isNarration, handler);
+  const stage = page.locator('[data-autoplay="stage"]');
+  const middle = page.locator('[data-autoplay="middle"]');
+  const settingsToggle = page.locator('[data-autoplay="settings-toggle"]');
+  try {
+    await page.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
+    // The earlier checks left a remembered place on this ayah ("Lanjutkan dari langkah N").
+    await page.evaluate(() => localStorage.removeItem("belajar:v1:autoplay:al-fatihah/1"));
+    await page.reload({ waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    const reciter = await stage.getAttribute("data-reciter");
+    const mine = reciter ? urlOf(1, reciter) : null;
+    const next = reciter ? urlOf(2, reciter) : null;
+    if (!mine || !next) throw new Error(`${vp}: early fetch — the stage's data-reciter (${reciter}) names no recording of Al-Fatihah 1 and 2 in content/al-fatihah.json`);
+
+    // 1. A page view alone: nothing of the imam's.
+    await page.waitForTimeout(IDLE_SETTLE_MS);
+    if (seen.length) throw new Error(`${vp}: a page view alone asked the reciters' host for ${seen.map(name).join(", ")} — before "Mulai"`);
+    console.log(`  early fetch 1/6: no request to ${[...hosts].join(", ")} on a page view (two loads, ${IDLE_SETTLE_MS} ms idle)`);
+
+    // 2. "Mulai": this ayah's recording, while the narrator speaks the opening line.
+    const t0 = Date.now();
+    await Promise.all([
+      page.waitForRequest((r) => r.url() === mine, { timeout: 10_000 }).catch(() => {
+        throw new Error(`${vp}: 10 s after "Mulai" the chosen reciter's recording (${name(mine)}) was not requested (requests: ${seen.map(name).join(", ") || "none"})`);
+      }),
+      page.locator('[data-autoplay="start"]').click(),
+    ]);
+    const askedAfter = Date.now() - t0;
+    const early = await stage.getAttribute("data-step");
+    if (early !== null && early !== "intro") throw new Error(`${vp}: ${name(mine)} was requested only on step "${early}", not while the opening line plays`);
+    await settleScroll(page);
+    const opening = await stage.getAttribute("data-step");
+    const line = await page.locator('[data-autoplay="caption"]').first().getAttribute("data-line").catch(() => null);
+    if (opening !== "intro") throw new Error(`${vp}: the lesson is on step "${opening}" right after "Mulai" (expected its first step, "intro")`);
+    console.log(`  early fetch 2/6: ${name(mine)} requested ${askedAfter} ms after "Mulai", the lesson on step "${opening}" (line ${line ?? "—"}), before the imam's step`);
+
+    // 5, first half. The imam's step with the network free: can this runner play him at all?
+    await toStep(page, vp, "recite");
+    const cue = await narratedLine(KARAOKE.slug, "al-fatihah:1:recite");
+    const cueMs = (cue.url && index.get(cue.url)) || 10_000;
+    const lit = stage.locator('button[aria-current="true"]');
+    const status = page.locator('[data-autoplay="loading"][data-kind="recitation"]');
+    const replay = page.locator('[data-autoplay="replay"]');
+    /** "↺ Ulangi" on the imam's step, then: ms until a word lights (null: none in time), and
+     *  whether "Memuat bacaan imam…" showed first (`stopOnStatus`: that ends the watch, the play
+     *  is waiting for the network). Leaves the lesson paused on that step. */
+    const imamTurn = async (stopOnStatus) => {
+      const t = Date.now();
+      await replay.click();
+      let sounded = null;
+      let waited = false;
+      while (sounded === null && !(waited && stopOnStatus) && Date.now() - t < cueMs + 15_000) {
+        if ((await lit.count()) > 0) sounded = Date.now() - t;
+        else if ((await status.count()) > 0) waited = true;
+        if (sounded === null) await page.waitForTimeout(100);
+      }
+      const took = Date.now() - t;
+      if ((await middle.getAttribute("data-mode").catch(() => null)) === "pause") await middle.click();
+      await page.waitForTimeout(150);
+      const at = await stage.getAttribute("data-step");
+      if (at !== "recite") throw new Error(`${vp}: early fetch — the lesson left the imam's step for "${at}" while it was watched`);
+      return { sounded, waited, took };
+    };
+    const base = await imamTurn(false);
+    const codec = await page.evaluate(() => document.createElement("audio").canPlayType("audio/mpeg"));
+    const canSound = base.sounded !== null;
+    console.log(
+      canSound
+        ? `  early fetch 5/6, network free: the imam sounded ${base.sounded} ms after "↺ Ulangi" (his cue line is ${cueMs} ms)${base.waited ? ", after a loading status" : ""}`
+        : `  early fetch 5/6: the imam does not sound on this runner (no word lit in ${base.took} ms; ${name(mine)} → ${answered.get(mine) ?? "no answer"}; canPlayType("audio/mpeg") = "${codec}")`,
+    );
+
+    // 3. Another reciter, chosen with the lesson paused on the imam's step: fetched when chosen.
+    let file = mine;
+    const others = recitations(1).map((r) => r.url).filter((u) => u !== mine);
+    const settings = page.locator('[data-autoplay="settings"]');
+    const select = settings.locator("select");
+    await settingsToggle.click();
+    await settings.waitFor({ state: "visible", timeout: 5_000 });
+    if (others.length && (await select.count()) > 0) {
+      const other = await select.evaluate((el) => [...el.options].findIndex((o) => !o.selected));
+      const [req] = await Promise.all([
+        page.waitForRequest((r) => others.includes(r.url()), { timeout: 5_000 }).catch(() => {
+          throw new Error(`${vp}: 5 s after another reciter was chosen, his recording was not requested (requests: ${seen.map(name).join(", ")})`);
+        }),
+        select.selectOption({ index: other }),
+      ]);
+      const chosen = await stage.getAttribute("data-reciter");
+      file = urlOf(1, chosen);
+      const mode = await middle.getAttribute("data-mode");
+      const problems = [];
+      if (chosen === reciter) problems.push("the stage's data-reciter did not change");
+      if (req.url() !== file) problems.push(`requested ${name(req.url())}, not the chosen reciter's ${file ? name(file) : "(none)"}`);
+      if (mode === "pause") problems.push("the lesson is playing (the check wants it paused, so that no play asked for the file)");
+      if (problems.length) throw new Error(`${vp}: another reciter chosen — ${problems.join("; ")}`);
+      console.log(`  early fetch 3/6: ${chosen} chosen with the lesson paused → ${name(file)} requested at once`);
+    } else {
+      console.log("  early fetch 3/6 skipped: this ayah has one reciter");
+    }
+    await settingsToggle.click();
+    await settings.waitFor({ state: "hidden", timeout: 5_000 });
+
+    // 5, second half. That recording was fetched ahead, by nothing else: with the network held
+    // back, the imam's step must play it all the same.
+    await until(page, () => answered.has(file), 20_000);
+    if (!canSound || answered.get(file) !== "ok") {
+      const why = canSound ? `the reciters' host did not answer ${name(file)} in full (${answered.get(file) ?? "no answer in 20 s"})` : "the imam does not sound here (above)";
+      console.log(`  early fetch 5/6 not checked on this runner: ${why}`);
+    } else {
+      await page.route(isRecitation, hold);
+      try {
+        const held = await imamTurn(true);
+        const again = heldBack.filter((u) => u === file).length;
+        if (held.waited || held.sounded === null) {
+          await page.screenshot({ path: `shots/${vp}-autoplay-early-fetch-FAILED.png`, fullPage: true }).catch(() => {});
+          throw new Error(
+            `${vp}: the imam's step did not play what was fetched ahead — ${held.waited ? "“Memuat bacaan imam…” showed" : "no word lit"} within ${held.took} ms of "↺ Ulangi", ` +
+              `the network held back ${RECITE_HOLD_MS} ms (${again} new request(s) for ${name(file)}; with the network free he sounded after ${base.sounded} ms)`,
+          );
+        }
+        console.log(
+          `  early fetch 5/6: with the reciters' host held back ${RECITE_HOLD_MS} ms, the imam sounded ${held.sounded} ms after "↺ Ulangi", ` +
+            `no loading status, ${again} new request(s) for ${name(file)} — played from what was fetched ahead`,
+        );
+      } finally {
+        await page.unroute(isRecitation, hold);
+      }
+    }
+
+    // 4. The next ayah's recording: on no step before the recap, then at the recap.
+    await toStep(page, vp, "recap", (at) => {
+      if (requested(next)) throw new Error(`${vp}: the next ayah's recording (${name(next)}) was requested on step "${at}", before the recap`);
+    });
+    if (!(await until(page, () => requested(next) > 0, 5_000))) {
+      throw new Error(`${vp}: 5 s into the recap the next ayah's recording (${name(next)}) was not requested (requests: ${seen.map(name).join(", ")})`);
+    }
+    const strangers = [...new Set(seen)].filter((u) => u !== mine && u !== file && u !== next);
+    if (strangers.length) throw new Error(`${vp}: recordings nobody will play were requested: ${strangers.map(name).join(", ")}`);
+    console.log(`  early fetch 4/6: ${name(next)} (the next page's first recording) requested at the recap and on no step before it; nothing else fetched (${[...new Set(seen)].map(name).join(", ")})`);
+
+    // 6. Observed only: the hand-off to ayah 2 — a new request for the recording, or the cache?
+    try {
+      await until(page, () => answered.has(next), 15_000);
+      if (answered.get(next) !== "ok") throw new Error(`the reciters' host did not answer ${name(next)} in full (${answered.get(next) ?? "no answer in 15 s"})`);
+      const before = heldBack.length;
+      await page.route(isRecitation, hold);
+      try {
+        // The lesson there starts by itself, and its player fetches ahead at once.
+        await handOffToAyah2(page);
+        await page.waitForTimeout(2500);
+        const again = heldBack.slice(before).filter((u) => u === next).length;
+        console.log(
+          `  early fetch 6/6 (observed, not asserted): after the hand-off to ayah 2 its player made ${again} new request(s) for ${name(next)}` +
+            (again ? " — it did not reuse what the spare element fetched (HTTP cache off under a route); its own early fetch at the start does the work" : " — it took what the spare element fetched at the recap from the media cache"),
+        );
+      } finally {
+        await page.unroute(isRecitation, hold);
+      }
+    } catch (err) {
+      console.log(`  early fetch 6/6 not observed: ${String(err?.message ?? err).split("\n")[0]}`);
+    }
+  } catch (err) {
+    console.error(`✗ ${vp}: the early fetch of the imam's recitation check on Al-Fatihah 1 failed`);
+    console.error(`  requests to the reciters' host (${seen.length}):\n    ${list()}`);
+    throw err;
+  } finally {
+    stop();
+    await page.unroute(isNarration, handler);
+  }
+  await page.goto("about:blank");
+}
+
+/**
+ * The hand-off's own early fetch, and Save-Data (operator 2026-10-11; src/lib/autoplay/warm.ts), on
+ * a page of its own whose navigator.connection says saveData (an init script: only what the lesson
+ * reads changes, the browser itself keeps loading as usual). Al-Fatihah 1 → 2, phone:
+ *   1. with Save-Data, the next ayah's recording is NOT fetched ahead at the recap (2.5 s there),
+ *      while this ayah's own was requested after "Mulai" all the same (the lesson plays it anyway);
+ *   2. the lesson then goes on to ayah 2 by itself, and that page's player requests its recording
+ *      at once, the lesson still on its first step — with no click on that page (so no unlock()
+ *      play), nothing in any cache (step 1), and the imam's step not reached: the early fetch
+ *      alone. This is every ayah after the first of a sitting, where the wait was.
+ * Requests are observed only (the real CDN answers; neither step needs its answer). Fails the job
+ * otherwise.
+ */
+async function handOffWarmupCheck(page, vp, index) {
+  const { urlOf, hosts } = await fatihahRecitations();
+  const name = recordingName;
+  const saver = await page.context().newPage();
+  await saver.addInitScript(() => {
+    Object.defineProperty(navigator, "connection", { configurable: true, get: () => ({ saveData: true, effectiveType: "4g" }) });
+  });
+  const { seen, requested, list, stop } = watchRecitations(saver, hosts);
+  const served = [];
+  const handler = narrationRoute(index, served);
+  await saver.route(isNarration, handler);
+  const stage = saver.locator('[data-autoplay="stage"]');
+  try {
+    await saver.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
+    await saver.evaluate(() => document.fonts.ready);
+    if ((await saver.evaluate(() => navigator.connection?.saveData)) !== true) throw new Error(`${vp}: hand-off check — navigator.connection.saveData could not be set on this page`);
+    const reciter = await stage.getAttribute("data-reciter");
+    const mine = reciter ? urlOf(1, reciter) : null;
+    const next = reciter ? urlOf(2, reciter) : null;
+    if (!mine || !next) throw new Error(`${vp}: hand-off check — the stage's data-reciter (${reciter}) names no recording of Al-Fatihah 1 and 2`);
+
+    // 1. Save-Data: this ayah's recording, yes; the next ayah's, not ahead.
+    await saver.locator('[data-autoplay="start"]').click();
+    await settleScroll(saver);
+    await toStep(saver, vp, "recap");
+    await saver.waitForTimeout(2500);
+    const problems = [];
+    if (!requested(mine)) problems.push(`this ayah's recording (${name(mine)}) was never requested`);
+    if (requested(next)) problems.push(`the next ayah's recording (${name(next)}) was fetched ahead at the recap`);
+    if (problems.length) throw new Error(`${vp}: with Save-Data — ${problems.join("; ")}`);
+    console.log(`  hand-off 1/2: with Save-Data, ${name(mine)} requested after "Mulai", ${name(next)} not fetched ahead at the recap`);
+
+    // 2. The hand-off: the new page's player fetches its recording at once, by itself.
+    await handOffToAyah2(saver);
+    const t0 = Date.now();
+    if (!(await until(saver, () => requested(next) > 0, 5_000))) {
+      throw new Error(`${vp}: 5 s after the lesson went on to ayah 2 by itself, its recording (${name(next)}) was not requested (requests: ${seen.map(name).join(", ")})`);
+    }
+    const at = await stage.getAttribute("data-step");
+    if (at !== "intro") throw new Error(`${vp}: after the hand-off ${name(next)} was requested only on step "${at}", not while the first line plays`);
+    console.log(`  hand-off 2/2: on ayah 2, reached by the lesson itself, ${name(next)} requested within ${Date.now() - t0} ms of its start, the lesson on step "${at}" — no click, no cache, before the imam's step`);
+  } catch (err) {
+    await saver.screenshot({ path: `shots/${vp}-autoplay-hand-off-FAILED.png`, fullPage: true }).catch(() => {});
+    console.error(`✗ ${vp}: the hand-off's early fetch check (Al-Fatihah 1 → 2, Save-Data) failed`);
+    console.error(`  requests to the reciters' host (${seen.length}):\n    ${list()}`);
+    throw err;
+  } finally {
+    stop();
+    await saver.unroute(isNarration, handler).catch(() => {});
+    await saver.close().catch(() => {});
+  }
+}
+
 /**
  * The composition animation on the stage's word-card slot (operator 2026-10-10, narration rule 14),
  * on the real page: the harakat primer (frame 2: fathah on its dotted circle, بَ "b + a"), then
@@ -1331,6 +1703,8 @@ try {
     await autoplayShots(page, vp);
     await karaokeShots(page, vp, narration);
     if (vp === "phone") await loadingChecks(page, vp, narration);
+    if (vp === "phone") await warmupChecks(page, vp, narration);
+    if (vp === "phone") await handOffWarmupCheck(page, vp, narration);
     await composeShots(page, vp, narration);
     await quizVoiceCheck(page, vp, narration);
     // Every composition frame fits at every text size (largest: all seven ayat; the others: ayah 1).
