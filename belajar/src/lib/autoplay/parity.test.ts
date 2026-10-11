@@ -17,9 +17,10 @@ import {
 } from "@/components/exercises/guide";
 
 import { SURAHS } from "../content";
-import { conceptsIntroducedIn, getLexeme, LIBRARY } from "../library";
-import { loadCheckInput } from "./checks";
-import { availableExercises, timedWords } from "./exercises";
+import { conceptsIntroducedIn, LIBRARY } from "../library";
+import { quizAyah } from "../quiz-content";
+import { loadCheckInput, quizAyahOf } from "./checks";
+import { availableExercises, questionNumbers } from "./exercises";
 import { buildAutoplaySequence, introducedConcepts } from "./sequence";
 import { ID_TEXTS } from "./texts";
 import { EXERCISE_KEYS, GUIDE_PARTS, PARTS_OF } from "./types";
@@ -29,7 +30,6 @@ const raw = loadCheckInput((rel) => {
   const path = join(CONTENT, rel);
   return existsSync(path) ? readFileSync(path, "utf8") : null;
 }).input;
-const rawLexicon = new Map(raw.lexicon.map((l) => [l.id, l]));
 
 describe("autoplay parity", () => {
   it("names the exercises and their controls exactly as components/exercises/guide.ts", () => {
@@ -44,7 +44,7 @@ describe("autoplay parity", () => {
           ayahCount: s.ayat.length,
           ayah: a,
           introduced: conceptsIntroducedIn(a.loc),
-          exercises: availableExercises({ words: a.words, timed: timedWords(a), lexeme: getLexeme }),
+          exercises: availableExercises(quizAyah(s.slug, a.ayah)),
           texts: ID_TEXTS,
         });
         for (const step of seq.steps) {
@@ -78,7 +78,8 @@ describe("autoplay parity", () => {
           ayahCount: s.ayat.length,
           ayah: a,
           introduced: conceptsIntroducedIn(a.loc),
-          exercises: availableExercises({ words: a.words, timed: timedWords(a), lexeme: getLexeme }),
+          exercises: availableExercises(quizAyah(s.slug, a.ayah)),
+          questions: questionNumbers(quizAyah(s.slug, a.ayah)),
           texts: ID_TEXTS,
         });
         const script = buildAutoplaySequence({
@@ -87,10 +88,13 @@ describe("autoplay parity", () => {
           ayahCount: r.ayat.length,
           ayah: ra,
           introduced: introducedConcepts(raw.concepts, ra.loc),
-          exercises: availableExercises({ words: ra.words, timed: timedWords(ra), lexeme: (id) => rawLexicon.get(id) }),
+          exercises: availableExercises(quizAyahOf(raw.quiz?.[r.slug], ra.ayah)),
+          questions: questionNumbers(quizAyahOf(raw.quiz?.[r.slug], ra.ayah)),
           texts: ID_TEXTS,
         });
         expect(JSON.stringify(script)).toBe(JSON.stringify(app));
+        // The page's validated quiz and the raw file the check script reads ask the same questions.
+        expect(JSON.stringify(quizAyahOf(raw.quiz?.[r.slug], ra.ayah).exercises)).toBe(JSON.stringify(quizAyah(s.slug, a.ayah).exercises));
       }
     }
   });

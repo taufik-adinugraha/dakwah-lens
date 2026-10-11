@@ -12,18 +12,26 @@ import { TapWord } from "@/components/exercises/TapWord";
 import { WaznFactory } from "@/components/exercises/WaznFactory";
 import { WhyHarakat } from "@/components/exercises/WhyHarakat";
 import { ForestGlow } from "@/components/ForestGlow";
+import { MainSiteBridge } from "@/components/MainSiteBridge";
+import { ShareButton } from "@/components/ShareButton";
 import { LessonStage, WordListenButton } from "@/components/lesson/LessonStage";
 import { MaterialsDisclosure } from "@/components/lesson/MaterialsDisclosure";
 import { WordCard } from "@/components/lesson/WordCard";
 import { ConceptCard } from "@/components/library/ConceptCard";
+import { MixedText } from "@/components/library/MixedText";
 import { SourceList } from "@/components/library/SourceList";
 import { StructureSection } from "@/components/library/StructureSection";
 import { FactCard } from "@/components/surah/FactCard";
 import { Link } from "@/i18n/navigation";
+import { composeFor } from "@/lib/compose-content";
 import { getAyah, getSurah, SURAH_INDEX, SURAHS } from "@/lib/content";
 import { orderRecitations } from "@/lib/autoplay";
 import { conceptsIntroducedIn, getConcept, getLexeme, LIBRARY } from "@/lib/library";
+import { quizAyah } from "@/lib/quiz-content";
+import { planOf } from "@/lib/quiz-plan";
 import { ayahHref, surahHref } from "@/lib/routes";
+import { lessonCard, translationExcerpt } from "@/lib/og/text";
+import { alternatesFor, lessonShareable, pageUrl, shareMetadata } from "@/lib/share";
 
 export const dynamicParams = false;
 
@@ -45,24 +53,47 @@ const RECITER_LABEL: Record<string, string> = {
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/quran/[surah]/[ayah]">): Promise<Metadata> {
-  const { surah: slug, ayah } = await params;
+  const { locale, surah: slug, ayah } = await params;
   const s = getSurah(slug);
-  return { title: s ? `${s.name_id} ${ayah}` : "—" };
+  const a = s ? getAyah(s, Number(ayah)) : undefined;
+  if (!s || !a) return { title: "—" };
+  const path = ayahHref(s.slug, a.ayah);
+  const meta: Metadata = { title: `${s.name_id} ${ayah}`, alternates: alternatesFor(locale, path) };
+  // Share preview (og:*, twitter:*) only for a lesson that may be shared: the one check,
+  // lib/share.ts lessonShareable. Its card is this folder's og/route.ts.
+  if (!lessonShareable(s.slug)) return meta;
+  const to = await getTranslations({ locale, namespace: "Og" });
+  const card = lessonCard(to, s, a);
+  return {
+    ...meta,
+    ...shareMetadata({
+      locale,
+      path,
+      title: `${card.title} · ${card.eyebrow}`,
+      description: to("lesson_description", { translation: translationExcerpt(a.translation.text) }),
+      imageAlt: to("lesson_image_alt", { surah: s.name_id, n: a.ayah }),
+    }),
+  };
 }
 
 /**
  * One row of "Pelajari lebih dalam": a collapsed 48px disclosure. No per-row
  * "Dibantu AI" tag: the operator removed those chips (2026-10-10) because each
  * record shows its Rujukan; the page footer carries the AI-assisted label.
+ * Narrow side padding while "Materi lengkap" (a container) is narrower than
+ * 18rem, i.e. from Besar up on a phone: the row sits in that card and holds
+ * cards of its own, and at Sangat besar the nested paddings left a 192px column,
+ * too narrow for words like "mencantumkannya" or "menerangkannya" (CI
+ * 2026-10-11, rule 15: no word is cut, so the column must hold it).
  */
 function Deeper({ title, children }: { title: string; children: ReactNode }) {
   return (
     <details className="rounded-2xl border border-hairline bg-white">
-      <summary className="disclosure-row px-5 py-2 text-ink">
+      <summary className="disclosure-row px-3 py-2 text-ink @2xs:px-5">
         <span>{title}</span>
         <ChevronDown aria-hidden className="chev h-5 w-5 shrink-0 text-forest" />
       </summary>
-      <div className="px-5 pt-1 pb-5">{children}</div>
+      <div className="px-3 pt-1 pb-5 @2xs:px-5">{children}</div>
     </details>
   );
 }
@@ -77,7 +108,8 @@ function Deeper({ title, children }: { title: string; children: ReactNode }) {
  * secondary control behind "⚙ Pengaturan") → everything else folded into
  * ONE collapsed row, "Materi lengkap ayat ini": word by word, the
  * standalone practice, "learn more" (structure, concepts, tafsir, facts),
- * content unchanged → the ayah navigation, once, at the bottom. The forest
+ * content unchanged, and last two links to the main site → the ayah
+ * navigation, once, at the bottom → one "Bagikan" under it. The forest
  * glow sits behind the page. Nothing gives positional instructions ("di
  * atas"); every citation (Rujukan) stays reachable inside the row.
  */
@@ -95,6 +127,8 @@ export default async function AyahPage({
   const tw = await getTranslations("Word");
   const tc = await getTranslations("Concept");
   const tp = await getTranslations("Player");
+  const tm = await getTranslations("MainSite");
+  const tshare = await getTranslations("Share");
 
   const playerWords = a.words.map((w, i) => ({
     index: i + 1,
@@ -114,7 +148,16 @@ export default async function AyahPage({
     label: RECITER_LABEL[r.reciter] ?? r.reciter,
   }));
   const timed = new Set(sources.flatMap((r) => r.segments.map(([w]) => w)));
-  const pool = s.ayat.flatMap((x) => x.words);
+  // The ayah's quiz (content/quiz, pipeline/build_quiz.py): every exercise asks only what the
+  // lesson has taught by this ayah, with wrong options from the ayat already studied (operator
+  // 2026-10-10: "make sure all questions in quiz already have lesson beforehand"). The stage and
+  // the standalone copies below ask the same questions.
+  const quiz = quizAyah(s.slug, a.ayah);
+  const tapPlan = planOf(quiz, "tap-word");
+  const whyPlan = planOf(quiz, "why-harakat");
+  const sortPlan = planOf(quiz, "sort-case");
+  const rolePlan = planOf(quiz, "label-role");
+  const waznPlan = planOf(quiz, "wazn-factory");
   const facts = s.facts.filter((f) => f.locations.includes(a.loc));
   const prev = getAyah(s, n - 1);
   const next = getAyah(s, n + 1);
@@ -127,13 +170,31 @@ export default async function AyahPage({
   // time: captions in the page's locale, narration audio from
   // content/narration/ when it has been rendered.
   const seq = stageSequence(s, a, locale);
+  // The word compositions and the harakat primer of this ayah (content/compose,
+  // operator 2026-10-10, narration rule 14): the bytes the stage's animation
+  // shows, by word number; the sequence above carries only their lines.
+  const composeFile = composeFor(s.slug);
+  const compose = composeFile
+    ? {
+        marks: composeFile.marks,
+        primer: composeFile.primer && composeFile.primer.ayah === a.ayah ? composeFile.primer : null,
+        words: Object.fromEntries(
+          a.words.flatMap((w, i) => (composeFile.words[w.loc] ? [[i + 1, composeFile.words[w.loc]]] : [])),
+        ),
+      }
+    : null;
   const lexemes = [...new Set(a.words.map((w) => w.lemma_id).filter((x): x is string => !!x))].flatMap((lid) => {
     const lx = getLexeme(lid);
     return lx?.tashrif ? [lx] : [];
   });
+  // For the end card of a surah's last ayah: the surahs after it. Which of
+  // them are published (BELAJAR_SURAHS) is read per request, and this page is
+  // prerendered, so the stage asks /belajar/api/surahs in the browser and
+  // offers only a published one; at the end of Al-Fatihah, while it is the
+  // only one, the card says the next surah is coming soon (operator,
+  // 2026-10-10).
   const surahIdx = SURAHS.findIndex((x) => x.slug === s.slug);
-  const after = surahIdx >= 0 ? SURAHS[surahIdx + 1] : undefined;
-  const nextSurah = after ? { slug: after.slug, name: after.name_id } : null;
+  const following = next ? [] : SURAHS.slice(surahIdx + 1).map((x) => ({ slug: x.slug, name: x.name_id }));
   const conceptTitle = Object.fromEntries(LIBRARY.concepts.map((c) => [c.id, c.title]));
   const wordAr = Object.fromEntries(s.ayat.flatMap((x) => x.words.map((w) => [w.loc, w.ar])));
   const conceptLabels = {
@@ -146,19 +207,27 @@ export default async function AyahPage({
   };
   const hasDeeper = !!a.structure || introduced.length > 0 || !!a.tafsir || facts.length > 0;
 
+  // Through MixedText (line breaks, operator 2026-10-10): the quotes and a
+  // footnote mark stay on their word ("pembalasan.[1]”"), "orang-orang" and
+  // "Al-Qur'an" are never cut, and neither " - " nor " · " starts a line.
   const translation = (
     <figure>
-      <blockquote className="text-pretty text-base text-ink">“{a.translation.text}”</blockquote>
+      <blockquote className="text-pretty text-base text-ink">
+        <MixedText text={`“${a.translation.text}”`} />
+      </blockquote>
       {a.translation.footnotes.length > 0 && (
         <ul className="mt-3 space-y-1 text-sm text-ink-muted">
           {a.translation.footnotes.map((f) => (
-            <li key={f}>{f}</li>
+            <li key={f}>
+              <MixedText text={f} />
+            </li>
           ))}
         </ul>
       )}
       <figcaption className="mt-2 text-xs text-ink-soft">
-        {a.translation.source_label}
-        {a.translation.version ? ` · ${a.translation.version}` : ""}
+        <MixedText
+          text={`${a.translation.source_label}${a.translation.version ? ` · ${a.translation.version}` : ""}`}
+        />
       </figcaption>
     </figure>
   );
@@ -170,7 +239,7 @@ export default async function AyahPage({
         {/* 1. Where am I: one way back, one short title. */}
         <BackLink href={surahHref(s.slug)} label={s.name_id} hint={t("back_to_surah")} />
         <h1 className="mt-2 text-balance font-display text-3xl font-medium">
-          {s.name_id} · {t("ayah_of", { n: a.ayah, total: s.ayat.length })}
+          <MixedText text={`${s.name_id} · ${t("ayah_of", { n: a.ayah, total: s.ayat.length })}`} />
         </h1>
 
         {/* 2. The stage: ayah, translation and the autoplay lesson — one
@@ -183,11 +252,12 @@ export default async function AyahPage({
             title={pageTitle}
             ayah={a.ayah}
             surahName={s.name_id}
-            nextSurah={nextSurah}
+            following={following}
             words={playerWords}
             sources={sources}
             translation={translation}
-            exercise={{ words: a.words, pool, lexemes }}
+            exercise={{ words: a.words, lexemes, quiz }}
+            compose={compose && (compose.primer || Object.keys(compose.words).length) ? compose : null}
           />
         </div>
 
@@ -201,9 +271,12 @@ export default async function AyahPage({
               </h2>
               <p className="mt-1 max-w-prose text-base text-ink-muted">{t("words_intro", { n: a.words.length })}</p>
               {/* Container query, not media query: columns collapse as the text
-                  size grows (rem in @media ignores the root size). */}
+                  size grows (rem in @media ignores the root size). grid-cols-1, not
+                  the implicit auto column: a card never grows past the page to fit a
+                  long kept-together word, the word breaks in the flow instead
+                  (src/lib/lineFit.ts; CI 2026-10-11: the page scrolled sideways). */}
               <div className="@container mt-4">
-                <div className="grid gap-4 @2xl:grid-cols-2 @5xl:grid-cols-3">
+                <div className="grid grid-cols-1 gap-4 @2xl:grid-cols-2 @5xl:grid-cols-3">
                   {a.words.map((w, i) => (
                     <WordCard
                       key={w.loc}
@@ -255,11 +328,13 @@ export default async function AyahPage({
                 </h2>
                 <p className="mt-1 max-w-prose text-base text-ink-muted">{t("practice_intro")}</p>
               </div>
-              <TapWord id={`${key}/tap`} words={playerWords} source={sources[0]} />
-              <WhyHarakat id={`${key}/why`} words={a.words} pool={pool} />
-              <SortCase id={`${key}/sort`} words={a.words} />
-              <LabelRole id={`${key}/role`} words={a.words} pool={pool} />
-              <WaznFactory id={`${key}/wazn`} lexemes={lexemes} />
+              {tapPlan && <TapWord id={`${key}/tap`} words={playerWords} questions={tapPlan.questions} source={sources[0]} />}
+              {whyPlan && <WhyHarakat id={`${key}/why`} words={a.words} questions={whyPlan.questions} states={quiz.states} />}
+              {sortPlan && (
+                <SortCase id={`${key}/sort`} words={a.words} questions={sortPlan.questions} bins={sortPlan.bins} states={quiz.states} />
+              )}
+              {rolePlan && <LabelRole id={`${key}/role`} words={a.words} questions={rolePlan.questions} />}
+              {waznPlan && <WaznFactory id={`${key}/wazn`} lexemes={lexemes} questions={waznPlan.questions} labels={quiz.labels} />}
             </section>
 
             {/* Learn more, each part collapsed again */}
@@ -290,7 +365,7 @@ export default async function AyahPage({
                       title={`${t("concepts_heading")} (${introduced.length})`}
                     >
                       <div className="@container">
-                        <div className="grid gap-4 @2xl:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-4 @2xl:grid-cols-2">
                           {introduced.map((c) => (
                             <ConceptCard
                               key={c.id}
@@ -308,7 +383,9 @@ export default async function AyahPage({
 
                   {a.tafsir && (
                     <Deeper title={t("tafsir_heading")}>
-                      <p className="max-w-prose text-pretty text-base text-ink">{a.tafsir.text}</p>
+                      <p className="max-w-prose text-pretty text-base text-ink">
+                        <MixedText text={a.tafsir.text} />
+                      </p>
                       <p className="mt-4 text-sm font-semibold text-ink">
                         {tw("sources")} ({a.tafsir.sources.length})
                       </p>
@@ -323,7 +400,7 @@ export default async function AyahPage({
                       title={`${t("facts_heading")} (${facts.length})`}
                     >
                       <div className="@container">
-                        <div className="grid gap-4 @2xl:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-4 @2xl:grid-cols-2">
                           {facts.map((f) => (
                             <FactCard
                               key={f.id}
@@ -342,6 +419,19 @@ export default async function AyahPage({
                 </div>
               </section>
             )}
+
+            {/* More on the main site (operator, 2026-10-10): two labelled
+                links, inside this collapsed row, so the stage stays the one
+                focus of the page. */}
+            <section className="mt-12" aria-labelledby="main-site">
+              <h2 id="main-site" className="font-display text-2xl font-medium">
+                {tm("materials_heading")}
+              </h2>
+              <div className="mt-2 space-y-1">
+                <MainSiteBridge id="ayah_kitab" />
+                <MainSiteBridge id="ayah_khutbah" />
+              </div>
+            </section>
           </MaterialsDisclosure>
         </div>
 
@@ -367,6 +457,18 @@ export default async function AyahPage({
               </Link>
             ) : null}
           </nav>
+        ) : null}
+
+        {/* 5. One "Bagikan", under the ayah navigation, outside the stage
+            (operator, 2026-10-10: one focused stage; sharing comes after
+            the lesson). Only for a lesson that may be shared: the one check,
+            lib/share.ts lessonShareable. */}
+        {lessonShareable(s.slug) ? (
+          <ShareButton
+            className="mt-8"
+            url={pageUrl(locale, ayahHref(s.slug, a.ayah))}
+            text={tshare("lesson_text", { surah: s.name_id, n: a.ayah })}
+          />
         ) : null}
       </div>
     </div>

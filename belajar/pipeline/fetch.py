@@ -23,6 +23,7 @@ import urllib.request
 import zipfile
 from pathlib import Path
 
+import terms as TM
 from common import PIPELINE, SURAHS, load_sources, load_tanzil, mp3_duration_ms, save_sources, sha256_bytes
 
 UA = "dakwah-lens-belajar-pipeline/0.1 (+https://dakwah-lens.id)"
@@ -244,6 +245,46 @@ def fetch_fawaz_muslim(meta: dict, refresh: bool, repin: set[str]) -> None:
         f["retrieved"] = f.get("retrieved") or TODAY
 
 
+def fetch_shamela_istilah(meta: dict, refresh: bool, repin: set[str]) -> None:
+    """Konsep grammar terms in Arabic script (operator 2026-10-10; terms.py): the Shamela pages whose
+    text attests each spelling in authored/library.terms.json. The HTML carries per-request tokens,
+    so the EXTRACTED page text (terms.extract_shamela) is what is cached and pinned (`text_sha256`).
+    A page is added by listing its "book/id" key in `pages`; the print page and page title are
+    recorded on the first run and must not change after that (a moved page breaks its citations)."""
+    key = "shamela_istilah"
+    d = PIPELINE / meta["cache_dir"]
+    for pk, pm in meta["pages"].items():
+        book, page = pk.split("/")
+        if str(pm.get("book")) != book or book not in meta["books"]:
+            problems.append(f"[{key}] {pk}: book {pm.get('book')!r} is not a listed kitab")
+            continue
+        url = meta["url_pattern"].replace("{BOOK}", book).replace("{PAGE}", page)
+        if pm.get("url") != url:
+            problems.append(f"[{key}] {pk}: pinned url {pm.get('url')} != {url}")
+        p = d / book / f"{page}.txt"
+        if p.exists() and not refresh:
+            b = p.read_bytes()
+        else:
+            print(f"  GET {url}")
+            try:
+                e = TM.extract_shamela(http_get(url).decode("utf-8"))
+            except ValueError as err:
+                problems.append(f"[{key}] {pk}: {err}")
+                continue
+            for field_name in ("print_page", "title"):
+                if pm.get(field_name) not in (None, e[field_name]) and key not in repin:
+                    problems.append(f"[{key}] {pk}: {field_name} changed upstream: {pm[field_name]!r} -> {e[field_name]!r}")
+                else:
+                    pm[field_name] = e[field_name]
+            b = e["text"].encode("utf-8")
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_bytes(b)
+            time.sleep(0.3)  # one page at a time, politely
+        pin(pm, pk, b, key, repin, "text_sha256")
+        pm["chars"] = len(b.decode("utf-8"))
+        pm["retrieved"] = pm.get("retrieved") or TODAY
+
+
 def fetch_everyayah(input_id: str, meta: dict, refresh: bool, repin: set[str]) -> None:
     d = PIPELINE / meta["cache_dir"]
     for spec in SURAHS:
@@ -285,6 +326,7 @@ def main() -> int:
         fetch_quranenc_waris(I["quranenc_indonesian_affairs_waris"], I["quranenc_indonesian_affairs"],
                              I["tanzil_uthmani"], args.refresh, repin)
         print("fawazahmed0_muslim_sections"); fetch_fawaz_muslim(I["fawazahmed0_muslim_sections"], args.refresh, repin)
+    print("shamela_istilah"); fetch_shamela_istilah(I["shamela_istilah"], args.refresh, repin)
     if not args.skip_audio:
         for k in ("everyayah_husary_muallim", "everyayah_alafasy"):
             print(k); fetch_everyayah(k, I[k], args.refresh, repin)

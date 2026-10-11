@@ -3,8 +3,11 @@
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 
+import type { QuizExerciseOf } from "@/content/quiz-schema";
 import type { Word } from "@/content/schema";
 import { seededShuffle } from "@/lib/shuffle";
+
+import { MixedText } from "../library/MixedText";
 
 import {
   Counter,
@@ -23,8 +26,10 @@ import { choiceGuidePart, guideMarker, guideTarget, type ExerciseGuide } from ".
 
 type Props = {
   id: string;
+  /** The ayah's words. */
   words: Word[];
-  pool: Word[];
+  /** The questions (content/quiz): the word's role and wrong roles, answer first. */
+  questions: QuizExerciseOf<"label-role">["questions"];
   /** Guided mode (see ExerciseShell.tsx). */
   guided?: ExerciseGuide;
   /** Hide the heading and instruction (the stage shows its own). */
@@ -33,8 +38,9 @@ type Props = {
 
 /**
  * "Tebak peran kata" — choose each word's role in the ayah (tarkib). Options
- * are role labels from the same ayah and the rest of the surah; the
- * explanation after each answer is the word's own "why".
+ * are role labels of the ayat studied so far that share no term with the
+ * answer (content/quiz: never two correct options), each term with its
+ * Arabic; the explanation after each answer is the word's own "why".
  */
 export function LabelRole(props: Props) {
   const { round, restart } = useRestart();
@@ -44,7 +50,7 @@ export function LabelRole(props: Props) {
 function LabelRoleRound({
   id,
   words,
-  pool,
+  questions,
   guided,
   compact,
   restarted,
@@ -53,18 +59,22 @@ function LabelRoleRound({
   const t = useTranslations("Exercise");
   const items = useMemo(
     () =>
-      words
-        .filter((w): w is Word & { role: string } => !!w.role)
-        .map((w) => {
-          const others = [...new Set(pool.map((p) => p.role).filter((r): r is string => !!r && r !== w.role))];
-          const options = seededShuffle([w.role, ...seededShuffle(others, w.loc).slice(0, 3)], `${w.loc}/r`);
-          return { word: w, options };
-        }),
-    [words, pool],
+      questions.flatMap((q) => {
+        const word = words[q.word - 1];
+        if (!word) return [];
+        const text = new Map(q.options.map((o) => [o.from, o.text]));
+        return [{ q, word, text, options: seededShuffle(q.options.map((o) => o.from), `${word.loc}/r`) }];
+      }),
+    [words, questions],
   );
-  const q = useChoiceQuiz(id, items.map((it) => it.word.role), guided);
+  const q = useChoiceQuiz(
+    id,
+    items.map((it) => it.word.loc),
+    guided,
+    items.map((it) => it.q.n),
+  );
   const focusRef = useStepFocus(q.i, !!guided);
-  const empty = items.length < 2;
+  const empty = items.length === 0;
   const part = empty
     ? null
     : choiceGuidePart({ finished: q.finished, settled: q.resolved !== null, canReveal: q.canReveal });
@@ -98,7 +108,7 @@ function LabelRoleRound({
                 {w.ar}
               </span>
               <span className="text-sm text-ink-muted">
-                {w.translit} · {w.gloss}
+                <MixedText text={`${w.translit} · ${w.gloss}`} />
               </span>
             </div>
           </div>
@@ -106,14 +116,17 @@ function LabelRoleRound({
           {/* Container query: two columns only while there is room at the
               learner's chosen text size. */}
           <div className="@container mt-4">
-            <ul data-guide={mark("options")} className="grid gap-3 @xl:grid-cols-2">
+            <ul data-guide={mark("options")} className="grid grid-cols-1 gap-3 @xl:grid-cols-2">
               {item.options.map((opt) => (
                 <li key={opt}>
                   <OptionButton
                     state={optionState(opt, q.answer, q.tried, q.resolved)}
                     onClick={() => q.choose(opt)}
+                    optionKey={opt}
                   >
-                    <span>{opt}</span>
+                    <span>
+                      <MixedText text={item.text.get(opt) ?? ""} />
+                    </span>
                   </OptionButton>
                 </li>
               ))}
@@ -127,7 +140,13 @@ function LabelRoleRound({
           >
             {q.resolved !== null && (
               <>
-                <strong className="font-semibold">{w.role}</strong>. {w.why}
+                {/* The full stop inside the role's text: a line may break right
+                    after a kept-together word, so "(jar-majrur)" ⏎ "." could
+                    happen with the stop outside (line breaks, 2026-10-10). */}
+                <strong className="font-semibold">
+                  <MixedText text={`${item.text.get(w.loc) ?? w.role}.`} />
+                </strong>{" "}
+                <MixedText text={item.q.why} />
               </>
             )}
           </Feedback>

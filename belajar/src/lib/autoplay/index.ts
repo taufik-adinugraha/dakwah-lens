@@ -3,9 +3,10 @@
  * types.ts for the step-id contract and machine.ts for the runtime rules.
  *
  * Typical use (lesson page → client runner):
- *   const exercises = availableExercises({ words: a.words, timed: timedWords(a), lexeme: getLexeme });
+ *   const quiz = quizAyah(slug, a.ayah);   // content/quiz (src/lib/quiz-content.ts)
  *   const seq = buildAutoplaySequence({ slug, surahName, ayahCount, ayah: a,
- *     introduced: conceptsIntroducedIn(a.loc), exercises, texts: ID_TEXTS, narration, shared });
+ *     introduced: conceptsIntroducedIn(a.loc), exercises: availableExercises(quiz),
+ *     questions: questionNumbers(quiz), texts: ID_TEXTS, narration, shared });
  *   // client:
  *   const [state, dispatch] = useReducer((s, e) => reduceAutoplay(seq, s, e), seq,
  *     (q) => createAutoplayState(q, { pace }));

@@ -51,10 +51,16 @@ export type GuideInfo = {
 
 /** The optional `guided` prop of every exercise. */
 export type ExerciseGuide = {
-  /** Every answer: true when right. A tap the exercise ignores (a settled
-   *  question, an option already tried, a group tapped with no word chosen)
-   *  is not an answer; neither is "Tunjukkan jawaban". */
-  onAnswer?: (correct: boolean) => void;
+  /** Every answer: true when right, with the number of the question answered
+   *  (content/quiz `n`: a right answer's explanation is that question's). A
+   *  tap the exercise ignores (a settled question, an option already tried, a
+   *  group tapped with no word chosen) is not an answer; neither is
+   *  "Tunjukkan jawaban". */
+  onAnswer?: (correct: boolean, question?: number) => void;
+  /** "Tunjukkan jawaban" on question `question` (every exercise): the lesson
+   *  says "Ini jawabannya." and the explanation of that answer. Called from
+   *  the click handler, before the exercise reports its next control. */
+  onReveal?: (question?: number) => void;
   /** The exercise is finished (or has nothing to ask on this ayah). */
   onDone?: () => void;
   /** The control the learner should use next has changed. */

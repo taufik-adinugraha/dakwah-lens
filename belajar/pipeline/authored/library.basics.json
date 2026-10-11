@@ -1,0 +1,139 @@
+{
+  "_comment": "Dasar membaca (foundation pages before the grammar) for the Konsep library. Operator 2026-10-10: \"expect also people dont understand what is kasrah, dhommah, and fathah\" — the Harakat page is the first item of /konsep and every first use of a harakah term on a Konsep page links here (pipeline/terms.py, src/lib/terms.ts). Prose uses the same [[…]] markup as library.concepts.json; build_library.py strips it into the plain fields and keeps the marked text. NO Arabic is typed here: each sign's example letter is a letter q-ref into the pinned Tanzil text (\"q:1:1:1#1\" = the first letter of بِسْمِ with its mark), and the sign shown alone on its dotted circle is cut from that letter by the app (src/lib/terms.ts signMarks; vitest checks the cut is exactly the named mark). Sound values and the doubled letter of tasydid follow the Indonesian transliteration standard the module already uses (SKB 158/1987); the names of the signs are the kitab's (Ajurrumiyyah, Qathr an-Nada); the shapes are plain didactic description. Status draft (pipeline state; there is no human review step, plan L11).",
+  "basics": [
+    {
+      "id": "harakat",
+      "title": "[[Harakat]]: tanda bunyi a, i, u",
+      "summary": "Bunyi pendek a, i, dan u dalam tulisan Arab ditandai dengan [[harakat]], yaitu tanda kecil di atas atau di bawah huruf.",
+      "explanation": [
+        "Tiga [[harakat]] yang paling sering muncul adalah [[fathah]], [[kasrah]], dan [[dhammah]]. [[Fathah]] berupa garis kecil miring di atas huruf, dibaca a. [[Kasrah]] adalah garis yang sama di bawah huruf, dibaca i. [[Dhammah]] bentuknya seperti huruf wawu kecil di atas huruf, dibaca u. Huruf pertama Al-Fatihah, [[ba'|q:1:1:1#1]] pada [[bismi|q:1:1:1]], memakai [[kasrah]]: dibaca bi.",
+        "[[Sukun]] berupa bulatan kecil di atas huruf: hurufnya mati, dibaca tanpa vokal, seperti [[sin|q:1:1:1#2]] sesudah [[ba'|q:1:1:1#1]] pada [[bismi|q:1:1:1]]. Mushaf yang dipakai di sini (Mushaf Madinah) menulis tanda [[sukun]] pada huruf mati yang dibaca jelas, dan sengaja tidak menuliskannya pada huruf mati yang tidak dibaca jelas. Menurut panitia Mushaf Madinah (dinukil ath-Thayyar), bila huruf sesudahnya [[bertasydid]], huruf mati itu dilebur sepenuhnya ke dalamnya ([[idgham]]), seperti nun pada [[yakun|q:112:4:2]] sebelum [[lahū|q:112:4:3]], yang terbaca yakul-lahū; bila tidak, ia dilebur sebagian atau dibaca samar ([[ikhfa']]), seperti nun pada [[min|q:113:2:1]] sebelum [[syarri|q:113:2:2]]. Hurufnya tetap mati; cara membacanya diajarkan dalam ilmu tajwid.",
+        "[[Tanwin]] adalah [[harakat]] yang ditulis dua kali di akhir kata, dibaca dengan tambahan bunyi n: dua [[fathah]] dibaca -an, dua [[kasrah]] -in, dan dua [[dhammah]] -un. Ibnu Hisyam menjelaskan, [[tanwin]] adalah nun mati tambahan di akhir kata yang diucapkan tetapi tidak ditulis sebagai huruf.",
+        "[[Tasydid]] bentuknya seperti huruf w kecil di atas huruf: hurufnya dibaca dobel, seperti b pada [[rabbi|q:1:2:3]]. [[Harakat]] huruf itu tetap ditulis bersamanya, di atas atau di bawahnya.",
+        "Di akhir kata, [[harakat]] sering berubah mengikuti peran kata dalam kalimat. Perubahan itu disebut [[i'rab]], dan [[harakat]] akhir itulah tandanya (lihat: [[I'rab]] dan tandanya)."
+      ],
+      "signs": [
+        {
+          "term": "fathah",
+          "example": "q:1:5:2#1",
+          "marks": [
+            "fathah"
+          ],
+          "sound": "a",
+          "place": "di atas huruf",
+          "shape": "garis kecil miring",
+          "reading": "n + a"
+        },
+        {
+          "term": "kasrah",
+          "example": "q:1:1:1#1",
+          "marks": [
+            "kasrah"
+          ],
+          "sound": "i",
+          "place": "di bawah huruf",
+          "shape": "garis kecil miring",
+          "reading": "b + i"
+        },
+        {
+          "term": "dhammah",
+          "example": "q:1:2:1#5",
+          "marks": [
+            "dhammah"
+          ],
+          "sound": "u",
+          "place": "di atas huruf",
+          "shape": "seperti huruf wawu kecil",
+          "reading": "d + u"
+        },
+        {
+          "term": "sukun",
+          "example": "q:1:1:1#2",
+          "marks": [
+            "sukun"
+          ],
+          "sound": "mati, tanpa vokal",
+          "place": "di atas huruf",
+          "shape": "bulatan kecil",
+          "reading": "s"
+        },
+        {
+          "term": "tanwin",
+          "example": "q:112:1:4#3",
+          "marks": [
+            "dhammatain"
+          ],
+          "sound": "-un",
+          "place": "di akhir kata, di atas huruf",
+          "shape": "dua dhammah",
+          "reading": "d + un"
+        },
+        {
+          "term": "tanwin",
+          "example": "q:112:4:4#3",
+          "marks": [
+            "fathatain"
+          ],
+          "sound": "-an",
+          "place": "di akhir kata, di atas huruf",
+          "shape": "dua fathah",
+          "reading": "w + an"
+        },
+        {
+          "term": "tanwin",
+          "example": "q:113:3:3#4",
+          "marks": [
+            "kasratain"
+          ],
+          "sound": "-in",
+          "place": "di akhir kata, di bawah huruf",
+          "shape": "dua kasrah",
+          "reading": "q + in"
+        },
+        {
+          "term": "tasydid",
+          "example": "q:1:2:3#2",
+          "marks": [
+            "shaddah"
+          ],
+          "sound": "huruf dibaca dobel",
+          "place": "di atas huruf",
+          "shape": "seperti huruf w kecil",
+          "reading": "bb + i"
+        }
+      ],
+      "related": [
+        "tanda-irab",
+        "murab-mabni"
+      ],
+      "sources": [
+        {
+          "kitab": "Pedoman Transliterasi Arab-Latin, SKB Menteri Agama dan Menteri Pendidikan dan Kebudayaan No. 158/1987 dan 0543b/U/1987",
+          "ref": "vokal tunggal: fathah = a, kasrah = i, dammah = u; syaddah (tasydid) dilambangkan dengan huruf ganda",
+          "url": "https://lib.ui.ac.id/detail?id=20501763&lokasi=lokal"
+        },
+        {
+          "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+          "ref": "hlm. 6–8, bab Ma'rifat 'Alamat al-I'rab: dhammah, fathah, kasrah dan sukun sebagai tanda i'rab",
+          "url": "https://shamela.ws/book/11371/3"
+        },
+        {
+          "kitab": "Ibnu Hisyam al-Anshari, Syarh Qathr an-Nada wa Ball ash-Shada (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, cet. 11, 1383 H/1963 M)",
+          "ref": "hlm. 12, tanda-tanda isim: tanwin adalah nun mati tambahan di akhir kata, terucap tetapi tidak tertulis",
+          "url": "https://shamela.ws/book/6970/3"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "huruf contoh: QS 1:1 kata 1 (ba' berkasrah, sin bersukun), QS 1:5 kata 2 (nun berfathah), QS 1:2 kata 1 (dal berdhammah) dan kata 3 (ba' bertasydid), QS 112:1 kata 4 (tanwin dhammah), QS 112:4 kata 4 (tanwin fathah), QS 113:3 kata 3 (tanwin kasrah); QS 113:2 kata 1 dan QS 112:4 kata 2 (nun tanpa tanda sukun)",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "Musa'id ath-Thayyar, al-Muharrar fi 'Ulum al-Qur'an (Markaz ad-Dirasat wa al-Ma'lumat al-Qur'aniyyah, cet. 2, 1429 H/2008 M)",
+          "ref": "hlm. 295–296, Isthilahat adh-Dhabth li Mushaf al-Madinah an-Nabawiyyah (menukil panitia mushaf): huruf tanpa tanda sukun dengan huruf sesudahnya bertasydid = idgham sempurna; tanpa tasydid = idgham sebagian atau ikhfa'",
+          "url": "https://shamela.ws/book/13896/280"
+        }
+      ],
+      "status": "draft"
+    }
+  ]
+}

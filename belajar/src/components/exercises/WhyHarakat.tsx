@@ -3,10 +3,12 @@
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 
+import type { QuizExerciseOf } from "@/content/quiz-schema";
 import type { Word } from "@/content/schema";
 import { seededShuffle } from "@/lib/shuffle";
 
 import { CaseBadge } from "../lesson/CaseBadge";
+import { MixedText } from "../library/MixedText";
 import {
   Counter,
   ExerciseShell,
@@ -22,12 +24,14 @@ import {
 } from "./ExerciseShell";
 import { choiceGuidePart, guideMarker, guideTarget, type ExerciseGuide } from "./guide";
 
-const GRADED = new Set(["marfu", "manshub", "majrur", "mabni"]);
-
 type Props = {
   id: string;
+  /** The ayah's words (the question shows its word as the mushaf writes it). */
   words: Word[];
-  pool: Word[];
+  /** The questions (content/quiz): each word's reason and the wrong ones, answer first. */
+  questions: QuizExerciseOf<"why-harakat">["questions"];
+  /** Each case state as its label, "majrur (مَجْرُور)" (content/quiz `states`). */
+  states: Record<string, string>;
   /** Guided mode (see ExerciseShell.tsx). */
   guided?: ExerciseGuide;
   /** Hide the heading and instruction (the stage shows its own). */
@@ -35,10 +39,11 @@ type Props = {
 };
 
 /**
- * "Kenapa harakat ini?" — choose the reason a word ends the way it does.
- * Options are EXPLANATION sentences (the correct word's reason + reasons of
- * words in a different case); the Qur'anic word is always shown as it is in
- * the mushaf, never altered (plan §4.7).
+ * "Kenapa harakat ini?" — choose the reason a word ends the way it does. Options are EXPLANATION
+ * sentences: the word's reason and the reasons of other words, all from the ayat studied so far
+ * and each of another cause (content/quiz, pipeline/quiz.py: operator 2026-10-10, test only what
+ * was taught); every grammar term in them shows its Arabic. The Qur'anic word is always shown as
+ * it is in the mushaf, never altered (plan §4.7).
  */
 export function WhyHarakat(props: Props) {
   const { round, restart } = useRestart();
@@ -48,7 +53,8 @@ export function WhyHarakat(props: Props) {
 function WhyHarakatRound({
   id,
   words,
-  pool,
+  questions,
+  states,
   guided,
   compact,
   restarted,
@@ -57,22 +63,20 @@ function WhyHarakatRound({
   const t = useTranslations("Exercise");
   const items = useMemo(
     () =>
-      words
-        .filter((w) => GRADED.has(w.case.state))
-        .map((w) => {
-          const distractors = seededShuffle(
-            [
-              ...new Set(
-                pool.filter((p) => p.case.state !== w.case.state && p.why !== w.why).map((p) => p.why),
-              ),
-            ],
-            w.loc,
-          ).slice(0, 2);
-          return { word: w, options: seededShuffle([w.why, ...distractors], `${w.loc}/o`) };
-        }),
-    [words, pool],
+      questions.flatMap((q) => {
+        const word = words[q.word - 1];
+        if (!word) return [];
+        const text = new Map(q.options.map((o) => [o.from, o.text]));
+        return [{ q, word, text, options: seededShuffle(q.options.map((o) => o.from), `${word.loc}/o`) }];
+      }),
+    [words, questions],
   );
-  const q = useChoiceQuiz(id, items.map((it) => it.word.why), guided);
+  const q = useChoiceQuiz(
+    id,
+    items.map((it) => it.word.loc),
+    guided,
+    items.map((it) => it.q.n),
+  );
   const focusRef = useStepFocus(q.i, !!guided);
   const empty = items.length === 0;
   const part = empty
@@ -108,22 +112,27 @@ function WhyHarakatRound({
                 {w.ar}
               </span>
               <span className="text-sm text-ink-muted">
-                {w.translit} · {w.gloss}
+                <MixedText text={`${w.translit} · ${w.gloss}`} />
               </span>
-              {w.case.sign !== "—" && (
-                <span className="text-sm text-ink-muted">{t("why_sign", { sign: w.case.sign })}</span>
+              {item.q.sign && (
+                <span className="text-sm text-ink-muted">
+                  <MixedText text={t("why_sign", { sign: item.q.sign })} />
+                </span>
               )}
             </div>
           </div>
 
-          <ul data-guide={mark("options")} className="mt-4 grid gap-3">
+          <ul data-guide={mark("options")} className="mt-4 grid grid-cols-1 gap-3">
             {item.options.map((opt) => (
               <li key={opt}>
                 <OptionButton
                   state={optionState(opt, q.answer, q.tried, q.resolved)}
                   onClick={() => q.choose(opt)}
+                  optionKey={opt}
                 >
-                  <span>{opt}</span>
+                  <span>
+                    <MixedText text={item.text.get(opt) ?? ""} />
+                  </span>
                 </OptionButton>
               </li>
             ))}
@@ -136,7 +145,8 @@ function WhyHarakatRound({
           >
             {q.resolved !== null && (
               <>
-                <CaseBadge state={w.case.state} sign={w.case.sign} /> {w.why}
+                <CaseBadge state={w.case.state} sign={item.q.sign ?? undefined} label={states[w.case.state]} />{" "}
+                <MixedText text={item.q.why} />
               </>
             )}
           </Feedback>

@@ -1,0 +1,422 @@
+{
+  "_comment": "Words explained by their parts on the Konsep pages (operator 2026-10-10, narration rule 14: \"bismi has 2 components, harf jar and ismi; ismi in its root is read dhommah, but because of harf jar it's read kasrah; provide visualization bi + ismu → bismi\"). A calm STATIC diagram (src/components/library/WordParts.tsx): the tiles, their transliteration and role, each changed letter on dotted circles (a vowel, or the alif of عَلَىٰ written ya'), the letters a word does not write faded, then the steps. The lesson stage's composition animation is built separately (branch feat/belajar-word-composition) and can replace this component. NO Arabic is typed: every tile is a q-ref, either a QAC 0.4 segment of the word itself or the part's bentuk dasar elsewhere in the Qur'an: a Tanzil token (ٱسْمُ marfu' at QS 55:78; QAC tags it NOM, the lemma of بِسْمِ's noun) or, for an attached pronoun, another word's QAC segment (the هُمْ of رَزَقْنَٰهُمْ, QS 2:3: an attached pronoun's base is an attached attestation, never the standalone هُمْ). Each tile's `translit` must name its bytes (terms.surface_matches). build_library.py checks that the tiles, with `changes` (a letter replaced by the word's letter: the same consonant with another vowel, or the alif maqsurah of عَلَىٰ written ya') and `drops` (letters the word does not write: an alif, and the lam of al- after its hamzah washal, as in لِلَّهِ) applied, spell the word's Tanzil bytes exactly; src/lib/terms.test.ts repeats the spelling check in CI and WordParts labels each change by where it is (the end of a part, its first letter). Say \"bentuk dasar\" for a base form, never \"akar\" (akar = the root letters; the build refuses it). Steps use the same [[…]] markup as the concepts and keep to what the cited kitab say. Status draft (plan L11).",
+  "parts": [
+    {
+      "loc": "1:1:1",
+      "concepts": [
+        "huruf-jar",
+        "kalimah-isim-fiil-huruf",
+        "tanda-irab"
+      ],
+      "tiles": [
+        {
+          "q": "q:1:1:1/1",
+          "translit": "bi-",
+          "label": "[[huruf jar]]",
+          "gloss": "dengan"
+        },
+        {
+          "q": "q:55:78:2",
+          "translit": "ismu",
+          "label": "[[isim]], bentuk dasar",
+          "gloss": "nama"
+        }
+      ],
+      "changes": [
+        {
+          "tile": 2,
+          "letter": -1,
+          "to": 3
+        }
+      ],
+      "drops": [
+        {
+          "tile": 2,
+          "letter": 1
+        }
+      ],
+      "steps": [
+        "[[bi-|q:1:1:1/1]] adalah [[huruf jar]] yang artinya “dengan”, dan [[ismu|q:55:78:2]] adalah [[isim]] yang artinya “nama”.",
+        "Bentuk dasar [[isim]] ini, yaitu bentuknya ketika [[marfu']], berakhir [[dhammah]]: ismu, seperti di QS 55:78. Karena didahului [[huruf jar]], akhirnya menjadi [[kasrah]]: ismi. [[Isim]] yang berubah seperti ini disebut [[majrur]] (Ibnu Ajurrum; Darwisy).",
+        "Alif di awal ismu adalah [[hamzah washal]]: ia hanya dibaca bila bacaan dimulai dari kata itu, jadi sesudah [[bi-|q:1:1:1/1]] ia tidak dibaca (Darwisy; as-Samin).",
+        "Di basmalah alif itu juga tidak ditulis: menurut as-Samin al-Halabi, alifnya dibuang dalam tulisan khusus bila ism disandarkan kepada lafaz Allah, karena sangat sering dipakai; bila disandarkan kepada kata lain, alif itu tetap ditulis. Jadilah [[bismi|q:1:1:1]]."
+      ],
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(1:1:1) dua segmen: P PREFIX bi+ dan N STEM LEM:{som GEN; (55:78:2) N STEM LEM:{som NOM",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=1"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "QS 55:78 kata 2 (bentuk dasar ismu, marfu') dan QS 1:1 kata 1",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+          "ref": "hlm. 6–7, bab Ma'rifat 'Alamat al-I'rab: dhammah tanda rafa', kasrah tanda khafdh",
+          "url": "https://shamela.ws/book/11371/3"
+        },
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 1, hlm. 8 (al-Lughah, ism: salah satu dari sepuluh isim yang huruf awalnya sukun; hamzah ditambahkan bila bacaan dimulai darinya, dan tidak diperlukan di tengah sambungan)",
+          "url": "https://shamela.ws/book/2163/5"
+        },
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 1, hlm. 9 (al-I'rab: bismi jar-majrur dan dua kemungkinan muta'allaq-nya)",
+          "url": "https://tafsir.app/iraab-aldarweesh/1/1"
+        },
+        {
+          "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath, Damaskus: Dar al-Qalam)",
+          "ref": "jil. 1, hlm. 21 (hamzah washal ism: tetap di awal, gugur di tengah sambungan; alifnya tidak ditulis khusus bila disandarkan kepada lafaz Allah, karena sering dipakai; bila disandarkan kepada selainnya, alif tetap ditulis)",
+          "url": "https://shamela.ws/book/9057/10"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "loc": "1:2:2",
+      "concepts": [
+        "huruf-jar"
+      ],
+      "tiles": [
+        {
+          "q": "q:1:2:2/1",
+          "translit": "li-",
+          "label": "[[huruf jar]]",
+          "gloss": "bagi"
+        },
+        {
+          "q": "q:112:1:3",
+          "translit": "Allāhu",
+          "label": "[[isim]], bentuk dasar",
+          "gloss": "Allah"
+        }
+      ],
+      "changes": [
+        {
+          "tile": 2,
+          "letter": -1,
+          "to": 3
+        }
+      ],
+      "drops": [
+        {
+          "tile": 2,
+          "letter": 1
+        },
+        {
+          "tile": 2,
+          "letter": 2
+        }
+      ],
+      "steps": [
+        "[[li-|q:1:2:2/1]] adalah [[huruf jar]] yang artinya “bagi”, dan [[Allāhu|q:112:1:3]] adalah lafaz Allah dalam bentuk dasarnya, [[marfu']], seperti pada [[huwa Allāhu aḥad|q:112:1:2-4]].",
+        "Karena didahului [[huruf jar]], akhirnya menjadi [[kasrah]]: Allāhi. [[Isim]] yang berubah seperti ini disebut [[majrur]] (Ibnu Ajurrum); Darwisy menyebut [[lillāhi|q:1:2:2]] [[jar-majrur]].",
+        "Dalam tulisan, alif al- tidak ditulis sesudah lam [[jar]] (Ibnu Qutaibah). Tinggal tiga lam berurutan, maka satu lam lagi tidak ditulis: al-'Ukbari menyebut [[lillāhi|q:1:2:2]] ditulis dengan dua lam agar tiga lam tidak berkumpul."
+      ],
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(1:2:2) dua segmen: P PREFIX l:P+ dan PN STEM LEM:{ll~ah GEN; (112:1:3) PN STEM LEM:{ll~ah NOM",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=2"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "QS 112:1 kata 3 (Allāhu, bentuk dasarnya, marfu') dan QS 1:2 kata 2",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+          "ref": "hlm. 7, bab Ma'rifat 'Alamat al-I'rab: kasrah tanda khafdh; hlm. 23, bab al-Makhfudhat: makhfudh bil-harf dan daftar hurufnya (termasuk lam)",
+          "url": "https://shamela.ws/book/11371/31"
+        },
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 1, hlm. 14 (al-I'rab: lillāhi jar-majrur, bergantung pada khabar yang dibuang)",
+          "url": "https://shamela.ws/book/2163/11"
+        },
+        {
+          "kitab": "Ibnu Qutaibah, Adab al-Katib (tahqiq Muhammad ad-Dali, Beirut: Mu'assasat ar-Risalah)",
+          "ref": "hlm. 218: alif al- dibuang dalam tulisan bila lam jar masuk padanya (lil-qaumi, lil-ghulami, lin-nasi), tetapi tetap ditulis sesudah ba'; hlm. 244: kata yang demikian ditulis dengan dua lam dan satu dibuang, karena berat bila tiga lam berkumpul",
+          "url": "https://shamela.ws/book/26349/214"
+        },
+        {
+          "kitab": "Abu al-Baqa' al-'Ukbari, al-Lubab fi 'Ilal al-Bina' wa al-I'rab (tahqiq 'Abd al-Ilah an-Nabhan, Damaskus: Dar al-Fikr)",
+          "ref": "jil. 2, hlm. 490: lam yang masuk pada lam ta'rif yang diikuti lam lagi, seperti lillah, ditulis dengan dua lam agar tiga lam tidak berkumpul",
+          "url": "https://shamela.ws/book/6986/961"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "loc": "1:7:4",
+      "concepts": [
+        "huruf-jar",
+        "dhamir"
+      ],
+      "tiles": [
+        {
+          "q": "q:2:5:2",
+          "translit": "‘alā",
+          "label": "[[huruf jar]], bentuk dasar",
+          "gloss": "atas, kepada"
+        },
+        {
+          "q": "q:2:3:7/3",
+          "translit": "-hum",
+          "label": "[[dhamir]] [[muttashil]], bentuk dasar",
+          "gloss": "mereka"
+        }
+      ],
+      "changes": [
+        {
+          "tile": 1,
+          "letter": -1,
+          "to": 3
+        },
+        {
+          "tile": 2,
+          "letter": 1,
+          "to": 4
+        }
+      ],
+      "drops": [],
+      "steps": [
+        "[[‘alā|q:2:5:2]] adalah [[huruf jar]] yang artinya “atas, kepada”, dan [[-hum|q:2:3:7/3]] adalah [[dhamir]] [[muttashil]] (kata ganti yang menempel) yang artinya “mereka”, seperti pada [[razaqnāhum|q:2:3:7]].",
+        "Bila bersambung dengan kata ganti, alif di akhir ‘alā berubah menjadi [[ya'|q:1:7:4#3]] mati (Ibnu Jinni; Ibnu Khalawaih), maka terbaca ‘alai-, bukan ‘alā.",
+        "Menurut as-Samin, asal bunyi ha' kata ganti ini u: -hum. Orang Arab selain penduduk Hijaz membacanya i bila didahului ya' mati atau [[kasrah]]; di sini ia didahului [[ya'|q:1:7:4#3]] mati, maka terbaca -him: [[‘alaihim|q:1:7:4]].",
+        "Al-Jadwal mengurainya begini: ha' itulah kata gantinya, [[mabni]] di atas [[kasrah]] dalam kedudukan [[jar]], sedangkan mim adalah huruf tanda jamak laki-laki. Jadi [[kasrah]] pada ha' bukan tanda [[i'rab]]."
+      ],
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(1:7:4) dua segmen: P STEM LEM:EalaY` dan PRON SUFFIX 3MP; (2:5:2) P LEM:EalaY`; (2:3:7) segmen ketiga PRON SUFFIX 3MP",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=7"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "QS 2:5 kata 2 (‘alā, bentuk dasarnya), QS 2:3 kata 7 (razaqnāhum: kata ganti -hum yang menempel) dan QS 1:7 kata 4",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "Ibnu Jinni, Sirr Shina'at al-I'rab (Beirut: Dar al-Kutub al-'Ilmiyyah, cet. 1, 1421 H/2000 M)",
+          "ref": "jil. 2, hlm. 375: alif pada ila, ‘ala dan lada berubah menjadi ya' bila disambung dengan kata ganti (ilaika, ‘alaika, ladaika)",
+          "url": "https://shamela.ws/book/12017/682"
+        },
+        {
+          "kitab": "Ibnu Khalawaih, Laisa fi Kalam al-'Arab (tahqiq Ahmad 'Abd al-Ghafur 'Aththar, Makkah, cet. 2, 1399 H/1979 M)",
+          "ref": "hlm. 338: lada, ‘ala dan ila beralif bersama isim zhahir dan berya' bersama kata ganti (‘alaika, ladaika, ilaika)",
+          "url": "https://shamela.ws/book/13239/304"
+        },
+        {
+          "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath, Damaskus: Dar al-Qalam)",
+          "ref": "jil. 1, hlm. 70 (QS 1:7: asal harakat ha' kata ganti adalah dhammah; bila didahului ya' mati atau kasrah, selain penduduk Hijaz membacanya kasrah, seperti ‘alaihim)",
+          "url": "https://shamela.ws/book/9057/63"
+        },
+        {
+          "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+          "ref": "jil. 1, hlm. 35 (QS 1:7, bagian al-I'rab: ‘alā huruf jar, ha' dhamir muttashil mabni di atas kasrah dalam kedudukan jar, mim huruf tanda jamak laki-laki)",
+          "url": "https://shamela.ws/book/22916/20"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "loc": "112:4:3",
+      "concepts": [
+        "huruf-jar",
+        "dhamir"
+      ],
+      "tiles": [
+        {
+          "q": "q:1:2:2/1",
+          "translit": "li-",
+          "label": "[[huruf jar]], bentuk dasar",
+          "gloss": "bagi"
+        },
+        {
+          "q": "q:112:4:3/2",
+          "translit": "-hū",
+          "label": "[[dhamir]] [[muttashil]]",
+          "gloss": "Dia"
+        }
+      ],
+      "changes": [
+        {
+          "tile": 1,
+          "letter": 1,
+          "to": 1
+        }
+      ],
+      "drops": [],
+      "steps": [
+        "[[li-|q:1:2:2/1]] adalah [[huruf jar]] yang artinya “bagi”, dan [[-hū|q:112:4:3/2]] adalah [[dhamir]] [[muttashil]] yang artinya “Dia”.",
+        "Menurut Ibnu Hisyam, lam [[jar]] dibaca [[kasrah]] di depan [[isim]] yang bukan kata ganti, tetapi [[fathah]] di depan semua kata ganti, kecuali ya' yang artinya “aku”. Karena itu di sini ia dibaca la-: [[lahū|q:112:4:3]].",
+        "Tanda [[tasydid]] pada lam itu datang dari kata sebelumnya: nun mati pada [[yakun|q:112:4:2]] dilebur ke dalam lam ini ([[idgham]]), maka terbaca yakul-lahū. Mushaf Madinah menandainya dengan nun tanpa tanda [[sukun]] dan lam yang [[bertasydid]] (dinukil ath-Thayyar).",
+        "Kata ganti itu [[mabni]]; frasa [[lahū|q:112:4:3]] dalam kedudukan [[jar]] dan bergantung pada [[kufuwan|q:112:4:4]] (Darwisy; al-Mujtaba; as-Samin)."
+      ],
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(112:4:3) dua segmen: P PREFIX l:P+ dan PRON STEM 3MS; (1:2:2) segmen pertama P PREFIX l:P+",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=112&verse=4"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "QS 1:2 kata 2 (lam jar berkasrah, bentuk dasarnya), QS 112:4 kata 2 dan 3",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "Ibnu Hisyam, Mughni al-Labib 'an Kutub al-A'arib (tahqiq Mazin al-Mubarak dan Muhammad 'Ali Hamdullah; Dar al-Fikr, Damaskus, cet. 6, 1985)",
+          "ref": "hlm. 274, huruf lam: lam jar berkasrah bersama setiap isim zhahir dan berfathah bersama setiap kata ganti (lana, lakum, lahum), kecuali bersama ya' mutakallim",
+          "url": "https://shamela.ws/book/6972/262"
+        },
+        {
+          "kitab": "Musa'id ath-Thayyar, al-Muharrar fi 'Ulum al-Qur'an (Markaz ad-Dirasat wa al-Ma'lumat al-Qur'aniyyah, cet. 2, 1429 H/2008 M)",
+          "ref": "hlm. 295, Isthilahat adh-Dhabth li Mushaf al-Madinah an-Nabawiyyah (menukil panitia mushaf): huruf tanpa tanda sukun dengan huruf sesudahnya bertasydid menandai idgham sempurna",
+          "url": "https://shamela.ws/book/13896/280"
+        },
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 10, hlm. 617 (al-I'rab QS 112:4: kufuwan khabar yakun; lahū bergantung padanya)",
+          "url": "https://shamela.ws/book/2163/5775"
+        },
+        {
+          "kitab": "Ahmad al-Kharrath, al-Mujtaba min Musykil I'rab al-Qur'an (Madinah: Mujamma' al-Malik Fahd, 1426 H)",
+          "ref": "jil. 4, hlm. 1491 (QS 112:4: aḥad isim yakun; lahū terkait khabar kufuwan)",
+          "url": "https://shamela.ws/book/9617/6022"
+        },
+        {
+          "kitab": "as-Samin al-Halabi, ad-Durr al-Mashun fi 'Ulum al-Kitab al-Maknun (tahqiq Ahmad Muhammad al-Kharrath, Damaskus: Dar al-Qalam)",
+          "ref": "jil. 11, hlm. 152-153 (QS 112:4: kufuwan khabar yakun, lahū terkait dengannya)",
+          "url": "https://shamela.ws/book/9057/10754"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "loc": "113:1:3",
+      "concepts": [
+        "huruf-jar"
+      ],
+      "tiles": [
+        {
+          "q": "q:113:1:3/1",
+          "translit": "bi-",
+          "label": "[[huruf jar]]",
+          "gloss": "kepada"
+        },
+        {
+          "q": "q:26:24:2",
+          "translit": "rabbu",
+          "label": "[[isim]], bentuk dasar",
+          "gloss": "Tuhan"
+        }
+      ],
+      "changes": [
+        {
+          "tile": 2,
+          "letter": -1,
+          "to": 3
+        }
+      ],
+      "drops": [],
+      "steps": [
+        "[[bi-|q:113:1:3/1]] adalah [[huruf jar]], di sini yang artinya “kepada” (berlindung kepada), dan [[rabbu|q:26:24:2]] adalah [[isim]] yang artinya “Tuhan”.",
+        "Bentuk dasar [[isim]] ini, yaitu bentuknya ketika [[marfu']], berakhir [[dhammah]]: rabbu, seperti di QS 26:24. Karena didahului [[huruf jar]], akhirnya menjadi [[kasrah]]: rabbi, dan [[isim]] itu [[majrur]] (Ibnu Ajurrum).",
+        "[[Bi-|q:113:1:3/1]] ditulis menyambung dengan kata sesudahnya, tanpa huruf yang gugur: [[birabbi|q:113:1:3]]. Frasa ini bergantung pada [[a‘ūżu|q:113:1:2]] (Darwisy; al-Jadwal)."
+      ],
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(113:1:3) dua segmen: P PREFIX bi+ dan N STEM LEM:rab~ GEN; (26:24:2) N STEM LEM:rab~ NOM",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=113&verse=1"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "QS 26:24 kata 2 (rabbu, bentuk dasarnya, marfu') dan QS 113:1 kata 3",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)",
+          "ref": "hlm. 23, bab al-Makhfudhat: makhfudh bil-harf (min, ila, ‘an, ‘ala, fi, rubba, ba', kaf, lam)",
+          "url": "https://shamela.ws/book/11371/31"
+        },
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 10, hlm. 623 (al-I'rab QS 113:1: birabbi al-falaqi bergantung pada a‘ūżu)",
+          "url": "https://shamela.ws/book/2163/5781"
+        },
+        {
+          "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+          "ref": "jil. 15, hlm. 427 (QS 113, al-I'rab: birabbi bergantung pada a‘ūżu)",
+          "url": "https://shamela.ws/book/22916/5919"
+        }
+      ],
+      "status": "draft"
+    },
+    {
+      "loc": "1:7:3",
+      "concepts": [
+        "fiil-madhi",
+        "dhamir"
+      ],
+      "tiles": [
+        {
+          "q": "q:4:69:8",
+          "translit": "an‘ama",
+          "label": "[[fi'il madhi]], bentuk dasar",
+          "gloss": "telah memberi nikmat"
+        },
+        {
+          "q": "q:1:7:3/2",
+          "translit": "-ta",
+          "label": "[[dhamir]], pelaku",
+          "gloss": "Engkau"
+        }
+      ],
+      "changes": [
+        {
+          "tile": 1,
+          "letter": -1,
+          "to": 4
+        }
+      ],
+      "drops": [],
+      "steps": [
+        "[[an‘ama|q:4:69:8]] adalah [[fi'il madhi]] yang artinya “telah memberi nikmat”, dan [[-ta|q:1:7:3/2]] adalah [[dhamir]] (kata ganti) yang artinya “Engkau”, pelakunya.",
+        "Bentuk dasar [[fi'il madhi]] [[mabni]] di atas [[fathah]]: an‘ama. Menurut Ibnu Hisyam, akhirnya menjadi [[sukun]] bila bersambung dengan kata ganti pelaku yang berharakat. Karena itu [[mim|q:1:7:3#4]] pada [[an‘amta|q:1:7:3]] mati (Darwisy; al-Jadwal)."
+      ],
+      "sources": [
+        {
+          "kitab": "Quranic Arabic Corpus 0.4",
+          "ref": "(1:7:3) dua segmen: V PERF (IV) LEM:>anoEama dan PRON SUFFIX 2MS; (4:69:8) V PERF (IV) LEM:>anoEama",
+          "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=7"
+        },
+        {
+          "kitab": "Tanzil Quran Text (Uthmani) 1.1",
+          "ref": "QS 4:69 kata 8 (an‘ama, bentuk dasarnya) dan QS 1:7 kata 3",
+          "url": "https://tanzil.net/download/"
+        },
+        {
+          "kitab": "Ibnu Hisyam al-Anshari, Syarh Qathr an-Nada wa Ball ash-Shada (tahqiq Muhammad Muhyiddin 'Abd al-Hamid, cet. 11, 1383 H/1963 M)",
+          "ref": "hlm. 27, al-Fi'l al-Madhi: tanda ta' ta'nits; mabni di atas fathah, sukun bila bersambung dhamir rafa' berharakat",
+          "url": "https://shamela.ws/book/6970/15"
+        },
+        {
+          "kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)",
+          "ref": "jil. 1, hlm. 15 (al-I'rab: an‘amta mabni di atas sukun; jumlah shilah tidak punya kedudukan i'rab)",
+          "url": "https://tafsir.app/iraab-aldarweesh/1/7"
+        },
+        {
+          "kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)",
+          "ref": "jil. 1, hlm. 35 (QS 1:7, bagian al-I'rab: an‘amta mabni di atas sukun karena bersambung dhamir rafa')",
+          "url": "https://shamela.ws/book/22916/20"
+        }
+      ],
+      "status": "draft"
+    }
+  ]
+}

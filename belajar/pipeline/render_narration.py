@@ -5,6 +5,7 @@ library only; run from belajar/pipeline.
 
     python3 render_narration.py                                  # dry run: characters and cost
     python3 render_narration.py --only al-fatihah:1: --only shared:   # dry run, narrowed
+    python3 render_narration.py --surah al-fatihah --skip-held     # dry run without the held-back lines
     python3 render_narration.py --render --i-approve-spend \
         --voice-id aK834gEOxQEtviMPgurT --voice-name "Kang Nandar" \
         --only al-fatihah:1: --only shared: --env-file /path/to/dakwah-lens/.env
@@ -13,7 +14,11 @@ Spending money needs BOTH --render and --i-approve-spend (house rule: every paid
 the operator's explicit go). The dry run never reads the API key and never opens a connection.
 A render is refused, before anything is sent, when validate_narration.py fails or when a selected
 line speaks a heavy letter + a (dh zh kh gh sh th q + a: khabar, mudhaf, 'athaf) that
-pronunciation.json has no operator-approved respelling for (validate_narration.heavy_latin).
+pronunciation.json has no operator-approved respelling for (validate_narration.heavy_latin), or an
+Arabic grammar term or letter name in Latin that the dictionary does not speak (mubtada', sukun,
+fa'il: validate_narration.latin_terms, rule 1). Dictionary terms marked "pending-ear-check" (added
+when the operator waived the pre-render review, 2026-10-10) do render, and both the dry run and the
+render list them, with the lines that say them, for the operator's ear.
 
 The request (validate_narration.request_body, fixed there, not flags): model eleven_v3,
 language_code "id" (mode A, operator 2026-10-10), stability 0.5, style 0.35, similarity_boost
@@ -122,8 +127,19 @@ def write_json(path: Path, data: dict) -> None:
 
 def blocked(rows: list[tuple[str, str, str]], lex: V.Lexicon) -> list[tuple[str, list[str]]]:
     """Lines that may not be rendered yet: they speak a heavy letter + a (validate_narration
-    heavy_latin) that pronunciation.json has no operator-approved respelling for."""
-    return [(lid, words) for _name, lid, text in rows if (words := V.heavy_latin(text, lex))]
+    heavy_latin) that pronunciation.json has no operator-approved respelling for, or an Arabic term
+    or letter name in Latin (validate_narration.latin_terms)."""
+    return [(lid, words) for _name, lid, text in rows if (words := V.held(text, lex))]
+
+
+def unheard(rows: list[tuple[str, str, str]], manifests: dict[str, dict], lex: V.Lexicon) -> list[str]:
+    """The pending-ear-check terms that the selected lines a render would send (no audio yet, not
+    held back) say: "term (speak → caption): n lines"."""
+    held_ids = {lid for lid, _ws in blocked(rows, lex)}
+    todo = {name: {lid: manifests[name]["lines"][lid] for n, lid, _t in rows if n == name and lid not in held_ids
+                   and "audio" not in manifests[name]["lines"][lid]} for name in {r[0] for r in rows}}
+    use = V.pending_terms({n: {"lines": ls} for n, ls in todo.items()}, lex)
+    return [f"{t.term} ({t.speak} → {t.display}): {len(use[t.term])} lines" for t in lex.terms if t.term in use]
 
 
 def dry_run(rows: list[tuple[str, str, str]], manifests: dict[str, dict]) -> None:
@@ -151,15 +167,18 @@ def dry_run(rows: list[tuple[str, str, str]], manifests: dict[str, dict]) -> Non
     if longest:
         print(f"longest request: {len(longest[2])} characters ({longest[1]}); eleven_v3 limit {V.TTS_MAX}")
     print(f"estimate at USD {PRICE_PER_1K}/1K characters ({MODEL}), first take only, no retakes.")
-    held = blocked(rows, V.load_lexicon())
+    lex = V.load_lexicon()
+    held = blocked(rows, lex)
     if held:
         words = sorted({V.key(w) for _lid, ws in held for w in ws})
-        print(f"refused by --render: {len(held)} selected lines speak a heavy letter + a with no approved respelling "
-              f"in pronunciation.json ({', '.join(words)})")
+        print(f"refused by --render: {len(held)} selected lines speak a heavy letter + a with no approved respelling, "
+              f"or an Arabic term in Latin, not from pronunciation.json ({', '.join(words)}); narrow --only to the others")
+    for row in unheard(rows, manifests, lex):
+        print(f"pending ear check, rendered: {row}")
     print("dry run: nothing was sent. A render needs --render --i-approve-spend --voice-id --voice-name.")
 
 
-def render(rows, manifests, lessons, args) -> int:
+def render(rows, manifests, lessons, args, library: dict | None = None) -> int:
     voice_slug = V.slugify(args.voice_name)
     voice = {"id": args.voice_id, "name": args.voice_name, "model": MODEL}
     root = Path(args.out).resolve() / "narration" / voice_slug
@@ -174,6 +193,7 @@ def render(rows, manifests, lessons, args) -> int:
                 line.pop("tokens", None)
     forms = V.Forms(lessons)
     lex = V.load_lexicon()
+    compose = V.load_compose()
     api_key = read_api_key(Path(args.env_file))
     sent = 0
     charged = 0
@@ -186,7 +206,9 @@ def render(rows, manifests, lessons, args) -> int:
         file = V.audio_name(text, args.voice_id)
         url = f"{V.MEDIA_PREFIX}{voice_slug}/{name}/{file}.mp3"
         mp3, aligned = root / name / f"{file}.mp3", root / name / f"{file}.json"
-        focus_ar = forms.word_ar.get(line["focus"]) if line.get("focus") else None
+        # A letter term's shape on screen: the focus word's, or the animation frame's (primer /
+        # compose lines), exactly as build_narration and validate_narration take it.
+        focus_ar = V.letters_for(name, lessons, forms, compose, library)(lid, line)
         if (line.get("audio") or {}).get("url") == url and "tokens" in line and not mp3.exists():
             print(f"skip   {lid} (the manifest already has this audio)")
             continue
@@ -238,6 +260,8 @@ def main() -> int:
     mode.add_argument("--render", action="store_true", help="call ElevenLabs (needs --i-approve-spend)")
     ap.add_argument("--i-approve-spend", action="store_true", help="the operator approved this spend")
     ap.add_argument("--switch-voice", action="store_true", help="drop audio made with another voice")
+    ap.add_argument("--skip-held", action="store_true",
+                    help="leave out (and list) the selected lines a render would refuse, instead of refusing the run")
     ap.add_argument("--out", default=str(DEFAULT_OUT), help=f"output root (default {DEFAULT_OUT})")
     ap.add_argument("--env-file", default=str(ENV_FILE), help=f"file with ELEVENLABS_API_KEY (default {ENV_FILE})")
     args = ap.parse_args()
@@ -246,6 +270,12 @@ def main() -> int:
     if args.surah and args.surah not in manifests:
         raise SystemExit(f"no manifest {args.surah!r}; have {sorted(manifests)}")
     rows = select(manifests, args.surah, args.only)
+    if args.skip_held:
+        out = {lid for lid, _ws in blocked(rows, V.load_lexicon())}
+        if out:
+            print(f"--skip-held: {len(out)} selected lines are held back and left out (caption-only until "
+                  f"pronunciation.json speaks their terms or they are reworded): {', '.join(sorted(out))}")
+        rows = [r for r in rows if r[1] not in out]
     if not rows:
         raise SystemExit("no lines selected")
     if not args.render:
@@ -262,10 +292,12 @@ def main() -> int:
     # line speaking one is rendered only once the dictionary has an approved respelling for it.
     held = blocked(rows, V.load_lexicon())
     if held:
-        raise SystemExit("refused, nothing was sent: these lines speak a heavy letter + a that pronunciation.json has "
-                         "no operator-approved respelling for (add it after the operator approves its sound, or "
-                         "narrow --only):\n  " + "\n  ".join(f"{lid}: {', '.join(ws)}" for lid, ws in held[:40]))
-    return render(rows, manifests, lessons, args)
+        raise SystemExit("refused, nothing was sent: these lines speak a heavy letter + a, or an Arabic term in Latin, "
+                         "that pronunciation.json does not speak (add it after the operator approves its sound, reword "
+                         "the line, or narrow --only):\n  " + "\n  ".join(f"{lid}: {', '.join(ws)}" for lid, ws in held[:40]))
+    for row in unheard(rows, manifests, V.load_lexicon()):
+        print(f"pending ear check, rendering anyway (the operator waived the pre-render review): {row}")
+    return render(rows, manifests, lessons, args, library)
 
 
 if __name__ == "__main__":

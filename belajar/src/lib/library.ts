@@ -8,13 +8,16 @@ import raw from "../../content/library.json";
 
 import {
   Library,
+  type Basic,
   type Concept,
   type Lexeme,
   type Root,
   type SurahContent,
+  type WordParts,
 } from "@/content/schema";
 
 import { IS_PUBLIC } from "./flags";
+import { lookupFrom, type Lookup } from "./terms";
 
 const parsed = Library.safeParse(raw);
 if (!parsed.success) {
@@ -30,6 +33,13 @@ const lexemeMap = new Map(LIBRARY.lexicon.map((l) => [l.id, l]));
 const rootMap = new Map(LIBRARY.roots.map((r) => [r.id, r]));
 
 export const getConcept = (id: string): Concept | undefined => conceptMap.get(id);
+/** Dasar membaca (the Harakat page): listed first on /konsep, served at /konsep/{id} too. */
+export const getBasic = (id: string): Basic | undefined => LIBRARY.basics.find((b) => b.id === id);
+/** Words explained by their parts that a concept page shows (rule 14). */
+export const partsFor = (conceptId: string): WordParts[] =>
+  LIBRARY.parts.filter((p) => p.concepts.includes(conceptId));
+/** Grammar terms in Arabic script + the Qur'anic bytes the marked prose names (src/lib/terms.ts). */
+export const TERMS: Lookup = lookupFrom(LIBRARY);
 export const getLexeme = (id: string): Lexeme | undefined => lexemeMap.get(id);
 export const getRoot = (id: string): Root | undefined => rootMap.get(id);
 
@@ -43,6 +53,8 @@ export function rootFor(letters: string[] | null): Root | undefined {
 export function libraryHasDrafts(): boolean {
   return (
     LIBRARY.concepts.some((c) => c.status === "draft") ||
+    LIBRARY.basics.some((b) => b.status === "draft") ||
+    LIBRARY.parts.some((p) => p.status === "draft") ||
     LIBRARY.lexicon.some((l) => l.status === "draft") ||
     LIBRARY.roots.some((r) => r.status === "draft")
   );
@@ -77,6 +89,8 @@ export function assertReferences(surahs: SurahContent[]): void {
     }
   }
   for (const c of LIBRARY.concepts) for (const r of c.related) if (!conceptMap.has(r)) problems.push(`concept ${c.id} → related "${r}"`);
+  for (const b of LIBRARY.basics) for (const r of b.related) if (!conceptMap.has(r)) problems.push(`basic ${b.id} → related "${r}"`);
+  for (const p of LIBRARY.parts) for (const c of p.concepts) if (!conceptMap.has(c)) problems.push(`parts ${p.loc} → concept "${c}"`);
   for (const r of LIBRARY.roots) for (const l of r.lemmas) if (!lexemeMap.has(l)) problems.push(`root ${r.id} → lemma "${l}"`);
   if (problems.length) {
     throw new Error("Broken content references:\n" + problems.slice(0, 20).join("\n"));

@@ -8,7 +8,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 const request = vi.hoisted(() => ({ arrive: (): void => undefined }));
 vi.mock("next/server", () => ({ connection: async () => request.arrive() }));
 
-import { warisSwitchOn, warisVisible } from "./features";
+import { publishedSurahs, visibleSurahs, warisSwitchOn, warisVisible } from "./features";
 
 const BELAJAR = fileURLToPath(new URL("../../", import.meta.url));
 const read = (rel: string) => readFileSync(join(BELAJAR, rel), "utf8");
@@ -57,5 +57,22 @@ describe("BELAJAR_WARIS (operator, 2026-10-10: Ilmu Waris hidden until shown aga
       .filter((f) => /\.(ts|tsx)$/.test(f) && !/\.test\.ts$/.test(f) && !inTrack.test(f) && !allowed.has(f));
     expect(files.length).toBeGreaterThan(20);
     for (const f of files) expect(read(f), f).not.toContain("warisHref");
+  });
+});
+
+describe("BELAJAR_SURAHS (operator, 2026-10-10: Al-Fatihah first, the Mu'awwidzat \"segera hadir\")", () => {
+  const savedSurahs = process.env.BELAJAR_SURAHS;
+  afterEach(() => {
+    if (savedSurahs === undefined) delete process.env.BELAJAR_SURAHS;
+    else process.env.BELAJAR_SURAHS = savedSurahs;
+  });
+
+  it("pages read it only after connection(), so a prerender never bakes the build's value", async () => {
+    delete process.env.BELAJAR_SURAHS;
+    expect(publishedSurahs()).toEqual(["al-fatihah"]);
+    request.arrive = () => {
+      process.env.BELAJAR_SURAHS = "al-fatihah,an-nas";
+    };
+    expect(await visibleSurahs()).toEqual(["al-fatihah", "an-nas"]);
   });
 });

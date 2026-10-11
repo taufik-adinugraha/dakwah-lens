@@ -1,0 +1,787 @@
+{
+ "version": 1,
+ "slug": "al-fatihah",
+ "authored": true,
+ "states": {
+  "marfu": "marfu' (مَرْفُوع)",
+  "manshub": "manshub (مَنْصُوب)",
+  "majrur": "majrur (مَجْرُور)",
+  "mabni": "mabni (مَبْنِيّ)"
+ },
+ "labels": {
+  "fi'il amr": "fi'il amr (فِعْل أَمْر)",
+  "fi'il madhi": "fi'il madhi (فِعْل مَاضٍ)",
+  "fi'il mudhari'": "fi'il mudhari' (فِعْل مُضَارِع)",
+  "isim fa'il": "isim fa'il (اِسْم فَاعِل)",
+  "isim maf'ul": "isim maf'ul (اِسْم مَفْعُول)"
+ },
+ "ayat": [
+  {
+   "ayah": 1,
+   "exercises": [
+    {
+     "key": "tap-word",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1
+      },
+      {
+       "n": 2,
+       "word": 2
+      },
+      {
+       "n": 3,
+       "word": 3
+      },
+      {
+       "n": 4,
+       "word": 4
+      }
+     ]
+    },
+    {
+     "key": "why-harakat",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena kata ism (nama) didahului huruf jar (حَرْف جَرّ) bi- (dengan).",
+       "options": [
+        {
+         "from": "1:1:1",
+         "text": "Akhirnya kasrah (كَسْرَة) karena kata ism (nama) didahului huruf jar (حَرْف جَرّ) bi- (dengan)."
+        },
+        {
+         "from": "1:1:2",
+         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata ismi."
+        },
+        {
+         "from": "1:1:3",
+         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi sifat (na't, نَعْت) bagi lafaz Allah, dan sifat mengikuti kata yang disifatinya."
+        }
+       ]
+      },
+      {
+       "n": 2,
+       "word": 2,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata ismi.",
+       "options": [
+        {
+         "from": "1:1:2",
+         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata ismi."
+        },
+        {
+         "from": "1:1:1",
+         "text": "Akhirnya kasrah (كَسْرَة) karena kata ism (nama) didahului huruf jar (حَرْف جَرّ) bi- (dengan)."
+        },
+        {
+         "from": "1:1:3",
+         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi sifat (na't, نَعْت) bagi lafaz Allah, dan sifat mengikuti kata yang disifatinya."
+        }
+       ]
+      },
+      {
+       "n": 3,
+       "word": 3,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena menjadi sifat (na't, نَعْت) bagi lafaz Allah, dan sifat mengikuti kata yang disifatinya.",
+       "options": [
+        {
+         "from": "1:1:3",
+         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi sifat (na't, نَعْت) bagi lafaz Allah, dan sifat mengikuti kata yang disifatinya."
+        },
+        {
+         "from": "1:1:1",
+         "text": "Akhirnya kasrah (كَسْرَة) karena kata ism (nama) didahului huruf jar (حَرْف جَرّ) bi- (dengan)."
+        },
+        {
+         "from": "1:1:2",
+         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata ismi."
+        }
+       ]
+      },
+      {
+       "n": 4,
+       "word": 4,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena menjadi sifat kedua bagi lafaz Allah, sehingga ikut majrur (مَجْرُور).",
+       "options": [
+        {
+         "from": "1:1:4",
+         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi sifat kedua bagi lafaz Allah, sehingga ikut majrur (مَجْرُور)."
+        },
+        {
+         "from": "1:1:1",
+         "text": "Akhirnya kasrah (كَسْرَة) karena kata ism (nama) didahului huruf jar (حَرْف جَرّ) bi- (dengan)."
+        },
+        {
+         "from": "1:1:2",
+         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata ismi."
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "ayah": 2,
+   "exercises": [
+    {
+     "key": "tap-word",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1
+      },
+      {
+       "n": 2,
+       "word": 2
+      },
+      {
+       "n": 3,
+       "word": 3
+      },
+      {
+       "n": 4,
+       "word": 4
+      }
+     ]
+    },
+    {
+     "key": "sort-case",
+     "bins": [
+      "marfu",
+      "majrur"
+     ],
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "sign": "dhammah (ضَمَّة)",
+       "why": "Akhirnya dhammah (ضَمَّة) karena menjadi mubtada' (مُبْتَدَأ, pokok kalimat)."
+      },
+      {
+       "n": 2,
+       "word": 2,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) li-; jar-majrur (جَارّ وَمَجْرُور) ini bergantung pada khabar (خَبَر) yang tidak disebut (misalnya 'tetap')."
+      },
+      {
+       "n": 3,
+       "word": 4,
+       "sign": "ya'",
+       "why": "Majrur (مَجْرُور) dengan tanda ya' karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dan termasuk kata yang disamakan (mulhaq, مُلْحَق) dengan jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم)."
+      }
+     ]
+    },
+    {
+     "key": "label-role",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "why": "Akhirnya dhammah (ضَمَّة) karena menjadi mubtada' (مُبْتَدَأ, pokok kalimat).",
+       "options": [
+        {
+         "from": "1:2:1",
+         "text": "mubtada' (مُبْتَدَأ)"
+        },
+        {
+         "from": "1:2:2",
+         "text": "khabar (خَبَر, jar-majrur, جَارّ وَمَجْرُور)"
+        },
+        {
+         "from": "1:1:2",
+         "text": "mudhaf ilaih (مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "1:1:3",
+         "text": "na't (نَعْت, sifat)"
+        }
+       ]
+      },
+      {
+       "n": 2,
+       "word": 2,
+       "why": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) li-; jar-majrur (جَارّ وَمَجْرُور) ini bergantung pada khabar (خَبَر) yang tidak disebut (misalnya 'tetap').",
+       "options": [
+        {
+         "from": "1:2:2",
+         "text": "khabar (خَبَر, jar-majrur, جَارّ وَمَجْرُور)"
+        },
+        {
+         "from": "1:2:1",
+         "text": "mubtada' (مُبْتَدَأ)"
+        },
+        {
+         "from": "1:1:2",
+         "text": "mudhaf ilaih (مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "1:1:3",
+         "text": "na't (نَعْت, sifat)"
+        }
+       ]
+      },
+      {
+       "n": 3,
+       "word": 4,
+       "why": "Majrur (مَجْرُور) dengan tanda ya' karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dan termasuk kata yang disamakan (mulhaq, مُلْحَق) dengan jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم).",
+       "options": [
+        {
+         "from": "1:2:4",
+         "text": "mudhaf ilaih (مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "1:2:1",
+         "text": "mubtada' (مُبْتَدَأ)"
+        },
+        {
+         "from": "1:2:2",
+         "text": "khabar (خَبَر, jar-majrur, جَارّ وَمَجْرُور)"
+        },
+        {
+         "from": "1:1:3",
+         "text": "na't (نَعْت, sifat)"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "ayah": 3,
+   "exercises": [
+    {
+     "key": "tap-word",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1
+      },
+      {
+       "n": 2,
+       "word": 2
+      }
+     ]
+    },
+    {
+     "key": "why-harakat",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena sekali lagi menjadi sifat bagi lafaz Allah yang majrur (مَجْرُور).",
+       "options": [
+        {
+         "from": "1:3:1",
+         "text": "Akhirnya kasrah (كَسْرَة) karena sekali lagi menjadi sifat bagi lafaz Allah yang majrur (مَجْرُور)."
+        },
+        {
+         "from": "1:2:2",
+         "text": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) li-; jar-majrur (جَارّ وَمَجْرُور) ini bergantung pada khabar (خَبَر) yang tidak disebut (misalnya 'tetap')."
+        },
+        {
+         "from": "1:1:2",
+         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari kata ismi."
+        }
+       ]
+      },
+      {
+       "n": 2,
+       "word": 2,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena menjadi sifat berikutnya bagi lafaz Allah yang majrur (مَجْرُور).",
+       "options": [
+        {
+         "from": "1:3:2",
+         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi sifat berikutnya bagi lafaz Allah yang majrur (مَجْرُور)."
+        },
+        {
+         "from": "1:1:1",
+         "text": "Akhirnya kasrah (كَسْرَة) karena kata ism (nama) didahului huruf jar (حَرْف جَرّ) bi- (dengan)."
+        },
+        {
+         "from": "1:2:1",
+         "text": "Akhirnya dhammah (ضَمَّة) karena menjadi mubtada' (مُبْتَدَأ, pokok kalimat)."
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "ayah": 4,
+   "exercises": [
+    {
+     "key": "tap-word",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1
+      },
+      {
+       "n": 2,
+       "word": 2
+      },
+      {
+       "n": 3,
+       "word": 3
+      }
+     ]
+    },
+    {
+     "key": "why-harakat",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena menjadi sifat keempat bagi lafaz Allah.",
+       "options": [
+        {
+         "from": "1:4:1",
+         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi sifat keempat bagi lafaz Allah."
+        },
+        {
+         "from": "1:4:2",
+         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) bagi māliki."
+        },
+        {
+         "from": "1:2:2",
+         "text": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) li-; jar-majrur (جَارّ وَمَجْرُور) ini bergantung pada khabar (خَبَر) yang tidak disebut (misalnya 'tetap')."
+        }
+       ]
+      },
+      {
+       "n": 2,
+       "word": 2,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) bagi māliki.",
+       "options": [
+        {
+         "from": "1:4:2",
+         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) bagi māliki."
+        },
+        {
+         "from": "1:4:1",
+         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi sifat keempat bagi lafaz Allah."
+        },
+        {
+         "from": "1:1:1",
+         "text": "Akhirnya kasrah (كَسْرَة) karena kata ism (nama) didahului huruf jar (حَرْف جَرّ) bi- (dengan)."
+        }
+       ]
+      },
+      {
+       "n": 3,
+       "word": 3,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) bagi yaumi.",
+       "options": [
+        {
+         "from": "1:4:3",
+         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) bagi yaumi."
+        },
+        {
+         "from": "1:4:1",
+         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi sifat keempat bagi lafaz Allah."
+        },
+        {
+         "from": "1:2:1",
+         "text": "Akhirnya dhammah (ضَمَّة) karena menjadi mubtada' (مُبْتَدَأ, pokok kalimat)."
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "ayah": 5,
+   "exercises": [
+    {
+     "key": "tap-word",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1
+      },
+      {
+       "n": 2,
+       "word": 2
+      },
+      {
+       "n": 3,
+       "word": 3
+      },
+      {
+       "n": 4,
+       "word": 4
+      }
+     ]
+    },
+    {
+     "key": "sort-case",
+     "bins": [
+      "marfu",
+      "majrur",
+      "mabni"
+     ],
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "sign": "fathah (فَتْحَة)",
+       "why": "Kata ganti ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة, akhirnya tetap) dan berkedudukan nashab (نَصْب) sebagai objek yang didahulukan, sehingga bermakna 'hanya kepada-Mu'."
+      },
+      {
+       "n": 2,
+       "word": 2,
+       "sign": "dhammah (ضَمَّة)",
+       "why": "Akhirnya dhammah (ضَمَّة) karena fi'il mudhari' (فِعْل مُضَارِع) ini tidak didahului huruf penashab (نَاصِب) atau penjazm (جَازِم); pelakunya tersirat, yaitu 'kami'."
+      },
+      {
+       "n": 3,
+       "word": 3,
+       "sign": "fathah (فَتْحَة)",
+       "why": "Wawu adalah huruf 'athaf (حَرْف عَطْف), dan iyyāka (mabni, مَبْنِيّ di atas fathah, فَتْحَة, berkedudukan nashab, نَصْب) diulang sebagai objek yang didahulukan bagi nasta‘īnu agar makna 'hanya' melekat pada kedua perbuatan."
+      },
+      {
+       "n": 4,
+       "word": 4,
+       "sign": "dhammah (ضَمَّة)",
+       "why": "Akhirnya dhammah (ضَمَّة) dengan alasan yang sama seperti na‘budu: fi'il mudhari' (فِعْل مُضَارِع) tanpa huruf penashab (نَاصِب) atau penjazm (جَازِم)."
+      }
+     ]
+    },
+    {
+     "key": "wazn-factory",
+     "questions": [
+      {
+       "n": 1,
+       "lexeme": "abada",
+       "label": "fi'il mudhari'",
+       "options": [
+        "fi'il mudhari'",
+        "isim fa'il"
+       ]
+      },
+      {
+       "n": 2,
+       "lexeme": "istaana",
+       "label": "isim fa'il",
+       "options": [
+        "isim fa'il",
+        "fi'il mudhari'"
+       ]
+      },
+      {
+       "n": 3,
+       "lexeme": "abada",
+       "label": "isim fa'il",
+       "options": [
+        "isim fa'il",
+        "fi'il mudhari'"
+       ]
+      },
+      {
+       "n": 4,
+       "lexeme": "istaana",
+       "label": "fi'il mudhari'",
+       "options": [
+        "fi'il mudhari'",
+        "isim fa'il"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "ayah": 6,
+   "exercises": [
+    {
+     "key": "tap-word",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1
+      },
+      {
+       "n": 2,
+       "word": 2
+      },
+      {
+       "n": 3,
+       "word": 3
+      }
+     ]
+    },
+    {
+     "key": "sort-case",
+     "bins": [
+      "marfu",
+      "manshub",
+      "majrur",
+      "mabni"
+     ],
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "sign": "dibuangnya huruf 'illah (حَرْف عِلَّة, ya')",
+       "why": "Fi'il amr (فِعْل أَمْر) yang bermakna doa ini mabni (مَبْنِيّ) dengan dibuangnya huruf ya' di akhir; pelakunya tersirat ('Engkau'), dan -nā ('kami') adalah objeknya."
+      },
+      {
+       "n": 2,
+       "word": 2,
+       "sign": "fathah (فَتْحَة)",
+       "why": "Akhirnya fathah (فَتْحَة) karena menjadi objek kedua (maf'ul bih, مَفْعُول بِه kedua) dari ihdi."
+      },
+      {
+       "n": 3,
+       "word": 3,
+       "sign": "fathah (فَتْحَة)",
+       "why": "Akhirnya fathah (فَتْحَة) karena menjadi sifat bagi aṣ-ṣirāṭa yang manshub (مَنْصُوب)."
+      }
+     ]
+    },
+    {
+     "key": "wazn-factory",
+     "questions": [
+      {
+       "n": 1,
+       "lexeme": "hada",
+       "label": "fi'il amr",
+       "options": [
+        "fi'il amr",
+        "fi'il mudhari'",
+        "isim fa'il"
+       ]
+      },
+      {
+       "n": 2,
+       "lexeme": "mustaqim",
+       "label": "isim fa'il",
+       "options": [
+        "isim fa'il",
+        "fi'il mudhari'",
+        "fi'il amr"
+       ]
+      },
+      {
+       "n": 3,
+       "lexeme": "hada",
+       "label": "fi'il mudhari'",
+       "options": [
+        "fi'il mudhari'",
+        "fi'il amr",
+        "isim fa'il"
+       ]
+      },
+      {
+       "n": 4,
+       "lexeme": "mustaqim",
+       "label": "fi'il amr",
+       "options": [
+        "fi'il amr",
+        "fi'il mudhari'",
+        "isim fa'il"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "ayah": 7,
+   "exercises": [
+    {
+     "key": "sort-case",
+     "bins": [
+      "marfu",
+      "manshub",
+      "majrur",
+      "mabni"
+     ],
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "sign": "fathah (فَتْحَة)",
+       "why": "Akhirnya fathah (فَتْحَة) karena menjadi badal (بَدَل, pengganti) dari aṣ-ṣirāṭa di ayat 6 yang manshub (مَنْصُوب)."
+      },
+      {
+       "n": 2,
+       "word": 3,
+       "sign": "sukun (سُكُون)",
+       "why": "Fi'il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas sukun (سُكُون) karena bersambung dengan dhamir (ضَمِير) -ta ('Engkau', pelakunya), dan kalimatnya menjadi shilah (صِلَة) bagi allażīna."
+      },
+      {
+       "n": 3,
+       "word": 5,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena menjadi badal (بَدَل) dari allażīna yang berkedudukan jar (جَرّ, sebagian ulama menjadikannya sifat)."
+      },
+      {
+       "n": 4,
+       "word": 9,
+       "sign": "ya'",
+       "why": "Majrur (مَجْرُور) dengan tanda ya' karena jamak mudzakkar salim (جَمْع مُذَكَّر سَالِم) yang di-'athaf-kan pada kata majrur sebelumnya."
+      }
+     ]
+    },
+    {
+     "key": "label-role",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "why": "Akhirnya fathah (فَتْحَة) karena menjadi badal (بَدَل, pengganti) dari aṣ-ṣirāṭa di ayat 6 yang manshub (مَنْصُوب).",
+       "options": [
+        {
+         "from": "1:7:1",
+         "text": "badal (بَدَل)"
+        },
+        {
+         "from": "1:7:2",
+         "text": "isim maushul (اِسْم مَوْصُول, mudhaf ilaih, مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "1:2:1",
+         "text": "mubtada' (مُبْتَدَأ)"
+        },
+        {
+         "from": "1:7:3",
+         "text": "fi'il madhi (فِعْل مَاضٍ) + fa'il (فَاعِل, -ta); bersama ‘alaihim menjadi shilah (صِلَة)"
+        }
+       ]
+      },
+      {
+       "n": 2,
+       "word": 2,
+       "why": "Isim maushul (اِسْم مَوْصُول) ini mabni (مَبْنِيّ, bentuknya tetap) dan berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari ṣirāṭa.",
+       "options": [
+        {
+         "from": "1:7:2",
+         "text": "isim maushul (اِسْم مَوْصُول, mudhaf ilaih, مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "1:7:1",
+         "text": "badal (بَدَل)"
+        },
+        {
+         "from": "1:7:7",
+         "text": "na'ib fa'il (نَائِب فَاعِل, jar-majrur, جَارّ وَمَجْرُور)"
+        },
+        {
+         "from": "1:2:2",
+         "text": "khabar (خَبَر, jar-majrur, جَارّ وَمَجْرُور)"
+        }
+       ]
+      },
+      {
+       "n": 3,
+       "word": 3,
+       "why": "Fi'il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas sukun (سُكُون) karena bersambung dengan dhamir (ضَمِير) -ta ('Engkau', pelakunya), dan kalimatnya menjadi shilah (صِلَة) bagi allażīna.",
+       "options": [
+        {
+         "from": "1:7:3",
+         "text": "fi'il madhi (فِعْل مَاضٍ) + fa'il (فَاعِل, -ta); bersama ‘alaihim menjadi shilah (صِلَة)"
+        },
+        {
+         "from": "1:7:1",
+         "text": "badal (بَدَل)"
+        },
+        {
+         "from": "1:7:2",
+         "text": "isim maushul (اِسْم مَوْصُول, mudhaf ilaih, مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "1:6:2",
+         "text": "maf'ul bih (مَفْعُول بِه) kedua"
+        }
+       ]
+      },
+      {
+       "n": 4,
+       "word": 7,
+       "why": "‘Alā adalah huruf jar (حَرْف جَرّ) dan -him kata ganti mabni (مَبْنِيّ) yang dijarkan olehnya, sedangkan kedudukan rafa' (رَفْع, mahall, مَحَلّ raf') di kartu ini milik frasa jar-majrur (جَارّ وَمَجْرُور) ‘alaihim secara utuh sebagai na'ib fa'il (نَائِب فَاعِل, pengganti pelaku) bagi al-magḍūbi, karena al-magḍūb adalah isim maf'ul (اِسْم مَفْعُول).",
+       "options": [
+        {
+         "from": "1:7:7",
+         "text": "na'ib fa'il (نَائِب فَاعِل, jar-majrur, جَارّ وَمَجْرُور)"
+        },
+        {
+         "from": "1:7:1",
+         "text": "badal (بَدَل)"
+        },
+        {
+         "from": "1:7:2",
+         "text": "isim maushul (اِسْم مَوْصُول, mudhaf ilaih, مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "1:1:2",
+         "text": "mudhaf ilaih (مُضَاف إِلَيْه)"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "key": "wazn-factory",
+     "questions": [
+      {
+       "n": 1,
+       "lexeme": "anama",
+       "label": "fi'il madhi",
+       "options": [
+        "fi'il madhi",
+        "fi'il mudhari'",
+        "isim fa'il"
+       ]
+      },
+      {
+       "n": 2,
+       "lexeme": "maghdub",
+       "label": "isim maf'ul",
+       "options": [
+        "isim maf'ul",
+        "fi'il madhi",
+        "fi'il mudhari'"
+       ]
+      },
+      {
+       "n": 3,
+       "lexeme": "dall",
+       "label": "isim fa'il",
+       "options": [
+        "isim fa'il",
+        "fi'il madhi",
+        "fi'il mudhari'"
+       ]
+      },
+      {
+       "n": 4,
+       "lexeme": "anama",
+       "label": "isim fa'il",
+       "options": [
+        "isim fa'il",
+        "fi'il madhi",
+        "isim maf'ul"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

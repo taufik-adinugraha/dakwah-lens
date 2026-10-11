@@ -1,24 +1,15 @@
 /**
- * Which exercises an ayah's lesson renders — the autoplay sequence waits
- * only at exercises that actually appear. The conditions MIRROR the
- * exercise components' own early returns (an exercise with too little to
- * ask renders nothing):
- *   TapWord      `order.length < 2`  → words timed in the page's FIRST source
- *   WhyHarakat   `items.length === 0` → words in a graded case
- *   SortCase     `items.length < 2`  → words in a SORT_BINS case
- *   LabelRole    `items.length < 2`  → words with a role
- *   WaznFactory  `items.length < 2`  → tashrif forms of lexemes with ≥ 3 forms
- * When a component's condition changes, change it here too (an exercise
- * that never reports done would leave the lesson waiting; the "Lewati
- * latihan" button is the learner's way out either way).
+ * Which exercises an ayah's lesson renders — the autoplay sequence waits only at exercises that
+ * actually appear. Since 2026-10-11 ONE plan decides it for the page, its exercises and the
+ * engine alike: content/quiz/<slug>.json (pipeline/build_quiz.py; operator 2026-10-10, narration
+ * rule 16: test only what was taught), whose exercises each render exactly the questions listed
+ * there. An exercise with no questions is not in the plan, so nothing has to mirror a
+ * component's "render nothing" rule any more (an exercise that never reported done would leave
+ * the lesson waiting; the "Lewati latihan" button is the learner's way out either way).
  */
-import type { Ayah, Lexeme, Word } from "@/content/schema";
+import type { Ayah } from "@/content/schema";
 
-import { SORT_BINS } from "../cases";
 import { EXERCISE_KEYS, type ExerciseKey } from "./types";
-
-/** Cases WhyHarakat asks about (its GRADED set). */
-const GRADED = new Set(["marfu", "manshub", "majrur", "mabni"]);
 
 /**
  * Reciter order of the lesson page (its RECITER_ORDER): Mishary Alafasy is
@@ -43,35 +34,26 @@ export function timedWords(ayah: Pick<Ayah, "recitation">): number[] {
   return first ? [...new Set(first.segments.map(([w]) => w))] : [];
 }
 
-export type ExerciseInput = {
-  words: readonly Pick<Word, "case" | "role" | "lemma_id">[];
-  /** Word indices with timings in the first source (timedWords). */
-  timed: Iterable<number>;
-  /** Lexicon lookup (library.getLexeme). */
-  lexeme: (id: string) => Pick<Lexeme, "tashrif"> | undefined;
+/** What the engine reads of one ayah's quiz (content/quiz, src/content/quiz-schema.ts): no zod
+ *  here, so scripts/autoplay-check.ts can run the engine on raw JSON. */
+export type QuizAyahLike = {
+  exercises: readonly { key: string; questions: readonly { n: number }[] }[];
 };
 
-/** The exercises this ayah renders, in page order. */
-export function availableExercises(input: ExerciseInput): ExerciseKey[] {
-  const { words } = input;
-  const timed = new Set(input.timed);
-  const tapCount = words.filter((_, i) => timed.has(i + 1)).length;
-  const whyCount = words.filter((w) => GRADED.has(w.case.state)).length;
-  const sortCount = words.filter((w) => SORT_BINS.includes(w.case.state)).length;
-  const roleCount = words.filter((w) => !!w.role).length;
-  const lemmaIds = [...new Set(words.map((w) => w.lemma_id).filter((x): x is string => !!x))];
-  const waznCount = lemmaIds.reduce((n, id) => {
-    const forms = input.lexeme(id)?.tashrif?.forms ?? [];
-    return n + (forms.length >= 3 ? forms.length : 0);
-  }, 0);
-  const has: Record<ExerciseKey, boolean> = {
-    "tap-word": tapCount >= 2,
-    "why-harakat": whyCount >= 1,
-    "sort-case": sortCount >= 2,
-    "label-role": roleCount >= 2,
-    "wazn-factory": waznCount >= 2,
-  };
-  return EXERCISE_KEYS.filter((k) => has[k]);
+const isKey = (k: string): k is ExerciseKey => (EXERCISE_KEYS as readonly string[]).includes(k);
+
+/** The exercises this ayah renders, in page order: those of its quiz with at least one question. */
+export function availableExercises(quiz: QuizAyahLike | null | undefined): ExerciseKey[] {
+  const keys = (quiz?.exercises ?? []).filter((e) => e.questions.length > 0).map((e) => e.key).filter(isKey);
+  return canonicalExercises(keys);
+}
+
+/** The question numbers of each exercise of the ayah (their explanation lines,
+ *  "${slug}:${ayah}:ex:${key}:${n}:why"). */
+export function questionNumbers(quiz: QuizAyahLike | null | undefined): Partial<Record<ExerciseKey, number[]>> {
+  const out: Partial<Record<ExerciseKey, number[]>> = {};
+  for (const e of quiz?.exercises ?? []) if (isKey(e.key)) out[e.key] = e.questions.map((q) => q.n);
+  return out;
 }
 
 /** Suffix of each exercise's progress id on the lesson page. */

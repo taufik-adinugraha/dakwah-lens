@@ -5,12 +5,14 @@ import { Check, Lightbulb } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 
+import type { QuizExerciseOf } from "@/content/quiz-schema";
 import type { CaseState, Word } from "@/content/schema";
 import { useProgress } from "@/hooks/useProgress";
-import { CASE_META, SORT_BINS } from "@/lib/cases";
+import { CASE_META } from "@/lib/cases";
 import { seededShuffle } from "@/lib/shuffle";
 
 import { CaseBadge, CaseShape } from "../lesson/CaseBadge";
+import { MixedText } from "../library/MixedText";
 import {
   ExerciseShell,
   Feedback,
@@ -25,7 +27,16 @@ import { guideMarker, guideTarget, sortCaseGuidePart, type ExerciseGuide } from 
 
 type Props = {
   id: string;
+  /** The ayah's words. */
   words: Word[];
+  /** The words to sort (content/quiz: `n`, `word`, each one's sign and reason, shown after it is
+   *  placed). */
+  questions: QuizExerciseOf<"sort-case">["questions"];
+  /** The groups: the case states taught so far (content/quiz; operator 2026-10-10: no group the
+   *  lesson has not taught — majrur at ayah 1, marfu' from ayah 2, mabni from 5, manshub from 6). */
+  bins: readonly CaseState[];
+  /** Each case state as its label, "majrur (مَجْرُور)". */
+  states: Record<string, string>;
   /** Guided mode (see ExerciseShell.tsx). */
   guided?: ExerciseGuide;
   /** Hide the heading and instruction (the stage shows its own). */
@@ -33,11 +44,11 @@ type Props = {
 };
 
 /**
- * "Kelompokkan menurut akhiran" — sort the ayah's words into raf' / nasb /
- * jarr / mabni groups. Tap a word, then tap its group (no drag-and-drop:
- * works with a thumb and a keyboard); the two steps are spelled out on
- * screen. Words are the mushaf words, unaltered; nothing explodes or is
- * thrown away (plan §4.7).
+ * "Kelompokkan menurut akhiran" — sort the ayah's words into the case groups
+ * taught so far (content/quiz `bins`), each labelled with its Arabic. Tap a
+ * word, then tap its group (no drag-and-drop: works with a thumb and a
+ * keyboard); the two steps are spelled out on screen. Words are the mushaf
+ * words, unaltered; nothing explodes or is thrown away (plan §4.7).
  */
 export function SortCase(props: Props) {
   const { round, restart } = useRestart();
@@ -49,6 +60,9 @@ type Say = { kind: FeedbackKind; word?: Word; n: number };
 function SortCaseRound({
   id,
   words,
+  questions,
+  bins,
+  states,
   guided,
   compact,
   restarted,
@@ -57,9 +71,15 @@ function SortCaseRound({
   const t = useTranslations("Exercise");
   const { progress, markDone } = useProgress();
   const items = useMemo(
-    () => seededShuffle(words.filter((w) => SORT_BINS.includes(w.case.state)), id),
-    [words, id],
+    () =>
+      seededShuffle(
+        questions.flatMap((q) => (words[q.word - 1] ? [words[q.word - 1]] : [])),
+        id,
+      ),
+    [words, questions, id],
   );
+  /** Each word's question in the plan: its number, sign and reason. */
+  const questionOf = (w: Word) => questions.find((q) => words[q.word - 1]?.loc === w.loc);
   const [placed, setPlaced] = useState<Record<string, CaseState>>({});
   const [selected, setSelected] = useState<string | null>(null);
   /** Groups already tried, wrongly, for the selected word. */
@@ -113,23 +133,26 @@ function SortCaseRound({
       tell("hint");
       return;
     }
+    const n = questionOf(selectedWord)?.n;
     if (selectedWord.case.state === bin) {
       // The answer is reported before place(), which reports onDone with
       // the last word.
-      guided?.onAnswer?.(true);
+      guided?.onAnswer?.(true, n);
       place(selectedWord, !misses[selectedWord.loc]);
       tell("ok", selectedWord);
     } else {
       setMisses({ ...misses, [selectedWord.loc]: (misses[selectedWord.loc] ?? 0) + 1 });
       if (!wrongBins.includes(bin)) setWrongBins([...wrongBins, bin]);
       tell("retry", selectedWord);
-      guided?.onAnswer?.(false);
+      guided?.onAnswer?.(false, n);
     }
   };
 
   const reveal = () => {
     if (!selectedWord) return;
     const last = remaining.length === 1;
+    // Reported before place(), which reports onDone with the last word.
+    guided?.onReveal?.(questionOf(selectedWord)?.n);
     place(selectedWord, false);
     tell("reveal", selectedWord);
     // The pressed button unmounts with the placed word; keep keyboard focus
@@ -234,10 +257,14 @@ function SortCaseRound({
 
       {/* The groups: always enabled (a tap with no word chosen explains the
           first step), a 2px case-colour border, the shape icon and an ink
-          label. Container query: four across only while there is room. */}
+          label. Container query: all of them in one row (three or four) only
+          while there is room; the plan's bins are the states taught so far. */}
       <div className={clsx("@container", !finished && "mt-5")}>
-        <div data-guide={mark("bins")} className="grid grid-cols-2 gap-3 @3xl:grid-cols-4">
-          {SORT_BINS.map((bin) => {
+        <div
+          data-guide={mark("bins")}
+          className={clsx("grid grid-cols-2 gap-3", bins.length === 3 && "@3xl:grid-cols-3", bins.length >= 4 && "@3xl:grid-cols-4")}
+        >
+          {bins.map((bin) => {
             const m = CASE_META[bin];
             const inBin = items.filter((w) => placed[w.loc] === bin);
             return (
@@ -245,6 +272,7 @@ function SortCaseRound({
                 key={bin}
                 type="button"
                 onClick={() => drop(bin)}
+                data-option={bin}
                 className={clsx(
                   "flex min-h-24 flex-col items-center gap-2 rounded-xl border-2 p-3 text-ink",
                   m.className,
@@ -252,7 +280,9 @@ function SortCaseRound({
               >
                 <span className="inline-flex items-center gap-2 text-base font-semibold text-ink">
                   <CaseShape state={bin} />
-                  {m.label}
+                  <span>
+                    <MixedText text={states[bin] ?? m.label} />
+                  </span>
                 </span>
                 {inBin.length > 0 ? (
                   <span dir="rtl" className="flex flex-wrap justify-center gap-x-3">
@@ -278,7 +308,12 @@ function SortCaseRound({
             <bdi lang="ar" dir="rtl" className="quran text-ar-sm">
               {say.word.ar}
             </bdi>{" "}
-            <CaseBadge state={say.word.case.state} sign={say.word.case.sign} /> {say.word.why}
+            <CaseBadge
+              state={say.word.case.state}
+              sign={questionOf(say.word)?.sign ?? undefined}
+              label={states[say.word.case.state]}
+            />{" "}
+            <MixedText text={questionOf(say.word)?.why ?? say.word.why} />
           </>
         )}
       </Feedback>

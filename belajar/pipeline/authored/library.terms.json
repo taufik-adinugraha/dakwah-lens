@@ -1,0 +1,2839 @@
+{
+  "_comment": "Grammar terms in Arabic script for the Konsep library (operator 2026-10-10: \"mention the arabic word like majrur in arabic letter, not only the transliteration\"). ONE table: every page shows a term from here, never retyped. `ar` is checked by terms.py / validate_terms.py against `attest`: {\"pron\": <term>} = the operator-approved pronunciation dictionary (authored/pronunciation.json, byte-equal), {\"page\": \"<book>/<id>\", \"text\": <verbatim excerpt of at most 12 words>} = a Shamela page of a kitab the Konsep library cites, pinned by the sha256 of its extracted text in sources.json `shamela_istilah` (fetch.py). The folded term must occur in the excerpt as whole tokens (proclitics allowed on the first), with no vowel conflict except on a token's last letter; with the cache, the excerpt must be a verbatim substring of the pinned page's matn (\"part\": \"hamesh\" = the editor's footnotes). A term no source verifies has ar null + `unverified` and is shown in Latin only. `forms` are the surfaces the prose writes ([[majrur]] in the authored concepts); a form left unmarked in prose fails the build, except `ambiguous_forms` (also ordinary Indonesian words: huruf, hal, sifat, bab, jumlah, syarat), which are marked only where they are the term. `hint` (harakah terms) is the short reminder shown at a term's first use on a page. Excerpts are chosen by a person (the check proves the spelling, not the sense); the spelling's harakat follow the dictionary convention, and an unvocalised excerpt confirms the letters only.",
+  "terms": [
+    {
+      "id": "harakat",
+      "latin": "harakat",
+      "forms": [
+        "harakat"
+      ],
+      "group": "harakah",
+      "hint": "tanda bunyi vokal pada huruf",
+      "ar": "حَرَكَات",
+      "attest": [
+        {
+          "page": "11371/5",
+          "text": "المعربات قسمان: قسم يُعرَبُ بالحركات، وقسم يعرب بالحروف."
+        }
+      ]
+    },
+    {
+      "id": "fathah",
+      "latin": "fathah",
+      "forms": [
+        "fathah",
+        "berfathah",
+        "difathah"
+      ],
+      "group": "harakah",
+      "hint": "tanda bunyi a di atas huruf",
+      "ar": "فَتْحَة",
+      "attest": [
+        {
+          "pron": "فَتْحَة"
+        },
+        {
+          "page": "11371/4",
+          "text": "وللنصب خمس علامات: الفتحة, والألف، والكسرة، والياء، وحذف النون."
+        }
+      ]
+    },
+    {
+      "id": "kasrah",
+      "latin": "kasrah",
+      "forms": [
+        "kasrah",
+        "berkasrah",
+        "dikasrah"
+      ],
+      "group": "harakah",
+      "hint": "tanda bunyi i di bawah huruf",
+      "ar": "كَسْرَة",
+      "attest": [
+        {
+          "pron": "كَسْرَة"
+        },
+        {
+          "page": "11371/4",
+          "text": "وللنصب خمس علامات: الفتحة, والألف، والكسرة، والياء، وحذف النون."
+        }
+      ]
+    },
+    {
+      "id": "dhammah",
+      "latin": "dhammah",
+      "forms": [
+        "dhammah",
+        "berdhammah",
+        "didhammah"
+      ],
+      "group": "harakah",
+      "hint": "tanda bunyi u di atas huruf",
+      "ar": "ضَمَّة",
+      "attest": [
+        {
+          "pron": "ضَمَّة"
+        },
+        {
+          "page": "11371/3",
+          "text": "للرفع أربعُ علامات: الضمة، والواو، والألف، والنون."
+        }
+      ]
+    },
+    {
+      "id": "sukun",
+      "latin": "sukun",
+      "forms": [
+        "sukun",
+        "bersukun",
+        "disukunkan"
+      ],
+      "group": "harakah",
+      "hint": "tanda huruf mati, dibaca tanpa vokal",
+      "ar": "سُكُون",
+      "attest": [
+        {
+          "page": "11371/5",
+          "text": "فأما السكون فيكون علامة للجزم في الفعل المضارع الصحيح الآخر."
+        },
+        {
+          "page": "11371/5",
+          "text": "وللجَزمِ علامتان: السُّكُون, والحَذف."
+        }
+      ]
+    },
+    {
+      "id": "tanwin",
+      "latin": "tanwin",
+      "forms": [
+        "tanwin",
+        "bertanwin"
+      ],
+      "group": "harakah",
+      "hint": "harakat ganda di akhir kata, dibaca dengan bunyi n",
+      "ar": "تَنْوِين",
+      "attest": [
+        {
+          "page": "11371/1",
+          "text": "فالاسم يُعرَفُ: بالخَفضِ، والتنوينِ، ودخولِ الألف واللام، وحروفِ الخَفضِ, وهي: مِن، وإلى،"
+        },
+        {
+          "page": "6970/11",
+          "text": "الرِّوَايَة بخفض قبل بِغَيْر تَنْوِين أى وَمن قبل"
+        }
+      ]
+    },
+    {
+      "id": "tasydid",
+      "latin": "tasydid",
+      "forms": [
+        "tasydid",
+        "bertasydid"
+      ],
+      "group": "harakah",
+      "hint": "tanda huruf dibaca dobel",
+      "ar": "تَشْدِيد",
+      "attest": [
+        {
+          "page": "9904/113",
+          "text": "الوقاية فتقول مني وعني بالتشديد ومنهم من يحذف النون فيقول مني وعني"
+        }
+      ]
+    },
+    {
+      "id": "nahwu",
+      "latin": "nahwu",
+      "forms": [
+        "nahwu"
+      ],
+      "group": "istilah",
+      "ar": "نَحْو",
+      "attest": [
+        {
+          "page": "9256/3",
+          "text": "ووضع علم النحو للنظر في إعراب ما تركب منها"
+        },
+        {
+          "page": "11243/41",
+          "text": "وَمَا لِبَاعَ قَد يُرى لِنَحْو حَبّ"
+        }
+      ]
+    },
+    {
+      "id": "sharaf",
+      "latin": "sharaf",
+      "forms": [
+        "sharaf"
+      ],
+      "group": "istilah",
+      "ar": "صَرْف",
+      "attest": [
+        {
+          "page": "11243/8",
+          "text": "الصَّرفُ، ويُقال له التصريفُ، وَهُوَ لُغَةً: التَّغْييْرُ، وَمِنْهُ تَصريفُ الرِّياح، أى تَغييرُها."
+        },
+        {
+          "page": "11243/182",
+          "text": "لا تَعْجَبُوا للصَّرْفِ مُجْتَمِعًا بهِ"
+        }
+      ]
+    },
+    {
+      "id": "kalimah",
+      "latin": "kalimah",
+      "forms": [
+        "kalimah"
+      ],
+      "group": "istilah",
+      "ar": "كَلِمَة",
+      "attest": [
+        {
+          "pron": "كَلِمَة"
+        },
+        {
+          "page": "6970/2",
+          "text": "تَعْرِيف الْكَلِمَة وأقسامها"
+        }
+      ]
+    },
+    {
+      "id": "kalam",
+      "latin": "kalam",
+      "forms": [
+        "kalam"
+      ],
+      "group": "istilah",
+      "ar": "كَلَام",
+      "attest": [
+        {
+          "page": "11371/1",
+          "text": "أنواع الكلام"
+        },
+        {
+          "page": "6970/3",
+          "text": "انحصار أَنْوَاعهَا فِي هَذِه الثَّلَاثَة الاستقراء فَإِن عُلَمَاء هَذَا الْفَنّ تتبعوا كَلَام"
+        }
+      ]
+    },
+    {
+      "id": "isim",
+      "latin": "isim",
+      "forms": [
+        "isim"
+      ],
+      "group": "istilah",
+      "ar": "اِسْم",
+      "attest": [
+        {
+          "pron": "اِسْم"
+        },
+        {
+          "page": "11371/1",
+          "text": "هو اللفظُ المُرَكَّبُ المُفيدُ بالوَضْع. وأقسامُه ثلاثة: اِسمٌ، وفعلٌ، وحَرفٌ جاءَ لمَعنى."
+        }
+      ]
+    },
+    {
+      "id": "isim-majrur",
+      "latin": "isim majrur",
+      "forms": [
+        "isim majrur"
+      ],
+      "group": "istilah",
+      "ar": "اِسْم مَجْرُور",
+      "attest": [
+        {
+          "pron": "اِسْم مَجْرُور"
+        },
+        {
+          "page": "9617/5",
+          "text": "الباء حرف جر، «اسم» اسم مجرور بالكسرة. والجار والمجرور متعلقان بخبر محذوف"
+        }
+      ]
+    },
+    {
+      "id": "fiil",
+      "latin": "fi'il",
+      "forms": [
+        "fi'il"
+      ],
+      "group": "istilah",
+      "ar": "فِعْل",
+      "attest": [
+        {
+          "pron": "فِعْل"
+        },
+        {
+          "page": "11371/1",
+          "text": "هو اللفظُ المُرَكَّبُ المُفيدُ بالوَضْع. وأقسامُه ثلاثة: اِسمٌ، وفعلٌ، وحَرفٌ جاءَ لمَعنى."
+        }
+      ]
+    },
+    {
+      "id": "huruf",
+      "latin": "huruf",
+      "forms": [
+        "huruf"
+      ],
+      "group": "istilah",
+      "ambiguous_forms": [
+        "huruf"
+      ],
+      "ar": "حَرْف",
+      "attest": [
+        {
+          "pron": "حَرْف"
+        },
+        {
+          "page": "11371/1",
+          "text": "هو اللفظُ المُرَكَّبُ المُفيدُ بالوَضْع. وأقسامُه ثلاثة: اِسمٌ، وفعلٌ، وحَرفٌ جاءَ لمَعنى."
+        }
+      ]
+    },
+    {
+      "id": "huruf-jar",
+      "latin": "huruf jar",
+      "forms": [
+        "huruf jar"
+      ],
+      "group": "istilah",
+      "ar": "حَرْف جَرّ",
+      "attest": [
+        {
+          "pron": "حَرْف جَرّ"
+        },
+        {
+          "page": "6970/15",
+          "text": "وَاسْتَدَلُّوا على ذَلِك بِدُخُول حرف الْجَرّ عَلَيْهِمَا فِي قَول بَعضهم وَقد بشر"
+        }
+      ]
+    },
+    {
+      "id": "huruf-athaf",
+      "latin": "huruf 'athaf",
+      "forms": [
+        "huruf 'athaf"
+      ],
+      "group": "istilah",
+      "ar": "حَرْف عَطْف",
+      "attest": [
+        {
+          "page": "9057/60",
+          "text": "هذا فتخريجُه أن يكونَ معطوفاً حُذِف منه حرفُ العطفِ وبالجملةِ فهو مُشْكِلٌ."
+        }
+      ]
+    },
+    {
+      "id": "huruf-illah",
+      "latin": "huruf 'illah",
+      "forms": [
+        "huruf 'illah"
+      ],
+      "group": "istilah",
+      "ar": "حَرْف عِلَّة",
+      "attest": [
+        {
+          "page": "9904/34",
+          "text": "وهو ما ليس آخره حرف علة كأرض وإلى معتل وهو ما آخره"
+        },
+        {
+          "page": "11243/16",
+          "text": "والمعتلّ: ما كان أحد أصوله حرف عِلة، نحو"
+        }
+      ]
+    },
+    {
+      "id": "irab",
+      "latin": "i'rab",
+      "forms": [
+        "i'rab"
+      ],
+      "group": "istilah",
+      "ar": "إِعْرَاب",
+      "attest": [
+        {
+          "pron": "إِعْرَاب"
+        },
+        {
+          "page": "11371/2",
+          "text": "[باب الإعراب]"
+        }
+      ]
+    },
+    {
+      "id": "amil",
+      "latin": "'amil",
+      "forms": [
+        "'amil"
+      ],
+      "group": "istilah",
+      "ar": "عَامِل",
+      "attest": [
+        {
+          "page": "6970/4",
+          "text": "العوامل أَلا ترى أَن الْعَامِل وَاحِد وَهُوَ جلس وَقد وجد مَعَه التَّغَيُّر"
+        }
+      ]
+    },
+    {
+      "id": "rafa",
+      "latin": "rafa'",
+      "forms": [
+        "rafa'",
+        "dirafa'kan"
+      ],
+      "group": "istilah",
+      "ar": "رَفْع",
+      "attest": [
+        {
+          "page": "11371/2",
+          "text": "وأقسامُه أربعة: رَفع، ونَصب، وخَفْض، وجَزْم. فللأسماء من ذلك الرفع، والنصب، والخفض،"
+        }
+      ]
+    },
+    {
+      "id": "marfu",
+      "latin": "marfu'",
+      "forms": [
+        "marfu'"
+      ],
+      "group": "istilah",
+      "ar": "مَرْفُوع",
+      "attest": [
+        {
+          "page": "11371/7",
+          "text": "يجمَعُهَا قولُك: \"أنَيتُ\" وهو مرفوعٌ أبدا، حتى يدخُلَ عليه ناصِبٌ أو جازِم."
+        },
+        {
+          "page": "6970/14",
+          "text": "على الْفَتْح كضرب إِلَّا مَعَ وَاو الْجَمَاعَة فيضم كضربوا أَو الضَّمِير الْمَرْفُوع"
+        }
+      ]
+    },
+    {
+      "id": "nashab",
+      "latin": "nashab",
+      "forms": [
+        "nashab",
+        "menashabkan",
+        "dinashabkan",
+        "nashb"
+      ],
+      "group": "istilah",
+      "ar": "نَصْب",
+      "attest": [
+        {
+          "page": "11371/2",
+          "text": "وأقسامُه أربعة: رَفع، ونَصب، وخَفْض، وجَزْم. فللأسماء من ذلك الرفع، والنصب، والخفض،"
+        },
+        {
+          "page": "9057/67",
+          "text": "وقيل: إنَّ نَصْبَ «غيرَ» بإضمار أعني، ويُحكى عن"
+        }
+      ]
+    },
+    {
+      "id": "manshub",
+      "latin": "manshub",
+      "forms": [
+        "manshub"
+      ],
+      "group": "istilah",
+      "ar": "مَنْصُوب",
+      "attest": [
+        {
+          "page": "11371/16",
+          "text": "مرفوعٍ رَفَعْتَ١، أو على منصوب نَصَبْتَ، أو على مخفوض خَفَضْتَ، أو على"
+        }
+      ]
+    },
+    {
+      "id": "jar",
+      "latin": "jar",
+      "forms": [
+        "jar",
+        "menjarkan"
+      ],
+      "group": "istilah",
+      "ar": "جَرّ",
+      "attest": [
+        {
+          "page": "6970/15",
+          "text": "على ذَلِك بِدُخُول حرف الْجَرّ عَلَيْهِمَا فِي قَول بَعضهم وَقد بشر ببنت"
+        }
+      ]
+    },
+    {
+      "id": "majrur",
+      "latin": "majrur",
+      "forms": [
+        "majrur"
+      ],
+      "group": "istilah",
+      "ar": "مَجْرُور",
+      "attest": [
+        {
+          "pron": "مَجْرُور"
+        },
+        {
+          "page": "11371/12",
+          "text": "المفرد أربعة أشياء: الجارُّ والمجرور، والظَّرف، والفِعل مع فاعله، والمبتدأ مع خبره،"
+        }
+      ]
+    },
+    {
+      "id": "jar-majrur",
+      "latin": "jar-majrur",
+      "forms": [
+        "jar-majrur"
+      ],
+      "group": "istilah",
+      "ar": "جَارّ وَمَجْرُور",
+      "attest": [
+        {
+          "page": "9904/167",
+          "text": "ينطلق أو ظرف أو جار ومجرور تامان نحو جاء الذي هو عندك"
+        }
+      ]
+    },
+    {
+      "id": "khafdh",
+      "latin": "khafdh",
+      "forms": [
+        "khafdh"
+      ],
+      "group": "istilah",
+      "ar": "خَفْض",
+      "attest": [
+        {
+          "page": "11371/2",
+          "text": "وأقسامُه أربعة: رَفع، ونَصب، وخَفْض، وجَزْم. فللأسماء من ذلك الرفع، والنصب، والخفض،"
+        }
+      ]
+    },
+    {
+      "id": "jazm",
+      "latin": "jazm",
+      "forms": [
+        "jazm",
+        "menjazmkan"
+      ],
+      "group": "istilah",
+      "ar": "جَزْم",
+      "attest": [
+        {
+          "page": "11371/2",
+          "text": "أربعة: رَفع، ونَصب، وخَفْض، وجَزْم. فللأسماء من ذلك الرفع، والنصب، والخفض، ولا"
+        }
+      ]
+    },
+    {
+      "id": "majzum",
+      "latin": "majzum",
+      "forms": [
+        "majzum"
+      ],
+      "group": "istilah",
+      "ar": "مَجْزُوم",
+      "attest": [
+        {
+          "page": "11371/7",
+          "text": "وأمر، نحو: ضَرَبَ، ويَضرِبُ، واضرِبْ. فالماضي: مفتوحُ الآخر أبدا. والأمر: مجزومٌ أبدا."
+        }
+      ]
+    },
+    {
+      "id": "mabni",
+      "latin": "mabni",
+      "forms": [
+        "mabni"
+      ],
+      "group": "istilah",
+      "ar": "مَبْنِيّ",
+      "attest": [
+        {
+          "page": "6970/4",
+          "text": "بِبَيَان انقسامه إِلَى مُعرب ومبني وقدمت المعرب لِأَنَّهُ الأَصْل وأخرت الْمَبْنِيّ لِأَنَّهُ"
+        },
+        {
+          "page": "6970/14",
+          "text": "وَلما فرغت من ذكر الْمَبْنِيّ على الضَّم ذكرت"
+        }
+      ]
+    },
+    {
+      "id": "murab",
+      "latin": "mu'rab",
+      "forms": [
+        "mu'rab"
+      ],
+      "group": "istilah",
+      "ar": "مُعْرَب",
+      "attest": [
+        {
+          "page": "6970/4",
+          "text": "ص وَهُوَ ضَرْبَان مُعرب وَهُوَ مَا يتَغَيَّر آخِره بِسَبَب العوامل الدَّاخِلَة عَلَيْهِ"
+        },
+        {
+          "page": "11243/80",
+          "text": "فالمنقوص: هو الاسم المُعْرَب الذى آخره ياء لازمة"
+        }
+      ]
+    },
+    {
+      "id": "bina",
+      "latin": "bina'",
+      "forms": [
+        "bina'"
+      ],
+      "group": "istilah",
+      "ar": "بِنَاء",
+      "attest": [
+        {
+          "page": "6970/15",
+          "text": "لكل وَاحِد مِنْهَا علامته الدَّالَّة عَلَيْهِ وَحكمه الثَّابِت لَهُ من بِنَاء وإعراب"
+        }
+      ]
+    },
+    {
+      "id": "mahall",
+      "latin": "mahall",
+      "forms": [
+        "mahall"
+      ],
+      "group": "istilah",
+      "ar": "مَحَلّ",
+      "attest": [
+        {
+          "page": "22916/14",
+          "text": "وجملة: «الحمد لله..» لا محل لها ابتدائية."
+        },
+        {
+          "page": "9256/14",
+          "text": "(٦) ... وأكرمُ من غَمام عند مَحل فتىً"
+        }
+      ]
+    },
+    {
+      "id": "jamak-mudzakkar-salim",
+      "latin": "jamak mudzakkar salim",
+      "forms": [
+        "jamak mudzakkar salim"
+      ],
+      "group": "istilah",
+      "ar": "جَمْع مُذَكَّر سَالِم",
+      "attest": [
+        {
+          "page": "11371/6",
+          "text": "بالحروف أربعة أنواع: التثنية، وجمع المُذَكَّر السالم، والأسماء الخمسة، والأفعال الخمسة، وهي:"
+        }
+      ]
+    },
+    {
+      "id": "mulhaq",
+      "latin": "mulhaq",
+      "forms": [
+        "mulhaq"
+      ],
+      "group": "istilah",
+      "ar": "مُلْحَق",
+      "attest": [
+        {
+          "page": "9904/56",
+          "text": "بزيادة أو شبهها فهو ملحق بالمثنى فكلا وكلتا واثنان واثنتان ملحقة بالمثنى"
+        },
+        {
+          "page": "11243/113",
+          "text": "متحركًا ثانى كلمتها: فالأولى ألف التأنيث كحُبارى: لطائر، أو الإلحاق كحَبَرْكي مُلْحَق"
+        }
+      ]
+    },
+    {
+      "id": "mufrad",
+      "latin": "mufrad",
+      "forms": [
+        "mufrad"
+      ],
+      "group": "istilah",
+      "ar": "مُفْرَد",
+      "attest": [
+        {
+          "page": "11371/3",
+          "text": "أربعة مواضع في الاسم المُفرد، وجَمع التكسير، وجمع المؤنث السالم، والفعل المضارع"
+        },
+        {
+          "page": "11243/182",
+          "text": "... شَمْلًا فَأَصْلُ الجمع هذا المفرَدُ"
+        },
+        {
+          "page": "6970/2",
+          "text": "ص الْكَلِمَة قَول مُفْرد ش تطلق الْكَلِمَة فِي"
+        }
+      ]
+    },
+    {
+      "id": "marifah",
+      "latin": "ma'rifah",
+      "forms": [
+        "ma'rifah"
+      ],
+      "group": "istilah",
+      "ar": "مَعْرِفَة",
+      "attest": [
+        {
+          "page": "11371/15",
+          "text": "والمَعرِفة خمسة أشياء: الاسم المُضمَرُ، نحو: أنا، وأنتَ، والاسم العَلَمُ، نحو: زيدٌ"
+        }
+      ]
+    },
+    {
+      "id": "nakirah",
+      "latin": "nakirah",
+      "forms": [
+        "nakirah"
+      ],
+      "group": "istilah",
+      "ar": "نَكِرَة",
+      "attest": [
+        {
+          "page": "11371/23",
+          "text": "ولا يكون الحال إلا نَكِرَةً، ولا يكونُ إلا بعد تمام الكلام، ولا"
+        }
+      ]
+    },
+    {
+      "id": "mubtada",
+      "latin": "mubtada'",
+      "forms": [
+        "mubtada'"
+      ],
+      "group": "istilah",
+      "ar": "مُبْتَدَأ",
+      "attest": [
+        {
+          "page": "11371/8",
+          "text": "الذي لم يُسَمَّ فاعِلُهُ، والمبتدأ وخبره، واسم كان وأخواتها، وخبر إنَّ وأخواتها،"
+        }
+      ]
+    },
+    {
+      "id": "khabar",
+      "latin": "khabar",
+      "forms": [
+        "khabar"
+      ],
+      "group": "istilah",
+      "ar": "خَبَر",
+      "attest": [
+        {
+          "page": "11371/8",
+          "text": "وخبره، واسم كان وأخواتها، وخبر إنَّ وأخواتها، والتابع للمرفوع، وهو أربعة أشياء:"
+        },
+        {
+          "page": "11371/13",
+          "text": "فأما كان وأخواتها , فإنها ترفَعُ الاسمَ, وتَنصِبُ الخَبَرَ،"
+        }
+      ]
+    },
+    {
+      "id": "khabar-jumlah",
+      "latin": "khabar jumlah",
+      "forms": [
+        "khabar jumlah"
+      ],
+      "group": "istilah",
+      "ar": "خَبَر جُمْلَة",
+      "attest": [
+        {
+          "page": "2163/5774",
+          "text": "قلت الرفع على الابتداء والخبر الجملة فإن قلت فالجملة الواقعة خبرا لا"
+        }
+      ]
+    },
+    {
+      "id": "jumlah",
+      "latin": "jumlah",
+      "forms": [
+        "jumlah"
+      ],
+      "group": "istilah",
+      "ambiguous_forms": [
+        "jumlah"
+      ],
+      "ar": "جُمْلَة",
+      "attest": [
+        {
+          "page": "9904/123",
+          "text": "وجملة وما بمزج ركبا ... ذا إن بغير ويه تم أعراب (٢)"
+        }
+      ]
+    },
+    {
+      "id": "jumlah-ismiyyah",
+      "latin": "jumlah ismiyyah",
+      "forms": [
+        "jumlah ismiyyah"
+      ],
+      "group": "istilah",
+      "ar": "جُمْلَة اِسْمِيَّة",
+      "attest": [
+        {
+          "pron": "جُمْلَة اِسْمِيَّة"
+        },
+        {
+          "page": "9904/157",
+          "text": "في الاختيار وقد جاء وصلها بالجملة الإسمية وبالظرف شذوذا فمن الأول قوله:"
+        }
+      ]
+    },
+    {
+      "id": "jumlah-filiyyah",
+      "latin": "jumlah fi'liyyah",
+      "forms": [
+        "jumlah fi'liyyah"
+      ],
+      "group": "istilah",
+      "ar": "جُمْلَة فِعْلِيَّة",
+      "attest": [
+        {
+          "pron": "جُمْلَة فِعْلِيَّة"
+        },
+        {
+          "page": "9256/50",
+          "text": "[المبحث الثالث في تقسيم الخبر إلى جملة فعلية وجملة اسمية]"
+        }
+      ]
+    },
+    {
+      "id": "syibhul-jumlah",
+      "latin": "syibhul jumlah",
+      "forms": [
+        "syibhul jumlah"
+      ],
+      "group": "istilah",
+      "ar": "شِبْه الجُمْلَة",
+      "attest": [
+        {
+          "page": "9904/153",
+          "text": "أو شبه جملة ونعني بشبه الجملة الظرف والجار والمجرور وهذا في غير"
+        }
+      ]
+    },
+    {
+      "id": "mutaalliq",
+      "latin": "muta'alliq",
+      "forms": [
+        "muta'alliq"
+      ],
+      "group": "istilah",
+      "ar": "مُتَعَلِّق",
+      "attest": [
+        {
+          "page": "9057/61",
+          "text": "و «عليهم» جارٌّ ومجرور متعلقٌ بأَنْعمت، والضميرُ هوالعائد وهو ضميرُ جمعِ المذكَّرِين"
+        },
+        {
+          "page": "9256/282",
+          "text": "نفى الشيء بايجابه: هو أن ينفى متعلّق أمر"
+        }
+      ]
+    },
+    {
+      "id": "fail",
+      "latin": "fa'il",
+      "forms": [
+        "fa'il"
+      ],
+      "group": "istilah",
+      "ar": "فَاعِل",
+      "attest": [
+        {
+          "page": "11371/8",
+          "text": "الفاعل، والمفعول الذي لم يُسَمَّ فاعِلُهُ، والمبتدأ وخبره، واسم كان وأخواتها، وخبر"
+        },
+        {
+          "page": "11243/64",
+          "text": "وقد يأتى فعيل مرادًا به فاعِل، كقدير بمعنى"
+        },
+        {
+          "page": "6970/8",
+          "text": "أمس فأمس فِي الْبَيْت فَاعل لمضى وَهُوَ مكسور"
+        }
+      ]
+    },
+    {
+      "id": "naib-fail",
+      "latin": "na'ib fa'il",
+      "forms": [
+        "na'ib fa'il"
+      ],
+      "group": "istilah",
+      "ar": "نَائِب فَاعِل",
+      "attest": [
+        {
+          "page": "9617/10",
+          "text": "مجرور. والجار والمجرور «عليهم» نائب فاعل لاسم المفعول «المغضوب» . «ولا الضالين»"
+        }
+      ]
+    },
+    {
+      "id": "maful-bih",
+      "latin": "maf'ul bih",
+      "forms": [
+        "maf'ul bih"
+      ],
+      "group": "istilah",
+      "ar": "مَفْعُول بِه",
+      "attest": [
+        {
+          "page": "11371/19",
+          "text": "المنصوبات خمسة عَشَرَ، وهي: المفعول به، والمَصدَر، وظَرْفُ الزمان، وظرفُ المكان، والحالُ،"
+        }
+      ]
+    },
+    {
+      "id": "maful",
+      "latin": "maf'ul",
+      "forms": [
+        "maf'ul"
+      ],
+      "group": "istilah",
+      "ar": "مَفْعُول",
+      "attest": [
+        {
+          "page": "11371/8",
+          "text": "الفاعل، والمفعول الذي لم يُسَمَّ فاعِلُهُ، والمبتدأ وخبره، واسم كان وأخواتها، وخبر"
+        },
+        {
+          "page": "11243/141",
+          "text": "ثامنها: أن تكون الواو لام مَفْعُول الذى ماضيه"
+        }
+      ]
+    },
+    {
+      "id": "zharaf",
+      "latin": "zharaf",
+      "forms": [
+        "zharaf"
+      ],
+      "group": "istilah",
+      "ar": "ظَرْف",
+      "attest": [
+        {
+          "page": "11371/19",
+          "text": "وهي: المفعول به، والمَصدَر، وظَرْفُ الزمان، وظرفُ المكان، والحالُ، والتمييزُ، والمُستَثنَى، واِسم"
+        }
+      ]
+    },
+    {
+      "id": "hal",
+      "latin": "hal",
+      "forms": [
+        "hal"
+      ],
+      "group": "istilah",
+      "ambiguous_forms": [
+        "hal"
+      ],
+      "ar": "حَال",
+      "attest": [
+        {
+          "page": "11371/19",
+          "text": "وظَرْفُ الزمان، وظرفُ المكان، والحالُ، والتمييزُ، والمُستَثنَى، واِسم لا، والمُنادَى، والمفعولُ من"
+        }
+      ]
+    },
+    {
+      "id": "syarat",
+      "latin": "syarat",
+      "forms": [
+        "syarat"
+      ],
+      "group": "istilah",
+      "ambiguous_forms": [
+        "syarat"
+      ],
+      "ar": "شَرْط",
+      "attest": [
+        {
+          "page": "9904/31",
+          "text": "للاستفهام نحو متى تقوم وللشرط نحو متى تقم أقم وفي الحالتين هي"
+        },
+        {
+          "page": "9256/130",
+          "text": "الأصل عدم جزم وقطع المتكلم بوقوع الشَّرط في"
+        }
+      ]
+    },
+    {
+      "id": "nafi",
+      "latin": "nafi",
+      "forms": [
+        "nafi",
+        "menafikan"
+      ],
+      "group": "istilah",
+      "ar": "نَفْي",
+      "attest": [
+        {
+          "page": "6970/16",
+          "text": "الحلبيات إِلَى أَنَّهَا حرف نفي بِمَنْزِلَة مَا النافية وَتَبعهُ على ذل أَبُو"
+        },
+        {
+          "page": "9256/106",
+          "text": "واعلم: أن (سلب العُموم) يكون النَّفي فيه للمجموع"
+        }
+      ]
+    },
+    {
+      "id": "idhafah",
+      "latin": "idhafah",
+      "forms": [
+        "idhafah"
+      ],
+      "group": "istilah",
+      "ar": "إِضَافَة",
+      "attest": [
+        {
+          "pron": "إِضَافَة"
+        },
+        {
+          "page": "11371/30",
+          "text": "المخفوضات ثلاثة أنواع ١: مخفوضٌ بالحَرفِ، ومخفوضٌ بالإضافة، وتابِعٌ للمَخفوض."
+        }
+      ]
+    },
+    {
+      "id": "mudhaf",
+      "latin": "mudhaf",
+      "forms": [
+        "mudhaf"
+      ],
+      "group": "istilah",
+      "ar": "مُضَاف",
+      "attest": [
+        {
+          "page": "11371/27",
+          "text": "خمسة أنواع: المُفردُ العَلَمُ، والنَّكِرة المقصودة، والنَّكِرة غيرُ المقصودة، والمُضاف، والشَبَّيهُ بالمضاف."
+        }
+      ]
+    },
+    {
+      "id": "mudhaf-ilaih",
+      "latin": "mudhaf ilaih",
+      "forms": [
+        "mudhaf ilaih"
+      ],
+      "group": "istilah",
+      "ar": "مُضَاف إِلَيْه",
+      "attest": [
+        {
+          "pron": "مُضَاف إِلَيْه"
+        },
+        {
+          "page": "6970/4",
+          "text": "لُزُوم الضَّم إِذا حذف الْمُضَاف إِلَيْهِ وَنوى مَعْنَاهُ وَكَمن وَكم فِي لُزُوم"
+        }
+      ]
+    },
+    {
+      "id": "mahdhah",
+      "latin": "mahdhah",
+      "forms": [
+        "mahdhah"
+      ],
+      "group": "istilah",
+      "ar": "مَحْضَة",
+      "attest": [
+        {
+          "page": "9617/7",
+          "text": "«مالك» : نعت للجلالة المعرفة، وإضافة «مالك» محضة فيتعرَّف بالإضافة."
+        },
+        {
+          "page": "9057/57",
+          "text": "وقرأ به خلف حيث وَرَد، وخلاَّد الأول فقط، وقد تُقْرَأ زاياً مَحْضَةً،"
+        }
+      ]
+    },
+    {
+      "id": "naat",
+      "latin": "na't",
+      "forms": [
+        "na't"
+      ],
+      "group": "istilah",
+      "ar": "نَعْت",
+      "attest": [
+        {
+          "pron": "نَعْت"
+        },
+        {
+          "page": "11371/19",
+          "text": "والتابع للمنصوب، وهو أربعة أشياء: النعت، والعطف، والتوكيد، والبدل."
+        }
+      ]
+    },
+    {
+      "id": "manut",
+      "latin": "man'ut",
+      "forms": [
+        "man'ut"
+      ],
+      "group": "istilah",
+      "ar": "مَنْعُوت",
+      "attest": [
+        {
+          "page": "11371/15",
+          "text": "النَّعتُ: تابِعٌ للمنعوت في رَفعِهِ، ونصبِهِ، وخفضِهِ، وتعريفِهِ، وتنكيرِهِ، تقول: قام زيدٌ"
+        }
+      ]
+    },
+    {
+      "id": "sifat",
+      "latin": "sifat",
+      "forms": [
+        "sifat"
+      ],
+      "group": "istilah",
+      "ambiguous_forms": [
+        "sifat"
+      ],
+      "ar": "صِفَة",
+      "attest": [
+        {
+          "page": "6970/16",
+          "text": "الْمَوْصُوف وَصفته وَإِقَامَة مَعْمُول الصّفة مقَامهَا وَالتَّقْدِير مَا هِيَ بِولد مقول فِيهِ"
+        },
+        {
+          "page": "11243/118",
+          "text": "ولا تُرَدُّ ألفًا لما صحت لامه، كعِدَةٍ وصِفَةٍ،"
+        }
+      ]
+    },
+    {
+      "id": "badal",
+      "latin": "badal",
+      "forms": [
+        "badal"
+      ],
+      "group": "istilah",
+      "ar": "بَدَل",
+      "attest": [
+        {
+          "page": "11371/8",
+          "text": "وخبر إنَّ وأخواتها، والتابع للمرفوع، وهو أربعة أشياء: النَّعتُ، والعطفُ، والتوكيد، والبَدَل."
+        }
+      ]
+    },
+    {
+      "id": "badal-muthabiq",
+      "latin": "badal muthabiq",
+      "forms": [
+        "badal muthabiq"
+      ],
+      "group": "istilah",
+      "ar": "بَدَل مُطَابِق",
+      "attest": [
+        {
+          "page": "2163/12",
+          "text": "لانكسار ما قبلها (صِراطَ) بدل مطابق من الصراط (الَّذِينَ) اسم موصول مضاف"
+        }
+      ]
+    },
+    {
+      "id": "badal-kull",
+      "latin": "badal kull min kull",
+      "forms": [
+        "badal kull min kull"
+      ],
+      "group": "istilah",
+      "ar": "بَدَل كُلّ مِنْ كُلّ",
+      "attest": [
+        {
+          "page": "9057/58",
+          "text": "الذين} : بدلٌ منه بدلُ كلٍ من كل، وهو بدلُ معرفةٍ من"
+        }
+      ]
+    },
+    {
+      "id": "athaf",
+      "latin": "'athaf",
+      "forms": [
+        "'athaf"
+      ],
+      "group": "istilah",
+      "ar": "عَطْف",
+      "attest": [
+        {
+          "page": "11371/16",
+          "text": "باب العَطفِ"
+        },
+        {
+          "page": "9057/67",
+          "text": "{وَلاَ الضآلين} زائدةٌ لتأكيد معنى النفي المفهومِ من «غير» لئلا يُتَوَهَّم عَطْفُ"
+        }
+      ]
+    },
+    {
+      "id": "athaf-bayan",
+      "latin": "'athaf bayan",
+      "forms": [
+        "'athaf bayan"
+      ],
+      "group": "istilah",
+      "ar": "عَطْف بَيَان",
+      "attest": [
+        {
+          "page": "23587/18",
+          "text": "بهذا وهذا بهذا، ويكون «الكتاب» عطف البيان الذي يقوم مقام النعت وهُدىً"
+        }
+      ]
+    },
+    {
+      "id": "athaf-nasaq",
+      "latin": "'athaf nasaq",
+      "forms": [
+        "'athaf nasaq"
+      ],
+      "group": "istilah",
+      "ar": "عَطْف نَسَق",
+      "attest": [
+        {
+          "page": "9256/125",
+          "text": "أمّا عطف النسق: فيؤتى به للأغراض الآتية:"
+        },
+        {
+          "page": "9256/125",
+          "text": "المبحث الرابع في التَّقييد بعطف النَّسَق"
+        }
+      ]
+    },
+    {
+      "id": "zaidah",
+      "latin": "zaidah",
+      "forms": [
+        "zaidah"
+      ],
+      "group": "istilah",
+      "ar": "زَائِدَة",
+      "attest": [
+        {
+          "page": "6970/3",
+          "text": "وَهِي التَّنْوِين وَهُوَ نون زَائِدَة سَاكِنة تلْحق الآخر لفظا لاخطا لغير توكيد"
+        }
+      ]
+    },
+    {
+      "id": "wazan",
+      "latin": "wazan",
+      "forms": [
+        "wazan",
+        "berwazan"
+      ],
+      "group": "istilah",
+      "ar": "وَزْن",
+      "attest": [
+        {
+          "page": "11243/11",
+          "text": "ثلاثةُ أحرف، وقابلوها عند الوزن بالفاء والعين واللام، مصوَّرة بصورةِ الموزون، فيقولون"
+        },
+        {
+          "page": "9057/50",
+          "text": "قبلها فَقُلِبَتْ ياءً. وهذه قاعدةٌ مطردَة، نحو: ميزان ومِيقات وهما من الوَزْن"
+        }
+      ]
+    },
+    {
+      "id": "tashrif",
+      "latin": "tashrif",
+      "forms": [
+        "tashrif"
+      ],
+      "group": "istilah",
+      "ar": "تَصْرِيف",
+      "attest": [
+        {
+          "pron": "تَصْرِيف"
+        },
+        {
+          "page": "11371/21",
+          "text": "الاسم المنصوب, الذي يجيءُ ثالثا في تصريفِ الفعل، نحو: ضربَ يَضرِبُ ضَرْبَاً."
+        }
+      ]
+    },
+    {
+      "id": "mizan",
+      "latin": "mizan",
+      "forms": [
+        "mizan"
+      ],
+      "group": "istilah",
+      "ar": "مِيزَان",
+      "attest": [
+        {
+          "page": "11243/11",
+          "text": "[الميزان الصرفي]"
+        },
+        {
+          "page": "11243/141",
+          "text": "خامسها: أن تقع متوسطة إثر كَسْرة، وهى ساكنة مفردة، كمِيزان،"
+        }
+      ]
+    },
+    {
+      "id": "mashdar",
+      "latin": "mashdar",
+      "forms": [
+        "mashdar"
+      ],
+      "group": "istilah",
+      "ar": "مَصْدَر",
+      "attest": [
+        {
+          "page": "11371/19",
+          "text": "عَشَرَ، وهي: المفعول به، والمَصدَر، وظَرْفُ الزمان، وظرفُ المكان، والحالُ، والتمييزُ، والمُستَثنَى،"
+        },
+        {
+          "page": "11243/57",
+          "text": "المَصْدَر:"
+        }
+      ]
+    },
+    {
+      "id": "mashdariyyah",
+      "latin": "mashdariyyah",
+      "forms": [
+        "mashdariyyah"
+      ],
+      "group": "istilah",
+      "ar": "مَصْدَرِيَّة",
+      "attest": [
+        {
+          "page": "9904/137",
+          "text": "أحدها: أن المصدرية وتوصل بالفعل المنصرف ماضيا مثل عجبت من أن قام"
+        }
+      ]
+    },
+    {
+      "id": "mubalaghah",
+      "latin": "mubalaghah",
+      "forms": [
+        "mubalaghah"
+      ],
+      "group": "istilah",
+      "ar": "مُبَالَغَة",
+      "attest": [
+        {
+          "page": "11243/31",
+          "text": "وخامسها: المبالغة فى معنى الفعل، كاقتدر وارتدّ، أى بالغ فى القدرة والردَّة."
+        },
+        {
+          "page": "9256/76",
+          "text": "(وإذ أخذنا ميثاقكم لا تسفكون دماءكم) لم يقل لا تسفكوا، قصداً للمُبالغة"
+        }
+      ]
+    },
+    {
+      "id": "isim-fail",
+      "latin": "isim fa'il",
+      "forms": [
+        "isim fa'il"
+      ],
+      "group": "istilah",
+      "ar": "اِسْم فَاعِل",
+      "attest": [
+        {
+          "page": "9904/155",
+          "text": "كتبه وأعني بالصفة الصريحة اسم الفاعل نحو الضارب واسم المفعول نحو المضروب"
+        }
+      ]
+    },
+    {
+      "id": "isim-maful",
+      "latin": "isim maf'ul",
+      "forms": [
+        "isim maf'ul"
+      ],
+      "group": "istilah",
+      "ar": "اِسْم مَفْعُول",
+      "attest": [
+        {
+          "page": "9904/155",
+          "text": "اسم الفاعل نحو الضارب واسم المفعول نحو المضروب والصفة المشبهة نحو الحسن"
+        },
+        {
+          "page": "11243/140",
+          "text": "رابعة فصاعدًا بعد فتح، نحو أعْطَيْت وزَكَّيْتُ، ومُعْطَيان ومُزَكَّيان، بصيغة اسم المَفعول،"
+        }
+      ]
+    },
+    {
+      "id": "isim-maushul",
+      "latin": "isim maushul",
+      "forms": [
+        "isim maushul"
+      ],
+      "group": "istilah",
+      "ar": "اِسْم مَوْصُول",
+      "attest": [
+        {
+          "page": "9904/148",
+          "text": "فذهب قوم إلى أنها اسم موصول وهو الصحيح وقيل إنها حرف موصول"
+        }
+      ]
+    },
+    {
+      "id": "maushul",
+      "latin": "maushul",
+      "forms": [
+        "maushul"
+      ],
+      "group": "istilah",
+      "ar": "مَوْصُول",
+      "attest": [
+        {
+          "page": "9904/86",
+          "text": "والمحلى بالألف واللام كالغلام والموصول كالذي وما أضيف إلى واحد منها كابني"
+        }
+      ]
+    },
+    {
+      "id": "shilah",
+      "latin": "shilah",
+      "forms": [
+        "shilah"
+      ],
+      "group": "istilah",
+      "ar": "صِلَة",
+      "attest": [
+        {
+          "page": "9256/34",
+          "text": "فهو قيد زائد على تكوينها - إلاّ صِلَة الموصول، والمضاف إليه (١)"
+        }
+      ]
+    },
+    {
+      "id": "dhamir",
+      "latin": "dhamir",
+      "forms": [
+        "dhamir"
+      ],
+      "group": "istilah",
+      "ar": "ضَمِير",
+      "attest": [
+        {
+          "pron": "ضَمِير"
+        },
+        {
+          "page": "11371/3",
+          "text": "المضارع, إذا اتصل به ضمير تثنية، أو ضمير جمع، أو ضمير المؤنَّثَة"
+        }
+      ]
+    },
+    {
+      "id": "dhamir-syan",
+      "latin": "dhamir sya'n",
+      "forms": [
+        "dhamir sya'n"
+      ],
+      "group": "istilah",
+      "ar": "ضَمِير الشَّأْن",
+      "attest": [
+        {
+          "page": "2163/5774",
+          "text": "فيه وجهان: ١- أنه ضمير الشأن لأنه موضع تعظيم كأنه قيل الشأن"
+        }
+      ]
+    },
+    {
+      "id": "muttashil",
+      "latin": "muttashil",
+      "forms": [
+        "muttashil"
+      ],
+      "group": "istilah",
+      "ar": "مُتَّصِل",
+      "attest": [
+        {
+          "page": "11371/20",
+          "text": "والمضمر قسمان: مُتَّصِل، ومُنفَصِل."
+        }
+      ]
+    },
+    {
+      "id": "munfashil",
+      "latin": "munfashil",
+      "forms": [
+        "munfashil"
+      ],
+      "group": "istilah",
+      "ar": "مُنْفَصِل",
+      "attest": [
+        {
+          "page": "11371/20",
+          "text": "والمضمر قسمان: مُتَّصِل، ومُنفَصِل."
+        }
+      ]
+    },
+    {
+      "id": "mustatir",
+      "latin": "mustatir",
+      "forms": [
+        "mustatir"
+      ],
+      "group": "istilah",
+      "ar": "مُسْتَتِر",
+      "attest": [
+        {
+          "page": "6970/9",
+          "text": "الْبَيْت فعل مَاض وفاعله مستتر وَالتَّقْدِير مذ أَمْسَى الْمسَاء وَلما فرغت من"
+        }
+      ]
+    },
+    {
+      "id": "fiil-mudhari",
+      "latin": "fi'il mudhari'",
+      "forms": [
+        "fi'il mudhari'"
+      ],
+      "group": "istilah",
+      "ar": "فِعْل مُضَارِع",
+      "attest": [
+        {
+          "page": "11371/3",
+          "text": "وجَمع التكسير، وجمع المؤنث السالم، والفعل المضارع الذي لم يتصل بآخره شيء."
+        },
+        {
+          "page": "6970/21",
+          "text": "الْفِعْل الْمُضَارع"
+        }
+      ]
+    },
+    {
+      "id": "mudhari",
+      "latin": "mudhari'",
+      "forms": [
+        "mudhari'"
+      ],
+      "group": "istilah",
+      "ar": "مُضَارِع",
+      "attest": [
+        {
+          "page": "11371/3",
+          "text": "وجَمع التكسير، وجمع المؤنث السالم، والفعل المضارع الذي لم يتصل بآخره شيء."
+        },
+        {
+          "page": "6970/21",
+          "text": "الْفِعْل الْمُضَارع"
+        }
+      ]
+    },
+    {
+      "id": "fiil-madhi",
+      "latin": "fi'il madhi",
+      "forms": [
+        "fi'il madhi"
+      ],
+      "group": "istilah",
+      "ar": "فِعْل مَاضٍ",
+      "attest": [
+        {
+          "page": "6970/9",
+          "text": "أَن أمسا فِي الْبَيْت فعل مَاض وفاعله مستتر وَالتَّقْدِير مذ أَمْسَى الْمسَاء"
+        }
+      ]
+    },
+    {
+      "id": "madhi",
+      "latin": "madhi",
+      "forms": [
+        "madhi"
+      ],
+      "group": "istilah",
+      "ar": "مَاضٍ",
+      "attest": [
+        {
+          "page": "11371/7",
+          "text": "الأفعالُ ثلاثة: ماضٍ، ومُضارعٌ، وأمر، نحو: ضَرَبَ، ويَضرِبُ، واضرِبْ. فالماضي: مفتوحُ الآخر"
+        },
+        {
+          "page": "6970/14",
+          "text": "ص وَأما الْفِعْل فَثَلَاثَة أَقسَام مَاض وَيعرف بتاء"
+        }
+      ]
+    },
+    {
+      "id": "fiil-amr",
+      "latin": "fi'il amr",
+      "forms": [
+        "fi'il amr"
+      ],
+      "group": "istilah",
+      "ar": "فِعْل أَمْر",
+      "attest": [
+        {
+          "page": "6970/18",
+          "text": "فعل الْأَمر"
+        }
+      ]
+    },
+    {
+      "id": "amr",
+      "latin": "amr",
+      "forms": [
+        "amr"
+      ],
+      "group": "istilah",
+      "ar": "أَمْر",
+      "attest": [
+        {
+          "page": "6970/18",
+          "text": "فعل الْأَمر"
+        },
+        {
+          "page": "11243/44",
+          "text": "٣ ويكون كثيرًا إذا وقع بعد أداة طلب: أمْرٍ،"
+        }
+      ]
+    },
+    {
+      "id": "majhul",
+      "latin": "majhul",
+      "forms": [
+        "majhul"
+      ],
+      "group": "istilah",
+      "ar": "مَجْهُول",
+      "attest": [
+        {
+          "page": "11243/41",
+          "text": "ولا يُبْنى الفعل اللازم للمجهول إلا مع الظرف أو المصدر المتصرفين المختصين،"
+        }
+      ]
+    },
+    {
+      "id": "taqdim-maful",
+      "latin": "taqdim maf'ul",
+      "forms": [
+        "taqdim maf'ul"
+      ],
+      "group": "istilah",
+      "ar": "تَقْدِيم المَفْعُول",
+      "attest": [
+        {
+          "page": "9256/105",
+          "text": "فاعبد وكن من الشاكرين) فتقديم المفعول في هذا لتخصيصه بالعبادة، وأنه ينبغي",
+          "part": "hamesh"
+        }
+      ]
+    },
+    {
+      "id": "takhshish",
+      "latin": "takhshish",
+      "forms": [
+        "takhshish"
+      ],
+      "group": "istilah",
+      "ar": "تَخْصِيص",
+      "attest": [
+        {
+          "page": "9256/116",
+          "text": "(١) منها التّخصيص بالمسند إليه - نحو (لله مُلكُ السموات والأرض) ."
+        },
+        {
+          "page": "9256/107",
+          "text": "(٧) ومنها إفادة التَخصيص - قطعاً (١)"
+        }
+      ]
+    },
+    {
+      "id": "hashr",
+      "latin": "hashr",
+      "forms": [
+        "hashr"
+      ],
+      "group": "istilah",
+      "ar": "حَصْر",
+      "attest": [
+        {
+          "page": "2163/13",
+          "text": "التّقديم فقد قدّم الضمير لحصر العبادة والاستعانة بالله وحده، وقدمت العبادة على"
+        }
+      ]
+    },
+    {
+      "id": "balaghah",
+      "latin": "balaghah",
+      "forms": [
+        "balaghah"
+      ],
+      "group": "istilah",
+      "ar": "بَلَاغَة",
+      "attest": [
+        {
+          "page": "9256/97",
+          "text": "يُوقفكَ على دقائق من البلاغة، تؤنسُك إذا انتَ نظرتَ اليها بثاقب فكرك،"
+        },
+        {
+          "page": "11243/58",
+          "text": "مصدره: فُعولة، كصعب الشيء صُعوبة، وعذُب الماء عُذوبة، وفعالة بالفتح، كبَلُغَ بَلَاغة،"
+        }
+      ]
+    },
+    {
+      "id": "bab",
+      "latin": "bab",
+      "forms": [
+        "bab"
+      ],
+      "group": "istilah",
+      "ambiguous_forms": [
+        "bab"
+      ],
+      "ar": "بَاب",
+      "attest": [
+        {
+          "page": "11371/2",
+          "text": "[باب الإعراب]"
+        },
+        {
+          "page": "6970/5",
+          "text": "فَأَما بَاب حذام وَنَحْوه فَأهل الْحجاز يبنونه على"
+        }
+      ]
+    },
+    {
+      "id": "thalab",
+      "latin": "thalab",
+      "forms": [
+        "thalab"
+      ],
+      "group": "istilah",
+      "ar": "طَلَب",
+      "attest": [
+        {
+          "page": "6970/18",
+          "text": "قُم فَإِنَّهُ دَال على طلب الْقيام وَيقبل يَاء المخاطبة تَقول إِذا أمرت"
+        },
+        {
+          "page": "11243/58",
+          "text": "فمن الأول: طَلَبَ طَلَبًا، ونَبَتَ نَبَاتًا، وكَتَبَ كِتَابًا،"
+        }
+      ]
+    },
+    {
+      "id": "mutawaah",
+      "latin": "mutawa'ah",
+      "forms": [
+        "mutawa'ah"
+      ],
+      "group": "istilah",
+      "ar": "مُطَاوَعَة",
+      "attest": [
+        {
+          "page": "11243/30",
+          "text": "يأتى لمعنى واحد، وهو المطاوعة، ولهذا لا يكون إلا لازمًا، ولا يكون"
+        }
+      ]
+    },
+    {
+      "id": "tadiyah",
+      "latin": "ta'diyah",
+      "forms": [
+        "ta'diyah"
+      ],
+      "group": "istilah",
+      "ar": "تَعْدِيَة",
+      "attest": [
+        {
+          "page": "11243/26",
+          "text": "زيادةُ الهمزة فى أوله للتعدية، فيقال فى ذهب أذهب، وفى خرج أخرج."
+        },
+        {
+          "page": "11243/27",
+          "text": "الأول: التَّعدية، وهي تصييرُ الفاعِ بالهمزةِ مفعولاً، كأقمتُ"
+        }
+      ]
+    },
+    {
+      "id": "ilal",
+      "latin": "i'lal",
+      "forms": [
+        "i'lal"
+      ],
+      "group": "istilah",
+      "ar": "إِعْلَال",
+      "attest": [
+        {
+          "page": "11243/8",
+          "text": "وموضوعُه: الألفاظُ العربيةُ من حيثُ تلك الأحوالِ، كالصحَّةِ والإعلالِ، والأصالةِ والزِّيادَةِ، وَنَحوِها."
+        },
+        {
+          "page": "11243/146",
+          "text": "وإنْ لحِرْفَيِنِ ذا الإعْلَالُ اسْتُحِقّ ... صُحِّحَ أوَّلٌ"
+        }
+      ]
+    },
+    {
+      "id": "ibdal",
+      "latin": "ibdal",
+      "forms": [
+        "ibdal"
+      ],
+      "group": "istilah",
+      "ar": "إِبْدَال",
+      "attest": [
+        {
+          "page": "11243/130",
+          "text": "ما جرى مجراه: علِج بإِبدال النون لامًا فى الأول، والضاد لامًا فى"
+        }
+      ]
+    },
+    {
+      "id": "idgham",
+      "latin": "idgham",
+      "forms": [
+        "idgham"
+      ],
+      "group": "istilah",
+      "ar": "إِدْغَام",
+      "attest": [
+        {
+          "page": "11243/49",
+          "text": "ومزيده: يجب فى ماضيه الإدغام، نحو مدّ واستمدّ، ومدُّوا واستمدوا، ما لم"
+        },
+        {
+          "page": "11243/147",
+          "text": "وتقول من الطُّهر بالطاء المهملة أطَّهَّر وفى هذه الحالة يجب الإِدغام لاجتماع"
+        }
+      ]
+    },
+    {
+      "id": "naz-al-khafidh",
+      "latin": "naz' al-khafidh",
+      "forms": [
+        "naz' al-khafidh"
+      ],
+      "group": "istilah",
+      "ar": "نَزْع الخَافِض",
+      "attest": [
+        {
+          "page": "2163/12",
+          "text": "أو منصوب بنزع الخافض لأنّ هدى لا تتعدى إلا الى مفعول واحد"
+        }
+      ]
+    },
+    {
+      "id": "tafsir-bada-ibham",
+      "latin": "tafsir ba'da ibham",
+      "forms": [
+        "tafsir ba'da ibham"
+      ],
+      "group": "istilah",
+      "ar": "تَفْسِير بَعْدَ إِبْهَام",
+      "attest": [
+        {
+          "page": "2163/16",
+          "text": "٧- التفسير بعد الإبهام وذلك في قوله تعالى: صِراطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ»"
+        }
+      ]
+    },
+    {
+      "id": "maqul-al-qaul",
+      "latin": "maqul al-qaul",
+      "forms": [
+        "maqul al-qaul"
+      ],
+      "group": "istilah",
+      "ar": "مَقُول القَوْل",
+      "attest": [
+        {
+          "page": "2163/5781",
+          "text": "تقديره أنت وجملة أعوذ مقول القول وأعوذ فعل مضارع مرفوع وفاعله مستتر"
+        }
+      ]
+    },
+    {
+      "id": "ibtidaiyyah",
+      "latin": "ibtida'iyyah",
+      "forms": [
+        "ibtida'iyyah"
+      ],
+      "group": "istilah",
+      "ar": "اِبْتِدَائِيَّة",
+      "attest": [
+        {
+          "page": "22916/14",
+          "text": "وجملة: «الحمد لله..» لا محل لها ابتدائية."
+        }
+      ]
+    },
+    {
+      "id": "ibtida",
+      "latin": "ibtida'",
+      "forms": [
+        "ibtida'"
+      ],
+      "group": "istilah",
+      "ar": "اِبْتِدَاء",
+      "attest": [
+        {
+          "page": "6970/14",
+          "text": "الأول فِي مَوضِع رفع بِالِابْتِدَاءِ عِنْد سِيبَوَيْهٍ وعَلى الخبرية عِنْد الْأَخْفَش وَفِي"
+        }
+      ]
+    },
+    {
+      "id": "nawasikh",
+      "latin": "nawasikh",
+      "forms": [
+        "nawasikh"
+      ],
+      "group": "istilah",
+      "ar": "نَوَاسِخ",
+      "attest": [
+        {
+          "page": "9256/129",
+          "text": "المبحث السابع في التقييد بالنّواسخ"
+        },
+        {
+          "page": "9256/37",
+          "text": "(٢) واسماء النَّواسخ: كان وأخواتها، وإنّ وَأخواتها -"
+        }
+      ]
+    },
+    {
+      "id": "sahih",
+      "latin": "sahih",
+      "forms": [
+        "sahih"
+      ],
+      "group": "istilah",
+      "ar": "صَحِيح",
+      "attest": [
+        {
+          "page": "11371/5",
+          "text": "فأما السكون فيكون علامة للجزم في الفعل المضارع الصحيح الآخر."
+        },
+        {
+          "page": "6970/16",
+          "text": "إِلَى أَنَّهَا حرف ترج بِمَنْزِلَة لَعَلَّ وتبعهم على ذَلِك ابْن السراج وَالصَّحِيح"
+        }
+      ]
+    },
+    {
+      "id": "jamid",
+      "latin": "jamid",
+      "forms": [
+        "jamid"
+      ],
+      "group": "istilah",
+      "ar": "جَامِد",
+      "attest": [
+        {
+          "page": "9904/59",
+          "text": "هذا الجمع وهو قسمان جامد وصفة. فيشترط في الجامد أن يكون علما"
+        }
+      ]
+    },
+    {
+      "id": "rubai-mujarrad",
+      "latin": "ruba'i mujarrad",
+      "forms": [
+        "ruba'i mujarrad"
+      ],
+      "group": "istilah",
+      "ar": "رُبَاعِيّ مُجَرَّد",
+      "attest": [
+        {
+          "page": "11243/23",
+          "text": "أوزان الرباعيِّ المجرَّد وملحقاته"
+        },
+        {
+          "page": "11243/54",
+          "text": "٢- وأوزان الاسم الرُّباعي المجرّد المتفق عليها خمسة:"
+        }
+      ]
+    },
+    {
+      "id": "mudhaaf",
+      "latin": "mudha'af",
+      "forms": [
+        "mudha'af"
+      ],
+      "group": "istilah",
+      "ar": "مُضَاعَف",
+      "attest": [
+        {
+          "page": "11243/21",
+          "text": "١- أن المضاعَف يجيء من ثلاثة أبواب: من باب نَصَر، وضَرَب، وفَرِحَ،"
+        }
+      ]
+    },
+    {
+      "id": "fashilah",
+      "latin": "fashilah",
+      "forms": [
+        "fashilah"
+      ],
+      "group": "istilah",
+      "ar": "فَاصِلَة",
+      "attest": [
+        {
+          "page": "11243/72",
+          "text": "وكبيرة، وهذا كقول العروضين: فاصلة صُغْرى وفاصلة كُبْرَى. وبذلك يندفع القول بلحن"
+        }
+      ]
+    },
+    {
+      "id": "muqaddar",
+      "latin": "muqaddar",
+      "forms": [
+        "muqaddar"
+      ],
+      "group": "istilah",
+      "ar": "مُقَدَّر",
+      "attest": [
+        {
+          "page": "11243/104",
+          "text": "كأعراب، فإنه جَمْعٌ واحدُه. مُقَدَّرٌ. وسواء توافق المفرد والجمع في الهيئة، كفُلْك"
+        }
+      ]
+    },
+    {
+      "id": "ta-tanits",
+      "latin": "ta' ta'nits",
+      "forms": [
+        "ta' ta'nits"
+      ],
+      "group": "istilah",
+      "ar": "تَاء التَّأْنِيث",
+      "attest": [
+        {
+          "page": "11371/1",
+          "text": "والفعلُ يُعرَفُ بقد، والسِّين، وسَوف، وتاء التأنيث الساكنة."
+        },
+        {
+          "page": "6970/15",
+          "text": "وبدأت من ذَلِك بالماضي فَذكرت أَن علامته أَن يقبل تَاء التَّأْنِيث"
+        }
+      ]
+    },
+    {
+      "id": "hamzah-washal",
+      "latin": "hamzah washal",
+      "forms": [
+        "hamzah washal"
+      ],
+      "group": "istilah",
+      "ar": "هَمْزَة الوَصْل",
+      "attest": [
+        {
+          "page": "11243/127",
+          "text": "[فصل في همزة الوصل]"
+        }
+      ]
+    },
+    {
+      "id": "dhamir-majhul",
+      "latin": "dhamir al-majhul",
+      "forms": [
+        "dhamir al-majhul"
+      ],
+      "group": "istilah",
+      "ar": null,
+      "unverified": "the concept cites Ibn Hisyam's Mughni for this name; the pinned pages do not contain it."
+    },
+    {
+      "id": "lam-doa",
+      "latin": "lam doa",
+      "forms": [
+        "lam doa"
+      ],
+      "group": "istilah",
+      "ar": null,
+      "unverified": "found only in the OCR of Dahlan's Syarh Mukhtashar Jiddan, which is not pinned as text; the pinned pages do not contain لام الدعاء."
+    },
+    {
+      "id": "wazan-failun",
+      "latin": "fā‘ilun",
+      "forms": [
+        "fā‘ilun"
+      ],
+      "group": "istilah",
+      "ar": "فَاعِلٌ",
+      "attest": [
+        {
+          "page": "11243/11",
+          "text": "الأصول بالأصول، وعبّرْتَ عن الزائد بلفظه، فتقول فى وزن قائم مثَلاً: فاعِل،"
+        },
+        {
+          "page": "6970/5",
+          "text": "القَوْل مَا قَالَت حذام فَذكرهَا فِي الْبَيْت مرَّتَيْنِ مَكْسُورَة مَعَ أَنَّهَا فَاعل"
+        }
+      ]
+    },
+    {
+      "id": "wazan-mafulun",
+      "latin": "maf‘ūlun",
+      "forms": [
+        "maf‘ūlun"
+      ],
+      "group": "istilah",
+      "ar": "مَفْعُولٌ",
+      "attest": [
+        {
+          "page": "11243/65",
+          "text": "وهو من الثلاثى على زنة مَفْعُول كمَنْصور، وموعود،"
+        }
+      ]
+    },
+    {
+      "id": "wazan-faalun",
+      "latin": "fa‘‘ālun",
+      "forms": [
+        "fa‘‘ālun"
+      ],
+      "group": "istilah",
+      "ar": "فَعَّالٌ",
+      "attest": [
+        {
+          "page": "11243/63",
+          "text": "تُسَمَّى صِيغ المبالغة، وهى فَعَّال: بتشديد العين، كأَكَّال وشرَّاب."
+        }
+      ]
+    },
+    {
+      "id": "wazan-mifalun",
+      "latin": "mif‘ālun",
+      "forms": [
+        "mif‘ālun"
+      ],
+      "group": "istilah",
+      "ar": "مِفْعَالٌ",
+      "attest": [
+        {
+          "page": "11243/63",
+          "text": "وشرَّاب. ومِفعال: كمِنحار. وفَعُول: كغَفُور."
+        },
+        {
+          "page": "11243/121",
+          "text": "وتُصاغ نادرًا على وزن مِفْعَال أي: كمِعْطَار، أى:"
+        }
+      ]
+    },
+    {
+      "id": "wazan-faulun",
+      "latin": "fa‘ūlun",
+      "forms": [
+        "fa‘ūlun"
+      ],
+      "group": "istilah",
+      "ar": "فَعُولٌ",
+      "attest": [
+        {
+          "page": "11243/63",
+          "text": "وفَعُول: كغَفُور. وفَعِيل: كسميع."
+        }
+      ]
+    },
+    {
+      "id": "wazan-failun-ya",
+      "latin": "fa‘īlun",
+      "forms": [
+        "fa‘īlun"
+      ],
+      "group": "istilah",
+      "ar": "فَعِيلٌ",
+      "attest": [
+        {
+          "page": "11243/63",
+          "text": "وفَعِيل: كسميع. وفَعِل: بفتح الفاء وكسر العين كحذِرٌ."
+        }
+      ]
+    },
+    {
+      "id": "wazan-failun-kasr",
+      "latin": "fa‘ilun",
+      "forms": [
+        "fa‘ilun"
+      ],
+      "group": "istilah",
+      "ar": "فَعِلٌ",
+      "attest": [
+        {
+          "page": "11243/63",
+          "text": "وفَعِيل: كسميع. وفَعِل: بفتح الفاء وكسر العين كحذِرٌ."
+        }
+      ]
+    },
+    {
+      "id": "wazan-falanu",
+      "latin": "fa‘lānu",
+      "forms": [
+        "fa‘lānu"
+      ],
+      "group": "istilah",
+      "ar": "فَعْلَانُ",
+      "attest": [
+        {
+          "page": "11243/67",
+          "text": "٢ وفَعْلَان الذى مؤنثه فَعْلى، كعطشان وعَطْشَى."
+        }
+      ]
+    },
+    {
+      "id": "wazan-falun",
+      "latin": "fa‘lun",
+      "forms": [
+        "fa‘lun"
+      ],
+      "group": "istilah",
+      "ar": "فَعْلٌ",
+      "attest": [
+        {
+          "page": "11243/53",
+          "text": "فَعْلِ، بفتح فسكون، كسَهْم وسَهْل، فَعَل، بفتحتين: كقََمَرَ"
+        }
+      ]
+    },
+    {
+      "id": "wazan-filun",
+      "latin": "fi‘lun",
+      "forms": [
+        "fi‘lun"
+      ],
+      "group": "istilah",
+      "ar": "فِعْلٌ",
+      "attest": [
+        {
+          "page": "11243/11",
+          "text": "بصورةِ الموزون، فيقولون فى وزن قَمَر مَثَلًا: فَعَلْ، بالتحريك، وفي جمْل: فِعْل،"
+        }
+      ]
+    },
+    {
+      "id": "wazan-faalun-fath",
+      "latin": "fa‘alun",
+      "forms": [
+        "fa‘alun"
+      ],
+      "group": "istilah",
+      "ar": "فَعَلٌ",
+      "attest": [
+        {
+          "page": "11243/11",
+          "text": "بالفاء والعين واللام، مصوَّرة بصورةِ الموزون، فيقولون فى وزن قَمَر مَثَلًا: فَعَلْ،"
+        }
+      ]
+    },
+    {
+      "id": "wazan-fuulun",
+      "latin": "fu‘ulun",
+      "forms": [
+        "fu‘ulun"
+      ],
+      "group": "istilah",
+      "ar": "فُعُلٌ",
+      "attest": [
+        {
+          "page": "11243/53",
+          "text": "إِبِل. فُعْل: بضم فسكون، كقُفْل وحُلْو. فُعَل: بضم ففتح، كصُرَد وحُطَم. فُعُل:"
+        }
+      ]
+    },
+    {
+      "id": "wazan-falalun",
+      "latin": "fa‘lālun",
+      "forms": [
+        "fa‘lālun"
+      ],
+      "group": "istilah",
+      "ar": "فَعْلَالٌ",
+      "attest": [
+        {
+          "page": "22916/5922",
+          "text": "(الوسواس) اسم لمن يوسوس، وزنه فعلال بفتح الفاء."
+        }
+      ]
+    },
+    {
+      "id": "wazan-istafala",
+      "latin": "istaf‘ala",
+      "forms": [
+        "istaf‘ala"
+      ],
+      "group": "istilah",
+      "ar": "اِسْتَفْعَلَ",
+      "attest": [
+        {
+          "page": "11243/32",
+          "text": "٩- استَفْعَلَ"
+        },
+        {
+          "page": "11243/185",
+          "text": "٩- اسْتَفْعَل..............................................................٣٤"
+        }
+      ]
+    },
+    {
+      "id": "wazan-istifalan",
+      "latin": "istif‘ālan",
+      "forms": [
+        "istif‘ālan"
+      ],
+      "group": "istilah",
+      "ar": "اِسْتِفْعَالًا",
+      "attest": [
+        {
+          "page": "11243/151",
+          "text": "وورد تصحيح إفعال واستفعال وفروعهما، نحو أعوَل"
+        }
+      ]
+    },
+    {
+      "id": "wazan-afala",
+      "latin": "af‘ala",
+      "forms": [
+        "af‘ala"
+      ],
+      "group": "istilah",
+      "ar": "أَفْعَلَ",
+      "attest": [
+        {
+          "page": "11243/153",
+          "text": "المسألة الأولى: إذا كان كان الماضى على وزن أَفْعَلَ"
+        },
+        {
+          "page": "11243/24",
+          "text": "الأول: أفْعَلَ، كأكرم، وأولَى، وأعطى، وأقام، وآتى، وآمن، وأقرّ."
+        }
+      ]
+    },
+    {
+      "id": "wazan-ifalan",
+      "latin": "if‘ālan",
+      "forms": [
+        "if‘ālan"
+      ],
+      "group": "istilah",
+      "ar": "إِفْعَالًا",
+      "attest": [
+        {
+          "page": "11243/151",
+          "text": "وورد تصحيح إفعال واستفعال وفروعهما، نحو أعوَل"
+        }
+      ]
+    },
+    {
+      "id": "wazan-falala",
+      "latin": "fa‘lala",
+      "forms": [
+        "fa‘lala"
+      ],
+      "group": "istilah",
+      "ar": "فَعْلَلَ",
+      "attest": [
+        {
+          "page": "11243/11",
+          "text": "لامين على أحرف، ف ع ل، فتقول فى وزن دَحْرَجَ مثلاً: فَعْلَلَ،"
+        }
+      ]
+    },
+    {
+      "id": "wazan-falalatan",
+      "latin": "fa‘lalatan",
+      "forms": [
+        "fa‘lalatan"
+      ],
+      "group": "istilah",
+      "ar": "فَعْلَلَةً",
+      "attest": [
+        {
+          "page": "11243/59",
+          "text": "٥ وقياس مصدر فَعْلَل وما ألحق به: فَعْلَلَة،"
+        }
+      ]
+    },
+    {
+      "id": "wazan-filalan",
+      "latin": "fi‘lālan",
+      "forms": [
+        "fi‘lālan"
+      ],
+      "group": "istilah",
+      "ar": "فِعْلَالًا",
+      "attest": [
+        {
+          "page": "11243/60",
+          "text": "ووَسْوَسَ وَسْوَسَة، وبَيْطَرَ بَيْطَرَة، وفِعْلَال بكسر الفاء، إن"
+        }
+      ]
+    },
+    {
+      "id": "bab-istifal-name",
+      "latin": "istif‘āl",
+      "forms": [
+        "istif‘āl"
+      ],
+      "group": "istilah",
+      "ar": "اِسْتِفْعَال",
+      "attest": [
+        {
+          "page": "11243/151",
+          "text": "وورد تصحيح إفعال واستفعال وفروعهما، نحو أعوَل"
+        },
+        {
+          "page": "11243/125",
+          "text": "والافتعال كالاقتراب، والاستفعال كالاستغراب والاستغفار"
+        }
+      ]
+    },
+    {
+      "id": "bab-ifal-name",
+      "latin": "if‘āl",
+      "forms": [
+        "if‘āl"
+      ],
+      "group": "istilah",
+      "ar": "إِفْعَال",
+      "attest": [
+        {
+          "page": "11243/151",
+          "text": "وورد تصحيح إفعال واستفعال وفروعهما، نحو أعوَل"
+        }
+      ]
+    },
+    {
+      "id": "kana",
+      "latin": "kāna",
+      "forms": [
+        "kāna"
+      ],
+      "group": "istilah",
+      "ar": "كَانَ",
+      "attest": [
+        {
+          "page": "11371/13",
+          "text": "وهي ثلاثة أشياء: كان وأخواتها، واِنَّ وأخواتها، وظَنَنْتُ وأخواتها."
+        },
+        {
+          "page": "6970/14",
+          "text": "من حُرُوف نأيت نَحْو نقوم وأقوم وَيقوم وَتقوم وَيضم أَوله إِن كَانَ"
+        }
+      ]
+    },
+    {
+      "id": "shara",
+      "latin": "ṣāra",
+      "forms": [
+        "ṣāra"
+      ],
+      "group": "istilah",
+      "ar": "صَارَ",
+      "attest": [
+        {
+          "page": "11371/13",
+          "text": "وأصبحَ، وأضحى، وظَلَّ، وباتَ، وصار، وليس، وما زال،"
+        },
+        {
+          "page": "9057/61",
+          "text": "والكثرة نحو: أظبى المكان أي كَثُر ظِباؤه، والصيرورة نحو: أَغَدَّ البعير صار"
+        }
+      ]
+    },
+    {
+      "id": "laisa",
+      "latin": "laisa",
+      "forms": [
+        "laisa"
+      ],
+      "group": "istilah",
+      "ar": "لَيْسَ",
+      "attest": [
+        {
+          "page": "11371/13",
+          "text": "وأصبحَ، وأضحى، وظَلَّ، وباتَ، وصار، وليس، وما زال،"
+        },
+        {
+          "page": "6970/14",
+          "text": "كضربوا أَو الضَّمِير الْمَرْفُوع المتحرك فيسكن كضربت وَمِنْه نعم وَبئسَ وَعَسَى وَلَيْسَ"
+        }
+      ]
+    },
+    {
+      "id": "yakunu",
+      "latin": "yakūnu",
+      "forms": [
+        "yakūnu"
+      ],
+      "group": "istilah",
+      "ar": "يَكُونُ",
+      "attest": [
+        {
+          "page": "11371/13",
+          "text": "وما تَصَرَّفَ منها نحو: كان, ويكون, وكُن،"
+        },
+        {
+          "page": "9904/137",
+          "text": "{وَأَنْ لَيْسَ لِلإِنْسَانِ إِلاَّ مَا سَعَى} وقوله تعالى: {وَأَنْ عَسَى أَنْ يَكُونَ"
+        }
+      ]
+    },
+    {
+      "id": "ana",
+      "latin": "anā",
+      "forms": [
+        "anā"
+      ],
+      "group": "istilah",
+      "ar": "أَنَا",
+      "attest": [
+        {
+          "page": "11371/12",
+          "text": "أنا، ونحن، وأنتَ، وأنتِ، وأنتُما، وأنتُم، وأنتُنَّ، وهو، وهي،"
+        },
+        {
+          "page": "11243/71",
+          "text": "نحو: {وَالآخِرَةُ خَيْرٌ وَأَبْقَى} [الأعلى: ١٧] وقد جاء الحذف والإثبات فى: {أَنَا"
+        }
+      ]
+    },
+    {
+      "id": "nahnu",
+      "latin": "naḥnu",
+      "forms": [
+        "naḥnu"
+      ],
+      "group": "istilah",
+      "ar": "نَحْنُ",
+      "attest": [
+        {
+          "page": "11371/12",
+          "text": "أنا، ونحن، وأنتَ، وأنتِ، وأنتُما، وأنتُم، وأنتُنَّ، وهو، وهي،"
+        },
+        {
+          "page": "11243/159",
+          "text": "وإذا اتصل المدغَم بضمير رفع متحرِّك وجب فك الإدغام، نحو {نَحْنُ"
+        }
+      ]
+    },
+    {
+      "id": "anta",
+      "latin": "anta",
+      "forms": [
+        "anta"
+      ],
+      "group": "istilah",
+      "ar": "أَنْتَ",
+      "attest": [
+        {
+          "page": "11371/12",
+          "text": "أنا، ونحن، وأنتَ، وأنتِ، وأنتُما، وأنتُم، وأنتُنَّ، وهو، وهي،"
+        },
+        {
+          "page": "6970/18",
+          "text": "بِمَعْنى اكفف أَو قبلت يَاء المخاطبة وَلم تدل على الطّلب نَحْو أَنْت"
+        }
+      ]
+    },
+    {
+      "id": "min",
+      "latin": "min",
+      "forms": [
+        "min"
+      ],
+      "group": "istilah",
+      "ar": "مِنْ",
+      "attest": [
+        {
+          "page": "11371/1",
+          "text": "وحروفِ الخَفضِ, وهي: مِن، وإلى، وعَن، وعلى، وفِي, ورُبَّ،"
+        },
+        {
+          "page": "11243/130",
+          "text": "وقَفتُ فِيها أصيْلالًا أُسَائِلُهَا ... أعْيَتْ جَوَابًا وَمَا بِالرَّبْعِ مِنْ"
+        }
+      ],
+      "ambiguous_forms": [
+        "min"
+      ]
+    },
+    {
+      "id": "ila",
+      "latin": "ilā",
+      "forms": [
+        "ilā"
+      ],
+      "group": "istilah",
+      "ar": "إِلَى",
+      "attest": [
+        {
+          "page": "11371/1",
+          "text": "وحروفِ الخَفضِ, وهي: مِن، وإلى، وعَن، وعلى، وفِي, ورُبَّ،"
+        },
+        {
+          "page": "6970/15",
+          "text": "وَلَا يصدنك ش لما فرغت من ذكر عَلَامَات الِاسْم وَبَيَان انقسامه إِلَى"
+        }
+      ],
+      "ambiguous_forms": [
+        "ilā"
+      ]
+    },
+    {
+      "id": "an-jar",
+      "latin": "‘an",
+      "forms": [
+        "‘an"
+      ],
+      "group": "istilah",
+      "ar": "عَنْ",
+      "attest": [
+        {
+          "page": "11371/1",
+          "text": "وحروفِ الخَفضِ, وهي: مِن، وإلى، وعَن، وعلى، وفِي, ورُبَّ،"
+        }
+      ],
+      "ambiguous_forms": [
+        "‘an"
+      ]
+    },
+    {
+      "id": "ala",
+      "latin": "‘alā",
+      "forms": [
+        "‘alā"
+      ],
+      "group": "istilah",
+      "ar": "عَلَى",
+      "attest": [
+        {
+          "page": "11371/1",
+          "text": "وحروفِ الخَفضِ, وهي: مِن، وإلى، وعَن، وعلى، وفِي, ورُبَّ،"
+        },
+        {
+          "page": "11243/72",
+          "text": "فِي كُلِّ قَرْيَةٍ أَكَابِرَ مُجْرِمِيهَا} [الأنعام: ١٢٣] وقوله: {وَلَتَجِدَنَّهُمْ أَحْرَصَ النَّاسِ عَلَى"
+        }
+      ],
+      "ambiguous_forms": [
+        "‘alā"
+      ]
+    },
+    {
+      "id": "fi",
+      "latin": "fī",
+      "forms": [
+        "fī"
+      ],
+      "group": "istilah",
+      "ar": "فِي",
+      "attest": [
+        {
+          "page": "11371/1",
+          "text": "وحروفِ الخَفضِ, وهي: مِن، وإلى، وعَن، وعلى، وفِي, ورُبَّ،"
+        }
+      ],
+      "ambiguous_forms": [
+        "fī"
+      ]
+    },
+    {
+      "id": "rubba",
+      "latin": "rubba",
+      "forms": [
+        "rubba"
+      ],
+      "group": "istilah",
+      "ar": "رُبَّ",
+      "attest": [
+        {
+          "page": "11371/1",
+          "text": "وحروفِ الخَفضِ, وهي: مِن، وإلى، وعَن، وعلى، وفِي, ورُبَّ،"
+        }
+      ]
+    },
+    {
+      "id": "tsumma",
+      "latin": "ṡumma",
+      "forms": [
+        "ṡumma"
+      ],
+      "group": "istilah",
+      "ar": "ثُمَّ",
+      "attest": [
+        {
+          "page": "11371/16",
+          "text": "الواو، والفاء، وثُمَّ، وأو، وأَمْ، وإمَّا، وبَل، ولا،"
+        }
+      ]
+    },
+    {
+      "id": "an-nashib",
+      "latin": "an",
+      "forms": [
+        "an"
+      ],
+      "group": "istilah",
+      "ar": "أَنْ",
+      "attest": [
+        {
+          "page": "11371/7",
+          "text": "أَنْ، ولَنْ، وإذنْ، وكَيْ، ولام كي، ولام الجُحُود،"
+        }
+      ],
+      "ambiguous_forms": [
+        "an"
+      ]
+    },
+    {
+      "id": "lan",
+      "latin": "lan",
+      "forms": [
+        "lan"
+      ],
+      "group": "istilah",
+      "ar": "لَنْ",
+      "attest": [
+        {
+          "page": "11371/7",
+          "text": "أَنْ، ولَنْ، وإذنْ، وكَيْ، ولام كي، ولام الجُحُود،"
+        }
+      ],
+      "ambiguous_forms": [
+        "lan"
+      ]
+    },
+    {
+      "id": "anaitu",
+      "latin": "anaitu",
+      "forms": [
+        "anaitu"
+      ],
+      "group": "istilah",
+      "ar": "أَنَيْتُ",
+      "attest": [
+        {
+          "page": "11371/7",
+          "text": "يجمَعُهَا قولُك: \"أنَيتُ\" وهو مرفوعٌ أبدا، حتى يدخُلَ عليه ناصِبٌ أو جازِم."
+        },
+        {
+          "page": "11243/35",
+          "text": "٢ وهي حروف \"أنَيْتُ أو نَأَيْتُ\" ا. هـ",
+          "part": "hamesh"
+        }
+      ]
+    },
+    {
+      "id": "nashib",
+      "latin": "nashib",
+      "forms": [
+        "penashab",
+        "nashib"
+      ],
+      "group": "istilah",
+      "ar": "نَاصِب",
+      "attest": [
+        {
+          "page": "11371/7",
+          "text": "يجمَعُهَا قولُك: \"أنَيتُ\" وهو مرفوعٌ أبدا، حتى يدخُلَ عليه ناصِبٌ أو جازِم."
+        }
+      ]
+    },
+    {
+      "id": "jazim",
+      "latin": "jazim",
+      "forms": [
+        "penjazm",
+        "jazim"
+      ],
+      "group": "istilah",
+      "ar": "جَازِم",
+      "attest": [
+        {
+          "page": "11371/7",
+          "text": "يجمَعُهَا قولُك: \"أنَيتُ\" وهو مرفوعٌ أبدا، حتى يدخُلَ عليه ناصِبٌ أو جازِم."
+        }
+      ]
+    },
+    {
+      "id": "shighat",
+      "latin": "shighat",
+      "forms": [
+        "shighat"
+      ],
+      "group": "istilah",
+      "ar": "صِيغَة",
+      "attest": [
+        {
+          "page": "11243/151",
+          "text": "الرابع: صيغة مفْعُول كمقُول ومَبِيع،"
+        },
+        {
+          "page": "11243/31",
+          "text": "وحفظت العلم مسألة بعد أخرى؛ وربما أغنت هذه الصيغة"
+        }
+      ]
+    },
+    {
+      "id": "wazan-yastafilu",
+      "latin": "yastaf‘ilu",
+      "forms": [
+        "yastaf‘ilu"
+      ],
+      "group": "istilah",
+      "ar": null,
+      "attest": [],
+      "unverified": "the pinned and searched pages of the cited kitab (Syadza al-‘Arf, Ibn ‘Aqil, al-Jadwal) never write the mudhari‘ pattern يستفعل; al-Amtsilah, which the concept cites for it, is only an image scan. Shown in Latin."
+    },
+    {
+      "id": "wazan-nastafilu",
+      "latin": "nastaf‘ilu",
+      "forms": [
+        "nastaf‘ilu"
+      ],
+      "group": "istilah",
+      "ar": null,
+      "attest": [],
+      "unverified": "no pinned page writes the pattern نستفعل (al-Jadwal gives nasta‘īnu its root, not this wazan). Shown in Latin."
+    },
+    {
+      "id": "wazan-yufilu",
+      "latin": "yuf‘ilu",
+      "forms": [
+        "yuf‘ilu"
+      ],
+      "group": "istilah",
+      "ar": null,
+      "attest": [],
+      "unverified": "the only folded match in the pinned pages is Syadza's يفعِل of form I (yaf‘ilu), another wazan; no page writes the form-IV mudhari‘ يُفعِل. Shown in Latin."
+    },
+    {
+      "id": "wazan-yufalilu",
+      "latin": "yufa‘lilu",
+      "forms": [
+        "yufa‘lilu"
+      ],
+      "group": "istilah",
+      "ar": null,
+      "attest": [],
+      "unverified": "no pinned page writes يفعلل; al-Amtsilah, cited for it, is only an image scan. Shown in Latin."
+    },
+    {
+      "id": "ikhfa",
+      "latin": "ikhfa'",
+      "forms": [
+        "ikhfa'"
+      ],
+      "group": "istilah",
+      "ar": "إِخْفَاء",
+      "attest": [
+        {
+          "page": "13896/281",
+          "text": "أو تدل على إخفاء الأول عند الثاني، فلا هو مظهر"
+        }
+      ]
+    }
+  ]
+}

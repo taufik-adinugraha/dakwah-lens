@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import type { ReactElement } from "react";
 
 export type PlayerWord = { index: number; ar: string; translit: string; gloss: string };
 
@@ -48,6 +49,23 @@ export function MushafLine({
   onTap: (index: number) => void;
 }) {
   const t = useTranslations("Player");
+  // The ayah marker never starts a row of its own (line breaks, operator
+  // 2026-10-10): it is glued to the last word, as a mushaf prints it. Same
+  // 8px gap; centred on that word's chip.
+  const marker = (
+    <span aria-hidden lang="ar" data-lb="ayah-marker" className="select-none self-center px-1 text-ink-soft">
+      ﴿{toArabicDigits(ayah)}﴾
+    </span>
+  );
+  const withMarker = (i: number, chip: ReactElement) =>
+    i < words.length - 1 ? (
+      chip
+    ) : (
+      <span key="ayah-end" data-lb="ayah-end" className="flex items-start gap-x-2">
+        {chip}
+        {marker}
+      </span>
+    );
   // lang="ar" sits on the Arabic text only, never on the container: the word
   // buttons' labels are in the page language, and a screen reader picks its
   // voice from the lang the label inherits.
@@ -56,7 +74,7 @@ export function MushafLine({
       dir="rtl"
       className="quran flex flex-wrap items-start justify-center gap-x-2 gap-y-3 text-ar-lg text-ink sm:text-ar-xl"
     >
-      {words.map((w) => {
+      {words.map((w, i) => {
         const isMarked = marked.includes(w.index);
         // The place under the word: LTR digits in the body face, 16px, in a
         // badge (filled when the word is marked).
@@ -73,7 +91,8 @@ export function MushafLine({
         ) : null;
         if (!canPlay(w.index)) {
           // No timing for this word in the chosen recording: plain text.
-          return (
+          return withMarker(
+            i,
             <span
               key={w.index}
               className={`inline-flex flex-col rounded-xl px-2.5 ${
@@ -85,11 +104,12 @@ export function MushafLine({
               {numbered ? <span className="sr-only">{t("word_place", { n: w.index })}</span> : null}
               <span lang="ar">{w.ar}</span>
               {place}
-            </span>
+            </span>,
           );
         }
         const active = activeWord === w.index;
-        return (
+        return withMarker(
+          i,
           <button
             key={w.index}
             type="button"
@@ -117,12 +137,10 @@ export function MushafLine({
             ) : (
               place
             )}
-          </button>
+          </button>,
         );
       })}
-      <span aria-hidden lang="ar" className="select-none self-center px-1 text-ink-soft">
-        ﴿{toArabicDigits(ayah)}﴾
-      </span>
+      {words.length === 0 ? marker : null}
     </div>
   );
 }

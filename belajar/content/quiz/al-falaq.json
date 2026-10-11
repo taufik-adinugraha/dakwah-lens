@@ -1,0 +1,1480 @@
+{
+ "version": 1,
+ "slug": "al-falaq",
+ "authored": false,
+ "states": {
+  "marfu": "marfu' (مَرْفُوع)",
+  "manshub": "manshub (مَنْصُوب)",
+  "majrur": "majrur (مَجْرُور)",
+  "mabni": "mabni (مَبْنِيّ)"
+ },
+ "labels": {
+  "fi'il amr": "fi'il amr (فِعْل أَمْر)",
+  "fi'il madhi": "fi'il madhi (فِعْل مَاضٍ)",
+  "fi'il mudhari'": "fi'il mudhari' (فِعْل مُضَارِع)",
+  "isim fa'il": "isim fa'il (اِسْم فَاعِل)",
+  "isim maf'ul": "isim maf'ul (اِسْم مَفْعُول)",
+  "mashdar": "mashdar (مَصْدَر)"
+ },
+ "ayat": [
+  {
+   "ayah": 1,
+   "exercises": [
+    {
+     "key": "tap-word",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1
+      },
+      {
+       "n": 2,
+       "word": 2
+      },
+      {
+       "n": 3,
+       "word": 3
+      },
+      {
+       "n": 4,
+       "word": 4
+      }
+     ]
+    },
+    {
+     "key": "why-harakat",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "sign": "sukun (سُكُون)",
+       "why": "Kata perintah (fi'il amr, فِعْل أَمْر) ini mabni (مَبْنِيّ) di atas sukun (سُكُون), jadi akhirnya tetap; pelakunya tersirat, yaitu “engkau”.",
+       "options": [
+        {
+         "from": "113:1:1",
+         "text": "Kata perintah (fi'il amr, فِعْل أَمْر) ini mabni (مَبْنِيّ) di atas sukun (سُكُون), jadi akhirnya tetap; pelakunya tersirat, yaitu “engkau”."
+        },
+        {
+         "from": "113:1:2",
+         "text": "Akhirnya dhammah (ضَمَّة) karena fi'il mudhari' (فِعْل مُضَارِع) ini tidak didahului huruf penashab (نَاصِب) atau penjazm (جَازِم); pelakunya tersirat, yaitu “aku”."
+        },
+        {
+         "from": "113:1:4",
+         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari rabbi (“Tuhan yang menguasai subuh”)."
+        }
+       ]
+      },
+      {
+       "n": 2,
+       "word": 2,
+       "sign": "dhammah (ضَمَّة)",
+       "why": "Akhirnya dhammah (ضَمَّة) karena fi'il mudhari' (فِعْل مُضَارِع) ini tidak didahului huruf penashab (نَاصِب) atau penjazm (جَازِم); pelakunya tersirat, yaitu “aku”.",
+       "options": [
+        {
+         "from": "113:1:2",
+         "text": "Akhirnya dhammah (ضَمَّة) karena fi'il mudhari' (فِعْل مُضَارِع) ini tidak didahului huruf penashab (نَاصِب) atau penjazm (جَازِم); pelakunya tersirat, yaitu “aku”."
+        },
+        {
+         "from": "113:1:3",
+         "text": "Akhirnya kasrah (كَسْرَة) karena kata rabb (Tuhan) didahului huruf jar (حَرْف جَرّ) bi-; frasa birabbi bergantung pada a‘ūżu, dan rabbi disandarkan kepada al-falaqi."
+        },
+        {
+         "from": "113:1:4",
+         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari rabbi (“Tuhan yang menguasai subuh”)."
+        }
+       ]
+      },
+      {
+       "n": 3,
+       "word": 3,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena kata rabb (Tuhan) didahului huruf jar (حَرْف جَرّ) bi-; frasa birabbi bergantung pada a‘ūżu, dan rabbi disandarkan kepada al-falaqi.",
+       "options": [
+        {
+         "from": "113:1:3",
+         "text": "Akhirnya kasrah (كَسْرَة) karena kata rabb (Tuhan) didahului huruf jar (حَرْف جَرّ) bi-; frasa birabbi bergantung pada a‘ūżu, dan rabbi disandarkan kepada al-falaqi."
+        },
+        {
+         "from": "113:1:2",
+         "text": "Akhirnya dhammah (ضَمَّة) karena fi'il mudhari' (فِعْل مُضَارِع) ini tidak didahului huruf penashab (نَاصِب) atau penjazm (جَازِم); pelakunya tersirat, yaitu “aku”."
+        },
+        {
+         "from": "113:1:1",
+         "text": "Kata perintah (fi'il amr, فِعْل أَمْر) ini mabni (مَبْنِيّ) di atas sukun (سُكُون), jadi akhirnya tetap; pelakunya tersirat, yaitu “engkau”."
+        }
+       ]
+      },
+      {
+       "n": 4,
+       "word": 4,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari rabbi (“Tuhan yang menguasai subuh”).",
+       "options": [
+        {
+         "from": "113:1:4",
+         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari rabbi (“Tuhan yang menguasai subuh”)."
+        },
+        {
+         "from": "113:1:1",
+         "text": "Kata perintah (fi'il amr, فِعْل أَمْر) ini mabni (مَبْنِيّ) di atas sukun (سُكُون), jadi akhirnya tetap; pelakunya tersirat, yaitu “engkau”."
+        },
+        {
+         "from": "113:1:2",
+         "text": "Akhirnya dhammah (ضَمَّة) karena fi'il mudhari' (فِعْل مُضَارِع) ini tidak didahului huruf penashab (نَاصِب) atau penjazm (جَازِم); pelakunya tersirat, yaitu “aku”."
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "key": "sort-case",
+     "bins": [
+      "marfu",
+      "manshub",
+      "majrur",
+      "mabni"
+     ],
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "sign": "sukun (سُكُون)",
+       "why": "Kata perintah (fi'il amr, فِعْل أَمْر) ini mabni (مَبْنِيّ) di atas sukun (سُكُون), jadi akhirnya tetap; pelakunya tersirat, yaitu “engkau”."
+      },
+      {
+       "n": 2,
+       "word": 2,
+       "sign": "dhammah (ضَمَّة)",
+       "why": "Akhirnya dhammah (ضَمَّة) karena fi'il mudhari' (فِعْل مُضَارِع) ini tidak didahului huruf penashab (نَاصِب) atau penjazm (جَازِم); pelakunya tersirat, yaitu “aku”."
+      },
+      {
+       "n": 3,
+       "word": 3,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena kata rabb (Tuhan) didahului huruf jar (حَرْف جَرّ) bi-; frasa birabbi bergantung pada a‘ūżu, dan rabbi disandarkan kepada al-falaqi."
+      },
+      {
+       "n": 4,
+       "word": 4,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari rabbi (“Tuhan yang menguasai subuh”)."
+      }
+     ]
+    },
+    {
+     "key": "label-role",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "why": "Kata perintah (fi'il amr, فِعْل أَمْر) ini mabni (مَبْنِيّ) di atas sukun (سُكُون), jadi akhirnya tetap; pelakunya tersirat, yaitu “engkau”.",
+       "options": [
+        {
+         "from": "113:1:1",
+         "text": "fi'il amr (فِعْل أَمْر, fa'il, فَاعِل tersimpan: “engkau”)"
+        },
+        {
+         "from": "113:1:2",
+         "text": "fi'il mudhari' (فِعْل مُضَارِع, fa'il, فَاعِل tersimpan: “aku”); kalimatnya maqul al-qaul (مَقُول القَوْل)"
+        },
+        {
+         "from": "113:1:4",
+         "text": "mudhaf ilaih (مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "113:1:3",
+         "text": "huruf jar (حَرْف جَرّ) + majrur (مَجْرُور, terkait a‘ūżu); mudhaf (مُضَاف)"
+        }
+       ]
+      },
+      {
+       "n": 2,
+       "word": 2,
+       "why": "Akhirnya dhammah (ضَمَّة) karena fi'il mudhari' (فِعْل مُضَارِع) ini tidak didahului huruf penashab (نَاصِب) atau penjazm (جَازِم); pelakunya tersirat, yaitu “aku”.",
+       "options": [
+        {
+         "from": "113:1:2",
+         "text": "fi'il mudhari' (فِعْل مُضَارِع, fa'il, فَاعِل tersimpan: “aku”); kalimatnya maqul al-qaul (مَقُول القَوْل)"
+        },
+        {
+         "from": "113:1:3",
+         "text": "huruf jar (حَرْف جَرّ) + majrur (مَجْرُور, terkait a‘ūżu); mudhaf (مُضَاف)"
+        },
+        {
+         "from": "113:1:4",
+         "text": "mudhaf ilaih (مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "113:1:1",
+         "text": "fi'il amr (فِعْل أَمْر, fa'il, فَاعِل tersimpan: “engkau”)"
+        }
+       ]
+      },
+      {
+       "n": 3,
+       "word": 3,
+       "why": "Akhirnya kasrah (كَسْرَة) karena kata rabb (Tuhan) didahului huruf jar (حَرْف جَرّ) bi-; frasa birabbi bergantung pada a‘ūżu, dan rabbi disandarkan kepada al-falaqi.",
+       "options": [
+        {
+         "from": "113:1:3",
+         "text": "huruf jar (حَرْف جَرّ) + majrur (مَجْرُور, terkait a‘ūżu); mudhaf (مُضَاف)"
+        },
+        {
+         "from": "113:1:1",
+         "text": "fi'il amr (فِعْل أَمْر, fa'il, فَاعِل tersimpan: “engkau”)"
+        },
+        {
+         "from": "113:1:4",
+         "text": "mudhaf ilaih (مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "113:1:2",
+         "text": "fi'il mudhari' (فِعْل مُضَارِع, fa'il, فَاعِل tersimpan: “aku”); kalimatnya maqul al-qaul (مَقُول القَوْل)"
+        }
+       ]
+      },
+      {
+       "n": 4,
+       "word": 4,
+       "why": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari rabbi (“Tuhan yang menguasai subuh”).",
+       "options": [
+        {
+         "from": "113:1:4",
+         "text": "mudhaf ilaih (مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "113:1:3",
+         "text": "huruf jar (حَرْف جَرّ) + majrur (مَجْرُور, terkait a‘ūżu); mudhaf (مُضَاف)"
+        },
+        {
+         "from": "113:1:1",
+         "text": "fi'il amr (فِعْل أَمْر, fa'il, فَاعِل tersimpan: “engkau”)"
+        },
+        {
+         "from": "113:1:2",
+         "text": "fi'il mudhari' (فِعْل مُضَارِع, fa'il, فَاعِل tersimpan: “aku”); kalimatnya maqul al-qaul (مَقُول القَوْل)"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "key": "wazn-factory",
+     "questions": [
+      {
+       "n": 1,
+       "lexeme": "qala",
+       "label": "fi'il madhi",
+       "options": [
+        "fi'il madhi",
+        "fi'il mudhari'",
+        "isim maf'ul"
+       ]
+      },
+      {
+       "n": 2,
+       "lexeme": "qala",
+       "label": "fi'il mudhari'",
+       "options": [
+        "fi'il mudhari'",
+        "fi'il madhi",
+        "isim fa'il"
+       ]
+      },
+      {
+       "n": 3,
+       "lexeme": "qala",
+       "label": "mashdar",
+       "options": [
+        "mashdar",
+        "fi'il mudhari'",
+        "isim fa'il"
+       ]
+      },
+      {
+       "n": 4,
+       "lexeme": "qala",
+       "label": "isim fa'il",
+       "options": [
+        "isim fa'il",
+        "mashdar",
+        "fi'il mudhari'"
+       ]
+      },
+      {
+       "n": 5,
+       "lexeme": "qala",
+       "label": "isim maf'ul",
+       "options": [
+        "isim maf'ul",
+        "mashdar",
+        "fi'il amr"
+       ]
+      },
+      {
+       "n": 6,
+       "lexeme": "qala",
+       "label": "fi'il amr",
+       "options": [
+        "fi'il amr",
+        "isim maf'ul",
+        "mashdar"
+       ]
+      },
+      {
+       "n": 7,
+       "lexeme": "adha",
+       "label": "fi'il madhi",
+       "options": [
+        "fi'il madhi",
+        "mashdar",
+        "fi'il mudhari'"
+       ]
+      },
+      {
+       "n": 8,
+       "lexeme": "adha",
+       "label": "fi'il mudhari'",
+       "options": [
+        "fi'il mudhari'",
+        "mashdar",
+        "isim fa'il"
+       ]
+      },
+      {
+       "n": 9,
+       "lexeme": "adha",
+       "label": "mashdar",
+       "options": [
+        "mashdar",
+        "isim fa'il",
+        "fi'il mudhari'"
+       ]
+      },
+      {
+       "n": 10,
+       "lexeme": "adha",
+       "label": "isim fa'il",
+       "options": [
+        "isim fa'il",
+        "fi'il madhi",
+        "fi'il mudhari'"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "ayah": 2,
+   "exercises": [
+    {
+     "key": "tap-word",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1
+      },
+      {
+       "n": 2,
+       "word": 2
+      },
+      {
+       "n": 3,
+       "word": 3
+      },
+      {
+       "n": 4,
+       "word": 4
+      }
+     ]
+    },
+    {
+     "key": "why-harakat",
+     "questions": [
+      {
+       "n": 1,
+       "word": 2,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) min; syarri juga disandarkan (mudhaf, مُضَاف) kepada kata sesudahnya, mā.",
+       "options": [
+        {
+         "from": "113:2:2",
+         "text": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) min; syarri juga disandarkan (mudhaf, مُضَاف) kepada kata sesudahnya, mā."
+        },
+        {
+         "from": "113:1:1",
+         "text": "Kata perintah (fi'il amr, فِعْل أَمْر) ini mabni (مَبْنِيّ) di atas sukun (سُكُون), jadi akhirnya tetap; pelakunya tersirat, yaitu “engkau”."
+        },
+        {
+         "from": "113:1:2",
+         "text": "Akhirnya dhammah (ضَمَّة) karena fi'il mudhari' (فِعْل مُضَارِع) ini tidak didahului huruf penashab (نَاصِب) atau penjazm (جَازِم); pelakunya tersirat, yaitu “aku”."
+        }
+       ]
+      },
+      {
+       "n": 2,
+       "word": 3,
+       "sign": "sukun (سُكُون)",
+       "why": "Isim maushul (اِسْم مَوْصُول, kata penghubung “yang”) ini mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari syarri; shilah-nya adalah khalaqa, dan kata ganti yang kembali kepada mā dibuang, maksudnya “yang Dia ciptakan”.",
+       "options": [
+        {
+         "from": "113:2:3",
+         "text": "Isim maushul (اِسْم مَوْصُول, kata penghubung “yang”) ini mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari syarri; shilah-nya adalah khalaqa, dan kata ganti yang kembali kepada mā dibuang, maksudnya “yang Dia ciptakan”."
+        },
+        {
+         "from": "113:1:3",
+         "text": "Akhirnya kasrah (كَسْرَة) karena kata rabb (Tuhan) didahului huruf jar (حَرْف جَرّ) bi-; frasa birabbi bergantung pada a‘ūżu, dan rabbi disandarkan kepada al-falaqi."
+        },
+        {
+         "from": "113:1:2",
+         "text": "Akhirnya dhammah (ضَمَّة) karena fi'il mudhari' (فِعْل مُضَارِع) ini tidak didahului huruf penashab (نَاصِب) atau penjazm (جَازِم); pelakunya tersirat, yaitu “aku”."
+        }
+       ]
+      },
+      {
+       "n": 3,
+       "word": 4,
+       "sign": "fathah (فَتْحَة)",
+       "why": "Fi'il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة); pelakunya tersirat, yaitu “Dia” (Allah), dan kalimat khalaqa menjadi shilah (صِلَة) bagi mā.",
+       "options": [
+        {
+         "from": "113:2:4",
+         "text": "Fi'il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة); pelakunya tersirat, yaitu “Dia” (Allah), dan kalimat khalaqa menjadi shilah (صِلَة) bagi mā."
+        },
+        {
+         "from": "113:2:1",
+         "text": "Min adalah huruf jar (حَرْف جَرّ, kata depan) “dari”; kata sesudahnya, syarri, menjadi majrur (مَجْرُور) karenanya, dan frasa min syarri bergantung pada a‘ūżu di ayat 1."
+        },
+        {
+         "from": "113:2:2",
+         "text": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) min; syarri juga disandarkan (mudhaf, مُضَاف) kepada kata sesudahnya, mā."
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "key": "sort-case",
+     "bins": [
+      "marfu",
+      "manshub",
+      "majrur",
+      "mabni"
+     ],
+     "questions": [
+      {
+       "n": 1,
+       "word": 2,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) min; syarri juga disandarkan (mudhaf, مُضَاف) kepada kata sesudahnya, mā."
+      },
+      {
+       "n": 2,
+       "word": 3,
+       "sign": "sukun (سُكُون)",
+       "why": "Isim maushul (اِسْم مَوْصُول, kata penghubung “yang”) ini mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari syarri; shilah-nya adalah khalaqa, dan kata ganti yang kembali kepada mā dibuang, maksudnya “yang Dia ciptakan”."
+      },
+      {
+       "n": 3,
+       "word": 4,
+       "sign": "fathah (فَتْحَة)",
+       "why": "Fi'il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة); pelakunya tersirat, yaitu “Dia” (Allah), dan kalimat khalaqa menjadi shilah (صِلَة) bagi mā."
+      }
+     ]
+    },
+    {
+     "key": "label-role",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "why": "Min adalah huruf jar (حَرْف جَرّ, kata depan) “dari”; kata sesudahnya, syarri, menjadi majrur (مَجْرُور) karenanya, dan frasa min syarri bergantung pada a‘ūżu di ayat 1.",
+       "options": [
+        {
+         "from": "113:2:1",
+         "text": "huruf jar (حَرْف جَرّ, min syarri terkait a‘ūżu)"
+        },
+        {
+         "from": "113:1:2",
+         "text": "fi'il mudhari' (فِعْل مُضَارِع, fa'il, فَاعِل tersimpan: “aku”); kalimatnya maqul al-qaul (مَقُول القَوْل)"
+        },
+        {
+         "from": "113:1:3",
+         "text": "huruf jar (حَرْف جَرّ) + majrur (مَجْرُور, terkait a‘ūżu); mudhaf (مُضَاف)"
+        },
+        {
+         "from": "113:2:3",
+         "text": "isim maushul (اِسْم مَوْصُول, mudhaf ilaih, مُضَاف إِلَيْه)"
+        }
+       ]
+      },
+      {
+       "n": 2,
+       "word": 2,
+       "why": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) min; syarri juga disandarkan (mudhaf, مُضَاف) kepada kata sesudahnya, mā.",
+       "options": [
+        {
+         "from": "113:2:2",
+         "text": "majrur (مَجْرُور) oleh min; mudhaf (مُضَاف)"
+        },
+        {
+         "from": "113:1:1",
+         "text": "fi'il amr (فِعْل أَمْر, fa'il, فَاعِل tersimpan: “engkau”)"
+        },
+        {
+         "from": "113:1:2",
+         "text": "fi'il mudhari' (فِعْل مُضَارِع, fa'il, فَاعِل tersimpan: “aku”); kalimatnya maqul al-qaul (مَقُول القَوْل)"
+        },
+        {
+         "from": "113:2:3",
+         "text": "isim maushul (اِسْم مَوْصُول, mudhaf ilaih, مُضَاف إِلَيْه)"
+        }
+       ]
+      },
+      {
+       "n": 3,
+       "word": 3,
+       "why": "Isim maushul (اِسْم مَوْصُول, kata penghubung “yang”) ini mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari syarri; shilah-nya adalah khalaqa, dan kata ganti yang kembali kepada mā dibuang, maksudnya “yang Dia ciptakan”.",
+       "options": [
+        {
+         "from": "113:2:3",
+         "text": "isim maushul (اِسْم مَوْصُول, mudhaf ilaih, مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "113:1:3",
+         "text": "huruf jar (حَرْف جَرّ) + majrur (مَجْرُور, terkait a‘ūżu); mudhaf (مُضَاف)"
+        },
+        {
+         "from": "113:1:4",
+         "text": "mudhaf ilaih (مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "113:1:1",
+         "text": "fi'il amr (فِعْل أَمْر, fa'il, فَاعِل tersimpan: “engkau”)"
+        }
+       ]
+      },
+      {
+       "n": 4,
+       "word": 4,
+       "why": "Fi'il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة); pelakunya tersirat, yaitu “Dia” (Allah), dan kalimat khalaqa menjadi shilah (صِلَة) bagi mā.",
+       "options": [
+        {
+         "from": "113:2:4",
+         "text": "fi'il madhi (فِعْل مَاضٍ, fa'il, فَاعِل tersimpan: “Dia”); kalimatnya shilah (صِلَة) bagi mā"
+        },
+        {
+         "from": "113:1:2",
+         "text": "fi'il mudhari' (فِعْل مُضَارِع, fa'il, فَاعِل tersimpan: “aku”); kalimatnya maqul al-qaul (مَقُول القَوْل)"
+        },
+        {
+         "from": "113:1:4",
+         "text": "mudhaf ilaih (مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "113:2:2",
+         "text": "majrur (مَجْرُور) oleh min; mudhaf (مُضَاف)"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "key": "wazn-factory",
+     "questions": [
+      {
+       "n": 1,
+       "lexeme": "khalaqa",
+       "label": "fi'il madhi",
+       "options": [
+        "fi'il madhi",
+        "isim maf'ul",
+        "fi'il mudhari'"
+       ]
+      },
+      {
+       "n": 2,
+       "lexeme": "khalaqa",
+       "label": "fi'il mudhari'",
+       "options": [
+        "fi'il mudhari'",
+        "isim maf'ul",
+        "mashdar"
+       ]
+      },
+      {
+       "n": 3,
+       "lexeme": "khalaqa",
+       "label": "mashdar",
+       "options": [
+        "mashdar",
+        "isim fa'il",
+        "fi'il mudhari'"
+       ]
+      },
+      {
+       "n": 4,
+       "lexeme": "khalaqa",
+       "label": "isim fa'il",
+       "options": [
+        "isim fa'il",
+        "fi'il madhi",
+        "fi'il mudhari'"
+       ]
+      },
+      {
+       "n": 5,
+       "lexeme": "khalaqa",
+       "label": "isim maf'ul",
+       "options": [
+        "isim maf'ul",
+        "fi'il madhi",
+        "mashdar"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "ayah": 3,
+   "exercises": [
+    {
+     "key": "tap-word",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1
+      },
+      {
+       "n": 2,
+       "word": 2
+      },
+      {
+       "n": 3,
+       "word": 3
+      },
+      {
+       "n": 4,
+       "word": 4
+      },
+      {
+       "n": 5,
+       "word": 5
+      }
+     ]
+    },
+    {
+     "key": "why-harakat",
+     "questions": [
+      {
+       "n": 1,
+       "word": 2,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) min; syarri juga disandarkan (mudhaf, مُضَاف) kepada gāsiqin.",
+       "options": [
+        {
+         "from": "113:3:2",
+         "text": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) min; syarri juga disandarkan (mudhaf, مُضَاف) kepada gāsiqin."
+        },
+        {
+         "from": "113:3:1",
+         "text": "Wa adalah huruf 'athaf (حَرْف عَطْف, penyambung) dan min huruf jar (حَرْف جَرّ) “dari”; frasa ini disambungkan pada min syarri di ayat 2, sehingga juga bergantung pada a‘ūżu."
+        },
+        {
+         "from": "113:2:1",
+         "text": "Min adalah huruf jar (حَرْف جَرّ, kata depan) “dari”; kata sesudahnya, syarri, menjadi majrur (مَجْرُور) karenanya, dan frasa min syarri bergantung pada a‘ūżu di ayat 1."
+        }
+       ]
+      },
+      {
+       "n": 2,
+       "word": 3,
+       "sign": "kasratain",
+       "why": "Akhirnya kasrah (كَسْرَة) bertanwin (تَنْوِين) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari syarri; kata ini nakirah (نَكِرَة, tak tentu), tanpa al-.",
+       "options": [
+        {
+         "from": "113:3:3",
+         "text": "Akhirnya kasrah (كَسْرَة) bertanwin (تَنْوِين) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari syarri; kata ini nakirah (نَكِرَة, tak tentu), tanpa al-."
+        },
+        {
+         "from": "113:1:1",
+         "text": "Kata perintah (fi'il amr, فِعْل أَمْر) ini mabni (مَبْنِيّ) di atas sukun (سُكُون), jadi akhirnya tetap; pelakunya tersirat, yaitu “engkau”."
+        },
+        {
+         "from": "113:2:1",
+         "text": "Min adalah huruf jar (حَرْف جَرّ, kata depan) “dari”; kata sesudahnya, syarri, menjadi majrur (مَجْرُور) karenanya, dan frasa min syarri bergantung pada a‘ūżu di ayat 1."
+        }
+       ]
+      },
+      {
+       "n": 3,
+       "word": 4,
+       "sign": "sukun (سُكُون)",
+       "why": "Iżā mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan nashab (نَصْب) sebagai keterangan waktu (zharaf, ظَرْف) murni, tanpa makna syarat; kalimat sesudahnya, waqaba, menjadi mudhaf ilaih (مُضَاف إِلَيْه) baginya.",
+       "options": [
+        {
+         "from": "113:3:4",
+         "text": "Iżā mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan nashab (نَصْب) sebagai keterangan waktu (zharaf, ظَرْف) murni, tanpa makna syarat; kalimat sesudahnya, waqaba, menjadi mudhaf ilaih (مُضَاف إِلَيْه) baginya."
+        },
+        {
+         "from": "113:3:3",
+         "text": "Akhirnya kasrah (كَسْرَة) bertanwin (تَنْوِين) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari syarri; kata ini nakirah (نَكِرَة, tak tentu), tanpa al-."
+        },
+        {
+         "from": "113:2:2",
+         "text": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) min; syarri juga disandarkan (mudhaf, مُضَاف) kepada kata sesudahnya, mā."
+        }
+       ]
+      },
+      {
+       "n": 4,
+       "word": 5,
+       "sign": "fathah (فَتْحَة)",
+       "why": "Fi'il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة); pelakunya tersirat (“ia”, yaitu malam itu), dan kalimat waqaba berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari iżā.",
+       "options": [
+        {
+         "from": "113:3:5",
+         "text": "Fi'il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة); pelakunya tersirat (“ia”, yaitu malam itu), dan kalimat waqaba berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari iżā."
+        },
+        {
+         "from": "113:2:2",
+         "text": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) min; syarri juga disandarkan (mudhaf, مُضَاف) kepada kata sesudahnya, mā."
+        },
+        {
+         "from": "113:1:4",
+         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari rabbi (“Tuhan yang menguasai subuh”)."
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "key": "sort-case",
+     "bins": [
+      "marfu",
+      "manshub",
+      "majrur",
+      "mabni"
+     ],
+     "questions": [
+      {
+       "n": 1,
+       "word": 2,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) min; syarri juga disandarkan (mudhaf, مُضَاف) kepada gāsiqin."
+      },
+      {
+       "n": 2,
+       "word": 3,
+       "sign": "kasratain",
+       "why": "Akhirnya kasrah (كَسْرَة) bertanwin (تَنْوِين) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari syarri; kata ini nakirah (نَكِرَة, tak tentu), tanpa al-."
+      },
+      {
+       "n": 3,
+       "word": 4,
+       "sign": "sukun (سُكُون)",
+       "why": "Iżā mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan nashab (نَصْب) sebagai keterangan waktu (zharaf, ظَرْف) murni, tanpa makna syarat; kalimat sesudahnya, waqaba, menjadi mudhaf ilaih (مُضَاف إِلَيْه) baginya."
+      },
+      {
+       "n": 4,
+       "word": 5,
+       "sign": "fathah (فَتْحَة)",
+       "why": "Fi'il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة); pelakunya tersirat (“ia”, yaitu malam itu), dan kalimat waqaba berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari iżā."
+      }
+     ]
+    },
+    {
+     "key": "label-role",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "why": "Wa adalah huruf 'athaf (حَرْف عَطْف, penyambung) dan min huruf jar (حَرْف جَرّ) “dari”; frasa ini disambungkan pada min syarri di ayat 2, sehingga juga bergantung pada a‘ūżu.",
+       "options": [
+        {
+         "from": "113:3:1",
+         "text": "huruf 'athaf (حَرْف عَطْف) + huruf jar (حَرْف جَرّ)"
+        },
+        {
+         "from": "113:2:3",
+         "text": "isim maushul (اِسْم مَوْصُول, mudhaf ilaih, مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "113:3:4",
+         "text": "zharaf (ظَرْف) zaman (keterangan waktu); disandarkan kepada kalimat sesudahnya"
+        },
+        {
+         "from": "113:2:1",
+         "text": "huruf jar (حَرْف جَرّ, min syarri terkait a‘ūżu)"
+        }
+       ]
+      },
+      {
+       "n": 2,
+       "word": 2,
+       "why": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) min; syarri juga disandarkan (mudhaf, مُضَاف) kepada gāsiqin.",
+       "options": [
+        {
+         "from": "113:3:2",
+         "text": "majrur (مَجْرُور) oleh min; mudhaf (مُضَاف)"
+        },
+        {
+         "from": "113:1:3",
+         "text": "huruf jar (حَرْف جَرّ) + majrur (مَجْرُور, terkait a‘ūżu); mudhaf (مُضَاف)"
+        },
+        {
+         "from": "113:2:4",
+         "text": "fi'il madhi (فِعْل مَاضٍ, fa'il, فَاعِل tersimpan: “Dia”); kalimatnya shilah (صِلَة) bagi mā"
+        },
+        {
+         "from": "113:1:4",
+         "text": "mudhaf ilaih (مُضَاف إِلَيْه)"
+        }
+       ]
+      },
+      {
+       "n": 3,
+       "word": 3,
+       "why": "Akhirnya kasrah (كَسْرَة) bertanwin (تَنْوِين) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari syarri; kata ini nakirah (نَكِرَة, tak tentu), tanpa al-.",
+       "options": [
+        {
+         "from": "113:3:3",
+         "text": "mudhaf ilaih (مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "113:2:1",
+         "text": "huruf jar (حَرْف جَرّ, min syarri terkait a‘ūżu)"
+        },
+        {
+         "from": "113:1:1",
+         "text": "fi'il amr (فِعْل أَمْر, fa'il, فَاعِل tersimpan: “engkau”)"
+        },
+        {
+         "from": "113:2:4",
+         "text": "fi'il madhi (فِعْل مَاضٍ, fa'il, فَاعِل tersimpan: “Dia”); kalimatnya shilah (صِلَة) bagi mā"
+        }
+       ]
+      },
+      {
+       "n": 4,
+       "word": 4,
+       "why": "Iżā mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan nashab (نَصْب) sebagai keterangan waktu (zharaf, ظَرْف) murni, tanpa makna syarat; kalimat sesudahnya, waqaba, menjadi mudhaf ilaih (مُضَاف إِلَيْه) baginya.",
+       "options": [
+        {
+         "from": "113:3:4",
+         "text": "zharaf (ظَرْف) zaman (keterangan waktu); disandarkan kepada kalimat sesudahnya"
+        },
+        {
+         "from": "113:2:1",
+         "text": "huruf jar (حَرْف جَرّ, min syarri terkait a‘ūżu)"
+        },
+        {
+         "from": "113:2:3",
+         "text": "isim maushul (اِسْم مَوْصُول, mudhaf ilaih, مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "113:1:4",
+         "text": "mudhaf ilaih (مُضَاف إِلَيْه)"
+        }
+       ]
+      },
+      {
+       "n": 5,
+       "word": 5,
+       "why": "Fi'il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة); pelakunya tersirat (“ia”, yaitu malam itu), dan kalimat waqaba berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari iżā.",
+       "options": [
+        {
+         "from": "113:3:5",
+         "text": "fi'il madhi (فِعْل مَاضٍ, fa'il, فَاعِل tersimpan: “ia”); kalimatnya mudhaf ilaih (مُضَاف إِلَيْه) bagi iżā"
+        },
+        {
+         "from": "113:2:3",
+         "text": "isim maushul (اِسْم مَوْصُول, mudhaf ilaih, مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "113:1:4",
+         "text": "mudhaf ilaih (مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "113:2:2",
+         "text": "majrur (مَجْرُور) oleh min; mudhaf (مُضَاف)"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "ayah": 4,
+   "exercises": [
+    {
+     "key": "tap-word",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1
+      },
+      {
+       "n": 2,
+       "word": 2
+      },
+      {
+       "n": 3,
+       "word": 3
+      },
+      {
+       "n": 4,
+       "word": 4
+      },
+      {
+       "n": 5,
+       "word": 5
+      }
+     ]
+    },
+    {
+     "key": "why-harakat",
+     "questions": [
+      {
+       "n": 1,
+       "word": 2,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) min; syarri juga disandarkan (mudhaf, مُضَاف) kepada an-naffāṡāti.",
+       "options": [
+        {
+         "from": "113:4:2",
+         "text": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) min; syarri juga disandarkan (mudhaf, مُضَاف) kepada an-naffāṡāti."
+        },
+        {
+         "from": "113:4:1",
+         "text": "Wa adalah huruf 'athaf (حَرْف عَطْف) dan min huruf jar (حَرْف جَرّ) “dari”; frasa ini juga disambungkan pada min syarri sebelumnya, jadi tetap bergantung pada a‘ūżu."
+        },
+        {
+         "from": "113:1:2",
+         "text": "Akhirnya dhammah (ضَمَّة) karena fi'il mudhari' (فِعْل مُضَارِع) ini tidak didahului huruf penashab (نَاصِب) atau penjazm (جَازِم); pelakunya tersirat, yaitu “aku”."
+        }
+       ]
+      },
+      {
+       "n": 2,
+       "word": 3,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari syarri; kata ini jamak dari naffāṡah, bentuk mubalaghah (مُبَالَغَة, “yang banyak meniup”) dari isim fa'il (اِسْم فَاعِل).",
+       "options": [
+        {
+         "from": "113:4:3",
+         "text": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari syarri; kata ini jamak dari naffāṡah, bentuk mubalaghah (مُبَالَغَة, “yang banyak meniup”) dari isim fa'il (اِسْم فَاعِل)."
+        },
+        {
+         "from": "113:2:1",
+         "text": "Min adalah huruf jar (حَرْف جَرّ, kata depan) “dari”; kata sesudahnya, syarri, menjadi majrur (مَجْرُور) karenanya, dan frasa min syarri bergantung pada a‘ūżu di ayat 1."
+        },
+        {
+         "from": "113:2:4",
+         "text": "Fi'il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة); pelakunya tersirat, yaitu “Dia” (Allah), dan kalimat khalaqa menjadi shilah (صِلَة) bagi mā."
+        }
+       ]
+      },
+      {
+       "n": 3,
+       "word": 5,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) fī; kata ini jamak dari ‘uqdah (buhul, simpul).",
+       "options": [
+        {
+         "from": "113:4:5",
+         "text": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) fī; kata ini jamak dari ‘uqdah (buhul, simpul)."
+        },
+        {
+         "from": "113:3:1",
+         "text": "Wa adalah huruf 'athaf (حَرْف عَطْف, penyambung) dan min huruf jar (حَرْف جَرّ) “dari”; frasa ini disambungkan pada min syarri di ayat 2, sehingga juga bergantung pada a‘ūżu."
+        },
+        {
+         "from": "113:2:3",
+         "text": "Isim maushul (اِسْم مَوْصُول, kata penghubung “yang”) ini mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari syarri; shilah-nya adalah khalaqa, dan kata ganti yang kembali kepada mā dibuang, maksudnya “yang Dia ciptakan”."
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "key": "sort-case",
+     "bins": [
+      "marfu",
+      "manshub",
+      "majrur",
+      "mabni"
+     ],
+     "questions": [
+      {
+       "n": 1,
+       "word": 2,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) min; syarri juga disandarkan (mudhaf, مُضَاف) kepada an-naffāṡāti."
+      },
+      {
+       "n": 2,
+       "word": 3,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari syarri; kata ini jamak dari naffāṡah, bentuk mubalaghah (مُبَالَغَة, “yang banyak meniup”) dari isim fa'il (اِسْم فَاعِل)."
+      },
+      {
+       "n": 3,
+       "word": 5,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) fī; kata ini jamak dari ‘uqdah (buhul, simpul)."
+      }
+     ]
+    },
+    {
+     "key": "label-role",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "why": "Wa adalah huruf 'athaf (حَرْف عَطْف) dan min huruf jar (حَرْف جَرّ) “dari”; frasa ini juga disambungkan pada min syarri sebelumnya, jadi tetap bergantung pada a‘ūżu.",
+       "options": [
+        {
+         "from": "113:4:1",
+         "text": "huruf 'athaf (حَرْف عَطْف) + huruf jar (حَرْف جَرّ)"
+        },
+        {
+         "from": "113:2:4",
+         "text": "fi'il madhi (فِعْل مَاضٍ, fa'il, فَاعِل tersimpan: “Dia”); kalimatnya shilah (صِلَة) bagi mā"
+        },
+        {
+         "from": "113:1:3",
+         "text": "huruf jar (حَرْف جَرّ) + majrur (مَجْرُور, terkait a‘ūżu); mudhaf (مُضَاف)"
+        },
+        {
+         "from": "113:4:4",
+         "text": "huruf jar (حَرْف جَرّ, fī al-‘uqadi terkait an-naffāṡāti)"
+        }
+       ]
+      },
+      {
+       "n": 2,
+       "word": 2,
+       "why": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) min; syarri juga disandarkan (mudhaf, مُضَاف) kepada an-naffāṡāti.",
+       "options": [
+        {
+         "from": "113:4:2",
+         "text": "majrur (مَجْرُور) oleh min; mudhaf (مُضَاف)"
+        },
+        {
+         "from": "113:2:4",
+         "text": "fi'il madhi (فِعْل مَاضٍ, fa'il, فَاعِل tersimpan: “Dia”); kalimatnya shilah (صِلَة) bagi mā"
+        },
+        {
+         "from": "113:2:3",
+         "text": "isim maushul (اِسْم مَوْصُول, mudhaf ilaih, مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "113:4:4",
+         "text": "huruf jar (حَرْف جَرّ, fī al-‘uqadi terkait an-naffāṡāti)"
+        }
+       ]
+      },
+      {
+       "n": 3,
+       "word": 3,
+       "why": "Akhirnya kasrah (كَسْرَة) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari syarri; kata ini jamak dari naffāṡah, bentuk mubalaghah (مُبَالَغَة, “yang banyak meniup”) dari isim fa'il (اِسْم فَاعِل).",
+       "options": [
+        {
+         "from": "113:4:3",
+         "text": "mudhaf ilaih (مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "113:2:1",
+         "text": "huruf jar (حَرْف جَرّ, min syarri terkait a‘ūżu)"
+        },
+        {
+         "from": "113:4:4",
+         "text": "huruf jar (حَرْف جَرّ, fī al-‘uqadi terkait an-naffāṡāti)"
+        },
+        {
+         "from": "113:3:5",
+         "text": "fi'il madhi (فِعْل مَاضٍ, fa'il, فَاعِل tersimpan: “ia”); kalimatnya mudhaf ilaih (مُضَاف إِلَيْه) bagi iżā"
+        }
+       ]
+      },
+      {
+       "n": 4,
+       "word": 4,
+       "why": "Fī adalah huruf jar (حَرْف جَرّ) “pada”; al-‘uqadi sesudahnya menjadi majrur (مَجْرُور) karenanya, dan frasa fī al-‘uqadi bergantung pada an-naffāṡāti.",
+       "options": [
+        {
+         "from": "113:4:4",
+         "text": "huruf jar (حَرْف جَرّ, fī al-‘uqadi terkait an-naffāṡāti)"
+        },
+        {
+         "from": "113:2:2",
+         "text": "majrur (مَجْرُور) oleh min; mudhaf (مُضَاف)"
+        },
+        {
+         "from": "113:2:1",
+         "text": "huruf jar (حَرْف جَرّ, min syarri terkait a‘ūżu)"
+        },
+        {
+         "from": "113:3:1",
+         "text": "huruf 'athaf (حَرْف عَطْف) + huruf jar (حَرْف جَرّ)"
+        }
+       ]
+      },
+      {
+       "n": 5,
+       "word": 5,
+       "why": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) fī; kata ini jamak dari ‘uqdah (buhul, simpul).",
+       "options": [
+        {
+         "from": "113:4:5",
+         "text": "majrur (مَجْرُور) oleh fī"
+        },
+        {
+         "from": "113:2:3",
+         "text": "isim maushul (اِسْم مَوْصُول, mudhaf ilaih, مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "113:4:4",
+         "text": "huruf jar (حَرْف جَرّ, fī al-‘uqadi terkait an-naffāṡāti)"
+        },
+        {
+         "from": "113:3:1",
+         "text": "huruf 'athaf (حَرْف عَطْف) + huruf jar (حَرْف جَرّ)"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "ayah": 5,
+   "exercises": [
+    {
+     "key": "tap-word",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1
+      },
+      {
+       "n": 2,
+       "word": 2
+      },
+      {
+       "n": 3,
+       "word": 3
+      },
+      {
+       "n": 4,
+       "word": 4
+      },
+      {
+       "n": 5,
+       "word": 5
+      }
+     ]
+    },
+    {
+     "key": "why-harakat",
+     "questions": [
+      {
+       "n": 1,
+       "word": 2,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) min; syarri juga disandarkan (mudhaf, مُضَاف) kepada ḥāsidin.",
+       "options": [
+        {
+         "from": "113:5:2",
+         "text": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) min; syarri juga disandarkan (mudhaf, مُضَاف) kepada ḥāsidin."
+        },
+        {
+         "from": "113:5:1",
+         "text": "Wa adalah huruf 'athaf (حَرْف عَطْف) dan min huruf jar (حَرْف جَرّ) “dari”; frasa terakhir ini pun disambungkan pada min syarri sebelumnya dan bergantung pada a‘ūżu."
+        },
+        {
+         "from": "113:3:5",
+         "text": "Fi'il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة); pelakunya tersirat (“ia”, yaitu malam itu), dan kalimat waqaba berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari iżā."
+        }
+       ]
+      },
+      {
+       "n": 2,
+       "word": 3,
+       "sign": "kasratain",
+       "why": "Akhirnya kasrah (كَسْرَة) bertanwin (تَنْوِين) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari syarri; ḥāsid adalah isim fa'il (اِسْم فَاعِل) dari ḥasada (“yang dengki”), dan di sini nakirah (نَكِرَة), tanpa al-.",
+       "options": [
+        {
+         "from": "113:5:3",
+         "text": "Akhirnya kasrah (كَسْرَة) bertanwin (تَنْوِين) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari syarri; ḥāsid adalah isim fa'il (اِسْم فَاعِل) dari ḥasada (“yang dengki”), dan di sini nakirah (نَكِرَة), tanpa al-."
+        },
+        {
+         "from": "113:1:1",
+         "text": "Kata perintah (fi'il amr, فِعْل أَمْر) ini mabni (مَبْنِيّ) di atas sukun (سُكُون), jadi akhirnya tetap; pelakunya tersirat, yaitu “engkau”."
+        },
+        {
+         "from": "113:5:5",
+         "text": "Fi'il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة); pelakunya tersirat (“dia”, yaitu orang yang dengki itu), dan kalimat ḥasada berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari iżā."
+        }
+       ]
+      },
+      {
+       "n": 3,
+       "word": 4,
+       "sign": "sukun (سُكُون)",
+       "why": "Iżā mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan nashab (نَصْب) sebagai keterangan waktu (zharaf, ظَرْف) murni; kalimat sesudahnya, ḥasada, menjadi mudhaf ilaih (مُضَاف إِلَيْه) baginya.",
+       "options": [
+        {
+         "from": "113:5:4",
+         "text": "Iżā mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan nashab (نَصْب) sebagai keterangan waktu (zharaf, ظَرْف) murni; kalimat sesudahnya, ḥasada, menjadi mudhaf ilaih (مُضَاف إِلَيْه) baginya."
+        },
+        {
+         "from": "113:3:2",
+         "text": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) min; syarri juga disandarkan (mudhaf, مُضَاف) kepada gāsiqin."
+        },
+        {
+         "from": "113:5:1",
+         "text": "Wa adalah huruf 'athaf (حَرْف عَطْف) dan min huruf jar (حَرْف جَرّ) “dari”; frasa terakhir ini pun disambungkan pada min syarri sebelumnya dan bergantung pada a‘ūżu."
+        }
+       ]
+      },
+      {
+       "n": 4,
+       "word": 5,
+       "sign": "fathah (فَتْحَة)",
+       "why": "Fi'il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة); pelakunya tersirat (“dia”, yaitu orang yang dengki itu), dan kalimat ḥasada berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari iżā.",
+       "options": [
+        {
+         "from": "113:5:5",
+         "text": "Fi'il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة); pelakunya tersirat (“dia”, yaitu orang yang dengki itu), dan kalimat ḥasada berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari iżā."
+        },
+        {
+         "from": "113:1:2",
+         "text": "Akhirnya dhammah (ضَمَّة) karena fi'il mudhari' (فِعْل مُضَارِع) ini tidak didahului huruf penashab (نَاصِب) atau penjazm (جَازِم); pelakunya tersirat, yaitu “aku”."
+        },
+        {
+         "from": "113:4:4",
+         "text": "Fī adalah huruf jar (حَرْف جَرّ) “pada”; al-‘uqadi sesudahnya menjadi majrur (مَجْرُور) karenanya, dan frasa fī al-‘uqadi bergantung pada an-naffāṡāti."
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "key": "sort-case",
+     "bins": [
+      "marfu",
+      "manshub",
+      "majrur",
+      "mabni"
+     ],
+     "questions": [
+      {
+       "n": 1,
+       "word": 2,
+       "sign": "kasrah (كَسْرَة)",
+       "why": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) min; syarri juga disandarkan (mudhaf, مُضَاف) kepada ḥāsidin."
+      },
+      {
+       "n": 2,
+       "word": 3,
+       "sign": "kasratain",
+       "why": "Akhirnya kasrah (كَسْرَة) bertanwin (تَنْوِين) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari syarri; ḥāsid adalah isim fa'il (اِسْم فَاعِل) dari ḥasada (“yang dengki”), dan di sini nakirah (نَكِرَة), tanpa al-."
+      },
+      {
+       "n": 3,
+       "word": 4,
+       "sign": "sukun (سُكُون)",
+       "why": "Iżā mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan nashab (نَصْب) sebagai keterangan waktu (zharaf, ظَرْف) murni; kalimat sesudahnya, ḥasada, menjadi mudhaf ilaih (مُضَاف إِلَيْه) baginya."
+      },
+      {
+       "n": 4,
+       "word": 5,
+       "sign": "fathah (فَتْحَة)",
+       "why": "Fi'il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة); pelakunya tersirat (“dia”, yaitu orang yang dengki itu), dan kalimat ḥasada berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari iżā."
+      }
+     ]
+    },
+    {
+     "key": "label-role",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "why": "Wa adalah huruf 'athaf (حَرْف عَطْف) dan min huruf jar (حَرْف جَرّ) “dari”; frasa terakhir ini pun disambungkan pada min syarri sebelumnya dan bergantung pada a‘ūżu.",
+       "options": [
+        {
+         "from": "113:5:1",
+         "text": "huruf 'athaf (حَرْف عَطْف) + huruf jar (حَرْف جَرّ)"
+        },
+        {
+         "from": "113:2:4",
+         "text": "fi'il madhi (فِعْل مَاضٍ, fa'il, فَاعِل tersimpan: “Dia”); kalimatnya shilah (صِلَة) bagi mā"
+        },
+        {
+         "from": "113:2:2",
+         "text": "majrur (مَجْرُور) oleh min; mudhaf (مُضَاف)"
+        },
+        {
+         "from": "113:3:5",
+         "text": "fi'il madhi (فِعْل مَاضٍ, fa'il, فَاعِل tersimpan: “ia”); kalimatnya mudhaf ilaih (مُضَاف إِلَيْه) bagi iżā"
+        }
+       ]
+      },
+      {
+       "n": 2,
+       "word": 2,
+       "why": "Akhirnya kasrah (كَسْرَة) karena didahului huruf jar (حَرْف جَرّ) min; syarri juga disandarkan (mudhaf, مُضَاف) kepada ḥāsidin.",
+       "options": [
+        {
+         "from": "113:5:2",
+         "text": "majrur (مَجْرُور) oleh min; mudhaf (مُضَاف)"
+        },
+        {
+         "from": "113:4:4",
+         "text": "huruf jar (حَرْف جَرّ, fī al-‘uqadi terkait an-naffāṡāti)"
+        },
+        {
+         "from": "113:3:1",
+         "text": "huruf 'athaf (حَرْف عَطْف) + huruf jar (حَرْف جَرّ)"
+        },
+        {
+         "from": "113:3:5",
+         "text": "fi'il madhi (فِعْل مَاضٍ, fa'il, فَاعِل tersimpan: “ia”); kalimatnya mudhaf ilaih (مُضَاف إِلَيْه) bagi iżā"
+        }
+       ]
+      },
+      {
+       "n": 3,
+       "word": 3,
+       "why": "Akhirnya kasrah (كَسْرَة) bertanwin (تَنْوِين) karena menjadi mudhaf ilaih (مُضَاف إِلَيْه) dari syarri; ḥāsid adalah isim fa'il (اِسْم فَاعِل) dari ḥasada (“yang dengki”), dan di sini nakirah (نَكِرَة), tanpa al-.",
+       "options": [
+        {
+         "from": "113:5:3",
+         "text": "mudhaf ilaih (مُضَاف إِلَيْه)"
+        },
+        {
+         "from": "113:1:1",
+         "text": "fi'il amr (فِعْل أَمْر, fa'il, فَاعِل tersimpan: “engkau”)"
+        },
+        {
+         "from": "113:5:5",
+         "text": "fi'il madhi (فِعْل مَاضٍ, fa'il, فَاعِل tersimpan: “dia”); kalimatnya mudhaf ilaih (مُضَاف إِلَيْه) bagi iżā"
+        },
+        {
+         "from": "113:3:4",
+         "text": "zharaf (ظَرْف) zaman (keterangan waktu); disandarkan kepada kalimat sesudahnya"
+        }
+       ]
+      },
+      {
+       "n": 4,
+       "word": 4,
+       "why": "Iżā mabni (مَبْنِيّ) di atas sukun (سُكُون) dan berkedudukan nashab (نَصْب) sebagai keterangan waktu (zharaf, ظَرْف) murni; kalimat sesudahnya, ḥasada, menjadi mudhaf ilaih (مُضَاف إِلَيْه) baginya.",
+       "options": [
+        {
+         "from": "113:5:4",
+         "text": "zharaf (ظَرْف) zaman (keterangan waktu); disandarkan kepada kalimat sesudahnya"
+        },
+        {
+         "from": "113:4:4",
+         "text": "huruf jar (حَرْف جَرّ, fī al-‘uqadi terkait an-naffāṡāti)"
+        },
+        {
+         "from": "113:2:1",
+         "text": "huruf jar (حَرْف جَرّ, min syarri terkait a‘ūżu)"
+        },
+        {
+         "from": "113:1:2",
+         "text": "fi'il mudhari' (فِعْل مُضَارِع, fa'il, فَاعِل tersimpan: “aku”); kalimatnya maqul al-qaul (مَقُول القَوْل)"
+        }
+       ]
+      },
+      {
+       "n": 5,
+       "word": 5,
+       "why": "Fi'il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas fathah (فَتْحَة); pelakunya tersirat (“dia”, yaitu orang yang dengki itu), dan kalimat ḥasada berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari iżā.",
+       "options": [
+        {
+         "from": "113:5:5",
+         "text": "fi'il madhi (فِعْل مَاضٍ, fa'il, فَاعِل tersimpan: “dia”); kalimatnya mudhaf ilaih (مُضَاف إِلَيْه) bagi iżā"
+        },
+        {
+         "from": "113:3:5",
+         "text": "fi'il madhi (فِعْل مَاضٍ, fa'il, فَاعِل tersimpan: “ia”); kalimatnya mudhaf ilaih (مُضَاف إِلَيْه) bagi iżā"
+        },
+        {
+         "from": "113:4:4",
+         "text": "huruf jar (حَرْف جَرّ, fī al-‘uqadi terkait an-naffāṡāti)"
+        },
+        {
+         "from": "113:2:4",
+         "text": "fi'il madhi (فِعْل مَاضٍ, fa'il, فَاعِل tersimpan: “Dia”); kalimatnya shilah (صِلَة) bagi mā"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "key": "wazn-factory",
+     "questions": [
+      {
+       "n": 1,
+       "lexeme": "hasada",
+       "label": "fi'il madhi",
+       "options": [
+        "fi'il madhi",
+        "isim fa'il",
+        "mashdar"
+       ]
+      },
+      {
+       "n": 2,
+       "lexeme": "hasada",
+       "label": "fi'il mudhari'",
+       "options": [
+        "fi'il mudhari'",
+        "isim maf'ul",
+        "mashdar"
+       ]
+      },
+      {
+       "n": 3,
+       "lexeme": "hasada",
+       "label": "mashdar",
+       "options": [
+        "mashdar",
+        "fi'il madhi",
+        "fi'il mudhari'"
+       ]
+      },
+      {
+       "n": 4,
+       "lexeme": "hasada",
+       "label": "isim fa'il",
+       "options": [
+        "isim fa'il",
+        "isim maf'ul",
+        "fi'il mudhari'"
+       ]
+      },
+      {
+       "n": 5,
+       "lexeme": "hasada",
+       "label": "isim maf'ul",
+       "options": [
+        "isim maf'ul",
+        "fi'il mudhari'",
+        "isim fa'il"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

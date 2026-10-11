@@ -39,6 +39,7 @@ import {
   playingWords,
   srAnnouncement,
   stageCaption,
+  stageFrame,
   stageMarks,
   type VoicePos,
 } from "./caption";
@@ -464,6 +465,8 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
   const caption = stageCaption(seq, state, clock, voice);
   const voiced = caption.voiced;
   const marks = stageMarks(seq, state);
+  // The composition / primer frame on screen (narration rule 14).
+  const frame = stageFrame(seq, state);
   const announcement = srAnnouncement(seq, state, voiced);
   /** The line on screen has the narration voice (null: no line on screen). */
   const lineHasVoice = lineVoiced(seq, state);
@@ -526,8 +529,12 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
       setLearnerWord(true);
       dispatch({ type: "pause" });
     },
-    answered(key: ExerciseKey, correct: boolean) {
-      dispatch({ type: "answered", key, correct });
+    answered(key: ExerciseKey, correct: boolean, question?: number) {
+      dispatch({ type: "answered", key, correct, question });
+    },
+    /** "Tunjukkan jawaban" on question `question`. */
+    revealed(key: ExerciseKey, question?: number) {
+      dispatch({ type: "revealed", key, question });
     },
     exerciseDone(key: ExerciseKey) {
       dispatch({ type: "exercise_done", key });
@@ -551,6 +558,8 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
     voiced,
     /** The words the mushaf line marks, and the word card's word. */
     marks,
+    /** The animation frame in the word card's slot (primer / compose steps). */
+    frame,
     lineHasVoice,
     /** Replays so far (the stage keys its exercise with it). */
     replays,

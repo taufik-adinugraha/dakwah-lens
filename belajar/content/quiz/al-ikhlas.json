@@ -1,0 +1,943 @@
+{
+ "version": 1,
+ "slug": "al-ikhlas",
+ "authored": false,
+ "states": {
+  "marfu": "marfu' (مَرْفُوع)",
+  "manshub": "manshub (مَنْصُوب)",
+  "majrur": "majrur (مَجْرُور)",
+  "mabni": "mabni (مَبْنِيّ)"
+ },
+ "labels": {
+  "fi'il amr": "fi'il amr (فِعْل أَمْر)",
+  "fi'il madhi": "fi'il madhi (فِعْل مَاضٍ)",
+  "fi'il mudhari'": "fi'il mudhari' (فِعْل مُضَارِع)",
+  "isim fa'il": "isim fa'il (اِسْم فَاعِل)",
+  "isim maf'ul": "isim maf'ul (اِسْم مَفْعُول)",
+  "mashdar": "mashdar (مَصْدَر)"
+ },
+ "ayat": [
+  {
+   "ayah": 1,
+   "exercises": [
+    {
+     "key": "tap-word",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1
+      },
+      {
+       "n": 2,
+       "word": 2
+      },
+      {
+       "n": 3,
+       "word": 3
+      },
+      {
+       "n": 4,
+       "word": 4
+      }
+     ]
+    },
+    {
+     "key": "why-harakat",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "sign": "sukun (سُكُون)",
+       "why": "Fi'il amr (فِعْل أَمْر, kata perintah) ini mabni (مَبْنِيّ) di atas sukun (سُكُون), sehingga akhirnya tetap mati; pelakunya tersirat, yaitu “engkau” (Nabi Muhammad).",
+       "options": [
+        {
+         "from": "112:1:1",
+         "text": "Fi'il amr (فِعْل أَمْر, kata perintah) ini mabni (مَبْنِيّ) di atas sukun (سُكُون), sehingga akhirnya tetap mati; pelakunya tersirat, yaitu “engkau” (Nabi Muhammad)."
+        },
+        {
+         "from": "112:1:3",
+         "text": "Akhirnya dhammah (ضَمَّة) karena menjadi mubtada' (مُبْتَدَأ) kedua, yaitu pokok kalimat Allāhu aḥadun yang menjelaskan huwa."
+        },
+        {
+         "from": "112:1:4",
+         "text": "Akhirnya dhammatain (dhammah, ضَمَّة bertanwin, تَنْوِين) karena menjadi khabar (خَبَر) bagi Allāhu, sehingga maknanya “Allah itu Esa”."
+        }
+       ]
+      },
+      {
+       "n": 2,
+       "word": 2,
+       "sign": "fathah (فَتْحَة)",
+       "why": "Kata ganti (dhamir, ضَمِير) ini mabni (مَبْنِيّ), sehingga bentuknya tidak berubah, dan berkedudukan rafa' (رَفْع, mahall, مَحَلّ raf') sebagai mubtada' (مُبْتَدَأ), pokok kalimat yang dijelaskan oleh Allāhu aḥadun sesudahnya.",
+       "options": [
+        {
+         "from": "112:1:2",
+         "text": "Kata ganti (dhamir, ضَمِير) ini mabni (مَبْنِيّ), sehingga bentuknya tidak berubah, dan berkedudukan rafa' (رَفْع, mahall, مَحَلّ raf') sebagai mubtada' (مُبْتَدَأ), pokok kalimat yang dijelaskan oleh Allāhu aḥadun sesudahnya."
+        },
+        {
+         "from": "112:1:3",
+         "text": "Akhirnya dhammah (ضَمَّة) karena menjadi mubtada' (مُبْتَدَأ) kedua, yaitu pokok kalimat Allāhu aḥadun yang menjelaskan huwa."
+        },
+        {
+         "from": "112:1:4",
+         "text": "Akhirnya dhammatain (dhammah, ضَمَّة bertanwin, تَنْوِين) karena menjadi khabar (خَبَر) bagi Allāhu, sehingga maknanya “Allah itu Esa”."
+        }
+       ]
+      },
+      {
+       "n": 3,
+       "word": 3,
+       "sign": "dhammah (ضَمَّة)",
+       "why": "Akhirnya dhammah (ضَمَّة) karena menjadi mubtada' (مُبْتَدَأ) kedua, yaitu pokok kalimat Allāhu aḥadun yang menjelaskan huwa.",
+       "options": [
+        {
+         "from": "112:1:3",
+         "text": "Akhirnya dhammah (ضَمَّة) karena menjadi mubtada' (مُبْتَدَأ) kedua, yaitu pokok kalimat Allāhu aḥadun yang menjelaskan huwa."
+        },
+        {
+         "from": "112:1:1",
+         "text": "Fi'il amr (فِعْل أَمْر, kata perintah) ini mabni (مَبْنِيّ) di atas sukun (سُكُون), sehingga akhirnya tetap mati; pelakunya tersirat, yaitu “engkau” (Nabi Muhammad)."
+        },
+        {
+         "from": "112:1:2",
+         "text": "Kata ganti (dhamir, ضَمِير) ini mabni (مَبْنِيّ), sehingga bentuknya tidak berubah, dan berkedudukan rafa' (رَفْع, mahall, مَحَلّ raf') sebagai mubtada' (مُبْتَدَأ), pokok kalimat yang dijelaskan oleh Allāhu aḥadun sesudahnya."
+        }
+       ]
+      },
+      {
+       "n": 4,
+       "word": 4,
+       "sign": "dhammatain",
+       "why": "Akhirnya dhammatain (dhammah, ضَمَّة bertanwin, تَنْوِين) karena menjadi khabar (خَبَر) bagi Allāhu, sehingga maknanya “Allah itu Esa”.",
+       "options": [
+        {
+         "from": "112:1:4",
+         "text": "Akhirnya dhammatain (dhammah, ضَمَّة bertanwin, تَنْوِين) karena menjadi khabar (خَبَر) bagi Allāhu, sehingga maknanya “Allah itu Esa”."
+        },
+        {
+         "from": "112:1:2",
+         "text": "Kata ganti (dhamir, ضَمِير) ini mabni (مَبْنِيّ), sehingga bentuknya tidak berubah, dan berkedudukan rafa' (رَفْع, mahall, مَحَلّ raf') sebagai mubtada' (مُبْتَدَأ), pokok kalimat yang dijelaskan oleh Allāhu aḥadun sesudahnya."
+        },
+        {
+         "from": "112:1:1",
+         "text": "Fi'il amr (فِعْل أَمْر, kata perintah) ini mabni (مَبْنِيّ) di atas sukun (سُكُون), sehingga akhirnya tetap mati; pelakunya tersirat, yaitu “engkau” (Nabi Muhammad)."
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "key": "sort-case",
+     "bins": [
+      "marfu",
+      "manshub",
+      "majrur",
+      "mabni"
+     ],
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "sign": "sukun (سُكُون)",
+       "why": "Fi'il amr (فِعْل أَمْر, kata perintah) ini mabni (مَبْنِيّ) di atas sukun (سُكُون), sehingga akhirnya tetap mati; pelakunya tersirat, yaitu “engkau” (Nabi Muhammad)."
+      },
+      {
+       "n": 2,
+       "word": 2,
+       "sign": "fathah (فَتْحَة)",
+       "why": "Kata ganti (dhamir, ضَمِير) ini mabni (مَبْنِيّ), sehingga bentuknya tidak berubah, dan berkedudukan rafa' (رَفْع, mahall, مَحَلّ raf') sebagai mubtada' (مُبْتَدَأ), pokok kalimat yang dijelaskan oleh Allāhu aḥadun sesudahnya."
+      },
+      {
+       "n": 3,
+       "word": 3,
+       "sign": "dhammah (ضَمَّة)",
+       "why": "Akhirnya dhammah (ضَمَّة) karena menjadi mubtada' (مُبْتَدَأ) kedua, yaitu pokok kalimat Allāhu aḥadun yang menjelaskan huwa."
+      },
+      {
+       "n": 4,
+       "word": 4,
+       "sign": "dhammatain",
+       "why": "Akhirnya dhammatain (dhammah, ضَمَّة bertanwin, تَنْوِين) karena menjadi khabar (خَبَر) bagi Allāhu, sehingga maknanya “Allah itu Esa”."
+      }
+     ]
+    },
+    {
+     "key": "label-role",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "why": "Fi'il amr (فِعْل أَمْر, kata perintah) ini mabni (مَبْنِيّ) di atas sukun (سُكُون), sehingga akhirnya tetap mati; pelakunya tersirat, yaitu “engkau” (Nabi Muhammad).",
+       "options": [
+        {
+         "from": "112:1:1",
+         "text": "fi'il amr (فِعْل أَمْر); fa'il (فَاعِل) tersimpan: “engkau” (Nabi Muhammad)"
+        },
+        {
+         "from": "112:1:4",
+         "text": "khabar (خَبَر)"
+        },
+        {
+         "from": "112:1:2",
+         "text": "mubtada' (مُبْتَدَأ, dhamir sya'n, ضَمِير الشَّأْن, atau kata ganti yang kembali kepada Allah)"
+        },
+        {
+         "from": "112:1:3",
+         "text": "mubtada' (مُبْتَدَأ) kedua (pendapat lain: khabar, خَبَر bagi huwa)"
+        }
+       ]
+      },
+      {
+       "n": 2,
+       "word": 2,
+       "why": "Kata ganti (dhamir, ضَمِير) ini mabni (مَبْنِيّ), sehingga bentuknya tidak berubah, dan berkedudukan rafa' (رَفْع, mahall, مَحَلّ raf') sebagai mubtada' (مُبْتَدَأ), pokok kalimat yang dijelaskan oleh Allāhu aḥadun sesudahnya.",
+       "options": [
+        {
+         "from": "112:1:2",
+         "text": "mubtada' (مُبْتَدَأ, dhamir sya'n, ضَمِير الشَّأْن, atau kata ganti yang kembali kepada Allah)"
+        },
+        {
+         "from": "112:1:1",
+         "text": "fi'il amr (فِعْل أَمْر); fa'il (فَاعِل) tersimpan: “engkau” (Nabi Muhammad)"
+        },
+        {
+         "from": "112:1:3",
+         "text": "mubtada' (مُبْتَدَأ) kedua (pendapat lain: khabar, خَبَر bagi huwa)"
+        },
+        {
+         "from": "112:1:4",
+         "text": "khabar (خَبَر)"
+        }
+       ]
+      },
+      {
+       "n": 3,
+       "word": 3,
+       "why": "Akhirnya dhammah (ضَمَّة) karena menjadi mubtada' (مُبْتَدَأ) kedua, yaitu pokok kalimat Allāhu aḥadun yang menjelaskan huwa.",
+       "options": [
+        {
+         "from": "112:1:3",
+         "text": "mubtada' (مُبْتَدَأ) kedua (pendapat lain: khabar, خَبَر bagi huwa)"
+        },
+        {
+         "from": "112:1:4",
+         "text": "khabar (خَبَر)"
+        },
+        {
+         "from": "112:1:1",
+         "text": "fi'il amr (فِعْل أَمْر); fa'il (فَاعِل) tersimpan: “engkau” (Nabi Muhammad)"
+        },
+        {
+         "from": "112:1:2",
+         "text": "mubtada' (مُبْتَدَأ, dhamir sya'n, ضَمِير الشَّأْن, atau kata ganti yang kembali kepada Allah)"
+        }
+       ]
+      },
+      {
+       "n": 4,
+       "word": 4,
+       "why": "Akhirnya dhammatain (dhammah, ضَمَّة bertanwin, تَنْوِين) karena menjadi khabar (خَبَر) bagi Allāhu, sehingga maknanya “Allah itu Esa”.",
+       "options": [
+        {
+         "from": "112:1:4",
+         "text": "khabar (خَبَر)"
+        },
+        {
+         "from": "112:1:3",
+         "text": "mubtada' (مُبْتَدَأ) kedua (pendapat lain: khabar, خَبَر bagi huwa)"
+        },
+        {
+         "from": "112:1:2",
+         "text": "mubtada' (مُبْتَدَأ, dhamir sya'n, ضَمِير الشَّأْن, atau kata ganti yang kembali kepada Allah)"
+        },
+        {
+         "from": "112:1:1",
+         "text": "fi'il amr (فِعْل أَمْر); fa'il (فَاعِل) tersimpan: “engkau” (Nabi Muhammad)"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "key": "wazn-factory",
+     "questions": [
+      {
+       "n": 1,
+       "lexeme": "qala",
+       "label": "fi'il madhi",
+       "options": [
+        "fi'il madhi",
+        "fi'il mudhari'",
+        "isim maf'ul"
+       ]
+      },
+      {
+       "n": 2,
+       "lexeme": "qala",
+       "label": "fi'il mudhari'",
+       "options": [
+        "fi'il mudhari'",
+        "fi'il madhi",
+        "isim fa'il"
+       ]
+      },
+      {
+       "n": 3,
+       "lexeme": "qala",
+       "label": "mashdar",
+       "options": [
+        "mashdar",
+        "fi'il mudhari'",
+        "isim fa'il"
+       ]
+      },
+      {
+       "n": 4,
+       "lexeme": "qala",
+       "label": "isim fa'il",
+       "options": [
+        "isim fa'il",
+        "mashdar",
+        "fi'il mudhari'"
+       ]
+      },
+      {
+       "n": 5,
+       "lexeme": "qala",
+       "label": "isim maf'ul",
+       "options": [
+        "isim maf'ul",
+        "mashdar",
+        "fi'il amr"
+       ]
+      },
+      {
+       "n": 6,
+       "lexeme": "qala",
+       "label": "fi'il amr",
+       "options": [
+        "fi'il amr",
+        "isim maf'ul",
+        "mashdar"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "ayah": 2,
+   "exercises": [
+    {
+     "key": "tap-word",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1
+      },
+      {
+       "n": 2,
+       "word": 2
+      }
+     ]
+    },
+    {
+     "key": "why-harakat",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "sign": "dhammah (ضَمَّة)",
+       "why": "Akhirnya dhammah (ضَمَّة) karena menjadi mubtada' (مُبْتَدَأ, pokok kalimat), dan aṣ-ṣamadu adalah khabarnya.",
+       "options": [
+        {
+         "from": "112:2:1",
+         "text": "Akhirnya dhammah (ضَمَّة) karena menjadi mubtada' (مُبْتَدَأ, pokok kalimat), dan aṣ-ṣamadu adalah khabarnya."
+        },
+        {
+         "from": "112:1:2",
+         "text": "Kata ganti (dhamir, ضَمِير) ini mabni (مَبْنِيّ), sehingga bentuknya tidak berubah, dan berkedudukan rafa' (رَفْع, mahall, مَحَلّ raf') sebagai mubtada' (مُبْتَدَأ), pokok kalimat yang dijelaskan oleh Allāhu aḥadun sesudahnya."
+        },
+        {
+         "from": "112:1:1",
+         "text": "Fi'il amr (فِعْل أَمْر, kata perintah) ini mabni (مَبْنِيّ) di atas sukun (سُكُون), sehingga akhirnya tetap mati; pelakunya tersirat, yaitu “engkau” (Nabi Muhammad)."
+        }
+       ]
+      },
+      {
+       "n": 2,
+       "word": 2,
+       "sign": "dhammah (ضَمَّة)",
+       "why": "Akhirnya dhammah (ضَمَّة) karena menjadi khabar (خَبَر, keterangan) bagi Allāhu.",
+       "options": [
+        {
+         "from": "112:2:2",
+         "text": "Akhirnya dhammah (ضَمَّة) karena menjadi khabar (خَبَر, keterangan) bagi Allāhu."
+        },
+        {
+         "from": "112:1:1",
+         "text": "Fi'il amr (فِعْل أَمْر, kata perintah) ini mabni (مَبْنِيّ) di atas sukun (سُكُون), sehingga akhirnya tetap mati; pelakunya tersirat, yaitu “engkau” (Nabi Muhammad)."
+        },
+        {
+         "from": "112:1:2",
+         "text": "Kata ganti (dhamir, ضَمِير) ini mabni (مَبْنِيّ), sehingga bentuknya tidak berubah, dan berkedudukan rafa' (رَفْع, mahall, مَحَلّ raf') sebagai mubtada' (مُبْتَدَأ), pokok kalimat yang dijelaskan oleh Allāhu aḥadun sesudahnya."
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "key": "sort-case",
+     "bins": [
+      "marfu",
+      "manshub",
+      "majrur",
+      "mabni"
+     ],
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "sign": "dhammah (ضَمَّة)",
+       "why": "Akhirnya dhammah (ضَمَّة) karena menjadi mubtada' (مُبْتَدَأ, pokok kalimat), dan aṣ-ṣamadu adalah khabarnya."
+      },
+      {
+       "n": 2,
+       "word": 2,
+       "sign": "dhammah (ضَمَّة)",
+       "why": "Akhirnya dhammah (ضَمَّة) karena menjadi khabar (خَبَر, keterangan) bagi Allāhu."
+      }
+     ]
+    },
+    {
+     "key": "label-role",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "why": "Akhirnya dhammah (ضَمَّة) karena menjadi mubtada' (مُبْتَدَأ, pokok kalimat), dan aṣ-ṣamadu adalah khabarnya.",
+       "options": [
+        {
+         "from": "112:2:1",
+         "text": "mubtada' (مُبْتَدَأ)"
+        },
+        {
+         "from": "112:2:2",
+         "text": "khabar (خَبَر, pendapat lain: na't, نَعْت)"
+        },
+        {
+         "from": "112:1:2",
+         "text": "mubtada' (مُبْتَدَأ, dhamir sya'n, ضَمِير الشَّأْن, atau kata ganti yang kembali kepada Allah)"
+        },
+        {
+         "from": "112:1:3",
+         "text": "mubtada' (مُبْتَدَأ) kedua (pendapat lain: khabar, خَبَر bagi huwa)"
+        }
+       ]
+      },
+      {
+       "n": 2,
+       "word": 2,
+       "why": "Akhirnya dhammah (ضَمَّة) karena menjadi khabar (خَبَر, keterangan) bagi Allāhu.",
+       "options": [
+        {
+         "from": "112:2:2",
+         "text": "khabar (خَبَر, pendapat lain: na't, نَعْت)"
+        },
+        {
+         "from": "112:1:3",
+         "text": "mubtada' (مُبْتَدَأ) kedua (pendapat lain: khabar, خَبَر bagi huwa)"
+        },
+        {
+         "from": "112:2:1",
+         "text": "mubtada' (مُبْتَدَأ)"
+        },
+        {
+         "from": "112:1:2",
+         "text": "mubtada' (مُبْتَدَأ, dhamir sya'n, ضَمِير الشَّأْن, atau kata ganti yang kembali kepada Allah)"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "ayah": 3,
+   "exercises": [
+    {
+     "key": "tap-word",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1
+      },
+      {
+       "n": 2,
+       "word": 2
+      },
+      {
+       "n": 3,
+       "word": 3
+      },
+      {
+       "n": 4,
+       "word": 4
+      }
+     ]
+    },
+    {
+     "key": "label-role",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "why": "Lam adalah huruf nafi (نَفْي, peniada) sekaligus huruf jazm (جَزْم): ia meniadakan kata kerja sesudahnya dan membuatnya majzum (مَجْزُوم).",
+       "options": [
+        {
+         "from": "112:3:1",
+         "text": "huruf nafi (نَفْي) dan jazm (جَزْم)"
+        },
+        {
+         "from": "112:1:2",
+         "text": "mubtada' (مُبْتَدَأ, dhamir sya'n, ضَمِير الشَّأْن, atau kata ganti yang kembali kepada Allah)"
+        },
+        {
+         "from": "112:1:1",
+         "text": "fi'il amr (فِعْل أَمْر); fa'il (فَاعِل) tersimpan: “engkau” (Nabi Muhammad)"
+        },
+        {
+         "from": "112:1:4",
+         "text": "khabar (خَبَر)"
+        }
+       ]
+      },
+      {
+       "n": 2,
+       "word": 2,
+       "why": "Fi'il mudhari' (فِعْل مُضَارِع) ini majzum (مَجْزُوم) karena didahului lam, dengan tanda sukun (سُكُون) di akhir, karena huruf terakhirnya bukan huruf 'illah (حَرْف عِلَّة); pelakunya kata ganti yang tersimpan.",
+       "options": [
+        {
+         "from": "112:3:2",
+         "text": "fi'il mudhari' (فِعْل مُضَارِع) majzum (مَجْزُوم)"
+        },
+        {
+         "from": "112:1:3",
+         "text": "mubtada' (مُبْتَدَأ) kedua (pendapat lain: khabar, خَبَر bagi huwa)"
+        },
+        {
+         "from": "112:2:1",
+         "text": "mubtada' (مُبْتَدَأ)"
+        },
+        {
+         "from": "112:1:1",
+         "text": "fi'il amr (فِعْل أَمْر); fa'il (فَاعِل) tersimpan: “engkau” (Nabi Muhammad)"
+        }
+       ]
+      },
+      {
+       "n": 3,
+       "word": 3,
+       "why": "Wawu adalah huruf 'athaf (حَرْف عَطْف) yang menyambungkan kalimat ini dengan lam yalid, dan lam kembali menjazmkan (جَزْم) kata kerja sesudahnya.",
+       "options": [
+        {
+         "from": "112:3:3",
+         "text": "huruf 'athaf (حَرْف عَطْف) + huruf nafi (نَفْي) dan jazm (جَزْم)"
+        },
+        {
+         "from": "112:3:2",
+         "text": "fi'il mudhari' (فِعْل مُضَارِع) majzum (مَجْزُوم)"
+        },
+        {
+         "from": "112:3:4",
+         "text": "fi'il mudhari' (فِعْل مُضَارِع) majhul (مَجْهُول), majzum (مَجْزُوم) oleh lam; na'ib fa'il (نَائِب فَاعِل) tersimpan"
+        },
+        {
+         "from": "112:1:4",
+         "text": "khabar (خَبَر)"
+        }
+       ]
+      },
+      {
+       "n": 4,
+       "word": 4,
+       "why": "Fi'il mudhari' (فِعْل مُضَارِع) bentuk majhul (مَجْهُول, pasif: “diperanakkan”) ini majzum (مَجْزُوم) oleh lam-nya sendiri, dengan tanda sukun (سُكُون) di akhir; na'ib fa'il-nya (pengganti pelaku) adalah kata ganti yang tersimpan.",
+       "options": [
+        {
+         "from": "112:3:4",
+         "text": "fi'il mudhari' (فِعْل مُضَارِع) majhul (مَجْهُول), majzum (مَجْزُوم) oleh lam; na'ib fa'il (نَائِب فَاعِل) tersimpan"
+        },
+        {
+         "from": "112:3:3",
+         "text": "huruf 'athaf (حَرْف عَطْف) + huruf nafi (نَفْي) dan jazm (جَزْم)"
+        },
+        {
+         "from": "112:1:3",
+         "text": "mubtada' (مُبْتَدَأ) kedua (pendapat lain: khabar, خَبَر bagi huwa)"
+        },
+        {
+         "from": "112:3:1",
+         "text": "huruf nafi (نَفْي) dan jazm (جَزْم)"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "key": "wazn-factory",
+     "questions": [
+      {
+       "n": 1,
+       "lexeme": "walada",
+       "label": "fi'il madhi",
+       "options": [
+        "fi'il madhi",
+        "isim fa'il",
+        "mashdar"
+       ]
+      },
+      {
+       "n": 2,
+       "lexeme": "walada",
+       "label": "fi'il mudhari'",
+       "options": [
+        "fi'il mudhari'",
+        "isim maf'ul",
+        "mashdar"
+       ]
+      },
+      {
+       "n": 3,
+       "lexeme": "walada",
+       "label": "mashdar",
+       "options": [
+        "mashdar",
+        "fi'il madhi",
+        "fi'il mudhari'"
+       ]
+      },
+      {
+       "n": 4,
+       "lexeme": "walada",
+       "label": "isim fa'il",
+       "options": [
+        "isim fa'il",
+        "mashdar",
+        "fi'il mudhari'"
+       ]
+      },
+      {
+       "n": 5,
+       "lexeme": "walada",
+       "label": "isim maf'ul",
+       "options": [
+        "isim maf'ul",
+        "isim fa'il",
+        "mashdar"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "ayah": 4,
+   "exercises": [
+    {
+     "key": "tap-word",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1
+      },
+      {
+       "n": 2,
+       "word": 2
+      },
+      {
+       "n": 3,
+       "word": 3
+      },
+      {
+       "n": 4,
+       "word": 4
+      },
+      {
+       "n": 5,
+       "word": 5
+      }
+     ]
+    },
+    {
+     "key": "why-harakat",
+     "questions": [
+      {
+       "n": 1,
+       "word": 3,
+       "sign": null,
+       "why": "Li- (bagi) adalah huruf jar (حَرْف جَرّ) dan -hū (Dia) kata ganti mabni (مَبْنِيّ) yang dijarkan olehnya; frasa jar-majrur (جَارّ وَمَجْرُور) lahū ini bergantung pada kufuwan, sehingga bermakna “setara bagi-Nya”.",
+       "options": [
+        {
+         "from": "112:4:3",
+         "text": "Li- (bagi) adalah huruf jar (حَرْف جَرّ) dan -hū (Dia) kata ganti mabni (مَبْنِيّ) yang dijarkan olehnya; frasa jar-majrur (جَارّ وَمَجْرُور) lahū ini bergantung pada kufuwan, sehingga bermakna “setara bagi-Nya”."
+        },
+        {
+         "from": "112:3:4",
+         "text": "Fi'il mudhari' (فِعْل مُضَارِع) bentuk majhul (مَجْهُول, pasif: “diperanakkan”) ini majzum (مَجْزُوم) oleh lam-nya sendiri, dengan tanda sukun (سُكُون) di akhir; na'ib fa'il-nya (pengganti pelaku) adalah kata ganti yang tersimpan."
+        },
+        {
+         "from": "112:3:3",
+         "text": "Wawu adalah huruf 'athaf (حَرْف عَطْف) yang menyambungkan kalimat ini dengan lam yalid, dan lam kembali menjazmkan (جَزْم) kata kerja sesudahnya."
+        }
+       ]
+      },
+      {
+       "n": 2,
+       "word": 4,
+       "sign": "fathatain",
+       "why": "Akhirnya fathatain (fathah, فَتْحَة bertanwin, تَنْوِين) karena menjadi khabar (خَبَر) yakun yang didahulukan sebelum isimnya, aḥadun.",
+       "options": [
+        {
+         "from": "112:4:4",
+         "text": "Akhirnya fathatain (fathah, فَتْحَة bertanwin, تَنْوِين) karena menjadi khabar (خَبَر) yakun yang didahulukan sebelum isimnya, aḥadun."
+        },
+        {
+         "from": "112:1:3",
+         "text": "Akhirnya dhammah (ضَمَّة) karena menjadi mubtada' (مُبْتَدَأ) kedua, yaitu pokok kalimat Allāhu aḥadun yang menjelaskan huwa."
+        },
+        {
+         "from": "112:3:4",
+         "text": "Fi'il mudhari' (فِعْل مُضَارِع) bentuk majhul (مَجْهُول, pasif: “diperanakkan”) ini majzum (مَجْزُوم) oleh lam-nya sendiri, dengan tanda sukun (سُكُون) di akhir; na'ib fa'il-nya (pengganti pelaku) adalah kata ganti yang tersimpan."
+        }
+       ]
+      },
+      {
+       "n": 3,
+       "word": 5,
+       "sign": "dhammatain",
+       "why": "Akhirnya dhammatain (dhammah, ضَمَّة bertanwin, تَنْوِين) karena menjadi isim (اِسْم) yakun, yang diletakkan di akhir kalimat.",
+       "options": [
+        {
+         "from": "112:4:5",
+         "text": "Akhirnya dhammatain (dhammah, ضَمَّة bertanwin, تَنْوِين) karena menjadi isim (اِسْم) yakun, yang diletakkan di akhir kalimat."
+        },
+        {
+         "from": "112:1:2",
+         "text": "Kata ganti (dhamir, ضَمِير) ini mabni (مَبْنِيّ), sehingga bentuknya tidak berubah, dan berkedudukan rafa' (رَفْع, mahall, مَحَلّ raf') sebagai mubtada' (مُبْتَدَأ), pokok kalimat yang dijelaskan oleh Allāhu aḥadun sesudahnya."
+        },
+        {
+         "from": "112:4:4",
+         "text": "Akhirnya fathatain (fathah, فَتْحَة bertanwin, تَنْوِين) karena menjadi khabar (خَبَر) yakun yang didahulukan sebelum isimnya, aḥadun."
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "key": "sort-case",
+     "bins": [
+      "marfu",
+      "manshub",
+      "majrur",
+      "mabni"
+     ],
+     "questions": [
+      {
+       "n": 1,
+       "word": 3,
+       "sign": null,
+       "why": "Li- (bagi) adalah huruf jar (حَرْف جَرّ) dan -hū (Dia) kata ganti mabni (مَبْنِيّ) yang dijarkan olehnya; frasa jar-majrur (جَارّ وَمَجْرُور) lahū ini bergantung pada kufuwan, sehingga bermakna “setara bagi-Nya”."
+      },
+      {
+       "n": 2,
+       "word": 4,
+       "sign": "fathatain",
+       "why": "Akhirnya fathatain (fathah, فَتْحَة bertanwin, تَنْوِين) karena menjadi khabar (خَبَر) yakun yang didahulukan sebelum isimnya, aḥadun."
+      },
+      {
+       "n": 3,
+       "word": 5,
+       "sign": "dhammatain",
+       "why": "Akhirnya dhammatain (dhammah, ضَمَّة bertanwin, تَنْوِين) karena menjadi isim (اِسْم) yakun, yang diletakkan di akhir kalimat."
+      }
+     ]
+    },
+    {
+     "key": "label-role",
+     "questions": [
+      {
+       "n": 1,
+       "word": 1,
+       "why": "Wawu adalah huruf 'athaf (حَرْف عَطْف) yang menyambungkan kalimat ini dengan lam yalid, dan lam sekali lagi menjazmkan (جَزْم) kata kerja sesudahnya.",
+       "options": [
+        {
+         "from": "112:4:1",
+         "text": "huruf 'athaf (حَرْف عَطْف) + huruf nafi (نَفْي) dan jazm (جَزْم)"
+        },
+        {
+         "from": "112:4:2",
+         "text": "fi'il mudhari' (فِعْل مُضَارِع) majzum (مَجْزُوم) dari kāna (كَانَ, merafa'kan isim, اِسْم, menashabkan, نَصْب khabar, خَبَر)"
+        },
+        {
+         "from": "112:2:1",
+         "text": "mubtada' (مُبْتَدَأ)"
+        },
+        {
+         "from": "112:2:2",
+         "text": "khabar (خَبَر, pendapat lain: na't, نَعْت)"
+        }
+       ]
+      },
+      {
+       "n": 2,
+       "word": 2,
+       "why": "Fi'il mudhari' (فِعْل مُضَارِع) dari kāna (كَانَ) ini majzum (مَجْزُوم) oleh lam, dengan tanda sukun (سُكُون) pada nun di akhirnya; seperti kāna, ia merafa'kan isimnya (aḥadun) dan menashabkan (نَصْب) khabarnya (kufuwan).",
+       "options": [
+        {
+         "from": "112:4:2",
+         "text": "fi'il mudhari' (فِعْل مُضَارِع) majzum (مَجْزُوم) dari kāna (كَانَ, merafa'kan isim, اِسْم, menashabkan, نَصْب khabar, خَبَر)"
+        },
+        {
+         "from": "112:1:1",
+         "text": "fi'il amr (فِعْل أَمْر); fa'il (فَاعِل) tersimpan: “engkau” (Nabi Muhammad)"
+        },
+        {
+         "from": "112:4:4",
+         "text": "khabar (خَبَر) yakun (didahulukan)"
+        },
+        {
+         "from": "112:2:1",
+         "text": "mubtada' (مُبْتَدَأ)"
+        }
+       ]
+      },
+      {
+       "n": 3,
+       "word": 3,
+       "why": "Li- (bagi) adalah huruf jar (حَرْف جَرّ) dan -hū (Dia) kata ganti mabni (مَبْنِيّ) yang dijarkan olehnya; frasa jar-majrur (جَارّ وَمَجْرُور) lahū ini bergantung pada kufuwan, sehingga bermakna “setara bagi-Nya”.",
+       "options": [
+        {
+         "from": "112:4:3",
+         "text": "huruf jar (حَرْف جَرّ) + majrur (مَجْرُور, terkait kufuwan)"
+        },
+        {
+         "from": "112:4:2",
+         "text": "fi'il mudhari' (فِعْل مُضَارِع) majzum (مَجْزُوم) dari kāna (كَانَ, merafa'kan isim, اِسْم, menashabkan, نَصْب khabar, خَبَر)"
+        },
+        {
+         "from": "112:3:2",
+         "text": "fi'il mudhari' (فِعْل مُضَارِع) majzum (مَجْزُوم)"
+        },
+        {
+         "from": "112:3:1",
+         "text": "huruf nafi (نَفْي) dan jazm (جَزْم)"
+        }
+       ]
+      },
+      {
+       "n": 4,
+       "word": 4,
+       "why": "Akhirnya fathatain (fathah, فَتْحَة bertanwin, تَنْوِين) karena menjadi khabar (خَبَر) yakun yang didahulukan sebelum isimnya, aḥadun.",
+       "options": [
+        {
+         "from": "112:4:4",
+         "text": "khabar (خَبَر) yakun (didahulukan)"
+        },
+        {
+         "from": "112:2:2",
+         "text": "khabar (خَبَر, pendapat lain: na't, نَعْت)"
+        },
+        {
+         "from": "112:3:2",
+         "text": "fi'il mudhari' (فِعْل مُضَارِع) majzum (مَجْزُوم)"
+        },
+        {
+         "from": "112:2:1",
+         "text": "mubtada' (مُبْتَدَأ)"
+        }
+       ]
+      },
+      {
+       "n": 5,
+       "word": 5,
+       "why": "Akhirnya dhammatain (dhammah, ضَمَّة bertanwin, تَنْوِين) karena menjadi isim (اِسْم) yakun, yang diletakkan di akhir kalimat.",
+       "options": [
+        {
+         "from": "112:4:5",
+         "text": "isim (اِسْم) yakun (diakhirkan)"
+        },
+        {
+         "from": "112:1:2",
+         "text": "mubtada' (مُبْتَدَأ, dhamir sya'n, ضَمِير الشَّأْن, atau kata ganti yang kembali kepada Allah)"
+        },
+        {
+         "from": "112:1:3",
+         "text": "mubtada' (مُبْتَدَأ) kedua (pendapat lain: khabar, خَبَر bagi huwa)"
+        },
+        {
+         "from": "112:4:3",
+         "text": "huruf jar (حَرْف جَرّ) + majrur (مَجْرُور, terkait kufuwan)"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "key": "wazn-factory",
+     "questions": [
+      {
+       "n": 1,
+       "lexeme": "kana",
+       "label": "fi'il madhi",
+       "options": [
+        "fi'il madhi",
+        "isim fa'il",
+        "fi'il mudhari'"
+       ]
+      },
+      {
+       "n": 2,
+       "lexeme": "kana",
+       "label": "fi'il mudhari'",
+       "options": [
+        "fi'il mudhari'",
+        "mashdar",
+        "isim fa'il"
+       ]
+      },
+      {
+       "n": 3,
+       "lexeme": "kana",
+       "label": "mashdar",
+       "options": [
+        "mashdar",
+        "fi'il mudhari'",
+        "fi'il amr"
+       ]
+      },
+      {
+       "n": 4,
+       "lexeme": "kana",
+       "label": "isim fa'il",
+       "options": [
+        "isim fa'il",
+        "fi'il mudhari'",
+        "fi'il madhi"
+       ]
+      },
+      {
+       "n": 5,
+       "lexeme": "kana",
+       "label": "fi'il amr",
+       "options": [
+        "fi'il amr",
+        "fi'il madhi",
+        "fi'il mudhari'"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -1,6 +1,8 @@
 import type { CaseState } from "@/content/schema";
 import { CASE_META } from "@/lib/cases";
 
+import { MixedText } from "../library/MixedText";
+
 /**
  * The case's gesture shape as an SVG at 1em, filled with the case colour
  * (shape vs its chip tint is 4.17–7.20:1). A Unicode glyph at chip size was
@@ -27,17 +29,35 @@ export function CaseShape({ state, className }: { state: CaseState; className?: 
 
 /**
  * Case chip: case-colour tint, ink label, 1.5px case-colour border, shape
- * then label then sign — never colour alone (WCAG 1.4.1).
+ * then label then sign — never colour alone (WCAG 1.4.1). In a quiz the label
+ * and the sign carry their Arabic from the verified term table ("majrur
+ * (مَجْرُور) · kasrah (كَسْرَة)", content/quiz; operator 2026-10-10: "write the
+ * arabic word in quiz as well").
  */
-export function CaseBadge({ state, sign }: { state: CaseState; sign?: string }) {
+export function CaseBadge({ state, sign, label }: { state: CaseState; sign?: string; label?: string }) {
   const m = CASE_META[state];
   return (
     <span
-      className={`inline-flex items-center gap-2 rounded-full border-[1.5px] px-3 py-1 text-sm font-semibold ${m.className}`}
+      className={`inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-0.5 rounded-full border-[1.5px] px-3 py-1 text-sm font-semibold ${m.className}`}
     >
       <CaseShape state={state} />
-      {m.label}
-      {sign && sign !== "—" ? <span className="font-normal">· {sign}</span> : null}
+      {label ? (
+        <span>
+          <MixedText text={label} />
+        </span>
+      ) : (
+        m.label
+      )}
+      {/* The dot is glued to the sign's first word (textUnits: a leading separator joins the
+          word after it, and with a term its Arabic), so it never sits alone at the end of a row
+          (line breaks, 2026-10-10). Not nowrap: "dibuangnya huruf 'illah (ya')" on one line made
+          the word card wider than a phone (CI 2026-10-11); a long sign moves under the label
+          (flex-wrap) and wraps there. */}
+      {sign && sign !== "—" ? (
+        <span className="min-w-0 font-normal">
+          <MixedText text={`· ${sign}`} />
+        </span>
+      ) : null}
     </span>
   );
 }
