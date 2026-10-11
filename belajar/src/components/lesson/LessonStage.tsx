@@ -827,9 +827,11 @@ export function LessonStage({
                 </span>
               </button>
             </div>
-            {/* Row 2: ‹ Sebelumnya and Berikutnya › (or "Lewati latihan"), equal halves, one
-                colour for moving between steps (operator 2026-10-11). */}
-            <div className="grid grid-cols-2 items-center gap-2 sm:contents">
+            {/* Row 2: ‹ Sebelumnya and Berikutnya › (or "Lewati latihan"), one colour for moving
+                between steps and always the same size (operator 2026-10-11): side by side while
+                each gets 9.5rem (the "‹ Sebelumnya" label at any text size), else stacked, each
+                full width (Sangat besar on a phone: the halves were 112px for a 132px label). */}
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(9.5rem,1fr))] items-center gap-2 sm:contents">
               <button
                 type="button"
                 data-autoplay="prev"
