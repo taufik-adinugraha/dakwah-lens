@@ -24,12 +24,19 @@ export type LinePart =
   | `concept:${string}`
   | `ex:${ExerciseKey}:intro`
   | `ex:${ExerciseKey}:${GuidePart}`
+  | `ex:${ExerciseKey}:${number}:why`
   | "recap"
   | "next"
   | "done";
 
 /** "${slug}:${ayah}:${part}", e.g. "al-fatihah:2:w3". */
 export const lineId = (slug: string, ayah: number, part: LinePart): string => `${slug}:${ayah}:${part}`;
+
+/** "${slug}:${ayah}:ex:${key}:${n}:why": the line explaining question n's correct answer, said
+ *  after "Benar." and after "Ini jawabannya." (operator 2026-10-10: "give narration/voice only
+ *  for the correct answer, to give auditory explanation"). */
+export const explainLineId = (slug: string, ayah: number, key: ExerciseKey, n: number): string =>
+  lineId(slug, ayah, `ex:${key}:${n}:why`);
 
 /** "shared:${key}", e.g. "shared:reminder". */
 export const sharedLineId = (key: SharedKey): string => `shared:${key}`;
@@ -40,7 +47,7 @@ export const promptLineId = (key: ExerciseKey, part: GuidePart): string => `shar
 const SLUG = "[a-z0-9]+(?:-[a-z0-9]+)*";
 const ID = "[a-z0-9]+(?:-[a-z0-9]+)*";
 const EX = EXERCISE_KEYS.join("|");
-const PART = `intro|recite|primer:[1-9][0-9]{0,2}|w[1-9][0-9]{0,2}(?::compose:[1-9][0-9]{0,2})?|structure|concept:${ID}|ex:(?:${EX}):[a-z]+(?:_[a-z]+)*|recap|next|done`;
+const PART = `intro|recite|primer:[1-9][0-9]{0,2}|w[1-9][0-9]{0,2}(?::compose:[1-9][0-9]{0,2})?|structure|concept:${ID}|ex:(?:${EX}):(?:[a-z]+(?:_[a-z]+)*|[1-9][0-9]{0,2}:why)|recap|next|done`;
 const SHARED = `${SHARED_KEYS.join("|")}|ex:(?:${EX}):(?:${GUIDE_PARTS.join("|")})`;
 /** A split part of a long line: ":a", ":b", … */
 const SPLIT = "(?::[a-z])?";

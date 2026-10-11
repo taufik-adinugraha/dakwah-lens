@@ -46,9 +46,12 @@ python3 validate_compose.py        # composition checks against the corpus (CI: 
 python3 test_validate_compose.py   # plants 34 faults in copies of the compositions, each must fail (CI: --no-corpus)
 python3 validate_terms.py          # Konsep terms in Arabic script + inline markup (CI: --no-corpus); see "Konsep"
 python3 test_validate_terms.py     # plants 32 faults (retyped term, unmarked term, wrong word bytes, a ref whose Latin names other bytes, ketuk, …)
+python3 build_quiz.py              # the quizzes ../content/quiz/*.json (see "Kuis"); before the narration, which reads them
 python3 build_narration.py         # narration manifests ../content/narration/*.json (see "Narasi")
 python3 validate_narration.py      # narration checks; exit 1 on any failure
 python3 test_validate_narration.py # plants 102 faults in copies of the manifests, the dictionary and the compositions, each must fail
+python3 validate_quiz.py           # the quiz guard: every question TAUGHT before it is asked (Al-Fatihah); exit 1 on any failure
+python3 test_validate_quiz.py      # plants 21 faults (an untaught state, an untaught option, two correct options, …), each must fail
 python3 render_narration.py        # DRY RUN: characters and cost; never calls the API without --render --i-approve-spend
 ```
 
@@ -103,6 +106,11 @@ for one surah (`null` = no lexicon entry yet, or a QAC stem with no lemma).
 | `validate_narration.py` | 6 | Narration checks: step-id coverage, the pronunciation dictionary, no Qur'anic word in any spelling or script, Arabic only from the dictionary, caption = speech, highlight/focus, audio entries and karaoke tokens, manifests equal a fresh build |
 | `test_validate_narration.py` | 6 | Mutation tests for `validate_narration.py` + unit tests of the speech text, dictionary rendering, tokens, numbers and render request |
 | `render_narration.py` | 4 | ElevenLabs renderer with word timings (`/with-timestamps`; dry run by default; spends only with `--render --i-approve-spend`) |
+| `authored/<slug>.quiz.json` | 3 | Hand-authored quiz plan (Al-Fatihah): per ayah the exercises kept, each question's word and the words whose reason / role are its wrong options, the sort bins, the wazan forms (see "Kuis") |
+| `quiz.py` | — | The quiz plan: resolving an authored plan (the mechanical one without it), the Arabic of its labels from the term table, TAUGHT (from the narration) and REQUIRED (per question), and every rule |
+| `build_quiz.py` | 2 | Writes `belajar/content/quiz/<slug>.json`; `--show <slug> <ayah>` prints one ayah's questions |
+| `validate_quiz.py` | 6 | The quiz guard: fresh build, the rules, TAUGHT(ayah) ⊇ REQUIRED(question), the narration's exercise lines; prints the per-ayah quiz and what each ayah teaches |
+| `test_validate_quiz.py` | 6 | Planted-fault tests for the guard + unit tests of TAUGHT, the cause classes, the labels and the shuffle port |
 
 ## Inputs (see `sources.json` for the pinned sha256 values)
 
@@ -650,13 +658,15 @@ in lesson order:
 | `w${n}:compose:${k}` | a word with a composition | the k-th sentence of its frames (strict: no Qur'anic word, spoken as authored) | `[n]`, focus = that word (the animation takes the card's place) |
 | `concept:${id}` | each Konsep whose first example is in this ayah (`library.ts conceptsIntroducedIn`) | "Konsep baru: title. summary" (a term spoken from Arabic script right after "Konsep baru:" is shown capitalised, as the caption shows it) | the words whose `concepts` list it and the words of the ayah's `structure.groups` of that concept (idhafah of 1:1: [1, 2]) |
 | `structure` | every ayah with `structure` | the structure summary, sanitised | `[0]` |
-| `ex:${key}:intro` | each exercise the page shows on this ayah (same thresholds as the components) | what the exercise is and how many questions | `[0]` for `tap-word`, else `[]` |
+| `ex:${key}:intro` | each exercise of the ayah's quiz (`content/quiz/<slug>.json`) | what the exercise is, how many questions, the case groups of a sort, the form names of a wazan quiz | `[0]` for `tap-word`, else `[]` |
+| `ex:${key}:${n}:why` | each question n of those exercises | the ONE short explanation of the correct answer, said after "Benar." and after "Ini jawabannya." (operator 2026-10-10): tap — the word's place and gloss; why / sort — the word's `why` (+ "Jadi, kata ini <state>." when it does not name the state); role — "Perannya: <role head>." + the `why`; wazan — "Itu bentuk <label>" + its Konsep card's title. Only sourced fields, sanitised like every line | `[]` |
 | `recap` | every ayah | before the imam recites the ayah again | `[0]` |
 | `next` / `done` | `next` on every ayah but the last, `done` on the last | | `[]` |
 
 Exercise keys: `tap-word`, `why-harakat`, `sort-case`, `label-role`, `wazn-factory`.
-`shared.json` holds `shared:start`, `resume`, `correct`, `try_again`, `revealed` (a settled
-question whose answer was shown), `reminder`, `skip_offer`, `surah_done` (true however the learner
+`shared.json` holds `shared:start`, `resume`, `correct` ("Benar."), `revealed` ("Ini
+jawabannya.", after "Tunjukkan jawaban"; a wrong pick is not voiced since 2026-10-11, so there is no
+`try_again`), `reminder`, `skip_offer`, `surah_done` (true however the learner
 got there: no claim that every ayah was studied), and one prompt per guide part,
 `shared:ex:${key}:${part}`, with the parts of `src/components/exercises/guide.ts`
 `EXERCISE_GUIDE_PARTS` (play, options, words, bins, reveal, next; `validate_narration.py`
@@ -868,6 +878,36 @@ review fix of 2026-10-10 the Huruf jar concept line (`al-fatihah:1:concept:huruf
 gives "huruf jar yang artinya atas" as its third example (the term defined by itself); its new text (226 characters, about USD 0.02)
 is caption-only until the operator approves that one render (`--only
 al-fatihah:1:concept:huruf-jar`), and its old file `08d5205d14fcad8e.mp3` is no longer used.
+
+## Kuis (the exercises' questions)
+
+Operator, 2026-10-10 (narration rule 16): "make sure all questions in quiz already have lesson
+beforehand when exploring ayat"; "in quiz, give narration/voice only for the correct answer, to
+give auditory explanation"; "better to write the arabic word in quiz as well like majrur in
+arabic". The quiz audit of 2026-10-11 rebuilt every question and the main session's decisions
+fixed the plan; `quiz.py`'s docstring has the rules.
+
+- **One plan** per surah, `content/quiz/<slug>.json` (`build_quiz.py`): each ayah's exercises with
+  every question, its answer first and its wrong options. The lesson page, its exercises
+  (`src/lib/quiz-content.ts`), the autoplay engine (`availableExercises`, the explanation cue of
+  each question) and the narration build all read it; nothing re-derives a question at render time.
+- **Authored** for Al-Fatihah (`authored/al-fatihah.quiz.json`): 63 questions in 2–3 exercises an
+  ayah; wrong options only from ayat already studied, of another cause (why-harakat) or sharing no
+  term with the answer (label-role: never two correct options); sort bins = the case states taught
+  so far (none at ayat 1, 3, 4); the wazan quiz from ayah 5, taught form labels only (no mashdar),
+  without the "Akar kata" / "Pola (bab)" lines. **Mechanical** for the Mu'awwidzat: the components'
+  old rules, the wrong options drawn from the ayat studied so far (a question left without one is
+  dropped); not taught-checked.
+- **TAUGHT** is derived from the narration the lesson plays before its exercises (the intro …
+  structure lines of every ayah ≤ n in `content/narration/<slug>.json`): a term is taught where a
+  line names or defines it — a concept step's title, "<term> adalah …", "… disebut <term>", or ", atau
+  <term>" in a concept's summary. Mentioned ("ia manshub") or glossed after an Indonesian word
+  ("pengganti (badal)") does not count (decision 6). marfu', mabni and manshub are named at the
+  word that first shows them (al-ḥamdu 2:w1, iyyāka 5:w1, aṣ-ṣirāṭa 6:w2: one `say` each in
+  `authored/al-fatihah.compose.json`). **REQUIRED**: the answer's case state and sign, every bin,
+  every term an option's text names, every form label. `validate_quiz.py` fails on any gap.
+- **Labels** carry the term table's Arabic at a term's first use in a text ("majrur (مَجْرُور)",
+  merged with the text's own gloss: "na't (نَعْت, sifat)").
 
 ## Not built here
 

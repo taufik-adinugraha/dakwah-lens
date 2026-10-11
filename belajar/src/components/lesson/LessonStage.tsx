@@ -270,7 +270,10 @@ export function LessonStage({
 
   const guided = exerciseKey
     ? {
-        onAnswer: (correct: boolean) => actions.answered(exerciseKey, correct),
+        // A right answer and "Tunjukkan jawaban" are voiced with that question's explanation; a
+        // wrong pick is not (operator 2026-10-10).
+        onAnswer: (correct: boolean, question?: number) => actions.answered(exerciseKey, correct, question),
+        onReveal: (question?: number) => actions.revealed(exerciseKey, question),
         onDone: () => actions.exerciseDone(exerciseKey),
         onGuide: (target: string, info?: { word?: number }) => actions.exerciseGuide(target, info?.word),
         // The lesson moves a settled question on, and recites Dengar dan

@@ -290,81 +290,11 @@
         }
       ]
     },
-    "shared:try_again": {
-      "text": "Belum tepat. Coba pilih yang lain.",
-      "display": "Belum tepat. Coba pilih yang lain.",
-      "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/shared/ab3bf5fdcbd85cf5.mp3",
-        "ms": 2116,
-        "sha256": "1ab8354b53b0a943ca9476346eeff7b09f6182f988cd984c3f0fc0e6815ec374"
-      },
-      "tokens": [
-        {
-          "t": "Belum",
-          "s": 0.0,
-          "e": 0.16
-        },
-        {
-          "t": "tepat.",
-          "s": 0.22,
-          "e": 0.64
-        },
-        {
-          "t": "Coba",
-          "s": 0.76,
-          "e": 1.2
-        },
-        {
-          "t": "pilih",
-          "s": 1.24,
-          "e": 1.44
-        },
-        {
-          "t": "yang",
-          "s": 1.472,
-          "e": 1.6
-        },
-        {
-          "t": "lain.",
-          "s": 1.664,
-          "e": 2.08
-        }
-      ]
-    },
     "shared:revealed": {
-      "text": "Ini jawabannya. Perhatikan sebentar.",
-      "display": "Ini jawabannya. Perhatikan sebentar.",
+      "text": "Ini jawabannya.",
+      "display": "Ini jawabannya.",
       "highlight": [],
-      "focus": null,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/shared/f46b63613b9bbad4.mp3",
-        "ms": 2691,
-        "sha256": "9090a80f3a7e132e5f1fc44446c38c1ac1e13200476fa8b07ff839d214b32774"
-      },
-      "tokens": [
-        {
-          "t": "Ini",
-          "s": 0.0,
-          "e": 0.24
-        },
-        {
-          "t": "jawabannya.",
-          "s": 0.28,
-          "e": 1.28
-        },
-        {
-          "t": "Perhatikan",
-          "s": 1.38,
-          "e": 2.0
-        },
-        {
-          "t": "sebentar.",
-          "s": 2.04,
-          "e": 2.64
-        }
-      ]
+      "focus": null
     },
     "shared:reminder": {
       "text": "Silakan lanjutkan latihannya. Bagian yang perlu diklik sedang diberi tanda di layar.",

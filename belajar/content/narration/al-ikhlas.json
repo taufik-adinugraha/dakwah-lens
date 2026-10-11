@@ -19,40 +19,40 @@
       "focus": null
     },
     "al-ikhlas:1:w1": {
-      "text": "Kata pertama artinya: katakanlah. Fi'il amr, kata perintah, ini mabni di atas sukun, sehingga akhirnya tetap mati; pelakunya tersirat, yaitu engkau, Nabi Muhammad shallallahu 'alaihi wa sallam.",
-      "display": "Kata pertama artinya: “katakanlah”. Fi'il amr (kata perintah) ini mabni di atas sukun, sehingga akhirnya tetap mati; pelakunya tersirat, yaitu “engkau” (Nabi Muhammad shallallahu 'alaihi wa sallam).",
+      "text": "Kata pertama artinya: katakanlah. فِعْل أَمْر, yaitu kata perintah, ini مَبْنِيّ di atas سُكُون, sehingga akhirnya tetap mati; pelakunya tersirat, yaitu engkau, Nabi Muhammad shallallahu 'alaihi wa sallam.",
+      "display": "Kata pertama artinya: “katakanlah”. Fi’il amr (فِعْل أَمْر), yaitu kata perintah, ini mabni (مَبْنِيّ) di atas sukun (سُكُون), sehingga akhirnya tetap mati; pelakunya tersirat, yaitu “engkau” (Nabi Muhammad shallallahu 'alaihi wa sallam).",
       "highlight": [
         1
       ],
       "focus": "112:1:1"
     },
     "al-ikhlas:1:w2": {
-      "text": "Kata kedua artinya: Dialah. Kata ganti, atau dhomir, ini mabni, sehingga bentuknya tidak berubah, dan berkedudukan rafa', mahall raf', sebagai mubtada', pokok kalimat yang dijelaskan oleh kata ketiga dan keempat sesudahnya.",
-      "display": "Kata kedua artinya: “Dialah”. Kata ganti, atau dhamir (ضَمِير), ini mabni, sehingga bentuknya tidak berubah, dan berkedudukan rafa' (mahall raf') sebagai mubtada', pokok kalimat yang dijelaskan oleh kata ketiga dan keempat sesudahnya.",
+      "text": "Kata kedua artinya: Dialah. Kata ganti, atau dhomir, ini مَبْنِيّ, sehingga bentuknya tidak berubah, dan berkedudukan رَفْع sebagai مُبْتَدَأ, pokok kalimat yang dijelaskan oleh kata ketiga dan keempat sesudahnya.",
+      "display": "Kata kedua artinya: “Dialah”. Kata ganti, atau dhamir (ضَمِير), ini mabni (مَبْنِيّ), sehingga bentuknya tidak berubah, dan berkedudukan rafa’ (رَفْع) sebagai mubtada’ (مُبْتَدَأ), pokok kalimat yang dijelaskan oleh kata ketiga dan keempat sesudahnya.",
       "highlight": [
         2
       ],
       "focus": "112:1:2"
     },
     "al-ikhlas:1:w3": {
-      "text": "Kata ketiga artinya: Alloh. Akhirnya dibaca dhommah, karena menjadi mubtada' kedua, yaitu pokok kalimat kata ketiga dan keempat yang menjelaskan kata kedua.",
-      "display": "Kata ketiga artinya: “Allah”. Akhirnya dibaca dhammah (ضَمَّة), karena menjadi mubtada' kedua, yaitu pokok kalimat kata ketiga dan keempat yang menjelaskan kata kedua.",
+      "text": "Kata ketiga artinya: Alloh. Akhirnya dibaca dhommah, karena menjadi مُبْتَدَأ kedua, yaitu pokok kalimat kata ketiga dan keempat yang menjelaskan kata kedua.",
+      "display": "Kata ketiga artinya: “Allah”. Akhirnya dibaca dhammah (ضَمَّة), karena menjadi mubtada’ (مُبْتَدَأ) kedua, yaitu pokok kalimat kata ketiga dan keempat yang menjelaskan kata kedua.",
       "highlight": [
         3
       ],
       "focus": "112:1:3"
     },
     "al-ikhlas:1:w4": {
-      "text": "Kata keempat artinya: Yang Maha Esa. Akhirnya dhammatain, yaitu dhommah bertanwin, karena menjadi khabar bagi kata ketiga, sehingga maknanya Alloh itu Esa.",
-      "display": "Kata keempat artinya: “Yang Maha Esa”. Akhirnya dhammatain, yaitu dhammah (ضَمَّة) bertanwin, karena menjadi khabar bagi kata ketiga, sehingga maknanya “Allah itu Esa”.",
+      "text": "Kata keempat artinya: Yang Maha Esa. Akhirnya dhammatain, yaitu dhommah bertanwin, karena menjadi khobar bagi kata ketiga, sehingga maknanya Alloh itu Esa.",
+      "display": "Kata keempat artinya: “Yang Maha Esa”. Akhirnya dhammatain, yaitu dhammah (ضَمَّة) bertanwin, karena menjadi khabar (خَبَر) bagi kata ketiga, sehingga maknanya “Allah itu Esa”.",
       "highlight": [
         4
       ],
       "focus": "112:1:4"
     },
     "al-ikhlas:1:concept:maqul-al-qaul": {
-      "text": "Konsep baru: Maqul al-qaul, isi perkataan sesudah kata pertama. Sesudah kata kerja berkata, seperti kata pertama, yang artinya katakanlah, kalimat yang diucapkan disebut maqul al-qaul; seluruh kalimat itu berkedudukan nashab, seperti objek.",
-      "display": "Konsep baru: Maqul al-qaul (isi perkataan sesudah kata pertama). Sesudah kata kerja “berkata”, seperti kata pertama, yang artinya “katakanlah”, kalimat yang diucapkan disebut maqul al-qaul; seluruh kalimat itu berkedudukan nashab, seperti objek.",
+      "text": "Konsep baru: Maqul al-qaul, isi perkataan sesudah kata pertama. Sesudah kata kerja berkata, seperti kata pertama, yang artinya katakanlah, kalimat yang diucapkan disebut maqul al-qaul; seluruh kalimat itu berkedudukan نَصْب, seperti objek.",
+      "display": "Konsep baru: Maqul al-qaul (isi perkataan sesudah kata pertama). Sesudah kata kerja “berkata”, seperti kata pertama, yang artinya “katakanlah”, kalimat yang diucapkan disebut maqul al-qaul; seluruh kalimat itu berkedudukan nashab (نَصْب), seperti objek.",
       "highlight": [
         1,
         2,
@@ -72,8 +72,8 @@
       "focus": null
     },
     "al-ikhlas:1:concept:khabar-jumlah": {
-      "text": "Konsep baru: Khabar jumlah, khabar berupa kalimat. Khabar tidak selalu satu kata; ia bisa berupa kalimat lengkap, misalnya mubtada' bersama khabarnya sendiri.",
-      "display": "Konsep baru: Khabar jumlah (khabar berupa kalimat). Khabar tidak selalu satu kata; ia bisa berupa kalimat lengkap, misalnya mubtada' bersama khabarnya sendiri.",
+      "text": "Konsep baru: Khobar jumlah, yaitu khobar berupa kalimat. Khobar tidak selalu satu kata; ia bisa berupa kalimat lengkap, misalnya مُبْتَدَأ bersama khabarnya sendiri.",
+      "display": "Konsep baru: Khabar (خَبَر) jumlah, yaitu khabar (خَبَر) berupa kalimat. Khabar (خَبَر) tidak selalu satu kata; ia bisa berupa kalimat lengkap, misalnya mubtada’ (مُبْتَدَأ) bersama khabarnya sendiri.",
       "highlight": [
         2,
         3
@@ -81,16 +81,16 @@
       "focus": null
     },
     "al-ikhlas:1:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Ayat dibuka dengan kata perintah, yaitu kata pertama, yang artinya katakanlah, yang pelakunya tersirat, engkau, Nabi Muhammad shallallahu 'alaihi wa sallam; kalimat sesudahnya, kata kedua sampai keempat, adalah isi yang diperintahkan untuk diucapkan, maqul al-qaul, dan berkedudukan nashab.",
-      "display": "Sekarang susunan kalimatnya. Ayat dibuka dengan kata perintah, yaitu kata pertama, yang artinya “katakanlah”, yang pelakunya tersirat, “engkau” (Nabi Muhammad shallallahu 'alaihi wa sallam); kalimat sesudahnya, kata kedua sampai keempat, adalah isi yang diperintahkan untuk diucapkan (maqul al-qaul) dan berkedudukan nashab.",
+      "text": "Sekarang susunan kalimatnya. Ayat dibuka dengan kata perintah, yaitu kata pertama, yang artinya katakanlah, yang pelakunya tersirat, engkau, Nabi Muhammad shallallahu 'alaihi wa sallam; kalimat sesudahnya, kata kedua sampai keempat, adalah isi yang diperintahkan untuk diucapkan, maqul al-qaul, dan berkedudukan نَصْب.",
+      "display": "Sekarang susunan kalimatnya. Ayat dibuka dengan kata perintah, yaitu kata pertama, yang artinya “katakanlah”, yang pelakunya tersirat, “engkau” (Nabi Muhammad shallallahu 'alaihi wa sallam); kalimat sesudahnya, kata kedua sampai keempat, adalah isi yang diperintahkan untuk diucapkan (maqul al-qaul) dan berkedudukan nashab (نَصْب).",
       "highlight": [
         0
       ],
       "focus": null
     },
     "al-ikhlas:1:structure:b": {
-      "text": "Di dalamnya kata kedua menjadi mubtada': menurut al-Mujtaba dan pendapat pertama Darwisy, kata kedua adalah dhomir sya'n, yang artinya perkaranya ialah, yang dijelaskan oleh kalimat kata ketiga dan keempat, dengan kata ketiga sebagai mubtada' kedua dan kata keempat sebagai khabarnya;",
-      "display": "Di dalamnya kata kedua menjadi mubtada': menurut al-Mujtaba dan pendapat pertama Darwisy, kata kedua adalah dhamir (ضَمِير) sya'n, yang artinya “perkaranya ialah …”, yang dijelaskan oleh kalimat kata ketiga dan keempat, dengan kata ketiga sebagai mubtada' kedua dan kata keempat sebagai khabarnya;",
+      "text": "Di dalamnya kata kedua menjadi مُبْتَدَأ: menurut al-Mujtaba dan pendapat pertama Darwisy, kata kedua adalah dhomir sya'n, yang artinya perkaranya ialah, yang dijelaskan oleh kalimat kata ketiga dan keempat, dengan kata ketiga sebagai مُبْتَدَأ kedua dan kata keempat sebagai khabarnya;",
+      "display": "Di dalamnya kata kedua menjadi mubtada’ (مُبْتَدَأ): menurut al-Mujtaba dan pendapat pertama Darwisy, kata kedua adalah dhamir (ضَمِير) sya'n, yang artinya “perkaranya ialah …”, yang dijelaskan oleh kalimat kata ketiga dan keempat, dengan kata ketiga sebagai mubtada’ (مُبْتَدَأ) kedua dan kata keempat sebagai khabarnya;",
       "highlight": [
         0
       ],
@@ -112,15 +112,87 @@
       ],
       "focus": null
     },
+    "al-ikhlas:1:ex:tap-word:1:why": {
+      "text": "Itu kata pertama, yang artinya katakanlah.",
+      "display": "Itu kata pertama, yang artinya “katakanlah”.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:1:ex:tap-word:2:why": {
+      "text": "Itu kata kedua, yang artinya Dialah.",
+      "display": "Itu kata kedua, yang artinya “Dialah”.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:1:ex:tap-word:3:why": {
+      "text": "Itu kata ketiga, yang artinya Alloh.",
+      "display": "Itu kata ketiga, yang artinya “Allah”.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:1:ex:tap-word:4:why": {
+      "text": "Itu kata keempat, yang artinya Yang Maha Esa.",
+      "display": "Itu kata keempat, yang artinya “Yang Maha Esa”.",
+      "highlight": [],
+      "focus": null
+    },
     "al-ikhlas:1:ex:why-harakat:intro": {
       "text": "Latihan kenapa harakat ini, empat soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu.",
       "display": "Latihan kenapa harakat ini, empat soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu.",
       "highlight": [],
       "focus": null
     },
+    "al-ikhlas:1:ex:why-harakat:1:why": {
+      "text": "فِعْل أَمْر, yaitu kata perintah, ini مَبْنِيّ di atas سُكُون, sehingga akhirnya tetap mati; pelakunya tersirat, yaitu engkau, Nabi Muhammad shallallahu 'alaihi wa sallam.",
+      "display": "Fi’il amr (فِعْل أَمْر), yaitu kata perintah, ini mabni (مَبْنِيّ) di atas sukun (سُكُون), sehingga akhirnya tetap mati; pelakunya tersirat, yaitu “engkau” (Nabi Muhammad shallallahu 'alaihi wa sallam).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:1:ex:why-harakat:2:why": {
+      "text": "Kata ganti, atau dhomir, ini مَبْنِيّ, sehingga bentuknya tidak berubah, dan berkedudukan رَفْع sebagai مُبْتَدَأ, pokok kalimat yang dijelaskan oleh kata ketiga dan keempat sesudahnya.",
+      "display": "Kata ganti, atau dhamir (ضَمِير), ini mabni (مَبْنِيّ), sehingga bentuknya tidak berubah, dan berkedudukan rafa’ (رَفْع) sebagai mubtada’ (مُبْتَدَأ), pokok kalimat yang dijelaskan oleh kata ketiga dan keempat sesudahnya.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:1:ex:why-harakat:3:why": {
+      "text": "Akhirnya dibaca dhommah, karena menjadi مُبْتَدَأ kedua, yaitu pokok kalimat kata ketiga dan keempat yang menjelaskan kata kedua. Jadi, kata ini مَرْفُوع.",
+      "display": "Akhirnya dibaca dhammah (ضَمَّة), karena menjadi mubtada’ (مُبْتَدَأ) kedua, yaitu pokok kalimat kata ketiga dan keempat yang menjelaskan kata kedua. Jadi, kata ini marfu’ (مَرْفُوع).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:1:ex:why-harakat:4:why": {
+      "text": "Akhirnya dhammatain, yaitu dhommah bertanwin, karena menjadi khobar bagi kata ketiga, sehingga maknanya Alloh itu Esa. Jadi, kata ini مَرْفُوع.",
+      "display": "Akhirnya dhammatain, yaitu dhammah (ضَمَّة) bertanwin, karena menjadi khabar (خَبَر) bagi kata ketiga, sehingga maknanya “Allah itu Esa”. Jadi, kata ini marfu’ (مَرْفُوع).",
+      "highlight": [],
+      "focus": null
+    },
     "al-ikhlas:1:ex:sort-case:intro": {
-      "text": "Latihan kelompokkan menurut akhiran, empat kata. Klik satu kata, lalu klik kelompok akhirannya.",
-      "display": "Latihan kelompokkan menurut akhiran, empat kata. Klik satu kata, lalu klik kelompok akhirannya.",
+      "text": "Latihan kelompokkan menurut akhiran, empat kata, dalam empat kelompok: مَرْفُوع, مَنْصُوب, مَجْرُور, dan مَبْنِيّ. Klik satu kata, lalu klik kelompok akhirannya.",
+      "display": "Latihan kelompokkan menurut akhiran, empat kata, dalam empat kelompok: marfu’ (مَرْفُوع), manshub (مَنْصُوب), majrur (مَجْرُور), dan mabni (مَبْنِيّ). Klik satu kata, lalu klik kelompok akhirannya.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:1:ex:sort-case:1:why": {
+      "text": "فِعْل أَمْر, yaitu kata perintah, ini مَبْنِيّ di atas سُكُون, sehingga akhirnya tetap mati; pelakunya tersirat, yaitu engkau, Nabi Muhammad shallallahu 'alaihi wa sallam.",
+      "display": "Fi’il amr (فِعْل أَمْر), yaitu kata perintah, ini mabni (مَبْنِيّ) di atas sukun (سُكُون), sehingga akhirnya tetap mati; pelakunya tersirat, yaitu “engkau” (Nabi Muhammad shallallahu 'alaihi wa sallam).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:1:ex:sort-case:2:why": {
+      "text": "Kata ganti, atau dhomir, ini مَبْنِيّ, sehingga bentuknya tidak berubah, dan berkedudukan رَفْع sebagai مُبْتَدَأ, pokok kalimat yang dijelaskan oleh kata ketiga dan keempat sesudahnya.",
+      "display": "Kata ganti, atau dhamir (ضَمِير), ini mabni (مَبْنِيّ), sehingga bentuknya tidak berubah, dan berkedudukan rafa’ (رَفْع) sebagai mubtada’ (مُبْتَدَأ), pokok kalimat yang dijelaskan oleh kata ketiga dan keempat sesudahnya.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:1:ex:sort-case:3:why": {
+      "text": "Akhirnya dibaca dhommah, karena menjadi مُبْتَدَأ kedua, yaitu pokok kalimat kata ketiga dan keempat yang menjelaskan kata kedua. Jadi, kata ini مَرْفُوع.",
+      "display": "Akhirnya dibaca dhammah (ضَمَّة), karena menjadi mubtada’ (مُبْتَدَأ) kedua, yaitu pokok kalimat kata ketiga dan keempat yang menjelaskan kata kedua. Jadi, kata ini marfu’ (مَرْفُوع).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:1:ex:sort-case:4:why": {
+      "text": "Akhirnya dhammatain, yaitu dhommah bertanwin, karena menjadi khobar bagi kata ketiga, sehingga maknanya Alloh itu Esa. Jadi, kata ini مَرْفُوع.",
+      "display": "Akhirnya dhammatain, yaitu dhammah (ضَمَّة) bertanwin, karena menjadi khabar (خَبَر) bagi kata ketiga, sehingga maknanya “Allah itu Esa”. Jadi, kata ini marfu’ (مَرْفُوع).",
       "highlight": [],
       "focus": null
     },
@@ -130,9 +202,69 @@
       "highlight": [],
       "focus": null
     },
+    "al-ikhlas:1:ex:label-role:1:why": {
+      "text": "Perannya: فِعْل أَمْر. فِعْل أَمْر, yaitu kata perintah, ini مَبْنِيّ di atas سُكُون, sehingga akhirnya tetap mati; pelakunya tersirat, yaitu engkau, Nabi Muhammad shallallahu 'alaihi wa sallam.",
+      "display": "Perannya: fi’il amr (فِعْل أَمْر). Fi’il amr (فِعْل أَمْر), yaitu kata perintah, ini mabni (مَبْنِيّ) di atas sukun (سُكُون), sehingga akhirnya tetap mati; pelakunya tersirat, yaitu “engkau” (Nabi Muhammad shallallahu 'alaihi wa sallam).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:1:ex:label-role:2:why": {
+      "text": "Perannya: مُبْتَدَأ. Kata ganti, atau dhomir, ini مَبْنِيّ, sehingga bentuknya tidak berubah, dan berkedudukan رَفْع sebagai مُبْتَدَأ, pokok kalimat yang dijelaskan oleh kata ketiga dan keempat sesudahnya.",
+      "display": "Perannya: mubtada’ (مُبْتَدَأ). Kata ganti, atau dhamir (ضَمِير), ini mabni (مَبْنِيّ), sehingga bentuknya tidak berubah, dan berkedudukan rafa’ (رَفْع) sebagai mubtada’ (مُبْتَدَأ), pokok kalimat yang dijelaskan oleh kata ketiga dan keempat sesudahnya.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:1:ex:label-role:3:why": {
+      "text": "Perannya: مُبْتَدَأ kedua. Akhirnya dibaca dhommah, karena menjadi مُبْتَدَأ kedua, yaitu pokok kalimat kata ketiga dan keempat yang menjelaskan kata kedua.",
+      "display": "Perannya: mubtada’ (مُبْتَدَأ) kedua. Akhirnya dibaca dhammah (ضَمَّة), karena menjadi mubtada’ (مُبْتَدَأ) kedua, yaitu pokok kalimat kata ketiga dan keempat yang menjelaskan kata kedua.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:1:ex:label-role:4:why": {
+      "text": "Perannya: khobar. Akhirnya dhammatain, yaitu dhommah bertanwin, karena menjadi khobar bagi kata ketiga, sehingga maknanya Alloh itu Esa.",
+      "display": "Perannya: khabar (خَبَر). Akhirnya dhammatain, yaitu dhammah (ضَمَّة) bertanwin, karena menjadi khabar (خَبَر) bagi kata ketiga, sehingga maknanya “Allah itu Esa”.",
+      "highlight": [],
+      "focus": null
+    },
     "al-ikhlas:1:ex:wazn-factory:intro": {
-      "text": "Latihan bentuk-bentuk kata, enam soal. Dari satu akar lahir beberapa bentuk kata; pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil تَصْرِيف, bukan kutipan ayat.",
-      "display": "Latihan bentuk-bentuk kata, enam soal. Dari satu akar lahir beberapa bentuk kata; pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif (تَصْرِيف), bukan kutipan ayat.",
+      "text": "Latihan bentuk-bentuk kata, enam soal. Pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil تَصْرِيف, bukan kutipan ayat.",
+      "display": "Latihan bentuk-bentuk kata, enam soal. Pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif (تَصْرِيف), bukan kutipan ayat.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:1:ex:wazn-factory:1:why": {
+      "text": "Itu bentuk فِعْل مَاضٍ, yaitu kata kerja lampau.",
+      "display": "Itu bentuk fi’il madhi (فِعْل مَاضٍ), yaitu kata kerja lampau.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:1:ex:wazn-factory:2:why": {
+      "text": "Itu bentuk fi'il mudhori', yaitu kata kerja sekarang dan akan datang.",
+      "display": "Itu bentuk fi’il mudhari’ (فِعْل مُضَارِع), yaitu kata kerja sekarang dan akan datang.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:1:ex:wazn-factory:3:why": {
+      "text": "Itu bentuk مَصْدَر.",
+      "display": "Itu bentuk mashdar (مَصْدَر).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:1:ex:wazn-factory:4:why": {
+      "text": "Itu bentuk اِسْم فَاعِل, yaitu kata pelaku.",
+      "display": "Itu bentuk isim fa’il (اِسْم فَاعِل), yaitu kata pelaku.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:1:ex:wazn-factory:5:why": {
+      "text": "Itu bentuk اِسْم مَفْعُول, yaitu kata bagi yang dikenai perbuatan.",
+      "display": "Itu bentuk isim maf’ul (اِسْم مَفْعُول), yaitu kata bagi yang dikenai perbuatan.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:1:ex:wazn-factory:6:why": {
+      "text": "Itu bentuk فِعْل أَمْر, yaitu bentuk perintah, juga untuk doa.",
+      "display": "Itu bentuk fi’il amr (فِعْل أَمْر), yaitu bentuk perintah, juga untuk doa.",
       "highlight": [],
       "focus": null
     },
@@ -167,24 +299,24 @@
       "focus": null
     },
     "al-ikhlas:2:w1": {
-      "text": "Kata pertama artinya: Alloh. Akhirnya dibaca dhommah, karena menjadi mubtada', pokok kalimat, dan kata kedua adalah khabarnya.",
-      "display": "Kata pertama artinya: “Allah”. Akhirnya dibaca dhammah (ضَمَّة), karena menjadi mubtada' (pokok kalimat), dan kata kedua adalah khabarnya.",
+      "text": "Kata pertama artinya: Alloh. Akhirnya dibaca dhommah, karena menjadi مُبْتَدَأ, yaitu pokok kalimat, dan kata kedua adalah khabarnya.",
+      "display": "Kata pertama artinya: “Allah”. Akhirnya dibaca dhammah (ضَمَّة), karena menjadi mubtada’ (مُبْتَدَأ), yaitu pokok kalimat, dan kata kedua adalah khabarnya.",
       "highlight": [
         1
       ],
       "focus": "112:2:1"
     },
     "al-ikhlas:2:w2": {
-      "text": "Kata kedua artinya: tempat meminta segala sesuatu. Akhirnya dibaca dhommah, karena menjadi khabar, keterangan, bagi kata pertama.",
-      "display": "Kata kedua artinya: “tempat meminta segala sesuatu”. Akhirnya dibaca dhammah (ضَمَّة), karena menjadi khabar (keterangan) bagi kata pertama.",
+      "text": "Kata kedua artinya: tempat meminta segala sesuatu. Akhirnya dibaca dhommah, karena menjadi khobar, yaitu keterangan, bagi kata pertama.",
+      "display": "Kata kedua artinya: “tempat meminta segala sesuatu”. Akhirnya dibaca dhammah (ضَمَّة), karena menjadi khabar (خَبَر), yaitu keterangan, bagi kata pertama.",
       "highlight": [
         2
       ],
       "focus": "112:2:2"
     },
     "al-ikhlas:2:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Kalimat nominal: kata pertama menjadi mubtada' dan kata kedua khabarnya, Darwisy, al-Mujtaba; al-Mujtaba dan al-Jadwal menjadikan seluruh kalimat ini khabar kedua bagi kata yang artinya Dialah di ayat satu, dan al-Jadwal juga membolehkannya sebagai kalimat baru di dalam isi perkataan itu.",
-      "display": "Sekarang susunan kalimatnya. Kalimat nominal: kata pertama menjadi mubtada' dan kata kedua khabarnya (Darwisy, al-Mujtaba); al-Mujtaba dan al-Jadwal menjadikan seluruh kalimat ini khabar kedua bagi kata yang artinya “Dialah” di ayat satu, dan al-Jadwal juga membolehkannya sebagai kalimat baru di dalam isi perkataan itu.",
+      "text": "Sekarang susunan kalimatnya. Kalimat nominal: kata pertama menjadi مُبْتَدَأ dan kata kedua khabarnya, Darwisy, al-Mujtaba; al-Mujtaba dan al-Jadwal menjadikan seluruh kalimat ini khobar kedua bagi kata yang artinya Dialah di ayat satu, dan al-Jadwal juga membolehkannya sebagai kalimat baru di dalam isi perkataan itu.",
+      "display": "Sekarang susunan kalimatnya. Kalimat nominal: kata pertama menjadi mubtada’ (مُبْتَدَأ) dan kata kedua khabarnya (Darwisy, al-Mujtaba); al-Mujtaba dan al-Jadwal menjadikan seluruh kalimat ini khabar (خَبَر) kedua bagi kata yang artinya “Dialah” di ayat satu, dan al-Jadwal juga membolehkannya sebagai kalimat baru di dalam isi perkataan itu.",
       "highlight": [
         0
       ],
@@ -206,21 +338,69 @@
       ],
       "focus": null
     },
+    "al-ikhlas:2:ex:tap-word:1:why": {
+      "text": "Itu kata pertama, yang artinya Alloh.",
+      "display": "Itu kata pertama, yang artinya “Allah”.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:2:ex:tap-word:2:why": {
+      "text": "Itu kata kedua, yang artinya tempat meminta segala sesuatu.",
+      "display": "Itu kata kedua, yang artinya “tempat meminta segala sesuatu”.",
+      "highlight": [],
+      "focus": null
+    },
     "al-ikhlas:2:ex:why-harakat:intro": {
       "text": "Latihan kenapa harakat ini, dua soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu.",
       "display": "Latihan kenapa harakat ini, dua soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu.",
       "highlight": [],
       "focus": null
     },
+    "al-ikhlas:2:ex:why-harakat:1:why": {
+      "text": "Akhirnya dibaca dhommah, karena menjadi مُبْتَدَأ, yaitu pokok kalimat, dan kata kedua adalah khabarnya. Jadi, kata ini مَرْفُوع.",
+      "display": "Akhirnya dibaca dhammah (ضَمَّة), karena menjadi mubtada’ (مُبْتَدَأ), yaitu pokok kalimat, dan kata kedua adalah khabarnya. Jadi, kata ini marfu’ (مَرْفُوع).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:2:ex:why-harakat:2:why": {
+      "text": "Akhirnya dibaca dhommah, karena menjadi khobar, yaitu keterangan, bagi kata pertama. Jadi, kata ini مَرْفُوع.",
+      "display": "Akhirnya dibaca dhammah (ضَمَّة), karena menjadi khabar (خَبَر), yaitu keterangan, bagi kata pertama. Jadi, kata ini marfu’ (مَرْفُوع).",
+      "highlight": [],
+      "focus": null
+    },
     "al-ikhlas:2:ex:sort-case:intro": {
-      "text": "Latihan kelompokkan menurut akhiran, dua kata. Klik satu kata, lalu klik kelompok akhirannya.",
-      "display": "Latihan kelompokkan menurut akhiran, dua kata. Klik satu kata, lalu klik kelompok akhirannya.",
+      "text": "Latihan kelompokkan menurut akhiran, dua kata, dalam empat kelompok: مَرْفُوع, مَنْصُوب, مَجْرُور, dan مَبْنِيّ. Klik satu kata, lalu klik kelompok akhirannya.",
+      "display": "Latihan kelompokkan menurut akhiran, dua kata, dalam empat kelompok: marfu’ (مَرْفُوع), manshub (مَنْصُوب), majrur (مَجْرُور), dan mabni (مَبْنِيّ). Klik satu kata, lalu klik kelompok akhirannya.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:2:ex:sort-case:1:why": {
+      "text": "Akhirnya dibaca dhommah, karena menjadi مُبْتَدَأ, yaitu pokok kalimat, dan kata kedua adalah khabarnya. Jadi, kata ini مَرْفُوع.",
+      "display": "Akhirnya dibaca dhammah (ضَمَّة), karena menjadi mubtada’ (مُبْتَدَأ), yaitu pokok kalimat, dan kata kedua adalah khabarnya. Jadi, kata ini marfu’ (مَرْفُوع).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:2:ex:sort-case:2:why": {
+      "text": "Akhirnya dibaca dhommah, karena menjadi khobar, yaitu keterangan, bagi kata pertama. Jadi, kata ini مَرْفُوع.",
+      "display": "Akhirnya dibaca dhammah (ضَمَّة), karena menjadi khabar (خَبَر), yaitu keterangan, bagi kata pertama. Jadi, kata ini marfu’ (مَرْفُوع).",
       "highlight": [],
       "focus": null
     },
     "al-ikhlas:2:ex:label-role:intro": {
       "text": "Latihan tebak peran kata, dua soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini.",
       "display": "Latihan tebak peran kata, dua soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:2:ex:label-role:1:why": {
+      "text": "Perannya: مُبْتَدَأ. Akhirnya dibaca dhommah, karena menjadi مُبْتَدَأ, yaitu pokok kalimat, dan kata kedua adalah khabarnya.",
+      "display": "Perannya: mubtada’ (مُبْتَدَأ). Akhirnya dibaca dhammah (ضَمَّة), karena menjadi mubtada’ (مُبْتَدَأ), yaitu pokok kalimat, dan kata kedua adalah khabarnya.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:2:ex:label-role:2:why": {
+      "text": "Perannya: khobar. Akhirnya dibaca dhommah, karena menjadi khobar, yaitu keterangan, bagi kata pertama.",
+      "display": "Perannya: khabar (خَبَر). Akhirnya dibaca dhammah (ضَمَّة), karena menjadi khabar (خَبَر), yaitu keterangan, bagi kata pertama.",
       "highlight": [],
       "focus": null
     },
@@ -263,32 +443,32 @@
       "focus": "112:3:1"
     },
     "al-ikhlas:3:w2": {
-      "text": "Kata kedua artinya: beranak. Fi'il mudhari' ini majzum karena didahului kata pertama, dengan tanda sukun di akhir, karena huruf terakhirnya bukan huruf 'illah; pelakunya kata ganti yang tersimpan.",
-      "display": "Kata kedua artinya: “beranak”. Fi'il mudhari' ini majzum karena didahului kata pertama, dengan tanda sukun di akhir, karena huruf terakhirnya bukan huruf 'illah; pelakunya kata ganti yang tersimpan.",
+      "text": "Kata kedua artinya: beranak. Fi'il mudhori' ini majzum karena didahului kata pertama, dengan tanda سُكُون di akhir, karena huruf terakhirnya bukan حَرْف عِلَّة; pelakunya kata ganti yang tersimpan.",
+      "display": "Kata kedua artinya: “beranak”. Fi’il mudhari’ (فِعْل مُضَارِع) ini majzum karena didahului kata pertama, dengan tanda sukun (سُكُون) di akhir, karena huruf terakhirnya bukan huruf ‘illah (حَرْف عِلَّة); pelakunya kata ganti yang tersimpan.",
       "highlight": [
         2
       ],
       "focus": "112:3:2"
     },
     "al-ikhlas:3:w3": {
-      "text": "Kata ketiga artinya: dan tidak pula. وَاو adalah huruf 'athaf yang menyambungkan kalimat ini dengan kata pertama dan kedua, dan kata ini kembali menjazmkan kata kerja sesudahnya.",
-      "display": "Kata ketiga artinya: “dan tidak pula”. Wawu (وَ) adalah huruf 'athaf yang menyambungkan kalimat ini dengan kata pertama dan kedua, dan kata ini kembali menjazmkan kata kerja sesudahnya.",
+      "text": "Kata ketiga artinya: dan tidak pula. وَاو adalah حَرْف عَطْف yang menyambungkan kalimat ini dengan kata pertama dan kedua, dan kata ini kembali menjazmkan kata kerja sesudahnya.",
+      "display": "Kata ketiga artinya: “dan tidak pula”. Wawu (وَ) adalah huruf ‘athaf (حَرْف عَطْف) yang menyambungkan kalimat ini dengan kata pertama dan kedua, dan kata ini kembali menjazmkan kata kerja sesudahnya.",
       "highlight": [
         3
       ],
       "focus": "112:3:3"
     },
     "al-ikhlas:3:w4": {
-      "text": "Kata keempat artinya: diperanakkan. Fi'il mudhari' bentuk majhul, pasif, yang artinya diperanakkan, ini majzum oleh kata pertama sendiri, dengan tanda sukun di akhir; na'ib fa'il-nya, pengganti pelaku, adalah kata ganti yang tersimpan.",
-      "display": "Kata keempat artinya: “diperanakkan”. Fi'il mudhari' bentuk majhul (pasif), yang artinya “diperanakkan”, ini majzum oleh kata pertama sendiri, dengan tanda sukun di akhir; na'ib fa'il-nya (pengganti pelaku) adalah kata ganti yang tersimpan.",
+      "text": "Kata keempat artinya: diperanakkan. Fi'il mudhori' bentuk majhul, pasif, yang artinya diperanakkan, ini majzum oleh kata pertama sendiri, dengan tanda سُكُون di akhir; na'ib fa'il-nya, pengganti pelaku, adalah kata ganti yang tersimpan.",
+      "display": "Kata keempat artinya: “diperanakkan”. Fi’il mudhari’ (فِعْل مُضَارِع) bentuk majhul (pasif), yang artinya “diperanakkan”, ini majzum oleh kata pertama sendiri, dengan tanda sukun (سُكُون) di akhir; na'ib fa'il-nya (pengganti pelaku) adalah kata ganti yang tersimpan.",
       "highlight": [
         4
       ],
       "focus": "112:3:4"
     },
     "al-ikhlas:3:concept:jazm-lam": {
-      "text": "Konsep baru: Huruf yang menafikan dan menjazmkan fi'il mudhari'. Kata pertama meniadakan fi'il mudhari' sesudahnya dan membuatnya majzum; bila huruf akhirnya sahih, tanda jazm-nya sukun.",
-      "display": "Konsep baru: Huruf yang menafikan dan menjazmkan fi'il mudhari'. Kata pertama meniadakan fi'il mudhari' sesudahnya dan membuatnya majzum; bila huruf akhirnya sahih, tanda jazm-nya sukun.",
+      "text": "Konsep baru: Huruf yang menafikan dan menjazmkan fi'il mudhori'. Kata pertama meniadakan fi'il mudhori' sesudahnya dan membuatnya majzum; bila huruf akhirnya sahih, tanda jazm-nya سُكُون.",
+      "display": "Konsep baru: Huruf yang menafikan dan menjazmkan fi’il mudhari’ (فِعْل مُضَارِع). Kata pertama meniadakan fi’il mudhari’ (فِعْل مُضَارِع) sesudahnya dan membuatnya majzum; bila huruf akhirnya sahih, tanda jazm-nya sukun (سُكُون).",
       "highlight": [
         1,
         2,
@@ -298,8 +478,8 @@
       "focus": null
     },
     "al-ikhlas:3:concept:fiil-majhul": {
-      "text": "Konsep baru: Fi'il majhul, yaitu kata kerja pasif. Fi'il majhul ialah kata kerja yang pelakunya tidak disebut; pada fi'il mudhari', huruf pertamanya berharakat dhommah dan huruf sebelum akhirnya berharakat فَتْحَة.",
-      "display": "Konsep baru: Fi'il majhul, yaitu kata kerja pasif. Fi'il majhul ialah kata kerja yang pelakunya tidak disebut; pada fi'il mudhari', huruf pertamanya berharakat dhammah (ضَمَّة) dan huruf sebelum akhirnya berharakat fathah (فَتْحَة).",
+      "text": "Konsep baru: Fi'il majhul, yaitu kata kerja pasif. Fi'il majhul ialah kata kerja yang pelakunya tidak disebut; pada fi'il mudhori', huruf pertamanya berharakat dhommah dan huruf sebelum akhirnya berharakat فَتْحَة.",
+      "display": "Konsep baru: Fi'il majhul, yaitu kata kerja pasif. Fi'il majhul ialah kata kerja yang pelakunya tidak disebut; pada fi’il mudhari’ (فِعْل مُضَارِع), huruf pertamanya berharakat dhammah (ضَمَّة) dan huruf sebelum akhirnya berharakat fathah (فَتْحَة).",
       "highlight": [
         3,
         4
@@ -307,16 +487,16 @@
       "focus": null
     },
     "al-ikhlas:3:structure:a": {
-      "text": "Sekarang susunan kalimatnya. Kata pertama meniadakan fi'il mudhari' sesudahnya dan menjazmkannya, maka kata kedua dan kata keempat sama-sama berakhiran sukun; Ibnu Hisyam, Mughni, menjadikan ayat ini contoh kata pertama yang menjazmkan.",
-      "display": "Sekarang susunan kalimatnya. Kata pertama meniadakan fi'il mudhari' sesudahnya dan menjazmkannya, maka kata kedua dan kata keempat sama-sama berakhiran sukun; Ibnu Hisyam (Mughni) menjadikan ayat ini contoh kata pertama yang menjazmkan.",
+      "text": "Sekarang susunan kalimatnya. Kata pertama meniadakan fi'il mudhori' sesudahnya dan menjazmkannya, maka kata kedua dan kata keempat sama-sama berakhiran سُكُون; Ibnu Hisyam, Mughni, menjadikan ayat ini contoh kata pertama yang menjazmkan.",
+      "display": "Sekarang susunan kalimatnya. Kata pertama meniadakan fi’il mudhari’ (فِعْل مُضَارِع) sesudahnya dan menjazmkannya, maka kata kedua dan kata keempat sama-sama berakhiran sukun (سُكُون); Ibnu Hisyam (Mughni) menjadikan ayat ini contoh kata pertama yang menjazmkan.",
       "highlight": [
         0
       ],
       "focus": null
     },
     "al-ikhlas:3:structure:b": {
-      "text": "Menurut al-Mujtaba dan al-Jadwal, kata pertama dan kedua adalah khabar ketiga bagi kata yang artinya Dialah di ayat satu, al-Jadwal juga membolehkannya sebagai kalimat baru, dan ad-Da'as membacanya sebagai kalimat baru, dan kalimat kata ketiga dan keempat di-'athaf-kan padanya, sedangkan kata keempat majzum oleh kata ketiga sendiri;",
-      "display": "Menurut al-Mujtaba dan al-Jadwal, kata pertama dan kedua adalah khabar ketiga bagi kata yang artinya “Dialah” di ayat satu (al-Jadwal juga membolehkannya sebagai kalimat baru, dan ad-Da'as membacanya sebagai kalimat baru), dan kalimat kata ketiga dan keempat di-'athaf-kan padanya, sedangkan kata keempat majzum oleh kata ketiga sendiri;",
+      "text": "Menurut al-Mujtaba dan al-Jadwal, kata pertama dan kedua adalah khobar ketiga bagi kata yang artinya Dialah di ayat satu, al-Jadwal juga membolehkannya sebagai kalimat baru, dan ad-Da'as membacanya sebagai kalimat baru, dan kalimat kata ketiga dan keempat disambungkan dengan عَطْف padanya, sedangkan kata keempat majzum oleh kata ketiga sendiri;",
+      "display": "Menurut al-Mujtaba dan al-Jadwal, kata pertama dan kedua adalah khabar (خَبَر) ketiga bagi kata yang artinya “Dialah” di ayat satu (al-Jadwal juga membolehkannya sebagai kalimat baru, dan ad-Da'as membacanya sebagai kalimat baru), dan kalimat kata ketiga dan keempat disambungkan dengan ‘athaf (عَطْف) padanya, sedangkan kata keempat majzum oleh kata ketiga sendiri;",
       "highlight": [
         0
       ],
@@ -338,15 +518,93 @@
       ],
       "focus": null
     },
+    "al-ikhlas:3:ex:tap-word:1:why": {
+      "text": "Itu kata pertama, yang artinya tidak.",
+      "display": "Itu kata pertama, yang artinya “tidak”.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:3:ex:tap-word:2:why": {
+      "text": "Itu kata kedua, yang artinya beranak.",
+      "display": "Itu kata kedua, yang artinya “beranak”.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:3:ex:tap-word:3:why": {
+      "text": "Itu kata ketiga, yang artinya dan tidak pula.",
+      "display": "Itu kata ketiga, yang artinya “dan tidak pula”.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:3:ex:tap-word:4:why": {
+      "text": "Itu kata keempat, yang artinya diperanakkan.",
+      "display": "Itu kata keempat, yang artinya “diperanakkan”.",
+      "highlight": [],
+      "focus": null
+    },
     "al-ikhlas:3:ex:label-role:intro": {
       "text": "Latihan tebak peran kata, empat soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini.",
       "display": "Latihan tebak peran kata, empat soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini.",
       "highlight": [],
       "focus": null
     },
+    "al-ikhlas:3:ex:label-role:1:why": {
+      "text": "Perannya: huruf nafi dan jazm. Kata ini adalah huruf nafi, peniada, sekaligus huruf jazm: ia meniadakan kata kerja sesudahnya dan membuatnya majzum.",
+      "display": "Perannya: huruf nafi dan jazm. Kata ini adalah huruf nafi (peniada) sekaligus huruf jazm: ia meniadakan kata kerja sesudahnya dan membuatnya majzum.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:3:ex:label-role:2:why": {
+      "text": "Perannya: fi'il mudhori' majzum. Fi'il mudhori' ini majzum karena didahului kata pertama, dengan tanda سُكُون di akhir, karena huruf terakhirnya bukan حَرْف عِلَّة; pelakunya kata ganti yang tersimpan.",
+      "display": "Perannya: fi’il mudhari’ (فِعْل مُضَارِع) majzum. Fi’il mudhari’ (فِعْل مُضَارِع) ini majzum karena didahului kata pertama, dengan tanda sukun (سُكُون) di akhir, karena huruf terakhirnya bukan huruf ‘illah (حَرْف عِلَّة); pelakunya kata ganti yang tersimpan.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:3:ex:label-role:3:why": {
+      "text": "Perannya: حَرْف عَطْف dan huruf nafi dan jazm. وَاو adalah حَرْف عَطْف yang menyambungkan kalimat ini dengan kata pertama dan kedua, dan kata ini kembali menjazmkan kata kerja sesudahnya.",
+      "display": "Perannya: huruf ‘athaf (حَرْف عَطْف) + huruf nafi dan jazm. Wawu (و) adalah huruf ‘athaf (حَرْف عَطْف) yang menyambungkan kalimat ini dengan kata pertama dan kedua, dan kata ini kembali menjazmkan kata kerja sesudahnya.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:3:ex:label-role:4:why": {
+      "text": "Perannya: fi'il mudhori' majhul, majzum oleh kata pertama. Fi'il mudhori' bentuk majhul, pasif, yang artinya diperanakkan, ini majzum oleh kata pertama sendiri, dengan tanda سُكُون di akhir; na'ib fa'il-nya, pengganti pelaku, adalah kata ganti yang tersimpan.",
+      "display": "Perannya: fi’il mudhari’ (فِعْل مُضَارِع) majhul, majzum oleh kata pertama. Fi’il mudhari’ (فِعْل مُضَارِع) bentuk majhul (pasif), yang artinya “diperanakkan”, ini majzum oleh kata pertama sendiri, dengan tanda sukun (سُكُون) di akhir; na'ib fa'il-nya (pengganti pelaku) adalah kata ganti yang tersimpan.",
+      "highlight": [],
+      "focus": null
+    },
     "al-ikhlas:3:ex:wazn-factory:intro": {
-      "text": "Latihan bentuk-bentuk kata, lima soal. Dari satu akar lahir beberapa bentuk kata; pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil تَصْرِيف, bukan kutipan ayat.",
-      "display": "Latihan bentuk-bentuk kata, lima soal. Dari satu akar lahir beberapa bentuk kata; pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif (تَصْرِيف), bukan kutipan ayat.",
+      "text": "Latihan bentuk-bentuk kata, lima soal. Pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil تَصْرِيف, bukan kutipan ayat.",
+      "display": "Latihan bentuk-bentuk kata, lima soal. Pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif (تَصْرِيف), bukan kutipan ayat.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:3:ex:wazn-factory:1:why": {
+      "text": "Itu bentuk فِعْل مَاضٍ, yaitu kata kerja lampau.",
+      "display": "Itu bentuk fi’il madhi (فِعْل مَاضٍ), yaitu kata kerja lampau.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:3:ex:wazn-factory:2:why": {
+      "text": "Itu bentuk fi'il mudhori', yaitu kata kerja sekarang dan akan datang.",
+      "display": "Itu bentuk fi’il mudhari’ (فِعْل مُضَارِع), yaitu kata kerja sekarang dan akan datang.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:3:ex:wazn-factory:3:why": {
+      "text": "Itu bentuk مَصْدَر.",
+      "display": "Itu bentuk mashdar (مَصْدَر).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:3:ex:wazn-factory:4:why": {
+      "text": "Itu bentuk اِسْم فَاعِل, yaitu kata pelaku.",
+      "display": "Itu bentuk isim fa’il (اِسْم فَاعِل), yaitu kata pelaku.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:3:ex:wazn-factory:5:why": {
+      "text": "Itu bentuk اِسْم مَفْعُول, yaitu kata bagi yang dikenai perbuatan.",
+      "display": "Itu bentuk isim maf’ul (اِسْم مَفْعُول), yaitu kata bagi yang dikenai perbuatan.",
       "highlight": [],
       "focus": null
     },
@@ -381,32 +639,32 @@
       "focus": null
     },
     "al-ikhlas:4:w1": {
-      "text": "Kata pertama artinya: dan tidak. وَاو adalah huruf 'athaf yang menyambungkan kalimat ini dengan frasa yang artinya tidak beranak di ayat tiga, dan kata ini sekali lagi menjazmkan kata kerja sesudahnya.",
-      "display": "Kata pertama artinya: “dan tidak”. Wawu (وَ) adalah huruf 'athaf yang menyambungkan kalimat ini dengan frasa yang artinya “tidak beranak” di ayat tiga, dan kata ini sekali lagi menjazmkan kata kerja sesudahnya.",
+      "text": "Kata pertama artinya: dan tidak. وَاو adalah حَرْف عَطْف yang menyambungkan kalimat ini dengan frasa yang artinya tidak beranak di ayat tiga, dan kata ini sekali lagi menjazmkan kata kerja sesudahnya.",
+      "display": "Kata pertama artinya: “dan tidak”. Wawu (وَ) adalah huruf ‘athaf (حَرْف عَطْف) yang menyambungkan kalimat ini dengan frasa yang artinya “tidak beranak” di ayat tiga, dan kata ini sekali lagi menjazmkan kata kerja sesudahnya.",
       "highlight": [
         1
       ],
       "focus": "112:4:1"
     },
     "al-ikhlas:4:w2": {
-      "text": "Kata kedua artinya: ada. Fi'il mudhari' dari kana ini majzum oleh kata pertama, dengan tanda sukun pada نُون di akhirnya; seperti kana, ia merafa'kan isimnya, kata kelima, dan menashabkan khabarnya, kata keempat.",
-      "display": "Kata kedua artinya: “ada”. Fi'il mudhari' dari kana ini majzum oleh kata pertama, dengan tanda sukun pada nun (ن) di akhirnya; seperti kana, ia merafa'kan isimnya (kata kelima) dan menashabkan khabarnya (kata keempat).",
+      "text": "Kata kedua artinya: ada. Fi'il mudhori' dari kana ini majzum oleh kata pertama, dengan tanda سُكُون pada نُون di akhirnya; seperti kana, ia merafa'kan isimnya, kata kelima, dan menashabkan khabarnya, kata keempat.",
+      "display": "Kata kedua artinya: “ada”. Fi’il mudhari’ (فِعْل مُضَارِع) dari kana ini majzum oleh kata pertama, dengan tanda sukun (سُكُون) pada nun (ن) di akhirnya; seperti kana, ia merafa'kan isimnya (kata kelima) dan menashabkan khabarnya (kata keempat).",
       "highlight": [
         2
       ],
       "focus": "112:4:2"
     },
     "al-ikhlas:4:w3": {
-      "text": "Kata ketiga artinya: bagi-Nya. Huruf لَام yang artinya bagi, adalah حَرْف جَرّ dan akhiran, yang artinya Dia, kata ganti mabni yang dijarkan olehnya; frasa jar-majrur kata ini bergantung pada kata keempat, sehingga bermakna setara bagi-Nya.",
-      "display": "Kata ketiga artinya: “bagi-Nya”. Huruf lam (لَّ) yang artinya “bagi”, adalah huruf jar (حَرْف جَرّ) dan akhiran, yang artinya “Dia”, kata ganti mabni yang dijarkan olehnya; frasa jar-majrur kata ini bergantung pada kata keempat, sehingga bermakna “setara bagi-Nya”.",
+      "text": "Kata ketiga artinya: bagi-Nya. Huruf لَام yang artinya bagi, adalah حَرْف جَرّ dan akhiran, yang artinya Dia, kata ganti مَبْنِيّ yang dijarkan olehnya; frasa جَارّ وَمَجْرُور kata ini bergantung pada kata keempat, sehingga bermakna setara bagi-Nya.",
+      "display": "Kata ketiga artinya: “bagi-Nya”. Huruf lam (لَّ) yang artinya “bagi”, adalah huruf jar (حَرْف جَرّ) dan akhiran, yang artinya “Dia”, kata ganti mabni (مَبْنِيّ) yang dijarkan olehnya; frasa jar-majrur (جَارّ وَمَجْرُور) kata ini bergantung pada kata keempat, sehingga bermakna “setara bagi-Nya”.",
       "highlight": [
         3
       ],
       "focus": "112:4:3"
     },
     "al-ikhlas:4:w4": {
-      "text": "Kata keempat artinya: setara. Akhirnya fathatain, yaitu فَتْحَة bertanwin, karena menjadi khabar kata kedua yang didahulukan sebelum isimnya, kata kelima.",
-      "display": "Kata keempat artinya: “setara”. Akhirnya fathatain, yaitu fathah (فَتْحَة) bertanwin, karena menjadi khabar kata kedua yang didahulukan sebelum isimnya, kata kelima.",
+      "text": "Kata keempat artinya: setara. Akhirnya fathatain, yaitu فَتْحَة bertanwin, karena menjadi khobar kata kedua yang didahulukan sebelum isimnya, kata kelima.",
+      "display": "Kata keempat artinya: “setara”. Akhirnya fathatain, yaitu fathah (فَتْحَة) bertanwin, karena menjadi khabar (خَبَر) kata kedua yang didahulukan sebelum isimnya, kata kelima.",
       "highlight": [
         4
       ],
@@ -421,8 +679,8 @@
       "focus": "112:4:5"
     },
     "al-ikhlas:4:concept:kana-wa-akhawatuha": {
-      "text": "Konsep baru: Kana dan saudaranya, isimnya marfu', khabarnya manshub. Kana dan saudara-saudaranya masuk pada mubtada' dan khabar: isimnya menjadi marfu' dan khabarnya manshub, dan khabar itu boleh diletakkan sebelum isimnya.",
-      "display": "Konsep baru: Kana dan saudaranya (isimnya marfu', khabarnya manshub). Kana dan saudara-saudaranya masuk pada mubtada' dan khabar: isimnya menjadi marfu' dan khabarnya manshub, dan khabar itu boleh diletakkan sebelum isimnya.",
+      "text": "Konsep baru: Kana dan saudaranya, yaitu isimnya مَرْفُوع, khabarnya مَنْصُوب. Kana dan saudara-saudaranya masuk pada مُبْتَدَأ dan khobar: isimnya menjadi مَرْفُوع dan khabarnya مَنْصُوب, dan khobar itu boleh diletakkan sebelum isimnya.",
+      "display": "Konsep baru: Kana dan saudaranya, yaitu isimnya marfu’ (مَرْفُوع), khabarnya manshub (مَنْصُوب). Kana dan saudara-saudaranya masuk pada mubtada’ (مُبْتَدَأ) dan khabar (خَبَر): isimnya menjadi marfu’ (مَرْفُوع) dan khabarnya manshub (مَنْصُوب), dan khabar (خَبَر) itu boleh diletakkan sebelum isimnya.",
       "highlight": [
         2,
         3,
@@ -463,15 +721,81 @@
       ],
       "focus": null
     },
+    "al-ikhlas:4:ex:tap-word:1:why": {
+      "text": "Itu kata pertama, yang artinya dan tidak.",
+      "display": "Itu kata pertama, yang artinya “dan tidak”.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:4:ex:tap-word:2:why": {
+      "text": "Itu kata kedua, yang artinya ada.",
+      "display": "Itu kata kedua, yang artinya “ada”.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:4:ex:tap-word:3:why": {
+      "text": "Itu kata ketiga, yang artinya bagi-Nya.",
+      "display": "Itu kata ketiga, yang artinya “bagi-Nya”.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:4:ex:tap-word:4:why": {
+      "text": "Itu kata keempat, yang artinya setara.",
+      "display": "Itu kata keempat, yang artinya “setara”.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:4:ex:tap-word:5:why": {
+      "text": "Itu kata kelima, yang artinya sesuatu.",
+      "display": "Itu kata kelima, yang artinya “sesuatu”.",
+      "highlight": [],
+      "focus": null
+    },
     "al-ikhlas:4:ex:why-harakat:intro": {
       "text": "Latihan kenapa harakat ini, tiga soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu.",
       "display": "Latihan kenapa harakat ini, tiga soal. Setiap soal menampilkan satu kata; pilih alasan yang membuat akhirnya dibaca seperti itu.",
       "highlight": [],
       "focus": null
     },
+    "al-ikhlas:4:ex:why-harakat:1:why": {
+      "text": "Huruf لَام yang artinya bagi, adalah حَرْف جَرّ dan akhiran, yang artinya Dia, kata ganti مَبْنِيّ yang dijarkan olehnya; frasa جَارّ وَمَجْرُور kata ini bergantung pada kata keempat, sehingga bermakna setara bagi-Nya.",
+      "display": "Huruf lam (لِ) yang artinya “bagi”, adalah huruf jar (حَرْف جَرّ) dan akhiran, yang artinya “Dia”, kata ganti mabni (مَبْنِيّ) yang dijarkan olehnya; frasa jar-majrur (جَارّ وَمَجْرُور) kata ini bergantung pada kata keempat, sehingga bermakna “setara bagi-Nya”.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:4:ex:why-harakat:2:why": {
+      "text": "Akhirnya fathatain, yaitu فَتْحَة bertanwin, karena menjadi khobar kata kedua yang didahulukan sebelum isimnya, kata kelima. Jadi, kata ini مَنْصُوب.",
+      "display": "Akhirnya fathatain, yaitu fathah (فَتْحَة) bertanwin, karena menjadi khabar (خَبَر) kata kedua yang didahulukan sebelum isimnya, kata kelima. Jadi, kata ini manshub (مَنْصُوب).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:4:ex:why-harakat:3:why": {
+      "text": "Akhirnya dhammatain, yaitu dhommah bertanwin, karena menjadi اِسْم kata kedua, yang diletakkan di akhir kalimat. Jadi, kata ini مَرْفُوع.",
+      "display": "Akhirnya dhammatain, yaitu dhammah (ضَمَّة) bertanwin, karena menjadi isim (اِسْم) kata kedua, yang diletakkan di akhir kalimat. Jadi, kata ini marfu’ (مَرْفُوع).",
+      "highlight": [],
+      "focus": null
+    },
     "al-ikhlas:4:ex:sort-case:intro": {
-      "text": "Latihan kelompokkan menurut akhiran, tiga kata. Klik satu kata, lalu klik kelompok akhirannya.",
-      "display": "Latihan kelompokkan menurut akhiran, tiga kata. Klik satu kata, lalu klik kelompok akhirannya.",
+      "text": "Latihan kelompokkan menurut akhiran, tiga kata, dalam empat kelompok: مَرْفُوع, مَنْصُوب, مَجْرُور, dan مَبْنِيّ. Klik satu kata, lalu klik kelompok akhirannya.",
+      "display": "Latihan kelompokkan menurut akhiran, tiga kata, dalam empat kelompok: marfu’ (مَرْفُوع), manshub (مَنْصُوب), majrur (مَجْرُور), dan mabni (مَبْنِيّ). Klik satu kata, lalu klik kelompok akhirannya.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:4:ex:sort-case:1:why": {
+      "text": "Huruf لَام yang artinya bagi, adalah حَرْف جَرّ dan akhiran, yang artinya Dia, kata ganti مَبْنِيّ yang dijarkan olehnya; frasa جَارّ وَمَجْرُور kata ini bergantung pada kata keempat, sehingga bermakna setara bagi-Nya.",
+      "display": "Huruf lam (لِ) yang artinya “bagi”, adalah huruf jar (حَرْف جَرّ) dan akhiran, yang artinya “Dia”, kata ganti mabni (مَبْنِيّ) yang dijarkan olehnya; frasa jar-majrur (جَارّ وَمَجْرُور) kata ini bergantung pada kata keempat, sehingga bermakna “setara bagi-Nya”.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:4:ex:sort-case:2:why": {
+      "text": "Akhirnya fathatain, yaitu فَتْحَة bertanwin, karena menjadi khobar kata kedua yang didahulukan sebelum isimnya, kata kelima. Jadi, kata ini مَنْصُوب.",
+      "display": "Akhirnya fathatain, yaitu fathah (فَتْحَة) bertanwin, karena menjadi khabar (خَبَر) kata kedua yang didahulukan sebelum isimnya, kata kelima. Jadi, kata ini manshub (مَنْصُوب).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:4:ex:sort-case:3:why": {
+      "text": "Akhirnya dhammatain, yaitu dhommah bertanwin, karena menjadi اِسْم kata kedua, yang diletakkan di akhir kalimat. Jadi, kata ini مَرْفُوع.",
+      "display": "Akhirnya dhammatain, yaitu dhammah (ضَمَّة) bertanwin, karena menjadi isim (اِسْم) kata kedua, yang diletakkan di akhir kalimat. Jadi, kata ini marfu’ (مَرْفُوع).",
       "highlight": [],
       "focus": null
     },
@@ -481,9 +805,69 @@
       "highlight": [],
       "focus": null
     },
+    "al-ikhlas:4:ex:label-role:1:why": {
+      "text": "Perannya: حَرْف عَطْف dan huruf nafi dan jazm. وَاو adalah حَرْف عَطْف yang menyambungkan kalimat ini dengan frasa yang artinya tidak beranak di ayat tiga, dan kata ini sekali lagi menjazmkan kata kerja sesudahnya.",
+      "display": "Perannya: huruf ‘athaf (حَرْف عَطْف) + huruf nafi dan jazm. Wawu (و) adalah huruf ‘athaf (حَرْف عَطْف) yang menyambungkan kalimat ini dengan frasa yang artinya “tidak beranak” di ayat tiga, dan kata ini sekali lagi menjazmkan kata kerja sesudahnya.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:4:ex:label-role:2:why": {
+      "text": "Perannya: fi'il mudhori' majzum dari kana. Fi'il mudhori' dari kana ini majzum oleh kata pertama, dengan tanda سُكُون pada نُون di akhirnya; seperti kana, ia merafa'kan isimnya, kata kelima, dan menashabkan khabarnya, kata keempat.",
+      "display": "Perannya: fi’il mudhari’ (فِعْل مُضَارِع) majzum dari kana. Fi’il mudhari’ (فِعْل مُضَارِع) dari kana ini majzum oleh kata pertama, dengan tanda sukun (سُكُون) pada nun (ن) di akhirnya; seperti kana, ia merafa'kan isimnya (kata kelima) dan menashabkan khabarnya (kata keempat).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:4:ex:label-role:3:why": {
+      "text": "Perannya: حَرْف جَرّ dan مَجْرُور. Huruf لَام yang artinya bagi, adalah حَرْف جَرّ dan akhiran, yang artinya Dia, kata ganti مَبْنِيّ yang dijarkan olehnya; frasa جَارّ وَمَجْرُور kata ini bergantung pada kata keempat, sehingga bermakna setara bagi-Nya.",
+      "display": "Perannya: huruf jar (حَرْف جَرّ) + majrur (مَجْرُور). Huruf lam (لِ) yang artinya “bagi”, adalah huruf jar (حَرْف جَرّ) dan akhiran, yang artinya “Dia”, kata ganti mabni (مَبْنِيّ) yang dijarkan olehnya; frasa jar-majrur (جَارّ وَمَجْرُور) kata ini bergantung pada kata keempat, sehingga bermakna “setara bagi-Nya”.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:4:ex:label-role:4:why": {
+      "text": "Perannya: khobar kata kedua. Akhirnya fathatain, yaitu فَتْحَة bertanwin, karena menjadi khobar kata kedua yang didahulukan sebelum isimnya, kata kelima.",
+      "display": "Perannya: khabar (خَبَر) kata kedua. Akhirnya fathatain, yaitu fathah (فَتْحَة) bertanwin, karena menjadi khabar (خَبَر) kata kedua yang didahulukan sebelum isimnya, kata kelima.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:4:ex:label-role:5:why": {
+      "text": "Perannya: اِسْم kata kedua. Akhirnya dhammatain, yaitu dhommah bertanwin, karena menjadi اِسْم kata kedua, yang diletakkan di akhir kalimat.",
+      "display": "Perannya: isim (اِسْم) kata kedua. Akhirnya dhammatain, yaitu dhammah (ضَمَّة) bertanwin, karena menjadi isim (اِسْم) kata kedua, yang diletakkan di akhir kalimat.",
+      "highlight": [],
+      "focus": null
+    },
     "al-ikhlas:4:ex:wazn-factory:intro": {
-      "text": "Latihan bentuk-bentuk kata, lima soal. Dari satu akar lahir beberapa bentuk kata; pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil تَصْرِيف, bukan kutipan ayat.",
-      "display": "Latihan bentuk-bentuk kata, lima soal. Dari satu akar lahir beberapa bentuk kata; pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif (تَصْرِيف), bukan kutipan ayat.",
+      "text": "Latihan bentuk-bentuk kata, lima soal. Pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil تَصْرِيف, bukan kutipan ayat.",
+      "display": "Latihan bentuk-bentuk kata, lima soal. Pilih bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif (تَصْرِيف), bukan kutipan ayat.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:4:ex:wazn-factory:1:why": {
+      "text": "Itu bentuk فِعْل مَاضٍ, yaitu kata kerja lampau.",
+      "display": "Itu bentuk fi’il madhi (فِعْل مَاضٍ), yaitu kata kerja lampau.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:4:ex:wazn-factory:2:why": {
+      "text": "Itu bentuk fi'il mudhori', yaitu kata kerja sekarang dan akan datang.",
+      "display": "Itu bentuk fi’il mudhari’ (فِعْل مُضَارِع), yaitu kata kerja sekarang dan akan datang.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:4:ex:wazn-factory:3:why": {
+      "text": "Itu bentuk مَصْدَر.",
+      "display": "Itu bentuk mashdar (مَصْدَر).",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:4:ex:wazn-factory:4:why": {
+      "text": "Itu bentuk اِسْم فَاعِل, yaitu kata pelaku.",
+      "display": "Itu bentuk isim fa’il (اِسْم فَاعِل), yaitu kata pelaku.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-ikhlas:4:ex:wazn-factory:5:why": {
+      "text": "Itu bentuk فِعْل أَمْر, yaitu bentuk perintah, juga untuk doa.",
+      "display": "Itu bentuk fi’il amr (فِعْل أَمْر), yaitu bentuk perintah, juga untuk doa.",
       "highlight": [],
       "focus": null
     },

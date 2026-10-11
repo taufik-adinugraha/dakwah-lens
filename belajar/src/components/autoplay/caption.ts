@@ -231,7 +231,7 @@ export function srAnnouncement(seq: AutoplaySequence, state: AutoplayState, voic
   const ref = state.caption;
   if (ref === "step") return "";
   // Feedback the exercise's own status box announces already.
-  if ("s" in ref && (ref.s === "correct" || ref.s === "try_again" || ref.s === "revealed")) return "";
+  if ("s" in ref && (ref.s === "correct" || ref.s === "revealed")) return "";
   const cue = captionCue(seq, state);
   if (!cue) return "";
   // A recitation step's lead line, shown while the imam recites (caption-

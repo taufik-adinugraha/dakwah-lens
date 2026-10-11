@@ -27,6 +27,8 @@ import { composeFor } from "@/lib/compose-content";
 import { getAyah, getSurah, SURAH_INDEX, SURAHS } from "@/lib/content";
 import { orderRecitations } from "@/lib/autoplay";
 import { conceptsIntroducedIn, getConcept, getLexeme, LIBRARY } from "@/lib/library";
+import { quizAyah } from "@/lib/quiz-content";
+import { planOf } from "@/lib/quiz-plan";
 import { ayahHref, surahHref } from "@/lib/routes";
 import { lessonCard, translationExcerpt } from "@/lib/og/text";
 import { alternatesFor, lessonShareable, pageUrl, shareMetadata } from "@/lib/share";
@@ -141,7 +143,16 @@ export default async function AyahPage({
     label: RECITER_LABEL[r.reciter] ?? r.reciter,
   }));
   const timed = new Set(sources.flatMap((r) => r.segments.map(([w]) => w)));
-  const pool = s.ayat.flatMap((x) => x.words);
+  // The ayah's quiz (content/quiz, pipeline/build_quiz.py): every exercise asks only what the
+  // lesson has taught by this ayah, with wrong options from the ayat already studied (operator
+  // 2026-10-10: "make sure all questions in quiz already have lesson beforehand"). The stage and
+  // the standalone copies below ask the same questions.
+  const quiz = quizAyah(s.slug, a.ayah);
+  const tapPlan = planOf(quiz, "tap-word");
+  const whyPlan = planOf(quiz, "why-harakat");
+  const sortPlan = planOf(quiz, "sort-case");
+  const rolePlan = planOf(quiz, "label-role");
+  const waznPlan = planOf(quiz, "wazn-factory");
   const facts = s.facts.filter((f) => f.locations.includes(a.loc));
   const prev = getAyah(s, n - 1);
   const next = getAyah(s, n + 1);
@@ -240,7 +251,7 @@ export default async function AyahPage({
             words={playerWords}
             sources={sources}
             translation={translation}
-            exercise={{ words: a.words, pool, lexemes }}
+            exercise={{ words: a.words, lexemes, quiz }}
             compose={compose && (compose.primer || Object.keys(compose.words).length) ? compose : null}
           />
         </div>
@@ -309,11 +320,13 @@ export default async function AyahPage({
                 </h2>
                 <p className="mt-1 max-w-prose text-base text-ink-muted">{t("practice_intro")}</p>
               </div>
-              <TapWord id={`${key}/tap`} words={playerWords} source={sources[0]} />
-              <WhyHarakat id={`${key}/why`} words={a.words} pool={pool} />
-              <SortCase id={`${key}/sort`} words={a.words} />
-              <LabelRole id={`${key}/role`} words={a.words} pool={pool} />
-              <WaznFactory id={`${key}/wazn`} lexemes={lexemes} />
+              {tapPlan && <TapWord id={`${key}/tap`} words={playerWords} questions={tapPlan.questions} source={sources[0]} />}
+              {whyPlan && <WhyHarakat id={`${key}/why`} words={a.words} questions={whyPlan.questions} states={quiz.states} />}
+              {sortPlan && (
+                <SortCase id={`${key}/sort`} words={a.words} questions={sortPlan.questions} bins={sortPlan.bins} states={quiz.states} />
+              )}
+              {rolePlan && <LabelRole id={`${key}/role`} words={a.words} questions={rolePlan.questions} />}
+              {waznPlan && <WaznFactory id={`${key}/wazn`} lexemes={lexemes} questions={waznPlan.questions} labels={quiz.labels} />}
             </section>
 
             {/* Learn more, each part collapsed again */}

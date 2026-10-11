@@ -186,7 +186,8 @@
         {"stage": "base", "tiles": ["al-hamdu"], "focus": "al-hamdu",
          "say": [
            "Akhir kata ini dhammah, tanda bunyi u di atas huruf dal; inilah bentuk dasarnya.",
-           "Di ayat ini akhiran itu tidak berubah, karena kata ini menjadi pokok kalimat, dan tidak didahului kata lain yang mengubah akhirnya."
+           "Di ayat ini akhiran itu tidak berubah, karena kata ini menjadi pokok kalimat, dan tidak didahului kata lain yang mengubah akhirnya.",
+           "Kata yang akhirnya dhammah, bunyi u, karena kedudukannya seperti ini disebut marfu'."
          ]}
       ],
       "sources": [
@@ -197,6 +198,7 @@
         {"kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)", "ref": "jil. 1, hlm. 14 (al-I'rab: al-ḥamdu mubtada')", "url": "https://tafsir.app/iraab-aldarweesh/1/2"},
         {"kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)", "ref": "jil. 1, hlm. 29 (QS 1:2, bagian al-I'rab: al-ḥamdu mubtada' marfu')", "url": "https://shamela.ws/book/22916/14"},
         {"kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)", "ref": "hlm. 12, bab al-Mubtada' wal-Khabar: mubtada' adalah isim marfu' yang bebas dari 'amil lafzhi", "url": "https://shamela.ws/book/11371/11"},
+        {"kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)", "ref": "hlm. 6, bab Ma'rifat 'Alamat al-I'rab: dhammah tanda rafa' (kata yang dibaca rafa' disebut marfu'; quiz audit 2026-10-11, T1)", "url": "https://shamela.ws/book/11371/3"},
         {"kitab": "Ibnu Ajurrum, Matn al-Ajurrumiyyah (Dar ash-Shumai'i, 1419 H/1998 M)", "ref": "hlm. 14, bab an-Na't: isim beralif lam termasuk ma'rifah", "url": "https://shamela.ws/book/11371/15"},
         {"kitab": "Rekaman imam pelajaran: Mishary Alafasy, EveryAyah 001002.mp3 (waktu kata quran-align)", "ref": "QS 1:2: bacaan ayat dimulai dari kata pertama", "url": "https://everyayah.com/data/Alafasy_128kbps/001002.mp3"}
       ]
@@ -441,7 +443,8 @@
         {"stage": "whole", "tiles": ["iyyaka"], "note": "kata ganti: akhirnya tetap",
          "say": [
            "Kata ini adalah dhamir, atau kata ganti, yang berdiri sendiri, tidak menempel pada kata lain.",
-           "Akhirnya fathah, bunyi a. Berbeda dengan kata-kata sebelumnya, akhir kata ganti tidak berubah oleh kata lain dalam kalimat."
+           "Akhirnya fathah, bunyi a. Berbeda dengan kata-kata sebelumnya, akhir kata ganti tidak berubah oleh kata lain dalam kalimat.",
+           "Kata yang akhirnya tetap seperti ini disebut mabni."
          ]},
         {"stage": "whole", "tiles": ["iyyaka"], "note": "objek di depan: makna “hanya”",
          "say": [
@@ -596,7 +599,8 @@
         {"stage": "change", "tiles": ["as-sirata"], "from": "as-siratu", "to": "as-sirata",
          "say": [
            "Di sini akhirnya menjadi fathah, tanda bunyi a di atas huruf.",
-           "Sebabnya, kata ini menjadi objek kedua dari kata pertama; objek pertamanya adalah dhamir yang artinya “kami”."
+           "Sebabnya, kata ini menjadi objek kedua dari kata pertama; objek pertamanya adalah dhamir yang artinya “kami”.",
+           "Kata yang akhirnya menjadi fathah, bunyi a, karena kedudukannya seperti ini disebut manshub."
          ]}
       ],
       "sources": [

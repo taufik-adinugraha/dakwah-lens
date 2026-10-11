@@ -16,14 +16,16 @@ What it enforces (README "Narasi" has the reasons):
   none); `focus` the word ("1:1:3") of the large word card, or null.
 - Ids follow the contract: "${slug}:${ayah}:${part}" with part in intro | recite | primer:${k} |
   w${n} | w${n}:compose:${k} | structure | concept:${conceptId} | ex:${exerciseKey}:${lineKey} |
-  recap | next | done, and "shared:${key}" in shared.json. A line longer than MAX_LINE is split
+  ex:${exerciseKey}:${n}:why | recap | next | done, and "shared:${key}" in shared.json. A line longer than MAX_LINE is split
   into "<id>:a", "<id>:b", … (at least two parts, letters contiguous from a, never next to the
   unsplit id); a primer or compose line is never split (one line per animation frame's sentence).
 - Coverage: every ayah has intro, recite, primer:1…k when content/compose/<slug>.json opens the
   ayah with the harakat primer, one w${n} per word followed by w${n}:compose:1…k when the word has
   a composition (one per `say` of its frames), structure, concept:${id} for each Konsep whose
-  first example is in that ayah, ex:${key}:intro for each exercise the ayah shows, recap, and next
-  (or done on the last ayah). Nothing else. shared.json holds SHARED_KEYS plus
+  first example is in that ayah, ex:${key}:intro for each exercise of the ayah's quiz
+  (content/quiz/<slug>.json, build_quiz.py) and ex:${key}:${n}:why for each of its questions (the
+  explanation of the correct answer, said after "Benar." / "Ini jawabannya."; operator 2026-10-10),
+  recap, and next (or done on the last ayah). Nothing else. shared.json holds SHARED_KEYS plus
   ex:${key}:${part} for every guide part of every exercise (mirrors src/components/exercises/guide.ts).
 - Word composition and the harakat primer (operator 2026-10-10, narration rule 14; compose.py):
   a primer / compose line carries `frame`, the 1-based frame of its animation shown while it
@@ -113,6 +115,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import compose as COMPOSE
+import quiz as QUIZ
 from common import AUTHORED_DIR, BELAJAR, CONTENT_DIR, SURAHS, normalise
 
 NARRATION_DIR = CONTENT_DIR / "narration"
@@ -162,43 +165,34 @@ EXERCISE_GUIDE_PARTS: dict[str, tuple[str, ...]] = {
     "label-role": ("options", "reveal", "next"),
     "wazn-factory": ("options", "reveal", "next"),
 }
-# Ayah page: Alafasy first (plan L7); TapWord uses the first source.
-RECITER_ORDER = ("Alafasy_128kbps", "Husary_Muallim_128kbps")
-# WhyHarakat GRADED == cases.ts SORT_BINS.
-GRADED = ("marfu", "manshub", "majrur", "mabni")
+# Which exercises an ayah shows, and their questions: content/quiz/<slug>.json (quiz.py; the
+# reciter order and the case states the components used to count with live there since 2026-10-11).
 
 # Generic lines, shared by every lesson (shared.json, "shared:${key}"). The exercise prompts
 # "shared:ex:${key}:${part}" are added from EXERCISE_GUIDE_PARTS.
-SHARED_KEYS = ("start", "resume", "correct", "try_again", "revealed", "reminder", "skip_offer", "surah_done")
+# No "try_again" since 2026-10-11: a wrong pick is not voiced (operator 2026-10-10: "give
+# narration/voice only for the correct answer").
+SHARED_KEYS = ("start", "resume", "correct", "revealed", "reminder", "skip_offer", "surah_done")
 ACRONYMS = {"AI"}
 HONORIFICS = ("subhanahu wa ta'ala", "shallallahu 'alaihi wa sallam")
 
 
-def exercise_counts(ayah: dict, library: dict) -> dict[str, int]:
-    """Questions each exercise asks on this ayah, by the components' own rules; an exercise the
-    page does not show (too few items) is left out."""
-    words = ayah["words"]
-    rank = {r: i for i, r in enumerate(RECITER_ORDER)}
-    srcs = sorted(ayah["recitation"], key=lambda r: rank.get(r["reciter"], len(RECITER_ORDER)))
-    timed = {seg[0] for seg in srcs[0]["segments"]} if srcs else set()
-    lex = {x["id"]: x for x in library["lexicon"]}
-    lemma_ids: list[str] = []
-    for w in words:
-        if w.get("lemma_id") and w["lemma_id"] not in lemma_ids:
-            lemma_ids.append(w["lemma_id"])
-    wazn_items = 0
-    for lid in lemma_ids:
-        forms = ((lex.get(lid) or {}).get("tashrif") or {}).get("forms") or []
-        if len(forms) >= 3:
-            wazn_items += len(forms)
-    raw = {
-        "tap-word": (sum(1 for i in range(1, len(words) + 1) if i in timed), 2),
-        "why-harakat": (sum(1 for w in words if w["case"]["state"] in GRADED), 1),
-        "sort-case": (sum(1 for w in words if w["case"]["state"] in GRADED), 2),
-        "label-role": (sum(1 for w in words if w.get("role")), 2),
-        "wazn-factory": (wazn_items, 2),
-    }
-    return {k: n for k, (n, need) in raw.items() if n >= need}
+def load_quiz() -> dict[str, dict]:
+    """content/quiz/<slug>.json of every lesson surah (build_quiz.py): the exercises each ayah
+    shows and their questions, the one plan the page, the engine and the narration all read."""
+    return QUIZ.load_all_content()
+
+
+def _quiz_of(ayah: dict, quiz: dict[str, dict] | None) -> dict | None:
+    surah = int(str(ayah["loc"]).split(":")[0])
+    slug = next((sp.slug for sp in SURAHS if sp.surah == surah), None)
+    return (load_quiz() if quiz is None else quiz).get(slug or "")
+
+
+def exercise_counts(ayah: dict, library: dict, quiz: dict[str, dict] | None = None) -> dict[str, int]:
+    """Questions each exercise asks on this ayah (content/quiz, default from disk); an exercise the
+    page does not show is left out. `library` is unused since the plan moved to content/quiz."""
+    return QUIZ.question_counts(_quiz_of(ayah, quiz), ayah["ayah"])
 
 
 def introduced_concepts(ayah_loc: str, library: dict) -> list[dict]:
@@ -222,9 +216,12 @@ def composition_of(compose: dict | None, loc: str) -> dict | None:
     return c if isinstance(c, dict) else None
 
 
-def expected_parts(lesson: dict, library: dict, compose: dict | None = None) -> dict[int, list[str]]:
+def expected_parts(lesson: dict, library: dict, compose: dict | None = None,
+                   quiz: dict | None = None) -> dict[int, list[str]]:
     """Part names each ayah's narration must have, in lesson order. `compose`: the surah's
-    content/compose/<slug>.json (the primer and the word compositions), or None."""
+    content/compose/<slug>.json (the primer and the word compositions), or None; `quiz`: its
+    content/quiz/<slug>.json (default: from disk)."""
+    quiz = quiz if quiz is not None else QUIZ.load_content(lesson["slug"])
     out: dict[int, list[str]] = {}
     last = lesson["ayat"][-1]["ayah"]
     for a in lesson["ayat"]:
@@ -240,7 +237,8 @@ def expected_parts(lesson: dict, library: dict, compose: dict | None = None) -> 
         parts += [f"concept:{c['id']}" for c in introduced_concepts(a["loc"], library)]
         if a.get("structure"):
             parts.append("structure")
-        parts += [f"ex:{k}:intro" for k in EXERCISE_KEYS if k in exercise_counts(a, library)]
+        for ex in QUIZ.ayah_plan(quiz, a["ayah"]):
+            parts += [f"ex:{ex['key']}:intro"] + [f"ex:{ex['key']}:{q['n']}:why" for q in ex["questions"]]
         parts += ["recap", "done" if a["ayah"] == last else "next"]
         out[a["ayah"]] = parts
     return out
@@ -303,14 +301,28 @@ def frame_pins(ayah: dict | None, part: str, compose: dict | None) -> list[str]:
     return out
 
 
-def line_letters(ayah: dict | None, part: str, focus: str | None, forms: "Forms", compose: dict | None):
+def concept_letters(library: dict | None, part: str) -> tuple[str, ...]:
+    """The Arabic a concept's own title and summary write (library bytes): the root letters ف ع ل
+    of the wazan concept, which its line names "fa', 'ain, dan lam" and shows as written there."""
+    if not library or not part.startswith("concept:"):
+        return ()
+    c = next((x for x in library.get("concepts") or [] if x.get("id") == part.split(":", 1)[1]), None)
+    return tuple(ARABIC_WORD.findall(f"{(c or {}).get('title', '')} {(c or {}).get('summary', '')}"))
+
+
+def line_letters(ayah: dict | None, part: str, focus: str | None, forms: "Forms", compose: dict | None,
+                 library: dict | None = None):
     """Where a caption takes the shape of a letter term it shows (rule 7: the letter as on
     screen): for a primer / compose line, the pieces the frame pins, then its tiles' (a tuple,
-    searched letter by letter: the bare lam of ٱلرَّحْمَٰن); otherwise the focus word (its first
-    letter)."""
+    searched letter by letter: the bare lam of ٱلرَّحْمَٰن); for a concept line, the Arabic its
+    summary writes (concept_letters; else the dictionary's letter); otherwise the focus word (its
+    first letter)."""
     tiles = frame_tiles(ayah, part, compose)
     if tiles:
         return tuple(frame_pins(ayah, part, compose) + tiles + ([forms.word_ar[focus]] if focus in forms.word_ar else []))
+    own = concept_letters(library, part)
+    if own:
+        return own
     return forms.word_ar.get(focus) if focus else None
 
 
@@ -641,30 +653,43 @@ MASK = "istilah"  # what a dictionary term becomes for the word guard (a plain I
 # Where the lesson prose (Latin) carries a dictionary term, by the term's caption head ("kasrah",
 # "na't", "huruf jar"; build_narration.mark speaks it from the dictionary there). Most heads count
 # anywhere as a whole word; these only in the contexts given ({h} is the head):
-_COMPOUND_NEXT = r"(?! (?:maushul|fa'il|maf'ul|manshub|marfu'|mudhari'|amr|madhi|majhul)(?![\w']))"
+_COMPOUND_NEXT = r"(?! (?:maushul|fa'il|maf'ul|mudhari'|amr|madhi|majhul)(?![\w']))"
 LATIN_CONTEXT: dict[str, str] = {
     # "huruf" is also plain Indonesian ("huruf ba'", "empat huruf", "huruf 'athaf"): the word
     # class is said from the dictionary only where the Kalimah concept lists the three classes.
     "حَرْف": r"(?:(?<=fi'il, dan ){h}|(?<=atau ){h}(?= \(kata tugas\)))",
     # The letter of a prefixed preposition (bi-, li-), never "alif lam" or a root letter (fa', 'ain, lam).
     "بَاء": r"(?:(?<=[Hh]uruf )|(?<=jar )){h}",
-    "لَام": r"(?:(?<=[Hh]uruf )|(?<=jar )){h}",
-    # The head of a longer term the dictionary does not have (isim fa'il, fi'il mudhari') stays as
-    # written until the operator approves that term's sound.
+    # … and the last of a wazan's three root letters as build_narration names them ("tiga huruf fa',
+    # 'ain, dan lam", the wazan-dan-tashrif concept; shown as its summary writes it, line_letters).
+    "لَام": r"(?:(?<=[Hh]uruf )|(?<=jar )|(?<='ain, dan )){h}",
+    # The head of a longer term the dictionary does not have (fi'il majhul) stays as written until
+    # that term is in the dictionary; a longer term it has (isim fa'il, fi'il mudhari', added
+    # 2026-10-11) is matched whole anyway (the longest match wins), and "isim manshub" is two terms.
     "اِسْم": "{h}" + _COMPOUND_NEXT,
     "فِعْل": "{h}" + _COMPOUND_NEXT,
 }
 
 
 def _ci(s: str) -> str:
-    """`s` as a regex whose first letter matches either case."""
-    if s[:1].isalpha() and s[:1].lower() != s[:1].upper():
-        return f"[{s[0].upper()}{s[0].lower()}]" + re.escape(s[1:])
+    """`s` as a regex whose first letter matches either case (after a leading 'ain apostrophe:
+    "'athaf" also matches the title's "'Athaf")."""
+    i = 1 if s[:1] in APOS and s[1:2].isalpha() else 0
+    if s[i:i + 1].isalpha() and s[i:i + 1].lower() != s[i:i + 1].upper():
+        return re.escape(s[:i]) + f"[{s[i].upper()}{s[i].lower()}]" + re.escape(s[i + 1:])
     return re.escape(s)
 
 
 def _cap(s: str) -> str:
-    return s[:1].upper() + s[1:]
+    """The first letter capitalised, after a leading 'ain apostrophe too ("‘Athaf")."""
+    i = 1 if s[:1] in APOS and s[1:2].isalpha() else 0
+    return s[:i] + s[i:i + 1].upper() + s[i + 1:]
+
+
+def _capitalised(s: str) -> bool:
+    """Does `s` start with a capital (after a leading 'ain apostrophe)?"""
+    i = 1 if s[:1] in APOS and s[1:2].isalpha() else 0
+    return s[i:i + 1].isupper()
 
 
 # `approved` of a dictionary term: the date the operator approved its sound by ear, or PENDING and the
@@ -767,7 +792,7 @@ class Lexicon:
     def latin_matches(self, text: str) -> list[tuple[int, int, Term, bool]]:
         """Non-overlapping (start, end, term, capitalised) of the dictionary terms the lesson
         prose writes in Latin (the longest at each place)."""
-        found = [(m.start(), m.end(), t, m.group()[:1].isupper()) for t, rx in self.latin_rules for m in rx.finditer(text)]
+        found = [(m.start(), m.end(), t, _capitalised(m.group())) for t, rx in self.latin_rules for m in rx.finditer(text)]
         found.sort(key=lambda x: (x[0], -(x[1] - x[0])))
         out, end = [], -1
         for f in found:
@@ -826,7 +851,7 @@ class Lexicon:
         for s, e, t in spans:
             if s < a or e > b:
                 continue
-            cap = text[s].isupper() if not t.arabic_speak else _sentence_start(text, s)
+            cap = _capitalised(text[s:e]) if not t.arabic_speak else _sentence_start(text, s)
             out += text[cur:s] + self.display_of(t, cap, focus_ar)
             cur = e
         return out + text[cur:b]
@@ -850,7 +875,7 @@ class Lexicon:
         """What a caption says: each display form back to its `speak` value, then tts_text."""
         def rep(m: re.Match) -> str:
             t = self._groups[m.lastgroup]
-            return self.speak_of(t, m.group()[:1].isupper())
+            return self.speak_of(t, _capitalised(m.group()))
         return tts_text(self.display_rx.sub(rep, display))
 
     def mask_spoken(self, text: str) -> str:
@@ -992,7 +1017,7 @@ def held(text: str, lex: Lexicon) -> list[str]:
 SLUG_ID = re.compile(
     r"^(?P<slug>[a-z-]+):(?P<ayah>[1-9]\d*):(?P<part>intro|recite|primer:[1-9]\d*|w[1-9]\d*(?::compose:[1-9]\d*)?"
     r"|structure|concept:[a-z0-9-]+"
-    r"|ex:(?:" + "|".join(EXERCISE_KEYS) + r"):[a-z][a-z_]+|recap|next|done)(?::(?P<split>[a-z]))?$"
+    r"|ex:(?:" + "|".join(EXERCISE_KEYS) + r"):(?:[a-z][a-z_]+|[1-9]\d*:why)|recap|next|done)(?::(?P<split>[a-z]))?$"
 )
 SHARED_ID = re.compile(r"^shared:(?P<part>[a-z_]+(?::[a-z-]+:[a-z_]+)?)(?::(?P<split>[a-z]))?$")
 HONORIFIC_RE = re.compile("|".join(re.escape(h) for h in HONORIFICS))
@@ -1123,9 +1148,11 @@ def check_spoken(lid: str, text, forms: Forms, lex: Lexicon) -> list[str]:
             errs.append(f"{lid}: Qur'anic word {w!r} (Arabic script) in spoken text")
         else:
             errs.append(f"{lid}: Arabic script in spoken text that is not a pronunciation-dictionary term: {w!r}")
-    for a, b, t, _cap_ in lex.latin_matches(text):
+    # On the text with the dictionary's own `speak` values masked: a Latin respelling may hold a
+    # term's Latin head ("fi'il mudhori'", the respelling of فِعْل مُضَارِع, holds "fi'il").
+    for a, b, t, _cap_ in lex.latin_matches(masked):
         if t.latin.lower() != t.speak.lower():  # alif, alif lam: spoken as the caption writes them
-            errs.append(f"{lid}: {text[a:b]!r} must be spoken from the pronunciation dictionary ({t.speak})")
+            errs.append(f"{lid}: {masked[a:b]!r} must be spoken from the pronunciation dictionary ({t.speak})")
     if re.search(r"\d", text):
         errs.append(f"{lid}: digit in narration (spell numbers out)")
     odd = sorted({c for c in ARABIC_WORD.sub(MASK, masked) if c not in SPOKEN_CHARS})
@@ -1398,7 +1425,7 @@ def check_view(lid: str, line: dict, ayah: dict | None, part: str, compose: dict
 
 
 def check_manifest(name: str, man, forms: Forms, lesson: dict | None, library: dict, lex: Lexicon,
-                   compose: dict | None = None) -> list[str]:
+                   compose: dict | None = None, quiz: dict | None = None) -> list[str]:
     errs: list[str] = []
     if not isinstance(man, dict) or set(man) != {"version", "voice", "lines"}:
         return [f"{name}: manifest must be exactly {{version, voice, lines}}"]
@@ -1430,7 +1457,7 @@ def check_manifest(name: str, man, forms: Forms, lesson: dict | None, library: d
                 errs.append(f"{lid}: id belongs to {m.group('slug')!r}, not {slug!r}")
             ayah = ayat.get(int(m.group("ayah")))
         focus = line["focus"] if isinstance(line.get("focus"), str) else None
-        focus_ar = line_letters(ayah, part, focus, forms, compose)
+        focus_ar = line_letters(ayah, part, focus, forms, compose, library)
         errs += check_spoken(lid, line["text"], forms, lex)
         errs += check_display(lid, line["display"], line["text"], forms, lex, focus_ar)
         if m and (name == "shared" or ayah is not None):
@@ -1460,7 +1487,7 @@ def check_manifest(name: str, man, forms: Forms, lesson: dict | None, library: d
         for lid in sorted(have - want):
             errs.append(f"shared: unexpected line {lid}")
     elif lesson is not None:
-        want = {f"{slug}:{n}:{p}" for n, parts in expected_parts(lesson, library, compose).items() for p in parts}
+        want = {f"{slug}:{n}:{p}" for n, parts in expected_parts(lesson, library, compose, quiz).items() for p in parts}
         have = set(groups)
         for lid in sorted(want - have):
             errs.append(f"{name}: missing line {lid}")
@@ -1530,19 +1557,20 @@ _BUILDS: dict[str, dict | str] = {}
 
 
 def check_build(manifests: dict[str, dict], lessons: dict[str, dict], library: dict, lex: Lexicon,
-                compose: dict[str, dict] | None = None) -> list[str]:
+                compose: dict[str, dict] | None = None, quiz: dict[str, dict] | None = None) -> list[str]:
     """Every line equals a fresh build (text, display, highlight, focus, frame), and nothing else is there."""
     import build_narration as B  # local import: build_narration imports this module
 
     errs = []
-    # The build depends only on the lessons, the library, the compositions and the dictionary (not
-    # on the manifests): one build per distinct input (the mutation tests check many manifest
-    # copies against one).
-    key = hashlib.sha256(json.dumps([lessons, library, compose or {}, [(t.term, t.speak, t.display) for t in lex.terms]],
+    # The build depends only on the lessons, the library, the compositions, the quizzes and the
+    # dictionary (not on the manifests): one build per distinct input (the mutation tests check many
+    # manifest copies against one).
+    quiz = load_quiz() if quiz is None else quiz
+    key = hashlib.sha256(json.dumps([lessons, library, compose or {}, quiz, [(t.term, t.speak, t.display) for t in lex.terms]],
                                     sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()
     if key not in _BUILDS:
         try:
-            _BUILDS[key] = B.build_lines(lessons, library, lex, compose or {})
+            _BUILDS[key] = B.build_lines(lessons, library, lex, compose or {}, quiz)
         except SystemExit as e:
             _BUILDS[key] = f"build_narration.py fails: {e}"
     want = _BUILDS[key]
@@ -1567,7 +1595,8 @@ def load_compose() -> dict[str, dict]:
     return COMPOSE.load_all_content()
 
 
-def letters_for(name: str, lessons: dict[str, dict], forms: Forms, compose: dict[str, dict]):
+def letters_for(name: str, lessons: dict[str, dict], forms: Forms, compose: dict[str, dict],
+                library: dict | None = None):
     """(lid, line) → where that line of manifest `name` takes a letter term's shape
     (line_letters): what build_narration, render_narration and check_manifest all use, so the
     karaoke tokens of a render join to the caption the validator expects."""
@@ -1578,15 +1607,17 @@ def letters_for(name: str, lessons: dict[str, dict], forms: Forms, compose: dict
         focus = line.get("focus") if isinstance(line.get("focus"), str) else None
         if not m or name == "shared":
             return forms.word_ar.get(focus) if focus else None
-        return line_letters(ayat.get(int(m.group("ayah"))), m.group("part"), focus, forms, compose.get(name))
+        return line_letters(ayat.get(int(m.group("ayah"))), m.group("part"), focus, forms, compose.get(name), library)
     return letters
 
 
 def check(manifests: dict[str, dict], lessons: dict[str, dict], library: dict, *, build: bool = True,
-          lex: Lexicon | None = None, compose: dict[str, dict] | None = None) -> list[str]:
+          lex: Lexicon | None = None, compose: dict[str, dict] | None = None,
+          quiz: dict[str, dict] | None = None) -> list[str]:
     forms = Forms(lessons)
     lex = lex or load_lexicon()
     compose = load_compose() if compose is None else compose
+    quiz = load_quiz() if quiz is None else quiz
     errs: list[str] = lex.problems(forms)
     for sp in SURAHS:
         if sp.slug in lessons and sp.slug not in manifests:
@@ -1597,10 +1628,10 @@ def check(manifests: dict[str, dict], lessons: dict[str, dict], library: dict, *
         if name != "shared" and name not in lessons:
             errs.append(f"{name}: narration manifest for a surah without a lesson")
             continue
-        errs += check_manifest(name, man, forms, lessons.get(name), library, lex, compose.get(name))
+        errs += check_manifest(name, man, forms, lessons.get(name), library, lex, compose.get(name), quiz.get(name))
     errs += check_guide_ts()
     if build:
-        errs += check_build(manifests, lessons, library, lex, compose)
+        errs += check_build(manifests, lessons, library, lex, compose, quiz)
     return errs
 
 

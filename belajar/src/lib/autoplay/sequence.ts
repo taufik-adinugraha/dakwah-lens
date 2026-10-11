@@ -14,7 +14,10 @@
  *   → concept (each concept FIRST introduced in this ayah) → structure
  *     (the lesson page's order, and the narration's: the structure line
  *     uses the terms the concept lines introduce)
- *   → exercises the page renders, in page order (each WAITS for the learner)
+ *   → exercises the page renders, in page order (each WAITS for the learner;
+ *     content/quiz/<slug>.json decides them, and each question's correct
+ *     answer has its explanation line, said after "Benar." or "Ini
+ *     jawabannya.": operator 2026-10-10)
  *   → recap (imam again) → next (to ayah + 1) | done (end of the surah)
  *
  * Every step carries its narration line ids (contract in types.ts), the
@@ -29,7 +32,7 @@ import type { Ayah, Concept } from "@/content/schema";
 import type { ComposeInput } from "../composition";
 import { latinSentences, splitCaption, stripArabic } from "../lessonSteps";
 import { canonicalExercises, exerciseProgressId } from "./exercises";
-import { lineId, manifestParts, parseLineId, promptLineId, sharedLineId, type LinePart } from "./ids";
+import { explainLineId, lineId, manifestParts, parseLineId, promptLineId, sharedLineId, type LinePart } from "./ids";
 import { lineDisplay, lineMarks, lineSegments, lineText, wordRefs } from "./narration";
 import {
   PARTS_OF,
@@ -56,6 +59,9 @@ export type SequenceInput = {
   introduced: readonly Concept[];
   /** Exercises the page renders for this ayah (availableExercises). */
   exercises: readonly ExerciseKey[];
+  /** Each exercise's question numbers (questionNumbers, content/quiz): the
+   *  explanation line of question n is "${slug}:${ayah}:ex:${key}:${n}:why". */
+  questions?: Partial<Record<ExerciseKey, readonly number[]>>;
   texts: AutoplayTexts;
   /** content/narration/${slug}.json, when it exists. */
   narration?: NarrationManifest | null;
@@ -290,13 +296,22 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
       const id = input.narration && manifestParts(input.narration, own) ? own : promptLineId(key, part);
       cues.push(cue(id, text, [partGuide(key, part)]));
     }
+    // The explanation of each question's correct answer, from the manifest only (its words come
+    // from the narration build; a page without narration says just "Benar.").
+    const explain: Partial<Record<number, number>> = {};
+    for (const q of input.questions?.[key] ?? []) {
+      const id = explainLineId(slug, n, key, q);
+      if (!input.narration || !manifestParts(input.narration, id)) continue;
+      explain[q] = cues.length;
+      cues.push(cue(id, ""));
+    }
     steps.push(
       step({
         id: `ex:${key}`,
         kind: "exercise",
         cues,
         guides: [partGuide(key, parts[0])],
-        exercise: { key, progressId: exerciseProgressId(lessonKey, key), parts, lead, promptCue, guides },
+        exercise: { key, progressId: exerciseProgressId(lessonKey, key), parts, lead, promptCue, guides, explain },
       }),
     );
   }

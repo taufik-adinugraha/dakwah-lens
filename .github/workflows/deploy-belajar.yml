@@ -78,6 +78,20 @@ jobs:
       - name: Compositions — validator mutation tests (corpus-free)
         run: python3 pipeline/test_validate_compose.py --no-corpus
 
+      # Quizzes (operator 2026-10-10: "make sure all questions in quiz already have lesson
+      # beforehand when exploring ayat"): content/quiz equal to a fresh build, and for the authored
+      # Al-Fatihah plan every term a question, an option, a bin or a form label needs TAUGHT by the
+      # narration lines the lesson plays before it (derived from content/narration, not a hand
+      # list); wrong options only from ayat already studied, never two correct options. Its
+      # planted-fault tests prove the guard fails on an untaught state, an untaught option and two
+      # correct options. Stdlib only, no network.
+      - name: Quizzes — up to date
+        run: python3 pipeline/build_quiz.py --check
+      - name: Quizzes — taught before tested
+        run: python3 pipeline/validate_quiz.py
+      - name: Quizzes — guard planted-fault tests
+        run: python3 pipeline/test_validate_quiz.py
+
       - name: Narration — manifests up to date
         run: python3 pipeline/build_narration.py --check
       - name: Narration — validate manifests

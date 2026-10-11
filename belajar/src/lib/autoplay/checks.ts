@@ -36,7 +36,7 @@ import type { Ayah, Concept, Lexeme } from "@/content/schema";
 import { composeFileProblems, composeInputFor, type ComposeInput } from "../composition";
 import { MAX_CAPTION, type Pace } from "../lessonSteps";
 import { SURAH_SLUGS } from "../routes";
-import { availableExercises, orderRecitations, timedWords } from "./exercises";
+import { availableExercises, orderRecitations, questionNumbers, type QuizAyahLike } from "./exercises";
 import { LINE_ID_RE, manifestParts, parseLineId, promptLineId } from "./ids";
 import {
   createAutoplayState,
@@ -86,6 +86,9 @@ export type CheckInput = {
   /** Parsed content/compose/${slug}.json per slug (word compositions and
    *  the harakat primer); null/absent = none for that surah. */
   compose?: Readonly<Record<string, unknown>>;
+  /** Parsed content/quiz/${slug}.json per slug (the exercises each ayah
+   *  shows and their questions); null/absent = no exercise in that surah. */
+  quiz?: Readonly<Record<string, unknown>>;
   texts?: AutoplayTexts;
   property?: { streams?: number; length?: number; seed?: number };
 };
@@ -134,11 +137,13 @@ export function loadCheckInput(read: (rel: string) => string | null): { input: C
   const surahs: CheckSurah[] = [];
   const manifests: Record<string, unknown> = {};
   const compose: Record<string, unknown> = {};
+  const quiz: Record<string, unknown> = {};
   for (const slug of SURAH_SLUGS) {
     const s = json(`${slug}.json`, true) as CheckSurah | null;
     if (s) surahs.push(s);
     manifests[slug] = json(`narration/${slug}.json`, false);
     compose[slug] = json(`compose/${slug}.json`, false);
+    quiz[slug] = json(`quiz/${slug}.json`, true);
   }
   const library = (json("library.json", true) ?? { concepts: [], lexicon: [] }) as {
     concepts: Concept[];
@@ -153,6 +158,7 @@ export function loadCheckInput(read: (rel: string) => string | null): { input: C
       sharedManifest: json("narration/shared.json", false),
       pronunciation: json(PRONUNCIATION_PATH, false),
       compose,
+      quiz,
     },
     errors,
   };
@@ -314,6 +320,9 @@ export function sequenceProblems(
         }
         if (!e.guides[part]) out.push(`${s.id}: no spotlight for "${part}"`);
       }
+      for (const [q, ci] of Object.entries(e.explain)) {
+        if (ci === undefined || s.cues[ci]?.line !== `${own}ex:${e.key}:${q}:why`) out.push(`${s.id}: the explanation of question ${q} has the wrong line`);
+      }
     }
   }
   for (const k of SHARED_KEYS) {
@@ -460,10 +469,13 @@ export function driveToEnd(
       // The learner: the exercise reports its controls, one miss, then right.
       const parts = PARTS_OF[ex.key];
       // Dengar dan klik reports the word its question asks about: the lesson's imam recites it.
+      // A wrong pick (no voice), a right one (Benar. + the explanation of question 1), then the
+      // answer of question 2 shown ("Tunjukkan jawaban": Ini jawabannya. + its explanation).
       const script: AutoplayEvent[] = [
         { type: "exercise_guide", target: `exercise:${ex.key}:${parts[0]}`, word: ex.key === "tap-word" ? 1 : undefined },
-        { type: "answered", key: ex.key, correct: false },
-        { type: "answered", key: ex.key, correct: true },
+        { type: "answered", key: ex.key, correct: false, question: 1 },
+        { type: "answered", key: ex.key, correct: true, question: 1 },
+        { type: "revealed", key: ex.key, question: 2 },
         { type: "exercise_guide", target: `exercise:${ex.key}:${parts[parts.length - 1]}` },
         { type: "exercise_done", key: ex.key },
       ];
@@ -515,7 +527,8 @@ function randomEvent(rng: () => number, seq: AutoplaySequence, s: AutoplayState)
     return { type: pick(["narration_end", "timer", "recite_end", "narration_error", "recite_error"] as const), token: token() };
   }
   if (r < 0.52) return { type: "idle_tick", ms: 500 + Math.floor(rng() * 25_000) };
-  if (r < 0.6) return { type: "answered", key: key(), correct: rng() < 0.6 };
+  if (r < 0.57) return { type: "answered", key: key(), correct: rng() < 0.6, question: 1 + Math.floor(rng() * 5) };
+  if (r < 0.6) return { type: "revealed", key: key(), question: rng() < 0.9 ? 1 + Math.floor(rng() * 5) : undefined };
   if (r < 0.66) {
     const t = rng();
     const word = rng() < 0.5 ? 1 + Math.floor(rng() * 5) : undefined;
@@ -603,6 +616,15 @@ function syntheticManifests(seq: AutoplaySequence): { narration: NarrationManife
 
 const PACES: readonly Pace[] = ["biasa", "pelan", "tunggu"];
 
+/** One ayah's exercises from a parsed content/quiz/${slug}.json (raw JSON: no zod here; the
+ *  page's loader, src/lib/quiz-content.ts, validates the same file). */
+export function quizAyahOf(raw: unknown, ayah: number): QuizAyahLike {
+  const ayat = (raw as { ayat?: unknown } | null)?.ayat;
+  const a = Array.isArray(ayat) ? ayat.find((x) => (x as { ayah?: unknown })?.ayah === ayah) : undefined;
+  const ex = (a as { exercises?: unknown } | undefined)?.exercises;
+  return { exercises: Array.isArray(ex) ? (ex as QuizAyahLike["exercises"]) : [] };
+}
+
 export function runAutoplayChecks(input: CheckInput): CheckReport {
   const texts = input.texts ?? ID_TEXTS;
   const errors: string[] = [];
@@ -610,7 +632,6 @@ export function runAutoplayChecks(input: CheckInput): CheckReport {
   const streams = input.property?.streams ?? 2;
   const length = input.property?.length ?? 150;
   const seed = input.property?.seed ?? 20261010;
-  const lexeme = new Map(input.lexicon.map((l) => [l.id, l]));
   const stats: CheckReport["stats"] = {
     surahs: input.surahs.length,
     ayat: 0,
@@ -732,7 +753,8 @@ export function runAutoplayChecks(input: CheckInput): CheckReport {
     for (const ayah of surah.ayat) {
       stats.ayat++;
       const where = `${surah.slug} ${ayah.loc}`;
-      const exercises = availableExercises({ words: ayah.words, timed: timedWords(ayah), lexeme: (id) => lexeme.get(id) });
+      const quizAyah = quizAyahOf(input.quiz?.[surah.slug], ayah.ayah);
+      const exercises = availableExercises(quizAyah);
       const introduced = introducedConcepts(input.concepts, ayah.loc);
       const last = ayah.ayah >= surah.ayat.length;
       const compose = composeInputFor(composeFiles.get(surah.slug), ayah);
@@ -743,6 +765,7 @@ export function runAutoplayChecks(input: CheckInput): CheckReport {
         ayah,
         introduced,
         exercises,
+        questions: questionNumbers(quizAyah),
         texts,
         narration: manifest,
         shared,

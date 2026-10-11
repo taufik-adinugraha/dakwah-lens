@@ -989,6 +989,116 @@ async function composeShots(page, vp, index) {
   await page.goto("about:blank");
 }
 
+/**
+ * The quiz's voice on Al-Fatihah 2 (operator 2026-10-10: "in quiz, give narration/voice only for
+ * the correct answer, to give auditory explanation"; "better to write the arabic word in quiz as
+ * well like majrur in arabic"). In "Tebak peran kata", reached by STEP IDENTITY (the exercise on
+ * screen, `[data-exercise]`; "Berikutnya ›" / "Lewati latihan" until it is there), with the
+ * narration answered in the browser (narration-route.mjs: silent stand-ins as long as the
+ * manifests say) and every request recorded:
+ *   1. each option of question 1 shows its terms' Arabic (the plan's text, content/quiz);
+ *   2. a WRONG pick: no narration request at all for 2.5 s, and "Belum tepat" on screen;
+ *   3. the RIGHT pick: shared:correct ("Benar."), then question 1's explanation line
+ *      (al-fatihah:2:ex:label-role:1:why) — requested by its URL when the manifest has its audio,
+ *      else shown as the caption (caption-only until it is rendered);
+ *   4. question 2: two wrong picks, then "Tunjukkan jawaban": shared:revealed ("Ini jawabannya.")
+ *      and question 2's explanation, the same way.
+ * Fails the job otherwise.
+ */
+async function quizVoiceCheck(page, vp, index) {
+  const read = async (rel) => JSON.parse(await readFile(path.join(BELAJAR_DIR, rel), "utf8"));
+  const quiz = await read("content/quiz/al-fatihah.json");
+  const lesson = (await read("content/narration/al-fatihah.json")).lines;
+  const shared = (await read("content/narration/shared.json")).lines;
+  const role = quiz.ayat.find((a) => a.ayah === 2).exercises.find((e) => e.key === "label-role");
+  const [q1, q2] = role.questions;
+  const served = [];
+  const handler = narrationRoute(index, served);
+  await page.route(isNarration, handler);
+  const exercise = page.locator('[data-autoplay="exercise"] [data-exercise="label-role"]');
+  const caption = page.locator('[data-autoplay="caption"]');
+  const option = (from) => exercise.locator(`[data-option="${from}"]`);
+  const urls = (from) => served.slice(from).map((s) => s.split(" → ")[0]);
+  /** A line was said after request `from`: its audio requested (the index after that request is
+   *  returned, so the next line is looked for after it), or — caption-only, not rendered yet —
+   *  its caption shown (its Latin start, up to the first Arabic). */
+  const said = async (line, from, what) => {
+    const url = line.audio?.url;
+    const head = line.display.split(/\s*[(\u0600-\u06FF]/u)[0].slice(0, 40);
+    const deadline = Date.now() + 20_000;
+    while (Date.now() < deadline) {
+      if (url) {
+        const k = urls(from).indexOf(url);
+        if (k !== -1) return from + k + 1;
+      } else if ((await caption.innerText()).includes(head)) return served.length;
+      await page.waitForTimeout(150);
+    }
+    throw new Error(`${vp}: ${what} was not said (${url ? `no request for ${url}` : `the caption never showed “${head}”`})`);
+  };
+  try {
+    await page.goto(BASE + AYAH_2, { waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    await page.locator('[data-autoplay="start"]').click();
+    const next = page.locator('[data-autoplay="next"]');
+    for (let i = 0; i < 60 && !(await exercise.isVisible()); i++) {
+      await next.click();
+      await page.waitForTimeout(250);
+    }
+    await exercise.waitFor({ state: "visible", timeout: 10_000 });
+    // The exercise waits once its introduction and its options prompt are through.
+    const prompt = shared["shared:ex:label-role:options"];
+    await said(prompt, 0, "the options prompt");
+    await page.waitForTimeout((prompt.audio?.ms ?? 3000) + 1500);
+
+    // 1. Arabic on every label.
+    for (const o of q1.options) {
+      const text = await option(o.from).innerText();
+      for (const ar of o.text.match(/[\u0600-\u06FF]+(?:\s+[\u0600-\u06FF]+)*/g) ?? []) {
+        if (!text.includes(ar)) throw new Error(`${vp}: option ${o.from} shows “${text}”, without its Arabic ${ar}`);
+      }
+    }
+    console.log(`  quiz labels: ${q1.options.map((o) => o.text).join(" | ")}`);
+
+    // 2. A wrong pick: silence, and the note on screen.
+    let mark = served.length;
+    await option(q1.options[1].from).click();
+    await page.waitForTimeout(2500);
+    if (served.length > mark) throw new Error(`${vp}: a wrong pick played narration: ${urls(mark).join(", ")}`);
+    await exercise.getByText("Belum tepat", { exact: false }).first().waitFor({ state: "visible", timeout: 5_000 });
+    console.log("  quiz: a wrong pick plays no narration (Belum tepat on screen)");
+
+    // 3. The right pick: Benar., then the explanation of question 1.
+    mark = served.length;
+    await option(q1.options[0].from).click();
+    const afterCorrect = await said(shared["shared:correct"], mark, "Benar. (shared:correct)");
+    await said(lesson["al-fatihah:2:ex:label-role:1:why"], afterCorrect, "question 1's explanation, after Benar.");
+    await page.locator('[data-autoplay="stage"]').screenshot({ path: `shots/${vp}-quiz-ayah2-role-right.png` });
+    console.log(`shot ${vp}-quiz-ayah2-role-right`);
+
+    // 4. Question 2 (the lesson moves on by itself): two wrong picks, then Tunjukkan jawaban.
+    await exercise.getByText(`Soal 2 dari ${role.questions.length}`).waitFor({ state: "visible", timeout: 30_000 });
+    await page.waitForTimeout(800);
+    await option(q2.options[1].from).click();
+    await page.waitForTimeout(400);
+    await option(q2.options[2].from).click();
+    const reveal = exercise.locator('[data-guide="exercise:label-role:reveal"]');
+    await reveal.waitFor({ state: "visible", timeout: 5_000 });
+    mark = served.length;
+    await reveal.click();
+    const afterRevealed = await said(shared["shared:revealed"], mark, "Ini jawabannya. (shared:revealed)");
+    await said(lesson["al-fatihah:2:ex:label-role:2:why"], afterRevealed, "question 2's explanation, after Ini jawabannya.");
+    console.log("  quiz: right → Benar. + its explanation; Tunjukkan jawaban → Ini jawabannya. + its explanation");
+  } catch (err) {
+    await page.screenshot({ path: `shots/${vp}-quiz-voice-FAILED.png`, fullPage: true }).catch(() => {});
+    console.error(`✗ ${vp}: the quiz voice check on Al-Fatihah 2 failed`);
+    console.error(`  narration requests answered (${served.length}):\n    ${served.join("\n    ") || "(none)"}`);
+    throw err;
+  } finally {
+    await page.unroute(isNarration, handler);
+  }
+  await page.goto("about:blank");
+}
+
 await mkdir("shots", { recursive: true });
 const DEFAULT_RUN = !WARIS_ONLY && !SURAHS_ON;
 const narration = DEFAULT_RUN ? await narrationIndex() : new Map();
@@ -1039,6 +1149,7 @@ try {
     await autoplayShots(page, vp);
     await karaokeShots(page, vp, narration);
     await composeShots(page, vp, narration);
+    await quizVoiceCheck(page, vp, narration);
     // Every composition frame fits at every text size (largest: all seven ayat; the others: ayah 1).
     await composeFitSweep(page, vp, "normal", [1], units);
     await composeFitSweep(page, vp, "besar", [1], units);

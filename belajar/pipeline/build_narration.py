@@ -65,6 +65,7 @@ import json
 import re
 import sys
 
+import quiz as Q
 import validate_narration as V
 from common import SURAHS
 
@@ -151,6 +152,16 @@ PRE_REWRITES: list[tuple[str, str]] = [
     # The Kalimah title lists the three word classes with the gloss after the list; spoken, the
     # gloss goes with the name, and the classes read as a list ("…, dan huruf").
     (r"^Kalimah: isim, fi'il, huruf \(tiga jenis kata\)$", "Tiga jenis kalimah, atau kata: isim, fi'il, dan huruf"),
+    # The quiz explanations speak the words' `why` (2026-10-11). A Latin term inside an Indonesian
+    # verb ("di-'athaf-kan") cannot be said from the dictionary: the verb is said in Indonesian,
+    # the term on its own.
+    (r"\bdi-'athaf-kan\b", "disambungkan dengan 'athaf"),
+    # The Arabic name of a position in brackets after its Indonesian one ("kedudukan rafa' (mahall
+    # raf')") says the same thing again: the Indonesian is said.
+    (r" \(mahall (?:raf'|nashb|jarr)\)", ""),
+    # An aside in brackets is its own clause, not a gloss of the word before it ("berkedudukan jar
+    # (sebagian ulama …)" would be said "jar, yaitu sebagian ulama …").
+    (r" \((sebagian ulama [^()]+)\)", r"; \1"),
 ]
 
 
@@ -624,9 +635,11 @@ SHARED_TEXT = {
               "Penjelasan ini dibacakan dengan suara kecerdasan buatan, disusun dengan bantuan kecerdasan "
               "buatan dari kitab-kitab yang disebutkan sumbernya."),
     "resume": "Kita lanjutkan pelajaran dari langkah terakhir.",
+    # A wrong pick is not voiced (operator 2026-10-10: "give narration/voice only for the correct
+    # answer"); the exercise shows "Belum tepat" on screen. A correct answer says "Benar." and
+    # "Tunjukkan jawaban" says "Ini jawabannya.", each followed by the question's explanation line.
     "correct": "Benar.",
-    "try_again": "Belum tepat. Coba pilih yang lain.",
-    "revealed": "Ini jawabannya. Perhatikan sebentar.",
+    "revealed": "Ini jawabannya.",
     "reminder": "Silakan lanjutkan latihannya. Bagian yang perlu diklik sedang diberi tanda di layar.",
     "skip_offer": "Jika ingin melewati latihan ini, klik tombol Lewati latihan.",
     # True however the learner got here (straight to the last ayah, every exercise skipped):
@@ -648,26 +661,80 @@ SHARED_EX_TEXT = {
 }
 
 
-def ex_intro(key: str, n: int) -> str:
-    c = num_id(n)
+def _list_id(items: list[str], last: str = "dan") -> str:
+    """"a", "a dan b", "a, b, dan c"."""
+    if len(items) <= 2:
+        return f" {last} ".join(items)
+    return ", ".join(items[:-1]) + f", {last} " + items[-1]
+
+
+def ex_intro(ex: dict, terms: Q.Terms) -> str:
+    """An exercise's introduction from its plan (content/quiz): how many questions, and what it
+    asks with — the case bins of a sort, the form names of a wazan quiz (quiz audit 2026-10-11:
+    "Exercise intros rewritten to match the new counts"; no "akar", which the lesson never defines)."""
+    key = ex["key"]
+    c = num_id(len(ex["questions"]))
+    if key == "sort-case":
+        bins = [terms.by_id[Q.STATE_TERM[b]]["latin"] for b in ex.get("bins") or []]
+        return (f"Latihan kelompokkan menurut akhiran, {c} kata, dalam {num_id(len(bins))} kelompok: {_list_id(bins)}. "
+                "Klik satu kata, lalu klik kelompok akhirannya.")
+    if key == "wazn-factory":
+        labels = list(dict.fromkeys(o for q in ex["questions"] for o in q["options"]))
+        which = (f"Pilih bentuk {_list_id(labels, 'atau')} yang ditanyakan." if len(labels) <= 3
+                 else "Pilih bentuk yang sesuai dengan namanya.")
+        return (f"Latihan bentuk-bentuk kata, {c} soal. {which} Bentuk-bentuk ini kata Arab hasil tashrif, bukan "
+                "kutipan ayat.")
     return {
         "tap-word": (f"Latihan dengar dan klik. Imam akan membacakan {c} kata dari ayat ini satu per satu, "
                      "dalam urutan acak. Setiap kali, klik kata yang Anda dengar."),
         "why-harakat": (f"Latihan kenapa harakat ini, {c} soal. Setiap soal menampilkan satu kata; pilih alasan "
                         "yang membuat akhirnya dibaca seperti itu."),
-        "sort-case": (f"Latihan kelompokkan menurut akhiran, {c} kata. Klik satu kata, lalu klik kelompok "
-                      "akhirannya."),
         "label-role": f"Latihan tebak peran kata, {c} soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini.",
-        "wazn-factory": (f"Latihan bentuk-bentuk kata, {c} soal. Dari satu akar lahir beberapa bentuk kata; pilih "
-                         "bentuk yang sesuai dengan namanya. Bentuk-bentuk ini kata Arab hasil tashrif, bukan "
-                         "kutipan ayat."),
     }[key]
+
+
+def ex_why(ex: dict, q: dict, a: dict, library: dict, san: Sanitiser, terms: Q.Terms, S: int) -> str:
+    """The ONE short line that explains a question's correct answer, said after "Benar." and after
+    "Ini jawabannya." (operator 2026-10-10: "give narration/voice only for the correct answer, to
+    give auditory explanation"; decision 2 of 2026-10-11: new short lines from the word's existing
+    sourced fields only, never a new claim):
+      tap-word      the word's place and gloss;
+      why / sort    the word's `why`, then its case state when the why does not name it ("Jadi,
+                    kata ini marfu'.": the state the sort bin and the badge show);
+      label-role    the word's `role`, then its `why`;
+      wazn-factory  the form's label with its Konsep card's title ("fi'il mudhari', yaitu kata
+                    kerja sekarang dan akan datang"), without the Arabic form (not a dictionary term).
+    """
+    A = a["ayah"]
+    key = ex["key"]
+    if key == "wazn-factory":
+        concept = next((c for tid in sorted(terms.ids(q["label"]))
+                        for c in library["concepts"] if c["id"] == tid), None)
+        if concept is None:
+            return f"Itu bentuk {q['label']}."
+        title = san.prose(concept["title"], S, A)
+        return f"Itu bentuk {title[:1].lower()}{title[1:]}."
+    i = q["word"]
+    w = a["words"][i - 1]
+    if key == "tap-word":
+        return f"Itu kata {ordinal(i)}, yang artinya “{V.fold(w['gloss'])}”."
+    why = san.prose(w["why"], S, A, i)
+    if key == "label-role":
+        # The role's head (before its brackets or its ";"): the why says the rest ("khabar
+        # (jar-majrur)" spoken "khabar, atau jar-majrur" would mean "or").
+        head = re.split(r" \(|;", w["role"], maxsplit=1)[0].strip()
+        return f"Perannya: {san.prose(head, S, A, i)}. {why}"
+    st = Q.STATE_TERM.get(w["case"]["state"])
+    if st and st in terms.by_id and st not in terms.ids(why):
+        why += f" Jadi, kata ini {terms.by_id[st]['latin']}."
+    return why
 
 
 Line = tuple[str, str, dict | None, str]  # id, prose, ayah (None for shared lines), part
 
 
-def surah_lines(lesson: dict, library: dict, san: Sanitiser, compose: dict | None = None) -> list[Line]:
+def surah_lines(lesson: dict, library: dict, san: Sanitiser, compose: dict | None = None,
+                quiz: dict | None = None, terms: Q.Terms | None = None) -> list[Line]:
     slug, S, name = lesson["slug"], lesson["surah"], lesson["name_id"]
     last = lesson["ayat"][-1]["ayah"]
     out: list[Line] = []
@@ -702,10 +769,12 @@ def surah_lines(lesson: dict, library: dict, san: Sanitiser, compose: dict | Non
             add(f"concept:{c['id']}", f"{V.TITLE_LEAD} {_cap(san.prose(c['title'], S, A))}. {san.prose(c['summary'], S, A)}")
         if a.get("structure"):
             add("structure", f"Sekarang susunan kalimatnya. {san.prose(a['structure']['summary'], S, A)}")
-        counts = V.exercise_counts(a, library)
-        for k in V.EXERCISE_KEYS:
-            if k in counts:
-                add(f"ex:{k}:intro", ex_intro(k, counts[k]))
+        # The exercises of content/quiz/<slug>.json (build_quiz.py): each one's introduction, then
+        # one explanation line per question, "ex:<key>:<n>:why".
+        for ex in Q.ayah_plan(quiz, A):
+            add(f"ex:{ex['key']}:intro", ex_intro(ex, terms))
+            for q in ex["questions"]:
+                add(f"ex:{ex['key']}:{q['n']}:why", ex_why(ex, q, a, library, san, terms, S))
         add("recap", f"Dengarkan sekali lagi seluruh ayat {ordinal(A)} dibacakan imam.")
         if A == last:
             add("done", f"Pelajaran ayat {ordinal(A)} selesai. Ini ayat terakhir Surah {name}.")
@@ -725,13 +794,15 @@ def shared_lines() -> list[Line]:
 
 
 def build_lines(lessons: dict[str, dict], library: dict, lex: V.Lexicon | None = None,
-                compose: dict[str, dict] | None = None) -> dict[str, dict[str, dict]]:
+                compose: dict[str, dict] | None = None, quiz: dict[str, dict] | None = None) -> dict[str, dict[str, dict]]:
     """manifest name → {id: {text, display, highlight, focus, frame?}}, in lesson order
-    (deterministic). `compose`: content/compose/<slug>.json by slug (default: from disk). Stops,
-    writing nothing, if a line fails a validate_narration check (a new mention or term the rules
-    above do not cover)."""
+    (deterministic). `compose`: content/compose/<slug>.json by slug, `quiz`: content/quiz/<slug>.json
+    by slug (both default: from disk). Stops, writing nothing, if a line fails a validate_narration
+    check (a new mention or term the rules above do not cover)."""
     lex = lex or V.load_lexicon()
     compose = V.load_compose() if compose is None else compose
+    quiz = V.load_quiz() if quiz is None else quiz
+    terms = Q.Terms(Q.load_terms())
     san = Sanitiser(lessons)
     sp = Speech(lex)
     forms = san.forms
@@ -741,7 +812,7 @@ def build_lines(lessons: dict[str, dict], library: dict, lex: V.Lexicon | None =
     raw: dict[str, list[Line]] = {}
     for spec in SURAHS:
         if spec.slug in lessons:
-            raw[spec.slug] = surah_lines(lessons[spec.slug], library, san, compose.get(spec.slug))
+            raw[spec.slug] = surah_lines(lessons[spec.slug], library, san, compose.get(spec.slug), quiz.get(spec.slug), terms)
     raw["shared"] = shared_lines()
     out: dict[str, dict[str, dict]] = {}
     for name, rows in raw.items():
@@ -751,7 +822,7 @@ def build_lines(lessons: dict[str, dict], library: dict, lex: V.Lexicon | None =
             errs += V.check_text(lid, prose, forms, max_len=None)
             highlight, focus = V.line_view(ayah, part, comp)
             frame = V.line_frame(ayah, part, comp)
-            focus_ar = V.line_letters(ayah, part, focus, forms, comp)
+            focus_ar = V.line_letters(ayah, part, focus, forms, comp, library)
             parts = split_line(sp.mark(prose), measure=lambda x: len(sp.spoken(x)))
             ids = [lid] if len(parts) == 1 else [f"{lid}:{chr(ord('a') + i)}" for i in range(len(parts))]
             for pid, marked in zip(ids, parts):
@@ -822,7 +893,7 @@ def main() -> int:
     for name, lines in built.items():
         path = V.NARRATION_DIR / f"{name}.json"
         old = json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
-        new = dump(manifest(lines, old, lex, forms, V.letters_for(name, lessons, forms, compose)))
+        new = dump(manifest(lines, old, lex, forms, V.letters_for(name, lessons, forms, compose, library)))
         chars = sum(len(x["text"]) for x in lines.values())
         if args.check:
             if not path.exists() or path.read_text(encoding="utf-8") != new:
