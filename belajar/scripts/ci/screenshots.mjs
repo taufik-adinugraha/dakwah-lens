@@ -651,6 +651,45 @@ async function assertKaraokeLayout(page, vp) {
 }
 const fmt = (b) => `${Math.round(b.top)}–${Math.round(b.bottom)}`;
 
+/** The module's forest and paper as getComputedStyle reports them (globals.css --color-forest,
+ *  --color-paper). */
+const FOREST = "rgb(14, 90, 60)";
+const PAPER = "rgb(251, 250, 246)";
+
+/**
+ * Emphasis on the karaoke shot (operator 2026-10-11: "we can also use bold text or different color
+ * to highlight the meanings or important things"): the meaning in `scope` — the word card's "yang
+ * artinya “…”", the caption's gloss — is on screen, bold, and forest (paper while it is the word
+ * being said, on the forest fill). So the emphasis cannot quietly disappear (a renamed prop, a
+ * class Tailwind no longer generates) while the shots still look fine at a glance.
+ */
+async function assertEmphasis(page, vp, scope, what) {
+  // A karaoke word's colour fades in 150ms when its state changes ("nama." the moment the narrator
+  // moves on): measured in a moment none of them is fading, never in between two colours.
+  const looks = await page.locator(`${scope} [data-emph="meaning"]`).evaluateAll(async (els) => {
+    for (let k = 0; k < 20; k++) {
+      const fading = els.flatMap((el) => el.getAnimations());
+      if (!fading.length) break;
+      await Promise.all(fading.map((a) => a.finished.catch(() => null)));
+    }
+    return els.map((el) => {
+      const s = getComputedStyle(el);
+      const r = el.getBoundingClientRect();
+      return {
+        text: (el.textContent ?? "").trim(),
+        weight: Number(s.fontWeight),
+        color: s.color,
+        now: !!el.closest('[data-karaoke="now"]'),
+        shown: r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < window.innerHeight && el.checkVisibility({ checkVisibilityCSS: true, visibilityProperty: true }),
+      };
+    });
+  });
+  if (!looks.length) throw new Error(`${vp}: ${what} has no emphasised meaning ([data-emph="meaning"])`);
+  const bad = looks.filter((x) => !x.shown || !(x.weight >= 600) || x.color !== (x.now ? PAPER : FOREST));
+  if (bad.length) throw new Error(`${vp}: ${what}: emphasised meaning not shown bold in ${FOREST} (${PAPER} on the word being said): ${JSON.stringify(bad)}`);
+  console.log(`  emphasis ok: ${what} — ${looks.map((x) => `“${x.text}” ${x.weight}`).join(", ")}`);
+}
+
 /** The karaoke check's line: word 1 of Al-Fatihah 1 explained ("w1"; rendered with the rest of
  *  Al-Fatihah's narration — a line whose text changed has no audio until then). */
 const KARAOKE = { slug: "al-fatihah", step: "w1", line: "al-fatihah:1:w1" };
@@ -669,7 +708,8 @@ const KARAOKE = { slug: "al-fatihah", step: "w1", line: "al-fatihah:1:w1" };
  * timeout on a caption that can never turn karaoke (CI 2026-10-11: the word line became "gloss +
  * lead" with the composition, and the stage played on into the composition lines caption-only).
  * Fails the job if the word card or the karaoke caption never shows (what a learner would see
- * without them is the caption-only fallback, already covered by the ayah 2 shots above).
+ * without them is the caption-only fallback, already covered by the ayah 2 shots above), or if
+ * either shows its meaning without the emphasis (assertEmphasis: "dengan nama" bold in forest).
  */
 async function karaokeShots(page, vp, index) {
   const line = await narratedLine(KARAOKE.slug, KARAOKE.line);
@@ -704,6 +744,8 @@ async function karaokeShots(page, vp, index) {
     await caption.locator('[data-karaoke="said"]').nth(half - 1).waitFor({ state: "attached", timeout: 25_000 });
     await caption.locator('[data-karaoke="now"]').first().waitFor({ state: "attached", timeout: 25_000 });
     await assertKaraokeLayout(page, vp);
+    await assertEmphasis(page, vp, '[data-autoplay="word-card"]', "the word card");
+    await assertEmphasis(page, vp, `[data-autoplay="caption"][data-line="${KARAOKE.line}"]`, "the karaoke caption");
     await stage.screenshot({ path: `shots/${vp}-autoplay-ayah1-karaoke.png` });
     console.log(`shot ${vp}-autoplay-ayah1-karaoke`);
     await page.screenshot({ path: `shots/${vp}-autoplay-ayah1-karaoke-viewport.png` });

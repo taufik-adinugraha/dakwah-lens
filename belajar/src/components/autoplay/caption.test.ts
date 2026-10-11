@@ -1,6 +1,8 @@
 import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import type { Ayah } from "@/content/schema";
@@ -20,6 +22,7 @@ import {
 } from "@/lib/autoplay";
 import { splitCaption } from "@/lib/lessonSteps";
 
+import { CaptionView } from "./CaptionView";
 import {
   captionText,
   karaokeAt,
@@ -105,7 +108,7 @@ describe("stage caption", () => {
     const s = run(seq, createAutoplayState(seq), { type: "start" });
     expect(s.activity?.kind).toBe("read");
     const c = stageCaption(seq, s, null);
-    expect(c).toEqual({ kind: "text", text: splitCaption(ID_TEXTS.shared.start)[0], voiced: false });
+    expect(c).toEqual({ kind: "text", text: splitCaption(ID_TEXTS.shared.start)[0], emphasis: [], voiced: false });
   });
 
   it("with narration audio and no word timings: the caption text, its part following the audio clock", () => {
@@ -117,7 +120,7 @@ describe("stage caption", () => {
     if (a?.kind !== "narrate") return;
     const parts = splitCaption(long);
     expect(parts.length).toBeGreaterThan(1);
-    expect(stageCaption(seq, s, null)).toEqual({ kind: "text", text: parts[0], voiced: true });
+    expect(stageCaption(seq, s, null)).toEqual({ kind: "text", text: parts[0], emphasis: [], voiced: true });
     const late = { token: a.token, line: a.line, ms: a.totalMs - 1, totalMs: a.totalMs };
     expect(captionText(stageCaption(seq, s, late))).toBe(parts[parts.length - 1]);
     // A clock left over from another activity is ignored.
@@ -163,6 +166,93 @@ describe("stage caption", () => {
     expect(stageCaption(seq, paused, null, at(1200))).toMatchObject({ kind: "karaoke", now: 2, said: 3 });
   });
 
+  it("karaoke: each word carries the emphasis of the display it says, across a split line's files", () => {
+    // Operator 2026-10-11 ("use bold text or different color to highlight the meanings"): the
+    // tokens have no quotes, the display does; a split line ("<id>:a", ":b") is aligned whole.
+    const words = (text: string, from = 0) => text.split(" ").map((t, i) => ({ t, s: from + i * 0.5, e: from + i * 0.5 + 0.4 }));
+    const seq = contractSequence({
+      "al-fatihah:1:w1": {
+        text: "Kata pertama artinya: dengan nama.",
+        display: "Kata pertama artinya: “dengan nama”.",
+        audio: AUDIO,
+        tokens: words("Kata pertama artinya: dengan nama."),
+      },
+      "al-fatihah:1:intro:a": {
+        text: "Kata ini disebut مَجْرُور dan bunyinya",
+        display: "Kata ini disebut majrur (مَجْرُور) dan bunyinya",
+        audio: AUDIO,
+        tokens: words("Kata ini disebut majrur (مَجْرُور) dan bunyinya").filter((w) => w.t !== "(مَجْرُور)").map((w) => (w.t === "majrur" ? { ...w, t: "majrur (مَجْرُور)" } : w)),
+      },
+      "al-fatihah:1:intro:b": { text: "i.", display: "i.", audio: AUDIO, tokens: words("i.") },
+    });
+    const intro = seq.steps[0].cues[0];
+    expect(intro.display).toBe("Kata ini disebut majrur (مَجْرُور) dan bunyinya i.");
+    let s = run(seq, createAutoplayState(seq), { type: "start", reason: "continue" });
+    let c = stageCaption(seq, s, null);
+    expect(c).toMatchObject({ kind: "karaoke", emph: [null, null, null, "term", null, null] });
+    // The second file of the line: its sound came from the first file's "bunyinya".
+    s = run(seq, s, endOf(s));
+    expect(s.activity?.kind).toBe("narrate");
+    c = stageCaption(seq, s, null);
+    expect(c).toMatchObject({ kind: "karaoke", words: [["i.", 0, 400]], emph: ["sound"] });
+    const w1 = seq.steps.find((x) => x.id === "w1")!;
+    const at = run(seq, createAutoplayState(seq), { type: "start", from: seq.steps.indexOf(w1), reason: "continue" });
+    expect(stageCaption(seq, at, null)).toMatchObject({ kind: "karaoke", emph: [null, null, null, "meaning", "meaning"] });
+  });
+
+  it("text caption: its part's slice of the whole line's emphasis — the line's first meaning, never a part's own", () => {
+    // Review 2026-10-11: a caption emphasises its first meaning; a later part shown alone must
+    // not pick a "first" of its own.
+    const long = `Kata pertama artinya: “dengan nama”. ${"Kalimat penjelas yang cukup panjang untuk dipotong. ".repeat(4)}Huruf lam (لِ) yang artinya “bagi”, bunyinya i.`;
+    const seq = contractSequence({}, { "shared:start": { text: long, display: long, audio: { ...AUDIO, ms: 8000 } } });
+    const s = run(seq, createAutoplayState(seq), { type: "start" });
+    const a = s.activity;
+    if (a?.kind !== "narrate") throw new Error("no narration");
+    const parts = splitCaption(long);
+    const first = stageCaption(seq, s, null);
+    const last = stageCaption(seq, s, { token: a.token, line: a.line, ms: a.totalMs - 1, totalMs: a.totalMs });
+    if (first.kind !== "text" || last.kind !== "text") throw new Error("not text");
+    expect(first.emphasis.map((e) => first.text.slice(e.from, e.to))).toEqual(["“dengan nama”"]);
+    expect(last.text).toBe(parts[parts.length - 1]);
+    expect(last.emphasis.map((e) => [e.kind, last.text.slice(e.from, e.to)])).toEqual([["sound", "i"]]);
+    // CaptionView draws exactly those.
+    const html = renderToStaticMarkup(createElement(CaptionView, { caption: last }));
+    expect([...html.matchAll(/data-emph="(\w+)"/g)].map((m) => m[1])).toEqual(["sound"]);
+  });
+
+  it("CaptionView: an emphasised word keeps its weight in every state; the word being said has no forest inside", () => {
+    const words = [["Bunyinya", 0, 1], ["kasrah (كَسْرَة)", 1, 2], ["“dengan", 2, 3], ["u.", 3, 4]] as const;
+    const emph = [null, "term", "meaning", "sound"] as const;
+    const html = (now: number, said: number) =>
+      renderToStaticMarkup(createElement(CaptionView, { caption: { kind: "karaoke", words, emph, now, said, voiced: true } }));
+    /** The class list of word i, and the markup inside it. */
+    const word = (markup: string, i: number) => {
+      const spans = [...markup.matchAll(/<span data-karaoke="(now|said|later)"(?: data-emph="([a-z]+)")? class="([^"]*)">/g)];
+      const start = spans[i].index! + spans[i][0].length;
+      const end = i + 1 < spans.length ? spans[i + 1].index! : markup.length;
+      return { state: spans[i][1], emph: spans[i][2] ?? null, cls: spans[i][3].replace(/&amp;/g, "&").split(" "), inner: markup.slice(start, end) };
+    };
+    for (let i = 0; i < words.length; i++) {
+      const states = [html(-1, words.length), html(i, i + 1), html(-1, 0)].map((m) => word(m, i));
+      expect(states.map((x) => x.state)).toEqual(["said", "now", "later"]);
+      expect(states.map((x) => x.emph)).toEqual([emph[i], emph[i], emph[i]]);
+      for (const x of states) expect(x.cls.includes("font-semibold"), `${words[i][0]} ${x.state}`).toBe(emph[i] !== null);
+      const [said, now, later] = states;
+      // Paper on forest whatever it is; nothing forest inside the fill (its Arabic would vanish).
+      expect(now.cls).toEqual(expect.arrayContaining(["bg-forest", "text-paper"]));
+      expect(now.inner).not.toContain("text-forest");
+      // Before and after: a meaning in forest, a term's Arabic in forest, the rest ink / ink-soft.
+      if (emph[i] === "meaning") for (const x of [said, later]) expect(x.cls).toContain("text-forest");
+      else {
+        expect(said.cls).toContain("text-ink");
+        expect(later.cls).toContain("text-ink-soft");
+      }
+      if (emph[i] === "term") for (const x of [said, later]) expect(x.inner).toContain('class="arabic-inline text-ar-sm text-forest"');
+      // Arabic is never bold.
+      if (emph[i] !== null) expect(said.cls).toContain("[&_bdi]:font-normal");
+    }
+  });
+
   it("karaokeAt: the latest word started, lit until the next starts; the last goes out after it ends", () => {
     const w = [
       ["a", 100, 300],
@@ -183,7 +273,7 @@ describe("stage caption", () => {
     expect(seq.steps[0].cues[0].display).toBe(display);
     const s = run(seq, createAutoplayState(seq), { type: "start", reason: "continue" });
     expect(s.activity?.kind).toBe("read");
-    expect(stageCaption(seq, s, null)).toEqual({ kind: "text", text: display, voiced: false });
+    expect(stageCaption(seq, s, null)).toEqual({ kind: "text", text: display, emphasis: [], voiced: false });
     // The screen reader hears it without the Arabic.
     expect(srAnnouncement(seq, s, false)).toBe("Akhirnya dibaca kasrah, karena didahului huruf jar.");
   });

@@ -31,6 +31,7 @@ import { TextSizeOptions } from "@/components/TextSizeSwitch";
 import type { RecitationSource } from "@/hooks/useSegmentPlayer";
 import { Link } from "@/i18n/navigation";
 import type { AutoplaySequence } from "@/lib/autoplay";
+import { glossSlot } from "@/lib/emphasis";
 import { PACES } from "@/lib/lessonSteps";
 import { ayahHref } from "@/lib/routes";
 
@@ -193,6 +194,8 @@ export function LessonStage({
   const t = useTranslations("Guided");
   const tp = useTranslations("Player");
   const tx = useTranslations("Exercise");
+  /** The word card's "yang artinya “…”", its gloss emphasised (glossSlot). */
+  const cardMeaning = (gloss: string) => glossSlot((g) => t("card_meaning", { gloss: g }), gloss);
   const uid = useId();
   const ap = useAutoplay(seq, sources, title);
   const { state, view, actions, player: p } = ap;
@@ -622,8 +625,11 @@ export function LessonStage({
                   <p className="text-lg text-ink-muted sm:order-3">
                     <MixedText text={focusWord.translit} />
                   </p>
-                  <p className="text-xl font-semibold text-pretty text-ink sm:order-4">
-                    <MixedText text={t("card_meaning", { gloss: focusWord.gloss })} />
+                  {/* The meaning bold in forest, "yang artinya" plain ink (operator 2026-10-11:
+                      "use bold text or different color to highlight the meanings"; 7.3:1 on
+                      forest-tint). The slot is found in the message, so it holds in English too. */}
+                  <p className="text-xl text-pretty text-ink sm:order-4">
+                    <MixedText {...cardMeaning(focusWord.gloss)} />
                   </p>
                 </div>
                 <p lang="ar" dir="rtl" className="quran ml-auto text-ar-lg text-ink sm:order-2 sm:ml-0 sm:text-ar-xl">

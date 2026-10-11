@@ -9,6 +9,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
+import { CaptionView } from "@/components/autoplay/CaptionView";
 import { MixedText } from "@/components/library/MixedText";
 
 import { fixtureCases, fixtureValues, loadFixture } from "./linebreaks-fixture.mjs";
@@ -30,13 +31,42 @@ describe("linebreaks self-test fixture", () => {
 
   it("holds exactly what MixedText renders in its good cases, and sizes the fallback's cases", () => {
     const good = cases.filter((c) => !c.expect.length);
-    expect(good.map((c) => c.name)).toEqual(["unit-with-room", "unit-in-flow", "glue-in-flow", "arabic-box-rtl", "ayah-end", "karaoke"]);
+    expect(good.map((c) => c.name)).toEqual([
+      "unit-with-room",
+      "unit-in-flow",
+      "glue-in-flow",
+      "arabic-box-rtl",
+      "ayah-end",
+      "karaoke",
+      "emphasis",
+      "karaoke-emphasis",
+    ]);
     const mixed = good.flatMap((c) => c.mixed.map((m) => [c.name, m]));
-    expect(mixed.length).toBe(6);
-    for (const [name, m] of mixed) expect(m.html, `${name}: "${m.text}"`).toBe(renderToStaticMarkup(createElement(MixedText, { text: m.text })));
+    expect(mixed.length).toBe(15);
+    for (const [name, m] of mixed)
+      expect(m.html, `${name}: "${m.text}"`).toBe(renderToStaticMarkup(createElement(MixedText, { text: m.text, emphasis: m.emphasis || undefined })));
     for (const name of ["unit-in-flow", "unit-boxed"]) expect(cases.find((c) => c.name === name)?.fit).toBe("unit");
     for (const name of ["glue-in-flow", "glue-boxed"]) expect(cases.find((c) => c.name === name)?.fit).toBe("glue");
     for (const name of ["arabic-box-rtl", "arabic-box-ltr"]) expect(cases.find((c) => c.name === name)?.fit).toBe("arabic");
+  });
+
+  it("holds every kind of emphasis, and karaoke words exactly as CaptionView draws them in every state", () => {
+    const section = (name) => body.split(`data-case="${name}"`)[1].split("</section>")[0];
+    expect([...section("emphasis").matchAll(/data-emph="(\w+)"/g)].map((m) => m[1])).toEqual(["term", "term", "meaning", "sound"]);
+    // The karaoke words: CaptionView's markup (its transition classes aside), every state with
+    // and without emphasis, the word being said a term with its Arabic.
+    const p = /<p[^>]*>([\s\S]*)<\/p>/.exec(section("karaoke-emphasis"))[1];
+    const words = [...p.matchAll(/<span data-mixed="([^"]*)"/g)].map((m) => m[1]);
+    const states = [...p.matchAll(/data-karaoke="(\w+)"(?: data-emph="(\w+)")?/g)].map((m) => [m[1], m[2] ?? null]);
+    expect(states.map(([st, e]) => `${st}:${e ?? "-"}`)).toEqual(expect.arrayContaining(["said:meaning", "now:term", "later:meaning", "said:-", "later:-"]));
+    const now = states.findIndex(([st]) => st === "now");
+    const drawn = renderToStaticMarkup(
+      createElement(CaptionView, {
+        caption: { kind: "karaoke", words: words.map((w, i) => [w, i, i + 1]), emph: states.map(([, e]) => e), now, said: now, voiced: true },
+      }),
+    );
+    const shipped = p.replace(/<span data-mixed="[^"]*" style="display:contents">([\s\S]*?)<\/span><!--\/mixed-->/g, "$1");
+    expect(drawn.replace(/ motion-safe:\S+/g, "").replace(/&amp;/g, "&")).toBe(shipped);
   });
 
   it("fills every slot from the dictionary and the lesson content", async () => {

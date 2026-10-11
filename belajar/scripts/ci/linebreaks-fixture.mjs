@@ -63,12 +63,13 @@ export async function loadFixture(belajarDir) {
 }
 
 /** The cases of a filled fixture body, parsed without a DOM: name, the kinds it expects, how it
- *  is sized (data-fit), and each MixedText rendering it holds (`text` → `html`). */
+ *  is sized (data-fit), and each MixedText rendering it holds (`text` → `html`; `emphasis`: drawn
+ *  with emphasis on, operator 2026-10-11). */
 export function fixtureCases(body) {
   const cases = [];
   for (const m of body.matchAll(/<section data-case="([^"]+)" data-expect="([^"]*)"([^>]*)>([\s\S]*?)<\/section>/g)) {
-    const mixed = [...m[4].matchAll(/<span data-mixed="([^"]*)" style="display:contents">([\s\S]*?)<\/span><!--\/mixed-->/g)].map(
-      ([, text, html]) => ({ text, html }),
+    const mixed = [...m[4].matchAll(/<span data-mixed="([^"]*)"( data-emphasis)? style="display:contents">([\s\S]*?)<\/span><!--\/mixed-->/g)].map(
+      ([, text, emphasis, html]) => ({ text, html, emphasis: !!emphasis }),
     );
     cases.push({ name: m[1], expect: m[2].split(/\s+/).filter(Boolean), fit: /data-fit="(\w+)"/.exec(m[4])?.[1] ?? null, mixed });
   }

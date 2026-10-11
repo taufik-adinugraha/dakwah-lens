@@ -7,6 +7,7 @@ import { SharafPanel } from "@/components/library/SharafPanel";
 import { SourcesDisclosure } from "@/components/library/SourceList";
 import { Link } from "@/i18n/navigation";
 import { SURAHS } from "@/lib/content";
+import { leadMeaning } from "@/lib/emphasis";
 import { visibleSurahs } from "@/lib/features";
 import { getLexeme, LIBRARY, parseLoc, rootFor } from "@/lib/library";
 import { ayahHref } from "@/lib/routes";
@@ -53,7 +54,9 @@ export default async function LexemePage({ params }: PageProps<"/[locale]/kosaka
           <p className="text-sm font-semibold text-forest">{t("eyebrow")}</p>
           <h1 className="mt-1 font-display text-3xl font-medium">{lex.translit}</h1>
           <p className="mt-1 max-w-prose text-base text-ink-muted">
-            <MixedText text={lex.meaning} />
+            {/* The core meaning it opens with, in forest (operator 2026-10-11; review: the one
+                meaning the page stresses, not a sub-example's gloss further on). */}
+            <MixedText text={lex.meaning} emphasis={leadMeaning(lex.meaning)} />
           </p>
         </div>
         <div className="text-end">

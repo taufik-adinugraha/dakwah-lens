@@ -17,7 +17,9 @@
   line while every piece fits. A span with data-mixed (closed by the comment /mixed) holds exactly
   what MixedText renders for that text: linebreaks-fixture.test.mjs renders it and compares.
   {{…}}: filled by linebreaks-fixture.mjs from the pronunciation dictionary and the lesson
-  content, never typed here.
+  content, never typed here. A data-mixed span with data-emphasis holds what MixedText renders
+  with emphasis on (operator 2026-10-11: bold meanings, terms and sounds): the emphasis and
+  karaoke-emphasis cases prove the check is not thrown by the data-emph spans and the bold.
 -->
 <html lang="id">
   <body>
@@ -114,6 +116,12 @@
     </section>
     <section data-case="karaoke" data-expect="">
       <p style="width:20rem"><span data-karaoke="said" class="-mx-0.5 box-decoration-clone rounded-md px-0.5 whitespace-nowrap"><span data-mixed="Al-Fatihah." style="display:contents"><span data-lb="glue" class="lb-glue">Al-Fatihah.</span></span><!--/mixed--></span> <span data-karaoke="now" class="-mx-0.5 box-decoration-clone rounded-md bg-forest px-0.5 text-paper [--karaoke-fill:var(--color-forest)]"><span data-mixed="{{TERM.display}}," style="display:contents"><span data-lb="unit" class="lb-unit">{{TERM.lead}} <span data-lb="unit" class="lb-unit"><span data-lb="part" class="lb-part">{{TERM.last}}</span> <span data-lb="part" class="lb-part lb-ar"><span dir="rtl">(<bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{TERM.ar}}</bdi>)</span>,</span></span></span></span><!--/mixed--></span></p>
+    </section>
+    <section data-case="emphasis" data-expect="">
+      <p style="width:20rem"><span data-mixed="disebut {{TERM.display}}, yang artinya “kata depan”, bunyinya i." data-emphasis style="display:contents">disebut <span data-lb="unit" class="lb-unit"><span data-emph="term" class="font-semibold">{{TERM.lead}}</span> <span data-lb="unit" class="lb-unit"><span data-lb="part" class="lb-part"><span data-emph="term" class="font-semibold">{{TERM.last}}</span></span> <span data-lb="part" class="lb-part lb-ar"><span dir="rtl">(<bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm text-forest">{{TERM.ar}}</bdi>)</span>,</span></span></span> yang artinya <span data-emph="meaning" class="font-semibold text-forest">“kata depan”</span>, bunyinya <span data-emph="sound" class="font-semibold">i</span>.</span><!--/mixed--></p>
+    </section>
+    <section data-case="karaoke-emphasis" data-expect="">
+      <p style="width:20rem"><span data-karaoke="said" data-emph="meaning" class="-mx-0.5 box-decoration-clone rounded-md px-0.5 whitespace-nowrap font-semibold [&_bdi]:font-normal text-forest"><span data-mixed="kata" style="display:contents">kata</span><!--/mixed--></span> <span data-karaoke="said" data-emph="meaning" class="-mx-0.5 box-decoration-clone rounded-md px-0.5 whitespace-nowrap font-semibold [&_bdi]:font-normal text-forest"><span data-mixed="depan," style="display:contents">depan,</span><!--/mixed--></span> <span data-karaoke="said" class="-mx-0.5 box-decoration-clone rounded-md px-0.5 whitespace-nowrap text-ink"><span data-mixed="disebut" style="display:contents">disebut</span><!--/mixed--></span> <span data-karaoke="now" data-emph="term" class="-mx-0.5 box-decoration-clone rounded-md px-0.5 font-semibold [&_bdi]:font-normal bg-forest text-paper [--karaoke-fill:var(--color-forest)]"><span data-mixed="{{TERM.display}}," style="display:contents"><span data-lb="unit" class="lb-unit">{{TERM.lead}} <span data-lb="unit" class="lb-unit"><span data-lb="part" class="lb-part">{{TERM.last}}</span> <span data-lb="part" class="lb-part lb-ar"><span dir="rtl">(<bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{TERM.ar}}</bdi>)</span>,</span></span></span></span><!--/mixed--></span> <span data-karaoke="later" class="-mx-0.5 box-decoration-clone rounded-md px-0.5 whitespace-nowrap text-ink-soft"><span data-mixed="yang" style="display:contents">yang</span><!--/mixed--></span> <span data-karaoke="later" class="-mx-0.5 box-decoration-clone rounded-md px-0.5 whitespace-nowrap text-ink-soft"><span data-mixed="artinya:" style="display:contents">artinya:</span><!--/mixed--></span> <span data-karaoke="later" data-emph="meaning" class="-mx-0.5 box-decoration-clone rounded-md px-0.5 whitespace-nowrap font-semibold [&_bdi]:font-normal text-forest"><span data-mixed="kata" style="display:contents">kata</span><!--/mixed--></span> <span data-karaoke="later" data-emph="meaning" class="-mx-0.5 box-decoration-clone rounded-md px-0.5 whitespace-nowrap font-semibold [&_bdi]:font-normal text-forest"><span data-mixed="depan." style="display:contents">depan.</span><!--/mixed--></span></p>
     </section>
   </body>
 </html>

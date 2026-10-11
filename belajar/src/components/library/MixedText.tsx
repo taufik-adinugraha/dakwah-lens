@@ -1,5 +1,6 @@
 import { Fragment, type ReactNode } from "react";
 
+import { emphasisSpans, type Emphasis, type EmphasisKind } from "@/lib/emphasis";
 import { joinUnits, rtlRuns, textUnits, type Seg, type UnitPart } from "@/lib/textUnits";
 
 /**
@@ -11,7 +12,9 @@ import { joinUnits, rtlRuns, textUnits, type Seg, type UnitPart } from "@/lib/te
 export type Overlay = { from: number; to: number; wrap?: (children: ReactNode) => ReactNode; arabic?: string };
 type Overlays = readonly Overlay[];
 
-/** Latin text at offset `at`, cut where a `wrap` overlay starts or ends. */
+/** Latin text at offset `at`, cut where a `wrap` overlay starts or ends; a piece inside several
+ *  is wrapped by each, the first overlay outermost (TermText's harakah link around a term's
+ *  emphasis, both on "kasrah"). */
 function latin(text: string, at: number, ov: Overlays): ReactNode {
   const wraps = ov.filter((o) => o.wrap && o.from < at + text.length && o.to > at);
   if (!wraps.length) return text;
@@ -20,10 +23,34 @@ function latin(text: string, at: number, ov: Overlays): ReactNode {
     .sort((a, b) => a - b);
   return cuts.slice(0, -1).map((c, k) => {
     const piece = text.slice(c, cuts[k + 1]);
-    const o = wraps.find((w) => w.from <= at + c && w.to >= at + cuts[k + 1]);
-    return <Fragment key={k}>{o?.wrap ? o.wrap(piece) : piece}</Fragment>;
+    const inside = wraps.filter((w) => w.from <= at + c && w.to >= at + cuts[k + 1]);
+    return <Fragment key={k}>{inside.reduceRight<ReactNode>((child, o) => o.wrap!(child), piece)}</Fragment>;
   });
 }
+
+/** How each kind of emphasis looks (operator 2026-10-11, narration rule 18): always bold — colour
+ *  is never the only cue — and a meaning in forest too (≥ 7:1 on every ground it sits on: white,
+ *  paper, paper-deep, forest-tint, the feedback greens and ambers). A term's Latin keeps the
+ *  colour around it and its Arabic turns forest, as the Konsep library draws terms; Arabic is never
+ *  bold (Amiri 700 would widen the word and thicken its harakat): the wrap only covers Latin.
+ *  Literal class strings: Tailwind scans the source for them. */
+const EMPHASIS_CLASS: Record<EmphasisKind, string> = {
+  meaning: "font-semibold text-forest",
+  term: "font-semibold",
+  sound: "font-semibold",
+};
+
+/** An emphasis as an overlay: its Latin in a `data-emph` span, a term's Arabic in forest. */
+const emphasisOverlay = (e: Emphasis): Overlay => ({
+  from: e.from,
+  to: e.to,
+  wrap: (children) => (
+    <span data-emph={e.kind} className={EMPHASIS_CLASS[e.kind]}>
+      {children}
+    </span>
+  ),
+  arabic: e.kind === "term" ? "text-forest" : undefined,
+});
 
 /** Where each of `lengths` starts, the first at `at`. */
 function starts(lengths: readonly number[], at: number): number[] {
@@ -177,9 +204,28 @@ function Pieces({ text, at = 0, ov = [] }: { text: string; at?: number; ov?: Ove
  * (TermText draws the Konsep library's marked prose this way, 2026-10-11:
  * styled spans of their own put a break opportunity next to every term,
  * "keduanya ( ⏎ mudhaf", "waswasa– ⏎ yuwaswisu", "al- ⏎ qaul").
+ *
+ * `emphasis` (operator 2026-10-11: "we can also use bold text or different
+ * color to highlight the meanings or important things"): `true` emphasises
+ * what the text itself names (src/lib/emphasis.ts: the meaning after "yang
+ * artinya", the term being taught, a harakah's sound) — opt-in, on prose a
+ * learner reads, never on titles, buttons, chips, references or quiz options;
+ * a list of spans emphasises a known slot (a word card's gloss, glossSlot).
+ * Drawn as overlays after `overlays`, so the pieces and their breaks stay
+ * those of the text alone.
  */
-export function MixedText({ text, overlays }: { text: string; overlays?: readonly Overlay[] }) {
-  return <Pieces text={text} ov={overlays} />;
+export function MixedText({
+  text,
+  overlays,
+  emphasis,
+}: {
+  text: string;
+  overlays?: readonly Overlay[];
+  emphasis?: true | readonly Emphasis[];
+}) {
+  const spans = emphasis === true ? emphasisSpans(text) : (emphasis ?? []);
+  const ov = spans.length ? [...(overlays ?? []), ...spans.map(emphasisOverlay)] : overlays;
+  return <Pieces text={text} ov={ov} />;
 }
 
 /**

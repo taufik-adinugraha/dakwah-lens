@@ -32,26 +32,49 @@ import type { StageCaption } from "./caption";
  * harakat, above and below the Inter line the fill covers, stay on forest
  * instead of paper on white. The fill's padding is cancelled by a negative
  * margin: the gaps between words are plain spaces, as in the text it follows.
+ *
+ * Emphasis (operator 2026-10-11: "we can also use bold text or different
+ * color to highlight the meanings or important things"): the meaning after
+ * "yang artinya", the term being taught and a harakah's sound are bold —
+ * in a text caption its part's slice of the line's (caption.ts
+ * `emphasis`), in a karaoke one per word (caption.ts `emph`); a caption
+ * emphasises its first meaning only, or a quiz answer alone (review
+ * 2026-10-11). A word keeps its weight in every state, so the
+ * highlight moving never reflows the line; its colour follows the state:
+ * the word being said is paper on forest whatever it is (7.9:1; no forest
+ * inside it, its Arabic would vanish into the fill), a meaning is forest
+ * before and after (8.3:1 on the panel's white), any other word ink once said
+ * and ink-soft still to come, a term's Arabic forest. Never colour alone:
+ * the bold says it too.
  */
 export function CaptionView({ caption }: { caption: StageCaption }) {
-  if (caption.kind === "text") return <MixedText text={caption.text} />;
+  if (caption.kind === "text") return <MixedText text={caption.text} emphasis={caption.emphasis} />;
   return (
     <>
       {caption.words.map(([text], i) => {
         const now = i === caption.now;
         const said = !now && i < caption.said;
+        const emph = caption.emph[i] ?? null;
         return (
           <Fragment key={i}>
             {i > 0 ? " " : null}
             <span
               data-karaoke={now ? "now" : said ? "said" : "later"}
+              data-emph={emph ?? undefined}
               className={clsx(
                 "-mx-0.5 box-decoration-clone rounded-md px-0.5 motion-safe:transition-colors motion-safe:duration-150",
                 !hasArabic(text) && "whitespace-nowrap",
-                now ? "bg-forest text-paper [--karaoke-fill:var(--color-forest)]" : said ? "text-ink" : "text-ink-soft",
+                emph && "font-semibold [&_bdi]:font-normal",
+                now
+                  ? "bg-forest text-paper [--karaoke-fill:var(--color-forest)]"
+                  : emph === "meaning"
+                    ? "text-forest"
+                    : said
+                      ? "text-ink"
+                      : "text-ink-soft",
               )}
             >
-              <MixedText text={text} />
+              <MixedText text={text} overlays={emph === "term" && !now ? [{ from: 0, to: text.length, arabic: "text-forest" }] : undefined} />
             </span>
           </Fragment>
         );

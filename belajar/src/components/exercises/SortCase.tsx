@@ -313,7 +313,7 @@ function SortCaseRound({
               sign={questionOf(say.word)?.sign ?? undefined}
               label={states[say.word.case.state]}
             />{" "}
-            <MixedText text={questionOf(say.word)?.why ?? say.word.why} />
+            <MixedText text={questionOf(say.word)?.why ?? say.word.why} emphasis />
           </>
         )}
       </Feedback>

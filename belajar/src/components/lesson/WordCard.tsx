@@ -92,7 +92,9 @@ export function WordCard({
         {word.ar}
       </p>
       <p className="text-sm text-ink-muted">{word.translit}</p>
-      <p className="mt-2 font-display text-lg font-medium text-ink">
+      {/* The meaning bold in forest (operator 2026-10-11: "use bold text or different color to
+          highlight the meanings"; 8.3:1 on white). */}
+      <p data-emph="meaning" className="mt-2 font-display text-lg font-semibold text-forest">
         <span className="sr-only">{labels.meaning}: </span>
         <MixedText text={word.gloss} />
       </p>
@@ -105,7 +107,7 @@ export function WordCard({
       <div className="mt-3 rounded-xl bg-paper-deep p-4">
         <p className="text-sm font-semibold text-ink">{whyHeading}</p>
         <p className="mt-1 text-pretty text-base text-ink">
-          <MixedText text={word.why} />
+          <MixedText text={word.why} emphasis />
         </p>
       </div>
 
