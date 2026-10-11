@@ -3,20 +3,31 @@
 manifests (content/narration/*.json), of the lessons they are built from or of the pronunciation
 dictionary (authored/pronunciation.json), and asserts that the validator fails with the expected
 message. The unmutated copies must pass. Also unit-tests the speech text, the dictionary rendering
-(spoken text, caption, karaoke tokens), the Indonesian numbers and the render request body (no
-network). Standard library only; run from belajar/pipeline after build_narration.py:
+(spoken text, caption, karaoke tokens), the Indonesian numbers, the render request body (no
+network) and the delivery encode (its name, its fixed flags, drift and token fit; with ffmpeg on
+the machine, one real encode of a generated tone). Standard library only; run from belajar/pipeline
+after build_narration.py:
 
     python3 test_validate_narration.py          # table of faults and the message that caught each
     python3 -m unittest test_validate_narration # the same as a unittest run
 """
 from __future__ import annotations
 
+import argparse
+import contextlib
 import copy
+import io
 import json
+import shutil
+import subprocess
 import sys
+import tempfile
 import unittest
+from pathlib import Path
+from unittest import mock
 
 import build_narration as B
+import encode_narration as E
 import render_narration as R
 import validate_narration as V
 
@@ -88,10 +99,16 @@ def fake_tokens(text, focus=None):
     return LEX.tokens(text, starts, ends, FORMS.word_ar.get(focus) if focus else None)
 
 
-def good_audio(m, lid, text=None):
+def good_audio(m, lid, text=None, *, fmt=V.DELIVERY_FORMAT):
+    """The audio entry of a delivered file of `text` (default: the line's own) whose bytes hash to SHA."""
     text = text if text is not None else line(m, lid)["text"]
-    return {"url": f"/belajar/media/narration/suara-uji/{name_of(lid)}/{V.audio_name(text, VOICE['id'])}.mp3",
+    return {"url": f"/belajar/media/narration/suara-uji/{name_of(lid)}/{V.delivery_name(text, VOICE['id'], SHA, fmt)}.mp3",
             "ms": len(text) * 50 + 500, "sha256": SHA}
+
+
+def master_audio(m, lid):
+    """The entry the manifests carried until 2026-10-11: the url of the 128 kbps master."""
+    return {**good_audio(m, lid), "url": V.master_url(VOICE, name_of(lid), line(m, lid)["text"])}
 
 
 def with_audio(lid, *, voice=True, tokens=True, audio=None, tweak=None):
@@ -270,6 +287,15 @@ MUTATIONS = [
      "exactly {url, ms, sha256}"),
     ("audio of an older text (stale file name)", with_audio(AUD, audio=lambda m: good_audio(m, AUD, "Teks lama.")),
      "a changed line needs a new render"),
+    # --- delivery at 64 kbps mono (operator 2026-10-11): the url names the DELIVERED file, by its
+    # text, the delivery format and its bytes
+    ("audio url naming the 128 kbps master", with_audio(AUD, audio=lambda m: master_audio(m, AUD)),
+     "is the name of the mp3_44100_128 master, not of the delivered file"),
+    ("audio sha256 of other bytes than the file is named by",
+     with_audio(AUD, audio=lambda m: {**good_audio(m, AUD), "sha256": "b" * 64}), "a changed file a new name"),
+    ("audio named with another delivery format tag",
+     with_audio(AUD, audio=lambda m: good_audio(m, AUD, fmt="mp3_44100_128_mono")),
+     "the delivery format mp3_44100_64_mono"),
     ("voice model not the house standard",
      lambda m, *_: m["al-fatihah"].__setitem__("voice", {"id": "v", "name": "n", "model": "eleven_v4"}),
      "not the house standard"),
@@ -602,6 +628,157 @@ class SpeechAndRender(unittest.TestCase):
         self.assertEqual(a, V.audio_name("Benar.", "v1"))
         self.assertNotEqual(a, V.audio_name("Benar sekali.", "v1"))
         self.assertNotEqual(a, V.audio_name("Benar.", "v2"))
+
+    def test_delivery_name_binds_text_format_and_bytes(self):
+        sha = "c" * 64
+        d = V.delivery_name("Benar.", "v1", sha)
+        self.assertRegex(d, r"^[0-9a-f]{16}$")
+        self.assertEqual(d, V.delivery_name("Benar.", "v1", sha))
+        # never the master's name: the server may keep both, and only one is in a manifest
+        self.assertNotEqual(d, V.audio_name("Benar.", "v1"))
+        self.assertNotEqual(d, V.delivery_name("Benar sekali.", "v1", sha))  # another text
+        self.assertNotEqual(d, V.delivery_name("Benar.", "v2", sha))  # another voice
+        self.assertNotEqual(d, V.delivery_name("Benar.", "v1", "d" * 64))  # other bytes: a retake, another encoder
+        self.assertNotEqual(d, V.delivery_name("Benar.", "v1", sha, "mp3_22050_32_mono"))  # another format
+        self.assertEqual(V.DELIVERY_FORMAT, "mp3_44100_64_mono")
+        self.assertNotEqual(V.DELIVERY_FORMAT, V.OUTPUT_FORMAT)
+        voice = {"id": "v1", "name": "Suara Uji", "model": "eleven_v3"}
+        audio = {"url": V.delivery_url(voice, "shared", "Benar.", sha), "ms": 800, "sha256": sha}
+        self.assertEqual(audio["url"], f"/belajar/media/narration/suara-uji/shared/{d}.mp3")
+        self.assertTrue(V.is_delivery(audio, voice, "shared", "Benar."))
+        self.assertFalse(V.is_delivery(audio, voice, "shared", "Benar sekali."))
+        self.assertFalse(V.is_delivery({**audio, "url": V.master_url(voice, "shared", "Benar.")}, voice, "shared", "Benar."))
+        self.assertFalse(V.is_delivery({**audio, "sha256": "d" * 64}, voice, "shared", "Benar."))
+        self.assertFalse(V.is_delivery(None, voice, "shared", "Benar."))
+
+    def test_rendered_lines_name_their_delivered_file(self):
+        # What is on disk: every rendered line is delivered, none still points at its master.
+        n = 0
+        for name, man in MANIFESTS.items():
+            for lid, ln in man["lines"].items():
+                if "audio" in ln:
+                    n += 1
+                    self.assertTrue(V.is_delivery(ln["audio"], man["voice"], name, ln["text"]), lid)
+                    self.assertNotEqual(ln["audio"]["url"], V.master_url(man["voice"], name, ln["text"]), lid)
+        self.assertGreater(n, 0)
+
+    def test_delivery_encode_is_fixed(self):
+        args = E.encode_args(Path("m.mp3"), Path("d.mp3"))
+        joined = " ".join(args)
+        for want in ("-c:a libmp3lame", "-b:a 64000", "-ac 1", "-ar 44100", "-map_metadata -1", "-flags +bitexact",
+                     "-fflags +bitexact", "-id3v2_version 0", "-write_xing 1", "-threads 1"):
+            self.assertIn(want, joined)
+        self.assertEqual((args[0], args[-1]), ("ffmpeg", "d.mp3"))
+        # the tag says what the flags do
+        self.assertEqual(V.DELIVERY_FORMAT, f"mp3_{E.SAMPLE_RATE}_{E.BITRATE // 1000}_mono")
+        self.assertEqual(E.CHANNELS, 1)
+        ok = {"codec": "mp3", "sample_rate": 44100, "channels": 1, "bit_rate": 64000}
+        self.assertEqual(E.format_problems(ok), [])
+        self.assertTrue(E.format_problems({**ok, "bit_rate": 128000}))  # a master copied over
+        self.assertTrue(E.format_problems({**ok, "channels": 2}))
+
+    def test_delivery_drift_and_token_fit(self):
+        toks = [{"t": "Kata", "s": 0.0, "e": 0.4}, {"t": "pertama.", "s": 0.5, "e": 2.95}]
+        self.assertEqual(E.fit_problems(toks, 3.0, 3.0), [])
+        self.assertEqual(E.fit_problems(toks, 3.0, 3.026), [])  # a frame longer
+        self.assertEqual(E.fit_problems(toks, 3.0, 2.974), [])  # a frame shorter, the last token still inside
+        self.assertTrue(any("no longer fits" in e for e in E.fit_problems(toks, 3.0, 2.94)))
+        self.assertTrue(any("drifted" in e for e in E.fit_problems(toks, 3.0, 3.081)))
+        self.assertTrue(any("drifted" in e for e in E.fit_problems(toks, 3.0, 2.919)))
+        self.assertEqual(E.MAX_DRIFT_MS, 80)
+        # A token that already ran past the end of its master (ElevenLabs' alignment: one rendered
+        # line, 131 ms) is not the encode's doing, unless the delivered file ends earlier still.
+        late = toks + [{"t": "Lagi.", "s": 3.0, "e": 3.131}]
+        self.assertEqual(E.fit_problems(late, 3.0, 3.0), [])
+        self.assertEqual(E.past_master_ms(late, 3.0), 131)
+        self.assertEqual(E.past_master_ms(toks, 3.0), 0)
+        self.assertTrue(any("no longer fits" in e for e in E.fit_problems(late, 3.0, 2.99)))
+
+    @unittest.skipUnless(shutil.which("ffmpeg") and shutil.which("ffprobe"), "needs ffmpeg and ffprobe (not on the CI runner)")
+    def test_render_delivers_what_it_renders(self):
+        # render_narration.render on a line whose master is already on disk (a generated tone and a
+        # made-up alignment): nothing is sent, the manifest gets the DELIVERED file, and with the
+        # master gone a second run skips the line instead of rendering it again.
+        lid, name = "shared:correct", "shared"
+        text = MANIFESTS[name]["lines"][lid]["text"]
+        voice = {"id": "v1", "name": "Suara Uji", "model": "eleven_v3"}
+        manifests = copy.deepcopy(MANIFESTS)
+        manifests[name]["voice"] = None
+        for ln in manifests[name]["lines"].values():
+            ln.pop("audio", None)
+            ln.pop("tokens", None)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            master = E.master_path(root / "out", voice, name, text)
+            master.parent.mkdir(parents=True)
+            made = subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-f", "lavfi", "-i", "sine=frequency=440:duration=3",
+                                   "-c:a", "libmp3lame", "-b:a", "128k", "-ac", "1", "-ar", "44100", str(master)],
+                                  capture_output=True, check=False)
+            if made.returncode:
+                self.skipTest(f"this ffmpeg cannot make the test tone: {made.stderr[:200]!r}")
+            master.with_suffix(".json").write_text(json.dumps({
+                "characters": list(text), "character_start_times_seconds": [i * 0.05 for i in range(len(text))],
+                "character_end_times_seconds": [i * 0.05 + 0.04 for i in range(len(text))]}), encoding="utf-8")
+            args = argparse.Namespace(voice_id=voice["id"], voice_name=voice["name"], out=str(root / "out"),
+                                      env_file=str(root / "none.env"), switch_voice=False)
+            sent = mock.Mock(side_effect=AssertionError("a test must never call the voice API"))
+            with mock.patch.object(R, "synthesize", sent), mock.patch.object(R, "read_api_key", return_value="test"), \
+                    mock.patch.object(V, "NARRATION_DIR", root), contextlib.redirect_stdout(io.StringIO()) as said:
+                self.assertEqual(R.render([(name, lid, text)], manifests, LESSONS, args, LIBRARY), 0)
+                ln = manifests[name]["lines"][lid]
+                first = dict(ln["audio"])
+                self.assertTrue(V.is_delivery(first, voice, name, text))
+                delivered = E.delivery_path(root / "out", first["url"])
+                self.assertEqual(E.sha256_bytes(delivered.read_bytes()), first["sha256"])
+                self.assertEqual(E.format_problems(E.probe(delivered)), [])
+                self.assertEqual(E.format_problems(E.probe(master))[0], "bit_rate is 128000, not 64000")  # the master is kept as rendered
+                self.assertEqual(" ".join(t["t"] for t in ln["tokens"]), LEX.render_display(text))
+                self.assertEqual(json.loads((root / f"{name}.json").read_text(encoding="utf-8"))["lines"][lid]["audio"], first)
+                self.assertEqual(V.check_audio(lid, first, name, manifests[name]["voice"], text), [])
+                # the upload it prints is the delivery directory, never the masters
+                self.assertIn(f"scp -r {(root / 'out').resolve() / 'delivery' / 'suara-uji'} ", said.getvalue())
+                self.assertIn("reuse  shared:correct", said.getvalue())
+                master.unlink()
+                self.assertEqual(R.render([(name, lid, text)], manifests, LESSONS, args, LIBRARY), 0)
+                self.assertIn("skip   shared:correct", said.getvalue())
+                self.assertEqual(ln["audio"], first)
+            sent.assert_not_called()
+
+    @unittest.skipUnless(shutil.which("ffmpeg") and shutil.which("ffprobe"), "needs ffmpeg and ffprobe (not on the CI runner)")
+    def test_delivery_encode_roundtrip(self):
+        # One real encode, of a generated 128 kbps mono tone standing in for a master: 64 kbps mono,
+        # the same length, the same bytes on a second run, named by its text and its bytes.
+        voice = {"id": "v1", "name": "Suara Uji", "model": "eleven_v3"}
+        text = "Benar."
+        toks = [{"t": "Benar.", "s": 0.1, "e": 1.9}]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            master = E.master_path(root, voice, "shared", text)
+            master.parent.mkdir(parents=True)
+            made = subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-f", "lavfi", "-i", "sine=frequency=440:duration=2",
+                                   "-c:a", "libmp3lame", "-b:a", "128k", "-ac", "1", "-ar", "44100", str(master)],
+                                  capture_output=True, check=False)
+            if made.returncode:
+                self.skipTest(f"this ffmpeg cannot make the test tone: {made.stderr[:200]!r}")
+            d = E.deliver(master, text, voice, "shared", toks, root)
+            body = d.path.read_bytes()
+            self.assertEqual(d.path, root / "delivery" / "suara-uji" / "shared" / f"{V.delivery_name(text, 'v1', d.audio['sha256'])}.mp3")
+            self.assertEqual(d.audio["sha256"], E.sha256_bytes(body))
+            self.assertTrue(V.is_delivery(d.audio, voice, "shared", text))
+            self.assertEqual(V.check_audio("shared:correct", d.audio, "shared", voice, text), [])
+            self.assertEqual(E.format_problems(E.probe(d.path)), [])
+            self.assertLessEqual(abs(d.drift_ms), E.MAX_DRIFT_MS)
+            self.assertEqual(d.audio["ms"], E.probe(d.path)["ms"])
+            self.assertLess(d.size, d.master_size * 0.6)
+            self.assertFalse(body.startswith(b"ID3"))
+            self.assertIsNone(E.decode_error(d.path))
+            self.assertEqual(E.encode(master), body)  # deterministic on this machine
+            self.assertNotEqual(d.path.name, master.name)
+            # a master ffmpeg cannot read is refused: nothing is delivered in its name
+            broken = master.with_name("0000000000000000.mp3")
+            broken.write_bytes(b"not an mp3" * 50)
+            with self.assertRaises(SystemExit):
+                E.deliver(broken, text, voice, "shared", toks, root)
 
     def test_sanitiser_names_places(self):
         san = B.Sanitiser(LESSONS)

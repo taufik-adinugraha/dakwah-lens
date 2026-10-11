@@ -853,6 +853,9 @@ def retext_tokens(tokens: list, line: dict, lex: V.Lexicon, focus_ar: str | None
 def manifest(lines: dict[str, dict], old: dict | None, lex: V.Lexicon, forms: V.Forms,
              letters=lambda lid, line: None) -> dict:
     """Keeps the voice, and the audio and tokens of every line whose spoken text did not change.
+    The audio entry is the DELIVERED file's (64 kbps mono, encode_narration.py; operator
+    2026-10-11), named by the text it speaks: a line whose text changed loses it here and plays
+    caption-only until it is rendered, and delivered, again.
     `letters(lid, line)`: where the line's caption takes a letter's shape (V.line_letters)."""
     old_lines = (old or {}).get("lines") or {}
     out = {}

@@ -30,36 +30,45 @@ POST /v1/text-to-speech/{voice}/with-timestamps, whose character alignment is 1:
 sent; it becomes the line's `tokens` [{t, s, e}] (validate_narration Lexicon.tokens: a dictionary
 term shown in its display form, "na’t (نَعْت)", "Allah").
 
-Output: <out>/narration/<voice-slug>/<slug>/<file>.mp3, mirroring
-/belajar/media/narration/<voice-slug>/<slug>/<file>.mp3 (Caddy serves /belajar/media/* from
-/srv/dakwah-lens/data/belajar-media), where <file> is validate_narration.audio_name: a hash of the
-text, voice and settings. An unchanged line is never rendered (or paid for) twice — it is skipped
-when the manifest already points at that file, or re-used from <file>.mp3 + <file>.json (the
-alignment) when they are on disk — and a changed line gets a new file name, never a stale cache.
-After each line the manifest gets audio {url, ms, sha256} (ms measured with
-common.mp3_duration_ms), tokens, and voice {id, name, model}. The upload command is printed,
-never run.
+Output, two files per line (operator 2026-10-11, "do all three": the narration is delivered at
+64 kbps mono, half the bytes of the render):
+
+- the MASTER, as ElevenLabs returned it (mp3 44.1 kHz 128 kbps mono), at
+  <out>/narration/<voice-slug>/<slug>/<file>.mp3 with its alignment <file>.json, where <file> is
+  validate_narration.audio_name: a hash of the text, voice and settings. Never served. An unchanged
+  line is never rendered (or paid for) twice — it is skipped when the manifest already names its
+  delivered file, or re-used from <file>.mp3 + <file>.json when they are on disk — and a changed
+  line gets a new file name, never a stale cache;
+- the DELIVERED file, made from the master right away by encode_narration.deliver (ffmpeg, fixed
+  flags, no cost), at <out>/delivery/<voice-slug>/<slug>/<name>.mp3, mirroring
+  /belajar/media/narration/<voice-slug>/<slug>/<name>.mp3 (Caddy serves /belajar/media/* from
+  /srv/dakwah-lens/data/belajar-media), where <name> is validate_narration.delivery_name: a hash of
+  the master's name, the delivery format and the delivered bytes.
+
+After each line the manifest gets audio {url, ms, sha256} of the DELIVERED file (ms measured with
+ffprobe), tokens, and voice {id, name, model}. A render therefore needs ffmpeg and ffprobe, and
+says so before anything is sent; the dry run needs neither. The upload command (the delivery
+directory, never the masters) is printed, never run.
 """
 from __future__ import annotations
 
 import argparse
 import base64
 import json
-import os
 import shutil
 import sys
 import urllib.error
 import urllib.request
 from pathlib import Path
 
-import build_narration as B
+import encode_narration as E
 import validate_narration as V
-from common import BELAJAR, mp3_duration_ms, sha256_bytes
+from common import BELAJAR
 
 REPO = BELAJAR.parent
 ENV_FILE = REPO / ".env"
-DEFAULT_OUT = BELAJAR / "pipeline" / "out"  # git-ignored
-VM_MEDIA = "/srv/dakwah-lens/data/belajar-media"
+DEFAULT_OUT = E.DEFAULT_OUT  # git-ignored: narration/ (masters) and delivery/ (what is uploaded)
+VM_MEDIA = E.VM_MEDIA
 API = "https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/with-timestamps?output_format=" + V.OUTPUT_FORMAT
 PRICE_PER_1K = 0.08  # USD, eleven_v3 API list price (docs/belajar-research/audio.md §5)
 MODEL = V.MODEL
@@ -119,10 +128,7 @@ def synthesize(api_key: str, voice_id: str, text: str) -> tuple[bytes, dict, int
         (int(cost) if cost and str(cost).isdigit() else None)
 
 
-def write_json(path: Path, data: dict) -> None:
-    tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(B.dump(data), encoding="utf-8")
-    os.replace(tmp, path)
+write_json = E.write_json
 
 
 def blocked(rows: list[tuple[str, str, str]], lex: V.Lexicon) -> list[tuple[str, list[str]]]:
@@ -167,6 +173,8 @@ def dry_run(rows: list[tuple[str, str, str]], manifests: dict[str, dict]) -> Non
     if longest:
         print(f"longest request: {len(longest[2])} characters ({longest[1]}); eleven_v3 limit {V.TTS_MAX}")
     print(f"estimate at USD {PRICE_PER_1K}/1K characters ({MODEL}), first take only, no retakes.")
+    print(f"each render ({V.OUTPUT_FORMAT} master) is then encoded once to {V.DELIVERY_FORMAT} for delivery "
+          "(encode_narration.py: ffmpeg on this machine, no cost).")
     lex = V.load_lexicon()
     held = blocked(rows, lex)
     if held:
@@ -181,7 +189,10 @@ def dry_run(rows: list[tuple[str, str, str]], manifests: dict[str, dict]) -> Non
 def render(rows, manifests, lessons, args, library: dict | None = None) -> int:
     voice_slug = V.slugify(args.voice_name)
     voice = {"id": args.voice_id, "name": args.voice_name, "model": MODEL}
-    root = Path(args.out).resolve() / "narration" / voice_slug
+    out = Path(args.out).resolve()
+    root = out / E.MASTERS / voice_slug
+    # Before the key is read or a character is paid for: a render that cannot be delivered is refused.
+    print(f"delivery encode ({V.DELIVERY_FORMAT}): {E.require_tools()}")
     for name in {r[0] for r in rows}:
         cur = manifests[name]["voice"]
         if cur and cur.get("id") != args.voice_id:
@@ -204,23 +215,22 @@ def render(rows, manifests, lessons, args, library: dict | None = None) -> int:
             raise SystemExit(f"{lid}: {len(text)} characters is over the {V.TTS_MAX} limit")
         line = manifests[name]["lines"][lid]
         file = V.audio_name(text, args.voice_id)
-        url = f"{V.MEDIA_PREFIX}{voice_slug}/{name}/{file}.mp3"
         mp3, aligned = root / name / f"{file}.mp3", root / name / f"{file}.json"
         # A letter term's shape on screen: the focus word's, or the animation frame's (primer /
         # compose lines), exactly as build_narration and validate_narration take it.
         focus_ar = V.letters_for(name, lessons, forms, compose, library)(lid, line)
-        if (line.get("audio") or {}).get("url") == url and "tokens" in line and not mp3.exists():
+        if V.is_delivery(line.get("audio"), voice, name, text) and "tokens" in line and not mp3.exists():
             print(f"skip   {lid} (the manifest already has this audio)")
             continue
         twins = sorted(root.glob(f"*/{file}.mp3"))
         if mp3.exists() and aligned.exists():
-            body, al = mp3.read_bytes(), json.loads(aligned.read_text(encoding="utf-8"))
+            al = json.loads(aligned.read_text(encoding="utf-8"))
             print(f"reuse  {lid} (unchanged, {mp3.name})")
         elif twins and twins[0].with_suffix(".json").exists():
             mp3.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(twins[0], mp3)
             shutil.copyfile(twins[0].with_suffix(".json"), aligned)
-            body, al = mp3.read_bytes(), json.loads(aligned.read_text(encoding="utf-8"))
+            al = json.loads(aligned.read_text(encoding="utf-8"))
             print(f"copy   {lid} (same text as {twins[0].parent.name}/{twins[0].name})")
         else:
             body, al, cost = synthesize(api_key, args.voice_id, text)
@@ -233,18 +243,23 @@ def render(rows, manifests, lessons, args, library: dict | None = None) -> int:
             else:
                 charged += cost
             print(f"render {lid} ({len(text)} chars, character-cost {cost})")
-        line["audio"] = {"url": url, "ms": mp3_duration_ms(body)["duration_ms"], "sha256": sha256_bytes(body)}
-        line["tokens"] = lex.tokens(text, al["character_start_times_seconds"], al["character_end_times_seconds"], focus_ar)
+        tokens = lex.tokens(text, al["character_start_times_seconds"], al["character_end_times_seconds"], focus_ar)
+        # The manifest describes what is served: the master encoded for delivery (64 kbps mono), not
+        # the master. Refused (SystemExit) if the encode drifts or a token no longer fits; the paid
+        # master stays on disk, so a re-run re-uses it.
+        delivered = E.deliver(mp3, text, voice, name, tokens, out)
+        line["audio"] = delivered.audio
+        line["tokens"] = tokens
         manifests[name]["voice"] = voice
         write_json(V.NARRATION_DIR / f"{name}.json", manifests[name])
-        done.append((lid, url, mp3))
+        done.append((lid, delivered.audio["url"], delivered.path))
     print(f"\nsent {sent} characters (≈ USD {sent / 1000 * PRICE_PER_1K:.2f} at list price); "
           f"character-cost header total {charged}" + (f" ({unknown_cost} responses without the header)" if unknown_cost else ""))
     for lid, url, mp3 in done:
         print(f"  {lid}  {url}")
     print("Next: python3 build_narration.py --check && python3 validate_narration.py, listen, then upload "
           "(not run by this script):")
-    print(f"  scp -r {root} <vm-host>:{VM_MEDIA}/narration/")
+    print(f"  scp -r {out / E.DELIVERY / voice_slug} <vm-host>:{VM_MEDIA}/narration/")
     return 0
 
 
