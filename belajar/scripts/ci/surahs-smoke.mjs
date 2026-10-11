@@ -77,6 +77,23 @@ function noLinkInto(where, html, slugs) {
   }
 }
 
+/**
+ * The fact cards' location chips open the ayah in a popup (operator 2026-10-12: they opened
+ * quran.com in a new tab or app): a surah or lesson page links nowhere on quran.com, and every
+ * place its fact cards locate (the surah page: all its facts; an ayah page: the facts of that
+ * ayah) is a chip BUTTON in the server HTML. Pages of a hidden surah are not checked (they 404).
+ */
+function chipsNotLinks(where, html, slug, ayah = null) {
+  if (/href="https?:\/\/(?:www\.)?quran\.com\//.test(html)) fail(where, "links to quran.com (the fact cards' chips open the ayah in a popup)");
+  const s = SURAH[slug];
+  const facts = s.facts.filter((f) => ayah === null || f.locations.includes(`${s.surah}:${ayah}`));
+  const want = new Set(facts.flatMap((f) => f.locations));
+  const chips = new Set([...html.matchAll(/<button\b[^>]*\bdata-ayah-chip="([^"]+)"/g)].map((m) => m[1]));
+  const missing = [...want].filter((l) => !chips.has(l));
+  if (missing.length) fail(where, `${missing.length} fact location(s) without a chip button (${missing.slice(0, 3).join(", ")}…)`);
+  return want.size;
+}
+
 async function get(path, headers = {}) {
   const res = await fetch(BASE + path, { redirect: "manual", headers });
   return { status: res.status, location: res.headers.get("location"), html: await res.text() };
@@ -272,15 +289,20 @@ async function checkHidden() {
   }
   console.log(`kosakata: ${LIBRARY.lexicon.length} page(s), ${plainPlaces} place(s) in a hidden surah shown as plain text`);
   if (plainPlaces === 0) fail("kosakata", "no word place in a hidden surah was found as plain text");
+  let chipped = 0;
   for (const path of [...DEFAULT.flatMap((s) => lessonPaths("id", s)), "/belajar/id/konsep", "/belajar/id/kredit", "/belajar/en/kredit"]) {
     const { status, html } = await get(path);
     if (status !== 200) fail(path, `status ${status}, expected 200`);
     noLinkInto(path, html, hidden);
+    const lesson = /^\/belajar\/id\/quran\/([^/]+)(?:\/(\d+))?$/.exec(path);
+    if (lesson) chipped += chipsNotLinks(path, html, lesson[1], lesson[2] ? Number(lesson[2]) : null);
     if (path.endsWith("/kredit")) {
       const text = visibleText(mainOf(html));
       for (const slug of hidden) if (text.includes(SURAH[slug].name_id)) fail(path, `names the hidden ${slug}`);
     }
   }
+  console.log(`fact cards: ${chipped} location chip(s) on the published lesson pages, buttons, no quran.com link`);
+  if (chipped === 0) fail("fact cards", "no location chip found on the published lesson pages");
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -289,6 +311,7 @@ async function checkHidden() {
 // ---------------------------------------------------------------------------------------------
 async function checkShown() {
   await api(SLUGS);
+  let chipped = 0;
   for (const slug of SLUGS) {
     for (const path of [...lessonPaths("id", slug), `/belajar/en/quran/${slug}`, `/belajar/en/quran/${slug}/1`]) {
       const { status, html } = await get(path);
@@ -297,7 +320,9 @@ async function checkShown() {
         fail(path, `status ${status}, expected 200`);
         continue;
       }
-      if (!/\/quran\/[^/]+\/\d+$/.test(path)) continue;
+      const ayah = /\/quran\/[^/]+\/(\d+)$/.exec(path);
+      chipped += chipsNotLinks(path, html, slug, ayah ? Number(ayah[1]) : null);
+      if (!ayah) continue;
       // The autoplay lesson: the single "Mulai pelajaran" button and the one-line hint, server
       // rendered; "klik", never "ketuk" (operator, 2026-10-10).
       if (!html.includes('data-autoplay="start"')) fail(path, "no autoplay start button");
@@ -308,6 +333,8 @@ async function checkShown() {
       }
     }
   }
+  console.log(`fact cards: ${chipped} location chip(s) on every surah's pages, buttons, no quran.com link`);
+  if (chipped === 0) fail("fact cards", "no location chip found on any lesson page");
   // An unknown ayah is still the module's 404.
   for (const path of ["/belajar/id/quran/an-nas/7", "/belajar/id/quran/al-ikhlas/5"]) {
     const { status } = await get(path);

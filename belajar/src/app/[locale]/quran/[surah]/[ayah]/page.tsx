@@ -21,17 +21,20 @@ import { ConceptCard } from "@/components/library/ConceptCard";
 import { MixedText } from "@/components/library/MixedText";
 import { SourceList } from "@/components/library/SourceList";
 import { StructureSection } from "@/components/library/StructureSection";
+import { AyahDialogProvider } from "@/components/surah/AyahDialog";
 import { FactCard } from "@/components/surah/FactCard";
 import { Link } from "@/i18n/navigation";
+import { surahNamesFor } from "@/lib/ayat";
 import { composeFor } from "@/lib/compose-content";
 import { getAyah, getSurah, SURAH_INDEX, SURAHS } from "@/lib/content";
 import { orderRecitations } from "@/lib/autoplay";
-import { conceptsIntroducedIn, getConcept, getLexeme, LIBRARY } from "@/lib/library";
+import { conceptsIntroducedIn, getConcept, getLexeme, LIBRARY, TERMS } from "@/lib/library";
 import { quizAyah } from "@/lib/quiz-content";
 import { planOf } from "@/lib/quiz-plan";
 import { ayahHref, surahHref } from "@/lib/routes";
 import { lessonCard, translationExcerpt } from "@/lib/og/text";
 import { alternatesFor, lessonShareable, pageUrl, shareMetadata } from "@/lib/share";
+import { headwordOf, lessonLookup } from "@/lib/terms";
 
 export const dynamicParams = false;
 
@@ -196,6 +199,11 @@ export default async function AyahPage({
   const surahIdx = SURAHS.findIndex((x) => x.slug === s.slug);
   const following = next ? [] : SURAHS.slice(surahIdx + 1).map((x) => ({ slug: x.slug, name: x.name_id }));
   const conceptTitle = Object.fromEntries(LIBRARY.concepts.map((c) => [c.id, c.title]));
+  // A marked lesson's word cards, structure and facts draw their Arabic (operator 2026-10-12:
+  // terms and Qur'anic words in Arabic, "not only the transliteration"): the library's terms and
+  // bytes with the lesson's own; a concept chip carries its title's Arabic headword.
+  const lookup = lessonLookup(TERMS, s);
+  const conceptHead = Object.fromEntries(LIBRARY.concepts.map((c) => [c.id, headwordOf(c.marked?.title, TERMS)]));
   const wordAr = Object.fromEntries(s.ayat.flatMap((x) => x.words.map((w) => [w.loc, w.ar])));
   const conceptLabels = {
     nahwu: tc("nahwu"),
@@ -284,8 +292,9 @@ export default async function AyahPage({
                       lexeme={w.lemma_id ? getLexeme(w.lemma_id) : undefined}
                       concepts={w.concepts.flatMap((id) => {
                         const c = getConcept(id);
-                        return c ? [{ id: c.id, title: c.title }] : [];
+                        return c ? [{ id: c.id, title: c.title, head: conceptHead[c.id] }] : [];
                       })}
+                      lookup={lookup}
                       listen={
                         timed.has(i + 1) ? (
                           <WordListenButton
@@ -350,6 +359,8 @@ export default async function AyahPage({
                       <StructureSection
                         ayah={a}
                         conceptTitle={conceptTitle}
+                        conceptHead={conceptHead}
+                        lookup={lookup}
                         hideHeading
                         labels={{
                           heading: t("structure_heading"),
@@ -399,21 +410,25 @@ export default async function AyahPage({
                     <Deeper
                       title={`${t("facts_heading")} (${facts.length})`}
                     >
-                      <div className="@container">
-                        <div className="grid grid-cols-1 gap-4 @2xl:grid-cols-2">
-                          {facts.map((f) => (
-                            <FactCard
-                              key={f.id}
-                              fact={f}
-                              labels={{
-                                method: t("fact_method"),
-                                where: t("fact_where"),
-                                sources: tw("sources"),
-                              }}
-                            />
-                          ))}
+                      {/* Location chips open the ayah in a dialog (operator 2026-10-12). */}
+                      <AyahDialogProvider names={surahNamesFor(facts.flatMap((f) => f.locations))}>
+                        <div className="@container">
+                          <div className="grid grid-cols-1 gap-4 @2xl:grid-cols-2">
+                            {facts.map((f) => (
+                              <FactCard
+                                key={f.id}
+                                fact={f}
+                                lookup={lookup}
+                                labels={{
+                                  method: t("fact_method"),
+                                  where: t("fact_where"),
+                                  sources: tw("sources"),
+                                }}
+                              />
+                            ))}
+                          </div>
                         </div>
-                      </div>
+                      </AyahDialogProvider>
                     </Deeper>
                   )}
                 </div>

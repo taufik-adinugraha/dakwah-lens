@@ -37,10 +37,21 @@ the harakat page and the word-parts diagrams too):
   [[bi-|q:1:1:1/1]]          the k-th QAC 0.4 segment of that word (a part of it)
   [[ya’|q:1:2:4#7]]          the n-th letter of that word, with its marks (rule 7: the letter
                              as in the ayah, never its spelled-out name)
+  [[“nama Allah”|q:1:1:1-2]] a GLOSS: an example given in the prose only as its Indonesian
+                             translation (operator 2026-10-12, on /konsep/idhafah: "better provide
+                             example, not only the translation 'nama Allah', but also write in arabic
+                             'bismillah'"). The surface is the quoted gloss itself, quotes included,
+                             so the plain text keeps it as it was; the page shows the Arabic of the
+                             ayah words it translates after it, “nama Allah” (بِسْمِ ٱللَّهِ). Only
+                             for a surface that is ONE quotation “…” and a word, run or segment ref:
+                             its ref is resolved and byte-checked like any other, but its Latin is
+                             not compared with the bytes (it is no transliteration).
 
 build_library.py strips the markup into today's plain fields (narration, metadata titles and the
 older prose checks read those, byte-identical) and ships the marked text beside them; the bytes
 of every q-ref go to library.json `quran`, resolved here from the pinned Tanzil file and QAC.
+build_surah.py does the same for the lesson prose of a marked surah (word cards, the ayah
+structure, the facts; `MARKED_SURAHS`), each lesson file shipping its own `quran` bytes.
 A term form left UNMARKED in prose fails the build (`unmarked`), except the forms marked
 `ambiguous` in the table (huruf, hal, sifat, bab, jumlah, syarat: ordinary Indonesian words
 too), which an author marks only where they are the term.
@@ -65,6 +76,9 @@ from pathlib import Path
 
 PIPELINE = Path(__file__).resolve().parent
 TERMS_JSON = PIPELINE / "authored" / "library.terms.json"
+# Lessons whose prose (word cards, ayah structure, facts) carries the markup (build_surah.py,
+# 2026-10-12). The Mu'awwidzat lessons are hidden on the live site and not marked yet.
+MARKED_SURAHS = ("al-fatihah",)
 PRONUNCIATION_JSON = PIPELINE / "authored" / "pronunciation.json"
 
 # ------------------------------------------------------------------ letters and marks
@@ -440,6 +454,33 @@ def term_index(table: dict) -> tuple[dict[str, dict], dict[str, dict]]:
     return by_id, by_form
 
 
+# A gloss variant's surface: ONE quotation “…” with nothing outside it (2026-10-12).
+GLOSS = re.compile(r"^“[^“”]+”$")
+
+
+def is_gloss(surface: str) -> bool:
+    """Is this span's surface a quoted Indonesian gloss (the gloss variant), not a transliteration?"""
+    return bool(GLOSS.match(surface))
+
+
+def gloss_problems(surface: str, ref: str | None, where: str) -> list[str]:
+    """The gloss variant is for a quoted gloss of Qur'anic words only: the surface one quotation
+    “…”, the ref a word, run or segment (a letter has no gloss)."""
+    if "“" not in surface and "”" not in surface:
+        return []
+    span = f"[[{surface}{'|' + ref if ref else ''}]]"
+    if not is_gloss(surface):
+        return [f"{where}: {span}: a gloss variant's surface must be one quoted Indonesian gloss, “…” around "
+                f"all of it (a transliteration is never quoted)"]
+    m = QREF.match(ref or "")
+    if not m:
+        return [f"{where}: {span}: a gloss variant names the Qur'anic words it translates (q:S:A:W, -W2 or /k), "
+                f"not a term"]
+    if m.group(6):
+        return [f"{where}: {span}: a gloss translates words, not a letter (#{m.group(6)})"]
+    return []
+
+
 def resolve(surface: str, ref: str | None, by_id: dict, by_form: dict) -> tuple[str, str] | None:
     """("term", id) | ("q", ref) | None when the span names nothing. A bare [[surface]] is looked
     up by its form; marking an ambiguous form is itself the author's statement that it is the term."""
@@ -477,6 +518,37 @@ def unmarked(text: str, table: dict) -> list[str]:
     return found
 
 
+def mark_terms(text: str, table: dict, ambiguous: bool = False) -> str:
+    """`text` (no markup) with every term form marked by id, [[surface|id]], longest form first,
+    whole words (the forms `unmarked` finds; with `ambiguous`, the ambiguous forms too). Only for
+    a closed vocabulary built by the pipeline, where every form IS the term: a word class from
+    QAC tags ("huruf jar + dhamir muttashil", "isim sifat (isim fa'il)") or a tashrif label
+    ("fi'il mudhari'"). Authored prose is marked by its author."""
+    pats = []
+    for t in table.get("terms", []):
+        amb = {f.lower() for f in t.get("ambiguous_forms", [])}
+        for f in t.get("forms", []):
+            if ambiguous or f.lower() not in amb:
+                pats.append((f, t["id"]))
+    pats.sort(key=lambda x: len(x[0]), reverse=True)
+    rest = MARKUP.sub(lambda m: " " * len(m.group(0)), text)  # markup already there stays as it is
+    taken = [False] * len(text)
+    found = []
+    for f, tid in pats:
+        rx = re.compile(rf"(?<![{_WORD_CHARS}]){re.escape(f)}(?:-?nya)?(?![{_WORD_CHARS}])", re.I)
+        for m in rx.finditer(rest):
+            if any(taken[m.start():m.end()]):
+                continue
+            for i in range(m.start(), m.end()):
+                taken[i] = True
+            found.append((m.start(), m.end(), tid))
+    out, cur = "", 0
+    for a, b, tid in sorted(found):
+        out += text[cur:a] + f"[[{text[a:b]}|{tid}]]"
+        cur = b
+    return out + text[cur:]
+
+
 def names_term(surface: str, term: dict) -> bool:
     """Does the surface name this term (one of its forms or its Latin, maybe with an Indonesian
     affix: "isimnya", "mashdar-nya")? Review 2026-10-10: an explicit [[majrur|marfu]] passed
@@ -492,6 +564,10 @@ def check_markup(text: str, where: str, by_id: dict, by_form: dict, table: dict)
     if text.count("[[") != text.count("]]") or "[[" in strip(text) or "]]" in strip(text):
         errs.append(f"{where}: unbalanced or nested [[…]] markup")
     for surface, ref in spans(text):
+        g = gloss_problems(surface, ref, where)
+        if g or is_gloss(surface):
+            errs += g
+            continue
         r = resolve(surface, ref, by_id, by_form)
         if r is None:
             errs.append(f"{where}: [[{surface}{'|' + ref if ref else ''}]] names no term in library.terms.json "
@@ -583,6 +659,12 @@ BARE_QUOTE_OK = {
     "concepts[huruf-jar].summary",      # al-fatihah:1:concept:huruf-jar has audio
     "concepts[fiil-amr].summary",       # narrated "seperti kata … yang artinya …" (another ayah's word)
     "concepts[isim-maushul].summary",   # the same
+    # Al-Fatihah's ayah structures, marked 2026-10-12: their plain text is the recorded narration
+    # of the structure steps ("bismi (“dengan nama”)"), which cannot change without a re-render.
+    "structure[1:1].summary",
+    "structure[1:4].groups[0].label",
+    "structure[1:6].summary",
+    "structure[1:7].groups[2].label",
 }
 _BARE_QUOTE = re.compile(r"\[\[[^\[\]|]+\|q:[^\[\]]+\]\],? \(?“")
 _BERARTI = re.compile(r"\[\[[^\[\]|]+\|q:[^\[\]]+\]\],? \(?berarti\b", re.I)
@@ -640,6 +722,97 @@ def resolve_q(ref: str, tanzil_token, qac_segments) -> str:
     if m.group(6):
         return letter_of(word, int(m.group(6)))
     return word
+
+
+# A letter q-ref's surface must name its letter (rule 7: the letter as in the ayah).
+LETTER_NAMES = {
+    "ا": {"alif"}, "ب": {"ba’", "ba'"}, "ت": {"ta’", "ta'"}, "ث": {"tsa’"}, "ج": {"jim"}, "ح": {"ha’"},
+    "خ": {"kha’"}, "د": {"dal"}, "ذ": {"dzal"}, "ر": {"ra’", "ra"}, "ز": {"zai"}, "س": {"sin"}, "ش": {"syin"},
+    "ص": {"shad"}, "ض": {"dhad"}, "ط": {"tha’"}, "ظ": {"zha’"}, "ع": {"‘ain"}, "غ": {"ghain"}, "ف": {"fa’"},
+    "ق": {"qaf"}, "ك": {"kaf"}, "ل": {"lam"}, "م": {"mim"}, "ن": {"nun"}, "و": {"wawu"}, "ه": {"ha’"},
+    "ي": {"ya’", "ya'"}, "ى": {"ya’", "alif"}, "ء": {"hamzah"}, "أ": {"hamzah", "alif"}, "إ": {"hamzah", "alif"},
+}
+PAUSAL = re.compile(r"(un|in|an|u|i|a)$")
+
+
+def _same_surface(surface: str, want: str, last: bool) -> bool:
+    s = surface if surface.startswith("All") else surface[:1].lower() + surface[1:]
+    return s == want or (last and PAUSAL.search(want) is not None and s == PAUSAL.sub("", want))
+
+
+def translit_problems(surface: str, ref: str, where: str, translit: dict[str, str]) -> list[str]:
+    """A lesson word's or run's Latin is its transliteration: each word of a run as the lessons
+    write it (multi-word transliterations, wa lā, count as their words), the last one maybe pausal
+    ("aḥad"); a single word likewise ("al-magḍūb", "rabb"). `translit`: lesson loc → its
+    transliteration. Refs outside the lesson words, segments, letters and glosses: nothing here."""
+    m = QREF.match(ref)
+    if not m or is_gloss(surface) or m.group(5) or m.group(6):
+        return []
+    s, a, w = int(m.group(1)), int(m.group(2)), int(m.group(3))
+    if m.group(4):
+        locs = [f"{s}:{a}:{k}" for k in range(w, int(m.group(4)) + 1)]
+        if all(loc in translit for loc in locs):
+            words = surface.split(" ")
+            want = [translit[loc] for loc in locs]
+            flat = " ".join(want).split(" ")
+            if len(words) != len(flat) or not all(_same_surface(x, y, i == len(flat) - 1)
+                                                  for i, (x, y) in enumerate(zip(words, flat))):
+                return [f"{where}: [[{surface}|{ref}]]: the words are {' '.join(want)!r}"]
+    elif f"{s}:{a}:{w}" in translit and not _same_surface(surface, translit[f"{s}:{a}:{w}"], True):
+        return [f"{where}: [[{surface}|{ref}]]: the word's transliteration is {translit[f'{s}:{a}:{w}']!r}"]
+    return []
+
+
+def q_problems(surface: str, ref: str, where: str, translit: dict[str, str], tanzil_token, qac_segments) -> list[str]:
+    """Everything wrong with one q-ref span (build_library.py and build_surah.py share it):
+    translit_problems; a letter's surface names its letter; every word, run and segment ref
+    resolves and its Latin names its bytes (surface_matches). A gloss variant (“…”, is_gloss) is
+    resolved only: it is a translation, not a transliteration."""
+    m = QREF.match(ref)
+    if not m:
+        return [f"{where}: bad q-ref {ref!r}"]
+    s, a, w = int(m.group(1)), int(m.group(2)), int(m.group(3))
+    if "“" in surface or "”" in surface:
+        out = gloss_problems(surface, ref, where)
+        if not is_gloss(surface):
+            return out
+        try:
+            resolve_q(ref, tanzil_token, qac_segments)
+        except ValueError as x:
+            out.append(f"{where}: [[{surface}|{ref}]]: {x}")
+        return out
+    out = translit_problems(surface, ref, where, translit)
+    if m.group(6):  # a letter: the surface names that letter
+        try:
+            letter = letter_of(tanzil_token(s, a, w) or "", int(m.group(6)))
+        except ValueError as x:
+            return out + [f"{where}: {x}"]
+        if surface.lower() not in LETTER_NAMES.get(letter[0], set()):
+            out.append(f"{where}: [[{surface}|{ref}]] names the letter {letter[0]}, whose name is "
+                       f"{sorted(LETTER_NAMES.get(letter[0], {'?'}))}")
+        return out
+    try:  # every word, run and segment: the Latin names the bytes (surface_matches)
+        ar = resolve_q(ref, tanzil_token, qac_segments)
+    except ValueError as x:
+        return out + [f"{where}: {x}"]
+    if not surface_matches(surface, ar):
+        out.append(f"{where}: [[{surface}|{ref}]]: {surface!r} does not name {ar} "
+                   f"(consonants {skeleton_latin(surface)!r} vs {skeleton_ar(ar)!r})")
+    return out
+
+
+_TYPED_AR_RUN = re.compile(r"[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]+")
+
+
+def typed_arabic(marked: str, where: str) -> list[str]:
+    """An Arabic word written into a marked field by hand, outside a «…» quotation of the pinned
+    text (single letters, a root's "ر ح م", are prose: validate.check_prose): the Arabic of a term
+    or a Qur'anic word comes from its markup, never typed (a gloss variant included: “nama Allah”
+    is followed by the bytes of its ref, not by Arabic typed after it)."""
+    rest = re.sub(r"«[^«»]*»", " ", marked)
+    words = [w for w in _TYPED_AR_RUN.findall(rest) if len(w) > 1]
+    return [f"{where}: typed Arabic {words[0]!r} in a marked field: the Arabic comes from the markup (the term "
+            f"table, the Tanzil/QAC bytes), never typed"] if words else []
 
 
 # ------------------------------------------------------------------ word parts (rule 14)

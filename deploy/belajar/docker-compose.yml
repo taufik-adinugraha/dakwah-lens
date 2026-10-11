@@ -14,7 +14,8 @@ services:
     image: dakwah-belajar-web:latest
     restart: unless-stopped
     # Created once by deploy.sh (mode 600): DATABASE_URL for the module's own
-    # `dakwah_belajar` database, MAIN_APP_INTERNAL_URL for session lookups.
+    # `dakwah_belajar` database. (MAIN_APP_INTERNAL_URL, written there by older
+    # installs for sign-in, is no longer read: the module has no sign-in, 2026-10-12.)
     # Optional, added by hand: BELAJAR_WARIS=on shows the Ilmu Waris track,
     # hidden while the line is absent (operator, 2026-10-10;
     # belajar/src/lib/features.ts); BELAJAR_SURAHS=al-fatihah,al-ikhlas,…
@@ -41,8 +42,8 @@ services:
     networks: [dakwah]
 
 networks:
-  # Joins the main stack's network to reach `postgres` (own DB + role) and
-  # `web` (session lookup). Created by the main compose project.
+  # Joins the main stack's network to reach `postgres` (own DB + role).
+  # Created by the main compose project.
   dakwah:
     external: true
     name: dakwah-lens_dakwah

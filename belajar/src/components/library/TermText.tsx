@@ -1,8 +1,9 @@
 import { Link } from "@/i18n/navigation";
-import { termEmphasis } from "@/lib/emphasis";
+import { leadMeaning, termEmphasis } from "@/lib/emphasis";
 import { conceptHref } from "@/lib/routes";
 import { type HeadTerm, termDisplay, type Token } from "@/lib/terms";
 
+import { MarkCircle } from "./MarkCircle";
 import { MixedText, type Overlay } from "./MixedText";
 
 /** The Harakat page (Dasar membaca); a harakah term's first use on a page links here. */
@@ -33,7 +34,16 @@ export const HARAKAT_PAGE = "harakat";
  * its Arabic), bold (src/lib/emphasis.ts termEmphasis) — after TermText's own styles, so a term's
  * or a Qur'anic word's colour stays as it is and a bold harakah term stays inside its link.
  */
-export function TermText({ tokens, links = true, emphasis = false }: { tokens: Token[]; links?: boolean; emphasis?: boolean }) {
+export function TermText({
+  tokens,
+  links = true,
+  emphasis = false,
+}: {
+  tokens: Token[];
+  links?: boolean;
+  /** true: termEmphasis; "lead": a Kosakata meaning's lead (leadMeaning, of the text drawn). */
+  emphasis?: boolean | "lead";
+}) {
   const { text, marks } = termDisplay(tokens);
   const overlays = marks.flatMap((m): Overlay[] =>
     m.kind !== "link"
@@ -52,15 +62,39 @@ export function TermText({ tokens, links = true, emphasis = false }: { tokens: T
           ]
         : [],
   );
-  return <MixedText text={text} overlays={overlays} emphasis={emphasis ? termEmphasis(tokens) : undefined} />;
+  const spans = emphasis === "lead" ? leadMeaning(text) : emphasis ? termEmphasis(tokens) : undefined;
+  return <MixedText text={text} overlays={overlays} emphasis={spans} />;
+}
+
+/**
+ * A prose field that may have a marked twin (a lesson's word card, its ayah structure and facts, a
+ * Kosakata page; 2026-10-12): its tokens (annotated by the caller in reading order, so "first use"
+ * is the first one the reader meets: src/lib/terms.ts markedTokens) drawn by TermText; without a
+ * marked twin (`tokens` null: a lesson not marked yet), the plain text exactly as before.
+ */
+export function Prose({
+  tokens,
+  plain,
+  links,
+  emphasis,
+}: {
+  tokens: Token[] | null;
+  plain: string;
+  links?: boolean;
+  emphasis?: boolean | "lead";
+}) {
+  if (tokens) return <TermText tokens={tokens} links={links} emphasis={emphasis} />;
+  const spans = emphasis === "lead" ? leadMeaning(plain) : emphasis ? true : undefined;
+  return <MixedText text={plain} emphasis={spans} />;
 }
 
 /**
  * A title's Arabic headword (its terms, e.g. حَرْف جَرّ · اِسْم مَجْرُور), shown large under it. It
  * wraps BETWEEN terms on a phone (review 2026-10-10: one unbreakable line ran off the left edge
  * of an RTL box): each term is one nowrap item with its separator after it, so a line may end
- * with "·" but never starts with one, and a term never breaks. A harakah term carries its sound
- * ("ضَمَّة u"), since the title is where a beginner meets it first.
+ * with "·" but never starts with one, and a term never breaks. A harakah term carries its sign on
+ * a small dotted circle, as the Harakat page draws it ("ضَمَّة" with ـُ, never "u": operator
+ * 2026-10-12), since the title is where a beginner meets it first.
  */
 export function Headword({ head, className = "" }: { head: HeadTerm[]; className?: string }) {
   if (!head.length) return null;
@@ -69,9 +103,9 @@ export function Headword({ head, className = "" }: { head: HeadTerm[]; className
       {head.map((h, i) => (
         <span key={h.ar} className="inline-flex items-baseline whitespace-nowrap">
           <bdi>{h.ar}</bdi>
-          {h.sound ? (
-            <span lang="id" dir="ltr" className="ms-1.5 font-body text-base text-ink-muted">
-              {h.sound}
+          {h.mark ? (
+            <span className="ms-2 self-center">
+              <MarkCircle mark={h.mark} size="xs" />
             </span>
           ) : null}
           {i < head.length - 1 ? (

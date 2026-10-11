@@ -68,7 +68,8 @@ Shared library (belajar/content/library.json) and the lesson's links into it
  16. Prose of the library, the structures and the roles goes through 1 (quotes byte-exact, no
      unquoted Arabic words) and, together with the lesson prose, through 10.
  17. Pins: data_versions name the current sha256 of each lesson's authored words, structure and
-     concepts map (and facts / hadith when the lesson was built from them), and of the lexicon,
+     concepts map (and facts / hadith when the lesson was built from them, and the facts' markup
+     overlay of a marked lesson, <slug>.facts.marked.json), and of the lexicon,
      concepts, terms, basics and parts files. The Konsep terms in Arabic script and the inline
      markup (operator 2026-10-10) have their own validator, validate_terms.py (CI: --no-corpus).
  18. App wiring: src/lib/content.ts loads exactly the lessons in content/, in mushaf order, and
@@ -995,10 +996,10 @@ def check_lesson(spec, data: dict, ctx: dict) -> tuple[list[tuple[str, str]], se
             fail(f"{lp} data_versions.quran_align lacks {n} sha256")
     for key, kind in (("authored_words", "words"), ("authored_structure", "structure"),
                       ("authored_concepts_map", "concepts-map"), ("authored_facts", "facts.generated"),
-                      ("authored_hadith", "hadith")):
+                      ("authored_hadith", "hadith"), ("authored_facts_marked", "facts.marked")):
         f = authored_file(spec.slug, kind)
-        if key in ("authored_facts", "authored_hadith") and not f.exists() and key not in dv:
-            continue  # optional input, not used
+        if key in ("authored_facts", "authored_hadith", "authored_facts_marked") and not f.exists() and key not in dv:
+            continue  # optional input, not used (the facts' markup overlay: a marked lesson only)
         if key == "authored_facts" and spec.slug == "al-fatihah":
             continue  # Al-Fatihah's facts are recomputed by facts.py
         if not f.exists():

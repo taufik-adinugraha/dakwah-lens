@@ -15,7 +15,7 @@ import { SURAH_INDEX, WORD_AR, WORD_INFO } from "@/lib/content";
 import { visibleSurahs } from "@/lib/features";
 import { getBasic, getConcept, LIBRARY, TERMS } from "@/lib/library";
 import { conceptHref, conceptIndexHref } from "@/lib/routes";
-import { annotate, prepareSigns, Scope, soundsOf, titleParts } from "@/lib/terms";
+import { annotate, prepareSigns, Scope, titleParts } from "@/lib/terms";
 
 export const dynamicParams = false;
 
@@ -115,7 +115,7 @@ function BasicArticle({
   // Its own subject: no "tanda bunyi … " reminders and no links back to itself.
   const sc = new Scope(false);
   const mk = basic.marked;
-  const title = mk ? titleParts(mk.title, sc, TERMS, soundsOf(basic.signs)) : { tokens: [{ kind: "text" as const, text: basic.title }], head: [] };
+  const title = mk ? titleParts(mk.title, sc, TERMS) : { tokens: [{ kind: "text" as const, text: basic.title }], head: [] };
   const summary = mk ? annotate(mk.summary, sc, TERMS) : [{ kind: "text" as const, text: basic.summary }];
   const explanation = (mk?.explanation ?? basic.explanation).map((p) =>
     mk ? annotate(p, sc, TERMS) : [{ kind: "text" as const, text: p }],

@@ -1,7 +1,9 @@
 import type { CaseState } from "@/content/schema";
 import { CASE_META } from "@/lib/cases";
+import type { Token } from "@/lib/terms";
 
 import { MixedText } from "../library/MixedText";
+import { TermText } from "../library/TermText";
 
 /**
  * The case's gesture shape as an SVG at 1em, filled with the case colour
@@ -34,8 +36,38 @@ export function CaseShape({ state, className }: { state: CaseState; className?: 
  * (مَجْرُور) · kasrah (كَسْرَة)", content/quiz; operator 2026-10-10: "write the
  * arabic word in quiz as well").
  */
-export function CaseBadge({ state, sign, label }: { state: CaseState; sign?: string; label?: string }) {
+export function CaseBadge({
+  state,
+  sign,
+  label,
+  labelTokens,
+  signTokens,
+}: {
+  state: CaseState;
+  sign?: string;
+  label?: string;
+  /** A word card's label and sign as marked tokens (2026-10-12: "majrūr (مَجْرُور) · kasrah (كَسْرَة)",
+   *  the term table's Arabic; a letter sign as the ayah writes it, "ya' (ي)"): they win over
+   *  `label` / `sign`. */
+  labelTokens?: Token[] | null;
+  signTokens?: Token[] | null;
+}) {
   const m = CASE_META[state];
+  if (labelTokens || signTokens) {
+    return (
+      <span
+        className={`inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-0.5 rounded-full border-[1.5px] px-3 py-1 text-sm font-semibold ${m.className}`}
+      >
+        <CaseShape state={state} />
+        <span>{labelTokens ? <TermText tokens={labelTokens} links={false} /> : m.label}</span>
+        {signTokens && signTokens.length ? (
+          <span className="min-w-0 font-normal">
+            <TermText tokens={[{ kind: "text", text: "· " }, ...signTokens]} links={false} />
+          </span>
+        ) : null}
+      </span>
+    );
+  }
   return (
     <span
       className={`inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-0.5 rounded-full border-[1.5px] px-3 py-1 text-sm font-semibold ${m.className}`}

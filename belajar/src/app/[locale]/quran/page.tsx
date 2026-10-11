@@ -195,10 +195,6 @@ export default async function QuranTrackPage({ params }: PageProps<"/[locale]/qu
             </div>
           </details>
 
-          <p className="mt-4 max-w-prose text-base text-ink-muted">
-            <span className="font-semibold text-ink">{t("next_heading")}:</span>{" "}
-            <MixedText text={t("next_body")} />
-          </p>
         </section>
 
         <section className="mt-12" aria-labelledby="how">

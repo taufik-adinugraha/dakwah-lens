@@ -13,10 +13,11 @@ import { TermText } from "@/components/library/TermText";
 
 import { measure } from "../../scripts/ci/linebreaks-measure.mjs";
 
+import { caseLabelMarked } from "./cases";
 import { SURAHS, WORD_INFO } from "./content";
 import { captionSpans, emphasisSpans, partEmphasis, termEmphasis } from "./emphasis";
 import { LIBRARY, TERMS } from "./library";
-import { annotate, prepareParts, Scope, soundsOf, termDisplay, titleParts, type Token } from "./terms";
+import { annotate, lessonLookup, prepareParts, Scope, soundsOf, termDisplay, titleParts, type Token } from "./terms";
 import { ARABIC_RUN, arabicRuns, hasArabic, joinUnits, rtlRuns, textUnits, type Seg } from "./textUnits";
 
 // Line breaks (operator, 2026-10-10: "make sure the line break is clean and easy to read,
@@ -73,9 +74,9 @@ const TERM_TEXTS: [string, string][] = (() => {
     const fields = [mk.summary, ...mk.explanation, ...(mk.bridge ? [mk.bridge] : []), ...mk.notes];
     for (const hints of [true, false]) {
       const page = new Scope(hints);
-      add(`${rec.id}.title`, titleParts(mk.title, page, TERMS, sounds).tokens);
+      add(`${rec.id}.title`, titleParts(mk.title, page, TERMS).tokens);
       fields.forEach((f, i) => add(`${rec.id}[${i}] (page)`, annotate(f, page, TERMS)));
-      add(`${rec.id}.title (card)`, titleParts(mk.title, new Scope(hints), TERMS, sounds).tokens);
+      add(`${rec.id}.title (card)`, titleParts(mk.title, new Scope(hints), TERMS).tokens);
       fields.forEach((f, i) => add(`${rec.id}[${i}] (alone)`, annotate(f, new Scope(hints), TERMS)));
     }
   }
@@ -86,6 +87,60 @@ const TERM_TEXTS: [string, string][] = (() => {
     d.tiles.forEach((t, i) => add(`parts ${p.loc} tile ${i}`, t.label));
     d.steps.forEach((st, i) => add(`parts ${p.loc} step ${i}`, st));
   }
+  // A marked lesson's word cards, ayah structure and facts, and the Kosakata prose (2026-10-12):
+  // each field alone (every term and word with its Arabic) and in a card's scope, without and with
+  // the harakah reminders; the case chip's label and sign.
+  for (const s of SURAHS) {
+    const lookup = lessonLookup(TERMS, s);
+    for (const a of s.ayat) {
+      for (const w of a.words) {
+        const mk = w.marked;
+        if (!mk) continue;
+        const fields = [
+          caseLabelMarked(w.case.state),
+          ...(mk.sign ? [mk.sign] : []),
+          mk.why,
+          ...(mk.role ? [mk.role] : []),
+          ...(mk.wazn ? [mk.wazn] : []),
+          ...mk.ikhtilaf.flatMap((x) => [`${x.point}:`, ...x.options]),
+        ];
+        for (const hints of [false, true]) {
+          const card = new Scope(hints);
+          fields.forEach((f, i) => {
+            add(`${w.loc}[${i}] (card)`, annotate(f, card, lookup));
+            add(`${w.loc}[${i}] (alone)`, annotate(f, new Scope(hints), lookup));
+          });
+        }
+      }
+      const st = a.structure?.marked;
+      if (st) {
+        const sec = new Scope();
+        [st.type, st.summary, ...st.groups].forEach((f, i) => {
+          add(`structure ${a.loc}[${i}]`, annotate(f, sec, lookup));
+          add(`structure ${a.loc}[${i}] (alone)`, annotate(f, new Scope(), lookup));
+        });
+      }
+    }
+    for (const f of s.facts) {
+      const mk = f.marked;
+      if (!mk) continue;
+      const card = new Scope(false);
+      [mk.title, mk.body, mk.method].forEach((x, i) => {
+        add(`fact ${f.id}[${i}]`, annotate(x, card, lookup));
+        add(`fact ${f.id}[${i}] (alone)`, annotate(x, new Scope(), lookup));
+      });
+    }
+  }
+  for (const lx of LIBRARY.lexicon) {
+    const mk = lx.marked;
+    if (!mk) continue;
+    const page = new Scope();
+    [mk.meaning, mk.pos, ...(mk.bab ? [mk.bab] : []), ...mk.labels, ...mk.ilal].forEach((f, i) => {
+      add(`lexeme ${lx.id}[${i}]`, annotate(f, page, TERMS));
+      add(`lexeme ${lx.id}[${i}] (alone)`, annotate(f, new Scope(), TERMS));
+    });
+  }
+  for (const r of LIBRARY.roots) if (r.marked) add(`root ${r.id}`, annotate(r.marked.meaning, new Scope(), TERMS));
   return out;
 })();
 
@@ -341,6 +396,19 @@ describe("textUnits: a term stays with its Arabic", () => {
       parts: [{ text: "waswasa–yuwaswisu" }, { text: "(يُوَسْوِسُ)" }],
     });
     expect(units("seperti bi- (بِ) “dengan”")[0]).toMatchObject({ parts: [{ text: "bi-" }, { text: "(بِ)" }] });
+    // A quoted gloss of Qur'anic words with their Arabic after it (TermText's gloss variant,
+    // 2026-10-12): its last word, closing quote and all, keeps the Arabic; the whole gloss while
+    // it fits the line.
+    expect(units("isim seperti “nama Allah” (بِسْمِ ٱللَّهِ), dan")[0]).toEqual({
+      kind: "unit",
+      parts: [
+        { text: "“nama", arabic: false },
+        { text: "Allah”", arabic: false },
+        { text: "(بِسْمِ ٱللَّهِ),", arabic: true },
+      ],
+      gaps: [" ", " "],
+      seam: [1, 2],
+    });
     expect(units("· kasrah (كَسْرَة)")).toEqual([
       { kind: "unit", parts: [{ text: "· kasrah", arabic: false }, { text: "(كَسْرَة)", arabic: true }], gaps: [" "], seam: [0, 1] },
     ]);

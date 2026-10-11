@@ -38,14 +38,14 @@
       "translit": "bismi",
       "gloss": "dengan nama",
       "wazn": null,
-      "case": { "state": "majrur", "sign": "kasrah" },
-      "why": "Akhirnya kasrah karena kata ism (nama) didahului huruf jar bi- (dengan).",
+      "case": { "state": "majrur", "sign": "[[kasrah]]" },
+      "why": "Akhirnya [[kasrah]] karena kata [[ism|q:1:1:1/2]] (nama) didahului [[huruf jar]] [[bi-|q:1:1:1/1]] (dengan).",
       "ikhtilaf": [
         {
-          "point": "Bismi bergantung pada kata yang tersirat; yang mana? (Darwisy menilai kedua pendapat ini baik)",
+          "point": "[[Bismi|q:1:1:1]] bergantung pada kata yang tersirat; yang mana? (Darwisy menilai kedua pendapat ini baik)",
           "options": [
-            "Kata kerja tersirat seperti abtadi’u ('aku memulai'), sehingga jar-majrur ini berkedudukan nashab — Darwisy; an-Nahhas menisbatkan pendapat ini kepada al-Farra' (Kufah)",
-            "Khabar tersirat bagi mubtada' tersirat ibtidā’ī ('permulaanku') — al-Jadwal, al-Mujtaba, Darwisy; an-Nahhas menisbatkannya kepada ulama Bashrah"
+            "Kata kerja tersirat seperti abtadi’u ('aku memulai'), sehingga [[jar-majrur]] ini berkedudukan [[nashab]] — Darwisy; an-Nahhas menisbatkan pendapat ini kepada al-Farra' (Kufah)",
+            "[[Khabar]] tersirat bagi [[mubtada']] tersirat ibtidā’ī ('permulaanku') — al-Jadwal, al-Mujtaba, Darwisy; an-Nahhas menisbatkannya kepada ulama Bashrah"
           ]
         }
       ],
@@ -56,8 +56,8 @@
       "translit": "Allāhi",
       "gloss": "Allah",
       "wazn": null,
-      "case": { "state": "majrur", "sign": "kasrah" },
-      "why": "Akhirnya kasrah karena menjadi mudhaf ilaih dari kata ismi.",
+      "case": { "state": "majrur", "sign": "[[kasrah]]" },
+      "why": "Akhirnya [[kasrah]] karena menjadi [[mudhaf ilaih]] dari kata [[ismi|q:1:1:1/2]].",
       "ikhtilaf": [],
       "src": [["D"], ["J"]],
       "review_notes": ["Asal-usul lafaz Allah (murtajal atau musytaq; D dan J berbeda) sengaja tidak dimuat, sesuai kebijakan editorial §8."]
@@ -66,8 +66,8 @@
       "translit": "ar-raḥmāni",
       "gloss": "Yang Maha Pengasih",
       "wazn": "فَعْلان",
-      "case": { "state": "majrur", "sign": "kasrah" },
-      "why": "Akhirnya kasrah karena menjadi sifat (na't) bagi lafaz Allah, dan sifat mengikuti kata yang disifatinya.",
+      "case": { "state": "majrur", "sign": "[[kasrah]]" },
+      "why": "Akhirnya [[kasrah]] karena menjadi sifat ([[na't]]) bagi lafaz Allah, dan sifat mengikuti kata yang disifatinya.",
       "ikhtilaf": [],
       "src": [["D"], ["J"], ["M"]]
     },
@@ -75,31 +75,31 @@
       "translit": "ar-raḥīmi",
       "gloss": "Maha Penyayang",
       "wazn": "فَعِيل",
-      "case": { "state": "majrur", "sign": "kasrah" },
-      "why": "Akhirnya kasrah karena menjadi sifat kedua bagi lafaz Allah, sehingga ikut majrur.",
+      "case": { "state": "majrur", "sign": "[[kasrah]]" },
+      "why": "Akhirnya [[kasrah]] karena menjadi [[sifat]] kedua bagi lafaz Allah, sehingga ikut [[majrur]].",
       "ikhtilaf": [],
       "src": [["J"], ["D"]]
     },
     "1:2:1": {
       "translit": "al-ḥamdu",
       "gloss": "segala puji",
-      "wazn": "فَعْل (mashdar)",
-      "case": { "state": "marfu", "sign": "dhammah" },
-      "why": "Akhirnya dhammah karena menjadi mubtada' (pokok kalimat).",
+      "wazn": "فَعْل ([[mashdar]])",
+      "case": { "state": "marfu", "sign": "[[dhammah]]" },
+      "why": "Akhirnya [[dhammah]] karena menjadi [[mubtada']] (pokok kalimat).",
       "ikhtilaf": [
         {
-          "point": "Apa yang membuat al-ḥamdu marfu'?",
+          "point": "Apa yang membuat [[al-ḥamdu|q:1:2:1]] [[marfu']]?",
           "options": [
-            "Ibtida', yaitu kedudukannya sebagai mubtada' — ulama Bashrah, menurut an-Nahhas",
-            "Dhamir yang tersimpan pada huruf lam, karena lam diperlakukan seperti kata kerja — al-Kisa'i, menurut an-Nahhas",
-            "Huruf lam sebagai 'mahall', karena lam diperlakukan seperti isim — al-Farra', menurut an-Nahhas"
+            "[[Ibtida']], yaitu kedudukannya sebagai [[mubtada']] — ulama Bashrah, menurut an-Nahhas",
+            "[[Dhamir]] yang tersimpan pada huruf [[lam|q:1:2:2#1]], karena [[lam|q:1:2:2#1]] diperlakukan seperti kata kerja — al-Kisa'i, menurut an-Nahhas",
+            "Huruf [[lam|q:1:2:2#1]] sebagai 'mahall', karena [[lam|q:1:2:2#1]] diperlakukan seperti [[isim]] — al-Farra', menurut an-Nahhas"
           ]
         },
         {
-          "point": "Makna alif-lam pada al-ḥamdu",
+          "point": "Makna alif-lam pada [[al-ḥamdu|q:1:2:1]]",
           "options": [
             "istighraq: mencakup seluruh pujian — disebut as-Samin",
-            "jins: jenis pujian — dipilih az-Zamakhsyari, menurut as-Samin; Darwisy juga menyebut al- pada al-ḥamd untuk jins",
+            "jins: jenis pujian — dipilih az-Zamakhsyari, menurut as-Samin; Darwisy juga menyebut [[al-|q:1:2:1/1]] pada [[al-ḥamd|q:1:2:1]] untuk jins",
             "'ahd: pujian yang sudah dikenal — disebut as-Samin"
           ]
         }
@@ -111,14 +111,14 @@
       "translit": "lillāhi",
       "gloss": "bagi Allah",
       "wazn": null,
-      "case": { "state": "majrur", "sign": "kasrah" },
-      "why": "Akhirnya kasrah karena didahului huruf jar li-; jar-majrur ini bergantung pada khabar yang tidak disebut (misalnya 'tetap').",
+      "case": { "state": "majrur", "sign": "[[kasrah]]" },
+      "why": "Akhirnya [[kasrah]] karena didahului [[huruf jar]] [[li-|q:1:2:2/1]]; [[jar-majrur]] ini bergantung pada [[khabar]] yang tidak disebut (misalnya 'tetap').",
       "ikhtilaf": [
         {
-          "point": "Makna huruf lam pada lillāhi",
+          "point": "Makna huruf [[lam|q:1:2:2#1]] pada [[lillāhi|q:1:2:2]]",
           "options": [
             "istihqaq: Allah-lah yang berhak atas pujian — as-Samin",
-            "ikhtishash: semua pujian khusus milik Allah (tinjauan balaghah) — Darwisy, al-Jadwal"
+            "ikhtishash: semua pujian khusus milik Allah (tinjauan [[balaghah]]) — Darwisy, al-Jadwal"
           ]
         }
       ],
@@ -128,14 +128,14 @@
       "translit": "rabbi",
       "gloss": "Tuhan",
       "wazn": "فَعْل",
-      "case": { "state": "majrur", "sign": "kasrah" },
-      "why": "Akhirnya kasrah karena mengikuti lafaz Allah sebagai sifat (na't) atau badal.",
+      "case": { "state": "majrur", "sign": "[[kasrah]]" },
+      "why": "Akhirnya [[kasrah]] karena mengikuti lafaz Allah sebagai sifat ([[na't]]) atau [[badal]].",
       "ikhtilaf": [
         {
-          "point": "Kedudukan rabbi",
+          "point": "Kedudukan [[rabbi|q:1:2:3]]",
           "options": [
-            "sifat (na't) bagi lafaz Allah — an-Nahhas; juga dibolehkan Darwisy, al-Jadwal, as-Samin",
-            "badal dari lafaz Allah — al-Mujtaba; juga dibolehkan Darwisy, al-Jadwal, as-Samin"
+            "sifat ([[na't]]) bagi lafaz Allah — an-Nahhas; juga dibolehkan Darwisy, al-Jadwal, as-Samin",
+            "[[badal]] dari lafaz Allah — al-Mujtaba; juga dibolehkan Darwisy, al-Jadwal, as-Samin"
           ]
         }
       ],
@@ -146,14 +146,14 @@
       "translit": "al-‘ālamīna",
       "gloss": "seluruh alam",
       "wazn": "فَاعَل",
-      "case": { "state": "majrur", "sign": "ya'" },
-      "why": "Majrur dengan tanda ya' karena menjadi mudhaf ilaih dan termasuk kata yang disamakan (mulhaq) dengan jamak mudzakkar salim.",
+      "case": { "state": "majrur", "sign": "[[ya'|q:1:2:4#6]]" },
+      "why": "[[Majrur]] dengan tanda [[ya'|q:1:2:4#6]] karena menjadi [[mudhaf ilaih]] dan termasuk kata yang disamakan ([[mulhaq]]) dengan [[jamak mudzakkar salim]].",
       "ikhtilaf": [
         {
-          "point": "Apakah al-‘ālamīna jamak dari ‘ālam?",
+          "point": "Apakah [[al-‘ālamīna|q:1:2:4]] jamak dari ‘ālam?",
           "options": [
-            "Ya, jamak dari ‘ālam yang disamakan (mulhaq) dengan jamak mudzakkar salim — Darwisy, al-Jadwal, al-Mujtaba",
-            "Bukan; ia isim jam' (bermakna jamak, tetapi tidak punya bentuk tunggal dari lafaznya sendiri) yang berakhiran seperti jamak mudzakkar salim — as-Samin"
+            "Ya, jamak dari ‘ālam yang disamakan ([[mulhaq]]) dengan [[jamak mudzakkar salim]] — Darwisy, al-Jadwal, al-Mujtaba",
+            "Bukan; ia [[isim]] jam' (bermakna jamak, tetapi tidak punya bentuk tunggal dari lafaznya sendiri) yang berakhiran seperti [[jamak mudzakkar salim]] — as-Samin"
           ]
         }
       ],
@@ -164,14 +164,14 @@
       "translit": "ar-raḥmāni",
       "gloss": "Yang Maha Pengasih",
       "wazn": "فَعْلان",
-      "case": { "state": "majrur", "sign": "kasrah" },
-      "why": "Akhirnya kasrah karena sekali lagi menjadi sifat bagi lafaz Allah yang majrur.",
+      "case": { "state": "majrur", "sign": "[[kasrah]]" },
+      "why": "Akhirnya [[kasrah]] karena sekali lagi menjadi [[sifat]] bagi lafaz Allah yang [[majrur]].",
       "ikhtilaf": [
         {
-          "point": "Kedudukan ar-raḥmāni ar-raḥīmi di ayat 3",
+          "point": "Kedudukan [[ar-raḥmāni ar-raḥīmi|q:1:3:1-2]] di ayat 3",
           "options": [
-            "sifat (na't) bagi lafaz Allah — Darwisy, al-Jadwal",
-            "badal dari lafaz Allah — kemungkinan lain dalam al-Jadwal"
+            "sifat ([[na't]]) bagi lafaz Allah — Darwisy, al-Jadwal",
+            "[[badal]] dari lafaz Allah — kemungkinan lain dalam al-Jadwal"
           ]
         }
       ],
@@ -181,14 +181,14 @@
       "translit": "ar-raḥīmi",
       "gloss": "Maha Penyayang",
       "wazn": "فَعِيل",
-      "case": { "state": "majrur", "sign": "kasrah" },
-      "why": "Akhirnya kasrah karena menjadi sifat berikutnya bagi lafaz Allah yang majrur.",
+      "case": { "state": "majrur", "sign": "[[kasrah]]" },
+      "why": "Akhirnya [[kasrah]] karena menjadi [[sifat]] berikutnya bagi lafaz Allah yang [[majrur]].",
       "ikhtilaf": [
         {
-          "point": "Kedudukan ar-raḥmāni ar-raḥīmi di ayat 3",
+          "point": "Kedudukan [[ar-raḥmāni ar-raḥīmi|q:1:3:1-2]] di ayat 3",
           "options": [
-            "sifat (na't) bagi lafaz Allah — Darwisy, al-Jadwal",
-            "badal dari lafaz Allah — kemungkinan lain dalam al-Jadwal"
+            "sifat ([[na't]]) bagi lafaz Allah — Darwisy, al-Jadwal",
+            "[[badal]] dari lafaz Allah — kemungkinan lain dalam al-Jadwal"
           ]
         }
       ],
@@ -198,14 +198,14 @@
       "translit": "māliki",
       "gloss": "Pemilik",
       "wazn": "فَاعِل",
-      "case": { "state": "majrur", "sign": "kasrah" },
-      "why": "Akhirnya kasrah karena menjadi sifat keempat bagi lafaz Allah.",
+      "case": { "state": "majrur", "sign": "[[kasrah]]" },
+      "why": "Akhirnya [[kasrah]] karena menjadi [[sifat]] keempat bagi lafaz Allah.",
       "ikhtilaf": [
         {
-          "point": "Kedudukan māliki",
+          "point": "Kedudukan [[māliki|q:1:4:1]]",
           "options": [
-            "sifat (na't) bagi lafaz Allah — Darwisy, al-Mujtaba, al-Jadwal",
-            "badal dari lafaz Allah — kemungkinan lain dalam al-Jadwal"
+            "sifat ([[na't]]) bagi lafaz Allah — Darwisy, al-Mujtaba, al-Jadwal",
+            "[[badal]] dari lafaz Allah — kemungkinan lain dalam al-Jadwal"
           ]
         }
       ],
@@ -216,8 +216,8 @@
       "translit": "yaumi",
       "gloss": "hari",
       "wazn": null,
-      "case": { "state": "majrur", "sign": "kasrah" },
-      "why": "Akhirnya kasrah karena menjadi mudhaf ilaih bagi māliki.",
+      "case": { "state": "majrur", "sign": "[[kasrah]]" },
+      "why": "Akhirnya [[kasrah]] karena menjadi [[mudhaf ilaih]] bagi [[māliki|q:1:4:1]].",
       "ikhtilaf": [],
       "src": [["D"], ["J"]],
       "review_notes": ["Wazan dikosongkan: Lampiran A memberi fa'l, tetapi tidak ada kitab yang dikutip (Darwisy, al-Jadwal) yang menyebut wazan yaum. Ustadz dapat mengisinya dengan sumber."]
@@ -225,9 +225,9 @@
     "1:4:3": {
       "translit": "ad-dīni",
       "gloss": "pembalasan",
-      "wazn": "فِعْل (mashdar)",
-      "case": { "state": "majrur", "sign": "kasrah" },
-      "why": "Akhirnya kasrah karena menjadi mudhaf ilaih bagi yaumi.",
+      "wazn": "فِعْل ([[mashdar]])",
+      "case": { "state": "majrur", "sign": "[[kasrah]]" },
+      "why": "Akhirnya [[kasrah]] karena menjadi [[mudhaf ilaih]] bagi [[yaumi|q:1:4:2]].",
       "ikhtilaf": [],
       "src": [["J"], ["D"]]
     },
@@ -235,14 +235,14 @@
       "translit": "iyyāka",
       "gloss": "hanya kepada Engkau",
       "wazn": null,
-      "case": { "state": "mabni", "sign": "fathah", "mahall": "mahall nashb" },
-      "why": "Kata ganti ini mabni di atas fathah (akhirnya tetap) dan berkedudukan nashab sebagai objek yang didahulukan, sehingga bermakna 'hanya kepada-Mu'.",
+      "case": { "state": "mabni", "sign": "[[fathah]]", "mahall": "mahall nashb" },
+      "why": "Kata ganti ini [[mabni]] di atas [[fathah]] (akhirnya tetap) dan berkedudukan [[nashab]] sebagai objek yang didahulukan, sehingga bermakna 'hanya kepada-Mu'.",
       "ikhtilaf": [
         {
-          "point": "Bagian mana dari iyyāka yang mabni?",
+          "point": "Bagian mana dari [[iyyāka|q:1:5:1]] yang [[mabni]]?",
           "options": [
-            "Seluruh iyyāka adalah dhamir yang mabni di atas fathah — al-Jadwal",
-            "Iyyā adalah dhamir yang mabni, sedangkan -ka huruf khithab (penanda lawan bicara) — pendapat kedua dalam al-Jadwal; al-Mujtaba juga berpendapat demikian dan menambahkan bahwa iyyā mabni di atas sukun"
+            "Seluruh [[iyyāka|q:1:5:1]] adalah [[dhamir]] yang [[mabni]] di atas [[fathah]] — al-Jadwal",
+            "Iyyā adalah [[dhamir]] yang [[mabni]], sedangkan -ka huruf khithab (penanda lawan bicara) — pendapat kedua dalam al-Jadwal; al-Mujtaba juga berpendapat demikian dan menambahkan bahwa iyyā [[mabni]] di atas [[sukun]]"
           ]
         }
       ],
@@ -252,8 +252,8 @@
       "translit": "na‘budu",
       "gloss": "kami menyembah",
       "wazn": "نَفْعُلُ",
-      "case": { "state": "marfu", "sign": "dhammah" },
-      "why": "Akhirnya dhammah karena fi'il mudhari' ini tidak didahului huruf penashab atau penjazm; pelakunya tersirat, yaitu 'kami'.",
+      "case": { "state": "marfu", "sign": "[[dhammah]]" },
+      "why": "Akhirnya [[dhammah]] karena [[fi'il mudhari']] ini tidak didahului huruf [[penashab]] atau [[penjazm]]; pelakunya tersirat, yaitu 'kami'.",
       "ikhtilaf": [],
       "src": [["D"], ["J"]]
     },
@@ -261,14 +261,14 @@
       "translit": "wa iyyāka",
       "gloss": "dan hanya kepada Engkau",
       "wazn": null,
-      "case": { "state": "mabni", "sign": "fathah", "mahall": "mahall nashb" },
-      "why": "Wawu adalah huruf 'athaf, dan iyyāka (mabni di atas fathah, berkedudukan nashab) diulang sebagai objek yang didahulukan bagi nasta‘īnu agar makna 'hanya' melekat pada kedua perbuatan.",
+      "case": { "state": "mabni", "sign": "[[fathah]]", "mahall": "mahall nashb" },
+      "why": "[[Wawu|q:1:5:3#1]] adalah [[huruf 'athaf]], dan [[iyyāka|q:1:5:3/2]] ([[mabni]] di atas [[fathah]], berkedudukan [[nashab]]) diulang sebagai objek yang didahulukan bagi [[nasta‘īnu|q:1:5:4]] agar makna 'hanya' melekat pada kedua perbuatan.",
       "ikhtilaf": [
         {
-          "point": "Bagian mana dari iyyāka yang mabni?",
+          "point": "Bagian mana dari [[iyyāka|q:1:5:3/2]] yang [[mabni]]?",
           "options": [
-            "Seluruh iyyāka adalah dhamir yang mabni di atas fathah — al-Jadwal",
-            "Iyyā adalah dhamir yang mabni, sedangkan -ka huruf khithab (penanda lawan bicara) — pendapat kedua dalam al-Jadwal; al-Mujtaba juga berpendapat demikian dan menambahkan bahwa iyyā mabni di atas sukun"
+            "Seluruh [[iyyāka|q:1:5:3/2]] adalah [[dhamir]] yang [[mabni]] di atas [[fathah]] — al-Jadwal",
+            "Iyyā adalah [[dhamir]] yang [[mabni]], sedangkan -ka huruf khithab (penanda lawan bicara) — pendapat kedua dalam al-Jadwal; al-Mujtaba juga berpendapat demikian dan menambahkan bahwa iyyā [[mabni]] di atas [[sukun]]"
           ]
         }
       ],
@@ -278,8 +278,8 @@
       "translit": "nasta‘īnu",
       "gloss": "kami mohon pertolongan",
       "wazn": "نَسْتَفْعِلُ",
-      "case": { "state": "marfu", "sign": "dhammah" },
-      "why": "Akhirnya dhammah dengan alasan yang sama seperti na‘budu: fi'il mudhari' tanpa huruf penashab atau penjazm.",
+      "case": { "state": "marfu", "sign": "[[dhammah]]" },
+      "why": "Akhirnya [[dhammah]] dengan alasan yang sama seperti [[na‘budu|q:1:5:2]]: [[fi'il mudhari']] tanpa huruf [[penashab]] atau [[penjazm]].",
       "ikhtilaf": [],
       "src": [["D"], ["J"], ["M", "catatan tentang nasta‘īnu ada pada pembahasan QS 1:6 (halaman cetak belum diverifikasi)", 6]],
       "review_notes": ["Asal nasta‘īnu adalah nasta‘wanu (i'lal); D, J, M sepakat. Bisa dimuat sebagai catatan sharaf. Catatan al-Mujtaba tentang kata ini ada di halaman ayat 6, bukan ayat 5."]
@@ -288,8 +288,8 @@
       "translit": "ihdinā",
       "gloss": "tunjukilah kami",
       "wazn": "افْعِنا",
-      "case": { "state": "mabni", "sign": "dibuangnya huruf 'illah (ya')" },
-      "why": "Fi'il amr yang bermakna doa ini mabni dengan dibuangnya huruf ya' di akhir; pelakunya tersirat ('Engkau'), dan -nā ('kami') adalah objeknya.",
+      "case": { "state": "mabni", "sign": "dibuangnya [[huruf 'illah]] (ya')" },
+      "why": "[[Fi'il amr]] yang bermakna doa ini [[mabni]] dengan dibuangnya huruf ya' di akhir; pelakunya tersirat ('Engkau'), dan [[-nā|q:1:6:1/2]] ('kami') adalah objeknya.",
       "ikhtilaf": [],
       "src": [["D"], ["J"]],
       "review_notes": ["al-Mujtaba QS 1:6 tidak membahas mengapa ihdinā mabni, jadi tidak dikutip untuk kata ini.", "Lampiran A mengosongkan wazan; al-Jadwal menulis 'wazan ihdina: if'ina' (افعنا), dipakai di sini persis seperti di laporan riset §2."]
@@ -298,14 +298,14 @@
       "translit": "aṣ-ṣirāṭa",
       "gloss": "jalan",
       "wazn": null,
-      "case": { "state": "manshub", "sign": "fathah" },
-      "why": "Akhirnya fathah karena menjadi objek kedua (maf'ul bih kedua) dari ihdi.",
+      "case": { "state": "manshub", "sign": "[[fathah]]" },
+      "why": "Akhirnya [[fathah]] karena menjadi objek kedua ([[maf'ul bih]] kedua) dari [[ihdi|q:1:6:1/1]].",
       "ikhtilaf": [
         {
-          "point": "Mengapa aṣ-ṣirāṭa manshub?",
+          "point": "Mengapa [[aṣ-ṣirāṭa|q:1:6:2]] [[manshub]]?",
           "options": [
-            "Objek kedua dari ihdi — al-Jadwal, al-Mujtaba, Darwisy",
-            "Manshub karena huruf jarnya dibuang (naz' al-khafidh), sebab hadā biasanya memerlukan li- atau ilā untuk objek kedua — Darwisy"
+            "Objek kedua dari [[ihdi|q:1:6:1/1]] — al-Jadwal, al-Mujtaba, Darwisy",
+            "[[Manshub]] karena [[huruf jarnya|huruf-jar]] dibuang ([[naz' al-khafidh]]), sebab [[hadā|q:6:90:3]] biasanya memerlukan [[li-|q:1:2:2/1]] atau [[ilā]] untuk objek kedua — Darwisy"
           ]
         }
       ],
@@ -316,8 +316,8 @@
       "translit": "al-mustaqīma",
       "gloss": "yang lurus",
       "wazn": "مُسْتَفْعِل",
-      "case": { "state": "manshub", "sign": "fathah" },
-      "why": "Akhirnya fathah karena menjadi sifat bagi aṣ-ṣirāṭa yang manshub.",
+      "case": { "state": "manshub", "sign": "[[fathah]]" },
+      "why": "Akhirnya [[fathah]] karena menjadi [[sifat]] bagi [[aṣ-ṣirāṭa|q:1:6:2]] yang [[manshub]].",
       "ikhtilaf": [],
       "src": [["D", "jil. 1, hlm. 15"], ["J"]]
     },
@@ -325,13 +325,13 @@
       "translit": "ṣirāṭa",
       "gloss": "jalan",
       "wazn": null,
-      "case": { "state": "manshub", "sign": "fathah" },
-      "why": "Akhirnya fathah karena menjadi badal (pengganti) dari aṣ-ṣirāṭa di ayat 6 yang manshub.",
+      "case": { "state": "manshub", "sign": "[[fathah]]" },
+      "why": "Akhirnya [[fathah]] karena menjadi [[badal]] (pengganti) dari [[aṣ-ṣirāṭa|q:1:6:2]] di ayat 6 yang [[manshub]].",
       "ikhtilaf": [
         {
-          "point": "Kedudukan ṣirāṭa di ayat 7",
+          "point": "Kedudukan [[ṣirāṭa|q:1:7:1]] di ayat 7",
           "options": [
-            "badal kull min kull (badal yang sepadan) — Darwisy, al-Jadwal, al-Mujtaba, as-Samin; menurut Ibnu Katsir inilah pendapat para ahli nahwu",
+            "[[badal kull min kull]] ([[badal]] yang sepadan) — Darwisy, al-Jadwal, al-Mujtaba, as-Samin; menurut Ibnu Katsir inilah pendapat para ahli [[nahwu]]",
             "'athf bayan — dibolehkan oleh Ibnu Katsir"
           ]
         }
@@ -343,8 +343,8 @@
       "translit": "allażīna",
       "gloss": "orang-orang yang",
       "wazn": null,
-      "case": { "state": "mabni", "sign": "fathah", "mahall": "mahall jarr" },
-      "why": "Isim maushul ini mabni (bentuknya tetap) dan berkedudukan jar sebagai mudhaf ilaih dari ṣirāṭa.",
+      "case": { "state": "mabni", "sign": "[[fathah]]", "mahall": "mahall jarr" },
+      "why": "[[Isim maushul]] ini [[mabni]] (bentuknya tetap) dan berkedudukan [[jar]] sebagai [[mudhaf ilaih]] dari [[ṣirāṭa|q:1:7:1]].",
       "ikhtilaf": [],
       "src": [["D"], ["J"]]
     },
@@ -352,8 +352,8 @@
       "translit": "an‘amta",
       "gloss": "telah Engkau beri nikmat",
       "wazn": "أَفْعَلْتَ",
-      "case": { "state": "mabni", "sign": "sukun" },
-      "why": "Fi'il madhi ini mabni di atas sukun karena bersambung dengan dhamir -ta ('Engkau', pelakunya), dan kalimatnya menjadi shilah bagi allażīna.",
+      "case": { "state": "mabni", "sign": "[[sukun]]" },
+      "why": "[[Fi'il madhi]] ini [[mabni]] di atas [[sukun]] karena bersambung dengan [[dhamir]] [[-ta|q:1:7:3/2]] ('Engkau', pelakunya), dan kalimatnya menjadi [[shilah]] bagi [[allażīna|q:1:7:2]].",
       "ikhtilaf": [],
       "src": [["D"], ["J"]],
       "review_notes": ["Gloss Quran.com (Indonesia) 'diberi nikmat' menghilangkan 'Engkau'; gloss ini sengaja memuat 'Engkau'."]
@@ -363,7 +363,7 @@
       "gloss": "kepada mereka",
       "wazn": null,
       "case": { "state": "mabni", "sign": "—", "mahall": "mahall nashb" },
-      "why": "‘Alā adalah huruf jar dan -him ('mereka') kata ganti mabni yang dijarkan olehnya, sedangkan kedudukan nashab (mahall nashb) di kartu ini milik frasa jar-majrur ‘alaihim secara utuh, yang bergantung pada an‘amta (as-Samin: manshub al-mahall).",
+      "why": "[[‘Alā|q:2:5:2]] adalah [[huruf jar]] dan [[-him|q:1:7:4/2]] ('mereka') kata ganti [[mabni]] yang dijarkan olehnya, sedangkan kedudukan [[nashab]] ([[mahall]] [[nashb|nashab]]) di kartu ini milik frasa [[jar-majrur]] [[‘alaihim|q:1:7:4]] secara utuh, yang bergantung pada [[an‘amta|q:1:7:3]] (as-Samin: [[manshub]] al-mahall).",
       "ikhtilaf": [],
       "src": [["D"], ["J"], ["S"]],
       "review_notes": [
@@ -375,16 +375,16 @@
       "translit": "gairi",
       "gloss": "bukan",
       "wazn": null,
-      "case": { "state": "majrur", "sign": "kasrah" },
-      "why": "Akhirnya kasrah karena menjadi badal dari allażīna yang berkedudukan jar (sebagian ulama menjadikannya sifat).",
+      "case": { "state": "majrur", "sign": "[[kasrah]]" },
+      "why": "Akhirnya [[kasrah]] karena menjadi [[badal]] dari [[allażīna|q:1:7:2]] yang berkedudukan [[jar]] (sebagian ulama menjadikannya [[sifat]]).",
       "ikhtilaf": [
         {
-          "point": "Kedudukan gairi",
+          "point": "Kedudukan [[gairi|q:1:7:5]]",
           "options": [
-            "badal dari allażīna — al-Jadwal, al-Mujtaba, as-Samin, Darwisy",
-            "sifat (na't) bagi allażīna — Darwisy, al-Jadwal, as-Samin; Ibnu Katsir: bacaan jumhur (jar) sebagai sifat. al-Jadwal mencatat keberatan al-Mubarrad dan dua jawabannya",
-            "badal dari kata ganti -him pada ‘alaihim — Darwisy, al-Jadwal; as-Samin mencatat kesulitannya",
-            "pengecualian terputus (istitsna' munqathi') (hanya pada bacaan nashab gaira, bukan bacaan Hafs) — as-Samin dan an-Nahhas menyebutnya untuk bacaan nashab itu; Ibnu Katsir menukilnya dari sebagian ahli nahwu lalu lebih memilih sifat"
+            "[[badal]] dari [[allażīna|q:1:7:2]] — al-Jadwal, al-Mujtaba, as-Samin, Darwisy",
+            "sifat ([[na't]]) bagi [[allażīna|q:1:7:2]] — Darwisy, al-Jadwal, as-Samin; Ibnu Katsir: bacaan jumhur ([[jar]]) sebagai sifat. al-Jadwal mencatat keberatan al-Mubarrad dan dua jawabannya",
+            "[[badal]] dari kata ganti [[-him|q:1:7:4/2]] pada [[‘alaihim|q:1:7:4]] — Darwisy, al-Jadwal; as-Samin mencatat kesulitannya",
+            "pengecualian terputus (istitsna' munqathi') (hanya pada bacaan [[nashab]] gaira, bukan bacaan Hafs) — as-Samin dan an-Nahhas menyebutnya untuk bacaan [[nashab]] itu; Ibnu Katsir menukilnya dari sebagian ahli [[nahwu]] lalu lebih memilih sifat"
           ]
         }
       ],
@@ -395,8 +395,8 @@
       "translit": "al-magḍūbi",
       "gloss": "yang dimurkai",
       "wazn": "مَفْعُول",
-      "case": { "state": "majrur", "sign": "kasrah" },
-      "why": "Akhirnya kasrah karena menjadi mudhaf ilaih dari gairi.",
+      "case": { "state": "majrur", "sign": "[[kasrah]]" },
+      "why": "Akhirnya [[kasrah]] karena menjadi [[mudhaf ilaih]] dari [[gairi|q:1:7:5]].",
       "ikhtilaf": [],
       "src": [["D"], ["J"]]
     },
@@ -405,7 +405,7 @@
       "gloss": "atas mereka",
       "wazn": null,
       "case": { "state": "mabni", "sign": "—", "mahall": "mahall raf'" },
-      "why": "‘Alā adalah huruf jar dan -him kata ganti mabni yang dijarkan olehnya, sedangkan kedudukan rafa' (mahall raf') di kartu ini milik frasa jar-majrur ‘alaihim secara utuh sebagai na'ib fa'il (pengganti pelaku) bagi al-magḍūbi, karena al-magḍūb adalah isim maf'ul.",
+      "why": "[[‘Alā|q:2:5:2]] adalah [[huruf jar]] dan [[-him|q:1:7:7/2]] kata ganti [[mabni]] yang dijarkan olehnya, sedangkan kedudukan [[rafa']] ([[mahall]] raf') di kartu ini milik frasa [[jar-majrur]] [[‘alaihim|q:1:7:7]] secara utuh sebagai [[na'ib fa'il]] (pengganti pelaku) bagi [[al-magḍūbi|q:1:7:6]], karena [[al-magḍūb|q:1:7:6]] adalah [[isim maf'ul]].",
       "ikhtilaf": [],
       "src": [["D"], ["J"], ["M"]],
       "gloss_exception": "QuranEnc menerjemahkan al-magḍūbi ‘alaihim sebagai 'mereka yang dimurkai' tanpa kata terpisah untuk ‘alaihim; gloss harfiah 'atas mereka' dipakai untuk kartu kata."
@@ -415,7 +415,7 @@
       "gloss": "dan bukan pula",
       "wazn": null,
       "case": { "state": "none", "sign": "—" },
-      "why": "Wawu adalah huruf 'athaf, dan lā di sini tambahan untuk menegaskan makna 'bukan' yang sudah ada pada gairi.",
+      "why": "[[Wawu|q:1:7:8#1]] adalah [[huruf 'athaf]], dan [[lā|q:1:7:8/2]] di sini tambahan untuk menegaskan makna 'bukan' yang sudah ada pada [[gairi|q:1:7:5]].",
       "ikhtilaf": [],
       "src": [["D"], ["J"], ["M"]]
     },
@@ -423,14 +423,14 @@
       "translit": "aḍ-ḍāllīna",
       "gloss": "orang-orang yang sesat",
       "wazn": "فَاعِل",
-      "case": { "state": "majrur", "sign": "ya'" },
-      "why": "Majrur dengan tanda ya' karena jamak mudzakkar salim yang di-'athaf-kan pada kata majrur sebelumnya.",
+      "case": { "state": "majrur", "sign": "[[ya'|q:1:7:9#6]]" },
+      "why": "[[Majrur]] dengan tanda [[ya'|q:1:7:9#6]] karena [[jamak mudzakkar salim]] yang di-'athaf-kan pada kata [[majrur]] sebelumnya.",
       "ikhtilaf": [
         {
-          "point": "Aḍ-ḍāllīna di-'athaf-kan kepada kata apa?",
+          "point": "[[Aḍ-ḍāllīna|q:1:7:9]] di-'athaf-kan kepada kata apa?",
           "options": [
-            "al-magḍūbi — Darwisy, al-Mujtaba, an-Nahhas, as-Samin",
-            "gairi — al-Jadwal"
+            "[[al-magḍūbi|q:1:7:6]] — Darwisy, al-Mujtaba, an-Nahhas, as-Samin",
+            "[[gairi|q:1:7:5]] — al-Jadwal"
           ]
         }
       ],

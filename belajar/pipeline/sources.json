@@ -176,6 +176,831 @@
       "licence": "QuranEnc terms of use (https://quranenc.com/en/home/api/): republishing allowed provided the text is not modified, the publisher and QuranEnc are credited, the version is stated, transcript information is kept, the latest version is used, and it is not placed next to inappropriate ads.",
       "attribution": "Terjemahan Berbahasa Indonesia - Kementerian Agama (indonesian_affairs), via QuranEnc.com (Pusat Terjemah Ruwwād)."
     },
+    "quranenc_indonesian_affairs_quran": {
+      "name": "QuranEnc translation indonesian_affairs, every sura 1..114 (the ayah popup of the fact cards)",
+      "version": "1.0.1",
+      "url_pattern": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/{SURA}",
+      "version_url": "https://quranenc.com/api/v1/translations/list/id?localization=id",
+      "options": "Same endpoint and translation as quranenc_indonesian_affairs (sura 1), for every sura: the fact cards' location chips open the ayah in a popup (operator, 2026-10-12), and the facts locate ayat in 103 suras, so the whole translation is pinned. One file per sura in cache_dir; a file another input pins too (sura 1, the lesson suras, the waris suras) is the same cache file, and fetch.py fails if the two pins differ. The sura endpoint reports no version, so version, title and last_update are the ones fetch.py reads for sura 1 from the pinned translations list (version_sha256 of that entry); fetch.py fails if they differ. fetch.py also checks that each file has ayat 1..N, N = the Tanzil ayah count of that sura, all of that sura. Read by build_ayat.py.",
+      "cache_dir": "cache/quranenc",
+      "title_id": "Terjemahan Berbahasa Indonesia - Kementerian Agama",
+      "title_en": "Indonesian Translation - Ministry of Religious Affairs",
+      "last_update_unix": 1750665512,
+      "files": {
+        "indonesian_affairs_sura1.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/1",
+          "sha256": "94d2be603ddb83c6556d609f673d51a9bd8593022a6936a61033324bdaf4ef02",
+          "bytes": 3039,
+          "ayat": 7,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura2.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/2",
+          "sha256": "7c7fdff5bdbc29b330e7bdd563c7950bc34501485123d2913c74068005774f28",
+          "bytes": 423062,
+          "ayat": 286,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura3.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/3",
+          "sha256": "2b51ed77d617cb011fc831d36db19d699cbb5a7e67e8b6d17395562924bc22a3",
+          "bytes": 246618,
+          "ayat": 200,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura4.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/4",
+          "sha256": "5312415a824f459641fbfe5fb7a4fda2f1ce4c32dffd827517911e17254c6a4c",
+          "bytes": 268970,
+          "ayat": 176,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura5.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/5",
+          "sha256": "34ff332bbf1e261579785884d48bca557ebe6e9c9787583a332f07f54f73248c",
+          "bytes": 197213,
+          "ayat": 120,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura6.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/6",
+          "sha256": "fb8ec793d4e34f1e08780cf907cdbf5ab72efd7d35b6058349e3bc01be8994b5",
+          "bytes": 210589,
+          "ayat": 165,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura7.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/7",
+          "sha256": "5256aad39161e7fb6df0fd9c914a7fcb07536add13c695337f8ba344c986c069",
+          "bytes": 237753,
+          "ayat": 206,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura8.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/8",
+          "sha256": "6fb5464a5944592919a122b5cc8f54e995c89cb921d3280134d2583c2bc41540",
+          "bytes": 89350,
+          "ayat": 75,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura9.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/9",
+          "sha256": "3b6b0fe4cf387b8b92bd75cfdbd41e88e159f7ef927eed5f5840617dc82ea0e3",
+          "bytes": 176512,
+          "ayat": 129,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura10.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/10",
+          "sha256": "e7bb44966b6537ae82ebf9e67d8d5ca260a857b98fa6c72ac76f97545603fadd",
+          "bytes": 124117,
+          "ayat": 109,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura11.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/11",
+          "sha256": "63413e3a44454be04a55a38d1b2eb4a6489e8fffbd8b1dc7d049458c4b61000a",
+          "bytes": 130756,
+          "ayat": 123,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura12.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/12",
+          "sha256": "93d9534843a68fa50e69041218184fe3f8f38f09f83c7b97f57dd3537a4acf27",
+          "bytes": 121229,
+          "ayat": 111,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura13.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/13",
+          "sha256": "0da95d27344ec7ed98cef504f2b599e119fa0a1f81a80a36cf9b73c9d7302c69",
+          "bytes": 57258,
+          "ayat": 43,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura14.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/14",
+          "sha256": "ad40271e5edfe00c7fd123cd3f21144fe5e4892cb0ac7a0e5c6237e4420133f0",
+          "bytes": 57902,
+          "ayat": 52,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura15.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/15",
+          "sha256": "18cb55c377b08f3ce0347ecd2ac88f4cbf224824eca91722aed0fae8cad88259",
+          "bytes": 54124,
+          "ayat": 99,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura16.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/16",
+          "sha256": "3a78b113eb63babbdfcfbe73b546fa04d4c78a94c14d63e86f50244cdba683a6",
+          "bytes": 130258,
+          "ayat": 128,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura17.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/17",
+          "sha256": "290f29a122378b7bcbcc5034ec0b40bd6ba8d4666ef92d90ac61fb22952329ea",
+          "bytes": 111472,
+          "ayat": 111,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura18.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/18",
+          "sha256": "044518e284616aa265f9eef4b3232316eb6cf53ebf2b8535e159496a45510c8d",
+          "bytes": 111220,
+          "ayat": 110,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura19.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/19",
+          "sha256": "170415774ca1c23913ff41b533415236902b00ee4012539c60d4695219e94be2",
+          "bytes": 69319,
+          "ayat": 98,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura20.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/20",
+          "sha256": "a6e278a18b1732f868981a9534b9b2cf970b895a63d24bd4a49c709192e56342",
+          "bytes": 98736,
+          "ayat": 135,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura21.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/21",
+          "sha256": "dd82ce3208e813db451a22399e703cf6bfe03005b993465466846651366642d1",
+          "bytes": 87706,
+          "ayat": 112,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura22.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/22",
+          "sha256": "e3d703cba716bf4555e49035859af301dd757f7b5bb0a2ad713cc37f91ec2e0d",
+          "bytes": 86865,
+          "ayat": 78,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura23.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/23",
+          "sha256": "548473836f4ccbc2565d5fbf83eb2de1e565fa56c15f60f7676a1a6bc7fb1c88",
+          "bytes": 78093,
+          "ayat": 118,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura24.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/24",
+          "sha256": "d4ac5d853c4e24fc27434031561b1107da098f34bf65f0bdb1f24d418d599d49",
+          "bytes": 94268,
+          "ayat": 64,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura25.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/25",
+          "sha256": "06a021ca45f008c85480f79df4a54526a29a9223d92047845a1b0a60632f6cf6",
+          "bytes": 65984,
+          "ayat": 77,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura26.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/26",
+          "sha256": "2ad0c00074bc200f163d1c62016f3dd2d4b1b3e194bcd192402709288dcb68ab",
+          "bytes": 105059,
+          "ayat": 227,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura27.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/27",
+          "sha256": "f1fb54eaf4a67d3f12b1312c3e77240d681b9b32556abec4ce8dfba6e6888891",
+          "bytes": 81925,
+          "ayat": 93,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura28.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/28",
+          "sha256": "5538b6c02bf749cf4bb3be649f3ce2e290e28b2f07632eb60e7f23f45629e53a",
+          "bytes": 99724,
+          "ayat": 88,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura29.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/29",
+          "sha256": "13093eabc8370ae843b3428b5c247eb3c8fb418a82b10d214030a0919e853b1e",
+          "bytes": 71519,
+          "ayat": 69,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura30.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/30",
+          "sha256": "610faf9f7aee90a903a5062f11c989302c4d7cb92c451bb78022d4c3634fb3d1",
+          "bytes": 60160,
+          "ayat": 60,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura31.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/31",
+          "sha256": "4b42de02bb64962210aab7c319b4d79ebf7608dfb1229680aeadf6420ff6b6e8",
+          "bytes": 35985,
+          "ayat": 34,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura32.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/32",
+          "sha256": "acc47efa7f8bae11c828095af45ca1a00ddefd25020f3391b17a3126435b0235",
+          "bytes": 27056,
+          "ayat": 30,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura33.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/33",
+          "sha256": "9401aa54b8ebeb7dc15aca60674a1ec9ba7a8998ebb22e16c9d89fc8b6362d17",
+          "bytes": 94323,
+          "ayat": 73,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura34.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/34",
+          "sha256": "3a1c29cb47e86ae3b48015e2d655b128a2bec18ef9a3683d6202082f27c55482",
+          "bytes": 61657,
+          "ayat": 54,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura35.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/35",
+          "sha256": "fea81b11a39ff1ac77d378c62ce77dc0659b28b7bf69c57c9a7349658e4db1cd",
+          "bytes": 53540,
+          "ayat": 45,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura36.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/36",
+          "sha256": "560016eee0690077f47424806a8380082558825c6c472e56dea0c812ebfdc70b",
+          "bytes": 54263,
+          "ayat": 83,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura37.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/37",
+          "sha256": "d492e113f71753f35031744312beee2d7279a414b51575eeb56e137a4fc49680",
+          "bytes": 76553,
+          "ayat": 182,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura38.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/38",
+          "sha256": "b908545cf5838ef2ac437b528a8f472607439731452968a93a7c2749cf28d324",
+          "bytes": 57270,
+          "ayat": 88,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura39.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/39",
+          "sha256": "f87b9d11a4ad427a71b72915c025b2171cf95698bc276190dbd9fcfeb89eeb47",
+          "bytes": 80590,
+          "ayat": 75,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura40.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/40",
+          "sha256": "ba437133183a4e89e92f4abdba4a0b84fec5b767813efc9abd62191d6da6bb7d",
+          "bytes": 83792,
+          "ayat": 85,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura41.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/41",
+          "sha256": "441704e7a2a01de817a29a0b939bd1d7c8472bb4cdc05fc42f109b087e3b3ee9",
+          "bytes": 55918,
+          "ayat": 54,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura42.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/42",
+          "sha256": "3bf7f083ec20ceda3b216e307287180e374a3bb4074a4259bb400c74da329c2d",
+          "bytes": 57367,
+          "ayat": 53,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura43.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/43",
+          "sha256": "a3646df68d3bdb4cbbe2db14a7ee10a0de29185dc0a68d28cc3f06949d3bd589",
+          "bytes": 65367,
+          "ayat": 89,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura44.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/44",
+          "sha256": "78a2cbf8c5b506b7014c4c363ccc3da99268bdd2db8ec38116ffe98bf27bf2cc",
+          "bytes": 28128,
+          "ayat": 59,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura45.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/45",
+          "sha256": "79fb366d5016ccc155af7571101c0420d3fea11158b185d01494cfbbe8382b77",
+          "bytes": 34271,
+          "ayat": 37,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura46.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/46",
+          "sha256": "1ae08ae0e0e88b7256ca6cc44438c8d40b1cbe32cbb0a6911600091028877036",
+          "bytes": 43878,
+          "ayat": 35,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura47.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/47",
+          "sha256": "b63e23e1b51359c8dbb391283df61d51cec06a305b58c3407965c2390d3f8360",
+          "bytes": 39386,
+          "ayat": 38,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura48.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/48",
+          "sha256": "1e124af0b19d58f0ef6018dcf127fecc7edc372c470e85a249ecd7431b698652",
+          "bytes": 40356,
+          "ayat": 29,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura49.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/49",
+          "sha256": "c61cc582b75fba8cf64445e5588d7f99dd501fff1213390a376f0322dd4cf0b1",
+          "bytes": 24217,
+          "ayat": 18,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura50.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/50",
+          "sha256": "1de436a016c7e98bad6143554a235163607dc1cdbc1105a3fd72df648446ec7b",
+          "bytes": 26841,
+          "ayat": 45,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura51.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/51",
+          "sha256": "1d1794ff238aafdc0630729aacadcade7b92170f549ff3ca5349fbb43808a94d",
+          "bytes": 29020,
+          "ayat": 60,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura52.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/52",
+          "sha256": "922dfc44016d0ff58fa7f0b3462cfaece8c062a9f0db38490c682ccc8ec2f687",
+          "bytes": 24462,
+          "ayat": 49,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura53.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/53",
+          "sha256": "98efed06a5ca8bdad4c29b3dd2195da73c09be8708680071657689af039d8806",
+          "bytes": 27833,
+          "ayat": 62,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura54.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/54",
+          "sha256": "b2397b648cf5b7e2c193bbc4bf490fb01068a9a15f3bced24aaea240b371b97a",
+          "bytes": 27603,
+          "ayat": 55,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura55.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/55",
+          "sha256": "b86f2702c46b37e6b64d78e34993cee0ac1d920285f9a1a2ffddcad5b2f0908b",
+          "bytes": 32042,
+          "ayat": 78,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura56.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/56",
+          "sha256": "08317c15f0937ed576e498fc29051a0e3ba73cede244910aef1e5f8df7dbc0b7",
+          "bytes": 34398,
+          "ayat": 96,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura57.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/57",
+          "sha256": "a0559dc727ea329e6ae342b5cad271f1d67ef808fb3b0ba449779af0c53f4c99",
+          "bytes": 39760,
+          "ayat": 29,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura58.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/58",
+          "sha256": "0767bffb4e1705988bf520f692fcec536ce37b7334d77d01959908c2bbd082b8",
+          "bytes": 33267,
+          "ayat": 22,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura59.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/59",
+          "sha256": "6d07ae3e0f9a86e755cd207dd1e11ee0c1d815c9c48da5d0c281758fce88e246",
+          "bytes": 31406,
+          "ayat": 24,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura60.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/60",
+          "sha256": "991c08c42350253291dd5f287fea2c120e24989053cd3888e7207146d3f536c7",
+          "bytes": 24949,
+          "ayat": 13,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura61.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/61",
+          "sha256": "d0947f00a3ee5d64fb7801e2112e9b5e091cd661e179a2baa7dbb67147bf22fa",
+          "bytes": 15321,
+          "ayat": 14,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura62.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/62",
+          "sha256": "c9102a11bd0b3d4da99312fb8f58d5b1401b789539387978305cd6739cdcf001",
+          "bytes": 11957,
+          "ayat": 11,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura63.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/63",
+          "sha256": "05a3c00b69169804bca976d6f71b16334f54dcc2aef60f7257e94a91456e4f04",
+          "bytes": 13319,
+          "ayat": 11,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura64.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/64",
+          "sha256": "74a150292eb78fc6640ff00e4924a764a16e739abe272b44ffc49f098b3ea303",
+          "bytes": 17673,
+          "ayat": 18,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura65.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/65",
+          "sha256": "6d56075ff4dd53f63cdf6b22699cea532764913f178cab7e955d4fc132db8a67",
+          "bytes": 19362,
+          "ayat": 12,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura66.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/66",
+          "sha256": "14f704f7b4355c4cb8088358b924fa62b9ede3406b386131cd68d0fa4f9ecea3",
+          "bytes": 17343,
+          "ayat": 12,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura67.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/67",
+          "sha256": "6bb17bbc79e6f1a1b0727d71347221b0370a7b25a5638fdede2a502d91f4aea5",
+          "bytes": 22787,
+          "ayat": 30,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura68.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/68",
+          "sha256": "d00cab9e41a3ca93a1586461a13c73ba9d1d2d9e83505dd1b42ecd27fe7b809c",
+          "bytes": 25918,
+          "ayat": 52,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura69.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/69",
+          "sha256": "fbf788d4c06403b4eed61b3b8a7852a4441491e9111ab85fa8561ff2a915c641",
+          "bytes": 22353,
+          "ayat": 52,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura70.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/70",
+          "sha256": "22e3db2f576770103d32da0d3bd90e48a06606f055a585522045edd10b36fed9",
+          "bytes": 19209,
+          "ayat": 44,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura71.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/71",
+          "sha256": "9f56a5a984e97ab8f47d707549b259e65bbf6b54e4cac2f3b06f73e389359881",
+          "bytes": 17167,
+          "ayat": 28,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura72.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/72",
+          "sha256": "89b9071fc5c0b7c45fa16a533b0464535376b0eaed59f5ed0237fca72f1c3bb6",
+          "bytes": 19965,
+          "ayat": 28,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura73.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/73",
+          "sha256": "dfcf8844cc0cf6efdfeaebea8ca07125af0f9b1e12dc372f083f197089a832f0",
+          "bytes": 14433,
+          "ayat": 20,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura74.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/74",
+          "sha256": "7343d4d0975029363052868ce3aaa2a70f9b195282d0be7207ecac0717f1e4cf",
+          "bytes": 21122,
+          "ayat": 56,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura75.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/75",
+          "sha256": "a95ac61a31432df2cf556601adb71f1abbc7f58f8f8216581e634f0e5bd70d67",
+          "bytes": 14119,
+          "ayat": 40,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura76.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/76",
+          "sha256": "43376198bda74c0c32f56959158f01f5bdb6869051b83728e58d07707f79a364",
+          "bytes": 18952,
+          "ayat": 31,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura77.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/77",
+          "sha256": "926fa54fa6b73fedf08521fdf62b91c13396255eefcf0ee284c60925d31c2389",
+          "bytes": 18074,
+          "ayat": 50,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura78.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/78",
+          "sha256": "cd16bd685c9295fe8793f892a56e3768fd399c8cc2ef63b8c398e5afaa6339e4",
+          "bytes": 15452,
+          "ayat": 40,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura79.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/79",
+          "sha256": "0d6befb1085e8a1934374a73ae3e211fe29ab62dc2095a9b60c71d653447b1b1",
+          "bytes": 16517,
+          "ayat": 46,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura80.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/80",
+          "sha256": "7706598b15ca12f491cb0d67fcb3b68c59879943e81553c3008b571ca056fac9",
+          "bytes": 12662,
+          "ayat": 42,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura81.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/81",
+          "sha256": "d391b0c2a43bbae6badb28cf1e064f490dc499aea709e92c0977cb5248cff095",
+          "bytes": 9225,
+          "ayat": 29,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura82.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/82",
+          "sha256": "84a802574946c9008a411b84bf93323c1a4cb187c9024d457e86b56b5b0ea830",
+          "bytes": 6700,
+          "ayat": 19,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura83.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/83",
+          "sha256": "88bd9ad867f051d9c70eede1bec8d6bdf611f12f2f8819ab05b1f8ce2539277a",
+          "bytes": 14745,
+          "ayat": 36,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura84.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/84",
+          "sha256": "5f4333c77d56fee5590748a01a9bf1ea3cefacd699255a71d92bdabebdd7ca1a",
+          "bytes": 9207,
+          "ayat": 25,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura85.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/85",
+          "sha256": "6d93b228afb850721dc26cd2e2913fc165e827746017a0c72731a3119a478a53",
+          "bytes": 8738,
+          "ayat": 22,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura86.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/86",
+          "sha256": "0c9e72076920d9a4ebeaa898a4b2ba841b9479e8dac73c0484bfb3eb3e0bfe45",
+          "bytes": 5583,
+          "ayat": 17,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura87.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/87",
+          "sha256": "b2521e20af46edfc81bd8fadd4abebd9fc2e0b173ddecdd5f3282559836c048b",
+          "bytes": 6239,
+          "ayat": 19,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura88.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/88",
+          "sha256": "8e8bb49985a1285de257d74a6cf68552a623fd8efc994ed0b6b9802f694176ea",
+          "bytes": 7890,
+          "ayat": 26,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura89.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/89",
+          "sha256": "61d4daee90a9036bd5fc48c2ab8bd6a8b6620bca8e0dad01b3ecfe7dc17ab1f5",
+          "bytes": 12153,
+          "ayat": 30,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura90.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/90",
+          "sha256": "2abe5ea53479d603669e6e63bc78cb1b3f8c61d399eac7cc09b79b23c919765c",
+          "bytes": 6871,
+          "ayat": 20,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura91.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/91",
+          "sha256": "fdb876bcf5930a350ffd83278ee1b907590172b6d56a1cf0d65c8f2d1df0633c",
+          "bytes": 4987,
+          "ayat": 15,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura92.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/92",
+          "sha256": "d602d299201a55acc89d413b186b97a40a9c60735132096888ad23fb3ca6b0f0",
+          "bytes": 6780,
+          "ayat": 21,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura93.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/93",
+          "sha256": "634289a9e7aa750702745f45b19fd7beaf287f00d5a70bbd3268e9f583ca4fab",
+          "bytes": 4495,
+          "ayat": 11,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura94.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/94",
+          "sha256": "80e19b665e8312804963e20108684170cb81769675be49aa468227338c9d9fad",
+          "bytes": 2853,
+          "ayat": 8,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura95.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/95",
+          "sha256": "3232b2f72831d27db125c3367a8f5b38f15ceda074ca9402e55580477d4f8741",
+          "bytes": 3298,
+          "ayat": 8,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura96.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/96",
+          "sha256": "d4a254caf3897639fdde35f1f8aebade121f6103389e08c706bed2d5c7c6f4db",
+          "bytes": 6573,
+          "ayat": 19,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura97.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/97",
+          "sha256": "371bbc1e3f30e4b63f6c8d1fb911eb34d318b9a6ddeb31c86d5f4f5e434fd1b6",
+          "bytes": 2331,
+          "ayat": 5,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura98.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/98",
+          "sha256": "55358df59dadebd58fe93b7707fb4d37dd30d0b20f2eb591844ce198806c68b2",
+          "bytes": 6794,
+          "ayat": 8,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura99.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/99",
+          "sha256": "6d3520a15a63e59c4b685342732c89f27af9df07744fc9681c166556af82b7cf",
+          "bytes": 3186,
+          "ayat": 8,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura100.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/100",
+          "sha256": "0cda719163c69647def489c27b0506b3fe0274e2c552d89402e596c24fd08d23",
+          "bytes": 3571,
+          "ayat": 11,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura101.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/101",
+          "sha256": "b177e913b20855c409212e51e28a25dada1850a96142f9c256ae0ce327e99036",
+          "bytes": 3216,
+          "ayat": 11,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura102.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/102",
+          "sha256": "fce954995a8a1745c2255bc00993ea33b87b6a9d9af5fe19e8c7274dfdedfb4a",
+          "bytes": 2766,
+          "ayat": 8,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura103.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/103",
+          "sha256": "afd80d1b16f9a5dc66e06bd7f1f69aff35a377c9624ac03218677101604a3935",
+          "bytes": 1271,
+          "ayat": 3,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura104.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/104",
+          "sha256": "1d9780831d096a6e792f1fd7fb11527d21aac5472bb4ee35ecf78591f6aaacef",
+          "bytes": 3021,
+          "ayat": 9,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura105.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/105",
+          "sha256": "1bca37ba161969a72e58bb4a8d4f023bc255727ef803bf0426864cd689574a0d",
+          "bytes": 2153,
+          "ayat": 5,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura106.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/106",
+          "sha256": "55796323ae647687c5f4588e44a114bb34f409d6518fdaa3f80813d18f54b3b3",
+          "bytes": 1950,
+          "ayat": 4,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura107.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/107",
+          "sha256": "ab4f6828b05f29653e62fb9d7f4c147c80f7ceea45365dab1f3762dd91b6c2aa",
+          "bytes": 2479,
+          "ayat": 7,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura108.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/108",
+          "sha256": "3a0a4d8e773436a7c0bc9f171f488b087d5cd039cf95eabfdabb239b20ff7e61",
+          "bytes": 1034,
+          "ayat": 3,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura109.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/109",
+          "sha256": "d11e4404cdde5945170af12e413ba0f732e7df3de4903e4b1347887eeec2b718",
+          "bytes": 1958,
+          "ayat": 6,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura110.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/110",
+          "sha256": "c66c14334de80370df4b260726e9ecf866482ea0a5815a843118be44a15f3817",
+          "bytes": 1422,
+          "ayat": 3,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura111.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/111",
+          "sha256": "e107f360a8bda770ab69782c46bcf39faff58e9cc31b200d54f9a93949893e14",
+          "bytes": 1767,
+          "ayat": 5,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura112.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/112",
+          "sha256": "2fd5eac590213d9871c53009094487eefbdc8f42a507533d0003ef793a2459a7",
+          "bytes": 1099,
+          "ayat": 4,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura113.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/113",
+          "sha256": "f8250fd994df183364e019892b0f8e5a9c4f16c527ec173a54326618b38e5d6a",
+          "bytes": 1589,
+          "ayat": 5,
+          "retrieved": "2026-10-12"
+        },
+        "indonesian_affairs_sura114.json": {
+          "url": "https://quranenc.com/api/v1/translation/sura/indonesian_affairs/114",
+          "sha256": "c2ad413ccfcc97d833774096a916bf5b4ba2dfad6f107f851ba1129103cacd00",
+          "bytes": 1628,
+          "ayat": 6,
+          "retrieved": "2026-10-12"
+        }
+      },
+      "licence": "QuranEnc terms of use (https://quranenc.com/en/home/api/): republishing allowed provided the text is not modified, the publisher and QuranEnc are credited, the version is stated, transcript information is kept, the latest version is used, and it is not placed next to inappropriate ads.",
+      "attribution": "Terjemahan Berbahasa Indonesia - Kementerian Agama (indonesian_affairs), via QuranEnc.com (Pusat Terjemah Ruwwād)."
+    },
+    "quranenc_sura_names": {
+      "name": "QuranEnc Indonesian sura list (sura names as QuranEnc's Indonesian pages print them)",
+      "version": "as served on retrieval date",
+      "url": "https://quranenc.com/id/browse/indonesian_affairs",
+      "options": "The Indonesian browse page of the indonesian_affairs translation lists the 114 suras with their number, ayah count, Arabic name and Indonesian (Latin) name. The HTML carries per-request tokens, so the EXTRACTED list (ayat.extract_sura_names: one 'number|ayat|arabic|name' line per sura) is what is cached and pinned (text_sha256). fetch.py checks 114 rows numbered 1..114 whose ayah counts equal Tanzil's metadata. build_ayat.py folds each name to plain letters for the popup's reference ('QS Al-Baqarah [2]: 255').",
+      "cache_path": "cache/quranenc/sura_names_id.txt",
+      "text_sha256": "1cb44693cd863238093e21b6711eabfcdf78a9de58851b351c3a6f105d352eca",
+      "licence": "QuranEnc terms of use (https://quranenc.com/en/home/api/): republishing allowed provided the text is not modified, the publisher and QuranEnc are credited, the version is stated, transcript information is kept, the latest version is used, and it is not placed next to inappropriate ads.",
+      "attribution": "Nama surah: QuranEnc.com (Pusat Terjemah Ruwwād), halaman terjemahan indonesian_affairs.",
+      "bytes": 3341,
+      "retrieved": "2026-10-12"
+    },
     "fawazahmed0_muslim_sections": {
       "name": "fawazahmed0 hadith-api, Sahih Muslim (Arabic) sections 23, 24, 25 (number map only; never shipped)",
       "version": "hadith-api@1 as served on retrieval date (jsDelivr; the @1 tag moves, so the sha256 pins are the version)",

@@ -269,6 +269,8 @@ describe("linebreaks measure(): the seams it reports", () => {
     expect(kinds(layout(body(para(split()))))).toEqual(["term-split"]);
     // "huruf ⏎ jar (حَرْف جَرّ)": two Latin words apart is a normal break.
     expect(kinds(layout(body(para([tx("didahului huruf ", [[0, 16, 0]]), tx("jar (", [[0, 5, 33]]), bdi(TERM, [[0, TERM.length, 30]]), tx("),", [[0, 2, 33]])]))))).toEqual([]);
+    // A quoted gloss and the Arabic of the words it translates (2026-10-12): “nama Allah” ⏎ (…).
+    expect(kinds(layout(body(para([tx("seperti “nama Allah” ", [[0, 21, 0]]), tx("(", [[0, 1, 33]]), bdi(TERM, [[0, TERM.length, 30]]), tx("),", [[0, 2, 33]])]))))).toEqual(["term-split"]);
     const unit = (width) =>
       box("unit", [box("part", [tx("jar", [[0, 3, 0]])], 30), tx(" ", [[0, 1, 0]]), box("part", [tx("(", [[0, 1, 33]]), bdi(TERM, [[0, TERM.length, 30]]), tx("),", [[0, 2, 33]])], 150)], width);
     // a box as wide as its line: the words around it cannot share its lines (review, 2026-10-10)

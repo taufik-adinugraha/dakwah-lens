@@ -42,6 +42,23 @@ export const CaseState = z.enum([
 ]);
 export type CaseState = z.infer<typeof CaseState>;
 
+/**
+ * A word card's prose with its inline markup kept (pipeline/build_surah.py, a marked lesson;
+ * operator 2026-10-12 on ‘alaihim's card: "write the arabic words, not only the transliteration"):
+ * the Konsep markup (MarkedProse below) on `why`, `role`, the case sign, `wazn` and `ikhtilaf`.
+ * The plain fields are this text with the markup stripped (narration and the quiz checks read
+ * those, byte-identical); WordCard shows the marked text, each term and Qur'anic word with its
+ * Arabic at its first use on the card.
+ */
+export const WordMarked = z.object({
+  why: z.string().min(10),
+  role: z.string().min(2).optional(),
+  sign: z.string().min(1).optional(),
+  wazn: z.string().min(1).optional(),
+  ikhtilaf: z.array(z.object({ point: z.string(), options: z.array(z.string()).min(2) })).default([]),
+});
+export type WordMarked = z.infer<typeof WordMarked>;
+
 export const Word = z.object({
   loc: WordLoc,
   /** Uthmani text of the word, verbatim from Tanzil (space-delimited token). */
@@ -80,6 +97,8 @@ export const Word = z.object({
     .default([]),
   sources: z.array(SourceRef).min(1),
   status: ReviewStatus,
+  /** The same prose with its terms and Qur'anic words marked (a marked lesson only). */
+  marked: WordMarked.optional(),
 });
 export type Word = z.infer<typeof Word>;
 
@@ -131,6 +150,10 @@ export const Ayah = z.object({
         .default([]),
       sources: z.array(SourceRef).min(1),
       status: ReviewStatus,
+      /** `type`, `summary` and each group's label with their markup kept (a marked lesson). */
+      marked: z
+        .object({ type: z.string().min(3), summary: z.string().min(20), groups: z.array(z.string().min(3)).default([]) })
+        .optional(),
     })
     .optional(),
   /** Light tafsir note in Indonesian, rendered from retrieved sources. */
@@ -152,6 +175,8 @@ export const Fact = z.object({
   method: z.string().min(5),
   sources: z.array(SourceRef).min(1),
   status: ReviewStatus,
+  /** title, body and method with their markup kept (a marked lesson; authored/<slug>.facts.marked.json). */
+  marked: z.object({ title: z.string().min(5), body: z.string().min(10), method: z.string().min(5) }).optional(),
 });
 export type Fact = z.infer<typeof Fact>;
 
@@ -333,6 +358,18 @@ export const Lexeme = z.object({
     .optional(),
   sources: z.array(SourceRef).min(1),
   status: ReviewStatus,
+  /** The page's prose with its markup kept (MarkedProse's markup; 2026-10-12): `meaning`, the
+   *  word class `pos` and the tashrif `labels` (both a closed vocabulary, marked by the build),
+   *  the tashrif `bab` and each i'lal `rule` (authored). */
+  marked: z
+    .object({
+      meaning: z.string().min(2),
+      pos: z.string().min(2),
+      bab: z.string().min(3).optional(),
+      labels: z.array(z.string().min(2)).default([]),
+      ilal: z.array(z.string().min(10)).default([]),
+    })
+    .optional(),
 });
 export type Lexeme = z.infer<typeof Lexeme>;
 
@@ -346,6 +383,8 @@ export const Root = z.object({
   occurrences: z.object({ count: z.number().int().nonnegative(), method: z.string().min(5) }),
   sources: z.array(SourceRef).min(1),
   status: ReviewStatus,
+  /** `meaning` with its markup kept (2026-10-12). */
+  marked: z.object({ meaning: z.string().min(5) }).optional(),
 });
 export type Root = z.infer<typeof Root>;
 
@@ -375,6 +414,11 @@ export const SurahContent = z.object({
   ayat: z.array(Ayah).min(1),
   facts: z.array(Fact).default([]),
   hadith: z.array(Hadith).default([]),
+  /** Bytes of every Qur'anic word, run, part or letter this lesson's marked prose names (as
+   *  Library.quran: keyed by the q-ref without "q:"), resolved by build_surah.py, never typed. */
+  quran: z.record(z.string(), z.string()).default({}),
+  /** QAC 0.4 segments of each lesson word a part ref names; joined they are the word. */
+  segments: z.record(z.string(), z.array(z.string().min(1))).default({}),
   /** Pinned inputs, e.g. { tanzil: "uthmani-1.1 sha256:…", qac: "0.4", quran_align: "2016-11-24" }. */
   data_versions: z.record(z.string(), z.string()),
 });

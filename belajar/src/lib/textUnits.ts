@@ -57,8 +57,9 @@ const SEP_TAIL = new RegExp(`(?:\\s+${SEP})+$`, "u");
  *  or digits ("Al-Fatihah", "ke-1", "waswasa–yuwaswisu", "orang/jenis"), a
  *  leading hyphen ("-nya"), a footnote mark after a word ("pembalasan.[1]"). */
 const GLUE_WORD = /[\p{L}\p{N}][-–—‐‑/][\p{L}\p{N}]|^[-–]\p{L}|\S\[\d+\]/u;
-/** A word of letters (a transliteration: "jar", "ba’", "Al-Fatihah", "waswasa–yuwaswisu"). */
-const LATIN_WORD = /^[\p{L}\p{M}’‘'ʿʾʼ–-]*\p{Script=Latin}[\p{L}\p{M}’‘'ʿʾʼ–-]*$/u;
+/** A word of letters (a transliteration: "jar", "ba’", "Al-Fatihah", "waswasa–yuwaswisu"), maybe
+ *  closing a quoted gloss whose Arabic follows ("Allah”" of “nama Allah” (بِسْمِ ٱللَّهِ), 2026-10-12). */
+const LATIN_WORD = /^[\p{L}\p{M}’‘'ʿʾʼ–-]*\p{Script=Latin}[\p{L}\p{M}’‘'ʿʾʼ–-]*”?$/u;
 /** Inside the prose's own bracket, a term with its Arabic after a comma: its last word with the
  *  comma ("ilaih,"), and a word before it, maybe the one that opens the bracket ("(mudhaf"). */
 const COMMA_TERM_LAST = /^\(?[\p{L}\p{M}’‘'ʿʾʼ–-]*\p{Script=Latin}[\p{L}\p{M}’‘'ʿʾʼ–-]*,$/u;
@@ -97,8 +98,9 @@ export const GLOSS_WORDS = QUOTE_WORDS - 1;
 /** At most this many Latin words of a term stay with its Arabic ("jumlah fi’liyyah (…)"). */
 const TERM_WORDS = 3;
 /** A word that ends in a Latin letter (maybe with ’), or a prefix ending in its hyphen ("bi-",
- *  "li-"): the word a term in brackets keeps ("bi- (بِ)", as TermText drew it before 2026-10-11). */
-const ENDS_LATIN = /\p{Script=Latin}[’'ʼ]?-?$/u;
+ *  "li-"): the word a term in brackets keeps ("bi- (بِ)", as TermText drew it before 2026-10-11);
+ *  or the last word of a quoted gloss, its ” included: “nama Allah” (بِسْمِ ٱللَّهِ) (2026-10-12). */
+const ENDS_LATIN = /\p{Script=Latin}[’'ʼ]?-?”?$/u;
 /** A bracket opening on Arabic, up to where it closes: "(حَرْف جَرّ)", "(ٱ أ إ آ dan alif kecil U+0670)". */
 const BRACKET = /^\(([^)]*)\)/u;
 /** The end of an Arabic word, maybe closed by » ” ): a gloss after it stays with it. */

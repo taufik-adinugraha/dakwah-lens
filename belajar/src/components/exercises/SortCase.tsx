@@ -284,7 +284,8 @@ function SortCaseRound({
                     <MixedText text={states[bin] ?? m.label} />
                   </span>
                 </span>
-                {inBin.length > 0 ? (
+                {/* An empty bin stays blank (operator, 2026-10-12: no "Belum ada kata"). */}
+                {inBin.length > 0 && (
                   <span dir="rtl" className="flex flex-wrap justify-center gap-x-3">
                     {inBin.map((w) => (
                       <span key={w.loc} lang="ar" className="quran text-ar-sm">
@@ -292,8 +293,6 @@ function SortCaseRound({
                       </span>
                     ))}
                   </span>
-                ) : (
-                  <span className="text-sm text-ink-soft">{t("sort_bin_empty")}</span>
                 )}
                 {wrongBins.includes(bin) && <OptionMark state="wrong" />}
               </button>

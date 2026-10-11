@@ -328,13 +328,16 @@ def main(only: list[str] | None = None) -> int:
         first = (st.s, st.a, st.w)
         loc = ":".join(map(str, first))
         sources = [expand_src(sp, kitab, where) for sp in e.get("src", [])]
-        prose.append((f"{where}.meaning", e["meaning"]))
+        # authored prose carries the Konsep markup (2026-10-12): plain here, marked in markup_section
+        meaning = TM.strip(e["meaning"])
+        prose.append((f"{where}.meaning", meaning))
 
         out = {"id": e["id"], "lemma_ar": bw_to_ar(lem), "translit": e["translit"],
-               "root": root_letters(bw_root) if bw_root else None, "pos": pos, "meaning": e["meaning"]}
+               "root": root_letters(bw_root) if bw_root else None, "pos": pos, "meaning": meaning}
 
         t = e.get("tashrif")
         if t:
+            t = {**t, "bab": TM.strip(t["bab"])}
             tw = f"{where}.tashrif"
             vl = t.get("verb_lem")
             vh = [g for g in by_lem.get(vl, []) if g.feat.get("POS") == "V"]
@@ -394,12 +397,13 @@ def main(only: list[str] | None = None) -> int:
             iw = f"{where}.ilal[{i}]"
             check_typed_arabic(il["from"], f"{iw}.from")
             check_typed_arabic(il["to"], f"{iw}.to")
-            if len(il.get("rule", "")) < 10:
+            rule = TM.strip(il.get("rule", ""))
+            if len(rule) < 10:
                 err(f"{iw}.rule: too short")
             if not il.get("src"):
                 err(f"{iw}: an i'lal entry needs its own src")
-            prose.append((f"{iw}.rule", il["rule"]))
-            ilal.append({"from": il["from"], "to": il["to"], "rule": il["rule"]})
+            prose.append((f"{iw}.rule", rule))
+            ilal.append({"from": il["from"], "to": il["to"], "rule": rule})
             sources += [expand_src(sp, kitab, iw, "i'lal") for sp in il.get("src", [])]
         out["ilal"] = ilal
 
@@ -454,9 +458,10 @@ def main(only: list[str] | None = None) -> int:
                 err(f"{where}: {m!r} does have a root in QAC 0.4")
             else:
                 unrooted.append(f"LEM:{m} {fmt(len(mh))}")
-        if len(e.get("meaning", "")) < 5:
+        meaning = TM.strip(e.get("meaning", ""))
+        if len(meaning) < 5:
             err(f"{where}.meaning: too short")
-        prose.append((f"{where}.meaning", e["meaning"]))
+        prose.append((f"{where}.meaning", meaning))
         ayat = {(g.s, g.a) for g in hits}
         nlem = len({g.feat.get("LEM") for g in hits})
         translits = [x["translit"] for x in lexicon if x["id"] in lemmas]
@@ -469,7 +474,7 @@ def main(only: list[str] | None = None) -> int:
                    + (f"; disebut di keterangan, tanpa akar di QAC: {', '.join(unrooted)}" if unrooted else ""),
             "url": qac_url(r, (st.s, st.a, st.w))})
         out = {
-            "id": root_id(r), "letters": root_letters(r), "meaning": e["meaning"], "lemmas": lemmas,
+            "id": root_id(r), "letters": root_letters(r), "meaning": meaning, "lemmas": lemmas,
             "occurrences": {
                 "count": len(hits),
                 "method": f"{basis}: jumlah segmen STEM dengan ROOT:{r} (akar kata {loc}), dalam "
@@ -523,7 +528,8 @@ def main(only: list[str] | None = None) -> int:
         for dup in sorted({i for i in cids if cids.count(i) > 1}):
             err(f"concept id {dup!r} used twice")
     # ---- terms in Arabic script + the inline markup; plain fields from here on (terms.py)
-    extra = markup_section(concepts, T, W, src)
+    extra = markup_section(concepts, T, W, src, {x["id"]: x for x in A["lexicon"]}, lexicon,
+                           {root_id(x["qac_root"]): x for x in A["roots"]}, roots)
     if CONCEPTS.exists():
         for c in concepts:
             cw = f"concepts[{c.get('id')}]"
@@ -576,18 +582,15 @@ def main(only: list[str] | None = None) -> int:
 # the harakat for beginners, words explained by their parts). terms.py has the markup and the term
 # checks; here every marked prose field is checked, stripped into the plain field the app,
 # narration and metadata read, and kept marked beside it; every q-ref is resolved from the pinned
-# Tanzil text and QAC 0.4 into library.json `quran`.
-LETTER_NAMES = {  # a letter q-ref's surface must name its letter (rule 7: the letter as in the ayah)
-    "ا": {"alif"}, "ب": {"ba’", "ba'"}, "ت": {"ta’", "ta'"}, "ث": {"tsa’"}, "ج": {"jim"}, "ح": {"ha’"},
-    "خ": {"kha’"}, "د": {"dal"}, "ذ": {"dzal"}, "ر": {"ra’", "ra"}, "ز": {"zai"}, "س": {"sin"}, "ش": {"syin"},
-    "ص": {"shad"}, "ض": {"dhad"}, "ط": {"tha’"}, "ظ": {"zha’"}, "ع": {"‘ain"}, "غ": {"ghain"}, "ف": {"fa’"},
-    "ق": {"qaf"}, "ك": {"kaf"}, "ل": {"lam"}, "م": {"mim"}, "ن": {"nun"}, "و": {"wawu"}, "ه": {"ha’"},
-    "ي": {"ya’", "ya'"}, "ى": {"ya’", "alif"}, "ء": {"hamzah"}, "أ": {"hamzah", "alif"}, "إ": {"hamzah", "alif"},
-}
-PAUSAL = re.compile(r"(un|in|an|u|i|a)$")
+# Tanzil text and QAC 0.4 into library.json `quran`. Since 2026-10-12 the Kosakata prose too
+# (lexicon meanings, tashrif bab, i'lal rules, root meanings; the word class and the tashrif
+# labels, both a closed vocabulary, marked here by terms.mark_terms), and the gloss variant
+# [[“nama Allah”|q:1:1:1-2]] (terms.py).
 
 
-def markup_section(concepts: list[dict], T, W, src: dict) -> dict:
+def markup_section(concepts: list[dict], T, W, src: dict, lexicon_src: dict | None = None,
+                   lexicon: list[dict] | None = None, roots_src: dict | None = None,
+                   roots: list[dict] | None = None) -> dict:
     table = TM.load_terms(TERMS_FILE)
     pron = TM.load_pronunciation(PRONUNCIATION)
     meta = src["inputs"]["shamela_istilah"]
@@ -622,48 +625,16 @@ def markup_section(concepts: list[dict], T, W, src: dict) -> dict:
 
     refs: set[str] = set()
 
-    def same_surface(surface: str, want: str, last: bool) -> bool:
-        s = surface if surface.startswith("All") else surface[:1].lower() + surface[1:]
-        return s == want or (last and PAUSAL.search(want) is not None and s == PAUSAL.sub("", want))
-
     def check_q(surface: str, ref: str, where: str) -> None:
-        m = TM.QREF.match(ref)
-        s, a, w = int(m.group(1)), int(m.group(2)), int(m.group(3))
-        if m.group(4):  # a run: each word's transliteration, the last may be pausal (aḥad)
-            locs = [f"{s}:{a}:{k}" for k in range(w, int(m.group(4)) + 1)]
-            if all(l in translit for l in locs):
-                words = surface.split(" ")
-                want = [translit[l] for l in locs]
-                # multi-word transliterations (wa lā) count as their words
-                flat = " ".join(want).split(" ")
-                if len(words) != len(flat) or not all(same_surface(x, y, i == len(flat) - 1)
-                                                      for i, (x, y) in enumerate(zip(words, flat))):
-                    err(f"{where}: [[{surface}|{ref}]]: the words are {' '.join(want)!r}")
-        elif m.group(6):  # a letter: the surface names that letter
-            try:
-                letter = TM.letter_of(tanzil_token(s, a, w) or "", int(m.group(6)))
-            except ValueError as x:
-                err(f"{where}: {x}")
-                return
-            if surface.lower() not in LETTER_NAMES.get(letter[0], set()):
-                err(f"{where}: [[{surface}|{ref}]] names the letter {letter[0]}, whose name is "
-                    f"{sorted(LETTER_NAMES.get(letter[0], {'?'}))}")
-        elif not m.group(5) and f"{s}:{a}:{w}" in translit:
-            if not same_surface(surface, translit[f"{s}:{a}:{w}"], False):
-                err(f"{where}: [[{surface}|{ref}]]: the word's transliteration is {translit[f'{s}:{a}:{w}']!r}")
-        if not m.group(6):  # every word, run and segment: the Latin names the bytes (terms.surface_matches)
-            try:
-                ar = TM.resolve_q(ref, tanzil_token, qac_segments)
-            except ValueError as x:
-                err(f"{where}: {x}")
-                return
-            if not TM.surface_matches(surface, ar):
-                err(f"{where}: [[{surface}|{ref}]]: {surface!r} does not name {ar} "
-                    f"(consonants {TM.skeleton_latin(surface)!r} vs {TM.skeleton_ar(ar)!r})")
+        for x in TM.q_problems(surface, ref, where, translit, tanzil_token, qac_segments):
+            err(x)
 
-    def field(text: str, where: str) -> str:
-        for x in (TM.check_markup(text, where, by_id, by_form, table) + TM.wording(TM.strip(text), where)
-                  + TM.meaning_problems(text, where)):
+    def field(text: str, where: str, style: bool = True) -> str:
+        """Check one marked field and return its plain text. `style`: the Konsep writing rules
+        ("klik", "yang artinya") too; off for the Kosakata prose, whose plain wording predates
+        them and is kept as it is (2026-10-12: marked without changing a plain byte)."""
+        for x in (TM.check_markup(text, where, by_id, by_form, table)
+                  + (TM.wording(TM.strip(text), where) + TM.meaning_problems(text, where) if style else [])):
             err(x)
         for surface, ref in TM.spans(text):
             if ref and ref.startswith("q:") and TM.QREF.match(ref):
@@ -784,6 +755,27 @@ def markup_section(concepts: list[dict], T, W, src: dict) -> dict:
             if pt.get("status") != "draft":
                 err(f"{pw}: status must be 'draft' (plan L11)")
             parts.append(pt)
+    # ---- Kosakata and Akar (2026-10-12): the authored prose is marked by its author; the word
+    # class and the tashrif labels are the pipeline's own closed vocabulary (build_surah.pos_label,
+    # TASHRIF_ORDER), where every term form IS the term, so they are marked here (terms.mark_terms).
+    for lx in lexicon or []:
+        e = lexicon_src[lx["id"]]
+        lw = f"lexicon[{lx['id']}]"
+        field(e["meaning"], f"{lw}.meaning", style=False)
+        mk = {"meaning": explicit(e["meaning"]), "pos": TM.mark_terms(lx["pos"], table, ambiguous=True)}
+        if e.get("tashrif"):
+            field(e["tashrif"]["bab"], f"{lw}.tashrif.bab", style=False)
+            mk["bab"] = explicit(e["tashrif"]["bab"])
+            mk["labels"] = [TM.mark_terms(f["label"], table) for f in lx["tashrif"]["forms"]]
+        mk["ilal"] = []
+        for i, il in enumerate(e.get("ilal", [])):
+            field(il["rule"], f"{lw}.ilal[{i}].rule", style=False)
+            mk["ilal"].append(explicit(il["rule"]))
+        lx["marked"] = mk
+    for r in roots or []:
+        e = roots_src[r["id"]]
+        field(e["meaning"], f"roots[{r['id']}].meaning", style=False)
+        r["marked"] = {"meaning": explicit(e["meaning"])}
     # ---- the bytes of every q-ref, and the segments of each lesson word a part names
     quran, segments = {}, {}
     # mushaf order, then the ref itself, so ties ("114:6:1-2" and "114:6:1#2") sort the same every run

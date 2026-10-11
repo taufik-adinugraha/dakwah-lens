@@ -64,6 +64,37 @@ export const CASE_META: Record<CaseState, CaseMeta> = {
   },
 };
 
+/** Each state's term in the verified table (library.terms.json id); "none" names i'rab. */
+const STATE_TERM: Record<CaseState, string> = {
+  marfu: "marfu",
+  manshub: "manshub",
+  majrur: "majrur",
+  majzum: "majzum",
+  mabni: "mabni",
+  none: "irab",
+};
+
+/** A word card's case label as marked prose (2026-10-12: the term's Arabic beside it, "majrūr
+ *  (مَجْرُور)"; its Arabic comes from the term table, never typed here). Without the markup it is
+ *  CASE_META's label (cases.test: stripped, the same string). */
+export function caseLabelMarked(state: CaseState): string {
+  const label = CASE_META[state].label;
+  if (state === "none") return label.replace("i'rab", `[[i'rab|${STATE_TERM.none}]]`);
+  return `[[${label}|${STATE_TERM[state]}]]`;
+}
+
+/** "mahall nashb" → its position marked as the term ("[[nashab|nashab]]"), for the word card's
+ *  "Kedudukannya …" line. */
+const MAHALL_TERM: Record<string, string> = {
+  nashb: "[[nashab|nashab]]",
+  jarr: "[[jar|jar]]",
+  "raf'": "[[rafa'|rafa]]",
+  jazm: "[[jazm|jazm]]",
+};
+export function mahallMarked(mahall: string): string | null {
+  return MAHALL_TERM[mahall.replace(/^mahall\s+/i, "").trim()] ?? null;
+}
+
 /** The four case states a beginner meets, in bin order. The quiz plan decides which of them a
  *  sort offers (content/quiz `bins`: the states taught so far); pipeline/quiz.py SORT_BINS
  *  mirrors this list. */

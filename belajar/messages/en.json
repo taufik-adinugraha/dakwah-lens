@@ -4,8 +4,6 @@
     "title_template": "%s · Learn · Dakwah-Lens",
     "description": "Short lessons on the faith, drawn from named kitabs. Available now: Qur'anic Arabic, word by word, with a real imam's recitation.",
     "back_to_main": "Back to Dakwah-Lens",
-    "sign_in": "Sign in",
-    "signed_in_as": "Signed in as {name}",
     "nav_concepts": "Grammar concepts",
     "menu": "Menu",
     "skip_to_content": "Skip to main content"
@@ -32,8 +30,6 @@
     "coming_soon": "Coming soon",
     "fatihah_pace": "~3 weeks at 10 minutes a day",
     "ayat_nav": "Ayat of {name}",
-    "next_heading": "Next",
-    "next_body": "After Al-Fatihah and Al-Mu'awwidhat: Al-'Asr, Al-Kawthar and An-Nasr.",
     "how_heading": "How it works",
     "how_1": "Pick an ayah, then click “Start the lesson”. The imam recites the ayah, then the lesson explains each word, step by step. You can pause at any time.",
     "how_2": "Short exercises come up inside the lesson, with no time limit. After that the lesson moves on to the next ayah by itself.",
@@ -90,15 +86,14 @@
   "Credits": {
     "title": "Sources & licences",
     "intro": "This module is built on the works and data below. We credit each source as its licence requires, and we do not store reciters' recordings on our servers: recitation streams directly from the provider.",
-    "status_planned": "Planned",
-    "status_in_use": "In use",
     "recitation_heading": "The imam's recitation on the lesson pages",
     "recitation_body": "Every ayah is played from these recordings, with a timing for every word:",
     "streaming_note": "When you start a lesson or play a recitation, your browser fetches the audio directly from the recording provider's servers abroad, so your IP address is visible to them.",
     "data_versions_heading": "Data versions",
     "data_versions_body": "For technical checks: the version and file fingerprint (sha256) of every dataset the lesson pages use, exactly as recorded when the lessons were built.",
     "data_versions_summary": "Show data versions (for technical checks)",
-    "data_versions_library": "Concept, vocabulary and root library"
+    "data_versions_library": "Concept, vocabulary and root library",
+    "data_versions_ayat": "Ayat opened from the “Did you know?” cards"
   },
   "NotFound": {
     "title": "Page not found",
@@ -119,6 +114,19 @@
     "ayah_label": "Ayah {n}",
     "loc_label": "Q {loc}",
     "fact_more_where": "See all locations ({n})"
+  },
+  "Ayah": {
+    "ref": "Surah {name} [{surah}]: {ayah}",
+    "close": "Close",
+    "loading_text": "Loading the ayah…",
+    "text_failed": "This ayah could not be loaded. Check your internet connection, then click “Try again”.",
+    "text_missing": "This ayah was not found.",
+    "retry": "Try again",
+    "play": "Play the imam's recitation",
+    "pause": "Pause",
+    "loading_slow": "Still loading. The connection may be slow; please wait a moment.",
+    "recite_failed": "The recitation could not play. Check your internet connection, then click “Try again”.",
+    "recitation_credit": "Recitation: Mishary Rashid Alafasy, streamed from EveryAyah.com"
   },
   "Lesson": {
     "ayah": "Ayah {n}",
@@ -212,7 +220,6 @@
     "sort_selected": "Selected",
     "sort_pick_first": "Pick a word first, then click its group.",
     "sort_not_yet": "Not quite — try another group.",
-    "sort_bin_empty": "No words yet",
     "role_title": "Guess the word's role",
     "role_instruction": "Choose each word's role in this ayah's sentence.",
     "role_question": "What is this word's role in the sentence?",

@@ -1,0 +1,77 @@
+{
+  "_comment": "Markup for Al-Fatihah's facts (operator 2026-10-12: terms and Qur'anic words in Arabic on every static page, \"check also other parts\"). The facts are computed by facts.py, so this file is an OVERLAY: fact id -> the fields that carry markup (terms.py: [[harakat]], [[Ar-raḥmān|q:1:1:3]], [[wa-|q:1:5:3/1]] …); each must strip to the computed text byte for byte (written from it, so no Arabic is retyped), and every fact is checked (a term left unmarked in any fact stops build_surah.py). Words a fact names in connected reading (Bismillāh, Alḥamdulillāh, Rabbil-‘ālamīn, Yaumid-dīn, Aṣ-ṣirāṭal-mustaqīm) are one Latin word for two Qur'anic words and stay as they are: the fact's «…» quotation shows them in Arabic. Lemma citations no ayah writes as such (raḥmān, raḥīm, raḥmah, arḥām, ista‘āna), the other reading maliki and āmīn (not Qur'anic) stay Latin. A form of another ayah is named by its own token, chosen by its QAC lemma: mālika 3:26:3, mālikūna 36:71:12, the name Mālik 43:77:2/2, al-musta‘ān 12:18:15, yaumu 5:119:4, yauma 3:30:1, the wa- of 38:22:20; a generic prefix by the lesson's own (wa- 1:5:3/1, bi- 1:1:1/1, li- 1:2:2/1) or the fa- of 2:18:4.",
+  "facts": {
+    "huruf-tidak-muncul": {
+      "method": "Himpunan huruf dasar dalam teks Tanzil 1:1–1:7 dibandingkan dengan 28 huruf hijaiyah. [[Harakat|harakat]] dan tanda diabaikan; semua bentuk alif dan hamzah dihitung sebagai alif, ta marbuthah sebagai ta, alif maqshurah sebagai ya. Hanya faktanya yang dimuat, tanpa tafsiran populer tentang huruf-huruf ini."
+    },
+    "basmalah-114": {
+      "method": "Tanzil menaruh basmalah di awal ayat 1 pada 112 surah (semua kecuali surah 1 dan 9); itu dihitung sebagai pembuka surah, bukan bagian ayat, lalu dibuang dari teks ayat. Setelah itu empat kata basmalah dicari berurutan di teks ayat: 2 tempat (1:1 dan 27:30). 112 + 2 = 114. Pada pembuka surah 95 dan 97 Tanzil menulis ba' [[bertasydid|tasydid]]; pencocokan tanpa [[harakat]] tetap mengenalinya. Pencocokan memakai kunci pencarian: tatweel (U+0640), [[harakat]] dan tanda baca Qur'ani (U+064B–U+065F, U+06D6–U+06ED) dibuang; bentuk alif (ٱ أ إ آ dan alif kecil U+0670) disamakan menjadi ا."
+    },
+    "bismillah-dalam-ayat": {
+      "method": "Dua token berurutan [[bismi|q:1:1:1]] + lafaz Allah (diambil dari 1:1), token pertama boleh berawalan [[wa-|q:1:5:3/1]] atau [[fa-|q:2:18:4/1]], di teks Tanzil setelah basmalah pembuka surah dibuang. Kunci pencarian: tatweel (U+0640), [[harakat]] dan tanda baca Qur'ani (U+064B–U+065F, U+06D6–U+06ED) dibuang; bentuk alif (ٱ أ إ آ dan alif kecil U+0670) disamakan menjadi ا."
+    },
+    "rahman-rahim-berdampingan": {
+      "title": "[[Ar-raḥmān|q:1:1:3]] [[ar-raḥīm|q:1:1:4]] berdampingan",
+      "body": "Pasangan «ٱلرَّحْمَٰنِ ٱلرَّحِيمِ» (dengan [[harakat]] akhir apa pun) muncul berdampingan di 6 ayat: 1:1, 1:3, 2:163, 27:30, 41:2 dan 59:22.",
+      "method": "Dua token berurutan [[ar-raḥmān|q:1:1:3]] + [[ar-raḥīm|q:1:1:4]] (diambil dari 1:1) di teks Tanzil setelah basmalah pembuka surah dibuang; [[harakat]] diabaikan sehingga akhiran -u/-a/-i ikut terhitung."
+    },
+    "ar-rahman": {
+      "title": "[[Ar-raḥmān|q:1:1:3]]: 57 kali"
+    },
+    "ar-rahim": {
+      "title": "[[Ar-raḥīm|q:1:1:4]]: 116 kali"
+    },
+    "alhamdulillah": {
+      "body": "«ٱلْحَمْدُ لِلَّهِ», dengan atau tanpa awalan [[wa-|q:1:5:3/1]], muncul di 23 ayat. 5 surah dibuka dengannya: Al-Fatihah (1:2), Al-An'am (6:1), Al-Kahf (18:1), Saba' (34:1) dan Fathir (35:1).",
+      "method": "Dua token berurutan [[al-ḥamdu|q:1:2:1]] + [[lillāhi|q:1:2:2]] (diambil dari 1:2); token pertama boleh berawalan [[wa-|q:1:5:3/1]] atau [[fa-|q:2:18:4/1]]; dihitung per ayat. 'Dibuka' = ayat pertama setelah basmalah (untuk Al-Fatihah: 1:2)."
+    },
+    "ayat-2-utuh": {
+      "body": "Kalimat «ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ», dengan atau tanpa awalan [[wa-|q:1:5:3/1]], muncul di 6 ayat: 1:2, 6:45, 10:10, 37:182, 39:75 dan 40:65.",
+      "method": "Empat token ayat 1:2 berurutan; token pertama boleh berawalan [[wa-|q:1:5:3/1]] atau [[fa-|q:2:18:4/1]]; [[harakat]] diabaikan."
+    },
+    "rabbil-alamin": {
+      "body": "Ungkapan «رَبِّ ٱلْعَٰلَمِينَ», dengan [[harakat]] akhir apa pun dan dengan atau tanpa awalan [[bi-|q:1:1:1/1]] atau [[li-|q:1:2:2/1]], muncul di 42 ayat (42 kali).",
+      "method": "Dua token berurutan [[rabb|q:1:2:3]] + [[al-‘ālamīn|q:1:2:4]] (diambil dari 1:2); token pertama boleh berawalan [[wa-|q:1:5:3/1]], [[fa-|q:2:18:4/1]], [[bi-|q:1:1:1/1]], atau [[li-|q:1:2:2/1]]. Tanpa awalan sama sekali: 34 ayat."
+    },
+    "rabb": {
+      "title": "[[Rabb|q:1:2:3]]: kata benda tersering setelah lafaz Allah",
+      "body": "Kata [[rabb|q:1:2:3]] (Tuhan, Pemelihara) muncul 975 kali dalam 866 ayat Al-Qur'an. Di antara lemma kata benda, hanya lafaz Allah (2.699 kali) yang lebih sering."
+    },
+    "yaumid-din": {
+      "body": "Ungkapan «يَوْمِ ٱلدِّينِ» (hari pembalasan) muncul 13 kali, 3 di antaranya di Surah Al-Infithar (82:15, 82:17 dan 82:18). Hitungan ini memasukkan [[harakat]] akhir apa pun ([[yaumu|q:5:119:4]], [[yauma|q:3:30:1]], [[yaumi|q:1:4:2]]) dan bentuk berawalan, misalnya «بِيَوْمِ ٱلدِّينِ» (70:26); tulisan yang persis sama dengan 1:4 hanya ada di 1:4, 15:35 dan 38:78.",
+      "method": "Dua token berurutan [[yaum|q:1:4:2]] + [[ad-dīn|q:1:4:3]] (diambil dari 1:4); token pertama boleh berawalan [[wa-|q:1:5:3/1]], [[fa-|q:2:18:4/1]], [[bi-|q:1:1:1/1]], atau [[li-|q:1:2:2/1]]; [[harakat]] diabaikan, jadi [[yaumu|q:5:119:4]], [[yauma|q:3:30:1]], [[yaumi|q:1:4:2]] dan bentuk berawalan ikut terhitung. Tulisan persis 1:4 (byte sama, tanpa awalan): 1:4, 15:35 dan 38:78."
+    },
+    "maliki": {
+      "title": "[[Mālik|q:1:4:1]] sebagai [[isim fa'il]]: 3 kali",
+      "body": "Kata [[mālik|q:1:4:1]] ([[isim fa'il]], lemma yang sama dengan 1:4) muncul 3 kali: [[māliki|q:1:4:1]] (1:4), [[mālika|q:3:26:3]] (3:26), [[mālikūna|q:36:71:12]] (36:71).",
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 1 identik byte-per-byte dengan 1.1 yang dipakai): segmen STEM dengan LEM:ma`lik (lemma 1:4:1), hanya POS N; ketiganya bertanda ACT PCPL ([[isim fa'il]]). [[Mālik|q:43:77:2/2]] di 43:77 adalah nama diri dengan lemma lain (LEM:ma`lik2, POS:PN), jadi tidak ikut dihitung. Hitungan ini mengikuti teks Hafs (Tanzil); bacaan maliki tanpa alif adalah qira'at lain."
+    },
+    "iyyaka": {
+      "title": "[[Iyyāka|q:1:5:1]] hanya di Al-Fatihah",
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 1 identik byte-per-byte dengan 1.1 yang dipakai): semua segmen STEM dengan LEM:<iy~aA (24 kali); yang bertanda 2MS hanya di 1:5. Dicek ulang di Tanzil: token [[iyyāka|q:1:5:1]] (boleh berawalan wa-/fa-) muncul 2 kali."
+    },
+    "istaana": {
+      "body": "Kata kerja ista‘āna (memohon pertolongan, [[wazan]] [[istaf‘ala]]) hanya muncul di 1:5, 2:45, 2:153 dan 7:128. Bentuk [[al-musta‘ān|q:12:18:15]] (Yang dimohon pertolongan-Nya) ada di 12:18 dan 21:112. Seluruh keluarga akar ع و ن muncul 11 kali dalam 10 ayat (5 lemma); hitungan akar ini menggabungkan semua kata seakar, termasuk yang maknanya berjauhan.",
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 1 identik byte-per-byte dengan 1.1 yang dipakai): segmen STEM dengan ROOT:Ewn (akar 1:5:4): POS V bertanda (X) = kata kerja [[wazan]] [[istaf‘ala]]; POS N bertanda (X) = [[al-musta‘ān|q:12:18:15]]; jumlah semua segmen akar = 11, dalam 10 ayat."
+    },
+    "ihdina": {
+      "title": "[[Ihdinā|q:1:6:1]] hanya 2 kali",
+      "body": "Kata «ٱهْدِنَا» (tunjukilah kami) hanya muncul 2 kali dalam Al-Qur'an: 1:6 dan 38:22 (dengan awalan [[wa-|q:38:22:20/1]]).",
+      "method": "Token [[ihdinā|q:1:6:1]] (diambil dari 1:6), boleh berawalan [[wa-|q:38:22:20/1]] atau [[fa-|q:2:18:4/1]]; [[harakat]] diabaikan."
+    },
+    "ash-shirathal-mustaqim": {
+      "method": "Dua token berurutan [[aṣ-ṣirāṭ|q:1:6:2]] + [[al-mustaqīm|q:1:6:3]] (diambil dari 1:6), token pertama boleh berawalan; lalu dicari token [[ṣirāṭ|q:1:7:1]] yang berakhiran kata ganti dan diikuti [[al-mustaqīm|q:1:6:3]]. [[Harakat|harakat]] diabaikan."
+    },
+    "shirath": {
+      "title": "[[Ṣirāṭ|q:1:7:1]]: 45 kali, selalu tunggal",
+      "body": "Kata [[ṣirāṭ|q:1:7:1]] (jalan) muncul 45 kali dalam Al-Qur'an dan selalu dalam bentuk tunggal; bentuk jamaknya tidak pernah dipakai."
+    },
+    "al-maghdhub": {
+      "title": "[[Al-magḍūb|q:1:7:6]] hanya sekali",
+      "method": "QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 1 identik byte-per-byte dengan 1.1 yang dipakai): LEM:magoDuwb (lemma 1:7:6) = 1; ROOT:gDb = 24 segmen dalam 21 ayat. Dicek di Tanzil: token [[al-magḍūb|q:1:7:6]] (boleh berawalan) muncul 1 kali."
+    },
+    "yang-diberi-nikmat": {
+      "method": "Bukan hitungan. Kaitan kedua ayat dikutip dari Ibnu Katsir (tafsir 1:7). Dicek di QAC 0.4 (disusun di atas teks Tanzil Uthmani 1.0.2; surah 1 identik byte-per-byte dengan 1.1 yang dipakai): 4:69 memuat kata kerja dengan LEM:>anoEama, lemma yang sama dengan [[an‘amta|q:1:7:3]] (1:7:3)."
+    }
+  }
+}

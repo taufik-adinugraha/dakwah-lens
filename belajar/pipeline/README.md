@@ -41,11 +41,14 @@ python3 build_surah.py al-fatihah  # write ../content/al-fatihah.json; prints da
 python3 build_surah.py al-ikhlas   # … and the same for al-falaq, an-nas
 python3 validate.py                # re-check every lesson, the library and the links between them; exit 1 on any failure
 python3 test_validate.py           # mutation tests: plants 66 faults in copies of the outputs, each must fail validate
+python3 build_ayat.py              # ../content/ayat/locations.json: every ayah a fact card locates, for its popup (see "Ayat popup"); after the lessons, whose facts it reads
+python3 validate_ayat.py           # the popup data against Tanzil, QuranEnc, the lessons and the pins (CI: --no-corpus); exit 1 on any failure
+python3 test_validate_ayat.py      # plants 28 faults (a missing or extra entry, another ayah's bytes, a stale pin, a name the cards spell otherwise, …) (CI: --no-corpus)
 python3 build_compose.py           # word compositions + harakat primer ../content/compose/*.json (see "Komposisi kata")
 python3 validate_compose.py        # composition checks against the corpus (CI: --no-corpus); exit 1 on any failure
 python3 test_validate_compose.py   # plants 34 faults in copies of the compositions, each must fail (CI: --no-corpus)
 python3 validate_terms.py          # Konsep terms in Arabic script + inline markup (CI: --no-corpus); see "Konsep"
-python3 test_validate_terms.py     # plants 32 faults (retyped term, unmarked term, wrong word bytes, a ref whose Latin names other bytes, ketuk, …)
+python3 test_validate_terms.py     # plants 50 faults (retyped term, unmarked term, wrong word bytes, a ref whose Latin names other bytes, ketuk, a gloss variant whose ref does not resolve, Arabic typed by hand, a marked lesson or Kosakata twin that drifted, …)
 python3 build_quiz.py              # the quizzes ../content/quiz/*.json (see "Kuis"); before the narration, which reads them
 python3 build_narration.py         # narration manifests ../content/narration/*.json (see "Narasi")
 python3 validate_narration.py      # narration checks; exit 1 on any failure
@@ -69,7 +72,10 @@ that file byte for byte (checked with `cmp` when the build was generalised).
 for one surah (`null` = no lexicon entry yet, or a QAC stem with no lemma).
 
 `fetch.py --refresh` re-downloads everything and compares with the pins (upstream drift check);
-`fetch.py --repin <id>` deliberately accepts new bytes for one input. `cache/` is git-ignored.
+`fetch.py --repin <id>` deliberately accepts new bytes for one input; `fetch.py --only <id>`
+(repeatable) fetches or verifies only that input and leaves the others as they are (e.g.
+`--only quranenc_indonesian_affairs_quran --only quranenc_sura_names` for the ayah popup's inputs on
+a machine whose cache predates them). `cache/` is git-ignored.
 
 ## Files
 
@@ -82,9 +88,14 @@ for one surah (`null` = no lexicon entry yet, or a QAC stem with no lemma).
 | `authored/<slug>.structure.json` | 3 | Hand-authored `Ayah.structure` (type, summary, word groups, sources) and `Word.role`, with `role_src` / pipeline review notes (never shipped) |
 | `authored/<slug>.concepts-map.json` | 3 | Word loc -> Konsep ids (`Word.concepts`); generated from the concepts' `examples`, re-checked both ways by `validate.py` |
 | `authored/<slug>.facts.generated.json` | 2/3 | Facts for a surah other than Al-Fatihah: `{"facts": [Fact, …]}` in `schema.ts` shape, passed through after the `validate.py` fact checks (optional) |
+| `authored/<slug>.facts.marked.json` | 3 | A marked lesson's facts with their terms and Qur'anic words marked (an overlay on the computed facts: fact id → title / body / method, each stripping to the computed text); see "Konsep" |
 | `authored/<slug>.hadith.json` | 1/3 | Hadith for the lesson: `{"hadith": [Hadith, …]}`, retrieved from the platform corpus (optional; `hadith: []` without it) |
 | `facts.py` | 2 | Recomputes the plan's Appendix B "Tahukah kamu?" facts for Al-Fatihah from Tanzil + QAC |
 | `facts_muawwidzat.py` | 1/2 | Writes the Al-Mu'awwidzat facts and hadith files from Tanzil + QAC + the platform corpus (`--corpus api/data`); every figure is re-derived a second way, and `--check` fails if a written file differs from a fresh run |
+| `ayat.py` | — | The fact cards' ayah popup data: which ayat (every fact location), the Arabic (Tanzil, heading sliced as `lesson_ayah`), the translation (QuranEnc, footnotes split as the lessons), the surah names (QuranEnc's list, folded), the build and every check, with and without the corpus |
+| `build_ayat.py` | 2 | Writes `belajar/content/ayat/locations.json`; `--check` compares with a fresh build; `--check --no-corpus` (CI) only that it still covers exactly the facts' locations with the pins of `sources.json` |
+| `validate_ayat.py` | 6 | The popup data checks (`--no-corpus` in CI: coverage, order, Arabic script, footnote markers, the lesson ayat byte for byte, the credit, pins, versions, the entries hash, names; locally also Tanzil, QuranEnc, the sura list and a fresh build) |
+| `test_validate_ayat.py` | 6 | Planted-fault tests for `validate_ayat.py` (`--no-corpus` skips the 5 faults only the cache can catch) + unit tests of the name folding and the sura list |
 | `build_surah.py` | 2 | `build_surah.py <slug>` joins everything into `belajar/content/<slug>.json` |
 | `build_fatihah.py` | 2 | Wrapper: `build_surah.py al-fatihah` |
 | `validate.py` | 6 | Independent re-check of every lesson and the library against Tanzil, QAC, quran-align, QuranEnc, the pins and `schema.ts` (a Python mirror of its zod rules), of every link between them, and of the app wiring |
@@ -123,6 +134,8 @@ for one surah (`null` = no lexicon entry yet, or a QAC stem with no lemma).
 | `qac_morphology` | Quranic Arabic Corpus morphology, GitHub mirror of the unmodified file (official download needs an email) | 0.4 (header checked) |
 | `quran_align` | cpfair/quran-align release zip; `Husary_Muallim_128kbps.json` and `Alafasy_128kbps.json` checked against the SHA-1s in the release README | release-2016-11-24 |
 | `quranenc_indonesian_affairs` | QuranEnc API: sura 1 (top-level fields, unchanged) and suras 112, 113, 114 (`suras` map, one pinned file each, same endpoint), plus the translations list for the version and title | 1.0.1 as reported by `translations/list` |
+| `quranenc_indonesian_affairs_quran` | The same translation for every sura 1..114 (the fact cards' ayah popup: the facts locate ayat in 103 suras), one pinned file per sura in `cache/quranenc/`; a file another input pins too must carry the same pin | 1.0.1 (sura 1's translations list) |
+| `quranenc_sura_names` | QuranEnc's Indonesian sura list (`/id/browse/indonesian_affairs`), cached and pinned as the extracted `number\|ayat\|arabic\|name` text (the HTML carries tokens); ayah counts checked against Tanzil | `text_sha256` |
 | `everyayah_*` | The 44 streamed MP3s (2 reciters × 22 ayat), downloaded only to measure their length (never committed or served); url pattern `{SSS}{AAA}.mp3` | per-file sha256 + duration |
 
 **Tanzil download options.** On tanzil.net/download the four checkboxes (pause marks, sajdah
@@ -321,6 +334,44 @@ are paraphrased in Indonesian in fact bodies (Bukhari 4974, 5013, 5016, 5017, 57
 hadith facts). Corpus defects are listed in each hadith file's `_anomalies` and kept byte for
 byte: Riyad 1013's English stops mid-quotation, and Muslim 813's Arabic (as in the fawazahmed0
 section file it came from) opens the Prophet's quoted saying and never closes it.
+
+## Ayat popup (the fact cards' locations)
+
+Operator 2026-10-12: a location chip on a "Tahukah Anda?" card ("QS 2:255") opened quran.com in a
+new tab or app; it now opens a dialog with the ayah itself — Arabic, translation, the imam's
+recitation (`src/components/surah/AyahDialog.tsx`). `build_ayat.py` writes what that dialog shows,
+`belajar/content/ayat/locations.json` (about 1.08 MB: 1,629 ayat in 103 suras, 237 of them with
+QuranEnc footnotes); the app serves it one ayah at a time from `GET /belajar/api/ayah?loc=S:A`
+(`src/app/api/ayah/route.ts`, `src/lib/ayat.ts`, server only), so no page carries the file.
+
+- **Which ayat:** every `Fact.locations` entry of every lesson file — all surahs in `common.SURAHS`,
+  the ones `BELAJAR_SURAHS` hides included, so showing a surah stays an env change — once each, in
+  mushaf order. No other entry. A fact that gains a location fails CI until the file is rebuilt.
+- **Arabic:** the Tanzil Uthmani 1.1 line, byte for byte, with the surah-heading basmalah sliced off
+  exactly as the lessons do (`common.lesson_ayah`; a byte-exact suffix of the line). The facts are
+  counted without the heading ("Lima surah dibuka dengan qul" lists 72:1, which starts with qul),
+  and the EveryAyah ayah-1 recordings carry none.
+- **Translation:** QuranEnc `indonesian_affairs` 1.0.1 (`quranenc_indonesian_affairs_quran`), the
+  row's `translation` verbatim with its `[n]` markers, and its `footnotes` field split per marker by
+  `build_surah.split_footnotes` — the same treatment as a lesson, so an ayah that has a lesson
+  (the 22 of Al-Fatihah and Al-Mu'awwidzat) is byte-identical here (checked, without the corpus
+  too). The credit is QuranEnc's own title and version, as on the lessons.
+- **Surah names** for the dialog's reference ("QS Al-Baqarah [2]: 255"): QuranEnc's Indonesian
+  sura list (`quranenc_sura_names`), folded to plain letters (diacritics dropped, \` written ':
+  "Āli 'Imrān" → "Ali 'Imran", "An-Nisā\`" → "An-Nisa'"). Where the module already writes a name
+  itself, that spelling wins so a card and its dialog never disagree: a lesson's `name_id`, and
+  `ayat.WRITTEN` (35 "Fathir", 82 "Al-Infithar", as the fact cards print them). Every
+  "<name> (<surah>:<ayah>)" the facts write is checked against the table.
+- **Provenance:** `data_versions` (Tanzil pin, QuranEnc version + translations list, the sura list
+  pin, the facts it covers, the hash of the entries, the pipeline) and `sura_files` (the pin of
+  every QuranEnc sura file used). CI has no `cache/`, so it runs `build_ayat.py --check --no-corpus`,
+  `validate_ayat.py --no-corpus` and `test_validate_ayat.py --no-corpus` (coverage, order, Arabic
+  script, footnote markers, the lesson ayat, the credit, pins, versions, the entries hash — a hand
+  edit shows — and the names); Tanzil's bytes, QuranEnc's text and a fresh build run locally.
+
+The recitation is not in the file: the dialog streams Mishary Alafasy's file of the ayah from
+EveryAyah (`Alafasy_128kbps/SSSAAA.mp3`, the lessons' default reciter and URL scheme), only once the
+learner presses play, never stored on our server.
 
 ## Shared library: Kosakata (lexicon) and Akar (roots)
 
@@ -615,6 +666,33 @@ beginners, words explained by their parts).
   rendered MP3 went stale. Two other summaries (fi'il amr, isim maushul) keep their bare quotes:
   the narration already says "kata yang artinya …" for a word of another ayah, and a written
   "yang artinya" would be spoken twice.
+- **Glosses and the other static pages (2026-10-12).** Operator, on /konsep/idhafah: "better
+  provide example, not only the translation 'nama Allah', but also write in arabic 'bismillah'
+  … check also other parts", and on ‘alaihim's word card: "better to write the arabic words, not
+  only the transliteration". So:
+  - the GLOSS variant `[[“nama Allah”|q:1:1:1-2]]`: an example the prose gives only as its
+    Indonesian translation keeps its plain text and shows the Arabic of the ayah words it
+    translates after it, “nama Allah” (بِسْمِ ٱللَّهِ). Only for a surface that is one quotation “…”
+    and a word, run or segment ref; the ref is resolved and byte-checked, its Latin is not
+    compared with the bytes (`terms.is_gloss`, `gloss_problems`).
+  - the lessons of `terms.MARKED_SURAHS` (Al-Fatihah; the hidden Mu'awwidzat are not marked yet)
+    carry the same markup in their authored prose: a word's `why`, `wazn`, `case.sign` and
+    `ikhtilaf` (`<slug>.words.json`), its `role` and the ayah structure's `type`, `summary` and
+    group labels (`<slug>.structure.json`), and the facts through an overlay,
+    `<slug>.facts.marked.json` (the facts are computed, so the overlay must strip to them;
+    every fact is checked). `build_surah.py` ships each as a `marked` twin with its own `quran`
+    and `segments` byte maps; WordCard, StructureSection and FactCard draw them (one first-use
+    scope per card or section; the case chip "majrūr (مَجْرُور) · kasrah (كَسْرَة)" from the
+    term table, `src/lib/cases.ts`), and the quiz texts (`quiz.Terms.annotate_marked`) show the
+    Qur'anic words' Arabic too. Lesson fields whose recorded narration has a bare quote after
+    a word are listed in `terms.BARE_QUOTE_OK`.
+  - the Kosakata prose (`library.lexicon.json`: meanings, tashrif `bab`, i'lal rules, root
+    meanings) is marked by its author, without the style rules (its wording is kept); the word
+    class and the tashrif labels, a closed vocabulary built here, are marked by
+    `terms.mark_terms`. A lexeme's own lemma cited bare is the page's Arabic headword already
+    and stays Latin; a lemma no ayah writes as cited (raḥmah, milk, …) stays Latin.
+  - no plain field changed: the narration manifests are byte-identical and `build_narration.py
+    --check` stays clean.
 
 ## Narasi (guided-lesson narration)
 

@@ -53,7 +53,7 @@ const WARIS = "waris";
 /**
  * Ilmu Waris (Faraidh) links. The report's answers travel only in the URL
  * FRAGMENT ("#j=v1.…", plan D9): never a query string, which would reach the
- * server through the /belajar/api/me referrer. `hitung({ baru: true })` asks
+ * server in the Referer of every request the page makes. `hitung({ baru: true })` asks
  * the questionnaire for a fresh start ("#baru"), for "Hitung untuk beliau".
  */
 export const warisHref = {

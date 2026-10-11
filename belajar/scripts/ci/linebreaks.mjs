@@ -4,7 +4,8 @@
 //
 // Every page a learner reaches by its links — the hub, the track, each surah and ayah it links
 // (every ayah closed, then with every disclosure open), the Konsep index and every concept, every
-// Kosakata entry linked from those — and the autoplay lesson stage step by step (Al-Fatihah 1 with
+// Kosakata entry linked from those, the fact cards' ayah dialog (the longest ayah a card locates,
+// one with footnotes, the first chip) — and the autoplay lesson stage step by step (Al-Fatihah 1 with
 // its narration, so the KARAOKE caption; Al-Fatihah 2 and 7 caption-only), each kind of exercise
 // answered once (a wrong pick, then the answer or "Tunjukkan jawaban") so its feedback is laid out
 // too, on a phone (390) and a desktop (1280), each at the three text sizes (Normal, Besar, Sangat
@@ -55,7 +56,8 @@
 // never page.waitForFunction, whose predicate Playwright runs through eval, which the module's CSP
 // (no 'unsafe-eval') refuses. Waits are locator waits, fixed timeouts, or animation frames awaited
 // inside page.evaluate.
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
 
 import { chromium } from "playwright";
 
@@ -230,6 +232,47 @@ async function staticPages(page, vp) {
 /** A click a learner could make; if something drawn over the stage (a spotlight label) takes the
  *  pointer, the same click is dispatched on the control itself (React handles both alike). */
 const press = (loc) => loc.click({ timeout: 3000 }).catch(() => loc.dispatchEvent("click"));
+
+const AYAH_DIALOG = "dialog[data-ayah-dialog]";
+
+/**
+ * The fact cards' ayah dialog (operator 2026-10-12; src/components/surah/AyahDialog.tsx), opened
+ * from the Al-Fatihah surah page (every disclosure open, so every chip is reachable) on the
+ * longest ayah its cards locate, the first one with QuranEnc footnotes, and the first chip, each
+ * measured inside the dialog at every text size: the Arabic wraps inside it, the reference, the
+ * translation and its footnotes break cleanly, and the page does not scroll sideways
+ * (page-overflow). The longest is also shot at each size (lb-<vp>-ayah-dialog-long-<size>.png).
+ */
+async function ayahDialogs(page, vp) {
+  const label = "ayah dialog";
+  try {
+    const data = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "ayat", "locations.json"), "utf8"));
+    const byLoc = new Map(data.ayat.map((e) => [e.loc, e]));
+    if (!(await open(page, vp, "/belajar/id/quran/al-fatihah"))) return;
+    // Drawn into <body> once the page has hydrated: from then on a chip opens it.
+    await page.locator(AYAH_DIALOG).waitFor({ state: "attached", timeout: 15_000 });
+    await openDetails(page);
+    const locs = await page.locator("[data-ayah-chip]").evaluateAll((els) => [...new Set(els.map((el) => el.getAttribute("data-ayah-chip")))]);
+    const len = (l) => (byLoc.get(l)?.ar.length ?? 0) + (byLoc.get(l)?.translation.text.length ?? 0);
+    const longest = locs.reduce((best, l) => (len(l) > len(best) ? l : best), locs[0]);
+    const footnoted = locs.find((l) => byLoc.get(l)?.translation.footnotes.length);
+    const picks = [...new Set([longest, footnoted, locs[0]].filter(Boolean))];
+    for (const loc of picks) {
+      await press(page.locator(`[data-ayah-chip="${loc}"]`).first());
+      await page.locator(`${AYAH_DIALOG} [data-ayah-ar]`).waitFor({ state: "visible", timeout: 10_000 });
+      await page.evaluate(() => document.fonts.ready.then(() => true));
+      await settle(page);
+      await measureAllSizes(page, vp, `${label} ${loc}`, AYAH_DIALOG, loc === longest ? "ayah-dialog-long" : null);
+      await page.keyboard.press("Escape");
+      await page.locator(AYAH_DIALOG).waitFor({ state: "hidden", timeout: 5_000 });
+    }
+    console.log(`  ${vp}: ayah dialog measured on ${picks.join(", ")} (of ${locs.length} chips)`);
+    if (!picks.length) record({ page: label, viewport: vp, size: "-", kind: "nothing-measured", where: "surah al-fatihah", detail: "no location chip", text: "" });
+  } catch (e) {
+    record({ page: label, viewport: vp, size: "-", kind: "check-error", where: AYAH_DIALOG, detail: String(e?.stack ?? e), text: "" });
+  }
+  await page.goto("about:blank");
+}
 
 /** "Langkah N dari M" → [N, M] (null once the stage is no longer playing). */
 const stepOf = async (page) => {
@@ -571,6 +614,7 @@ async function runViewport(browser, vp, viewport, index) {
   const page = await ctx.newPage();
   try {
     await staticPages(page, vp);
+    await ayahDialogs(page, vp);
     await lessonPages(page, vp, index);
   } finally {
     await ctx.close();

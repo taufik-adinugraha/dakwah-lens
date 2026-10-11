@@ -3,9 +3,8 @@
 import { useCallback, useSyncExternalStore } from "react";
 
 /**
- * Anonymous-first progress (plan §7.3): kept in localStorage; merged into
- * the learner's account on sign-in (server sync lands with the FSRS review
- * queue). useSyncExternalStore keeps SSR and the first client render equal
+ * Progress, kept in this browser's localStorage only: the module has no
+ * sign-in and no account (operator, 2026-10-12; plan L16). useSyncExternalStore keeps SSR and the first client render equal
  * (empty) and then reads storage — no hydration mismatch, no setState in an
  * effect.
  */
