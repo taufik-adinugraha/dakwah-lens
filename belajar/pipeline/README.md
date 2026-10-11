@@ -836,13 +836,24 @@ syllables, splits, letter shapes, strict prose; 3 with the delivery format, 2026
 naming the master, a sha256 of other bytes, another format tag) and unit-tests numbers, `tts_text`, the
 dictionary rendering (spoken text, caption, tokens), the sanitiser, the word places, the content
 addresses (master and delivery), the request body, the delivery encode's fixed flags, drift limit
-and token fit and — on a machine with ffmpeg, so not on the CI runner — one real encode of a
+and token fit, the rule that lines sharing a file carry one set of timings (`settle` refuses twins
+whose timings differ) and the upload command the scripts print (the listed files only, never
+`scp -r`) and — on a machine with ffmpeg, so not on the CI runner — one real encode of a
 generated tone, one `render` of a line whose master is on disk (nothing sent, the manifest gets
 the delivered file, a second run keeps that file without encoding it again, a third with the master
 gone skips the line), the rule that a published name stands (`settle`: kept whatever the master or
 the encoder would give today, encoded again only with `--reencode` or when damaged, a failure when
-damaged with no master, "absent" when neither file is here) and `encode_narration.py --check` on an
-empty output directory (it says nothing was checked, and with `--list` it fails and lists nothing).
+damaged with no master, "absent" when neither file is here), `encode_narration.py --check` on an
+empty output directory (it says nothing was checked, and with `--list` it fails and lists nothing),
+and the rules of the 2026-10-11 review, each with the voice API mocked: audio and tokens move
+together when a master and its alignment are replaced by hand, when a line is rendered fresh over
+a file the manifest already names, and when a text two lines share is retaken (both lines selected,
+or one, which `settle` then refuses until the other is rendered); a line whose entry still names
+its master is rendered, not skipped; a published file that is lost or damaged is restored as the
+published bytes or refused when the encoder writes other bytes (`settle`, `render` and the script
+itself, with LAME quality 3 standing in for another build); and `encode_narration.py --check`
+exits 1 with "out of date" on a damaged file, `--list` leaves that file out, and a failed run
+leaves no list from an earlier run behind.
 CI (`.github/workflows/deploy-belajar.yml`, verify job) runs
 `build_narration.py --check`, `validate_narration.py` and `test_validate_narration.py`; the
 TypeScript guard in `src/lib/autoplay/narration.ts` (`spokenTextProblems`, run by `npm test`) is a
@@ -874,15 +885,20 @@ manifest already names its delivered file, re-used from disk otherwise, copied b
 a changed line gets a new name, never a stale cached file. Each master is then encoded for
 delivery, in the same run (`encode_narration.deliver`, below; a render checks for ffmpeg before it
 sends anything), and the manifest line gets `audio {url, ms, sha256}` of the DELIVERED file
-(duration by ffprobe) and `tokens` after each line;
+(duration by ffprobe) and `tokens` after each line. Audio and tokens always come from one take:
+the tokens are derived each time from the alignment beside the master, and the delivered file the
+manifest already names is kept only when the line was not rendered in this run and those tokens
+have the timings the manifest already has; otherwise the master is delivered anew (a fresh render,
+a master and its `.json` replaced by hand, a second line of a text that was just retaken);
 `build_narration.py` keeps both while the spoken text is unchanged (re-deriving token texts if a
 display form changes). `--surah` and `--only <id-prefix>` (repeatable) narrow a run, e.g.
 `--only al-fatihah:1: --only shared:`; a selection with held-back lines (a heavy letter or a Latin
 Arabic term not from the dictionary) is refused whole, unless `--skip-held` leaves those lines out
 and lists them (`--surah al-fatihah --skip-held` renders the rest); a manifest already voiced by
 another voice needs `--switch-voice`. The run prints the characters sent and the `character-cost` header total. The
-upload is printed, never run, and it is the delivery directory, never the masters:
-`scp -r …/out/delivery/<voice-slug> <vm-host>:/srv/dakwah-lens/data/belajar-media/narration/`.
+upload is printed, never run: the two commands of "Before a deploy" below (the list of the
+delivered files the manifests reference, then those files and no others; never the masters, never
+a whole directory).
 
 **Delivery (`encode_narration.py`; ffmpeg on this machine, no cost).** Operator, 2026-10-11, on
 "how to reduce the loading time?": "do all three" — fetch the imam's recitation early, deliver the
@@ -918,26 +934,48 @@ served as rendered, mono at 128 kbps, twice what speech needs: the opening line 
   again despite the immutable cache, 22.6 MB would have to be uploaded before the next deploy, and
   CI could not notice a missed upload (the validators pass on the renamed manifests). So a line
   whose manifest entry already names a delivered file, with that file on disk and intact (sha256,
-  length, format, decode), is **kept**, master on disk or not, by this script and by
-  `render_narration.py` for a master it re-uses. Only a line without a valid delivered file is
+  length, format, decode), is **kept**, master on disk or not, by this script, and by
+  `render_narration.py` for a master it re-uses while that master is still the take the file was
+  made from (the same token timings). Only a line without a valid delivered file is
   encoded: a new or changed text, a fresh render or retake, a file lost or damaged.
+  A **lost or damaged** file is made again only as the bytes the manifest publishes (the same
+  sha256, so the same name): on the build that published it that is a silent restore. When this
+  machine's ffmpeg writes other bytes for the master, the step fails ("this ffmpeg writes other
+  bytes") instead of renaming the file, in both scripts: fetch the published file back from the
+  server (`https://dakwah-lens.id` + its `audio.url`) into its place under `out/delivery/`. So
+  `out/delivery/` is not a cache to delete on a machine with another ffmpeg.
   `--reencode` encodes every line whose master is here and takes what comes out; it is for a
-  deliberate change of `ENCODE` (a new format: give `DELIVERY_FORMAT` a new tag with it) or a
-  master replaced by hand.
+  deliberate change of `ENCODE` (a new format: give `DELIVERY_FORMAT` a new tag with it) and for
+  nothing else.
 - **The manifest describes what is served.** `audio.url` is the delivered file's, `audio.sha256`
   the sha256 of its bytes, `audio.ms` its length by ffprobe, rounded to the millisecond. `tokens`
   are untouched: they are seconds from the start of the clip, and the clip did not move.
+- **`encode_narration.py` never touches tokens; a retake goes through `render_narration.py`.** A
+  master replaced by hand (another take put in the master's place, with its alignment `.json`) is
+  not a case for `--reencode` alone: that would deliver the new take's audio under the old take's
+  word timings, and neither validator would notice unless the new take is more than 0.5 s shorter
+  than the timings. Run the render on that line first:
+  `python3 render_narration.py --render --i-approve-spend --voice-id <id> --voice-name "<name>" --only <line id>`.
+  Nothing is sent or paid for while the master and its `.json` are on disk (the run prints `reuse`);
+  it re-derives the tokens from the `.json` and delivers the master, so the line gets its audio
+  and its timings together, under the new name the new bytes give. Lines of one manifest with the
+  same text share one master and one delivered file (12 texts on 2026-10-11), so select every one
+  of them: if one is left on the older take, `encode_narration.py` refuses that file ("their token
+  timings differ") and names the lines, instead of giving the new audio to a line that still has
+  the old timings.
 - **What stops the step** (no manifest is written): a freshly encoded file that is not MP3 / 64 kbps /
   mono / 44.1 kHz by ffprobe, whose frames do not add up to ffprobe's length, or that does not
   decode cleanly (`ffmpeg -v error -i f -f null -`); a length more than 80 ms from its master's
   (`MAX_DRIFT_MS`); a karaoke token that no longer fits, i.e. ends later after the end of the
   delivered file than it did after the end of the master. Also a kept file that is damaged while
-  its master is not on the machine to make it again.
+  its master is not on the machine to make it again; a lost or damaged published file that this
+  ffmpeg cannot make again as the published bytes (above); and lines that share a text but carry
+  different token timings (above).
 
 ```bash
 python3 encode_narration.py                    # deliver what the manifests reference (keep what stands, encode the rest), update their audio entries
 python3 encode_narration.py --check            # the same, writing nothing; exit 1 if anything would change
-python3 encode_narration.py --list files.txt   # also list the delivered files on this machine, relative to out/delivery, for the upload; exit 1 if a referenced file is not here
+python3 encode_narration.py --list files.txt   # also list the delivered files on this machine, relative to out/delivery, for the upload; exit 1 if a referenced file is not here as described
 python3 encode_narration.py --check --reencode # every master encoded again and compared with the manifests and the files on disk (this ffmpeg still writes the published bytes)
 ```
 
@@ -947,9 +985,57 @@ is delivered at 64 kbps without this step; run it by hand to re-check a machine'
 master nor its delivered file on the machine (another one rendered it) is left as the manifest has
 it and reported as NOT checked: the run still exits 0, and its last line says how many were kept,
 encoded and unchecked. `--list` is the gate before an upload: it writes only files that are on
-this machine, names every referenced file that is not, and then exits 1, because an upload from a
-short list leaves those lines without audio (a 404, caption-only) unless the server already has
-them.
+this machine as the manifests describe them, names every referenced file that is not, and then
+exits 1, because an upload from a short list leaves those lines without audio (a 404,
+caption-only) unless the server already has them. Under `--check` nothing is repaired, so a file
+found damaged or absent is left out of the list as well. The list of an earlier run is removed
+when the run starts: a run that fails before it writes its own list leaves none behind.
+
+**Before a deploy.** CI has no audio: it checks the manifests alone and cannot see a file that was
+never uploaded, and a line whose file is missing on the server plays caption-only (a 404). So
+whenever a manifest's `audio` entries changed (a render, a retake, a new delivery format), do
+these in order, from `belajar/pipeline`, and deploy only after the last one. Nothing here costs
+money, and only step 3 writes to the server (it adds files and replaces none).
+
+```bash
+# 1. The manifests are what the build gives, and valid.
+python3 build_narration.py --check && python3 validate_narration.py
+
+# 2. Every delivered file the manifests reference is on this machine as described (sha256, length,
+#    format, decode), and the upload list is written. Go on only if this exits 0. If it says "out
+#    of date", run `python3 encode_narration.py` (no --check), commit the manifests if they
+#    changed, and start again at 1.
+python3 encode_narration.py --check --list out/delivery/files.txt
+
+# 3. Upload the listed files and no others (the directory also holds files no manifest references
+#    any more). The script prints this command with its paths filled in; it never runs it.
+cd out/delivery
+COPYFILE_DISABLE=1 tar --no-mac-metadata -cf - -T files.txt | ssh <vm-host> 'sudo -n -u deploy tar -x --skip-old-files -C /srv/dakwah-lens/data/belajar-media/narration'
+
+# 4. Every listed file is served, byte for byte (still in out/delivery). Step 2 has just checked
+#    the local files against the manifests' sha256, so equal to the local file is equal to the
+#    manifest. The last line must say "0 of N".
+bad=0; while read -r f; do
+  served=$(curl -fsS "https://dakwah-lens.id/belajar/media/narration/$f" | shasum -a 256 | cut -d' ' -f1)
+  [ "$served" = "$(shasum -a 256 "$f" | cut -d' ' -f1)" ] || { echo "NOT SERVED AS LISTED: $f"; bad=$((bad+1)); }
+done < files.txt; echo "$bad of $(wc -l < files.txt | tr -d ' ') listed files are not served as listed"
+
+# 5. Only now merge and deploy.
+```
+
+About step 3 (the 335 files were uploaded with it on 2026-10-11, `-k` then in place of
+`--skip-old-files`, into a directory that held none of them): the VM's ssh alias logs in as
+an admin user, while `/srv/dakwah-lens/data/belajar-media` belongs to the user `deploy` and is
+world-readable for Caddy (`deploy/belajar/deploy.sh`), hence `sudo -n -u deploy` on the receiving
+side: files written as another user would not be `deploy`'s. `tar -T files.txt` reads the paths
+relative to `out/delivery` (`<voice-slug>/<slug>/<name>.mp3`), which is the layout under
+`narration/` on the server. `--skip-old-files` keeps a file that is already there: names are
+content-addressed, so a name never means two files and nothing ever needs replacing; that also
+makes the upload safe to run again. Measured on the VM's GNU tar 1.35 (2026-10-11): extracting a
+file that exists exits 0 with `--skip-old-files` and 2 with `-k`, which is why `-k` is not used. A
+non-zero status from step 3 is therefore a real failure; step 4 decides either way.
+`COPYFILE_DISABLE=1` and `--no-mac-metadata` are for macOS's tar, which would otherwise add `._*`
+files and extended attributes to the archive.
 
 Encoded on 2026-10-11 (everything rendered: Al-Fatihah and the shared lines; 362 lines, 335
 files): 45,282,075 → 22,633,255 bytes (50.0%); the largest, `al-fatihah:4:structure`, 491,146 →
