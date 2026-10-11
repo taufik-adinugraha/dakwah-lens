@@ -255,7 +255,7 @@ const MAIN = "https://dakwah-lens.id";
 const UTM = (campaign) => `utm_source=belajar&utm_medium=referral&utm_campaign=${campaign}`;
 
 /** Sets the learner's text size the way the "Aa" panel does (the attribute on <html>). */
-async function setTextSize(page, size) {
+async function setTextSizeAttr(page, size) {
   await page.evaluate((s) => {
     if (s) document.documentElement.dataset.textSize = s;
     else delete document.documentElement.dataset.textSize;
@@ -277,7 +277,7 @@ async function headerShots(page, vp) {
     await page.goto(BASE + path, { waitUntil: "networkidle" });
     await page.evaluate(() => document.fonts.ready);
     for (const size of SIZES) {
-      await setTextSize(page, size);
+      await setTextSizeAttr(page, size);
       const m = await page.locator("header").evaluate((header) => {
         const brand = header.querySelector("[data-brand]");
         const img = brand?.querySelector('img[alt="Dakwah-Lens"]');
@@ -323,7 +323,7 @@ async function headerShots(page, vp) {
         console.log(`shot ${vp}-header-${size ?? "normal"}`);
       }
     }
-    await setTextSize(page, null);
+    await setTextSizeAttr(page, null);
   }
   await page.goto("about:blank");
 }
@@ -370,11 +370,11 @@ async function shareShots(page, vp) {
   const url = `${MAIN}${AYAH_1}`;
   const hasSheet = await page.evaluate(() => typeof navigator.share === "function");
   for (const size of [null, "sangat-besar"]) {
-    await setTextSize(page, size);
+    await setTextSizeAttr(page, size);
     const h = (await toggle.boundingBox())?.height ?? 0;
     if (h < 47.5) throw new Error(`${vp}: Bagikan is ${Math.round(h)}px tall (< 48)`);
   }
-  await setTextSize(page, null);
+  await setTextSizeAttr(page, null);
   if (hasSheet) {
     console.log(`  ${vp}: this browser has a share sheet; the fallback panel is not exercised`);
   } else {
@@ -392,12 +392,12 @@ async function shareShots(page, vp) {
     if (copied !== `${url}?utm_source=share&utm_medium=share`) throw new Error(`${vp}: copied "${copied}"`);
     console.log(`  share ok ${vp}: WhatsApp → …utm_medium=whatsapp, copied ${copied}`);
     for (const size of [null, "sangat-besar"]) {
-      await setTextSize(page, size);
+      await setTextSizeAttr(page, size);
       await share.scrollIntoViewIfNeeded();
       await page.screenshot({ path: `shots/${vp}-share-${size ?? "normal"}.png` });
       console.log(`shot ${vp}-share-${size ?? "normal"}`);
     }
-    await setTextSize(page, null);
+    await setTextSizeAttr(page, null);
   }
   await page.goto("about:blank");
 }
