@@ -4,9 +4,10 @@ manifests (content/narration/*.json), of the lessons they are built from or of t
 dictionary (authored/pronunciation.json), and asserts that the validator fails with the expected
 message. The unmutated copies must pass. Also unit-tests the speech text, the dictionary rendering
 (spoken text, caption, karaoke tokens), the Indonesian numbers, the render request body (no
-network) and the delivery encode (its name, its fixed flags, drift and token fit; with ffmpeg on
-the machine, one real encode of a generated tone). Standard library only; run from belajar/pipeline
-after build_narration.py:
+network) and the delivery encode (its name, its fixed flags, drift and token fit, one take per
+file, the upload command; with ffmpeg on the machine, real encodes of generated tones, renders of
+them with the voice API mocked, and encode_narration.py itself on a scratch output directory).
+Standard library only; run from belajar/pipeline after build_narration.py:
 
     python3 test_validate_narration.py          # table of faults and the message that caught each
     python3 -m unittest test_validate_narration # the same as a unittest run
@@ -590,6 +591,83 @@ class WordPlaces(unittest.TestCase):
         self.assertEqual(V.line_view(None, "start"), ([], None))
 
 
+NEEDS_FFMPEG = unittest.skipUnless(shutil.which("ffmpeg") and shutil.which("ffprobe"),
+                                   "needs ffmpeg and ffprobe (not on the CI runner)")
+RENDER_VOICE = {"id": "v1", "name": "Suara Uji", "model": "eleven_v3"}
+# A stand-in for another ffmpeg or LAME build: LAME quality 3 in place of 2, so the same master
+# gives other bytes of the same length and format.
+OTHER_BUILD = tuple("3" if i and E.ENCODE[i - 1] == "-compression_level" else x for i, x in enumerate(E.ENCODE))
+
+
+def tone(path: Path, hz: int, seconds: float) -> bool:
+    """A generated 128 kbps mono tone at `path`, standing in for a master (False: this ffmpeg cannot)."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    made = subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-y", "-f", "lavfi", "-i", f"sine=frequency={hz}:duration={seconds}",
+                           "-c:a", "libmp3lame", "-b:a", "128k", "-ac", "1", "-ar", "44100", str(path)],
+                          capture_output=True, check=False)
+    return made.returncode == 0
+
+
+def alignment(text: str, seconds: float) -> dict:
+    """A made-up alignment as ElevenLabs returns one: the characters of `text` spread evenly over `seconds`."""
+    step = seconds / len(text)
+    return {"characters": list(text), "character_start_times_seconds": [round(i * step, 3) for i in range(len(text))],
+            "character_end_times_seconds": [round((i + 1) * step, 3) for i in range(len(text))]}
+
+
+def take(master: Path, hz: int, seconds: float, text: str) -> bool:
+    """One take of `text` on disk: the master (a tone) and, beside it, its alignment .json."""
+    if not tone(master, hz, seconds):
+        return False
+    master.with_suffix(".json").write_text(json.dumps(alignment(text, seconds - 0.1)), encoding="utf-8")
+    return True
+
+
+def aligned_timings(text: str, seconds: float) -> list:
+    """The token timings render_narration derives from take(…, seconds, text)'s alignment."""
+    al = alignment(text, seconds - 0.1)
+    return E.timings(LEX.tokens(text, al["character_start_times_seconds"], al["character_end_times_seconds"]))
+
+
+def unrendered(name: str) -> dict:
+    """A copy of the manifests in which `name` has no voice, no audio and no tokens yet."""
+    manifests = copy.deepcopy(MANIFESTS)
+    manifests[name]["voice"] = None
+    for ln in manifests[name]["lines"].values():
+        ln.pop("audio", None)
+        ln.pop("tokens", None)
+    return manifests
+
+
+@contextlib.contextmanager
+def rendering(root: Path, synthesize):
+    """render_narration.render with the voice API replaced by `synthesize` (nothing is ever sent)
+    and the manifests written under `root`; yields what the run prints."""
+    with mock.patch.object(R, "synthesize", synthesize), mock.patch.object(R, "read_api_key", return_value="test"), \
+            mock.patch.object(V, "NARRATION_DIR", root), contextlib.redirect_stdout(io.StringIO()) as said:
+        yield said
+
+
+def render_args(root: Path) -> argparse.Namespace:
+    return argparse.Namespace(voice_id=RENDER_VOICE["id"], voice_name=RENDER_VOICE["name"], out=str(root / "out"),
+                              env_file=str(root / "none.env"), switch_voice=False)
+
+
+def encode_main(narration: Path, *argv: str) -> tuple[int, str]:
+    """encode_narration.main() on the manifests in `narration`, in this process (so that a test can
+    stand in for another encoder build): its exit status and what it printed."""
+    with mock.patch.object(V, "NARRATION_DIR", narration), mock.patch.object(sys, "argv", ["encode_narration.py", *argv]), \
+            contextlib.redirect_stdout(io.StringIO()) as said:
+        try:
+            status = E.main()
+        except SystemExit as e:
+            status = e.code
+    return status, said.getvalue()
+
+
+NEVER_SENT = "a test must never call the voice API"
+
+
 class SpeechAndRender(unittest.TestCase):
     def test_numbers(self):
         cases = {1: "satu", 11: "sebelas", 12: "dua belas", 20: "dua puluh", 45: "empat puluh lima",
@@ -694,6 +772,82 @@ class SpeechAndRender(unittest.TestCase):
         self.assertEqual(E.past_master_ms(toks, 3.0), 0)
         self.assertTrue(any("no longer fits" in e for e in E.fit_problems(late, 3.0, 2.99)))
 
+    def test_one_file_one_take(self):
+        # What tells two takes of a text apart is the token timings, never the token texts (those
+        # are re-derived by the build when a display form changes).
+        toks = [{"t": "Kata", "s": 0.0, "e": 0.4}, {"t": "pertama.", "s": 0.5, "e": 2.95}]
+        self.assertEqual(E.timings(toks), [(0.0, 0.4), (0.5, 2.95)])
+        self.assertEqual(E.timings([{**toks[0], "t": "kata (كَلِمَة)"}, toks[1]]), E.timings(toks))
+        self.assertEqual(E.timings(None), [])
+        # encode_narration.settle never writes tokens, so lines that share a text (one master, one
+        # delivered file) must carry ONE set of timings: a twin still on an older take is refused,
+        # before ffmpeg is asked for anything, instead of getting the new audio under old timings.
+        text = "Benar."
+        audio = {"url": V.delivery_url(RENDER_VOICE, "shared", text, SHA), "ms": 3000, "sha256": SHA}
+        line = {"text": text, "audio": dict(audio), "tokens": toks}
+        older = {**line, "tokens": [{**t, "s": round(t["s"] * 1.1, 3), "e": round(t["e"] * 1.1, 3)} for t in toks]}
+        nowhere = Path("no-such-out")
+        for reencode in (False, True):
+            how, d, errs = E.settle([line, older], nowhere / "master.mp3", RENDER_VOICE, "shared", nowhere, reencode=reencode, write=False)
+            self.assertEqual((how, d), ("failed", None))
+            self.assertIn("token timings differ", errs[0])
+            self.assertIn("render_narration.py --render", errs[0])
+        # Every line of a group is compared, not only the second: published groups have 3 and 6 lines.
+        for group in ([line, line, older], [line, line, line, line, line, older]):
+            self.assertEqual(E.settle(group, nowhere / "master.mp3", RENDER_VOICE, "shared", nowhere, write=False)[0], "failed")
+        # the same timings under other token texts are one take: nothing to refuse (and nothing here to check)
+        retexted = {**line, "tokens": [{**toks[0], "t": "kata"}, toks[1]]}
+        self.assertEqual(E.settle([line, retexted], nowhere / "master.mp3", RENDER_VOICE, "shared", nowhere, write=False),
+                         ("absent", None, []))
+
+    def test_tokens_are_the_masters_take(self):
+        # encode_narration.take_problems (review 2026-10-11): this step never writes tokens, so a
+        # master replaced by hand and re-encoded (--reencode) would play under the old take's
+        # timings. Every token time is copied (to the ms) from the alignment beside the master: a
+        # time that is not there is another take's, and the line is refused before ffmpeg is asked.
+        text = "Kata pertama."
+        times = lambda k: {"characters": list(text),
+                           "character_start_times_seconds": [round(k * i * 0.2, 4) for i in range(len(text))],
+                           "character_end_times_seconds": [round(k * (i + 1) * 0.2 - 0.01, 4) for i in range(len(text))]}
+        al = times(1.0)
+        toks = [{"t": "Kata", "s": round(al["character_start_times_seconds"][0], 3), "e": round(al["character_end_times_seconds"][3], 3)},
+                {"t": "pertama.", "s": round(al["character_start_times_seconds"][5], 3), "e": round(al["character_end_times_seconds"][-1], 3)}]
+        audio = {"url": V.delivery_url(RENDER_VOICE, "shared", text, SHA), "ms": 3000, "sha256": SHA}
+        line = {"text": text, "audio": audio, "tokens": toks}
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            master = root / "master.mp3"
+            master.write_bytes(b"not decoded: refused before ffmpeg")
+            self.assertIn("no alignment beside the master", E.take_problems([line], master)[0])
+            master.with_suffix(".json").write_text(json.dumps(al), encoding="utf-8")
+            self.assertEqual(E.take_problems([line, line], master), [])
+            # the master and its alignment replaced by a slower take: the lines' timings are not in it
+            master.with_suffix(".json").write_text(json.dumps(times(1.1)), encoding="utf-8")
+            self.assertIn("not the take at the master", E.take_problems([line], master)[0])
+            for reencode in (False, True):
+                how, d, errs = E.settle([line], master, RENDER_VOICE, "shared", root, reencode=reencode, write=False)
+                self.assertEqual((how, d), ("failed", None))
+                self.assertIn("render_narration.py --render", errs[0])
+
+    def test_upload_sends_the_listed_files_only(self):
+        # The upload the scripts print (never run): the files of the --list file, read by tar from the
+        # delivery directory, unpacked on the VM as the owner of the media directory, existing files
+        # kept. Never `scp -r` of a directory, which also holds files no manifest references.
+        out = Path("/o/out")
+        self.assertEqual(E.upload_command(out),
+                         "cd /o/out/delivery && COPYFILE_DISABLE=1 tar --no-mac-metadata -cf - -T /o/out/delivery/files.txt "
+                         "| ssh <vm-host> 'sudo -n -u deploy tar -x --skip-old-files -C /srv/dakwah-lens/data/belajar-media/narration'")
+        self.assertIn("-T '/tmp/my list.txt' ", E.upload_command(out, Path("/tmp/my list.txt")))
+        self.assertEqual(E.list_command(out), "python3 encode_narration.py --check --out /o/out --list /o/out/delivery/files.txt")
+        self.assertEqual(E.list_command(E.DEFAULT_OUT.resolve()),
+                         f"python3 encode_narration.py --check --list {E.DEFAULT_OUT.resolve() / 'delivery' / 'files.txt'}")
+        # the steps a run prints: the list first (unless it has just written it), the upload, the served check
+        self.assertEqual(E.upload_steps(out)[:2], [f"  {E.list_command(out)}", f"  {E.upload_command(out)}"])
+        self.assertEqual(E.upload_steps(out, Path("/l.txt"))[0], f"  {E.upload_command(out, Path('/l.txt'))}")
+        self.assertIn("https://dakwah-lens.id/belajar/media/narration/", E.upload_steps(out)[-1])
+        for script in ("encode_narration.py", "render_narration.py"):
+            self.assertNotIn("scp ", (Path(E.__file__).resolve().parent / script).read_text(encoding="utf-8"), script)
+
     @unittest.skipUnless(shutil.which("ffmpeg") and shutil.which("ffprobe"), "needs ffmpeg and ffprobe (not on the CI runner)")
     def test_render_delivers_what_it_renders(self):
         # render_narration.render on a line whose master is already on disk (a generated tone and a
@@ -735,8 +889,11 @@ class SpeechAndRender(unittest.TestCase):
                 self.assertEqual(" ".join(t["t"] for t in ln["tokens"]), LEX.render_display(text))
                 self.assertEqual(json.loads((root / f"{name}.json").read_text(encoding="utf-8"))["lines"][lid]["audio"], first)
                 self.assertEqual(V.check_audio(lid, first, name, manifests[name]["voice"], text), [])
-                # the upload it prints is the delivery directory, never the masters
-                self.assertIn(f"scp -r {(root / 'out').resolve() / 'delivery' / 'suara-uji'} ", said.getvalue())
+                # the upload it prints sends the files of the list, from the delivery directory: never
+                # the masters, never a whole directory
+                self.assertIn(E.list_command((root / "out").resolve()), said.getvalue())
+                self.assertIn(E.upload_command((root / "out").resolve()), said.getvalue())
+                self.assertNotIn("scp", said.getvalue())
                 self.assertIn("reuse  shared:correct", said.getvalue())
                 # Run again with the master still on disk: the delivered file the manifest names is
                 # kept, not encoded again (another ffmpeg build would write other bytes, a new name).
@@ -807,7 +964,16 @@ class SpeechAndRender(unittest.TestCase):
             master.parent.mkdir(parents=True)
             if not tone(master, 440):
                 self.skipTest("this ffmpeg cannot make the test tone")
+            # Its alignment, as render_narration.py keeps one beside every master: the take the
+            # tokens are from (encode_narration.take_problems), unchanged below where only the bytes are.
+            n = len(text)
+            master.with_suffix(".json").write_text(json.dumps({
+                "characters": list(text),
+                "character_start_times_seconds": [round(0.1 + i * 1.8 / n, 3) for i in range(n)],
+                "character_end_times_seconds": [round(0.1 + (i + 1) * 1.8 / n, 3) for i in range(n)],
+            }), encoding="utf-8")
             d = E.deliver(master, text, voice, "shared", toks, root)
+            first_take = master.read_bytes()
             line = {"text": text, "audio": dict(d.audio), "tokens": toks}
             twin = {"text": text, "audio": dict(d.audio), "tokens": toks}  # the same text on another line
             settle = lambda lines=None, **kw: E.settle(lines or [line, twin], master, voice, "shared", root, **kw)
@@ -830,12 +996,18 @@ class SpeechAndRender(unittest.TestCase):
             elsewhere = {"url": V.delivery_url(voice, "shared", text, "1" * 64), "ms": d.audio["ms"], "sha256": "1" * 64}
             self.assertTrue(V.is_delivery(elsewhere, voice, "shared", text))
             self.assertEqual(settle([line, {**twin, "audio": elsewhere}], write=False)[0], "encoded")
-            # A damaged delivered file: made again while its master is here, a failure once it is not.
+            # A damaged delivered file: made again while its master is here and still gives the
+            # published bytes, a failure once it is not. (With the other bytes in the master's place
+            # it is refused: test_published_file_is_never_renamed_in_passing.)
             whole = d.path.read_bytes()
             for damaged in (whole[: len(whole) // 2], b"", b"not an mp3" * 50):
                 d.path.write_bytes(damaged)
                 self.assertIsNone(E.standing(line, voice, "shared", root))
-                self.assertEqual(settle(write=False)[0], "encoded")
+                self.assertEqual(settle(write=False)[0], "failed")
+                master.write_bytes(first_take)
+                how, again, errs = settle(write=False)
+                self.assertEqual((how, errs, again.audio), ("encoded", [], line["audio"]))
+                self.assertTrue(tone(master, 880))
             master.unlink()
             how, _d, errs = settle()
             self.assertEqual(how, "failed")
@@ -869,6 +1041,305 @@ class SpeechAndRender(unittest.TestCase):
             self.assertIn("NOT in the list", gate.stdout)
             self.assertEqual(listed.read_text(encoding="utf-8"), "")
             self.assertEqual(list(Path(tmp).glob("delivery/**/*.mp3")), [])  # --check wrote nothing
+
+    @NEEDS_FFMPEG
+    def test_render_takes_audio_and_tokens_from_one_take(self):
+        # render_narration.render derives the tokens from the alignment beside the master, every
+        # time. The delivered file the manifest already names may be kept only while it is that
+        # same take; otherwise the line would play one take under another take's word timings, and
+        # no validator could tell (review 2026-10-11).
+        lid, name = "shared:correct", "shared"
+        text = MANIFESTS[name]["lines"][lid]["text"]
+        manifests = unrendered(name)
+        ln = manifests[name]["lines"][lid]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            out, args = root / "out", render_args(root)
+            master = E.master_path(out, RENDER_VOICE, name, text)
+            if not take(master, 440, 3, text):
+                self.skipTest("this ffmpeg cannot make the test tone")
+            never = mock.Mock(side_effect=AssertionError(NEVER_SENT))
+            run = lambda: R.render([(name, lid, text)], manifests, LESSONS, args, LIBRARY)
+
+            def one_take(seconds: float) -> None:
+                """The line's audio is the master on disk, delivered, and its tokens are that take's."""
+                delivered = E.delivery_path(out, ln["audio"]["url"])
+                self.assertEqual(delivered.read_bytes(), E.encode(master))
+                self.assertEqual(E.sha256_bytes(delivered.read_bytes()), ln["audio"]["sha256"])
+                self.assertEqual(ln["audio"]["ms"], E.probe(delivered)["ms"])
+                self.assertEqual(E.timings(ln["tokens"]), aligned_timings(text, seconds))
+                self.assertLessEqual(ln["tokens"][-1]["e"], ln["audio"]["ms"] / 1000)
+                self.assertEqual(json.loads((root / f"{name}.json").read_text(encoding="utf-8"))["lines"][lid], ln)
+
+            with rendering(root, never):
+                self.assertEqual(run(), 0)
+                first = dict(ln["audio"])
+                one_take(3)
+                # A retake put in the master's place by hand, with its alignment: the audio and the
+                # tokens move together. (Kept, the line would have the 3 s file under 2 s timings.)
+                self.assertTrue(take(master, 880, 2, text))
+                self.assertEqual(run(), 0)
+                second = dict(ln["audio"])
+                self.assertNotEqual(second["url"], first["url"])
+                self.assertLess(second["ms"], first["ms"] - 500)
+                one_take(2)
+                # Again with nothing replaced: now the manifest's file IS the take on disk, and it is kept.
+                with mock.patch.object(E, "_encode_to", side_effect=AssertionError("a published file must not be encoded again")):
+                    self.assertEqual(run(), 0)
+                self.assertEqual(ln["audio"], second)
+            never.assert_not_called()
+            # A FRESH render (here: the alignment is gone, so the line is sent again) is delivered
+            # anew even when its timings are the very ones the manifest has: the audio is another take.
+            master.with_suffix(".json").unlink()
+            self.assertTrue(tone(root / "retake.mp3", 660, 2))
+            fresh = mock.Mock(return_value=((root / "retake.mp3").read_bytes(), alignment(text, 1.9), len(text)))
+            with rendering(root, fresh) as said:
+                self.assertEqual(run(), 0)
+            fresh.assert_called_once()
+            self.assertIn(f"render {lid}", said.getvalue())
+            self.assertEqual(master.read_bytes(), (root / "retake.mp3").read_bytes())
+            self.assertNotEqual(ln["audio"]["url"], second["url"])
+            one_take(2)
+
+    @NEEDS_FFMPEG
+    def test_render_retake_of_a_shared_text(self):
+        # Two lines of one manifest with the same text share one master. When the text is retaken,
+        # the line rendered second re-uses the master the first one just paid for: it must take
+        # that take's audio with its tokens, not keep the old file under the new timings.
+        name = "shared"
+        by: dict[str, list[str]] = {}
+        for lid, ln in MANIFESTS[name]["lines"].items():
+            by.setdefault(ln["text"], []).append(lid)
+        twins = next((lids for lids in by.values() if len(lids) > 1), None)
+        if not twins:
+            self.skipTest("no two shared lines have the same text")
+        a, b = twins[:2]
+        text = MANIFESTS[name]["lines"][a]["text"]
+        manifests = unrendered(name)
+        la, lb = manifests[name]["lines"][a], manifests[name]["lines"][b]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            out, args = root / "out", render_args(root)
+            master = E.master_path(out, RENDER_VOICE, name, text)
+            if not take(master, 440, 3, text):
+                self.skipTest("this ffmpeg cannot make the test tone")
+            run = lambda *lids: R.render([(name, lid, text) for lid in lids], manifests, LESSONS, args, LIBRARY)
+            settle = lambda **kw: E.settle([la, lb], master, RENDER_VOICE, name, out, **kw)
+
+            def retake(hz: int, seconds: float) -> mock.Mock:
+                """The operator's retake: the master and its alignment deleted, the audio taken off
+                the FIRST line only; the voice API (mocked) then returns another take."""
+                self.assertTrue(tone(root / "retake.mp3", hz, seconds))
+                master.unlink()
+                master.with_suffix(".json").unlink()
+                la.pop("audio")
+                la.pop("tokens")
+                return mock.Mock(return_value=((root / "retake.mp3").read_bytes(), alignment(text, seconds - 0.1), len(text)))
+
+            with rendering(root, mock.Mock(side_effect=AssertionError(NEVER_SENT))):
+                self.assertEqual(run(a, b), 0)
+            first = dict(la["audio"])
+            self.assertEqual(lb["audio"], first)
+            self.assertEqual(settle(), ("kept", None, []))
+            # Both lines selected: one request, and both get the new take's audio and timings.
+            sent = retake(880, 2)
+            with rendering(root, sent) as said:
+                self.assertEqual(run(a, b), 0)
+            sent.assert_called_once()
+            self.assertIn(f"render {a}", said.getvalue())
+            self.assertIn(f"reuse  {b}", said.getvalue())
+            second = dict(la["audio"])
+            self.assertNotEqual(second["url"], first["url"])
+            self.assertEqual(lb["audio"], second)
+            for ln in (la, lb):
+                self.assertEqual(E.timings(ln["tokens"]), aligned_timings(text, 2))
+                self.assertLessEqual(ln["tokens"][-1]["e"], ln["audio"]["ms"] / 1000)
+            self.assertEqual(E.delivery_path(out, second["url"]).read_bytes(), E.encode(master))
+            self.assertEqual(settle(), ("kept", None, []))
+            # Only the first selected (--only): the second still has the older take, whole (its
+            # audio with its own timings). encode_narration.py must not hand it the new file, which
+            # would sit under the old timings: it refuses, and names what to run.
+            sent = retake(660, 2.5)
+            with rendering(root, sent):
+                self.assertEqual(run(a), 0)
+            third = dict(la["audio"])
+            self.assertNotEqual(third["url"], second["url"])
+            self.assertEqual((lb["audio"], E.timings(lb["tokens"])), (second, aligned_timings(text, 2)))
+            for kw in ({}, {"write": False}, {"reencode": True}):
+                how, _d, errs = settle(**kw)
+                self.assertEqual(how, "failed", kw)
+                self.assertIn("token timings differ", errs[0])
+            self.assertEqual(lb["audio"], second)
+            # What it names: render on the other line. Nothing is sent (the master is on disk), and
+            # the line moves to the new take, audio and tokens together.
+            with rendering(root, mock.Mock(side_effect=AssertionError(NEVER_SENT))) as said:
+                self.assertEqual(run(b), 0)
+            self.assertIn(f"reuse  {b}", said.getvalue())
+            self.assertEqual(lb["audio"], third)
+            self.assertEqual(E.timings(lb["tokens"]), aligned_timings(text, 2.5))
+            self.assertEqual(settle(), ("kept", None, []))
+
+    @NEEDS_FFMPEG
+    def test_render_does_not_skip_a_line_that_names_its_master(self):
+        # Until 2026-10-11 a rendered line named its 128 kbps master. Such an entry has audio and
+        # tokens but no delivered file, so with the master not on this machine the line is rendered
+        # (and delivered), not skipped as "the manifest already has this audio".
+        lid, name = "shared:correct", "shared"
+        text = MANIFESTS[name]["lines"][lid]["text"]
+        manifests = unrendered(name)
+        manifests[name]["voice"] = dict(RENDER_VOICE)
+        ln = manifests[name]["lines"][lid]
+        ln["audio"] = {"url": V.master_url(RENDER_VOICE, name, text), "ms": 3000, "sha256": SHA}
+        ln["tokens"] = fake_tokens(text)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            if not tone(root / "take.mp3", 440, 3):
+                self.skipTest("this ffmpeg cannot make the test tone")
+            sent = mock.Mock(return_value=((root / "take.mp3").read_bytes(), alignment(text, 2.9), len(text)))
+            with rendering(root, sent) as said:
+                self.assertEqual(R.render([(name, lid, text)], manifests, LESSONS, render_args(root), LIBRARY), 0)
+            sent.assert_called_once()
+            self.assertIn(f"render {lid}", said.getvalue())
+            self.assertNotIn("skip   ", said.getvalue())  # render's own "skip   <id>" line, not the upload's --skip-old-files
+            self.assertTrue(V.is_delivery(ln["audio"], RENDER_VOICE, name, text))
+            self.assertTrue(E.delivery_path(root / "out", ln["audio"]["url"]).is_file())
+            self.assertEqual(E.timings(ln["tokens"]), aligned_timings(text, 3))
+
+    @NEEDS_FFMPEG
+    def test_published_file_is_never_renamed_in_passing(self):
+        # A delivered file the manifest names, lost or damaged on this machine, is made again from
+        # its master only as the published bytes. Another ffmpeg or LAME build writes other bytes,
+        # which would be a new name: the manifest rewritten, exit 0, and a file CI cannot see was
+        # never uploaded. So that is a failure that says to fetch the file back from the server;
+        # only --reencode takes the new bytes (review 2026-10-11).
+        lid, name = "shared:correct", "shared"
+        text = MANIFESTS[name]["lines"][lid]["text"]
+        manifests = unrendered(name)
+        ln = manifests[name]["lines"][lid]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            out, args = root / "out", render_args(root)
+            master = E.master_path(out, RENDER_VOICE, name, text)
+            if not take(master, 440, 3, text):
+                self.skipTest("this ffmpeg cannot make the test tone")
+            never = mock.Mock(side_effect=AssertionError(NEVER_SENT))
+            run = lambda: R.render([(name, lid, text)], manifests, LESSONS, args, LIBRARY)
+            with rendering(root, never):
+                self.assertEqual(run(), 0)
+            published = dict(ln["audio"])
+            delivered = E.delivery_path(out, published["url"])
+            whole = delivered.read_bytes()
+            written = (root / f"{name}.json").read_bytes()
+            with mock.patch.object(E, "ENCODE", OTHER_BUILD):
+                self.assertNotEqual(E.encode(master), whole)  # the stand-in does write other bytes
+            settle = lambda **kw: E.settle([ln], master, RENDER_VOICE, name, out, **kw)
+            for what, hurt in (("lost", delivered.unlink), ("damaged", lambda: delivered.write_bytes(whole[: len(whole) // 2]))):
+                with mock.patch.object(E, "ENCODE", OTHER_BUILD):
+                    # everything on disk: kept, whatever this build would write
+                    self.assertEqual(settle(), ("kept", None, []), what)
+                    hurt()
+                    was = delivered.read_bytes() if delivered.exists() else None
+                    for kw in ({}, {"write": False}):
+                        how, _d, errs = settle(**kw)
+                        self.assertEqual(how, "failed", what)
+                        self.assertIn("this ffmpeg writes other bytes", errs[0])
+                        self.assertIn(f"fetch the file back from the server ({E.SITE}{published['url']})", errs[0])
+                    # the same rule for a render that re-uses the master (not rendered fresh)
+                    with rendering(root, never), self.assertRaises(SystemExit) as stopped:
+                        run()
+                    self.assertIn("this ffmpeg writes other bytes", str(stopped.exception))
+                    # nothing was renamed, nothing written: the manifest, the directory, the damaged file
+                    self.assertEqual(ln["audio"], published)
+                    self.assertEqual((root / f"{name}.json").read_bytes(), written)
+                    self.assertEqual((delivered.read_bytes() if delivered.exists() else None), was)
+                    self.assertEqual([p for p in delivered.parent.glob("*.mp3") if p != delivered], [])
+                    # --reencode is the deliberate way: the new bytes, under a new name (not written by --check)
+                    how, again, errs = settle(reencode=True, write=False)
+                    self.assertEqual((how, errs), ("encoded", []))
+                    self.assertNotEqual(again.audio["url"], published["url"])
+                # The build that published it gives the published bytes: restored without a word.
+                how, again, errs = settle()
+                self.assertEqual((how, errs, again.audio), ("encoded", [], published), what)
+                self.assertEqual(delivered.read_bytes(), whole)
+                hurt()
+                with rendering(root, never):
+                    self.assertEqual(run(), 0)
+                self.assertEqual(ln["audio"], published)
+                self.assertEqual(delivered.read_bytes(), whole)
+            never.assert_not_called()
+
+    @NEEDS_FFMPEG
+    def test_encode_check_and_list_see_a_damaged_file(self):
+        # encode_narration.py itself, on a scratch output directory and a scratch copy of one
+        # manifest: --check must exit 1 on a delivered file that is damaged (it says "out of
+        # date"), --list must never name such a file for the upload, and a list from an earlier
+        # run must not outlive a run that fails.
+        lid, name = "shared:correct", "shared"
+        text = MANIFESTS[name]["lines"][lid]["text"]
+        manifests = unrendered(name)
+        ln = manifests[name]["lines"][lid]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            out, narration = root / "out", root / "narration"
+            narration.mkdir()
+            master = E.master_path(out, RENDER_VOICE, name, text)
+            if not take(master, 440, 3, text):
+                self.skipTest("this ffmpeg cannot make the test tone")
+            with rendering(narration, mock.Mock(side_effect=AssertionError(NEVER_SENT))):
+                self.assertEqual(R.render([(name, lid, text)], manifests, LESSONS, render_args(root), LIBRARY), 0)
+            delivered = E.delivery_path(out, ln["audio"]["url"])
+            rel = ln["audio"]["url"][len(V.MEDIA_PREFIX):]
+            whole, written = delivered.read_bytes(), (narration / f"{name}.json").read_bytes()
+            listed = root / "files.txt"
+            main = lambda *argv: encode_main(narration, "--out", str(out), *argv)
+            # everything as described: OK, and the list names the one file
+            status, said = main("--check", "--list", str(listed))
+            self.assertEqual(status, 0, said)
+            self.assertIn("OK: 1 delivered files are on disk as the manifests describe them", said)
+            self.assertEqual(listed.read_text(encoding="utf-8"), f"{rel}\n")
+            self.assertIn(E.upload_command(out.resolve(), listed.resolve()), said)
+            # the delivered file cut in half, its master here: --check says so with its exit status,
+            # writes nothing, and the damaged file is not in the list
+            delivered.write_bytes(whole[: len(whole) // 2])
+            status, said = main("--check")
+            self.assertEqual(status, 1, said)
+            self.assertIn("out of date: 1 delivered files not on disk as encoded", said)
+            self.assertNotIn("OK:", said)
+            self.assertEqual(delivered.read_bytes(), whole[: len(whole) // 2])
+            status, said = main("--check", "--list", str(listed))
+            self.assertEqual(status, 1, said)
+            self.assertEqual(listed.read_text(encoding="utf-8"), "")
+            self.assertIn("NOT in the list", said)
+            self.assertIn(f"  - {rel}", said)
+            self.assertNotIn("tar ", said)  # no upload is offered from a list that is short
+            # the same file absent: the same
+            delivered.unlink()
+            status, said = main("--check", "--list", str(listed))
+            self.assertEqual((status, listed.read_text(encoding="utf-8")), (1, ""), said)
+            # another encoder build cannot make the published bytes: a failure, and the list of an
+            # earlier run is gone, not left to look current
+            listed.write_text(f"{rel}\n", encoding="utf-8")
+            with mock.patch.object(E, "ENCODE", OTHER_BUILD):
+                status, said = main("--list", str(listed))
+            self.assertEqual(status, 1, said)
+            self.assertIn("this ffmpeg writes other bytes", said)
+            self.assertFalse(listed.exists())
+            self.assertFalse(delivered.exists())
+            self.assertEqual((narration / f"{name}.json").read_bytes(), written)
+            # the plain run on the publishing build restores the published bytes and lists the file
+            status, said = main("--list", str(listed))
+            self.assertEqual(status, 0, said)
+            self.assertEqual(delivered.read_bytes(), whole)
+            self.assertEqual(listed.read_text(encoding="utf-8"), f"{rel}\n")
+            self.assertEqual((narration / f"{name}.json").read_bytes(), written)
+            self.assertIn("the manifests already describe these files", said)
+            # damaged with its master gone: a failed run, and again no list is left behind
+            delivered.write_bytes(whole[: len(whole) // 2])
+            master.unlink()
+            status, said = main("--list", str(listed))
+            self.assertEqual(status, 1, said)
+            self.assertIn("FAIL: ", said)
+            self.assertFalse(listed.exists())
 
     def test_sanitiser_names_places(self):
         san = B.Sanitiser(LESSONS)

@@ -10,6 +10,10 @@ belajar/pipeline:
                                                    # exit 1 if a referenced file is not on this machine
     python3 encode_narration.py --check --reencode # every master encoded again and compared with what is on disk
 
+Before a deploy (README, "Narasi", Delivery, "Before a deploy"): `--check --list <file>` must exit 0,
+then the listed files, and only those, are uploaded with the command this script prints, and each
+is checked as served before the deploy. CI has no audio and cannot see a file that was not uploaded.
+
 Why (operator 2026-10-11, "how to reduce the loading time?" → "do all three"): the narration was
 served as rendered, mono at 128 kbps, twice what speech needs; the opening line alone was 372 KB,
 2–3 seconds on a weak signal. Delivered at 64 kbps each line arrives about twice as fast. The
@@ -27,9 +31,23 @@ ffmpeg or LAME build may write other bytes for the same master. So a line whose 
 already names a delivered file, with that file on disk and intact (verify_kept: sha256, length,
 format, decode), is KEPT, master on disk or not: an upgraded encoder renames nothing, learners
 download nothing twice, and nothing has to be uploaded again. Only a line without a valid delivered
-file (a new or changed text, a file lost or damaged) is encoded. --reencode encodes every line whose
-master is here and takes whatever comes out: for a deliberate change of ENCODE, which is a new
-format (give DELIVERY_FORMAT a new tag with it), or for a master replaced by hand.
+file (a new or changed text, a file lost or damaged) is encoded. A lost or damaged file is made
+again only as the bytes the manifest publishes (its sha256): when this ffmpeg writes other bytes
+for the master, the step fails and says to fetch the published file back from the server, instead
+of renaming it without a word. --reencode encodes every line whose master is here and takes
+whatever comes out: it is for a deliberate change of ENCODE, which is a new format (give
+DELIVERY_FORMAT a new tag with it), and for nothing else.
+
+THIS STEP NEVER TOUCHES TOKENS. A master replaced by hand (a retake put in the master's place with
+its alignment .json) is therefore NOT a case for --reencode alone: that would deliver the new
+take's audio with the old take's word timings, and the validators notice that only when the
+timings run more than 0.5 s past the end of the new audio. Run
+render_narration.py --render on that line first (--only <line id>; nothing is sent or paid for
+while the master and its .json are on disk): it re-derives the tokens from the .json and delivers
+the master, so audio and tokens come from one take. Lines of one manifest that share a text share
+one master and one delivered file, so they must carry the same token timings; when they do not
+(one of them was retaken, the other still has the old take), this step refuses that file and names
+the lines to render, instead of giving the new audio to a line that has the old timings.
 
 Level: every delivered file is 0.45 dB quieter than its master (review 2026-10-11, all 335 pairs
 decoded: gain 0.944–0.953, mean 0.9495, the same below 4 kHz, zero lag). That is LAME itself, which
@@ -53,6 +71,8 @@ What must hold of a file this step encodes, or the step fails and no manifest is
 - every karaoke token still fits: none ends later after the end of the delivered file than it did
   after the end of the master. (A token that already ran past the end of its MASTER is ElevenLabs'
   own alignment, not the encode; it is listed, and validate_narration.check_tokens bounds it.)
+  This holds for every line that shares the file: their timings are the same, or the file is refused;
+- a file the manifest already names is made again as the published bytes, or not at all (above).
 
 render_narration.py runs `deliver` on every line it renders, so the next surah is delivered at
 64 kbps without a separate step. A machine without the masters (CI) needs none of this:
@@ -63,6 +83,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shlex
 import shutil
 import subprocess
 import sys
@@ -78,7 +99,10 @@ from common import BELAJAR, mp3_duration_ms, sha256_bytes
 DEFAULT_OUT = BELAJAR / "pipeline" / "out"  # git-ignored
 MASTERS = "narration"  # <out>/narration/<voice-slug>/<slug>/<audio_name>.mp3 (+ .json alignment)
 DELIVERY = "delivery"  # <out>/delivery/<voice-slug>/<slug>/<delivery_name>.mp3
-VM_MEDIA = "/srv/dakwah-lens/data/belajar-media"
+VM_MEDIA = "/srv/dakwah-lens/data/belajar-media"  # on the VM; Caddy serves it as SITE/belajar/media
+VM_MEDIA_OWNER = "deploy"  # the user that directory belongs to (deploy/belajar/deploy.sh); the upload writes as it
+SITE = "https://dakwah-lens.id"  # SITE + a manifest's audio url is where the delivered file is served
+UPLOAD_LIST = "files.txt"  # the list --list writes, by the README's convention inside <out>/delivery
 
 # The delivery format, V.DELIVERY_FORMAT ("mp3_44100_64_mono"), spelled out for ffmpeg. A change
 # here is a change of format: give DELIVERY_FORMAT a new tag with it, so every file is renamed.
@@ -185,6 +209,47 @@ def past_master_ms(tokens: list[dict], master_s: float) -> int:
     return max(0, round((max(tk["e"] for tk in tokens) - master_s) * 1000)) if tokens else 0
 
 
+def timings(tokens: list[dict] | None) -> list[tuple[float, float]]:
+    """The (start, end) of each karaoke token: what tells one take of a text from another. The token
+    texts are left out on purpose: build_narration.py re-derives them when a display form changes,
+    while the timings come from the alignment ElevenLabs returned with the audio and from nowhere else."""
+    return [(tk["s"], tk["e"]) for tk in tokens or []]
+
+
+def take_problems(lines: list[dict], master: Path) -> list[str]:
+    """Whether the token timings of `lines` are the take now at `master` ([]: they are). Every
+    token's start and end is copied, rounded to the millisecond, from the alignment .json that
+    ElevenLabs returned with the master and render_narration.py keeps beside it; a time the .json
+    does not have belongs to another take. This step never writes tokens, so without this check a
+    master replaced by hand and re-encoded (--reencode) would play the new take under the old
+    take's timings, and CI could not tell unless they ran past the end of the audio (review
+    2026-10-11). Every published line passes: its timings are its master's."""
+    aligned = master.with_suffix(".json")
+    if not aligned.is_file():
+        return [f"{aligned}: no alignment beside the master, so nothing shows that the lines' token timings are "
+                "this take (render_narration.py writes one with every master)"]
+    al = json.loads(aligned.read_text(encoding="utf-8"))
+    starts = {round(x, 3) for x in al.get("character_start_times_seconds") or []}
+    ends = {round(x, 3) for x in al.get("character_end_times_seconds") or []}
+    if any(tk["s"] not in starts or tk["e"] not in ends for ln in lines for tk in ln.get("tokens") or []):
+        return ["the lines' token timings are not the take at the master (a token starts or ends at a time its "
+                "alignment .json does not have): the master was replaced. Run render_narration.py --render with "
+                "--only <id> for each line (nothing is sent while the master and its .json are on disk): it gives "
+                "the line the new take's audio and its timings together"]
+    return []
+
+
+def other_bytes(published: dict, sha: str, root: Path) -> str:
+    """Why a file the manifest already names is not made again from its master: the encode gave
+    bytes with sha256 `sha`, not the published ones."""
+    return (f"{delivery_path(root, published['url'])}: this published file is missing or damaged on this machine, and "
+            f"this ffmpeg writes other bytes for its master (sha256 {sha[:16]}…, published {published['sha256'][:16]}…): "
+            "another ffmpeg or LAME build than the one that published it, or a master that is no longer the take the "
+            f"file was made from. A published name stands: fetch the file back from the server ({SITE}{published['url']}) "
+            "to that path. Only a deliberate re-encode (encode_narration.py --reencode) takes the new bytes, under a "
+            "new name that has to be uploaded before the next deploy")
+
+
 @dataclass
 class Delivered:
     audio: dict  # the manifest line's audio: {url, ms, sha256} of the delivered file
@@ -204,11 +269,15 @@ def delivery_path(root: Path, url: str) -> Path:
     return root / DELIVERY / url[len(V.MEDIA_PREFIX):]
 
 
-def deliver(master: Path, text: str, voice: dict, slug: str, tokens: list[dict], root: Path, *, write: bool = True) -> Delivered:
+def deliver(master: Path, text: str, voice: dict, slug: str, tokens: list[dict], root: Path, *, write: bool = True,
+            published: dict | None = None) -> Delivered:
     """Encodes one line's master, checks the result (format, decode, drift, token fit; SystemExit
     on any, and nothing is kept) and, unless `write` is False, puts it at
     <root>/delivery/<voice-slug>/<slug>/<delivery_name>.mp3. Returns the manifest's audio entry for
-    it and what was measured."""
+    it and what was measured. `published` is the audio entry the manifest already has for this
+    take, when its delivered file is being made again because it is lost or damaged: the encode
+    must then give those very bytes (the same sha256, so the same name), or it is refused and
+    nothing is written (other_bytes: another ffmpeg build must not rename a published file)."""
     with tempfile.TemporaryDirectory(prefix="belajar-delivery-") as tmp:
         made = Path(tmp) / "delivery.mp3"
         body = _encode_to(master, made)
@@ -224,6 +293,8 @@ def deliver(master: Path, text: str, voice: dict, slug: str, tokens: list[dict],
     if errs:
         raise SystemExit(f"delivery of {master} ({V.DELIVERY_FORMAT}) refused: " + "; ".join(errs))
     sha = sha256_bytes(body)
+    if published is not None and sha != published["sha256"]:
+        raise SystemExit(other_bytes(published, sha, root))
     url = V.delivery_url(voice, slug, text, sha)
     out = delivery_path(root, url)
     if write and not (out.exists() and out.read_bytes() == body):
@@ -273,8 +344,19 @@ def settle(lines: list[dict], master: Path, voice: dict, slug: str, root: Path, 
       ("encoded", it, [])     encoded from the master (no valid delivered file, or `reencode`);
       ("absent", None, [])    named by the manifest, but neither it nor its master is on this
                               machine (another one rendered it): nothing to check here;
-      ("failed", None, why)."""
+      ("failed", None, why).
+    A file the manifest names that is lost or damaged is made again only as the published bytes
+    (deliver's `published`); only `reencode` takes other bytes, under a new name."""
     line = lines[0]
+    # One file can only be right for lines that carry ONE set of timings: this step never writes
+    # tokens, so a line whose timings are another take's would get this take's audio under them
+    # (a retake rendered for one of the lines only). Refused in every case, also when the lines
+    # already name one file. With equal timings, the token fit deliver checks below is every line's.
+    if any(timings(ln.get("tokens")) != timings(line.get("tokens")) for ln in lines[1:]):
+        return "failed", None, [
+            "these lines share one text, so one master and one delivered file, but their token timings differ: they are "
+            "not all from one take. Run render_narration.py --render with --only <id> for each of them (nothing is sent "
+            "while the master and its alignment .json are on disk): it gives each the master's audio and its timings"]
     named = all(V.is_delivery(ln.get("audio"), voice, slug, ln["text"]) and ln["audio"] == line["audio"] for ln in lines)
     kept = delivery_path(root, line["audio"]["url"]) if named else None
     if kept and kept.is_file() and not (reencode and master.exists()):
@@ -285,8 +367,17 @@ def settle(lines: list[dict], master: Path, voice: dict, slug: str, root: Path, 
             return "failed", None, [f"{kept}: {e}" for e in errs]
         # Damaged or cut short, and its master is here: made again below.
     if master.exists():
+        # Only this take's timings may go with this take's audio (take_problems): never encoded
+        # under tokens of another take, --reencode included.
+        problems = take_problems(lines, master)
+        if problems:
+            return "failed", None, problems
+        # A name the manifest already publishes is remade as the published bytes or not at all;
+        # only --reencode, or lines that name no file or not one file, take whatever comes out.
+        published = line["audio"] if named and not reencode else None
         try:
-            return "encoded", deliver(master, line["text"], voice, slug, line.get("tokens") or [], root, write=write), []
+            return "encoded", deliver(master, line["text"], voice, slug, line.get("tokens") or [], root,
+                                      write=write, published=published), []
         except SystemExit as e:
             return "failed", None, [str(e)]
     if not named:
@@ -300,6 +391,35 @@ def on_disk(files: set[str], root: Path) -> tuple[list[str], list[str]]:
     return here, sorted(files - set(here))
 
 
+def upload_command(root: Path, listed: Path | None = None) -> str:
+    """The upload of the delivered files a --list file names, and of no other file (printed, never
+    run; README "Before a deploy"). tar reads the list relative to the delivery directory, so it
+    runs there. The archive is unpacked on the VM as the user the media directory belongs to;
+    --skip-old-files keeps a file that is already there, which is right because a name never means
+    two files, and exits 0 for it (GNU tar 1.35 on the VM; -k would exit 2 on a re-upload).
+    COPYFILE_DISABLE and --no-mac-metadata keep macOS's tar from adding ._ files."""
+    listed = listed if listed is not None else root / DELIVERY / UPLOAD_LIST
+    return (f"cd {shlex.quote(str(root / DELIVERY))} && COPYFILE_DISABLE=1 tar --no-mac-metadata -cf - -T {shlex.quote(str(listed))} "
+            f"| ssh <vm-host> 'sudo -n -u {VM_MEDIA_OWNER} tar -x --skip-old-files -C {VM_MEDIA}/narration'")
+
+
+def list_command(root: Path) -> str:
+    """The run that writes the upload list for `root` (and exits 1 unless every referenced file is
+    on this machine as its manifest describes it): the step before upload_command."""
+    out = "" if root == DEFAULT_OUT.resolve() else f" --out {shlex.quote(str(root))}"
+    return f"python3 encode_narration.py --check{out} --list {shlex.quote(str(root / DELIVERY / UPLOAD_LIST))}"
+
+
+def upload_steps(root: Path, listed: Path | None = None) -> list[str]:
+    """What is left to do before a deploy, as lines to print (README "Before a deploy"; no script
+    runs any of it): write the upload list, unless `listed` is the list this run has just written;
+    upload the listed files; check each as served."""
+    return ([] if listed is not None else [f"  {list_command(root)}"]) + [
+        f"  {upload_command(root, listed)}",
+        f"then check that each listed file is served with the manifest's sha256 from {SITE}{V.MEDIA_PREFIX}… "
+        "(CI cannot see a missing file)."]
+
+
 def write_json(path: Path, data: dict) -> None:
     tmp = path.with_suffix(path.suffix + ".tmp")
     tmp.write_text(B.dump(data), encoding="utf-8")
@@ -310,14 +430,21 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="Encode the narration masters to the delivery format (64 kbps mono).")
     ap.add_argument("--check", action="store_true", help="write nothing; exit 1 if a manifest or a delivered file would change")
     ap.add_argument("--list", metavar="FILE", help="write the delivered files the manifests reference that are on this "
-                    "machine, one path per line relative to the delivery directory; exit 1 if one is not here")
+                    "machine as described, one path per line relative to the delivery directory, for the upload; exit 1 "
+                    "if one is not here (a FILE left by an earlier run is removed first)")
     ap.add_argument("--reencode", action="store_true", help="encode every line whose master is here again, also where the "
-                    "manifest's delivered file is on disk and intact (a deliberate change of ENCODE, or a master "
-                    "replaced by hand): published names may change")
+                    "manifest's delivered file is on disk and intact, and take whatever comes out: published names may "
+                    "change. For a deliberate change of ENCODE (a new format) only. NOT for a master replaced by hand: "
+                    "this script never touches tokens, so run render_narration.py --render on that line first (it "
+                    "re-derives the tokens from the master's .json and delivers the new take)")
     ap.add_argument("--out", default=str(DEFAULT_OUT), help=f"output root holding narration/ and delivery/ (default {DEFAULT_OUT})")
     ap.add_argument("--jobs", type=int, default=min(8, os.cpu_count() or 2), help="encodes at a time")
     args = ap.parse_args()
     root = Path(args.out).resolve()
+    if args.list:
+        # A list from an earlier run must not outlive a run that stops before it writes its own
+        # (a failed line, no ffmpeg): it would look current to whoever uploads from it.
+        Path(args.list).unlink(missing_ok=True)
     print(f"{require_tools()}\nformat {V.DELIVERY_FORMAT}: ffmpeg {' '.join(ENCODE)}")
 
     manifests, _lessons, _library = V.load_all()
@@ -341,7 +468,7 @@ def main() -> int:
     def one(job: tuple[str, str]) -> tuple[str, Delivered | None, list[str]]:
         master, lines, lids = jobs[job]
         how, d, errs = settle(lines, master, manifests[job[0]]["voice"], job[0], root, reencode=args.reencode, write=not args.check)
-        return how, d, [f"{lids[0]}: {e}" for e in errs]
+        return how, d, [f"{', '.join(lids)}: {e}" for e in errs]
 
     with ThreadPoolExecutor(max_workers=max(1, args.jobs)) as pool:
         results = dict(zip(jobs, pool.map(one, jobs)))
@@ -397,8 +524,10 @@ def main() -> int:
         print(f"{len(stale)} files under {root / DELIVERY} are no longer referenced by a manifest (older texts or "
               "takes); they are not listed for the upload")
     out_of_date = False
+    unfit: set[str] = set()  # --check: referenced files that are not on disk as encoded (damaged, absent, or a new name)
     if args.check:
-        missing = [lid for lid, d in done if not d.path.exists() or sha256_bytes(d.path.read_bytes()) != d.audio["sha256"]]
+        missing = [(lid, d) for lid, d in done if not d.path.exists() or sha256_bytes(d.path.read_bytes()) != d.audio["sha256"]]
+        unfit = {d.audio["url"][len(V.MEDIA_PREFIX):] for _lid, d in missing}
         if changed or missing:
             out_of_date = True
             print("\nout of date: " + ", ".join([f"{n} ({c} lines)" for n, c in changed.items()]
@@ -406,19 +535,26 @@ def main() -> int:
                   + "; run encode_narration.py" + (" --reencode" if args.reencode else ""))
     else:
         for name, n in changed.items():
-            write_json(V.NARRATION_DIR / f"{name}.json", manifests[name])
-            print(f"{name}: {n} lines now name their delivered file -> {(V.NARRATION_DIR / f'{name}.json').relative_to(BELAJAR.parent)}")
+            dest = V.NARRATION_DIR / f"{name}.json"
+            write_json(dest, manifests[name])
+            print(f"{name}: {n} lines now name their delivered file -> "
+                  f"{dest.relative_to(BELAJAR.parent) if dest.is_relative_to(BELAJAR.parent) else dest}")
         if not changed:
             print("the manifests already describe these files")
-    # The upload list: only what is on this machine, and a referenced file that is not fails the
-    # run — an upload from this list would leave that line without its audio (a 404, caption-only).
+    # The upload list: only what is on this machine as the manifests describe it, and a referenced
+    # file that is not fails the run — an upload from this list would leave that line without its
+    # audio (a 404, caption-only). Under --check nothing was repaired, so a file found damaged
+    # (`unfit`) is still on disk as it was: it is left out too, never listed for an upload.
     gone: list[str] = []
     if args.list:
-        here, gone = on_disk(files, root)
+        here, gone = on_disk(files - unfit, root)
+        gone = sorted(set(gone) | unfit)
+        Path(args.list).parent.mkdir(parents=True, exist_ok=True)
         Path(args.list).write_text("".join(f"{f}\n" for f in here), encoding="utf-8")
         print(f"listed {len(here)} of {len(files)} referenced files in {args.list}")
         if gone:
-            print(f"\nFAIL: {len(gone)} referenced file(s) are not under {root / DELIVERY} and are NOT in the list; "
+            print(f"\nFAIL: {len(gone)} referenced file(s) are not under {root / DELIVERY} as the manifests describe them "
+                  "(absent, or damaged) and are NOT in the list; "
                   "unless the server already has them, their lines would play caption-only:")
             for f in gone[:20]:
                 print("  -", f)
@@ -431,13 +567,19 @@ def main() -> int:
               f"{count['encoded']} encoded again from their masters, equal to the manifests and to the files on disk" if count["encoded"] else "",
               f"{count['absent']} are not on this machine and were NOT checked" if count["absent"] else ""]
         print("\nOK: " + "; ".join(o for o in ok if o))
-        return 0
-    print(f"\ndelivery directory: {root / DELIVERY}")
-    if count["absent"]:
-        print(f"{count['absent']} referenced files are not on this machine (neither master nor delivered file) and were NOT checked")
-    print("Next: python3 build_narration.py --check && python3 validate_narration.py, then upload (not run by this script):")
-    for slug in sorted({f.split("/")[0] for f in files}):
-        print(f"  scp -r {root / DELIVERY / slug} <vm-host>:{VM_MEDIA}/narration/")
+    else:
+        print(f"\ndelivery directory: {root / DELIVERY}")
+        if count["absent"]:
+            print(f"{count['absent']} referenced files are not on this machine (neither master nor delivered file) and were NOT checked")
+    # The upload is printed, never run, and it sends the listed files only: not the directory,
+    # which also holds the files no manifest references any more.
+    if args.list:
+        print(f"Next, before the deploy (README, \"Before a deploy\"; not run by this script): upload the {len(files)} listed files,")
+        print("\n".join(upload_steps(root, Path(args.list).resolve())))
+    elif not args.check:
+        print("Next: python3 build_narration.py --check && python3 validate_narration.py; then, before the deploy (README, "
+              "\"Before a deploy\"; not run by this script):")
+        print("\n".join(upload_steps(root)))
     return 0
 
 

@@ -43,15 +43,30 @@ Output, two files per line (operator 2026-10-11, "do all three": the narration i
   flags, no cost), at <out>/delivery/<voice-slug>/<slug>/<name>.mp3, mirroring
   /belajar/media/narration/<voice-slug>/<slug>/<name>.mp3 (Caddy serves /belajar/media/* from
   /srv/dakwah-lens/data/belajar-media), where <name> is validate_narration.delivery_name: a hash of
-  the master's name, the delivery format and the delivered bytes. A line re-used from disk whose
-  manifest entry already names a delivered file that is here and intact keeps it
-  (encode_narration.standing): the published name stands, whatever this machine's ffmpeg would
-  write today (review 2026-10-11).
+  the master's name, the delivery format and the delivered bytes.
+
+AUDIO AND TOKENS ALWAYS COME FROM ONE TAKE (review 2026-10-11). The tokens are derived, every time,
+from the alignment .json beside the master. The delivered file the manifest already names is kept
+(encode_narration.standing: the published name stands, whatever this machine's ffmpeg would write
+today) only when the line was not rendered in this run AND those tokens have the timings the
+manifest already has, which is to say the master on disk is still the take that file was made
+from. In every other case the master is delivered anew, so the line gets its audio and its
+timings together: a fresh render, a master and its .json replaced by hand (a retake put in their
+place), or a second line of the same text whose first line was just retaken. Replacing a master by
+hand is therefore finished by running --render on its line (--only <id>): nothing is sent while
+the master and its .json are on disk. encode_narration.py --reencode alone is not the way: it
+never touches tokens.
+
+A kept take whose delivered file is lost or damaged is made again from the master only as the
+bytes the manifest publishes (the same sha256, so the same name). When this ffmpeg writes other
+bytes, the run stops and says to fetch the published file back from the server: another ffmpeg
+build must not rename a published file in passing.
 
 After each line the manifest gets audio {url, ms, sha256} of the DELIVERED file (ms measured with
 ffprobe), tokens, and voice {id, name, model}. A render therefore needs ffmpeg and ffprobe, and
-says so before anything is sent; the dry run needs neither. The upload command (the delivery
-directory, never the masters) is printed, never run.
+says so before anything is sent; the dry run needs neither. The upload is printed, never run: the
+list encode_narration.py --check --list writes, and those files only (never the masters, never the
+whole directory); README, "Before a deploy".
 """
 from __future__ import annotations
 
@@ -71,7 +86,6 @@ from common import BELAJAR
 REPO = BELAJAR.parent
 ENV_FILE = REPO / ".env"
 DEFAULT_OUT = E.DEFAULT_OUT  # git-ignored: narration/ (masters) and delivery/ (what is uploaded)
-VM_MEDIA = E.VM_MEDIA
 API = "https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/with-timestamps?output_format=" + V.OUTPUT_FORMAT
 PRICE_PER_1K = 0.08  # USD, eleven_v3 API list price (docs/belajar-research/audio.md §5)
 MODEL = V.MODEL
@@ -251,15 +265,22 @@ def render(rows, manifests, lessons, args, library: dict | None = None) -> int:
         tokens = lex.tokens(text, al["character_start_times_seconds"], al["character_end_times_seconds"], focus_ar)
         # The manifest describes what is served: the master encoded for delivery (64 kbps mono), not
         # the master. Refused (SystemExit) if the encode drifts or a token no longer fits; the paid
-        # master stays on disk, so a re-run re-uses it. A master that was NOT rendered in this run
-        # keeps the delivered file the manifest already names, when that file is here and intact:
-        # its name is published, and another ffmpeg build would write other bytes under a new one
-        # (encode_narration: a published name stands; review 2026-10-11).
-        kept = None if fresh else E.standing(line, voice, name, out)
+        # master stays on disk, so a re-run re-uses it.
+        # Audio and tokens come from one take. The tokens above are the take on disk. The delivered
+        # file the manifest already names is that same take only if the master was not rendered in
+        # this run and the manifest's tokens have these timings (a master replaced by hand, or
+        # rendered a moment ago for another line of the same text, has others). Then it is kept when
+        # it is here and intact: its name is published, and another ffmpeg build would write other
+        # bytes under a new one (encode_narration: a published name stands; review 2026-10-11). If
+        # it is lost or damaged it is made again as the published bytes or refused (`published`).
+        # Any other take is delivered from the master, under the name its own bytes give.
+        published = line.get("audio") if V.is_delivery(line.get("audio"), voice, name, text) else None
+        same_take = not fresh and published is not None and E.timings(line.get("tokens")) == E.timings(tokens)
+        kept = E.standing(line, voice, name, out) if same_take else None
         if kept:
             audio, path = line["audio"], kept
         else:
-            delivered = E.deliver(mp3, text, voice, name, tokens, out)
+            delivered = E.deliver(mp3, text, voice, name, tokens, out, published=published if same_take else None)
             audio, path = delivered.audio, delivered.path
         line["audio"] = audio
         line["tokens"] = tokens
@@ -270,9 +291,11 @@ def render(rows, manifests, lessons, args, library: dict | None = None) -> int:
           f"character-cost header total {charged}" + (f" ({unknown_cost} responses without the header)" if unknown_cost else ""))
     for lid, url, mp3 in done:
         print(f"  {lid}  {url}")
-    print("Next: python3 build_narration.py --check && python3 validate_narration.py, listen, then upload "
-          "(not run by this script):")
-    print(f"  scp -r {out / E.DELIVERY / voice_slug} <vm-host>:{VM_MEDIA}/narration/")
+    # The upload sends the files the manifests reference and no others: the list is written by
+    # encode_narration.py --check --list, which exits 1 if a referenced file is not here as described.
+    print("Next: python3 build_narration.py --check && python3 validate_narration.py, listen; then, before the deploy "
+          "(README, \"Before a deploy\"; not run by this script):")
+    print("\n".join(E.upload_steps(out)))
     return 0
 
 
