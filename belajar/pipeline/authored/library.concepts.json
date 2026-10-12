@@ -6,7 +6,7 @@
     "summary": "Setiap kata Arab termasuk salah satu dari tiga jenis: [[isim]] (nama benda, orang, atau sifat), [[fi'il]] (kata kerja), atau [[huruf]] (kata tugas).",
     "explanation": [
       "Dalam [[nahwu]] (tata bahasa Arab), satu kata disebut [[kalimah]]. Ibnu Ajurrum menyebut tiga bagian penyusun [[kalam]] (ucapan yang bermakna): [[isim]], [[fi'il]], dan [[huruf]] yang membawa makna. Ahmad Zaini Dahlan menjelaskan bedanya: [[isim]] punya makna sendiri dan tidak terikat waktu; [[fi'il]] punya makna sendiri dan terikat waktu (lampau, sekarang, atau perintah untuk nanti); [[huruf]] baru jelas maknanya bila bergabung dengan kata lain.",
-      "[[Isim]] bisa dikenali dari tanda-tandanya, antara lain didahului [[huruf jar]] (kata depan seperti [[bi-|q:1:1:1/1]] yang artinya “dengan”) atau diawali [[al-|q:1:2:1/1]]. Kata pertama Al-Fatihah, [[bismi|q:1:1:1]], sudah memuat dua jenis kata: [[bi-|q:1:1:1/1]] adalah [[huruf]], dan [[ism|q:1:1:1/2]], yang artinya “nama”, adalah [[isim]], karena ia didahului [[huruf jar]].",
+      "[[Isim]] bisa dikenali dari tanda-tandanya, antara lain didahului [[huruf jar]] (kata depan seperti [[bi-|q:1:1:1/1]] yang artinya “dengan”) atau diawali [[al-|q:1:2:1/1]]. Kata pertama Al-Fatihah, [[bismi|q:1:1:1]], sudah memuat dua jenis kata: [[bi-|q:1:1:1/1]] adalah [[huruf]], dan [[ism|q:55:78:2]], yang artinya “nama”, adalah [[isim]], karena ia didahului [[huruf jar]].",
       "[[Na‘budu|q:1:5:2]], yang artinya “kami menyembah”, di ayat 5 adalah [[fi'il]]. [[Wa lā|q:1:7:8]] di ayat 7 terdiri dari dua [[huruf]]: [[wa|q:1:7:8/1]] yang artinya “dan”, dan [[lā|q:1:7:8/2]] yang artinya “bukan”; keduanya baru bermakna utuh bersama kata sesudahnya.",
       "Mengenali jenis kata adalah langkah pertama, karena aturan bunyi akhir kata berbeda untuk [[isim]], [[fi'il]], dan [[huruf]]."
     ],
@@ -14,7 +14,7 @@
     "examples": [
       {
         "loc": "1:1:1",
-        "note": "[[bi-|q:1:1:1/1]] ([[huruf jar]]) + [[ism|q:1:1:1/2]] ([[isim]]): dua jenis kata dalam satu tulisan."
+        "note": "[[bi-|q:1:1:1/1]] ([[huruf jar]]) + [[ism|q:55:78:2]] ([[isim]]): dua jenis kata dalam satu tulisan."
       },
       {
         "loc": "1:5:2",
@@ -1673,7 +1673,7 @@
     "summary": "[['Athaf]] adalah menyambungkan kata atau kalimat dengan [[huruf]] seperti [[wa|q:1:5:3/1]] yang artinya “dan”; kata yang disambungkan mengikuti [[i'rab]] kata sebelumnya.",
     "explanation": [
       "[['Athaf]] artinya menyambungkan. Ibnu Ajurrum menyebut sepuluh [[huruf 'athaf]], di antaranya [[wa|q:1:5:3/1]] yang artinya “dan”, [[fa|q:2:18:4/1]] yang artinya “lalu”, dan [[ṡumma]] yang artinya “kemudian”. Kata yang disambungkan mengikuti [[i'rab]] kata sebelumnya: jika yang sebelumnya [[marfu']] ia [[marfu']], jika [[manshub]] ia [[manshub]], jika [[majrur]] ia [[majrur]].",
-      "Di ayat 5, [[wa|q:1:5:3/1]] menyambungkan dua kalimat: [[iyyāka na‘budu|q:1:5:1-2]] dan [[iyyāka|q:1:5:1]] [[nasta‘īnu|q:1:5:4]] (al-Jadwal). As-Samin mencatat, menurut mayoritas ulama, wa tidak mengharuskan urutan: yang disebut lebih dulu belum tentu terjadi lebih dulu.",
+      "Di ayat 5, [[wa|q:1:5:3/1]] menyambungkan dua kalimat: [[iyyāka na‘budu|q:1:5:1-2]] dan [[iyyāka|q:1:5:3/2]] [[nasta‘īnu|q:1:5:4]] (al-Jadwal). As-Samin mencatat, menurut mayoritas ulama, wa tidak mengharuskan urutan: yang disebut lebih dulu belum tentu terjadi lebih dulu.",
       "Di ayat 7, [[wa|q:1:7:8/1]] menyambungkan [[aḍ-ḍāllīna|q:1:7:9]] dengan kata [[majrur]] sebelumnya, sehingga [[aḍ-ḍāllīna|q:1:7:9]] ikut [[majrur]]. Ke kata mana ia disambung? Menurut Darwisy, al-Mujtaba, dan as-Samin, ke [[al-magḍūbi|q:1:7:6]]; menurut al-Jadwal, ke [[gairi|q:1:7:5]]. Di Al-Ikhlas, kalimat [[wa lam yūlad|q:112:3:3-4]] dan kalimat [[wa lam yakun|q:112:4:1-2]] disambungkan pada kalimat [[lam yalid|q:112:3:1-2]], sedangkan kata kerjanya [[majzum]] oleh lam-nya masing-masing (ad-Da'as; al-Jadwal); di Al-Falaq, [[wa min syarri|q:113:3:1-2]] tiga kali disambungkan pada [[min syarri|q:113:2:1-2]] di ayat 2 (Darwisy); di An-Nas, [[wa an-nāsi|q:114:6:3]] disambungkan pada [[al-jinnati|q:114:6:2]] (ad-Da'as), atau menurut pendapat yang dinukil an-Nahhas, pada [[al-waswāsi|q:114:4:3]].",
       "[[Lā|q:1:7:8/2]] sesudah [[wa|q:1:7:8/1]] di sini bukan [[huruf 'athaf]]. Darwisy dan al-Jadwal menyebutnya [[zaidah]], yang artinya “tambahan”, untuk menegaskan makna “bukan” yang sudah ada pada [[gairi|q:1:7:5]]. “Tambahan” dalam istilah [[nahwu]] berarti tidak diperlukan untuk susunan kalimat, bukan berarti tanpa makna: faedahnya penegasan. As-Samin menyebut satu faedahnya: agar [[aḍ-ḍāllīna|q:1:7:9]] tidak dikira disambung kepada [[“orang-orang yang telah Engkau beri nikmat”|q:1:7:2-3]]."
     ],

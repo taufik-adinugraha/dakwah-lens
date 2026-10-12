@@ -47,11 +47,14 @@ const GLOSSARY = (readJson("pipeline/authored/pronunciation.json") as { terms: {
   .map((t) => t.display)
   .filter(hasArabic);
 
-/** Every string a page can render: lesson + library content, manifests, both message files. */
+/** Every string a page can render: lesson + library content, the quizzes (their reasons and roles
+ *  are text built by pipeline/quiz.py: an item inside a bracket with its Arabic right after it, a
+ *  phrase with one bracket), manifests, both message files. */
 const CORPUS: [string, string][] = [
   ...["al-fatihah", "al-ikhlas", "al-falaq", "an-nas", "library"].flatMap((f) =>
     strings(readJson(`content/${f}.json`), f),
   ),
+  ...["al-fatihah", "al-ikhlas", "al-falaq", "an-nas"].flatMap((f) => strings(readJson(`content/quiz/${f}.json`), `quiz/${f}`)),
   ...MANIFESTS.flatMap(([f, m]) => strings(m, `narration/${f}`)),
   ...["id", "en"].flatMap((l) => strings(readJson(`messages/${l}.json`), `messages/${l}`)),
 ];
@@ -192,19 +195,29 @@ function problems(s: string): string[] {
  *  punctuation, infix separators, "!" "?", quotation marks): " :" in a hadith is no open break. */
 const NO_BREAK_BEFORE = /^[,.;:!?)\]}»”’؟،؛/]/u;
 
+/** How deep in its own brackets a text ends (the check counts the same way over a block's lines). */
+const depthOf = (text: string) => {
+  let d = 0;
+  for (const ch of text) d = ch === "(" ? d + 1 : ch === ")" ? Math.max(0, d - 1) : d;
+  return d;
+};
+
 /** Every line break MixedText leaves open in s, as the browser check sees a seam: [line before,
- *  line after, at a space, the Arabic run before]. Open: the whitespace of its text pieces, and of
- *  a unit outside its seam (where a unit wider than its line breaks in the flow first). Each side
- *  is the string up to 200 characters back and 300 on (more than the rules read: a line's end, an
- *  Arabic run of four words, a bracket up to its ")"). */
-function openBreaks(s: string): [string, string, boolean, string][] {
-  const out: [string, string, boolean, string][] = [];
+ *  line after, at a space, the Arabic run before, how deep in the text's brackets the line after
+ *  starts]. Open: the whitespace of its text pieces, and of a unit outside its seam (where a unit
+ *  wider than its line breaks in the flow first). Each side is the string up to 200 characters
+ *  back and 300 on (more than the rules read: a line's end, an Arabic run of four words, a bracket
+ *  up to its ")"). */
+type OpenBreak = [string, string, boolean, string, number];
+function openBreaks(s: string): OpenBreak[] {
+  const out: OpenBreak[] = [];
   const open = (at: number, text: string) => {
     for (const m of text.matchAll(/\s+/g)) {
       const cut = at + (m.index ?? 0);
       const prev = s.slice(Math.max(0, cut - 200), cut).trimEnd();
       const next = s.slice(cut + m[0].length, cut + m[0].length + 300).trimStart();
-      if (prev && next && !NO_BREAK_BEFORE.test(next)) out.push([prev, next, true, [...prev.matchAll(ARABIC_RUN)].pop()?.[0] ?? ""]);
+      if (prev && next && !NO_BREAK_BEFORE.test(next))
+        out.push([prev, next, true, [...prev.matchAll(ARABIC_RUN)].pop()?.[0] ?? "", depthOf(s.slice(0, cut))]);
     }
   };
   let at = 0;
@@ -370,24 +383,54 @@ describe("textUnits: a term stays with its Arabic", () => {
     expect(units("huruf jar (حَرْف جَرّ) — yaitu")[0]).toMatchObject({ parts: [{ text: "huruf" }, { text: "jar" }, { text: "(حَرْف جَرّ) —" }] });
   });
 
-  it("keeps a term inside the prose's bracket with its Arabic after the comma; an en-dashed pair, a prefix, a case sign's dot with theirs", () => {
-    // TermText's "(term, Arabic)" (CI 2026-10-11: "keduanya ( ⏎ mudhaf" when it was drawn token by
-    // token): the bracket's words up to as many as the Arabic has, the last one in the seam.
-    expect(units("dan kata keduanya (mudhaf ilaih, مُضَاف إِلَيْه) selalu")[0]).toEqual({
+  it("keeps an item inside the prose's bracket with the Arabic right after it; an en-dashed pair, a prefix, a case sign's dot with theirs", () => {
+    // TermText's "(item Arabic)" (operator 2026-10-12: one space, the commas separate items;
+    // "(mudhaf ilaih, مُضَاف إِلَيْه)" before): the bracket's words up to as many as the Arabic has,
+    // the last one in the seam (CI 2026-10-11: "keduanya ( ⏎ mudhaf" when drawn token by token).
+    expect(units("dan kata keduanya (mudhaf ilaih مُضَاف إِلَيْه) selalu")[0]).toEqual({
       kind: "unit",
       parts: [
         { text: "(mudhaf", arabic: false },
-        { text: "ilaih,", arabic: false },
+        { text: "ilaih", arabic: false },
         { text: "مُضَاف إِلَيْه)", arabic: true },
       ],
       gaps: [" ", " "],
       seam: [1, 2],
     });
-    expect(units("(dalam keadaan jar, جَرّ)")[0]).toMatchObject({ parts: [{ text: "jar," }, { text: "جَرّ)" }], seam: [0, 1] });
-    expect(units("objeknya (maf'ul bih, مَفْعُول بِه, yaitu kata)")[0]).toMatchObject({
-      parts: [{ text: "(maf'ul" }, { text: "bih," }, { text: "مَفْعُول بِه," }],
+    expect(units("(dalam keadaan jar جَرّ)")[0]).toMatchObject({ parts: [{ text: "jar" }, { text: "جَرّ)" }], seam: [0, 1] });
+    expect(units("objeknya (maf'ul bih مَفْعُول بِه, yaitu kata)")[0]).toMatchObject({
+      parts: [{ text: "(maf'ul" }, { text: "bih" }, { text: "مَفْعُول بِه," }],
     });
-    // Outside a bracket a comma before Arabic is only a comma.
+    // A list in a bracket: each item with its own Arabic, the comma closing it.
+    expect(units("tandanya (dhammah ضَمَّة, fathah فَتْحَة, kasrah كَسْرَة) itu")).toEqual([
+      { kind: "unit", parts: [{ text: "(dhammah", arabic: false }, { text: "ضَمَّة,", arabic: true }], gaps: [" "], seam: [0, 1] },
+      { kind: "unit", parts: [{ text: "fathah", arabic: false }, { text: "فَتْحَة,", arabic: true }], gaps: [" "], seam: [0, 1] },
+      { kind: "unit", parts: [{ text: "kasrah", arabic: false }, { text: "كَسْرَة)", arabic: true }], gaps: [" "], seam: [0, 1] },
+    ]);
+    // The merged head keeps its bracket; the item after it its own Arabic; an ending ("-ta").
+    expect(units("huruf wa (وَ, 'athaf عَطْف, penyambungan)").map((u) => (u.kind === "unit" ? u.parts.map((p) => p.text).join(" ") : u.text))).toEqual([
+      "huruf wa (وَ,",
+      "'athaf عَطْف,",
+    ]);
+    expect(units("fa'il (فَاعِل, -ta تَ); bersama")[1]).toMatchObject({ parts: [{ text: "-ta" }, { text: "تَ);" }], seam: [0, 1] });
+    // A run in a bracket: as many words as its Arabic has. A reminder after the Arabic is free text.
+    expect(units("(mahall nashb مَحَلّ نَصْب) karena")[0]).toMatchObject({ parts: [{ text: "(mahall" }, { text: "nashb" }, { text: "مَحَلّ نَصْب)" }], seam: [1, 2] });
+    expect(textUnits("(berakhir kasrah كَسْرَة, tanda bunyi i di bawah huruf)").map((g) => g.kind)).toEqual(["text", "unit", "text"]);
+    // Punctuation ends the item: "as-Samin:" is not its word; a list word names no item; and a
+    // quotation (4+ words) keeps nothing with it.
+    expect(units("(as-Samin: manshub مَنْصُوب)").at(-1)).toMatchObject({ parts: [{ text: "manshub" }, { text: "مَنْصُوب)" }] });
+    expect(units("(akar و ق ب dan ن ف ث) hanya").at(-1)).toEqual({ kind: "unit", parts: [{ text: "ن ف ث)", arabic: true }], gaps: [], seam: [0, 0] });
+    expect(units("(yakni qul huwa Allāhu aḥad قُلْ هُوَ ٱللَّهُ أَحَدٌ)")[0]).toEqual({
+      kind: "unit",
+      parts: [{ text: "قُلْ هُوَ ٱللَّهُ أَحَدٌ)", arabic: true }],
+      gaps: [],
+      seam: [0, 0],
+    });
+    // Outside a bracket a word before bare Arabic is only a word, and a comma only a comma.
+    expect(units("Rasulullah ﷺ bersabda, dari akar ف ل ق itu")).toEqual([
+      { kind: "unit", parts: [{ text: "ﷺ", arabic: true }], gaps: [], seam: [0, 0] },
+      { kind: "unit", parts: [{ text: "ف ل ق", arabic: true }], gaps: [], seam: [0, 0] },
+    ]);
     expect(units("Di An-Nas, «مَلِكِ ٱلنَّاسِ» itu")).toEqual([
       { kind: "glue", text: "An-Nas," },
       { kind: "unit", parts: [{ text: "«مَلِكِ ٱلنَّاسِ»", arabic: true }], gaps: [], seam: [0, 0] },
@@ -396,6 +439,18 @@ describe("textUnits: a term stays with its Arabic", () => {
       parts: [{ text: "waswasa–yuwaswisu" }, { text: "(يُوَسْوِسُ)" }],
     });
     expect(units("seperti bi- (بِ) “dengan”")[0]).toMatchObject({ parts: [{ text: "bi-" }, { text: "(بِ)" }] });
+    // A run of Qur'anic words whose last has the article (review 2026-10-12): both words stay with
+    // the run's one bracket, "rabbi an-nāsi (رَبِّ ٱلنَّاسِ)", never "rabbi ⏎ an-nāsi (…)"; the
+    // article does not count as a word of its own, while a real compound still counts two.
+    expect(units("badal dari rabbi an-nāsi (رَبِّ ٱلنَّاسِ) dan")[0]).toMatchObject({
+      parts: [{ text: "rabbi" }, { text: "an-nāsi" }, { text: "(رَبِّ ٱلنَّاسِ)" }],
+    });
+    expect(units("disebut yaum ad-dīn (يَوْمِ ٱلدِّينِ), yaitu")[0]).toMatchObject({
+      parts: [{ text: "yaum" }, { text: "ad-dīn" }, { text: "(يَوْمِ ٱلدِّينِ)," }],
+    });
+    expect(units("frasa jar-majrur (جَارّ وَمَجْرُور) itu")[0]).toMatchObject({
+      parts: [{ text: "jar-majrur" }, { text: "(جَارّ وَمَجْرُور)" }],
+    });
     // A quoted gloss of Qur'anic words with their Arabic after it (TermText's gloss variant,
     // 2026-10-12): its last word, closing quote and all, keeps the Arabic; the whole gloss while
     // it fits the line.
@@ -473,8 +528,8 @@ describe("textUnits over every string the module shows", () => {
     // The rules read the end of the line before and the start of the line after (a bracket up to
     // its ")", a gloss's first words): one seam per distinct pair of those.
     const pairs = new Set<string>();
-    const breaks = all.filter(([, [prev, next, sp, ar]]) => {
-      const key = `${prev.slice(-60)}\u0000${next.slice(0, 200)}\u0000${sp}\u0000${ar}`;
+    const breaks = all.filter(([, [prev, next, sp, ar, depth]]) => {
+      const key = `${prev.slice(-60)}\u0000${next.slice(0, 200)}\u0000${sp}\u0000${ar}\u0000${depth > 0}`;
       return !pairs.has(key) && !!pairs.add(key);
     });
     const kinds = measure({ scope: null, seams: breaks.map(([, b]) => b) }) as string[][];

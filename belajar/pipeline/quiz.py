@@ -46,16 +46,21 @@ Two kinds of plan:
   for them here). A question left with no wrong option is dropped. Not taught-checked.
 
 Shown Arabic: a grammar term in an option, a bin, a sign or a form label is shown "majrur
-(مَجْرُور)" (first use in that text), merged with the text's own gloss ("na't (نَعْت, sifat)"), and
-inside the text's brackets with a comma ("(mudhaf ilaih, مُضَاف إِلَيْه)") — the convention of the
-Konsep pages (src/lib/terms.ts annotate). The Arabic is the term table's, byte for byte; a term
-the table cannot attest (ar null) stays Latin. Nothing here types Arabic: forms come from the
+(مَجْرُور)" (first use in that text), merged with the text's own gloss ("na't (نَعْت, sifat)"),
+inside the text's brackets right after the term, one space and no comma ("(mudhaf ilaih مُضَاف
+إِلَيْه)"), and a phrase of Qur'anic words with ONE bracket after the whole phrase ("yaum ad-dīn
+(يَوْمِ ٱلدِّينِ)"); two grammar terms side by side never share one, each keeps its own ("fi'il
+mudhari' (فِعْل مُضَارِع) majzum (مَجْزُوم)") — the convention of the Konsep
+pages and the word cards (src/lib/terms.ts annotate + termDisplay, of which render_marked below is
+the twin; operator 2026-10-12, "tidy them up"). The Arabic is the term table's, byte for byte; a
+term the table cannot attest (ar null) stays Latin. Nothing here types Arabic: forms come from the
 lexicon's tashrif tables, words from the lesson content.
 """
 from __future__ import annotations
 
 import json
 import re
+import unicodedata
 from pathlib import Path
 
 from common import AUTHORED_DIR, CONTENT_DIR, SURAHS
@@ -145,71 +150,237 @@ class Terms:
         return f"{t['latin']} ({t['ar']})" if t.get("ar") else t["latin"]
 
     def annotate(self, text: str) -> str:
-        """`text` with each grammar term's Arabic at its first use (module docstring)."""
-        out, cur, seen = "", 0, set()
+        """`text` (plain prose: an unmarked lesson's reason, role or sign, a tashrif label) with each
+        grammar term's Arabic at its first use: every term the text names is marked ([[…|id]]) and
+        the text shown as marked text is (render_marked), so a plain text and a marked one follow
+        one set of rules. A term the table has no Arabic for is left as it is written."""
+        out, cur = "", 0
         for a, b, tid in self.matches(text):
-            ar = self.ar(tid)
-            if not ar or tid in seen:
+            if not self.ar(tid):
                 continue
-            seen.add(tid)
-            depth = text[:a].count("(") - text[:a].count(")")
-            if depth > 0:
-                out += text[cur:b] + f", {ar}"
-                cur = b
-            elif re.match(r" \((?=[a-z“'‘\-])", text[b:]):
-                out += text[cur:b] + f" ({ar}, "
-                cur = b + 2
-            else:
-                out += text[cur:b] + f" ({ar})"
-                cur = b
-        return out + text[cur:]
+            out += text[cur:a] + f"[[{text[a:b]}|{tid}]]"
+            cur = b
+        return self.annotate_marked(out + text[cur:], {})
 
-    def annotate_marked(self, marked: str, quran: dict[str, str]) -> str:
+    def annotate_marked(self, marked: str, quran: dict[str, str], segments: dict[str, list[str]] | None = None) -> str:
         """A MARKED text — a marked lesson's `why`, `role` or sign (build_surah.py MARKED_SURAHS;
-        operator 2026-10-12: Qur'anic words in Arabic too, "not only the transliteration") — shown
-        as `annotate` shows plain text: each term its Arabic from this table, each Qur'anic word,
-        part, letter or gloss its bytes from the lesson's `quran` (q-ref without "q:"), at its
-        first use in the text, in annotate's three placements. Its markup is gone from the result."""
-        out, last, seen = "", 0, set()
-        for m in _MARKUP.finditer(marked):
-            out += marked[last:m.start()]
-            surface, ref = m.group(1), m.group(2) or ""
-            ar = quran.get(ref[2:]) if ref.startswith("q:") else self.ar(ref)
-            out += surface
-            last = m.end()
-            if not ar or ref in seen:
-                continue
-            rest = _MARKUP.sub(lambda x: x.group(1), marked[last:])
-            inside = out.count("(") - out.count(")") > 0
-            if inside and _continues_phrase(rest):
-                # src/lib/terms.ts continuesPhrase (review 2026-10-12): inside brackets, a term or
-                # Qur'anic word the phrase goes on past stays Latin there — "(mahall raf')", never
-                # "(mahall, مَحَلّ raf')" — and is not counted as seen: its next use shows the Arabic.
-                continue
-            seen.add(ref)
-            if inside:
-                out += f", {ar}"
-            elif re.match(r" \((?=[a-z“'‘\-])", rest):
-                out += f" ({ar}, "
-                last += 2
-            else:
-                out += f" ({ar})"
-        return out + marked[last:]
+        operator 2026-10-12: Qur'anic words in Arabic too, "not only the transliteration") — as the
+        word card shows it: each term its Arabic from this table, each Qur'anic word, part, letter
+        or gloss its bytes from the lesson's `quran` (q-ref without "q:"), at its first use in the
+        text. Its markup is gone from the result."""
+        return render_marked(marked, self.by_id, quran, segments or {})
 
+
+# ------------------------------------------------------------------ marked text as the card shows it
+# The twin of src/lib/terms.ts annotate + termDisplay for one text in a scope of its own, without
+# the harakah reminders (a word card's scope: new Scope(false) — so a harakah term never owes a
+# reminder here; runs are Qur'anic words only, as there). Every rule here is that module's, under
+# the same name; src/lib/quiz-content.test.ts pins the Al-Fatihah quiz to the card's rendering,
+# character for character. Change the two together.
 
 # The Konsep markup (pipeline/terms.py MARKUP): [[surface]] or [[surface|ref]].
 _MARKUP = re.compile(r"\[\[([^\[\]|]+?)(?:\|([^\[\]|]+))?\]\]")
-
+# q:S:A:W · q:S:A:W1-W2 · q:S:A:W/k (QAC segment) · q:S:A:W#n (letter): terms.ts QREF.
+_QREF = re.compile(r"^q:(\d{1,3}):(\d{1,3}):(\d{1,3})(?:-(\d{1,3})|/(\d{1,2})|#(\d{1,2}))?$")
+# A gloss variant's surface, one quotation “…” (terms.ts GLOSS).
+_GLOSS = re.compile(r"^“[^“”]+”$")
 # Words that join a list inside brackets rather than continue a phrase (terms.ts LIST_WORDS).
 _LIST_WORDS = {"dan", "atau", "serta", "maupun"}
+_LEADING_PUNCT = re.compile(r"^[,.;:!?)”]+")
+# The authors and kitabs cited by a capitalised name (terms.ts CITED: the same list).
+CITED = ("Darwisy", "Ibnu", "Abu", "Ahmad", "Mughni", "Shahih", "Riyadhush")
 
 
-def _continues_phrase(rest: str) -> bool:
-    """Whether the text after a marked item (markup already reduced to its surfaces) goes on with
-    the same phrase: another word, not the end of the bracket, a comma or a list. The twin of
-    src/lib/terms.ts continuesPhrase; src/lib/quiz-content.test.ts holds the two together."""
-    m = re.match(r" ([^\W\d_'‘’-]|['‘’-])+", rest)
-    return bool(m) and m.group(0)[1:].lower() not in _LIST_WORDS
+def _cited(rest: str) -> bool:
+    """`rest` opens with a cited name as a whole word (terms.ts CITED_NAME)."""
+    for name in CITED:
+        if rest.startswith(name):
+            nxt = rest[len(name):len(name) + 1]
+            if not nxt or unicodedata.category(nxt)[0] not in "LM":
+                return True
+    return False
+
+
+def _gloss_opens(text: str) -> bool:
+    """terms.ts GLOSS_OPENS: " (" opening the text's own gloss of the word, its ending, or its place
+    (a bracket that opens on a number) — lowercase Indonesian, a quoted gloss, or a capitalised one
+    whose first word is not a cited name; not "(al-Jadwal)", not "(lihat: …)"."""
+    if not text.startswith(" (") or len(text) < 3:
+        return False
+    rest = text[2:]
+    if rest[0] in "0123456789":
+        return True
+    if re.match(r"[a-z“'‘\-]", rest) and not re.match(r"[a-z]{1,2}-|lihat(?![A-Za-z0-9_])", rest):
+        return True
+    return unicodedata.category(rest[0]) == "Lu" and not _cited(rest)
+
+
+def _cite_opens(text: str) -> bool:
+    """terms.ts CITE_OPENS: " (" opening an author citation or a cross-reference."""
+    if not text.startswith(" ("):
+        return False
+    rest = text[2:]
+    return bool(re.match(r"lihat(?![A-Za-z0-9_])|[a-z]{1,3}-[A-Z]", rest)) or _cited(rest)
+
+
+def _bracket_state(before: str) -> tuple[int, bool]:
+    """terms.ts bracketState: how deep the text so far sits in its own brackets, and whether the
+    innermost one is a cross-reference ("(lihat: …)")."""
+    stack: list[int] = []
+    for i, ch in enumerate(before):
+        if ch == "(":
+            stack.append(i)
+        elif ch == ")" and stack:
+            stack.pop()
+    return len(stack), bool(stack) and bool(re.match(r"\(lihat(?![A-Za-z0-9_])", before[stack[-1]:]))
+
+
+def _continues_phrase(nxt: tuple | None, after: tuple | None) -> bool:
+    """terms.ts continuesPhrase: whether the text after an item or a run goes on with the same
+    phrase — another word, or another marked item that is not of its run — not the end of the
+    bracket, a comma or a list."""
+    if not nxt or nxt[0] != "text":
+        return False
+    if nxt[1] == " ":
+        return bool(after) and after[0] == "mark"
+    m = re.match(r" ((?:[^\W\d_]|['‘’-])+)", nxt[1])
+    return bool(m) and m.group(1).lower() not in _LIST_WORDS
+
+
+def _follows(a: str, b: str, segments: dict[str, list[str]]) -> bool:
+    """terms.ts follows: Qur'anic item `b` goes on where `a` ends — the next word of the same ayah,
+    `a` a word, a run of words or the LAST part of its word, `b` a word, a run or the FIRST part of
+    its own — so that their bytes joined by a space are the mushaf's own text."""
+    x, y = _QREF.match(a), _QREF.match(b)
+    if not x or not y or x.group(6) or y.group(6) or x.group(1) != y.group(1) or x.group(2) != y.group(2):
+        return False
+    if x.group(5) and len(segments.get(f"{x.group(1)}:{x.group(2)}:{x.group(3)}") or []) != int(x.group(5)):
+        return False
+    if y.group(5) and y.group(5) != "1":
+        return False
+    return int(y.group(3)) == int(x.group(4) or x.group(3)) + 1
+
+
+def render_marked(marked: str, terms: dict[str, dict], quran: dict[str, str], segments: dict[str, list[str]]) -> str:
+    """`marked` as a word card draws it (terms.ts annotate + termDisplay, a scope of its own, no
+    harakah reminders). `terms`: the term table by id; `quran`: the bytes of each q-ref (without
+    "q:"); `segments`: the QAC parts of each word a part ref names."""
+    # spans: ("text", text) | ("mark", surface, ref)
+    spans: list[tuple] = []
+    last = 0
+    for m in _MARKUP.finditer(marked):
+        if m.start() > last:
+            spans.append(("text", marked[last:m.start()]))
+        spans.append(("mark", m.group(1), m.group(2) or m.group(1)))
+        last = m.end()
+    if last < len(marked):
+        spans.append(("text", marked[last:]))
+
+    # items: (kind, key, ar | None) — a term the table has no Arabic for keeps ar None; an unknown
+    # ref is None (its surface, as plain text).
+    def resolve(sp: tuple):
+        if sp[0] != "mark":
+            return None
+        ref = sp[2]
+        if ref.startswith("q:"):
+            ar = quran.get(ref[2:])
+            return ("quran", ref, ar) if ar else None
+        term = terms.get(ref)
+        return ("term", ref, term.get("ar")) if term else None
+
+    items = [resolve(sp) for sp in spans]
+
+    def joins(k: int) -> bool:
+        if not 0 <= k < len(spans) or items[k] is None:
+            return False
+        kind, _key, _ar = items[k]
+        # Qur'anic words only (terms.ts runFrom): two grammar terms side by side are seldom one
+        # Arabic phrase, so each keeps its own Arabic (review 2026-10-12).
+        return kind == "quran" and not _GLOSS.match(spans[k][1])
+
+    # terms.ts runFrom, for every span at once (no scope state decides a run here): start → its spans.
+    runs: dict[int, list[int]] = {}
+    k = 0
+    while k < len(spans):
+        if joins(k):
+            run = [k]
+            while True:
+                end = run[-1]
+                gap = spans[end + 1] if end + 1 < len(spans) else None
+                if not gap or gap != ("text", " ") or not joins(end + 2) or items[end + 2][0] != items[end][0]:
+                    break
+                if items[end][0] == "quran" and not _follows(items[end][1], items[end + 2][1], segments):
+                    break
+                run.append(end + 2)
+            if len(run) > 1:
+                runs[k] = run
+            k = run[-1]
+        k += 1
+
+    out, before, seen = "", "", set()
+    k = 0
+    while k < len(spans):
+        sp = spans[k]
+        if sp[0] == "text":
+            out += sp[1]
+            before += sp[1]
+            k += 1
+            continue
+        item = items[k]
+        if item is None:
+            out += sp[1]
+            before += sp[1]
+            k += 1
+            continue
+        depth, cross = _bracket_state(before)
+        run = runs.get(k)
+        end = run[-1] if run else k
+        nxt = spans[end + 1] if end + 1 < len(spans) else None
+        aft = spans[end + 2] if end + 2 < len(spans) else None
+        live = not cross and not (depth > 0 and _continues_phrase(nxt, aft))
+        if run:
+            members = [items[i] for i in run]
+            ar = " ".join(m[2] for m in members)
+            arabic = live and any(m[1] not in seen for m in members)
+            surface = " ".join(spans[i][1] for i in run)
+            if live:
+                seen.update(m[1] for m in members)
+            k = end
+        else:
+            kind, key, ar = item
+            surface = sp[1]
+            arabic = live and bool(ar) and key not in seen
+            if live and (kind == "term" or arabic):
+                seen.add(key)
+        out += surface
+        before += surface
+        if arabic:
+            text = nxt[1] if nxt and nxt[0] == "text" else None
+            after, merge, cite = "", False, False
+            if text is not None:
+                m = _LEADING_PUNCT.match(text)
+                if m:
+                    after = m.group(0)
+                    spans[k + 1] = ("text", text[len(after):])
+                    before += after
+                elif depth == 0 and (_gloss_opens(text) or (text == " (" and aft is not None and aft[0] == "mark")):
+                    merge = True
+                elif depth == 0 and _cite_opens(text):
+                    cite = True
+                if merge or cite:
+                    spans[k + 1] = ("text", text[2:])
+                    before += " ("
+            # terms.ts termDisplay
+            if depth > 0:
+                out += f" {ar}{after}"
+            elif merge:
+                out += f" ({ar}, "
+            elif cite:
+                out += f" ({ar}; "
+            else:
+                out += f" ({ar}){after}"
+        k += 1
+    return out
 
 
 def cause_class(text: str, terms: Terms, *, after_karena: bool) -> str | None:
@@ -376,12 +547,13 @@ def build(lesson: dict, library: dict, terms: Terms, authored: dict | None) -> d
     labels_used: dict[str, str] = {}
     known = {str(a["ayah"]) for a in lesson["ayat"]}
     quran = lesson.get("quran") or {}
+    segments = lesson.get("segments") or {}
 
     def shown(w: dict, key: str) -> str:
         """A word's why / role / sign as the question shows it: from its marked twin when the lesson
         is marked (terms and Qur'anic words in Arabic), else the plain text with its terms'."""
         mk = (w.get("marked") or {}).get(key)
-        return terms.annotate_marked(mk, quran) if mk else terms.annotate(w["case"]["sign"] if key == "sign" else w[key])
+        return terms.annotate_marked(mk, quran, segments) if mk else terms.annotate(w["case"]["sign"] if key == "sign" else w[key])
     for k in (plan.get("ayat") or {}):
         if k not in known:
             raise QuizError(f"{slug}: the plan names ayah {k}, which the lesson does not have")

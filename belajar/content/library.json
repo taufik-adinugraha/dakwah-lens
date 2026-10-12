@@ -73,13 +73,13 @@
         "summary": "Setiap kata Arab termasuk salah satu dari tiga jenis: [[isim|isim]] (nama benda, orang, atau sifat), [[fi'il|fiil]] (kata kerja), atau [[huruf|huruf]] (kata tugas).",
         "explanation": [
           "Dalam [[nahwu|nahwu]] (tata bahasa Arab), satu kata disebut [[kalimah|kalimah]]. Ibnu Ajurrum menyebut tiga bagian penyusun [[kalam|kalam]] (ucapan yang bermakna): [[isim|isim]], [[fi'il|fiil]], dan [[huruf|huruf]] yang membawa makna. Ahmad Zaini Dahlan menjelaskan bedanya: [[isim|isim]] punya makna sendiri dan tidak terikat waktu; [[fi'il|fiil]] punya makna sendiri dan terikat waktu (lampau, sekarang, atau perintah untuk nanti); [[huruf|huruf]] baru jelas maknanya bila bergabung dengan kata lain.",
-          "[[Isim|isim]] bisa dikenali dari tanda-tandanya, antara lain didahului [[huruf jar|huruf-jar]] (kata depan seperti [[bi-|q:1:1:1/1]] yang artinya “dengan”) atau diawali [[al-|q:1:2:1/1]]. Kata pertama Al-Fatihah, [[bismi|q:1:1:1]], sudah memuat dua jenis kata: [[bi-|q:1:1:1/1]] adalah [[huruf|huruf]], dan [[ism|q:1:1:1/2]], yang artinya “nama”, adalah [[isim|isim]], karena ia didahului [[huruf jar|huruf-jar]].",
+          "[[Isim|isim]] bisa dikenali dari tanda-tandanya, antara lain didahului [[huruf jar|huruf-jar]] (kata depan seperti [[bi-|q:1:1:1/1]] yang artinya “dengan”) atau diawali [[al-|q:1:2:1/1]]. Kata pertama Al-Fatihah, [[bismi|q:1:1:1]], sudah memuat dua jenis kata: [[bi-|q:1:1:1/1]] adalah [[huruf|huruf]], dan [[ism|q:55:78:2]], yang artinya “nama”, adalah [[isim|isim]], karena ia didahului [[huruf jar|huruf-jar]].",
           "[[Na‘budu|q:1:5:2]], yang artinya “kami menyembah”, di ayat 5 adalah [[fi'il|fiil]]. [[Wa lā|q:1:7:8]] di ayat 7 terdiri dari dua [[huruf|huruf]]: [[wa|q:1:7:8/1]] yang artinya “dan”, dan [[lā|q:1:7:8/2]] yang artinya “bukan”; keduanya baru bermakna utuh bersama kata sesudahnya.",
           "Mengenali jenis kata adalah langkah pertama, karena aturan bunyi akhir kata berbeda untuk [[isim|isim]], [[fi'il|fiil]], dan [[huruf|huruf]]."
         ],
         "bridge": "Kira-kira: [[isim|isim]] mencakup kata benda dan kata sifat, [[fi'il|fiil]] adalah kata kerja, dan [[huruf|huruf]] mirip kata tugas (kata depan, kata sambung). Padanannya tidak persis: kata ganti seperti [[iyyāka|q:1:5:1]], misalnya, dihitung sebagai [[isim|isim]].",
         "notes": [
-          "[[bi-|q:1:1:1/1]] ([[huruf jar|huruf-jar]]) + [[ism|q:1:1:1/2]] ([[isim|isim]]): dua jenis kata dalam satu tulisan.",
+          "[[bi-|q:1:1:1/1]] ([[huruf jar|huruf-jar]]) + [[ism|q:55:78:2]] ([[isim|isim]]): dua jenis kata dalam satu tulisan.",
           "[[na‘budu|q:1:5:2]]: [[fi'il|fiil]], kata kerja.",
           "[[wa lā|q:1:7:8]]: dua [[huruf|huruf]], [[wa|q:1:7:8/1]] yang artinya “dan”, dan [[lā|q:1:7:8/2]] yang artinya “bukan”.",
           "[[lam|q:112:3:1]]: [[huruf|huruf]]; maknanya baru utuh bersama kata kerja sesudahnya."
@@ -2111,7 +2111,7 @@
         "summary": "[['Athaf|athaf]] adalah menyambungkan kata atau kalimat dengan [[huruf|huruf]] seperti [[wa|q:1:5:3/1]] yang artinya “dan”; kata yang disambungkan mengikuti [[i'rab|irab]] kata sebelumnya.",
         "explanation": [
           "[['Athaf|athaf]] artinya menyambungkan. Ibnu Ajurrum menyebut sepuluh [[huruf 'athaf|huruf-athaf]], di antaranya [[wa|q:1:5:3/1]] yang artinya “dan”, [[fa|q:2:18:4/1]] yang artinya “lalu”, dan [[ṡumma|tsumma]] yang artinya “kemudian”. Kata yang disambungkan mengikuti [[i'rab|irab]] kata sebelumnya: jika yang sebelumnya [[marfu'|marfu]] ia [[marfu'|marfu]], jika [[manshub|manshub]] ia [[manshub|manshub]], jika [[majrur|majrur]] ia [[majrur|majrur]].",
-          "Di ayat 5, [[wa|q:1:5:3/1]] menyambungkan dua kalimat: [[iyyāka na‘budu|q:1:5:1-2]] dan [[iyyāka|q:1:5:1]] [[nasta‘īnu|q:1:5:4]] (al-Jadwal). As-Samin mencatat, menurut mayoritas ulama, wa tidak mengharuskan urutan: yang disebut lebih dulu belum tentu terjadi lebih dulu.",
+          "Di ayat 5, [[wa|q:1:5:3/1]] menyambungkan dua kalimat: [[iyyāka na‘budu|q:1:5:1-2]] dan [[iyyāka|q:1:5:3/2]] [[nasta‘īnu|q:1:5:4]] (al-Jadwal). As-Samin mencatat, menurut mayoritas ulama, wa tidak mengharuskan urutan: yang disebut lebih dulu belum tentu terjadi lebih dulu.",
           "Di ayat 7, [[wa|q:1:7:8/1]] menyambungkan [[aḍ-ḍāllīna|q:1:7:9]] dengan kata [[majrur|majrur]] sebelumnya, sehingga [[aḍ-ḍāllīna|q:1:7:9]] ikut [[majrur|majrur]]. Ke kata mana ia disambung? Menurut Darwisy, al-Mujtaba, dan as-Samin, ke [[al-magḍūbi|q:1:7:6]]; menurut al-Jadwal, ke [[gairi|q:1:7:5]]. Di Al-Ikhlas, kalimat [[wa lam yūlad|q:112:3:3-4]] dan kalimat [[wa lam yakun|q:112:4:1-2]] disambungkan pada kalimat [[lam yalid|q:112:3:1-2]], sedangkan kata kerjanya [[majzum|majzum]] oleh lam-nya masing-masing (ad-Da'as; al-Jadwal); di Al-Falaq, [[wa min syarri|q:113:3:1-2]] tiga kali disambungkan pada [[min syarri|q:113:2:1-2]] di ayat 2 (Darwisy); di An-Nas, [[wa an-nāsi|q:114:6:3]] disambungkan pada [[al-jinnati|q:114:6:2]] (ad-Da'as), atau menurut pendapat yang dinukil an-Nahhas, pada [[al-waswāsi|q:114:4:3]].",
           "[[Lā|q:1:7:8/2]] sesudah [[wa|q:1:7:8/1]] di sini bukan [[huruf 'athaf|huruf-athaf]]. Darwisy dan al-Jadwal menyebutnya [[zaidah|zaidah]], yang artinya “tambahan”, untuk menegaskan makna “bukan” yang sudah ada pada [[gairi|q:1:7:5]]. “Tambahan” dalam istilah [[nahwu|nahwu]] berarti tidak diperlukan untuk susunan kalimat, bukan berarti tanpa makna: faedahnya penegasan. As-Samin menyebut satu faedahnya: agar [[aḍ-ḍāllīna|q:1:7:9]] tidak dikira disambung kepada [[“orang-orang yang telah Engkau beri nikmat”|q:1:7:2-3]]."
         ],
@@ -12103,6 +12103,7 @@
     "1:5:2#1": "نَ",
     "1:5:3": "وَإِيَّاكَ",
     "1:5:3/1": "وَ",
+    "1:5:3/2": "إِيَّاكَ",
     "1:5:4": "نَسْتَعِينُ",
     "1:6:1": "ٱهْدِنَا",
     "1:6:1/1": "ٱهْدِ",
@@ -12346,7 +12347,7 @@
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
     "tanzil": "uthmani-1.1 sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8 (only to byte-check «…» quotations in prose)",
     "authored_lexicon": "authored/library.lexicon.json sha256:dce288b269a51d7364c050c96d5251e80c1dc57f5a10599d6fb5e4ab9dba1e25",
-    "authored_concepts": "authored/library.concepts.json sha256:d5d743fa5a3518a0ad4e98de1bdfb349231c39c2bc2b543547160499afc415df",
+    "authored_concepts": "authored/library.concepts.json sha256:fe5fa57ba19c9ee819a911d7cd6e92af85f9a64f0b691b8e83eb37163691d999",
     "authored_terms": "authored/library.terms.json sha256:0deaddcc223e2367681d306f7bd02ab7c3c52f042ddfe8863b8daa83073892f0",
     "shamela_istilah": "121 Shamela pages pinned by text sha256 (sources.json shamela_istilah)",
     "authored_basics": "authored/library.basics.json sha256:bed21eae0e64526878bd69e88af294d75990ef260f7e527d7713031398545774",

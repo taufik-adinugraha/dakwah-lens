@@ -15,8 +15,11 @@ export const HARAKAT_PAGE = "harakat";
  * the word linked to the Harakat page (operator 2026-10-10: learners may not know kasrah,
  * dhammah, fathah). One pair of brackets at most (less clutter): where the prose glosses the word
  * in brackets itself the Arabic joins that gloss ("nahwu (نَحْو, tata bahasa Arab)"), an author
- * citation joins it after a semicolon ("mabni (مَبْنِيّ; Ibnu 'Aqil)"), and a term already inside
- * the prose's brackets takes its Arabic after a comma ("(dalam keadaan jar, جَرّ)").
+ * citation joins it after a semicolon ("mabni (مَبْنِيّ; Ibnu 'Aqil)"), a term already inside
+ * the prose's brackets takes its Arabic right after it, one space and no comma ("(dalam keadaan
+ * jar جَرّ)"), and a phrase of Qur'anic words has one bracket after the whole phrase ("yaum ad-dīn
+ * (يَوْمِ ٱلدِّينِ)"; operator 2026-10-12) — grammar terms never form one, each keeps its own
+ * ("dhamir (ضَمِير) munfashil (مُنْفَصِل)").
  *
  * Line breaks (rule 15): the tokens become ONE text (termDisplay) that MixedText draws — the same
  * pieces and the same rules as every other text in the module, so a term keeps its last word, the

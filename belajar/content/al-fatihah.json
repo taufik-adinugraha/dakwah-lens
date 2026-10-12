@@ -79,7 +79,7 @@
           ],
           "status": "draft",
           "marked": {
-            "why": "Akhirnya [[kasrah|kasrah]] karena kata [[ism|q:1:1:1/2]] (nama) didahului [[huruf jar|huruf-jar]] [[bi-|q:1:1:1/1]] (dengan).",
+            "why": "Akhirnya [[kasrah|kasrah]] karena kata [[ism|q:55:78:2]] (nama) didahului [[huruf jar|huruf-jar]] [[bi-|q:1:1:1/1]] (dengan).",
             "role": "[[huruf jar|huruf-jar]] + [[majrur|majrur]]",
             "sign": "[[kasrah|kasrah]]",
             "ikhtilaf": [
@@ -5247,7 +5247,8 @@
     "12:18:15": "ٱلْمُسْتَعَانُ",
     "36:71:12": "مَٰلِكُونَ",
     "38:22:20/1": "وَ",
-    "43:77:2/2": "مَٰلِكُ"
+    "43:77:2/2": "مَٰلِكُ",
+    "55:78:2": "ٱسْمُ"
   },
   "segments": {
     "1:1:1": [
@@ -5293,7 +5294,7 @@
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
     "quran_align": "release-2016-11-24 sha256:5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7; Husary_Muallim_128kbps.json sha256:3719fb5c482d7db7086b4a81cdb6f114aa71979899917a74e6c8ae5bec684f5f; Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7",
     "quranenc": "indonesian_affairs 1.0.1 (last_update 1750665512) sha256:94d2be603ddb83c6556d609f673d51a9bd8593022a6936a61033324bdaf4ef02",
-    "authored_words": "authored/al-fatihah.words.json sha256:91a2b2be96a22bcdcc9b03cff53335678be8a7550abc73522bb7dc2e4ee4790b",
+    "authored_words": "authored/al-fatihah.words.json sha256:da89efdc7759bde444bf41930ca91a8515e5bca1713dcc03f75ff33ba60d49c4",
     "authored_structure": "authored/al-fatihah.structure.json sha256:d5f5d06071f57afd240cd62d782903d72b2fe6c028e216ea253b218be1727e33",
     "authored_concepts_map": "authored/al-fatihah.concepts-map.json sha256:656c8d94d0a68b81de3ab3c32608db99f9481e8e1b382c7c838bae61b636f960",
     "authored_facts_marked": "authored/al-fatihah.facts.marked.json sha256:7c512319fea82ac63b6af3b36d449670655a4d069b31218b1501dc7e1e73d330",

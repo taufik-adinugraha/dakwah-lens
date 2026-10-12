@@ -32,8 +32,8 @@ export const KINDS = [
  * Runs IN THE PAGE (passed to page.evaluate as a function: self-contained, no closures).
  * `scope`: a selector to measure under (default: the whole body). Returns { counts, offenders }.
  *
- * `seams`: instead, no DOM at all — [prev, next, afterSpace, arabicBefore] per break, returns the
- * text rules each one breaks (seamKinds below). textUnits.test.ts runs it over every break
+ * `seams`: instead, no DOM at all — [prev, next, afterSpace, arabicBefore, depth] per break, returns
+ * the text rules each one breaks (seamKinds below). textUnits.test.ts runs it over every break
  * MixedText leaves open in the content, so the pieces it keeps together and the seams this check
  * reports are one rule, not two that can drift (review, 2026-10-10).
  */
@@ -59,10 +59,22 @@ export function measure({ scope, seams }) {
    *  punctuation rules: a box breaks only between its pieces, which carry their punctuation. */
   const BOX_MAY_BREAK = new Set(["hyphen-split", "term-split"]);
 
+  /** A word of an item inside the text's own bracket, its Arabic right after it ("ilaih" of
+   *  "(mudhaf ilaih مُضَاف إِلَيْه)"; textUnits ITEM_WORD), and the words that join a list instead
+   *  (textUnits LIST_WORD). */
+  const ITEM_WORD = /^\(?[\p{L}\p{M}’‘'ʿʾʼ–-]*\p{Script=Latin}[\p{L}\p{M}’‘'ʿʾʼ–-]*”?$/u;
+  const LIST_WORD = /^\(?(?:dan|atau|serta|maupun)$/iu;
+  /** How deep in its own brackets a text ends, starting `from` deep. */
+  const depthAfter = (text, from) => {
+    let d = from;
+    for (const ch of text) d = ch === "(" ? d + 1 : ch === ")" ? Math.max(0, d - 1) : d;
+    return d;
+  };
+
   /** The text rules of one line seam: `prev` the line before, `t` the line after (both trimmed),
    *  `afterSpace` whether the break is at a space, `arabicBefore` the whole Arabic run `prev` ends
-   *  in. The kinds it breaks. */
-  const seamKinds = (prev, t, afterSpace, arabicBefore) => {
+   *  in, `depth` how deep in the text's own brackets the line after starts. The kinds it breaks. */
+  const seamKinds = (prev, t, afterSpace, arabicBefore, depth) => {
     const out = [];
     if (BAD_START.test(t)) out.push("line-start-punct");
     if (/^\[\d+\]/.test(t)) out.push("footnote-orphan");
@@ -82,9 +94,21 @@ export function measure({ scope, seams }) {
       const inside = closeAt >= 0 ? firstTwo.slice(0, closeAt + 1) : firstTwo;
       if (!inside.some((w) => AR.test(w))) out.push("term-split");
     }
+    // … and, inside the text's own bracket, an item and the Arabic right after it, "(mudhaf ilaih ⏎
+    // مُضَاف إِلَيْه)", "(dhammah ⏎ ضَمَّة, fathah فَتْحَة)" (TermText's form since 2026-10-12: one
+    // space, no bracket of its own): a line never starts with the Arabic of the item before it.
+    // The Arabic opens no bracket or quote and is no quotation; a list word ("dan") names no item.
+    if (depth > 0 && AR.test(t[0] ?? "")) {
+      const last = prev.split(/\s+/).pop() ?? "";
+      // The Arabic the line starts with: its words up to the first one without Arabic.
+      const words = t.split(/\s+/);
+      const stop = words.findIndex((w) => !AR.test(w));
+      const lead = (stop < 0 ? words : words.slice(0, stop)).join(" ");
+      if (ITEM_WORD.test(last) && !LIST_WORD.test(last) && longWords(lead) < QUOTE_WORDS) out.push("term-split");
+    }
     return out;
   };
-  if (seams) return seams.map(([prev, t, afterSpace, arabicBefore]) => seamKinds(prev, t, afterSpace, arabicBefore ?? ""));
+  if (seams) return seams.map(([prev, t, afterSpace, arabicBefore, depth]) => seamKinds(prev, t, afterSpace, arabicBefore ?? "", depth ?? 0));
 
   const root = (scope && document.querySelector(scope)) || document.body;
   const seg = new Intl.Segmenter("id", { granularity: "grapheme" });
@@ -335,6 +359,9 @@ export function measure({ scope, seams }) {
     const lines = linesOf(charBoxes(nodes));
     counts.containers++;
     counts.lines += lines.length;
+    // How deep in the text's own brackets each line starts (an item and its Arabic: seamKinds).
+    const depths = [];
+    lines.reduce((d, ln) => (depths.push(d), depthAfter(ln.text, d)), 0);
     lines.forEach((ln, k) => {
       const t = ln.text.trim();
       if (k > 0) {
@@ -347,7 +374,7 @@ export function measure({ scope, seams }) {
         // break a term or a hyphen inside itself, nothing else.
         const lastAr = lines[k - 1].boxes.findLast((x) => AR.test(x.ch));
         const arabicBefore = lastAr?.el.closest('[lang|="ar"]')?.textContent ?? "";
-        for (const kind of seamKinds(prev, t, ln.afterSpace, arabicBefore))
+        for (const kind of seamKinds(prev, t, ln.afterSpace, arabicBefore, depths[k]))
           if (!BOX_MAY_BREAK.has(kind) || !allowed()) push(kind, kind === "line-end-opener" ? a.el : b.el, seam);
         // A word cut with no space at the seam: never inside Arabic; in Latin only where the page
         // asked for it (break-all / overflow-wrap on a long code or address).

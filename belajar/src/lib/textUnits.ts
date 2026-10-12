@@ -17,8 +17,11 @@
  *   A quotation of 4+ words is a unit with nothing glued to it. The term may
  *   be en-dashed ("waswasa–yuwaswisu (يُوَسْوِسُ)"), a prefix ("bi- (بِ)"), open
  *   the prose's quote (“majzum (مَجْزُوم)”) or carry a case chip's dot ("·
- *   kasrah (كَسْرَة)"); inside the prose's own bracket it takes its Arabic after a
- *   comma ("(mudhaf ilaih, مُضَاف إِلَيْه)", TermText's form; 2026-10-11).
+ *   kasrah (كَسْرَة)"); inside the prose's own bracket an item takes its Arabic
+ *   right after it, with no bracket of its own and no comma ("(mudhaf ilaih
+ *   مُضَاف إِلَيْه)", "(dhammah ضَمَّة, fathah فَتْحَة)", TermText's form since
+ *   2026-10-12: the item's last word and its Arabic are the seam, so no line
+ *   starts with the Arabic of the item before it).
  * - glue: a Latin word that a hyphen, dash, slash or footnote mark could split
  *   ("Al-Fatihah", "jar-majrur", "-nya", "pembalasan.[1]"), or a word with the
  *   separator after it ("nashab —", "(Kufah) ·"), so no line starts with
@@ -60,13 +63,19 @@ const GLUE_WORD = /[\p{L}\p{N}][-–—‐‑/][\p{L}\p{N}]|^[-–]\p{L}|\S\[\d+
 /** A word of letters (a transliteration: "jar", "ba’", "Al-Fatihah", "waswasa–yuwaswisu"), maybe
  *  closing a quoted gloss whose Arabic follows ("Allah”" of “nama Allah” (بِسْمِ ٱللَّهِ), 2026-10-12). */
 const LATIN_WORD = /^[\p{L}\p{M}’‘'ʿʾʼ–-]*\p{Script=Latin}[\p{L}\p{M}’‘'ʿʾʼ–-]*”?$/u;
-/** Inside the prose's own bracket, a term with its Arabic after a comma: its last word with the
- *  comma ("ilaih,"), and a word before it, maybe the one that opens the bracket ("(mudhaf"). */
-const COMMA_TERM_LAST = /^\(?[\p{L}\p{M}’‘'ʿʾʼ–-]*\p{Script=Latin}[\p{L}\p{M}’‘'ʿʾʼ–-]*,$/u;
-const COMMA_TERM_WORD = /^\(?[\p{L}\p{M}’‘'ʿʾʼ–-]*\p{Script=Latin}[\p{L}\p{M}’‘'ʿʾʼ–-]*$/u;
+/** Inside the prose's own bracket, a word of an item whose Arabic comes right after it: letters
+ *  only, no punctuation after them — maybe the word that opens the bracket ("(mudhaf"), a prefix
+ *  or an ending ("bi-", "-ta"), the end of a quoted gloss ("Allah”"). */
+const ITEM_WORD = /^\(?[\p{L}\p{M}’‘'ʿʾʼ–-]*\p{Script=Latin}[\p{L}\p{M}’‘'ʿʾʼ–-]*”?$/u;
+/** A word that joins a list ("(… و ق ب dan ن ف ث)") names no item: it does not keep the Arabic
+ *  after it (src/lib/terms.ts LIST_WORDS; scripts/ci/linebreaks-measure.mjs has the same words). */
+const LIST_WORD = /^\(?(?:dan|atau|serta|maupun)$/iu;
 /** A quote or bracket the prose opens right before a term: “majzum (مَجْزُوم)”, (lihat: …). Not
  *  ‘, the ‘ain of a transliteration (‘illah, ‘alā). */
 const OPENS = /^[“«(]/u;
+/** The article before a transliterated word, as the module writes it, assimilated or not: "al-",
+ *  "an-", "ad-", "aṣ-", "asy-", "ats-" (the word "an-nāsi" is one Arabic word, ٱلنَّاسِ). */
+const ARTICLE = /^[“«(]?[Aa][lnrdtszṣḍṭẓżṡ][yhs]?-(?=\p{L})/u;
 /** A separator glued to the first word of the string ("· kasrah"): the word, for the term rules. */
 const SEP_LEAD = new RegExp(`^${SEP}\\s+`, "u");
 
@@ -176,7 +185,10 @@ export function textUnits(text: string): Seg[] {
     // A hyphenated head names one Arabic word per part: "jar-majrur (جَارّ وَمَجْرُور)" is the
     // whole term, not "frasa jar-majrur" (the quiz narration's dictionary terms, 2026-10-11); so
     // does an en-dashed pair, "waswasa–yuwaswisu (يُوَسْوِسُ)" (the Konsep summary, 2026-10-11).
-    const named = (k: number) => wordOf(k).split(/[-‐‑–]/u).filter(Boolean).length;
+    // The article's hyphen is not one: "an-nāsi", "ad-dīn", "aṣ-ṣirāṭa" are ONE Arabic word each
+    // (ٱلنَّاسِ), so a run of Qur'anic words, "rabbi an-nāsi (رَبِّ ٱلنَّاسِ)", keeps both of its words
+    // with its bracket (review 2026-10-12: it could break after "rabbi").
+    const named = (k: number) => wordOf(k).replace(ARTICLE, "").split(/[-‐‑–]/u).filter(Boolean).length;
     const bracket = BRACKET.exec(join(i, toks.length - 1));
     if (bracket && hasArabic(bracket[1].trim()[0] ?? "") && longWords(bracket[1]) < QUOTE_WORDS) {
       const inside = bracket[1].match(ARABIC_WORD) ?? [];
@@ -189,16 +201,19 @@ export function textUnits(text: string): Seg[] {
         while (have < n && !OPENS.test(toks[b].w) && latin(b - 1)) have += named(--b);
       }
     } else {
-      // A term inside the prose's own bracket takes its Arabic after a comma, "(mudhaf ilaih,
-      // مُضَاف إِلَيْه)", "(maf'ul bih, مَفْعُول بِه, yaitu …)" (TermText, src/lib/terms.ts
-      // annotate): as many Latin words as the Arabic has, at most 3, back to the bracket's "(";
-      // the last one, its comma and the Arabic are the seam (rule 15, 2026-10-11).
-      const word = (k: number, re: RegExp) => k >= 0 && free(k) && !ar[k] && re.test(toks[k].w);
-      if (depth[i] > 0 && !/^[(«“]/u.test(core) && longWords(core) < QUOTE_WORDS && word(i - 1, COMMA_TERM_LAST)) {
+      // An item inside the prose's own bracket takes its Arabic right after it, "(mudhaf ilaih
+      // مُضَاف إِلَيْه)", "(maf'ul bih مَفْعُول بِه, yaitu …)", a run of Qur'anic words "(seperti yaum
+      // ad-dīn يَوْمِ ٱلدِّينِ)" (TermText, src/lib/terms.ts termDisplay): as many Latin words as the
+      // Arabic has (a hyphenated word names two), at most 3, back to the bracket's "(" or to
+      // punctuation; the last one and the Arabic are the seam (rule 15; operator 2026-10-12: one
+      // space, the commas separate items). The Arabic opens no bracket or quote of its own and is
+      // no quotation (4+ words); a list word names no item.
+      const word = (k: number) => k >= 0 && free(k) && !ar[k] && ITEM_WORD.test(toks[k].w) && !LIST_WORD.test(toks[k].w);
+      if (depth[i] > 0 && !/^[(«“]/u.test(core) && longWords(core) < QUOTE_WORDS && word(i - 1)) {
         const n = Math.min(TERM_WORDS, (core.match(ARABIC_WORD) ?? []).reduce((k, w) => k + namesFor(w), 0));
         b = i - 1;
         let have = named(b);
-        while (have < n && !toks[b].w.startsWith("(") && word(b - 1, COMMA_TERM_WORD)) have += named(--b);
+        while (have < n && !toks[b].w.startsWith("(") && word(b - 1)) have += named(--b);
       } else if (closesOpen(core) && longWords(core) < QUOTE_WORDS) {
         // A short parenthetical that closes on the Arabic, "(seperti عَلِمَ–يَعْلَمُ)": the Latin
         // words back to its "(" (at most 2).

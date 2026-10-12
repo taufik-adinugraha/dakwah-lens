@@ -16,7 +16,7 @@
  * Never inside a “…” quotation the span did not open: a kitab's words ("al-Jadwal menyebutnya
  * “mabni di atas kasrah, …”") and an ayah's translation ("Terjemahannya: “Dengan nama Allah …”")
  * are quoted as they are, nothing in them emphasised. Never a term named inside the prose's own
- * brackets, an aside ("rafa' (رَفْع, katanya disebut marfu', مَرْفُوع)"), nor an author's name for
+ * brackets, an aside ("rafa' (رَفْع, katanya disebut marfu' مَرْفُوع)"), nor an author's name for
  * it ("Darwisy menyebutnya zaidah"): the term a text teaches is named in its own sentence.
  *
  * How much (review 2026-10-11, restraint): a text that gives a quiz answer ("Perannya: …",
@@ -208,7 +208,7 @@ function find(text: string, terms = true): Found {
       const last = u.parts[ai - 1];
       let to = last.at + last.text.replace(/[,.;:!?)\]]+$/u, "").length;
       // Its own bracket of Arabic, closed right after the run: the term, "(", the Arabic and ")".
-      // (The prose's bracket, "(katanya disebut marfu’, مَرْفُوع)", or a reminder after the Arabic,
+      // (The prose's bracket, "(katanya disebut marfu’ مَرْفُوع)", or a reminder after the Arabic,
       // "kasrah (كَسْرَة, tanda bunyi i …)", is not the term's: the term's words alone.)
       const ar = u.parts[ai];
       const run = ar.text.startsWith("(") ? new RegExp(ARABIC_RUN.source, "u").exec(ar.text.slice(1)) : null;
@@ -304,7 +304,9 @@ export function partEmphasis(parts: readonly string[], k: number): Emphasis[] {
  * brackets — whether or not its Arabic is shown there (review 2026-10-11: a page's own term shows
  * its Arabic in the title, so "perubahan itu disebut i'rab" has none, and the same sentence read
  * differently on two pages). The term's words, and its Arabic when it is in the term's own
- * bracket: "disebut **mudhaf (مُضَاف)**", "disebut **'amil** (عَامِل; Ibnu Ajurrum)".
+ * bracket: "disebut **mudhaf (مُضَاف)**", "disebut **'amil** (عَامِل; Ibnu Ajurrum)". Grammar terms
+ * never form a run (src/lib/terms.ts runFrom), so a named term is always one token with its own
+ * bracket: "disebut **dhamir (ضَمِير)** munfashil (مُنْفَصِل)".
  */
 export function termEmphasis(tokens: readonly Token[]): Emphasis[] {
   const { text } = termDisplay(tokens);
