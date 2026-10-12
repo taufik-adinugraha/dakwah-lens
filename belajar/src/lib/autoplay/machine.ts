@@ -84,6 +84,7 @@ import {
   type ExerciseKey,
   type Guide,
   type GuidePart,
+  type NarrationSegment,
   type NavIntent,
   type SharedKey,
 } from "./types";
@@ -516,14 +517,29 @@ function enter(
   idx: number,
   opts: { run: boolean; skipDone: boolean; prefix?: Action[] },
 ): AutoplayState {
+  const i = entryIndex(seq, s, idx, opts.run && opts.skipDone);
+  const base = entered(seq, s, i);
+  const plan = [...(opts.prefix ?? []), ...planFor(seq, base, seq.steps[i])];
+  if (!opts.run) return { ...base, plan, phase: "paused", pausedFrom: "running" };
+  return run(seq, { ...base, plan }, false);
+}
+
+/** The step `enter` lands on for `idx`: `skipDone` passes the exercises that already reported
+ *  done (never past the last step). */
+function entryIndex(seq: AutoplaySequence, s: AutoplayState, idx: number, skipDone: boolean): number {
   let i = clampIdx(seq, idx);
-  if (opts.run && opts.skipDone) {
+  if (skipDone) {
     while (i < lastIdx(seq)) {
       const key = seq.steps[i].exercise?.key;
       if (!key || !s.doneKeys.includes(key)) break;
       i++;
     }
   }
+  return i;
+}
+
+/** The state on step `i` just entered, before its plan (enter's, and the look-ahead's). */
+function entered(seq: AutoplaySequence, s: AutoplayState, i: number): AutoplayState {
   const step = seq.steps[i];
   const ex: ExerciseState | null = step.exercise
     ? {
@@ -543,7 +559,7 @@ function enter(
   if (ex && step.exercise?.promptCue[ex.part] !== undefined && !(ex.part === "next" && autoAdvance(s.pace))) {
     ex.voiced = [ex.part];
   }
-  const base: AutoplayState = {
+  return {
     ...s,
     idx: i,
     plan: [],
@@ -558,9 +574,6 @@ function enter(
     error: null,
     intent: null,
   };
-  const plan = [...(opts.prefix ?? []), ...planFor(seq, base, step)];
-  if (!opts.run) return { ...base, plan, phase: "paused", pausedFrom: "running" };
-  return run(seq, { ...base, plan }, false);
 }
 
 /** End of the current activity (its token matched). */
@@ -1015,6 +1028,50 @@ export function upcomingAudio(seq: AutoplaySequence, s: AutoplayState): string[]
     if (a.t !== "say") continue;
     const cue = cueOf(seq, step, a.ref);
     if (audible(s, cue)) for (const f of cue.audio) if (!out.includes(f.url)) out.push(f.url);
+  }
+  return out;
+}
+
+/** The narration files a plan says, in order (lines without audio give none). */
+function planAudio(seq: AutoplaySequence, s: AutoplayState, step: AutoplayStep, plan: readonly Action[]): NarrationSegment[] {
+  const out: NarrationSegment[] = [];
+  for (const a of plan) {
+    if (a.t !== "say") continue;
+    const cue = cueOf(seq, step, a.ref);
+    if (audible(s, cue)) out.push(...cue.audio);
+  }
+  return out;
+}
+
+/**
+ * The narration files the lesson will play from now on, along its own path, step by step (for
+ * the look-ahead, lookahead.ts): [0] the rest of the current step — after the file playing now
+ * (a paused or not yet started line plays again from its start: all its files) — then one entry
+ * for each of the next `steps` steps the lesson moves on to by itself (`advance`: past the
+ * exercises already done), with the plan it gets on entry: the pace, the lines whose audio failed
+ * this visit (caption-only from then on) and an exercise's remembered control taken into account.
+ * An exercise gives the lines it says by itself (its introduction, the prompt of the control it
+ * opens on); what it says once the learner answers depends on the learner, and is not listed.
+ * Never past the last step: what follows is another ayah, whose page plays its own. Only the
+ * narrator's files: the imam's recitation is the stage player's own (warm.ts).
+ */
+export function audioAhead(seq: AutoplaySequence, s: AutoplayState, steps: number): NarrationSegment[][] {
+  const step = stepOf(seq, s);
+  const rest = s.plan.slice(s.at);
+  const head = rest[0];
+  const out: NarrationSegment[][] = [];
+  if (head?.t === "say" && s.activity?.kind === "narrate") {
+    const cue = cueOf(seq, step, head.ref);
+    out.push([...(audible(s, cue) ? cue.audio.slice(s.seg + 1) : []), ...planAudio(seq, s, step, rest.slice(1))]);
+  } else {
+    out.push(planAudio(seq, s, step, rest));
+  }
+  let idx = s.idx;
+  for (let n = 0; n < steps && idx < lastIdx(seq); n++) {
+    idx = entryIndex(seq, s, idx + 1, true);
+    const next = seq.steps[idx];
+    const base = entered(seq, s, idx);
+    out.push(planAudio(seq, base, next, planFor(seq, base, next)));
   }
   return out;
 }

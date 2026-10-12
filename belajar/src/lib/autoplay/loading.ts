@@ -100,14 +100,20 @@ export const IDLE_PRELOAD_MAX_MS = 30_000;
 /** What the browser says about the connection (navigator.connection, where it exists). */
 export type ConnectionHints = { saveData?: boolean; effectiveType?: string };
 
+/** The learner's browser asks to save data: Data Saver on, or a 2G-class connection. Where the
+ *  browser says nothing (no navigator.connection: Safari, Firefox), false. */
+export function savesData(conn?: ConnectionHints | null): boolean {
+  return !!conn && (conn.saveData === true || conn.effectiveType === "slow-2g" || conn.effectiveType === "2g");
+}
+
 /**
  * The narration file to warm while the page is idle, or null: the first one "Mulai" plays
  * (`first`, machine.ts firstNarration), unless it is longer than IDLE_PRELOAD_MAX_MS or the
- * learner's browser asks to save data (Data Saver, or a 2G-class connection) — learners on mobile
- * data pay for every byte, and a page they only look at should not spend them.
+ * learner's browser asks to save data (savesData) — learners on mobile data pay for every byte,
+ * and a page they only look at should not spend them.
  */
 export function idlePreloadUrl(first: { url: string; ms: number } | null, conn?: ConnectionHints | null): string | null {
   if (!first || first.ms > IDLE_PRELOAD_MAX_MS) return null;
-  if (conn?.saveData || conn?.effectiveType === "slow-2g" || conn?.effectiveType === "2g") return null;
+  if (savesData(conn)) return null;
   return first.url;
 }

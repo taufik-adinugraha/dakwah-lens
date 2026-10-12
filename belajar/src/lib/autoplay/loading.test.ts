@@ -9,6 +9,7 @@ import {
   loadingStage,
   mediaLoading,
   type MediaEventType,
+  savesData,
   watchLoading,
 } from "./loading";
 
@@ -173,5 +174,22 @@ describe("idle preload of the first line (before Mulai)", () => {
     expect(idlePreloadUrl(first, { saveData: true })).toBeNull();
     expect(idlePreloadUrl(first, { effectiveType: "2g" })).toBeNull();
     expect(idlePreloadUrl(first, { effectiveType: "slow-2g" })).toBeNull();
+  });
+});
+
+describe("the browser asks to save data (savesData: the idle warm and the look-ahead, lookahead.ts)", () => {
+  it("Data Saver, or a 2G-class connection", () => {
+    expect(savesData({ saveData: true })).toBe(true);
+    expect(savesData({ effectiveType: "2g" })).toBe(true);
+    expect(savesData({ effectiveType: "slow-2g" })).toBe(true);
+    expect(savesData({ saveData: true, effectiveType: "4g" })).toBe(true);
+  });
+
+  it("not otherwise, nor where the browser says nothing (Safari, Firefox: no navigator.connection)", () => {
+    expect(savesData(undefined)).toBe(false);
+    expect(savesData(null)).toBe(false);
+    expect(savesData({})).toBe(false);
+    expect(savesData({ saveData: false, effectiveType: "3g" })).toBe(false);
+    expect(savesData({ effectiveType: "4g" })).toBe(false);
   });
 });

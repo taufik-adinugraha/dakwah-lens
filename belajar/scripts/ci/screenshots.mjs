@@ -1427,6 +1427,291 @@ async function warmupChecks(page, vp, index) {
 }
 
 /**
+ * Installed with addInitScript (aheadChecks), before the page's own scripts: navigator.wakeLock
+ * replaced by a recorder — every request("screen") and every sentinel released (by the page:
+ * "release"; dropped as a browser drops it when the page is hidden: "dropped") goes into
+ * window.__belajarWakeLog — and the page's visibility put under the check's control
+ * (window.__belajarSetHidden(true | false): document.visibilityState / hidden, the locks dropped
+ * on hiding, a visibilitychange event each time). A request while hidden is refused, as a browser
+ * refuses it. Runs in the page (serialised by Playwright): plain browser JavaScript only.
+ */
+function wakeLockStub() {
+  const log = [];
+  const held = new Set();
+  let hidden = false;
+  class Sentinel extends EventTarget {
+    constructor() {
+      super();
+      this.type = "screen";
+      this.released = false;
+      this.onrelease = null;
+    }
+    release() {
+      if (!this.released) {
+        this.released = true;
+        held.delete(this);
+        log.push({ t: "release", at: Date.now() });
+        this.dispatchEvent(new Event("release"));
+      }
+      return Promise.resolve();
+    }
+  }
+  const wakeLock = {
+    request(type) {
+      log.push({ t: "request", type, hidden, at: Date.now() });
+      if (hidden) return Promise.reject(new DOMException("The document is hidden", "NotAllowedError"));
+      const s = new Sentinel();
+      held.add(s);
+      return Promise.resolve(s);
+    },
+  };
+  Object.defineProperty(Navigator.prototype, "wakeLock", { configurable: true, get: () => wakeLock });
+  Object.defineProperty(Document.prototype, "visibilityState", { configurable: true, get: () => (hidden ? "hidden" : "visible") });
+  Object.defineProperty(Document.prototype, "hidden", { configurable: true, get: () => hidden });
+  window.__belajarWakeLog = log;
+  window.__belajarSetHidden = (h) => {
+    hidden = h;
+    if (h) {
+      for (const s of [...held]) {
+        s.released = true;
+        held.delete(s);
+        log.push({ t: "dropped", at: Date.now() });
+        s.dispatchEvent(new Event("release"));
+      }
+    }
+    document.dispatchEvent(new Event("visibilitychange"));
+  };
+}
+
+/** The delivered file(s) of manifest line `id` in `lines`: the line's, or its split parts'. */
+function lineFiles(lines, id) {
+  if (lines[id]?.audio?.url) return [lines[id].audio.url];
+  const out = [];
+  for (let c = 97; c <= 122 && lines[`${id}:${String.fromCharCode(c)}`]?.audio?.url; c++) out.push(lines[`${id}:${String.fromCharCode(c)}`].audio.url);
+  return out;
+}
+
+/**
+ * The two behaviours of operator 2026-10-12 (docs/belajar-plan.md L18) on Al-Fatihah 1, phone, in
+ * a page of its own (an init script stays with its page for good, so the stub never reaches the
+ * other checks), its remembered place cleared. The narration is answered in the browser
+ * (narrationRoute), with every fetch() request held back AHEAD_HOLD_MS so that two prefetches made
+ * at once would overlap in the request timeline; navigator.wakeLock is the recorder above.
+ *   1. A page view alone, AHEAD_IDLE_MS after load: no fetch() of narration at all, nothing but
+ *      today's idle warm of the first line ("shared:start", by the narration player's preload
+ *      element), and no wake lock asked for.
+ *   2. "Mulai": the wake lock is asked for ("screen"), once.
+ *   3. While the lesson is still on its first step ("intro": the opening line, then the intro
+ *      line, ~36 s): the first line of the next step (the ayah: "al-fatihah:1:recite") and of the
+ *      step after (the harakat primer: "…:primer:1") are fetched, the first after the first line's
+ *      own load was answered; ONE AT A TIME (each fetch() starts after the previous was answered);
+ *      each file once; and nothing but those two steps' files (two steps ahead, never the intro
+ *      line the preload element loads, never a later step's, never another ayah's) until the
+ *      fetches go quiet.
+ *   4. "Jeda" releases the lock; "Lanjutkan" asks again; the page hidden (another app, the screen
+ *      off) drops it, and nothing is asked for while hidden; visible again, it is asked for again.
+ *   5. The hand-off keeps it (review 2026-10-12: a release for even a moment can let a phone left
+ *      untouched turn its screen off right there): from the recap, "Lanjutkan" lets the lesson
+ *      play to its end and go on to Al-Fatihah 2 by itself; from that request on there is no
+ *      release and no new request — ayah 2's lesson adopts the lock — while it runs there.
+ *   6. A hand-off nobody takes up is released after the grace (WAKE_GRACE_MS, the app's
+ *      WAKE_HANDOFF_GRACE_MS): ayah 2's lesson goes on to ayah 3 from its paused recap, with the
+ *      hand-off mark the page writes made unusable (sessionStorage), so ayah 3 does not start by
+ *      itself and shows "Mulai"; the lock kept for the hand-off is released about WAKE_GRACE_MS
+ *      after ayah 3's page appeared — not at the page change.
+ *   (The stub's log is the document's: the hand-off is a client-side navigation, the init script
+ *   does not run again, so one log spans the three ayat.)
+ * What this cannot show: that the audio element's later load of a prefetched file is served from
+ * the HTTP cache (Playwright turns the cache off while a route is set), nor a real phone's screen
+ * staying on — the unit tests (src/components/autoplay/ahead.test.ts) and a phone do those.
+ * Fails the job on 1–6.
+ */
+const AHEAD_HOLD_MS = 1000;
+const AHEAD_IDLE_MS = 4000;
+const AHEAD_QUIET_MS = 3000;
+/** = src/lib/autoplay/wake.ts WAKE_HANDOFF_GRACE_MS (ahead.test.ts checks they agree). */
+const WAKE_GRACE_MS = 10000;
+async function aheadChecks(page, vp, index) {
+  const shared = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "narration", "shared.json"), "utf8")).lines ?? {};
+  const lines = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "narration", "al-fatihah.json"), "utf8")).lines ?? {};
+  const startUrl = lineFiles(shared, "shared:start")[0];
+  const introFiles = lineFiles(lines, "al-fatihah:1:intro");
+  const reciteFiles = lineFiles(lines, "al-fatihah:1:recite");
+  // The primer's lines, a split one ("…:primer:3:a", ":b") by its own id.
+  const primerIds = [...new Set(Object.keys(lines).flatMap((id) => /^(al-fatihah:1:primer:\d+)(?::[a-z])?$/.exec(id)?.[1] ?? []))];
+  const primerFiles = [...new Set(primerIds.flatMap((id) => lineFiles(lines, id)))];
+  const [recite1, primer1] = [reciteFiles[0], lineFiles(lines, "al-fatihah:1:primer:1")[0]];
+  if (!startUrl || !introFiles.length || !recite1 || !primer1) {
+    throw new Error(`${vp}: look-ahead check — Al-Fatihah 1's opening lines have no rendered narration (shared:start ${!!startUrl}, intro ${introFiles.length}, recite ${!!recite1}, primer:1 ${!!primer1})`);
+  }
+  /** What the look-ahead may fetch while the lesson is on "intro": the next two steps' files. */
+  const twoAhead = new Set([...reciteFiles, ...primerFiles]);
+  const short = (p) => p.split("/").slice(-2).join("/");
+
+  const pg = await page.context().newPage();
+  await pg.addInitScript(wakeLockStub);
+  const served = [];
+  const timeline = [];
+  const handler = narrationRoute(index, served, { timeline, holdFetchMs: AHEAD_HOLD_MS });
+  await pg.route(isNarration, handler);
+  const stage = pg.locator('[data-autoplay="stage"]');
+  const middle = pg.locator('[data-autoplay="middle"]');
+  const wakeLog = () => pg.evaluate(() => window.__belajarWakeLog ?? null);
+  const requests = async () => ((await wakeLog()) ?? []).filter((e) => e.t === "request");
+  const fetches = (from) => timeline.slice(from).filter((e) => e.type === "fetch");
+  const t0 = { at: 0 };
+  const rel = (ms) => (ms === null ? "…" : `${ms - t0.at}`);
+  try {
+    await pg.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
+    // The earlier checks left a remembered place on this ayah ("Lanjutkan dari langkah N").
+    await pg.evaluate(() => localStorage.removeItem("belajar:v1:autoplay:al-fatihah/1"));
+    const mark = timeline.length;
+    await pg.reload({ waitUntil: "networkidle" });
+    await pg.evaluate(() => document.fonts.ready);
+    if (!Array.isArray(await wakeLog())) throw new Error(`${vp}: the wake-lock recorder is not installed (addInitScript)`);
+
+    // 1. A page view alone.
+    await pg.waitForTimeout(AHEAD_IDLE_MS);
+    const before = timeline.slice(mark);
+    const strays = before.filter((e) => e.type === "fetch" || e.path !== startUrl);
+    if (strays.length) {
+      throw new Error(`${vp}: a page view alone asked for narration beyond the idle warm of the first line: ${strays.map((e) => `${short(e.path)} (${e.type})`).join(", ")}`);
+    }
+    if ((await wakeLog()).length) throw new Error(`${vp}: a page view alone asked for the wake lock: ${JSON.stringify(await wakeLog())}`);
+    console.log(`  ahead 1/6: a page view (${AHEAD_IDLE_MS} ms idle): ${before.length ? `only the idle warm of ${short(startUrl)} (${before.map((e) => e.type).join(", ")})` : "no narration request"}, no fetch(), no wake lock`);
+
+    // 2. "Mulai": the screen is kept on.
+    const mark2 = timeline.length;
+    t0.at = Date.now();
+    await pg.locator('[data-autoplay="start"]').click();
+    if (!(await until(pg, async () => (await requests()).length > 0, 5_000))) throw new Error(`${vp}: 5 s after "Mulai" no wake lock was asked for`);
+    const [first] = await requests();
+    if (first.type !== "screen" || first.hidden) throw new Error(`${vp}: the wake lock asked for after "Mulai" is ${JSON.stringify(first)} (expected "screen", page visible)`);
+    console.log(`  ahead 2/6: wake lock ("screen") asked for ${first.at - t0.at} ms after "Mulai"`);
+    await settleScroll(pg);
+
+    // 3. On the first step: the next two steps' first lines fetched, one at a time.
+    const onIntro = async (what) => {
+      const at = await stage.getAttribute("data-step");
+      if (at !== "intro") throw new Error(`${vp}: ${what} only once the lesson was on step "${at}", not while it is still on its first step ("intro")`);
+    };
+    if (!(await until(pg, () => fetches(mark2).some((e) => e.path === primer1), 25_000))) {
+      throw new Error(`${vp}: 25 s after "Mulai" the primer's first line (${short(primer1)}) was not fetched ahead (fetches: ${fetches(mark2).map((e) => short(e.path)).join(", ") || "none"})`);
+    }
+    await onIntro(`${short(primer1)} was fetched`);
+    // Until the fetches go quiet: the whole look-ahead of this moment.
+    let count = -1;
+    let still = 0;
+    for (const end = Date.now() + 30_000; Date.now() < end && still < AHEAD_QUIET_MS; ) {
+      const n = fetches(mark2).length;
+      still = n === count && fetches(mark2).every((e) => e.end !== null) ? still + 250 : 0;
+      count = n;
+      await pg.waitForTimeout(250);
+    }
+    await onIntro("the fetches went quiet");
+    const got = fetches(mark2);
+    const problems = [];
+    const order = got.map((e) => e.path);
+    if (order[0] !== recite1) problems.push(`the first fetched is ${short(order[0] ?? "(none)")}, not the next step's first line ${short(recite1)}`);
+    if (order.indexOf(primer1) < order.indexOf(recite1)) problems.push(`${short(primer1)} was fetched before ${short(recite1)}`);
+    if (new Set(order).size !== order.length) problems.push("a file was fetched twice");
+    const outside = order.filter((p) => !twoAhead.has(p));
+    if (outside.length) problems.push(`fetched beyond the next two steps: ${outside.map(short).join(", ")}${outside.some((p) => introFiles.includes(p)) ? " (the intro line is the preload element's)" : ""}`);
+    for (let i = 1; i < got.length; i++) {
+      if (got[i - 1].end === null || got[i].start < got[i - 1].end) {
+        problems.push(`${short(got[i].path)} was asked for at ${rel(got[i].start)} ms while ${short(got[i - 1].path)} (asked at ${rel(got[i - 1].start)} ms) was answered only at ${rel(got[i - 1].end)} ms: two at once`);
+      }
+    }
+    const firstLoad = timeline.slice(mark2).find((e) => e.path === startUrl && e.type === "media");
+    if (firstLoad && got.length && got[0].start < (firstLoad.end ?? Infinity)) problems.push("the first prefetch started before the opening line's own load was answered");
+    if (problems.length) throw new Error(`${vp}: the look-ahead on the first step — ${problems.join("; ")}`);
+    console.log(
+      `  ahead 3/6: on step "intro", ${got.length} file(s) fetched ahead, one at a time (held ${AHEAD_HOLD_MS} ms each): ` +
+        got.map((e) => `${short(e.path)} ${rel(e.start)}–${rel(e.end)} ms`).join(", ") +
+        ` — the next step's first line, then the primer's; nothing past them`,
+    );
+
+    // 4. Pause, resume, hidden, visible.
+    const wakeEvents = async () => ((await wakeLog()) ?? []).map((e) => e.t);
+    if ((await requests()).length !== 1) throw new Error(`${vp}: the wake lock was asked for ${(await requests()).length} times while the lesson ran (expected once): ${(await wakeEvents()).join(", ")}`);
+    if ((await middle.getAttribute("data-mode")) !== "pause") throw new Error(`${vp}: the middle button is "${await middle.getAttribute("data-mode")}", not "pause", while the lesson runs`);
+    await middle.click();
+    if (!(await until(pg, async () => (await wakeEvents()).includes("release"), 3_000))) throw new Error(`${vp}: "Jeda" did not release the wake lock (${(await wakeEvents()).join(", ")})`);
+    await middle.click();
+    if (!(await until(pg, async () => (await requests()).length === 2, 3_000))) throw new Error(`${vp}: "Lanjutkan" did not ask for the wake lock again (${(await wakeEvents()).join(", ")})`);
+    await pg.evaluate(() => window.__belajarSetHidden(true));
+    await pg.waitForTimeout(1_000);
+    if ((await requests()).length !== 2) throw new Error(`${vp}: the wake lock was asked for while the page was hidden (${(await wakeEvents()).join(", ")})`);
+    await pg.evaluate(() => window.__belajarSetHidden(false));
+    if (!(await until(pg, async () => (await requests()).length === 3, 3_000))) throw new Error(`${vp}: visible again with the lesson running, the wake lock was not asked for again (${(await wakeEvents()).join(", ")})`);
+    if ((await requests()).some((e) => e.hidden)) throw new Error(`${vp}: a wake lock was asked for while hidden`);
+    console.log(`  ahead 4/6: wake lock — ${(await wakeEvents()).join(" → ")} (Mulai, Jeda, Lanjutkan, hidden, visible)`);
+
+    // 5. The hand-off keeps the lock: the lesson plays from its recap to its end, on to ayah 2.
+    const since = async (mark) => ((await wakeLog()) ?? []).slice(mark).map((e) => e.t);
+    await toStep(pg, vp, "recap"); // paused there (a release)
+    const mark5 = (await wakeLog()).length;
+    await middle.click(); // "Lanjutkan": the recap, the last step, then the hand-off by itself
+    try {
+      await pg.waitForURL(/\/quran\/al-fatihah\/2(\?.*)?$/, { timeout: 60_000 });
+    } catch {
+      throw new Error(`${vp}: 60 s after "Lanjutkan" on the recap the lesson had not gone on to Al-Fatihah 2 by itself (on step "${await stage.getAttribute("data-step").catch(() => null)}"; wake lock ${(await since(mark5)).join(", ")})`);
+    }
+    await pg.locator('[data-autoplay="panel"]').first().waitFor({ state: "visible", timeout: 15_000 });
+    if (!(await until(pg, async () => (await middle.getAttribute("data-mode").catch(() => null)) === "pause", 10_000))) {
+      throw new Error(`${vp}: on Al-Fatihah 2 after the hand-off the lesson is not running (middle button "${await middle.getAttribute("data-mode").catch(() => null)}")`);
+    }
+    await pg.waitForTimeout(2_000);
+    const across = await since(mark5);
+    if (across.join(",") !== "request") {
+      throw new Error(`${vp}: across the hand-off to Al-Fatihah 2 the wake lock went ${across.join(" → ") || "(nothing)"} — expected one request ("Lanjutkan") and no release, ayah 2's lesson adopting the lock`);
+    }
+    console.log(`  ahead 5/6: recap → end → Al-Fatihah 2 by itself, its lesson running: wake lock ${across.join(" → ")} — no release across the hand-off, no new request there (adopted)`);
+
+    // 6. A hand-off nobody takes up: released after the grace.
+    await toStep(pg, vp, "recap"); // paused (a release)
+    // The page's hand-off mark made unusable, so ayah 3 does not start by itself.
+    await pg.evaluate(() => {
+      const set = Storage.prototype.setItem;
+      Storage.prototype.setItem = function (k, v) {
+        return set.call(this, k, k === "belajar:v1:autoplay:continue" ? JSON.stringify({ to: "none", at: 0 }) : v);
+      };
+    });
+    const forward = pg.locator('[data-autoplay="next"]');
+    await forward.click();
+    if (!(await until(pg, async () => (await stage.getAttribute("data-step")) === "next", 5_000))) {
+      throw new Error(`${vp}: Al-Fatihah 2 did not reach its last step ("next") from the recap (on "${await stage.getAttribute("data-step")}")`);
+    }
+    const mark6 = (await wakeLog()).length;
+    await forward.click(); // past the last step: the hand-off to ayah 3
+    await pg.waitForURL(/\/quran\/al-fatihah\/3(\?.*)?$/, { timeout: 15_000 });
+    await pg.locator('[data-autoplay="start"]').waitFor({ state: "visible", timeout: 15_000 });
+    const arrivedAt = await pg.evaluate(() => Date.now());
+    const atArrival = await since(mark6);
+    if (atArrival.join(",") !== "request") {
+      throw new Error(`${vp}: at the hand-off to Al-Fatihah 3 the wake lock went ${atArrival.join(" → ") || "(nothing)"} — expected it asked for (kept for the hand-off) and not released`);
+    }
+    if (!(await until(pg, async () => (await since(mark6)).includes("release"), WAKE_GRACE_MS + 8_000))) {
+      throw new Error(`${vp}: on Al-Fatihah 3, its lesson not running, the wake lock kept for the hand-off was not released within ${WAKE_GRACE_MS + 8_000} ms`);
+    }
+    const released = ((await wakeLog()) ?? []).slice(mark6).find((e) => e.t === "release");
+    const after = released.at - arrivedAt;
+    if (after < WAKE_GRACE_MS - 2_500) throw new Error(`${vp}: the wake lock kept for the hand-off was released ${after} ms after Al-Fatihah 3 appeared — before the grace (${WAKE_GRACE_MS} ms)`);
+    if ((await requests()).some((e) => e.at > released.at)) throw new Error(`${vp}: the wake lock was asked for again on Al-Fatihah 3 with its lesson not running`);
+    console.log(`  ahead 6/6: hand-off to Al-Fatihah 3 with its lesson not running ("Mulai" shown): kept, then released ${after} ms after the page appeared (grace ${WAKE_GRACE_MS} ms)`);
+  } catch (err) {
+    await pg.screenshot({ path: `shots/${vp}-autoplay-ahead-FAILED.png`, fullPage: true }).catch(() => {});
+    console.error(`✗ ${vp}: the look-ahead / wake-lock check on Al-Fatihah 1 failed`);
+    console.error(`  narration requests (${timeline.length}):\n    ${timeline.map((e) => `${short(e.path)} ${e.type} ${e.range ?? ""} ${rel(e.start)}–${rel(e.end)}`).join("\n    ") || "(none)"}`);
+    console.error(`  wake lock: ${JSON.stringify(await wakeLog().catch(() => null))}`);
+    throw err;
+  } finally {
+    await pg.unroute(isNarration, handler).catch(() => {});
+    await pg.close().catch(() => {});
+  }
+}
+
+/**
  * The composition animation on the stage's word-card slot (operator 2026-10-10, narration rule 14),
  * on the real page: the harakat primer (frame 2: fathah on its dotted circle, بَ "b + a"), then
  * word 1 of Al-Fatihah 1 explained by its parts — its first frame [بِ] + [ٱسْمُ], MID-WAY through
@@ -1874,6 +2159,7 @@ try {
     await karaokeShots(page, vp, narration);
     if (vp === "phone") await loadingChecks(page, vp, narration);
     if (vp === "phone") await warmupChecks(page, vp, narration);
+    if (vp === "phone") await aheadChecks(page, vp, narration);
     await composeShots(page, vp, narration);
     await quizVoiceCheck(page, vp, narration);
     // Every composition frame fits at every text size (largest: all seven ayat; the others: ayah 1).

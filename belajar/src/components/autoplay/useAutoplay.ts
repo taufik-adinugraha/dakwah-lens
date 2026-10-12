@@ -5,6 +5,7 @@ import { preconnect } from "react-dom";
 
 import { useNarrationPlayer } from "@/hooks/useNarrationPlayer";
 import { readPace, useImamRate, usePace } from "@/hooks/usePace";
+import { useWakeLock } from "@/hooks/useWakeLock";
 import {
   AUDIO_START_EVENT,
   type PlayError,
@@ -16,14 +17,17 @@ import {
   autoplayStorageKey,
   browserStorage,
   createAutoplayState,
+  createPrefetcher,
   firstNarration,
   IDLE_TICK_MS,
   idlePreloadUrl,
+  lookaheadAudio,
   markContinue,
   positionToSave,
   readSavedIndex,
   recitationToWarm,
   reduceAutoplay,
+  screenAwake,
   takeContinue,
   upcomingAudio,
   viewAutoplay,
@@ -38,6 +42,7 @@ import {
   type LoadingKind,
   type LoadingStage,
   type Pace,
+  type Prefetcher,
 } from "@/lib/autoplay";
 import { ayahHref } from "@/lib/routes";
 
@@ -148,6 +153,13 @@ export function continueToAyah(router: ReturnType<typeof useRouter>, slug: strin
  *   while the narrator speaks the opening line, on the stage's own player.
  *   Never another ayah's (each page fetches its own), and never part of
  *   `loading`: that is the wait of the activity due to sound.
+ * - The narration is fetched AHEAD across steps (operator 2026-10-12; rules
+ *   in src/lib/autoplay/lookahead.ts, prefetch.ts): the rest of this step and
+ *   the next two, one file at a time, into the HTTP cache, while the lesson
+ *   runs and its sound is not loading.
+ * - The screen stays on while the lesson runs (operator 2026-10-12; Screen
+ *   Wake Lock, src/lib/autoplay/wake.ts, src/hooks/useWakeLock.ts), and
+ *   across the hand-off to the next ayah, whose lesson adopts the lock.
  * - Remembers the step per ayah; hands off to the next ayah; Media Session
  *   (lock screen, earphones) play/pause/next/previous.
  * - Never scrolls the page.
@@ -423,6 +435,41 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
   useEffect(() => {
     preload(nextUrl);
   }, [nextUrl, preload]);
+
+  // ── Ahead of the lesson: the narration of the next steps, one file at a time ──
+  // (operator 2026-10-12: "when i'm still in slide 1, it already start downloading for slide 2 or
+  // even 3"; rules: src/lib/autoplay/lookahead.ts and prefetch.ts). The file playing now is its
+  // own element's and the next line of this step the preload element's (above); the rest of this
+  // step and the next steps are fetched into the browser's HTTP cache. A new fetch starts only
+  // while the lesson runs and no sound it plays is loading (the line just started is heard first);
+  // nothing before "Mulai", nothing after the lesson finished (the hand-off aborts what is left).
+  const awake = screenAwake(state);
+  const running = awake === "on";
+  const prefetchRef = useRef<Prefetcher | null>(null);
+  useEffect(() => {
+    const p = createPrefetcher({ fetch: (url, init) => window.fetch(url, init) });
+    prefetchRef.current = p;
+    return () => {
+      p.stop();
+      prefetchRef.current = null;
+    };
+  }, []);
+  const soundLoading = narrationLoading !== null || player.loading !== null;
+  const lineHeard = activity?.kind !== "narrate" || heardFor === activity.token;
+  const aheadOpen = running && !soundLoading && lineHeard;
+  const aheadKey = activity?.token ?? null;
+  useEffect(() => {
+    const conn = (navigator as Navigator & { connection?: ConnectionHints }).connection;
+    const wanted = lookaheadAudio(seq, state, { conn }).filter((u) => u !== nextUrl);
+    prefetchRef.current?.update({ wanted, open: aheadOpen, key: aheadKey });
+  }, [seq, state, nextUrl, aheadOpen, aheadKey]);
+
+  // ── The screen stays on while the lesson runs ── (operator 2026-10-12: "why my phone goes
+  // inactive while … listening to the lesson?"; when: src/lib/autoplay/wake.ts; how:
+  // src/hooks/useWakeLock.ts). Never on a page view alone; let go on pause, at the end of the
+  // surah and when the page is left mid-lesson. KEPT across the hand-off to the next ayah: that
+  // page's lesson adopts it, or it is released after a short grace if that lesson does not run.
+  useWakeLock(awake);
 
   // ── Before "Mulai": warm the first line that click plays ──
   // (operator 2026-10-11). The primary button's: "Lanjutkan dari langkah N" when a place is

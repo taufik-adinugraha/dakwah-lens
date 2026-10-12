@@ -24,3 +24,6 @@ export * from "./machine";
 export * from "./persist";
 export * from "./loading";
 export * from "./warm";
+export * from "./wake";
+export * from "./lookahead";
+export * from "./prefetch";
