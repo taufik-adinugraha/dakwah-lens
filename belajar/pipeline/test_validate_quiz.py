@@ -182,10 +182,125 @@ class Pieces(unittest.TestCase):
     def test_arabic_from_the_table(self):
         self.assertEqual(TERMS.annotate("mudhaf ilaih"), "mudhaf ilaih (مُضَاف إِلَيْه)")
         self.assertEqual(TERMS.annotate("na't (sifat)"), "na't (نَعْت, sifat)")
-        self.assertEqual(TERMS.annotate("isim maushul (mudhaf ilaih)"), "isim maushul (اِسْم مَوْصُول, mudhaf ilaih, مُضَاف إِلَيْه)")
+        # inside the text's own bracket the Arabic follows its term after one space (operator
+        # 2026-10-12; "(اِسْم مَوْصُول, mudhaf ilaih, مُضَاف إِلَيْه)" before: the commas separate items)
+        self.assertEqual(TERMS.annotate("isim maushul (mudhaf ilaih)"), "isim maushul (اِسْم مَوْصُول, mudhaf ilaih مُضَاف إِلَيْه)")
         self.assertEqual(TERMS.label("marfu"), "marfu' (مَرْفُوع)")
         for tid in ("marfu", "manshub", "majrur", "mabni"):
             self.assertIn(TERMS.by_id[tid]["ar"], QUIZZES[SLUG]["states"][tid])
+
+
+class Twin(unittest.TestCase):
+    """render_marked is the twin of src/lib/terms.ts annotate + termDisplay (a card's scope, no
+    reminders): the same cases as src/lib/terms.test.ts, so a rule changed on one side only fails
+    here or there (src/lib/quiz-content.test.ts pins the built quiz to the card's rendering)."""
+
+    QURAN = LESSONS[SLUG]["quran"] | LIBRARY["quran"]
+    SEGMENTS = LESSONS[SLUG]["segments"] | LIBRARY["segments"]
+
+    def show(self, marked: str, segments=None) -> str:
+        return TERMS.annotate_marked(marked, self.QURAN, self.SEGMENTS if segments is None else segments)
+
+    def ar(self, tid: str) -> str:
+        return TERMS.by_id[tid]["ar"]
+
+    def test_inside_brackets_one_space(self):
+        self.assertEqual(self.show("([[dhammah|dhammah]], [[fathah|fathah]], [[kasrah|kasrah]])"),
+                         f"(dhammah {self.ar('dhammah')}, fathah {self.ar('fathah')}, kasrah {self.ar('kasrah')})")
+        self.assertEqual(self.show("[[wa|q:1:7:8/1]] ([['athaf|athaf]], penyambungan)"),
+                         f"wa ({self.QURAN['1:7:8/1']}, 'athaf {self.ar('athaf')}, penyambungan)")
+        self.assertEqual(self.show("[[fa'il|fail]] ([[-ta|q:1:7:3/2]])"), f"fa'il ({self.ar('fail')}, -ta {self.QURAN['1:7:3/2']})")
+        # the phrase goes on: the term stays Latin, and shows its Arabic at its next use
+        self.assertEqual(self.show("kedudukan [[rafa'|rafa]] ([[mahall|mahall]] raf'). [[Mahall|mahall]] itu"),
+                         f"kedudukan rafa' ({self.ar('rafa')}, mahall raf'). Mahall ({self.ar('mahall')}) itu")
+        self.assertEqual(self.show("(lihat: [[dhamir|dhamir]] [[munfashil|munfashil]])"), "(lihat: dhamir munfashil)")
+
+    def test_terms_never_run(self):
+        # grammar terms never form a run (terms.ts runFrom, review 2026-10-12): each its own Arabic;
+        # inside a bracket the first stays Latin because another marked item follows (the phrase
+        # goes on), the second has its Arabic right after it
+        self.assertEqual(self.show("[[dhamir|dhamir]] [[munfashil|munfashil]] boleh"),
+                         f"dhamir ({self.ar('dhamir')}) munfashil ({self.ar('munfashil')}) boleh")
+        self.assertEqual(self.show("([[mahall|mahall]] [[nashb|nashab]])"), f"(mahall nashb {self.ar('nashab')})")
+        self.assertEqual(self.show("kedudukan [[nashab|nashab]] ([[mahall|mahall]] [[nashb|nashab]]) di kartu ini"),
+                         f"kedudukan nashab ({self.ar('nashab')}, mahall nashb) di kartu ini")
+        self.assertEqual(self.show("[[jumlah|jumlah]] [[ibtida'iyyah|ibtidaiyyah]] (kalimat pembuka)"),
+                         f"jumlah ({self.ar('jumlah')}) ibtida'iyyah ({self.ar('ibtidaiyyah')}, kalimat pembuka)")
+        # shown once: a second use stays Latin; one already shown, the other not: only the other's
+        self.assertEqual(self.show("[[dhamir|dhamir]] [[munfashil|munfashil]], lalu [[dhamir|dhamir]] [[munfashil|munfashil]]"),
+                         f"dhamir ({self.ar('dhamir')}) munfashil ({self.ar('munfashil')}), lalu dhamir munfashil")
+        self.assertEqual(self.show("[[dhamir|dhamir]] itu [[dhamir|dhamir]] [[muttashil|muttashil]]"),
+                         f"dhamir ({self.ar('dhamir')}) itu dhamir muttashil ({self.ar('muttashil')})")
+
+    def test_rejected_glued_phrases(self):
+        # the four phrases a first version glued, from their own marked sources in the library
+        # (found by their Latin), never drawn with one bracket for two terms
+        for phrase in ("isimnya dirafa'kan", "Fi'il amr mabni", "menafikan mudhari'", "ta' ta'nits sukun"):
+            hits = [c["marked"]["explanation"][i] for c in LIBRARY["concepts"] for i, p in enumerate(c["explanation"]) if phrase in p]
+            self.assertEqual(len(hits), 1, phrase)
+            marks = Q._MARKUP.findall(hits[0])
+            pair = next((a, b) for a, b in zip(marks, marks[1:]) if f"{a[0]} {b[0]}" == phrase)
+            ar_a, ar_b = self.ar(pair[0][1]), self.ar(pair[1][1])
+            out = self.show(hits[0])
+            self.assertNotIn(f"{pair[0][0]} {pair[1][0]} ({ar_a} {ar_b}", out, phrase)
+            self.assertNotIn(f"{ar_a} {ar_b}", out, phrase)
+            self.assertIn(f"{pair[0][0]} ({ar_a}) {pair[1][0]} ({ar_b}", out, phrase)
+
+    def test_quranic_runs(self):
+        q = self.QURAN
+        self.assertEqual(self.show("[[yaum|q:1:4:2]] [[ad-dīn|q:1:4:3]], yang"), f"yaum ad-dīn ({q['1:4:2']} {q['1:4:3']}), yang")
+        self.assertEqual(self.show("[[lam|q:112:3:3/2]] [[yūlad|q:112:3:4]]"), f"lam yūlad ({q['112:3:3/2']} {q['112:3:4']})")
+        self.assertEqual(self.show("[[māliki|q:1:4:1]] [[yaumi|q:1:4:2]] [[ad-dīni|q:1:4:3]]"), f"māliki yaumi ad-dīni ({q['1:4:1']} {q['1:4:2']} {q['1:4:3']})")
+        self.assertEqual(self.show("(seperti [[yaum|q:1:4:2]] [[ad-dīn|q:1:4:3]])"), f"(seperti yaum ad-dīn {q['1:4:2']} {q['1:4:3']})")
+        self.assertEqual(self.show("([[yaum|q:1:4:2]] [[ad-dīn|q:1:4:3]] adalah hari kiamat)"), "(yaum ad-dīn adalah hari kiamat)")
+        # shown once: a second use of the phrase, and of one of its words, stays Latin
+        self.assertEqual(self.show("[[yaum|q:1:4:2]] [[ad-dīn|q:1:4:3]], lalu [[yaum|q:1:4:2]] [[ad-dīn|q:1:4:3]] dan [[ad-dīn|q:1:4:3]]"),
+                         f"yaum ad-dīn ({q['1:4:2']} {q['1:4:3']}), lalu yaum ad-dīn dan ad-dīn")
+        # one word already shown, the other not: the phrase's Arabic, whole
+        self.assertEqual(self.show("[[yaum|q:1:4:2]] itu [[yaum|q:1:4:2]] [[ad-dīn|q:1:4:3]]"),
+                         f"yaum ({q['1:4:2']}) itu yaum ad-dīn ({q['1:4:2']} {q['1:4:3']})")
+
+    def test_no_run(self):
+        q = self.QURAN
+        # words 4 and 6 of 33:37; the first part of a word; a part whose word has no known parts
+        self.assertEqual(self.show("[[an‘ama|q:33:37:4]] [[‘alaihi|q:33:37:6]]"), f"an‘ama ({q['33:37:4']}) ‘alaihi ({q['33:37:6']})")
+        self.assertEqual(self.show("[[bi-|q:1:1:1/1]] [[Allāhi|q:1:1:2]]"), f"bi- ({q['1:1:1/1']}) Allāhi ({q['1:1:2']})")
+        self.assertEqual(self.show("[[lam|q:112:3:3/2]] [[yūlad|q:112:3:4]]", segments={}), f"lam ({q['112:3:3/2']}) yūlad ({q['112:3:4']})")
+        # punctuation, a list word, a double space, a term, a term without Arabic, a quoted gloss, an unknown ref
+        self.assertEqual(self.show("[[yaum|q:1:4:2]], [[ad-dīn|q:1:4:3]]"), f"yaum ({q['1:4:2']}), ad-dīn ({q['1:4:3']})")
+        self.assertEqual(self.show("[[yaum|q:1:4:2]] dan [[ad-dīn|q:1:4:3]]"), f"yaum ({q['1:4:2']}) dan ad-dīn ({q['1:4:3']})")
+        self.assertEqual(self.show("[[yaum|q:1:4:2]]  [[ad-dīn|q:1:4:3]]"), f"yaum ({q['1:4:2']})  ad-dīn ({q['1:4:3']})")
+        self.assertEqual(self.show("[[yaum|q:1:4:2]] [[mudhaf|mudhaf]]"), f"yaum ({q['1:4:2']}) mudhaf ({self.ar('mudhaf')})")
+        self.assertEqual(self.show("[[huruf jar|huruf-jar]] [[bi-|q:1:1:1/1]] (dengan)"), f"huruf jar ({self.ar('huruf-jar')}) bi- ({q['1:1:1/1']}, dengan)")
+        self.assertIsNone(self.ar("wazan-yufalilu"))
+        self.assertEqual(self.show("[[berwazan|wazan]] [[yufa‘lilu|wazan-yufalilu]] [[mabni|mabni]]."),
+                         f"berwazan ({self.ar('wazan')}) yufa‘lilu mabni ({self.ar('mabni')}).")
+        self.assertEqual(self.show("[[bismi|q:1:1:1]] [[“nama Allah”|q:1:1:1-2]]"), f"bismi ({q['1:1:1']}) “nama Allah” ({q['1:1:1-2']})")
+        self.assertEqual(self.show("[[yaum|q:1:4:2]] [[x|q:1:4:9]] [[ad-dīn|q:1:4:3]]"), f"yaum ({q['1:4:2']}) x ad-dīn ({q['1:4:3']})")
+        self.assertEqual(self.show("([[huruf jar|huruf-jar]] [[bi-|q:1:1:1/1]])"), f"(huruf jar bi- {q['1:1:1/1']})")
+
+    def test_gloss_place_citation(self):
+        mabni = self.ar("mabni")
+        self.assertEqual(self.show("[[qul a‘ūżu|q:113:1:1-2]] (113 dan 114)"), f"qul a‘ūżu ({self.QURAN['113:1:1-2']}, 113 dan 114)")
+        self.assertEqual(self.show("[[mabni|mabni]] (Yang dimohon pertolongan-Nya)"), f"mabni ({mabni}, Yang dimohon pertolongan-Nya)")
+        self.assertEqual(self.show("[[mabni|mabni]] (Abunya)"), f"mabni ({mabni}, Abunya)")
+        for cite in ("Darwisy", "Darwisy; al-Jadwal", "Ibnu 'Aqil", "Abu Hayyan", "Ahmad Zaini Dahlan", "Mughni", "al-Jadwal",
+                     "as-Samin: manshub", "an-Nahhas", "lihat: mu'rab"):
+            self.assertEqual(self.show(f"[[mabni|mabni]] ({cite})"), f"mabni ({mabni}; {cite})", cite)
+        # neither a gloss nor a citation: its own bracket
+        self.assertEqual(self.show("[[mabni|mabni]] (al-mabniy)"), f"mabni ({mabni}) (al-mabniy)")
+
+    def test_plain_text_follows_the_same_rules(self):
+        # terms never form a run here either: "fi'il mudhari' majzum (فِعْل مُضَارِع مَجْزُوم)" is not one phrase
+        self.assertEqual(TERMS.annotate("fi'il mudhari' majzum"), f"fi'il mudhari' ({self.ar('fiil-mudhari')}) majzum ({self.ar('majzum')})")
+        self.assertEqual(TERMS.annotate("khabar (jar-majrur)"), f"khabar ({self.ar('khabar')}, jar-majrur {self.ar('jar-majrur')})")
+        self.assertEqual(TERMS.annotate("mabni (Ibnu 'Aqil)"), f"mabni ({self.ar('mabni')}; Ibnu 'Aqil)")
+
+    def test_the_cited_names_are_the_apps(self):
+        ts = (Q.AUTHORED_DIR.parent.parent / "src" / "lib" / "terms.ts").read_text(encoding="utf-8")
+        m = Q.re.search(r"export const CITED = \[([^\]]*)\]", ts)
+        self.assertIsNotNone(m)
+        self.assertEqual(tuple(Q.re.findall(r'"([^"]+)"', m.group(1))), Q.CITED)
 
     def test_seeded_shuffle_matches_the_components(self):
         # src/lib/shuffle.ts seededShuffle([1..6], "1:1:1") and ("abc", "al-fatihah/2/tap"), as node prints them.
@@ -205,7 +320,7 @@ def main() -> int:
         failed += hit is None
         print(f"{name:{width}s}  {'caught' if hit else 'MISSED'}  {hit or errs[:3]}")
     suite = unittest.TestSuite()
-    for cls in (Taught, Pieces):
+    for cls in (Taught, Pieces, Twin):
         suite.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(cls))
     res = unittest.TextTestRunner(verbosity=1, stream=sys.stdout).run(suite)
     caught = len(MUTATIONS) - (failed - bool(base))

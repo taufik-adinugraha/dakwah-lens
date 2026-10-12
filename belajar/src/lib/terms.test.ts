@@ -3,8 +3,10 @@ import { describe, expect, it } from "vitest";
 import { CASE_META, caseLabelMarked } from "./cases";
 import { SURAHS, WORD_AR, WORD_INFO } from "./content";
 import { LIBRARY, TERMS } from "./library";
+import { quizFor } from "./quiz-content";
 import {
   annotate,
+  CITED,
   headwordOf,
   isGloss,
   lessonLookup,
@@ -17,6 +19,7 @@ import {
   MARK_NAME,
   marksOf,
   noteWithoutWord,
+  parseMarked,
   partsProblems,
   prepareParts,
   prepareSigns,
@@ -30,6 +33,21 @@ import {
 const clone = <T,>(x: T): T => JSON.parse(JSON.stringify(x)) as T;
 const shown = (tokens: Token[]) =>
   tokens.flatMap((t) => (t.kind !== "text" && t.arabic ? [t.surface] : []));
+
+/** Arabic stretches of `text` that are two or more term-table spellings joined by spaces, and not
+ *  one term's own spelling: the glued form two adjacent grammar terms must never take. */
+function gluedTerms(text: string, terms: readonly { ar: string | null }[] = LIBRARY.terms): string[] {
+  const ars = new Set(terms.flatMap((t) => (t.ar ? [t.ar] : [])));
+  const out: string[] = [];
+  for (const m of text.matchAll(/[\u0621-\u0652\u0670\u0671]+(?: [\u0621-\u0652\u0670\u0671]+)*/gu)) {
+    if (ars.has(m[0])) continue;
+    const w = m[0].split(" ");
+    const cut = (i: number, n: number): boolean =>
+      i === w.length ? n >= 2 : w.slice(i).some((_, k) => ars.has(w.slice(i, i + k + 1).join(" ")) && cut(i + k + 1, n + 1));
+    if (cut(0, 0)) out.push(m[0]);
+  }
+  return out;
+}
 
 describe("the marked Konsep library (operator 2026-10-10: terms and words in Arabic)", () => {
   it("passes every corpus-free check: plain = marked minus markup, refs resolve to content bytes", () => {
@@ -202,13 +220,331 @@ describe("display: Arabic at the first use in a scope", () => {
     const rafa = TERMS.terms.get("rafa")!.ar;
     const mahall = TERMS.terms.get("mahall")!.ar;
     expect(show("kedudukan [[rafa'|rafa]] ([[mahall|mahall]] raf') di kartu ini")).toBe(`kedudukan rafa' (${rafa}, mahall raf') di kartu ini`);
-    // two marked items in one phrase: the first stays Latin
-    expect(show("([[mahall|mahall]] [[nashb|nashab]])")).toBe(`(mahall nashb, ${TERMS.terms.get("nashab")!.ar})`);
+    // two marked terms in one phrase are NOT a run (grammar terms never form one, review
+    // 2026-10-12): the first stays Latin because the phrase goes on after it (continuesPhrase),
+    // the second has its own Arabic, right after it — never "(mahall nashb مَحَلّ نَصْب)"
+    const nashab = TERMS.terms.get("nashab")!.ar;
+    expect(show("([[mahall|mahall]] [[nashb|nashab]])")).toBe(`(mahall nashb ${nashab})`);
+    expect(show("([[mahall|mahall]] [[nashb|nashab]])")).not.toContain(`${mahall} ${nashab}`);
+    // the first is not counted as shown (its next use has the Arabic); the second is
+    expect(show("([[mahall|mahall]] [[nashb|nashab]]). [[Mahall|mahall]] dan [[nashab|nashab]] itu")).toBe(
+      `(mahall nashb ${nashab}). Mahall (${mahall}) dan nashab itu`,
+    );
+    // where the second was already shown, the whole bracket stays Latin: "kedudukan nashab (نَصْب,
+    // mahall nashb)", the Al-Fatihah card's form
+    expect(show("kedudukan [[nashab|nashab]] ([[mahall|mahall]] [[nashb|nashab]]) di kartu ini")).toBe(
+      `kedudukan nashab (${nashab}, mahall nashb) di kartu ini`,
+    );
     // not counted as shown: its next use outside the phrase has the Arabic
     expect(show("([[mahall|mahall]] raf'). [[Mahall|mahall]] adalah kedudukan")).toBe(`(mahall raf'). Mahall (${mahall}) adalah kedudukan`);
-    // the end of the bracket, a comma or a list is not a phrase going on: the Arabic stays
-    expect(show("(dalam keadaan [[mahall|mahall]])")).toBe(`(dalam keadaan mahall, ${mahall})`);
-    expect(show("([[mahall|mahall]] dan [[rafa'|rafa]])")).toBe(`(mahall, ${mahall} dan rafa', ${rafa})`);
+    // the end of the bracket, a comma or a list is not a phrase going on: the Arabic stays, right
+    // after its item (one space, 2026-10-12: the commas of a bracket separate its items)
+    expect(show("(dalam keadaan [[mahall|mahall]])")).toBe(`(dalam keadaan mahall ${mahall})`);
+    expect(show("([[mahall|mahall]] dan [[rafa'|rafa]])")).toBe(`(mahall ${mahall} dan rafa' ${rafa})`);
+    // a run that unmarked words go on after stays Latin too, and none of it counts as shown
+    expect(show("([[mahall|mahall]] [[nashb|nashab]] sebagai objek). [[Mahall|mahall]] itu")).toBe(`(mahall nashb sebagai objek). Mahall (${mahall}) itu`);
+    // a term next to a Qur'anic word inside a bracket is no run: the phrase goes on, it stays Latin
+    expect(show("([[huruf jar|huruf-jar]] [[bi-|q:1:1:1/1]])")).toBe(`(huruf jar bi- ${LIBRARY.quran["1:1:1/1"]})`);
+  });
+
+  // Operator 2026-10-12, "tidy them up" (R1): "(dhammah, ضَمَّة, fathah, فَتْحَة, kasrah, كَسْرَة)" read
+  // as six items. Inside the prose's own bracket an item's Arabic follows it after ONE SPACE.
+  it("inside the prose's brackets, puts an item's Arabic right after it: the commas separate items", () => {
+    const show = (t: string, scope = new Scope(false)) => termDisplay(annotate(t, scope, TERMS)).text;
+    const ar = (id: string) => TERMS.terms.get(id)!.ar!;
+    expect(show("([[dhammah|dhammah]], [[fathah|fathah]], [[kasrah|kasrah]])")).toBe(`(dhammah ${ar("dhammah")}, fathah ${ar("fathah")}, kasrah ${ar("kasrah")})`);
+    expect(show("kata keduanya ([[mudhaf ilaih|mudhaf-ilaih]]) selalu")).toBe(`kata keduanya (mudhaf ilaih ${ar("mudhaf-ilaih")}) selalu`);
+    // The MERGED head keeps its comma: its Arabic glosses the word BEFORE the bracket.
+    expect(show("[[wa|q:1:7:8/1]] ([['athaf|athaf]], penyambungan)")).toBe(
+      `wa (${LIBRARY.quran["1:7:8/1"]}, 'athaf ${ar("athaf")}, penyambungan)`,
+    );
+    expect(show("[[fa'il|fail]] ([[-ta|q:1:7:3/2]])")).toBe(`fa'il (${ar("fail")}, -ta ${LIBRARY.quran["1:7:3/2"]})`);
+    // A harakah reminder still follows its comma; the punctuation after the item follows the Arabic.
+    expect(show("(berakhir [[kasrah|kasrah]]; lalu [[kasrah|kasrah]])", new Scope())).toBe(
+      `(berakhir kasrah ${ar("kasrah")}, ${TERMS.terms.get("kasrah")!.hint}; lalu kasrah)`,
+    );
+    // A quoted gloss of Qur'anic words inside a bracket: the same form.
+    expect(show("(seperti [[“nama Allah”|q:1:1:1-2]])")).toBe(`(seperti “nama Allah” ${LIBRARY.quran["1:1:1-2"]})`);
+    // Never the old comma form.
+    for (const c of LIBRARY.concepts) {
+      const sc = new Scope();
+      for (const f of [c.marked!.summary, ...c.marked!.explanation, ...c.marked!.notes])
+        expect(show(f, sc), c.id).not.toMatch(/\p{Script=Latin}[’']?, [\u0621-\u064A][^()]*\)/u);
+    }
+  });
+
+  // R2: "yaum (يَوْمِ) ad-dīn (ٱلدِّينِ)" glossed a phrase word by word. A run — Qur'anic words that
+  // follow one another in one ayah (or the last part of a word, then the next word), a single space
+  // apart — gets ONE bracket after the whole phrase, the mushaf's own text. Grammar terms never
+  // form one (review 2026-10-12).
+  describe("a phrase of Qur'anic words (a run) gets one bracket after the whole phrase; terms never form one", () => {
+    const fatihah = SURAHS.find((s) => s.slug === "al-fatihah")!;
+    const lookup = lessonLookup(TERMS, fatihah);
+    const show = (t: string, scope = new Scope(false), l = lookup) => termDisplay(annotate(t, scope, l)).text;
+    const ar = (id: string) => TERMS.terms.get(id)!.ar!;
+    const q = (ref: string) => LIBRARY.quran[ref] ?? fatihah.quran[ref];
+
+    // Grammar terms never form a run (review 2026-10-12: a first version glued "isimnya
+    // dirafa'kan (اِسْم رَفْع)", "Fi'il amr mabni (فِعْل أَمْر مَبْنِيّ)": two terms side by side are
+    // seldom one Arabic phrase). Each keeps its own Arabic; a gloss or a citation after the last
+    // joins the last one's bracket, as it joins any item's.
+    it("terms: never a run — each term its own Arabic, the prose's gloss or citation joined to the last", () => {
+      expect(show("[[dhamir|dhamir]] [[munfashil|munfashil]] boleh")).toBe(`dhamir (${ar("dhamir")}) munfashil (${ar("munfashil")}) boleh`);
+      expect(show("[[jumlah|jumlah]] [[ibtida'iyyah|ibtidaiyyah]] (kalimat pembuka)")).toBe(
+        `jumlah (${ar("jumlah")}) ibtida'iyyah (${ar("ibtidaiyyah")}, kalimat pembuka)`,
+      );
+      expect(show("[[huruf|huruf]] [[mabni|mabni]] (Ibnu 'Aqil).")).toBe(`huruf (${ar("huruf")}) mabni (${ar("mabni")}; Ibnu 'Aqil).`);
+      expect(show("[[isim fa'il|isim-fail]] [[berwazan|wazan]] [[fā‘ilun|wazan-failun]], dari")).toBe(
+        `isim fa'il (${ar("isim-fail")}) berwazan (${ar("wazan")}) fā‘ilun (${ar("wazan-failun")}), dari`,
+      );
+      // no token of adjacent terms carries a run, and no bracket holds two terms' Arabic
+      const tokens = annotate("[[isim fa'il|isim-fail]] [[berwazan|wazan]] [[fā‘ilun|wazan-failun]]", new Scope(false), TERMS);
+      expect(tokens.filter((t) => t.kind !== "text").map((t) => [t.kind, t.arabic, t.run])).toEqual([
+        ["term", true, undefined],
+        ["term", true, undefined],
+        ["term", true, undefined],
+      ]);
+      // a term next to a Qur'anic word that a Qur'anic word follows: only the two words are a run
+      expect(show("[[huruf jar|huruf-jar]] [[lam|q:112:3:3/2]] [[yūlad|q:112:3:4]] itu", new Scope(false), TERMS)).toBe(
+        `huruf jar (${ar("huruf-jar")}) lam yūlad (${q("112:3:3/2")} ${q("112:3:4")}) itu`,
+      );
+    });
+
+    // The four phrases the first version glued (review 2026-10-12), rendered from their own
+    // marked sources in the library — found by their Latin, not typed here — on their Konsep
+    // page (in reading order, so the page's earlier first uses count) and each on its own: none
+    // of them is ever drawn with one bracket for two terms.
+    it("never glues the four term phrases the review rejected, on their page or alone", () => {
+      const rejected = ["isimnya dirafa'kan", "Fi'il amr mabni", "menafikan mudhari'", "ta' ta'nits sukun"];
+      for (const phrase of rejected) {
+        const hits = LIBRARY.concepts.flatMap((c) =>
+          c.explanation.flatMap((p, i) => (p.includes(phrase) ? [{ c, i, marked: c.marked!.explanation[i] }] : [])),
+        );
+        expect(hits.length, phrase).toBe(1);
+        const { c, i, marked } = hits[0];
+        // the two marked terms of the phrase, as the source marks them
+        const spans = parseMarked(marked).filter((x): x is Extract<typeof x, { kind: "mark" }> => x.kind === "mark");
+        const at = spans.findIndex((x, k) => `${x.surface} ${spans[k + 1]?.surface}` === phrase);
+        expect(at, phrase).toBeGreaterThanOrEqual(0);
+        const [a, b] = [spans[at], spans[at + 1]];
+        expect(marked, phrase).toContain(`[[${a.surface}|${a.ref}]] [[${b.surface}|${b.ref}]]`);
+        const arA = TERMS.terms.get(a.ref)!.ar!;
+        const arB = TERMS.terms.get(b.ref)!.ar!;
+        const glued = `${a.surface} ${b.surface} (${arA} ${arB}`;
+        // on its page: title, summary, the paragraphs before it, then it
+        const page = new Scope(true);
+        titleParts(c.marked!.title, page, TERMS);
+        annotate(c.marked!.summary, page, TERMS);
+        c.marked!.explanation.slice(0, i).forEach((p) => annotate(p, page, TERMS));
+        const onPage = termDisplay(annotate(marked, page, TERMS)).text;
+        expect(onPage, phrase).toContain(`${a.surface} `);
+        expect(onPage, phrase).not.toContain(glued);
+        expect(onPage, phrase).not.toContain(`${arA} ${arB}`);
+        // on its own, every term due: each its own Arabic, right after it
+        for (const scope of [new Scope(true), new Scope(false)]) {
+          const alone = termDisplay(annotate(marked, scope, TERMS)).text;
+          expect(alone, phrase).not.toContain(glued);
+          expect(alone, phrase).toContain(`${a.surface} (${arA}) ${b.surface} (${arB}`);
+        }
+      }
+    });
+
+    // The same over every marked text of the content, each on its own (every term due) with and
+    // without reminders, and over every quiz string: no Arabic stretch shown is two or more term spellings joined by
+    // a space (the old glued form, "(فِعْل مُضَارِع مَجْزُوم)", "(mahall nashb مَحَلّ نَصْب)"), unless
+    // the stretch is itself one term's spelling (حَرْف جَرّ).
+    it("draws no bracket that glues two terms' Arabic, anywhere in the content or the quiz", () => {
+      const texts: [string, string, typeof TERMS][] = [];
+      const walk = (v: unknown, inMarked: boolean, where: string, l: typeof TERMS): void => {
+        if (typeof v === "string") {
+          if (inMarked) texts.push([where, v, l]);
+        } else if (Array.isArray(v)) v.forEach((x, i) => walk(x, inMarked, `${where}[${i}]`, l));
+        else if (v && typeof v === "object") for (const [k, x] of Object.entries(v)) walk(x, inMarked || k === "marked", `${where}.${k}`, l);
+      };
+      walk([LIBRARY.concepts, LIBRARY.basics, LIBRARY.lexicon, LIBRARY.roots], false, "library", TERMS);
+      for (const p of LIBRARY.parts) for (const x of [...p.steps, ...p.tiles.map((t) => t.label)]) texts.push([`parts ${p.loc}`, x, TERMS]);
+      for (const su of SURAHS) walk([su.ayat, su.facts], false, su.slug, lessonLookup(TERMS, su));
+      expect(texts.length).toBeGreaterThan(900);
+      const bad = texts.flatMap(([where, text, l]) =>
+        [new Scope(false), new Scope(true)].flatMap((sc) => gluedTerms(termDisplay(annotate(text, sc, l)).text).map((g) => `${where}: ${g}`)),
+      );
+      expect(bad).toEqual([]);
+      // and every string of every lesson's quiz (pipeline/quiz.py, the twin renderer)
+      const quiz: string[] = [];
+      const collect = (o: unknown): void => {
+        if (typeof o === "string") quiz.push(o);
+        else if (Array.isArray(o)) o.forEach(collect);
+        else if (o && typeof o === "object") Object.values(o).forEach(collect);
+      };
+      for (const su of SURAHS) collect(quizFor(su.slug));
+      expect(quiz.length).toBeGreaterThan(1000);
+      expect(quiz.flatMap((x) => gluedTerms(x).map((g) => `${g} :: ${x}`))).toEqual([]);
+      // the check sees the glued form
+      expect(gluedTerms(`fi'il mudhari' majzum (${ar("fiil-mudhari")} ${ar("majzum")})`)).toEqual([`${ar("fiil-mudhari")} ${ar("majzum")}`]);
+      expect(gluedTerms(`huruf jar (${ar("huruf-jar")})`)).toEqual([]);
+    });
+
+    it("Qur'anic words that follow one another in the ayah, a part included", () => {
+      expect(show("[[yaum|q:1:4:2]] [[ad-dīn|q:1:4:3]], yang")).toBe(`yaum ad-dīn (${q("1:4:2")} ${q("1:4:3")}), yang`);
+      expect(`${q("1:4:2")} ${q("1:4:3")}`).toBe(`${WORD_AR["1:4:2"]} ${WORD_AR["1:4:3"]}`); // the ayah's own words, in order
+      // the last part of a word, then the next word: "lam yūlad" (wa-lam is 112:3:3)
+      expect(show("[[lam|q:112:3:3/2]] [[yūlad|q:112:3:4]] dengan", new Scope(false), TERMS)).toBe(`lam yūlad (${q("112:3:3/2")} ${q("112:3:4")}) dengan`);
+      expect(LIBRARY.segments["112:3:3"]).toHaveLength(2);
+      // the prose's gloss joins it
+      expect(show("[[malik|q:114:2:1]] [[an-nās|q:114:2:2]] (“Raja manusia”), dan", new Scope(false), TERMS)).toBe(
+        `malik an-nās (${q("114:2:1")} ${q("114:2:2")}, “Raja manusia”), dan`,
+      );
+      // a run and a longer run of words after it
+      expect(show("[[lam|q:112:4:1/2]] [[yakun lahū kufuwan aḥad|q:112:4:2-5]] (112:4), dari", new Scope(false), TERMS)).toBe(
+        `lam yakun lahū kufuwan aḥad (${q("112:4:1/2")} ${q("112:4:2-5")}, 112:4), dari`,
+      );
+    });
+
+    it("never joins Qur'anic words that are not next to each other in the ayah (the Arabic shown is the mushaf's own text)", () => {
+      // 33:37 reads an‘ama Allāhu ‘alaihi: words 4 and 6
+      expect(show("[[an‘ama|q:33:37:4]] [[‘alaihi|q:33:37:6]], 'memberi nikmat'")).toBe(`an‘ama (${q("33:37:4")}) ‘alaihi (${q("33:37:6")}), 'memberi nikmat'`);
+      // another ayah; the FIRST part of a word (bi- of bismi) before the next word; a letter
+      expect(show("[[bismi|q:1:1:1]] [[al-ḥamdu|q:1:2:1]]", new Scope(false), TERMS)).toBe(`bismi (${q("1:1:1")}) al-ḥamdu (${q("1:2:1")})`);
+      expect(show("[[bi-|q:1:1:1/1]] [[Allāhi|q:1:1:2]]", new Scope(false), TERMS)).toBe(`bi- (${q("1:1:1/1")}) Allāhi (${q("1:1:2")})`);
+      expect(show("[[ba'|q:1:1:1#1]] [[sin|q:1:1:1#2]]", new Scope(false), TERMS)).toBe(`ba' (${q("1:1:1#1")}) sin (${q("1:1:1#2")})`);
+      // a part whose word has no segments in the lookup cannot be known to be its last: no run
+      const bare = { terms: TERMS.terms, quran: TERMS.quran };
+      expect(show("[[lam|q:112:3:3/2]] [[yūlad|q:112:3:4]]", new Scope(false), bare)).toBe(`lam (${q("112:3:3/2")}) yūlad (${q("112:3:4")})`);
+    });
+
+    it("a run never crosses punctuation, a list word, a double space, a term, an unknown ref, a quoted gloss", () => {
+      expect(show("[[yaum|q:1:4:2]], [[ad-dīn|q:1:4:3]]")).toBe(`yaum (${q("1:4:2")}), ad-dīn (${q("1:4:3")})`);
+      expect(show("[[yaum|q:1:4:2]] dan [[ad-dīn|q:1:4:3]]")).toBe(`yaum (${q("1:4:2")}) dan ad-dīn (${q("1:4:3")})`);
+      expect(show("[[yaum|q:1:4:2]]  [[ad-dīn|q:1:4:3]]")).toBe(`yaum (${q("1:4:2")})  ad-dīn (${q("1:4:3")})`); // two spaces
+      // a term next to a Qur'anic item is not a run
+      expect(show("[[huruf jar|huruf-jar]] [[bi-|q:1:1:1/1]] (dengan)")).toBe(`huruf jar (${ar("huruf-jar")}) bi- (${q("1:1:1/1")}, dengan)`);
+      expect(show("[[yaum|q:1:4:2]] [[mudhaf|mudhaf]]")).toBe(`yaum (${q("1:4:2")}) mudhaf (${ar("mudhaf")})`);
+      // a term the table has no Arabic for stays Latin between two that have it
+      expect(TERMS.terms.get("wazan-yufalilu")!.ar).toBeNull();
+      expect(show("[[berwazan|wazan]] [[yufa‘lilu|wazan-yufalilu]] [[mabni|mabni]].")).toBe(`berwazan (${ar("wazan")}) yufa‘lilu mabni (${ar("mabni")}).`);
+      // a quoted gloss is an example, not a word of the phrase
+      expect(show("[[bismi|q:1:1:1]] [[“nama Allah”|q:1:1:1-2]]", new Scope(false), TERMS)).toBe(`bismi (${q("1:1:1")}) “nama Allah” (${q("1:1:1-2")})`);
+      // an unknown ref is plain text: it ends a run as any word does
+      expect(show("[[yaum|q:1:4:2]] [[x|q:1:4:9]] [[ad-dīn|q:1:4:3]]")).toBe(`yaum (${q("1:4:2")}) x ad-dīn (${q("1:4:3")})`);
+    });
+
+    it("shows the whole run when any of its words is due, counts every word as shown, and stays Latin when all were", () => {
+      const sc = new Scope(false);
+      expect(show("[[yaum|q:1:4:2]] itu", sc)).toBe(`yaum (${q("1:4:2")}) itu`);
+      // yaum was shown, ad-dīn was not: the phrase's Arabic, whole — never "yaum ad-dīn (ٱلدِّينِ)"
+      expect(show("[[yaum|q:1:4:2]] [[ad-dīn|q:1:4:3]] itu", sc)).toBe(`yaum ad-dīn (${q("1:4:2")} ${q("1:4:3")}) itu`);
+      expect(show("[[yaum|q:1:4:2]] [[ad-dīn|q:1:4:3]] lagi, lalu [[ad-dīn|q:1:4:3]]", sc)).toBe("yaum ad-dīn lagi, lalu ad-dīn");
+      // three words: the bracket after the last, the mushaf's three words in order
+      const tokens = annotate("[[māliki|q:1:4:1]] [[yaumi|q:1:4:2]] [[ad-dīni|q:1:4:3]]", new Scope(false), lookup);
+      expect(tokens.map((t) => (t.kind === "text" ? t.text : [t.kind, t.surface, t.arabic, t.run?.end]))).toEqual([
+        ["quran", "māliki", false, false],
+        " ",
+        ["quran", "yaumi", false, false],
+        " ",
+        ["quran", "ad-dīni", true, true],
+      ]);
+      const end = tokens[tokens.length - 1];
+      expect(end.kind !== "text" && end.run?.ar).toBe(["1:4:1", "1:4:2", "1:4:3"].map((l) => WORD_AR[l]).join(" "));
+      // inside the prose's bracket: the run's Arabic right after it, one space; a run that more
+      // words follow there stays Latin, and none of it counts as shown
+      expect(show("(seperti [[yaum|q:1:4:2]] [[ad-dīn|q:1:4:3]])")).toBe(`(seperti yaum ad-dīn ${q("1:4:2")} ${q("1:4:3")})`);
+      const inner = new Scope(false);
+      expect(show("([[yaum|q:1:4:2]] [[ad-dīn|q:1:4:3]] adalah hari kiamat)", inner)).toBe("(yaum ad-dīn adalah hari kiamat)");
+      expect(inner.shown.size).toBe(0);
+      // inside a cross-reference nothing is shown, and nothing counts as shown
+      const x = new Scope(false);
+      expect(show("(lihat: [[yaum|q:1:4:2]] [[ad-dīn|q:1:4:3]])", x)).toBe("(lihat: yaum ad-dīn)");
+      expect(x.shown.size).toBe(0);
+      // the same for two TERMS: no run, so only the one not yet shown has its Arabic, after itself
+      const t = new Scope(false);
+      expect(show("[[dhamir|dhamir]] itu", t)).toBe(`dhamir (${ar("dhamir")}) itu`);
+      expect(show("[[dhamir|dhamir]] [[munfashil|munfashil]] itu", t)).toBe(`dhamir munfashil (${ar("munfashil")}) itu`);
+    });
+
+    it("a harakah term keeps its reminder and link at its first use, and like every term never joins a run", () => {
+      const hint = (id: string) => TERMS.terms.get(id)!.hint;
+      const sc = new Scope();
+      // first use on a page that shows reminders: each word with its own reminder and link
+      const first = termDisplay(annotate("[[dhammah|dhammah]] [[bertanwin|tanwin]], tanda rafa'", sc, TERMS));
+      expect(first.text).toBe(`dhammah (${ar("dhammah")}, ${hint("dhammah")}) bertanwin (${ar("tanwin")}, ${hint("tanwin")}), tanda rafa'`);
+      expect(first.marks.filter((m) => m.kind === "link").map((m) => first.text.slice(m.from, m.to))).toEqual(["dhammah", "bertanwin"]);
+      // the reminder is not swallowed by a term before it either: "tanda jazm-nya sukun (…)"
+      expect(termDisplay(annotate("tanda [[jazm-nya|jazm]] [[sukun|sukun]].", new Scope(), TERMS)).text).toBe(
+        `tanda jazm-nya (${ar("jazm")}) sukun (${ar("sukun")}, ${hint("sukun")}).`,
+      );
+      // once shown, plain
+      expect(termDisplay(annotate("[[dhammah|dhammah]] [[bertanwin|tanwin]] lagi", sc, TERMS)).text).toBe("dhammah bertanwin lagi");
+      // after its reminder: the next term keeps its own Arabic, never "fathah mabni (فَتْحَة مَبْنِيّ)"
+      const later = new Scope();
+      annotate("[[fathah|fathah]]", later, TERMS);
+      const pair = termDisplay(annotate("[[fathah|fathah]] [[mabni|mabni]]", later, TERMS));
+      expect(pair.text).toBe(`fathah mabni (${ar("mabni")})`);
+      expect(pair.marks.map((m) => [m.kind, pair.text.slice(m.from, m.to)])).toEqual([["term", ar("mabni")]]);
+      // where no reminders are shown (a word card, the Harakat page, the quiz): each its own Arabic
+      const card = termDisplay(annotate("[[dhammah|dhammah]] [[bertanwin|tanwin]], tanda rafa'", new Scope(false), TERMS));
+      expect(card.text).toBe(`dhammah (${ar("dhammah")}) bertanwin (${ar("tanwin")}), tanda rafa'`);
+      expect(card.marks.map((m) => m.kind)).toEqual(["term", "term"]);
+      // inside a bracket: the first word of the phrase stays Latin, the second has its reminder
+      expect(termDisplay(annotate("([[dhammah|dhammah]] [[bertanwin|tanwin]])", new Scope(), TERMS)).text).toBe(
+        `(dhammah bertanwin ${ar("tanwin")}, ${hint("tanwin")})`,
+      );
+    });
+
+    it("leaves a title's terms to its headword, one entry each; its Qur'anic words form a run inline", () => {
+      const t = titleParts("[[Fi'il|fiil]] [[majhul|majhul]] (kata kerja pasif)", new Scope(), TERMS);
+      expect(termDisplay(t.tokens).text).toBe("Fi'il majhul (kata kerja pasif)");
+      expect(t.head).toEqual([{ ar: ar("fiil") }, { ar: ar("majhul") }]);
+      const r = titleParts("[[Ar-raḥmān|q:1:1:3]] [[ar-raḥīm|q:1:1:4]] berdampingan", new Scope(), TERMS);
+      expect(termDisplay(r.tokens).text).toBe(`Ar-raḥmān ar-raḥīm (${q("1:1:3")} ${q("1:1:4")}) berdampingan`);
+    });
+  });
+
+  // R4 and R5 (operator 2026-10-12): a bracket of surah/ayah numbers and a capitalised Indonesian
+  // gloss join the Arabic's bracket; an author's or kitab's name is a citation, as before.
+  describe("what the bracket after an item is: a gloss, a place, a citation", () => {
+    const show = (t: string) => termDisplay(annotate(t, new Scope(false), TERMS)).text;
+    const quran = (ref: string) => LIBRARY.quran[ref];
+
+    it("joins a bracket that opens on a number (R4)", () => {
+      expect(show("[[qul a‘ūżu|q:113:1:1-2]] (113 dan 114)")).toBe(`qul a‘ūżu (${quran("113:1:1-2")}, 113 dan 114)`);
+      expect(show("[[yakun|q:112:4:2]] (112:4), lalu")).toBe(`yakun (${quran("112:4:2")}, 112:4), lalu`);
+    });
+
+    it("takes a capitalised gloss for a gloss, a cited name for a citation (R5)", () => {
+      const mabni = TERMS.terms.get("mabni")!.ar;
+      expect(show("[[mabni|mabni]] (Yang dimohon pertolongan-Nya)")).toBe(`mabni (${mabni}, Yang dimohon pertolongan-Nya)`);
+      expect(show("[[mabni|mabni]] (Tuhan, Pemelihara)")).toBe(`mabni (${mabni}, Tuhan, Pemelihara)`);
+      for (const cite of ["Darwisy", "Darwisy; al-Jadwal", "Ibnu 'Aqil", "Ibnu Ajurrum; Darwisy", "Abu Hayyan", "Ahmad Zaini Dahlan", "Mughni", "al-Jadwal", "as-Samin: manshub", "an-Nahhas", "ad-Da'as", "lihat: mu'rab"])
+        expect(show(`[[mabni|mabni]] (${cite})`), cite).toBe(`mabni (${mabni}; ${cite})`);
+      // a cited name is a whole word: "Ibnul …" or "Abunya" is not on the list
+      expect(show("[[mabni|mabni]] (Abunya)")).toBe(`mabni (${mabni}, Abunya)`);
+    });
+
+    // Every bracket that opens with a capital right after a marked item, anywhere in the content:
+    // each is a citation or a gloss, pinned — a new author's name is added to CITED knowingly.
+    it("classifies every capitalised bracket of the content", () => {
+      const glosses = new Set<string>();
+      const cites = new Set<string>();
+      const texts: string[] = [];
+      const walk = (v: unknown, inMarked: boolean): void => {
+        if (typeof v === "string") {
+          if (inMarked) texts.push(v);
+        } else if (Array.isArray(v)) v.forEach((x) => walk(x, inMarked));
+        else if (v && typeof v === "object") for (const [k, x] of Object.entries(v)) walk(x, inMarked || k === "marked");
+      };
+      walk([LIBRARY.concepts, LIBRARY.basics, LIBRARY.lexicon, LIBRARY.roots, SURAHS.map((s) => [s.ayat, s.facts])], false);
+      for (const p of LIBRARY.parts) texts.push(...p.steps, ...p.tiles.map((t) => t.label));
+      expect(texts.length).toBeGreaterThan(900);
+      for (const text of texts)
+        for (const m of text.matchAll(/\]\] \((\p{Lu}[^()[\]]*)/gu)) {
+          const first = m[1].split(/[\s;:,)]/u)[0];
+          const merged = termDisplay(annotate(`[[mabni|mabni]] (${m[1]})`, new Scope(false), TERMS)).text;
+          (merged.includes("; ") && merged.startsWith(`mabni (${TERMS.terms.get("mabni")!.ar}; `) ? cites : glosses).add(first);
+        }
+      expect([...cites].sort()).toEqual(["Darwisy", "Ibnu"]);
+      expect([...glosses].sort()).toEqual(["Tuhan", "Yang"]);
+      expect(CITED).toEqual(expect.arrayContaining([...cites]));
+    });
   });
 
   it("shows a term's Arabic once per scope, and keeps the punctuation with it", () => {
@@ -244,18 +580,11 @@ describe("display: Arabic at the first use in a scope", () => {
   });
 
   it("never opens a second pair of brackets: inside the prose's brackets, before a citation, after a title's word", () => {
-    const text = (tokens: Token[]) =>
-      tokens
-        .map((t) => {
-          if (t.kind === "text") return t.text;
-          if (!t.arabic) return t.surface;
-          const ar = t.kind === "term" ? t.term.ar : t.ar;
-          if (t.inBracket) return `${t.surface}, ${ar}${t.after}`;
-          return `${t.surface} (${ar}${t.merge ? ", " : t.cite ? "; " : `)${t.after}`}`;
-        })
-        .join("");
+    const text = (tokens: Token[]) => termDisplay(tokens).text;
     const inside = annotate("(dalam keadaan [[jar|jar]])", new Scope(), TERMS);
-    expect(text(inside)).toBe(`(dalam keadaan jar, ${TERMS.terms.get("jar")!.ar})`);
+    // one space, no comma (2026-10-12): "(dalam keadaan jar, جَرّ)" before
+    expect(text(inside)).toBe(`(dalam keadaan jar ${TERMS.terms.get("jar")!.ar})`);
+    expect(inside.find((t) => t.kind === "term")).toMatchObject({ inBracket: true, arabic: true, after: ")" });
     const cite = annotate("ia [[mabni|mabni]] (Ibnu 'Aqil).", new Scope(), TERMS);
     expect(text(cite)).toBe(`ia mabni (${TERMS.terms.get("mabni")!.ar}; Ibnu 'Aqil).`);
     const xref = annotate("(lihat: [[I'rab|irab]] dan tandanya)", new Scope(), TERMS);

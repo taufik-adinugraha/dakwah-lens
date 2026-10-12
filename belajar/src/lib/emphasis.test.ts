@@ -168,7 +168,9 @@ describe("emphasisSpans: what a text emphasises", () => {
       ["sound", "i"],
     ]);
     // Named inside the prose's own bracket — an aside — or by one author: not the term taught.
-    expect(shown("rafa' (رَفْع, katanya disebut marfu', مَرْفُوع), nashab")).toEqual([]);
+    // (the item's Arabic right after it, one space: TermText's form since 2026-10-12)
+    expect(shown("rafa' (رَفْع, katanya disebut marfu' مَرْفُوع), nashab")).toEqual([]);
+    expect(shown("kata keduanya (disebut mudhaf ilaih مُضَاف إِلَيْه) selalu majrur")).toEqual([]);
     expect(shown("Darwisy dan al-Jadwal menyebutnya zaidah (زَائِدَة), yang artinya “tambahan”")).toEqual([["meaning", "“tambahan”"]]);
   });
 
@@ -393,6 +395,27 @@ describe("termEmphasis: TermText's terms from its tokens", () => {
     expect(drawn(field("konsep tanda-irab[2]")).filter(([k]) => k === "term")).toEqual([]);
     const tokens = annotate("Darwisy dan al-Jadwal menyebutnya [[zaidah|zaidah]], dan ulama menyebutnya [[syibhul jumlah|syibhul-jumlah]].", new Scope(), TERMS);
     expect(drawn(tokens)).toEqual([["term", "syibhul jumlah (شِبْه الجُمْلَة)"]]);
+  });
+
+  // Grammar terms never form a run (src/lib/terms.ts runFrom, review 2026-10-12): two terms named
+  // side by side are two tokens, and the one named — right after the trigger — is emphasised with
+  // its own bracket, as before the tidy-up.
+  it("two terms named side by side: the first, with its own bracket; its word alone once shown, or with the prose's gloss", () => {
+    const ar = (id: string) => TERMS.terms.get(id)!.ar!;
+    const named = "Kata ganti yang berdiri sendiri disebut [[dhamir|dhamir]] [[munfashil|munfashil]], dan";
+    const fresh = annotate(named, new Scope(), TERMS);
+    expect(termDisplay(fresh).text).toBe(`Kata ganti yang berdiri sendiri disebut dhamir (${ar("dhamir")}) munfashil (${ar("munfashil")}), dan`);
+    expect(drawn(fresh)).toEqual([["term", `dhamir (${ar("dhamir")})`]]);
+    // never the glued phrase, emphasised or drawn
+    expect(termDisplay(fresh).text).not.toContain(`${ar("dhamir")} ${ar("munfashil")}`);
+    const sc = new Scope();
+    annotate("[[dhamir|dhamir]] [[munfashil|munfashil]]", sc, TERMS);
+    expect(drawn(annotate(named, sc, TERMS))).toEqual([["term", "dhamir"]]);
+    expect(drawn(annotate("disebut [[jumlah|jumlah]] [[ibtida'iyyah|ibtidaiyyah]] (kalimat pembuka).", new Scope(), TERMS))).toEqual([["term", `jumlah (${ar("jumlah")})`]]);
+    // a term named inside the prose's bracket is an aside, in the new form too
+    const aside = annotate("[[rafa'|rafa]] (katanya disebut [[marfu'|marfu]]).", new Scope(), TERMS);
+    expect(termDisplay(aside).text).toBe(`rafa' (${ar("rafa")}, katanya disebut marfu' ${ar("marfu")}).`);
+    expect(drawn(aside)).toEqual([]);
   });
 
   it("the same sentence the same on every page (a parts diagram's step)", () => {

@@ -29,6 +29,9 @@
     <section data-case="gloss-split" data-expect="term-split">
       <p style="width:20rem">kata <bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{ONE.ar}}</bdi><br>({{ONE.latin}}) lagi</p>
     </section>
+    <section data-case="item-split" data-expect="term-split">
+      <p style="width:20rem">kata keduanya ({{TERM.lead}} {{TERM.last}}<br><bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{TERM.ar}}</bdi>) selalu</p>
+    </section>
     <section data-case="arabic-phrase-split" data-expect="arabic-phrase-split">
       <p style="width:20rem">kata <bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{TERM.w1}} <br>{{TERM.w2}}</bdi> lagi</p>
     </section>
@@ -101,6 +104,9 @@
 
     <section data-case="unit-with-room" data-expect="">
       <p style="width:20rem"><span data-mixed="didahului {{TERM.display}}, yaitu {{ONE.ar}} ({{ONE.latin}}) dan Al-Fatihah." style="display:contents">didahului <span data-lb="unit" class="lb-unit">{{TERM.lead}} <span data-lb="unit" class="lb-unit"><span data-lb="part" class="lb-part">{{TERM.last}}</span> <span data-lb="part" class="lb-part lb-ar"><span dir="rtl">(<bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{TERM.ar}}</bdi>)</span>,</span></span></span> yaitu <span data-lb="unit" class="lb-unit"><span data-lb="part" class="lb-part lb-ar"><bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{ONE.ar}}</bdi></span> <span data-lb="part" class="lb-part">({{ONE.latin}})</span></span> dan <span data-lb="glue" class="lb-glue">Al-Fatihah.</span></span><!--/mixed--></p>
+    </section>
+    <section data-case="item-in-bracket" data-expect="">
+      <p style="width:20rem"><span data-mixed="kata keduanya ({{TERM.lead}} {{TERM.last}} {{TERM.ar}}) dan ({{ONE.latin}} {{ONE.ar}}, lagi) itu" style="display:contents">kata keduanya <span data-lb="unit" class="lb-unit">({{TERM.lead}} <span data-lb="unit" class="lb-unit"><span data-lb="part" class="lb-part">{{TERM.last}}</span> <span data-lb="part" class="lb-part lb-ar"><bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{TERM.ar}}</bdi>)</span></span></span> dan <span data-lb="unit" class="lb-unit"><span data-lb="part" class="lb-part">({{ONE.latin}}</span> <span data-lb="part" class="lb-part lb-ar"><bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{ONE.ar}}</bdi>,</span></span> lagi) itu</span><!--/mixed--></p>
     </section>
     <section data-case="unit-in-flow" data-expect="">
       <p data-fit="unit"><span data-mixed="kata {{WIDE.display}} lagi" style="display:contents">kata <span data-lb="unit" class="lb-unit">{{WIDE.lead}} <span data-lb="unit" class="lb-unit"><span data-lb="part" class="lb-part">{{WIDE.last}}</span> <span data-lb="part" class="lb-part lb-ar"><span dir="rtl">(<bdi lang="ar" dir="rtl" class="arabic-inline text-ar-sm">{{WIDE.ar}}</bdi>)</span></span></span></span> lagi</span><!--/mixed--></p>

@@ -309,6 +309,38 @@ describe("linebreaks measure(): the seams it reports", () => {
     expect(kinds(layout(body(para([bdi("فَعِلَ–يَفْعَلُ", [[0, 14, 0]]), tx(" (seperti ", [[0, 1, 0], [1, 10, 33]]), bdi("عَلِمَ", [[0, 6, 33]]), tx(")", [[0, 1, 33]])]))))).toEqual([]);
   });
 
+  it("inside the text's own bracket, an item and the Arabic right after it on two lines; not a list word, a quotation, or outside a bracket", () => {
+    // "(mudhaf ilaih ⏎ مُضَاف إِلَيْه)" — TermText's form since 2026-10-12: one space, no bracket of
+    // its own. A line never starts with the Arabic of the item before it.
+    const item = (before, ar = TERM, after = ") selalu") => para([tx(before, [[0, before.length, 0]]), bdi(ar, [[0, ar.length, 30]]), tx(after, [[0, after.length, 33]])]);
+    expect(kinds(layout(body(item("kata keduanya (huruf jar "))))).toEqual(["term-split"]);
+    // the bracket opened two lines up: the depth is counted over the block's lines
+    const three = para([tx("tandanya (dhammah, lalu fathah ", [[0, 18, 0], [18, 31, 33]]), bdi(WORD, [[0, WORD.length, 63]]), tx(", kasrah)", [[0, 9, 66]])]);
+    expect(kinds(layout(body(three)))).toEqual(["term-split"]);
+    // an ending or a prefix is an item too: "(فَاعِل, -ta ⏎ تَ)"
+    expect(kinds(layout(body(item("fa'il (pelaku, -ta ", "تَ", ");"))))).toEqual(["term-split"]);
+    // the break before the item's last word is a normal one: "(huruf ⏎ jar حَرْف جَرّ)"
+    expect(kinds(layout(body(para([tx("kata keduanya (huruf ", [[0, 21, 0]]), tx("jar ", [[0, 4, 33]]), bdi(TERM, [[0, TERM.length, 30]]), tx(") selalu", [[0, 8, 33]])]))))).toEqual([]);
+    // outside a bracket a word before bare Arabic is only a word ("akar ⏎ ف ل ق", "Rasulullah ⏎ ﷺ")
+    expect(kinds(layout(body(item("keluarga akar ", "ف ل ق", " muncul"))))).toEqual([]);
+    // … and so is one after the bracket has closed
+    expect(kinds(layout(body(item("(pertama) keluarga akar ", "ف ل ق", " muncul"))))).toEqual([]);
+    // a list word names no item; a quotation of four words keeps nothing with it
+    expect(kinds(layout(body(item("(akar pertama dan ", "ن ف ث"))))).toEqual([]);
+    expect(kinds(layout(body(para([tx("(yakni kalimat ", [[0, 15, 0]]), bdi(PHRASE, [[0, PHRASE.length, 30]]), tx(")", [[0, 1, 33]])], 400))))).toEqual([]);
+  });
+
+  it("the text rules alone (seams: what textUnits.test.ts runs over the corpus) take the depth of the line", () => {
+    const seam = (prev, next, depth) => measure({ scope: null, seams: [[prev, next, true, "", depth]] })[0];
+    expect(seam("kata keduanya (mudhaf ilaih", "مُضَاف إِلَيْه) selalu", 1)).toEqual(["term-split"]);
+    expect(seam("kata keduanya mudhaf ilaih", "مُضَاف إِلَيْه selalu", 0)).toEqual([]);
+    // no depth given: outside any bracket (the seams of before 2026-10-12)
+    expect(measure({ scope: null, seams: [["(mudhaf ilaih", "مُضَاف إِلَيْه)", true, ""]] })[0]).toEqual([]);
+    // punctuation ends the item: after a comma or a colon the Arabic starts its own
+    expect(seam("(وَ, 'athaf,", "عَطْف, penyambungan)", 1)).toEqual([]);
+    expect(seam("(as-Samin:", "مَنْصُوب)", 1)).toEqual([]);
+  });
+
   it("a hyphenated word cut, unless it is a kept word wider than its line, laid out in the flow", () => {
     expect(kinds(layout(body(para([tx("surah Al-Fatihah", [[0, 9, 0], [9, 16, 33]])]))))).toEqual(["hyphen-split"]);
     // a kept word wider than its line still a box: reported as boxed

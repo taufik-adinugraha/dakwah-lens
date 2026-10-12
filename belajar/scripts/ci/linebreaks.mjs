@@ -15,7 +15,9 @@
 // fails the step.
 //
 //   term-split           "huruf jar ⏎ (حَرْف جَرّ)" — a term and its Arabic on two lines; also an
-//                        Arabic word and the gloss after it, "«مَلِكِ» ⏎ (raja)"
+//                        Arabic word and the gloss after it, "«مَلِكِ» ⏎ (raja)", and, inside the
+//                        text's own bracket, an item and the Arabic right after it, "(mudhaf
+//                        ilaih ⏎ مُضَاف إِلَيْه)"
 //   arabic-phrase-split  an inline Arabic phrase cut across lines (read in the wrong order there)
 //   arabic-word-split    an Arabic word cut inside   ·   word-split: the same for a Latin word
 //   hyphen-split         "Al- ⏎ Fatihah"   ·   footnote-orphan: a line starting with "[1]"

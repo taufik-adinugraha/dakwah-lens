@@ -71,11 +71,17 @@ describe("quizzes (content/quiz)", () => {
   });
 });
 
-// The quiz text is built in Python (pipeline/quiz.py annotate_marked), a word card's by
+// The quiz text is built in Python (pipeline/quiz.py render_marked), a word card's by
 // src/lib/terms.ts: two renderers of one marked text. Review 2026-10-12: the rule that keeps a
 // term Latin inside a bracketed phrase reached the card only, and the quiz still read
 // "rafa' (رَفْع, mahall, مَحَلّ raf')". Wherever the quiz shows a word's reason or role, it must
-// be the string the card shows.
+// be the string the card shows — also after the tidy-up of the same day (one space inside a
+// bracket, one bracket after a phrase of Qur'anic words and never after two terms, a place or a
+// capitalised gloss joined: both renderers changed together, and the count below did not move).
+// What the count cannot see: none of the 58 Al-Fatihah reasons and roles holds a Qur'anic run,
+// and the one with two adjacent terms (1:7:4's why, "(mahall nashb)") is not quiz text, so the
+// run rule is held by pipeline/test_validate_quiz.py (Twin: the cases of terms.test.ts) and by
+// terms.test.ts, which checks every quiz string of every lesson for two terms' Arabic glued.
 describe("the quiz and the word card show one text", () => {
   it("every reason or role the Al-Fatihah quiz takes from a word is what the card renders", () => {
     const strings: string[] = [];
@@ -89,7 +95,9 @@ describe("the quiz and the word card show one text", () => {
     const inQuiz = new Set(strings);
     // A reason or role the quiz shows is the card's rendering, character for character. Counted,
     // not matched one by one (a quiz string and its plain text differ by the Arabic itself): 43 of
-    // the 58 reasons and roles are quiz text today, and a renderer that drifts drops the count.
+    // the 58 reasons and roles are quiz text today — the other 15 are no quiz string in any
+    // rendering (the authored quiz asks nothing that shows them) — and a renderer that drifts
+    // drops the count.
     let shared = 0;
     for (const a of fatihah.ayat) {
       for (const w of a.words) {
@@ -102,5 +110,35 @@ describe("the quiz and the word card show one text", () => {
     // the words that moves it is updated here knowingly.
     expect(shared).toBe(43);
     expect(strings.join("\n")).not.toMatch(/mahall, \p{Script=Arabic}+ raf'/u);
+    // The shared strings carry the forms of 2026-10-12, so the count is not 43 strings that have
+    // no bracket to differ in: an item inside the text's bracket with its Arabic after one space,
+    // and no quiz string of any lesson with the comma form it replaced ("(mudhaf ilaih, مُضَاف
+    // إِلَيْه)": a Latin word, a comma, then bare Arabic up to the bracket's end).
+    const ar = (id: string) => LIBRARY.terms.find((t) => t.id === id)!.ar!;
+    expect(inQuiz.has(`khabar (${ar("khabar")}, jar-majrur ${ar("jar-majrur")})`)).toBe(true);
+    expect(inQuiz.has(`isim maushul (${ar("isim-maushul")}, mudhaf ilaih ${ar("mudhaf-ilaih")})`)).toBe(true);
+    const all: string[] = [];
+    const collect = (o: unknown): void => {
+      if (typeof o === "string") all.push(o);
+      else if (Array.isArray(o)) o.forEach(collect);
+      else if (o && typeof o === "object") Object.values(o).forEach(collect);
+    };
+    for (const s of SURAHS) collect(quizFor(s.slug));
+    expect(all.length).toBeGreaterThan(1000);
+    const commaForm = /\p{Script=Latin}[’']?, \p{Script=Arabic}[^()]*\)/u;
+    expect(all.filter((x) => commaForm.test(x))).toEqual([]);
+  });
+
+  // The signs too (a case chip's "kasrah (كَسْرَة)", a letter sign's "ya' (ي)").
+  it("every sign the Al-Fatihah quiz shows is what the card renders", () => {
+    const strings = new Set<string>();
+    for (const a of quizFor("al-fatihah")!.ayat)
+      for (const ex of a.exercises) for (const q of ex.questions) if ("sign" in q && typeof q.sign === "string") strings.add(q.sign);
+    expect(strings.size).toBeGreaterThan(2);
+    const lookup = lessonLookup(TERMS, fatihah);
+    const cards = new Set(
+      fatihah.ayat.flatMap((a) => a.words.flatMap((w) => (w.marked?.sign ? [termDisplay(annotate(w.marked.sign, new Scope(false), lookup)).text] : []))),
+    );
+    for (const s of strings) expect(cards.has(s), s).toBe(true);
   });
 });

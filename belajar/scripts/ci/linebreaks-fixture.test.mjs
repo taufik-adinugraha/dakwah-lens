@@ -33,6 +33,7 @@ describe("linebreaks self-test fixture", () => {
     const good = cases.filter((c) => !c.expect.length);
     expect(good.map((c) => c.name)).toEqual([
       "unit-with-room",
+      "item-in-bracket",
       "unit-in-flow",
       "glue-in-flow",
       "arabic-box-rtl",
@@ -42,7 +43,7 @@ describe("linebreaks self-test fixture", () => {
       "karaoke-emphasis",
     ]);
     const mixed = good.flatMap((c) => c.mixed.map((m) => [c.name, m]));
-    expect(mixed.length).toBe(15);
+    expect(mixed.length).toBe(16);
     for (const [name, m] of mixed)
       expect(m.html, `${name}: "${m.text}"`).toBe(renderToStaticMarkup(createElement(MixedText, { text: m.text, emphasis: m.emphasis || undefined })));
     for (const name of ["unit-in-flow", "unit-boxed"]) expect(cases.find((c) => c.name === name)?.fit).toBe("unit");
