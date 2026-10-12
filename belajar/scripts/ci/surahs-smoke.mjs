@@ -328,7 +328,7 @@ async function checkShown() {
       if (!html.includes('data-autoplay="start"')) fail(path, "no autoplay start button");
       if (path.startsWith("/belajar/id/")) {
         if (!html.includes(`<span>${MSG.id.Guided.start}</span>`)) fail(path, `"${MSG.id.Guided.start}" label missing`);
-        if (!html.includes(MSG.id.Guided.start_hint)) fail(path, "one-click hint missing");
+        if (html.includes("Klik sekali; pelajaran berjalan sendiri")) fail(path, "the removed one-click hint is back (operator 2026-10-12)");
         if (/\b(ketuk|mengetuk|diketuk)\b/i.test(html)) fail(path, "says ketuk (use klik)");
       }
     }

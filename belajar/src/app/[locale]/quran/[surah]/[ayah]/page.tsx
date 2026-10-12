@@ -232,11 +232,9 @@ export default async function AyahPage({
           ))}
         </ul>
       )}
-      <figcaption className="mt-2 text-xs text-ink-soft">
-        <MixedText
-          text={`${a.translation.source_label}${a.translation.version ? ` · ${a.translation.version}` : ""}`}
-        />
-      </figcaption>
+      {/* No source line under the translation (operator 2026-10-12: "remove this line, to make
+          the space more clean"): the translation is credited on the Kredit page (lib/sources.ts,
+          QuranEnc), linked from the Menu, and its version is in "Versi data" there. */}
     </figure>
   );
 

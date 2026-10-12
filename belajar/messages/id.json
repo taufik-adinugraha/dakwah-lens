@@ -268,7 +268,6 @@
     "title": "Pelajaran dipandu",
     "step": "Langkah {n} dari {total}",
     "start": "Mulai pelajaran",
-    "start_hint": "Klik sekali; pelajaran berjalan sendiri.",
     "resume_from": "Lanjutkan dari langkah {n}",
     "start_over": "Mulai dari awal",
     "preparing": "Menyiapkan pelajaran…",

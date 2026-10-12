@@ -765,7 +765,6 @@ export function LessonStage({
                 )}
               </button>
             </div>
-            <p className="mt-3 max-w-prose text-pretty text-base text-ink-muted">{t("start_hint")}</p>
           </div>
         ) : finished ? (
           state.intent?.kind === "surah_end" ? (
