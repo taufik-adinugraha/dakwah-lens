@@ -7,11 +7,25 @@
  * side: src/hooks/useWakeLock.ts) for exactly as long as these rules say.
  *
  * WHEN (screenAwake, pure) —
- * - "on": the lesson has started ("Mulai", "Lanjutkan dari langkah N", or the hand-off from the
- *   previous ayah) and is neither paused nor finished (machine.ts phases): the narrator speaking,
- *   the imam reciting, a caption-only line read, a silent pause between lines ("running"); "Tunggu
- *   saya" holding a caption for "Lanjut" ("ready"); an exercise waiting for the learner
- *   ("waiting") — the learner is reading or thinking, and the screen must stay on for that.
+ * - "on": the lesson runs (machine.ts lessonRuns: started — "Mulai", "Lanjutkan dari langkah N",
+ *   or the hand-off from the previous ayah — and neither paused nor finished): the narrator
+ *   speaking, the imam reciting, a caption-only line read, a silent pause between lines
+ *   ("running"); "Tunggu saya" holding a caption for "Lanjut" ("ready"); an exercise waiting for
+ *   the learner ("waiting") — the learner is reading or thinking, and the screen must stay on for
+ *   that. WITH A TIME LIMIT where the lesson waits for the learner and nothing moves it on (review
+ *   2026-10-12: with none, a phone left at an exercise kept its screen on until the battery
+ *   died) — waitedTooLong:
+ *   · an exercise waiting: its reminders are through (the third, at 60 s of silence) and the
+ *     silence has reached SCREEN_IDLE_LIMIT_MS (timing.ts: 60 s after that reminder, 120 s in
+ *     all) — the exercise's own `idleMs`, which starts over when the learner acts (an answer,
+ *     right or wrong; "Tunjukkan jawaban"; another control), so any answer takes the lock again;
+ *   · "Tunggu saya" holding a caption: the same SCREEN_IDLE_LIMIT_MS of silence (`heldMs`, the
+ *     idle ticks of this one wait; it has no reminders), starting over with every "Lanjut".
+ *   Then the lock is "off" and NOTHING ELSE CHANGES: the lesson waits where it is, as long as the
+ *   learner likes (the phone's own sleep timer applies again); their next action takes the lock
+ *   back. The silent time is counted by the machine's idle ticks (one a second, not while the
+ *   page is hidden or the learner listens to a word of their own: useAutoplay), so the rule
+ *   stays a pure function of the state.
  * - "hand-off": the ayah is through and the lesson goes on to the next ayah by itself (finished,
  *   intent "ayah"; useAutoplay continueToAyah). The lock is KEPT across that page change: it is a
  *   client-side navigation, the document stays, and the next ayah's page adopts the lock its
@@ -34,31 +48,66 @@
  * runs. Every request may be refused (no support, battery saver, a policy, the page hidden): then
  * nothing happens and nothing is shown.
  *
+ * DROPPED WHILE VISIBLE (review 2026-10-12) — a browser may also take the lock back while the page
+ * is still on screen (the sentinel's "release" event: a power-saving mode coming on, the system's
+ * own reasons). While a lesson holds it and the page is visible, it is asked for again at once —
+ * but only when the lock dropped had been kept at least WAKE_REASK_MIN_HELD_MS: a browser that
+ * grants a lock and drops it straight away would otherwise be asked in a loop. A request refused
+ * is not repeated either way. What was not asked again is asked again at the next occasion the
+ * page has anyway: visible again, or the lesson holding it anew ("Lanjutkan" after a pause).
+ *
  * No DOM here: the holder is handed the browser's wakeLock and visibility (useWakeLock), so it is
- * unit-tested with a stub (wake.test.ts); the rule over every step of every lesson in
+ * unit-tested with a stub (wake.test.ts); the rule over every step of every lesson, and the
+ * page's own part (followScreenAwake / leaveScreenAwake, what useWakeLock runs), in
  * src/components/autoplay/ahead.test.ts.
  */
-import type { AutoplayState } from "./machine";
+import { lessonRuns, type AutoplayState } from "./machine";
+import { MAX_REMINDERS, SCREEN_IDLE_LIMIT_MS } from "./timing";
 
 /** What the lesson in state `s` wants of the screen: rules above. */
 export type ScreenAwake = "on" | "hand-off" | "off";
 
-export function screenAwake(s: Pick<AutoplayState, "started" | "phase" | "intent">): ScreenAwake {
-  if (!s.started) return "off";
-  if (s.phase === "finished") return s.intent?.kind === "ayah" ? "hand-off" : "off";
-  return s.phase === "idle" || s.phase === "paused" ? "off" : "on";
+/** The part of the state the screen rule reads. */
+export type ScreenState = Pick<AutoplayState, "started" | "phase" | "intent" | "exercise" | "heldMs">;
+
+/**
+ * The lesson has waited for the learner past the screen lock's time limit (rules above): an
+ * exercise waiting whose reminders are through, or a caption "Tunggu saya" holds, in silence for
+ * SCREEN_IDLE_LIMIT_MS. Never while the lesson itself is doing something (a line, the imam, a
+ * reminder being said).
+ */
+export function waitedTooLong(s: Pick<AutoplayState, "phase" | "exercise" | "heldMs">): boolean {
+  if (s.phase === "ready") return s.heldMs >= SCREEN_IDLE_LIMIT_MS;
+  if (s.phase !== "waiting") return false;
+  const ex = s.exercise;
+  return !!ex && ex.reminders >= MAX_REMINDERS && ex.idleMs >= SCREEN_IDLE_LIMIT_MS;
+}
+
+export function screenAwake(s: ScreenState): ScreenAwake {
+  if (s.phase === "finished") return s.started && s.intent?.kind === "ayah" ? "hand-off" : "off";
+  return lessonRuns(s) && !waitedTooLong(s) ? "on" : "off";
 }
 
 /** The screen is kept on in state `s` (running, or handing off to the next ayah). */
-export function keepsScreenAwake(s: Pick<AutoplayState, "started" | "phase" | "intent">): boolean {
+export function keepsScreenAwake(s: ScreenState): boolean {
   return screenAwake(s) !== "off";
 }
 
 /** How long a lock handed over to the next ayah's page waits for that page's lesson to run. */
 export const WAKE_HANDOFF_GRACE_MS = 10_000;
 
+/** A lock the browser drops while the page is visible is asked for again only if it had been
+ *  kept at least this long (no loop with a browser that grants and drops at once). */
+export const WAKE_REASK_MIN_HELD_MS = 5_000;
+
 /** The parts of the Screen Wake Lock API the holder uses (navigator.wakeLock, its sentinels). */
-export type WakeSentinelLike = { readonly released: boolean; release(): Promise<void> };
+export type WakeSentinelLike = {
+  readonly released: boolean;
+  release(): Promise<void>;
+  /** WakeLockSentinel is an EventTarget: "release" fires when the lock ends, by the page's own
+   *  release() or by the browser. Optional: a holder without it only loses the re-ask. */
+  addEventListener?(type: "release", listener: () => void): void;
+};
 export type WakeLockLike = { request(type: "screen"): Promise<WakeSentinelLike> };
 
 export type WakeLockHolder = {
@@ -85,11 +134,19 @@ export function createWakeLockHolder(env: {
   /** document.visibilityState === "visible". */
   visible: () => boolean;
   graceMs?: number;
+  /** Override WAKE_REASK_MIN_HELD_MS. */
+  minHeldMs?: number;
+  /** The clock (Date.now). */
+  now?: () => number;
 }): WakeLockHolder {
   const graceMs = env.graceMs ?? WAKE_HANDOFF_GRACE_MS;
+  const minHeldMs = env.minHeldMs ?? WAKE_REASK_MIN_HELD_MS;
+  const now = env.now ?? (() => Date.now());
   /** What the pages want: nothing, a lesson running, or a hand-off waiting for the next one. */
   let want: "none" | "hold" | "grace" = "none";
   let sentinel: WakeSentinelLike | null = null;
+  /** When the lock held now was granted. */
+  let since = 0;
   let asking = false;
   /** The page came back while a request was out: check again once it is answered. */
   let recheck = false;
@@ -125,6 +182,8 @@ export function createWakeLockHolder(env: {
           return;
         }
         sentinel = s;
+        since = now();
+        s.addEventListener?.("release", () => dropped(s));
         // Hidden and shown again while the request was out: the browser may have dropped it.
         if (recheck && s.released) acquire();
       },
@@ -132,6 +191,18 @@ export function createWakeLockHolder(env: {
         asking = false; // refused: no lock, no message
       },
     );
+  };
+  /** Sentinel `s` ended (its "release" event). The page's own release() has let go of it before
+   *  (`sentinel` is no longer `s`): nothing to do. Otherwise the browser dropped it — rules above
+   *  (DROPPED WHILE VISIBLE). */
+  const dropped = (s: WakeSentinelLike) => {
+    if (sentinel !== s) return;
+    sentinel = null;
+    // Hidden: visible() asks again. A hand-off's grace: the next lesson's hold() does.
+    if (want !== "hold" || !env.visible()) return;
+    // Granted and dropped straight away: not asked again here (no loop).
+    if (now() - since < minHeldMs) return;
+    acquire();
   };
   const release = () => {
     want = "none";
@@ -168,4 +239,26 @@ export function createWakeLockHolder(env: {
     },
     holding: active,
   };
+}
+
+/**
+ * What a lesson page does with the document's holder when its lesson's mode becomes `mode` (it
+ * was `was`; "off" on mount) — useWakeLock's effect: "on" and "hand-off" hold the lock (asked
+ * for, or adopted from the previous ayah's page; a lock already held is kept, never asked for
+ * twice); turning "off" lets go; "off" from the start lets nothing go, so a lock handed over
+ * waits out its grace for this page's lesson.
+ */
+export function followScreenAwake(h: WakeLockHolder, was: ScreenAwake, mode: ScreenAwake): void {
+  if (mode !== "off") h.hold();
+  else if (was !== "off") h.release();
+}
+
+/**
+ * …and when the page goes away with its lesson in `mode` (useWakeLock's unmount): the hand-off
+ * keeps the lock for the next ayah's page (its grace); a page left mid-lesson lets go; a lesson
+ * that held nothing leaves the holder alone (a hand-off's grace may be running for it).
+ */
+export function leaveScreenAwake(h: WakeLockHolder, mode: ScreenAwake): void {
+  if (mode === "hand-off") h.handOff();
+  else if (mode === "on") h.release();
 }

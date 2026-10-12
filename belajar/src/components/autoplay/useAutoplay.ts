@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useReducer, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState, useSyncExternalStore } from "react";
 import { preconnect } from "react-dom";
 
 import { useNarrationPlayer } from "@/hooks/useNarrationPlayer";
@@ -14,6 +14,7 @@ import {
 } from "@/hooks/useSegmentPlayer";
 import { useRouter } from "@/i18n/navigation";
 import {
+  aheadUpdate,
   autoplayStorageKey,
   browserStorage,
   createAutoplayState,
@@ -21,15 +22,15 @@ import {
   firstNarration,
   IDLE_TICK_MS,
   idlePreloadUrl,
-  lookaheadAudio,
   markContinue,
+  nextLinePreload,
+  nextNarration,
   positionToSave,
   readSavedIndex,
   recitationToWarm,
   reduceAutoplay,
   screenAwake,
   takeContinue,
-  upcomingAudio,
   viewAutoplay,
   wantsIdleTicks,
   watchLoading,
@@ -127,7 +128,9 @@ export function continueToAyah(router: ReturnType<typeof useRouter>, slug: strin
  *   or a silent pause — and answers with that activity's token. Narration
  *   and recitation therefore never overlap.
  * - Exercises: forwards the guided exercise's answers, done and control
- *   reports; sends idle_tick once a second while one waits in silence.
+ *   reports; sends idle_tick once a second while one waits in silence (its
+ *   reminders, then the screen lock's time limit), and while "Tunggu saya"
+ *   holds a caption for "Lanjut" (that limit only: the lesson waits on).
  *   Dengar dan klik's word is recited here, on the stage's player (the one
  *   "Mulai" unlocked); the learner's own replay of it ends that recitation
  *   instead of pausing the lesson.
@@ -154,12 +157,17 @@ export function continueToAyah(router: ReturnType<typeof useRouter>, slug: strin
  *   Never another ayah's (each page fetches its own), and never part of
  *   `loading`: that is the wait of the activity due to sound.
  * - The narration is fetched AHEAD across steps (operator 2026-10-12; rules
- *   in src/lib/autoplay/lookahead.ts, prefetch.ts): the rest of this step and
- *   the next two, one file at a time, into the HTTP cache, while the lesson
- *   runs and its sound is not loading.
+ *   in src/lib/autoplay/lookahead.ts, prefetch.ts, ahead.ts): the rest of
+ *   this step and the next two, one file at a time, INTO THE PAGE (a Blob
+ *   each, kept until played), while the lesson runs and its sound is not
+ *   loading. The narration player plays a line from the copy held when there
+ *   is one (no request at all, on every browser), else from the network as
+ *   before.
  * - The screen stays on while the lesson runs (operator 2026-10-12; Screen
  *   Wake Lock, src/lib/autoplay/wake.ts, src/hooks/useWakeLock.ts), and
- *   across the hand-off to the next ayah, whose lesson adopts the lock.
+ *   across the hand-off to the next ayah, whose lesson adopts the lock. Where
+ *   the lesson waits for the learner (an exercise, "Tunggu saya") the lock is
+ *   let go after two minutes of silence; the lesson waits on.
  * - Remembers the step per ayah; hands off to the next ayah; Media Session
  *   (lock screen, earphones) play/pause/next/previous.
  * - Never scrolls the page.
@@ -192,7 +200,19 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
     () => null,
   );
 
-  const { play: playNarration, preload, owns: ownsNarration, positionMs, loading: narrationLoading } = useNarrationPlayer();
+  /** The narration fetched ahead and kept by the page (prefetch.ts; created in an effect below). */
+  const prefetchRef = useRef<Prefetcher | null>(null);
+  /** Counts the fetches that ended (a copy arrived, or one failed): the preload below looks again. */
+  const [aheadSeen, setAheadSeen] = useState(0);
+  const heldNarration = useCallback((url: string) => prefetchRef.current?.held(url) ?? null, []);
+  const dropNarration = useCallback((url: string) => prefetchRef.current?.discard(url), []);
+  const {
+    play: playNarration,
+    preload,
+    owns: ownsNarration,
+    positionMs,
+    loading: narrationLoading,
+  } = useNarrationPlayer(heldNarration, dropNarration);
   /** Token of the first activity a "Mulai" click starts (null: no click yet). */
   const [prepFor, setPrepFor] = useState<number | null>(null);
   /** Token of the last narration file heard ("playing"). */
@@ -428,47 +448,49 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
     return () => window.cancelAnimationFrame(raf);
   }, [activity, words, positionMs]);
 
-  // Warm the next narration file (same-origin only).
-  const upcoming = upcomingAudio(seq, state);
-  const nextUrl =
-    upcoming.find((u) => !(activity?.kind === "narrate" && activity.url === u)) ?? null;
-  useEffect(() => {
-    preload(nextUrl);
-  }, [nextUrl, preload]);
-
-  // ── Ahead of the lesson: the narration of the next steps, one file at a time ──
+  // ── Ahead of the lesson: the narration of the next lines and steps, held by the page ──
   // (operator 2026-10-12: "when i'm still in slide 1, it already start downloading for slide 2 or
-  // even 3"; rules: src/lib/autoplay/lookahead.ts and prefetch.ts). The file playing now is its
-  // own element's and the next line of this step the preload element's (above); the rest of this
-  // step and the next steps are fetched into the browser's HTTP cache. A new fetch starts only
-  // while the lesson runs and no sound it plays is loading (the line just started is heard first);
-  // nothing before "Mulai", nothing after the lesson finished (the hand-off aborts what is left).
+  // even 3"; rules: src/lib/autoplay/lookahead.ts, prefetch.ts and ahead.ts). The page fetches
+  // the lesson's path from here — the next line of this step, the rest of it, the next steps —
+  // one file at a time, each into a Blob it keeps until the file has been played; the narration
+  // player plays a line from the copy held (useNarrationPlayer's `held`), else from the network
+  // as before. A new fetch starts only while the lesson runs and no sound it plays is loading
+  // (the line just started is heard first); nothing before "Mulai"; a fetch is cancelled only
+  // when its file has left the path, and everything is let go once the lesson has finished and
+  // when the page unmounts (the hand-off).
   const awake = screenAwake(state);
-  const running = awake === "on";
-  const prefetchRef = useRef<Prefetcher | null>(null);
   useEffect(() => {
-    const p = createPrefetcher({ fetch: (url, init) => window.fetch(url, init) });
+    const p = createPrefetcher({
+      fetch: (url, init) => window.fetch(url, init),
+      createObjectURL: (blob) => URL.createObjectURL(blob),
+      revokeObjectURL: (url) => URL.revokeObjectURL(url),
+      onChange: () => setAheadSeen((n) => n + 1),
+    });
     prefetchRef.current = p;
     return () => {
       p.stop();
       prefetchRef.current = null;
     };
   }, []);
+  // The next narration file of this step (ahead.ts nextNarration): the preload element's, as
+  // before the look-ahead — unless the page's own fetch of it is under way or due
+  // (nextLinePreload).
+  const nextUrl = nextNarration(seq, state);
   const soundLoading = narrationLoading !== null || player.loading !== null;
-  const lineHeard = activity?.kind !== "narrate" || heardFor === activity.token;
-  const aheadOpen = running && !soundLoading && lineHeard;
-  const aheadKey = activity?.token ?? null;
   useEffect(() => {
+    const p = prefetchRef.current;
     const conn = (navigator as Navigator & { connection?: ConnectionHints }).connection;
-    const wanted = lookaheadAudio(seq, state, { conn }).filter((u) => u !== nextUrl);
-    prefetchRef.current?.update({ wanted, open: aheadOpen, key: aheadKey });
-  }, [seq, state, nextUrl, aheadOpen, aheadKey]);
+    p?.update(aheadUpdate(seq, state, { conn, soundLoading, heardFor }));
+    preload(nextLinePreload(nextUrl, p));
+  }, [seq, state, soundLoading, heardFor, nextUrl, preload, aheadSeen]);
 
   // ── The screen stays on while the lesson runs ── (operator 2026-10-12: "why my phone goes
   // inactive while … listening to the lesson?"; when: src/lib/autoplay/wake.ts; how:
   // src/hooks/useWakeLock.ts). Never on a page view alone; let go on pause, at the end of the
   // surah and when the page is left mid-lesson. KEPT across the hand-off to the next ayah: that
   // page's lesson adopts it, or it is released after a short grace if that lesson does not run.
+  // Let go, too, once the lesson has waited two minutes in silence for the learner (an exercise
+  // past its reminders, "Tunggu saya"): the lesson waits on, their next action takes it again.
   useWakeLock(awake);
 
   // ── Before "Mulai": warm the first line that click plays ──
@@ -503,7 +525,9 @@ export function useAutoplay(seq: AutoplaySequence, sources: RecitationSource[], 
     };
   }, [firstUrl, firstMs, preload]);
 
-  // ── Idle reminders: one tick a second while an exercise waits ──
+  // ── Silent waiting, one tick a second: an exercise's reminders, and the screen lock's limit ──
+  // (machine.ts wantsIdleTicks: an exercise waiting, "Tunggu saya" holding a caption; the ticks
+  // stop once the lock's time limit is reached, wake.ts.)
   const ticking = wantsIdleTicks(state);
   useEffect(() => {
     if (!ticking) return;

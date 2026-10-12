@@ -38,7 +38,13 @@
  *    `idle_tick`s add up silent time and fire a gentle reminder at 20 s,
  *    40 s and 60 s (at most 3 between two actions of the learner):
  *    shared:reminder + the current prompt; the third also offers "Lewati
- *    latihan" (shared:skip_offer, spotlight "skip").
+ *    latihan" (shared:skip_offer, spotlight "skip"). After the third the
+ *    ticks are only counted, up to SCREEN_IDLE_LIMIT_MS: nothing more is
+ *    said or shown; the screen lock is let go there (wake.ts).
+ *  - While "Tunggu saya" holds a caption for "Lanjut" (phase "ready"),
+ *    `idle_tick`s add up `heldMs`, to the same limit and for the same lock
+ *    only: the lesson never reads it, and waits for "Lanjut" as long as the
+ *    learner likes. Any other event that changes the state starts it over.
  *  - Inside an exercise the learner only ANSWERS (operator, 2026-10-10):
  *    · Dengar dan klik reports the word its question asks about with
  *      "play"; the lesson's imam recites it (a recite activity on the
@@ -70,6 +76,7 @@ import {
   advanceHoldMs,
   MAX_REMINDERS,
   REMINDER_AT_MS,
+  SCREEN_IDLE_LIMIT_MS,
   WORD_REPEAT_GAP_MS,
   readMs,
   settleAfterNarrationMs,
@@ -223,6 +230,10 @@ export type AutoplayState = {
   /** The imam's recording failed: paused; resume retries. */
   error: "recite" | null;
   intent: NavIntent | null;
+  /** "Tunggu saya": silent time the caption on screen has been held for "Lanjut" (idle_ticks in
+   *  the "ready" phase; 0 in every other phase, and again after any other event that changes the
+   *  state). Read by the screen lock's time limit only (wake.ts): the lesson never acts on it. */
+  heldMs: number;
 };
 
 export type AutoplayEvent =
@@ -248,7 +259,8 @@ export type AutoplayEvent =
   | { type: "skip" }
   | { type: "pause" }
   | { type: "resume" }
-  /** While wantsIdleTicks(state): silent time passed, in ms. */
+  /** While wantsIdleTicks(state): silent time passed, in ms (an exercise waiting: its reminders,
+   *  then the screen lock's limit; "Tunggu saya" holding a caption: that limit only). */
   | { type: "idle_tick"; ms: number }
   | { type: "prev" }
   /** "Berikutnya", and "Lanjut" in the "Tunggu saya" mode. */
@@ -644,10 +656,18 @@ export function createAutoplayState(
     resumeRecite: false,
     error: null,
     intent: null,
+    heldMs: 0,
   };
 }
 
 export function reduceAutoplay(seq: AutoplaySequence, s: AutoplayState, e: AutoplayEvent): AutoplayState {
+  const next = reduce(seq, s, e);
+  // `heldMs` is the silent time of ONE wait for "Lanjut": idle_ticks add to it, and anything else
+  // that changes the state (the learner acting, the lesson moving) starts it over.
+  return next === s || e.type === "idle_tick" || next.heldMs === 0 ? next : { ...next, heldMs: 0 };
+}
+
+function reduce(seq: AutoplaySequence, s: AutoplayState, e: AutoplayEvent): AutoplayState {
   switch (e.type) {
     case "start": {
       if (s.phase !== "idle" && s.phase !== "finished") return s;
@@ -837,6 +857,12 @@ export function reduceAutoplay(seq: AutoplaySequence, s: AutoplayState, e: Autop
     }
 
     case "idle_tick": {
+      if (s.phase === "ready") {
+        // "Tunggu saya" holds a caption: the silent time is counted (the screen lock's time
+        // limit, wake.ts) and nothing else changes — the lesson waits for "Lanjut" as before.
+        if (s.activity || !(e.ms > 0) || !Number.isFinite(e.ms)) return s;
+        return { ...s, heldMs: s.heldMs + e.ms };
+      }
       const ex = s.exercise;
       if (s.phase !== "waiting" || s.activity || !isOpen(ex)) return s;
       if (!(e.ms > 0) || !Number.isFinite(e.ms)) return s;
@@ -932,14 +958,31 @@ export function reduceAutoplay(seq: AutoplaySequence, s: AutoplayState, e: Autop
 
 // ───────────────────────────── selectors ─────────────────────────────
 
-/** Should the UI send `idle_tick`s now? (An exercise waits in silence.) */
+/**
+ * Should the UI send `idle_tick`s now? While the lesson waits for the learner in silence: an
+ * exercise waiting — until its reminders are through, and after them until the silence reaches
+ * SCREEN_IDLE_LIMIT_MS (nothing more is said then: the ticks are only counted, for the screen
+ * lock's time limit, wake.ts) — and "Tunggu saya" holding a caption for "Lanjut", up to that same
+ * limit. Past the limit there is nothing left to count: no ticks.
+ */
 export function wantsIdleTicks(s: AutoplayState): boolean {
+  if (s.activity !== null) return false;
+  if (s.phase === "ready") return s.heldMs < SCREEN_IDLE_LIMIT_MS;
   return (
     s.phase === "waiting" &&
-    s.activity === null &&
     isOpen(s.exercise) &&
-    s.exercise.reminders < MAX_REMINDERS
+    (s.exercise.reminders < MAX_REMINDERS || s.exercise.idleMs < SCREEN_IDLE_LIMIT_MS)
   );
+}
+
+/**
+ * The lesson runs: started ("Mulai", "Lanjutkan dari langkah N", or the hand-off from the previous
+ * ayah) and neither paused nor finished — the narrator speaking, the imam reciting, a caption
+ * read, a pause between lines, "Tunggu saya" holding a caption, an exercise waiting. The look-ahead
+ * fetches only then (lookahead.ts); the screen is kept on then, up to its time limit (wake.ts).
+ */
+export function lessonRuns(s: Pick<AutoplayState, "started" | "phase">): boolean {
+  return s.started && (s.phase === "running" || s.phase === "ready" || s.phase === "waiting");
 }
 
 export const isAudioActivity = (a: Activity | null): boolean => a?.kind === "narrate" || a?.kind === "recite";
@@ -1017,19 +1060,6 @@ export function firstNarration(
   });
   const a = s.activity;
   return a?.kind === "narrate" ? { url: a.url, ms: a.ms } : null;
-}
-
-/** URLs of the narration audio this step can still play, in order — for
- *  the UI to preload the next files (same-origin only). */
-export function upcomingAudio(seq: AutoplaySequence, s: AutoplayState): string[] {
-  const step = stepOf(seq, s);
-  const out: string[] = [];
-  for (const a of s.plan.slice(s.at)) {
-    if (a.t !== "say") continue;
-    const cue = cueOf(seq, step, a.ref);
-    if (audible(s, cue)) for (const f of cue.audio) if (!out.includes(f.url)) out.push(f.url);
-  }
-  return out;
 }
 
 /** The narration files a plan says, in order (lines without audio give none). */

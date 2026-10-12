@@ -86,26 +86,31 @@ function fulfillBytes(route, body, contentType) {
  * an entry just before the click that plays the line and removes it once the line plays, so the
  * page's own preload of the same file, made earlier, is not what waits.
  *
- * For the look-ahead check (screenshots.mjs aheadChecks; operator 2026-10-12, plan L18), both
+ * For the look-ahead check (screenshots.mjs aheadChecks; operator 2026-10-12, plan L18), all
  * optional:
  * - `timeline` (an array): one entry per request as it reaches this route — { path, type, range,
  *   start, end }: `type` is Playwright's resourceType ("media" for an audio element, "fetch" for
  *   the page's fetch()), `start` / `end` Date.now() when it arrived / was answered (end null until
- *   then) — so the check can tell the page's prefetches from the players' loads, and whether two
- *   of them overlapped.
+ *   then) — so the check can tell the page's fetches ahead from the players' loads, whether two of
+ *   them overlapped, and HOW MANY requests each file got (a file the page fetched and then plays
+ *   from its own copy gets no second one: an object URL never reaches the network).
  * - `holdFetchMs`: every fetch() request is answered only after that long (the players' loads
- *   are not held), so that prefetches made two at a time would visibly overlap.
- * (Playwright turns the browser's HTTP cache off while a route is set, so every request reaches
- * this route: nothing here can show a prefetched file served from the cache.)
+ *   are not held), so that fetches made two at a time would visibly overlap.
+ * - `failFetch` (a Set of pathnames, read at each request): a fetch() request for one of them is
+ *   answered 503 — the page cannot make its copy of that file, so the line must play from the
+ *   network URL as before the look-ahead (the audio element's own request is answered as usual).
+ * (Playwright turns the browser's HTTP cache off while a route is set, so every request the
+ * browser makes reaches this route.)
  */
-export function narrationRoute(index, served, { delays, timeline, holdFetchMs = 0 } = {}) {
+export function narrationRoute(index, served, { delays, timeline, holdFetchMs = 0, failFetch } = {}) {
   return async (route) => {
     const req = route.request();
     const { pathname } = new URL(req.url());
     const entry = { path: pathname, type: req.resourceType(), range: req.headers()["range"] ?? null, start: Date.now(), end: null };
     timeline?.push(entry);
+    const byFetch = entry.type === "fetch";
     try {
-      await answerNarration(route, pathname, index, served, delays, entry.type === "fetch" ? holdFetchMs : 0);
+      await answerNarration(route, pathname, index, served, delays, byFetch ? holdFetchMs : 0, byFetch && failFetch?.has(pathname) === true);
     } finally {
       entry.end = Date.now();
     }
@@ -113,8 +118,9 @@ export function narrationRoute(index, served, { delays, timeline, holdFetchMs = 
 }
 
 /** One narration request answered (narrationRoute): 404 for a file no manifest names, else the
- *  delivered MP3 or its silent stand-in — after `delays`' entry for it, or `holdMs`. */
-async function answerNarration(route, pathname, index, served, delays, holdMs) {
+ *  delivered MP3 or its silent stand-in — after `delays`' entry for it, or `holdMs`; `fail`: 503
+ *  instead (after the same wait). */
+async function answerNarration(route, pathname, index, served, delays, holdMs, fail) {
   const rel = pathname.slice(NARRATION_PREFIX.length);
   const ms = index.get(pathname);
   if (ms === undefined || rel.split("/").some((p) => p === ".." || p === "")) {
@@ -122,6 +128,10 @@ async function answerNarration(route, pathname, index, served, delays, holdMs) {
     return route.fulfill({ status: 404, body: "" });
   }
   const answer = async () => {
+    if (fail) {
+      served.push(`${pathname} → 503 (this fetch() made to fail)`);
+      return route.fulfill({ status: 503, body: "" });
+    }
     let body = null;
     try {
       body = await readFile(path.join(BELAJAR_DIR, "pipeline", "out", "delivery", ...rel.split("/")));

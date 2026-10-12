@@ -27,3 +27,5 @@ export * from "./warm";
 export * from "./wake";
 export * from "./lookahead";
 export * from "./prefetch";
+export * from "./ahead";
+export * from "./voice";

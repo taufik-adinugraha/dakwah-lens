@@ -2,7 +2,13 @@
 
 import { useEffect, useRef } from "react";
 
-import { createWakeLockHolder, type ScreenAwake, type WakeLockHolder } from "@/lib/autoplay/wake";
+import {
+  createWakeLockHolder,
+  followScreenAwake,
+  leaveScreenAwake,
+  type ScreenAwake,
+  type WakeLockHolder,
+} from "@/lib/autoplay/wake";
 
 /**
  * The document's one Screen Wake Lock holder (src/lib/autoplay/wake.ts), kept at module level so
@@ -25,8 +31,12 @@ function holder(): WakeLockHolder {
  * handed it over); turning "off" releases it. On unmount: a page handing off keeps it for the next
  * ayah's page (WAKE_HANDOFF_GRACE_MS, then released unless that page's lesson runs); a page left
  * mid-lesson releases it. A mode that starts "off" on mount releases nothing: a lock handed over
- * waits out its grace for this page's lesson. Browsers drop the lock when the page is hidden; once
- * visible again while the lesson runs, it is asked for again.
+ * waits out its grace for this page's lesson (followScreenAwake / leaveScreenAwake: the page's
+ * part, pure and tested with the holder). Browsers drop the lock when the page is hidden; once
+ * visible again while the lesson runs, it is asked for again — and at once when the browser takes
+ * it back while the page is still visible (the holder watches the sentinel's "release"). `mode`
+ * turns "off" by itself when the lesson has waited for the learner past the lock's time limit
+ * (wake.ts waitedTooLong), and "on" again with their next action.
  *
  * Supported by Chrome / Edge / Chrome for Android 84+, Safari 16.4+ (iOS and macOS) and Firefox
  * 126+. Elsewhere (or when the browser refuses: battery saver, a permission policy, the page
@@ -42,10 +52,7 @@ export function useWakeLock(mode: ScreenAwake): void {
     const box = seen.current;
     const h = holder();
     h.arrived();
-    return () => {
-      if (box.mode === "hand-off") h.handOff();
-      else if (box.mode === "on") h.release();
-    };
+    return () => leaveScreenAwake(h, box.mode);
   }, []);
 
   useEffect(() => {
@@ -53,11 +60,8 @@ export function useWakeLock(mode: ScreenAwake): void {
     const h = holder();
     const was = box.mode;
     box.mode = mode;
-    if (mode === "off") {
-      if (was !== "off") h.release();
-      return;
-    }
-    h.hold();
+    followScreenAwake(h, was, mode);
+    if (mode === "off") return;
     const onVisibility = () => {
       if (document.visibilityState === "visible") h.visible();
     };

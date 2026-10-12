@@ -4,11 +4,12 @@
  * i'm still in slide 1, it already start downloading for slide 2 or even 3").
  *
  * Before this, the page warmed only the next file of the CURRENT step (useAutoplay's preload
- * element, machine.ts upcomingAudio), so the first line of every step began downloading only when
- * that step began: the wait at each change of step. lookaheadAudio lists, in the order the lesson
+ * element), so the first line of every step began downloading only when that step began: the
+ * wait at each change of step. lookaheadAudio lists, in the order the lesson
  * will play them, the narration files of the rest of this step and of the next steps; the runner
- * fetches them into the browser's HTTP cache one at a time (prefetch.ts), so a step's first line
- * is usually there before the step comes.
+ * fetches them into the page one at a time (prefetch.ts: each file's bytes kept as a Blob until
+ * it has been played) and the narration player plays them from there, so a step's first line is
+ * usually there before the step comes — on every browser, without relying on its HTTP cache.
  *
  * WHAT — machine.ts audioAhead: the lesson's own path, as the machine will play it — the rest of
  * this step after the file playing now, then the steps it moves on to by itself (past exercises
@@ -25,13 +26,14 @@
  * 2026-10-12 (ahead.test.ts, every moment of every lesson at every pace): the look-ahead is at
  * most ~768 KB (a composition step's narration alone is up to 515 KB), so the cap never cuts
  * today; it bounds what a learner who stops right there could have paid for in vain if the
- * narration grows. When the browser asks to save data (Data Saver, a 2G-class connection:
- * loading.ts savesData) only LOOKAHEAD_STEPS_LOW_DATA (1) step ahead.
+ * narration grows, and what the page holds in memory (prefetch.ts keeps a copy only while its
+ * file is on this list or playing). When the browser asks to save data (Data Saver, a 2G-class
+ * connection: loading.ts savesData) only LOOKAHEAD_STEPS_LOW_DATA (1) step ahead.
  *
  * WHEN — nothing before the lesson has started (a page only looked at keeps today's single idle
  * warm of the first line, loading.ts idlePreloadUrl) and nothing once it has finished (the
- * hand-off). The runner starts a fetch only while the lesson runs (wake.ts screenAwake "on") and
- * no sound it plays is loading (prefetch.ts).
+ * hand-off). The runner starts a fetch only while the lesson runs (machine.ts lessonRuns) and no
+ * sound it plays is loading (ahead.ts aheadUpdate, prefetch.ts).
  *
  * Pure (no React, no DOM): unit-tested over the real lessons (src/components/autoplay/
  * ahead.test.ts) and on its own (lookahead.test.ts).
