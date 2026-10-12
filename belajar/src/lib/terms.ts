@@ -602,8 +602,20 @@ export type PartsChange = {
 export type PreparedParts = {
   loc: string;
   word: { ar: string; translit: string; gloss: string };
-  /** `dropped`: 1-based letters of the tile the word does not write (shown faded). */
-  tiles: { ar: string; dropped: number[]; translit: string; label: Token[]; gloss: string }[];
+  /** `dropped`: 1-based letters of the tile the word does not write (shown faded). `q`: the
+   *  tile's q-ref (its clip, src/lib/clips.ts: a whole word has the imam's voice, a part none).
+   *  `washal`: a whole-word tile that starts with hamzat washal mid-ayah is heard without its alif,
+   *  so it plays the run with the word before it (`run`, a clip key) and names what is heard
+   *  (`heard`, "tabārakasmu"); derived by the build (pipeline/clips.py washal_of). */
+  tiles: {
+    q: string;
+    ar: string;
+    dropped: number[];
+    translit: string;
+    label: Token[];
+    gloss: string;
+    washal?: { run: string; heard: string };
+  }[];
   changes: PartsChange[];
   steps: Token[][];
 };
@@ -617,7 +629,7 @@ const LETTER_LATIN: Record<string, string> = { "ى": "alif", "ي": "ya’" };
 export function prepareParts(
   part: {
     loc: string;
-    tiles: { q: string; translit: string; label: string; gloss: string }[];
+    tiles: { q: string; translit: string; label: string; gloss: string; washal?: { run: string; before: string; heard: string } }[];
     changes: { tile: number; letter: number; to: number }[];
     drops: { tile: number; letter: number }[];
     steps: string[];
@@ -633,11 +645,13 @@ export function prepareParts(
     return ar;
   });
   const tiles = part.tiles.map((t, i) => ({
+    q: t.q,
     ar: bytes[i],
     dropped: part.drops.filter((d) => d.tile === i + 1).map((d) => d.letter),
     translit: t.translit,
     label: annotate(t.label, scope, lookup),
     gloss: t.gloss,
+    ...(t.washal ? { washal: { run: t.washal.run, heard: t.washal.heard } } : {}),
   }));
   const termOf = (m: string) => lookup.terms.get(MARK_TERM[MARK_NAME[m] ?? ""] ?? "") ?? null;
   const soundOf = (t: TermView | null) => (t ? (sounds[t.id] ?? "") : "");
@@ -675,9 +689,13 @@ export type PreparedSign = {
   term: TermView | null;
   /** The sign alone (cut from the example letter), for its dotted circle. */
   mark: string;
-  /** The example letter as the ayah writes it, and the word it comes from (a lesson word). */
+  /** The example letter as the ayah writes it, and the word it comes from (`loc`). */
   letter: string;
   loc: string;
+  /** That word when it is NOT a lesson word (سَلَٰمٌ of QS 97:5, where the tanwin is heard): its
+   *  Tanzil bytes (library.json `quran`) and the sign's own transliteration; null for a lesson
+   *  word, which the page draws from the lesson content. */
+  word: { ar: string; translit: string } | null;
   sound: string;
   place: string;
   shape: string;
@@ -685,24 +703,40 @@ export type PreparedSign = {
 };
 
 export function prepareSigns(
-  signs: { term: string; example: string; marks: string[]; sound: string; place: string; shape: string; reading: string }[],
+  signs: { term: string; example: string; translit?: string; marks: string[]; sound: string; place: string; shape: string; reading: string }[],
   lookup: Lookup,
 ): PreparedSign[] {
   return signs.map((s) => {
     const letter = lookup.quran[s.example.slice(2)];
     const m = s.example.match(QREF);
     if (!letter || !m || !m[6]) throw new Error(`harakat sign ${s.term}: ${s.example} is not a resolved letter ref`);
+    const loc = `${m[1]}:${m[2]}:${m[3]}`;
+    const ar = lookup.quran[loc];
     return {
       term: lookup.terms.get(s.term) ?? null,
       mark: marksOf(letter, s.marks),
       letter,
-      loc: `${m[1]}:${m[2]}:${m[3]}`,
+      loc,
+      word: s.translit && ar ? { ar, translit: s.translit } : null,
       sound: s.sound,
       place: s.place,
       shape: s.shape,
       reading: s.reading,
     };
   });
+}
+
+/** The harakah terms whose sign on its dotted circle IS its sound (a vowel, or a vowel + n): no
+ *  Latin "a", "i", "u", "-un" is written after it (operator 2026-10-12: "better not use 'a', 'i',
+ *  'u', but use harakat symbols"). */
+const VOWEL_TERMS: ReadonlySet<string> = new Set(["fathah", "kasrah", "dhammah", "tanwin"]);
+
+/** What a parts diagram writes after a changed mark's name: nothing for a vowel sign (the sign
+ *  says it), the sound in words for the others — sukun's "mati, tanpa vokal". Decided by the
+ *  mark's TERM, not by the sound's length (review 2026-10-12: `said.length > 3` would have dropped
+ *  a short description and kept a long vowel label). */
+export function soundAfterSign(term: Pick<TermView, "id"> | null, said: string): string {
+  return term && !VOWEL_TERMS.has(term.id) ? said : "";
 }
 
 /** Term id → its sound on the Harakat page ("a", "i", "u", "mati, tanpa vokal"). */

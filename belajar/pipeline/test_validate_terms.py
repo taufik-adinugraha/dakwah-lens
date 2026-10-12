@@ -131,6 +131,19 @@ CASES = [
      "the tiles spell"),
     ("tile-translit-not-its-bytes", "library", lambda d: d["parts"][0]["tiles"][1].update(translit="rabbu"),
      "does not name the tile's bytes"),
+    # --- 2026-10-13: a Harakat sign's word outside the lessons (سَلَٰمٌ of QS 97:5, where the tanwin
+    # is heard) carries its own transliteration, as a parts tile does
+    ("sign-word-translit-not-its-bytes", "library",
+     lambda d: next(sg for sg in d["basics"][0]["signs"] if sg["marks"] == ["dhammatain"]).update(translit="nārun"),
+     "translit 'nārun' does not name the example's word"),
+    ("sign-word-outside-lessons-without-translit", "library",
+     lambda d: next(sg for sg in d["basics"][0]["signs"] if sg["marks"] == ["dhammatain"]).pop("translit"),
+     "is not a lesson word; it needs `translit`"),
+    ("sign-lesson-word-with-translit", "library",
+     lambda d: next(sg for sg in d["basics"][0]["signs"] if sg["term"] == "kasrah").update(translit="bismillah"),
+     "is a lesson word, shown with the lesson's transliteration"),
+    ("sign-word-without-bytes", "library", lambda d: d["quran"].pop("97:5:1"),
+     "has no bytes for q:97:5:1"),
     # --- 2026-10-12: the gloss variant ([[“nama Allah”|q:1:1:1-2]]), typed Arabic, the marked
     # lessons (word cards, ayah structure, facts) and the Kosakata prose
     ("gloss-ref-does-not-resolve", "library",

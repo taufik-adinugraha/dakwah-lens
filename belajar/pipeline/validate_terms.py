@@ -497,6 +497,7 @@ def main(no_corpus: bool | None = None) -> int:
             used |= {r for r in TM.q_refs(t)}
         for sg in rec.get("signs", []):
             used.add(sg["example"])
+            used.add(sg["example"].split("#")[0])  # the word the letter is cut from: "dari <word> (…)"
     for pt in lib.get("parts", []):
         used.add(f"q:{pt['loc']}")
         for tl in pt["tiles"]:
@@ -549,6 +550,17 @@ def main(no_corpus: bool | None = None) -> int:
             if letter is not None:
                 for x in TM.sign_problems(sg, letter, f"basics[{b.get('id')}].signs[{i}]"):
                     fail(f"library.json {x}")
+            # "dari <word> (<transliteration>)": a lesson word brings its own; a word outside the
+            # lessons (chosen so the sign is heard there, clips.py) carries one that names its bytes
+            sloc = sg.get("example", "")[2:].split("#")[0]
+            sword, sw = quran.get(sloc), f"library.json basics[{b.get('id')}].signs[{i}]"
+            if sloc in words:
+                if "translit" in sg:
+                    fail(f"{sw}: {sloc} is a lesson word, shown with the lesson's transliteration; remove `translit`")
+            elif sword is not None and not sg.get("translit"):
+                fail(f"{sw}: the example's word {sword} ({sloc}) is not a lesson word; it needs `translit`")
+            elif sword is not None and not TM.surface_matches(sg["translit"], sword):
+                fail(f"{sw}: translit {sg['translit']!r} does not name the example's word {sword}")
     for key, bytes_ in quran.items():
         m = TM.QREF.match("q:" + key)
         if not m:

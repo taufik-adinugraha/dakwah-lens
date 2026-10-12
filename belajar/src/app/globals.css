@@ -261,6 +261,39 @@ body {
   }
 }
 
+/* The imam's voice of one example (operator 2026-10-12: "each explanation should be followed by
+   examples (visual + voice)"): btn-primary's family — play is forest in the module's three colours,
+   paper text 7.9:1 — at the 48px standard size, so a page of examples is not a page of 56px
+   primary actions. Icon + word (▶ Dengarkan, ■ Hentikan, ↺ Coba lagi), never cut across lines.
+   src/components/library/ClipButton.tsx. */
+@utility btn-listen {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  min-height: 3rem;
+  min-width: 3rem;
+  padding: 0.25rem 1rem;
+  border: 1.5px solid var(--color-forest);
+  border-radius: 9999px;
+  background-color: var(--color-forest);
+  color: var(--color-paper);
+  font-size: var(--text-base);
+  line-height: 1.35;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition-property: background-color, border-color, color;
+  transition-duration: 150ms;
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--color-forest-hover);
+      border-color: var(--color-forest-hover);
+    }
+  }
+}
+
 /* Standard buttons and toggles: 48px tall, visible ≥3:1 border. */
 /* The lesson's controls bar, three colours by role (operator, 2026-10-11: "let use 3 different
    colors: 1 color for sebelumnya & berikutnya, also make the size equal; 1 color for

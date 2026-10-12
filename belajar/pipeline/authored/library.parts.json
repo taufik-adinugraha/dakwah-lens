@@ -1,5 +1,5 @@
 {
-  "_comment": "Words explained by their parts on the Konsep pages (operator 2026-10-10, narration rule 14: \"bismi has 2 components, harf jar and ismi; ismi in its root is read dhommah, but because of harf jar it's read kasrah; provide visualization bi + ismu → bismi\"). A calm STATIC diagram (src/components/library/WordParts.tsx): the tiles, their transliteration and role, each changed letter on dotted circles (a vowel, or the alif of عَلَىٰ written ya'), the letters a word does not write faded, then the steps. The lesson stage's composition animation is built separately (branch feat/belajar-word-composition) and can replace this component. NO Arabic is typed: every tile is a q-ref, either a QAC 0.4 segment of the word itself or the part's bentuk dasar elsewhere in the Qur'an: a Tanzil token (ٱسْمُ marfu' at QS 55:78; QAC tags it NOM, the lemma of بِسْمِ's noun) or, for an attached pronoun, another word's QAC segment (the هُمْ of رَزَقْنَٰهُمْ, QS 2:3: an attached pronoun's base is an attached attestation, never the standalone هُمْ). Each tile's `translit` must name its bytes (terms.surface_matches). build_library.py checks that the tiles, with `changes` (a letter replaced by the word's letter: the same consonant with another vowel, or the alif maqsurah of عَلَىٰ written ya') and `drops` (letters the word does not write: an alif, and the lam of al- after its hamzah washal, as in لِلَّهِ) applied, spell the word's Tanzil bytes exactly; src/lib/terms.test.ts repeats the spelling check in CI and WordParts labels each change by where it is (the end of a part, its first letter). Say \"bentuk dasar\" for a base form, never \"akar\" (akar = the root letters; the build refuses it). Steps use the same [[…]] markup as the concepts and keep to what the cited kitab say. Status draft (plan L11).",
+  "_comment": "Words explained by their parts on the Konsep pages (operator 2026-10-10, narration rule 14: \"bismi has 2 components, harf jar and ismi; ismi in its root is read dhommah, but because of harf jar it's read kasrah; provide visualization bi + ismu → bismi\"). A calm STATIC diagram (src/components/library/WordParts.tsx): the tiles, their transliteration and role, each changed letter on dotted circles (a vowel, or the alif of عَلَىٰ written ya'), the letters a word does not write faded, then the steps. The lesson stage's composition animation is built separately (branch feat/belajar-word-composition) and can replace this component. NO Arabic is typed: every tile is a q-ref, either a QAC 0.4 segment of the word itself or the part's bentuk dasar elsewhere in the Qur'an: a Tanzil token (ٱسْمُ marfu' at QS 55:78; QAC tags it NOM, the lemma of بِسْمِ's noun) or, for an attached pronoun, another word's QAC segment (the هُمْ of رَزَقْنَٰهُمْ, QS 2:3: an attached pronoun's base is an attached attestation, never the standalone هُمْ). Each tile's `translit` must name its bytes (terms.surface_matches). build_library.py checks that the tiles, with `changes` (a letter replaced by the word's letter: the same consonant with another vowel, or the alif maqsurah of عَلَىٰ written ya') and `drops` (letters the word does not write: an alif, and the lam of al- after its hamzah washal, as in لِلَّهِ) applied, spell the word's Tanzil bytes exactly; src/lib/terms.test.ts repeats the spelling check in CI and WordParts labels each change by where it is (the end of a part, its first letter). Say \"bentuk dasar\" for a base form, never \"akar\" (akar = the root letters; the build refuses it). Steps use the same [[…]] markup as the concepts and keep to what the cited kitab say. Status draft (plan L11). A tile that is a whole word also plays the imam reciting it (plan L19), so it is chosen by what is HEARD (pipeline/clips.py, review 2026-10-12): never an ayah's last word (the imam stops there and the ending the diagram shows is not pronounced), and from an ayah whose quran-align alignment is clean where the Qur'an has one: an‘ama is taken from QS 5:23 (word 6: same bytes and QAC tags as 4:69:8, whose alignment has insertions 6, transpositions 1; 4:72:10 is clean too, but there the words are a speaker's claim about himself, while in 5:23, as in 4:69 and 1:7, they describe people Allah favoured; 19:58:3 and 33:37:4 are not clean). A base-form tile that starts with hamzat washal and is not its ayah's first word (ismu after tabāraka, Allāhu after huwa) is heard without its alif, so the build makes it play the run with the word before it and ship what is heard (`washal`: run, before, heard = \"tabārakasmu\"); type only `before`, that word's transliteration, when it is not a lesson word (checked against its Tanzil bytes; the word must end in a short vowel).",
   "parts": [
     {
       "loc": "1:1:1",
@@ -18,6 +18,7 @@
         {
           "q": "q:55:78:2",
           "translit": "ismu",
+          "before": "tabāraka",
           "label": "[[isim]], bentuk dasar",
           "gloss": "nama"
         }
@@ -365,7 +366,7 @@
       ],
       "tiles": [
         {
-          "q": "q:4:69:8",
+          "q": "q:5:23:6",
           "translit": "an‘ama",
           "label": "[[fi'il madhi]], bentuk dasar",
           "gloss": "telah memberi nikmat"
@@ -386,18 +387,18 @@
       ],
       "drops": [],
       "steps": [
-        "[[an‘ama|q:4:69:8]] adalah [[fi'il madhi]] yang artinya “telah memberi nikmat”, dan [[-ta|q:1:7:3/2]] adalah [[dhamir]] (kata ganti) yang artinya “Engkau”, pelakunya.",
-        "Bentuk dasar [[fi'il madhi]] [[mabni]] di atas [[fathah]]: [[an‘ama|q:4:69:8]]. Menurut Ibnu Hisyam, akhirnya menjadi [[sukun]] bila bersambung dengan kata ganti pelaku yang berharakat. Karena itu [[mim|q:1:7:3#4]] pada [[an‘amta|q:1:7:3]] mati (Darwisy; al-Jadwal)."
+        "[[an‘ama|q:5:23:6]] adalah [[fi'il madhi]] yang artinya “telah memberi nikmat”, dan [[-ta|q:1:7:3/2]] adalah [[dhamir]] (kata ganti) yang artinya “Engkau”, pelakunya.",
+        "Bentuk dasar [[fi'il madhi]] [[mabni]] di atas [[fathah]]: [[an‘ama|q:5:23:6]]. Menurut Ibnu Hisyam, akhirnya menjadi [[sukun]] bila bersambung dengan kata ganti pelaku yang berharakat. Karena itu [[mim|q:1:7:3#4]] pada [[an‘amta|q:1:7:3]] mati (Darwisy; al-Jadwal)."
       ],
       "sources": [
         {
           "kitab": "Quranic Arabic Corpus 0.4",
-          "ref": "(1:7:3) dua segmen: V PERF (IV) LEM:>anoEama dan PRON SUFFIX 2MS; (4:69:8) V PERF (IV) LEM:>anoEama",
+          "ref": "(1:7:3) dua segmen: V PERF (IV) LEM:>anoEama dan PRON SUFFIX 2MS; (5:23:6) V PERF (IV) LEM:>anoEama",
           "url": "https://corpus.quran.com/wordbyword.jsp?chapter=1&verse=7"
         },
         {
           "kitab": "Tanzil Quran Text (Uthmani) 1.1",
-          "ref": "QS 4:69 kata 8 (an‘ama, bentuk dasarnya) dan QS 1:7 kata 3",
+          "ref": "QS 5:23 kata 6 (an‘ama, bentuk dasarnya) dan QS 1:7 kata 3",
           "url": "https://tanzil.net/download/"
         },
         {

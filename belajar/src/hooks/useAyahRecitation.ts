@@ -147,12 +147,13 @@ export function useAyahRecitation() {
     setLoading(null);
   }, []);
 
-  return { status, notice: useNotice(loading), play, pause, stop };
+  return { status, notice: useRecitationNotice(loading), play, pause, stop };
 }
 
 /** The loading line's stage for `loading` (as useAutoplay's useLoadingNotice): timers only, the
- *  stage a timer reported kept with the load it belongs to, so a new load starts quiet. */
-function useNotice(loading: AudioLoading | null): RecitationNotice {
+ *  stage a timer reported kept with the load it belongs to, so a new load starts quiet. Shared
+ *  with the Konsep examples' clip player (src/hooks/useClipPlayer.ts). */
+export function useRecitationNotice(loading: AudioLoading | null): RecitationNotice {
   const [seen, setSeen] = useState<{ of: AudioLoading; stage: LoadingStage } | null>(null);
   useEffect(() => {
     if (!loading) return;

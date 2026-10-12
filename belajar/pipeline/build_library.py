@@ -12,7 +12,16 @@ Inputs (pinned in sources.json and verified by sha256 before use):
   carries inline markup (terms.py: [[majrur]], [[bismi|q:1:1:1]], …): every field is checked,
   stripped into the plain field (narration and metadata read those) and shipped marked beside it,
   and every Qur'anic ref's bytes go to `quran` from Tanzil and QAC (operator 2026-10-10: terms
-  and words in Arabic, never retyped).
+  and words in Arabic, never retyped). quran-align's Alafasy_128kbps member gives `clips`: the
+  imam's voice of every example the static pages show (a concept example, a Harakat sign's word, a
+  parts diagram's word and its whole-word tiles), as {url, start, end} into that ayah's streamed
+  EveryAyah file (operator 2026-10-12: "each explanation should be followed by examples (visual +
+  voice)"; clips.py, checked by validate_clips.py). An example is chosen and labelled by what the
+  learner HEARS (clips.py "WHAT IS HEARD"): `last` on a clip that ends its ayah (the imam's waqf),
+  a Harakat sign only where it is heard, a base-form tile that starts with hamzat washal played
+  with the word before it (`washal`). The ayat of the clips outside the lessons are written, as
+  the pinned files have them, to pipeline/fixtures/clips_outside_lessons.json, so CI (no cache)
+  can check those clips too.
 
 Covered surahs: every surah registered in common.SURAHS whose authored/<slug>.words.json exists,
 in mushaf order (`--only <slug> ...` narrows the set, e.g. to rebuild the Al-Fatihah-only file).
@@ -34,6 +43,7 @@ import urllib.parse
 from collections import Counter
 
 import build_surah
+import clips as C
 import terms as TM
 import validate as V
 from common import (ARABIC_RUN, CONTENT_DIR, PIPELINE, SCHEMA_TS, SURAH_BY_SLUG, authored_file, authored_surahs,
@@ -98,6 +108,7 @@ ASPECT = [("PERF", "madhi"), ("IMPF", "mudhari'"), ("IMPV", "amr")]
 
 errors: list[str] = []
 warnings: list[str] = []
+FIXTURE_OUT: dict | None = None  # clips.FIXTURE's content for this build (set in main, written by finish)
 
 
 def err(msg: str) -> None:
@@ -236,7 +247,7 @@ def check_sources(srcs: list, where: str) -> None:
 
 # ---------------------------------------------------------------- main
 def main(only: list[str] | None = None) -> int:
-    global SURAHS, WORDS
+    global SURAHS, WORDS, FIXTURE_OUT
     specs = [SURAH_BY_SLUG[x] for x in only] if only else authored_surahs()
     specs = sorted(specs, key=lambda sp: sp.surah)
     if not specs:
@@ -540,6 +551,33 @@ def main(only: list[str] | None = None) -> int:
             prose += [(f"{cw}.examples[{i}].note", x.get("note", "")) for i, x in enumerate(c.get("examples") or [])]
 
     prose += extra["prose"]
+    # ---- the imam's voice of every example the static pages show (operator 2026-10-12: "each
+    # explanation should be followed by examples (visual + voice)"; clips.py)
+    clips = {}
+    align, align_note = C.load_alignment(src)
+    if align is None:
+        err(align_note)
+    else:
+        clips, cerr, cwarn = C.build({"concepts": concepts, "basics": extra["basics"], "parts": extra["parts"]},
+                                     align, T)
+        for x in cerr:
+            err(x)
+        warnings.extend(cwarn)
+        FIXTURE_OUT = C.fixture_from(clips, align, T, src)
+
+    # ---- what the learner hears (clips.py "WHAT IS HEARD"; validate_clips.py repeats these from
+    # library.json): a sign where it is heard, washal tiles as derived, a pause the note can describe
+    def ayah_tokens(s_: int, a_: int):
+        return lesson_ayah(T, s_, a_)[0].split(" ") if (s_, a_) in T.verses else None
+
+    def last_word(key: str) -> str:
+        s_, a_, _w, w2 = C.parse_key(key)
+        return (ayah_tokens(s_, a_) or [""] * w2)[w2 - 1]
+
+    for x in (C.sign_heard_problems(extra["basics"], ayah_tokens)
+              + C.tile_problems({"parts": extra["parts"], "quran": extra["quran"], "clips": clips}, extra["translit"])
+              + C.pause_problems(clips, last_word)):
+        err(x)
     # ---- prose (lexicon, roots and concepts together, as the app shows them side by side): no
     # unquoted Arabic words, «…» quotes byte-exact in Tanzil, SKB transliteration
     for path, text in prose:
@@ -557,11 +595,12 @@ def main(only: list[str] | None = None) -> int:
         "authored_lexicon": f"authored/library.lexicon.json sha256:{sha256_file(LEXICON)}",
         "authored_concepts": concepts_ver,
         **extra["versions"],
+        C.DATA_VERSION: C.data_version(src),
         "pipeline": "belajar/pipeline/build_library.py (stdlib only, no LLM)",
     }
     out = {"concepts": concepts, "lexicon": lexicon, "roots": roots, "basics": extra["basics"],
            "terms": extra["terms"], "parts": extra["parts"], "quran": extra["quran"],
-           "segments": extra["segments"], "data_versions": data_versions}
+           "segments": extra["segments"], "clips": clips, "data_versions": data_versions}
 
     # ---- shape against schema.ts (keys, nesting, enums) + status
     schemas, enums = V.parse_schema(SCHEMA_TS.read_text(encoding="utf-8"))
@@ -683,11 +722,27 @@ def markup_section(concepts: list[dict], T, W, src: dict, lexicon_src: dict | No
                     err(f"{sw}: example must be a letter q-ref (q:S:A:W#n), got {sg.get('example')!r}")
                     continue
                 refs.add(sg["example"])
+                sloc = ":".join(m.groups()[:3])
+                sword = tanzil_token(*map(int, m.groups()[:3])) or ""
                 try:
-                    letter = TM.letter_of(tanzil_token(*map(int, m.groups()[:3])) or "", int(m.group(6)))
+                    letter = TM.letter_of(sword, int(m.group(6)))
                 except ValueError as x:
                     err(f"{sw}: {x}")
                     continue
+                # The card says "dari <word> (<transliteration>)": a lesson word brings its own; a
+                # word outside the lessons (chosen so the sign is HEARD there, clips.py) carries its
+                # transliteration as a parts tile does, checked against its Tanzil bytes.
+                refs.add(f"q:{sloc}")
+                if sloc in translit:
+                    if "translit" in sg:
+                        err(f"{sw}: {sloc} is a lesson word, shown with the lesson's transliteration "
+                            f"({translit[sloc]!r}); remove `translit`")
+                elif not sg.get("translit"):
+                    err(f"{sw}: the example's word {sword} ({sloc}) is not a lesson word; give its `translit`")
+                elif set(sg["translit"]) - V.TRANSLIT_OK or V.TRANSLIT_BAD.search(sg["translit"]):
+                    err(f"{sw}: translit {sg['translit']!r} outside the SKB 158/1987 character set")
+                elif not TM.surface_matches(sg["translit"], sword):
+                    err(f"{sw}: translit {sg['translit']!r} does not name the example's word {sword}")
                 have = {TM.MARKS[ch] for ch in letter if ch in TM.MARKS}
                 if not set(sg["marks"]) <= have:
                     err(f"{sw}: the example letter {letter} carries {sorted(have)}, not {sg['marks']}")
@@ -738,6 +793,34 @@ def markup_section(concepts: list[dict], T, W, src: dict, lexicon_src: dict | No
                 if not TM.surface_matches(tl.get("translit", ""), tiles[-1]):
                     err(f"{tw}: translit {tl.get('translit')!r} does not name the tile's bytes {tiles[-1]}")
                 refs.add(tl["q"])
+                # A base-form tile that starts with hamzat washal mid-ayah is heard without its alif
+                # ("tabāraka-smu"): it plays the run with the word before it and says what is heard
+                # (clips.washal_of). `before`, the transliteration of that word, is the lesson's own
+                # or typed in the tile; `washal` itself is derived, never typed.
+                before = tl.pop("before", None)
+                if "washal" in tl:
+                    err(f"{tw}: `washal` is derived by the build; give only `before` (the word before it, in Latin)")
+                    continue
+                if not m.group(5):
+                    ts_, ta_, tw_ = map(int, m.groups()[:3])
+                    prev_loc = f"{ts_}:{ta_}:{tw_ - 1}"
+                    prev = tanzil_token(ts_, ta_, tw_ - 1) if tw_ > 1 else None
+                    needs = tiles[-1].startswith(C.WASHAL) and tw_ > 1
+                    if before is not None and (not needs or prev_loc in translit):
+                        err(f"{tw}: `before` is only for a word that starts with hamzat washal mid-ayah after a "
+                            f"word outside the lessons; remove it")
+                    elif needs and before is not None and (set(before) - V.TRANSLIT_OK or V.TRANSLIT_BAD.search(before)):
+                        err(f"{tw}: before {before!r} outside the SKB 158/1987 character set")
+                    else:
+                        ws, werr = C.washal_of(tl.get("translit", ""), tiles[-1], (ts_, ta_, tw_), prev,
+                                               translit.get(prev_loc, before))
+                        for x in werr:
+                            err(f"{tw}: {x}")
+                        if ws:
+                            tl["washal"] = ws
+                            refs.update({f"q:{prev_loc}", f"q:{ws['run']}"})
+                elif before is not None:
+                    err(f"{tw}: `before` on a tile that is a part of a word (it has no voice of its own)")
                 field(tl["label"], f"{tw}.label")  # checked; shipped marked
                 if TM.AKAR.search(TM.strip(tl["label"])):
                     err(f"{tw}.label: says 'akar'; a part's base form is its 'bentuk dasar' (rule 14)")
@@ -823,7 +906,7 @@ def markup_section(concepts: list[dict], T, W, src: dict, lexicon_src: dict | No
     if PARTS.exists():
         versions["authored_parts"] = f"authored/library.parts.json sha256:{sha256_file(PARTS)}"
     return {"terms": terms_out, "basics": basics, "parts": parts, "quran": quran, "segments": segments,
-            "prose": prose_items, "versions": versions}
+            "prose": prose_items, "versions": versions, "translit": translit}
 
 
 def word_lemma_ids(surah: int = 1) -> dict[str, str]:
@@ -850,12 +933,17 @@ def finish(out) -> int:
         return 1
     CONTENT_DIR.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if FIXTURE_OUT is not None:
+        C.FIXTURE.parent.mkdir(parents=True, exist_ok=True)
+        C.FIXTURE.write_text(C.fixture_text(FIXTURE_OUT), encoding="utf-8")
     n_t = sum(1 for x in out["lexicon"] if "tashrif" in x)
     n_i = sum(len(x["ilal"]) for x in out["lexicon"])
     n_src = sum(len(x["sources"]) for k in ("concepts", "lexicon", "roots") for x in out[k])
     print(f"wrote {OUT.relative_to(PIPELINE.parent.parent)}: {len(out['lexicon'])} lexemes "
           f"({n_t} with tashrif, {n_i} i'lal), {len(out['roots'])} roots, {len(out['concepts'])} concepts, "
-          f"{n_src} source refs; all draft.")
+          f"{n_src} source refs, {len(out['clips'])} example clips "
+          f"({sum(1 for c in out['clips'].values() if c.get('last'))} end their ayah; "
+          f"{len((FIXTURE_OUT or {}).get('ayat', {}))} ayat outside the lessons in {C.FIXTURE.name}); all draft.")
     return 0
 
 
