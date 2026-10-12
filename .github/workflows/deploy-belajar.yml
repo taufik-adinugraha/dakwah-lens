@@ -334,7 +334,8 @@ jobs:
             html="$(curl -fsS "http://127.0.0.1:3300${path}")"
             grep -q 'data-autoplay="start"' <<<"$html" || { echo "✗ ${path}: no autoplay start button"; exit 1; }
             grep -q '<span>Mulai pelajaran</span>' <<<"$html" || { echo "✗ ${path}: Mulai pelajaran label missing"; exit 1; }
-            grep -q 'Klik sekali; pelajaran berjalan sendiri' <<<"$html" || { echo "✗ ${path}: one-click hint missing"; exit 1; }
+            if grep -q 'Klik sekali; pelajaran berjalan sendiri' <<<"$html"; then echo "✗ ${path}: the removed one-click hint is back"; exit 1; fi
+            if grep -q 'Terjemahan Berbahasa Indonesia - Kementerian Agama · ' <<<"$html"; then echo "✗ ${path}: the removed translation source line is back"; exit 1; fi
             if grep -qiE '\b(ketuk|mengetuk|diketuk)\b' <<<"$html"; then echo "✗ ${path}: says ketuk (use klik)"; exit 1; fi
             echo "${path}: autoplay start ok"
           done

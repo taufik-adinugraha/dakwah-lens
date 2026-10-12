@@ -268,7 +268,6 @@
     "title": "Guided lesson",
     "step": "Step {n} of {total}",
     "start": "Start the lesson",
-    "start_hint": "Click once; the lesson runs by itself.",
     "resume_from": "Resume from step {n}",
     "start_over": "Start from the beginning",
     "preparing": "Preparing the lesson…",

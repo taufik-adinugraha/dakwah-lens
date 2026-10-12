@@ -270,9 +270,10 @@ describe("autoplay stage: messages and markers", () => {
     }
   });
 
-  it("explains the one click under the one start button, and nothing else (operator, 2026-10-10)", () => {
+  it("one start button and no hint under it (operator, 2026-10-10; the hint removed 2026-10-12)", () => {
     expect(id.Guided.start).toBe("Mulai pelajaran");
-    expect(id.Guided.start_hint).toBe("Klik sekali; pelajaran berjalan sendiri.");
+    // "remove this line, to make the space more clean" (operator 2026-10-12)
+    for (const msgs of [id, en]) expect(msgs.Guided.start_hint).toBeUndefined();
     // The stage's long notes, mode line and duplicate imam buttons are gone,
     // and so are their messages (they would still ship in the page payload).
     for (const msgs of [id, en]) {
@@ -288,16 +289,17 @@ describe("autoplay stage: messages and markers", () => {
     expect(id.Lesson.materials).toBe("Materi lengkap ayat ini");
   });
 
-  it("the image smoke test greps the start label and the hint the page renders", () => {
+  it("the image smoke test greps the start label the page renders", () => {
     // The workflow checks the server-rendered copy with literal greps; keep
     // them and these messages in step (checked where the repo is complete).
     const wf = join(BELAJAR, "..", ".github", "workflows", "deploy-belajar.yml");
     if (!existsSync(wf)) return;
     const yaml = readFileSync(wf, "utf8");
     const label = /grep -q '<span>([^<']+)<\/span>'/.exec(yaml)?.[1];
-    const hint = /grep -q '([^']+)'[^\n]*one-click hint/.exec(yaml)?.[1];
     if (label !== undefined) expect(label, "deploy-belajar.yml: start label grep").toBe(id.Guided.start);
-    if (hint !== undefined) expect(id.Guided.start_hint, "deploy-belajar.yml: one-click hint grep").toContain(hint);
+    // The removed one-click hint (2026-10-12) is no longer required: only checked to stay gone.
+    expect(yaml, "deploy-belajar.yml must not require the removed one-click hint").not.toMatch(/grep -q 'Klik sekali[^']*' <<<"\$html" \|\|/);
+    expect(yaml).toMatch(/the removed one-click hint is back/);
   });
 
   it("never promises a human review, never shouts", () => {
