@@ -284,8 +284,10 @@ jobs:
           # quran.com in a new tab or app: no Al-Fatihah page links to quran.com, the surah page's
           # chips are buttons, and /belajar/api/ayah answers one ayah exactly as
           # content/ayat/locations.json has it (its first, a middle and its last entry, read from the
-          # file, never typed here) and 404 for a location the file has no entry for. Every chip of
-          # every published page is checked by surahs-smoke.mjs below; the dialog in screenshots.mjs.
+          # file, never typed here) and 404 for a location the file has no entry for. The chips of
+          # every published surah's own page are checked by surahs-smoke.mjs in the every-surah
+          # container further down (in this one it visits lesson pages only); the dialog in
+          # screenshots.mjs.
           for path in /belajar/id/quran/al-fatihah /belajar/en/quran/al-fatihah \
                       /belajar/id/quran/al-fatihah/1 /belajar/id/quran/al-fatihah/2 /belajar/id/quran/al-fatihah/7; do
             html="$(curl -fsS "http://127.0.0.1:3300${path}")"

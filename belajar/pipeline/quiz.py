@@ -179,9 +179,15 @@ class Terms:
             last = m.end()
             if not ar or ref in seen:
                 continue
-            seen.add(ref)
             rest = _MARKUP.sub(lambda x: x.group(1), marked[last:])
-            if out.count("(") - out.count(")") > 0:
+            inside = out.count("(") - out.count(")") > 0
+            if inside and _continues_phrase(rest):
+                # src/lib/terms.ts continuesPhrase (review 2026-10-12): inside brackets, a term or
+                # Qur'anic word the phrase goes on past stays Latin there — "(mahall raf')", never
+                # "(mahall, مَحَلّ raf')" — and is not counted as seen: its next use shows the Arabic.
+                continue
+            seen.add(ref)
+            if inside:
                 out += f", {ar}"
             elif re.match(r" \((?=[a-z“'‘\-])", rest):
                 out += f" ({ar}, "
@@ -193,6 +199,17 @@ class Terms:
 
 # The Konsep markup (pipeline/terms.py MARKUP): [[surface]] or [[surface|ref]].
 _MARKUP = re.compile(r"\[\[([^\[\]|]+?)(?:\|([^\[\]|]+))?\]\]")
+
+# Words that join a list inside brackets rather than continue a phrase (terms.ts LIST_WORDS).
+_LIST_WORDS = {"dan", "atau", "serta", "maupun"}
+
+
+def _continues_phrase(rest: str) -> bool:
+    """Whether the text after a marked item (markup already reduced to its surfaces) goes on with
+    the same phrase: another word, not the end of the bracket, a comma or a list. The twin of
+    src/lib/terms.ts continuesPhrase; src/lib/quiz-content.test.ts holds the two together."""
+    m = re.match(r" ([^\W\d_'‘’-]|['‘’-])+", rest)
+    return bool(m) and m.group(0)[1:].lower() not in _LIST_WORDS
 
 
 def cause_class(text: str, terms: Terms, *, after_karena: bool) -> str | None:

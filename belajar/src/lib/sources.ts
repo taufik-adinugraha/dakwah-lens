@@ -242,8 +242,8 @@ export const SOURCES: Source[] = [
     name: "Bacaan Syaikh Mahmud Khalil al-Husary (Mu'allim)",
     role: "Bacaan imam untuk mendengar dan menirukan (diputar langsung, tidak disimpan)",
     licence: "Diputar dari server penyedia; hak rekaman tetap pada pemiliknya",
-    credit: "Recitation: Mahmoud Khalil Al-Husary (Mu'allim)",
-    url: "https://quran.com",
+    credit: "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com",
+    url: "https://everyayah.com",
   },
   {
     name: "QuranEnc — Terjemahan Indonesia (Kementerian Agama)",

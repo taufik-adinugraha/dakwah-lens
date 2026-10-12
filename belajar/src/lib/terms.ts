@@ -276,7 +276,11 @@ export function annotate(text: string, scope: Scope, lookup: Lookup): Token[] {
     if (s.ref.startsWith("q:")) {
       const ar = lookup.quran[s.ref.slice(2)];
       if (ar) {
-        const arabic = !crossRef && !scope.shown.has(s.ref);
+        // As for a term below: inside brackets, a Qur'anic word the phrase goes on past stays Latin
+        // there ("(as-Samin mengurai al-magḍūbi ‘alaihim menjadi …)"), and shows its Arabic at its
+        // next use (review 2026-10-12).
+        const inner = depth > 0 && continuesPhrase(spans[k + 1], spans[k + 2]);
+        const arabic = !crossRef && !inner && !scope.shown.has(s.ref);
         if (arabic) scope.shown.add(s.ref);
         token = { kind: "quran", surface: s.surface, ref: s.ref, ar, arabic, after: "", merge: false, cite: false, inBracket: depth > 0 };
       }

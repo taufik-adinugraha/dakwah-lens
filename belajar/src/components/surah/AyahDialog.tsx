@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import {
   createContext,
   type MouseEvent,
+  type PointerEvent,
   type ReactNode,
   useCallback,
   useContext,
@@ -93,6 +94,8 @@ export function AyahDialogProvider({ names, children }: { names: Readonly<Record
   const dialogRef = useRef<HTMLDialogElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const chipRef = useRef<HTMLElement | null>(null);
+  /** The press now ending in a click began on the backdrop (onBackdropDown). */
+  const pressedBackdrop = useRef(false);
   /** The fetch whose answer may still be shown; a later open or a close drops an older one. */
   const requestRef = useRef(0);
   const [text, setText] = useState<Text | null>(null);
@@ -150,9 +153,16 @@ export function AyahDialogProvider({ names, children }: { names: Readonly<Record
     // Back on the chip that opened it (Chromium does so itself; Safari does not focus a clicked button).
     chip?.focus();
   };
-  // A click on the dialog box itself, not on its content (which fills it): the backdrop.
+  // A click on the dialog box itself, not on its content (which fills it): the backdrop. Only when
+  // the press began there too: a learner who selects the ayah by dragging and lets go outside the
+  // box gets a click on the dialog as well (the nearest common ancestor), and must not lose it
+  // (review 2026-10-12).
+  const onBackdropDown = (e: PointerEvent<HTMLDialogElement>) => {
+    pressedBackdrop.current = e.target === e.currentTarget;
+  };
   const onBackdrop = (e: MouseEvent<HTMLDialogElement>) => {
-    if (e.target === e.currentTarget) e.currentTarget.close();
+    if (e.target === e.currentTarget && pressedBackdrop.current) e.currentTarget.close();
+    pressedBackdrop.current = false;
   };
 
   const loc = text?.loc ?? null;
@@ -177,6 +187,7 @@ export function AyahDialogProvider({ names, children }: { names: Readonly<Record
       data-loc={loc ?? undefined}
       aria-labelledby={titleId}
       onClose={onClose}
+      onPointerDown={onBackdropDown}
       onClick={onBackdrop}
       className="m-auto max-h-[calc(100dvh-2rem)] w-[min(44rem,calc(100vw-2rem))] max-w-none overflow-hidden rounded-2xl border-[1.5px] border-forest-teal bg-white p-0 text-base text-ink shadow-2xl backdrop:bg-ink/55"
     >

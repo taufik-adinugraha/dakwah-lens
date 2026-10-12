@@ -6,9 +6,8 @@ import { publishedSurahs, warisSwitchOn } from "@/lib/features";
 import { SURAH_SLUGS } from "@/lib/routes";
 
 // Locale routing, plus the runtime switches of what is hidden. The module has
-// no protected routes: learning is anonymous-first (progress in localStorage,
-// merged into the account on sign-in — plan §7.3). Identity is read
-// server-side where needed.
+// no protected routes and no sign-in (plan L16, §7.3): progress stays in the
+// learner's browser (localStorage).
 const intl = createIntlMiddleware(routing);
 
 const LOCALE = `(${routing.locales.join("|")})`;

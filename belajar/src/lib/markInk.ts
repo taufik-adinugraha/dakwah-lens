@@ -34,7 +34,7 @@ const LETTER: Record<string, number> = {
 /** The em to move the circle's glyph DOWN by (negative: up) so that its ink sits on the centre.
  *  `letter`: `text` is a whole letter (MarkCircle's `letter`), else the marks set on a tatweel.
  *  Marks not measured one by one (two on one letter) take the mean of theirs; a letter not
- *  measured, none (marks.test.ts lists every letter the library shows on a circle). */
+ *  measured, none (markInk.test.ts lists every letter the library shows on a circle). */
 export function inkShift(text: string, letter = false): number {
   if (letter) return -(LETTER[text] ?? 0);
   const known = [...text.replace(TATWEEL, "")].map((ch) => MARK[ch]).filter((v) => v !== undefined);
