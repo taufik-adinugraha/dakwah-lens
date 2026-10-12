@@ -1755,15 +1755,22 @@ async function aheadChecks(page, vp, index) {
     }
     const [text, kind] = [(await status.innerText()).replace(/\s+/g, " ").trim(), await status.getAttribute("data-kind")];
     if (text !== msgs.loading_narration || kind !== "narration") throw new Error(`${vp}: the loading status says “${text}” (data-kind ${kind}), expected “${msgs.loading_narration}” (narration)`);
-    try {
-      await caption(PRIMER_1).locator('[data-karaoke="now"]').first().waitFor({ state: "attached", timeout: AHEAD_STALL_MS + 10_000 });
-    } catch {
-      throw new Error(`${vp}: the primer's first line never played from the network after its fetch ahead had failed (line on screen: ${await pg.locator('[data-autoplay="caption"]').first().getAttribute("data-line").catch(() => null)})`);
+    // "Played" is the held request ANSWERED and then the caption's words being said. Not the first
+    // word marked "now": the caption marks it the moment play is asked for, before any audio has
+    // arrived (CI 2026-10-13: it showed 822 ms into the 4 s hold, and the check took the hold for
+    // broken).
+    if (!(await until(pg, () => stream().end !== null, AHEAD_STALL_MS + 10_000))) {
+      throw new Error(`${vp}: the primer's first line, held back ${AHEAD_STALL_MS} ms, was never answered (${Date.now() - stream().start} ms on)`);
     }
     delays.delete(primer1);
+    const primerSaid = () => caption(PRIMER_1).locator('[data-karaoke="said"]').count();
+    const saidAtAnswer = await primerSaid();
+    if (!(await until(pg, async () => (await primerSaid()) > saidAtAnswer, 10_000))) {
+      throw new Error(`${vp}: the primer's first line never played from the network after its fetch ahead had failed (${saidAtAnswer} word(s) said 10 s after its load was answered; line on screen: ${await pg.locator('[data-autoplay="caption"]').first().getAttribute("data-line").catch(() => null)})`);
+    }
     const line = stream();
-    const stalled = (line.end ?? Date.now()) - line.start;
-    if (line.end === null || stalled < AHEAD_STALL_MS - AHEAD_SLACK_MS) throw new Error(`${vp}: the primer's first line was answered after ${stalled} ms, not held back ${AHEAD_STALL_MS} ms: the check cannot show the stall`);
+    const stalled = line.end - line.start;
+    if (stalled < AHEAD_STALL_MS - AHEAD_SLACK_MS) throw new Error(`${vp}: the primer's first line was answered after ${stalled} ms, not held back ${AHEAD_STALL_MS} ms: the check cannot show the stall`);
     const since = timeline.slice(timeline.indexOf(line) + 1).filter((e) => e.type === "fetch");
     const during = since.filter((e) => e.start < line.end + AHEAD_SETTLE_MS - AHEAD_SLACK_MS);
     if (during.length) {
