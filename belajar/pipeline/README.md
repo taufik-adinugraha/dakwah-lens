@@ -49,6 +49,8 @@ python3 validate_compose.py        # composition checks against the corpus (CI: 
 python3 test_validate_compose.py   # plants 34 faults in copies of the compositions, each must fail (CI: --no-corpus)
 python3 validate_terms.py          # Konsep terms in Arabic script + inline markup (CI: --no-corpus); see "Konsep"
 python3 test_validate_terms.py     # plants 50 faults (retyped term, unmarked term, wrong word bytes, a ref whose Latin names other bytes, ketuk, a gloss variant whose ref does not resolve, Arabic typed by hand, a marked lesson or Kosakata twin that drifted, …)
+python3 validate_clips.py          # the imam's voice of every Konsep example: library.json `clips` (CI: --no-corpus); see "Suara contoh"
+python3 test_validate_clips.py     # plants 28 faults (an example with no voice, an unwanted clip, another ayah's or reciter's file, a word's timing off by one, an implausible length, a stale pin, …) (CI: --no-corpus)
 python3 build_quiz.py              # the quizzes ../content/quiz/*.json (see "Kuis"); before the narration, which reads them
 python3 build_narration.py         # narration manifests ../content/narration/*.json (see "Narasi")
 python3 validate_narration.py      # narration checks; exit 1 on any failure
@@ -114,6 +116,9 @@ a machine whose cache predates them). `cache/` is git-ignored.
 | `terms.py` | — | Term table checks (folded attestation, vowel compatibility, confirmed harakat), Shamela page-text extraction, the `[[…]]` markup (parse, strip, unmarked forms, a term ref's surface, a q-ref's Latin against its bytes), meanings ("yang artinya"), q-ref resolution, letters, parts arithmetic, the Harakat signs |
 | `validate_terms.py` | 6 | Konsep terms + markup + Qur'anic bytes; `--no-corpus` in CI, full with the cache locally |
 | `test_validate_terms.py` | 6 | Mutation tests for `validate_terms.py` (`--no-corpus` skips the 2 faults only the cache can catch) |
+| `clips.py` | — | The imam's voice of every example the static pages show (library.json `clips`): which examples, the clip of each from the pinned quran-align file (build_surah.word_segments / everyayah_url, the lessons' own mapping), and every check, with and without the corpus |
+| `validate_clips.py` | 6 | The clip checks (`--no-corpus` in CI: coverage, URLs, lengths, the lessons' own timings, the pin; locally also a fresh build and the Tanzil tokens) |
+| `test_validate_clips.py` | 6 | Planted-fault tests for `validate_clips.py` (`--no-corpus` skips the 3 faults only the cache can catch) + unit tests of the keys and the length rule |
 | `build_narration.py` | 3 | Writes the guided-lesson narration manifests `belajar/content/narration/<slug>.json` + `shared.json` (spoken text, caption, highlight, word card) from the lessons, the library and `authored/pronunciation.json` (templates + content fields; see "Narasi") |
 | `validate_narration.py` | 6 | Narration checks: step-id coverage, the pronunciation dictionary, no Qur'anic word in any spelling or script, Arabic only from the dictionary, caption = speech, highlight/focus, audio entries and karaoke tokens, manifests equal a fresh build |
 | `test_validate_narration.py` | 6 | Mutation tests for `validate_narration.py` + unit tests of the speech text, dictionary rendering, tokens, numbers and render request |
@@ -693,6 +698,47 @@ beginners, words explained by their parts).
     and stays Latin; a lemma no ayah writes as cited (raḥmah, milk, …) stays Latin.
   - no plain field changed: the narration manifests are byte-identical and `build_narration.py
     --check` stays clean.
+
+## Suara contoh (the imam's voice of every example, 2026-10-12)
+
+Operator, 2026-10-12: "in explanation, for example when explaining dhommah, kasrah, etc provide
+example + additional voice. e.g ismu (read by voice + show visual) when combined with harf jar, it
+becomes ismi (read by voice + visual). in principel, each explanation should be followed by
+examples (visual + voice)", then "not only for harakah, but also for all rules" (plan L19).
+
+- **What has a voice** (`clips.wanted`): every concept example (200 rows over 84 lesson words),
+  the word of every Harakat sign's example letter (8 signs, 7 words: a letter alone is never
+  recited, so بِ of kasrah plays بِسْمِ), every parts diagram's joined word (6) and each tile that
+  is a whole Tanzil token, the bentuk dasar (5: ٱسْمُ 55:78:2, ٱللَّهُ 112:1:3, عَلَىٰ 2:5:2, رَبُّ 26:24:2,
+  أَنْعَمَ 4:69:8). 88 clips over 26 ayat. **Without one** (`clips.unvoiced`, listed by the
+  validator): the 7 tiles that are a QAC segment (bi-, li-, -hum, li-, -hū, bi-, -ta), since no
+  reciter says a prefix or suffix on its own; the joined word's clip voices it inside the word.
+- **The clip** (`library.json` `clips`, keyed by the word's location; a run "112:1:2-4" is
+  supported): `{"url": "https://everyayah.com/data/Alafasy_128kbps/055078.mp3", "start": 1060,
+  "end": 1490}` — Mishary Alafasy (L7), the first word's start and the last word's end from the
+  pinned `Alafasy_128kbps.json` of quran-align, read with `build_surah.word_segments` (segment
+  [wordStart0, wordEndExclusive0, startMs, endMs] → word wordStart0 + 1 = the Tanzil token index of
+  `common.lesson_ayah`, basmalah heading removed), the URL by `build_surah.everyayah_url`. The
+  browser seeks to `start` and stops at `end` (`src/hooks/useClipPlayer.ts`), the way the lesson
+  plays one word; nothing is downloaded here or stored on our server. `data_versions.quran_align`
+  pins the member.
+- **Checks** (`validate_clips.py`, the same as the build's): every wanted example has a clip and
+  no clip is unwanted, mushaf order; the url is the reciter's file of that ayah; integers,
+  0 ≤ start < end; 150 ms–4 s a word, up to 7 s for a lesson ayah's last word (the imam holds the
+  madd at the pause: ad-ḍāllīna, 1:7:9, is 5,680 ms; "last" is read from `common.SURAHS`, so the
+  rule is the same with and without the corpus; another ayah's word keeps the 4 s cap); a lesson
+  ayah's clip equals the lesson's own Alafasy timing of that word and that lesson word is the one
+  the page shows. With the cache: a fresh build equals the file, quran-align's single-word
+  segments cover the ayah's Tanzil tokens exactly once, no segment joins a clip word to another,
+  and the Tanzil token(s) at the clip's index are the bytes the page shows. A non-zero quran-align
+  matcher statistic is a warning: 4:69 (the tile أَنْعَمَ, 8,090–8,930 ms) has `insertions: 6,
+  transpositions: 1` — check it by ear.
+- **The app**: ConceptCard example rows, HarakatChart sign cards and WordParts tiles show the
+  example as before and add `ClipButton` ("▶ Dengarkan"), one `ClipPlayerProvider` per page; the
+  lesson's "Materi lengkap" shows concept cards compact (no examples), so it has none. vitest
+  (`src/lib/clips.test.ts`) checks that every concept, sign and diagram has an example with Arabic
+  and a clip; `scripts/ci/screenshots.mjs` (`clipChecks`) that nothing is fetched before a press, a
+  press fetches that ayah's file and a second press stops the first.
 
 ## Narasi (guided-lesson narration)
 

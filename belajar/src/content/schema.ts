@@ -388,6 +388,21 @@ export const Root = z.object({
 });
 export type Root = z.infer<typeof Root>;
 
+/**
+ * The imam's voice of one example a static page shows (operator 2026-10-12: "each explanation
+ * should be followed by examples (visual + voice)"): Mishary Alafasy's recording of the ayah,
+ * streamed from EveryAyah (never stored here), and the word's place in it, [start, end) in ms,
+ * from the pinned quran-align timings the lessons use. The browser seeks to `start` and stops at
+ * `end` (src/components/library/ClipButton.tsx). Built by pipeline/build_library.py (clips.py),
+ * checked by pipeline/validate_clips.py.
+ */
+export const Clip = z.object({
+  url: z.string().url().regex(/^https:\/\/everyayah\.com\/data\/Alafasy_128kbps\/\d{6}\.mp3$/),
+  start: z.number().int().nonnegative(),
+  end: z.number().int().positive(),
+});
+export type Clip = z.infer<typeof Clip>;
+
 export const Library = z.object({
   concepts: z.array(Concept),
   lexicon: z.array(Lexeme),
@@ -402,6 +417,10 @@ export const Library = z.object({
   quran: z.record(z.string(), z.string()).default({}),
   /** QAC 0.4 segments of each lesson word a part names; joined they are the word. */
   segments: z.record(z.string(), z.array(z.string().min(1))).default({}),
+  /** The imam's voice of every example the static pages show, keyed by the word's location
+   *  ("55:78:2"; a run "112:1:2-4"): concept examples, each Harakat sign's word, each parts
+   *  diagram's word and its whole-word tiles (src/lib/clips.ts clipKey). */
+  clips: z.record(z.string().regex(/^\d{1,3}:\d{1,3}:\d{1,3}(?:-\d{1,3})?$/), Clip).default({}),
   data_versions: z.record(z.string(), z.string()),
 });
 export type Library = z.infer<typeof Library>;

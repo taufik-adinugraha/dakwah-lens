@@ -816,6 +816,127 @@ async function konsepChecks(page, vp) {
 }
 
 /**
+ * The imam's voice beside every example (operator 2026-10-12: "in explanation … provide example +
+ * additional voice … each explanation should be followed by examples (visual + voice)"; "not only
+ * for harakah, but also for all rules"), on a concept page (idhafah: its example rows) and the
+ * Harakat page (its sign cards), in the real browser:
+ *   1. every example row / sign card shown carries a voice button ([data-clip]: a real <button>,
+ *      at least 48px tall, its aria-label naming the word, idle), each naming an example of
+ *      content/library.json `clips`; the page asks the reciters' host for nothing while it loads
+ *      and sits there;
+ *   2. pressing one (the longest clip, so it still plays at step 3) asks EveryAyah for that
+ *      example's ayah file and no other, and the button says it plays (data-state "playing");
+ *   3. pressing a second example's button, of another ayah, while the first plays: the first is
+ *      back to idle at once (the page's one element left it), the second plays and its file is
+ *      asked for, and nothing else;
+ *   4. the second stops by itself at its word's end (idle again, never "failed").
+ * The reciters' host is reached through the real CDN and only observed (watchRecitations); every
+ * page call is a locator / page.evaluate (never waitForFunction: the CSP refuses its eval). Fails
+ * the job otherwise.
+ */
+async function clipChecks(page, vp) {
+  const lib = JSON.parse(await readFile(path.join(BELAJAR_DIR, "content", "library.json"), "utf8"));
+  const msgs = JSON.parse(await readFile(path.join(BELAJAR_DIR, "messages", "id.json"), "utf8"));
+  const idhafah = lib.concepts.find((c) => c.id === "idhafah");
+  const signs = lib.basics.flatMap((b) => b.signs);
+  if (!idhafah || !signs.length || !lib.clips) throw new Error("content/library.json has no idhafah, no Harakat signs or no clips");
+  // [page, how many voice buttons it shows outside a closed disclosure (at least), what they are]
+  const pages = [
+    ["/belajar/id/konsep/idhafah", Math.min(6, idhafah.examples.length), "example rows"],
+    ["/belajar/id/konsep/harakat", signs.length, "sign cards"],
+  ];
+  const buttons = page.locator("main button[data-clip]");
+  for (const [urlPath, atLeast, what] of pages) {
+    const watch = watchRecitations(page, new Set(["everyayah.com"]));
+    const fail = (m) => {
+      throw new Error(`${vp} ${urlPath}: example voices — ${m}`);
+    };
+    try {
+      await page.goto(BASE + urlPath, { waitUntil: "networkidle" });
+      await page.evaluate(() => document.fonts.ready);
+      await page.waitForTimeout(600);
+      // 1. The buttons as drawn, before any press.
+      const all = await buttons.evaluateAll((els) =>
+        els.map((el, i) => {
+          const r = el.getBoundingClientRect();
+          return {
+            i,
+            loc: el.getAttribute("data-clip"),
+            tag: el.tagName,
+            type: el.getAttribute("type"),
+            label: el.getAttribute("aria-label") ?? "",
+            state: el.getAttribute("data-state"),
+            height: r.height,
+            visible: r.width > 0 && r.height > 0 && !el.closest("details:not([open])"),
+          };
+        }),
+      );
+      const shown = all.filter((b) => b.visible);
+      if (shown.length < atLeast) fail(`${shown.length} voice buttons shown, expected at least ${atLeast} (${what})`);
+      for (const b of shown) {
+        if (!lib.clips[b.loc]) fail(`button ${b.i} names ${b.loc}, which has no clip in content/library.json`);
+        if (b.tag !== "BUTTON" || b.type !== "button") fail(`${b.loc}: not a <button type="button">`);
+        if (b.height < 47.5) fail(`${b.loc}: ${b.height}px tall (< 48px)`);
+        const prefix = msgs.Clip.play_label.replace("{word}", "");
+        if (!b.label.startsWith(prefix) || b.label.length <= prefix.length) fail(`${b.loc}: aria-label “${b.label}” does not name its word`);
+        if (b.state !== "idle") fail(`${b.loc} says "${b.state}" before any press`);
+      }
+      if (watch.seen.length) fail(`the reciters' host was asked before a press: ${watch.list()}`);
+      await page.screenshot({ path: `shots/${vp}-suara-contoh-${urlPath.split("/").pop()}.png`, fullPage: true });
+
+      // 2. The longest clip first, then one of another ayah's file.
+      const ms = (b) => lib.clips[b.loc].end - lib.clips[b.loc].start;
+      const first = [...shown].sort((x, y) => ms(y) - ms(x))[0];
+      const second = shown.find((b) => lib.clips[b.loc].url !== lib.clips[first.loc].url);
+      if (!second) fail("no two examples of different ayat to press");
+      const fileA = lib.clips[first.loc].url;
+      const fileB = lib.clips[second.loc].url;
+      const btnA = buttons.nth(first.i);
+      const btnB = buttons.nth(second.i);
+      await btnA.click();
+      if (!(await until(page, async () => watch.requested(fileA) > 0, 15_000))) {
+        fail(`pressing ${first.loc} did not ask for ${recordingName(fileA)} (asked: ${watch.list()})`);
+      }
+      const stateA = await btnA.getAttribute("data-state");
+      if (stateA !== "playing") fail(`after its press ${first.loc} says "${stateA}", not "playing" (${recordingName(fileA)} → ${watch.answered.get(fileA) ?? "no answer yet"})`);
+      if (watch.seen.some((u) => u !== fileA)) fail(`the press asked for other files too: ${watch.list()}`);
+
+      // 3. A second press, on another example, stops the first.
+      await btnB.click();
+      const states = async () => [await btnA.getAttribute("data-state"), await btnB.getAttribute("data-state")];
+      await until(page, async () => (await states()).join() === "idle,playing", 2_000);
+      const [aAfter, bAfter] = await states();
+      if (aAfter !== "idle") fail(`after pressing ${second.loc}, ${first.loc} still says "${aAfter}" (two voices at once)`);
+      if (bAfter !== "playing") fail(`after its press ${second.loc} says "${bAfter}", not "playing"`);
+      if (!(await until(page, async () => watch.requested(fileB) > 0, 15_000))) {
+        fail(`pressing ${second.loc} did not ask for ${recordingName(fileB)} (asked: ${watch.list()})`);
+      }
+      const others = watch.seen.filter((u) => u !== fileA && u !== fileB);
+      if (others.length) fail(`the presses asked for other files too: ${others.join(", ")}`);
+      const playingNow = await buttons.evaluateAll((els) => els.filter((el) => el.getAttribute("data-state") === "playing").length);
+      if (playingNow > 1) fail(`${playingNow} buttons say "playing" at once`);
+
+      // 4. It stops by itself at its word's end.
+      const ended = await until(page, async () => (await btnB.getAttribute("data-state")) !== "playing", 15_000 + ms(second));
+      const endState = await btnB.getAttribute("data-state");
+      if (!ended || endState !== "idle") {
+        fail(`${second.loc} did not end by itself at its word's end (says "${endState}"; ${recordingName(fileB)} → ${watch.answered.get(fileB) ?? "no answer yet"})`);
+      }
+      console.log(
+        `  ${vp}: example voices ok on ${urlPath} (${shown.length} buttons, none asked before a press; ${first.loc} → ${recordingName(fileA)} ` +
+          `${watch.answered.get(fileA) ?? "?"}, stopped by ${second.loc} → ${recordingName(fileB)} ${watch.answered.get(fileB) ?? "?"}, which ended by itself)`,
+      );
+    } catch (err) {
+      await page.screenshot({ path: `shots/${vp}-suara-contoh-FAILED.png` }).catch(() => {});
+      throw err;
+    } finally {
+      watch.stop();
+    }
+  }
+  await page.goto("about:blank");
+}
+
+/**
  * What a learner must see while the narrator explains a word, checked on the real page in the
  * viewport (not the screenshot's stage crop): the whole caption on screen and above the controls,
  * and the word card fully on screen, not under the bottom panel. The 2026-10-10 phone shot had the
@@ -1862,6 +1983,7 @@ try {
       console.log(`shot ${vp}-${name} (${href})`);
     }
     await konsepChecks(page, vp);
+    await clipChecks(page, vp);
     await menuShots(page, vp);
     await headerShots(page, vp);
     await footerCheck(page, vp);

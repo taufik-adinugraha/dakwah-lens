@@ -1,15 +1,17 @@
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import type { Concept } from "@/content/schema";
+import type { Clip, Concept } from "@/content/schema";
 import { Link } from "@/i18n/navigation";
+import { clipFor } from "@/lib/clips";
 import { WORD_INFO } from "@/lib/content";
 import { surahPublished } from "@/lib/features";
 import { glossSlot } from "@/lib/emphasis";
-import { getBasic, parseLoc, partsFor, TERMS } from "@/lib/library";
+import { getBasic, LIBRARY, parseLoc, partsFor, TERMS } from "@/lib/library";
 import { ayahHref, conceptHref } from "@/lib/routes";
 import { annotate, noteWithoutWord, type PartsChange, prepareParts, Scope, soundsOf, titleParts, type Token } from "@/lib/terms";
 
+import { ClipButton, ClipPlayerProvider } from "./ClipButton";
 import { MixedText } from "./MixedText";
 import { SourcesDisclosure } from "./SourceList";
 import { Headword, HARAKAT_PAGE, TermText } from "./TermText";
@@ -41,6 +43,12 @@ const plain = (text: string): Token[] => [{ kind: "text", text }];
  * headword under it (operator 2026-10-10). Example rows show the word as the ayah writes it, its
  * transliteration and "yang artinya …", all from the lesson content (WORD_INFO), then the note.
  * No per-card AI chip (narration rule 12: the page footer carries the label).
+ *
+ * Every example is followed by its voice (operator 2026-10-12: "each explanation should be followed
+ * by examples (visual + voice)", "not only for harakah, but also for all rules"): an example row's
+ * "▶ Dengarkan" plays the imam reciting that very word, and a parts diagram voices its bentuk dasar
+ * and the joined word (WordParts); library.json `clips`, one player for the card
+ * (ClipPlayerProvider), nothing fetched before a press. `compact` shows no example, so no player.
  */
 export function ConceptCard({
   concept,
@@ -64,6 +72,7 @@ export function ConceptCard({
   scope?: Scope;
 }) {
   const t = useTranslations("Concept");
+  const tc = useTranslations("Clip");
   const sc = scope ?? new Scope();
   const mk = concept.marked;
   // Annotated in reading order, so "first use" is the first one the reader meets.
@@ -89,7 +98,7 @@ export function ConceptCard({
         sc.shown.add(`q:${ex.loc}`); // the row shows the word in Arabic itself
         const raw = mk?.notes[i] ?? ex.note;
         const note = mk ? annotate(info ? noteWithoutWord(raw, info.translit) : raw, sc, TERMS) : plain(ex.note);
-        return [{ ex, s, ayah, word, info, ar, note }];
+        return [{ ex, s, ayah, word, info, ar, note, clip: clipFor(LIBRARY.clips, ex.loc) }];
       });
 
   const partsLabels = {
@@ -108,7 +117,7 @@ export function ConceptCard({
   const Title = page ? "h1" : "h3";
   const kind = concept.kind === "nahwu" ? labels.nahwu : labels.sharaf;
 
-  return (
+  const card = (
     <article
       className={
         // Compact, in a lesson's "Pelajari lebih dalam" row (a @container): narrow padding while
@@ -148,7 +157,7 @@ export function ConceptCard({
           </h2>
           <div className="mt-3 space-y-5">
             {parts.slice(0, PARTS_SHOWN).map((p) => (
-              <WordParts key={p.loc} data={p} labels={partsLabels} />
+              <WordParts key={p.loc} data={p} labels={partsLabels} clips={LIBRARY.clips} />
             ))}
           </div>
           {parts.length > PARTS_SHOWN && (
@@ -159,7 +168,7 @@ export function ConceptCard({
               </summary>
               <div className="space-y-5 pb-2">
                 {parts.slice(PARTS_SHOWN).map((p) => (
-                  <WordParts key={p.loc} data={p} labels={partsLabels} />
+                  <WordParts key={p.loc} data={p} labels={partsLabels} clips={LIBRARY.clips} />
                 ))}
               </div>
             </details>
@@ -199,6 +208,12 @@ export function ConceptCard({
         </section>
       )}
 
+      {examples.length > 0 || parts.length > 0 ? (
+        <p className="mt-4 text-xs text-ink-soft">
+          <MixedText text={tc("credit")} />
+        </p>
+      ) : null}
+
       <div className="mt-auto pt-3">
         {compact ? (
           <Link href={conceptHref(concept.id)} className="chip-link">
@@ -211,6 +226,8 @@ export function ConceptCard({
       </div>
     </article>
   );
+  // One player for the card's example voices (a page shows one concept card in full).
+  return compact ? card : <ClipPlayerProvider>{card}</ClipPlayerProvider>;
 }
 
 function ExampleRow({
@@ -225,6 +242,7 @@ function ExampleRow({
     info?: { translit: string; gloss: string };
     ar?: string;
     note: Token[];
+    clip: Clip | null;
   };
   meaning: string;
   locLabel: string;
@@ -250,6 +268,9 @@ function ExampleRow({
             />
           </span>
         ) : null}
+        {/* The imam's voice of this word, beside it (a flex item: it moves under the word when
+            the line is full, never into it). */}
+        {row.clip && info ? <ClipButton loc={row.ex.loc} clip={row.clip} word={info.translit} className="self-center" /> : null}
       </p>
       <p className="mt-1 max-w-prose text-pretty text-base text-ink">
         <TermText tokens={row.note} emphasis />

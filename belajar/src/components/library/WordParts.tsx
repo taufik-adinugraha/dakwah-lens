@@ -1,8 +1,10 @@
 import { ArrowDown, ArrowRight, Plus } from "lucide-react";
 import { Fragment, type ReactNode } from "react";
 
+import { type Clip, clipFor, clipKey } from "@/lib/clips";
 import { letters, type PartsChange, type PreparedParts } from "@/lib/terms";
 
+import { ClipButton } from "./ClipButton";
 import { MarkCircle } from "./MarkCircle";
 import { MixedText } from "./MixedText";
 import { TermText } from "./TermText";
@@ -28,8 +30,24 @@ export type WordPartsLabels = {
  * is an alif or the lam right after al-'s alif, so cutting them out of the tile changes no other
  * letter's shape. Each change is named by where it is, shown on dotted circles with its names and
  * sounds, then the steps (which give each part's meaning with "yang artinya").
+ *
+ * The imam's voice (operator 2026-10-12: "ismu (read by voice + show visual) when combined with
+ * harf jar, it becomes ismi (read by voice + visual)"): a tile that is a whole word — the part's
+ * bentuk dasar as an ayah writes it, ٱسْمُ of QS 55:78 — carries "▶ Dengarkan" with that word's
+ * recitation, and so does the joined word (بِسْمِ, the ayah's own); a part that is only a piece of
+ * a word (bi-, -hum) has none, since no imam recites it alone (pipeline/clips.py). `clips`:
+ * library.json's (src/lib/clips.ts), played by the page's ClipPlayerProvider.
  */
-export function WordParts({ data, labels }: { data: PreparedParts; labels: WordPartsLabels }) {
+export function WordParts({
+  data,
+  labels,
+  clips = {},
+}: {
+  data: PreparedParts;
+  labels: WordPartsLabels;
+  clips?: Readonly<Record<string, Clip>>;
+}) {
+  const wordClip = clipFor(clips, data.loc);
   return (
     <figure className="rounded-2xl border-[1.5px] border-teal-line bg-paper p-4 sm:p-6">
       <div role="group" aria-label={labels.parts} className="flex flex-col items-center gap-2">
@@ -37,14 +55,25 @@ export function WordParts({ data, labels }: { data: PreparedParts; labels: WordP
           {data.tiles.map((t, i) => (
             <Fragment key={i}>
               {i > 0 ? <Plus aria-hidden className="h-6 w-6 shrink-0 text-ink-soft" /> : null}
-              <Tile ar={t.ar} dropped={t.dropped} translit={t.translit} notWritten={labels.notWritten}>
+              <Tile
+                ar={t.ar}
+                dropped={t.dropped}
+                translit={t.translit}
+                notWritten={labels.notWritten}
+                voice={voiceOf(clips, t.q, t.translit)}
+              >
                 <TermText tokens={t.label} links={false} />
               </Tile>
             </Fragment>
           ))}
         </div>
         <ArrowDown aria-hidden className="h-7 w-7 shrink-0 text-forest" />
-        <Tile ar={data.word.ar} translit={data.word.translit} result />
+        <Tile
+          ar={data.word.ar}
+          translit={data.word.translit}
+          result
+          voice={wordClip ? <ClipButton loc={data.loc} clip={wordClip} word={data.word.translit} className="justify-center" /> : null}
+        />
       </div>
       <p className="mt-3 text-center text-base text-ink-muted">
         <span className="whitespace-nowrap">{data.tiles.map((t) => t.translit).join(" + ")}</span>{" "}
@@ -81,12 +110,20 @@ export function WordParts({ data, labels }: { data: PreparedParts; labels: WordP
   );
 }
 
+/** The voice of a tile: its clip's button, or null for a part of a word (no clip). */
+function voiceOf(clips: Readonly<Record<string, Clip>>, q: string, translit: string): ReactNode {
+  const key = clipKey(q);
+  const clip = key ? clipFor(clips, key) : null;
+  return clip && key ? <ClipButton loc={key} clip={clip} word={translit} className="justify-center" /> : null;
+}
+
 function Tile({
   ar,
   dropped = [],
   translit,
   result = false,
   notWritten,
+  voice = null,
   children,
 }: {
   ar: string;
@@ -94,6 +131,8 @@ function Tile({
   translit: string;
   result?: boolean;
   notWritten?: string;
+  /** The imam's voice of the tile's word (ClipButton), under it. */
+  voice?: ReactNode;
   children?: ReactNode;
 }) {
   const ls = letters(ar);
@@ -120,6 +159,7 @@ function Tile({
       <span className="text-base font-semibold text-ink">{translit}</span>
       {children ? <span className="text-sm text-ink-muted">{children}</span> : null}
       {dropped.length && notWritten ? <span className="sr-only">{notWritten}</span> : null}
+      {voice ? <span className="mt-2 mb-1 flex max-w-full justify-center">{voice}</span> : null}
     </div>
   );
 }
@@ -133,7 +173,11 @@ function Tile({
 function ChangeMark({ c, side }: { c: PartsChange; side: "from" | "to" }) {
   const mark = side === "from" ? c.from : c.to;
   const term = side === "from" ? c.fromTerm : c.toTerm;
-  const sound = side === "from" ? c.fromSound : c.toSound;
+  // The sign on the circle IS the vowel: no Latin "a", "i", "u" after it (operator 2026-10-12:
+  // "better not use 'a', 'i', 'u', but use harakat symbols"). A sound said in words stays, e.g.
+  // sukun's "mati, tanpa vokal".
+  const said = side === "from" ? c.fromSound : c.toSound;
+  const sound = said && said.length > 3 ? said : "";
   const name = side === "from" ? c.fromName : c.toName;
   const head = [c.kind === "letter" && name ? name : "", term ? `${term.latin}${term.ar ? ` (${term.ar})` : ""}` : ""]
     .filter(Boolean)

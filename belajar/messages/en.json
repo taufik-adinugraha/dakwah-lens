@@ -254,6 +254,14 @@
     "sign_example": "Example",
     "sign_from": "from"
   },
+  "Clip": {
+    "play": "Listen",
+    "play_label": "Listen to the imam's recitation: {word}",
+    "stop": "Stop",
+    "stop_label": "Stop the imam's recitation: {word}",
+    "retry_label": "Try again, the imam's recitation: {word}",
+    "credit": "Example voices: recitation by Mishary Rashid Alafasy, streamed from EveryAyah.com; word timings: quran-align (Collin Fair, CC BY 4.0)."
+  },
   "Lexeme": {
     "eyebrow": "Vocabulary",
     "pos": "Word class",

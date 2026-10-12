@@ -12343,6 +12343,448 @@
       "جِنَّةِ"
     ]
   },
+  "clips": {
+    "1:1:1": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001001.mp3",
+      "start": 60,
+      "end": 610
+    },
+    "1:1:2": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001001.mp3",
+      "start": 620,
+      "end": 1310
+    },
+    "1:1:3": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001001.mp3",
+      "start": 1320,
+      "end": 2450
+    },
+    "1:1:4": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001001.mp3",
+      "start": 2460,
+      "end": 5970
+    },
+    "1:2:1": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001002.mp3",
+      "start": 80,
+      "end": 960
+    },
+    "1:2:2": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001002.mp3",
+      "start": 970,
+      "end": 1800
+    },
+    "1:2:3": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001002.mp3",
+      "start": 1810,
+      "end": 2460
+    },
+    "1:2:4": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001002.mp3",
+      "start": 2470,
+      "end": 5140
+    },
+    "1:3:1": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001003.mp3",
+      "start": 40,
+      "end": 1230
+    },
+    "1:3:2": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001003.mp3",
+      "start": 1240,
+      "end": 4160
+    },
+    "1:4:1": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001004.mp3",
+      "start": 60,
+      "end": 840
+    },
+    "1:4:2": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001004.mp3",
+      "start": 850,
+      "end": 1400
+    },
+    "1:4:3": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001004.mp3",
+      "start": 1410,
+      "end": 4280
+    },
+    "1:5:1": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001005.mp3",
+      "start": 30,
+      "end": 970
+    },
+    "1:5:2": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001005.mp3",
+      "start": 980,
+      "end": 1710
+    },
+    "1:5:3": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001005.mp3",
+      "start": 1720,
+      "end": 2870
+    },
+    "1:5:4": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001005.mp3",
+      "start": 2880,
+      "end": 6290
+    },
+    "1:6:1": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001006.mp3",
+      "start": 30,
+      "end": 670
+    },
+    "1:6:2": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001006.mp3",
+      "start": 680,
+      "end": 1630
+    },
+    "1:6:3": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001006.mp3",
+      "start": 1640,
+      "end": 5120
+    },
+    "1:7:1": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001007.mp3",
+      "start": 30,
+      "end": 740
+    },
+    "1:7:2": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001007.mp3",
+      "start": 750,
+      "end": 1700
+    },
+    "1:7:3": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001007.mp3",
+      "start": 1710,
+      "end": 2620
+    },
+    "1:7:4": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001007.mp3",
+      "start": 2630,
+      "end": 3590
+    },
+    "1:7:5": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001007.mp3",
+      "start": 3600,
+      "end": 4210
+    },
+    "1:7:6": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001007.mp3",
+      "start": 4220,
+      "end": 5290
+    },
+    "1:7:7": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001007.mp3",
+      "start": 5300,
+      "end": 6320
+    },
+    "1:7:8": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001007.mp3",
+      "start": 6330,
+      "end": 6630
+    },
+    "1:7:9": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/001007.mp3",
+      "start": 6640,
+      "end": 12320
+    },
+    "2:5:2": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/002005.mp3",
+      "start": 2500,
+      "end": 3030
+    },
+    "4:69:8": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/004069.mp3",
+      "start": 8090,
+      "end": 8930
+    },
+    "26:24:2": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/026024.mp3",
+      "start": 640,
+      "end": 1290
+    },
+    "55:78:2": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/055078.mp3",
+      "start": 1060,
+      "end": 1490
+    },
+    "112:1:1": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/112001.mp3",
+      "start": 30,
+      "end": 390
+    },
+    "112:1:2": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/112001.mp3",
+      "start": 400,
+      "end": 790
+    },
+    "112:1:3": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/112001.mp3",
+      "start": 800,
+      "end": 1640
+    },
+    "112:1:4": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/112001.mp3",
+      "start": 1650,
+      "end": 2300
+    },
+    "112:2:1": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/112002.mp3",
+      "start": 40,
+      "end": 980
+    },
+    "112:2:2": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/112002.mp3",
+      "start": 990,
+      "end": 1850
+    },
+    "112:3:1": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/112003.mp3",
+      "start": 60,
+      "end": 390
+    },
+    "112:3:2": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/112003.mp3",
+      "start": 400,
+      "end": 1000
+    },
+    "112:3:3": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/112003.mp3",
+      "start": 1010,
+      "end": 1720
+    },
+    "112:3:4": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/112003.mp3",
+      "start": 1730,
+      "end": 2490
+    },
+    "112:4:1": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/112004.mp3",
+      "start": 30,
+      "end": 650
+    },
+    "112:4:2": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/112004.mp3",
+      "start": 660,
+      "end": 1130
+    },
+    "112:4:3": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/112004.mp3",
+      "start": 1140,
+      "end": 2040
+    },
+    "112:4:4": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/112004.mp3",
+      "start": 2050,
+      "end": 2950
+    },
+    "112:4:5": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/112004.mp3",
+      "start": 2960,
+      "end": 3570
+    },
+    "113:1:1": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/113001.mp3",
+      "start": 30,
+      "end": 340
+    },
+    "113:1:2": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/113001.mp3",
+      "start": 350,
+      "end": 1200
+    },
+    "113:1:3": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/113001.mp3",
+      "start": 1210,
+      "end": 2080
+    },
+    "113:1:4": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/113001.mp3",
+      "start": 2090,
+      "end": 2870
+    },
+    "113:2:1": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/113002.mp3",
+      "start": 30,
+      "end": 1300
+    },
+    "113:2:2": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/113002.mp3",
+      "start": 1310,
+      "end": 2020
+    },
+    "113:2:3": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/113002.mp3",
+      "start": 2030,
+      "end": 2370
+    },
+    "113:2:4": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/113002.mp3",
+      "start": 2380,
+      "end": 3060
+    },
+    "113:3:1": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/113003.mp3",
+      "start": 30,
+      "end": 1410
+    },
+    "113:3:3": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/113003.mp3",
+      "start": 2110,
+      "end": 3190
+    },
+    "113:3:4": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/113003.mp3",
+      "start": 3200,
+      "end": 3820
+    },
+    "113:3:5": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/113003.mp3",
+      "start": 3830,
+      "end": 4470
+    },
+    "113:4:1": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/113004.mp3",
+      "start": 30,
+      "end": 1400
+    },
+    "113:4:3": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/113004.mp3",
+      "start": 2150,
+      "end": 4360
+    },
+    "113:4:4": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/113004.mp3",
+      "start": 4370,
+      "end": 4590
+    },
+    "113:4:5": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/113004.mp3",
+      "start": 4600,
+      "end": 5460
+    },
+    "113:5:1": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/113005.mp3",
+      "start": 30,
+      "end": 1270
+    },
+    "113:5:3": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/113005.mp3",
+      "start": 1930,
+      "end": 3070
+    },
+    "113:5:4": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/113005.mp3",
+      "start": 3080,
+      "end": 3640
+    },
+    "113:5:5": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/113005.mp3",
+      "start": 3650,
+      "end": 4330
+    },
+    "114:1:1": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/114001.mp3",
+      "start": 30,
+      "end": 330
+    },
+    "114:1:2": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/114001.mp3",
+      "start": 340,
+      "end": 1150
+    },
+    "114:1:3": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/114001.mp3",
+      "start": 1160,
+      "end": 2050
+    },
+    "114:1:4": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/114001.mp3",
+      "start": 2060,
+      "end": 5830
+    },
+    "114:2:1": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/114002.mp3",
+      "start": 30,
+      "end": 610
+    },
+    "114:2:2": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/114002.mp3",
+      "start": 620,
+      "end": 4900
+    },
+    "114:3:1": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/114003.mp3",
+      "start": 30,
+      "end": 840
+    },
+    "114:3:2": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/114003.mp3",
+      "start": 850,
+      "end": 4990
+    },
+    "114:4:1": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/114004.mp3",
+      "start": 70,
+      "end": 1380
+    },
+    "114:4:2": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/114004.mp3",
+      "start": 1390,
+      "end": 2070
+    },
+    "114:4:3": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/114004.mp3",
+      "start": 2080,
+      "end": 3340
+    },
+    "114:4:4": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/114004.mp3",
+      "start": 3350,
+      "end": 7510
+    },
+    "114:5:1": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/114005.mp3",
+      "start": 30,
+      "end": 1060
+    },
+    "114:5:2": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/114005.mp3",
+      "start": 1070,
+      "end": 2080
+    },
+    "114:5:3": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/114005.mp3",
+      "start": 2090,
+      "end": 2460
+    },
+    "114:5:4": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/114005.mp3",
+      "start": 2470,
+      "end": 3460
+    },
+    "114:5:5": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/114005.mp3",
+      "start": 3470,
+      "end": 7790
+    },
+    "114:6:1": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/114006.mp3",
+      "start": 100,
+      "end": 380
+    },
+    "114:6:2": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/114006.mp3",
+      "start": 390,
+      "end": 2580
+    },
+    "114:6:3": {
+      "url": "https://everyayah.com/data/Alafasy_128kbps/114006.mp3",
+      "start": 2590,
+      "end": 7120
+    }
+  },
   "data_versions": {
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
     "tanzil": "uthmani-1.1 sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8 (only to byte-check «…» quotations in prose)",
@@ -12352,6 +12794,7 @@
     "shamela_istilah": "121 Shamela pages pinned by text sha256 (sources.json shamela_istilah)",
     "authored_basics": "authored/library.basics.json sha256:bed21eae0e64526878bd69e88af294d75990ef260f7e527d7713031398545774",
     "authored_parts": "authored/library.parts.json sha256:f4dfdd718b03bd1a33ef7d30a4fa306c72a2f2f3ac65a6837f32653fadb2432d",
+    "quran_align": "release-2016-11-24 Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7 (clips: Konsep example voices)",
     "pipeline": "belajar/pipeline/build_library.py (stdlib only, no LLM)"
   }
 }

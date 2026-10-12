@@ -254,6 +254,14 @@
     "sign_example": "Contoh",
     "sign_from": "dari"
   },
+  "Clip": {
+    "play": "Dengarkan",
+    "play_label": "Dengarkan bacaan imam: {word}",
+    "stop": "Hentikan",
+    "stop_label": "Hentikan bacaan imam: {word}",
+    "retry_label": "Coba lagi, bacaan imam: {word}",
+    "credit": "Suara contoh: bacaan Mishary Rasyid Alafasy, diputar langsung dari EveryAyah.com; penanda waktu kata: quran-align (Collin Fair, CC BY 4.0)."
+  },
   "Lexeme": {
     "eyebrow": "Kosakata",
     "pos": "Jenis kata",

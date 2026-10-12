@@ -602,8 +602,9 @@ export type PartsChange = {
 export type PreparedParts = {
   loc: string;
   word: { ar: string; translit: string; gloss: string };
-  /** `dropped`: 1-based letters of the tile the word does not write (shown faded). */
-  tiles: { ar: string; dropped: number[]; translit: string; label: Token[]; gloss: string }[];
+  /** `dropped`: 1-based letters of the tile the word does not write (shown faded). `q`: the
+   *  tile's q-ref (its clip, src/lib/clips.ts: a whole word has the imam's voice, a part none). */
+  tiles: { q: string; ar: string; dropped: number[]; translit: string; label: Token[]; gloss: string }[];
   changes: PartsChange[];
   steps: Token[][];
 };
@@ -633,6 +634,7 @@ export function prepareParts(
     return ar;
   });
   const tiles = part.tiles.map((t, i) => ({
+    q: t.q,
     ar: bytes[i],
     dropped: part.drops.filter((d) => d.tile === i + 1).map((d) => d.letter),
     translit: t.translit,

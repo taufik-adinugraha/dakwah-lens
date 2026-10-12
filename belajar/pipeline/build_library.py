@@ -12,7 +12,11 @@ Inputs (pinned in sources.json and verified by sha256 before use):
   carries inline markup (terms.py: [[majrur]], [[bismi|q:1:1:1]], …): every field is checked,
   stripped into the plain field (narration and metadata read those) and shipped marked beside it,
   and every Qur'anic ref's bytes go to `quran` from Tanzil and QAC (operator 2026-10-10: terms
-  and words in Arabic, never retyped).
+  and words in Arabic, never retyped). quran-align's Alafasy_128kbps member gives `clips`: the
+  imam's voice of every example the static pages show (a concept example, a Harakat sign's word, a
+  parts diagram's word and its whole-word tiles), as {url, start, end} into that ayah's streamed
+  EveryAyah file (operator 2026-10-12: "each explanation should be followed by examples (visual +
+  voice)"; clips.py, checked by validate_clips.py).
 
 Covered surahs: every surah registered in common.SURAHS whose authored/<slug>.words.json exists,
 in mushaf order (`--only <slug> ...` narrows the set, e.g. to rebuild the Al-Fatihah-only file).
@@ -34,6 +38,7 @@ import urllib.parse
 from collections import Counter
 
 import build_surah
+import clips as C
 import terms as TM
 import validate as V
 from common import (ARABIC_RUN, CONTENT_DIR, PIPELINE, SCHEMA_TS, SURAH_BY_SLUG, authored_file, authored_surahs,
@@ -540,6 +545,18 @@ def main(only: list[str] | None = None) -> int:
             prose += [(f"{cw}.examples[{i}].note", x.get("note", "")) for i, x in enumerate(c.get("examples") or [])]
 
     prose += extra["prose"]
+    # ---- the imam's voice of every example the static pages show (operator 2026-10-12: "each
+    # explanation should be followed by examples (visual + voice)"; clips.py)
+    clips = {}
+    align, align_note = C.load_alignment(src)
+    if align is None:
+        err(align_note)
+    else:
+        clips, cerr, cwarn = C.build({"concepts": concepts, "basics": extra["basics"], "parts": extra["parts"]},
+                                     align, T)
+        for x in cerr:
+            err(x)
+        warnings.extend(cwarn)
     # ---- prose (lexicon, roots and concepts together, as the app shows them side by side): no
     # unquoted Arabic words, «…» quotes byte-exact in Tanzil, SKB transliteration
     for path, text in prose:
@@ -557,11 +574,12 @@ def main(only: list[str] | None = None) -> int:
         "authored_lexicon": f"authored/library.lexicon.json sha256:{sha256_file(LEXICON)}",
         "authored_concepts": concepts_ver,
         **extra["versions"],
+        C.DATA_VERSION: C.data_version(src),
         "pipeline": "belajar/pipeline/build_library.py (stdlib only, no LLM)",
     }
     out = {"concepts": concepts, "lexicon": lexicon, "roots": roots, "basics": extra["basics"],
            "terms": extra["terms"], "parts": extra["parts"], "quran": extra["quran"],
-           "segments": extra["segments"], "data_versions": data_versions}
+           "segments": extra["segments"], "clips": clips, "data_versions": data_versions}
 
     # ---- shape against schema.ts (keys, nesting, enums) + status
     schemas, enums = V.parse_schema(SCHEMA_TS.read_text(encoding="utf-8"))
@@ -855,7 +873,7 @@ def finish(out) -> int:
     n_src = sum(len(x["sources"]) for k in ("concepts", "lexicon", "roots") for x in out[k])
     print(f"wrote {OUT.relative_to(PIPELINE.parent.parent)}: {len(out['lexicon'])} lexemes "
           f"({n_t} with tashrif, {n_i} i'lal), {len(out['roots'])} roots, {len(out['concepts'])} concepts, "
-          f"{n_src} source refs; all draft.")
+          f"{n_src} source refs, {len(out['clips'])} example clips; all draft.")
     return 0
 
 
