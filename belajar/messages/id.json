@@ -260,6 +260,8 @@
     "stop": "Hentikan",
     "stop_label": "Hentikan bacaan imam: {word}",
     "retry_label": "Coba lagi, bacaan imam: {word}",
+    "waqf_note": "Di akhir ayat imam berhenti (waqaf), jadi harakat akhirnya tidak terdengar.",
+    "washal_note": "Di tengah bacaan, alif di awal kata ini tidak dibaca: bersama kata sebelumnya terdengar “{heard}”.",
     "credit": "Suara contoh: bacaan Mishary Rasyid Alafasy, diputar langsung dari EveryAyah.com; penanda waktu kata: quran-align (Collin Fair, CC BY 4.0)."
   },
   "Lexeme": {

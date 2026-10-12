@@ -7,11 +7,13 @@ import { clipFor } from "@/lib/clips";
 import { WORD_INFO } from "@/lib/content";
 import { surahPublished } from "@/lib/features";
 import { glossSlot } from "@/lib/emphasis";
+import { hasWaqfNote } from "@/lib/heard";
 import { getBasic, LIBRARY, parseLoc, partsFor, TERMS } from "@/lib/library";
 import { ayahHref, conceptHref } from "@/lib/routes";
 import { annotate, noteWithoutWord, type PartsChange, prepareParts, Scope, soundsOf, titleParts, type Token } from "@/lib/terms";
 
 import { ClipButton, ClipPlayerProvider } from "./ClipButton";
+import { ClipNote, clipNoteId } from "./ClipNote";
 import { MixedText } from "./MixedText";
 import { SourcesDisclosure } from "./SourceList";
 import { Headword, HARAKAT_PAGE, TermText } from "./TermText";
@@ -49,6 +51,12 @@ const plain = (text: string): Token[] => [{ kind: "text", text }];
  * "▶ Dengarkan" plays the imam reciting that very word, and a parts diagram voices its bentuk dasar
  * and the joined word (WordParts); library.json `clips`, one player for the card
  * (ClipPlayerProvider), nothing fetched before a press. `compact` shows no example, so no player.
+ *
+ * And each voice is labelled by what is HEARD (review 2026-10-12): an example row keeps its word
+ * (the lesson's own), but where that word ends its ayah the imam stops, so its final harakah or
+ * tanwin is not pronounced — nasta‘īnu, "marfu' dengan dhammah", is heard "nasta‘īn". Such a row
+ * says so under its word, in one line that is also the button's description (ClipNote; decided by
+ * library.json `clips[].last` and the word's ending, src/lib/heard.ts).
  */
 export function ConceptCard({
   concept,
@@ -98,12 +106,17 @@ export function ConceptCard({
         sc.shown.add(`q:${ex.loc}`); // the row shows the word in Arabic itself
         const raw = mk?.notes[i] ?? ex.note;
         const note = mk ? annotate(info ? noteWithoutWord(raw, info.translit) : raw, sc, TERMS) : plain(ex.note);
-        return [{ ex, s, ayah, word, info, ar, note, clip: clipFor(LIBRARY.clips, ex.loc) }];
+        const clip = clipFor(LIBRARY.clips, ex.loc);
+        // The imam stops on an ayah's last word: its final harakah is not heard there.
+        const waqfId = hasWaqfNote(clip, ar) ? clipNoteId(concept.id, ex.loc) : undefined;
+        return [{ ex, s, ayah, word, info, ar, note, clip, waqfId }];
       });
 
   const partsLabels = {
     parts: t("parts_heading"),
     notWritten: t("parts_not_written"),
+    waqf: tc("waqf_note"),
+    washal: (heard: string) => tc("washal_note", { heard }),
     change: (c: PartsChange) =>
       c.where === "end"
         ? t("parts_change_end", { part: c.part })
@@ -157,7 +170,7 @@ export function ConceptCard({
           </h2>
           <div className="mt-3 space-y-5">
             {parts.slice(0, PARTS_SHOWN).map((p) => (
-              <WordParts key={p.loc} data={p} labels={partsLabels} clips={LIBRARY.clips} />
+              <WordParts key={p.loc} data={p} labels={partsLabels} clips={LIBRARY.clips} scope={concept.id} />
             ))}
           </div>
           {parts.length > PARTS_SHOWN && (
@@ -168,7 +181,7 @@ export function ConceptCard({
               </summary>
               <div className="space-y-5 pb-2">
                 {parts.slice(PARTS_SHOWN).map((p) => (
-                  <WordParts key={p.loc} data={p} labels={partsLabels} clips={LIBRARY.clips} />
+                  <WordParts key={p.loc} data={p} labels={partsLabels} clips={LIBRARY.clips} scope={concept.id} />
                 ))}
               </div>
             </details>
@@ -189,7 +202,7 @@ export function ConceptCard({
           </h2>
           <ul className="mt-2">
             {examples.slice(0, EXAMPLES_SHOWN).map((r) => (
-              <ExampleRow key={r.ex.loc} row={r} meaning={t("meaning")} locLabel={t("example_loc", { surah: r.s.name, ayah: r.ayah, word: r.word })} />
+              <ExampleRow key={r.ex.loc} row={r} meaning={t("meaning")} waqf={tc("waqf_note")} locLabel={t("example_loc", { surah: r.s.name, ayah: r.ayah, word: r.word })} />
             ))}
           </ul>
           {examples.length > EXAMPLES_SHOWN && (
@@ -200,7 +213,7 @@ export function ConceptCard({
               </summary>
               <ul>
                 {examples.slice(EXAMPLES_SHOWN).map((r) => (
-                  <ExampleRow key={r.ex.loc} row={r} meaning={t("meaning")} locLabel={t("example_loc", { surah: r.s.name, ayah: r.ayah, word: r.word })} />
+                  <ExampleRow key={r.ex.loc} row={r} meaning={t("meaning")} waqf={tc("waqf_note")} locLabel={t("example_loc", { surah: r.s.name, ayah: r.ayah, word: r.word })} />
                 ))}
               </ul>
             </details>
@@ -233,6 +246,7 @@ export function ConceptCard({
 function ExampleRow({
   row,
   meaning,
+  waqf,
   locLabel,
 }: {
   row: {
@@ -243,8 +257,12 @@ function ExampleRow({
     ar?: string;
     note: Token[];
     clip: Clip | null;
+    /** Set when the word ends its ayah and the pause drops its final harakah (the note's id). */
+    waqfId?: string;
   };
   meaning: string;
+  /** "Di akhir ayat imam berhenti (waqaf), jadi harakat akhirnya tidak terdengar." */
+  waqf: string;
   locLabel: string;
 }) {
   const { s, info } = row;
@@ -270,8 +288,13 @@ function ExampleRow({
         ) : null}
         {/* The imam's voice of this word, beside it (a flex item: it moves under the word when
             the line is full, never into it). */}
-        {row.clip && info ? <ClipButton loc={row.ex.loc} clip={row.clip} word={info.translit} className="self-center" /> : null}
+        {row.clip && info ? (
+          <ClipButton loc={row.ex.loc} clip={row.clip} word={info.translit} noteId={row.waqfId} className="self-center" />
+        ) : null}
       </p>
+      {/* What is heard, right under the word and its button, before the grammar note that names
+          the ending ("marfu' dengan dhammah"): at an ayah's end that ending is not pronounced. */}
+      {row.clip && info && row.waqfId ? <ClipNote id={row.waqfId} kind="waqf" text={waqf} className="mt-1 max-w-prose text-base" /> : null}
       <p className="mt-1 max-w-prose text-pretty text-base text-ink">
         <TermText tokens={row.note} emphasis />
       </p>

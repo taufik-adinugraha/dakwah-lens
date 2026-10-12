@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 
 import { type AudioLoading, mediaLoading, type MediaEventType } from "@/lib/autoplay/loading";
-import { atClipEnd, type Clip, CLIP_IDLE, clipReducer, clipStartSeconds, needsSeek, pressAction } from "@/lib/clips";
+import { atClipEnd, type Clip, CLIP_IDLE, clipReducer, clipStartSeconds, endTimerMs, needsSeek, pressAction } from "@/lib/clips";
 
 import { useRecitationNotice } from "./useAyahRecitation";
 import { AUDIO_START_EVENT, isBlocked } from "./useSegmentPlayer";
@@ -16,8 +16,14 @@ const isAbort = (e: unknown) => e instanceof DOMException && e.name === "AbortEr
  * examples (visual + voice)"): ONE Audio element for the page (created after mount, never
  * rendered), which plays one example's clip — [start, end) of one word in an ayah's streamed
  * EveryAyah recording (src/lib/clips.ts) — and stops there, the way the lesson plays one word
- * (useSegmentPlayer.playWord: seek, play, stop at the word's end, checked every animation frame).
+ * (useSegmentPlayer.playWord: seek, play, stop at the word's end).
  *
+ * - The stop (review 2026-10-12): checked every animation frame, and once the end is within
+ *   END_TIMER_WINDOW_MS a timer is set for the predicted end itself, so the stop does not wait up
+ *   to a frame inside the next word. Whichever comes first stops the element only when its
+ *   currentTime has reached the end, never before. Frames do not run in a hidden tab, where the
+ *   rest of the ayah would play on: `timeupdate` (about four a second, hidden or not) is the
+ *   backstop, and a tab that becomes hidden stops the clip at once.
  * - Nothing reaches the reciter's host before a press: `preload` is "none" and the element has no
  *   `src` until a press sets it (privacy, mobile data). Nothing is cut or stored here.
  * - One clip at a time: pressing another example plays that one (the element moves to its file
@@ -44,28 +50,46 @@ export function useClipPlayer() {
     a.preload = "none";
     audioRef.current = a;
     let raf: number | null = null;
+    let timer: ReturnType<typeof setTimeout> | null = null;
     const halt = () => {
       if (raf !== null) cancelAnimationFrame(raf);
+      if (timer !== null) clearTimeout(timer);
       raf = null;
+      timer = null;
     };
     const load = (type: MediaEventType) => {
       const at = { kind: "recitation" as const, nowMs: Date.now(), ready: a.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA };
       setLoading((prev) => mediaLoading(prev, type, at));
     };
+    /** Stops the element once it has reached the clip's end. True when there is nothing more to
+     *  watch: it stopped now, or nothing plays. */
+    const stopAtEnd = (): boolean => {
+      const c = clipRef.current;
+      if (a.paused || !c) return true;
+      if (!atClipEnd(c, a.currentTime * 1000)) return false;
+      halt();
+      askedRef.current = false;
+      a.pause();
+      dispatch({ type: "end" });
+      return true;
+    };
+    /** Near the end: a timer for the predicted end itself (a frame may come up to 16.7 ms late).
+     *  It stops only at the real end, and waits again while the element has not reached it. */
+    const armEnd = () => {
+      const c = clipRef.current;
+      if (!c || timer !== null || a.paused) return;
+      const wait = endTimerMs(c, a.currentTime * 1000, a.playbackRate);
+      if (wait === null) return;
+      timer = setTimeout(() => {
+        timer = null;
+        if (!stopAtEnd()) armEnd();
+      }, wait);
+    };
     // Every frame (timeupdate fires only ~4×/s, too coarse for one word): stop at the clip's end.
     const loop = () => {
-      const c = clipRef.current;
-      if (a.paused || !c) {
-        raf = null;
-        return;
-      }
-      if (atClipEnd(c, a.currentTime * 1000)) {
-        raf = null;
-        askedRef.current = false;
-        a.pause();
-        dispatch({ type: "end" });
-        return;
-      }
+      raf = null;
+      if (stopAtEnd()) return;
+      armEnd();
       raf = requestAnimationFrame(loop);
     };
     const onPlay = () => {
@@ -79,6 +103,17 @@ export function useClipPlayer() {
     const onPause = () => {
       load("pause");
       halt();
+    };
+    // The backstop where no frame runs (a hidden tab, a throttled page): the element's own clock.
+    const onTimeUpdate = () => {
+      if (!stopAtEnd()) armEnd();
+    };
+    // A hidden tab never plays on: timers and frames are throttled there, the audio is not.
+    const onVisibility = () => {
+      if (!document.hidden || a.paused) return;
+      askedRef.current = false;
+      a.pause();
+      dispatch({ type: "interrupt" });
     };
     const onEnded = () => {
       askedRef.current = false;
@@ -111,6 +146,7 @@ export function useClipPlayer() {
       ["playing", onPlaying],
       ["waiting", onWaiting],
       ["pause", onPause],
+      ["timeupdate", onTimeUpdate],
       ["ended", onEnded],
       ["emptied", onEmptied],
       ["error", onError],
@@ -118,7 +154,9 @@ export function useClipPlayer() {
     ];
     for (const [type, fn] of events) a.addEventListener(type, fn);
     window.addEventListener(AUDIO_START_EVENT, onOtherStart);
+    document.addEventListener("visibilitychange", onVisibility);
     return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener(AUDIO_START_EVENT, onOtherStart);
       for (const [type, fn] of events) a.removeEventListener(type, fn);
       halt();

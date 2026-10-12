@@ -149,7 +149,9 @@ describe("letters and marks, cut from the ayah's bytes", () => {
     for (const s of prepareSigns(LIBRARY.basics[0].signs, TERMS)) {
       expect(s.mark.length).toBeGreaterThan(0);
       expect(s.letter.includes(s.mark)).toBe(true);
-      expect(WORD_AR[s.loc]?.includes(s.letter)).toBe(true);
+      // cut from a lesson word, or from another ayah's word the library resolves (سَلَٰمٌ, QS 97:5)
+      expect((WORD_AR[s.loc] ?? LIBRARY.quran[s.loc])?.includes(s.letter)).toBe(true);
+      expect(s.word === null).toBe(s.loc in WORD_AR);
       expect(s.term?.group).toBe("harakah");
     }
     const kasrah = prepareSigns(LIBRARY.basics[0].signs, TERMS).find((s) => s.term?.id === "kasrah")!;

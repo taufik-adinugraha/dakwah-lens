@@ -260,6 +260,8 @@
     "stop": "Stop",
     "stop_label": "Stop the imam's recitation: {word}",
     "retry_label": "Try again, the imam's recitation: {word}",
+    "waqf_note": "At the end of an ayah the imam stops (waqf), so the final vowel sign is not heard.",
+    "washal_note": "In mid-recitation the alif at the start of this word is not read: with the word before it you hear “{heard}”.",
     "credit": "Example voices: recitation by Mishary Rashid Alafasy, streamed from EveryAyah.com; word timings: quran-align (Collin Fair, CC BY 4.0)."
   },
   "Lexeme": {

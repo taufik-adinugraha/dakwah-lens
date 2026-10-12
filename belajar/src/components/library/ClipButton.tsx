@@ -48,9 +48,25 @@ function LoadingMark({ className }: { className?: string }) {
  * - `loc`: the example's clip key (src/lib/clips.ts clipKey), `data-clip` for the CI checks. The
  *   player knows each button by its own id, not by the word: two buttons of one word (kasrah's
  *   and sukun's example are both بِسْمِ) are two buttons.
+ * - `word`: what is HEARD, in Latin — the word, or for a tile played with the word before it the
+ *   two as they sound ("tabārakasmu"). `noteId`: the id of the line that says what is heard when
+ *   it is not what is written (ClipNote: the imam's stop at an ayah's end, a hamzat washal); the
+ *   button is described by it, so a screen reader says it after the button's name.
  * - Without a ClipPlayerProvider above it, nothing is drawn.
  */
-export function ClipButton({ loc, clip, word, className }: { loc: string; clip: Clip; word: string; className?: string }) {
+export function ClipButton({
+  loc,
+  clip,
+  word,
+  noteId,
+  className,
+}: {
+  loc: string;
+  clip: Clip;
+  word: string;
+  noteId?: string;
+  className?: string;
+}) {
   const player = useContext(ClipPlayerContext);
   const t = useTranslations("Clip");
   const ta = useTranslations("Ayah");
@@ -81,7 +97,7 @@ export function ClipButton({ loc, clip, word, className }: { loc: string; clip: 
         data-clip={loc}
         data-state={view.mode === "stop" ? "playing" : view.mode === "retry" ? "failed" : "idle"}
         aria-label={label}
-        aria-describedby={line ? statusId : undefined}
+        aria-describedby={[noteId, line ? statusId : null].filter(Boolean).join(" ") || undefined}
         onClick={() => player.press(id, clip)}
         className="btn-listen"
       >

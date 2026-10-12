@@ -7,9 +7,11 @@
  *
  * - The data: library.json `clips`, one per example the static pages show, keyed by the word's
  *   location — Mishary Alafasy's EveryAyah file of that ayah and [start, end) of the word in it,
- *   from the pinned quran-align timings the lessons use (pipeline/clips.py, validate_clips.py).
- *   The server components that draw examples (ConceptCard, HarakatChart, WordParts) pick each
- *   example's clip here and hand the browser only that {url, start, end}.
+ *   from the pinned quran-align timings the lessons use (pipeline/clips.py, validate_clips.py);
+ *   `last` on a clip whose word ends its ayah, where the imam stops (what is then heard, and
+ *   said beside the button: src/lib/heard.ts). The server components that draw examples
+ *   (ConceptCard, HarakatChart, WordParts) pick each example's clip here and hand the browser
+ *   only that {url, start, end}.
  * - The player (src/hooks/useClipPlayer.ts, one Audio element per page): its state machine and
  *   what each button shows, below.
  */
@@ -89,6 +91,22 @@ export function pressAction(s: ClipState, key: string): "play" | "stop" {
 /** Has playback at `ms` (the element's currentTime × 1000) reached the clip's end? */
 export function atClipEnd(clip: Clip, ms: number): boolean {
   return ms >= clip.end;
+}
+
+/** How near the clip's end the player stops waiting for the next animation frame and sets a
+ *  timer for the end itself: three frames at 60 Hz. A frame is 16.7 ms, so a stop decided only
+ *  frame by frame lands up to a frame late, inside the next word; quran-align leaves 10 ms
+ *  between two words. */
+export const END_TIMER_WINDOW_MS = 50;
+
+/** Once playback at `ms` is within END_TIMER_WINDOW_MS of the clip's end: the wall-clock wait
+ *  until that end at playback rate `rate`, for a timer that stops there (it stops only when the
+ *  element has really reached the end, and waits again if not). null while the end is further
+ *  away (keep checking each frame) or already reached. */
+export function endTimerMs(clip: Clip, ms: number, rate = 1): number | null {
+  const left = clip.end - ms;
+  if (left <= 0 || left > END_TIMER_WINDOW_MS) return null;
+  return left / (rate > 0 ? rate : 1);
 }
 
 /** Where the element must stand before it plays the clip, in seconds (HTMLMediaElement.currentTime). */
