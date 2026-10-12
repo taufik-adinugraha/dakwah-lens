@@ -6,9 +6,9 @@ import { ForestGlow } from "@/components/ForestGlow";
 import { MarkCircle } from "@/components/library/MarkCircle";
 import { Headword, TermText } from "@/components/library/TermText";
 import { Link } from "@/i18n/navigation";
-import { getBasic, LIBRARY, TERMS } from "@/lib/library";
+import { LIBRARY, TERMS } from "@/lib/library";
 import { conceptHref } from "@/lib/routes";
-import { annotate, type HeadTerm, prepareSigns, Scope, soundsOf, titleParts, type Token } from "@/lib/terms";
+import { annotate, type HeadTerm, prepareSigns, Scope, titleParts, type Token } from "@/lib/terms";
 
 export async function generateMetadata({
   params,
@@ -18,7 +18,6 @@ export async function generateMetadata({
   return { title: t("index_title") };
 }
 
-const SOUNDS = soundsOf(getBasic("harakat")?.signs ?? []);
 
 /** A card's title (Latin, with any Qur'anic word in Arabic), its Arabic headword and summary,
  *  in one first-use scope per card (each card is read on its own). `hints: false` for the
@@ -28,7 +27,7 @@ function cardText(rec: { title: string; summary: string; marked?: { title: strin
   if (!rec.marked) {
     return { title: [{ kind: "text", text: rec.title }] as Token[], head: [] as HeadTerm[], summary: [{ kind: "text", text: rec.summary }] as Token[] };
   }
-  const { tokens, head } = titleParts(rec.marked.title, sc, TERMS, SOUNDS);
+  const { tokens, head } = titleParts(rec.marked.title, sc, TERMS);
   return { title: tokens, head, summary: annotate(rec.marked.summary, sc, TERMS) };
 }
 

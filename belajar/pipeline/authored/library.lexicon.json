@@ -127,7 +127,7 @@
               5
             ]
           ],
-          "rule": "Menurut ulama Bashrah, asal kata ism adalah simw (atau sumw), dari sumuww 'tinggi'. Huruf terakhirnya, wawu, dibuang, dan huruf pertamanya, sin, menjadi mati (sukun). Darwisy menjelaskan, ism termasuk kata benda yang huruf pertamanya mati; supaya kata tidak dimulai dengan huruf mati, ditambahkan hamzah washal (hamzah yang hanya dibaca bila kata ini di awal ucapan) di depannya. Hamzah itu sekaligus menjadi ganti huruf yang dibuang (al-Jadwal; al-Mishbah). Buktinya, menurut al-Mishbah, huruf asli itu kembali pada bentuk jamak asmā’ dan bentuk kecil sumayy. Sebagian ulama Kufah berpendapat asalnya wasm ('tanda'). Darwisy menilai kedua pendapat itu benar dari sisi makna."
+          "rule": "Menurut ulama Bashrah, asal kata ism adalah simw (atau sumw), dari sumuww 'tinggi'. Huruf terakhirnya, wawu, dibuang, dan huruf pertamanya, sin, menjadi mati ([[sukun|sukun]]). Darwisy menjelaskan, ism termasuk kata benda yang huruf pertamanya mati; supaya kata tidak dimulai dengan huruf mati, ditambahkan [[hamzah washal|hamzah-washal]] (hamzah yang hanya dibaca bila kata ini di awal ucapan) di depannya. Hamzah itu sekaligus menjadi ganti huruf yang dibuang (al-Jadwal; al-Mishbah). Buktinya, menurut al-Mishbah, huruf asli itu kembali pada bentuk jamak asmā’ dan bentuk kecil sumayy. Sebagian ulama Kufah berpendapat asalnya wasm ('tanda'). Darwisy menilai kedua pendapat itu benar dari sisi makna."
         }
       ],
       "review_notes": [
@@ -155,7 +155,7 @@
       "qac_lem": "r~aHoma`n",
       "id": "rahman",
       "translit": "raḥmān",
-      "meaning": "Yang Maha Pengasih: nama dan sifat Allah yang berasal dari kata raḥmah (kasih sayang). Dengan al- (ar-raḥmān), kata ini hanya dipakai untuk Allah. Polanya fa‘lānu, salah satu pola yang menunjukkan makna 'sangat' (al-Jadwal).",
+      "meaning": "Yang Maha Pengasih: nama dan sifat Allah yang berasal dari kata raḥmah (kasih sayang). Dengan [[al-|q:1:1:3/1]] ([[ar-raḥmān|q:1:1:3]]), kata ini hanya dipakai untuk Allah. Polanya [[fa‘lānu|wazan-falanu]], salah satu pola yang menunjukkan makna 'sangat' (al-Jadwal).",
       "src": [
         [
           "MS",
@@ -180,7 +180,7 @@
       ],
       "tashrif": {
         "verb_lem": "r~aHima",
-        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) bab 4: فَعِلَ–يَفْعَلُ (seperti عَلِمَ–يَعْلَمُ)",
+        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) [[bab]] 4: فَعِلَ–يَفْعَلُ (seperti عَلِمَ–يَعْلَمُ)",
         "forms": [
           {
             "label": "fi'il madhi",
@@ -244,7 +244,7 @@
       "qac_lem": "r~aHiym",
       "id": "rahim",
       "translit": "raḥīm",
-      "meaning": "Maha Penyayang: juga dari kata raḥmah, dengan pola fa‘īlun. Berbeda dengan ar-raḥmān, kata raḥīm juga dipakai untuk selain Allah; misalnya Al-Qur'an menyifati Nabi Muhammad ﷺ dengan raḥīm (9:128), sebagaimana dicontohkan ar-Raghib.",
+      "meaning": "Maha Penyayang: juga dari kata raḥmah, dengan pola [[fa‘īlun|wazan-failun-ya]]. Berbeda dengan [[ar-raḥmān|q:1:1:3]], kata raḥīm juga dipakai untuk selain Allah; misalnya Al-Qur'an menyifati Nabi Muhammad ﷺ dengan [[raḥīm|q:9:128:14]] (9:128), sebagaimana dicontohkan ar-Raghib.",
       "src": [
         [
           "R",
@@ -264,7 +264,7 @@
       ],
       "tashrif": {
         "verb_lem": "r~aHima",
-        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) bab 4: فَعِلَ–يَفْعَلُ (seperti عَلِمَ–يَعْلَمُ)",
+        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) [[bab]] 4: فَعِلَ–يَفْعَلُ (seperti عَلِمَ–يَعْلَمُ)",
         "forms": [
           {
             "label": "fi'il madhi",
@@ -341,7 +341,7 @@
       ],
       "tashrif": {
         "verb_lem": "yuHomadu",
-        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) bab 4: فَعِلَ–يَفْعَلُ (seperti عَلِمَ–يَعْلَمُ)",
+        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) [[bab]] 4: فَعِلَ–يَفْعَلُ (seperti عَلِمَ–يَعْلَمُ)",
         "forms": [
           {
             "label": "fi'il madhi",
@@ -402,7 +402,7 @@
       "qac_lem": "rab~",
       "id": "rabb",
       "translit": "rabb",
-      "meaning": "Tuhan yang memelihara, mengatur, dan memperbaiki keadaan makhluk-Nya. Dalam bahasa Arab, rabb juga berarti pemilik atau tuan, misalnya 'pemilik rumah' (rabb ad-dār); tetapi menurut ar-Raghib, dengan al- dan tanpa sandaran (ar-rabb), kata ini hanya dipakai untuk Allah. Al-Mishbah mencatat bahwa kadang-kadang ar-rabb dengan al- dipakai untuk makhluk dalam arti 'tuan', sebagai ganti sandaran.",
+      "meaning": "Tuhan yang memelihara, mengatur, dan memperbaiki keadaan makhluk-Nya. Dalam bahasa Arab, rabb juga berarti pemilik atau tuan, misalnya 'pemilik rumah' (rabb ad-dār); tetapi menurut ar-Raghib, dengan [[al-|q:1:2:1/1]] dan tanpa sandaran (ar-rabb), kata ini hanya dipakai untuk Allah. Al-Mishbah mencatat bahwa kadang-kadang ar-rabb dengan [[al-|q:1:2:1/1]] dipakai untuk makhluk dalam arti 'tuan', sebagai ganti sandaran.",
       "src": [
         [
           "MQ",
@@ -434,7 +434,7 @@
       "qac_lem": "Ea`lamiyn",
       "id": "alamin",
       "translit": "‘ālamīn",
-      "meaning": "seluruh alam: semua jenis makhluk (Darwisy: seluruh yang ada). Menurut ar-Raghib, alam disebut ‘ālam karena ia menjadi tanda yang menunjukkan Penciptanya. Ulama berbeda pendapat tentang bentuk katanya. Darwisy, al-Jadwal, dan al-Mujtaba menyebut ‘ālamīn jamak dari ‘ālam, yang disamakan (mulhaq) dengan jamak mudzakkar salim (jamak laki-laki beraturan, berakhiran -ūna/-īna). As-Samin berpendapat ‘ālamīn adalah isim jam', yaitu kata yang bermakna jamak tetapi tidak punya bentuk tunggal dari lafaznya sendiri, sehingga ia bukan jamak dari ‘ālam; menurutnya ia hanya berakhiran seperti jamak mudzakkar salim.",
+      "meaning": "seluruh alam: semua jenis makhluk (Darwisy: seluruh yang ada). Menurut ar-Raghib, alam disebut ‘ālam karena ia menjadi tanda yang menunjukkan Penciptanya. Ulama berbeda pendapat tentang bentuk katanya. Darwisy, al-Jadwal, dan al-Mujtaba menyebut ‘ālamīn jamak dari ‘ālam, yang disamakan ([[mulhaq|mulhaq]]) dengan [[jamak mudzakkar salim|jamak-mudzakkar-salim]] (jamak laki-laki beraturan, berakhiran -ūna/-īna). As-Samin berpendapat ‘ālamīn adalah [[isim|isim]] jam', yaitu kata yang bermakna jamak tetapi tidak punya bentuk tunggal dari lafaznya sendiri, sehingga ia bukan jamak dari ‘ālam; menurutnya ia hanya berakhiran seperti [[jamak mudzakkar salim|jamak-mudzakkar-salim]].",
       "src": [
         [
           "D",
@@ -477,7 +477,7 @@
       "qac_lem": "ma`lik",
       "id": "malik",
       "translit": "mālik",
-      "meaning": "pemilik: yang memiliki sesuatu dan berkuasa penuh atasnya. Darwisy membedakan: mālik adalah pemilik (dari milk), sedangkan malik adalah raja (dari mulk).",
+      "meaning": "pemilik: yang memiliki sesuatu dan berkuasa penuh atasnya. Darwisy membedakan: [[mālik|q:1:4:1]] adalah pemilik (dari milk), sedangkan [[malik|q:114:2:1]] adalah raja (dari mulk).",
       "src": [
         [
           "D",
@@ -497,7 +497,7 @@
       ],
       "tashrif": {
         "verb_lem": "malakato",
-        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) bab 2: فَعَلَ–يَفْعِلُ (seperti ضَرَبَ–يَضْرِبُ)",
+        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) [[bab]] 2: فَعَلَ–يَفْعِلُ (seperti ضَرَبَ–يَضْرِبُ)",
         "forms": [
           {
             "label": "fi'il madhi",
@@ -558,7 +558,7 @@
       "qac_lem": "yawom",
       "id": "yawm",
       "translit": "yaum",
-      "meaning": "hari: waktu dari terbit sampai terbenam matahari; juga dipakai untuk suatu masa atau waktu secara umum (ar-Raghib). Dalam yaum ad-dīn, yang dimaksud adalah hari kiamat (al-Jadwal).",
+      "meaning": "hari: waktu dari terbit sampai terbenam matahari; juga dipakai untuk suatu masa atau waktu secara umum (ar-Raghib). Dalam [[yaum|q:1:4:2]] [[ad-dīn|q:1:4:3]], yang dimaksud adalah hari kiamat (al-Jadwal).",
       "src": [
         [
           "R",
@@ -581,7 +581,7 @@
       "qac_lem": "diyn",
       "id": "din",
       "translit": "dīn",
-      "meaning": "pembalasan; juga ketaatan, dan agama (aturan hidup yang ditaati). Di Al-Fatihah, yaum ad-dīn berarti hari pembalasan (Darwisy).",
+      "meaning": "pembalasan; juga ketaatan, dan agama (aturan hidup yang ditaati). Di Al-Fatihah, [[yaum|q:1:4:2]] [[ad-dīn|q:1:4:3]] berarti hari pembalasan (Darwisy).",
       "src": [
         [
           "D",
@@ -601,7 +601,7 @@
       ],
       "tashrif": {
         "verb_lem": "yadiynu",
-        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) bab 2: فَعَلَ–يَفْعِلُ, jenis ajwaf (huruf tengah akarnya ya'), seperti سَارَ–يَسِيْرُ",
+        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) [[bab]] 2: فَعَلَ–يَفْعِلُ, jenis ajwaf (huruf tengah akarnya ya'), seperti سَارَ–يَسِيْرُ",
         "forms": [
           {
             "label": "fi'il madhi",
@@ -645,7 +645,7 @@
       "qac_lem": "<iy~aA",
       "id": "iyya",
       "translit": "iyyā",
-      "meaning": "kata ganti untuk sasaran perbuatan (objek) yang berdiri terpisah dari kata kerjanya. Pada iyyāka artinya 'Engkau' sebagai sasaran; karena diletakkan sebelum kata kerja, maknanya menjadi 'hanya kepada-Mu' (Darwisy).",
+      "meaning": "kata ganti untuk sasaran perbuatan (objek) yang berdiri terpisah dari kata kerjanya. Pada [[iyyāka|q:1:5:1]] artinya 'Engkau' sebagai sasaran; karena diletakkan sebelum kata kerja, maknanya menjadi 'hanya kepada-Mu' (Darwisy).",
       "src": [
         [
           "D",
@@ -686,7 +686,7 @@
       ],
       "tashrif": {
         "verb_lem": "Eabada",
-        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) bab 1: فَعَلَ–يَفْعُلُ (seperti نَصَرَ–يَنْصُرُ)",
+        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) [[bab]] 1: فَعَلَ–يَفْعُلُ (seperti نَصَرَ–يَنْصُرُ)",
         "forms": [
           {
             "label": "fi'il madhi",
@@ -743,7 +743,7 @@
       "qac_lem": "{sotaEiynu",
       "id": "istaana",
       "translit": "ista‘īnu",
-      "meaning": "memohon pertolongan; meminta agar dibantu. Pola istaf‘ala di sini bermakna 'meminta' (thalab): ista‘āna berarti meminta ‘aun (pertolongan). QAC (Quranic Arabic Corpus) menyimpan kata dasar ini sebagai ista‘īnu, yaitu bentuk mudhari' tanpa huruf awalannya; kamus dan tabel tashrif memakai bentuk lampaunya, ista‘āna.",
+      "meaning": "memohon pertolongan; meminta agar dibantu. Pola [[istaf‘ala|wazan-istafala]] di sini bermakna 'meminta' ([[thalab|thalab]]): ista‘āna berarti meminta ‘aun (pertolongan). QAC (Quranic Arabic Corpus) menyimpan kata dasar ini sebagai ista‘īnu, yaitu bentuk [[mudhari'|mudhari]] tanpa huruf awalannya; kamus dan tabel [[tashrif|tashrif]] memakai bentuk lampaunya, ista‘āna.",
       "src": [
         [
           "R",
@@ -763,7 +763,7 @@
       ],
       "tashrif": {
         "verb_lem": "{sotaEiynu",
-        "bab": "Tsulatsi mazid (akar tiga huruf dengan huruf tambahan), wazan اِسْتَفْعَلَ–يَسْتَفْعِلُ (tambahan hamzah washal, sin, dan ta'), jenis ajwaf (huruf tengah akarnya wawu), seperti اِسْتَجَابَ–يَسْتَجِيْبُ",
+        "bab": "Tsulatsi mazid (akar tiga huruf dengan huruf tambahan), [[wazan|wazan]] اِسْتَفْعَلَ–يَسْتَفْعِلُ (tambahan [[hamzah washal|hamzah-washal]], sin, dan ta'), jenis ajwaf (huruf tengah akarnya wawu), seperti اِسْتَجَابَ–يَسْتَجِيْبُ",
         "forms": [
           {
             "label": "fi'il madhi",
@@ -837,7 +837,7 @@
               6
             ]
           ],
-          "rule": "Asalnya nasta‘winu, dari ‘aun (pertolongan). Kasrah pada wawu terasa berat, maka dipindah ke huruf 'ain yang sebelumnya mati, sehingga wawu menjadi mati (i'lal bit-taskin). Wawu mati sesudah kasrah lalu diganti ya' (i'lal bil-qalb), menjadi nasta‘īnu. I'lal adalah perubahan pada huruf 'illah (wawu, ya', alif) supaya kata lebih ringan diucapkan."
+          "rule": "Asalnya nasta‘winu, dari ‘aun (pertolongan). [[Kasrah|kasrah]] pada wawu terasa berat, maka dipindah ke huruf 'ain yang sebelumnya mati, sehingga wawu menjadi mati ([[i'lal|ilal]] bit-taskin). Wawu mati sesudah [[kasrah|kasrah]] lalu diganti ya' ([[i'lal|ilal]] bil-qalb), menjadi [[nasta‘īnu|q:1:5:4]]. [[I'lal|ilal]] adalah perubahan pada [[huruf 'illah|huruf-illah]] (wawu, ya', alif) supaya kata lebih ringan diucapkan."
         }
       ],
       "review_notes": [
@@ -851,7 +851,7 @@
       "qac_lem": "hadaY",
       "id": "hada",
       "translit": "hadā",
-      "meaning": "menunjukkan jalan dan membimbing dengan lembut (ar-Raghib: hidāyah adalah petunjuk yang diberikan dengan lembut). Kata kerja ini bisa langsung mengenai dua objek, seperti pada ihdinā aṣ-ṣirāṭa, atau memakai li- dan ilā (ar-Razi).",
+      "meaning": "menunjukkan jalan dan membimbing dengan lembut (ar-Raghib: hidāyah adalah petunjuk yang diberikan dengan lembut). Kata kerja ini bisa langsung mengenai dua objek, seperti pada [[ihdinā aṣ-ṣirāṭa|q:1:6:1-2]], atau memakai [[li-|q:1:2:2/1]] dan [[ilā]] (ar-Razi).",
       "src": [
         [
           "R",
@@ -871,7 +871,7 @@
       ],
       "tashrif": {
         "verb_lem": "hadaY",
-        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) bab 2: فَعَلَ–يَفْعِلُ, jenis naqish (huruf akhir akarnya ya'), seperti سَرَى–يَسْرِيْ",
+        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) [[bab]] 2: فَعَلَ–يَفْعِلُ, jenis naqish (huruf akhir akarnya ya'), seperti سَرَى–يَسْرِيْ",
         "forms": [
           {
             "label": "fi'il madhi",
@@ -957,7 +957,7 @@
               54
             ]
           ],
-          "rule": "Fi'il amr ini dibentuk dari mudhari'-nya, tahdīnā ('Engkau menunjuki kami'), dalam beberapa langkah. Huruf awalan ta- dibuang; karena huruf sesudahnya, ha', mati (sukun), ditambahkan hamzah washal di depannya (al-Hamalawi), dibaca i karena mudhari'-nya yahdī (an-Nahhas). Lalu huruf 'illah ya' di ujung kata dibuang (i'lal bil-hadzf), sebab fi'il amr mabni (akhirnya tidak berubah karena 'amil). As-Samin menjelaskan alasannya: fi'il amr diperlakukan seperti mudhari' yang majzum (dalam keadaan jazm), dan pada mudhari' majzum huruf 'illah di akhir kata dibuang. Hasilnya ihdinā."
+          "rule": "[[Fi'il amr|fiil-amr]] ini dibentuk dari [[mudhari'-nya|mudhari]], tahdīnā ('Engkau menunjuki kami'), dalam beberapa langkah. Huruf awalan ta- dibuang; karena huruf sesudahnya, ha', mati ([[sukun|sukun]]), ditambahkan [[hamzah washal|hamzah-washal]] di depannya (al-Hamalawi), dibaca i karena [[mudhari'-nya|mudhari]] yahdī (an-Nahhas). Lalu [[huruf 'illah|huruf-illah]] ya' di ujung kata dibuang ([[i'lal|ilal]] bil-hadzf), sebab [[fi'il amr|fiil-amr]] [[mabni|mabni]] (akhirnya tidak berubah karena [['amil|amil]]). As-Samin menjelaskan alasannya: [[fi'il amr|fiil-amr]] diperlakukan seperti [[mudhari'|mudhari]] yang [[majzum|majzum]] (dalam keadaan [[jazm|jazm]]), dan pada [[mudhari'|mudhari]] [[majzum|majzum]] [[huruf 'illah|huruf-illah]] di akhir kata dibuang. Hasilnya [[ihdinā|q:1:6:1]]."
         }
       ],
       "review_notes": [
@@ -1035,7 +1035,7 @@
       ],
       "tashrif": {
         "verb_lem": "{sotaqa`mu",
-        "bab": "Tsulatsi mazid (akar tiga huruf dengan huruf tambahan), wazan اِسْتَفْعَلَ–يَسْتَفْعِلُ (tambahan hamzah washal, sin, dan ta'), jenis ajwaf (huruf tengah akarnya wawu), seperti اِسْتَجَابَ–يَسْتَجِيْبُ",
+        "bab": "Tsulatsi mazid (akar tiga huruf dengan huruf tambahan), [[wazan|wazan]] اِسْتَفْعَلَ–يَسْتَفْعِلُ (tambahan [[hamzah washal|hamzah-washal]], sin, dan ta'), jenis ajwaf (huruf tengah akarnya wawu), seperti اِسْتَجَابَ–يَسْتَجِيْبُ",
         "forms": [
           {
             "label": "fi'il madhi",
@@ -1095,7 +1095,7 @@
               12
             ]
           ],
-          "rule": "Asalnya mustaqwimun, karena kata kerja dasarnya qāma–yaqūmu (akar q-w-m). Prosesnya sama dengan nasta‘īnu: kasrah pada wawu dipindah ke qaf yang sebelumnya mati, lalu wawu yang mati sesudah kasrah diganti ya', menjadi mustaqīmun."
+          "rule": "Asalnya mustaqwimun, karena kata kerja dasarnya qāma–yaqūmu (akar q-w-m). Prosesnya sama dengan [[nasta‘īnu|q:1:5:4]]: [[kasrah|kasrah]] pada wawu dipindah ke qaf yang sebelumnya mati, lalu wawu yang mati sesudah [[kasrah|kasrah]] diganti ya', menjadi mustaqīmun."
         }
       ],
       "review_notes": [
@@ -1107,7 +1107,7 @@
       "qac_lem": "{l~a*iY",
       "id": "alladhi",
       "translit": "allażī",
-      "meaning": "yang: kata sambung (isim maushul) yang menghubungkan kata benda dengan keterangan sesudahnya. QAC 0.4 memasukkan bentuk laki-laki dan perempuan, tunggal, dua, dan jamak ke lemma ini. Di Al-Fatihah dipakai allażīna, bentuk jamak laki-laki: 'orang-orang yang'.",
+      "meaning": "yang: kata sambung ([[isim maushul|isim-maushul]]) yang menghubungkan kata benda dengan keterangan sesudahnya. QAC 0.4 memasukkan bentuk laki-laki dan perempuan, tunggal, dua, dan jamak ke lemma ini. Di Al-Fatihah dipakai [[allażīna|q:1:7:2]], bentuk jamak laki-laki: 'orang-orang yang'.",
       "src": [
         [
           "J",
@@ -1128,7 +1128,7 @@
       "qac_lem": ">anoEama",
       "id": "anama",
       "translit": "an‘ama",
-      "meaning": "memberi nikmat: menganugerahkan kebaikan dan kesenangan hidup kepada seseorang. Kata kerja ini dipakai dengan ‘alā: an‘ama ‘alaihi, 'memberi nikmat kepadanya' (al-Mishbah).",
+      "meaning": "memberi nikmat: menganugerahkan kebaikan dan kesenangan hidup kepada seseorang. Kata kerja ini dipakai dengan [[‘alā|q:2:5:2]]: [[an‘ama|q:33:37:4]] [[‘alaihi|q:33:37:6]], 'memberi nikmat kepadanya' (al-Mishbah).",
       "src": [
         [
           "MB",
@@ -1148,7 +1148,7 @@
       ],
       "tashrif": {
         "verb_lem": ">anoEama",
-        "bab": "Tsulatsi mazid (akar tiga huruf dengan huruf tambahan), wazan أَفْعَلَ–يُفْعِلُ (tambahan hamzah qatha', yaitu hamzah yang selalu dibaca, di depan akar), seperti أَكْرَمَ–يُكْرِمُ",
+        "bab": "Tsulatsi mazid (akar tiga huruf dengan huruf tambahan), [[wazan|wazan]] أَفْعَلَ–يُفْعِلُ (tambahan hamzah qatha', yaitu hamzah yang selalu dibaca, di depan akar), seperti أَكْرَمَ–يُكْرِمُ",
         "forms": [
           {
             "label": "fi'il madhi",
@@ -1213,7 +1213,7 @@
               2107
             ]
           ],
-          "rule": "Jika ‘alā bersambung dengan kata ganti, alif di ujungnya berubah menjadi ya': bukan ‘alāhu tetapi ‘alaihi, begitu pula ‘alaihim di Al-Fatihah. Al-Mishbah menyebut alasannya: seandainya alif tetap (‘alāhu), kata itu akan tertukar dengan kata kerja ‘alāhu ('ia menaikinya')."
+          "rule": "Jika ‘alā bersambung dengan kata ganti, alif di ujungnya berubah menjadi ya': bukan ‘alāhu tetapi [[‘alaihi|q:33:37:6]], begitu pula [[‘alaihim|q:1:7:4]] di Al-Fatihah. Al-Mishbah menyebut alasannya: seandainya alif tetap (‘alāhu), kata itu akan tertukar dengan kata kerja ‘alāhu ('ia menaikinya')."
         }
       ],
       "review_notes": [
@@ -1224,7 +1224,7 @@
       "qac_lem": "gayor",
       "id": "ghayr",
       "translit": "gair",
-      "meaning": "selain; bukan. Kata gair selalu disandarkan kepada kata lain, dengan sandaran yang tertulis atau tersirat, dan tidak memakai al- (Darwisy; as-Samin; al-Jadwal).",
+      "meaning": "selain; bukan. Kata gair selalu disandarkan kepada kata lain, dengan sandaran yang tertulis atau tersirat, dan tidak memakai [[al-|q:1:2:1/1]] (Darwisy; as-Samin; al-Jadwal).",
       "src": [
         [
           "R",
@@ -1257,7 +1257,7 @@
       "qac_lem": "magoDuwb",
       "id": "maghdub",
       "translit": "magḍūb",
-      "meaning": "yang dimurkai: orang yang terkena murka. Kata ini berpola maf‘ūlun (yang dikenai perbuatan) dari gaḍiba 'marah'; maknanya lengkap bersama ‘alaihim ('atas mereka').",
+      "meaning": "yang dimurkai: orang yang terkena murka. Kata ini berpola [[maf‘ūlun|wazan-mafulun]] (yang dikenai perbuatan) dari [[gaḍiba|q:4:93:9/2]] 'marah'; maknanya lengkap bersama [[‘alaihim|q:1:7:7]] ('atas mereka').",
       "src": [
         [
           "J",
@@ -1277,7 +1277,7 @@
       ],
       "tashrif": {
         "verb_lem": "gaDiba",
-        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) bab 4: فَعِلَ–يَفْعَلُ (seperti عَلِمَ–يَعْلَمُ)",
+        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) [[bab]] 4: فَعِلَ–يَفْعَلُ (seperti عَلِمَ–يَعْلَمُ)",
         "forms": [
           {
             "label": "fi'il madhi",
@@ -1332,7 +1332,7 @@
       "qac_lem": "laA",
       "id": "la",
       "translit": "lā",
-      "meaning": "tidak; bukan. Selain untuk menafikan, lā juga dipakai untuk melarang ('jangan'). Di akhir Al-Fatihah, wa lā menegaskan makna 'bukan' yang sudah ada pada gair (al-Jadwal; Darwisy).",
+      "meaning": "tidak; bukan. Selain untuk [[menafikan|nafi]], lā juga dipakai untuk melarang ('jangan'). Di akhir Al-Fatihah, [[wa lā|q:1:7:8]] menegaskan makna 'bukan' yang sudah ada pada [[gair|q:1:7:5]] (al-Jadwal; Darwisy).",
       "src": [
         [
           "J",
@@ -1373,7 +1373,7 @@
       ],
       "tashrif": {
         "verb_lem": "Dal~a",
-        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) bab 2: فَعَلَ–يَفْعِلُ, jenis mudha'af (dua huruf terakhir akarnya sama), seperti فَرَّ–يَفِرُّ",
+        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) [[bab]] 2: فَعَلَ–يَفْعِلُ, jenis [[mudha'af|mudhaaf]] (dua huruf terakhir akarnya sama), seperti فَرَّ–يَفِرُّ",
         "forms": [
           {
             "label": "fi'il madhi",
@@ -1431,7 +1431,7 @@
               20
             ]
           ],
-          "rule": "Polanya fā‘ilun, jadi asalnya ḍālilun. Huruf kedua dan ketiga akarnya sama (lam dan lam), maka keduanya dileburkan menjadi satu lam bertasydid (idgham): ḍāllun. Begitu pula bentuk jamaknya di Al-Fatihah, aḍ-ḍāllīna."
+          "rule": "Polanya [[fā‘ilun|wazan-failun]], jadi asalnya ḍālilun. Huruf kedua dan ketiga akarnya sama (lam dan lam), maka keduanya dileburkan menjadi satu lam [[bertasydid|tasydid]] ([[idgham|idgham]]): ḍāllun. Begitu pula bentuk jamaknya di Al-Fatihah, [[aḍ-ḍāllīna|q:1:7:9]]."
         }
       ],
       "review_notes": [
@@ -1443,7 +1443,7 @@
       "qac_lem": "qaAla",
       "id": "qala",
       "translit": "qāla",
-      "meaning": "berkata, mengucapkan. Ar-Raghib: pemakaian qaul yang paling jelas ialah untuk susunan huruf yang diucapkan dengan lisan, satu kata ataupun satu kalimat. Di awal Al-Ikhlas, Al-Falaq, dan An-Nas dipakai bentuk perintahnya, qul (“katakanlah”).",
+      "meaning": "berkata, mengucapkan. Ar-Raghib: pemakaian qaul yang paling jelas ialah untuk susunan huruf yang diucapkan dengan lisan, satu kata ataupun satu kalimat. Di awal Al-Ikhlas, Al-Falaq, dan An-Nas dipakai bentuk perintahnya, [[qul|q:112:1:1]] (“katakanlah”).",
       "src": [
         [
           "R",
@@ -1463,7 +1463,7 @@
       ],
       "tashrif": {
         "verb_lem": "qaAla",
-        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) bab 1: فَعَلَ–يَفْعُلُ, jenis ajwaf (huruf tengah akarnya wawu), seperti صَانَ–يَصُوْنُ",
+        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) [[bab]] 1: فَعَلَ–يَفْعُلُ, jenis ajwaf (huruf tengah akarnya wawu), seperti صَانَ–يَصُوْنُ",
         "forms": [
           {
             "label": "fi'il madhi",
@@ -1520,7 +1520,7 @@
       "qac_lem": ">aHad",
       "id": "ahad",
       "translit": "aḥad",
-      "meaning": "esa; seorang pun. Ar-Raghib membedakan dua pemakaian. Dalam kalimat yang menafikan, aḥad berarti “seorang pun”, mencakup sedikit maupun banyak, seperti pada akhir Al-Ikhlas (112:4). Dalam kalimat positif, salah satu pemakaiannya ialah sebagai sifat yang berdiri sendiri, dan itu hanya untuk Allah, seperti pada qul huwa Allāhu aḥad (112:1).",
+      "meaning": "esa; seorang pun. Ar-Raghib membedakan dua pemakaian. Dalam kalimat yang [[menafikan|nafi]], aḥad berarti “seorang pun”, mencakup sedikit maupun banyak, seperti pada akhir Al-Ikhlas (112:4). Dalam kalimat positif, salah satu pemakaiannya ialah sebagai sifat yang berdiri sendiri, dan itu hanya untuk Allah, seperti pada [[qul huwa Allāhu aḥad|q:112:1:1-4]] (112:1).",
       "src": [
         [
           "R",
@@ -1564,7 +1564,7 @@
               49
             ]
           ],
-          "rule": "Menurut pendapat yang dikenal (as-Samin), hamzah pada aḥad di ayat 1 adalah ganti dari wawu: asalnya waḥad, dari al-waḥdah (“keesaan”), sebagaimana juga dikatakan Ibnu Faris dan ar-Raghib. Ibnu Khalawaih (dinukil Darwisy) mencatat bahwa wawu berharakat fathah jarang sekali diganti hamzah; ia menyebut dua kata saja, aḥad dan anāh. Abu al-Baqa' (dinukil as-Samin) berpendapat hamzahnya asli. As-Samin menambahkan, aḥad yang bermakna umum dalam penafian (“seorang pun”, 112:4) hamzahnya asli."
+          "rule": "Menurut pendapat yang dikenal (as-Samin), hamzah pada [[aḥad|q:112:1:4]] di ayat 1 adalah ganti dari wawu: asalnya waḥad, dari al-waḥdah (“keesaan”), sebagaimana juga dikatakan Ibnu Faris dan ar-Raghib. Ibnu Khalawaih (dinukil Darwisy) mencatat bahwa wawu berharakat [[fathah|fathah]] jarang sekali diganti hamzah; ia menyebut dua kata saja, [[aḥad|q:112:1:4]] dan anāh. Abu al-Baqa' (dinukil as-Samin) berpendapat hamzahnya asli. As-Samin menambahkan, [[aḥad|q:112:4:5]] yang bermakna umum dalam penafian (“seorang pun”, 112:4) hamzahnya asli."
         }
       ],
       "review_notes": [
@@ -1577,7 +1577,7 @@
       "qac_lem": "S~amad",
       "id": "samad",
       "translit": "ṣamad",
-      "meaning": "Tuhan yang dituju dalam segala kebutuhan. Ibnu Faris: salah satu makna dasar akarnya ialah menuju (al-qaṣd); Allah disebut aṣ-ṣamad karena hamba-hamba-Nya menuju kepada-Nya dengan doa dan permintaan. Ar-Raghib dan ar-Razi: aṣ-ṣamad ialah penguasa (as-sayyid) yang dituju dalam urusan dan kebutuhan; ath-Thabari memilih makna ini: penguasa yang dituju, yang tidak ada seorang pun di atas-Nya. Polanya fa‘alun dengan makna maf‘ūlun, “yang dituju” (Darwisy; al-Jadwal).",
+      "meaning": "Tuhan yang dituju dalam segala kebutuhan. Ibnu Faris: salah satu makna dasar akarnya ialah menuju (al-qaṣd); Allah disebut [[aṣ-ṣamad|q:112:2:2]] karena hamba-hamba-Nya menuju kepada-Nya dengan doa dan permintaan. Ar-Raghib dan ar-Razi: [[aṣ-ṣamad|q:112:2:2]] ialah penguasa (as-sayyid) yang dituju dalam urusan dan kebutuhan; ath-Thabari memilih makna ini: penguasa yang dituju, yang tidak ada seorang pun di atas-Nya. Polanya [[fa‘alun|wazan-faalun-fath]] dengan makna [[maf‘ūlun|wazan-mafulun]], “yang dituju” (Darwisy; al-Jadwal).",
       "src": [
         [
           "MQ",
@@ -1619,7 +1619,7 @@
       "qac_lem": "lam",
       "id": "lam",
       "translit": "lam",
-      "meaning": "tidak: huruf yang menafikan fi'il mudhari' sesudahnya dan membuatnya majzum (Ibnu Hisyam; Ibnu Ajurrum). Ibnu Hisyam menambahkan bahwa lam memindahkan makna mudhari' ke masa lampau, dengan lam yalid wa lam yūlad (112:3) sebagai contohnya. Ath-Thabari menafsirkan ayat itu: lam yalid berarti Allah tidak binasa, karena segala yang beranak pasti binasa; lam yūlad berarti Dia tidak diadakan sesudah sebelumnya tiada; Dia senantiasa ada dan kekal.",
+      "meaning": "tidak: huruf yang [[menafikan|nafi]] [[fi'il mudhari'|fiil-mudhari]] sesudahnya dan membuatnya [[majzum|majzum]] (Ibnu Hisyam; Ibnu Ajurrum). Ibnu Hisyam menambahkan bahwa lam memindahkan makna [[mudhari'|mudhari]] ke masa lampau, dengan [[lam yalid wa lam yūlad|q:112:3:1-4]] (112:3) sebagai contohnya. Ath-Thabari menafsirkan ayat itu: [[lam yalid|q:112:3:1-2]] berarti Allah tidak binasa, karena segala yang beranak pasti binasa; [[lam|q:112:3:3/2]] [[yūlad|q:112:3:4]] berarti Dia tidak diadakan sesudah sebelumnya tiada; Dia senantiasa ada dan kekal.",
       "src": [
         [
           "MG",
@@ -1646,7 +1646,7 @@
       "qac_lem": "walada",
       "id": "walada",
       "translit": "walada",
-      "meaning": "melahirkan, beranak. Ar-Raghib: walad (anak) dipakai untuk satu ataupun banyak, kecil ataupun besar; ayah disebut wālid dan ibu wālidah. Al-Mishbah: walad ialah segala yang dilahirkan, berpola fa‘alun dengan makna maf‘ūlun. Pada lam yalid wa lam yūlad (112:3), keduanya dinafikan dari Allah: Dia tidak beranak dan tidak diperanakkan.",
+      "meaning": "melahirkan, beranak. Ar-Raghib: walad (anak) dipakai untuk satu ataupun banyak, kecil ataupun besar; ayah disebut wālid dan ibu wālidah. Al-Mishbah: walad ialah segala yang dilahirkan, berpola [[fa‘alun|wazan-faalun-fath]] dengan makna [[maf‘ūlun|wazan-mafulun]]. Pada [[lam yalid wa lam yūlad|q:112:3:1-4]] (112:3), keduanya dinafikan dari Allah: Dia tidak beranak dan tidak diperanakkan.",
       "src": [
         [
           "R",
@@ -1666,7 +1666,7 @@
       ],
       "tashrif": {
         "verb_lem": "walada",
-        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) bab 2: فَعَلَ–يَفْعِلُ, jenis mitsal (huruf pertama akarnya wawu), seperti وَعَدَ–يَعِدُ",
+        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) [[bab]] 2: فَعَلَ–يَفْعِلُ, jenis mitsal (huruf pertama akarnya wawu), seperti وَعَدَ–يَعِدُ",
         "forms": [
           {
             "label": "fi'il madhi",
@@ -1722,7 +1722,7 @@
               1413
             ]
           ],
-          "rule": "Huruf pertama akar kata ini wawu (w-l-d), jadi bentuk asal mudhari'-nya yawlidu. Menurut an-Nahhas, wawu itu dibuang karena terletak di antara ya' (huruf awal mudhari') dan kasrah, sehingga menjadi yalidu; dalam lam yalid ia majzum. Pada yūlad (bentuk majhul), wawu tetap ada karena terletak di antara ya' dan fathah."
+          "rule": "Huruf pertama akar kata ini wawu (w-l-d), jadi bentuk asal [[mudhari'-nya|mudhari]] yawlidu. Menurut an-Nahhas, wawu itu dibuang karena terletak di antara ya' (huruf awal [[mudhari'|mudhari]]) dan [[kasrah|kasrah]], sehingga menjadi yalidu; dalam [[lam yalid|q:112:3:1-2]] ia [[majzum|majzum]]. Pada [[yūlad|q:112:3:4]] (bentuk [[majhul|majhul]]), wawu tetap ada karena terletak di antara ya' dan [[fathah|fathah]]."
         }
       ],
       "review_notes": [
@@ -1733,7 +1733,7 @@
       "qac_lem": "kaAna",
       "id": "kana",
       "translit": "kāna",
-      "meaning": "ada, terjadi; dan sebagai kata kerja penghubung, “adalah”. Ibnu Faris: akar ini memberitakan terjadinya sesuatu, di masa lampau atau sekarang. Ar-Razi membedakan kāna nāqiṣah, yang memerlukan khabar, seperti pada lam yakun lahū kufuwan aḥad (112:4), dari kāna tāmmah yang berarti “terjadi”. Ar-Raghib mencatat, dalam banyak ayat yang menyifati Allah, kāna menunjukkan makna azali, yaitu sifat yang senantiasa ada pada-Nya, bukan sifat yang hanya ada di masa lalu (misalnya 33:40).",
+      "meaning": "ada, terjadi; dan sebagai kata kerja penghubung, “adalah”. Ibnu Faris: akar ini memberitakan terjadinya sesuatu, di masa lampau atau sekarang. Ar-Razi membedakan [[kāna|kana]] nāqiṣah, yang memerlukan [[khabar|khabar]], seperti pada [[lam|q:112:4:1/2]] [[yakun lahū kufuwan aḥad|q:112:4:2-5]] (112:4), dari [[kāna|kana]] tāmmah yang berarti “terjadi”. Ar-Raghib mencatat, dalam banyak ayat yang menyifati Allah, [[kāna|kana]] menunjukkan makna azali, yaitu sifat yang senantiasa ada pada-Nya, bukan sifat yang hanya ada di masa lalu (misalnya 33:40).",
       "src": [
         [
           "MQ",
@@ -1753,7 +1753,7 @@
       ],
       "tashrif": {
         "verb_lem": "kaAna",
-        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) bab 1: فَعَلَ–يَفْعُلُ, jenis ajwaf (huruf tengah akarnya wawu), seperti صَانَ–يَصُوْنُ",
+        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) [[bab]] 1: فَعَلَ–يَفْعُلُ, jenis ajwaf (huruf tengah akarnya wawu), seperti صَانَ–يَصُوْنُ",
         "forms": [
           {
             "label": "fi'il madhi",
@@ -1811,7 +1811,7 @@
               2893
             ]
           ],
-          "rule": "Pada lam yakun (112:4), lam membuat huruf terakhir yakūnu mati, sehingga dua huruf mati bertemu: wawu dan nun. Wawu dibuang untuk menghindarinya, maka jadilah lam yakun (ar-Razi). Ar-Razi menambahkan, kadang nun pun dibuang karena kata ini sering dipakai (lam yaku), tetapi nun tetap ada bila ia berharakat."
+          "rule": "Pada [[lam|q:112:4:1/2]] [[yakun|q:112:4:2]] (112:4), [[lam|q:112:4:1/2]] membuat huruf terakhir [[yakūnu|yakunu]] mati, sehingga dua huruf mati bertemu: wawu dan nun. Wawu dibuang untuk menghindarinya, maka jadilah [[lam|q:112:4:1/2]] [[yakun|q:112:4:2]] (ar-Razi). Ar-Razi menambahkan, kadang nun pun dibuang karena kata ini sering dipakai (lam yaku), tetapi nun tetap ada bila ia berharakat."
         }
       ],
       "review_notes": [
@@ -1823,7 +1823,7 @@
       "qac_lem": "kufuw",
       "id": "kufuw",
       "translit": "kufuw",
-      "meaning": "yang setara, yang sebanding. Ibnu Faris: salah satu makna dasar akarnya kesetaraan dua hal, dan al-kuf’ berarti yang serupa, dengan 112:4 sebagai contohnya. Ar-Raghib: setara dalam kedudukan dan derajat. Al-Jadwal: polanya fu‘ulun dengan dua dhammah, dan wawu-nya keringanan dari hamzah (kufu’); Darwisy menukil bahwa Hafs membaca hamzah itu dengan wawu.",
+      "meaning": "yang setara, yang sebanding. Ibnu Faris: salah satu makna dasar akarnya kesetaraan dua hal, dan al-kuf’ berarti yang serupa, dengan 112:4 sebagai contohnya. Ar-Raghib: setara dalam kedudukan dan derajat. Al-Jadwal: polanya [[fu‘ulun|wazan-fuulun]] dengan dua [[dhammah|dhammah]], dan wawu-nya keringanan dari hamzah (kufu’); Darwisy menukil bahwa Hafs membaca hamzah itu dengan wawu.",
       "src": [
         [
           "MQ",
@@ -1854,7 +1854,7 @@
       "qac_lem": "Eu*o",
       "id": "adha",
       "translit": "‘uż",
-      "meaning": "berlindung: mencari perlindungan dan bersandar kepada yang lain (ar-Raghib). QAC menyimpan kata dasar ini dalam bentuk ‘uż (bentuk perintah); kamus dan tabel tashrif memakai bentuk lampaunya, ‘āża–ya‘ūżu. A‘ūżu berarti “aku berlindung”. Dari akar yang sama datang nama al-mu‘awwiżatān (al-Mishbah), sebutan untuk dua surah yang dibuka dengan qul a‘ūżu (113 dan 114).",
+      "meaning": "berlindung: mencari perlindungan dan bersandar kepada yang lain (ar-Raghib). QAC menyimpan kata dasar ini dalam bentuk ‘uż (bentuk perintah); kamus dan tabel [[tashrif|tashrif]] memakai bentuk lampaunya, ‘āża–ya‘ūżu. [[A‘ūżu|q:113:1:2]] berarti “aku berlindung”. Dari akar yang sama datang nama al-mu‘awwiżatān (al-Mishbah), sebutan untuk dua surah yang dibuka dengan [[qul a‘ūżu|q:113:1:1-2]] (113 dan 114).",
       "src": [
         [
           "R",
@@ -1874,7 +1874,7 @@
       ],
       "tashrif": {
         "verb_lem": "Eu*o",
-        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) bab 1: فَعَلَ–يَفْعُلُ, jenis ajwaf (huruf tengah akarnya wawu), seperti صَانَ–يَصُوْنُ",
+        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) [[bab]] 1: فَعَلَ–يَفْعُلُ, jenis ajwaf (huruf tengah akarnya wawu), seperti صَانَ–يَصُوْنُ",
         "forms": [
           {
             "label": "fi'il madhi",
@@ -1929,7 +1929,7 @@
       "qac_lem": "falaq",
       "id": "falaq",
       "translit": "falaq",
-      "meaning": "subuh, fajar. Ibnu Faris dan Darwisy: disebut falaq karena kegelapan malam terbelah darinya; makna dasar akarnya membelah, memisahkan. Al-Jadwal: polanya fa‘alun; Darwisy (dari az-Zamakhsyari): fa‘alun dengan makna maf‘ūlun, “yang dibelah”. Ibnu Faris juga mencatat makna al-falaq “seluruh makhluk”, seakan setiap makhluk dibelahkan dari sesuatu lalu dimunculkan.",
+      "meaning": "subuh, fajar. Ibnu Faris dan Darwisy: disebut falaq karena kegelapan malam terbelah darinya; makna dasar akarnya membelah, memisahkan. Al-Jadwal: polanya [[fa‘alun|wazan-faalun-fath]]; Darwisy (dari az-Zamakhsyari): [[fa‘alun|wazan-faalun-fath]] dengan makna [[maf‘ūlun|wazan-mafulun]], “yang dibelah”. Ibnu Faris juga mencatat makna [[al-falaq|q:113:1:4]] “seluruh makhluk”, seakan setiap makhluk dibelahkan dari sesuatu lalu dimunculkan.",
       "src": [
         [
           "MQ",
@@ -1960,7 +1960,7 @@
       "qac_lem": "min",
       "id": "min",
       "translit": "min",
-      "meaning": "dari. Ibnu Hisyam menyebut min memiliki lima belas makna; yang paling sering ialah permulaan (ibtida' al-ghayah), sampai-sampai sebagian ulama mengembalikan makna-makna lainnya kepadanya. Min termasuk huruf jar (Ibnu Ajurrum), dan semua huruf mabni (Ibnu 'Aqil).",
+      "meaning": "dari. Ibnu Hisyam menyebut min memiliki lima belas makna; yang paling sering ialah permulaan ([[ibtida'|ibtida]] al-ghayah), sampai-sampai sebagian ulama mengembalikan makna-makna lainnya kepadanya. Min termasuk [[huruf jar|huruf-jar]] (Ibnu Ajurrum), dan semua huruf [[mabni|mabni]] (Ibnu 'Aqil).",
       "src": [
         [
           "MG",
@@ -2009,7 +2009,7 @@
       "qac_lem": "maA",
       "id": "ma",
       "translit": "mā",
-      "meaning": "apa; yang. Ibnu Hisyam membagi mā menjadi isim dan huruf, masing-masing tiga macam; salah satunya mā maushulah (“yang”), seperti pada min syarri mā khalaqa (113:2). Menurutnya, mā maushulah dipakai untuk yang tidak berakal. QAC 0.4 memasukkan semua pemakaian mā (antara lain “yang”, penafian, tanya, dan syarat) ke dalam satu lemma, jadi hitungannya mencakup semuanya.",
+      "meaning": "apa; yang. Ibnu Hisyam membagi mā menjadi [[isim|isim]] dan huruf, masing-masing tiga macam; salah satunya mā maushulah (“yang”), seperti pada [[min syarri mā khalaqa|q:113:2:1-4]] (113:2). Menurutnya, mā maushulah dipakai untuk yang tidak berakal. QAC 0.4 memasukkan semua pemakaian mā (antara lain “yang”, penafian, tanya, dan syarat) ke dalam satu lemma, jadi hitungannya mencakup semuanya.",
       "src": [
         [
           "MG",
@@ -2032,7 +2032,7 @@
       "qac_lem": "xalaqa",
       "id": "khalaqa",
       "translit": "khalaqa",
-      "meaning": "menciptakan. Ibnu Faris dan ar-Razi: makna dasar khalq ialah menakar, menentukan ukuran. Ar-Raghib: khalq dipakai untuk mengadakan sesuatu tanpa asal dan tanpa contoh sebelumnya, dan penciptaan seperti itu hanya milik Allah. Khalq juga berarti makhluk, yang diciptakan; al-Mishbah menukil al-Azhari bahwa sebutan al-khāliq dengan al- hanya untuk Allah.",
+      "meaning": "menciptakan. Ibnu Faris dan ar-Razi: makna dasar khalq ialah menakar, menentukan ukuran. Ar-Raghib: khalq dipakai untuk mengadakan sesuatu tanpa asal dan tanpa contoh sebelumnya, dan penciptaan seperti itu hanya milik Allah. Khalq juga berarti makhluk, yang diciptakan; al-Mishbah menukil al-Azhari bahwa sebutan al-khāliq dengan [[al-|q:1:2:1/1]] hanya untuk Allah.",
       "src": [
         [
           "MQ",
@@ -2057,7 +2057,7 @@
       ],
       "tashrif": {
         "verb_lem": "xalaqa",
-        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) bab 1: فَعَلَ–يَفْعُلُ (seperti نَصَرَ–يَنْصُرُ)",
+        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) [[bab]] 1: فَعَلَ–يَفْعُلُ (seperti نَصَرَ–يَنْصُرُ)",
         "forms": [
           {
             "label": "fi'il madhi",
@@ -2110,7 +2110,7 @@
       "qac_lem": "gaAsiq",
       "id": "ghasiq",
       "translit": "gāsiq",
-      "meaning": "malam yang gelap. Ibnu Faris: makna dasar akarnya kegelapan, dan al-gāsiq ialah malam. Ar-Razi: al-gāsiq ialah malam ketika mega merah telah hilang; ia juga menukil al-Hasan bahwa di 113:3 maksudnya malam ketika ia datang, dan ada yang menafsirkannya bulan. Ar-Raghib: ungkapan itu menunjuk musibah yang datang di malam hari. Polanya fā‘ilun, isim fa'il dari gasaqa, “menjadi gelap” (al-Jadwal).",
+      "meaning": "malam yang gelap. Ibnu Faris: makna dasar akarnya kegelapan, dan al-gāsiq ialah malam. Ar-Razi: al-gāsiq ialah malam ketika mega merah telah hilang; ia juga menukil al-Hasan bahwa di 113:3 maksudnya malam ketika ia datang, dan ada yang menafsirkannya bulan. Ar-Raghib: ungkapan itu menunjuk musibah yang datang di malam hari. Polanya [[fā‘ilun|wazan-failun]], [[isim fa'il|isim-fail]] dari gasaqa, “menjadi gelap” (al-Jadwal).",
       "src": [
         [
           "MQ",
@@ -2194,7 +2194,7 @@
       ],
       "tashrif": {
         "verb_lem": "waqaba",
-        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) bab 2: فَعَلَ–يَفْعِلُ, jenis mitsal (huruf pertama akarnya wawu), seperti وَعَدَ–يَعِدُ",
+        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) [[bab]] 2: فَعَلَ–يَفْعِلُ, jenis mitsal (huruf pertama akarnya wawu), seperti وَعَدَ–يَعِدُ",
         "forms": [
           {
             "label": "fi'il madhi",
@@ -2227,7 +2227,7 @@
       "qac_lem": "n~af~a`va`t",
       "id": "naffathat",
       "translit": "naffāṡāt",
-      "meaning": "perempuan-perempuan yang banyak meniup pada buhul. Nafṡ ialah tiupan dengan sedikit ludah, lebih sedikit daripada meludah (ar-Raghib; Ibnu Faris). Kata ini dipakai untuk tiupan orang yang meruqyah dan untuk tiupan penyihir pada buhul (ar-Raghib; al-Mishbah). Pelakunya disebut nāfiṡ, dan naffāṡ adalah bentuk mubalaghah (“yang banyak meniup”); bentuk perempuannya nāfiṡah dan naffāṡah (al-Mishbah). Al-Jadwal: an-naffāṡāt jamak dari an-naffāṡah, wazannya fa‘‘ālun. Surah ini mengajarkan berlindung kepada Allah dari kejahatan mereka.",
+      "meaning": "perempuan-perempuan yang banyak meniup pada buhul. Nafṡ ialah tiupan dengan sedikit ludah, lebih sedikit daripada meludah (ar-Raghib; Ibnu Faris). Kata ini dipakai untuk tiupan orang yang meruqyah dan untuk tiupan penyihir pada buhul (ar-Raghib; al-Mishbah). Pelakunya disebut nāfiṡ, dan naffāṡ adalah bentuk [[mubalaghah|mubalaghah]] (“yang banyak meniup”); bentuk perempuannya nāfiṡah dan naffāṡah (al-Mishbah). Al-Jadwal: [[an-naffāṡāt|q:113:4:3]] jamak dari an-naffāṡah, [[wazannya|wazan]] [[fa‘‘ālun|wazan-faalun]]. Surah ini mengajarkan berlindung kepada Allah dari kejahatan mereka.",
       "src": [
         [
           "R",
@@ -2258,7 +2258,7 @@
       "qac_lem": "fiY",
       "id": "fi",
       "translit": "fī",
-      "meaning": "di dalam; pada. Ibnu Hisyam: fī adalah huruf jar dengan sepuluh makna; yang pertama ẓarfiyyah, yaitu menunjukkan tempat atau waktu, baik yang nyata maupun kiasan. Fī al-‘uqadi (113:4) berarti “pada buhul-buhul”, dan fī ṣudūri (114:5) “ke dalam dada”.",
+      "meaning": "di dalam; pada. Ibnu Hisyam: fī adalah [[huruf jar|huruf-jar]] dengan sepuluh makna; yang pertama ẓarfiyyah, yaitu menunjukkan tempat atau waktu, baik yang nyata maupun kiasan. [[Fī al-‘uqadi|q:113:4:4-5]] (113:4) berarti “pada buhul-buhul”, dan [[fī ṣudūri|q:114:5:3-4]] (114:5) “ke dalam dada”.",
       "src": [
         [
           "MG",
@@ -2276,7 +2276,7 @@
       "qac_lem": "Euqodap",
       "id": "uqdah",
       "translit": "‘uqdah",
-      "meaning": "simpul, buhul; juga ikatan, seperti ikatan akad nikah (2:235). Ibnu Faris: makna dasar akarnya mengikat dengan kuat; ‘aqadtu al-ḥabla, “aku mengikat tali”, dan ikatan itulah ‘uqdah. Ar-Raghib: al-‘uqad (113:4) adalah jamak ‘uqdah, yaitu buhul yang diikat oleh penyihir perempuan.",
+      "meaning": "simpul, buhul; juga ikatan, seperti ikatan akad nikah (2:235). Ibnu Faris: makna dasar akarnya mengikat dengan kuat; ‘aqadtu al-ḥabla, “aku mengikat tali”, dan ikatan itulah ‘uqdah. Ar-Raghib: [[al-‘uqad|q:113:4:5]] (113:4) adalah jamak ‘uqdah, yaitu buhul yang diikat oleh penyihir perempuan.",
       "src": [
         [
           "MQ",
@@ -2299,7 +2299,7 @@
       "qac_lem": "HaAsid",
       "id": "hasid",
       "translit": "ḥāsid",
-      "meaning": "orang yang dengki: isim fa'il dari ḥasada, berwazan fā‘ilun (al-Jadwal); al-Mishbah menyebut pelakunya ḥāsid dan ḥasūd. Darwisy mencatat bahwa ḥasad ada yang terpuji dan ada yang tercela; al-Mishbah menyebut yang tidak tercela itu gibṭah, yaitu ingin memiliki kebaikan seperti orang lain tanpa ingin kebaikan itu hilang darinya.",
+      "meaning": "orang yang dengki: [[isim fa'il|isim-fail]] dari [[ḥasada|q:113:5:5]], [[berwazan|wazan]] [[fā‘ilun|wazan-failun]] (al-Jadwal); al-Mishbah menyebut pelakunya ḥāsid dan ḥasūd. Darwisy mencatat bahwa ḥasad ada yang terpuji dan ada yang tercela; al-Mishbah menyebut yang tidak tercela itu gibṭah, yaitu ingin memiliki kebaikan seperti orang lain tanpa ingin kebaikan itu hilang darinya.",
       "src": [
         [
           "J",
@@ -2342,7 +2342,7 @@
       ],
       "tashrif": {
         "verb_lem": "Hasada",
-        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) bab 1: فَعَلَ–يَفْعُلُ (seperti نَصَرَ–يَنْصُرُ)",
+        "bab": "Tsulatsi mujarrad (akar tiga huruf tanpa huruf tambahan) [[bab]] 1: فَعَلَ–يَفْعُلُ (seperti نَصَرَ–يَنْصُرُ)",
         "forms": [
           {
             "label": "fi'il madhi",
@@ -2395,7 +2395,7 @@
       "qac_lem": "n~aAs",
       "id": "nas",
       "translit": "nās",
-      "meaning": "manusia. Al-Mishbah: an-nās adalah kata untuk orang banyak, seperti qaum dan rahṭ; bentuk tunggalnya insān, dari kata lain. Asal katanya diperselisihkan: menurut Sibawaih (dinukil an-Nahhas), asalnya unās dan al- menggantikan hamzahnya; menurut pendapat lain, dari nāsa–yanūsu, “bergerak” (al-Mishbah; ar-Raghib menyebut keduanya). Al-Mishbah mencatat kata ini kadang dipakai juga untuk jin, tetapi lebih sering untuk manusia.",
+      "meaning": "manusia. Al-Mishbah: [[an-nās|q:114:1:4]] adalah kata untuk orang banyak, seperti qaum dan rahṭ; bentuk tunggalnya insān, dari kata lain. Asal katanya diperselisihkan: menurut Sibawaih (dinukil an-Nahhas), asalnya unās dan [[al-|q:1:2:1/1]] menggantikan hamzahnya; menurut pendapat lain, dari nāsa–yanūsu, “bergerak” (al-Mishbah; ar-Raghib menyebut keduanya). Al-Mishbah mencatat kata ini kadang dipakai juga untuk jin, tetapi lebih sering untuk manusia.",
       "src": [
         [
           "MB",
@@ -2421,7 +2421,7 @@
       "qac_lem": "malik",
       "id": "malik-raja",
       "translit": "malik",
-      "meaning": "raja: yang mengatur orang banyak dengan perintah dan larangan. Ar-Raghib: karena itu dikatakan malik an-nās (“Raja manusia”), dan tidak dikatakan “raja segala benda”. An-Nahhas membedakan malik, pemilik kekuasaan (mulk), dari mālik, pemilik milik (milk) dan kekuasaan. Darwisy: semua qari' membaca malik di An-Nas tanpa alif, berbeda dengan Al-Fatihah.",
+      "meaning": "raja: yang mengatur orang banyak dengan perintah dan larangan. Ar-Raghib: karena itu dikatakan [[malik|q:114:2:1]] [[an-nās|q:114:2:2]] (“Raja manusia”), dan tidak dikatakan “raja segala benda”. An-Nahhas membedakan malik, pemilik kekuasaan (mulk), dari [[mālik|q:1:4:1]], pemilik milik (milk) dan kekuasaan. Darwisy: semua qari' membaca [[malik|q:114:2:1]] di An-Nas tanpa alif, berbeda dengan Al-Fatihah.",
       "src": [
         [
           "R",
@@ -2469,7 +2469,7 @@
       "qac_lem": "wasowaAs",
       "id": "waswas",
       "translit": "waswās",
-      "meaning": "bisikan; pembisik. Al-Mishbah, dan ar-Razi yang dinukil Darwisy: waswās dengan fathah adalah kata benda, sedangkan wiswās dengan kasrah adalah mashdar dari waswasa. Al-Jadwal: al-waswās di 114:4 ialah nama bagi yang membisikkan, wazannya fa‘lālun. Darwisy (dari az-Zamakhsyari): yang dimaksud setan, dinamai dengan kata “bisikan” seakan ia bisikan itu sendiri, karena membisik adalah pekerjaannya. Makna asalnya bunyi yang sangat pelan, seperti gemerincing perhiasan (Ibnu Faris; ar-Raghib).",
+      "meaning": "bisikan; pembisik. Al-Mishbah, dan ar-Razi yang dinukil Darwisy: waswās dengan [[fathah|fathah]] adalah kata benda, sedangkan wiswās dengan [[kasrah|kasrah]] adalah [[mashdar|mashdar]] dari [[waswasa|q:7:20:1/2]]. Al-Jadwal: [[al-waswās|q:114:4:3]] di 114:4 ialah nama bagi yang membisikkan, [[wazannya|wazan]] [[fa‘lālun|wazan-falalun]]. Darwisy (dari az-Zamakhsyari): yang dimaksud setan, dinamai dengan kata “bisikan” seakan ia bisikan itu sendiri, karena membisik adalah pekerjaannya. Makna asalnya bunyi yang sangat pelan, seperti gemerincing perhiasan (Ibnu Faris; ar-Raghib).",
       "src": [
         [
           "MB",
@@ -2497,7 +2497,7 @@
       "qac_lem": "xan~aAs",
       "id": "khannas",
       "translit": "khannās",
-      "meaning": "yang sering mundur bersembunyi: sifat setan, karena ia mundur dan bersembunyi bila Allah disebut (Ibnu Faris; ar-Raghib; al-Mishbah). Al-Mishbah: khannās adalah isim fa'il untuk makna “sangat” (mubalaghah), dari khanasa, “mundur, bersembunyi”; as-Samin: artinya ar-rajjā‘, yang sering mundur. Ibnu Katsir menukil Ibnu 'Abbas: setan bercokol di hati manusia; bila manusia lalai ia membisik, dan bila manusia mengingat Allah ia mundur.",
+      "meaning": "yang sering mundur bersembunyi: sifat setan, karena ia mundur dan bersembunyi bila Allah disebut (Ibnu Faris; ar-Raghib; al-Mishbah). Al-Mishbah: khannās adalah [[isim fa'il|isim-fail]] untuk makna “sangat” ([[mubalaghah|mubalaghah]]), dari khanasa, “mundur, bersembunyi”; as-Samin: artinya ar-rajjā‘, yang sering mundur. Ibnu Katsir menukil Ibnu 'Abbas: setan bercokol di hati manusia; bila manusia lalai ia membisik, dan bila manusia mengingat Allah ia mundur.",
       "src": [
         [
           "MB",
@@ -2533,7 +2533,7 @@
       "qac_lem": "wasowasa",
       "id": "waswasa",
       "translit": "waswasa",
-      "meaning": "membisikkan (keburukan). Ar-Raghib: waswasah ialah lintasan pikiran yang buruk; asal katanya waswās, bunyi perhiasan dan suara yang sangat pelan. Al-Mishbah: waswasa memakai ilā, “membisikkan kepada”. Kata kerja ini tersusun dari empat huruf akar (w-s-w-s); al-Amtsilah at-Tashrifiyyah memakainya sebagai salah satu contoh bab ruba'i mujarrad.",
+      "meaning": "membisikkan (keburukan). Ar-Raghib: waswasah ialah lintasan pikiran yang buruk; asal katanya waswās, bunyi perhiasan dan suara yang sangat pelan. Al-Mishbah: waswasa memakai [[ilā]], “membisikkan kepada”. Kata kerja ini tersusun dari empat huruf akar (w-s-w-s); al-Amtsilah at-Tashrifiyyah memakainya sebagai salah satu contoh [[bab]] [[ruba'i mujarrad|rubai-mujarrad]].",
       "src": [
         [
           "R",
@@ -2548,7 +2548,7 @@
       ],
       "tashrif": {
         "verb_lem": "wasowasa",
-        "bab": "Ruba'i mujarrad (akar empat huruf tanpa huruf tambahan), satu-satunya bab: فَعْلَلَ–يُفَعْلِلُ, jenis mudha'af (dua huruf pertama akarnya terulang), seperti دَحْرَجَ–يُدَحْرِجُ",
+        "bab": "[[Ruba'i mujarrad|rubai-mujarrad]] (akar empat huruf tanpa huruf tambahan), satu-satunya [[bab]]: فَعْلَلَ–يُفَعْلِلُ, jenis [[mudha'af|mudhaaf]] (dua huruf pertama akarnya terulang), seperti دَحْرَجَ–يُدَحْرِجُ",
         "forms": [
           {
             "label": "fi'il madhi",
@@ -2599,7 +2599,7 @@
       "qac_lem": "Sador",
       "id": "sadr",
       "translit": "ṣadr",
-      "meaning": "dada: bagian tubuh manusia (ar-Raghib); jamaknya ṣudūr, seperti fals dan fulūs (al-Mishbah). Kata ini juga dipakai untuk bagian depan sesuatu, seperti bagian depan majelis (ar-Raghib; al-Mishbah). Di 114:5, pembisik itu membisik ke dalam ṣudūr an-nās, “dada manusia”.",
+      "meaning": "dada: bagian tubuh manusia (ar-Raghib); jamaknya [[ṣudūr|q:114:5:4]], seperti fals dan fulūs (al-Mishbah). Kata ini juga dipakai untuk bagian depan sesuatu, seperti bagian depan majelis (ar-Raghib; al-Mishbah). Di 114:5, pembisik itu membisik ke dalam [[ṣudūr|q:114:5:4]] [[an-nās|q:114:5:5]], “dada manusia”.",
       "src": [
         [
           "R",
@@ -3038,7 +3038,7 @@
     },
     {
       "qac_root": "Smd",
-      "meaning": "menuju, bermaksud kepada sesuatu (al-qaṣd), salah satu dari dua makna dasar yang disebut Ibnu Faris. Dari makna ini Allah disebut aṣ-ṣamad, karena hamba-hamba-Nya menuju kepada-Nya dengan doa dan permintaan. Di Al-Qur'an akar ini hanya muncul pada 112:2.",
+      "meaning": "menuju, bermaksud kepada sesuatu (al-qaṣd), salah satu dari dua makna dasar yang disebut Ibnu Faris. Dari makna ini Allah disebut [[aṣ-ṣamad|q:112:2:2]], karena hamba-hamba-Nya menuju kepada-Nya dengan doa dan permintaan. Di Al-Qur'an akar ini hanya muncul pada 112:2.",
       "src": [
         [
           "MQ",
@@ -3075,7 +3075,7 @@
     },
     {
       "qac_root": "kwn",
-      "meaning": "terjadi, ada. Ibnu Faris: akar ini memberitakan terjadinya sesuatu, di masa lampau atau sekarang. QAC 0.4 juga menaruh makān (tempat) di akar ini; Ibnu Faris menukil sebagian ulama yang menurunkan makān dari kāna–yakūnu. Hitungan akar ini didominasi kāna.",
+      "meaning": "terjadi, ada. Ibnu Faris: akar ini memberitakan terjadinya sesuatu, di masa lampau atau sekarang. QAC 0.4 juga menaruh makān (tempat) di akar ini; Ibnu Faris menukil sebagian ulama yang menurunkan makān dari [[kāna|kana]]–[[yakūnu|yakunu]]. Hitungan akar ini didominasi [[kāna|kana]].",
       "src": [
         [
           "MQ",
@@ -3090,7 +3090,7 @@
     },
     {
       "qac_root": "kfA",
-      "meaning": "setara, sama. Ibnu Faris menyebut dua makna dasar; yang pertama kesetaraan dua hal, dan dari sini kuf’ atau kufuw, “yang setara” (112:4). Yang kedua: miring atau membalikkan. Di Al-Qur'an QAC 0.4 hanya mencatat satu kata dari akar ini.",
+      "meaning": "setara, sama. Ibnu Faris menyebut dua makna dasar; yang pertama kesetaraan dua hal, dan dari sini kuf’ atau [[kufuw|q:112:4:4]], “yang setara” (112:4). Yang kedua: miring atau membalikkan. Di Al-Qur'an QAC 0.4 hanya mencatat satu kata dari akar ini.",
       "src": [
         [
           "MQ",
@@ -3104,7 +3104,7 @@
     },
     {
       "qac_root": "Ew*",
-      "meaning": "berlindung, mencari tempat berlindung (Ibnu Faris: satu makna dasar, yaitu berlindung kepada sesuatu, lalu dipakai juga untuk segala yang melekat pada sesuatu). Dari sini a‘ūżu (“aku berlindung”), ista‘iż (“mintalah perlindungan”), dan ma‘āża (perlindungan).",
+      "meaning": "berlindung, mencari tempat berlindung (Ibnu Faris: satu makna dasar, yaitu berlindung kepada sesuatu, lalu dipakai juga untuk segala yang melekat pada sesuatu). Dari sini [[a‘ūżu|q:113:1:2]] (“aku berlindung”), ista‘iż (“mintalah perlindungan”), dan ma‘āża (perlindungan).",
       "src": [
         [
           "MQ",
@@ -3120,7 +3120,7 @@
     },
     {
       "qac_root": "flq",
-      "meaning": "membelah; celah dan keterpisahan pada sesuatu (Ibnu Faris). Dari sini al-falaq (subuh, karena kegelapan terbelah darinya), fāliq (“yang membelah”, 6:95–96), dan infalaqa (“terbelah”, 26:63).",
+      "meaning": "membelah; celah dan keterpisahan pada sesuatu (Ibnu Faris). Dari sini [[al-falaq|q:113:1:4]] (subuh, karena kegelapan terbelah darinya), fāliq (“yang membelah”, 6:95–96), dan infalaqa (“terbelah”, 26:63).",
       "src": [
         [
           "MQ",
@@ -3168,7 +3168,7 @@
     },
     {
       "qac_root": "gsq",
-      "meaning": "kegelapan (Ibnu Faris). Dari sini gasaq (gelapnya malam, 17:78) dan gāsiq (malam yang gelap, 113:3). Akar ini juga memuat gassāq (38:57, 78:25), yang menurut para mufasir yang dinukil Ibnu Faris adalah sesuatu yang menetes dari kulit penghuni neraka.",
+      "meaning": "kegelapan (Ibnu Faris). Dari sini [[gasaq|q:17:78:6]] (gelapnya malam, 17:78) dan [[gāsiq|q:113:3:3]] (malam yang gelap, 113:3). Akar ini juga memuat [[gassāq|q:38:57:4/2]] (38:57, 78:25), yang menurut para mufasir yang dinukil Ibnu Faris adalah sesuatu yang menetes dari kulit penghuni neraka.",
       "src": [
         [
           "MQ",
@@ -3184,7 +3184,7 @@
     },
     {
       "qac_root": "wqb",
-      "meaning": "masuk dan menghilang ke tempat yang tersembunyi (Ibnu Faris); waqaba juga berarti turun dan datang. Di Al-Qur'an akar ini hanya muncul pada 113:3.",
+      "meaning": "masuk dan menghilang ke tempat yang tersembunyi (Ibnu Faris); [[waqaba|q:113:3:5]] juga berarti turun dan datang. Di Al-Qur'an akar ini hanya muncul pada 113:3.",
       "src": [
         [
           "MQ",
@@ -3198,7 +3198,7 @@
     },
     {
       "qac_root": "nfv",
-      "meaning": "keluarnya sesuatu dari mulut dengan bunyi yang paling pelan (Ibnu Faris), seperti tiupan dengan sedikit ludah, lebih sedikit daripada meludah. Di Al-Qur'an akar ini hanya muncul pada an-naffāṡāt (113:4).",
+      "meaning": "keluarnya sesuatu dari mulut dengan bunyi yang paling pelan (Ibnu Faris), seperti tiupan dengan sedikit ludah, lebih sedikit daripada meludah. Di Al-Qur'an akar ini hanya muncul pada [[an-naffāṡāt|q:113:4:3]] (113:4).",
       "src": [
         [
           "MQ",
@@ -3244,7 +3244,7 @@
     },
     {
       "qac_root": "nws",
-      "meaning": "bergerak, terayun-ayun (Ibnu Faris). QAC 0.4 menaruh an-nās (manusia) di akar ini, sejalan dengan pendapat bahwa nās berasal dari nāsa–yanūsu, “bergerak” (al-Mishbah); menurut Sibawaih (dinukil an-Nahhas) asalnya unās. Seluruh hitungan akar ini adalah kata nās.",
+      "meaning": "bergerak, terayun-ayun (Ibnu Faris). QAC 0.4 menaruh [[an-nās|q:114:1:4]] (manusia) di akar ini, sejalan dengan pendapat bahwa nās berasal dari nāsa–yanūsu, “bergerak” (al-Mishbah); menurut Sibawaih (dinukil an-Nahhas) asalnya unās. Seluruh hitungan akar ini adalah kata nās.",
       "src": [
         [
           "MQ",
@@ -3283,7 +3283,7 @@
     },
     {
       "qac_root": "xns",
-      "meaning": "bersembunyi dan menutupi diri (Ibnu Faris: satu makna dasar). Dari sini al-khannās, sifat setan yang mundur bersembunyi bila Allah disebut, dan al-khunnas (81:15), bintang-bintang yang menghilang di tempat terbenamnya.",
+      "meaning": "bersembunyi dan menutupi diri (Ibnu Faris: satu makna dasar). Dari sini [[al-khannās|q:114:4:4]], sifat setan yang mundur bersembunyi bila Allah disebut, dan al-khunnas (81:15), bintang-bintang yang menghilang di tempat terbenamnya.",
       "src": [
         [
           "MQ",
@@ -3298,7 +3298,7 @@
     },
     {
       "qac_root": "Sdr",
-      "meaning": "dua makna dasar (Ibnu Faris): pulang dari tempat air (lawan datang), dan dada manusia. Dari makna kedua datang ṣadr (dada), jamaknya ṣudūr; dari makna pertama yaṣduru (“mereka keluar”, 99:6).",
+      "meaning": "dua makna dasar (Ibnu Faris): pulang dari tempat air (lawan datang), dan dada manusia. Dari makna kedua datang ṣadr (dada), jamaknya [[ṣudūr|q:114:5:4]]; dari makna pertama yaṣduru (“mereka keluar”, 99:6).",
       "src": [
         [
           "MQ",

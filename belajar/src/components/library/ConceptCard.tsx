@@ -67,7 +67,7 @@ export function ConceptCard({
   const sc = scope ?? new Scope();
   const mk = concept.marked;
   // Annotated in reading order, so "first use" is the first one the reader meets.
-  const title = mk ? titleParts(mk.title, sc, TERMS, SOUNDS) : { tokens: plain(concept.title), head: [] };
+  const title = mk ? titleParts(mk.title, sc, TERMS) : { tokens: plain(concept.title), head: [] };
   const summary = mk ? annotate(mk.summary, sc, TERMS) : plain(concept.summary);
   const explanation = compact ? [] : (mk?.explanation ?? concept.explanation).map((p) => (mk ? annotate(p, sc, TERMS) : plain(p)));
   const parts = page

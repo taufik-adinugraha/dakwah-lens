@@ -204,9 +204,11 @@ export type Source = {
   licence: string;
   credit: string;
   url: string;
-  status: "in_use" | "planned";
 };
 
+/** What the published lessons are built from: every entry is in use (operator, 2026-10-12: no
+ *  "Direncanakan" label on the Kredit page — the list once carried a planned/in-use status from
+ *  the plan stage, never updated). A source the lessons do not use yet is not listed. */
 export const SOURCES: Source[] = [
   {
     name: "Tanzil Quran Text (Uthmani, v1.1)",
@@ -214,15 +216,13 @@ export const SOURCES: Source[] = [
     licence: "CC BY 3.0 — salinan verbatim, tanpa perubahan",
     credit: "Tanzil Quran Text — tanzil.net",
     url: "https://tanzil.net/docs/text_license",
-    status: "planned",
   },
   {
     name: "Quranic Arabic Corpus 0.4",
-    role: "Akar kata, lemma, jenis kata (bahan penyusunan; ditinjau manusia)",
+    role: "Akar kata, lemma, jenis kata (bahan penyusunan materi)",
     licence: "GNU GPL; salinan verbatim; wajib menyebut dan menautkan sumber",
     credit: "Quranic Arabic Corpus — corpus.quran.com",
     url: "https://corpus.quran.com",
-    status: "planned",
   },
   {
     name: "quran-align (Collin Fair)",
@@ -230,7 +230,6 @@ export const SOURCES: Source[] = [
     licence: "CC BY 4.0",
     credit: "Word timings: Collin Fair, quran-align (CC BY 4.0)",
     url: "https://github.com/cpfair/quran-align",
-    status: "planned",
   },
   {
     name: "Bacaan Syaikh Mishary Rasyid Alafasy",
@@ -238,15 +237,13 @@ export const SOURCES: Source[] = [
     licence: "Diputar dari server penyedia; hak rekaman tetap pada pemiliknya",
     credit: "Recitation: Mishary Rashid Alafasy via EveryAyah.com",
     url: "https://everyayah.com",
-    status: "planned",
   },
   {
     name: "Bacaan Syaikh Mahmud Khalil al-Husary (Mu'allim)",
     role: "Bacaan imam untuk mendengar dan menirukan (diputar langsung, tidak disimpan)",
     licence: "Diputar dari server penyedia; hak rekaman tetap pada pemiliknya",
-    credit: "Recitation: Mahmoud Khalil Al-Husary (Mu'allim)",
-    url: "https://quran.com",
-    status: "planned",
+    credit: "Recitation: Mahmoud Khalil Al-Husary (Mu'allim) via EveryAyah.com",
+    url: "https://everyayah.com",
   },
   {
     name: "QuranEnc — Terjemahan Indonesia (Kementerian Agama)",
@@ -254,7 +251,6 @@ export const SOURCES: Source[] = [
     licence: "Ketentuan QuranEnc (tanpa perubahan, sebut sumber)",
     credit: "QuranEnc.com",
     url: "https://quranenc.com",
-    status: "planned",
   },
   {
     name: "Kitab rujukan i'rab dan tafsir",
@@ -262,6 +258,5 @@ export const SOURCES: Source[] = [
     licence: "Dikutip seperlunya dan diparafrasekan, dengan rujukan jilid/halaman",
     credit: "Rujukan dicantumkan pada setiap kata dan ayat",
     url: "https://dakwah-lens.id/belajar/id/kredit",
-    status: "planned",
   },
 ];

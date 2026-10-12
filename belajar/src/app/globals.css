@@ -554,6 +554,17 @@ html {
   }
 }
 
+/* The fact cards' ayah dialog (src/components/surah/AyahDialog.tsx, a modal <dialog>): while it is
+   open the page behind does not scroll (wheel, touch, keys; the dialog scrolls inside itself), and
+   keeps its scrollbar's room, so nothing behind shifts sideways. */
+html:has(dialog[data-ayah-dialog][open]),
+html:has(dialog[data-ayah-dialog][open]) body {
+  overflow: hidden;
+}
+html:has(dialog[data-ayah-dialog][open]) {
+  scrollbar-gutter: stable;
+}
+
 /* 2.4.7 / 2.4.13: one strong focus ring everywhere (forest vs paper 7.90). */
 :where(a, button, summary, select, input, textarea, [tabindex]):focus-visible {
   outline: 3px solid var(--color-forest);

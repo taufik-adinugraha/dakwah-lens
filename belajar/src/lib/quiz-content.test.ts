@@ -10,9 +10,10 @@ import { describe, expect, it } from "vitest";
 import { stageSequence } from "@/components/autoplay/build";
 
 import { SURAHS } from "./content";
-import { getLexeme, LIBRARY } from "./library";
+import { getLexeme, LIBRARY, TERMS } from "./library";
 import { QUIZ_SLUGS, quizAyah, quizFileProblems, quizFor } from "./quiz-content";
 import { planOf } from "./quiz-plan";
+import { annotate, lessonLookup, Scope, termDisplay } from "./terms";
 
 const fatihah = SURAHS.find((s) => s.slug === "al-fatihah")!;
 
@@ -67,5 +68,39 @@ describe("quizzes (content/quiz)", () => {
     expect(planOf(quizAyah("al-fatihah", 2), "sort-case")?.bins).toEqual(["marfu", "majrur"]);
     expect(planOf(quizAyah("al-fatihah", 1), "sort-case")).toBeNull();
     expect(planOf(quizAyah("al-fatihah", 4), "wazn-factory")).toBeNull();
+  });
+});
+
+// The quiz text is built in Python (pipeline/quiz.py annotate_marked), a word card's by
+// src/lib/terms.ts: two renderers of one marked text. Review 2026-10-12: the rule that keeps a
+// term Latin inside a bracketed phrase reached the card only, and the quiz still read
+// "rafa' (رَفْع, mahall, مَحَلّ raf')". Wherever the quiz shows a word's reason or role, it must
+// be the string the card shows.
+describe("the quiz and the word card show one text", () => {
+  it("every reason or role the Al-Fatihah quiz takes from a word is what the card renders", () => {
+    const strings: string[] = [];
+    const walk = (o: unknown): void => {
+      if (typeof o === "string") strings.push(o);
+      else if (Array.isArray(o)) o.forEach(walk);
+      else if (o && typeof o === "object") Object.values(o).forEach(walk);
+    };
+    walk(quizFor("al-fatihah"));
+    const lookup = lessonLookup(TERMS, fatihah);
+    const inQuiz = new Set(strings);
+    // A reason or role the quiz shows is the card's rendering, character for character. Counted,
+    // not matched one by one (a quiz string and its plain text differ by the Arabic itself): 43 of
+    // the 58 reasons and roles are quiz text today, and a renderer that drifts drops the count.
+    let shared = 0;
+    for (const a of fatihah.ayat) {
+      for (const w of a.words) {
+        for (const marked of [w.marked?.why, w.marked?.role]) {
+          if (marked && inQuiz.has(termDisplay(annotate(marked, new Scope(false), lookup)).text)) shared++;
+        }
+      }
+    }
+    // Exactly today's count: three drifting strings (40) was the defect. A change to the quiz or
+    // the words that moves it is updated here knowingly.
+    expect(shared).toBe(43);
+    expect(strings.join("\n")).not.toMatch(/mahall, \p{Script=Arabic}+ raf'/u);
   });
 });

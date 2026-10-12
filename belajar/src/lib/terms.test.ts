@@ -1,12 +1,19 @@
 import { describe, expect, it } from "vitest";
 
-import { WORD_AR, WORD_INFO } from "./content";
+import { CASE_META, caseLabelMarked } from "./cases";
+import { SURAHS, WORD_AR, WORD_INFO } from "./content";
 import { LIBRARY, TERMS } from "./library";
 import {
   annotate,
+  headwordOf,
+  isGloss,
+  lessonLookup,
+  lessonProblems,
   letterOf,
   letters,
   libraryProblems,
+  markedTokens,
+  termDisplay,
   MARK_NAME,
   marksOf,
   noteWithoutWord,
@@ -188,6 +195,22 @@ describe("words explained by their parts (rule 14)", () => {
 });
 
 describe("display: Arabic at the first use in a scope", () => {
+  // Operator review 2026-10-12: "rafa' (رَفْع, mahall, مَحَلّ raf')" wedged an Arabic gloss into
+  // the phrase "mahall raf'". Inside brackets, a term that more of the phrase follows stays Latin.
+  it("keeps a term Latin inside a bracketed phrase that goes on after it, and shows it at its next use", () => {
+    const show = (t: string) => termDisplay(annotate(t, new Scope(false), TERMS)).text;
+    const rafa = TERMS.terms.get("rafa")!.ar;
+    const mahall = TERMS.terms.get("mahall")!.ar;
+    expect(show("kedudukan [[rafa'|rafa]] ([[mahall|mahall]] raf') di kartu ini")).toBe(`kedudukan rafa' (${rafa}, mahall raf') di kartu ini`);
+    // two marked items in one phrase: the first stays Latin
+    expect(show("([[mahall|mahall]] [[nashb|nashab]])")).toBe(`(mahall nashb, ${TERMS.terms.get("nashab")!.ar})`);
+    // not counted as shown: its next use outside the phrase has the Arabic
+    expect(show("([[mahall|mahall]] raf'). [[Mahall|mahall]] adalah kedudukan")).toBe(`(mahall raf'). Mahall (${mahall}) adalah kedudukan`);
+    // the end of the bracket, a comma or a list is not a phrase going on: the Arabic stays
+    expect(show("(dalam keadaan [[mahall|mahall]])")).toBe(`(dalam keadaan mahall, ${mahall})`);
+    expect(show("([[mahall|mahall]] dan [[rafa'|rafa]])")).toBe(`(mahall, ${mahall} dan rafa', ${rafa})`);
+  });
+
   it("shows a term's Arabic once per scope, and keeps the punctuation with it", () => {
     const sc = new Scope();
     const a = annotate("Ia [[majrur|majrur]], lalu tetap [[majrur|majrur]].", sc, TERMS);
@@ -202,7 +225,7 @@ describe("display: Arabic at the first use in a scope", () => {
   it("gives a harakah term its reminder and link at its first use, even after the headword", () => {
     const sc = new Scope();
     const title = titleParts("Tanda [[kasrah|kasrah]]", sc, TERMS);
-    expect(title.head).toEqual([{ ar: TERMS.terms.get("kasrah")!.ar }]);
+    expect(title.head).toEqual([{ ar: TERMS.terms.get("kasrah")!.ar, mark: "\u0650" }]);
     const body = annotate("berakhir [[kasrah|kasrah]], lalu [[kasrah|kasrah]] lagi", sc, TERMS);
     const terms = body.filter((t) => t.kind === "term");
     expect(terms.map((t) => t.kind === "term" && t.hint)).toEqual([true, false]);
@@ -241,10 +264,17 @@ describe("display: Arabic at the first use in a scope", () => {
     expect(text(title.tokens)).toBe(`Zharaf iżā (${LIBRARY.quran["113:3:4"]}, keterangan waktu)`);
   });
 
-  it("gives a harakah term in a title its sound on the headword", () => {
-    const sounds = soundsOf(LIBRARY.basics[0].signs);
-    const { head } = titleParts("[[I'rab|irab]] dan tandanya ([[dhammah|dhammah]])", new Scope(), TERMS, sounds);
-    expect(head).toEqual([{ ar: TERMS.terms.get("irab")!.ar }, { ar: TERMS.terms.get("dhammah")!.ar, sound: "u" }]);
+  // Operator 2026-10-12: "better not use 'a', 'i', 'u', but use harakat symbols".
+  it("gives a harakah term in a title its sign on the headword, never its sound in Latin", () => {
+    const { head } = titleParts("[[I'rab|irab]] dan tandanya ([[dhammah|dhammah]], [[fathah|fathah]], [[kasrah|kasrah]])", new Scope(), TERMS);
+    expect(head).toEqual([
+      { ar: TERMS.terms.get("irab")!.ar },
+      { ar: TERMS.terms.get("dhammah")!.ar, mark: "\u064f" },
+      { ar: TERMS.terms.get("fathah")!.ar, mark: "\u064e" },
+      { ar: TERMS.terms.get("kasrah")!.ar, mark: "\u0650" },
+    ]);
+    // tanwin names three signs: it gets none
+    expect(titleParts("[[Tanwin|tanwin]]", new Scope(), TERMS).head).toEqual([{ ar: TERMS.terms.get("tanwin")!.ar }]);
   });
 
   it("drops the example's own word from the start of its note (the row shows it)", () => {
@@ -259,5 +289,128 @@ describe("display: Arabic at the first use in a scope", () => {
       expect(w?.translit.length).toBeGreaterThan(0);
       expect(w?.gloss.length).toBeGreaterThan(0);
     }
+  });
+});
+
+describe("the marked lessons and the Kosakata (operator 2026-10-12: Arabic, not only the transliteration)", () => {
+  const fatihah = SURAHS.find((s) => s.slug === "al-fatihah")!;
+  const lookup = lessonLookup(TERMS, fatihah);
+  const show = (marked: string, scope = new Scope(false)) => termDisplay(annotate(marked, scope, lookup)).text;
+
+  it("passes every corpus-free check: plain = marked minus markup, refs resolve to the lesson's bytes", () => {
+    for (const s of SURAHS) expect(lessonProblems(s, LIBRARY, WORD_AR), s.slug).toEqual([]);
+    expect(libraryProblems(LIBRARY, WORD_AR)).toEqual([]);
+  });
+
+  it("marks every word card, ayah structure and fact of Al-Fatihah, and every Kosakata entry", () => {
+    expect(fatihah.ayat.every((a) => a.words.every((w) => w.marked) && a.structure?.marked)).toBe(true);
+    expect(fatihah.facts.every((f) => f.marked)).toBe(true);
+    expect(LIBRARY.lexicon.every((l) => l.marked) && LIBRARY.roots.every((r) => r.marked)).toBe(true);
+    // the hidden Mu'awwidzat lessons are not marked yet (pipeline/terms.py MARKED_SURAHS)
+    expect(SURAHS.filter((s) => s.ayat.some((a) => a.words.some((w) => w.marked))).map((s) => s.slug)).toEqual(["al-fatihah"]);
+  });
+
+  it("shows ‘alaihim's card in Arabic: ‘alā, -him, every term", () => {
+    const w = fatihah.ayat[6].words[6]; // 1:7:7
+    const text = show(w.marked!.why);
+    expect(stripMarked(w.marked!.why)).toBe(w.why);
+    for (const want of [
+      `‘Alā (${LIBRARY.quran["2:5:2"]})`,
+      `huruf jar (${TERMS.terms.get("huruf-jar")!.ar})`,
+      `-him (${fatihah.quran["1:7:7/2"]})`,
+      // the phrase "mahall raf'" stays whole: no Arabic wedged inside it (review 2026-10-12)
+      `rafa' (${TERMS.terms.get("rafa")!.ar}, mahall raf')`,
+      `jar-majrur (${TERMS.terms.get("jar-majrur")!.ar})`,
+      `na'ib fa'il (${TERMS.terms.get("naib-fail")!.ar}, pengganti pelaku)`,
+      `al-magḍūbi (${fatihah.quran["1:7:6"]})`,
+      `isim maf'ul (${TERMS.terms.get("isim-maful")!.ar})`,
+    ])
+      expect(text).toContain(want);
+    // the card's own word is shown above it: its name is not repeated
+    const card = new Scope(false);
+    card.shown.add(`q:${w.loc}`);
+    expect(show(w.marked!.why, card)).toContain(" ‘alaihim secara utuh");
+  });
+
+  it("gives the case chip the term table's Arabic and a letter sign the ayah's letter", () => {
+    for (const st of Object.keys(CASE_META) as (keyof typeof CASE_META)[]) expect(stripMarked(caseLabelMarked(st))).toBe(CASE_META[st].label);
+    expect(show(caseLabelMarked("majrur"))).toBe(`majrūr (${TERMS.terms.get("majrur")!.ar})`);
+    const alamina = fatihah.ayat[1].words[3]; // 1:2:4, majrur with ya'
+    expect(show(alamina.marked!.sign!)).toBe(`ya' (${letterOf(alamina.ar, 6)})`);
+  });
+
+  it("shows an example given only as a translation with the Arabic of its ayah words (the gloss variant)", () => {
+    const idhafah = LIBRARY.concepts.find((c) => c.id === "idhafah")!;
+    const text = termDisplay(annotate(idhafah.marked!.summary, new Scope(), TERMS)).text;
+    expect(text).toContain(`seperti “nama Allah” (${LIBRARY.quran["1:1:1-2"]}),`);
+    expect(LIBRARY.quran["1:1:1-2"]).toBe(`${WORD_AR["1:1:1"]} ${WORD_AR["1:1:2"]}`);
+    expect(idhafah.summary).toContain("seperti “nama Allah”, dan"); // the plain text as it was
+    expect(isGloss("“nama Allah”")).toBe(true);
+    expect(isGloss("“nama Allah")).toBe(false);
+    expect(isGloss("nama Allah")).toBe(false);
+  });
+
+  it("gives a concept chip its Arabic headword", () => {
+    expect(headwordOf(LIBRARY.concepts.find((c) => c.id === "huruf-jar")!.marked!.title, TERMS)).toBe(TERMS.terms.get("huruf-jar")!.ar);
+  });
+
+  it("returns null without a marked twin (an unmarked lesson draws its plain text as before)", () => {
+    expect(markedTokens(undefined, new Scope(), lookup)).toBeNull();
+  });
+});
+
+describe("planted faults in the marked lessons and the Kosakata are caught", () => {
+  const fatihah = SURAHS.find((s) => s.slug === "al-fatihah")!;
+  const problems = (s: typeof fatihah) => lessonProblems(s, LIBRARY, WORD_AR).join("\n");
+
+  it("a plain field that drifted from its marked twin", () => {
+    const s = clone(fatihah);
+    s.ayat[6].words[3].why += " Lagi.";
+    expect(problems(s)).toMatch(/word 1:7:4.why: the plain text is not the marked text/);
+  });
+
+  it("a q-ref with no bytes in the lesson, and a part that is not the word's segment", () => {
+    const s = clone(fatihah);
+    delete s.quran["2:5:2"];
+    s.quran["1:7:4/2"] = s.quran["1:1:1/1"];
+    const p = problems(s);
+    expect(p).toMatch(/q:2:5:2 has no bytes in content\/al-fatihah.json quran/);
+    expect(p).toMatch(/q:1:7:4\/2 is not segment 2/);
+  });
+
+  it("a gloss whose ref does not resolve, a gloss on a half-quoted surface, a gloss naming a term", () => {
+    const lib = clone(LIBRARY);
+    const c = lib.concepts.find((x) => x.id === "idhafah")!;
+    const mk = c.marked!;
+    mk.summary = mk.summary.replace("|q:1:1:1-2]]", "|q:1:1:1-9]]");
+    mk.bridge = mk.bridge!.replace("[[“nama Allah”|", "[[“nama Allah|").replace("|q:1:1:1-2]] atau", "|q:1:1:1-2]]” atau");
+    mk.explanation[0] = mk.explanation[0] + " [[“nama”|idhafah]]";
+    c.explanation[0] = c.explanation[0] + " “nama”";
+    const p = libraryProblems(lib, WORD_AR).join("\n");
+    expect(p).toMatch(/q:1:1:1-9 has no bytes in library.json quran/);
+    expect(p).toMatch(/idhafah.bridge: \[\[“nama Allah\|q:1:1:1-2\]\]: a gloss variant's surface must be one quotation/);
+    expect(p).toMatch(/a gloss names the Qur'anic words it translates, not a term/);
+  });
+
+  it("Arabic typed by hand into a marked field (a lesson's, a concept's)", () => {
+    const s = clone(fatihah);
+    const ala = s.quran["2:5:2"];
+    s.ayat[6].words[3].marked!.why = s.ayat[6].words[3].marked!.why.replace("[[‘Alā|q:2:5:2]]", `‘Alā (${ala})`);
+    s.ayat[6].words[3].why = s.ayat[6].words[3].why.replace("‘Alā", `‘Alā (${ala})`);
+    expect(problems(s)).toMatch(/word 1:7:4.why: typed Arabic/);
+    const lib = clone(LIBRARY);
+    const c = lib.concepts.find((x) => x.id === "idhafah")!;
+    c.marked!.summary = c.marked!.summary.replace("[[“nama Allah”|q:1:1:1-2]]", `“nama Allah” (${lib.quran["1:1:1-2"]})`);
+    c.summary = c.summary.replace("“nama Allah”", `“nama Allah” (${lib.quran["1:1:1-2"]})`);
+    expect(libraryProblems(lib, WORD_AR).join("\n")).toMatch(/concept idhafah.summary: typed Arabic/);
+  });
+
+  it("a Kosakata field that drifted from its marked twin, and a word card without its twin", () => {
+    const lib = clone(LIBRARY);
+    lib.lexicon[0].meaning += " Lagi.";
+    expect(libraryProblems(lib, WORD_AR).join("\n")).toMatch(/lexeme ism.meaning: the plain text is not the marked text/);
+    const s = clone(fatihah);
+    delete s.ayat[0].words[0].marked;
+    expect(problems(s)).toMatch(/word 1:1:1: no marked prose/);
   });
 });

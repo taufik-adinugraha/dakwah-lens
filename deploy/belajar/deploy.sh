@@ -72,7 +72,6 @@ if [[ ! -f "$ENV_FILE" || "$ROLE_EXISTS" != "1" ]]; then
   ( umask 077
     cat > "${ENV_FILE}.tmp" <<ENVEOF
 DATABASE_URL=postgres://belajar:${PW}@postgres:5432/dakwah_belajar
-MAIN_APP_INTERNAL_URL=http://web:3000
 ENVEOF
   )
   # Password goes over stdin, never argv; terse errors never echo it.

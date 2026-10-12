@@ -4,6 +4,7 @@
     python3 fetch.py               # download what is missing; verify everything against the pins
     python3 fetch.py --refresh     # re-download everything and compare with the pins (upstream drift check)
     python3 fetch.py --repin ID    # accept new bytes for input ID (deliberate pin update)
+    python3 fetch.py --only ID     # only input ID (repeatable); every other input is left as it is
 
 First run: pins are empty, so the downloaded bytes are pinned. Later runs fail loudly
 (exit 1) if a cached or re-downloaded file differs from its pin. Per-surah inputs (the QuranEnc
@@ -20,6 +21,7 @@ import json
 import sys
 import time
 import urllib.request
+import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
 
@@ -217,6 +219,82 @@ def fetch_quranenc_waris(meta: dict, sura1: dict, tanzil: dict, refresh: bool, r
                         f"translations list as read for sura 1: {sura1.get('version')!r}/{sura1.get('title_id')!r}")
 
 
+def fetch_quranenc_quran(meta: dict, sura1: dict, waris: dict, tanzil: dict, refresh: bool, repin: set[str]) -> None:
+    """The ayah popup of the fact cards (operator 2026-10-12; content/ayat/locations.json,
+    build_ayat.py) shows any ayah a fact locates, and the facts locate ayat in 103 suras: the whole
+    indonesian_affairs translation is pinned, one file per sura, 1..114, from sura 1's endpoint. A
+    file another input pins too (sura 1, the lesson suras, the waris suras) is the same cache file,
+    so its two pins must agree. The endpoint reports no version: version, title and last_update are
+    the ones fetch_quranenc() read for sura 1 from the pinned translations list."""
+    key = "quranenc_indonesian_affairs_quran"
+    counts: dict[int, int] = {}
+    for (s, _a) in load_tanzil(PIPELINE / tanzil["cache_path"]).verses:
+        counts[s] = counts.get(s, 0) + 1
+    other = {Path(sura1["cache_path"]).name: sura1.get("sha256")}
+    other.update({Path(sm["cache_path"]).name: sm.get("sha256") for sm in (sura1.get("suras") or {}).values()})
+    other.update({name: f.get("sha256") for name, f in waris.get("files", {}).items()})
+    d = PIPELINE / meta["cache_dir"]
+    files = meta.setdefault("files", {})
+    for sura in range(1, 115):
+        name = f"indonesian_affairs_sura{sura}.json"
+        url = meta["url_pattern"].replace("{SURA}", str(sura))
+        downloads = refresh or not (d / name).exists()
+        b = obtain(d / name, url, refresh)
+        if downloads:
+            time.sleep(0.3)  # one sura at a time, politely
+        f = files.setdefault(name, {"url": url, "sha256": None})
+        if f["url"] != url:
+            problems.append(f"[{key}] {name}: pinned url {f['url']} != {url}")
+        pin(f, name, b, key, repin)
+        f["bytes"] = len(b)
+        rows = json.loads(b)["result"]
+        if {int(r["sura"]) for r in rows} != {sura}:
+            problems.append(f"[{key}] {name}: rows are not all sura {sura}")
+        if [int(r["aya"]) for r in rows] != list(range(1, counts[sura] + 1)):
+            problems.append(f"[{key}] {name}: ayat are not 1..{counts[sura]} (the Tanzil count)")
+        f["ayat"] = len(rows)
+        f["retrieved"] = f.get("retrieved") or TODAY
+        if other.get(name) and other[name] != f["sha256"]:
+            problems.append(f"[{key}] {name}: pinned {f['sha256']}, but another input pins the same file as {other[name]}")
+    for field_name in ("version", "title_id", "last_update_unix"):
+        if meta.get(field_name) != sura1.get(field_name):
+            problems.append(f"[{key}] {field_name} {meta.get(field_name)!r} differs from the translations list as read "
+                            f"for sura 1: {sura1.get(field_name)!r}")
+
+
+def fetch_quranenc_sura_names(meta: dict, tanzil_meta: dict, refresh: bool, repin: set[str]) -> None:
+    """The popup's surah names (build_ayat.py): QuranEnc's Indonesian sura list. Its HTML carries
+    per-request tokens, so the EXTRACTED list (ayat.extract_sura_names) is cached and pinned
+    (`text_sha256`), like the Shamela pages; its ayah counts must be Tanzil's."""
+    import ayat as AY  # here, not at the top: it imports the lesson build
+
+    key = "quranenc_sura_names"
+    p = PIPELINE / meta["cache_path"]
+    if p.exists() and not refresh:
+        b = p.read_bytes()
+    else:
+        print(f"  GET {meta['url']}")
+        try:
+            b = AY.extract_sura_names(http_get(meta["url"]).decode("utf-8")).encode("utf-8")
+        except AY.AyatError as err:
+            problems.append(f"[{key}] {err}")
+            return
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_bytes(b)
+    pin(meta, "sura list", b, key, repin, "text_sha256")
+    meta["bytes"] = len(b)
+    meta["retrieved"] = meta.get("retrieved") or TODAY
+    try:
+        listing = AY.parse_sura_names(b.decode("utf-8"))
+    except (AY.AyatError, ValueError) as err:
+        problems.append(f"[{key}] {err}")
+        return
+    ayas = {int(e.get("index")): int(e.get("ayas")) for e in ET.parse(PIPELINE / tanzil_meta["cache_path"]).getroot().iter("sura")}
+    for n, r in listing.items():
+        if r["ayat"] != ayas.get(n):
+            problems.append(f"[{key}] sura {n}: {r['ayat']} ayat in the list, {ayas.get(n)} in Tanzil's metadata")
+
+
 def fetch_fawaz_muslim(meta: dict, refresh: bool, repin: set[str]) -> None:
     """Ilmu Waris dalil: fawazahmed0 Sahih Muslim sections, used only to map api/data/muslim.json's
     sequential numbers to Fuad Abd al-Baqi numbers (build_dalil.muslim_canon)."""
@@ -312,24 +390,47 @@ def main() -> int:
     ap.add_argument("--repin", action="append", default=[], help="accept new bytes for this input id")
     ap.add_argument("--skip-audio", action="store_true", help="skip the EveryAyah duration probes")
     ap.add_argument("--skip-waris", action="store_true", help="skip the Ilmu Waris inputs (QuranEnc suras > 1, Muslim map)")
+    ap.add_argument("--only", action="append", default=[], metavar="ID",
+                    help="fetch only this input id (repeatable); every other input is left as it is")
     args = ap.parse_args()
     repin = set(args.repin)
     src = load_sources()
     I = src["inputs"]
-    print("tanzil_uthmani"); fetch_tanzil(I["tanzil_uthmani"], args.refresh, repin)
-    print("tanzil_metadata"); fetch_tanzil_metadata(I["tanzil_metadata"], args.refresh, repin)
-    print("qac_morphology"); fetch_qac(I["qac_morphology"], args.refresh, repin)
-    print("quran_align"); fetch_quran_align(I["quran_align"], args.refresh, repin)
-    print("quranenc_indonesian_affairs"); fetch_quranenc(I["quranenc_indonesian_affairs"], args.refresh, repin)
+    unknown = sorted(set(args.only) - set(I))
+    if unknown:
+        print(f"unknown input id(s): {', '.join(unknown)}", file=sys.stderr)
+        return 1
+    want = lambda k: not args.only or k in args.only  # noqa: E731
+    if want("tanzil_uthmani"):
+        print("tanzil_uthmani"); fetch_tanzil(I["tanzil_uthmani"], args.refresh, repin)
+    if want("tanzil_metadata"):
+        print("tanzil_metadata"); fetch_tanzil_metadata(I["tanzil_metadata"], args.refresh, repin)
+    if want("qac_morphology"):
+        print("qac_morphology"); fetch_qac(I["qac_morphology"], args.refresh, repin)
+    if want("quran_align"):
+        print("quran_align"); fetch_quran_align(I["quran_align"], args.refresh, repin)
+    if want("quranenc_indonesian_affairs"):
+        print("quranenc_indonesian_affairs"); fetch_quranenc(I["quranenc_indonesian_affairs"], args.refresh, repin)
     if not args.skip_waris:
-        print("quranenc_indonesian_affairs_waris")
-        fetch_quranenc_waris(I["quranenc_indonesian_affairs_waris"], I["quranenc_indonesian_affairs"],
-                             I["tanzil_uthmani"], args.refresh, repin)
-        print("fawazahmed0_muslim_sections"); fetch_fawaz_muslim(I["fawazahmed0_muslim_sections"], args.refresh, repin)
-    print("shamela_istilah"); fetch_shamela_istilah(I["shamela_istilah"], args.refresh, repin)
+        if want("quranenc_indonesian_affairs_waris"):
+            print("quranenc_indonesian_affairs_waris")
+            fetch_quranenc_waris(I["quranenc_indonesian_affairs_waris"], I["quranenc_indonesian_affairs"],
+                                 I["tanzil_uthmani"], args.refresh, repin)
+        if want("fawazahmed0_muslim_sections"):
+            print("fawazahmed0_muslim_sections"); fetch_fawaz_muslim(I["fawazahmed0_muslim_sections"], args.refresh, repin)
+    # The fact cards' ayah popup (build_ayat.py): every sura of the translation, and the sura names.
+    if want("quranenc_indonesian_affairs_quran"):
+        print("quranenc_indonesian_affairs_quran")
+        fetch_quranenc_quran(I["quranenc_indonesian_affairs_quran"], I["quranenc_indonesian_affairs"],
+                             I["quranenc_indonesian_affairs_waris"], I["tanzil_uthmani"], args.refresh, repin)
+    if want("quranenc_sura_names"):
+        print("quranenc_sura_names"); fetch_quranenc_sura_names(I["quranenc_sura_names"], I["tanzil_metadata"], args.refresh, repin)
+    if want("shamela_istilah"):
+        print("shamela_istilah"); fetch_shamela_istilah(I["shamela_istilah"], args.refresh, repin)
     if not args.skip_audio:
         for k in ("everyayah_husary_muallim", "everyayah_alafasy"):
-            print(k); fetch_everyayah(k, I[k], args.refresh, repin)
+            if want(k):
+                print(k); fetch_everyayah(k, I[k], args.refresh, repin)
     if problems:
         print("\nFETCH FAILED:", file=sys.stderr)
         for p in problems:

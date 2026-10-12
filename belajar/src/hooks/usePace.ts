@@ -9,8 +9,8 @@ export type { Pace };
 /**
  * Lesson preferences kept in this browser (like useProgress: localStorage
  * read through useSyncExternalStore, so SSR and the first client render
- * agree and no effect sets state). Synced to the account later, together
- * with progress (senior-ux §3.4).
+ * agree and no effect sets state). Kept on this device only: the module has
+ * no account to sync it to (plan L16).
  *
  * If storage is blocked (private mode), a choice still holds for this visit
  * through the in-memory fallback, so the learner is not asked again on every

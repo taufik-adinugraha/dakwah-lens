@@ -69,9 +69,10 @@ export function measure({ scope, seams }) {
     if (BAD_END.test(prev)) out.push("line-end-opener");
     if (!afterSpace && /[\p{L}\p{M}\p{N}][-–—/]$/u.test(prev) && /^[\p{L}\p{N}]/u.test(t)) out.push("hyphen-split");
     // The term and its Arabic on two lines, "huruf jar ⏎ (حَرْف جَرّ)" — a bracket opening on
-    // Arabic (≤ 3 words of ≥ 2 letters up to its ")", as MixedText keeps them) after a Latin word.
+    // Arabic (≤ 3 words of ≥ 2 letters up to its ")", as MixedText keeps them) after a Latin word,
+    // or after a quoted gloss's closing ”: “nama Allah” ⏎ (بِسْمِ ٱللَّهِ) (2026-10-12).
     const term = /^\(([^)]*)\)/.exec(t);
-    if (/\p{Script=Latin}[’'ʼ]?$/u.test(prev) && term && AR.test(term[1].trim()[0] ?? "") && longWords(term[1]) < QUOTE_WORDS)
+    if (/\p{Script=Latin}[’'ʼ]?”?$/u.test(prev) && term && AR.test(term[1].trim()[0] ?? "") && longWords(term[1]) < QUOTE_WORDS)
       out.push("term-split");
     // … and the gloss after a word or phrase, "«مَلِكِ» ⏎ (raja)" (not a bracket holding Arabic
     // itself within its first two words: that one belongs to its own Arabic; not after a quotation).

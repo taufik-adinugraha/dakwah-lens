@@ -3,7 +3,7 @@
 //   M2.6  three vectors (simple, 'aul, radd) driven through /belajar/id/waris/hitung screen by
 //         screen; every data-share of the leading (fikih) column equals the vector's fraction,
 //         court cells appear exactly where the columns differ; ZERO non-GET requests and nothing
-//         but static assets, /belajar/api/me and the module's own pages (see NETWORK below).
+//         but static assets and the module's own pages (see NETWORK below).
 //   M2.9  print: case 3 (driven through the UI, rupiah panel filled) rendered as print media at
 //         A4: screenshot, a real Chromium PDF (page count) and the height / A4 estimate; FAIL when
 //         case 3 needs more than 3 pages. Every vector the questionnaire can express is loaded
@@ -50,7 +50,6 @@ const ok = (msg) => console.log(`  ✓ ${msg}`);
 // NETWORK (plan §9.4 "E2E check"): fail on any POST (any non-GET), any request body, any other
 // origin, and any request other than
 //   - static assets under /belajar/_next/,
-//   - GET /belajar/api/me (the account chip),
 //   - the module's own pages: the documents this script opens, and the App Router's GET fetches
 //     of in-module pages (client navigation hitung → laporan and <Link> prefetch, "?_rsc=" only).
 // A page fetch carries no answers: they travel in memory, sessionStorage or the URL FRAGMENT,
@@ -80,14 +79,13 @@ function classify(req) {
   const searchable = u.pathname.startsWith("/belajar/_next/static/") ? u.search : sent;
   for (const s of secrets) if (searchable.includes(s)) return { bad: "URL carries a share token or an amount" };
   if (u.pathname.startsWith("/belajar/_next/")) return { cls: "static" };
-  if (u.pathname === "/belajar/api/me") return { cls: "api/me" };
   // The browser's own icon fetches: the site root's guess, and the module's icon links (the main
   // site's favicon set under the basePath since 2026-10-10, src/app/favicon.ico + apple-icon.png).
   if (BROWSER_ICONS.has(u.pathname)) return { cls: "browser" };
   if (PAGE_PATH.test(u.pathname) && [...u.searchParams.keys()].every((k) => k === "_rsc")) {
     return { cls: req.isNavigationRequest() && req.resourceType() === "document" ? "document" : "page-fetch" };
   }
-  return { bad: "not a static asset, /belajar/api/me or an in-module page" };
+  return { bad: "not a static asset or an in-module page" };
 }
 
 function watch(ctx, label) {

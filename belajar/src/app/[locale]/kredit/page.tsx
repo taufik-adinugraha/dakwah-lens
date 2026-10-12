@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ChevronDown } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { AYAT_DATA_VERSIONS } from "@/lib/ayat";
 import { SURAHS } from "@/lib/content";
 import { visibleSurahs } from "@/lib/features";
 import { LIBRARY } from "@/lib/library";
@@ -62,12 +63,7 @@ export default async function CreditsPage({
             key={s.name}
             className="rounded-2xl border border-hairline bg-white p-5"
           >
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <p className="text-lg font-semibold">{s.name}</p>
-              <span className="rounded-full bg-paper-deep px-3 py-0.5 text-sm font-medium text-ink-muted">
-                {s.status === "in_use" ? t("status_in_use") : t("status_planned")}
-              </span>
-            </div>
+            <p className="text-lg font-semibold">{s.name}</p>
             <p className="mt-1 text-base text-ink-muted">{s.role}</p>
             <p className="mt-2 text-sm text-ink-muted">{s.licence}</p>
             <a
@@ -118,6 +114,8 @@ export default async function CreditsPage({
               <VersionList key={s.slug} title={s.name_id} versions={s.data_versions} />
             ))}
             <VersionList title={t("data_versions_library")} versions={LIBRARY.data_versions} />
+            {/* The ayat the fact cards' location chips open (content/ayat/locations.json). */}
+            <VersionList title={t("data_versions_ayat")} versions={AYAT_DATA_VERSIONS} />
           </div>
         </details>
       </section>

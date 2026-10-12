@@ -53,7 +53,7 @@ const KONSEP_TOKENS: [string, Token[]][] = [...LIBRARY.concepts, ...LIBRARY.basi
   const mk = rec.marked;
   if (!mk) return [];
   const page = new Scope(rec.id !== "harakat");
-  titleParts(mk.title, page, TERMS, SOUNDS);
+  titleParts(mk.title, page, TERMS);
   const at = (f: string) => annotate(f, page, TERMS);
   const steps = partsFor(rec.id).flatMap((p) => (WORD_INFO[p.loc] ? prepareParts(p, WORD_INFO[p.loc], page, TERMS, SOUNDS).steps : []));
   return [at(mk.summary), ...mk.explanation.map(at), ...steps, ...(mk.bridge ? [at(mk.bridge)] : []), ...mk.notes.map(at)].map(

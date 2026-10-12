@@ -36,10 +36,11 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+import terms as TM
 import validate as V
-from common import (AUTHORED_DIR, CONTENT_DIR, PIPELINE, SCHEMA_TS, SURAH_BY_SLUG, SurahSpec, authored_file,
-                    bw_to_ar, lesson_ayah, load_qac, load_sources, load_tanzil, qac_words, quranenc_sura,
-                    require_pinned, root_letters, sha256_file, stem_of)
+from common import (AUTHORED_DIR, CONTENT_DIR, PIPELINE, SCHEMA_TS, SURAH_BY_SLUG, SURAHS, SurahSpec,
+                    authored_file, bw_to_ar, lesson_ayah, load_qac, load_sources, load_tanzil, qac_words,
+                    quranenc_sura, require_pinned, root_letters, sha256_file, stem_of)
 from facts import QAC_TANZIL_HEADER, Corpus, compute_facts
 
 LEXICON = AUTHORED_DIR / "library.lexicon.json"
@@ -61,6 +62,85 @@ SHORT_WARN_MS = 200
 
 errors: list[str] = []
 warnings: list[str] = []
+
+# ---------------------------------------------------------------- marked lesson prose
+# Operator 2026-10-12, on a word card in "Materi lengkap ayat ini" (Al-Fatihah 7, ‘alaihim): "here
+# also better to write the arabic words, not only the transliteration" — and on the Konsep pages
+# "check also other parts". The lesson prose of a MARKED surah carries the Konsep markup
+# (terms.py: [[majrur]], [[‘alā|q:2:5:2]], [[-him|q:1:7:4/2]], [[ya'|q:1:2:4#6]], the gloss
+# [[“…”|q:…]]) in its authored files: a word's `why`, `wazn`, `case.sign` and `ikhtilaf`
+# (<slug>.words.json), its `role` and the ayah structure's `type`, `summary` and group labels
+# (<slug>.structure.json), and the facts in authored/<slug>.facts.marked.json (the facts are
+# computed by facts.py, so their markup is an overlay that must strip to the computed text). Every
+# field is checked like the Konsep prose (terms.check_markup, q_problems, meaning_problems),
+# stripped into the plain field (the narration, the quiz checks and validate.py read those,
+# byte-identical) and shipped marked beside it, as `marked`; the bytes of every q-ref go to the
+# lesson's own `quran` (and the QAC segments of each lesson word a part names to `segments`).
+# The Mu'awwidzat lessons are hidden on the live site (2026-10-10); their prose is not marked yet,
+# and markup in their authored files stops the build.
+MARKED_SURAHS = TM.MARKED_SURAHS
+TERMS_FILE = AUTHORED_DIR / "library.terms.json"
+
+
+class LessonMarkup:
+    """Checks one marked lesson's prose and collects the bytes of its q-refs."""
+
+    def __init__(self, T, W):
+        self.table = TM.load_terms(TERMS_FILE)
+        self.by_id, self.by_form = TM.term_index(self.table)
+        self.translit: dict[str, str] = {}
+        for sp in SURAHS:
+            p = authored_file(sp.slug, "words")
+            if p.exists():
+                for loc, w in json.loads(p.read_text(encoding="utf-8"))["words"].items():
+                    self.translit[loc] = TM.strip(w["translit"])
+        self.T, self.W = T, W
+        self.refs: set[str] = set()
+
+    def tanzil_token(self, s, a, w):
+        if (s, a) not in self.T.verses:
+            return None
+        toks = lesson_ayah(self.T, s, a)[0].split(" ")
+        return toks[w - 1] if 1 <= w <= len(toks) else None
+
+    def qac_segments(self, s, a, w):
+        return [bw_to_ar(g.form) for g in self.W.get((s, a, w), [])]
+
+    def field(self, text: str, where: str) -> tuple[str, str]:
+        """(plain, marked with every term named by id) of one authored field, checked. A `wazn`
+        is a morphological pattern typed in imla'i Arabic by design (validate.py checks it), so
+        only its Latin note is marked: "فَعْل ([[mashdar]])"."""
+        typed = [] if where.endswith(".wazn") else TM.typed_arabic(text, where)
+        for x in (TM.check_markup(text, where, self.by_id, self.by_form, self.table)
+                  + TM.wording(TM.strip(text), where) + TM.meaning_problems(text, where) + typed):
+            errors.append(x)
+        for surface, ref in TM.spans(text):
+            if ref and ref.startswith("q:") and TM.QREF.match(ref):
+                self.refs.add(ref)
+                errors.extend(TM.q_problems(surface, ref, where, self.translit, self.tanzil_token, self.qac_segments))
+        return TM.strip(text), TM.explicit(text, self.by_id, self.by_form)
+
+    def bytes(self) -> tuple[dict[str, str], dict[str, list[str]]]:
+        """The lesson's `quran` (q-ref without "q:" → bytes) and `segments` (lesson word loc → its
+        QAC segments, for every word a part ref names), in mushaf order."""
+        quran, segments = {}, {}
+        for ref in sorted(self.refs, key=lambda r: ([int(x) for x in re.findall(r"\d+", r)], r)):
+            try:
+                quran[ref[2:]] = TM.resolve_q(ref, self.tanzil_token, self.qac_segments)
+            except ValueError as x:
+                errors.append(f"q-ref {ref}: {x}")
+            m = TM.QREF.match(ref)
+            loc = ":".join(m.groups()[:3])
+            if m.group(5) and loc in self.translit:
+                segments[loc] = self.qac_segments(*map(int, m.groups()[:3]))
+        return quran, segments
+
+
+def no_markup(text: str | None, where: str) -> str | None:
+    """A field of a lesson that is not marked yet (MARKED_SURAHS) must carry no markup."""
+    if text and ("[[" in text or "]]" in text):
+        errors.append(f"{where}: [[…]] markup in a lesson that is not marked (MARKED_SURAHS)")
+    return text
 
 
 # ---------------------------------------------------------------- QAC -> learner word class
@@ -195,8 +275,9 @@ def load_links(word_locs: list[str], kitab: dict, cmap_path: Path, struct_path: 
     return lex_by_lem, concept_ids, cmap, struct
 
 
-def ayah_structure(s: int, a: int, n_words: int, struct: dict, concept_ids: set) -> dict | None:
-    """Ayah.structure from the authored file: schema keys only, groups checked."""
+def ayah_structure(s: int, a: int, n_words: int, struct: dict, concept_ids: set, prose=None) -> dict | None:
+    """Ayah.structure from the authored file: schema keys only, groups checked. `prose` (build's
+    helper): the type, summary and group labels of a marked lesson, plain + `marked` twin."""
     sa = (struct["ayat"].get(str(a)) or {}).get("structure")
     if not sa:
         errors.append(f"structure.json: no structure for ayah {s}:{a}")
@@ -220,8 +301,19 @@ def ayah_structure(s: int, a: int, n_words: int, struct: dict, concept_ids: set)
         if "concept" in g and g["concept"] not in concept_ids:
             errors.append(f"{gw}: concept {g['concept']!r} is not in library.concepts.json")
         groups.append({k: g[k] for k in ("words", "label", "concept") if k in g})
-    return {"type": sa["type"], "summary": sa["summary"], "groups": groups, "sources": sa["sources"],
-            "status": sa["status"]}
+    out = {"type": sa["type"], "summary": sa["summary"], "groups": groups, "sources": sa["sources"],
+           "status": sa["status"]}
+    if prose is not None:
+        sw = f"structure[{s}:{a}]"
+        out["type"], type_m = prose(sa["type"], f"{sw}.type")
+        out["summary"], summary_m = prose(sa["summary"], f"{sw}.summary")
+        labels_m = []
+        for i, g in enumerate(groups):
+            g["label"], lm = prose(g.get("label", ""), f"{sw}.groups[{i}].label")
+            labels_m.append(lm)
+        if type_m is not None:
+            out["marked"] = {"type": type_m, "summary": summary_m, "groups": labels_m}
+    return out
 
 
 def split_footnotes(raw: str) -> list[str]:
@@ -320,6 +412,15 @@ def build(spec: SurahSpec) -> int:
         align[reciter] = {(e["surah"], e["ayah"]): e for e in json.loads(p.read_text())}
     authored = json.loads(words_path.read_text(encoding="utf-8"))
     kitab = authored["kitab"]
+    mk = LessonMarkup(T, W) if slug in MARKED_SURAHS else None
+
+    def prose(text, where: str) -> tuple[str, str | None]:
+        """(plain, marked) of an authored prose field; marked is None for an unmarked lesson."""
+        if text is None:
+            return None, None
+        if mk is None:
+            return no_markup(text, where), None
+        return mk.field(text, where)
 
     # ---- metadata cross-check
     sura_meta = {int(e.get("index")): e for e in meta_xml.iter("sura")}
@@ -387,9 +488,19 @@ def build(spec: SurahSpec) -> int:
             sources.append({"kitab": f"Gloss in-house (draf), diselaraskan dengan terjemahan QuranEnc "
                                      f"'{qe['title_id']}' v{qe['version']}",
                             "ref": f"QS {S}:{a}", "url": qe["url"]})
-            case = {"state": au["case"]["state"], "sign": au["case"]["sign"]}
+            wp = f"words[{loc}]"
+            sign, sign_m = prose(au["case"]["sign"], f"{wp}.sign")
+            case = {"state": au["case"]["state"], "sign": sign}
             if "mahall" in au["case"]:
                 case["mahall"] = au["case"]["mahall"]
+            why, why_m = prose(au["why"], f"{wp}.why")
+            wazn, wazn_m = prose(au["wazn"], f"{wp}.wazn")
+            ikh, ikh_m = [], []
+            for i, x in enumerate(au["ikhtilaf"]):
+                point, point_m = prose(x["point"], f"{wp}.ikhtilaf[{i}].point")
+                opts = [prose(o, f"{wp}.ikhtilaf[{i}].options[{j}]") for j, o in enumerate(x["options"])]
+                ikh.append({"point": point, "options": [o for o, _m in opts]})
+                ikh_m.append({"point": point_m, "options": [m for _o, m in opts]})
             qac_pos = pos_label(segs_w)
             pos = au.get("pos") or qac_pos
             if au.get("pos") and not au.get("pos_note"):
@@ -406,12 +517,20 @@ def build(spec: SurahSpec) -> int:
             for abbr in sw.get("role_src", []):
                 if abbr not in src_abbr:
                     errors.append(f"{loc}: role_src {abbr!r} is not among the word's own src {sorted(src_abbr)}")
-            words.append({
+            role, role_m = prose(sw["role"], f"{wp}.role")
+            word = {
                 "loc": loc, "ar": tok, "translit": au["translit"], "gloss": au["gloss"],
-                "root": root, "lemma": lemma, "pos": pos, "wazn": au["wazn"], "case": case,
-                "why": au["why"], "lemma_id": lemma_id, "concepts": list(cmap[loc]), "role": sw["role"],
-                "ikhtilaf": au["ikhtilaf"], "sources": sources, "status": "draft",
-            })
+                "root": root, "lemma": lemma, "pos": pos, "wazn": wazn, "case": case,
+                "why": why, "lemma_id": lemma_id, "concepts": list(cmap[loc]), "role": role,
+                "ikhtilaf": ikh, "sources": sources, "status": "draft",
+            }
+            if mk is not None:
+                # ship-only twins of the prose (schema.ts WordMarked): the app shows these, with
+                # the Arabic of every term and Qur'anic word they name (src/lib/terms.ts)
+                word["marked"] = {"why": why_m, **({"role": role_m} if role else {}),
+                                  **({"sign": sign_m} if sign != "—" else {}), **({"wazn": wazn_m} if wazn else {}),
+                                  "ikhtilaf": ikh_m}
+            words.append(word)
 
         # QuranEnc text verbatim (markers kept); its footnotes verbatim, one item per [n].
         if a not in qe_rows:
@@ -449,7 +568,7 @@ def build(spec: SurahSpec) -> int:
                             "version": qe["version"]},
             "recitation": recitation, "status": "draft",
         }
-        structure = ayah_structure(S, a, len(tokens), struct, concept_ids)
+        structure = ayah_structure(S, a, len(tokens), struct, concept_ids, prose)
         if structure:
             ayah = {**{k: v for k, v in ayah.items() if k != "status"}, "structure": structure, "status": "draft"}
         ayat.append(ayah)
@@ -469,6 +588,30 @@ def build(spec: SurahSpec) -> int:
             warnings.append(f"no authored/{slug}.facts.generated.json: the lesson ships without facts")
     hadith, hadith_ver = load_records(authored_file(slug, "hadith"), "hadith", HADITH_KEYS)
     check_authored_records(facts if facts_ver else [], hadith, T, [g for g in segs if "STEM" in g.flags])
+    facts_marked_path = authored_file(slug, "facts.marked")
+    if mk is not None:
+        # The facts' markup: an overlay on the computed facts (fact id → title / body / method,
+        # each stripping to the computed text). Every fact is checked, so a term or a word left
+        # in Latin in a fact the overlay does not cover stops the build (terms.unmarked).
+        overlay = {}
+        if facts_marked_path.exists():
+            overlay = json.loads(facts_marked_path.read_text(encoding="utf-8")).get("facts", {})
+        for fid in sorted(set(overlay) - {f["id"] for f in facts}):
+            errors.append(f"authored/{facts_marked_path.name}: fact {fid!r} is not a fact of {slug}")
+        for f in facts:
+            o = overlay.get(f["id"], {})
+            for k in sorted(set(o) - {"title", "body", "method"}):
+                errors.append(f"authored/{facts_marked_path.name} {f['id']}: unknown field {k!r}")
+            marked = {}
+            for fld in ("title", "body", "method"):
+                plain, m = mk.field(o.get(fld, f[fld]), f"facts[{f['id']}].{fld}")
+                if plain != f[fld]:
+                    errors.append(f"authored/{facts_marked_path.name} {f['id']}.{fld}: the markup strips to "
+                                  f"{plain!r}, not the computed text {f[fld]!r}")
+                marked[fld] = m
+            f["marked"] = marked
+    elif facts_marked_path.exists():
+        errors.append(f"authored/{facts_marked_path.name}: {slug} is not a marked lesson (MARKED_SURAHS)")
 
     # ---- gloss consistency heuristic (every gloss word appears in the ayah translation)
     for ay in ayat:
@@ -497,6 +640,9 @@ def build(spec: SurahSpec) -> int:
         data_versions["authored_facts"] = facts_ver
     if hadith_ver:
         data_versions["authored_hadith"] = hadith_ver
+    if mk is not None and facts_marked_path.exists():
+        data_versions["authored_facts_marked"] = (f"authored/{facts_marked_path.name} "
+                                                  f"sha256:{sha256_file(facts_marked_path)}")
     # al-fatihah keeps its provenance line: build_fatihah.py is the wrapper that runs this build.
     # Other surahs name build_surah.py plus the script that generated their authored facts/hadith
     # (the `_generated_by` line of those files, e.g. facts_muawwidzat.py).
@@ -514,7 +660,10 @@ def build(spec: SurahSpec) -> int:
         data_versions["pipeline"] = ("belajar/pipeline/build_surah.py"
                                      + "".join(f" + {g}" for g in gens) + " (stdlib only, no LLM)")
     out = {"surah": S, "slug": slug, "name_ar": name_ar, "name_id": spec.name_id, "ayat": ayat,
-           "facts": facts, "hadith": hadith, "data_versions": data_versions}
+           "facts": facts, "hadith": hadith}
+    if mk is not None:
+        out["quran"], out["segments"] = mk.bytes()
+    out["data_versions"] = data_versions
     return finish(out, out_path, comparisons)
 
 

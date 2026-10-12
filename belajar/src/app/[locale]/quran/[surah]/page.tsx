@@ -6,11 +6,15 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { BackLink } from "@/components/BackLink";
 import { ForestGlow } from "@/components/ForestGlow";
 import { MixedText } from "@/components/library/MixedText";
+import { AyahDialogProvider } from "@/components/surah/AyahDialog";
 import { AyahProgressMark } from "@/components/surah/AyahProgressMark";
 import { FactCard } from "@/components/surah/FactCard";
 import { Link } from "@/i18n/navigation";
+import { surahNamesFor } from "@/lib/ayat";
 import { getSurah, SURAHS } from "@/lib/content";
+import { TERMS } from "@/lib/library";
 import { ayahHref, quranHref } from "@/lib/routes";
+import { lessonLookup } from "@/lib/terms";
 
 export const dynamicParams = false;
 
@@ -101,22 +105,27 @@ export default async function SurahPage({ params }: PageProps<"/[locale]/quran/[
             <h2 id="facts" className="font-display text-2xl font-medium">
               {t("facts_heading")}
             </h2>
-            <div className="@container mt-4">
-              <ul className="grid grid-cols-1 gap-4 @2xl:grid-cols-2">
-                {s.facts.map((f) => (
-                  <li key={f.id}>
-                    <FactCard
-                      fact={f}
-                      labels={{
-                        method: t("fact_method"),
-                        where: t("fact_where"),
-                        sources: t("sources"),
-                      }}
-                    />
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {/* Each location chip opens the ayah in the one dialog (operator 2026-10-12); the
+                dialog gets the names of the surahs the chips point into, for its reference. */}
+            <AyahDialogProvider names={surahNamesFor(s.facts.flatMap((f) => f.locations))}>
+              <div className="@container mt-4">
+                <ul className="grid grid-cols-1 gap-4 @2xl:grid-cols-2">
+                  {s.facts.map((f) => (
+                    <li key={f.id}>
+                      <FactCard
+                        fact={f}
+                        lookup={lessonLookup(TERMS, s)}
+                        labels={{
+                          method: t("fact_method"),
+                          where: t("fact_where"),
+                          sources: t("sources"),
+                        }}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </AyahDialogProvider>
           </section>
         )}
 

@@ -5,7 +5,6 @@ import { ArrowLeft, FileText, Library, Menu as MenuIcon, X } from "lucide-react"
 import { useTranslations } from "next-intl";
 import { useEffect, useId, useRef, useState } from "react";
 
-import { AccountChip } from "@/components/AccountChip";
 import { MixedText } from "@/components/library/MixedText";
 import { TextSizeOptions } from "@/components/TextSizeSwitch";
 import { Link, usePathname } from "@/i18n/navigation";
@@ -28,8 +27,8 @@ const toggleClass = (on: boolean) =>
  * the positioned ancestor; no hover, no modal); opening one closes the
  * other, Escape or "Tutup" closes it and puts focus back on its button.
  * The Menu panel holds everything the header row used to carry: Konsep tata
- * bahasa, Kembali ke Dakwah-Lens (a plain <a>: cross-app), Masuk / the
- * signed-in name, Sumber & lisensi.
+ * bahasa, Kembali ke Dakwah-Lens (a plain <a>: cross-app), Sumber & lisensi.
+ * No sign-in (operator, 2026-10-12: "there should be no login feature here").
  *
  * Both panels are always rendered (hidden when closed), so aria-controls
  * points at a real id and the static HTML carries every link.
@@ -168,9 +167,6 @@ export function HeaderControls({ locale }: { locale: string }) {
                     <MixedText text={t("back_to_main")} />
                   </span>
                 </a>
-              </li>
-              <li>
-                <AccountChip locale={locale} />
               </li>
               <li>
                 <Link href={creditsHref()} onClick={leave} aria-current={current(creditsHref())} className="menu-row">

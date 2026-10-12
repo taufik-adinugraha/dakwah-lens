@@ -3,14 +3,15 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { MixedText } from "@/components/library/MixedText";
-import { SharafPanel } from "@/components/library/SharafPanel";
+import { SharafPanel, sharafTokens } from "@/components/library/SharafPanel";
 import { SourcesDisclosure } from "@/components/library/SourceList";
+import { Prose } from "@/components/library/TermText";
 import { Link } from "@/i18n/navigation";
 import { SURAHS } from "@/lib/content";
-import { leadMeaning } from "@/lib/emphasis";
 import { visibleSurahs } from "@/lib/features";
-import { getLexeme, LIBRARY, parseLoc, rootFor } from "@/lib/library";
+import { getLexeme, LIBRARY, parseLoc, rootFor, TERMS } from "@/lib/library";
 import { ayahHref } from "@/lib/routes";
+import { markedTokens, Scope } from "@/lib/terms";
 
 export const dynamicParams = false;
 
@@ -31,6 +32,11 @@ export async function generateMetadata({
  * in a surah BELAJAR_SURAHS does not publish (operator, 2026-10-10: Al-Fatihah
  * first) is listed as plain text, not a link; the switch is read per request,
  * so this page renders at request time.
+ *
+ * Its prose is drawn from the marked twins (2026-10-12: terms and Qur'anic words in Arabic, "check
+ * also other parts"): the meaning, the word class, the root's meaning, the tashrif bab, labels and
+ * i'lal rules, one first-use scope for the page in reading order. The lemma's own Arabic is the
+ * headword; mentions of the lemma by its bare citation form stay Latin beside it.
  */
 export default async function LexemePage({ params }: PageProps<"/[locale]/kosakata/[id]">) {
   const { locale, id } = await params;
@@ -41,6 +47,12 @@ export default async function LexemePage({ params }: PageProps<"/[locale]/kosaka
   const tw = await getTranslations("Word");
   const root = rootFor(lex.root);
   const published = new Set(await visibleSurahs());
+  // The page's prose in reading order, one first-use scope.
+  const sc = new Scope();
+  const meaning = markedTokens(lex.marked?.meaning, sc, TERMS);
+  const pos = markedTokens(lex.marked?.pos, sc, TERMS);
+  const rootMeaning = root ? markedTokens(root.marked?.meaning, sc, TERMS) : null;
+  const sharaf = sharafTokens(lex, sc, TERMS);
   const appearances = SURAHS.flatMap((s) =>
     s.ayat.flatMap((a) =>
       a.words.filter((w) => w.lemma_id === lex.id).map((w) => ({ s, a, w })),
@@ -56,7 +68,7 @@ export default async function LexemePage({ params }: PageProps<"/[locale]/kosaka
           <p className="mt-1 max-w-prose text-base text-ink-muted">
             {/* The core meaning it opens with, in forest (operator 2026-10-11; review: the one
                 meaning the page stresses, not a sub-example's gloss further on). */}
-            <MixedText text={lex.meaning} emphasis={leadMeaning(lex.meaning)} />
+            <Prose tokens={meaning} plain={lex.meaning} emphasis="lead" />
           </p>
         </div>
         <div className="text-end">
@@ -73,7 +85,7 @@ export default async function LexemePage({ params }: PageProps<"/[locale]/kosaka
         <div>
           <dt className="text-sm font-semibold text-ink-muted">{t("pos")}</dt>
           <dd className="text-base text-ink">
-            <MixedText text={lex.pos} />
+            <Prose tokens={pos} plain={lex.pos} />
           </dd>
         </div>
         <div>
@@ -92,7 +104,10 @@ export default async function LexemePage({ params }: PageProps<"/[locale]/kosaka
             )}{" "}
             {root ? (
               <span className="text-ink-muted">
-                <MixedText text={`(${root.meaning})`} />
+                <Prose
+                  tokens={rootMeaning ? [{ kind: "text", text: "(" }, ...rootMeaning, { kind: "text", text: ")" }] : null}
+                  plain={`(${root.meaning})`}
+                />
               </span>
             ) : null}
           </dd>
@@ -114,6 +129,7 @@ export default async function LexemePage({ params }: PageProps<"/[locale]/kosaka
 
       <SharafPanel
         lexeme={lex}
+        tokens={sharaf}
         defaultOpen
         labels={{
           heading: tw("sharaf_heading"),

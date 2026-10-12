@@ -4,8 +4,6 @@
     "title_template": "%s · Belajar · Dakwah-Lens",
     "description": "Pelajaran agama yang singkat dan bersumber dari kitab. Saat ini: bahasa Arab Al-Qur'an, kata demi kata, dengan bacaan imam sungguhan.",
     "back_to_main": "Kembali ke Dakwah-Lens",
-    "sign_in": "Masuk",
-    "signed_in_as": "Masuk sebagai {name}",
     "nav_concepts": "Konsep tata bahasa",
     "menu": "Menu",
     "skip_to_content": "Langsung ke isi halaman"
@@ -32,8 +30,6 @@
     "coming_soon": "Segera hadir",
     "fatihah_pace": "±3 pekan, 10 menit sehari",
     "ayat_nav": "Ayat {name}",
-    "next_heading": "Berikutnya",
-    "next_body": "Setelah Al-Fatihah dan Al-Mu'awwidzat: Al-'Asr, Al-Kautsar, dan An-Nasr.",
     "how_heading": "Cara belajarnya",
     "how_1": "Pilih satu ayat, lalu klik “Mulai pelajaran”. Imam membacakan ayatnya, lalu pelajaran menjelaskan setiap kata, langkah demi langkah. Anda bisa menjeda kapan saja.",
     "how_2": "Latihan singkat muncul di dalam pelajaran, tanpa batas waktu. Setelah itu pelajaran lanjut sendiri ke ayat berikutnya.",
@@ -90,15 +86,14 @@
   "Credits": {
     "title": "Sumber & lisensi",
     "intro": "Modul ini dibangun di atas karya dan data berikut. Kami menyebut setiap sumber sesuai ketentuan lisensinya, dan tidak menyimpan rekaman qari di server kami: bacaan diputar langsung dari server penyedianya.",
-    "status_planned": "Direncanakan",
-    "status_in_use": "Dipakai",
     "recitation_heading": "Bacaan imam di halaman pelajaran",
     "recitation_body": "Setiap ayat diperdengarkan dari rekaman berikut, lengkap dengan penanda waktu setiap kata:",
     "streaming_note": "Saat Anda memulai pelajaran atau memutar bacaan, peramban Anda mengambil berkas audio langsung dari server penyedia rekaman di luar negeri, sehingga alamat IP Anda terlihat oleh server tersebut.",
     "data_versions_heading": "Versi data",
     "data_versions_body": "Untuk pemeriksaan teknis: versi dan sidik berkas (sha256) setiap data yang dipakai halaman pelajaran, persis seperti yang dicatat saat materi disusun.",
     "data_versions_summary": "Lihat versi data (untuk pemeriksaan teknis)",
-    "data_versions_library": "Pustaka Konsep, Kosakata, dan Akar"
+    "data_versions_library": "Pustaka Konsep, Kosakata, dan Akar",
+    "data_versions_ayat": "Ayat yang dibuka dari kartu “Tahukah Anda?”"
   },
   "NotFound": {
     "title": "Halaman tidak ditemukan",
@@ -119,6 +114,19 @@
     "ayah_label": "Ayat {n}",
     "loc_label": "QS {loc}",
     "fact_more_where": "Lihat semua letak ({n})"
+  },
+  "Ayah": {
+    "ref": "QS {name} [{surah}]: {ayah}",
+    "close": "Tutup",
+    "loading_text": "Memuat ayat…",
+    "text_failed": "Ayat ini belum bisa dimuat. Periksa sambungan internet Anda, lalu klik “Coba lagi”.",
+    "text_missing": "Ayat ini tidak ditemukan.",
+    "retry": "Coba lagi",
+    "play": "Putar bacaan imam",
+    "pause": "Jeda",
+    "loading_slow": "Masih memuat. Koneksi mungkin sedang lambat; mohon tunggu sebentar.",
+    "recite_failed": "Bacaan imam belum bisa diputar. Periksa sambungan internet Anda, lalu klik “Coba lagi”.",
+    "recitation_credit": "Bacaan: Mishary Rasyid Alafasy, diputar langsung dari EveryAyah.com"
   },
   "Lesson": {
     "ayah": "Ayat {n}",
@@ -212,7 +220,6 @@
     "sort_selected": "Terpilih",
     "sort_pick_first": "Pilih satu kata dulu, lalu klik kelompoknya.",
     "sort_not_yet": "Belum tepat — coba kelompok yang lain.",
-    "sort_bin_empty": "Belum ada kata",
     "role_title": "Tebak peran kata",
     "role_instruction": "Pilih peran setiap kata dalam kalimat ayat ini.",
     "role_question": "Apa peran kata ini dalam kalimat?",

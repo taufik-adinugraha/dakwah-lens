@@ -164,6 +164,53 @@ class Terms:
                 cur = b
         return out + text[cur:]
 
+    def annotate_marked(self, marked: str, quran: dict[str, str]) -> str:
+        """A MARKED text — a marked lesson's `why`, `role` or sign (build_surah.py MARKED_SURAHS;
+        operator 2026-10-12: Qur'anic words in Arabic too, "not only the transliteration") — shown
+        as `annotate` shows plain text: each term its Arabic from this table, each Qur'anic word,
+        part, letter or gloss its bytes from the lesson's `quran` (q-ref without "q:"), at its
+        first use in the text, in annotate's three placements. Its markup is gone from the result."""
+        out, last, seen = "", 0, set()
+        for m in _MARKUP.finditer(marked):
+            out += marked[last:m.start()]
+            surface, ref = m.group(1), m.group(2) or ""
+            ar = quran.get(ref[2:]) if ref.startswith("q:") else self.ar(ref)
+            out += surface
+            last = m.end()
+            if not ar or ref in seen:
+                continue
+            rest = _MARKUP.sub(lambda x: x.group(1), marked[last:])
+            inside = out.count("(") - out.count(")") > 0
+            if inside and _continues_phrase(rest):
+                # src/lib/terms.ts continuesPhrase (review 2026-10-12): inside brackets, a term or
+                # Qur'anic word the phrase goes on past stays Latin there — "(mahall raf')", never
+                # "(mahall, مَحَلّ raf')" — and is not counted as seen: its next use shows the Arabic.
+                continue
+            seen.add(ref)
+            if inside:
+                out += f", {ar}"
+            elif re.match(r" \((?=[a-z“'‘\-])", rest):
+                out += f" ({ar}, "
+                last += 2
+            else:
+                out += f" ({ar})"
+        return out + marked[last:]
+
+
+# The Konsep markup (pipeline/terms.py MARKUP): [[surface]] or [[surface|ref]].
+_MARKUP = re.compile(r"\[\[([^\[\]|]+?)(?:\|([^\[\]|]+))?\]\]")
+
+# Words that join a list inside brackets rather than continue a phrase (terms.ts LIST_WORDS).
+_LIST_WORDS = {"dan", "atau", "serta", "maupun"}
+
+
+def _continues_phrase(rest: str) -> bool:
+    """Whether the text after a marked item (markup already reduced to its surfaces) goes on with
+    the same phrase: another word, not the end of the bracket, a comma or a list. The twin of
+    src/lib/terms.ts continuesPhrase; src/lib/quiz-content.test.ts holds the two together."""
+    m = re.match(r" ([^\W\d_'‘’-]|['‘’-])+", rest)
+    return bool(m) and m.group(0)[1:].lower() not in _LIST_WORDS
+
 
 def cause_class(text: str, terms: Terms, *, after_karena: bool) -> str | None:
     """The grammar cause a reason or a role names: the first term (sifat counts: it is the na't)
@@ -328,6 +375,13 @@ def build(lesson: dict, library: dict, terms: Terms, authored: dict | None) -> d
     states_used: set[str] = set()
     labels_used: dict[str, str] = {}
     known = {str(a["ayah"]) for a in lesson["ayat"]}
+    quran = lesson.get("quran") or {}
+
+    def shown(w: dict, key: str) -> str:
+        """A word's why / role / sign as the question shows it: from its marked twin when the lesson
+        is marked (terms and Qur'anic words in Arabic), else the plain text with its terms'."""
+        mk = (w.get("marked") or {}).get(key)
+        return terms.annotate_marked(mk, quran) if mk else terms.annotate(w["case"]["sign"] if key == "sign" else w[key])
     for k in (plan.get("ayat") or {}):
         if k not in known:
             raise QuizError(f"{slug}: the plan names ayah {k}, which the lesson does not have")
@@ -359,12 +413,12 @@ def build(lesson: dict, library: dict, terms: Terms, authored: dict | None) -> d
                 for q, item in enumerate(s, 1):
                     w = word(item["word"], key)
                     states_used.add(w["case"]["state"])
-                    options = [{"from": w["loc"], "text": terms.annotate(w["why"])}]
+                    options = [{"from": w["loc"], "text": shown(w, "why")}]
                     for loc in item["distractors"]:
-                        options.append({"from": loc, "text": terms.annotate(word_at(lesson, loc)["why"])})
+                        options.append({"from": loc, "text": shown(word_at(lesson, loc), "why")})
                     sign = w["case"]["sign"]
-                    qs.append({"n": q, "word": item["word"], "sign": terms.annotate(sign) if sign != "—" else None,
-                               "why": terms.annotate(w["why"]), "options": options})
+                    qs.append({"n": q, "word": item["word"], "sign": shown(w, "sign") if sign != "—" else None,
+                               "why": shown(w, "why"), "options": options})
             elif key == "sort-case":
                 bins = list(s.get("bins") or [])
                 ex["bins"] = bins
@@ -373,20 +427,20 @@ def build(lesson: dict, library: dict, terms: Terms, authored: dict | None) -> d
                     w = word(i, key)
                     states_used.add(w["case"]["state"])
                     sign = w["case"]["sign"]
-                    qs.append({"n": q, "word": i, "sign": terms.annotate(sign) if sign != "—" else None,
-                               "why": terms.annotate(w["why"])})
+                    qs.append({"n": q, "word": i, "sign": shown(w, "sign") if sign != "—" else None,
+                               "why": shown(w, "why")})
             elif key == "label-role":
                 for q, item in enumerate(s, 1):
                     w = word(item["word"], key)
                     if not w.get("role"):
                         raise QuizError(f"{slug} {n} {key}: word {item['word']} has no role")
-                    options = [{"from": w["loc"], "text": terms.annotate(w["role"])}]
+                    options = [{"from": w["loc"], "text": shown(w, "role")}]
                     for loc in item["distractors"]:
                         r = word_at(lesson, loc).get("role")
                         if not r:
                             raise QuizError(f"{slug} {n} {key}: {loc} has no role to offer")
-                        options.append({"from": loc, "text": terms.annotate(r)})
-                    qs.append({"n": q, "word": item["word"], "why": terms.annotate(w["why"]), "options": options})
+                        options.append({"from": loc, "text": shown(word_at(lesson, loc), "role")})
+                    qs.append({"n": q, "word": item["word"], "why": shown(w, "why"), "options": options})
             elif key == "wazn-factory":
                 for q, item in enumerate(s, 1):
                     lx = lex.get(item["lexeme"])

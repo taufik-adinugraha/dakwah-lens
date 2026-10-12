@@ -241,7 +241,7 @@ async function autoplayShots(page, vp) {
 
 /**
  * The header's one "Menu" button, open, on the hub (viewport): the panel holding Konsep tata
- * bahasa, Kembali ke Dakwah-Lens, Masuk / the signed-in name and Sumber & lisensi. Escape closes it
+ * bahasa, Kembali ke Dakwah-Lens and Sumber & lisensi (no sign-in: operator, 2026-10-12). Escape closes it
  * again. Fails the job if the panel never opens or never closes.
  */
 async function menuShots(page, vp) {
@@ -473,6 +473,186 @@ async function materialsShot(page, vp) {
   await page.waitForTimeout(300);
   await page.screenshot({ path: `shots/${vp}-ayah-2-materials-open.png`, fullPage: true });
   console.log(`shot ${vp}-ayah-2-materials-open`);
+  await page.goto("about:blank");
+}
+
+/**
+ * The fact cards' ayah popup (operator 2026-10-12: a location chip opened quran.com in a new tab
+ * or app; now "show popup and show the verse (arabic + translation + play qari voice)";
+ * src/components/surah/AyahDialog.tsx), on the Al-Fatihah surah page, in the real image:
+ *   1. a click on the first location chip opens the dialog, modal, with the focus inside it; the
+ *      address did not change, no page opened, nothing asked of the reciters' host;
+ *   2. it shows the reference with the surah's name and the ayah's Arabic (lang ar, RTL) and
+ *      translation exactly as content/ayat/locations.json has them (read here, never typed);
+ *   3. the page behind does not move under a wheel over the backdrop, and nothing scrolls
+ *      sideways; shot of the open dialog;
+ *   4. Escape closes it and the focus is back on the chip;
+ *   5. opened again, "Putar bacaan imam" asks EveryAyah for that ayah's file (and nothing was
+ *      asked before); "Tutup" closes it and the recitation stops (back to idle);
+ *   6. the longest ayah a card on the page locates, at the largest text size: it wraps inside the
+ *      dialog (no box wider than its own, the page not wider than the screen); shot.
+ * The reciters' host is reached through the real CDN and only observed (watchRecitations); the
+ * recording need not play on the runner, only be asked for. Fails the job otherwise.
+ */
+async function ayahDialogChecks(page, vp) {
+  const read = async (rel) => JSON.parse(await readFile(path.join(BELAJAR_DIR, rel), "utf8"));
+  const data = await read("content/ayat/locations.json");
+  const msgs = await read("messages/id.json");
+  const byLoc = new Map(data.ayat.map((e) => [e.loc, e]));
+  const fill = (template, values) => template.replace(/\{(\w+)\}/g, (all, k) => (k in values ? String(values[k]) : all));
+  const fileOf = (loc) => {
+    const [s, a] = loc.split(":").map((n) => String(n).padStart(3, "0"));
+    return `https://everyayah.com/data/Alafasy_128kbps/${s}${a}.mp3`;
+  };
+  const surahPage = "/belajar/id/quran/al-fatihah";
+  const dialog = page.locator("dialog[data-ayah-dialog]");
+  const arabic = dialog.locator("[data-ayah-ar]");
+  const opened = [];
+  const onPage = (p) => opened.push(p.url());
+  page.context().on("page", onPage);
+  const watch = watchRecitations(page, new Set(["everyayah.com"]));
+  const fail = (what) => {
+    throw new Error(`${vp}: ayah popup — ${what}`);
+  };
+  /** The dialog as drawn: open/modal, focus, reference, Arabic, translation, sideways overflow. */
+  const look = () =>
+    dialog.evaluate((d) => {
+      const ar = d.querySelector("[data-ayah-ar]");
+      const body = d.querySelector("[data-ayah-body]");
+      return {
+        open: d.open,
+        modal: d.matches(":modal"),
+        focusInside: d.contains(document.activeElement),
+        title: d.querySelector("h2")?.textContent?.trim() ?? "",
+        ar: ar?.textContent ?? "",
+        lang: ar?.getAttribute("lang"),
+        dir: ar?.getAttribute("dir"),
+        translation: (d.querySelector("[data-ayah-translation] blockquote")?.textContent ?? "").replace(/\s+/g, " "),
+        wide: [d, body, ar].filter((el) => el && el.scrollWidth > el.clientWidth + 1).map((el) => el.tagName.toLowerCase()),
+        dialogRight: d.getBoundingClientRect().right,
+        pageWide: document.documentElement.scrollWidth > window.innerWidth + 1,
+        innerWidth: window.innerWidth,
+      };
+    });
+  try {
+    await page.goto(BASE + surahPage, { waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    // The dialog is drawn into <body> once the page has hydrated: from then on a chip opens it.
+    await dialog.waitFor({ state: "attached", timeout: 15_000 });
+    const chip = page.locator("[data-ayah-chip]").first();
+    await chip.scrollIntoViewIfNeeded();
+    const loc = await chip.getAttribute("data-ayah-chip");
+    const entry = byLoc.get(loc ?? "");
+    if (!entry) fail(`the first chip (${loc}) has no entry in content/ayat/locations.json`);
+    if ((await chip.evaluate((el) => el.tagName)) !== "BUTTON") fail(`the chip ${loc} is not a button`);
+    const address = page.url();
+    const y = await page.evaluate(() => window.scrollY);
+
+    // 1–2. Open, modal, focus inside; the ayah as the data file has it.
+    await chip.click();
+    await dialog.waitFor({ state: "visible", timeout: 5_000 });
+    await arabic.waitFor({ state: "visible", timeout: 10_000 });
+    await page.evaluate(() => document.fonts.ready);
+    const shown = await look();
+    const [s, a] = loc.split(":");
+    const title = fill(msgs.Ayah.ref, { name: data.names[s], surah: s, ayah: a });
+    if (!shown.open || !shown.modal) fail(`the dialog is not open as a modal (open ${shown.open}, modal ${shown.modal})`);
+    if (!shown.focusInside) fail("the focus did not move into the dialog");
+    if (shown.title !== title) fail(`the reference reads “${shown.title}”, expected “${title}”`);
+    if (shown.ar !== entry.ar) fail(`the Arabic of ${loc} is not the data file's`);
+    if (shown.lang !== "ar" || shown.dir !== "rtl") fail(`the Arabic is not marked lang="ar" dir="rtl" (${shown.lang}, ${shown.dir})`);
+    if (!shown.translation.includes(entry.translation.text.replace(/\s+/g, " "))) fail(`the translation of ${loc} is not the data file's`);
+    if (page.url() !== address) fail(`the address changed to ${page.url()}`);
+    if (opened.length) fail(`a page was opened: ${opened.join(", ")}`);
+    if (watch.seen.length) fail(`the reciters' host was asked before play: ${watch.list()}`);
+
+    // 3. The page behind stays put; nothing scrolls sideways.
+    await page.mouse.move(4, 4);
+    await page.mouse.wheel(0, 900);
+    await page.waitForTimeout(400);
+    if ((await page.evaluate(() => window.scrollY)) !== y) fail("the page behind scrolled under the open dialog");
+    if (shown.pageWide || shown.wide.length || shown.dialogRight > shown.innerWidth + 1) {
+      fail(`something is wider than the screen or its box (${shown.wide.join(", ") || "the page"})`);
+    }
+    await page.screenshot({ path: `shots/${vp}-ayah-dialog.png` });
+    console.log(`shot ${vp}-ayah-dialog (${loc}: “${title}”)`);
+
+    // 4. Escape closes it; the focus is back on the chip.
+    await page.keyboard.press("Escape");
+    await dialog.waitFor({ state: "hidden", timeout: 5_000 });
+    if (!(await chip.evaluate((el) => el === document.activeElement))) fail("after Escape the focus is not back on the chip");
+
+    // 5. Play asks EveryAyah for this ayah's file, and nothing before; Tutup stops it.
+    await chip.click();
+    await arabic.waitFor({ state: "visible", timeout: 10_000 });
+    if (watch.seen.length) fail(`the reciters' host was asked before play: ${watch.list()}`);
+    const file = fileOf(loc);
+    await dialog.locator("[data-ayah-play]").click();
+    if (!(await until(page, async () => watch.requested(file) > 0, 15_000))) {
+      fail(`play did not ask for ${file} (asked: ${watch.list()})`);
+    }
+    const others = watch.seen.filter((u) => u !== file);
+    if (others.length) fail(`play asked for other files too: ${others.join(", ")}`);
+    await page.waitForTimeout(1500);
+    const playing = await dialog.locator("[data-ayah-play]").getAttribute("data-state");
+    console.log(`  ${vp}: play asked for ${recordingName(file)} → ${watch.answered.get(file) ?? "no answer yet"}; the button says ${playing}`);
+    await dialog.locator("[data-ayah-close]").click();
+    await dialog.waitFor({ state: "hidden", timeout: 5_000 });
+    await page.waitForTimeout(300);
+    const after = await dialog.locator("[data-ayah-play]").getAttribute("data-state");
+    if (after !== "idle") fail(`after Tutup the recitation is "${after}", not stopped`);
+
+    // 6. The longest ayah on the page, at the largest text size.
+    const locs = await page.locator("[data-ayah-chip]").evaluateAll((els) => els.map((el) => el.getAttribute("data-ayah-chip")));
+    const longest = locs.reduce((best, l) => ((byLoc.get(l)?.ar.length ?? 0) > (byLoc.get(best)?.ar.length ?? 0) ? l : best), locs[0]);
+    await page.evaluate(() => {
+      document.querySelectorAll("details").forEach((d) => (d.open = true));
+      return true;
+    });
+    await setTextSizeAttr(page, "sangat-besar");
+    const longChip = page.locator(`[data-ayah-chip="${longest}"]`).first();
+    await longChip.scrollIntoViewIfNeeded();
+    await longChip.click();
+    await arabic.waitFor({ state: "visible", timeout: 10_000 });
+    await page.evaluate(() => document.fonts.ready);
+    await page.waitForTimeout(300);
+    const big = await look();
+    if (big.ar !== byLoc.get(longest).ar) fail(`the Arabic of ${longest} is not the data file's`);
+    if (big.pageWide || big.wide.length || big.dialogRight > big.innerWidth + 1) {
+      fail(`${longest} at Sangat besar does not wrap inside the dialog (${big.wide.join(", ") || "the page is wider than the screen"})`);
+    }
+    await page.screenshot({ path: `shots/${vp}-ayah-dialog-long-sangat-besar.png` });
+    console.log(`shot ${vp}-ayah-dialog-long-sangat-besar (${longest}, ${byLoc.get(longest).ar.length} characters)`);
+    await page.keyboard.press("Escape");
+    await dialog.waitFor({ state: "hidden", timeout: 5_000 });
+    await setTextSizeAttr(page, null);
+
+    // 7. The same dialog in a lesson's "Pelajari lebih dalam" row (Al-Fatihah 2: Materi lengkap →
+    //    Tahukah Anda?), its first chip.
+    await page.goto(BASE + AYAH_2, { waitUntil: "networkidle" });
+    await dialog.waitFor({ state: "attached", timeout: 15_000 });
+    await page.locator("[data-materials] > summary").click();
+    const facts = page.locator("details", { has: page.locator("summary", { hasText: msgs.Lesson.facts_heading }) }).last();
+    await facts.locator("summary").first().click();
+    const lessonChip = facts.locator("[data-ayah-chip]").first();
+    await lessonChip.scrollIntoViewIfNeeded();
+    const lessonLoc = await lessonChip.getAttribute("data-ayah-chip");
+    const lessonAddress = page.url();
+    await lessonChip.click();
+    await arabic.waitFor({ state: "visible", timeout: 10_000 });
+    const inLesson = await look();
+    if (!inLesson.modal || inLesson.ar !== byLoc.get(lessonLoc ?? "")?.ar) fail(`on ${AYAH_2} the chip ${lessonLoc} did not open its ayah`);
+    if (page.url() !== lessonAddress || opened.length) fail(`on ${AYAH_2} the chip ${lessonLoc} navigated or opened a page`);
+    await page.keyboard.press("Escape");
+    await dialog.waitFor({ state: "hidden", timeout: 5_000 });
+    console.log(`  ${vp}: ayah popup ok (button chip, modal, ${loc} as the data file has it, no navigation, no new page, page behind still, Escape → chip, play → ${recordingName(file)} only, Tutup stops it, ${longest} wraps; ${lessonLoc} from the lesson row)`);
+  } catch (err) {
+    await page.screenshot({ path: `shots/${vp}-ayah-dialog-FAILED.png` }).catch(() => {});
+    throw err;
+  } finally {
+    watch.stop();
+    page.context().off("page", onPage);
+  }
   await page.goto("about:blank");
 }
 
@@ -1686,6 +1866,7 @@ try {
     await headerShots(page, vp);
     await footerCheck(page, vp);
     await materialsShot(page, vp);
+    await ayahDialogChecks(page, vp);
     await shareShots(page, vp);
     await surahEndBridgeShots(page, vp);
     if (vp === "desktop") await ogShots(ctx.request);

@@ -92,6 +92,22 @@ jobs:
       - name: Quizzes — guard planted-fault tests
         run: python3 pipeline/test_validate_quiz.py
 
+      # The fact cards' ayah popup (operator 2026-10-12: a location chip opens the ayah — Arabic,
+      # translation, the imam's recitation — in a dialog, no longer quran.com in a new tab or app).
+      # content/ayat/locations.json has one entry for every location of every fact (the surahs
+      # BELAJAR_SURAHS hides included) and no other, in mushaf order; its sura pins and data
+      # versions are sources.json's; its entries are the ones build_ayat.py wrote (their hash); an
+      # ayah with a lesson is byte-identical to its lesson; the names are what the cards write.
+      # pipeline/cache is git-ignored, so CI runs the corpus-free half and the validator names what
+      # it skipped; Tanzil's bytes, QuranEnc's text and a fresh build run locally with plain
+      # `python3 pipeline/build_ayat.py --check` and `python3 pipeline/validate_ayat.py`.
+      - name: Ayah popup — up to date with the facts (corpus-free)
+        run: python3 pipeline/build_ayat.py --check --no-corpus
+      - name: Ayah popup — validate (corpus-free)
+        run: python3 pipeline/validate_ayat.py --no-corpus
+      - name: Ayah popup — validator planted-fault tests (corpus-free)
+        run: python3 pipeline/test_validate_ayat.py --no-corpus
+
       - name: Narration — manifests up to date
         run: python3 pipeline/build_narration.py --check
       - name: Narration — validate manifests
@@ -264,6 +280,47 @@ jobs:
               echo "✗ ${path}: a removed AI chip / trial banner / spoken 'bukan fatwa' is back"; exit 1
             fi
           done
+          # The fact cards' location chips open the ayah in a popup (operator 2026-10-12), no longer
+          # quran.com in a new tab or app: no Al-Fatihah page links to quran.com, the surah page's
+          # chips are buttons, and /belajar/api/ayah answers one ayah exactly as
+          # content/ayat/locations.json has it (its first, a middle and its last entry, read from the
+          # file, never typed here) and 404 for a location the file has no entry for. The chips of
+          # every published surah's own page are checked by surahs-smoke.mjs in the every-surah
+          # container further down (in this one it visits lesson pages only); the dialog in
+          # screenshots.mjs.
+          for path in /belajar/id/quran/al-fatihah /belajar/en/quran/al-fatihah \
+                      /belajar/id/quran/al-fatihah/1 /belajar/id/quran/al-fatihah/2 /belajar/id/quran/al-fatihah/7; do
+            html="$(curl -fsS "http://127.0.0.1:3300${path}")"
+            if grep -qE 'href="https?://(www\.)?quran\.com/' <<<"$html"; then echo "✗ ${path}: a fact card links to quran.com"; exit 1; fi
+          done
+          html="$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/al-fatihah)"
+          grep -qE '<button[^>]*data-ayah-chip="1:1"' <<<"$html" || { echo "✗ the surah page's location chips are not buttons"; exit 1; }
+          python3 - <<'PY'
+          import json, urllib.error, urllib.request
+          base = "http://127.0.0.1:3300/belajar/api/ayah"
+          data = json.load(open("belajar/content/ayat/locations.json", encoding="utf-8"))
+          ayat = data["ayat"]
+          for e in (ayat[0], ayat[len(ayat) // 2], ayat[-1]):
+              with urllib.request.urlopen(f"{base}?loc={e['loc']}") as r:
+                  got = json.load(r)
+              s = e["loc"].split(":")[0]
+              ok = (got["loc"] == e["loc"] and got["ar"] == e["ar"] and got["name"] == data["names"][s]
+                    and got["translation"]["text"] == e["translation"]["text"]
+                    and got["translation"]["footnotes"] == e["translation"]["footnotes"]
+                    and got["translation"]["source_label"] == data["translation"]["source_label"])
+              print(f"/belajar/api/ayah?loc={e['loc']} -> {'ok' if ok else 'NOT the data file'}")
+              assert ok, f"api/ayah {e['loc']} is not the data file's entry"
+          # an ayah that exists but no fact locates (so the file has no entry for it), and non-ayat
+          absent = next(f"{s}:1" for s in range(1, 115) if f"{s}:1" not in {e["loc"] for e in ayat})
+          for q in (f"loc={absent}", "loc=2:999", "loc=abc", ""):
+              try:
+                  urllib.request.urlopen(f"{base}?{q}")
+                  code = 200
+              except urllib.error.HTTPError as err:
+                  code = err.code
+              print(f"/belajar/api/ayah?{q} -> {code}")
+              assert code == 404, f"api/ayah?{q} answered {code}, expected 404"
+          PY
           # Al-Fatihah ayah 1 is narrated (Kang Nandar): its page ships the same-origin narration
           # files and their word timings for the karaoke caption. The MP3s themselves are uploaded
           # to the VM media dir (Caddy, /belajar/media/), not baked into the image.
@@ -381,7 +438,13 @@ jobs:
       # "Bagian dari Dakwah-Lens" link (href checked on the element); the
       # Bagikan fallback panel (WhatsApp link, Salin tautan → "Tautan
       # disalin"); the end-of-surah card with its Tafsir Pekan Ini bridge; and
-      # two share cards (hub, Al-Fatihah 1) saved as served.
+      # two share cards (hub, Al-Fatihah 1) saved as served. The fact cards' ayah
+      # popup (operator 2026-10-12): a chip opens a modal dialog with the ayah as
+      # content/ayat/locations.json has it, the address unchanged and no page
+      # opened; the page behind does not scroll; Escape closes it with the focus
+      # back on the chip; play asks EveryAyah for that ayah's file and nothing
+      # before (observed, the real CDN answers); Tutup stops it; the longest ayah
+      # wraps at the largest text size; shots of the open dialog.
       - name: Screenshots (phone + desktop)
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: |
@@ -517,7 +580,7 @@ jobs:
       #   M2.6  a simple, an 'aul and a radd family driven through /waris/hitung screen by screen
       #         (the plan's screens must be exactly the model's); every fikih data-share equals the
       #         test vector; FAILS on any POST and on any request other than static assets under
-      #         /belajar/_next/, /belajar/api/me and the module's own pages (GET, "?_rsc=" only);
+      #         /belajar/_next/ and the module's own pages (GET, "?_rsc=" only);
       #   M2.9  case 3 printed (A4 PDF + print-media screenshot): fails above 3 pages; every vector
       #         the questionnaire can express is opened from its #j= share link, checked, and
       #         measured; the longest is recorded;
