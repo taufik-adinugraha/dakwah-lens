@@ -547,6 +547,39 @@ describe("the lesson map's card", () => {
     }
   });
 
+  it("on a phone the repeated and the postponed groups show a count for their names; the new ones are always listed", () => {
+    /** Per group: the count beside its heading (null: none), and its list's classes. */
+    const compact = (html: string) =>
+      Object.fromEntries(
+        [...html.matchAll(/<div data-map-group="([a-z]+)"[^>]*>([\s\S]*?)<\/ul><\/div>/g)].map((m) => [
+          m[1],
+          {
+            count: /<span data-map-count="true" class="([^"]*)">([^<]*)<\/span>/.exec(m[2])?.slice(1, 3) ?? null,
+            list: /<ul class="([^"]*)">/.exec(m[2])![1].split(" "),
+          },
+        ]),
+      );
+    for (const a of FATIHAH.ayat) {
+      const [, review, later] = FILE_TABLE[a.ayah];
+      const got = compact(card("id", lessonMapInput("al-fatihah", a.ayah)!, "map"));
+      // The new concepts: every name on every screen, no count.
+      expect(got.new.count, `ayah ${a.ayah}`).toBeNull();
+      expect(got.new.list).not.toContain("max-sm:sr-only");
+      for (const [group, ids] of [["review", review], ["later", later]] as const) {
+        if (!ids.length) continue;
+        // The count is the number of names, shown below sm only; the names leave the screen there
+        // and stay in the page (sr-only, never display:none).
+        expect(got[group].count, `ayah ${a.ayah} ${group}`).toEqual([expect.stringMatching(/(^| )sm:hidden( |$)/), `· ${ids.length} hal`]);
+        expect(got[group].list, `ayah ${a.ayah} ${group}`).toContain("max-sm:sr-only");
+      }
+      // The closing card lists what was learnt, on every screen.
+      const closing = compact(card("id", lessonMapInput("al-fatihah", a.ayah)!, "learned"));
+      expect(closing.learned.count).toBeNull();
+      expect(closing.learned.list).not.toContain("max-sm:sr-only");
+    }
+    expect(compact(card("en", lessonMapInput("al-fatihah", 2)!, "map")).review.count?.[1]).toBe(`· ${FILE_TABLE[2][1].length} items`);
+  });
+
   it("the closing: the new concepts, each with a tick, under Sudah dipelajari — nothing else", () => {
     for (const a of FATIHAH.ayat) {
       const html = card("id", lessonMapInput("al-fatihah", a.ayah)!, "learned");

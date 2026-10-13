@@ -41,9 +41,12 @@ const WIDE_FROM = 5;
  * the text size grows), so a long list stays short on a wide screen. Names go through MixedText:
  * a term never leaves its Arabic, and a name wider than its column wraps in the flow. The ayah a
  * concept belongs to is its own short piece ("dari ayat 1"), which moves to the next row whole:
- * no row starts with a separator. On a phone, a card with many concepts is taller than the room
- * above the caption panel: its first group, the new concepts, is what stays in view, and the rest
- * is reached by scrolling the page. Nothing here is spoken.
+ * no row starts with a separator. On a phone the room above the caption panel holds about one
+ * group (CI 2026-10-13, 390×844: the card of ayat 2 covered the mushaf line and its "Mengulang"
+ * and "Nanti" groups lay under the panel): there the new concepts are listed in full and the two
+ * other groups show their heading with a count ("Mengulang · 4 hal"), their names being what the
+ * narrator says and the caption shows; from sm up every name is listed. The names stay in the
+ * page for a screen reader either way. Nothing here is spoken.
  */
 export function LessonMapCard({ map, kind }: { map: LessonMapInput; kind: LessonMapCardKind }) {
   const t = useTranslations("Guided");
@@ -75,14 +78,14 @@ export function LessonMapCard({ map, kind }: { map: LessonMapInput; kind: Lesson
             {map.new.length ? map.new.map((it) => <Item key={it.id} item={it} />) : none}
           </Group>
           {map.review.length ? (
-            <Group group="review" icon={<RotateCcw aria-hidden className="h-5 w-5 shrink-0" />} title={t("map_review")}>
+            <Group group="review" icon={<RotateCcw aria-hidden className="h-5 w-5 shrink-0" />} title={t("map_review")} count={t("map_count", { n: map.review.length })}>
               {map.review.map((it) => (
                 <Item key={it.id} item={it} where={where(it, "review")} />
               ))}
             </Group>
           ) : null}
           {map.later.length ? (
-            <Group group="later" icon={<Clock aria-hidden className="h-5 w-5 shrink-0" />} title={t("map_later")}>
+            <Group group="later" icon={<Clock aria-hidden className="h-5 w-5 shrink-0" />} title={t("map_later")} count={t("map_count", { n: map.later.length })}>
               {map.later.map((it) => (
                 <Item key={it.id} item={it} where={where(it, "later")} />
               ))}
@@ -95,15 +98,25 @@ export function LessonMapCard({ map, kind }: { map: LessonMapInput; kind: Lesson
 }
 
 /** One group: its heading (an icon and the words, forest) and its names, in columns where the
- *  card is wide enough for them. */
-function Group({ group, icon, title, children }: { group: string; icon: ReactNode; title: string; children: ReactNode }) {
+ *  card is wide enough for them. With `count` (the repeated and the postponed groups), a phone
+ *  shows the heading and that count and keeps the names for sm and up (see the card's comment);
+ *  the count is not part of the heading's text, so the heading reads the same on every screen.
+ *  Heading and count are one row that never wraps: no line starts with the "·". */
+function Group({ group, icon, title, count, children }: { group: string; icon: ReactNode; title: string; count?: string; children: ReactNode }) {
   return (
     <div data-map-group={group} className="min-w-0">
-      <h3 className="flex items-center gap-2 text-base font-semibold text-forest">
-        {icon}
-        <span>{title}</span>
-      </h3>
-      <ul className="mt-1 grid grid-cols-1 gap-x-6 gap-y-0.5 @xl:grid-cols-2 @4xl:grid-cols-3">{children}</ul>
+      <div className="flex items-baseline gap-x-2">
+        <h3 className="flex items-center gap-2 text-base font-semibold text-forest">
+          {icon}
+          <span>{title}</span>
+        </h3>
+        {count ? (
+          <span data-map-count className="text-base whitespace-nowrap text-ink-muted sm:hidden">
+            · {count}
+          </span>
+        ) : null}
+      </div>
+      <ul className={clsx("mt-1 grid grid-cols-1 gap-x-6 gap-y-0.5 @xl:grid-cols-2 @4xl:grid-cols-3", count && "max-sm:sr-only")}>{children}</ul>
     </div>
   );
 }

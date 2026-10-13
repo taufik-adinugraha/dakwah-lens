@@ -70,7 +70,7 @@ export function TermText({
   );
   const spans =
     emphasis === "lead" ? leadSpans(text) : emphasis === "meaning" ? meaningSpans(text) : emphasis ? termEmphasis(tokens) : undefined;
-  return <MixedText text={text} overlays={overlays} emphasis={spans} />;
+  return <MixedText text={text} overlays={overlays} emphasis={spans} label={emphasis === "meaning"} />;
 }
 
 /**

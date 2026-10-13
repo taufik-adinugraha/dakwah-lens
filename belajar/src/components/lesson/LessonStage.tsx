@@ -927,7 +927,10 @@ export function LessonStage({
                   data-mode={middle}
                   data-guide={middle === "lanjut" ? "lanjut" : undefined}
                   onClick={onMiddle}
-                  className={clsx("btn-primary w-full min-h-14!", lanjutGuide && BAR_RING)}
+                  // Narrow side padding on a phone, like the replay button beside it: paused at the
+                  // largest text size, "Lanjutkan" (101px) did not fit the 75px the wide padding left
+                  // (found by the line-break check once it measured a paused lesson, 2026-10-13).
+                  className={clsx("btn-primary w-full min-h-14! px-2! sm:px-6!", lanjutGuide && BAR_RING)}
                 >
                   {middle === "pause" ? (
                     <Pause aria-hidden className="h-5 w-5" />

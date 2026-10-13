@@ -325,6 +325,7 @@
     "map_label": "What this ayah's lesson covers",
     "map_new": "New in this ayah",
     "map_review": "Review",
+    "map_count": "{n} items",
     "map_later": "Later",
     "map_none": "Nothing new.",
     "map_review_ayah": "from ayah {n}",
