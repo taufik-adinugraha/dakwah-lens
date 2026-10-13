@@ -103,7 +103,11 @@ export default async function IntroPage({ params }: PageProps<"/[locale]/quran/p
 
         <nav className="mt-10 flex justify-end border-t border-hairline pt-6" aria-label={t("next", { surah: host.name_id })}>
           <Link href={ayahHref(host.slug, first.ayah)} data-intro-next className="btn-secondary">
-            <MixedText text={t("next", { surah: host.name_id })} />
+            {/* One span: inside a flex container every piece of MixedText would be a flex item of
+                its own, and "Al-Fatihah," lost its kept box (CI line breaks, 2026-10-14). */}
+            <span>
+              <MixedText text={t("next", { surah: host.name_id })} />
+            </span>
             <ChevronRight aria-hidden className="h-5 w-5 shrink-0" />
           </Link>
         </nav>
@@ -115,7 +119,9 @@ export default async function IntroPage({ params }: PageProps<"/[locale]/quran/p
           {basics.map((id) => (
             <p key={id} className="mt-3">
               <Link href={conceptHref(id)} data-intro-basics={id} className="link-text inline-flex min-h-12 items-center gap-1 text-base font-medium">
-                <MixedText text={t("harakat_page")} />
+                <span>
+                  <MixedText text={t("harakat_page")} />
+                </span>
                 <ChevronRight aria-hidden className="h-5 w-5 shrink-0" />
               </Link>
             </p>
