@@ -64,6 +64,22 @@ function mahallPos(mahall: string): string {
  * reminders on a card (less clutter): the chip right above the reason names the sign in Arabic.
  * Concept chips carry their Arabic headword, as the Konsep page's related chips do.
  */
+/**
+ * A scholars' reading and who holds it: "reading — al-Jadwal, al-Mujtaba, …" (96 of the 100
+ * readings of the four surahs are written this way, with one " — "; the other four name their
+ * scholars inside the sentence). Split so the card can give the attribution a line of its own: at
+ * Sangat besar on a phone the column is 202px, "(“permulaanku”) —" is wider than that once the
+ * gloss carries its “…” (plan L22), and a kept piece wider than its line breaks at its space —
+ * which left the dash at the start of a line (CI line breaks, 2026-10-13). [the reading, the
+ * attribution or undefined]; undefined in gives undefined out.
+ */
+export function splitAttribution(text: string): [string, string | undefined];
+export function splitAttribution(text: string | undefined): [string | undefined, string | undefined];
+export function splitAttribution(text: string | undefined): [string | undefined, string | undefined] {
+  const at = text?.indexOf(" — ") ?? -1;
+  return text === undefined || at < 0 ? [text, undefined] : [text.slice(0, at), text.slice(at + 3)];
+}
+
 export function WordCard({
   word,
   labels,
@@ -123,7 +139,15 @@ export function WordCard({
   const sharaf = lexeme && mk && lookup ? sharafTokens(lexeme, sc, lookup) : null;
   const ikhtilaf = word.ikhtilaf.map((x, i) => {
     const y = mk?.ikhtilaf[i];
-    return { point: tok(y ? `${y.point}:` : undefined), options: x.options.map((_, j) => tok(y?.options[j])) };
+    return {
+      point: tok(y ? `${y.point}:` : undefined),
+      // Each reading and who holds it, annotated in reading order (one scope).
+      options: x.options.map((o, j) => {
+        const [reading, by] = splitAttribution(o);
+        const [mReading, mBy] = splitAttribution(y?.options[j]);
+        return { reading, by, tokens: tok(mReading), byTokens: by === undefined ? null : tok(mBy) };
+      }),
+    };
   });
 
   return (
@@ -275,13 +299,28 @@ export function WordCard({
                       {/* No indent: at Sangat besar on a phone the column is already the width of
                           its longest word ("membolehkannya,"). */}
                       <ul className="mt-1 space-y-1">
-                        {x.options.map((o, j) => (
-                          <li key={o}>
-                            {/* A scholars' reading glosses what it reads (“aku memulai”): the
-                                meaning forest, as in the explanation above (plan L22). */}
-                            <Prose tokens={ikhtilaf[i].options[j]} plain={o} emphasis="meaning" />
-                          </li>
-                        ))}
+                        {x.options.map((o, j) => {
+                          const opt = ikhtilaf[i].options[j];
+                          return (
+                            <li key={o}>
+                              {/* A scholars' reading glosses what it reads (“aku memulai”): the
+                                  meaning forest, as in the explanation above (plan L22). */}
+                              <Prose tokens={opt.tokens} plain={opt.reading} emphasis="meaning" />
+                              {opt.by !== undefined ? (
+                                <>
+                                  {" "}
+                                  {/* Who holds it, on a line of its own, opened by the text's own
+                                      dash: the text is the content's, byte for byte, and the dash
+                                      can no longer be left at the start of a wrapped line. */}
+                                  <span data-attribution className="block">
+                                    {"— "}
+                                    <Prose tokens={opt.byTokens} plain={opt.by} emphasis="meaning" />
+                                  </span>
+                                </>
+                              ) : null}
+                            </li>
+                          );
+                        })}
                       </ul>
                     </li>
                   ))}

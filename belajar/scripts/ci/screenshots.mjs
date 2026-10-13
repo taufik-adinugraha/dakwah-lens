@@ -3016,11 +3016,11 @@ async function quizVoiceCheck(page, vp, index) {
  *      "Berikutnya ›" from there lands on "recap".
  *   3. NOTHING STICKS OUT SIDEWAYS, on either card: the card lies within the screen's width, does
  *      not scroll sideways, and the page does not either.
- *   4. A PHONE SHOWS A COUNT FOR THE REPEATED AND THE POSTPONED (the opening card; CI 2026-10-13:
- *      at 390×844 the card of ayat 2 covered the mushaf line and those two groups lay under the
- *      caption panel): below sm each of those two groups shows "· N hal" beside its heading, N
- *      its number of names, and its list takes no room (sr-only, still in the page); from sm up
- *      the count is not drawn and the names are. The new concepts are listed on every screen.
+ *   4. A PHONE SHOWS THE NEW CONCEPTS ONLY (the opening card; CI 2026-10-13: at 390×844 the
+ *      room above the caption panel is 270px, about one group, and the card of ayat 2 put
+ *      "Mengulang" and "Nanti" under the panel): below sm the repeated and the postponed groups
+ *      are not drawn (they stay in the page's markup, which 1 reads), from sm up they are. The
+ *      new concepts are drawn on every screen.
  * Whether the whole card is in view above the bottom panel is MEASURED and reported, not failed: a
  * card with many new concepts can still be taller than the room a phone leaves above the caption.
  * A warning on the run's summary gives the numbers — look at the viewport shots.
@@ -3111,27 +3111,17 @@ async function lessonMapChecks(page, vp, index) {
     if (JSON.stringify(got.groups) !== JSON.stringify(want)) {
       fail(`${what}: the card shows ${JSON.stringify(got.groups)}, expected ${JSON.stringify(want)} (content/map/al-fatihah.json, messages/id.json)`);
     }
-    // 4. The count on a phone, the names from sm up.
+    // 4. The new concepts only on a phone, every group from sm up.
     const narrow = got.width < 640;
     const drawn = await card.first().evaluate((el) =>
       [...el.querySelectorAll("[data-map-group]")].map((g) => {
-        const size = (n) => (n ? n.getBoundingClientRect() : { width: 0, height: 0 });
-        const c = g.querySelector("[data-map-count]");
-        const list = size(g.querySelector("ul"));
-        return {
-          group: g.getAttribute("data-map-group"),
-          count: c && size(c).width > 1 && size(c).height > 1 ? (c.textContent ?? "").replace(/\s+/g, " ").trim() : null,
-          names: list.width > 1 && list.height > 1,
-          n: g.querySelectorAll("[data-map-item]").length,
-        };
+        const r = g.getBoundingClientRect();
+        return { group: g.getAttribute("data-map-group"), shown: r.width > 1 && r.height > 1 };
       }),
     );
     for (const g of drawn) {
-      const counted = narrow && (g.group === "review" || g.group === "later");
-      const wantCount = counted ? `· ${fill(msgs.map_count, { n: g.n })}` : null;
-      if (g.count !== wantCount || g.names !== !counted) {
-        fail(`${what}: at ${got.width}px the group "${g.group}" shows ${g.count ? `the count “${g.count}”` : "no count"} and ${g.names ? "its names" : "no names"}; expected ${wantCount ? `“${wantCount}”` : "no count"} and ${counted ? "no names" : "its names"}`);
-      }
+      const want = !(narrow && (g.group === "review" || g.group === "later"));
+      if (g.shown !== want) fail(`${what}: at ${got.width}px the group "${g.group}" is ${g.shown ? "drawn" : "not drawn"}; expected ${want ? "drawn" : "not drawn"}`);
     }
     const sideways = [];
     if (got.box.left < -1 || got.box.right > got.width + 1) sideways.push(`the card ${Math.round(got.box.left)}–${Math.round(got.box.right)} is wider than the screen (${got.width})`);
