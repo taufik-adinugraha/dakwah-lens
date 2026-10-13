@@ -952,6 +952,7 @@
     "live_badge": "Live · {count} posts ingested",
     "live_section_title": "What's surfacing right now",
     "live_section_subtitle": "Top posts by da'wah relevance from the {count} already-ingested · classified by Gemini.",
+    "live_top_stories_note": "The list below holds the top {shown} posts; the sentiment chart and the total count all {total} posts.",
     "live_section_top50_note": "Note: the Sentiment mix chart counts all {count} posts, so the chart percentages and the filter-chip counts will differ.",
     "livestream_show_posts": "Show post list",
     "livestream_hide_posts": "Hide post list",

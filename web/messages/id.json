@@ -952,6 +952,7 @@
     "live_badge": "Live · {count} postingan ter-ingest",
     "live_section_title": "Yang sedang menonjol saat ini",
     "live_section_subtitle": "Postingan teratas berdasarkan relevansi da'wah dari {count} yang sudah ter-ingest · diklasifikasi oleh Gemini.",
+    "live_top_stories_note": "Daftar di bawah memuat {shown} postingan teratas; grafik sentimen dan angka total menghitung seluruh {total} postingan.",
     "live_section_top50_note": "Catatan: chart Komposisi Sentimen menghitung semua {count} postingan, jadi angka di chart dan jumlah pada chip filter wajar berbeda.",
     "livestream_show_posts": "Tampilkan daftar postingan",
     "livestream_hide_posts": "Sembunyikan daftar postingan",
