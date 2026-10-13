@@ -11,7 +11,9 @@
  *     word with a composition: one line per sentence of its frames, the
  *     animation in the word card's slot, then the imam recites the word
  *     again; operator 2026-10-10, narration rule 14)
- *   → concept (each concept FIRST introduced in this ayah) → structure
+ *   → concept (each concept FIRST introduced in this ayah), each followed by
+ *     its example step (the concept's example in this ayah, recited by the
+ *     imam; operator 2026-10-12, plan L20, examples.ts) → structure
  *     (the lesson page's order, and the narration's: the structure line
  *     uses the terms the concept lines introduce)
  *   → exercises the page renders, in page order (each WAITS for the learner;
@@ -26,11 +28,20 @@
  * caption) is attached from the manifests when present; without it the
  * sequence is caption-only and the machine paces it by reading time. Pure
  * and deterministic.
+ *
+ * EXAMPLE BEATS (operator 2026-10-12: "each explanation should be followed by
+ * examples (visual + voice)"; which ones: examples.ts lessonExamples) ride on
+ * the steps: a compose step's bentuk dasar after the last line of its `base`
+ * frame, a word's own recitation after the line that explains its harakah,
+ * and a concept's example(s) as an "example" step right after the concept
+ * step. A beat has a caption (AutoplayTexts.example) and what the imam
+ * recites; no narration line, so no manifest and no render knows of it.
  */
 import type { Ayah, Concept } from "@/content/schema";
 
 import type { ComposeInput } from "../composition";
 import { latinSentences, splitCaption, stripArabic } from "../lessonSteps";
+import type { ExampleInput } from "./examples";
 import { canonicalExercises, exerciseProgressId } from "./exercises";
 import { explainLineId, lineId, manifestParts, parseLineId, promptLineId, sharedLineId, type LinePart } from "./ids";
 import { lineDisplay, lineMarks, lineSegments, lineText, wordRefs } from "./narration";
@@ -41,6 +52,7 @@ import {
   type AutoplayStep,
   type AutoplayTexts,
   type Cue,
+  type ExampleBeat,
   type ExerciseKey,
   type Guide,
   type GuidePart,
@@ -70,6 +82,8 @@ export type SequenceInput = {
   /** This ayah's word compositions and harakat primer (content/compose/,
    *  without their Arabic: lines and frames only), when it has any. */
   compose?: ComposeInput | null;
+  /** This ayah's example beats (examples.ts lessonExamples), when it has any. */
+  examples?: readonly ExampleInput[] | null;
 };
 
 /** Concepts whose FIRST example lies in `ayahLoc` ("1:2"). Same rule as
@@ -178,6 +192,19 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
     lines: s.cues.map((c) => c.line),
     caption: s.caption ?? s.cues[0]?.caption ?? "",
   });
+  /** The example beats of step `id` (examples.ts), each after the cue `after` gives it (null:
+   *  dropped — its cue is not there). The caption says what is shown and heard, in Latin only. */
+  const beatsOf = (id: string, after: (e: ExampleInput) => number | null): ExampleBeat[] =>
+    (input.examples ?? []).flatMap((e) => {
+      const at = e.step === id ? after(e) : null;
+      if (at === null || (e.word === null) === (e.clip === null)) return [];
+      const where = { translit: e.translit, surah: e.place.surah, ayah: e.place.ayah };
+      const lead =
+        e.of === "base" ? texts.example.base(where) : e.word !== null ? texts.example.word({ n: e.word, translit: e.translit }) : texts.example.other(where);
+      const caption = clean(stripArabic([lead, e.washal ? texts.example.washal({ heard: e.washal.heard }) : "", e.waqf ? texts.example.waqf : ""].filter(Boolean).join(" ")));
+      return [{ id: e.id, of: e.of, after: at, key: e.key, word: e.word, clip: e.clip, frame: e.frame, caption, parts: splitCaption(caption) }];
+    });
+  const withBeats = (beats: ExampleBeat[]) => (beats.length ? { examples: beats } : {});
 
   const steps: AutoplayStep[] = [];
   steps.push(
@@ -240,14 +267,20 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
         guides: [card, wordGuide],
         word: wn,
         loc: w.loc,
+        // A word without a composition: the imam recites it again once its line has explained
+        // its harakah (a word with one is recited at the end of its composition step).
+        ...withBeats(comp && comp.lines.length ? [] : beatsOf(`w${wn}`, () => 0)),
       }),
     );
     if (comp && comp.lines.length) {
+      const cues = comp.lines.map((l, k) => cue(p(`w${wn}:compose:${k + 1}`), l.say, [card]));
+      // The bentuk dasar: recited once the lines of its `base` frame are said, the frame still on screen.
+      const lastCueOf = (frame: number | null) => (frame === null ? -1 : cues.reduce((at, c, k) => (c.frame === frame ? k : at), -1));
       steps.push(
         step({
           id: `w${wn}:compose`,
           kind: "compose",
-          cues: comp.lines.map((l, k) => cue(p(`w${wn}:compose:${k + 1}`), l.say, [card])),
+          cues,
           // While the imam recites the joined word (after the frames).
           caption: clean(stripArabic(texts.wordIntro(a))),
           guides: [card, wordGuide],
@@ -255,6 +288,12 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
           loc: w.loc,
           recite: { target: "word", word: wn },
           frames: comp.frames,
+          ...withBeats(
+            beatsOf(`w${wn}:compose`, (e) => {
+              const at = lastCueOf(e.frame);
+              return at === -1 ? null : at;
+            }),
+          ),
         }),
       );
     }
@@ -271,6 +310,12 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
         guides: [],
       }),
     );
+    // "Each explanation should be followed by examples (visual + voice)": the concept's example
+    // in this ayah (and at most one more), a step of its own so that "↺ Ulangi" plays it again.
+    const beats = beatsOf(`concept:${c.id}:ex`, () => -1);
+    if (beats.length) {
+      steps.push(step({ id: `concept:${c.id}:ex`, kind: "example", cues: [], caption: beats[0].caption, guides: [], examples: beats }));
+    }
   }
 
   if (ayah.structure) {

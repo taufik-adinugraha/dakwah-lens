@@ -483,10 +483,11 @@ def needs_basmalah(ayat) -> bool:
     return any(a == 1 and s not in (1, 9) for s, a in ayat)
 
 
-def fixture_from(keys, align: dict, T, src: dict) -> dict:
-    """The fixture for the clips `keys`, from the pinned files."""
+def fixture_from(keys, align: dict, T, src: dict, comment: str = FIXTURE_COMMENT) -> dict:
+    """The fixture for the clips `keys`, from the pinned files. `comment`: the file's own note
+    (the lessons' example voices keep a fixture of their own, compose.EXAMPLES_FIXTURE)."""
     ayat = outside_ayat(keys)
-    out = {"_comment": FIXTURE_COMMENT, "pins": fixture_pins(src)}
+    out = {"_comment": comment, "pins": fixture_pins(src)}
     if needs_basmalah(ayat):
         out["basmalah"] = T.verses[(1, 1)]
     out["ayat"] = {f"{s}:{a}": {"tanzil": T.verses[(s, a)], "segments": align[(s, a)]["segments"],
@@ -525,10 +526,11 @@ def fixture_sources(fx: dict | None) -> tuple[dict, Tanzil]:
     return align, Tanzil(raw="", verses=verses, footer="")
 
 
-def fixture_problems(fx, keys, src: dict, align: dict | None = None, T=None) -> list[str]:
+def fixture_problems(fx, keys, src: dict, align: dict | None = None, T=None, name: str | None = None) -> list[str]:
     """The fixture holds exactly the ayat of the clips outside the lessons, under the current pins;
-    with the corpus, each is the pinned Tanzil line and quran-align entry."""
-    name = FIXTURE.name
+    with the corpus, each is the pinned Tanzil line and quran-align entry. `name`: the fixture
+    file's name in the messages (default: FIXTURE's)."""
+    name = name or FIXTURE.name
     if not isinstance(fx, dict) or not isinstance(fx.get("ayat"), dict):
         return [f"{name}: missing or not a fixture (run build_library.py)"]
     out = []
@@ -621,10 +623,13 @@ def heard_problems(lib: dict, lessons: dict, T) -> list[str]:
 
 
 def problems(lib: dict, lessons: dict, src: dict, align: dict | None = None, T=None,
-             fixture: dict | None = None) -> tuple[list[str], list[str]]:
+             fixture: dict | None = None, fixture_name: str | None = None) -> tuple[list[str], list[str]]:
     """(errors, warnings) of library.json `clips`. Without `align` and `T` (CI: --no-corpus) the
     corpus-free checks only — the lessons' own timings, and the fixture for the ayat outside them;
-    with them, also a fresh build and the Tanzil tokens. `fixture`: FIXTURE's content."""
+    with them, also a fresh build and the Tanzil tokens. `fixture`: FIXTURE's content.
+    `fixture_name`: that file's name in the messages, when it is not FIXTURE (the lessons' example
+    voices are checked through here too, as a library of their own: compose.voice_problems)."""
+    fixture_name = fixture_name or FIXTURE.name
     errs, warns = [], []
     clips = lib.get("clips")
     if not isinstance(clips, dict):
@@ -639,7 +644,7 @@ def problems(lib: dict, lessons: dict, src: dict, align: dict | None = None, T=N
             errs.append(f"clips[{key}]: no page shows this example (an unwanted clip)")
     if list(clips) != sorted(clips, key=lambda k: (order(k), k)):
         errs.append("clips: keys are not in mushaf order (run build_library.py)")
-    errs += fixture_problems(fixture, keys | set(clips), src, align, T)
+    errs += fixture_problems(fixture, keys | set(clips), src, align, T, fixture_name)
     fx_align, fx_T = fixture_sources(fixture)
     for key, clip in clips.items():
         errs += clip_problems(key, clip)
@@ -678,7 +683,7 @@ def problems(lib: dict, lessons: dict, src: dict, align: dict | None = None, T=N
         # An ayah without a lesson: the committed fixture's Tanzil line and quran-align entry.
         elif (s, a) in fx_align:
             fresh, e, _ = clip_from(key, fx_align, fx_T)
-            errs += [f"{FIXTURE.name}: {x}" for x in e]
+            errs += [f"{fixture_name}: {x}" for x in e]
             if not e and fresh != clip:
                 errs.append(f"clips[{key}]: {clip} is not the clip the fixture's quran-align entry of {s}:{a} gives, "
                             f"{fresh} (a shifted timing, another ayah's file or a wrong `last`; run build_library.py)")

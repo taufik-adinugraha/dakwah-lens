@@ -1397,7 +1397,7 @@
           "ar": "رَبُّ",
           "translit": "rabbu",
           "src": {
-            "tanzil": "7:54:31"
+            "tanzil": "41:9:13"
           },
           "label": "isim",
           "gloss": "Tuhan",
@@ -1433,7 +1433,7 @@
             "rabbu"
           ],
           "focus": "rabbu",
-          "note": "seperti di QS 7:54"
+          "note": "seperti di QS 41:9"
         },
         {
           "stage": "change",
@@ -1471,7 +1471,7 @@
       "sources": [
         {
           "kitab": "Tanzil Quran Text (Uthmani) 1.1",
-          "ref": "QS 7:54:31 (tabaraka Allāhu rabbu al-‘ālamīna): bentuk dengan dhammah; juga 26:23:4 dan 28:30:18",
+          "ref": "QS 41:9:13 (żālika rabbu al-‘ālamīna): bentuk dengan dhammah; juga 7:54:31 dan 26:23:4",
           "url": "https://tanzil.net/download/"
         },
         {
@@ -3886,7 +3886,7 @@
           "ar": "أَنْعَمَ",
           "translit": "an‘ama",
           "src": {
-            "tanzil": "4:69:8"
+            "tanzil": "5:23:6"
           },
           "label": "fi'il",
           "gloss": "telah memberi nikmat",
@@ -3941,7 +3941,7 @@
             "anama"
           ],
           "focus": "anama",
-          "note": "seperti di QS 4:69",
+          "note": "seperti di QS 5:23",
           "base_mark": "fathah"
         },
         {
@@ -4025,7 +4025,7 @@
         },
         {
           "kitab": "Tanzil Quran Text (Uthmani) 1.1",
-          "ref": "QS 4:69:8 (juga 4:72:10, 5:23:6, 19:58:3): an‘ama dengan fathah di akhir; QS 1:7:3: mim bersukun sebelum ta'",
+          "ref": "QS 5:23:6 (juga 4:69:8, 4:72:10, 19:58:3): an‘ama dengan fathah di akhir; QS 1:7:3: mim bersukun sebelum ta'",
           "url": "https://tanzil.net/download/"
         }
       ],
@@ -5146,9 +5146,183 @@
       "status": "draft"
     }
   },
+  "examples": {
+    "1:1:1": [
+      {
+        "frame": 2,
+        "form": "ismu",
+        "loc": "55:78:2",
+        "key": "55:78:1-2",
+        "clip": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/055078.mp3",
+          "start": 30,
+          "end": 1490
+        },
+        "washal": {
+          "run": "55:78:1-2",
+          "before": "tabāraka",
+          "heard": "tabārakasmu"
+        }
+      }
+    ],
+    "1:1:2": [
+      {
+        "frame": 1,
+        "form": "allahu",
+        "loc": "112:2:1",
+        "key": "112:2:1",
+        "clip": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/112002.mp3",
+          "start": 40,
+          "end": 980
+        }
+      }
+    ],
+    "1:1:3": [
+      {
+        "frame": 3,
+        "form": "ar-rahmanu",
+        "loc": "20:5:1",
+        "key": "20:5:1",
+        "clip": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/020005.mp3",
+          "start": 30,
+          "end": 1580
+        }
+      }
+    ],
+    "1:2:1": [
+      {
+        "frame": 3,
+        "form": "al-hamdu",
+        "unvoiced": "own"
+      }
+    ],
+    "1:2:2": [
+      {
+        "frame": 1,
+        "form": "allahu",
+        "loc": "112:2:1",
+        "key": "112:2:1",
+        "clip": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/112002.mp3",
+          "start": 40,
+          "end": 980
+        }
+      }
+    ],
+    "1:2:3": [
+      {
+        "frame": 1,
+        "form": "rabbu",
+        "loc": "41:9:13",
+        "key": "41:9:13",
+        "clip": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/041009.mp3",
+          "start": 13760,
+          "end": 14370
+        }
+      }
+    ],
+    "1:4:1": [
+      {
+        "frame": 1,
+        "form": "maliku",
+        "unvoiced": "unattested"
+      }
+    ],
+    "1:4:2": [
+      {
+        "frame": 1,
+        "form": "yaumu",
+        "loc": "37:20:4",
+        "key": "37:20:4",
+        "clip": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/037020.mp3",
+          "start": 3550,
+          "end": 4210
+        }
+      }
+    ],
+    "1:5:2": [
+      {
+        "frame": 2,
+        "form": "nabudu",
+        "unvoiced": "own"
+      }
+    ],
+    "1:5:4": [
+      {
+        "frame": 2,
+        "form": "nastainu",
+        "unvoiced": "own"
+      }
+    ],
+    "1:6:2": [
+      {
+        "frame": 2,
+        "form": "as-siratu",
+        "unvoiced": "unattested"
+      }
+    ],
+    "1:6:3": [
+      {
+        "frame": 2,
+        "form": "al-mustaqimu",
+        "unvoiced": "unattested"
+      }
+    ],
+    "1:7:1": [
+      {
+        "frame": 1,
+        "form": "siratu",
+        "loc": "6:126:2",
+        "key": "6:126:2",
+        "clip": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/006126.mp3",
+          "start": 1240,
+          "end": 2070
+        }
+      }
+    ],
+    "1:7:3": [
+      {
+        "frame": 2,
+        "form": "anama",
+        "loc": "5:23:6",
+        "key": "5:23:6",
+        "clip": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/005023.mp3",
+          "start": 4450,
+          "end": 5240
+        }
+      }
+    ],
+    "1:7:5": [
+      {
+        "frame": 1,
+        "form": "gairu",
+        "loc": "74:10:3",
+        "key": "74:10:3",
+        "clip": {
+          "url": "https://everyayah.com/data/Alafasy_128kbps/074010.mp3",
+          "start": 1750,
+          "end": 2340
+        }
+      }
+    ],
+    "1:7:6": [
+      {
+        "frame": 2,
+        "form": "al-magdubu",
+        "unvoiced": "unattested"
+      }
+    ]
+  },
   "data_versions": {
     "tanzil": "uthmani sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
-    "authored_compose": "authored/al-fatihah.compose.json sha256:98a0a83790678393d59ae32c569efab261beca71c943941abb50c0ec13226810"
+    "authored_compose": "authored/al-fatihah.compose.json sha256:2d2c0211f670b8dafbfd208faa39c4500c13d6041719c23bfd1c0fe03d38d153",
+    "quran_align": "release-2016-11-24 Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7 (examples: the imam's voice of a bentuk dasar)"
   }
 }

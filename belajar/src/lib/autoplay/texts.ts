@@ -59,6 +59,17 @@ export const ID_TEXTS: AutoplayTexts = {
   recap: "Dengarkan sekali lagi seluruh ayatnya, dan ikuti bacaan imam.",
   next: ({ ayah }) => `Pelajaran ayat ini selesai. Berikutnya, ayat ${ayah}.`,
   done: ({ surah }) => `Pelajaran ayat ini selesai. Ini ayat terakhir surah ${surah}.`,
+  // Short on purpose: the card beside it shows the word, its transliteration and its meaning, and
+  // a beat lasts at least its caption's reading time (35 beats in Al-Fatihah).
+  example: {
+    word: ({ n, translit }) => `Contoh: kata ke-${n}, ${translit}.`,
+    other: ({ translit, surah, ayah }) => `Contoh lain: ${translit}, di QS ${surah}:${ayah}.`,
+    base: ({ translit, surah, ayah }) => `Contoh: ${translit}, di QS ${surah}:${ayah}.`,
+    // What is heard where it is not what is written, as the Konsep pages say it beside an
+    // example's button (messages Clip.waqf_note, washal_note).
+    waqf: "Di akhir ayat imam berhenti, jadi harakat akhirnya tidak terdengar.",
+    washal: ({ heard }) => `Bersama kata sebelumnya terdengar “${heard}”, karena alif di awalnya tidak dibaca.`,
+  },
   shared: {
     start: "Pelajaran dimulai. Anda cukup mendengarkan dan memperhatikan layar; saat ada latihan, Anda akan dipandu.",
     resume: "Kita lanjutkan.",

@@ -456,6 +456,14 @@ export function useSegmentPlayer(
     [source],
   );
 
+  /** A play asked for is SOUNDING right now: not loading, not stalled, not paused. For the lesson's
+   *  example beats, which give up on a recording that does not start (operator 2026-10-12, plan
+   *  L20; src/lib/autoplay/timing.ts exampleGivesUp): read from a timer, never in render. */
+  const flowing = useCallback((): boolean => {
+    const a = audioRef.current;
+    return !!a && askedRef.current && !a.paused && !a.seeking && a.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA;
+  }, []);
+
   return {
     source,
     sourceIdx,
@@ -476,5 +484,7 @@ export function useSegmentPlayer(
     unlock,
     /** Fetch the chosen recording ahead of its first play (the lesson has started). */
     warm,
+    /** A play asked for is sounding right now. */
+    flowing,
   };
 }

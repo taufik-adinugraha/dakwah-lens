@@ -1,5 +1,5 @@
 {
-  "_comment": "Word composition (kata dari bagian-bagiannya) and the harakat primer for Al-Fatihah — operator 2026-10-10, feedback_belajar_narration_style rule 14 and the harakat request ('expect also people dont understand what is kasrah, dhommah, and fathah'). Built by build_compose.py into content/compose/al-fatihah.json; checked by validate_compose.py; each `say` string becomes one narration line (build_narration.py). NO Arabic is typed here: every form names where its bytes come from (a lesson word, a Tanzil token, a QAC segment, or a deterministic edit of one; compose.py docstring), and the build records where in the Qur'an each form stands. Say 'bentuk dasar', never 'akar' (akar = the root letters). Narration rules: pipeline/README.md 'Komposisi kata'. Status draft (pipeline state; no human review, plan L11).",
+  "_comment": "Word composition (kata dari bagian-bagiannya) and the harakat primer for Al-Fatihah — operator 2026-10-10, feedback_belajar_narration_style rule 14 and the harakat request ('expect also people dont understand what is kasrah, dhommah, and fathah'). Built by build_compose.py into content/compose/al-fatihah.json; checked by validate_compose.py; each `say` string becomes one narration line (build_narration.py). NO Arabic is typed here: every form names where its bytes come from (a lesson word, a Tanzil token, a QAC segment, or a deterministic edit of one; compose.py docstring), and the build records where in the Qur'an each form stands. Say 'bentuk dasar', never 'akar' (akar = the root letters). Narration rules: pipeline/README.md 'Komposisi kata'. Status draft (pipeline state; no human review, plan L11). In the lesson the IMAM recites each bentuk dasar a `base` frame shows (plan L20; the build writes `examples`, compose.py 'THE IMAM'S VOICE OF A BENTUK DASAR'): a form that QUOTES a place ({'tanzil': loc}) is voiced from that very place, so quote one where it is HEARD as shown — never an ayah's last word (the imam stops there and the ending is not pronounced), a word that starts with hamzat washal only at the start of its ayah or where the library's diagram types the word before it (ismu, QS 55:78: played with tabāraka, 'tabārakasmu'), and from an ayah whose quran-align alignment is clean where the Qur'an has one: rabbu is quoted from QS 41:9 (żālika rabbu al-‘ālamīna; 7:54:31 has insertions 4), an‘ama from QS 5:23 as on the Konsep diagram (4:69:8: insertions 6, transpositions 1). The frame's note names that place ('seperti di QS 41:9'): display only, the narration never names it. The build stops on a quoted place that is not heard as shown and says why.",
   "primer": {
     "ayah": 1,
     "forms": {
@@ -233,11 +233,11 @@
     },
     "1:2:3": {
       "forms": {
-        "rabbu": {"ar": {"tanzil": "7:54:31"}, "translit": "rabbu", "label": "isim", "gloss": "Tuhan"},
+        "rabbu": {"ar": {"tanzil": "41:9:13"}, "translit": "rabbu", "label": "isim", "gloss": "Tuhan"},
         "rabbi": {"ar": {"word": "1:2:3"}, "translit": "rabbi", "label": "isim", "gloss": "Tuhan"}
       },
       "frames": [
-        {"stage": "base", "tiles": ["rabbu"], "focus": "rabbu", "note": "seperti di QS 7:54",
+        {"stage": "base", "tiles": ["rabbu"], "focus": "rabbu", "note": "seperti di QS 41:9",
          "say": ["Dalam bentuk dasarnya, kata ini berakhir dengan dhammah, bunyi u; misalnya di ayat lain, dalam ungkapan yang artinya “Tuhan seluruh alam”."]},
         {"stage": "change", "tiles": ["rabbi"], "from": "rabbu", "to": "rabbi",
          "say": [
@@ -246,7 +246,7 @@
          ]}
       ],
       "sources": [
-        {"kitab": "Tanzil Quran Text (Uthmani) 1.1", "ref": "QS 7:54:31 (tabaraka Allāhu rabbu al-‘ālamīna): bentuk dengan dhammah; juga 26:23:4 dan 28:30:18", "url": "https://tanzil.net/download/"},
+        {"kitab": "Tanzil Quran Text (Uthmani) 1.1", "ref": "QS 41:9:13 (żālika rabbu al-‘ālamīna): bentuk dengan dhammah; juga 7:54:31 dan 26:23:4", "url": "https://tanzil.net/download/"},
         {"kitab": "Abu Ja'far an-Nahhas, I'rab al-Qur'an (catatan 'Abd al-Mun'im Khalil Ibrahim, Beirut: Dar al-Kutub al-'Ilmiyyah, cet. 1, 1421 H)", "ref": "jil. 1, hlm. 18 (QS 1:2: rabbi na't)", "url": "https://shamela.ws/book/23587/13"},
         {"kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)", "ref": "jil. 1, hlm. 29 (QS 1:2, bagian al-I'rab: rabbi na't bagi lafaz Allah, mengikutinya dalam jar, tandanya kasrah; catatan kaki: atau badal)", "url": "https://shamela.ws/book/22916/14"},
         {"kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)", "ref": "jil. 1, hlm. 14 (al-I'rab: rabbi sifat bagi Allah atau badal darinya)", "url": "https://tafsir.app/iraab-aldarweesh/1/2"},
@@ -717,7 +717,7 @@
       "lead": "Kata ini juga terdiri dari dua bagian.",
       "forms": {
         "anam": {"ar": {"word": "1:7:3", "pieces": [0, 4]}, "translit": "an‘am", "label": "fi'il", "gloss": "telah memberi nikmat"},
-        "anama": {"ar": {"tanzil": "4:69:8"}, "translit": "an‘ama", "label": "fi'il", "gloss": "telah memberi nikmat"},
+        "anama": {"ar": {"tanzil": "5:23:6"}, "translit": "an‘ama", "label": "fi'il", "gloss": "telah memberi nikmat"},
         "ta": {"ar": {"word": "1:7:3", "pieces": [4, null]}, "translit": "ta", "label": "dhamir", "gloss": "Engkau"},
         "anamta": {"ar": {"word": "1:7:3"}, "translit": "an‘amta", "gloss": "telah Engkau beri nikmat"}
       },
@@ -728,7 +728,7 @@
            "Bagian kedua adalah dhamir yang artinya “Engkau”, yaitu pelakunya.",
            "Berbeda dengan ayat keenam, di sini dhamir yang menempel adalah pelaku, bukan objek."
          ]},
-        {"stage": "base", "tiles": ["anama"], "focus": "anama", "base_mark": "fathah", "note": "seperti di QS 4:69",
+        {"stage": "base", "tiles": ["anama"], "focus": "anama", "base_mark": "fathah", "note": "seperti di QS 5:23",
          "say": ["Kata kerja lampau akhirnya tetap; bentuk dasarnya berakhir dengan fathah, bunyi a, seperti tertulis di ayat lain."]},
         {"stage": "join", "tiles": ["anamta"], "from": ["anama", "ta"], "note": "mim mati karena bersambung dengan dhamir pelaku",
          "say": [
@@ -743,7 +743,7 @@
         {"kitab": "Muhyiddin Darwisy, I'rab al-Qur'an wa Bayanuh (cet. 4, 1415 H)", "ref": "jil. 1, hlm. 15 (al-I'rab: an‘amta mabni di atas sukun; jumlah shilah tidak punya kedudukan i'rab)", "url": "https://tafsir.app/iraab-aldarweesh/1/7"},
         {"kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)", "ref": "jil. 1, hlm. 35 (QS 1:7, bagian al-I'rab: an‘amta mabni di atas sukun karena bersambung dhamir rafa')", "url": "https://shamela.ws/book/22916/20"},
         {"kitab": "Mahmud Shafi, al-Jadwal fi I'rab al-Qur'an wa Sharfihi wa Bayanihi (Damaskus: Dar ar-Rasyid; Beirut: Mu'assasat al-Iman, cet. 3, 1416 H/1995 M)", "ref": "jil. 1, hlm. 35 (QS 1:7, bagian al-I'rab: -ta dhamir muttashil sebagai fa'il; -hi- pada ‘alaihim)", "url": "https://shamela.ws/book/22916/20"},
-        {"kitab": "Tanzil Quran Text (Uthmani) 1.1", "ref": "QS 4:69:8 (juga 4:72:10, 5:23:6, 19:58:3): an‘ama dengan fathah di akhir; QS 1:7:3: mim bersukun sebelum ta'", "url": "https://tanzil.net/download/"}
+        {"kitab": "Tanzil Quran Text (Uthmani) 1.1", "ref": "QS 5:23:6 (juga 4:69:8, 4:72:10, 19:58:3): an‘ama dengan fathah di akhir; QS 1:7:3: mim bersukun sebelum ta'", "url": "https://tanzil.net/download/"}
       ]
     },
     "1:7:4": {

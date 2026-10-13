@@ -6,7 +6,9 @@
  *   const quiz = quizAyah(slug, a.ayah);   // content/quiz (src/lib/quiz-content.ts)
  *   const seq = buildAutoplaySequence({ slug, surahName, ayahCount, ayah: a,
  *     introduced: conceptsIntroducedIn(a.loc), exercises: availableExercises(quiz),
- *     questions: questionNumbers(quiz), texts: ID_TEXTS, narration, shared });
+ *     questions: questionNumbers(quiz), texts: ID_TEXTS, narration, shared,
+ *     // the example beats (plan L20): lessonExamples({ ayah: a, introduced, compose, clips, wordAt })
+ *     examples });
  *   // client:
  *   const [state, dispatch] = useReducer((s, e) => reduceAutoplay(seq, s, e), seq,
  *     (q) => createAutoplayState(q, { pace }));
@@ -17,6 +19,7 @@ export * from "./types";
 export * from "./ids";
 export * from "./timing";
 export * from "./exercises";
+export * from "./examples";
 export * from "./narration";
 export * from "./texts";
 export * from "./sequence";

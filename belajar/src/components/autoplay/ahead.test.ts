@@ -899,7 +899,9 @@ async function playLesson(
     } else if (a?.kind === "recite") {
       push();
       ends = { type: "recite_end", token: a.token };
-      lasts = a.target === "ayah" ? 6000 : 1200;
+      // The imam, and at least the reading time the lesson gives the caption beside him (the
+      // runner ends a recitation only when both are through): a word, an example beat.
+      lasts = Math.max(a.target === "ayah" ? 6000 : a.target === "clip" ? a.clip.end - a.clip.start : 1200, a.minMs);
     } else if (s.phase === "waiting") {
       push();
       ends = { type: "skip" };

@@ -7,6 +7,15 @@
  * recitation, silent wait) and reports back with events; so narration and
  * the imam's recitation can never overlap.
  *
+ * EXAMPLE BEATS (operator 2026-10-12: "each explanation should be followed by
+ * examples (visual + voice)", "not only for harakah, but also for all rules";
+ * plan L20; which examples: examples.ts): after a rule is explained the stage
+ * shows one example of it and the IMAM recites it — a word of this ayah on
+ * the stage's own recitation player, a word or run of another ayah as a clip
+ * of that ayah's streamed recording (ExampleClip). A beat has NO narration
+ * line: its caption is on-screen text only (AutoplayTexts.example), so the
+ * narrator still never voices a Qur'anic word and nothing is rendered for it.
+ *
  * Narration lines are keyed by the step-id contract shared by every part of
  * the autoplay build (and by pipeline/build_narration.py + validate_narration.py):
  *   "${slug}:${ayah}:${part}"   part ∈ intro | recite | primer:${k} | w${n} |
@@ -233,6 +242,44 @@ export type Cue = {
   refs: number[];
 };
 
+// ───────────────────────────── Example beats ─────────────────────────────
+
+/** The imam's voice of an example in another ayah: that ayah's streamed recording by the default
+ *  reciter and [start, end) of the word (or run) in it, in ms, from the pinned quran-align
+ *  timings (content/library.json `clips`, content/compose `examples`; pipeline/clips.py). `last`:
+ *  the word ends its ayah, where the imam stops. Nothing is cut or stored: the player seeks and
+ *  stops (src/hooks/useExamplePlayer.ts). */
+export type ExampleClip = { url: string; start: number; end: number; last?: boolean };
+
+/** What an example beat exemplifies: a concept just introduced, the bentuk dasar a composition's
+ *  `base` frame shows, or the word whose harakah was just explained. */
+export type ExampleOf = "concept" | "base" | "word";
+
+/**
+ * One example beat of a step: the stage shows the example (its Arabic comes from the content
+ * bytes, by `id`; the sequence carries none) with `caption`, and the imam recites it.
+ */
+export type ExampleBeat = {
+  /** Unique in the sequence, and the key of the stage's drawing of it: "concept:huruf-jar:1",
+   *  "w1:base:2" (word 1's composition, frame 2), "w3:word". */
+  id: string;
+  of: ExampleOf;
+  /** The cue of its step it comes after (index); -1: it opens the step (an example step). */
+  after: number;
+  /** The clip key of what is recited: a word ("1:1:1") or a run ("55:78:1-2"). */
+  key: string;
+  /** A word of THIS ayah (1-based): recited on the stage's own recitation player and lit on the
+   *  mushaf line; null: another ayah's, `clip`. Exactly one of `word` and `clip` is set. */
+  word: number | null;
+  clip: ExampleClip | null;
+  /** The composition frame on screen while it plays (a base example), else null. */
+  frame: number | null;
+  /** On-screen text while it plays ("Contoh: …"): never spoken, never Arabic script. */
+  caption: string;
+  /** The caption cut into ≤180-character parts. */
+  parts: string[];
+};
+
 export type StepKind =
   | "intro"
   | "recite_ayah"
@@ -245,6 +292,8 @@ export type StepKind =
   | "compose"
   | "structure"
   | "concept"
+  /** The example(s) of the concept just introduced: no narration line, the imam only. */
+  | "example"
   | "exercise"
   | "recap"
   | "next"
@@ -295,6 +344,8 @@ export type AutoplayStep = {
   /** The imam's recitation, played after the cues (never during them). */
   recite?: ReciteTarget;
   exercise?: ExerciseSpec;
+  /** The step's example beats, each after the cue it names (operator 2026-10-12, plan L20). */
+  examples?: ExampleBeat[];
 };
 
 /** Where the learner goes when the ayah's sequence ends. */
@@ -344,6 +395,20 @@ export type AutoplayTexts = {
   recap: string;
   next: (a: { ayah: number }) => string;
   done: (a: { surah: string }) => string;
+  /** The caption of an example beat (shown, never spoken; operator 2026-10-12, plan L20). Plain
+   *  words for adults: "klik" never "ketuk", no ALL CAPS, Latin transliteration at most. */
+  example: {
+    /** A word of this ayah. */
+    word: (a: { n: number; translit: string }) => string;
+    /** One more example, a word of another ayah. */
+    other: (a: { translit: string; surah: number; ayah: number }) => string;
+    /** The bentuk dasar a composition shows, where it stands in the Qur'an. */
+    base: (a: { translit: string; surah: number; ayah: number }) => string;
+    /** Added when the example ends its ayah and the imam's stop drops its last harakah. */
+    waqf: string;
+    /** Added when a word that starts with hamzat washal is played with the word before it. */
+    washal: (a: { heard: string }) => string;
+  };
   shared: Record<SharedKey, string>;
   /** Spotlight labels. */
   guide: {

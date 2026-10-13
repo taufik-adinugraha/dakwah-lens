@@ -4,6 +4,10 @@ plants one fault in a copy of content/compose/<slug>.json (or of the authored fi
 asserts that the validator fails with the expected message; the unmutated copy must pass. Faults
 only the pinned corpus can catch (a Tanzil token, an attestation, the parts against QAC's
 segments) are listed as skipped with --no-corpus (CI). Also unit-tests the pieces and the edits.
+The imam's voice of each bentuk dasar (`examples`, plan L20) has its own faults: a base frame
+without its entry, a hamzat-washal word played alone, a clip shifted to the next word or taken
+from another ayah's file, a word that ends its ayah, a reason that is not true, a fixture that
+drifted (a mutation may plant its fault in fixtures/compose_examples.json: `in_fixture`).
 Standard library only; run from belajar/pipeline after build_compose.py:
 
     python3 test_validate_compose.py               # with pipeline/cache (local)
@@ -28,8 +32,11 @@ CONTENTS = C.load_all_content()
 SLUG = "al-fatihah"
 
 
-def run_check(contents, authored=None):
-    return VC.check(contents, LESSONS, CORPUS, authored)
+FIXTURE = C.load_examples_fixture()
+
+
+def run_check(contents, authored=None, fixture=None):
+    return VC.check(contents, LESSONS, CORPUS, authored, copy.deepcopy(FIXTURE) if fixture is None else fixture)
 
 
 def unit(c, loc):
@@ -52,6 +59,49 @@ def say_of(loc, k, fn):
 
 def frame_set(loc, k, **kv):
     return setf(lambda x: x["words"][loc]["frames"][k - 1].update(kv))
+
+
+def voice(loc, fn, k=0):
+    """The k-th `examples` entry of a word, rewritten."""
+    return setf(lambda x: fn(x["examples"][loc][k]))
+
+
+def voice_is(loc, entry, k=0):
+    """The k-th `examples` entry of a word, replaced (its frame and form kept)."""
+    def f(c, a):
+        e = c[SLUG]["examples"][loc][k]
+        c[SLUG]["examples"][loc][k] = {"frame": e["frame"], "form": e["form"], **entry}
+    return f
+
+
+def in_fixture(fn):
+    """A fault planted in fixtures/compose_examples.json (the contents stay as built)."""
+    def f(c, a):
+        pass
+    f.fixture = fn
+    return f
+
+
+def mutated_fixture(mutate):
+    fx = copy.deepcopy(FIXTURE)
+    getattr(mutate, "fixture", lambda d: None)(fx)
+    return fx
+
+
+def swap_fixture_words(d):
+    """Two words of 41:9 that no base frame shows, swapped in the fixture's Tanzil line."""
+    toks = d["ayat"]["41:9"]["tanzil"].split(" ")
+    toks[0], toks[1] = toks[1], toks[0]
+    d["ayat"]["41:9"]["tanzil"] = " ".join(toks)
+
+
+def lesson_clip(loc):
+    """The lesson's own Alafasy timing of a lesson word, as a clip (clips.py)."""
+    s, a, w = (int(x) for x in loc.split(":"))
+    rec = C.CL.lesson_recitation(LESSONS, s, a)
+    seg = next(x for x in rec["segments"] if x[0] == w)
+    last = C.CL.is_last(s, a, w)
+    return {"url": rec["url"], "start": seg[1], "end": seg[2], **({"last": True} if last else {})}
 
 
 # (name, mutation(contents, authored-sha map), expected substring, needs the corpus)
@@ -122,6 +172,64 @@ MUTATIONS = [
     ("akar instead of bentuk dasar",
      say_of("1:1:1", 3, lambda t: t.replace("Dalam bentuk dasarnya", "Dalam akarnya")), "never “akar”", False),
     ("a letter pin outside the composition", frame_set("1:7:9", 2, letters=[["nope", 0]]), "letters pins", False),
+    # --- the imam's voice of each bentuk dasar (`examples`; operator 2026-10-12, plan L20)
+    ("no examples at all", setf(lambda x: x.pop("examples")), "no `examples`", False),
+    ("a base frame without its voice entry", setf(lambda x: x["examples"].pop("1:1:1")),
+     "are not one entry per base frame", False),
+    ("a voice entry on a frame that is not a base frame", voice("1:1:1", lambda e: e.update(frame=3)),
+     "are not one entry per base frame", False),
+    ("a voice entry for a word that is not composed", setf(lambda x: x["examples"].__setitem__(
+        "112:1:1", x["examples"]["1:1:2"])), "is not a composed word of this file", False),
+    ("a hamzat-washal base form played alone (\"ismu\" would sound \"smu\")",
+     voice("1:1:1", lambda e: (e.pop("washal"), e.update(key="55:78:2", clip=dict(e["clip"], start=1060)))),
+     "starts with hamzat washal mid-ayah", False),
+    ("a washal run that says another heard form", voice("1:1:1", lambda e: e["washal"].update(heard="tabārakaismu")),
+     "is not what the bytes give", False),
+    ("a washal `before` that is not the word before", voice("1:1:1", lambda e: e["washal"].update(before="rabbika", heard="rabbikasmu")),
+     "does not name the word before it", False),
+    ("a washal entry that plays the word alone", voice("1:1:1", lambda e: e.update(key="55:78:2")),
+     "not the run with the word before it", False),
+    ("`washal` on a word without a hamzat washal", voice("1:4:2", lambda e: e.update(
+        washal={"run": "37:20:3-4", "before": "hāżā", "heard": "hāżāyaumu"})), "does not start with hamzat washal mid-ayah", False),
+    ("a voice that is not the place the form quotes", voice("1:2:3", lambda e: e.update(loc="41:9:12", key="41:9:12")),
+     "quotes 41:9:13, but its voice is 41:9:12", False),
+    ("a voice whose word is not the bentuk dasar's bytes",
+     setf(lambda x: x["examples"]["1:1:3"][0].update(loc="20:5:2", key="20:5:2")), "not the bentuk dasar", False),
+    ("a clip shifted to the next word", voice("1:7:3", lambda e: e["clip"].update(start=5250, end=6050)),
+     "is not the clip the fixture's quran-align entry of 5:23 gives", False),
+    ("a clip from another ayah's file", voice("1:7:3", lambda e: e["clip"].update(
+        url=e["clip"]["url"].replace("005023", "005024"))), "is not Alafasy_128kbps's file of 5:23", False),
+    ("a clip in a lesson ayah that is not the lesson's own timing",
+     setf(lambda x: [x["examples"][w][0]["clip"].update(start=50) for w in ("1:1:2", "1:2:2")]),
+     "is not the lesson's timing", False),
+    ("one place played as two different clips", voice("1:2:2", lambda e: e["clip"].update(end=970)),
+     "plays the same place as", False),
+    ("an implausibly long clip", voice("1:4:2", lambda e: e["clip"].update(end=e["clip"]["start"] + 9000)),
+     "is not a plausible length", False),
+    ("a bentuk dasar voiced on its ayah's last word (the ending is not heard there)",
+     voice_is("1:5:4", {"loc": "1:5:4", "key": "1:5:4", "clip": lesson_clip("1:5:4")}), "is its ayah's last word", False),
+    ("a second voice of the lesson's own word", voice_is("1:5:2", {"loc": "1:5:2", "key": "1:5:2", "clip": lesson_clip("1:5:2")}),
+     "no second voice of it", False),
+    ("'own' on a form that quotes another place", voice_is("1:1:2", {"unvoiced": "own"}), "is not the lesson word itself", False),
+    ("'unattested' on a form that quotes a place", voice_is("1:4:2", {"unvoiced": "unattested"}), "that place is its voice", False),
+    ("'unattested' on a form the Qur'an has", voice_is("1:7:5", {"unvoiced": "unattested"}), "but the form's attested list is", False),
+    ("'unheard' on a teaching form", voice_is("1:4:1", {"unvoiced": "unheard"}), "but the form's attested list is", False),
+    ("a reason that is not one of the three", voice_is("1:4:1", {"unvoiced": "later"}), "an unvoiced entry is exactly", False),
+    ("an entry with a stray key", voice("1:4:2", lambda e: e.update(note="x")), "a voiced entry is exactly", False),
+    ("a stale quran-align pin", setf(lambda x: x["data_versions"].__setitem__("quran_align", "release sha256:" + "0" * 64)),
+     "does not pin", False),
+    ("the fixture without an ayah a clip uses", in_fixture(lambda d: d["ayat"].pop("74:10")), "no entry for 74:10", False),
+    ("the fixture with an ayah no clip uses", in_fixture(lambda d: d["ayat"].__setitem__("2:5", d["ayat"]["74:10"])),
+     "2:5 is not the ayah of any clip outside the lessons", False),
+    ("a fixture timing off by one word", in_fixture(lambda d: d["ayat"]["37:20"]["segments"][3].__setitem__(2, 3560)),
+     "is not the clip the fixture's quran-align entry of 37:20 gives", False),
+    ("a fixture under other pins", in_fixture(lambda d: d["pins"].__setitem__("quran_align", "other")),
+     "are not those of sources.json", False),
+    ("a fixture line that is not the Tanzil line", in_fixture(swap_fixture_words), "41:9 is not the pinned Tanzil line", True),
+    ("a derived form's voice that is not the build's choice (another place of the same bytes)",
+     voice("1:7:5", lambda e: e.update(loc="4:95:6", key="4:95:6", clip={
+         "url": "https://everyayah.com/data/Alafasy_128kbps/004095.mp3", "start": 4430, "end": 5020})),
+     "differs from a fresh build_compose.py run", True),
 ]
 
 
@@ -137,8 +245,68 @@ class ComposeValidation(unittest.TestCase):
                 c = copy.deepcopy(CONTENTS)
                 a = {s: VC.sha256_file(VC.AUTHORED_DIR / f"{s}.compose.json") for s in C.authored_slugs()}
                 mutate(c, a)
-                errs = run_check(c, a)
+                errs = run_check(c, a, mutated_fixture(mutate))
                 self.assertTrue(any(expect in e for e in errs), f"{name}: expected {expect!r} in {errs[:4]}")
+
+    def test_every_base_frame_has_a_voice_or_a_true_reason(self):
+        c = CONTENTS[SLUG]
+        rows = {loc: [(e["frame"], e["form"]) for e in es] for loc, es in c["examples"].items()}
+        base = {loc: [(k, fr["focus"]) for k, fr in enumerate(u["frames"], 1) if fr["stage"] == "base"]
+                for loc, u in c["words"].items()}
+        self.assertEqual(rows, {loc: b for loc, b in base.items() if b})
+        voiced = {loc: e for loc, es in c["examples"].items() for e in es if "clip" in e}
+        # operator 2026-10-12: "ismu (read by voice + show visual)": heard with the word before it
+        self.assertEqual(voiced["1:1:1"]["key"], "55:78:1-2")
+        self.assertEqual(voiced["1:1:1"]["washal"], {"run": "55:78:1-2", "before": "tabāraka", "heard": "tabārakasmu"})
+        # the Konsep diagram's place (plan L19), not 4:69:8
+        self.assertEqual(voiced["1:7:3"]["loc"], "5:23:6")
+        for loc, e in voiced.items():
+            self.assertNotIn("last", e["clip"], f"{loc}: a bentuk dasar is never voiced on an ayah's last word")
+        for loc, es in c["examples"].items():
+            for e in es:
+                if "unvoiced" in e:
+                    self.assertIn(e["unvoiced"], C.UNVOICED)
+
+    def test_voice_library_is_what_clips_checks(self):
+        fx_T = C.CL.fixture_sources(FIXTURE)[1]
+        lib = C.voice_library(CONTENTS, LESSONS, fx_T)
+        self.assertEqual(list(lib["clips"]), C.example_keys(CONTENTS))
+        self.assertEqual([k for k, _ in C.CL.wanted(lib)], C.example_keys(CONTENTS))
+        ismu = CONTENTS[SLUG]["words"]["1:1:1"]["forms"]["ismu"]["ar"]
+        self.assertTrue(lib["quran"]["55:78:1-2"].endswith(" " + ismu))
+        self.assertEqual(len(lib["quran"]["55:78:1-2"].split(" ")), 2)
+
+    @unittest.skipIf(CORPUS is None, "needs the corpus")
+    def test_place_voice_rules(self):
+        voices = C.Voices.load(LESSONS)
+        # an ayah's last word: never (the ending is not heard)
+        ex, why, _ = C.place_voice("55:1:1", "ar-raḥmānu", CORPUS, voices)
+        self.assertIsNone(ex)
+        self.assertIn("ends its ayah", why)
+        # a hamzat washal mid-ayah whose word before has no transliteration on record: not usable
+        ex, why, _ = C.place_voice("2:163:8", "ar-raḥmānu", CORPUS, voices)
+        self.assertIsNone(ex)
+        self.assertIn("hamzat washal", why)
+        # … at the start of its ayah the alif is read: the word itself
+        ex, why, _ = C.place_voice("20:5:1", "ar-raḥmānu", CORPUS, voices)
+        self.assertEqual((ex["key"], why, "washal" in ex), ("20:5:1", None, False))
+        # … with the library's typed `before`: the run, and what is heard
+        ex, why, _ = C.place_voice("55:78:2", "ismu", CORPUS, voices)
+        self.assertEqual((ex["key"], ex["washal"]["heard"]), ("55:78:1-2", "tabārakasmu"))
+        # a derived form: a clean alignment in the shortest ayah
+        forms = CONTENTS[SLUG]["words"]["1:7:5"]["forms"]
+        entry, warns = C.base_voice("1:7:5", "gairu", forms["gairu"], CORPUS, voices)
+        self.assertEqual((entry["loc"], warns), ("74:10:3", []))
+        # a quoted place that is not heard as shown stops the build
+        bad = dict(CONTENTS[SLUG]["words"]["1:4:2"]["forms"]["yaumu"], src={"tanzil": "1:4:3"})
+        with self.assertRaises(C.ComposeError):
+            C.base_voice("1:4:2", "yaumu", bad, CORPUS, voices)
+
+    def test_quoted_place(self):
+        self.assertEqual(C.quoted_place({"tanzil": "55:78:2"}), "55:78:2")
+        self.assertEqual(C.quoted_place({"word": "112:2:1"}), "112:2:1")
+        for sp in ({"word": "1:1:1", "pieces": [0, 1]}, {"qac": "1:1:3:2"}, {"from": "ismu", "ops": []}, {"join": ["a", "b"]}, None):
+            self.assertIsNone(C.quoted_place(sp))
 
 
 class PiecesAndEdits(unittest.TestCase):
@@ -189,7 +357,7 @@ def main() -> int:
         c = copy.deepcopy(CONTENTS)
         a = {s: VC.sha256_file(VC.AUTHORED_DIR / f"{s}.compose.json") for s in C.authored_slugs()}
         mutate(c, a)
-        errs = run_check(c, a)
+        errs = run_check(c, a, mutated_fixture(mutate))
         hit = next((e for e in errs if expect in e), None)
         failed += hit is None
         print(f"{name:{width}s}  {'caught' if hit else 'MISSED'}  {hit or errs[:2]}")

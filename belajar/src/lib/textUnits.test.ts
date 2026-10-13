@@ -57,6 +57,17 @@ const CORPUS: [string, string][] = [
   ...["al-fatihah", "al-ikhlas", "al-falaq", "an-nas"].flatMap((f) => strings(readJson(`content/quiz/${f}.json`), `quiz/${f}`)),
   ...MANIFESTS.flatMap(([f, m]) => strings(m, `narration/${f}`)),
   ...["id", "en"].flatMap((l) => strings(readJson(`messages/${l}.json`), `messages/${l}`)),
+  // The example beats' captions (operator 2026-10-12, plan L20): text the engine writes, shown
+  // in the bottom panel through MixedText like every other caption ("Contoh: ismu, di QS 55:78. …").
+  ...SURAHS.flatMap((s) =>
+    s.ayat.flatMap((a) =>
+      ["id", "en"].flatMap((locale) =>
+        stageSequence(s, a, locale).steps.flatMap((st) =>
+          (st.examples ?? []).map((b): [string, string] => [`example ${s.slug}/${a.ayah} ${b.id} (${locale})`, b.caption]),
+        ),
+      ),
+    ),
+  ),
 ];
 
 /**

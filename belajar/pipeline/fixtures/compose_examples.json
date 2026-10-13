@@ -1,0 +1,41 @@
+{
+ "_comment": "The ayat of the lessons' example clips OUTSIDE the lessons (content/compose/<slug>.json `examples`: the imam's voice of a bentuk dasar, played when its `base` frame is on the lesson stage), exactly as the pinned files have them: `tanzil` = the Tanzil Uthmani line, `segments` and `stats` = the quran-align Alafasy_128kbps entry. pipeline/cache is git-ignored, so without this file CI could not tell a shifted timing or a wrong word in these clips. Written by build_compose.py (compose.examples_fixture); validate_compose.py checks it against the pinned files when the cache is present, and the clips against it in every run. Never edit by hand.",
+ "pins": {"tanzil_uthmani": "1.1 sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8", "quran_align": "release-2016-11-24 Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7"},
+ "ayat": {
+  "5:23": {
+   "tanzil": "قَالَ رَجُلَانِ مِنَ ٱلَّذِينَ يَخَافُونَ أَنْعَمَ ٱللَّهُ عَلَيْهِمَا ٱدْخُلُوا۟ عَلَيْهِمُ ٱلْبَابَ فَإِذَا دَخَلْتُمُوهُ فَإِنَّكُمْ غَٰلِبُونَ وَعَلَى ٱللَّهِ فَتَوَكَّلُوٓا۟ إِن كُنتُم مُّؤْمِنِينَ",
+   "segments": [[0, 1, 80, 670], [1, 2, 680, 1740], [2, 3, 1750, 2070], [3, 4, 2080, 3120], [4, 5, 3130, 4440], [5, 6, 4450, 5240], [6, 7, 5250, 6050], [7, 8, 6060, 7140], [8, 9, 7150, 7960], [9, 10, 7970, 9080], [10, 11, 9090, 9890], [11, 12, 9900, 10740], [12, 13, 10750, 12210], [13, 14, 12220, 14090], [14, 15, 14100, 16980], [15, 16, 16990, 17570], [16, 17, 17580, 18370], [17, 18, 18380, 21180], [18, 19, 21190, 22320], [19, 20, 22330, 24780], [20, 21, 24790, 27110]],
+   "stats": {"deletions": 0, "transpositions": 0, "insertions": 0}
+  },
+  "6:126": {
+   "tanzil": "وَهَٰذَا صِرَٰطُ رَبِّكَ مُسْتَقِيمًا قَدْ فَصَّلْنَا ٱلْـَٔايَٰتِ لِقَوْمٍ يَذَّكَّرُونَ",
+   "segments": [[0, 1, 170, 1230], [1, 2, 1240, 2070], [2, 3, 2080, 3050], [3, 4, 3060, 5300], [4, 5, 5310, 5640], [5, 6, 5650, 6750], [6, 7, 6760, 8140], [7, 8, 8150, 10100], [8, 9, 10110, 13470]],
+   "stats": {"deletions": 0, "transpositions": 0, "insertions": 0}
+  },
+  "20:5": {
+   "tanzil": "ٱلرَّحْمَٰنُ عَلَى ٱلْعَرْشِ ٱسْتَوَىٰ",
+   "segments": [[0, 1, 30, 1580], [1, 2, 1590, 2010], [2, 3, 2020, 2900], [3, 4, 2910, 3940]],
+   "stats": {"deletions": 0, "transpositions": 0, "insertions": 0}
+  },
+  "37:20": {
+   "tanzil": "وَقَالُوا۟ يَٰوَيْلَنَا هَٰذَا يَوْمُ ٱلدِّينِ",
+   "segments": [[0, 1, 50, 1120], [1, 2, 1130, 2700], [2, 3, 2710, 3540], [3, 4, 3550, 4210], [4, 5, 4220, 7350]],
+   "stats": {"deletions": 0, "transpositions": 0, "insertions": 0}
+  },
+  "41:9": {
+   "tanzil": "قُلْ أَئِنَّكُمْ لَتَكْفُرُونَ بِٱلَّذِى خَلَقَ ٱلْأَرْضَ فِى يَوْمَيْنِ وَتَجْعَلُونَ لَهُۥٓ أَندَادًا ذَٰلِكَ رَبُّ ٱلْعَٰلَمِينَ",
+   "segments": [[0, 1, 30, 310], [1, 2, 320, 2060], [2, 3, 2070, 3380], [3, 4, 3390, 4270], [4, 5, 4280, 4910], [5, 6, 4920, 5650], [6, 7, 5660, 6050], [7, 8, 6060, 7000], [8, 9, 7010, 8300], [9, 10, 8310, 10130], [10, 11, 10140, 12960], [11, 12, 12970, 13750], [12, 13, 13760, 14370], [13, 14, 14380, 17440]],
+   "stats": {"deletions": 0, "transpositions": 0, "insertions": 0}
+  },
+  "55:78": {
+   "tanzil": "تَبَٰرَكَ ٱسْمُ رَبِّكَ ذِى ٱلْجَلَٰلِ وَٱلْإِكْرَامِ",
+   "segments": [[0, 1, 30, 1050], [1, 2, 1060, 1490], [2, 3, 1500, 2400], [3, 4, 2410, 2760], [4, 5, 2770, 3880], [5, 6, 3890, 7750]],
+   "stats": {"deletions": 0, "transpositions": 0, "insertions": 0}
+  },
+  "74:10": {
+   "tanzil": "عَلَى ٱلْكَٰفِرِينَ غَيْرُ يَسِيرٍ",
+   "segments": [[0, 1, 40, 380], [1, 2, 390, 1740], [2, 3, 1750, 2340], [3, 4, 2350, 5020]],
+   "stats": {"deletions": 0, "transpositions": 0, "insertions": 0}
+  }
+ }
+}

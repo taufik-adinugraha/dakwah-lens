@@ -30,6 +30,24 @@ export function settleAfterReciteMs(pace: Pace): number {
 export const WORD_REPEAT_GAP_MS = 1500;
 
 /**
+ * An example beat (operator 2026-10-12, plan L20) waits this long for the imam's clip to SOUND
+ * before it gives up on it: the runner then reports recite_error, and the lesson goes on (an
+ * example is never a dead stop). Long enough for "Memuat bacaan imam…" to show (LOADING_SHOW_MS,
+ * 0.6 s) and for a slow first byte from the reciter's CDN; shorter than LOADING_SLOW_MS (8 s),
+ * whose advice — wait, or click ↺ Ulangi — is for a sound the lesson cannot go on without.
+ */
+export const EXAMPLE_LOAD_LIMIT_MS = 6000;
+
+/** An example whose recording could not be played stays on screen, with its caption, this long. */
+export const EXAMPLE_FAILED_HOLD_MS = 3000;
+
+/** Has an example beat waited long enough for its sound (rules above)? `heard`: the clip played
+ *  to its end; `flowing`: it is sounding right now. */
+export function exampleGivesUp(waitedMs: number, sound: { heard: boolean; flowing: boolean }): boolean {
+  return waitedMs >= EXAMPLE_LOAD_LIMIT_MS && !sound.heard && !sound.flowing;
+}
+
+/**
  * A settled exercise question (answered right, or its answer shown) stays
  * this long after its feedback line before the next question comes by
  * itself — longer when the answer was shown, so the right option and its

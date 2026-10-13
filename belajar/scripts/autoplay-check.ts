@@ -2,10 +2,15 @@
  * Checks the autoplay lesson engine over every ayah of every surah:
  * sequences, narration manifests (when content/narration/*.json exist),
  * full simulated runs in every pace (caption-only and with audio) and
- * seeded property runs of the state machine. Pure TypeScript — runs without
+ * seeded property runs of the state machine, and the EXAMPLE BEATS (operator
+ * 2026-10-12, plan L20: every rule explained is followed by an example the
+ * imam recites, or is listed with the reason). Pure TypeScript — runs without
  * node_modules:
  *
- *   cd belajar && npx --yes tsx@4.19.2 scripts/autoplay-check.ts [--streams N] [--length N] [--seed N]
+ *   cd belajar && npx --yes tsx@4.19.2 scripts/autoplay-check.ts [--streams N] [--length N] [--seed N] [--examples]
+ *
+ * --examples also lists every beat (the rule's step → what the imam recites)
+ * and every rule without one, with the seconds the beats add per ayah.
  *
  * Exit code 1 on any error. The same checks run in CI through
  * src/lib/autoplay/autoplay.test.ts and src/components/autoplay/stage.test.ts
@@ -59,6 +64,25 @@ console.log(
 );
 for (const [slug, m] of Object.entries(stats.minutes)) {
   console.log(`  ${slug}: ≈ ${m.biasa} min Biasa · ${m.pelan} min Pelan (caption-only estimate, exercises answered at once)`);
+}
+// The example beats: per surah, how many, what they add to the lesson, the rules without one.
+const listed = process.argv.includes("--examples");
+for (const slug of Object.keys(stats.minutes)) {
+  const rows = Object.entries(stats.examples).filter(([k]) => k.startsWith(`${slug}/`));
+  const beats = rows.reduce((n, [, r]) => n + r.beats.length, 0);
+  const clips = rows.reduce((n, [, r]) => n + r.beats.filter((b) => !b.own).length, 0);
+  const gaps = rows.reduce((n, [, r]) => n + r.gaps.length, 0);
+  const sec = (pace: "biasa" | "pelan") => Math.round(rows.reduce((n, [, r]) => n + r.addedMs[pace], 0) / 1000);
+  console.log(
+    `  ${slug}: ${beats} example beats (${beats - clips} this ayah's own word, ${clips} a clip of another ayah), ` +
+      `+${sec("biasa")} s Biasa · +${sec("pelan")} s Pelan; ${gaps} rule(s) without a beat of their own, each with its reason`,
+  );
+  if (!listed) continue;
+  for (const [key, r] of rows) {
+    console.log(`    ${key}: ${r.beats.length} beats, +${(r.addedMs.biasa / 1000).toFixed(1)} s Biasa · +${(r.addedMs.pelan / 1000).toFixed(1)} s Pelan`);
+    for (const b of r.beats) console.log(`      ${b.step} → ${b.key}${b.own ? " (this ayah's word, the stage's player)" : " (clip)"}`);
+    for (const g of r.gaps) console.log(`      ${g.step}: no beat for ${g.rule} — ${g.why}`);
+  }
 }
 for (const n of report.notes) console.log(`note: ${n}`);
 if (errors.length) {

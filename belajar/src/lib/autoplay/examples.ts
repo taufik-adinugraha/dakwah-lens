@@ -1,0 +1,290 @@
+/**
+ * Which examples a lesson plays, and by what is HEARD (operator 2026-10-12: "in explanation, for
+ * example when explaining dhommah, kasrah, etc provide example + additional voice. e.g ismu (read
+ * by voice + show visual) when combined with harf jar, it becomes ismi (read by voice + visual). in
+ * principel, each explanation should be followed by examples (visual + voice)" — "not only for
+ * harakah, but also for all rules"; plan L20). PR #100 did this on the static pages (Konsep,
+ * Harakat, the word-parts diagrams); this is the same inside the autoplay lesson, where the
+ * narrator explains each word, each new concept and each word by its parts.
+ *
+ * Derived from the content, never listed by hand (lessonExamples):
+ *
+ * (a) CONCEPT — after the line of a concept first introduced at this ayah ("Konsep baru: …"),
+ *     in an example step of its own: the concept's example in THIS ayah (its first example, by
+ *     the rule that makes it "introduced here"): the lesson's own word, lit on the mushaf line
+ *     and recited on the stage's own recitation player. If that word ends its ayah, the imam
+ *     stops on it and its last harakah is not heard (waqf): the beat says so — and when the
+ *     example itself is about that ending (its note on the Konsep page names the word's own
+ *     harakah: "bismi: kasrah, tanda jar …"), ONE more example follows, the first of the
+ *     concept's other examples that does not end its ayah (a clip; library.json `clips`).
+ * (b) BENTUK DASAR — in a word-by-parts composition (rule 14: bi + ismu → bismi), when the `base`
+ *     frame is on screen and its lines are said: the imam's clip of that base form where the
+ *     build found it heard as shown (content/compose `examples`, pipeline/compose.py: never an
+ *     ayah's last word; a word that starts with hamzat washal mid-ayah is played with the word
+ *     before it, "tabārakasmu", and says so). The joined word is the step's own recitation at its
+ *     last frame, as before: "ismu (read by voice + show visual) … becomes ismi (read by voice +
+ *     visual)". A base frame without a voice of its own is listed with the build's reason (gaps).
+ * (c) WORD — when a word's harakah is explained by its own line (a word WITHOUT a composition:
+ *     "Akhirnya kasrah karena …", the word card's "Kenapa akhirnya dibaca …"), the imam recites
+ *     that word right after — unless the harakah is not heard there (src/lib/heard.ts
+ *     signNotHeard: the ayah's last word, a tanwin before a letter that hides its n), which is
+ *     listed with the reason. A word WITH a composition is recited at the end of its composition
+ *     step already, right after its ending is explained: no second time.
+ *
+ * At most two beats per rule. Every beat is labelled by what is heard (src/lib/heard.ts, the
+ * rules of PR #100's review): `waqf` on an ayah-final word whose last harakah the pause drops,
+ * `washal` with the heard form of a run. Pure (type imports only): scripts/autoplay-check.ts runs
+ * it under tsx without node_modules; unit-tested over every lesson (examples.test.ts).
+ */
+import type { Ayah, Concept } from "@/content/schema";
+
+import { signNotHeard, waqfDrop } from "../heard";
+import { letters } from "../terms";
+import type { ExampleClip, ExampleOf } from "./types";
+
+/** The harakat a word's `case.sign` can name, as the mark names of src/lib/heard.ts. */
+const HARAKAT: ReadonlySet<string> = new Set(["fathah", "kasrah", "dhammah", "fathatain", "kasratain", "dhammatain"]);
+/** The harakat the stage can name beside an example (content/compose `marks`: its term and sound). */
+export const ENDING_MARKS = ["fathah", "kasrah", "dhammah"] as const;
+export type EndingMark = (typeof ENDING_MARKS)[number];
+
+/** At most this many example beats per rule (a concept, a bentuk dasar, a word's line). */
+export const MAX_EXAMPLES_PER_RULE = 2;
+
+/** Why a `base` frame of a composition has no voice of its own (pipeline/compose.py UNVOICED). */
+export const UNVOICED_REASON: Readonly<Record<string, string>> = {
+  own: "the bentuk dasar is this very word; the step ends with the imam reciting it",
+  unattested: "no word of the Qur'an has these bytes (a teaching form)",
+  unheard: "the Qur'an has these bytes, but in no place are they heard as shown",
+};
+
+/** One entry of content/compose/<slug>.json `examples[loc]` (src/content/compose-schema.ts). */
+export type ComposeExampleLike = {
+  frame: number;
+  form: string;
+  loc?: string;
+  key?: string;
+  clip?: ExampleClip;
+  washal?: { run: string; before: string; heard: string };
+  unvoiced?: string;
+};
+
+/** What this module reads of a composition file (raw JSON or the parsed ComposeFile). */
+export type ComposeLike = {
+  words: Readonly<
+    Record<
+      string,
+      {
+        forms: Readonly<Record<string, { ar: string; translit: string; gloss?: string }>>;
+        frames: readonly { stage: string; focus?: string }[];
+        lines: readonly { frame: number }[];
+      }
+    >
+  >;
+  examples?: Readonly<Record<string, readonly ComposeExampleLike[]>>;
+};
+
+type WordLike = Pick<Ayah["words"][number], "loc" | "ar" | "translit" | "gloss" | "case">;
+
+export type ExampleSource = {
+  ayah: { surah: number; ayah: number; words: readonly WordLike[] };
+  /** Concepts FIRST introduced in this ayah (library.conceptsIntroducedIn). */
+  introduced: readonly Pick<Concept, "id" | "examples">[];
+  /** content/compose/<slug>.json, or null (a surah without compositions). */
+  compose: ComposeLike | null;
+  /** content/library.json `clips`: the imam's voice of every concept example. */
+  clips: Readonly<Record<string, ExampleClip>>;
+  /** A lesson word of any surah, by loc: a concept's example in another ayah. */
+  wordAt: (loc: string) => { ar: string; translit: string; gloss: string } | undefined;
+};
+
+/** One example the lesson plays. The Latin fields go into the sequence (captions); `ar`,
+ *  `gloss` and `ending` are for the stage's drawing only (the sequence carries no Arabic). */
+export type LessonExample = {
+  id: string;
+  of: ExampleOf;
+  /** The step it plays in: an example step of its own ("concept:${id}:ex") or the lesson step
+   *  it is part of ("w1:compose", "w3"). */
+  step: string;
+  /** base: the composition frame it plays over (after that frame's last line); else null. */
+  frame: number | null;
+  key: string;
+  /** A word of this ayah (1-based), recited on the stage's own player; null: `clip`. */
+  word: number | null;
+  clip: ExampleClip | null;
+  translit: string;
+  gloss: string | null;
+  /** Where the example stands in the Qur'an. */
+  place: { surah: number; ayah: number };
+  /** It ends its ayah and the imam's stop drops its last harakah (heard.ts hasWaqfNote). */
+  waqf: boolean;
+  /** Played with the word before it: what is heard. */
+  washal: { before: string; heard: string } | null;
+  /** The example's Arabic, exactly the content's bytes. */
+  ar: string;
+  /** The harakah the example is about, when it is heard there: named beside it on the stage. */
+  ending: EndingMark | null;
+};
+
+/** A rule explained without an example beat of its own, and why. */
+export type ExampleGap = { step: string; rule: string; why: string };
+
+const placeOf = (loc: string) => {
+  const [surah, ayah, word] = loc.split(":").map(Number);
+  return { surah, ayah, word };
+};
+
+/** Does the example's note name the word's own harakah ("bismi: kasrah, tanda jar …")? Then the
+ *  example is about that ending. */
+export function claimsEnding(note: string, sign: string): boolean {
+  if (!HARAKAT.has(sign)) return false;
+  return new RegExp(`(^|[^\\p{L}])${sign}([^\\p{L}]|$)`, "iu").test(note);
+}
+
+const endingMark = (sign: string): EndingMark | null => (ENDING_MARKS as readonly string[]).includes(sign) ? (sign as EndingMark) : null;
+
+export function lessonExamples(src: ExampleSource): { examples: LessonExample[]; gaps: ExampleGap[] } {
+  const { ayah } = src;
+  const words = ayah.words;
+  const tokens = words.map((w) => w.ar);
+  const numberOf = new Map(words.map((w, i) => [w.loc, i + 1]));
+  const examples: LessonExample[] = [];
+  const gaps: ExampleGap[] = [];
+  const here = { surah: ayah.surah, ayah: ayah.ayah };
+
+  // (b) the bentuk dasar of a composition, and (c) the word whose harakah its own line explains
+  words.forEach((w, i) => {
+    const n = i + 1;
+    const unit = src.compose?.words[w.loc];
+    if (unit && unit.lines.length) {
+      for (const e of (src.compose?.examples?.[w.loc] ?? []).slice(0, MAX_EXAMPLES_PER_RULE)) {
+        const form = unit.forms[e.form];
+        const step = `w${n}:compose`;
+        if (!form) continue;
+        if (!e.clip || !e.key || !e.loc) {
+          gaps.push({ step, rule: `bentuk dasar ${form.translit}`, why: UNVOICED_REASON[e.unvoiced ?? ""] ?? `no voice (${e.unvoiced ?? "?"})` });
+          continue;
+        }
+        const at = placeOf(e.loc);
+        // A base form that is another word of this very ayah, played alone: the stage's own player.
+        const own = e.key === e.loc ? (numberOf.get(e.loc) ?? null) : null;
+        examples.push({
+          id: `w${n}:base:${e.frame}`,
+          of: "base",
+          step,
+          frame: e.frame,
+          key: e.key,
+          word: own,
+          clip: own === null ? e.clip : null,
+          translit: form.translit,
+          gloss: form.gloss ?? null,
+          place: { surah: at.surah, ayah: at.ayah },
+          waqf: false,
+          washal: e.washal ? { before: e.washal.before, heard: e.washal.heard } : null,
+          ar: form.ar,
+          ending: null,
+        });
+      }
+      return;
+    }
+    const sign = w.case.sign;
+    if (!HARAKAT.has(sign)) return; // its line explains no harakah (a mabni word's sukun, a letter, none)
+    const unheard = signNotHeard([sign], letters(w.ar).length, n, tokens);
+    if (unheard) {
+      gaps.push({ step: `w${n}`, rule: `akhiran ${w.translit}`, why: `its ${sign} is not heard here (${unheard})` });
+      return;
+    }
+    examples.push({
+      id: `w${n}:word`,
+      of: "word",
+      step: `w${n}`,
+      frame: null,
+      key: w.loc,
+      word: n,
+      clip: null,
+      translit: w.translit,
+      gloss: w.gloss,
+      place: here,
+      waqf: false,
+      washal: null,
+      ar: w.ar,
+      ending: endingMark(sign),
+    });
+  });
+
+  // (a) each concept introduced here: its example in this ayah, then at most one from elsewhere
+  for (const c of src.introduced) {
+    const first = c.examples[0];
+    const n = first ? numberOf.get(first.loc) : undefined;
+    const step = `concept:${c.id}:ex`;
+    if (!first || n === undefined) {
+      gaps.push({ step, rule: c.id, why: "its first example is not a word of this ayah" });
+      continue;
+    }
+    const w = words[n - 1];
+    const last = n === words.length;
+    const drop = last ? waqfDrop(w.ar) : "none";
+    const claims = claimsEnding(first.note, w.case.sign);
+    examples.push({
+      id: `concept:${c.id}:1`,
+      of: "concept",
+      step,
+      frame: null,
+      key: w.loc,
+      word: n,
+      clip: null,
+      translit: w.translit,
+      gloss: w.gloss,
+      place: here,
+      waqf: drop === "harakat",
+      washal: null,
+      ar: w.ar,
+      ending: claims && !last ? endingMark(w.case.sign) : null,
+    });
+    if (!(last && drop !== "none" && claims)) continue;
+    // The example is about an ending that is not heard here: one more, where it is.
+    const other = c.examples.slice(1).find((x) => {
+      const clip = src.clips[x.loc];
+      return !!clip && !clip.last && !!src.wordAt(x.loc);
+    });
+    const word = other ? src.wordAt(other.loc) : undefined;
+    if (!other || !word) {
+      gaps.push({ step, rule: c.id, why: `its example here ends the ayah, where the ${w.case.sign} it is about is not heard, and the concept has no other example that does not end its ayah` });
+      continue;
+    }
+    const at = placeOf(other.loc);
+    const own = numberOf.get(other.loc) ?? null;
+    examples.push({
+      id: `concept:${c.id}:2`,
+      of: "concept",
+      step,
+      frame: null,
+      key: other.loc,
+      word: own,
+      clip: own === null ? src.clips[other.loc] : null,
+      translit: word.translit,
+      gloss: word.gloss,
+      place: { surah: at.surah, ayah: at.ayah },
+      waqf: false,
+      washal: null,
+      ar: word.ar,
+      ending: null,
+    });
+  }
+  return { examples, gaps };
+}
+
+/** The part of a LessonExample the sequence is built from: no Arabic, nothing for drawing. */
+export type ExampleInput = Pick<LessonExample, "id" | "of" | "step" | "frame" | "key" | "word" | "clip" | "translit" | "place" | "waqf" | "washal">;
+
+/** What the stage draws for one beat, by its id (content bytes; LessonStage). */
+export type StageExample = Pick<LessonExample, "of" | "key" | "word" | "translit" | "gloss" | "place" | "ar" | "ending" | "waqf" | "washal">;
+
+export function stageExamples(examples: readonly LessonExample[]): Record<string, StageExample> {
+  return Object.fromEntries(
+    examples.map((e) => [
+      e.id,
+      { of: e.of, key: e.key, word: e.word, translit: e.translit, gloss: e.gloss, place: e.place, ar: e.ar, ending: e.ending, waqf: e.waqf, washal: e.washal },
+    ]),
+  );
+}

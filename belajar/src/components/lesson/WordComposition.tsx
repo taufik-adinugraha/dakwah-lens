@@ -28,6 +28,12 @@ const VOWEL: ReadonlySet<ComposeMark> = new Set(["fathah", "kasrah", "dhammah", 
  * the ayah). One FRAME at a time, the one the line on screen is said over
  * (caption.ts stageFrame); the imam then recites the joined word over the
  * last frame ("recited": the tile filled forest, as the mushaf's active word).
+ * On a `base` frame the imam may recite the bentuk dasar itself (operator
+ * 2026-10-12: "ismu (read by voice + show visual) … becomes ismi (read by voice
+ * + visual)"; plan L20, an example beat): `example` names that beat, and while
+ * he recites it the ringed tile is filled the same way. Nothing is added to
+ * the figure for it — the beat's caption, in the bottom panel, says where the
+ * form stands and what is heard — so no frame grows.
  *
  * Arabic is never split, coloured or moved in pieces (joining across styled
  * spans breaks the letters' shapes): every string is one whole form or one
@@ -58,6 +64,7 @@ export function WordComposition({
   marks,
   word,
   stepKey,
+  example = null,
 }: {
   unit: Composition | Primer;
   kind: "compose" | "primer";
@@ -69,18 +76,23 @@ export function WordComposition({
   word: number | null;
   /** Remounts the frame (its transition plays) when the step or frame changes. */
   stepKey: string;
+  /** The example beat of the bentuk dasar on this frame: its id, the clip key it plays, and what
+   *  it is doing (ExampleCard's states); null: none. */
+  example?: { id: string; key: string; state: "reciting" | "failed" | "shown" } | null;
 }) {
   const t = useTranslations("Compose");
   const fr = unit.frames[Math.min(Math.max(frame, 1), unit.frames.length) - 1];
   const form = (n: string | undefined) => (n ? unit.forms[n] : undefined);
   const markText = (m: ComposeMark | null | undefined) => (m ? (marks[m]?.display ?? m) : "");
   const sound = (m: ComposeMark | null | undefined) => (m ? marks[m]?.sound : null);
-  const describe = describeFrame(fr, unit.forms, kind, word, t, markText, sound, recited);
+  // A screen reader is told when the imam recites what the frame shows: the joined word, or the
+  // bentuk dasar a base frame rings.
+  const describe = describeFrame(fr, unit.forms, kind, word, t, markText, sound, recited || example?.state === "reciting");
   const draw = (f: ComposeFrame, live: boolean) =>
     kind === "primer" ? (
       <PrimerFrame fr={f} form={form} marks={marks} t={t} />
     ) : (
-      <WordFrame fr={f} form={form} recited={live && recited} markText={markText} sound={sound} t={t} />
+      <WordFrame fr={f} form={form} recited={live && recited} voiced={live && example?.state === "reciting"} markText={markText} sound={sound} t={t} />
     );
   const LAYER = "col-start-1 row-start-1 flex min-w-0 flex-col items-center justify-center gap-1 sm:gap-2";
   return (
@@ -92,6 +104,9 @@ export function WordComposition({
       data-compose-frame={frame}
       data-compose-word={word ?? undefined}
       data-recited={recited ? "true" : undefined}
+      data-example={example?.id}
+      data-example-state={example?.state}
+      data-clip={example?.key}
       className="mx-auto flex max-w-xl flex-col rounded-2xl border-[1.5px] border-forest bg-forest-tint px-3 py-2 sm:min-h-56 sm:px-5 sm:py-3"
     >
       <figcaption className="sr-only">{describe}</figcaption>
@@ -268,6 +283,7 @@ function WordFrame({
   fr,
   form,
   recited,
+  voiced,
   markText,
   sound,
   t,
@@ -275,6 +291,8 @@ function WordFrame({
   fr: ComposeFrame;
   form: (n: string | undefined) => ComposeForm | undefined;
   recited: boolean;
+  /** The imam is reciting the bentuk dasar this (base) frame rings. */
+  voiced: boolean;
   markText: (m: ComposeMark | null | undefined) => string;
   sound: (m: ComposeMark | null | undefined) => string | null | undefined;
   t: T;
@@ -347,7 +365,7 @@ function WordFrame({
               before={isChange && (fr.to ?? fr.tiles[0]) === n ? fromForm : undefined}
               tag={fr.cause === n ? <span className="font-semibold text-forest">{t("cause_tag")}</span> : undefined}
               ring={fr.focus === n || (isChange && (fr.to ?? fr.tiles[0]) === n)}
-              recited={recited && tiles.length === 1}
+              recited={(recited && tiles.length === 1) || (voiced && fr.stage === "base" && fr.focus === n)}
               quran={i === tiles.length - 1 && tiles.length === 1 && (fr.stage === "drop" || fr.stage === "whole" || recited)}
             />
           </Fragment>
