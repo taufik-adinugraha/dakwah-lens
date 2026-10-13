@@ -145,6 +145,12 @@ MUTATIONS = [
         "tiles", ["ba-i"])), "no example tile carries the fathah", False),
     ("the primer's highlighted words not re-derived", setf(lambda x: x["primer"]["frames"][2].__setitem__(
         "words", [2])), "the words each primer frame shows", False),
+    # 2026-10-13: the primer is played by lesson zero (`lesson: "0"`), the one lesson with no ayah
+    ("the primer handed to a lesson that is not lesson zero", setf(lambda x: x["primer"].__setitem__("lesson", "1:2")),
+     "`lesson` is '0', the lesson with no ayah that opens the course, or is left out", False),
+    # (corpus-free, the narration and the curriculum catch it: lesson zero's lines and lists go)
+    ("the primer's lesson marker dropped from the built file", setf(lambda x: x["primer"].pop("lesson")),
+     "differs from a fresh build_compose.py run", True),
     ("a composition on a word of another surah", setf(lambda x: x["words"].__setitem__(
         "112:1:1", dict(x["words"]["1:1:2"], loc="112:1:1"))), "not a word of this surah's lesson", False),
     ("the mark table edited by hand", setf(lambda x: x["marks"]["kasrah"].__setitem__("sound", "e")),

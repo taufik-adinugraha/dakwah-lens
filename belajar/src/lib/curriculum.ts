@@ -16,6 +16,8 @@ import { CurriculumFile, type CurriculumFile as File } from "@/content/curriculu
 import type { Ayah } from "@/content/schema";
 
 import { curriculumProblems, taughtEarlier, taughtIn, type Taught } from "./autoplay/curriculum";
+import { hostsZero, zeroAyah } from "./autoplay/zero";
+import { composeFor } from "./compose-content";
 import { SURAHS } from "./content";
 import { LIBRARY } from "./library";
 
@@ -23,7 +25,12 @@ const parsed = CurriculumFile.safeParse(raw);
 if (!parsed.success) {
   throw new Error(`content/curriculum.json does not match the schema:\n${JSON.stringify(parsed.error.issues.slice(0, 10), null, 2)}`);
 }
-const problems = curriculumProblems(parsed.data, SURAHS, LIBRARY.concepts);
+/** The surah that hosts LESSON ZERO — the curriculum's lesson with no ayah, which opens the
+ *  course (autoplay/zero.ts): the one whose harakat primer is played there. null: no surah
+ *  does, and lesson zero has no page. */
+export const ZERO_HOST = SURAHS.find((s) => hostsZero(composeFor(s.slug))) ?? null;
+
+const problems = curriculumProblems(parsed.data, SURAHS, LIBRARY.concepts, ZERO_HOST !== null);
 if (problems.length) throw new Error(`content/curriculum.json:\n${problems.slice(0, 10).join("\n")}`);
 
 export const CURRICULUM: File = parsed.data;
@@ -31,6 +38,12 @@ export const CURRICULUM: File = parsed.data;
 /** The "Konsep baru" items of an ayah's lesson, in the order their lines are said. */
 export function taughtAt(ayah: Ayah): Taught[] {
   return taughtIn(CURRICULUM, LIBRARY.concepts, ayah);
+}
+
+/** The "Konsep baru" items of lesson zero (the kalimah record), in the order their lines are
+ *  said; [] when no surah hosts it. */
+export function taughtInZero(): Taught[] {
+  return ZERO_HOST ? taughtIn(CURRICULUM, LIBRARY.concepts, zeroAyah(ZERO_HOST.surah)) : [];
 }
 
 /** Where an EARLIER lesson taught what a Konsep tag on `word` shows, or null (the word card's

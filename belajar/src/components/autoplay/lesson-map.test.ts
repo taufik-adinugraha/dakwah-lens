@@ -252,8 +252,10 @@ describe("the lesson map in the autoplay sequence", () => {
         const ids = seq.steps.map((s) => s.id);
         const where = `al-fatihah ${a.ayah} (${locale})`;
         expect(ids.slice(0, 5), where).toEqual(["intro", "recite", ...OPENING]);
-        // The harakat primer (ayah 1) comes after the map; else the first word does.
-        expect(ids[5], where).toBe(a.ayah === 1 ? "primer" : "w1:recite");
+        // The first word comes after the map (in ayah 1 the harakat primer stood between them
+        // until 2026-10-13: it is lesson zero's now).
+        expect(ids[5], where).toBe("w1:recite");
+        expect(ids, where).not.toContain("primer");
         expect(ids.slice(-3), where).toEqual(["learned", "recap", a.ayah === 7 ? "done" : "next"]);
         expect(ids.indexOf("learned"), where).toBeGreaterThan(Math.max(...seq.steps.flatMap((s, i) => (s.kind === "exercise" || s.kind === "structure" ? [i] : []))));
         const map = lessonMapInput("al-fatihah", a.ayah)!;

@@ -866,7 +866,10 @@ describe("narration ids and the spoken-text guard", () => {
     expect(parseLineId("al-fatihah:1:concept:huruf-jar")).toMatchObject({ part: "concept:huruf-jar", split: null });
     expect(parseLineId("shared:ex:sort-case:bins")).toMatchObject({ kind: "shared", key: "ex:sort-case:bins" });
     for (const k of SHARED_KEYS) expect(parseLineId(`shared:${k}`)).not.toBeNull();
-    for (const bad of ["al-fatihah:0:intro", "Al-Fatihah:1:intro", "al-fatihah:1:w", "shared:nope", "al-fatihah:1:ex:tap:intro"]) {
+    // "Ayah 0" is the place of lesson zero's lines in the surah that hosts it (zero.ts).
+    expect(parseLineId("al-fatihah:0:intro")).toMatchObject({ kind: "ayah", slug: "al-fatihah", ayah: 0, part: "intro", split: null });
+    expect(parseLineId("al-fatihah:0:primer:9")).toMatchObject({ ayah: 0, part: "primer:9" });
+    for (const bad of ["al-fatihah:00:intro", "al-fatihah:01:intro", "Al-Fatihah:1:intro", "al-fatihah:1:w", "shared:nope", "al-fatihah:1:ex:tap:intro"]) {
       expect(parseLineId(bad)).toBeNull();
     }
   });
@@ -1186,7 +1189,7 @@ describe("autoplay checks (every ayah of every surah)", () => {
       const report = runAutoplayChecks(input);
       for (const n of report.notes) console.info(`autoplay-check note: ${n}`);
       expect(report.errors).toEqual([]);
-      expect(report.stats.ayat).toBe(22);
+      expect(report.stats.ayat).toBe(23); // 22 ayat and lesson zero
       expect(report.stats.simulatedEvents).toBeGreaterThan(10_000);
     },
     FULL_RUN_TIMEOUT_MS,

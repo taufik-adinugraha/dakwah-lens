@@ -386,7 +386,8 @@ def content_problems(content, authored: dict, lessons: dict[str, dict], library:
             errs.append(f"{w}: lesson {lid}: learnt before / after is {count} / {count + len(own)}, not {l.get('before')} / {l.get('after')}")
         count += len(own)
         if (lid in on_disk) != ("map" in l and "lines" in l):
-            errs.append(f"{w}: lesson {lid}: a lesson whose ayah is on disk, and only such a lesson, has its derived `lines` and `map`")
+            errs.append(f"{w}: lesson {lid}: a lesson that has a page (its ayah on disk; lesson zero once a harakat primer is "
+                        "played there), and only such a lesson, has its derived `lines` and `map`")
             continue
         if lid not in on_disk:
             continue

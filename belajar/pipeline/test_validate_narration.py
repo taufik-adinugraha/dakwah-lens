@@ -245,6 +245,18 @@ def split_item(m, *_):
     lines[S12 + ":b"] = dict(old)
 
 
+def primer_lesson(value):
+    """The primer's `lesson` marker changed in the compositions (None: taken away — the primer
+    then opens its own ayah's lesson again)."""
+    def f(_m, _l, _x, cp, *_):
+        p = cp["al-fatihah"]["primer"]
+        if value is None:
+            p.pop("lesson", None)
+        else:
+            p["lesson"] = value
+    return f
+
+
 def drop_frame(lid):
     def f(m, *_):
         line(m, lid).pop("frame")
@@ -511,9 +523,29 @@ MUTATIONS = [
     # --- word composition and the harakat primer (narration rule 14, 2026-10-10)
     ("compose line missing", drop(C1), f"missing line {C1}"),
     ("compose line past the frames' says", add(PAST_W2, "Lagi."), f"unexpected line {PAST_W2}"),
-    ("primer line missing", drop("al-fatihah:1:primer:2"), "missing line al-fatihah:1:primer:2"),
+    ("primer line missing", drop("al-fatihah:0:primer:2"), "missing line al-fatihah:0:primer:2"),
     ("primer on an ayah the primer does not open", add("al-fatihah:2:primer:1", "Harakat."),
      "unexpected line al-fatihah:2:primer:1"),
+    # --- lesson zero (kurikulum-dasar.md decision 1; 2026-10-13): the lesson with no ayah plays the
+    # harakat primer and the kalimah record's line, as "ayah 0" of the surah that hosts it
+    ("the primer still played in ayah 1, where it stood until 2026-10-13", add("al-fatihah:1:primer:1", "Harakat adalah tanda bunyi."),
+     "unexpected line al-fatihah:1:primer:1"),
+    ("lesson zero without its opening line", drop("al-fatihah:0:intro"), "missing line al-fatihah:0:intro"),
+    ("lesson zero without its hand-over to ayah 1", drop("al-fatihah:0:next"), "missing line al-fatihah:0:next"),
+    ("the kalimah record's line said nowhere", drop("al-fatihah:0:concept:kalimah-isim-fiil-huruf"),
+     "missing line al-fatihah:0:concept:kalimah-isim-fiil-huruf"),
+    ("the kalimah record's line said in ayah 1 as well", add("al-fatihah:1:concept:kalimah-isim-fiil-huruf", "Konsep baru: tiga jenis kata."),
+     "unexpected line al-fatihah:1:concept:kalimah-isim-fiil-huruf"),
+    ("a part lesson zero does not have (the imam recites no ayah there)", add("al-fatihah:0:recite", "Sekarang dengarkan imam."),
+     "unexpected line al-fatihah:0:recite"),
+    ("a lesson zero in a surah that hosts none", add("al-ikhlas:0:intro", "Ini pelajaran pengantar."), "unexpected line al-ikhlas:0:intro"),
+    ("a lesson-zero line lighting a word (there is no ayah on its stage)", set_field("al-fatihah:0:primer:4", "highlight", [1]),
+     "al-fatihah:0:primer:4: highlight [1] must be [0] (the whole ayah), [] or word numbers 1–0 in order"),
+    ("a lesson-zero line lighting the whole ayah", set_field("al-fatihah:0:intro", "highlight", [0]), "not what the stage shows"),
+    ("lesson zero's hand-over reworded by hand", both("al-fatihah:0:next", "berlanjut sendiri", "berlanjut"), "out of date"),
+    ("the primer taken back from lesson zero in the content, narration stale", primer_lesson(None), "missing line al-fatihah:1:primer:1"),
+    ("a term of a later lesson in lesson zero", more("al-fatihah:0:intro", "Lalu majrur (مَجْرُور).", "Lalu مَجْرُور."),
+     "al-fatihah:0:intro: uses the term 'majrur' before the lesson that teaches it (taught in 1:1)"),
     ("compose line without its frame", drop_frame(C1), "is not the animation frame this line plays over"),
     ("compose line on the wrong frame", set_field(C1, "frame", 1), "is not the animation frame this line plays over"),
     ("a frame on a line without animation", set_field("al-fatihah:1:w1", "frame", 1), "only primer / compose lines have one"),
@@ -570,7 +602,7 @@ MUTATIONS = [
     ("a composed word's lead with a Latin term", append_text("al-fatihah:1:w1", " Ia mabni."), "says 'mabni' in Latin"),
     # Caught by check_renderable while the line is unrendered, by the rendered-audio check once it
     # carries audio (Al-Fatihah was rendered 2026-10-11): both messages share this wording.
-    ("a primer line with a heavy letter + a (mushaf)", append_text("al-fatihah:1:primer:1", " Lihat mushaf."),
+    ("a primer line with a heavy letter + a (mushaf)", append_text("al-fatihah:0:primer:1", " Lihat mushaf."),
      "a heavy letter + a with no approved respelling"),
     ("a rendered line with a Latin grammar term", with_audio(LATIN), "in Latin, an Arabic term"),
     ("a letter name spoken in Latin where the dictionary has it", replace_in(C1, "text", "مِيم", "mim"),
@@ -579,7 +611,7 @@ MUTATIONS = [
     ("dictionary: an approval that is not a date", lex_term("نَعْت", approved="soon"), "approved must be a date"),
     ("a syllable of another word's tiles in the same ayah (hum)",
      append_text("al-fatihah:7:w7:compose:2", " Bunyi asalnya hum."), "a syllable the tiles show"),
-    ("a letter's name read as a sound", append_text("al-fatihah:1:primer:3", " Huruf بَاء dibaca بَاء."),
+    ("a letter's name read as a sound", append_text("al-fatihah:0:primer:3", " Huruf بَاء dibaca بَاء."),
      "reads a letter's name as a sound"),
     ("Indonesian spelling, long vowel doubled (maaliki)", append_text(W, " Seperti maaliki."),
      "Qur'anic word 'maaliki' (another spelling"),
@@ -727,9 +759,24 @@ class NarrationValidation(unittest.TestCase):
         lines = B.build_lines(LESSONS, LIBRARY, LEX, COMPOSE)["al-fatihah"]
         ids = [lid for lid in lines if lid.startswith("al-fatihah:1:")]
         # recite → what the ayah brings (the lesson map, plan L23 and L26: one line per group of its
-        # card) → the primer → each word: its gloss line, then its frames' lines (rule 14)
+        # card) → each word: its gloss line, then its frames' lines (rule 14). The harakat primer
+        # stood between them until 2026-10-13; it is lesson zero's now.
         self.assertEqual(ids[1:6], ["al-fatihah:1:recite", "al-fatihah:1:map:new", "al-fatihah:1:map:learnt",
-                                    "al-fatihah:1:map:later", "al-fatihah:1:primer:1"])
+                                    "al-fatihah:1:map:later", "al-fatihah:1:w1"])
+        zero = [lid for lid in lines if lid.startswith("al-fatihah:0:")]
+        self.assertEqual(zero, ["al-fatihah:0:intro", *[f"al-fatihah:0:primer:{k}" for k in range(1, 10)],
+                                "al-fatihah:0:concept:kalimah-isim-fiil-huruf", "al-fatihah:0:next"])
+        self.assertEqual(list(lines)[:len(zero)], zero)  # before ayah 1's lines
+        for k, ln in enumerate(COMPOSE["al-fatihah"]["primer"]["lines"], 1):
+            self.assertEqual(lines[f"al-fatihah:0:primer:{k}"]["frame"], ln["frame"])
+        # No ayah on its stage: nothing lit, no word card.
+        self.assertTrue(all(lines[lid]["highlight"] == [] and lines[lid]["focus"] is None for lid in zero))
+        self.assertEqual(lines["al-fatihah:0:intro"]["text"], B.ZERO_INTRO.format(surah="Al-Fatihah"))
+        self.assertEqual(lines["al-fatihah:0:next"]["text"], B.ZERO_NEXT.format(surah="Al-Fatihah"))
+        # No other surah hosts it.
+        for slug in ("al-ikhlas", "al-falaq", "an-nas"):
+            self.assertIsNone(V.lesson_zero(LESSONS[slug], COMPOSE.get(slug)))
+            self.assertFalse(any(f"{slug}:0:" in lid for lid in B.build_lines(LESSONS, LIBRARY, LEX, COMPOSE)[slug]))
         w1 = ids.index("al-fatihah:1:w1")
         self.assertEqual(ids[w1 + 1], "al-fatihah:1:w1:compose:1")
         comp = COMPOSE["al-fatihah"]["words"]["1:1:1"]
@@ -742,7 +789,7 @@ class NarrationValidation(unittest.TestCase):
         for lid, ln in lines.items():
             if ":compose:" in lid or ":primer:" in lid:
                 self.assertNotRegex(ln["text"], r"\b(?:bi|ismu|ismi|bismi|ar-rahmanu|ar-rahmani)\b", lid)
-        self.assertIn("bunyi a", lines["al-fatihah:1:primer:3"]["text"])
+        self.assertIn("bunyi a", lines["al-fatihah:0:primer:3"]["text"])
 
     def test_mutations_fail(self):
         for name, mutate, expect in MUTATIONS:
@@ -960,10 +1007,12 @@ class LessonMapLines(unittest.TestCase):
         self.assertEqual(fatihah["al-fatihah:3:concept:alif-lam"]["highlight"], [1, 2])
         self.assertTrue(fatihah["al-fatihah:3:concept:alif-lam"]["display"].startswith("Konsep baru: Alif lam (ال), penanda isim (اِسْم) yang tertentu."))
         self.assertIn("seperti nama Allah subhanahu wa ta'ala, sudah ma’rifah (مَعْرِفَة) tanpa alif lam (ال).", fatihah["al-fatihah:3:concept:alif-lam"]["display"])
-        # The lesson with no ayah is not built yet: the kalimah record's line is said nowhere, and
-        # the harakat primer stays where it is, in ayah 1.
-        self.assertNotIn("concept:kalimah-isim-fiil-huruf", said)
-        self.assertIn("al-fatihah:1:primer:1", fatihah)
+        # The lesson with no ayah has its page (2026-10-13): the kalimah record's line is said
+        # there, once, and the harakat primer left ayah 1 for it.
+        self.assertIn("al-fatihah:0:concept:kalimah-isim-fiil-huruf", fatihah)
+        self.assertNotIn("al-fatihah:1:concept:kalimah-isim-fiil-huruf", fatihah)
+        self.assertIn("al-fatihah:0:primer:1", fatihah)
+        self.assertFalse(any(lid.startswith("al-fatihah:1:primer:") for lid in fatihah))
 
     def test_a_moved_line_keeps_its_audio(self):
         # The curriculum moved four "Konsep baru" lines to another ayah of Al-Fatihah with their
@@ -991,10 +1040,16 @@ class LessonMapLines(unittest.TestCase):
         bare = lambda t: {"text": t, "display": LEX.render_display(t), "highlight": [], "focus": None}  # noqa: E731
         # moved: the old id is gone, the text is the same
         self.assertEqual(new({"x:3:concept:naat": bare(text)})["x:3:concept:naat"]["audio"], aud)
-        # not moved: the old line is still there, so a second line with the same text is a new line
+        # the old line is still there and a second line says the same text: one file for both,
+        # as the renderer would give them (identical texts are rendered once and copied)
         got = new({"x:1:concept:naat": bare(text), "x:3:concept:naat": bare(text)})
-        self.assertIn("audio", got["x:1:concept:naat"])
-        self.assertNotIn("audio", got["x:3:concept:naat"])
+        self.assertEqual(got["x:1:concept:naat"]["audio"], aud)
+        self.assertEqual(got["x:3:concept:naat"]["audio"], aud)
+        # renumbered (the quiz replanned, 2026-10-13): the id lives on with another text, and the
+        # line that now says the old text keeps the recording
+        got = new({"x:1:concept:naat": bare("Konsep baru: lain."), "x:2:concept:naat": bare(text)})
+        self.assertNotIn("audio", got["x:1:concept:naat"])
+        self.assertEqual(got["x:2:concept:naat"]["audio"], aud)
         # another text: nothing to take
         self.assertNotIn("audio", new({"x:3:concept:naat": bare(text + " Lagi.")})["x:3:concept:naat"])
         # a line that kept its id and changed its text loses its audio, as before
@@ -1227,9 +1282,21 @@ class WordPlaces(unittest.TestCase):
         self.assertEqual(V.line_view(a, "w1:compose:3", cp), ([1], "1:1:1"))
         self.assertEqual(V.line_frame(a, "w1:compose:3", cp), cp["words"]["1:1:1"]["lines"][2]["frame"])
         self.assertIsNone(V.line_frame(a, "w1", cp))
-        # The primer marks the words whose letters its frame shows as they are (بِ of word 1).
-        self.assertEqual(V.line_view(a, "primer:4", cp), ([1], None))
-        self.assertEqual(V.line_view(a, "primer:3", cp), ([], None))  # بَ: an edit, not the ayah's letter
+        # A primer that opens its own ayah's lesson marks the words whose letters its frame shows
+        # as they are (بِ of word 1) — what Al-Fatihah's did until 2026-10-13 …
+        own = {**cp, "primer": {k: v for k, v in cp["primer"].items() if k != "lesson"}}
+        self.assertEqual(V.line_view(a, "primer:4", own), ([1], None))
+        self.assertEqual(V.line_view(a, "primer:3", own), ([], None))  # بَ: an edit, not the ayah's letter
+        # … and one that lesson zero plays marks nothing: there is no ayah on that stage.
+        zero = V.lesson_zero(LESSONS["al-fatihah"], cp)
+        self.assertEqual((zero["ayah"], zero["words"]), (0, []))
+        self.assertEqual(V.line_view(zero, "primer:4", cp), ([], None))
+        self.assertEqual(V.line_frame(zero, "primer:4", cp), cp["primer"]["lines"][3]["frame"])
+        self.assertIsNone(V.primer_of(cp, 1))
+        self.assertIs(V.primer_of(cp, 0), cp["primer"])
+        self.assertIs(V.primer_of(own, 1), own["primer"])
+        self.assertIsNone(V.lesson_zero(LESSONS["al-fatihah"], own))
+        self.assertEqual(V.line_view(zero, "intro", cp), ([], None))
         # A letter term takes the frame's shape: the bare lam of ٱلرَّحْمَٰن (join frame).
         src = V.line_letters(a, "w3:compose:3", "1:1:3", FORMS, cp)
         self.assertEqual(LEX.shown_letter(LEX.by_term["لَام"], src), "ل")

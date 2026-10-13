@@ -149,6 +149,19 @@
     "deeper_heading": "Pelajari lebih dalam",
     "deeper_intro": "Klik salah satu judul untuk membuka atau menutup penjelasannya."
   },
+  "Intro": {
+    "title": "Pengantar: harakat dan tiga jenis kata",
+    "eyebrow": "Pelajaran pembuka",
+    "card_hint": "Sebelum ayat pertama: tanda bunyi pada huruf Arab, lalu tiga jenis kata.",
+    "card_cta": "Buka pengantar",
+    "about": "Pelajaran pembuka sebelum ayat pertama Surah {surah}. Kita mengenal harakat, yaitu tanda bunyi pada huruf Arab, lalu tiga jenis kata dalam bahasa Arab. Sesudah itu pelajaran berlanjut sendiri ke ayat pertama.",
+    "back_hint": "Kembali ke daftar surah",
+    "ayah1_question": "Belum mengenal harakat?",
+    "ayah1_link": "Mulai dari Pengantar.",
+    "next": "Berikutnya: {surah}, ayat 1",
+    "deeper": "Pelajari lebih dalam",
+    "harakat_page": "Harakat: semua tanda dan contohnya"
+  },
   "Word": {
     "meaning": "Arti",
     "root": "Akar kata",

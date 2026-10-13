@@ -10,10 +10,13 @@ import type { Ayah } from "@/content/schema";
 import {
   buildAutoplaySequence,
   createAutoplayState,
+  hostsZero,
   ID_TEXTS,
   parseLineId,
+  primerAyah,
   reduceAutoplay,
   viewAutoplay,
+  zeroAyah,
   type Activity,
   type AutoplayEvent,
   type AutoplaySequence,
@@ -120,16 +123,46 @@ function seq1(narration: NarrationManifest | null = null): AutoplaySequence {
   });
 }
 
+/** Lesson zero as its page builds it (the harakat primer is played there since 2026-10-13: the
+ *  basic curriculum, decision 1; autoplay/zero.ts). */
+function seq0(narration: NarrationManifest | null = null): AutoplaySequence {
+  const zero = zeroAyah(fatihah.surah);
+  return buildAutoplaySequence({
+    slug: "al-fatihah",
+    surahName: "Al-Fatihah",
+    ayahCount: 7,
+    ayah: zero,
+    zero: true,
+    introduced: [],
+    exercises: [],
+    texts: ID_TEXTS,
+    narration,
+    compose: composeInput("al-fatihah", zero),
+  });
+}
+
 const end = (a: Activity): AutoplayEvent =>
   a.kind === "narrate" ? { type: "narration_end", token: a.token } : a.kind === "recite" ? { type: "recite_end", token: a.token } : { type: "timer", token: a.token };
 
 describe("the autoplay sequence with compositions", () => {
-  it("plays the primer after the imam's ayah, then per word: recite, explain, compose", () => {
+  it("after the imam's ayah, per word: recite, explain, compose — the primer is lesson zero's", () => {
     const seq = seq1(manifest);
-    expect(seq.steps.slice(0, 15).map((s) => s.id)).toEqual([
+    // The harakat primer stood right after the imam's ayah until 2026-10-13; lesson zero plays
+    // it now, right after its own opening line, and no ayah's lesson does.
+    expect(seq.steps.some((s) => s.kind === "primer")).toBe(false);
+    expect(composeInput("al-fatihah", ayah1)?.primer ?? null).toBeNull();
+    expect(raw.primer).toMatchObject({ ayah: 1, lesson: "0" });
+    expect([primerAyah(raw.primer!), hostsZero(raw)]).toEqual([0, true]);
+    expect(seq0(manifest).steps.map((s) => s.id)).toEqual(["intro", "primer", "next"]);
+    expect(seq0(manifest).nav).toEqual({ kind: "ayah", slug: "al-fatihah", ayah: 1 });
+    expect(seq0(manifest).lessonKey).toBe("al-fatihah/0");
+    // A primer without the marker opens its own ayah's lesson, as it did.
+    const own = { ...raw, primer: { ...raw.primer!, lesson: undefined } };
+    expect(composeInputFor(own, ayah1)?.primer?.frames).toBe(raw.primer!.frames.length);
+    expect(composeInputFor(own, zeroAyah(1))).toBeNull();
+    expect(seq.steps.slice(0, 14).map((s) => s.id)).toEqual([
       "intro",
       "recite",
-      "primer",
       "w1:recite",
       "w1",
       "w1:compose",
@@ -169,7 +202,7 @@ describe("the autoplay sequence with compositions", () => {
   });
 
   it("caption-only (an English page): the frames follow the content's own line plan", () => {
-    const seq = seq1(null);
+    const seq = seq0(null);
     const p = seq.steps.find((s) => s.id === "primer")!;
     expect(p.cues.map((q) => q.frame)).toEqual(raw.primer!.lines.map((l) => l.frame));
     expect(p.cues.map((q) => parseLineId(q.line)?.kind)).toEqual(p.cues.map(() => "ayah"));
@@ -295,8 +328,8 @@ describe("the autoplay sequence with compositions", () => {
     expect(stageFrame(seq, p)).toEqual({ step: "compose", word: 3, frame: 1, recited: false });
   });
 
-  it("the primer shows its frames in order and highlights the words its letters come from", () => {
-    const seq = seq1(manifest);
+  it("the primer shows its frames in order — in lesson zero, where there is no ayah to light a word of", () => {
+    const seq = seq0(manifest);
     const idx = seq.steps.findIndex((s) => s.id === "primer");
     let s: AutoplayState = reduceAutoplay(seq, createAutoplayState(seq, { idx }), { type: "start", from: idx, reason: "continue" });
     const frames: number[] = [];
@@ -307,10 +340,12 @@ describe("the autoplay sequence with compositions", () => {
     }
     // fathah, kasrah, dhammah, sukun + shaddah, then the small upright alif (review 2026-10-10)
     expect(frames).toEqual([1, 2, 3, 4, 5, 6]);
-    const kasrah = seq.steps[idx].cues.find((q) => q.frame === 3)!;
-    expect(kasrah.highlight).toEqual([1]); // بِ of word 1, as the ayah writes it
-    const smallAlif = seq.steps[idx].cues.find((q) => q.frame === 6)!;
-    expect(smallAlif.highlight).toEqual([3]); // مَٰ of word 3
+    // The frames still say which words of ayah 1 their letters come from (بِ of word 1, مَٰ of
+    // word 3) — what the primer's lines lit on the mushaf line while ayah 1 played it — and the
+    // lines of lesson zero light nothing: its stage has no mushaf line.
+    expect([raw.primer!.frames[2].words, raw.primer!.frames[5].words]).toEqual([[1], [3]]);
+    expect(seq.steps[idx].cues.every((q) => q.highlight.length === 0 && q.focus === null)).toBe(true);
+    expect(seq.steps[idx].cues.map((q) => q.line)).toEqual(raw.primer!.lines.map((_, k) => `al-fatihah:0:primer:${k + 1}`));
     expect(raw.primer!.frames[5].marks).toEqual(["small_alif"]);
   });
 });

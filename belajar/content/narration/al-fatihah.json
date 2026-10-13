@@ -6,6 +6,709 @@
     "model": "eleven_v3"
   },
   "lines": {
+    "al-fatihah:0:intro": {
+      "text": "Ini pelajaran pengantar, sebelum kita masuk ke ayat pertama Surah Al-Fatihah. Ada dua hal yang kita kenali di sini: harakat, dan tiga jenis kata dalam bahasa Arab.",
+      "display": "Ini pelajaran pengantar, sebelum kita masuk ke ayat pertama Surah Al-Fatihah. Ada dua hal yang kita kenali di sini: harakat, dan tiga jenis kata dalam bahasa Arab.",
+      "highlight": [],
+      "focus": null
+    },
+    "al-fatihah:0:primer:1": {
+      "text": "Sebelum mulai, kita kenali dulu harakat, yaitu tanda bunyi pada huruf Arab.",
+      "display": "Sebelum mulai, kita kenali dulu harakat, yaitu tanda bunyi pada huruf Arab.",
+      "highlight": [],
+      "focus": null,
+      "frame": 1
+    },
+    "al-fatihah:0:primer:2": {
+      "text": "Tiga harakat utama adalah فَتْحَة, كَسْرَة, dan dhommah. Bunyinya a, i, dan u.",
+      "display": "Tiga harakat utama adalah fathah (فَتْحَة), kasrah (كَسْرَة), dan dhammah (ضَمَّة). Bunyinya a, i, dan u.",
+      "highlight": [],
+      "focus": null,
+      "frame": 1,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/e6191ccc86da82d0.mp3",
+        "ms": 8359,
+        "sha256": "541239e085b6cce63995feb65b7c1d47a625cc20f226457fec0a72881bc3779c"
+      },
+      "tokens": [
+        {
+          "t": "Tiga",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "harakat",
+          "s": 0.3,
+          "e": 0.72
+        },
+        {
+          "t": "utama",
+          "s": 0.8,
+          "e": 1.2
+        },
+        {
+          "t": "adalah",
+          "s": 1.257,
+          "e": 1.6
+        },
+        {
+          "t": "fathah (فَتْحَة),",
+          "s": 1.84,
+          "e": 3.04
+        },
+        {
+          "t": "kasrah (كَسْرَة),",
+          "s": 3.08,
+          "e": 3.84
+        },
+        {
+          "t": "dan",
+          "s": 3.88,
+          "e": 4.0
+        },
+        {
+          "t": "dhammah (ضَمَّة).",
+          "s": 4.053,
+          "e": 5.2
+        },
+        {
+          "t": "Bunyinya",
+          "s": 5.24,
+          "e": 5.92
+        },
+        {
+          "t": "a,",
+          "s": 6.16,
+          "e": 6.48
+        },
+        {
+          "t": "i,",
+          "s": 6.88,
+          "e": 7.56
+        },
+        {
+          "t": "dan",
+          "s": 7.63,
+          "e": 7.84
+        },
+        {
+          "t": "u.",
+          "s": 8.0,
+          "e": 8.32
+        }
+      ]
+    },
+    "al-fatihah:0:primer:3": {
+      "text": "فَتْحَة adalah garis kecil miring di atas huruf. Huruf yang diberi فَتْحَة dibaca dengan bunyi a.",
+      "display": "Fathah (فَتْحَة) adalah garis kecil miring di atas huruf. Huruf yang diberi fathah (فَتْحَة) dibaca dengan bunyi a.",
+      "highlight": [],
+      "focus": null,
+      "frame": 2,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/6327a9fb8731dec2.mp3",
+        "ms": 7236,
+        "sha256": "4e7a1a688c85db6170595d78380a5b60fc3f1a1edfdda435f2434cdbfb22f586"
+      },
+      "tokens": [
+        {
+          "t": "Fathah (فَتْحَة)",
+          "s": 0.0,
+          "e": 0.56
+        },
+        {
+          "t": "adalah",
+          "s": 0.651,
+          "e": 1.2
+        },
+        {
+          "t": "garis",
+          "s": 1.28,
+          "e": 1.6
+        },
+        {
+          "t": "kecil",
+          "s": 1.68,
+          "e": 2.0
+        },
+        {
+          "t": "miring",
+          "s": 2.08,
+          "e": 2.48
+        },
+        {
+          "t": "di",
+          "s": 2.533,
+          "e": 2.64
+        },
+        {
+          "t": "atas",
+          "s": 2.688,
+          "e": 2.88
+        },
+        {
+          "t": "huruf.",
+          "s": 2.92,
+          "e": 3.76
+        },
+        {
+          "t": "Huruf",
+          "s": 3.88,
+          "e": 4.32
+        },
+        {
+          "t": "yang",
+          "s": 4.368,
+          "e": 4.56
+        },
+        {
+          "t": "diberi",
+          "s": 4.62,
+          "e": 4.88
+        },
+        {
+          "t": "fathah (فَتْحَة)",
+          "s": 4.92,
+          "e": 5.44
+        },
+        {
+          "t": "dibaca",
+          "s": 5.54,
+          "e": 6.16
+        },
+        {
+          "t": "dengan",
+          "s": 6.194,
+          "e": 6.4
+        },
+        {
+          "t": "bunyi",
+          "s": 6.46,
+          "e": 6.72
+        },
+        {
+          "t": "a.",
+          "s": 6.92,
+          "e": 7.2
+        }
+      ]
+    },
+    "al-fatihah:0:primer:4": {
+      "text": "كَسْرَة adalah garis yang sama, tetapi di bawah huruf; bunyinya i. Huruf pertama Surah Al-Fatihah, huruf بَاء, memakai كَسْرَة.",
+      "display": "Kasrah (كَسْرَة) adalah garis yang sama, tetapi di bawah huruf; bunyinya i. Huruf pertama Surah Al-Fatihah, huruf ba’ (بِ), memakai kasrah (كَسْرَة).",
+      "highlight": [],
+      "focus": null,
+      "frame": 3
+    },
+    "al-fatihah:0:primer:5": {
+      "text": "Dhommah bentuknya seperti huruf وَاو kecil di atas huruf; bunyinya u.",
+      "display": "Dhammah (ضَمَّة) bentuknya seperti huruf wawu (و) kecil di atas huruf; bunyinya u.",
+      "highlight": [],
+      "focus": null,
+      "frame": 4,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/c282bfc4d3a2f6dc.mp3",
+        "ms": 5146,
+        "sha256": "be2b7a09b67e3f0037866a572f35a24d396498dcd4f28d0214b4d1010c37c3c5"
+      },
+      "tokens": [
+        {
+          "t": "Dhammah (ضَمَّة)",
+          "s": 0.0,
+          "e": 0.48
+        },
+        {
+          "t": "bentuknya",
+          "s": 0.544,
+          "e": 1.12
+        },
+        {
+          "t": "seperti",
+          "s": 1.17,
+          "e": 1.52
+        },
+        {
+          "t": "huruf",
+          "s": 1.58,
+          "e": 1.92
+        },
+        {
+          "t": "wawu (و)",
+          "s": 1.96,
+          "e": 2.16
+        },
+        {
+          "t": "kecil",
+          "s": 2.24,
+          "e": 2.72
+        },
+        {
+          "t": "di",
+          "s": 2.773,
+          "e": 2.88
+        },
+        {
+          "t": "atas",
+          "s": 2.928,
+          "e": 3.12
+        },
+        {
+          "t": "huruf;",
+          "s": 3.16,
+          "e": 4.08
+        },
+        {
+          "t": "bunyinya",
+          "s": 4.14,
+          "e": 4.64
+        },
+        {
+          "t": "u.",
+          "s": 4.84,
+          "e": 5.12
+        }
+      ]
+    },
+    "al-fatihah:0:primer:6": {
+      "text": "Ada tanda lain di ayat pertama surah itu. Tanda kecil di atas huruf سِين menandakan huruf mati, dibaca tanpa vokal.",
+      "display": "Ada tanda lain di ayat pertama surah itu. Tanda kecil di atas huruf sin (سْ) menandakan huruf mati, dibaca tanpa vokal.",
+      "highlight": [],
+      "focus": null,
+      "frame": 5
+    },
+    "al-fatihah:0:primer:7": {
+      "text": "Tanda seperti huruf w kecil di atas huruf رَاء menandakan huruf itu dibaca dobel.",
+      "display": "Tanda seperti huruf w kecil di atas huruf ra’ (رَّ) menandakan huruf itu dibaca dobel.",
+      "highlight": [],
+      "focus": null,
+      "frame": 5,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/8414d2dc085f94f8.mp3",
+        "ms": 5721,
+        "sha256": "c98efd4cb15decf007859cc7240d2ee9f772d1cb68110287d796d15e12ae4cc9"
+      },
+      "tokens": [
+        {
+          "t": "Tanda",
+          "s": 0.0,
+          "e": 0.4
+        },
+        {
+          "t": "seperti",
+          "s": 0.46,
+          "e": 0.88
+        },
+        {
+          "t": "huruf",
+          "s": 0.92,
+          "e": 1.2
+        },
+        {
+          "t": "w",
+          "s": 1.32,
+          "e": 1.44
+        },
+        {
+          "t": "kecil",
+          "s": 1.493,
+          "e": 1.84
+        },
+        {
+          "t": "di",
+          "s": 1.893,
+          "e": 2.0
+        },
+        {
+          "t": "atas",
+          "s": 2.048,
+          "e": 2.24
+        },
+        {
+          "t": "huruf",
+          "s": 2.3,
+          "e": 2.64
+        },
+        {
+          "t": "ra’ (رَّ)",
+          "s": 2.68,
+          "e": 3.04
+        },
+        {
+          "t": "menandakan",
+          "s": 3.18,
+          "e": 4.16
+        },
+        {
+          "t": "huruf",
+          "s": 4.2,
+          "e": 4.48
+        },
+        {
+          "t": "itu",
+          "s": 4.54,
+          "e": 4.72
+        },
+        {
+          "t": "dibaca",
+          "s": 4.76,
+          "e": 5.2
+        },
+        {
+          "t": "dobel.",
+          "s": 5.253,
+          "e": 5.68
+        }
+      ]
+    },
+    "al-fatihah:0:primer:8": {
+      "text": "Satu tanda lagi: alif kecil yang tegak di atas huruf مِيم pada kata ketiga ayat itu.",
+      "display": "Satu tanda lagi: alif (ا) kecil yang tegak di atas huruf mim (مَٰ) pada kata ketiga ayat itu.",
+      "highlight": [],
+      "focus": null,
+      "frame": 6
+    },
+    "al-fatihah:0:primer:9": {
+      "text": "Huruf kecil seperti ini menandai huruf yang tidak tertulis dalam tulisan asli Al-Qur'an, tetapi wajib dibaca; karena itu bunyi a pada huruf مِيم itu dibaca panjang.",
+      "display": "Huruf kecil seperti ini menandai huruf yang tidak tertulis dalam tulisan asli Al-Qur'an, tetapi wajib dibaca; karena itu bunyi a pada huruf mim (مَٰ) itu dibaca panjang.",
+      "highlight": [],
+      "focus": null,
+      "frame": 6,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/9802792783603bd0.mp3",
+        "ms": 12278,
+        "sha256": "c0f455ca48bd66ad5653ff1d814395402ac1d8bafad4daf58626360f39048485"
+      },
+      "tokens": [
+        {
+          "t": "Huruf",
+          "s": 0.0,
+          "e": 0.24
+        },
+        {
+          "t": "kecil",
+          "s": 0.293,
+          "e": 0.64
+        },
+        {
+          "t": "seperti",
+          "s": 0.69,
+          "e": 1.04
+        },
+        {
+          "t": "ini",
+          "s": 1.14,
+          "e": 1.44
+        },
+        {
+          "t": "menandai",
+          "s": 1.48,
+          "e": 2.08
+        },
+        {
+          "t": "huruf",
+          "s": 2.14,
+          "e": 2.48
+        },
+        {
+          "t": "yang",
+          "s": 2.528,
+          "e": 2.72
+        },
+        {
+          "t": "tidak",
+          "s": 2.773,
+          "e": 3.04
+        },
+        {
+          "t": "tertulis",
+          "s": 3.088,
+          "e": 3.6
+        },
+        {
+          "t": "dalam",
+          "s": 3.667,
+          "e": 4.0
+        },
+        {
+          "t": "tulisan",
+          "s": 4.06,
+          "e": 4.48
+        },
+        {
+          "t": "asli",
+          "s": 4.56,
+          "e": 4.8
+        },
+        {
+          "t": "Al-Qur'an,",
+          "s": 4.853,
+          "e": 6.0
+        },
+        {
+          "t": "tetapi",
+          "s": 6.06,
+          "e": 6.48
+        },
+        {
+          "t": "wajib",
+          "s": 6.56,
+          "e": 6.88
+        },
+        {
+          "t": "dibaca;",
+          "s": 6.94,
+          "e": 7.52
+        },
+        {
+          "t": "karena",
+          "s": 7.646,
+          "e": 8.4
+        },
+        {
+          "t": "itu",
+          "s": 8.48,
+          "e": 8.72
+        },
+        {
+          "t": "bunyi",
+          "s": 8.82,
+          "e": 9.2
+        },
+        {
+          "t": "a",
+          "s": 9.4,
+          "e": 9.6
+        },
+        {
+          "t": "pada",
+          "s": 9.664,
+          "e": 9.92
+        },
+        {
+          "t": "huruf",
+          "s": 9.98,
+          "e": 10.24
+        },
+        {
+          "t": "mim (مَٰ)",
+          "s": 10.36,
+          "e": 10.72
+        },
+        {
+          "t": "itu",
+          "s": 10.82,
+          "e": 11.12
+        },
+        {
+          "t": "dibaca",
+          "s": 11.2,
+          "e": 11.68
+        },
+        {
+          "t": "panjang.",
+          "s": 11.74,
+          "e": 12.24
+        }
+      ]
+    },
+    "al-fatihah:0:concept:kalimah-isim-fiil-huruf": {
+      "text": "Konsep baru: Tiga jenis كَلِمَة, atau kata: اِسْم, فِعْل, dan حَرْف. Setiap kata Arab termasuk salah satu dari tiga jenis: اِسْم, yaitu nama benda, orang, atau sifat, فِعْل, yaitu kata kerja, atau حَرْف, yaitu kata tugas.",
+      "display": "Konsep baru: Tiga jenis kalimah (كَلِمَة), atau kata: isim (اِسْم), fi’il (فِعْل), dan huruf (حَرْف). Setiap kata Arab termasuk salah satu dari tiga jenis: isim (اِسْم), yaitu nama benda, orang, atau sifat, fi’il (فِعْل), yaitu kata kerja, atau huruf (حَرْف), yaitu kata tugas.",
+      "highlight": [],
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/e65b9eff220c8fed.mp3",
+        "ms": 21316,
+        "sha256": "58cafaf2f680a05431a88d28da3c0d73ca4793dfff907b46ee817cc78b7ad2a3"
+      },
+      "tokens": [
+        {
+          "t": "Konsep",
+          "s": 0.0,
+          "e": 0.4
+        },
+        {
+          "t": "baru:",
+          "s": 0.48,
+          "e": 0.88
+        },
+        {
+          "t": "Tiga",
+          "s": 1.12,
+          "e": 1.6
+        },
+        {
+          "t": "jenis",
+          "s": 1.667,
+          "e": 2.0
+        },
+        {
+          "t": "kalimah (كَلِمَة),",
+          "s": 2.08,
+          "e": 2.64
+        },
+        {
+          "t": "atau",
+          "s": 2.72,
+          "e": 3.04
+        },
+        {
+          "t": "kata:",
+          "s": 3.136,
+          "e": 3.6
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 3.8,
+          "e": 4.4
+        },
+        {
+          "t": "fi’il (فِعْل),",
+          "s": 4.68,
+          "e": 5.36
+        },
+        {
+          "t": "dan",
+          "s": 5.48,
+          "e": 5.84
+        },
+        {
+          "t": "huruf (حَرْف).",
+          "s": 5.92,
+          "e": 6.4
+        },
+        {
+          "t": "Setiap",
+          "s": 6.64,
+          "e": 7.52
+        },
+        {
+          "t": "kata",
+          "s": 7.568,
+          "e": 7.76
+        },
+        {
+          "t": "Arab",
+          "s": 7.824,
+          "e": 8.08
+        },
+        {
+          "t": "termasuk",
+          "s": 8.128,
+          "e": 8.56
+        },
+        {
+          "t": "salah",
+          "s": 8.613,
+          "e": 8.88
+        },
+        {
+          "t": "satu",
+          "s": 8.944,
+          "e": 9.2
+        },
+        {
+          "t": "dari",
+          "s": 9.248,
+          "e": 9.44
+        },
+        {
+          "t": "tiga",
+          "s": 9.52,
+          "e": 9.68
+        },
+        {
+          "t": "jenis:",
+          "s": 9.773,
+          "e": 10.4
+        },
+        {
+          "t": "isim (اِسْم),",
+          "s": 10.72,
+          "e": 11.44
+        },
+        {
+          "t": "yaitu",
+          "s": 11.68,
+          "e": 12.16
+        },
+        {
+          "t": "nama",
+          "s": 12.208,
+          "e": 12.4
+        },
+        {
+          "t": "benda,",
+          "s": 12.44,
+          "e": 13.04
+        },
+        {
+          "t": "orang,",
+          "s": 13.16,
+          "e": 13.84
+        },
+        {
+          "t": "atau",
+          "s": 13.936,
+          "e": 14.32
+        },
+        {
+          "t": "sifat,",
+          "s": 14.36,
+          "e": 14.88
+        },
+        {
+          "t": "fi’il (فِعْل),",
+          "s": 15.32,
+          "e": 16.16
+        },
+        {
+          "t": "yaitu",
+          "s": 16.36,
+          "e": 16.8
+        },
+        {
+          "t": "kata",
+          "s": 16.848,
+          "e": 17.04
+        },
+        {
+          "t": "kerja,",
+          "s": 17.12,
+          "e": 17.6
+        },
+        {
+          "t": "atau",
+          "s": 17.824,
+          "e": 18.72
+        },
+        {
+          "t": "huruf (حَرْف),",
+          "s": 18.8,
+          "e": 19.48
+        },
+        {
+          "t": "yaitu",
+          "s": 19.58,
+          "e": 20.08
+        },
+        {
+          "t": "kata",
+          "s": 20.16,
+          "e": 20.48
+        },
+        {
+          "t": "tugas.",
+          "s": 20.52,
+          "e": 21.28
+        }
+      ]
+    },
+    "al-fatihah:0:next": {
+      "text": "Pelajaran pengantar selesai. Berikutnya ayat pertama Surah Al-Fatihah; pelajaran berlanjut sendiri.",
+      "display": "Pelajaran pengantar selesai. Berikutnya ayat pertama Surah Al-Fatihah; pelajaran berlanjut sendiri.",
+      "highlight": [],
+      "focus": null
+    },
     "al-fatihah:1:intro": {
       "text": "Ayat pertama Surah Al-Fatihah. Terjemahannya: Dengan nama Alloh Yang Maha Pengasih, Maha Penyayang. Ayat ini terdiri dari empat kata, dan kita akan mempelajarinya satu per satu.",
       "display": "Ayat pertama Surah Al-Fatihah. Terjemahannya: “Dengan nama Allah Yang Maha Pengasih, Maha Penyayang.” Ayat ini terdiri dari empat kata, dan kita akan mempelajarinya satu per satu.",
@@ -213,874 +916,6 @@
       "display": "Ada tiga hal lagi di ayat ini, tetapi baru kita bahas nanti: alif lam (ال) di ayat ketiga, na’t (نَعْت) di ayat ketiga, dan idhafah (إِضَافَة) di ayat keempat. Ada juga satu hal tingkat lanjut, yang tidak kita bahas di tingkat dasar.",
       "highlight": [],
       "focus": null
-    },
-    "al-fatihah:1:primer:1": {
-      "text": "Sebelum membahas kata demi kata, kita kenali dulu harakat, yaitu tanda bunyi pada huruf Arab.",
-      "display": "Sebelum membahas kata demi kata, kita kenali dulu harakat, yaitu tanda bunyi pada huruf Arab.",
-      "highlight": [],
-      "focus": null,
-      "frame": 1,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/aab0fd3c99423f28.mp3",
-        "ms": 6844,
-        "sha256": "6a1c2e76667f4fd9f187dfd6c93514980b41bc1e206f5efa052af952b2b474b3"
-      },
-      "tokens": [
-        {
-          "t": "Sebelum",
-          "s": 0.0,
-          "e": 0.32
-        },
-        {
-          "t": "membahas",
-          "s": 0.368,
-          "e": 0.88
-        },
-        {
-          "t": "kata",
-          "s": 0.944,
-          "e": 1.2
-        },
-        {
-          "t": "demi",
-          "s": 1.264,
-          "e": 1.52
-        },
-        {
-          "t": "kata,",
-          "s": 1.6,
-          "e": 2.4
-        },
-        {
-          "t": "kita",
-          "s": 2.448,
-          "e": 2.64
-        },
-        {
-          "t": "kenali",
-          "s": 2.68,
-          "e": 3.04
-        },
-        {
-          "t": "dulu",
-          "s": 3.08,
-          "e": 3.28
-        },
-        {
-          "t": "harakat,",
-          "s": 3.34,
-          "e": 4.56
-        },
-        {
-          "t": "yaitu",
-          "s": 4.6,
-          "e": 5.04
-        },
-        {
-          "t": "tanda",
-          "s": 5.12,
-          "e": 5.52
-        },
-        {
-          "t": "bunyi",
-          "s": 5.58,
-          "e": 5.84
-        },
-        {
-          "t": "pada",
-          "s": 5.904,
-          "e": 6.16
-        },
-        {
-          "t": "huruf",
-          "s": 6.2,
-          "e": 6.4
-        },
-        {
-          "t": "Arab.",
-          "s": 6.464,
-          "e": 6.8
-        }
-      ]
-    },
-    "al-fatihah:1:primer:2": {
-      "text": "Tiga harakat utama adalah فَتْحَة, كَسْرَة, dan dhommah. Bunyinya a, i, dan u.",
-      "display": "Tiga harakat utama adalah fathah (فَتْحَة), kasrah (كَسْرَة), dan dhammah (ضَمَّة). Bunyinya a, i, dan u.",
-      "highlight": [],
-      "focus": null,
-      "frame": 1,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/e6191ccc86da82d0.mp3",
-        "ms": 8359,
-        "sha256": "541239e085b6cce63995feb65b7c1d47a625cc20f226457fec0a72881bc3779c"
-      },
-      "tokens": [
-        {
-          "t": "Tiga",
-          "s": 0.0,
-          "e": 0.24
-        },
-        {
-          "t": "harakat",
-          "s": 0.3,
-          "e": 0.72
-        },
-        {
-          "t": "utama",
-          "s": 0.8,
-          "e": 1.2
-        },
-        {
-          "t": "adalah",
-          "s": 1.257,
-          "e": 1.6
-        },
-        {
-          "t": "fathah (فَتْحَة),",
-          "s": 1.84,
-          "e": 3.04
-        },
-        {
-          "t": "kasrah (كَسْرَة),",
-          "s": 3.08,
-          "e": 3.84
-        },
-        {
-          "t": "dan",
-          "s": 3.88,
-          "e": 4.0
-        },
-        {
-          "t": "dhammah (ضَمَّة).",
-          "s": 4.053,
-          "e": 5.2
-        },
-        {
-          "t": "Bunyinya",
-          "s": 5.24,
-          "e": 5.92
-        },
-        {
-          "t": "a,",
-          "s": 6.16,
-          "e": 6.48
-        },
-        {
-          "t": "i,",
-          "s": 6.88,
-          "e": 7.56
-        },
-        {
-          "t": "dan",
-          "s": 7.63,
-          "e": 7.84
-        },
-        {
-          "t": "u.",
-          "s": 8.0,
-          "e": 8.32
-        }
-      ]
-    },
-    "al-fatihah:1:primer:3": {
-      "text": "فَتْحَة adalah garis kecil miring di atas huruf. Huruf yang diberi فَتْحَة dibaca dengan bunyi a.",
-      "display": "Fathah (فَتْحَة) adalah garis kecil miring di atas huruf. Huruf yang diberi fathah (فَتْحَة) dibaca dengan bunyi a.",
-      "highlight": [],
-      "focus": null,
-      "frame": 2,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/6327a9fb8731dec2.mp3",
-        "ms": 7236,
-        "sha256": "4e7a1a688c85db6170595d78380a5b60fc3f1a1edfdda435f2434cdbfb22f586"
-      },
-      "tokens": [
-        {
-          "t": "Fathah (فَتْحَة)",
-          "s": 0.0,
-          "e": 0.56
-        },
-        {
-          "t": "adalah",
-          "s": 0.651,
-          "e": 1.2
-        },
-        {
-          "t": "garis",
-          "s": 1.28,
-          "e": 1.6
-        },
-        {
-          "t": "kecil",
-          "s": 1.68,
-          "e": 2.0
-        },
-        {
-          "t": "miring",
-          "s": 2.08,
-          "e": 2.48
-        },
-        {
-          "t": "di",
-          "s": 2.533,
-          "e": 2.64
-        },
-        {
-          "t": "atas",
-          "s": 2.688,
-          "e": 2.88
-        },
-        {
-          "t": "huruf.",
-          "s": 2.92,
-          "e": 3.76
-        },
-        {
-          "t": "Huruf",
-          "s": 3.88,
-          "e": 4.32
-        },
-        {
-          "t": "yang",
-          "s": 4.368,
-          "e": 4.56
-        },
-        {
-          "t": "diberi",
-          "s": 4.62,
-          "e": 4.88
-        },
-        {
-          "t": "fathah (فَتْحَة)",
-          "s": 4.92,
-          "e": 5.44
-        },
-        {
-          "t": "dibaca",
-          "s": 5.54,
-          "e": 6.16
-        },
-        {
-          "t": "dengan",
-          "s": 6.194,
-          "e": 6.4
-        },
-        {
-          "t": "bunyi",
-          "s": 6.46,
-          "e": 6.72
-        },
-        {
-          "t": "a.",
-          "s": 6.92,
-          "e": 7.2
-        }
-      ]
-    },
-    "al-fatihah:1:primer:4": {
-      "text": "كَسْرَة adalah garis yang sama, tetapi di bawah huruf; bunyinya i. Huruf pertama ayat ini, huruf بَاء, memakai كَسْرَة.",
-      "display": "Kasrah (كَسْرَة) adalah garis yang sama, tetapi di bawah huruf; bunyinya i. Huruf pertama ayat ini, huruf ba’ (بِ), memakai kasrah (كَسْرَة).",
-      "highlight": [
-        1
-      ],
-      "focus": null,
-      "frame": 3,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/c2e50aaaf5497e68.mp3",
-        "ms": 9796,
-        "sha256": "b6fa1930cf44048750e163e156098e4537b3f4477a58f3d88ca2d355014b1f80"
-      },
-      "tokens": [
-        {
-          "t": "Kasrah (كَسْرَة)",
-          "s": 0.0,
-          "e": 0.48
-        },
-        {
-          "t": "adalah",
-          "s": 0.571,
-          "e": 1.12
-        },
-        {
-          "t": "garis",
-          "s": 1.2,
-          "e": 1.52
-        },
-        {
-          "t": "yang",
-          "s": 1.568,
-          "e": 1.76
-        },
-        {
-          "t": "sama,",
-          "s": 1.856,
-          "e": 2.4
-        },
-        {
-          "t": "tetapi",
-          "s": 2.44,
-          "e": 2.8
-        },
-        {
-          "t": "di",
-          "s": 2.853,
-          "e": 2.96
-        },
-        {
-          "t": "bawah",
-          "s": 3.0,
-          "e": 3.2
-        },
-        {
-          "t": "huruf;",
-          "s": 3.26,
-          "e": 3.76
-        },
-        {
-          "t": "bunyinya",
-          "s": 3.94,
-          "e": 4.88
-        },
-        {
-          "t": "i.",
-          "s": 5.12,
-          "e": 5.44
-        },
-        {
-          "t": "Huruf",
-          "s": 5.68,
-          "e": 6.48
-        },
-        {
-          "t": "pertama",
-          "s": 6.528,
-          "e": 6.88
-        },
-        {
-          "t": "ayat",
-          "s": 6.933,
-          "e": 7.2
-        },
-        {
-          "t": "ini,",
-          "s": 7.28,
-          "e": 7.68
-        },
-        {
-          "t": "huruf",
-          "s": 7.74,
-          "e": 8.08
-        },
-        {
-          "t": "ba’ (بِ),",
-          "s": 8.16,
-          "e": 8.68
-        },
-        {
-          "t": "memakai",
-          "s": 8.73,
-          "e": 9.12
-        },
-        {
-          "t": "kasrah (كَسْرَة).",
-          "s": 9.16,
-          "e": 9.76
-        }
-      ]
-    },
-    "al-fatihah:1:primer:5": {
-      "text": "Dhommah bentuknya seperti huruf وَاو kecil di atas huruf; bunyinya u.",
-      "display": "Dhammah (ضَمَّة) bentuknya seperti huruf wawu (و) kecil di atas huruf; bunyinya u.",
-      "highlight": [],
-      "focus": null,
-      "frame": 4,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/c282bfc4d3a2f6dc.mp3",
-        "ms": 5146,
-        "sha256": "be2b7a09b67e3f0037866a572f35a24d396498dcd4f28d0214b4d1010c37c3c5"
-      },
-      "tokens": [
-        {
-          "t": "Dhammah (ضَمَّة)",
-          "s": 0.0,
-          "e": 0.48
-        },
-        {
-          "t": "bentuknya",
-          "s": 0.544,
-          "e": 1.12
-        },
-        {
-          "t": "seperti",
-          "s": 1.17,
-          "e": 1.52
-        },
-        {
-          "t": "huruf",
-          "s": 1.58,
-          "e": 1.92
-        },
-        {
-          "t": "wawu (و)",
-          "s": 1.96,
-          "e": 2.16
-        },
-        {
-          "t": "kecil",
-          "s": 2.24,
-          "e": 2.72
-        },
-        {
-          "t": "di",
-          "s": 2.773,
-          "e": 2.88
-        },
-        {
-          "t": "atas",
-          "s": 2.928,
-          "e": 3.12
-        },
-        {
-          "t": "huruf;",
-          "s": 3.16,
-          "e": 4.08
-        },
-        {
-          "t": "bunyinya",
-          "s": 4.14,
-          "e": 4.64
-        },
-        {
-          "t": "u.",
-          "s": 4.84,
-          "e": 5.12
-        }
-      ]
-    },
-    "al-fatihah:1:primer:6": {
-      "text": "Ada tanda lain di ayat ini. Tanda kecil di atas huruf سِين menandakan huruf mati, dibaca tanpa vokal.",
-      "display": "Ada tanda lain di ayat ini. Tanda kecil di atas huruf sin (سْ) menandakan huruf mati, dibaca tanpa vokal.",
-      "highlight": [
-        1,
-        3
-      ],
-      "focus": null,
-      "frame": 5,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/490cc0e8d2266b52.mp3",
-        "ms": 7549,
-        "sha256": "287a3009dc346516b58e43af6441d46b74a964308e9fc30356b4cf39ca5b9f6d"
-      },
-      "tokens": [
-        {
-          "t": "Ada",
-          "s": 0.0,
-          "e": 0.16
-        },
-        {
-          "t": "tanda",
-          "s": 0.2,
-          "e": 0.4
-        },
-        {
-          "t": "lain",
-          "s": 0.464,
-          "e": 0.72
-        },
-        {
-          "t": "di",
-          "s": 0.773,
-          "e": 0.88
-        },
-        {
-          "t": "ayat",
-          "s": 0.907,
-          "e": 1.12
-        },
-        {
-          "t": "ini.",
-          "s": 1.18,
-          "e": 1.8
-        },
-        {
-          "t": "Tanda",
-          "s": 2.02,
-          "e": 2.4
-        },
-        {
-          "t": "kecil",
-          "s": 2.48,
-          "e": 2.8
-        },
-        {
-          "t": "di",
-          "s": 2.853,
-          "e": 2.96
-        },
-        {
-          "t": "atas",
-          "s": 3.024,
-          "e": 3.28
-        },
-        {
-          "t": "huruf",
-          "s": 3.32,
-          "e": 3.52
-        },
-        {
-          "t": "sin (سْ)",
-          "s": 3.6,
-          "e": 4.0
-        },
-        {
-          "t": "menandakan",
-          "s": 4.08,
-          "e": 4.72
-        },
-        {
-          "t": "huruf",
-          "s": 4.76,
-          "e": 4.96
-        },
-        {
-          "t": "mati,",
-          "s": 5.04,
-          "e": 5.92
-        },
-        {
-          "t": "dibaca",
-          "s": 5.96,
-          "e": 6.48
-        },
-        {
-          "t": "tanpa",
-          "s": 6.56,
-          "e": 6.96
-        },
-        {
-          "t": "vokal.",
-          "s": 7.0,
-          "e": 7.52
-        }
-      ]
-    },
-    "al-fatihah:1:primer:7": {
-      "text": "Tanda seperti huruf w kecil di atas huruf رَاء menandakan huruf itu dibaca dobel.",
-      "display": "Tanda seperti huruf w kecil di atas huruf ra’ (رَّ) menandakan huruf itu dibaca dobel.",
-      "highlight": [
-        1,
-        3
-      ],
-      "focus": null,
-      "frame": 5,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/8414d2dc085f94f8.mp3",
-        "ms": 5721,
-        "sha256": "c98efd4cb15decf007859cc7240d2ee9f772d1cb68110287d796d15e12ae4cc9"
-      },
-      "tokens": [
-        {
-          "t": "Tanda",
-          "s": 0.0,
-          "e": 0.4
-        },
-        {
-          "t": "seperti",
-          "s": 0.46,
-          "e": 0.88
-        },
-        {
-          "t": "huruf",
-          "s": 0.92,
-          "e": 1.2
-        },
-        {
-          "t": "w",
-          "s": 1.32,
-          "e": 1.44
-        },
-        {
-          "t": "kecil",
-          "s": 1.493,
-          "e": 1.84
-        },
-        {
-          "t": "di",
-          "s": 1.893,
-          "e": 2.0
-        },
-        {
-          "t": "atas",
-          "s": 2.048,
-          "e": 2.24
-        },
-        {
-          "t": "huruf",
-          "s": 2.3,
-          "e": 2.64
-        },
-        {
-          "t": "ra’ (رَّ)",
-          "s": 2.68,
-          "e": 3.04
-        },
-        {
-          "t": "menandakan",
-          "s": 3.18,
-          "e": 4.16
-        },
-        {
-          "t": "huruf",
-          "s": 4.2,
-          "e": 4.48
-        },
-        {
-          "t": "itu",
-          "s": 4.54,
-          "e": 4.72
-        },
-        {
-          "t": "dibaca",
-          "s": 4.76,
-          "e": 5.2
-        },
-        {
-          "t": "dobel.",
-          "s": 5.253,
-          "e": 5.68
-        }
-      ]
-    },
-    "al-fatihah:1:primer:8": {
-      "text": "Satu tanda lagi: alif kecil yang tegak di atas huruf مِيم pada kata ketiga.",
-      "display": "Satu tanda lagi: alif (ا) kecil yang tegak di atas huruf mim (مَٰ) pada kata ketiga.",
-      "highlight": [
-        3
-      ],
-      "focus": null,
-      "frame": 6,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/b07d5384ef6f6a7e.mp3",
-        "ms": 5642,
-        "sha256": "727efaf5e6a651528de4a7852ffa080da9504f747f642d67795919cf2566cce6"
-      },
-      "tokens": [
-        {
-          "t": "Satu",
-          "s": 0.0,
-          "e": 0.24
-        },
-        {
-          "t": "tanda",
-          "s": 0.28,
-          "e": 0.56
-        },
-        {
-          "t": "lagi:",
-          "s": 0.64,
-          "e": 1.44
-        },
-        {
-          "t": "alif (ا)",
-          "s": 1.6,
-          "e": 2.0
-        },
-        {
-          "t": "kecil",
-          "s": 2.08,
-          "e": 2.48
-        },
-        {
-          "t": "yang",
-          "s": 2.512,
-          "e": 2.64
-        },
-        {
-          "t": "tegak",
-          "s": 2.72,
-          "e": 3.12
-        },
-        {
-          "t": "di",
-          "s": 3.147,
-          "e": 3.2
-        },
-        {
-          "t": "atas",
-          "s": 3.264,
-          "e": 3.52
-        },
-        {
-          "t": "huruf",
-          "s": 3.56,
-          "e": 3.76
-        },
-        {
-          "t": "mim (مَٰ)",
-          "s": 3.84,
-          "e": 4.16
-        },
-        {
-          "t": "pada",
-          "s": 4.256,
-          "e": 4.64
-        },
-        {
-          "t": "kata",
-          "s": 4.704,
-          "e": 4.96
-        },
-        {
-          "t": "ketiga.",
-          "s": 5.02,
-          "e": 5.6
-        }
-      ]
-    },
-    "al-fatihah:1:primer:9": {
-      "text": "Huruf kecil seperti ini menandai huruf yang tidak tertulis dalam tulisan asli Al-Qur'an, tetapi wajib dibaca; karena itu bunyi a pada huruf مِيم itu dibaca panjang.",
-      "display": "Huruf kecil seperti ini menandai huruf yang tidak tertulis dalam tulisan asli Al-Qur'an, tetapi wajib dibaca; karena itu bunyi a pada huruf mim (مَٰ) itu dibaca panjang.",
-      "highlight": [
-        3
-      ],
-      "focus": null,
-      "frame": 6,
-      "audio": {
-        "url": "/belajar/media/narration/kang-nandar/al-fatihah/9802792783603bd0.mp3",
-        "ms": 12278,
-        "sha256": "c0f455ca48bd66ad5653ff1d814395402ac1d8bafad4daf58626360f39048485"
-      },
-      "tokens": [
-        {
-          "t": "Huruf",
-          "s": 0.0,
-          "e": 0.24
-        },
-        {
-          "t": "kecil",
-          "s": 0.293,
-          "e": 0.64
-        },
-        {
-          "t": "seperti",
-          "s": 0.69,
-          "e": 1.04
-        },
-        {
-          "t": "ini",
-          "s": 1.14,
-          "e": 1.44
-        },
-        {
-          "t": "menandai",
-          "s": 1.48,
-          "e": 2.08
-        },
-        {
-          "t": "huruf",
-          "s": 2.14,
-          "e": 2.48
-        },
-        {
-          "t": "yang",
-          "s": 2.528,
-          "e": 2.72
-        },
-        {
-          "t": "tidak",
-          "s": 2.773,
-          "e": 3.04
-        },
-        {
-          "t": "tertulis",
-          "s": 3.088,
-          "e": 3.6
-        },
-        {
-          "t": "dalam",
-          "s": 3.667,
-          "e": 4.0
-        },
-        {
-          "t": "tulisan",
-          "s": 4.06,
-          "e": 4.48
-        },
-        {
-          "t": "asli",
-          "s": 4.56,
-          "e": 4.8
-        },
-        {
-          "t": "Al-Qur'an,",
-          "s": 4.853,
-          "e": 6.0
-        },
-        {
-          "t": "tetapi",
-          "s": 6.06,
-          "e": 6.48
-        },
-        {
-          "t": "wajib",
-          "s": 6.56,
-          "e": 6.88
-        },
-        {
-          "t": "dibaca;",
-          "s": 6.94,
-          "e": 7.52
-        },
-        {
-          "t": "karena",
-          "s": 7.646,
-          "e": 8.4
-        },
-        {
-          "t": "itu",
-          "s": 8.48,
-          "e": 8.72
-        },
-        {
-          "t": "bunyi",
-          "s": 8.82,
-          "e": 9.2
-        },
-        {
-          "t": "a",
-          "s": 9.4,
-          "e": 9.6
-        },
-        {
-          "t": "pada",
-          "s": 9.664,
-          "e": 9.92
-        },
-        {
-          "t": "huruf",
-          "s": 9.98,
-          "e": 10.24
-        },
-        {
-          "t": "mim (مَٰ)",
-          "s": 10.36,
-          "e": 10.72
-        },
-        {
-          "t": "itu",
-          "s": 10.82,
-          "e": 11.12
-        },
-        {
-          "t": "dibaca",
-          "s": 11.2,
-          "e": 11.68
-        },
-        {
-          "t": "panjang.",
-          "s": 11.74,
-          "e": 12.24
-        }
-      ]
     },
     "al-fatihah:1:w1": {
       "text": "Kata pertama artinya: dengan nama. Kata ini terdiri dari dua bagian.",
@@ -23877,19 +23712,315 @@
       "text": "Latihan tebak peran kata, tiga soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini.",
       "display": "Latihan tebak peran kata, tiga soal. Untuk setiap kata, pilih perannya dalam kalimat ayat ini.",
       "highlight": [],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/0c463efb753c4811.mp3",
+        "ms": 6531,
+        "sha256": "42b76efb6f05c6cd9666dcfde0bec62661b24a052d1fb61215c37dc7d2089063"
+      },
+      "tokens": [
+        {
+          "t": "Latihan",
+          "s": 0.0,
+          "e": 0.48
+        },
+        {
+          "t": "tebak",
+          "s": 0.533,
+          "e": 0.88
+        },
+        {
+          "t": "peran",
+          "s": 0.92,
+          "e": 1.12
+        },
+        {
+          "t": "kata,",
+          "s": 1.2,
+          "e": 2.0
+        },
+        {
+          "t": "tiga",
+          "s": 2.04,
+          "e": 2.24
+        },
+        {
+          "t": "soal.",
+          "s": 2.32,
+          "e": 2.8
+        },
+        {
+          "t": "Untuk",
+          "s": 2.94,
+          "e": 3.44
+        },
+        {
+          "t": "setiap",
+          "s": 3.48,
+          "e": 3.76
+        },
+        {
+          "t": "kata,",
+          "s": 3.84,
+          "e": 4.32
+        },
+        {
+          "t": "pilih",
+          "s": 4.36,
+          "e": 4.64
+        },
+        {
+          "t": "perannya",
+          "s": 4.68,
+          "e": 5.12
+        },
+        {
+          "t": "dalam",
+          "s": 5.16,
+          "e": 5.36
+        },
+        {
+          "t": "kalimat",
+          "s": 5.4,
+          "e": 5.76
+        },
+        {
+          "t": "ayat",
+          "s": 5.813,
+          "e": 6.08
+        },
+        {
+          "t": "ini.",
+          "s": 6.14,
+          "e": 6.48
+        }
+      ]
     },
     "al-fatihah:7:ex:label-role:1:why": {
       "text": "Perannya: اِسْم مَوْصُول. اِسْم مَوْصُول ini مَبْنِيّ, yaitu bentuknya tetap, dan berkedudukan جَرّ sebagai mudhof ilaih dari kata pertama.",
       "display": "Perannya: isim maushul (اِسْم مَوْصُول). Isim maushul (اِسْم مَوْصُول) ini mabni (مَبْنِيّ), yaitu bentuknya tetap, dan berkedudukan jar (جَرّ) sebagai mudhaf ilaih (مُضَاف إِلَيْه) dari kata pertama.",
       "highlight": [],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/0d0d0fda0c5ce224.mp3",
+        "ms": 9718,
+        "sha256": "82c1a29fa2688f8d71ef7eac615c8bb0e4167385f3e0ce86fcb5564addfed2b6"
+      },
+      "tokens": [
+        {
+          "t": "Perannya:",
+          "s": 0.0,
+          "e": 0.48
+        },
+        {
+          "t": "isim maushul (اِسْم مَوْصُول).",
+          "s": 0.6,
+          "e": 2.04
+        },
+        {
+          "t": "Isim maushul (اِسْم مَوْصُول)",
+          "s": 2.22,
+          "e": 3.04
+        },
+        {
+          "t": "ini",
+          "s": 3.1,
+          "e": 3.28
+        },
+        {
+          "t": "mabni (مَبْنِيّ),",
+          "s": 3.32,
+          "e": 4.08
+        },
+        {
+          "t": "yaitu",
+          "s": 4.16,
+          "e": 4.48
+        },
+        {
+          "t": "bentuknya",
+          "s": 4.544,
+          "e": 5.04
+        },
+        {
+          "t": "tetap,",
+          "s": 5.1,
+          "e": 5.52
+        },
+        {
+          "t": "dan",
+          "s": 5.62,
+          "e": 5.92
+        },
+        {
+          "t": "berkedudukan",
+          "s": 5.98,
+          "e": 6.64
+        },
+        {
+          "t": "jar (جَرّ)",
+          "s": 6.72,
+          "e": 7.28
+        },
+        {
+          "t": "sebagai",
+          "s": 7.32,
+          "e": 7.6
+        },
+        {
+          "t": "mudhaf ilaih (مُضَاف إِلَيْه)",
+          "s": 7.66,
+          "e": 8.68
+        },
+        {
+          "t": "dari",
+          "s": 8.72,
+          "e": 8.88
+        },
+        {
+          "t": "kata",
+          "s": 8.928,
+          "e": 9.12
+        },
+        {
+          "t": "pertama.",
+          "s": 9.168,
+          "e": 9.68
+        }
+      ]
     },
     "al-fatihah:7:ex:label-role:2:why": {
       "text": "Perannya: فِعْل مَاضٍ dan فَاعِل. فِعْل مَاضٍ ini مَبْنِيّ di atas سُكُون karena bersambung dengan dhomir akhiran, Engkau, pelakunya, dan kalimatnya menjadi صِلَة bagi kata kedua.",
       "display": "Perannya: fi’il madhi (فِعْل مَاضٍ) + fa’il (فَاعِل). Fi’il madhi (فِعْل مَاضٍ) ini mabni (مَبْنِيّ) di atas sukun (سُكُون) karena bersambung dengan dhamir (ضَمِير) akhiran (“Engkau”, pelakunya), dan kalimatnya menjadi shilah (صِلَة) bagi kata kedua.",
       "highlight": [],
-      "focus": null
+      "focus": null,
+      "audio": {
+        "url": "/belajar/media/narration/kang-nandar/al-fatihah/686c1532fd21bcb1.mp3",
+        "ms": 14916,
+        "sha256": "125fc26f9061974d7281b9bd54308474f18779708fbbb1ec325c9361e49bbf12"
+      },
+      "tokens": [
+        {
+          "t": "Perannya:",
+          "s": 0.0,
+          "e": 0.76
+        },
+        {
+          "t": "fi’il madhi (فِعْل مَاضٍ)",
+          "s": 0.9,
+          "e": 2.0
+        },
+        {
+          "t": "dan",
+          "s": 2.16,
+          "e": 2.64
+        },
+        {
+          "t": "fa’il (فَاعِل).",
+          "s": 2.88,
+          "e": 3.68
+        },
+        {
+          "t": "Fi’il madhi (فِعْل مَاضٍ)",
+          "s": 4.16,
+          "e": 5.28
+        },
+        {
+          "t": "ini",
+          "s": 5.38,
+          "e": 5.68
+        },
+        {
+          "t": "mabni (مَبْنِيّ)",
+          "s": 5.76,
+          "e": 6.24
+        },
+        {
+          "t": "di",
+          "s": 6.267,
+          "e": 6.32
+        },
+        {
+          "t": "atas",
+          "s": 6.368,
+          "e": 6.56
+        },
+        {
+          "t": "sukun (سُكُون)",
+          "s": 6.64,
+          "e": 7.04
+        },
+        {
+          "t": "karena",
+          "s": 7.12,
+          "e": 7.6
+        },
+        {
+          "t": "bersambung",
+          "s": 7.664,
+          "e": 8.24
+        },
+        {
+          "t": "dengan",
+          "s": 8.274,
+          "e": 8.48
+        },
+        {
+          "t": "dhamir (ضَمِير)",
+          "s": 8.533,
+          "e": 8.88
+        },
+        {
+          "t": "akhiran,",
+          "s": 8.933,
+          "e": 9.44
+        },
+        {
+          "t": "Engkau,",
+          "s": 9.6,
+          "e": 10.4
+        },
+        {
+          "t": "pelakunya,",
+          "s": 10.52,
+          "e": 12.0
+        },
+        {
+          "t": "dan",
+          "s": 12.06,
+          "e": 12.24
+        },
+        {
+          "t": "kalimatnya",
+          "s": 12.3,
+          "e": 12.96
+        },
+        {
+          "t": "menjadi",
+          "s": 13.01,
+          "e": 13.36
+        },
+        {
+          "t": "shilah (صِلَة)",
+          "s": 13.44,
+          "e": 13.92
+        },
+        {
+          "t": "bagi",
+          "s": 13.984,
+          "e": 14.24
+        },
+        {
+          "t": "kata",
+          "s": 14.288,
+          "e": 14.48
+        },
+        {
+          "t": "kedua.",
+          "s": 14.52,
+          "e": 14.88
+        }
+      ]
     },
     "al-fatihah:7:ex:label-role:3:why": {
       "text": "Perannya: mudhof ilaih. Akhirnya dibaca كَسْرَة, karena menjadi mudhof ilaih dari kata kelima.",

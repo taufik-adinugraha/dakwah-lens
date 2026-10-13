@@ -53,12 +53,12 @@ python3 validate_clips.py          # the imam's voice of every Konsep example: l
 python3 test_validate_clips.py     # plants 58 faults (an example with no voice, an unwanted clip, another ayah's or reciter's file, a word's timing off by one in a lesson or outside the lessons, an implausible length, a Harakat sign that is not heard where its example is, an ayah's last word without `last`, a hamzat-washal tile played alone, a fixture that drifted, a stale pin, …) (CI: --no-corpus)
 python3 build_curriculum.py        # the curriculum ../content/curriculum.json from authored/curriculum.json (see "Kurikulum"); after the lessons and the library, BEFORE the quizzes, the lesson map and the narration, which read it
 python3 validate_curriculum.py     # the curriculum: every step in one lesson, at most three a lesson, every Konsep placed once, term owners, a step's own text and sources, the lists derived per lesson; prints the table; exit 1 on any failure
-python3 test_validate_curriculum.py # plants 71 faults (a step in two lessons, a fourth step, a record placed twice or not at all, a term with two owners, a text with no source or with a Qur'anic word, a derived list that drifted, …), each must fail
+python3 test_validate_curriculum.py # plants 74 faults (a step in two lessons, a fourth step, a record placed twice or not at all, a term with two owners, a text with no source or with a Qur'anic word, a derived list that drifted, …), each must fail
 python3 build_quiz.py              # the quizzes ../content/quiz/*.json (see "Kuis"); before the narration, which reads them
 python3 build_map.py               # the lesson maps ../content/map/*.json, for the surahs switched on (see "Peta pelajaran"); before the narration, which reads them
 python3 build_narration.py         # narration manifests ../content/narration/*.json (see "Narasi"); stops on a term said before its lesson that authored/curriculum.pending.json does not list (`--write-pending` writes that list: see "Kurikulum")
 python3 validate_narration.py      # narration checks; exit 1 on any failure
-python3 test_validate_narration.py # plants 155 faults in copies of the manifests, the dictionary, the compositions, the lesson maps, the curriculum and the pending list, each must fail
+python3 test_validate_narration.py # plants 191 faults in copies of the manifests, the lessons, the dictionary, the compositions, the lesson maps, the curriculum and the pending list, each must fail (`--only <text>`: the faults and unit tests whose name holds <text>, while iterating)
 python3 validate_map.py            # the lesson maps: new / learnt so far / later / next-level against the curriculum, the names against the captions
 python3 test_validate_map.py       # plants 39 faults (a step in the wrong group, one taught later listed as learnt, a learnt step left out, `here` on a step that does not occur, a name that says a Qur'anic word, …)
 python3 validate_quiz.py           # the quiz guard: every question TAUGHT before it is asked (Al-Fatihah), or listed in authored/curriculum.pending.json; exit 1 on any failure
@@ -92,8 +92,8 @@ a machine whose cache predates them). `cache/` is git-ignored.
 | `sources.json` | 0 | Every input: URL, version, sha256 (pinned after download), bytes, retrieval date, licence, attribution |
 | `fetch.py` | 1 | Downloads into `cache/`, checks headers/licence footers, pins or verifies sha256; per-surah inputs follow `common.SURAHS` |
 | `common.py` | — | Paths, the surah registry (`SURAHS`), sha256, Tanzil and QAC loaders, `lesson_ayah` (surah-heading basmalah), QuranEnc per-sura lookup, QAC Buckwalter table, search normalisation, MP3 duration probe |
-| `authored/<slug>.words.json` | 3 | Hand-authored per-word values: translit, gloss, wazn, case, why, ikhtilaf, kitab sources, review notes |
-| `authored/<slug>.structure.json` | 3 | Hand-authored `Ayah.structure` (type, summary, word groups, sources) and `Word.role`, with `role_src` / pipeline review notes (never shipped) |
+| `authored/<slug>.words.json` | 3 | Hand-authored per-word values: translit, gloss, wazn, case, why, ikhtilaf, kitab sources, review notes; optionally `why_basic`, the reason as the narrator says it (see "why_basic") |
+| `authored/<slug>.structure.json` | 3 | Hand-authored `Ayah.structure` (type, summary, word groups, sources) and `Word.role`, with `role_src` / pipeline review notes (never shipped); optionally `structure.items`, the same analysis as separate narrated items (see "Susunan kalimat per butir") |
 | `authored/<slug>.concepts-map.json` | 3 | Word loc -> Konsep ids (`Word.concepts`); generated from the concepts' `examples`, re-checked both ways by `validate.py` |
 | `authored/<slug>.facts.generated.json` | 2/3 | Facts for a surah other than Al-Fatihah: `{"facts": [Fact, …]}` in `schema.ts` shape, passed through after the `validate.py` fact checks (optional) |
 | `authored/<slug>.facts.marked.json` | 3 | A marked lesson's facts with their terms and Qur'anic words marked (an overlay on the computed facts: fact id → title / body / method, each stripping to the computed text); see "Konsep" |
@@ -560,7 +560,8 @@ Operator, 2026-10-10 (narration rule 14): "when explaining bismi … it has 2 co
 ismi; ismi in its root is not read as kasrah but dhommah, but because of harf jar it's read kasrah;
 provide visualization/animation bi + ismu → bismi". Say **bentuk dasar** (base form: the marfu'
 form, اسْمُ with dhammah), never "akar" (in grammar the akar is the root letters س م و). And, because
-the first lesson's learners do not know the marks yet, a **harakat primer** opens Al-Fatihah 1:
+the first lesson's learners do not know the marks yet, a **harakat primer** opens the course —
+in Al-Fatihah 1 until 2026-10-13, in lesson zero since (its `"lesson": "0"`; see "Pelajaran nol"):
 each mark on a dotted circle, where it sits and the sound it gives (fathah a, kasrah i, dhammah u;
 sukun, syaddah and the small upright alif of ٱلرَّحْمَٰنِ too, since the ayah carries them — the
 small alif is a letter the mushaf leaves out in writing but which is read, a long a: Sya'ban
@@ -572,7 +573,8 @@ word card's slot, as tall as the word's tallest frame — every frame is laid ou
 one on screen, so nothing jumps and nothing is clipped at any text size; CI measures it; the
 sequence step `w${n}:compose` after `w${n}`, its last line said over the last frame, the joined
 word — the imam does not recite the word again there: he says it once, when the word's step opens
-(`w${n}:recite`; operator 2026-10-13, plan L24); the step `primer` after the imam's ayah). Only
+(`w${n}:recite`; operator 2026-10-13, plan L24); the step `primer` after the opening line of
+lesson zero — after the imam's ayah, when a primer is played in an ayah's lesson). Only
 an ayah's LAST word is recited once more, after the last line of its composition, its tile filled
 forest: the composition that ends on the frame whose note is "imam berhenti di sini", said over
 by its last line (`src/lib/composition.ts` `STOP_NOTE`). Keep exactly that note for that frame,
@@ -610,7 +612,7 @@ alif of the basmalah, QAC for the parts, Tanzil for the orthography, SKB 158/198
 **What the lines say against what the frames show** (`compose.say_problems`, run by
 `validate_compose.py` in both modes; review of 2026-10-10): the first use of each harakah in a
 word's lead and lines carries its sound ("kasrah, bunyi i"; operator: learners do not know the marks
-— the primer opens ayah 1, a reminder follows at each word); a line over a `base` frame names only
+— the primer opens the course, a reminder follows at each word); a line over a `base` frame names only
 the bentuk dasar's ending and its sound, over a `change` frame only the change's marks and sounds;
 "bentuk dasar" is said over a base or change frame, or one whose note names it; "ditulis bersambung"
 / "bersambung dengan" over a join, or the whole word after its parts; "bagian pertama / kedua" over
@@ -634,8 +636,9 @@ sound; a letter term is shown as the frame pins it or its tiles write it (the ba
 ٱلرَّحْمَٰن). Explain a rule in full the first time and briefly after ("sama seperti kata ketiga");
 several short lines rather than one long one.
 
-**Later lessons and the harakat primer (design, not wired yet).** Only Al-Fatihah 1 opens with the
-primer; a learner may start at Al-Ikhlas from the hub, whose word lines say "dhammah" with no sound.
+**Later lessons and the harakat primer (design, not wired yet; written before lesson zero —
+the link would point at `/quran/pengantar` now, and `primer_ref` at lesson zero).** Only lesson
+zero plays the primer; a learner may start at Al-Ikhlas from the hub, whose word lines say "dhammah" with no sound.
 When a surah other than Al-Fatihah gets `authored/<slug>.compose.json`, it carries
 `"primer_ref": {"slug": "al-fatihah", "ayah": 1}` instead of a primer: `build_compose.py` checks
 that the target opens with a primer; `build_narration.py` adds one line before its first word,
@@ -1058,10 +1061,13 @@ the grammar terms its prose says — through the pronunciation dictionary (`lexi
 any spelling the dictionary knows), each mapped to its `library.terms.json` id by its Arabic —
 and `curriculum.too_early` names those whose step is taught in a LATER lesson, or in no basic
 lesson. The build also holds each line's caption to the same terms as its prose. One exemption:
-a `map:later` line may name the later steps it announces. What the check cannot see: a library
-term the dictionary has no entry for is in the prose in Latin only and is not found (2026-10-13:
-nafi in 1 line of Al-Fatihah; majhul, maqul al-qaul, sahih in Al-Ikhlas; zharaf, mubalaghah,
-maqul al-qaul, mashdariyyah in Al-Falaq; maqul al-qaul in An-Nas).
+a `map:later` line may name the later steps it announces. The dictionary alone left a hole: a
+library term it has no entry for stands in a line in Latin (nafi, zharaf, mubalaghah, maqul
+al-qaul, majhul, sahih, mashdariyyah), and so does a dictionary term in a form it does not
+match ("fa'il-nya"). So what a line USES is the dictionary's matches and, in the text between
+them, the term table's own forms (`terms.TermForms`, the rule of `terms.unmarked`: whole words,
+with -nya, the longest form; a term's `ambiguous_forms` stay the author's call) —
+`validate_narration.prose_terms` / `caption_terms` through `TermIds.forms`.
 
 The uses that exist today are listed in `authored/curriculum.pending.json`: `lines` (line id →
 the term ids) and `quiz` (`<slug>:<ayah>:<exercise>:<n>` → the terms a question needs untaught).
@@ -1074,15 +1080,88 @@ one that is no longer found — so it can only shrink as the lines are reworded,
 python3 build_narration.py --write-pending   # rewrite authored/curriculum.pending.json from what is found now, then build
 ```
 
-2026-10-13: 48 lines (75 uses) and 13 questions. Al-Fatihah 25 lines — ayah 1: 5, ayah 2: 6, ayah
-3: 1, ayah 5: 6, ayah 6: 2, ayah 7: 5; Al-Ikhlas 3: 2; Al-Falaq 1: 4, 4: 5, 5: 4; An-Nas 1: 4, 5:
-4. Questions: Al-Fatihah 1 why-harakat 1–4, 2 label-role 1–3, 3 why-harakat 1, 4 why-harakat 1, 7
-label-role 1–4.
+2026-10-13, first: 48 lines (75 uses) and 13 questions, 25 of the lines and every question in
+Al-Fatihah. The same day Al-Fatihah was reworded and replanned (the structure told item by item,
+`why_basic`, the quiz plan): **no Al-Fatihah entry is left**, lines or quiz. What remains is the
+Mu'awwidzat's (hidden; rewritten when their lessons are): 39 lines, 58 uses, no question —
+Al-Ikhlas 1: 1, 3: 5; Al-Falaq 1: 5, 2: 1, 3: 5, 4: 5, 5: 8; An-Nas 1: 5, 5: 4 (16 of them found
+only by the term table's forms).
 
-**Not built yet.** Lesson zero has no page: the harakat primer still plays in Al-Fatihah 1, and
-the kalimah record's line (its step belongs to lesson zero) is said by no lesson — the lesson map
-of Al-Fatihah 1 already counts lesson zero's two steps as learnt. An-Nas, Al-Falaq and Al-Ikhlas
-follow the placement mechanically (their steps without a text have no line yet).
+**Not built yet.** An-Nas, Al-Falaq and Al-Ikhlas follow the placement mechanically (their steps
+without a text have no line yet); the segments of Ayat al-Kursi have no page.
+
+## Pelajaran nol (lesson zero: the lesson with no ayah)
+
+Decision 1 of `kurikulum-dasar.md` (operator-approved 2026-10-13): "A 'lesson zero' with no ayah
+opens the course. It teaches harakat and the three kinds of word (kalimah: isim, fi'il, huruf),
+so ayah 1 is lighter. The harakat primer and kalimah move out of 1:1 into lesson zero." Until it
+had a page the primer opened Al-Fatihah 1, that ayah's lesson map said "two things already
+learnt" of things no lesson had taught, and the kalimah record's line was said nowhere.
+
+- **Who hosts it**: the surah whose harakat primer says `"lesson": "0"`
+  (`authored/al-fatihah.compose.json` → `content/compose/al-fatihah.json`; `compose.LESSON_ZERO`).
+  The primer's `ayah` stays the ayah whose words its frames show (the letters of 1:1); `lesson`
+  says who PLAYS it. `validate_narration.primer_of(compose, ayah)` gives it to "ayah 0" only, so
+  Al-Fatihah 1 no longer plays it. One source: the primer is not copied anywhere.
+- **Its lines** are the lines of "ayah 0" of that surah, in that surah's own manifest
+  (`validate_narration.lesson_zero`, `zero_parts`): `al-fatihah:0:intro`, `:primer:1` … `:primer:9`,
+  `:concept:kalimah-isim-fiil-huruf`, `:next` — first in the file. In the surah's manifest and
+  not one of their own because a recorded file is named by its text and lives in its manifest's
+  folder: five primer lines and the kalimah line moved there with their text and kept their
+  audio. Nothing is lit (no ayah on that stage: `highlight` `[]`, `focus` `null`).
+- **The text written for it** is two sentences, in `build_narration.py`: `ZERO_INTRO` ("Ini
+  pelajaran pengantar, sebelum kita masuk ke ayat pertama Surah Al-Fatihah. Ada dua hal yang kita
+  kenali di sini: harakat, dan tiga jenis kata dalam bahasa Arab.") and `ZERO_NEXT` ("Pelajaran
+  pengantar selesai. Berikutnya ayat pertama Surah Al-Fatihah; pelajaran berlanjut sendiri.", the
+  words of an ayah's `next` line). Four primer lines were reworded for a lesson with no "ayat
+  ini" (main session's texts: "Sebelum mulai, …", "Huruf pertama Surah Al-Fatihah …", "… di ayat
+  pertama surah itu.", "… pada kata ketiga ayat itu.").
+- **The curriculum** marks lesson "0" as written when a primer is played there
+  (`curriculum.zero_written`, `written`): its `lines` (the kalimah record's line, no word to
+  light) and its `map` (`new`: harakat, kalimah; nothing learnt, postponed or next-level). The
+  file's format did not change: lesson "0" gained the two keys every written lesson has.
+  `curriculum.ayah_lesson(surah, 0)` is `"0"`, so the term check holds its lines to lesson "0".
+- **The app**: `/quran/pengantar` (`src/lib/routes.ts introHref`), the same stage as an ayah's
+  lesson; `src/lib/autoplay/zero.ts` (`zeroAyah`, `hostsZero`, `primerAyah`),
+  `buildAutoplaySequence({ zero: true })` — intro → primer → `concept:<id>` →
+  `concept:<id>:ex` (the record's first two examples, each the imam's clip of its own ayah:
+  1:1:1 and 1:5:2) → next, which leads to ayah 1 like an ayah to the next. Listed first on the
+  track page and on Al-Fatihah's page; Al-Fatihah 1 says "Belum mengenal harakat? Mulai dari
+  Pengantar."
+
+## Susunan kalimat per butir (the structure told item by item)
+
+Operator, 2026-10-13: "can we make this kind of explanation in items: harfjar in one item, idhafah
+in next item etc, it's kind of confusing which for which in this paragraph". An ayah's
+`structure` may carry `items: [{words, say}]` (authored in `<slug>.structure.json`, carried by
+`build_surah.structure_items` into `content/<slug>.json`; `schema.ts`). When it does:
+
+- its narration is ONE LINE PER ITEM, `structure:1` … `structure:n`
+  (`validate_narration.structure_parts`), INSTEAD of the one `structure` line built from
+  `summary`; the first opens with `STRUCTURE_LEAD` ("Sekarang susunan kalimatnya.");
+- a `say` is spoken as it stands, like a composition's: through the strict sanitiser (a Qur'anic
+  word stops the build — positions and meanings instead), never split (a longer item is two
+  items), and held to rule 1 (`validate_narration.authored`: no Latin term the dictionary does
+  not speak, so "fa'il-nya" is refused);
+- each line lights its item's `words` (`line_view`) and is a step of the lesson of its own, with
+  those words on the stage's card (`StructureItemCard`); "Ulangi" replays the item;
+- the quiz reads these lines as teaching lines (`quiz.TEACHING_PART`): ayah 1's first item ends
+  "Gabungan seperti ini disebut jar-majrur", which teaches the term.
+
+`summary` and `groups` stay the reference text of the page. An ayah without items is told from
+its summary as before (the Mu'awwidzat). Al-Fatihah: 24 items (4, 4, 2, 3, 3, 3, 5).
+
+## why_basic (a word's reason as the narrator says it)
+
+A word's `why` is its reference text, with every term and its sources; it is what the word's
+card shows. Its optional `why_basic` (authored in `<slug>.words.json`, 2026-10-13) is the same
+reason in the lesson's own vocabulary — only terms taught by then — and is what the NARRATED
+lines say instead (`build_narration.said_why`): a quiz question's explanation
+(`ex:<key>:<n>:why` of why-harakat, sort-case and label-role) and the `w<n>` line of a word
+without a composition. Plain prose spoken as it stands: strict (no Qur'anic word), no markup,
+no marked twin (it is never drawn), and held to rule 1. A `why_basic` that names a term taught
+later fails through the term check like any line. Nine words of Al-Fatihah have one. The
+exercise's own on-screen feedback (`content/quiz` `why`) still shows `why`.
 
 ## Peta pelajaran (the lesson map: what is new, what we have learnt so far, what comes later)
 
@@ -1141,9 +1220,14 @@ split). A group with nothing in it has no line (`validate_narration.map_opening_
 `lessonMap.ts mapOpening`). A name with a "dan" of its own is joined by ", serta":
 
 - new: "Di ayat ini ada tiga hal baru: A, B, dan C." / "Di ayat ini tidak ada hal baru."
-- learnt: "Sebelum ayat ini, kita sudah mempelajari tujuh hal. Yang kita temui lagi di ayat ini
-  ada dua: X dan Y." — up to three are all named (`MAP_ALL`), of more two after "di antaranya"
-  (`MAP_NAMED_MORE`); "Tidak ada yang kita temui lagi di ayat ini." when none is.
+- learnt: "Sebelum ayat ini, kita sudah mempelajari empat hal. Yang kita temui lagi di ayat ini
+  ada tiga, di antaranya Y dan X." — named by RECENCY (`validate_narration.named_again`; decision
+  8: "preferring the ones taught most recently"): the most recently taught first, all of them up
+  to three (`MAP_ALL`), else the two most recent (`MAP_NAMED_MORE`); a step that occurs in every
+  ayah (`occurs.always`: tiga jenis kata) is counted and named only when nothing else is met
+  again ("… ada satu: tiga jenis kata."). The count is every step met again, so "di antaranya"
+  is said whenever not all are named. "Tidak ada yang kita temui lagi di ayat ini." when none
+  is. (The card keeps teaching order.)
 - later: up to three are all named, with the ayah that teaches them when that is an ayah of this
   surah — one ayah for all: "Ada dua hal lagi di ayat ini, yaitu Z dan W, tetapi baru kita bahas
   di ayat ketiga."; several: "…, tetapi baru kita bahas nanti: Z di ayat ketiga, serta W di ayat
@@ -1183,36 +1267,57 @@ python3 validate_map.py         # the rules, each on its own; the names against 
 python3 test_validate_map.py    # 39 planted faults
 ```
 
-**Rendering the lines (2026-10-13: prepared, NOT rendered).** Against the manifest before the
-curriculum, Al-Fatihah has 29 new lines (21 map lines; `concept:majrur` at ayah 1, `concept:marfu`
-at 2, `concept:alif-lam` at 3, `concept:manshub` at 6; and four that MOVED with their text and
-kept their audio: `3:concept:naat`, `4:concept:idhafah`, `6:concept:jumlah-filiyyah`,
-`7:concept:athaf`), 7 changed lines (the seven `learned`: they say the running total now) and 39
-fewer (the seven `map` lines of version 1, 17 "Konsep baru" lines, 15 wazan-exercise lines); every
-other line kept `text`, `audio` and `tokens` byte for byte. 32 lines carry no `audio` — the 21 map
-lines, the 4 new texts, the 7 closings — and play caption-only until rendered. Dry run: 32
-distinct texts, 4,304 characters, USD 0.34. In order, from `belajar/pipeline` (`OUT`: where the
+**Rendering the lines (2026-10-13: prepared, NOT rendered).** After the curriculum (21 map lines,
+four new "Konsep baru" texts, the seven closings that say the running total) and, the same day,
+the rework on it — the structure told item by item (24 lines for 7), `why_basic` in the quiz
+explanations, the new quiz plan, the reworded compositions and "Konsep baru" texts, lesson zero
+(two new lines, four reworded primer lines) — Al-Fatihah has 358 lines, 271 with `audio`, and
+**87 without** (86 distinct texts: the label-role intro of ayah 2 and of ayah 6 is one text). A
+line that moved with its text kept its audio, under whatever id it has now
+(`build_narration.manifest`: a recorded file is named by its text, so a line without a recording
+under its own id takes the recording of any line that said exactly its text): the five primer
+lines that were not reworded, the kalimah record's line, the moved "Konsep baru" lines. The 87
+play caption-only until rendered:
+
+| lesson | lines without audio |
+|---|---|
+| 0 (6) | `intro`, `primer:1`, `primer:4`, `primer:6`, `primer:8`, `next` |
+| 1 (14) | `map:new`, `map:learnt`, `map:later`, `w2:compose:2`, `w2:compose:3`, `w3:compose:1`, `w3:compose:6`, `w3:compose:7`, `concept:majrur`, `structure:1`–`4`, `learned` |
+| 2 (16) | the three `map:` lines, `w3:compose:3`, `w4:compose:5`, `concept:marfu`, `concept:jamak-mudzakkar-salim`, `structure:1`–`4`, `ex:sort-case:2:why`, `ex:sort-case:3:why`, `ex:label-role:intro`, `ex:label-role:2:why`, `learned` |
+| 3 (8) | the three `map:` lines, `w1:compose:4`, `concept:alif-lam`, `structure:1`–`2`, `learned` |
+| 4 (7) | the three `map:` lines, `structure:1`–`3`, `learned` |
+| 5 (12) | the three `map:` lines, `concept:fiil-mudhari`, `structure:1`–`3`, `ex:sort-case:1:why` … `4:why`, `learned` |
+| 6 (12) | the three `map:` lines, `concept:manshub`, `structure:1`–`3`, `ex:sort-case:1:why`, `ex:label-role:intro`, `ex:label-role:1:why`, `ex:label-role:2:why`, `learned` |
+| 7 (12) | the three `map:` lines, `structure:1`–`5`, `ex:sort-case:1:why`, `ex:sort-case:3:why`, `ex:label-role:3:why`, `learned` |
+
+Dry run: 86 distinct texts, 12,179 characters, USD 0.97; none is refused (no heavy letter without
+a respelling, no Latin term outside the dictionary). `--render` sends only the lines without
+`audio`, so the whole surah is the selection. In order, from `belajar/pipeline` (`OUT`: where the
 masters of record are, so the upload list sees every delivered file; without `--out` the files go
 to `pipeline/out` of this checkout):
 
 ```bash
 OUT=/path/to/the/checkout/with/the/masters/belajar/pipeline/out
-ONLY=""; for n in 1 2 3 4 5 6 7; do ONLY="$ONLY --only al-fatihah:${n}:map: --only al-fatihah:${n}:learned"; done   # bash
-for id in 1:concept:majrur 2:concept:marfu 3:concept:alif-lam 6:concept:manshub; do ONLY="$ONLY --only al-fatihah:${id}"; done
 
-# 0. What would be sent (no key read, nothing sent): must say 32 distinct texts.
-python3 render_narration.py $ONLY
+# 0. What would be sent (no key read, nothing sent): must say 86 distinct texts.
+python3 render_narration.py --surah al-fatihah
 # 1. Render (the one step that costs money) and deliver: the masters to $OUT/narration/kang-nandar/al-fatihah/<audio_name>.mp3
 #    (+ .json alignment), the delivered files to $OUT/delivery/kang-nandar/al-fatihah/<delivery_name>.mp3; the manifest
 #    gets each line's audio {url, ms, sha256} and tokens.
 python3 render_narration.py --render --i-approve-spend --voice-id aK834gEOxQEtviMPgurT --voice-name "Kang Nandar" \
-    --env-file /path/to/dakwah-lens/.env --out "$OUT" $ONLY
-# 2. The manifests are what the build gives, and valid (343 of 343 Al-Fatihah lines with audio).
+    --env-file /path/to/dakwah-lens/.env --out "$OUT" --surah al-fatihah
+# 2. The manifests are what the build gives, and valid (358 of 358 Al-Fatihah lines with audio).
 python3 build_narration.py --check && python3 validate_narration.py
 # 3. Every delivered file is on this machine as described; write the upload list.
 python3 encode_narration.py --check --out "$OUT" --list "$OUT/delivery/files.txt"
 # 4. Upload the listed files, check each as served ("Before a deploy", steps 3 and 4), commit the manifest, push.
 ```
+
+Four lines got their `audio` entry back from the repository's history through that carry-over
+(their texts are again exactly what was recorded: `0:concept:kalimah-isim-fiil-huruf`, said as
+`1:concept:kalimah-isim-fiil-huruf` until the curriculum; `7:ex:label-role:intro`, `:1:why`,
+`:2:why`). Step 3 (`encode_narration.py --check`) is what proves their files are still on the
+machine with the masters, and "Before a deploy" that they are still served.
 
 `[[ma'rifah]]` (the alif lam text says it) is in the pronunciation dictionary with `approved:
 "pending-ear-check 2026-10-13"`: listen to `al-fatihah:3:concept:alif-lam` after the render.
@@ -1255,20 +1360,22 @@ lines; `version` is the format version, 2):
 | `tokens` | after a render: the karaoke caption, `[{t, s, e}]`, one per spoken word (a multi-word term such as حَرْف جَرّ is one word), `t` its display text, `s`/`e` seconds from the start of that file |
 
 **Ids** (the step-id contract shared with the runner and the exercises): `${slug}:${ayah}:${part}`,
-in lesson order:
+in lesson order — `ayah` an ayah's number, or `0` for the lines of lesson zero in the surah that
+hosts it (intro, primer:k, concept:<id>, next; see "Pelajaran nol"):
 
 | part | when | says | highlight / focus |
 |---|---|---|---|
 | `intro` | every ayah | which ayah, its translation (QuranEnc, in quotes on the caption), how many words | `[0]` |
 | `recite` | every ayah | one line before the imam recites the ayah | `[0]` |
 | `map:new`, `map:learnt`, `map:later` | every ayah of a surah with a lesson map (`content/map/<slug>.json`; "Peta pelajaran"), one line and one step per group; `map:learnt` once anything was learnt, `map:later` when the ayah has a postponed or a next-level topic | what is new in the ayah (named); how many steps were learnt before it and which come up again here (named); what a later lesson teaches (named, with the ayah) and how many next-level topics there are (counted, never named) | `[]`, focus `null` (its card is on the stage) |
-| `primer:${k}` | the ayah the harakat primer opens (Al-Fatihah 1) | the k-th sentence of the primer's frames | the words whose letters its frame shows as they are (بِ: `[1]`), focus `null` |
-| `w${n}` | every word | "Kata ke-n artinya: “gloss”." + the word's `why`, sanitised — or, when the word has a composition, + its `lead` ("Kata ini terdiri dari dua bagian."), since the frames say the why part by part | `[n]`, focus = that word |
+| `primer:${k}` | the lesson the harakat primer plays in: lesson zero ("ayah 0" of Al-Fatihah) since 2026-10-13, where its lines light nothing | the k-th sentence of the primer's frames | `[]` in lesson zero (no ayah on the stage); in an ayah's lesson the words whose letters its frame shows as they are (بِ: `[1]`); focus `null` |
+| `w${n}` | every word | "Kata ke-n artinya: “gloss”." + the word's `why`, sanitised (its `why_basic` when it has one: see "why_basic") — or, when the word has a composition, + its `lead` ("Kata ini terdiri dari dua bagian."), since the frames say the why part by part | `[n]`, focus = that word |
 | `w${n}:compose:${k}` | a word with a composition | the k-th sentence of its frames (strict: no Qur'anic word, spoken as authored) | `[n]`, focus = that word (the animation takes the card's place) |
 | `concept:${id}` | each step the ayah's lesson teaches that has a text, in the curriculum's order (`content/curriculum.json` `lessons[].lines`; "Kurikulum"): `id` the Konsep record's for a record taught whole, the step's for a step with a text of its own (`teach`) | "Konsep baru: title. summary" (a term spoken from Arabic script right after "Konsep baru:" is shown capitalised, as the caption shows it) | the words the step occurs on in this ayah (the curriculum's `words`: every majrur word for the step majrur; for a record, the words whose `concepts` list it and the words of the ayah's `structure.groups` of that concept — idhafah of 1:4: [1, 2, 3]) |
-| `structure` | every ayah with `structure` | the structure summary, sanitised | `[0]` |
+| `structure` | every ayah with `structure` and no `structure.items` | the structure summary, sanitised | `[0]` |
+| `structure:${k}` | each item of an ayah whose `structure` has `items` (see "Susunan kalimat per butir") | the item's `say`, spoken as authored (strict), the first after "Sekarang susunan kalimatnya." | the item's `words`, focus `null` |
 | `ex:${key}:intro` | each exercise of the ayah's quiz (`content/quiz/<slug>.json`) | what the exercise is, how many questions, the case groups of a sort (the form names of a wazan quiz: no basic lesson has one since 2026-10-13) | `[0]` for `tap-word`, else `[]` |
-| `ex:${key}:${n}:why` | each question n of those exercises | the ONE short explanation of the correct answer, said after "Benar." and after "Ini jawabannya." (operator 2026-10-10): tap — the word's place and gloss; why / sort — the word's `why` (+ "Jadi, kata ini <state>." when it does not name the state); role — "Perannya: <role head>." + the `why`; wazan — "Itu bentuk <label>" + its Konsep card's title. Only sourced fields, sanitised like every line | `[]` |
+| `ex:${key}:${n}:why` | each question n of those exercises | the ONE short explanation of the correct answer, said after "Benar." and after "Ini jawabannya." (operator 2026-10-10): tap — the word's place and gloss; why / sort — the word's `why_basic` when it has one, else its `why` (+ "Jadi, kata ini <state>." when it does not name the state); role — "Perannya: <role head>." + the `why`; wazan — "Itu bentuk <label>" + its Konsep card's title. Only sourced fields, sanitised like every line | `[]` |
 | `learned` | every ayah of a surah with a lesson map | what the ayah taught: its new steps, as the `map:new` line named them, and the running total ("Dengan itu, sudah tujuh hal yang kita pelajari.") | `[]`, focus `null` |
 | `recap` | every ayah | before the imam recites the ayah again | `[0]` |
 | `next` / `done` | `next` on every ayah but the last, `done` on the last | | `[]` |
@@ -1690,8 +1797,10 @@ fixed the plan; `quiz.py`'s docstring has the rules.
   every question, its answer first and its wrong options. The lesson page, its exercises
   (`src/lib/quiz-content.ts`), the autoplay engine (`availableExercises`, the explanation cue of
   each question) and the narration build all read it; nothing re-derives a question at render time.
-- **Authored** for Al-Fatihah (`authored/al-fatihah.quiz.json`): 63 questions in 2–3 exercises an
-  ayah; wrong options only from ayat already studied, of another cause (why-harakat) or sharing no
+- **Authored** for Al-Fatihah (`authored/al-fatihah.quiz.json`): 46 questions (63 until the plan
+  of 2026-10-13, on the basic curriculum: ayah 1 keeps tap-word only — no wrong option of
+  why-harakat is taught by then — and the roles asked are the ones each lesson taught) in 1–3
+  exercises an ayah; wrong options only from ayat already studied, of another cause (why-harakat) or sharing no
   term with the answer (label-role: never two correct options); sort bins = the case states taught
   so far (none at ayat 1, 3, 4). **Mechanical** for the Mu'awwidzat: the components' old rules,
   the wrong options drawn from the ayat studied so far (a question left without one is dropped);
@@ -1709,10 +1818,8 @@ fixed the plan; `quiz.py`'s docstring has the rules.
   `authored/al-fatihah.compose.json`). **REQUIRED**: the answer's case state and sign, every bin,
   every term an option's text names, every form label. `validate_quiz.py` fails on any gap that
   `authored/curriculum.pending.json` does not list (`quiz`: "<slug>:<ayah>:<exercise>:<n>" → the
-  untaught terms) — and on a listed question that is taught by now. The curriculum moved several
-  "Konsep baru" lines to later lessons, so 13 questions of Al-Fatihah ask a term before its lesson
-  until their lessons are reworded (2026-10-13: ayah 1 why-harakat 1–4, ayah 2 label-role 1–3,
-  ayah 3 and 4 why-harakat 1, ayah 7 label-role 1–4).
+  untaught terms) — and on a listed question that is taught by now. The list has no question
+  left (2026-10-13: the 13 of Al-Fatihah went with the new plan).
 - **Labels** carry the term table's Arabic at a term's first use in a text ("majrur (مَجْرُور)",
   merged with the text's own gloss: "na't (نَعْت, sifat)").
 

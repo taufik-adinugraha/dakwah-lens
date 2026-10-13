@@ -134,6 +134,9 @@ describe("every place that lists or links surahs reads the switch", () => {
       "src/app/[locale]/quran/[surah]/[ayah]/page.tsx", // ditto
       "src/components/lesson/LessonStage.tsx", // within its surah; the next surah via useUpNext
       "src/components/autoplay/useAutoplay.ts", // the hand-offs LessonStage asks for
+      // Lesson zero: on to the first ayah of the surah that hosts it (Al-Fatihah, published by
+      // default). The page is linked only where that surah is (the track page checks the switch).
+      "src/app/[locale]/quran/pengantar/page.tsx",
     ]);
     const files = readdirSync(join(BELAJAR, "src"), { recursive: true, encoding: "utf8" })
       .map((f) => `src/${f.split("\\").join("/")}`)

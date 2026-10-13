@@ -100,6 +100,10 @@ from common import (AUTHORED_DIR, CONTENT_DIR, PIPELINE, SURAH_BY_SLUG, bw_to_ar
 
 COMPOSE_DIR = CONTENT_DIR / "compose"
 VERSION = 1
+# The curriculum's lesson with no ayah (authored/curriculum.json lesson "0", kurikulum-dasar.md
+# decision 1: "A 'lesson zero' with no ayah opens the course. It teaches harakat and the three
+# kinds of word"). A primer whose `lesson` is this is played there, not by its ayah's lesson.
+LESSON_ZERO = "0"
 
 # ------------------------------------------------------------------ marks
 MARKS: dict[str, str] = {
@@ -838,7 +842,9 @@ def build(slug: str, lessons: dict[str, dict], corpus: Corpus, authored_path: Pa
     if raw.get("primer"):
         p = raw["primer"]
         built = build_unit(p, words, corpus, kind="primer")
-        out["primer"] = {"ayah": p.get("ayah"), **built, "sources": p.get("sources") or [], "status": "draft"}
+        # `lesson`: the lesson that plays the primer when that is not its ayah's (LESSON_ZERO).
+        out["primer"] = {"ayah": p.get("ayah"), **({"lesson": p["lesson"]} if "lesson" in p else {}), **built,
+                         "sources": p.get("sources") or [], "status": "draft"}
     else:
         out["primer"] = None
     out["words"] = {}
@@ -1027,7 +1033,10 @@ def problems(content: dict, lessons: dict[str, dict], corpus: Corpus | None = No
     if p is not None:
         w = f"{where} primer"
         if not isinstance(p, dict) or p.get("ayah") not in ayat:
-            errs.append(f"{w}: needs the ayah it opens (one of the lesson's ayat)")
+            errs.append(f"{w}: needs the ayah whose words it shows (one of the lesson's ayat)")
+        elif "lesson" in p and p["lesson"] != LESSON_ZERO:
+            errs.append(f"{w}: `lesson` is {LESSON_ZERO!r}, the lesson with no ayah that opens the course, or is left out "
+                        "(the primer then opens its own ayah's lesson)")
         else:
             errs += unit_problems(p, words, corpus, w, kind="primer", ayah=ayat[p["ayah"]])
     for loc, unit in (content.get("words") or {}).items():
@@ -1051,7 +1060,7 @@ def problems(content: dict, lessons: dict[str, dict], corpus: Corpus | None = No
 def unit_problems(unit: dict, words: dict[str, str], corpus: Corpus | None, w: str, *, kind: str,
                   word_ar: str | None = None, ayah: dict | None = None) -> list[str]:
     errs: list[str] = []
-    want = {"forms", "frames", "lines", "sources", "status"} | ({"loc", "ar", "lead"} if kind == "word" else {"ayah"})
+    want = {"forms", "frames", "lines", "sources", "status"} | ({"loc", "ar", "lead"} if kind == "word" else {"ayah", "lesson"})
     need = {"forms", "frames", "lines", "sources", "status"} | ({"loc", "ar"} if kind == "word" else {"ayah"})
     if not need <= set(unit) or set(unit) - want:
         errs.append(f"{w}: keys {sorted(unit)} (need {sorted(need)}, may also have {sorted(want - need)})")

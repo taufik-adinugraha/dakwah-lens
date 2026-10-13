@@ -26,9 +26,18 @@ const BASE = process.env.BASE_URL ?? "http://127.0.0.1:3300";
 // URL shape: plan L9 (hub → /quran track; Konsep/Kosakata at hub level).
 const AYAH_1 = "/belajar/id/quran/al-fatihah/1";
 const AYAH_2 = "/belajar/id/quran/al-fatihah/2";
+// LESSON ZERO, "Pengantar: harakat dan tiga jenis kata" (the basic curriculum's lesson with no ayah,
+// kurikulum-dasar.md decision 1; since 2026-10-13 the harakat primer plays there, not in Al-Fatihah
+// 1). Its path is src/lib/routes.ts introHref() (lesson-zero.test.ts checks they agree); in the
+// content its lines are the lines of "ayah 0" of Al-Fatihah.
+const INTRO = "/belajar/id/quran/pengantar";
+const ZERO_AYAH = 0;
+/** The page of an Al-Fatihah lesson: an ayah's, or lesson zero's (ayah 0). */
+const lessonPath = (ayah) => (ayah === ZERO_AYAH ? INTRO : `/belajar/id/quran/al-fatihah/${ayah}`);
 const PAGES = [
   ["hub", "/belajar/id"],
   ["track", "/belajar/id/quran"],
+  ["pengantar", INTRO],
   ["surah", "/belajar/id/quran/al-fatihah"],
   ["ayah-2", AYAH_2],
   ["ayah-7", "/belajar/id/quran/al-fatihah/7"],
@@ -100,7 +109,7 @@ async function settleScroll(page) {
 
 /**
  * "Berikutnya ›" until the lesson is on step `id` — the stage's data-step (LessonStage: "intro",
- * "primer", "w1:recite", "w1", "w1:compose", …): a step is reached by what it is, never by a count
+ * "primer" (lesson zero), "w1:recite", "w1", "w1:compose", …): a step is reached by what it is, never by a count
  * of clicks (the harakat primer and the composition steps, 2026-10-10, moved every step after them
  * and the karaoke check landed on a composition line). The lesson is paused first ("Jeda"), so it
  * cannot move on by itself between a look and a click (a step that ends on its own just then would
@@ -1189,7 +1198,7 @@ const KARAOKE = { slug: "al-fatihah", step: "w1", line: "al-fatihah:1:w1" };
  * word 1 — the KARAOKE caption (the narrator's current word filled forest, words said in ink,
  * words to come muted) under the large WORD CARD (the word's Arabic · transliteration · "yang
  * artinya …"), the mushaf words numbered with word 1 marked. "Berikutnya ›" jumps whole steps up to
- * the step named "w1" on the stage (toStep: intro → the ayah → what the ayah brings, a step per group → the harakat primer → the imam says
+ * the step named "w1" on the stage (toStep: intro → the ayah → what the ayah brings, a step per group → the imam says
  * word 1 → its explanation, whatever steps come between), then "↺ Ulangi langkah ini" plays the
  * explanation from its start — the replay control, and a start that holds even when the imam's
  * stream paused the lesson on the way — and the caption must be that line (data-line) with half
@@ -2272,7 +2281,7 @@ async function aheadChecks(page, vp, index) {
 
 /**
  * The composition animation on the stage's word-card slot (operator 2026-10-10, narration rule 14),
- * on the real page: the harakat primer (frame 2: fathah on its dotted circle, بَ "b + a"), then
+ * on the real pages: the harakat primer in lesson zero (frame 2: fathah on its dotted circle, بَ "b + a"), then
  * word 1 of Al-Fatihah 1 explained by its parts — its first frame [بِ] + [ٱسْمُ], MID-WAY through
  * the change frame (the dhammah fading into kasrah, مُ → مِ, u → i), the change settled, the
  * join (بِٱسْمِ, "bi + ismi → bismi"), and the LAST frame, the joined word exactly as the ayah
@@ -2367,7 +2376,9 @@ async function composedUnits() {
     const ayah = Number(loc.split(":")[1]);
     by.set(ayah, [...(by.get(ayah) ?? []), `word ${loc.split(":")[2]}`]);
   }
-  if (c.primer) by.set(c.primer.ayah, ["primer", ...(by.get(c.primer.ayah) ?? [])]);
+  // The primer is a unit of the lesson that plays it: its own ayah's, or lesson zero's (ayah 0).
+  const plays = c.primer?.lesson === "0" ? ZERO_AYAH : c.primer?.ayah;
+  if (c.primer) by.set(plays, ["primer", ...(by.get(plays) ?? [])]);
   return by;
 }
 
@@ -2386,7 +2397,7 @@ async function composeFitSweep(page, vp, size, ayat, units) {
     for (const ayah of ayat) {
       const want = new Set(units.get(ayah) ?? []);
       if (!want.size) continue;
-      await page.goto(BASE + `/belajar/id/quran/al-fatihah/${ayah}`, { waitUntil: "networkidle" });
+      await page.goto(BASE + lessonPath(ayah), { waitUntil: "networkidle" });
       await page.evaluate(() => document.fonts.ready);
       await page.locator('[data-autoplay="start"]').click();
       await settleScroll(page);
@@ -2480,12 +2491,13 @@ async function composeShots(page, vp, index) {
     throw new Error(`${vp}: the composition never reached ${sel}`);
   };
   try {
-    await page.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
+    // The harakat primer: LESSON ZERO's, right after its opening line (it opened Al-Fatihah 1,
+    // after the imam's ayah and the lesson map, until 2026-10-13).
+    await page.goto(BASE + INTRO, { waitUntil: "networkidle" });
     await page.evaluate(() => document.fonts.ready);
     await page.locator('[data-autoplay="start"]').click();
     await settleScroll(page);
     const replay = page.locator('[data-autoplay="replay"]');
-    // intro → the ayah → what the ayah brings → the harakat primer (Biasa: "Berikutnya ›" jumps whole steps)
     await toStep(page, vp, "primer");
     await setPace("Tunggu saya");
     await replay.click();
@@ -2494,9 +2506,14 @@ async function composeShots(page, vp, index) {
     await page.waitForTimeout(1600);
     await assertComposeLayout(page, vp);
     await assertComposeFits(page, `${vp}: primer`);
-    await shot("autoplay-ayah1-primer");
-    // → the imam says word 1 → its gloss line → its composition
+    await shot("autoplay-pengantar-primer");
+    // Ayah 1: intro → the ayah → what the ayah brings → the imam says word 1 → its gloss line →
+    // its composition (Biasa: "Berikutnya ›" jumps whole steps)
     await setPace("Biasa");
+    await page.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    await page.locator('[data-autoplay="start"]').click();
+    await settleScroll(page);
     await toStep(page, vp, "w1:compose");
     await setPace("Tunggu saya");
     await replay.click();
@@ -3337,6 +3354,133 @@ async function lessonMapChecks(page, vp, index) {
 }
 
 /**
+ * LESSON ZERO in a browser — "Pengantar: harakat dan tiga jenis kata" (the basic curriculum,
+ * kurikulum-dasar.md decision 1, operator-approved 2026-10-13: "A 'lesson zero' with no ayah opens
+ * the course. It teaches harakat and the three kinds of word (kalimah: isim, fi'il, huruf), so
+ * ayah 1 is lighter. The harakat primer and kalimah move out of 1:1 into lesson zero."). Its
+ * narration is answered in the browser (narrationRoute); what it must play is read from the
+ * content (content/curriculum.json lesson "0", content/narration/al-fatihah.json), never typed.
+ *   1. IT IS LISTED FIRST: on the track page and on the Al-Fatihah page the first link into a
+ *      lesson is its card ([data-intro-card] → INTRO), before any ayah's; Al-Fatihah 1 carries the
+ *      one quiet line for someone who lands there first ([data-intro-hint], a link to INTRO), and
+ *      ayah 2 does not.
+ *   2. THE SAME STAGE, WITH NO AYAH ON IT: one "Mulai pelajaran", and no word of a mushaf line
+ *      (no button[data-word]) before the start or while it plays.
+ *   3. ITS STEPS, by name (toStep): "intro" first; "primer" with the harakat primer's figure
+ *      (data-compose-kind "primer") in the card slot; then, for each step the curriculum teaches
+ *      there with a line, "concept:<id>" (its caption is the line "al-fatihah:0:concept:<id>") and
+ *      "concept:<id>:ex" with an example card; then "next". Al-Fatihah 1's lesson has no primer
+ *      step any more (checked on its page by composeShots, which reaches word 1 without one).
+ *   4. THE HAND-OVER: from "next", one "Berikutnya ›" ends the lesson and the page goes on to
+ *      Al-Fatihah 1 by itself — its address, and its stage live — as an ayah goes on to the next.
+ * Shots: the page before "Mulai" (stage; on a phone also the viewport), the primer, the concept
+ * line, its example. Works rendered or not (a line without audio is caption-only). Fails the job
+ * on 1–4.
+ */
+async function introChecks(page, vp, index) {
+  const read = async (rel) => JSON.parse(await readFile(path.join(BELAJAR_DIR, rel), "utf8"));
+  const curriculum = await read("content/curriculum.json");
+  const lines = (await read("content/narration/al-fatihah.json")).lines ?? {};
+  const zero = curriculum.lessons.find((l) => l.id === "0");
+  const taught = (zero?.lines ?? []).map((l) => l.line);
+  const fail = (m) => {
+    throw new Error(`${vp}: lesson zero — ${m}`);
+  };
+  if (!taught.length) fail('content/curriculum.json gives lesson "0" no “Konsep baru” line (it has no page)');
+  for (const part of ["intro", "primer:1", ...taught, "next"]) {
+    if (!lines[`al-fatihah:${ZERO_AYAH}:${part}`]) fail(`content/narration/al-fatihah.json has no line al-fatihah:${ZERO_AYAH}:${part}`);
+  }
+  const served = [];
+  const handler = narrationRoute(index, served);
+  await page.route(isNarration, handler);
+  const stage = page.locator('[data-autoplay="stage"]');
+  const next = page.locator('[data-autoplay="next"]');
+  const replay = page.locator('[data-autoplay="replay"]');
+  const step = () => stage.getAttribute("data-step");
+  /** The first link into a lesson (lesson zero or an ayah) inside <main>, as a path. */
+  const firstLessonLink = () =>
+    page.locator("main a[href]").evaluateAll((as) => {
+      const paths = as.map((a) => new URL(a.getAttribute("href"), location.href).pathname);
+      return paths.find((p) => /\/quran\/(?:pengantar|[a-z-]+\/\d+)$/.test(p)) ?? null;
+    });
+  const shot = async (name) => {
+    await stage.screenshot({ path: `shots/${vp}-${name}.png` });
+    console.log(`shot ${vp}-${name}`);
+  };
+  try {
+    // 1. Listed first, and pointed at from the first ayah.
+    for (const from of ["/belajar/id/quran", "/belajar/id/quran/al-fatihah"]) {
+      await page.goto(BASE + from, { waitUntil: "networkidle" });
+      const card = page.locator("main a[data-intro-card]");
+      if ((await card.count()) !== 1) fail(`${from}: ${await card.count()} lesson-zero card(s), expected one`);
+      const href = new URL(await card.first().getAttribute("href"), BASE).pathname;
+      if (href !== INTRO) fail(`${from}: the card links ${href}, not ${INTRO}`);
+      const first = await firstLessonLink();
+      if (first !== INTRO) fail(`${from}: the first lesson link is ${first}, not lesson zero's (${INTRO})`);
+    }
+    await page.goto(BASE + AYAH_1, { waitUntil: "networkidle" });
+    const hint = page.locator("main [data-intro-hint] a");
+    if ((await hint.count()) !== 1 || new URL(await hint.first().getAttribute("href"), BASE).pathname !== INTRO) {
+      fail(`${AYAH_1}: no quiet line that links lesson zero ([data-intro-hint] a → ${INTRO})`);
+    }
+    await page.goto(BASE + AYAH_2, { waitUntil: "networkidle" });
+    if ((await page.locator("[data-intro-hint]").count()) !== 0) fail(`${AYAH_2}: the line for a first-time visitor shows on another ayah than the first`);
+
+    // 2. The same stage, no ayah on it.
+    await page.goto(BASE + INTRO, { waitUntil: "networkidle" });
+    await page.evaluate((key) => localStorage.removeItem(key), `belajar:v1:autoplay:al-fatihah/${ZERO_AYAH}`);
+    await page.reload({ waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    if ((await stage.count()) !== 1) fail(`${INTRO}: no lesson stage`);
+    if ((await stage.locator("button[data-word]").count()) !== 0) fail("its stage shows words of a mushaf line: lesson zero has no ayah");
+    await shot("pengantar-before-start");
+    if (vp === "phone") await page.screenshot({ path: `shots/${vp}-pengantar-before-start-viewport.png` });
+    await page.locator('[data-autoplay="start"]').click();
+    await settleScroll(page);
+
+    // 3. Its steps, by name.
+    if (!(await until(page, async () => (await step()) === "intro", 10_000))) fail(`after "Mulai" the lesson is on "${await step()}", not on its opening line ("intro")`);
+    await toStep(page, vp, "primer");
+    await replay.click();
+    const figure = page.locator('[data-autoplay="composition"][data-compose-kind="primer"]');
+    await figure.first().waitFor({ state: "visible", timeout: 10_000 }).catch(() => fail('on the step "primer" the harakat primer\'s figure does not show'));
+    if ((await stage.locator("button[data-word]").count()) !== 0) fail("a mushaf word shows while the primer plays");
+    await shot("pengantar-primer");
+    for (const part of taught) {
+      await toStep(page, vp, part);
+      await replay.click();
+      const caption = page.locator(`[data-autoplay="caption"][data-line="al-fatihah:${ZERO_AYAH}:${part}"]`);
+      await caption.first().waitFor({ state: "attached", timeout: 10_000 }).catch(() => fail(`on the step "${part}" the caption is not its line al-fatihah:${ZERO_AYAH}:${part}`));
+      await shot(`pengantar-${part.replace(":", "-")}`);
+      await toStep(page, vp, `${part}:ex`);
+      // Reached paused: "↺ Ulangi" plays the step from its start, and its card shows.
+      await replay.click();
+      const example = page.locator('[data-autoplay="example"]');
+      await example.first().waitFor({ state: "visible", timeout: 10_000 }).catch(() => fail(`on the step "${part}:ex" no example card shows`));
+      await shot(`pengantar-${part.replace(":", "-")}-example`);
+    }
+    await toStep(page, vp, "next");
+
+    // 4. On to Al-Fatihah 1 by itself.
+    await next.click();
+    await page.waitForURL(/\/quran\/al-fatihah\/1(\?.*)?$/, { timeout: 20_000 }).catch(() => fail(`from its last step the lesson did not go on to ${AYAH_1} (still at ${page.url()})`));
+    await page.locator('[data-autoplay="panel"]').first().waitFor({ state: "visible", timeout: 15_000 }).catch(() => fail(`${AYAH_1} opened, and its lesson did not start by itself`));
+    const there = await step();
+    if (!there) fail(`${AYAH_1} opened after lesson zero, and its stage is not live`);
+    if (there === "primer") fail("Al-Fatihah 1 still plays the harakat primer");
+    console.log(`  lesson zero ok: listed first on the track and the surah page; intro → primer → ${taught.join(" → ")} (each with its example) → next → Al-Fatihah 1 by itself (on "${there}")`);
+  } catch (err) {
+    await page.screenshot({ path: `shots/${vp}-pengantar-FAILED.png`, fullPage: true }).catch(() => {});
+    console.error(`✗ ${vp}: the lesson zero check failed (on step "${await step().catch(() => null)}")`);
+    console.error(`  narration requests answered: ${served.length}`);
+    throw err;
+  } finally {
+    await page.unroute(isNarration, handler);
+  }
+  await page.goto("about:blank");
+}
+
+/**
  * A hidden address shows the module's own 404 in the browser: answered 404, and the page drawn is
  * src/app/[locale]/not-found.tsx ([data-not-found]) with its title (messages/id.json, never typed
  * here) visible inside <main>. The server HTML carries that page only in the RSC payload (Next
@@ -3415,10 +3559,12 @@ try {
     await exampleChecks(page, vp, narration);
     await quizVoiceCheck(page, vp, narration);
     await lessonMapChecks(page, vp, narration);
+    await introChecks(page, vp, narration);
     // Every composition frame fits at every text size (largest: all seven ayat; the others: ayah 1).
-    await composeFitSweep(page, vp, "normal", [1], units);
-    await composeFitSweep(page, vp, "besar", [1], units);
-    await composeFitSweep(page, vp, "sangat-besar", [1, 2, 3, 4, 5, 6, 7], units);
+    // Lesson zero (ayah 0: the harakat primer) with ayah 1 at every size; all of them at the largest.
+    await composeFitSweep(page, vp, "normal", [ZERO_AYAH, 1], units);
+    await composeFitSweep(page, vp, "besar", [ZERO_AYAH, 1], units);
+    await composeFitSweep(page, vp, "sangat-besar", [ZERO_AYAH, 1, 2, 3, 4, 5, 6, 7], units);
     await comingSoonCheck(page, vp);
     await endCardShots(page, vp, false);
     await ctx.close();

@@ -102,6 +102,9 @@ const EN: AutoplayTexts = {
   recap: "Listen to the whole ayah once more, and recite along with the imam.",
   next: ({ ayah }) => `This ayah's lesson is complete. Next: ayah ${ayah}.`,
   done: ({ surah }) => `This ayah's lesson is complete. It is the last ayah of surah ${surah}.`,
+  zeroIntro: ({ surah }) =>
+    `This is the introductory lesson, before the first ayah of Surah ${surah}. It covers two things: the vowel marks (harakat), and the three kinds of word in Arabic.`,
+  zeroNext: ({ surah }) => `The introductory lesson is complete. Next: the first ayah of Surah ${surah}; the lesson continues by itself.`,
   example: {
     word: ({ n, translit }) => `Example: word ${n}, ${translit}.`,
     other: ({ translit, surah, ayah }) => `Another example: ${translit}, in QS ${surah}:${ayah}.`,

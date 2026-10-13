@@ -435,6 +435,10 @@ export type AutoplayTexts = {
   recap: string;
   next: (a: { ayah: number }) => string;
   done: (a: { surah: string }) => string;
+  /** Lesson zero (the lesson with no ayah that opens the course): what it is for, and its
+   *  hand-over to the surah's first ayah. */
+  zeroIntro: (a: { surah: string }) => string;
+  zeroNext: (a: { surah: string }) => string;
   /** The caption of an example beat (shown, never spoken; operator 2026-10-12, plan L20). Plain
    *  words for adults: "klik" never "ketuk", no ALL CAPS, Latin transliteration at most. */
   example: {

@@ -95,6 +95,11 @@ type WordLike = Pick<Ayah["words"][number], "loc" | "ar" | "translit" | "gloss" 
 
 export type ExampleSource = {
   ayah: { surah: number; ayah: number; words: readonly WordLike[] };
+  /** A lesson with NO ayah (lesson zero): a concept's examples are then all words of other
+   *  places, so each is the imam's clip of its own ayah — the record's first
+   *  MAX_EXAMPLES_PER_RULE that have one and do not end their ayah (there the imam's stop
+   *  changes what is heard). */
+  zero?: boolean;
   /** What this ayah's lesson teaches as "Konsep baru" (curriculum.ts taughtIn): each with its
    *  examples, the one in this ayah first. */
   introduced: readonly { id: string; examples: readonly { loc: string; note: string }[] }[];
@@ -200,6 +205,31 @@ export function lessonExamples(src: ExampleSource): { examples: LessonExample[];
     const first = c.examples[0];
     const n = first ? numberOf.get(first.loc) : undefined;
     const step = `concept:${c.id}:ex`;
+    if (src.zero) {
+      const picks = c.examples.filter((x) => !!src.clips[x.loc] && !src.clips[x.loc].last && !!src.wordAt(x.loc)).slice(0, MAX_EXAMPLES_PER_RULE);
+      if (!picks.length) gaps.push({ step, rule: c.id, why: "the lesson has no ayah, and the concept has no example whose clip does not end its ayah" });
+      picks.forEach((x, k) => {
+        const word = src.wordAt(x.loc)!;
+        const at = placeOf(x.loc);
+        examples.push({
+          id: `concept:${c.id}:${k + 1}`,
+          of: "concept",
+          step,
+          frame: null,
+          key: x.loc,
+          word: null,
+          clip: src.clips[x.loc],
+          translit: word.translit,
+          gloss: word.gloss,
+          place: { surah: at.surah, ayah: at.ayah },
+          waqf: false,
+          washal: null,
+          ar: word.ar,
+          ending: null,
+        });
+      });
+      continue;
+    }
     if (!first || n === undefined) {
       gaps.push({ step, rule: c.id, why: first ? "its first example is not a word of this ayah" : "no word of this ayah carries it" });
       continue;

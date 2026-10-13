@@ -241,8 +241,14 @@ MUTATIONS = [
      "lesson 1:1: lines must be the steps that have a text"),
     ("a line dropped", built(lambda c: lesson(c, "1:3")["lines"].pop()), "lesson 1:3: lines must be the steps that have a text"),
     ("the running count off by one", built(lambda c: lesson(c, "1:4").__setitem__("before", 8)), "lesson 1:4: learnt before / after is 9 / 10"),
-    ("derived lists on a lesson with no ayah on disk", built(lambda c: lesson(c, "0").update(lines=[], map={"new": [], "learnt": [], "later": [], "lanjut": []})),
-     "lesson 0: a lesson whose ayah is on disk, and only such a lesson"),
+    # A segment of Ayat al-Kursi has no page yet; lesson zero has one since 2026-10-13.
+    ("derived lists on a lesson that has no page", built(lambda c: lesson(c, "2:255/1").update(lines=[], map={"new": [], "learnt": [], "later": [], "lanjut": []})),
+     "lesson 2:255/1: a lesson that has a page"),
+    ("lesson zero without its derived lists", built(lambda c: [lesson(c, "0").pop(k) for k in ("lines", "map")]),
+     "lesson 0: a lesson that has a page"),
+    ("lesson zero's line dropped", built(lambda c: lesson(c, "0")["lines"].pop()), "lesson 0: lines must be the steps that have a text"),
+    ("something met again in lesson zero", built(lambda c: lesson(c, "0")["map"]["learnt"].append({"id": "majrur", "here": False})),
+     "lesson 0: learnt must be every step of every earlier lesson"),
     # --- the content moved under the file
     ("a word newly tagged with a taught record", in_lesson("al-fatihah", lambda ayat: ayat[2]["words"][0]["concepts"].append("huruf-jar")),
      "lesson 1:3: learnt says huruf-jar does not occur in this ayah; it does"),
@@ -307,7 +313,7 @@ class Curriculum(unittest.TestCase):
         self.assertEqual({lid: {k: v for k, v in lesson(CONTENT, lid).items() if k in ("lines", "map")}
                           for lid in CUR.derive(AUTHORED, LESSONS, LIBRARY)},
                          CUR.derive(AUTHORED, LESSONS, LIBRARY))
-        self.assertEqual(sum(1 for l in CONTENT["lessons"] if "map" in l), 22)  # 7 + 6 + 5 + 4 ayat on disk
+        self.assertEqual(sum(1 for l in CONTENT["lessons"] if "map" in l), 23)  # lesson zero + 7 + 6 + 5 + 4 ayat on disk
 
     def test_new_and_learnt_are_always_apart_and_learnt_is_cumulative(self):
         # Decision 9: "separate new vs already knows concept" — and "learnt so far" is everything
@@ -361,10 +367,19 @@ class Curriculum(unittest.TestCase):
         for cid in CONTENT["lanjut"]:
             self.assertNotIn(f"concept:{cid}", said, cid)
         self.assertTrue(all(len(l.get("lines") or []) <= CUR.MAX_STEPS for l in CONTENT["lessons"]))
-        # Lesson zero has no ayah: the kalimah record has a text and no lesson to say it in yet.
-        self.assertNotIn("concept:kalimah-isim-fiil-huruf", said)
-        self.assertEqual(lesson(CONTENT, "0")["steps"], ["harakat", "kalimah"])
-        self.assertNotIn("lines", lesson(CONTENT, "0"))
+        # Lesson zero has no ayah and has its page since 2026-10-13 (a harakat primer is played
+        # there: content/compose primer.lesson "0"): the kalimah record's line is said there, with
+        # no word to light; harakat is taught by the primer's own lines, so it has no such line.
+        zero = lesson(CONTENT, "0")
+        self.assertEqual(zero["steps"], ["harakat", "kalimah"])
+        self.assertEqual(zero["lines"], [{"line": "concept:kalimah-isim-fiil-huruf", "step": "kalimah", "words": []}])
+        self.assertEqual(zero["map"], {"new": ["harakat", "kalimah"], "learnt": [], "later": [], "lanjut": []})
+        self.assertTrue(CUR.zero_written())
+        self.assertEqual(CUR.ayah_lesson(1, CUR.ZERO_AYAH), CUR.LESSON_ZERO)
+        # Without a primer played there it is a lesson with no page, like a segment of a long ayah.
+        self.assertNotIn(CUR.LESSON_ZERO, CUR.written(AUTHORED, LESSONS, zero=False))
+        self.assertNotIn(CUR.LESSON_ZERO, CUR.derive(AUTHORED, LESSONS, LIBRARY, zero=False))
+        self.assertEqual(CUR.derive(AUTHORED, LESSONS, LIBRARY, zero=True)[CUR.LESSON_ZERO], {"lines": zero["lines"], "map": zero["map"]})
 
     def test_where_a_step_occurs(self):
         a1, a2, a3 = (LESSONS["al-fatihah"]["ayat"][i] for i in range(3))

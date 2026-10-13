@@ -22,6 +22,7 @@ export * from "./exercises";
 export * from "./examples";
 export * from "./curriculum";
 export * from "./lessonMap";
+export * from "./zero";
 export * from "./narration";
 export * from "./texts";
 export * from "./sequence";

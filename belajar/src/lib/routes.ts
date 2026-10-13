@@ -36,6 +36,17 @@ export const quranHref = () => `/${QURAN}`;
 export const surahHref = (slug: string) => `/${QURAN}/${slug}`;
 
 /**
+ * The path segment of LESSON ZERO under the track — "Pengantar", the curriculum's lesson with no
+ * ayah that opens the course (harakat and the three kinds of word; kurikulum-dasar.md decision
+ * 1). No surah has this slug (SURAH_SLUGS), so the static route wins over /quran/[surah] and
+ * the proxy's surah gate lets it through: it is published whenever the track is.
+ */
+export const INTRO_SEGMENT = "pengantar";
+
+/** Lesson zero: /quran/pengantar. */
+export const introHref = () => `/${QURAN}/${INTRO_SEGMENT}`;
+
+/**
  * One ayah's lesson; with `wordLoc` ("1:2:3"), straight to that word's card
  * ("#w-1-2-3", the id WordCard renders).
  */

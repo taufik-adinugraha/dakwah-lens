@@ -91,8 +91,11 @@ jobs:
       # lesson (its lines, new / learnt so far / later / next-level) are the ones the lessons give.
       # The term-order check itself runs with the narration and the quizzes, below, against the
       # list of what is still to be reworded (pipeline/authored/curriculum.pending.json: an entry
-      # that is not found any more fails as well as a use that is not listed). Before the quizzes,
-      # the lesson map and the narration, which read it. Stdlib only, no network.
+      # that is not found any more fails as well as a use that is not listed). Lesson zero (plan
+      # L29, decision 1: the lesson with no ayah) counts as written once a harakat primer is played
+      # there (content/compose `primer.lesson` "0"): its line and its map are derived like an
+      # ayah's. Before the quizzes, the lesson map and the narration, which read it. Stdlib only,
+      # no network.
       - name: Curriculum — up to date
         run: python3 pipeline/build_curriculum.py --check
       - name: Curriculum — validate
@@ -153,10 +156,15 @@ jobs:
         run: python3 pipeline/test_validate_map.py
 
       # … and no term before its lesson (plan L26, decision 7): every grammar term a line says —
-      # found in its prose through the pronunciation dictionary, so in any spelling — belongs to a
-      # step already taught by then, or the line is listed with that term in
-      # pipeline/authored/curriculum.pending.json; an unlisted use fails, and so does a listed one
-      # that is gone (the main session rewords the lines and the list shrinks to nothing).
+      # found in its prose through the pronunciation dictionary, so in any spelling, and through
+      # the term table's own Latin forms where the dictionary has no entry (nafi, zharaf, a form
+      # with -nya) — belongs to a step already taught by then, or the line is listed with that
+      # term in pipeline/authored/curriculum.pending.json; an unlisted use fails, and so does a
+      # listed one that is gone (Al-Fatihah's part of the list is empty since 2026-10-13).
+      # Also here (plan L27–L29): an ayah's structure told item by item (`structure:1…n`, each
+      # lighting its own words, spoken as authored and never split), the narrated `why_basic` of a
+      # word, and the lines of lesson zero (`<slug>:0:…`: intro, the harakat primer, the kalimah
+      # record's line, next), which Al-Fatihah 1 must no longer play.
       - name: Narration — manifests up to date
         run: python3 pipeline/build_narration.py --check
       - name: Narration — validate manifests
@@ -290,6 +298,7 @@ jobs:
           for path in /belajar/id /belajar/en /belajar/id/kredit /belajar/id/konsep \
                       /belajar/id/konsep/harakat /belajar/en/konsep/harakat /belajar/id/konsep/huruf-jar \
                       /belajar/id/quran /belajar/en/quran \
+                      /belajar/id/quran/pengantar /belajar/en/quran/pengantar \
                       /belajar/id/quran/al-fatihah /belajar/id/quran/al-fatihah/1 \
                       /belajar/id/quran/al-fatihah/7 /belajar/en/quran/al-fatihah/5; do
             code="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:3300${path}")"
@@ -325,6 +334,26 @@ jobs:
           [[ "$(grep -o 'href="/belajar/id/konsep"' <<<"$hub" | wc -l)" -ge 2 ]]
           track="$(curl -fsS http://127.0.0.1:3300/belajar/id/quran)"
           grep -q 'href="/belajar/id/quran/al-fatihah"' <<<"$track"
+          # Lesson zero, "Pengantar: harakat dan tiga jenis kata" (the basic curriculum's lesson with
+          # no ayah, kurikulum-dasar.md decision 1; plan L27): listed FIRST on the track page and on
+          # the Al-Fatihah page — its card stands before the first ayah link —, its page carries the
+          # same single "Mulai pelajaran" and the narration it plays, and Al-Fatihah 1 points a
+          # first-time visitor at it. Its steps in a browser: screenshots.mjs introChecks.
+          surah_page="$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/al-fatihah)"
+          for html in "$track" "$surah_page"; do
+            grep -q 'data-intro-card' <<<"$html" || { echo "✗ no lesson-zero card on the track or the Al-Fatihah page"; exit 1; }
+            first="$(grep -oE 'href="/belajar/id/quran/(pengantar|al-fatihah/[0-9]+)"' <<<"$html" | sed -n 1p || true)"
+            [[ "$first" == 'href="/belajar/id/quran/pengantar"' ]] || { echo "✗ the first lesson link is ${first}, not lesson zero's"; exit 1; }
+          done
+          intro="$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/pengantar)"
+          grep -q 'data-autoplay="start"' <<<"$intro" || { echo "✗ /quran/pengantar: no autoplay start button"; exit 1; }
+          grep -q '<span>Mulai pelajaran</span>' <<<"$intro" || { echo "✗ /quran/pengantar: Mulai pelajaran label missing"; exit 1; }
+          grep -q '/belajar/media/narration/kang-nandar/al-fatihah/' <<<"$intro" || { echo "✗ /quran/pengantar carries no narration audio"; exit 1; }
+          grep -q 'href="/belajar/id/quran/al-fatihah/1"' <<<"$intro" || { echo "✗ /quran/pengantar does not lead to Al-Fatihah 1"; exit 1; }
+          if grep -qiE '\b(ketuk|mengetuk|diketuk)\b' <<<"$intro"; then echo "✗ /quran/pengantar: says ketuk (use klik)"; exit 1; fi
+          ayah1="$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/al-fatihah/1)"
+          grep -q 'data-intro-hint' <<<"$ayah1" || { echo "✗ Al-Fatihah 1 does not point a first-time visitor at lesson zero"; exit 1; }
+          if grep -q 'data-intro-hint' <<<"$(curl -fsS http://127.0.0.1:3300/belajar/id/quran/al-fatihah/2)"; then echo "✗ Al-Fatihah 2 carries ayah 1's line about lesson zero"; exit 1; fi
           # Ayah chips on the track page: hub → track → ayah N is two taps.
           grep -q 'href="/belajar/id/quran/al-fatihah/7"' <<<"$track"
           # The lesson page carries the streamed recitation + the AI-assisted footer. ONE imam

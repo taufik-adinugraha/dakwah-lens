@@ -80,7 +80,13 @@ export type SequenceInput = {
   surahName: string;
   /** Number of ayat in the surah (the last one ends with "done"). */
   ayahCount: number;
-  ayah: Ayah;
+  ayah: Pick<Ayah, "ayah" | "words" | "structure">;
+  /** LESSON ZERO (the basic curriculum's lesson with no ayah, decision 1: "A 'lesson zero' with
+   *  no ayah opens the course. It teaches harakat and the three kinds of word"): `ayah` is then
+   *  its place in the manifest — number 0, no word — and the sequence has no recitation of an
+   *  ayah and no recap: its opening line, the harakat primer, the "Konsep baru" line of each
+   *  step it teaches with the examples the imam recites, and the hand-over to ayah 1. */
+  zero?: boolean;
   /** What this ayah's lesson teaches as "Konsep baru", in the order said (curriculum.ts taughtIn):
    *  a whole Konsep record (`id` its id) or a step's own text (`id` the step's); `words`: the
    *  words of the ayah its line lights (else: the words tagged with a record of that id). */
@@ -226,24 +232,29 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
     });
   const withBeats = (beats: ExampleBeat[]) => (beats.length ? { examples: beats } : {});
 
+  const zero = input.zero === true;
+  // No ayah on the stage of lesson zero: nothing for the spotlight to point at.
+  const onAyah = zero ? [] : [line];
   const steps: AutoplayStep[] = [];
   steps.push(
     step({
       id: "intro",
       kind: "intro",
-      cues: [cue(p("intro"), texts.intro({ surah: input.surahName, ayah: n, total: input.ayahCount }), [line])],
-      guides: [line],
+      cues: [cue(p("intro"), zero ? texts.zeroIntro({ surah: input.surahName }) : texts.intro({ surah: input.surahName, ayah: n, total: input.ayahCount }), onAyah)],
+      guides: onAyah,
     }),
   );
-  steps.push(
-    step({
-      id: "recite",
-      kind: "recite_ayah",
-      cues: [cue(p("recite"), texts.recite, [line])],
-      guides: [line],
-      recite: { target: "ayah" },
-    }),
-  );
+  if (!zero) {
+    steps.push(
+      step({
+        id: "recite",
+        kind: "recite_ayah",
+        cues: [cue(p("recite"), texts.recite, [line])],
+        guides: [line],
+        recite: { target: "ayah" },
+      }),
+    );
+  }
 
   // What this ayah brings, before its words (plan L23, L26): ONE step per group of the card, in
   // step with the narrator (each waits for "Lanjut" in the "Tunggu saya" pace, and "↺ Ulangi"
@@ -417,9 +428,11 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
     steps.push(step({ id: "learned", kind: "learned", cues: [cue(p("learned"), said)], guides: [] }));
   }
 
-  steps.push(
-    step({ id: "recap", kind: "recap", cues: [cue(p("recap"), texts.recap, [line])], guides: [line], recite: { target: "ayah" } }),
-  );
+  if (!zero) {
+    steps.push(
+      step({ id: "recap", kind: "recap", cues: [cue(p("recap"), texts.recap, [line])], guides: [line], recite: { target: "ayah" } }),
+    );
+  }
 
   const last = n >= input.ayahCount;
   if (last) {
@@ -432,7 +445,8 @@ export function buildAutoplaySequence(input: SequenceInput): AutoplaySequence {
       }),
     );
   } else {
-    steps.push(step({ id: "next", kind: "next", cues: [cue(p("next"), texts.next({ ayah: n + 1 }))], guides: [] }));
+    const said = zero ? texts.zeroNext({ surah: input.surahName }) : texts.next({ ayah: n + 1 });
+    steps.push(step({ id: "next", kind: "next", cues: [cue(p("next"), said)], guides: [] }));
   }
 
   const skipGuide: Guide = { target: "skip", label: texts.guide.skip };

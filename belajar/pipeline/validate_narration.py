@@ -288,9 +288,45 @@ def taught_lines(ayah: dict, curriculum: dict | None) -> list[dict]:
 
 
 def primer_of(compose: dict | None, ayah: int) -> dict | None:
-    """The harakat primer that opens this ayah, if any (content/compose/<slug>.json)."""
+    """The harakat primer this lesson plays, if any (content/compose/<slug>.json): the primer of
+    the lesson of its own `ayah` — or, when it says `lesson: "0"`, of lesson zero ("ayah 0":
+    lesson_zero) and of no ayah's lesson."""
     p = (compose or {}).get("primer")
-    return p if isinstance(p, dict) and p.get("ayah") == ayah else None
+    if not isinstance(p, dict):
+        return None
+    plays = CUR.ZERO_AYAH if p.get("lesson") == CUR.LESSON_ZERO else p.get("ayah")
+    return p if plays == ayah else None
+
+
+def lesson_zero(lesson: dict | None, compose: dict | None) -> dict | None:
+    """LESSON ZERO, as the narration sees it (decision 1 of kurikulum-dasar.md: "A 'lesson zero'
+    with no ayah opens the course. It teaches harakat and the three kinds of word (kalimah: isim,
+    fi'il, huruf), so ayah 1 is lighter. The harakat primer and kalimah move out of 1:1 into
+    lesson zero."): a pseudo-ayah with number 0 and no word, of the surah whose harakat primer
+    is played there (primer.lesson == "0"), or None for every other surah.
+
+    Its lines are "<slug>:0:<part>" in that surah's own manifest: intro, primer:1 … primer:n, the
+    "Konsep baru" line of each step the curriculum teaches in lesson "0" that has one (the
+    kalimah record), next. In the surah's manifest and not one of their own, so that a primer
+    line that moved there with its text unchanged keeps its recorded file (a file is named by
+    its text and lives in its manifest's folder)."""
+    if not lesson or primer_of(compose, CUR.ZERO_AYAH) is None:
+        return None
+    return {"ayah": CUR.ZERO_AYAH, "loc": f"{lesson['surah']}:{CUR.ZERO_AYAH}", "words": [], "zero": True}
+
+
+def lesson_ayat(lesson: dict | None, compose: dict | None) -> list[dict]:
+    """The lessons a surah's manifest narrates, in order: lesson zero when this surah hosts it,
+    then its ayat."""
+    zero = lesson_zero(lesson, compose)
+    return ([zero] if zero else []) + list((lesson or {}).get("ayat") or [])
+
+
+def zero_parts(zero: dict, compose: dict | None, curriculum: dict | None) -> list[str]:
+    """The parts of lesson zero's narration, in order."""
+    p = primer_of(compose, CUR.ZERO_AYAH) or {}
+    return (["intro"] + [f"primer:{k}" for k in range(1, len(p.get("lines") or []) + 1)]
+            + [t["line"] for t in taught_lines(zero, curriculum)] + ["next"])
 
 
 def composition_of(compose: dict | None, loc: str) -> dict | None:
@@ -318,6 +354,9 @@ def expected_parts(lesson: dict, library: dict, compose: dict | None = None,
     quiz = quiz if quiz is not None else QUIZ.load_content(lesson["slug"])
     curriculum = load_curriculum() if curriculum is None else curriculum
     out: dict[int, list[str]] = {}
+    zero = lesson_zero(lesson, compose)
+    if zero:
+        out[CUR.ZERO_AYAH] = zero_parts(zero, compose, curriculum)
     last = lesson["ayat"][-1]["ayah"]
     for a in lesson["ayat"]:
         entry = LESSONMAP.ayah_entry(lessonmap, a["ayah"])
@@ -471,6 +510,8 @@ def line_view(ayah: dict | None, part: str, compose: dict | None = None,
     record's own words (concept_words)."""
     if ayah is None:
         return [], None
+    if ayah.get("zero") and not PRIMER_PART.fullmatch(part):
+        return [], None  # lesson zero: no ayah, so nothing to light and no word card
     if part in ("intro", "recite", "structure", "recap", "ex:tap-word:intro"):
         return list(WHOLE_AYAH), None
     m = re.fullmatch(r"w([1-9]\d*)(?::compose:[1-9]\d*)?", part)
@@ -480,7 +521,9 @@ def line_view(ayah: dict | None, part: str, compose: dict | None = None,
     if PRIMER_PART.fullmatch(part):
         k = line_frame(ayah, part, compose)
         p = primer_of(compose, ayah["ayah"])
-        return (list(p["frames"][k - 1].get("words") or []) if p and k else []), None
+        # In lesson zero there is no ayah on the stage to light a word of (the frames show the
+        # letters themselves).
+        return (list(p["frames"][k - 1].get("words") or []) if p and k and not ayah.get("zero") else []), None
     if part.startswith("concept:"):
         own = next((t for t in (taught_lines(ayah, curriculum) if curriculum else []) if t["line"] == part), None)
         return (list(own["words"]) if own else concept_words(ayah, part.split(":", 1)[1])), None
@@ -1166,7 +1209,7 @@ def held(text: str, lex: Lexicon) -> list[str]:
 
 # ------------------------------------------------------------------ checks
 SLUG_ID = re.compile(
-    r"^(?P<slug>[a-z-]+):(?P<ayah>[1-9]\d*):(?P<part>intro|recite|map:(?:new|learnt|later)|primer:[1-9]\d*|w[1-9]\d*(?::compose:[1-9]\d*)?"
+    r"^(?P<slug>[a-z-]+):(?P<ayah>0|[1-9]\d*):(?P<part>intro|recite|map:(?:new|learnt|later)|primer:[1-9]\d*|w[1-9]\d*(?::compose:[1-9]\d*)?"
     r"|structure(?::[1-9]\d*)?|concept:[a-z0-9-]+|learned"
     r"|ex:(?:" + "|".join(EXERCISE_KEYS) + r"):(?:[a-z][a-z_]+|[1-9]\d*:why)|recap|next|done)(?::(?P<split>[a-z]))?$"
 )
@@ -1648,7 +1691,7 @@ def check_manifest(name: str, man, forms: Forms, lesson: dict | None, library: d
     rx = SHARED_ID if name == "shared" else SLUG_ID
     groups, gerrs = _split_groups(list(lines), rx, name)
     errs += gerrs
-    ayat = {a["ayah"]: a for a in lesson["ayat"]} if lesson else {}
+    ayat = {a["ayah"]: a for a in lesson_ayat(lesson, compose)}
     for lid, line in lines.items():
         if not isinstance(line, dict) or not LINE_KEYS <= set(line) or set(line) - LINE_KEYS - LINE_OPTIONAL:
             errs.append(f"{lid}: a line is {{text, display, highlight, focus, frame?, audio?, tokens?}}")
@@ -2231,7 +2274,7 @@ def letters_for(name: str, lessons: dict[str, dict], forms: Forms, compose: dict
     """(lid, line) → where that line of manifest `name` takes a letter term's shape
     (line_letters): what build_narration, render_narration and check_manifest all use, so the
     karaoke tokens of a render join to the caption the validator expects."""
-    ayat = {a["ayah"]: a for a in (lessons.get(name) or {}).get("ayat", [])}
+    ayat = {a["ayah"]: a for a in lesson_ayat(lessons.get(name), compose.get(name))}
 
     def letters(lid: str, line: dict):
         m = SLUG_ID.match(lid)

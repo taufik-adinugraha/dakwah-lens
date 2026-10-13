@@ -9,6 +9,7 @@ import {
   ayahLessonId,
   curriculumProblems,
   deriveLesson,
+  LESSON_ZERO,
   lessonAyah,
   lessonRanks,
   MAX_STEPS_PER_LESSON,
@@ -19,7 +20,7 @@ import {
   type CurriculumFile,
 } from "@/lib/autoplay";
 import { SURAHS } from "@/lib/content";
-import { CURRICULUM, taughtAt, taughtBefore } from "@/lib/curriculum";
+import { CURRICULUM, taughtAt, taughtBefore, taughtInZero, ZERO_HOST } from "@/lib/curriculum";
 import { LIBRARY } from "@/lib/library";
 
 import id from "../../../messages/id.json";
@@ -69,7 +70,8 @@ const LEARNT_BEFORE = [2, 4, 7, 9, 10, 13, 16];
 
 describe("the curriculum file is what the lessons give (the app's twin of pipeline/curriculum.py)", () => {
   it("every ayah on disk is a lesson, and its lines and lists equal the derivation", () => {
-    expect(curriculumProblems(CURRICULUM, SURAHS, LIBRARY.concepts)).toEqual([]);
+    expect(ZERO_HOST?.slug).toBe("al-fatihah");
+    expect(curriculumProblems(CURRICULUM, SURAHS, LIBRARY.concepts, true)).toEqual([]);
     let written = 0;
     for (const s of SURAHS) {
       for (const a of s.ayat) {
@@ -81,9 +83,24 @@ describe("the curriculum file is what the lessons give (the app's twin of pipeli
         written++;
       }
     }
-    // 7 + 4 + 5 + 6 ayat; the lesson with no ayah and the nine segments of Ayat al-Kursi have none yet.
+    // 7 + 4 + 5 + 6 ayat, and the lesson with no ayah, which has its page since 2026-10-13
+    // (lesson zero: the harakat primer is played there); the nine segments of Ayat al-Kursi have none yet.
     expect(written).toBe(22);
-    expect(CURRICULUM.lessons.filter((l) => l.map).length).toBe(22);
+    expect(CURRICULUM.lessons.filter((l) => l.map).length).toBe(23);
+    // Lesson zero: its steps are new, nothing was learnt before it, nothing occurs in it (no
+    // ayah, no word) — and its one "Konsep baru" line is the kalimah record's.
+    const zero = lesson(LESSON_ZERO);
+    expect([zero.steps, zero.map, zero.lines]).toEqual([
+      ["harakat", "kalimah"],
+      { new: ["harakat", "kalimah"], learnt: [], later: [], lanjut: [] },
+      [{ line: "concept:kalimah-isim-fiil-huruf", step: "kalimah", words: [] }],
+    ]);
+    expect(ayahLessonId(1, 0)).toBe(LESSON_ZERO);
+    expect(taughtInZero().map((x) => [x.id, x.whole, x.concept, x.words])).toEqual([["kalimah-isim-fiil-huruf", true, "kalimah-isim-fiil-huruf", []]]);
+    // The record's examples in the record's own order: none is "in this ayah".
+    expect(taughtInZero()[0].examples.map((e) => e.loc)).toEqual(LIBRARY.concepts.find((c) => c.id === "kalimah-isim-fiil-huruf")!.examples.map((e) => e.loc));
+    // Without a primer played there it has no page, and must have no lists.
+    expect(curriculumProblems(CURRICULUM, SURAHS, LIBRARY.concepts, false).join("\n")).toContain("lesson 0 has derived lists and no page");
     expect(deriveLesson(CURRICULUM, { ...FATIHAH.ayat[0], surah: 99 }, LIBRARY.concepts)).toBeNull();
   });
 
@@ -151,7 +168,7 @@ describe("the curriculum file is what the lessons give (the app's twin of pipeli
     const fault = (fn: (f: CurriculumFile) => void) => {
       const f = structuredClone(CURRICULUM) as CurriculumFile;
       fn(f);
-      return curriculumProblems(f, SURAHS, LIBRARY.concepts).join("\n");
+      return curriculumProblems(f, SURAHS, LIBRARY.concepts, true).join("\n");
     };
     const L = (f: CurriculumFile, lid: string) => f.lessons.find((l) => l.id === lid)!;
     const S = (f: CurriculumFile, sid: string) => f.steps.find((s) => s.id === sid)!;
@@ -161,8 +178,12 @@ describe("the curriculum file is what the lessons give (the app's twin of pipeli
     expect(fault((f) => L(f, "1:3").map!.later.push("idhafah"))).toContain("lesson 1:3: later");
     expect(fault((f) => L(f, "1:1").map!.lanjut.push("hal"))).toContain("lesson 1:1: lanjut");
     expect(fault((f) => (L(f, "1:1").lines![0].words = [1]))).toContain("lesson 1:1: lines are not what the lessons give");
-    expect(fault((f) => delete L(f, "1:4").map)).toContain("lesson 1:4 has an ayah on disk and no derived lists");
-    expect(fault((f) => (L(f, "0").map = { new: [], learnt: [], later: [], lanjut: [] }))).toContain("lesson 0 has derived lists and no ayah on disk");
+    expect(fault((f) => delete L(f, "1:4").map)).toContain("lesson 1:4 has a page and no derived lists");
+    expect(fault((f) => delete L(f, "0").map)).toContain("lesson 0 has a page and no derived lists");
+    expect(fault((f) => (L(f, "0").map!.new = []))).toContain("lesson 0: new");
+    expect(fault((f) => L(f, "0").map!.learnt.push({ id: "majrur", here: false }))).toContain("lesson 0: learnt");
+    expect(fault((f) => (L(f, "0").lines = []))).toContain("lesson 0: lines are not what the lessons give");
+    expect(fault((f) => (L(f, "2:255/1").map = { new: [], learnt: [], later: [], lanjut: [] }))).toContain("lesson 2:255/1 has derived lists and no page");
     expect(fault((f) => (L(f, "1:4").before = 8))).toContain("lesson 1:4: learnt before / after is 9 / 10");
     // a step moved: the lesson it left and the one it reached both stop adding up
     expect(fault((f) => (S(f, "naat").lesson = "1:1"))).toMatch(/step naat is not in teaching order|lesson 1:1: steps/);
@@ -248,8 +269,8 @@ describe("what an ayah's lesson teaches as “Konsep baru” (taughtAt: what con
         for (const t of got) expect(CURRICULUM.lanjut, `${a.loc} ${t.id}`).not.toContain(t.concept && t.whole ? t.concept : "");
       }
     }
-    // The lesson with no ayah is not built yet: the three kinds of word are taught there, so no
-    // ayah has that line; the same function over raw JSON gives the same.
+    // The three kinds of word are taught in lesson zero, the lesson with no ayah (lesson-zero.test.ts),
+    // so no ayah has that line; the same function over raw JSON gives the same.
     for (const s of SURAHS) for (const a of s.ayat) expect(taughtAt(a).map((t) => t.id), a.loc).not.toContain("kalimah-isim-fiil-huruf");
     expect(taughtIn(CURRICULUM, LIBRARY.concepts, FATIHAH.ayat[0])).toEqual(taughtAt(FATIHAH.ayat[0]));
   });
@@ -283,7 +304,7 @@ describe("a word card: a concept an earlier lesson taught, and no wazan at the b
     expect(at("1:2:1", "tanda-irab")).toBeNull();
     expect(at("1:6:2", "tanda-irab")).toBeNull(); // manshub: this lesson's
     // A next-level record is never "already learnt"; nor is a step of the lesson with no ayah
-    // (it has no ayah to point at, and is not built yet).
+    // (the card's sentence names an ayah, and lesson zero has none to point at).
     expect(at("1:3:1", "wazan-dan-tashrif")).toBeNull();
     expect(at("1:5:2", "kalimah-isim-fiil-huruf")).toBeNull();
     // Across surahs, in the curriculum's order: An-Nas repeats Al-Fatihah, Al-Falaq repeats An-Nas.

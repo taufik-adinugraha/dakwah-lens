@@ -82,6 +82,10 @@ export const ID_TEXTS: AutoplayTexts = {
   recap: "Dengarkan sekali lagi seluruh ayatnya, dan ikuti bacaan imam.",
   next: ({ ayah }) => `Pelajaran ayat ini selesai. Berikutnya, ayat ${ayah}.`,
   done: ({ surah }) => `Pelajaran ayat ini selesai. Ini ayat terakhir surah ${surah}.`,
+  // As the narration says them (pipeline/build_narration.py ZERO_INTRO, ZERO_NEXT).
+  zeroIntro: ({ surah }) =>
+    `Ini pelajaran pengantar, sebelum kita masuk ke ayat pertama Surah ${surah}. Ada dua hal yang kita kenali di sini: harakat, dan tiga jenis kata dalam bahasa Arab.`,
+  zeroNext: ({ surah }) => `Pelajaran pengantar selesai. Berikutnya ayat pertama Surah ${surah}; pelajaran berlanjut sendiri.`,
   // Short on purpose: the card beside it shows the word, its transliteration and its meaning, and
   // a beat lasts at least its caption's reading time (25 beats in Al-Fatihah).
   example: {

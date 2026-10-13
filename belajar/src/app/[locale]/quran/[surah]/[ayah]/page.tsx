@@ -28,13 +28,13 @@ import { Link } from "@/i18n/navigation";
 import { surahNamesFor } from "@/lib/ayat";
 import { composeFor } from "@/lib/compose-content";
 import { getAyah, getSurah, SURAH_INDEX, SURAHS } from "@/lib/content";
-import { stageExamples } from "@/lib/autoplay";
-import { taughtAt, taughtBefore } from "@/lib/curriculum";
+import { primerAyah, stageExamples } from "@/lib/autoplay";
+import { taughtAt, taughtBefore, ZERO_HOST } from "@/lib/curriculum";
 import { getConcept, getLexeme, LIBRARY, TERMS } from "@/lib/library";
 import { lessonMapInput } from "@/lib/map-content";
 import { quizAyah } from "@/lib/quiz-content";
 import { planOf } from "@/lib/quiz-plan";
-import { ayahHref, surahHref } from "@/lib/routes";
+import { ayahHref, introHref, surahHref } from "@/lib/routes";
 import { lessonCard, translationExcerpt } from "@/lib/og/text";
 import { alternatesFor, lessonShareable, pageUrl, shareMetadata } from "@/lib/share";
 import { headwordOf, lessonLookup } from "@/lib/terms";
@@ -130,6 +130,7 @@ export default async function AyahPage({
   const tp = await getTranslations("Player");
   const tm = await getTranslations("MainSite");
   const tshare = await getTranslations("Share");
+  const ti = await getTranslations("Intro");
 
   const playerWords = a.words.map((w, i) => ({
     index: i + 1,
@@ -180,7 +181,9 @@ export default async function AyahPage({
   const compose = composeFile
     ? {
         marks: composeFile.marks,
-        primer: composeFile.primer && composeFile.primer.ayah === a.ayah ? composeFile.primer : null,
+        // The primer opens the lesson of its own ayah — unless it is lesson zero's (Al-Fatihah's
+        // is, since 2026-10-13: /quran/pengantar plays it, and ayah 1 no longer does).
+        primer: composeFile.primer && primerAyah(composeFile.primer) === a.ayah ? composeFile.primer : null,
         words: Object.fromEntries(
           a.words.flatMap((w, i) => (composeFile.words[w.loc] ? [[i + 1, composeFile.words[w.loc]]] : [])),
         ),
@@ -257,6 +260,16 @@ export default async function AyahPage({
         <h1 className="mt-2 text-balance font-display text-3xl font-medium">
           <MixedText text={`${s.name_id} · ${t("ayah_of", { n: a.ayah, total: s.ayat.length })}`} />
         </h1>
+        {/* One quiet line for someone who lands on the first ayah first (2026-10-13): the harakat
+            primer is lesson zero's now, so this lesson starts with two things already learnt. */}
+        {ZERO_HOST?.slug === s.slug && a.ayah === s.ayat[0].ayah && (
+          <p data-intro-hint className="mt-1 text-base text-ink-muted">
+            {ti("ayah1_question")}{" "}
+            <Link href={introHref()} className="link-text font-medium">
+              {ti("ayah1_link")}
+            </Link>
+          </p>
+        )}
 
         {/* 2. The stage: ayah, translation and the autoplay lesson — one
             player. Keyed by ayah: the next ayah (reached by the lesson's own

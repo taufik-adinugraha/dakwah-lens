@@ -35,7 +35,9 @@ THE AUTHORED FILE (its own `_comment` has the full account):
   lanjut   the Konsep records of the next level ("tingkat lanjut", decision 6): a basic lesson
            names such a topic on its card and never teaches it.
 
-WHAT IS DERIVED (`derive`), per lesson whose ayah is on disk ("written"):
+WHAT IS DERIVED (`derive`), per lesson whose ayah is on disk ("written") — and for lesson zero
+once a surah's harakat primer is played there (`zero_written`; its `lines` light no word and
+nothing "occurs" in it, so it has `new` and nothing else):
 
   new      the lesson's steps, in the order listed;
   learnt   EVERY step of every earlier lesson, in teaching order, each with `here`: whether it
@@ -151,9 +153,28 @@ def place(lesson_id: str) -> tuple[int | None, int | None, int | None]:
     return int(m.group("surah")), int(m.group("ayah")), int(m.group("segment")) if m.group("segment") else None
 
 
+# The lesson with no ayah that opens the course (decision 1 of kurikulum-dasar.md: "A 'lesson
+# zero' with no ayah opens the course. It teaches harakat and the three kinds of word"). In the
+# narration its lines are the lines of "ayah 0" of the surah that hosts it ("al-fatihah:0:intro":
+# validate_narration.lesson_zero), so that a line that moved there keeps its recorded file.
+LESSON_ZERO = "0"
+ZERO_AYAH = 0
+
+
 def ayah_lesson(surah: int, ayah: int) -> str:
-    """The lesson id of a whole ayah."""
-    return f"{surah}:{ayah}"
+    """The lesson id of a whole ayah — and of "ayah 0", the place of lesson zero's lines."""
+    return LESSON_ZERO if ayah == ZERO_AYAH else f"{surah}:{ayah}"
+
+
+def zero_written(compose_dir: Path | None = None) -> bool:
+    """Does lesson zero have a page? It does when a surah's harakat primer is played there
+    (content/compose/<slug>.json: primer.lesson == "0"; compose.LESSON_ZERO) — the primer is the
+    lesson's first half, the kalimah record's line its second."""
+    for f in sorted((compose_dir or CONTENT_DIR / "compose").glob("*.json")):
+        primer = json.loads(f.read_text(encoding="utf-8")).get("primer")
+        if isinstance(primer, dict) and primer.get("lesson") == LESSON_ZERO:
+            return True
+    return False
 
 
 def ranks(cur: dict) -> dict[str, int]:
@@ -274,11 +295,15 @@ def tagged(ayah: dict) -> list[str]:
 
 
 # ------------------------------------------------------------------ the derivation
-def written(cur: dict, lessons: dict[str, dict]) -> dict[str, tuple[dict, dict]]:
-    """lesson id → (the surah's lesson content, the ayah) for every lesson whose ayah is on disk
-    (`lessons`: content/<slug>.json by slug). The lesson with no ayah and the segments of a long
-    ayah have no content yet."""
-    out: dict[str, tuple[dict, dict]] = {}
+def written(cur: dict, lessons: dict[str, dict], zero: bool | None = None) -> dict[str, tuple[dict | None, dict]]:
+    """lesson id → (the surah's lesson content, the ayah) for every lesson that has a page: an
+    ayah on disk (`lessons`: content/<slug>.json by slug) — and lesson zero once it has its page
+    (`zero`; default: read from content/compose, zero_written), with no surah and an "ayah" of
+    no word: nothing occurs in it, so its lines light nothing, nothing is met again there and
+    nothing of a later lesson is postponed. The segments of a long ayah have no content yet."""
+    out: dict[str, tuple[dict | None, dict]] = {}
+    if (zero_written() if zero is None else zero) and any(l.get("id") == LESSON_ZERO for l in cur.get("lessons") or []):
+        out[LESSON_ZERO] = (None, {"ayah": ZERO_AYAH, "words": []})
     for l in cur.get("lessons") or []:
         surah, ayah, segment = place(l["id"])
         spec = SURAH_BY_NUM.get(surah) if surah is not None and segment is None else None
@@ -289,10 +314,10 @@ def written(cur: dict, lessons: dict[str, dict]) -> dict[str, tuple[dict, dict]]
     return out
 
 
-def derive(cur: dict, lessons: dict[str, dict], library: dict) -> dict[str, dict]:
+def derive(cur: dict, lessons: dict[str, dict], library: dict, zero: bool | None = None) -> dict[str, dict]:
     """lesson id → {"lines", "map": {new, learnt, later, lanjut}} for every written lesson (module
     docstring, "WHAT IS DERIVED"). `cur`: the authored curriculum (or the built one: both list
-    `lessons`, `steps` and `lanjut` the same way)."""
+    `lessons`, `steps` and `lanjut` the same way). `zero`: lesson zero has a page (`written`)."""
     rank = ranks(cur)
     steps = in_teaching_order(cur)
     for s in steps:
@@ -300,7 +325,7 @@ def derive(cur: dict, lessons: dict[str, dict], library: dict) -> dict[str, dict
             raise CurriculumError(f"step {s.get('id')!r} is taught in lesson {s.get('lesson')!r}, which is not a lesson")
     next_level = set(cur.get("lanjut") or [])
     out: dict[str, dict] = {}
-    for lid, (_content, a) in written(cur, lessons).items():
+    for lid, (_content, a) in written(cur, lessons, zero).items():
         here = rank[lid]
         own = [s for s in steps if s["lesson"] == lid]
         carried = set(tagged(a))

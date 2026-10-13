@@ -102,8 +102,12 @@ export type CurriculumFile = {
 /** Decision 7: at most three new steps per lesson (pipeline/curriculum.py MAX_STEPS). */
 export const MAX_STEPS_PER_LESSON = 3;
 
-/** The lesson id of a whole ayah: "1:4". */
-export const ayahLessonId = (surah: number, ayah: number): string => `${surah}:${ayah}`;
+/** The curriculum's lesson with no ayah, which opens the course (decision 1). */
+export const LESSON_ZERO = "0";
+
+/** The lesson id of a whole ayah: "1:4" — and of "ayah 0", the place of lesson zero's lines in
+ *  the surah that hosts it (ids.ts ZERO_AYAH; pipeline/curriculum.py ayah_lesson). */
+export const ayahLessonId = (surah: number, ayah: number): string => (ayah === 0 ? LESSON_ZERO : `${surah}:${ayah}`);
 
 /** (surah, ayah) of a lesson that is one whole ayah; null for the lesson with no ayah and for a
  *  segment of a long ayah. */
@@ -206,7 +210,14 @@ export type CurriculumSurahs = readonly { ayat: readonly CurriculumAyah[] }[];
  * lesson with its derived lines and lists, and these equal the derivation; no other lesson has any;
  * the running counts add up; a step's line is its record's id (a whole record) or its own.
  */
-export function curriculumProblems(file: CurriculumFile, surahs: CurriculumSurahs, concepts: readonly Pick<Concept, "id">[]): string[] {
+export function curriculumProblems(
+  file: CurriculumFile,
+  surahs: CurriculumSurahs,
+  concepts: readonly Pick<Concept, "id">[],
+  /** Lesson zero has a page (a surah's harakat primer is played there: zero.ts hostsZero): it
+   *  is then a written lesson too, with the lists an "ayah" of no word gives. */
+  zero = false,
+): string[] {
   const out: string[] = [];
   const where = "content/curriculum.json";
   const rank = lessonRanks(file);
@@ -226,8 +237,9 @@ export function curriculumProblems(file: CurriculumFile, surahs: CurriculumSurah
     if (s.line !== line) out.push(`${where}: step ${s.id}: its line is ${line}, not ${s.line}`);
   }
   for (const c of file.lanjut) if (!known.has(c)) out.push(`${where}: lanjut names ${c}, which the library does not have`);
-  const ayat = new Map(surahs.flatMap((s) => s.ayat.map((a) => [ayahLessonId(a.surah, a.ayah), a] as const)));
-  for (const id of ayat.keys()) if (!rank.has(id)) out.push(`${where}: ${id} is an ayah with a lesson on disk and no lesson of the curriculum`);
+  const ayat = new Map<string, CurriculumAyah>(surahs.flatMap((s) => s.ayat.map((a) => [ayahLessonId(a.surah, a.ayah), a] as const)));
+  if (zero) ayat.set(LESSON_ZERO, { surah: 0, ayah: 0, words: [] });
+  for (const id of ayat.keys()) if (!rank.has(id)) out.push(`${where}: ${id} is ${id === LESSON_ZERO ? "the lesson with no ayah, which has a page," : "an ayah with a lesson on disk"} and no lesson of the curriculum`);
   let count = 0;
   for (const l of file.lessons) {
     const own = file.steps.filter((s) => s.lesson === l.id).map((s) => s.id);
@@ -237,11 +249,11 @@ export function curriculumProblems(file: CurriculumFile, surahs: CurriculumSurah
     count += own.length;
     const a = ayat.get(l.id);
     if (!a) {
-      if (l.map || l.lines) out.push(`${where}: lesson ${l.id} has derived lists and no ayah on disk`);
+      if (l.map || l.lines) out.push(`${where}: lesson ${l.id} has derived lists and no page (no ayah on disk; lesson zero: no primer played there)`);
       continue;
     }
     const want = deriveLesson(file, a, concepts);
-    if (!l.map || !l.lines) out.push(`${where}: lesson ${l.id} has an ayah on disk and no derived lists`);
+    if (!l.map || !l.lines) out.push(`${where}: lesson ${l.id} has a page and no derived lists`);
     else if (want) {
       for (const g of ["new", "learnt", "later", "lanjut"] as const) {
         if (JSON.stringify(l.map[g]) !== JSON.stringify(want.map[g])) {
@@ -334,9 +346,9 @@ export function taughtIn(file: Pick<CurriculumFile, "lessons" | "steps">, concep
 /**
  * The step that TAUGHT what a Konsep tag on a word shows, when an EARLIER lesson did: the whole
  * record's step, or — for a record that arrives in parts (i'rab) — the part this word shows (its
- * i'rab state). null: taught in this lesson or later, a next-level record, or a step with no ayah
- * to point at yet (the lesson with no ayah is not built). For the word card's "sudah dipelajari
- * di ayat N" under a concept chip.
+ * i'rab state). null: taught in this lesson or later, a next-level record, or a step of lesson
+ * zero (the lesson with no ayah: there is no ayah to point at, and the card's sentence names
+ * one). For the word card's "sudah dipelajari di ayat N" under a concept chip.
  */
 export function taughtEarlier(
   file: Pick<CurriculumFile, "lessons" | "steps">,

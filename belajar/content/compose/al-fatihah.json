@@ -36,6 +36,7 @@
   },
   "primer": {
     "ayah": 1,
+    "lesson": "0",
     "forms": {
       "ba-a": {
         "ar": "بَ",
@@ -206,7 +207,7 @@
     "lines": [
       {
         "frame": 1,
-        "say": "Sebelum membahas kata demi kata, kita kenali dulu harakat, yaitu tanda bunyi pada huruf Arab."
+        "say": "Sebelum mulai, kita kenali dulu harakat, yaitu tanda bunyi pada huruf Arab."
       },
       {
         "frame": 1,
@@ -218,7 +219,7 @@
       },
       {
         "frame": 3,
-        "say": "Kasrah adalah garis yang sama, tetapi di bawah huruf; bunyinya i. Huruf pertama ayat ini, huruf ba', memakai kasrah."
+        "say": "Kasrah adalah garis yang sama, tetapi di bawah huruf; bunyinya i. Huruf pertama Surah Al-Fatihah, huruf ba', memakai kasrah."
       },
       {
         "frame": 4,
@@ -226,7 +227,7 @@
       },
       {
         "frame": 5,
-        "say": "Ada tanda lain di ayat ini. Tanda kecil di atas huruf sin menandakan huruf mati, dibaca tanpa vokal."
+        "say": "Ada tanda lain di ayat pertama surah itu. Tanda kecil di atas huruf sin menandakan huruf mati, dibaca tanpa vokal."
       },
       {
         "frame": 5,
@@ -234,7 +235,7 @@
       },
       {
         "frame": 6,
-        "say": "Satu tanda lagi: alif kecil yang tegak di atas huruf mim pada kata ketiga."
+        "say": "Satu tanda lagi: alif kecil yang tegak di atas huruf mim pada kata ketiga ayat itu."
       },
       {
         "frame": 6,
@@ -5330,7 +5331,7 @@
   "data_versions": {
     "tanzil": "uthmani sha256:bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
     "qac": "0.4 sha256:a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
-    "authored_compose": "authored/al-fatihah.compose.json sha256:3aea4d3823ebc9ca999db19f4bfa6bcfc060dc911e8dc05312ba507a1b254e7f",
+    "authored_compose": "authored/al-fatihah.compose.json sha256:54e88db816fef4d322434babcb15492ae982c7f214737474096c1390919773ff",
     "quran_align": "release-2016-11-24 Alafasy_128kbps.json sha256:55c1353848d8f3140abab72bb5d1d4533476a8219f6241079a425d232f001eb7 (examples: the imam's voice of a bentuk dasar)"
   }
 }

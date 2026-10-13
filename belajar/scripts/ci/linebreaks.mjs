@@ -79,7 +79,11 @@ const VIEWPORTS = [
   ["desktop", { width: 1280, height: 900 }],
 ];
 /** The lesson stage, step by step: [ayah path, narrated (karaoke via the routed narration)?]. */
+// LESSON ZERO ("Pengantar": the curriculum's lesson with no ayah, 2026-10-13; src/lib/routes.ts
+// introHref). A page of its own under the track: no surah, although its path has a surah's shape.
+const INTRO_PATH = "/belajar/id/quran/pengantar";
 const LESSONS = [
+  [INTRO_PATH, false],
   ["/belajar/id/quran/al-fatihah/1", true],
   ["/belajar/id/quran/al-fatihah/2", false],
   ["/belajar/id/quran/al-fatihah/7", false],
@@ -181,9 +185,12 @@ async function staticPages(page, vp) {
   ];
   const surahs = [];
   const ayat = new Set();
+  let intro = false;
   if (await open(page, vp, "/belajar/id/quran"))
     for (const p of await paths(page, 'main a[href*="/quran/"]')) {
-      if (SURAH_PATH.test(p)) surahs.push(p);
+      // Lesson zero is no surah: left out of the surah harvest, measured as a page of its own.
+      if (p === INTRO_PATH) intro = true;
+      else if (SURAH_PATH.test(p)) surahs.push(p);
       else if (AYAH_PATH.test(p)) ayat.add(p);
     }
   for (const s of surahs) {
@@ -195,6 +202,8 @@ async function staticPages(page, vp) {
     const [sb, nb] = b.split("/").slice(-2);
     return surahs.findIndex((s) => s.endsWith(`/${sa}`)) - surahs.findIndex((s) => s.endsWith(`/${sb}`)) || Number(na) - Number(nb);
   };
+  pages.push(["pengantar", INTRO_PATH]);
+  if (!intro) record({ page: "/belajar/id/quran", viewport: vp, size: "-", kind: "nothing-measured", where: "track", detail: `the track does not link lesson zero (${INTRO_PATH})`, text: "" });
   pages.push(...surahs.map((s) => [`surah ${s.split("/").pop()}`, s]));
   pages.push(...[...ayat].sort(byAyah).map((a) => [`ayah ${a.split("/").slice(-2).join("/")}`, a]));
   pages.push(["konsep", "/belajar/id/konsep"]);

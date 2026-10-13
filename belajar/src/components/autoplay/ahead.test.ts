@@ -1069,13 +1069,15 @@ describe("the lesson played with the page's prefetcher (ahead.ts aheadUpdate + p
         expect(u.path).toEqual(lookaheadAudio(seq, first, { steps: LOOKAHEAD_STEPS }));
         const twoOn = seq.steps[2].cues.flatMap((c) => c.audio.map((f) => f.url));
         expect(u.path).toEqual([...u.wanted, ...twoOn]);
-        // … and from the harakat primer's step, whose step two ahead (the first word's line) is
-        // rendered: strictly further. (Until 2026-10-13 this was asked from the imam's step, two
-        // ahead of which the primer stood; the lesson map's three steps stand there now, and their
-        // lines have a file only once they are rendered.)
+        // … and from a step whose step two ahead IS rendered: strictly further. Found, not named
+        // (until 2026-10-13 it was the imam's step, then the harakat primer's — which is lesson
+        // zero's now; a step named here would be the next to move): the first one after the start
+        // whose step two on has a file. A bounded walk: a step that is gone must fail, not spin.
+        const at = seq.steps.findIndex((_, i) => i > 0 && (seq.steps[i + 2]?.cues ?? []).some((c) => c.audio.length > 0));
+        expect(at).toBeGreaterThan(0);
         let onPrimer = first;
-        while (seq.steps[onPrimer.idx].id !== "primer") onPrimer = reduceAutoplay(seq, onPrimer, { type: "next" });
-        expect(seq.steps[onPrimer.idx + 2].id).toBe("w1");
+        for (let k = 0; k < seq.steps.length && onPrimer.idx !== at; k++) onPrimer = reduceAutoplay(seq, onPrimer, { type: "next" });
+        expect(onPrimer.idx).toBe(at);
         const v = aheadUpdate(seq, onPrimer, { conn, soundLoading: false, heardFor: null });
         expect(v.wanted).toEqual(lookaheadAudio(seq, onPrimer, { steps: 1 }));
         expect(v.path.length).toBeGreaterThan(v.wanted.length);

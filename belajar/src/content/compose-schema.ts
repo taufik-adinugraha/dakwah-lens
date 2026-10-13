@@ -103,7 +103,10 @@ export const Composition = z.object({
 });
 export type Composition = z.infer<typeof Composition>;
 
-export const Primer = z.object({ ayah: z.number().int().positive(), ...ComposeUnit });
+/** `ayah`: the ayah whose words its frames show. `lesson`: the lesson that PLAYS it when that is
+ *  not that ayah's — "0", the curriculum's lesson with no ayah that opens the course (the basic
+ *  curriculum, decision 1; since 2026-10-13 the primer plays there and Al-Fatihah 1 does not). */
+export const Primer = z.object({ ayah: z.number().int().positive(), lesson: z.literal("0").optional(), ...ComposeUnit });
 export type Primer = z.infer<typeof Primer>;
 
 /**

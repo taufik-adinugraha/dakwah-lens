@@ -149,6 +149,19 @@
     "deeper_heading": "Learn more",
     "deeper_intro": "Click a title to open or close it."
   },
+  "Intro": {
+    "title": "Introduction: vowel marks and the three kinds of word",
+    "eyebrow": "Opening lesson",
+    "card_hint": "Before the first ayah: the marks on Arabic letters, then the three kinds of word.",
+    "card_cta": "Open the introduction",
+    "about": "The opening lesson, before the first ayah of Surah {surah}. It covers the vowel marks (harakat) on Arabic letters, then the three kinds of word in Arabic. After that the lesson continues by itself into the first ayah.",
+    "back_hint": "Back to the list of surahs",
+    "ayah1_question": "New to the vowel marks?",
+    "ayah1_link": "Start with the Introduction.",
+    "next": "Next: {surah}, ayah 1",
+    "deeper": "Learn more",
+    "harakat_page": "Harakat: every mark with its examples"
+  },
   "Word": {
     "meaning": "Meaning",
     "root": "Root",

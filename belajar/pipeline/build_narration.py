@@ -870,12 +870,37 @@ def map_closing(entry: dict, steps: dict) -> str:
 Line = tuple[str, str, dict | None, str]  # id, prose, ayah (None for shared lines), part
 
 
+# Lesson zero's own two sentences (2026-10-13; plain, for adults and seniors, no all-caps): what
+# the lesson is for, before its first line of the primer ("Sebelum mulai, kita kenali dulu
+# harakat …"), and the hand-over, in the words an ayah's "next" line uses ("Pelajaran ayat
+# pertama selesai. Berikutnya ayat kedua; pelajaran berlanjut sendiri.").
+ZERO_INTRO = ("Ini pelajaran pengantar, sebelum kita masuk ke ayat pertama Surah {surah}. Ada dua hal yang kita kenali di sini: "
+              "harakat, dan tiga jenis kata dalam bahasa Arab.")
+ZERO_NEXT = "Pelajaran pengantar selesai. Berikutnya ayat pertama Surah {surah}; pelajaran berlanjut sendiri."
+
+
 def surah_lines(lesson: dict, library: dict, san: Sanitiser, compose: dict | None = None,
                 quiz: dict | None = None, terms: Q.Terms | None = None, lessonmap: dict | None = None,
                 curriculum: dict | None = None) -> list[Line]:
     slug, S, name = lesson["slug"], lesson["surah"], lesson["name_id"]
     last = lesson["ayat"][-1]["ayah"]
     out: list[Line] = []
+    # LESSON ZERO (validate_narration.lesson_zero), in the surah that hosts it: what it is for, the
+    # harakat primer, the "Konsep baru" line of each step the curriculum teaches there that has
+    # one (the three kinds of word), and the hand-over to the surah's first ayah — worded like an
+    # ayah's own "next" line. The two sentences of its own (ZERO_INTRO, ZERO_NEXT) are the only
+    # text written for it; the rest is the primer's and the record's.
+    zero = V.lesson_zero(lesson, compose)
+    if zero:
+        Z = CUR.ZERO_AYAH
+        add0 = lambda part, text: out.append((f"{slug}:{Z}:{part}", text, zero, part))  # noqa: E731
+        add0("intro", ZERO_INTRO.format(surah=name))
+        for k, ln in enumerate(V.primer_of(compose, Z)["lines"], 1):
+            add0(f"primer:{k}", san.prose(ln["say"], S, Z, strict=f"{slug}:{Z}:primer:{k}"))
+        for t in V.taught_lines(zero, curriculum):
+            title, summary = CUR.taught_text(curriculum, library, t["step"])
+            add0(t["line"], f"{V.TITLE_LEAD} {_cap(san.prose(title, S, Z))}. {san.prose(summary, S, Z)}")
+        add0("next", ZERO_NEXT.format(surah=name))
     for a in lesson["ayat"]:
         A = a["ayah"]
         base = f"{slug}:{A}"
@@ -1062,22 +1087,28 @@ def manifest(lines: dict[str, dict], old: dict | None, lex: V.Lexicon, forms: V.
     The audio entry is the DELIVERED file's (64 kbps mono, encode_narration.py; operator
     2026-10-11), named by the text it speaks: a line whose text changed loses it here and plays
     caption-only until it is rendered, and delivered, again.
-    A line that MOVED keeps its audio too (the basic curriculum, 2026-10-13: a "Konsep baru" line
-    is said in another ayah, so its id changed and its text did not): a line id the old manifest
-    does not have takes the audio of an old line that says exactly its text and whose own id is
-    gone. Nothing is invented — the file is named by the text, the voice and its bytes
+    A line whose ID changed keeps its audio too: one that has no file of its own takes the file of
+    an old line that says EXACTLY its text. First for a line that moved (the basic curriculum,
+    2026-10-13: a "Konsep baru" line is said in another ayah); since the quiz was replanned the
+    same day also for a line that was renumbered (question 2's explanation is question 1's now,
+    while the id "…:2:why" lives on with another text) and for a line that says what another
+    still says (two exercise introductions) — the renderer treats identical texts the same way:
+    rendered once and copied (render_narration.py), sharing one set of timings. Nothing is
+    invented — the file is named by the text, the voice and its bytes
     (validate_narration.delivery_name), never by the line's place, and the tokens are that file's.
     `letters(lid, line)`: where the line's caption takes a letter's shape (V.line_letters)."""
     old_lines = (old or {}).get("lines") or {}
-    # Rendered lines of the old manifest whose id the new build no longer has, by their text.
-    moved: dict[str, dict] = {}
-    for lid, prev in old_lines.items():
-        if lid not in lines and isinstance(prev, dict) and "audio" in prev and isinstance(prev.get("text"), str):
-            moved.setdefault(prev["text"], prev)
+    # Every rendered line of the old manifest, by its text (the first one of a text).
+    said: dict[str, dict] = {}
+    for prev in old_lines.values():
+        if isinstance(prev, dict) and "audio" in prev and isinstance(prev.get("text"), str):
+            said.setdefault(prev["text"], prev)
     out = {}
     for lid, line in lines.items():
         new = dict(line)
-        prev = old_lines.get(lid) if lid in old_lines else moved.get(line["text"])
+        prev = old_lines.get(lid)
+        if not (isinstance(prev, dict) and prev.get("text") == line["text"] and "audio" in prev):
+            prev = said.get(line["text"])
         if isinstance(prev, dict) and prev.get("text") == line["text"] and "audio" in prev:
             new["audio"] = prev["audio"]
             if "tokens" in prev:

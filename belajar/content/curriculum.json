@@ -45,7 +45,23 @@
     "kalimah"
    ],
    "before": 0,
-   "after": 2
+   "after": 2,
+   "lines": [
+    {
+     "line": "concept:kalimah-isim-fiil-huruf",
+     "step": "kalimah",
+     "words": []
+    }
+   ],
+   "map": {
+    "new": [
+     "harakat",
+     "kalimah"
+    ],
+    "learnt": [],
+    "later": [],
+    "lanjut": []
+   }
   },
   {
    "id": "1:1",

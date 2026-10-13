@@ -1119,12 +1119,14 @@ describe("what the beats add to a lesson", () => {
     // Until 2026-10-13 a beat lasted its caption's captionMs (a 2.5 s settle for the eyes, never
     // under 5 s): 5.8 s for a one-line card, 240 s in all — "about four minutes to a lesson of
     // about seventy; no ayah more than 75 s". Plan L24: the reading alone (timing.ts exampleReadMs).
-    "Al-Fatihah: 26 beats add under two minutes to its lesson; no ayah more than 45 s",
+    "Al-Fatihah: 26 beats in its ayat and 2 in lesson zero add about two minutes to its lessons; no lesson more than 45 s",
     () => {
       const report = runAutoplayChecks({ ...input, property: { streams: 0, length: 0 } });
       expect(report.errors).toEqual([]);
       const rows = Object.entries(report.stats.examples).filter(([k]) => k.startsWith("al-fatihah/"));
       expect(rows.map(([k, r]) => [k, r.beats.length])).toEqual([
+        // Lesson zero: the three kinds of word, shown by two clips (isim and huruf in one word, a fi'il).
+        ["al-fatihah/0", 2],
         ["al-fatihah/1", 5],
         ["al-fatihah/2", 5],
         ["al-fatihah/3", 2],

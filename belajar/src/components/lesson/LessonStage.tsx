@@ -670,7 +670,8 @@ export function LessonStage({
       </div>
 
       <section ref={areaRef} aria-labelledby={`${uid}-guided`} className="relative isolate px-4 pt-3 pb-6 sm:px-7">
-        {showMushaf && (
+        {/* No mushaf line in lesson zero: it has no ayah (zero.ts), so no word to show or click. */}
+        {showMushaf && words.length > 0 && (
           <div ref={wordsRef} className="mt-2">
             <MushafLine
               ayah={ayah}
