@@ -3011,11 +3011,12 @@ async function exampleChecks(page, vp, index) {
  * manifests say) and every request recorded:
  *   1. each option of question 1 shows its terms' Arabic (the plan's text, content/quiz);
  *   2. a WRONG pick: no narration request at all for 2.5 s, and "Belum tepat" on screen;
- *   3. the RIGHT pick: shared:correct ("Benar."), then question 1's explanation line
- *      (al-fatihah:2:ex:label-role:1:why) — requested by its URL when the manifest has its audio,
- *      else shown as the caption (caption-only until it is rendered);
- *   4. question 2: two wrong picks, then "Tunjukkan jawaban": shared:revealed ("Ini jawabannya.")
- *      and question 2's explanation, the same way.
+ *   3. question 1 (it has three options: the reveal needs two wrong picks): a second wrong pick,
+ *      then "Tunjukkan jawaban": shared:revealed ("Ini jawabannya.") and question 1's explanation
+ *      line (al-fatihah:2:ex:label-role:1:why) — requested by its URL when the manifest has its
+ *      audio, else shown as the caption (caption-only until it is rendered);
+ *   4. question 2 (two options since the quiz follows the curriculum): the RIGHT pick:
+ *      shared:correct ("Benar."), then question 2's explanation, the same way.
  * Fails the job otherwise.
  */
 async function quizVoiceCheck(page, vp, index) {
@@ -3093,27 +3094,30 @@ async function quizVoiceCheck(page, vp, index) {
     await exercise.getByText("Belum tepat", { exact: false }).first().waitFor({ state: "visible", timeout: 5_000 });
     console.log("  quiz: a wrong pick plays no narration (Belum tepat on screen)");
 
-    // 3. The right pick: Benar., then the explanation of question 1.
-    mark = served.length;
-    await option(q1.options[0].from).click();
-    const afterCorrect = await said(shared["shared:correct"], mark, "Benar. (shared:correct)");
-    await said(lesson["al-fatihah:2:ex:label-role:1:why"], afterCorrect, "question 1's explanation, after Benar.");
-    await page.locator('[data-autoplay="stage"]').screenshot({ path: `shots/${vp}-quiz-ayah2-role-right.png` });
-    console.log(`shot ${vp}-quiz-ayah2-role-right`);
-
-    // 4. Question 2 (the lesson moves on by itself): two wrong picks, then Tunjukkan jawaban.
-    await exercise.getByText(`Soal 2 dari ${role.questions.length}`).waitFor({ state: "visible", timeout: 30_000 });
-    await page.waitForTimeout(800);
-    await option(q2.options[1].from).click();
+    // 3. Question 1, two wrong picks in all (one is made above), then Tunjukkan jawaban: "Ini
+    //    jawabannya." and the explanation of question 1. (The reveal needs two wrong picks, so it
+    //    is asked of the question with three options: since the quiz plan followed the
+    //    curriculum, question 2 has two, one of them wrong: 2026-10-14.)
+    if (q1.options.length < 3) throw new Error(`${vp}: label-role question 1 of Al-Fatihah 2 has ${q1.options.length} options; the reveal needs a question with three`);
+    await option(q1.options[2].from).click();
     await page.waitForTimeout(400);
-    await option(q2.options[2].from).click();
     const reveal = exercise.locator('[data-guide="exercise:label-role:reveal"]');
     await reveal.waitFor({ state: "visible", timeout: 5_000 });
     mark = served.length;
     await reveal.click();
     const afterRevealed = await said(shared["shared:revealed"], mark, "Ini jawabannya. (shared:revealed)");
-    await said(lesson["al-fatihah:2:ex:label-role:2:why"], afterRevealed, "question 2's explanation, after Ini jawabannya.");
-    console.log("  quiz: right → Benar. + its explanation; Tunjukkan jawaban → Ini jawabannya. + its explanation");
+    await said(lesson["al-fatihah:2:ex:label-role:1:why"], afterRevealed, "question 1's explanation, after Ini jawabannya.");
+
+    // 4. Question 2 (the lesson moves on by itself): the right pick, Benar. and its explanation.
+    await exercise.getByText(`Soal 2 dari ${role.questions.length}`).waitFor({ state: "visible", timeout: 30_000 });
+    await page.waitForTimeout(800);
+    mark = served.length;
+    await option(q2.options[0].from).click();
+    const afterCorrect = await said(shared["shared:correct"], mark, "Benar. (shared:correct)");
+    await said(lesson["al-fatihah:2:ex:label-role:2:why"], afterCorrect, "question 2's explanation, after Benar.");
+    await page.locator('[data-autoplay="stage"]').screenshot({ path: `shots/${vp}-quiz-ayah2-role-right.png` });
+    console.log(`shot ${vp}-quiz-ayah2-role-right`);
+    console.log("  quiz: Tunjukkan jawaban → Ini jawabannya. + its explanation; right → Benar. + its explanation");
   } catch (err) {
     await page.screenshot({ path: `shots/${vp}-quiz-voice-FAILED.png`, fullPage: true }).catch(() => {});
     console.error(`✗ ${vp}: the quiz voice check on Al-Fatihah 2 failed`);
